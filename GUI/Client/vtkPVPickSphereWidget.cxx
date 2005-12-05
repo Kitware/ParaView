@@ -52,7 +52,7 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVPickSphereWidget);
-vtkCxxRevisionMacro(vtkPVPickSphereWidget, "1.3");
+vtkCxxRevisionMacro(vtkPVPickSphereWidget, "1.4");
 
 //*****************************************************************************
 //----------------------------------------------------------------------------
@@ -163,13 +163,13 @@ int vtkPVPickSphereWidget::GetMouseControlToggleInternal()
   return -1;
 }
 
-void vtkPVPickSphereWidget::SetMouseControlToggle()
+void vtkPVPickSphereWidget::SetMouseControlToggle(int state)
 {
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->WidgetProxy->GetProperty("MouseControlToggle"));
   if (ivp)
     {
-    ivp->SetElements1(this->MouseControlToggle->GetSelectedState());
+    ivp->SetElements1(state);
     }
   this->WidgetProxy->UpdateVTKObjects();
 

@@ -38,9 +38,9 @@ public:
   // Description:
   // Threshold for collecting geometry to the client (vs. showing the outline
   // on the client).
-  void CollectCheckCallback();
-  void CollectThresholdScaleCallback();
-  void CollectThresholdLabelCallback();
+  void CollectCheckCallback(int state);
+  void CollectThresholdScaleCallback(double);
+  void CollectThresholdLabelCallback(double);
   void SetCollectThreshold(float val);
   vtkGetMacro(CollectThreshold, float);
 
@@ -48,8 +48,8 @@ public:
   // Tracing uses the method with the argument.
   // A reduction value of 1 is equivalent to having the feature
   // disabled.
-  void StillReductionCheckCallback();
-  void StillReductionFactorScaleCallback();
+  void StillReductionCheckCallback(int state);
+  void StillReductionFactorScaleCallback(double value);
   void SetStillReductionFactor(int val);
 
 protected:

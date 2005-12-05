@@ -99,14 +99,6 @@ public:
   vtkGetMacro(AnnotationChangedEvent, int);
 
   // Description:
-  // Callbacks
-  virtual void CheckButtonCallback();
-  virtual void CornerTextCallback(int i);
-  virtual void MaximumLineHeightCallback();
-  virtual void MaximumLineHeightEndCallback();
-  virtual void TextPropertyCallback();
-
-  // Description:
   // Access to sub-widgets
   virtual vtkKWCheckButton* GetCornerVisibilityButton()
     { return this->GetCheckButton(); };
@@ -133,6 +125,14 @@ public:
   // Access to the TextPropertyWidget from a script.
   vtkGetObjectMacro(TextPropertyWidget, vtkKWTextPropertyEditor);
   
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void CheckButtonCallback(int state);
+  virtual void CornerTextCallback(int i);
+  virtual void MaximumLineHeightCallback(double value);
+  virtual void MaximumLineHeightEndCallback(double value);
+  virtual void TextPropertyCallback();
+
 protected:
   vtkKWCornerAnnotationEditor();
   ~vtkKWCornerAnnotationEditor();

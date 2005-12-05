@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRadioButton );
-vtkCxxRevisionMacro(vtkKWRadioButton, "1.24");
+vtkCxxRevisionMacro(vtkKWRadioButton, "1.25");
 
 //----------------------------------------------------------------------------
 void vtkKWRadioButton::Create()
@@ -113,6 +113,18 @@ int vtkKWRadioButton::GetSelectedState()
 #endif
     }
   return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRadioButton::SetCommand(vtkObject *object, const char *method)
+{
+  this->Superclass::SetCommand(object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRadioButton::InvokeCommand(int)
+{
+  this->InvokeObjectMethodCommand(this->Command);
 }
 
 //----------------------------------------------------------------------------

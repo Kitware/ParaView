@@ -52,12 +52,12 @@ public:
 
   // Description:
   // Callback used when interaction has been performed.
-  virtual void AutoAcceptCallback();
-  virtual void ShowSourcesDescriptionCallback();
-  virtual void ShowSourcesNameCallback();
-  virtual void ShowTraceFilesCallback();
-  virtual void CreateLogFilesCallback();
-  virtual void StreamBlockCallback();
+  virtual void AutoAcceptCallback(int state);
+  virtual void ShowSourcesDescriptionCallback(int state);
+  virtual void ShowSourcesNameCallback(int state);
+  virtual void ShowTraceFilesCallback(int state);
+  virtual void CreateLogFilesCallback(int state);
+  virtual void StreamBlockCallback(int state);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.

@@ -86,17 +86,6 @@ public:
   vtkGetMacro(ScalarComponentChangedEvent, int);
 
   // Description:
-  // Callbacks
-  virtual void CheckButtonCallback();
-  virtual void SelectedComponentCallback(int);
-  virtual void ScalarBarTitleCallback();
-  virtual void ScalarBarLabelFormatCallback();
-  virtual void TitleTextPropertyCallback();
-  virtual void LabelTextPropertyCallback();
-  virtual void MaximumNumberOfColorsEndCallback();
-  virtual void NumberOfLabelsEndCallback();
-
-  // Description:
   // Set/Get the LabelFormat UI visibility, which might be a bit confusing
   virtual void SetLabelFormatVisibility(int i);
   vtkGetMacro(LabelFormatVisibility, int);
@@ -119,6 +108,17 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void CheckButtonCallback(int state);
+  virtual void SelectedComponentCallback(int);
+  virtual void ScalarBarTitleCallback(const char *value);
+  virtual void ScalarBarLabelFormatCallback(const char *value);
+  virtual void TitleTextPropertyCallback();
+  virtual void LabelTextPropertyCallback();
+  virtual void MaximumNumberOfColorsEndCallback(double value);
+  virtual void NumberOfLabelsEndCallback(double value);
 
 protected:
   vtkKWScalarBarAnnotation();

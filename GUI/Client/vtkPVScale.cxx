@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.73");
+vtkCxxRevisionMacro(vtkPVScale, "1.74");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -141,6 +141,18 @@ void vtkPVScale::CheckModifiedCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVScale::ScaleModifiedCallback(double)
+{
+  this->CheckModifiedCallback();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVScale::ScaleModifiedEndCallback(double)
+{
+  this->Trace();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVScale::EntryCheckModifiedCallback()
 {
   if (!this->EntryFlag)
@@ -191,10 +203,10 @@ void vtkPVScale::Create()
   this->Scale->Create();
   this->Scale->GetScale()->SetValueVisibility(this->DisplayValueFlag);
 
-  this->Scale->SetCommand(this, "CheckModifiedCallback");
+  this->Scale->SetCommand(this, "ScaleModifiedCallback");
   if (this->TraceSliderMovement)
     {
-    this->Scale->SetEndCommand(this, "Trace");
+    this->Scale->SetEndCommand(this, "ScaleModifiedEndCallback");
     }
   
   if (this->EntryFlag)

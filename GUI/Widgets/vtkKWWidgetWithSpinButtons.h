@@ -55,7 +55,7 @@ public:
   virtual void UpdateEnableState();
 
   // Description:
-  // Callbacks
+  // Callbacks. Internal, do not use.
   virtual void NextValueCallback() {};
   virtual void PreviousValueCallback() {};
 

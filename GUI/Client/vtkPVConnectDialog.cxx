@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.27");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.28");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create()
@@ -208,9 +208,9 @@ int vtkPVConnectDialog::GetPortNumber()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVConnectDialog::MPICheckBoxCallback()
+void vtkPVConnectDialog::MPICheckBoxCallback(int state)
 {
-  if ( this->MPIMode->GetWidget()->GetSelectedState() )
+  if (state)
     {
     this->MPINumberOfServers->EnabledOn();
     }

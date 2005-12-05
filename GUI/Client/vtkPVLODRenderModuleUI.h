@@ -54,14 +54,14 @@ public:
   
   // Description:
   // Callback for the interrupt render check button
-  void RenderInterruptsEnabledCheckCallback();
+  void RenderInterruptsEnabledCheckCallback(int state);
   void SetRenderInterruptsEnabled(int state);
   
   // Description:
   // Threshold for individual actors as number of points.
-  void LODThresholdScaleCallback();
-  void LODThresholdLabelCallback();
-  void LODCheckCallback();
+  void LODThresholdScaleCallback(double value);
+  void LODThresholdLabelCallback(double value);
+  void LODCheckCallback(int state);
 
   // Description:
   // This methods can be used from a script.  
@@ -72,8 +72,8 @@ public:
 
   // Description:
   // LOD resolution determines how many cells are in decimated model.
-  void LODResolutionScaleCallback();
-  void LODResolutionLabelCallback();
+  void LODResolutionScaleCallback(double value);
+  void LODResolutionLabelCallback(double value);
 
   // Description:
   // This method sets the resolution without tracing or
@@ -89,9 +89,9 @@ public:
 
   // Description:
   // Called when user stops moving scale
-  void OutlineThresholdScaleCallback();
+  void OutlineThresholdScaleCallback(double value);
   // Interactive scale callback
-  void OutlineThresholdLabelCallback();
+  void OutlineThresholdLabelCallback(double value);
 
   // Description:
   // This methods can be used from a script.  

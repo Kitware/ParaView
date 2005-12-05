@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.45");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.46");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -2219,7 +2219,7 @@ void vtkKWMultiColumnList::CellWindowCommandToCheckButtonCallback(
 
 //---------------------------------------------------------------------------
 void vtkKWMultiColumnList::CellWindowCommandToCheckButtonSelectCallback(
-  vtkKWWidget *widget, int row, int col)
+  vtkKWWidget *widget, int row, int col, int)
 {
   vtkKWCheckButton *cb = vtkKWCheckButton::SafeDownCast(widget);
   if (widget)
@@ -3280,12 +3280,7 @@ void vtkKWMultiColumnList::SetSelectionCommand(
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::InvokeSelectionCommand()
 {
-  if (this->SelectionCommand && 
-      *this->SelectionCommand && 
-      this->IsCreated())
-    {
-    this->Script("eval %s", this->SelectionCommand);
-    }
+  this->InvokeObjectMethodCommand(this->SelectionCommand);
 }
 
 //----------------------------------------------------------------------------
@@ -3298,12 +3293,7 @@ void vtkKWMultiColumnList::SetSelectionChangedCommand(
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::InvokeSelectionChangedCommand()
 {
-  if (this->SelectionChangedCommand && 
-      *this->SelectionChangedCommand && 
-      this->IsCreated())
-    {
-    this->Script("eval %s", this->SelectionChangedCommand);
-    }
+  this->InvokeObjectMethodCommand(this->SelectionChangedCommand);
 }
 
 //----------------------------------------------------------------------------
@@ -3317,12 +3307,7 @@ void vtkKWMultiColumnList::SetPotentialCellColorsChangedCommand(
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::InvokePotentialCellColorsChangedCommand()
 {
-  if (this->PotentialCellColorsChangedCommand && 
-      *this->PotentialCellColorsChangedCommand && 
-      this->IsCreated())
-    {
-    this->Script("eval %s", this->PotentialCellColorsChangedCommand);
-    }
+  this->InvokeObjectMethodCommand(this->PotentialCellColorsChangedCommand);
 }
 
 //----------------------------------------------------------------------------
@@ -3335,11 +3320,7 @@ void vtkKWMultiColumnList::SetColumnSortedCommand(
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::InvokeColumnSortedCommand()
 {
-  if (this->ColumnSortedCommand && *this->ColumnSortedCommand && 
-      this->IsCreated())
-    {
-    this->Script("eval %s", this->ColumnSortedCommand);
-    }
+  this->InvokeObjectMethodCommand(this->ColumnSortedCommand);
 }
 
 //----------------------------------------------------------------------------

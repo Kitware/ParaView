@@ -24,7 +24,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVSinusoidKeyFrame);
-vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.13");
+vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.14");
 
 //-----------------------------------------------------------------------------
 inline static int DoubleVectPropertySetElement(vtkSMProxy *proxy, 
@@ -84,7 +84,6 @@ void vtkPVSinusoidKeyFrame::ChildCreate()
   this->PhaseThumbWheel->SetBalloonHelpString("Specify the phase of the parameter's"
     " sine waveform in degrees.");
   this->PhaseThumbWheel->SetEntryCommand(this, "PhaseChangedCallback");
-  this->PhaseThumbWheel->GetEntry()->SetCommand(this, "PhaseChangedCallback");
   this->PhaseThumbWheel->SetEndCommand(this, "PhaseChangedCallback");
 
   this->FrequencyLabel->SetParent(this);
@@ -104,7 +103,6 @@ void vtkPVSinusoidKeyFrame::ChildCreate()
   this->FrequencyThumbWheel->ExpandEntryOn();
   this->FrequencyThumbWheel->SetBalloonHelpString("Specify the number of waveform "
     "cycles until the next key frame.");
-  this->FrequencyThumbWheel->GetEntry()->SetCommand(this, "FrequencyChangedCallback");
   this->FrequencyThumbWheel->SetEntryCommand(this, "FrequencyChangedCallback");
   this->FrequencyThumbWheel->SetEndCommand(this, "FrequencyChangedCallback");
 
@@ -126,8 +124,6 @@ void vtkPVSinusoidKeyFrame::ChildCreate()
   this->OffsetThumbWheel->SetBalloonHelpString(
     "Specify the positive offset for the crest "
     "of the sine waveform.");
-  this->OffsetThumbWheel->GetEntry()->SetCommand(this, 
-    "OffsetChangedCallback");
   this->OffsetThumbWheel->SetEntryCommand(this, "OffsetChangedCallback");
   this->OffsetThumbWheel->SetEndCommand(this, "OffsetChangedCallback");
 
@@ -143,24 +139,21 @@ void vtkPVSinusoidKeyFrame::ChildCreate()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSinusoidKeyFrame::PhaseChangedCallback()
+void vtkPVSinusoidKeyFrame::PhaseChangedCallback(double value)
 {
-  this->SetPhaseWithTrace(
-    this->PhaseThumbWheel->GetEntry()->GetValueAsDouble());
+  this->SetPhaseWithTrace(value);
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSinusoidKeyFrame::OffsetChangedCallback()
+void vtkPVSinusoidKeyFrame::OffsetChangedCallback(double value)
 {
-  this->SetOffsetWithTrace(
-    this->OffsetThumbWheel->GetEntry()->GetValueAsDouble());
+  this->SetOffsetWithTrace(value);
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSinusoidKeyFrame::FrequencyChangedCallback()
+void vtkPVSinusoidKeyFrame::FrequencyChangedCallback(double value)
 {
-  this->SetFrequencyWithTrace(
-    this->FrequencyThumbWheel->GetEntry()->GetValueAsDouble());
+  this->SetFrequencyWithTrace(value);
 }
 
 //-----------------------------------------------------------------------------

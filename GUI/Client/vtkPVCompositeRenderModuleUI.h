@@ -46,34 +46,31 @@ public:
   // The ones without parameters are only public because they are callbacks;
   // they cannot be used from a script because they do not change the state of
   // the check.  Use the ones with parameters from a script.
-  void CompositeWithFloatCallback();
   void CompositeWithFloatCallback(int val);
-  void CompositeWithRGBACallback();
   void CompositeWithRGBACallback(int val);
-  void CompositeCompressionCallback();
   void CompositeCompressionCallback(int val);
 
   // Description:
   // Tracing uses the method with the argument.
   // A reduction value of 1 is equivalent to having the feature
   // disabled.
-  void ReductionCheckCallback();
-  void ReductionFactorScaleCallback();
+  void ReductionCheckCallback(int state);
+  void ReductionFactorScaleCallback(double value);
   void SetReductionFactor(int val);
 
   // Description:
   // Squirt compression os a combination of run-length encoding
   // and bit compression.  A level of 0 is the same as disabling
   // squirt compression.
-  void SquirtCheckCallback();
-  void SquirtLevelScaleCallback();
+  void SquirtCheckCallback(int state);
+  void SquirtLevelScaleCallback(double value);
   void SetSquirtLevel(int val);
 
   // Description:
   // Threshold for collecting data to a single process (MBytes).
-  void CompositeCheckCallback();
-  void CompositeThresholdScaleCallback();
-  void CompositeThresholdLabelCallback();
+  void CompositeCheckCallback(int state);
+  void CompositeThresholdScaleCallback(double value);
+  void CompositeThresholdLabelCallback(double value);
   void SetCompositeThreshold(float val);
   vtkGetMacro(CompositeThreshold, float);
 

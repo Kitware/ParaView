@@ -50,13 +50,16 @@ KWWidgetsTourItem* vtkKWColorPresetSelectorEntryPoint(
 
   // -----------------------------------------------------------------------
 
+  app->Script(
+    "proc update_editor {name} {%s Update}", cpsel_tfunc_editor->GetTclName());
+
   // Create a color preset selector
 
   vtkKWColorPresetSelector *cpsel1 = vtkKWColorPresetSelector::New();
   cpsel1->SetParent(parent);
   cpsel1->Create();
   cpsel1->SetColorTransferFunction(cpsel_func);
-  cpsel1->SetPresetSelectedCommand(cpsel_tfunc_editor, "Update");
+  cpsel1->SetPresetSelectedCommand(NULL, "update_editor");
   cpsel1->SetBalloonHelpString(
     "A set of predefined color presets. Select one of them to apply the "
     "preset to a color transfer function (vtkColorTransferFunction)");
@@ -75,7 +78,7 @@ KWWidgetsTourItem* vtkKWColorPresetSelectorEntryPoint(
   cpsel2->SetLabelText("Solid Color Presets:");
   cpsel2->HideGradientPresetsOn();
   cpsel2->SetColorTransferFunction(cpsel_func);
-  cpsel2->SetPresetSelectedCommand(cpsel_tfunc_editor, "Update");
+  cpsel2->SetPresetSelectedCommand(NULL, "update_editor");
   cpsel2->SetBalloonHelpString(
     "A set of predefined color presets. Let's hide the gradient presets.");
 
@@ -92,7 +95,7 @@ KWWidgetsTourItem* vtkKWColorPresetSelectorEntryPoint(
   cpsel3->Create();
   cpsel3->SetLabelPositionToRight();
   cpsel3->SetColorTransferFunction(cpsel_func);
-  cpsel3->SetPresetSelectedCommand(cpsel_tfunc_editor, "Update");
+  cpsel3->SetPresetSelectedCommand(NULL, "update_editor");
   cpsel3->RemoveAllPresets();
   cpsel3->SetPreviewSize(cpsel3->GetPreviewSize() * 2);
   cpsel3->SetLabelText("Custom Color Presets");

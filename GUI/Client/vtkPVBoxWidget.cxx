@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.64");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.65");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -474,11 +474,11 @@ void vtkPVBoxWidget::ChildCreate()
     this->TranslateThumbWheel[cc]->GetEntry()->AddBinding(
       "<Key>", this, "SetValueChanged");
     //EntryCommand is called on <Return> and <FocusOut>
-    this->TranslateThumbWheel[cc]->SetEntryCommand(this, "SetTranslate");
+    this->TranslateThumbWheel[cc]->SetEntryCommand(this, "TranslateCallback");
     //Command is called when the value is changed  
-    this->TranslateThumbWheel[cc]->SetCommand(this, "SetValueChanged");
+    this->TranslateThumbWheel[cc]->SetCommand(this, "ValueChangedCallback");
     //EndCommand is called when Thumbwheel/Scale motion is stopped
-    this->TranslateThumbWheel[cc]->SetEndCommand(this,"SetTranslate");
+    this->TranslateThumbWheel[cc]->SetEndCommand(this,"TranslateCallback");
     this->TranslateThumbWheel[cc]->SetBalloonHelpString(
       "Translate the geometry relative to the dataset location.");
 
@@ -494,9 +494,9 @@ void vtkPVBoxWidget::ChildCreate()
     this->ScaleThumbWheel[cc]->GetEntry()->AddBinding(
       "<Key>", this, "SetValueChanged");
     //EntryCommand is called on <Return> and <FocusOut>
-    this->ScaleThumbWheel[cc]->SetEntryCommand(this,"SetScale");
-    this->ScaleThumbWheel[cc]->SetCommand(this, "SetValueChanged");
-    this->ScaleThumbWheel[cc]->SetEndCommand(this, "SetScale");
+    this->ScaleThumbWheel[cc]->SetEntryCommand(this, "ScaleCallback");
+    this->ScaleThumbWheel[cc]->SetCommand(this, "ValueChangedCallback");
+    this->ScaleThumbWheel[cc]->SetEndCommand(this, "ScaleCallback");
     this->ScaleThumbWheel[cc]->SetBalloonHelpString(
       "Scale the geometry relative to the size of the dataset.");
 
@@ -511,9 +511,9 @@ void vtkPVBoxWidget::ChildCreate()
     this->OrientationScale[cc]->GetEntry()->AddBinding(
       "<Key>", this, "SetValueChanged");
     //EntryCommand is called on <Return> and <FocusOut>
-    this->OrientationScale[cc]->SetEntryCommand(this,"SetOrientation");
-    this->OrientationScale[cc]->SetCommand(this, "SetValueChanged");
-    this->OrientationScale[cc]->SetEndCommand(this, "SetOrientation");
+    this->OrientationScale[cc]->SetEntryCommand(this,"OrientationCallback");
+    this->OrientationScale[cc]->SetCommand(this, "ValueChangedCallback");
+    this->OrientationScale[cc]->SetEndCommand(this, "OrientationCallback");
     this->OrientationScale[cc]->SetBalloonHelpString(
       "Orient the geometry relative to the dataset origin.");
 
@@ -615,7 +615,7 @@ void vtkPVBoxWidget::Create()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::SetScale()
+void vtkPVBoxWidget::ScaleCallback(double)
 {
   if (!this->ValueChanged)
     {
@@ -633,7 +633,7 @@ void vtkPVBoxWidget::SetScale()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::SetTranslate()
+void vtkPVBoxWidget::TranslateCallback(double)
 {
   if ( !this->ValueChanged )
     {
@@ -651,7 +651,13 @@ void vtkPVBoxWidget::SetTranslate()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::SetOrientation()
+void vtkPVBoxWidget::ValueChangedCallback(double)
+{
+  this->SetValueChanged();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::OrientationCallback(double)
 {
   if (!this->ValueChanged)
     {

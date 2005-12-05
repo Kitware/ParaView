@@ -89,9 +89,7 @@ KWWidgetsTourItem* vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   scale3->SetBalloonHelpString(
     "It's a pop-up, and it sets the previous scale value too");
 
-  char buffer[100];
-  sprintf(buffer, "SetValue [%s GetValue]", scale3->GetTclName());
-  scale3->SetCommand(scale2b, buffer);
+  scale3->SetCommand(scale2b, "SetValue");
 
   app->Script(
     "pack %s -side top -anchor nw -expand n -fill none -padx 2 -pady 6", 
@@ -110,6 +108,7 @@ KWWidgetsTourItem* vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   scale_set->SetReliefToGroove();
   scale_set->SetMaximumNumberOfWidgetsInPackingDirection(2);
 
+  char buffer[100];
   for (int id = 0; id < 4; id++)
     {
     sprintf(buffer, "Scale %d", id);

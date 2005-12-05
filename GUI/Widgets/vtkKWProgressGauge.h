@@ -72,7 +72,7 @@ public:
   vtkGetVectorMacro(BarColor,double,3);
 
   // Description:
-  // Callbacks
+  // Callbacks. Internal, do not use.
   virtual void ConfigureCallback();
 
 protected:

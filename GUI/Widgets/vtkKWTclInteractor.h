@@ -44,18 +44,6 @@ public:
   virtual void AppendText(const char* text);
 
   // Description:
-  // Evaluate the tcl string
-  virtual void EvaluateCallback();
-
-  // Description:
-  // Callback for the down arrow key
-  virtual void DownCallback();
-  
-  // Description:
-  // Callback for the up arrow key
-  virtual void UpCallback();
-
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -63,6 +51,12 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void EvaluateCallback();
+  virtual void DownCallback();
+  virtual void UpCallback();
 
 protected:
   vtkKWTclInteractor();

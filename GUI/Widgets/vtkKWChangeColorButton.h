@@ -53,11 +53,12 @@ public:
 
   // Description:
   // Set the command that is called when the color is changed.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // Note that the current color is passed too, as 3 RGB (double) parameters.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - selected RGB color: double, double, double
   virtual void SetCommand(vtkObject *object, const char *method);
 
   // Description:
@@ -72,11 +73,6 @@ public:
   vtkBooleanMacro(LabelOutsideButton, int);
 
   // Description:
-  // Callbacks (handle button press and release events, etc.)
-  virtual void ButtonPressCallback();
-  virtual void ButtonReleaseCallback();
-  
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -85,6 +81,11 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void ButtonPressCallback();
+  virtual void ButtonReleaseCallback();
+  
 protected:
   vtkKWChangeColorButton();
   ~vtkKWChangeColorButton();

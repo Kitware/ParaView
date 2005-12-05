@@ -33,9 +33,9 @@ public:
 
   // Description:
   // Callbacks for GUI
-  void BaseChangedCallback();
-  void StartPowerChangedCallback();
-  void EndPowerChangedCallback();
+  void BaseChangedCallback(double);
+  void StartPowerChangedCallback(double);
+  void EndPowerChangedCallback(double);
 
   void SetBase(double base);
   void SetBaseWithTrace(double base);

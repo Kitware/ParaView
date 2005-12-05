@@ -403,7 +403,7 @@ public:
   //ETX
 
   // Description:
-  // Callbacks
+  // Callbacks. Internal, do not use.
   virtual void TclBgErrorCallback(const char* message);
 
 protected:

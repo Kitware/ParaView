@@ -60,9 +60,10 @@ public:
   // Description:
   // Callbacks to update the values from the GUI.
   // These methods do nothing is this->ValueChanged is not set
-  void SetTranslate();
-  void SetOrientation();
-  void SetScale();
+  void TranslateCallback(double);
+  void OrientationCallback(double);
+  void ScaleCallback(double);
+  void ValueChangedCallback(double);
 
   // Description:
   // Set the box

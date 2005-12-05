@@ -288,15 +288,6 @@ public:
   virtual void PrepareForDelete();
 
   // Description:
-  // Callbacks.
-  // Process the click on the error icon.
-  // Override it in subclasses to popup more elaborate log/error dialog.
-  virtual void ErrorIconCallback();
-  virtual void PrintSettingsCallback() {};
-  virtual void ToolbarVisibilityChangedCallback();
-  virtual void NumberOfToolbarsChangedCallback();
-
-  // Description:
   // Some constants
   //BTX
   static const char *PrintOptionsMenuLabel;
@@ -314,6 +305,13 @@ public:
   static const char *WindowGeometryRegKey;
   static const char *DefaultGeometry;
   //ETX
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void ErrorIconCallback();
+  virtual void PrintSettingsCallback() {};
+  virtual void ToolbarVisibilityChangedCallback(vtkKWToolbar*);
+  virtual void NumberOfToolbarsChangedCallback();
 
 protected:
   vtkKWWindowBase();

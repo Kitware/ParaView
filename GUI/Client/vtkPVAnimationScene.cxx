@@ -70,7 +70,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.61");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.62");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 #define VTK_PV_TOOLBARS_ANIMATION_LABEL "Animation"
@@ -366,8 +366,6 @@ void vtkPVAnimationScene::Create()
   this->DurationThumbWheel->ExpandEntryOn();
   this->DurationThumbWheel->SetEntryCommand(this, "DurationChangedCallback");
   this->DurationThumbWheel->SetEndCommand(this, "DurationChangedCallback");
-  this->DurationThumbWheel->GetEntry()->SetCommand(this, 
-    "DurationChangedCallback");
   this->DurationThumbWheel->GetEntry()->AddBinding(
     "<KeyRelease>", this, "DurationChangedKeyReleaseCallback");
   this->SetDuration(10.0);
@@ -544,10 +542,9 @@ void vtkPVAnimationScene::ExecuteEvent(vtkObject* , unsigned long event,
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationScene::DurationChangedCallback()
+void vtkPVAnimationScene::DurationChangedCallback(double value)
 {
-  double duration = this->DurationThumbWheel->GetEntry()->GetValueAsDouble();
-  this->SetDurationWithTrace(duration);
+  this->SetDurationWithTrace(value);
 }
 
 //-----------------------------------------------------------------------------
@@ -1068,9 +1065,9 @@ double vtkPVAnimationScene::GetNormalizedAnimationTime()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationScene::TimeScaleCallback()
+void vtkPVAnimationScene::TimeScaleCallback(double value)
 {
-  this->SetAnimationTimeWithTrace(this->TimeScale->GetValue());
+  this->SetAnimationTimeWithTrace(value);
 }
 
 //-----------------------------------------------------------------------------

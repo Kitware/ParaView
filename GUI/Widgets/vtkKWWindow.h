@@ -345,14 +345,6 @@ public:
   virtual void UpdateToolbarState();
 
   // Description:
-  // Callbacks.
-  virtual void MainPanelVisibilityCallback();
-  virtual void SecondaryPanelVisibilityCallback();
-  virtual void PrintSettingsCallback();
-  virtual void ToolbarVisibilityChangedCallback();
-  virtual void NumberOfToolbarsChangedCallback();
-
-  // Description:
   // Deallocate/delete/reparent some internal objects in order to solve
   // reference loops that would prevent this instance from being deleted.
   virtual void PrepareForDelete();
@@ -374,6 +366,14 @@ public:
   static const char *TclInteractorMenuLabel;
   static const char *ViewPanelPositionRegKey;
   //ETX
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void MainPanelVisibilityCallback();
+  virtual void SecondaryPanelVisibilityCallback();
+  virtual void PrintSettingsCallback();
+  virtual void ToolbarVisibilityChangedCallback(vtkKWToolbar*);
+  virtual void NumberOfToolbarsChangedCallback();
 
 protected:
   vtkKWWindow();

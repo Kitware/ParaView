@@ -140,8 +140,8 @@ public:
   // Description:
   // Callbacks.
   void ScalarBarCheckCallback();
-  void ScalarRangeWidgetCallback();
-  void LockCheckCallback();
+  void ScalarRangeWidgetCallback(double r0, double r1);
+  void LockCheckCallback(int state);
 
   // Description:
   // Access for scripts.
@@ -180,7 +180,7 @@ public:
 
   // Description:
   // Called when the slider that select the resolution changes.
-  void NumberOfColorsScaleCallback();
+  void NumberOfColorsScaleCallback(double value);
   void SetNumberOfColors(int num);
 
   // Description:

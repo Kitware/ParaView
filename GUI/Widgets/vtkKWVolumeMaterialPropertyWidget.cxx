@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWVolumeMaterialPropertyWidget);
-vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.19");
+vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.20");
 
 //----------------------------------------------------------------------------
 vtkKWVolumeMaterialPropertyWidget::vtkKWVolumeMaterialPropertyWidget()
@@ -314,15 +314,8 @@ void vtkKWVolumeMaterialPropertyWidget::SelectedComponentCallback(int n)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWVolumeMaterialPropertyWidget::EnableShadingCallback()
+void vtkKWVolumeMaterialPropertyWidget::EnableShadingCallback(int state)
 {
-  if (!this->IsCreated())
-    {
-    return;
-    }
-
-  int state = this->EnableShadingCheckButton->GetWidget()->GetSelectedState();
-
   if (this->VolumeProperty &&
       this->VolumeProperty->GetShade(this->SelectedComponent) != state)
     {

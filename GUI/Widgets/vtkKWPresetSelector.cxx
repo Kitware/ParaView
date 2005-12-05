@@ -55,7 +55,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.25");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.26");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -2014,7 +2014,8 @@ void vtkKWPresetSelector::InvokePresetUpdateCommand(int id)
       *this->PresetUpdateCommand && 
       this->IsCreated())
     {
-    this->Script("eval %s %d", this->PresetUpdateCommand, id);
+    //this->Script("eval %s %d", this->PresetUpdateCommand, id);
+    this->Script("%s %d", this->PresetUpdateCommand, id);
     }
 }
 
@@ -2032,7 +2033,8 @@ void vtkKWPresetSelector::InvokePresetApplyCommand(int id)
       *this->PresetApplyCommand && 
       this->IsCreated())
     {
-    this->Script("eval %s %d", this->PresetApplyCommand, id);
+    //this->Script("eval %s %d", this->PresetApplyCommand, id);
+    this->Script("%s %d", this->PresetApplyCommand, id);
     }
 }
 
@@ -2050,7 +2052,8 @@ int vtkKWPresetSelector::InvokePresetRemoveCommand(int id)
       *this->PresetRemoveCommand && 
       this->IsCreated())
     {
-    return atoi(this->Script("eval %s %d", this->PresetRemoveCommand, id));
+    //return atoi(this->Script("eval %s %d", this->PresetRemoveCommand, id));
+    return atoi(this->Script("%s %d", this->PresetRemoveCommand, id));
     }
   return 1;
 }
@@ -2070,7 +2073,8 @@ void vtkKWPresetSelector::InvokePresetHasChangedCommand(int id)
       *this->PresetHasChangedCommand && 
       this->IsCreated())
     {
-    this->Script("eval %s %d", this->PresetHasChangedCommand, id);
+    //this->Script("eval %s %d", this->PresetHasChangedCommand, id);
+    this->Script("%s %d", this->PresetHasChangedCommand, id);
     }
 }
 

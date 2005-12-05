@@ -135,10 +135,12 @@ public:
   // 'StartCommand' is invoked at the beginning of an interaction with
   // the widget.
   // 'EndCommand' is invoked at the end of an interaction with the widget.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the current value: double
   virtual void SetCommand(vtkObject *object, const char *method);
   virtual void SetStartCommand(vtkObject *object, const char *method);
   virtual void SetEndCommand(vtkObject *object, const char *method);
@@ -186,14 +188,8 @@ protected:
   void Bind();
   void UnBind();
 
-  int DisableCommands;
   int DisableScaleValueCallback;
   int ClampValue;
-
-  char        *Command;
-  char        *StartCommand;
-  char        *EndCommand;
-  char        *EntryCommand;
 
   double       Value;
   double       Resolution;
@@ -212,10 +208,15 @@ protected:
   friend class vtkKWScaleWithEntry;
   //ETX
 
-  virtual void InvokeObjectMethodCommand(const char *command);
-  virtual void InvokeCommand();
-  virtual void InvokeStartCommand();
-  virtual void InvokeEndCommand();
+  int DisableCommands;
+  char *Command;
+  char *StartCommand;
+  char *EndCommand;
+
+  virtual void InvokeScaleCommand(const char *command, double value);
+  virtual void InvokeCommand(double value);
+  virtual void InvokeStartCommand(double value);
+  virtual void InvokeEndCommand(double value);
 
 private:
   vtkKWScale(const vtkKWScale&); // Not implemented

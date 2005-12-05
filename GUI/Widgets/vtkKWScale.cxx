@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.109");
+vtkCxxRevisionMacro(vtkKWScale, "1.110");
 
 //----------------------------------------------------------------------------
 vtkKWScale::vtkKWScale()
@@ -222,7 +222,7 @@ void vtkKWScale::SetValue(double num)
 
   this->UpdateValue();
 
-  this->InvokeCommand();
+  this->InvokeCommand(this->GetValue());
 }
 
 //----------------------------------------------------------------------------
@@ -289,21 +289,32 @@ void vtkKWScale::ScaleValueCallback(double num)
 //----------------------------------------------------------------------------
 void vtkKWScale::ButtonPressCallback()
 {
-  this->InvokeStartCommand();
+  this->InvokeStartCommand(this->GetValue());
 }
 
 //----------------------------------------------------------------------------
 void vtkKWScale::ButtonReleaseCallback()
 {
-  this->InvokeEndCommand();
+  this->InvokeEndCommand(this->GetValue());
 }
 
 //----------------------------------------------------------------------------
-void vtkKWScale::InvokeObjectMethodCommand(const char *command)
+void vtkKWScale::InvokeScaleCommand(const char *command, double value)
 {
-  if (!this->DisableCommands)
+  if (!this->DisableCommands && command && *command && this->GetApplication())
     {
-    this->Superclass::InvokeObjectMethodCommand(command);
+    // As a convenience, try to detect if we are manipulating integers, and
+    // invoke the callback with the approriate type.
+    if ((double)((long int)value) == value)
+      {
+      //this->Script("eval %s %ld", command, (long int)value);
+      this->Script("%s %ld", command, (long int)value);
+      }
+    else
+      {
+      //this->Script("eval %s %lf", command, value);
+      this->Script("%s %lf", command, value);
+      }
     }
 }
 
@@ -314,9 +325,9 @@ void vtkKWScale::SetCommand(vtkObject *object, const char *method)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWScale::InvokeCommand()
+void vtkKWScale::InvokeCommand(double value)
 {
-  this->InvokeObjectMethodCommand(this->Command);
+  this->InvokeScaleCommand(this->Command, value);
 }
 
 //----------------------------------------------------------------------------
@@ -326,9 +337,9 @@ void vtkKWScale::SetStartCommand(vtkObject *object, const char * method)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWScale::InvokeStartCommand()
+void vtkKWScale::InvokeStartCommand(double value)
 {
-  this->InvokeObjectMethodCommand(this->StartCommand);
+  this->InvokeScaleCommand(this->StartCommand, value);
 }
 
 //----------------------------------------------------------------------------
@@ -338,9 +349,9 @@ void vtkKWScale::SetEndCommand(vtkObject *object, const char * method)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWScale::InvokeEndCommand()
+void vtkKWScale::InvokeEndCommand(double value)
 {
-  this->InvokeObjectMethodCommand(this->EndCommand);
+  this->InvokeScaleCommand(this->EndCommand, value);
 }
 
 //----------------------------------------------------------------------------

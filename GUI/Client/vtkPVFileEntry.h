@@ -104,11 +104,11 @@ public:
 
   // Description:
   // This callback is called when entry changes.
-  void EntryChangedCallback();
+  void EntryChangedCallback(const char *value);
 
   // Description:
   // This callback is called when timestep changes.
-  void TimestepChangedCallback();
+  void TimestepChangedCallback(double value);
 
   // Description:
   // Set the current time step.

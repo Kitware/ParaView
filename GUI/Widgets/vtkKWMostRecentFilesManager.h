@@ -69,7 +69,7 @@ public:
   // specified when the most recent file was added, the default target
   // object and default target command are used.
   vtkGetObjectMacro(DefaultTargetObject, vtkObject);
-  virtual void SetDefaultTargetObject(vtkObject*);
+  virtual void SetDefaultTargetObject(vtkObject *object);
   vtkGetStringMacro(DefaultTargetCommand);
   virtual void SetDefaultTargetCommand(const char *);
 

@@ -74,6 +74,14 @@ public:
     const char *group, double window, double level);
 
   // Description:
+  // Some constants
+  //BTX
+  static const char *WindowColumnName;
+  static const char *LevelColumnName;
+  static const char *ModalityColumnName;
+  //ETX
+
+  // Description:
   // Callback invoked when the user ends editing a specific preset field
   // located at cell ('row', 'col').
   // The main purpose of this method is to perform a final validation of
@@ -89,14 +97,6 @@ public:
   // located at ('row', 'col') with the new contents 'text', as a result
   // of editing the corresponding cell interactively.
   virtual void PresetCellUpdatedCallback(int row, int col, const char *text);
-
-  // Description:
-  // Some constants
-  //BTX
-  static const char *WindowColumnName;
-  static const char *LevelColumnName;
-  static const char *ModalityColumnName;
-  //ETX
 
 protected:
   vtkKWWindowLevelPresetSelector() {};

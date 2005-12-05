@@ -79,15 +79,17 @@ public:
   // performed.
   // The EndCommand of all targets that contain the drop coordinates is called
   // when Drag & Drop ends.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // Note that the each command is passed the absolute/screen (x,y) mouse 
-  // coordinates, the Source widget and the SourceAnchor widget (which are the
-  // same most of the times), i.e. the last 4 parameters are: int, int, 
-  // vtkKWWidget*, vtkKWWidget*). Additionally, EndCommand is passed a 5th 
-  // parameter, the target (vtkKWWidget *).
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the commands:
+  // - absolute/screen (x,y) mouse coordinates: int, int
+  // - the Source widget: vtkKWWidget*
+  // - the SourceAnchor widget: vtkKWWidget* (same as Source widget most of
+  // the times)
+  // Additionally, EndCommand is passed a 5th parameter:
+  // - the target: vtkKWWidget*
   virtual int SetTargetStartCommand(
     vtkKWWidget *target, vtkObject *object, const char *method);
   virtual int SetTargetPerformCommand(
@@ -96,29 +98,29 @@ public:
     vtkKWWidget *target, vtkObject *object, const char *method);
 
   // Description:
-  // Drag and Drop callbacks
-  virtual void StartCallback(int x, int y);
-  virtual void PerformCallback(int x, int y);
-  virtual void EndCallback(int x, int y);
-
-  // Description:
   // Independent of any targets, the following commands can be set:
   // The StartCommand is called when Drag & Drop starts.
   // The PerformCommand is called while Drag & Drop is performed.
   // The EndCommand is called when Drag & Drop ends.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // Note that the each command is passed the absolute/screen (x,y) mouse 
-  // coordinates.
-  // None of them is called is Enable is false.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the commands:
+  // - absolute/screen (x,y) mouse coordinates: int, int
+  // None of them is called if Enable is false.
   // StartCommand and PerformCommand are called *before* any target's
   // corresponding command. EndCommand is called *after* any target's
   // EndCommand.
   virtual void SetStartCommand(vtkObject *object, const char *method);
   virtual void SetPerformCommand(vtkObject *object, const char *method);
   virtual void SetEndCommand(vtkObject *object, const char *method);
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void StartCallback(int x, int y);
+  virtual void PerformCallback(int x, int y);
+  virtual void EndCallback(int x, int y);
 
 protected:
   vtkKWDragAndDropTargetSet();

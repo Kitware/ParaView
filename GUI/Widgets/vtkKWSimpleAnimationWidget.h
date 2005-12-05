@@ -79,59 +79,62 @@ public:
 
   // Description:
   // Set the command to invoke to set the slice value on an external
-  // object when the animation is in 'slice' mode. 
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // This command is passed an int (the slice value).
+  // source when the animation is in 'slice' mode. 
   // This command is mandatory for the slice animation to work.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the slice value: int
   virtual void SetSliceSetCommand(vtkObject *object, const char *method);
 
   // Description:
   // Set the command to invoke to get the slice value from an external
-  // object when the animation is in 'slice' mode. 
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // This command should return an int (the slice value).
+  // source when the animation is in 'slice' mode. 
   // This command is optional for the slice animation to work but will
   // guarantee that the slice is set back to its proper value once
   // the animation has been performed.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following output is expected from the command:
+  // - the slice value: int
   virtual void SetSliceGetCommand(vtkObject *object, const char *method);
 
   // Description:
   // Set the commands to invoke to get the minimum and maximum value of the
-  // slice range from an external object when the animation is in 'slice' mode.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // These commands should return an int (the min and max).
+  // slice range from an external source when the animation is in 'slice' mode.
   // These commands are mandatory for the slice animation to work.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following output is expected from the commands:
+  // - the slice value min or max: int
   virtual void SetSliceGetMinAndMaxCommands(
     vtkObject *object, const char *get_min_method, const char *get_max_method);
 
   // Description:
   // Set a command to be invoked after the slice animation has been
   // created/previewed.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
   // This command is optional.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void SetSlicePostAnimationCommand(
     vtkObject *object, const char *method);
 
   // Description:
   // Set a command to be invoked after the camera animation has been
   // created/previewed.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
   // This command is optional.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void SetCameraPostAnimationCommand(
     vtkObject *object, const char *method);
 
@@ -139,12 +142,6 @@ public:
   // Update the whole UI depending on the value of the Ivars
   virtual void Update();
 
-  // Description:
-  // Callbacks
-  virtual void PreviewAnimationCallback();
-  virtual void CreateAnimationCallback();
-  virtual void CancelAnimationCallback();
-  
   // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
@@ -154,6 +151,12 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void PreviewAnimationCallback();
+  virtual void CreateAnimationCallback();
+  virtual void CancelAnimationCallback();
+  
 protected:
   vtkKWSimpleAnimationWidget();
   ~vtkKWSimpleAnimationWidget();

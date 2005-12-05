@@ -64,7 +64,7 @@ public:
 
   // Description:
   // Callbacks
-  void IndexChangedCallback();
+  void IndexChangedCallback(double value);
   void AddKeyFrameButtonCallback();
   void DeleteKeyFrameButtonCallback();
 

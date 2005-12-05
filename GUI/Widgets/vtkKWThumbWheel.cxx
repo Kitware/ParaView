@@ -34,7 +34,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.44");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.45");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -245,7 +245,7 @@ void vtkKWThumbWheel::SetValue(double arg)
 
   this->RefreshValue();
   
-  this->InvokeCommand();
+  this->InvokeCommand(this->GetValue());
 }
 
 // ---------------------------------------------------------------------------
@@ -723,8 +723,7 @@ void vtkKWThumbWheel::Bind()
 
   if (this->Entry && this->Entry->IsCreated())
     {
-    this->Entry->SetBinding("<Return>", this, "EntryValueCallback");
-    this->Entry->SetBinding("<FocusOut>", this, "EntryValueCallback");
+    this->Entry->SetCommand(this, "EntryValueCallback");
     }
 
   if (this->PopupMode && 
@@ -760,8 +759,7 @@ void vtkKWThumbWheel::UnBind()
 
   if (this->Entry && this->Entry->IsCreated())
     {
-    this->Entry->RemoveBinding("<Return>");
-    this->Entry->RemoveBinding("<FocusOut>");
+    this->Entry->SetCommand(NULL, NULL);
     }
 
   if (this->PopupMode && 
@@ -828,7 +826,7 @@ void vtkKWThumbWheel::WithdrawPopupCallback()
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWThumbWheel::EntryValueCallback()
+void vtkKWThumbWheel::EntryValueCallback(const char *)
 {
   double value = this->Entry->GetValueAsDouble();
   double old_value = this->GetValue();
@@ -836,7 +834,7 @@ void vtkKWThumbWheel::EntryValueCallback()
 
   if (value != old_value)
     {
-    this->InvokeEntryCommand();
+    this->InvokeEntryCommand(this->GetValue());
     }
 }
 
@@ -879,7 +877,7 @@ void vtkKWThumbWheel::StartLinearMotionCallback()
     this->UpdateThumbWheelImage(this->StartLinearMotionState.MousePosition);
     }
 
-  this->InvokeStartCommand();
+  this->InvokeStartCommand(this->GetValue());
 }
 
 // ---------------------------------------------------------------------------
@@ -939,7 +937,7 @@ void vtkKWThumbWheel::StartNonLinearMotionCallback()
   this->StartNonLinearMotionState.Increment = 0.0;
   this->StartNonLinearMotionState.InPerform = 0;
 
-  this->InvokeStartCommand();
+  this->InvokeStartCommand(this->GetValue());
 
   // Now perform the motion immediately
 
@@ -1026,7 +1024,28 @@ void vtkKWThumbWheel::StopMotionCallback()
     this->UpdateThumbWheelImage();
     }
 
-  this->InvokeEndCommand();
+  this->InvokeEndCommand(this->GetValue());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWThumbWheel::InvokeThumbWheelCommand(
+  const char *command, double value)
+{
+  if (command && *command && this->GetApplication())
+    {
+    // As a convenience, try to detect if we are manipulating integers, and
+    // invoke the callback with the approriate type.
+    if ((double)((long int)value) == value)
+      {
+      //this->Script("eval %s %ld", command, (long int)value);
+      this->Script("%s %ld", command, (long int)value);
+      }
+    else
+      {
+      //this->Script("eval %s %lf", command, value);
+      this->Script("%s %lf", command, value);
+      }
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -1036,7 +1055,7 @@ void vtkKWThumbWheel::SetCommand(vtkObject *object, const char *method)
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWThumbWheel::InvokeCommand()
+void vtkKWThumbWheel::InvokeCommand(double value)
 {
   if (this->InInvokeCommand)
     {
@@ -1045,7 +1064,7 @@ void vtkKWThumbWheel::InvokeCommand()
 
   this->InInvokeCommand = 1;
 
-  this->InvokeObjectMethodCommand(this->Command);
+  this->InvokeThumbWheelCommand(this->Command, value);
 
   this->InInvokeCommand = 0;
 }
@@ -1057,9 +1076,9 @@ void vtkKWThumbWheel::SetStartCommand(vtkObject *object, const char *method)
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWThumbWheel::InvokeStartCommand()
+void vtkKWThumbWheel::InvokeStartCommand(double value)
 {
-  this->InvokeObjectMethodCommand(this->StartCommand);
+  this->InvokeThumbWheelCommand(this->StartCommand, value);
 }
 
 // ---------------------------------------------------------------------------
@@ -1069,9 +1088,9 @@ void vtkKWThumbWheel::SetEndCommand(vtkObject *object, const char *method)
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWThumbWheel::InvokeEndCommand()
+void vtkKWThumbWheel::InvokeEndCommand(double value)
 {
-  this->InvokeObjectMethodCommand(this->EndCommand);
+  this->InvokeThumbWheelCommand(this->EndCommand, value);
 }
 
 // ---------------------------------------------------------------------------
@@ -1081,9 +1100,9 @@ void vtkKWThumbWheel::SetEntryCommand(vtkObject *object, const char *method)
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWThumbWheel::InvokeEntryCommand()
+void vtkKWThumbWheel::InvokeEntryCommand(double value)
 {
-  this->InvokeObjectMethodCommand(this->EntryCommand);
+  this->InvokeThumbWheelCommand(this->EntryCommand, value);
 }
 
 // ---------------------------------------------------------------------------

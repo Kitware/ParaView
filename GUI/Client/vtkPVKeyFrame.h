@@ -83,7 +83,7 @@ public:
  
   // Description:
   // Callbacks for GUI
-  void TimeChangedCallback();
+  void TimeChangedCallback(double value);
  
   // Description:
   // Prepares the Key frame GUI for display.

@@ -66,13 +66,14 @@ public:
 
   // Description:
   // Specifies a command to associate with the widget. This command is 
-  // typically invoked when an item is pickedby the user in the selection list.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // This command is passed both the selected string and a pointer to this
-  // object.
+  // invoked when an item is picked by the user in the selection list.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - item selected in the list: const char *
+  // - pointer to this object: vtkKWSelectionFrame*
   virtual void SetSelectionListCommand(vtkObject *object, const char *method);
 
   // Description:
@@ -94,11 +95,12 @@ public:
   // Specifies a command to associate with the widget. This command is 
   // typically invoked when the widget is closed (using the close button
   // or the Close() method).
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // This command is passed a pointer to this object.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - pointer to this object: vtkKWSelectionFrame*
   virtual void SetCloseCommand(vtkObject *object, const char *method);
 
   // Description:
@@ -120,24 +122,21 @@ public:
   // Description:
   // Specifies a command to associate with the widget. This command is 
   // typically invoked when the "Change title" menu entry is selected.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
   // This command is usually implemented by a different class and will, 
   // for example, query the user for a new title, check that this title meet
   // some constraints, and call SetTitle() on this object (which in turn will
   // trigger the TitleChangedCommand).
-  // This command is passed a pointer to this object. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - pointer to this object: vtkKWSelectionFrame*
   virtual void SetChangeTitleCommand(vtkObject *object, const char *method);
 
   // Description:
   // Specifies a command to associate with the widget. This command is 
   // typically invoked when the title is changed.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
   // This command can be used, for example, to notify a layout manager that
   // it should refresh its list of available selection frame titles 
   // (see vtkKWSelectionFrameLayoutManager).
@@ -146,18 +145,24 @@ public:
   // to allow a third-party class to provide some user-dialog and change
   // the title (given some potential constraints). This user-dialog will, in
   // turn, most probably call SetTitle, which will trigger TitleChangedCommand.
-  // This command is passed a pointer to this object. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - pointer to this object: vtkKWSelectionFrame*
   virtual void SetTitleChangedCommand(vtkObject *object, const char *method);
 
   // Description:
   // Specifies a command to associate with the widget. This command is 
   // typically invoked when the frame title is selected by the user
   // (click in title bar).
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // This command is passed a pointer to this object.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - pointer to this object: vtkKWSelectionFrame*
   virtual void SetSelectCommand(vtkObject *object, const char *method);
 
   // Description:
@@ -165,11 +170,12 @@ public:
   // typically invoked when the f frame title is double-clicked on.
   // Note that this will also invoke the SelectCommand, since the first
   // click acts as a select event.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // This command is passed a pointer to this object.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - pointer to this object: vtkKWSelectionFrame*
   virtual void SetDoubleClickCommand(vtkObject *object, const char *method);
 
   // Description:
@@ -255,14 +261,6 @@ public:
     { this->SetOuterSelectionFrameSelectedColor(rgb[0], rgb[1], rgb[2]); };
   
   // Description:
-  // Callbacks
-  virtual void CloseCallback();
-  virtual void SelectionListCallback(const char *menuItem);
-  virtual void SelectCallback();
-  virtual void DoubleClickCallback();
-  virtual void ChangeTitleCallback();
-  
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -271,6 +269,14 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void CloseCallback();
+  virtual void SelectionListCallback(const char *menuItem);
+  virtual void SelectCallback();
+  virtual void DoubleClickCallback();
+  virtual void ChangeTitleCallback();
+  
 protected:
   vtkKWSelectionFrame();
   ~vtkKWSelectionFrame();
@@ -304,12 +310,12 @@ protected:
   char *DoubleClickCommand;
   char *ChangeTitleCommand;
   char *TitleChangedCommand;
-  virtual void InvokeSelectionListCommand(const char*);
-  virtual void InvokeCloseCommand();
-  virtual void InvokeSelectCommand();
-  virtual void InvokeDoubleClickCommand();
-  virtual void InvokeChangeTitleCommand();
-  virtual void InvokeTitleChangedCommand();
+  virtual void InvokeSelectionListCommand(const char*, vtkKWSelectionFrame*);
+  virtual void InvokeCloseCommand(vtkKWSelectionFrame *obj);
+  virtual void InvokeSelectCommand(vtkKWSelectionFrame *obj);
+  virtual void InvokeDoubleClickCommand(vtkKWSelectionFrame *obj);
+  virtual void InvokeChangeTitleCommand(vtkKWSelectionFrame *obj);
+  virtual void InvokeTitleChangedCommand(vtkKWSelectionFrame *obj);
 
   int Selected;
   int SelectionListVisibility;

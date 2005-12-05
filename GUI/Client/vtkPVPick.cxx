@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.35");
+vtkCxxRevisionMacro(vtkPVPick, "1.36");
 
 
 //*****************************************************************************
@@ -796,10 +796,10 @@ void vtkPVPick::InsertDataLabel(const char* labelArg, vtkIdType idx,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPick::PointLabelCheckCallback()
+void vtkPVPick::PointLabelCheckCallback(int state)
 {
   //PVSource does tracing for us
-  this->SetPointLabelVisibility(this->PointLabelCheck->GetSelectedState());
+  this->SetPointLabelVisibility(state);
 }
 
 //----------------------------------------------------------------------------
@@ -809,10 +809,9 @@ void vtkPVPick::UpdatePointLabelCheck()
 } 
 
 //----------------------------------------------------------------------------
-void vtkPVPick::ChangePointLabelFontSize()
+void vtkPVPick::ChangePointLabelFontSizeCallback(double value)
 {
-  this->SetPointLabelFontSize(
-    (int)this->PointLabelFontSizeThumbWheel->GetValue());
+  this->SetPointLabelFontSize((int)value);
 } 
 
 //----------------------------------------------------------------------------

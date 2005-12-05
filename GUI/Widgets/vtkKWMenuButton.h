@@ -58,12 +58,16 @@ public:
   // AddRadioButton methods, but we make sure all radiobuttons share
   // the same internal variable reference so that they behave as if
   // they were part of the same group.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void AddRadioButton(const char *label);
   virtual void AddRadioButton(
-    const char *label, vtkObject *obj, const char *method, 
+    const char *label, vtkObject *object, const char *method, 
     const char *help = 0);
   virtual void AddRadioButtonImage(
-    const char *image_name, vtkObject *obj, const char *method, 
+    const char *image_name, vtkObject *object, const char *method, 
     const char *help = 0);
 
   // Description
@@ -146,7 +150,7 @@ public:
   virtual void UpdateEnableState();
 
   // Description:
-  // Callbacks (don't call)
+  // Callbacks. Internal, do not use.
   virtual void TracedVariableChangedCallback(
     const char *, const char *, const char *);
 

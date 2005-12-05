@@ -63,9 +63,7 @@ KWWidgetsTourItem* vtkKWRangeEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 
     range2->GetWidgetName());
 
-  char buffer[100];
-  sprintf(buffer, "SetRange [%s GetRange]", range2->GetTclName());
-  range2->SetCommand(range1, buffer);
+  range2->SetCommand(range1, "SetRange");
 
   // -----------------------------------------------------------------------
 

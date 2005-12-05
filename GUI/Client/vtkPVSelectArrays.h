@@ -50,7 +50,7 @@ public:
 
   // Description:
   // Button callbacks.
-  void ShowAllArraysCheckCallback();
+  void ShowAllArraysCheckCallback(int);
 
   // Description:
   // Access metod necessary for scripting.

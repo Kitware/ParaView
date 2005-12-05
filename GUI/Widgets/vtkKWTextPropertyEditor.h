@@ -110,20 +110,22 @@ public:
   // Description:
   // Specifies a command to associate with the widget. This command is 
   // typically invoked each time a change is made to the text property.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void SetChangedCommand(vtkObject *object, const char *method);
 
   // Description:
   // Specifies a command to associate with the widget. This command is 
   // typically invoked each time a change is made to the color of
   // the text property (the ChangedCommand is triggered too).
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the new RGB color: double, double, double
   virtual void SetColorChangedCommand(vtkObject *object, const char *method);
 
   // Description:
@@ -138,24 +140,6 @@ public:
   // Copy the values from another text widget
   virtual void CopyValuesFrom(vtkKWTextPropertyEditor*);
 
-  // GUI components callbacks
-  virtual void ChangeColorButtonCallback(double, double, double);
-  virtual void SetColor(double, double, double);
-  virtual void SetColor(double *v) { this->SetColor(v[0], v[1], v[2]); };
-  virtual double* GetColor();
-  virtual void FontFamilyCallback();
-  virtual void SetFontFamily(int);
-  virtual void BoldCallback();
-  virtual void SetBold(int);
-  virtual void ItalicCallback();
-  virtual void SetItalic(int);
-  virtual void ShadowCallback();
-  virtual void SetShadow(int);
-  virtual void OpacityCallback();
-  virtual void OpacityEndCallback();
-  virtual void SetOpacity(float);
-  virtual float GetOpacity();
-
   // Description:
   // Save out the text properties to a file.
   virtual void SaveInTclScript(ofstream *file, const char *tcl_name = 0,
@@ -169,6 +153,28 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Convenience method to set the text properties
+  virtual void SetColor(double, double, double);
+  virtual void SetColor(double *v) { this->SetColor(v[0], v[1], v[2]); };
+  virtual double* GetColor();
+  virtual void SetFontFamily(int);
+  virtual void SetBold(int);
+  virtual void SetItalic(int);
+  virtual void SetShadow(int);
+  virtual void SetOpacity(float);
+  virtual float GetOpacity();
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void ChangeColorButtonCallback(double, double, double);
+  virtual void FontFamilyCallback();
+  virtual void BoldCallback(int state);
+  virtual void ItalicCallback(int state);
+  virtual void ShadowCallback(int state);
+  virtual void OpacityCallback(double value);
+  virtual void OpacityEndCallback(double value);
 
 protected:
   vtkKWTextPropertyEditor();
@@ -212,7 +218,7 @@ protected:
   char *ColorChangedCommand;
 
   virtual void InvokeChangedCommand();
-  virtual void InvokeColorChangedCommand();
+  virtual void InvokeColorChangedCommand(double r, double g, double b);
 
   int CopyVisibility;
   vtkKWPushButtonSetWithLabel *PushButtonSet;

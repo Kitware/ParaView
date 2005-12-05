@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.43");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.44");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -863,7 +863,7 @@ void vtkKWPiecewiseFunctionEditor::SetWindowLevelMode(int arg)
       }
     }
 
-  this->InvokeWindowLevelModeChangedCommand();
+  this->InvokeWindowLevelModeChangedCommand(this->WindowLevelMode);
 
   this->UpdatePointsFromWindowLevel();
   this->Update();
@@ -1134,7 +1134,7 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointsFromWindowLevel(int interactive)
 }
   
 //----------------------------------------------------------------------------
-void vtkKWPiecewiseFunctionEditor::ValueEntryCallback()
+void vtkKWPiecewiseFunctionEditor::ValueEntryCallback(const char*)
 {
   if (!this->ValueEntry || !this->HasSelection())
     {
@@ -1175,20 +1175,21 @@ void vtkKWPiecewiseFunctionEditor::SetWindowLevelModeChangedCommand(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPiecewiseFunctionEditor::InvokeWindowLevelModeChangedCommand()
+void vtkKWPiecewiseFunctionEditor::InvokeWindowLevelModeChangedCommand(int mode)
 {
-  this->InvokeObjectMethodCommand(this->WindowLevelModeChangedCommand);
+  if (this->WindowLevelModeChangedCommand && 
+      *this->WindowLevelModeChangedCommand && 
+      this->GetApplication())
+    {
+    //this->Script("eval %s %d", this->WindowLevelModeChangedCommand, mode);
+    this->Script("%s %d", this->WindowLevelModeChangedCommand, mode);
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPiecewiseFunctionEditor::WindowLevelModeCallback()
+void vtkKWPiecewiseFunctionEditor::WindowLevelModeCallback(int state)
 {
-  if (!this->WindowLevelModeCheckButton)
-    {
-    return;
-    }
-
-  this->SetWindowLevelMode(this->WindowLevelModeCheckButton->GetSelectedState());
+  this->SetWindowLevelMode(state);
 }
 
 //----------------------------------------------------------------------------

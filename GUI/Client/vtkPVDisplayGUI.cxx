@@ -96,7 +96,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.53");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.54");
 
 //----------------------------------------------------------------------------
 
@@ -751,7 +751,7 @@ void vtkPVDisplayGUI::Create()
   this->PointSizeThumbWheel->DisplayEntryAndLabelOnTopOff();
   this->PointSizeThumbWheel->SetBalloonHelpString("Set the point size.");
   this->PointSizeThumbWheel->GetEntry()->SetWidth(5);
-  this->PointSizeThumbWheel->SetCommand(this, "ChangePointSize");
+  this->PointSizeThumbWheel->SetCommand(this, "ChangePointSizeCallback");
   this->PointSizeThumbWheel->SetEndCommand(this, "ChangePointSizeEndCallback");
   this->PointSizeThumbWheel->SetEntryCommand(this, "ChangePointSizeEndCallback");
   this->PointSizeThumbWheel->SetBalloonHelpString(
@@ -776,7 +776,7 @@ void vtkPVDisplayGUI::Create()
   this->LineWidthThumbWheel->DisplayEntryAndLabelOnTopOff();
   this->LineWidthThumbWheel->SetBalloonHelpString("Set the line width.");
   this->LineWidthThumbWheel->GetEntry()->SetWidth(5);
-  this->LineWidthThumbWheel->SetCommand(this, "ChangeLineWidth");
+  this->LineWidthThumbWheel->SetCommand(this, "ChangeLineWidthCallback");
   this->LineWidthThumbWheel->SetEndCommand(this, "ChangeLineWidthEndCallback");
   this->LineWidthThumbWheel->SetEntryCommand(this, "ChangeLineWidthEndCallback");
   this->LineWidthThumbWheel->SetBalloonHelpString(
@@ -799,9 +799,9 @@ void vtkPVDisplayGUI::Create()
   this->PointLabelFontSizeThumbWheel->DisplayEntryAndLabelOnTopOff();
   this->PointLabelFontSizeThumbWheel->SetBalloonHelpString("Set the point ID label font size.");
   this->PointLabelFontSizeThumbWheel->GetEntry()->SetWidth(5);
-  this->PointLabelFontSizeThumbWheel->SetCommand(this, "ChangePointLabelFontSize");
-  this->PointLabelFontSizeThumbWheel->SetEndCommand(this, "ChangePointLabelFontSize");
-  this->PointLabelFontSizeThumbWheel->SetEntryCommand(this, "ChangePointLabelFontSize");
+  this->PointLabelFontSizeThumbWheel->SetCommand(this, "ChangePointLabelFontSizeCallback");
+  this->PointLabelFontSizeThumbWheel->SetEndCommand(this, "ChangePointLabelFontSizeCallback");
+  this->PointLabelFontSizeThumbWheel->SetEntryCommand(this, "ChangePointLabelFontSizeCallback");
   this->PointLabelFontSizeThumbWheel->SetBalloonHelpString(
     "This scale adjusts the font size of the point ID labels.");
 
@@ -2131,14 +2131,14 @@ void vtkPVDisplayGUI::ScalarBarCheckCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::CubeAxesCheckCallback()
+void vtkPVDisplayGUI::CubeAxesCheckCallback(int state)
 {
   //law int fixme;  // Loading the trace will not trace the visibility.
   // Move the tracing into vtkPVSource.
   this->GetTraceHelper()->AddEntry("$kw(%s) SetCubeAxesVisibility %d", 
                       this->PVSource->GetTclName(),
-                      this->CubeAxesCheck->GetSelectedState());
-  this->PVSource->SetCubeAxesVisibility(this->CubeAxesCheck->GetSelectedState());
+                      state);
+  this->PVSource->SetCubeAxesVisibility(state);
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -2146,10 +2146,10 @@ void vtkPVDisplayGUI::CubeAxesCheckCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::PointLabelCheckCallback()
+void vtkPVDisplayGUI::PointLabelCheckCallback(int state)
 {
   //PVSource does tracing for us
-  this->PVSource->SetPointLabelVisibility(this->PointLabelCheck->GetSelectedState());
+  this->PVSource->SetPointLabelVisibility(state);
 }
 
 //----------------------------------------------------------------------------
@@ -2216,10 +2216,9 @@ void vtkPVDisplayGUI::SetPointSize(int size)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::ChangePointSize()
+void vtkPVDisplayGUI::ChangePointSizeCallback(double value)
 {
-  this->PVSource->GetDisplayProxy()->SetPointSizeCM(
-    this->PointSizeThumbWheel->GetValue());
+  this->PVSource->GetDisplayProxy()->SetPointSizeCM(value);
  
   if ( this->GetPVRenderView() )
     {
@@ -2228,11 +2227,11 @@ void vtkPVDisplayGUI::ChangePointSize()
 } 
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::ChangePointSizeEndCallback()
+void vtkPVDisplayGUI::ChangePointSizeEndCallback(double value)
 {
-  this->ChangePointSize();
+  this->ChangePointSizeCallback(value);
   this->GetTraceHelper()->AddEntry("$kw(%s) SetPointSize %d", this->GetTclName(),
-                      (int)(this->PointSizeThumbWheel->GetValue()));
+                      (int)(value));
 } 
 
 //----------------------------------------------------------------------------
@@ -2252,10 +2251,9 @@ void vtkPVDisplayGUI::SetLineWidth(int width)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::ChangeLineWidth()
+void vtkPVDisplayGUI::ChangeLineWidthCallback(double value)
 {
-  this->PVSource->GetDisplayProxy()->SetLineWidthCM(
-    this->LineWidthThumbWheel->GetValue());
+  this->PVSource->GetDisplayProxy()->SetLineWidthCM(value);
 
   if ( this->GetPVRenderView() )
     {
@@ -2264,11 +2262,11 @@ void vtkPVDisplayGUI::ChangeLineWidth()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::ChangeLineWidthEndCallback()
+void vtkPVDisplayGUI::ChangeLineWidthEndCallback(double value)
 {
-  this->ChangeLineWidth();
+  this->ChangeLineWidthCallback(value);
   this->GetTraceHelper()->AddEntry("$kw(%s) SetLineWidth %d", this->GetTclName(),
-                      (int)(this->LineWidthThumbWheel->GetValue()));
+                      (int)(value));
 }
 
 //----------------------------------------------------------------------------
@@ -2282,10 +2280,9 @@ void vtkPVDisplayGUI::SetPointLabelFontSize(int size)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::ChangePointLabelFontSize()
+void vtkPVDisplayGUI::ChangePointLabelFontSizeCallback(double value)
 {
-  this->PVSource->SetPointLabelFontSize(
-    (int)this->PointLabelFontSizeThumbWheel->GetValue());
+  this->PVSource->SetPointLabelFontSize((int)value);
  } 
 
 //----------------------------------------------------------------------------
@@ -2320,9 +2317,9 @@ void vtkPVDisplayGUI::SetOpacity(float val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::OpacityChangedCallback()
+void vtkPVDisplayGUI::OpacityChangedCallback(double value)
 {
-  this->PVSource->GetDisplayProxy()->SetOpacityCM(this->OpacityScale->GetValue());
+  this->PVSource->GetDisplayProxy()->SetOpacityCM(value);
 
   if ( this->GetPVRenderView() )
     {
@@ -2331,11 +2328,11 @@ void vtkPVDisplayGUI::OpacityChangedCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::OpacityChangedEndCallback()
+void vtkPVDisplayGUI::OpacityChangedEndCallback(double value)
 {
-  this->OpacityChangedCallback();
+  this->OpacityChangedCallback(value);
   this->GetTraceHelper()->AddEntry("$kw(%s) SetOpacity %f", 
-                      this->GetTclName(), this->OpacityScale->GetValue());
+                      this->GetTclName(), value);
 }
 
 //----------------------------------------------------------------------------
@@ -2387,7 +2384,7 @@ void vtkPVDisplayGUI::SetActorTranslate(double* point)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::ActorTranslateCallback()
+void vtkPVDisplayGUI::ActorTranslateCallback(double)
 {
   double point[3];
   point[0] = this->TranslateThumbWheel[0]->GetValue();
@@ -2401,7 +2398,7 @@ void vtkPVDisplayGUI::ActorTranslateCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::ActorTranslateEndCallback()
+void vtkPVDisplayGUI::ActorTranslateEndCallback(double)
 {
   double point[3];
   point[0] = this->TranslateThumbWheel[0]->GetValue();
@@ -2459,7 +2456,7 @@ void vtkPVDisplayGUI::SetActorScale(double* point)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::ActorScaleCallback()
+void vtkPVDisplayGUI::ActorScaleCallback(double)
 {
   double point[3];
   point[0] = this->ScaleThumbWheel[0]->GetValue();
@@ -2473,7 +2470,7 @@ void vtkPVDisplayGUI::ActorScaleCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::ActorScaleEndCallback()
+void vtkPVDisplayGUI::ActorScaleEndCallback(double)
 {
   double point[3];
   point[0] = this->ScaleThumbWheel[0]->GetValue();
@@ -2531,7 +2528,7 @@ void vtkPVDisplayGUI::SetActorOrientation(double* point)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::ActorOrientationCallback()
+void vtkPVDisplayGUI::ActorOrientationCallback(double)
 {
   double point[3];
   point[0] = this->OrientationScale[0]->GetValue();
@@ -2545,7 +2542,7 @@ void vtkPVDisplayGUI::ActorOrientationCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::ActorOrientationEndCallback()
+void vtkPVDisplayGUI::ActorOrientationEndCallback(double)
 {
   double point[3];
   point[0] = this->OrientationScale[0]->GetValue();
@@ -2603,7 +2600,7 @@ void vtkPVDisplayGUI::SetActorOrigin(double* point)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::ActorOriginCallback()
+void vtkPVDisplayGUI::ActorOriginCallback(double)
 {
   double point[3];
   point[0] = this->OriginThumbWheel[0]->GetValue();
@@ -2617,7 +2614,7 @@ void vtkPVDisplayGUI::ActorOriginCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::ActorOriginEndCallback()
+void vtkPVDisplayGUI::ActorOriginEndCallback(double)
 {
   double point[3];
   point[0] = this->OriginThumbWheel[0]->GetValue();

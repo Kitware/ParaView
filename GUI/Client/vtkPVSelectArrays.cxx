@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectArrays);
-vtkCxxRevisionMacro(vtkPVSelectArrays, "1.16");
+vtkCxxRevisionMacro(vtkPVSelectArrays, "1.17");
 vtkCxxSetObjectMacro(vtkPVSelectArrays, InputMenu, vtkPVInputMenu);
 
 //----------------------------------------------------------------------------
@@ -389,7 +389,7 @@ void vtkPVSelectArrays::Update()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSelectArrays::ShowAllArraysCheckCallback()
+void vtkPVSelectArrays::ShowAllArraysCheckCallback(int)
 {
   this->Update();
 }

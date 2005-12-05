@@ -61,7 +61,7 @@ public:
   virtual void UpdateEnableState();
 
   // Description:
-  // Callbacks
+  // Callbacks. Internal, do not use.
   virtual void UpdateVariableCallback(const char*, const char*, const char*);
 
 protected:

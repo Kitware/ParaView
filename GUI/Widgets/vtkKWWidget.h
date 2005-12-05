@@ -90,13 +90,13 @@ public:
   // Description:
   // Set/add/remove a binding to a widget, i.e. the command that is invoked
   // whenever the 'event' is triggered on the widget.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
   // SetBinding will replace any old bindings, whereas AddBinding will
   // add the binding to the list of bindings already defined for that event.
   // RemoveBinding can remove a specific binding or all bindings for an event.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void SetBinding(
     const char *event, vtkObject *object, const char *method);
   virtual void SetBinding(

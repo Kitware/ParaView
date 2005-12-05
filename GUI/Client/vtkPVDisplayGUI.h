@@ -85,8 +85,8 @@ public:
   void SetActorTranslate(double x, double y, double z);
   void SetActorTranslateNoTrace(double x, double y, double z);
   void GetActorTranslate(double* p);
-  void ActorTranslateCallback();
-  void ActorTranslateEndCallback();
+  void ActorTranslateCallback(double);
+  void ActorTranslateEndCallback(double);
   
   // Description:
   // Scale the actor. Also modify the entry widget that controles the scaling.
@@ -94,8 +94,8 @@ public:
   void SetActorScale(double x, double y, double z);
   void SetActorScaleNoTrace(double x, double y, double z);
   void GetActorScale(double* p);
-  void ActorScaleCallback();
-  void ActorScaleEndCallback();
+  void ActorScaleCallback(double);
+  void ActorScaleEndCallback(double);
   
   // Description:
   // Orient the actor. 
@@ -104,8 +104,8 @@ public:
   void SetActorOrientation(double x, double y, double z);
   void SetActorOrientationNoTrace(double x, double y, double z);
   void GetActorOrientation(double* p);
-  void ActorOrientationCallback();
-  void ActorOrientationEndCallback();
+  void ActorOrientationCallback(double);
+  void ActorOrientationEndCallback(double);
   
   // Description:
   // Set the actor origin. 
@@ -114,14 +114,14 @@ public:
   void SetActorOrigin(double x, double y, double z);
   void SetActorOriginNoTrace(double x, double y, double z);
   void GetActorOrigin(double* p);
-  void ActorOriginCallback();
-  void ActorOriginEndCallback();
+  void ActorOriginCallback(double);
+  void ActorOriginEndCallback(double);
   
   // Description:
   // Set the transparency of the actor.
   void SetOpacity(float f);
-  void OpacityChangedCallback();
-  void OpacityChangedEndCallback();
+  void OpacityChangedCallback(double value);
+  void OpacityChangedEndCallback(double value);
 
   // Description:
   // Create the widget.
@@ -194,9 +194,9 @@ public:
   void ScalarBarCheckCallback();
   vtkGetObjectMacro(ScalarBarCheck, vtkKWCheckButton);
 
-  void CubeAxesCheckCallback();
+  void CubeAxesCheckCallback(int state);
   vtkGetObjectMacro(CubeAxesCheck, vtkKWCheckButton);
-  void PointLabelCheckCallback();
+  void PointLabelCheckCallback(int state);
   vtkGetObjectMacro(PointLabelCheck, vtkKWCheckButton);
 
   void CenterCamera();
@@ -214,11 +214,11 @@ public:
   
   // Description:
   // Callbacks for point size and line width sliders.
-  void ChangePointSize();
-  void ChangePointSizeEndCallback();
-  void ChangeLineWidth();
-  void ChangeLineWidthEndCallback();
-  void ChangePointLabelFontSize();
+  void ChangePointSizeCallback(double value);
+  void ChangePointSizeEndCallback(double value);
+  void ChangeLineWidthCallback(double value);
+  void ChangeLineWidthEndCallback(double value);
+  void ChangePointLabelFontSizeCallback(double value);
 
   // Description:
   // Access to option menus for scripting.

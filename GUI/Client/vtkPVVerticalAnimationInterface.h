@@ -72,9 +72,9 @@ public:
   void SetAnimationManager(vtkPVAnimationManager* am) { this->AnimationManager = am;}
 
   // Callbacks for GUI elements.
-  void RecordAllChangedCallback();
-  void CacheGeometryCheckCallback();
-  void AdvancedAnimationViewCallback();
+  void RecordAllChangedCallback(int state);
+  void CacheGeometryCheckCallback(int state);
+  void AdvancedAnimationViewCallback(int state);
 
   void SetAdvancedAnimationView(int advanced);
 

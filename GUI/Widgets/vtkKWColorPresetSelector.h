@@ -76,9 +76,9 @@ public:
   // Convenience methods to add a preset given a solid color, in RGB or
   // HSV format.
   virtual int AddSolidRGBPreset(const char *name, double rgb[3]);
-  virtual int AddSolidRGBPreset(const char *name,double r,double g, double b);
+  virtual int AddSolidRGBPreset(const char *name, double r,double g, double b);
   virtual int AddSolidHSVPreset(const char *name, double hsv[3]);
-  virtual int AddSolidHSVPreset(const char *name,double h,double s, double v);
+  virtual int AddSolidHSVPreset(const char *name, double h,double s, double v);
 
   // Description:
   // Add a color preset. 
@@ -130,14 +130,16 @@ public:
   // Description:
   // Specifies a command to associate with the widget. This command is 
   // invoked when a preset is selected.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - name of the selected preset: const char*
   virtual void SetPresetSelectedCommand(vtkObject *object, const char *method);
 
   // Description:
-  // Callbacks
+  // Callbacks. Internal, do not use.
   virtual void PresetSelectedCallback(const char *name);
 
 protected:
@@ -152,7 +154,7 @@ protected:
   int ApplyPresetBetweenEndPoints;
 
   char *PresetSelectedCommand;
-  virtual void InvokePresetSelectedCommand();
+  virtual void InvokePresetSelectedCommand(const char *name);
 
   // PIMPL Encapsulation for STL containers
 

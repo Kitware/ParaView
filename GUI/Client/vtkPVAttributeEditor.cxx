@@ -60,7 +60,7 @@ Wylie, Brian
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAttributeEditor);
-vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.13");
+vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.14");
 
 
 //----------------------------------------------------------------------------
@@ -107,7 +107,10 @@ void vtkPVAttributeEditor::CreateProperties()
     interactor->AddObserver(vtkCommand::LeftButtonReleaseEvent, this->EventCallbackCommand, 1);
     // Currently only a timestep change from the animation manager will prompt the user to save changes:
     this->GetPVWindow()->GetAnimationManager()->GetAnimationScene()->AddObserver(vtkKWEvent::TimeChangedEvent,this->EventCallbackCommand, 1);
-    this->GetPVWindow()->GetCurrentPVReaderModule()->GetTimeStepWidget()->AddObserver(vtkKWEvent::TimeChangedEvent,this->EventCallbackCommand, 1);
+    if (this->GetPVWindow()->GetCurrentPVReaderModule())
+      {
+      this->GetPVWindow()->GetCurrentPVReaderModule()->GetTimeStepWidget()->AddObserver(vtkKWEvent::TimeChangedEvent,this->EventCallbackCommand, 1);
+      }
     }
 
   vtkPVSelectWidget *select = vtkPVSelectWidget::SafeDownCast(this->GetPVWidget("PickFunction"));
@@ -251,12 +254,14 @@ void vtkPVAttributeEditor::OnChar()
     if(strcmp(select->GetCurrentValue(),"'e'dit within a box") == 0)
       {
       box->GetMouseControlToggle()->ToggleSelectedState();
-      box->SetMouseControlToggle();
+      box->SetMouseControlToggle(
+        box->GetMouseControlToggle()->GetSelectedState());
       }
     else if(strcmp(select->GetCurrentValue(),"'e'dit within a draggable sphere") == 0)
       {
       sphere->GetMouseControlToggle()->ToggleSelectedState();
-      sphere->SetMouseControlToggle();
+      sphere->SetMouseControlToggle(
+        sphere->GetMouseControlToggle()->GetSelectedState());
       }
 
     return;

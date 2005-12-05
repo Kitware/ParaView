@@ -55,8 +55,8 @@ public:
 
   // Description:
   // Callback used by widgets.
-  void SaveImagesCheckCallback();
-  void SaveGeometryCheckCallback();
+  void SaveImagesCheckCallback(int state);
+  void SaveGeometryCheckCallback(int state);
   void ImageFileNameBrowseButtonCallback();
   void GeometryFileNameBrowseButtonCallback();
 

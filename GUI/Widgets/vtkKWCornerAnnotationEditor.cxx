@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.17");
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.18");
 
 //----------------------------------------------------------------------------
 vtkKWCornerAnnotationEditor::vtkKWCornerAnnotationEditor()
@@ -393,7 +393,8 @@ void vtkKWCornerAnnotationEditor::Update()
 
   if (this->CheckButton && this->CornerAnnotation)
     {
-    this->CheckButton->SetSelectedState(this->CornerAnnotation->GetVisibility());
+    this->CheckButton->SetSelectedState(
+      this->CornerAnnotation->GetVisibility());
     }
 }
 
@@ -455,12 +456,9 @@ void vtkKWCornerAnnotationEditor::SetVisibility(int state)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotationEditor::CheckButtonCallback() 
+void vtkKWCornerAnnotationEditor::CheckButtonCallback(int state) 
 {
-  if (this->CheckButton && this->CheckButton->IsCreated())
-    {
-    this->SetVisibility(this->CheckButton->GetSelectedState() ? 1 : 0);
-    }
+  this->SetVisibility(state ? 1 : 0);
 }
 
 //----------------------------------------------------------------------------
@@ -485,22 +483,15 @@ void vtkKWCornerAnnotationEditor::SetMaximumLineHeight(float v)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotationEditor::MaximumLineHeightCallback()
+void vtkKWCornerAnnotationEditor::MaximumLineHeightCallback(double value)
 {
-  if (this->IsCreated() && this->MaximumLineHeightScale)
-    {
-    this->SetMaximumLineHeight(
-      this->MaximumLineHeightScale->GetValue());
-    }
+  this->SetMaximumLineHeight(value);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotationEditor::MaximumLineHeightEndCallback()
+void vtkKWCornerAnnotationEditor::MaximumLineHeightEndCallback(double value)
 {
-  if (this->IsCreated() && this->MaximumLineHeightScale)
-    {
-    this->SetMaximumLineHeight(this->MaximumLineHeightScale->GetValue());
-    }
+  this->SetMaximumLineHeight(value);
 }
 
 //----------------------------------------------------------------------------

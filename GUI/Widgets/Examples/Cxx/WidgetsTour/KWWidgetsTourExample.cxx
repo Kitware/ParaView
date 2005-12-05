@@ -304,10 +304,10 @@ int my_main(int argc, char *argv[])
   // bring the C++ and Tcl source for each example
 
   sprintf(buffer, 
-          "{if [%s HasSelection] {"
+          "if [%s HasSelection] {"
           "%s ShowViewUserInterface [%s GetSelection] ; "
           "%s SetText $cxx_source([%s GetSelection]) ; "
-          "%s SetText $tcl_source([%s GetSelection]) }}",
+          "%s SetText $tcl_source([%s GetSelection]) }",
           widgets_tree->GetWidget()->GetTclName(),
           win->GetTclName(),
           widgets_tree->GetWidget()->GetTclName(),

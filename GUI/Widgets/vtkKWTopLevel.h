@@ -205,10 +205,10 @@ public:
   // Specifies a command to associate with the widget. This command is 
   // typically invoked when the user closes the window using the
   // window manager.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void SetDeleteWindowProtocolCommand(
     vtkObject *object, const char *method);
 

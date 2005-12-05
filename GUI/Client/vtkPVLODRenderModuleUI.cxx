@@ -57,7 +57,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.35");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.36");
 
 //----------------------------------------------------------------------------
 vtkPVLODRenderModuleUI::vtkPVLODRenderModuleUI()
@@ -318,7 +318,8 @@ void vtkPVLODRenderModuleUI::Create()
     }
   this->RenderInterruptsEnabledCheck->SetSelectedState(this->RenderInterruptsEnabled);
   // This call just forwards the value to the render module.
-  this->RenderInterruptsEnabledCheckCallback();
+  this->RenderInterruptsEnabledCheckCallback(
+    this->RenderInterruptsEnabledCheck->GetSelectedState());
 
   this->RenderInterruptsEnabledCheck->SetBalloonHelpString(
     "Toggle the use of  render interrupts (when using MPI, this uses "
@@ -336,17 +337,16 @@ void vtkPVLODRenderModuleUI::Create()
 
 
 //----------------------------------------------------------------------------
-void vtkPVLODRenderModuleUI::LODThresholdScaleCallback()
+void vtkPVLODRenderModuleUI::LODThresholdScaleCallback(double value)
 {
-  float threshold = this->LODThresholdScale->GetValue();
-  this->SetLODThreshold(threshold);
+  this->SetLODThreshold(value);
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVLODRenderModuleUI::LODCheckCallback()
+void vtkPVLODRenderModuleUI::LODCheckCallback(int state)
 {
-  if (this->LODCheck->GetSelectedState())
+  if (state)
     {
     float threshold = this->LODThresholdScale->GetValue();
     this->SetLODThreshold(threshold);
@@ -358,9 +358,9 @@ void vtkPVLODRenderModuleUI::LODCheckCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLODRenderModuleUI::LODThresholdLabelCallback()
+void vtkPVLODRenderModuleUI::LODThresholdLabelCallback(double value)
 {
-  float threshold = this->LODThresholdScale->GetValue();
+  float threshold = value;
   if (threshold == VTK_LARGE_FLOAT)
     {
     this->LODThresholdValue->SetText("Disabled");
@@ -397,7 +397,7 @@ void vtkPVLODRenderModuleUI::SetLODThreshold(float threshold)
       this->LODCheck->SetSelectedState(1);
       this->LODThresholdScale->SetValue(threshold);
       }
-    this->LODThresholdLabelCallback();
+    this->LODThresholdLabelCallback(this->LODThresholdScale->GetValue());
     }
     
   if ( this->RenderModuleProxy)
@@ -423,9 +423,9 @@ void vtkPVLODRenderModuleUI::SetLODThreshold(float threshold)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLODRenderModuleUI::LODResolutionScaleCallback()
+void vtkPVLODRenderModuleUI::LODResolutionScaleCallback(double val)
 {
-  int value = static_cast<int>(this->LODResolutionScale->GetValue());
+  int value = static_cast<int>(val);
   value = 170 - value;
 
   // Use internal method so we do not reset the slider.
@@ -440,9 +440,9 @@ void vtkPVLODRenderModuleUI::LODResolutionScaleCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLODRenderModuleUI::LODResolutionLabelCallback()
+void vtkPVLODRenderModuleUI::LODResolutionLabelCallback(double value)
 {
-  int resolution = static_cast<int>(this->LODResolutionScale->GetValue());
+  int resolution = static_cast<int>(value);
   resolution = 170 - resolution;
 
   char str[256];
@@ -492,9 +492,9 @@ void vtkPVLODRenderModuleUI::SetLODResolutionInternal(int resolution)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLODRenderModuleUI::OutlineThresholdScaleCallback()
+void vtkPVLODRenderModuleUI::OutlineThresholdScaleCallback(double val)
 {
-  float value = static_cast<float>(this->OutlineThresholdScale->GetValue());
+  float value = static_cast<float>(val);
 
   value = value * 1000000.0;  
 
@@ -510,9 +510,9 @@ void vtkPVLODRenderModuleUI::OutlineThresholdScaleCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLODRenderModuleUI::OutlineThresholdLabelCallback()
+void vtkPVLODRenderModuleUI::OutlineThresholdLabelCallback(double val)
 {
-  float value = static_cast<float>(this->OutlineThresholdScale->GetValue());
+  float value = static_cast<float>(val);
 
   char str[256];
   sprintf(str, "%0.1f MCells", value);
@@ -547,10 +547,9 @@ void vtkPVLODRenderModuleUI::SetOutlineThresholdInternal(float threshold)
 
 
 //----------------------------------------------------------------------------
-void vtkPVLODRenderModuleUI::RenderInterruptsEnabledCheckCallback()
+void vtkPVLODRenderModuleUI::RenderInterruptsEnabledCheckCallback(int state)
 {
-  this->SetRenderInterruptsEnabled(
-    this->RenderInterruptsEnabledCheck->GetSelectedState());
+  this->SetRenderInterruptsEnabled(state);
 }
 
 //----------------------------------------------------------------------------

@@ -76,7 +76,7 @@ public:
 
   // Description:
   // Callback when a field criterion is enabled/disabled.
-  virtual void ToggleCriterionCallback();
+  virtual void ToggleCriterionCallback(int state);
 
   // Description:
   // Callback when a point field is selected.

@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.11");
+vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVIceTRenderModuleUI::vtkPVIceTRenderModuleUI()
@@ -194,11 +194,9 @@ void vtkPVIceTRenderModuleUI::Create()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVIceTRenderModuleUI::CollectCheckCallback()
+void vtkPVIceTRenderModuleUI::CollectCheckCallback(int state)
 {
-  int val = this->CollectCheck->GetSelectedState();
-
-  if (val)
+  if (state)
     {
     float threshold = this->CollectThresholdScale->GetValue();
     this->SetCollectThreshold(threshold);
@@ -210,16 +208,15 @@ void vtkPVIceTRenderModuleUI::CollectCheckCallback()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVIceTRenderModuleUI::CollectThresholdScaleCallback()
+void vtkPVIceTRenderModuleUI::CollectThresholdScaleCallback(double value)
 {
-  float threshold = this->CollectThresholdScale->GetValue();
-  this->SetCollectThreshold(threshold);
+  this->SetCollectThreshold(value);
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVIceTRenderModuleUI::CollectThresholdLabelCallback()
+void vtkPVIceTRenderModuleUI::CollectThresholdLabelCallback(double value)
 {
-  float threshold = this->CollectThresholdScale->GetValue();
+  float threshold = value;
 
   if (threshold == VTK_LARGE_FLOAT)
     {
@@ -238,7 +235,7 @@ void vtkPVIceTRenderModuleUI::SetCollectThreshold(float threshold)
 {
   if (this->CollectThreshold == threshold) return;
 
-  this->CollectThresholdLabelCallback();
+  this->CollectThresholdLabelCallback(this->CollectThresholdScale->GetValue());
 
   if (threshold == VTK_LARGE_FLOAT)
     {
@@ -270,24 +267,23 @@ void vtkPVIceTRenderModuleUI::SetCollectThreshold(float threshold)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVIceTRenderModuleUI::StillReductionCheckCallback()
+void vtkPVIceTRenderModuleUI::StillReductionCheckCallback(int state)
 {
-  int val = this->StillReductionCheck->GetSelectedState();
-  if (val)
+  if (state)
     {
-    val = (int)(this->StillReductionFactorScale->GetValue());
+    state = (int)(this->StillReductionFactorScale->GetValue());
     }
   else
     { // value of 1 is disabled.
-    val = 1;
+    state = 1;
     }
-  this->SetStillReductionFactor(val);
+  this->SetStillReductionFactor(state);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVIceTRenderModuleUI::StillReductionFactorScaleCallback()
+void vtkPVIceTRenderModuleUI::StillReductionFactorScaleCallback(double value)
 {
-  int val = (int)(this->StillReductionFactorScale->GetValue());
+  int val = (int)(value);
   this->SetStillReductionFactor(val);
 }
 

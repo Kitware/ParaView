@@ -43,7 +43,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.80");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.81");
 
 //----------------------------------------------------------------------------
 vtkPVArraySelection::vtkPVArraySelection()
@@ -284,7 +284,7 @@ void vtkPVArraySelection::UpdateGUI()
                      this->Selection->GetArrayName(idx));
         this->Script("grid %s -row %d -sticky w", checkButton->GetWidgetName(), row);
         ++row;
-        checkButton->SetCommand(this, "ModifiedCallback");
+        checkButton->SetCommand(this, "CheckButtonCallback");
         this->ArrayCheckButtons->AddItem(checkButton);
         checkButton->Delete();
         }
@@ -302,8 +302,12 @@ void vtkPVArraySelection::UpdateGUI()
     check->SetSelectedState(this->Selection->ArrayIsEnabled(check->GetText()));
     }
   it->Delete();
+}
 
-  
+//----------------------------------------------------------------------------
+void vtkPVArraySelection::CheckButtonCallback(int)
+{
+  this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------

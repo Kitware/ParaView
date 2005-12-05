@@ -284,15 +284,6 @@ public:
   int GetPageIdContainingCoordinatesInTab(int x, int y);
 
   // Description:
-  // Some callback routines.
-  void ScheduleResize();
-  void Resize();
-  void PageTabContextMenuCallback(int id, int x, int y);
-  void RaiseCallback(int id);
-  void TogglePagePinnedCallback(int id);
-  void TogglePageVisibilityCallback(int id);
-
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -300,6 +291,18 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Schedule the widget to resize itself, or resize it right away
+  virtual void ScheduleResize();
+  virtual void Resize();
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void PageTabContextMenuCallback(int id, int x, int y);
+  virtual void RaiseCallback(int id);
+  virtual void TogglePagePinnedCallback(int id);
+  virtual void TogglePageVisibilityCallback(int id);
 
 protected:
   vtkKWNotebook();

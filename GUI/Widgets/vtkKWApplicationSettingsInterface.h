@@ -53,18 +53,6 @@ public:
   virtual void Update();
 
   // Description:
-  // Callback used when interaction has been performed.
-  virtual void ConfirmExitCallback();
-  virtual void SaveUserInterfaceGeometryCallback();
-  virtual void SplashScreenVisibilityCallback();
-  virtual void BalloonHelpVisibilityCallback();
-  virtual void ResetDragAndDropCallback();
-  virtual void FlatFrameCallback();
-  virtual void FlatButtonsCallback();
-  virtual void DPICallback(double dpi);
-  virtual void ViewPanelPositionCallback();
-
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -78,6 +66,18 @@ public:
   //BTX
   static const char *PrintSettingsLabel;
   //ETX
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void ConfirmExitCallback(int state);
+  virtual void SaveUserInterfaceGeometryCallback(int state);
+  virtual void SplashScreenVisibilityCallback(int state);
+  virtual void BalloonHelpVisibilityCallback(int state);
+  virtual void ResetDragAndDropCallback();
+  virtual void FlatFrameCallback(int state);
+  virtual void FlatButtonsCallback(int state);
+  virtual void DPICallback(double dpi);
+  virtual void ViewPanelPositionCallback();
 
 protected:
   vtkKWApplicationSettingsInterface();

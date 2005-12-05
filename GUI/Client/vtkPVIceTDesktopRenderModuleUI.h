@@ -41,7 +41,6 @@ public:
 
   // Description:
   // Callback for the ordered composite check button.
-  virtual void OrderedCompositingCheckCallback();
   virtual void SetOrderedCompositingFlag(int state);
 
   void EnableRenductionFactor();

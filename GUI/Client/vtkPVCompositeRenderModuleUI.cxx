@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.33");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.34");
 
 //----------------------------------------------------------------------------
 vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
@@ -359,7 +359,8 @@ void vtkPVCompositeRenderModuleUI::Create()
         pvapp->GetIntRegistryValue(2, "RunTime", "UseFloatInComposite");
       }
     this->CompositeWithFloatCheck->SetSelectedState(this->CompositeWithFloatFlag);
-    this->CompositeWithFloatCallback();
+    this->CompositeWithFloatCallback(
+      this->CompositeWithFloatCheck->GetSelectedState());
     this->CompositeWithFloatCheck->SetBalloonHelpString(
       "Toggle the use of char/float values when compositing. "
       "If rendering defects occur, try turning this on.");
@@ -372,7 +373,8 @@ void vtkPVCompositeRenderModuleUI::Create()
         pvapp->GetIntRegistryValue(2, "RunTime", "UseRGBAInComposite");
       }
     this->CompositeWithRGBACheck->SetSelectedState(this->CompositeWithRGBAFlag);
-    this->CompositeWithRGBACallback();
+    this->CompositeWithRGBACallback(
+      this->CompositeWithRGBACheck->GetSelectedState());
     this->CompositeWithRGBACheck->SetBalloonHelpString(
       "Toggle the use of RGB/RGBA values when compositing. "
       "This is here to bypass some bugs in some graphics card drivers.");
@@ -386,7 +388,8 @@ void vtkPVCompositeRenderModuleUI::Create()
         pvapp->GetIntRegistryValue(2, "RunTime", "UseCompressionInComposite");
       }
     this->CompositeCompressionCheck->SetSelectedState(this->CompositeCompressionFlag);
-    this->CompositeCompressionCallback();
+    this->CompositeCompressionCallback(
+      this->CompositeCompressionCheck->GetSelectedState());
     this->CompositeCompressionCheck->SetBalloonHelpString(
       "Toggle the use of run length encoding when compositing. "
       "This is here to compare performance.  "
@@ -456,17 +459,15 @@ void vtkPVCompositeRenderModuleUI::Initialize()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCompositeRenderModuleUI::CompositeThresholdScaleCallback()
+void vtkPVCompositeRenderModuleUI::CompositeThresholdScaleCallback(double value)
 {
-  float threshold = this->CompositeThresholdScale->GetValue();
-
-  this->SetCompositeThreshold(threshold);
+  this->SetCompositeThreshold(value);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCompositeRenderModuleUI::CompositeThresholdLabelCallback()
+void vtkPVCompositeRenderModuleUI::CompositeThresholdLabelCallback(double value)
 {
-  float threshold = this->CompositeThresholdScale->GetValue();
+  float threshold = value;
 
   if (threshold == VTK_LARGE_FLOAT)
     {
@@ -481,11 +482,9 @@ void vtkPVCompositeRenderModuleUI::CompositeThresholdLabelCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCompositeRenderModuleUI::CompositeCheckCallback()
+void vtkPVCompositeRenderModuleUI::CompositeCheckCallback(int state)
 {
-  int val = this->CompositeCheck->GetSelectedState();
-
-  if (val == 0)
+  if (state == 0)
     {
     this->SetCompositeThreshold(VTK_LARGE_FLOAT);
     }
@@ -510,7 +509,8 @@ void vtkPVCompositeRenderModuleUI::SetCompositeThreshold(float threshold)
     threshold = VTK_LARGE_FLOAT;
     }
 
-  this->CompositeThresholdLabelCallback();
+  this->CompositeThresholdLabelCallback(
+    this->CompositeThresholdScale->GetValue());
 
   if (threshold == VTK_LARGE_FLOAT)
     {
@@ -544,13 +544,6 @@ void vtkPVCompositeRenderModuleUI::SetCompositeThreshold(float threshold)
   // the trace might not have this module
   this->GetTraceHelper()->AddEntry("catch {$kw(%s) SetCompositeThreshold %f}",
                       this->GetTclName(), threshold);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVCompositeRenderModuleUI::CompositeWithFloatCallback()
-{
-  int val = this->CompositeWithFloatCheck->GetSelectedState();
-  this->CompositeWithFloatCallback(val);
 }
 
 //----------------------------------------------------------------------------
@@ -588,13 +581,6 @@ void vtkPVCompositeRenderModuleUI::CompositeWithFloatCallback(int val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCompositeRenderModuleUI::CompositeWithRGBACallback()
-{
-  int val = this->CompositeWithRGBACheck->GetSelectedState();
-  this->CompositeWithRGBACallback(val);
-}
-
-//----------------------------------------------------------------------------
 void vtkPVCompositeRenderModuleUI::CompositeWithRGBACallback(int val)
 {
   // We use a catch in this trace because the paraview executing
@@ -626,13 +612,6 @@ void vtkPVCompositeRenderModuleUI::CompositeWithRGBACallback(int val)
     {
     vtkTimerLog::MarkEvent("--- Use RGB pixels to get color buffers.");
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVCompositeRenderModuleUI::CompositeCompressionCallback()
-{
-  int val = this->CompositeCompressionCheck->GetSelectedState();
-  this->CompositeCompressionCallback(val);
 }
 
 //----------------------------------------------------------------------------
@@ -672,21 +651,19 @@ void vtkPVCompositeRenderModuleUI::CompositeCompressionCallback(int val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCompositeRenderModuleUI::SquirtLevelScaleCallback()
+void vtkPVCompositeRenderModuleUI::SquirtLevelScaleCallback(double value)
 {
-  int val = (int)(this->SquirtLevelScale->GetValue());
-  this->SetSquirtLevel(val);
+  this->SetSquirtLevel((int)value);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCompositeRenderModuleUI::SquirtCheckCallback()
+void vtkPVCompositeRenderModuleUI::SquirtCheckCallback(int state)
 {
-  int val = this->SquirtCheck->GetSelectedState();
-  if (val)
+  if (state)
     {
-    val = (int)(this->SquirtLevelScale->GetValue());
+    state = (int)(this->SquirtLevelScale->GetValue());
     }
-  this->SetSquirtLevel(val);
+  this->SetSquirtLevel(state);
 }
 
 //----------------------------------------------------------------------------
@@ -754,25 +731,23 @@ void vtkPVCompositeRenderModuleUI::SetSquirtLevel(int level)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCompositeRenderModuleUI::ReductionFactorScaleCallback()
+void vtkPVCompositeRenderModuleUI::ReductionFactorScaleCallback(double value)
 {
-  int val = (int)(this->ReductionFactorScale->GetValue());
-  this->SetReductionFactor(val);
+  this->SetReductionFactor((int)value);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCompositeRenderModuleUI::ReductionCheckCallback()
+void vtkPVCompositeRenderModuleUI::ReductionCheckCallback(int state)
 {
-  int val = this->ReductionCheck->GetSelectedState();
-  if (val)
+  if (state)
     {
-    val = (int)(this->ReductionFactorScale->GetValue());
+    state = (int)(this->ReductionFactorScale->GetValue());
     }
   else
     { // value of 1 is disabled.
-    val = 1;
+    state = 1;
     }
-  this->SetReductionFactor(val);
+  this->SetReductionFactor(state);
 }
 
 //----------------------------------------------------------------------------
@@ -825,7 +800,8 @@ void vtkPVCompositeRenderModuleUI::SetCompositeOptionEnabled(int val)
 {
   this->CompositeOptionEnabled = val;
   this->CompositeCheck->SetEnabled(val);
-  this->CompositeCheckCallback();
+  this->CompositeCheckCallback(
+    this->CompositeWithRGBACheck->GetSelectedState());
 }
 
 //----------------------------------------------------------------------------

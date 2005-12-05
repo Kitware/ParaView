@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSpinBox);
-vtkCxxRevisionMacro(vtkKWSpinBox, "1.8");
+vtkCxxRevisionMacro(vtkKWSpinBox, "1.9");
 
 //----------------------------------------------------------------------------
 vtkKWSpinBox::vtkKWSpinBox() 
@@ -144,7 +144,7 @@ int vtkKWSpinBox::GetExportSelection()
 //----------------------------------------------------------------------------
 void vtkKWSpinBox::CommandCallback()
 {
-  this->InvokeCommand();
+  this->InvokeCommand(this->GetValue());
 }
 
 //----------------------------------------------------------------------------
@@ -154,9 +154,23 @@ void vtkKWSpinBox::SetCommand(vtkObject *object, const char *method)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSpinBox::InvokeCommand()
+void vtkKWSpinBox::InvokeCommand(double value)
 {
-  this->InvokeObjectMethodCommand(this->Command);
+  if (this->Command && *this->Command && this->GetApplication())
+    {
+    // As a convenience, try to detect if we are manipulating integers, and
+    // invoke the callback with the approriate type.
+    if ((double)((long int)value) == value)
+      {
+      //this->Script("eval %s %ld", this->Command, (long int)value);
+      this->Script("%s %ld", this->Command, (long int)value);
+      }
+    else
+      {
+      //this->Script("eval %s %lf", this->Command, value);
+      this->Script("%s %lf", this->Command, value);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

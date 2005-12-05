@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBoxToListBoxSelectionEditor );
-vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.12");
+vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.13");
 
 //----------------------------------------------------------------------------
 vtkKWListBoxToListBoxSelectionEditor::vtkKWListBoxToListBoxSelectionEditor()
@@ -59,7 +59,11 @@ vtkKWListBoxToListBoxSelectionEditor::~vtkKWListBoxToListBoxSelectionEditor()
   this->UpButton->Delete();
   this->DownButton->Delete();
 
-  this->SetEllipsisCommand(0);
+  if (this->EllipsisCommand)
+    {
+    delete [] this->EllipsisCommand;
+    this->EllipsisCommand = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -424,21 +428,20 @@ void vtkKWListBoxToListBoxSelectionEditor::RemoveEllipsis()
 //----------------------------------------------------------------------------
 void vtkKWListBoxToListBoxSelectionEditor::EllipsisCallback()
 {
-  if ( !this->EllipsisCommand )
-    {
-    return;
-    }
-  this->Script(this->EllipsisCommand);
+  this->InvokeEllipsisCommand();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWListBoxToListBoxSelectionEditor::SetEllipsisCommand(
   vtkObject *obj, const char *method)
 {
-  char *command = NULL;
-  this->SetObjectMethodCommand(&command, obj, method);
-  this->SetEllipsisCommand(command);
-  delete [] command;
+  this->SetObjectMethodCommand(&this->EllipsisCommand, obj, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBoxToListBoxSelectionEditor::InvokeEllipsisCommand()
+{
+  this->InvokeObjectMethodCommand(this->EllipsisCommand);
 }
 
 //-----------------------------------------------------------------------------
@@ -461,8 +464,5 @@ void vtkKWListBoxToListBoxSelectionEditor::UpdateEnableState()
 void vtkKWListBoxToListBoxSelectionEditor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  
-  os << indent << "EllipsisCommand: "
-     << (this->EllipsisCommand ? this->EllipsisCommand : "(none)") << endl;
 }
 

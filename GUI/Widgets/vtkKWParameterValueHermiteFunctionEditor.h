@@ -137,9 +137,13 @@ public:
   virtual void SelectPoint(int id);
 
   // Description:
-  // Set commands.
-  // SelectionChanged is called when the midpoint selection was changed
-  // or on deselection.
+  // Specifies selection-related commands to associate with the widget.
+  // 'MidPointSelectionChangedCommand' is called whenever the midpoint
+  // selection was changed or cleared.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void SetMidPointSelectionChangedCommand(
     vtkObject *object,const char *method);
 
@@ -187,22 +191,22 @@ public:
   virtual void UpdateEnableState();
 
   // Description:
-  // Callbacks
-  virtual void MidPointEntryChangedCallback();
-  virtual void MidPointEntryChangingCallback();
-  virtual void SharpnessEntryChangedCallback();
-  virtual void SharpnessEntryChangingCallback();
-  virtual void StartInteractionCallback(int x, int y);
-  virtual void MoveMidPointCallback(int x, int y, int button);
-  virtual void EndMidPointInteractionCallback(int x, int y);
-
-  // Description:
   // Some constants
   //BTX
   static const char *MidPointTag;
   static const char *MidPointGuidelineTag;
   static const char *MidPointSelectedTag;
   //ETX
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void MidPointEntryChangedCallback(double value);
+  virtual void MidPointEntryChangingCallback(double value);
+  virtual void SharpnessEntryChangedCallback(double value);
+  virtual void SharpnessEntryChangingCallback(double value);
+  virtual void StartInteractionCallback(int x, int y);
+  virtual void MoveMidPointCallback(int x, int y, int button);
+  virtual void EndMidPointInteractionCallback(int x, int y);
 
 protected:
   vtkKWParameterValueHermiteFunctionEditor();

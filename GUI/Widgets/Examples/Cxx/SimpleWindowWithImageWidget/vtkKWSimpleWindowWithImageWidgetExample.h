@@ -20,7 +20,7 @@ public:
 
   // Description:
   // Callbacks
-  virtual void SetSliceFromScaleCallback();
+  virtual void SetSliceFromScaleCallback(double value);
   virtual void SetSliceCallback(int slice);
   virtual int  GetSliceCallback();
   virtual int  GetSliceMinCallback();

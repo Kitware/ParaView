@@ -71,6 +71,18 @@ public:
   vtkGetMacro(WindowLevelMode, int);
 
   // Description:
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when the window/level *mode* is changed.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - new histogram log mode: int
+  virtual void SetWindowLevelModeChangedCommand(
+    vtkObject *object,const char *method);
+
+  // Description:
   // Set/Get the window/level mode button visibility.
   // Note: set this parameter to the proper value before calling Create() in
   // order to minimize the footprint of the object.
@@ -94,16 +106,6 @@ public:
   virtual void SetInteractiveWindowLevel(double window, double level);
   vtkGetMacro(Window, double);
   vtkGetMacro(Level, double);
-
-  // Description:
-  // Specifies a command to associate with the widget. This command is 
-  // typically invoked when the window/level is changed.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  virtual void SetWindowLevelModeChangedCommand(
-    vtkObject *object,const char *method);
 
   // Description:
   // Set/Get the value entry UI visibility.
@@ -130,11 +132,6 @@ public:
   virtual void UpdateEnableState();
 
   // Description:
-  // Callbacks
-  virtual void ValueEntryCallback();
-  virtual void WindowLevelModeCallback();
-
-  // Description:
   // Proxy to the function. 
   // See protected: section too.
   virtual int HasFunction();
@@ -153,6 +150,11 @@ public:
   // Description:
   // Higher-level methods to manipulate the function. 
   virtual int  MoveFunctionPoint(int id,double parameter,const double *values);
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void ValueEntryCallback(const char *value);
+  virtual void WindowLevelModeCallback(int state);
 
 protected:
   vtkKWPiecewiseFunctionEditor();
@@ -204,7 +206,7 @@ protected:
   virtual void UpdatePointsFromWindowLevel(int interactive = 0);
   virtual void UpdateWindowLevelFromPoints();
 
-  virtual void InvokeWindowLevelModeChangedCommand();
+  virtual void InvokeWindowLevelModeChangedCommand(int mode);
   virtual void InvokeFunctionChangedCommand();
   virtual void InvokeFunctionChangingCommand();
 

@@ -24,7 +24,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVExponentialKeyFrame);
-vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.12");
+vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.13");
 
 //Helper methods to down cast the property and set value.
 inline static int DoubleVectPropertySetElement(vtkSMProxy *proxy, 
@@ -81,7 +81,6 @@ void vtkPVExponentialKeyFrame::ChildCreate()
   this->BaseThumbWheel->DisplayLabelOff();
   this->BaseThumbWheel->DisplayEntryAndLabelOnTopOff();
   this->BaseThumbWheel->ExpandEntryOn();
-  this->BaseThumbWheel->GetEntry()->SetCommand(this, "BaseChangedCallback");
   this->BaseThumbWheel->SetEndCommand(this, "BaseChangedCallback");
   this->BaseThumbWheel->SetEntryCommand(this, "BaseChangedCallback");
 
@@ -98,7 +97,6 @@ void vtkPVExponentialKeyFrame::ChildCreate()
   this->StartPowerThumbWheel->DisplayLabelOff();
   this->StartPowerThumbWheel->DisplayEntryAndLabelOnTopOff();
   this->StartPowerThumbWheel->ExpandEntryOn();
-  this->StartPowerThumbWheel->GetEntry()->SetCommand(this, "StartPowerChangedCallback");
   this->StartPowerThumbWheel->SetEndCommand(this, "StartPowerChangedCallback");
   this->StartPowerThumbWheel->SetEntryCommand(this, "StartPowerChangedCallback");
 
@@ -115,7 +113,6 @@ void vtkPVExponentialKeyFrame::ChildCreate()
   this->EndPowerThumbWheel->DisplayLabelOff();
   this->EndPowerThumbWheel->DisplayEntryAndLabelOnTopOff();
   this->EndPowerThumbWheel->ExpandEntryOn();
-  this->EndPowerThumbWheel->GetEntry()->SetCommand(this, "EndPowerChangedCallback");
   this->EndPowerThumbWheel->SetEndCommand(this, "EndPowerChangedCallback");
   this->EndPowerThumbWheel->SetEntryCommand(this, "EndPowerChangedCallback");
 
@@ -131,24 +128,21 @@ void vtkPVExponentialKeyFrame::ChildCreate()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVExponentialKeyFrame::BaseChangedCallback()
+void vtkPVExponentialKeyFrame::BaseChangedCallback(double value)
 {
-  this->SetBaseWithTrace(
-    this->BaseThumbWheel->GetEntry()->GetValueAsDouble());
+  this->SetBaseWithTrace(value);
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVExponentialKeyFrame::EndPowerChangedCallback()
+void vtkPVExponentialKeyFrame::EndPowerChangedCallback(double value)
 {
-  this->SetEndPowerWithTrace(
-    this->EndPowerThumbWheel->GetEntry()->GetValueAsDouble());
+  this->SetEndPowerWithTrace(value);
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVExponentialKeyFrame::StartPowerChangedCallback()
+void vtkPVExponentialKeyFrame::StartPowerChangedCallback(double value)
 {
-  this->SetStartPowerWithTrace(
-    this->StartPowerThumbWheel->GetEntry()->GetValueAsDouble());
+  this->SetStartPowerWithTrace(value);
 }
 
 //-----------------------------------------------------------------------------

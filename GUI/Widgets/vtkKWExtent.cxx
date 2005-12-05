@@ -19,12 +19,14 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.44");
+vtkCxxRevisionMacro(vtkKWExtent, "1.45");
 
 //----------------------------------------------------------------------------
 vtkKWExtent::vtkKWExtent()
 {
   this->Command = NULL;
+  this->StartCommand = NULL;
+  this->EndCommand   = NULL;
 
   for (int i = 0; i < 3; i++)
     {
@@ -41,6 +43,18 @@ vtkKWExtent::~vtkKWExtent()
   if (this->Command)
     {
     delete [] this->Command;
+    }
+
+  if (this->StartCommand)
+    {
+    delete [] this->StartCommand;
+    this->StartCommand = NULL;
+    }
+
+  if (this->EndCommand)
+    {
+    delete [] this->EndCommand;
+    this->EndCommand = NULL;
     }
 
   for (int i = 0; i < 3; i++)
@@ -72,7 +86,9 @@ void vtkKWExtent::Create()
     this->Range[i]->LabelVisibilityOn();
     this->Range[i]->EntriesVisibilityOn();
     this->Range[i]->Create();
-    this->Range[i]->SetCommand(this, "ExtentChangedCallback");
+    this->Range[i]->SetCommand(this, "RangeCommandCallback");
+    this->Range[i]->SetStartCommand(this, "RangeStartCommandCallback");
+    this->Range[i]->SetEndCommand(this,  "RangeEndCommandCallback");
     this->Range[i]->AdjustResolutionOn();
     }
 
@@ -241,7 +257,7 @@ void vtkKWExtent::SetExtentVisibility(int index, int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::ExtentChangedCallback()
+void vtkKWExtent::RangeCommandCallback(double, double)
 {
   // first check to see if anything changed.
   // Normally something should have changed, but 
@@ -264,43 +280,96 @@ void vtkKWExtent::ExtentChangedCallback()
   this->Extent[4] = this->Range[2]->GetRange()[0];
   this->Extent[5] = this->Range[2]->GetRange()[1];
  
-  this->InvokeCommand();
+  this->InvokeCommand(
+    this->Extent[0], this->Extent[1],
+    this->Extent[2], this->Extent[3],
+    this->Extent[4], this->Extent[5]);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWExtent::RangeStartCommandCallback(double, double)
+{
+  this->InvokeStartCommand(
+    this->Extent[0], this->Extent[1],
+    this->Extent[2], this->Extent[3],
+    this->Extent[4], this->Extent[5]);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWExtent::RangeEndCommandCallback(double, double)
+{
+  this->InvokeEndCommand(
+    this->Extent[0], this->Extent[1],
+    this->Extent[2], this->Extent[3],
+    this->Extent[4], this->Extent[5]);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWExtent::InvokeExtentCommand(
+  const char *command, 
+  double x0, double x1, double y0, double y1, double z0, double z1)
+{
+  if (command && *command && this->GetApplication())
+    {
+    // As a convenience, try to detect if we are manipulating integers, and
+    // invoke the callback with the approriate type.
+    if ((double)((long int)x0) == x0 && (long double)((int)x1) == x1 &&
+        (double)((long int)y0) == y0 && (long double)((int)y1) == y1 &&
+        (double)((long int)z0) == z0 && (long double)((int)z1) == z1)
+      {
+      //this->Script("eval %s %ld %ld %ld %ld %ld %ld", 
+      this->Script("%s %ld %ld %ld %ld %ld %ld", 
+                   command, 
+                   (long int)x0, (long int)x1, 
+                   (long int)y0, (long int)y1, 
+                   (long int)z0, (long int)z1);
+      }
+    else
+      {
+      //this->Script("eval %s %lf %lf %lf %lf %lf %lf", 
+      this->Script("%s %lf %lf %lf %lf %lf %lf", 
+                   command, x0, x1, y0, y1, z0, z1);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWExtent::SetCommand(vtkObject *object, const char *method)
-{ 
+{
   this->SetObjectMethodCommand(&this->Command, object, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::InvokeCommand()
+void vtkKWExtent::InvokeCommand(
+  double x0, double x1, double y0, double y1, double z0, double z1)
 {
-  this->InvokeObjectMethodCommand(this->Command);
+  this->InvokeExtentCommand(this->Command, x0, x1, y0, y1, z0, z1);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::SetStartCommand(vtkObject *object, const char *method)
-{ 
-  for (int i = 0; i < 3; i++)
-    {
-    if (this->Range[i])
-      {
-      this->Range[i]->SetStartCommand(object, method);
-      }
-    }
+void vtkKWExtent::SetStartCommand(vtkObject *object, const char * method)
+{
+  this->SetObjectMethodCommand(&this->StartCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::SetEndCommand(vtkObject *object, const char *method)
-{ 
-  for (int i = 0; i < 3; i++)
-    {
-    if (this->Range[i])
-      {
-      this->Range[i]->SetEndCommand(object, method);
-      }
-    }
+void vtkKWExtent::InvokeStartCommand(
+  double x0, double x1, double y0, double y1, double z0, double z1)
+{
+  this->InvokeExtentCommand(this->StartCommand, x0, x1, y0, y1, z0, z1);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWExtent::SetEndCommand(vtkObject *object, const char * method)
+{
+  this->SetObjectMethodCommand(&this->EndCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWExtent::InvokeEndCommand(
+  double x0, double x1, double y0, double y1, double z0, double z1)
+{
+  this->InvokeExtentCommand(this->EndCommand, x0, x1, y0, y1, z0, z1);
 }
 
 //----------------------------------------------------------------------------
