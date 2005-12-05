@@ -275,6 +275,19 @@ ADD_TEST("ArrowServer-ParaView-rc"
   -T ${ParaView_BINARY_DIR}/Testing/Temporary
   -V ${PVClientTestData}/Baseline/Arrow.png)
 
+# Make sure that load cth - extract cth - array calc (cell data)
+# works. This is a bug that keeps resurfacing.
+ADD_TEST(TestCTHAndCalc-ParaView
+  ${PARAVIEW_EXECUTABLE} 
+  ${TIMEOUT}
+  --disable-registry
+  ${PVClientTests_SOURCE_DIR}/Tcl/TestCTHAndCalc.pvs
+  -D ${PVClientTestData}
+  -C ${PVCompareImages}
+  -T ${ParaView_BINARY_DIR}/Testing/Temporary
+  -V ${PVClientTestData}/Baseline/TestCTHAndCalc.png
+  )
+
 # remove the following for the batch tests
 SET (PROJECT_TESTS_NO_BATCH 
   #Animation
