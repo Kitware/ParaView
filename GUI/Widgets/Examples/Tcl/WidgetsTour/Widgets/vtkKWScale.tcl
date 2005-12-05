@@ -69,7 +69,7 @@ proc vtkKWScaleEntryPoint {parent win} {
   scale3 SetBalloonHelpString \
     "It's a pop-up and it sets the previous scale value too"
 
-  scale3 SetCommand scale2b {SetValue [scale3 GetValue]}
+  scale3 SetCommand scale2b "SetValue"
 
   pack [scale3 GetWidgetName] -side top -anchor nw -expand n -fill none -padx 2 -pady 6
 
