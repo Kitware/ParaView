@@ -34,13 +34,15 @@ proc vtkKWColorPresetSelectorEntryPoint {parent win} {
 
   # -----------------------------------------------------------------------
 
+  proc update_editor {name} {cpsel_tfunc_editor Update}
+
   # Create a color preset selector
 
   vtkKWColorPresetSelector cpsel1
   cpsel1 SetParent $parent
   cpsel1 Create
   cpsel1 SetColorTransferFunction cpsel_func
-  cpsel1 SetPresetSelectedCommand cpsel_tfunc_editor "Update"
+  cpsel1 SetPresetSelectedCommand "" "update_editor"
   cpsel1 SetBalloonHelpString \
     "A set of predefined color presets. Select one of them to apply the\
     preset to a color transfer function vtkColorTransferFunction"
@@ -57,7 +59,7 @@ proc vtkKWColorPresetSelectorEntryPoint {parent win} {
   cpsel2 SetLabelText "Solid Color Presets:"
   cpsel2 HideGradientPresetsOn
   cpsel2 SetColorTransferFunction cpsel_func
-  cpsel2 SetPresetSelectedCommand cpsel_tfunc_editor "Update"
+  cpsel2 SetPresetSelectedCommand "" "update_editor"
   cpsel2 SetBalloonHelpString \
     "A set of predefined color presets. Let's hide the gradient presets."
 
@@ -72,7 +74,7 @@ proc vtkKWColorPresetSelectorEntryPoint {parent win} {
   cpsel3 Create
   cpsel3 SetLabelPositionToRight
   cpsel3 SetColorTransferFunction cpsel_func
-  cpsel3 SetPresetSelectedCommand cpsel_tfunc_editor "Update"
+  cpsel3 SetPresetSelectedCommand "" "update_editor"
   cpsel3 RemoveAllPresets
   cpsel3 SetPreviewSize [expr [cpsel3 GetPreviewSize]  * 2]
   cpsel3 SetLabelText "Custom Color Presets"

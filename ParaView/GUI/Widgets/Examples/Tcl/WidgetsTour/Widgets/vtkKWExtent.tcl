@@ -43,7 +43,7 @@ proc vtkKWExtentEntryPoint {parent win} {
 
   pack [extent2 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 
-  extent2 SetCommand extent1 {SetExtent [extent2 GetExtent]}
+  extent2 SetCommand extent1 "SetExtent"
 
   # -----------------------------------------------------------------------
 

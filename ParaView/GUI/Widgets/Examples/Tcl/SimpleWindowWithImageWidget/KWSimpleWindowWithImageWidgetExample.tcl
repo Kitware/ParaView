@@ -83,7 +83,7 @@ $ca SetText 3 "<window>\n<level>"
 vtkKWScale slice_scale
 slice_scale SetParent [win GetViewPanelFrame]
 slice_scale Create
-slice_scale SetCommand "" {viewer SetSlice [slice_scale GetValue]}
+slice_scale SetCommand viewer "SetSlice"
 
 proc update_slice_scale {} { 
   slice_scale SetRange [viewer GetSliceMin] [viewer GetSliceMax]

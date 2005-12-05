@@ -47,7 +47,7 @@ proc vtkKWRangeEntryPoint {parent win} {
 
   pack [range2 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 
-  range2 SetCommand range1 {SetRange [range2 GetRange]}
+  range2 SetCommand range1 "SetRange"
 
   # -----------------------------------------------------------------------
 

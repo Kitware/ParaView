@@ -97,14 +97,14 @@ proc vtkKWComboBoxEntryPoint {parent win} {
   [combobox_set GetWidget 0] SetValue "Enter a value here..."
   [combobox_set GetWidget 2] SetValue "...and it will show here."
   [combobox_set GetWidget 2] DeleteAllValues
-  [combobox_set GetWidget 0] SetCommand [combobox_set GetWidget 2] {SetValue [[combobox_set GetWidget 0] GetValue]}
+  [combobox_set GetWidget 0] SetCommand [combobox_set GetWidget 2] "SetValue"
 
   # Let's be creative. The second one adds its value to the fourth one
   
   [combobox_set GetWidget 1] SetValue "Enter a value here..."
   [combobox_set GetWidget 3] SetValue "...and it will be added here."
   [combobox_set GetWidget 3] DeleteAllValues
-  [combobox_set GetWidget 1] SetCommand [combobox_set GetWidget 3] {AddValue [[combobox_set GetWidget 1] GetValue]}
+  [combobox_set GetWidget 1] SetCommand [combobox_set GetWidget 3] "AddValue"
 
   pack [combobox_set GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 
