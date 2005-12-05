@@ -21,7 +21,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.12");
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.13");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";
@@ -184,9 +184,12 @@ void vtkKWParameterValueHermiteFunctionEditor::CreateMidPointEntry()
 
     this->UpdateMidPointEntry(this->GetSelectedMidPoint());
 
-    this->MidPointEntry->SetCommand(this, "MidPointEntryChangingCallback");
-    this->MidPointEntry->SetEndCommand(this, "MidPointEntryChangedCallback");
-    this->MidPointEntry->SetEntryCommand(this, "MidPointEntryChangedCallback");
+    this->MidPointEntry->SetCommand(
+      this, "MidPointEntryChangingCallback");
+    this->MidPointEntry->SetEndCommand(
+      this, "MidPointEntryChangedCallback");
+    this->MidPointEntry->SetEntryCommand(
+      this, "MidPointEntryChangedCallback");
     }
 }
 
@@ -232,8 +235,10 @@ void vtkKWParameterValueHermiteFunctionEditor::CreateSharpnessEntry()
 
     this->UpdateSharpnessEntry(this->GetSelectedMidPoint());
 
-    this->SharpnessEntry->SetCommand(this, "SharpnessEntryChangingCallback");
-    this->SharpnessEntry->SetEndCommand(this, "SharpnessEntryChangedCallback");
+    this->SharpnessEntry->SetCommand(
+      this, "SharpnessEntryChangingCallback");
+    this->SharpnessEntry->SetEndCommand(
+      this, "SharpnessEntryChangedCallback");
     this->SharpnessEntry->SetEntryCommand(
       this, "SharpnessEntryChangedCallback");
     }
@@ -393,9 +398,10 @@ void vtkKWParameterValueHermiteFunctionEditor::UpdateMidPointEntry(int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueHermiteFunctionEditor::MidPointEntryChangedCallback()
+void vtkKWParameterValueHermiteFunctionEditor::MidPointEntryChangedCallback(
+  double value)
 {
-  if (this->MidPointEntry && this->HasMidPointSelection())
+  if (this->HasMidPointSelection())
     {
     int id = this->GetSelectedMidPoint();
     unsigned long mtime = this->GetFunctionMTime();
@@ -407,11 +413,11 @@ void vtkKWParameterValueHermiteFunctionEditor::MidPointEntryChangedCallback()
       this->MapParameterToDisplayedParameter(p1, &p1);
       this->MapParameterToDisplayedParameter(p2, &p2);
       this->SetFunctionPointMidPoint(
-        id, (this->MidPointEntry->GetValue() - p1) / (p2 - p1));
+        id, (value - p1) / (p2 - p1));
       }
     else
       {
-      this->SetFunctionPointMidPoint(id, this->MidPointEntry->GetValue());
+      this->SetFunctionPointMidPoint(id, value);
       }
     if (this->GetFunctionMTime() > mtime)
       {
@@ -423,9 +429,10 @@ void vtkKWParameterValueHermiteFunctionEditor::MidPointEntryChangedCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueHermiteFunctionEditor::MidPointEntryChangingCallback()
+void vtkKWParameterValueHermiteFunctionEditor::MidPointEntryChangingCallback(
+  double value)
 {
-  if (this->MidPointEntry && this->HasMidPointSelection())
+  if (this->HasMidPointSelection())
     {
     int id = this->GetSelectedMidPoint();
     unsigned long mtime = this->GetFunctionMTime();
@@ -437,11 +444,11 @@ void vtkKWParameterValueHermiteFunctionEditor::MidPointEntryChangingCallback()
       this->MapParameterToDisplayedParameter(p1, &p1);
       this->MapParameterToDisplayedParameter(p2, &p2);
       this->SetFunctionPointMidPoint(
-        id, (this->MidPointEntry->GetValue() - p1) / (p2 - p1));
+        id, (value - p1) / (p2 - p1));
       }
     else
       {
-      this->SetFunctionPointMidPoint(id, this->MidPointEntry->GetValue());
+      this->SetFunctionPointMidPoint(id, value);
       }
     if (this->GetFunctionMTime() > mtime)
       {
@@ -511,13 +518,14 @@ void vtkKWParameterValueHermiteFunctionEditor::UpdateSharpnessEntry(int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueHermiteFunctionEditor::SharpnessEntryChangedCallback()
+void vtkKWParameterValueHermiteFunctionEditor::SharpnessEntryChangedCallback(
+  double value)
 {
-  if (this->SharpnessEntry && this->HasMidPointSelection())
+  if (this->HasMidPointSelection())
     {
     unsigned long mtime = this->GetFunctionMTime();
     if (this->SetFunctionPointSharpness(
-          this->GetSelectedMidPoint(), this->SharpnessEntry->GetValue()) &&
+          this->GetSelectedMidPoint(), value) &&
         this->GetFunctionMTime() > mtime)
       {
       this->RedrawSinglePointDependentElements(this->GetSelectedMidPoint());
@@ -528,13 +536,14 @@ void vtkKWParameterValueHermiteFunctionEditor::SharpnessEntryChangedCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueHermiteFunctionEditor::SharpnessEntryChangingCallback()
+void vtkKWParameterValueHermiteFunctionEditor::SharpnessEntryChangingCallback(
+  double value)
 {
-  if (this->SharpnessEntry && this->HasMidPointSelection())
+  if (this->HasMidPointSelection())
     {
     unsigned long mtime = this->GetFunctionMTime();
     if (this->SetFunctionPointSharpness(
-          this->GetSelectedMidPoint(), this->SharpnessEntry->GetValue()) &&
+          this->GetSelectedMidPoint(), value) &&
         this->GetFunctionMTime() > mtime)
       {
       this->RedrawSinglePointDependentElements(this->GetSelectedMidPoint());

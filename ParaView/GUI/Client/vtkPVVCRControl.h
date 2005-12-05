@@ -72,8 +72,8 @@ public:
   void GoToEndCallback();
   void GoToPreviousCallback();
   void GoToNextCallback();
-  void LoopCheckCallback();
-  void RecordCheckCallback();
+  void LoopCheckCallback(int);
+  void RecordCheckCallback(int);
   void RecordStateCallback();
   void SaveAnimationCallback();
 

@@ -149,7 +149,7 @@ public:
   virtual void UpdateEnableState();
 
   // Description:
-  // Callbacks. Do not use.
+  // Callbacks. Internal, do not use.
   virtual void AdjustWrapLengthToWidthCallback();
 
 protected:

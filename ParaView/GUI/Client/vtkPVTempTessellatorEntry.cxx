@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.32");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.33");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -229,7 +229,7 @@ void vtkPVTempTessellatorEntry::Update()
   this->Superclass::Update();
 }
 
-void vtkPVTempTessellatorEntry::ToggleCriterionCallback()
+void vtkPVTempTessellatorEntry::ToggleCriterionCallback(int)
 {
   int fnum = this->Data->ScalarFieldList->GetSelectionIndex();
   const char* field = this->Data->ScalarFieldList->GetSelection();
@@ -443,7 +443,7 @@ void vtkPVTempTessellatorEntry::SetFieldCriterion( int fnum, float crit )
     {
     d->ScalarFieldList->SetSelectionIndex( fnum );
     d->CriterionEnable->SetSelectedState( want_active ? 1 : 0 );
-    this->ToggleCriterionCallback();
+    this->ToggleCriterionCallback(d->CriterionEnable->GetSelectedState());
     }
 
   d->CriterionValue->SetValueAsDouble( crit );

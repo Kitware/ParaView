@@ -69,7 +69,7 @@ public:
 
   // Description:
   // Call back from the EnableCheck that will stop or start loging of events.
-  void EnableCheckCallback();
+  void EnableCheckCallback(int state);
 
   //BTX
   // Description:

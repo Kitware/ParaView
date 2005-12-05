@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDesktopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.8");
+vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVIceTDesktopRenderModuleUI::vtkPVIceTDesktopRenderModuleUI()
@@ -73,7 +73,7 @@ void vtkPVIceTDesktopRenderModuleUI::Create()
   this->OrderedCompositingCheck->Create();
   this->OrderedCompositingCheck->SetText("Enabled Ordered Compositing");
   this->OrderedCompositingCheck->SetCommand(this,
-                                            "OrderedCompositingCheckCallback");
+                                            "SetOrderedCompositingFlag");
 
   if (pvapp && pvapp->GetRegistryValue(2, "RunTime", "OrderedCompositing", 0))
     {
@@ -82,7 +82,8 @@ void vtkPVIceTDesktopRenderModuleUI::Create()
     }
   this->OrderedCompositingCheck->SetSelectedState(this->OrderedCompositingFlag);
   // This call just forwards the value to the render module.
-  this->OrderedCompositingCheckCallback();
+  this->SetOrderedCompositingFlag(
+    this->OrderedCompositingCheck->GetSelectedState());
 
   this->OrderedCompositingCheck->SetBalloonHelpString(
     "Toggle the use of ordered compositing.  Ordered compositing makes updates "
@@ -91,13 +92,6 @@ void vtkPVIceTDesktopRenderModuleUI::Create()
 
   this->Script("pack %s -side top -anchor w",
                this->OrderedCompositingCheck->GetWidgetName());
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVIceTDesktopRenderModuleUI::OrderedCompositingCheckCallback()
-{
-  this->SetOrderedCompositingFlag(
-                             this->OrderedCompositingCheck->GetSelectedState());
 }
 
 //-----------------------------------------------------------------------------

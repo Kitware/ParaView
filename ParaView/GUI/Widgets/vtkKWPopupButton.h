@@ -44,11 +44,6 @@ public:
   vtkGetObjectMacro(PopupCloseButton, vtkKWPushButton);
 
   // Description:
-  // Popup callbacks;
-  virtual void DisplayPopupCallback();
-  virtual void WithdrawPopupCallback();
-
-  // Description:
   // Convenience method to set the popup title
   virtual void SetPopupTitle(const char* title);
 
@@ -64,11 +59,16 @@ public:
   // Description:
   // Specifies a command to associate with the widget. This command is 
   // typically invoked when the popup is withdrawn.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void SetWithdrawCommand(vtkObject *object, const char* command);
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void DisplayPopupCallback();
+  virtual void WithdrawPopupCallback();
 
 protected:
   vtkKWPopupButton();

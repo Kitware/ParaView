@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSimpleWindowWithImageWidgetExample );
-vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.10");
+vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.11");
 
 //----------------------------------------------------------------------------
 int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
@@ -239,9 +239,10 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSimpleWindowWithImageWidgetExample::SetSliceFromScaleCallback()
+void vtkKWSimpleWindowWithImageWidgetExample::SetSliceFromScaleCallback(
+  double value)
 {
-  this->ImageViewer->SetSlice((int)this->SliceScale->GetValue());
+  this->ImageViewer->SetSlice((int)value);
 }
 
 //----------------------------------------------------------------------------

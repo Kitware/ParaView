@@ -70,7 +70,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.48");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.49");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -617,7 +617,8 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
   int res[][2] = VTK_KW_SFLMGR_RESOLUTIONS;
   for (size_t idx = 0; idx < sizeof(res) / sizeof(res[0]); idx++)
     {
-    sprintf(command, "SetResolution %d %d", res[idx][0], res[idx][1]);
+    sprintf(command, "SetResolution %d %d", 
+            res[idx][0], res[idx][1]);
     sprintf(help, VTK_KW_SFLMGR_HELP_PATTERN, 
             res[idx][0], res[idx][1]);
     sprintf(icon, VTK_KW_SFLMGR_ICON_PATTERN, 

@@ -17,19 +17,25 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry);
-vtkCxxRevisionMacro(vtkKWEntry, "1.74");
+vtkCxxRevisionMacro(vtkKWEntry, "1.75");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
 {
-  this->Width       = -1;
-  this->ReadOnly    = 0;
+  this->Width               = -1;
+  this->ReadOnly            = 0;
   this->InternalValueString = NULL;
+  this->Command             = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkKWEntry::~vtkKWEntry()
 {
+  if (this->Command)
+    {
+    delete [] this->Command;
+    this->Command = NULL;
+    }
   this->SetInternalValueString(NULL);
 }
 
@@ -44,14 +50,23 @@ void vtkKWEntry::Create()
     return;
     }
 
-  if (this->Width >= 0)
-    {
-    this->SetConfigurationOptionAsInt("-width", this->Width);
-    }
+  this->Configure();
 
   // Update enable state
 
   this->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::Configure()
+{
+  this->SetBinding("<Return>", this, "ValueCallback");
+  this->SetBinding("<FocusOut>", this, "ValueCallback");
+
+  if (this->Width >= 0)
+    {
+    this->SetConfigurationOptionAsInt("-width", this->Width);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -229,10 +244,26 @@ void vtkKWEntry::SetWidth(int width)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWEntry::ValueCallback()
+{
+  this->InvokeCommand(this->GetValue());
+}
+
+//----------------------------------------------------------------------------
 void vtkKWEntry::SetCommand(vtkObject *object, const char *method)
 {
-  this->SetBinding("<Return>", object, method);
-  this->SetBinding("<FocusOut>", object, method);
+  this->SetObjectMethodCommand(&this->Command, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::InvokeCommand(const char *value)
+{
+  if (this->Command && *this->Command && this->GetApplication())
+    {
+    const char *val = this->ConvertInternalStringToTclString(
+      value, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
+    this->Script("%s \"%s\"", this->Command, val ? val : "");
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -72,6 +72,8 @@ public:
   // Check if the widget was modified.
   void CheckModifiedCallback();
   void EntryCheckModifiedCallback();
+  void ScaleModifiedCallback(double value);
+  void ScaleModifiedEndCallback(double value);
   
 //BTX
   // Description:

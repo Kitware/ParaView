@@ -155,7 +155,7 @@ public:
   // Description:
   // Callback added to all lookmark and folder checkboxes. This does some bookkeeping like making sure that if an item nested in a selected folder
   // is deselected, the folder is also deselected
-  void SelectItemCallback(char *name);
+  void SelectItemCallback(char *name, int state);
 
   // Description:
   // Callbacks for the help menu

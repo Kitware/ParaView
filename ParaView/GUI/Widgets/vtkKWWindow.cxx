@@ -46,7 +46,7 @@ const char *vtkKWWindow::DefaultViewPanelName = "View";
 const char *vtkKWWindow::TclInteractorMenuLabel = "Command Prompt";
 const char *vtkKWWindow::ViewPanelPositionRegKey = "ViewPanelPosition";
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.270");
+vtkCxxRevisionMacro(vtkKWWindow, "1.271");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -185,8 +185,10 @@ void vtkKWWindow::PrepareForDelete()
 
   if (this->SecondaryToolbarSet)
     {
-    this->SecondaryToolbarSet->SetToolbarVisibilityChangedCommand(NULL, NULL);
-    this->SecondaryToolbarSet->SetNumberOfToolbarsChangedCommand(NULL, NULL);
+    this->SecondaryToolbarSet->SetToolbarVisibilityChangedCommand(
+      NULL, NULL);
+    this->SecondaryToolbarSet->SetNumberOfToolbarsChangedCommand(
+      NULL, NULL);
     this->SecondaryToolbarSet->RemoveAllToolbars();
     }
 }
@@ -1146,9 +1148,9 @@ void vtkKWWindow::NumberOfToolbarsChangedCallback()
 }
   
 //----------------------------------------------------------------------------
-void vtkKWWindow::ToolbarVisibilityChangedCallback()
+void vtkKWWindow::ToolbarVisibilityChangedCallback(vtkKWToolbar *toolbar)
 {
-  this->Superclass::ToolbarVisibilityChangedCallback();
+  this->Superclass::ToolbarVisibilityChangedCallback(toolbar);
 
   if (this->SecondaryToolbarSet)
     {

@@ -219,10 +219,12 @@ public:
   // 'EndCommand' is invoked at the end of an interaction with the widget.
   // 'EntryCommand' is invoked when the widget value is changed using
   // the text entry.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the current value: double
   virtual void SetCommand(vtkObject *object, const char *method);
   virtual void SetStartCommand(vtkObject *object, const char *method);
   virtual void SetEndCommand(vtkObject *object, const char *method);
@@ -254,7 +256,7 @@ public:
   // Callbacks. Internal, do not use.
   virtual void DisplayPopupModeCallback();
   virtual void WithdrawPopupModeCallback();
-  virtual void EntryValueCallback();
+  virtual void EntryValueCallback(const char *value);
   virtual void ScaleValueCallback(double num);
 
 protected:
@@ -270,7 +272,7 @@ protected:
   int PopupMode;
   int RangeVisibility;
 
-  virtual void InvokeEntryCommand();
+  virtual void InvokeEntryCommand(double value);
   char *EntryCommand;
 
   int EntryVisibility;

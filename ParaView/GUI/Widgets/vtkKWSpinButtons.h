@@ -53,6 +53,10 @@ public:
   // Description:
   // Specifies the commands to associate to the next and previous 
   // buttons.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void SetPreviousCommand(vtkObject *object, const char *method);
   virtual void SetNextCommand(vtkObject *object, const char *method);
 

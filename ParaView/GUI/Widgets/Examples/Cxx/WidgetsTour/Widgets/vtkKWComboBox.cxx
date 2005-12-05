@@ -115,17 +115,14 @@ KWWidgetsTourItem* vtkKWComboBoxEntryPoint(
       }
     }
 
-  char buffer[100];
-
   // Let's be creative. The first one sets the value of the third one
   
   combobox_set->GetWidget(0)->SetValue("Enter a value here...");
   combobox_set->GetWidget(2)->SetValue("...and it will show here.");
   combobox_set->GetWidget(2)->DeleteAllValues();
 
-  sprintf(buffer, "SetValue [%s GetValue]", 
-          combobox_set->GetWidget(0)->GetTclName());
-  combobox_set->GetWidget(0)->SetCommand(combobox_set->GetWidget(2), buffer);
+  combobox_set->GetWidget(0)->SetCommand(
+    combobox_set->GetWidget(2), "SetValue");
 
   // Let's be creative. The second one adds its value to the fourth one
   
@@ -133,9 +130,8 @@ KWWidgetsTourItem* vtkKWComboBoxEntryPoint(
   combobox_set->GetWidget(3)->SetValue("...and it will be added here.");
   combobox_set->GetWidget(3)->DeleteAllValues();
 
-  sprintf(buffer, "AddValue [%s GetValue]", 
-          combobox_set->GetWidget(1)->GetTclName());
-  combobox_set->GetWidget(1)->SetCommand(combobox_set->GetWidget(3), buffer);
+  combobox_set->GetWidget(1)->SetCommand(
+    combobox_set->GetWidget(3), "AddValue");
 
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 

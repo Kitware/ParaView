@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.76");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.77");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -417,7 +417,7 @@ void vtkPVLookmarkManager::AddMacroExampleCallback(int index)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLookmarkManager::SelectItemCallback(char *widgetName)
+void vtkPVLookmarkManager::SelectItemCallback(char *widgetName, int)
 {
   // loop thru till you find the widget that this name belongs to 
   // if it has been selected and it is a lookmark, return, if it is a folder, call selectcallback and return

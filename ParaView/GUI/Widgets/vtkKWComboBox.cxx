@@ -20,7 +20,13 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWComboBox);
-vtkCxxRevisionMacro(vtkKWComboBox, "1.10");
+vtkCxxRevisionMacro(vtkKWComboBox, "1.11");
+
+//----------------------------------------------------------------------------
+vtkKWComboBox::vtkKWComboBox()
+{
+  this->Width = 20;
+}
 
 //----------------------------------------------------------------------------
 void vtkKWComboBox::Create()
@@ -39,10 +45,7 @@ void vtkKWComboBox::Create()
     return;
     }
 
-  // The default one is too small, use Tk's default
-
-  this->SetConfigurationOptionAsInt(
-    "-width", this->Width >= 0 ? this->Width : 20);
+  this->Configure();
 
   // Update enable state
 
@@ -183,7 +186,7 @@ void vtkKWComboBox::SetCommand(vtkObject *object, const char *method)
   if (this->IsCreated())
     {
     char *command = NULL;
-    this->SetObjectMethodCommand(&command, object, method);
+    this->SetObjectMethodCommand(&command, this, "ValueCallback");
     this->SetConfigurationOption("-command", command);
     this->SetConfigurationOption("-modifycmd", command);
     delete [] command;

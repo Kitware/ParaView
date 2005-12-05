@@ -209,10 +209,10 @@ public:
   // changed (i.e. at the end of the user interaction), whereas 
   // 'VolumePropertyChangingCommand' is invoked when the volume property is
   // changing (i.e. during the user interaction itself).
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void SetVolumePropertyChangedCommand(
     vtkObject *object,const char *method);
   virtual void SetVolumePropertyChangingCommand(
@@ -223,32 +223,6 @@ public:
   vtkSetMacro(DisableCommands, int);
   vtkGetMacro(DisableCommands, int);
   vtkBooleanMacro(DisableCommands, int);
-
-  // Description:
-  // Callbacks
-  virtual void SelectedComponentCallback(int);
-  virtual void InterpolationTypeCallback(int type);
-  virtual void EnableShadingCallback();
-  virtual void MaterialPropertyChangedCallback();
-  virtual void MaterialPropertyChangingCallback();
-  virtual void InteractiveApplyCallback();
-  virtual void ScalarOpacityFunctionChangedCallback();
-  virtual void ScalarOpacityFunctionChangingCallback();
-  virtual void DoubleClickOnScalarOpacityPointCallback(int id);
-  virtual void WindowLevelModeCallback();
-  virtual void LockOpacityAndColorCallback();
-  virtual void ScalarOpacityUnitDistanceChangedCallback();
-  virtual void ScalarOpacityUnitDistanceChangingCallback();
-  virtual void RGBTransferFunctionChangedCallback();
-  virtual void RGBTransferFunctionChangingCallback();
-  virtual void RGBTransferFunctionSelectionChangedCallback();
-  virtual void EnableGradientOpacityCallback(int val);
-  virtual void GradientOpacityFunctionChangedCallback();
-  virtual void GradientOpacityFunctionChangingCallback();
-  virtual void HSVColorSelectionChangedCallback(double h, double s, double v);
-  virtual void HSVColorSelectionChangingCallback(double h, double s, double v);
-  virtual void ComponentWeightChangedCallback(int index);
-  virtual void ComponentWeightChangingCallback(int index);
 
   // Description:
   // Access the objects
@@ -271,6 +245,32 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void SelectedComponentCallback(int);
+  virtual void InterpolationTypeCallback(int type);
+  virtual void EnableShadingCallback(int state);
+  virtual void MaterialPropertyChangedCallback();
+  virtual void MaterialPropertyChangingCallback();
+  virtual void InteractiveApplyCallback(int state);
+  virtual void ScalarOpacityFunctionChangedCallback();
+  virtual void ScalarOpacityFunctionChangingCallback();
+  virtual void DoubleClickOnScalarOpacityPointCallback(int id);
+  virtual void WindowLevelModeCallback(int mode);
+  virtual void LockOpacityAndColorCallback(int state);
+  virtual void ScalarOpacityUnitDistanceChangedCallback(double value);
+  virtual void ScalarOpacityUnitDistanceChangingCallback(double value);
+  virtual void RGBTransferFunctionChangedCallback();
+  virtual void RGBTransferFunctionChangingCallback();
+  virtual void RGBTransferFunctionSelectionChangedCallback();
+  virtual void EnableGradientOpacityCallback(int val);
+  virtual void GradientOpacityFunctionChangedCallback();
+  virtual void GradientOpacityFunctionChangingCallback();
+  virtual void HSVColorSelectionChangedCallback(double h, double s, double v);
+  virtual void HSVColorSelectionChangingCallback(double h, double s, double v);
+  virtual void ComponentWeightChangedCallback(int index, double value);
+  virtual void ComponentWeightChangingCallback(int index, double value);
 
 protected:
   vtkKWVolumePropertyWidget();

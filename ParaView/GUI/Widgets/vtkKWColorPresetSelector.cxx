@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWColorPresetSelector);
-vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.22");
+vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.23");
 
 vtkCxxSetObjectMacro(vtkKWColorPresetSelector,ColorTransferFunction,vtkColorTransferFunction);
 
@@ -662,7 +662,7 @@ void vtkKWColorPresetSelector::PresetSelectedCallback(const char *name)
         preset_func, preset_range, 
         this->ColorTransferFunction, scalar_range))
     {
-    this->InvokePresetSelectedCommand();
+    this->InvokePresetSelectedCommand(name);
     }
 }
 
@@ -894,9 +894,16 @@ void vtkKWColorPresetSelector::SetPresetSelectedCommand(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWColorPresetSelector::InvokePresetSelectedCommand()
+void vtkKWColorPresetSelector::InvokePresetSelectedCommand(const char *name)
 {
-  this->InvokeObjectMethodCommand(this->PresetSelectedCommand);
+  if (this->PresetSelectedCommand && *this->PresetSelectedCommand && 
+      this->GetApplication())
+    {
+    //this->Script("eval %s {%s}", this->PresetSelectedCommand, name);
+    const char *val = this->ConvertInternalStringToTclString(
+      name, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
+    this->Script("%s \"%s\"", this->PresetSelectedCommand, val ? val : "");
+    }
 }
 
 //----------------------------------------------------------------------------

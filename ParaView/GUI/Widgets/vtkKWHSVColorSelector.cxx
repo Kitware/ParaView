@@ -21,7 +21,7 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.17");
+vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.18");
 vtkStandardNewMacro(vtkKWHSVColorSelector);
 
 #define VTK_KW_HSV_SEL_POINT_RADIUS_MIN     2
@@ -425,21 +425,23 @@ int vtkKWHSVColorSelector::HasSelection()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHSVColorSelector::InvokeCommandWithColor(const char *command)
+void vtkKWHSVColorSelector::InvokeCommandWithColor(
+  const char *command, double h, double s, double v)
 {
   if (command && *command && this->IsCreated())
     {
-    double rgb[3], *color;
     if (this->InvokeCommandsWithRGB)
       {
-      vtkMath::HSVToRGB(this->SelectedColor, rgb);
-      color = rgb;
+      double r, g, b;
+      vtkMath::HSVToRGB(h, s, v, &r, &g, &b);
+      //this->Script("eval %s %lf %lf %lf", command, r, g, b);
+      this->Script("%s %lf %lf %lf", command, r, g, b);
       }
     else
       {
-      color = this->SelectedColor;
+      //this->Script("eval %s %lf %lf %lf", command, h, s, v);
+      this->Script("%s %lf %lf %lf", command, h, s, v);
       }
-    this->Script("eval %s %lf %lf %lf", command, color[0], color[1], color[2]);
     }
 }
 
@@ -452,9 +454,10 @@ void vtkKWHSVColorSelector::SetSelectionChangedCommand(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHSVColorSelector::InvokeSelectionChangedCommand()
+void vtkKWHSVColorSelector::InvokeSelectionChangedCommand(
+  double h, double s, double v)
 {
-  this->InvokeCommandWithColor(this->SelectionChangedCommand);
+  this->InvokeCommandWithColor(this->SelectionChangedCommand, h, s, v);
 }
 
 //----------------------------------------------------------------------------
@@ -466,9 +469,10 @@ void vtkKWHSVColorSelector::SetSelectionChangingCommand(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHSVColorSelector::InvokeSelectionChangingCommand()
+void vtkKWHSVColorSelector::InvokeSelectionChangingCommand(
+  double h, double s, double v)
 {
-  this->InvokeCommandWithColor(this->SelectionChangingCommand);
+  this->InvokeCommandWithColor(this->SelectionChangingCommand, h, s, v);
 }
 
 //----------------------------------------------------------------------------
@@ -1057,7 +1061,10 @@ void vtkKWHSVColorSelector::HueSatMoveCallback(int x, int y)
       this->PreviouslySelectedColor[1] != this->SelectedColor[1] ||
       this->PreviouslySelectedColor[2] != this->SelectedColor[2])
     {
-    this->InvokeSelectionChangingCommand();
+    this->InvokeSelectionChangingCommand(
+      this->SelectedColor[0],
+      this->SelectedColor[1],
+      this->SelectedColor[2]);
     }
 }
 
@@ -1073,7 +1080,10 @@ void vtkKWHSVColorSelector::HueSatReleaseCallback()
       this->PreviouslySelectedColor[1] != this->SelectedColor[1] ||
       this->PreviouslySelectedColor[2] != this->SelectedColor[2])
     {
-    this->InvokeSelectionChangedCommand();
+    this->InvokeSelectionChangedCommand(
+      this->SelectedColor[0],
+      this->SelectedColor[1],
+      this->SelectedColor[2]);
     }
 }
 
@@ -1118,7 +1128,10 @@ void vtkKWHSVColorSelector::ValueMoveCallback(int vtkNotUsed(x), int y)
       this->PreviouslySelectedColor[1] != this->SelectedColor[1] ||
       this->PreviouslySelectedColor[2] != this->SelectedColor[2])
     {
-    this->InvokeSelectionChangingCommand();
+    this->InvokeSelectionChangingCommand(
+      this->SelectedColor[0],
+      this->SelectedColor[1],
+      this->SelectedColor[2]);
     }
 }
 
@@ -1134,7 +1147,10 @@ void vtkKWHSVColorSelector::ValueReleaseCallback()
       this->PreviouslySelectedColor[1] != this->SelectedColor[1] ||
       this->PreviouslySelectedColor[2] != this->SelectedColor[2])
     {
-    this->InvokeSelectionChangedCommand();
+    this->InvokeSelectionChangedCommand(
+      this->SelectedColor[0],
+      this->SelectedColor[1],
+      this->SelectedColor[2]);
     }
 }
 

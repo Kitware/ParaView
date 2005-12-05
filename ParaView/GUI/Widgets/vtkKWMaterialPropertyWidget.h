@@ -96,17 +96,19 @@ public:
   vtkGetMacro(PropertyChangingEvent, int);
 
   // Description:
-  // Set the command that will be called when the property is changed/changing.
+  // Specifies commands to associate with the widget. 
+  // 'PropertyChangedCommand' is invoked when the property has
+  // changed (i.e. at the end of the user interaction).
+  // 'PropertyChangingCommand' is invoked when the selected color is
+  // changing (i.e. during the user interaction).
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void SetPropertyChangedCommand(
     vtkObject *object, const char *method);
   virtual void SetPropertyChangingCommand(
     vtkObject *object, const char *method);
-
-  // Description:
-  // Callbacks for the buttons, scales and presets
-  virtual void PropertyChangingCallback();
-  virtual void PropertyChangedCallback();
-  virtual void PresetMaterialCallback(int preset_idx);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -116,6 +118,12 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void PropertyChangingCallback(double value);
+  virtual void PropertyChangedCallback(double value);
+  virtual void PresetMaterialCallback(int preset_idx);
 
 protected:
 

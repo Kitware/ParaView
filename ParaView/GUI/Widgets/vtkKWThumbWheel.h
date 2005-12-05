@@ -137,7 +137,6 @@ public:
   virtual void SetResizeThumbWheel(int flag);
   vtkGetMacro(ResizeThumbWheel, int);
   vtkBooleanMacro(ResizeThumbWheel, int);
-  void ResizeThumbWheelCallback();
 
   // Description:
   // Display/Hide a thumbwheel position indicator when the user performs a 
@@ -190,8 +189,6 @@ public:
   vtkSetMacro(PopupMode, int);
   vtkGetMacro(PopupMode, int);
   vtkBooleanMacro(PopupMode, int);  
-  void DisplayPopupCallback();
-  void WithdrawPopupCallback();
   vtkGetObjectMacro(PopupPushButton, vtkKWPushButton);
 
   // Description:
@@ -211,10 +208,12 @@ public:
   // 'EndCommand' is invoked at the end of an interaction with the widget.
   // 'EntryCommand' is invoked when the widget value is changed using
   // the text entry.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the current value: double
   virtual void SetCommand(vtkObject *object, const char *method);
   virtual void SetStartCommand(vtkObject *object, const char *method);
   virtual void SetEndCommand(vtkObject *object, const char *method);
@@ -232,16 +231,6 @@ public:
   void UnBind();
 
   // Description:
-  // Methods that gets invoked when the value has changed
-  // or motion is started/end
-  virtual void EntryValueCallback();
-  virtual void StartLinearMotionCallback();
-  virtual void PerformLinearMotionCallback();
-  virtual void StartNonLinearMotionCallback();
-  virtual void PerformNonLinearMotionCallback();
-  virtual void StopMotionCallback();
-
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -249,6 +238,18 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void ResizeThumbWheelCallback();
+  virtual void DisplayPopupCallback();
+  virtual void WithdrawPopupCallback();
+  virtual void EntryValueCallback(const char*);
+  virtual void StartLinearMotionCallback();
+  virtual void PerformLinearMotionCallback();
+  virtual void StartNonLinearMotionCallback();
+  virtual void PerformNonLinearMotionCallback();
+  virtual void StopMotionCallback();
 
 protected:
   vtkKWThumbWheel();
@@ -282,10 +283,11 @@ protected:
   char        *EndCommand;
   char        *EntryCommand;
 
-  virtual void InvokeCommand();
-  virtual void InvokeStartCommand();
-  virtual void InvokeEndCommand();
-  virtual void InvokeEntryCommand();
+  virtual void InvokeThumbWheelCommand(const char *command, double value);
+  virtual void InvokeCommand(double value);
+  virtual void InvokeStartCommand(double value);
+  virtual void InvokeEndCommand(double value);
+  virtual void InvokeEntryCommand(double value);
 
   double      ThumbWheelShift;
 

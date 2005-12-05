@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.45");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.46");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -960,7 +960,7 @@ void vtkKWColorTransferFunctionEditor::ColorSpaceCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWColorTransferFunctionEditor::ValueEntriesCallback()
+void vtkKWColorTransferFunctionEditor::ValueEntriesCallback(const char *)
 {
   if (!this->HasSelection())
     {

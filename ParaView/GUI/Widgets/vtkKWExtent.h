@@ -70,28 +70,23 @@ public:
     { this->SetExtentVisibility(2, arg); };
 
   // Description:
-  // Handle the callback, this is called internally when one of the 
-  // sliders has been moved.
-  void ExtentChangedCallback();
-
-  // Description:
-  // Specifies a command to associate with the widget. This command is 
-  // invoked when the extent is changed.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // Specifies commands to associate with the widget. 
+  // 'Command' is invoked when the extent value is changed.
+  // 'StartCommand' is invoked at the beginning of an interaction with
+  // the widget.
+  // 'EndCommand' is invoked at the end of an interaction with the widget.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the current extent: double, double, double, double, double, double
   virtual void SetCommand(vtkObject *object, const char *method);
-
-  // Description:
-  // A convenience method to set the start and end method of all the
-  // internal ranges.  
   virtual void SetStartCommand(vtkObject *object, const char *method);
   virtual void SetEndCommand(vtkObject *object, const char *method);
 
   // Description:
-  // Convenience method to set whether the command should be called or not.
-  // This just propagates SetDisableCommands to the internal ranges.
+  // Set/get whether the above commands should be called or not.
   virtual void SetDisableCommands(int);
   vtkBooleanMacro(DisableCommands, int);
 
@@ -159,12 +154,29 @@ public:
   vtkKWRange* GetZRange() { return this->Range[2]; };
   vtkKWRange* GetRange(int index);
 
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void RangeCommandCallback(double r0, double r1);
+  virtual void RangeStartCommandCallback(double r0, double r1);
+  virtual void RangeEndCommandCallback(double r0, double r1);
+
 protected:
   vtkKWExtent();
   ~vtkKWExtent();
 
   char *Command;
-  virtual void InvokeCommand();
+  char *StartCommand;
+  char *EndCommand;
+
+  virtual void InvokeExtentCommand(
+    const char *command, 
+    double x0, double x1, double y0, double y1, double z0, double z1);
+  virtual void InvokeCommand(
+    double x0, double x1, double y0, double y1, double z0, double z1);
+  virtual void InvokeStartCommand(
+    double x0, double x1, double y0, double y1, double z0, double z1);
+  virtual void InvokeEndCommand(
+    double x0, double x1, double y0, double y1, double z0, double z1);
 
   double Extent[6];
 

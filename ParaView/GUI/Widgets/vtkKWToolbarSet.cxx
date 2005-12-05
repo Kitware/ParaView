@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.35");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.36");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarSetInternals
@@ -586,7 +586,7 @@ void vtkKWToolbarSet::SetToolbarVisibility(
       this->SaveToolbarVisibilityToRegistry(toolbar_slot->Toolbar);
       }
     this->Pack();
-    this->InvokeToolbarVisibilityChangedCommand();
+    this->InvokeToolbarVisibilityChangedCommand(toolbar);
     }
 }
 
@@ -886,9 +886,18 @@ void vtkKWToolbarSet::SetToolbarVisibilityChangedCommand(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWToolbarSet::InvokeToolbarVisibilityChangedCommand()
+void vtkKWToolbarSet::InvokeToolbarVisibilityChangedCommand(
+  vtkKWToolbar *toolbar)
 {
-  this->InvokeObjectMethodCommand(this->ToolbarVisibilityChangedCommand);
+  if (this->ToolbarVisibilityChangedCommand && 
+      *this->ToolbarVisibilityChangedCommand && 
+      this->GetApplication())
+    {
+    //this->Script("eval {%s %s}",
+    this->Script("%s %s",
+                 this->ToolbarVisibilityChangedCommand, 
+                 toolbar->GetTclName());
+    }
 }
 
 //----------------------------------------------------------------------------

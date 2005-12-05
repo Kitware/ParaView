@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceManagerDialog);
-vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.12");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.13");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceManagerDialogInternals
@@ -140,8 +140,8 @@ void vtkKWUserInterfaceManagerDialog::Create()
   this->TopLevel->SetApplication(this->GetApplication());
   this->TopLevel->Create();
   this->TopLevel->ModalOff();
-  this->TopLevel->SetSize(600, 300);
-  this->TopLevel->SetMinimumSize(600, 300);
+  this->TopLevel->SetSize(600, 400);
+  this->TopLevel->SetMinimumSize(600, 400);
 
   vtkKWWidget *parent = this->TopLevel;
 

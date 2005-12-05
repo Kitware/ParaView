@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.61");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.62");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -188,13 +188,13 @@ void vtkPVExtentEntry::Create()
     this->MinMax[i]->Create();
     this->MinMax[i]->SetRange(this->Range[i*2], this->Range[i*2+1]);
     this->MinMax[i]->SetMinimumLabel(labels[i]);
-    this->MinMax[i]->GetMinScale()->SetEndCommand(this, "ModifiedCallback");
-    this->MinMax[i]->GetMinScale()->SetEntryCommand(this, "ModifiedCallback");
+    this->MinMax[i]->GetMinScale()->SetEndCommand(this, "ScaleModifiedCallback");
+    this->MinMax[i]->GetMinScale()->SetEntryCommand(this, "ScaleModifiedCallback");
     this->MinMax[i]->GetMinScale()->SetEntryPositionToTop();
     this->MinMax[i]->GetMinScale()->SetLabelPositionToTop();
     this->MinMax[i]->GetMinScale()->SetLabelText(" Min.");
-    this->MinMax[i]->GetMaxScale()->SetEndCommand(this, "ModifiedCallback");
-    this->MinMax[i]->GetMaxScale()->SetEntryCommand(this, "ModifiedCallback");
+    this->MinMax[i]->GetMaxScale()->SetEndCommand(this, "ScaleModifiedCallback");
+    this->MinMax[i]->GetMaxScale()->SetEntryCommand(this, "ScaleModifiedCallback");
     this->MinMax[i]->GetMaxScale()->SetEntryPositionToTop();
     this->MinMax[i]->GetMaxScale()->SetLabelPositionToTop();
     this->MinMax[i]->GetMaxScale()->SetLabelText(" Max.");
@@ -210,6 +210,11 @@ void vtkPVExtentEntry::Create()
                this->LabeledFrame->GetWidgetName());
 }
 
+//-----------------------------------------------------------------------------
+void vtkPVExtentEntry::ScaleModifiedCallback(double)
+{
+  this->ModifiedCallback();
+}
 
 //-----------------------------------------------------------------------------
 void vtkPVExtentEntry::SaveInBatchScript(ofstream *file)

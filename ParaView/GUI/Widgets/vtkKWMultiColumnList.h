@@ -369,8 +369,8 @@ public:
     unsigned long buffer_length = 0);
 
   // Description:
-  // Specifies the command to be invoked when displaying the contents 
-  // of a cell within this column or adding them to the selection when the
+  // Specifies the command to be invoked when displaying the contents of a
+  // cell within a column col_index or adding them to the selection when the
   // latter is being exported. If command is a nonempty string, then it is
   // automatically concatenated with the cell's text, the resulting script is
   // evaluated in the global scope, and the return value is displayed in the
@@ -383,15 +383,29 @@ public:
   // make it possible to sort the items very easily by time, with a second's
   // precision, even if their visual representation only contains the year, 
   // month, and day. 
-  // This command also comes in handy if only images or embedded windows are
+  // Also check SetColumnFormatCommandToEmptyOutput, which can be used
+  // to set the ColumnFormatCommand to return an empty output.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the current cell's text for that col_index column: const char*
+  // The following output is expected from the command:
+  // - the text to be displayed in the cell instead: const char*
+  virtual void SetColumnFormatCommand(int col_index, 
+                                      vtkObject *object, const char *method);
+  // Description:
+  // Specifies the command to be invoked when displaying the contents of a
+  // cell within a column col_index.
+  // This is a convenience method to set the ColumnFormatCommand to return an
+  // empty output. This comes in handy if only images or embedded windows are
   // to be displayed in a column but the texts associated with the cells may
   // not simply be empty strings because they are needed for other purposes
   // (like sorting or editing). In such cases, a command returning an empty
   // string can be used, thus making sure that the textual information 
-  // contained in that column remains hidden. The special 
-  // SetColumnFormatCommandToEmptyOutput can be used for that.
-  virtual void SetColumnFormatCommand(int col_index, 
-                                      vtkObject *object, const char *method);
+  // contained in that column remains hidden. This method can be used just
+  // for that instead of SetColumnFormatCommand.
   virtual void SetColumnFormatCommandToEmptyOutput(int col_index);
 
   // Description:
@@ -626,14 +640,16 @@ public:
 
   // Description:
   // Specifies a command to create the window (i.e. widget) to be embedded
-  // into a cell.
+  // into the cell located at (row_index, col_index).
   // The command is automatically concatenated with the name of the tablelist
   // widget, the cell's row and column indices, as well as the path name of
   // the embedded window to be created, and the resulting script is evaluated
-  // in the global scope.
+  // in the global scope. This path name can be used to create your own
+  // vtkKWWidget by assigning the widget's name manually using vtkKWWidget's
+  // SetWidgetName method.
   // In most case, you should attempt to set the widget's background and
   // foreground colors to match the cell's background and foreground colors
-  // (retrieve them using GetCellCurrentBackgroundColor and 
+  // (which can be retrieved using GetCellCurrentBackgroundColor and 
   // GetCellCurrentForegroundColor). 
   // Since the background and foreground colors of the cell change dynamically
   // depending on the sorting order and the selected rows, you should set
@@ -643,6 +659,14 @@ public:
   // Also, if you have set a text contents in the same cell (using SetCellText)
   // you may want to hide it automatically using 
   // SetColumnFormatCommandToEmptyOutput.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the name of the internal tablelist widget (to be ignored): const char*
+  // - the cell location, i.e. its row and column indices: int, int
+  // - the path name of the embedded window/widget to be created: const char*
   virtual void SetCellWindowCommand(
     int row_index, int col_index, vtkObject *object, const char *method);
 
@@ -688,18 +712,29 @@ public:
   virtual void SetCellWindowCommandToColorButton(int row_index, int col_index);
 
   // Description:
-  // Specifies a command to be invoked when the window embedded into
-  // the cell is destroyed. It is automatically concatenated the same
-  // parameter as SetCellWindowCommand.
-  // The SetCellWindowDestroyCommandToRemoveChild method is a convenient
-  // way to automatically set the command to a callback that will
-  // remove the child widget that matches the name of the Tk widget about
-  // to be destroyed. This is very useful if the SetCellWindowCommand
-  // is set to a callback at actually allocate a new vtkKWWidget subclass.
-  // That way, each time the cell is about to be destroyed, it is
-  // cleanly de-allocated first (by setting its Parent to NULL).
+  // Specifies a command to be invoked when the window embedded into the cell
+  // located at (row_index, col_index) is destroyed. It is automatically 
+  // concatenated the same parameter as the SetCellWindowCommand method that
+  // was used to create the embedded window.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the name of the internal tablelist widget (to be ignored): const char*
+  // - the cell location, i.e. row and column indices: int, int
+  // - the path name of the embedded window/widget to be created: const char*
   virtual void SetCellWindowDestroyCommand(
     int row_index, int col_index, vtkObject *object, const char *method);
+
+  // Description:
+  // The SetCellWindowDestroyCommandToRemoveChild method is a convenient
+  // way to automatically set the CellWindowDestroyCommand to a callback that
+  // will remove the child widget that matches the name of the Tk widget about
+  // to be destroyed. This is very useful if the SetCellWindowCommand
+  // is set to a callback that actually allocates a new vtkKWWidget object.
+  // That way, each time the cell is about to be destroyed, it is
+  // cleanly de-allocated first (by setting its Parent to NULL).
   virtual void SetCellWindowDestroyCommandToRemoveChild(
     int row_index, int col_index);
 
@@ -944,10 +979,10 @@ public:
   // If one want to be notified only when the selection has *changed* (the
   // number of selected/deselected items has changed), use the
   // SelectionChangedCommand command instead.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void SetSelectionCommand(vtkObject *object, const char *method);
 
   // Description:
@@ -955,10 +990,10 @@ public:
   // command will *not* be invoked when an item is re-selected (i.e. it
   // was already selected when the user clicked on it again). To be notified
   // when any selection event occurs, use SelectionCommand instead.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void SetSelectionChangedCommand(
     vtkObject *object, const char *method);
 
@@ -971,19 +1006,19 @@ public:
   // is setting its own background color to match the background color
   // of a cell (using GetCellCurrentBackgroundColor). In that case,
   // just set this command to RefreshColorsOfAllCellsWithWindowCommand. 
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void SetPotentialCellColorsChangedCommand(
     vtkObject *object, const char *method);
 
   // Description:
   // Specifies a command to be invoked when a column has been sorted. 
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void SetColumnSortedCommand(
     vtkObject *object, const char *method);
 
@@ -995,10 +1030,15 @@ public:
   // the return value becomes the initial contents of the temporary
   // embedded widget used for the editing.
   // The next step (validation) is handled by SetEditEndCommand (if any)
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the cell location, i.e. its row and column indices: int, int
+  // - the current cell's text: const char*
+  // The following output is expected from the command:
+  // - the initial contents of the widget used for editing: const char*
   virtual void SetEditStartCommand(vtkObject *object, const char *method);
 
   // Description:
@@ -1011,15 +1051,20 @@ public:
   // return value becomes the cell's new contents after destroying the
   // temporary embedded widget. The main purpose of this script is to perform
   // a final validation of the edit window's contents and eventually reject
-  // the input by calling the RejectInput() method. Another purpose of thi
+  // the input by calling the RejectInput() method. Another purpose of this
   // command is to convert the edit window's text to the cell's new internal
   // contents, which is necessary if, due to the SetColumnFormatCommand option
   // the cell's internal value is different from its external representation. 
   // The next step (updating) is handled by SetCellUpdatedCommand (if any)
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the cell location, i.e. its row and column indices: int, int
+  // - the final contents of the edit window: const char*
+  // The following output is expected from the command:
+  // - the cell's new contents: const char*
   virtual void SetEditEndCommand(vtkObject *object, const char *method);
 
   // Description:
@@ -1036,10 +1081,13 @@ public:
   // new contents of the cell. The main purpose of this script is to let
   // external/third-party applications/objects retrieve the new cell contents
   // and update their own internal values.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the cell location, i.e. its row and column indices: int, int
+  // - the cell's new contents: const char*
   virtual void SetCellUpdatedCommand(vtkObject *object, const char *method);
 
   // Description:
@@ -1049,10 +1097,13 @@ public:
   // concatenated with the name of the tablelist widget and the column index
   // of the respective label, and the resulting script is evaluated in the
   // global scope. 
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the name of the internal tablelist widget (to be ignored): const char*
+  // - the column index of the label: int
   virtual void SetLabelCommand(vtkObject *object, const char *method);
 
   // Description:
@@ -1064,14 +1115,28 @@ public:
   // is evaluated. The script should return an integer less than, equal to, or
   // greater than zero if the first item is to be considered less than, equal
   // to, or greater than the second, respectively.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the contents of the first item/cell to compare: const char*
+  // - the contents of the second item/cell to compare: const char*
+  // The following output is expected from the command:
+  // - the result of the comparison: int
   virtual void SetSortCommand(vtkObject *object, const char *method);
 
   // Description:
-  // Callbacks
+  // Update the "enable" state of the object and its internal parts.
+  // Depending on different Ivars (this->Enabled, the application's 
+  // Limited Edition Mode, etc.), the "enable" state of the object is updated
+  // and propagated to its internal parts/subwidgets. This will, for example,
+  // enable/disable parts of the widget UI, enable/disable the visibility
+  // of 3D widgets, etc.
+  virtual void UpdateEnableState();
+ 
+  // Description:
+  // Callbacks. Internal, do not use.
   virtual void SelectionCallback();
   virtual void CellWindowDestroyRemoveChildCallback(
     const char*, int, int, const char*);
@@ -1085,21 +1150,12 @@ public:
   virtual void CellWindowCommandToReadOnlyComboBoxCallback(
     const char*, int, int, const char*);
   virtual void CellWindowCommandToCheckButtonSelectCallback(
-    vtkKWWidget*, int, int);
+    vtkKWWidget*, int, int, int);
   virtual void CellWindowCommandToColorButtonCallback(
     const char*, int, int, const char*);
   virtual void ColumnSortedCallback();
   virtual void EnterCallback();
 
-  // Description:
-  // Update the "enable" state of the object and its internal parts.
-  // Depending on different Ivars (this->Enabled, the application's 
-  // Limited Edition Mode, etc.), the "enable" state of the object is updated
-  // and propagated to its internal parts/subwidgets. This will, for example,
-  // enable/disable parts of the widget UI, enable/disable the visibility
-  // of 3D widgets, etc.
-  virtual void UpdateEnableState();
- 
 protected:
   vtkKWMultiColumnList();
   ~vtkKWMultiColumnList();

@@ -106,7 +106,7 @@ public:
       scale->RangeVisibilityOn();
       scale->SetValue(p->Value);
       scale->SetLabelText(name->c_str());
-      scale->SetCommand(parent, "ModifiedCallback");
+      scale->SetCommand(parent, "ScaleModifiedCallback");
       parent->Script("pack %s -fill x -expand 1 -side top", scale->GetWidgetName());
       this->Widgets->AddItem(scale);
       scale->Delete();
@@ -150,7 +150,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.43");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.44");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -193,6 +193,12 @@ void vtkPVXDMFParameters::CheckModifiedCallback()
   this->ModifiedCallback();
   this->AcceptedCallback();
   this->InvokeEvent(vtkCommand::WidgetModifiedEvent, 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXDMFParameters::ScaleModifiedCallback(double)
+{
+  this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------

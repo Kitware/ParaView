@@ -41,6 +41,7 @@ public:
   // Description:
   // Check if the widget was modified.
   void CheckModifiedCallback();
+  void ScaleModifiedCallback(double value);
   
 //BTX
   // Description:

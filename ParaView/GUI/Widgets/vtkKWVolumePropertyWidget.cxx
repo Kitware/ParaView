@@ -51,7 +51,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.34");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.35");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -1810,10 +1810,9 @@ void vtkKWVolumePropertyWidget::InterpolationTypeCallback(int type)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::EnableShadingCallback()
+void vtkKWVolumePropertyWidget::EnableShadingCallback(int state)
 {
-  if (!this->EnableShadingCheckButton || 
-      !this->VolumeProperty || 
+  if (!this->VolumeProperty || 
       !this->EnableShadingForAllComponents)
     {
     return;
@@ -1823,8 +1822,7 @@ void vtkKWVolumePropertyWidget::EnableShadingCallback()
 
   // Set the first component
 
-  this->VolumeProperty->SetShade(
-    0, this->EnableShadingCheckButton->GetSelectedState() ? 1 : 0);
+  this->VolumeProperty->SetShade(0, state ? 1 : 0);
 
   // Update the others
 
@@ -1846,16 +1844,9 @@ void vtkKWVolumePropertyWidget::EnableShadingCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::LockOpacityAndColorCallback()
+void vtkKWVolumePropertyWidget::LockOpacityAndColorCallback(int state)
 {
-  if (!this->LockOpacityAndColorCheckButton)
-    {
-    return;
-    }
-
-  this->LockOpacityAndColor[this->SelectedComponent] = 
-    this->LockOpacityAndColorCheckButton->GetSelectedState();
-
+  this->LockOpacityAndColor[this->SelectedComponent] = state;
   this->Update();
 }
 
@@ -1886,13 +1877,9 @@ void vtkKWVolumePropertyWidget::MaterialPropertyChangingCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::InteractiveApplyCallback()
+void vtkKWVolumePropertyWidget::InteractiveApplyCallback(int state)
 {
-  if (this->InteractiveApplyCheckButton)
-    {
-    this->SetInteractiveApplyMode(
-      this->InteractiveApplyCheckButton->GetSelectedState() ? 1 : 0);
-    }
+  this->SetInteractiveApplyMode(state ? 1 : 0);
 }
 
 //----------------------------------------------------------------------------
@@ -1980,33 +1967,33 @@ void vtkKWVolumePropertyWidget::DoubleClickOnScalarOpacityPointCallback(int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::ScalarOpacityUnitDistanceChangedCallback()
+void vtkKWVolumePropertyWidget::ScalarOpacityUnitDistanceChangedCallback(
+  double value)
 {
-  if (!this->IsCreated() || !this->VolumeProperty)
+  if (!this->VolumeProperty)
     {
     return;
     }
 
-  float d = this->ScalarOpacityUnitDistanceScale->GetValue();
   this->VolumeProperty->SetScalarOpacityUnitDistance(
-    this->SelectedComponent, d);
+    this->SelectedComponent, value);
   
   this->InvokeVolumePropertyChangedCommand();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::ScalarOpacityUnitDistanceChangingCallback()
+void vtkKWVolumePropertyWidget::ScalarOpacityUnitDistanceChangingCallback(
+  double value)
 {
-  if (!this->IsCreated() || !this->VolumeProperty)
+  if (!this->VolumeProperty)
     {
     return;
     }
 
   if (this->InteractiveApplyMode)
     {
-    float d = this->ScalarOpacityUnitDistanceScale->GetValue();
     this->VolumeProperty->SetScalarOpacityUnitDistance(
-      this->SelectedComponent, d);
+      this->SelectedComponent, value);
   
     this->InvokeVolumePropertyChangingCommand();
     }
@@ -2014,11 +2001,9 @@ void vtkKWVolumePropertyWidget::ScalarOpacityUnitDistanceChangingCallback()
 
 
 //----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::WindowLevelModeCallback()
+void vtkKWVolumePropertyWidget::WindowLevelModeCallback(int mode)
 {
-  this->WindowLevelMode[this->SelectedComponent] = 
-    this->ScalarOpacityFunctionEditor->GetWindowLevelMode();
-
+  this->WindowLevelMode[this->SelectedComponent] = mode;
   this->Update();
 }
 
@@ -2204,52 +2189,33 @@ void vtkKWVolumePropertyWidget::HSVColorSelectionChangingCallback(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::ComponentWeightChangedCallback(int index)
+void vtkKWVolumePropertyWidget::ComponentWeightChangedCallback(
+  int index, double value)
 {
-  if (!this->IsCreated() || !this->VolumeProperty)
+  if (!this->VolumeProperty)
     {
     return;
     }
 
-  vtkKWScaleWithEntrySet *scaleset = 
-    this->ComponentWeightScaleSet->GetWidget();
-  if (index < 0 || index > scaleset->GetNumberOfVisibleWidgets())
-    {
-    return;
-    }
-
-  float weight = scaleset->GetWidget(index)->GetValue();
-  this->VolumeProperty->SetComponentWeight(index, weight);
+  this->VolumeProperty->SetComponentWeight(index, value);
   
   float fargs[2];
   fargs[0] = index;
-  fargs[1] = weight;
+  fargs[1] = value;
   this->InvokeEvent(vtkKWEvent::ScalarComponentWeightChangedEvent, fargs);
 
   this->InvokeVolumePropertyChangedCommand();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::ComponentWeightChangingCallback(int index)
+void vtkKWVolumePropertyWidget::ComponentWeightChangingCallback(
+  int index, double value)
 {
-  if (!this->IsCreated() || !this->VolumeProperty)
-    {
-    return;
-    }
-
-  vtkKWScaleWithEntrySet *scaleset = 
-    this->ComponentWeightScaleSet->GetWidget();
-  if (index < 0 || index > scaleset->GetNumberOfVisibleWidgets())
-    {
-    return;
-    }
-
-  float weight = scaleset->GetWidget(index)->GetValue();
-  this->VolumeProperty->SetComponentWeight(index, weight);
+  this->VolumeProperty->SetComponentWeight(index, value);
   
   float fargs[2];
   fargs[0] = index;
-  fargs[1] = weight;
+  fargs[1] = value;
   this->InvokeEvent(vtkKWEvent::ScalarComponentWeightChangingEvent, fargs);
 
   if (this->InteractiveApplyMode)

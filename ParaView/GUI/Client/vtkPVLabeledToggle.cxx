@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.41");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.42");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -85,8 +85,14 @@ void vtkPVLabeledToggle::Create()
   
   // Now the check button
   this->CheckButton->Create();
-  this->CheckButton->SetCommand(this, "ModifiedCallback");
+  this->CheckButton->SetCommand(this, "CheckButtonCallback");
   this->Script("pack %s -side left", this->CheckButton->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLabeledToggle::CheckButtonCallback(int)
+{
+  this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------

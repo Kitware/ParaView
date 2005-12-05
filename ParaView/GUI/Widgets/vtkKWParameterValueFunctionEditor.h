@@ -818,10 +818,12 @@ public:
   // Description:
   // Specifies a command to associate with the widget. This command is 
   // typically invoked when the histogram log mode is changed.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - new histogram log mode: int
   virtual void SetHistogramLogModeChangedCommand(
     vtkObject *object,const char *method);
 
@@ -833,69 +835,109 @@ public:
   vtkSetMacro(ChangeMouseCursor, int);
 
   // Description:
-  // Specifies commands to associate with the widget.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // Point... commands are passed the index of the point that is/was modified.
-  // PointAddedCommand is called when a point was added.
-  // PointChangingCommand/PointChangedCommand is called when a point is
-  // changing or has changed (at the end of the interaction). Moving the point
-  // for example, qualify as a change.
-  // PointRemovedCommand is called when a point was removed, it takes an
-  // additional arg which is the value of the parameter of the point that
-  // was removed.
-  // SelectionChanged is called when the selection was changed or deselection.
-  // FunctionChanged is called when the function was changed (as the
-  // result of an interaction which is now over, like point added/(re)moved). 
-  // FunctionChanging is called when the function is changing (as the
-  // result of an interaction in progress, like moving a point). 
-  // VisibleRangeChangedCommand/VisibleRangeChangingCommand is called
-  // when the visible range (parameter or value) is changing, or was changed
-  // (at the end of the interaction).
-  // ParameterCursorMovingCommand/ParameterCursorMovedCommand is called when
-  // the parameter cursor is moving or was moved (at the end of the
-  // interaction).
+  // Specifies point-related commands to associate with the widget.
+  // 'PointAddedCommand' is called after a point was added.
+  // 'PointChangingCommand' is called when a point is changing (as the
+  // result of a user interaction that is in progress, like moving a point).
+  // 'PointChangedCommand' is called when a point is has changed (as the
+  // result of a user interaction that is now over, like a point moved).
+  // 'DoubleClickOnPointCommand' is called when double-clicking on a point.
+  // 'PointRemovedCommand' is called after a point was removed.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the commands:
+  // - index of the point that is being/was modified: int
+  // 'PointRemovedCommand' is passed additional parameters:
+  // - value of the parameter of the point that was removed (i.e. its position
+  // in the parameter domain): double
   virtual void SetPointAddedCommand(
     vtkObject *object,const char *method);
   virtual void SetPointChangingCommand(
     vtkObject *object, const char *method);
   virtual void SetPointChangedCommand(
     vtkObject *object, const char *method);
+  virtual void SetDoubleClickOnPointCommand(
+    vtkObject *object,const char *method);
   virtual void SetPointRemovedCommand(
     vtkObject *object, const char *method);
+
+  // Description:
+  // Specifies selection-related commands to associate with the widget.
+  // 'SelectionChanged' is called whenever the selection was changed or
+  // cleared.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void SetSelectionChangedCommand(
     vtkObject *object,const char *method);
+
+  // Description:
+  // Specifies function-related commands to associate with the widget.
+  // 'FunctionChanging' is called when the function is changing (as the result
+  // of a user interaction in progress, like moving a point). 
+  // 'FunctionChanged' is called when the function has changed (as the result
+  // of a user interaction that is now over, like a point added/(re)moved). 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void SetFunctionChangedCommand(
     vtkObject *object, const char *method);
   virtual void SetFunctionChangingCommand(
     vtkObject *object, const char *method);
+
+  // Description:
+  // Specifies range-related commands to associate with the widget.
+  // 'VisibleRangeChangingCommand' is called whenever the visible range 
+  // (in parameter or value domain) is changing (i.e. during user interaction).
+  // 'VisibleRangeChangedCommand' is called whenever the visible range 
+  // (in parameter or value domain) has changed (i.e. at the end of the
+  // user interaction).
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void SetVisibleRangeChangedCommand(
     vtkObject *object, const char *method);
   virtual void SetVisibleRangeChangingCommand(
     vtkObject *object, const char *method);
+
+  // Description:
+  // Specifies cursor-related commands to associate with the widget.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // 'ParameterCursorMovingCommand' is called whenever the parameter cursor
+  // is moving (i.e. during user interaction).
+  // 'ParameterCursorMovedCommand' is called whenever the parameter cursor
+  // was moved (i.e., at the end of the user interaction).
+  // The following parameters are also passed to the commands:
+  // - current parameter cursor position: double
   virtual void SetParameterCursorMovingCommand(
     vtkObject *object, const char *method);
   virtual void SetParameterCursorMovedCommand(
     vtkObject *object, const char *method);
 
   // Description:
-  // Specifies a command to associate with the widget. This command is 
-  // typically invoked when  when double/clicking on a point.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // The id of the node is passed as a parameter.
-  virtual void SetDoubleClickOnPointCommand(
-    vtkObject *object,const char *method);
+  // Set/get whether the above commands should be called or not.
+  // This allow you to disable the commands while you are setting the range
+  // value for example. Events are still invoked.
+  vtkSetMacro(DisableCommands, int);
+  vtkGetMacro(DisableCommands, int);
+  vtkBooleanMacro(DisableCommands, int);
 
   // Description:
   // Events. Even though it is highly recommended to use the commands
   // framework defined above to specify the callback methods you want to be 
   // invoked when specific event occur, you can also use the observer
-  // framework and listen to the corresponding events:
+  // framework and listen to the corresponding events/
+  // Note that they are passed the same parameters as the commands, if any.
+  // If more than one numerical parameter is passed, they are all stored
+  // in the calldata as an array of double.
   //BTX
   enum
   {
@@ -915,14 +957,6 @@ public:
     DoubleClickOnPointEvent
   };
   //ETX
-
-  // Description:
-  // Set/get whether the above commands should be called or not.
-  // This allow you to disable the commands while you are setting the range
-  // value for example. Events are still invoked.
-  vtkSetMacro(DisableCommands, int);
-  vtkGetMacro(DisableCommands, int);
-  vtkBooleanMacro(DisableCommands, int);
 
   // Description:
   // Synchronize the visible parameter range between two editors A and B.
@@ -978,24 +1012,6 @@ public:
   virtual void SetBalloonHelpString(const char *str);
 
   // Description:
-  // Callbacks
-  virtual void ConfigureCallback();
-  virtual void CanvasEnterCallback();
-  virtual void VisibleParameterRangeChangingCallback();
-  virtual void VisibleParameterRangeChangedCallback();
-  virtual void VisibleValueRangeChangingCallback();
-  virtual void VisibleValueRangeChangedCallback();
-  virtual void StartInteractionCallback(int x, int y);
-  virtual void MovePointCallback(int x, int y, int shift);
-  virtual void EndInteractionCallback(int x, int y);
-  virtual void ParameterCursorStartInteractionCallback(int x);
-  virtual void ParameterCursorEndInteractionCallback();
-  virtual void ParameterCursorMoveCallback(int x);
-  virtual void ParameterEntryCallback();
-  virtual void HistogramLogModeCallback(int mode);
-  virtual void DoubleClickOnPointCallback(int x, int y);
-
-  // Description:
   // Update the whole UI depending on the value of the Ivars
   virtual void Update();
 
@@ -1036,6 +1052,24 @@ public:
   // Description:
   // Higher-level methods to manipulate the function. 
   virtual int  MoveFunctionPoint(int id,double parameter,const double *values);
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void ConfigureCallback();
+  virtual void CanvasEnterCallback();
+  virtual void VisibleParameterRangeChangingCallback(double, double);
+  virtual void VisibleParameterRangeChangedCallback(double, double);
+  virtual void VisibleValueRangeChangingCallback(double, double);
+  virtual void VisibleValueRangeChangedCallback(double, double);
+  virtual void StartInteractionCallback(int x, int y);
+  virtual void MovePointCallback(int x, int y, int shift);
+  virtual void EndInteractionCallback(int x, int y);
+  virtual void ParameterCursorStartInteractionCallback(int x);
+  virtual void ParameterCursorEndInteractionCallback();
+  virtual void ParameterCursorMoveCallback(int x);
+  virtual void ParameterEntryCallback(const char*);
+  virtual void HistogramLogModeCallback(int mode);
+  virtual void DoubleClickOnPointCallback(int x, int y);
 
 protected:
   vtkKWParameterValueFunctionEditor();
@@ -1179,7 +1213,7 @@ protected:
   char  *DoubleClickOnPointCommand;
 
   virtual void InvokeObjectMethodCommand(const char *command);
-  virtual void InvokeHistogramLogModeChangedCommand();
+  virtual void InvokeHistogramLogModeChangedCommand(int mode);
   virtual void InvokePointCommand(
     const char *command, int id, const char *extra = 0);
 
@@ -1187,14 +1221,14 @@ protected:
   virtual void InvokePointChangingCommand(int id);
   virtual void InvokePointChangedCommand(int id);
   virtual void InvokePointRemovedCommand(int id, double parameter);
+  virtual void InvokeDoubleClickOnPointCommand(int id);
   virtual void InvokeSelectionChangedCommand();
   virtual void InvokeFunctionChangedCommand();
   virtual void InvokeFunctionChangingCommand();
   virtual void InvokeVisibleRangeChangedCommand();
   virtual void InvokeVisibleRangeChangingCommand();
-  virtual void InvokeParameterCursorMovingCommand();
-  virtual void InvokeParameterCursorMovedCommand();
-  virtual void InvokeDoubleClickOnPointCommand(int id);
+  virtual void InvokeParameterCursorMovingCommand(double pos);
+  virtual void InvokeParameterCursorMovedCommand(double pos);
 
   // GUI
 

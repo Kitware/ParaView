@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.26");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.27");
 
 #define VTK_PV_RAMP_INDEX 1
 #define VTK_PV_RAMP_LABEL "Ramp"
@@ -237,9 +237,9 @@ vtkKWFrame* vtkPVVerticalAnimationInterface::GetPropertiesFrame()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVVerticalAnimationInterface::CacheGeometryCheckCallback()
+void vtkPVVerticalAnimationInterface::CacheGeometryCheckCallback(int state)
 {
-  this->SetCacheGeometry(this->CacheGeometryCheck->GetSelectedState());
+  this->SetCacheGeometry(state);
 }
 
 //-----------------------------------------------------------------------------
@@ -274,9 +274,9 @@ void vtkPVVerticalAnimationInterface::DisableCacheCheck()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVVerticalAnimationInterface::AdvancedAnimationViewCallback()
+void vtkPVVerticalAnimationInterface::AdvancedAnimationViewCallback(int state)
 {
-  this->SetAdvancedAnimationView(this->AdvancedAnimationCheck->GetSelectedState());
+  this->SetAdvancedAnimationView(state);
 }
 
 //-----------------------------------------------------------------------------
@@ -287,9 +287,8 @@ void vtkPVVerticalAnimationInterface::SetAdvancedAnimationView(int advanced)
     advanced);
 }
 //-----------------------------------------------------------------------------
-void vtkPVVerticalAnimationInterface::RecordAllChangedCallback()
+void vtkPVVerticalAnimationInterface::RecordAllChangedCallback(int state)
 {
-  int state = this->RecordAllButton->GetSelectedState();
   this->AnimationManager->SetRecordAll(state);
 }
 

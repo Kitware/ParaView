@@ -53,8 +53,8 @@ public:
 
   // Description:
   // Called by GUI to change Point Label appearance
-  void PointLabelCheckCallback();
-  void ChangePointLabelFontSize();
+  void PointLabelCheckCallback(int state);
+  void ChangePointLabelFontSizeCallback(double value);
 
   // Description:
   // Refreshes GUI with current Point Label appearance

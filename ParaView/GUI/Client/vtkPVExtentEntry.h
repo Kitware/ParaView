@@ -113,6 +113,8 @@ public:
   // Save this widget to a file.
   virtual void SaveInBatchScript(ofstream *file);
 
+  virtual void ScaleModifiedCallback(double);
+
 protected:
   vtkPVExtentEntry();
   ~vtkPVExtentEntry();

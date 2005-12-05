@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.32");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.33");
 
 //----------------------------------------------------------------------------
 vtkKWMenuButton::vtkKWMenuButton()
@@ -182,7 +182,7 @@ void vtkKWMenuButton::AddRadioButton(const char *label)
 
 //----------------------------------------------------------------------------
 void vtkKWMenuButton::AddRadioButton(const char *label, 
-                                     vtkObject *obj, 
+                                     vtkObject *object, 
                                      const char *method,
                                      const char *help)
 {
@@ -190,12 +190,12 @@ void vtkKWMenuButton::AddRadioButton(const char *label,
   options += this->GetWidgetName();
   options += "Value";
   this->Menu->AddGeneric(
-    "radiobutton", label, obj, method, options.c_str(), help);
+    "radiobutton", label, object, method, options.c_str(), help);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMenuButton::AddRadioButtonImage(const char *image_name, 
-                                          vtkObject *obj, 
+                                          vtkObject *object, 
                                           const char *method,
                                           const char *help)
 {
@@ -208,7 +208,7 @@ void vtkKWMenuButton::AddRadioButtonImage(const char *image_name,
   options += image_name;
 
   this->Menu->AddGeneric(
-    "radiobutton", image_name, obj, method, options.c_str(), help);
+    "radiobutton", image_name, object, method, options.c_str(), help);
 }
 
 //----------------------------------------------------------------------------

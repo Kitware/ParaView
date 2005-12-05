@@ -190,7 +190,7 @@ public:
   vtkBooleanMacro(VerticalScrollbarVisibility, int);
 
   // Description:
-  // Callbacks
+  // Callbacks. Internal, do not use.
   virtual void SelectionChangedCallback();
 
 protected:

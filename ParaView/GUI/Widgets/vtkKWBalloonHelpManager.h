@@ -59,7 +59,7 @@ public:
   virtual void RemoveBindings(vtkKWWidget *widget);
 
   // Description:
-  // Callbacks.
+  // Callbacks. Internal, do not use.
   virtual void TriggerCallback(vtkKWWidget *widget);
   virtual void DisplayCallback(vtkKWWidget *widget);
   virtual void CancelCallback();

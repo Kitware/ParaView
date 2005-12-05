@@ -46,6 +46,19 @@ public:
   virtual int GetValueAsInt();
 
   // Description:
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when the button is selected or deselected.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // Note that the selected state is *not* passed as parameter, which is
+  // the case for vtkKWCheckButton for example. In most cases, since the 
+  // selected state is shared among many radiobuttons, this command will
+  // likely to perform a task related to the button meaning itself.
+  virtual void SetCommand(vtkObject *object, const char *method);
+
+  // Description:
   // Convenience method to set/get the button's associated variable directly
   // to a specific value.
   virtual void SetVariableValue(const char *v);
@@ -56,6 +69,9 @@ public:
 protected:
   vtkKWRadioButton() {};
   ~vtkKWRadioButton() {};
+
+  // Override the superclass (state is ignored)
+  virtual void InvokeCommand(int state);
 
 private:
   vtkKWRadioButton(const vtkKWRadioButton&); // Not implemented

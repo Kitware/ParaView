@@ -62,11 +62,6 @@ public:
   virtual void Update();
 
   // Description:
-  // Callbacks for the buttons, scales and presets
-  virtual void EnableShadingCallback();
-  virtual void SelectedComponentCallback(int);
-
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -74,6 +69,11 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void EnableShadingCallback(int state);
+  virtual void SelectedComponentCallback(int);
 
 protected:
 

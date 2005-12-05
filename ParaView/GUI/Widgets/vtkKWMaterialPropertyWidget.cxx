@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.23");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.24");
 
 //----------------------------------------------------------------------------
 class vtkKWMaterialPropertyWidgetInternals
@@ -818,7 +818,7 @@ void vtkKWMaterialPropertyWidget::UpdateEnableState()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMaterialPropertyWidget::PropertyChangingCallback()
+void vtkKWMaterialPropertyWidget::PropertyChangingCallback(double)
 {
   // We put UpdatePreview out of the test to make sure the UI can still
   // be modified/tested without any real VTK object connected to it 
@@ -834,7 +834,7 @@ void vtkKWMaterialPropertyWidget::PropertyChangingCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMaterialPropertyWidget::PropertyChangedCallback()
+void vtkKWMaterialPropertyWidget::PropertyChangedCallback(double)
 {
   // We put UpdatePreview out of the test to make sure the UI can still
   // be modified/tested without any real VTK object connected to it 

@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.29");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.30");
 
 //----------------------------------------------------------------------------
 vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
@@ -654,12 +654,9 @@ void vtkKWScalarBarAnnotation::SetNumberOfComponents(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWScalarBarAnnotation::CheckButtonCallback() 
+void vtkKWScalarBarAnnotation::CheckButtonCallback(int state) 
 {
-  if (this->CheckButton && this->CheckButton->IsCreated())
-    {
-    this->SetVisibility(this->CheckButton->GetSelectedState() ? 1 : 0);
-    }
+  this->SetVisibility(state ? 1 : 0);
 }
 
 //----------------------------------------------------------------------------
@@ -732,12 +729,9 @@ void vtkKWScalarBarAnnotation::SetScalarBarTitle(const char *text)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWScalarBarAnnotation::ScalarBarTitleCallback() 
+void vtkKWScalarBarAnnotation::ScalarBarTitleCallback(const char *value) 
 {
-  if (this->IsCreated() && this->TitleEntry)
-    {
-    this->SetScalarBarTitle(this->TitleEntry->GetWidget()->GetValue());
-    }
+  this->SetScalarBarTitle(value);
 }
 
 //----------------------------------------------------------------------------
@@ -763,27 +757,21 @@ void vtkKWScalarBarAnnotation::SetScalarBarLabelFormat(const char *text)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWScalarBarAnnotation::ScalarBarLabelFormatCallback() 
+void vtkKWScalarBarAnnotation::ScalarBarLabelFormatCallback(const char *value) 
 {
-  if (this->IsCreated() && this->LabelFormatEntry)
-    {
-    this->SetScalarBarLabelFormat(
-      this->LabelFormatEntry->GetWidget()->GetValue());
-    }
+  this->SetScalarBarLabelFormat(value);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWScalarBarAnnotation::MaximumNumberOfColorsEndCallback()
+void vtkKWScalarBarAnnotation::MaximumNumberOfColorsEndCallback(double value)
 {
-  if (this->MaximumNumberOfColorsThumbWheel && 
-      this->MaximumNumberOfColorsThumbWheel->IsCreated() &&
-      this->ScalarBarWidget &&
+  if (this->ScalarBarWidget &&
       this->ScalarBarWidget->GetScalarBarActor())
     {
     int old_v = 
       this->ScalarBarWidget->GetScalarBarActor()->GetMaximumNumberOfColors();
     this->ScalarBarWidget->GetScalarBarActor()->SetMaximumNumberOfColors(
-      static_cast<int>(this->MaximumNumberOfColorsThumbWheel->GetValue()));
+      static_cast<int>(value));
     if (old_v != 
         this->ScalarBarWidget->GetScalarBarActor()->GetMaximumNumberOfColors())
       {
@@ -795,17 +783,15 @@ void vtkKWScalarBarAnnotation::MaximumNumberOfColorsEndCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWScalarBarAnnotation::NumberOfLabelsEndCallback()
+void vtkKWScalarBarAnnotation::NumberOfLabelsEndCallback(double value)
 {
-  if (this->NumberOfLabelsScale && 
-      this->NumberOfLabelsScale->IsCreated() &&
-      this->ScalarBarWidget &&
+  if (this->ScalarBarWidget &&
       this->ScalarBarWidget->GetScalarBarActor())
     {
     int old_v = 
       this->ScalarBarWidget->GetScalarBarActor()->GetNumberOfLabels();
     this->ScalarBarWidget->GetScalarBarActor()->SetNumberOfLabels(
-      static_cast<int>(this->NumberOfLabelsScale->GetValue()));
+      static_cast<int>(value));
     if (old_v != 
         this->ScalarBarWidget->GetScalarBarActor()->GetNumberOfLabels())
       {

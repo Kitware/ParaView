@@ -176,18 +176,18 @@ public:
 
   // Description:
   // Callback for toggling between parallel and perspective.
-  void ParallelProjectionCallback();
+  void ParallelProjectionCallback(int state);
   void ParallelProjectionOn();
   void ParallelProjectionOff();
   
   // Description:
   // Callback for the triangle strips check button
-  void TriangleStripsCallback();
+  void TriangleStripsCallback(int state);
   void SetUseTriangleStrips(int state);
   
   // Description:
   // Callback for the immediate mode rendering check button
-  void ImmediateModeCallback();
+  void ImmediateModeCallback(int state);
   void SetUseImmediateMode(int state);
   
   // Description:
@@ -252,7 +252,7 @@ public:
 
   // Description:
   // Set the global variable for always displaying 3D widgets.
-  void Display3DWidgetsCallback();
+  void Display3DWidgetsCallback(int state);
   void SetDisplay3DWidgets(int s);
 
   // Description:
@@ -283,9 +283,9 @@ public:
   // Callbacks for the orientation axes.
   void SetOrientationAxesVisibility(int val);
   int  GetOrientationAxesVisibility();
-  void OrientationAxesCheckCallback();
+  void OrientationAxesCheckCallback(int state);
   void SetOrientationAxesInteractivity(int val);
-  void OrientationAxesInteractiveCallback();
+  void OrientationAxesInteractiveCallback(int state);
   void SetOrientationAxesOutlineColor(double r, double g, double b);
   void SetOrientationAxesTextColor(double r, double g, double b);
 
@@ -329,32 +329,32 @@ public:
 
   // Description:
   // Set the value of default light
-  void DefaultLightIntensityCallback();
-  void DefaultLightIntensityEndCallback();
+  void DefaultLightIntensityCallback(double value);
+  void DefaultLightIntensityEndCallback(double value);
   void SetDefaultLightIntensity(double intensity);
   void SetDefaultLightIntensityNoTrace(double intensity);
   void SetDefaultLightAmbientColor(double r, double g, double b);
   void SetDefaultLightDiffuseColor(double r, double g, double b);
   void SetDefaultLightSpecularColor(double r, double g, double b);
-  void DefaultLightSwitchCallback();
+  void DefaultLightSwitchCallback(int state);
   void SetDefaultLightSwitch(int val);
 
   // Description:
   // Callback when modifying the light kit via a slider
-  void              LightCallback(int type, int subtype);
+  void              LightCallback(int type, int subtype, double);
 
   // Description:
   // Callback when done modifying the light kit (end of slider event)
-  void              LightEndCallback(int type, int subtype);
+  void              LightEndCallback(int type, int subtype, double);
 
   // Description:
   // Callback for setting/removing the luminance
-  void              MaintainLuminanceCallback();
+  void              MaintainLuminanceCallback(int state);
   void              SetMaintainLuminance(int s);
 
   // Description:
   // Callback for setting/remove the kit light from the renderer (usefull for the test suite)
-  void              UseLightCallback();
+  void              UseLightCallback(int state);
   void              SetUseLight(int s);
   
   // Description:

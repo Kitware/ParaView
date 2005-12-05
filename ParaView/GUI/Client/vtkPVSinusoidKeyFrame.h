@@ -31,9 +31,9 @@ public:
   vtkTypeRevisionMacro(vtkPVSinusoidKeyFrame, vtkPVPropertyKeyFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void FrequencyChangedCallback();
-  void PhaseChangedCallback();
-  void OffsetChangedCallback();
+  void FrequencyChangedCallback(double);
+  void PhaseChangedCallback(double);
+  void OffsetChangedCallback(double);
 
   void SetFrequency(double base);
   void SetFrequencyWithTrace(double f);

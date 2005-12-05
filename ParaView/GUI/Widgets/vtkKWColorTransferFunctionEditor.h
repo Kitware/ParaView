@@ -144,12 +144,6 @@ public:
   virtual void Update();
 
   // Description:
-  // Callbacks
-  virtual void ColorSpaceCallback();
-  virtual void ValueEntriesCallback();
-  virtual void DoubleClickOnPointCallback(int x, int y);
-
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -167,6 +161,12 @@ public:
   virtual unsigned long GetFunctionMTime();
   virtual int GetFunctionPointParameter(int id, double *parameter);
   virtual int GetFunctionPointDimensionality();
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void ColorSpaceCallback();
+  virtual void ValueEntriesCallback(const char *value);
+  virtual void DoubleClickOnPointCallback(int x, int y);
 
 protected:
   vtkKWColorTransferFunctionEditor();

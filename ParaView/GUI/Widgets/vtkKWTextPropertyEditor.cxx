@@ -99,7 +99,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextPropertyEditor);
-vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.17");
+vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.18");
 
 // ----------------------------------------------------------------------------
 vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
@@ -568,7 +568,7 @@ void vtkKWTextPropertyEditor::SetColor(double r, double g, double b)
 
   this->UpdateColorButton();
 
-  this->InvokeColorChangedCommand();
+  this->InvokeColorChangedCommand(r, g, b);
   this->InvokeChangedCommand();
 }
 
@@ -762,13 +762,9 @@ void vtkKWTextPropertyEditor::UpdateBoldCheckButton()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextPropertyEditor::BoldCallback() 
+void vtkKWTextPropertyEditor::BoldCallback(int state) 
 {
-  if (this->IsCreated())
-    {
-    this->SetBold(this->StylesCheckButtonSet->GetWidget()
-                  ->GetWidget(VTK_KW_TEXT_PROP_BOLD_ID)->GetSelectedState());
-    }
+  this->SetBold(state);
 }
 
 // ----------------------------------------------------------------------------
@@ -800,13 +796,9 @@ void vtkKWTextPropertyEditor::UpdateItalicCheckButton()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextPropertyEditor::ItalicCallback() 
+void vtkKWTextPropertyEditor::ItalicCallback(int state) 
 {
-  if (this->IsCreated())
-    {
-    this->SetItalic(this->StylesCheckButtonSet->GetWidget()
-                    ->GetWidget(VTK_KW_TEXT_PROP_ITALIC_ID)->GetSelectedState());
-    }
+  this->SetItalic(state);
 }
 
 // ----------------------------------------------------------------------------
@@ -838,13 +830,9 @@ void vtkKWTextPropertyEditor::UpdateShadowCheckButton()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextPropertyEditor::ShadowCallback() 
+void vtkKWTextPropertyEditor::ShadowCallback(int state) 
 {
-  if (this->IsCreated())
-    {
-    this->SetShadow(this->StylesCheckButtonSet->GetWidget()
-                    ->GetWidget(VTK_KW_TEXT_PROP_SHADOW_ID)->GetSelectedState());
-    }
+  this->SetShadow(state);
 }
 
 // ----------------------------------------------------------------------------
@@ -928,21 +916,15 @@ void vtkKWTextPropertyEditor::UpdateOpacityScale()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextPropertyEditor::OpacityCallback() 
+void vtkKWTextPropertyEditor::OpacityCallback(double value) 
 {
-  if (this->OpacityScale->IsCreated())
-    {
-    this->SetOpacity(this->OpacityScale->GetValue());
-    }
+  this->SetOpacity(value);
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextPropertyEditor::OpacityEndCallback() 
+void vtkKWTextPropertyEditor::OpacityEndCallback(double value) 
 {
-  if (this->OpacityScale->IsCreated())
-    {
-    this->SetOpacity(this->OpacityScale->GetValue());
-    }
+  this->SetOpacity(value);
 }
 
 // ----------------------------------------------------------------------------
@@ -1095,9 +1077,15 @@ void vtkKWTextPropertyEditor::SetColorChangedCommand(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTextPropertyEditor::InvokeColorChangedCommand()
+void vtkKWTextPropertyEditor::InvokeColorChangedCommand(
+  double r, double g, double b)
 {
-  this->InvokeObjectMethodCommand(this->ChangedCommand);
+  if (this->GetApplication() &&
+      this->ColorChangedCommand && *this->ColorChangedCommand)
+    {
+    //this->Script("eval %s %lf %lf %lf", this->ColorChangedCommand, r, g, b);
+    this->Script("%s %lf %lf %lf", this->ColorChangedCommand, r, g, b);
+    }
 }
 
 //----------------------------------------------------------------------------

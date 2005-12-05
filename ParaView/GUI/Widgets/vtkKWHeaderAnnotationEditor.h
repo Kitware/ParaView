@@ -64,12 +64,6 @@ public:
   vtkGetMacro(AnnotationChangedEvent, int);
 
   // Description:
-  // Callbacks
-  virtual void CheckButtonCallback();
-  virtual void HeaderTextCallback();
-  virtual void TextPropertyCallback();
-
-  // Description:
   // Access to sub-widgets
   virtual vtkKWCheckButton* GetHeaderVisibilityButton()
     { return this->GetCheckButton(); };
@@ -87,6 +81,12 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void CheckButtonCallback(int state);
+  virtual void HeaderTextCallback(const char *value);
+  virtual void TextPropertyCallback();
+
 protected:
   vtkKWHeaderAnnotationEditor();
   ~vtkKWHeaderAnnotationEditor();
@@ -99,9 +99,9 @@ protected:
 
   int                     PopupTextProperty;
 
-  vtkKWFrame              *TextFrame;
+  vtkKWFrame                *TextFrame;
   vtkKWEntryWithLabel       *TextEntry;
-  vtkKWTextPropertyEditor *TextPropertyWidget;
+  vtkKWTextPropertyEditor   *TextPropertyWidget;
   vtkKWPopupButtonWithLabel *TextPropertyPopupButton;
 
   virtual void Render();

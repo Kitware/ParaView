@@ -70,20 +70,13 @@ public:
   virtual void RemoveItemsFromFinalList();
 
   // Description:
-  // Callbacks.
-  virtual void AddCallback();
-  virtual void AddAllCallback();
-  virtual void RemoveCallback();
-  virtual void RemoveAllCallback();
-  virtual void UpCallback();
-  virtual void DownCallback();
-
-  // Description:
-  // Callback for ellipsis.
-  void EllipsisCallback();
-  vtkSetStringMacro(EllipsisCommand);
-  vtkGetStringMacro(EllipsisCommand);
-  void SetEllipsisCommand(vtkObject *obj, const char *method);
+  // Specifies a command to associate with the widget. This command is 
+  // typically invoked when the ellipsis button is pressed.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  virtual void SetEllipsisCommand(vtkObject *obj, const char *method);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -93,6 +86,16 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void AddCallback();
+  virtual void AddAllCallback();
+  virtual void RemoveCallback();
+  virtual void RemoveAllCallback();
+  virtual void UpCallback();
+  virtual void DownCallback();
+  virtual void EllipsisCallback();
 
 protected:
   vtkKWListBoxToListBoxSelectionEditor();
@@ -109,16 +112,18 @@ protected:
   vtkKWPushButton* DownButton;
 
   virtual void MoveWholeList(vtkKWListBox* l1, vtkKWListBox* l2);
-  void MoveSelectedList(vtkKWListBox* l1, vtkKWListBox* l2);
-  void MoveList(vtkKWListBox* l1, vtkKWListBox* l2, const char* list);
-  void ShiftItems(vtkKWListBox* l1, int down);
-  void AddElement(vtkKWListBox* l1, vtkKWListBox* l2, const char* element, int force);
+  virtual void MoveSelectedList(vtkKWListBox* l1, vtkKWListBox* l2);
+  virtual void MoveList(vtkKWListBox* l1, vtkKWListBox* l2, const char* list);
+  virtual void ShiftItems(vtkKWListBox* l1, int down);
+  virtual void AddElement(vtkKWListBox* l1, vtkKWListBox* l2, const char* element, int force);
 
   char* EllipsisCommand;
+  virtual void InvokeEllipsisCommand();
+
   int EllipsisDisplayed;
 
-  void DisplayEllipsis();
-  void RemoveEllipsis();
+  virtual void DisplayEllipsis();
+  virtual void RemoveEllipsis();
   
 private:
   vtkKWListBoxToListBoxSelectionEditor(const vtkKWListBoxToListBoxSelectionEditor&); // Not implemented

@@ -21,7 +21,7 @@
 #include "vtkKWMenu.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.16");
+vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.17");
 vtkStandardNewMacro(vtkKWScalarComponentSelectionWidget);
 
 //----------------------------------------------------------------------------
@@ -250,18 +250,20 @@ void vtkKWScalarComponentSelectionWidget::SetSelectedComponentChangedCommand(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWScalarComponentSelectionWidget::InvokeSelectedComponentChangedCommand()
+void 
+vtkKWScalarComponentSelectionWidget::InvokeSelectedComponentChangedCommand(
+  int comp)
 {
   if (this->SelectedComponentChangedCommand && 
-      *this->SelectedComponentChangedCommand)
+      *this->SelectedComponentChangedCommand && 
+      this->GetApplication())
     {
-    this->Script("eval %s %d", 
-                 this->SelectedComponentChangedCommand, 
-                 this->SelectedComponent);
+    //this->Script("eval %s %d", 
+    this->Script("%s %d", 
+                 this->SelectedComponentChangedCommand, comp);
     }
 
-  this->InvokeEvent(vtkKWEvent::ScalarComponentChangedEvent, 
-                    &this->SelectedComponent);
+  this->InvokeEvent(vtkKWEvent::ScalarComponentChangedEvent, &comp);
 }
 
 //----------------------------------------------------------------------------
@@ -274,7 +276,7 @@ void vtkKWScalarComponentSelectionWidget::SelectedComponentCallback(int n)
 
   this->SelectedComponent = n;
   this->Update();
-  this->InvokeSelectedComponentChangedCommand();
+  this->InvokeSelectedComponentChangedCommand(this->SelectedComponent);
 }
 
 //----------------------------------------------------------------------------

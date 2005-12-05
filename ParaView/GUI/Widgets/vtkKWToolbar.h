@@ -151,8 +151,7 @@ public:
   vtkGetMacro(WidgetsFlatAdditionalPadY, int);
 
   // Description:
-  // Callbacks to ensure all widgets are visible (only
-  // if the were added with AddWidget)
+  // Schedule the widget to resize itself, or resize it right away
   virtual void ScheduleResize();
   virtual void Resize();
 

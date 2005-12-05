@@ -142,7 +142,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.410");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.411");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -941,12 +941,11 @@ vtkKWWidget *vtkPVRenderView::GetSourceParent()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::Display3DWidgetsCallback()
+void vtkPVRenderView::Display3DWidgetsCallback(int state)
 {
-  int val = this->Display3DWidgets->GetSelectedState();
-  this->SetDisplay3DWidgets(val);
+  this->SetDisplay3DWidgets(state);
   this->GetApplication()->SetRegistryValue(2, "RunTime","Display3DWidgets",
-                                      (val?"1":"0"));
+                                      (state?"1":"0"));
 }
 
 //----------------------------------------------------------------------------
@@ -1016,7 +1015,8 @@ void vtkPVRenderView::CreateViewProperties()
     this->ParallelProjectionCheck->SetSelectedState(
       pvwindow->GetApplication()->GetIntRegistryValue(
         2, "RunTime", "UseParallelProjection"));
-    this->ParallelProjectionCallback();
+    this->ParallelProjectionCallback(
+      this->ParallelProjectionCheck->GetSelectedState());
     }
   else
     {
@@ -1566,7 +1566,8 @@ void vtkPVRenderView::CreateViewProperties()
     {
     this->OrientationAxesCheck->SetSelectedState(1);
     }
-  this->OrientationAxesCheckCallback();
+  this->OrientationAxesCheckCallback(
+    this->OrientationAxesCheck->GetSelectedState());
   
   // Orientation axes settings: interactive check
   
@@ -1590,7 +1591,8 @@ void vtkPVRenderView::CreateViewProperties()
     this->OrientationAxesInteractiveCheck->SetSelectedState(0);
     }
   
-  this->OrientationAxesInteractiveCallback();
+  this->OrientationAxesInteractiveCallback(
+    this->OrientationAxesInteractiveCheck->GetSelectedState());
   
   // Orientation axes settings: outline color
   
@@ -2158,9 +2160,9 @@ void vtkPVRenderView::EventuallyRenderCallBack()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::TriangleStripsCallback()
+void vtkPVRenderView::TriangleStripsCallback(int state)
 {
-  if (this->TriangleStripsCheck->GetSelectedState())
+  if (state)
     {
     vtkTimerLog::MarkEvent("--- Enable triangle strips.");
     }
@@ -2251,10 +2253,10 @@ void vtkPVRenderView::ParallelProjectionOff()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::ParallelProjectionCallback()
+void vtkPVRenderView::ParallelProjectionCallback(int state)
 {
 
-  if (this->ParallelProjectionCheck->GetSelectedState())
+  if (state)
     {
     vtkTimerLog::MarkEvent("--- Enable parallel projection.");
     this->ParallelProjectionOn();
@@ -2267,9 +2269,9 @@ void vtkPVRenderView::ParallelProjectionCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::ImmediateModeCallback()
+void vtkPVRenderView::ImmediateModeCallback(int state)
 {
-  if (this->ImmediateModeCheck->GetSelectedState())
+  if (state)
     {
     vtkTimerLog::MarkEvent("--- Disable display lists.");
     }
@@ -2278,7 +2280,7 @@ void vtkPVRenderView::ImmediateModeCallback()
     vtkTimerLog::MarkEvent("--- Enable display lists.");
     }
   
-  this->SetUseImmediateMode(this->ImmediateModeCheck->GetSelectedState());
+  this->SetUseImmediateMode(state);
 }
 
 //----------------------------------------------------------------------------
@@ -2414,17 +2416,15 @@ inline int IntVectSetElement(vtkSMProperty* prop, int value)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::DefaultLightIntensityCallback()
+void vtkPVRenderView::DefaultLightIntensityCallback(double value)
 {
-  double value = this->DefaultLightIntensity->GetValue();
   this->SetDefaultLightIntensityNoTrace(value);
   this->Render();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::DefaultLightIntensityEndCallback()
+void vtkPVRenderView::DefaultLightIntensityEndCallback(double value)
 {
-  double value = this->DefaultLightIntensity->GetValue();
   this->SetDefaultLightIntensity(value);
 }
 
@@ -2482,10 +2482,9 @@ void vtkPVRenderView::SetDefaultLightSpecularColor(double r, double g, double b)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::DefaultLightSwitchCallback()
+void vtkPVRenderView::DefaultLightSwitchCallback(int state)
 {
-  int value = this->DefaultLightSwitch->GetSelectedState();
-  this->SetDefaultLightSwitch(value);
+  this->SetDefaultLightSwitch(state);
 }
 
 //----------------------------------------------------------------------------
@@ -2611,7 +2610,7 @@ void vtkPVRenderView::SetLight(int type, int subtype, double value)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::LightCallback(int /*LightKitType*/ type, int /*LightKitSubType*/ subtype)
+void vtkPVRenderView::LightCallback(int /*LightKitType*/ type, int /*LightKitSubType*/ subtype, double)
 {
   double value = this->GetLight(type, subtype);
   this->SetLightNoTrace(type, subtype, value);
@@ -2619,17 +2618,16 @@ void vtkPVRenderView::LightCallback(int /*LightKitType*/ type, int /*LightKitSub
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::LightEndCallback(int type, int subtype)
+void vtkPVRenderView::LightEndCallback(int type, int subtype, double)
 {
   double value = this->GetLight(type, subtype);
   this->SetLight(type, subtype, value);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::MaintainLuminanceCallback()
+void vtkPVRenderView::MaintainLuminanceCallback(int state)
 {
-  int val = this->MaintainLuminanceButton->GetSelectedState();
-  this->SetMaintainLuminance(val);
+  this->SetMaintainLuminance(state);
 }
 
 //----------------------------------------------------------------------------
@@ -2650,10 +2648,9 @@ void vtkPVRenderView::SetMaintainLuminance(int s)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::UseLightCallback()
+void vtkPVRenderView::UseLightCallback(int state)
 {
-  int val = this->UseLightButton->GetSelectedState();
-  this->SetUseLight(val);
+  this->SetUseLight(state);
 }
 
 //----------------------------------------------------------------------------
@@ -3013,16 +3010,15 @@ void vtkPVRenderView::SetOrientationAxesVisibility(int val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::OrientationAxesCheckCallback()
+void vtkPVRenderView::OrientationAxesCheckCallback(int state)
 {
-  int val = this->OrientationAxesCheck->GetSelectedState();
   this->GetTraceHelper()->AddEntry("$kw(%s) SetOrientationAxesVisibility %d",
-                      this->GetTclName(), val);
-  this->SetOrientationAxesVisibility(val);
+                      this->GetTclName(), state);
+  this->SetOrientationAxesVisibility(state);
   
   this->GetApplication()->SetRegistryValue(2, "RunTime",
                                        "OrientationAxesVisibility",
-                                       (val ? "1" : "0"));
+                                       (state ? "1" : "0"));
 }
 
 //----------------------------------------------------------------------------
@@ -3039,15 +3035,14 @@ void vtkPVRenderView::SetOrientationAxesInteractivity(int val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::OrientationAxesInteractiveCallback()
+void vtkPVRenderView::OrientationAxesInteractiveCallback(int state)
 {
-  int val = this->OrientationAxesInteractiveCheck->GetSelectedState();
   this->GetTraceHelper()->AddEntry("$kw(%s) SetOrientationAxesInteractivity %d",
-                      this->GetTclName(), val);
-  this->SetOrientationAxesInteractivity(val);
+                      this->GetTclName(), state);
+  this->SetOrientationAxesInteractivity(state);
   this->GetApplication()->SetRegistryValue(2, "RunTime",
                                        "OrientationAxesInteractivity",
-                                       (val ? "1" : "0"));
+                                       (state ? "1" : "0"));
 }
 
 //----------------------------------------------------------------------------

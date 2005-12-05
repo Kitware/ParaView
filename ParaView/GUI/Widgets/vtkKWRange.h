@@ -230,10 +230,12 @@ public:
   // 'EndCommand' is invoked at the end of an interaction with the widget.
   // 'EntriesCommand' is invoked when the widget value is changed using
   // the text entries.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the current (sub-)range: double, double
   virtual void SetCommand(vtkObject *object, const char *method);
   virtual void SetStartCommand(vtkObject *object, const char *method);
   virtual void SetEndCommand(vtkObject *object, const char *method);
@@ -251,25 +253,6 @@ public:
   // Set the string that enables balloon help for this widget.
   // Override to pass down to children.
   virtual void SetBalloonHelpString(const char *str);
-
-  // Description:
-  // Callbacks
-  //BTX
-  enum
-  {
-    SliderIndex1 = 1,
-    SliderIndex2 = 2
-  };
-  //ETX
-  virtual void ConfigureCallback();
-  virtual void MaximizeRangeCallback();
-  virtual void EnlargeRangeCallback();
-  virtual void ShrinkRangeCallback();
-  virtual void EntriesUpdateCallback(int i);
-  virtual void StartInteractionCallback(int x, int y);
-  virtual void EndInteractionCallback();
-  virtual void SliderMotionCallback(int slider_idx, int x, int y);
-  virtual void RangeMotionCallback(int x, int y);
 
   // Description:
   // Access to the canvas
@@ -290,6 +273,25 @@ public:
   vtkSetMacro(ClampRange, int);
   vtkGetMacro(ClampRange, int);
   vtkBooleanMacro(ClampRange, int);
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  //BTX
+  enum
+  {
+    SliderIndex1 = 1,
+    SliderIndex2 = 2
+  };
+  //ETX
+  virtual void ConfigureCallback();
+  virtual void MaximizeRangeCallback();
+  virtual void EnlargeRangeCallback();
+  virtual void ShrinkRangeCallback();
+  virtual void EntriesUpdateCallback(int i);
+  virtual void StartInteractionCallback(int x, int y);
+  virtual void EndInteractionCallback();
+  virtual void SliderMotionCallback(int slider_idx, int x, int y);
+  virtual void RangeMotionCallback(int x, int y);
 
 protected:
   vtkKWRange();
@@ -327,11 +329,11 @@ protected:
   char  *EndCommand;
   char  *EntriesCommand;
 
-  virtual void InvokeObjectMethodCommand(const char *command);
-  virtual void InvokeCommand();
-  virtual void InvokeStartCommand();
-  virtual void InvokeEndCommand();
-  virtual void InvokeEntriesCommand();
+  virtual void InvokeRangeCommand(const char *command, double r0, double r1);
+  virtual void InvokeCommand(double r0, double r1);
+  virtual void InvokeStartCommand(double r0, double r1);
+  virtual void InvokeEndCommand(double r0, double r1);
+  virtual void InvokeEntriesCommand(double r0, double r1);
 
   vtkKWFrame         *CanvasFrame;
   vtkKWCanvas        *Canvas;

@@ -105,6 +105,8 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
  
+  virtual void CheckButtonCallback(int);
+
 protected:
   vtkPVItemSelection();
   ~vtkPVItemSelection();

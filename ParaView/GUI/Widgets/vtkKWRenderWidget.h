@@ -232,24 +232,6 @@ public:
   virtual void UnRegister(vtkObjectBase* o);
   
   // Description:
-  // Event handlers and useful interactions
-  virtual void MouseMoveCallback(
-    int num, int x, int y, int ctrl, int shift);
-  virtual void MouseWheelCallback(
-    int delta, int ctrl, int shift);
-  virtual void MouseButtonPressCallback(
-    int num, int x, int y, int ctrl, int shift, int repeat);
-  virtual void MouseButtonReleaseCallback(
-    int num, int x, int y, int ctrl, int shift);
-  virtual void KeyPressCallback(
-    char key, int x, int y, int ctrl, int shift, char *keysym);
-  virtual void ConfigureCallback(int width, int height);
-  virtual void ExposeCallback();
-  virtual void EnterCallback(int /*x*/, int /*y*/) {};
-  virtual void FocusInCallback();
-  virtual void FocusOutCallback();
-
-  // Description:
   // Setup print parameters
 #ifdef _WIN32
   virtual void SetupPrint(RECT &rcDest, HDC ghdc,
@@ -270,6 +252,24 @@ public:
   // observers, but should call the superclass too.
   virtual void AddCallbackCommandObservers();
   virtual void RemoveCallbackCommandObservers();
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void MouseMoveCallback(
+    int num, int x, int y, int ctrl, int shift);
+  virtual void MouseWheelCallback(
+    int delta, int ctrl, int shift);
+  virtual void MouseButtonPressCallback(
+    int num, int x, int y, int ctrl, int shift, int repeat);
+  virtual void MouseButtonReleaseCallback(
+    int num, int x, int y, int ctrl, int shift);
+  virtual void KeyPressCallback(
+    char key, int x, int y, int ctrl, int shift, char *keysym);
+  virtual void ConfigureCallback(int width, int height);
+  virtual void ExposeCallback();
+  virtual void EnterCallback(int /*x*/, int /*y*/) {};
+  virtual void FocusInCallback();
+  virtual void FocusOutCallback();
 
 protected:
   vtkKWRenderWidget();

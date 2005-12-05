@@ -50,7 +50,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVPickBoxWidget);
-vtkCxxRevisionMacro(vtkPVPickBoxWidget, "1.3");
+vtkCxxRevisionMacro(vtkPVPickBoxWidget, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVPickBoxWidget::vtkPVPickBoxWidget()
@@ -161,13 +161,13 @@ int vtkPVPickBoxWidget::GetMouseControlToggleInternal()
   return -1;
 }
 
-void vtkPVPickBoxWidget::SetMouseControlToggle()
+void vtkPVPickBoxWidget::SetMouseControlToggle(int state)
 {
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->WidgetProxy->GetProperty("MouseControlToggle"));
   if (ivp)
     {
-    ivp->SetElements1(this->MouseControlToggle->GetSelectedState());
+    ivp->SetElements1(state);
     }
   this->WidgetProxy->UpdateVTKObjects();
 }

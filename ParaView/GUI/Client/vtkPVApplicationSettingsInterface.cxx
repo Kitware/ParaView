@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.30");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.31");
 
 //----------------------------------------------------------------------------
 vtkPVApplicationSettingsInterface::vtkPVApplicationSettingsInterface()
@@ -308,16 +308,9 @@ void vtkPVApplicationSettingsInterface::Update()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplicationSettingsInterface::AutoAcceptCallback()
+void vtkPVApplicationSettingsInterface::AutoAcceptCallback(int state)
 {
- if (!this->AutoAcceptCheckButton ||
-     !this->AutoAcceptCheckButton->IsCreated())
-   {
-   return;
-   }
-
- int flag = this->AutoAcceptCheckButton->GetSelectedState() ? 1 : 0;
- this->SetAutoAccept(flag);
+ this->SetAutoAccept(state);
 }
 
 //----------------------------------------------------------------------------
@@ -346,73 +339,41 @@ void vtkPVApplicationSettingsInterface::SetAutoAccept(int val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplicationSettingsInterface::ShowSourcesDescriptionCallback()
+void vtkPVApplicationSettingsInterface::ShowSourcesDescriptionCallback(int state)
 {
- if (!this->ShowSourcesDescriptionCheckButton ||
-     !this->ShowSourcesDescriptionCheckButton->IsCreated())
-   {
-   return;
-   }
-
- int flag = this->ShowSourcesDescriptionCheckButton->GetSelectedState() ? 1 : 0;
-
  this->GetApplication()->SetRegistryValue(
-   2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY, "%d", flag);
+   2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY, "%d", state);
 
  vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->GetApplication());
  if (app)
    {
-   app->SetShowSourcesLongHelp(flag);
+   app->SetShowSourcesLongHelp(state);
    }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplicationSettingsInterface::ShowTraceFilesCallback()
+void vtkPVApplicationSettingsInterface::ShowTraceFilesCallback(int state)
 {
-  if (!this->ShowTraceFilesCheckButton ||
-    !this->ShowTraceFilesCheckButton->IsCreated())
-    {
-    return;
-    }
-
-  int flag = this->ShowTraceFilesCheckButton->GetSelectedState() ? 1 : 0;
-
   this->GetApplication()->SetRegistryValue(
-    2, "RunTime", VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY, "%d", flag);
+    2, "RunTime", VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY, "%d", state);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplicationSettingsInterface::CreateLogFilesCallback()
+void vtkPVApplicationSettingsInterface::CreateLogFilesCallback(int state)
 {
-  if (!this->CreateLogFilesCheckButton ||
-      !this->CreateLogFilesCheckButton->IsCreated())
-    {
-    return;
-    }
-
-  int flag = this->CreateLogFilesCheckButton->GetSelectedState() ? 1 : 0;
-
   this->GetApplication()->SetRegistryValue(
-    2, "RunTime", VTK_PV_ASI_CREATE_LOG_FILES_REG_KEY, "%d", flag);
+    2, "RunTime", VTK_PV_ASI_CREATE_LOG_FILES_REG_KEY, "%d", state);
 }
 
 //----------------------------------------------------------------------------
 // This is only for the temorary prototype streaming feature.
-void vtkPVApplicationSettingsInterface::StreamBlockCallback()
+void vtkPVApplicationSettingsInterface::StreamBlockCallback(int state)
 {
-  if (!this->StreamBlockCheckButton ||
-      !this->StreamBlockCheckButton->IsCreated())
-    {
-    return;
-    }
-
-  int flag = this->StreamBlockCheckButton->GetSelectedState() ? 1 : 0;
-
   vtkPVApplication *app=vtkPVApplication::SafeDownCast(this->GetApplication());
 //TODO: disabling Streaming stuff for time being.
 //  app->GetProcessModule()->SetGlobalStreamBlock(flag);
   
-  if (flag == 0)
+  if (state == 0)
     { // Turning the normal update back on.
     // Mark all sources that they need to update to have valid geometry.
     app->GetRenderModuleProxy()->InvalidateAllGeometries();
@@ -422,23 +383,15 @@ void vtkPVApplicationSettingsInterface::StreamBlockCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplicationSettingsInterface::ShowSourcesNameCallback()
+void vtkPVApplicationSettingsInterface::ShowSourcesNameCallback(int state)
 {
- if (!this->ShowSourcesNameCheckButton ||
-     !this->ShowSourcesNameCheckButton->IsCreated())
-   {
-   return;
-   }
-
- int flag = this->ShowSourcesNameCheckButton->GetSelectedState() ? 1 : 0;
-
  this->GetApplication()->SetRegistryValue(
-   2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY, "%d", flag);
+   2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY, "%d", state);
 
  vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->GetApplication());
  if (app)
    {
-   app->SetSourcesBrowserAlwaysShowName(flag);
+   app->SetSourcesBrowserAlwaysShowName(state);
    }
 }
 

@@ -142,23 +142,25 @@ public:
   // Description:
   // Specifies a command to associate with the widget. This command is 
   // typically invoked when the visibility of a toolbar is changed.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - pointer to the toolbar which visibility changed: vtkKWToolbar*
   virtual void SetToolbarVisibilityChangedCommand(
-    vtkObject *object,const char *method);
+    vtkObject *object, const char *method);
 
   // Description:
   // Specifies a command to associate with the widget. This command is 
   // typically invoked when the number of toolbars has changed 
   // (i.e. a toolbar is added or removed).
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void SetNumberOfToolbarsChangedCommand(
-    vtkObject *object,const char *method);
+    vtkObject *object, const char *method);
 
   // Description:
   // Set/Get the visibility of the separator at the bottom of the set
@@ -206,7 +208,8 @@ protected:
   char *ToolbarVisibilityChangedCommand;
   char *NumberOfToolbarsChangedCommand;
 
-  virtual void InvokeToolbarVisibilityChangedCommand();
+  virtual void InvokeToolbarVisibilityChangedCommand(
+    vtkKWToolbar *toolbar);
   virtual void InvokeNumberOfToolbarsChangedCommand();
 
   //BTX

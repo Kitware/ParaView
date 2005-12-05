@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSaveBatchScriptDialog );
-vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.22");
+vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.23");
 
 //----------------------------------------------------------------------------
 vtkPVSaveBatchScriptDialog::vtkPVSaveBatchScriptDialog()
@@ -233,9 +233,9 @@ const char* vtkPVSaveBatchScriptDialog::GetGeometryFileName()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSaveBatchScriptDialog::SaveImagesCheckCallback()
+void vtkPVSaveBatchScriptDialog::SaveImagesCheckCallback(int state)
 {
-  if (this->SaveImagesCheck->GetSelectedState())
+  if (state)
     {
     this->ImageFileNameEntry->SetEnabled(1);
     this->ImageFileNameBrowseButton->SetEnabled(1);
@@ -248,9 +248,9 @@ void vtkPVSaveBatchScriptDialog::SaveImagesCheckCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSaveBatchScriptDialog::SaveGeometryCheckCallback()
+void vtkPVSaveBatchScriptDialog::SaveGeometryCheckCallback(int state)
 {
-  if (this->SaveGeometryCheck->GetSelectedState())
+  if (state)
     {
     this->GeometryFileNameEntry->SetEnabled(1);
     this->GeometryFileNameBrowseButton->SetEnabled(1);

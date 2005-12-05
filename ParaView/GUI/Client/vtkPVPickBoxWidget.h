@@ -50,7 +50,7 @@ public:
   virtual void UpdateEnableState();
 
 // ATTRIBUTE EDITOR
-  void SetMouseControlToggle();
+  void SetMouseControlToggle(int state);
   int GetMouseControlToggleInternal();
   vtkGetObjectMacro(MouseControlToggle,vtkKWCheckButton);
 

@@ -63,6 +63,7 @@ public:
   // Description:
   // Callbacks for GUI.
   void ValueChangedCallback();
+  void ThumbWheelValueChangedCallback(double);
   void MinimumCallback();
   void MaximumCallback();
 

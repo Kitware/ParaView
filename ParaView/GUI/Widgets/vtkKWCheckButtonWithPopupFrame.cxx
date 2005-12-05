@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButtonWithPopupFrame );
-vtkCxxRevisionMacro(vtkKWCheckButtonWithPopupFrame, "1.3");
+vtkCxxRevisionMacro(vtkKWCheckButtonWithPopupFrame, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButtonWithPopupFrame::vtkKWCheckButtonWithPopupFrame()
@@ -138,7 +138,7 @@ void vtkKWCheckButtonWithPopupFrame::SetDisablePopupButtonWhenNotChecked(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButtonWithPopupFrame::CheckButtonCallback() 
+void vtkKWCheckButtonWithPopupFrame::CheckButtonCallback(int) 
 {
   this->Update();
 }

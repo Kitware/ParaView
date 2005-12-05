@@ -51,11 +51,11 @@ public:
   // Callbacks
   void SetPlayModeToSequence();
   void SetPlayModeToRealTime();
-  void DurationChangedCallback();
+  void DurationChangedCallback(double value);
   void DurationChangedKeyReleaseCallback();
   void LoopCheckButtonCallback();
   void ToolbarLoopCheckButtonCallback();
-  void TimeScaleCallback();
+  void TimeScaleCallback(double value);
   void ToolbarRecordCheckButtonCallback();
   void RecordCheckCallback();
   void SaveAnimationCallback();

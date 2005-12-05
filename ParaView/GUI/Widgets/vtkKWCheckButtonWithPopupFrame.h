@@ -44,10 +44,6 @@ public:
   vtkGetMacro(DisablePopupButtonWhenNotChecked, int);
 
   // Description:
-  // Callbacks
-  virtual void CheckButtonCallback();
-
-  // Description:
   // Access to sub-widgets
   vtkGetObjectMacro(CheckButton, vtkKWCheckButton);
 
@@ -63,6 +59,10 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void CheckButtonCallback(int state);
 
 protected:
   vtkKWCheckButtonWithPopupFrame();

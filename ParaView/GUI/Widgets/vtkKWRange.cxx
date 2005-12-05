@@ -24,7 +24,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.59");
+vtkCxxRevisionMacro(vtkKWRange, "1.60");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -639,7 +639,7 @@ void vtkKWRange::SetRange(double r0, double r1)
 
   if (old_range[0] != this->Range[0] || old_range[1] != this->Range[1])
     {
-    this->InvokeCommand();
+    this->InvokeCommand(this->Range[0], this->Range[1]);
     }
 }
 
@@ -1252,11 +1252,23 @@ void vtkKWRange::GetSliderColor(int type, double &r, double &g, double &b)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::InvokeObjectMethodCommand(const char *command)
+void vtkKWRange::InvokeRangeCommand(const char *command, 
+                                    double r0, double r1)
 {
-  if (!this->DisableCommands)
+  if (!this->DisableCommands && command && *command && this->GetApplication())
     {
-    this->Superclass::InvokeObjectMethodCommand(command);
+    // As a convenience, try to detect if we are manipulating integers, and
+    // invoke the callback with the approriate type.
+    if ((double)((long int)r0) == r0 && (long double)((int)r1) == r1)
+      {
+      //this->Script("eval %s %ld %ld", command, (long int)r0, (long int)r1);
+      this->Script("%s %ld %ld", command, (long int)r0, (long int)r1);
+      }
+    else
+      {
+      //this->Script("eval %s %lf %lf", command, r0, r1);
+      this->Script("%s %lf %lf", command, r0, r1);
+      }
     }
 }
 
@@ -1267,9 +1279,9 @@ void vtkKWRange::SetCommand(vtkObject *object, const char *method)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::InvokeCommand()
+void vtkKWRange::InvokeCommand(double r0, double r1)
 {
-  this->InvokeObjectMethodCommand(this->Command);
+  this->InvokeRangeCommand(this->Command, r0, r1);
 }
 
 //----------------------------------------------------------------------------
@@ -1279,9 +1291,9 @@ void vtkKWRange::SetStartCommand(vtkObject *object, const char *method)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::InvokeStartCommand()
+void vtkKWRange::InvokeStartCommand(double r0, double r1)
 {
-  this->InvokeObjectMethodCommand(this->StartCommand);
+  this->InvokeRangeCommand(this->StartCommand, r0, r1);
 }
 
 //----------------------------------------------------------------------------
@@ -1291,9 +1303,9 @@ void vtkKWRange::SetEndCommand(vtkObject *object, const char *method)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::InvokeEndCommand()
+void vtkKWRange::InvokeEndCommand(double r0, double r1)
 {
-  this->InvokeObjectMethodCommand(this->EndCommand);
+  this->InvokeRangeCommand(this->EndCommand, r0, r1);
 }
 
 //----------------------------------------------------------------------------
@@ -1303,9 +1315,9 @@ void vtkKWRange::SetEntriesCommand(vtkObject *object, const char *method)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::InvokeEntriesCommand()
+void vtkKWRange::InvokeEntriesCommand(double r0, double r1)
 {
-  this->InvokeObjectMethodCommand(this->EntriesCommand);
+  this->InvokeRangeCommand(this->EntriesCommand, r0, r1);
 }
 
 //----------------------------------------------------------------------------
@@ -2052,7 +2064,7 @@ void vtkKWRange::EntriesUpdateCallback(int i)
 
   if (this->Range[i] != old_value)
     {
-    this->InvokeEntriesCommand();
+    this->InvokeEntriesCommand(this->Range[0], this->Range[1]);
     }
 }
 
@@ -2110,7 +2122,7 @@ void vtkKWRange::StartInteractionCallback(int x, int y)
   this->StartInteractionRange[1] = this->RangeAdjusted[1];
 
   this->UpdateRangeColors();
-  this->InvokeStartCommand();
+  this->InvokeStartCommand(this->Range[0], this->Range[1]);
 }
 
 //----------------------------------------------------------------------------
@@ -2123,7 +2135,7 @@ void vtkKWRange::EndInteractionCallback()
 
   this->InInteraction = 0;
   this->UpdateRangeColors();
-  this->InvokeEndCommand();
+  this->InvokeEndCommand(this->Range[0], this->Range[1]);
 }
 
 //----------------------------------------------------------------------------

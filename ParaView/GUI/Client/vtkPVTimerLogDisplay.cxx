@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.40");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.41");
 
 //----------------------------------------------------------------------------
 vtkPVTimerLogDisplay::vtkPVTimerLogDisplay()
@@ -296,13 +296,13 @@ void vtkPVTimerLogDisplay::Clear()
 
 
 //----------------------------------------------------------------------------
-void vtkPVTimerLogDisplay::EnableCheckCallback()
+void vtkPVTimerLogDisplay::EnableCheckCallback(int state)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke 
-         << pm->GetProcessModuleID() << "SetEnableLog" << this->EnableCheck->GetSelectedState()
+         << pm->GetProcessModuleID() << "SetEnableLog" << state
          << vtkClientServerStream::End;
   pm->SendStream(
     vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 

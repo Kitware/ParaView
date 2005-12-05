@@ -200,44 +200,46 @@ public:
   // Description:
   // Specifies a command to associate with the widget. This command is 
   // typically invoked when the user opens a node.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // Note that path of the opened node is passed as parameter.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - path to the opened node: const char*
   virtual void SetOpenCommand(vtkObject *object, const char *method);
 
   // Description:
   // Specifies a command to associate with the widget. This command is 
   // typically invoked when the user closes a node.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // Note that path of the closed node is passed as parameter.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - path to the closed node: const char*
   virtual void SetCloseCommand(vtkObject *object, const char *method);
 
   // Description:
   // Specifies a command to execute whenever the event sequence given 
   // by 'event' occurs on the label of a node. 
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // Note that the node identifier on which the event occurred is passed as
-  // parameter.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - path to the node for which the event occured: const char*
   virtual void SetBindText(
     const char *event, vtkObject *object, const char *method);
 
   // Description:
   // Convenience method to set the command for single click and double
   // click on a node. This, in turn, just calls SetBindText.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // Note that the node identifier on which the event occurred is passed as
-  // parameter.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - path to the node for which the event occured: const char*
   virtual void SetDoubleClickOnNodeCommand(
     vtkObject *object, const char *method);
   virtual void SetSingleClickOnNodeCommand(
@@ -246,10 +248,10 @@ public:
   // Description:
   // Specifies a command to associate with the widget. This command is 
   // typically invoked when the selection changes.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void SetSelectionChangedCommand(
     vtkObject *object, const char *method);
 
@@ -263,7 +265,7 @@ public:
   virtual void UpdateEnableState();
 
   // Description:
-  // Callbacks
+  // Callbacks. Internal, do not use.
   virtual void SelectionCallback();
 
 protected:

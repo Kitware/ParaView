@@ -65,7 +65,7 @@ inline static int IntVectPropertySetElement(vtkSMProxy *proxy,
 }
 
 
-vtkCxxRevisionMacro(vtkPVPropertyKeyFrame, "1.8");
+vtkCxxRevisionMacro(vtkPVPropertyKeyFrame, "1.9");
 //-----------------------------------------------------------------------------
 vtkPVPropertyKeyFrame::vtkPVPropertyKeyFrame()
 {
@@ -188,8 +188,8 @@ void vtkPVPropertyKeyFrame::CreateValueWidget()
       pvWheel->DisplayLabelOff();
       pvWheel->DisplayEntryAndLabelOnTopOff();
       pvWheel->ExpandEntryOn();
-      pvWheel->SetEntryCommand(this, "ValueChangedCallback");
-      pvWheel->SetEndCommand(this, "ValueChangedCallback");
+      pvWheel->SetEntryCommand(this, "ThumbWheelValueChangedCallback");
+      pvWheel->SetEndCommand(this, "ThumbWheelValueChangedCallback");
       this->ValueWidget = pvWheel;
       }
     }
@@ -553,6 +553,12 @@ void vtkPVPropertyKeyFrame::InitializeKeyValueDomainUsingCurrentState()
 void vtkPVPropertyKeyFrame::ValueChangedCallback()
 {
   this->UpdateValueFromGUI();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPropertyKeyFrame::ThumbWheelValueChangedCallback(double)
+{
+  this->ValueChangedCallback();
 }
 
 //-----------------------------------------------------------------------------

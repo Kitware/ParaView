@@ -81,6 +81,8 @@ public:
   // Save this widget to a file.
   virtual void SaveInBatchScript(ofstream *file);
  
+  virtual void CheckButtonCallback(int);
+
 protected:
   vtkPVLabeledToggle();
   ~vtkPVLabeledToggle();

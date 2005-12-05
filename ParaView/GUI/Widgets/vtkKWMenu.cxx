@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.88");
+vtkCxxRevisionMacro(vtkKWMenu, "1.89");
 
 //----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
@@ -89,7 +89,7 @@ void vtkKWMenu::DisplayHelp(const char* widget)
 //----------------------------------------------------------------------------
 void vtkKWMenu::AddGeneric(const char* addtype, 
                            const char* label,
-                           vtkObject* Object,
+                           vtkObject *object,
                            const char *method,
                            const char* extra, 
                            const char* help)
@@ -107,10 +107,10 @@ void vtkKWMenu::AddGeneric(const char* addtype,
     str << " -label {" << label << "}";
     }
 
-  if (Object || method)
+  if (object || method)
     {
     char *command = NULL;
-    this->SetObjectMethodCommand(&command, Object, method);
+    this->SetObjectMethodCommand(&command, object, method);
     str << " -command {" << command << "}" ;
     delete [] command;
     }
@@ -137,7 +137,7 @@ void vtkKWMenu::AddGeneric(const char* addtype,
 //----------------------------------------------------------------------------
 void vtkKWMenu::InsertGeneric(int position, const char* addtype, 
                               const char* label, 
-                              vtkObject* Object,
+                              vtkObject *object,
                               const char *method, 
                               const char* extra, 
                               const char* help)
@@ -150,10 +150,10 @@ void vtkKWMenu::InsertGeneric(int position, const char* addtype,
     str << " -label {" << label << "}";
     }
 
-  if (Object || method)
+  if (object || method)
     {
     char *command = NULL;
-    this->SetObjectMethodCommand(&command, Object, method);
+    this->SetObjectMethodCommand(&command, object, method);
     str << " -command {" << command << "}" ;
     delete [] command;
     }
@@ -325,16 +325,16 @@ void vtkKWMenu::SetCascade(const char *label, const char* menu_name)
 
 //----------------------------------------------------------------------------
 void  vtkKWMenu::AddCheckButton(const char* label, const char* ButtonVar, 
-                                vtkObject* Object, 
+                                vtkObject *object, 
                                 const char *method, 
                                 const char* help )
 { 
-  this->AddCheckButton(label, ButtonVar, Object, method, -1, help);
+  this->AddCheckButton(label, ButtonVar, object, method, -1, help);
 }
  
 //----------------------------------------------------------------------------
 void  vtkKWMenu::AddCheckButton(const char* label, const char* ButtonVar, 
-                                vtkObject* Object, 
+                                vtkObject *object, 
                                 const char *method, 
                                 int underline, const char* help )
 { 
@@ -345,7 +345,7 @@ void  vtkKWMenu::AddCheckButton(const char* label, const char* ButtonVar,
     str << " -underline " << underline;
     }
   str << ends;
-  this->AddGeneric("checkbutton", label, Object, 
+  this->AddGeneric("checkbutton", label, object, 
                    method, str.str(), help);
   str.rdbuf()->freeze(0);
 }
@@ -354,17 +354,17 @@ void  vtkKWMenu::AddCheckButton(const char* label, const char* ButtonVar,
 //----------------------------------------------------------------------------
 void vtkKWMenu::InsertCheckButton(int position, 
                                   const char* label, const char* ButtonVar, 
-                                  vtkObject* Object, 
+                                  vtkObject *object, 
                                   const char *method, const char* help )
 { 
-  this->InsertCheckButton( position, label, ButtonVar, Object, method,
+  this->InsertCheckButton( position, label, ButtonVar, object, method,
                            -1, help );
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMenu::InsertCheckButton(int position, 
                                   const char* label, const char* ButtonVar, 
-                                  vtkObject* Object, 
+                                  vtkObject *object, 
                                   const char *method, 
                                   int underline, const char* help )
 { 
@@ -375,14 +375,14 @@ void vtkKWMenu::InsertCheckButton(int position,
     str << " -underline " << underline;
     }
   str << ends;
-  this->InsertGeneric(position, "checkbutton", label, Object, 
+  this->InsertGeneric(position, "checkbutton", label, object, 
                       method, str.str(), help);
   str.rdbuf()->freeze(0);
 }
 
 
 //----------------------------------------------------------------------------
-void  vtkKWMenu::AddCommand(const char* label, vtkObject* Object,
+void  vtkKWMenu::AddCommand(const char* label, vtkObject *object,
                             const char *method,
                             int underline, 
                             const char* help)
@@ -393,22 +393,22 @@ void  vtkKWMenu::AddCommand(const char* label, vtkObject* Object,
     str << " -underline " << underline;
     }
   str << ends;
-  this->AddGeneric("command", label, Object, 
+  this->AddGeneric("command", label, object, 
                    method, str.str(), help);
   str.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------
-void  vtkKWMenu::AddCommand(const char* label, vtkObject* Object,
+void  vtkKWMenu::AddCommand(const char* label, vtkObject *object,
                             const char *method ,
                             const char* help)
 {
-  this->AddGeneric("command", label, Object, 
+  this->AddGeneric("command", label, object, 
                    method, NULL, help);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::InsertCommand(int position, const char* label, vtkObject* Object,
+void vtkKWMenu::InsertCommand(int position, const char* label, vtkObject *object,
                               const char *method,
                               int underline, 
                               const char* help)
@@ -419,26 +419,26 @@ void vtkKWMenu::InsertCommand(int position, const char* label, vtkObject* Object
     str << " -underline " << underline;
     }
   str << ends;
-  this->InsertGeneric(position, "command", label, Object,
+  this->InsertGeneric(position, "command", label, object,
                       method, str.str(), help);
   str.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::InsertCommand(int position, const char* label, vtkObject* Object,
+void vtkKWMenu::InsertCommand(int position, const char* label, vtkObject *object,
                               const char *method,
                               const char* help)
 {
-  this->InsertGeneric(position, "command", label, Object,
+  this->InsertGeneric(position, "command", label, object,
                       method, NULL, help);
 }
 
 //----------------------------------------------------------------------------
-char* vtkKWMenu::CreateRadioButtonVariable(vtkKWObject* Object, 
+char* vtkKWMenu::CreateRadioButtonVariable(vtkKWObject* object, 
                                            const char* varname)
 {
   char *buffer = NULL;
-  const char *objname = Object->GetTclName();
+  const char *objname = object->GetTclName();
   if (objname && varname)
     {
     char *clean_name = vtksys::SystemTools::RemoveChars(varname, " ");
@@ -450,24 +450,24 @@ char* vtkKWMenu::CreateRadioButtonVariable(vtkKWObject* Object,
 }
   
 //----------------------------------------------------------------------------
-int vtkKWMenu::GetRadioButtonValue(vtkKWObject* Object, 
+int vtkKWMenu::GetRadioButtonValue(vtkKWObject* object, 
                                    const char* varname)
 {
   int res;
   
   char *rbv = 
-    this->CreateRadioButtonVariable(Object,varname);
+    this->CreateRadioButtonVariable(object,varname);
   res = atoi(this->Script("set %s",rbv));
   delete [] rbv;
   return res;
 }
     
 //----------------------------------------------------------------------------
-int vtkKWMenu::GetCheckedRadioButtonItem(vtkKWObject* Object, 
+int vtkKWMenu::GetCheckedRadioButtonItem(vtkKWObject* object, 
                                          const char* varname)
 {
-  char *rbv = this->CreateRadioButtonVariable(Object,varname);
-  int value = this->GetCheckButtonValue(Object,varname);
+  char *rbv = this->CreateRadioButtonVariable(object,varname);
+  int value = this->GetCheckButtonValue(object,varname);
 
   int numEntries = this->GetNumberOfItems();
   for(int i = 0; i < numEntries; i++)
@@ -495,40 +495,40 @@ int vtkKWMenu::GetCheckedRadioButtonItem(vtkKWObject* Object,
 }
     
 //----------------------------------------------------------------------------
-void vtkKWMenu::CheckRadioButton(vtkKWObject* Object, 
+void vtkKWMenu::CheckRadioButton(vtkKWObject* object, 
                                  const char* varname, int id)
 {
-  char *rbv = this->CreateRadioButtonVariable(Object,varname);
+  char *rbv = this->CreateRadioButtonVariable(object,varname);
   this->Script("if {![info exists %s] || $%s != %d} {set %s %d}",
                rbv, rbv, id, rbv, id);
   delete [] rbv;
 }
 
 //----------------------------------------------------------------------------
-char* vtkKWMenu::CreateCheckButtonVariable(vtkKWObject* Object, 
+char* vtkKWMenu::CreateCheckButtonVariable(vtkKWObject* object, 
                                            const char* varname)
 {
-  return this->CreateRadioButtonVariable(Object, varname);
+  return this->CreateRadioButtonVariable(object, varname);
 }
   
 //----------------------------------------------------------------------------
-int vtkKWMenu::GetCheckButtonValue(vtkKWObject* Object, 
+int vtkKWMenu::GetCheckButtonValue(vtkKWObject* object, 
                                    const char* name)
 {
   int res;
   
   char *rbv = 
-    this->CreateCheckButtonVariable(Object,name);
+    this->CreateCheckButtonVariable(object,name);
   res = atoi(this->Script("set %s",rbv));
   delete [] rbv;
   return res;
 }
     
 //----------------------------------------------------------------------------
-void vtkKWMenu::CheckCheckButton(vtkKWObject* Object, 
+void vtkKWMenu::CheckCheckButton(vtkKWObject* object, 
                                  const char* name, int id)
 {
-  char *rbv = this->CreateCheckButtonVariable(Object,name);
+  char *rbv = this->CreateCheckButtonVariable(object,name);
   this->Script("if {![info exists %s] || $%s != %d} {set %s %d}",
                rbv, rbv, id, rbv, id);
   delete [] rbv;
@@ -538,7 +538,7 @@ void vtkKWMenu::CheckCheckButton(vtkKWObject* Object,
 void vtkKWMenu::AddRadioButton(int value, 
                                const char* label, 
                                const char* buttonVar, 
-                               vtkObject* Object, 
+                               vtkObject *object, 
                                const char *method,
                                int underline, 
                                const char* help)
@@ -550,18 +550,18 @@ void vtkKWMenu::AddRadioButton(int value,
     str << " -underline " << underline;
     }
   str << ends;
-  this->AddGeneric("radiobutton", label, Object,
+  this->AddGeneric("radiobutton", label, object,
                    method, str.str(), help);
   str.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMenu::AddRadioButton(int value, const char* label, const char* buttonVar, 
-                               vtkObject* Object, 
+                               vtkObject *object, 
                                const char *method,
                                const char* help)
 {
-  this->AddRadioButton(value, label, buttonVar, Object, method,
+  this->AddRadioButton(value, label, buttonVar, object, method,
                        -1, help);
 }
 
@@ -570,7 +570,7 @@ void vtkKWMenu::AddRadioButton(int value, const char* label, const char* buttonV
 void vtkKWMenu::AddRadioButtonImage(int value, 
                                     const char* imgname, 
                                     const char* buttonVar, 
-                                    vtkObject* Object, 
+                                    vtkObject *object, 
                                     const char *method,
                                     const char* help)
 {
@@ -581,7 +581,7 @@ void vtkKWMenu::AddRadioButtonImage(int value,
       << " -variable " << buttonVar
       << ends;
   // Uses the imgname as label, so that the help string can work.
-  this->AddGeneric("radiobutton", imgname, Object,
+  this->AddGeneric("radiobutton", imgname, object,
                    method, str.str(), help);
   str.rdbuf()->freeze(0);
 }
@@ -589,18 +589,18 @@ void vtkKWMenu::AddRadioButtonImage(int value,
 //----------------------------------------------------------------------------
 void vtkKWMenu::InsertRadioButton(int position, int value, const char* label, 
                                   const char* buttonVar, 
-                                  vtkObject* Object, 
+                                  vtkObject *object, 
                                   const char *method,
                                   const char* help)
 {
-  this->InsertRadioButton( position, value, label, buttonVar, Object,
+  this->InsertRadioButton( position, value, label, buttonVar, object,
                            method, -1, help );
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMenu::InsertRadioButton(int position, int value, const char* label, 
                                   const char* buttonVar, 
-                                  vtkObject* Object, 
+                                  vtkObject *object, 
                                   const char *method,
                                   int underline,
                                   const char* help)
@@ -612,7 +612,7 @@ void vtkKWMenu::InsertRadioButton(int position, int value, const char* label,
     str << " -underline " << underline;
     }
   str << ends;
-  this->InsertGeneric(position, "radiobutton", label, Object,
+  this->InsertGeneric(position, "radiobutton", label, object,
                       method, str.str(), help);
   str.rdbuf()->freeze(0);
 }
@@ -755,12 +755,12 @@ int vtkKWMenu::GetIndexOfItem(const char *label)
 
 //----------------------------------------------------------------------------
 int vtkKWMenu::GetIndexOfCommand(
-  vtkObject* Object, const char *method)
+  vtkObject *object, const char *method)
 {
-  if (Object || method)
+  if (object || method)
     {
     char *command = NULL;
-    this->SetObjectMethodCommand(&command, Object, method);
+    this->SetObjectMethodCommand(&command, object, method);
 
     int nb_of_items = this->GetNumberOfItems();
     for (int i = 0; i < nb_of_items; i++)

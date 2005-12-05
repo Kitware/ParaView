@@ -78,19 +78,19 @@ public:
   vtkBooleanMacro(HideValue, int);
 
   // Description:
-  // Description:
   // Specifies commands to associate with the widget. 
   // 'SelectionChangedCommand' is invoked when the selected color has
-  // changed (i.e. at the end of the user interaction), whereas 
-  // 'SelectionChangingCommand' is invoked when the select color is
-  // changing (i.e. during the user interaction itself).
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // Note that the current color is passed, as 3 HSV (double) parameters,
-  // unless InvokeCommandsWithRGB is true, in that case the current HSV 
-  // value is converted to RGB first.
+  // changed (i.e. at the end of the user interaction).
+  // 'SelectionChangingCommand' is invoked when the selected color is
+  // changing (i.e. during the user interaction).
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - selected HSV color: double, double, double
+  // Note that if InvokeCommandsWithRGB is true, the selected color is passed
+  // as RGB instead of HSV.
   virtual void SetSelectionChangedCommand(
     vtkObject *object, const char *method);
   virtual void SetSelectionChangingCommand(
@@ -107,15 +107,6 @@ public:
   // Set the string that enables balloon help for this widget.
   // Override to pass down to children.
   virtual void SetBalloonHelpString(const char *str);
-
-  // Description:
-  // Callbacks
-  virtual void HueSatPickCallback(int x, int y);
-  virtual void HueSatMoveCallback(int x, int y);
-  virtual void HueSatReleaseCallback();
-  virtual void ValuePickCallback(int x, int y);
-  virtual void ValueMoveCallback(int x, int y);
-  virtual void ValueReleaseCallback();
 
   // Description:
   // Access to the canvas and internal elements
@@ -135,6 +126,15 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void HueSatPickCallback(int x, int y);
+  virtual void HueSatMoveCallback(int x, int y);
+  virtual void HueSatReleaseCallback();
+  virtual void ValuePickCallback(int x, int y);
+  virtual void ValueMoveCallback(int x, int y);
+  virtual void ValueReleaseCallback();
+
 protected:
   vtkKWHSVColorSelector();
   ~vtkKWHSVColorSelector();
@@ -153,11 +153,12 @@ protected:
 
   char *SelectionChangedCommand;
   char *SelectionChangingCommand;
-  int    InvokeCommandsWithRGB;
 
-  virtual void InvokeCommandWithColor(const char *command);
-  virtual void InvokeSelectionChangedCommand();
-  virtual void InvokeSelectionChangingCommand();
+  int InvokeCommandsWithRGB;
+  virtual void InvokeCommandWithColor(
+    const char *command, double h, double s, double v);
+  virtual void InvokeSelectionChangedCommand(double h, double s, double v);
+  virtual void InvokeSelectionChangingCommand(double h, double s, double v);
 
   // GUI
 

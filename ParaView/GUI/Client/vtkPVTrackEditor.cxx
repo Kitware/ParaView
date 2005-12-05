@@ -35,7 +35,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVTrackEditor);
-vtkCxxRevisionMacro(vtkPVTrackEditor, "1.17");
+vtkCxxRevisionMacro(vtkPVTrackEditor, "1.18");
 //-----------------------------------------------------------------------------
 class vtkPVTrackEditorObserver : public vtkCommand
 {
@@ -440,9 +440,9 @@ void vtkPVTrackEditor::UpdateTypeImage(vtkPVKeyFrame* keyframe)
 
 
 //-----------------------------------------------------------------------------
-void vtkPVTrackEditor::IndexChangedCallback()
+void vtkPVTrackEditor::IndexChangedCallback(double value)
 {
-  int val = static_cast<int>(this->IndexScale->GetValue()) - 1;
+  int val = static_cast<int>(value) - 1;
   this->SetKeyFrameIndex(val);
 }
 

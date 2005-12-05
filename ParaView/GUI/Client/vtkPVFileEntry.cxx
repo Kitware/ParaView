@@ -71,7 +71,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.122");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.123");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -254,7 +254,7 @@ void vtkPVFileEntry::Create()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVFileEntry::EntryChangedCallback()
+void vtkPVFileEntry::EntryChangedCallback(const char *)
 {
   const char* val = this->Entry->GetValue();
   this->SetValue(val);
@@ -309,9 +309,9 @@ void vtkPVFileEntry::SetTimeStep(int ts)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVFileEntry::TimestepChangedCallback()
+void vtkPVFileEntry::TimestepChangedCallback(double value)
 {
-  int ts = static_cast<int>(this->Timestep->GetValue());
+  int ts = static_cast<int>(value);
   this->SetTimeStep(ts);
 }
 

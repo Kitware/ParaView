@@ -94,10 +94,7 @@ KWWidgetsTourItem* vtkKWEntryEntryPoint(
   entry_set->GetWidget(0)->SetValue("Enter a value here...");
   entry_set->GetWidget(2)->SetValue("...and it will show there.");
 
-  char buffer[100];
-  sprintf(buffer, "SetValue [%s GetValue]", 
-          entry_set->GetWidget(0)->GetTclName());
-  entry_set->GetWidget(0)->SetCommand(entry_set->GetWidget(2), buffer);
+  entry_set->GetWidget(0)->SetCommand(entry_set->GetWidget(2), "SetValue");
 
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 

@@ -296,10 +296,10 @@ public:
   // fields independently (using the SetPresetGroup(), SetPresetComment(),
   // SetPreset...() methods).
   // Note that if not set, the "add preset" button is not visible.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   virtual void SetPresetAddCommand(vtkObject *object, const char *method);
 
   // Description:
@@ -310,11 +310,12 @@ public:
   // is then free to update the preset's fields independently (using the
   // SetPresetGroup(), SetPresetComment(), SetPreset...() methods).
   // Note that if not set, the "update selected preset" button is not visible.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // The id of the preset to update is passed to the command.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the id of the preset to update: int
   virtual void SetPresetUpdateCommand(vtkObject *object, const char *method);
 
   // Description:
@@ -327,11 +328,12 @@ public:
   // apply those values to the relevant objects.
   // Note that if not set or ApplyPresetOnSelection is On, the 
   // "apply selected preset" button is not visible.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // The id of the preset to apply is passed to the command.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the id of the preset to apply: int
   virtual void SetPresetApplyCommand(vtkObject *object, const char *method);
 
   // Description:
@@ -353,13 +355,14 @@ public:
   // GetPresetGroup(), GetPresetComment(), GetPreset...() methods),
   // decide if the preset should be removed or not, and delete it from
   // its internal structures accordingly, if needed.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // The id of the preset to remove is passed to the command.
-  // This command is expected to return an integer equal to 1 if the preset
-  // is really to be removed, 0 otherwise.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the id of the preset to remove: int
+  // The following output is expected from the command:
+  // - whereas the preset is really to be removed (1) or not (0): int
   virtual void SetPresetRemoveCommand(vtkObject *object, const char *method);
 
   // Description:
@@ -379,11 +382,12 @@ public:
   // fields independently (using the GetPresetGroup(), GetPresetComment(), 
   // GetPreset...() methods), and update its internal structures accordingly, 
   // if needed.
-  // The first argument is the object that will have the method called on it.
-  // The second argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method
-  // is still evaluated as a simple command. 
-  // The id of the preset that has changed is passed to the command.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the id of the preset that has changed: int
   virtual void SetPresetHasChangedCommand(
     vtkObject *object, const char *method);
 
@@ -399,17 +403,6 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
-
-  // Description:
-  // Callbacks
-  virtual void PresetAddCallback();
-  virtual void PresetApplyCallback();
-  virtual void PresetUpdateCallback();
-  virtual void PresetRemoveCallback();
-  virtual void PresetEmailCallback();
-  virtual void PresetLocateCallback();
-  virtual void PresetSelectionCallback();
-  virtual void PresetSelectionChangedCallback() {};
 
   // Description:
   // Callback used to refresh the contents of the image cell for each preset
@@ -450,6 +443,17 @@ public:
   static const char *GroupColumnName;
   static const char *CommentColumnName;
   //ETX
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void PresetAddCallback();
+  virtual void PresetApplyCallback();
+  virtual void PresetUpdateCallback();
+  virtual void PresetRemoveCallback();
+  virtual void PresetEmailCallback();
+  virtual void PresetLocateCallback();
+  virtual void PresetSelectionCallback();
+  virtual void PresetSelectionChangedCallback() {};
 
 protected:
   vtkKWPresetSelector();

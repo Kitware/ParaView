@@ -148,11 +148,6 @@ public:
   vtkBooleanMacro(SeparatorVisibility, int);  
 
   // Description:
-  // Callbacks used internally to adjust the size,
-  virtual void DragCallback();
-  virtual void ConfigureCallback();
-
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -160,6 +155,11 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void DragCallback();
+  virtual void ConfigureCallback();
 
 protected:
   vtkKWSplitFrame();

@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.53");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.54");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -470,22 +470,22 @@ void vtkPVMinMax::GetRange(double range[2])
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::MinValueCallback()
+void vtkPVMinMax::MinValueCallback(double value)
 {
-  if (this->MinScale->GetValue() > this->MaxScale->GetValue())
+  if (value > this->MaxScale->GetValue())
     {
-    this->MaxScale->SetValue(this->MinScale->GetValue());
+    this->MaxScale->SetValue(value);
     }
   
   this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::MaxValueCallback()
+void vtkPVMinMax::MaxValueCallback(double value)
 {
-  if (this->MaxScale->GetValue() < this->MinScale->GetValue())
+  if (value < this->MinScale->GetValue())
     {
-    this->MinScale->SetValue(this->MaxScale->GetValue());
+    this->MinScale->SetValue(value);
     }
   
   this->ModifiedCallback();

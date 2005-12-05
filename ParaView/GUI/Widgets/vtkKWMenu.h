@@ -62,32 +62,32 @@ public:
   int   GetCheckButtonValue(vtkKWObject* Object, const char* name);
   void  CheckCheckButton(vtkKWObject *Object, const char *name, int val);
   void AddCheckButton(const char* label, const char* ButtonVar, 
-                      vtkObject* Object, 
+                      vtkObject *object, 
                       const char *method , const char* help = 0);
   void AddCheckButton(const char* label, const char* ButtonVar, 
-                      vtkObject* Object, 
+                      vtkObject *object, 
                       const char *method , int underline,
                       const char* help = 0);
   void InsertCheckButton(int position, 
                          const char* label, const char* ButtonVar, 
-                         vtkObject* Object, 
+                         vtkObject *object, 
                          const char *method , const char* help = 0);
   void InsertCheckButton(int position, 
                          const char* label, const char* ButtonVar, 
-                         vtkObject* Object, 
+                         vtkObject *object, 
                          const char *method , 
                          int underline, const char* help = 0);
 
   // Description: 
   // Append/Insert a standard menu item and command to the current menu.
-  void AddCommand(const char* label, vtkObject* Object,
+  void AddCommand(const char* label, vtkObject *object,
                   const char *method , const char* help = 0);
-  void AddCommand(const char* label, vtkObject* Object,
+  void AddCommand(const char* label, vtkObject *object,
                   const char *method , int underline, 
                   const char* help = 0);
-  void InsertCommand(int position, const char* label, vtkObject* Object,
+  void InsertCommand(int position, const char* label, vtkObject *object,
                      const char *method , const char* help = 0);
-  void InsertCommand(int position, const char* label, vtkObject* Object,
+  void InsertCommand(int position, const char* label, vtkObject *object,
                      const char *method , 
                      int underline, const char* help = 0);
 
@@ -108,30 +108,30 @@ public:
   void  CheckRadioButton(vtkKWObject *Object, const char *varname, int id);
   int   GetCheckedRadioButtonItem(vtkKWObject *Object, const char *varname);
   void AddRadioButton(int value, const char* label, const char* buttonVar, 
-                      vtkObject* Called, 
+                      vtkObject *object, 
                       const char *method, const char* help = 0);
   void AddRadioButton(int value, const char* label, const char* buttonVar, 
-                      vtkObject* Called, 
+                      vtkObject *object, 
                       const char *method, int underline,  
                       const char* help = 0);
   void AddRadioButtonImage(int value, const char* imgname, 
-                           const char* buttonVar, vtkObject* Called, 
+                           const char* buttonVar, vtkObject *object, 
                           const char *method, const char* help = 0);
   void  InsertRadioButton(int position, int value, const char* label, 
-                          const char* buttonVar, vtkObject* Called, 
+                          const char* buttonVar, vtkObject *object, 
                           const char *method, const char* help = 0);
   void  InsertRadioButton(int position, int value, const char* label, 
-                          const char* buttonVar, vtkObject* Called, 
+                          const char* buttonVar, vtkObject *object, 
                           const char *method, 
                           int underline, const char* help = 0);
 
   // Description: 
   // Add a generic menu item (defined by addtype)
-  void AddGeneric(const char* addtype, const char* label, vtkObject* Object,
+  void AddGeneric(const char* addtype, const char* label, vtkObject *object,
                   const char *method, const char* extra, 
                   const char* help);
   void InsertGeneric(int position, const char* addtype, const char* label, 
-                     vtkObject* Object,
+                     vtkObject *object,
                      const char *method, const char* extra, 
                      const char* help);
 
@@ -152,7 +152,7 @@ public:
   // Returns the integer index of the menu item by string, or by the
   // command (object/method) pair associated to it.
   int GetIndexOfItem(const char *label);
-  int GetIndexOfCommand(vtkObject* Object, const char *method);
+  int GetIndexOfCommand(vtkObject *object, const char *method);
 
   // Description:
   // Get the command for the entry at index. This is what is returned by

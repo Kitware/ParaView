@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.12");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.13");
 
 //----------------------------------------------------------------------------
 vtkKWHeaderAnnotationEditor::vtkKWHeaderAnnotationEditor()
@@ -302,12 +302,9 @@ void vtkKWHeaderAnnotationEditor::SetVisibility(int state)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHeaderAnnotationEditor::CheckButtonCallback() 
+void vtkKWHeaderAnnotationEditor::CheckButtonCallback(int state) 
 {
-  if (this->CheckButton && this->CheckButton->IsCreated())
-    {
-    this->SetVisibility(this->CheckButton->GetSelectedState() ? 1 : 0);
-    }
+  this->SetVisibility(state ? 1 : 0);
 }
 
 //----------------------------------------------------------------------------
@@ -342,12 +339,9 @@ void vtkKWHeaderAnnotationEditor::SetHeaderText(const char *text)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHeaderAnnotationEditor::HeaderTextCallback() 
+void vtkKWHeaderAnnotationEditor::HeaderTextCallback(const char *value) 
 {
-  if (this->TextEntry && this->TextEntry->IsCreated())
-    {
-    this->SetHeaderText(this->TextEntry->GetWidget()->GetValue());
-    }
+  this->SetHeaderText(value);
 }
 
 //----------------------------------------------------------------------------

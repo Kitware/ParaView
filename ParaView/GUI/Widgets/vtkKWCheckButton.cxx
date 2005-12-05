@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.47");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.48");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -209,7 +209,7 @@ void vtkKWCheckButton::Configure()
 //----------------------------------------------------------------------------
 void vtkKWCheckButton::CommandCallback()
 {
-  this->InvokeCommand();
+  this->InvokeCommand(this->GetSelectedState());
 }
 
 //----------------------------------------------------------------------------
@@ -219,9 +219,14 @@ void vtkKWCheckButton::SetCommand(vtkObject *object, const char *method)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButton::InvokeCommand()
+void vtkKWCheckButton::InvokeCommand(int state)
 {
-  this->InvokeObjectMethodCommand(this->Command);
+  if (this->GetApplication() &&
+      this->Command && *this->Command)
+    {
+    //this->Script("eval %s %d", this->Command, state);
+    this->Script("%s %d", this->Command, state);
+    }
 }
 
 //----------------------------------------------------------------------------

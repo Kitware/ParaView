@@ -77,10 +77,10 @@ public:
   // Description:;
   // Callbacks for GUI.
   void CaptureCurrentCameraCallback();
-  void PositionChangedCallback();
-  void FocalPointChangedCallback();
-  void ViewUpChangedCallback();
-  void ViewAngleChangedCallback();
+  void PositionChangedCallback(double);
+  void FocalPointChangedCallback(double);
+  void ViewUpChangedCallback(double);
+  void ViewAngleChangedCallback(double);
 
   // Description:
   // Save pvs state.

@@ -158,12 +158,6 @@ public:
   vtkGetMacro(EnableDragAndDrop, int);
 
   // Description:
-  // Drag and Drop callback
-  virtual void DragAndDropEndCallback(
-    int x, int y, 
-    vtkKWWidget *widget, vtkKWWidget *anchor, vtkKWWidget *target);
-
-  // Description:
   // Get the number of Drag&Drop entries so far.
   // Delete all Drag&Drop entries.
   virtual int GetNumberOfDragAndDropEntries();
@@ -231,6 +225,12 @@ public:
   };
   // @endcond
   //ETX
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void DragAndDropEndCallback(
+    int x, int y, 
+    vtkKWWidget *widget, vtkKWWidget *anchor, vtkKWWidget *target);
 
 protected:
   vtkKWUserInterfaceManagerNotebook();

@@ -27,7 +27,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVCameraKeyFrame);
-vtkCxxRevisionMacro(vtkPVCameraKeyFrame, "1.5");
+vtkCxxRevisionMacro(vtkPVCameraKeyFrame, "1.6");
 //------------------------------------------------------------------------------
 vtkPVCameraKeyFrame::vtkPVCameraKeyFrame()
 {
@@ -383,14 +383,14 @@ void vtkPVCameraKeyFrame::CaptureCurrentCameraCallback()
 }
 
 //------------------------------------------------------------------------------
-void vtkPVCameraKeyFrame::PositionChangedCallback()
+void vtkPVCameraKeyFrame::PositionChangedCallback(double)
 {
   this->SetPositionWithTrace(this->PositionWheels[0]->GetValue(),
     this->PositionWheels[1]->GetValue(), this->PositionWheels[2]->GetValue());
 }
 
 //------------------------------------------------------------------------------
-void vtkPVCameraKeyFrame::FocalPointChangedCallback()
+void vtkPVCameraKeyFrame::FocalPointChangedCallback(double)
 {
   this->SetFocalPointWithTrace(this->FocalPointWheels[0]->GetValue(),
     this->FocalPointWheels[1]->GetValue(),
@@ -398,7 +398,7 @@ void vtkPVCameraKeyFrame::FocalPointChangedCallback()
 }
 
 //------------------------------------------------------------------------------
-void vtkPVCameraKeyFrame::ViewUpChangedCallback()
+void vtkPVCameraKeyFrame::ViewUpChangedCallback(double)
 {
   this->SetViewUpWithTrace(this->ViewUpWheels[0]->GetValue(),
     this->ViewUpWheels[1]->GetValue(),
@@ -406,9 +406,9 @@ void vtkPVCameraKeyFrame::ViewUpChangedCallback()
 }
 
 //------------------------------------------------------------------------------
-void vtkPVCameraKeyFrame::ViewAngleChangedCallback()
+void vtkPVCameraKeyFrame::ViewAngleChangedCallback(double value)
 {
-  this->SetViewAngleWithTrace(this->ViewAngleWheel->GetValue());
+  this->SetViewAngleWithTrace(value);
 }
 
 //------------------------------------------------------------------------------

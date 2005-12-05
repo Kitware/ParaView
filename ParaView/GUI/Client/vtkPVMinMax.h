@@ -61,11 +61,11 @@ public:
 
   // Description:
   // Callback for min scale
-  void MinValueCallback();
+  void MinValueCallback(double value);
   
   // Description:
   // Callback for max scale
-  void MaxValueCallback();
+  void MaxValueCallback(double value);
   
   // Description:
   // Label for the minimum value scale.
