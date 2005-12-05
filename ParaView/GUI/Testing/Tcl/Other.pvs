@@ -81,8 +81,8 @@ $view StandardViewCallback 0 -1 0
 $view StandardViewCallback 0 0 1
 $view StandardViewCallback 0 0 -1
 
-$view TriangleStripsCallback
-$view ImmediateModeCallback
+$view TriangleStripsCallback 1
+$view ImmediateModeCallback 1
 $view StoreCurrentCamera 0
 $view RestoreCurrentCamera 0
 $view Print
