@@ -63,7 +63,7 @@
 #define VTK_PV_CAMERA_PROXYNAME "_dont_validate_.ActiveCamera"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.62.2.1");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.62.2.2");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizontalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1129,7 +1129,7 @@ void vtkPVAnimationManager::SaveAnimation()
     framerateEntry->GetLabel()->SetText("Frame Rate:");
     framerateEntry->SetParent(frame);
     framerateEntry->Create(this->GetApplication());
-    framerateEntry->GetWidget()->SetValueAsInt(15);
+    framerateEntry->GetWidget()->SetValueAsInt(1);
 
     this->Script("pack %s %s -side left -fill both -expand t",
       widthEntry->GetWidgetName(), heightEntry->GetWidgetName());
