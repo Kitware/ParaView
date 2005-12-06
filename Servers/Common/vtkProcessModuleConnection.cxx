@@ -57,7 +57,7 @@ protected:
 
 };
 
-vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.4");
+vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.5");
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnection::vtkProcessModuleConnection()
 {
@@ -313,6 +313,7 @@ void vtkProcessModuleConnection::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "AbortConnection: " << this->AbortConnection << endl;
   os << indent << "StreamBlock: " << this->StreamBlock << endl;
+  os << indent << "SelfID: " << this->SelfID << endl;
   os << indent << "Controller: ";
   if (this->Controller)
     {
