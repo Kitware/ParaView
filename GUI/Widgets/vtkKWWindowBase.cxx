@@ -49,7 +49,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.39");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.40");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -280,6 +280,7 @@ void vtkKWWindowBase::Create()
   vtkKWApplication *app = this->GetApplication();
 
   // Restore Window Geometry
+  // Yes, it has to be done now
 
   if (app->GetSaveUserInterfaceGeometry())
     {
@@ -703,7 +704,8 @@ void vtkKWWindowBase::SaveWindowGeometryToRegistry()
 
   vtksys_stl::string geometry = this->GetGeometry();
   this->GetApplication()->SetRegistryValue(
-    2, "Geometry", vtkKWWindowBase::WindowGeometryRegKey, "%s", geometry.c_str());
+    2, "Geometry", vtkKWWindowBase::WindowGeometryRegKey, "%s", 
+    geometry.c_str());
 }
 
 //----------------------------------------------------------------------------
