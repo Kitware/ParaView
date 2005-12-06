@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.34");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.35");
 
 //----------------------------------------------------------------------------
 vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
@@ -801,7 +801,7 @@ void vtkPVCompositeRenderModuleUI::SetCompositeOptionEnabled(int val)
   this->CompositeOptionEnabled = val;
   this->CompositeCheck->SetEnabled(val);
   this->CompositeCheckCallback(
-    this->CompositeWithRGBACheck->GetSelectedState());
+    this->CompositeCheck->GetSelectedState());
 }
 
 //----------------------------------------------------------------------------
