@@ -110,7 +110,7 @@
   # Tell vtkWrapPython.cmake to set VTK_PYTHON_LIBRARIES for us.
   SET(VTK_WRAP_PYTHON_FIND_LIBS 1)
 
-  INCLUDE("${VTK_SOURCE_DIR}/CMake/vtkWrapPython.cmake")
+  INCLUDE("${VTK_CMAKE_DIR}/vtkWrapPython.cmake")
 IF (PARAVIEW_WRAP_PYTHON)
   SET(KIT Common)
   SET(VTK_WRAP_PYTHON3_INIT_DIR "${VTK_SOURCE_DIR}/Wrapping")

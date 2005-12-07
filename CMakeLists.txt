@@ -64,6 +64,7 @@ SET(VTK_USE_MATROX_IMAGING OFF CACHE INTERNAL "" FORCE)
 
 SET(VTK_DIR "${ParaView_BINARY_DIR}/VTK" CACHE INTERNAL "" FORCE)
 SET(VTK_SOURCE_DIR "${ParaView_SOURCE_DIR}/VTK" CACHE INTERNAL "" FORCE)
+SET(VTK_CMAKE_DIR "${VTK_SOURCE_DIR}/CMake" CACHE INTERNAL "" FORCE)
 SET(VTK_FOUND 1)
 FIND_PATH(VTK_DATA_ROOT VTKData.readme ${ParaView_SOURCE_DIR}/../VTKData $ENV{VTK_DATA_ROOT})
 MARK_AS_ADVANCED(VTK_DATA_ROOT)
@@ -71,7 +72,7 @@ MARK_AS_ADVANCED(BUILD_EXAMPLES)
 
 # Choose static or shared libraries.  This provides BUILD_SHARED_LIBS
 # and VTK_USE_RPATH.
-INCLUDE(${VTK_SOURCE_DIR}/CMake/vtkSelectSharedLibraries.cmake)
+INCLUDE(${VTK_CMAKE_DIR}/vtkSelectSharedLibraries.cmake)
 
 # Disable the install targets if using the rpath feature.
 IF(NOT WIN32)
