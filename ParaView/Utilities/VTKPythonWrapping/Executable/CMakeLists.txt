@@ -1,6 +1,6 @@
 # Tell vtkWrapPython.cmake to set VTK_PYTHON_LIBRARIES for us.
 SET(VTK_WRAP_PYTHON_FIND_LIBS 1)
-INCLUDE("${VTK_SOURCE_DIR}/CMake/vtkWrapPython.cmake")
+INCLUDE("${VTK_CMAKE_DIR}/vtkWrapPython.cmake")
 
 INCLUDE_DIRECTORIES(
   ${MPI_INCLUDE_PATH}

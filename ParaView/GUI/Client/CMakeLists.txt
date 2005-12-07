@@ -279,7 +279,7 @@ CS_INITIALIZE_WRAP()
 # Wrap PVServer
 # Create ClientServer wrappers for ParaView classes.
 SET(VTK_BINARY_DIR "${PVClient_BINARY_DIR}")
-INCLUDE(${VTK_SOURCE_DIR}/CMake/vtkExportKit.cmake)
+INCLUDE(${VTK_CMAKE_DIR}/vtkExportKit.cmake)
 VTK_EXPORT_KIT("KWParaView" "PVSERVER" "${ParaViewServer_SRCS};${ParaViewShared_SRCS};${ParaView_SOURCE_DIR}/GUI/Widgets/vtkKWApplication.cxx;${ParaView_SOURCE_DIR}/GUI/Widgets/vtkKWObject.cxx;${ParaViewSharedNotTclWrapped_SRCS}")
 
 SET(KIT_WRAP_DEPS PVFilters PVServerCommon)
@@ -287,8 +287,7 @@ SET(VTK_KITS_DIR "${ParaView_BINARY_DIR}/GUI/Client/Utilities")
 PV_WRAP_VTK_CS(KWParaView PVSERVER "${KIT_WRAP_DEPS}")
 
 # Wrap Tcl code
-SET(VTK_WRAP_TCL3_INIT_DIR "${VTK_SOURCE_DIR}/Wrapping")
-INCLUDE("${VTK_SOURCE_DIR}/CMake/vtkWrapTcl.cmake")
+INCLUDE("${VTK_CMAKE_DIR}/vtkWrapTcl.cmake")
 VTK_WRAP_TCL3(vtkKWParaView ParaViewTCL_SRCS "${ParaViewShared_SRCS};${ParaViewClient_SRCS}" "")
 ADD_LIBRARY(vtkKWParaView ${ParaViewTCL_SRCS} ${PVInstantiator_SRCS}
   ${ParaViewServer_SRCS} 
