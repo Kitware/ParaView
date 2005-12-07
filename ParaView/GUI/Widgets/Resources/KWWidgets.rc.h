@@ -12,6 +12,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#define IDI_KWWIDGETSICO 107
-#define IDI_KWWIDGETSICOSMALL 108
+#define IDI_KWWidgetsICO 107
+#define IDI_KWWidgetsICOSMALL 108
 

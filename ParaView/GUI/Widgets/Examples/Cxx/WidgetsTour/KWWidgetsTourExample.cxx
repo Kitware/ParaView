@@ -65,12 +65,12 @@ int my_main(int argc, char *argv[])
 
   char res_path[2048];
   sprintf(res_path, "%s/Examples/Resources/KWWidgetsSplashScreen.png", 
-          KWWIDGETS_SOURCE_DIR);
+          KWWidgets_SOURCE_DIR);
   if (!vtksys::SystemTools::FileExists(res_path))
     {
     sprintf(res_path, 
             "%s/..%s/Examples/Resources/KWWidgetsSplashScreen.png",
-            app->GetInstallationDirectory(), KW_INSTALL_SHARE_DIR);
+            app->GetInstallationDirectory(), KWWidgets_INSTALL_DATA_DIR);
     }
   app->GetSplashScreen()->ReadImage(res_path);
 
@@ -253,14 +253,14 @@ int my_main(int argc, char *argv[])
       sprintf(
         buffer, 
         "%s/Examples/Cxx/%s/%s/%s.cxx", 
-        KWWIDGETS_SOURCE_DIR, ExampleDirName, WidgetsDirName, node_ptr->Name);
+        KWWidgets_SOURCE_DIR, ExampleDirName, WidgetsDirName, node_ptr->Name);
 
       if (!vtksys::SystemTools::FileExists(buffer))
         {
         sprintf(
           buffer, 
           "%s/..%s/Examples/Cxx/%s/%s/%s.cxx",
-          app->GetInstallationDirectory(), KW_INSTALL_SHARE_DIR,
+          app->GetInstallationDirectory(), KWWidgets_INSTALL_DATA_DIR,
           ExampleDirName, WidgetsDirName, node_ptr->Name);
         }
       if (vtksys::SystemTools::FileExists(buffer))
@@ -278,13 +278,13 @@ int my_main(int argc, char *argv[])
       sprintf(
         buffer, 
         "%s/Examples/Tcl/%s/%s/%s.tcl", 
-        KWWIDGETS_SOURCE_DIR, ExampleDirName, WidgetsDirName, node_ptr->Name);
+        KWWidgets_SOURCE_DIR, ExampleDirName, WidgetsDirName, node_ptr->Name);
 
       if (!vtksys::SystemTools::FileExists(buffer))
         {
         sprintf(buffer, 
                 "%s/..%s/Examples/Tcl/%s/%s/%s.tcl",
-                app->GetInstallationDirectory(), KW_INSTALL_SHARE_DIR,
+                app->GetInstallationDirectory(), KWWidgets_INSTALL_DATA_DIR,
                 ExampleDirName, WidgetsDirName, node_ptr->Name);
         }
       if (vtksys::SystemTools::FileExists(buffer))
@@ -376,12 +376,12 @@ const char* KWWidgetsTourItem::GetPathToExampleData(
 {
   static char data_path[2048];
   sprintf(
-    data_path, "%s/Examples/Data/%s", KWWIDGETS_SOURCE_DIR, name);
+    data_path, "%s/Examples/Data/%s", KWWidgets_SOURCE_DIR, name);
   if (!vtksys::SystemTools::FileExists(data_path))
     {
     sprintf(data_path, 
             "%s/..%s/Examples/Data/%s",
-            app->GetInstallationDirectory(), KW_INSTALL_SHARE_DIR, name);
+            app->GetInstallationDirectory(), KWWidgets_INSTALL_DATA_DIR, name);
     }
   return data_path;
 }

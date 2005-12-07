@@ -83,12 +83,12 @@ int my_main(int argc, char *argv[])
   vtkXMLPolyDataReader *reader = vtkXMLPolyDataReader::New();
 
   char data_path[2048];
-  sprintf(data_path, "%s/Examples/Data/teapot.vtp", KWWIDGETS_SOURCE_DIR);
+  sprintf(data_path, "%s/Examples/Data/teapot.vtp", KWWidgets_SOURCE_DIR);
   if (!vtksys::SystemTools::FileExists(data_path))
     {
     sprintf(data_path, 
             "%s/..%s/Examples/Data/teapot.vtp",
-            app->GetInstallationDirectory(), KW_INSTALL_SHARE_DIR);
+            app->GetInstallationDirectory(), KWWidgets_INSTALL_DATA_DIR);
     }
   reader->SetFileName(data_path);
 

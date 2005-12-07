@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSimpleWindowWithImageWidgetExample );
-vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.11");
+vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.12");
 
 //----------------------------------------------------------------------------
 int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
@@ -85,12 +85,12 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
 
   char data_path[2048];
   sprintf(
-    data_path, "%s/Examples/Data/head100x100x47.vti", KWWIDGETS_SOURCE_DIR);
+    data_path, "%s/Examples/Data/head100x100x47.vti", KWWidgets_SOURCE_DIR);
   if (!vtksys::SystemTools::FileExists(data_path))
     {
     sprintf(data_path, 
             "%s/..%s/Examples/Data/head100x100x47.vti",
-            app->GetInstallationDirectory(), KW_INSTALL_SHARE_DIR);
+            app->GetInstallationDirectory(), KWWidgets_INSTALL_DATA_DIR);
     }
   reader->SetFileName(data_path);
 

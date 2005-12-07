@@ -63,7 +63,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.264");
+vtkCxxRevisionMacro(vtkKWApplication, "1.265");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -459,8 +459,8 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
     {
       "../lib/TclTk/lib",
       "TclTk/lib",
-      ".." KWWIDGETS_INSTALL_TclTk_DIR,     // for exe in PREFIX/bin
-      "../.." KWWIDGETS_INSTALL_TclTk_DIR,  // for exe in PREFIX/lib/foo-V.v
+      ".." KWWidgets_INSTALL_TclTk_DIR,     // for exe in PREFIX/bin
+      "../.." KWWidgets_INSTALL_TclTk_DIR,  // for exe in PREFIX/lib/foo-V.v
       0
     };
   vtkTclApplicationInitTclTk(interp, relative_dirs);
@@ -712,8 +712,8 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
 
 #ifdef _WIN32
   vtkKWTkUtilities::ProcessPendingEvents(this->MainInterp);
-  vtkKWSetApplicationIcon(this->MainInterp, NULL, IDI_KWWIDGETSICO);
-  vtkKWSetApplicationSmallIcon(this->MainInterp, NULL, IDI_KWWIDGETSICOSMALL);
+  vtkKWSetApplicationIcon(this->MainInterp, NULL, IDI_KWWidgetsICO);
+  vtkKWSetApplicationSmallIcon(this->MainInterp, NULL, IDI_KWWidgetsICOSMALL);
 #endif
 
   // Start the event loop
@@ -958,7 +958,7 @@ void vtkKWApplication::DisplayHelpDialog(vtkKWWindowBase* master)
   vtksys_stl::string msg;
 
 #ifdef _WIN32
-#ifdef KWWIDGETS_HAS_HTML_HELP
+#ifdef KWWidgets_HAS_HTML_HELP
   // .chm ?
 
   if (strstr(helplink.c_str(), ".chm") || 

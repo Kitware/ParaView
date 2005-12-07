@@ -1,4 +1,4 @@
-/*! @mainpage ${PROJECT_NAME} ${KWWIDGETS_MAJOR_VERSION}.${KWWIDGETS_MINOR_VERSION} Documentation
+/*! @mainpage ${PROJECT_NAME} ${KWWidgets_MAJOR_VERSION}.${KWWidgets_MINOR_VERSION} Documentation
 
   @image html KWWidgetsSplashScreen.png
   @li KWWidgets Home: http://public.kitware.com/Wiki/KWWidgets
