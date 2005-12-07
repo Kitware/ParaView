@@ -389,8 +389,7 @@ INCLUDE_DIRECTORIES(
 # Wrap the classes in Tcl
 
 SET(VTK_WRAP_HINTS ${KWWidgets_SOURCE_DIR}/hints)
-SET(VTK_WRAP_TCL3_INIT_DIR "${VTK_SOURCE_DIR}/Wrapping")
-INCLUDE("${VTK_SOURCE_DIR}/CMake/vtkWrapTcl.cmake")
+INCLUDE("${VTK_CMAKE_DIR}/vtkWrapTcl.cmake")
 VTK_WRAP_TCL3(
   KWWidgets 
   KWWidgetsTCL_SRCS 
