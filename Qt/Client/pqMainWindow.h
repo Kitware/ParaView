@@ -16,7 +16,6 @@
 class pqObjectInspectorWidget;
 class pqPipelineData;
 class pqPipelineListWidget;
-class pqRefreshToolbar;
 class pqServer;
 class pqSMAdaptor;
 class pqMultiViewManager;
@@ -52,7 +51,6 @@ private:
   void setServer(pqServer* Server);
 
   pqServer* CurrentServer;
-  pqRefreshToolbar* RefreshToolbar;
   QToolBar* PropertyToolbar;
   pqMultiViewManager* MultiViewManager;
   QAction* ServerDisconnectAction;

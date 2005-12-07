@@ -8,8 +8,6 @@
  */
 
 #include "pqAboutDialog.h"
-#include "pqCommandDispatcher.h"
-#include "pqCommandDispatcherManager.h"
 #include "pqConfig.h"
 #include "pqConnect.h"
 #include "pqFileDialog.h"
@@ -23,7 +21,6 @@
 #include "pqPipelineData.h"
 #include "pqPipelineListModel.h"
 #include "pqPipelineListWidget.h"
-#include "pqRefreshToolbar.h"
 #include "pqRenderViewProxy.h"
 #include "vtkSMMultiViewRenderModuleProxy.h"
 #include "pqServer.h"
@@ -73,7 +70,6 @@
 
 pqMainWindow::pqMainWindow() :
   CurrentServer(0),
-  RefreshToolbar(0),
   PropertyToolbar(0),
   MultiViewManager(0),
   ServerDisconnectAction(0),
@@ -85,7 +81,6 @@ pqMainWindow::pqMainWindow() :
   PipelineDock(0),
   ActiveView(0)
 {
-
   this->setObjectName("mainWindow");
   this->setWindowTitle(QByteArray("ParaQ Client") + QByteArray(" ") + QByteArray(QT_CLIENT_VERSION));
 
@@ -162,7 +157,7 @@ pqMainWindow::pqMainWindow() :
     << pqConnect(SIGNAL(triggered()), this, SLOT(onPythonShell()));
     
 #endif // PARAQ_EMBED_PYTHON
-  
+
   // Help menu.
   QMenu* const helpMenu = this->menuBar()->addMenu(tr("Help"))
     << pqSetName("helpMenu");
@@ -171,11 +166,6 @@ pqMainWindow::pqMainWindow() :
     << pqSetName("About")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onHelpAbout()));
  
-  // Setup the refresh toolbar.
-  QObject::connect(&pqCommandDispatcherManager::Instance(), SIGNAL(updateWindows()), this, SLOT(onUpdateWindows()));
-  this->RefreshToolbar = new pqRefreshToolbar(this);
-  this->addToolBar(this->RefreshToolbar);
-
   // Create the pipeline instance.
   this->Pipeline = new pqPipelineData(this);
 
@@ -247,7 +237,6 @@ pqMainWindow::~pqMainWindow()
     }
 
   delete this->PropertyToolbar;
-  delete this->RefreshToolbar;
   delete this->CurrentServer;
   delete this->Adaptor;
 }

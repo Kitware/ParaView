@@ -11,10 +11,7 @@ INCLUDE_DIRECTORIES(
 )
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
-  pqCommandDispatcher.h
-  pqCommandDispatcherManager.h
   pqConsoleWidget.h
-  pqExplicitCommandDispatcher.h
   pqFileDialog.h
   pqFileDialogModel.h
   pqLocalFileDialogModel.h
@@ -26,11 +23,9 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineData.h
   pqPipelineListModel.h
   pqPipelineListWidget.h
-  pqRefreshToolbar.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
   pqSMAdaptor.h
-  pqTimeoutCommandDispatcher.h
 )
 
 SET(UI_FORMS
@@ -64,23 +59,14 @@ SOURCE_GROUP("Generated" FILES
 )
 
 ADD_LIBRARY(QtWidgets
-  pqCommandDispatcher.cxx
-  pqCommandDispatcher.h
-  pqCommandDispatcherManager.cxx
-  pqCommandDispatcherManager.h
-  pqCommand.h
   pqConnect.cxx
   pqConnect.h
   pqConsoleWidget.cxx
   pqConsoleWidget.h
-  pqExplicitCommandDispatcher.cxx
-  pqExplicitCommandDispatcher.h
   pqFileDialog.cxx
   pqFileDialog.h
   pqFileDialogModel.cxx
   pqFileDialogModel.h
-  pqImmediateCommandDispatcher.cxx
-  pqImmediateCommandDispatcher.h
   pqLocalFileDialogModel.cxx
   pqLocalFileDialogModel.h
   pqMultiView.cxx
@@ -111,8 +97,6 @@ ADD_LIBRARY(QtWidgets
   pqPipelineObject.h
   pqPipelineServer.cxx
   pqPipelineServer.h
-  pqRefreshToolbar.cxx
-  pqRefreshToolbar.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
   pqServer.cxx
@@ -127,8 +111,6 @@ ADD_LIBRARY(QtWidgets
   pqSetName.h
   pqSMAdaptor.cxx
   pqSMAdaptor.h
-  pqTimeoutCommandDispatcher.cxx
-  pqTimeoutCommandDispatcher.h
   QtWidgetsExport.h
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}
