@@ -14,6 +14,7 @@
 
 class pqPipelineListModel;
 class QModelIndex;
+class QString;
 class QTreeView;
 class QVTKWidget;
 class vtkSMProxy;
@@ -30,7 +31,8 @@ public:
   pqPipelineListModel *getListModel() const {return this->ListModel;}
   QTreeView *getTreeView() const {return this->TreeView;}
 
-  vtkSMSourceProxy *getSelectedProxy() const;
+  vtkSMProxy *getSelectedProxy() const;
+  vtkSMProxy *getNextProxy() const; // TEMP
   QVTKWidget *getCurrentWindow() const;
 
 signals:

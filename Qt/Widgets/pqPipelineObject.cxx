@@ -123,6 +123,21 @@ pqPipelineObject *pqPipelineObject::GetInput(int index) const
   return 0;
 }
 
+bool pqPipelineObject::HasInput(pqPipelineObject *input) const
+{
+  if(this->Internal && input)
+    {
+    QList<pqPipelineObject *>::Iterator iter = this->Internal->Inputs.begin();
+    for( ; iter != this->Internal->Inputs.end(); ++iter)
+      {
+      if(*iter == input)
+        return true;
+      }
+    }
+
+  return false;
+}
+
 void pqPipelineObject::AddInput(pqPipelineObject *intput)
 {
   if(this->Internal && intput)
@@ -157,6 +172,21 @@ pqPipelineObject *pqPipelineObject::GetOutput(int index) const
   if(this->Internal && index >= 0 && index < this->Internal->Outputs.size())
     return this->Internal->Outputs[index];
   return 0;
+}
+
+bool pqPipelineObject::HasOutput(pqPipelineObject *output) const
+{
+  if(this->Internal && output)
+    {
+    QList<pqPipelineObject *>::Iterator iter = this->Internal->Outputs.begin();
+    for( ; iter != this->Internal->Outputs.end(); ++iter)
+      {
+      if(*iter == output)
+        return true;
+      }
+    }
+
+  return false;
 }
 
 void pqPipelineObject::AddOutput(pqPipelineObject *output)

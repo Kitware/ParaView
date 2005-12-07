@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/pqWidgets" >
-        <file>Resources/SplitViewHorizontal.png</file>
-        <file>Resources/SplitViewVertical.png</file>
+        <file alias="SplitViewHorizontal.png">Resources/SplitViewHorizontal.png</file>
+        <file alias="SplitViewVertical.png">Resources/SplitViewVertical.png</file>
         <file alias="pqCamera16.png">Resources/pqCamera16.png</file>
         <file alias="pqCamerad16.png">Resources/pqCamerad16.png</file>
         <file alias="pqFilter16.png">Resources/pqFilter16.png</file>
@@ -18,6 +18,8 @@
         <file alias="pqSource22.png">Resources/pqSource22.png</file>
         <file alias="pqSource32.png">Resources/pqSource32.png</file>
         <file alias="pqSplit16.png">Resources/pqSplit16.png</file>
+        <file alias="pqSplitViewH12.png">Resources/pqSplitViewH12.png</file>
+        <file alias="pqSplitViewV12.png">Resources/pqSplitViewV12.png</file>
         <file alias="pqWindow16.png">Resources/pqWindow16.png</file>
         <file alias="pqWindow22.png">Resources/pqWindow22.png</file>
         <file alias="pqWindow32.png">Resources/pqWindow32.png</file>

@@ -10,6 +10,7 @@
 #define _pqPipelineListModel_h
 
 
+#include "QtWidgetsExport.h"
 #include <QAbstractItemModel>
 
 class pqPipelineListInternal;
@@ -26,7 +27,7 @@ class vtkSMProxy;
 /// \brief
 ///   The pqPipelineListModel class is used to represent the pipeline
 ///   in the form of a list.
-class pqPipelineListModel : public QAbstractItemModel
+class QTWIDGETS_EXPORT pqPipelineListModel : public QAbstractItemModel
 {
   Q_OBJECT
 
@@ -133,10 +134,19 @@ public slots:
   void addFilter(pqPipelineObject *filter);
   void removeFilter(pqPipelineObject *filter);
 
+  void addConnection(pqPipelineObject *source, pqPipelineObject *sink);
+  void removeConnection(pqPipelineObject *source, pqPipelineObject *sink);
+
+  void beginCreateAndAppend();
+  void finishCreateAndAppend();
+  void beginCreateAndInsert();
+  void finishCreateAndInsert();
+
 signals:
   void childAdded(const QModelIndex &index);
 
 private:
+  void addSubItem(pqPipelineObject *object, ItemType itemType);
   void removeLookupItems(pqPipelineListItem *item);
 
 private:

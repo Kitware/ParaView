@@ -21,6 +21,7 @@
 #include "pqObjectInspectorWidget.h"
 #include "pqParts.h"
 #include "pqPipelineData.h"
+#include "pqPipelineListModel.h"
 #include "pqPipelineListWidget.h"
 #include "pqRefreshToolbar.h"
 #include "pqRenderViewProxy.h"
@@ -546,15 +547,33 @@ void pqMainWindow::onCreateFilter(QAction* action)
     return;
   
   QByteArray filterName = action->data().toString().toAscii();
-  vtkSMSourceProxy* current = this->PipelineList->getSelectedProxy();
-  QVTKWidget* window = this->PipelineList->getCurrentWindow();
+  vtkSMProxy *current = this->PipelineList->getSelectedProxy();
+  QVTKWidget *window = this->PipelineList->getCurrentWindow();
   if(current && window)
     {
-    vtkSMRenderModuleProxy* rm = this->Pipeline->getRenderModule(window);
-    vtkSMProxy* source = this->Pipeline->createFilter(filterName, window);
-    vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(source);
-    this->Pipeline->addInput(sp, current);
-    this->Pipeline->setVisibility(source, true);
+    vtkSMProxy *source = 0;
+    vtkSMProxy *next = this->PipelineList->getNextProxy();
+    if(next)
+      {
+      this->PipelineList->getListModel()->beginCreateAndInsert();
+      source = this->Pipeline->createFilter(filterName, window);
+      this->Pipeline->addInput(source, current);
+      this->Pipeline->addInput(next, source);
+      this->Pipeline->removeInput(next, current);
+      this->PipelineList->getListModel()->finishCreateAndInsert();
+      }
+    else
+      {
+      this->PipelineList->getListModel()->beginCreateAndAppend();
+      source = this->Pipeline->createFilter(filterName, window);
+      this->Pipeline->addInput(source, current);
+      this->PipelineList->getListModel()->finishCreateAndAppend();
+
+      // Only turn on visibility for added filters?
+      this->Pipeline->setVisibility(source, true);
+      }
+
+    vtkSMRenderModuleProxy *rm = this->Pipeline->getRenderModule(window);
     rm->ResetCamera();
     window->update();
     this->PipelineList->selectProxy(source);

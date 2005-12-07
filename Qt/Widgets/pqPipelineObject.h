@@ -52,12 +52,14 @@ public:
   //@{
   int GetInputCount() const;
   pqPipelineObject *GetInput(int index) const;
+  bool HasInput(pqPipelineObject *input) const;
 
   void AddInput(pqPipelineObject *input);
   void RemoveInput(pqPipelineObject *input);
 
   int GetOutputCount() const;
   pqPipelineObject *GetOutput(int index) const;
+  bool HasOutput(pqPipelineObject *output) const;
 
   void AddOutput(pqPipelineObject *output);
   void RemoveOutput(pqPipelineObject *output);

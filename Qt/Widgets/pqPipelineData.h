@@ -44,7 +44,8 @@ public:
 
   void setVisibility(vtkSMProxy *proxy, bool on);
 
-  void addInput(vtkSMSourceProxy* proxy, vtkSMSourceProxy* input);
+  void addInput(vtkSMProxy *proxy, vtkSMProxy *input);
+  void removeInput(vtkSMProxy *proxy, vtkSMProxy *input);
 
   QVTKWidget *getWindowFor(vtkSMProxy *proxy) const;
   pqPipelineObject *getObjectFor(vtkSMProxy *proxy) const;
@@ -59,6 +60,9 @@ signals:
 
   void sourceCreated(pqPipelineObject *source);
   void filterCreated(pqPipelineObject *filter);
+
+  void connectionCreated(pqPipelineObject *source, pqPipelineObject *sink);
+  void removingConnection(pqPipelineObject *source, pqPipelineObject *sink);
 
   /// signal for new proxy created
   void newPipelineObject(vtkSMSourceProxy* proxy);

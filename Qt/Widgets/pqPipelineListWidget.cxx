@@ -70,7 +70,7 @@ pqPipelineListWidget::~pqPipelineListWidget()
 {
 }
 
-vtkSMSourceProxy *pqPipelineListWidget::getSelectedProxy() const
+vtkSMProxy *pqPipelineListWidget::getSelectedProxy() const
 {
   vtkSMProxy *proxy = 0;
   if(this->ListModel && this->TreeView)
@@ -80,7 +80,25 @@ vtkSMSourceProxy *pqPipelineListWidget::getSelectedProxy() const
     proxy = this->ListModel->getProxyFor(current);
     }
 
-  return vtkSMSourceProxy::SafeDownCast(proxy);
+  return proxy;
+}
+
+vtkSMProxy *pqPipelineListWidget::getNextProxy() const
+{
+  vtkSMProxy *proxy = 0;
+  if(this->ListModel && this->TreeView)
+    {
+    // Get the current item from the model. Make sure the current item
+    // is a proxy object.
+    QModelIndex current = this->TreeView->selectionModel()->currentIndex();
+    if(this->ListModel->getProxyFor(current))
+      {
+      current = this->ListModel->sibling(current.row() + 1, 0, current);
+      proxy = this->ListModel->getProxyFor(current);
+      }
+    }
+
+  return proxy;
 }
 
 QVTKWidget *pqPipelineListWidget::getCurrentWindow() const

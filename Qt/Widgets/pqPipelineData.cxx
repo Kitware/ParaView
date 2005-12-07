@@ -7,6 +7,7 @@
 #include "pqServer.h"
 
 #include "QVTKWidget.h"
+#include "vtkSMInputProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
@@ -327,7 +328,7 @@ void pqPipelineData::setVisibility(vtkSMProxy *proxy, bool on)
     }
 }
 
-void pqPipelineData::addInput(vtkSMSourceProxy* proxy, vtkSMSourceProxy* input)
+void pqPipelineData::addInput(vtkSMProxy *proxy, vtkSMProxy *input)
 {
   if(!this->Internal || !proxy || !input)
     return;
@@ -353,15 +354,79 @@ void pqPipelineData::addInput(vtkSMSourceProxy* proxy, vtkSMSourceProxy* input)
   if(!source || !sink)
     return;
 
-  // Connect the internal objects together.
-  source->AddOutput(sink);
-  sink->AddInput(source);
+  // Make sure the two objects are not already connected.
+  if(sink->HasInput(source))
+    return;
 
-  // Add the input to the proxy in the server manager.
-  vtkSMProxyProperty::SafeDownCast(proxy->GetProperty("Input"))->AddProxy(input);
+  vtkSMInputProperty *inputProp = vtkSMInputProperty::SafeDownCast(
+      proxy->GetProperty("Input"));
+  if(inputProp)
+    {
+    // If the sink already has an input, the previous connection
+    // needs to be broken if it doesn't support multiple inputs.
+    if(!inputProp->GetMultipleInput() && sink->GetInputCount() > 0)
+      {
+      pqPipelineObject *other = sink->GetInput(0);
+      emit this->removingConnection(other, sink);
 
-  // TODO: The server manager should send an event for this.
-  emit this->newPipelineObjectInput(proxy, input);
+      other->RemoveOutput(sink);
+      sink->RemoveInput(other);
+      inputProp->RemoveProxy(other->GetProxy());
+      }
+
+    // Connect the internal objects together.
+    source->AddOutput(sink);
+    sink->AddInput(source);
+
+    // Add the input to the proxy in the server manager.
+    inputProp->AddProxy(input);
+    emit this->connectionCreated(source, sink);
+    }
+}
+
+void pqPipelineData::removeInput(vtkSMProxy* proxy, vtkSMProxy* input)
+{
+  if(!this->Internal || !proxy || !input)
+    return;
+
+  // Get the object from the list of servers.
+  pqPipelineObject *source = 0;
+  pqPipelineObject *sink = 0;
+  QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
+  for( ; iter != this->Internal->Servers.end(); ++iter)
+    {
+    if(*iter)
+      {
+      sink = (*iter)->GetObject(proxy);
+      if(sink)
+        {
+        // Make sure the source is on the same server.
+        source = (*iter)->GetObject(input);
+        break;
+        }
+      }
+    }
+
+  if(!source || !sink)
+    return;
+
+  // Make sure the two objects are connected.
+  if(!sink->HasInput(source))
+    return;
+
+  vtkSMInputProperty *inputProp = vtkSMInputProperty::SafeDownCast(
+      proxy->GetProperty("Input"));
+  if(inputProp)
+  {
+    emit this->removingConnection(source, sink);
+
+    // Disconnect the internal objects.
+    sink->RemoveInput(source);
+    source->RemoveOutput(sink);
+
+    // Remove the input from the server manager.
+    inputProp->RemoveProxy(input);
+  }
 }
 
 QVTKWidget *pqPipelineData::getWindowFor(vtkSMProxy *proxy) const
