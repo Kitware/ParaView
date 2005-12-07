@@ -53,14 +53,14 @@ void pqObjectInspectorItem::setValue(const QVariant &value)
     }
 }
 
-int pqObjectInspectorItem::getChildCount() const
+int pqObjectInspectorItem::childCount() const
 {
   if(this->Internal)
     return this->Internal->size();
   return 0;
 }
 
-int pqObjectInspectorItem::getChildIndex(pqObjectInspectorItem *child) const
+int pqObjectInspectorItem::childIndex(pqObjectInspectorItem *child) const
 {
   for(int row = 0; this->Internal && row < this->Internal->size(); row++)
     {
@@ -71,7 +71,7 @@ int pqObjectInspectorItem::getChildIndex(pqObjectInspectorItem *child) const
   return -1;
 }
 
-pqObjectInspectorItem *pqObjectInspectorItem::getChild(int index) const
+pqObjectInspectorItem *pqObjectInspectorItem::child(int index) const
 {
   if(this->Internal && index >= 0 && index < this->Internal->size())
     return (*this->Internal)[index];
@@ -123,7 +123,7 @@ void pqObjectInspectorItem::updateDomain(vtkSMProperty *property)
       // an invalid variant as a placeholder.
       int elemType = adaptor->GetElementType();
       QList<QVariant> list;
-      if(this->getChildCount() > 0)
+      if(this->childCount() > 0)
         {
         pqObjectInspectorItem *item = 0;
         unsigned int total = adaptor->GetNumberOfRangeElements();

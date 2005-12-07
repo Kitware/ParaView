@@ -123,19 +123,19 @@ public:
   /// \return
   ///   The domain of the property.
   /// \sa pqObjectInspectorDelegate
-  QVariant getDomain(const QModelIndex &index) const;
+  QVariant domain(const QModelIndex &index) const;
 
   /// \brief
   ///   Gets the current object.
   /// \return
   ///   A pointer to the current object.
-  vtkSMSourceProxy *getProxy() const {return this->Proxy;}
+  vtkSMSourceProxy *proxy() const {return this->Proxy;}
 
   /// \brief
   ///   Gets the change commit policy.
   /// \return
   ///   The change commit policy.
-  CommitType getCommitType() const {return this->Commit;}
+  CommitType commitType() const {return this->Commit;}
 
 public slots:
   /// \brief
@@ -178,7 +178,7 @@ private:
   /// \param item The item to find the index for.
   /// \return
   ///   The index of the given item or -1 if it doesn't exist.
-  int getItemIndex(pqObjectInspectorItem *item) const;
+  int itemIndex(pqObjectInspectorItem *item) const;
 
   /// \brief
   ///   Commits changes for a specific item.

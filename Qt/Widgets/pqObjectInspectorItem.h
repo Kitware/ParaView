@@ -28,8 +28,8 @@ class vtkSMProperty;
 class pqObjectInspectorItem : public QObject
 {
   Q_OBJECT
-  Q_PROPERTY(QString propertyName READ getPropertyName WRITE setPropertyName)
-  Q_PROPERTY(QVariant value READ getValue WRITE setValue)
+  Q_PROPERTY(QString propertyName READ propertyName WRITE setPropertyName)
+  Q_PROPERTY(QVariant value READ value WRITE setValue)
 
 public:
   /// \brief
@@ -44,7 +44,7 @@ public:
   ///   Gets the property name.
   /// \return
   ///   The name  of the property.
-  const QString &getPropertyName() const {return this->Name;}
+  const QString &propertyName() const {return this->Name;}
 
   /// \brief
   ///   Sets the property name.
@@ -55,7 +55,7 @@ public:
   ///   Gets the property value.
   /// \return
   ///   The value of the property.
-  const QVariant &getValue() const {return this->Value;}
+  const QVariant &value() const {return this->Value;}
 
   /// \brief
   ///   Sets the property value.
@@ -66,7 +66,7 @@ public:
   ///   Gets the property domain.
   /// \return
   ///   The domain of the property.
-  const QVariant &getDomain() const {return this->Domain;}
+  const QVariant &domain() const {return this->Domain;}
 
   /// \brief
   ///   Sets the property domain.
@@ -92,19 +92,19 @@ public:
   ///   Gets the number of child items.
   /// \return
   ///   The number of child items.
-  int getChildCount() const;
+  int childCount() const;
 
   /// \brief
   ///   Gets the index of a specific child item.
   /// \return
   ///   The index of the child item. -1 if it doesn't exist.
-  int getChildIndex(pqObjectInspectorItem *child) const;
+  int childIndex(pqObjectInspectorItem *child) const;
 
   /// \brief
   ///   Gets the child item at a specific index.
   /// \return
   ///   A pointer to the child at the given index.
-  pqObjectInspectorItem *getChild(int index) const;
+  pqObjectInspectorItem *child(int index) const;
 
   /// \brief
   ///   Clears the list of child items.
@@ -122,7 +122,7 @@ public:
   ///   Gets the parent of this item.
   /// \return
   ///   A pointer to the parent item or null if there is no parent.
-  pqObjectInspectorItem *getParent() const {return this->Parent;}
+  pqObjectInspectorItem *parent() const {return this->Parent;}
 
   /// \brief
   ///   Sets the parent of this item.

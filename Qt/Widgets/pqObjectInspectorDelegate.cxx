@@ -46,7 +46,7 @@ QWidget *pqObjectInspectorDelegate::createEditor(QWidget *parent,
   // information to create the correct widget type.
   QWidget *editor = 0;
   QVariant data = model->data(index, Qt::EditRole);
-  QVariant domain = model->getDomain(index);
+  QVariant domain = model->domain(index);
   if(data.type() == QVariant::Bool)
     {
     // Use a combo box with true/false in it.

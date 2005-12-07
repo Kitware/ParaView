@@ -208,8 +208,7 @@ pqMainWindow::pqMainWindow() :
       if(this->PipelineList)
         {
         connect(this->PipelineList, SIGNAL(proxySelected(vtkSMSourceProxy *)),
-            this->Inspector->getObjectModel(),
-            SLOT(setProxy(vtkSMSourceProxy *)));
+            this->Inspector, SLOT(setProxy(vtkSMSourceProxy *)));
         }
       }
 

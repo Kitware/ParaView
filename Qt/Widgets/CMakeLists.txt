@@ -20,6 +20,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqMultiViewManager.h
   pqObjectInspector.h
   pqObjectInspectorItem.h
+  pqObjectInspectorWidget.h
   pqPipelineData.h
   pqPipelineListModel.h
   pqPipelineListWidget.h

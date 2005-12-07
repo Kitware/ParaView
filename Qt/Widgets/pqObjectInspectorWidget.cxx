@@ -58,4 +58,32 @@ pqObjectInspectorWidget::~pqObjectInspectorWidget()
     this->TreeView->setModel(0);
 }
 
+void pqObjectInspectorWidget::setProxy(vtkSMSourceProxy *proxy)
+{
+  if(this->Inspector)
+    {
+    // remember expanded items
+    int count = this->Inspector->rowCount();
+    QList<bool> expanded;
+    for(int i=0; i<count; i++)
+      {
+      if(this->TreeView->isExpanded(this->Inspector->index(i,0)))
+        expanded.append(true);
+      else
+        expanded.append(false);
+      }
+
+    this->Inspector->setProxy(proxy);
+    
+    // if less rows than before (was empty), make all expanded
+    int newcount = this->Inspector->rowCount();
+    for(; count < newcount; count++)
+      expanded.append(true);
+
+    for(int i=0; i<newcount; i++)
+      {
+      this->TreeView->setExpanded(this->Inspector->index(i,0), expanded[i]);
+      }
+    }
+}
 

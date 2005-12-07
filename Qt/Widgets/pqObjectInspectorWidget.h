@@ -15,15 +15,20 @@
 class pqObjectInspector;
 class pqObjectInspectorDelegate;
 class QTreeView;
+class vtkSMSourceProxy;
 
 class QTWIDGETS_EXPORT pqObjectInspectorWidget : public QWidget
 {
+  Q_OBJECT
 public:
   pqObjectInspectorWidget(QWidget *parent=0);
   virtual ~pqObjectInspectorWidget();
 
   pqObjectInspector *getObjectModel() const {return this->Inspector;}
   QTreeView *getTreeView() const {return this->TreeView;}
+
+public slots:
+  void setProxy(vtkSMSourceProxy *proxy);
 
 private:
   pqObjectInspector *Inspector;
