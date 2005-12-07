@@ -17,6 +17,7 @@
 #include "vtkKWLabel.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWScale.h"
 #include "vtkPVApplication.h"
 #include "vtkPVOptions.h"
@@ -28,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.12");
+vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVIceTRenderModuleUI::vtkPVIceTRenderModuleUI()
@@ -46,6 +47,9 @@ vtkPVIceTRenderModuleUI::vtkPVIceTRenderModuleUI()
   this->StillReductionFactorScale = vtkKWScale::New();
   this->StillReductionFactorLabel = vtkKWLabel::New();
   this->StillReductionFactor = 0;
+
+  this->OrderedCompositingCheck = vtkKWCheckButton::New();
+  this->OrderedCompositingFlag = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -59,6 +63,8 @@ vtkPVIceTRenderModuleUI::~vtkPVIceTRenderModuleUI()
                             this->CollectThreshold);
     pvapp->SetRegistryValue(2, "RunTime", "StillReductionFactor", "%d",
                             this->StillReductionFactor);
+    pvapp->SetRegistryValue(2, "RunTime", "OrderedCompositing", "%d",
+                            this->OrderedCompositingFlag);
     }
 
   this->CollectLabel->Delete();
@@ -78,6 +84,9 @@ vtkPVIceTRenderModuleUI::~vtkPVIceTRenderModuleUI()
   this->StillReductionFactorScale = NULL;
   this->StillReductionFactorLabel->Delete();
   this->StillReductionFactorLabel = NULL;
+
+  this->OrderedCompositingCheck->Delete();
+  this->OrderedCompositingCheck = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -191,6 +200,29 @@ void vtkPVIceTRenderModuleUI::Create()
 
   this->Script("grid columnconfigure %s 2 -weight 1",
                this->CollectThresholdScale->GetParent()->GetWidgetName());
+
+  this->OrderedCompositingCheck->SetParent(this->LODFrame->GetFrame());
+  this->OrderedCompositingCheck->Create();
+  this->OrderedCompositingCheck->SetText("Enabled Ordered Compositing");
+  this->OrderedCompositingCheck->SetCommand(this,
+                                            "OrderedCompositingCheckCallback");
+
+  if (pvapp && pvapp->GetRegistryValue(2, "RunTime", "OrderedCompositing", 0))
+    {
+    this->OrderedCompositingFlag
+      = pvapp->GetIntRegistryValue(2, "RunTime", "OrderedCompositing");
+    }
+  this->OrderedCompositingCheck->SetSelectedState(this->OrderedCompositingFlag);
+  // This call just forwards the value to the render module.
+  this->OrderedCompositingCheckCallback();
+
+  this->OrderedCompositingCheck->SetBalloonHelpString(
+    "Toggle the use of ordered compositing.  Ordered compositing makes updates "
+    "and animations slower, but make volume rendering correct and may speed "
+    "up compositing in general.");
+
+  this->Script("pack %s -side top -anchor w",
+               this->OrderedCompositingCheck->GetWidgetName());
 }
 
 //-----------------------------------------------------------------------------
@@ -330,6 +362,42 @@ void vtkPVIceTRenderModuleUI::SetStillReductionFactor(int factor)
     }
   ivp->SetElement(0, factor);
   this->RenderModuleProxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVIceTRenderModuleUI::OrderedCompositingCheckCallback()
+{
+  this->SetOrderedCompositingFlag(
+                             this->OrderedCompositingCheck->GetSelectedState());
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVIceTRenderModuleUI::SetOrderedCompositingFlag(int state)
+{
+  if (this->OrderedCompositingCheck->GetSelectedState() != state)
+    {
+    this->OrderedCompositingCheck->SetSelectedState(state);
+    }
+
+  this->OrderedCompositingFlag = state;
+
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+                    this->RenderModuleProxy->GetProperty("OrderedCompositing"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property OrderedCompositing on "
+                  "RenderModuleProxy.");
+    return;
+    }
+  ivp->SetElements1(this->OrderedCompositingFlag);
+  this->RenderModuleProxy->UpdateVTKObjects();
+
+  // We use a catch in this trace because the paraview executing
+  // the trace might not have this module
+  this->GetTraceHelper()->AddEntry(
+                                 "catch {$kw(%s) SetOrderedCompositingFlag %d}",
+                                 this->GetTclName(),
+                                 this->OrderedCompositingFlag);
 }
 
 //----------------------------------------------------------------------------
