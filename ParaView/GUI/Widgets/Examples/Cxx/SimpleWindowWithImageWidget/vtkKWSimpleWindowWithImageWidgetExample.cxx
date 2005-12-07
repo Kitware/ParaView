@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSimpleWindowWithImageWidgetExample );
-vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.12");
+vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.13");
 
 //----------------------------------------------------------------------------
 int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
@@ -58,7 +58,7 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
 
   // Set a help link. Can be a remote link (URL), or a local file
 
-  app->SetHelpDialogStartingPage("http://public.kitware.com/KWWidgets");
+  app->SetHelpDialogStartingPage("http://www.kwwidgets.org");
 
   // Add a window
   // Set 'SupportHelp' to automatically add a menu entry for the help link

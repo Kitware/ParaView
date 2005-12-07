@@ -21,7 +21,7 @@ app RestoreApplicationSettingsFromRegistry
 
 # Set a help link. Can be a remote link (URL), or a local file
 
-app SetHelpDialogStartingPage "http://public.kitware.com/KWWidgets"
+app SetHelpDialogStartingPage "http://www.kwwidgets.org"
 
 # Add a window
 # Set 'SupportHelp' to automatically add a menu entry for the help link

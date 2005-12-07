@@ -43,7 +43,7 @@ int my_main(int argc, char *argv[])
   // Set a help link. Can be a remote link (URL), or a local file
 
   // vtksys::SystemTools::GetFilenamePath(__FILE__) + "/help.html";
-  app->SetHelpDialogStartingPage("http://public.kitware.com/KWWidgets");
+  app->SetHelpDialogStartingPage("http://www.kwwidgets.org");
 
   // Add a window
   // Set 'SupportHelp' to automatically add a menu entry for the help link
