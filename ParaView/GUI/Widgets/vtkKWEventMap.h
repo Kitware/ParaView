@@ -24,7 +24,7 @@
 #include "vtkObject.h"
 #include "vtkKWWidgets.h" // Needed for export symbols directives
 
-class KWWIDGETS_EXPORT vtkKWEventMap : public vtkObject
+class KWWidgets_EXPORT vtkKWEventMap : public vtkObject
 {
 public:
   static vtkKWEventMap *New();

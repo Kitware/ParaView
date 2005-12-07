@@ -29,7 +29,7 @@
 class vtkKWWidget;
 class vtkKWWidgetSetInternals;
 
-class KWWIDGETS_EXPORT vtkKWWidgetSet : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWWidgetSet : public vtkKWCompositeWidget
 {
 public:
   vtkTypeRevisionMacro(vtkKWWidgetSet,vtkKWCompositeWidget);

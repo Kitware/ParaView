@@ -47,7 +47,7 @@ class vtkKWPresetSelectorInternals;
 class vtkKWPushButtonSet;
 class vtkRenderWindow;
 
-class KWWIDGETS_EXPORT vtkKWPresetSelector : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWPresetSelector : public vtkKWCompositeWidget
 {
 public:
   static vtkKWPresetSelector* New();

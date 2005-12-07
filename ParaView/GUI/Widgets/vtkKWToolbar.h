@@ -26,7 +26,7 @@ class vtkKWFrame;
 class vtkKWRadioButton;
 class vtkKWToolbarInternals;
 
-class KWWIDGETS_EXPORT vtkKWToolbar : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWToolbar : public vtkKWCompositeWidget
 {
 public:
   static vtkKWToolbar* New();

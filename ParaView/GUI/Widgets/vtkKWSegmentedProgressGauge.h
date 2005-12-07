@@ -26,7 +26,7 @@
 class vtkKWFrame;
 class vtkKWCanvas;
 
-class KWWIDGETS_EXPORT vtkKWSegmentedProgressGauge : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWSegmentedProgressGauge : public vtkKWCompositeWidget
 {
 public:
   // Description:

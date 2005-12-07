@@ -26,7 +26,7 @@ class vtkKWHistogram;
 class vtkKWHistogramCallback;
 class vtkKWHistogramSetInternals;
 
-class KWWIDGETS_EXPORT vtkKWHistogramSet : public vtkObject
+class KWWidgets_EXPORT vtkKWHistogramSet : public vtkObject
 {
 public:
   static vtkKWHistogramSet* New();

@@ -23,7 +23,7 @@
 class vtkKWFrameWithLabel;
 class vtkKWPopupButton;
 
-class KWWIDGETS_EXPORT vtkKWPopupFrame : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWPopupFrame : public vtkKWCompositeWidget
 {
 public:
   static vtkKWPopupFrame* New();

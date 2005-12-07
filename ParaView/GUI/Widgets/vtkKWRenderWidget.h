@@ -32,7 +32,7 @@ class vtkRenderer;
 class vtkTextActor;
 class vtkKWMenu;
 
-class KWWIDGETS_EXPORT vtkKWRenderWidget : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWRenderWidget : public vtkKWCompositeWidget
 {
 public:
   static vtkKWRenderWidget* New();

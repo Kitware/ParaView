@@ -25,7 +25,7 @@
 
 #include "vtkKWRange.h" // Needed for some constants
 
-class KWWIDGETS_EXPORT vtkKWExtent : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWExtent : public vtkKWCompositeWidget
 {
 public:
   static vtkKWExtent* New();

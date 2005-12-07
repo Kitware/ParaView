@@ -29,7 +29,7 @@
 
 #include "vtkKWEntry.h"
 
-class KWWIDGETS_EXPORT vtkKWComboBox : public vtkKWEntry
+class KWWidgets_EXPORT vtkKWComboBox : public vtkKWEntry
 {
 public:
   static vtkKWComboBox* New();

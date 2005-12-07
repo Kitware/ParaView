@@ -21,7 +21,7 @@
 
 #include "vtkKWCheckButton.h"
 
-class KWWIDGETS_EXPORT vtkKWRadioButton : public vtkKWCheckButton
+class KWWidgets_EXPORT vtkKWRadioButton : public vtkKWCheckButton
 {
 public:
   static vtkKWRadioButton* New();

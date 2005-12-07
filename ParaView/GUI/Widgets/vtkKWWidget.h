@@ -31,7 +31,7 @@ class vtkKWWidgetInternals;
 class vtkKWBalloonHelpManager;
 class vtkKWIcon;
 
-class KWWIDGETS_EXPORT vtkKWWidget : public vtkKWObject
+class KWWidgets_EXPORT vtkKWWidget : public vtkKWObject
 {
 public:
   static vtkKWWidget* New();

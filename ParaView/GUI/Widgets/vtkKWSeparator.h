@@ -23,7 +23,7 @@
 
 #include "vtkKWFrame.h"
 
-class KWWIDGETS_EXPORT vtkKWSeparator : public vtkKWFrame
+class KWWidgets_EXPORT vtkKWSeparator : public vtkKWFrame
 {
 public:
   static vtkKWSeparator* New();

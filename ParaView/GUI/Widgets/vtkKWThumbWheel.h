@@ -26,7 +26,7 @@ class vtkKWEntry;
 class vtkKWPushButton;
 class vtkKWTopLevel;
 
-class KWWIDGETS_EXPORT vtkKWThumbWheel : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWThumbWheel : public vtkKWCompositeWidget
 {
 public:
   static vtkKWThumbWheel* New();

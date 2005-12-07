@@ -28,7 +28,7 @@
 
 class vtkKWIcon;
 
-class KWWIDGETS_EXPORT vtkKWLabel : public vtkKWCoreWidget
+class KWWidgets_EXPORT vtkKWLabel : public vtkKWCoreWidget
 {
 public:
   static vtkKWLabel* New();

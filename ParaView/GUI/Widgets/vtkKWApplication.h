@@ -37,7 +37,7 @@ class vtkKWTextWithScrollbars;
 class vtkKWApplicationInternals;
 class vtkKWLoadSaveDialog;
 
-class KWWIDGETS_EXPORT vtkKWApplication : public vtkKWObject
+class KWWidgets_EXPORT vtkKWApplication : public vtkKWObject
 {
 public:
   static vtkKWApplication* New();

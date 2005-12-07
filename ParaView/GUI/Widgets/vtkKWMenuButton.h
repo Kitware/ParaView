@@ -24,7 +24,7 @@
 class vtkKWMenu;
 class vtkKWIcon;
 
-class KWWIDGETS_EXPORT vtkKWMenuButton : public vtkKWCoreWidget
+class KWWidgets_EXPORT vtkKWMenuButton : public vtkKWCoreWidget
 {
 public:
   static vtkKWMenuButton* New();

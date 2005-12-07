@@ -21,7 +21,7 @@
 
 #include "vtkKWCoreWidget.h"
 
-class KWWIDGETS_EXPORT vtkKWScrollbar : public vtkKWCoreWidget
+class KWWidgets_EXPORT vtkKWScrollbar : public vtkKWCoreWidget
 {
 public:
   static vtkKWScrollbar* New();

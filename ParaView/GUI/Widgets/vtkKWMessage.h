@@ -35,7 +35,7 @@
 
 #include "vtkKWCoreWidget.h"
 
-class KWWIDGETS_EXPORT vtkKWMessage : public vtkKWCoreWidget
+class KWWidgets_EXPORT vtkKWMessage : public vtkKWCoreWidget
 {
 public:
   static vtkKWMessage* New();

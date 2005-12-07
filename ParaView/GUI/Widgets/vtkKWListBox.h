@@ -23,7 +23,7 @@
 
 #include "vtkKWCoreWidget.h"
 
-class KWWIDGETS_EXPORT vtkKWListBox : public vtkKWCoreWidget
+class KWWidgets_EXPORT vtkKWListBox : public vtkKWCoreWidget
 {
 public:
   static vtkKWListBox* New();

@@ -27,7 +27,7 @@ class vtkKWIcon;
 class vtkKWLabel;
 class vtkKWLabelWithLabel;
 
-class KWWIDGETS_EXPORT vtkKWFrameWithLabel : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWFrameWithLabel : public vtkKWCompositeWidget
 {
 public:
   static vtkKWFrameWithLabel* New();

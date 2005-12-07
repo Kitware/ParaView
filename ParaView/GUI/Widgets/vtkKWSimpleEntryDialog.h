@@ -20,7 +20,7 @@
 
 class vtkKWEntryWithLabel;
 
-class KWWIDGETS_EXPORT vtkKWSimpleEntryDialog : public vtkKWMessageDialog
+class KWWidgets_EXPORT vtkKWSimpleEntryDialog : public vtkKWMessageDialog
 {
 public:
   static vtkKWSimpleEntryDialog* New();

@@ -23,7 +23,7 @@
 #include "vtkKWCompositeWidget.h"
 class vtkKWFrame;
 
-class KWWIDGETS_EXPORT vtkKWSplitFrame : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWSplitFrame : public vtkKWCompositeWidget
 {
 public:
   static vtkKWSplitFrame* New();

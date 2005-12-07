@@ -29,7 +29,7 @@
 
 class vtkKWFrame;
 
-class KWWIDGETS_EXPORT vtkKWChangeColorButton : public vtkKWWidgetWithLabel
+class KWWidgets_EXPORT vtkKWChangeColorButton : public vtkKWWidgetWithLabel
 {
 public:
   static vtkKWChangeColorButton* New();

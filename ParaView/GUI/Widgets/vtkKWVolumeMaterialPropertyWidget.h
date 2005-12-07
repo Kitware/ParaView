@@ -23,7 +23,7 @@ class vtkKWCheckButtonWithLabel;
 class vtkKWScalarComponentSelectionWidget;
 class vtkVolumeProperty;
 
-class KWWIDGETS_EXPORT vtkKWVolumeMaterialPropertyWidget : public vtkKWMaterialPropertyWidget
+class KWWidgets_EXPORT vtkKWVolumeMaterialPropertyWidget : public vtkKWMaterialPropertyWidget
 {
 public:
   static vtkKWVolumeMaterialPropertyWidget *New();

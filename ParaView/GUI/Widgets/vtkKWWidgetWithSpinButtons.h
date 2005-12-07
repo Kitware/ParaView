@@ -25,7 +25,7 @@
 
 class vtkKWSpinButtons;
 
-class KWWIDGETS_EXPORT vtkKWWidgetWithSpinButtons : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWWidgetWithSpinButtons : public vtkKWCompositeWidget
 {
 public:
   static vtkKWWidgetWithSpinButtons* New();

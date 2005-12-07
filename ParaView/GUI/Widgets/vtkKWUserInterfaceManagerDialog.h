@@ -56,7 +56,7 @@ class vtkKWUserInterfaceManagerDialogInternals;
 class vtkKWUserInterfacePanel;
 class vtkKWWidget;
 
-class KWWIDGETS_EXPORT vtkKWUserInterfaceManagerDialog : public vtkKWUserInterfaceManager
+class KWWidgets_EXPORT vtkKWUserInterfaceManagerDialog : public vtkKWUserInterfaceManager
 {
 public:
   static vtkKWUserInterfaceManagerDialog* New();

@@ -24,7 +24,7 @@
 
 class vtkKWWidget;
 
-class KWWIDGETS_EXPORT vtkKWResourceUtilities : public vtkObject
+class KWWidgets_EXPORT vtkKWResourceUtilities : public vtkObject
 {
 public:
   static vtkKWResourceUtilities* New();

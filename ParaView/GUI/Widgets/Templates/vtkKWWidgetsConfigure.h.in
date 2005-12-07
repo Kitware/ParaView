@@ -14,7 +14,7 @@
 #ifndef __vtkKWWidgetsConfigure_h
 #define __vtkKWWidgetsConfigure_h
 
-#cmakedefine KWWIDGETS_SHARED_LIBS
+#cmakedefine KWWidgets_SHARED_LIBS
 #cmakedefine VTK_USE_VIDEO_FOR_WINDOWS
 
 #endif

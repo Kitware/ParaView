@@ -40,7 +40,7 @@
 
 class @WidgetType@;
 
-class KWWIDGETS_EXPORT @WidgetType@Set : public vtkKWWidgetSet
+class KWWidgets_EXPORT @WidgetType@Set : public vtkKWWidgetSet
 {
 public:
   static @WidgetType@Set* New();

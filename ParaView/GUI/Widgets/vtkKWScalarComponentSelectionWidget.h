@@ -22,7 +22,7 @@
 
 class vtkKWMenuButtonWithLabel;
 
-class KWWIDGETS_EXPORT vtkKWScalarComponentSelectionWidget : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWScalarComponentSelectionWidget : public vtkKWCompositeWidget
 {
 public:
   static vtkKWScalarComponentSelectionWidget* New();

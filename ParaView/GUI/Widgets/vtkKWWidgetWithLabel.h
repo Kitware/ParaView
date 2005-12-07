@@ -23,7 +23,7 @@
 
 class vtkKWLabel;
 
-class KWWIDGETS_EXPORT vtkKWWidgetWithLabel : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWWidgetWithLabel : public vtkKWCompositeWidget
 {
 public:
   static vtkKWWidgetWithLabel* New();

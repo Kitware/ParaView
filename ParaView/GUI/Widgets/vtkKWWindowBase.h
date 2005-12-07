@@ -31,7 +31,7 @@ class vtkKWTclInteractor;
 class vtkKWToolbar;
 class vtkKWToolbarSet;
 
-class KWWIDGETS_EXPORT vtkKWWindowBase : public vtkKWTopLevel
+class KWWidgets_EXPORT vtkKWWindowBase : public vtkKWTopLevel
 {
 public:
 

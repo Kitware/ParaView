@@ -21,7 +21,7 @@
 
 #include "vtkKWCoreWidget.h"
 
-class KWWIDGETS_EXPORT vtkKWEntry : public vtkKWCoreWidget
+class KWWidgets_EXPORT vtkKWEntry : public vtkKWCoreWidget
 {
 public:
   static vtkKWEntry* New();

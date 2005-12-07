@@ -46,7 +46,7 @@ class vtkKWMenuButton;
 class ostrstream;
 //ETX
 
-class KWWIDGETS_EXPORT vtkKWParameterValueFunctionEditor : public vtkKWParameterValueFunctionInterface
+class KWWidgets_EXPORT vtkKWParameterValueFunctionEditor : public vtkKWParameterValueFunctionInterface
 {
 public:
   vtkTypeRevisionMacro(vtkKWParameterValueFunctionEditor,vtkKWParameterValueFunctionInterface);

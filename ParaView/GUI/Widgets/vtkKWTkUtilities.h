@@ -37,7 +37,7 @@ class vtkKWApplication;
 class vtkKWIcon;
 struct Tcl_Interp;
 
-class KWWIDGETS_EXPORT vtkKWTkUtilities : public vtkObject
+class KWWidgets_EXPORT vtkKWTkUtilities : public vtkObject
 {
 public:
   static vtkKWTkUtilities* New();

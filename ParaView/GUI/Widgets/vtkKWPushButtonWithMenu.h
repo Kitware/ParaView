@@ -23,7 +23,7 @@
 
 class vtkKWMenu;
 
-class KWWIDGETS_EXPORT vtkKWPushButtonWithMenu : public vtkKWPushButton
+class KWWidgets_EXPORT vtkKWPushButtonWithMenu : public vtkKWPushButton
 {
 public:
   static vtkKWPushButtonWithMenu* New();

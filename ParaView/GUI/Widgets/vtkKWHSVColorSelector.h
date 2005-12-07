@@ -23,7 +23,7 @@
 class vtkKWCanvas;
 class vtkKWLabel;
 
-class KWWIDGETS_EXPORT vtkKWHSVColorSelector : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWHSVColorSelector : public vtkKWCompositeWidget
 {
 public:
   static vtkKWHSVColorSelector* New();

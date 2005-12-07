@@ -155,7 +155,7 @@ class vtkKWUserInterfaceManagerDialog;
 class vtkKWApplicationSettingsInterface;
 class vtkKWUserInterfacePanel;
 
-class KWWIDGETS_EXPORT vtkKWWindow : public vtkKWWindowBase
+class KWWidgets_EXPORT vtkKWWindow : public vtkKWWindowBase
 {
 public:
 

@@ -26,7 +26,7 @@
 class vtkColorTransferFunction;
 class vtkKWColorPresetSelectorInternals;
 
-class KWWIDGETS_EXPORT vtkKWColorPresetSelector : public vtkKWMenuButtonWithLabel
+class KWWidgets_EXPORT vtkKWColorPresetSelector : public vtkKWMenuButtonWithLabel
 {
 public:
   static vtkKWColorPresetSelector* New();

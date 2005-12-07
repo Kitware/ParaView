@@ -28,7 +28,7 @@
 
 #include "vtkKWCoreWidget.h"
 
-class KWWIDGETS_EXPORT vtkKWSpinBox : public vtkKWCoreWidget
+class KWWidgets_EXPORT vtkKWSpinBox : public vtkKWCoreWidget
 {
 public:
   static vtkKWSpinBox* New();

@@ -22,7 +22,7 @@
 
 class vtkKWCanvas;
 
-class KWWIDGETS_EXPORT vtkKWSplashScreen : public vtkKWTopLevel
+class KWWidgets_EXPORT vtkKWSplashScreen : public vtkKWTopLevel
 {
 public:
   static vtkKWSplashScreen* New();
