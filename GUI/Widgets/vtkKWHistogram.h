@@ -25,7 +25,7 @@ class vtkDataArray;
 class vtkImageData;
 class vtkDoubleArray;
 
-class KWWIDGETS_EXPORT vtkKWHistogram : public vtkObject
+class KWWidgets_EXPORT vtkKWHistogram : public vtkObject
 {
 public:
   static vtkKWHistogram* New();
@@ -166,7 +166,7 @@ public:
   // of RGB.
   //BTX
   // @cond nested_class
-  class KWWIDGETS_EXPORT ImageDescriptor
+  class KWWidgets_EXPORT ImageDescriptor
   {
   public:
     ImageDescriptor();

@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWCoreWidget.h"
 
-class KWWIDGETS_EXPORT vtkKWCanvas : public vtkKWCoreWidget
+class KWWidgets_EXPORT vtkKWCanvas : public vtkKWCoreWidget
 {
 public:
   static vtkKWCanvas* New();

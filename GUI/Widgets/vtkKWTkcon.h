@@ -28,7 +28,7 @@
 
 class vtkKWTkconInternals;
 
-class KWWIDGETS_EXPORT vtkKWTkcon : public vtkKWTclInteractor
+class KWWidgets_EXPORT vtkKWTkcon : public vtkKWTclInteractor
 {
 public:
   static vtkKWTkcon* New();

@@ -31,7 +31,7 @@ class vtkPiecewiseFunction;
 class vtkKWScaleWithEntry;
 class vtkColorTransferFunction;
 
-class KWWIDGETS_EXPORT vtkKWPiecewiseFunctionEditor : public vtkKWParameterValueHermiteFunctionEditor
+class KWWidgets_EXPORT vtkKWPiecewiseFunctionEditor : public vtkKWParameterValueHermiteFunctionEditor
 {
 public:
   static vtkKWPiecewiseFunctionEditor* New();

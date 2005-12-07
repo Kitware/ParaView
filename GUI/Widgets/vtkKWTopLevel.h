@@ -22,7 +22,7 @@
 
 class vtkKWMenu;
 
-class KWWIDGETS_EXPORT vtkKWTopLevel : public vtkKWCoreWidget
+class KWWidgets_EXPORT vtkKWTopLevel : public vtkKWCoreWidget
 {
 public:
   static vtkKWTopLevel* New();

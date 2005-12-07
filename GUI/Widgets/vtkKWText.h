@@ -26,7 +26,7 @@
 
 class vtkKWTextInternals;
 
-class KWWIDGETS_EXPORT vtkKWText : public vtkKWCoreWidget
+class KWWidgets_EXPORT vtkKWText : public vtkKWCoreWidget
 {
 public:
   static vtkKWText* New();

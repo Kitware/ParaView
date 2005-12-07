@@ -21,7 +21,7 @@
 
 #include "vtkKWDialog.h"
 
-class KWWIDGETS_EXPORT vtkKWLoadSaveDialog : public vtkKWDialog
+class KWWidgets_EXPORT vtkKWLoadSaveDialog : public vtkKWDialog
 {
 public:
   static vtkKWLoadSaveDialog* New();

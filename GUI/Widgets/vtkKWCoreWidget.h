@@ -28,7 +28,7 @@
 #include "vtkKWWidget.h"
 #include "vtkKWTkOptions.h" // For option constants
 
-class KWWIDGETS_EXPORT vtkKWCoreWidget : public vtkKWWidget
+class KWWidgets_EXPORT vtkKWCoreWidget : public vtkKWWidget
 {
 public:
   static vtkKWCoreWidget* New();

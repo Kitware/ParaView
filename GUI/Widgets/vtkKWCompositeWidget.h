@@ -30,7 +30,7 @@
 
 #include "vtkKWFrame.h"
 
-class KWWIDGETS_EXPORT vtkKWCompositeWidget : public vtkKWFrame
+class KWWidgets_EXPORT vtkKWCompositeWidget : public vtkKWFrame
 {
 public:
   static vtkKWCompositeWidget* New();

@@ -31,7 +31,7 @@
 class vtkKWApplication;
 class vtkCallbackCommand;
 
-class KWWIDGETS_EXPORT vtkKWObject : public vtkObject
+class KWWidgets_EXPORT vtkKWObject : public vtkObject
 {
 public:
   static vtkKWObject* New();

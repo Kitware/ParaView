@@ -53,7 +53,7 @@
 
 #include "vtkKWWidgetWithLabel.h"
 
-class KWWIDGETS_EXPORT vtkKWParameterValueFunctionInterface : public vtkKWWidgetWithLabel
+class KWWidgets_EXPORT vtkKWParameterValueFunctionInterface : public vtkKWWidgetWithLabel
 {
 public:
   vtkTypeRevisionMacro(vtkKWParameterValueFunctionInterface,vtkKWWidgetWithLabel);

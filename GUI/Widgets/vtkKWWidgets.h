@@ -16,14 +16,14 @@
 
 #include "vtkKWWidgetsConfigure.h"
 
-#if defined(_WIN32) && defined(KWWIDGETS_SHARED_LIBS)
+#if defined(_WIN32) && defined(KWWidgets_SHARED_LIBS)
 # if defined(KWWidgets_EXPORTS)
-#  define KWWIDGETS_EXPORT __declspec( dllexport )
+#  define KWWidgets_EXPORT __declspec( dllexport )
 # else
-#  define KWWIDGETS_EXPORT __declspec( dllimport )
+#  define KWWidgets_EXPORT __declspec( dllimport )
 # endif
 #else
-# define KWWIDGETS_EXPORT
+# define KWWidgets_EXPORT
 #endif
 
 #endif

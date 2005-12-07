@@ -39,7 +39,7 @@ class vtkKWScaleWithEntry;
 class vtkKWVolumeMaterialPropertyWidget;
 class vtkVolumeProperty;
 
-class KWWIDGETS_EXPORT vtkKWVolumePropertyWidget : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWVolumePropertyWidget : public vtkKWCompositeWidget
 {
 public:
   static vtkKWVolumePropertyWidget* New();

@@ -27,7 +27,7 @@ class vtkKWLabel;
 class vtkKWPushButton;
 class vtkKWTopLevel;
 
-class KWWIDGETS_EXPORT vtkKWScale : public vtkKWCoreWidget
+class KWWidgets_EXPORT vtkKWScale : public vtkKWCoreWidget
 {
 public:
   static vtkKWScale* New();

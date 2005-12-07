@@ -20,7 +20,7 @@
 
 #include "vtkKWLoadSaveDialog.h"
 
-class KWWIDGETS_EXPORT vtkKWSaveImageDialog : public vtkKWLoadSaveDialog
+class KWWidgets_EXPORT vtkKWSaveImageDialog : public vtkKWLoadSaveDialog
 {
 public:
   static vtkKWSaveImageDialog* New();

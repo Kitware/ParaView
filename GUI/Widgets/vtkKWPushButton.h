@@ -22,7 +22,7 @@
 
 class vtkKWIcon;
 
-class KWWIDGETS_EXPORT vtkKWPushButton : public vtkKWCoreWidget
+class KWWidgets_EXPORT vtkKWPushButton : public vtkKWCoreWidget
 {
 public:
   static vtkKWPushButton* New();

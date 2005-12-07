@@ -22,7 +22,7 @@
 #include "vtkKWWidgets.h" // Needed for export symbols directives
 #include "vtkTcl.h" // Needed for Tcl interpreter
 
-class KWWIDGETS_EXPORT vtkKWTkconInit : public vtkObject
+class KWWidgets_EXPORT vtkKWTkconInit : public vtkObject
 {
 public:
   static vtkKWTkconInit* New();

@@ -18,7 +18,7 @@
 
 #include "vtkKWWidgets.h" // Needed for export symbols directives
 
-class KWWIDGETS_EXPORT vtkKWEvent
+class KWWidgets_EXPORT vtkKWEvent
 {
 public:
 

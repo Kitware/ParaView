@@ -30,7 +30,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 class vtkKWRenderWidget;
 
-class KWWIDGETS_EXPORT vtkKWGenericRenderWindowInteractor : public vtkGenericRenderWindowInteractor
+class KWWidgets_EXPORT vtkKWGenericRenderWindowInteractor : public vtkGenericRenderWindowInteractor
 {
 public:
   static vtkKWGenericRenderWindowInteractor *New();

@@ -26,7 +26,7 @@ class vtkKWEntry;
 class vtkKWLabel;
 class vtkKWTextWithScrollbars;
 
-class KWWIDGETS_EXPORT vtkKWTclInteractor : public vtkKWTopLevel
+class KWWidgets_EXPORT vtkKWTclInteractor : public vtkKWTopLevel
 {
 public:
   static vtkKWTclInteractor* New();

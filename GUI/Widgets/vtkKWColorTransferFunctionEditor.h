@@ -34,7 +34,7 @@ class vtkColorTransferFunction;
 class vtkKWEntryWithLabel;
 class vtkKWMenuButton;
 
-class KWWIDGETS_EXPORT vtkKWColorTransferFunctionEditor : public vtkKWParameterValueHermiteFunctionEditor
+class KWWidgets_EXPORT vtkKWColorTransferFunctionEditor : public vtkKWParameterValueHermiteFunctionEditor
 {
 public:
   static vtkKWColorTransferFunctionEditor* New();

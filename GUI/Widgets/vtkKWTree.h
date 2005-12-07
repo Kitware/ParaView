@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWCoreWidget.h"
 
-class KWWIDGETS_EXPORT vtkKWTree : public vtkKWCoreWidget
+class KWWidgets_EXPORT vtkKWTree : public vtkKWCoreWidget
 {
 public:
   static vtkKWTree* New();

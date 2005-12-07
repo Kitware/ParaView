@@ -35,7 +35,7 @@
 class vtkKWMostRecentFilesManagerInternals;
 class vtkKWMenu;
 
-class KWWIDGETS_EXPORT vtkKWMostRecentFilesManager : public vtkKWObject
+class KWWidgets_EXPORT vtkKWMostRecentFilesManager : public vtkKWObject
 {
 public:
   static vtkKWMostRecentFilesManager* New();

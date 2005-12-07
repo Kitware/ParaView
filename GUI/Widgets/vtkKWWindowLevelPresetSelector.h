@@ -37,7 +37,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWPresetSelector.h"
 
-class KWWIDGETS_EXPORT vtkKWWindowLevelPresetSelector : public vtkKWPresetSelector
+class KWWidgets_EXPORT vtkKWWindowLevelPresetSelector : public vtkKWPresetSelector
 {
 public:
   static vtkKWWindowLevelPresetSelector* New();

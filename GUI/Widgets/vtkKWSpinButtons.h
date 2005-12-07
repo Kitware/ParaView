@@ -34,7 +34,7 @@
 
 class vtkKWPushButton;
 
-class KWWIDGETS_EXPORT vtkKWSpinButtons : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWSpinButtons : public vtkKWCompositeWidget
 {
 public:
   static vtkKWSpinButtons* New();

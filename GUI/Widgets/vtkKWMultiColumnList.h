@@ -40,7 +40,7 @@
 class vtkKWIcon;
 class vtkKWMultiColumnListInternals;
 
-class KWWIDGETS_EXPORT vtkKWMultiColumnList : public vtkKWCoreWidget
+class KWWidgets_EXPORT vtkKWMultiColumnList : public vtkKWCoreWidget
 {
 public:
   static vtkKWMultiColumnList* New();

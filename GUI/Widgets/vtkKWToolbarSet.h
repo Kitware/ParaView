@@ -26,7 +26,7 @@ class vtkKWSeparator;
 class vtkKWToolbar;
 class vtkKWToolbarSetInternals;
 
-class KWWIDGETS_EXPORT vtkKWToolbarSet : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWToolbarSet : public vtkKWCompositeWidget
 {
 public:
   static vtkKWToolbarSet* New();

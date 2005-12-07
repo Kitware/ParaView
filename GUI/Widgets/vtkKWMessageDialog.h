@@ -27,7 +27,7 @@ class vtkKWMessage;
 class vtkKWLabel;
 class vtkKWPushButton;
 
-class KWWIDGETS_EXPORT vtkKWMessageDialog : public vtkKWDialog
+class KWWidgets_EXPORT vtkKWMessageDialog : public vtkKWDialog
 {
 public:
   static vtkKWMessageDialog* New();

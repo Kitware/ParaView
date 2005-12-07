@@ -29,7 +29,7 @@
 
 class vtkVolumeProperty;
 
-class KWWIDGETS_EXPORT vtkKWVolumePropertyPresetSelector : public vtkKWPresetSelector
+class KWWidgets_EXPORT vtkKWVolumePropertyPresetSelector : public vtkKWPresetSelector
 {
 public:
   static vtkKWVolumePropertyPresetSelector* New();

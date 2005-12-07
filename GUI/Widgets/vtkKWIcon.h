@@ -26,7 +26,7 @@
 
 class vtkKWIcon;
 
-class KWWIDGETS_EXPORT vtkKWIcon : public vtkObject
+class KWWidgets_EXPORT vtkKWIcon : public vtkObject
 {
 public:
   static vtkKWIcon* New();

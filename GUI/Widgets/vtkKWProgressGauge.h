@@ -23,7 +23,7 @@
 
 class vtkKWCanvas;
 
-class KWWIDGETS_EXPORT vtkKWProgressGauge : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWProgressGauge : public vtkKWCompositeWidget
 {
 public:
   static vtkKWProgressGauge* New();

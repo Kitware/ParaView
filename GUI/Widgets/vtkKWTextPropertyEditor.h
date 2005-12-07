@@ -32,7 +32,7 @@ class vtkKWPushButton;
 class vtkKWScaleWithEntry;
 class vtkTextProperty;
 
-class KWWIDGETS_EXPORT vtkKWTextPropertyEditor : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWTextPropertyEditor : public vtkKWCompositeWidget
 {
 public:
   static vtkKWTextPropertyEditor* New();

@@ -23,7 +23,7 @@
 
 class vtkKWScrollbar;
 
-class KWWIDGETS_EXPORT vtkKWWidgetWithScrollbars : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWWidgetWithScrollbars : public vtkKWCompositeWidget
 {
 public:
   vtkTypeRevisionMacro(vtkKWWidgetWithScrollbars,vtkKWCompositeWidget);

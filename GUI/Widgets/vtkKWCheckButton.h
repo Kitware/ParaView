@@ -23,7 +23,7 @@
 
 class vtkKWIcon;
 
-class KWWIDGETS_EXPORT vtkKWCheckButton : public vtkKWCoreWidget
+class KWWidgets_EXPORT vtkKWCheckButton : public vtkKWCoreWidget
 {
 public:
   static vtkKWCheckButton* New();

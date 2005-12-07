@@ -27,7 +27,7 @@ class vtkKWTextPropertyEditor;
 class vtkTextActor;
 class vtkKWFrame;
 
-class KWWIDGETS_EXPORT vtkKWHeaderAnnotationEditor : public vtkKWCheckButtonWithPopupFrame
+class KWWidgets_EXPORT vtkKWHeaderAnnotationEditor : public vtkKWCheckButtonWithPopupFrame
 {
 public:
   static vtkKWHeaderAnnotationEditor* New();

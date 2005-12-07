@@ -22,7 +22,7 @@
 
 #include "vtkKWCoreWidget.h"
 
-class KWWIDGETS_EXPORT vtkKWMenu : public vtkKWCoreWidget
+class KWWidgets_EXPORT vtkKWMenu : public vtkKWCoreWidget
 {
 public:
   static vtkKWMenu* New();

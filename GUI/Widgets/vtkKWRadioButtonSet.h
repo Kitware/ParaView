@@ -32,7 +32,7 @@
 
 class vtkKWRadioButton;
 
-class KWWIDGETS_EXPORT vtkKWRadioButtonSet : public vtkKWWidgetSet
+class KWWidgets_EXPORT vtkKWRadioButtonSet : public vtkKWWidgetSet
 {
 public:
   static vtkKWRadioButtonSet* New();

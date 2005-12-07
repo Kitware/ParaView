@@ -38,7 +38,7 @@ class vtkKWPushButtonSet;
 class vtkKWScaleWithEntrySet;
 class vtkKWRenderWidget;
 
-class KWWIDGETS_EXPORT vtkKWSimpleAnimationWidget : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWSimpleAnimationWidget : public vtkKWCompositeWidget
 {
 public:
   static vtkKWSimpleAnimationWidget* New();

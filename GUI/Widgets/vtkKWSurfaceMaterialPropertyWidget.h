@@ -21,7 +21,7 @@
 
 class vtkProperty;
 
-class KWWIDGETS_EXPORT vtkKWSurfaceMaterialPropertyWidget : public vtkKWMaterialPropertyWidget
+class KWWidgets_EXPORT vtkKWSurfaceMaterialPropertyWidget : public vtkKWMaterialPropertyWidget
 {
 public:
   static vtkKWSurfaceMaterialPropertyWidget *New();

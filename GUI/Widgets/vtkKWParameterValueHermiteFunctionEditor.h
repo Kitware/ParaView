@@ -32,7 +32,7 @@
 
 class vtkKWScaleWithEntry;
 
-class KWWIDGETS_EXPORT vtkKWParameterValueHermiteFunctionEditor : public vtkKWParameterValueFunctionEditor
+class KWWidgets_EXPORT vtkKWParameterValueHermiteFunctionEditor : public vtkKWParameterValueFunctionEditor
 {
 public:
   vtkTypeRevisionMacro(vtkKWParameterValueHermiteFunctionEditor,vtkKWParameterValueFunctionEditor);

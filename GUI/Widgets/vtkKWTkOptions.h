@@ -22,7 +22,7 @@
 #include "vtkObject.h"
 #include "vtkKWWidgets.h" // Needed for export symbols directives
 
-class KWWIDGETS_EXPORT vtkKWTkOptions : public vtkObject
+class KWWidgets_EXPORT vtkKWTkOptions : public vtkObject
 {
 public:
   static vtkKWTkOptions* New();

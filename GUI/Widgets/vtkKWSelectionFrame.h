@@ -31,7 +31,7 @@ class vtkKWPushButton;
 class vtkKWSelectionFrameInternals;
 class vtkKWToolbarSet;
 
-class KWWIDGETS_EXPORT vtkKWSelectionFrame : public vtkKWCompositeWidget
+class KWWidgets_EXPORT vtkKWSelectionFrame : public vtkKWCompositeWidget
 {
 public:
   static vtkKWSelectionFrame* New();

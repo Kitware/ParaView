@@ -25,7 +25,7 @@
 
 class vtkKWCheckButton;
 
-class KWWIDGETS_EXPORT vtkKWCheckButtonWithPopupFrame : public vtkKWPopupFrame
+class KWWidgets_EXPORT vtkKWCheckButtonWithPopupFrame : public vtkKWPopupFrame
 {
 public:
   static vtkKWCheckButtonWithPopupFrame* New();

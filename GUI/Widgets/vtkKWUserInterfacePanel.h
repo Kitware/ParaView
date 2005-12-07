@@ -47,7 +47,7 @@ class vtkKWIcon;
 class vtkKWUserInterfaceManager;
 class vtkKWWidget;
 
-class KWWIDGETS_EXPORT vtkKWUserInterfacePanel : public vtkKWObject
+class KWWidgets_EXPORT vtkKWUserInterfacePanel : public vtkKWObject
 {
 public:
   static vtkKWUserInterfacePanel* New();
