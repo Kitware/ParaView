@@ -1,0 +1,80 @@
+#-----------------------------------------------------------------------------
+#
+# KWWidgetsConfig.cmake - CMake configuration file for external projects.
+#
+# This file is configured by KWWidgets and used by the UseKWWidgets.cmake 
+# module to load KWWidgets's settings for an external project.
+@KWWidgets_CONFIG_INSTALL_ONLY@
+# The KWWidgets version number
+SET(KWWidgets_MAJOR_VERSION "@KWWidgets_MAJOR_VERSION@")
+SET(KWWidgets_MINOR_VERSION "@KWWidgets_MINOR_VERSION@")
+
+# The KWWidgets version number
+SET(KWWidgets_LIBRARIES "@KWWidgets_LIBRARIES@")
+
+# The list of available languages.
+SET(KWWidgets_LANGUAGES "TCL")
+
+# KWWidgets Configuration options.
+SET(KWWidgets_BUILD_SHARED_LIBS "@BUILD_SHARED_LIBS@")
+
+# KWWidgets VTK options.
+SET(KWWidgets_VTK_DIR "@KWWidgets_VTK_DIR_CONFIG@")
+
+# The KWWidgets include file directories.
+SET(KWWidgets_INCLUDE_DIRS "@KWWidgets_INCLUDE_DIRS_CONFIG@")
+
+# The KWWidgets library directories.
+SET(KWWidgets_LIBRARY_DIRS "@KWWidgets_LIBRARY_DIRS_CONFIG@")
+
+# The KWWidgets runtime library directories.  Note that if
+# KWWidgets_CONFIGURATION_TYPES is set (see below) then these directories
+# will be the parent directories under which there will be a directory
+# of runtime binaries for each configuration type.
+SET(KWWidgets_RUNTIME_DIRS "@KWWidgets_RUNTIME_DIRS_CONFIG@")
+
+# The C and C++ flags added by KWWidgets to the cmake-configured flags.
+SET(KWWidgets_REQUIRED_C_FLAGS "@KWWidgets_REQUIRED_C_FLAGS@")
+SET(KWWidgets_REQUIRED_CXX_FLAGS "@KWWidgets_REQUIRED_CXX_FLAGS@")
+SET(KWWidgets_REQUIRED_EXE_LINKER_FLAGS "@KWWidgets_REQUIRED_EXE_LINKER_FLAGS@")
+SET(KWWidgets_REQUIRED_SHARED_LINKER_FLAGS "@KWWidgets_REQUIRED_SHARED_LINKER_FLAGS@")
+SET(KWWidgets_REQUIRED_MODULE_LINKER_FLAGS "@KWWidgets_REQUIRED_MODULE_LINKER_FLAGS@")
+
+# The location of the UseKWWidgets.cmake file.
+SET(KWWidgets_USE_FILE "@KWWidgets_USE_FILE_CONFIG@")
+
+# The build settings file.
+SET(KWWidgets_BUILD_SETTINGS_FILE "@KWWidgets_BUILD_SETTINGS_FILE_CONFIG@")
+
+# KWWidgets Tk options.
+SET(KWWidgets_RESOURCE_DIR "@KWWidgets_RESOURCE_DIR_CONFIG@")
+SET(KWWidgets_RESOURCE_MAJOR_VERSION "@KWWidgets_RESOURCE_MAJOR_VERSION@")
+SET(KWWidgets_RESOURCE_MINOR_VERSION "@KWWidgets_RESOURCE_MINOR_VERSION@")
+SET(KWWidgets_RESOURCE_APPLICATION_NAME "@KWWidgets_RESOURCE_APPLICATION_NAME@")
+SET(KWWidgets_RESOURCE_FILE_NAME "@KWWidgets_RESOURCE_FILE_NAME@")
+SET(KWWidgets_RESOURCE_COMPANY_NAME "@KWWidgets_RESOURCE_COMPANY_NAME@")
+
+SET(KWWidgets_TCL_PACKAGE_INDEX_DIR "@KWWidgets_TCL_PACKAGE_INDEX_DIR_CONFIG@")
+
+# KWWidgets Tk options.
+SET(KWWidgets_DOXYGEN_DIR "@KWWidgets_DOXYGEN_DIR_CONFIG@")
+
+# A KWWidgets install tree always provides one build configuration.
+# A KWWidgets build tree may provide either one or multiple build
+# configurations depending on the CMake generator used.  Since
+# KWWidgets can be used either from a build tree or an install tree it
+# is useful for outside projects to know the configurations available.
+# If this KWWidgetsConfig.cmake is in a KWWidgets install tree
+# KWWidgets_CONFIGURATION_TYPES will be empty and KWWidgets_BUILD_TYPE
+# will be set to the value of CMAKE_BUILD_TYPE used to build
+# KWWidgets.  If KWWidgetsConfig.cmake is in a KWWidgets build tree
+# then KWWidgets_CONFIGURATION_TYPES and KWWidgets_BUILD_TYPE will
+# have values matching CMAKE_CONFIGURATION_TYPES and CMAKE_BUILD_TYPE
+# for that build tree (only one will ever be set).
+SET(KWWidgets_CONFIGURATION_TYPES @KWWidgets_CONFIGURATION_TYPES_CONFIG@)
+SET(KWWidgets_BUILD_TYPE @KWWidgets_BUILD_TYPE_CONFIG@)
+
+# The KWWidgets library dependencies.
+IF(NOT KWWidgets_NO_LIBRARY_DEPENDS)
+  INCLUDE("@KWWidgets_LIBRARY_DEPENDS_FILE@")
+ENDIF(NOT KWWidgets_NO_LIBRARY_DEPENDS)
