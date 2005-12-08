@@ -40,7 +40,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.114");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.115");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -850,7 +850,8 @@ void vtkKWRenderWidget::Render()
     }
   static_in_render = 1;
 
-  if (this->RenderMode != vtkKWRenderWidget::DisabledRender)
+  if (this->RenderMode != vtkKWRenderWidget::DisabledRender &&
+      this->VTKWidget->IsCreated())
     {
     this->ResetCameraClippingRange();
     this->RenderWindow->Render();
