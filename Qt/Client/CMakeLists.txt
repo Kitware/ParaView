@@ -40,6 +40,8 @@ ENDIF(PARAQ_EMBED_PYTHON)
 
 INCLUDE_DIRECTORIES(
   ${QtClient_BINARY_DIR}
+  ${pqChart_BINARY_DIR}
+  ${pqChart_SOURCE_DIR}
   ${QtTesting_BINARY_DIR}
   ${QtTesting_SOURCE_DIR}
   ${QtWidgets_BINARY_DIR}
@@ -102,6 +104,7 @@ ADD_EXECUTABLE(pqClient WIN32 MACOSX_BUNDLE
 )
 
 TARGET_LINK_LIBRARIES(pqClient
+  pqChart
   QtWidgets
   QtTesting
   ${PYTHON_LINK_LIBRARIES}

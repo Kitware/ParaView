@@ -13,6 +13,7 @@
 #include <QMainWindow>
 #include <vtkIOStream.h>
 
+class pqHistogramWidget;
 class pqObjectInspectorWidget;
 class pqPipelineData;
 class pqPipelineListWidget;
@@ -62,6 +63,8 @@ private:
   QDockWidget *InspectorDock;
   pqPipelineListWidget *PipelineList;
   QDockWidget *PipelineDock;
+  pqHistogramWidget *ChartWidget;
+  QDockWidget *ChartDock;
   pqMultiViewFrame* ActiveView;
 
 private slots:

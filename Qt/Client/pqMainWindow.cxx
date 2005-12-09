@@ -11,6 +11,7 @@
 #include "pqConfig.h"
 #include "pqConnect.h"
 #include "pqFileDialog.h"
+#include "pqHistogramWidget.h"
 #include "pqLocalFileDialogModel.h"
 #include "pqMainWindow.h"
 #include "pqMultiViewManager.h"
@@ -29,6 +30,10 @@
 #include "pqSetData.h"
 #include "pqSetName.h"
 #include "pqSMAdaptor.h"
+
+// TEMP
+#include "pqChartValue.h"
+#include "pqHistogramChart.h"
 
 #ifdef PARAQ_EMBED_PYTHON
 #include "pqPythonDialog.h"
@@ -79,6 +84,8 @@ pqMainWindow::pqMainWindow() :
   InspectorDock(0),
   PipelineList(0),
   PipelineDock(0),
+  ChartWidget(0),
+  ChartDock(0),
   ActiveView(0)
 {
   this->setObjectName("mainWindow");
@@ -169,6 +176,11 @@ pqMainWindow::pqMainWindow() :
   // Create the pipeline instance.
   this->Pipeline = new pqPipelineData(this);
 
+  // Set up the dock window corners to give the vertical docks
+  // more room.
+  this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
+  this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
+
   // Add the pipeline list dock window.
   this->PipelineDock = new QDockWidget("Pipeline Inspector", this);
   if(this->PipelineDock)
@@ -213,6 +225,40 @@ pqMainWindow::pqMainWindow() :
       }
 
     this->addDockWidget(Qt::LeftDockWidgetArea, this->InspectorDock);
+    }
+
+  // Add the chart dock window.
+  this->ChartDock = new QDockWidget("Chart View", this);
+  if(this->ChartDock)
+    {
+    this->ChartDock->setObjectName("ChartDock");
+    this->ChartDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
+    this->ChartDock->setAllowedAreas(Qt::BottomDockWidgetArea |
+        Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+
+    this->ChartWidget = new pqHistogramWidget(this->ChartDock);
+    if(this->ChartWidget)
+      {
+      this->ChartWidget->setObjectName("ChartWidget");
+      this->ChartDock->setWidget(this->ChartWidget);
+
+      // TEMP: Put in some fake data.
+      pqChartValueList list;
+      list.pushBack(pqChartValue((float)1.35));
+      list.pushBack(pqChartValue((float)1.40));
+      list.pushBack(pqChartValue((float)1.60));
+      list.pushBack(pqChartValue((float)2.00));
+      list.pushBack(pqChartValue((float)1.50));
+      list.pushBack(pqChartValue((float)1.80));
+      list.pushBack(pqChartValue((float)1.40));
+      list.pushBack(pqChartValue((float)1.30));
+      list.pushBack(pqChartValue((float)1.20));
+      pqChartValue min((int)0);
+      pqChartValue interval((int)10);
+      this->ChartWidget->getHistogram()->setData(list, min, interval);
+      }
+
+    this->addDockWidget(Qt::BottomDockWidgetArea, this->ChartDock);
     }
 
   this->setServer(0);

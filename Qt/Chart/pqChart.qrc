@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/pqChart" >
+        <file>pqHistogram22.png</file>
+        <file>pqLineChart22.png</file>
+    </qresource>
+</RCC>

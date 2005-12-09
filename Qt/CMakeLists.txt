@@ -10,6 +10,7 @@ IF(PARAQ_EMBED_PYTHON)
 ENDIF(PARAQ_EMBED_PYTHON)
 
 SUBDIRS(
+  Chart
   Testing
   Widgets
   Client)

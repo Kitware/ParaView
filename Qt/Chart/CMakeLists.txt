@@ -1,0 +1,130 @@
+
+PROJECT(pqChart)
+
+CMAKE_MINIMUM_REQUIRED(VERSION 2.2)
+
+# find modules
+FIND_PACKAGE(Qt4)
+INCLUDE(${QT_USE_FILE})
+
+IF(NOT QT4_FOUND)
+   MESSAGE(SEND_ERROR "Qt4 not found.  Qt4 is required to build QtSNLChart.")
+ENDIF(NOT QT4_FOUND)
+
+
+SET(pqChart_SRCS
+  pqChartAxis.cxx
+  pqChartAxis.h
+  pqChartCoordinate.cxx
+  pqChartCoordinate.h
+  pqChartExport.h
+  pqChartMouseBox.cxx
+  pqChartMouseBox.h
+  pqChartValue.cxx
+  pqChartValue.h
+  pqChartZoomHistory.cxx
+  pqChartZoomHistory.h
+  pqChartZoomPan.cxx
+  pqChartZoomPan.h
+  pqHistogramChart.cxx
+  pqHistogramChart.h
+  pqHistogramColor.cxx
+  pqHistogramColor.h
+  pqHistogramSelection.cxx
+  pqHistogramSelection.h
+  pqHistogramWidget.cxx
+  pqHistogramWidget.h
+  pqLinearRamp.cxx
+  pqLinearRamp.h
+  pqLineChart.cxx
+  pqLineChart.h
+  pqLineChartWidget.cxx
+  pqLineChartWidget.h
+  pqLinePlot.cxx
+  pqLinePlot.h
+  pqPiecewiseLine.cxx
+  pqPiecewiseLine.h
+)
+
+
+QT4_WRAP_CPP(pqChart_MOC_SRCS
+  pqChartAxis.h
+  pqChartZoomPan.h
+  pqHistogramChart.h
+  pqHistogramWidget.h
+  pqLineChart.h
+  pqLineChartWidget.h
+  pqLinePlot.h
+)
+
+
+SET(UI_RESOURCES
+  pqChart.qrc
+)
+
+QT4_ADD_RESOURCES(pqChart_QRC_SRCS
+  ${UI_RESOURCES}
+)
+
+
+SOURCE_GROUP("Resources" FILES
+  ${UI_RESOURCES}
+)
+
+SOURCE_GROUP("Generated" FILES
+  ${pqChart_MOC_SRCS}
+  ${pqChart_QRC_SRCS}
+)
+
+
+ADD_LIBRARY(pqChart
+  ${pqChart_SRCS}
+  ${pqChart_MOC_SRCS}
+  ${pqChart_QRC_SRCS}
+)
+
+TARGET_LINK_LIBRARIES(pqChart ${QT_LIBRARIES})
+
+
+# -----------------------------------------------------------------------------
+# plugin
+# -----------------------------------------------------------------------------
+
+SET(BUILD_PARAQ_CHART_PLUGIN ON)
+
+# don't build plugin on systems that require dependents to be shared (PIC actually)
+IF(NOT BUILD_SHARED_LIBS)
+  IF(CMAKE_SYSTEM MATCHES "HP-UX.*")
+    SET(BUILD_PARAQ_CHART_PLUGIN OFF)
+  ENDIF(CMAKE_SYSTEM MATCHES "HP-UX.*")
+ENDIF(NOT BUILD_SHARED_LIBS)
+
+
+SET(pqChartPlugin_SRCS
+  pqChartPlugin.cxx
+  pqChartPlugin.h
+  pqHistogramWidgetPlugin.h
+  pqLineChartWidgetPlugin.h
+)
+
+QT4_WRAP_CPP(pqChartPlugin_MOC_SRCS
+  pqChartPlugin.h
+  pqHistogramWidgetPlugin.h
+  pqLineChartWidgetPlugin.h
+)
+
+
+ADD_DEFINITIONS(-DQT_PLUGIN)
+
+ADD_LIBRARY(pqChartPlugin
+  SHARED
+  ${pqChartPlugin_SRCS}
+  ${pqChartPlugin_MOC_SRCS}
+)
+
+
+TARGET_LINK_LIBRARIES(pqChartPlugin 
+  pqChart
+  ${QT_LIBRARIES}
+)
+
