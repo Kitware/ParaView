@@ -16,7 +16,6 @@
 #include "vtkKWWidgetsPaths.h"
 
 #include "KWWidgetsTourExampleEntryPoints.h"
-#include "KWWidgetsTourExamplePath.h"
 
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/CommandLineArguments.hxx>
@@ -252,16 +251,16 @@ int my_main(int argc, char *argv[])
 
       sprintf(
         buffer, 
-        "%s/Cxx/%s/%s/%s.cxx", 
-        KWWidgets_EXAMPLES_DIR,ExampleDirName, WidgetsDirName, node_ptr->Name);
+        "%s/Cxx/WidgetsTour/Widgets/%s.cxx", 
+        KWWidgets_EXAMPLES_DIR, node_ptr->Name);
 
       if (!vtksys::SystemTools::FileExists(buffer))
         {
         sprintf(
           buffer, 
-          "%s/..%s/Examples/Cxx/%s/%s/%s.cxx",
+          "%s/..%s/Examples/Cxx/WidgetsTour/Widgets/%s.cxx",
           app->GetInstallationDirectory(), KWWidgets_INSTALL_DATA_DIR,
-          ExampleDirName, WidgetsDirName, node_ptr->Name);
+          node_ptr->Name);
         }
       if (vtksys::SystemTools::FileExists(buffer))
         {
@@ -277,15 +276,15 @@ int my_main(int argc, char *argv[])
 
       sprintf(
         buffer, 
-        "%s/Tcl/%s/%s/%s.tcl", 
-        KWWidgets_EXAMPLES_DIR,ExampleDirName, WidgetsDirName, node_ptr->Name);
+        "%s/Tcl/WidgetsTour/Widgets/%s.tcl", 
+        KWWidgets_EXAMPLES_DIR, node_ptr->Name);
 
       if (!vtksys::SystemTools::FileExists(buffer))
         {
         sprintf(buffer, 
-                "%s/..%s/Examples/Tcl/%s/%s/%s.tcl",
+                "%s/..%s/Examples/Tcl/WidgetsTour/Widgets/%s.tcl",
                 app->GetInstallationDirectory(), KWWidgets_INSTALL_DATA_DIR,
-                ExampleDirName, WidgetsDirName, node_ptr->Name);
+                node_ptr->Name);
         }
       if (vtksys::SystemTools::FileExists(buffer))
         {

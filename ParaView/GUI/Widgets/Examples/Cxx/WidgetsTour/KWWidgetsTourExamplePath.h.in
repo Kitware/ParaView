@@ -1,7 +1,0 @@
-#ifndef __KWWidgetsTourExamplePath_h
-#define __KWWidgetsTourExamplePath_h
-
-static const char *ExampleDirName = "@EXAMPLE_DIR_NAME@";
-static const char *WidgetsDirName = "@WIDGETS_DIR_NAME@";
-
-#endif
