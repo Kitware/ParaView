@@ -2940,7 +2940,7 @@ This filter uses colors to show levels of a hiearchical dataset.    </Documentat
           short_help="Extract level.">
     <Filter class="vtkMultiGroupDataExtractGroup">
       <Input name="Input"
-             class="vtkMultiGroupData"/>
+             class="vtkMultiGroupDataSet"/>
     </Filter>
     <InputMenu trace_name="Input" property="Input"
                label="Input"
