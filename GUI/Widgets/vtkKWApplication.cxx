@@ -63,7 +63,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.266");
+vtkCxxRevisionMacro(vtkKWApplication, "1.267");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -901,6 +901,7 @@ int vtkKWApplication::DisplayExitDialog(vtkKWWindowBase *master)
   msg += "?";
   
   vtkKWMessageDialog *dialog = vtkKWMessageDialog::New();
+  dialog->SetApplication(this);
   dialog->SetStyleToYesNo();
   dialog->SetMasterWindow(master);
   dialog->SetOptions(
@@ -1023,6 +1024,7 @@ void vtkKWApplication::DisplayAboutDialog(vtkKWWindowBase* master)
 
   if (!this->AboutDialog->IsCreated())
     {
+    this->AboutDialog->SetApplication(this);
     this->AboutDialog->SetMasterWindow(master);
     this->AboutDialog->HideDecorationOn();
     this->AboutDialog->Create();
