@@ -135,7 +135,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.770.2.3");
+vtkCxxRevisionMacro(vtkPVWindow, "1.770.2.4");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -2400,9 +2400,15 @@ int vtkPVWindow::FinalizeRead(vtkPVReaderModule* clone, const char *fileName)
 //-----------------------------------------------------------------------------
 int vtkPVWindow::OpenCustom(const char* reader, const char* filename)
 {
-  if ( !reader || strlen(reader) == 0 || 
-       !filename || strlen(filename) == 0 )
+  if(!filename || !filename[0])
     {
+    vtkErrorMacro("No file name given to open.");
+    return VTK_ERROR;
+    }
+  if(!reader || !reader[0])
+    {
+    vtkErrorMacro("Cannot open file \"" << filename
+                  << "\": no reader type specified.");
     return VTK_ERROR;
     }
   vtkLinkedListIterator<vtkPVReaderModule*>* it = 
@@ -2421,6 +2427,9 @@ int vtkPVWindow::OpenCustom(const char* reader, const char* filename)
     it->GoToNextItem();
     }
   it->Delete();
+  vtkErrorMacro("Cannot open file \"" << filename
+                << "\": reader type \"" << reader
+                << "\" could not be created.");
   return VTK_ERROR;
 }
 
