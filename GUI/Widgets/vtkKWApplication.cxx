@@ -40,7 +40,7 @@
 #include <vtksys/stl/algorithm>
 
 #include "Resources/KWWidgets.rc.h"
-#include "vtkKWWidgetsConfigurePaths.h"
+#include "vtkKWWidgetsConfigure.h"
 
 #include "vtkToolkits.h"
 
@@ -63,7 +63,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.265");
+vtkCxxRevisionMacro(vtkKWApplication, "1.266");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -459,8 +459,8 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
     {
       "../lib/TclTk/lib",
       "TclTk/lib",
-      ".." KWWidgets_INSTALL_TclTk_DIR,     // for exe in PREFIX/bin
-      "../.." KWWidgets_INSTALL_TclTk_DIR,  // for exe in PREFIX/lib/foo-V.v
+      ".." KWWidgets_TclTk_INSTALL_LIB_DIR,    // for exe in PREFIX/bin
+      "../.." KWWidgets_TclTk_INSTALL_LIB_DIR, // for exe in PREFIX/lib/foo-V.v
       0
     };
   vtkTclApplicationInitTclTk(interp, relative_dirs);
@@ -707,7 +707,7 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
   // Set the KWWidgets icon by default
   // For this to work, the executable should be linked against the
   // KWWidgets resource file KWWidgets.rc:
-  // CONFIGURE_FILE(${KWWidgets_SOURCE_DIR}/Resources/KWWidgets.rc.in foo.rc)
+  // CONFIGURE_FILE(${KWWidgets_RESOURCES_DIR}/KWWidgets.rc.in foo.rc)
   // ADD_EXECUTABLE(... foo.rc)
 
 #ifdef _WIN32

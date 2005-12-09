@@ -9,7 +9,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkXMLPolyDataReader.h"
 
-#include "vtkKWWidgetsConfigurePaths.h"
+#include "vtkKWWidgetsPaths.h"
 
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/CommandLineArguments.hxx>
@@ -83,7 +83,7 @@ int my_main(int argc, char *argv[])
   vtkXMLPolyDataReader *reader = vtkXMLPolyDataReader::New();
 
   char data_path[2048];
-  sprintf(data_path, "%s/Examples/Data/teapot.vtp", KWWidgets_SOURCE_DIR);
+  sprintf(data_path, "%s/Data/teapot.vtp", KWWidgets_EXAMPLES_DIR);
   if (!vtksys::SystemTools::FileExists(data_path))
     {
     sprintf(data_path, 

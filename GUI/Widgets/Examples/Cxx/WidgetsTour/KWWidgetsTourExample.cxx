@@ -13,7 +13,7 @@
 #include "vtkKWUserInterfacePanel.h"
 #include "vtkKWWindow.h"
 
-#include "vtkKWWidgetsConfigurePaths.h"
+#include "vtkKWWidgetsPaths.h"
 
 #include "KWWidgetsTourExampleEntryPoints.h"
 #include "KWWidgetsTourExamplePath.h"
@@ -64,8 +64,8 @@ int my_main(int argc, char *argv[])
   // Setup the splash screen
 
   char res_path[2048];
-  sprintf(res_path, "%s/Examples/Resources/KWWidgetsSplashScreen.png", 
-          KWWidgets_SOURCE_DIR);
+  sprintf(res_path, 
+          "%s/Resources/KWWidgetsSplashScreen.png", KWWidgets_EXAMPLES_DIR);
   if (!vtksys::SystemTools::FileExists(res_path))
     {
     sprintf(res_path, 
@@ -252,8 +252,8 @@ int my_main(int argc, char *argv[])
 
       sprintf(
         buffer, 
-        "%s/Examples/Cxx/%s/%s/%s.cxx", 
-        KWWidgets_SOURCE_DIR, ExampleDirName, WidgetsDirName, node_ptr->Name);
+        "%s/Cxx/%s/%s/%s.cxx", 
+        KWWidgets_EXAMPLES_DIR,ExampleDirName, WidgetsDirName, node_ptr->Name);
 
       if (!vtksys::SystemTools::FileExists(buffer))
         {
@@ -277,8 +277,8 @@ int my_main(int argc, char *argv[])
 
       sprintf(
         buffer, 
-        "%s/Examples/Tcl/%s/%s/%s.tcl", 
-        KWWidgets_SOURCE_DIR, ExampleDirName, WidgetsDirName, node_ptr->Name);
+        "%s/Tcl/%s/%s/%s.tcl", 
+        KWWidgets_EXAMPLES_DIR,ExampleDirName, WidgetsDirName, node_ptr->Name);
 
       if (!vtksys::SystemTools::FileExists(buffer))
         {
@@ -376,7 +376,7 @@ const char* KWWidgetsTourItem::GetPathToExampleData(
 {
   static char data_path[2048];
   sprintf(
-    data_path, "%s/Examples/Data/%s", KWWidgets_SOURCE_DIR, name);
+    data_path, "%s/Data/%s", KWWidgets_EXAMPLES_DIR, name);
   if (!vtksys::SystemTools::FileExists(data_path))
     {
     sprintf(data_path, 
