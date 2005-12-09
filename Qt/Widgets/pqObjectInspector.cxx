@@ -265,7 +265,7 @@ Qt::ItemFlags pqObjectInspector::flags(const QModelIndex &index) const
         index.internalPointer());
     if(item && item->childCount() == 0 &&
        ((item->parent() == this->Internal->Parameters) ||
-       (item->parent()->parent() && item->parent()->parent() == this->Internal->Parameters)))
+       (item->parent() && item->parent()->parent() == this->Internal->Parameters)))
       {
       flags |= Qt::ItemIsEditable;
       }
