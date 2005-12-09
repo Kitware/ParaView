@@ -1,14 +1,51 @@
+PROJECT(WidgetsTour)
+
+# If we are not in the KWWidgets source tree, make sure we can find KWWidgets
+# as an external package, and use it. If you are using this CMakeLists.txt 
+# file to create your own application based on KWWidgets, you only need the
+# FIND_PACKAGE(...) and INCLUDE(...) commands. 
+
 IF (NOT KWWidgets_SOURCE_DIR)
   FIND_PACKAGE(KWWidgets REQUIRED)
   INCLUDE(${KWWidgets_USE_FILE})
 ENDIF (NOT KWWidgets_SOURCE_DIR)
 
-GET_FILENAME_COMPONENT(EXAMPLE_DIR_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-SET(EXAMPLE_TARGET_NAME "KW${EXAMPLE_DIR_NAME}Example")
-SET(EXAMPLE_SRCS "${EXAMPLE_TARGET_NAME}.cxx")
+# The name of our targets (executable or libraries) will simply be based
+# on the project name, with an extra prefix and suffix.
 
-SET(WIDGETS_DIR_NAME "Widgets")
-FILE(GLOB WIDGETS_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/${WIDGETS_DIR_NAME}/*.cxx")
+SET(TARGET_BASE_NAME "KW${PROJECT_NAME}Example")
+
+# The name of our executable and the corresponding source file.
+
+SET(EXE_NAME "${TARGET_BASE_NAME}")
+SET(EXE_SRCS "${EXE_NAME}.cxx")
+
+# On Win32 platforms, let's configure the KWWidgets sample resource file
+# to get a nice application icon and some additional information.
+
+IF(WIN32)
+  SET(RES_FILE "${CMAKE_CURRENT_BINARY_DIR}/${EXE_NAME}.rc")
+  SET(KWWidgets_RESOURCE_APPLICATION_NAME "${EXE_NAME}")
+  SET(KWWidgets_RESOURCE_FILE_NAME "${EXE_NAME}")
+  CONFIGURE_FILE(${KWWidgets_RESOURCES_DIR}/KWWidgets.rc.in ${RES_FILE})
+ENDIF(WIN32)
+
+# This example uses some files from the KWWidgets distribution tree.
+# Let's configure KWWidgets's vtkKWWidgetsPaths.h.in into our
+# own header file so that we can find the paths to KWWidgets files.
+
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+CONFIGURE_FILE(
+  ${KWWidgets_TEMPLATES_DIR}/vtkKWWidgetsPaths.h.in 
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkKWWidgetsPaths.h)
+
+# Now this gets tricky. We are going to iterate over all examples file
+# in the Widgets sub-directory, and create a header file with the expected
+# entry points for each one of them. This allows us to just drop examples
+# in the Widgets sub-directory without having to modify an extra header
+# file or a CMakeLists.txt file.
+
+FILE(GLOB WIDGETS_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/Widgets/*.cxx")
 FOREACH(file ${WIDGETS_SRCS})
   GET_FILENAME_COMPONENT(filename ${file} NAME)
   GET_FILENAME_COMPONENT(WIDGET_NAME ${file} NAME_WE)
@@ -25,33 +62,37 @@ CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/KWWidgetsTourExampleEntryPoints.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/KWWidgetsTourExampleEntryPoints.h
   IMMEDIATE)
-CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/KWWidgetsTourExamplePath.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/KWWidgetsTourExamplePath.h
-  IMMEDIATE)
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
-IF(WIN32)
-  SET(RES_FILE "${CMAKE_CURRENT_BINARY_DIR}/${EXAMPLE_TARGET_NAME}.rc")
-  SET(KWWidgets_RESOURCE_APPLICATION_NAME "${EXAMPLE_TARGET_NAME}")
-  SET(KWWidgets_RESOURCE_FILE_NAME "${EXAMPLE_TARGET_NAME}")
-  CONFIGURE_FILE(${KWWidgets_RESOURCES_DIR}/KWWidgets.rc.in ${RES_FILE})
-ENDIF(WIN32)
+# Create the executable, and link it against the KWWidgets libraries.
 
-ADD_EXECUTABLE(${EXAMPLE_TARGET_NAME} WIN32 ${EXAMPLE_SRCS} ${WIDGETS_SRCS} ${RES_FILE})
-TARGET_LINK_LIBRARIES(${EXAMPLE_TARGET_NAME} ${KWWidgets_LIBRARIES})
+ADD_EXECUTABLE(${EXE_NAME} WIN32 ${EXE_SRCS} ${WIDGETS_SRCS} ${RES_FILE})
+TARGET_LINK_LIBRARIES(${EXE_NAME} ${KWWidgets_LIBRARIES})
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
-CONFIGURE_FILE(
-  ${KWWidgets_TEMPLATES_DIR}/vtkKWWidgetsPaths.h.in 
-  ${CMAKE_CURRENT_BINARY_DIR}/vtkKWWidgetsPaths.h)
+# Install the example target. If you are using this CMakeLists.txt file
+# to create your own application based on KWWidgets, you can most likely 
+# omit this section or change the installation directory, unless you want
+# to install your application right where KWWidgets is already installed.
 
 IF(BUILD_EXAMPLES)
-  INSTALL_TARGETS(${KWWidgets_INSTALL_BIN_DIR} ${EXAMPLE_TARGET_NAME})
-  INSTALL_FILES("${KWWidgets_INSTALL_DATA_DIR}/Examples/Cxx/${EXAMPLE_DIR_NAME}" .cxx ${EXAMPLE_SRCS})
-  INSTALL_FILES("${KWWidgets_INSTALL_DATA_DIR}/Examples/Cxx/${EXAMPLE_DIR_NAME}/${WIDGETS_DIR_NAME}" .cxx ${WIDGETS_SRCS})
+  INSTALL_TARGETS(${KWWidgets_INSTALL_BIN_DIR} ${EXE_NAME})
 ENDIF(BUILD_EXAMPLES)
 
+# Install all individual widgets examples. They are used by the executable
+# to display the C++ and Tcl source code side-by-side.
+
+IF(BUILD_EXAMPLES)
+  INSTALL_FILES(
+    "${KWWidgets_INSTALL_DATA_DIR}/Examples/Cxx/${PROJECT_NAME}/Widgets"
+    .cxx ${WIDGETS_SRCS})
+ENDIF(BUILD_EXAMPLES)
+
+# Register this example as a test. Our executable supports a --test
+# configuration option so that it can be run non-interactively as a test.
+# If you are using this CMakeLists.txt file to create your own application
+# based on KWWidgets, you can most likely omit this section too, unless
+# your application supports that feature too.
+
 IF(BUILD_TESTING)
-  ADD_TEST(Test${EXAMPLE_TARGET_NAME} ${EXECUTABLE_OUTPUT_PATH}/${EXAMPLE_TARGET_NAME} --test)
+  ADD_TEST(Test${EXE_NAME} ${EXECUTABLE_OUTPUT_PATH}/${EXE_NAME} --test)
 ENDIF(BUILD_TESTING)
