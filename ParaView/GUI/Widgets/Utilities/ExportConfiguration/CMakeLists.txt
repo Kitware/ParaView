@@ -50,9 +50,17 @@ SET(KWWidgets_INCLUDE_DIRS_CONFIG ${KWWidgets_INCLUDE_PATH})
 SET(KWWidgets_LIBRARY_DEPENDS_FILE 
   ${KWWidgets_BINARY_DIR}/KWWidgetsLibraryDepends.cmake)
 
-# The resources options.
-SET(KWWidgets_RESOURCE_DIR_CONFIG 
-  ${KWWidgets_RESOURCE_DIR})
+# The examples dir.
+SET(KWWidgets_EXAMPLES_DIR_CONFIG 
+  ${KWWidgets_EXAMPLES_DIR})
+
+# The templates dir.
+SET(KWWidgets_TEMPLATES_DIR_CONFIG 
+  ${KWWidgets_TEMPLATES_DIR})
+
+# The resources dir.
+SET(KWWidgets_RESOURCES_DIR_CONFIG 
+  ${KWWidgets_RESOURCES_DIR})
 
 # The Tcl/Tk options.
 SET(KWWidgets_TCL_PACKAGE_INDEX_DIR_CONFIG 
@@ -112,8 +120,16 @@ SET(KWWidgets_INCLUDE_DIRS_CONFIG
 SET(KWWidgets_LIBRARY_DEPENDS_FILE 
   ${DOLLAR}{KWWidgets_INSTALL_PREFIX}${KWWidgets_INSTALL_PACKAGE_DIR}/KWWidgetsLibraryDepends.cmake)
 
-# The resources options.
-SET(KWWidgets_RESOURCE_DIR_CONFIG 
+# The examples dir.
+SET(KWWidgets_EXAMPLES_DIR_CONFIG 
+  ${DOLLAR}{KWWidgets_INSTALL_PREFIX}${KWWidgets_INSTALL_DATA_DIR}/Examples)
+
+# The templates dir.
+SET(KWWidgets_TEMPLATES_DIR_CONFIG 
+ ${DOLLAR}{KWWidgets_INSTALL_PREFIX}${KWWidgets_INSTALL_INCLUDE_DIR}/Templates)
+
+# The resources dir.
+SET(KWWidgets_RESOURCES_DIR_CONFIG 
   ${DOLLAR}{KWWidgets_INSTALL_PREFIX}${KWWidgets_INSTALL_DATA_DIR}/Resources)
 
 # The Tcl/Tk options.

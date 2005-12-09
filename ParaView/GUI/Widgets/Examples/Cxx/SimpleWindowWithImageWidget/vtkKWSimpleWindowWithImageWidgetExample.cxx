@@ -20,7 +20,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkXMLImageDataReader.h"
 
-#include "vtkKWWidgetsConfigurePaths.h"
+#include "vtkKWWidgetsPaths.h"
 #include "vtkToolkits.h"
 
 #include <vtksys/SystemTools.hxx>
@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSimpleWindowWithImageWidgetExample );
-vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.13");
+vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.14");
 
 //----------------------------------------------------------------------------
 int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
@@ -84,8 +84,7 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
   vtkXMLImageDataReader *reader = vtkXMLImageDataReader::New();
 
   char data_path[2048];
-  sprintf(
-    data_path, "%s/Examples/Data/head100x100x47.vti", KWWidgets_SOURCE_DIR);
+  sprintf(data_path, "%s/Data/head100x100x47.vti", KWWidgets_EXAMPLES_DIR);
   if (!vtksys::SystemTools::FileExists(data_path))
     {
     sprintf(data_path, 
