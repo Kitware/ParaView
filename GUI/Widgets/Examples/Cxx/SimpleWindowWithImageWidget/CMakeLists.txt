@@ -1,34 +1,81 @@
-GET_FILENAME_COMPONENT(EXAMPLE_DIR_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-SET(EXAMPLE_TARGET_NAME "KW${EXAMPLE_DIR_NAME}Example")
-SET(EXAMPLE_SRCS "${EXAMPLE_TARGET_NAME}.cxx")
-SET(EXAMPLE_LIB "${EXAMPLE_TARGET_NAME}Lib")
-SET(EXAMPLE_LIB_SRCS "vtk${EXAMPLE_TARGET_NAME}.cxx")
+PROJECT(SimpleWindowWithImageWidget)
+
+# If we are not in the KWWidgets source tree, make sure we can find KWWidgets
+# as an external package, and use it. If you are using this CMakeLists.txt 
+# file to create your own application based on KWWidgets, you only need the
+# FIND_PACKAGE(...) and INCLUDE(...) commands. 
+
+IF (NOT KWWidgets_SOURCE_DIR)
+  FIND_PACKAGE(KWWidgets REQUIRED)
+  INCLUDE(${KWWidgets_USE_FILE})
+ENDIF (NOT KWWidgets_SOURCE_DIR)
+
+# The name of our targets (executable or libraries) will simply be based
+# on the project name, with an extra prefix and suffix.
+
+SET(TARGET_BASE_NAME "KW${PROJECT_NAME}Example")
+
+# We actually define a class in this example, and we want to be able to
+# use its callbacks from our user interface. To do so, we need to create
+# a library and wrap it automatically for the Tcl language.
+
+SET(LIB_NAME "${TARGET_BASE_NAME}Lib")
+SET(LIB_SRCS "vtk${TARGET_BASE_NAME}.cxx")
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
-VTK_WRAP_TCL3(${EXAMPLE_LIB} EXAMPLE_LIB_TCL_SRCS ${EXAMPLE_LIB_SRCS} "")
-ADD_LIBRARY(${EXAMPLE_LIB} STATIC ${EXAMPLE_LIB_TCL_SRCS} ${EXAMPLE_LIB_SRCS})
+INCLUDE("${VTK_CMAKE_DIR}/vtkWrapTcl.cmake")
+VTK_WRAP_TCL3(${LIB_NAME} LIB_TCL_SRCS ${LIB_SRCS} "")
+
+# Create the library (in static mode for convenience).
+
+ADD_LIBRARY(${LIB_NAME} STATIC ${LIB_TCL_SRCS} ${LIB_SRCS})
+
+# The name of our executable and the corresponding source file.
+
+SET(EXE_NAME "${TARGET_BASE_NAME}")
+SET(EXE_SRCS "${EXE_NAME}.cxx")
+
+# On Win32 platforms, let's configure the KWWidgets sample resource file
+# to get a nice application icon and some additional information.
 
 IF(WIN32)
-  SET(RES_FILE "${CMAKE_CURRENT_BINARY_DIR}/${EXAMPLE_TARGET_NAME}.rc")
-  SET(KWWidgets_RESOURCE_APPLICATION_NAME "${EXAMPLE_TARGET_NAME}")
-  SET(KWWidgets_RESOURCE_FILE_NAME "${EXAMPLE_TARGET_NAME}")
+  SET(RES_FILE "${CMAKE_CURRENT_BINARY_DIR}/${EXE_NAME}.rc")
+  SET(KWWidgets_RESOURCE_APPLICATION_NAME "${EXE_NAME}")
+  SET(KWWidgets_RESOURCE_FILE_NAME "${EXE_NAME}")
   CONFIGURE_FILE(${KWWidgets_RESOURCES_DIR}/KWWidgets.rc.in ${RES_FILE})
 ENDIF(WIN32)
+
+# This example uses some files from the KWWidgets distribution tree.
+# Let's configure KWWidgets's vtkKWWidgetsPaths.h.in into our
+# own header file so that we can find the paths to KWWidgets files.
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 CONFIGURE_FILE(
   ${KWWidgets_TEMPLATES_DIR}/vtkKWWidgetsPaths.h.in 
   ${CMAKE_CURRENT_BINARY_DIR}/vtkKWWidgetsPaths.h)
 
-ADD_EXECUTABLE(${EXAMPLE_TARGET_NAME} WIN32 ${EXAMPLE_SRCS} ${RES_FILE})
-TARGET_LINK_LIBRARIES(${EXAMPLE_TARGET_NAME} ${KWWidgets_LIBRARIES} ${EXAMPLE_LIB})
+# Create the executable, and link it against the KWWidgets libraries and our
+# own library.
+
+ADD_EXECUTABLE(${EXE_NAME} WIN32 ${EXE_SRCS} ${RES_FILE})
+TARGET_LINK_LIBRARIES(${EXE_NAME} ${KWWidgets_LIBRARIES} ${LIB_NAME})
+
+# Install the example target. If you are using this CMakeLists.txt file
+# to create your own application based on KWWidgets, you can most likely 
+# omit this section or change the installation directory, unless you want
+# to install your application right where KWWidgets is already installed.
 
 IF(BUILD_EXAMPLES)
-  INSTALL_TARGETS(${KWWidgets_INSTALL_BIN_DIR} ${EXAMPLE_TARGET_NAME})
-  INSTALL_FILES("${KWWidgets_INSTALL_DATA_DIR}/Examples/Cxx/${EXAMPLE_DIR_NAME}" ${EXAMPLE_TARGET_NAME})
+  INSTALL_TARGETS(${KWWidgets_INSTALL_BIN_DIR} ${EXE_NAME})
 ENDIF(BUILD_EXAMPLES)
 
+# Register this example as a test. Our executable supports a --test
+# configuration option so that it can be run non-interactively as a test.
+# If you are using this CMakeLists.txt file to create your own application
+# based on KWWidgets, you can most likely omit this section too, unless
+# your application supports that feature too.
+
 IF(BUILD_TESTING)
-  ADD_TEST(Test${EXAMPLE_TARGET_NAME} ${EXECUTABLE_OUTPUT_PATH}/${EXAMPLE_TARGET_NAME} --test)
+  ADD_TEST(Test${EXE_NAME} ${EXECUTABLE_OUTPUT_PATH}/${EXE_NAME} --test)
 ENDIF(BUILD_TESTING)
 
