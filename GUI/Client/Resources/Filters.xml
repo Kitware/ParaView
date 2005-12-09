@@ -2982,6 +2982,7 @@ This filter extracts a list of datasets from multigroup datasets.
     </Documentation>
   </Module>
 
+<!--
  <Module name="AttributeEditor"
           root_name="AttributeEditor"
           class="vtkPVAttributeEditor"
@@ -3044,4 +3045,5 @@ If an implicit function is selected, the clip filter returns that portion of the
 This filter operates on all types of data sets, and it returns unstructured grid data on output. This filter is available on the toolbar.
     </Documentation>
   </Module>
+-->
 </ModuleInterfaces>
