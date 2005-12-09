@@ -24,7 +24,8 @@
 struct VTK_EXPORT vtkConnectionID
 {
   // Convenience operators.
-  int operator<(const vtkConnectionID& i) const
+  // Need to use vtkstd_bool type because std: :less requires bool return
+  vtkstd_bool operator<(const vtkConnectionID& i) const
     {
     return this->ID < i.ID;
     }
