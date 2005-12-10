@@ -309,12 +309,15 @@ CONFIGURE_FILE(${PVGUI_SOURCE_DIR}/Client/vtkPVHelpPaths.h.in
   ${PVGUI_BINARY_DIR}/Client/vtkPVHelpPaths.h
   ESCAPE_QUOTES)
 
-IF(WIN32 AND VTK_TK_RESOURCE_FILE)
-  GET_FILENAME_COMPONENT(TK_RESOURCE_PATH ${VTK_TK_RESOURCE_FILE} PATH)
-  INCLUDE_DIRECTORIES(${TK_RESOURCE_PATH})
-  SET(ParaViewBinary_SRCS ${ParaViewBinary_SRCS} Resources/ParaView.rc)
-  SET(PVClient_SRCS ${PVClient_SRCS} Resources/ParaView.rc)
-ENDIF(WIN32 AND VTK_TK_RESOURCE_FILE)
+IF (WIN32)
+  IF (NOT BORLAND)
+    IF(NOT CYGWIN)
+      INCLUDE_DIRECTORIES(${VTK_TK_RESOURCES_DIR})
+      SET(ParaViewBinary_SRCS ${ParaViewBinary_SRCS} Resources/ParaView.rc)
+      SET(PVClient_SRCS ${PVClient_SRCS} Resources/ParaView.rc)
+    ENDIF(NOT CYGWIN)
+  ENDIF (NOT BORLAND)
+ENDIF (WIN32)
 
 SET(PV_EXE_BUILD_LIST paraview pvclient pvTestDriver)
 SET(PV_EXE_INSTALL_LIST paraview pvclient)
