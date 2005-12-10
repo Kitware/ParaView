@@ -63,7 +63,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.267");
+vtkCxxRevisionMacro(vtkKWApplication, "1.268");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -457,15 +457,32 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
 
   const char* relative_dirs[] =
     {
+      "lib",
+      "../lib",
+      "../../lib",
       "../lib/TclTk/lib",
-      "TclTk/lib",
+      "../../lib/TclTk/lib",
       ".." KWWidgets_TclTk_INSTALL_LIB_DIR,    // for exe in PREFIX/bin
       "../.." KWWidgets_TclTk_INSTALL_LIB_DIR, // for exe in PREFIX/lib/foo-V.v
       0
     };
   vtkTclApplicationInitTclTk(interp, relative_dirs);
 
-  return vtkKWApplication::InitializeTcl(interp, err);
+  Tcl_Interp *res = vtkKWApplication::InitializeTcl(interp, err);
+
+  // If we are on Windows, bring a win32 message box since cerr is not
+  // redirected to the command prompt.
+
+#ifdef _WIN32
+  if (!res)
+    {
+    MessageBox(NULL, 
+               "The application failed to initialize Tcl/Tk!", "Error",
+               MB_ICONERROR | MB_OK);
+    }
+#endif
+
+  return res;
 }
 
 //----------------------------------------------------------------------------
