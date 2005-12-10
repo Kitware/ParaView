@@ -63,7 +63,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.268");
+vtkCxxRevisionMacro(vtkKWApplication, "1.269");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -474,7 +474,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
   // redirected to the command prompt.
 
 #ifdef _WIN32
-  if (!res)
+  if (!res && err)
     {
     MessageBox(NULL, 
                "The application failed to initialize Tcl/Tk!", "Error",
