@@ -1,5 +1,6 @@
 # Make sure we have Tcl
 
+INCLUDE(${CMAKE_ROOT}/Modules/FindTCL.cmake)
 IF (NOT TCL_LIBRARY)
   MESSAGE("VTK_WRAP_TCL is ON, but the Tcl library was not found.  Please set TCL_LIBRARY." "Error")
 ENDIF (NOT TCL_LIBRARY)
