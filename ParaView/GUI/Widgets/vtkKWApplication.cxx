@@ -63,7 +63,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.269");
+vtkCxxRevisionMacro(vtkKWApplication, "1.270");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -273,7 +273,7 @@ void vtkKWApplication::PrepareForDelete()
 
   if (this->MainInterp)
     {
-    vtkKWTkUtilities::CancelAllAfterEventHandlers(this->MainInterp);
+    vtkKWTkUtilities::CancelAllTimerHandlers(this->MainInterp);
     }
 }
 
