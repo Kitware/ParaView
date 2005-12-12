@@ -45,19 +45,25 @@ pqPipelineObject::~pqPipelineObject()
 {
   // Clean up the connection lists.
   if(this->Internal)
+    {
     delete this->Internal;
+    }
 }
 
 void pqPipelineObject::SetType(ObjectType type)
 {
   if(this->Type != pqPipelineObject::Window && type != pqPipelineObject::Window)
+    {
     this->Type = type;
+    }
 }
 
 vtkSMProxy *pqPipelineObject::GetProxy() const
 {
   if(this->Type != pqPipelineObject::Window)
+    {
     return this->Data.Proxy;
+    }
   return 0;
 }
 
@@ -70,7 +76,9 @@ void pqPipelineObject::SetProxy(vtkSMProxy *proxy)
 QWidget *pqPipelineObject::GetWidget() const
 {
   if(this->Type == pqPipelineObject::Window)
+    {
     return this->Data.Widget;
+    }
   return 0;
 }
 
@@ -83,7 +91,9 @@ void pqPipelineObject::SetWidget(QWidget *widget)
 pqPipelineObject *pqPipelineObject::GetParent() const
 {
   if(this->Type != pqPipelineObject::Window)
+    {
     return this->Parent.Window;
+    }
   return 0;
 }
 
@@ -99,27 +109,35 @@ void pqPipelineObject::SetParent(pqPipelineObject *parent)
 pqPipelineServer *pqPipelineObject::GetServer() const
 {
   if(this->Type == pqPipelineObject::Window)
+    {
     return this->Parent.Server;
+    }
   return 0;
 }
 
 void pqPipelineObject::SetServer(pqPipelineServer *server)
 {
   if(this->Type == pqPipelineObject::Window)
+    {
     this->Parent.Server = server;
+    }
 }
 
 int pqPipelineObject::GetInputCount() const
 {
   if(this->Internal)
+    {
     return this->Internal->Inputs.size();
+    }
   return 0;
 }
 
 pqPipelineObject *pqPipelineObject::GetInput(int index) const
 {
   if(this->Internal && index >= 0 && index < this->Internal->Inputs.size())
+    {
     return this->Internal->Inputs[index];
+    }
   return 0;
 }
 
@@ -131,7 +149,9 @@ bool pqPipelineObject::HasInput(pqPipelineObject *input) const
     for( ; iter != this->Internal->Inputs.end(); ++iter)
       {
       if(*iter == input)
+        {
         return true;
+        }
       }
     }
 
@@ -141,7 +161,9 @@ bool pqPipelineObject::HasInput(pqPipelineObject *input) const
 void pqPipelineObject::AddInput(pqPipelineObject *intput)
 {
   if(this->Internal && intput)
+    {
     this->Internal->Inputs.append(intput);
+    }
 }
 
 void pqPipelineObject::RemoveInput(pqPipelineObject *input)
@@ -163,14 +185,18 @@ void pqPipelineObject::RemoveInput(pqPipelineObject *input)
 int pqPipelineObject::GetOutputCount() const
 {
   if(this->Internal)
+    {
     return this->Internal->Outputs.size();
+    }
   return 0;
 }
 
 pqPipelineObject *pqPipelineObject::GetOutput(int index) const
 {
   if(this->Internal && index >= 0 && index < this->Internal->Outputs.size())
+    {
     return this->Internal->Outputs[index];
+    }
   return 0;
 }
 
@@ -182,7 +208,9 @@ bool pqPipelineObject::HasOutput(pqPipelineObject *output) const
     for( ; iter != this->Internal->Outputs.end(); ++iter)
       {
       if(*iter == output)
+        {
         return true;
+        }
       }
     }
 
@@ -192,7 +220,9 @@ bool pqPipelineObject::HasOutput(pqPipelineObject *output) const
 void pqPipelineObject::AddOutput(pqPipelineObject *output)
 {
   if(this->Internal && output)
+    {
     this->Internal->Outputs.append(output);
+    }
 }
 
 void pqPipelineObject::RemoveOutput(pqPipelineObject *output)
