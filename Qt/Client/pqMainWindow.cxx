@@ -30,6 +30,8 @@
 #include "pqSetData.h"
 #include "pqSetName.h"
 #include "pqSMAdaptor.h"
+#include "pqPicking.h"
+#include "pqDataSetModel.h"
 
 // TEMP
 #include "pqChartValue.h"
@@ -51,6 +53,7 @@
 #include <QMessageBox>
 #include <QToolBar>
 #include <QTreeView>
+#include <QTableView>
 #include <QSignalMapper>
 
 #include <vtkRenderWindow.h>
@@ -66,8 +69,12 @@
 #include <vtkSMXMLParser.h>
 #include <vtkTesting.h>
 #include <vtkPVGenericRenderWindowInteractor.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkInteractorStyle.h>
+#include <vtkUnstructuredGrid.h>
 
 #include <QVTKWidget.h>
+#include <vtkEventQtSlotConnect.h>
 
 #include <pqEventPlayer.h>
 #include <pqEventPlayerXML.h>
@@ -86,7 +93,9 @@ pqMainWindow::pqMainWindow() :
   PipelineDock(0),
   ChartWidget(0),
   ChartDock(0),
-  ActiveView(0)
+  ActiveView(0),
+  ElementInspectorWidget(0),
+  ElementInspectorDock(0)
 {
   this->setObjectName("mainWindow");
   this->setWindowTitle(QByteArray("ParaQ Client") + QByteArray(" ") + QByteArray(QT_CLIENT_VERSION));
@@ -260,9 +269,31 @@ pqMainWindow::pqMainWindow() :
 
     this->addDockWidget(Qt::BottomDockWidgetArea, this->ChartDock);
     }
+  
+  // Add the element inspector dock window.
+  this->ElementInspectorDock = new QDockWidget("Element Inspector View", this);
+  if(this->ElementInspectorDock)
+    {
+    this->ElementInspectorDock->setObjectName("ElementInspectorDock");
+    this->ElementInspectorDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
+    this->ElementInspectorDock->setAllowedAreas(Qt::BottomDockWidgetArea |
+        Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+
+    this->ElementInspectorWidget = new QTableView(this->ElementInspectorDock);
+    if(this->ElementInspectorWidget)
+      {
+      this->ElementInspectorWidget->setObjectName("ElementInspectorWidget");
+      this->ElementInspectorDock->setWidget(this->ElementInspectorWidget);
+      }
+
+    this->addDockWidget(Qt::BottomDockWidgetArea, this->ElementInspectorDock);
+    }
 
   this->setServer(0);
   this->Adaptor = new pqSMAdaptor;
+
+  this->VTKConnector = vtkEventQtSlotConnect::New();
+  
 }
 
 pqMainWindow::~pqMainWindow()
@@ -281,6 +312,7 @@ pqMainWindow::~pqMainWindow()
     this->MultiViewManager = 0;
     }
 
+  this->VTKConnector->Delete();
   delete this->PropertyToolbar;
   delete this->CurrentServer;
   delete this->Adaptor;
@@ -727,6 +759,7 @@ void pqMainWindow::onNewQVTKWidget(pqMultiViewFrame* parent)
   QVTKWidget* w = new QVTKWidget(parent);
   parent->setMainWidget(w);
 
+
   // gotta tell SM about window positions
   pqMultiViewRenderModuleUpdater* u = new pqMultiViewRenderModuleUpdater(view, this->MultiViewManager, w);
   w->installEventFilter(u);
@@ -739,6 +772,13 @@ void pqMainWindow::onNewQVTKWidget(pqMultiViewFrame* parent)
   iren->SetPVRenderView(vp);
   vp->Delete();
   iren->Enable();
+  
+  pqPicking* picking = new pqPicking(view, w);
+  this->VTKConnector->Connect(iren, vtkCommand::CharEvent, 
+                              picking, SLOT(computeSelection(vtkObject*,unsigned long, void*, void*, vtkCommand*)),
+                              NULL, 1.0);
+  QObject::connect(picking, SIGNAL(selectionChanged(vtkSMSourceProxy*, vtkUnstructuredGrid*)),
+                   this, SLOT(onNewSelections(vtkSMSourceProxy*, vtkUnstructuredGrid*)));
 
   // Keep a map of window to render module. Add the new window to the
   // pipeline data structure.
@@ -783,4 +823,22 @@ void pqMainWindow::onFrameActive(QWidget* w)
 
   this->ActiveView = qobject_cast<pqMultiViewFrame*>(w);
 }
+
+void pqMainWindow::onNewSelections(vtkSMSourceProxy*, vtkUnstructuredGrid* selections)
+{
+  QAbstractItemModel* oldModel = this->ElementInspectorWidget->model();
+
+  pqDataSetModel* newModel = new pqDataSetModel(this->ElementInspectorWidget);
+  this->ElementInspectorWidget->setModel(newModel);
+  newModel->setDataSet(selections);
+  
+  if(oldModel)
+    {
+    delete oldModel;
+    }
+
+  this->ElementInspectorWidget->update();
+
+}
+
 

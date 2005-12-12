@@ -12,6 +12,7 @@ INCLUDE_DIRECTORIES(
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqConsoleWidget.h
+  pqDataSetModel.h
   pqFileDialog.h
   pqFileDialogModel.h
   pqLocalFileDialogModel.h
@@ -21,6 +22,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqObjectInspector.h
   pqObjectInspectorItem.h
   pqObjectInspectorWidget.h
+  pqPicking.h
   pqPipelineData.h
   pqPipelineListModel.h
   pqPipelineListWidget.h
@@ -64,6 +66,8 @@ ADD_LIBRARY(QtWidgets
   pqConnect.h
   pqConsoleWidget.cxx
   pqConsoleWidget.h
+  pqDataSetModel.cxx
+  pqDataSetModel.h
   pqFileDialog.cxx
   pqFileDialog.h
   pqFileDialogModel.cxx
@@ -88,6 +92,8 @@ ADD_LIBRARY(QtWidgets
   pqOptions.h
   pqParts.cxx
   pqParts.h
+  pqPicking.cxx
+  pqPicking.h
   pqPipelineData.cxx
   pqPipelineData.h
   pqPipelineListModel.cxx

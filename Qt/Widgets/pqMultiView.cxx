@@ -57,10 +57,14 @@ QWidget* pqMultiView::replaceView(pqMultiView::Index index, QWidget* widget)
       sizes = splitter->sizes();
       }
 
+    splitter->hide();
+
     // remove widget
     w->setParent(NULL);
     // add replacement at same location
     splitter->insertWidget(location, widget);
+    
+    splitter->show();
 
     // ensure same splitter sizes
     if(splitter->count() > 1)
@@ -146,6 +150,7 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index, Qt::Orientat
     {
     // get parent sizes
     QList<int> parentsizes = splitter->sizes();
+    splitter->hide();
     
     int location = splitter->indexOf(w);
     QSplitter* newSplitter = makeNewSplitter(orientation);
@@ -158,6 +163,7 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index, Qt::Orientat
     newFrame = makeNewFrame();
     newSplitter->addWidget(newFrame);
     
+    splitter->show();
     // ensure same sizes for parent splitter
     splitter->setSizes(parentsizes);
 

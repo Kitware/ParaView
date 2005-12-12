@@ -25,12 +25,15 @@ class pqMultiViewFrame;
 class vtkSMSourceProxy;
 class QVTKWidget;
 class vtkSMRenderModuleProxy;
+class vtkEventQtSlotConnect;
+class vtkUnstructuredGrid;
 
 class QAction;
 class QDockWidget;
 class QToolBar;
 class QTreeView;
 class QTabWidget;
+class QTableView;
 
 /// Provides the main window for the ParaQ application
 class pqMainWindow :
@@ -66,6 +69,10 @@ private:
   pqHistogramWidget *ChartWidget;
   QDockWidget *ChartDock;
   pqMultiViewFrame* ActiveView;
+  QTableView *ElementInspectorWidget;
+  QDockWidget *ElementInspectorDock;
+
+  vtkEventQtSlotConnect* VTKConnector;
 
 private slots:
   
@@ -94,6 +101,8 @@ private slots:
   void onCreateSource(QAction*);
   void onCreateFilter(QAction*);
   void onOpenLinkEditor();
+
+  void onNewSelections(vtkSMSourceProxy* p, vtkUnstructuredGrid* selections);
   
   void onRecordTest();
   void onRecordTest(const QStringList& Files);

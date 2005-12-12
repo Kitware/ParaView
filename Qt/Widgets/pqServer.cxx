@@ -26,6 +26,8 @@
 #include <vtkSMMultiViewRenderModuleProxy.h>
 
 #include <cassert>
+  
+vtkSMApplication* pqServer::ServerManager = 0;
 
 // Client / server wrapper initialization functions
 extern "C" void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
@@ -224,9 +226,9 @@ pqServer::pqServer(pqOptions* options, vtkProcessModule* process_module, vtkSMAp
   FriendlyName(),
   Options(options),
   ProcessModule(process_module),
-  ServerManager(server_manager),
   RenderModule(render_module)
 {
+  pqServer::ServerManager = server_manager;
   this->FriendlyName = this->getAddress();
 }
 

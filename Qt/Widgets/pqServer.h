@@ -35,7 +35,7 @@ public:
   void setFriendlyName(const QString& name);
 
   vtkProcessModule* GetProcessModule();
-  vtkSMProxyManager* GetProxyManager();
+  static vtkSMProxyManager* GetProxyManager();
   vtkSMMultiViewRenderModuleProxy* GetRenderModule();
 
 private:
@@ -46,7 +46,7 @@ private:
   QString FriendlyName;
   pqOptions* const Options;
   vtkProcessModule* const ProcessModule;
-  vtkSMApplication* const ServerManager;
+  static vtkSMApplication* ServerManager;
   vtkSMMultiViewRenderModuleProxy* const RenderModule;
 };
 
