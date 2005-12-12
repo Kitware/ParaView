@@ -26,7 +26,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.54");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.55");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -956,7 +956,6 @@ void vtkKWSelectionFrame::InvokeSelectionListCommand(
       *this->SelectionListCommand && 
       this->IsCreated())
     {
-    //this->Script("eval {%s {%s} %s}",
     this->Script("%s {%s} %s",
                  this->SelectionListCommand, item, obj->GetTclName());
     }
@@ -974,7 +973,6 @@ void vtkKWSelectionFrame::InvokeCloseCommand(vtkKWSelectionFrame *obj)
 {
   if (this->CloseCommand && *this->CloseCommand && this->IsCreated())
     {
-    //this->Script("eval {%s %s}",
     this->Script("%s %s",
                  this->CloseCommand, obj->GetTclName());
     }
@@ -992,7 +990,6 @@ void vtkKWSelectionFrame::InvokeSelectCommand(vtkKWSelectionFrame *obj)
 {
   if (this->SelectCommand && *this->SelectCommand && this->IsCreated())
     {
-    //this->Script("eval {%s %s}", this->SelectCommand, obj->GetTclName());
     this->Script("%s %s", this->SelectCommand, obj->GetTclName());
     }
 }
@@ -1010,7 +1007,6 @@ void vtkKWSelectionFrame::InvokeDoubleClickCommand(vtkKWSelectionFrame *obj)
   if (this->DoubleClickCommand && *this->DoubleClickCommand && 
       this->IsCreated())
     {
-    //this->Script("eval {%s %s}",
     this->Script("%s %s",
                  this->DoubleClickCommand, obj->GetTclName());
     }
@@ -1029,7 +1025,6 @@ void vtkKWSelectionFrame::InvokeChangeTitleCommand(vtkKWSelectionFrame *obj)
   if (this->ChangeTitleCommand && *this->ChangeTitleCommand && 
       this->IsCreated())
     {
-    //this->Script("eval {%s %s}",
     this->Script("%s %s",
                  this->ChangeTitleCommand, obj->GetTclName());
     }
@@ -1048,7 +1043,6 @@ void vtkKWSelectionFrame::InvokeTitleChangedCommand(vtkKWSelectionFrame *obj)
   if (this->TitleChangedCommand && *this->TitleChangedCommand && 
       this->IsCreated())
     {
-    //this->Script("eval {%s %s}",
     this->Script("%s %s",
                  this->TitleChangedCommand, obj->GetTclName());
     }

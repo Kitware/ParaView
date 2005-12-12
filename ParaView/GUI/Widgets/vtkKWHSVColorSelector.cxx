@@ -21,7 +21,7 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.18");
+vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.19");
 vtkStandardNewMacro(vtkKWHSVColorSelector);
 
 #define VTK_KW_HSV_SEL_POINT_RADIUS_MIN     2
@@ -434,12 +434,10 @@ void vtkKWHSVColorSelector::InvokeCommandWithColor(
       {
       double r, g, b;
       vtkMath::HSVToRGB(h, s, v, &r, &g, &b);
-      //this->Script("eval %s %lf %lf %lf", command, r, g, b);
       this->Script("%s %lf %lf %lf", command, r, g, b);
       }
     else
       {
-      //this->Script("eval %s %lf %lf %lf", command, h, s, v);
       this->Script("%s %lf %lf %lf", command, h, s, v);
       }
     }

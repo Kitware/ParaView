@@ -99,7 +99,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextPropertyEditor);
-vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.18");
+vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.19");
 
 // ----------------------------------------------------------------------------
 vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
@@ -1083,7 +1083,6 @@ void vtkKWTextPropertyEditor::InvokeColorChangedCommand(
   if (this->GetApplication() &&
       this->ColorChangedCommand && *this->ColorChangedCommand)
     {
-    //this->Script("eval %s %lf %lf %lf", this->ColorChangedCommand, r, g, b);
     this->Script("%s %lf %lf %lf", this->ColorChangedCommand, r, g, b);
     }
 }

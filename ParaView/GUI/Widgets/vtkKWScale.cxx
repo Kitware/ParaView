@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.110");
+vtkCxxRevisionMacro(vtkKWScale, "1.111");
 
 //----------------------------------------------------------------------------
 vtkKWScale::vtkKWScale()
@@ -307,12 +307,10 @@ void vtkKWScale::InvokeScaleCommand(const char *command, double value)
     // invoke the callback with the approriate type.
     if ((double)((long int)value) == value)
       {
-      //this->Script("eval %s %ld", command, (long int)value);
       this->Script("%s %ld", command, (long int)value);
       }
     else
       {
-      //this->Script("eval %s %lf", command, value);
       this->Script("%s %lf", command, value);
       }
     }

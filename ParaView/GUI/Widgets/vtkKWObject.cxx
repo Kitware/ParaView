@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWObject);
-vtkCxxRevisionMacro(vtkKWObject, "1.58");
+vtkCxxRevisionMacro(vtkKWObject, "1.59");
 
 vtkCxxSetObjectMacro(vtkKWObject, Application, vtkKWApplication);
 
@@ -99,60 +99,14 @@ const char* vtkKWObject::Script(const char* format, ...)
   return NULL;
 }
 
-
 //----------------------------------------------------------------------------
 void vtkKWObject::SetObjectMethodCommand(
   char **command, 
   vtkObject *object, 
   const char *method)
 {
-  if (*command)
-    {
-    delete [] *command;
-    *command = NULL;
-    }
-
-  const char *object_name = NULL;
-  if (object)
-    {
-    vtkKWObject *kw_object = vtkKWObject::SafeDownCast(object);
-    if (kw_object)
-      {
-      object_name = kw_object->GetTclName();
-      }
-    else
-      {
-      if (!this->GetApplication())
-        {
-        vtkErrorMacro(
-          "Attempt to create a Tcl instance before the application was set!");
-        }
-      else
-        {
-        object_name = vtkKWTkUtilities::GetTclNameFromPointer(
-          this->GetApplication(), object);
-        }
-      }
-    }
-
-  size_t object_len = object_name ? strlen(object_name) + 1 : 0;
-  size_t method_len = method ? strlen(method) : 0;
-
-  *command = new char[object_len + method_len + 1];
-  if (object_name && method)
-    {
-    sprintf(*command, "%s %s", object_name, method);
-    }
-  else if (object_name)
-    {
-    sprintf(*command, "%s", object_name);
-    }
-  else if (method)
-    {
-    sprintf(*command, "%s", method);
-    }
-
-  (*command)[object_len + method_len] = '\0';
+  vtkKWTkUtilities::CreateObjectMethodCommand(
+    this->GetApplication(), command, object, method);
 }
 
 //----------------------------------------------------------------------------
@@ -160,8 +114,8 @@ void vtkKWObject::InvokeObjectMethodCommand(const char *command)
 {
   if (command && *command && this->GetApplication())
     {
-    //this->Script("eval %s", command);
-    this->Script(command);
+    vtkKWTkUtilities::EvaluateSimpleString(
+      this->GetApplication(), command);
     }
 }
 

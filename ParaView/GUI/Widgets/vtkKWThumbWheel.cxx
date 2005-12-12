@@ -34,7 +34,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.45");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.46");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -1037,12 +1037,10 @@ void vtkKWThumbWheel::InvokeThumbWheelCommand(
     // invoke the callback with the approriate type.
     if ((double)((long int)value) == value)
       {
-      //this->Script("eval %s %ld", command, (long int)value);
       this->Script("%s %ld", command, (long int)value);
       }
     else
       {
-      //this->Script("eval %s %lf", command, value);
       this->Script("%s %lf", command, value);
       }
     }

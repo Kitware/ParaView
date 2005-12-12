@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDragAndDropTargetSet );
-vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.13");
+vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.14");
 
 //----------------------------------------------------------------------------
 class vtkKWDragAndDropTargetSetInternals
@@ -247,7 +247,6 @@ void vtkKWDragAndDropTargetSet::InvokeCommandWithCoordinates(
 {
   if (command && *command)
     {
-    //this->Script("eval %s %d %d", command, x, y);
     this->Script("%s %d %d", command, x, y);
     }
 }
@@ -549,7 +548,6 @@ void vtkKWDragAndDropTargetSet::StartCallback(int x, int y)
           vtkErrorMacro("Error! SourceAnchor's application not set!");
           continue;
           }
-        //this->Script("eval %s %d %d %s %s", 
         this->Script("%s %d %d %s %s", 
                      (*it)->StartCommand, x, y, 
                      this->Source ? this->Source->GetTclName() : "", 
@@ -591,7 +589,6 @@ void vtkKWDragAndDropTargetSet::PerformCallback(int x, int y)
           vtkErrorMacro("Error! SourceAnchor's application not set!");
           continue;
           }
-        //this->Script("eval %s %d %d %s %s", 
         this->Script("%s %d %d %s %s", 
                      (*it)->PerformCommand, x, y, 
                      this->Source ? this->Source->GetTclName() : "", 
@@ -653,7 +650,6 @@ void vtkKWDragAndDropTargetSet::EndCallback(int x, int y)
           vtkErrorMacro("Error! SourceAnchor's application not set!");
           continue;
           }
-        //this->Script("eval %s %d %d %s %s %s", 
         this->Script("%s %d %d %s %s %s", 
                      (*it)->EndCommand, x, y, 
                      this->Source ? this->Source->GetTclName() : "", 

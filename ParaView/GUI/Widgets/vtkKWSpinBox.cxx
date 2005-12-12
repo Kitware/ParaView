@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSpinBox);
-vtkCxxRevisionMacro(vtkKWSpinBox, "1.9");
+vtkCxxRevisionMacro(vtkKWSpinBox, "1.10");
 
 //----------------------------------------------------------------------------
 vtkKWSpinBox::vtkKWSpinBox() 
@@ -162,12 +162,10 @@ void vtkKWSpinBox::InvokeCommand(double value)
     // invoke the callback with the approriate type.
     if ((double)((long int)value) == value)
       {
-      //this->Script("eval %s %ld", this->Command, (long int)value);
       this->Script("%s %ld", this->Command, (long int)value);
       }
     else
       {
-      //this->Script("eval %s %lf", this->Command, value);
       this->Script("%s %lf", this->Command, value);
       }
     }
