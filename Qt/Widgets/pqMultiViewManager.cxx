@@ -26,6 +26,12 @@ pqMultiViewManager::pqMultiViewManager(QWidget* parent)
 
 pqMultiViewManager::~pqMultiViewManager()
 {
+  // emit signals for removing frames
+  QList<pqMultiViewFrame*> frames = this->findChildren<pqMultiViewFrame*>();
+  foreach(pqMultiViewFrame* v, frames)
+    {
+    this->removeWidget(v);
+    }
 }
 
 bool pqMultiViewManager::eventFilter(QObject*, QEvent* e)
