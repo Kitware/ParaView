@@ -23,6 +23,10 @@
 
 class vtkPVXMLParser;
 
+//BTX
+struct vtkPVXMLElementInternals;
+//ETX
+
 class VTK_EXPORT vtkPVXMLElement : public vtkObject
 {
 public:
@@ -77,35 +81,39 @@ public:
   // Lookup the element with the given id, starting at this scope.
   vtkPVXMLElement* LookupElement(const char* id);
 
+  // Description:
+  // Given it's name and value, add an attribute.
+  void AddAttribute(const char* attrName, const char* attrValue);
+  void AddAttribute(const char* attrName, unsigned int attrValue);
+  void AddAttribute(const char* attrName, int attrValue);
+  void AddAttribute(const char* attrName, double attrValue);
+
+  // Description:
+  // Add a sub-element. The parent element keeps a reference to
+  // sub-element.
+  void AddNestedElement(vtkPVXMLElement* element);
+
+  vtkSetStringMacro(Name);
+
+  void PrintXML(ostream& os, vtkIndent indent);
+
 protected:
   vtkPVXMLElement();
   ~vtkPVXMLElement();
 
+  vtkPVXMLElementInternals* Internal;
+
   char* Name;
   char* Id;
-
-  // The raw property name/value pairs read from the XML attributes.
-  char** AttributeNames;
-  char** AttributeValues;
-  unsigned int NumberOfAttributes;
-  unsigned int AttributesSize;
-
-  // The set of nested elements.
-  unsigned int NumberOfNestedElements;
-  unsigned int NestedElementsSize;
-  vtkPVXMLElement** NestedElements;
 
   // The parent of this element.
   vtkPVXMLElement* Parent;
 
   // Method used by vtkPVXMLParser to setup the element.
-  vtkSetStringMacro(Name);
   vtkSetStringMacro(Id);
   void ReadXMLAttributes(const char** atts);
-  void AddNestedElement(vtkPVXMLElement* element);
   void AddCharacterData(const char* data, int length);
 
-  void PrintXML(ostream& os, vtkIndent indent);
 
   // Internal utility methods.
   vtkPVXMLElement* LookupElementInScope(const char* id);
