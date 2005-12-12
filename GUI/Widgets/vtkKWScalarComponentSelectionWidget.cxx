@@ -21,7 +21,7 @@
 #include "vtkKWMenu.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.17");
+vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.18");
 vtkStandardNewMacro(vtkKWScalarComponentSelectionWidget);
 
 //----------------------------------------------------------------------------
@@ -258,7 +258,6 @@ vtkKWScalarComponentSelectionWidget::InvokeSelectedComponentChangedCommand(
       *this->SelectedComponentChangedCommand && 
       this->GetApplication())
     {
-    //this->Script("eval %s %d", 
     this->Script("%s %d", 
                  this->SelectedComponentChangedCommand, comp);
     }

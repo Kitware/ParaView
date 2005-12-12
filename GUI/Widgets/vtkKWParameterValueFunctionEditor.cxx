@@ -34,7 +34,7 @@
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.78");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.79");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -3709,7 +3709,6 @@ void vtkKWParameterValueFunctionEditor::InvokePointCommand(
   if (command && *command && !this->DisableCommands && 
       this->HasFunction() && id >= 0 && id < this->GetFunctionSize())
     {
-    //this->Script("eval %s %d %s", command, id, (extra ? extra : ""));
     this->Script("%s %d %s", command, id, (extra ? extra : ""));
     }
 }
@@ -3730,7 +3729,6 @@ void vtkKWParameterValueFunctionEditor::InvokeHistogramLogModeChangedCommand(
       *this->HistogramLogModeChangedCommand && 
       this->GetApplication())
     {
-    //this->Script("eval %s %d", this->HistogramLogModeChangedCommand, mode);
     this->Script("%s %d", this->HistogramLogModeChangedCommand, mode);
     }
 }
@@ -3918,7 +3916,6 @@ void vtkKWParameterValueFunctionEditor::InvokeParameterCursorMovingCommand(
       *this->ParameterCursorMovingCommand && 
       this->GetApplication())
     {
-    //this->Script("eval %s %lf", this->ParameterCursorMovingCommand, pos);
     this->Script("%s %lf", this->ParameterCursorMovingCommand, pos);
     }
 
@@ -3942,7 +3939,6 @@ void vtkKWParameterValueFunctionEditor::InvokeParameterCursorMovedCommand(
       *this->ParameterCursorMovedCommand && 
       this->GetApplication())
     {
-    //this->Script("eval %s %lf", this->ParameterCursorMovedCommand, pos);
     this->Script("%s %lf", this->ParameterCursorMovedCommand, pos);
     }
 

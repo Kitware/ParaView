@@ -61,7 +61,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.11");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.12");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -1147,7 +1147,6 @@ int vtkKWSimpleAnimationWidget::InvokeSliceGetCommand()
   if (this->SliceGetCommand && *this->SliceGetCommand && 
       this->GetApplication())
     {
-    //return atoi(this->Script("eval %s", this->SliceGetCommand));
     return atoi(this->Script(this->SliceGetCommand));
     }
   return 0;
@@ -1174,7 +1173,6 @@ int vtkKWSimpleAnimationWidget::InvokeSliceGetMinCommand()
   if (this->SliceGetMinCommand && *this->SliceGetMinCommand && 
       this->GetApplication())
     {
-    //return atoi(this->Script("eval %s", this->SliceGetMinCommand));
     return atoi(this->Script(this->SliceGetMinCommand));
     }
   return 0;
@@ -1186,7 +1184,6 @@ int vtkKWSimpleAnimationWidget::InvokeSliceGetMaxCommand()
   if (this->SliceGetMaxCommand && *this->SliceGetMaxCommand && 
       this->GetApplication())
     {
-    //return atoi(this->Script("eval %s", this->SliceGetMaxCommand));
     return atoi(this->Script(this->SliceGetMaxCommand));
     }
   return 0;
@@ -1205,7 +1202,6 @@ void vtkKWSimpleAnimationWidget::InvokeSliceSetCommand(int slice)
   if (this->SliceSetCommand && *this->SliceSetCommand && 
       this->GetApplication())
     {
-    //this->Script("eval %s %d", this->SliceSetCommand, slice);
     this->Script("%s %d", this->SliceSetCommand, slice);
     }
 }

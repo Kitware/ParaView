@@ -83,9 +83,11 @@ protected:
 
   // Description:
   // Convenience method that can be used to create a Tcl callback command.
-  // The first argument is a pointer to the command/callback to be created, 
-  // the second is the object that the method will be called on, the third is
-  // the name of the method itself and any arguments in string form. 
+  // The 'command' argument is a pointer to the command to be created.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   // Note that 'command' is allocated automatically using the 'new' 
   // operator. If it is not NULL, it is deallocated first using 'delete []'.
   virtual void SetObjectMethodCommand(

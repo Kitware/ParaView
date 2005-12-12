@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.45");
+vtkCxxRevisionMacro(vtkKWExtent, "1.46");
 
 //----------------------------------------------------------------------------
 vtkKWExtent::vtkKWExtent()
@@ -317,7 +317,6 @@ void vtkKWExtent::InvokeExtentCommand(
         (double)((long int)y0) == y0 && (long double)((int)y1) == y1 &&
         (double)((long int)z0) == z0 && (long double)((int)z1) == z1)
       {
-      //this->Script("eval %s %ld %ld %ld %ld %ld %ld", 
       this->Script("%s %ld %ld %ld %ld %ld %ld", 
                    command, 
                    (long int)x0, (long int)x1, 
@@ -326,7 +325,6 @@ void vtkKWExtent::InvokeExtentCommand(
       }
     else
       {
-      //this->Script("eval %s %lf %lf %lf %lf %lf %lf", 
       this->Script("%s %lf %lf %lf %lf %lf %lf", 
                    command, x0, x1, y0, y1, z0, z1);
       }

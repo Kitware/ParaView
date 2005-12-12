@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.36");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.37");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarSetInternals
@@ -893,7 +893,6 @@ void vtkKWToolbarSet::InvokeToolbarVisibilityChangedCommand(
       *this->ToolbarVisibilityChangedCommand && 
       this->GetApplication())
     {
-    //this->Script("eval {%s %s}",
     this->Script("%s %s",
                  this->ToolbarVisibilityChangedCommand, 
                  toolbar->GetTclName());
