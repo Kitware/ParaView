@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);
-vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.22");
+vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.23");
 
 struct vtkSMIntVectorPropertyInternals
 {
@@ -289,25 +289,24 @@ int vtkSMIntVectorProperty::ReadXMLAttributes(vtkSMProxy* parent,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIntVectorProperty::SaveState(
-  const char* name, ostream* file, vtkIndent indent)
+void vtkSMIntVectorProperty::ChildSaveState(vtkPVXMLElement* propertyElement)
 {
+  this->Superclass::ChildSaveState(propertyElement);
+
   unsigned int size = this->GetNumberOfElements();
-  *file << indent << "<Property name=\"" << (this->XMLName?this->XMLName:"")
-        << "\" id=\"" << name << "\" ";
   if (size > 0)
     {
-    *file << "number_of_elements=\"" << size << "\"";
+    propertyElement->AddAttribute("number_of_elements", size);
     }
-  *file << ">" << endl;
   for (unsigned int i=0; i<size; i++)
     {
-    *file << indent.GetNextIndent() << "<Element index=\""
-          << i << "\" " << "value=\"" << this->GetElement(i) << "\"/>"
-          << endl;
+    vtkPVXMLElement* elementElement = vtkPVXMLElement::New();
+    elementElement->SetName("Element");
+    elementElement->AddAttribute("index", i);
+    elementElement->AddAttribute("value", this->GetElement(i));
+    propertyElement->AddNestedElement(elementElement);
+    elementElement->Delete();
     }
-  this->Superclass::SaveState(name, file, indent);
-  *file << indent << "</Property>" << endl;
 }
 
 //---------------------------------------------------------------------------

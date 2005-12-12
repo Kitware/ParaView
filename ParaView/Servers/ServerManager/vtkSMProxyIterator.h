@@ -89,8 +89,6 @@ protected:
 
   int Mode;
 
-  virtual void SaveState(const char*, ostream*, vtkIndent) {}
-
 private:
   vtkSMProxyIteratorInternals* Internals;
 

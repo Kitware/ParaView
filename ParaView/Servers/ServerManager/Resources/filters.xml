@@ -2768,8 +2768,8 @@
         number_of_elements="1"
         default_values="0" >
        <EnumerationDomain name="enum">
-         <Entry value="0" text="On"/>
-         <Entry value="1" text="Off"/>
+         <Entry value="0" text="Off"/>
+         <Entry value="1" text="On"/>
        </EnumerationDomain>
      </IntVectorProperty>
 
@@ -3340,13 +3340,6 @@
              <Property name="Input" function="Input"/>
           </RequiredProperties>
        </NumberOfGroupsDomain>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="InputGroups"
-        command="GetInputGroups"
-        information_only="1">
-        <SimpleIntInformationHelper/>
      </IntVectorProperty>
    <!-- End ExtractLevel -->
    </SourceProxy>

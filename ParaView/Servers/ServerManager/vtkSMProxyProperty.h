@@ -156,7 +156,7 @@ protected:
 
   // Description:
   // Saves the state of the object in XML format. 
-  virtual void SaveState(const char* name,  ostream* file, vtkIndent indent);
+  virtual void ChildSaveState(vtkPVXMLElement* parent);
 
   // Description:
 

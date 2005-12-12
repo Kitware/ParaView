@@ -30,7 +30,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.35");
+vtkCxxRevisionMacro(vtkSMProperty, "1.36");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -389,26 +389,48 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProperty::SaveState(const char* name, ostream* file, vtkIndent indent)
+void vtkSMProperty::ChildSaveState(vtkPVXMLElement* /*propertyElement*/)
 {
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::SaveState(vtkPVXMLElement* parent, const char* uid)
+{
+  vtkPVXMLElement* propertyElement = vtkPVXMLElement::New();
+  propertyElement->SetName("Property");
+  propertyElement->AddAttribute("name", this->XMLName);
+  propertyElement->AddAttribute("id", uid);
+
   if (this->ControllerProxy && this->ControllerProperty)
     {
-    *file << "    <ControllerProperty name=\""
-      << this->ControllerProxy->GetName() << "." 
-      << this->ControllerProperty->GetXMLName() 
-      << "\" />" << endl;
+    vtkPVXMLElement* controllerProxyElem = vtkPVXMLElement::New();
+    controllerProxyElem->SetName("ControllerProperty");
+    ostrstream cpName;
+    cpName << this->ControllerProxy->GetName() << "." 
+           << this->ControllerProperty->GetXMLName() 
+           << ends;
+    controllerProxyElem->AddAttribute("name", cpName.str());
+    delete[] cpName.str();
+    propertyElement->AddNestedElement(controllerProxyElem);
+    controllerProxyElem->Delete();
     }
+
+  this->ChildSaveState(propertyElement);
+
   this->DomainIterator->Begin();
   while(!this->DomainIterator->IsAtEnd())
     {
     ostrstream dname;
-    dname << name << "." << this->DomainIterator->GetKey() << ends;
-    this->DomainIterator->GetDomain()->SaveState(
-      dname.str(), file, indent.GetNextIndent());
+    dname << uid << "." << this->DomainIterator->GetKey() << ends;
+    this->DomainIterator->GetDomain()->SaveState(propertyElement, dname.str());
     delete[] dname.str();
     this->DomainIterator->Next();
     }
+
+  parent->AddNestedElement(propertyElement);
+  propertyElement->Delete();
 }
+
 //---------------------------------------------------------------------------
 void vtkSMProperty::SetCheckDomains(int check)
 {

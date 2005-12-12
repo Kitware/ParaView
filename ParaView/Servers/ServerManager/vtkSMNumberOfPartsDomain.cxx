@@ -20,7 +20,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMNumberOfPartsDomain);
-vtkCxxRevisionMacro(vtkSMNumberOfPartsDomain, "1.4");
+vtkCxxRevisionMacro(vtkSMNumberOfPartsDomain, "1.5");
 
 //---------------------------------------------------------------------------
 vtkSMNumberOfPartsDomain::vtkSMNumberOfPartsDomain()
@@ -91,26 +91,23 @@ int vtkSMNumberOfPartsDomain::IsInDomain(vtkSMSourceProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMNumberOfPartsDomain::SaveState(
-  const char* name, ostream* file, vtkIndent indent)
+void vtkSMNumberOfPartsDomain::ChildSaveState(vtkPVXMLElement* domainElement)
 {
-  *file << indent 
-        << "<Domain name=\"" << this->XMLName << "\" id=\"" << name << "\">"
-        << endl;
-  *file << indent.GetNextIndent() 
-        << "<Multiplicity value=\"";
+  this->Superclass::ChildSaveState(domainElement);
+
+  vtkPVXMLElement* multiplicityElem = vtkPVXMLElement::New();
+  multiplicityElem->SetName("Multiplicity");
   switch (this->PartMultiplicity)
     {
     case vtkSMNumberOfPartsDomain::SINGLE:
-      *file << "single";
+      multiplicityElem->AddAttribute("value", "single");
       break;
     case vtkSMNumberOfPartsDomain::MULTIPLE:
-      *file << "multiple";
+      multiplicityElem->AddAttribute("value", "multiple");
       break;
     }
-  *file << "\"/>" << endl;
-  *file << indent
-        << "</Domain>" << endl;
+  domainElement->AddNestedElement(multiplicityElem);
+  multiplicityElem->Delete();
 }
 
 //---------------------------------------------------------------------------

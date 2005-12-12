@@ -69,6 +69,9 @@ protected:
   vtkSMDomain();
   ~vtkSMDomain();
 
+  virtual void SaveState(vtkPVXMLElement* parent, const char* uid);
+  virtual void ChildSaveState(vtkPVXMLElement* propertyElement);
+
 //BTX
   friend class vtkSMProperty;
 //ETX

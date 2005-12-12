@@ -22,7 +22,7 @@
 #include "vtkSphereWidget.h"
 
 vtkStandardNewMacro(vtkSMSphereWidgetProxy);
-vtkCxxRevisionMacro(vtkSMSphereWidgetProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMSphereWidgetProxy, "1.10");
 
 //----------------------------------------------------------------------------
 vtkSMSphereWidgetProxy::vtkSMSphereWidgetProxy()
@@ -87,8 +87,7 @@ void vtkSMSphereWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long event,vo
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSphereWidgetProxy::SaveState(const char* name, ostream* file, 
-  vtkIndent indent)
+void vtkSMSphereWidgetProxy::SaveState(vtkPVXMLElement* root)
 {
   vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("Center"));
@@ -103,9 +102,9 @@ void vtkSMSphereWidgetProxy::SaveState(const char* name, ostream* file,
     {
     dvp->SetElements1(this->Radius);
     }
-  this->Superclass::SaveState(name,file,indent);
+  this->Superclass::SaveState(root);
 }
-  
+
 //----------------------------------------------------------------------------
 void vtkSMSphereWidgetProxy::CreateVTKObjects(int numObjects)
 {

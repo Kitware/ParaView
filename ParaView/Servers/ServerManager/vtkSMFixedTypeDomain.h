@@ -54,8 +54,6 @@ protected:
   vtkSMFixedTypeDomain();
   ~vtkSMFixedTypeDomain();
 
-  virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
-
 private:
   vtkSMFixedTypeDomain(const vtkSMFixedTypeDomain&); // Not implemented
   void operator=(const vtkSMFixedTypeDomain&); // Not implemented

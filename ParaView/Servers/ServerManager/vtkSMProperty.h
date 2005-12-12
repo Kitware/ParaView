@@ -273,7 +273,8 @@ protected:
 
   // Description:
   // Save the state in XML.
-  virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
+  virtual void SaveState(vtkPVXMLElement* parent, const char* uid);
+  virtual void ChildSaveState(vtkPVXMLElement* propertyElement);
 
   // Description:
   // Set from the XML file, information helpers fill in the property

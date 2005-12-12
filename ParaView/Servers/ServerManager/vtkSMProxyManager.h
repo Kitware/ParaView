@@ -120,11 +120,7 @@ public:
   // This saves the state of all proxies and properties. NOTE: The XML
   // format is still evolving.
   void SaveState(const char* filename);
-
-  // Description:
-  // Saves the state of the object in XML format. Should
-  // be overwritten by proxies and properties.
-  virtual void SaveState(const char*, ostream*, vtkIndent);
+  void SaveState(vtkPVXMLElement* rootElement);
 
   // Description:
   // Given a group name, create prototypes and store them

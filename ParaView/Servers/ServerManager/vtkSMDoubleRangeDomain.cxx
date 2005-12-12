@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleRangeDomain);
-vtkCxxRevisionMacro(vtkSMDoubleRangeDomain, "1.16");
+vtkCxxRevisionMacro(vtkSMDoubleRangeDomain, "1.17");
 
 struct vtkSMDoubleRangeDomainInternals
 {
@@ -288,53 +288,49 @@ void vtkSMDoubleRangeDomain::SetEntry(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDoubleRangeDomain::SaveState(
-  const char* name, ostream* file, vtkIndent indent)
+void vtkSMDoubleRangeDomain::ChildSaveState(vtkPVXMLElement* domainElement) 
 {
-  if (!this->XMLName)
-    {
-    return;
-    }
-  *file << indent 
-        << "<Domain name=\"" << this->XMLName
-        << "\" id=\"" << name << "\">"
-        << endl;
+  this->Superclass::ChildSaveState(domainElement);
+
   unsigned int size = this->GetNumberOfEntries();
   unsigned int i;
   for(i=0; i<size; i++)
     {
     if (this->DRInternals->Entries[i].MinSet)
       {
-      *file << indent.GetNextIndent() 
-            << "<Min index=\"" << i << "\" value=\"" 
-            << this->DRInternals->Entries[i].Min
-            << "\"/>" << endl;
+      vtkPVXMLElement* minElem = vtkPVXMLElement::New();
+      minElem->SetName("Min");
+      minElem->AddAttribute("index", i);
+      minElem->AddAttribute("value", this->DRInternals->Entries[i].Min);
+      domainElement->AddNestedElement(minElem);
+      minElem->Delete();
       }
     }
   for(i=0; i<size; i++)
     {
     if (this->DRInternals->Entries[i].MaxSet)
       {
-      *file << indent.GetNextIndent() 
-            << "<Max index=\"" << i << "\" value=\"" 
-            << this->DRInternals->Entries[i].Max
-            << "\"/>" << endl;
+      vtkPVXMLElement* maxElem = vtkPVXMLElement::New();
+      maxElem->SetName("Max");
+      maxElem->AddAttribute("index", i);
+      maxElem->AddAttribute("value", this->DRInternals->Entries[i].Max);
+      domainElement->AddNestedElement(maxElem);
+      maxElem->Delete();
       }
     }
   for(i=0; i<size; i++)
     {
     if (this->DRInternals->Entries[i].ResolutionSet)
       {
-      *file << indent.GetNextIndent() 
-            << "<Resolution index=\"" << i << "\" value=\"" 
-            << this->DRInternals->Entries[i].Resolution
-            << "\"/>" << endl;
+      vtkPVXMLElement* resolutionElem = vtkPVXMLElement::New();
+      resolutionElem->SetName("Resolution");
+      resolutionElem->AddAttribute("index", i);
+      resolutionElem->AddAttribute("value", 
+                                   this->DRInternals->Entries[i].Resolution);
+      domainElement->AddNestedElement(resolutionElem);
+      resolutionElem->Delete();
       }
     }
-      
-  *file << indent
-        << "</Domain>" << endl;
-    
 }
 
 //---------------------------------------------------------------------------
