@@ -57,7 +57,7 @@
 #include <vtksys/ios/sstream>
  
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.168");
+vtkCxxRevisionMacro(vtkPVProbe, "1.169");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -427,11 +427,15 @@ void vtkPVProbe::AcceptCallbackInternal()
     vtkErrorMacro("Failed to find property Input on PlotDisplayProxy.");
     return;
     }
-  ip->RemoveAllProxies();  
+  ip->RemoveAllProxies();
   if (numPts == 1)
+    {
     ip->AddProxy(this->TemporalProbeProxy);
+    }
   else
-    ip->AddProxy(this->GetProxy());      
+    {
+    ip->AddProxy(this->GetProxy());
+    }
   
   if (numPts == 1)
     { // Put the array information in the UI. 
