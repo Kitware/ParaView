@@ -95,7 +95,7 @@ protected:
   // Overloaded to hack for IgnorePlaceWidgetChanges flag which must be
   // set to 1 in SM state. This is the most weird way of doing things. I
   // have to get rid of IgnorePlaceWidgetChanges flag soon.
-  virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
+  virtual void SaveState(vtkPVXMLElement* root);
 
   // Description:
   // Indicator if the PlaceWidget message

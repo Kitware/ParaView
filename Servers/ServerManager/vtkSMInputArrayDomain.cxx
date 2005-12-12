@@ -25,7 +25,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMInputArrayDomain);
-vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.9");
+vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.10");
 
 //---------------------------------------------------------------------------
 static const char* const vtkSMInputArrayDomainAttributeTypes[] = {
@@ -223,21 +223,20 @@ int vtkSMInputArrayDomain::AttributeInfoContainsArray(
   return 0;
 }
 
-
 //---------------------------------------------------------------------------
-void vtkSMInputArrayDomain::SaveState(
-  const char* name, ostream* file, vtkIndent indent)
+void vtkSMInputArrayDomain::ChildSaveState(vtkPVXMLElement* domainElement)
 {
-  *file << indent 
-        << "<Domain name=\"" << this->XMLName << "\" id=\"" << name << "\">"
-        << endl;
-  *file << indent.GetNextIndent() 
-        << "<InputArray attribute_type=\"" << this->GetAttributeTypeAsString()
-        << "\" number_of_components=\"" << this->GetNumberOfComponents()
-        << "\"/>" << endl;
-  
-  *file << indent
-        << "</Domain>" << endl;
+  this->Superclass::ChildSaveState(domainElement);
+
+  vtkPVXMLElement* inputArrayElem = vtkPVXMLElement::New();
+  inputArrayElem->SetName("InputArray");
+  inputArrayElem->AddAttribute("attribute_type", 
+                               this->GetAttributeTypeAsString());
+  inputArrayElem->AddAttribute("number_of_components", 
+                               this->GetNumberOfComponents());
+  domainElement->AddNestedElement(inputArrayElem);
+  inputArrayElem->Delete();
+
 }
 
 //---------------------------------------------------------------------------

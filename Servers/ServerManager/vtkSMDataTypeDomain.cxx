@@ -27,7 +27,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMDataTypeDomain);
-vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.9");
+vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.10");
 
 struct vtkSMDataTypeDomainInternals
 {
@@ -182,22 +182,20 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMDataTypeDomain::SaveState(
-  const char* name, ostream* file, vtkIndent indent)
+void vtkSMDataTypeDomain::ChildSaveState(vtkPVXMLElement* domainElement)
 {
-  *file << indent 
-        << "<Domain name=\"" << this->XMLName << "\" id=\"" << name << "\">"
-        << endl;
+  this->Superclass::ChildSaveState(domainElement);
+
   unsigned int size = this->GetNumberOfDataTypes();
   for(unsigned int i=0; i<size; i++)
     {
-    *file << indent.GetNextIndent() 
-          << "<DataType value=\"" << this->GetDataType(i)
-          << "\"/>" << endl;
+    vtkPVXMLElement* dataTypeElem = vtkPVXMLElement::New();
+    dataTypeElem->SetName("DataType");
+    dataTypeElem->AddAttribute("value", this->GetDataType(i));
+    domainElement->AddNestedElement(dataTypeElem);
+    dataTypeElem->Delete();
     }
-      
-  *file << indent
-        << "</Domain>" << endl;
+
 }
 
 //---------------------------------------------------------------------------

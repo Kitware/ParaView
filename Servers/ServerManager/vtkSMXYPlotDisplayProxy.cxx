@@ -59,7 +59,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.17");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -185,9 +185,13 @@ void vtkSMXYPlotDisplayProxy::SetupPipeline()
     stream
       << vtkClientServerStream::Invoke;
     if (this->PolyOrUGrid)
-      stream << this->CollectProxy->GetID(i) << "GetUnstructuredGridOutput";   
+      {
+      stream << this->CollectProxy->GetID(i) << "GetUnstructuredGridOutput";
+      }
     else
+      {
       stream << this->CollectProxy->GetID(i) << "GetPolyDataOutput";
+      }
     stream << vtkClientServerStream::End
            << vtkClientServerStream::Invoke
            << this->UpdateSuppressorProxy->GetID(i) << "SetInput"
@@ -209,9 +213,13 @@ void vtkSMXYPlotDisplayProxy::SetupPipeline()
     return;
     }
   if (this->PolyOrUGrid)
+    {
     svp->SetElement(0,"vtkUnstructuredGrid");
+    }
   else
+    {
     svp->SetElement(0,"vtkPolyData");
+    }
   this->UpdateSuppressorProxy->UpdateVTKObjects();
 
   // We hook up the XY plot's input here itself.
@@ -251,8 +259,9 @@ void vtkSMXYPlotDisplayProxy::SetupDefaults()
   ivp->SetElement(0, 2); // Clone mode.
   this->CollectProxy->UpdateVTKObjects();
 
-  // This stuff is quite similar to vtkSMCompositePartDisplay::SetupCollectionFilter.
-  // If only I could avoid repetition.
+  // This stuff is quite similar to
+  // vtkSMCompositePartDisplay::SetupCollectionFilter.  If only I could
+  // avoid repetition.
   for (i=0; i < num; i++)
     {
 

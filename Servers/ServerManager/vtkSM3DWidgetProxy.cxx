@@ -25,7 +25,7 @@
 #include "vtkSMRenderModuleProxy.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.14");
+vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.15");
 //===========================================================================
 //***************************************************************************
 class vtkSM3DWidgetProxyObserver : public vtkCommand
@@ -336,15 +336,14 @@ void vtkSM3DWidgetProxy::SaveInBatchScript(ofstream *file)
 
 }
 
-//----------------------------------------------------------------------------
-void vtkSM3DWidgetProxy::SaveState(const char* name, ostream* file,
-  vtkIndent indent)
+//---------------------------------------------------------------------------
+void vtkSM3DWidgetProxy::SaveState(vtkPVXMLElement* root)
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProperty("IgnorePlaceWidgetChanges"));
   int old_ipc = ivp->GetElement(0);
   ivp->SetElement(0, 1);
-  this->Superclass::SaveState(name, file, indent);
+  this->Superclass::SaveState(root);
   ivp->SetElement(0, old_ipc);
 }
 

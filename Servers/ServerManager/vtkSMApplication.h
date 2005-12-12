@@ -69,8 +69,6 @@ protected:
   vtkSMApplication();
   ~vtkSMApplication();
 
-  virtual void SaveState(const char*, ostream*, vtkIndent) {};
-
   vtkSMApplicationInternals* Internals;
 private:
   vtkSMApplication(const vtkSMApplication&); // Not implemented

@@ -22,7 +22,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMStringListRangeDomain);
-vtkCxxRevisionMacro(vtkSMStringListRangeDomain, "1.5");
+vtkCxxRevisionMacro(vtkSMStringListRangeDomain, "1.6");
 
 //---------------------------------------------------------------------------
 vtkSMStringListRangeDomain::vtkSMStringListRangeDomain()
@@ -195,19 +195,19 @@ int vtkSMStringListRangeDomain::ReadXMLAttributes(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMStringListRangeDomain::SaveState(
-  const char* name, ostream* file, vtkIndent indent)
+void vtkSMStringListRangeDomain::ChildSaveState(vtkPVXMLElement* domainElement)
 {
-  *file << indent 
-        << "<Domain name=\"" << this->XMLName << "\" id=\"" << name << "\">"
-        << endl;
+  this->Superclass::ChildSaveState(domainElement);
+
   unsigned int i;
   unsigned int size = this->SLDomain->GetNumberOfStrings();
   for(i=0; i<size; i++)
     {
-    *file << indent.GetNextIndent() 
-          << "<String text=\"" << this->SLDomain->GetString(i)
-          << "\"/>" << endl;
+    vtkPVXMLElement* stringElem = vtkPVXMLElement::New();
+    stringElem->SetName("String");
+    stringElem->AddAttribute("text", this->SLDomain->GetString(i));
+    domainElement->AddNestedElement(stringElem);
+    stringElem->Delete();
     }
 
   size = this->IRDomain->GetNumberOfEntries();
@@ -217,10 +217,12 @@ void vtkSMStringListRangeDomain::SaveState(
     int min = this->IRDomain->GetMinimum(i, exists);
     if (exists)
       {
-      *file << indent.GetNextIndent() 
-            << "<Min index=\"" << i << "\" value=\"" 
-            << min
-            << "\"/>" << endl;
+      vtkPVXMLElement* minElem = vtkPVXMLElement::New();
+      minElem->SetName("Min");
+      minElem->AddAttribute("index", i);
+      minElem->AddAttribute("value", min);
+      domainElement->AddNestedElement(minElem);
+      minElem->Delete();
       }
     }
   for(i=0; i<size; i++)
@@ -229,15 +231,15 @@ void vtkSMStringListRangeDomain::SaveState(
     int max = this->IRDomain->GetMaximum(i, exists);
     if (exists)
       {
-      *file << indent.GetNextIndent() 
-            << "<Max index=\"" << i << "\" value=\"" 
-            << max
-            << "\"/>" << endl;
+      vtkPVXMLElement* maxElem = vtkPVXMLElement::New();
+      maxElem->SetName("Max");
+      maxElem->AddAttribute("index", i);
+      maxElem->AddAttribute("value", max);
+      domainElement->AddNestedElement(maxElem);
+      maxElem->Delete();
       }
     }
       
-  *file << indent
-        << "</Domain>" << endl;
 }
 
 //---------------------------------------------------------------------------

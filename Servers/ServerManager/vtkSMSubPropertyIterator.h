@@ -69,8 +69,6 @@ protected:
 
   vtkSMProperty* Property;
 
-  virtual void SaveState(const char*, ostream*, vtkIndent) {}
-
 private:
   vtkSMSubPropertyIteratorInternals* Internals;
 

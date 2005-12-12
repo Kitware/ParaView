@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringListDomain);
-vtkCxxRevisionMacro(vtkSMStringListDomain, "1.14");
+vtkCxxRevisionMacro(vtkSMStringListDomain, "1.15");
 
 struct vtkSMStringListDomainInternals
 {
@@ -190,23 +190,20 @@ int vtkSMStringListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElemen
 }
 
 //---------------------------------------------------------------------------
-void vtkSMStringListDomain::SaveState(
-  const char* name, ostream* file, vtkIndent indent)
+void vtkSMStringListDomain::ChildSaveState(vtkPVXMLElement* domainElement)
 {
-  *file << indent 
-        << "<Domain name=\"" << this->XMLName << "\" id=\"" << name << "\">"
-        << endl;
+  this->Superclass::ChildSaveState(domainElement);
+
   unsigned int size = this->GetNumberOfStrings();
   for(unsigned int i=0; i<size; i++)
     {
-    *file << indent.GetNextIndent() 
-          << "<String text=\"" << this->GetString(i)
-          << "\"/>" << endl;
+    vtkPVXMLElement* stringElem = vtkPVXMLElement::New();
+    stringElem->SetName("String");
+    stringElem->AddAttribute("text", this->GetString(i));
+    domainElement->AddNestedElement(stringElem);
+    stringElem->Delete();
     }
-      
-  *file << indent
-        << "</Domain>" << endl;
-    
+
 }
 
 //---------------------------------------------------------------------------

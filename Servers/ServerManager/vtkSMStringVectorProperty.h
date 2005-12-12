@@ -123,7 +123,7 @@ protected:
   virtual int ReadXMLAttributes(vtkSMProxy* parent, 
                                 vtkPVXMLElement* element);
 
-  virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
+  virtual void ChildSaveState(vtkPVXMLElement* parent);
 
 private:
   vtkSMStringVectorProperty(const vtkSMStringVectorProperty&); // Not implemented

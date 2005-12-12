@@ -73,7 +73,7 @@ protected:
   // be overwritten by subclass if adding ivars.
   virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
 
-  virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
+  virtual void ChildSaveState(vtkPVXMLElement* domainElement);
 
   unsigned char PartMultiplicity;
 

@@ -49,7 +49,7 @@ protected:
 
   // Description:
   // Overloaded to update the property values before saving state
-  virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
+  virtual void SaveState(vtkPVXMLElement* root);
   
   // Description:
   // Execute event of the 3D Widget.

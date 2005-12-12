@@ -546,12 +546,11 @@ protected:
   // the name is the name with which the proxy was registered with pxm.
   // However, the proxy, uses SelfID to create a name for itself while 
   // saving the state.
-  virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
+  virtual void SaveState(vtkPVXMLElement* root);
 
   void SetupSharedProperties(vtkSMProxy* subproxy, vtkPVXMLElement *element);
   void SetupExposedProperties(vtkSMProxy* subproxy, vtkPVXMLElement *element);
   
-
   int CreateProxyHierarchy(vtkSMProxyManager* pm, vtkPVXMLElement* element);
 
   // Description:

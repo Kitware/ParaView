@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMImplicitPlaneWidgetProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.11");
 
 //----------------------------------------------------------------------------
 vtkSMImplicitPlaneWidgetProxy::vtkSMImplicitPlaneWidgetProxy()
@@ -160,7 +160,7 @@ void vtkSMImplicitPlaneWidgetProxy::UpdateVTKObjects()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMImplicitPlaneWidgetProxy::SaveState(const char* name, ostream* file, vtkIndent indent)
+void vtkSMImplicitPlaneWidgetProxy::SaveState(vtkPVXMLElement* root)
 {
   vtkSMDoubleVectorProperty* dvp;
   dvp = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -195,7 +195,7 @@ void vtkSMImplicitPlaneWidgetProxy::SaveState(const char* name, ostream* file, v
     {
     vtkErrorMacro("Failed to find property 'DrawPlane'");
     }
-  this->Superclass::SaveState(name,file,indent);
+  this->Superclass::SaveState(root);
 }
 
 

@@ -60,7 +60,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.28");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.29");
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -524,16 +524,17 @@ void vtkSMProxyManager::UnMarkProxyAsModified(vtkSMProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::SaveState(const char* filename)
+void vtkSMProxyManager::SaveState(vtkPVXMLElement* rootElement)
 {
-  ofstream os(filename, ios::out);
-  vtkIndent indent;
-  this->SaveState(0, &os, indent);
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProxyManager::SaveState(const char*, ostream* os, vtkIndent indent)
-{
+  if (!rootElement)
+    {
+    rootElement = vtkPVXMLElement::New();
+    rootElement->SetName("ServerManagerState");
+    }
+  else
+    {
+    rootElement->Register(this);
+    }
 
   vtkstd::set<vtkstd::string> seen;
   vtkstd::set<vtkSMProxy*> visited_proxies; // set of proxies already added.
@@ -571,7 +572,7 @@ void vtkSMProxyManager::SaveState(const char*, ostream* os, vtkIndent indent)
         if (visited_proxies.find(it2->second.Proxy.GetPointer()) 
           == visited_proxies.end())
           {
-          it2->second.Proxy.GetPointer()->SaveState(it2->first.c_str(), os, indent);
+          it2->second.Proxy.GetPointer()->SaveState(rootElement);
           visited_proxies.insert(it2->second.Proxy.GetPointer());
           }
         }
@@ -597,21 +598,39 @@ void vtkSMProxyManager::SaveState(const char*, ostream* os, vtkIndent indent)
       }
     if (do_group)
       {
-      *os << indent 
-         << "<ProxyCollection name=\"" << it->first.c_str() << "\">" << endl;
+      vtkPVXMLElement* collectionElement = vtkPVXMLElement::New();
+      collectionElement->SetName("ProxyCollection");
+      collectionElement->AddAttribute("name", it->first.c_str());
       vtkSMProxyManagerProxyMapType::iterator it2 =
         it->second.begin();
       for (; it2 != it->second.end(); it2++)
         {
-        *os << indent.GetNextIndent()
-           << "<Item "
-           << "id=\""<< it2->second.Proxy.GetPointer()->GetName() << "\" "
-           << "name=\"" << it2->first.c_str() << "\" "
-           << "/>" << endl;
+        vtkPVXMLElement* itemElement = vtkPVXMLElement::New();
+        itemElement->SetName("Item");
+        itemElement->AddAttribute("id", it2->second.Proxy.GetPointer()->GetName());
+        itemElement->AddAttribute("name", it2->first.c_str());
+        collectionElement->AddNestedElement(itemElement);
+        itemElement->Delete();
         }
-      *os << indent << "</ProxyCollection>" << endl;
+      rootElement->AddNestedElement(collectionElement);
+      collectionElement->Delete();
       }
     }
+
+  rootElement->Delete();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::SaveState(const char* filename)
+{
+  vtkPVXMLElement* rootElement = vtkPVXMLElement::New();
+  rootElement->SetName("ServerManagerState");
+
+  this->SaveState(rootElement);
+
+  ofstream os(filename, ios::out);
+  rootElement->PrintXML(os, vtkIndent());
+  rootElement->Delete();
 }
 
 //---------------------------------------------------------------------------

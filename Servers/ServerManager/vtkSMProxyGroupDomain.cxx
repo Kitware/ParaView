@@ -26,7 +26,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyGroupDomain);
-vtkCxxRevisionMacro(vtkSMProxyGroupDomain, "1.8");
+vtkCxxRevisionMacro(vtkSMProxyGroupDomain, "1.9");
 
 struct vtkSMProxyGroupDomainInternals
 {
@@ -205,6 +205,23 @@ vtkSMProxy* vtkSMProxyGroupDomain::GetProxy(const char* name)
       }
     }
   return 0;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyGroupDomain::ChildSaveState(vtkPVXMLElement* domainElement)
+{
+  this->Superclass::ChildSaveState(domainElement);
+
+  unsigned int size = this->GetNumberOfGroups();
+  for(unsigned int i=0; i<size; i++)
+    {
+    vtkPVXMLElement* groupElem = vtkPVXMLElement::New();
+    groupElem->SetName("Group");
+    groupElem->AddAttribute("value", this->GetGroup(i));
+    domainElement->AddNestedElement(groupElem);
+    groupElem->Delete();
+    }
+
 }
 
 //---------------------------------------------------------------------------

@@ -22,7 +22,7 @@
 #include <vtkstd/map>
 #include "vtkStdString.h"
 
-vtkCxxRevisionMacro(vtkSMDomain, "1.10");
+vtkCxxRevisionMacro(vtkSMDomain, "1.11");
 
 struct vtkSMDomainInternals
 {
@@ -145,6 +145,25 @@ void vtkSMDomain::AddRequiredProperty(vtkSMProperty *prop,
 void vtkSMDomain::InvokeModified()
 {
   this->InvokeEvent(vtkCommand::DomainModifiedEvent, 0);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDomain::ChildSaveState(vtkPVXMLElement* /*domainElement*/)
+{
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDomain::SaveState(vtkPVXMLElement* parent, const char* uid)
+{
+  vtkPVXMLElement* domainElement = vtkPVXMLElement::New();
+  domainElement->SetName("Domain");
+  domainElement->AddAttribute("name", this->XMLName);
+  domainElement->AddAttribute("id", uid);
+
+  this->ChildSaveState(domainElement);
+
+  parent->AddNestedElement(domainElement);
+  domainElement->Delete();
 }
 
 //---------------------------------------------------------------------------

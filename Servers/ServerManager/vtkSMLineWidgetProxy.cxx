@@ -24,7 +24,7 @@
 
 
 vtkStandardNewMacro(vtkSMLineWidgetProxy);
-vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.10");
 //----------------------------------------------------------------------------
 vtkSMLineWidgetProxy::vtkSMLineWidgetProxy()
 {
@@ -114,9 +114,8 @@ void vtkSMLineWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long event,void
   this->Superclass::ExecuteEvent(wdg, event, p);
 }
 
-//----------------------------------------------------------------------------
-void vtkSMLineWidgetProxy::SaveState(const char* name,ostream* file, 
-  vtkIndent indent)
+//---------------------------------------------------------------------------
+void vtkSMLineWidgetProxy::SaveState(vtkPVXMLElement* root)
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("Point1"));
@@ -130,7 +129,7 @@ void vtkSMLineWidgetProxy::SaveState(const char* name,ostream* file,
     {
     dvp->SetElements(this->Point2);
     }
-  this->Superclass::SaveState(name,file,indent);
+  this->Superclass::SaveState(root);
 }
 
 //----------------------------------------------------------------------------

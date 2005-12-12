@@ -30,7 +30,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.22");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.23");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -466,17 +466,10 @@ int vtkSMProxyProperty::ReadXMLAttributes(vtkSMProxy* parent,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyProperty::SaveState(
-  const char* name,  ostream* file, vtkIndent indent)
+void vtkSMProxyProperty::ChildSaveState(vtkPVXMLElement* propertyElement)
 {
-  vtkSMProxyManager* pm = this->GetProxyManager();
-  if (!pm)
-    {
-    return;
-    }
-  
-  *file << indent << "<Property name=\"" << (this->XMLName?this->XMLName:"")
-        << "\" id=\"" << name << "\" ";
+  this->Superclass::ChildSaveState(propertyElement);
+
   vtkstd::vector<vtkStdString> proxies;
   unsigned int numProxies = this->GetNumberOfProxies();
   for (unsigned int idx=0; idx<numProxies; idx++)
@@ -499,21 +492,18 @@ void vtkSMProxyProperty::SaveState(
   unsigned int numFoundProxies = proxies.size();
   if (numFoundProxies > 0)
     {
-    *file << "number_of_elements=\"" << numFoundProxies << "\">" << endl;
+    propertyElement->AddAttribute("number_of_elements", numFoundProxies);
+
     for(unsigned int i=0; i<numFoundProxies; i++)
       {
-      *file << indent.GetNextIndent() << "<Element index=\""
-            << i << "\" " << "value=\"" << proxies[i].c_str() << "\"/>"
-            << endl;
+      vtkPVXMLElement* elementElement = vtkPVXMLElement::New();
+      elementElement->SetName("Element");
+      elementElement->AddAttribute("index", i);
+      elementElement->AddAttribute("value", proxies[i].c_str());
+      propertyElement->AddNestedElement(elementElement);
+      elementElement->Delete();
       }
     }
-  else
-    {
-    *file << ">" << endl;
-    }
-  this->Superclass::SaveState(name, file, indent);
-  *file << indent << "</Property>" << endl;
-          
 }
 
 //---------------------------------------------------------------------------

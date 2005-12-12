@@ -33,7 +33,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.54");
+vtkCxxRevisionMacro(vtkSMProxy, "1.55");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -1449,13 +1449,13 @@ void vtkSMProxy::SetupSharedProperties(vtkSMProxy* subproxy,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxy::SaveState(const char* vtkNotUsed(name), ostream* file, vtkIndent indent)
+void vtkSMProxy::SaveState(vtkPVXMLElement* root)
 {
-  *file << indent
-        << "<Proxy group=\"" 
-        << this->XMLGroup << "\" type=\"" 
-        << this->XMLName << "\" id=\""
-        << this->Name << "\">" << endl;
+  vtkPVXMLElement* proxyElement = vtkPVXMLElement::New();
+  proxyElement->SetName("Proxy");
+  proxyElement->AddAttribute("group", this->XMLGroup);
+  proxyElement->AddAttribute("type", this->XMLName);
+  proxyElement->AddAttribute("id", this->Name);
 
   vtkSMPropertyIterator* iter = this->NewPropertyIterator();
 
@@ -1465,14 +1465,16 @@ void vtkSMProxy::SaveState(const char* vtkNotUsed(name), ostream* file, vtkInden
       {
       ostrstream propID;
       propID << this->Name << "." << iter->GetKey() << ends;
-      iter->GetProperty()->SaveState(propID.str(), file, indent.GetNextIndent());
+      iter->GetProperty()->SaveState(proxyElement, propID.str());
       delete [] propID.str();
       }
     iter->Next();
     }
-  *file << indent << "</Proxy>" << endl;
 
   iter->Delete();
+
+  root->AddNestedElement(proxyElement);
+  proxyElement->Delete();
 }
 
 //---------------------------------------------------------------------------

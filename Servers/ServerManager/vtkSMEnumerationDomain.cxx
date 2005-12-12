@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMEnumerationDomain);
-vtkCxxRevisionMacro(vtkSMEnumerationDomain, "1.7");
+vtkCxxRevisionMacro(vtkSMEnumerationDomain, "1.8");
 
 struct vtkSMEnumerationDomainInternals
 {
@@ -117,24 +117,19 @@ int vtkSMEnumerationDomain::IsInDomain(int val, unsigned int& idx)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMEnumerationDomain::SaveState(
-  const char* name, ostream* file, vtkIndent indent)
+void vtkSMEnumerationDomain::ChildSaveState(vtkPVXMLElement* domainElement)
 {
-  *file << indent 
-        << "<Domain name=\"" << this->XMLName << "\" id=\"" << name << "\">"
-        << endl;
+  this->Superclass::ChildSaveState(domainElement);
   unsigned int size = this->GetNumberOfEntries();
   for(unsigned int i=0; i<size; i++)
     {
-    *file << indent.GetNextIndent() 
-          << "<Entry value=\"" << this->GetEntryValue(i)
-          << "\" text=\"" << this->GetEntryText(i)
-          << "\"/>" << endl;
+    vtkPVXMLElement* entryElem = vtkPVXMLElement::New();
+    entryElem->SetName("Entry");
+    entryElem->AddAttribute("value", this->GetEntryValue(i));
+    entryElem->AddAttribute("text", this->GetEntryText(i));
+    domainElement->AddNestedElement(entryElem);
+    entryElem->Delete();
     }
-      
-  *file << indent
-        << "</Domain>" << endl;
-    
 }
 
 //---------------------------------------------------------------------------
