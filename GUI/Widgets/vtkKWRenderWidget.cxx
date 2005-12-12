@@ -40,7 +40,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.116");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.117");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -724,89 +724,7 @@ void vtkKWRenderWidget::ResetCamera()
     vtkRenderer *renderer = this->GetNthRenderer(i);
     if (renderer)
       {
-      double bounds[6];
-      this->ComputeVisiblePropBounds(i, bounds);
-      if (bounds[0] == VTK_LARGE_FLOAT)
-        {
-        vtkDebugMacro(<< "Cannot reset camera!");
-        return;
-        }
-
-      double vn[3];
-      vtkCamera *cam = renderer->GetActiveCamera();
-      if (cam != NULL)
-        {
-        cam->GetViewPlaneNormal(vn);
-        }
-      else
-        {
-        vtkErrorMacro(<< "Trying to reset non-existant camera");
-        return;
-        }
-
-      double center[3];
-      center[0] = ((bounds[0] + bounds[1]) / 2.0);
-      center[1] = ((bounds[2] + bounds[3]) / 2.0);
-      center[2] = ((bounds[4] + bounds[5]) / 2.0);
-
-      double aspect[2];
-      renderer->ComputeAspect();
-      renderer->GetAspect(aspect);
-
-      double distance, width, viewAngle, *vup;
-
-      // Check Y and Z for the Y axis on the window
-
-      width = (bounds[3] - bounds[2]) / aspect[1];
-      
-      if (((bounds[5] - bounds[4]) / aspect[1]) > width) 
-        {
-        width = (bounds[5] - bounds[4]) / aspect[1];
-        }
-      
-      // Check X and Y for the X axis on the window
-
-      if (((bounds[1] - bounds[0]) / aspect[0]) > width) 
-        {
-        width = (bounds[1] - bounds[0]) / aspect[0];
-        }
-
-      if (((bounds[3] - bounds[2]) / aspect[0]) > width) 
-        {
-        width = (bounds[3] - bounds[2]) / aspect[0];
-        }
-  
-      if (cam->GetParallelProjection())
-        {
-        viewAngle = 30;  // the default in vtkCamera
-        }
-      else
-        {
-        viewAngle = cam->GetViewAngle();
-        }
-  
-      distance = width / (double)tan(viewAngle * vtkMath::Pi() / 360.0);
-
-      // Check view-up vector against view plane normal
-
-      vup = cam->GetViewUp();
-      if (fabs(vtkMath::Dot(vup, vn)) > 0.999)
-        {
-        vtkWarningMacro(
-          "Resetting view-up since view plane normal is parallel");
-        cam->SetViewUp(-vup[2], vup[0], vup[1]);
-        }
-
-      // Update the camera
-      
-      cam->SetFocalPoint(center[0], center[1], center[2]);
-      cam->SetPosition((center[0] + distance * vn[0]),
-                       (center[1] + distance * vn[1]),
-                       (center[2] + distance * vn[2]));
-
-      // Setup default parallel scale
-      
-      cam->SetParallelScale(0.5 * width);
+      renderer->ResetCamera();
       }
     }
 
