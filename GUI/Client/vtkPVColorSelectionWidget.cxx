@@ -26,7 +26,7 @@
 #include "vtkSMDataObjectDisplayProxy.h"
 
 vtkStandardNewMacro(vtkPVColorSelectionWidget);
-vtkCxxRevisionMacro(vtkPVColorSelectionWidget, "1.5.2.1");
+vtkCxxRevisionMacro(vtkPVColorSelectionWidget, "1.5.2.2");
 //-----------------------------------------------------------------------------
 vtkPVColorSelectionWidget::vtkPVColorSelectionWidget()
 {
@@ -78,11 +78,14 @@ void vtkPVColorSelectionWidget::Update(int remove_all /*=1*/)
     {
     vtkPVDataInformation* geomInfo = dproxy->GetGeometryInformation();
     
-    attrInfo = geomInfo->GetPointDataInformation();
-    this->AddArray(attrInfo, vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
-    
-    attrInfo = geomInfo->GetCellDataInformation();
-    this->AddArray(attrInfo, vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+    if (geomInfo)
+      {
+      attrInfo = geomInfo->GetPointDataInformation();
+      this->AddArray(attrInfo, vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+      
+      attrInfo = geomInfo->GetCellDataInformation();
+      this->AddArray(attrInfo, vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+      }
     }
 
 }

@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectArrays);
-vtkCxxRevisionMacro(vtkPVSelectArrays, "1.13");
+vtkCxxRevisionMacro(vtkPVSelectArrays, "1.13.2.1");
 vtkCxxSetObjectMacro(vtkPVSelectArrays, InputMenu, vtkPVInputMenu);
 
 //----------------------------------------------------------------------------
@@ -220,6 +220,10 @@ void vtkPVSelectArrays::Accept()
       svp->SetElement(count, arrayName);
       count++;
       }
+    }
+  if (num == 0)
+    {
+    vtkWarningMacro("No arrays selected.");
     }
 
   this->Superclass::Accept();

@@ -29,7 +29,7 @@
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.4.2.2");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.4.2.3");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -805,7 +805,7 @@ vtkPVLODPartDisplayInformation* vtkSMCompositeDisplayProxy::GetLODInformation()
 //-----------------------------------------------------------------------------
 void vtkSMCompositeDisplayProxy::SetCollectionDecision(int v)
 {
-  if (v == this->CollectionDecision)
+  if (v == this->CollectionDecision || !this->CollectProxy)
     {
     return;
     }
