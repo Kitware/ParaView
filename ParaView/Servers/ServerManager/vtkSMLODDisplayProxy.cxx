@@ -25,7 +25,7 @@
 #include "vtkSMInputProperty.h"
 
 vtkStandardNewMacro(vtkSMLODDisplayProxy);
-vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.8");
 //-----------------------------------------------------------------------------
 vtkSMLODDisplayProxy::vtkSMLODDisplayProxy()
 {
@@ -265,6 +265,11 @@ void vtkSMLODDisplayProxy::CacheUpdate(int idx, int total)
 //-----------------------------------------------------------------------------
 int vtkSMLODDisplayProxy::GetLODFlag()
 {
+  if (!this->ActorProxy)
+    {
+    vtkErrorMacro("ActorProxy not created.");
+    return 1;
+    }
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->ActorProxy->GetProperty("RenderModuleHelper"));
   if (!pp)
