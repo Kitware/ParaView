@@ -79,6 +79,19 @@ public:
     vtkKWApplication *app, const char *str);
 
   // Description:
+  // Convenience method that can be used to create a Tcl callback command.
+  // The 'command' argument is a pointer to the command to be created.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // Note that 'command' is allocated automatically using the 'new' 
+  // operator. If it is not NULL, it is deallocated first using 'delete []'.
+  static void CreateObjectMethodCommand(
+    vtkKWApplication *app, 
+    char **command, vtkObject *object, const char *method);
+
+  // Description:
   // Get the RGB components that correspond to 'color' (say, #223344)
   // in the widget given by 'widget' (say, .foo.bar). Color may be specified
   // in any of the forms acceptable for a Tk color option.
@@ -508,12 +521,28 @@ public:
   static const char *GetCurrentScript(vtkKWApplication *app);
 
   // Description:
+  // Create a timer handler, i.e. arranges for a command to be executed
+  // exactly once 'ms' milliseconds later, or when the application is idle,
+  // i.e. the next time the event loop is entered and there are no events to
+  // process.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // Returns a string identifier that can be used to cancel the timer.
+  static const char* CreateTimerHandler(
+    vtkKWApplication *app, unsigned long ms, 
+    vtkObject *object, const char *method);
+  static const char* CreateIdleTimerHandler(
+    vtkKWApplication *app, vtkObject *object, const char *method);
+
+  // Description:
   // Cancel one or all event handlers, i.e. cancel all delayed command that
-  // were registered using the 'after' command.
-  static void CancelAfterEventHandler(Tcl_Interp *interp, const char *id);
-  static void CancelAfterEventHandler(vtkKWApplication *app, const char *id);
-  static void CancelAllAfterEventHandlers(Tcl_Interp *interp);
-  static void CancelAllAfterEventHandlers(vtkKWApplication *app);
+  // were registered using the 'after' command or CreateTimerHandler methods.
+  static void CancelTimerHandler(Tcl_Interp *interp, const char *id);
+  static void CancelTimerHandler(vtkKWApplication *app, const char *id);
+  static void CancelAllTimerHandlers(Tcl_Interp *interp);
+  static void CancelAllTimerHandlers(vtkKWApplication *app);
 
   // Description:
   // Rings the bell on the display of the application's main window

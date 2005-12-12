@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBalloonHelpManager );
-vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.10");
+vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.11");
 
 //----------------------------------------------------------------------------
 vtkKWBalloonHelpManager::vtkKWBalloonHelpManager()
@@ -143,7 +143,7 @@ void vtkKWBalloonHelpManager::CancelCallback()
   
   if (this->AfterTimerId)
     {
-    vtkKWTkUtilities::CancelAfterEventHandler(
+    vtkKWTkUtilities::CancelTimerHandler(
       this->GetApplication(), this->AfterTimerId);
     this->SetAfterTimerId(NULL);
     }
