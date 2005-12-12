@@ -40,7 +40,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.115");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.116");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -458,7 +458,7 @@ void vtkKWRenderWidget::AddInteractionBindings()
       this->VTKWidget->SetBinding(event, this, callback);
         
       sprintf(event, "<%sKeyPress>", translators[i].Modifier);
-      sprintf(callback, "KeyPressCallback %%A %%x %%y %d %d %K", 
+      sprintf(callback, "KeyPressCallback %%A %%x %%y %d %d %%K", 
               translators[i].Ctrl, translators[i].Shift);
       this->VTKWidget->SetBinding(event, this, callback);
       }
