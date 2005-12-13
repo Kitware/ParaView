@@ -419,13 +419,13 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *proxy)
     item->setParent(this->Internal->Information);
     this->Internal->Information->addChild(item);
     item->setPropertyName("Number of cells");
-    item->setValue(dataInfo->GetNumberOfCells());
+    item->setValue(static_cast<qint64>(dataInfo->GetNumberOfCells()));
 
     item = new pqObjectInspectorItem();
     item->setParent(this->Internal->Information);
     this->Internal->Information->addChild(item);
     item->setPropertyName("Number of points");
-    item->setValue(dataInfo->GetNumberOfPoints());
+    item->setValue(static_cast<qint64>(dataInfo->GetNumberOfPoints()));
     
     item = new pqObjectInspectorItem();
     item->setParent(this->Internal->Information);
