@@ -39,7 +39,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisPropertyWidget );
-vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.12");
+vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.13");
 
 vtkCxxSetObjectMacro(vtkPVComparativeVisPropertyWidget, TrackEditor, vtkPVTrackEditor);
 
@@ -112,6 +112,7 @@ void vtkPVComparativeVisPropertyWidget::Create()
   this->CueEditor = vtkPVSimpleAnimationCue::New();
   this->CueEditor->SetDuration(4);
   this->CueEditor->SetKeyFrameParent(this->TrackEditor->GetPropertiesFrame());
+  this->CueEditor->SetApplication(pvApp);
   this->CueEditor->Create();
 }
 
