@@ -3,6 +3,7 @@
 #ifndef _pqPicking_h
 #define _pqPicking_h
 
+#include "QtWidgetsExport.h"
 #include <QObject>
 #include <vtkType.h>
 class vtkObject;
@@ -15,7 +16,7 @@ class vtkSMPointLabelDisplayProxy;
 class vtkUnstructuredGrid;
 
 /// class to do picking
-class pqPicking : public QObject
+class QTWIDGETS_EXPORT pqPicking : public QObject
 {
   Q_OBJECT
 public:

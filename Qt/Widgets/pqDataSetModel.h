@@ -3,12 +3,13 @@
 #ifndef _pqDataSetModel_h
 #define _pqDataSetModel_h
 
+#include "QtWidgetsExport.h"
 #include <QAbstractTableModel>
 class vtkDataSet;
 
 /// provide a QAbstractTableModel for a vtkDataSet's cell scalars
 /// \ todo fix this class to watch for changes in the pipeline and update the view accordingly
-class pqDataSetModel : public QAbstractTableModel
+class QTWIDGETS_EXPORT pqDataSetModel : public QAbstractTableModel
 {
   Q_OBJECT
 public:
