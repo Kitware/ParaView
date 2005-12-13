@@ -3,6 +3,7 @@
 
 #include <QObject>
 
+class pqNameCount;
 class pqPipelineDataInternal;
 class pqPipelineObject;
 class pqPipelineServer;
@@ -12,7 +13,6 @@ class vtkSMProxy;
 class vtkSMRenderModuleProxy;
 class vtkSMSourceProxy;
 class vtkSMProxy;
-class pqServer;
 
 #include "QtWidgetsExport.h"
 #include <QObject>
@@ -82,6 +82,7 @@ public:
 
 protected:
   pqPipelineDataInternal *Internal; ///< Stores the pipeline objects.
+  pqNameCount *Names;               ///< Keeps track of the proxy names.
   vtkSMSourceProxy* CurrentProxy;
 
   static pqPipelineData *Instance;

@@ -17,6 +17,9 @@ public:
   pqMultiViewFrame(QWidget* parent = NULL);
   ~pqMultiViewFrame();
 
+  /// sets the window title in the title bar and the widget.
+  void setTitle(const QString& title);
+
   /// whether the menu is auto hidden
   bool menuAutoHide() const;
   /// whether the menu is auto hidden

@@ -7,6 +7,8 @@
 #define _pqPipelineObject_h
 
 
+#include <QString> // Needed for proxy name.
+
 class pqPipelineObjectInternal;
 class pqPipelineServer;
 class QWidget;
@@ -31,6 +33,9 @@ public:
 
   ObjectType GetType() const {return this->Type;}
   void SetType(ObjectType type);
+
+  const QString &GetProxyName() const {return this->ProxyName;}
+  void SetProxyName(const QString &name) {this->ProxyName = name;}
 
   vtkSMProxy *GetProxy() const;
   void SetProxy(vtkSMProxy *proxy);
@@ -71,6 +76,7 @@ private:
   pqPipelineObjectInternal *Internal; ///< Stores the object connections.
   vtkSMDisplayProxy *Display;         ///< Stores the display proxy;
   ObjectType Type;                    ///< Stores the object type.
+  QString ProxyName;                  ///< Stores the proxy name.
   union {
     vtkSMProxy *Proxy;                ///< Stores the proxy pointer.
     QWidget *Widget;                  ///< Stores the widget pointer.

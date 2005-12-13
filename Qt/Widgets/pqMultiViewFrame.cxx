@@ -63,6 +63,15 @@ pqMultiViewFrame::~pqMultiViewFrame()
 {
 }
 
+void pqMultiViewFrame::setTitle(const QString& title)
+{
+  this->WindowCaption->setText(title);
+  if(this->MainWidget)
+    {
+    this->MainWidget->setWindowTitle(title);
+    }
+}
+
 bool pqMultiViewFrame::menuAutoHide() const
 {
   return this->AutoHide;
@@ -110,9 +119,14 @@ void pqMultiViewFrame::setMainWidget(QWidget* w)
   QLayout* l = this->layout()->itemAt(1)->layout();
   l->removeItem(l->itemAt(0));
   if(w)
+    {
     l->addWidget(w);
+    this->WindowCaption->setText(w->windowTitle());
+    }
   else
+    {
     static_cast<QBoxLayout*>(l)->addStretch();
+    }
 }
 
 QWidget* pqMultiViewFrame::mainWidget()

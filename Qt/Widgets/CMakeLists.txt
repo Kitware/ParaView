@@ -80,6 +80,8 @@ ADD_LIBRARY(QtWidgets
   pqMultiViewFrame.h
   pqMultiViewManager.cxx
   pqMultiViewManager.h
+  pqNameCount.cxx
+  pqNameCount.h
   pqObjectInspector.cxx
   pqObjectInspector.h
   pqObjectInspectorDelegate.cxx

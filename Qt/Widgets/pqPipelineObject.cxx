@@ -24,6 +24,7 @@ pqPipelineObjectInternal::pqPipelineObjectInternal()
 
 
 pqPipelineObject::pqPipelineObject(vtkSMProxy *proxy, ObjectType type)
+  : ProxyName()
 {
   this->Internal = new pqPipelineObjectInternal();
   this->Display = 0;

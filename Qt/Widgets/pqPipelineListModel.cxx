@@ -445,7 +445,7 @@ void pqPipelineListModel::addWindow(pqPipelineObject *window)
   if(item)
     {
     item->Type = pqPipelineListModel::Window;
-    item->Name = "Window";
+    item->Name = window->GetWidget()->windowTitle();
     item->Data.Object = window;
     item->Parent = serverItem;
     this->Internal->Lookup.insert(window, item);
@@ -823,7 +823,7 @@ void pqPipelineListModel::finishCreateAndAppend()
   else
     newItem->Type = pqPipelineListModel::Filter;
   newItem->Data.Object = filter;
-  newItem->Name = filter->GetProxy()->GetVTKClassName();
+  newItem->Name = filter->GetProxyName();
 
   // If the source is not at the end of the list, the new filter needs
   // to be added to a split item. The items after the source may also
@@ -904,7 +904,7 @@ void pqPipelineListModel::finishCreateAndInsert()
   else
     newItem->Type = pqPipelineListModel::Filter;
   newItem->Data.Object = filter;
-  newItem->Name = filter->GetProxy()->GetVTKClassName();
+  newItem->Name = filter->GetProxyName();
 
   // Make sure the sink is connected to the source. If the source is
   // connected to multiple objects, the filter should be inserted in
@@ -1049,7 +1049,7 @@ void pqPipelineListModel::addSubItem(pqPipelineObject *object,
   if(item)
     {
     item->Type = itemType;
-    item->Name = object->GetProxy()->GetVTKClassName();
+    item->Name = object->GetProxyName();
     item->Data.Object = object;
     item->Parent = parent;
     this->Internal->Lookup.insert(object, item);

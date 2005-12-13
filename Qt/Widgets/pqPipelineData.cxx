@@ -1,6 +1,8 @@
 
 #include "pqPipelineData.h"
 
+#include "pqMultiViewFrame.h"
+#include "pqNameCount.h"
 #include "pqParts.h"
 #include "pqPipelineObject.h"
 #include "pqPipelineServer.h"
@@ -41,6 +43,7 @@ pqPipelineData::pqPipelineData(QObject* parent)
   : QObject(parent), CurrentProxy(NULL)
 {
   this->Internal = new pqPipelineDataInternal;
+  this->Names = new pqNameCount();
 
   if(!pqPipelineData::Instance)
     pqPipelineData::Instance = this;
@@ -51,6 +54,8 @@ pqPipelineData::~pqPipelineData()
   if(pqPipelineData::Instance == this)
     pqPipelineData::Instance = 0;
 
+  if(this->Names)
+    delete this->Names;
   if(this->Internal)
     {
     // Clean up the server objects, which will clean up all the
@@ -140,6 +145,17 @@ void pqPipelineData::addWindow(QVTKWidget *window, pqServer *server)
   pqPipelineObject *object = serverObject->AddWindow(window);
   if(object)
     {
+    // Give the window a title.
+    QString name;
+    name.setNum(this->Names->GetCountAndIncrement("Window"));
+    name.prepend("Window");
+    window->setWindowTitle(name);
+    pqMultiViewFrame *frame = qobject_cast<pqMultiViewFrame *>(window->parent());
+    if(frame)
+      {
+      frame->setTitle(name);
+      }
+
     object->SetServer(serverObject);
     emit this->windowAdded(object);
     }
@@ -236,10 +252,19 @@ vtkSMProxy *pqPipelineData::createSource(const char *proxyName,
   vtkSMProxyManager *proxyManager = server->GetServer()->GetProxyManager();
   vtkSMProxy *proxy = proxyManager->NewProxy("sources", proxyName);
 
+  // Register the proxy with the server manager. Use a unique name
+  // based on the class name and a count.
+  QString name;
+  name.setNum(this->Names->GetCountAndIncrement(proxyName));
+  name.prepend(proxyName);
+  proxyManager->RegisterProxy("sources", name.toAscii().data(), proxy);
+  proxy->Delete();
+
   // Create an internal representation for the source.
   pqPipelineObject *source = server->AddSource(proxy);
   if(source)
     {
+    source->SetProxyName(name);
     source->SetParent(server->GetWindow(window));
     emit this->sourceCreated(source);
     }
@@ -273,10 +298,19 @@ vtkSMProxy *pqPipelineData::createFilter(const char *proxyName,
   vtkSMProxyManager *proxyManager = server->GetServer()->GetProxyManager();
   vtkSMProxy *proxy = proxyManager->NewProxy("filters", proxyName);
 
+  // Register the proxy with the server manager. Use a unique name
+  // based on the class name and a count.
+  QString name;
+  name.setNum(this->Names->GetCountAndIncrement(proxyName));
+  name.prepend(proxyName);
+  proxyManager->RegisterProxy("filters", name.toAscii().data(), proxy);
+  proxy->Delete();
+
   // Create an internal representation for the filter.
   pqPipelineObject *filter = server->AddFilter(proxy);
   if(filter)
     {
+    filter->SetProxyName(name);
     filter->SetParent(server->GetWindow(window));
     emit this->filterCreated(filter);
     }

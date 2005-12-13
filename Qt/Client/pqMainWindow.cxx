@@ -304,6 +304,13 @@ pqMainWindow::~pqMainWindow()
     delete this->Inspector;
     this->Inspector = 0;
     }
+
+  // Clean up the pipeline inspector before the views.
+  if(this->PipelineList)
+    {
+    delete this->PipelineList;
+    this->PipelineList;
+    }
   
   // clean up multiview before server
   if(this->MultiViewManager)

@@ -365,7 +365,6 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *proxy)
     this->Internal->Information->setPropertyName(tr("Information"));
 
     vtkPVDataInformation* dataInfo = this->Proxy->GetDataInformation();
-    double bounds[6];
 
     item = new pqObjectInspectorItem();
     item->setParent(this->Internal->Information);
