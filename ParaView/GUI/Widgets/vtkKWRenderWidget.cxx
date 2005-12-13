@@ -40,7 +40,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.117");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.118");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -620,6 +620,26 @@ void vtkKWRenderWidget::KeyPressCallback(char key,
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::ConfigureCallback(int width, int height)
 {
+  // When calling the superclass's SetWidth or SetHeight, the
+  // other field will be set to 1 (i.e. a width/height of 0 for a Tk frame
+  // translates to a size 1 in that dimension). Fix that.
+
+  if (width <= 1)
+    {
+    width = this->Interactor->GetSize()[0];
+    }
+  if (height <= 1)
+    {
+    height = this->Interactor->GetSize()[1];
+    }
+
+  // We *need* to propagate the size to the vtkTkRenderWidget
+
+  this->VTKWidget->SetConfigurationOptionAsInt("-width", width);
+  this->VTKWidget->SetConfigurationOptionAsInt("-height", height);
+
+  // And to the interactor too, for safety
+
   this->Interactor->UpdateSize(width, height);
   this->Interactor->ConfigureEvent();
 }
