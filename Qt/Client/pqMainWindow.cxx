@@ -466,10 +466,7 @@ void pqMainWindow::onFileSaveServerState(const QStringList& Files)
 {
   for(int i = 0; i != Files.size(); ++i)
     {
-    ofstream file(Files[i].toAscii().data());
-    file << "<ServerState>" << "\n";
-    this->CurrentServer->GetProxyManager()->SaveState("test", &file, 0);
-    file << "</ServerState>" << "\n";
+    this->CurrentServer->GetProxyManager()->SaveState(Files[i].toAscii().data());
     }
 }
 
