@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.13");
+vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.14");
 
 //----------------------------------------------------------------------------
 vtkPVIceTRenderModuleUI::vtkPVIceTRenderModuleUI()
@@ -204,8 +204,7 @@ void vtkPVIceTRenderModuleUI::Create()
   this->OrderedCompositingCheck->SetParent(this->LODFrame->GetFrame());
   this->OrderedCompositingCheck->Create();
   this->OrderedCompositingCheck->SetText("Enabled Ordered Compositing");
-  this->OrderedCompositingCheck->SetCommand(this,
-                                            "OrderedCompositingCheckCallback");
+  this->OrderedCompositingCheck->SetCommand(this, "SetOrderedCompositingFlag");
 
   if (pvapp && pvapp->GetRegistryValue(2, "RunTime", "OrderedCompositing", 0))
     {
@@ -214,7 +213,7 @@ void vtkPVIceTRenderModuleUI::Create()
     }
   this->OrderedCompositingCheck->SetSelectedState(this->OrderedCompositingFlag);
   // This call just forwards the value to the render module.
-  this->OrderedCompositingCheckCallback();
+  this->SetOrderedCompositingFlag(this->OrderedCompositingFlag);
 
   this->OrderedCompositingCheck->SetBalloonHelpString(
     "Toggle the use of ordered compositing.  Ordered compositing makes updates "
@@ -362,13 +361,6 @@ void vtkPVIceTRenderModuleUI::SetStillReductionFactor(int factor)
     }
   ivp->SetElement(0, factor);
   this->RenderModuleProxy->UpdateVTKObjects();
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVIceTRenderModuleUI::OrderedCompositingCheckCallback()
-{
-  this->SetOrderedCompositingFlag(
-                             this->OrderedCompositingCheck->GetSelectedState());
 }
 
 //-----------------------------------------------------------------------------
