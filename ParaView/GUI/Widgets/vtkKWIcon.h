@@ -48,6 +48,7 @@ public:
     IconConnection                = 1,
     IconContourTool               = 16,
     IconCornerAnnotation          = 11,
+    IconCropTool                  = 22,
     IconDistanceTool              = 15,
     IconDocument                  = 9,
     IconEmpty16x16                = 6,
