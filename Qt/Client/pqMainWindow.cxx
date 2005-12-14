@@ -263,8 +263,8 @@ pqMainWindow::pqMainWindow() :
       list.pushBack(pqChartValue((float)1.30));
       list.pushBack(pqChartValue((float)1.20));
       pqChartValue min((int)0);
-      pqChartValue interval((int)10);
-      this->ChartWidget->getHistogram()->setData(list, min, interval);
+      pqChartValue max((int)90);
+      this->ChartWidget->getHistogram()->setData(list, min, max);
       }
 
     this->addDockWidget(Qt::BottomDockWidgetArea, this->ChartDock);
@@ -283,6 +283,8 @@ pqMainWindow::pqMainWindow() :
     if(this->ElementInspectorWidget)
       {
       this->ElementInspectorWidget->setObjectName("ElementInspectorWidget");
+      this->ElementInspectorWidget->setRootIsDecorated(false);
+      //this->ElementInspectorWidget->setAlternatingRowColors(true);
       this->ElementInspectorDock->setWidget(this->ElementInspectorWidget);
       }
 
