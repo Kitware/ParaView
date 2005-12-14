@@ -124,6 +124,10 @@ void pqPicking::computeSelection(vtkRenderWindowInteractor* iren, int X, int Y)
   rm->GetRenderer()->DisplayToWorld();
   rm->GetRenderer()->GetWorldPoint(pt);
 
+  pt[0] /= pt[3];
+  pt[1] /= pt[3];
+  pt[2] /= pt[3];
+
   // give the world point to the pick filter
   vtkSMDoubleVectorProperty *worldPointProperty = vtkSMDoubleVectorProperty::SafeDownCast(this->PickFilter->GetProperty("WorldPoint"));
   worldPointProperty->SetElements3(pt[0], pt[1], pt[2]);

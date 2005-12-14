@@ -32,6 +32,7 @@
 #include "pqSMAdaptor.h"
 #include "pqPicking.h"
 #include "pqDataSetModel.h"
+#include "pqOpenExodusOptions.h"
 
 // TEMP
 #include "pqChartValue.h"
@@ -423,6 +424,10 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
       Adaptor->setProperty(source->GetProperty("FileName"), file);
       Adaptor->setProperty(source->GetProperty("FilePrefix"), file);
       Adaptor->setProperty(source->GetProperty("FilePattern"), "%s");
+      
+      pqOpenExodusOptions options(vtkSMSourceProxy::SafeDownCast(source), this);
+      options.exec();
+
       source->UpdateVTKObjects();
       this->Pipeline->setVisibility(source, true);
       }

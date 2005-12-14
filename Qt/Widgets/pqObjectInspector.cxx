@@ -291,11 +291,15 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *proxy)
   // Clean up the current property data.
   this->cleanData();
 
+
   // Save the new proxy. Get all the property data.
   pqSMAdaptor *adapter = pqSMAdaptor::instance();
   this->Proxy = proxy;
   if(this->Internal && adapter && this->Proxy)
     {
+    // update pipline information on the server
+    proxy->UpdatePipelineInformation();
+
     pqObjectInspectorItem *item = 0;
     pqObjectInspectorItem *child = 0;
     vtkSMProperty *prop = 0;
@@ -354,9 +358,12 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *proxy)
           }
 
         // Set up the property domain information and link it to the server.
+        // TODO  fix pqSMAdaptor to recognize QObject deletions
+        /*
         item->updateDomain(prop);
         adapter->connectDomain(prop, item,
             SLOT(updateDomain(vtkSMProperty*)));
+            */
         }
       }
     iter->Delete();

@@ -19,6 +19,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqMultiView.h
   pqMultiViewFrame.h
   pqMultiViewManager.h
+  pqOpenExodusOptions.h
   pqObjectInspector.h
   pqObjectInspectorItem.h
   pqObjectInspectorWidget.h
@@ -33,8 +34,9 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
 
 SET(UI_FORMS
   pqFileDialog.ui
-  pqServerBrowser.ui
   pqMultiViewFrameMenu.ui
+  pqOpenExodusOptions.ui
+  pqServerBrowser.ui
 )
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
@@ -80,6 +82,8 @@ ADD_LIBRARY(QtWidgets
   pqMultiViewFrame.h
   pqMultiViewManager.cxx
   pqMultiViewManager.h
+  pqOpenExodusOptions.cxx
+  pqOpenExodusOptions.h
   pqNameCount.cxx
   pqNameCount.h
   pqObjectInspector.cxx
