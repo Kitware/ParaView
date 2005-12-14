@@ -312,7 +312,7 @@ pqMainWindow::~pqMainWindow()
   if(this->PipelineList)
     {
     delete this->PipelineList;
-    this->PipelineList;
+    this->PipelineList = 0;
     }
   
   // clean up multiview before server
