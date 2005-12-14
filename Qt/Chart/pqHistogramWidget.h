@@ -304,6 +304,7 @@ private:
   QTimer *MoveTimer;           ///< Used for the mouse interaction.
   int LastBin;                 ///< Stores the last bin click.
   int LastValueX;              ///< Stores the last value click.
+  bool MouseDown;              ///< Used for mouse interactions.
 };
 
 #endif

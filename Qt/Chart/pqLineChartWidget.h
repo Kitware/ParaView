@@ -174,6 +174,7 @@ private:
   pqChartAxis *XAxis;      ///< Used to draw the x-axis.
   pqChartAxis *YAxis;      ///< Used to draw the y-axis.
   pqLineChart *LineChart;  ///< Used to draw the line chart.
+  bool MouseDown;          ///< Used for mouse interactions.
 };
 
 #endif

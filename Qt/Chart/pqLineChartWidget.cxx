@@ -41,6 +41,7 @@ pqLineChartWidget::pqLineChartWidget(QWidget *parent)
   this->XAxis = 0;
   this->YAxis = 0;
   this->LineChart = 0;
+  this->MouseDown = false;
 
   // Set up the default Qt properties.
   this->setFocusPolicy(Qt::ClickFocus);
@@ -310,6 +311,7 @@ void pqLineChartWidget::mousePressEvent(QMouseEvent *e)
     return;
 
   // Get the current mouse position and convert it to contents coords.
+  this->MouseDown = true;
   QPoint point = e->pos();
   point.rx() += this->ZoomPan->contentsX();
   point.ry() += this->ZoomPan->contentsY();
@@ -334,6 +336,7 @@ void pqLineChartWidget::mouseReleaseEvent(QMouseEvent *e)
     return;
 
   // Get the current mouse position and convert it to contents coords.
+  this->MouseDown = false;
   QPoint point = e->pos();
   point.rx() += this->ZoomPan->contentsX();
   point.ry() += this->ZoomPan->contentsY();
@@ -380,7 +383,7 @@ void pqLineChartWidget::mouseDoubleClickEvent(QMouseEvent *e)
 
 void pqLineChartWidget::mouseMoveEvent(QMouseEvent *e)
 {
-  if(!this->ZoomPan)
+  if(!this->ZoomPan || !this->MouseDown)
     return;
 
   // Get the current mouse position and convert it to contents coords.
