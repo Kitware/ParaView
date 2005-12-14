@@ -62,6 +62,8 @@ pqPicking::pqPicking(vtkSMRenderModuleProxy* rm, QObject* p)
   inputProp->AddProxy(this->PickFilter);
   this->PickRetriever->SetVisibilityCM(0);  // invisible
 
+  this->EmptySet = vtkUnstructuredGrid::New();
+
 }
 
 pqPicking::~pqPicking()
@@ -70,6 +72,7 @@ pqPicking::~pqPicking()
   this->PickFilter->Delete();
   this->PickRetriever->Delete();
   this->PickDisplay->Delete();
+  this->EmptySet->Delete();
 }
 
 void pqPicking::computeSelection(vtkObject* o, unsigned long, void*, void*, vtkCommand* command)
@@ -113,6 +116,7 @@ void pqPicking::computeSelection(vtkRenderWindowInteractor* iren, int X, int Y)
     vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(this->RenderModule->GetProperty("Displays"));
     pp->RemoveProxy(this->PickDisplay);
     rm->UpdateVTKObjects();
+    emit this->selectionChanged(inputProxy, this->EmptySet);
     rm->StillRender();  // TODO : replace with correct update policy
     return;
     }

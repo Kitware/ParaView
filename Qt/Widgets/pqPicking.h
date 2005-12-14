@@ -40,6 +40,7 @@ private:
   vtkSMSourceProxy* PickFilter;
   vtkSMDisplayProxy* PickDisplay;
   vtkSMPointLabelDisplayProxy* PickRetriever;
+  vtkUnstructuredGrid* EmptySet;
 
 };
 
