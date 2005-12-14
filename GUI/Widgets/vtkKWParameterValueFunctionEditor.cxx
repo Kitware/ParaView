@@ -34,7 +34,7 @@
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.79");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.80");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -5384,7 +5384,8 @@ void vtkKWParameterValueFunctionEditor::RedrawLine(
                 << " " << vtkKWParameterValueFunctionEditor::LineTag
                 << " " << vtkKWParameterValueFunctionEditor::FunctionTag 
                 << "}" << endl;
-        *tk_cmd << canv << " lower l" << id2 << " {p" << id1 << "||p" << id2 
+        *tk_cmd << canv << " lower l" << id2 
+                << " {p" << id1 << "||p" << id2 << "||m_p" << id1
                 << "}" << endl;
         }
   
