@@ -33,7 +33,10 @@ public:
   virtual void Create();
 
   // Description:
-  // Convenience method to set the width/height of a frame.
+  // Convenience method to request the width/height of a frame.
+  // If width or height is less than or equal to zero then the frame will
+  // not request any site at all, and we obey both the geometry of its
+  // children and the space provided by its parent.
   // Supported only starting Tcl/Tk 8.3
   virtual void SetWidth(int);
   virtual int GetWidth();
