@@ -137,6 +137,13 @@ public:
   virtual void SelectPoint(int id);
 
   // Description:
+  // Select next and previous point.
+  // Override the superclass so that the mid-points are also selected (i.e.
+  // it will iterator over point, mid-point, point, mid-point, etc.)
+  virtual void SelectNextPoint();
+  virtual void SelectPreviousPoint();
+
+  // Description:
   // Specifies selection-related commands to associate with the widget.
   // 'MidPointSelectionChangedCommand' is called whenever the midpoint
   // selection was changed or cleared.

@@ -21,7 +21,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.13");
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.14");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";
@@ -38,6 +38,7 @@ const char *vtkKWParameterValueHermiteFunctionEditor::MidPointSelectedTag = "mps
 #define RSTRANGE 1
 
 #define VTK_KW_PVHFE_GUIDELINE_VALUE_TEXT_SIZE          7
+#define VTK_KW_PVHFE_POINT_RADIUS_FACTOR          0.76
 
 //----------------------------------------------------------------------------
 vtkKWParameterValueHermiteFunctionEditor::vtkKWParameterValueHermiteFunctionEditor()
@@ -910,11 +911,11 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawFunction()
 
 //----------------------------------------------------------------------------
 void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
-  int id, int id2, ostrstream *tk_cmd)
+  int id1, int id2, ostrstream *tk_cmd)
 {
   // Redraw the line
 
-  this->Superclass::RedrawLine(id, id2, tk_cmd);
+  this->Superclass::RedrawLine(id1, id2, tk_cmd);
 
   // Then redraw the midpoint on this line
 
@@ -940,12 +941,12 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
   double p, displayed_p;
   int x, y, r;
   int is_not_visible = 0, is_not_visible_h = 0;
-  int is_not_valid = (id < 0 || id >= (this->GetFunctionSize() - 1));
+  int is_not_valid = (id1 < 0 || id1 >= (this->GetFunctionSize() - 1));
 
   // Do we have a midpoint for this segment ?
 
   double midpoint;
-  if (!this->GetFunctionPointMidPoint(id, &midpoint))
+  if (!this->GetFunctionPointMidPoint(id1, &midpoint))
     {
     is_not_valid = 1;
     }
@@ -955,10 +956,10 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
 
   if (!is_not_valid)
     {
-    this->GetMidPointCanvasCoordinates(id, &x, &y, &p);
+    this->GetMidPointCanvasCoordinates(id1, &x, &y, &p);
 
-    r = (int)((double)this->PointRadius * 0.72);
-    if (id == this->GetSelectedMidPoint())
+    r = (int)((double)this->PointRadius * VTK_KW_PVHFE_POINT_RADIUS_FACTOR);
+    if (id1 == this->GetSelectedMidPoint())
       {
       r = (int)ceil((double)r * this->SelectedPointRadius);
       }
@@ -986,7 +987,7 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
 
   if (is_not_valid)
     {
-    *tk_cmd << canv << " delete m_p" << id << endl;
+    *tk_cmd << canv << " delete m_p" << id1 << endl;
     }
   else
     {
@@ -994,29 +995,29 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
         !this->GetMidPointVisibility() || 
         !this->CanvasVisibility)
       {
-      *tk_cmd << canv << " itemconfigure m_p" << id << " -state hidden" <<endl;
+      *tk_cmd << canv << " itemconfigure m_p" << id1 << " -state hidden"<<endl;
       }
     else
       {
-      if (!this->CanvasHasTag("m_p", &id))
+      if (!this->CanvasHasTag("m_p", &id1))
         {
-        *tk_cmd << canv << " create rectangle" << " 0 0 0 0 -tags {m_p" << id 
+        *tk_cmd << canv << " create rectangle" << " 0 0 0 0 -tags {m_p" << id1 
                 << " "<< vtkKWParameterValueHermiteFunctionEditor::MidPointTag 
                 << " " << vtkKWParameterValueFunctionEditor::FunctionTag 
                 << "}" << endl;
-        *tk_cmd << canv << " lower m_p" << id << " {p" << id << "||p" << id + 1
+        *tk_cmd << canv << " lower m_p" << id1 << " {p" << id1 << "||p" << id2
                 << "}" << endl;
         }
-      *tk_cmd << canv << " coords m_p" << id 
+      *tk_cmd << canv << " coords m_p" << id1 
               << " " << x - r << " " << y - r 
               << " " << x + r << " " << y + r
               << endl;
       char color[10];
-      double *rgb = (id == this->GetSelectedMidPoint()) 
+      double *rgb = (id1 == this->GetSelectedMidPoint()) 
         ? this->SelectedMidPointColor : this->MidPointColor;
       sprintf(color, "#%02x%02x%02x", 
               (int)(rgb[0]*255.0), (int)(rgb[1]*255.0), (int)(rgb[2]*255.0));
-      *tk_cmd << canv << " itemconfigure m_p" << id 
+      *tk_cmd << canv << " itemconfigure m_p" << id1
               << " -state normal  -width " << this->PointOutlineWidth
               << " -outline black -fill " << color << endl;
       }
@@ -1026,7 +1027,7 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
 
   if (is_not_valid)
     {
-    *tk_cmd << canv << " delete m_g" << id << endl;
+    *tk_cmd << canv << " delete m_g" << id1 << endl;
     }
   else
     {
@@ -1034,19 +1035,19 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
         !this->MidPointGuidelineVisibility || 
         !this->CanvasVisibility)
       {
-      *tk_cmd << canv << " itemconfigure m_g" << id << " -state hidden" <<endl;
+      *tk_cmd << canv << " itemconfigure m_g" << id1 << " -state hidden"<<endl;
       }
     else
       {
-      if (!this->CanvasHasTag("m_g", &id))
+      if (!this->CanvasHasTag("m_g", &id1))
         {
         *tk_cmd 
           << canv << " create line 0 0 0 0 -fill black -width 1 " 
-          << " -tags {m_g" << id << " " 
+          << " -tags {m_g" << id1 << " " 
           << vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag 
           << " " << vtkKWParameterValueFunctionEditor::FunctionTag
           << "}" << endl;
-        *tk_cmd << canv << " lower m_g" << id << " m_p" << id << endl;
+        *tk_cmd << canv << " lower m_g" << id1 << " m_p" << id1 << endl;
         }
   
       double factors[2] = {0.0, 0.0};
@@ -1054,9 +1055,9 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
       double *v_w_range = this->GetWholeValueRange();
       int y1 = vtkMath::Round(v_w_range[0] * factors[1]);
       int y2 = vtkMath::Round(v_w_range[1] * factors[1]);
-      *tk_cmd << canv << " coords m_g" << id << " "
+      *tk_cmd << canv << " coords m_g" << id1 << " "
               << x << " " << y1 << " " << x << " " << y2 << endl;
-      *tk_cmd << canv << " itemconfigure m_g" << id;
+      *tk_cmd << canv << " itemconfigure m_g" << id1;
       if (this->PointGuidelineStyle == 
           vtkKWParameterValueFunctionEditor::LineStyleDash)
         {
@@ -1080,7 +1081,7 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
   
     if (is_not_valid)
       {
-      *tk_cmd << gv_canv << " delete m_g" << id << endl;
+      *tk_cmd << gv_canv << " delete m_g" << id1 << endl;
       }
     else
       {
@@ -1088,32 +1089,32 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
           !this->MidPointGuidelineVisibility || 
           !this->MidPointGuidelineValueVisibility)
         {
-        *tk_cmd << gv_canv << " itemconfigure m_g" << id << " -state hidden" 
+        *tk_cmd << gv_canv << " itemconfigure m_g" << id1 << " -state hidden" 
                 << endl;
         }
       else
         {
-        if (!this->CanvasHasTag("m_g", &id, this->GuidelineValueCanvas))
+        if (!this->CanvasHasTag("m_g", &id1, this->GuidelineValueCanvas))
           {
           *tk_cmd 
             << gv_canv << " create text 0 0 -text {} -anchor s " 
             << "-font {{fixed} " << VTK_KW_PVHFE_GUIDELINE_VALUE_TEXT_SIZE 
-            << "} -tags {m_g" << id << " " 
+            << "} -tags {m_g" << id1 << " " 
             << vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag 
             << " " << vtkKWParameterValueFunctionEditor::FunctionTag
             << "}" << endl;
           }
         
-        *tk_cmd << gv_canv << " coords m_g" << id << " " << x 
+        *tk_cmd << gv_canv << " coords m_g" << id1 << " " << x 
                 << " " << this->GuidelineValueCanvas->GetHeight() + 1 << endl
-                << gv_canv << " itemconfigure m_g" << id << " -state normal" 
+                << gv_canv << " itemconfigure m_g" << id1 << " -state normal" 
                 << endl;
         if (this->MidPointGuidelineValueFormat)
           {
           this->MapParameterToDisplayedParameter(p, &displayed_p);
           char buffer[256];
           sprintf(buffer, this->MidPointGuidelineValueFormat, displayed_p);
-          *tk_cmd << gv_canv << " itemconfigure m_g" << id 
+          *tk_cmd << gv_canv << " itemconfigure m_g" << id1
                   << " -text {" << buffer << "}" << endl;
           }
         }
@@ -1142,6 +1143,46 @@ void vtkKWParameterValueHermiteFunctionEditor::SelectPoint(int id)
   if (this->HasSelection())
     {
     this->ClearMidPointSelection();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueHermiteFunctionEditor::SelectNextPoint()
+{
+  if (this->HasMidPointSelection())
+    {
+    this->SelectPoint(this->GetSelectedMidPoint() + 1);
+    }
+  else if (this->HasSelection())
+    {
+    if (this->GetSelectedPoint() == this->GetFunctionSize() - 1)
+      {
+      this->SelectPoint(0);
+      }
+    else
+      {
+      this->SelectMidPoint(this->GetSelectedPoint());
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueHermiteFunctionEditor::SelectPreviousPoint()
+{
+  if (this->HasMidPointSelection())
+    {
+    this->SelectPoint(this->GetSelectedMidPoint());
+    }
+  else if (this->HasSelection())
+    {
+    if (this->GetSelectedPoint() == 0)
+      {
+      this->SelectPoint(this->GetFunctionSize() - 1);
+      }
+    else
+      {
+      this->SelectMidPoint(this->GetSelectedPoint() - 1);
+      }
     }
 }
 
