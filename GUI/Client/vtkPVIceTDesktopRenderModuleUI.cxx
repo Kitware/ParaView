@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDesktopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.7");
+vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.7.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVIceTDesktopRenderModuleUI::vtkPVIceTDesktopRenderModuleUI()
@@ -70,7 +70,7 @@ void vtkPVIceTDesktopRenderModuleUI::Create(vtkKWApplication *app)
 
   this->OrderedCompositingCheck->SetParent(this->LODFrame->GetFrame());
   this->OrderedCompositingCheck->Create(app);
-  this->OrderedCompositingCheck->SetText("Enabled Ordered Compositing");
+  this->OrderedCompositingCheck->SetText("Enable Ordered Compositing");
   this->OrderedCompositingCheck->SetCommand(this,
                                             "OrderedCompositingCheckCallback");
 
