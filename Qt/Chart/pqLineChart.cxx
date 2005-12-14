@@ -29,8 +29,8 @@ public:
   ~pqLineChartItem() {}
 
 public:
-  QPolygon array; ///< Stores the pixel coordinates.
-  pqLinePlot *plot;   ///< Stores the line plot interface.
+  QPolygon Array;   ///< Stores the pixel coordinates.
+  pqLinePlot *Plot; ///< Stores the line plot interface.
 };
 
 
@@ -42,9 +42,9 @@ class pqLineChartData : public vtkstd::list<pqLineChartItem *> {};
 
 
 pqLineChartItem::pqLineChartItem()
-  : array()
+  : Array()
 {
-  this->plot = 0;
+  this->Plot = 0;
 }
 
 
@@ -89,7 +89,7 @@ void pqLineChart::addData(pqLinePlot *plot)
   for( ; iter != this->Data->end(); iter++)
     {
     item = *iter;
-    if(item && item->plot == plot)
+    if(item && item->Plot == plot)
       return;
     }
 
@@ -97,19 +97,19 @@ void pqLineChart::addData(pqLinePlot *plot)
   item = new pqLineChartItem();
   if(item)
     {
-    item->plot = plot;
+    item->Plot = plot;
     this->Data->push_back(item);
 
     // Listen to the plot changed signal.
-    connect(plot, SIGNAL(plotModified(const pqLinePlot *)), this,
+    connect(item->Plot, SIGNAL(plotModified(const pqLinePlot *)), this,
         SLOT(handlePlotChanges(const pqLinePlot *)));
 
     pqChartCoordinate min;
     pqChartCoordinate max;
-    plot->getMinX(min.X);
-    plot->getMinY(min.Y);
-    plot->getMaxX(max.X);
-    plot->getMaxY(max.Y);
+    item->Plot->getMinX(min.X);
+    item->Plot->getMinY(min.Y);
+    item->Plot->getMaxX(max.X);
+    item->Plot->getMaxY(max.Y);
 
     // If neither of the axes needs to be changed, the new plot
     // can be layed out using the current pixel maping. Setting
@@ -142,10 +142,10 @@ void pqLineChart::removeData(pqLinePlot *plot)
     item = *iter;
     if(item)
       {
-      if(item->plot == plot)
+      if(item->Plot == plot)
         {
         // Disconnect from the plot's signals.
-        disconnect(plot, 0, this, 0);
+        disconnect(item->Plot, 0, this, 0);
 
         // Remove the item from the list.
         iter = this->Data->erase(iter);
@@ -156,24 +156,24 @@ void pqLineChart::removeData(pqLinePlot *plot)
         {
         if(firstItem)
           {
-          item->plot->getMinX(min.X);
-          item->plot->getMinY(min.Y);
-          item->plot->getMaxX(max.X);
-          item->plot->getMaxY(max.Y);
+          item->Plot->getMinX(min.X);
+          item->Plot->getMinY(min.Y);
+          item->Plot->getMaxX(max.X);
+          item->Plot->getMaxY(max.Y);
           firstItem = false;
           }
         else
           {
-          item->plot->getMinX(value);
+          item->Plot->getMinX(value);
           if(value < min.X)
             min.X = value;
-          item->plot->getMinY(value);
+          item->Plot->getMinY(value);
           if(value < min.Y)
             min.Y = value;
-          item->plot->getMaxX(value);
+          item->Plot->getMaxX(value);
           if(value > max.X)
             max.X = value;
-          item->plot->getMaxY(value);
+          item->Plot->getMaxY(value);
           if(value > max.Y)
             max.Y = value;
           }
@@ -240,20 +240,20 @@ void pqLineChart::drawChart(QPainter *p, const QRect &area)
   for( ; iter != this->Data->end(); iter++)
     {
     pqLineChartItem *item = *iter;
-    if(item && item->plot && !item->array.isEmpty())
+    if(item && item->Plot && !item->Array.isEmpty())
       {
       // Set the drawing pen up for the plot.
-      linePen.setColor(item->plot->getColor());
-      linePen.setWidth(item->plot->getWidth());
+      linePen.setColor(item->Plot->getColor());
+      linePen.setWidth(item->Plot->getWidth());
       p->setPen(linePen);
 
       // Draw the line segments.
-      if(item->plot->isPolyLine())
-        p->drawPolyline(item->array);
+      if(item->Plot->isPolyLine())
+        p->drawPolyline(item->Array);
       else
         {
-        for(int i = 1; i < item->array.size(); i += 2)
-          p->drawLine(item->array[i - 1], item->array[i]);
+        for(int i = 1; i < item->Array.size(); i += 2)
+          p->drawLine(item->Array[i - 1], item->Array[i]);
         }
 
       // TODO: Draw in the user editable points.
@@ -289,10 +289,10 @@ void pqLineChart::handlePlotChanges(const pqLinePlot *plot)
     item = *iter;
     if(item)
       {
-      if(item->plot == plot)
+      if(item->Plot == plot)
         {
         match = item;
-        if(!plot->isModified())
+        if(!item->Plot->isModified())
           break;
         }
 
@@ -300,24 +300,24 @@ void pqLineChart::handlePlotChanges(const pqLinePlot *plot)
         {
         if(firstItem)
           {
-          item->plot->getMinX(min.X);
-          item->plot->getMinY(min.Y);
-          item->plot->getMaxX(max.X);
-          item->plot->getMaxY(max.Y);
+          item->Plot->getMinX(min.X);
+          item->Plot->getMinY(min.Y);
+          item->Plot->getMaxX(max.X);
+          item->Plot->getMaxY(max.Y);
           firstItem = false;
           }
         else
           {
-          item->plot->getMinX(value);
+          item->Plot->getMinX(value);
           if(value < min.X)
             min.X = value;
-          item->plot->getMinY(value);
+          item->Plot->getMinY(value);
           if(value < min.Y)
             min.Y = value;
-          item->plot->getMaxX(value);
+          item->Plot->getMaxX(value);
           if(value > max.X)
             max.X = value;
-          item->plot->getMaxY(value);
+          item->Plot->getMaxY(value);
           if(value > max.Y)
             max.Y = value;
           }
@@ -362,15 +362,15 @@ void pqLineChart::clearData()
 
 void pqLineChart::layoutItem(pqLineChartItem *item)
 {
-  if(!item || !item->plot)
+  if(!item || !item->Plot)
     return;
 
   // Flag the item as not modified.
-  item->plot->setModified(false);
+  item->Plot->setModified(false);
 
   // Make sure the array can hold the data.
-  int total = item->plot->getCoordinateCount();
-  item->array.resize(total);
+  int total = item->Plot->getCoordinateCount();
+  item->Array.resize(total);
 
   // Transform the plot data into pixel coordinates.
   int px = 0;
@@ -378,13 +378,13 @@ void pqLineChart::layoutItem(pqLineChartItem *item)
   pqChartCoordinate coord;
   for(int i = 0; i < total; i++)
     {
-    if(item->plot->getCoordinate(i, coord))
+    if(item->Plot->getCoordinate(i, coord))
       {
       px = this->XAxis->getPixelFor(coord.X);
       py = this->YAxis->getPixelFor(coord.Y);
       }
 
-    item->array.setPoint(i, px, py);
+    item->Array.setPoint(i, px, py);
     }
 }
 

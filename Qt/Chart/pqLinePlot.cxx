@@ -14,14 +14,14 @@
 pqLinePlot::pqLinePlot(QObject *parent)
   : QObject(parent), Color(Qt::black)
 {
-  this->thickness = 1;
-  this->modified = true;
+  this->Thickness = 1;
+  this->Modified = true;
 }
 
 void pqLinePlot::setModified(bool modified)
 {
-  this->modified = modified;
-  if(this->modified)
+  this->Modified = modified;
+  if(this->Modified)
     {
     emit this->plotModified(this);
     }
@@ -35,7 +35,7 @@ void pqLinePlot::setColor(const QColor &color)
 
 void pqLinePlot::setWidth(int width)
 {
-  this->thickness = width;
+  this->Thickness = width;
   emit this->plotModified(this);
 }
 

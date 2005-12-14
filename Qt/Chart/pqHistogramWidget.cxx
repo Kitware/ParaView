@@ -46,12 +46,12 @@ public:
 
 public:
   /// Stores the previously used list of selected ranges.
-  pqHistogramSelectionList selection;
+  pqHistogramSelectionList Selection;
 };
 
 
 pqHistogramWidgetData::pqHistogramWidgetData()
-  : selection()
+  : Selection()
 {
 }
 
@@ -62,14 +62,14 @@ pqHistogramWidgetData::~pqHistogramWidgetData()
 
 void pqHistogramWidgetData::cleanSelectionList()
 {
-  pqHistogramSelectionList::Iterator iter = this->selection.begin();
-  for( ; iter != this->selection.end(); iter++)
+  pqHistogramSelectionList::Iterator iter = this->Selection.begin();
+  for( ; iter != this->Selection.end(); iter++)
     {
     if(*iter)
       delete *iter;
     }
 
-  this->selection.clear();
+  this->Selection.clear();
 }
 
 
@@ -554,7 +554,7 @@ void pqHistogramWidget::mousePressEvent(QMouseEvent *e)
             this->Data->cleanSelectionList();
             pqHistogramSelection *selection = new pqHistogramSelection(range);
             if(selection)
-              this->Data->selection.pushBack(selection);
+              this->Data->Selection.pushBack(selection);
             }
           }
         else if(this->Data)
@@ -612,7 +612,7 @@ void pqHistogramWidget::mousePressEvent(QMouseEvent *e)
             this->Data->cleanSelectionList();
             pqHistogramSelection *selection = new pqHistogramSelection(range);
             if(selection)
-              this->Data->selection.pushBack(selection);
+              this->Data->Selection.pushBack(selection);
             }
           }
         else if(this->Data)
@@ -849,8 +849,8 @@ void pqHistogramWidget::mouseMoveEvent(QMouseEvent *e)
         this->Histogram->getBinsIn(this->Mouse->Box, newSelection);
         if(e->modifiers() & Qt::ShiftModifier)
           {
-          if(!this->Data->selection.isEmpty())
-            this->Histogram->subtractSelection(this->Data->selection);
+          if(!this->Data->Selection.isEmpty())
+            this->Histogram->subtractSelection(this->Data->Selection);
           this->Histogram->addSelection(newSelection);
           }
         else if(e->modifiers() & Qt::ControlModifier)
@@ -860,9 +860,9 @@ void pqHistogramWidget::mouseMoveEvent(QMouseEvent *e)
           pqHistogramSelectionList toDelete;
           pqHistogramSelectionList copy;
           copy.makeNewCopy(newSelection);
-          this->Data->selection.Xor(copy, toDelete);
-          this->Histogram->xorSelection(this->Data->selection);
-          this->Data->selection += toDelete;
+          this->Data->Selection.Xor(copy, toDelete);
+          this->Histogram->xorSelection(this->Data->Selection);
+          this->Data->Selection += toDelete;
           }
         else
           this->Histogram->setSelection(newSelection);
@@ -877,7 +877,7 @@ void pqHistogramWidget::mouseMoveEvent(QMouseEvent *e)
 
         // Save the new selection in place of the old one.
         this->Data->cleanSelectionList();
-        this->Data->selection = newSelection;
+        this->Data->Selection = newSelection;
         }
 
       // Repaint the affected area.
@@ -913,9 +913,9 @@ void pqHistogramWidget::mouseMoveEvent(QMouseEvent *e)
           pqHistogramSelectionList toDelete;
           pqHistogramSelectionList copy;
           copy.makeNewCopy(newSelection);
-          this->Data->selection.Xor(copy, toDelete);
-          this->Histogram->xorSelection(this->Data->selection);
-          this->Data->selection += toDelete;
+          this->Data->Selection.Xor(copy, toDelete);
+          this->Histogram->xorSelection(this->Data->Selection);
+          this->Data->Selection += toDelete;
           }
         else
           this->Histogram->setSelection(newSelection);
@@ -928,7 +928,7 @@ void pqHistogramWidget::mouseMoveEvent(QMouseEvent *e)
 
         // Save the new selection in place of the old one.
         this->Data->cleanSelectionList();
-        this->Data->selection = newSelection;
+        this->Data->Selection = newSelection;
 
         area.translate(-this->ZoomPan->contentsX(),
             -this->ZoomPan->contentsY());

@@ -107,7 +107,7 @@ public:
 
   /// \brief
   ///   Gets whether or not the plot has been modified.
-  bool isModified() const {return this->modified;}
+  bool isModified() const {return this->Modified;}
   //@}
 
   /// \name Drawing Parameters
@@ -132,7 +132,7 @@ public:
   ///   Gets the width used to draw the line plot.
   /// \return
   ///   The drawing width of the line plot.
-  int getWidth() const {return this->thickness;}
+  int getWidth() const {return this->Thickness;}
   //@}
 
 signals:
@@ -147,8 +147,8 @@ signals:
 
 private:
   QColor Color;  ///< Stores the line plot's color.
-  int thickness; ///< Stores the line thickness.
-  bool modified; ///< True if the data has changed.
+  int Thickness; ///< Stores the line thickness.
+  bool Modified; ///< True if the data has changed.
 };
 
 #endif

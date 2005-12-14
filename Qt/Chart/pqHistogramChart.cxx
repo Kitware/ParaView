@@ -44,13 +44,13 @@ public:
   ///   Gets the value for the histogram bar.
   /// \return
   ///   The value for the histogram bar.
-  const pqChartValue &getValue() const {return value;}
+  const pqChartValue &getValue() const {return Value;}
 
 public:
   QRect Bounds;       ///< The bounding rectangle of the bar.
 
 private:
-  pqChartValue value; ///< Stores the histogram value.
+  pqChartValue Value; ///< Stores the histogram value.
 };
 
 
@@ -108,29 +108,29 @@ public:
 
 public:
   /// Stores the list of histogram bars.
-  vtkstd::vector<QHistogramItem *> items;
+  vtkstd::vector<QHistogramItem *> Items;
 
   /// Stores the list of current selection ranges.
-  pqHistogramSelectionList selections;
+  pqHistogramSelectionList Selections;
 
   /// Stores the default color scheme for the histogram.
-  static pqHistogramColor colorScheme;
+  static pqHistogramColor ColorScheme;
 };
 
 
 QHistogramItem::QHistogramItem()
-  : Bounds(), value((int)0)
+  : Bounds(), Value((int)0)
 {
 }
 
-QHistogramItem::QHistogramItem(const pqChartValue &val)
-  : Bounds(), value(val)
+QHistogramItem::QHistogramItem(const pqChartValue &value)
+  : Bounds(), Value(value)
 {
 }
 
 void QHistogramItem::setValue(const pqChartValue &value)
 {
-  this->value = value;
+  this->Value = value;
 }
 
 
@@ -169,20 +169,20 @@ QHistogramHighlight &QHistogramHighlight::operator=(
 }
 
 
-pqHistogramColor pqHistogramChartData::colorScheme;
+pqHistogramColor pqHistogramChartData::ColorScheme;
 
 pqHistogramChartData::pqHistogramChartData()
-  : items(), selections()
+  : Items(), Selections()
 {
 }
 
 void pqHistogramChartData::clearSelection()
 {
-  pqHistogramSelectionList::Iterator iter = this->selections.begin();
-  for( ; iter != this->selections.end(); ++iter)
+  pqHistogramSelectionList::Iterator iter = this->Selections.begin();
+  for( ; iter != this->Selections.end(); ++iter)
     delete *iter;
 
-  this->selections.clear();
+  this->Selections.clear();
 }
 
 
@@ -193,7 +193,7 @@ pqHistogramChart::pqHistogramChart(QObject *parent)
 {
   this->Style = pqHistogramChart::Fill;
   this->OutlineType = pqHistogramChart::Darker;
-  this->Colors = &pqHistogramChartData::colorScheme;
+  this->Colors = &pqHistogramChartData::ColorScheme;
   this->Data = new pqHistogramChartData();
 }
 
@@ -228,7 +228,7 @@ void pqHistogramChart::setData(const pqChartValueList &values,
   for( ; iter != values.constEnd(); ++iter)
     {
     QHistogramItem *item = new QHistogramItem(*iter);
-    this->Data->items.push_back(item);
+    this->Data->Items.push_back(item);
     if(*iter > yMax)
       yMax = *iter;
     else if(*iter < yMin)
@@ -268,13 +268,13 @@ void pqHistogramChart::setData(const pqChartValueList &values,
 
   // If there was a selection change, notify the observers.
   if(hadSelection)
-    emit this->selectionChanged(this->Data->selections);
+    emit this->selectionChanged(this->Data->Selections);
 }
 
 int pqHistogramChart::getBinCount() const
 {
   if(this->Data)
-    return static_cast<int>(this->Data->items.size());
+    return static_cast<int>(this->Data->Items.size());
   return 0;
 }
 
@@ -288,7 +288,7 @@ int pqHistogramChart::getLastBin() const
 
 int pqHistogramChart::getBinWidth() const
 {
-  if(this->Data && this->Data->items.size() > 0 && this->Bounds.isValid())
+  if(this->Data && this->Data->Items.size() > 0 && this->Bounds.isValid())
     return this->Bounds.width()/this->getBinCount();
   return 0;
 }
@@ -297,8 +297,8 @@ int pqHistogramChart::getBinAt(int x, int y) const
 {
   if(this->Data)
     {
-    vtkstd::vector<QHistogramItem *>::iterator iter = this->Data->items.begin();
-    for(int i = 0; iter != this->Data->items.end(); iter++, i++)
+    vtkstd::vector<QHistogramItem *>::iterator iter = this->Data->Items.begin();
+    for(int i = 0; iter != this->Data->Items.end(); iter++, i++)
       {
       if(*iter && (*iter)->Bounds.isValid() && (*iter)->Bounds.contains(x, y))
         return i;
@@ -338,7 +338,7 @@ bool pqHistogramChart::getValueRangeAt(int x, int y,
     pqHistogramSelection &range) const
 {
   if(this->Data && this->Bounds.isValid() && this->XAxis->isValid() &&
-    this->Data->selections.getType() == pqHistogramSelection::Value &&
+    this->Data->Selections.getType() == pqHistogramSelection::Value &&
     this->Bounds.contains(x, y))
     {
     pqChartValue diff = this->XAxis->getValueRange();
@@ -357,8 +357,8 @@ bool pqHistogramChart::getValueRangeAt(int x, int y,
 
     // Search through the current selection list.
     pqChartValue value = this->XAxis->getValueFor(x);
-    pqHistogramSelectionList::ConstIterator iter = this->Data->selections.begin();
-    for( ; iter != this->Data->selections.end(); ++iter)
+    pqHistogramSelectionList::ConstIterator iter = this->Data->Selections.begin();
+    for( ; iter != this->Data->Selections.end(); ++iter)
       {
       const pqHistogramSelection *selection = *iter;
       if(selection->getFirst() <= value)
@@ -385,8 +385,8 @@ void pqHistogramChart::getBinsIn(const QRect &area,
     {
     pqChartValue i((int)0);
     pqHistogramSelection *selection = 0;
-    vtkstd::vector<QHistogramItem *>::iterator iter = this->Data->items.begin();
-    for( ; iter != this->Data->items.end(); iter++, ++i)
+    vtkstd::vector<QHistogramItem *>::iterator iter = this->Data->Items.begin();
+    for( ; iter != this->Data->Items.end(); iter++, ++i)
       {
       if(*iter && (*iter)->Bounds.isValid() &&
           (*iter)->Bounds.intersects(area))
@@ -455,14 +455,14 @@ void pqHistogramChart::getValuesIn(const QRect &area,
 bool pqHistogramChart::hasSelection() const
 {
   if(this->Data)
-    return this->Data->selections.getSize() > 0;
+    return this->Data->Selections.getSize() > 0;
   return false;
 }
 
 void pqHistogramChart::getSelection(pqHistogramSelectionList &list) const
 {
   if(this->Data)
-    list.makeNewCopy(this->Data->selections);
+    list.makeNewCopy(this->Data->Selections);
 }
 
 void pqHistogramChart::selectAllBins()
@@ -489,7 +489,7 @@ void pqHistogramChart::selectNone()
   if(this->Data)
     {
     this->Data->clearSelection();
-    emit this->selectionChanged(this->Data->selections);
+    emit this->selectionChanged(this->Data->Selections);
     }
 }
 
@@ -498,7 +498,7 @@ void pqHistogramChart::selectInverse()
   if(this->Data && this->XAxis->isValid())
     {
     pqHistogramSelection selection;
-    if(this->Data->selections.getType() == pqHistogramSelection::Value)
+    if(this->Data->Selections.getType() == pqHistogramSelection::Value)
       {
       selection.setType(pqHistogramSelection::Value);
       selection.setRange(this->XAxis->getMinValue(),
@@ -539,13 +539,13 @@ void pqHistogramChart::addSelection(const pqHistogramSelectionList &list)
     }
 
   pqHistogramSelectionList toDelete;
-  this->Data->selections.unite(newList, toDelete);
+  this->Data->Selections.unite(newList, toDelete);
   pqHistogramSelectionList::Iterator diter = toDelete.begin();
   for( ; diter != toDelete.end(); ++diter)
     delete *diter;
 
   this->layoutSelection();
-  emit this->selectionChanged(this->Data->selections);
+  emit this->selectionChanged(this->Data->Selections);
 }
 
 void pqHistogramChart::xorSelection(const pqHistogramSelectionList &list)
@@ -566,13 +566,13 @@ void pqHistogramChart::xorSelection(const pqHistogramSelectionList &list)
     }
 
   pqHistogramSelectionList toDelete;
-  this->Data->selections.Xor(newList, toDelete);
+  this->Data->Selections.Xor(newList, toDelete);
   pqHistogramSelectionList::Iterator diter = toDelete.begin();
   for( ; diter != toDelete.end(); ++diter)
     delete *diter;
 
   this->layoutSelection();
-  emit this->selectionChanged(this->Data->selections);
+  emit this->selectionChanged(this->Data->Selections);
 }
 
 void pqHistogramChart::subtractSelection(const pqHistogramSelectionList &list)
@@ -593,13 +593,13 @@ void pqHistogramChart::subtractSelection(const pqHistogramSelectionList &list)
     }
 
   pqHistogramSelectionList toDelete;
-  this->Data->selections.subtract(newList, toDelete);
+  this->Data->Selections.subtract(newList, toDelete);
   pqHistogramSelectionList::Iterator diter = toDelete.begin();
   for( ; diter != toDelete.end(); ++diter)
     delete *diter;
 
   this->layoutSelection();
-  emit this->selectionChanged(this->Data->selections);
+  emit this->selectionChanged(this->Data->Selections);
 }
 
 void pqHistogramChart::setSelection(const pqHistogramSelection *range)
@@ -613,8 +613,8 @@ void pqHistogramChart::addSelection(const pqHistogramSelection *range)
 {
   if(!this->Data || !range || range->getType() == pqHistogramSelection::None)
     return;
-  if(this->Data->selections.getType() != pqHistogramSelection::None &&
-      this->Data->selections.getType() != range->getType())
+  if(this->Data->Selections.getType() != pqHistogramSelection::None &&
+      this->Data->Selections.getType() != range->getType())
     {
     return;
     }
@@ -635,13 +635,13 @@ void pqHistogramChart::addSelection(const pqHistogramSelection *range)
       }
 
     pqHistogramSelectionList toDelete;
-    this->Data->selections.unite(highlight, toDelete);
+    this->Data->Selections.unite(highlight, toDelete);
     pqHistogramSelectionList::Iterator iter = toDelete.begin();
     for( ; iter != toDelete.end(); ++iter)
       delete *iter;
 
     this->layoutSelection();
-    emit this->selectionChanged(this->Data->selections);
+    emit this->selectionChanged(this->Data->Selections);
     }
 }
 
@@ -649,8 +649,8 @@ void pqHistogramChart::xorSelection(const pqHistogramSelection *range)
 {
   if(!range || !this->Data)
     return;
-  if((this->Data->selections.getType() != pqHistogramSelection::None &&
-      this->Data->selections.getType() != range->getType()) ||
+  if((this->Data->Selections.getType() != pqHistogramSelection::None &&
+      this->Data->Selections.getType() != range->getType()) ||
       range->getType() == pqHistogramSelection::None)
     {
     return;
@@ -672,13 +672,13 @@ void pqHistogramChart::xorSelection(const pqHistogramSelection *range)
       }
 
     pqHistogramSelectionList toDelete;
-    this->Data->selections.Xor(highlight, toDelete);
+    this->Data->Selections.Xor(highlight, toDelete);
     pqHistogramSelectionList::Iterator iter = toDelete.begin();
     for( ; iter != toDelete.end(); ++iter)
       delete *iter;
 
     this->layoutSelection();
-    emit this->selectionChanged(this->Data->selections);
+    emit this->selectionChanged(this->Data->Selections);
     }
 }
 
@@ -687,8 +687,8 @@ void pqHistogramChart::moveSelection(const pqHistogramSelection &range,
 {
   if(!this->Data || offset == 0)
     return;
-  if((this->Data->selections.getType() != pqHistogramSelection::None &&
-      this->Data->selections.getType() != range.getType()) ||
+  if((this->Data->Selections.getType() != pqHistogramSelection::None &&
+      this->Data->Selections.getType() != range.getType()) ||
       range.getType() == pqHistogramSelection::None)
     {
     return;
@@ -696,8 +696,8 @@ void pqHistogramChart::moveSelection(const pqHistogramSelection &range,
 
   // Find the given selection range and remove it from the list.
   QHistogramHighlight *highlight = 0;
-  pqHistogramSelectionList::Iterator iter = this->Data->selections.begin();
-  for( ; iter != this->Data->selections.end(); ++iter)
+  pqHistogramSelectionList::Iterator iter = this->Data->Selections.begin();
+  for( ; iter != this->Data->Selections.end(); ++iter)
     {
     pqHistogramSelection *selection = *iter;
     if(selection->getFirst() == range.getFirst() &&
@@ -705,7 +705,7 @@ void pqHistogramChart::moveSelection(const pqHistogramSelection &range,
       {
       highlight = dynamic_cast<QHistogramHighlight *>(selection);
       if(highlight)
-        this->Data->selections.erase(iter);
+        this->Data->Selections.erase(iter);
 
       break;
       }
@@ -730,18 +730,18 @@ void pqHistogramChart::moveSelection(const pqHistogramSelection &range,
 
     // Unite the adjusted selection to the list.
     pqHistogramSelectionList toDelete;
-    this->Data->selections.unite(highlight, toDelete);
+    this->Data->Selections.unite(highlight, toDelete);
     for(iter = toDelete.begin(); iter != toDelete.end(); ++iter)
       delete *iter;
 
     this->layoutSelection();
-    emit this->selectionChanged(this->Data->selections);
+    emit this->selectionChanged(this->Data->Selections);
     }
 }
 
 void pqHistogramChart::setBinColorScheme(pqHistogramColor *scheme)
 {
-  if(!scheme && this->Colors == &pqHistogramChartData::colorScheme)
+  if(!scheme && this->Colors == &pqHistogramChartData::ColorScheme)
     return;
 
   if(this->Colors != scheme)
@@ -749,7 +749,7 @@ void pqHistogramChart::setBinColorScheme(pqHistogramColor *scheme)
     if(scheme)
       this->Colors = scheme;
     else
-      this->Colors = &pqHistogramChartData::colorScheme;
+      this->Colors = &pqHistogramChartData::ColorScheme;
     emit this->repaintNeeded();
     }
 }
@@ -805,8 +805,8 @@ void pqHistogramChart::layoutChart()
 
   int total = this->XAxis->getNumberShowing();
   pqChartValue v = this->XAxis->getMinValue();
-  vtkstd::vector<QHistogramItem *>::iterator iter = this->Data->items.begin();
-  for( ; iter != this->Data->items.end() && i < total; iter++, i++)
+  vtkstd::vector<QHistogramItem *>::iterator iter = this->Data->Items.begin();
+  for( ; iter != this->Data->Items.end() && i < total; iter++, i++)
     {
     QHistogramItem *item = *iter;
     item->Bounds.setLeft(this->XAxis->getPixelFor(v));
@@ -836,8 +836,8 @@ void pqHistogramChart::drawBackground(QPainter *p, const QRect &area)
 
   // Draw in the selection if there is one.
   QHistogramHighlight *highlight = 0;
-  pqHistogramSelectionList::Iterator siter = this->Data->selections.begin();
-  for( ; siter != this->Data->selections.end(); siter++)
+  pqHistogramSelectionList::Iterator siter = this->Data->Selections.begin();
+  for( ; siter != this->Data->Selections.end(); siter++)
     {
     highlight = dynamic_cast<QHistogramHighlight *>(*siter);
     if(!highlight || !highlight->Bounds.isValid())
@@ -860,9 +860,9 @@ void pqHistogramChart::drawChart(QPainter *p, const QRect &area)
   bool areaFound = false;
   int total = this->XAxis->getNumberShowing();
   QHistogramHighlight *highlight = 0;
-  pqHistogramSelectionList::Iterator siter = this->Data->selections.begin();
-  vtkstd::vector<QHistogramItem *>::iterator iter = this->Data->items.begin();
-  for( ; iter != this->Data->items.end() && i < total; iter++, i++)
+  pqHistogramSelectionList::Iterator siter = this->Data->Selections.begin();
+  vtkstd::vector<QHistogramItem *>::iterator iter = this->Data->Items.begin();
+  for( ; iter != this->Data->Items.end() && i < total; iter++, i++)
     {
     // Make sure the bounding rectangle is known.
     QHistogramItem *item = *iter;
@@ -888,7 +888,7 @@ void pqHistogramChart::drawChart(QPainter *p, const QRect &area)
         // and fill highlighting is being used.
         if(this->Style == pqHistogramChart::Fill)
           {
-          for( ; siter != this->Data->selections.end(); siter++)
+          for( ; siter != this->Data->Selections.end(); siter++)
             {
             highlight = dynamic_cast<QHistogramHighlight *>(*siter);
             if(!highlight)
@@ -917,7 +917,7 @@ void pqHistogramChart::drawChart(QPainter *p, const QRect &area)
         // a lighter and thicker outline around the bar.
         if(this->Style == pqHistogramChart::Outline)
           {
-          for( ; siter != this->Data->selections.end(); siter++)
+          for( ; siter != this->Data->Selections.end(); siter++)
             {
             highlight = dynamic_cast<QHistogramHighlight *>(*siter);
             if(!highlight)
@@ -948,8 +948,8 @@ void pqHistogramChart::drawChart(QPainter *p, const QRect &area)
 
   // Draw in the selection outline.
   p->setPen(QColor(60, 90, 135));
-  siter = this->Data->selections.begin();
-  for( ; siter != this->Data->selections.end(); siter++)
+  siter = this->Data->Selections.begin();
+  for( ; siter != this->Data->Selections.end(); siter++)
     {
     highlight = dynamic_cast<QHistogramHighlight *>(*siter);
     if(!highlight || !highlight->Bounds.isValid())
@@ -968,8 +968,8 @@ void pqHistogramChart::layoutSelection()
   if(this->Data && this->Bounds.isValid())
     {
     QHistogramHighlight *highlight = 0;
-    pqHistogramSelectionList::Iterator iter = this->Data->selections.begin();
-    for( ; iter != this->Data->selections.end(); iter++)
+    pqHistogramSelectionList::Iterator iter = this->Data->Selections.begin();
+    for( ; iter != this->Data->Selections.end(); iter++)
       {
       highlight = dynamic_cast<QHistogramHighlight *>(*iter);
       if(highlight)
@@ -1003,14 +1003,14 @@ void pqHistogramChart::resetData()
   if(this->Data)
     {
     this->Data->clearSelection();
-    vtkstd::vector<QHistogramItem *>::iterator iter = this->Data->items.begin();
-    for( ; iter != this->Data->items.end(); iter++)
+    vtkstd::vector<QHistogramItem *>::iterator iter = this->Data->Items.begin();
+    for( ; iter != this->Data->Items.end(); iter++)
       {
       delete *iter;
       *iter = 0;
       }
 
-    this->Data->items.clear();
+    this->Data->Items.clear();
     }
 }
 
