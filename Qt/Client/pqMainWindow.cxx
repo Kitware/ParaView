@@ -805,7 +805,8 @@ void pqMainWindow::onDeleteQVTKWidget(pqMultiViewFrame* parent)
   vtkSMRenderModuleProxy* rm = this->Pipeline->removeViewMapping(w);
 
   // delete render module
-  rm->Delete();
+  if(rm)
+    rm->Delete();
 
   // Remove the window from the pipeline data structure.
   this->Pipeline->removeWindow(w);
