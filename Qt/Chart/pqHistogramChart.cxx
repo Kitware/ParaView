@@ -211,7 +211,7 @@ void pqHistogramChart::setAxes(pqChartAxis *xAxis, pqChartAxis *yAxis)
 }
 
 void pqHistogramChart::setData(const pqChartValueList &values,
-    const pqChartValue &min, const pqChartValue &interval)
+    const pqChartValue &min, const pqChartValue &max)
 {
   bool hadSelection = hasSelection();
   this->resetData();
@@ -221,26 +221,25 @@ void pqHistogramChart::setData(const pqChartValueList &values,
   if(!this->XAxis || !this->YAxis)
     return;
 
-  pqChartValue yMin;
-  pqChartValueList::ConstIterator iter = values.constBegin();
-  yMin.convertTo(iter->getType());
-  pqChartValue yMax = yMin;
-  for( ; iter != values.constEnd(); ++iter)
-    {
-    QHistogramItem *item = new QHistogramItem(*iter);
-    this->Data->Items.push_back(item);
-    if(*iter > yMax)
-      yMax = *iter;
-    else if(*iter < yMin)
-      yMin = *iter;
-    }
-
-  // Set up the x and y axes min/max. The axis changes will cause
+  // Set up the y axis min/max. The axis changes will cause
   // layout signals to be sent. Avoid multiple signals by blocking
   // the signals for all but the last change.
-  pqChartValue xMax = min + (interval * values.getSize());
   if(this->YAxis->getLayoutType() != pqChartAxis::FixedInterval)
     {
+    pqChartValue yMin;
+    pqChartValueList::ConstIterator iter = values.constBegin();
+    yMin.convertTo(iter->getType());
+    pqChartValue yMax = yMin;
+    for( ; iter != values.constEnd(); ++iter)
+      {
+      QHistogramItem *item = new QHistogramItem(*iter);
+      this->Data->Items.push_back(item);
+      if(*iter > yMax)
+        yMax = *iter;
+      else if(*iter < yMin)
+        yMin = *iter;
+      }
+
     // Set up the extra padding parameters for the min/max.
     if(yMin == 0)
       {
@@ -263,8 +262,9 @@ void pqHistogramChart::setData(const pqChartValueList &values,
     this->YAxis->blockSignals(false);
     }
 
+  pqChartValue interval = (max - min)/values.getSize();
   this->XAxis->setInterval(interval);
-  this->XAxis->setValueRange(min, xMax);
+  this->XAxis->setValueRange(min, max);
 
   // If there was a selection change, notify the observers.
   if(hadSelection)
