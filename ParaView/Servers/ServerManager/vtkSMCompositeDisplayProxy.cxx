@@ -29,7 +29,7 @@
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.14");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -838,6 +838,12 @@ void vtkSMCompositeDisplayProxy::SetCollectionDecision(int v)
   ivp->SetElement(0, this->CollectionDecision);
   this->InvalidateGeometryInternal(0);
   this->UpdateVTKObjects();
+
+  // Changing the collection decision can change the ordered compositing
+  // distribution.
+  int oc = this->OrderedCompositing;
+  this->OrderedCompositing = 0;
+  this->SetOrderedCompositing(oc);
 }
 
 //-----------------------------------------------------------------------------
@@ -867,6 +873,12 @@ void vtkSMCompositeDisplayProxy::SetLODCollectionDecision(int v)
   //ivp->SetElement(0, this->LODCollectionDecision);
   this->InvalidateLODGeometry(0);
   this->UpdateVTKObjects();
+
+  // Changing the collection decision can change the ordered compositing
+  // distribution.
+  int oc = this->OrderedCompositing;
+  this->OrderedCompositing = 0;
+  this->SetOrderedCompositing(oc);
 }
 
 //-----------------------------------------------------------------------------
@@ -878,16 +890,22 @@ void vtkSMCompositeDisplayProxy::SetOrderedCompositing(int val)
     return;
     }
 
-  if (this->OrderedCompositing == val)
-    {
-    return;
-    }
-
   this->OrderedCompositing = val;
 
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
                             this->DistributorProxy->GetProperty("PassThrough"));
-  ivp->SetElements1(!this->OrderedCompositing);
+  ivp->SetElements1(!this->OrderedCompositing || this->CollectionDecision);
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+                         this->LODDistributorProxy->GetProperty("PassThrough"));
+  ivp->SetElements1(!this->OrderedCompositing || this->LODCollectionDecision);
+
+  if (this->VolumeDistributorProxy)
+    {
+    ivp = vtkSMIntVectorProperty::SafeDownCast(
+                      this->VolumeDistributorProxy->GetProperty("PassThrough"));
+    ivp->SetElements1(!this->OrderedCompositing);
+    }
 
   this->UpdateVTKObjects();
 

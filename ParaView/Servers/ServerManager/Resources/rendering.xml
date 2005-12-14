@@ -2352,6 +2352,7 @@
         </Proxy>
         <ShareProperties subproxy="Distributor">
           <Exception name="Input"/>
+          <Exception name="PassThrough"/>
         </ShareProperties>
       </SubProxy>
 
@@ -2363,6 +2364,7 @@
         <ShareProperties subproxy="Distributor">
           <Exception name="Input"/>
           <Exception name="OutputType"/>
+          <Exception name="PassThrough"/>
         </ShareProperties>
       </SubProxy>
 
