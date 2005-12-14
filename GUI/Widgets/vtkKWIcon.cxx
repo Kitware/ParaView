@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.30");
+vtkCxxRevisionMacro(vtkKWIcon, "1.31");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -208,6 +208,14 @@ void vtkKWIcon::SetImage(int image)
         image_corner_annotation_width, image_corner_annotation_height,
         image_corner_annotation_pixel_size, 
         image_corner_annotation_length);
+      break;
+
+    case vtkKWIcon::IconCropTool:
+      this->SetImage(
+        image_crop_tool, 
+        image_crop_tool_width, image_crop_tool_height,
+        image_crop_tool_pixel_size, 
+        image_crop_tool_length);
       break;
 
     case vtkKWIcon::IconDistanceTool:

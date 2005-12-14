@@ -121,6 +121,20 @@ static const unsigned char image_corner_annotation[] =
 
 /* 
  * Resource generated for file:
+ *    crop_tool.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_crop_tool_width          = 16;
+static const unsigned int  image_crop_tool_height         = 16;
+static const unsigned int  image_crop_tool_pixel_size     = 4;
+static const unsigned long image_crop_tool_length         = 112;
+static const unsigned long image_crop_tool_decoded_length = 1024;
+
+static const unsigned char image_crop_tool[] = 
+  "eNr7//8/w38oBgIQ8f8/khgpmBT92NQRqx9ZDUwPKRibneTqJ9b9lOiHiZGjH1tYEasfV1"
+  "gRo5+c+CUURqToH+i0QI77r1w48Z9a+YtY/QDakT5N";
+
+/* 
+ * Resource generated for file:
  *    distance_tool.png (zlib, base64) (image file)
  */
 static const unsigned int  image_distance_tool_width          = 16;

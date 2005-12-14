@@ -17,6 +17,7 @@ KWConvertImageToHeader --zlib --base64 \
     connection.png \
     contour_tool.png \
     corner_annotation.png \
+    crop_tool.png \
     distance_tool.png \
     document.png \
     empty_16x16.png \
