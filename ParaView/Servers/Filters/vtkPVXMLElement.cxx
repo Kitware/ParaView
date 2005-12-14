@@ -16,7 +16,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.11");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.12");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 #include <vtkstd/string>
@@ -67,7 +67,7 @@ void vtkPVXMLElement::AddAttribute(const char* attrName,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXMLElement::AddAttribute(const char* attrName, int attrValue)
+void vtkPVXMLElement::AddAttribute(const char* attrName, vtkIdType attrValue)
 {
   ostrstream valueStr;
   valueStr << attrValue << ends;
