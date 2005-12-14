@@ -12,6 +12,7 @@
 #include <QKeyEvent>
 #include <QTextCursor>
 #include <QTextEdit>
+#include <QVBoxLayout>
 
 /////////////////////////////////////////////////////////////////////////
 // pqConsoleWidget::pqImplementation
@@ -166,10 +167,12 @@ private:
 // pqConsoleWidget
 
 pqConsoleWidget::pqConsoleWidget(QWidget* Parent) :
-  QFrame(Parent),
+  QWidget(Parent),
   Implementation(new pqImplementation(*this))
 {
-  this->setFrameShape(QFrame::NoFrame);
+  QVBoxLayout* const layout = new QVBoxLayout(this);
+  layout->setMargin(0);
+  layout->addWidget(this->Implementation);
 
   QObject::connect(this->Implementation, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
   QObject::connect(this->Implementation, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
@@ -198,11 +201,6 @@ void pqConsoleWidget::printString(const QString& Text)
 void pqConsoleWidget::internalExecuteCommand(const QString& Command)
 {
   emit executeCommand(Command);
-}
-
-void pqConsoleWidget::resizeEvent(QResizeEvent* Event)
-{
-  this->Implementation->resize(Event->size());
 }
 
 void pqConsoleWidget::onCursorPositionChanged()

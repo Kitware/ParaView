@@ -21,6 +21,7 @@
 #include <QDir>
 #include <QResizeEvent>
 #include <QTextCharFormat>
+#include <QVBoxLayout>
 
 /////////////////////////////////////////////////////////////////////////
 // pqPythonShell::pqImplementation
@@ -116,10 +117,13 @@ struct pqPythonShell::pqImplementation
 // pqPythonShell
 
 pqPythonShell::pqPythonShell(QWidget* Parent) :
-  QFrame(Parent),
+  QWidget(Parent),
   Implementation(new pqImplementation(this))
 {
-  this->setFrameShape(QFrame::NoFrame);
+  QVBoxLayout* const layout = new QVBoxLayout(this);
+  layout->setMargin(0);
+  layout->addWidget(&this->Implementation->Console);
+
   this->setObjectName("pythonShell");
   
   QObject::connect(&this->Implementation->pythonStdout, SIGNAL(streamWrite(const QString&)), this, SLOT(printStdout(const QString&)));
@@ -186,11 +190,6 @@ void pqPythonShell::onExecuteCommand(const QString& Command)
     }
   
   this->promptForInput();
-}
-
-void pqPythonShell::resizeEvent(QResizeEvent* Event)
-{
-  this->Implementation->Console.resize(Event->size());
 }
 
 void pqPythonShell::promptForInput()

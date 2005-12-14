@@ -12,12 +12,12 @@
 
 #include "QtWidgetsExport.h"
 
-#include <QFrame>
+#include <QWidget>
 #include <QTextCharFormat>
 
 /// Qt widget that provides an interactive console - send text to the console by calling printString(), and connect to the executeCommand() slot to receive user input
 class QTWIDGETS_EXPORT pqConsoleWidget :
-  public QFrame
+  public QWidget
 {
   Q_OBJECT
   
@@ -45,7 +45,6 @@ private:
   pqConsoleWidget(const pqConsoleWidget&);
   pqConsoleWidget& operator=(const pqConsoleWidget&);
 
-  void resizeEvent(QResizeEvent*);
   void internalExecuteCommand(const QString& Command);
 
   class pqImplementation;

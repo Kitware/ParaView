@@ -11,11 +11,11 @@
 #define _pqPythonShell_h
 
 #include "QtPythonExport.h"
-#include <QFrame>
+#include <QWidget>
 
 /// Provides an interactive "shell" interface to an embedded Python interpreter
 class QTPYTHON_EXPORT pqPythonShell :
-  public QFrame
+  public QWidget
 {
   Q_OBJECT
   
@@ -32,7 +32,6 @@ private:
   pqPythonShell(const pqPythonShell&);
   pqPythonShell& operator=(const pqPythonShell&);
 
-  void resizeEvent(QResizeEvent*);
   void promptForInput();
 
   struct pqImplementation;
