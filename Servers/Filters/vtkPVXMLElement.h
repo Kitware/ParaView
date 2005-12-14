@@ -85,8 +85,8 @@ public:
   // Given it's name and value, add an attribute.
   void AddAttribute(const char* attrName, const char* attrValue);
   void AddAttribute(const char* attrName, unsigned int attrValue);
-  void AddAttribute(const char* attrName, int attrValue);
   void AddAttribute(const char* attrName, double attrValue);
+  void AddAttribute(const char* attrName, vtkIdType attrValue);
 
   // Description:
   // Add a sub-element. The parent element keeps a reference to
