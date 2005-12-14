@@ -53,7 +53,7 @@
 #include <QMessageBox>
 #include <QToolBar>
 #include <QTreeView>
-#include <QTableView>
+#include <QListView>
 #include <QSignalMapper>
 
 #include <vtkRenderWindow.h>
@@ -279,7 +279,7 @@ pqMainWindow::pqMainWindow() :
     this->ElementInspectorDock->setAllowedAreas(Qt::BottomDockWidgetArea |
         Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-    this->ElementInspectorWidget = new QTableView(this->ElementInspectorDock);
+    this->ElementInspectorWidget = new QTreeView(this->ElementInspectorDock);
     if(this->ElementInspectorWidget)
       {
       this->ElementInspectorWidget->setObjectName("ElementInspectorWidget");
@@ -327,16 +327,16 @@ pqMainWindow::~pqMainWindow()
 
 void pqMainWindow::setServer(pqServer* Server)
 {
-  if(this->Pipeline)
-    {
-    this->Pipeline->clearViewMapping();
-    this->Pipeline->removeServer(this->CurrentServer);
-    }
-
   if(this->MultiViewManager)
     {
     delete this->MultiViewManager;
     this->MultiViewManager = 0;
+    }
+  
+  if(this->Pipeline)
+    {
+    this->Pipeline->clearViewMapping();
+    this->Pipeline->removeServer(this->CurrentServer);
     }
 
   delete this->PropertyToolbar;
@@ -805,8 +805,7 @@ void pqMainWindow::onDeleteQVTKWidget(pqMultiViewFrame* parent)
   vtkSMRenderModuleProxy* rm = this->Pipeline->removeViewMapping(w);
 
   // delete render module
-  if(rm)
-    rm->Delete();
+  rm->Delete();
 
   // Remove the window from the pipeline data structure.
   this->Pipeline->removeWindow(w);

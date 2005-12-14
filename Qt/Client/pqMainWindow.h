@@ -33,7 +33,6 @@ class QDockWidget;
 class QToolBar;
 class QTreeView;
 class QTabWidget;
-class QTableView;
 
 /// Provides the main window for the ParaQ application
 class pqMainWindow :
@@ -69,7 +68,7 @@ private:
   pqHistogramWidget *ChartWidget;
   QDockWidget *ChartDock;
   pqMultiViewFrame* ActiveView;
-  QTableView *ElementInspectorWidget;
+  QTreeView *ElementInspectorWidget;
   QDockWidget *ElementInspectorDock;
 
   vtkEventQtSlotConnect* VTKConnector;
