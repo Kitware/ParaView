@@ -22,7 +22,7 @@
 #include "vtkMath.h"
 
 vtkStandardNewMacro(vtkSMLookupTableProxy);
-vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.13");
 
 //---------------------------------------------------------------------------
 vtkSMLookupTableProxy::vtkSMLookupTableProxy()
@@ -143,8 +143,6 @@ void vtkSMLookupTableProxy::Build()
 //---------------------------------------------------------------------------
 void vtkSMLookupTableProxy::SaveInBatchScript(ofstream* file)
 {
-  unsigned int cc;
-  unsigned numObjects = this->GetNumberOfIDs();
   vtkSMIntVectorProperty* ivp;
   vtkSMDoubleVectorProperty* dvp;
 
