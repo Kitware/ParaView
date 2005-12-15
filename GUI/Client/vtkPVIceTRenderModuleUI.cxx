@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.14");
+vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.15");
 
 //----------------------------------------------------------------------------
 vtkPVIceTRenderModuleUI::vtkPVIceTRenderModuleUI()
@@ -59,7 +59,7 @@ vtkPVIceTRenderModuleUI::~vtkPVIceTRenderModuleUI()
   vtkPVApplication *pvapp = this->GetPVApplication();
   if (pvapp)
     {
-    pvapp->SetRegistryValue(2, "RunTime", "CollectThreshold", "%d",
+    pvapp->SetRegistryValue(2, "RunTime", "CollectThreshold", "%f",
                             this->CollectThreshold);
     pvapp->SetRegistryValue(2, "RunTime", "StillReductionFactor", "%d",
                             this->StillReductionFactor);
@@ -203,7 +203,7 @@ void vtkPVIceTRenderModuleUI::Create()
 
   this->OrderedCompositingCheck->SetParent(this->LODFrame->GetFrame());
   this->OrderedCompositingCheck->Create();
-  this->OrderedCompositingCheck->SetText("Enabled Ordered Compositing");
+  this->OrderedCompositingCheck->SetText("Enable Ordered Compositing");
   this->OrderedCompositingCheck->SetCommand(this, "SetOrderedCompositingFlag");
 
   if (pvapp && pvapp->GetRegistryValue(2, "RunTime", "OrderedCompositing", 0))
