@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.37");
+vtkCxxRevisionMacro(vtkPVPick, "1.38");
 
 
 //*****************************************************************************
@@ -877,7 +877,6 @@ void vtkPVPick::SaveTemporalPickInBatchScript(ofstream* file)
   // Some displays do not have VTKClassName set and hence only create Subproxies.
   // For such displays we use their self ids. 
   
-  unsigned int count = this->TemporalPickProxy->GetNumberOfIDs();
   const char* id = this->TemporalPickProxy->GetSelfIDAsString();
     
   *file << endl;
