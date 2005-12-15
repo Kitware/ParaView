@@ -29,11 +29,12 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkPVTraceHelper.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThumbWheel);
-vtkCxxRevisionMacro(vtkPVThumbWheel, "1.22");
+vtkCxxRevisionMacro(vtkPVThumbWheel, "1.23");
 
 //-----------------------------------------------------------------------------
 vtkPVThumbWheel::vtkPVThumbWheel()
@@ -169,9 +170,9 @@ vtkPVThumbWheel* vtkPVThumbWheel::ClonePrototype(
 //-----------------------------------------------------------------------------
 void vtkPVThumbWheel::SaveInBatchScript(ofstream *file)
 {
-  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  const char* sourceID = this->PVSource->GetProxy()->GetSelfIDAsString();
   
-  if (sourceID.ID == 0 || !this->SMPropertyName)
+  if (!sourceID || !this->SMPropertyName)
     {
     vtkErrorMacro("Sanity check failed. " << this->GetClassName());
     return;

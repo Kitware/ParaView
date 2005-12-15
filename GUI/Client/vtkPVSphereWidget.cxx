@@ -45,7 +45,7 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.69");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.70");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -279,50 +279,54 @@ void vtkPVSphereWidget::SaveInBatchScript(ofstream *file)
   
   this->WidgetProxy->SaveInBatchScript(file);
 
-  vtkClientServerID sphereID = this->ImplicitFunctionProxy->GetID(0);
+  const char* sphereID = this->ImplicitFunctionProxy->GetSelfIDAsString();
 
   *file << endl;
-  *file << "set pvTemp" << sphereID.ID
-    << " [$proxyManager NewProxy implicit_functions Sphere]"
-    << endl;
+  *file << "set pvTemp" << sphereID
+        << " [$proxyManager NewProxy implicit_functions Sphere]"
+        << endl;
   *file << "  $proxyManager RegisterProxy implicit_functions pvTemp"
-    << sphereID.ID << " $pvTemp" << sphereID.ID
-    << endl;
-  *file << "  $pvTemp" << sphereID.ID << " UnRegister {}" << endl;
+        << sphereID << " $pvTemp" << sphereID
+        << endl;
+  *file << "  $pvTemp" << sphereID << " UnRegister {}" << endl;
   
   vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->ImplicitFunctionProxy->GetProperty("Center"));  
   if(sdvp)
     {
-    *file << "  [$pvTemp" << sphereID.ID << " GetProperty Center] "
-      << "SetElements3 " 
-      << sdvp->GetElement(0) << " "
-      << sdvp->GetElement(1) << " "
-      << sdvp->GetElement(2)
-      << endl;
-    *file << "  [$pvTemp" << sphereID.ID << " GetProperty Center]"
-      << " SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0) 
-      << endl;
-    *file << "  [$pvTemp" << sphereID.ID << " GetProperty Center]"
-      << " SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
-      << " GetProperty Center]" << endl;
+    *file << "  [$pvTemp" << sphereID << " GetProperty Center] "
+          << "SetElements3 " 
+          << sdvp->GetElement(0) << " "
+          << sdvp->GetElement(1) << " "
+          << sdvp->GetElement(2)
+          << endl;
+    *file << "  [$pvTemp" << sphereID << " GetProperty Center]"
+          << " SetControllerProxy $pvTemp" 
+          << this->WidgetProxy->GetSelfIDAsString() 
+          << endl;
+    *file << "  [$pvTemp" << sphereID << " GetProperty Center]"
+          << " SetControllerProperty [$pvTemp" 
+          << this->WidgetProxy->GetSelfIDAsString()
+          << " GetProperty Center]" << endl;
     }
 
   sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->ImplicitFunctionProxy->GetProperty("Radius"));
   if (sdvp)
     {
-    *file << "  [$pvTemp" << sphereID.ID << " GetProperty Radius] "
-      << "SetElements1 "
-      << sdvp->GetElement(0) << endl << endl;
-    *file << "  [$pvTemp" << sphereID.ID << " GetProperty Radius]"
-      << " SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0) 
-      << endl;
-    *file << "  [$pvTemp" << sphereID.ID << " GetProperty Radius]"
-      << " SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
-      << " GetProperty Radius]" << endl;
+    *file << "  [$pvTemp" << sphereID << " GetProperty Radius] "
+          << "SetElements1 "
+          << sdvp->GetElement(0) << endl << endl;
+    *file << "  [$pvTemp" << sphereID << " GetProperty Radius]"
+          << " SetControllerProxy $pvTemp" 
+          << this->WidgetProxy->GetSelfIDAsString() 
+          << endl;
+    *file << "  [$pvTemp" << sphereID << " GetProperty Radius]"
+          << " SetControllerProperty [$pvTemp" 
+          << this->WidgetProxy->GetSelfIDAsString()
+          << " GetProperty Radius]" << endl;
     }
-  *file << "  $pvTemp" << sphereID.ID << " UpdateVTKObjects" << endl;
+  *file << "  $pvTemp" << sphereID << " UpdateVTKObjects" << endl;
   *file << endl;
 
 }

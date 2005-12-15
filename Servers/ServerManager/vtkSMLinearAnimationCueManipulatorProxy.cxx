@@ -21,7 +21,7 @@
 #include "vtkSMProperty.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMLinearAnimationCueManipulatorProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMLinearAnimationCueManipulatorProxy, "1.4");
 vtkStandardNewMacro(vtkSMLinearAnimationCueManipulatorProxy);
 
 //----------------------------------------------------------------------------
@@ -64,12 +64,15 @@ void vtkSMLinearAnimationCueManipulatorProxy::UpdateValue(double currenttime,
 void vtkSMLinearAnimationCueManipulatorProxy::SaveInBatchScript(ofstream* file)
 {
   this->Superclass::SaveInBatchScript(file);
-  vtkClientServerID id = this->GetSelfID();  
-  *file << "  [$pvTemp" << id << " GetProperty StartValue]"
-    << " SetElements1 " << this->StartValue << endl;
-  *file << "  [$pvTemp" << id << " GetProperty EndValue]"
-    << " SetElements1 " << this->EndValue << endl;
-  *file << "  $pvTemp" << id << " UpdateVTKObjects" << endl;
+
+  *file << "  [$pvTemp" << this->GetSelfIDAsString() 
+        << " GetProperty StartValue]"
+        << " SetElements1 " << this->StartValue << endl;
+  *file << "  [$pvTemp" << this->GetSelfIDAsString() 
+        << " GetProperty EndValue]"
+        << " SetElements1 " << this->EndValue << endl;
+  *file << "  $pvTemp" << this->GetSelfIDAsString() 
+        << " UpdateVTKObjects" << endl;
   *file << endl; 
 }
 

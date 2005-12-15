@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.50");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.51");
 
 vtkCxxSetObjectMacro(vtkPVPointSourceWidget, InputMenu, vtkPVInputMenu);
 
@@ -139,9 +139,9 @@ void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
     return;
     }
   
-  vtkClientServerID sourceID = this->SourceProxy->GetID(0);
+  const char* sourceID = this->SourceProxy->GetSelfIDAsString();
   
-  if (sourceID.ID == 0)
+  if (!sourceID)
     {
     vtkErrorMacro("Sanity check failed. " << this->GetClassName());
     return;
@@ -163,26 +163,26 @@ void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
   if(dvp)
     {
     *file << "  [$pvTemp" << sourceID << " GetProperty Center] "
-      << "SetElements3 " 
-      << dvp->GetElement(0) << " " 
-      << dvp->GetElement(1) << " " 
-      << dvp->GetElement(2) << endl;
+          << "SetElements3 " 
+          << dvp->GetElement(0) << " " 
+          << dvp->GetElement(1) << " " 
+          << dvp->GetElement(2) << endl;
     *file << "  [$pvTemp" << sourceID << " GetProperty Center]"
-      << " SetControllerProxy $pvTemp" 
-      << this->WidgetProxy->GetID(0) << endl;
+          << " SetControllerProxy $pvTemp" 
+          << this->WidgetProxy->GetSelfIDAsString() << endl;
     *file << "  [$pvTemp" << sourceID << " GetProperty Center]"
-      << " SetControllerProperty [$pvTemp"
-      << this->WidgetProxy->GetID(0) 
-      << " GetProperty Position]" << endl; 
+          << " SetControllerProperty [$pvTemp"
+          << this->WidgetProxy->GetSelfIDAsString() 
+          << " GetProperty Position]" << endl; 
     }
 
   this->NumberOfPointsWidget->GetValue(&num, 1);
   *file << "  [$pvTemp" << sourceID << " GetProperty NumberOfPoints] "
-    << "SetElements1 " << static_cast<int>(num) << endl;
+        << "SetElements1 " << static_cast<int>(num) << endl;
   
   this->RadiusWidget->GetValue(&rad, 1);
   *file << "  [$pvTemp" << sourceID << " GetProperty Radius] "
-    << "SetElements1 " << rad << endl;
+        << "SetElements1 " << rad << endl;
   *file << "  $pvTemp" << sourceID << " UpdateVTKObjects" << endl;
   *file << endl;
 

@@ -25,7 +25,7 @@
 #include "vtkSMPropertyIterator.h"
 
 vtkStandardNewMacro(vtkSMScalarBarActorProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarActorProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMScalarBarActorProxy, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMScalarBarActorProxy::vtkSMScalarBarActorProxy()
 {
@@ -127,13 +127,15 @@ void vtkSMScalarBarActorProxy::SaveTextPropertiesInBatchScript(ofstream* file)
 void vtkSMScalarBarActorProxy::SaveTextPropertiesInBatchScript(ofstream* file,
   vtkSMProxy* label)
 {
-  *file << "set pvTemp" << label->GetID(0)
+  *file << "set pvTemp" << label->GetSelfIDAsString()
     << " [$proxyManager NewProxy " << label->GetXMLGroup() << " "
     << label->GetXMLName() << "]" << endl;
   *file << "  $proxyManager RegisterProxy " << label->GetXMLGroup()
-    << " pvTemp" << label->GetID(0) << " $pvTemp" << label->GetID(0)
-    << endl;
-  *file << "  $pvTemp" << label->GetID(0) << " UnRegister {}" << endl;
+        << " pvTemp" << label->GetSelfIDAsString() << " $pvTemp" 
+        << label->GetSelfIDAsString()
+        << endl;
+  *file << "  $pvTemp" << label->GetSelfIDAsString() 
+        << " UnRegister {}" << endl;
   
   vtkSMPropertyIterator* iter = label->NewPropertyIterator();
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
@@ -153,7 +155,7 @@ void vtkSMScalarBarActorProxy::SaveTextPropertiesInBatchScript(ofstream* file,
       {
       for (unsigned int i=0; i < ivp->GetNumberOfElements(); i++)
         {
-        *file << "  [$pvTemp" << label->GetID(0) << " GetProperty "
+        *file << "  [$pvTemp" << label->GetSelfIDAsString() << " GetProperty "
           << ivp->GetXMLName() << "] SetElement "
           << i << " " << ivp->GetElement(i) 
           << endl;
@@ -163,7 +165,7 @@ void vtkSMScalarBarActorProxy::SaveTextPropertiesInBatchScript(ofstream* file,
       {
       for (unsigned int i=0; i < dvp->GetNumberOfElements(); i++)
         {
-        *file << "  [$pvTemp" << label->GetID(0) << " GetProperty "
+        *file << "  [$pvTemp" << label->GetSelfIDAsString() << " GetProperty "
           << dvp->GetXMLName() << "] SetElement "
           << i << " " << dvp->GetElement(i) 
           << endl;
@@ -176,7 +178,8 @@ void vtkSMScalarBarActorProxy::SaveTextPropertiesInBatchScript(ofstream* file,
     }
 
   iter->Delete();
-  *file << "  $pvTemp" << label->GetID(0) << " UpdateVTKObjects" << endl;
+  *file << "  $pvTemp" << label->GetSelfIDAsString() 
+        << " UpdateVTKObjects" << endl;
 }
 
 //-----------------------------------------------------------------------------

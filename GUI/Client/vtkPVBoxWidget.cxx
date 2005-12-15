@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.65");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.66");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -290,13 +290,13 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
   int i;
   if (this->BoxTransformProxy)
     {
-    vtkClientServerID boxTransformID = this->BoxTransformProxy->GetID(0);
-    *file << "set pvTemp" << boxTransformID.ID
+    const char* boxTransformID = this->BoxTransformProxy->GetSelfIDAsString();
+    *file << "set pvTemp" << boxTransformID
       << " [$proxyManager NewProxy transforms Transform2]"
       << endl;
-    *file << "  $proxyManager RegisterProxy transforms pvTemp" << boxTransformID.ID
-      << " $pvTemp" << boxTransformID.ID << endl;
-    *file << "  $pvTemp" << boxTransformID.ID << " UnRegister {}" << endl;
+    *file << "  $proxyManager RegisterProxy transforms pvTemp" << boxTransformID
+      << " $pvTemp" << boxTransformID << endl;
+    *file << "  $pvTemp" << boxTransformID << " UnRegister {}" << endl;
 
     //NOw, set the properties of the BoxTransformProxy
     const char *properties[] = { "Rotation", "Scale", "Position" , 0};
@@ -306,32 +306,39 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
         this->BoxProxy->GetProperty(properties[i]));
       if (dvp)
         {
-        *file << "  [$pvTemp" << boxTransformID.ID << " GetProperty " << properties[i] 
-          << "] SetElement 0 " << dvp->GetElement(0) << endl;
-        *file << "  [$pvTemp" << boxTransformID.ID << " GetProperty " << properties[i] 
-          << "] SetElement 1 " << dvp->GetElement(1) << endl;
-        *file << "  [$pvTemp" << boxTransformID.ID << " GetProperty " << properties[i] 
-          << "] SetElement 2 " << dvp->GetElement(2) << endl;
-        *file << "  [$pvTemp" << boxTransformID.ID << " GetProperty " << properties[i]
-          << "] SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0) << endl;
-        *file << "  [$pvTemp" << boxTransformID.ID << " GetProperty " << properties[i]
-          << "] SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
-          << " GetProperty " << properties[i] << "]" << endl;
+        *file << "  [$pvTemp" << boxTransformID 
+              << " GetProperty " << properties[i] 
+              << "] SetElement 0 " << dvp->GetElement(0) << endl;
+        *file << "  [$pvTemp" << boxTransformID 
+              << " GetProperty " << properties[i] 
+              << "] SetElement 1 " << dvp->GetElement(1) << endl;
+        *file << "  [$pvTemp" << boxTransformID 
+              << " GetProperty " << properties[i] 
+              << "] SetElement 2 " << dvp->GetElement(2) << endl;
+        *file << "  [$pvTemp" << boxTransformID 
+              << " GetProperty " << properties[i]
+              << "] SetControllerProxy $pvTemp" 
+              << this->WidgetProxy->GetSelfIDAsString() << endl;
+        *file << "  [$pvTemp" << boxTransformID 
+              << " GetProperty " << properties[i]
+              << "] SetControllerProperty [$pvTemp" 
+              << this->WidgetProxy->GetSelfIDAsString()
+              << " GetProperty " << properties[i] << "]" << endl;
         }
       }
-    *file << "  $pvTemp" << boxTransformID.ID
+    *file << "  $pvTemp" << boxTransformID
       << " UpdateVTKObjects"  << endl;
     *file << endl;
     }
 
   if (this->BoxProxy)
     {
-    vtkClientServerID boxID = this->BoxProxy->GetID(0);
-    *file << "set pvTemp" << boxID.ID
+    const char* boxID = this->BoxProxy->GetSelfIDAsString();
+    *file << "set pvTemp" << boxID
       << " [$proxyManager NewProxy implicit_functions Box]" << endl;
-    *file << "  $proxyManager RegisterProxy implicit_functions pvTemp" << boxID.ID
-      << " $pvTemp" << boxID.ID << endl;
-    *file << "  $pvTemp" << boxID.ID << " UnRegister {}" << endl;
+    *file << "  $proxyManager RegisterProxy implicit_functions pvTemp" << boxID
+      << " $pvTemp" << boxID << endl;
+    *file << "  $pvTemp" << boxID << " UnRegister {}" << endl;
 
     //Now, set the properties of the BoxProxy
     vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -340,7 +347,7 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
       {
       for( i=0;i<6;i++)
         {
-        *file << "  [$pvTemp" << boxID.ID << " GetProperty Bounds] SetElement " 
+        *file << "  [$pvTemp" << boxID << " GetProperty Bounds] SetElement " 
           << i << " "  << dvp->GetElement(i) << endl;
         }
       }
@@ -351,21 +358,23 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
         this->BoxProxy->GetProperty(properties[i]));
       if (dvp)
         {
-        *file << "  [$pvTemp" << boxID.ID << " GetProperty " << properties[i] 
-          << "] SetElement 0 " << dvp->GetElement(0) << endl;
-        *file << "  [$pvTemp" << boxID.ID << " GetProperty " << properties[i] 
-          << "] SetElement 1 " << dvp->GetElement(1) << endl;
-        *file << "  [$pvTemp" << boxID.ID << " GetProperty " << properties[i] 
-          << "] SetElement 2 " << dvp->GetElement(2) << endl;
-        *file << "  [$pvTemp" << boxID.ID << " GetProperty " << properties[i]
-          << "] SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0) << endl;
-        *file << "  [$pvTemp" << boxID.ID << " GetProperty " << properties[i]
-          << "] SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
-          << " GetProperty " << properties[i] << "]" << endl;
-
+        *file << "  [$pvTemp" << boxID << " GetProperty " << properties[i] 
+              << "] SetElement 0 " << dvp->GetElement(0) << endl;
+        *file << "  [$pvTemp" << boxID << " GetProperty " << properties[i] 
+              << "] SetElement 1 " << dvp->GetElement(1) << endl;
+        *file << "  [$pvTemp" << boxID << " GetProperty " << properties[i] 
+              << "] SetElement 2 " << dvp->GetElement(2) << endl;
+        *file << "  [$pvTemp" << boxID << " GetProperty " << properties[i]
+              << "] SetControllerProxy $pvTemp" 
+              << this->WidgetProxy->GetSelfIDAsString() << endl;
+        *file << "  [$pvTemp" << boxID << " GetProperty " << properties[i]
+              << "] SetControllerProperty [$pvTemp" 
+              << this->WidgetProxy->GetSelfIDAsString()
+              << " GetProperty " << properties[i] << "]" << endl;
+        
         }
       }
-    *file << "  $pvTemp" << boxID.ID << " UpdateVTKObjects" << endl;
+    *file << "  $pvTemp" << boxID << " UpdateVTKObjects" << endl;
     }
 }
 

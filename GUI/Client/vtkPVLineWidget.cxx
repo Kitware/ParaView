@@ -38,7 +38,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.76");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.77");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -496,26 +496,29 @@ void vtkPVLineWidget::SaveInBatchScript(ofstream *file)
   // First create the Line Widget proxy.
   this->WidgetProxy->SaveInBatchScript(file);
 
-  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  const char* sourceID = this->PVSource->GetProxy()->GetSelfIDAsString();
 
   // Point1
   vtkSMSourceProxy* sproxy = this->GetPVSource()->GetProxy();
-  const char *variablename = (this->Point1Variable)? this->Point1Variable : "Point1";
+  const char *variablename = 
+    (this->Point1Variable)? this->Point1Variable : "Point1";
   vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
     sproxy->GetProperty(variablename));
   if(sdvp)
     {  
     *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
-      << variablename << "] SetElements3 "
-      << sdvp->GetElement(0) << " "
-      << sdvp->GetElement(1) << " "
-      << sdvp->GetElement(2) << endl;
+          << variablename << "] SetElements3 "
+          << sdvp->GetElement(0) << " "
+          << sdvp->GetElement(1) << " "
+          << sdvp->GetElement(2) << endl;
     *file << "  [$pvTemp" << sourceID << " GetProperty "
-      << variablename << "] SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0)
+          << variablename << "] SetControllerProxy $pvTemp" 
+          << this->WidgetProxy->GetSelfIDAsString()
       << endl;
     *file << "  [$pvTemp" << sourceID << " GetProperty "
-      << variablename << "] SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
-      << " GetProperty Point1]" << endl;
+          << variablename << "] SetControllerProperty [$pvTemp" 
+          << this->WidgetProxy->GetSelfIDAsString()
+          << " GetProperty Point1]" << endl;
     }
 
   // Point2
@@ -525,16 +528,18 @@ void vtkPVLineWidget::SaveInBatchScript(ofstream *file)
   if(sdvp)
     {
     *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
-      << variablename << "] SetElements3 "
-      << sdvp->GetElement(0) << " "
-      << sdvp->GetElement(1) << " "
-      << sdvp->GetElement(2) << endl;
+          << variablename << "] SetElements3 "
+          << sdvp->GetElement(0) << " "
+          << sdvp->GetElement(1) << " "
+          << sdvp->GetElement(2) << endl;
     *file << "  [$pvTemp" << sourceID << " GetProperty "
-      << variablename << "] SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0)
-      << endl;
+          << variablename << "] SetControllerProxy $pvTemp" 
+          << this->WidgetProxy->GetSelfIDAsString()
+          << endl;
     *file << "  [$pvTemp" << sourceID << " GetProperty "
-      << variablename << "] SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
-      << " GetProperty Point2]" << endl;   
+          << variablename << "] SetControllerProperty [$pvTemp" 
+          << this->WidgetProxy->GetSelfIDAsString()
+          << " GetProperty Point2]" << endl;   
     }
 
   // Resolution
@@ -545,14 +550,16 @@ void vtkPVLineWidget::SaveInBatchScript(ofstream *file)
     if(sivp)
       {
       *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
-        << variablename << "] SetElements1 "
-        << sivp->GetElement(0) << endl;
+            << variablename << "] SetElements1 "
+            << sivp->GetElement(0) << endl;
       *file << "  [$pvTemp" << sourceID << " GetProperty "
-        << variablename << "] SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0)
-        << endl;
+            << variablename << "] SetControllerProxy $pvTemp" 
+            << this->WidgetProxy->GetSelfIDAsString()
+            << endl;
       *file << "  [$pvTemp" << sourceID << " GetProperty "
-        << variablename << "] SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
-        << " GetProperty Resolution]" << endl;
+            << variablename << "] SetControllerProperty [$pvTemp" 
+            << this->WidgetProxy->GetSelfIDAsString()
+            << " GetProperty Resolution]" << endl;
       }
     }
 }

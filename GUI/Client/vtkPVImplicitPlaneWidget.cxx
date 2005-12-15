@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.65");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.66");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -384,48 +384,52 @@ void vtkPVImplicitPlaneWidget::SaveInBatchScript(ofstream* file)
 {
   this->WidgetProxy->SaveInBatchScript(file);
 
-  vtkClientServerID planeID = this->ImplicitFunctionProxy->GetID(0);
+  const char* planeID = this->ImplicitFunctionProxy->GetSelfIDAsString();
   *file << endl;
-  *file << "set pvTemp" <<  planeID.ID
+  *file << "set pvTemp" <<  planeID
     << " [$proxyManager NewProxy implicit_functions Plane]"
     << endl;
   *file << "  $proxyManager RegisterProxy implicit_functions pvTemp"
-    << planeID.ID << " $pvTemp" << planeID.ID
+    << planeID << " $pvTemp" << planeID
     << endl;
-  *file << "  $pvTemp" << planeID.ID << " UnRegister {}" << endl;
+  *file << "  $pvTemp" << planeID << " UnRegister {}" << endl;
 
   vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->ImplicitFunctionProxy->GetProperty("Origin"));
   if (sdvp)
     {
-    *file << "  [$pvTemp" << planeID.ID << " GetProperty Origin] "
+    *file << "  [$pvTemp" << planeID << " GetProperty Origin] "
       << "SetElements3 " 
       << sdvp->GetElement(0) << " " 
       << sdvp->GetElement(1) << " " 
       << sdvp->GetElement(2) << endl;
-    *file << "  [$pvTemp" << planeID.ID << " GetProperty Origin]"
-      << " SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0) << endl;
-    *file << "  [$pvTemp" << planeID.ID << " GetProperty Origin]"
-      << " SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
-      << " GetProperty Center]" << endl;
+    *file << "  [$pvTemp" << planeID << " GetProperty Origin]"
+          << " SetControllerProxy $pvTemp" 
+          << this->WidgetProxy->GetSelfIDAsString() << endl;
+    *file << "  [$pvTemp" << planeID << " GetProperty Origin]"
+          << " SetControllerProperty [$pvTemp" 
+          << this->WidgetProxy->GetSelfIDAsString()
+          << " GetProperty Center]" << endl;
     }
 
   sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->ImplicitFunctionProxy->GetProperty("Normal"));
   if(sdvp)
     {
-    *file << "  [$pvTemp" << planeID.ID << " GetProperty Normal] "
+    *file << "  [$pvTemp" << planeID << " GetProperty Normal] "
       << "SetElements3 " 
       << sdvp->GetElement(0) << " " 
       << sdvp->GetElement(1) << " " 
       << sdvp->GetElement(2) << endl;
-    *file << "  [$pvTemp" << planeID.ID << " GetProperty Normal]"
-      << " SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0) << endl;
-    *file << "  [$pvTemp" << planeID.ID << " GetProperty Normal]"
-      << " SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
-      << " GetProperty Normal]" << endl;
+    *file << "  [$pvTemp" << planeID << " GetProperty Normal]"
+          << " SetControllerProxy $pvTemp" 
+          << this->WidgetProxy->GetSelfIDAsString() << endl;
+    *file << "  [$pvTemp" << planeID << " GetProperty Normal]"
+          << " SetControllerProperty [$pvTemp" 
+          << this->WidgetProxy->GetSelfIDAsString()
+          << " GetProperty Normal]" << endl;
     }
-  *file << "  $pvTemp" << planeID.ID << " UpdateVTKObjects" << endl;
+  *file << "  $pvTemp" << planeID << " UpdateVTKObjects" << endl;
   *file << endl;
 
 }

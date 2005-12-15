@@ -33,7 +33,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.55");
+vtkCxxRevisionMacro(vtkSMProxy, "1.56");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -163,6 +163,16 @@ vtkSMProxy::~vtkSMProxy()
     }
 }
 
+//---------------------------------------------------------------------------
+const char* vtkSMProxy::GetSelfIDAsString()
+{
+  if (!this->Name)
+    {
+    this->GetSelfID();
+    }
+
+  return this->Name;
+}
 
 //---------------------------------------------------------------------------
 vtkClientServerID vtkSMProxy::GetSelfID()
@@ -198,9 +208,9 @@ vtkClientServerID vtkSMProxy::GetSelfID()
   if (!this->Name) 
     {
     ostrstream str;
-    str << "pvTemp" << this->SelfID << ends;
+    str << this->SelfID << ends;
     this->SetName(str.str());
-    str.rdbuf()->freeze(0);
+    delete[] str.str();
     }
   return this->SelfID;
 }
@@ -1455,7 +1465,7 @@ void vtkSMProxy::SaveState(vtkPVXMLElement* root)
   proxyElement->SetName("Proxy");
   proxyElement->AddAttribute("group", this->XMLGroup);
   proxyElement->AddAttribute("type", this->XMLName);
-  proxyElement->AddAttribute("id", this->Name);
+  proxyElement->AddAttribute("id", this->GetSelfIDAsString());
 
   vtkSMPropertyIterator* iter = this->NewPropertyIterator();
 
@@ -1464,7 +1474,7 @@ void vtkSMProxy::SaveState(vtkPVXMLElement* root)
     if (iter->GetProperty()->GetSaveable())
       {
       ostrstream propID;
-      propID << this->Name << "." << iter->GetKey() << ends;
+      propID << this->GetSelfIDAsString() << "." << iter->GetKey() << ends;
       iter->GetProperty()->SaveState(proxyElement, propID.str());
       delete [] propID.str();
       }

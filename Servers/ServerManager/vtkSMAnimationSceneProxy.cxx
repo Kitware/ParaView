@@ -46,7 +46,7 @@
 # include <io.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.18");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.19");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
@@ -373,17 +373,23 @@ int vtkSMAnimationSceneProxy::SaveGeometry(const char* filename)
 void vtkSMAnimationSceneProxy::SaveInBatchScript(ofstream* file)
 {
   this->Superclass::SaveInBatchScript(file);
-  vtkClientServerID id = this->GetSelfID();
 
-  *file << "  [$pvTemp" << id << " GetProperty Loop]"
+  ostrstream batchNameStr;
+  batchNameStr << "pvTemp" << this->GetSelfIDAsString()
+               << ends;
+  char* batchName = batchNameStr.str();;
+
+  *file << "  [$" << batchName << " GetProperty Loop]"
     << " SetElements1 " << this->GetLoop() << endl;
-  *file << "  [$pvTemp" << id << " GetProperty FrameRate]"
+  *file << "  [$" << batchName << " GetProperty FrameRate]"
     << " SetElements1 " << this->GetFrameRate() << endl;
-  *file << "  [$pvTemp" << id << " GetProperty PlayMode]"
+  *file << "  [$" << batchName << " GetProperty PlayMode]"
     << " SetElements1 " << this->GetPlayMode() << endl;
   
-  *file << "  $pvTemp" << id << " SetRenderModuleProxy $Ren1" << endl;
-  *file << "  $pvTemp" << id << " UpdateVTKObjects" << endl;
+  *file << "  $" << batchName << " SetRenderModuleProxy $pvTemp" 
+        << this->RenderModuleProxy->GetSelfIDAsString()
+        << endl;
+  *file << "  $" << batchName << " UpdateVTKObjects" << endl;
   *file << endl;
   vtkCollectionIterator* iter = this->AnimationCueProxiesIterator;
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
@@ -394,9 +400,9 @@ void vtkSMAnimationSceneProxy::SaveInBatchScript(ofstream* file)
     if (cue)
       {
       cue->SaveInBatchScript(file);
-      *file << "  [$pvTemp" << id << " GetProperty Cues]"
-        " AddProxy $pvTemp" << cue->GetID() << endl;
-      *file << "  $pvTemp" << id << " UpdateVTKObjects" << endl;
+      *file << "  [$" << batchName << " GetProperty Cues]"
+        " AddProxy $pvTemp" << cue->GetSelfIDAsString() << endl;
+      *file << "  $" << batchName << " UpdateVTKObjects" << endl;
       *file << endl;
       }
     }

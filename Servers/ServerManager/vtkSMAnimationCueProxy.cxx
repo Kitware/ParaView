@@ -25,7 +25,7 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.14");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);
@@ -307,16 +307,8 @@ void vtkSMAnimationCueProxy::SaveInBatchScript(ofstream* file)
 
   if (this->AnimatedProxy)
     {
-    proxyTclName << "$";
-    if (this->AnimatedProxy->GetNumberOfIDs() > 0)
-      {
-      proxyTclName << "pvTemp" << this->AnimatedProxy->GetID(0);
-      }
-    else
-      {
-      proxyTclName << this->AnimatedProxy->GetName();
-      }
-    proxyTclName << ends;
+    proxyTclName << "$pvTemp" << this->AnimatedProxy->GetSelfIDAsString()
+                 << ends;
     this->SaveInBatchScript(file, proxyTclName.str(), 1);
     delete[] proxyTclName.str();
     }
@@ -332,23 +324,23 @@ void vtkSMAnimationCueProxy::SaveInBatchScript(ofstream* file,
                                                int doRegister)
 {
   *file << endl;
-  vtkClientServerID id = this->GetSelfID();
-  *file << "set pvTemp" << id
+  *file << "set pvTemp" << this->GetSelfIDAsString()
     << " [$proxyManager NewProxy animation "
     << this->GetXMLName() <<"]" << endl;
   if (doRegister)
     {
-    *file << "$proxyManager RegisterProxy animation pvTemp" << id
-          << " $pvTemp" << id << endl;
+    *file << "$proxyManager RegisterProxy animation pvTemp" 
+          << this->GetSelfIDAsString()
+          << " $pvTemp" << this->GetSelfIDAsString() << endl;
     }
 
-  *file << "[$pvTemp" << id << " GetProperty TimeMode]"
+  *file << "[$pvTemp" << this->GetSelfIDAsString() << " GetProperty TimeMode]"
     << " SetElements1 " << this->AnimationCue->GetTimeMode() << endl;
 
-  *file << "[$pvTemp" << id << " GetProperty StartTime]"
+  *file << "[$pvTemp" << this->GetSelfIDAsString() << " GetProperty StartTime]"
     << " SetElements1 " << this->AnimationCue->GetStartTime() << endl;
 
-  *file << "[$pvTemp" << id << " GetProperty EndTime]"
+  *file << "[$pvTemp" << this->GetSelfIDAsString() << " GetProperty EndTime]"
     << " SetElements1 " << this->AnimationCue->GetEndTime() << endl;
 
   // Set Animated proxy details.
@@ -357,48 +349,58 @@ void vtkSMAnimationCueProxy::SaveInBatchScript(ofstream* file,
   // the animation batch out at the end of the batch script.
   if (proxyTclName)
     {
-    *file << "[$pvTemp" << id << " GetProperty AnimatedProxy]"
-      << " RemoveAllProxies" << endl;
-    *file << "[$pvTemp" << id << " GetProperty AnimatedProxy]"
+    *file << "[$pvTemp" << this->GetSelfIDAsString() 
+          << " GetProperty AnimatedProxy]"
+          << " RemoveAllProxies" << endl;
+    *file << "[$pvTemp" << this->GetSelfIDAsString() 
+          << " GetProperty AnimatedProxy]"
           << " AddProxy " << proxyTclName;
     *file << endl;
     }
  
   if (this->AnimatedPropertyName)
     {
-    *file << "[$pvTemp" << id << " GetProperty AnimatedPropertyName]"
-      << " SetElement 0 " << this->AnimatedPropertyName << endl;
+    *file << "[$pvTemp" << this->GetSelfIDAsString() 
+          << " GetProperty AnimatedPropertyName]"
+          << " SetElement 0 " << this->AnimatedPropertyName << endl;
     }
 
   if (this->AnimatedDomainName)
     {
-    *file << "[$pvTemp" << id << " GetProperty AnimatedDomainName]"
-      << " SetElement 0 {" << this->AnimatedDomainName << "}" << endl;
+    *file << "[$pvTemp" << this->GetSelfIDAsString() 
+          << " GetProperty AnimatedDomainName]"
+          << " SetElement 0 {" << this->AnimatedDomainName 
+          << "}" << endl;
     }
 
-  *file << "[$pvTemp" << id << " GetProperty AnimatedElement]"
-    << " SetElements1 " << this->AnimatedElement << endl;
+  *file << "[$pvTemp" << this->GetSelfIDAsString() 
+        << " GetProperty AnimatedElement]"
+        << " SetElements1 " << this->AnimatedElement << endl;
 
   // Save Manipulator in batch script.
   if (this->Manipulator)
     {
     this->Manipulator->SaveInBatchScript(file);
     *file << endl;
-    *file << "[$pvTemp" << id << " GetProperty Manipulator] AddProxy $pvTemp"
-      << this->Manipulator->GetID() << endl;
-    *file << "$pvTemp" << id << " UpdateVTKObjects" << endl;
-    *file << "$pvTemp" << this->Manipulator->GetID() << " UnRegister {}"
+    *file << "[$pvTemp" << this->GetSelfIDAsString() 
+          << " GetProperty Manipulator] AddProxy $pvTemp"
+          << this->Manipulator->GetSelfIDAsString() << endl;
+    *file << "$pvTemp" << this->GetSelfIDAsString() 
+          << " UpdateVTKObjects" << endl;
+    *file << "$pvTemp" << this->Manipulator->GetSelfIDAsString() 
+          << " UnRegister {}"
           << endl;
     }
   else
     {
-    *file << "$pvTemp" << id << " UpdateVTKObjects" << endl;
+    *file << "$pvTemp" << this->GetSelfIDAsString() 
+          << " UpdateVTKObjects" << endl;
     }
   
   if (doRegister)
     {
     *file << endl;
-    *file << "$pvTemp" << id << " UnRegister {}" << endl;
+    *file << "$pvTemp" << this->GetSelfIDAsString() << " UnRegister {}" << endl;
     }
   *file << endl;
 }

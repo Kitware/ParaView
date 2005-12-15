@@ -20,7 +20,7 @@
 #include "vtkClientServerID.h"
 
 #include <vtkstd/vector>
-vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.12");
 vtkStandardNewMacro(vtkSMKeyFrameAnimationCueManipulatorProxy);
 
 //****************************************************************************
@@ -340,7 +340,6 @@ vtkSMKeyFrameProxy* vtkSMKeyFrameAnimationCueManipulatorProxy::GetKeyFrameAtInde
 //----------------------------------------------------------------------------
 void vtkSMKeyFrameAnimationCueManipulatorProxy::SaveInBatchScript(ofstream* file)
 {
-  vtkClientServerID id = this->GetSelfID();
   this->Superclass::SaveInBatchScript(file);
 
   vtkSMKeyFrameAnimationCueManipulatorProxyInternals::DoubleToKeyFrameVector::
@@ -349,10 +348,11 @@ void vtkSMKeyFrameAnimationCueManipulatorProxy::SaveInBatchScript(ofstream* file
     {
     vtkSMKeyFrameProxy* proxy = *it; 
     proxy->SaveInBatchScript(file);
-    *file << "[$pvTemp" << id << " GetProperty KeyFrames]"
-      <<" AddProxy $pvTemp" << proxy->GetID() << endl;
-    *file << "$pvTemp" << id << " UpdateVTKObjects" << endl;
-    *file << "$pvTemp" << proxy->GetID() << " UnRegister {}" << endl;
+    *file << "[$pvTemp" << this->GetSelfIDAsString() << " GetProperty KeyFrames]"
+          << " AddProxy $pvTemp" << proxy->GetSelfIDAsString() << endl;
+    *file << "$pvTemp" << this->GetSelfIDAsString() 
+          << " UpdateVTKObjects" << endl;
+    *file << "$pvTemp" << proxy->GetSelfIDAsString() << " UnRegister {}" << endl;
     }
 }
 

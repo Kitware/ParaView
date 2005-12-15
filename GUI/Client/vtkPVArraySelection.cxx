@@ -43,7 +43,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.81");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.82");
 
 //----------------------------------------------------------------------------
 vtkPVArraySelection::vtkPVArraySelection()
@@ -488,9 +488,9 @@ void vtkPVArraySelection::SetArrayStatus(const char *name, int status)
 //----------------------------------------------------------------------------
 void vtkPVArraySelection::SaveInBatchScript(ofstream *file)
 {
-  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  const char* sourceID = this->PVSource->GetProxy()->GetSelfIDAsString();
 
-  if (!sourceID.ID || !this->SMPropertyName)
+  if (!sourceID || !this->SMPropertyName)
     {
     vtkErrorMacro("Sanity check failed. " << this->GetClassName());
     return;

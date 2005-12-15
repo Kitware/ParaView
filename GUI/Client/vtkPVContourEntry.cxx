@@ -25,11 +25,12 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkPVTraceHelper.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.58");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.59");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -114,7 +115,7 @@ void vtkPVContourEntry::Accept()
 //-----------------------------------------------------------------------------
 void vtkPVContourEntry::SaveInBatchScript(ofstream *file)
 {
-  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  const char* sourceID = this->PVSource->GetProxy()->GetSelfIDAsString();
 
   vtkSMDoubleVectorProperty* prop = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetSMProperty());
@@ -122,12 +123,12 @@ void vtkPVContourEntry::SaveInBatchScript(ofstream *file)
     {
     unsigned int numContours = prop->GetNumberOfElements();
 
-    *file << "  [$pvTemp" << sourceID.ID << " GetProperty ContourValues] "
+    *file << "  [$pvTemp" << sourceID << " GetProperty ContourValues] "
           << "SetNumberOfElements " << numContours << endl;
     for (unsigned int i = 0; i < numContours; i++)
       {
       *file << "  ";
-      *file << "[$pvTemp" << sourceID.ID << " GetProperty ContourValues] "
+      *file << "[$pvTemp" << sourceID << " GetProperty ContourValues] "
             << "SetElement " << i << " " << prop->GetElement(i) << endl;
       }
     }

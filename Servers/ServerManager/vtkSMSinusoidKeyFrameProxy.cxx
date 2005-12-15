@@ -21,7 +21,7 @@
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkSMSinusoidKeyFrameProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMSinusoidKeyFrameProxy, "1.5");
 vtkStandardNewMacro(vtkSMSinusoidKeyFrameProxy);
 
 //----------------------------------------------------------------------------
@@ -41,14 +41,16 @@ vtkSMSinusoidKeyFrameProxy::~vtkSMSinusoidKeyFrameProxy()
 void vtkSMSinusoidKeyFrameProxy::SaveInBatchScript(ofstream* file)
 {
   this->Superclass::SaveInBatchScript(file);
-  const char* name = this->GetName();
-  *file << "  [$" << name << " GetProperty Phase]"
+  
+  const char* batchName = this->GetSelfIDAsString();
+
+  *file << "  [$pvTemp" << batchName << " GetProperty Phase]"
     << " SetElements1 " << this->Phase<< endl;
-  *file << "  [$" << name << " GetProperty Frequency]"
+  *file << "  [$pvTemp" << batchName << " GetProperty Frequency]"
     << " SetElements1 " << this->Frequency<< endl;
-  *file << "  [$" << name << " GetProperty Offset]"
+  *file << "  [$pvTemp" << batchName << " GetProperty Offset]"
     << " SetElements1 " << this->Offset<< endl;
-  *file << "  $" << name << " UpdateVTKObjects";
+  *file << "  $pvTemp" << batchName << " UpdateVTKObjects";
   *file << endl;
 }
 

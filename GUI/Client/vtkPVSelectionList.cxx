@@ -25,10 +25,11 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkStringList.h"
 #include "vtkPVTraceHelper.h"
+#include "vtkSMSourceProxy.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.63");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.64");
 
 //----------------------------------------------------------------------------
 vtkPVSelectionList::vtkPVSelectionList()
@@ -185,8 +186,8 @@ const char *vtkPVSelectionList::GetLabel()
 //-----------------------------------------------------------------------------
 void vtkPVSelectionList::SaveInBatchScript(ofstream *file)
 {
-  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
-  if (sourceID.ID == 0 || !this->SMPropertyName)
+  const char* sourceID = this->PVSource->GetProxy()->GetSelfIDAsString();
+  if (!sourceID || !this->SMPropertyName)
     {
     vtkErrorMacro("Sanity check failed. "
                   << this->GetClassName());

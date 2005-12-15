@@ -129,14 +129,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // A proxy can be assigned a name. The name is used to
-  // indentify the proxy when saving ServerManager state.
-  // By default the name is set to pvTemp{%d} where {%d} 
-  // gets substituted by the SelfID of the proxy.
-  vtkSetStringMacro(Name);
-  vtkGetStringMacro(Name);
-
-  // Description:
   // Add a property with the given key (name). The name can then
   // be used to retrieve the property with GetProperty(). If a
   // property with the given name has been added before, it will
@@ -309,6 +301,11 @@ public:
   // Description:
   // Calls MarkModified() on all consumers.
   virtual void MarkConsumersAsModified(vtkSMProxy* modifiedProxy);
+
+  // Description:
+  // Returns the self ID as string. If the name was overwritten
+  // with SetName(), it returns that instead.
+  const char* GetSelfIDAsString();
 
 protected:
   vtkSMProxy();
@@ -564,6 +561,17 @@ private:
   vtkClientServerID SelfID; 
   // SelfID is private to avoid direct access by subclasses.
   // They must use GetSelfID().
+
+  // PVEE only
+  // DO NOT USE THIS. THIS IS TEMPORARY AND TO BE USED
+  // IN PVEE ONLY
+  // A proxy can be assigned a name. The name is used to
+  // indentify the proxy when saving ServerManager state.
+  // By default the name is set to pvTemp{%d} where {%d} 
+  // gets substituted by the SelfID of the proxy.
+  vtkSetStringMacro(Name);
+  vtkGetStringMacro(Name);
+  // -- PVEE only
 
   vtkSMProxy(const vtkSMProxy&); // Not implemented
   void operator=(const vtkSMProxy&); // Not implemented

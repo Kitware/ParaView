@@ -41,7 +41,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.20");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.21");
 
 // Private implementation
 struct vtkPVComparativeVisManagerInternals
@@ -117,7 +117,7 @@ vtkSMComparativeVisProxy* vtkPVComparativeVisManager::GetVisualization(
   for(; iter != this->Internal->Visualizations.end(); iter++)
     {
     vtkSMComparativeVisProxy* vis = iter->GetPointer();
-    if (vis && vis->GetName() && name && strcmp(name, vis->GetName()) == 0)
+    if (vis && vis->GetVisName() && name && strcmp(name, vis->GetVisName()) == 0)
       {
       return iter->GetPointer();
       }
@@ -140,7 +140,7 @@ void vtkPVComparativeVisManager::GenerateVisualization(vtkSMComparativeVisProxy*
 //-----------------------------------------------------------------------------
 void vtkPVComparativeVisManager::AddVisualization(vtkSMComparativeVisProxy* vis)
 {
-  if (!vis->GetName())
+  if (!vis->GetVisName())
     {
     vtkErrorMacro("Cannot add visualization without a name!");
     return;
@@ -157,7 +157,7 @@ void vtkPVComparativeVisManager::AddVisualization(vtkSMComparativeVisProxy* vis)
 
   if (!this->SelectedVisualizationName)
     {
-    this->SetSelectedVisualizationName(vis->GetName());
+    this->SetSelectedVisualizationName(vis->GetVisName());
     }
 }
 
@@ -171,7 +171,7 @@ void vtkPVComparativeVisManager::RemoveVisualization(const char* name)
   for(; iter != this->Internal->Visualizations.end(); iter++)
     {
     vtkSMComparativeVisProxy* vis = iter->GetPointer();
-    if (vis && vis->GetName() && name && strcmp(name, vis->GetName()) == 0)
+    if (vis && vis->GetVisName() && name && strcmp(name, vis->GetVisName()) == 0)
       {
       if (iter->GetPointer() == curVis)
         {
@@ -422,8 +422,8 @@ void vtkPVComparativeVisManager::SaveState(ofstream *file)
     *file << "set comparativeVis(" << idx << ") "
           << "[$proxyManager NewProxy ComparativeVisHelpers " 
           << "ComparativeVis]" << endl;
-    *file << "$comparativeVis(" << idx << ") SetName {" 
-          << iter->GetPointer()->GetName() << "}" << endl;
+    *file << "$comparativeVis(" << idx << ") SetVisName {" 
+          << iter->GetPointer()->GetVisName() << "}" << endl;
     *file << "$comparativeVis(" << idx << ") SetNumberOfXFrames " 
           <<  iter->GetPointer()->GetNumberOfXFrames()
           << endl;
@@ -438,7 +438,7 @@ void vtkPVComparativeVisManager::SaveState(ofstream *file)
             << endl;
       *file << "$comparativeVis(" << idx << ") SetSourceName " 
             << i << " [$kw(" << iter->GetPointer()->GetSourceTclName(i)
-            << ") GetName]" << endl;
+            << ") GetVisName]" << endl;
       *file << "$comparativeVis(" << idx << ") SetSourceTclName " 
             << i << " $kw(" << iter->GetPointer()->GetSourceTclName(i)
             << ")" << endl;

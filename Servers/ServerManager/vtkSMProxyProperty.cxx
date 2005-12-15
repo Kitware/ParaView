@@ -30,7 +30,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.23");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.24");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -483,7 +483,7 @@ void vtkSMProxyProperty::ChildSaveState(vtkPVXMLElement* propertyElement)
       
       if (dom && dom->IsInDomain(proxy))
         {
-        proxies.push_back(proxy->GetName());
+        proxies.push_back(proxy->GetSelfIDAsString());
         break;
         }
       this->DomainIterator->Next();

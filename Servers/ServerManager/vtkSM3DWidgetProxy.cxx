@@ -25,7 +25,7 @@
 #include "vtkSMRenderModuleProxy.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.15");
+vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.16");
 //===========================================================================
 //***************************************************************************
 class vtkSM3DWidgetProxyObserver : public vtkCommand
@@ -303,36 +303,37 @@ void vtkSM3DWidgetProxy::SetCurrentRenderModuleProxy(
 //----------------------------------------------------------------------------
 void vtkSM3DWidgetProxy::SaveInBatchScript(ofstream *file)
 {
-  for (unsigned int cc=0;cc < this->GetNumberOfIDs(); cc++)
-    {
-    vtkClientServerID id = this->GetID(cc);
-    *file << endl;
-    *file << "set pvTemp" << id.ID
-      <<" [$proxyManager NewProxy 3d_widgets " 
-      << this->GetXMLName()
-      << "]"
-      <<endl;
-    *file << "  $proxyManager RegisterProxy 3d_widgets pvTemp"
-      << id.ID << " $pvTemp" << id.ID
-      << endl;
-    *file << "  $pvTemp" << id.ID << " UnRegister {}" << endl;
-
-    *file << "  [$pvTemp" << id.ID << " GetProperty IgnorePlaceWidgetChanges]"
-      << " SetElements1 0" << endl;
-    for(int i=0;i < 6; i++)
-      {
-      *file << "  [$pvTemp" << id.ID << " GetProperty PlaceWidget] "
-        << "SetElement " << i << " "
-        << this->Bounds[i] 
+  *file << endl;
+  *file << "set pvTemp" << this->GetSelfIDAsString()
+        << " [$proxyManager NewProxy 3d_widgets " 
+        << this->GetXMLName()
+        << "]"
+        <<endl;
+  *file << "  $proxyManager RegisterProxy 3d_widgets pvTemp"
+        << this->GetSelfIDAsString() << " $pvTemp" << this->GetSelfIDAsString()
         << endl;
-      }
+  *file << "  $pvTemp" << this->GetSelfIDAsString() 
+        << " UnRegister {}" << endl;
 
-    *file << "  [$pvTemp" << id.ID << " GetProperty Visibility] "
-      << "SetElements1 " << this->Enabled << endl;
-
-    *file << "  $pvTemp" << id.ID << " UpdateVTKObjects" << endl;
-    *file << endl;
+  *file << "  [$pvTemp" << this->GetSelfIDAsString() 
+        << " GetProperty IgnorePlaceWidgetChanges]"
+        << " SetElements1 0" << endl;
+  for(int i=0;i < 6; i++)
+    {
+    *file << "  [$pvTemp" << this->GetSelfIDAsString() 
+          << " GetProperty PlaceWidget] "
+          << "SetElement " << i << " "
+          << this->Bounds[i] 
+          << endl;
     }
+
+  *file << "  [$pvTemp" << this->GetSelfIDAsString() 
+        << " GetProperty Visibility] "
+        << "SetElements1 " << this->Enabled << endl;
+
+  *file << "  $pvTemp" << this->GetSelfIDAsString() 
+        << " UpdateVTKObjects" << endl;
+  *file << endl;
 
 }
 

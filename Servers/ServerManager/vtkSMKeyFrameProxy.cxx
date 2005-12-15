@@ -28,7 +28,7 @@ public:
 //----------------------------------------------------------------------------
 
 
-vtkCxxRevisionMacro(vtkSMKeyFrameProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMKeyFrameProxy, "1.8");
 vtkStandardNewMacro(vtkSMKeyFrameProxy);
 //----------------------------------------------------------------------------
 vtkSMKeyFrameProxy::vtkSMKeyFrameProxy()
@@ -94,8 +94,7 @@ unsigned int vtkSMKeyFrameProxy::GetNumberOfKeyValues()
 void vtkSMKeyFrameProxy::SaveInBatchScript(ofstream* file)
 {
   *file << endl;
-  vtkClientServerID id = this->GetSelfID();
-  *file << "set pvTemp" << id
+  *file << "set pvTemp" << this->GetSelfIDAsString()
     << " [$proxyManager NewProxy " 
     << this->GetXMLGroup() <<" "
     << this->GetXMLName() << "]" << endl;
@@ -105,14 +104,14 @@ void vtkSMKeyFrameProxy::SaveInBatchScript(ofstream* file)
   int i = 0;
   for (; iter != this->Internals->KeyValues.end(); ++iter)
     {
-    *file << "[$pvTemp" << id << " GetProperty KeyValues]"
+    *file << "[$pvTemp" << this->GetSelfIDAsString() << " GetProperty KeyValues]"
       << " SetElement " << i << " " << (*iter) << endl;
     i++;
     }
 
-  *file << "[$pvTemp" << id << " GetProperty KeyTime]"
+  *file << "[$pvTemp" << this->GetSelfIDAsString() << " GetProperty KeyTime]"
     << " SetElements1 " << this->KeyTime << endl;
-  *file << "$pvTemp" << id << " UpdateVTKObjects" << endl;
+  *file << "$pvTemp" << this->GetSelfIDAsString() << " UpdateVTKObjects" << endl;
 }
 
 //----------------------------------------------------------------------------

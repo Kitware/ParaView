@@ -40,7 +40,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMComparativeVisProxy);
-vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.15");
 
 vtkCxxSetObjectMacro(vtkSMComparativeVisProxy, RenderModule, vtkSMRenderModuleProxy);
 
@@ -116,7 +116,7 @@ vtkSMComparativeVisProxy::vtkSMComparativeVisProxy()
   vtkSMProxyManager* proxMan = vtkSMProxy::GetProxyManager();
   this->MultiActorHelper = 
     proxMan->NewProxy("ComparativeVisHelpers", "MultiActorHelper");
-  this->Name = 0;
+  this->VisName = 0;
 
   this->InFirstShow = 1;
   this->IsGenerated = 0;
@@ -145,7 +145,7 @@ vtkSMComparativeVisProxy::~vtkSMComparativeVisProxy()
   this->MultiActorHelper->Delete();
   this->MultiActorHelper = 0;
 
-  this->SetName(0);
+  this->SetVisName(0);
 
   this->Adaptor->Delete();
   this->Adaptor = 0;
@@ -963,7 +963,7 @@ void vtkSMComparativeVisProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "IsGenerated: " << this->IsGenerated << endl;
-  os << indent << "Name: " << (this->Name?this->Name:"(null)") << endl;
+  os << indent << "Name: " << (this->VisName?this->VisName:"(null)") << endl;
   os << indent << "MultiActorHelper: " << this->MultiActorHelper << endl;
   os << indent << "ShouldAbort: " << this->ShouldAbort << endl;
   os << indent << "RenderModule: " << this->RenderModule << endl;

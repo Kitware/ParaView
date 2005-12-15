@@ -64,7 +64,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.466");
+vtkCxxRevisionMacro(vtkPVSource, "1.467");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -2276,14 +2276,16 @@ void vtkPVSource::SaveFilterInBatchScript(ofstream *file)
     {
     module_group = "sources";
     }
-  *file << "set pvTemp" <<  this->GetVTKSourceID(0)
+  *file << "set pvTemp" <<  this->Proxy->GetSelfIDAsString()
         << " [$proxyManager NewProxy " << module_group << " " 
         << this->GetModuleName() << "]"
         << endl;
   *file << "  $proxyManager RegisterProxy " << module_group << " pvTemp" 
-        << this->GetVTKSourceID(0) << " $pvTemp" << this->GetVTKSourceID(0)
+        << this->Proxy->GetSelfIDAsString() << " $pvTemp" 
+        << this->Proxy->GetSelfIDAsString()
         << endl;
-  *file << "  $pvTemp" << this->GetVTKSourceID(0) << " UnRegister {}" << endl;
+  *file << "  $pvTemp" << this->Proxy->GetSelfIDAsString() 
+        << " UnRegister {}" << endl;
 
   this->SetInputsInBatchScript(file);
 
@@ -2299,7 +2301,7 @@ void vtkPVSource::SaveFilterInBatchScript(ofstream *file)
     }
   it->Delete();
 
-  *file << "  $pvTemp" <<  this->GetVTKSourceID(0)
+  *file << "  $pvTemp" << this->Proxy->GetSelfIDAsString()
         << " UpdateVTKObjects" << endl;
 }
 
@@ -2505,9 +2507,9 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
       inputName = "Input";
       }
 
-    *file << "  [$pvTemp" <<  this->GetVTKSourceID(0) 
+    *file << "  [$pvTemp" <<  this->Proxy->GetSelfIDAsString() 
           << " GetProperty " << inputName << "]"
-          << " AddProxy $pvTemp" << pvs->GetVTKSourceID(0)
+          << " AddProxy $pvTemp" << pvs->Proxy->GetSelfIDAsString()
           << endl;
     }
 

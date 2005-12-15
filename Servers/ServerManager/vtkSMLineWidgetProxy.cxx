@@ -24,7 +24,7 @@
 
 
 vtkStandardNewMacro(vtkSMLineWidgetProxy);
-vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.11");
 //----------------------------------------------------------------------------
 vtkSMLineWidgetProxy::vtkSMLineWidgetProxy()
 {
@@ -139,33 +139,33 @@ void vtkSMLineWidgetProxy::SaveInBatchScript(ofstream *file)
   vtkSMIntVectorProperty* propResolution = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProperty("Resolution"));
   
-  for (unsigned int cc=0;cc < this->GetNumberOfIDs(); cc++)
-    {
-    vtkClientServerID id = this->GetID(cc);
-    *file << endl;
-    
-    *file << "  [$pvTemp" << id.ID << " GetProperty Point1] "
-      << "SetElements3 "
-      << this->Point1[0] << " "
-      << this->Point1[1] << " "
-      << this->Point1[2] 
-      << endl;
-
-    *file << "  [$pvTemp" << id.ID << " GetProperty Point2] "
-      << "SetElements3 "
-      << this->Point2[0] << " "
-      << this->Point2[1] << " "
-      << this->Point2[2] 
-      << endl;
-
-    *file << "  [$pvTemp" << id.ID << " GetProperty Resolution] "
-      << "SetElements1 "
-      << propResolution->GetElement(0)
-      << endl;
-
-    *file << "  $pvTemp" << id.ID << " UpdateVTKObjects" << endl;
-    *file << endl;
-    }
+  *file << endl;
+  
+  *file << "  [$pvTemp" << this->GetSelfIDAsString() 
+        << " GetProperty Point1] "
+        << "SetElements3 "
+        << this->Point1[0] << " "
+        << this->Point1[1] << " "
+        << this->Point1[2] 
+        << endl;
+  
+  *file << "  [$pvTemp" << this->GetSelfIDAsString() 
+        << " GetProperty Point2] "
+        << "SetElements3 "
+        << this->Point2[0] << " "
+        << this->Point2[1] << " "
+        << this->Point2[2] 
+        << endl;
+  
+  *file << "  [$pvTemp" << this->GetSelfIDAsString() 
+        << " GetProperty Resolution] "
+        << "SetElements1 "
+        << propResolution->GetElement(0)
+        << endl;
+  
+  *file << "  $pvTemp" << this->GetSelfIDAsString() 
+        << " UpdateVTKObjects" << endl;
+  *file << endl;
 }
 
 //----------------------------------------------------------------------------

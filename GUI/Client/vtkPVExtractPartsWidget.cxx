@@ -28,11 +28,12 @@
 #include "vtkPVSource.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkPVTraceHelper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.35");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.36");
 
 //----------------------------------------------------------------------------
 vtkPVExtractPartsWidget::vtkPVExtractPartsWidget()
@@ -304,9 +305,9 @@ void vtkPVExtractPartsWidget::SaveInBatchScript(ofstream *file)
 {
   int num, idx;
 
-  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  const char* sourceID = this->PVSource->GetProxy()->GetSelfIDAsString();
 
-  if (sourceID.ID == 0 || !this->SMPropertyName)
+  if (!sourceID || !this->SMPropertyName)
     {
     vtkErrorMacro("Sanity check failed. " << this->GetClassName());
     return;

@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisManagerGUI );
-vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.13");
+vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.14");
 
 class vtkCVProgressObserver : public vtkCommand
 {
@@ -256,11 +256,11 @@ void vtkPVComparativeVisManagerGUI::AddVisualization()
     this->EditDialog->CopyToVisualization(
       static_cast<vtkSMComparativeVisProxy*>(vis));
  
-    this->Manager->AddVisualization(
-      static_cast<vtkSMComparativeVisProxy*>(vis));
-    if (vis->GetName() && vis->GetName()[0] != '\0')
+    vtkSMComparativeVisProxy* cvp = static_cast<vtkSMComparativeVisProxy*>(vis);
+    this->Manager->AddVisualization(cvp);
+    if (cvp->GetVisName() && cvp->GetVisName()[0] != '\0')
       {
-      this->Manager->SetSelectedVisualizationName(vis->GetName());
+      this->Manager->SetSelectedVisualizationName(cvp->GetVisName());
       }
 
     vis->Delete();
@@ -282,9 +282,9 @@ void vtkPVComparativeVisManagerGUI::EditVisualization()
       if (this->EditDialog->Invoke()) 
         {
         this->EditDialog->CopyToVisualization(vis);
-        if (vis->GetName() && vis->GetName()[0] != '\0')
+        if (vis->GetVisName() && vis->GetVisName()[0] != '\0')
           {
-          this->Manager->SetSelectedVisualizationName(vis->GetName());
+          this->Manager->SetSelectedVisualizationName(vis->GetVisName());
           }
         this->Update();
         }
@@ -377,7 +377,7 @@ void vtkPVComparativeVisManagerGUI::Update()
   for (unsigned int i=0; i<numVis; i++)
     {
     vtkSMComparativeVisProxy* vis = this->Manager->GetVisualization(i);
-    const char* name = vis->GetName();
+    const char* name = vis->GetVisName();
     if (name && name[0] != '\0')
       {
       this->ComparativeVisList->AppendUnique(name);

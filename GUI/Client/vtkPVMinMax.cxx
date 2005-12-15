@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.54");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.55");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -250,7 +250,7 @@ void vtkPVMinMax::SetMaxValueInternal(double val)
 //-----------------------------------------------------------------------------
 void vtkPVMinMax::SaveInBatchScript(ofstream *file)
 {
-  *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+  *file << "  [$pvTemp" << this->PVSource->GetProxy()->GetSelfIDAsString() 
         <<  " GetProperty " 
         << this->GetSMProperty()->GetXMLName() << "] SetElements2 "
         << this->GetMinValue() << " " << this->GetMaxValue() << endl;
