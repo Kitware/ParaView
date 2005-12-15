@@ -34,13 +34,14 @@
 #include "vtkPVColorMap.h"
 #include "vtkPVTraceHelper.h"
 #include "vtkSMDataObjectDisplayProxy.h"
+#include "vtkSMSourceProxy.h"
 
 #include <vtkstd/string>
 #include <vtkstd/map>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.47");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.48");
 
 class vtkXDMFReaderModuleInternal
 {
@@ -488,13 +489,14 @@ void vtkXDMFReaderModule::SaveInBatchScript(ofstream *file)
     }
   this->SaveFilterInBatchScript(file);
 
+  const char* sourceID = this->Proxy->GetSelfIDAsString();
   if ( this->Domain )
     {
-    *file << "  [$pvTemp" << this->GetVTKSourceID(0) 
+    *file << "  [$pvTemp" << sourceID 
           << " GetProperty DomainName] SetElement 0 {"
           << this->Domain << "}" << endl;
-    *file << "  $pvTemp" << this->GetVTKSourceID(0) << " UpdateVTKObjects" << endl;
-    *file << "  $pvTemp" << this->GetVTKSourceID(0) << " UpdatePipelineInformation" << endl;
+    *file << "  $pvTemp" << sourceID << " UpdateVTKObjects" << endl;
+    *file << "  $pvTemp" << sourceID << " UpdatePipelineInformation" << endl;
     }
   int numGrids=0;
   vtkXDMFReaderModuleInternal::GridListType::iterator mit;
@@ -504,7 +506,7 @@ void vtkXDMFReaderModule::SaveInBatchScript(ofstream *file)
     {
     numGrids++;
     }
-  *file << "  [$pvTemp" << this->GetVTKSourceID(0) 
+  *file << "  [$pvTemp" << sourceID 
         << " GetProperty EnableGrid] SetNumberOfElements "
         << numGrids << endl;
   
@@ -513,11 +515,11 @@ void vtkXDMFReaderModule::SaveInBatchScript(ofstream *file)
         mit != this->Internals->GridList.end(); 
         ++mit )
     {
-    *file << "  [$pvTemp" << this->GetVTKSourceID(0) 
+    *file << "  [$pvTemp" << sourceID 
           << " GetProperty EnableGrid] SetElement " << numGrids << " {" << mit->first.c_str() << "}" << endl;
     numGrids++;
     }
-  *file << "  $pvTemp" << this->GetVTKSourceID(0) << " UpdateVTKObjects" << endl;
+  *file << "  $pvTemp" << sourceID << " UpdateVTKObjects" << endl;
 
   // Add the mapper, actor, scalar bar actor ...
   if (this->GetVisibility())

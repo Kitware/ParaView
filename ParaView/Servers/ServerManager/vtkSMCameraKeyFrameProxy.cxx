@@ -19,7 +19,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMAnimationCueProxy.h"
 
-vtkCxxRevisionMacro(vtkSMCameraKeyFrameProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMCameraKeyFrameProxy, "1.3");
 vtkStandardNewMacro(vtkSMCameraKeyFrameProxy);
 //----------------------------------------------------------------------------
 vtkSMCameraKeyFrameProxy::vtkSMCameraKeyFrameProxy()
@@ -132,32 +132,27 @@ void vtkSMCameraKeyFrameProxy::SetViewAngle(double angle)
 void vtkSMCameraKeyFrameProxy::SaveInBatchScript(ofstream* file)
 {
   this->Superclass::SaveInBatchScript(file);
+
   double *val = this->Camera->GetPosition();
-  const char* name = this->GetName();
-  *file << "  [$" << name << " GetProperty Position]"
-    << " SetElements3 " << val[0] << " " << val[1] << " " << val[2] << endl;
+  const char* batchName = this->GetSelfIDAsString();
+  *file << "  [$pvTemp" << batchName << " GetProperty Position]"
+        << " SetElements3 " << val[0] << " " << val[1] << " " << val[2] << endl;
 
   val = this->Camera->GetFocalPoint();
-  *file << "  [$" << name << " GetProperty FocalPoint]"
-    << " SetElements3 " << val[0] << " " << val[1] << " " << val[2] << endl;
+  *file << "  [$pvTemp" << batchName << " GetProperty FocalPoint]"
+        << " SetElements3 " << val[0] << " " << val[1] << " " << val[2] << endl;
  
   val = this->Camera->GetViewUp();
-  *file << "  [$" << name << " GetProperty ViewUp]"
-    << " SetElements3 " << val[0] << " " << val[1] << " " << val[2] << endl;
+  *file << "  [$pvTemp" << batchName << " GetProperty ViewUp]"
+        << " SetElements3 " << val[0] << " " << val[1] << " " << val[2] << endl;
 
   double angle = this->Camera->GetViewAngle();
-  *file << "  [$" << name << " GetProperty ViewAngle]"
-    << " SetElements1 " << angle << endl;
+  *file << "  [$pvTemp" << batchName << " GetProperty ViewAngle]"
+        << " SetElements1 " << angle << endl;
 
-  *file << "  $" << name << " UpdateVTKObjects" << endl;
+  *file << "  $pvTemp" << batchName << " UpdateVTKObjects" << endl;
 }
 
-//----------------------------------------------------------------------------
-//----------------------------------------------------------------------------
-//----------------------------------------------------------------------------
-//----------------------------------------------------------------------------
-//----------------------------------------------------------------------------
-//----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 void vtkSMCameraKeyFrameProxy::PrintSelf(ostream &os, vtkIndent indent)
 {

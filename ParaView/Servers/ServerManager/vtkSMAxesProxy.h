@@ -36,11 +36,6 @@ public:
   vtkTypeRevisionMacro(vtkSMAxesProxy, vtkSMDisplayProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Save the proxy in batch script.
-  virtual void SaveInBatchScript(ofstream* file);  
-
-//BTX
 protected:
   vtkSMAxesProxy();
   ~vtkSMAxesProxy();
@@ -51,7 +46,6 @@ protected:
 private:
   vtkSMAxesProxy(const vtkSMAxesProxy&); // Not implemented
   void operator=(const vtkSMAxesProxy&); // Not implemented
-//ETX
 };
 
 

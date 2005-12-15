@@ -42,7 +42,7 @@ class vtkPVItemSelectionArraySet: public vtkPVItemSelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVItemSelection);
-vtkCxxRevisionMacro(vtkPVItemSelection, "1.9");
+vtkCxxRevisionMacro(vtkPVItemSelection, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVItemSelection::vtkPVItemSelection()
@@ -447,9 +447,9 @@ void vtkPVItemSelection::SetArrayStatus(const char *name, int status)
 //----------------------------------------------------------------------------
 void vtkPVItemSelection::SaveInBatchScript(ofstream *file)
 {
-  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  const char* sourceID = this->PVSource->GetProxy()->GetSelfIDAsString();
 
-  if (!sourceID.ID || !this->SMPropertyName)
+  if (!sourceID || !this->SMPropertyName)
     {
     vtkErrorMacro("Sanity check failed. " << this->GetClassName());
     return;
@@ -472,17 +472,18 @@ void vtkPVItemSelection::SaveInBatchScript(ofstream *file)
     {
     // Need to update information before setting array selections.
     *file << "  " 
-      << "$pvTemp" << sourceID << " UpdateVTKObjects\n";
+          << "$pvTemp" << sourceID << " UpdateVTKObjects\n";
     *file << "  " 
-      << "$pvTemp" << sourceID << " UpdatePipelineInformation\n";
+          << "$pvTemp" << sourceID << " UpdatePipelineInformation\n";
     *file << "  [$pvTemp" << sourceID << " GetProperty "
-      << this->SMPropertyName << "] SetNumberOfElements " 
-      << numElems << endl;
+          << this->SMPropertyName << "] SetNumberOfElements " 
+          << numElems << endl;
     }
   numElems=0;
   for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
     {
-    vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetCurrentObject());
+    vtkKWCheckButton* check = 
+      static_cast<vtkKWCheckButton*>(it->GetCurrentObject());
     // Since they default to on.
     if(this->Selection->ArrayIsEnabled(check->GetText()))
       {

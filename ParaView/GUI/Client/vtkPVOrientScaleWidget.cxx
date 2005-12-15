@@ -40,7 +40,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.38");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.39");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScalarProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMVectorProperty, vtkSMProperty);
@@ -945,9 +945,9 @@ void vtkPVOrientScaleWidget::UpdateEnableState()
 //----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::SaveInBatchScript(ofstream* file)
 {
-  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  const char* sourceID = this->PVSource->GetProxy()->GetSelfIDAsString();
   
-  if (sourceID.ID == 0 || !this->SMScalarPropertyName ||
+  if (!sourceID || !this->SMScalarPropertyName ||
       !this->SMVectorPropertyName || !this->SMOrientModePropertyName ||
       !this->SMScaleModePropertyName || !this->SMScaleFactorPropertyName)
     {

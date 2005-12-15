@@ -35,6 +35,7 @@
 #include "vtkCommand.h"
 #include "vtkKWPopupButton.h"
 #include "vtkKWEvent.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkPVTraceHelper.h"
@@ -71,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.123");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.124");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -908,9 +909,9 @@ void vtkPVFileEntry::SaveInBatchScript(ofstream* file)
     return;
     }
 
-  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  const char* sourceID = this->PVSource->GetProxy()->GetSelfIDAsString();
 
-  if (sourceID.ID == 0 || !this->SMPropertyName)
+  if (!sourceID || !this->SMPropertyName)
     {
     vtkErrorMacro("Sanity check failed. " << this->GetClassName());
     return;

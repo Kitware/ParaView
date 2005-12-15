@@ -21,10 +21,11 @@
 #include "vtkPVColorMap.h"
 #include "vtkPVFileEntry.h"
 #include "vtkSMDataObjectDisplayProxy.h"
+#include "vtkSMSourceProxy.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.60");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.61");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
@@ -80,7 +81,7 @@ void vtkPVEnSightReaderModule::SaveInBatchScript(ofstream *file)
     }
 
   this->SaveFilterInBatchScript(file);
-  *file << "  $pvTemp" <<  this->GetVTKSourceID(0)
+  *file << "  $pvTemp" <<  this->Proxy->GetSelfIDAsString()
         << " UpdatePipeline" 
         << endl;
   // Add the mapper, actor, scalar bar actor ...

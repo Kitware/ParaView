@@ -137,7 +137,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.778");
+vtkCxxRevisionMacro(vtkPVWindow, "1.779");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -3005,13 +3005,21 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
   this->CenterAxesProxy->SaveInBatchScript(file);
   // Save the renderer stuff.
   this->GetMainView()->SaveInBatchScript(file);
+  vtkSMProxy* renMod = 
+    this->GetPVApplication()->GetRenderModuleProxy();
+  ostrstream batchNameStr;
+  batchNameStr << "pvTemp" << renMod->GetSelfIDAsString()
+               << ends;
+  char* batchName = batchNameStr.str();;
   if (offScreenFlag)
     {
-    *file << "  [$Ren1 GetProperty OffScreenRendering] SetElement 0 1\n";
+    *file << "  [$" << batchName
+          << " GetProperty OffScreenRendering] SetElement 0 1\n";
     }    
   else
     {
-    *file << "  [$Ren1 GetProperty OffScreenRendering] SetElement 0 0\n";
+    *file << "  [$" << batchName
+          << " GetProperty OffScreenRendering] SetElement 0 0\n";
     }
 
   this->AnimationManager->SaveInBatchScript(file);
@@ -3048,7 +3056,8 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
 
   
   *file << "if { $saveState } {" << endl;
-  *file << "   $Ren1 UpdateVTKObjects" << endl;
+  *file << "   $" << batchName 
+        << " UpdateVTKObjects" << endl;
   *file << "   $proxyManager SaveState $stateName" << endl;
   *file << "} else {" << endl;
 
@@ -3057,7 +3066,7 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
     }
   else
     {
-    *file << endl << "$Ren1 UpdateVTKObjects" << endl;
+    *file << endl << "$" << batchName << " UpdateVTKObjects" << endl;
     if (imageFileName && *imageFileName && writerName)
       {
       *file << "set inBatch 0" << endl;
@@ -3070,20 +3079,21 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
 //      *file << "  set xsize [[$Ren1 GetProperty Size] GetElement 0]" << endl;
 //      *file << "  set ysize [[$Ren1 GetProperty Size] GetElement 1]" << endl;
 //      *file << "  $Ren1 TileWindows [expr $xsize+30] [expr $ysize+30] 2" << endl;
-      *file << "  [$Ren1 GetProperty RenderWindowSize] "
+      *file << "  [$" << batchName << " GetProperty RenderWindowSize] "
         " SetElement 0 300" << endl;
-      *file << "  [$Ren1 GetProperty RenderWindowSize] "
+      *file << "  [$" << batchName << " GetProperty RenderWindowSize] "
         " SetElement 1 300" << endl;
-      *file << "  $Ren1 UpdateVTKObjects" << endl;
+      *file << "  $" << batchName << " UpdateVTKObjects" << endl;
       *file << "}" << endl;
-      *file << "$Ren1 StillRender" << endl;
+      *file << "$" << batchName << " StillRender" << endl;
       *file 
-        << "$Ren1 WriteImage {" << imageFileName << "} " << writerName
+        << "$" << batchName 
+        << " WriteImage {" << imageFileName << "} " << writerName
         << "\n";
       }
     else
       {
-      *file << "$Ren1 StillRender" << endl;
+      *file << "$" << batchName << " StillRender" << endl;
       }
 
     }
@@ -3126,6 +3136,7 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
     unlink(filename);
     }
 
+  delete[] batchName;
   delete file;
 }
 

@@ -42,7 +42,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisDialog );
-vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.14");
+vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.15");
 
 int vtkPVComparativeVisDialog::NumberOfVisualizationsCreated = 0;
 const int vtkPVComparativeVisDialog::DialogWidth = 700;
@@ -384,7 +384,7 @@ void vtkPVComparativeVisDialog::CopyToVisualization(
     iter->GetPointer()->CopyToVisualization(cv);
     }
 
-  cv->SetName(this->NameEntry->GetWidget()->GetValue());
+  cv->SetVisName(this->NameEntry->GetWidget()->GetValue());
 }
 
 //-----------------------------------------------------------------------------
@@ -423,7 +423,7 @@ void vtkPVComparativeVisDialog::CopyFromVisualization(
   this->NumberOfYFramesEntry->GetWidget()->SetValueAsInt(
     cv->GetNumberOfYFrames());
     
-  this->NameEntry->GetWidget()->SetValue(cv->GetName());
+  this->NameEntry->GetWidget()->SetValue(cv->GetVisName());
   // Choose the first widget by default
   this->CueSelected(static_cast<unsigned int>(0));
   this->Internal->RadioButtons[0]->SetSelectedState(1);

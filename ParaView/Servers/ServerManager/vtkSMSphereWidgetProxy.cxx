@@ -22,7 +22,7 @@
 #include "vtkSphereWidget.h"
 
 vtkStandardNewMacro(vtkSMSphereWidgetProxy);
-vtkCxxRevisionMacro(vtkSMSphereWidgetProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMSphereWidgetProxy, "1.11");
 
 //----------------------------------------------------------------------------
 vtkSMSphereWidgetProxy::vtkSMSphereWidgetProxy()
@@ -119,24 +119,22 @@ void vtkSMSphereWidgetProxy::CreateVTKObjects(int numObjects)
 void vtkSMSphereWidgetProxy::SaveInBatchScript(ofstream *file)
 {
   this->Superclass::SaveInBatchScript(file);
-  for (unsigned int cc=0;cc < this->GetNumberOfIDs(); cc++)
-    {
-    vtkClientServerID id = this->GetID(cc);
-    *file << "  [$pvTemp" << id.ID << " GetProperty Center] "
-      << "SetElements3 "
-      << this->Center[0] << " "
-      << this->Center[1] << " "
-      << this->Center[2] 
-      << endl;
 
-    *file << "  [$pvTemp" << id.ID << " GetProperty Radius] "
-      << "SetElements1 "
-      << this->Radius
-      << endl;
-    
-    *file << "  $pvTemp" << id.ID << " UpdateVTKObjects" << endl;
-    *file << endl;
-    }
+  *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty Center] "
+        << "SetElements3 "
+        << this->Center[0] << " "
+        << this->Center[1] << " "
+        << this->Center[2] 
+        << endl;
+  
+  *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty Radius] "
+        << "SetElements1 "
+        << this->Radius
+        << endl;
+  
+  *file << "  $pvTemp" << this->GetSelfIDAsString() << " UpdateVTKObjects" 
+        << endl;
+  *file << endl;
 }
 
 //----------------------------------------------------------------------------

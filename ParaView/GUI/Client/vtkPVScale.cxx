@@ -30,6 +30,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkPVTraceHelper.h"
 #include "vtkKWEvent.h"
 
@@ -37,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.74");
+vtkCxxRevisionMacro(vtkPVScale, "1.75");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -263,9 +264,9 @@ void vtkPVScale::SetValueInternal(double val)
 //-----------------------------------------------------------------------------
 void vtkPVScale::SaveInBatchScript(ofstream *file)
 {
-  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  const char* sourceID = this->PVSource->GetProxy()->GetSelfIDAsString();
   
-  if (sourceID.ID == 0 || !this->SMPropertyName)
+  if (!sourceID || !this->SMPropertyName)
     {
     vtkErrorMacro("Sanity check failed. " << this->GetClassName());
     return;

@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.33");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.34");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -678,7 +678,8 @@ int vtkPVTempTessellatorEntry::ReadXMLAttributes( vtkPVXMLElement* element, vtkP
   return 1;
 }
 
-void vtkPVTempTessellatorEntry::SaveInBatchScriptForPart( ofstream *file, vtkClientServerID id )
+void vtkPVTempTessellatorEntry::SaveInBatchScriptForPart( 
+  ofstream *file, vtkClientServerID id )
 {
   vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetSMProperty());

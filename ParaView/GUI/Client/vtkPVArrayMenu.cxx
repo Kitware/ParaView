@@ -32,6 +32,7 @@
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayListDomain.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkPVTraceHelper.h"
 #include "vtkKWFrame.h"
@@ -39,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.83");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.84");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -271,9 +272,9 @@ void vtkPVArrayMenu::ResetInternal()
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::SaveInBatchScript(ofstream *file)
 {
-  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  const char* sourceID = this->PVSource->GetProxy()->GetSelfIDAsString();
 
-  if (sourceID.ID == 0)
+  if (!sourceID)
     {
     vtkErrorMacro("Sanity check failed. " 
                   << this->GetClassName());

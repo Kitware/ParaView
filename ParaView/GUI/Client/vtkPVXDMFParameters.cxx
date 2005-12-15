@@ -33,6 +33,7 @@
 #include "vtkPVTraceHelper.h"
 
 #include "vtkSMProperty.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMStringListRangeDomain.h"
 #include "vtkSMStringVectorProperty.h"
 
@@ -150,7 +151,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.44");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.45");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -302,7 +303,7 @@ void vtkPVXDMFParameters::SaveInBatchScript(ofstream *file)
     return;
     }
 
-  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  const char* sourceID = this->PVSource->GetProxy()->GetSelfIDAsString();
 
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
     this->GetSMProperty());
@@ -310,14 +311,14 @@ void vtkPVXDMFParameters::SaveInBatchScript(ofstream *file)
   if (svp)
     {
     unsigned int numStrings = svp->GetNumberOfElements();
-    *file << "  [$pvTemp" << sourceID.ID 
+    *file << "  [$pvTemp" << sourceID 
           << " GetProperty ParameterIndex] SetNumberOfElements "
           << numStrings << endl;
     
     unsigned int idx;
     for(idx=0; idx<numStrings; idx++)
       {
-      *file << "  [$pvTemp" << sourceID.ID 
+      *file << "  [$pvTemp" << sourceID 
             << " GetProperty ParameterIndex] SetElement " << idx
             <<  " " << svp->GetElement(idx) << endl;
       }

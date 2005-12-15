@@ -27,13 +27,14 @@
 #include "vtkPVSource.h"
 #include "vtkPVTraceHelper.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMPart.h"
 
 #include <vtkstd/vector>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractDataSetsWidget);
-vtkCxxRevisionMacro(vtkPVExtractDataSetsWidget, "1.9");
+vtkCxxRevisionMacro(vtkPVExtractDataSetsWidget, "1.10");
 
 struct vtkPVExtractDataSetsWidgetInternals
 {
@@ -379,9 +380,9 @@ void vtkPVExtractDataSetsWidget::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVExtractDataSetsWidget::SaveInBatchScript(ofstream *file)
 {
-  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  const char* sourceID = this->PVSource->GetProxy()->GetSelfIDAsString();
 
-  if (sourceID.ID == 0 || !this->SMPropertyName)
+  if (!sourceID || !this->SMPropertyName)
     {
     vtkErrorMacro("Sanity check failed. " << this->GetClassName());
     return;

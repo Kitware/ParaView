@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.50");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.51");
 
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMFunctionProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMScalarVariableProperty,
@@ -931,9 +931,9 @@ void vtkPVCalculatorWidget::SaveInBatchScript(ofstream *file)
     return;
     }
   
-  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  const char* sourceID = this->PVSource->GetProxy()->GetSelfIDAsString();
 
-  if (sourceID.ID == 0 || !this->SMFunctionPropertyName ||
+  if (!sourceID || !this->SMFunctionPropertyName ||
       !this->SMScalarVariablePropertyName ||
       !this->SMVectorVariablePropertyName ||
       !this->SMAttributeModePropertyName)
@@ -944,7 +944,7 @@ void vtkPVCalculatorWidget::SaveInBatchScript(ofstream *file)
   
   int i;
 
-  *file << "  [$pvTemp" << sourceID.ID << " GetProperty "
+  *file << "  [$pvTemp" << sourceID << " GetProperty "
         << this->SMAttributeModePropertyName << "] SetElement 0 ";
   if (strcmp(this->AttributeModeMenu->GetValue(), "Point Data") == 0)
     {
@@ -956,40 +956,40 @@ void vtkPVCalculatorWidget::SaveInBatchScript(ofstream *file)
     }
   *file << endl;
 
-  *file << "  [$pvTemp" << sourceID.ID << " GetProperty "
+  *file << "  [$pvTemp" << sourceID << " GetProperty "
         << this->SMScalarVariablePropertyName << " ] SetNumberOfElements " 
         << this->NumberOfScalarVariables*3 << endl;
   for (i = 0; i < this->NumberOfScalarVariables; i++)
     {
-    *file << "  [$pvTemp" << sourceID.ID << " GetProperty "
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
           << this->SMScalarVariablePropertyName << "] SetElement " << i*3
           << " {" <<  this->ScalarVariableNames[i] << "}" << endl;
-    *file << "  [$pvTemp" << sourceID.ID << " GetProperty "
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
           << this->SMScalarVariablePropertyName << "] SetElement " << i*3+1
           << " {" <<  this->ScalarArrayNames[i] << "}" << endl;
-    *file << "  [$pvTemp" << sourceID.ID << " GetProperty "
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
           << this->SMScalarVariablePropertyName << "] SetElement " << i*3+2
           << " " << this->ScalarComponents[i] << endl;
     }
 
-  *file << "  [$pvTemp" << sourceID.ID << " GetProperty "
+  *file << "  [$pvTemp" << sourceID << " GetProperty "
         << this->SMVectorVariablePropertyName << "] SetNumberOfElements " 
         << this->NumberOfVectorVariables*5 << endl;
   for (i = 0; i < this->NumberOfVectorVariables; i++)
     {
-    *file << "  [$pvTemp" << sourceID.ID << " GetProperty "
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
           << this->SMVectorVariablePropertyName << "] SetElement " << i*5
           << " {" <<  this->VectorVariableNames[i] << "}" << endl;
-    *file << "  [$pvTemp" << sourceID.ID << " GetProperty "
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
           << this->SMVectorVariablePropertyName << "] SetElement " << i*5+1
           << " {" <<  this->VectorArrayNames[i] << "}" << endl;
-    *file << "  [$pvTemp" << sourceID.ID << " GetProperty "
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
           << this->SMVectorVariablePropertyName << "] SetElement " << i*5+2
           << " 0" << endl;
-    *file << "  [$pvTemp" << sourceID.ID << " GetProperty "
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
           << this->SMVectorVariablePropertyName<< "] SetElement " << i*5+3
           << " 1" << endl;
-    *file << "  [$pvTemp" << sourceID.ID << " GetProperty "
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
           << this->SMVectorVariablePropertyName << "] SetElement " << i*5+4
           << " 2" << endl;
     }
@@ -998,7 +998,7 @@ void vtkPVCalculatorWidget::SaveInBatchScript(ofstream *file)
     {
     vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
       this->GetSMFunctionProperty());
-    *file << "  [$pvTemp" << sourceID.ID << " GetProperty "
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
           << this->SMFunctionPropertyName << "] SetElement 0 "
           <<  "{" << svp->GetElement(0) << "}"
           << endl;

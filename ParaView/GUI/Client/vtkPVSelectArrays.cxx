@@ -38,10 +38,11 @@
 #include "vtkCollectionIterator.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkPVTraceHelper.h"
+#include "vtkSMSourceProxy.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectArrays);
-vtkCxxRevisionMacro(vtkPVSelectArrays, "1.18");
+vtkCxxRevisionMacro(vtkPVSelectArrays, "1.19");
 vtkCxxSetObjectMacro(vtkPVSelectArrays, InputMenu, vtkPVInputMenu);
 
 //----------------------------------------------------------------------------
@@ -425,9 +426,9 @@ void vtkPVSelectArrays::SaveInBatchScript(ofstream *file)
 {
   int num, idx;
 
-  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  const char* sourceID = this->PVSource->GetProxy()->GetSelfIDAsString();
   
-  if (sourceID.ID == 0 || !this->SMPropertyName)
+  if (!sourceID || !this->SMPropertyName)
     {
     vtkErrorMacro("Sanity check failed. " << this->GetClassName());
     return;
@@ -436,15 +437,15 @@ void vtkPVSelectArrays::SaveInBatchScript(ofstream *file)
   vtkSMStringVectorProperty* svp =
     vtkSMStringVectorProperty::SafeDownCast(this->GetSMProperty());
   num = svp->GetNumberOfElements();
-   *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+  *file << "  [$pvTemp" << sourceID
         << " GetProperty AddVolumeArrayName] SetNumberOfElements "
         << num << endl;
   for (idx = 0; idx < num; idx++)
-  {
+    {
     *file << "  [$pvTemp" << sourceID << " GetProperty "
-      << this->SMPropertyName << "] SetElement " << idx << " {"
-      << svp->GetElement(idx) << "}" << endl;
-  }
+          << this->SMPropertyName << "] SetElement " << idx << " {"
+          << svp->GetElement(idx) << "}" << endl;
+    }
 }
 
 

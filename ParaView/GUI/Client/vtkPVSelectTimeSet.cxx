@@ -31,12 +31,13 @@
 #include "vtkPVTraceHelper.h"
 #include "vtkKWTree.h"
 #include "vtkKWTreeWithScrollbars.h"
+#include "vtkSMSourceProxy.h"
 
 #include <vtksys/stl/string>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.64");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.65");
 
 //-----------------------------------------------------------------------------
 vtkPVSelectTimeSet::vtkPVSelectTimeSet()
@@ -230,9 +231,9 @@ void vtkPVSelectTimeSet::AddChildNode(const char* parent, const char* name,
 //-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::SaveInBatchScript(ofstream *file)
 {
-  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  const char* sourceID = this->PVSource->GetProxy()->GetSelfIDAsString();
   
-  if (sourceID.ID == 0 || !this->SMPropertyName)
+  if (!sourceID || !this->SMPropertyName)
     {
     vtkErrorMacro("Sanity check failed. " << this->GetClassName());
     return;

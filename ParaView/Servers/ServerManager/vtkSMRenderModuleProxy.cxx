@@ -46,7 +46,7 @@
 #include "vtkWindowToImageFilter.h"
 
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.20");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.21");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1009,11 +1009,13 @@ void vtkSMRenderModuleProxy::SaveInBatchScript(ofstream* file)
     }
   this->SynchronizeCameraProperties();
 
-  *file << "set Ren1 [$proxyManager NewProxy "
-    << this->GetXMLGroup() << " " << this->GetXMLName() << "]" << endl;
+  *file << "set pvTemp" << this->GetSelfIDAsString() 
+        << " [$proxyManager NewProxy "
+        << this->GetXMLGroup() << " " << this->GetXMLName() << "]" << endl;
   *file << "  $proxyManager RegisterProxy " << this->GetXMLGroup()
-    << " Ren1 $Ren1" << endl;
-  *file << "  $Ren1 UnRegister {}" << endl;
+        << " pvTemp" << this->GetSelfIDAsString() << " $pvTemp" 
+        << this->GetSelfIDAsString() << endl;
+  *file << "  $pvTemp" << this->GetSelfIDAsString() << " UnRegister {}" << endl;
 
   // Now, we save all the properties that are not Input.
   // Also note that only exposed properties are getting saved.
@@ -1042,7 +1044,7 @@ void vtkSMRenderModuleProxy::SaveInBatchScript(ofstream* file)
       {
       for (unsigned int i=0; i < ivp->GetNumberOfElements(); i++)
         {
-        *file << "  [$Ren1 GetProperty {"
+        *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty {"
           << ivp->GetXMLName() << "}] SetElement "
           << i << " " << ivp->GetElement(i) 
           << endl;
@@ -1052,7 +1054,7 @@ void vtkSMRenderModuleProxy::SaveInBatchScript(ofstream* file)
       {
       for (unsigned int i=0; i < dvp->GetNumberOfElements(); i++)
         {
-        *file << "  [$Ren1 GetProperty {"
+        *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty {"
           << dvp->GetXMLName() << "}] SetElement "
           << i << " " << dvp->GetElement(i) 
           << endl;
@@ -1062,7 +1064,7 @@ void vtkSMRenderModuleProxy::SaveInBatchScript(ofstream* file)
       {
       for (unsigned int i=0; i < svp->GetNumberOfElements(); i++)
         {
-        *file << "  [$Ren1 GetProperty {"
+        *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty {"
           << svp->GetXMLName() << "}] SetElement "
           << i << " {" << svp->GetElement(i) << "}"
           << endl;
@@ -1079,24 +1081,11 @@ void vtkSMRenderModuleProxy::SaveInBatchScript(ofstream* file)
         // instead of mirroring that logic to determine if
         // the display got saved in batch, we just catch the
         // exception.
-        if (proxy->GetNumberOfIDs() == 0)
-          {
-          *file << "  catch { [$Ren1 GetProperty {"
-            << pp->GetXMLName() << "}] AddProxy $pvTemp"
-            << proxy->GetSelfID()
-            << " } ;#--- " << proxy->GetXMLName() << endl;
-          }
-        else
-          {
-          for (unsigned int kk=0; kk < proxy->GetNumberOfIDs(); kk++)
-            {
-            *file << "  catch { [$Ren1 GetProperty {"
+        *file << "  catch { [$pvTemp" << this->GetSelfIDAsString() 
+              << " GetProperty {"
               << pp->GetXMLName() << "}] AddProxy $pvTemp"
-              << proxy->GetID(kk)
-              << " } ;#--- " << proxy->GetXMLName() 
-              << " part " << kk << endl; 
-            }
-          }
+              << proxy->GetSelfIDAsString()
+              << " } ;#--- " << proxy->GetXMLName() << endl;
         }
       }
     else

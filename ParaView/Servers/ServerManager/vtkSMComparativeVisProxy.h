@@ -129,8 +129,8 @@ public:
   // Description:
   // Set/Get the comparative vis name. Used by the comparative vis
   // manager.
-  vtkSetStringMacro(Name);
-  vtkGetStringMacro(Name);
+  vtkSetStringMacro(VisName);
+  vtkGetStringMacro(VisName);
 
   // Description:
   // Set this to 1 to abort before generating next frame. Automatically
@@ -192,7 +192,7 @@ protected:
 
   vtkSMProxy* MultiActorHelper;
 
-  char* Name;
+  char* VisName;
 
   char* SourceName;
 

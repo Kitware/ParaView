@@ -37,7 +37,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.76");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.77");
 
 //-----------------------------------------------------------------------------
 vtkPVSelectWidget::vtkPVSelectWidget()
@@ -195,10 +195,10 @@ void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
     this->GetSMProperty());
   vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
     this->GetSMProperty());
-  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  const char* sourceID = this->PVSource->GetProxy()->GetSelfIDAsString();
   if (pp)
     {
-    if (!sourceID.ID || !this->SMPropertyName)
+    if (!sourceID || !this->SMPropertyName)
       {
       vtkErrorMacro("Sanity check failed. " << this->GetClassName());
       return;
@@ -209,12 +209,12 @@ void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
       {
       *file << "  [$pvTemp" << sourceID << " GetProperty "
             << this->SMPropertyName << "] AddProxy $pvTemp"
-            << w3d->GetProxyByName(this->GetCurrentVTKValue())->GetID(0);
+            << w3d->GetProxyByName(this->GetCurrentVTKValue())->GetSelfIDAsString();
       }
     }
   else if (ivp)
     {
-    if (!sourceID.ID || !this->SMPropertyName)
+    if (!sourceID || !this->SMPropertyName)
       {
       vtkErrorMacro("Sanity check failed. " << this->GetClassName());
       return;
@@ -225,7 +225,7 @@ void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
     }
   else if (dvp)
     {
-    if (!sourceID.ID || !this->SMPropertyName)
+    if (!sourceID || !this->SMPropertyName)
       {
       vtkErrorMacro("Sanity check failed. " << this->GetClassName());
       return;
@@ -236,7 +236,7 @@ void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
     }
   else if (svp)
     {
-    if (!sourceID.ID || !this->SMPropertyName)
+    if (!sourceID || !this->SMPropertyName)
       {
       vtkErrorMacro("Sanity check failed. " << this->GetClassName());
       return;

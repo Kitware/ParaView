@@ -57,7 +57,7 @@
 #include <vtksys/ios/sstream>
  
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.169");
+vtkCxxRevisionMacro(vtkPVProbe, "1.170");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -617,43 +617,35 @@ void vtkPVProbe::SaveTemporalProbeInBatchScript(ofstream* file)
   // Some displays do not have VTKClassName set and hence only create Subproxies.
   // For such displays we use their self ids. 
   
-  unsigned int count = this->TemporalProbeProxy->GetNumberOfIDs();
-  vtkClientServerID id = (count)? this->TemporalProbeProxy->GetID(0) : this->TemporalProbeProxy->GetSelfID();
-  count = (count)? count : 1;
-   
-  for (unsigned int kk = 0; kk < count ; kk++)
-    {
-    if (kk > 0)
-      {
-      id = this->TemporalProbeProxy->GetID(kk);
-      }
+  const char* id = this->TemporalProbeProxy->GetSelfIDAsString();
     
-    *file << endl;
-    *file << "set pvTemp" << id
-      << " [$proxyManager NewProxy " << this->TemporalProbeProxy->GetXMLGroup() << " "
-      << this->TemporalProbeProxy->GetXMLName() << "]" << endl;
-    *file << "  $proxyManager RegisterProxy " << this->TemporalProbeProxy->GetXMLGroup()
-      << " pvTemp" << id <<" $pvTemp" << id << endl;
-    *file << "  $pvTemp" << id << " UnRegister {}" << endl;
-
-    //First set the input
-    vtkSMInputProperty* ipp;
-    ipp = vtkSMInputProperty::SafeDownCast(
-      this->TemporalProbeProxy->GetProperty("Input"));
-    if (ipp && ipp->GetNumberOfProxies() > 0)
-      {
-      *file << "  [$pvTemp" << id << " GetProperty Input] "
-        " AddProxy $pvTemp" << ipp->GetProxy(0)->GetID(0)
-        << endl;
-      }
-    else
-      {
-      *file << "# Input to Display Proxy not set properly or takes no Input." 
-        << endl;
-      }
-
-    *file << "  $pvTemp" << id << " UpdateVTKObjects" << endl;
+  *file << endl;
+  *file << "set pvTemp" << id
+        << " [$proxyManager NewProxy " 
+        << this->TemporalProbeProxy->GetXMLGroup() << " "
+        << this->TemporalProbeProxy->GetXMLName() << "]" << endl;
+  *file << "  $proxyManager RegisterProxy " 
+        << this->TemporalProbeProxy->GetXMLGroup()
+        << " pvTemp" << id <<" $pvTemp" << id << endl;
+  *file << "  $pvTemp" << id << " UnRegister {}" << endl;
+  
+  //First set the input
+  vtkSMInputProperty* ipp;
+  ipp = vtkSMInputProperty::SafeDownCast(
+    this->TemporalProbeProxy->GetProperty("Input"));
+  if (ipp && ipp->GetNumberOfProxies() > 0)
+    {
+    *file << "  [$pvTemp" << id << " GetProperty Input] "
+      " AddProxy $pvTemp" << ipp->GetProxy(0)->GetSelfIDAsString()
+          << endl;
     }
+  else
+    {
+    *file << "# Input to Display Proxy not set properly or takes no Input." 
+          << endl;
+    }
+  
+  *file << "  $pvTemp" << id << " UpdateVTKObjects" << endl;
 }
 
 //----------------------------------------------------------------------------
