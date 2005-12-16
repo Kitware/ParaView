@@ -39,7 +39,7 @@ extern "C" {
 }
 
 
-vtkCxxRevisionMacro(vtkPVProcessModulePythonHelper, "1.2");
+vtkCxxRevisionMacro(vtkPVProcessModulePythonHelper, "1.3");
 vtkStandardNewMacro(vtkPVProcessModulePythonHelper);
 
 //----------------------------------------------------------------------------
@@ -114,7 +114,6 @@ int vtkPVProcessModulePythonHelper::RunGUIStart(int argc, char **argv, int numSe
     }
 
   // Ok, all done, now enter python main.
-  cout << "argc: " << argc << " argv[0] << " << argv[0] << endl; 
   vtkstd::vector<char*> vArg;
 #define vtkPVStrDup(x) \
   strcpy(new char[ strlen(x) + 1], x)
