@@ -29,7 +29,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.12");
 
 vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderModuleProxy, 
                      ServerRenderWindowProxy,
@@ -477,6 +477,29 @@ void vtkSMIceTDesktopRenderModuleProxy::SetOrderedCompositing(int flag)
       disp->UpdateVTKObjects();
       }
     }
+
+  if (this->OrderedCompositing)
+    {
+    // Cannot do this with the server manager because this method only
+    // exists on the render server, not the client.
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke << this->RendererProxy->GetID(0)
+           << "SetComposeOperation" << 1 // Over
+           << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+                   this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
+    }
+  else
+    {
+    // Cannot do this with the server manager because this method only
+    // exists on the render server, not the client.
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke << this->RendererProxy->GetID(0)
+           << "SetComposeOperation" << 0 // Closest
+           << vtkClientServerStream::End;
+    vtkProcessModule::GetProcessModule()->SendStream(
+                   this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -588,29 +611,7 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
       vtkSMProperty *p = this->PKdTreeProxy->GetProperty("BuildLocator");
       p->Modified();
       this->PKdTreeProxy->UpdateVTKObjects();
-
-      // Cannot do this with the server manager because this method only
-      // exists on the render server, not the client.
-      vtkClientServerStream stream;
-      stream << vtkClientServerStream::Invoke << this->RendererProxy->GetID(0)
-             << "SetComposeOperation" << 1 // Over
-             << vtkClientServerStream::End;
-      vtkProcessModule::GetProcessModule()->SendStream(
-        this->ConnectionID,
-        vtkProcessModule::RENDER_SERVER, stream);
       }
-    }
-  else
-    {
-    // Cannot do this with the server manager because this method only
-    // exists on the render server, not the client.
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke << this->RendererProxy->GetID(0)
-           << "SetComposeOperation" << 0 // Closest
-           << vtkClientServerStream::End;
-    vtkProcessModule::GetProcessModule()->SendStream(
-      this->ConnectionID,
-      vtkProcessModule::RENDER_SERVER, stream);
     }
 
   this->Superclass::StillRender();
