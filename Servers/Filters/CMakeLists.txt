@@ -58,8 +58,6 @@ SET(Filters_SRCS
   vtkPVSummaryHelper.cxx
   vtkPVTreeComposite.cxx
   vtkPVUpdateSuppressor.cxx
-  vtkPVXMLElement.cxx
-  vtkPVXMLParser.cxx
   vtkPickFilter.cxx
   vtkSelectInputs.cxx
   vtkSpyPlotReader.cxx
