@@ -504,8 +504,8 @@ static const unsigned long image_pan_hand_length         = 128;
 static const unsigned long image_pan_hand_decoded_length = 1024;
 
 static const unsigned char image_pan_hand[] = 
-  "eNqtk1cKACAMQ73/paOCHxI7orXgKCRP6wDQ4LQRswMCjadfI1aCjGXp95zmZb/FSTwHmx"
-  "mq39oLnZEbWZ2Zn1msV/177Tdrevd4y6j4lTf04lcYyn+KGL/9HQMYBiU=";
+  "eNq9k9sKACAIQ/v/n14FPoTNpgUJXYSddbEANARtxOyAgybS2whLoLyYfs3d/JlnPoLZvL"
+  "1Hlmd7YffGQp1T8d7L67P8evbKmlEdqx4vfOYN3fCF+sl/9Ivv5mwIIw==";
 
 /* 
  * Resource generated for file:
