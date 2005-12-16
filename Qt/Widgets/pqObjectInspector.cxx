@@ -375,9 +375,9 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *proxy)
           }
 
         // Set up the property domain information and link it to the server.
+        item->updateDomain(prop);
         // TODO  fix pqSMAdaptor to recognize QObject deletions
         /*
-        item->updateDomain(prop);
         adapter->connectDomain(prop, item,
             SLOT(updateDomain(vtkSMProperty*)));
             */

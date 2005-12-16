@@ -108,7 +108,7 @@ void pqObjectInspectorItem::addChild(pqObjectInspectorItem *child)
 
 void pqObjectInspectorItem::updateDomain(vtkSMProperty *property)
 {
-  if(!property || this->Parent)
+  if(!property)
     return;
 
   vtkSMPropertyAdaptor *adaptor = vtkSMPropertyAdaptor::New();
