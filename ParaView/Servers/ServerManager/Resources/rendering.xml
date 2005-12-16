@@ -1959,6 +1959,37 @@
       </SubProxy>
     </XYPlotDisplayProxy>
     
+    <ClientSideDataProxy name="ClientSideData">
+      <InputProperty name="Input" command="SetInput-not-used">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+          <Group name="glyph_sources" />
+        </ProxyGroupDomain>
+        <InputArrayDomain name="input_array" attribute_type="point">
+        </InputArrayDomain>
+      </InputProperty>
+      <Property name="Update" command="Update" update_self="1">
+      </Property>
+      <Property name="InvalidateGeometry" command="InvalidateGeometry" update_self="1">
+      </Property>
+      <!-- Cache Update directly on UpdateSuppressor subproxy -->
+      <IntVectorProperty name="Visibility" command="SetVisibility" number_of_elements="1" update_self="1" default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="UpdateSuppressor" proxygroup="filters" proxyname="UpdateSuppressor" />
+        <ExposedProperties>
+          <Property name="CacheUpdate" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
+    </ClientSideDataProxy>
+    
     <CubeAxesDisplayProxy name="CubeAxesDisplay">
        <InputProperty
         name="Input"

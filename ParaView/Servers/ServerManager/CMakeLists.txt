@@ -115,6 +115,8 @@ SET(Kit_SRCS
   vtkSMXMLPVAnimationWriterProxy.cxx
   vtkSMXYPlotActorProxy.cxx
   vtkSMXYPlotDisplayProxy.cxx
+  vtkSMClientSideDataProxy.cxx
+  vtkSMClientSideDataProxy.h
   )
 
 SET( ServerManagerCS_SRCS
