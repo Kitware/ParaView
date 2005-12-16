@@ -19,6 +19,7 @@
 #include "vtkKWFrameWithLabel.h"
 #include "vtkKWScale.h"
 #include "vtkPVApplication.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVTraceHelper.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMRenderModuleProxy.h"
@@ -26,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDesktopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.9");
+vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVIceTDesktopRenderModuleUI::vtkPVIceTDesktopRenderModuleUI()
@@ -121,6 +122,8 @@ void vtkPVIceTDesktopRenderModuleUI::SetOrderedCompositingFlag(int state)
                                  "catch {$kw(%s) SetOrderedCompositingFlag %d}",
                                  this->GetTclName(),
                                  this->OrderedCompositingFlag);
+
+  this->GetPVApplication()->GetMainView()->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
