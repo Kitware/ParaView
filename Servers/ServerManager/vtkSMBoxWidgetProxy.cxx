@@ -27,7 +27,7 @@
 
 
 vtkStandardNewMacro(vtkSMBoxWidgetProxy);
-vtkCxxRevisionMacro(vtkSMBoxWidgetProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMBoxWidgetProxy, "1.9");
 
 //----------------------------------------------------------------------------
 vtkSMBoxWidgetProxy::vtkSMBoxWidgetProxy()
@@ -223,33 +223,33 @@ void vtkSMBoxWidgetProxy::SaveInBatchScript(ofstream *file)
   int i;
   for (i=0; i<3; i++)
     {
-    *file << "  [$pvTemp(" << this->GetSelfIDAsString()
-          << ") GetProperty Rotation] SetElement " << i << " "
+    *file << "  [$pvTemp" << this->GetSelfIDAsString()
+          << " GetProperty Rotation] SetElement " << i << " "
           << this->Rotation[i] << endl;
-    *file << "  [$pvTemp(" << this->GetSelfIDAsString()
-          << ") GetProperty RotationInfo] SetElement " << i << " "
+    *file << "  [$pvTemp" << this->GetSelfIDAsString()
+          << " GetProperty RotationInfo] SetElement " << i << " "
           << this->Rotation[i] << endl;
     }
   for (i=0; i<3; i++)
     {
-    *file << "  [$pvTemp(" << this->GetSelfIDAsString()
-          << ") GetProperty Scale] SetElement " << i << " "
+    *file << "  [$pvTemp" << this->GetSelfIDAsString()
+          << " GetProperty Scale] SetElement " << i << " "
           << this->Scale[i] << endl;
-    *file << "  [$pvTemp(" << this->GetSelfIDAsString()
-          << ") GetProperty ScaleInfo] SetElement " << i << " "
+    *file << "  [$pvTemp" << this->GetSelfIDAsString()
+          << " GetProperty ScaleInfo] SetElement " << i << " "
           << this->Scale[i] << endl;
     }
   for (i=0; i<3; i++)
     {
-    *file << "  [$pvTemp(" << this->GetSelfIDAsString()
-          << ") GetProperty Position] SetElement " << i << " "
+    *file << "  [$pvTemp" << this->GetSelfIDAsString()
+          << " GetProperty Position] SetElement " << i << " "
           << this->Position[i] << endl;
-    *file << "  [$pvTemp(" << this->GetSelfIDAsString()
-          << ") GetProperty PositionInfo] SetElement " << i << " "
+    *file << "  [$pvTemp" << this->GetSelfIDAsString()
+          << " GetProperty PositionInfo] SetElement " << i << " "
           << this->Position[i] << endl;
     }
-  *file << "  $pvTemp(" << this->GetSelfIDAsString() 
-        << ") UpdateVTKObjects"<<endl;
+  *file << "  $pvTemp" << this->GetSelfIDAsString() 
+        << " UpdateVTKObjects"<<endl;
 }
 
 //----------------------------------------------------------------------------
