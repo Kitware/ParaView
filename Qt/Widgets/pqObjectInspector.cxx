@@ -313,6 +313,11 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *proxy)
       // Skip the property if it doesn't have a valid value. This
       // is the case with the data information.
       prop = iter->GetProperty();
+
+      // skip information-only properties
+      if(prop->GetInformationOnly())
+        continue;
+
       QVariant value = adapter->getProperty(prop);
       if(!value.isValid())
         continue;
@@ -334,12 +339,25 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *proxy)
           for(int index = 0; li != list.end(); ++li, ++index)
             {
             QString num;
-            num.setNum(index + 1);
+            QVariant subvalue;
+            if(li->type() == QVariant::List)
+              {
+              QList<QVariant> sublist = li->toList();
+              num = sublist[0].toString();
+              subvalue = sublist[1];
+              }
+            else
+              {
+              num.setNum(index + 1);
+              subvalue = *li;
+              printf("setting subvalue %s\n", subvalue.toString().toAscii().data());
+              }
+
             child = new pqObjectInspectorItem();
             if(child)
               {
               child->setPropertyName(num);
-              child->setValue(*li);
+              child->setValue(subvalue);
               child->setParent(item);
               item->addChild(child);
               adapter->linkPropertyTo(this->Proxy, prop, index,

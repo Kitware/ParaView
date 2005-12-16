@@ -35,6 +35,7 @@ public:
   /// Set the specified property of a proxy property index 0 is assumed if Value is not a QList
   void setProperty(vtkSMProperty* Property, QVariant Value);
   /// Get the specified property of a proxy if property has more than one element, a QList is returned
+  /// A QList<QList<QVariant>> ( a list of name/value pairs can be returned )
   QVariant getProperty(vtkSMProperty* Property);
   
   /// Set the specified property of a proxy
