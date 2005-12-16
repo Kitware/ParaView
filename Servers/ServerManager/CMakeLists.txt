@@ -27,6 +27,7 @@ SET(Kit_SRCS
   vtkSMCameraKeyFrameProxy.cxx
   vtkSMCameraManipulatorProxy.cxx
   vtkSMCaveRenderModuleProxy.cxx
+  vtkSMClientSideDataProxy.cxx
   vtkSMComparativeVisProxy.cxx
   vtkSMCompositeDisplayProxy.cxx
   vtkSMCompositeRenderModuleProxy.cxx
@@ -115,8 +116,6 @@ SET(Kit_SRCS
   vtkSMXMLPVAnimationWriterProxy.cxx
   vtkSMXYPlotActorProxy.cxx
   vtkSMXYPlotDisplayProxy.cxx
-  vtkSMClientSideDataProxy.cxx
-  vtkSMClientSideDataProxy.h
   )
 
 SET( ServerManagerCS_SRCS
