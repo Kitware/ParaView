@@ -34,6 +34,8 @@ SET(Kit_SRCS
   vtkPVServerOptions.cxx
   vtkPVServerSocket.cxx
   vtkPVTimerInformation.cxx
+  vtkPVXMLElement.cxx
+  vtkPVXMLParser.cxx
   vtkProcessModule.cxx
   vtkProcessModuleConnection.cxx
   vtkProcessModuleConnectionManager.cxx
