@@ -350,7 +350,6 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *proxy)
               {
               num.setNum(index + 1);
               subvalue = *li;
-              printf("setting subvalue %s\n", subvalue.toString().toAscii().data());
               }
 
             child = new pqObjectInspectorItem();
