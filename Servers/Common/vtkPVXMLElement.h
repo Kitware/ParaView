@@ -35,11 +35,14 @@ public:
   static vtkPVXMLElement* New();
 
   // Description:
-  // Get the name of the element.  This is its XML tag.
+  // Set/Get the name of the element.  This is its XML tag.
+  // (<Name />).
+  vtkSetStringMacro(Name);
   vtkGetStringMacro(Name);
 
   // Description:
-  // Get the id of the element.
+  // Get the id of the element. This is assigned by the XML parser
+  // and can be used as an identifier to an element.
   vtkGetStringMacro(Id);
 
   // Description:
@@ -96,8 +99,8 @@ public:
   // sub-element.
   void AddNestedElement(vtkPVXMLElement* element);
 
-  vtkSetStringMacro(Name);
-
+  // Description:
+  // Serialize (as XML) in the given stream.
   void PrintXML(ostream& os, vtkIndent indent);
 
 protected:
