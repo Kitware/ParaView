@@ -26,6 +26,7 @@ INCLUDE_DIRECTORIES(
   ${VTK_SOURCE_DIR}
   ${VTK_BINARY_DIR}
   ${VTK_BINARY_DIR}/Utilities
+  ${VTK_SOURCE_DIR}/IO
   ${VTK_SOURCE_DIR}/Common
   ${VTK_SOURCE_DIR}/Filtering
   ${VTK_BINARY_DIR}/Rendering
@@ -86,6 +87,7 @@ SET(VTK_TCL_FILES
   "${VTK_SOURCE_DIR}/Common/vtkObject.cxx"
   "${VTK_SOURCE_DIR}/Common/vtkObjectBase.cxx"
   "${VTK_SOURCE_DIR}/Common/vtkTimerLog.cxx"
+  "${VTK_SOURCE_DIR}/IO/vtkXMLParser.cxx"
 )
 
 SET_SOURCE_FILES_PROPERTIES(
@@ -124,6 +126,7 @@ ADD_LIBRARY(vtkCommonTCL ${vtkTCLSources}
   )
 TARGET_LINK_LIBRARIES(vtkCommonTCL 
   vtkCommon
+  vtkIO
   vtkRendering
   ${TCL_LIBRARY}
   ${TK_LIBRARY}
