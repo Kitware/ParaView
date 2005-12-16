@@ -9,7 +9,6 @@
 
 #include "pqObjectHistogramWidget.h"
 #include "pqServer.h"
-#include "pqVTKEventAdaptor.h"
 
 #include <pqChartValue.h>
 #include <pqHistogramChart.h>
@@ -19,6 +18,7 @@
 
 #include <vtkCommand.h>
 #include <vtkDataSet.h>
+#include <vtkEventQtSlotConnect.h>
 #include <vtkSMClientSideDataProxy.h>
 #include <vtkSMInputProperty.h>
 #include <vtkSMProxyManager.h>
@@ -35,12 +35,15 @@ struct pqObjectHistogramWidget::pqImplementation :
   public pqHistogramWidget
 {
   pqImplementation() :
-    ClientSideData(0)
+    ClientSideData(0),
+    EventAdaptor(vtkEventQtSlotConnect::New())
   {
   }
   
   ~pqImplementation()
   {
+    this->EventAdaptor->Delete();
+    
     if(this->ClientSideData)
       this->ClientSideData->Delete();
   }
@@ -55,7 +58,7 @@ struct pqObjectHistogramWidget::pqImplementation :
   }
   
   vtkSMClientSideDataProxy* ClientSideData;
-  pqVTKEventAdaptor EventAdaptor;
+  vtkEventQtSlotConnect* EventAdaptor;
 };
 
 pqObjectHistogramWidget::pqObjectHistogramWidget(QWidget *parent) :
@@ -65,8 +68,6 @@ pqObjectHistogramWidget::pqObjectHistogramWidget(QWidget *parent) :
   QVBoxLayout* const layout = new QVBoxLayout(this);
   layout->setMargin(0);
   layout->addWidget(this->Implementation);
-  
-  connect(&this->Implementation->EventAdaptor, SIGNAL(vtkEvent()), this, SLOT(onDisplayData()));
 }
 
 pqObjectHistogramWidget::~pqObjectHistogramWidget()
@@ -86,8 +87,8 @@ void pqObjectHistogramWidget::onSetProxy(vtkSMSourceProxy* proxy)
 
   if(!this->Implementation->ClientSideData)
     return;
-    
-  proxy->AddObserver(vtkCommand::UpdateEvent, &this->Implementation->EventAdaptor);
+
+  this->Implementation->EventAdaptor->Connect(proxy, vtkCommand::UpdateEvent, this, SLOT(onDisplayData(vtkObject*,unsigned long, void*, void*, vtkCommand*)));    
     
   vtkSMInputProperty* const input = vtkSMInputProperty::SafeDownCast(
     this->Implementation->ClientSideData->GetProperty("Input"));
@@ -135,4 +136,9 @@ void pqObjectHistogramWidget::onDisplayData()
       list,
       pqChartValue(static_cast<double>(bins.begin()->first)), static_cast<double>(pqChartValue(bins.rbegin()->first)));
     }
+}
+
+void pqObjectHistogramWidget::onDisplayData(vtkObject*,unsigned long, void*, void*, vtkCommand*)
+{
+  onDisplayData();
 }

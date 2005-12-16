@@ -14,6 +14,8 @@
 #include <QWidget>
 
 class pqServer;
+class vtkCommand;
+class vtkObject;
 class vtkSMSourceProxy;
 
 /// Displays a histogram based on data from a single proxy
@@ -34,6 +36,8 @@ public slots:
   void onSetProxy(vtkSMSourceProxy* proxy);
   /// Call this whenever the proxy output data is modified
   void onDisplayData();
+  /// Call this whenever the proxy output data is modified
+  void onDisplayData(vtkObject*,unsigned long, void*, void*, vtkCommand*);
 
 private:
   struct pqImplementation;
