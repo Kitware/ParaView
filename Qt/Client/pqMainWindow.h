@@ -13,7 +13,6 @@
 #include <QMainWindow>
 #include <vtkIOStream.h>
 
-class pqHistogramWidget;
 class pqObjectInspectorWidget;
 class pqPipelineData;
 class pqPipelineListWidget;
@@ -48,7 +47,7 @@ public:
   bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
 
 signals:
-  void serverChanged();
+  void serverChanged(pqServer*);
   
 private:
   void setServer(pqServer* Server);
@@ -65,7 +64,6 @@ private:
   QDockWidget *InspectorDock;
   pqPipelineListWidget *PipelineList;
   QDockWidget *PipelineDock;
-  pqHistogramWidget *ChartWidget;
   QDockWidget *ChartDock;
   pqMultiViewFrame* ActiveView;
   QTreeView *ElementInspectorWidget;
@@ -94,7 +92,7 @@ private slots:
   void onServerConnect();
   void onServerConnect(pqServer* Server);
   void onServerDisconnect();
-  void onUpdateSourcesFiltersMenu();
+  void onUpdateSourcesFiltersMenu(pqServer*);
   void onHelpAbout();
   void onUpdateWindows();
   void onCreateSource(QAction*);

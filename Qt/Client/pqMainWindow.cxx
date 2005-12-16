@@ -11,7 +11,7 @@
 #include "pqConfig.h"
 #include "pqConnect.h"
 #include "pqFileDialog.h"
-#include "pqHistogramWidget.h"
+#include "pqObjectHistogramWidget.h"
 #include "pqLocalFileDialogModel.h"
 #include "pqMainWindow.h"
 #include "pqMultiViewManager.h"
@@ -33,10 +33,6 @@
 #include "pqPicking.h"
 #include "pqDataSetModel.h"
 #include "pqOpenExodusOptions.h"
-
-// TEMP
-#include "pqChartValue.h"
-#include "pqHistogramChart.h"
 
 #ifdef PARAQ_EMBED_PYTHON
 #include "pqPythonDialog.h"
@@ -92,7 +88,6 @@ pqMainWindow::pqMainWindow() :
   InspectorDock(0),
   PipelineList(0),
   PipelineDock(0),
-  ChartWidget(0),
   ChartDock(0),
   ActiveView(0),
   ElementInspectorWidget(0),
@@ -148,7 +143,7 @@ pqMainWindow::pqMainWindow() :
     << pqSetName("filtersMenu")
     << pqConnect(SIGNAL(triggered(QAction*)), this, SLOT(onCreateFilter(QAction*)));
   
-  QObject::connect(this, SIGNAL(serverChanged()), SLOT(onUpdateSourcesFiltersMenu()));
+  QObject::connect(this, SIGNAL(serverChanged(pqServer*)), SLOT(onUpdateSourcesFiltersMenu(pqServer*)));
 
   // Tools menu.
   QMenu* toolsMenu = this->menuBar()->addMenu(tr("Tools")) << pqSetName("toolsMenu");
@@ -239,37 +234,21 @@ pqMainWindow::pqMainWindow() :
 
   // Add the chart dock window.
   this->ChartDock = new QDockWidget("Chart View", this);
-  if(this->ChartDock)
+  this->ChartDock->setObjectName("ChartDock");
+  this->ChartDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
+  this->ChartDock->setAllowedAreas(Qt::BottomDockWidgetArea |
+      Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+
+  pqObjectHistogramWidget* const histogram = new pqObjectHistogramWidget(this->ChartDock);  
+  this->ChartDock->setWidget(histogram);
+  if(this->PipelineList)
     {
-    this->ChartDock->setObjectName("ChartDock");
-    this->ChartDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
-    this->ChartDock->setAllowedAreas(Qt::BottomDockWidgetArea |
-        Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-
-    this->ChartWidget = new pqHistogramWidget(this->ChartDock);
-    if(this->ChartWidget)
-      {
-      this->ChartWidget->setObjectName("ChartWidget");
-      this->ChartDock->setWidget(this->ChartWidget);
-
-      // TEMP: Put in some fake data.
-      pqChartValueList list;
-      list.pushBack(pqChartValue((float)1.35));
-      list.pushBack(pqChartValue((float)1.40));
-      list.pushBack(pqChartValue((float)1.60));
-      list.pushBack(pqChartValue((float)2.00));
-      list.pushBack(pqChartValue((float)1.50));
-      list.pushBack(pqChartValue((float)1.80));
-      list.pushBack(pqChartValue((float)1.40));
-      list.pushBack(pqChartValue((float)1.30));
-      list.pushBack(pqChartValue((float)1.20));
-      pqChartValue min((int)0);
-      pqChartValue max((int)90);
-      this->ChartWidget->getHistogram()->setData(list, min, max);
-      }
-
-    this->addDockWidget(Qt::BottomDockWidgetArea, this->ChartDock);
+    connect(this->PipelineList, SIGNAL(proxySelected(vtkSMSourceProxy*)),
+        histogram, SLOT(onSetProxy(vtkSMSourceProxy*)));
     }
+  connect(this, SIGNAL(serverChanged(pqServer*)), histogram, SLOT(onServerChanged(pqServer*)));
+  
+  this->addDockWidget(Qt::BottomDockWidgetArea, this->ChartDock);
   
   // Add the element inspector dock window.
   this->ElementInspectorDock = new QDockWidget("Element Inspector View", this);
@@ -363,7 +342,7 @@ void pqMainWindow::setServer(pqServer* Server)
     }
   
   this->ServerDisconnectAction->setEnabled(this->CurrentServer);
-  emit serverChanged();
+  emit serverChanged(this->CurrentServer);
 }
 
 void pqMainWindow::onFileNew()
@@ -556,7 +535,7 @@ void pqMainWindow::onUpdateWindows()
     */
 }
 
-void pqMainWindow::onUpdateSourcesFiltersMenu()
+void pqMainWindow::onUpdateSourcesFiltersMenu(pqServer* Server)
 {
   this->FiltersMenu->clear();
   this->SourcesMenu->clear();
@@ -851,5 +830,3 @@ void pqMainWindow::onNewSelections(vtkSMSourceProxy*, vtkUnstructuredGrid* selec
   this->ElementInspectorWidget->update();
 
 }
-
-

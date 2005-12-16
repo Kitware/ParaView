@@ -8,6 +8,8 @@ INCLUDE(${QT_USE_FILE})
 INCLUDE_DIRECTORIES(
   ${QtWidgets_BINARY_DIR}
   ${QtWidgets_SOURCE_DIR}
+  ${ParaQ_SOURCE_DIR}/Qt/Chart
+  ${ParaQ_SOURCE_DIR}/ParaView/VTK/Graphics
 )
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
@@ -19,6 +21,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqMultiView.h
   pqMultiViewFrame.h
   pqMultiViewManager.h
+  pqObjectHistogramWidget.h
   pqOpenExodusOptions.h
   pqObjectInspector.h
   pqObjectInspectorItem.h
@@ -30,6 +33,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerBrowser.h
   pqServerFileDialogModel.h
   pqSMAdaptor.h
+  pqVTKEventAdaptor.h
 )
 
 SET(UI_FORMS
@@ -86,6 +90,8 @@ ADD_LIBRARY(QtWidgets
   pqOpenExodusOptions.h
   pqNameCount.cxx
   pqNameCount.h
+  pqObjectHistogramWidget.cxx
+  pqObjectHistogramWidget.h
   pqObjectInspector.cxx
   pqObjectInspector.h
   pqObjectInspectorDelegate.cxx
@@ -124,6 +130,8 @@ ADD_LIBRARY(QtWidgets
   pqSetName.h
   pqSMAdaptor.cxx
   pqSMAdaptor.h
+  pqVTKEventAdaptor.cxx
+  pqVTKEventAdaptor.h
   QtWidgetsExport.h
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}
@@ -131,6 +139,7 @@ ADD_LIBRARY(QtWidgets
 )
 
 TARGET_LINK_LIBRARIES(QtWidgets
+  pqChart
   vtkPVServerManager
   vtkPVFiltersCS
   vtkPVFilters
