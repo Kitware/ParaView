@@ -16,6 +16,7 @@
     ${VTK_SOURCE_DIR}
     ${VTK_BINARY_DIR}
     ${VTK_SOURCE_DIR}/Common
+    ${VTK_SOURCE_DIR}/IO
     ${VTK_SOURCE_DIR}/Filtering
     ${VTK_BINARY_DIR}/Rendering
     ${PYTHON_INCLUDE_PATH}
@@ -78,6 +79,7 @@
     "${VTK_SOURCE_DIR}/Common/vtkObject.cxx"
     "${VTK_SOURCE_DIR}/Common/vtkObjectBase.cxx"
     "${VTK_SOURCE_DIR}/Common/vtkTimerLog.cxx"
+    "${VTK_SOURCE_DIR}/IO/vtkXMLParser.cxx"
     )
 
   SET_SOURCE_FILES_PROPERTIES(
@@ -117,6 +119,7 @@ IF (PARAVIEW_WRAP_PYTHON)
   SET(Kit_PYTHON_EXTRA_SRCS
     "${VTK_SOURCE_DIR}/${KIT}/vtkPythonUtil.cxx")
   SET(KIT_PYTHON_LIBS
+    vtkIO
     vtkRendering
     )
 
