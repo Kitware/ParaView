@@ -97,9 +97,9 @@ void pqChartValue::convertTo(ValueType type)
 {
   if(this->Type != type)
     {
-    if(Type == pqChartValue::IntValue)
+    if(type == pqChartValue::IntValue)
       this->Value.Int = getIntValue();
-    else if(Type == pqChartValue::FloatValue)
+    else if(type == pqChartValue::FloatValue)
       this->Value.Float = getFloatValue();
     else
       this->Value.Double = getDoubleValue();
