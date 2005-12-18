@@ -95,6 +95,22 @@ SET_SOURCE_FILES_PROPERTIES(
   ABSTRACT
   )
 
+# This requires wrapping a few more files.
+# ie.. when distributing, build without testing to get smaller binaries
+IF(BUILD_TESTING)
+  SET(VTK_TCL_FILES
+    ${VTK_TCL_FILES}
+    "${VTK_SOURCE_DIR}/Filtering/vtkDataObject.cxx"
+    "${VTK_SOURCE_DIR}/Filtering/vtkDataSet.cxx"
+    "${VTK_SOURCE_DIR}/Filtering/vtkImageData.cxx"
+  )
+  SET_SOURCE_FILES_PROPERTIES(
+    "${VTK_SOURCE_DIR}/Filtering/vtkDataSet.cxx"
+    ABSTRACT
+  )
+ENDIF(BUILD_TESTING)
+  
+
 SET(EXE_EXT "")
 IF(WIN32)
   SET(EXE_EXT ".exe")
