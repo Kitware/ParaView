@@ -15,6 +15,7 @@
 #include <pqHistogramWidget.h>
 
 #include <QComboBox>
+#include <QSpinBox>
 #include <QVBoxLayout>
 
 #include <vtkCellData.h>
@@ -37,7 +38,8 @@ struct pqObjectHistogramWidget::pqImplementation
 {
   pqImplementation() :
     ClientSideData(0),
-    EventAdaptor(vtkEventQtSlotConnect::New())
+    EventAdaptor(vtkEventQtSlotConnect::New()),
+    BinCount(10)
   {
   }
   
@@ -78,6 +80,15 @@ struct pqObjectHistogramWidget::pqImplementation
   void setCurrentVariable(const QString& CurrentVariable)
   {
     this->CurrentVariable = CurrentVariable;
+    this->updateChart();
+  }
+  
+  void setBinCount(unsigned long Count)
+  {
+    if(Count < 2)
+      return;
+      
+    this->BinCount = Count;
     this->updateChart();
   }
   
@@ -158,9 +169,8 @@ struct pqObjectHistogramWidget::pqImplementation
 
     double value_min = VTK_DOUBLE_MAX;
     double value_max = -VTK_DOUBLE_MAX;
-    const unsigned int bin_count = 10;
     typedef vtkstd::vector<int> bins_t;
-    bins_t bins(bin_count, 0);
+    bins_t bins(this->BinCount, 0);
 
     for(vtkIdType i = 0; i != array->GetNumberOfTuples(); ++i)
       {
@@ -169,10 +179,10 @@ struct pqObjectHistogramWidget::pqImplementation
       value_max = vtkstd::max(value_max, value);
       }
       
-    for(unsigned long bin = 0; bin != bin_count; ++bin)
+    for(unsigned long bin = 0; bin != this->BinCount; ++bin)
       {
-      const double bin_min = lerp(value_min, value_max, static_cast<double>(bin) / static_cast<double>(bin_count));
-      const double bin_max = lerp(value_min, value_max, static_cast<double>(bin+1) / static_cast<double>(bin_count));
+      const double bin_min = lerp(value_min, value_max, static_cast<double>(bin) / static_cast<double>(this->BinCount));
+      const double bin_max = lerp(value_min, value_max, static_cast<double>(bin+1) / static_cast<double>(this->BinCount));
       
       for(vtkIdType i = 0; i != array->GetNumberOfTuples(); ++i)
         {
@@ -201,8 +211,10 @@ struct pqObjectHistogramWidget::pqImplementation
   vtkSMClientSideDataProxy* ClientSideData;
   vtkEventQtSlotConnect* EventAdaptor;
   QComboBox Variables;
+  QSpinBox BinCountSpinBox;
   pqHistogramWidget HistogramWidget;
   QString CurrentVariable;
+  unsigned long BinCount;
 };
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -212,16 +224,31 @@ pqObjectHistogramWidget::pqObjectHistogramWidget(QWidget *parent) :
   QWidget(parent),
   Implementation(new pqImplementation())
 {
-  QVBoxLayout* const layout = new QVBoxLayout(this);
-  layout->setMargin(0);
-  layout->addWidget(&this->Implementation->Variables);
-  layout->addWidget(&this->Implementation->HistogramWidget);
+  QHBoxLayout* const hbox = new QHBoxLayout();
+  hbox->setMargin(0);
+  hbox->addWidget(&this->Implementation->Variables);
+  hbox->addWidget(&this->Implementation->BinCountSpinBox);
+
+  QVBoxLayout* const vbox = new QVBoxLayout(this);
+  vbox->setMargin(0);
+  vbox->addLayout(hbox);
+  vbox->addWidget(&this->Implementation->HistogramWidget);
+  
+  this->Implementation->BinCountSpinBox.setMinimum(2);
+  this->Implementation->BinCountSpinBox.setMaximum(256);
+  this->Implementation->BinCountSpinBox.setValue(this->Implementation->BinCount);
   
   QObject::connect(
     &this->Implementation->Variables,
     SIGNAL(activated(int)),
     this,
     SLOT(onCurrentVariableChanged(int)));
+    
+  QObject::connect(
+    &this->Implementation->BinCountSpinBox,
+    SIGNAL(valueChanged(int)),
+    this,
+    SLOT(onBinCountChanged(int)));
 }
 
 pqObjectHistogramWidget::~pqObjectHistogramWidget()
@@ -229,7 +256,7 @@ pqObjectHistogramWidget::~pqObjectHistogramWidget()
   delete this->Implementation;
 }
 
-void pqObjectHistogramWidget::onSetProxy(vtkSMSourceProxy* proxy)
+void pqObjectHistogramWidget::setProxy(vtkSMSourceProxy* proxy)
 {
   this->Implementation->setProxy(proxy);
   
@@ -243,9 +270,14 @@ void pqObjectHistogramWidget::onSetProxy(vtkSMSourceProxy* proxy)
     }
 }
 
-void pqObjectHistogramWidget::onSetCurrentVariable(const QString& CurrentVariable)
+void pqObjectHistogramWidget::setCurrentVariable(const QString& CurrentVariable)
 {
   this->Implementation->setCurrentVariable(CurrentVariable);
+}
+
+void pqObjectHistogramWidget::setBinCount(unsigned long Count)
+{
+  this->Implementation->setBinCount(Count);
 }
 
 void pqObjectHistogramWidget::onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*)
@@ -256,4 +288,9 @@ void pqObjectHistogramWidget::onInputChanged(vtkObject*,unsigned long, void*, vo
 void pqObjectHistogramWidget::onCurrentVariableChanged(int Row)
 {
   this->Implementation->setCurrentVariable(this->Implementation->Variables.itemData(Row).toString());
+}
+
+void pqObjectHistogramWidget::onBinCountChanged(int Count)
+{
+  this->Implementation->setBinCount(Count);
 }

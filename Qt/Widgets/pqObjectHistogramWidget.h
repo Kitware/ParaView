@@ -29,13 +29,16 @@ public:
 
 public slots:
   /// Call this to set the proxy that will become the data source
-  void onSetProxy(vtkSMSourceProxy*);
+  void setProxy(vtkSMSourceProxy*);
   /// Call this to set the current variable
-  void onSetCurrentVariable(const QString&);
+  void setCurrentVariable(const QString&);
+  /// Call this to set the current bin count (defaults to 10)
+  void setBinCount(unsigned long Count);
   
 private slots:
   void onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*);
   void onCurrentVariableChanged(int);
+  void onBinCountChanged(int);
 
 private:
   struct pqImplementation;
