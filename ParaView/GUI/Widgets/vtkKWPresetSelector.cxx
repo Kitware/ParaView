@@ -51,11 +51,11 @@ int vtkKWPresetSelector::EmailButtonId          = 7;
 const char *vtkKWPresetSelector::IdColumnName        = "Id";
 const char *vtkKWPresetSelector::ThumbnailColumnName = "Image";
 const char *vtkKWPresetSelector::GroupColumnName     = "Group";
-const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
+const char *vtkKWPresetSelector::CommentColumnName   = "Name";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.27");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.28");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
