@@ -2725,7 +2725,7 @@ The Outline filter generates an axis-aligned bounding box for the input data set
       </Item>
       <Item label="Line"
             value="Output">
-        <LineSourceWidget trace_name="Line"/>
+        <LineSourceWidget trace_name="Line" input_menu="im"/>
       </Item>
     </SelectWidget>
     <ContainerWidget pack_direction="left" trace_name="MaxProp">
