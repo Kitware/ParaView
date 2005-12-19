@@ -246,7 +246,6 @@ pqMainWindow::pqMainWindow() :
     connect(this->PipelineList, SIGNAL(proxySelected(vtkSMSourceProxy*)),
         histogram, SLOT(onSetProxy(vtkSMSourceProxy*)));
     }
-  connect(this, SIGNAL(serverChanged(pqServer*)), histogram, SLOT(onServerChanged(pqServer*)));
   
   this->addDockWidget(Qt::BottomDockWidgetArea, this->ChartDock);
   

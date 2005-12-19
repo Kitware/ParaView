@@ -13,7 +13,6 @@
 #include "QtWidgetsExport.h"
 #include <QWidget>
 
-class pqServer;
 class vtkCommand;
 class vtkObject;
 class vtkSMSourceProxy;
@@ -29,15 +28,14 @@ public:
   ~pqObjectHistogramWidget();
 
 public slots:
-  /// Call this whenever the connected server changes
-  /** \todo This may need to change when we start supporting multiple server connections */
-  void onServerChanged(pqServer* server);
   /// Call this to set the proxy that will become the data source
-  void onSetProxy(vtkSMSourceProxy* proxy);
-  /// Call this whenever the proxy output data is modified
-  void onDisplayData();
-  /// Call this whenever the proxy output data is modified
-  void onDisplayData(vtkObject*,unsigned long, void*, void*, vtkCommand*);
+  void onSetProxy(vtkSMSourceProxy*);
+  /// Call this to set the current variable
+  void onSetCurrentVariable(const QString&);
+  
+private slots:
+  void onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*);
+  void onCurrentVariableChanged(int);
 
 private:
   struct pqImplementation;

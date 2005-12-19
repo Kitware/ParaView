@@ -14,25 +14,26 @@
 #include <pqHistogramChart.h>
 #include <pqHistogramWidget.h>
 
+#include <QComboBox>
 #include <QVBoxLayout>
 
+#include <vtkCellData.h>
 #include <vtkCommand.h>
+#include <vtkDataArray.h>
 #include <vtkDataSet.h>
 #include <vtkEventQtSlotConnect.h>
+#include <vtkPointData.h>
+#include <vtkPointSet.h>
 #include <vtkSMClientSideDataProxy.h>
 #include <vtkSMInputProperty.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSphereSource.h>
-#include <vtkPointSet.h>
-
-#include <vtkstd/map>
 
 //////////////////////////////////////////////////////////////////////////////
 // pqObjectHistogramWidget::pqImplementation
 
-struct pqObjectHistogramWidget::pqImplementation :
-  public pqHistogramWidget
+struct pqObjectHistogramWidget::pqImplementation
 {
   pqImplementation() :
     ClientSideData(0),
@@ -45,21 +46,167 @@ struct pqObjectHistogramWidget::pqImplementation :
     this->EventAdaptor->Delete();
     
     if(this->ClientSideData)
+      {
       this->ClientSideData->Delete();
+      this->ClientSideData = 0;
+      }
   }
   
-  void setServer(pqServer* Server)
+  void setProxy(vtkSMSourceProxy* Proxy)
   {
     if(this->ClientSideData)
+      {
       this->ClientSideData->Delete();
+      this->ClientSideData = 0;
+      }  
     
-    if(Server)
-      this->ClientSideData = vtkSMClientSideDataProxy::SafeDownCast(Server->GetProxyManager()->NewProxy("displays", "ClientSideData"));
+    this->CurrentVariable = QString();
+    
+    if(!Proxy)
+      return;
+    
+    // Connect a client side data object to the input source
+    this->ClientSideData = vtkSMClientSideDataProxy::SafeDownCast(
+      Proxy->GetProxyManager()->NewProxy("displays", "ClientSideData"));
+    vtkSMInputProperty* const input = vtkSMInputProperty::SafeDownCast(
+      this->ClientSideData->GetProperty("Input"));
+    input->AddProxy(Proxy);
+    
+    this->onInputChanged();
+  }
+  
+  void setCurrentVariable(const QString& CurrentVariable)
+  {
+    this->CurrentVariable = CurrentVariable;
+    this->updateChart();
+  }
+  
+  void onInputChanged()
+  {
+    if(!this->ClientSideData)
+      return;
+    this->ClientSideData->UpdateVTKObjects();
+    this->ClientSideData->Update();
+
+    vtkDataSet* const data = this->ClientSideData->GetCollectedData();
+    if(!data)
+      return;
+
+    // Populate the current-variable combo-box with available variables
+    // (we do this here because the set of available variables may change as properties
+    // are modified in e.g: a source or a reader)
+    this->Variables.clear();
+    this->Variables.addItem(QString(), QString());
+    
+    if(vtkPointData* const point_data = data->GetPointData())
+      {
+      for(int i = 0; i != point_data->GetNumberOfArrays(); ++i)
+        {
+        vtkDataArray* const array = point_data->GetArray(i);
+        if(array->GetNumberOfComponents() != 1)
+          continue;
+        const char* const array_name = point_data->GetArrayName(i);
+        this->Variables.addItem(QString(array_name) + " (point)", QString(array_name));
+        }
+      }
+      
+    if(vtkCellData* const cell_data = data->GetCellData())
+      {
+      for(int i = 0; i != cell_data->GetNumberOfArrays(); ++i)
+        {
+        vtkDataArray* const array = cell_data->GetArray(i);
+        if(array->GetNumberOfComponents() != 1)
+          continue;
+        const char* const array_name = cell_data->GetArrayName(i);
+        this->Variables.addItem(QString(array_name) + " (cell)", QString(array_name));
+        }
+      }
+
+    this->updateChart();
+  }
+  
+  static inline double lerp(double A, double B, double Amount)
+  {
+    return ((1 - Amount) * A) + (Amount * B);
+  }
+  
+  void updateChart()
+  {
+    if(!this->ClientSideData)
+      return;
+
+    vtkDataSet* const data = this->ClientSideData->GetCollectedData();
+    if(!data)
+      return;
+
+    vtkDataArray* array = 0;
+    if(vtkPointData* const point_data = data->GetPointData())
+      {
+      array = point_data->GetArray(this->CurrentVariable.toAscii().data());
+      }
+      
+    if(!array)
+      {
+      if(vtkCellData* const cell_data = data->GetCellData())
+        {
+        array = cell_data->GetArray(this->CurrentVariable.toAscii().data());
+        }
+      }
+      
+    if(!array)
+      return;
+
+    double value_min = VTK_DOUBLE_MAX;
+    double value_max = -VTK_DOUBLE_MAX;
+    const unsigned int bin_count = 10;
+    typedef vtkstd::vector<int> bins_t;
+    bins_t bins(bin_count, 0);
+
+    for(vtkIdType i = 0; i != array->GetNumberOfTuples(); ++i)
+      {
+      const double value = array->GetTuple1(i);
+      value_min = vtkstd::min(value_min, value);
+      value_max = vtkstd::max(value_max, value);
+      }
+      
+    for(unsigned long bin = 0; bin != bin_count; ++bin)
+      {
+      const double bin_min = lerp(value_min, value_max, static_cast<double>(bin) / static_cast<double>(bin_count));
+      const double bin_max = lerp(value_min, value_max, static_cast<double>(bin+1) / static_cast<double>(bin_count));
+      
+      for(vtkIdType i = 0; i != array->GetNumberOfTuples(); ++i)
+        {
+        const double value = array->GetTuple1(i);
+        if(bin_min <= value && value <= bin_max)
+          {
+          ++bins[bin];
+          }
+        }
+      }
+
+    pqChartValueList list;
+    for(bins_t::const_iterator bin = bins.begin(); bin != bins.end(); ++bin)
+      {
+      list.pushBack(static_cast<double>(*bin));
+      }
+
+    if(!bins.empty())
+      {
+      this->HistogramWidget.getHistogram()->setData(
+        list,
+        pqChartValue(value_min), pqChartValue(value_max));
+      }
   }
   
   vtkSMClientSideDataProxy* ClientSideData;
   vtkEventQtSlotConnect* EventAdaptor;
+  QComboBox Variables;
+  pqHistogramWidget HistogramWidget;
+  QString CurrentVariable;
 };
+
+/////////////////////////////////////////////////////////////////////////////////
+// pqObjectHistogramWidget
 
 pqObjectHistogramWidget::pqObjectHistogramWidget(QWidget *parent) :
   QWidget(parent),
@@ -67,7 +214,14 @@ pqObjectHistogramWidget::pqObjectHistogramWidget(QWidget *parent) :
 {
   QVBoxLayout* const layout = new QVBoxLayout(this);
   layout->setMargin(0);
-  layout->addWidget(this->Implementation);
+  layout->addWidget(&this->Implementation->Variables);
+  layout->addWidget(&this->Implementation->HistogramWidget);
+  
+  QObject::connect(
+    &this->Implementation->Variables,
+    SIGNAL(activated(int)),
+    this,
+    SLOT(onCurrentVariableChanged(int)));
 }
 
 pqObjectHistogramWidget::~pqObjectHistogramWidget()
@@ -75,70 +229,31 @@ pqObjectHistogramWidget::~pqObjectHistogramWidget()
   delete this->Implementation;
 }
 
-void pqObjectHistogramWidget::onServerChanged(pqServer* server)
-{
-  this->Implementation->setServer(server);
-}
-
 void pqObjectHistogramWidget::onSetProxy(vtkSMSourceProxy* proxy)
 {
-  if(!proxy)
-    return;
-
-  if(!this->Implementation->ClientSideData)
-    return;
-
-  this->Implementation->EventAdaptor->Connect(proxy, vtkCommand::UpdateEvent, this, SLOT(onDisplayData(vtkObject*,unsigned long, void*, void*, vtkCommand*)));    
-    
-  vtkSMInputProperty* const input = vtkSMInputProperty::SafeDownCast(
-    this->Implementation->ClientSideData->GetProperty("Input"));
-  input->AddProxy(proxy);
+  this->Implementation->setProxy(proxy);
   
-  this->onDisplayData();
-}
-
-void pqObjectHistogramWidget::onDisplayData()
-{
-  if(!this->Implementation->ClientSideData)
-    return;
-    
-  this->Implementation->ClientSideData->UpdateVTKObjects();
-  this->Implementation->ClientSideData->Update();
-
-  vtkDataSet* const data = this->Implementation->ClientSideData->GetCollectedData();
-  if(!data)
-    return;
-
-  vtkPointSet* const point_set = vtkPointSet::SafeDownCast(data);
-  if(!point_set)
-    return;
-
-  // For grins, create a histogram of Z-coordinates
-  vtkstd::map<int, int> bins;
-  for(vtkIdType i = 0; i != point_set->GetNumberOfPoints(); ++i)
+  if(proxy)
     {
-    double point[3];
-    point_set->GetPoint(i, point);
-    const int bin = point[2];
-    bins.insert(vtkstd::make_pair(bin, 0));
-    bins[bin]++;
-    }
-
-  pqChartValueList list;
-  for(vtkstd::map<int, int>::iterator bin = bins.begin(); bin != bins.end(); ++bin)
-    {
-    list.pushBack(static_cast<float>(bin->second));
-    }
-
-  if(bins.size() > 1)
-    {
-    this->Implementation->getHistogram()->setData(
-      list,
-      pqChartValue(static_cast<double>(bins.begin()->first)), static_cast<double>(pqChartValue(bins.rbegin()->first)));
+    this->Implementation->EventAdaptor->Connect(
+      proxy,
+      vtkCommand::UpdateEvent,
+      this,
+      SLOT(onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*)));    
     }
 }
 
-void pqObjectHistogramWidget::onDisplayData(vtkObject*,unsigned long, void*, void*, vtkCommand*)
+void pqObjectHistogramWidget::onSetCurrentVariable(const QString& CurrentVariable)
 {
-  onDisplayData();
+  this->Implementation->setCurrentVariable(CurrentVariable);
+}
+
+void pqObjectHistogramWidget::onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*)
+{
+  this->Implementation->onInputChanged();
+}
+
+void pqObjectHistogramWidget::onCurrentVariableChanged(int Row)
+{
+  this->Implementation->setCurrentVariable(this->Implementation->Variables.itemData(Row).toString());
 }
