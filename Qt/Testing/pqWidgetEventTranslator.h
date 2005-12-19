@@ -30,8 +30,10 @@ signals:
 
 protected:
   pqWidgetEventTranslator() {}
-  pqWidgetEventTranslator(const pqWidgetEventTranslator&) {}
-  pqWidgetEventTranslator& operator=(const pqWidgetEventTranslator&) { return *this; }
+  
+private:
+  pqWidgetEventTranslator(const pqWidgetEventTranslator&);
+  pqWidgetEventTranslator& operator=(const pqWidgetEventTranslator&);
 };
 
 #endif // !_pqWidgetEventTranslator_h

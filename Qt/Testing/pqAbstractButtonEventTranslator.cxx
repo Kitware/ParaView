@@ -17,7 +17,7 @@ pqAbstractButtonEventTranslator::pqAbstractButtonEventTranslator() :
 {
 }
 
-bool pqAbstractButtonEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& Error)
+bool pqAbstractButtonEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& /*Error*/)
 {
   QAbstractButton* const object = qobject_cast<QAbstractButton*>(Object);
   if(!object)
