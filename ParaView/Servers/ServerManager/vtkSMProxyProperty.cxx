@@ -16,12 +16,13 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyGroupDomain.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMStateLoader.h"
 #include "vtkSmartPointer.h"
-#include "vtkPVXMLElement.h"
 
 #include <vtkstd/map>
 #include <vtkstd/vector>
@@ -30,7 +31,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.24");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.25");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -463,6 +464,48 @@ int vtkSMProxyProperty::ReadXMLAttributes(vtkSMProxy* parent,
     this->SetRemoveCommand(remove_command);
     }
   return ret;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
+                                  vtkSMStateLoader* loader)
+{
+  int prevImUpdate = this->ImmediateUpdate;
+
+  // Wait until all values are set before update (if ImmediateUpdate)
+  this->ImmediateUpdate = 0;
+  this->Superclass::LoadState(element, loader);
+
+  unsigned int numElems = element->GetNumberOfNestedElements();
+  for (unsigned int i=0; i<numElems; i++)
+    {
+    vtkPVXMLElement* currentElement = element->GetNestedElement(i);
+    if (currentElement->GetName() &&
+        strcmp(currentElement->GetName(), "Element") == 0)
+      {
+      int id;
+      if (currentElement->GetScalarAttribute("value", &id))
+        {
+        vtkSMProxy* proxy = loader->NewProxy(id);
+        if (proxy)
+          {
+          this->AddProxy(proxy);
+          proxy->Delete();
+          }
+        else
+          {
+          vtkErrorMacro("Could not create proxy of id: " << id);
+          return 0;
+          }
+        }
+      }
+    }
+
+  // Do not immediately update. Leave it to the loader.
+  this->Modified();
+  this->ImmediateUpdate = prevImUpdate;
+
+  return 1;
 }
 
 //---------------------------------------------------------------------------

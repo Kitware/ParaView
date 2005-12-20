@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.21");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.22");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -277,6 +277,42 @@ int vtkSMStringVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
     this->SetElement(0, initVal); // what to do with > 1 element?
     }
   
+  return 1;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMStringVectorProperty::LoadState(vtkPVXMLElement* element,
+                                         vtkSMStateLoader* loader)
+{
+  int prevImUpdate = this->ImmediateUpdate;
+
+  // Wait until all values are set before update (if ImmediateUpdate)
+  this->ImmediateUpdate = 0;
+  this->Superclass::LoadState(element, loader);
+
+  unsigned int numElems = element->GetNumberOfNestedElements();
+  for (unsigned int i=0; i<numElems; i++)
+    {
+    vtkPVXMLElement* currentElement = element->GetNestedElement(i);
+    if (currentElement->GetName() &&
+        strcmp(currentElement->GetName(), "Element") == 0)
+      {
+      int index;
+      if (currentElement->GetScalarAttribute("index", &index))
+        {
+        const char* value = currentElement->GetAttribute("value");
+        if (value)
+          {
+          this->SetElement(index, value);
+          }
+        }
+      }
+    }
+
+  // Do not immediately update. Leave it to the loader.
+  this->Modified();
+  this->ImmediateUpdate = prevImUpdate;
+
   return 1;
 }
 

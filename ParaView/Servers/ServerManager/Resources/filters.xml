@@ -122,11 +122,6 @@
    <!-- End IntegrateFlowThroughSurface -->
    </SourceProxy>
 
-
-
-
-
-
    <SourceProxy name="AllToN" class="vtkAllToNRedistributePolyData">
       <InputProperty
          name="Input"

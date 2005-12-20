@@ -155,6 +155,10 @@ protected:
   virtual void UpdateAllInputs();
 
   // Description:
+  // Updates state from an XML element. Returns 0 on failure.
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoader* loader);
+
+  // Description:
   // Saves the state of the object in XML format. 
   virtual void ChildSaveState(vtkPVXMLElement* parent);
 

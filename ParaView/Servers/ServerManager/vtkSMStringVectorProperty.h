@@ -123,6 +123,10 @@ protected:
   virtual int ReadXMLAttributes(vtkSMProxy* parent, 
                                 vtkPVXMLElement* element);
 
+  // Description:
+  // Updates state from an XML element. Returns 0 on failure.
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoader* loader);
+
   virtual void ChildSaveState(vtkPVXMLElement* parent);
 
 private:

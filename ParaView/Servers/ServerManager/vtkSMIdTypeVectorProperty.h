@@ -132,6 +132,10 @@ protected:
 
   int ArgumentIsArray;
 
+  // Description:
+  // Updates state from an XML element. Returns 0 on failure.
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoader* loader);
+
   virtual void ChildSaveState(vtkPVXMLElement* parent);
 
   // Description:

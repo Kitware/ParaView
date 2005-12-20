@@ -120,6 +120,7 @@ class vtkSMProperty;
 class vtkSMPropertyIterator;
 class vtkSMProxyManager;
 class vtkSMProxyObserver;
+class vtkSMStateLoader;
 
 class VTK_EXPORT vtkSMProxy : public vtkSMObject
 {
@@ -334,6 +335,7 @@ protected:
   friend class vtkSMSourceProxy;
   friend class vtkSMIceTDesktopRenderModuleProxy;
   friend class vtkSMCompoundProxy;
+  friend class vtkSMStateLoader;
 //ETX
 
   // Description:
@@ -514,6 +516,10 @@ protected:
   // (makes it public) and updates the pipeline information.
   virtual void UpdatePipelineInformation();
 
+  // Description:
+  // Updates state from an XML element. Returns 0 on failure.
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoader* loader);
+ 
   int CreateSubProxiesAndProperties(vtkSMProxyManager* pm, 
     vtkPVXMLElement *element);
 
