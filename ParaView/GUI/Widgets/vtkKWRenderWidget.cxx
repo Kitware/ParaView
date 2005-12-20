@@ -40,7 +40,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.120");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.121");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -117,6 +117,7 @@ vtkKWRenderWidget::vtkKWRenderWidget()
     {
     cam->ParallelProjectionOn();
     }
+  
   vtkRenderer *overlay_ren = this->GetOverlayRenderer();
   if (overlay_ren)
     {
