@@ -34,7 +34,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.57");
+vtkCxxRevisionMacro(vtkSMProxy, "1.58");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -552,10 +552,19 @@ void vtkSMProxy::PushProperty(
     }
   if (it->second.ModifiedFlag)
     {
+    // In case this property is a self property and causes
+    // another UpdateVTKObjects(), make sure that it does
+    // not cause recursion. If this is not set, UpdateVTKObjects()
+    // that is caused by PushProperty() can end up calling trying
+    // to push the same property.
+    it->second.ModifiedFlag = 0;
+
     vtkClientServerStream str;
     it->second.Property.GetPointer()->AppendCommandToStream(this, &str, id);
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     pm->SendStream(this->ConnectionID, servers, str);
+
+    it->second.ModifiedFlag = 1;
     }
 }
 
