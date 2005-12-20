@@ -66,6 +66,9 @@ public:
   int GetVectorAttribute(const char* name, int length, int* value);
   int GetVectorAttribute(const char* name, int length, float* value);
   int GetVectorAttribute(const char* name, int length, double* value);
+#if defined(VTK_USE_64BIT_IDS)
+  int GetVectorAttribute(const char* name, int length, vtkIdType* value);
+#endif
 
   // Description:
   // Get the parent of this element.
