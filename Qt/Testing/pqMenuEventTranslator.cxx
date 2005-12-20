@@ -22,7 +22,7 @@ pqMenuEventTranslator::~pqMenuEventTranslator()
   clearActions();
 }
 
-bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& Error)
+bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& /*Error*/)
 {
   QMenu* const object = qobject_cast<QMenu*>(Object);
   if(!object)
@@ -47,6 +47,8 @@ bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool&
       break;
     case QEvent::Leave:
       this->clearActions();
+      break;
+    default:
       break;
     }
       

@@ -81,6 +81,11 @@ ADD_LIBRARY(QtTesting
   ${UI_BUILT_SOURCES}
 )
 
+SOURCE_GROUP("Generated" FILES
+  ${MOC_BUILT_SOURCES}
+  ${UI_BUILT_SOURCES}
+)
+
 TARGET_LINK_LIBRARIES(QtTesting
   vtkIO
   vtkRendering

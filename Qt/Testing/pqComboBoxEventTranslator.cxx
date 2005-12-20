@@ -17,7 +17,7 @@ pqComboBoxEventTranslator::pqComboBoxEventTranslator() :
 {
 }
 
-bool pqComboBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& Error)
+bool pqComboBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& /*Error*/)
 {
   QComboBox* const object = qobject_cast<QComboBox*>(Object);
   if(!object)
@@ -38,6 +38,9 @@ bool pqComboBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event, b
         connect(object, SIGNAL(activated(const QString&)), this, SLOT(onStateChanged(const QString&)));
         connect(object, SIGNAL(editTextChanged(const QString&)), this, SLOT(onStateChanged(const QString&)));
         }
+      break;
+      
+    default:
       break;
     }
 

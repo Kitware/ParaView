@@ -17,7 +17,7 @@ pqDoubleSpinBoxEventTranslator::pqDoubleSpinBoxEventTranslator() :
 {
 }
 
-bool pqDoubleSpinBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& Error)
+bool pqDoubleSpinBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& /*Error*/)
 {
   QDoubleSpinBox* const object = qobject_cast<QDoubleSpinBox*>(Object);
   if(!object)
@@ -32,6 +32,8 @@ bool pqDoubleSpinBoxEventTranslator::translateEvent(QObject* Object, QEvent* Eve
     case QEvent::Leave:
       disconnect(Object, 0, this, 0);
       this->CurrentObject = 0;
+      break;
+    default:
       break;
     }
       

@@ -18,7 +18,7 @@ pqLineEditEventTranslator::pqLineEditEventTranslator() :
 {
 }
 
-bool pqLineEditEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& Error)
+bool pqLineEditEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& /*Error*/)
 {
   QLineEdit* const object = qobject_cast<QLineEdit*>(Object);
   if(!object)
@@ -37,6 +37,8 @@ bool pqLineEditEventTranslator::translateEvent(QObject* Object, QEvent* Event, b
     case QEvent::Leave:
       disconnect(Object, 0, this, 0);
       this->CurrentObject = 0;
+      break;
+    default:
       break;
     }
       
