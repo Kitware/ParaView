@@ -100,6 +100,7 @@ SET(Kit_SRCS
   vtkSMMPIRenderModuleProxy.cxx
   vtkSMSourceProxy.cxx
   vtkSMSphereWidgetProxy.cxx
+  vtkSMStateLoader.cxx
   vtkSMStringListDomain.cxx
   vtkSMStringListRangeDomain.cxx
   vtkSMStringVectorProperty.cxx

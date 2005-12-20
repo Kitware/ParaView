@@ -105,6 +105,10 @@ protected:
   char* CleanCommand;
 
   // Description:
+  // Updates state from an XML element. Returns 0 on failure.
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoader* loader);
+
+  // Description:
   // Set the appropriate ivars from the xml element.
   virtual int ReadXMLAttributes(vtkSMProxy* parent, 
                                 vtkPVXMLElement* element);

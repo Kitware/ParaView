@@ -30,7 +30,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.36");
+vtkCxxRevisionMacro(vtkSMProperty, "1.37");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -385,6 +385,13 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
     }
 
   this->SetProxy(0);
+  return 1;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMProperty::LoadState(vtkPVXMLElement* /*propertyElement*/, 
+                             vtkSMStateLoader* /*loader*/)
+{
   return 1;
 }
 

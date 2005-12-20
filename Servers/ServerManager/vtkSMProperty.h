@@ -72,6 +72,7 @@ class vtkSMDomain;
 class vtkSMDomainIterator;
 class vtkSMInformationHelper;
 class vtkSMProxy;
+class vtkSMStateLoader;
 class vtkSMXMLParser;
 //BTX
 struct vtkSMPropertyInternals;
@@ -275,6 +276,10 @@ protected:
   // Save the state in XML.
   virtual void SaveState(vtkPVXMLElement* parent, const char* uid);
   virtual void ChildSaveState(vtkPVXMLElement* propertyElement);
+
+  // Description:
+  // Updates state from an XML element. Returns 0 on failure.
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoader* loader);
 
   // Description:
   // Set from the XML file, information helpers fill in the property

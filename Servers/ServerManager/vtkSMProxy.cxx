@@ -25,6 +25,7 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMStateLoader.h"
 
 #include "vtkSMProxyInternals.h"
 
@@ -33,7 +34,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.56");
+vtkCxxRevisionMacro(vtkSMProxy, "1.57");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -804,7 +805,7 @@ void vtkSMProxy::UpdateVTKObjects()
       vtkSMProperty* prop = it->second.Property.GetPointer();
       if (prop->IsA("vtkSMInputProperty"))
         {
-        if (it->second.ModifiedFlag && !prop->GetImmediateUpdate())
+        if (it->second.ModifiedFlag)
           {
           if (prop->GetUpdateSelf())
             {
@@ -831,8 +832,7 @@ void vtkSMProxy::UpdateVTKObjects()
       {
       vtkSMProperty* prop = it->second.Property.GetPointer();
       if (it->second.ModifiedFlag && 
-        !prop->GetImmediateUpdate() && 
-        !prop->GetInformationOnly())
+          !prop->GetInformationOnly())
         {
         if (prop->GetUpdateSelf())
           {
@@ -1456,6 +1456,38 @@ void vtkSMProxy::SetupSharedProperties(vtkSMProxy* subproxy,
       piter->Delete();
       }
     }
+}
+
+//---------------------------------------------------------------------------
+int vtkSMProxy::LoadState(vtkPVXMLElement* proxyElement, 
+                          vtkSMStateLoader* loader)
+{
+  unsigned int numElems = proxyElement->GetNumberOfNestedElements();
+  for (unsigned int i=0; i<numElems; i++)
+    {
+    vtkPVXMLElement* currentElement = proxyElement->GetNestedElement(i);
+    if (currentElement->GetName() &&
+        strcmp(currentElement->GetName(), "Property") == 0)
+      {
+      const char* name = currentElement->GetAttribute("name");
+      if (!name)
+        {
+        vtkErrorMacro("Cannon load property without a name.");
+        continue;
+        }
+      vtkSMProperty* property = this->GetProperty(name);
+      if (!property)
+        {
+        vtkErrorMacro("Property " << name << " does not exist.");
+        continue;
+        }
+      if (!property->LoadState(currentElement, loader))
+        {
+        return 0;
+        }
+      }
+    }
+  return 1;
 }
 
 //---------------------------------------------------------------------------
