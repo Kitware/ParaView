@@ -56,6 +56,9 @@ public:
   int GetScalarAttribute(const char* name, int* value);
   int GetScalarAttribute(const char* name, float* value);
   int GetScalarAttribute(const char* name, double* value);
+#if defined(VTK_USE_64BIT_IDS)
+  void GetScalarAttribute(const char* name, vtkIdType* value);
+#endif
 
   // Description:
   // Get the attribute with the given name and converted to a scalar

@@ -16,7 +16,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.2");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.3");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 #include <vtkstd/string>
@@ -302,6 +302,14 @@ int vtkPVXMLElement::GetScalarAttribute(const char* name, double* value)
 {
   return this->GetVectorAttribute(name, 1, value);
 }
+
+#if defined(VTK_USE_64BIT_IDS)
+//----------------------------------------------------------------------------
+int vtkPVXMLElement::GetScalarAttribute(const char* name, vtkIdType* value)
+{
+  return this->GetVectorAttribute(name, 1, value);
+}
+#endif
 
 //----------------------------------------------------------------------------
 template <class T>
