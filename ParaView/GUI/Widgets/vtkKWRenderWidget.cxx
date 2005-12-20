@@ -40,7 +40,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.119");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.120");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -632,7 +632,10 @@ void vtkKWRenderWidget::ConfigureCallback(int width, int height)
     {
     height = this->Interactor->GetSize()[1];
     }
-
+  //Interactor->GetSize() can return 0. in that case set
+  //the size to 1.
+  if(width==0) width=1;
+  if(height==0) height=1;
   // We *need* to propagate the size to the vtkTkRenderWidget
   // if we specified the widget's width/height explicitly
 
@@ -647,7 +650,7 @@ void vtkKWRenderWidget::ConfigureCallback(int width, int height)
     height = frame_height;
     }
   if (frame_width || frame_height)
-    {
+    {    
     this->VTKWidget->SetConfigurationOptionAsInt("-width", width);
     this->VTKWidget->SetConfigurationOptionAsInt("-height", height);
     }
