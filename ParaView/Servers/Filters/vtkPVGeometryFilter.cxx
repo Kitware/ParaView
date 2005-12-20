@@ -47,7 +47,7 @@
 #include "vtkGenericDataSet.h"
 #include "vtkGenericGeometryFilter.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.57");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.58");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -271,9 +271,27 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
     return 0;
     }
 
+  unsigned int numGroups = mgInput->GetNumberOfGroups();
+
+  unsigned int group;
+  unsigned int dataset;
+  unsigned int totNumBlocks=0;
+  for (group=0; group<numGroups; group++)
+    {
+    unsigned int numDataSets = mgInput->GetNumberOfDataSets(group);
+    for (dataset=0; dataset<numDataSets; dataset++)
+      {
+      vtkDataSet* ds = 
+        vtkDataSet::SafeDownCast(mgInput->GetDataSet(group, dataset));
+      if (ds)
+        {
+        totNumBlocks++;
+        }
+      }
+    }
+  
   vtkAppendPolyData* append = vtkAppendPolyData::New();
   int numInputs = 0;
-  unsigned int numGroups = mgInput->GetNumberOfGroups();
   this->GenerateGroupScalars = 1;
   for (unsigned int group=0; group<numGroups; group++)
     {
@@ -292,6 +310,8 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
         // collection checks. This improves the preformance significantly
         tmpOut->FastDelete();
         numInputs++;
+
+        this->UpdateProgress(static_cast<float>(numInputs)/totNumBlocks);
         }
       }
     }
