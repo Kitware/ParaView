@@ -52,7 +52,7 @@
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.37");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.38");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -243,7 +243,7 @@ private:
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.37");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.38");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -1676,6 +1676,7 @@ public:
       {
       it->second = vtkSpyPlotUniReader::New();
       it->second->SetCellArraySelection(parent->GetCellDataArraySelection());
+      it->second->SetFileName(it->first.c_str());
       //cout << parent->GetController()->GetLocalProcessId() << "Create reader: " << it->second << endl;
       }
     return it->second;
@@ -1708,6 +1709,11 @@ public:
   // Description:
   // Go to first block if any.
   virtual void Start()=0;
+ 
+  // Description:
+  // Returns the total number of blocks to be processed by this Processor.
+  // Can be called only after Init().
+  virtual int GetNumberOfBlocksToProcess()=0;
   
   // Description:
   // Is there no block at current position?
@@ -1815,7 +1821,38 @@ public:
       this->FileIndex=0;
       this->FindFirstBlockOfCurrentOrNextFile();
     }
+ 
   
+  virtual int GetNumberOfBlocksToProcess()
+    {
+    // When distributing blocks, each process is as such
+    // going to read each file, so it's okay if this method 
+    // creates reader for all files and reads information from them.
+    int total_num_blocks = 0;
+    vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator fileIterator;
+    fileIterator = this->FileMap->Files.begin();
+    for ( ;fileIterator != this->FileMap->Files.end(); fileIterator++)
+      {
+      vtkSpyPlotUniReader* reader = this->FileMap->GetReader(fileIterator, 
+        this->Parent);
+      reader->ReadInformation();
+      reader->SetCurrentTimeStep(this->CurrentTimeStep);
+      int numBlocks = reader->GetNumberOfDataBlocks();
+      int numBlocksPerProcess = ( numBlocks / this->NumberOfProcessors);
+      int leftOverBlocks = numBlocks - 
+        (numBlocksPerProcess*this->NumberOfProcessors);
+      if (this->ProcessorId < leftOverBlocks)
+        {
+        total_num_blocks += numBlocksPerProcess + 1;
+        }
+      else
+        {
+        total_num_blocks += numBlocksPerProcess;
+        }
+      }
+    return total_num_blocks;
+    }
+
 protected:
   virtual void FindFirstBlockOfCurrentOrNextFile()
     {
@@ -1932,7 +1969,30 @@ public:
         this->FindFirstBlockOfCurrentOrNextFile();
         }
     }
-  
+ 
+  virtual int GetNumberOfBlocksToProcess()
+    {
+    int total_num_blocks = 0;
+    vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator fileIterator;
+    fileIterator = this->FileMap->Files.begin();
+    int file_index = 0;
+    for ( ;fileIterator != this->FileMap->Files.end() && file_index <= this->FileEnd; 
+      fileIterator++, file_index++)
+      {
+      if (file_index < this->FileStart)
+        {
+        continue;
+        }
+      
+      vtkSpyPlotUniReader* reader = this->FileMap->GetReader(fileIterator, 
+        this->Parent);
+      reader->ReadInformation();
+      reader->SetCurrentTimeStep(this->CurrentTimeStep);
+      total_num_blocks += reader->GetNumberOfDataBlocks();
+      }
+    return total_num_blocks;
+    }
+
 protected:
   virtual void FindFirstBlockOfCurrentOrNextFile()
     {
@@ -2672,8 +2732,16 @@ int vtkSpyPlotReader::RequestData(
   int firstBlock=1;
   
   blockIterator->Start();
+  int total_num_of_blocks = blockIterator->GetNumberOfBlocksToProcess();
+  int current_block_number = 1;
+  int progressInterval = total_num_of_blocks / 10 + 1;
   while(!blockIterator->IsOff())
     {
+    if (!(current_block_number % progressInterval))
+      {
+      this->UpdateProgress(
+        static_cast<double>(current_block_number)/total_num_of_blocks * 0.5);
+      }
     block=blockIterator->GetBlock();
     uniReader=blockIterator->GetUniReader();
     int dims[3];
@@ -2782,6 +2850,7 @@ int vtkSpyPlotReader::RequestData(
         }
       }
     blockIterator->Next();
+    current_block_number++;
     } // while
   
   int parent;
@@ -2932,8 +3001,14 @@ int vtkSpyPlotReader::RequestData(
 //    for ( block = startBlock; block <= endBlock; ++ block )
   
   blockIterator->Start();
+  current_block_number = 1;
   while(!blockIterator->IsOff())
     {
+    if ( !(current_block_number % progressInterval) )
+      {
+      this->UpdateProgress(0.5 * 
+        (1.0 + static_cast<double>(current_block_number)/total_num_of_blocks));
+      }
     block=blockIterator->GetBlock();
     int numFields=blockIterator->GetNumberOfFields();
     uniReader=blockIterator->GetUniReader();
@@ -3482,6 +3557,7 @@ int vtkSpyPlotReader::RequestData(
       }
     //this->MergeVectors(cd);
     blockIterator->Next();
+    current_block_number++;
     } // while
   delete blockIterator;
   
