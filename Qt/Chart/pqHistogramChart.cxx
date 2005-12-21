@@ -20,20 +20,20 @@
 #include <vtkstd/list>
 
 
-/// \class QHistogramItem
+/// \class pqHistogramItem
 /// \brief
-///   The QHistogramItem class stores the information needed
+///   The pqHistogramItem class stores the information needed
 ///   to draw an histogram bar.
-class QHistogramItem
+class pqHistogramItem
 {
 public:
   /// Creates a histogram bar representation.
-  QHistogramItem();
+  pqHistogramItem();
 
   /// \brief
   ///   Creates a histogram bar representation and assigns the value.
-  QHistogramItem(const pqChartValue &value);
-  ~QHistogramItem() {}
+  pqHistogramItem(const pqChartValue &value);
+  ~pqHistogramItem() {}
 
   /// \brief
   ///   Sets the value for the histogram bar.
@@ -108,7 +108,7 @@ public:
 
 public:
   /// Stores the list of histogram bars.
-  vtkstd::vector<QHistogramItem *> Items;
+  vtkstd::vector<pqHistogramItem *> Items;
 
   /// Stores the list of current selection ranges.
   pqHistogramSelectionList Selections;
@@ -118,17 +118,17 @@ public:
 };
 
 
-QHistogramItem::QHistogramItem()
+pqHistogramItem::pqHistogramItem()
   : Bounds(), Value((int)0)
 {
 }
 
-QHistogramItem::QHistogramItem(const pqChartValue &value)
+pqHistogramItem::pqHistogramItem(const pqChartValue &value)
   : Bounds(), Value(value)
 {
 }
 
-void QHistogramItem::setValue(const pqChartValue &value)
+void pqHistogramItem::setValue(const pqChartValue &value)
 {
   this->Value = value;
 }
@@ -216,59 +216,113 @@ void pqHistogramChart::setData(const pqChartValueList &values,
   bool hadSelection = hasSelection();
   this->resetData();
   if(!this->Data || values.getSize() == 0)
+    {
     return;
+    }
 
   if(!this->XAxis || !this->YAxis)
+    {
     return;
+    }
 
-  // Set up the y axis min/max. The axis changes will cause
-  // layout signals to be sent. Avoid multiple signals by blocking
-  // the signals for all but the last change.
+  pqChartValue yMin;
+  pqChartValueList::ConstIterator iter = values.constBegin();
+  if(this->YAxis->getScaleType() == pqChartAxis::Logarithmic)
+    {
+    yMin = *iter;
+    }
+  else
+    {
+    yMin.convertTo(iter->getType());
+    }
+
+  pqChartValue yMax = yMin;
+  for( ; iter != values.constEnd(); ++iter)
+    {
+    pqHistogramItem *item = new pqHistogramItem(*iter);
+    this->Data->Items.push_back(item);
+    if(*iter == 0)
+      {
+      continue;
+      }
+    else if(*iter > yMax)
+      {
+      yMax = *iter;
+      }
+    else if(*iter < yMin)
+      {
+      yMin = *iter;
+      }
+    }
+
   if(this->YAxis->getLayoutType() != pqChartAxis::FixedInterval)
     {
-    pqChartValue yMin;
-    pqChartValueList::ConstIterator iter = values.constBegin();
-    yMin.convertTo(iter->getType());
-    pqChartValue yMax = yMin;
-    for( ; iter != values.constEnd(); ++iter)
+    if(this->YAxis->getScaleType() == pqChartAxis::Logarithmic)
       {
-      QHistogramItem *item = new QHistogramItem(*iter);
-      this->Data->Items.push_back(item);
-      if(*iter > yMax)
-        yMax = *iter;
-      else if(*iter < yMin)
-        yMin = *iter;
-      }
-
-    // Set up the extra padding parameters for the min/max.
-    if(yMin == 0)
-      {
-      this->YAxis->setExtraMaxPadding(true);
-      this->YAxis->setExtraMinPadding(false);
-      }
-    else if(yMax == 0)
-      {
-      this->YAxis->setExtraMaxPadding(false);
-      this->YAxis->setExtraMinPadding(true);
+      if(yMax < 0)
+        {
+        if(yMax.getType() == pqChartValue::IntValue)
+          {
+          yMax = (int)0;
+          }
+        else if(yMax <= -1)
+          {
+          yMax = -0.1;
+          yMax.convertTo(yMin.getType());
+          }
+        }
+      else if(yMin > 0)
+        {
+        if(yMin.getType() == pqChartValue::IntValue)
+          {
+          yMin = (int)0;
+          }
+        else if(yMin >= 1)
+          {
+          yMin = 0.1;
+          yMin.convertTo(yMax.getType());
+          }
+        }
       }
     else
       {
-      this->YAxis->setExtraMaxPadding(true);
-      this->YAxis->setExtraMinPadding(true);
+      // Set up the extra padding parameters for the min/max.
+      if(yMin == 0)
+        {
+        this->YAxis->setExtraMaxPadding(true);
+        this->YAxis->setExtraMinPadding(false);
+        }
+      else if(yMax == 0)
+        {
+        this->YAxis->setExtraMaxPadding(false);
+        this->YAxis->setExtraMinPadding(true);
+        }
+      else
+        {
+        this->YAxis->setExtraMaxPadding(true);
+        this->YAxis->setExtraMinPadding(true);
+        }
       }
 
+    // Set up the y axis min/max. The axis changes will cause
+    // layout signals to be sent. Avoid multiple signals by blocking
+    // the signals for all but the last change.
     this->YAxis->blockSignals(true);
     this->YAxis->setValueRange(yMin, yMax);
     this->YAxis->blockSignals(false);
     }
 
-  pqChartValue interval = (max - min)/values.getSize();
-  this->XAxis->setInterval(interval);
+
+  this->XAxis->blockSignals(true);
   this->XAxis->setValueRange(min, max);
+  this->XAxis->blockSignals(false);
+  this->XAxis->setNumberOfIntervals(values.getSize());
 
   // If there was a selection change, notify the observers.
   if(hadSelection)
+    {
     emit this->selectionChanged(this->Data->Selections);
+    }
 }
 
 int pqHistogramChart::getBinCount() const
@@ -297,7 +351,7 @@ int pqHistogramChart::getBinAt(int x, int y) const
 {
   if(this->Data)
     {
-    vtkstd::vector<QHistogramItem *>::iterator iter = this->Data->Items.begin();
+    vtkstd::vector<pqHistogramItem *>::iterator iter = this->Data->Items.begin();
     for(int i = 0; iter != this->Data->Items.end(); iter++, i++)
       {
       if(*iter && (*iter)->Bounds.isValid() && (*iter)->Bounds.contains(x, y))
@@ -385,7 +439,7 @@ void pqHistogramChart::getBinsIn(const QRect &area,
     {
     pqChartValue i((int)0);
     pqHistogramSelection *selection = 0;
-    vtkstd::vector<QHistogramItem *>::iterator iter = this->Data->Items.begin();
+    vtkstd::vector<pqHistogramItem *>::iterator iter = this->Data->Items.begin();
     for( ; iter != this->Data->Items.end(); iter++, ++i)
       {
       if(*iter && (*iter)->Bounds.isValid() &&
@@ -788,7 +842,6 @@ void pqHistogramChart::layoutChart()
   this->Bounds.setBottom(this->YAxis->getMinPixel());
 
   // Set up the size for each bar in the histogram.
-  int i = 0;
   int bottom = this->YAxis->getMinPixel();
   bool reversed = false;
   if(this->YAxis->isZeroInRange())
@@ -797,21 +850,19 @@ void pqHistogramChart::layoutChart()
     zero.convertTo(this->YAxis->getMaxValue().getType());
     bottom = this->YAxis->getPixelFor(zero);
     }
-  else if(this->YAxis->getValueRange() < 0)
+  else if(this->YAxis->getMaxValue() <= 0)
     {
     bottom = this->YAxis->getMaxPixel();
     reversed = true;
     }
 
   int total = this->XAxis->getNumberShowing();
-  pqChartValue v = this->XAxis->getMinValue();
-  vtkstd::vector<QHistogramItem *>::iterator iter = this->Data->Items.begin();
-  for( ; iter != this->Data->Items.end() && i < total; iter++, i++)
+  vtkstd::vector<pqHistogramItem *>::iterator iter = this->Data->Items.begin();
+  for(int i = 0; iter != this->Data->Items.end() && i < total; iter++, i++)
     {
-    QHistogramItem *item = *iter;
-    item->Bounds.setLeft(this->XAxis->getPixelFor(v));
-    v += this->XAxis->getInterval();
-    item->Bounds.setRight(this->XAxis->getPixelFor(v));
+    pqHistogramItem *item = *iter;
+    item->Bounds.setLeft(this->XAxis->getPixelForIndex(i));
+    item->Bounds.setRight(this->XAxis->getPixelForIndex(i + 1));
     if(reversed || item->getValue() < 0)
       {
       item->Bounds.setTop(bottom);
@@ -861,11 +912,11 @@ void pqHistogramChart::drawChart(QPainter *p, const QRect &area)
   int total = this->XAxis->getNumberShowing();
   QHistogramHighlight *highlight = 0;
   pqHistogramSelectionList::Iterator siter = this->Data->Selections.begin();
-  vtkstd::vector<QHistogramItem *>::iterator iter = this->Data->Items.begin();
+  vtkstd::vector<pqHistogramItem *>::iterator iter = this->Data->Items.begin();
   for( ; iter != this->Data->Items.end() && i < total; iter++, i++)
     {
     // Make sure the bounding rectangle is known.
-    QHistogramItem *item = *iter;
+    pqHistogramItem *item = *iter;
     if(!item || !item->Bounds.isValid())
       continue;
 
@@ -985,13 +1036,10 @@ void pqHistogramChart::layoutSelection()
           }
         else
           {
-          pqChartValue left = this->XAxis->getMinValue();
-          pqChartValue right = left;
-          left += this->XAxis->getInterval() * highlight->getFirst();
-          right += this->XAxis->getInterval() *
-              (highlight->getSecond() + 1);
-          highlight->Bounds.setLeft(this->XAxis->getPixelFor(left));
-          highlight->Bounds.setRight(this->XAxis->getPixelFor(right));
+          highlight->Bounds.setLeft(this->XAxis->getPixelForIndex(
+              highlight->getFirst()));
+          highlight->Bounds.setRight(this->XAxis->getPixelForIndex(
+              highlight->getSecond() + 1));
           }
         }
       }
@@ -1003,7 +1051,7 @@ void pqHistogramChart::resetData()
   if(this->Data)
     {
     this->Data->clearSelection();
-    vtkstd::vector<QHistogramItem *>::iterator iter = this->Data->Items.begin();
+    vtkstd::vector<pqHistogramItem *>::iterator iter = this->Data->Items.begin();
     for( ; iter != this->Data->Items.end(); iter++)
       {
       delete *iter;

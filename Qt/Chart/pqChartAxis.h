@@ -21,6 +21,7 @@
 #include <QFont>  // Needed for font member.
 #include <QColor> // Needed for grid and axis members.
 
+class pqChartAxisData;
 class QPainter;
 class QFontMetrics;
 
@@ -64,6 +65,11 @@ public:
     Bottom
   };
 
+  enum AxisScale {
+    Linear,
+    Logarithmic
+  };
+
   enum AxisLayout {
     FixedInterval,
     BestInterval
@@ -80,7 +86,7 @@ public:
   /// \param location Where on the chart the axis will be drawn.
   /// \param parent The parent object.
   pqChartAxis(AxisLocation location, QObject *parent=0);
-  virtual ~pqChartAxis() {}
+  virtual ~pqChartAxis();
 
   /// \name Pixel to Value Mapping
   //@{
@@ -171,8 +177,20 @@ public:
   /// \return
   ///   The pixel location for the given value.
   /// \sa pqChartAxis::isValid(),
-  ///     pqChartAxis::getValueFor()
+  ///     pqChartAxis::getValueFor(int)
   int getPixelFor(const pqChartValue &value) const;
+
+  /// \brief
+  ///   Maps an index to a pixel.
+  ///
+  /// This method only returns valid pixel coordinates after the
+  /// axis has been laid out.
+  ///
+  /// \param index The index of the axis tick mark.
+  /// \return
+  ///   The pixel location for the given index.
+  /// \sa pqChartAxis::getPixelFor(const pqChartValue &)
+  int getPixelForIndex(int index) const;
 
   /// \brief
   ///   Maps a pixel to a value.
@@ -298,7 +316,7 @@ public:
   /// \brief
   ///   Sets the axis layout type.
   /// \param layout The new layout type.
-  /// \sa pqChartAxis::setInterval(const pqChartValue &),
+  /// \sa pqChartAxis::setNumberOfIntervals(int),
   ///     pqChartAxis::layoutAxis(const QRect &)
   void setLayoutType(AxisLayout layout) {this->Layout = layout;}
 
@@ -307,6 +325,17 @@ public:
   /// \return
   ///   The current axis layout type.
   AxisLayout getLayoutType() const {return this->Layout;}
+
+  /// \brief
+  ///   Sets the axis scale type.
+  /// \param scale The new axis scale type.
+  void setScaleType(AxisScale scale) {this->Scale = scale;}
+
+  /// \brief
+  ///   Gets the axis scale type.
+  /// \return
+  ///   The current axis scale type.
+  AxisScale getScaleType() const {return this->Scale;}
 
   /// \brief
   ///   Sets whether or not extra padding is used for the maximum.
@@ -341,20 +370,21 @@ public:
   bool isMinExtraPadded() const {return this->ExtraMinPadding;}
 
   /// \brief
-  ///   Sets the value interval for the axis.
+  ///   Sets the number of intervals for the axis.
   ///
   /// This method is needed for the fixed interval layout. After
-  /// the interval is set, the fixed layout can be calculated.
+  /// the number of intervals is set, the fixed layout can be
+  /// calculated.
   ///
-  /// \param interval The fixed value interval for the axis.
+  /// \param intervals The number of intervals.
   /// \sa pqChartAxis::setLayoutType(AxisLayout)
-  void setInterval(const pqChartValue &interval);
+  void setNumberOfIntervals(int intervals);
 
   /// \brief
-  ///   Gets the value interval for the axis.
+  ///   Gets the number of intervals on the axis.
   /// \return
-  ///   The value interval for the axis.
-  const pqChartValue &getInterval() const {return this->Interval;}
+  ///   The number of intervals on the axis.
+  int getNumberOfIntervals() const {return this->Intervals;}
 
   /// \brief
   ///   Gets the maximum label width.
@@ -468,16 +498,21 @@ private:
   void calculateMaxWidth();
 
   /// \brief
-  ///   Used to calculate a suitable interval for the axis.
+  ///   Used to calculate a suitable linear interval for the axis.
   ///
   /// The suitable interval layout method uses a list of
   /// predetermined intervals that are mapped to the value range
   /// based on the label precision. The interval will always leave
   /// a bit of padding for the value range. This helps the chart
   /// look better and ensures the data can be displayed.
-  ///
-  /// \sa pqChartAxis::getInterval()
   void calculateInterval();
+
+  /// \brief
+  ///   Used to calculate suitable log intervals for the axis.
+  ///
+  /// The suitable interval layout for a logarithmic scale axis will
+  /// always pad the min and max to a power of ten.
+  void calculateLogInterval();
 
   /// \brief
   ///   Used to set up a fixed interval layout for the axis.
@@ -490,36 +525,43 @@ private:
   /// be set. The tick mark for the intervals without a label will
   /// be drawn shorter than those with a label.
   ///
-  /// \sa pqChartAxis::setInterval(const pqChartValue &)
+  /// \sa pqChartAxis::setNumberOfIntervals(int)
   void calculateFixedLayout();
+
+  /// Cleans up the allocated axis tick mark data.
+  void cleanData();
 
 public:
   QRect Bounds;             ///< Stores the axis bounding rectangle.
 
 private:
   AxisLocation Location;    ///< Stores the location of the axis.
+  AxisScale Scale;          ///< Stores the axis type.
   AxisLayout Layout;        ///< Stores the axis layout type.
   AxisGridColor GridType;   ///< Stores the grid color type.
   QColor Axis;              ///< Stores the axis color.
   QColor Grid;              ///< Stores the grid color.
   QFont Font;               ///< Stores the font for the axis.
+  pqChartAxisData *Data;    ///< Used to draw the axis and grid.
   const pqChartAxis *AtMin; ///< A pointer to the axis at the minimum.
   const pqChartAxis *AtMax; ///< A pointer to the axis at the maximum.
   pqChartValue ValueMin;    ///< Stores the minimum value.
   pqChartValue ValueMax;    ///< Stores the maximum value.
   pqChartValue TrueMin;     ///< Stores the true minimum value.
   pqChartValue TrueMax;     ///< Stores the true maximum value.
-  pqChartValue Interval;    ///< Stores the value interval.
+  int Intervals;            ///< Stores the number of intervals.
   int PixelMin;             ///< Stores the minimum pixel.
   int PixelMax;             ///< Stores the maximum pixel.
   int Precision;            ///< Stores axis label precision.
   int WidthMax;             ///< Stores the maximum label width.
-  int Count;                ///< Stores the number of intervals.
+  int Count;                ///< Stores the number of intervals showing.
   int Skip;                 ///< Used when drawing small tick marks.
   bool Visible;             ///< True if the axis should be drawn.
   bool GridVisible;         ///< True if the axis grid should be drawn.
   bool ExtraMaxPadding;     ///< Used for best interval layout.
   bool ExtraMinPadding;     ///< Used for best interval layout.
+
+  static double MinLogValue; ///< Stores the log scale minimum.
 };
 
 #endif

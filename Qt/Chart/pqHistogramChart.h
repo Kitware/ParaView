@@ -80,7 +80,7 @@ public:
   ///
   /// The number of items in the value list determines the number
   /// of bars on the histogram chart. The horizontal axis is set up
-  /// based on the \c min and \c interval parameters. The interval
+  /// based on the \c min and \c max parameters. The interval
   /// value on the horizontal axis is calculated using the minumum,
   /// the maximum, and the number of values in the list. The
   /// limits of the vertical axis are determined from the minimum
@@ -88,7 +88,7 @@ public:
   ///
   /// \param values A list of values. One for each histogram bar.
   /// \param min The minimum value for the histogram axis.
-  /// \param interval The interval for the histogram axis.
+  /// \param max The maximum value for the histogram axis.
   /// \sa pqHistogramChart::setAxes(pqChartAxis *, pqChartAxis *)
   void setData(const pqChartValueList &values, const pqChartValue &min,
       const pqChartValue &max);

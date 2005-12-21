@@ -98,6 +98,12 @@ public:
     ValueDrag
   };
 
+  enum AxisName {
+    HorizontalAxis,
+    HistogramAxis,
+    LineChartAxis
+  };
+
 public:
   /// \brief
   ///   Creates an interactive histogram chart.
@@ -141,6 +147,13 @@ public:
   /// \return
   ///   A pointer to the line chart object.
   pqLineChart *getLineChart() {return this->LineChart;}
+
+  /// \brief
+  ///   Gets one of the chart axes.
+  /// \param name The name of the axis to get.
+  /// \return
+  ///   A pointer to the specified axis.
+  pqChartAxis *getAxis(AxisName name);
 
   /// \brief
   ///   Gets the zoom/pan handler for the widget.

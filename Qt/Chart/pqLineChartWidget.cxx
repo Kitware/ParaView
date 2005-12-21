@@ -485,7 +485,7 @@ void pqLineChartWidget::wheelEvent(QWheelEvent *e)
   e->accept();
 }
 
-void pqLineChartWidget::resizeEvent(QResizeEvent *e)
+void pqLineChartWidget::resizeEvent(QResizeEvent *)
 {
   if(this->ZoomPan)
     this->ZoomPan->updateContentSize();

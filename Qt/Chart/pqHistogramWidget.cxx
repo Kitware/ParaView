@@ -224,6 +224,24 @@ void pqHistogramWidget::setBinColorScheme(pqHistogramColor *scheme)
     this->Histogram->setBinColorScheme(scheme);
 }
 
+pqChartAxis *pqHistogramWidget::getAxis(AxisName name)
+{
+  if(name == pqHistogramWidget::HorizontalAxis)
+    {
+    return this->XAxis;
+    }
+  else if(name == pqHistogramWidget::HistogramAxis)
+    {
+    return this->YAxis;
+    }
+  else if(name == pqHistogramWidget::LineChartAxis)
+    {
+    return this->FAxis;
+    }
+
+  return 0;
+}
+
 void pqHistogramWidget::setInteractMode(InteractMode mode)
 {
   if(mode != this->Interact)
@@ -637,7 +655,6 @@ void pqHistogramWidget::mousePressEvent(QMouseEvent *e)
       }
     else if(this->Interact == pqHistogramWidget::ValueMove)
       {
-      pqHistogramSelection range;
       bool valid = this->Histogram->getValueRangeAt(point.x(), point.y(), range);
       if(valid)
         this->LastValueX = point.x();
@@ -1007,7 +1024,7 @@ void pqHistogramWidget::wheelEvent(QWheelEvent *e)
   e->accept();
 }
 
-void pqHistogramWidget::resizeEvent(QResizeEvent *e)
+void pqHistogramWidget::resizeEvent(QResizeEvent *)
 {
   if(this->ZoomPan)
     this->ZoomPan->updateContentSize();
