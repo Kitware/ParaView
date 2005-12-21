@@ -47,7 +47,7 @@ bool pqComboBoxEventTranslator::translateEvent(QObject* Object, QEvent* Event, b
   return true;
 }
 
-void pqComboBoxEventTranslator::onDestroyed(QObject* Object)
+void pqComboBoxEventTranslator::onDestroyed(QObject* /*Object*/)
 {
   this->CurrentObject = 0;
 }

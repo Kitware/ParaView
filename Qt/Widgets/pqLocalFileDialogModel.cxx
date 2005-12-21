@@ -45,8 +45,8 @@ public:
   }
 
   FileInfo(const QString& Label, const QString& FilePath) :
-    label(Label),
-    QFileInfo(FilePath)
+    QFileInfo(FilePath),
+    label(Label)
   {
   }
 
@@ -177,7 +177,7 @@ public:
     return false;
   }
 
-  int columnCount(const QModelIndex& Index) const
+  int columnCount(const QModelIndex& /*Index*/) const
   {
     return 3;
   }
@@ -266,7 +266,7 @@ public:
     return true; // This is the top-level node ...
   }
 
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const
+  QVariant headerData(int section, Qt::Orientation /*orientation*/, int role) const
   {
     switch(role)
       {
@@ -347,7 +347,7 @@ public:
     return file.isDir();
   }
 
-  virtual int columnCount(const QModelIndex& parent) const
+  virtual int columnCount(const QModelIndex& /*parent*/) const
   {
     return 1;
   }
@@ -384,7 +384,7 @@ public:
     return QVariant();
   }
   
-  virtual QModelIndex index(int row, int column, const QModelIndex& parent) const
+  virtual QModelIndex index(int row, int column, const QModelIndex& /*parent*/) const
   {
     return createIndex(row, column);
   }
