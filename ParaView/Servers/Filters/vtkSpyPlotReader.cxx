@@ -52,7 +52,7 @@
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.38");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.39");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -243,7 +243,7 @@ private:
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.38");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.39");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -1831,8 +1831,15 @@ public:
     int total_num_blocks = 0;
     vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator fileIterator;
     fileIterator = this->FileMap->Files.begin();
-    for ( ;fileIterator != this->FileMap->Files.end(); fileIterator++)
+    int numFiles = this->FileMap->Files.size();
+    int cur_file = 1;
+    int progressInterval = numFiles/20 + 1;
+    for ( ;fileIterator != this->FileMap->Files.end(); fileIterator++, cur_file++)
       {
+      if ( !(cur_file%progressInterval) )
+        {
+        this->Parent->UpdateProgress(0.2 * static_cast<double>(cur_file)/numFiles);
+        }
       vtkSpyPlotUniReader* reader = this->FileMap->GetReader(fileIterator, 
         this->Parent);
       reader->ReadInformation();
@@ -1976,6 +1983,8 @@ public:
     vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator fileIterator;
     fileIterator = this->FileMap->Files.begin();
     int file_index = 0;
+    int numFiles = this->FileEnd - this->FileStart + 1;
+    int progressInterval = numFiles/ 20 + 1;
     for ( ;fileIterator != this->FileMap->Files.end() && file_index <= this->FileEnd; 
       fileIterator++, file_index++)
       {
@@ -1983,7 +1992,10 @@ public:
         {
         continue;
         }
-      
+      if ( !(file_index % progressInterval) )
+        {
+        this->Parent->UpdateProgress(0.2 * (file_index+1.0)/numFiles);
+        }
       vtkSpyPlotUniReader* reader = this->FileMap->GetReader(fileIterator, 
         this->Parent);
       reader->ReadInformation();
@@ -2740,7 +2752,7 @@ int vtkSpyPlotReader::RequestData(
     if (!(current_block_number % progressInterval))
       {
       this->UpdateProgress(
-        static_cast<double>(current_block_number)/total_num_of_blocks * 0.5);
+        static_cast<double>(0.2 + current_block_number)/total_num_of_blocks * 0.4);
       }
     block=blockIterator->GetBlock();
     uniReader=blockIterator->GetUniReader();
@@ -3006,8 +3018,8 @@ int vtkSpyPlotReader::RequestData(
     {
     if ( !(current_block_number % progressInterval) )
       {
-      this->UpdateProgress(0.5 * 
-        (1.0 + static_cast<double>(current_block_number)/total_num_of_blocks));
+      this->UpdateProgress(0.6 + 
+        0.4 * static_cast<double>(current_block_number)/total_num_of_blocks);
       }
     block=blockIterator->GetBlock();
     int numFields=blockIterator->GetNumberOfFields();
