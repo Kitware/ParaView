@@ -40,7 +40,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.121");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.122");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -112,16 +112,15 @@ vtkKWRenderWidget::vtkKWRenderWidget()
 
   // Get the camera, use it in overlay renderer too
 
-  vtkCamera *cam = this->GetRenderer()->GetActiveCamera();
+  vtkCamera *cam = this->Renderer->GetActiveCamera();
   if (cam)
     {
     cam->ParallelProjectionOn();
     }
-  
-  vtkRenderer *overlay_ren = this->GetOverlayRenderer();
-  if (overlay_ren)
+
+  if (this->OverlayRenderer)
     {
-    overlay_ren->SetActiveCamera(cam);
+    this->OverlayRenderer->SetActiveCamera(cam);
     }
 
   // Current state (render mode, in expose, printing, etc)
