@@ -35,4 +35,5 @@ INCLUDE_DIRECTORIES(
   ${ParaQ_SOURCE_DIR}/ParaView/Utilities/VTKClientServer
 )
 
-
+CONFIGURE_FILE("{ParaQ_SOURCE_DIR}/Qt/CTestCustom.ctest.in
+  ${ParaQ_BINARY_DIR}/Qt/CTestCustom.ctest
