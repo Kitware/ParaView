@@ -842,7 +842,6 @@ void pqChartAxis::calculateMaxWidth()
   // values can be converted to floats.
   int length1 = 0;
   int length2 = 0;
-  pqChartValue value = this->ValueMax;
   if(this->Scale == pqChartAxis::Logarithmic &&
       this->ValueMin.getType() == pqChartValue::IntValue)
     {
