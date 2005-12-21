@@ -41,7 +41,9 @@ class pqMainWindow :
 
 public:
   pqMainWindow();
-  ~pqMainWindow();
+  virtual ~pqMainWindow();
+
+  virtual bool eventFilter(QObject* watched, QEvent* e);
 
   /// Compares the contents of the window with the given reference image, returns true iff they "match" within some tolerance
   bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
@@ -62,12 +64,16 @@ private:
   QMenu* FiltersMenu;
   pqObjectInspectorWidget *Inspector;
   QDockWidget *InspectorDock;
+  QAction *InspectorDockAction;
   pqPipelineListWidget *PipelineList;
   QDockWidget *PipelineDock;
+  QAction *PipelineDockAction;
   QDockWidget *ChartDock;
+  QAction *ChartDockAction;
   pqMultiViewFrame* ActiveView;
   QTreeView *ElementInspectorWidget;
   QDockWidget *ElementInspectorDock;
+  QAction *ElementDockAction;
 
   vtkEventQtSlotConnect* VTKConnector;
 

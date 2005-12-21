@@ -86,12 +86,16 @@ pqMainWindow::pqMainWindow() :
   Pipeline(0),
   Inspector(0),
   InspectorDock(0),
+  InspectorDockAction(0),
   PipelineList(0),
   PipelineDock(0),
+  PipelineDockAction(0),
   ChartDock(0),
+  ChartDockAction(0),
   ActiveView(0),
   ElementInspectorWidget(0),
-  ElementInspectorDock(0)
+  ElementInspectorDock(0),
+  ElementDockAction(0)
 {
   this->setObjectName("mainWindow");
   this->setWindowTitle(QByteArray("ParaQ Client") + QByteArray(" ") + QByteArray(QT_CLIENT_VERSION));
@@ -99,7 +103,7 @@ pqMainWindow::pqMainWindow() :
   this->menuBar() << pqSetName("menuBar");
 
   // File menu.
-  QMenu* const fileMenu = this->menuBar()->addMenu(tr("File"))
+  QMenu* const fileMenu = this->menuBar()->addMenu(tr("&File"))
     << pqSetName("fileMenu");
   
   fileMenu->addAction(tr("New..."))
@@ -118,9 +122,13 @@ pqMainWindow::pqMainWindow() :
     << pqSetName("SaveScreenshot")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onFileSaveScreenshot())); 
   
-  fileMenu->addAction(tr("Quit"))
-    << pqSetName("Quit")
+  fileMenu->addAction(tr("E&xit"))
+    << pqSetName("Exit")
     << pqConnect(SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));
+
+  // View menu
+  QMenu* viewMenu = this->menuBar()->addMenu(tr("&View"))
+    << pqSetName("viewMenu");
 
   // Server menu.
   QMenu* const serverMenu = this->menuBar()->addMenu(tr("Server"))
@@ -146,8 +154,8 @@ pqMainWindow::pqMainWindow() :
   QObject::connect(this, SIGNAL(serverChanged(pqServer*)), SLOT(onUpdateSourcesFiltersMenu(pqServer*)));
 
   // Tools menu.
-  QMenu* toolsMenu = this->menuBar()->addMenu(tr("Tools")) << pqSetName("toolsMenu");
-  toolsMenu->addAction(tr("Link Editor..."))
+  QMenu* toolsMenu = this->menuBar()->addMenu(tr("&Tools")) << pqSetName("toolsMenu");
+  toolsMenu->addAction(tr("&Link Editor..."))
     << pqConnect(SIGNAL(triggered(bool)), this, SLOT(onOpenLinkEditor()));
 
   // Test menu.
@@ -171,10 +179,10 @@ pqMainWindow::pqMainWindow() :
 #endif // PARAQ_EMBED_PYTHON
 
   // Help menu.
-  QMenu* const helpMenu = this->menuBar()->addMenu(tr("Help"))
+  QMenu* const helpMenu = this->menuBar()->addMenu(tr("&Help"))
     << pqSetName("helpMenu");
   
-  helpMenu->addAction(QString(tr("About %1 %2")).arg("ParaQ").arg(QT_CLIENT_VERSION))
+  helpMenu->addAction(QString(tr("&About %1 %2")).arg("ParaQ").arg(QT_CLIENT_VERSION))
     << pqSetName("About")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onHelpAbout()));
  
@@ -270,6 +278,40 @@ pqMainWindow::pqMainWindow() :
     this->addDockWidget(Qt::BottomDockWidgetArea, this->ElementInspectorDock);
     }
 
+  // Set up the view menu items for the dock windows.
+  this->PipelineDockAction = viewMenu->addAction(tr("&Pipeline Inspector"))
+    << pqSetName("Pipeline");
+  this->PipelineDockAction->setCheckable(true);
+  this->PipelineDockAction->setChecked(true);
+  this->PipelineDockAction << pqConnect(SIGNAL(triggered(bool)),
+    this->PipelineDock, SLOT(setVisible(bool)));
+  this->PipelineDock->installEventFilter(this);
+
+  this->InspectorDockAction = viewMenu->addAction(tr("&Object Inspector"))
+    << pqSetName("Inspector");
+  this->InspectorDockAction->setCheckable(true);
+  this->InspectorDockAction->setChecked(true);
+  this->InspectorDockAction << pqConnect(SIGNAL(triggered(bool)),
+    this->InspectorDock, SLOT(setVisible(bool)));
+  this->InspectorDock->installEventFilter(this);
+
+  this->ChartDockAction = viewMenu->addAction(
+    QIcon(":pqChart/pqHistogram22.png"), tr("&Chart View"))
+    << pqSetName("Chart");
+  this->ChartDockAction->setCheckable(true);
+  this->ChartDockAction->setChecked(true);
+  this->ChartDockAction << pqConnect(SIGNAL(triggered(bool)),
+    this->ChartDock, SLOT(setVisible(bool)));
+  this->ChartDock->installEventFilter(this);
+
+  this->ElementDockAction = viewMenu->addAction(tr("&Element Inspector"))
+    << pqSetName("Element");
+  this->ElementDockAction->setCheckable(true);
+  this->ElementDockAction->setChecked(true);
+  this->ElementDockAction << pqConnect(SIGNAL(triggered(bool)),
+    this->ElementInspectorDock, SLOT(setVisible(bool)));
+  this->ElementInspectorDock->installEventFilter(this);
+
   this->setServer(0);
   this->Adaptor = new pqSMAdaptor;
 
@@ -304,6 +346,32 @@ pqMainWindow::~pqMainWindow()
   delete this->PropertyToolbar;
   delete this->CurrentServer;
   delete this->Adaptor;
+}
+
+bool pqMainWindow::eventFilter(QObject* watched, QEvent* e)
+{
+  if(e->type() == QEvent::Hide || e->type() == QEvent::Show)
+    {
+    bool checked = e->type() == QEvent::Show;
+    if(watched == this->PipelineDock)
+      {
+      this->PipelineDockAction->setChecked(checked);
+      }
+    else if(watched == this->InspectorDock)
+      {
+      this->InspectorDockAction->setChecked(checked);
+      }
+    else if(watched == this->ChartDock)
+      {
+      this->ChartDockAction->setChecked(checked);
+      }
+    else if(watched == this->ElementInspectorDock)
+      {
+      this->ElementDockAction->setChecked(checked);
+      }
+    }
+
+  return QMainWindow::eventFilter(watched, e);
 }
 
 void pqMainWindow::setServer(pqServer* Server)
