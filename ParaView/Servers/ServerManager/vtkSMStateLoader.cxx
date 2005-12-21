@@ -23,7 +23,7 @@
 #include <vtkstd/map>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.1");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.2");
 
 struct vtkSMStateLoaderInternals
 {
@@ -96,9 +96,9 @@ vtkSMProxy* vtkSMStateLoader::NewProxy(int id)
       this->Internal->CreatedProxies[id] = proxy;
       if (!proxy->LoadState(currentElement, this))
         {
-        vtkSMStateLoaderInternals::ProxyMapType::iterator iter =
+        vtkSMStateLoaderInternals::ProxyMapType::iterator iter2 =
           this->Internal->CreatedProxies.find(id);
-        this->Internal->CreatedProxies.erase(iter);
+        this->Internal->CreatedProxies.erase(iter2);
         proxy->Delete();
         return 0;
         }
