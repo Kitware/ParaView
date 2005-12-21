@@ -64,7 +64,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.467");
+vtkCxxRevisionMacro(vtkPVSource, "1.468");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -1171,7 +1171,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
         << "Time = [smGet Sources " << this->GetName()
         << " TimestepValues "
         << "[smGet Sources " << this->GetName()
-        << " TimeStep] 13.5f]"
+        << " TimeStep] 1.3e]"
         << ends;
       annot->SetCornerText(cornerText.str(), 1);
       delete[] cornerText.str();
