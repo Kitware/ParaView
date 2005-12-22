@@ -69,7 +69,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.59");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.59.2.1");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 #define VTK_PV_TOOLBARS_ANIMATION_LABEL "Animation"
@@ -1031,7 +1031,7 @@ void vtkPVAnimationScene::SetAnimationTime(double time)
     if (sourceProxy)
       {
       // Data information needs to be updated.
-      sourceProxy->MarkConsumersAsModified();
+      sourceProxy->InvalidateDataInformation(1);
       sourceProxy->GetDataInformation();
       }
     }
