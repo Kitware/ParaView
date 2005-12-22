@@ -143,6 +143,15 @@ public:
   // NewProxy() will fail.
   int ProxyElementExists(const char* groupName,  const char* proxyName);
 
+//BTX
+  struct RegisteredProxyInformation
+  {
+    vtkSMProxy* Proxy;
+    const char* GroupName;
+    const char* ProxyName;
+  };
+//ETX
+
 protected:
   vtkSMProxyManager();
   ~vtkSMProxyManager();
