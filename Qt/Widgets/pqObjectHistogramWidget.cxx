@@ -15,6 +15,7 @@
 #include <pqHistogramWidget.h>
 
 #include <QComboBox>
+#include <QLabel>
 #include <QSpinBox>
 #include <QVBoxLayout>
 
@@ -224,12 +225,18 @@ pqObjectHistogramWidget::pqObjectHistogramWidget(QWidget *parent) :
   QWidget(parent),
   Implementation(new pqImplementation())
 {
+  QLabel* const bin_label = new QLabel(tr("Bins:"));
+  bin_label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+  this->Implementation->BinCountSpinBox.setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
   QHBoxLayout* const hbox = new QHBoxLayout();
   hbox->setMargin(0);
   hbox->addWidget(&this->Implementation->Variables);
+  hbox->addWidget(bin_label);
   hbox->addWidget(&this->Implementation->BinCountSpinBox);
 
-  QVBoxLayout* const vbox = new QVBoxLayout(this);
+  QVBoxLayout* const vbox = new QVBoxLayout();
   vbox->setMargin(0);
   vbox->addLayout(hbox);
   vbox->addWidget(&this->Implementation->HistogramWidget);
@@ -237,6 +244,8 @@ pqObjectHistogramWidget::pqObjectHistogramWidget(QWidget *parent) :
   this->Implementation->BinCountSpinBox.setMinimum(2);
   this->Implementation->BinCountSpinBox.setMaximum(256);
   this->Implementation->BinCountSpinBox.setValue(this->Implementation->BinCount);
+  
+  this->setLayout(vbox);
   
   QObject::connect(
     &this->Implementation->Variables,
