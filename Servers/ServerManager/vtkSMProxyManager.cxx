@@ -30,6 +30,23 @@
 
 #include "vtkSMProxyManagerInternals.h"
 
+#if 0 // for debugging
+class vtkSMProxyRegObserver : public vtkCommand
+{
+public:
+  virtual void Execute(vtkObject*, unsigned long event, void* data)
+    {
+      vtkSMProxyManager::RegisteredProxyInformation* info =
+        (vtkSMProxyManager::RegisteredProxyInformation*)data;
+      cout << info->Proxy 
+           << " " << vtkCommand::GetStringFromEventId(event)
+           << " " << info->GroupName
+           << " " << info->ProxyName
+           << endl;
+    }
+};
+#endif
+
 //*****************************************************************************
 class vtkSMProxyManagerObserver : public vtkCommand
 {
@@ -60,7 +77,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.29");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.30");
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -68,6 +85,12 @@ vtkSMProxyManager::vtkSMProxyManager()
   this->Internals = new vtkSMProxyManagerInternals;
   this->Observer = vtkSMProxyManagerObserver::New();
   this->Observer->SetTarget(this);
+
+#if 0 // for debugging
+  vtkSMProxyRegObserver* obs = new vtkSMProxyRegObserver;
+  this->AddObserver(vtkCommand::RegisterEvent, obs);
+  this->AddObserver(vtkCommand::UnRegisterEvent, obs);
+#endif
 }
 
 //---------------------------------------------------------------------------
@@ -395,6 +418,13 @@ void vtkSMProxyManager::UnRegisterProxy(const char* group, const char* name)
       it->second.find(name);
     if (it2 != it->second.end())
       {
+      RegisteredProxyInformation info;
+      info.Proxy = it2->second.Proxy;
+      info.GroupName = it->first.c_str();
+      info.ProxyName = it2->first.c_str();
+      
+      this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
+
       it->second.erase(it2);
       }
     }
@@ -411,9 +441,17 @@ void vtkSMProxyManager::UnRegisterProxy(const char* name)
       it->second.find(name);
     if (it2 != it->second.end())
       {
+      RegisteredProxyInformation info;
+      info.Proxy = it2->second.Proxy;
+      info.GroupName = it->first.c_str();
+      info.ProxyName = it2->first.c_str();
+      
+      this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
+
       it->second.erase(it2);
       }
     }
+
 }
 
 //---------------------------------------------------------------------------
@@ -431,9 +469,14 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
     this->Observer);
   obj.UpdateObserverTag = proxy->AddObserver(vtkCommand::UpdateEvent,
     this->Observer);
-
   // Note, these observer will be removed in the destructor of obj.
 
+  RegisteredProxyInformation info;
+  info.Proxy = proxy;
+  info.GroupName = groupname;
+  info.ProxyName = name;
+
+  this->InvokeEvent(vtkCommand::RegisterEvent, &info);
 }
 
 //---------------------------------------------------------------------------
