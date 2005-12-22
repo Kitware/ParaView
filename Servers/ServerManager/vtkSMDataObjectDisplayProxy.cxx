@@ -35,9 +35,8 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.7");
 
-int vtkSMDataObjectDisplayProxy::UseCache = 0;
 
 //-----------------------------------------------------------------------------
 vtkSMDataObjectDisplayProxy::vtkSMDataObjectDisplayProxy()
@@ -93,33 +92,6 @@ vtkSMDataObjectDisplayProxy::~vtkSMDataObjectDisplayProxy()
   this->OpacityFunctionProxy = 0;
   this->ColorTransferFunctionProxy = 0;
   this->GeometryInformation->Delete();
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMDataObjectDisplayProxy::SetUseCache(int useCache)
-{
-  vtkSMDataObjectDisplayProxy::UseCache = useCache;
-}
-
-//-----------------------------------------------------------------------------
-int vtkSMDataObjectDisplayProxy::GetUseCache()
-{
-  return vtkSMDataObjectDisplayProxy::UseCache;
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMDataObjectDisplayProxy::MarkModified(vtkSMProxy* modifiedProxy)
-{
-  this->Superclass::MarkModified(modifiedProxy);
-
-  // Do not invalidate geometry if MarkModified() was called by self.
-  // A lot of the changes to the display proxy do not require
-  // invalidating geometry. Those that do should call InvalidateGeometry()
-  // explicitly.
-  if (modifiedProxy != this)
-    {
-    this->InvalidateGeometryInternal(this->UseCache);
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1103,12 +1075,6 @@ void vtkSMDataObjectDisplayProxy::CacheUpdate(int idx, int total)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDataObjectDisplayProxy::InvalidateGeometry()
-{
-  this->InvalidateGeometryInternal(0);
-}
-
-//-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::InvalidateGeometryInternal(int useCache)
 {
   this->VolumeGeometryIsValid = 0;
@@ -1121,6 +1087,7 @@ void vtkSMDataObjectDisplayProxy::InvalidateGeometryInternal(int useCache)
       vtkSMProperty *p = 
         this->UpdateSuppressorProxy->GetProperty("RemoveAllCaches");
       p->Modified();
+      this->UpdateSuppressorProxy->UpdateVTKObjects();
       }
     }
 }

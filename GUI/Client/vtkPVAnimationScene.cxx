@@ -70,7 +70,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.62");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.63");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 #define VTK_PV_TOOLBARS_ANIMATION_LABEL "Animation"
@@ -1029,14 +1029,8 @@ void vtkPVAnimationScene::SetAnimationTime(double time)
     if (sourceProxy)
       {
       // Data information needs to be updated.
-
-      // Tell the displays the update are calling from animation and
-      // that they should use their cache if possible.
-      int prev = vtkSMDataObjectDisplayProxy::GetUseCache();
-      vtkSMDataObjectDisplayProxy::SetUseCache(1);
-      sourceProxy->MarkModified(0);
+      sourceProxy->InvalidateDataInformation(1);
       sourceProxy->GetDataInformation();
-      vtkSMDataObjectDisplayProxy::SetUseCache(prev);
       }
     }
 }

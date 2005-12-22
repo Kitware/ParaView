@@ -39,9 +39,33 @@ public:
   virtual void AddInput(vtkSMSourceProxy* input, const char* method, 
     int hasMultipleInputs) = 0;
 
+  // Description:
+  // Chains to superclass and calls InvalidateGeometryInternal(UseCache).
+  virtual void MarkModified(vtkSMProxy* modifiedProxy); 
+
+  // Description:
+  // Invalidates Geometry. Results in removal of any cached geometry. Also,
+  // marks the current geometry as invalid, thus a subsequent call to Update
+  // will result in call to ForceUpdate on the UpdateSuppressor(s), if any.
+  virtual void InvalidateGeometry();
+
+  // Description:
+  // UseCache tells the display to whether to try to use geometry cache
+  // (when true) or not (when false) when invalidating geometry. If
+  // UseCache is true, cached geometry is not marked as invalid (and
+  // is not updated on server).
+  static void SetUseCache(int useCache);
+  static int GetUseCache();
+
 protected:
   vtkSMConsumerDisplayProxy();
   ~vtkSMConsumerDisplayProxy();
+
+  // Invalidate geometry. If useCache is true, do not invalidate
+  // cached geometry
+  virtual void InvalidateGeometryInternal(int useCache) {};
+
+  static int UseCache;
   
 private:
   vtkSMConsumerDisplayProxy(const vtkSMConsumerDisplayProxy&); // Not implemented.

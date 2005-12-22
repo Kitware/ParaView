@@ -70,10 +70,6 @@ public:
   virtual void Update();
   
   // Description:
-  // Marks for Update.
-  virtual void InvalidateGeometry();
-
-  // Description:
   // Chains to superclass and calls InvalidateGeometry().
   virtual void MarkModified(vtkSMProxy* modifiedProxy);
 
@@ -88,6 +84,10 @@ public:
 protected:
   vtkSMXYPlotDisplayProxy();
   ~vtkSMXYPlotDisplayProxy();
+
+  // Description:
+  // Marks for Update.
+  virtual void InvalidateGeometryInternal(int useCache);
   
   virtual void CreateVTKObjects(int numObjects);
 

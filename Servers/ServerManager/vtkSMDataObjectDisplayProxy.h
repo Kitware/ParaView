@@ -61,12 +61,6 @@ public:
   virtual void Update();
   
   // Description:
-  // Invalidates Geometry. Results in removal of any cached geometry. Also,
-  // marks the current geometry as invalid, thus a subsequent call to Update
-  // will result in call to ForceUpdate on the UpdateSuppressor(s), if any.
-  virtual void InvalidateGeometry();
-
-  // Description:
   // Called when the display is added/removed to/from a RenderModule.
   virtual void AddToRenderModule(vtkSMRenderModuleProxy*);
   virtual void RemoveFromRenderModule(vtkSMRenderModuleProxy*);
@@ -121,10 +115,6 @@ public:
   // as the input (using property "Input") on the argument
   // onProxy. 
   void SetInputAsGeometryFilter(vtkSMProxy* onProxy);
-
-  // Description:
-  // Chains to superclass and calls InvalidateGeometry().
-  virtual void MarkModified(vtkSMProxy* modifiedProxy); 
 
   //BTX
   // Interpolation types.
@@ -249,14 +239,6 @@ public:
   void SetImmediateModeRenderingCM(int f);
   int GetImmediateModeRenderingCM();
 
-  // Description:
-  // UseCache tells the display to whether to try to use geometry cache
-  // (when true) or not (when false) when invalidating geometry. If
-  // UseCache is true, cached geometry is not marked as invalid (and
-  // is not updated on server).
-  static void SetUseCache(int useCache);
-  static int GetUseCache();
-
 protected:
   vtkSMDataObjectDisplayProxy();
   ~vtkSMDataObjectDisplayProxy();
@@ -280,8 +262,6 @@ protected:
   virtual void CreateVTKObjects(int numObjects);
 
   virtual void GatherGeometryInformation();
-
-  static int UseCache;
 
 //BTX
   // This is the least intrusive way of giving vtkPVComparativeVisManager
