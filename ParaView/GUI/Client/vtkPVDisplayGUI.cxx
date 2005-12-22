@@ -96,7 +96,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.54");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.55");
 
 //----------------------------------------------------------------------------
 
@@ -1765,7 +1765,7 @@ void vtkPVDisplayGUI::DrawVolume()
     vtkSMDataObjectDisplayProxy::VOLUME);
 
   this->GetPVRenderView()->GetRenderWindow()->AddObserver( 
-    vtkCommand::StartEvent, this->VRObserver );
+    vtkCommand::StartEvent, this->VRObserver, 1.0f );
   
   if ( this->GetPVRenderView() )
     {
