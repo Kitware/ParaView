@@ -279,7 +279,8 @@ pqMainWindow::pqMainWindow() :
     }
 
   // Set up the view menu items for the dock windows.
-  this->PipelineDockAction = viewMenu->addAction(tr("&Pipeline Inspector"))
+  this->PipelineDockAction = viewMenu->addAction(
+    QIcon(":pqWidgets/pqPipelineList22.png"), tr("&Pipeline Inspector"))
     << pqSetName("Pipeline");
   this->PipelineDockAction->setCheckable(true);
   this->PipelineDockAction->setChecked(true);

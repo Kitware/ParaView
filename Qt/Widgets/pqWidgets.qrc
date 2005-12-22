@@ -11,6 +11,7 @@
         <file alias="pqLinkIn16.png">Resources/pqLinkIn16.png</file>
         <file alias="pqLinkOut16.png">Resources/pqLinkOut16.png</file>
         <file alias="pqMerge16.png">Resources/pqMerge16.png</file>
+        <file alias="pqPipelineList22.png">Resources/pqPipelineList22.png</file>
         <file alias="pqServer16.png">Resources/pqServer16.png</file>
         <file alias="pqServer22.png">Resources/pqServer22.png</file>
         <file alias="pqServer32.png">Resources/pqServer32.png</file>

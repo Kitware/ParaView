@@ -2,6 +2,7 @@
 #include "pqPipelineServer.h"
 
 #include "pqPipelineObject.h"
+#include "pqPipelineWindow.h"
 #include <QHash>
 #include <QList>
 
@@ -13,7 +14,7 @@ public:
   ~pqPipelineServerInternal() {}
 
   QList<pqPipelineObject *> Sources;
-  QList<pqPipelineObject *> Windows;
+  QList<pqPipelineWindow *> Windows;
   QHash<vtkSMProxy *, pqPipelineObject *> Objects;
 };
 
@@ -66,12 +67,12 @@ pqPipelineObject *pqPipelineServer::AddFilter(vtkSMProxy *filter)
   return object;
 }
 
-pqPipelineObject *pqPipelineServer::AddWindow(QWidget *window)
+pqPipelineWindow *pqPipelineServer::AddWindow(QWidget *window)
 {
-  pqPipelineObject *object = 0;
+  pqPipelineWindow *object = 0;
   if(this->Internal && window)
     {
-    object = new pqPipelineObject(window);
+    object = new pqPipelineWindow(window);
     if(object)
       this->Internal->Windows.append(object);
     }
@@ -92,11 +93,11 @@ pqPipelineObject *pqPipelineServer::GetObject(vtkSMProxy *proxy) const
   return 0;
 }
 
-pqPipelineObject *pqPipelineServer::GetWindow(QWidget *window) const
+pqPipelineWindow *pqPipelineServer::GetWindow(QWidget *window) const
 {
   if(this->Internal)
     {
-    QList<pqPipelineObject *>::Iterator iter = this->Internal->Windows.begin();
+    QList<pqPipelineWindow *>::Iterator iter = this->Internal->Windows.begin();
     for( ; iter != this->Internal->Windows.end(); ++iter)
       {
       if(*iter && (*iter)->GetWidget() == window)
@@ -119,18 +120,10 @@ bool pqPipelineServer::RemoveObject(vtkSMProxy *proxy)
       this->Internal->Objects.erase(iter);
       if(object && object->GetType() == pqPipelineObject::Source)
         {
-        QList<pqPipelineObject *>::Iterator jter =
-            this->Internal->Sources.begin();
-        for( ; jter != this->Internal->Sources.end(); ++jter)
-          {
-          if(*jter && (*jter)->GetProxy() == proxy)
-            {
-            this->Internal->Sources.erase(jter);
-            break;
-            }
-          }
+        this->Internal->Sources.removeAll(object);
         }
 
+      delete object;
       return true;
       }
     }
@@ -142,13 +135,37 @@ bool pqPipelineServer::RemoveWindow(QWidget *window)
 {
   if(this->Internal && window)
     {
-    QList<pqPipelineObject *>::Iterator iter = this->Internal->Windows.begin();
+    QList<pqPipelineWindow *>::Iterator iter = this->Internal->Windows.begin();
     for( ; iter != this->Internal->Windows.end(); ++iter)
       {
       if(*iter && (*iter)->GetWidget() == window)
         {
         delete *iter;
         this->Internal->Windows.erase(iter);
+
+        // Clean up all objects connected with the window.
+        QHash<vtkSMProxy *, pqPipelineObject *>::Iterator jter =
+            this->Internal->Objects.begin();
+        while(jter != this->Internal->Objects.end())
+          {
+          if(*jter && (*jter)->GetParent() &&
+              (*jter)->GetParent()->GetWidget() == window)
+            {
+            pqPipelineObject *object = *jter;
+            jter = this->Internal->Objects.erase(jter);
+            if(object->GetType() == pqPipelineObject::Source)
+              {
+              this->Internal->Sources.removeAll(object);
+              }
+
+            delete object;
+            }
+          else
+            {
+            ++jter;
+            }
+          }
+
         return true;
         }
       }
@@ -178,7 +195,7 @@ int pqPipelineServer::GetWindowCount() const
   return 0;
 }
 
-pqPipelineObject *pqPipelineServer::GetWindow(int index) const
+pqPipelineWindow *pqPipelineServer::GetWindow(int index) const
 {
   if(this->Internal && index >= 0 && index < this->Internal->Windows.size())
     return this->Internal->Windows[index];
@@ -202,7 +219,7 @@ void pqPipelineServer::ClearPipelines()
       }
 
     // Clean up the window objects.
-    QList<pqPipelineObject *>::Iterator jter = this->Internal->Windows.begin();
+    QList<pqPipelineWindow *>::Iterator jter = this->Internal->Windows.begin();
     for( ; jter != this->Internal->Windows.end(); ++jter)
       {
       if(*jter)

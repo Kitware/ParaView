@@ -6,6 +6,7 @@
 #include "pqParts.h"
 #include "pqPipelineObject.h"
 #include "pqPipelineServer.h"
+#include "pqPipelineWindow.h"
 #include "pqServer.h"
 
 #include "QVTKWidget.h"
@@ -142,7 +143,7 @@ void pqPipelineData::addWindow(QVTKWidget *window, pqServer *server)
     return;
 
   // Create a new window representation.
-  pqPipelineObject *object = serverObject->AddWindow(window);
+  pqPipelineWindow *object = serverObject->AddWindow(window);
   if(object)
     {
     // Give the window a title.
@@ -172,7 +173,7 @@ void pqPipelineData::removeWindow(QVTKWidget *window)
     {
     if(*iter)
       {
-      pqPipelineObject *object = (*iter)->GetWindow(window);
+      pqPipelineWindow *object = (*iter)->GetWindow(window);
       if(object)
         {
         emit this->removingWindow(object);
@@ -303,7 +304,7 @@ vtkSMProxy *pqPipelineData::createFilter(const char *proxyName,
   QString name;
   name.setNum(this->Names->GetCountAndIncrement(proxyName));
   name.prepend(proxyName);
-  proxyManager->RegisterProxy("filters", name.toAscii().data(), proxy);
+  proxyManager->RegisterProxy("sources", name.toAscii().data(), proxy);
   proxy->Delete();
 
   // Create an internal representation for the filter.
@@ -494,13 +495,13 @@ pqPipelineObject *pqPipelineData::getObjectFor(vtkSMProxy *proxy) const
   return 0;
 }
 
-pqPipelineObject *pqPipelineData::getObjectFor(QVTKWidget *window) const
+pqPipelineWindow *pqPipelineData::getObjectFor(QVTKWidget *window) const
 {
   if(!this->Internal || !window)
     return 0;
 
   // Get the pipeline object for the proxy.
-  pqPipelineObject *object = 0;
+  pqPipelineWindow *object = 0;
   QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
   for( ; iter != this->Internal->Servers.end(); ++iter)
     {

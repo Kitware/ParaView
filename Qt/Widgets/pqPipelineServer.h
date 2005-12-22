@@ -9,6 +9,7 @@
 
 class pqPipelineObject;
 class pqPipelineServerInternal;
+class pqPipelineWindow;
 class pqServer;
 class QWidget;
 class vtkSMProxy;
@@ -25,10 +26,10 @@ public:
 
   pqPipelineObject *AddSource(vtkSMProxy *source);
   pqPipelineObject *AddFilter(vtkSMProxy *filter);
-  pqPipelineObject *AddWindow(QWidget *window);
+  pqPipelineWindow *AddWindow(QWidget *window);
 
   pqPipelineObject *GetObject(vtkSMProxy *proxy) const;
-  pqPipelineObject *GetWindow(QWidget *window) const;
+  pqPipelineWindow *GetWindow(QWidget *window) const;
 
   bool RemoveObject(vtkSMProxy *proxy);
   bool RemoveWindow(QWidget *window);
@@ -37,7 +38,7 @@ public:
   pqPipelineObject *GetSource(int index) const;
 
   int GetWindowCount() const;
-  pqPipelineObject *GetWindow(int index) const;
+  pqPipelineWindow *GetWindow(int index) const;
 
   void ClearPipelines();
 

@@ -10,8 +10,7 @@
 #include <QString> // Needed for proxy name.
 
 class pqPipelineObjectInternal;
-class pqPipelineServer;
-class QWidget;
+class pqPipelineWindow;
 class vtkSMDisplayProxy;
 class vtkSMProxy;
 
@@ -22,36 +21,28 @@ public:
   enum ObjectType {
     Source,
     Filter,
-    Bundle,
-    Window
+    Bundle
   };
 
 public:
   pqPipelineObject(vtkSMProxy *proxy, ObjectType type);
-  pqPipelineObject(QWidget *widget);
   ~pqPipelineObject();
 
   ObjectType GetType() const {return this->Type;}
-  void SetType(ObjectType type);
+  void SetType(ObjectType type) {this->Type = type;}
 
   const QString &GetProxyName() const {return this->ProxyName;}
   void SetProxyName(const QString &name) {this->ProxyName = name;}
 
-  vtkSMProxy *GetProxy() const;
-  void SetProxy(vtkSMProxy *proxy);
-
-  QWidget *GetWidget() const;
-  void SetWidget(QWidget *widget);
+  vtkSMProxy *GetProxy() const {return this->Proxy;}
+  void SetProxy(vtkSMProxy *proxy) {this->Proxy = proxy;}
 
   bool IsVisible() const {return this->Display != 0;}
   vtkSMDisplayProxy *GetDisplayProxy() const {return this->Display;}
   void SetDisplayProxy(vtkSMDisplayProxy *display) {this->Display = display;}
 
-  pqPipelineObject *GetParent() const;
-  void SetParent(pqPipelineObject *parent);
-
-  pqPipelineServer *GetServer() const;
-  void SetServer(pqPipelineServer *server);
+  pqPipelineWindow *GetParent() const {return this->Window;}
+  void SetParent(pqPipelineWindow *parent) {this->Window = parent;}
 
   /// \name Connection Methods
   //@{
@@ -77,14 +68,8 @@ private:
   vtkSMDisplayProxy *Display;         ///< Stores the display proxy;
   ObjectType Type;                    ///< Stores the object type.
   QString ProxyName;                  ///< Stores the proxy name.
-  union {
-    vtkSMProxy *Proxy;                ///< Stores the proxy pointer.
-    QWidget *Widget;                  ///< Stores the widget pointer.
-  } Data;
-  union {
-    pqPipelineObject *Window;         ///< Stores the parent window.
-    pqPipelineServer *Server;         ///< Stores the parent server.
-  } Parent;
+  vtkSMProxy *Proxy;                  ///< Stores the proxy pointer.
+  pqPipelineWindow *Window;           ///< Stores the parent window.
 };
 
 #endif

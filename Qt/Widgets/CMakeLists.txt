@@ -115,6 +115,8 @@ ADD_LIBRARY(QtWidgets
   pqPipelineObject.h
   pqPipelineServer.cxx
   pqPipelineServer.h
+  pqPipelineWindow.cxx
+  pqPipelineWindow.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
   pqServer.cxx

@@ -11,6 +11,7 @@
 #include "pqPipelineData.h"
 #include "pqPipelineObject.h"
 #include "pqPipelineServer.h"
+#include "pqPipelineWindow.h"
 #include "pqServer.h"
 
 #include "QVTKWidget.h"
@@ -38,6 +39,7 @@ public:
   QList<pqPipelineListItem *> Internal;
   union {
     pqPipelineServer *Server;
+    pqPipelineWindow *Window;
     pqPipelineObject *Object;
     pqPipelineListItem *Link;
   } Data;
@@ -59,6 +61,7 @@ public:
 
 public:
   QHash<pqPipelineObject *, pqPipelineListItem *> Lookup;
+  QHash<pqPipelineWindow *, pqPipelineListItem *> Windows;
   GroupedCommands CommandType;
   pqPipelineObject *MoveOrCreate;
   pqPipelineObject *Source;
@@ -106,7 +109,7 @@ bool pqPipelineListItem::IsLast(pqPipelineListItem *child) const
 
 
 pqPipelineListInternal::pqPipelineListInternal()
-  : Lookup()
+  : Lookup(), Windows()
 {
   this->CommandType = pqPipelineListInternal::NoCommands;
   this->MoveOrCreate = 0;
@@ -156,10 +159,10 @@ pqPipelineListModel::pqPipelineListModel(QObject *parent)
         this, SLOT(addServer(pqPipelineServer *)));
     connect(pipeline, SIGNAL(removingServer(pqPipelineServer *)),
         this, SLOT(removeServer(pqPipelineServer *)));
-    connect(pipeline, SIGNAL(windowAdded(pqPipelineObject *)),
-        this, SLOT(addWindow(pqPipelineObject *)));
-    connect(pipeline, SIGNAL(removingWindow(pqPipelineObject *)),
-        this, SLOT(removeWindow(pqPipelineObject *)));
+    connect(pipeline, SIGNAL(windowAdded(pqPipelineWindow *)),
+        this, SLOT(addWindow(pqPipelineWindow *)));
+    connect(pipeline, SIGNAL(removingWindow(pqPipelineWindow *)),
+        this, SLOT(removeWindow(pqPipelineWindow *)));
     connect(pipeline, SIGNAL(sourceCreated(pqPipelineObject *)),
         this, SLOT(addSource(pqPipelineObject *)));
     connect(pipeline, SIGNAL(filterCreated(pqPipelineObject *)),
@@ -329,7 +332,7 @@ QWidget *pqPipelineListModel::getWidgetFor(const QModelIndex &index) const
     pqPipelineListItem *item = reinterpret_cast<pqPipelineListItem *>(
         index.internalPointer());
     if(item && item->Type == pqPipelineListModel::Window)
-      widget = item->Data.Object->GetWidget();
+      widget = item->Data.Window->GetWidget();
     }
 
   return widget;
@@ -359,10 +362,10 @@ QModelIndex pqPipelineListModel::getIndexFor(QVTKWidget *window) const
   pqPipelineData *pipeline = pqPipelineData::instance();
   if(this->Internal && pipeline && window)
   {
-    pqPipelineObject *object = pipeline->getObjectFor(window);
-    QHash<pqPipelineObject *, pqPipelineListItem *>::Iterator iter =
-        this->Internal->Lookup.find(object);
-    if(iter != this->Internal->Lookup.end())
+    pqPipelineWindow *object = pipeline->getObjectFor(window);
+    QHash<pqPipelineWindow *, pqPipelineListItem *>::Iterator iter =
+        this->Internal->Windows.find(object);
+    if(iter != this->Internal->Windows.end())
     {
       pqPipelineListItem *item = *iter;
       int row = item->Parent->Internal.indexOf(item);
@@ -415,13 +418,13 @@ void pqPipelineListModel::removeServer(pqPipelineServer *server)
     }
 }
 
-void pqPipelineListModel::addWindow(pqPipelineObject *window)
+void pqPipelineListModel::addWindow(pqPipelineWindow *window)
 {
   if(!this->Internal || !this->Root || !window || !window->GetServer())
     return;
 
   // Make sure the window item doesn't exist.
-  if(this->Internal->Lookup.find(window) != this->Internal->Lookup.end())
+  if(this->Internal->Windows.find(window) != this->Internal->Windows.end())
     return;
 
   // Look up the server object in the root.
@@ -446,9 +449,9 @@ void pqPipelineListModel::addWindow(pqPipelineObject *window)
     {
     item->Type = pqPipelineListModel::Window;
     item->Name = window->GetWidget()->windowTitle();
-    item->Data.Object = window;
+    item->Data.Window = window;
     item->Parent = serverItem;
-    this->Internal->Lookup.insert(window, item);
+    this->Internal->Windows.insert(window, item);
 
     // Add the window to the server item.
     int rows = serverItem->Internal.size();
@@ -462,15 +465,15 @@ void pqPipelineListModel::addWindow(pqPipelineObject *window)
     }
 }
 
-void pqPipelineListModel::removeWindow(pqPipelineObject *window)
+void pqPipelineListModel::removeWindow(pqPipelineWindow *window)
 {
   if(!this->Internal || !this->Root || !window)
     return;
 
   // Look up the window in the hash table.
-  QHash<pqPipelineObject *, pqPipelineListItem *>::Iterator iter =
-      this->Internal->Lookup.find(window);
-  if(iter == this->Internal->Lookup.end())
+  QHash<pqPipelineWindow *, pqPipelineListItem *>::Iterator iter =
+      this->Internal->Windows.find(window);
+  if(iter == this->Internal->Windows.end())
     return;
 
   // Remove the item from the server and delete it. Remove it from
@@ -484,7 +487,7 @@ void pqPipelineListModel::removeWindow(pqPipelineObject *window)
   this->beginRemoveRows(parent, row, row);
   serverItem->Internal.removeAll(item);
   this->endRemoveRows();
-  this->Internal->Lookup.erase(iter);
+  this->Internal->Windows.erase(iter);
   this->removeLookupItems(item);
   delete item;
 }
@@ -966,9 +969,9 @@ void pqPipelineListModel::addSubItem(pqPipelineObject *object,
     return;
 
   // Get the window item from the lookup table.
-  QHash<pqPipelineObject *, pqPipelineListItem *>::Iterator iter =
-      this->Internal->Lookup.find(object->GetParent());
-  if(iter == this->Internal->Lookup.end())
+  QHash<pqPipelineWindow *, pqPipelineListItem *>::Iterator iter =
+      this->Internal->Windows.find(object->GetParent());
+  if(iter == this->Internal->Windows.end())
     return;
 
   // If there are items in the window's list, the new item needs

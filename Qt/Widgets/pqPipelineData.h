@@ -7,6 +7,7 @@ class pqNameCount;
 class pqPipelineDataInternal;
 class pqPipelineObject;
 class pqPipelineServer;
+class pqPipelineWindow;
 class pqServer;
 class QVTKWidget;
 class vtkSMProxy;
@@ -49,14 +50,14 @@ public:
 
   QVTKWidget *getWindowFor(vtkSMProxy *proxy) const;
   pqPipelineObject *getObjectFor(vtkSMProxy *proxy) const;
-  pqPipelineObject *getObjectFor(QVTKWidget *window) const;
+  pqPipelineWindow *getObjectFor(QVTKWidget *window) const;
 
 signals:
   void serverAdded(pqPipelineServer *server);
   void removingServer(pqPipelineServer *server);
 
-  void windowAdded(pqPipelineObject *window);
-  void removingWindow(pqPipelineObject *window);
+  void windowAdded(pqPipelineWindow *window);
+  void removingWindow(pqPipelineWindow *window);
 
   void sourceCreated(pqPipelineObject *source);
   void filterCreated(pqPipelineObject *filter);
@@ -85,7 +86,7 @@ protected:
   pqNameCount *Names;               ///< Keeps track of the proxy names.
   vtkSMSourceProxy* CurrentProxy;
 
-  static pqPipelineData *Instance;
+  static pqPipelineData *Instance;  ///< Pointer to the pipeline instance.
 };
 
 #endif // _pqPipelineData_h

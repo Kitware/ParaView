@@ -17,6 +17,7 @@ class pqPipelineListInternal;
 class pqPipelineListItem;
 class pqPipelineObject;
 class pqPipelineServer;
+class pqPipelineWindow;
 class QPixmap;
 class QVTKWidget;
 class QWidget;
@@ -125,8 +126,8 @@ public slots:
   void addServer(pqPipelineServer *server);
   void removeServer(pqPipelineServer *server);
 
-  void addWindow(pqPipelineObject *window);
-  void removeWindow(pqPipelineObject *window);
+  void addWindow(pqPipelineWindow *window);
+  void removeWindow(pqPipelineWindow *window);
 
   void addSource(pqPipelineObject *source);
   void removeSource(pqPipelineObject *source);
