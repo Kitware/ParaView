@@ -29,7 +29,7 @@
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.15");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -793,11 +793,13 @@ vtkPVLODPartDisplayInformation* vtkSMCompositeDisplayProxy::GetLODInformation()
     {
     return 0;
     }
-  if ( ! this->LODGeometryIsValid)
-    { // Update but with collection filter off.
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (!this->LODGeometryIsValid &&
+      (pm->GetOptions()->GetClientMode() || pm->GetNumberOfPartitions() >= 2))
+    { 
+    // Update but with collection filter off.
     this->CollectionDecision = 0;
     this->LODCollectionDecision = 0;
-    this->LODInformationIsValid = 0;
 
     vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
       this->CollectProxy->GetProperty("MoveMode"));
@@ -810,7 +812,8 @@ vtkPVLODPartDisplayInformation* vtkSMCompositeDisplayProxy::GetLODInformation()
     vtkSMProperty *p = this->UpdateSuppressorProxy->GetProperty("ForceUpdate");
     if (!p)
       {
-      vtkErrorMacro("Failed to find property ForceUpdate on UpdateSuppressorProxy.");
+      vtkErrorMacro("Failed to find property ForceUpdate on "
+                    "UpdateSuppressorProxy.");
       return 0;
       }
     p->Modified();

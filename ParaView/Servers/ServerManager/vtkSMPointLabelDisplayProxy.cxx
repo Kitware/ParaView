@@ -302,22 +302,19 @@ void vtkSMPointLabelDisplayProxy::Update()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPointLabelDisplayProxy::InvalidateGeometry()
+void vtkSMPointLabelDisplayProxy::InvalidateGeometryInternal(int useCache)
 {
-  this->GeometryIsValid = 0;
-  if (this->UpdateSuppressorProxy)
+  if (!useCache)
     {
-    vtkSMProperty *p = this->UpdateSuppressorProxy->GetProperty("RemoveAllCaches");
-    p->Modified();
-    this->UpdateSuppressorProxy->UpdateVTKObjects();
+    this->GeometryIsValid = 0;
+    if (this->UpdateSuppressorProxy)
+      {
+      vtkSMProperty *p = 
+        this->UpdateSuppressorProxy->GetProperty("RemoveAllCaches");
+      p->Modified();
+      this->UpdateSuppressorProxy->UpdateVTKObjects();
+      }
     }
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMPointLabelDisplayProxy::MarkModified(vtkSMProxy* modifiedProxy)
-{
-  this->Superclass::MarkModified(modifiedProxy);
-  this->InvalidateGeometry();
 }
 
 //-----------------------------------------------------------------------------

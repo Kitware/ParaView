@@ -123,6 +123,12 @@ public:
       return this->Superclass::GetProperty(name);
     }
 
+  // Description:
+  // Mark the data information as invalid. If invalidateConsumers
+  // is true, all consumers' data information is also marked as
+  // invalid.
+  void InvalidateDataInformation(int invalidateConsumers);
+
 protected:
   vtkSMSourceProxy();
   ~vtkSMSourceProxy();

@@ -71,7 +71,7 @@ public:
 
   // Description:
   // PVSource calls this when it gets modified.
-  virtual void InvalidateGeometry();
+  virtual void InvalidateGeometryInternal(int useCache);
 
   // Description:
   // Chains to superclass and calls InvalidateGeometry()

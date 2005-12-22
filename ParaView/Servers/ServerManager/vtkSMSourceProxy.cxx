@@ -34,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.35");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.36");
 
 struct vtkSMSourceProxyInternals
 {
@@ -397,6 +397,25 @@ vtkPVDataInformation* vtkSMSourceProxy::GetDataInformation()
     this->UpdateDataInformation();
     }
   return this->DataInformation;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSourceProxy::InvalidateDataInformation(int invalidateConsumers)
+{
+  if (invalidateConsumers)
+    {
+    unsigned int numConsumers = this->GetNumberOfConsumers();
+    for (unsigned int i=0; i<numConsumers; i++)
+      {
+      vtkSMSourceProxy* cons = vtkSMSourceProxy::SafeDownCast(
+        this->GetConsumerProxy(i));
+      if (cons)
+        {
+        cons->InvalidateDataInformation(invalidateConsumers);
+        }
+      }
+    }
+  this->InvalidateDataInformation();
 }
 
 //----------------------------------------------------------------------------

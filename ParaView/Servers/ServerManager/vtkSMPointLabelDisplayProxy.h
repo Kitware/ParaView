@@ -51,10 +51,6 @@ public:
   // GeometryIsValid==0;
   virtual void Update();
 
-  // Description:
-  // Marks for Update.
-  virtual void InvalidateGeometry();
-  
   //BTX
   // Description:
   // The Pick needs access to this to fill in the UI point values.
@@ -62,10 +58,6 @@ public:
   vtkUnstructuredGrid* GetCollectedData();
   //ETX
   
-  // Description:
-  // Chains to superclass and calls InvalidateGeometry().
-  virtual void MarkModified(vtkSMProxy* modifiedProxy);
-
   // Description:
   // Accessor to the font size in the sub proxy.
   void SetFontSizeCM(int size);
@@ -80,6 +72,10 @@ protected:
 
   virtual void CreateVTKObjects(int numObjects);
 
+  // Description:
+  // Marks for Update.
+  virtual void InvalidateGeometryInternal(int useCache);
+  
   vtkSMProxy* CollectProxy;
   vtkSMProxy* UpdateSuppressorProxy;
   vtkSMProxy* MapperProxy;
