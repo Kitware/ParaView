@@ -402,8 +402,26 @@ bool pqLineChart::updateAxes(pqChartCoordinate &min, pqChartCoordinate &max,
     {
     if(fromAdd)
       {
-      xChanged = min.X < this->XAxis->getMinValue() ||
-          max.X > this->XAxis->getMaxValue();
+      if(this->Data->size() > 1)
+        {
+        xChanged = min.X < this->XAxis->getMinValue() ||
+            max.X > this->XAxis->getMaxValue();
+        if(xChanged)
+          {
+          if(min.X > this->XAxis->getMinValue())
+            {
+            min.X = this->XAxis->getMinValue();
+            }
+          if(max.X < this->XAxis->getMaxValue())
+            {
+            max.X = this->XAxis->getMaxValue();
+            }
+          }
+        }
+      else
+        {
+        xChanged = true;
+        }
       }
     else
       {
@@ -416,8 +434,26 @@ bool pqLineChart::updateAxes(pqChartCoordinate &min, pqChartCoordinate &max,
     {
     if(fromAdd)
       {
-      yChanged = min.Y < this->YAxis->getMinValue() ||
-          max.Y > this->YAxis->getMaxValue();
+      if(this->Data->size() > 1)
+        {
+        yChanged = min.Y < this->YAxis->getMinValue() ||
+            max.Y > this->YAxis->getMaxValue();
+        if(yChanged)
+          {
+          if(min.Y > this->YAxis->getMinValue())
+            {
+            min.Y = this->YAxis->getMinValue();
+            }
+          if(max.Y < this->YAxis->getMaxValue())
+            {
+            max.Y = this->YAxis->getMaxValue();
+            }
+          }
+        }
+      else
+        {
+        yChanged = true;
+        }
       }
     else
       {
@@ -432,14 +468,6 @@ bool pqLineChart::updateAxes(pqChartCoordinate &min, pqChartCoordinate &max,
     // signal to avoid laying out the chart twice.
     if(xChanged)
       this->YAxis->blockSignals(true);
-    if(fromAdd)
-      {
-      if(min.Y > this->YAxis->getMinValue())
-        min.Y = this->YAxis->getMinValue();
-      if(max.Y < this->YAxis->getMaxValue())
-        max.Y = this->YAxis->getMaxValue();
-      }
-
     this->YAxis->setValueRange(min.Y, max.Y);
     if(xChanged)
       this->YAxis->blockSignals(false);
@@ -447,16 +475,8 @@ bool pqLineChart::updateAxes(pqChartCoordinate &min, pqChartCoordinate &max,
 
   if(xChanged)
     {
-    if(fromAdd)
-      {
-      if(min.X > this->XAxis->getMinValue())
-        min.X = this->XAxis->getMinValue();
-      if(max.X < this->XAxis->getMaxValue())
-        max.X = this->XAxis->getMaxValue();
-     }
-
     this->XAxis->setValueRange(min.X, max.X);
-   }
+    }
 
   return xChanged || yChanged;
 }
