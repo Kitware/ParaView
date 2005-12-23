@@ -31,7 +31,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.25");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.26");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -219,6 +219,8 @@ void vtkSMProxyProperty::AppendProxyToStream(vtkSMProxy* toAppend,
       << toAppend << vtkClientServerStream::End;
     return;
     }
+
+  toAppend->CreateVTKObjects(1);
 
   unsigned int numConsIDs = cons->GetNumberOfIDs();
   unsigned int numIDs = toAppend->GetNumberOfIDs();
