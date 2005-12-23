@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.34.2.2");
+vtkCxxRevisionMacro(vtkPVOptions, "1.34.2.3");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -170,10 +170,10 @@ void vtkPVOptions::Initialize()
                     vtkPVOptions::PVCLIENT|vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVSERVER);
   
   // This should be deprecated when I get the time 
-  this->AddArgument("--cave-configuration", "-cc", &this->CaveConfigurationFileName,
-    "Specify the file that defines the displays for a cave. It is used only with CaveRenderModule.");
-  this->AddArgument("--machines", "-m", &this->MachinesFileName, 
-                    "Specify the network configurations file for the render server.");
+  this->AddDeprecatedArgument("--cave-configuration", "-cc",
+    "Deprecated. Use xml pvx file to define the displays for a cave.");
+  this->AddDeprecatedArgument("--machines", "-m",
+                    "Deprecated. Use xml pvx file to specify machines for render and data server.");
 
   this->AddBooleanArgument("--version", "-V", &this->TellVersion, 
                            "Give the version number and exit.");
