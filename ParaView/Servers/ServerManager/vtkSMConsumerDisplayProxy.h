@@ -63,7 +63,7 @@ protected:
 
   // Invalidate geometry. If useCache is true, do not invalidate
   // cached geometry
-  virtual void InvalidateGeometryInternal(int useCache) {};
+  virtual void InvalidateGeometryInternal(int /*useCache*/) {};
 
   static int UseCache;
   
