@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.64");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.65");
 
 
 //*****************************************************************************
@@ -130,6 +130,7 @@ vtkPVLookmark::vtkPVLookmark()
   this->ErrorEventTag = 0;
   this->ReleaseEventFlag = 0;
   this->Version = NULL;
+  this->Location = 0;
 }
 
 //----------------------------------------------------------------------------
