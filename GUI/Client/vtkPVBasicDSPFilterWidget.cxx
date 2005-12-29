@@ -57,7 +57,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBasicDSPFilterWidget);
-vtkCxxRevisionMacro(vtkPVBasicDSPFilterWidget, "1.5");
+vtkCxxRevisionMacro(vtkPVBasicDSPFilterWidget, "1.6");
 
 //20 weights, 5 cutoff freqs(.3, .4, .5, .6, .7)
 const double g_butter_lp_numerator_coeffs[5][20]={
@@ -1017,17 +1017,17 @@ void vtkPVBasicDSPFilterWidget::ResizeOutputVariableList()
     l_DeleteThisVarLabel[i] = DeleteThisVarLabel[i];
     }
 
-  delete m_outputVariableNames;
+  delete[] m_outputVariableNames;
   m_outputVariableNames = l_outputVariableNames;
-  delete m_inputVariableNames;
+  delete[] m_inputVariableNames;
   m_inputVariableNames = l_inputVariableNames;
-  delete m_filterType;
+  delete[] m_filterType;
   m_filterType = l_filterType;
-  delete m_outputVariableCutoffs;
+  delete[] m_outputVariableCutoffs;
   m_outputVariableCutoffs = l_outputVariableCutoffs;
-  delete DeleteThisVarButton;
+  delete[] DeleteThisVarButton;
   DeleteThisVarButton = l_DeleteThisVarButton;
-  delete DeleteThisVarLabel;
+  delete[] DeleteThisVarLabel;
   DeleteThisVarLabel = l_DeleteThisVarLabel;
 
   for(i=m_maxNumOutputVariables;i<l_newMaxNum;i++)
@@ -1121,7 +1121,7 @@ void vtkPVBasicDSPFilterWidget::AddVarFunction()
 
   this->DeleteThisVarLabel[which]->SetText(l_str);
 
-  delete l_str;
+  delete[] l_str;
 
   if(which==m_numOutputVariables)
     {
@@ -1360,13 +1360,13 @@ void vtkPVBasicDSPFilterWidget::ChangeDSPFilterMode(const char* newMode)
 
     l_str=getSmoothingNumeratorWeightsString(this->GetFilterLength());
     this->NumeratorWeightsEntry->SetValue(l_str);
-    delete l_str;
+    delete[] l_str;
 
     this->DenominatorWeightsEntry->SetValue("");
 
     l_str=getSmoothingForwardNumeratorWeightsString(this->GetFilterLength());
     this->ForwardNumeratorWeightsEntry->SetValue(l_str);
-    delete l_str;
+    delete[] l_str;
 
     }
   else if (!strcmp(newMode, "lowpass"))
@@ -1429,7 +1429,7 @@ void vtkPVBasicDSPFilterWidget::ChangeDSPFilterMode(const char* newMode)
     this->ForwardNumeratorWeightsEntry->SetValue("1");
     }
 
-  delete(l_weightsString);
+  delete[] l_weightsString;
 
   this->ModifiedCallback();
 }
@@ -1487,7 +1487,7 @@ void vtkPVBasicDSPFilterWidget::ChangeCutoffFreq(const char* newMode)
     this->CutoffFreqMenu->GetValue());
   this->DenominatorWeightsEntry->SetValue(l_weightsString);
   this->ForwardNumeratorWeightsEntry->SetValue("");
-  delete(l_weightsString);
+  delete[] l_weightsString;
 
 
   this->ModifiedCallback();
@@ -2034,13 +2034,13 @@ void vtkPVBasicDSPFilterWidget::AddThisFilterToSource(const char *a_inputName, c
     char *l_str;
     l_str=getSmoothingNumeratorWeightsString(l_length);
     this->NumeratorWeightsEntry->SetValue(l_str);
-    delete l_str;
+    delete[] l_str;
 
     this->DenominatorWeightsEntry->SetValue("");
 
     l_str=getSmoothingForwardNumeratorWeightsString(this->GetFilterLength());
     this->ForwardNumeratorWeightsEntry->SetValue(l_str);
-    delete l_str;
+    delete[] l_str;
 
 
     //do the x[n+1] terms
@@ -2077,7 +2077,7 @@ void vtkPVBasicDSPFilterWidget::AddThisFilterToSource(const char *a_inputName, c
       vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
       vtkProcessModule::DATA_SERVER, stream);
 
-    delete l_weights;
+    delete[] l_weights;
     }
   else 
     {
