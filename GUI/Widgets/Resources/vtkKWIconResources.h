@@ -1040,3 +1040,21 @@ static const unsigned char image_window_level[] =
   "S9R2LL/2MSK5n3LfbJXWr+l5mlN/1ntf3vVvOqVWitMcZgbY8bHCEEYhxJUyJ/Mhtcdz15"
   "1aK7r++txblh85GUFp+vvaTiZ84zZrU=";
 
+/*
+ * Resource generated for file:
+ *    contour_segment.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_contour_segment_width          = 16;
+static const unsigned int  image_contour_segment_height         = 16;
+static const unsigned int  image_contour_segment_pixel_size     = 4;
+static const unsigned long image_contour_segment_length         = 400;
+static const unsigned long image_contour_segment_decoded_length = 1024;
+
+static const unsigned char image_contour_segment[] =
+  "eNr7//8/w38smEEOuzgxGKSXQeYtkP5Nnn4GhnIzU2MQA4TfMLgF/keRR+Nj0f+vobbi/+"
+  "nj+/+npST+B6kHij0FYiVC+oHgWkiQ//+nD27AMUh9SlIczD2PwObJYdXrAlKzad0KDP0g"
+  "vG/XFjibQeYDRhgDwc/83EwUvchmwGhNDXWg/o/oeleAwgybXmQ3QMMCNTzl/oH0/58ysQ"
+  "enfpgZnW1NIP0/UeJa+gUDPrvBeoGqIXaDHXsU1f7fYPsf3rmCVz9IHqIfgtH8/3tiXyd2"
+  "e6FYXFwMRR8qm2Gnva01XN/+3VvAasNDg/6rqapAzJC8BNYDizcMN0icZHBytP/Py8MDTS"
+  "tgRTeBuBmmFqf94DzzDohfg9xiglctFv/jyrO41MIwAEe7fPw=";
+

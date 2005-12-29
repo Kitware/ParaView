@@ -79,4 +79,5 @@ KWConvertImageToHeader --zlib --base64 \
     tree_open.png \
     warning.png \
     warning_mini.png \
-    window_level.png
+    window_level.png \
+    contour_segment.png
