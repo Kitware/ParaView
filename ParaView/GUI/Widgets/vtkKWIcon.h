@@ -47,6 +47,7 @@ public:
     IconColorSquares              = 18,
     IconConnection                = 1,
     IconContourTool               = 16,
+    IconContourSegment            = 33,
     IconCornerAnnotation          = 11,
     IconCropTool                  = 22,
     IconDistanceTool              = 15,

@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.31");
+vtkCxxRevisionMacro(vtkKWIcon, "1.32");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -200,6 +200,14 @@ void vtkKWIcon::SetImage(int image)
         image_contour_tool_width, image_contour_tool_height,
         image_contour_tool_pixel_size, 
         image_contour_tool_length);
+      break;
+
+    case vtkKWIcon::IconContourSegment:
+      this->SetImage(
+        image_contour_segment, 
+        image_contour_segment_width, image_contour_segment_height,
+        image_contour_segment_pixel_size, 
+        image_contour_segment_length);
       break;
 
     case vtkKWIcon::IconCornerAnnotation:
