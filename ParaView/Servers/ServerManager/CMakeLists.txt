@@ -60,6 +60,7 @@ SET(Kit_SRCS
   vtkSMKeyFrameAnimationCueManipulatorProxy.cxx
   vtkSMLinearAnimationCueManipulatorProxy.cxx
   vtkSMLineWidgetProxy.cxx
+  vtkSMLink.cxx
   vtkSMLookupTableProxy.cxx
   vtkSMLODDisplayProxy.cxx
   vtkSMLODRenderModuleProxy.cxx
@@ -79,6 +80,7 @@ SET(Kit_SRCS
   vtkSMProperty.cxx
   vtkSMPropertyAdaptor.cxx
   vtkSMPropertyIterator.cxx
+  vtkSMPropertyLink.cxx
   vtkSMPropertyStatusManager.cxx
   vtkSMProxy.cxx
   vtkSMProxyGroupDomain.cxx
@@ -144,6 +146,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMConsumerDisplayProxy.cxx
   vtkSMDomain.cxx
   vtkSMInformationHelper.cxx
+  vtkSMLink.cxx
   vtkSMRenderModuleProxy.cxx
   vtkSMVectorProperty.cxx
   ABSTRACT

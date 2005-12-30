@@ -23,43 +23,9 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMProxyLink);
-vtkCxxRevisionMacro(vtkSMProxyLink, "1.1");
+vtkCxxRevisionMacro(vtkSMProxyLink, "1.2");
 
-class vtkSMProxyUpdateObserver : public vtkCommand
-{
-public:
-
-  static vtkSMProxyUpdateObserver* New()
-    {
-      return new vtkSMProxyUpdateObserver;
-    }
-  vtkSMProxyUpdateObserver()
-    {
-      this->Link = 0;
-    }
-  ~vtkSMProxyUpdateObserver()
-    {
-      this->Link = 0;
-    }
-  
-  virtual void Execute(vtkObject *caller, unsigned long event, void* pname)
-    {
-      if (this->Link)
-        {
-        if (event == vtkCommand::UpdateEvent)
-          {
-          this->Link->UpdateVTKObjects(caller);
-          }
-        else if (event == vtkCommand::PropertyModifiedEvent)
-          {
-          this->Link->UpdateProperties(caller, (const char*)pname);
-          }
-        }
-    }
-
-  vtkSMProxyLink* Link;
-};
-
+//---------------------------------------------------------------------------
 struct vtkSMProxyLinkInternals
 {
   struct LinkedProxy
@@ -89,18 +55,12 @@ struct vtkSMProxyLinkInternals
 vtkSMProxyLink::vtkSMProxyLink()
 {
   this->Internals = new vtkSMProxyLinkInternals;
-  vtkSMProxyUpdateObserver* obs = vtkSMProxyUpdateObserver::New();
-  obs->Link = this;
-  this->Observer = obs;
 }
 
 //---------------------------------------------------------------------------
 vtkSMProxyLink::~vtkSMProxyLink()
 {
   delete this->Internals;
-
-  this->Observer->Delete();
-  this->Observer = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -131,21 +91,18 @@ void vtkSMProxyLink::AddLinkedProxy(vtkSMProxy* proxy, int updateDir)
     {
     vtkSMProxyLinkInternals::LinkedProxy link(proxy, updateDir);
     link.Observer = this->Observer;
-    this->Internals->LinkedProxies.push_back(
-      vtkSMProxyLinkInternals::LinkedProxy(proxy, updateDir));
+    this->Internals->LinkedProxies.push_back(link);
     }
 
   if (addObserver)
     {
-    proxy->AddObserver(vtkCommand::UpdateEvent, this->Observer);
-    proxy->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer);
+    this->ObserveProxyUpdates(proxy);
     }
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyLink::UpdateProperties(vtkObject* caller, const char* pname)
+void vtkSMProxyLink::UpdateProperties(vtkSMProxy* fromProxy, const char* pname)
 {
-  vtkSMProxy* fromProxy = vtkSMProxy::SafeDownCast(caller);
   if (!fromProxy)
     {
     return;
@@ -160,7 +117,7 @@ void vtkSMProxyLink::UpdateProperties(vtkObject* caller, const char* pname)
     this->Internals->LinkedProxies.begin();
   for(; iter != this->Internals->LinkedProxies.end(); iter++)
     {
-    if ((iter->Proxy.GetPointer() != caller) && 
+    if ((iter->Proxy.GetPointer() != fromProxy) && 
         (iter->UpdateDirection & OUTPUT))
       {
       vtkSMProperty* toProp = iter->Proxy->GetProperty(pname);
@@ -173,7 +130,7 @@ void vtkSMProxyLink::UpdateProperties(vtkObject* caller, const char* pname)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyLink::UpdateVTKObjects(vtkObject* caller)
+void vtkSMProxyLink::UpdateVTKObjects(vtkSMProxy* caller)
 {
   vtkSMProxyLinkInternals::LinkedProxiesType::iterator iter =
     this->Internals->LinkedProxies.begin();
