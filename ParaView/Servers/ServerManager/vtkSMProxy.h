@@ -577,7 +577,10 @@ private:
   // gets substituted by the SelfID of the proxy.
   vtkSetStringMacro(Name);
   vtkGetStringMacro(Name);
+  //BTX
   // -- PVEE only
+  friend class vtkWSMApplication;
+  //ETX
 
   vtkSMProxy(const vtkSMProxy&); // Not implemented
   void operator=(const vtkSMProxy&); // Not implemented
