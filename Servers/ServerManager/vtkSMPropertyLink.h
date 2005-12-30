@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMProxyLink.h
+  Module:    vtkSMPropertyLink.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,43 +12,50 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMProxyLink -
+// .NAME vtkSMPropertyLink -
 // .SECTION Description
+// Creates a link between two properties. Can create M->N links.
 
-#ifndef __vtkSMProxyLink_h
-#define __vtkSMProxyLink_h
+#ifndef __vtkSMPropertyLink_h
+#define __vtkSMPropertyLink_h
 
 #include "vtkSMLink.h"
 
 //BTX
-struct vtkSMProxyLinkInternals;
+class vtkSMProperty;
+struct vtkSMPropertyLinkInternals;
 //ETX
 
-class VTK_EXPORT vtkSMProxyLink : public vtkSMLink
+class VTK_EXPORT vtkSMPropertyLink : public vtkSMLink
 {
 public:
-  static vtkSMProxyLink* New();
-  vtkTypeRevisionMacro(vtkSMProxyLink, vtkSMLink);
+  static vtkSMPropertyLink* New();
+  vtkTypeRevisionMacro(vtkSMPropertyLink, vtkSMLink);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Add a property to the link. updateDir determines whether a property of
   // the proxy is read or written. When a property of an input proxy
   // changes, it's value is pushed to all other output proxies in the link.
-  void AddLinkedProxy(vtkSMProxy* proxy, int updateDir);
+  void AddLinkedProperty(vtkSMProxy* proxy, const char* propertyname, int updateDir);
 
 protected:
-  vtkSMProxyLink();
-  ~vtkSMProxyLink();
+  vtkSMPropertyLink();
+  ~vtkSMPropertyLink();
+
+//BTX
+  friend class vtkSMPropertyLinkInternals;
+//ETX
 
   virtual void UpdateVTKObjects(vtkSMProxy* caller);
   virtual void UpdateProperties(vtkSMProxy* caller, const char* pname);
-
 private:
-  vtkSMProxyLinkInternals* Internals;
+  vtkSMPropertyLinkInternals* Internals;
 
-  vtkSMProxyLink(const vtkSMProxyLink&); // Not implemented
-  void operator=(const vtkSMProxyLink&); // Not implemented
+  vtkSMPropertyLink(const vtkSMPropertyLink&); // Not implemented.
+  void operator=(const vtkSMPropertyLink&); // Not implemented.
 };
 
+
 #endif
+
