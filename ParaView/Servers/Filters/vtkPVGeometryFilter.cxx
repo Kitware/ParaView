@@ -46,8 +46,11 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkGenericDataSet.h"
 #include "vtkGenericGeometryFilter.h"
+#include "vtkHyperOctree.h"
+#include "vtkHyperOctreeSurfaceFilter.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.59");
+
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.60");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -201,6 +204,12 @@ void vtkPVGeometryFilter::ExecuteBlock(
   if (input->IsA("vtkPolyData"))
     {
     this->PolyDataExecute(static_cast<vtkPolyData*>(input), output, doCommunicate);
+    this->ExecuteCellNormals(output, doCommunicate);
+    return;
+    }
+  if (input->IsA("vtkHyperOctree"))
+    {
+    this->OctreeExecute(static_cast<vtkHyperOctree*>(input), output, doCommunicate);
     this->ExecuteCellNormals(output, doCommunicate);
     return;
     }
@@ -535,7 +544,6 @@ void vtkPVGeometryFilter::GenericDataSetExecute(
     // Geometry filter
     this->GenericGeometryFilter->SetInput(input);
     
-    
     // Observe the progress of the internal filter.
     this->GenericGeometryFilter->AddObserver(vtkCommand::ProgressEvent, 
                                             this->InternalProgressObserver);
@@ -826,6 +834,29 @@ void vtkPVGeometryFilter::PolyDataExecute(
       out->ShallowCopy(input);
       out->RemoveGhostCells(1);
       }
+    return;
+    }
+  
+  this->OutlineFlag = 1;
+  this->DataSetExecute(input, out, doCommunicate);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::OctreeExecute(
+  vtkHyperOctree* input, vtkPolyData* out, int doCommunicate)
+{
+  if (!this->UseOutline)
+    {
+    this->OutlineFlag = 0;
+
+    vtkHyperOctreeSurfaceFilter* internalFilter = vtkHyperOctreeSurfaceFilter::New();
+    vtkHyperOctree* octreeCopy = vtkHyperOctree::New();
+    octreeCopy->ShallowCopy(input);
+    internalFilter->SetInput(octreeCopy);
+    internalFilter->Update();
+    out->ShallowCopy(internalFilter->GetOutput());
+    octreeCopy->Delete();
+    internalFilter->Delete();
     return;
     }
   

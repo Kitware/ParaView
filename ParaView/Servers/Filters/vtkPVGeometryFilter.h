@@ -35,6 +35,7 @@ class vtkOutlineSource;
 class vtkMultiProcessController;
 class vtkCallbackCommand;
 class vtkGenericGeometryFilter;
+class vtkHyperOctree;
 
 class VTK_EXPORT vtkPVGeometryFilter : public vtkPolyDataAlgorithm
 {
@@ -105,6 +106,8 @@ protected:
     vtkUnstructuredGrid* input, vtkPolyData* output, int doCommunicate);
   void PolyDataExecute(
     vtkPolyData* input, vtkPolyData* output, int doCommunicate);
+  void OctreeExecute(
+    vtkHyperOctree* input, vtkPolyData* output, int doCommunicate);
   void DataSetSurfaceExecute(vtkDataSet* input, vtkPolyData* output);
   void ExecuteCellNormals(vtkPolyData* output, int doCommunicate);
 

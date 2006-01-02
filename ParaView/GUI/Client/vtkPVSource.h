@@ -506,6 +506,16 @@ public:
   void SetLookmark(vtkPVLookmark *lookmark);
   vtkGetObjectMacro(Lookmark,vtkPVLookmark);
 
+  // Description:
+  // I am saving the last color selection as a default.
+  // When outline is selected, color selection changes to Property.
+  // When surface is reselected, I want the previous selection to be set again.
+  // It has to be saved here because the display GUI is shared.
+  vtkSetStringMacro(SavedColorArrayName);
+  vtkGetStringMacro(SavedColorArrayName);
+  vtkSetMacro(SavedColorArrayField,int);
+  vtkGetMacro(SavedColorArrayField,int);
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -518,6 +528,11 @@ protected:
   // Description:
   // Set the color map and the field to use.
   void ColorByArray(vtkPVColorMap* colorMap, int field);
+  // I am saving the last color selection as a default.
+  // When outline is selected, color selection changes to Property.
+  // When surface is reselected, I want the previous selection to be set again.
+  char *SavedColorArrayName;
+  int SavedColorArrayField;
 
   void SetPVInputInternal(const char* name, 
                           int idx, 
