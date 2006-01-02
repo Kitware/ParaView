@@ -259,8 +259,9 @@ public:
   void SetInterpolateColorsFlag(int val);
   void InterpolateColorsCheckCallback();
 
-  vtkGetMacro(ColorSetByUser, int);
-  vtkGetMacro(ArraySetByUser, int);
+  // I do not this these are used because this is a shared GUI object.
+  //vtkGetMacro(ColorSetByUser, int);
+  //vtkGetMacro(ArraySetByUser, int);
 
   vtkGetMacro(ShouldReinitialize, int);
 
@@ -307,10 +308,11 @@ protected:
   void VolumeRenderModeOn();
   void VolumeRenderModeOff();
   
+  // I do not this these are used because this is a shared GUI object.
   // A flag that helps Update determine 
   // whether to set the default color.
-  int ColorSetByUser;
-  int ArraySetByUser;
+  //int ColorSetByUser;
+  //int ArraySetByUser;
 
   // A flag to let the source know that Initialize should be called again.
   // This flag is set when the data set type is unknown.

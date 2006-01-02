@@ -42,7 +42,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.17");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.18");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -245,7 +245,12 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
     {
     return;
     }
-  this->NumberOfCells = data->GetNumberOfCells();
+  // We do not want to get the number of dual cells from an octree
+  // because this triggers generation of connectivity arrays.
+  if (data->GetDataObjectType() != VTK_HYPER_OCTREE)
+    {
+    this->NumberOfCells = data->GetNumberOfCells();
+    }
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   ofstream *tmpFile = pm->GetLogFile();
   if (tmpFile)
@@ -333,7 +338,12 @@ void vtkPVDataInformation::CopyFromGenericDataSet(vtkGenericDataSet *data)
     {
     return;
     }
-  this->NumberOfCells = data->GetNumberOfCells();
+  // We do not want to get the number of dual cells from an octree
+  // because this triggers generation of connectivity arrays.
+  if (data->GetDataObjectType() != VTK_HYPER_OCTREE)
+    {
+    this->NumberOfCells = data->GetNumberOfCells();
+    }
   bds = data->GetBounds();
   for (idx = 0; idx < 6; ++idx)
     {

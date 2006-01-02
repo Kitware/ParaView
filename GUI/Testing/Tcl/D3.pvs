@@ -30,7 +30,6 @@ set kw(vtkTemp287) [$kw(vtkTemp247) GetPVWidget {StandardDeviation}]
 $kw(vtkTemp287) SetValue 0.5
 $kw(vtkTemp247) AcceptCallback
 set kw(vtkTemp293) [$kw(vtkTemp247) GetPVOutput]
-$kw(vtkTemp293) ColorByArray {RTData} 3
 $kw(vtkTemp293) DrawOutline
 $kw(vtkTemp247) SetVisibility 0
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp247)
@@ -44,7 +43,6 @@ set kw(vtkTemp575) [$kw(vtkTemp569) GetPVWidget {Scalars}]
 set kw(vtkTemp569) [$kw(vtkTemp479) GetPVWidget {Clip Function}]
 set kw(vtkTemp575) [$kw(vtkTemp569) GetPVWidget {Scalars}]
 set kw(vtkTemp574) [$kw(vtkTemp575) GetPVWidget {Scalars}]
-$kw(vtkTemp574) SetValue {RTData}
 set kw(vtkTemp569) [$kw(vtkTemp479) GetPVWidget {Clip Function}]
 set kw(vtkTemp575) [$kw(vtkTemp569) GetPVWidget {Scalars}]
 set kw(vtkTemp566) [$kw(vtkTemp575) GetPVWidget {Offset}]
@@ -53,7 +51,6 @@ set kw(vtkTemp570) [$kw(vtkTemp479) GetPVWidget {InsideOut}]
 $kw(vtkTemp570) SetSelectedState 0
 $kw(vtkTemp479) AcceptCallback
 set kw(vtkTemp579) [$kw(vtkTemp479) GetPVOutput]
-$kw(vtkTemp579) ColorByArray {RTData} 3
 $kw(vtkTemp579) DrawSurface
 $kw(vtkTemp479) SetVisibility 0
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp479)

@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInformationGUI);
-vtkCxxRevisionMacro(vtkPVInformationGUI, "1.15");
+vtkCxxRevisionMacro(vtkPVInformationGUI, "1.16");
 
 //----------------------------------------------------------------------------
 vtkPVInformationGUI::vtkPVInformationGUI()
@@ -182,6 +182,12 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
     this->Script("pack forget %s", 
       this->ExtentDisplay->GetWidgetName());
     }
+  else if (dataType == VTK_HYPER_OCTREE)
+    {
+    type << "Octree";
+    this->Script("pack forget %s", 
+      this->ExtentDisplay->GetWidgetName());
+    }
   else if (dataType == VTK_UNSTRUCTURED_GRID)
     {
     type << "Unstructured Grid";
@@ -241,7 +247,7 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
     this->Script("pack forget %s", 
       this->ExtentDisplay->GetWidgetName());
     }
-  else
+  else if (dataType == VTK_HYPER_OCTREE)
     {
     type << "Unknown";
     }

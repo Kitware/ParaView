@@ -34,7 +34,9 @@ $pv(vtkTemp98) AcceptCallback
 $max1 SetValue 100
 $pv(vtkTemp98) AcceptCallback
 
-set map [$pv(vtkTemp98) GetPVColorMap]
+set map [$pv(vtkTemp1) GetPVColorMap {Iterations} 1]
+# This no longer works because colorMap not set for outline.
+#set map [$pv(vtkTemp98) GetPVColorMap] 
 $map SetScalarRangeLock 1
 # Now the scalar range should not grow with the data.
 

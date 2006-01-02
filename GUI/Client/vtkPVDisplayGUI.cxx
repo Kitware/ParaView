@@ -96,7 +96,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.55");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.56");
 
 //----------------------------------------------------------------------------
 
@@ -232,8 +232,9 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
   
   this->ActorColor[0] = this->ActorColor[1] = this->ActorColor[2] = 1.0;
 
-  this->ColorSetByUser = 0;
-  this->ArraySetByUser = 0;
+  // I do not this these are used because this is a shared GUI object.
+  //this->ColorSetByUser = 0;
+  //this->ArraySetByUser = 0;
     
   this->VolumeRenderMode = 0;
   
@@ -1327,60 +1328,54 @@ void vtkPVDisplayGUI::UpdateScalarBarVisibilityCheck()
 void vtkPVDisplayGUI::UpdateColorMenu()
 {  
   // Variables that hold the current color state.
-  vtkPVDataInformation *dataInfo;
+  vtkPVDataInformation *geomInfo;
   vtkPVDataSetAttributesInformation *attrInfo;
   vtkPVArrayInformation *arrayInfo;
-  vtkPVColorMap* colorMap = this->PVSource->GetPVColorMap();
-  int colorField = -1;
+  int colorField = this->PVSource->GetSavedColorArrayField();
+  const char* colorArrayName = this->PVSource->GetSavedColorArrayName();
 
-  if (colorMap)
+  // Detect the case where the color has never been set, 
+  // and we are switching from outline to surface.
+  // SavedColorField is initialized to -1 in PVSOurce contructor.
+  // It is set to 0 when the user colors by property.
+  if (colorField == -1)
     {
-    colorField = this->PVSource->GetDisplayProxy()->GetScalarModeCM();
+    this->PVSource->SetDefaultColorParameters();
+    vtkPVColorMap* colorMap = this->PVSource->GetPVColorMap();
+    if (colorMap)
+      {
+      colorField = this->PVSource->GetDisplayProxy()->GetScalarModeCM();
+      colorArrayName = colorMap->GetArrayName();
+      }
     }
-  dataInfo = this->PVSource->GetDataInformation();
-    
+        
   // See if the current selection still exists.
   // If not, set a new default.
-  if (colorMap)
+  geomInfo = this->PVSource->GetDisplayProxy()->GetGeometryInformation();
+  if (colorArrayName)
     {
     if (colorField == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)
       {
-      attrInfo = dataInfo->GetPointDataInformation();
+      attrInfo = geomInfo->GetPointDataInformation();
       }
     else
       {
-      attrInfo = dataInfo->GetCellDataInformation();
+      attrInfo = geomInfo->GetCellDataInformation();
       }
-    arrayInfo = attrInfo->GetArrayInformation(colorMap->GetArrayName());
-    if (!arrayInfo)
-      {
-      vtkSMDisplayProxy* dproxy = this->PVSource->GetDisplayProxy();
-      if (dproxy)
-        {
-        vtkPVDataInformation* geomInfo = dproxy->GetGeometryInformation();
-        if (colorField == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)
-          {
-          attrInfo = geomInfo->GetPointDataInformation();
-          }
-        else
-          {
-          attrInfo = geomInfo->GetCellDataInformation();
-          }
-
-        arrayInfo = attrInfo->GetArrayInformation(colorMap->GetArrayName());
-        }
-      }
+    arrayInfo = attrInfo->GetArrayInformation(colorArrayName);
     if (arrayInfo == 0)
       {
       this->PVSource->SetDefaultColorParameters();
-      colorMap = this->PVSource->GetPVColorMap();
+      vtkPVColorMap* colorMap = this->PVSource->GetPVColorMap();
       if (colorMap)
         {
         colorField = this->PVSource->GetDisplayProxy()->GetScalarModeCM();
+        colorArrayName = colorMap->GetArrayName();
         }
       else
         {
-        colorField = -1;
+        colorField = 0;
+        colorArrayName = 0;
         }
       }
     }
@@ -1392,12 +1387,12 @@ void vtkPVDisplayGUI::UpdateColorMenu()
   this->ColorSelectionMenu->SetPVSource(this->PVSource);
 
   this->ColorSelectionMenu->Update(0);
-  if (colorMap)
+  if (colorArrayName)
     {
     // Verify that the old colorby array has not disappeared.
     attrInfo = (colorField == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)?
-      dataInfo->GetPointDataInformation() : dataInfo->GetCellDataInformation();
-    arrayInfo = attrInfo->GetArrayInformation(colorMap->GetArrayName());
+      geomInfo->GetPointDataInformation() : geomInfo->GetCellDataInformation();
+    arrayInfo = attrInfo->GetArrayInformation(colorArrayName);
     if (!attrInfo)
       {
       vtkErrorMacro("Could not find previous color setting.");
@@ -1405,8 +1400,15 @@ void vtkPVDisplayGUI::UpdateColorMenu()
       }
     else
       {
-      this->ColorSelectionMenu->SetValue(colorMap->GetArrayName(),
-        colorField);
+      this->ColorSelectionMenu->SetValue(colorArrayName,
+                                         colorField);
+      // If color map does not exist, 
+      // we are switching from outline (which has no color arrays).
+      vtkPVColorMap* colorMap = this->PVSource->GetPVColorMap();
+      if (colorMap == 0)
+        {
+        this->PVSource->ColorByArray(colorArrayName, colorField); 
+        }                                  
       }
     }
   else
@@ -1563,10 +1565,11 @@ void vtkPVDisplayGUI::ChangeActorColor(double r, double g, double b)
     this->GetPVRenderView()->EventuallyRender();
     }
   
-  if (strcmp(this->ColorSelectionMenu->GetValue(), "Property") == 0)
-    {
-    this->ColorSetByUser = 1;
-    }
+  // I do not this these are used because this is a shared GUI object.
+  //if (strcmp(this->ColorSelectionMenu->GetValue(), "Property") == 0)
+  //  {
+  //  this->ColorSetByUser = 1;
+  //  }
 }
 
 //----------------------------------------------------------------------------
@@ -1590,7 +1593,8 @@ void vtkPVDisplayGUI::ColorByArray(const char* array, int field)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ColorByProperty()
 {
-  this->ColorSetByUser = 1;
+  // I do not this these are used because this is a shared GUI object.
+  //this->ColorSetByUser = 1;
   this->GetTraceHelper()->AddEntry("$kw(%s) ColorByProperty", 
                                    this->GetTclName());
   this->ColorSelectionMenu->SetValue("Property");
@@ -2038,6 +2042,10 @@ void vtkPVDisplayGUI::Initialize()
       this->SetRepresentation(VTK_PV_OUTLINE_LABEL);
       }
     }
+  else if (dataSetType == VTK_HYPER_OCTREE)
+    {
+    this->SetRepresentation(VTK_PV_SURFACE_LABEL);
+    }
   else if (dataSetType == VTK_GENERIC_DATA_SET)
     {
     this->SetRepresentation(VTK_PV_OUTLINE_LABEL);
@@ -2303,10 +2311,11 @@ void vtkPVDisplayGUI::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "RepresentationMenu: " << this->RepresentationMenu << endl;
   os << indent << "InterpolationMenu: " << this->InterpolationMenu << endl;
   os << indent << "ActorControlFrame: " << this->ActorControlFrame << endl;
-  os << indent << "ArraySetByUser: " << this->ArraySetByUser << endl;
+  // I do not this these are used because this is a shared GUI object.
+  //os << indent << "ArraySetByUser: " << this->ArraySetByUser << endl;
+  //os << indent << "ColorSetByUser: " << this->ColorSetByUser << endl;
   os << indent << "ActorColor: " << this->ActorColor[0] << ", " << this->ActorColor[1]
                << ", " << this->ActorColor[2] << endl;
-  os << indent << "ColorSetByUser: " << this->ColorSetByUser << endl;
   os << indent << "ShouldReinitialize: " << this->ShouldReinitialize << endl;
 }
 
