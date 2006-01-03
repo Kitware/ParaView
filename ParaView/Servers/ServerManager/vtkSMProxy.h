@@ -329,9 +329,9 @@ protected:
   friend class vtkSMProperty;
   friend class vtkSMProxyManager;
   friend class vtkSMInputProperty;
-  friend class vtkSMProxyProperty;
   friend class vtkSMPropertyIterator;
   friend class vtkSMProxyObserver;
+  friend class vtkSMProxyProperty;
   friend class vtkSMSourceProxy;
   friend class vtkSMIceTDesktopRenderModuleProxy;
   friend class vtkSMCompoundProxy;
