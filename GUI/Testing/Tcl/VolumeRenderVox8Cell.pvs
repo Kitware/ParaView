@@ -61,6 +61,7 @@ $kw(vtkTemp24) SetCameraState 3.887 -4.721 6.343  1.569 0.111 1.885  -0.812 0.11
 $kw(vtkTemp5) SetCurrentPVSourceCallback $kw(vtkTemp1422)
 set kw(vtkTemp1452) [$kw(vtkTemp1422) GetPVOutput]
 $kw(vtkTemp1452) DrawSurface
+$kw(vtkTemp1452) ColorByProperty
 $kw(vtkTemp5) SetCurrentPVSourceCallback $kw(vtkTemp1176)
 
 
