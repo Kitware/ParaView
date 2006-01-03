@@ -23,7 +23,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMProxyLink);
-vtkCxxRevisionMacro(vtkSMProxyLink, "1.2");
+vtkCxxRevisionMacro(vtkSMProxyLink, "1.3");
 
 //---------------------------------------------------------------------------
 struct vtkSMProxyLinkInternals
@@ -78,6 +78,10 @@ void vtkSMProxyLink::AddLinkedProxy(vtkSMProxy* proxy, int updateDir)
       if (iter->UpdateDirection != updateDir)
         {
         iter->UpdateDirection = updateDir;
+        if (addObserver)
+          {
+          iter->Observer = this->Observer;
+          }
         }
       else
         {
@@ -90,8 +94,11 @@ void vtkSMProxyLink::AddLinkedProxy(vtkSMProxy* proxy, int updateDir)
   if (addToList)
     {
     vtkSMProxyLinkInternals::LinkedProxy link(proxy, updateDir);
-    link.Observer = this->Observer;
     this->Internals->LinkedProxies.push_back(link);
+    if (addObserver)
+      {
+      this->Internals->LinkedProxies.back().Observer = this->Observer;
+      }
     }
 
   if (addObserver)

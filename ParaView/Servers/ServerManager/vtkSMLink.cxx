@@ -22,7 +22,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkSMLink, "1.1");
+vtkCxxRevisionMacro(vtkSMLink, "1.2");
 //-----------------------------------------------------------------------------
 class vtkSMLinkObserver : public vtkCommand
 {
@@ -79,8 +79,8 @@ vtkSMLink::~vtkSMLink()
 //-----------------------------------------------------------------------------
 void vtkSMLink::ObserveProxyUpdates(vtkSMProxy* proxy)
 {
-  proxy->AddObserver(vtkCommand::UpdateEvent, this->Observer);
   proxy->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer);
+  proxy->AddObserver(vtkCommand::UpdateEvent, this->Observer);
 }
 
 //-----------------------------------------------------------------------------
