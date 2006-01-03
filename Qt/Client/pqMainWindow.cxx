@@ -884,17 +884,16 @@ void pqMainWindow::onFrameActive(QWidget* w)
 
 void pqMainWindow::onNewSelections(vtkSMSourceProxy*, vtkUnstructuredGrid* selections)
 {
-  QAbstractItemModel* oldModel = this->ElementInspectorWidget->model();
-
-  pqDataSetModel* newModel = new pqDataSetModel(this->ElementInspectorWidget);
-  this->ElementInspectorWidget->setModel(newModel);
-  newModel->setDataSet(selections);
-  
-  if(oldModel)
+  pqDataSetModel* model = qobject_cast<pqDataSetModel*>(
+      this->ElementInspectorWidget->model());
+  if(!model)
     {
-    delete oldModel;
+    model = new pqDataSetModel(this->ElementInspectorWidget);
+    this->ElementInspectorWidget->setModel(model);
     }
 
-  this->ElementInspectorWidget->update();
-
+  if(model)
+    {
+    model->setDataSet(selections);
+    }
 }

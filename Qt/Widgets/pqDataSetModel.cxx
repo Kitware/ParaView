@@ -12,7 +12,10 @@ pqDataSetModel::pqDataSetModel(QObject* p)
 
 pqDataSetModel::~pqDataSetModel()
 {
-  this->setDataSet(0);
+  if(this->DataSet)
+    {
+    this->DataSet->UnRegister(NULL);
+    }
 }
 
 
@@ -52,17 +55,15 @@ QVariant pqDataSetModel::data(const QModelIndex& index, int role) const
   return QVariant();
 }
 
-QVariant pqDataSetModel::headerData(int section, Qt::Orientation, int role) const
+QVariant pqDataSetModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-  if(!this->DataSet)
+  if(this->DataSet && orientation == Qt::Horizontal)
     {
-    return QVariant();
-    }
-
-  if(role == Qt::DisplayRole)
-    {
-    vtkDataArray* array = this->DataSet->GetCellData()->GetArray(section);
-    return array->GetName();
+    if(role == Qt::DisplayRole)
+      {
+      vtkDataArray* array = this->DataSet->GetCellData()->GetArray(section);
+      return array->GetName();
+      }
     }
 
   return QVariant();
@@ -76,13 +77,8 @@ void pqDataSetModel::setDataSet(vtkDataSet* ds)
     return;
     }
 
-  int oldRow=0, oldCol=0;
-  int newRow=0, newCol=0;
-
   if(this->DataSet)
     {
-    oldRow = this->DataSet->GetNumberOfCells();
-    oldCol = this->DataSet->GetCellData()->GetNumberOfArrays();
     this->DataSet->UnRegister(NULL);
     }
 
@@ -91,11 +87,10 @@ void pqDataSetModel::setDataSet(vtkDataSet* ds)
   if(this->DataSet)
     {
     this->DataSet->Register(NULL);
-    newRow = this->DataSet->GetNumberOfCells();
-    newCol = this->DataSet->GetCellData()->GetNumberOfArrays();
     }
   
-  // TODO : tell the view that we changed
+  // Tell the view that we changed.
+  this->reset();
 }
 
 vtkDataSet* pqDataSetModel::dataSet() const
