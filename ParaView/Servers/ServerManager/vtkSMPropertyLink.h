@@ -44,7 +44,7 @@ protected:
   ~vtkSMPropertyLink();
 
 //BTX
-  friend class vtkSMPropertyLinkInternals;
+  friend struct vtkSMPropertyLinkInternals;
 //ETX
 
   virtual void UpdateVTKObjects(vtkSMProxy* caller);
