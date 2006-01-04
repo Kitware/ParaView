@@ -178,7 +178,7 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index, Qt::Orientat
     
     QByteArray n = "MultiViewSplitter:";
     Index idxName = this->indexOf(newSplitter);
-    for(int i=0; i<idxName.size(); i++)
+    for(i=0; i<idxName.size(); i++)
       {
       QString tmp;
       tmp.setNum(idxName[i]);

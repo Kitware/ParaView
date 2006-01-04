@@ -389,12 +389,12 @@ public:
     return createIndex(row, column);
   }
   
-  virtual QModelIndex parent(const QModelIndex& index) const
+  virtual QModelIndex parent(const QModelIndex& /*index*/) const
   {
     return QModelIndex();
   }
   
-  virtual int rowCount(const QModelIndex& parent) const
+  virtual int rowCount(const QModelIndex& /*parent*/) const
   {
     return this->FavoriteList.size();
   }
@@ -407,7 +407,7 @@ public:
     return false;
   }
   
-  virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const
+  virtual QVariant headerData(int section, Qt::Orientation /*orientation*/, int role) const
   {
     switch(role)
       {
