@@ -352,6 +352,17 @@ pqChartValue pqChartAxis::getValueFor(int pixel)
   return result;
 }
 
+pqChartValue pqChartAxis::getValueForIndex(int index) const
+{
+  pqChartValue value = 0;
+  if(this->Data && index >= 0 && index < static_cast<int>(this->Data->size()))
+    {
+    value = (*this->Data)[index]->Value;
+    }
+
+  return value;
+}
+
 bool pqChartAxis::isValid() const
 {
   if(this->ValueMax == this->ValueMin)

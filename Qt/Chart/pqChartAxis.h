@@ -198,8 +198,20 @@ public:
   /// \return
   ///   The value equivalent to the pixel location.
   /// \sa pqChartAxis::isValid(),
-  ///     pqChartAxis::getPixelFor()
+  ///     pqChartAxis::getPixelFor(const pqChartValue &)
   pqChartValue getValueFor(int pixel);
+
+  /// \brief
+  ///   Maps an index to a value.
+  ///
+  /// This method only returns valid values after the axis has
+  /// been laid out.
+  ///
+  /// \param index The index of the axis tick mark.
+  /// \return
+  ///   The value for the given index.
+  /// \sa pqChartAxis::getValueFor(int)
+  pqChartValue getValueForIndex(int index) const;
 
   /// \brief
   ///   Used to determine if the pixel/value mapping is valid.
