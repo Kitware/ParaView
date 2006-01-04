@@ -23,6 +23,10 @@ $kw(vtkTemp2) SetCenterOfRotation 33.500000 33.500000 33.500000
 set kw(vtkTemp813) [$kw(vtkTemp2) GetPVColorMap {scalars} 1]
 $kw(vtkTemp813) SetScalarBarTitle {scalars}
 $kw(vtkTemp782) AcceptCallback
+
+set kw(vtkTemp1310) [$kw(vtkTemp782) GetPVOutput]
+$kw(vtkTemp1310) ColorByProperty
+
 set kw(vtkTemp886) [$kw(vtkTemp2) CreatePVSource Contour]
 set kw(vtkTemp887) [$kw(vtkTemp886) GetPVWidget {Input}]
 $kw(vtkTemp887) SetCurrentValue $kw(vtkTemp782)
