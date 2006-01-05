@@ -11,7 +11,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWHistogramSet - an histogram
+// .NAME vtkKWHistogram - an histogram
 // .SECTION Description
 
 #ifndef __vtkKWHistogram_h
