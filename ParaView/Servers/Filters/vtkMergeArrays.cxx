@@ -15,12 +15,13 @@
 #include "vtkMergeArrays.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkDataArray.h"
 #include "vtkDataSet.h"
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 #include "vtkFieldData.h"
 
-vtkCxxRevisionMacro(vtkMergeArrays, "1.5");
+vtkCxxRevisionMacro(vtkMergeArrays, "1.6");
 vtkStandardNewMacro(vtkMergeArrays);
 
 //----------------------------------------------------------------------------
