@@ -23,7 +23,7 @@
 #include <vtkstd/map>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.3");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.4");
 
 struct vtkSMStateLoaderInternals
 {
@@ -48,7 +48,7 @@ vtkSMStateLoader::~vtkSMStateLoader()
 //---------------------------------------------------------------------------
 vtkSMProxy* vtkSMStateLoader::NewProxy(int id)
 {
-  this->NewProxy(this->RootElement, id);
+  return this->NewProxy(this->RootElement, id);
 }
 
 //---------------------------------------------------------------------------
