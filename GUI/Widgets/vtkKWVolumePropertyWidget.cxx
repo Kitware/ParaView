@@ -14,6 +14,7 @@
 #include "vtkKWVolumePropertyWidget.h"
 
 #include "vtkColorTransferFunction.h"
+#include "vtkDataArray.h"
 #include "vtkDataSet.h"
 #include "vtkImageData.h"
 #include "vtkKWCheckButton.h"
@@ -51,7 +52,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.35");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.36");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
