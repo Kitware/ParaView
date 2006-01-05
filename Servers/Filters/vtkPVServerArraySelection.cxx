@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerArraySelection);
-vtkCxxRevisionMacro(vtkPVServerArraySelection, "1.4");
+vtkCxxRevisionMacro(vtkPVServerArraySelection, "1.5");
 
 //----------------------------------------------------------------------------
 class vtkPVServerArraySelectionInternals
@@ -80,7 +80,6 @@ vtkPVServerArraySelection
              << readerID
              << aname.str()
              << vtkClientServerStream::End;
-      aname.rdbuf()->freeze(0); 
       interp->ProcessStream(stream);
       stream.Reset();
       int numArrays = 0;
@@ -89,6 +88,7 @@ vtkPVServerArraySelection
         vtkErrorMacro("Error getting number of arrays from reader.");
         }
 
+      delete[] aname.str();
       // For each array, get its name and status.
       for(int i=0; i < numArrays; ++i)
         {
@@ -101,12 +101,12 @@ vtkPVServerArraySelection
                << naname.str()
                << i
                << vtkClientServerStream::End;
-        naname.rdbuf()->freeze(0); 
         if(!interp->ProcessStream(stream))
           {
           break;
           }
         stream.Reset();
+        delete[] naname.str();
         const char* pname;
         if(!interp->GetLastResult().GetArgument(0, 0, &pname))
           {
@@ -129,12 +129,12 @@ vtkPVServerArraySelection
           << saname.str()
           << name.c_str()
           << vtkClientServerStream::End;
-        saname.rdbuf()->freeze(0); 
         if(!interp->ProcessStream(stream))
           {
           break;
           }
         stream.Reset();
+        delete[] saname.str();
         int status = 0;
         if(!interp->GetLastResult().GetArgument(0, 0, &status))
           {
