@@ -11,7 +11,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWRegistryHelper - A registry class
+// .NAME vtkKWUNIXRegistryHelper - A registry class
 // .SECTION Description
 // This class abstracts the storing of data that can be restored
 // when the program executes again. It is implemented as a file in
