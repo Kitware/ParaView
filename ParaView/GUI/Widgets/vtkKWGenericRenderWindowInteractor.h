@@ -19,8 +19,13 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWGenericRenderWindowInteractor
+// .NAME vtkKWGenericRenderWindowInteractor - Subclass of vtkGenericRenderWindowInteractor specific to KWWidgets
 // .SECTION Description
+// vtkKWGenericRenderWindowInteractor provides a way to translate native
+// mouse and keyboard events into vtk Events. By calling the methods on
+// this class, vtk events will be invoked. This will allow scripting
+// languages to use vtkInteractorStyles and 3D widgets.
+
 
 #ifndef __vtkKWGenericRenderWindowInteractor_h
 #define __vtkKWGenericRenderWindowInteractor_h
