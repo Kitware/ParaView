@@ -11,7 +11,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWRegistryHelper - A Win32 implementation of the registry
+// .NAME vtkKWWin32RegistryHelper - A Win32 implementation of the registry
 // .SECTION Description
 // This class abstracts the storing of data that can be restored
 // when the program executes again. It is designed specifically for 
