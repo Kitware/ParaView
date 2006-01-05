@@ -156,7 +156,7 @@ public:
   // Description:
   // Called when saving server manager state.
   // Overridden to SynchronizeCameraProperties before saving the properties.
-  virtual void SaveState(vtkPVXMLElement* root);
+  virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
 
   // Description:
   // Indicates if we should locally render.

@@ -34,6 +34,7 @@ public:
 
   virtual void SaveInBatchScript(ofstream *file);
   virtual void UpdateVTKObjects();
+
 protected:
 //BTX
   vtkSMLineWidgetProxy();
@@ -41,7 +42,7 @@ protected:
 
   // Description:
   // Overloaded to update the property values before saving state
-  virtual void SaveState(vtkPVXMLElement* root);
+  virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
   
   // Description:
   // Execute event of the 3D Widget.

@@ -22,7 +22,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPointWidgetProxy);
-vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.11");
 
 //----------------------------------------------------------------------------
 vtkSMPointWidgetProxy::vtkSMPointWidgetProxy()
@@ -102,7 +102,7 @@ void vtkSMPointWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long event,voi
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPointWidgetProxy::SaveState(vtkPVXMLElement* root)
+vtkPVXMLElement* vtkSMPointWidgetProxy::SaveState(vtkPVXMLElement* root)
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("Position"));
@@ -110,7 +110,7 @@ void vtkSMPointWidgetProxy::SaveState(vtkPVXMLElement* root)
     {
     dvp->SetElements(this->Position);
     }
-  this->Superclass::SaveState(root);
+  return this->Superclass::SaveState(root);
 }
 
 //----------------------------------------------------------------------------

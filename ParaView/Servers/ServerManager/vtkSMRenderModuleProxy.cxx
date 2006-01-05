@@ -46,7 +46,7 @@
 #include "vtkWindowToImageFilter.h"
 
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.21");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.22");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -993,10 +993,10 @@ void vtkSMRenderModuleProxy::SynchronizeCameraProperties()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMRenderModuleProxy::SaveState(vtkPVXMLElement* root)
+vtkPVXMLElement* vtkSMRenderModuleProxy::SaveState(vtkPVXMLElement* root)
 {
   this->SynchronizeCameraProperties();
-  this->Superclass::SaveState(root);
+  return this->Superclass::SaveState(root);
 }
 
 //-----------------------------------------------------------------------------

@@ -23,7 +23,7 @@
 #include <vtkstd/map>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.2");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.3");
 
 struct vtkSMStateLoaderInternals
 {
@@ -48,6 +48,13 @@ vtkSMStateLoader::~vtkSMStateLoader()
 //---------------------------------------------------------------------------
 vtkSMProxy* vtkSMStateLoader::NewProxy(int id)
 {
+  this->NewProxy(this->RootElement, id);
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMStateLoader::NewProxyFromElement(
+  vtkPVXMLElement* proxyElement, int id)
+{
   vtkSMStateLoaderInternals::ProxyMapType::iterator iter =
     this->Internal->CreatedProxies.find(id);
   if (iter != this->Internal->CreatedProxies.end())
@@ -56,17 +63,62 @@ vtkSMProxy* vtkSMStateLoader::NewProxy(int id)
     return iter->second;
     }
 
-  if (!this->RootElement)
+  vtkSMProxyManager* pm = this->GetProxyManager();
+
+  const char* group = proxyElement->GetAttribute("group");
+  const char* type = proxyElement->GetAttribute("type");
+  if (!type || !group)
     {
+    vtkErrorMacro("Could not create proxy from element.");
+    return 0;
+    }
+  vtkSMProxy* proxy = pm->NewProxy(group, type);
+  if (!proxy)
+    {
+    vtkErrorMacro("Could not create a proxy of group: "
+                  << group
+                  << " type: "
+                  << type);
+    return 0;
+    }
+  this->Internal->CreatedProxies[id] = proxy;
+  if (!proxy->LoadState(proxyElement, this))
+    {
+    vtkSMStateLoaderInternals::ProxyMapType::iterator iter2 =
+      this->Internal->CreatedProxies.find(id);
+    this->Internal->CreatedProxies.erase(iter2);
+    proxy->Delete();
+    vtkErrorMacro("Failed to load state.");
+    return 0;
+    }
+  return proxy;
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMStateLoader::NewProxy(vtkPVXMLElement* root, 
+                                       int id)
+{
+  vtkSMStateLoaderInternals::ProxyMapType::iterator iter =
+    this->Internal->CreatedProxies.find(id);
+  if (iter != this->Internal->CreatedProxies.end())
+    {
+    iter->second->Register(this);
+    return iter->second;
+    }
+
+  if (!root)
+    {
+    vtkErrorMacro("No root is defined. Cannot create proxy");
     return 0;
     }
 
   vtkSMProxyManager* pm = this->GetProxyManager();
 
-  unsigned int numElems = this->RootElement->GetNumberOfNestedElements();
-  for (unsigned int i=0; i<numElems; i++)
+  unsigned int numElems = root->GetNumberOfNestedElements();
+  unsigned int i=0;
+  for (i=0; i<numElems; i++)
     {
-    vtkPVXMLElement* currentElement = this->RootElement->GetNestedElement(i);
+    vtkPVXMLElement* currentElement = root->GetNestedElement(i);
     if (currentElement->GetName() &&
         strcmp(currentElement->GetName(), "Proxy") == 0)
       {
@@ -79,32 +131,21 @@ vtkSMProxy* vtkSMStateLoader::NewProxy(int id)
         {
         continue;
         }
-      const char* group = currentElement->GetAttribute("group");
-      const char* type = currentElement->GetAttribute("type");
-      if (!type || !group)
-        {
-        continue;
-        }
-      vtkSMProxy* proxy = pm->NewProxy(group, type);
-      if (!proxy)
-        {
-        vtkErrorMacro("Could not create a proxy of group: "
-                      << group
-                      << " type: "
-                      << type);
-        }
-      this->Internal->CreatedProxies[id] = proxy;
-      if (!proxy->LoadState(currentElement, this))
-        {
-        vtkSMStateLoaderInternals::ProxyMapType::iterator iter2 =
-          this->Internal->CreatedProxies.find(id);
-        this->Internal->CreatedProxies.erase(iter2);
-        proxy->Delete();
-        return 0;
-        }
-      return proxy;
+      return this->NewProxyFromElement(currentElement, id);
       }
     }
+
+  // If proxy was not found on root level, go into nested elements
+  for (i=0; i<numElems; i++)
+    {
+    vtkPVXMLElement* currentElement = root->GetNestedElement(i);
+    vtkSMProxy* res = this->NewProxy(currentElement, id);
+    if (res)
+      {
+      return res;
+      }
+    }
+
   return 0;
 }
 
@@ -154,6 +195,12 @@ int vtkSMStateLoader::HandleProxyCollection(vtkPVXMLElement* collectionElement)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMStateLoader::ClearCreatedProxies()
+{
+  this->Internal->CreatedProxies.clear();
+}
+
+//---------------------------------------------------------------------------
 int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement)
 {
   if (!rootElement)
@@ -171,7 +218,7 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement)
 
   this->RootElement = rootElement;
 
-  this->Internal->CreatedProxies.clear();
+  this->ClearCreatedProxies();
 
   unsigned int numElems = rootElement->GetNumberOfNestedElements();
   for (unsigned int i=0; i<numElems; i++)
@@ -187,7 +234,7 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement)
       }
     }
 
-  this->Internal->CreatedProxies.clear();
+  this->ClearCreatedProxies();
 
   this->RootElement = 0;
 

@@ -33,6 +33,10 @@
 
 #include "vtkSMProxy.h"
 
+//BTX
+struct vtkSMCompoundProxyInternals;
+//ETX
+
 class VTK_EXPORT vtkSMCompoundProxy : public vtkSMProxy
 {
 public:
@@ -72,13 +76,34 @@ public:
   // Returns the number of sub-proxies.
   unsigned int GetNumberOfProxies();
 
+  // Description:
+  // This is the same as save state except it will remove all references to
+  // "outside" proxies. Outside proxies are proxies that are not contained
+  // in the compound proxy.  As a result, the saved state will be self
+  // contained.  Returns the top element created. It is the caller's
+  // responsibility to delete the returned element. If root is NULL,
+  // the returned element will be a top level element.
+  virtual vtkPVXMLElement* SaveDefinition(vtkPVXMLElement* root);
+
 protected:
   vtkSMCompoundProxy();
   ~vtkSMCompoundProxy();
 
   vtkSMProxy* MainProxy;
 
+  virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
+
+  vtkSMCompoundProxyInternals* Internal;
+
 private:
+  // returns 1 if the value element should be written.
+  // proxy property values that point to "outside" proxies
+  // are not written
+  int ShouldWriteValue(vtkPVXMLElement* valueElem);
+
+  void TraverseForProperties(vtkPVXMLElement* root);
+  void StripValues(vtkPVXMLElement* propertyElem);
+
   vtkSMCompoundProxy(const vtkSMCompoundProxy&); // Not implemented
   void operator=(const vtkSMCompoundProxy&); // Not implemented
 };

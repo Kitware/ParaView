@@ -87,6 +87,10 @@ public:
   vtkPVXMLElement* FindNestedElement(const char* id);
 
   // Description:
+  // Removes all nested elements.
+  void RemoveAllNestedElements();
+
+  // Description:
   // Lookup the element with the given id, starting at this scope.
   vtkPVXMLElement* LookupElement(const char* id);
 
