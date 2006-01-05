@@ -72,9 +72,13 @@ class pyProxy:
         self.__LastAttrName = None
 
     def CreateDisplayProxy(self):
-        "Overload RenderModules CreateDisplayProxy() to return a pyProxy"
+        "Overload RenderModule's CreateDisplayProxy() to return a pyProxy"
         return pyProxy(self.SMProxy.CreateDisplayProxy())
-    
+
+    def AddProxy(self, name, proxy):
+        "Overload CompoundProxy's AddProxy()"
+        self.SMProxy.AddProxy(name, proxy.SMProxy)
+
     def __getattr__(self, name):
         """With the exception of a few overloaded methods,
         returns the SMProxy method"""
