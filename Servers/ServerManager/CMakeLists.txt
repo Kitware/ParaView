@@ -32,6 +32,7 @@ SET(Kit_SRCS
   vtkSMCompositeDisplayProxy.cxx
   vtkSMCompositeRenderModuleProxy.cxx
   vtkSMCompoundProxy.cxx
+  vtkSMCompoundProxyDefinitionLoader.cxx
   vtkSMConsumerDisplayProxy.cxx
   vtkSMDataObjectDisplayProxy.cxx
   vtkSMDataTypeDomain.cxx

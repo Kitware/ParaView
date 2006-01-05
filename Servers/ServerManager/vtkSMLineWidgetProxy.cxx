@@ -24,7 +24,7 @@
 
 
 vtkStandardNewMacro(vtkSMLineWidgetProxy);
-vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.12");
 //----------------------------------------------------------------------------
 vtkSMLineWidgetProxy::vtkSMLineWidgetProxy()
 {
@@ -115,7 +115,7 @@ void vtkSMLineWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long event,void
 }
 
 //---------------------------------------------------------------------------
-void vtkSMLineWidgetProxy::SaveState(vtkPVXMLElement* root)
+vtkPVXMLElement* vtkSMLineWidgetProxy::SaveState(vtkPVXMLElement* root)
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("Point1"));
@@ -129,7 +129,7 @@ void vtkSMLineWidgetProxy::SaveState(vtkPVXMLElement* root)
     {
     dvp->SetElements(this->Point2);
     }
-  this->Superclass::SaveState(root);
+  return this->Superclass::SaveState(root);
 }
 
 //----------------------------------------------------------------------------

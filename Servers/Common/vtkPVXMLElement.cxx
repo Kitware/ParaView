@@ -16,7 +16,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.4");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.5");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 #include <vtkstd/string>
@@ -52,8 +52,21 @@ vtkPVXMLElement::~vtkPVXMLElement()
 void vtkPVXMLElement::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << "Id: " << (this->Id?this->Id:"<none>") << endl;
-  os << "Name: " << (this->Name?this->Name:"<none>") << endl;
+  os << indent << "Id: " << (this->Id?this->Id:"<none>") << endl;
+  os << indent << "Name: " << (this->Name?this->Name:"<none>") << endl;
+  unsigned int numNested = this->GetNumberOfNestedElements();
+  for (unsigned int i=0; i< numNested; i++)
+    {
+    if (this->GetNestedElement(i))
+      {
+      this->GetNestedElement(i)->PrintSelf(os, indent.GetNextIndent());
+      }
+    }
+
+  if (!this->GetParent())
+    {
+    this->PrintXML(os, indent);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -127,6 +140,12 @@ void vtkPVXMLElement::ReadXMLAttributes(const char** atts)
       this->AddAttribute(atts[i*2], atts[i*2+1]);
       }
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXMLElement::RemoveAllNestedElements()
+{
+  this->Internal->NestedElements.clear();
 }
 
 //----------------------------------------------------------------------------

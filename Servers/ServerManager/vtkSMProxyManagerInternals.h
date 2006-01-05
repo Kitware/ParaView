@@ -75,6 +75,10 @@ struct vtkSMProxyManagerInternals
   // This data structure stores a set of proxies that have been modified.
   typedef vtkstd::set<vtkSMProxy*> SetOfProxies;
   SetOfProxies ModifiedProxies;
+
+  typedef vtkstd::map<vtkStdString, vtkSmartPointer<vtkPVXMLElement> >
+     DefinitionType;
+  DefinitionType CompoundProxyDefinitions;
 };
 
 #endif

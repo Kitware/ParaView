@@ -22,7 +22,7 @@
 #include "vtkSphereWidget.h"
 
 vtkStandardNewMacro(vtkSMSphereWidgetProxy);
-vtkCxxRevisionMacro(vtkSMSphereWidgetProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMSphereWidgetProxy, "1.12");
 
 //----------------------------------------------------------------------------
 vtkSMSphereWidgetProxy::vtkSMSphereWidgetProxy()
@@ -87,7 +87,7 @@ void vtkSMSphereWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long event,vo
 }
 
 //----------------------------------------------------------------------------
-void vtkSMSphereWidgetProxy::SaveState(vtkPVXMLElement* root)
+vtkPVXMLElement* vtkSMSphereWidgetProxy::SaveState(vtkPVXMLElement* root)
 {
   vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("Center"));
@@ -102,7 +102,7 @@ void vtkSMSphereWidgetProxy::SaveState(vtkPVXMLElement* root)
     {
     dvp->SetElements1(this->Radius);
     }
-  this->Superclass::SaveState(root);
+  return this->Superclass::SaveState(root);
 }
 
 //----------------------------------------------------------------------------

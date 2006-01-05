@@ -31,7 +31,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.26");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.27");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -483,7 +483,8 @@ int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
     {
     vtkPVXMLElement* currentElement = element->GetNestedElement(i);
     if (currentElement->GetName() &&
-        strcmp(currentElement->GetName(), "Element") == 0)
+        (strcmp(currentElement->GetName(), "Element") == 0 ||
+         strcmp(currentElement->GetName(), "Proxy") == 0) )
       {
       int id;
       if (currentElement->GetScalarAttribute("value", &id))
@@ -542,8 +543,7 @@ void vtkSMProxyProperty::ChildSaveState(vtkPVXMLElement* propertyElement)
     for(unsigned int i=0; i<numFoundProxies; i++)
       {
       vtkPVXMLElement* elementElement = vtkPVXMLElement::New();
-      elementElement->SetName("Element");
-      elementElement->AddAttribute("index", i);
+      elementElement->SetName("Proxy");
       elementElement->AddAttribute("value", proxies[i].c_str());
       propertyElement->AddNestedElement(elementElement);
       elementElement->Delete();

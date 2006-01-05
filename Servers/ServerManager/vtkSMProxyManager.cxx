@@ -19,8 +19,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMCompoundProxyDefinitionLoader.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
+#include "vtkSMStateLoader.h"
 #include "vtkSmartPointer.h"
 
 #include <vtkstd/map>
@@ -77,7 +79,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.30");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.31");
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -661,6 +663,49 @@ void vtkSMProxyManager::SaveState(vtkPVXMLElement* rootElement)
     }
 
   rootElement->Delete();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::RegisterCompoundProxyDefinition(
+  const char* name, vtkPVXMLElement* top)
+{
+  if (!top)
+    {
+    return;
+    }
+
+  this->Internals->CompoundProxyDefinitions[name] = top;
+}
+
+//---------------------------------------------------------------------------
+vtkPVXMLElement* vtkSMProxyManager::GetCompoundProxyDefinition(
+  const char* name)
+{
+  if (!name)
+    {
+    return 0;
+    }
+
+  vtkSMProxyManagerInternals::DefinitionType::iterator iter =
+    this->Internals->CompoundProxyDefinitions.find(name);
+  if (iter != this->Internals->CompoundProxyDefinitions.end())
+    {
+    return iter->second.GetPointer();
+    }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+vtkSMCompoundProxy* vtkSMProxyManager::NewCompoundProxy(const char* name)
+{
+  vtkPVXMLElement* definition = this->GetCompoundProxyDefinition(name);
+  if (!definition)
+    {
+    return 0;
+    }
+  vtkSMCompoundProxyDefinitionLoader* loader = 
+    vtkSMCompoundProxyDefinitionLoader::New();
+  return loader->LoadDefinition(definition);
 }
 
 //---------------------------------------------------------------------------

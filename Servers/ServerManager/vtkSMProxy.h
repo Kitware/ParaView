@@ -546,10 +546,7 @@ protected:
   void SetXMLElement(vtkPVXMLElement* element);
   vtkPVXMLElement* XMLElement;
 
-  // the name is the name with which the proxy was registered with pxm.
-  // However, the proxy, uses SelfID to create a name for itself while 
-  // saving the state.
-  virtual void SaveState(vtkPVXMLElement* root);
+  virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
 
   void SetupSharedProperties(vtkSMProxy* subproxy, vtkPVXMLElement *element);
   void SetupExposedProperties(vtkSMProxy* subproxy, vtkPVXMLElement *element);

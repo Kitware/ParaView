@@ -42,7 +42,7 @@ public:
   // Load the state from the given root element. This root
   // element must have Proxy and ProxyCollection sub-elements
   // Returns 1 on success, 0 on failure.
-  int LoadState(vtkPVXMLElement* rootElement);
+  virtual int LoadState(vtkPVXMLElement* rootElement);
 
   // Description:
   // Either create a new proxy or returns one from the map
@@ -56,7 +56,17 @@ protected:
 
   vtkPVXMLElement* RootElement;
 
+  void ClearCreatedProxies();
+
   int HandleProxyCollection(vtkPVXMLElement* collectionElement);
+
+  // Either create a new proxy or returns one from the map
+  // of existing properties. Newly created proxies are stored
+  // in the map with the id as the key. The root is the xml
+  // element under which the proxy definitions are stored.
+  vtkSMProxy* NewProxy(vtkPVXMLElement* root, int id);
+
+  vtkSMProxy* NewProxyFromElement(vtkPVXMLElement* proxyElement, int id);
 
   vtkSMStateLoaderInternals* Internal;
 

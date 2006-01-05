@@ -33,6 +33,7 @@
 #include "vtkSMObject.h"
 
 class vtkPVXMLElement;
+class vtkSMCompoundProxy;
 class vtkSMProperty;
 class vtkSMProxy;
 class vtkSMProxyManagerObserver;
@@ -114,6 +115,21 @@ public:
   // not pushed to the VTK objects.
   void UpdateRegisteredProxies(const char* groupname, int modified_only = 1);
   void UpdateRegisteredProxies(int modified_only=1);
+
+  // Description:
+  // Register a compound proxy definition with the proxy manager. This
+  // definition (represented as a tree of vtkPVXMLElement objects) can
+  // then be used to instantiate a copy of the compound proxy. See
+  // vtkSMCompoundProxy.h for details.
+  void RegisterCompoundProxyDefinition(const char* name, vtkPVXMLElement* top);
+
+  // Description:
+  // Returns a registered compound proxy definition.
+  vtkPVXMLElement* GetCompoundProxyDefinition(const char* name);
+
+  // Description:
+  // Creates a compound proxy from compound proxy definition.
+  vtkSMCompoundProxy* NewCompoundProxy(const char* name); 
 
   // Description:
   // Save the state of the server manager in XML format in a file.
