@@ -68,8 +68,10 @@ private:
   pqPipelineListWidget *PipelineList;
   QDockWidget *PipelineDock;
   QAction *PipelineDockAction;
-  QDockWidget *ChartDock;
-  QAction *ChartDockAction;
+  QDockWidget *HistogramDock;
+  QDockWidget *LineChartDock;
+  QAction *HistogramDockAction;
+  QAction *LineChartDockAction;
   pqMultiViewFrame* ActiveView;
   QTreeView *ElementInspectorWidget;
   QDockWidget *ElementInspectorDock;

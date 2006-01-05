@@ -10,6 +10,7 @@ INCLUDE_DIRECTORIES(
   ${QtWidgets_SOURCE_DIR}
   ${ParaQ_SOURCE_DIR}/Qt/Chart
   ${ParaQ_SOURCE_DIR}/ParaView/VTK/Graphics
+  ${ParaQ_SOURCE_DIR}/ParaView/VTK/Hybrid
 )
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
@@ -22,6 +23,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqMultiViewFrame.h
   pqMultiViewManager.h
   pqObjectHistogramWidget.h
+  pqObjectLineChartWidget.h
   pqOpenExodusOptions.h
   pqObjectInspector.h
   pqObjectInspectorItem.h
@@ -85,12 +87,12 @@ ADD_LIBRARY(QtWidgets
   pqMultiViewFrame.h
   pqMultiViewManager.cxx
   pqMultiViewManager.h
-  pqOpenExodusOptions.cxx
-  pqOpenExodusOptions.h
   pqNameCount.cxx
   pqNameCount.h
   pqObjectHistogramWidget.cxx
   pqObjectHistogramWidget.h
+  pqObjectLineChartWidget.cxx
+  pqObjectLineChartWidget.h
   pqObjectInspector.cxx
   pqObjectInspector.h
   pqObjectInspectorDelegate.cxx
@@ -99,6 +101,8 @@ ADD_LIBRARY(QtWidgets
   pqObjectInspectorItem.h
   pqObjectInspectorWidget.cxx
   pqObjectInspectorWidget.h
+  pqOpenExodusOptions.cxx
+  pqOpenExodusOptions.h
   pqOptions.cxx
   pqOptions.h
   pqParts.cxx

@@ -11,6 +11,7 @@
 #include "pqConfig.h"
 #include "pqConnect.h"
 #include "pqFileDialog.h"
+#include "pqObjectLineChartWidget.h"
 #include "pqObjectHistogramWidget.h"
 #include "pqLocalFileDialogModel.h"
 #include "pqMainWindow.h"
@@ -90,8 +91,10 @@ pqMainWindow::pqMainWindow() :
   PipelineList(0),
   PipelineDock(0),
   PipelineDockAction(0),
-  ChartDock(0),
-  ChartDockAction(0),
+  HistogramDock(0),
+  LineChartDock(0),
+  HistogramDockAction(0),
+  LineChartDockAction(0),
   ActiveView(0),
   ElementInspectorWidget(0),
   ElementInspectorDock(0),
@@ -240,22 +243,39 @@ pqMainWindow::pqMainWindow() :
     this->addDockWidget(Qt::LeftDockWidgetArea, this->InspectorDock);
     }
 
-  // Add the chart dock window.
-  this->ChartDock = new QDockWidget("Chart View", this);
-  this->ChartDock->setObjectName("ChartDock");
-  this->ChartDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
-  this->ChartDock->setAllowedAreas(Qt::BottomDockWidgetArea |
+  // Add the histogram dock window.
+  this->HistogramDock = new QDockWidget("Histogram View", this);
+  this->HistogramDock->setObjectName("HistogramDock");
+  this->HistogramDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
+  this->HistogramDock->setAllowedAreas(Qt::BottomDockWidgetArea |
       Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-  pqObjectHistogramWidget* const histogram = new pqObjectHistogramWidget(this->ChartDock);  
-  this->ChartDock->setWidget(histogram);
+  pqObjectHistogramWidget* const histogram = new pqObjectHistogramWidget(this->HistogramDock);  
+  this->HistogramDock->setWidget(histogram);
   if(this->PipelineList)
     {
     connect(this->PipelineList, SIGNAL(proxySelected(vtkSMSourceProxy*)),
         histogram, SLOT(setProxy(vtkSMSourceProxy*)));
     }
-  
-  this->addDockWidget(Qt::BottomDockWidgetArea, this->ChartDock);
+
+  this->addDockWidget(Qt::LeftDockWidgetArea, this->HistogramDock);
+
+  // Add the line plot dock window.
+  this->LineChartDock = new QDockWidget("Line Chart View", this);
+  this->LineChartDock->setObjectName("LineChartDock");
+  this->LineChartDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
+  this->LineChartDock->setAllowedAreas(Qt::BottomDockWidgetArea |
+      Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+
+  pqObjectLineChartWidget* const line_plot = new pqObjectLineChartWidget(this->LineChartDock);  
+  this->LineChartDock->setWidget(line_plot);
+  if(this->PipelineList)
+    {
+    connect(this->PipelineList, SIGNAL(proxySelected(vtkSMSourceProxy*)),
+        line_plot, SLOT(setProxy(vtkSMSourceProxy*)));
+    }
+
+  this->addDockWidget(Qt::BottomDockWidgetArea, this->LineChartDock);
   
   // Add the element inspector dock window.
   this->ElementInspectorDock = new QDockWidget("Element Inspector View", this);
@@ -296,14 +316,23 @@ pqMainWindow::pqMainWindow() :
     this->InspectorDock, SLOT(setVisible(bool)));
   this->InspectorDock->installEventFilter(this);
 
-  this->ChartDockAction = viewMenu->addAction(
-    QIcon(":pqChart/pqHistogram22.png"), tr("&Chart View"))
-    << pqSetName("Chart");
-  this->ChartDockAction->setCheckable(true);
-  this->ChartDockAction->setChecked(true);
-  this->ChartDockAction << pqConnect(SIGNAL(triggered(bool)),
-    this->ChartDock, SLOT(setVisible(bool)));
-  this->ChartDock->installEventFilter(this);
+  this->HistogramDockAction = viewMenu->addAction(
+    QIcon(":pqChart/pqHistogram22.png"), tr("&Histogram View"))
+    << pqSetName("Histogram");
+  this->HistogramDockAction->setCheckable(true);
+  this->HistogramDockAction->setChecked(true);
+  this->HistogramDockAction << pqConnect(SIGNAL(triggered(bool)),
+    this->HistogramDock, SLOT(setVisible(bool)));
+  this->HistogramDock->installEventFilter(this);
+
+  this->LineChartDockAction = viewMenu->addAction(
+    QIcon(":pqChart/pqLineChart22.png"), tr("&Line Chart View"))
+    << pqSetName("LineChart");
+  this->LineChartDockAction->setCheckable(true);
+  this->LineChartDockAction->setChecked(true);
+  this->LineChartDockAction << pqConnect(SIGNAL(triggered(bool)),
+    this->LineChartDock, SLOT(setVisible(bool)));
+  this->LineChartDock->installEventFilter(this);
 
   this->ElementDockAction = viewMenu->addAction(tr("&Element Inspector"))
     << pqSetName("Element");
@@ -362,9 +391,13 @@ bool pqMainWindow::eventFilter(QObject* watched, QEvent* e)
       {
       this->InspectorDockAction->setChecked(checked);
       }
-    else if(watched == this->ChartDock)
+    else if(watched == this->HistogramDock)
       {
-      this->ChartDockAction->setChecked(checked);
+      this->HistogramDockAction->setChecked(checked);
+      }
+    else if(watched == this->LineChartDock)
+      {
+      this->LineChartDockAction->setChecked(checked);
       }
     else if(watched == this->ElementInspectorDock)
       {
