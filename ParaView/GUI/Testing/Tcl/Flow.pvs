@@ -87,6 +87,9 @@ $pv(vtkTemp728) SetSelectedState 1
 set pv(vtkTemp731) [$pv(vtkTemp711) GetPVWidget {RandomMask}]
 $pv(vtkTemp731) SetSelectedState 0
 $pv(vtkTemp711) AcceptCallback
+set pv(vtkTemp411) [$pv(vtkTemp711) GetPVOutput]
+$pv(vtkTemp411) ColorByProperty
+$pv(vtkTemp411) ChangeActorColor 0.800000 0.000000 0.200000
 
 $pv(vtkTemp41) ColorByProperty
 $pvWindow SetCurrentPVSourceCallback $pv(vtkTemp632)
