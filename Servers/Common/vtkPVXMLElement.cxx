@@ -16,7 +16,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.5");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.6");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 #include <vtkstd/string>
@@ -61,11 +61,6 @@ void vtkPVXMLElement::PrintSelf(ostream& os, vtkIndent indent)
       {
       this->GetNestedElement(i)->PrintSelf(os, indent.GetNextIndent());
       }
-    }
-
-  if (!this->GetParent())
-    {
-    this->PrintXML(os, indent);
     }
 }
 
@@ -178,13 +173,15 @@ const char* vtkPVXMLElement::GetAttribute(const char* name)
 //----------------------------------------------------------------------------
 void vtkPVXMLElement::PrintXML(ostream& os, vtkIndent indent)
 {
-  os << indent << "<" << this->Name;
+  os << indent << "<" << (this->Name?this->Name:"NoName");
   unsigned int numAttributes = this->Internal->AttributeNames.size();
   unsigned int i;
   for(i=0;i < numAttributes; ++i)
     {
-    os << " " << this->Internal->AttributeNames[i].c_str()
-       << "=\"" << this->Internal->AttributeValues[i].c_str() << "\"";
+    const char* aName = this->Internal->AttributeNames[i].c_str();
+    const char* aValue = this->Internal->AttributeValues[i].c_str();
+    os << " " << (aName?aName:"NoName")
+       << "=\"" << (aValue?aValue:"NoValue") << "\"";
     }
   unsigned int numberOfNestedElements = this->Internal->NestedElements.size();
   if(numberOfNestedElements > 0)
@@ -195,7 +192,7 @@ void vtkPVXMLElement::PrintXML(ostream& os, vtkIndent indent)
       vtkIndent nextIndent = indent.GetNextIndent();
       this->Internal->NestedElements[i]->PrintXML(os, nextIndent);
       }
-    os << indent << "</" << this->Name << ">\n";
+    os << indent << "</" << (this->Name?this->Name:"NoName") << ">\n";
     }
   else
     {
