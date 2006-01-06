@@ -480,17 +480,19 @@ ELSE(DEFINED BUILD_EXAMPLES)
   MARK_AS_ADVANCED(BUILD_EXAMPLES)
 ENDIF(DEFINED BUILD_EXAMPLES)
 
-IF(BUILD_EXAMPLES)
-  SUBDIRS(Examples)
-ENDIF(BUILD_EXAMPLES)
+SET(NEED_TO_BUILD_EXAMPLES ${BUILD_EXAMPLES})
 
 # --------------------------------------------------------------------------
 # Testing (requires some of the examples)
 
 IF(BUILD_TESTING)
-  SUBDIRS(Examples)
+  SET(NEED_TO_BUILD_EXAMPLES 1)
   SUBDIRS(Testing)
 ENDIF(BUILD_TESTING)
+
+IF(NEED_TO_BUILD_EXAMPLES)
+  SUBDIRS(Examples)
+ENDIF(NEED_TO_BUILD_EXAMPLES)
 
 # --------------------------------------------------------------------------
 # Build the utilities
