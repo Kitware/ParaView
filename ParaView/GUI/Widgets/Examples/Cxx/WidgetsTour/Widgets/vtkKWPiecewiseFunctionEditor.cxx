@@ -81,12 +81,21 @@ KWWidgetsTourItem* vtkKWPiecewiseFunctionEditorEntryPoint(
   // This one shows a different look & feel
 
   vtkPiecewiseFunction *pfed_tfunc2 = vtkPiecewiseFunction::New();
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   pfed_tfunc2->AddPoint(range[0]                    , 0.1, 0.5, 0.00);
   pfed_tfunc2->AddPoint((range[0] + range[1]) * 0.15, 0.9, 0.5, 0.25);
   pfed_tfunc2->AddPoint((range[0] + range[1]) * 0.30, 0.1, 0.5, 0.50);
   pfed_tfunc2->AddPoint((range[0] + range[1]) * 0.45, 0.9, 0.5, 0.75);
   pfed_tfunc2->AddPoint((range[0] + range[1]) * 0.60, 0.1, 0.5, 1.00);
   pfed_tfunc2->AddPoint((range[0] + range[1]) * 0.75, 0.9, 0.2, 0.00);
+#else
+  pfed_tfunc2->AddPoint(range[0]                    , 0.1);
+  pfed_tfunc2->AddPoint((range[0] + range[1]) * 0.15, 0.9);
+  pfed_tfunc2->AddPoint((range[0] + range[1]) * 0.30, 0.1);
+  pfed_tfunc2->AddPoint((range[0] + range[1]) * 0.45, 0.9);
+  pfed_tfunc2->AddPoint((range[0] + range[1]) * 0.60, 0.1);
+  pfed_tfunc2->AddPoint((range[0] + range[1]) * 0.75, 0.9);
+#endif
   pfed_tfunc2->AddPoint(range[1],                     0.1);
 
   // Create a transfer function editor

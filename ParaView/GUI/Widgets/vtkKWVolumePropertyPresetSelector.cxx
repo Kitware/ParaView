@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWVolumePropertyPresetSelector);
-vtkCxxRevisionMacro(vtkKWVolumePropertyPresetSelector, "1.2");
+vtkCxxRevisionMacro(vtkKWVolumePropertyPresetSelector, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWVolumePropertyPresetSelector::~vtkKWVolumePropertyPresetSelector()
@@ -65,7 +65,7 @@ int vtkKWVolumePropertyPresetSelector::SetPresetVolumeProperty(
       {
       ptr = vtkVolumeProperty::New();
       }
-    ptr->DeepCopy(prop);
+    this->DeepCopyVolumeProperty(ptr, prop);
     this->SetPresetUserSlotAsPointer(id, "VolumeProperty", ptr);
     return 1;
     }
@@ -79,6 +79,60 @@ vtkVolumeProperty* vtkKWVolumePropertyPresetSelector::GetPresetVolumeProperty(
 {
   return (vtkVolumeProperty*)
     this->GetPresetUserSlotAsPointer(id, "VolumeProperty");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWVolumePropertyPresetSelector::DeepCopyVolumeProperty(
+    vtkVolumeProperty *target, vtkVolumeProperty *source)
+{
+  if (!target || !source)
+    {
+    return;
+    }
+
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
+  target->DeepCopy(source);
+#else
+  target->SetIndependentComponents(source->GetIndependentComponents());
+
+  target->SetInterpolationType(source->GetInterpolationType());
+
+  for (int i = 0; i < VTK_MAX_VRCOMP; i++)
+    {
+    target->SetComponentWeight(i, source->GetComponentWeight(i));
+    
+    // Force ColorChannels to the right value and/or create a default tfunc
+    // then DeepCopy all the points
+
+    if (source->GetColorChannels(i) > 1)
+      {
+      target->SetColor(i, target->GetRGBTransferFunction(i));
+      target->GetRGBTransferFunction(i)->DeepCopy(
+        source->GetRGBTransferFunction(i));
+      }
+    else
+      {
+      target->SetColor(i, target->GetGrayTransferFunction(i));
+      target->GetGrayTransferFunction(i)->DeepCopy(
+        source->GetGrayTransferFunction(i));
+      }
+
+    target->GetScalarOpacity(i)->DeepCopy(source->GetScalarOpacity(i));
+
+    target->SetScalarOpacityUnitDistance(
+      i, source->GetScalarOpacityUnitDistance(i));
+
+    target->GetGradientOpacity(i)->DeepCopy(source->GetGradientOpacity(i));
+
+    target->SetDisableGradientOpacity(i, source->GetDisableGradientOpacity(i));
+
+    target->SetShade(i, source->GetShade(i));
+    target->SetAmbient(i, source->GetAmbient(i));
+    target->SetDiffuse(i, source->GetDiffuse(i));
+    target->SetSpecular(i, source->GetSpecular(i));
+    target->SetSpecularPower(i, source->GetSpecularPower(i));
+    }
+#endif
 }
 
 //----------------------------------------------------------------------------

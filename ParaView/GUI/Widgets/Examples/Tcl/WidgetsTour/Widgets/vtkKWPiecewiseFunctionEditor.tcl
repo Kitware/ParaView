@@ -60,13 +60,28 @@ proc vtkKWPiecewiseFunctionEditorEntryPoint {parent win} {
   set r0 [lindex $range 0]
   set r1 [lindex $range 1]
 
+  vtkVersion version
+  set vtk_major [version GetVTKMajorVersion]
+  set vtk_minor [version GetVTKMinorVersion]
+  version Delete
+
   vtkPiecewiseFunction pfed_tfunc2
-  pfed_tfunc2 AddPoint $r0                       0.1 0.5 0.00
-  pfed_tfunc2 AddPoint [expr ($r0 + $r1) * 0.15] 0.9 0.5 0.25
-  pfed_tfunc2 AddPoint [expr ($r0 + $r1) * 0.30] 0.1 0.5 0.50
-  pfed_tfunc2 AddPoint [expr ($r0 + $r1) * 0.45] 0.9 0.5 0.75
-  pfed_tfunc2 AddPoint [expr ($r0 + $r1) * 0.60] 0.1 0.5 1.00
-  pfed_tfunc2 AddPoint [expr ($r0 + $r1) * 0.75] 0.9 0.2 0.00
+  if {$vtk_major > 5 || ($vtk_major == 5 && $vtk_minor > 0)} {
+    pfed_tfunc2 AddPoint $r0                       0.1 0.5 0.00
+    pfed_tfunc2 AddPoint [expr ($r0 + $r1) * 0.15] 0.9 0.5 0.25
+    pfed_tfunc2 AddPoint [expr ($r0 + $r1) * 0.30] 0.1 0.5 0.50
+    pfed_tfunc2 AddPoint [expr ($r0 + $r1) * 0.45] 0.9 0.5 0.75
+    pfed_tfunc2 AddPoint [expr ($r0 + $r1) * 0.60] 0.1 0.5 1.00
+    pfed_tfunc2 AddPoint [expr ($r0 + $r1) * 0.75] 0.9 0.2 0.00
+  } else {
+    pfed_tfunc2 AddPoint $r0                       0.1
+    pfed_tfunc2 AddPoint [expr ($r0 + $r1) * 0.15] 0.9
+    pfed_tfunc2 AddPoint [expr ($r0 + $r1) * 0.30] 0.1
+    pfed_tfunc2 AddPoint [expr ($r0 + $r1) * 0.45] 0.9
+    pfed_tfunc2 AddPoint [expr ($r0 + $r1) * 0.60] 0.1
+    pfed_tfunc2 AddPoint [expr ($r0 + $r1) * 0.75] 0.9
+  }
+  
   pfed_tfunc2 AddPoint $r1                       0.1
 
   # Create a transfer function editor
