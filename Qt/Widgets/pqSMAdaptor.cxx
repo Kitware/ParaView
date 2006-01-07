@@ -151,12 +151,13 @@ QVariant pqSMAdaptor::getProperty(vtkSMProperty* Property)
   else
     {
     numElems = VectorProperty->GetNumberOfElements();
+    if(numElems == 1)
+      {
+      return this->getProperty(Property, 0);
+      }
     }
 
-  if(numElems == 1)
-    {
-    return this->getProperty(Property, 0);
-    }
+
   QList<QVariant> props;
   for(int i=0; i<numElems; i++)
     {
