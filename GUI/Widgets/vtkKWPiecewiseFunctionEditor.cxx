@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.45");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.46");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -219,9 +219,14 @@ int vtkKWPiecewiseFunctionEditor::GetFunctionPointParameter(
     return 0;
     }
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[4];
   this->PiecewiseFunction->GetNodeValue(id, node_value);
   *parameter = node_value[0];
+#else
+  *parameter = this->PiecewiseFunction->GetDataPointer()[
+    id * (1 + this->GetFunctionPointDimensionality())];
+#endif
   
   return 1;
 }
@@ -242,9 +247,14 @@ int vtkKWPiecewiseFunctionEditor::GetFunctionPointValues(
     return 0;
     }
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[4];
   this->PiecewiseFunction->GetNodeValue(id, node_value);
   values[0] = node_value[1];
+#else
+  values[0] = this->PiecewiseFunction->GetDataPointer()[
+    id * (1 + this->GetFunctionPointDimensionality()) + 1];
+#endif
   
   return 1;
 }
@@ -264,11 +274,14 @@ int vtkKWPiecewiseFunctionEditor::SetFunctionPointValues(
   double value;
   vtkMath::ClampValue(values[0], this->GetWholeValueRange(), &value);
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[4];
   this->PiecewiseFunction->GetNodeValue(id, node_value);
-
   this->PiecewiseFunction->AddPoint(
     parameter, value, node_value[2], node_value[3]);
+#else
+  this->PiecewiseFunction->AddPoint(parameter, value);
+#endif
   
   return 1;
 }
@@ -305,6 +318,7 @@ int vtkKWPiecewiseFunctionEditor::AddFunctionPoint(
   // Add the point
 
   int old_size = this->GetFunctionSize();
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   if (this->GetFunctionPointId(parameter, id))
     {
     double node_value[4];
@@ -313,6 +327,7 @@ int vtkKWPiecewiseFunctionEditor::AddFunctionPoint(
       parameter, value, node_value[2], node_value[3]);
     }
   else
+#endif
     {
     *id = this->PiecewiseFunction->AddPoint(parameter, value);
     }
@@ -334,8 +349,10 @@ int vtkKWPiecewiseFunctionEditor::SetFunctionPoint(
     return 0;
     }
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[4];
   this->PiecewiseFunction->GetNodeValue(id, node_value);
+#endif
 
   // Clamp
 
@@ -347,8 +364,13 @@ int vtkKWPiecewiseFunctionEditor::SetFunctionPoint(
     {
     this->PiecewiseFunction->RemovePoint(old_parameter);
     }
+
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   int new_id = this->PiecewiseFunction->AddPoint(
     parameter, value, node_value[2], node_value[3]);
+#else
+  int new_id = this->PiecewiseFunction->AddPoint(parameter, value);
+#endif
 
   if (new_id != id)
     {
@@ -369,9 +391,14 @@ int vtkKWPiecewiseFunctionEditor::RemoveFunctionPoint(int id)
 
   // Remove the point
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[4];
   this->PiecewiseFunction->GetNodeValue(id, node_value);
   double parameter = node_value[0];
+#else
+  double parameter = this->PiecewiseFunction->GetDataPointer()[
+    id * (1 + this->GetFunctionPointDimensionality())];
+#endif
 
   int old_size = this->GetFunctionSize();
   this->PiecewiseFunction->RemovePoint(parameter);
@@ -445,11 +472,14 @@ int vtkKWPiecewiseFunctionEditor::GetFunctionPointMidPoint(
     return 0;
     }
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[4];
   this->PiecewiseFunction->GetNodeValue(id, node_value);
   *pos = node_value[2];
-
   return 1;
+#else
+  return 0;
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -470,12 +500,15 @@ int vtkKWPiecewiseFunctionEditor::SetFunctionPointMidPoint(
     pos = 1.0;
     }
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[4];
   this->PiecewiseFunction->GetNodeValue(id, node_value);
   this->PiecewiseFunction->AddPoint(
     node_value[0], node_value[1], pos, node_value[3]);
-
   return 1;
+#else
+  return 0;
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -487,11 +520,14 @@ int vtkKWPiecewiseFunctionEditor::GetFunctionPointSharpness(
     return 0;
     }
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[4];
   this->PiecewiseFunction->GetNodeValue(id, node_value);
   *sharpness = node_value[3];
-
   return 1;
+#else
+  return 0;
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -512,12 +548,15 @@ int vtkKWPiecewiseFunctionEditor::SetFunctionPointSharpness(
     sharpness = 1.0;
     }
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[4];
   this->PiecewiseFunction->GetNodeValue(id, node_value);
   this->PiecewiseFunction->AddPoint(
     node_value[0], node_value[1], node_value[2], sharpness);
-
   return 1;
+#else
+  return 0;
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -619,8 +658,12 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointEntries(int id)
 
   // Get the value
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[4];
   this->PiecewiseFunction->GetNodeValue(id, node_value);
+#else
+  double *node_value = this->PiecewiseFunction->GetDataPointer() + id * 2;
+#endif
 
   this->ValueEntry->GetWidget()->SetValueAsFormattedDouble(node_value[1], 3);
 }
@@ -844,22 +887,32 @@ void vtkKWPiecewiseFunctionEditor::SetWindowLevelMode(int arg)
 
     double parameter;
     double *v_w_range = this->GetWholeValueRange();
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
     double node_value[4];
+#endif
 
     if (this->GetFunctionSize() > 0 && 
         this->GetFunctionPointParameter(0, &parameter))
       {
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
       this->PiecewiseFunction->GetNodeValue(0, node_value);
       this->PiecewiseFunction->AddPoint(
         parameter, v_w_range[0], node_value[2], node_value[3]);
+#else
+      this->PiecewiseFunction->AddPoint(parameter, v_w_range[0]);
+#endif
       }
     if (this->GetFunctionSize() > 1 &&
         this->GetFunctionPointParameter(this->GetFunctionSize()-1, &parameter))
       {
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
       this->PiecewiseFunction->GetNodeValue(
         this->GetFunctionSize() - 1, node_value);
       this->PiecewiseFunction->AddPoint(
         parameter, v_w_range[1], node_value[2], node_value[3]);
+#else
+      this->PiecewiseFunction->AddPoint(parameter, v_w_range[1]);
+#endif
       }
     }
 
@@ -994,7 +1047,9 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointsFromWindowLevel(int interactive)
 
   double parameter;
   int id;
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[4];
+#endif
 
   // We are in not WindowLevel mode, make sure our points are within the
   // range (while in W/L mode, those points can be out of the parameter range)
@@ -1010,12 +1065,17 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointsFromWindowLevel(int interactive)
         if (this->GetFunctionPointParameter(id, &parameter) &&
             (parameter < p_w_range[0] || parameter > p_w_range[1]))
           {
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
           this->PiecewiseFunction->GetNodeValue(id, node_value);
+#endif
           double value = this->PiecewiseFunction->GetValue(parameter);
           this->PiecewiseFunction->RemovePoint(parameter);
           this->PiecewiseFunction->AddPoint(
-            (parameter < p_w_range[0] ? p_w_range[0] : p_w_range[1]), value,
-            node_value[2], node_value[3]);
+            (parameter < p_w_range[0] ? p_w_range[0] : p_w_range[1]), value
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
+            , node_value[2], node_value[3]
+#endif
+            );
           done = 0;
           break;
           }
@@ -1101,6 +1161,7 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointsFromWindowLevel(int interactive)
     int size = this->GetFunctionSize();
     for (id = 0; id < 4; id++)
       {
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
       if (id < size)
         {
         this->PiecewiseFunction->GetNodeValue(id, node_value);
@@ -1108,9 +1169,9 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointsFromWindowLevel(int interactive)
           points[id], id < 2 ? start_v : end_v, node_value[2], node_value[3]);
         }
       else
+#endif
         {
-        this->PiecewiseFunction->AddPoint(
-          points[id], id < 2 ? start_v : end_v);
+        this->PiecewiseFunction->AddPoint(points[id], id < 2 ? start_v :end_v);
         }
       this->SetFunctionPointMidPoint(id, 0.5);
       this->SetFunctionPointSharpness(id, 0.0);

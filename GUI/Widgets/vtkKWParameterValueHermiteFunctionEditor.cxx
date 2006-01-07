@@ -21,7 +21,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.14");
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.15");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";
@@ -1161,7 +1161,15 @@ void vtkKWParameterValueHermiteFunctionEditor::SelectNextPoint()
       }
     else
       {
-      this->SelectMidPoint(this->GetSelectedPoint());
+      double pos;
+      if (this->GetFunctionPointMidPoint(this->GetSelectedPoint(), &pos))
+        {
+        this->SelectMidPoint(this->GetSelectedPoint());
+        }
+      else
+        {
+        this->Superclass::SelectNextPoint();
+        }
       }
     }
 }
@@ -1181,7 +1189,15 @@ void vtkKWParameterValueHermiteFunctionEditor::SelectPreviousPoint()
       }
     else
       {
-      this->SelectMidPoint(this->GetSelectedPoint() - 1);
+      double pos;
+      if (this->GetFunctionPointMidPoint(this->GetSelectedPoint() - 1, &pos))
+        {
+        this->SelectMidPoint(this->GetSelectedPoint() - 1);
+        }
+      else
+        {
+        this->Superclass::SelectPreviousPoint();
+        }
       }
     }
 }

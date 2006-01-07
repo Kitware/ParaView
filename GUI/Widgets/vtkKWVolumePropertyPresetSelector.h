@@ -56,6 +56,11 @@ protected:
   // first).
   virtual void DeAllocatePreset(int id);
 
+  // Description:
+  // Deep copy contents of volume property 'source' into 'target'
+  virtual void DeepCopyVolumeProperty(
+    vtkVolumeProperty *target, vtkVolumeProperty *source);
+
 private:
 
   vtkKWVolumePropertyPresetSelector(const vtkKWVolumePropertyPresetSelector&); // Not implemented

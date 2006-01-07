@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.46");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.47");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -193,9 +193,14 @@ int vtkKWColorTransferFunctionEditor::GetFunctionPointParameter(
     return 0;
     }
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[6];
   this->ColorTransferFunction->GetNodeValue(id, node_value);
   *parameter = node_value[0];
+#else
+  *parameter = this->ColorTransferFunction->GetDataPointer()[
+    id * (1 + this->GetFunctionPointDimensionality())];
+#endif
   
   return 1;
 }
@@ -216,11 +221,17 @@ int vtkKWColorTransferFunctionEditor::GetFunctionPointValues(
     return 0;
     }
   
+  int dim = this->GetFunctionPointDimensionality();
+
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[6];
   this->ColorTransferFunction->GetNodeValue(id, node_value);
-
-  int dim = this->GetFunctionPointDimensionality();
   memcpy(values, node_value + 1, dim * sizeof(double));
+#else
+  memcpy(values, 
+         (this->ColorTransferFunction->GetDataPointer() + id * (1 + dim) + 1), 
+         dim * sizeof(double));
+#endif
   
   return 1;
 }
@@ -242,13 +253,18 @@ int vtkKWColorTransferFunctionEditor::SetFunctionPointValues(
   vtkMath::ClampValues(values, this->GetFunctionPointDimensionality(), 
                        this->GetWholeValueRange(), clamped_values);
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[6];
   this->ColorTransferFunction->GetNodeValue(id, node_value);
+#endif
 
   this->ColorTransferFunction->AddRGBPoint(
     parameter, 
-    clamped_values[0], clamped_values[1], clamped_values[2], 
-    node_value[4], node_value[5]);
+    clamped_values[0], clamped_values[1], clamped_values[2]
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
+    , node_value[4], node_value[5]
+#endif
+    );
   
   return 1;
 }
@@ -287,6 +303,7 @@ int vtkKWColorTransferFunctionEditor::AddFunctionPoint(
   // Add the point
  
   int old_size = this->GetFunctionSize();
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   if (this->GetFunctionPointId(parameter, id))
     {
     double node_value[6];
@@ -297,6 +314,7 @@ int vtkKWColorTransferFunctionEditor::AddFunctionPoint(
       node_value[4], node_value[5]);
     }
   else
+#endif
     {
     *id = this->ColorTransferFunction->AddRGBPoint(
       parameter, clamped_values[0], clamped_values[1], clamped_values[2]);
@@ -319,8 +337,10 @@ int vtkKWColorTransferFunctionEditor::SetFunctionPoint(
     return 0;
     }
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[6];
   this->ColorTransferFunction->GetNodeValue(id, node_value);
+#endif
 
   // Clamp
 
@@ -336,8 +356,11 @@ int vtkKWColorTransferFunctionEditor::SetFunctionPoint(
     }
   int new_id = this->ColorTransferFunction->AddRGBPoint(
     parameter, 
-    clamped_values[0], clamped_values[1], clamped_values[2],
-    node_value[4], node_value[5]);
+    clamped_values[0], clamped_values[1], clamped_values[2]
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
+    , node_value[4], node_value[5]
+#endif
+    );
   
   if (new_id != id)
     {
@@ -358,9 +381,14 @@ int vtkKWColorTransferFunctionEditor::RemoveFunctionPoint(int id)
 
   // Remove the point
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[6];
   this->ColorTransferFunction->GetNodeValue(id, node_value);
   double parameter = node_value[0];
+#else
+  double parameter = this->ColorTransferFunction->GetDataPointer()[
+    id * (1 + this->GetFunctionPointDimensionality())];
+#endif
 
   int old_size = this->GetFunctionSize();
   this->ColorTransferFunction->RemovePoint(parameter);
@@ -376,11 +404,14 @@ int vtkKWColorTransferFunctionEditor::GetFunctionPointMidPoint(
     return 0;
     }
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[6];
   this->ColorTransferFunction->GetNodeValue(id, node_value);
   *pos = node_value[4];
-
   return 1;
+#else
+  return 0;
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -401,14 +432,17 @@ int vtkKWColorTransferFunctionEditor::SetFunctionPointMidPoint(
     pos = 1.0;
     }
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[6];
   this->ColorTransferFunction->GetNodeValue(id, node_value);
   this->ColorTransferFunction->AddRGBPoint(
     node_value[0], 
     node_value[1], node_value[2], node_value[3], 
     pos, node_value[5]);
-
   return 1;
+#else
+  return 0;
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -420,11 +454,14 @@ int vtkKWColorTransferFunctionEditor::GetFunctionPointSharpness(
     return 0;
     }
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[6];
   this->ColorTransferFunction->GetNodeValue(id, node_value);
   *sharpness = node_value[5];
-
   return 1;
+#else
+  return 0;
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -445,14 +482,17 @@ int vtkKWColorTransferFunctionEditor::SetFunctionPointSharpness(
     sharpness = 1.0;
     }
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[6];
   this->ColorTransferFunction->GetNodeValue(id, node_value);
   this->ColorTransferFunction->AddRGBPoint(
     node_value[0], 
     node_value[1], node_value[2], node_value[3], 
     node_value[4], sharpness);
-
   return 1;
+#else
+  return 0;
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -534,8 +574,12 @@ void vtkKWColorTransferFunctionEditor::UpdatePointEntries(
 
   // Get the values in the right color space
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   double node_value[6];
   this->ColorTransferFunction->GetNodeValue(id, node_value);
+#else
+  double *node_value = this->ColorTransferFunction->GetDataPointer() + id * 4;
+#endif
 
   double *values = node_value + 1, hsv[3];
   if (this->ColorTransferFunction->GetColorSpace() == VTK_CTF_HSV)
