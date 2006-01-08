@@ -63,7 +63,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.270");
+vtkCxxRevisionMacro(vtkKWApplication, "1.271");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -332,6 +332,7 @@ int vtkKWApplication::RemoveWindow(vtkKWWindowBase *win)
                       win);
     if (it != this->Internals->Windows.end())
       {
+      win->Withdraw();
       win->PrepareForDelete();
       win->UnRegister(this);
       this->Internals->Windows.erase(it);
