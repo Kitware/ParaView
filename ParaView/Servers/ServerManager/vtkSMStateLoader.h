@@ -42,7 +42,9 @@ public:
   // Load the state from the given root element. This root
   // element must have Proxy and ProxyCollection sub-elements
   // Returns 1 on success, 0 on failure.
-  virtual int LoadState(vtkPVXMLElement* rootElement);
+  // If keep_proxies is set, then the internal map
+  // of proxy ids to proxies is not cleared on loading of the state.
+  virtual int LoadState(vtkPVXMLElement* rootElement, int keep_proxies=0);
 
   // Description:
   // Either create a new proxy or returns one from the map
