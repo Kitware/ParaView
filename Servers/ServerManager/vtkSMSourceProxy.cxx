@@ -34,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.36");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.37");
 
 struct vtkSMSourceProxyInternals
 {
@@ -93,11 +93,9 @@ void vtkSMSourceProxy::UpdatePipelineInformation()
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendStream(this->ConnectionID, this->Servers, command);
 
-  // This simply iterates over subproxies and calls UpdateInformation();
+  // This simply iterates over subproxies and calls UpdatePropertyInformation();
   this->Superclass::UpdatePipelineInformation();
 
-  // This calls will also call vtkSMProxy::UpdatePropertyInformation(),
-  // thus updating all info properties.
   this->MarkModified(this);  
 }
 //---------------------------------------------------------------------------
