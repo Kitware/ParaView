@@ -23,7 +23,7 @@
 #include <vtkstd/map>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.5");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.6");
 
 struct vtkSMStateLoaderInternals
 {
@@ -199,7 +199,7 @@ void vtkSMStateLoader::ClearCreatedProxies()
 }
 
 //---------------------------------------------------------------------------
-int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement)
+int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_proxies/*=0*/)
 {
   if (!rootElement)
     {
@@ -232,7 +232,10 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement)
       }
     }
 
-  this->ClearCreatedProxies();
+  if (!keep_proxies)
+    {
+    this->ClearCreatedProxies();
+    }
 
   this->RootElement = 0;
 
