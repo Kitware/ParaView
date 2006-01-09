@@ -27,7 +27,7 @@
 
 
 vtkStandardNewMacro(vtkSMBoxWidgetProxy);
-vtkCxxRevisionMacro(vtkSMBoxWidgetProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMBoxWidgetProxy, "1.10");
 
 //----------------------------------------------------------------------------
 vtkSMBoxWidgetProxy::vtkSMBoxWidgetProxy()
@@ -47,11 +47,6 @@ vtkSMBoxWidgetProxy::vtkSMBoxWidgetProxy()
 //----------------------------------------------------------------------------
 vtkSMBoxWidgetProxy::~vtkSMBoxWidgetProxy()
 {
-  vtkSMProxyManager *pxm = vtkSMObject::GetProxyManager();
-  if (!pxm)
-    {
-    vtkErrorMacro("ProxyManger does not exist");
-    }
   this->BoxTransform = 0;
 }
 
