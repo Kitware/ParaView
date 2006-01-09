@@ -16,6 +16,7 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMDisplayProxy.h"
 
 #include <QList>
 #include <QMap>
@@ -320,11 +321,13 @@ vtkSMProxy *pqPipelineData::createFilter(const char *proxyName,
   return proxy;
 }
 
-void pqPipelineData::setVisibility(vtkSMProxy *proxy, bool on)
+vtkSMDisplayProxy* pqPipelineData::createDisplay(vtkSMSourceProxy* proxy)
 {
   if(!this->Internal || !proxy)
-    return;
-
+    {
+    return NULL;
+    }
+  
   // Get the object from the list of servers.
   pqPipelineObject *object = 0;
   QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
@@ -339,28 +342,28 @@ void pqPipelineData::setVisibility(vtkSMProxy *proxy, bool on)
     }
 
   if(!object || !object->GetParent())
-    return;
+    return NULL;
 
   QVTKWidget *window = qobject_cast<QVTKWidget *>(
       object->GetParent()->GetWidget());
   vtkSMRenderModuleProxy *module = this->getRenderModule(window);
   if(!module)
-    return;
+    return NULL;
+      
+  vtkSMDisplayProxy* display = pqAddPart(module, vtkSMSourceProxy::SafeDownCast(proxy));
+  object->SetDisplayProxy(display);
 
-  vtkSMDisplayProxy *display = object->GetDisplayProxy();
-  if(on)
+  return display;
+}
+
+void pqPipelineData::setVisibility(vtkSMDisplayProxy* display, bool on)
+{
+  if(!this->Internal || !display)
     {
-    if(!display)
-      {
-      display = pqAddPart(module, vtkSMSourceProxy::SafeDownCast(proxy));
-      object->SetDisplayProxy(display);
-      }
+    return;
     }
-  else if(display)
-    {
-    object->SetDisplayProxy(0);
-    pqRemovePart(module, display);
-    }
+
+  display->SetVisibilityCM(on);
 }
 
 void pqPipelineData::addInput(vtkSMProxy *proxy, vtkSMProxy *input)

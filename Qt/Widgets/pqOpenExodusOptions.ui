@@ -123,7 +123,7 @@
     </widget>
    </item>
    <item row="1" column="1" >
-    <widget class="QGroupBox" name="NodeSetsGroup" >
+    <widget class="QGroupBox" name="NodeSetGroup" >
      <property name="title" >
       <string>Node Sets</string>
      </property>

@@ -14,6 +14,7 @@ class vtkSMProxy;
 class vtkSMRenderModuleProxy;
 class vtkSMSourceProxy;
 class vtkSMProxy;
+class vtkSMDisplayProxy;
 
 #include "QtWidgetsExport.h"
 #include <QObject>
@@ -40,10 +41,16 @@ public:
   vtkSMRenderModuleProxy *getRenderModule(QVTKWidget *widget) const;
   void clearViewMapping();
 
+  // TODO: perhaps not tie source proxies to windows
+
   vtkSMProxy *createSource(const char *proxyName, QVTKWidget *window);
   vtkSMProxy *createFilter(const char *proxyName, QVTKWidget *window);
 
-  void setVisibility(vtkSMProxy *proxy, bool on);
+  // TODO: should take a window to create a display proxy in, but source proxy is already tied to window
+  //! create a display proxy for a source proxy
+  vtkSMDisplayProxy* createDisplay(vtkSMSourceProxy* source);
+  //! set the visibility on/off for a display
+  void setVisibility(vtkSMDisplayProxy* proxy, bool on);
 
   void addInput(vtkSMProxy *proxy, vtkSMProxy *input);
   void removeInput(vtkSMProxy *proxy, vtkSMProxy *input);

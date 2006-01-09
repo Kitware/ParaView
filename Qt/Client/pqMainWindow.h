@@ -62,6 +62,7 @@ private:
   pqPipelineData *Pipeline;
   QMenu* SourcesMenu;
   QMenu* FiltersMenu;
+  QMenu* ToolsMenu;
   pqObjectInspectorWidget *Inspector;
   QDockWidget *InspectorDock;
   QAction *InspectorDockAction;
@@ -76,6 +77,7 @@ private:
   QTreeView *ElementInspectorWidget;
   QDockWidget *ElementInspectorDock;
   QAction *ElementDockAction;
+  QToolBar* CompoundProxyToolBar;
 
   vtkEventQtSlotConnect* VTKConnector;
 
@@ -106,6 +108,7 @@ private slots:
   void onCreateSource(QAction*);
   void onCreateFilter(QAction*);
   void onOpenLinkEditor();
+  void onOpenCompoundFilterWizard();
 
   void onNewSelections(vtkSMSourceProxy* p, vtkUnstructuredGrid* selections);
   

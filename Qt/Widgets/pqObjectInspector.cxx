@@ -9,6 +9,7 @@
 
 #include "pqObjectInspectorItem.h"
 #include "pqPipelineData.h"
+#include "pqPipelineObject.h"
 #include "pqSMAdaptor.h"
 #include "QVTKWidget.h"
 #include "vtkSMProperty.h"
@@ -16,25 +17,36 @@
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkPVDataInformation.h"
+#include "vtkSMDisplayProxy.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVGeometryInformation.h"
+#include "vtkPVArrayInformation.h"
+#include <vtkSMDoubleVectorProperty.h>
+#include <vtkSMLookupTableProxy.h>
+#include <vtkSMProxyManager.h>
+#include <vtkProcessModule.h>
+#include <vtkSMProxyProperty.h>
+#include <vtkSMIntVectorProperty.h>
+#include <vtkSMStringVectorProperty.h>
+#include <vtkSMDataObjectDisplayProxy.h>
 
 #include <QList>
 #include <QString>
 #include <QStringList>
 #include <QVariant>
-
-
-class pqObjectInspectorInternal
-{
-public:
+class pqObjectInspectorInternal { public:
   pqObjectInspectorInternal()
-    : Parameters(NULL), Information(NULL) {}
+    : Display(NULL), Parameters(NULL), Information(NULL) {}
 
+  pqObjectInspectorItem* Display;
   pqObjectInspectorItem* Parameters;
   pqObjectInspectorItem* Information;
 
   int size() const
     {
     int count = 0;
+    if(this->Display)
+      count++;
     if(this->Parameters)
       count++;
     if(this->Information)
@@ -45,14 +57,19 @@ public:
   pqObjectInspectorItem* operator[](int i)
     {
     if(i == 0)
-      return this->Parameters;
+      return this->Display;
     if(i == 1)
+      return this->Parameters;
+    if(i == 2)
       return this->Information;
     return NULL;
     }
 
   void clear()
     {
+    if(this->Display)
+      delete this->Display;
+    this->Display = NULL;
     if(this->Parameters)
       delete this->Parameters;
     this->Parameters = NULL;
@@ -263,9 +280,14 @@ Qt::ItemFlags pqObjectInspector::flags(const QModelIndex &index) const
     {
     pqObjectInspectorItem *item = reinterpret_cast<pqObjectInspectorItem *>(
         index.internalPointer());
+    // TODO: consider putting editable flag on item?
     if(item && item->childCount() == 0 &&
-       ((item->parent() == this->Internal->Parameters) ||
-       (item->parent() && item->parent()->parent() == this->Internal->Parameters)))
+       (
+       (item->parent() == this->Internal->Parameters) ||
+       (item->parent() && item->parent()->parent() == this->Internal->Parameters) ||
+       (item->parent() == this->Internal->Display) ||
+       (item->parent() && item->parent()->parent() == this->Internal->Display)
+       ))
       {
       flags |= Qt::ItemIsEditable;
       }
@@ -299,9 +321,73 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *proxy)
     {
     // update pipline information on the server
     proxy->UpdatePipelineInformation();
-
     pqObjectInspectorItem *item = 0;
     pqObjectInspectorItem *child = 0;
+
+    // ************* display properties ***************
+
+    vtkSMDisplayProxy* display = pqPipelineData::instance()->getObjectFor(proxy)->GetDisplayProxy();
+    if(display)
+      {
+      this->Internal->Display = new pqObjectInspectorItem();
+      this->Internal->Display->setPropertyName(tr("Display"));
+
+      // visibility
+      item = new pqObjectInspectorItem();
+      item->setParent(this->Internal->Display);
+      this->Internal->Display->addChild(item);
+      item->setPropertyName("Visibility");
+      item->setValue(static_cast<bool>(display->GetVisibilityCM()));
+      QList<QVariant> possibles;
+      possibles.append(true);
+      possibles.append(false);
+      item->setDomain(possibles);
+      this->connect(item, SIGNAL(valueChanged(pqObjectInspectorItem*)), SLOT(updateDisplayProperties(pqObjectInspectorItem*)));
+
+      possibles.clear();
+      // color by
+      item = new pqObjectInspectorItem();
+      item->setParent(this->Internal->Display);
+      this->Internal->Display->addChild(item);
+      item->setPropertyName("Color by");
+      
+      possibles.append("Default");
+      vtkPVDataInformation* geomInfo = display->GetGeometryInformation();
+      vtkPVDataSetAttributesInformation* cellinfo = geomInfo->GetCellDataInformation();
+      int i;
+      for(i=0; i<cellinfo->GetNumberOfArrays(); i++)
+        {
+        vtkPVArrayInformation* info = cellinfo->GetArrayInformation(i);
+        QString name = info->GetName();
+        name += " (cell)";
+        possibles.append(name);
+        }
+      
+      vtkPVDataSetAttributesInformation* pointinfo = geomInfo->GetPointDataInformation();
+      for(i=0; i<pointinfo->GetNumberOfArrays(); i++)
+        {
+        vtkPVArrayInformation* info = pointinfo->GetArrayInformation(i);
+        QString name = info->GetName();
+        name += " (point)";
+        possibles.append(name);
+        }
+
+      if(possibles.size() > 1)
+        {
+        item->setValue(possibles[1]);
+        this->updateDisplayProperties(item);
+        }
+      else
+        {
+        item->setValue(possibles[0]);
+        }
+      item->setDomain(possibles);
+      this->connect(item, SIGNAL(valueChanged(pqObjectInspectorItem*)), SLOT(updateDisplayProperties(pqObjectInspectorItem*)));
+      }
+
+    
+    // ************* object properties *****************
+
     vtkSMProperty *prop = 0;
     vtkSMPropertyIterator *iter = this->Proxy->NewPropertyIterator();
       
@@ -385,6 +471,8 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *proxy)
       }
     iter->Delete();
 
+    // ************* information ***************
+
     this->Internal->Information = new pqObjectInspectorItem();
     this->Internal->Information->setPropertyName(tr("Information"));
 
@@ -458,7 +546,15 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *proxy)
     mem.sprintf("%g MBytes", dataInfo->GetMemorySize()/1000.0);
     item->setValue(mem);
 
-
+    QVariant timeSteps = adapter->getProperty(this->Proxy->GetProperty("TimestepValues"));
+    if(timeSteps.type() == QVariant::List)
+      {
+      item = new pqObjectInspectorItem();
+      item->setParent(this->Internal->Information);
+      this->Internal->Information->addChild(item);
+      item->setPropertyName("Number of timesteps");
+      item->setValue(timeSteps.toList().size());
+      }
     }
 
   // Notify the view that the model has changed.
@@ -673,6 +769,76 @@ void pqObjectInspector::handleValueChange(pqObjectInspectorItem *item)
     QModelIndex index = this->createIndex(this->itemIndex(item), 1, item);
     emit dataChanged(index, index);
     }
+}
+
+
+void pqObjectInspector::updateDisplayProperties(pqObjectInspectorItem* item)
+{
+  // TODO: this code should probably be somewhere else
+  vtkSMDisplayProxy* display = pqPipelineData::instance()->getObjectFor(this->Proxy)->GetDisplayProxy();
+
+  if(item->propertyName().toAscii() == "Visibility")
+    {
+    display->SetVisibilityCM(item->value().toInt());
+    }
+  if(item->propertyName().toAscii() == "Color by")
+    {
+    
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(display->GetProperty("LookupTable"));
+    pp->RemoveAllProxies();
+
+    QString value = item->value().toString();
+    if(value == "Default")
+      {
+      // lookup table removed
+      vtkSMIntVectorProperty* ivp;
+      ivp = vtkSMIntVectorProperty::SafeDownCast(display->GetProperty("ScalarVisibility"));
+      ivp->SetElement(0,0);
+      }
+    else
+      {
+      // create lut
+      vtkSMDoubleVectorProperty* dvp;
+      vtkSMIntVectorProperty* ivp;
+      vtkPVDataInformation* geomInfo = display->GetGeometryInformation();
+      vtkSMLookupTableProxy* lut = vtkSMLookupTableProxy::SafeDownCast(
+        vtkSMObject::GetProxyManager()->NewProxy("lookup_tables", "LookupTable"));
+      lut->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+      pp = vtkSMProxyProperty::SafeDownCast(display->GetProperty("LookupTable"));
+      pp->AddProxy(lut);
+      
+      ivp = vtkSMIntVectorProperty::SafeDownCast(display->GetProperty("ScalarVisibility"));
+      ivp->SetElement(0,1);
+    
+      vtkPVArrayInformation* ai;
+      ivp = vtkSMIntVectorProperty::SafeDownCast(display->GetProperty("ScalarMode"));
+      bool cell = value.right(6) == "(cell)";
+      if(cell)
+        {
+        value = value.left(value.size() - strlen(" (cell)"));
+        ai = geomInfo->GetCellDataInformation()->GetArrayInformation(value.toAscii().data());
+        ivp->SetElement(0, vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+        }
+      else
+        {
+        value = value.left(value.size() - strlen(" (point)"));
+        ai = geomInfo->GetPointDataInformation()->GetArrayInformation(value.toAscii().data());
+        ivp->SetElement(0, vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+        }
+
+      vtkSMStringVectorProperty* d_svp = vtkSMStringVectorProperty::SafeDownCast(display->GetProperty("ColorArray"));
+      d_svp->SetElement(0, value.toAscii().data());
+      dvp = vtkSMDoubleVectorProperty::SafeDownCast(lut->GetProperty("ScalarRange"));
+      double range[2];
+      ai->GetComponentRange(0, range);
+      dvp->SetElement(0,range[0]);
+      dvp->SetElement(1,range[1]);
+      lut->UpdateVTKObjects();
+      }
+    }
+
+  display->UpdateVTKObjects();
+
 }
 
 

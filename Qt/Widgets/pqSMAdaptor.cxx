@@ -123,9 +123,21 @@ void pqSMAdaptor::setProperty(vtkSMProperty* Property, QVariant QtProperty)
     props = QtProperty.toList();
   else
     props.push_back(QtProperty);
+  
   vtkSMVectorProperty* VectorProperty = vtkSMVectorProperty::SafeDownCast(Property);
   assert(VectorProperty != NULL);
-  assert(props.size() <= VectorProperty->GetNumberOfElements());
+  
+  vtkSMPropertyAdaptor* adapter = vtkSMPropertyAdaptor::New();
+  adapter->SetProperty(Property);
+
+  if(adapter->GetPropertyType() == vtkSMPropertyAdaptor::SELECTION)
+    {
+    assert(props.size() <= adapter->GetNumberOfSelectionElements());
+    }
+  else
+    {
+    assert(props.size() <= VectorProperty->GetNumberOfElements());
+    }
   for(int i=0; i<props.size(); i++)
     {
     this->setProperty(Property, i, props[i]);
@@ -157,7 +169,6 @@ QVariant pqSMAdaptor::getProperty(vtkSMProperty* Property)
       }
     }
 
-
   QList<QVariant> props;
   for(int i=0; i<numElems; i++)
     {
@@ -185,7 +196,7 @@ void pqSMAdaptor::setProperty(vtkSMProperty* Property, int Index, QVariant QtPro
       QtProperty = QtProperty.toInt();
     adapter->SetRangeValue(0, name);
     adapter->SetRangeValue(1, QtProperty.toString().toAscii().data());
-    Property->Modified();  // push to server
+    Property->Modified();  // push to server  // TODO: this doesn't work
     }
   else
     {

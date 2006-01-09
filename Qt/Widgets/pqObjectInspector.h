@@ -164,6 +164,9 @@ public slots:
   /// using the commit \c Collectively policy.
   void commitChanges();
 
+  /// update display properties when changed in object inspector
+  void updateDisplayProperties(pqObjectInspectorItem* item);
+
 private:
   /// \brief
   ///   Cleans up the list of property items.

@@ -80,8 +80,15 @@ QWidget *pqObjectInspectorDelegate::createEditor(QWidget *parent,
       editor = combo;
       }
     }
+  else if(data.type() == QVariant::String && domain.isValid())
+    {
+    QStringList names = domain.toStringList();
+    QComboBox *combo = new QComboBox(parent);
+    for(QStringList::Iterator it = names.begin(); it != names.end(); ++it)
+      combo->addItem(*it);
+    editor = combo;
+    }
 
-  // TODO: What editor should be used for StringList domains?
   // Use a line edit for the default case.
   if(!editor)
     editor = new QLineEdit(parent);
@@ -99,9 +106,17 @@ void pqObjectInspectorDelegate::setEditorData(QWidget *editor,
   if(combo)
     {
     if(data.type() == QVariant::Bool)
+      {
       combo->setCurrentIndex(data.toBool() ? 1 : 0);
+      }
     else if(data.type() == QVariant::Int)
+      {
       combo->setCurrentIndex(data.toInt());
+      }
+    else if(data.type() == QVariant::String)
+      {
+      combo->setCurrentIndex(combo->findText(data.toString()));
+      }
     return;
     }
 
@@ -124,10 +139,18 @@ void pqObjectInspectorDelegate::setModelData(QWidget *editor,
     QAbstractItemModel *model, const QModelIndex &index) const
 {
   QVariant value;
+  QVariant data = model->data(index, Qt::EditRole);
   QComboBox *combo = qobject_cast<QComboBox *>(editor);
   if(combo)
     {
-    value = combo->currentIndex();
+    if(data.type() == QVariant::String)
+      {
+      value = combo->currentText();
+      }
+    else
+      {
+      value = combo->currentIndex();
+      }
     model->setData(index, value);
     return;
     }

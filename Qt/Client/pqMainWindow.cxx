@@ -34,6 +34,7 @@
 #include "pqPicking.h"
 #include "pqDataSetModel.h"
 #include "pqOpenExodusOptions.h"
+#include "pqCompoundProxyWizard.h"
 
 #ifdef PARAQ_EMBED_PYTHON
 #include "pqPythonDialog.h"
@@ -98,7 +99,8 @@ pqMainWindow::pqMainWindow() :
   ActiveView(0),
   ElementInspectorWidget(0),
   ElementInspectorDock(0),
-  ElementDockAction(0)
+  ElementDockAction(0),
+  CompoundProxyToolBar(0)
 {
   this->setObjectName("mainWindow");
   this->setWindowTitle(QByteArray("ParaQ Client") + QByteArray(" ") + QByteArray(QT_CLIENT_VERSION));
@@ -157,8 +159,13 @@ pqMainWindow::pqMainWindow() :
   QObject::connect(this, SIGNAL(serverChanged(pqServer*)), SLOT(onUpdateSourcesFiltersMenu(pqServer*)));
 
   // Tools menu.
-  QMenu* toolsMenu = this->menuBar()->addMenu(tr("&Tools")) << pqSetName("toolsMenu");
-  toolsMenu->addAction(tr("&Link Editor..."))
+  ToolsMenu = this->menuBar()->addMenu(tr("&Tools")) << pqSetName("toolsMenu");
+  QAction* compoundFilterAction = this->ToolsMenu->addAction(tr("&Compound Filters..."))
+    << pqConnect(SIGNAL(triggered(bool)), this, SLOT(onOpenCompoundFilterWizard()))
+    << pqSetName("CompoundFilterAction");
+  compoundFilterAction->setEnabled(false);
+
+  this->ToolsMenu->addAction(tr("&Link Editor..."))
     << pqConnect(SIGNAL(triggered(bool)), this, SLOT(onOpenLinkEditor()));
 
   // Test menu.
@@ -342,6 +349,14 @@ pqMainWindow::pqMainWindow() :
     this->ElementInspectorDock, SLOT(setVisible(bool)));
   this->ElementInspectorDock->installEventFilter(this);
 
+
+  this->CompoundProxyToolBar = new QToolBar(this);
+  this->addToolBar(Qt::TopToolBarArea, this->CompoundProxyToolBar);
+  this->connect(this->CompoundProxyToolBar, SIGNAL(actionTriggered(QAction*)), SLOT(onCreateFilter(QAction*)));
+  // TODO: replace with real compound proxy
+  this->CompoundProxyToolBar->addAction(QIcon(":/pqWidgets/pqFilter32.png"), "MyCompoundFilter") 
+    << pqSetName("MyCompoundFilter") << pqSetData("Threshold");
+
   this->setServer(0);
   this->Adaptor = new pqSMAdaptor;
 
@@ -435,11 +450,21 @@ void pqMainWindow::setServer(pqServer* Server)
     this->Pipeline->addServer(this->CurrentServer);
 
     this->MultiViewManager = new pqMultiViewManager(this) << pqSetName("MultiViewManager");
-    this->MultiViewManager->hide();  // workaround for flickering in Qt 4.0.1
+    this->MultiViewManager->hide();  // workaround for flickering in Qt 4.0.1 & 4.1.0
     QObject::connect(this->MultiViewManager, SIGNAL(frameAdded(pqMultiViewFrame*)), this, SLOT(onNewQVTKWidget(pqMultiViewFrame*)));
     QObject::connect(this->MultiViewManager, SIGNAL(frameRemoved(pqMultiViewFrame*)), this, SLOT(onDeleteQVTKWidget(pqMultiViewFrame*)));
     this->setCentralWidget(this->MultiViewManager);
-    this->MultiViewManager->show();  // workaround for flickering in Qt 4.0.1
+    this->MultiViewManager->show();  // workaround for flickering in Qt 4.0.1 & 4.1.0
+    }
+
+  QAction* compoundFilterAction = this->ToolsMenu->findChild<QAction*>("CompoundFilterAction");
+  if(Server)
+    {
+    compoundFilterAction->setEnabled(true);
+    }
+  else
+    {
+    compoundFilterAction->setEnabled(false);
     }
   
   this->ServerDisconnectAction->setEnabled(this->CurrentServer);
@@ -492,13 +517,13 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
   QVTKWidget *window = this->PipelineList->getCurrentWindow();
   if(window)
     {
-    vtkSMProxy* source = 0;
+    vtkSMSourceProxy* source = 0;
     vtkSMRenderModuleProxy* rm = this->Pipeline->getRenderModule(window);
     for(int i = 0; i != Files.size(); ++i)
       {
       QString file = Files[i];
       
-      source = this->Pipeline->createSource("ExodusReader", window);
+      source = vtkSMSourceProxy::SafeDownCast(this->Pipeline->createSource("ExodusReader", window));
       this->CurrentServer->GetProxyManager()->RegisterProxy("paraq", "source1", source);
       source->Delete();
       Adaptor->setProperty(source->GetProperty("FileName"), file);
@@ -509,7 +534,7 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
       options.exec();
 
       source->UpdateVTKObjects();
-      this->Pipeline->setVisibility(source, true);
+      this->Pipeline->setVisibility(this->Pipeline->createDisplay(source), true);
       }
 
     rm->ResetCamera();
@@ -689,8 +714,8 @@ void pqMainWindow::onCreateSource(QAction* action)
   QVTKWidget* window = this->PipelineList->getCurrentWindow();
   if(window)
     {
-    vtkSMProxy* source = this->Pipeline->createSource(sourceName, window);
-    this->Pipeline->setVisibility(source, true);
+    vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(this->Pipeline->createSource(sourceName, window));
+    this->Pipeline->setVisibility(this->Pipeline->createDisplay(source), true);
     vtkSMRenderModuleProxy* rm = this->Pipeline->getRenderModule(window);
     rm->ResetCamera();
     window->update();
@@ -708,26 +733,27 @@ void pqMainWindow::onCreateFilter(QAction* action)
   QVTKWidget *window = this->PipelineList->getCurrentWindow();
   if(current && window)
     {
-    vtkSMProxy *source = 0;
+    vtkSMSourceProxy *source = 0;
     vtkSMProxy *next = this->PipelineList->getNextProxy();
     if(next)
       {
       this->PipelineList->getListModel()->beginCreateAndInsert();
-      source = this->Pipeline->createFilter(filterName, window);
+      source = vtkSMSourceProxy::SafeDownCast(this->Pipeline->createFilter(filterName, window));
       this->Pipeline->addInput(source, current);
       this->Pipeline->addInput(next, source);
       this->Pipeline->removeInput(next, current);
       this->PipelineList->getListModel()->finishCreateAndInsert();
+      this->Pipeline->setVisibility(this->Pipeline->createDisplay(source), false);
       }
     else
       {
       this->PipelineList->getListModel()->beginCreateAndAppend();
-      source = this->Pipeline->createFilter(filterName, window);
+      source = vtkSMSourceProxy::SafeDownCast(this->Pipeline->createFilter(filterName, window));
       this->Pipeline->addInput(source, current);
       this->PipelineList->getListModel()->finishCreateAndAppend();
 
       // Only turn on visibility for added filters?
-      this->Pipeline->setVisibility(source, true);
+      this->Pipeline->setVisibility(this->Pipeline->createDisplay(source), true);
       }
 
     vtkSMRenderModuleProxy *rm = this->Pipeline->getRenderModule(window);
@@ -739,6 +765,13 @@ void pqMainWindow::onCreateFilter(QAction* action)
 
 void pqMainWindow::onOpenLinkEditor()
 {
+}
+
+void pqMainWindow::onOpenCompoundFilterWizard()
+{
+  pqCompoundProxyWizard* wizard = new pqCompoundProxyWizard(this->CurrentServer, this);
+  wizard->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
+  wizard->show();
 }
 
 
@@ -929,4 +962,8 @@ void pqMainWindow::onNewSelections(vtkSMSourceProxy*, vtkUnstructuredGrid* selec
     {
     model->setDataSet(selections);
     }
+  
+  this->ElementInspectorWidget->reset();
+  this->ElementInspectorWidget->update();
 }
+

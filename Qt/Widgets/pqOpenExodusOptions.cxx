@@ -3,6 +3,8 @@
 #include "pqOpenExodusOptions.h"
 #include <QCheckBox>
 
+#include "pqSMAdaptor.h"
+
 #include <vtkSMSourceProxy.h>
 #include <vtkSMStringVectorProperty.h>
 #include <vtkSMArraySelectionDomain.h>
@@ -18,122 +20,64 @@ pqOpenExodusOptions::pqOpenExodusOptions(vtkSMSourceProxy* exodusReader, QWidget
 
   this->ExodusReader->UpdateVTKObjects();
   this->ExodusReader->UpdatePipelineInformation();
+
+  pqSMAdaptor* PropertyAdaptor = pqSMAdaptor::instance();
   
   int i;
   
   // get and populate block ids
-  vtkSMStringVectorProperty* blockStatus = 
-    vtkSMStringVectorProperty::SafeDownCast(this->ExodusReader->GetProperty("BlockArrayStatus"));
-  vtkSMStringVectorProperty* blockInfo =
-    vtkSMStringVectorProperty::SafeDownCast(this->ExodusReader->GetProperty("BlockArrayInfo"));
-  vtkSMArraySelectionDomain* blockDomain = vtkSMArraySelectionDomain::SafeDownCast(blockStatus->GetDomain("array_list"));
-    
-  int numBlocks = blockDomain->GetNumberOfStrings();
-  for(i=0; i<numBlocks; i++)
+  QList<QVariant> blocks = PropertyAdaptor->getProperty(this->ExodusReader->GetProperty("BlockArrayStatus")).toList();
+  for(i=0; i<blocks.size(); i++)
     {
+    QList<QVariant> block = blocks[i].toList();
     QCheckBox* cb = new QCheckBox(this->BlocksGroup);
-    cb->setText(blockDomain->GetString(i));
-    int tmp;
-    QVariant checked = "0";
-    int idx = blockInfo->GetElementIndex(blockDomain->GetString(i), tmp);
-    if(tmp)
-      {
-      checked = blockInfo->GetElement(idx+1);
-      }
-    cb->setChecked(checked == "1" ? true : false);
+    cb->setText(block[0].toString());
+    cb->setChecked(block[1].toBool());
     this->BlocksGroup->layout()->addWidget(cb);
     }
 
   // get and populate cell arrays
-  vtkSMStringVectorProperty* cellArrayStatus = 
-    vtkSMStringVectorProperty::SafeDownCast(this->ExodusReader->GetProperty("CellArrayStatus"));
-  vtkSMStringVectorProperty* cellArrayInfo =
-    vtkSMStringVectorProperty::SafeDownCast(this->ExodusReader->GetProperty("CellArrayInfo"));
-  vtkSMArraySelectionDomain* cellArrayDomain = vtkSMArraySelectionDomain::SafeDownCast(cellArrayStatus->GetDomain("array_list"));
-    
-  int numCells = cellArrayDomain->GetNumberOfStrings();
-  for(i=0; i<numCells; i++)
+  QList<QVariant> cellArrays = PropertyAdaptor->getProperty(this->ExodusReader->GetProperty("CellArrayStatus")).toList();
+  for(i=0; i<cellArrays.size(); i++)
     {
+    QList<QVariant> cellArray = cellArrays[i].toList();
     QCheckBox* cb = new QCheckBox(this->ElementVariablesGroup);
-    cb->setText(cellArrayDomain->GetString(i));
-    int tmp;
-    QVariant checked = "0";
-    int idx = cellArrayInfo->GetElementIndex(cellArrayDomain->GetString(i), tmp);
-    if(tmp)
-      {
-      checked = cellArrayInfo->GetElement(idx+1);
-      }
-    cb->setChecked(checked == "1" ? true : false);
+    cb->setText(cellArray[0].toString());
+    cb->setChecked(cellArray[1].toBool());
     this->ElementVariablesGroup->layout()->addWidget(cb);
     }
 
   // get and populate point arrays
-  vtkSMStringVectorProperty* pointArrayStatus = 
-    vtkSMStringVectorProperty::SafeDownCast(this->ExodusReader->GetProperty("PointArrayStatus"));
-  vtkSMStringVectorProperty* pointArrayInfo =
-    vtkSMStringVectorProperty::SafeDownCast(this->ExodusReader->GetProperty("PointArrayInfo"));
-  vtkSMArraySelectionDomain* pointArrayDomain = vtkSMArraySelectionDomain::SafeDownCast(pointArrayStatus->GetDomain("array_list"));
-    
-  int numPoints = pointArrayDomain->GetNumberOfStrings();
-  for(i=0; i<numPoints; i++)
+  QList<QVariant> pointArrays = PropertyAdaptor->getProperty(this->ExodusReader->GetProperty("PointArrayStatus")).toList();
+  for(i=0; i<pointArrays.size(); i++)
     {
+    QList<QVariant> pointArray = pointArrays[i].toList();
     QCheckBox* cb = new QCheckBox(this->NodeVariablesGroup);
-    cb->setText(pointArrayDomain->GetString(i));
-    int tmp;
-    QVariant checked = "0";
-    int idx = pointArrayInfo->GetElementIndex(pointArrayDomain->GetString(i), tmp);
-    if(tmp)
-      {
-      checked = pointArrayInfo->GetElement(idx+1);
-      }
-    cb->setChecked(checked == "1" ? true : false);
+    cb->setText(pointArray[0].toString());
+    cb->setChecked(pointArray[1].toBool());
     this->NodeVariablesGroup->layout()->addWidget(cb);
     }
   
   // get and populate side sets
-  vtkSMStringVectorProperty* sideSetStatus = 
-    vtkSMStringVectorProperty::SafeDownCast(this->ExodusReader->GetProperty("SideSetArrayStatus"));
-  vtkSMStringVectorProperty* sideSetInfo =
-    vtkSMStringVectorProperty::SafeDownCast(this->ExodusReader->GetProperty("SideSetInfo"));
-  vtkSMArraySelectionDomain* sideSetDomain = vtkSMArraySelectionDomain::SafeDownCast(sideSetStatus->GetDomain("array_list"));
-    
-  int numSideSets = sideSetDomain->GetNumberOfStrings();
-  for(i=0; i<numSideSets; i++)
+  QList<QVariant> sideSetArrays = PropertyAdaptor->getProperty(this->ExodusReader->GetProperty("SideSetArrayStatus")).toList();
+  for(i=0; i<sideSetArrays.size(); i++)
     {
+    QList<QVariant> sideSetArray = sideSetArrays[i].toList();
     QCheckBox* cb = new QCheckBox(this->SideSetGroup);
-    cb->setText(sideSetDomain->GetString(i));
-    int tmp;
-    QVariant checked = "0";
-    int idx = sideSetInfo->GetElementIndex(sideSetDomain->GetString(i), tmp);
-    if(tmp)
-      {
-      checked = sideSetInfo->GetElement(idx+1);
-      }
-    cb->setChecked(checked == "1" ? true : false);
+    cb->setText(sideSetArray[0].toString());
+    cb->setChecked(sideSetArray[1].toBool());
     this->SideSetGroup->layout()->addWidget(cb);
     }
   
   // get and populate node sets
-  vtkSMStringVectorProperty* nodeSetStatus = 
-    vtkSMStringVectorProperty::SafeDownCast(this->ExodusReader->GetProperty("NodeSetArrayStatus"));
-  vtkSMStringVectorProperty* nodeSetInfo =
-    vtkSMStringVectorProperty::SafeDownCast(this->ExodusReader->GetProperty("NodeSetInfo"));
-  vtkSMArraySelectionDomain* nodeSetDomain = vtkSMArraySelectionDomain::SafeDownCast(nodeSetStatus->GetDomain("array_list"));
-    
-  int numNodeSets = nodeSetDomain->GetNumberOfStrings();
-  for(i=0; i<numNodeSets; i++)
+  QList<QVariant> nodeSetArrays = PropertyAdaptor->getProperty(this->ExodusReader->GetProperty("NodeSetArrayStatus")).toList();
+  for(i=0; i<nodeSetArrays.size(); i++)
     {
-    QCheckBox* cb = new QCheckBox(this->NodeSetsGroup);
-    cb->setText(nodeSetDomain->GetString(i));
-    int tmp;
-    QVariant checked = "0";
-    int idx = nodeSetInfo->GetElementIndex(nodeSetDomain->GetString(i), tmp);
-    if(tmp)
-      {
-      checked = nodeSetInfo->GetElement(idx+1);
-      }
-    cb->setChecked(checked == "1" ? true : false);
-    this->NodeSetsGroup->layout()->addWidget(cb);
+    QList<QVariant> nodeSetArray = nodeSetArrays[i].toList();
+    QCheckBox* cb = new QCheckBox(this->NodeSetGroup);
+    cb->setText(nodeSetArray[0].toString());
+    cb->setChecked(nodeSetArray[1].toBool());
+    this->NodeSetGroup->layout()->addWidget(cb);
     }
 }
 
@@ -144,37 +88,62 @@ pqOpenExodusOptions::~pqOpenExodusOptions()
 void pqOpenExodusOptions::accept()
 {
   int i;
+  pqSMAdaptor* PropertyAdaptor = pqSMAdaptor::instance();
 
   // set blocks
-  vtkSMStringVectorProperty* blockStatus = 
-    vtkSMStringVectorProperty::SafeDownCast(this->ExodusReader->GetProperty("BlockArrayStatus"));
-  vtkSMArraySelectionDomain* blockDomain = vtkSMArraySelectionDomain::SafeDownCast(blockStatus->GetDomain("array_list"));
-  int numBlocks = blockDomain->GetNumberOfStrings();
-  for(i=0; i<numBlocks; i++)
+  vtkSMProperty* property = this->ExodusReader->GetProperty("BlockArrayStatus");
+  QList<QVariant> blocks = PropertyAdaptor->getProperty(property).toList();
+  for(i=0; i<blocks.size(); i++)
     {
     QLayout* l = this->BlocksGroup->layout();
-    QCheckBox* cb = qobject_cast<QCheckBox*>(l->itemAt(l->count() - numBlocks + i)->widget());
-    QString checked = cb->isChecked() ? "1" : "0";
-    blockStatus->SetElement(0, cb->text().toAscii().data());
-    blockStatus->SetElement(1, checked.toAscii().data());
-    this->ExodusReader->UpdateVTKObjects();
+    QCheckBox* cb = qobject_cast<QCheckBox*>(l->itemAt(l->count() - blocks.size() + i)->widget());
+    PropertyAdaptor->setProperty(property, i, cb->isChecked());
+    this->ExodusReader->UpdateVTKObjects();  // TODO: get rid of this call
     }
 
   // set element arrays
-  vtkSMStringVectorProperty* cellArrayStatus = 
-    vtkSMStringVectorProperty::SafeDownCast(this->ExodusReader->GetProperty("CellArrayStatus"));
-  vtkSMArraySelectionDomain* cellArrayDomain = vtkSMArraySelectionDomain::SafeDownCast(cellArrayStatus->GetDomain("array_list"));
-  int numCells = cellArrayDomain->GetNumberOfStrings();
-  for(i=0; i<numCells; i++)
+  property = this->ExodusReader->GetProperty("CellArrayStatus");
+  QList<QVariant> cellArrays = PropertyAdaptor->getProperty(property).toList();
+  for(i=0; i<cellArrays.size(); i++)
     {
     QLayout* l = this->ElementVariablesGroup->layout();
-    QCheckBox* cb = qobject_cast<QCheckBox*>(l->itemAt(l->count() - numCells + i)->widget());
-    QString checked = cb->isChecked() ? "1" : "0";
-    cellArrayStatus->SetElement(0, cb->text().toAscii().data());
-    cellArrayStatus->SetElement(1, checked.toAscii().data());
-    this->ExodusReader->UpdateVTKObjects();
+    QCheckBox* cb = qobject_cast<QCheckBox*>(l->itemAt(l->count() - cellArrays.size() + i)->widget());
+    PropertyAdaptor->setProperty(property, i, cb->isChecked());
+    this->ExodusReader->UpdateVTKObjects();  // TODO: get rid of this call
     }
-
+  
+  // set point arrays
+  property = this->ExodusReader->GetProperty("PointArrayStatus");
+  QList<QVariant> pointArrays = PropertyAdaptor->getProperty(property).toList();
+  for(i=0; i<pointArrays.size(); i++)
+    {
+    QLayout* l = this->NodeVariablesGroup->layout();
+    QCheckBox* cb = qobject_cast<QCheckBox*>(l->itemAt(l->count() - pointArrays.size() + i)->widget());
+    PropertyAdaptor->setProperty(property, i, cb->isChecked());
+    this->ExodusReader->UpdateVTKObjects();  // TODO: get rid of this call
+    }
+  
+  // set sideset arrays
+  property = this->ExodusReader->GetProperty("SideSetArrayStatus");
+  QList<QVariant> sideSetArrays = PropertyAdaptor->getProperty(property).toList();
+  for(i=0; i<sideSetArrays.size(); i++)
+    {
+    QLayout* l = this->SideSetGroup->layout();
+    QCheckBox* cb = qobject_cast<QCheckBox*>(l->itemAt(l->count() - sideSetArrays.size() + i)->widget());
+    PropertyAdaptor->setProperty(property, i, cb->isChecked());
+    this->ExodusReader->UpdateVTKObjects();  // TODO: get rid of this call
+    }
+  
+  // set nodeset arrays
+  property = this->ExodusReader->GetProperty("NodeSetArrayStatus");
+  QList<QVariant> nodeSetArrays = PropertyAdaptor->getProperty(property).toList();
+  for(i=0; i<nodeSetArrays.size(); i++)
+    {
+    QLayout* l = this->NodeSetGroup->layout();
+    QCheckBox* cb = qobject_cast<QCheckBox*>(l->itemAt(l->count() - nodeSetArrays.size() + i)->widget());
+    PropertyAdaptor->setProperty(property, i, cb->isChecked());
+    this->ExodusReader->UpdateVTKObjects();  // TODO: get rid of this call
+    }
 
   QDialog::accept();
 }

@@ -14,6 +14,7 @@ INCLUDE_DIRECTORIES(
 )
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
+  pqCompoundProxyWizard.h
   pqConsoleWidget.h
   pqDataSetModel.h
   pqFileDialog.h
@@ -38,6 +39,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
 )
 
 SET(UI_FORMS
+  pqCompoundProxyWizard.ui
   pqFileDialog.ui
   pqMultiViewFrameMenu.ui
   pqOpenExodusOptions.ui
@@ -69,6 +71,8 @@ SOURCE_GROUP("Generated" FILES
 )
 
 ADD_LIBRARY(QtWidgets
+  pqCompoundProxyWizard.cxx
+  pqCompoundProxyWizard.h
   pqConnect.cxx
   pqConnect.h
   pqConsoleWidget.cxx
