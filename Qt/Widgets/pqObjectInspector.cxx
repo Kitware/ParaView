@@ -372,15 +372,7 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *proxy)
         possibles.append(name);
         }
 
-      if(possibles.size() > 1)
-        {
-        item->setValue(possibles[1]);
-        this->updateDisplayProperties(item);
-        }
-      else
-        {
-        item->setValue(possibles[0]);
-        }
+      item->setValue(possibles[0]);
       item->setDomain(possibles);
       this->connect(item, SIGNAL(valueChanged(pqObjectInspectorItem*)), SLOT(updateDisplayProperties(pqObjectInspectorItem*)));
       }
