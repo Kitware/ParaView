@@ -105,6 +105,12 @@ public:
 #endif
 
   // Description:
+  // Given it's name and value, set an attribute.
+  // If an attribute with the given name already exists,
+  // it replaces the old attribute.
+  void SetAttribute(const char* attrName, const char* attrValue);
+
+  // Description:
   // Add a sub-element. The parent element keeps a reference to
   // sub-element.
   void AddNestedElement(vtkPVXMLElement* element);
