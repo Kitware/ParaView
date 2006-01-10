@@ -17,7 +17,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.39");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.40");
 
 //----------------------------------------------------------------------------
 vtkKWSplitFrame::vtkKWSplitFrame()
@@ -29,8 +29,8 @@ vtkKWSplitFrame::vtkKWSplitFrame()
   this->Frame1Size = 250;
   this->Frame2Size = 250;
 
-  this->Frame1MinimumSize = 150;
-  this->Frame2MinimumSize = 150;
+  this->Frame1MinimumSize = 50;
+  this->Frame2MinimumSize = 50;
 
   this->Frame1Visibility = 1;
   this->Frame2Visibility = 1;
