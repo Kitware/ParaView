@@ -16,6 +16,9 @@
 // This class encapsulates a render window, a renderer and several other
 // objects inside a single widget. Actors and props can be added,
 // annotations can be set.
+// .WARNING by default this widget set the Camera to be Parallel projection
+// You can change this default doing:
+// renderwidget->GetRenderer()->GetActiveCamera()->ParallelProjectionOff();
 
 #ifndef __vtkKWRenderWidget_h
 #define __vtkKWRenderWidget_h
