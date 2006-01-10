@@ -58,7 +58,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.94");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.95");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -585,7 +585,7 @@ int vtkKWNotebook::AreTabsVisible()
 }
 
 //----------------------------------------------------------------------------
-vtkKWWidget *vtkKWNotebook::GetFrame(int id)
+vtkKWFrame *vtkKWNotebook::GetFrame(int id)
 {
   // Return the frame corresponding to that id
 
@@ -598,7 +598,7 @@ vtkKWWidget *vtkKWNotebook::GetFrame(int id)
 }
 
 //----------------------------------------------------------------------------
-vtkKWWidget *vtkKWNotebook::GetFrame(const char *title)
+vtkKWFrame *vtkKWNotebook::GetFrame(const char *title)
 {
   // Return the frame corresponding to that title
 
@@ -611,7 +611,7 @@ vtkKWWidget *vtkKWNotebook::GetFrame(const char *title)
 }
 
 //----------------------------------------------------------------------------
-vtkKWWidget *vtkKWNotebook::GetFrame(const char *title, int tag)
+vtkKWFrame *vtkKWNotebook::GetFrame(const char *title, int tag)
 {
   // Return the frame corresponding to that title and tag
 
@@ -2004,11 +2004,15 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
 
   if (selected)
     {
-    page->Label->SetBackgroundColor(page->Frame->GetBackgroundColor());
+    double fr, fg, fb;
+    //page->Frame->GetBackgroundColor(&fr, &fg, &fb);
+    this->GetBackgroundColor(&fr, &fg, &fb);
+
+    page->Label->SetBackgroundColor(fr, fr, fb);
 
     if (page->Icon)
       {
-      page->ImageLabel->SetBackgroundColor(page->Frame->GetBackgroundColor());
+      page->ImageLabel->SetBackgroundColor(fr, fr, fb);
       // Reset the imagelabel so that the icon is blended with the background
       page->ImageLabel->SetImageToIcon(page->Icon);
       }
@@ -2018,7 +2022,7 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
 
     if (!page->Pinned)
       {
-      page->TabFrame->SetBackgroundColor(page->Frame->GetBackgroundColor());
+      page->TabFrame->SetBackgroundColor(fr, fr, fb);
       vtkKWTkUtilities::ChangeFontSlantToRoman(page->Label);
       }
     else
@@ -2033,7 +2037,8 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
     // Compute the shaded color based on the current frame background color
 
     double fr, fg, fb;
-    page->Frame->GetBackgroundColor(&fr, &fg, &fb);
+    //page->Frame->GetBackgroundColor(&fr, &fg, &fb);
+    this->GetBackgroundColor(&fr, &fg, &fb);
 
     double fh, fs, fv;
     if (fr == fg && fg == fb)
