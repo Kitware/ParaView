@@ -45,7 +45,7 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.70");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.71");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -300,14 +300,6 @@ void vtkPVSphereWidget::SaveInBatchScript(ofstream *file)
           << sdvp->GetElement(1) << " "
           << sdvp->GetElement(2)
           << endl;
-    *file << "  [$pvTemp" << sphereID << " GetProperty Center]"
-          << " SetControllerProxy $pvTemp" 
-          << this->WidgetProxy->GetSelfIDAsString() 
-          << endl;
-    *file << "  [$pvTemp" << sphereID << " GetProperty Center]"
-          << " SetControllerProperty [$pvTemp" 
-          << this->WidgetProxy->GetSelfIDAsString()
-          << " GetProperty Center]" << endl;
     }
 
   sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -317,14 +309,6 @@ void vtkPVSphereWidget::SaveInBatchScript(ofstream *file)
     *file << "  [$pvTemp" << sphereID << " GetProperty Radius] "
           << "SetElements1 "
           << sdvp->GetElement(0) << endl << endl;
-    *file << "  [$pvTemp" << sphereID << " GetProperty Radius]"
-          << " SetControllerProxy $pvTemp" 
-          << this->WidgetProxy->GetSelfIDAsString() 
-          << endl;
-    *file << "  [$pvTemp" << sphereID << " GetProperty Radius]"
-          << " SetControllerProperty [$pvTemp" 
-          << this->WidgetProxy->GetSelfIDAsString()
-          << " GetProperty Radius]" << endl;
     }
   *file << "  $pvTemp" << sphereID << " UpdateVTKObjects" << endl;
   *file << endl;
@@ -547,12 +531,10 @@ void vtkPVSphereWidget::Create()
   // that in the SM State, we can have a mapping from the widget to the 
   // controlled implicit function.
   vtkSMProperty* p = this->ImplicitFunctionProxy->GetProperty("Center");
-  p->SetControllerProxy(this->WidgetProxy);
-  p->SetControllerProperty(this->WidgetProxy->GetProperty("Center"));
+  p->SetController(this->WidgetProxy, "Center");
 
   p = this->ImplicitFunctionProxy->GetProperty("Radius");
-  p->SetControllerProxy(this->WidgetProxy);
-  p->SetControllerProperty(this->WidgetProxy->GetProperty("Radius"));
+  p->SetController(this->WidgetProxy, "Radius");
 }
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::SetupPropertyObservers()

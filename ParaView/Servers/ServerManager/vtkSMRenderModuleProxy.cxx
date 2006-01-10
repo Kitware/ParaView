@@ -46,7 +46,7 @@
 #include "vtkWindowToImageFilter.h"
 
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.22");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.23");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1030,7 +1030,7 @@ void vtkSMRenderModuleProxy::SaveInBatchScript(ofstream* file)
 
     if (!p->GetSaveable() || p->GetInformationOnly())
       {
-      *file << "  # skipping proxy property " << p->GetXMLName() << endl;
+      *file << "  # skipping proxy property " << iter->GetKey() << endl;
       continue;
       }
 
@@ -1045,7 +1045,7 @@ void vtkSMRenderModuleProxy::SaveInBatchScript(ofstream* file)
       for (unsigned int i=0; i < ivp->GetNumberOfElements(); i++)
         {
         *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty {"
-          << ivp->GetXMLName() << "}] SetElement "
+          << iter->GetKey() << "}] SetElement "
           << i << " " << ivp->GetElement(i) 
           << endl;
         }
@@ -1055,7 +1055,7 @@ void vtkSMRenderModuleProxy::SaveInBatchScript(ofstream* file)
       for (unsigned int i=0; i < dvp->GetNumberOfElements(); i++)
         {
         *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty {"
-          << dvp->GetXMLName() << "}] SetElement "
+          << iter->GetKey() << "}] SetElement "
           << i << " " << dvp->GetElement(i) 
           << endl;
         }
@@ -1065,7 +1065,7 @@ void vtkSMRenderModuleProxy::SaveInBatchScript(ofstream* file)
       for (unsigned int i=0; i < svp->GetNumberOfElements(); i++)
         {
         *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty {"
-          << svp->GetXMLName() << "}] SetElement "
+          << iter->GetKey() << "}] SetElement "
           << i << " {" << svp->GetElement(i) << "}"
           << endl;
         }
@@ -1083,14 +1083,14 @@ void vtkSMRenderModuleProxy::SaveInBatchScript(ofstream* file)
         // exception.
         *file << "  catch { [$pvTemp" << this->GetSelfIDAsString() 
               << " GetProperty {"
-              << pp->GetXMLName() << "}] AddProxy $pvTemp"
+              << iter->GetKey() << "}] AddProxy $pvTemp"
               << proxy->GetSelfIDAsString()
               << " } ;#--- " << proxy->GetXMLName() << endl;
         }
       }
     else
       {
-      *file << "  # skipping property " << p->GetXMLName() << endl;
+      *file << "  # skipping property " << iter->GetKey() << endl;
       }
     }
   iter->Delete();

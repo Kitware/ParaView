@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.66");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.67");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -315,15 +315,6 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
         *file << "  [$pvTemp" << boxTransformID 
               << " GetProperty " << properties[i] 
               << "] SetElement 2 " << dvp->GetElement(2) << endl;
-        *file << "  [$pvTemp" << boxTransformID 
-              << " GetProperty " << properties[i]
-              << "] SetControllerProxy $pvTemp" 
-              << this->WidgetProxy->GetSelfIDAsString() << endl;
-        *file << "  [$pvTemp" << boxTransformID 
-              << " GetProperty " << properties[i]
-              << "] SetControllerProperty [$pvTemp" 
-              << this->WidgetProxy->GetSelfIDAsString()
-              << " GetProperty " << properties[i] << "]" << endl;
         }
       }
     *file << "  $pvTemp" << boxTransformID
@@ -364,14 +355,6 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
               << "] SetElement 1 " << dvp->GetElement(1) << endl;
         *file << "  [$pvTemp" << boxID << " GetProperty " << properties[i] 
               << "] SetElement 2 " << dvp->GetElement(2) << endl;
-        *file << "  [$pvTemp" << boxID << " GetProperty " << properties[i]
-              << "] SetControllerProxy $pvTemp" 
-              << this->WidgetProxy->GetSelfIDAsString() << endl;
-        *file << "  [$pvTemp" << boxID << " GetProperty " << properties[i]
-              << "] SetControllerProperty [$pvTemp" 
-              << this->WidgetProxy->GetSelfIDAsString()
-              << " GetProperty " << properties[i] << "]" << endl;
-        
         }
       }
     *file << "  $pvTemp" << boxID << " UpdateVTKObjects" << endl;
@@ -611,12 +594,9 @@ void vtkPVBoxWidget::Create()
   for (i=0; properties[i] != 0 ; i++)
     {
     vtkSMProperty* pbox = this->BoxProxy->GetProperty(properties[i]);
-    pbox->SetControllerProxy(this->WidgetProxy);
-    pbox->SetControllerProperty(this->WidgetProxy->GetProperty(properties[i]));
-    
+    pbox->SetController(this->WidgetProxy, properties[i]);
     vtkSMProperty* ptrans = this->BoxTransformProxy->GetProperty(properties[i]);
-    ptrans->SetControllerProxy(this->WidgetProxy);
-    ptrans->SetControllerProperty(this->WidgetProxy->GetProperty(properties[i]));
+    ptrans->SetController(this->WidgetProxy, properties[i]);
     }
   
   

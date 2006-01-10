@@ -34,7 +34,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.60");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.61");
 
 //----------------------------------------------------------------------------
 vtkPVPointWidget::vtkPVPointWidget()
@@ -210,8 +210,7 @@ void vtkPVPointWidget::Create()
   if (this->VariableName)
     {
     vtkSMProperty* p = sproxy->GetProperty(this->VariableName);
-    p->SetControllerProxy(this->WidgetProxy);
-    p->SetControllerProperty(this->WidgetProxy->GetProperty("Position"));
+    p->SetController(this->WidgetProxy, "Position");
     }
 }
 
@@ -233,13 +232,6 @@ void vtkPVPointWidget::SaveInBatchScript(ofstream *file)
           << sdvp->GetElement(0) << " "
           << sdvp->GetElement(1) << " "
           << sdvp->GetElement(2) << endl;
-    *file << "  [$pvTemp" << sourceID << " GetProperty "
-      << variablename << "] SetControllerProxy $pvTemp"
-      << this->WidgetProxy->GetID(0) << endl;
-    *file << "  [$pvTemp" << sourceID << " GetProperty "
-      << variablename << "] SetControllerProperty [$pvTemp"
-      << this->WidgetProxy->GetID(0) 
-      << " GetProperty Position]" << endl;
     }
 }
 

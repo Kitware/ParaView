@@ -30,12 +30,12 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.37");
+vtkCxxRevisionMacro(vtkSMProperty, "1.38");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationProperty, vtkSMProperty);
-vtkCxxSetObjectMacro(vtkSMProperty, ControllerProperty, vtkSMProperty);
+vtkCxxSetObjectMacro(vtkSMProperty, ControllerProxy, vtkSMProxy);
 
 int vtkSMProperty::CheckDomains = 1;
 
@@ -55,7 +55,7 @@ vtkSMProperty::vtkSMProperty()
   this->InformationHelper = 0;
   this->InformationProperty = 0;
   this->ControllerProxy = 0;
-  this->ControllerProperty = 0;
+  this->ControllerPropertyName = 0;
   this->Saveable = 0;
 }
 
@@ -69,7 +69,7 @@ vtkSMProperty::~vtkSMProperty()
   this->SetProxy(0);
   this->SetInformationHelper(0);
   this->SetInformationProperty(0);
-  this->SetControllerProperty(0);
+  this->SetControllerPropertyName(0);
   this->SetControllerProxy(0);
 }
 
@@ -105,12 +105,6 @@ int vtkSMProperty::IsInDomains()
     this->DomainIterator->Next();
     }
   return 1;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProperty::SetControllerProxy(vtkSMProxy* proxy)
-{
-  this->ControllerProxy = proxy;
 }
 
 //---------------------------------------------------------------------------
@@ -401,29 +395,48 @@ void vtkSMProperty::ChildSaveState(vtkPVXMLElement* /*propertyElement*/)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProperty::SaveState(vtkPVXMLElement* parent, const char* uid)
+void vtkSMProperty::SetController(vtkSMProxy* p, const char* pname)
+{
+  this->SetControllerPropertyName(pname);
+  this->SetControllerProxy(p);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::SaveState(vtkPVXMLElement* parent, 
+  const char* property_name, const char* uid,
+  int saveDomains/*=1*/)
 {
   vtkPVXMLElement* propertyElement = vtkPVXMLElement::New();
   propertyElement->SetName("Property");
-  propertyElement->AddAttribute("name", this->XMLName);
+  propertyElement->AddAttribute("name", property_name);
   propertyElement->AddAttribute("id", uid);
 
-  if (this->ControllerProxy && this->ControllerProperty)
+  if (this->ControllerProxy && this->ControllerPropertyName)
     {
     vtkPVXMLElement* controllerProxyElem = vtkPVXMLElement::New();
     controllerProxyElem->SetName("ControllerProperty");
-    ostrstream cpName;
-    cpName << this->ControllerProxy->GetName() << "." 
-           << this->ControllerProperty->GetXMLName() 
-           << ends;
-    controllerProxyElem->AddAttribute("name", cpName.str());
-    delete[] cpName.str();
+    controllerProxyElem->AddAttribute("id",
+      this->ControllerProxy->GetName());
+    controllerProxyElem->AddAttribute("name",
+      this->ControllerPropertyName);
     propertyElement->AddNestedElement(controllerProxyElem);
     controllerProxyElem->Delete();
     }
 
   this->ChildSaveState(propertyElement);
 
+  if (saveDomains)
+    {
+    this->SaveDomainState(propertyElement, uid);
+    }
+  parent->AddNestedElement(propertyElement);
+  propertyElement->Delete();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::SaveDomainState(vtkPVXMLElement* propertyElement, 
+  const char* uid)
+{
   this->DomainIterator->Begin();
   while(!this->DomainIterator->IsAtEnd())
     {
@@ -433,11 +446,7 @@ void vtkSMProperty::SaveState(vtkPVXMLElement* parent, const char* uid)
     delete[] dname.str();
     this->DomainIterator->Next();
     }
-
-  parent->AddNestedElement(propertyElement);
-  propertyElement->Delete();
 }
-
 //---------------------------------------------------------------------------
 void vtkSMProperty::SetCheckDomains(int check)
 {

@@ -41,7 +41,6 @@ SET(ParaViewServer_SRCS ${ParaViewServer_SRCS}
   )
 
 SET( ParaViewClientNotWrapped_SRCS
-  vtkPVAnimationBatchHelper.cxx
   vtkPVAxesActor.cxx
   vtkPVAxesWidget.cxx
   vtkInteractorStyleTrackballMultiActor.cxx

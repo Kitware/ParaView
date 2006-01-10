@@ -23,7 +23,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.9");
 
 //-----------------------------------------------------------------------------
 vtkSMDisplayProxy::vtkSMDisplayProxy()
@@ -189,7 +189,7 @@ void vtkSMDisplayProxy::SaveInBatchScript(ofstream* file)
     
     if (!p->GetSaveable())
       {
-      *file << "  # skipping not-saveable property " << p->GetXMLName() << endl;
+      *file << "  # skipping not-saveable property " << iter->GetKey() << endl;
       continue;
       }
     
@@ -204,7 +204,7 @@ void vtkSMDisplayProxy::SaveInBatchScript(ofstream* file)
       for (unsigned int i=0; i < ivp->GetNumberOfElements(); i++)
         {
         *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty "
-              << ivp->GetXMLName() << "] SetElement "
+              << iter->GetKey() << "] SetElement "
               << i << " " << ivp->GetElement(i) 
               << endl;
         }
@@ -214,7 +214,7 @@ void vtkSMDisplayProxy::SaveInBatchScript(ofstream* file)
       for (unsigned int i=0; i < dvp->GetNumberOfElements(); i++)
         {
         *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty "
-              << dvp->GetXMLName() << "] SetElement "
+              << iter->GetKey() << "] SetElement "
               << i << " " << dvp->GetElement(i) 
               << endl;
         }
@@ -224,7 +224,7 @@ void vtkSMDisplayProxy::SaveInBatchScript(ofstream* file)
       for (unsigned int i=0; i < svp->GetNumberOfElements(); i++)
         {
         *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty "
-              << svp->GetXMLName() << "] SetElement "
+              << iter->GetKey() << "] SetElement "
               << i << " {" << svp->GetElement(i) << "}"
               << endl;
         }
@@ -234,13 +234,13 @@ void vtkSMDisplayProxy::SaveInBatchScript(ofstream* file)
       for (unsigned int i=0; i < pp->GetNumberOfProxies(); i++)
         {
         *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty "
-              << pp->GetXMLName() << "] AddProxy $pvTemp"
+              << iter->GetKey() << "] AddProxy $pvTemp"
               << pp->GetProxy(i)->GetSelfIDAsString() << endl;
         }
       }
     else
       {
-      *file << "  # skipping property " << p->GetXMLName() << endl;
+      *file << "  # skipping property " << iter->GetKey() << endl;
       }
     }
   
