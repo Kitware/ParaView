@@ -51,7 +51,9 @@ static Tcl_Interp *Et_Interp = 0;
 #include <shellapi.h>
 #include <process.h>
 #include <mapi.h>
+#ifdef KWWidgets_HAS_HTML_HELP
 #include <htmlhelp.h>
+#endif
 #include "Utilities/ApplicationIcon/vtkKWSetApplicationIconTclCommand.h"
 #endif
 
@@ -63,7 +65,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.271");
+vtkCxxRevisionMacro(vtkKWApplication, "1.272");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
