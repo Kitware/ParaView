@@ -100,9 +100,9 @@ public:
   // that title is considered. In the same way, if a tag is provided with the 
   // title, the page which match both title *and* tag is considered.
   // Return NULL on error.
-  vtkKWWidget *GetFrame(int id);
-  vtkKWWidget *GetFrame(const char *title);
-  vtkKWWidget *GetFrame(const char *title, int tag);
+  vtkKWFrame *GetFrame(int id);
+  vtkKWFrame *GetFrame(const char *title);
+  vtkKWFrame *GetFrame(const char *title, int tag);
   int GetPageIdFromFrameWidgetName(const char *frame_wname);
 
   // Description:
