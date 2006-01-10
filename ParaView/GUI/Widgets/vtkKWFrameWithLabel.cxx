@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithLabel );
-vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.5");
+vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.6");
 
 int vtkKWFrameWithLabel::DefaultLabelCase = vtkKWFrameWithLabel::LabelCaseUppercaseFirst;
 int vtkKWFrameWithLabel::DefaultLabelFontWeight = vtkKWFrameWithLabel::LabelFontWeightBold;
@@ -51,117 +51,45 @@ vtkKWFrameWithLabel::vtkKWFrameWithLabel()
 //----------------------------------------------------------------------------
 vtkKWFrameWithLabel::~vtkKWFrameWithLabel()
 {
-  this->Icon->Delete();
-  this->IconData->Delete();
-  this->Label->Delete();
-  this->Frame->Delete();
-  this->LabelFrame->Delete();
-  this->Border->Delete();
-  this->Border2->Delete();
-  this->Groove->Delete();
-}
-
-//----------------------------------------------------------------------------
-vtkKWLabel* vtkKWFrameWithLabel::GetLabel()
-{
+  if (this->Icon)
+    {
+    this->Icon->Delete();
+    this->Icon = NULL;
+    }
+  if (this->IconData)
+    {
+    this->IconData->Delete();
+    this->IconData = NULL;
+    }
   if (this->Label)
     {
-    return this->Label->GetWidget();
+    this->Label->Delete();
+    this->Label = NULL;
     }
-  return NULL;
-}
-
-//----------------------------------------------------------------------------
-vtkKWLabel* vtkKWFrameWithLabel::GetLabelIcon()
-{
-  if (this->Label)
+  if (this->Frame)
     {
-    return this->Label->GetLabel();
+    this->Frame->Delete();
+    this->Frame = NULL;
     }
-  return NULL;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWFrameWithLabel::SetLabelText(const char *text)
-{
-  if (!text)
+  if (this->LabelFrame)
     {
-    return;
+    this->LabelFrame->Delete();
+    this->LabelFrame = NULL;
     }
-
-  if (vtkKWFrameWithLabel::DefaultLabelCase == 
-      vtkKWFrameWithLabel::LabelCaseUserSpecified)
+  if (this->Border)
     {
-    this->GetLabel()->SetText(text);
+    this->Border->Delete();
+    this->Border = NULL;
     }
-  else
+  if (this->Border2)
     {
-    vtksys_stl::string res;
-    switch (vtkKWFrameWithLabel::DefaultLabelCase)
-      {
-      case vtkKWFrameWithLabel::LabelCaseUppercaseFirst:
-        res = vtksys::SystemTools::CapitalizedWords(text);
-        break;
-      case vtkKWFrameWithLabel::LabelCaseLowercaseFirst:
-        res = vtksys::SystemTools::UnCapitalizedWords(text);
-        break;
-      }
-    this->GetLabel()->SetText(res.c_str());
+    this->Border2->Delete();
+    this->Border2 = NULL;
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWFrameWithLabel::AdjustMarginCallback()
-{
-  if (this->IsCreated())
+  if (this->Groove)
     {
-    // Get the height of the label frame, and share it between
-    // the two borders (frame).
-
-    int height = 0;
-    vtkKWTkUtilities::GetWidgetRequestedSize(this->LabelFrame, NULL, &height);
-
-    // If the frame has not been packed yet, reqheight will return 1,
-    // so try the hard way by checking what's inside the pack, provided
-    // that it's simple (i.e. packed in a single row or column)
-
-    if (height <= 1) 
-      {
-      int width;
-      vtkKWTkUtilities::GetSlavesBoundingBoxInPack(
-        this->LabelFrame, &width, &height);
-      }
-
-    // Don't forget the show/hide collapse icon, it might be bigger than
-    // the LabelFrame contents (really ?)
-
-    if (vtkKWFrameWithLabel::DefaultAllowFrameToCollapse && 
-        this->AllowFrameToCollapse &&
-        height < this->IconData->GetHeight())
-      {
-      height = this->IconData->GetHeight();
-      }
-
-    int border_h = height / 2;
-    int border2_h = height / 2;
-#ifdef _WIN32
-    border_h++;
-#else
-    border2_h++;
-#endif
-
-    this->Border->SetHeight(border_h);
-    this->Border2->SetHeight(border2_h);
-
-    if (vtkKWFrameWithLabel::DefaultAllowFrameToCollapse && 
-        this->AllowFrameToCollapse)
-      {
-      this->Script("place %s -relx 1 -x %d -rely 0 -y %d -anchor center",
-                   this->Icon->GetWidgetName(),
-                   -this->IconData->GetWidth() -1,
-                   border_h + 1);    
-      this->Icon->Raise();
-      }
+    this->Groove->Delete();
+    this->Groove = NULL;
     }
 }
 
@@ -243,17 +171,23 @@ void vtkKWFrameWithLabel::Create()
   this->Icon->SetImageToIcon(this->IconData);
   this->Icon->SetBalloonHelpString("Shrink or expand the frame");
   
-  this->Script("pack %s -fill x -side top", this->Border->GetWidgetName());
-  this->Script("pack %s -fill x -side top", this->Groove->GetWidgetName());
-  this->Script("pack %s -fill x -side top", this->Border2->GetWidgetName());
-  this->Script("pack %s -padx 2 -pady 2 -fill both -expand yes",
+  this->Script(
+    "pack %s -fill x -expand y -side top", this->Border->GetWidgetName());
+  this->Script(
+    "pack %s -fill both -expand y -side top", this->Groove->GetWidgetName());
+  this->Script(
+    "pack %s -fill x -expand y -side top", this->Border2->GetWidgetName());
+
+  this->Script(
+    "pack %s -padx 2 -pady 2 -fill both -expand yes -side top",
                this->Frame->GetWidgetName());
+
   this->Script(
     "pack %s -anchor nw -side left -fill both -expand y -padx 2 -pady 0",
     this->Label->GetWidgetName());
+
   this->Script("place %s -relx 0 -x 5 -y 0 -anchor nw",
                this->LabelFrame->GetWidgetName());
-
   this->Label->Raise();
 
   if (vtkKWFrameWithLabel::DefaultAllowFrameToCollapse && 
@@ -275,11 +209,235 @@ void vtkKWFrameWithLabel::Create()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWFrameWithLabel::SetWidth(int width)
+{
+  this->Superclass::SetWidth(width);
+  if (this->Groove)
+    {
+    this->Groove->SetWidth(width);
+    width -= this->Groove->GetBorderWidth() * 2;
+    if (this->Border2)
+      {
+      this->Border2->SetWidth(width);
+      }
+    if (this->Frame)
+      {
+      int padx = 2; // see Create()
+      this->Frame->SetWidth(width - padx * 2);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWFrameWithLabel::GetWidth()
+{
+  int width = this->Superclass::GetWidth();
+  if (this->Groove)
+    {
+    int internal_width = this->Groove->GetWidth();
+    if (internal_width > width)
+      {
+      width = internal_width;
+      }
+    if (this->Frame)
+      {
+      int padx = 2; // see Create()
+      internal_width = this->Frame->GetWidth() + 
+        padx * 2 + this->Groove->GetBorderWidth() * 2;
+      if (internal_width > width)
+        {
+        width = internal_width;
+        }
+      }
+    }
+  return width;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWFrameWithLabel::SetHeight(int height)
+{
+  this->Superclass::SetHeight(height);
+  if (this->Groove)
+    {
+    if (this->Border)
+      {
+      height -= this->Border->GetHeight();
+      }
+    this->Groove->SetHeight(height);
+    height -= this->Groove->GetBorderWidth() * 2;
+    if (this->Border2)
+      {
+      height -= this->Border2->GetHeight();
+      }
+    if (this->Frame)
+      {
+      int pady = 2; // see Create()
+      this->Frame->SetHeight(height - pady * 2);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWFrameWithLabel::GetHeight()
+{
+  int height = this->Superclass::GetHeight();
+  if (this->Groove)
+    {
+    int internal_height = this->Groove->GetHeight();
+    if (this->Border)
+      {
+      internal_height += this->Border->GetHeight();
+      }
+    if (internal_height > height)
+      {
+      height = internal_height;
+      }
+    if (this->Frame)
+      {
+      int pady = 2; // see Create()
+      internal_height = this->Frame->GetHeight() + 
+        pady * 2 + this->Groove->GetBorderWidth() * 2;
+      if (this->Border)
+        {
+        internal_height += this->Border->GetHeight();
+        }
+      if (this->Border2)
+        {
+        internal_height += this->Border2->GetHeight();
+        }
+      if (internal_height > height)
+        {
+        height = internal_height;
+        }
+      }
+    }
+  return height;
+}
+
+//----------------------------------------------------------------------------
+vtkKWLabel* vtkKWFrameWithLabel::GetLabel()
+{
+  if (this->Label)
+    {
+    return this->Label->GetWidget();
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkKWLabel* vtkKWFrameWithLabel::GetLabelIcon()
+{
+  if (this->Label)
+    {
+    return this->Label->GetLabel();
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWFrameWithLabel::SetLabelText(const char *text)
+{
+  if (!text)
+    {
+    return;
+    }
+
+  if (vtkKWFrameWithLabel::DefaultLabelCase == 
+      vtkKWFrameWithLabel::LabelCaseUserSpecified)
+    {
+    this->GetLabel()->SetText(text);
+    }
+  else
+    {
+    vtksys_stl::string res;
+    switch (vtkKWFrameWithLabel::DefaultLabelCase)
+      {
+      case vtkKWFrameWithLabel::LabelCaseUppercaseFirst:
+        res = vtksys::SystemTools::CapitalizedWords(text);
+        break;
+      case vtkKWFrameWithLabel::LabelCaseLowercaseFirst:
+        res = vtksys::SystemTools::UnCapitalizedWords(text);
+        break;
+      }
+    this->GetLabel()->SetText(res.c_str());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWFrameWithLabel::AdjustMarginCallback()
+{
+  if (this->IsCreated())
+    {
+    // Get the height of the label frame, and share it between
+    // the two borders (frame).
+
+    int height = 0, width = 0;
+    vtkKWTkUtilities::GetWidgetRequestedSize(
+      this->LabelFrame, &width, &height);
+
+    // If the frame has not been packed yet, reqheight will return 1,
+    // so try the hard way by checking what's inside the pack, provided
+    // that it's simple (i.e. packed in a single row or column)
+
+    if (height <= 1) 
+      {
+      vtkKWTkUtilities::GetSlavesBoundingBoxInPack(
+        this->LabelFrame, &width, &height);
+      }
+
+    // Don't forget the show/hide collapse icon, it might be bigger than
+    // the LabelFrame contents (really ?)
+
+    if (vtkKWFrameWithLabel::DefaultAllowFrameToCollapse && 
+        this->AllowFrameToCollapse &&
+        height < this->IconData->GetHeight())
+      {
+      height = this->IconData->GetHeight();
+      }
+
+    int border_h = height / 2;
+    int border2_h = height / 2;
+#ifdef _WIN32
+    border_h++;
+#else
+    border2_h++;
+#endif
+
+    this->Border->SetHeight(border_h);
+    this->Border2->SetHeight(border2_h);
+
+    if (vtkKWFrameWithLabel::DefaultAllowFrameToCollapse && 
+        this->AllowFrameToCollapse)
+      {
+      this->Script("place %s -relx 1 -x %d -rely 0 -y %d -anchor center",
+                   this->Icon->GetWidgetName(),
+                   -this->IconData->GetWidth() -1,
+                   border_h + 1);    
+      this->Icon->Raise();
+      }
+
+    // Now check if we need to expand the widget to show the label
+    // This is required if the frame is empty for example, since
+    // the Label is 'placed', it does not claim its own space
+
+    int min_width = width + this->IconData->GetWidth() + 40;
+    if (this->GetWidth() < min_width)
+      {
+      vtkKWTkUtilities::GetWidgetRequestedSize(this, &width, NULL);
+      if (width < min_width)
+        {
+        this->SetWidth(min_width);
+        }
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWFrameWithLabel::ExpandFrame()
 {
   if (this->Frame && this->Frame->IsCreated())
     {
-    this->Script("pack %s -fill both -expand yes",
+    this->Script("pack %s -fill both -expand yes -padx 2 -pady 2",
                  this->Frame->GetWidgetName());
     }
   if (this->IconData && this->Icon)
@@ -294,8 +452,9 @@ void vtkKWFrameWithLabel::CollapseFrame()
 {
   if (this->Frame && this->Frame->IsCreated())
     {
-    this->Script("pack forget %s", 
-                 this->Frame->GetWidgetName());
+    this->Script("pack forget %s", this->Frame->GetWidgetName());
+    this->SetWidth(this->GetWidth());
+    this->SetHeight(this->GetHeight());
     }
   if (this->IconData && this->Icon)
     {

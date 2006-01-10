@@ -143,6 +143,15 @@ public:
   virtual vtkKWDragAndDropTargetSet* GetDragAndDropTargetSet();
 
   // Description:
+  // Override parent's SetWidth/SetHeight to propagate to internal frames.
+  // A frame's size can be set explicitly, until something else is packed
+  // inside.
+  virtual void SetWidth(int);
+  virtual int GetWidth();
+  virtual void SetHeight(int);
+  virtual int GetHeight();
+
+  // Description:
   // Callbacks. Internal, do not use.
   virtual void AdjustMarginCallback();
   virtual void CollapseButtonCallback();
