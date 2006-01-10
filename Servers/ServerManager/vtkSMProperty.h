@@ -317,9 +317,10 @@ protected:
 
   void SetInformationProperty(vtkSMProperty* ip);
   vtkSMProperty* InformationProperty;
-
+//BTX
   // For PVEE.
   friend class vtkWSMApplication;
+//ETX
 private:
   vtkSMProperty(const vtkSMProperty&); // Not implemented
   void operator=(const vtkSMProperty&); // Not implemented
