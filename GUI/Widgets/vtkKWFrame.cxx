@@ -16,7 +16,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWFrame);
-vtkCxxRevisionMacro(vtkKWFrame, "1.29");
+vtkCxxRevisionMacro(vtkKWFrame, "1.30");
 
 //----------------------------------------------------------------------------
 void vtkKWFrame::Create()
@@ -33,7 +33,7 @@ void vtkKWFrame::Create()
 //----------------------------------------------------------------------------
 void vtkKWFrame::SetWidth(int width)
 {
-  this->SetConfigurationOptionAsInt("-width", width);
+  this->SetConfigurationOptionAsInt("-width", width < 0 ? 0 : width);
 }
 
 //----------------------------------------------------------------------------
@@ -45,7 +45,7 @@ int vtkKWFrame::GetWidth()
 //----------------------------------------------------------------------------
 void vtkKWFrame::SetHeight(int height)
 {
-  this->SetConfigurationOptionAsInt("-height", height);
+  this->SetConfigurationOptionAsInt("-height", height < 0 ? 0 : height);
 }
 
 //----------------------------------------------------------------------------
