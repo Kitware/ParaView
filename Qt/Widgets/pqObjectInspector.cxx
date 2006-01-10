@@ -372,7 +372,16 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *proxy)
         possibles.append(name);
         }
 
-      item->setValue(possibles[0]);
+      vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(display->GetProperty("ScalarVisibility"));
+      if(ivp->GetElement(0))
+        {
+        vtkSMStringVectorProperty* d_svp = vtkSMStringVectorProperty::SafeDownCast(display->GetProperty("ColorArray"));
+        item->setValue(d_svp->GetElement(0));
+        }
+      else
+        {
+        item->setValue(possibles[0]);
+        }
       item->setDomain(possibles);
       this->connect(item, SIGNAL(valueChanged(pqObjectInspectorItem*)), SLOT(updateDisplayProperties(pqObjectInspectorItem*)));
       }

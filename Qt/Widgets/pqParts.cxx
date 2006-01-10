@@ -16,6 +16,7 @@
 #include <vtkSMProxyProperty.h>
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
+#include <vtkSMIntVectorProperty.h>
 
 vtkSMDisplayProxy* pqAddPart(vtkSMRenderModuleProxy* rm, vtkSMSourceProxy* Part)
 {
@@ -44,6 +45,14 @@ vtkSMDisplayProxy* pqAddPart(vtkSMRenderModuleProxy* rm, vtkSMSourceProxy* Part)
   // Add the part display to the render module.
   pp = vtkSMProxyProperty::SafeDownCast(rm->GetProperty("Displays"));
   pp->AddProxy(partdisplay);
+
+  // scalar vis off by default, TODO: perhaps turn it on by default, but pick a good default scalar to go by
+  vtkSMIntVectorProperty* ivp;
+  ivp = vtkSMIntVectorProperty::SafeDownCast(partdisplay->GetProperty("ScalarVisibility"));
+  if(ivp)
+    {
+    ivp->SetElement(0,0);
+    }
   rm->UpdateVTKObjects();
 
   // Allow the render module proxy to maintain the part display.
