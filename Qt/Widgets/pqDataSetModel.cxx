@@ -38,18 +38,18 @@ int pqDataSetModel::columnCount(const QModelIndex&) const
   return this->DataSet->GetCellData()->GetNumberOfArrays();
 }
 
-QVariant pqDataSetModel::data(const QModelIndex& index, int role) const
+QVariant pqDataSetModel::data(const QModelIndex& idx, int role) const
 {
-  if(!index.isValid() || !this->DataSet)
+  if(!idx.isValid() || !this->DataSet)
     {
     return QVariant();
     }
 
-  vtkDataArray* array = this->DataSet->GetCellData()->GetArray(index.column());
+  vtkDataArray* array = this->DataSet->GetCellData()->GetArray(idx.column());
 
   if(role == Qt::DisplayRole)
     {
-    return array->GetTuple1(index.row());
+    return array->GetTuple1(idx.row());
     }
   
   return QVariant();

@@ -48,8 +48,8 @@ pqLineChartItem::pqLineChartItem()
 }
 
 
-pqLineChart::pqLineChart(QObject *parent)
-  : QObject(parent), Bounds()
+pqLineChart::pqLineChart(QObject *p)
+  : QObject(p), Bounds()
 {
   this->XAxis = 0;
   this->YAxis = 0;

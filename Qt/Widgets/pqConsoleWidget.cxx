@@ -21,19 +21,19 @@ class pqConsoleWidget::pqImplementation :
   public QTextEdit
 {
 public:
-  pqImplementation(pqConsoleWidget& parent) :
-    QTextEdit(&parent),
-    Parent(parent),
+  pqImplementation(pqConsoleWidget& p) :
+    QTextEdit(&p),
+    Parent(p),
     InteractivePosition(documentEnd())
   {
     this->setTabChangesFocus(false);
     this->setAcceptDrops(false);
     
-    QFont font;
-    font.setStyleHint(QFont::TypeWriter);
+    QFont f;
+    f.setStyleHint(QFont::TypeWriter);
     
     QTextCharFormat format;
-    format.setFont(font);
+    format.setFont(f);
     format.setForeground(QColor(0, 0, 0));
     this->setCurrentCharFormat(format);
     
@@ -51,21 +51,21 @@ public:
 
   void onCursorPositionChanged()
   {
-    QTextCursor cursor = this->textCursor();
-    if(cursor.position() < this->documentEnd())
+    QTextCursor c = this->textCursor();
+    if(c.position() < this->documentEnd())
       {
-      cursor.setPosition(this->documentEnd());
-      this->setTextCursor(cursor);
+      c.setPosition(this->documentEnd());
+      this->setTextCursor(c);
       }
   }
   
   void onSelectionChanged()
   {
-    QTextCursor cursor = this->textCursor();
-    if(cursor.position() < this->documentEnd())
+    QTextCursor c = this->textCursor();
+    if(c.position() < this->documentEnd())
       {
-      cursor.setPosition(this->documentEnd());
-      this->setTextCursor(cursor);
+      c.setPosition(this->documentEnd());
+      this->setTextCursor(c);
       }
   }
 
@@ -112,9 +112,9 @@ private:
   /// Return the end of the document
   const int documentEnd()
   {
-    QTextCursor cursor(this->document());
-    cursor.movePosition(QTextCursor::End);
-    return cursor.position();
+    QTextCursor c(this->document());
+    c.movePosition(QTextCursor::End);
+    return c.position();
   }
   
   /// Replace the contents of the command buffer, updating the display
@@ -122,11 +122,11 @@ private:
   {
     this->commandBuffer() = Text;
   
-    QTextCursor cursor(this->document());
-    cursor.setPosition(this->InteractivePosition);
-    cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
-    cursor.removeSelectedText();
-    cursor.insertText(Text);
+    QTextCursor c(this->document());
+    c.setPosition(this->InteractivePosition);
+    c.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+    c.removeSelectedText();
+    c.insertText(Text);
   }
   
   /// References the buffer where the current un-executed command is stored
@@ -138,9 +138,9 @@ private:
   /// Implements command-execution
   void internalExecuteCommand()
   {
-    QTextCursor cursor(this->document());
-    cursor.movePosition(QTextCursor::End);
-    cursor.insertText("\n");
+    QTextCursor c(this->document());
+    c.movePosition(QTextCursor::End);
+    c.insertText("\n");
 
     this->Parent.internalExecuteCommand(this->commandBuffer());
     
@@ -170,9 +170,9 @@ pqConsoleWidget::pqConsoleWidget(QWidget* Parent) :
   QWidget(Parent),
   Implementation(new pqImplementation(*this))
 {
-  QVBoxLayout* const layout = new QVBoxLayout(this);
-  layout->setMargin(0);
-  layout->addWidget(this->Implementation);
+  QVBoxLayout* const l = new QVBoxLayout(this);
+  l->setMargin(0);
+  l->addWidget(this->Implementation);
 
   QObject::connect(this->Implementation, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
   QObject::connect(this->Implementation, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));

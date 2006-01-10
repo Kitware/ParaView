@@ -11,8 +11,8 @@
 #include "pqLinePlot.h"
 
 
-pqLinePlot::pqLinePlot(QObject *parent)
-  : QObject(parent), Color(Qt::black)
+pqLinePlot::pqLinePlot(QObject *p)
+  : QObject(p), Color(Qt::black)
 {
   this->Thickness = 1;
   this->Modified = true;

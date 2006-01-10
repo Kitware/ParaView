@@ -106,25 +106,25 @@ pqLineChartWidget::~pqLineChartWidget()
     delete this->Mouse;
 }
 
-void pqLineChartWidget::setFont(const QFont &font)
+void pqLineChartWidget::setFont(const QFont &f)
 {
-  QAbstractScrollArea::setFont(font);
+  QAbstractScrollArea::setFont(f);
 
   // Block the axis update signals until all the changes are
   // made. This avoids laying out the chart for each individual
   // change.
-  QFontMetrics fm(font);
+  QFontMetrics fm(f);
   if(this->XAxis)
     {
     this->XAxis->blockSignals(true);
-    this->XAxis->setFont(font);
+    this->XAxis->setFont(f);
     this->XAxis->blockSignals(false);
     }
 
   if(this->YAxis)
     {
     this->YAxis->blockSignals(true);
-    this->YAxis->setFont(font);
+    this->YAxis->setFont(f);
     this->YAxis->blockSignals(false);
     }
 
@@ -152,9 +152,9 @@ void pqLineChartWidget::repaintChart()
   this->viewport()->update();
 }
 
-void pqLineChartWidget::layoutChart(int width, int height)
+void pqLineChartWidget::layoutChart(int w, int h)
 {
-  QRect area(MARGIN, MARGIN, width - DBL_MARGIN, height - DBL_MARGIN);
+  QRect area(MARGIN, MARGIN, w - DBL_MARGIN, h - DBL_MARGIN);
   if(this->XAxis)
     this->XAxis->layoutAxis(area);
   if(this->YAxis)

@@ -132,12 +132,13 @@ void pqSMAdaptor::setProperty(vtkSMProperty* Property, QVariant QtProperty)
 
   if(adapter->GetPropertyType() == vtkSMPropertyAdaptor::SELECTION)
     {
-    assert(props.size() <= adapter->GetNumberOfSelectionElements());
+    assert(props.size() <= (QList<QVariant>::size_type)adapter->GetNumberOfSelectionElements());
     }
   else
     {
-    assert(props.size() <= VectorProperty->GetNumberOfElements());
+    assert(props.size() <= (QList<QVariant>::size_type)VectorProperty->GetNumberOfElements());
     }
+
   for(int i=0; i<props.size(); i++)
     {
     this->setProperty(Property, i, props[i]);

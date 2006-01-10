@@ -188,8 +188,8 @@ void pqHistogramChartData::clearSelection()
 
 QColor pqHistogramChart::LightBlue = QColor(125, 165, 230);
 
-pqHistogramChart::pqHistogramChart(QObject *parent)
-  : QObject(parent), Bounds(), Select(LightBlue)
+pqHistogramChart::pqHistogramChart(QObject *p)
+  : QObject(p), Bounds(), Select(LightBlue)
 {
   this->Style = pqHistogramChart::Fill;
   this->OutlineType = pqHistogramChart::Darker;

@@ -78,9 +78,9 @@ struct pqObjectHistogramWidget::pqImplementation
     this->onInputChanged();
   }
   
-  void setCurrentVariable(const QString& CurrentVariable)
+  void setCurrentVariable(const QString& c)
   {
-    this->CurrentVariable = CurrentVariable;
+    this->CurrentVariable = c;
     this->updateChart();
   }
   
@@ -221,8 +221,8 @@ struct pqObjectHistogramWidget::pqImplementation
 /////////////////////////////////////////////////////////////////////////////////
 // pqObjectHistogramWidget
 
-pqObjectHistogramWidget::pqObjectHistogramWidget(QWidget *parent) :
-  QWidget(parent),
+pqObjectHistogramWidget::pqObjectHistogramWidget(QWidget *p) :
+  QWidget(p),
   Implementation(new pqImplementation())
 {
   QLabel* const bin_label = new QLabel(tr("Bins:"));

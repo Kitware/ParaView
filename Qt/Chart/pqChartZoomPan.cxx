@@ -31,11 +31,11 @@
 #include "zoom.xpm"
 
 
-pqChartZoomPan::pqChartZoomPan(QAbstractScrollArea *parent)
-  : QObject(parent), Last()
+pqChartZoomPan::pqChartZoomPan(QAbstractScrollArea *p)
+  : QObject(p), Last()
 {
   this->Current = pqChartZoomPan::NoMode;
-  this->Parent = parent;
+  this->Parent = p;
   this->History = new pqChartZoomHistory();
   this->ContentsX = 0;
   this->ContentsY = 0;

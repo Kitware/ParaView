@@ -66,8 +66,8 @@ void pqPiecewiseLineData::calculateBounds()
 }
 
 
-pqPiecewiseLine::pqPiecewiseLine(QObject *parent)
-  : pqLinePlot(parent)
+pqPiecewiseLine::pqPiecewiseLine(QObject *p)
+  : pqLinePlot(p)
 {
   this->Data = new pqPiecewiseLineData();
 }

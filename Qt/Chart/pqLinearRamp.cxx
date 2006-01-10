@@ -12,8 +12,8 @@
 #include "pqChartValue.h"
 
 
-pqLinearRamp::pqLinearRamp(QObject *parent)
-  : pqLinePlot(parent), Point1(), Point2()
+pqLinearRamp::pqLinearRamp(QObject *p)
+  : pqLinePlot(p), Point1(), Point2()
 {
 }
 

@@ -118,7 +118,7 @@ public:
       else
         {
         const QString name = regex.cap(1);
-        const QString index = regex.cap(2);
+        const QString idx = regex.cap(2);
         
         if(name != numbered_files.Label)
           {
@@ -352,25 +352,25 @@ public:
     return 1;
   }
   
-  virtual QVariant data(const QModelIndex & index, int role) const
+  virtual QVariant data(const QModelIndex& idx, int role) const
   {
-    if(!index.isValid())
+    if(!idx.isValid())
       return QVariant();
 
-    if(index.row() >= this->FavoriteList.size())
+    if(idx.row() >= this->FavoriteList.size())
       return QVariant();
 
-    const FileInfo& file = this->FavoriteList[index.row()];
+    const FileInfo& file = this->FavoriteList[idx.row()];
     switch(role)
       {
       case Qt::DisplayRole:
-        switch(index.column())
+        switch(idx.column())
           {
           case 0:
             return file.label;
           }
       case Qt::DecorationRole:
-        switch(index.column())
+        switch(idx.column())
           {
           case 0:
             if(file.isRoot())
@@ -399,9 +399,9 @@ public:
     return this->FavoriteList.size();
   }
   
-  virtual bool hasChildren(const QModelIndex& parent) const
+  virtual bool hasChildren(const QModelIndex& p) const
   {
-    if(!parent.isValid())
+    if(!p.isValid())
       return true;
       
     return false;

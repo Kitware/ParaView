@@ -81,8 +81,8 @@ class pqObjectInspectorInternal { public:
 };
 
 
-pqObjectInspector::pqObjectInspector(QObject *parent)
-  : QAbstractItemModel(parent)
+pqObjectInspector::pqObjectInspector(QObject *p)
+  : QAbstractItemModel(p)
 {
   this->Commit = pqObjectInspector::Individually;
   this->Internal = new pqObjectInspectorInternal();
@@ -99,15 +99,15 @@ pqObjectInspector::~pqObjectInspector()
     }
 }
 
-int pqObjectInspector::rowCount(const QModelIndex &parent) const
+int pqObjectInspector::rowCount(const QModelIndex &p) const
 {
   int rows = 0;
   if(this->Internal)
     {
-    if(parent.isValid() && parent.model() == this)
+    if(p.isValid() && p.model() == this)
       {
       pqObjectInspectorItem *item = reinterpret_cast<pqObjectInspectorItem *>(
-          parent.internalPointer());
+          p.internalPointer());
       if(item)
         rows = item->childCount();
       }
@@ -127,13 +127,13 @@ int pqObjectInspector::columnCount(const QModelIndex &) const
   return 0;
 }
 
-bool pqObjectInspector::hasChildren(const QModelIndex &parent) const
+bool pqObjectInspector::hasChildren(const QModelIndex &p) const
 {
-  if(parent.isValid() && parent.model() == this)
+  if(p.isValid() && p.model() == this)
     {
     pqObjectInspectorItem *item = reinterpret_cast<pqObjectInspectorItem *>(
-        parent.internalPointer());
-    if(item && parent.column() == 0)
+        p.internalPointer());
+    if(item && p.column() == 0)
       return item->childCount() > 0;
     }
   else if(this->Internal)
@@ -143,15 +143,15 @@ bool pqObjectInspector::hasChildren(const QModelIndex &parent) const
 }
 
 QModelIndex pqObjectInspector::index(int row, int column,
-    const QModelIndex &parent) const
+    const QModelIndex &p) const
 {
   if(this->Internal && row >= 0 && column >= 0 && column < 2)
     {
     pqObjectInspectorItem *item = 0;
-    if(parent.isValid() && parent.model() == this)
+    if(p.isValid() && p.model() == this)
       {
-      pqObjectInspectorItem *item = reinterpret_cast<pqObjectInspectorItem *>(
-          parent.internalPointer());
+      item = reinterpret_cast<pqObjectInspectorItem *>(
+          p.internalPointer());
       if(item && row < item->childCount())
         {
         item = item->child(row);
@@ -168,12 +168,12 @@ QModelIndex pqObjectInspector::index(int row, int column,
   return QModelIndex();
 }
 
-QModelIndex pqObjectInspector::parent(const QModelIndex &index) const
+QModelIndex pqObjectInspector::parent(const QModelIndex &idx) const
 {
-  if(index.isValid() && index.model() == this)
+  if(idx.isValid() && idx.model() == this)
     {
     pqObjectInspectorItem *item = reinterpret_cast<pqObjectInspectorItem *>(
-        index.internalPointer());
+        idx.internalPointer());
     if(item && item->parent())
       {
       // Find the parent's row and column from the parent's parent.
@@ -187,18 +187,18 @@ QModelIndex pqObjectInspector::parent(const QModelIndex &index) const
   return QModelIndex();
 }
 
-QVariant pqObjectInspector::data(const QModelIndex &index, int role) const
+QVariant pqObjectInspector::data(const QModelIndex &idx, int role) const
 {
-  if(index.isValid() && index.model() == this)
+  if(idx.isValid() && idx.model() == this)
     {
     pqObjectInspectorItem *item = reinterpret_cast<pqObjectInspectorItem *>(
-        index.internalPointer());
+        idx.internalPointer());
     switch(role)
       {
       case Qt::DisplayRole:
       case Qt::ToolTipRole:
         {
-        if(index.column() == 0)
+        if(idx.column() == 0)
           return QVariant(item->propertyName());
         else
           {
@@ -216,7 +216,7 @@ QVariant pqObjectInspector::data(const QModelIndex &index, int role) const
         }
       case Qt::EditRole:
         {
-        if(index.column() == 0)
+        if(idx.column() == 0)
           return QVariant(item->propertyName());
         else
           return item->value();
@@ -227,13 +227,13 @@ QVariant pqObjectInspector::data(const QModelIndex &index, int role) const
   return QVariant();
 }
 
-bool pqObjectInspector::setData(const QModelIndex &index,
+bool pqObjectInspector::setData(const QModelIndex &idx,
     const QVariant &value, int)
 {
-  if(index.isValid() && index.model() == this && index.column() == 1)
+  if(idx.isValid() && idx.model() == this && idx.column() == 1)
     {
     pqObjectInspectorItem *item = reinterpret_cast<pqObjectInspectorItem *>(
-        index.internalPointer());
+        idx.internalPointer());
     if(item && item->childCount() == 0 && value.isValid())
       {
       // Save the value according to the item's type. The value
@@ -272,14 +272,14 @@ bool pqObjectInspector::setData(const QModelIndex &index,
   return false;
 }
 
-Qt::ItemFlags pqObjectInspector::flags(const QModelIndex &index) const
+Qt::ItemFlags pqObjectInspector::flags(const QModelIndex &idx) const
 {
   // Add editable to the flags for the item values.
   Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-  if(index.isValid() && index.model() == this && index.column() == 1)
+  if(idx.isValid() && idx.model() == this && idx.column() == 1)
     {
     pqObjectInspectorItem *item = reinterpret_cast<pqObjectInspectorItem *>(
-        index.internalPointer());
+        idx.internalPointer());
     // TODO: consider putting editable flag on item?
     if(item && item->childCount() == 0 &&
        (
@@ -295,12 +295,12 @@ Qt::ItemFlags pqObjectInspector::flags(const QModelIndex &index) const
   return flags;
 }
 
-QVariant pqObjectInspector::domain(const QModelIndex &index) const
+QVariant pqObjectInspector::domain(const QModelIndex &idx) const
 {
-  if(index.isValid() && index.model() == this)
+  if(idx.isValid() && idx.model() == this)
     {
     pqObjectInspectorItem *item = reinterpret_cast<pqObjectInspectorItem *>(
-        index.internalPointer());
+        idx.internalPointer());
     if(item)
       return item->domain();
     }
@@ -414,7 +414,7 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *proxy)
           {
           QList<QVariant> list = value.toList();
           QList<QVariant>::Iterator li = list.begin();
-          for(int index = 0; li != list.end(); ++li, ++index)
+          for(int i = 0; li != list.end(); ++li, ++i)
             {
             QString num;
             QVariant subvalue;
@@ -426,7 +426,7 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *proxy)
               }
             else
               {
-              num.setNum(index + 1);
+              num.setNum(i + 1);
               subvalue = *li;
               }
 
@@ -437,7 +437,7 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *proxy)
               child->setValue(subvalue);
               child->setParent(item);
               item->addChild(child);
-              adapter->linkPropertyTo(this->Proxy, prop, index,
+              adapter->linkPropertyTo(this->Proxy, prop, i,
                   child, "value");
               connect(child, SIGNAL(valueChanged(pqObjectInspectorItem *)),
                   this, SLOT(handleValueChange(pqObjectInspectorItem *)));

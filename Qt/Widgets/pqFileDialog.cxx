@@ -14,8 +14,8 @@
 
 #include <vtkstd/set>
 
-pqFileDialog::pqFileDialog(pqFileDialogModel* model, const QString& title, QWidget* parent, const char* const name) :
-  QDialog(parent),
+pqFileDialog::pqFileDialog(pqFileDialogModel* model, const QString& title, QWidget* p, const char* const name) :
+  QDialog(p),
   Model(model)
 {
   this->Ui.setupUi(this);

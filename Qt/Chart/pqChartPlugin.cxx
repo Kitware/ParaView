@@ -20,14 +20,14 @@
 #include "pqLineChartWidgetPlugin.h"
 
 
-pqHistogramWidgetPlugin::pqHistogramWidgetPlugin(QObject *parent)
-  : QObject(parent)
+pqHistogramWidgetPlugin::pqHistogramWidgetPlugin(QObject *p)
+  : QObject(p)
 {
 }
 
-QWidget *pqHistogramWidgetPlugin::createWidget(QWidget *parent)
+QWidget *pqHistogramWidgetPlugin::createWidget(QWidget *p)
 {
-  return new pqHistogramWidget(parent);
+  return new pqHistogramWidget(p);
 }
 
 QString pqHistogramWidgetPlugin::domXml() const
@@ -66,14 +66,14 @@ QString pqHistogramWidgetPlugin::whatsThis() const
 }
 
 
-pqLineChartWidgetPlugin::pqLineChartWidgetPlugin(QObject *parent)
-  : QObject(parent)
+pqLineChartWidgetPlugin::pqLineChartWidgetPlugin(QObject *p)
+  : QObject(p)
 {
 }
 
-QWidget *pqLineChartWidgetPlugin::createWidget(QWidget *parent)
+QWidget *pqLineChartWidgetPlugin::createWidget(QWidget *p)
 {
-  return new pqLineChartWidget(parent);
+  return new pqLineChartWidget(p);
 }
 
 QString pqLineChartWidgetPlugin::domXml() const
@@ -112,8 +112,8 @@ QString pqLineChartWidgetPlugin::whatsThis() const
 }
 
 
-pqChartPlugin::pqChartPlugin(QObject *parent)
-  : QObject(parent), QDesignerCustomWidgetCollectionInterface()
+pqChartPlugin::pqChartPlugin(QObject *p)
+  : QObject(p), QDesignerCustomWidgetCollectionInterface()
 {
   this->Histogram = new pqHistogramWidgetPlugin();
   this->LineChart = new pqLineChartWidgetPlugin();

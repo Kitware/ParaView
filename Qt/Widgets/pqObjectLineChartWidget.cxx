@@ -93,9 +93,9 @@ struct pqObjectLineChartWidget::pqImplementation
     this->updateChart();
   }
   
-  void setCurrentElementID(unsigned long ElementID)
+  void setCurrentElementID(unsigned long e)
   {
-    this->CurrentElementID = ElementID;
+    this->CurrentElementID = e;
     this->updateChart();
   }
   
@@ -195,8 +195,8 @@ struct pqObjectLineChartWidget::pqImplementation
 /////////////////////////////////////////////////////////////////////////////////
 // pqObjectLineChartWidget
 
-pqObjectLineChartWidget::pqObjectLineChartWidget(QWidget *parent) :
-  QWidget(parent),
+pqObjectLineChartWidget::pqObjectLineChartWidget(QWidget *p) :
+  QWidget(p),
   Implementation(new pqImplementation())
 {
   QLabel* const element_label = new QLabel(tr("Element:"));

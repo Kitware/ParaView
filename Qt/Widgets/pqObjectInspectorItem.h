@@ -72,7 +72,7 @@ public:
   ///   Sets the property domain.
   /// \param domain The domain of the property.
   /// \sa pqObjectInspectorItem::updateDomain(vtkSMProperty *)
-  void setDomain(const QVariant &domain) {this->Domain = domain;}
+  void setDomain(const QVariant &d) {this->Domain = d;}
 
   /// \brief
   ///   Gets whether or not the property has been modified by the user.
@@ -127,7 +127,7 @@ public:
   /// \brief
   ///   Sets the parent of this item.
   /// \param parent The new parent of this item.
-  void setParent(pqObjectInspectorItem *parent) {this->Parent = parent;}
+  void setParent(pqObjectInspectorItem *p) {this->Parent = p;}
   //@}
 
 public slots:

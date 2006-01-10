@@ -57,8 +57,8 @@ pqChartAxisPair::pqChartAxisPair()
 }
 
 
-pqChartAxis::pqChartAxis(AxisLocation location, QObject *parent)
-  : QObject(parent), Bounds(), Axis(Qt::black), Grid(178, 178, 178),
+pqChartAxis::pqChartAxis(AxisLocation location, QObject *p)
+  : QObject(p), Bounds(), Axis(Qt::black), Grid(178, 178, 178),
     Font(), ValueMin(), ValueMax(), TrueMin(), TrueMax()
 {
   this->Location = location;

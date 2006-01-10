@@ -21,16 +21,16 @@ namespace {
     }
 }
 
-pqMultiView::pqMultiView(QWidget* parent)
-  : QFrame(parent)
+pqMultiView::pqMultiView(QWidget* p)
+  : QFrame(p)
 {
-  QHBoxLayout* layout = new QHBoxLayout(this);
-  layout->setSpacing(0);
-  layout->setMargin(0);
-  this->setLayout(layout);
+  QHBoxLayout* l = new QHBoxLayout(this);
+  l->setSpacing(0);
+  l->setMargin(0);
+  this->setLayout(l);
   QSplitter* splitter = new QSplitter(this);
   splitter->setObjectName("MultiViewSplitter");
-  layout->addWidget(splitter);
+  l->addWidget(splitter);
   splitter->addWidget(makeNewFrame());
 }
 
@@ -214,22 +214,22 @@ pqMultiView::Index pqMultiView::indexOf(QWidget* widget) const
   if(!widget)
     return index;
 
-  QWidget* parent = widget->parentWidget();
-  while(parent && parent != this)
+  QWidget* p = widget->parentWidget();
+  while(p && p != this)
     {
-    QSplitter* splitter = qobject_cast<QSplitter*>(parent);
+    QSplitter* splitter = qobject_cast<QSplitter*>(p);
     if(splitter)
       {
       index.push_front(splitter->indexOf(widget));
       }
     else
       {
-      QLayout* layout = parent->layout();
-      Q_ASSERT(layout != NULL);
-      index.push_front(layout->indexOf(widget));
+      QLayout* l = p->layout();
+      Q_ASSERT(l != NULL);
+      index.push_front(l->indexOf(widget));
       }
-    widget = parent;
-    parent = parent->parentWidget();
+    widget = p;
+    p = p->parentWidget();
     }
   return index;
 }
