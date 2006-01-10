@@ -63,7 +63,7 @@
 #define VTK_PV_CAMERA_PROXYNAME "_dont_validate_.ActiveCamera"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.64");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.65");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizontalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -550,7 +550,7 @@ int vtkPVAnimationManager::AddProperties(vtkPVSource* pvSource, vtkSMProxy* prox
     if (vtkSMStringVectorProperty::SafeDownCast(property))
       {
       property_added += this->AddStringVectorProperty(pvSource, proxy, pvCueTree, 
-        vtkSMStringVectorProperty::SafeDownCast(property));
+        vtkSMStringVectorProperty::SafeDownCast(property), iter->GetKey());
       continue;
       }
     vtkSMVectorProperty* vproperty = vtkSMVectorProperty::SafeDownCast(property);
@@ -568,17 +568,17 @@ int vtkPVAnimationManager::AddProperties(vtkPVSource* pvSource, vtkSMProxy* prox
     if (numOfElements == 1 || has_repeat_command)
       {
       int element_index = (has_repeat_command)? -1: 0;
-      this->SetupCue(pvSource, pvCueTree, proxy, property->GetXMLName(),NULL,
-        element_index,  property->GetXMLName());
+      this->SetupCue(pvSource, pvCueTree, proxy, iter->GetKey(),NULL,
+        element_index,  iter->GetKey());
       property_added++;
       }
     else
       {
       vtkPVAnimationCueTree* cueTree = vtkPVAnimationCueTree::New();
-      cueTree->SetLabelText(property->GetXMLName());
+      cueTree->SetLabelText(iter->GetKey());
       //create tree name.
       ostrstream cueTreeName;
-      cueTreeName /*<< pvCueTree->GetName() << "."*/ << property->GetXMLName() << ends;
+      cueTreeName /*<< pvCueTree->GetName() << "."*/ << iter->GetKey() << ends;
       cueTree->SetName(cueTreeName.str());
       cueTree->SetPVSource(pvSource);
       cueTreeName.rdbuf()->freeze(0);
@@ -590,7 +590,7 @@ int vtkPVAnimationManager::AddProperties(vtkPVSource* pvSource, vtkSMProxy* prox
         {
         ostrstream str;
         str << i << ends;
-        this->SetupCue(pvSource, cueTree, proxy, property->GetXMLName(),
+        this->SetupCue(pvSource, cueTree, proxy, iter->GetKey(),
           NULL, i, str.str());
         str.rdbuf()->freeze(0);
         property_added++;
@@ -604,7 +604,7 @@ int vtkPVAnimationManager::AddProperties(vtkPVSource* pvSource, vtkSMProxy* prox
 //-----------------------------------------------------------------------------
 int vtkPVAnimationManager::AddStringVectorProperty(vtkPVSource* pvSource,
   vtkSMProxy* proxy, vtkPVAnimationCueTree* pvCueTree, 
-  vtkSMStringVectorProperty* svp)
+  vtkSMStringVectorProperty* svp, const char* property_name)
 {
   vtkSMDomainIterator* diter = svp->NewDomainIterator();
   diter->Begin();
@@ -630,7 +630,7 @@ int vtkPVAnimationManager::AddStringVectorProperty(vtkPVSource* pvSource,
     for (int i=0; i < no_tracks; i++)
       {
       const char* name = svp->GetElement(2 * i);
-      this->SetupCue(pvSource, pvCueTree, proxy, svp->GetXMLName(),
+      this->SetupCue(pvSource, pvCueTree, proxy, property_name,
         0, i, name);
       }
     return (no_tracks > 0)? 1 : 0;
@@ -642,8 +642,8 @@ int vtkPVAnimationManager::AddStringVectorProperty(vtkPVSource* pvSource,
       vtkDebugMacro("Case not handled.");
       return 0;
       }
-    this->SetupCue(pvSource, pvCueTree, proxy, svp->GetXMLName(),NULL, 
-      0, svp->GetXMLName());
+    this->SetupCue(pvSource, pvCueTree, proxy, property_name,NULL, 
+      0, property_name);
     return 1;
     }
   else if (sld)
@@ -653,8 +653,8 @@ int vtkPVAnimationManager::AddStringVectorProperty(vtkPVSource* pvSource,
       vtkDebugMacro("Case not handled.");
       return 0;
       }
-    this->SetupCue(pvSource, pvCueTree, proxy, svp->GetXMLName(),NULL, 
-      0, svp->GetXMLName());
+    this->SetupCue(pvSource, pvCueTree, proxy, property_name,NULL, 
+      0, property_name);
     return 1;
     }
   return 0;
@@ -1250,7 +1250,7 @@ void vtkPVAnimationManager::AddDefaultAnimation(vtkPVSource* pvSource)
       return;
       }
     vtkPVWidget* pvTimeStepWidget = clone->GetTimeStepWidget();
-    const char* animatedPropertyName = pvTimeStepWidget->GetSMProperty()->GetXMLName();
+    const char* animatedPropertyName = pvTimeStepWidget->GetSMPropertyName();
     if (!animatedPropertyName || !animatedPropertyName[0])
       {
       return;

@@ -1342,17 +1342,7 @@
           <Group name="lookup_tables"/>
         </ProxyGroupDomain>
       </ProxyProperty>
-      <ProxyProperty
-        name="TitleTextProperty"
-        command="SetTitleTextProperty"
-        number_of_elements="1">
-      </ProxyProperty>
-      <ProxyProperty
-        name="LabelTextProperty"
-        command="SetLabelTextProperty"
-        number_of_elements="1">
-      </ProxyProperty>
-    
+      
       <IntVectorProperty
         name="Visibility"
         command="SetVisibility"
@@ -1416,13 +1406,13 @@
           proxygroup="properties" proxyname="TextProperty">
         </Proxy>
         <ExposedProperties>
-          <Property name="Color" />
-          <Property name="Opacity" />
-          <Property name="FontFamily" />
-          <Property name="Bold" />
-          <Property name="Italic" />
-          <Property name="Shadow" />
-          <Property name="FontSize" />
+          <Property name="Color"      exposed_name="LabelColor"     />
+          <Property name="Opacity"    exposed_name="LabelOpacity"   />
+          <Property name="FontFamily" exposed_name="LabelFontFamily"/>
+          <Property name="Bold"       exposed_name="LabelBold"      />
+          <Property name="Italic"     exposed_name="LabelItalic"    />
+          <Property name="Shadow"     exposed_name="LabelShadow"    />
+          <Property name="FontSize"   exposed_name="LabelFontSize"  />
         </ExposedProperties>
       </SubProxy>
 
@@ -1432,13 +1422,13 @@
           proxygroup="properties" proxyname="TextProperty">
         </Proxy>
         <ExposedProperties>
-          <Property name="Color" />
-          <Property name="Opacity" />
-          <Property name="FontFamily" />
-          <Property name="Bold" />
-          <Property name="Italic" />
-          <Property name="Shadow" />
-          <Property name="FontSize" />
+          <Property name="Color"      exposed_name="TitleColor"     />
+          <Property name="Opacity"    exposed_name="TitleOpacity"   />
+          <Property name="FontFamily" exposed_name="TitleFontFamily"/>
+          <Property name="Bold"       exposed_name="TitleBold"      />
+          <Property name="Italic"     exposed_name="TitleItalic"    />
+          <Property name="Shadow"     exposed_name="TitleShadow"    />
+          <Property name="FontSize"   exposed_name="TitleFontSize"  />
         </ExposedProperties>
       </SubProxy>
     </ScalarBarActorProxy>

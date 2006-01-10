@@ -28,7 +28,7 @@
 #include "vtkPVWindow.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.38");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.39");
 
 vtkCxxSetObjectMacro(vtkPVLineSourceWidget, InputMenu, vtkPVInputMenu);
 
@@ -112,12 +112,10 @@ void vtkPVLineSourceWidget::Create()
   // that in the SM State, we can have a mapping from the widget to the 
   // controlled implicit function.
   vtkSMProperty* p = this->SourceProxy->GetProperty("Point1");
-  p->SetControllerProxy(this->WidgetProxy);
-  p->SetControllerProperty(this->WidgetProxy->GetProperty("Point1"));
+  p->SetController(this->WidgetProxy, "Point1");
 
   p = this->SourceProxy->GetProperty("Point2");
-  p->SetControllerProxy(this->WidgetProxy);
-  p->SetControllerProperty(this->WidgetProxy->GetProperty("Point2"));
+  p->SetController(this->WidgetProxy, "Point2");
   
 }
 
@@ -264,14 +262,6 @@ void vtkPVLineSourceWidget::SaveInBatchScript(ofstream *file)
       << dvp->GetElement(0) << " " 
       << dvp->GetElement(1) << " " 
       << dvp->GetElement(2) << endl;
-    *file << "  [$pvTemp" << sourceID << " GetProperty Point1]"
-          << " SetControllerProxy $pvTemp" 
-          << this->WidgetProxy->GetSelfIDAsString()
-          << endl;
-    *file << " [$pvTemp" << sourceID << " GetProperty Point1]"
-          << " SetControllerProperty [$pvTemp" 
-          << this->WidgetProxy->GetSelfIDAsString()
-          << " GetProperty Point1]" << endl;
     }
   
   dvp = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -283,14 +273,6 @@ void vtkPVLineSourceWidget::SaveInBatchScript(ofstream *file)
           << dvp->GetElement(0) << " " 
           << dvp->GetElement(1) << " " 
           << dvp->GetElement(2) << endl;
-    *file << "  [$pvTemp" << sourceID << " GetProperty Point2]"
-          << " SetControllerProxy $pvTemp" 
-          << this->WidgetProxy->GetSelfIDAsString()
-          << endl;
-    *file << " [$pvTemp" << sourceID << " GetProperty Point2]"
-          << " SetControllerProperty [$pvTemp" 
-          << this->WidgetProxy->GetSelfIDAsString()
-          << " GetProperty Point2]" << endl;
     }
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->SourceProxy->GetProperty("Resolution"));
@@ -298,14 +280,6 @@ void vtkPVLineSourceWidget::SaveInBatchScript(ofstream *file)
     {
     *file << "  [$pvTemp" << sourceID << " GetProperty Resolution] "
           << "SetElements1 " << ivp->GetElement(0) << endl;
-    *file << "  [$pvTemp" << sourceID << " GetProperty Resolution]"
-          << " SetControllerProxy $pvTemp" 
-          << this->WidgetProxy->GetSelfIDAsString()
-          << endl;
-    *file << " [$pvTemp" << sourceID << " GetProperty Resolution]"
-          << " SetControllerProperty [$pvTemp" 
-          << this->WidgetProxy->GetSelfIDAsString()
-          << " GetProperty Resolution]" << endl;
     }
   *file << "  $pvTemp" << sourceID << " UpdateVTKObjects" << endl;
   *file << endl;

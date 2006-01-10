@@ -156,11 +156,6 @@ public:
   static void SetCheckDomains(int check);
 
   // Description:
-  // The name assigned by the xml parser. Used to get the property
-  // from a proxy.
-  vtkGetStringMacro(XMLName);
-
-  // Description:
   // Is InformationOnly is set to true, this property is used to
   // get information from server instead of setting values.
   vtkGetMacro(InformationOnly, int);
@@ -178,13 +173,12 @@ public:
   // controlled by the 3DWidget will have these set to the corresponing
   // property of the 3DWidget. Thus, providing hints about which implicit
   // function property is controlled by which 3DWidget and what property.
-  // This goes mostly unnoticed in ParaView, but useful for ARL.  If these
-  // are set, then they are saved in the XML during SaveState as a element
-  // <ControllerProperty name="propertyname" />. ARL notices such elements
+  // This goes mostly unnoticed in ParaView, but useful for PVEE(WebVis).  
+  // If these are set, then they are saved in the XML during SaveState as a element
+  // <ControllerProperty name="propertyname" />. WebVis notices such elements
   // and creates a property value dependency among the controlee and the
   // controller property.
-  void SetControllerProxy(vtkSMProxy* proxy);
-  void SetControllerProperty(vtkSMProperty* property);
+  void SetController(vtkSMProxy* proxy, const char* pname);
 
   // Description:
   // Properties can have one or more domains. These are assigned by
@@ -247,8 +241,17 @@ protected:
 
   // Description:
   // The name assigned by the xml parser. Used to get the property
-  // from a proxy.
+  // from a proxy. Note that the name used to obtain a property
+  // that is on a subproxy may be different from the XMLName of the property,
+  // see the note on ExposedProperties for vtkSMProxy.
   vtkSetStringMacro(XMLName);
+  
+  // Description:
+  // The name assigned by the xml parser. Used to get the property
+  // from a proxy. Note that the name used to obtain a property
+  // that is on a subproxy may be different from the XMLName of the property,
+  // see the note on ExposedProperties for vtkSMProxy.
+  vtkGetStringMacro(XMLName);
 
   // Description:
   // Add a sub-property with the given name.
@@ -274,8 +277,10 @@ protected:
 
   // Description:
   // Save the state in XML.
-  virtual void SaveState(vtkPVXMLElement* parent, const char* uid);
+  virtual void SaveState(vtkPVXMLElement* parent, const char* property_name, 
+    const char* uid, int saveDomains=1);
   virtual void ChildSaveState(vtkPVXMLElement* propertyElement);
+  void SaveDomainState(vtkPVXMLElement* propertyElement, const char* uid);
 
   // Description:
   // Updates state from an XML element. Returns 0 on failure.
@@ -300,20 +305,6 @@ protected:
   vtkSMDomainIterator* DomainIterator;
 
   static int CheckDomains;
-
-  // ControllerProxy is pointer to the proxy whose property
-  // (ControllerProperty) is mapped to the current property. This is useful
-  // for 3DWidgets. The properties of the implicit function proxy
-  // controlled by the 3DWidget will have these set to the corresponing
-  // property of the 3DWidget. Thus, providing hints about which implicit
-  // function property is controlled by which 3DWidget and what property.
-  // This goes mostly unnoticed in ParaView, but useful for ARL.  If these
-  // are set, then they are saved in the XML during SaveState as a element
-  // <ControllerProperty name="propertyname" />. ARL notices such elements
-  // and creates a property value dependency among the controlee and the
-  // controller property.
-  vtkSMProxy* ControllerProxy;
-  vtkSMProperty* ControllerProperty;
   
   // Set during xml parsing only. Do not use outside ReadXMLAttributes().
   vtkSMProxy* Proxy;
@@ -327,9 +318,27 @@ protected:
   void SetInformationProperty(vtkSMProperty* ip);
   vtkSMProperty* InformationProperty;
 
+  // For PVEE.
+  friend class vtkWSMApplication;
 private:
   vtkSMProperty(const vtkSMProperty&); // Not implemented
   void operator=(const vtkSMProperty&); // Not implemented
+
+  // ControllerProxy is pointer to the proxy whose property
+  // (ControllerProperty) is mapped to the current property. This is useful
+  // for 3DWidgets. The properties of the implicit function proxy
+  // controlled by the 3DWidget will have these set to the corresponing
+  // property of the 3DWidget. Thus, providing hints about which implicit
+  // function property is controlled by which 3DWidget and what property.
+  // This goes mostly unnoticed in ParaView, but useful for PVEE(WebVis).  
+  // If these are set, then they are saved in the XML during SaveState as a element
+  // <ControllerProperty name="propertyname" />. WebVis notices such elements
+  // and creates a property value dependency among the controlee and the
+  // controller property.
+  vtkSMProxy* ControllerProxy;
+  void SetControllerProxy(vtkSMProxy* );
+  char* ControllerPropertyName;
+  vtkSetStringMacro(ControllerPropertyName);
 };
 
 #endif

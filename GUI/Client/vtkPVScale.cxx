@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.75");
+vtkCxxRevisionMacro(vtkPVScale, "1.76");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -394,7 +394,7 @@ void vtkPVScale::Initialize()
     else
       {
       vtkErrorMacro("Could not find a required domain (range) for property "
-                    << prop->GetClassName() << ": " << prop->GetXMLName());
+                    << prop->GetClassName() << ": " << this->GetSMPropertyName());
       }
     }
 

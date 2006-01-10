@@ -64,7 +64,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.470");
+vtkCxxRevisionMacro(vtkPVSource, "1.471");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -2358,7 +2358,7 @@ void vtkPVSource::SaveStateDisplay(ofstream *file)
       for (unsigned int i=0; i < ivp->GetNumberOfElements(); i++)
         {
         *file << "[$pvDisp(" << this->GetTclName() << ") GetProperty "
-          << p->GetXMLName() << "] SetElement " << i << " "
+          << iter->GetKey() << "] SetElement " << i << " "
           << ivp->GetElement(i)
           << endl;
         }
@@ -2368,7 +2368,7 @@ void vtkPVSource::SaveStateDisplay(ofstream *file)
       for (unsigned int i=0; i < dvp->GetNumberOfElements(); i++)
         {
         *file << "[$pvDisp(" << this->GetTclName() << ") GetProperty "
-          << p->GetXMLName() << "] SetElement " << i << " "
+          << iter->GetKey() << "] SetElement " << i << " "
           << dvp->GetElement(i)
           << endl;
         }
@@ -2378,7 +2378,7 @@ void vtkPVSource::SaveStateDisplay(ofstream *file)
       for (unsigned int i=0; i < svp->GetNumberOfElements(); i++)
         {
         *file << "[$pvDisp(" << this->GetTclName() << ") GetProperty "
-          << p->GetXMLName() << "] SetElement " << i << " {"
+          << iter->GetKey() << "] SetElement " << i << " {"
           <<  ( (svp->GetElement(i)? svp->GetElement(i) : "" )) << "}"
           << endl;
         }

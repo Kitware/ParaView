@@ -292,7 +292,8 @@ protected:
     const char* label, vtkPVAnimationCue* cueToSetup = NULL);
 
   int AddStringVectorProperty(vtkPVSource* pvSource, vtkSMProxy* proxy, 
-    vtkPVAnimationCueTree* pvCueTree, vtkSMStringVectorProperty* svp);
+    vtkPVAnimationCueTree* pvCueTree, vtkSMStringVectorProperty* svp,
+    const char* property_name);
   
   void InitializeObservers(vtkPVAnimationCue* cue);
 

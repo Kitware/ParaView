@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.66");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.67");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -403,13 +403,6 @@ void vtkPVImplicitPlaneWidget::SaveInBatchScript(ofstream* file)
       << sdvp->GetElement(0) << " " 
       << sdvp->GetElement(1) << " " 
       << sdvp->GetElement(2) << endl;
-    *file << "  [$pvTemp" << planeID << " GetProperty Origin]"
-          << " SetControllerProxy $pvTemp" 
-          << this->WidgetProxy->GetSelfIDAsString() << endl;
-    *file << "  [$pvTemp" << planeID << " GetProperty Origin]"
-          << " SetControllerProperty [$pvTemp" 
-          << this->WidgetProxy->GetSelfIDAsString()
-          << " GetProperty Center]" << endl;
     }
 
   sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -421,13 +414,6 @@ void vtkPVImplicitPlaneWidget::SaveInBatchScript(ofstream* file)
       << sdvp->GetElement(0) << " " 
       << sdvp->GetElement(1) << " " 
       << sdvp->GetElement(2) << endl;
-    *file << "  [$pvTemp" << planeID << " GetProperty Normal]"
-          << " SetControllerProxy $pvTemp" 
-          << this->WidgetProxy->GetSelfIDAsString() << endl;
-    *file << "  [$pvTemp" << planeID << " GetProperty Normal]"
-          << " SetControllerProperty [$pvTemp" 
-          << this->WidgetProxy->GetSelfIDAsString()
-          << " GetProperty Normal]" << endl;
     }
   *file << "  $pvTemp" << planeID << " UpdateVTKObjects" << endl;
   *file << endl;
@@ -732,12 +718,10 @@ void vtkPVImplicitPlaneWidget::Create()
   // that in the SM State, we can have a mapping from the widget to the 
   // controlled implicit function.
   vtkSMProperty* p = this->ImplicitFunctionProxy->GetProperty("Origin");
-  p->SetControllerProxy(this->WidgetProxy);
-  p->SetControllerProperty(this->WidgetProxy->GetProperty("Center"));
+  p->SetController(this->WidgetProxy, "Center");
 
   p = this->ImplicitFunctionProxy->GetProperty("Normal");
-  p->SetControllerProxy(this->WidgetProxy);
-  p->SetControllerProperty(this->WidgetProxy->GetProperty("Normal"));
+  p->SetController(this->WidgetProxy,"Normal");
 }
 
 //----------------------------------------------------------------------------

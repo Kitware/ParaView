@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.65");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.66");
 
 
 //*****************************************************************************
@@ -1967,7 +1967,7 @@ void vtkPVLookmark::ParseAndExecuteStateScript(char *script, int macroFlag)
             for (propIter->Begin(); !propIter->IsAtEnd(); propIter->Next())
               {
               vtkSMProperty* p = propIter->GetProperty();
-              if(strcmp(sval,p->GetXMLName()))
+              if(strcmp(sval,propIter->GetKey() ))
                 { 
                 continue;
                 }

@@ -43,10 +43,6 @@ public:
   virtual void AddToRenderModule(vtkSMRenderModuleProxy*);
   virtual void RemoveFromRenderModule(vtkSMRenderModuleProxy*);
 
-  // Description:
-  // Save the proxy in batch.
-  virtual void SaveInBatchScript(ofstream* file);
-  
 protected:
 //BTX
   vtkSMScalarBarWidgetProxy();

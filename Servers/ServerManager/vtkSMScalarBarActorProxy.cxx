@@ -25,7 +25,7 @@
 #include "vtkSMPropertyIterator.h"
 
 vtkStandardNewMacro(vtkSMScalarBarActorProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarActorProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMScalarBarActorProxy, "1.5");
 //-----------------------------------------------------------------------------
 vtkSMScalarBarActorProxy::vtkSMScalarBarActorProxy()
 {
@@ -49,54 +49,51 @@ void vtkSMScalarBarActorProxy::CreateVTKObjects(int numObjects)
   vtkSMProxy* labelTextProperty = this->GetSubProxy("LabelTextProperty");
   vtkSMProxy* titleTextProperty = this->GetSubProxy("TitleTextProperty");
   
-  vtkSMProxyProperty* pp;
-  pp = vtkSMProxyProperty::SafeDownCast(this->GetProperty("TitleTextProperty"));
-  if (pp)
+ 
+  vtkClientServerStream stream;
+  for (unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
     {
-    pp->AddProxy(titleTextProperty);
+    stream << vtkClientServerStream::Invoke
+      << this->GetID(cc)
+      << "SetLabelTextProperty" << labelTextProperty->GetID(0)
+      << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+      << this->GetID(cc)
+      << "SetTitleTextProperty" << titleTextProperty->GetID(0)
+      << vtkClientServerStream::End;
     }
-  else
+  if (stream.GetNumberOfMessages() > 0)
     {
-    vtkErrorMacro("Failed to find property TitleTextProperty.");
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->ConnectionID, this->GetServers(), stream);
     }
-
-  pp = vtkSMProxyProperty::SafeDownCast(this->GetProperty("LabelTextProperty"));
-  if (pp)
-    {
-    pp->AddProxy(labelTextProperty);
-    }
-  else
-    {
-    vtkErrorMacro("Failed to find property LabelTextProperty.");
-    }
-
+  
   // Let's set bold/shadow/italic on the text properties.
-
   vtkSMIntVectorProperty* ivp;
   vtkSMDoubleVectorProperty* dvp;
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    labelTextProperty->GetProperty("Bold"));
+    this->GetProperty("LabelBold"));
   ivp->SetElement(0, 1);
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    labelTextProperty->GetProperty("Shadow"));
+    this->GetProperty("LabelShadow"));
   ivp->SetElement(0, 1);
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    labelTextProperty->GetProperty("Italic"));
+    this->GetProperty("LabelItalic"));
   ivp->SetElement(0, 1);
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    titleTextProperty->GetProperty("Bold"));
+    this->GetProperty("TitleBold"));
   ivp->SetElement(0, 1);
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    titleTextProperty->GetProperty("Shadow"));
+    this->GetProperty("TitleShadow"));
   ivp->SetElement(0, 1);
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    titleTextProperty->GetProperty("Italic"));
+    this->GetProperty("TitleItalic"));
   ivp->SetElement(0, 1);
 
   // We set the position only if the properties
@@ -111,75 +108,6 @@ void vtkSMScalarBarActorProxy::CreateVTKObjects(int numObjects)
   //dvp->SetElements2(0.13, 0.5);
   dvp->Modified();
   this->UpdateVTKObjects();
-}
-
-
-//-----------------------------------------------------------------------------
-void vtkSMScalarBarActorProxy::SaveTextPropertiesInBatchScript(ofstream* file)
-{
-  vtkSMProxy* label = this->GetSubProxy("LabelTextProperty");
-  vtkSMProxy* title = this->GetSubProxy("TitleTextProperty");
-  this->SaveTextPropertiesInBatchScript(file, label);
-  this->SaveTextPropertiesInBatchScript(file, title);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMScalarBarActorProxy::SaveTextPropertiesInBatchScript(ofstream* file,
-  vtkSMProxy* label)
-{
-  *file << "set pvTemp" << label->GetSelfIDAsString()
-    << " [$proxyManager NewProxy " << label->GetXMLGroup() << " "
-    << label->GetXMLName() << "]" << endl;
-  *file << "  $proxyManager RegisterProxy " << label->GetXMLGroup()
-        << " pvTemp" << label->GetSelfIDAsString() << " $pvTemp" 
-        << label->GetSelfIDAsString()
-        << endl;
-  *file << "  $pvTemp" << label->GetSelfIDAsString() 
-        << " UnRegister {}" << endl;
-  
-  vtkSMPropertyIterator* iter = label->NewPropertyIterator();
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    vtkSMProperty* p = iter->GetProperty();
-
-    if (!p->GetSaveable())
-      {
-      *file << "  # skipping not-saveable property " << p->GetXMLName() << endl;
-      continue;
-      }
-
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(p);
-    vtkSMDoubleVectorProperty* dvp = 
-      vtkSMDoubleVectorProperty::SafeDownCast(p);
-    if (ivp)
-      {
-      for (unsigned int i=0; i < ivp->GetNumberOfElements(); i++)
-        {
-        *file << "  [$pvTemp" << label->GetSelfIDAsString() << " GetProperty "
-          << ivp->GetXMLName() << "] SetElement "
-          << i << " " << ivp->GetElement(i) 
-          << endl;
-        }
-      }
-    else if (dvp)
-      {
-      for (unsigned int i=0; i < dvp->GetNumberOfElements(); i++)
-        {
-        *file << "  [$pvTemp" << label->GetSelfIDAsString() << " GetProperty "
-          << dvp->GetXMLName() << "] SetElement "
-          << i << " " << dvp->GetElement(i) 
-          << endl;
-        }
-      }
-    else
-      {
-      *file << "  # skipping property " << p->GetXMLName() << endl;
-      }
-    }
-
-  iter->Delete();
-  *file << "  $pvTemp" << label->GetSelfIDAsString() 
-        << " UpdateVTKObjects" << endl;
 }
 
 //-----------------------------------------------------------------------------

@@ -65,7 +65,7 @@ inline static int IntVectPropertySetElement(vtkSMProxy *proxy,
 }
 
 
-vtkCxxRevisionMacro(vtkPVPropertyKeyFrame, "1.9");
+vtkCxxRevisionMacro(vtkPVPropertyKeyFrame, "1.10");
 //-----------------------------------------------------------------------------
 vtkPVPropertyKeyFrame::vtkPVPropertyKeyFrame()
 {
@@ -319,8 +319,7 @@ void vtkPVPropertyKeyFrame::InitializeKeyValueUsingProperty(
         (vtkSMVectorProperty::SafeDownCast(property)->GetNumberOfElements())) 
       <= index)
       {
-      vtkErrorMacro(<<"Invalid index " << index << " for property : " 
-        << property->GetXMLName());
+      vtkErrorMacro(<<"Invalid index " << index << " for property.");
       return;
       }
     }

@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.51");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.52");
 
 vtkCxxSetObjectMacro(vtkPVPointSourceWidget, InputMenu, vtkPVInputMenu);
 
@@ -167,13 +167,6 @@ void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
           << dvp->GetElement(0) << " " 
           << dvp->GetElement(1) << " " 
           << dvp->GetElement(2) << endl;
-    *file << "  [$pvTemp" << sourceID << " GetProperty Center]"
-          << " SetControllerProxy $pvTemp" 
-          << this->WidgetProxy->GetSelfIDAsString() << endl;
-    *file << "  [$pvTemp" << sourceID << " GetProperty Center]"
-          << " SetControllerProperty [$pvTemp"
-          << this->WidgetProxy->GetSelfIDAsString() 
-          << " GetProperty Position]" << endl; 
     }
 
   this->NumberOfPointsWidget->GetValue(&num, 1);
@@ -256,8 +249,7 @@ void vtkPVPointSourceWidget::Create()
   // that in the SM State, we can have a mapping from the widget to the 
   // controlled implicit function.
   vtkSMProperty* p = this->SourceProxy->GetProperty("Center");
-  p->SetControllerProxy(this->WidgetProxy);
-  p->SetControllerProperty(this->WidgetProxy->GetProperty("Position"));
+  p->SetController(this->WidgetProxy, "Position");
 
   this->ModifiedCallback();
 }

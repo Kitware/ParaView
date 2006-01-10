@@ -82,26 +82,32 @@
 //     </SubProxy>
 //
 //  3) It is possible to scope the properties exposed by a subproxy and expose
-//     only a fixed set of properties to be accessible from outside.
+//     only a fixed set of properties to be accessible from outside. Also,
+//     while exposing the property, it can be exposed with a different name. 
 //     eg.
-//     <Proxy name="Alpha" ..>
+//     <Proxy name="Alpha" ....>
 //       ....
 //       <SubProxy>
 //         <Proxy name="Mapper" proxygroup="mappers" proxyname="PolyDataMapper" />
 //         <ExposedProperties>
-//           <Property name="LookupTable ... />
+//           <Property name="LookupTable" exposed_name="MapperLookupTable" />
 //         </ExposedProperties>
 //       </SubProxy>
 //     </Proxy>
-//     Thus the only mapper property available on calling
-//     GetProperty on the proxy Alpha is "LookupTable". More than one property 
-//     can be exposed. Note that properties that are not exposed are treated as
+//     Here, for the proxy Alpha, the property with the name LookupTable from its 
+//     subproxy "Mapper" can be obtained by calling GetProperty("MapperLookupTable")
+//     on an instance of the proxy Alpha. "exposed_name" attribute is optional, if 
+//     not specified, then the "name" is used as the exposed property name.
+//     Properties that are not exposed are treated as
 //     non-saveable and non-animateable (see vtkSMProperty for details).
-//     Note that exposed property restrictions only work when 
+//     Exposed property restrictions only work when 
 //     using the GetProperty on the container proxy (in this case Alpha) or
 //     using the PropertyIterator obtained from the container proxy. If one
-//     is to some how obtain a pointer to the subproxy and call GetProperty on it,
-//     the properties exposed by the container class are no longer applicable.
+//     is to some how obtain a pointer to the subproxy and call GetProperty on 
+//     it (or get a PropertyIterator for the subproxy), the properties exposed 
+//     by the container class are no longer applicable.
+//     If two exposed properties are exposed with the same name, then a Warning is
+//     flagged -- only one of the two exposed properties will get exposed. 
 // .SECTION See Also
 // vtkSMProxyManager vtkSMProperty vtkSMSourceProxy vtkSMPropertyIterator
 
@@ -313,13 +319,11 @@ protected:
   ~vtkSMProxy();
 
   // Description:
-  // Return a property of the given name, provided it has been
-  // exposed (by a call to ExposeProperty());
-  vtkSMProperty* GetExposedProperty(const char* name);
-
-  // Description:
-  // Expose a property by the given name.
-  void ExposeProperty(const char* name);
+  // Expose a subproxy property from the base proxy. The property with the name
+  // "property_name" on the subproxy with the name "subproxy_name" is exposed 
+  // with the name "exposed_name".
+  void ExposeSubProxyProperty(const char* subproxy_name, 
+    const char* property_name, const char* exposed_name);
 
 //BTX
   // These classes have been declared as friends to minimize the
@@ -549,7 +553,7 @@ protected:
   virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
 
   void SetupSharedProperties(vtkSMProxy* subproxy, vtkPVXMLElement *element);
-  void SetupExposedProperties(vtkSMProxy* subproxy, vtkPVXMLElement *element);
+  void SetupExposedProperties(const char* subproxy_name, vtkPVXMLElement *element);
   
   int CreateProxyHierarchy(vtkSMProxyManager* pm, vtkPVXMLElement* element);
 

@@ -34,7 +34,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.60");
+vtkCxxRevisionMacro(vtkSMProxy, "1.61");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -366,28 +366,34 @@ vtkSMProperty* vtkSMProxy::GetProperty(const char* name, int selfOnly)
     }
   vtkSMProxyInternals::PropertyInfoMap::iterator it =
     this->Internals->Properties.find(name);
-  if (it == this->Internals->Properties.end())
-    {
-    if (!selfOnly)
-      {
-      vtkSMProxyInternals::ProxyMap::iterator it2 =
-        this->Internals->SubProxies.begin();
-      for( ; it2 != this->Internals->SubProxies.end(); it2++)
-        {
-        vtkSMProperty* prop = it2->second.GetPointer()->
-          GetExposedProperty(name);
-        if (prop)
-          {
-          return prop;
-          }
-        }
-      }
-    return 0;
-    }
-  else
+  if (it != this->Internals->Properties.end())
     {
     return it->second.Property.GetPointer();
     }
+  if (!selfOnly)
+    {
+    vtkSMProxyInternals::ExposedPropertyInfoMap::iterator eiter = 
+      this->Internals->ExposedProperties.find(name);
+    if (eiter == this->Internals->ExposedProperties.end())
+      {
+      // no such property is being exposed.
+      return 0;
+      }
+    const char* subproxy_name =  eiter->second.SubProxyName.c_str();
+    const char* property_name = eiter->second.PropertyName.c_str();
+    vtkSMProxy * sp = this->GetSubProxy(subproxy_name);
+    if (sp)
+      {
+      return sp->GetProperty(property_name, 0);
+      }
+    // indicates that the internal dbase for exposed properties is
+    // corrupt.. when a subproxy was removed, the exposed properties
+    // for that proxy should also have been cleaned up.
+    // Flag an error so that it can be debugged.
+    vtkWarningMacro("Subproxy required for the exposed property is missing."
+      "No subproxy with name : " << subproxy_name);
+    }
+  return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -1051,6 +1057,11 @@ void vtkSMProxy::AddSubProxy(const char* name, vtkSMProxy* proxy)
 //---------------------------------------------------------------------------
 void vtkSMProxy::RemoveSubProxy(const char* name)
 {
+  if (!name)
+    {
+    return;
+    }
+
   vtkSMProxyInternals::ProxyMap::iterator it =
     this->Internals->SubProxies.find(name);
 
@@ -1060,6 +1071,23 @@ void vtkSMProxy::RemoveSubProxy(const char* name)
     // Note, we are assuming here that a proxy cannot be added
     // twice as a subproxy to the same proxy.
     this->Internals->SubProxies.erase(it);
+    }
+  // Now, remove any exposed properties for this subproxy.
+  vtkSMProxyInternals::ExposedPropertyInfoMap::iterator iter =
+    this->Internals->ExposedProperties.begin();
+  vtkSMProxyInternals::ExposedPropertyInfoMap::iterator prev_iter =
+    iter++;
+  while (prev_iter != this->Internals->ExposedProperties.end())
+    {
+    if (prev_iter->second.SubProxyName == name)
+      {
+      this->Internals->ExposedProperties.erase(prev_iter);
+      }
+    prev_iter = iter;
+    if (iter != this->Internals->ExposedProperties.end())
+      {
+      iter++;
+      }
     }
 }
 
@@ -1072,10 +1100,39 @@ void vtkSMProxy::ExecuteSubProxyEvent(vtkSMProxy* subproxy,
     // A Subproxy has been modified.
     const char* name = reinterpret_cast<const char*>(data);
     const char* exposed_name = 0;
-    if (name && subproxy->GetExposedProperty(name))
+    if (name)
       {
-      // the modified property was exposed by the subproxy.
-      exposed_name = name;
+      // Check if the property from the subproxy was exposed.
+      // If so, we invoke this event with the exposed name.
+      
+      // First determine the name for this subproxy.
+      vtkSMProxyInternals::ProxyMap::iterator proxy_iter =
+        this->Internals->SubProxies.begin();
+      const char* subproxy_name = 0;
+      for (; proxy_iter != this->Internals->SubProxies.end(); ++proxy_iter)
+        {
+        if (proxy_iter->second.GetPointer() == subproxy)
+          {
+          subproxy_name = proxy_iter->first.c_str();
+          break;
+          }
+        }
+      if (subproxy_name)
+        {
+        // Now locate the exposed property name.
+        vtkSMProxyInternals::ExposedPropertyInfoMap::iterator iter =
+          this->Internals->ExposedProperties.begin();
+        for (; iter != this->Internals->ExposedProperties.end(); ++iter)
+          {
+          if (iter->second.SubProxyName == subproxy_name &&
+            iter->second.PropertyName == name)
+            {
+            // This property is indeed exposed. Set the corrrect exposed name.
+            exposed_name = iter->first.c_str();
+            break;
+            }
+          }
+        }
       }
     // Let the world know that one of the subproxies of this proxy has 
     // been modified. If the subproxy exposed the modified property, we
@@ -1366,7 +1423,7 @@ int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMProxyManager* pm,
             return 0;
             }
           this->SetupSharedProperties(subproxy, propElement);
-          this->SetupExposedProperties(subproxy, propElement);
+          this->SetupExposedProperties(name, propElement);
           this->AddSubProxy(name, subproxy);
           subproxy->Delete();
           }
@@ -1385,10 +1442,10 @@ int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMProxyManager* pm,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxy::SetupExposedProperties(vtkSMProxy* subproxy, 
+void vtkSMProxy::SetupExposedProperties(const char* subproxy_name, 
   vtkPVXMLElement *element)
 {
-  if (!subproxy || !element)
+  if (!subproxy_name || !element)
     {
     return;
     }
@@ -1406,7 +1463,7 @@ void vtkSMProxy::SetupExposedProperties(vtkSMProxy* subproxy,
        vtkPVXMLElement* propertyElement = exposedElement->GetNestedElement(j);
        if (strcmp(propertyElement->GetName(), "Property") != 0)
          {
-         vtkErrorMacro("ExposedProperties can only have Property tags.");
+         vtkErrorMacro("<ExposedProperties> can contain <Property> elements alone.");
          continue;
          }
        const char* name = propertyElement->GetAttribute("name");
@@ -1415,7 +1472,13 @@ void vtkSMProxy::SetupExposedProperties(vtkSMProxy* subproxy,
          vtkErrorMacro("Attribute name is required!");
          continue;
          }
-       subproxy->ExposeProperty(name);
+       const char* exposed_name = propertyElement->GetAttribute("exposed_name");
+       if (!exposed_name)
+         {
+         // use the property name as the exposed name.
+         exposed_name = name;
+         }
+       this->ExposeSubProxyProperty(subproxy_name, name, exposed_name);
        }
     }
 }
@@ -1539,7 +1602,7 @@ vtkPVXMLElement* vtkSMProxy::SaveState(vtkPVXMLElement* root)
       {
       ostrstream propID;
       propID << this->GetSelfIDAsString() << "." << iter->GetKey() << ends;
-      iter->GetProperty()->SaveState(proxyElement, propID.str());
+      iter->GetProperty()->SaveState(proxyElement, iter->GetKey(), propID.str());
       delete [] propID.str();
       }
     iter->Next();
@@ -1628,34 +1691,27 @@ void vtkSMProxy::Copy(vtkSMProxy* src, const char* exceptionClass,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxy::ExposeProperty(const char* name)
+void vtkSMProxy::ExposeSubProxyProperty(const char* subproxy_name, 
+  const char* property_name, const char* exposed_name)
 {
-  this->Internals->ExposedPropertyNames.insert(vtkStdString(name));
-}
-
-//---------------------------------------------------------------------------
-vtkSMProperty* vtkSMProxy::GetExposedProperty(const char* name)
-{
-  if ( this->Internals->ExposedPropertyNames.find(name) ==
-    this->Internals->ExposedPropertyNames.end())
+  if (!subproxy_name || !property_name || !exposed_name)
     {
-    return 0; // property has not been exposed.
+    vtkErrorMacro("Either subproxy name, property name, or exposed name is NULL.");
+    return;
     }
 
-  vtkSMProperty* toReturn = 0;
-  vtkSMPropertyIterator* iter = this->NewPropertyIterator();
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+  vtkSMProxyInternals::ExposedPropertyInfoMap::iterator iter =
+    this->Internals->ExposedProperties.find(exposed_name);
+  if (iter != this->Internals->ExposedProperties.end())
     {
-    const char* key = iter->GetKey();
-    vtkSMProperty* property = iter->GetProperty();
-    if (strcmp(name, key) == 0)
-      {
-      toReturn = property;
-      break;
-      }
+    vtkWarningMacro("An exposed property with the name \"" << exposed_name
+      << "\" already exists. It will be replaced.");
     }
-  iter->Delete();
-  return toReturn;
+  
+  vtkSMProxyInternals::ExposedPropertyInfo info;
+  info.SubProxyName = subproxy_name;
+  info.PropertyName = property_name;
+  this->Internals->ExposedProperties[exposed_name] = info;
 }
 
 //---------------------------------------------------------------------------
