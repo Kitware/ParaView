@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBoxToListBoxSelectionEditor );
-vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.13");
+vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.14");
 
 //----------------------------------------------------------------------------
 vtkKWListBoxToListBoxSelectionEditor::vtkKWListBoxToListBoxSelectionEditor()
@@ -83,7 +83,7 @@ void vtkKWListBoxToListBoxSelectionEditor::Create()
 
   this->SourceList->SetParent(this);
   this->SourceList->Create();
-  this->SourceList->GetWidget()->SetSelectionModeToMultiple();
+  this->SourceList->GetWidget()->SetSelectionModeToExtended();
   this->Script("pack %s -side left -expand true -fill both",
     this->SourceList->GetWidgetName());
 
@@ -111,7 +111,7 @@ void vtkKWListBoxToListBoxSelectionEditor::Create()
   this->RemoveAllButton->SetText("RemoveAll");
   this->RemoveAllButton->SetCommand(this, "RemoveAllCallback");
 
-  this->Script("pack %s %s %s %s -side top -fill x",
+  this->Script("pack %s %s %s %s -side top -fill x -padx 2 -pady 1",
     this->AddButton->GetWidgetName(),
     this->AddAllButton->GetWidgetName(),
     this->RemoveButton->GetWidgetName(),
@@ -127,7 +127,7 @@ void vtkKWListBoxToListBoxSelectionEditor::Create()
 
   this->FinalList->SetParent(frame);
   this->FinalList->Create();
-  this->FinalList->GetWidget()->SetSelectionModeToMultiple();
+  this->FinalList->GetWidget()->SetSelectionModeToExtended();
 
   this->Script("pack %s -side top -expand true -fill both",
     this->FinalList->GetWidgetName());
@@ -146,7 +146,7 @@ void vtkKWListBoxToListBoxSelectionEditor::Create()
   this->DownButton->SetText("Down");
   this->DownButton->SetCommand(this, "DownCallback");
 
-  this->Script("pack %s %s -side left -fill x",
+  this->Script("pack %s %s -side left -fill x -expand y -padx 1 -pady 2",
     this->UpButton->GetWidgetName(),
     this->DownButton->GetWidgetName());
 
