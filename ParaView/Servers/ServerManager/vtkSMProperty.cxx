@@ -30,7 +30,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.38");
+vtkCxxRevisionMacro(vtkSMProperty, "1.39");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -383,9 +383,24 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
 }
 
 //---------------------------------------------------------------------------
-int vtkSMProperty::LoadState(vtkPVXMLElement* /*propertyElement*/, 
-                             vtkSMStateLoader* /*loader*/)
+int vtkSMProperty::LoadState(vtkPVXMLElement* propertyElement, 
+                             vtkSMStateLoader* loader)
 {
+  // Process the domains.
+  unsigned int numElems = propertyElement->GetNumberOfNestedElements();
+  for (unsigned int cc=0;  cc < numElems; cc++)
+    {
+    vtkPVXMLElement* child = propertyElement->GetNestedElement(cc);
+    if (child->GetName() && strcmp(child->GetName(),"Domain") == 0)
+      {
+      const char* name = child->GetAttribute("name");
+      vtkSMDomain* domain = name? this->GetDomain(name) : 0;
+      if (domain)
+        {
+        domain->LoadState(child, loader);
+        }
+      }
+    }
   return 1;
 }
 

@@ -90,6 +90,10 @@ protected:
   virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
 
   virtual void ChildSaveState(vtkPVXMLElement* domainElement);
+  
+  // Load the state of the domain from the XML.
+  virtual int LoadState(vtkPVXMLElement* vtkNotUsed(domainElement), 
+    vtkSMStateLoader* vtkNotUsed(loader));
 
   vtkSMStringListDomainInternals* SLInternals;
 
