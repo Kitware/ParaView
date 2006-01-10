@@ -45,7 +45,8 @@ public:
   virtual int GetTextWidth();
 
   // Description:
-  // Set the style of the message box
+  // Set the style of the message box.
+  // No effect if called after Create()
   //BTX
   enum 
   {
