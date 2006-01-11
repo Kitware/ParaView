@@ -112,12 +112,15 @@ public:
 
   // Description:
   // Add a sub-element. The parent element keeps a reference to
-  // sub-element.
+  // sub-element. If setParent is true, the nested element's parent
+  // is set as this.
+  void AddNestedElement(vtkPVXMLElement* element, int setPrent);
   void AddNestedElement(vtkPVXMLElement* element);
 
   // Description:
   // Serialize (as XML) in the given stream.
   void PrintXML(ostream& os, vtkIndent indent);
+  void PrintXML();
 
 protected:
   vtkPVXMLElement();
