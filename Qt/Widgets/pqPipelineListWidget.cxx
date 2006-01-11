@@ -152,7 +152,7 @@ void pqPipelineListWidget::selectWindow(QVTKWidget *win)
 }
 
 void pqPipelineListWidget::changeCurrent(const QModelIndex &current,
-    const QModelIndex &previous)
+                                         const QModelIndex &/*previous*/)
 {
   if(this->ListModel)
     {
