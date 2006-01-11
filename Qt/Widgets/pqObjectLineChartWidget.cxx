@@ -212,7 +212,6 @@ pqObjectLineChartWidget::pqObjectLineChartWidget(QWidget *p) :
   vbox->setMargin(0);
   vbox->addLayout(hbox);
   vbox->addWidget(&this->Implementation->LineChartWidget);
-  vbox->addStretch();
   this->setLayout(vbox);
 
   this->Implementation->ElementID.setMinimum(0);
