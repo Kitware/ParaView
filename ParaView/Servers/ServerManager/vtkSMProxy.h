@@ -71,8 +71,9 @@
 //        </ShareProperties>
 //      </SubProxy>
 //    </Proxy>
-//    Thus, subproxies Mapper and Mapper2 share the properties that are common to both;
-//    except those listed as exceptions using the "Exception" tag.
+//    Thus, subproxies Mapper and Mapper2 share the properties that are 
+//    common to both; except those listed as exceptions using the "Exception" 
+//    tag.
 //
 //  2) It is possible for a subproxy to use proxy definition defined elsewhere
 //     by identifying the interface with attribues "proxygroup" and "proxyname".
@@ -206,7 +207,7 @@ public:
 
   // Description:
   // Returns a new (initialized) iterator of the properties.
-  vtkSMPropertyIterator* NewPropertyIterator();
+  virtual vtkSMPropertyIterator* NewPropertyIterator();
 
   // Description:
   // Returns the number of consumers. Consumers are proxies

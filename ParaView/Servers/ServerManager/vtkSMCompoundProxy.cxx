@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCompoundProxy);
-vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.6");
 
 vtkCxxSetObjectMacro(vtkSMCompoundProxy, MainProxy, vtkSMProxy);
 
@@ -120,6 +120,38 @@ unsigned int vtkSMCompoundProxy::GetNumberOfProxies()
     }
 
   return this->MainProxy->GetNumberOfSubProxies();
+}
+
+
+//---------------------------------------------------------------------------
+vtkSMProperty* vtkSMCompoundProxy::GetProperty(const char* name)
+{
+  if (!this->MainProxy)
+    {
+    return 0;
+    }
+
+  return this->MainProxy->GetProperty(name);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMCompoundProxy::UpdateVTKObjects()
+{
+  if (!this->MainProxy)
+    {
+    return;
+    }
+  this->MainProxy->UpdateVTKObjects();
+}
+
+//---------------------------------------------------------------------------
+vtkSMPropertyIterator* vtkSMCompoundProxy::NewPropertyIterator()
+{
+  if (!this->MainProxy)
+    {
+    return 0;
+    }
+  return this->MainProxy->NewPropertyIterator();
 }
 
 //---------------------------------------------------------------------------
