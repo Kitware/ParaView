@@ -91,57 +91,57 @@ void pqOpenExodusOptions::accept()
   pqSMAdaptor* PropertyAdaptor = pqSMAdaptor::instance();
 
   // set blocks
-  vtkSMProperty* property = this->ExodusReader->GetProperty("BlockArrayStatus");
-  QList<QVariant> blocks = PropertyAdaptor->getProperty(property).toList();
+  vtkSMProperty* prop = this->ExodusReader->GetProperty("BlockArrayStatus");
+  QList<QVariant> blocks = PropertyAdaptor->getProperty(prop).toList();
   for(i=0; i<blocks.size(); i++)
     {
     QLayout* l = this->BlocksGroup->layout();
     QCheckBox* cb = qobject_cast<QCheckBox*>(l->itemAt(l->count() - blocks.size() + i)->widget());
-    PropertyAdaptor->setProperty(property, i, cb->isChecked());
+    PropertyAdaptor->setProperty(prop, i, cb->isChecked());
     this->ExodusReader->UpdateVTKObjects();  // TODO: get rid of this call
     }
 
   // set element arrays
-  property = this->ExodusReader->GetProperty("CellArrayStatus");
-  QList<QVariant> cellArrays = PropertyAdaptor->getProperty(property).toList();
+  prop = this->ExodusReader->GetProperty("CellArrayStatus");
+  QList<QVariant> cellArrays = PropertyAdaptor->getProperty(prop).toList();
   for(i=0; i<cellArrays.size(); i++)
     {
     QLayout* l = this->ElementVariablesGroup->layout();
     QCheckBox* cb = qobject_cast<QCheckBox*>(l->itemAt(l->count() - cellArrays.size() + i)->widget());
-    PropertyAdaptor->setProperty(property, i, cb->isChecked());
+    PropertyAdaptor->setProperty(prop, i, cb->isChecked());
     this->ExodusReader->UpdateVTKObjects();  // TODO: get rid of this call
     }
   
   // set point arrays
-  property = this->ExodusReader->GetProperty("PointArrayStatus");
-  QList<QVariant> pointArrays = PropertyAdaptor->getProperty(property).toList();
+  prop = this->ExodusReader->GetProperty("PointArrayStatus");
+  QList<QVariant> pointArrays = PropertyAdaptor->getProperty(prop).toList();
   for(i=0; i<pointArrays.size(); i++)
     {
     QLayout* l = this->NodeVariablesGroup->layout();
     QCheckBox* cb = qobject_cast<QCheckBox*>(l->itemAt(l->count() - pointArrays.size() + i)->widget());
-    PropertyAdaptor->setProperty(property, i, cb->isChecked());
+    PropertyAdaptor->setProperty(prop, i, cb->isChecked());
     this->ExodusReader->UpdateVTKObjects();  // TODO: get rid of this call
     }
   
   // set sideset arrays
-  property = this->ExodusReader->GetProperty("SideSetArrayStatus");
-  QList<QVariant> sideSetArrays = PropertyAdaptor->getProperty(property).toList();
+  prop = this->ExodusReader->GetProperty("SideSetArrayStatus");
+  QList<QVariant> sideSetArrays = PropertyAdaptor->getProperty(prop).toList();
   for(i=0; i<sideSetArrays.size(); i++)
     {
     QLayout* l = this->SideSetGroup->layout();
     QCheckBox* cb = qobject_cast<QCheckBox*>(l->itemAt(l->count() - sideSetArrays.size() + i)->widget());
-    PropertyAdaptor->setProperty(property, i, cb->isChecked());
+    PropertyAdaptor->setProperty(prop, i, cb->isChecked());
     this->ExodusReader->UpdateVTKObjects();  // TODO: get rid of this call
     }
   
   // set nodeset arrays
-  property = this->ExodusReader->GetProperty("NodeSetArrayStatus");
-  QList<QVariant> nodeSetArrays = PropertyAdaptor->getProperty(property).toList();
+  prop = this->ExodusReader->GetProperty("NodeSetArrayStatus");
+  QList<QVariant> nodeSetArrays = PropertyAdaptor->getProperty(prop).toList();
   for(i=0; i<nodeSetArrays.size(); i++)
     {
     QLayout* l = this->NodeSetGroup->layout();
     QCheckBox* cb = qobject_cast<QCheckBox*>(l->itemAt(l->count() - nodeSetArrays.size() + i)->widget());
-    PropertyAdaptor->setProperty(property, i, cb->isChecked());
+    PropertyAdaptor->setProperty(prop, i, cb->isChecked());
     this->ExodusReader->UpdateVTKObjects();  // TODO: get rid of this call
     }
 

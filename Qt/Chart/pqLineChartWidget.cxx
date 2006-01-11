@@ -32,8 +32,8 @@
 #define DBL_MARGIN 6
 
 
-pqLineChartWidget::pqLineChartWidget(QWidget *parent)
-  : QAbstractScrollArea(parent)
+pqLineChartWidget::pqLineChartWidget(QWidget *p)
+  : QAbstractScrollArea(p)
 {
   this->Mode = pqLineChartWidget::NoMode;
   this->Mouse = new pqChartMouseBox();

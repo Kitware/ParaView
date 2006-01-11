@@ -41,8 +41,8 @@ pqPipelineDataInternal::pqPipelineDataInternal()
 
 pqPipelineData *pqPipelineData::Instance = 0;
 
-pqPipelineData::pqPipelineData(QObject* parent)
-  : QObject(parent), CurrentProxy(NULL)
+pqPipelineData::pqPipelineData(QObject* p)
+  : QObject(p), CurrentProxy(NULL)
 {
   this->Internal = new pqPipelineDataInternal;
   this->Names = new pqNameCount();

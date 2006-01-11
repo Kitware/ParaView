@@ -32,7 +32,7 @@ void pqCompoundProxyWizard::onLoad()
   fileDialog->show();
 }
 
-void pqCompoundProxyWizard::onLoad(const QStringList& files)
+void pqCompoundProxyWizard::onLoad(const QStringList& /*files*/)
 {
 }
 

@@ -10,8 +10,8 @@
 
 static int gNameNum = 0;
 
-pqMultiViewManager::pqMultiViewManager(QWidget* parent)
-  : pqMultiView(parent)
+pqMultiViewManager::pqMultiViewManager(QWidget* p)
+  : pqMultiView(p)
 {
   pqMultiViewFrame* frame = new pqMultiViewFrame(this);
   QString name;
@@ -77,7 +77,7 @@ void pqMultiViewManager::splitWidgetVertical(QWidget* widget)
   this->splitWidget(widget, Qt::Vertical);
 }
 
-void pqMultiViewManager::maximizeWidget(QWidget* widget)
+void pqMultiViewManager::maximizeWidget(QWidget* /*widget*/)
 {
   /*
   pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(widget);
@@ -94,7 +94,7 @@ void pqMultiViewManager::maximizeWidget(QWidget* widget)
   */
 }
 
-void pqMultiViewManager::restoreWidget(QWidget* widget)
+void pqMultiViewManager::restoreWidget(QWidget* /*widget*/)
 {
 
 }

@@ -16,8 +16,8 @@
 #include <QVBoxLayout>
 
 
-pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *parent)
-  : QWidget(parent)
+pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
+  : QWidget(p)
 {
   this->Inspector = 0;
   this->Delegate = 0;
@@ -44,11 +44,11 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *parent)
     }
 
   // Add the tree view to the layout.
-  QVBoxLayout *layout = new QVBoxLayout(this);
-  if(layout)
+  QVBoxLayout *boxLayout = new QVBoxLayout(this);
+  if(boxLayout)
     {
-    layout->setMargin(0);
-    layout->addWidget(this->TreeView);
+    boxLayout->setMargin(0);
+    boxLayout->addWidget(this->TreeView);
     }
 }
 

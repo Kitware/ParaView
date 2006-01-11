@@ -90,7 +90,7 @@ void pqPicking::computeSelection(vtkObject* o, unsigned long, void*, void*, vtkC
 
 }
 
-void pqPicking::computeSelection(vtkRenderWindowInteractor* iren, int X, int Y)
+void pqPicking::computeSelection(vtkRenderWindowInteractor* /*iren*/, int X, int Y)
 {
   // TODO: find a better way to decide the input of the pick filter.
   pqPipelineData* pipeline = pqPipelineData::instance();

@@ -20,8 +20,8 @@
 #include <QVBoxLayout>
 
 
-pqPipelineListWidget::pqPipelineListWidget(QWidget *parent)
-  : QWidget(parent)
+pqPipelineListWidget::pqPipelineListWidget(QWidget *p)
+  : QWidget(p)
 {
   this->ListModel = 0;
   this->TreeView = 0;
@@ -58,11 +58,11 @@ pqPipelineListWidget::pqPipelineListWidget(QWidget *parent)
     }
 
   // Add the tree view to the layout.
-  QVBoxLayout *layout = new QVBoxLayout(this);
-  if(layout)
+  QVBoxLayout *boxLayout = new QVBoxLayout(this);
+  if(boxLayout)
     {
-    layout->setMargin(0);
-    layout->addWidget(this->TreeView);
+    boxLayout->setMargin(0);
+    boxLayout->addWidget(this->TreeView);
     }
 }
 
@@ -140,11 +140,11 @@ void pqPipelineListWidget::selectProxy(vtkSMProxy *proxy)
     }
 }
 
-void pqPipelineListWidget::selectWindow(QVTKWidget *window)
+void pqPipelineListWidget::selectWindow(QVTKWidget *win)
 {
   if(this->ListModel && this->TreeView)
     {
-    QModelIndex index = this->ListModel->getIndexFor(window);
+    QModelIndex index = this->ListModel->getIndexFor(win);
     this->TreeView->selectionModel()->setCurrentIndex(index,
         QItemSelectionModel::Select | QItemSelectionModel::Current |
         QItemSelectionModel::Clear);

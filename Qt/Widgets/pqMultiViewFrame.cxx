@@ -9,19 +9,19 @@
 
 static int gPenWidth = 2;
 
-pqMultiViewFrame::pqMultiViewFrame(QWidget* parent)
-  : QWidget(parent), MainWidget(0), AutoHide(false), Active(false), Color(QColor("red"))
+pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
+  : QWidget(p), MainWidget(0), AutoHide(false), Active(false), Color(QColor("red"))
 {
-  QVBoxLayout* layout = new QVBoxLayout(this);
-  layout->setMargin(gPenWidth);
-  layout->setSpacing(gPenWidth);
+  QVBoxLayout* boxLayout = new QVBoxLayout(this);
+  boxLayout->setMargin(gPenWidth);
+  boxLayout->setSpacing(gPenWidth);
 
   this->Menu = new QWidget(this);
   this->setupUi(Menu);
-  layout->addWidget(this->Menu);
+  boxLayout->addWidget(this->Menu);
 
   QVBoxLayout* sublayout = new QVBoxLayout();
-  layout->addLayout(sublayout);
+  boxLayout->addLayout(sublayout);
   sublayout->addStretch();
 
   this->CloseButton->setIcon(QIcon(this->style()->standardPixmap(QStyle::SP_TitleBarCloseButton)));

@@ -18,8 +18,8 @@
 class pqObjectInspectorItemInternal : public QList<pqObjectInspectorItem *> {};
 
 
-pqObjectInspectorItem::pqObjectInspectorItem(QObject *parent)
-  : QObject(parent), Name(), Value(), Domain()
+pqObjectInspectorItem::pqObjectInspectorItem(QObject *p)
+  : QObject(p), Name(), Value(), Domain()
 {
   this->Internal = 0;
   this->Parent = 0;
@@ -44,11 +44,11 @@ void pqObjectInspectorItem::setPropertyName(const QString &name)
     }
 }
 
-void pqObjectInspectorItem::setValue(const QVariant &value)
+void pqObjectInspectorItem::setValue(const QVariant &val)
 {
-  if(this->Value != value)
+  if(this->Value != val)
     {
-    this->Value = value;
+    this->Value = val;
     emit valueChanged(this);
     }
 }
@@ -60,11 +60,11 @@ int pqObjectInspectorItem::childCount() const
   return 0;
 }
 
-int pqObjectInspectorItem::childIndex(pqObjectInspectorItem *child) const
+int pqObjectInspectorItem::childIndex(pqObjectInspectorItem *c) const
 {
   for(int row = 0; this->Internal && row < this->Internal->size(); row++)
     {
-    if((*this->Internal)[row] == child)
+    if((*this->Internal)[row] == c)
       return row;
     }
 
@@ -97,24 +97,24 @@ void pqObjectInspectorItem::clearChildren()
     }
 }
 
-void pqObjectInspectorItem::addChild(pqObjectInspectorItem *child)
+void pqObjectInspectorItem::addChild(pqObjectInspectorItem *c)
 {
   if(!this->Internal)
     this->Internal = new pqObjectInspectorItemInternal();
 
   if(this->Internal)
-    this->Internal->append(child);
+    this->Internal->append(c);
 }
 
-void pqObjectInspectorItem::updateDomain(vtkSMProperty *property)
+void pqObjectInspectorItem::updateDomain(vtkSMProperty *prop)
 {
-  if(!property)
+  if(!prop)
     return;
 
   vtkSMPropertyAdaptor *adaptor = vtkSMPropertyAdaptor::New();
   if(adaptor)
     {
-    adaptor->SetProperty(property);
+    adaptor->SetProperty(prop);
     if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::SELECTION)
       this->Domain = QVariant(QString("StringListRange"));
     else if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::RANGE)
@@ -125,7 +125,6 @@ void pqObjectInspectorItem::updateDomain(vtkSMProperty *property)
       QList<QVariant> list;
       if(this->childCount() > 0)
         {
-        pqObjectInspectorItem *item = 0;
         unsigned int total = adaptor->GetNumberOfRangeElements();
         for(int i = 0; i < this->Internal->size() && i < (int)total; i++)
           {
@@ -167,11 +166,11 @@ QVariant pqObjectInspectorItem::convertLimit(const char *limit, int type) const
 {
   if(limit)
     {
-    QString value = limit;
+    QString val = limit;
     if(type == vtkSMPropertyAdaptor::INT)
-      return QVariant(value.toInt());
+      return QVariant(val.toInt());
     else if(type == vtkSMPropertyAdaptor::DOUBLE)
-      return QVariant(value.toDouble());
+      return QVariant(val.toDouble());
     }
 
   return QVariant();

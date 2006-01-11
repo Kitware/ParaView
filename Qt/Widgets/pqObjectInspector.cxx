@@ -177,10 +177,10 @@ QModelIndex pqObjectInspector::parent(const QModelIndex &idx) const
     if(item && item->parent())
       {
       // Find the parent's row and column from the parent's parent.
-      pqObjectInspectorItem *parent = item->parent();
-      int row = this->itemIndex(parent);
+      pqObjectInspectorItem *p = item->parent();
+      int row = this->itemIndex(p);
       if(row != -1)
-        return this->createIndex(row, 0, parent);
+        return this->createIndex(row, 0, p);
       }
     }
 
@@ -202,12 +202,12 @@ QVariant pqObjectInspector::data(const QModelIndex &idx, int role) const
           return QVariant(item->propertyName());
         else
           {
-          QVariant domain = item->domain();
+          QVariant dom = item->domain();
           if(item->value().type() == QVariant::Int &&
-              domain.type() == QVariant::StringList)
+              dom.type() == QVariant::StringList)
             {
             // Return the enum name instead of the index.
-            QStringList names = domain.toStringList();
+            QStringList names = dom.toStringList();
             return QVariant(names[item->value().toInt()]);
             }
           else
@@ -275,7 +275,7 @@ bool pqObjectInspector::setData(const QModelIndex &idx,
 Qt::ItemFlags pqObjectInspector::flags(const QModelIndex &idx) const
 {
   // Add editable to the flags for the item values.
-  Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+  Qt::ItemFlags itemFlags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
   if(idx.isValid() && idx.model() == this && idx.column() == 1)
     {
     pqObjectInspectorItem *item = reinterpret_cast<pqObjectInspectorItem *>(
@@ -289,10 +289,10 @@ Qt::ItemFlags pqObjectInspector::flags(const QModelIndex &idx) const
        (item->parent() && item->parent()->parent() == this->Internal->Display)
        ))
       {
-      flags |= Qt::ItemIsEditable;
+      itemFlags |= Qt::ItemIsEditable;
       }
     }
-  return flags;
+  return itemFlags;
 }
 
 QVariant pqObjectInspector::domain(const QModelIndex &idx) const
@@ -308,7 +308,7 @@ QVariant pqObjectInspector::domain(const QModelIndex &idx) const
   return QVariant();
 }
 
-void pqObjectInspector::setProxy(vtkSMSourceProxy *proxy)
+void pqObjectInspector::setProxy(vtkSMSourceProxy *sourceProxy)
 {
   // Clean up the current property data.
   this->cleanData();
@@ -316,17 +316,17 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *proxy)
 
   // Save the new proxy. Get all the property data.
   pqSMAdaptor *adapter = pqSMAdaptor::instance();
-  this->Proxy = proxy;
+  this->Proxy = sourceProxy;
   if(this->Internal && adapter && this->Proxy)
     {
     // update pipline information on the server
-    proxy->UpdatePipelineInformation();
+    sourceProxy->UpdatePipelineInformation();
     pqObjectInspectorItem *item = 0;
     pqObjectInspectorItem *child = 0;
 
     // ************* display properties ***************
 
-    vtkSMDisplayProxy* display = pqPipelineData::instance()->getObjectFor(proxy)->GetDisplayProxy();
+    vtkSMDisplayProxy* display = pqPipelineData::instance()->getObjectFor(sourceProxy)->GetDisplayProxy();
     if(display)
       {
       this->Internal->Display = new pqObjectInspectorItem();
@@ -622,20 +622,20 @@ void pqObjectInspector::cleanData()
             {
             // If the item has a list, unlink each item from its property.
             // Otherwise, unlink the item from the vtk property.
-            vtkSMProperty *property = this->Proxy->GetProperty(
+            vtkSMProperty *prop = this->Proxy->GetProperty(
                 item->propertyName().toAscii().data());
             if(item->childCount() > 0)
               {
               for(int i = 0; i < item->childCount(); ++i)
                 {
                 pqObjectInspectorItem *child = item->child(i);
-                adapter->unlinkPropertyFrom(this->Proxy, property, i, child,
+                adapter->unlinkPropertyFrom(this->Proxy, prop, i, child,
                     "value");
                 }
               }
             else
               {
-              adapter->unlinkPropertyFrom(this->Proxy, property, 0, item,
+              adapter->unlinkPropertyFrom(this->Proxy, prop, 0, item,
                   "value");
               }
             }
@@ -674,35 +674,35 @@ void pqObjectInspector::commitChange(pqObjectInspectorItem *item)
   if(!adapter)
     return;
 
-  int index = 0;
-  vtkSMProperty *property = 0;
+  int idx = 0;
+  vtkSMProperty *prop = 0;
   item->setModified(false);
   if(item->parent() && item->parent()->parent())
     {
     // Get the parent name.
-    index = this->itemIndex(item);
-    property = this->Proxy->GetProperty(
+    idx = this->itemIndex(item);
+    prop = this->Proxy->GetProperty(
         item->parent()->propertyName().toAscii().data());
-    adapter->setProperty(property, index, item->value());
+    adapter->setProperty(prop, idx, item->value());
     }
   else if(item->parent() && item->childCount() > 0)
     {
     // Set the value for each element of the property.
     pqObjectInspectorItem *child = 0;
-    property = this->Proxy->GetProperty(
+    prop = this->Proxy->GetProperty(
         item->propertyName().toAscii().data());
-    for(index = 0; index < item->childCount(); index++)
+    for(idx = 0; idx < item->childCount(); idx++)
       {
-      child = item->child(index);
-      adapter->setProperty(property, index, child->value());
+      child = item->child(idx);
+      adapter->setProperty(prop, idx, child->value());
       child->setModified(false);
       }
     }
   else
     {
-    property = this->Proxy->GetProperty(
+    prop = this->Proxy->GetProperty(
         item->propertyName().toAscii().data());
-    adapter->setProperty(property, 0, item->value());
+    adapter->setProperty(prop, 0, item->value());
     }
 }
 
@@ -711,8 +711,8 @@ void pqObjectInspector::handleNameChange(pqObjectInspectorItem *item)
   int row = this->itemIndex(item);
   if(row != -1)
     {
-    QModelIndex index = this->createIndex(row, 0, item);
-    emit dataChanged(index, index);
+    QModelIndex idx = this->createIndex(row, 0, item);
+    emit dataChanged(idx, idx);
     }
 }
 
@@ -721,8 +721,8 @@ void pqObjectInspector::handleValueChange(pqObjectInspectorItem *item)
   int row = this->itemIndex(item);
   if(row != -1)
     {
-    QModelIndex index = this->createIndex(row, 1, item);
-    emit dataChanged(index, index);
+    QModelIndex idx = this->createIndex(row, 1, item);
+    emit dataChanged(idx, idx);
     }
 
   // update information
@@ -739,8 +739,8 @@ void pqObjectInspector::handleValueChange(pqObjectInspectorItem *item)
   if(numCells != item->value())
     {
     item->setValue(numCells);
-    QModelIndex index = this->createIndex(this->itemIndex(item), 1, item);
-    emit dataChanged(index, index);
+    QModelIndex idx = this->createIndex(this->itemIndex(item), 1, item);
+    emit dataChanged(idx, idx);
     }
   
   int numPoints = dataInfo->GetNumberOfPoints();
@@ -752,8 +752,8 @@ void pqObjectInspector::handleValueChange(pqObjectInspectorItem *item)
   if(numPoints != item->value())
     {
     item->setValue(numPoints);
-    QModelIndex index = this->createIndex(this->itemIndex(item), 1, item);
-    emit dataChanged(index, index);
+    QModelIndex idx = this->createIndex(this->itemIndex(item), 1, item);
+    emit dataChanged(idx, idx);
     }
   
   double memory = dataInfo->GetMemorySize() / 1000.0;
@@ -767,8 +767,8 @@ void pqObjectInspector::handleValueChange(pqObjectInspectorItem *item)
   if(mem != item->value())
     {
     item->setValue(mem);
-    QModelIndex index = this->createIndex(this->itemIndex(item), 1, item);
-    emit dataChanged(index, index);
+    QModelIndex idx = this->createIndex(this->itemIndex(item), 1, item);
+    emit dataChanged(idx, idx);
     }
 }
 

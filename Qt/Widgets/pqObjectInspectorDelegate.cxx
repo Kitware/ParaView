@@ -21,8 +21,8 @@
 #include <QVariant>
 
 
-pqObjectInspectorDelegate::pqObjectInspectorDelegate(QObject *parent)
-  : QItemDelegate(parent)
+pqObjectInspectorDelegate::pqObjectInspectorDelegate(QObject *p)
+  : QItemDelegate(p)
 {
 }
 
@@ -30,7 +30,7 @@ pqObjectInspectorDelegate::~pqObjectInspectorDelegate()
 {
 }
 
-QWidget *pqObjectInspectorDelegate::createEditor(QWidget *parent,
+QWidget *pqObjectInspectorDelegate::createEditor(QWidget *p,
     const QStyleOptionViewItem &, const QModelIndex &index) const
 {
   if(!index.isValid())
@@ -50,7 +50,7 @@ QWidget *pqObjectInspectorDelegate::createEditor(QWidget *parent,
   if(data.type() == QVariant::Bool)
     {
     // Use a combo box with true/false in it.
-    QComboBox *combo = new QComboBox(parent);
+    QComboBox *combo = new QComboBox(p);
     combo->addItem("false");
     combo->addItem("true");
     editor = combo;
@@ -65,7 +65,7 @@ QWidget *pqObjectInspectorDelegate::createEditor(QWidget *parent,
       QList<QVariant> list = domain.toList();
       if(list.size() == 2 && list[0].isValid() && list[1].isValid())
         {
-        QSpinBox *spin = new QSpinBox(parent);
+        QSpinBox *spin = new QSpinBox(p);
         spin->setMinimum(list[0].toInt());
         spin->setMaximum(list[1].toInt());
         editor = spin;
@@ -74,7 +74,7 @@ QWidget *pqObjectInspectorDelegate::createEditor(QWidget *parent,
     else if(domain.type() == QVariant::StringList)
       {
       QStringList names = domain.toStringList();
-      QComboBox *combo = new QComboBox(parent);
+      QComboBox *combo = new QComboBox(p);
       for(QStringList::Iterator it = names.begin(); it != names.end(); ++it)
         combo->addItem(*it);
       editor = combo;
@@ -83,7 +83,7 @@ QWidget *pqObjectInspectorDelegate::createEditor(QWidget *parent,
   else if(data.type() == QVariant::String && domain.isValid())
     {
     QStringList names = domain.toStringList();
-    QComboBox *combo = new QComboBox(parent);
+    QComboBox *combo = new QComboBox(p);
     for(QStringList::Iterator it = names.begin(); it != names.end(); ++it)
       combo->addItem(*it);
     editor = combo;
@@ -91,7 +91,7 @@ QWidget *pqObjectInspectorDelegate::createEditor(QWidget *parent,
 
   // Use a line edit for the default case.
   if(!editor)
-    editor = new QLineEdit(parent);
+    editor = new QLineEdit(p);
 
   if(editor)
     editor->installEventFilter(const_cast<pqObjectInspectorDelegate *>(this));
