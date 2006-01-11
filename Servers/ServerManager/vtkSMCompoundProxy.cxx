@@ -16,6 +16,10 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMProxyInternals.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMStateLoader.h"
 #include "vtkSmartPointer.h"
 
 #include <vtkstd/set>
@@ -24,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCompoundProxy);
-vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.5");
 
 vtkCxxSetObjectMacro(vtkSMCompoundProxy, MainProxy, vtkSMProxy);
 
@@ -119,6 +123,69 @@ unsigned int vtkSMCompoundProxy::GetNumberOfProxies()
 }
 
 //---------------------------------------------------------------------------
+void vtkSMCompoundProxy::ExposeProperty(const char* proxyName, 
+                                        const char* propertyName,
+                                        const char* exposedName)
+{
+  if (!this->MainProxy)
+    {
+    return;
+    }
+  this->MainProxy->ExposeSubProxyProperty(proxyName, 
+                                          propertyName,
+                                          exposedName);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMCompoundProxy::ExposeExternalProperties()
+{
+  unsigned int numProxies = this->GetNumberOfProxies();
+  for (unsigned int i=0; i<numProxies; i++)
+    {
+    vtkSMProxy* subProxy = this->GetProxy(i);
+    vtkSMPropertyIterator* iter = subProxy->NewPropertyIterator();
+    for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
+      {
+      vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::SafeDownCast(
+        iter->GetProperty());
+      if (proxyProp)
+        {
+        int expose = 1;
+        unsigned int numProxiesInProp = proxyProp->GetNumberOfProxies();
+        if (numProxiesInProp < 1)
+          {
+          expose = 0;
+          }
+        for (unsigned int j=0; j<numProxiesInProp; j++)
+          {
+          vtkSMProxy* aProxy = proxyProp->GetProxy(j);
+
+          for (unsigned int k=0; k<numProxies; k++)
+            {
+            if (aProxy == this->GetProxy(k))
+              {
+              expose = 0;
+              break;
+              }
+            }
+          if (!expose)
+            {
+            break;
+            }
+          }
+        if (expose)
+          {
+          this->MainProxy->ExposeSubProxyProperty(this->GetProxyName(i),
+                                                  iter->GetKey(),
+                                                  iter->GetKey());
+          }
+        }
+      }
+    iter->Delete();
+    }
+}
+
+//---------------------------------------------------------------------------
 int vtkSMCompoundProxy::ShouldWriteValue(vtkPVXMLElement* valueElem)
 {
   if (strcmp(valueElem->GetName(), "Proxy") != 0)
@@ -196,10 +263,116 @@ void vtkSMCompoundProxy::TraverseForProperties(vtkPVXMLElement* root)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMCompoundProxy::HandleExposedProperties(vtkPVXMLElement* element)
+{
+  if (!this->MainProxy)
+    {
+    return;
+    }
+
+  unsigned int numElems = element->GetNumberOfNestedElements();
+  for (unsigned int i=0; i<numElems; i++)
+    {
+    vtkPVXMLElement* currentElement = element->GetNestedElement(i);
+    if (currentElement->GetName() &&
+        strcmp(currentElement->GetName(), "Property") == 0)
+      {
+      const char* name = currentElement->GetAttribute("name");
+      const char* proxyName = currentElement->GetAttribute("proxy_name");
+      const char* exposedName = currentElement->GetAttribute("exposed_name");
+      if (name && proxyName && exposedName)
+        {
+        this->MainProxy->ExposeSubProxyProperty(proxyName, name, exposedName);
+        }
+      else if (!name)
+        {
+        vtkErrorMacro("Required attribute name could not be found.");
+        }
+      else if (!proxyName)
+        {
+        vtkErrorMacro("Required attribute proxy_name could not be found.");
+        }
+      else if (!exposedName)
+        {
+        vtkErrorMacro("Required attribute exposed_name could not be found.");
+        }
+      }
+    }
+}
+
+//---------------------------------------------------------------------------
+int vtkSMCompoundProxy::LoadState(vtkPVXMLElement* proxyElement, 
+                                  vtkSMStateLoader* loader)
+{
+  unsigned int numElems = proxyElement->GetNumberOfNestedElements();
+  for (unsigned int i=0; i<numElems; i++)
+    {
+    vtkPVXMLElement* currentElement = proxyElement->GetNestedElement(i);
+    if (currentElement->GetName() &&
+        strcmp(currentElement->GetName(), "Proxy") == 0)
+      {
+      const char* compoundName = currentElement->GetAttribute(
+        "compound_name");
+      if (compoundName && compoundName[0] != '\0')
+        {
+        int currentId;
+        if (!currentElement->GetScalarAttribute("id", &currentId))
+          {
+          continue;
+          }
+        vtkSMProxy* subProxy = loader->NewProxyFromElement(
+          currentElement, currentId);
+        if (subProxy)
+          {
+          this->AddProxy(compoundName, subProxy);
+          subProxy->Delete();
+          }
+        }
+      }
+    }
+
+
+  for (unsigned int i=0; i<numElems; i++)
+    {
+    vtkPVXMLElement* currentElement = proxyElement->GetNestedElement(i);
+    if (currentElement->GetName() &&
+        strcmp(currentElement->GetName(), "ExposedProperties") == 0)
+      {
+      this->HandleExposedProperties(currentElement);
+      }
+    }
+
+  return 1;
+}
+
+//---------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMCompoundProxy::SaveState(vtkPVXMLElement* root)
 {
-  vtkPVXMLElement* proxyElement = vtkPVXMLElement::New();
+  vtkPVXMLElement* proxyElement = this->Superclass::SaveState(root);
   proxyElement->SetName("CompoundProxy");
+
+  vtkPVXMLElement* exposed = vtkPVXMLElement::New();
+  exposed->SetName("ExposedProperties");
+  unsigned int numExposed = 0;
+  vtkSMProxyInternals* internals = this->MainProxy->Internals;
+  vtkSMProxyInternals::ExposedPropertyInfoMap::iterator iter =
+    internals->ExposedProperties.begin();
+  for(; iter != internals->ExposedProperties.end(); iter++)
+    {
+    numExposed++;
+    vtkPVXMLElement* expElem = vtkPVXMLElement::New();
+    expElem->SetName("Property");
+    expElem->AddAttribute("name", iter->second.PropertyName);
+    expElem->AddAttribute("proxy_name", iter->second.SubProxyName);
+    expElem->AddAttribute("exposed_name", iter->first.c_str());
+    exposed->AddNestedElement(expElem);
+    expElem->Delete();
+    }
+  if (numExposed > 0)
+    {
+    proxyElement->AddNestedElement(exposed);
+    }
+  exposed->Delete();
 
   unsigned int numProxies = this->GetNumberOfProxies();
   for (unsigned int i=0; i<numProxies; i++)
@@ -208,24 +381,20 @@ vtkPVXMLElement* vtkSMCompoundProxy::SaveState(vtkPVXMLElement* root)
     newElem->AddAttribute("compound_name", this->GetProxyName(i));
     }
 
-  root->AddNestedElement(proxyElement);
-  proxyElement->Delete();
   return proxyElement;
 }
 
 //---------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMCompoundProxy::SaveDefinition(vtkPVXMLElement* root)
 {
-  vtkPVXMLElement* defElement = vtkPVXMLElement::New();
-  defElement->SetName("CompoundProxyDefinition");
-
-  this->SaveState(defElement);
+  vtkPVXMLElement* defElement = this->SaveState(0);
 
   this->Internal->ProxyProperties.clear();
-  this->TraverseForProperties(defElement->GetNestedElement(0));
+  this->TraverseForProperties(defElement);
   if (root)
     {
     root->AddNestedElement(defElement);
+    defElement->Delete();
     }
 
   return defElement;

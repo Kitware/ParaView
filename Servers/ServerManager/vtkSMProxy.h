@@ -577,7 +577,6 @@ private:
   // By default the name is set to pvTemp{%d} where {%d} 
   // gets substituted by the SelfID of the proxy.
   vtkSetStringMacro(Name);
-  vtkGetStringMacro(Name);
   //BTX
   // -- PVEE only
   friend class vtkWSMApplication;

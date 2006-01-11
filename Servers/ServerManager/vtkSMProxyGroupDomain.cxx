@@ -26,7 +26,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyGroupDomain);
-vtkCxxRevisionMacro(vtkSMProxyGroupDomain, "1.9");
+vtkCxxRevisionMacro(vtkSMProxyGroupDomain, "1.10");
 
 struct vtkSMProxyGroupDomainInternals
 {
@@ -57,26 +57,21 @@ int vtkSMProxyGroupDomain::IsInDomain(vtkSMProperty* property)
     {
     return 0;
     }
-  // TODO this should be enabled again. Once ParaView client uses proxies
-  // in 3d widgets too
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(property);
+  if (pp)
+    {
+    unsigned int numProxies = pp->GetNumberOfUncheckedProxies();
+    for (unsigned int i=0; i<numProxies; i++)
+      {
+      if (!this->IsInDomain(pp->GetUncheckedProxy(i)))
+        {
+        return 0;
+        }
+      }
+    return 1;
+    }
 
-//   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(property);
-//   if (pp)
-//     {
-//     unsigned int numProxies = pp->GetNumberOfUncheckedProxies();
-//     for (unsigned int i=0; i<numProxies; i++)
-//       {
-//       if (!this->IsInDomain(pp->GetUncheckedProxy(i)))
-//         {
-//         return 0;
-//         }
-//       }
-//     return 1;
-//     }
-
-//   return 0;
-
-  return 1;
+  return 0;
 }
 
 //---------------------------------------------------------------------------
