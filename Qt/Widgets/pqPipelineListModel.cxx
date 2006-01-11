@@ -118,8 +118,8 @@ pqPipelineListInternal::pqPipelineListInternal()
 }
 
 
-pqPipelineListModel::pqPipelineListModel(QObject *p)
-  : QAbstractItemModel(p)
+pqPipelineListModel::pqPipelineListModel(QObject *parentObject)
+  : QAbstractItemModel(parentObject)
 {
   this->Internal = new pqPipelineListInternal();
   this->Root = new pqPipelineListItem();
@@ -186,15 +186,20 @@ pqPipelineListModel::~pqPipelineListModel()
     delete [] this->PixmapList;
 }
 
-int pqPipelineListModel::rowCount(const QModelIndex &p) const
+int pqPipelineListModel::rowCount(const QModelIndex &parentIndex) const
 {
   pqPipelineListItem *item = this->Root;
-  if(p.isValid())
+  if(parentIndex.isValid())
     {
-    if(p.model() == this)
-      item = reinterpret_cast<pqPipelineListItem *>(p.internalPointer());
+    if(parentIndex.model() == this)
+      {
+      item = reinterpret_cast<pqPipelineListItem *>(
+          parentIndex.internalPointer());
+      }
     else
+      {
       item = 0;
+      }
     }
 
   if(item)
@@ -203,52 +208,66 @@ int pqPipelineListModel::rowCount(const QModelIndex &p) const
   return 0;
 }
 
-int pqPipelineListModel::columnCount(const QModelIndex &/*p*/) const
+int pqPipelineListModel::columnCount(const QModelIndex &) const
 {
   return 1;
 }
 
-bool pqPipelineListModel::hasChildren(const QModelIndex &p) const
+bool pqPipelineListModel::hasChildren(const QModelIndex &parentIndex) const
 {
   pqPipelineListItem *item = this->Root;
-  if(p.isValid())
+  if(parentIndex.isValid())
     {
-    if(p.model() == this)
-      item = reinterpret_cast<pqPipelineListItem *>(p.internalPointer());
+    if(parentIndex.model() == this)
+      {
+      item = reinterpret_cast<pqPipelineListItem *>(
+          parentIndex.internalPointer());
+      }
     else
+      {
       item = 0;
+      }
     }
 
   if(item)
+    {
     return item->Internal.size() > 0;
+    }
 
   return false;
 }
 
 QModelIndex pqPipelineListModel::index(int row, int column,
-    const QModelIndex &p) const
+    const QModelIndex &parentIndex) const
 {
   pqPipelineListItem *item = this->Root;
-  if(p.isValid())
+  if(parentIndex.isValid())
     {
-    if(p.model() == this)
-      item = reinterpret_cast<pqPipelineListItem *>(p.internalPointer());
+    if(parentIndex.model() == this)
+      {
+      item = reinterpret_cast<pqPipelineListItem *>(
+          parentIndex.internalPointer());
+      }
     else
+      {
       item = 0;
+      }
     }
 
   if(item && column == 0 && row >= 0 && row < item->Internal.size())
+    {
     return this->createIndex(row, column, item->Internal[row]);
+    }
 
   return QModelIndex();
 }
 
-QModelIndex pqPipelineListModel::parent(const QModelIndex &idx) const
+QModelIndex pqPipelineListModel::parent(const QModelIndex &index) const
 {
-  if(this->Root && idx.isValid() && idx.model() == this)
+  if(this->Root && index.isValid() && index.model() == this)
     {
     pqPipelineListItem *item = reinterpret_cast<pqPipelineListItem *>(
-        idx.internalPointer());
+        index.internalPointer());
     if(item && item->Parent && item->Parent->Parent)
       {
       int row = item->Parent->Parent->Internal.indexOf(item->Parent);
@@ -260,12 +279,12 @@ QModelIndex pqPipelineListModel::parent(const QModelIndex &idx) const
   return QModelIndex();
 }
 
-QVariant pqPipelineListModel::data(const QModelIndex &idx, int role) const
+QVariant pqPipelineListModel::data(const QModelIndex &index, int role) const
 {
-  if(this->Root && idx.isValid() && idx.model() == this)
+  if(this->Root && index.isValid() && index.model() == this)
     {
     pqPipelineListItem *item = reinterpret_cast<pqPipelineListItem *>(
-        idx.internalPointer());
+        index.internalPointer());
     if(item)
       {
       switch(role)
@@ -288,18 +307,18 @@ QVariant pqPipelineListModel::data(const QModelIndex &idx, int role) const
   return QVariant();
 }
 
-Qt::ItemFlags pqPipelineListModel::flags(const QModelIndex &/*idx*/) const
+Qt::ItemFlags pqPipelineListModel::flags(const QModelIndex &index) const
 {
   return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 }
 
 pqPipelineListModel::ItemType pqPipelineListModel::getTypeFor(
-    const QModelIndex &idx) const
+    const QModelIndex &index) const
 {
-  if(this->Internal && idx.isValid() && idx.model() == this)
+  if(this->Internal && index.isValid() && index.model() == this)
     {
     pqPipelineListItem *item = reinterpret_cast<pqPipelineListItem *>(
-        idx.internalPointer());
+        index.internalPointer());
     if(item)
       return item->Type;
     }
@@ -307,13 +326,13 @@ pqPipelineListModel::ItemType pqPipelineListModel::getTypeFor(
   return pqPipelineListModel::Invalid;
 }
 
-vtkSMProxy *pqPipelineListModel::getProxyFor(const QModelIndex &idx) const
+vtkSMProxy *pqPipelineListModel::getProxyFor(const QModelIndex &index) const
 {
   vtkSMProxy *proxy = 0;
-  if(this->Internal && idx.isValid() && idx.model() == this)
+  if(this->Internal && index.isValid() && index.model() == this)
     {
     pqPipelineListItem *item = reinterpret_cast<pqPipelineListItem *>(
-        idx.internalPointer());
+        index.internalPointer());
     if(item && (item->Type == pqPipelineListModel::Source || 
         item->Type == pqPipelineListModel::Filter))
       {
@@ -324,13 +343,13 @@ vtkSMProxy *pqPipelineListModel::getProxyFor(const QModelIndex &idx) const
   return proxy;
 }
 
-QWidget *pqPipelineListModel::getWidgetFor(const QModelIndex &idx) const
+QWidget *pqPipelineListModel::getWidgetFor(const QModelIndex &index) const
 {
   QWidget *widget = 0;
-  if(this->Internal && idx.isValid() && idx.model() == this)
+  if(this->Internal && index.isValid() && index.model() == this)
     {
     pqPipelineListItem *item = reinterpret_cast<pqPipelineListItem *>(
-        idx.internalPointer());
+        index.internalPointer());
     if(item && item->Type == pqPipelineListModel::Window)
       widget = item->Data.Window->GetWidget();
     }
@@ -455,13 +474,15 @@ void pqPipelineListModel::addWindow(pqPipelineWindow *window)
 
     // Add the window to the server item.
     int rows = serverItem->Internal.size();
-    QModelIndex p = this->createIndex(serverRow, 0, serverItem);
-    this->beginInsertRows(p, rows, rows);
+    QModelIndex parentIndex = this->createIndex(serverRow, 0, serverItem);
+    this->beginInsertRows(parentIndex, rows, rows);
     serverItem->Internal.append(item);
     this->endInsertRows();
 
     if(serverItem->Internal.size() == 1)
-      emit this->childAdded(p);
+      {
+      emit this->childAdded(parentIndex);
+      }
     }
 }
 
@@ -482,9 +503,9 @@ void pqPipelineListModel::removeWindow(pqPipelineWindow *window)
   pqPipelineListItem *serverItem = item->Parent;
 
   int serverRow = this->Root->Internal.indexOf(serverItem);
-  QModelIndex p = this->createIndex(serverRow, 0, serverItem);
+  QModelIndex parentIndex = this->createIndex(serverRow, 0, serverItem);
   int row = serverItem->Internal.indexOf(item);
-  this->beginRemoveRows(p, row, row);
+  this->beginRemoveRows(parentIndex, row, row);
   serverItem->Internal.removeAll(item);
   this->endRemoveRows();
   this->Internal->Windows.erase(iter);
@@ -514,9 +535,9 @@ void pqPipelineListModel::removeSource(pqPipelineObject *source)
   pqPipelineListItem *windowItem = item->Parent;
 
   //int windowRow = windowItem->GetParent()->Internal.indexOf(windowItem);
-  //QModelIndex parent = this->createIndex(windowRow, 0, windowItem);
+  //QModelIndex parentIndex = this->createIndex(windowRow, 0, windowItem);
   //int row = windowItem->Internal.indexOf(item);
-  //this->beginRemoveRows(parent, row, row);
+  //this->beginRemoveRows(parentIndex, row, row);
   windowItem->Internal.removeAll(item);
   this->Internal->Lookup.erase(iter);
   this->removeLookupItems(item);
@@ -562,9 +583,9 @@ void pqPipelineListModel::removeFilter(pqPipelineObject *filter)
   pqPipelineListItem *windowItem = item->Parent;
 
   //int windowRow = windowItem->GetParent()->Internal.indexOf(windowItem);
-  //QModelIndex parent = this->createIndex(windowRow, 0, windowItem);
+  //QModelIndex parentIndex = this->createIndex(windowRow, 0, windowItem);
   //int row = windowItem->Internal.indexOf(item);
-  //this->beginRemoveRows(parent, row, row);
+  //this->beginRemoveRows(parentIndex, row, row);
   windowItem->Internal.removeAll(item);
   this->Internal->Lookup.erase(iter);
   this->removeLookupItems(item);
@@ -617,151 +638,234 @@ void pqPipelineListModel::addConnection(pqPipelineObject *source,
 
   pqPipelineListItem *sinkItem = *iter;
   int i = 0;
+  int row = 0;
   int sourceRow = 0;
   QModelIndex parentIndex;
-  pqPipelineListItem *p = 0;
+  pqPipelineListItem *parentItem = 0;
   pqPipelineListItem *split1 = 0;
   pqPipelineListItem *split2 = 0;
+  pqPipelineListItem *link = 0;
   if(source->GetParent() == sink->GetParent())
     {
-    // Check to see if the source and sink are connected already.
-    if(!sourceItem->Parent->IsLast(sourceItem))
-      {
-      sourceRow = sourceItem->Parent->Internal.indexOf(sourceItem);
-      pqPipelineListItem *next = sourceItem->Parent->Internal[++sourceRow];
-      if(next == sinkItem)
-        return;
-      if(next->Type == pqPipelineListModel::LinkBack &&
-          next->Data.Link == sinkItem)
-        {
-        return;
-        }
-
-      // The source may have several outputs.
-      while(next->Type == pqPipelineListModel::Split)
-        {
-        if(next->Internal.size() > 0 && (next->Internal[0] == sinkItem ||
-            (next->Internal[0]->Type == pqPipelineListModel::LinkBack &&
-            next->Internal[0]->Data.Link == sinkItem)))
-          {
-          return;
-          }
-
-        if(sourceItem->Parent->IsLast(next))
-          break;
-        next = sourceItem->Parent->Internal[++sourceRow];
-        }
-      }
-
-    // Step through the different same window connection cases.
+    // Both items are in the same window. Check to see if they have
+    // the same parent.
     if(sourceItem->Parent == sinkItem->Parent)
       {
-      // If both items are in the same chain, creating a new
-      // connection will result in a pipeline branch and merge.
-      // If the sink is higher in the chain, this connection will
-      // form a loop.
-      pqPipelineListItem *link = new pqPipelineListItem();
-      if(!link)
-        return;
-
-      // Set up the link for the new connection.
-      link->Type = pqPipelineListModel::LinkBack;
-      link->Data.Link = sinkItem;
-
-      // Get the parent index ready.
-      p = sourceItem->Parent;
-      parentIndex = this->createIndex(
-          p->Parent->Internal.indexOf(p), 0, p);
-      if(p->IsLast(sourceItem))
-        {
-        // If the source is at the end, this is a loop back. Since it
-        // is at the end, a branch is not needed.
-        link->Parent = p;
-        int row = p->Internal.size();
-        this->beginInsertRows(parentIndex, row, row);
-        p->Internal.append(link);
-        this->endInsertRows();
-        }
-      else
-        {
-        split1 = new pqPipelineListItem();
-        if(!split1)
-          {
-          delete link;
-          return;
-          }
-
-        split1->Type = pqPipelineListModel::Split;
-        split1->Parent = p;
-        split2 = new pqPipelineListItem();
-        if(!split2)
-          {
-          delete link;
-          delete split1;
-          return;
-          }
-
-        split2->Type = pqPipelineListModel::Split;
-        split2->Parent = p;
-        link->Parent = split1;
-        split1->Internal.append(link);
-
-        // When the sink is after the source, a second link object is
-        // needed.
-        sourceRow = p->Internal.indexOf(sourceItem);
-        int sinkRow = p->Internal.indexOf(sinkItem);
-        pqPipelineListItem *link2 = 0;
-        if(sinkRow > sourceRow)
-          {
-          link2 = new pqPipelineListItem();
-          if(!link2)
-            {
-            delete split1;
-            delete split2;
-            return;
-            }
-
-          link2->Type = pqPipelineListModel::LinkBack;
-          link2->Data.Link = sinkItem;
-          link2->Parent = split2;
-          }
-
-        // desermine which rows will be removed.
-        int startRow = sourceRow + 1;
-        int endRow = sinkRow - 1;
-        if(sinkRow < sourceRow)
-          endRow = p->Internal.size() - 1;
-
-        // Remove the items from the parent. Put the items on the second
-        // split item.
-        this->beginRemoveRows(parentIndex, startRow, endRow);
-        for(i = endRow; i >= startRow; i--)
-          split2->Internal.prepend(p->Internal.takeAt(i));
-        this->endRemoveRows();
-
-        // Set the parent pointers for the new chain.
-        QList<pqPipelineListItem *>::Iterator jter = split2->Internal.begin();
-        for( ; jter != split2->Internal.end(); ++jter)
-          (*jter)->Parent = split2;
-
-        // Insert the extra link item if needed.
-        if(sinkRow > sourceRow)
-          split2->Internal.append(link2);
-
-        // Insert the new split items after the source.
-        this->beginInsertRows(parentIndex, startRow, startRow + 1);
-        p->Internal.append(split1);
-        p->Internal.append(split2);
-        this->endInsertRows();
-
-        // Make sure the new split items are expanded.
-        emit this->childAdded(this->createIndex(startRow, 0, split1));
-        emit this->childAdded(this->createIndex(startRow + 1, 0, split2));
-        }
       }
     else
       {
-      // Source and sink have different parents.
+      // Check to see if the two items are connected. With different
+      // parents in the same window, the only possibility is having
+      // the source on a merge chain connected to the sink by a
+      // link back item.
+      parentItem = sourceItem->Parent;
+      if(!sourceItem->Parent->IsLast(sourceItem))
+        {
+        sourceRow = parentItem->Internal.indexOf(sourceItem);
+        link = parentItem->Internal[sourceRow + 1];
+        if(link->Type == pqPipelineListModel::LinkBack &&
+            link->Data.Link == sinkItem)
+          {
+          return;
+          }
+
+        // Since the source is not last in the list, a splitter needs
+        // to be created. If the rest of the chain is composed of
+        // splitters, only one needs to be made.
+        bool needSecond = false;
+        for(i = sourceRow + 1; i < parentItem->Internal.size(); i++)
+          {
+          if(parentItem->Internal[i]->Type != pqPipelineListModel::Split)
+            {
+            needSecond = true;
+            break;
+            }
+          }
+
+        split1 = new pqPipelineListItem();
+        if(!split1)
+          {
+          return;
+          }
+
+        parentIndex = this->createIndex(
+            parentItem->Parent->Internal.indexOf(parentItem), 0, parentItem);
+        if(needSecond)
+          {
+          split2 = new pqPipelineListItem();
+          if(!split2)
+            {
+            delete split1;
+            return;
+            }
+
+          // Move all the subsequent items to the new splitter.
+          split2->Type = pqPipelineListModel::Split;
+          split2->Parent = parentItem;
+          i = parentItem->Internal.size() - 1;
+          this->beginRemoveRows(parentIndex, sourceRow + 1, i);
+          for( ; i >= sourceRow + 1; i--)
+            {
+            pqPipelineListItem *item = parentItem->Internal.takeAt(i);
+            item->Parent = split2;
+            split2->Internal.prepend(item);
+            }
+
+          this->endRemoveRows();
+          row = parentItem->Internal.size();
+          this->beginInsertRows(parentIndex, row, row);
+          parentItem->Internal.append(split2);
+          this->endInsertRows();
+
+          // TODO: Re-open all the sub-items.
+          emit this->childAdded(this->createIndex(row, 0, split2));
+          }
+
+        split1->Type = pqPipelineListModel::Split;
+        split1->Parent = parentItem;
+        row = parentItem->Internal.size();
+        this->beginInsertRows(parentIndex, row, row);
+        parentItem->Internal.append(split1);
+        this->endInsertRows();
+
+        // Set the parent pointer for the new connection item(s).
+        parentItem = split1;
+        }
+
+      // If the sink is at the beginning of its parent's list, the whole
+      // list can be moved to the source's chain. Otherwise, a link back
+      // item needs to be placed after the source.
+      bool canMove = false;
+      if(sinkItem->Parent->Type == pqPipelineListModel::Merge &&
+          sinkItem->Parent->IsFirst(sinkItem))
+        {
+        // If the sink outputs to the source, the sink chain can't be moved.
+        canMove = true;
+        pqPipelineListItem *sourceParent = sourceItem->Parent;
+        while(sourceParent)
+          {
+          if(sourceParent == sinkItem->Parent)
+            {
+            canMove = false;
+            break;
+            }
+
+          sourceParent = sourceParent->Parent;
+          }
+        }
+
+      if(canMove)
+        {
+        // If the source and sink have the same grandparent and the source
+        // is on a merge chain, it may be possible to simplify farther. If
+        // there are only two merge chains in the grandparent, the source
+        // chain can be moved to the grandparent along with the sink.
+        bool canSimplify =
+            sourceItem->Parent->Type == pqPipelineListModel::Merge &&
+            sourceItem->Parent->Parent == sinkItem->Parent->Parent &&
+            sourceItem->Parent->Parent->Internal.size() == 2;
+
+        // Remove the sink's parent from the model.
+        pqPipelineListItem *sinkParent = sinkItem->Parent;
+        parentIndex = this->createIndex(
+            sinkParent->Parent->Parent->Internal.indexOf(sinkParent->Parent),
+            0, sinkParent->Parent);
+        row = sinkParent->Parent->Internal.indexOf(sinkParent);
+        this->beginRemoveRows(parentIndex, row, row);
+        sinkParent->Parent->Internal.removeAt(row);
+        this->endRemoveRows();
+
+        QList<pqPipelineListItem *>::Iterator jter;
+        if(canSimplify)
+          {
+          // Remove the source's parent from the model.
+          pqPipelineListItem *sourceParent = sourceItem->Parent;
+          parentIndex = this->createIndex(
+              sourceParent->Parent->Parent->Internal.indexOf(
+              sourceParent->Parent), 0, sourceParent->Parent);
+          row = sourceParent->Parent->Internal.indexOf(sourceParent);
+          this->beginRemoveRows(parentIndex, row, row);
+          sourceParent->Parent->Internal.removeAt(row);
+          this->endRemoveRows();
+
+          // Move the source chain to the grandparent.
+          i = sourceParent->Parent->Internal.size();
+          row = i + sourceParent->Internal.size();
+          this->beginInsertRows(parentIndex, i, row);
+          jter = sourceParent->Internal.begin();
+          for( ; jter != sourceParent->Internal.end(); ++jter)
+            {
+            sourceParent->Parent->Internal.append(*jter);
+            (*jter)->Parent = sourceParent->Parent;
+            }
+
+          this->endInsertRows();
+          delete sourceParent;
+
+          // If the sink chain is not being added to a splitter, set up
+          // the new parent.
+          if(!split1)
+            {
+            parentItem = sourceItem->Parent;
+            }
+
+          // TODO: Re-open source chain items.
+          }
+
+        // Move the sink chain to the new location.
+        parentIndex = this->createIndex(
+            parentItem->Parent->Internal.indexOf(parentItem), 0, parentItem);
+        i = parentItem->Internal.size();
+        row = i + sinkParent->Internal.size();
+        this->beginInsertRows(parentIndex, i, row);
+        jter = sinkParent->Internal.begin();
+        for( ; jter != sinkParent->Internal.end(); ++jter)
+          {
+          parentItem->Internal.append(*jter);
+          (*jter)->Parent = parentItem;
+          }
+
+        this->endInsertRows();
+        delete sinkParent;
+
+        // If the items are added to a new splitter, make sure the split
+        // item is open.
+        if(split1)
+          {
+          emit this->childAdded(parentIndex);
+          }
+
+        // TODO: Re-open sink chain items.
+        }
+      else
+        {
+        // Add a link back item for the new connection.
+        link = new pqPipelineListItem();
+        if(!link)
+          {
+          return;
+          }
+
+        link->Type = pqPipelineListModel::LinkBack;
+        link->Parent = parentItem;
+        link->Data.Link = sinkItem;
+        row = parentItem->Internal.size();
+        parentIndex = this->createIndex(
+          parentItem->Parent->Internal.indexOf(parentItem), 0, parentItem);
+        this->beginInsertRows(parentIndex, row, row);
+        parentItem->Internal.append(link);
+        this->endInsertRows();
+
+        // If the link item is added to a new splitter, make sure the
+        // split item is open.
+        if(split1)
+          {
+          emit this->childAdded(parentIndex);
+          }
+
+        // TODO: Adding a link back item may create common pipeline
+        // segments.
+        }
       }
     }
   else
@@ -773,8 +877,8 @@ void pqPipelineListModel::addConnection(pqPipelineObject *source,
     }
 }
 
-void pqPipelineListModel::removeConnection(pqPipelineObject* /*source*/,
-                                           pqPipelineObject* /*sink*/)
+void pqPipelineListModel::removeConnection(pqPipelineObject *source,
+    pqPipelineObject *sink)
 {
 }
 
@@ -832,17 +936,17 @@ void pqPipelineListModel::finishCreateAndAppend()
   // to be added to a split item. The items after the source may also
   // need to be moved to a new split item in that case.
   QModelIndex parentIndex;
-  pqPipelineListItem *p = sourceItem->Parent;
-  if(p->IsLast(sourceItem))
+  pqPipelineListItem *parentItem = sourceItem->Parent;
+  if(parentItem->IsLast(sourceItem))
     {
     // Add the filter to the parent after the source.
     this->Internal->Lookup.insert(filter, newItem);
-    newItem->Parent = p;
+    newItem->Parent = parentItem;
     parentIndex = this->createIndex(
-        p->Parent->Internal.indexOf(p), 0, p);
-    int row = p->Internal.size();
+        parentItem->Parent->Internal.indexOf(parentItem), 0, parentItem);
+    int row = parentItem->Internal.size();
     this->beginInsertRows(parentIndex, row, row);
-    p->Internal.append(newItem);
+    parentItem->Internal.append(newItem);
     this->endInsertRows();
     }
   else
@@ -912,33 +1016,33 @@ void pqPipelineListModel::finishCreateAndInsert()
   // Make sure the sink is connected to the source. If the source is
   // connected to multiple objects, the filter should be inserted in
   // the sink chain.
-  pqPipelineListItem *p = sourceItem->Parent;
-  int i = p->Internal.indexOf(sourceItem) + 1;
-  if(i == p->Internal.size())
+  pqPipelineListItem *parentItem = sourceItem->Parent;
+  int i = parentItem->Internal.indexOf(sourceItem) + 1;
+  if(i == parentItem->Internal.size())
     {
     delete newItem;
     return;
     }
 
   QModelIndex parentIndex;
-  pqPipelineListItem *next = p->Internal[i];
+  pqPipelineListItem *next = parentItem->Internal[i];
   if(next == sinkItem || (next->Type == pqPipelineListModel::LinkBack &&
       next->Data.Link == sinkItem))
     {
     // Insert the filter after the source item.
     this->Internal->Lookup.insert(filter, newItem);
     parentIndex = this->createIndex(
-        p->Parent->Internal.indexOf(p), 0, p);
+        parentItem->Parent->Internal.indexOf(parentItem), 0, parentItem);
     this->beginInsertRows(parentIndex, i, i);
-    newItem->Parent = p;
-    p->Internal.insert(i, newItem);
+    newItem->Parent = parentItem;
+    parentItem->Internal.insert(i, newItem);
     this->endInsertRows();
     }
   else
     {
-    for( ; i < p->Internal.size(); i++)
+    for( ; i < parentItem->Internal.size(); i++)
       {
-      next = p->Internal[i];
+      next = parentItem->Internal[i];
       if(next->Type != pqPipelineListModel::Split)
         break;
       if(next->Internal.size() > 0 && next->Internal[0] == sinkItem)
@@ -976,19 +1080,19 @@ void pqPipelineListModel::addSubItem(pqPipelineObject *object,
 
   // If there are items in the window's list, the new item needs
   // a merge item to contain it.
-  pqPipelineListItem *p = *iter;
-  if(p->Internal.size() > 0)
+  pqPipelineListItem *parentItem = *iter;
+  if(parentItem->Internal.size() > 0)
     {
     int mergeRow = 0;
-    int windowRow = p->Parent->Internal.indexOf(p);
-    QModelIndex windowIndex = this->createIndex(windowRow, 0, p);
+    int windowRow = parentItem->Parent->Internal.indexOf(parentItem);
+    QModelIndex windowIndex = this->createIndex(windowRow, 0, parentItem);
 
     // If not all the window items are merge items, the current
     // children of the window need to be added to a new merge
     // item.
     bool needsMerge = false;
-    QList<pqPipelineListItem *>::Iterator jter = p->Internal.begin();
-    for( ; jter != p->Internal.end(); ++jter)
+    QList<pqPipelineListItem *>::Iterator jter = parentItem->Internal.begin();
+    for( ; jter != parentItem->Internal.end(); ++jter)
       {
       if(!(*jter) || (*jter)->Type != pqPipelineListModel::Merge)
         {
@@ -1004,15 +1108,15 @@ void pqPipelineListModel::addSubItem(pqPipelineObject *object,
         return;
 
       merge->Type = pqPipelineListModel::Merge;
-      merge->Parent = p;
+      merge->Parent = parentItem;
 
       // Remove the window's current items.
-      this->beginRemoveRows(windowIndex, 0, p->Internal.size() - 1);
+      this->beginRemoveRows(windowIndex, 0, parentItem->Internal.size() - 1);
       this->endRemoveRows();
 
       // Add the items to the new merge item.
-      merge->Internal = p->Internal;
-      p->Internal.clear();
+      merge->Internal = parentItem->Internal;
+      parentItem->Internal.clear();
       jter = merge->Internal.begin();
       for( ; jter != merge->Internal.end(); ++jter)
         {
@@ -1022,7 +1126,7 @@ void pqPipelineListModel::addSubItem(pqPipelineObject *object,
 
       // Add the merge item to the window.
       this->beginInsertRows(windowIndex, 0, 0);
-      p->Internal.append(merge);
+      parentItem->Internal.append(merge);
       this->endInsertRows();
 
       emit this->childAdded(this->createIndex(0, 0, merge));
@@ -1030,22 +1134,22 @@ void pqPipelineListModel::addSubItem(pqPipelineObject *object,
       }
 
     // Add a merge item for the new source, filter, or bundle.
-    pqPipelineListItem *windowItem = p;
-    p = new pqPipelineListItem();
-    if(p)
+    pqPipelineListItem *windowItem = parentItem;
+    parentItem = new pqPipelineListItem();
+    if(parentItem)
       {
-      p->Type = pqPipelineListModel::Merge;
-      p->Parent = windowItem;
+      parentItem->Type = pqPipelineListModel::Merge;
+      parentItem->Parent = windowItem;
 
       // Add the merge item to the window.
       mergeRow = windowItem->Internal.size();
       this->beginInsertRows(windowIndex, mergeRow, mergeRow);
-      windowItem->Internal.append(p);
+      windowItem->Internal.append(parentItem);
       this->endInsertRows();
       }
     }
 
-  if(!p)
+  if(!parentItem)
     return;
 
   pqPipelineListItem *item = new pqPipelineListItem();
@@ -1054,18 +1158,18 @@ void pqPipelineListModel::addSubItem(pqPipelineObject *object,
     item->Type = itemType;
     item->Name = object->GetProxyName();
     item->Data.Object = object;
-    item->Parent = p;
+    item->Parent = parentItem;
     this->Internal->Lookup.insert(object, item);
 
     // Add the source, filter, or bundle to the parent item.
-    int parentRow = p->Parent->Internal.indexOf(p);
-    int rows = p->Internal.size();
-    QModelIndex parentIndex = this->createIndex(parentRow, 0, p);
+    int parentRow = parentItem->Parent->Internal.indexOf(parentItem);
+    int rows = parentItem->Internal.size();
+    QModelIndex parentIndex = this->createIndex(parentRow, 0, parentItem);
     this->beginInsertRows(parentIndex, rows, rows);
-    p->Internal.append(item);
+    parentItem->Internal.append(item);
     this->endInsertRows();
 
-    if(p->Internal.size() == 1)
+    if(parentItem->Internal.size() == 1)
       emit this->childAdded(parentIndex);
     }
 }
