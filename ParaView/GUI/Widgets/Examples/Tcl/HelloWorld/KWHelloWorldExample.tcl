@@ -1,10 +1,10 @@
-# Initialize Tcl
+# Load the KWWidgets package
 
 package require kwwidgets
-package require vtkio
-package require vtkrendering
 
 # Process some command-line arguments
+# The --test option here is used to run this example as a non-interactive test
+# for software quality purposes. Ignore this feature in your own application.
 
 set option_test [expr [lsearch -exact $argv "--test"] == -1 ? 0 : 1]
 
@@ -14,7 +14,7 @@ set option_test [expr [lsearch -exact $argv "--test"] == -1 ? 0 : 1]
 # the geometry of the user interface so far.
 
 vtkKWApplication app
-app SetName "KWSimpleWindowWithRenderWidgetExample"
+app SetName "KWHelloWorldExample"
 if {$option_test} {
   app SetRegistryLevel 0
   app PromptBeforeExitOff
@@ -33,40 +33,18 @@ win SupportHelpOn
 app AddWindow win
 win Create
 
-# Add a render widget, attach it to the view frame, and pack
+# Add a label, attach it to the view frame, and pack
 
-# Create a render widget
-
-vtkKWRenderWidget rw
-rw SetParent [win GetViewFrame]
-rw Create
-
-pack [rw GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
-
-# Switch to trackball style, it's nicer
-
-[[[rw GetRenderWindow] GetInteractor] GetInteractorStyle] SetCurrentStyleToTrackballCamera
-
-# Create a 3D object reader
-
-vtkXMLPolyDataReader reader
-reader SetFileName [file join [file dirname [info script]] ".." ".." Data teapot.vtp]
-
-# Create the mapper and actor
-
-vtkPolyDataMapper mapper
-mapper SetInputConnection [reader GetOutputPort]
-
-vtkActor actor
-actor SetMapper mapper
-
-# Add the actor to the scene
-
-rw AddViewProp actor
-rw ResetCamera
+vtkKWLabel hello_label
+hello_label SetParent [win GetViewFrame]
+hello_label Create
+hello_label SetText "Hello, World!"
+pack [hello_label GetWidgetName] -side left -anchor c -expand y
+hello_label Delete
 
 # Start the application
-# If --test was provided, do not enter the event loop
+# If --test was provided, do not enter the event loop and run this example
+# as a non-interactive test for software quality purposes.
 
 set ret 0
 win Display
@@ -78,10 +56,6 @@ win Close
 
 # Deallocate and exit
 
-rw Delete
-reader Delete
-mapper Delete
-actor Delete
 win Delete
 app Delete
 

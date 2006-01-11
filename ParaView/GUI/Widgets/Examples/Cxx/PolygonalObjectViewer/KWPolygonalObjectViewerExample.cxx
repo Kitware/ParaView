@@ -1,7 +1,15 @@
+#include "vtkActor.h"
+#include "vtkInteractorStyleSwitch.h"
 #include "vtkKWApplication.h"
-#include "vtkKWWindowBase.h"
-#include "vtkKWLabel.h"
 #include "vtkKWFrame.h"
+#include "vtkGenericRenderWindowInteractor.h"
+#include "vtkKWRenderWidget.h"
+#include "vtkKWWindowBase.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkRenderWindow.h"
+#include "vtkXMLPolyDataReader.h"
+
+#include "vtkKWWidgetsPaths.h"
 
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/CommandLineArguments.hxx>
@@ -18,6 +26,8 @@ int my_main(int argc, char *argv[])
     }
 
   // Process some command-line arguments
+  // The --test option here is used to run this example as a non-interactive 
+  // test for software quality purposes. You can ignore it.
 
   int option_test = 0;
   vtksys::CommandLineArguments args;
@@ -32,7 +42,7 @@ int my_main(int argc, char *argv[])
   // the geometry of the user interface so far.
 
   vtkKWApplication *app = vtkKWApplication::New();
-  app->SetName("KWSimpleWindowExample");
+  app->SetName("KWPolygonalObjectViewerExample");
   if (option_test)
     {
     app->SetRegistryLevel(0);
@@ -42,7 +52,6 @@ int my_main(int argc, char *argv[])
 
   // Set a help link. Can be a remote link (URL), or a local file
 
-  // vtksys::SystemTools::GetFilenamePath(__FILE__) + "/help.html";
   app->SetHelpDialogStartingPage("http://www.kwwidgets.org");
 
   // Add a window
@@ -53,18 +62,54 @@ int my_main(int argc, char *argv[])
   app->AddWindow(win);
   win->Create();
 
-  // Add a label, attach it to the view frame, and pack
+  // Add a render widget, attach it to the view frame, and pack
   
-  vtkKWLabel *hello_label = vtkKWLabel::New();
-  hello_label->SetParent(win->GetViewFrame());
-  hello_label->Create();
-  hello_label->SetText("Hello, World!");
-  app->Script("pack %s -side left -anchor c -expand y", 
-              hello_label->GetWidgetName());
-  hello_label->Delete();
+  vtkKWRenderWidget *rw = vtkKWRenderWidget::New();
+  rw->SetParent(win->GetViewFrame());
+  rw->Create();
+
+  app->Script("pack %s -expand y -fill both -anchor c -expand y", 
+              rw->GetWidgetName());
+
+  // Switch to trackball style, it's nicer
+
+  vtkInteractorStyleSwitch *istyle = vtkInteractorStyleSwitch::SafeDownCast(
+    rw->GetRenderWindow()->GetInteractor()->GetInteractorStyle());
+  if (istyle)
+    {
+    istyle->SetCurrentStyleToTrackballCamera();
+    }
+
+  // Create a 3D object reader
+
+  vtkXMLPolyDataReader *reader = vtkXMLPolyDataReader::New();
+
+  char data_path[2048];
+  sprintf(data_path, "%s/Data/teapot.vtp", KWWidgets_EXAMPLES_DIR);
+  if (!vtksys::SystemTools::FileExists(data_path))
+    {
+    sprintf(data_path, 
+            "%s/..%s/Examples/Data/teapot.vtp",
+            app->GetInstallationDirectory(), KWWidgets_INSTALL_DATA_DIR);
+    }
+  reader->SetFileName(data_path);
+
+  // Create the mapper and actor
+
+  vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
+  mapper->SetInputConnection(reader->GetOutputPort());
+
+  vtkActor *actor = vtkActor::New();
+  actor->SetMapper(mapper);
+
+  // Add the actor to the scene
+
+  rw->AddViewProp(actor);
+  rw->ResetCamera();
 
   // Start the application
-  // If --test was provided, do not enter the event loop
+  // If --test was provided, do not enter the event loop and run this example
+  // as a non-interactive test for software quality purposes.
 
   int ret = 0;
   win->Display();
@@ -77,6 +122,10 @@ int my_main(int argc, char *argv[])
 
   // Deallocate and exit
 
+  reader->Delete();
+  actor->Delete();
+  mapper->Delete();
+  rw->Delete();
   win->Delete();
   app->Delete();
   
