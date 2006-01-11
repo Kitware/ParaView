@@ -16,7 +16,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.7");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.8");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 #include <vtkstd/string>
@@ -170,7 +170,16 @@ void vtkPVXMLElement::RemoveAllNestedElements()
 //----------------------------------------------------------------------------
 void vtkPVXMLElement::AddNestedElement(vtkPVXMLElement* element)
 {
-  element->SetParent(this);
+  this->AddNestedElement(element, 1);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXMLElement::AddNestedElement(vtkPVXMLElement* element, int setParent)
+{
+  if (setParent)
+    {
+    element->SetParent(this);
+    }
   this->Internal->NestedElements.push_back(element);
 }
 
@@ -192,6 +201,12 @@ const char* vtkPVXMLElement::GetAttribute(const char* name)
       }
     }
   return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXMLElement::PrintXML()
+{
+  this->PrintXML(cout, vtkIndent());
 }
 
 //----------------------------------------------------------------------------
