@@ -51,6 +51,21 @@ public:
   vtkGetObjectMacro(MainProxy, vtkSMProxy);
 
   // Description:
+  // Returns an exposed or regular property from the MainProxy.
+  // Convenience method.
+  virtual vtkSMProperty* GetProperty(const char* name);
+
+  // Description:
+  // Calls UpdateVTKObjects() on the MainProxy.
+  // Convenience method.
+  virtual void UpdateVTKObjects();
+
+  // Description:
+  // Returns the property iterator from the MainProxy.
+  // Convenience method.
+  virtual vtkSMPropertyIterator* NewPropertyIterator();
+
+  // Description:
   // Add a sub-proxy. If no main proxy exists, one will be
   // created (of type vtkSMProxy)
   void AddProxy(const char* name, vtkSMProxy* proxy);
