@@ -1,8 +1,10 @@
-# Initialize Tcl
+# Load the KWWidgets package
 
 package require kwwidgets
 
 # Process some command-line arguments
+# The --test option here is used to run this example as a non-interactive test
+# for software quality purposes. Ignore this feature in your own application.
 
 set option_test [expr [lsearch -exact $argv "--test"] == -1 ? 0 : 1]
 
@@ -12,7 +14,7 @@ set option_test [expr [lsearch -exact $argv "--test"] == -1 ? 0 : 1]
 # the geometry of the user interface so far.
 
 vtkKWApplication app
-app SetName "KWSimpleWindowWithImageWidgetExample"
+app SetName "KWMedicalImageViewerExample"
 if {$option_test} {
   app SetRegistryLevel 0
   app PromptBeforeExitOff
@@ -178,7 +180,8 @@ animation_widget SetSliceGetMinAndMaxCommands viewer "GetSliceMin" "GetSliceMax"
 pack [animation_widget GetWidgetName] -side top -anchor nw -expand n -fill x
 
 # Start the application
-# If --test was provided, do not enter the event loop
+# If --test was provided, do not enter the event loop and run this example
+# as a non-interactive test for software quality purposes.
 
 set ret 0
 win Display

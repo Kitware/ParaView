@@ -1,4 +1,4 @@
-#include "vtkKWSimpleWindowWithImageWidgetExample.h"
+#include "vtkKWMedicalImageViewerExample.h"
 
 #include "vtkCornerAnnotation.h"
 #include "vtkImageData.h"
@@ -27,13 +27,15 @@
 #include <vtksys/CommandLineArguments.hxx>
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWSimpleWindowWithImageWidgetExample );
-vtkCxxRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample, "1.14");
+vtkStandardNewMacro( vtkKWMedicalImageViewerExample );
+vtkCxxRevisionMacro(vtkKWMedicalImageViewerExample, "1.1");
 
 //----------------------------------------------------------------------------
-int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
+int vtkKWMedicalImageViewerExample::Run(int argc, char *argv[])
 {
   // Process some command-line arguments
+  // The --test option here is used to run this example as a non-interactive 
+  // test for software quality purposes. You can ignore it.
 
   int option_test = 0;
   vtksys::CommandLineArguments args;
@@ -48,7 +50,7 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
   // the geometry of the user interface so far.
 
   vtkKWApplication *app = this->GetApplication();
-  app->SetName("KWSimpleWindowWithImageWidgetExample");
+  app->SetName("KWMedicalImageViewerExample");
   if (option_test)
     {
     app->SetRegistryLevel(0);
@@ -210,7 +212,8 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
               animation_widget->GetWidgetName());
 
   // Start the application
-  // If --test was provided, do not enter the event loop
+  // If --test was provided, do not enter the event loop and run this example
+  // as a non-interactive test for software quality purposes.
 
   int ret = 0;
   win->Display();
@@ -238,38 +241,38 @@ int vtkKWSimpleWindowWithImageWidgetExample::Run(int argc, char *argv[])
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSimpleWindowWithImageWidgetExample::SetSliceFromScaleCallback(
+void vtkKWMedicalImageViewerExample::SetSliceFromScaleCallback(
   double value)
 {
   this->ImageViewer->SetSlice((int)value);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSimpleWindowWithImageWidgetExample::SetSliceCallback(int slice)
+void vtkKWMedicalImageViewerExample::SetSliceCallback(int slice)
 {
   this->ImageViewer->SetSlice(slice);
 }
 
 //----------------------------------------------------------------------------
-int vtkKWSimpleWindowWithImageWidgetExample::GetSliceCallback()
+int vtkKWMedicalImageViewerExample::GetSliceCallback()
 {
   return this->ImageViewer->GetSlice();
 }
 
 //----------------------------------------------------------------------------
-int vtkKWSimpleWindowWithImageWidgetExample::GetSliceMinCallback()
+int vtkKWMedicalImageViewerExample::GetSliceMinCallback()
 {
   return this->ImageViewer->GetSliceMin();
 }
 
 //----------------------------------------------------------------------------
-int vtkKWSimpleWindowWithImageWidgetExample::GetSliceMaxCallback()
+int vtkKWMedicalImageViewerExample::GetSliceMaxCallback()
 {
   return this->ImageViewer->GetSliceMax();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSimpleWindowWithImageWidgetExample::UpdateSliceScale()
+void vtkKWMedicalImageViewerExample::UpdateSliceScale()
 {
   this->SliceScale->SetRange(
     this->ImageViewer->GetSliceMin(), this->ImageViewer->GetSliceMax());
@@ -277,28 +280,28 @@ void vtkKWSimpleWindowWithImageWidgetExample::UpdateSliceScale()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSimpleWindowWithImageWidgetExample::SetSliceOrientationToXYCallback()
+void vtkKWMedicalImageViewerExample::SetSliceOrientationToXYCallback()
 {
   this->ImageViewer->SetSliceOrientationToXY();
   this->UpdateSliceScale();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSimpleWindowWithImageWidgetExample::SetSliceOrientationToXZCallback()
+void vtkKWMedicalImageViewerExample::SetSliceOrientationToXZCallback()
 {
   this->ImageViewer->SetSliceOrientationToXZ();
   this->UpdateSliceScale();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSimpleWindowWithImageWidgetExample::SetSliceOrientationToYZCallback()
+void vtkKWMedicalImageViewerExample::SetSliceOrientationToYZCallback()
 {
   this->ImageViewer->SetSliceOrientationToYZ();
   this->UpdateSliceScale();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSimpleWindowWithImageWidgetExample::WindowLevelPresetApplyCallback(
+void vtkKWMedicalImageViewerExample::WindowLevelPresetApplyCallback(
   int id)
 {
   if (this->WindowLevelPresetSelector->HasPreset(id))
@@ -311,14 +314,14 @@ void vtkKWSimpleWindowWithImageWidgetExample::WindowLevelPresetApplyCallback(
     }
 }
 //----------------------------------------------------------------------------
-void vtkKWSimpleWindowWithImageWidgetExample::WindowLevelPresetAddCallback()
+void vtkKWMedicalImageViewerExample::WindowLevelPresetAddCallback()
 {
   this->WindowLevelPresetUpdateCallback(
     this->WindowLevelPresetSelector->AddPreset());
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSimpleWindowWithImageWidgetExample::WindowLevelPresetUpdateCallback(
+void vtkKWMedicalImageViewerExample::WindowLevelPresetUpdateCallback(
   int id)
 {
   this->WindowLevelPresetSelector->SetPresetWindow(
@@ -330,7 +333,7 @@ void vtkKWSimpleWindowWithImageWidgetExample::WindowLevelPresetUpdateCallback(
 
 //----------------------------------------------------------------------------
 void 
-vtkKWSimpleWindowWithImageWidgetExample::WindowLevelPresetHasChangedCallback(
+vtkKWMedicalImageViewerExample::WindowLevelPresetHasChangedCallback(
   int id)
 {
   this->WindowLevelPresetSelector->SetPresetImageFromRenderWindow(

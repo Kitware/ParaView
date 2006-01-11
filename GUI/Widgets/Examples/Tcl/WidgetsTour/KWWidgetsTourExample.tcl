@@ -3,6 +3,8 @@
 package require kwwidgets
 
 # Process some command-line arguments
+# The --test option here is used to run this example as a non-interactive test
+# for software quality purposes. Ignore this feature in your own application.
 
 set option_test [expr [lsearch -exact $argv "--test"] == -1 ? 0 : 1]
 
@@ -203,7 +205,8 @@ proc selection_callback {} {
 [widgets_tree GetWidget] SetSelectionChangedCommand "" selection_callback
 
 # Start the application
-# If --test was provided, do not enter the event loop
+# If --test was provided, do not enter the event loop and run this example
+# as a non-interactive test for software quality purposes.
 
 set ret 0
 win Display

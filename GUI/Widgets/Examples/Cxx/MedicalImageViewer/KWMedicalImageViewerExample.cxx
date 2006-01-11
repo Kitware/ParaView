@@ -1,8 +1,8 @@
-#include "vtkKWSimpleWindowWithImageWidgetExample.h"
+#include "vtkKWMedicalImageViewerExample.h"
 #include "vtkKWApplication.h"
 #include <vtksys/SystemTools.hxx>
 
-extern "C" int Kwsimplewindowwithimagewidgetexamplelib_Init(Tcl_Interp *interp);
+extern "C" int Kwmedicalimageviewerexamplelib_Init(Tcl_Interp *interp);
 int my_main(int argc, char *argv[])
 {
   // Initialize Tcl
@@ -13,15 +13,15 @@ int my_main(int argc, char *argv[])
     cerr << "Error: InitializeTcl failed" << endl ;
     return 1;
     }
-  Kwsimplewindowwithimagewidgetexamplelib_Init(interp);
+  Kwmedicalimageviewerexamplelib_Init(interp);
 
   // Create an application object, then create an example object
   // and let it run the demo
 
   vtkKWApplication *app = vtkKWApplication::New();
   
-  vtkKWSimpleWindowWithImageWidgetExample *example = 
-    vtkKWSimpleWindowWithImageWidgetExample::New();
+  vtkKWMedicalImageViewerExample *example = 
+    vtkKWMedicalImageViewerExample::New();
   example->SetApplication(app);
 
   int res = example->Run(argc, argv);

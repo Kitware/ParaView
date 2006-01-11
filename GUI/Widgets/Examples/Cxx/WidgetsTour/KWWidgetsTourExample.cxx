@@ -36,6 +36,8 @@ int my_main(int argc, char *argv[])
     }
 
   // Process some command-line arguments
+  // The --test option here is used to run this example as a non-interactive 
+  // test for software quality purposes. You can ignore it.
 
   int option_test = 0;
   vtksys::CommandLineArguments args;
@@ -318,7 +320,8 @@ int my_main(int argc, char *argv[])
   widgets_tree->GetWidget()->SetSelectionChangedCommand(NULL, buffer);
   
   // Start the application
-  // If --test was provided, do not enter the event loop
+  // If --test was provided, do not enter the event loop and run this example
+  // as a non-interactive test for software quality purposes.
 
   int ret = 0;
   win->Display();

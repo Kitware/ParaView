@@ -31,6 +31,8 @@ int my_main(int argc, char *argv[])
   char buffer[1024];
 
   // Process some command-line arguments
+  // The --test option here is used to run this example as a non-interactive 
+  // test for software quality purposes. You can ignore it.
 
   int option_test = 0;
   vtksys::CommandLineArguments args;
@@ -45,7 +47,7 @@ int my_main(int argc, char *argv[])
   // the geometry of the user interface so far.
 
   vtkKWApplication *app = vtkKWApplication::New();
-  app->SetName("KWSimpleWindowWithPanelsExample");
+  app->SetName("KWWindowWithPanelsExample");
   if (option_test)
     {
     app->SetRegistryLevel(0);
@@ -249,7 +251,8 @@ int my_main(int argc, char *argv[])
     }
   
   // Start the application
-  // If --test was provided, do not enter the event loop
+  // If --test was provided, do not enter the event loop and run this example
+  // as a non-interactive test for software quality purposes.
 
   int ret = 0;
   win->Display();

@@ -1,7 +1,7 @@
 SUBDIRS(
-  SimpleWindow
-  SimpleWindowWithImageWidget
-  SimpleWindowWithPanels
-  SimpleWindowWithRenderWidget
+  HelloWorld
+  MedicalImageViewer
+  PolygonalObjectViewer
   WidgetsTour
+  WindowWithPanels
 )

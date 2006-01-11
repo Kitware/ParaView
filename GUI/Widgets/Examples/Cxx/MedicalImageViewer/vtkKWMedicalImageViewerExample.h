@@ -1,5 +1,5 @@
-#ifndef __vtkKWSimpleWindowWithImageWidgetExample_h
-#define __vtkKWSimpleWindowWithImageWidgetExample_h
+#ifndef __vtkKWMedicalImageViewerExample_h
+#define __vtkKWMedicalImageViewerExample_h
 
 #include "vtkKWObject.h"
 
@@ -8,11 +8,11 @@ class vtkImageViewer2;
 class vtkKWScale;
 class vtkKWWindowLevelPresetSelector;
 
-class vtkKWSimpleWindowWithImageWidgetExample : public vtkKWObject
+class vtkKWMedicalImageViewerExample : public vtkKWObject
 {
 public:
-  static vtkKWSimpleWindowWithImageWidgetExample* New();
-  vtkTypeRevisionMacro(vtkKWSimpleWindowWithImageWidgetExample,vtkKWObject);
+  static vtkKWMedicalImageViewerExample* New();
+  vtkTypeRevisionMacro(vtkKWMedicalImageViewerExample,vtkKWObject);
 
   // Description:
   // Run the example.
@@ -34,8 +34,8 @@ public:
   virtual void WindowLevelPresetHasChangedCallback(int id);
 
 protected:
-  vtkKWSimpleWindowWithImageWidgetExample() {};
-  ~vtkKWSimpleWindowWithImageWidgetExample() {};
+  vtkKWMedicalImageViewerExample() {};
+  ~vtkKWMedicalImageViewerExample() {};
 
   vtkImageViewer2                *ImageViewer; 
   vtkKWScale                     *SliceScale;
@@ -45,8 +45,8 @@ protected:
   virtual void UpdateSliceScale();
 
 private:
-  vtkKWSimpleWindowWithImageWidgetExample(const vtkKWSimpleWindowWithImageWidgetExample&);   // Not implemented.
-  void operator=(const vtkKWSimpleWindowWithImageWidgetExample&);  // Not implemented.
+  vtkKWMedicalImageViewerExample(const vtkKWMedicalImageViewerExample&);   // Not implemented.
+  void operator=(const vtkKWMedicalImageViewerExample&);  // Not implemented.
 };
 
 #endif

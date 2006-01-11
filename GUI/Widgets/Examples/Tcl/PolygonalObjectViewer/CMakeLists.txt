@@ -1,4 +1,4 @@
-PROJECT(SimpleWindowWithPanels)
+PROJECT(PolygonalObjectViewer)
 
 # If we are not in the KWWidgets source tree, make sure we can find KWWidgets
 # as an external package, and use it. If you are using this CMakeLists.txt 

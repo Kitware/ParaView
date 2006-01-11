@@ -1,4 +1,4 @@
-PROJECT(SimpleWindowWithPanels)
+PROJECT(PolygonalObjectViewer)
 
 # If we are not in the KWWidgets source tree, make sure we can find KWWidgets
 # as an external package, and use it. If you are using this CMakeLists.txt 
@@ -34,6 +34,15 @@ IF (WIN32)
     ENDIF(NOT CYGWIN)
   ENDIF (NOT BORLAND)
 ENDIF (WIN32)
+
+# This example uses some files from the KWWidgets distribution tree.
+# Let's configure KWWidgets's vtkKWWidgetsPaths.h.in into our
+# own header file so that we can find the paths to KWWidgets files.
+
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+CONFIGURE_FILE(
+  ${KWWidgets_TEMPLATES_DIR}/vtkKWWidgetsPaths.h.in 
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkKWWidgetsPaths.h)
 
 # Create the executable, and link it against the KWWidgets libraries.
 
