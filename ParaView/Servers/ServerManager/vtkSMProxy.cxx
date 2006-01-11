@@ -34,7 +34,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.61");
+vtkCxxRevisionMacro(vtkSMProxy, "1.62");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -1610,8 +1610,11 @@ vtkPVXMLElement* vtkSMProxy::SaveState(vtkPVXMLElement* root)
 
   iter->Delete();
 
-  root->AddNestedElement(proxyElement);
-  proxyElement->Delete();
+  if (root)
+    {
+    root->AddNestedElement(proxyElement);
+    proxyElement->Delete();
+    }
 
   return proxyElement;
 }

@@ -31,7 +31,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.27");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.28");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -516,35 +516,16 @@ void vtkSMProxyProperty::ChildSaveState(vtkPVXMLElement* propertyElement)
 {
   this->Superclass::ChildSaveState(propertyElement);
 
-  vtkstd::vector<vtkStdString> proxies;
   unsigned int numProxies = this->GetNumberOfProxies();
+  propertyElement->AddAttribute("number_of_elements", numProxies);
   for (unsigned int idx=0; idx<numProxies; idx++)
     {
-    this->DomainIterator->Begin();
-    while (!this->DomainIterator->IsAtEnd())
-      {
-      vtkSMProxyGroupDomain* dom = vtkSMProxyGroupDomain::SafeDownCast(
-        this->DomainIterator->GetDomain());
-      vtkSMProxy* proxy = this->GetProxy(idx);
-      
-      if (dom && dom->IsInDomain(proxy))
-        {
-        proxies.push_back(proxy->GetSelfIDAsString());
-        break;
-        }
-      this->DomainIterator->Next();
-      }
-    }
-  unsigned int numFoundProxies = proxies.size();
-  if (numFoundProxies > 0)
-    {
-    propertyElement->AddAttribute("number_of_elements", numFoundProxies);
-
-    for(unsigned int i=0; i<numFoundProxies; i++)
+    vtkSMProxy* proxy = this->GetProxy(idx);
+    if (proxy)
       {
       vtkPVXMLElement* elementElement = vtkPVXMLElement::New();
       elementElement->SetName("Proxy");
-      elementElement->AddAttribute("value", proxies[i].c_str());
+      elementElement->AddAttribute("value", proxy->GetSelfIDAsString());
       propertyElement->AddNestedElement(elementElement);
       elementElement->Delete();
       }

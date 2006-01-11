@@ -51,6 +51,7 @@ public:
   // of existing properties. Newly created proxies are stored
   // in the map with the id as the key.
   vtkSMProxy* NewProxy(int id);
+  vtkSMProxy* NewProxyFromElement(vtkPVXMLElement* proxyElement, int id);
 
 protected:
   vtkSMStateLoader();
@@ -61,14 +62,13 @@ protected:
   void ClearCreatedProxies();
 
   int HandleProxyCollection(vtkPVXMLElement* collectionElement);
+  void HandleCompoundProxyDefinitions(vtkPVXMLElement* element);
 
   // Either create a new proxy or returns one from the map
   // of existing properties. Newly created proxies are stored
   // in the map with the id as the key. The root is the xml
   // element under which the proxy definitions are stored.
   vtkSMProxy* NewProxy(vtkPVXMLElement* root, int id);
-
-  vtkSMProxy* NewProxyFromElement(vtkPVXMLElement* proxyElement, int id);
 
   vtkSMStateLoaderInternals* Internal;
 

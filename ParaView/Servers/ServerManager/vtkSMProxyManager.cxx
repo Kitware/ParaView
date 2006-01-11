@@ -19,6 +19,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
 #include "vtkSMCompoundProxyDefinitionLoader.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
@@ -79,7 +80,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.31");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.32");
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -569,6 +570,43 @@ void vtkSMProxyManager::UnMarkProxyAsModified(vtkSMProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxyManager::LoadState(const char* filename)
+{
+  vtkPVXMLParser* parser = vtkPVXMLParser::New();
+  parser->SetFileName(filename);
+  parser->Parse();
+
+  this->LoadState(parser->GetRootElement());
+  parser->Delete();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement)
+{
+  if (!rootElement)
+    {
+    return;
+    }
+  vtkSMStateLoader* loader = vtkSMStateLoader::New();
+  loader->LoadState(rootElement);
+  loader->Delete();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::SaveState(const char* filename)
+{
+  vtkPVXMLElement* rootElement = vtkPVXMLElement::New();
+  rootElement->SetName("ServerManagerState");
+
+  this->SaveState(rootElement);
+
+  ofstream os(filename, ios::out);
+  rootElement->PrintXML(os, vtkIndent());
+  rootElement->Delete();
+}
+
+
+//---------------------------------------------------------------------------
 void vtkSMProxyManager::SaveState(vtkPVXMLElement* rootElement)
 {
   if (!rootElement)
@@ -652,7 +690,8 @@ void vtkSMProxyManager::SaveState(vtkPVXMLElement* rootElement)
         {
         vtkPVXMLElement* itemElement = vtkPVXMLElement::New();
         itemElement->SetName("Item");
-        itemElement->AddAttribute("id", it2->second.Proxy.GetPointer()->GetName());
+        itemElement->AddAttribute("id", 
+                     it2->second.Proxy.GetPointer()->GetSelfIDAsString());
         itemElement->AddAttribute("name", it2->first.c_str());
         collectionElement->AddNestedElement(itemElement);
         itemElement->Delete();
@@ -662,7 +701,32 @@ void vtkSMProxyManager::SaveState(vtkPVXMLElement* rootElement)
       }
     }
 
+  vtkPVXMLElement* defs = vtkPVXMLElement::New();
+  defs->SetName("CompoundProxyDefinitions");
+  this->SaveCompoundProxyDefinitions(defs);
+  rootElement->AddNestedElement(defs);
+  defs->Delete();
+
   rootElement->Delete();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::UnRegisterCompoundProxyDefinitions()
+{
+  this->Internals->CompoundProxyDefinitions.erase(
+    this->Internals->CompoundProxyDefinitions.begin(),
+    this->Internals->CompoundProxyDefinitions.end());
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::UnRegisterCompoundProxyDefinition(const char* name)
+{
+  vtkSMProxyManagerInternals::DefinitionType::iterator it =
+    this->Internals->CompoundProxyDefinitions.find(name);
+  if ( it != this->Internals->CompoundProxyDefinitions.end() )
+    {
+    this->Internals->CompoundProxyDefinitions.erase(it);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -696,6 +760,85 @@ vtkPVXMLElement* vtkSMProxyManager::GetCompoundProxyDefinition(
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxyManager::LoadCompoundProxyDefinitions(vtkPVXMLElement* root)
+{
+  if (!root)
+    {
+    return;
+    }
+  
+  unsigned int numElems = root->GetNumberOfNestedElements();
+  for (unsigned int i=0; i<numElems; i++)
+    {
+    vtkPVXMLElement* currentElement = root->GetNestedElement(i);
+    if (currentElement->GetName() &&
+        strcmp(currentElement->GetName(), "CompoundProxyDefinition") == 0)
+      {
+      const char* name = currentElement->GetAttribute("name");
+      if (name)
+        {
+        if (currentElement->GetNumberOfNestedElements() == 1)
+          {
+          vtkPVXMLElement* defElement = currentElement->GetNestedElement(0);
+          if (strcmp(defElement->GetName(), "CompoundProxy") == 0)
+            {
+            this->RegisterCompoundProxyDefinition(name, defElement);
+            }
+          }
+        }
+      }
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::LoadCompoundProxyDefinitions(const char* filename)
+{
+  vtkPVXMLParser* parser = vtkPVXMLParser::New();
+  parser->SetFileName(filename);
+  parser->Parse();
+
+  this->LoadCompoundProxyDefinitions(parser->GetRootElement());
+  parser->Delete();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::SaveCompoundProxyDefinitions(
+  vtkPVXMLElement* rootElement)
+{
+  if (!rootElement)
+    {
+    return;
+    }
+  vtkSMProxyManagerInternals::DefinitionType::iterator iter =
+    this->Internals->CompoundProxyDefinitions.begin();
+  for(; iter != this->Internals->CompoundProxyDefinitions.end(); iter++)
+    {
+    vtkPVXMLElement* elem = iter->second;
+    if (elem)
+      {
+      vtkPVXMLElement* defElement = vtkPVXMLElement::New();
+      defElement->SetName("CompoundProxyDefinition");
+      defElement->AddAttribute("name", iter->first.c_str());
+      defElement->AddNestedElement(elem, 0);
+      rootElement->AddNestedElement(defElement);
+      defElement->Delete();
+      }
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::SaveCompoundProxyDefinitions(const char* filename)
+{
+  vtkPVXMLElement* root = vtkPVXMLElement::New();
+  root->SetName("CompoundProxyDefinitions");
+  this->SaveCompoundProxyDefinitions(root);
+
+  ofstream os(filename, ios::out);
+  root->PrintXML(os, vtkIndent());
+  root->Delete();
+}
+
+//---------------------------------------------------------------------------
 vtkSMCompoundProxy* vtkSMProxyManager::NewCompoundProxy(const char* name)
 {
   vtkPVXMLElement* definition = this->GetCompoundProxyDefinition(name);
@@ -706,19 +849,6 @@ vtkSMCompoundProxy* vtkSMProxyManager::NewCompoundProxy(const char* name)
   vtkSMCompoundProxyDefinitionLoader* loader = 
     vtkSMCompoundProxyDefinitionLoader::New();
   return loader->LoadDefinition(definition);
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProxyManager::SaveState(const char* filename)
-{
-  vtkPVXMLElement* rootElement = vtkPVXMLElement::New();
-  rootElement->SetName("ServerManagerState");
-
-  this->SaveState(rootElement);
-
-  ofstream os(filename, ios::out);
-  rootElement->PrintXML(os, vtkIndent());
-  rootElement->Delete();
 }
 
 //---------------------------------------------------------------------------

@@ -20,7 +20,7 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMCompoundProxyDefinitionLoader);
-vtkCxxRevisionMacro(vtkSMCompoundProxyDefinitionLoader, "1.1");
+vtkCxxRevisionMacro(vtkSMCompoundProxyDefinitionLoader, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMCompoundProxyDefinitionLoader::vtkSMCompoundProxyDefinitionLoader()
@@ -38,32 +38,7 @@ vtkSMCompoundProxy* vtkSMCompoundProxyDefinitionLoader::HandleDefinition(
 {
   vtkSMCompoundProxy* result = vtkSMCompoundProxy::New();
 
-  unsigned int numElems = rootElement->GetNumberOfNestedElements();
-  for (unsigned int i=0; i<numElems; i++)
-    {
-    vtkPVXMLElement* currentElement = rootElement->GetNestedElement(i);
-    if (currentElement->GetName() &&
-        strcmp(currentElement->GetName(), "Proxy") == 0)
-      {
-      const char* compoundName = currentElement->GetAttribute(
-        "compound_name");
-      if (compoundName && compoundName[0] != '\0')
-        {
-        int currentId;
-        if (!currentElement->GetScalarAttribute("id", &currentId))
-          {
-          continue;
-          }
-        vtkSMProxy* subProxy = this->NewProxyFromElement(
-          currentElement, currentId);
-        if (subProxy)
-          {
-          result->AddProxy(compoundName, subProxy);
-          subProxy->Delete();
-          }
-        }
-      }
-    }
+  result->LoadState(rootElement, this);
 
   return result;
 }
@@ -89,16 +64,10 @@ vtkSMCompoundProxy* vtkSMCompoundProxyDefinitionLoader::LoadDefinition(
   this->RootElement = rootElement;
   this->ClearCreatedProxies();
 
-  unsigned int numElems = rootElement->GetNumberOfNestedElements();
-  for (unsigned int i=0; i<numElems; i++)
+  if (rootElement->GetName() &&
+      strcmp(rootElement->GetName(), "CompoundProxy") == 0)
     {
-    vtkPVXMLElement* currentElement = rootElement->GetNestedElement(i);
-    if (currentElement->GetName() &&
-        strcmp(currentElement->GetName(), "CompoundProxy") == 0)
-      {
-      result = this->HandleDefinition(currentElement);
-      break;
-      }
+    result = this->HandleDefinition(rootElement);
     }
 
   this->ClearCreatedProxies();

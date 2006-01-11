@@ -77,6 +77,18 @@ public:
   unsigned int GetNumberOfProxies();
 
   // Description:
+  // Expose all main proxy properties that point to external
+  // proxies.
+  void ExposeExternalProperties();
+
+  // Description:
+  // Given a proxy/property pair, expose the property with the
+  // given (exposed property) name.
+  void ExposeProperty(const char* proxyName, 
+                      const char* propertyName,
+                      const char* exposedName);
+
+  // Description:
   // This is the same as save state except it will remove all references to
   // "outside" proxies. Outside proxies are proxies that are not contained
   // in the compound proxy.  As a result, the saved state will be self
@@ -91,9 +103,17 @@ protected:
 
   vtkSMProxy* MainProxy;
 
+  // Description:
+  // Updates state from an XML element. Returns 0 on failure.
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoader* loader);
   virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
+  void HandleExposedProperties(vtkPVXMLElement* element);
 
   vtkSMCompoundProxyInternals* Internal;
+
+  //BTX
+  friend class vtkSMCompoundProxyDefinitionLoader;
+  //ETX
 
 private:
   // returns 1 if the value element should be written.

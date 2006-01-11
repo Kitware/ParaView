@@ -124,12 +124,35 @@ public:
   void RegisterCompoundProxyDefinition(const char* name, vtkPVXMLElement* top);
 
   // Description:
+  // Given its name, unregisters a compound proxy definition.
+  void UnRegisterCompoundProxyDefinition(const char* name);
+
+  // Description:
+  // Unregisters all registered compound proxy definitions.
+  void UnRegisterCompoundProxyDefinitions();
+
+  // Description:
   // Returns a registered compound proxy definition.
   vtkPVXMLElement* GetCompoundProxyDefinition(const char* name);
 
   // Description:
   // Creates a compound proxy from compound proxy definition.
   vtkSMCompoundProxy* NewCompoundProxy(const char* name); 
+
+  // Description:
+  // Load compound proxy definitions and register them.
+  void LoadCompoundProxyDefinitions(const char* filename);
+  void LoadCompoundProxyDefinitions(vtkPVXMLElement* root);
+
+  // Description:
+  // Save registered compound proxy definitions.
+  void SaveCompoundProxyDefinitions(const char* filename);
+  void SaveCompoundProxyDefinitions(vtkPVXMLElement* root);
+
+  // Description:
+  // Loads the state of the server manager from XML.
+  void LoadState(const char* filename);
+  void LoadState(vtkPVXMLElement* rootElement);
 
   // Description:
   // Save the state of the server manager in XML format in a file.

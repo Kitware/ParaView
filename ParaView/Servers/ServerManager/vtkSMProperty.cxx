@@ -30,7 +30,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.39");
+vtkCxxRevisionMacro(vtkSMProperty, "1.40");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -431,7 +431,7 @@ void vtkSMProperty::SaveState(vtkPVXMLElement* parent,
     vtkPVXMLElement* controllerProxyElem = vtkPVXMLElement::New();
     controllerProxyElem->SetName("ControllerProperty");
     controllerProxyElem->AddAttribute("id",
-      this->ControllerProxy->GetName());
+      this->ControllerProxy->GetSelfIDAsString());
     controllerProxyElem->AddAttribute("name",
       this->ControllerPropertyName);
     propertyElement->AddNestedElement(controllerProxyElem);

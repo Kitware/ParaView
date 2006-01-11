@@ -16,6 +16,7 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMCompoundProxy.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSmartPointer.h"
@@ -23,7 +24,7 @@
 #include <vtkstd/map>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.6");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.7");
 
 struct vtkSMStateLoaderInternals
 {
@@ -65,21 +66,29 @@ vtkSMProxy* vtkSMStateLoader::NewProxyFromElement(
 
   vtkSMProxyManager* pm = this->GetProxyManager();
 
-  const char* group = proxyElement->GetAttribute("group");
-  const char* type = proxyElement->GetAttribute("type");
-  if (!type || !group)
+  vtkSMProxy* proxy = 0;
+  if (strcmp(proxyElement->GetName(), "Proxy") == 0)
     {
-    vtkErrorMacro("Could not create proxy from element.");
-    return 0;
+    const char* group = proxyElement->GetAttribute("group");
+    const char* type = proxyElement->GetAttribute("type");
+    if (!type || !group)
+      {
+      vtkErrorMacro("Could not create proxy from element.");
+      return 0;
+      }
+    proxy = pm->NewProxy(group, type);
+    if (!proxy)
+      {
+      vtkErrorMacro("Could not create a proxy of group: "
+                    << group
+                    << " type: "
+                    << type);
+      return 0;
+      }
     }
-  vtkSMProxy* proxy = pm->NewProxy(group, type);
-  if (!proxy)
+  else if (strcmp(proxyElement->GetName(), "CompoundProxy") == 0)
     {
-    vtkErrorMacro("Could not create a proxy of group: "
-                  << group
-                  << " type: "
-                  << type);
-    return 0;
+    proxy = vtkSMCompoundProxy::New();
     }
   this->Internal->CreatedProxies[id] = proxy;
   if (!proxy->LoadState(proxyElement, this))
@@ -118,7 +127,8 @@ vtkSMProxy* vtkSMStateLoader::NewProxy(vtkPVXMLElement* root,
     {
     vtkPVXMLElement* currentElement = root->GetNestedElement(i);
     if (currentElement->GetName() &&
-        strcmp(currentElement->GetName(), "Proxy") == 0)
+        (strcmp(currentElement->GetName(), "Proxy") == 0 ||
+         strcmp(currentElement->GetName(), "CompoundProxy") == 0))
       {
       int currentId;
       if (!currentElement->GetScalarAttribute("id", &currentId))
@@ -193,6 +203,14 @@ int vtkSMStateLoader::HandleProxyCollection(vtkPVXMLElement* collectionElement)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMStateLoader::HandleCompoundProxyDefinitions(
+  vtkPVXMLElement* element)
+{
+  vtkSMProxyManager* pm = this->GetProxyManager();
+  pm->LoadCompoundProxyDefinitions(element);
+}
+
+//---------------------------------------------------------------------------
 void vtkSMStateLoader::ClearCreatedProxies()
 {
   this->Internal->CreatedProxies.clear();
@@ -222,12 +240,19 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_proxies/*
   for (unsigned int i=0; i<numElems; i++)
     {
     vtkPVXMLElement* currentElement = rootElement->GetNestedElement(i);
-    if (currentElement->GetName() &&
-        strcmp(currentElement->GetName(), "ProxyCollection") == 0)
+    const char* name = currentElement->GetName();
+    if (name)
       {
-      if (!this->HandleProxyCollection(currentElement))
+      if (strcmp(name, "ProxyCollection") == 0)
         {
-        return 0;
+        if (!this->HandleProxyCollection(currentElement))
+          {
+          return 0;
+          }
+        }
+      else if (strcmp(name, "CompoundProxyDefinitions") == 0)
+        {
+        this->HandleCompoundProxyDefinitions(currentElement);
         }
       }
     }
