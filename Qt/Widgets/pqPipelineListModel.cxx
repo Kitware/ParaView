@@ -262,12 +262,12 @@ QModelIndex pqPipelineListModel::index(int row, int column,
   return QModelIndex();
 }
 
-QModelIndex pqPipelineListModel::parent(const QModelIndex &index) const
+QModelIndex pqPipelineListModel::parent(const QModelIndex &idx) const
 {
-  if(this->Root && index.isValid() && index.model() == this)
+  if(this->Root && idx.isValid() && idx.model() == this)
     {
     pqPipelineListItem *item = reinterpret_cast<pqPipelineListItem *>(
-        index.internalPointer());
+        idx.internalPointer());
     if(item && item->Parent && item->Parent->Parent)
       {
       int row = item->Parent->Parent->Internal.indexOf(item->Parent);
@@ -279,12 +279,12 @@ QModelIndex pqPipelineListModel::parent(const QModelIndex &index) const
   return QModelIndex();
 }
 
-QVariant pqPipelineListModel::data(const QModelIndex &index, int role) const
+QVariant pqPipelineListModel::data(const QModelIndex &idx, int role) const
 {
-  if(this->Root && index.isValid() && index.model() == this)
+  if(this->Root && idx.isValid() && idx.model() == this)
     {
     pqPipelineListItem *item = reinterpret_cast<pqPipelineListItem *>(
-        index.internalPointer());
+        idx.internalPointer());
     if(item)
       {
       switch(role)
@@ -307,18 +307,18 @@ QVariant pqPipelineListModel::data(const QModelIndex &index, int role) const
   return QVariant();
 }
 
-Qt::ItemFlags pqPipelineListModel::flags(const QModelIndex &index) const
+Qt::ItemFlags pqPipelineListModel::flags(const QModelIndex &/*idx*/) const
 {
   return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 }
 
 pqPipelineListModel::ItemType pqPipelineListModel::getTypeFor(
-    const QModelIndex &index) const
+    const QModelIndex &idx) const
 {
-  if(this->Internal && index.isValid() && index.model() == this)
+  if(this->Internal && idx.isValid() && idx.model() == this)
     {
     pqPipelineListItem *item = reinterpret_cast<pqPipelineListItem *>(
-        index.internalPointer());
+        idx.internalPointer());
     if(item)
       return item->Type;
     }
@@ -326,13 +326,13 @@ pqPipelineListModel::ItemType pqPipelineListModel::getTypeFor(
   return pqPipelineListModel::Invalid;
 }
 
-vtkSMProxy *pqPipelineListModel::getProxyFor(const QModelIndex &index) const
+vtkSMProxy *pqPipelineListModel::getProxyFor(const QModelIndex &idx) const
 {
   vtkSMProxy *proxy = 0;
-  if(this->Internal && index.isValid() && index.model() == this)
+  if(this->Internal && idx.isValid() && idx.model() == this)
     {
     pqPipelineListItem *item = reinterpret_cast<pqPipelineListItem *>(
-        index.internalPointer());
+        idx.internalPointer());
     if(item && (item->Type == pqPipelineListModel::Source || 
         item->Type == pqPipelineListModel::Filter))
       {
@@ -343,13 +343,13 @@ vtkSMProxy *pqPipelineListModel::getProxyFor(const QModelIndex &index) const
   return proxy;
 }
 
-QWidget *pqPipelineListModel::getWidgetFor(const QModelIndex &index) const
+QWidget *pqPipelineListModel::getWidgetFor(const QModelIndex &idx) const
 {
   QWidget *widget = 0;
-  if(this->Internal && index.isValid() && index.model() == this)
+  if(this->Internal && idx.isValid() && idx.model() == this)
     {
     pqPipelineListItem *item = reinterpret_cast<pqPipelineListItem *>(
-        index.internalPointer());
+        idx.internalPointer());
     if(item && item->Type == pqPipelineListModel::Window)
       widget = item->Data.Window->GetWidget();
     }
@@ -877,8 +877,8 @@ void pqPipelineListModel::addConnection(pqPipelineObject *source,
     }
 }
 
-void pqPipelineListModel::removeConnection(pqPipelineObject *source,
-    pqPipelineObject *sink)
+void pqPipelineListModel::removeConnection(pqPipelineObject* /*source*/,
+                                           pqPipelineObject* /*sink*/)
 {
 }
 

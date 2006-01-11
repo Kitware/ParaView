@@ -514,16 +514,16 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
   if(!this->Pipeline || !this->PipelineList)
     return;
     
-  QVTKWidget *window = this->PipelineList->getCurrentWindow();
-  if(window)
+  QVTKWidget *win = this->PipelineList->getCurrentWindow();
+  if(win)
     {
     vtkSMSourceProxy* source = 0;
-    vtkSMRenderModuleProxy* rm = this->Pipeline->getRenderModule(window);
+    vtkSMRenderModuleProxy* rm = this->Pipeline->getRenderModule(win);
     for(int i = 0; i != Files.size(); ++i)
       {
       QString file = Files[i];
       
-      source = vtkSMSourceProxy::SafeDownCast(this->Pipeline->createSource("ExodusReader", window));
+      source = vtkSMSourceProxy::SafeDownCast(this->Pipeline->createSource("ExodusReader", win));
       this->CurrentServer->GetProxyManager()->RegisterProxy("paraq", "source1", source);
       source->Delete();
       Adaptor->setProperty(source->GetProperty("FileName"), file);
@@ -538,7 +538,7 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
       }
 
     rm->ResetCamera();
-    window->update();
+    win->update();
 
     // Select the latest source in the pipeline inspector.
     if(source)
@@ -564,7 +564,7 @@ void pqMainWindow::onFileOpenServerState(pqServer* Server)
   file_dialog->show();
 }
 
-void pqMainWindow::onFileOpenServerState(const QStringList& Files)
+void pqMainWindow::onFileOpenServerState(const QStringList& /*Files*/)
 {
 }
 
@@ -661,7 +661,7 @@ void pqMainWindow::onUpdateWindows()
     */
 }
 
-void pqMainWindow::onUpdateSourcesFiltersMenu(pqServer* Server)
+void pqMainWindow::onUpdateSourcesFiltersMenu(pqServer* /*Server*/)
 {
   this->FiltersMenu->clear();
   this->SourcesMenu->clear();
@@ -711,14 +711,14 @@ void pqMainWindow::onCreateSource(QAction* action)
     return;
 
   QByteArray sourceName = action->data().toString().toAscii();
-  QVTKWidget* window = this->PipelineList->getCurrentWindow();
-  if(window)
+  QVTKWidget* win = this->PipelineList->getCurrentWindow();
+  if(win)
     {
-    vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(this->Pipeline->createSource(sourceName, window));
+    vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(this->Pipeline->createSource(sourceName, win));
     this->Pipeline->setVisibility(this->Pipeline->createDisplay(source), true);
-    vtkSMRenderModuleProxy* rm = this->Pipeline->getRenderModule(window);
+    vtkSMRenderModuleProxy* rm = this->Pipeline->getRenderModule(win);
     rm->ResetCamera();
-    window->update();
+    win->update();
     this->PipelineList->selectProxy(source);
     }
 }
@@ -730,15 +730,15 @@ void pqMainWindow::onCreateFilter(QAction* action)
   
   QByteArray filterName = action->data().toString().toAscii();
   vtkSMProxy *current = this->PipelineList->getSelectedProxy();
-  QVTKWidget *window = this->PipelineList->getCurrentWindow();
-  if(current && window)
+  QVTKWidget *win = this->PipelineList->getCurrentWindow();
+  if(current && win)
     {
     vtkSMSourceProxy *source = 0;
     vtkSMProxy *next = this->PipelineList->getNextProxy();
     if(next)
       {
       this->PipelineList->getListModel()->beginCreateAndInsert();
-      source = vtkSMSourceProxy::SafeDownCast(this->Pipeline->createFilter(filterName, window));
+      source = vtkSMSourceProxy::SafeDownCast(this->Pipeline->createFilter(filterName, win));
       this->Pipeline->addInput(source, current);
       this->Pipeline->addInput(next, source);
       this->Pipeline->removeInput(next, current);
@@ -748,7 +748,7 @@ void pqMainWindow::onCreateFilter(QAction* action)
     else
       {
       this->PipelineList->getListModel()->beginCreateAndAppend();
-      source = vtkSMSourceProxy::SafeDownCast(this->Pipeline->createFilter(filterName, window));
+      source = vtkSMSourceProxy::SafeDownCast(this->Pipeline->createFilter(filterName, win));
       this->Pipeline->addInput(source, current);
       this->PipelineList->getListModel()->finishCreateAndAppend();
 
@@ -756,9 +756,9 @@ void pqMainWindow::onCreateFilter(QAction* action)
       this->Pipeline->setVisibility(this->Pipeline->createDisplay(source), true);
       }
 
-    vtkSMRenderModuleProxy *rm = this->Pipeline->getRenderModule(window);
+    vtkSMRenderModuleProxy *rm = this->Pipeline->getRenderModule(win);
     rm->ResetCamera();
-    window->update();
+    win->update();
     this->PipelineList->selectProxy(source);
     }
 }
@@ -827,8 +827,8 @@ void pqMainWindow::onPythonShell()
 class pqMultiViewRenderModuleUpdater : public QObject
 {
 public:
-  pqMultiViewRenderModuleUpdater(vtkSMProxy* view, QWidget* topWidget, QWidget* parent)
-    : QObject(parent), View(view), TopWidget(topWidget) {}
+  pqMultiViewRenderModuleUpdater(vtkSMProxy* view, QWidget* topWidget, QWidget* p)
+    : QObject(p), View(view), TopWidget(topWidget) {}
 
 protected:
   bool eventFilter(QObject* caller, QEvent* e)
@@ -865,7 +865,7 @@ protected:
 
 };
 
-void pqMainWindow::onNewQVTKWidget(pqMultiViewFrame* parent)
+void pqMainWindow::onNewQVTKWidget(pqMultiViewFrame* p)
 {
   vtkSMMultiViewRenderModuleProxy* rm = this->CurrentServer->GetRenderModule();
   vtkSMRenderModuleProxy* view = vtkSMRenderModuleProxy::SafeDownCast(rm->NewRenderModule());
@@ -880,8 +880,8 @@ void pqMainWindow::onNewQVTKWidget(pqMultiViewFrame* parent)
   view->UpdateVTKObjects();
 
 
-  QVTKWidget* w = new QVTKWidget(parent);
-  parent->setMainWidget(w);
+  QVTKWidget* w = new QVTKWidget(p);
+  p->setMainWidget(w);
 
 
   // gotta tell SM about window positions
@@ -910,18 +910,18 @@ void pqMainWindow::onNewQVTKWidget(pqMultiViewFrame* parent)
   this->Pipeline->addWindow(w, this->CurrentServer);
   this->PipelineList->selectWindow(w);
 
-  QSignalMapper* sm = new QSignalMapper(parent);
-  sm->setMapping(parent, parent);
-  QObject::connect(parent, SIGNAL(activeChanged(bool)), sm, SLOT(map()));
+  QSignalMapper* sm = new QSignalMapper(p);
+  sm->setMapping(p, p);
+  QObject::connect(p, SIGNAL(activeChanged(bool)), sm, SLOT(map()));
   QObject::connect(sm, SIGNAL(mapped(QWidget*)), this, SLOT(onFrameActive(QWidget*)));
 
-  //parent->setActive(1);
+  //p->setActive(1);
   
 }
 
-void pqMainWindow::onDeleteQVTKWidget(pqMultiViewFrame* parent)
+void pqMainWindow::onDeleteQVTKWidget(pqMultiViewFrame* p)
 {
-  QVTKWidget* w = qobject_cast<QVTKWidget*>(parent->mainWidget());
+  QVTKWidget* w = qobject_cast<QVTKWidget*>(p->mainWidget());
   vtkSMRenderModuleProxy* rm = this->Pipeline->removeViewMapping(w);
 
   // delete render module
@@ -930,7 +930,7 @@ void pqMainWindow::onDeleteQVTKWidget(pqMultiViewFrame* parent)
   // Remove the window from the pipeline data structure.
   this->Pipeline->removeWindow(w);
 
-  if(this->ActiveView == parent)
+  if(this->ActiveView == p)
     {
     this->ActiveView = 0;
     }

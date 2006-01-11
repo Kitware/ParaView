@@ -450,7 +450,7 @@ void pqSMAdaptor::qtLinkedPropertyChanged(QWidget* data)
     }
 }
 
-void pqSMAdaptor::connectDomain(vtkSMProperty* property, QObject* qObject, const char* slot)
+void pqSMAdaptor::connectDomain(vtkSMProperty* prop, QObject* qObject, const char* slot)
 {
   if(!QMetaObject::checkConnectArgs(SIGNAL(foo(vtkSMProperty*)), slot))
     {
@@ -460,13 +460,13 @@ void pqSMAdaptor::connectDomain(vtkSMProperty* property, QObject* qObject, const
     return;
     }
 
-  vtkSMDomainIterator* domainIter = property->NewDomainIterator();
+  vtkSMDomainIterator* domainIter = prop->NewDomainIterator();
   for(; !domainIter->IsAtEnd(); domainIter->Next())
     {
     pqSMAdaptorInternal::DomainConnectionMap::iterator iter =
       this->Internal->DomainConnections.insert(this->Internal->DomainConnections.end(),
                                                pqSMAdaptorInternal::DomainConnectionMap::value_type(
-                                                 property, vtkstd::pair<QObject*, QByteArray>(
+                                                 prop, vtkstd::pair<QObject*, QByteArray>(
                                                    qObject, slot)));
     this->Internal->VTKConnections->Connect(domainIter->GetDomain(), vtkCommand::DomainModifiedEvent,
                                             this, SLOT(smDomainChanged(vtkObject*, unsigned long, void*)),
@@ -475,17 +475,17 @@ void pqSMAdaptor::connectDomain(vtkSMProperty* property, QObject* qObject, const
   domainIter->Delete();
 }
 
-void pqSMAdaptor::disconnectDomain(vtkSMProperty* property, QObject* qObject, const char* slot)
+void pqSMAdaptor::disconnectDomain(vtkSMProperty* prop, QObject* qObject, const char* slot)
 {
   typedef vtkstd::pair<pqSMAdaptorInternal::DomainConnectionMap::iterator, pqSMAdaptorInternal::DomainConnectionMap::iterator> PairIter;
 
-  PairIter iters = this->Internal->DomainConnections.equal_range(property);
+  PairIter iters = this->Internal->DomainConnections.equal_range(prop);
 
   for(; iters.first != iters.second; ++iters.first)
     {
     if(iters.first->second.first == qObject && iters.first->second.second == slot)
       {
-      vtkSMDomainIterator* domainIter = property->NewDomainIterator();
+      vtkSMDomainIterator* domainIter = prop->NewDomainIterator();
       for(; !domainIter->IsAtEnd(); domainIter->Next())
         {
         this->Internal->VTKConnections->Disconnect(domainIter->GetDomain(), vtkCommand::DomainModifiedEvent,

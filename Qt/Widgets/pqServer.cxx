@@ -66,7 +66,7 @@ public:
   {
   }
   
-  virtual void SetLocalProgress(const char *filter, int progress)
+  virtual void SetLocalProgress(const char* /*filter*/, int /*progress*/)
   {
   }
   
@@ -78,7 +78,7 @@ public:
   {
   }
 
-  virtual int RunGUIStart(int argc, char **argv, int numServerProcs, int myId)
+  virtual int RunGUIStart(int /*argc*/, char** /*argv*/, int /*numServerProcs*/, int /*myId*/)
   {
     return 0;
   }
