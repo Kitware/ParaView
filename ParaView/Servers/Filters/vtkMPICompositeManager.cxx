@@ -20,7 +20,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkRenderWindow.h"
 vtkStandardNewMacro(vtkMPICompositeManager);
-vtkCxxRevisionMacro(vtkMPICompositeManager, "1.4");
+vtkCxxRevisionMacro(vtkMPICompositeManager, "1.5");
 
 //-----------------------------------------------------------------------------
 static void vtkMPICompositeManagerGatherZBufferValueRMI(void *local, void *pArg, 
@@ -198,13 +198,14 @@ void vtkMPICompositeManager::StartRender()
 }
 
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
+int vtkMPICompositeManager::ChooseBuffer()
+{
+  // Choose the back buffer if double buffering is on.
+  return (this->RenderWindow->GetDoubleBuffer() == 0 ||
+    this->LastRenderInFrontBuffer());
+  // If LastRenderInFrontBuffer then front buffer is the buffer to work on.
+}
+
 //-----------------------------------------------------------------------------
 void vtkMPICompositeManager::PrintSelf(ostream& os, vtkIndent indent)
 {
