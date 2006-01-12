@@ -118,6 +118,8 @@ protected:
 
   vtkSMProxy* MainProxy;
 
+  virtual vtkSMProperty* GetProperty(const char* name, int selfOnly);
+
   // Description:
   // Updates state from an XML element. Returns 0 on failure.
   virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoader* loader);
