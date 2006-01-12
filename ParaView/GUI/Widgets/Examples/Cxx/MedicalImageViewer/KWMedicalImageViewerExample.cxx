@@ -13,6 +13,9 @@ int my_main(int argc, char *argv[])
     cerr << "Error: InitializeTcl failed" << endl ;
     return 1;
     }
+
+  // Initialize our Tcl library (i.e. our classes wrapped in Tcl)
+
   Kwmedicalimageviewerexamplelib_Init(interp);
 
   // Create an application object, then create an example object
