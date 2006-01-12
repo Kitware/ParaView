@@ -24,8 +24,7 @@ int VTK_TK_EXPORT Vtkkwwidgetsinitializecommand_Init(Tcl_Interp *interp)
   if(Tcl_PkgPresent(interp, (char *)"Tcl", (char *)TCL_VERSION, 0))
     {
     ostrstream err;
-    Tcl_Interp *res = 
-      vtkKWApplication::InitializeTcl(interp, &err);
+    Tcl_Interp *res = vtkKWApplication::InitializeTcl(interp, &err);
     err << ends;
     if (!res && *(err.str()))
       {
