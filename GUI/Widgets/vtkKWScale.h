@@ -120,7 +120,7 @@ public:
   virtual double GetTickInterval();
   
   // Description
-  // Set/Get the sting to display as a label for the scale. 
+  // Set/Get the string to display as a label for the scale. 
   // For vertical scales the label is displayed just to the right of the top
   // end of the scale. For horizontal scales the label is displayed just above
   // the left end of the scale. If the option is specified as an empty string, 
@@ -131,7 +131,8 @@ public:
 
   // Description:
   // Specifies commands to associate with the widget. 
-  // 'Command' is invoked when the widget value is changed.
+  // 'Command' is invoked when the widget value is changed (i.e., during user
+  // interaction on the widget's slider).
   // 'StartCommand' is invoked at the beginning of an interaction with
   // the widget.
   // 'EndCommand' is invoked at the end of an interaction with the widget.
@@ -144,6 +145,21 @@ public:
   virtual void SetCommand(vtkObject *object, const char *method);
   virtual void SetStartCommand(vtkObject *object, const char *method);
   virtual void SetEndCommand(vtkObject *object, const char *method);
+
+  // Description:
+  // Events. The ScaleValueChangingEvent is triggered when the widget value
+  // is changed (i.e., during user interaction on the widget's slider),
+  // the ScaleValueChangedEvent is invoked at the end of an interaction with 
+  // the widget.
+  // The following parameters are also passed as client data:
+  // - the current value: double
+  //BTX
+  enum
+  {
+    ScaleValueChangingEvent = 10000,
+    ScaleValueChangedEvent
+  };
+  //ETX
 
   // Description:
   // Set/get whether the above commands should be called or not.
