@@ -1289,6 +1289,46 @@
    <!-- End  PartScalars -->
    </SourceProxy>
 
+   <SourceProxy name="OctreeDepthScalars" class="vtkHyperOctreeDepth">
+     <InputProperty
+        name="Input"
+        command="AddInput"
+        clean_command="RemoveAllInputs">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkHyperOctree"/>
+           </DataTypeDomain>
+      </InputProperty>
+   <!-- End  OctreeDepthScalars-->
+   </SourceProxy>
+
+   <SourceProxy name="OctreeDepthLimit" class="vtkHyperOctreeLimiter">
+     <InputProperty
+        name="Input"
+        command="AddInput"
+        clean_command="RemoveAllInputs">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkHyperOctree"/>
+           </DataTypeDomain>
+      </InputProperty>
+
+     <IntVectorProperty 
+        name="MaximumLevel" 
+        command="SetMaximumLevel" 
+        number_of_elements="1"
+        default_values="4" > 
+       <IntRangeDomain name="range" min="3" max="255"/>
+     </IntVectorProperty>
+   <!-- End  OctreeDepthLimit-->
+   </SourceProxy>
+
    <SourceProxy name="ProcessIdScalars" class="vtkProcessIdScalars">
      <InputProperty
         name="Input"

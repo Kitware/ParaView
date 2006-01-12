@@ -1202,6 +1202,55 @@ The Outline Corners filter generates the corners of a bounding box for the input
 The Part Id Scalars filter assigns a unique scalar value to each part in the input. The input parts must have been collected together either as a result of a reader that loads multiple parts (e.g., EnSight reader) or because the Group Parts filter has been run to form a collection of data sets.
     </Documentation>
   </Module>
+
+  <Module name="OctreeDepthScalars"
+          menu_name="Octree Depth Scalars"
+          root_name="OctreeDepth"
+          module_type="Filter"
+          long_help="This filter adds a scalar to each leaf of the octree that represents the leaf's depth within the tree."
+          short_help="Computes cell depths within the octree.">
+    <Filter class="vtkHyperOctreeDepth">
+      <Input name="Input"
+             class="vtkHyperOctree"
+             quantity="Single">
+        <GroupRequirement quantity="Single"/>
+      </Input>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <Documentation>
+The vtkHyperOctreeDepth filter adds a scalar to each leaf of the octree that represents the leaf's depth within the tree.
+    </Documentation>
+  </Module>
+
+  <Module name="OctreeDepthLimit"
+          menu_name="Octree Depth Limit"
+          root_name="OctreeLimit"
+          module_type="Filter"
+          long_help="This filter takes in a octree and produces a new octree which is no deeper than the maximum specified depth level."
+          short_help="Reduce an octree's resolution.">
+    <Filter class="vtkHyperOctreeLimiter">
+      <Input name="Input"
+             class="vtkHyperOctree"
+             quantity="Single">
+        <GroupRequirement quantity="Single"/>
+      </Input>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+      <VectorEntry label="MaximumLevel" 
+                   trace_name="MaximumLevel"
+                   property="MaximumLevel" 
+                   type="int"
+                   help="Set the maximum depth of the output."/>
+    <Documentation>
+The vtkHyperOctreeLimiter takes in a octree and produces a new octree in which is nowhere deeper than the maximum specified depth level. The attribute data of pruned leaf cells is integrated in to their ancestors at the cut level.
+    </Documentation>
+  </Module>
   <Module name="ProcessIdScalars"
           menu_name="Process Id Scalars"
           root_name="PIScalars"
