@@ -87,6 +87,10 @@ IF(WIN32)
       STRING(REGEX REPLACE "(.):/" "/cygdrive/\\1/" 
         KWWidgets_PATHS "${KWWidgets_PATHS}")
       STRING(REGEX REPLACE ";" ":" KWWidgets_PATHS "${KWWidgets_PATHS}")
+      STRING(REGEX REPLACE "/cygdrive/(.)/" "\\1:/" 
+        VTK_TCL_PATH "${VTK_TCL_PATH}")
+      STRING(REGEX REPLACE "/cygdrive/(.)/" "\\1:/" 
+        KWWidgets_TCL_PATH "${KWWidgets_TCL_PATH}")
       CONFIGURE_FILE(
         ${KWWidgets_SOURCE_DIR}/Wrapping/Tcl/KWWidgetsSetupPaths.sh.in
         ${EXECUTABLE_OUTPUT_PATH}/${config}/KWWidgetsSetupPaths.sh
@@ -97,6 +101,14 @@ IF(WIN32)
       ${KWWidgets_SOURCE_DIR}/Wrapping/Tcl/KWWidgetsSetupPaths.bat.in
       ${EXECUTABLE_OUTPUT_PATH}/KWWidgetsSetupPaths.bat
       IMMEDIATE)
+    # For Cygwin
+    STRING(REGEX REPLACE "(.):/" "/cygdrive/\\1/" 
+      KWWidgets_PATHS "${KWWidgets_PATHS}")
+    STRING(REGEX REPLACE ";" ":" KWWidgets_PATHS "${KWWidgets_PATHS}")
+    STRING(REGEX REPLACE "/cygdrive/(.)/" "\\1:/" 
+      VTK_TCL_PATH "${VTK_TCL_PATH}")
+    STRING(REGEX REPLACE "/cygdrive/(.)/" "\\1:/" 
+      KWWidgets_TCL_PATH "${KWWidgets_TCL_PATH}")
     CONFIGURE_FILE(
       ${KWWidgets_SOURCE_DIR}/Wrapping/Tcl/KWWidgetsSetupPaths.sh.in
       ${EXECUTABLE_OUTPUT_PATH}/KWWidgetsSetupPaths.sh
