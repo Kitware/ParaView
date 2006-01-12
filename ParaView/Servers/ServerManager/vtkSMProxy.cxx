@@ -34,7 +34,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.62");
+vtkCxxRevisionMacro(vtkSMProxy, "1.63");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -1736,23 +1736,26 @@ void vtkSMProxy::PrintSelf(ostream& os, vtkIndent indent)
     << endl;
 
   vtkSMPropertyIterator* iter = this->NewPropertyIterator();
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+  if (iter)
     {
-    const char* key = iter->GetKey();
-    vtkSMProperty* property = iter->GetProperty();
-    if (key)
+    for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
       {
-      os << indent << "Property (" << key << "): ";
-      if (property)
+      const char* key = iter->GetKey();
+      vtkSMProperty* property = iter->GetProperty();
+      if (key)
         {
-        os << endl;
-        property->PrintSelf(os, indent.GetNextIndent());
-        }
-      else
-        {
-        os << "(none)" << endl; 
+        os << indent << "Property (" << key << "): ";
+        if (property)
+          {
+          os << endl;
+          property->PrintSelf(os, indent.GetNextIndent());
+          }
+        else
+          {
+          os << "(none)" << endl; 
+          }
         }
       }
+    iter->Delete();
     }
-  iter->Delete();
 }
