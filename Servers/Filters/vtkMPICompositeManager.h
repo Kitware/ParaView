@@ -53,6 +53,11 @@ public:
   // Overridden to set the Image Size when ParallelRendering is off.
   virtual void StartRender();
 
+  // Description:
+  // Select buffer to read from / render into.
+  // Overridden to choose the back buffer only when the
+  // buffers haven;t been swapped yet.
+  virtual int ChooseBuffer();
 protected:
   vtkMPICompositeManager();
   ~vtkMPICompositeManager();
