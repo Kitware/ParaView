@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCompoundProxy);
-vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.7");
 
 vtkCxxSetObjectMacro(vtkSMCompoundProxy, MainProxy, vtkSMProxy);
 
@@ -132,6 +132,17 @@ vtkSMProperty* vtkSMCompoundProxy::GetProperty(const char* name)
     }
 
   return this->MainProxy->GetProperty(name);
+}
+
+//---------------------------------------------------------------------------
+vtkSMProperty* vtkSMCompoundProxy::GetProperty(const char* name, int selfOnly)
+{
+  if (!this->MainProxy)
+    {
+    return 0;
+    }
+
+  return this->MainProxy->GetProperty(name, selfOnly);
 }
 
 //---------------------------------------------------------------------------
@@ -336,8 +347,9 @@ void vtkSMCompoundProxy::HandleExposedProperties(vtkPVXMLElement* element)
 int vtkSMCompoundProxy::LoadState(vtkPVXMLElement* proxyElement, 
                                   vtkSMStateLoader* loader)
 {
+  unsigned int i;
   unsigned int numElems = proxyElement->GetNumberOfNestedElements();
-  for (unsigned int i=0; i<numElems; i++)
+  for (i=0; i<numElems; i++)
     {
     vtkPVXMLElement* currentElement = proxyElement->GetNestedElement(i);
     if (currentElement->GetName() &&
@@ -364,7 +376,7 @@ int vtkSMCompoundProxy::LoadState(vtkPVXMLElement* proxyElement,
     }
 
 
-  for (unsigned int i=0; i<numElems; i++)
+  for (i=0; i<numElems; i++)
     {
     vtkPVXMLElement* currentElement = proxyElement->GetNestedElement(i);
     if (currentElement->GetName() &&
