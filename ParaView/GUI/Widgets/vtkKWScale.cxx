@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.111");
+vtkCxxRevisionMacro(vtkKWScale, "1.112");
 
 //----------------------------------------------------------------------------
 vtkKWScale::vtkKWScale()
@@ -79,7 +79,7 @@ void vtkKWScale::Create()
     return;
     }
 
-  this->ValueVisibilityOff();
+  this->ValueVisibilityOn();
   this->SetBorderWidth(2);
   this->SetHighlightThickness(0);
 
@@ -305,7 +305,7 @@ void vtkKWScale::InvokeScaleCommand(const char *command, double value)
     {
     // As a convenience, try to detect if we are manipulating integers, and
     // invoke the callback with the approriate type.
-    if ((double)((long int)value) == value)
+    if ((double)((long int)this->Resolution) == this->Resolution)
       {
       this->Script("%s %ld", command, (long int)value);
       }
@@ -326,6 +326,7 @@ void vtkKWScale::SetCommand(vtkObject *object, const char *method)
 void vtkKWScale::InvokeCommand(double value)
 {
   this->InvokeScaleCommand(this->Command, value);
+  this->InvokeEvent(vtkKWScale::ScaleValueChangingEvent, &value);
 }
 
 //----------------------------------------------------------------------------
@@ -350,6 +351,7 @@ void vtkKWScale::SetEndCommand(vtkObject *object, const char * method)
 void vtkKWScale::InvokeEndCommand(double value)
 {
   this->InvokeScaleCommand(this->EndCommand, value);
+  this->InvokeEvent(vtkKWScale::ScaleValueChangedEvent, &value);
 }
 
 //----------------------------------------------------------------------------
