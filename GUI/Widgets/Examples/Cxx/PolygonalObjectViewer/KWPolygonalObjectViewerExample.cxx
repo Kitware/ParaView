@@ -18,8 +18,8 @@ int my_main(int argc, char *argv[])
 {
   // Initialize Tcl
 
-  Tcl_Interp *res = vtkKWApplication::InitializeTcl(argc, argv, &cerr);
-  if (!res)
+  Tcl_Interp *interp = vtkKWApplication::InitializeTcl(argc, argv, &cerr);
+  if (!interp)
     {
     cerr << "Error: InitializeTcl failed" << endl ;
     return 1;

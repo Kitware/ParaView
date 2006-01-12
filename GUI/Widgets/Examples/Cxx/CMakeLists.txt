@@ -1,4 +1,5 @@
 SUBDIRS(
+  Callbacks
   HelloWorld
   MedicalImageViewer
   PolygonalObjectViewer
