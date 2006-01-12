@@ -1,2 +1,2 @@
-export PATH=$PATH:"${TCL_TCLSH_PATH}":"${VTK_PATHS}":"${KWWidgets_PATHS}"
+export PATH=$PATH:${KWWidgets_PATHS}
 export TCLLIBPATH="$TCLLIBPATH \"${VTK_TCL_PATH}\" \"${KWWidgets_TCL_PATH}\""
