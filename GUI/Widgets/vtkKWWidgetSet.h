@@ -103,7 +103,8 @@ public:
   vtkGetMacro(WidgetsInternalPadY, int);
 
   // Description:
-  // Set the layout to allow the widgets to expand automatically 
+  // Set the layout to allow the widgets to expand automatically
+  // within the set.
   virtual void SetExpandWidgets(int);
   vtkBooleanMacro(ExpandWidgets, int);
   vtkGetMacro(ExpandWidgets, int);
