@@ -40,9 +40,9 @@ public:
   {
   }
 
-  FileInfo(const QString& fileName, const bool isDir) :
-    FileName(fileName),
-    IsDir(isDir)
+  FileInfo(const QString& filename, const bool isdir) :
+    FileName(filename),
+    IsDir(isdir)
   {
   }
 
@@ -126,31 +126,31 @@ public:
     emit layoutChanged();
   }
 
-  int columnCount(const QModelIndex& parent) const
+  int columnCount(const QModelIndex& /*p*/) const
   {
     return 1;
   }
 
-  QVariant data(const QModelIndex & index, int role) const
+  QVariant data(const QModelIndex & idx, int role) const
   {
-    if(!index.isValid())
+    if(!idx.isValid())
       return QVariant();
 
-    if(index.row() >= this->FileList.size())
+    if(idx.row() >= this->FileList.size())
       return QVariant();
 
-    const FileInfo& file = this->FileList[index.row()];
+    const FileInfo& file = this->FileList[idx.row()];
 
     switch(role)
       {
       case Qt::DisplayRole:
-        switch(index.column())
+        switch(idx.column())
           {
           case 0:
             return file.fileName();
           }
       case Qt::DecorationRole:
-        switch(index.column())
+        switch(idx.column())
           {
           case 0:
             return Icons().icon(file.isDir() ? QFileIconProvider::Folder : QFileIconProvider::File);
@@ -160,30 +160,30 @@ public:
     return QVariant();
   }
 
-  QModelIndex index(int row, int column, const QModelIndex& parent) const
+  QModelIndex index(int row, int column, const QModelIndex& /*p*/) const
   {
     return createIndex(row, column);
   }
 
-  QModelIndex parent(const QModelIndex& index) const
+  QModelIndex parent(const QModelIndex& /*idx*/) const
   {
     return QModelIndex();
   }
 
-  int rowCount(const QModelIndex& parent) const
+  int rowCount(const QModelIndex& /*p*/) const
   {
     return this->FileList.size();
   }
 
-  bool hasChildren(const QModelIndex& parent) const
+  bool hasChildren(const QModelIndex& p) const
   {
-    if(!parent.isValid())
+    if(!p.isValid())
       return true;
       
     return false;
   }
 
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const
+  QVariant headerData(int section, Qt::Orientation /*orientation*/, int role) const
   {
     switch(role)
       {
@@ -210,40 +210,40 @@ class pqFavoriteModel :
   public QAbstractItemModel
 {
 public:
-  virtual int columnCount(const QModelIndex& parent) const
+  virtual int columnCount(const QModelIndex& /*p*/) const
   {
     return 1;
   }
   
-  virtual QVariant data(const QModelIndex & index, int role) const
+  virtual QVariant data(const QModelIndex & /*idx*/, int /*role*/) const
   {
     return QVariant();
   }
   
-  virtual QModelIndex index(int row, int column, const QModelIndex& parent) const
+  virtual QModelIndex index(int row, int column, const QModelIndex& /*p*/) const
   {
     return createIndex(row, column);
   }
   
-  virtual QModelIndex parent(const QModelIndex& index) const
+  virtual QModelIndex parent(const QModelIndex& /*idx*/) const
   {
     return QModelIndex();
   }
   
-  virtual int rowCount(const QModelIndex& parent) const
+  virtual int rowCount(const QModelIndex& /*p*/) const
   {
     return 0;
   }
   
-  virtual bool hasChildren(const QModelIndex& parent) const
+  virtual bool hasChildren(const QModelIndex& p) const
   {
-    if(!parent.isValid())
+    if(!p.isValid())
       return true;
       
     return false;
   }
   
-  virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const
+  virtual QVariant headerData(int /*section*/, Qt::Orientation /*orientation*/, int /*role*/) const
   {
     return QVariant();
   }

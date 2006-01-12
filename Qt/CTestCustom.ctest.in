@@ -3,4 +3,5 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "QtCore"
   "QtGui"
   "Qt3Support"
+  "python2.3"
   )

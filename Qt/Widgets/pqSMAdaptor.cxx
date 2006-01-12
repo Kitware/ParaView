@@ -499,7 +499,7 @@ void pqSMAdaptor::disconnectDomain(vtkSMProperty* prop, QObject* qObject, const 
     }
 }
 
-void pqSMAdaptor::smDomainChanged(vtkObject*, unsigned long event, void* data)
+void pqSMAdaptor::smDomainChanged(vtkObject*, unsigned long /*event*/, void* data)
 {
   pqSMAdaptorInternal::DomainConnectionMap::value_type* call = 
     reinterpret_cast<pqSMAdaptorInternal::DomainConnectionMap::value_type*>(data);
