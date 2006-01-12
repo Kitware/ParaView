@@ -57,40 +57,53 @@ SUBDIRS(kwwidgets)
 
 # Configure some helper file to setup paths
 
-GET_FILENAME_COMPONENT(TCL_TCLSH_PATH "${TCL_TCLSH}" PATH)
+GET_FILENAME_COMPONENT(KWWidgets_PATHS ${TCL_TCLSH} PATH)
+SET(KWWidgets_PATHS ${KWWidgets_PATHS} 
+  ${VTK_LIBRARY_DIRS} ${VTK_RUNTIME_DIRS} 
+  ${LIBRARY_OUTPUT_PATH} ${EXECUTABLE_OUTPUT_PATH})
+SET(VTK_TCL_PATH "${VTK_DIR}/Wrapping/Tcl")
+SET(KWWidgets_TCL_PATH "${KWWidgets_BINARY_DIR}/Wrapping/Tcl")
 
 IF(WIN32)
   IF(CMAKE_CONFIGURATION_TYPES)
     FOREACH(config ${CMAKE_CONFIGURATION_TYPES})
+      GET_FILENAME_COMPONENT(KWWidgets_PATHS "${TCL_TCLSH}" PATH)
       FOREACH(dir ${VTK_LIBRARY_DIRS})
-        SET(VTK_PATHS ${VTK_PATHS} "${dir}/${config}")
+        SET(KWWidgets_PATHS ${KWWidgets_PATHS} "${dir}/${config}")
       ENDFOREACH(dir)
       FOREACH(dir ${VTK_RUNTIME_DIRS})
-        SET(VTK_PATHS ${VTK_PATHS} "${dir}/${config}")
+        SET(KWWidgets_PATHS ${KWWidgets_PATHS} "${dir}/${config}")
       ENDFOREACH(dir)
+      SET(KWWidgets_PATHS ${KWWidgets_PATHS} 
+        "${LIBRARY_OUTPUT_PATH}/${config}" 
+        "${EXECUTABLE_OUTPUT_PATH}/${config}")
       SET(VTK_TCL_PATH "${VTK_DIR}/Wrapping/Tcl/${config}")
-      SET(KWWidgets_PATHS "${LIBRARY_OUTPUT_PATH}/${config}" "${EXECUTABLE_OUTPUT_PATH}/${config}")
       SET(KWWidgets_TCL_PATH "${KWWidgets_BINARY_DIR}/Wrapping/Tcl/${config}")
       CONFIGURE_FILE(
         ${KWWidgets_SOURCE_DIR}/Wrapping/Tcl/KWWidgetsSetupPaths.bat.in
         ${EXECUTABLE_OUTPUT_PATH}/${config}/KWWidgetsSetupPaths.bat
         IMMEDIATE)
+      # For Cygwin
+      STRING(REGEX REPLACE "(.):/" "/cygdrive/\\1/" 
+        KWWidgets_PATHS "${KWWidgets_PATHS}")
+      STRING(REGEX REPLACE ";" ":" KWWidgets_PATHS "${KWWidgets_PATHS}")
+      CONFIGURE_FILE(
+        ${KWWidgets_SOURCE_DIR}/Wrapping/Tcl/KWWidgetsSetupPaths.sh.in
+        ${EXECUTABLE_OUTPUT_PATH}/${config}/KWWidgetsSetupPaths.sh
+        IMMEDIATE)
     ENDFOREACH(config)
   ELSE(CMAKE_CONFIGURATION_TYPES)
-    SET(VTK_PATHS ${VTK_LIBRARY_DIRS} ${VTK_RUNTIME_DIRS})
-    SET(VTK_TCL_PATH "${VTK_DIR}/Wrapping/Tcl")
-    SET(KWWidgets_PATHS "${LIBRARY_OUTPUT_PATH}" "${EXECUTABLE_OUTPUT_PATH}")
-    SET(KWWidgets_TCL_PATH "${KWWidgets_BINARY_DIR}/Wrapping/Tcl")
     CONFIGURE_FILE(
       ${KWWidgets_SOURCE_DIR}/Wrapping/Tcl/KWWidgetsSetupPaths.bat.in
       ${EXECUTABLE_OUTPUT_PATH}/KWWidgetsSetupPaths.bat
       IMMEDIATE)
+    CONFIGURE_FILE(
+      ${KWWidgets_SOURCE_DIR}/Wrapping/Tcl/KWWidgetsSetupPaths.sh.in
+      ${EXECUTABLE_OUTPUT_PATH}/KWWidgetsSetupPaths.sh
+      IMMEDIATE)
   ENDIF(CMAKE_CONFIGURATION_TYPES)
 ELSE(WIN32)
-  SET(VTK_PATHS ${VTK_LIBRARY_DIRS} ${VTK_RUNTIME_DIRS})
-  SET(VTK_TCL_PATH "${VTK_DIR}/Wrapping/Tcl")
-  SET(KWWidgets_PATHS "${LIBRARY_OUTPUT_PATH}" "${EXECUTABLE_OUTPUT_PATH}")
-  SET(KWWidgets_TCL_PATH "${KWWidgets_BINARY_DIR}/Wrapping/Tcl")
+  STRING(REGEX REPLACE ";" ":" KWWidgets_PATHS "${KWWidgets_PATHS}")
   CONFIGURE_FILE(
     ${KWWidgets_SOURCE_DIR}/Wrapping/Tcl/KWWidgetsSetupPaths.sh.in
     ${EXECUTABLE_OUTPUT_PATH}/KWWidgetsSetupPaths.sh
