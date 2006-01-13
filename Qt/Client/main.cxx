@@ -48,7 +48,7 @@ void printUsage()
 }
 
 /// Parses command-line arguments for the --version flag, returning unused arguments
-const arguments_t handleVersion(arguments_t& Arguments, bool& Quit, bool& Error)
+const arguments_t handleVersion(arguments_t& Arguments, bool& Quit, bool& /*Error*/)
 {
   if(vtkstd::count(Arguments.begin(), Arguments.end(), "--version"))
     {
