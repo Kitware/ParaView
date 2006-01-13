@@ -61,7 +61,7 @@ const arguments_t handleVersion(arguments_t& Arguments, bool& Quit, bool& Error)
 }
 
 /// Parses command-line arguments for the --help flag, returning unused arguments
-const arguments_t handleHelp(arguments_t& Arguments, bool& Quit, bool& Error)
+const arguments_t handleHelp(arguments_t& Arguments, bool& Quit, bool& /*Error*/)
 {
   if(vtkstd::count(Arguments.begin(), Arguments.end(), "--help"))
     {
@@ -102,7 +102,7 @@ const arguments_t handleTestCases(const arguments_t& Arguments, QObject& RootObj
 }
 
 /// Parses command-line arguments for the --temp-directory flag, returning unused arguments
-const arguments_t handleTestDirectory(const arguments_t& Arguments, bool& Quit, bool& Error)
+const arguments_t handleTestDirectory(const arguments_t& Arguments, bool& /*Quit*/, bool& /*Error*/)
 {
   arguments_t unused;
   
@@ -121,7 +121,7 @@ const arguments_t handleTestDirectory(const arguments_t& Arguments, bool& Quit, 
 }
 
 /// Parses command-line arguments for the --image-threshold flag, returning unused arguments
-const arguments_t handleImageThreshold(const arguments_t& Arguments, bool& Quit, bool& Error)
+const arguments_t handleImageThreshold(const arguments_t& Arguments, bool& /*Quit*/, bool& /*Error*/)
 {
   arguments_t unused;
   
@@ -160,7 +160,7 @@ const arguments_t handleCompareView(const arguments_t& Arguments, pqMainWindow& 
 }
 
 /// Parses command-line arguments for the --exit flag, returning unused arguments
-const arguments_t handleExit(arguments_t& Arguments, bool& Quit, bool& Error)
+const arguments_t handleExit(arguments_t& Arguments, bool& Quit, bool& /*Error*/)
 {
   if(vtkstd::count(Arguments.begin(), Arguments.end(), "--exit"))
     {

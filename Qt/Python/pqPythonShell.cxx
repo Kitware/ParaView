@@ -120,9 +120,9 @@ pqPythonShell::pqPythonShell(QWidget* Parent) :
   QWidget(Parent),
   Implementation(new pqImplementation(this))
 {
-  QVBoxLayout* const layout = new QVBoxLayout(this);
-  layout->setMargin(0);
-  layout->addWidget(&this->Implementation->Console);
+  QVBoxLayout* const boxLayout = new QVBoxLayout(this);
+  boxLayout->setMargin(0);
+  boxLayout->addWidget(&this->Implementation->Console);
 
   this->setObjectName("pythonShell");
   
