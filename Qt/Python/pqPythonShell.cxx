@@ -34,13 +34,13 @@ struct pqPythonShell::pqImplementation
     this->Interpreter.MakeCurrent();
     
     // Redirect Python's stdout and stderr
-    PySys_SetObject("stdout", reinterpret_cast<PyObject*>(pqWrap(this->pythonStdout)));
-    PySys_SetObject("stderr", reinterpret_cast<PyObject*>(pqWrap(this->pythonStderr)));
+    PySys_SetObject(const_cast<char*>("stdout"), reinterpret_cast<PyObject*>(pqWrap(this->pythonStdout)));
+    PySys_SetObject(const_cast<char*>("stderr"), reinterpret_cast<PyObject*>(pqWrap(this->pythonStderr)));
 
     /** \todo Add the path to the *installed* paraview module to Python's path, or do some sort of dynamic lookup */
     
     // For the convenience of developers, add the path to the paraview module in the source tree to Python's path
-    if(PyObject* path = PySys_GetObject("path"))
+    if(PyObject* path = PySys_GetObject(const_cast<char*>("path")))
       {
       PyObject* const module_dir = PyString_FromString(QDir::convertSeparators(PARAQ_DEFAULT_PYTHON_MODULE_DIR).toAscii().data());
       PyList_Insert(path, 0, module_dir);
@@ -48,7 +48,7 @@ struct pqPythonShell::pqImplementation
       }
 
     // For the convenience of developers, add the path to the built server manager wrappers to Python's path
-    if(PyObject* path = PySys_GetObject("path"))
+    if(PyObject* path = PySys_GetObject(const_cast<char*>("path")))
       {
       PyObject* const module_dir = PyString_FromString(QDir::convertSeparators(PARAQ_LIBRARY_OUTPUT_PATH).toAscii().data());
       PyList_Insert(path, 0, module_dir);
@@ -56,17 +56,17 @@ struct pqPythonShell::pqImplementation
       }
       
     // Setup Python's interactive prompts
-    PyObject* ps1 = PySys_GetObject("ps1");
+    PyObject* ps1 = PySys_GetObject(const_cast<char*>("ps1"));
     if(!ps1)
       {
-        PySys_SetObject("ps1", ps1 = PyString_FromString(">>> "));
+        PySys_SetObject(const_cast<char*>("ps1"), ps1 = PyString_FromString(">>> "));
         Py_XDECREF(ps1);
       }
       
-    PyObject* ps2 = PySys_GetObject("ps2");
+    PyObject* ps2 = PySys_GetObject(const_cast<char*>("ps2"));
     if(!ps2)
       {
-        PySys_SetObject("ps2", ps2 = PyString_FromString("... "));
+        PySys_SetObject(const_cast<char*>("ps2"), ps2 = PyString_FromString("... "));
         Py_XDECREF(ps2);
       }
   }
@@ -76,8 +76,8 @@ struct pqPythonShell::pqImplementation
     this->Interpreter.MakeCurrent();
     
     // Restore Python's original stdout and stderr
-    PySys_SetObject("stdout", PySys_GetObject("__stdout__"));
-    PySys_SetObject("stderr", PySys_GetObject("__stderr__"));
+    PySys_SetObject(const_cast<char*>("stdout"), PySys_GetObject(const_cast<char*>("__stdout__")));
+    PySys_SetObject(const_cast<char*>("stderr"), PySys_GetObject(const_cast<char*>("__stderr__")));
   }
   
   void executeCommand(const QString& Command)
@@ -96,9 +96,9 @@ struct pqPythonShell::pqImplementation
     this->Console.setFormat(format);
 
     if(this->MultilineStatement.isEmpty())
-      this->Console.printString(PyString_AsString(PySys_GetObject("ps1")));
+      this->Console.printString(PyString_AsString(PySys_GetObject(const_cast<char*>("ps1"))));
     else
-      this->Console.printString(PyString_AsString(PySys_GetObject("ps2")));
+      this->Console.printString(PyString_AsString(PySys_GetObject(const_cast<char*>("ps2"))));
   }
 
   /// Provides a console for gathering user input and displaying Python output
