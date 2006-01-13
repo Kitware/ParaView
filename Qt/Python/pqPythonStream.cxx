@@ -53,7 +53,7 @@ PyObject* pqPythonStreamWrapperWrite(PyObject* self, PyObject* args)
     return 0;
     
   const char* string;
-  if(!PyArg_ParseTuple(args, "s", &string))
+  if(!PyArg_ParseTuple(args, const_cast<char*>("s"), &string))
     return 0;
     
   stream->write(string);
