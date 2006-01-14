@@ -178,13 +178,13 @@ foreach widget $widgets {
     }
     [widgets_tree GetWidget] AddNode $parent_node $name $name
 
-    set tcl_source($name) [read [open $widget]]
+    set tcl_source($name) [read [open "$widget"]]
 
     # Try to find the C++ source too
 
     set cxx_source_name [file join [file dirname [info script]] ".." ".." Cxx WidgetsTour Widgets ${name}.cxx]
     if {[file exists $cxx_source_name]} {
-      set cxx_source($name) [read [open $cxx_source_name]]
+      set cxx_source($name) [read [open "$cxx_source_name"]]
     } else {
       set cxx_source($name) {}
     }
