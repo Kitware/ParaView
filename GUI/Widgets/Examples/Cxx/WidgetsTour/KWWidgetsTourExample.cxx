@@ -266,7 +266,7 @@ int my_main(int argc, char *argv[])
         }
       if (vtksys::SystemTools::FileExists(buffer))
         {
-        app->Script("set cxx_source(%s) [read [open %s]]", 
+        app->Script("set cxx_source(%s) [read [open \"%s\"]]", 
                     node_ptr->Name, buffer);
         }
       else
@@ -290,7 +290,7 @@ int my_main(int argc, char *argv[])
         }
       if (vtksys::SystemTools::FileExists(buffer))
         {
-        app->Script("set tcl_source(%s) [read [open %s]]", 
+        app->Script("set tcl_source(%s) [read [open \"%s\"]]", 
                     node_ptr->Name, buffer);
         }
       else
