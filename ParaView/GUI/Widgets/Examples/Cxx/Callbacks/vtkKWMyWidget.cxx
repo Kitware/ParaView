@@ -7,7 +7,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMyWidget );
-vtkCxxRevisionMacro(vtkKWMyWidget, "1.1");
+vtkCxxRevisionMacro(vtkKWMyWidget, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWMyWidget::vtkKWMyWidget()
@@ -89,8 +89,6 @@ void vtkKWMyWidget::ScaleChangeNotifiedByCommandCallback(double value)
 void vtkKWMyWidget::ProcessCallbackCommandEvents(
   vtkObject *caller, unsigned long event, void *calldata)
 {
-  vtkKWScale *scale = vtkKWScale::SafeDownCast(caller);
-
   vtkKWMyApplication *myapp = vtkKWMyApplication::SafeDownCast(
     this->GetApplication());
 
