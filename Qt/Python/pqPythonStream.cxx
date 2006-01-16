@@ -63,14 +63,14 @@ PyObject* pqPythonStreamWrapperWrite(PyObject* self, PyObject* args)
 
 PyMethodDef pqPythonStreamWrapperMethods[] =
 {
-  { "write", pqPythonStreamWrapperWrite, METH_VARARGS, "Write to the stream" },
+  { const_cast<char*>("write"), pqPythonStreamWrapperWrite, METH_VARARGS, const_cast<char*>("Write to the stream") },
   { 0 }
 };
 
 static PyTypeObject pqPythonStreamWrapperType = {
     PyObject_HEAD_INIT(NULL)
     0,                         // ob_size
-    "pqPythonStreamWrapper",   // tp_name
+    const_cast<char*>("pqPythonStreamWrapper"),   // tp_name
     sizeof(pqPythonStreamWrapper), // tp_basicsize
     0,                         // tp_itemsize
     0,                         // tp_dealloc
@@ -89,7 +89,7 @@ static PyTypeObject pqPythonStreamWrapperType = {
     0,                         // tp_setattro
     0,                         // tp_as_buffer
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, // tp_flags
-    "pqPythonStreamWrapper",   //  tp_doc 
+    const_cast<char*>("pqPythonStreamWrapper"),   //  tp_doc 
     0,                         //  tp_traverse 
     0,                         //  tp_clear 
     0,                         //  tp_richcompare 
