@@ -153,9 +153,6 @@ bool pqPipelineServer::RemoveWindow(QWidget *window)
       {
       if(*iter && (*iter)->GetWidget() == window)
         {
-        delete *iter;
-        this->Internal->Windows.erase(iter);
-
         // Clean up all objects connected with the window.
         QHash<vtkSMProxy *, pqPipelineObject *>::Iterator jter =
             this->Internal->Objects.begin();
@@ -178,6 +175,9 @@ bool pqPipelineServer::RemoveWindow(QWidget *window)
             ++jter;
             }
           }
+        
+        delete *iter;
+        this->Internal->Windows.erase(iter);
 
         return true;
         }
