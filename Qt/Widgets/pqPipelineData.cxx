@@ -17,6 +17,7 @@
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMDisplayProxy.h"
+#include "vtkSMCompoundProxy.h"
 
 #include <QList>
 #include <QMap>
@@ -229,7 +230,7 @@ void pqPipelineData::clearViewMapping()
     this->Internal->ViewMap.clear();
 }
 
-vtkSMProxy *pqPipelineData::createSource(const char *proxyName,
+vtkSMSourceProxy *pqPipelineData::createSource(const char *proxyName,
     QVTKWidget *window)
 {
   if(!this->Internal || !proxyName || !window)
@@ -252,7 +253,7 @@ vtkSMProxy *pqPipelineData::createSource(const char *proxyName,
 
   // Create a proxy object on the server.
   vtkSMProxyManager *proxyManager = server->GetServer()->GetProxyManager();
-  vtkSMProxy *proxy = proxyManager->NewProxy("sources", proxyName);
+  vtkSMSourceProxy *proxy = vtkSMSourceProxy::SafeDownCast(proxyManager->NewProxy("sources", proxyName));
 
   // Register the proxy with the server manager. Use a unique name
   // based on the class name and a count.
@@ -271,11 +272,11 @@ vtkSMProxy *pqPipelineData::createSource(const char *proxyName,
     emit this->sourceCreated(source);
     }
 
-  this->setCurrentProxy(vtkSMSourceProxy::SafeDownCast(proxy));
+  this->setCurrentProxy(proxy);
   return proxy;
 }
 
-vtkSMProxy *pqPipelineData::createFilter(const char *proxyName,
+vtkSMSourceProxy *pqPipelineData::createFilter(const char *proxyName,
     QVTKWidget *window)
 {
   if(!this->Internal || !proxyName || !window)
@@ -298,7 +299,7 @@ vtkSMProxy *pqPipelineData::createFilter(const char *proxyName,
 
   // Create a proxy object on the server.
   vtkSMProxyManager *proxyManager = server->GetServer()->GetProxyManager();
-  vtkSMProxy *proxy = proxyManager->NewProxy("filters", proxyName);
+  vtkSMSourceProxy *proxy = vtkSMSourceProxy::SafeDownCast(proxyManager->NewProxy("filters", proxyName));
 
   // Register the proxy with the server manager. Use a unique name
   // based on the class name and a count.
@@ -317,15 +318,66 @@ vtkSMProxy *pqPipelineData::createFilter(const char *proxyName,
     emit this->filterCreated(filter);
     }
 
-  this->setCurrentProxy(vtkSMSourceProxy::SafeDownCast(proxy));
+  this->setCurrentProxy(proxy);
   return proxy;
 }
 
-vtkSMDisplayProxy* pqPipelineData::createDisplay(vtkSMSourceProxy* proxy)
+vtkSMCompoundProxy *pqPipelineData::createCompoundProxy(const char *proxyName,
+    QVTKWidget *window)
+{
+  if(!this->Internal || !proxyName || !window)
+    return 0;
+
+  // Get the server from the window.
+  pqPipelineServer *server = 0;
+  QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
+  for( ; iter != this->Internal->Servers.end(); ++iter)
+    {
+    if(*iter && (*iter)->GetWindow(window))
+      {
+      server = *iter;
+      break;
+      }
+    }
+
+  if(!server)
+    return 0;
+
+  // Create a proxy object on the server.
+  vtkSMProxyManager *proxyManager = server->GetServer()->GetProxyManager();
+  vtkSMCompoundProxy *proxy = vtkSMCompoundProxy::SafeDownCast(proxyManager->NewCompoundProxy(proxyName));
+
+  // Register the proxy with the server manager. Use a unique name
+  // based on the class name and a count.
+  QString name;
+  name.setNum(this->Names->GetCountAndIncrement(proxyName));
+  name.prepend(proxyName);
+  proxyManager->RegisterProxy("compound_proxies", name.toAscii().data(), proxy);
+  proxy->Delete();
+
+  // Create an internal representation for the filter.
+  pqPipelineObject *filter = server->AddCompoundProxy(proxy);
+  if(filter)
+    {
+    filter->SetProxyName(name);
+    filter->SetParent(server->GetWindow(window));
+    emit this->filterCreated(filter);
+    }
+
+  this->setCurrentProxy(proxy);
+  return proxy;
+}
+
+vtkSMDisplayProxy* pqPipelineData::createDisplay(vtkSMSourceProxy* proxy, vtkSMProxy* rep)
 {
   if(!this->Internal || !proxy)
     {
     return NULL;
+    }
+
+  if(!rep)
+    {
+    rep = proxy;
     }
   
   // Get the object from the list of servers.
@@ -335,7 +387,7 @@ vtkSMDisplayProxy* pqPipelineData::createDisplay(vtkSMSourceProxy* proxy)
     {
     if(*iter)
       {
-      object = (*iter)->GetObject(proxy);
+      object = (*iter)->GetObject(rep);
       if(object)
         break;
       }
@@ -350,7 +402,7 @@ vtkSMDisplayProxy* pqPipelineData::createDisplay(vtkSMSourceProxy* proxy)
   if(!module)
     return NULL;
       
-  vtkSMDisplayProxy* display = pqAddPart(module, vtkSMSourceProxy::SafeDownCast(proxy));
+  vtkSMDisplayProxy* display = pqAddPart(module, proxy);
   object->SetDisplayProxy(display);
 
   return display;
@@ -366,6 +418,7 @@ void pqPipelineData::setVisibility(vtkSMDisplayProxy* display, bool on)
   display->SetVisibilityCM(on);
 }
 
+// TODO: how to handle compound proxies better ????
 void pqPipelineData::addInput(vtkSMProxy *proxy, vtkSMProxy *input)
 {
   if(!this->Internal || !proxy || !input)
@@ -395,6 +448,19 @@ void pqPipelineData::addInput(vtkSMProxy *proxy, vtkSMProxy *input)
   // Make sure the two objects are not already connected.
   if(sink->HasInput(source))
     return;
+
+  // TODO  hardwired compound proxies
+  vtkSMCompoundProxy* compoundProxy = vtkSMCompoundProxy::SafeDownCast(proxy);
+  if(compoundProxy)
+    {
+    proxy = compoundProxy->GetMainProxy();
+    }
+  
+  compoundProxy = vtkSMCompoundProxy::SafeDownCast(input);
+  if(compoundProxy)
+    {
+    input = compoundProxy->GetProxy(compoundProxy->GetNumberOfProxies()-1);
+    }
 
   vtkSMInputProperty *inputProp = vtkSMInputProperty::SafeDownCast(
       proxy->GetProperty("Input"));
@@ -519,13 +585,13 @@ pqPipelineWindow *pqPipelineData::getObjectFor(QVTKWidget *window) const
   return 0;
 }
 
-void pqPipelineData::setCurrentProxy(vtkSMSourceProxy* proxy)
+void pqPipelineData::setCurrentProxy(vtkSMProxy* proxy)
 {
   this->CurrentProxy = proxy;
   emit this->currentProxyChanged(this->CurrentProxy);
 }
 
-vtkSMSourceProxy * pqPipelineData::currentProxy() const
+vtkSMProxy * pqPipelineData::currentProxy() const
 {
   return this->CurrentProxy;
 }

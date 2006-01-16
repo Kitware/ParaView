@@ -123,6 +123,9 @@ IF(BUILD_TESTING)
   ADD_TEST(QtClientAboutDialog    ${TEST_BINARY} --run-test ${TEST_XML}/AboutDialog.xml --exit)
   ADD_TEST(QtClientFileDialog     ${TEST_BINARY} --run-test ${TEST_XML}/FileDialog.xml --exit)
   ADD_TEST(QtClientCreateSource   ${TEST_BINARY} --run-test ${TEST_XML}/CreateSource.xml --compare-view ${TEST_IMAGE}/CreateSource.png)
+  CONFIGURE_FILE(${QtClient_SOURCE_DIR}/Testing/XML/filters.xml
+                 ${QtClient_BINARY_DIR}/Testing/XML/filters.xml COPYONLY)
+  ADD_TEST(QtClientCompoundProxy  ${TEST_BINARY} --run-test ${TEST_XML}/CompoundProxy.xml --exit)
 ENDIF(BUILD_TESTING)
 
 CONFIGURE_FILE(${QtClient_SOURCE_DIR}/pqConfig.h.in

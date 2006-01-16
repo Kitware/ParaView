@@ -59,13 +59,6 @@ void pqServerBrowser::accept()
   emit serverConnected(server);
 
   base::accept();
-  delete this;
-}
-
-void pqServerBrowser::reject()
-{
-  base::reject();
-  delete this;
 }
 
 void pqServerBrowser::onServerTypeActivated(int Index)

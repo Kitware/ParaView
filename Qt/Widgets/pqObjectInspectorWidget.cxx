@@ -58,7 +58,7 @@ pqObjectInspectorWidget::~pqObjectInspectorWidget()
     this->TreeView->setModel(0);
 }
 
-void pqObjectInspectorWidget::setProxy(vtkSMSourceProxy *proxy)
+void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
 {
   if(this->Inspector)
     {

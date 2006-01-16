@@ -15,7 +15,7 @@
 
 class vtkCommand;
 class vtkObject;
-class vtkSMSourceProxy;
+class vtkSMProxy;
 
 /// Displays a histogram based on data from a single proxy
 class QTWIDGETS_EXPORT pqObjectHistogramWidget :
@@ -29,7 +29,7 @@ public:
 
 public slots:
   /// Call this to set the proxy that will become the data source
-  void setProxy(vtkSMSourceProxy*);
+  void setProxy(vtkSMProxy*);
   /// Call this to set the current variable
   void setCurrentVariable(const QString&);
   /// Call this to set the current bin count (defaults to 10)

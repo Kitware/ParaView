@@ -18,7 +18,6 @@ class QString;
 class QTreeView;
 class QVTKWidget;
 class vtkSMProxy;
-class vtkSMSourceProxy;
 
 class QTWIDGETS_EXPORT pqPipelineListWidget : public QWidget
 {
@@ -36,7 +35,7 @@ public:
   QVTKWidget *getCurrentWindow() const;
 
 signals:
-  void proxySelected(vtkSMSourceProxy *proxy);
+  void proxySelected(vtkSMProxy *proxy);
 
 public slots:
   void selectProxy(vtkSMProxy *proxy);

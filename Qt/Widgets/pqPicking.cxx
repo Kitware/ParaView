@@ -28,8 +28,8 @@ pqPicking::pqPicking(vtkSMRenderModuleProxy* rm, QObject* p)
 
   // create the pick filter
   vtkSMProxyManager *proxyManager = pqServer::GetProxyManager();
-  this->PickFilter = vtkSMSourceProxy::SafeDownCast(proxyManager->NewProxy("filters", "Pick"));
-  this->PickFilter->CreateParts();  // needed?
+  this->PickFilter = proxyManager->NewProxy("filters", "Pick");
+  //this->PickFilter->CreateParts();  // needed?
 
   // specify we want to use points to pick with
   vtkSMIntVectorProperty *useIdToPickProperty = vtkSMIntVectorProperty::SafeDownCast(this->PickFilter->GetProperty("UseIdToPick"));
@@ -95,7 +95,7 @@ void pqPicking::computeSelection(vtkRenderWindowInteractor* /*iren*/, int X, int
   // TODO: find a better way to decide the input of the pick filter.
   pqPipelineData* pipeline = pqPipelineData::instance();
 
-  vtkSMSourceProxy* inputProxy = pipeline->currentProxy();
+  vtkSMProxy* inputProxy = pipeline->currentProxy();
 
   if(!inputProxy)
     return;

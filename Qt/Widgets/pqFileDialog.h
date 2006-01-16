@@ -36,7 +36,6 @@ private:
   pqFileDialog& operator=(const pqFileDialog&);
 
   void accept();
-  void reject();
   
   pqFileDialogModel* const Model;
   Ui::pqFileDialog Ui;
@@ -49,7 +48,6 @@ private slots:
   void onNavigate(const QString&);
   void onNavigateUp();
   void onNavigateDown();
-  void onAutoDelete();
 };
 
 #endif // !_pqFileDialog_h

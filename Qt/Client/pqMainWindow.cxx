@@ -242,8 +242,8 @@ pqMainWindow::pqMainWindow() :
       this->InspectorDock->setWidget(this->Inspector);
       if(this->PipelineList)
         {
-        connect(this->PipelineList, SIGNAL(proxySelected(vtkSMSourceProxy *)),
-            this->Inspector, SLOT(setProxy(vtkSMSourceProxy *)));
+        connect(this->PipelineList, SIGNAL(proxySelected(vtkSMProxy *)),
+            this->Inspector, SLOT(setProxy(vtkSMProxy *)));
         }
       }
 
@@ -261,8 +261,8 @@ pqMainWindow::pqMainWindow() :
   this->HistogramDock->setWidget(histogram);
   if(this->PipelineList)
     {
-    connect(this->PipelineList, SIGNAL(proxySelected(vtkSMSourceProxy*)),
-        histogram, SLOT(setProxy(vtkSMSourceProxy*)));
+    connect(this->PipelineList, SIGNAL(proxySelected(vtkSMProxy*)),
+        histogram, SLOT(setProxy(vtkSMProxy*)));
     }
 
   this->addDockWidget(Qt::LeftDockWidgetArea, this->HistogramDock);
@@ -278,8 +278,8 @@ pqMainWindow::pqMainWindow() :
   this->LineChartDock->setWidget(line_plot);
   if(this->PipelineList)
     {
-    connect(this->PipelineList, SIGNAL(proxySelected(vtkSMSourceProxy*)),
-        line_plot, SLOT(setProxy(vtkSMSourceProxy*)));
+    connect(this->PipelineList, SIGNAL(proxySelected(vtkSMProxy*)),
+        line_plot, SLOT(setProxy(vtkSMProxy*)));
     }
 
   this->addDockWidget(Qt::BottomDockWidgetArea, this->LineChartDock);
@@ -350,12 +350,9 @@ pqMainWindow::pqMainWindow() :
   this->ElementInspectorDock->installEventFilter(this);
 
 
-  this->CompoundProxyToolBar = new QToolBar(this);
+  this->CompoundProxyToolBar = new QToolBar(this) << pqSetName("CompoundProxyToolBar");
   this->addToolBar(Qt::TopToolBarArea, this->CompoundProxyToolBar);
-  this->connect(this->CompoundProxyToolBar, SIGNAL(actionTriggered(QAction*)), SLOT(onCreateFilter(QAction*)));
-  // TODO: replace with real compound proxy
-  this->CompoundProxyToolBar->addAction(QIcon(":/pqWidgets/pqFilter32.png"), "MyCompoundFilter") 
-    << pqSetName("MyCompoundFilter") << pqSetData("Threshold");
+  this->connect(this->CompoundProxyToolBar, SIGNAL(actionTriggered(QAction*)), SLOT(onCreateCompoundProxy(QAction*)));
 
   this->setServer(0);
   this->Adaptor = new pqSMAdaptor;
@@ -476,6 +473,7 @@ void pqMainWindow::onFileNew()
   setServer(0);
   
   pqServerBrowser* const server_browser = new pqServerBrowser(this);
+  server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
   QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, SLOT(onFileNew(pqServer*)));
   server_browser->show();
 }
@@ -490,6 +488,7 @@ void pqMainWindow::onFileOpen()
   if(!this->CurrentServer)
     {
     pqServerBrowser* const server_browser = new pqServerBrowser(this);
+    server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
     QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, SLOT(onFileOpen(pqServer*)));
     server_browser->show();
     }
@@ -505,6 +504,7 @@ void pqMainWindow::onFileOpen(pqServer* Server)
     setServer(Server);
 
   pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(this->CurrentServer->GetProcessModule()), tr("Open File:"), this, "fileOpenDialog");
+  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileOpen(const QStringList&)));
   file_dialog->show();
 }
@@ -523,14 +523,14 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
       {
       QString file = Files[i];
       
-      source = vtkSMSourceProxy::SafeDownCast(this->Pipeline->createSource("ExodusReader", win));
+      source = this->Pipeline->createSource("ExodusReader", win);
       this->CurrentServer->GetProxyManager()->RegisterProxy("paraq", "source1", source);
       source->Delete();
       Adaptor->setProperty(source->GetProperty("FileName"), file);
       Adaptor->setProperty(source->GetProperty("FilePrefix"), file);
       Adaptor->setProperty(source->GetProperty("FilePattern"), "%s");
       
-      pqOpenExodusOptions options(vtkSMSourceProxy::SafeDownCast(source), this);
+      pqOpenExodusOptions options(source, this);
       options.exec();
 
       source->UpdateVTKObjects();
@@ -551,6 +551,7 @@ void pqMainWindow::onFileOpenServerState()
   setServer(0);
   
   pqServerBrowser* const server_browser = new pqServerBrowser(this);
+  server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
   QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, SLOT(onFileOpenServerState(pqServer*)));
   server_browser->show();
 }
@@ -560,6 +561,7 @@ void pqMainWindow::onFileOpenServerState(pqServer* Server)
   setServer(Server);
 
   pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(this->CurrentServer->GetProcessModule()), tr("Open Server State File:"), this, "fileOpenDialog");
+  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(pnFileOpenServerState(const QStringList&)));
   file_dialog->show();
 }
@@ -577,6 +579,7 @@ void pqMainWindow::onFileSaveServerState()
     }
 
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save Server State:"), this, "fileSaveDialog");
+  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileSaveServerState(const QStringList&)));
   file_dialog->show();
 }
@@ -607,6 +610,7 @@ void pqMainWindow::onFileSaveScreenshot()
     }
 
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save Screenshot:"), this, "fileSaveDialog");
+  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileSaveScreenshot(const QStringList&)));
   file_dialog->show();
 }
@@ -639,6 +643,7 @@ void pqMainWindow::onServerConnect()
   setServer(0);
   
   pqServerBrowser* const server_browser = new pqServerBrowser(this);
+  server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
   QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, SLOT(onServerConnect(pqServer*)));
   server_browser->show();
 }
@@ -714,7 +719,7 @@ void pqMainWindow::onCreateSource(QAction* action)
   QVTKWidget* win = this->PipelineList->getCurrentWindow();
   if(win)
     {
-    vtkSMSourceProxy* source = vtkSMSourceProxy::SafeDownCast(this->Pipeline->createSource(sourceName, win));
+    vtkSMSourceProxy* source = this->Pipeline->createSource(sourceName, win);
     this->Pipeline->setVisibility(this->Pipeline->createDisplay(source), true);
     vtkSMRenderModuleProxy* rm = this->Pipeline->getRenderModule(win);
     rm->ResetCamera();
@@ -738,7 +743,7 @@ void pqMainWindow::onCreateFilter(QAction* action)
     if(next)
       {
       this->PipelineList->getListModel()->beginCreateAndInsert();
-      source = vtkSMSourceProxy::SafeDownCast(this->Pipeline->createFilter(filterName, win));
+      source = this->Pipeline->createFilter(filterName, win);
       this->Pipeline->addInput(source, current);
       this->Pipeline->addInput(next, source);
       this->Pipeline->removeInput(next, current);
@@ -748,7 +753,7 @@ void pqMainWindow::onCreateFilter(QAction* action)
     else
       {
       this->PipelineList->getListModel()->beginCreateAndAppend();
-      source = vtkSMSourceProxy::SafeDownCast(this->Pipeline->createFilter(filterName, win));
+      source = this->Pipeline->createFilter(filterName, win);
       this->Pipeline->addInput(source, current);
       this->PipelineList->getListModel()->finishCreateAndAppend();
 
@@ -771,6 +776,10 @@ void pqMainWindow::onOpenCompoundFilterWizard()
 {
   pqCompoundProxyWizard* wizard = new pqCompoundProxyWizard(this->CurrentServer, this);
   wizard->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
+
+  this->connect(wizard, SIGNAL(newCompoundProxy(const QString&, const QString&)), 
+                        SLOT(onCompoundProxyAdded(const QString&, const QString&)));
+  
   wizard->show();
 }
 
@@ -784,6 +793,7 @@ void pqMainWindow::onHelpAbout()
 void pqMainWindow::onRecordTest()
 {
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Record Test:"), this, "fileSaveDialog");
+  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onRecordTest(const QStringList&)));
   file_dialog->show();
 }
@@ -800,6 +810,7 @@ void pqMainWindow::onRecordTest(const QStringList& Files)
 void pqMainWindow::onPlayTest()
 {
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Record Test:"), this, "fileSaveDialog");
+  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onPlayTest(const QStringList&)));
   file_dialog->show();
 }
@@ -901,8 +912,8 @@ void pqMainWindow::onNewQVTKWidget(pqMultiViewFrame* p)
   this->VTKConnector->Connect(iren, vtkCommand::CharEvent, 
                               picking, SLOT(computeSelection(vtkObject*,unsigned long, void*, void*, vtkCommand*)),
                               NULL, 1.0);
-  QObject::connect(picking, SIGNAL(selectionChanged(vtkSMSourceProxy*, vtkUnstructuredGrid*)),
-                   this, SLOT(onNewSelections(vtkSMSourceProxy*, vtkUnstructuredGrid*)));
+  QObject::connect(picking, SIGNAL(selectionChanged(vtkSMProxy*, vtkUnstructuredGrid*)),
+                   this, SLOT(onNewSelections(vtkSMProxy*, vtkUnstructuredGrid*)));
 
   // Keep a map of window to render module. Add the new window to the
   // pipeline data structure.
@@ -948,7 +959,7 @@ void pqMainWindow::onFrameActive(QWidget* w)
   this->ActiveView = qobject_cast<pqMultiViewFrame*>(w);
 }
 
-void pqMainWindow::onNewSelections(vtkSMSourceProxy*, vtkUnstructuredGrid* selections)
+void pqMainWindow::onNewSelections(vtkSMProxy*, vtkUnstructuredGrid* selections)
 {
   pqDataSetModel* model = qobject_cast<pqDataSetModel*>(
       this->ElementInspectorWidget->model());
@@ -966,4 +977,60 @@ void pqMainWindow::onNewSelections(vtkSMSourceProxy*, vtkUnstructuredGrid* selec
   this->ElementInspectorWidget->reset();
   this->ElementInspectorWidget->update();
 }
+
+void pqMainWindow::onCreateCompoundProxy(QAction* action)
+{
+  if(!action || !this->Pipeline || !this->PipelineList)
+    return;
+  
+  QByteArray filterName = action->data().toString().toAscii();
+  vtkSMProxy *current = this->PipelineList->getSelectedProxy();
+  QVTKWidget *win = this->PipelineList->getCurrentWindow();
+  if(current && win)
+    {
+    vtkSMCompoundProxy *source = 0;
+    vtkSMProxy *next = this->PipelineList->getNextProxy();
+    bool vis = false;
+    if(next)
+      {
+      this->PipelineList->getListModel()->beginCreateAndInsert();
+      source = this->Pipeline->createCompoundProxy(filterName, win);
+      this->Pipeline->addInput(source->GetMainProxy(), current);
+      this->Pipeline->addInput(next, source);
+      this->Pipeline->removeInput(next, current);
+      this->PipelineList->getListModel()->finishCreateAndInsert();
+      }
+    else
+      {
+      this->PipelineList->getListModel()->beginCreateAndAppend();
+      source = this->Pipeline->createCompoundProxy(filterName, win);
+      this->Pipeline->addInput(source, current);
+      this->PipelineList->getListModel()->finishCreateAndAppend();
+      vis = true;
+      // Only turn on visibility for added filters?
+      }
+
+    if(source)
+      {
+      // TODO: how to decide which part of the compound proxy to display ????
+      // for now just get the last one, and assuming it is a source proxy
+      vtkSMProxy* sourceDisplay = source->GetProxy(source->GetNumberOfProxies()-1);
+      this->Pipeline->setVisibility(this->Pipeline->createDisplay(vtkSMSourceProxy::SafeDownCast(sourceDisplay), source), vis);
+      //this->Pipeline->setVisibility(this->Pipeline->createDisplay(source), vis);
+      }
+
+    vtkSMRenderModuleProxy *rm = this->Pipeline->getRenderModule(win);
+    rm->ResetCamera();
+    win->update();
+    this->PipelineList->selectProxy(source);
+    }
+}
+
+
+void pqMainWindow::onCompoundProxyAdded(const QString&, const QString& proxy)
+{
+  this->CompoundProxyToolBar->addAction(QIcon(":/pqWidgets/pqFilter32.png"), proxy) 
+    << pqSetName(proxy) << pqSetData(proxy);
+}
+
 

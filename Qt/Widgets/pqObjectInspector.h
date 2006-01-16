@@ -13,7 +13,7 @@
 
 class pqObjectInspectorInternal;
 class pqObjectInspectorItem;
-class vtkSMSourceProxy;
+class vtkSMProxy;
 
 /// \class pqObjectInspector
 /// \brief
@@ -129,7 +129,7 @@ public:
   ///   Gets the current object.
   /// \return
   ///   A pointer to the current object.
-  vtkSMSourceProxy *proxy() const {return this->Proxy;}
+  vtkSMProxy *proxy() const {return this->Proxy;}
 
   /// \brief
   ///   Gets the change commit policy.
@@ -149,7 +149,7 @@ public slots:
   /// after all the changes are made to notify the view.
   ///
   /// \param proxy The current object.
-  void setProxy(vtkSMSourceProxy *proxy);
+  void setProxy(vtkSMProxy *proxy);
 
   /// \brief
   ///   Sets the change commit policy.
@@ -214,7 +214,7 @@ private slots:
 private:
   CommitType Commit;                   ///< The change commit policy.
   pqObjectInspectorInternal *Internal; ///< The list of property items.
-  vtkSMSourceProxy *Proxy;             ///< A pointer to the current object.
+  vtkSMProxy *Proxy;             ///< A pointer to the current object.
 };
 
 #endif

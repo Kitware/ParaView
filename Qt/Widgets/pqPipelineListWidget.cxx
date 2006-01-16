@@ -158,7 +158,7 @@ void pqPipelineListWidget::changeCurrent(const QModelIndex &current,
     {
     // Get the current item from the model.
     vtkSMProxy *proxy = this->ListModel->getProxyFor(current);
-    emit this->proxySelected(vtkSMSourceProxy::SafeDownCast(proxy));
+    emit this->proxySelected(proxy);
     }
 }
 

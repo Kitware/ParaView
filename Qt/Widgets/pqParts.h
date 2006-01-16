@@ -31,5 +31,11 @@ QTWIDGETS_EXPORT vtkSMDisplayProxy* pqAddPart(vtkSMRenderModuleProxy* rm, vtkSMS
 /// Removes a part created with AddPart.
 QTWIDGETS_EXPORT void pqRemovePart(vtkSMRenderModuleProxy* rm, vtkSMDisplayProxy* Part);
 
+/// color the part to its default color
+QTWIDGETS_EXPORT void pqColorPart(vtkSMDisplayProxy* Part);
+
+/// color the part by a specific field, if fieldname is NULL, colors by actor color
+QTWIDGETS_EXPORT void pqColorPart(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype);
+
 #endif //_pqParts_h
 

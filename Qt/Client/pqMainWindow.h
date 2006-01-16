@@ -21,11 +21,11 @@ class pqSMAdaptor;
 class pqMultiViewManager;
 class pqMultiViewFrame;
 
-class vtkSMSourceProxy;
 class QVTKWidget;
 class vtkSMRenderModuleProxy;
 class vtkEventQtSlotConnect;
 class vtkUnstructuredGrid;
+class vtkSMProxy;
 
 class QAction;
 class QDockWidget;
@@ -110,7 +110,9 @@ private slots:
   void onOpenLinkEditor();
   void onOpenCompoundFilterWizard();
 
-  void onNewSelections(vtkSMSourceProxy* p, vtkUnstructuredGrid* selections);
+  void onNewSelections(vtkSMProxy* p, vtkUnstructuredGrid* selections);
+  void onCompoundProxyAdded(const QString&, const QString&);
+  void onCreateCompoundProxy(QAction*);
   
   void onRecordTest();
   void onRecordTest(const QStringList& Files);

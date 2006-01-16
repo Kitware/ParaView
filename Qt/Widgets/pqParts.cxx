@@ -17,6 +17,17 @@
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSMIntVectorProperty.h>
+#include <vtkPVDataSetAttributesInformation.h>
+#include <vtkPVGeometryInformation.h>
+#include <vtkPVArrayInformation.h>
+#include <vtkSMDoubleVectorProperty.h>
+#include <vtkSMLookupTableProxy.h>
+#include <vtkSMProxyManager.h>
+#include <vtkProcessModule.h>
+#include <vtkSMStringVectorProperty.h>
+
+#include "pqPipelineData.h"
+#include "pqPipelineObject.h"
 
 vtkSMDisplayProxy* pqAddPart(vtkSMRenderModuleProxy* rm, vtkSMSourceProxy* Part)
 {
@@ -46,13 +57,9 @@ vtkSMDisplayProxy* pqAddPart(vtkSMRenderModuleProxy* rm, vtkSMSourceProxy* Part)
   pp = vtkSMProxyProperty::SafeDownCast(rm->GetProperty("Displays"));
   pp->AddProxy(partdisplay);
 
-  // scalar vis off by default, TODO: perhaps turn it on by default, but pick a good default scalar to go by
-  vtkSMIntVectorProperty* ivp;
-  ivp = vtkSMIntVectorProperty::SafeDownCast(partdisplay->GetProperty("ScalarVisibility"));
-  if(ivp)
-    {
-    ivp->SetElement(0,0);
-    }
+  // set default colors for display
+  pqColorPart(partdisplay);
+
   rm->UpdateVTKObjects();
 
   // Allow the render module proxy to maintain the part display.
@@ -68,3 +75,249 @@ void pqRemovePart(vtkSMRenderModuleProxy* rm, vtkSMDisplayProxy* Part)
   pp->RemoveProxy(Part);
   rm->UpdateVTKObjects();
 }
+
+
+static void pqGetColorArray(
+  vtkPVDataSetAttributesInformation* attrInfo,
+  vtkPVDataSetAttributesInformation* inAttrInfo,
+  vtkPVArrayInformation*& arrayInfo)
+{  
+  arrayInfo = NULL;
+
+  // Check for new point scalars.
+  vtkPVArrayInformation* tmp =
+    attrInfo->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
+  vtkPVArrayInformation* inArrayInfo = 0;
+  if (tmp)
+    {
+    if (inAttrInfo)
+      {
+      inArrayInfo = inAttrInfo->GetAttributeInformation(
+        vtkDataSetAttributes::SCALARS);
+      }
+    if (inArrayInfo == 0 ||
+      strcmp(tmp->GetName(),inArrayInfo->GetName()) != 0)
+      { 
+      // No input or different scalars: use the new scalars.
+      arrayInfo = tmp;
+      }
+    }
+}
+
+
+/// color the part to its default color
+void pqColorPart(vtkSMDisplayProxy* Part)
+{
+  // if the source created a new point scalar, use it
+  // else if the source created a new cell scalar, use it
+  // else if the input color by array exists in this source, use it
+  // else color by property
+  
+  vtkPVDataInformation* inGeomInfo = 0;
+  vtkPVDataInformation* geomInfo = 0;
+  vtkPVDataSetAttributesInformation* inAttrInfo = 0;
+  vtkPVDataSetAttributesInformation* attrInfo;
+  vtkPVArrayInformation* arrayInfo;
+  vtkSMDisplayProxy* dproxy;
+
+  dproxy = Part;
+  if (dproxy)
+    {
+    geomInfo = dproxy->GetGeometryInformation();
+    }
+    
+#if 0
+  pqPipelineObject* input = 0;
+  pqPipelineData* pipeline = pqPipelineData::instance();
+  pqPipelineObject* pqpart = pipeline->getObjectFor(Part);  // this doesn't work with compound proxies
+  input = pqpart->GetInput(0);
+
+  if (input)
+    {
+    dproxy = input->GetDisplayProxy();
+    if (dproxy)
+      {
+      inGeomInfo = dproxy->GetGeometryInformation();
+      }
+    }
+#endif
+  
+  // Look for a new point array.
+  // I do not think the logic is exactly as describerd in this methods
+  // comment.  I believe this method only looks at "Scalars".
+  attrInfo = geomInfo->GetPointDataInformation();
+  if (inGeomInfo)
+    {
+    inAttrInfo = inGeomInfo->GetPointDataInformation();
+    }
+  else
+    {
+    inAttrInfo = 0;
+    }
+  pqGetColorArray(attrInfo, inAttrInfo, arrayInfo);
+  if(arrayInfo)
+    {
+    pqColorPart(Part, arrayInfo->GetName(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+    return;
+    }
+    
+  // Check for new cell scalars.
+  attrInfo = geomInfo->GetCellDataInformation();
+  if (inGeomInfo)
+    {
+    inAttrInfo = inGeomInfo->GetCellDataInformation();
+    }
+  else
+    {
+    inAttrInfo = 0;
+    }
+  pqGetColorArray(attrInfo, inAttrInfo, arrayInfo);
+  if(arrayInfo)
+    {
+    pqColorPart(Part, arrayInfo->GetName(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+    return;
+    }
+    
+#if 0
+  // Inherit property color from input.
+  if (input)
+    {
+    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      input->GetDisplayProxy()->GetProperty("Color"));
+    if (!dvp)
+      {
+      vtkErrorMacro("Failed to find property Color on input->DisplayProxy.");
+      return;
+      }
+    double rgb[3] = { 1, 1, 1};
+    input->GetDisplayProxy()->GetColorCM(rgb);
+    this->DisplayProxy->SetColorCM(rgb);
+    this->DisplayProxy->UpdateVTKObjects();
+    } 
+#endif
+
+  if (geomInfo)
+    {
+    // Check for scalars in geometry
+    attrInfo = geomInfo->GetPointDataInformation();
+    pqGetColorArray(attrInfo, inAttrInfo, arrayInfo);
+    if(arrayInfo)
+      {
+      pqColorPart(Part, arrayInfo->GetName(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+      return;
+      }
+    }
+
+  if (geomInfo)
+    {
+    // Check for scalars in geometry
+    attrInfo = geomInfo->GetCellDataInformation();
+    pqGetColorArray(attrInfo, inAttrInfo, arrayInfo);
+    if(arrayInfo)
+      {
+      pqColorPart(Part, arrayInfo->GetName(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+      return;
+      }
+    }
+
+#if 0
+  // Try to use the same array selected by the input.
+  if (input)
+    {
+    colorMap = input->GetPVColorMap();
+    int colorField = -1;
+    if (colorMap)
+      {
+      colorField = input->GetDisplayProxy()->GetScalarModeCM();
+
+      // Find the array in our info.
+      switch (colorField)
+        {
+      case vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA:
+          attrInfo = geomInfo->GetPointDataInformation();
+          arrayInfo = attrInfo->GetArrayInformation(colorMap->GetArrayName());
+          if (arrayInfo && colorMap->MatchArrayName(arrayInfo->GetName(),
+                                       arrayInfo->GetNumberOfComponents()))
+            {  
+            this->ColorByArray(
+              colorMap, vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+            return;
+            }
+          break;
+        case vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA:
+          attrInfo = geomInfo->GetCellDataInformation();
+          arrayInfo = attrInfo->GetArrayInformation(colorMap->GetArrayName());
+          if (arrayInfo && colorMap->MatchArrayName(arrayInfo->GetName(),
+                                       arrayInfo->GetNumberOfComponents()))
+            {  
+            this->ColorByArray(
+              colorMap, vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+            return;
+            }
+          break;
+        default:
+          vtkErrorMacro("Bad attribute.");
+          return;
+        }
+
+      }
+    }
+#endif
+
+  // Color by property.
+  pqColorPart(Part, NULL, 0);
+}
+
+/// color the part by a specific field, if fieldname is NULL, colors by actor color
+void pqColorPart(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype)
+{
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(Part->GetProperty("LookupTable"));
+  pp->RemoveAllProxies();
+  
+  if(fieldname == 0)
+    {
+    vtkSMIntVectorProperty* ivp;
+    ivp = vtkSMIntVectorProperty::SafeDownCast(Part->GetProperty("ScalarVisibility"));
+    ivp->SetElement(0,0);
+    }
+  else
+    {
+    // create lut
+    vtkSMDoubleVectorProperty* dvp;
+    vtkSMIntVectorProperty* ivp;
+    vtkPVDataInformation* geomInfo = Part->GetGeometryInformation();
+    vtkSMLookupTableProxy* lut = vtkSMLookupTableProxy::SafeDownCast(
+      vtkSMObject::GetProxyManager()->NewProxy("lookup_tables", "LookupTable"));
+    lut->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+    pp = vtkSMProxyProperty::SafeDownCast(Part->GetProperty("LookupTable"));
+    pp->AddProxy(lut);
+    
+    ivp = vtkSMIntVectorProperty::SafeDownCast(Part->GetProperty("ScalarVisibility"));
+    ivp->SetElement(0,1);
+  
+    vtkPVArrayInformation* ai;
+    ivp = vtkSMIntVectorProperty::SafeDownCast(Part->GetProperty("ScalarMode"));
+    ivp->SetElement(0, fieldtype);
+
+    if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
+      {
+      ai = geomInfo->GetCellDataInformation()->GetArrayInformation(fieldname);
+      }
+    else
+      {
+      ai = geomInfo->GetPointDataInformation()->GetArrayInformation(fieldname);
+      }
+
+    vtkSMStringVectorProperty* d_svp = vtkSMStringVectorProperty::SafeDownCast(Part->GetProperty("ColorArray"));
+    d_svp->SetElement(0, fieldname);
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(lut->GetProperty("ScalarRange"));
+    double range[2];
+    ai->GetComponentRange(0, range);
+    dvp->SetElement(0,range[0]);
+    dvp->SetElement(1,range[1]);
+    lut->UpdateVTKObjects();
+    }
+
+  Part->UpdateVTKObjects();
+}
+

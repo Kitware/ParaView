@@ -32,6 +32,7 @@
 #include <vtkSMInputProperty.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMSourceProxy.h>
+#include <vtkSMCompoundProxy.h>
 #include <vtkSphereSource.h>
 
 #include <vtkExodusReader.h>
@@ -62,7 +63,7 @@ struct pqObjectLineChartWidget::pqImplementation
       }
   }
   
-  void setProxy(vtkSMSourceProxy* Proxy)
+  void setProxy(vtkSMProxy* Proxy)
   {
     if(this->ClientSideData)
       {
@@ -74,9 +75,16 @@ struct pqObjectLineChartWidget::pqImplementation
 
     this->CurrentVariable = QString();
 
+    // TODO: hack -- figure out how compound proxies really fit in
+    vtkSMCompoundProxy* cp = vtkSMCompoundProxy::SafeDownCast(Proxy);
+    if(cp)
+      {
+        Proxy = cp->GetProxy(cp->GetNumberOfProxies()-1);
+      }
+
     if(!Proxy)
       return;
-
+    
     // Connect a client side data object to the input source
     this->ClientSideData = vtkSMClientSideDataProxy::SafeDownCast(
       Proxy->GetProxyManager()->NewProxy("displays", "ClientSideData"));
@@ -182,7 +190,7 @@ struct pqObjectLineChartWidget::pqImplementation
     array->Delete();
   }
   
-  vtkSMSourceProxy* SourceProxy;
+  vtkSMProxy* SourceProxy;
   vtkSMClientSideDataProxy* ClientSideData;
   vtkEventQtSlotConnect* EventAdaptor;
   QComboBox Variables;
@@ -236,7 +244,7 @@ pqObjectLineChartWidget::~pqObjectLineChartWidget()
   delete this->Implementation;
 }
 
-void pqObjectLineChartWidget::setProxy(vtkSMSourceProxy* proxy)
+void pqObjectLineChartWidget::setProxy(vtkSMProxy* proxy)
 {
   this->Implementation->setProxy(proxy);
   

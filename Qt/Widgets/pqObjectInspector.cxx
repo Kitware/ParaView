@@ -12,23 +12,20 @@
 #include "pqPipelineObject.h"
 #include "pqSMAdaptor.h"
 #include "QVTKWidget.h"
-#include "vtkSMProperty.h"
-#include "vtkSMPropertyAdaptor.h"
-#include "vtkSMPropertyIterator.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkPVDataInformation.h"
-#include "vtkSMDisplayProxy.h"
-#include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVGeometryInformation.h"
-#include "vtkPVArrayInformation.h"
-#include <vtkSMDoubleVectorProperty.h>
-#include <vtkSMLookupTableProxy.h>
-#include <vtkSMProxyManager.h>
-#include <vtkProcessModule.h>
-#include <vtkSMProxyProperty.h>
-#include <vtkSMIntVectorProperty.h>
-#include <vtkSMStringVectorProperty.h>
+#include <vtkSMProperty.h>
+#include <vtkSMPropertyAdaptor.h>
+#include <vtkSMPropertyIterator.h>
+#include <vtkPVDataInformation.h>
+#include <vtkSMDisplayProxy.h>
+#include <vtkSMSourceProxy.h>
+#include <vtkSMCompoundProxy.h>
+#include <vtkPVDataSetAttributesInformation.h>
 #include <vtkSMDataObjectDisplayProxy.h>
+#include <vtkPVArrayInformation.h>
+#include <vtkSMStringVectorProperty.h>
+#include <vtkSMIntVectorProperty.h>
+#include <vtkPVGeometryInformation.h>
+#include "pqParts.h"
 
 #include <QList>
 #include <QString>
@@ -46,35 +43,74 @@ class pqObjectInspectorInternal { public:
     {
     int count = 0;
     if(this->Display)
+      {
       count++;
+      }
     if(this->Parameters)
+      {
       count++;
+      }
     if(this->Information)
+      {
       count++;
+      }
     return count;
     }
 
   pqObjectInspectorItem* operator[](int i)
     {
-    if(i == 0)
-      return this->Display;
-    if(i == 1)
-      return this->Parameters;
-    if(i == 2)
-      return this->Information;
+    if(this->Display)
+      {
+      if(i == 0)
+        {
+        return this->Display;
+        }
+      }
+    else
+      {
+      i++;
+      }
+    if(this->Parameters)
+      {
+      if(i == 1)
+        {
+        return this->Parameters;
+        }
+      }
+    else
+      {
+      i++;
+      }
+    if(this->Information)
+      {
+      if(i == 2)
+        {
+        return this->Information;
+        }
+      }
+    else
+      {
+      i++;
+      }
     return NULL;
     }
 
   void clear()
     {
     if(this->Display)
+      {
       delete this->Display;
+      }
     this->Display = NULL;
     if(this->Parameters)
+      {
       delete this->Parameters;
+      }
     this->Parameters = NULL;
     if(this->Information)
+      {
       delete this->Information;
+      }
     this->Information = NULL;
     }
 
@@ -193,6 +229,11 @@ QVariant pqObjectInspector::data(const QModelIndex &idx, int role) const
     {
     pqObjectInspectorItem *item = reinterpret_cast<pqObjectInspectorItem *>(
         idx.internalPointer());
+    if(!item)
+      {
+      return QVariant();
+      }
+
     switch(role)
       {
       case Qt::DisplayRole:
@@ -308,7 +349,7 @@ QVariant pqObjectInspector::domain(const QModelIndex &idx) const
   return QVariant();
 }
 
-void pqObjectInspector::setProxy(vtkSMSourceProxy *sourceProxy)
+void pqObjectInspector::setProxy(vtkSMProxy *sourceProxy)
 {
   // Clean up the current property data.
   this->cleanData();
@@ -319,8 +360,25 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *sourceProxy)
   this->Proxy = sourceProxy;
   if(this->Internal && adapter && this->Proxy)
     {
-    // update pipline information on the server
-    sourceProxy->UpdatePipelineInformation();
+      // update pipline information on the server
+      {
+      // scope so rest of code only uses vtkSMProxy interface
+      vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(sourceProxy);
+      if(sp)
+        {
+        sp->UpdatePipelineInformation();
+        }
+      else
+        {
+        vtkSMCompoundProxy* cp = vtkSMCompoundProxy::SafeDownCast(sourceProxy);
+        if(cp)
+          {
+          // TODO: gotta figure out which proxy to really do an update on
+          vtkSMProxy* sourceDisplay = cp->GetProxy(cp->GetNumberOfProxies()-1);
+          vtkSMSourceProxy::SafeDownCast(sourceDisplay)->UpdatePipelineInformation();
+          }
+        }
+      }
     pqObjectInspectorItem *item = 0;
     pqObjectInspectorItem *child = 0;
 
@@ -376,7 +434,17 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *sourceProxy)
       if(ivp->GetElement(0))
         {
         vtkSMStringVectorProperty* d_svp = vtkSMStringVectorProperty::SafeDownCast(display->GetProperty("ColorArray"));
-        item->setValue(d_svp->GetElement(0));
+        const char* fieldname = d_svp->GetElement(0);
+        ivp = vtkSMIntVectorProperty::SafeDownCast(display->GetProperty("ScalarMode"));
+        int fieldtype = ivp->GetElement(0);
+        if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
+          {
+          item->setValue(QString(fieldname) + " (cell)");
+          }
+        else
+          {
+          item->setValue(QString(fieldname) + " (point)");
+          }
         }
       else
         {
@@ -390,7 +458,14 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *sourceProxy)
     // ************* object properties *****************
 
     vtkSMProperty *prop = 0;
-    vtkSMPropertyIterator *iter = this->Proxy->NewPropertyIterator();
+    vtkSMProxy* propertyProxy = this->Proxy;
+    vtkSMCompoundProxy* compoundProxy = vtkSMCompoundProxy::SafeDownCast(this->Proxy);
+    if(compoundProxy)
+      {
+      propertyProxy = compoundProxy->GetMainProxy();
+      }
+
+    vtkSMPropertyIterator *iter = propertyProxy->NewPropertyIterator();
       
     this->Internal->Parameters = new pqObjectInspectorItem();
     this->Internal->Parameters->setPropertyName(tr("Parameters"));
@@ -446,7 +521,7 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *sourceProxy)
               child->setValue(subvalue);
               child->setParent(item);
               item->addChild(child);
-              adapter->linkPropertyTo(this->Proxy, prop, i,
+              adapter->linkPropertyTo(propertyProxy, prop, i,
                   child, "value");
               connect(child, SIGNAL(valueChanged(pqObjectInspectorItem *)),
                   this, SLOT(handleValueChange(pqObjectInspectorItem *)));
@@ -456,7 +531,7 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *sourceProxy)
         else
           {
           item->setValue(value);
-          adapter->linkPropertyTo(this->Proxy, prop, 0, item, "value");
+          adapter->linkPropertyTo(propertyProxy, prop, 0, item, "value");
           connect(item, SIGNAL(valueChanged(pqObjectInspectorItem *)),
               this, SLOT(handleValueChange(pqObjectInspectorItem *)));
           }
@@ -474,87 +549,91 @@ void pqObjectInspector::setProxy(vtkSMSourceProxy *sourceProxy)
 
     // ************* information ***************
 
-    this->Internal->Information = new pqObjectInspectorItem();
-    this->Internal->Information->setPropertyName(tr("Information"));
-
-    vtkPVDataInformation* dataInfo = this->Proxy->GetDataInformation();
-
-    item = new pqObjectInspectorItem();
-    item->setParent(this->Internal->Information);
-    this->Internal->Information->addChild(item);
-    item->setPropertyName("Type");
-    int dataType = dataInfo->GetDataSetType();
-    switch(dataType)
+    vtkSMSourceProxy* dataInfoProxy = vtkSMSourceProxy::SafeDownCast(this->Proxy);
+    if(dataInfoProxy)
       {
-      case VTK_POLY_DATA:
-        item->setValue("Polygonal");
-        break;
-      case VTK_UNSTRUCTURED_GRID:
-        item->setValue("Unstructured Grid");
-        break;
-      case VTK_STRUCTURED_GRID:
-        item->setValue("Structured Grid");
-        break;
-      case VTK_RECTILINEAR_GRID:
-        item->setValue("Nonuniform Rectilinear");
-        break;
-      case VTK_IMAGE_DATA:
-          {
-          int* ext = dataInfo->GetExtent();
-          if(ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
-            {
-            item->setValue("Image (Uniform Rectilinear)");
-            }
-          else
-            {
-            item->setValue("Volume (Uniform Rectilinear)");
-            }
-          }
-        break;
-      case VTK_MULTIGROUP_DATA_SET:
-        item->setValue("Multi-group");
-        break;
-      case VTK_MULTIBLOCK_DATA_SET:
-        item->setValue("Multi-block");
-        break;
-      case VTK_HIERARCHICAL_DATA_SET:
-        item->setValue("Hierarchical AMR");
-        break;
-      case VTK_HIERARCHICAL_BOX_DATA_SET:
-        item->setValue("Hierarchical Uniform AMR");
-        break;
-      default:
-        item->setValue("Unknown");
-      }
+      this->Internal->Information = new pqObjectInspectorItem();
+      this->Internal->Information->setPropertyName(tr("Information"));
 
-    item = new pqObjectInspectorItem();
-    item->setParent(this->Internal->Information);
-    this->Internal->Information->addChild(item);
-    item->setPropertyName("Number of cells");
-    item->setValue(static_cast<qint64>(dataInfo->GetNumberOfCells()));
+      vtkPVDataInformation* dataInfo = dataInfoProxy->GetDataInformation();
 
-    item = new pqObjectInspectorItem();
-    item->setParent(this->Internal->Information);
-    this->Internal->Information->addChild(item);
-    item->setPropertyName("Number of points");
-    item->setValue(static_cast<qint64>(dataInfo->GetNumberOfPoints()));
-    
-    item = new pqObjectInspectorItem();
-    item->setParent(this->Internal->Information);
-    this->Internal->Information->addChild(item);
-    item->setPropertyName("Memory");
-    QString mem;
-    mem.sprintf("%g MBytes", dataInfo->GetMemorySize()/1000.0);
-    item->setValue(mem);
-
-    QVariant timeSteps = adapter->getProperty(this->Proxy->GetProperty("TimestepValues"));
-    if(timeSteps.type() == QVariant::List)
-      {
       item = new pqObjectInspectorItem();
       item->setParent(this->Internal->Information);
       this->Internal->Information->addChild(item);
-      item->setPropertyName("Number of timesteps");
-      item->setValue(timeSteps.toList().size());
+      item->setPropertyName("Type");
+      int dataType = dataInfo->GetDataSetType();
+      switch(dataType)
+        {
+        case VTK_POLY_DATA:
+          item->setValue("Polygonal");
+          break;
+        case VTK_UNSTRUCTURED_GRID:
+          item->setValue("Unstructured Grid");
+          break;
+        case VTK_STRUCTURED_GRID:
+          item->setValue("Structured Grid");
+          break;
+        case VTK_RECTILINEAR_GRID:
+          item->setValue("Nonuniform Rectilinear");
+          break;
+        case VTK_IMAGE_DATA:
+            {
+            int* ext = dataInfo->GetExtent();
+            if(ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
+              {
+              item->setValue("Image (Uniform Rectilinear)");
+              }
+            else
+              {
+              item->setValue("Volume (Uniform Rectilinear)");
+              }
+            }
+          break;
+        case VTK_MULTIGROUP_DATA_SET:
+          item->setValue("Multi-group");
+          break;
+        case VTK_MULTIBLOCK_DATA_SET:
+          item->setValue("Multi-block");
+          break;
+        case VTK_HIERARCHICAL_DATA_SET:
+          item->setValue("Hierarchical AMR");
+          break;
+        case VTK_HIERARCHICAL_BOX_DATA_SET:
+          item->setValue("Hierarchical Uniform AMR");
+          break;
+        default:
+          item->setValue("Unknown");
+        }
+
+      item = new pqObjectInspectorItem();
+      item->setParent(this->Internal->Information);
+      this->Internal->Information->addChild(item);
+      item->setPropertyName("Number of cells");
+      item->setValue(static_cast<qint64>(dataInfo->GetNumberOfCells()));
+
+      item = new pqObjectInspectorItem();
+      item->setParent(this->Internal->Information);
+      this->Internal->Information->addChild(item);
+      item->setPropertyName("Number of points");
+      item->setValue(static_cast<qint64>(dataInfo->GetNumberOfPoints()));
+      
+      item = new pqObjectInspectorItem();
+      item->setParent(this->Internal->Information);
+      this->Internal->Information->addChild(item);
+      item->setPropertyName("Memory");
+      QString mem;
+      mem.sprintf("%g MBytes", dataInfo->GetMemorySize()/1000.0);
+      item->setValue(mem);
+
+      QVariant timeSteps = adapter->getProperty(dataInfoProxy->GetProperty("TimestepValues"));
+      if(timeSteps.type() == QVariant::List)
+        {
+        item = new pqObjectInspectorItem();
+        item->setParent(this->Internal->Information);
+        this->Internal->Information->addChild(item);
+        item->setPropertyName("Number of timesteps");
+        item->setValue(timeSteps.toList().size());
+        }
       }
     }
 
@@ -725,50 +804,54 @@ void pqObjectInspector::handleValueChange(pqObjectInspectorItem *item)
     emit dataChanged(idx, idx);
     }
 
-  // update information
-  // can this get called too many times to slow things down unecessarily???
-  vtkPVDataInformation* dataInfo = this->Proxy->GetDataInformation();
-  int i;
+  vtkSMSourceProxy* dataInfoProxy = vtkSMSourceProxy::SafeDownCast(this->Proxy);
+  if(dataInfoProxy)
+    { 
+    // update information
+    // can this get called too many times to slow things down unecessarily???
+    vtkPVDataInformation* dataInfo = dataInfoProxy->GetDataInformation();
+    int i;
 
-  int numCells = dataInfo->GetNumberOfCells();
-  for(i=0; i<this->Internal->Information->childCount(); i++)
-    {
-    if(this->Internal->Information->child(i)->propertyName() == "Number of cells")
-      item = this->Internal->Information->child(i);
-    }
-  if(numCells != item->value())
-    {
-    item->setValue(numCells);
-    QModelIndex idx = this->createIndex(this->itemIndex(item), 1, item);
-    emit dataChanged(idx, idx);
-    }
-  
-  int numPoints = dataInfo->GetNumberOfPoints();
-  for(i=0; i<this->Internal->Information->childCount(); i++)
-    {
-    if(this->Internal->Information->child(i)->propertyName() == "Number of points")
-      item = this->Internal->Information->child(i);
-    }
-  if(numPoints != item->value())
-    {
-    item->setValue(numPoints);
-    QModelIndex idx = this->createIndex(this->itemIndex(item), 1, item);
-    emit dataChanged(idx, idx);
-    }
-  
-  double memory = dataInfo->GetMemorySize() / 1000.0;
-  for(i=0; i<this->Internal->Information->childCount(); i++)
-    {
-    if(this->Internal->Information->child(i)->propertyName() == "Memory")
-      item = this->Internal->Information->child(i);
-    }
-  QString mem;
-  mem.sprintf("%g MBytes", memory);
-  if(mem != item->value())
-    {
-    item->setValue(mem);
-    QModelIndex idx = this->createIndex(this->itemIndex(item), 1, item);
-    emit dataChanged(idx, idx);
+    int numCells = dataInfo->GetNumberOfCells();
+    for(i=0; i<this->Internal->Information->childCount(); i++)
+      {
+      if(this->Internal->Information->child(i)->propertyName() == "Number of cells")
+        item = this->Internal->Information->child(i);
+      }
+    if(numCells != item->value())
+      {
+      item->setValue(numCells);
+      QModelIndex idx = this->createIndex(this->itemIndex(item), 1, item);
+      emit dataChanged(idx, idx);
+      }
+    
+    int numPoints = dataInfo->GetNumberOfPoints();
+    for(i=0; i<this->Internal->Information->childCount(); i++)
+      {
+      if(this->Internal->Information->child(i)->propertyName() == "Number of points")
+        item = this->Internal->Information->child(i);
+      }
+    if(numPoints != item->value())
+      {
+      item->setValue(numPoints);
+      QModelIndex idx = this->createIndex(this->itemIndex(item), 1, item);
+      emit dataChanged(idx, idx);
+      }
+    
+    double memory = dataInfo->GetMemorySize() / 1000.0;
+    for(i=0; i<this->Internal->Information->childCount(); i++)
+      {
+      if(this->Internal->Information->child(i)->propertyName() == "Memory")
+        item = this->Internal->Information->child(i);
+      }
+    QString mem;
+    mem.sprintf("%g MBytes", memory);
+    if(mem != item->value())
+      {
+      item->setValue(mem);
+      QModelIndex idx = this->createIndex(this->itemIndex(item), 1, item);
+      emit dataChanged(idx, idx);
+      }
     }
 }
 
@@ -781,65 +864,30 @@ void pqObjectInspector::updateDisplayProperties(pqObjectInspectorItem* item)
   if(item->propertyName().toAscii() == "Visibility")
     {
     display->SetVisibilityCM(item->value().toInt());
+    display->UpdateVTKObjects();
     }
   if(item->propertyName().toAscii() == "Color by")
     {
-    
-    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(display->GetProperty("LookupTable"));
-    pp->RemoveAllProxies();
-
     QString value = item->value().toString();
     if(value == "Default")
       {
-      // lookup table removed
-      vtkSMIntVectorProperty* ivp;
-      ivp = vtkSMIntVectorProperty::SafeDownCast(display->GetProperty("ScalarVisibility"));
-      ivp->SetElement(0,0);
+      pqColorPart(display);
       }
     else
       {
-      // create lut
-      vtkSMDoubleVectorProperty* dvp;
-      vtkSMIntVectorProperty* ivp;
-      vtkPVDataInformation* geomInfo = display->GetGeometryInformation();
-      vtkSMLookupTableProxy* lut = vtkSMLookupTableProxy::SafeDownCast(
-        vtkSMObject::GetProxyManager()->NewProxy("lookup_tables", "LookupTable"));
-      lut->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-      pp = vtkSMProxyProperty::SafeDownCast(display->GetProperty("LookupTable"));
-      pp->AddProxy(lut);
-      
-      ivp = vtkSMIntVectorProperty::SafeDownCast(display->GetProperty("ScalarVisibility"));
-      ivp->SetElement(0,1);
-    
-      vtkPVArrayInformation* ai;
-      ivp = vtkSMIntVectorProperty::SafeDownCast(display->GetProperty("ScalarMode"));
       bool cell = value.right(6) == "(cell)";
       if(cell)
         {
         value = value.left(value.size() - strlen(" (cell)"));
-        ai = geomInfo->GetCellDataInformation()->GetArrayInformation(value.toAscii().data());
-        ivp->SetElement(0, vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+        pqColorPart(display, value.toAscii().data(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
         }
       else
         {
         value = value.left(value.size() - strlen(" (point)"));
-        ai = geomInfo->GetPointDataInformation()->GetArrayInformation(value.toAscii().data());
-        ivp->SetElement(0, vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+        pqColorPart(display, value.toAscii().data(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
         }
-
-      vtkSMStringVectorProperty* d_svp = vtkSMStringVectorProperty::SafeDownCast(display->GetProperty("ColorArray"));
-      d_svp->SetElement(0, value.toAscii().data());
-      dvp = vtkSMDoubleVectorProperty::SafeDownCast(lut->GetProperty("ScalarRange"));
-      double range[2];
-      ai->GetComponentRange(0, range);
-      dvp->SetElement(0,range[0]);
-      dvp->SetElement(1,range[1]);
-      lut->UpdateVTKObjects();
       }
     }
-
-  display->UpdateVTKObjects();
-
 }
 
 

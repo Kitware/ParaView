@@ -334,7 +334,8 @@ vtkSMProxy *pqPipelineListModel::getProxyFor(const QModelIndex &idx) const
     pqPipelineListItem *item = reinterpret_cast<pqPipelineListItem *>(
         idx.internalPointer());
     if(item && (item->Type == pqPipelineListModel::Source || 
-        item->Type == pqPipelineListModel::Filter))
+        item->Type == pqPipelineListModel::Filter ||
+        item->Type == pqPipelineListModel::Bundle))
       {
       proxy = item->Data.Object->GetProxy();
       }

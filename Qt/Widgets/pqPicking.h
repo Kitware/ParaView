@@ -10,7 +10,7 @@ class vtkObject;
 class vtkCommand;
 class vtkRenderWindowInteractor;
 class vtkSMRenderModuleProxy;
-class vtkSMSourceProxy;
+class vtkSMProxy;
 class vtkSMDisplayProxy;
 class vtkSMPointLabelDisplayProxy;
 class vtkUnstructuredGrid;
@@ -33,11 +33,11 @@ public slots:
 
 signals:
   /// emit selection changed, proxy and dataset is given
-  void selectionChanged(vtkSMSourceProxy* p, vtkUnstructuredGrid* selections);
+  void selectionChanged(vtkSMProxy* p, vtkUnstructuredGrid* selections);
 
 private:
   vtkSMRenderModuleProxy* RenderModule;
-  vtkSMSourceProxy* PickFilter;
+  vtkSMProxy* PickFilter;
   vtkSMDisplayProxy* PickDisplay;
   vtkSMPointLabelDisplayProxy* PickRetriever;
   vtkUnstructuredGrid* EmptySet;

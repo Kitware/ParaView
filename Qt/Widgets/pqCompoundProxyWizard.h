@@ -21,6 +21,10 @@ public slots:
   void onLoad();
   void onLoad(const QStringList& files);
   void onRemove();
+  void addToList(const QString& filename, const QString& proxy);
+
+signals:
+  void newCompoundProxy(const QString& filename, const QString& proxy);
 
 private:
   pqServer* Server;

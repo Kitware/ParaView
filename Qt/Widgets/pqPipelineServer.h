@@ -26,6 +26,7 @@ public:
 
   pqPipelineObject *AddSource(vtkSMProxy *source);
   pqPipelineObject *AddFilter(vtkSMProxy *filter);
+  pqPipelineObject *AddCompoundProxy(vtkSMProxy *proxy);
   pqPipelineWindow *AddWindow(QWidget *window);
 
   pqPipelineObject *GetObject(vtkSMProxy *proxy) const;

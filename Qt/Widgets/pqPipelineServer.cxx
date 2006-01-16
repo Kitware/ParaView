@@ -67,6 +67,19 @@ pqPipelineObject *pqPipelineServer::AddFilter(vtkSMProxy *filter)
   return object;
 }
 
+pqPipelineObject *pqPipelineServer::AddCompoundProxy(vtkSMProxy *proxy)
+{
+  pqPipelineObject *object = 0;
+  if(this->Internal && proxy)
+    {
+    object = new pqPipelineObject(proxy, pqPipelineObject::Bundle);
+    if(object)
+      this->Internal->Objects.insert(proxy, object);
+    }
+
+  return object;
+}
+
 pqPipelineWindow *pqPipelineServer::AddWindow(QWidget *window)
 {
   pqPipelineWindow *object = 0;

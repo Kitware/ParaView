@@ -39,7 +39,6 @@ private:
   
 private slots:
   void accept();
-  void reject();
   void onServerTypeActivated(int);
 };
 

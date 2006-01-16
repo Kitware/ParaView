@@ -29,7 +29,7 @@
 #include <vtkSMClientSideDataProxy.h>
 #include <vtkSMInputProperty.h>
 #include <vtkSMProxyManager.h>
-#include <vtkSMSourceProxy.h>
+#include <vtkSMCompoundProxy.h>
 #include <vtkSphereSource.h>
 
 //////////////////////////////////////////////////////////////////////////////
@@ -55,7 +55,7 @@ struct pqObjectHistogramWidget::pqImplementation
       }
   }
   
-  void setProxy(vtkSMSourceProxy* Proxy)
+  void setProxy(vtkSMProxy* Proxy)
   {
     if(this->ClientSideData)
       {
@@ -65,9 +65,16 @@ struct pqObjectHistogramWidget::pqImplementation
     
     this->CurrentVariable = QString();
     
+    // TODO: hack -- figure out how compound proxies really fit in
+    vtkSMCompoundProxy* cp = vtkSMCompoundProxy::SafeDownCast(Proxy);
+    if(cp)
+      {
+        Proxy = cp->GetProxy(cp->GetNumberOfProxies()-1);
+      }
+    
     if(!Proxy)
       return;
-    
+
     // Connect a client side data object to the input source
     this->ClientSideData = vtkSMClientSideDataProxy::SafeDownCast(
       Proxy->GetProxyManager()->NewProxy("displays", "ClientSideData"));
@@ -265,7 +272,7 @@ pqObjectHistogramWidget::~pqObjectHistogramWidget()
   delete this->Implementation;
 }
 
-void pqObjectHistogramWidget::setProxy(vtkSMSourceProxy* proxy)
+void pqObjectHistogramWidget::setProxy(vtkSMProxy* proxy)
 {
   this->Implementation->setProxy(proxy);
   

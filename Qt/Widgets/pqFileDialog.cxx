@@ -75,13 +75,6 @@ void pqFileDialog::accept()
     emit filesSelected(selected_files);
   
   base::accept();
-  QTimer::singleShot(0, this, SLOT(onAutoDelete()));
-}
-
-void pqFileDialog::reject()
-{
-  base::reject();
-  QTimer::singleShot(0, this, SLOT(onAutoDelete()));
 }
 
 void pqFileDialog::onDataChanged(const QModelIndex&, const QModelIndex&)
@@ -106,7 +99,7 @@ void pqFileDialog::onActivated(const QModelIndex& Index)
     this->hide();
   
     emit filesSelected(this->Model->getFilePaths(Index));
-    QTimer::singleShot(0, this, SLOT(onAutoDelete()));
+    base::accept();
     }
 }
 
@@ -135,10 +128,5 @@ void pqFileDialog::onNavigateDown()
     return;
     
   this->Model->setCurrentPath(paths[0]);
-}
-
-void pqFileDialog::onAutoDelete()
-{
-  delete this;
 }
 

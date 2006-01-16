@@ -13,7 +13,7 @@ class QVTKWidget;
 class vtkSMProxy;
 class vtkSMRenderModuleProxy;
 class vtkSMSourceProxy;
-class vtkSMProxy;
+class vtkSMCompoundProxy;
 class vtkSMDisplayProxy;
 
 #include "QtWidgetsExport.h"
@@ -43,12 +43,13 @@ public:
 
   // TODO: perhaps not tie source proxies to windows
 
-  vtkSMProxy *createSource(const char *proxyName, QVTKWidget *window);
-  vtkSMProxy *createFilter(const char *proxyName, QVTKWidget *window);
+  vtkSMSourceProxy *createSource(const char *proxyName, QVTKWidget *window);
+  vtkSMSourceProxy *createFilter(const char *proxyName, QVTKWidget *window);
+  vtkSMCompoundProxy *createCompoundProxy(const char *proxyName, QVTKWidget *window);
 
   // TODO: should take a window to create a display proxy in, but source proxy is already tied to window
   //! create a display proxy for a source proxy
-  vtkSMDisplayProxy* createDisplay(vtkSMSourceProxy* source);
+  vtkSMDisplayProxy* createDisplay(vtkSMSourceProxy* source, vtkSMProxy* rep = NULL);
   //! set the visibility on/off for a display
   void setVisibility(vtkSMDisplayProxy* proxy, bool on);
 
@@ -73,25 +74,25 @@ signals:
   void removingConnection(pqPipelineObject *source, pqPipelineObject *sink);
 
   /// signal for new proxy created
-  void newPipelineObject(vtkSMSourceProxy* proxy);
+  void newPipelineObject(vtkSMProxy* proxy);
   /// signal for new input connection to proxy
-  void newPipelineObjectInput(vtkSMSourceProxy* proxy, vtkSMSourceProxy* input);
+  void newPipelineObjectInput(vtkSMProxy* proxy, vtkSMProxy* input);
 
   /// new current proxy
-  void currentProxyChanged(vtkSMSourceProxy* newproxy);
+  void currentProxyChanged(vtkSMProxy* newproxy);
 
 public slots:
   /// set the current proxy
-  void setCurrentProxy(vtkSMSourceProxy* proxy);
+  void setCurrentProxy(vtkSMProxy* proxy);
 
 public:
   /// get the current proxy
-  vtkSMSourceProxy* currentProxy() const;
+  vtkSMProxy* currentProxy() const;
 
 protected:
   pqPipelineDataInternal *Internal; ///< Stores the pipeline objects.
   pqNameCount *Names;               ///< Keeps track of the proxy names.
-  vtkSMSourceProxy* CurrentProxy;
+  vtkSMProxy* CurrentProxy;
 
   static pqPipelineData *Instance;  ///< Pointer to the pipeline instance.
 };
