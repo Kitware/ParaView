@@ -1,2 +1,2 @@
-export PATH=$PATH:${KWWidgets_PATHS}
-export TCLLIBPATH="$TCLLIBPATH \"${VTK_TCL_PATH}\" \"${KWWidgets_TCL_PATH}\""
+export PATH=${KWWidgets_PATHS}:$PATH
+export TCLLIBPATH="\"${VTK_TCL_PATH}\" \"${KWWidgets_TCL_PATH}\" $TCLLIBPATH"
