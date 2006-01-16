@@ -19,11 +19,13 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkKWIcon.h"
 
+#include <ctype.h>
+
 #include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.89");
+vtkCxxRevisionMacro(vtkKWMenu, "1.90");
 
 //----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
