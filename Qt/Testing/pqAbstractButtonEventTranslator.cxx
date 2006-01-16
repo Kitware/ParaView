@@ -10,6 +10,8 @@
 #include "pqAbstractButtonEventTranslator.h"
 
 #include <QAbstractButton>
+#include <QToolButton>
+#include <QAction>
 #include <QEvent>
 
 pqAbstractButtonEventTranslator::pqAbstractButtonEventTranslator() :
@@ -45,7 +47,14 @@ bool pqAbstractButtonEventTranslator::translateEvent(QObject* Object, QEvent* Ev
 
 void pqAbstractButtonEventTranslator::onClicked(bool)
 {
-  emit recordEvent(this->CurrentObject, "activate", "");
+  if(this->CurrentObject->objectName() == QString::null && qobject_cast<QToolButton*>(this->CurrentObject))
+    {
+    emit recordEvent(qobject_cast<QToolButton*>(this->CurrentObject)->defaultAction(), "activate", "");
+    }
+  else
+    {
+    emit recordEvent(this->CurrentObject, "activate", "");
+    }
 }
 
 void pqAbstractButtonEventTranslator::onToggled(bool Checked)
