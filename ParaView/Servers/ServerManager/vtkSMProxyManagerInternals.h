@@ -17,8 +17,9 @@
 #define __vtkSMProxyManagerInternals_h
 
 #include "vtkPVXMLElement.h"
-#include "vtkSMProxy.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMLink.h"
+#include "vtkSMProxy.h"
 
 #include <vtkstd/map>
 #include <vtkstd/set>
@@ -79,6 +80,11 @@ struct vtkSMProxyManagerInternals
   typedef vtkstd::map<vtkStdString, vtkSmartPointer<vtkPVXMLElement> >
      DefinitionType;
   DefinitionType CompoundProxyDefinitions;
+
+  // Data structure to save registered links.
+  typedef vtkstd::map<vtkStdString, vtkSmartPointer<vtkSMLink> >
+    LinkType;
+  LinkType RegisteredLinkMap;
 };
 
 #endif

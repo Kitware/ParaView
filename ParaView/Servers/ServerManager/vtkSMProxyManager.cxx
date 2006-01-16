@@ -80,7 +80,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.32");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.33");
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -528,6 +528,48 @@ void vtkSMProxyManager::UpdateRegisteredProxies(int modified_only /*=1*/)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxyManager::RegisterLink(const char* name, vtkSMLink* link)
+{
+  vtkSMProxyManagerInternals::LinkType::iterator it =
+    this->Internals->RegisteredLinkMap.find(name);
+  if (it != this->Internals->RegisteredLinkMap.end())
+    {
+    vtkWarningMacro("Replacing previously registered link with name " << name);
+    }
+  this->Internals->RegisteredLinkMap[name] = link;
+}
+
+//---------------------------------------------------------------------------
+vtkSMLink* vtkSMProxyManager::GetRegisteredLink(const char* name)
+{
+  vtkSMProxyManagerInternals::LinkType::iterator it =
+    this->Internals->RegisteredLinkMap.find(name);
+  if (it != this->Internals->RegisteredLinkMap.end())
+    {
+    return it->second.GetPointer();
+    }
+  return NULL;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::UnRegisterLink(const char* name)
+{
+  vtkSMProxyManagerInternals::LinkType::iterator it =
+    this->Internals->RegisteredLinkMap.find(name);
+  if (it != this->Internals->RegisteredLinkMap.end())
+    {
+    this->Internals->RegisteredLinkMap.erase(it);
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::UnRegisterAllLinks()
+{
+  this->Internals->RegisteredLinkMap.clear();
+}
+
+
+//---------------------------------------------------------------------------
 void vtkSMProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
   void* )
 {
@@ -707,6 +749,12 @@ void vtkSMProxyManager::SaveState(vtkPVXMLElement* rootElement)
   rootElement->AddNestedElement(defs);
   defs->Delete();
 
+  vtkPVXMLElement* links = vtkPVXMLElement::New();
+  links->SetName("Links");
+  this->SaveRegisteredLinks(links);
+  rootElement->AddNestedElement(links);
+  links->Delete();
+
   rootElement->Delete();
 }
 
@@ -849,6 +897,17 @@ vtkSMCompoundProxy* vtkSMProxyManager::NewCompoundProxy(const char* name)
   vtkSMCompoundProxyDefinitionLoader* loader = 
     vtkSMCompoundProxyDefinitionLoader::New();
   return loader->LoadDefinition(definition);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::SaveRegisteredLinks(vtkPVXMLElement* rootElement)
+{
+  vtkSMProxyManagerInternals::LinkType::iterator it =
+    this->Internals->RegisteredLinkMap.begin();
+  for (; it != this->Internals->RegisteredLinkMap.end(); ++it)
+    {
+    it->second.GetPointer()->SaveState(it->first.c_str(), rootElement);
+    }
 }
 
 //---------------------------------------------------------------------------

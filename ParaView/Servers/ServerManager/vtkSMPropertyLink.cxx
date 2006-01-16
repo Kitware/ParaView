@@ -16,15 +16,17 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
+#include "vtkSMStateLoader.h"
 #include "vtkStdString.h"
 
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMPropertyLink);
-vtkCxxRevisionMacro(vtkSMPropertyLink, "1.2");
+vtkCxxRevisionMacro(vtkSMPropertyLink, "1.3");
 //-----------------------------------------------------------------------------
 struct vtkSMPropertyLinkInternals
 {
@@ -175,6 +177,87 @@ void vtkSMPropertyLink::UpdateVTKObjects(vtkSMProxy* caller)
       iter->Proxy.GetPointer()->UpdateVTKObjects();
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMPropertyLink::SaveState(const char* linkname, vtkPVXMLElement* parent)
+{
+  vtkPVXMLElement* root = vtkPVXMLElement::New();
+  root->SetName("PropertyLink");
+  root->AddAttribute("name", linkname);
+  vtkSMPropertyLinkInternals::LinkedPropertyType::iterator iter =
+    this->Internals->LinkedProperties.begin();
+  for(; iter != this->Internals->LinkedProperties.end(); ++iter)
+    {
+    vtkPVXMLElement* child = vtkPVXMLElement::New();
+    child->SetName("Property");
+    child->AddAttribute("id", iter->Proxy.GetPointer()->GetSelfIDAsString());
+    child->AddAttribute("name", iter->PropertyName);
+    child->AddAttribute("direction", ( (iter->UpdateDirection & INPUT)? 
+        "input" : "output"));
+    root->AddNestedElement(child);
+    child->Delete();
+    }
+  parent->AddNestedElement(root);
+  root->Delete();
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMPropertyLink::LoadState(vtkPVXMLElement* linkElement, 
+  vtkSMStateLoader* loader)
+{
+  unsigned int numElems = linkElement->GetNumberOfNestedElements();
+  for (unsigned int cc=0; cc < numElems; cc++)
+    {
+    vtkPVXMLElement* child = linkElement->GetNestedElement(cc);
+    if (!child->GetName() || strcmp(child->GetName(), "Property") != 0)
+      {
+      vtkWarningMacro("Invalid element in link state. Ignoring.");
+      continue;
+      }
+    const char* direction = child->GetAttribute("direction");
+    if (!direction)
+      {
+      vtkErrorMacro("State missing required attribute direction.");
+      return 0;
+      }
+    int idirection;
+    if (strcmp(direction, "input") == 0)
+      {
+      idirection = INPUT;
+      }
+    else if (strcmp(direction, "output") == 0)
+      {
+      idirection = OUTPUT;
+      }
+    else
+      {
+      vtkErrorMacro("Invalid value for direction: " << direction);
+      return 0;
+      }
+    int id;
+    if (!child->GetScalarAttribute("id", &id))
+      {
+      vtkErrorMacro("State missing required attribute id.");
+      return 0;
+      }
+    vtkSMProxy* proxy = loader->NewProxy(id); 
+    if (!proxy)
+      {
+      vtkErrorMacro("Failed to locate proxy with ID: " << id);
+      return 0;
+      }
+
+    const char* pname = child->GetAttribute("name");
+    if (!pname)
+      {
+      vtkErrorMacro("State missing required attribute name.");
+      return 0;
+      }
+    this->AddLinkedProperty(proxy, pname, idirection);
+    proxy->Delete(); 
+    }
+  return 1;
 }
 
 //-----------------------------------------------------------------------------

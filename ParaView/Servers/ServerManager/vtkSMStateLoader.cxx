@@ -17,14 +17,16 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMCompoundProxy.h"
+#include "vtkSMPropertyLink.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyLink.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSmartPointer.h"
 
 #include <vtkstd/map>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.7");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.8");
 
 struct vtkSMStateLoaderInternals
 {
@@ -211,6 +213,52 @@ void vtkSMStateLoader::HandleCompoundProxyDefinitions(
 }
 
 //---------------------------------------------------------------------------
+int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
+{
+  vtkSMProxyManager* pxm = this->GetProxyManager();
+  
+  unsigned int numElems = element->GetNumberOfNestedElements();
+  for (unsigned int cc=0; cc < numElems; cc++)
+    {
+    vtkPVXMLElement* currentElement= element->GetNestedElement(cc);
+    const char* name = currentElement->GetName();
+    const char* linkname = currentElement->GetAttribute("name");
+    if (name && linkname)
+      {
+      vtkSMLink* link = 0;
+      if (strcmp(name, "PropertyLink") == 0)
+        {
+        link = pxm->GetRegisteredLink(linkname);
+        if (!link)
+          {
+          link = vtkSMPropertyLink::New();
+          pxm->RegisterLink(linkname, link);
+          link->Delete();
+          }
+        }
+      else if (strcmp(name, "ProxyLink") == 0)
+        {
+        link = pxm->GetRegisteredLink(linkname);
+        if (!link)
+          {
+          link = vtkSMProxyLink::New();
+          pxm->RegisterLink(linkname, link);
+          link->Delete();
+          }       
+        }
+      if (link)
+        {
+        if (!link->LoadState(currentElement, this))
+          {
+          return 0;
+          }
+        }
+      }
+    }
+  return 1;
+}
+
+//---------------------------------------------------------------------------
 void vtkSMStateLoader::ClearCreatedProxies()
 {
   this->Internal->CreatedProxies.clear();
@@ -253,6 +301,10 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_proxies/*
       else if (strcmp(name, "CompoundProxyDefinitions") == 0)
         {
         this->HandleCompoundProxyDefinitions(currentElement);
+        }
+      else if (strcmp(name, "Links") == 0)
+        {
+        this->HandleLinks(currentElement);
         }
       }
     }
