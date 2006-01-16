@@ -16,14 +16,16 @@
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVXMLElement.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
-#include "vtkSmartPointer.h"
+#include "vtkSMStateLoader.h"
 
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMProxyLink);
-vtkCxxRevisionMacro(vtkSMProxyLink, "1.3");
+vtkCxxRevisionMacro(vtkSMProxyLink, "1.4");
 
 //---------------------------------------------------------------------------
 struct vtkSMProxyLinkInternals
@@ -149,6 +151,77 @@ void vtkSMProxyLink::UpdateVTKObjects(vtkSMProxy* caller)
       iter->Proxy->UpdateVTKObjects();
       }
     }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyLink::SaveState(const char* linkname, vtkPVXMLElement* parent)
+{
+  vtkPVXMLElement* root = vtkPVXMLElement::New();
+  root->SetName("ProxyLink");
+  root->AddAttribute("name", linkname);
+  vtkSMProxyLinkInternals::LinkedProxiesType::iterator iter =
+    this->Internals->LinkedProxies.begin();
+  for(; iter != this->Internals->LinkedProxies.end(); ++iter)
+    {
+    vtkPVXMLElement* child = vtkPVXMLElement::New();
+    child->SetName("Proxy");
+    child->AddAttribute("direction", (iter->UpdateDirection == INPUT? "input" : "output"));
+    child->AddAttribute("id", iter->Proxy.GetPointer()->GetSelfIDAsString());
+    root->AddNestedElement(child);
+    child->Delete();
+    }
+  parent->AddNestedElement(root);
+  root->Delete();
+}
+
+//---------------------------------------------------------------------------
+int vtkSMProxyLink::LoadState(vtkPVXMLElement* linkElement, vtkSMStateLoader* loader)
+{
+  unsigned int numElems = linkElement->GetNumberOfNestedElements();
+  for (unsigned int cc=0; cc < numElems; cc++)
+    {
+    vtkPVXMLElement* child = linkElement->GetNestedElement(cc);
+    if (!child->GetName() || strcmp(child->GetName(), "Proxy") != 0)
+      {
+      vtkWarningMacro("Invalid element in link state. Ignoring.");
+      continue;
+      }
+    const char* direction = child->GetAttribute("direction");
+    if (!direction)
+      {
+      vtkErrorMacro("State missing required attribute direction.");
+      return 0;
+      }
+    int idirection;
+    if (strcmp(direction, "input") == 0)
+      {
+      idirection = INPUT;
+      }
+    else if (strcmp(direction, "output") == 0)
+      {
+      idirection = OUTPUT;
+      }
+    else
+      {
+      vtkErrorMacro("Invalid value for direction: " << direction);
+      return 0;
+      }
+    int id;
+    if (!child->GetScalarAttribute("id", &id))
+      {
+      vtkErrorMacro("State missing required attribute id.");
+      return 0;
+      }
+    vtkSMProxy* proxy = loader->NewProxy(id); 
+    if (!proxy)
+      {
+      vtkErrorMacro("Failed to locate proxy with ID: " << id);
+      return 0;
+      }
+    this->AddLinkedProxy(proxy, idirection);
+    proxy->Delete();
+    }
+  return 1;
 }
 
 //---------------------------------------------------------------------------

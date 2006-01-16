@@ -63,6 +63,7 @@ protected:
 
   int HandleProxyCollection(vtkPVXMLElement* collectionElement);
   void HandleCompoundProxyDefinitions(vtkPVXMLElement* element);
+  int HandleLinks(vtkPVXMLElement* linksElement);
 
   // Either create a new proxy or returns one from the map
   // of existing properties. Newly created proxies are stored

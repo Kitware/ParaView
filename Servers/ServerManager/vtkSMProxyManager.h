@@ -34,6 +34,7 @@
 
 class vtkPVXMLElement;
 class vtkSMCompoundProxy;
+class vtkSMLink;
 class vtkSMProperty;
 class vtkSMProxy;
 class vtkSMProxyManagerObserver;
@@ -116,6 +117,24 @@ public:
   void UpdateRegisteredProxies(const char* groupname, int modified_only = 1);
   void UpdateRegisteredProxies(int modified_only=1);
 
+  // Description:
+  // Register proxy/property links with the server manager. The linknames
+  // must be unique, if a link with the given name already exists, it will be replaced.
+  void RegisterLink(const char* linkname, vtkSMLink* link);
+
+  // Description:
+  // Unregister a proxy or property link previously registered with the given name.
+  void UnRegisterLink(const char* linkname);
+
+  // Description:
+  // Get the link registered with the given name. If no such link exists,
+  // returns NULL.
+  vtkSMLink* GetRegisteredLink(const char* linkname);
+ 
+  // Description:
+  // Unregister all registered proxy/property links.
+  void UnRegisterAllLinks();
+  
   // Description:
   // Register a compound proxy definition with the proxy manager. This
   // definition (represented as a tree of vtkPVXMLElement objects) can
@@ -227,6 +246,11 @@ protected:
   // Mark/UnMark a proxy as modified.
   void MarkProxyAsModified(vtkSMProxy*);
   void UnMarkProxyAsModified(vtkSMProxy*);
+
+  // Description:
+  // Save/Load registered link states.
+  void SaveRegisteredLinks(vtkPVXMLElement* root);
+
 private:
   vtkSMProxyManagerInternals* Internals;
   vtkSMProxyManagerObserver* Observer;

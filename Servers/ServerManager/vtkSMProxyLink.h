@@ -37,6 +37,7 @@ public:
   // changes, it's value is pushed to all other output proxies in the link.
   void AddLinkedProxy(vtkSMProxy* proxy, int updateDir);
 
+ 
 protected:
   vtkSMProxyLink();
   ~vtkSMProxyLink();
@@ -44,6 +45,13 @@ protected:
   virtual void UpdateVTKObjects(vtkSMProxy* caller);
   virtual void UpdateProperties(vtkSMProxy* caller, const char* pname);
 
+  // Description:
+  // Save the state of the link.
+  virtual void SaveState(const char* linkname, vtkPVXMLElement* parent);
+
+  // Description:
+  // Load the link state.
+  virtual int LoadState(vtkPVXMLElement* linkElement, vtkSMStateLoader* loader);
 private:
   vtkSMProxyLinkInternals* Internals;
 

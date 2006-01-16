@@ -21,7 +21,9 @@
 #include "vtkSMObject.h"
 //BTX
 class vtkCommand;
+class vtkPVXMLElement;
 class vtkSMProxy;
+class vtkSMStateLoader;
 //ETX
 
 class VTK_EXPORT vtkSMLink : public vtkSMObject
@@ -38,6 +40,7 @@ public:
     OUTPUT = 2
     };
 //ETX
+
 
 protected:
   vtkSMLink();
@@ -57,8 +60,19 @@ protected:
   // Description:
   // Subclasses call this method to observer events on a INPUT proxy.
   void ObserveProxyUpdates(vtkSMProxy* proxy);
+
+  // Description:
+  // Save the state of the link.
+  virtual void SaveState(const char* linkname, vtkPVXMLElement* parent) = 0;
+
+  // Description:
+  // Load the link state.
+  virtual int LoadState(vtkPVXMLElement* linkElement, vtkSMStateLoader* loader) = 0;
+
 //BTX
   friend class vtkSMLinkObserver;
+  friend class vtkSMStateLoader;
+  friend class vtkSMProxyManager;
 //ETX
   vtkCommand* Observer;
 private:

@@ -39,6 +39,7 @@ public:
   // changes, it's value is pushed to all other output proxies in the link.
   void AddLinkedProperty(vtkSMProxy* proxy, const char* propertyname, int updateDir);
 
+ 
 protected:
   vtkSMPropertyLink();
   ~vtkSMPropertyLink();
@@ -47,6 +48,14 @@ protected:
   friend struct vtkSMPropertyLinkInternals;
 //ETX
 
+  // Description:
+  // Load the link state.
+  virtual int LoadState(vtkPVXMLElement* linkElement, vtkSMStateLoader* loader);
+
+  // Description:
+  // Save the state of the link.
+  virtual void SaveState(const char* linkname, vtkPVXMLElement* parent);
+  
   virtual void UpdateVTKObjects(vtkSMProxy* caller);
   virtual void UpdateProperties(vtkSMProxy* caller, const char* pname);
 private:
