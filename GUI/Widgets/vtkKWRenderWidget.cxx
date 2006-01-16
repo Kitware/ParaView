@@ -32,6 +32,7 @@
 #include "vtkRendererCollection.h"
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
+#include "vtkInteractorStyleSwitch.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -40,7 +41,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.122");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.123");
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -83,6 +84,15 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->Interactor->SetRenderWidget(this);  
   this->Interactor->SetRenderWindow(this->RenderWindow);
   this->InteractorTimerToken = NULL;
+
+  // Switch to trackball style, it's nicer
+
+  vtkInteractorStyleSwitch *istyle = vtkInteractorStyleSwitch::SafeDownCast(
+    this->Interactor->GetInteractorStyle());
+  if (istyle)
+    {
+    istyle->SetCurrentStyleToTrackballCamera();
+    }
 
   // Corner annotation
 

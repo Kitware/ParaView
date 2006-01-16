@@ -14,11 +14,6 @@ proc vtkKWRenderWidgetEntryPoint {parent win} {
 
   # -----------------------------------------------------------------------
 
-  # Switch to trackball style it's nicer
-
-  [[[rw_renderwidget GetRenderWindow] GetInteractor] GetInteractorStyle] \
-      SetCurrentStyleToTrackballCamera
-
   # Create a 3D object reader
 
   vtkXMLPolyDataReader rw_reader

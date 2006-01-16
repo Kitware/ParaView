@@ -1,5 +1,4 @@
 #include "vtkActor.h"
-#include "vtkInteractorStyleSwitch.h"
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
 #include "vtkGenericRenderWindowInteractor.h"
@@ -70,15 +69,6 @@ int my_main(int argc, char *argv[])
 
   app->Script("pack %s -expand y -fill both -anchor c -expand y", 
               rw->GetWidgetName());
-
-  // Switch to trackball style, it's nicer
-
-  vtkInteractorStyleSwitch *istyle = vtkInteractorStyleSwitch::SafeDownCast(
-    rw->GetRenderWindow()->GetInteractor()->GetInteractorStyle());
-  if (istyle)
-    {
-    istyle->SetCurrentStyleToTrackballCamera();
-    }
 
   // Create a 3D object reader
 
