@@ -47,9 +47,9 @@ ENDIF(BUILD_EXAMPLES)
 # based on KWWidgets, you can most likely omit this section too, unless
 # your application supports that feature too.
 
-IF(BUILD_TESTING)
+IF(BUILD_TESTING AND BUILD_SHARED_LIBS)
   IF (VTK_WRAP_TCL AND TCL_TCLSH)
     ADD_TEST(Test${EXE_NAME}Tcl 
       ${TCL_TCLSH} "${CMAKE_CURRENT_SOURCE_DIR}/${EXE_NAME}.tcl" --test)
   ENDIF (VTK_WRAP_TCL AND TCL_TCLSH)
-ENDIF(BUILD_TESTING)
+ENDIF(BUILD_TESTING AND BUILD_SHARED_LIBS)
