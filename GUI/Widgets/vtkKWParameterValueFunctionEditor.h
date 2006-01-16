@@ -529,7 +529,7 @@ public:
   // Description:
   // Set/Get if the points of the function are locked in the parameter
   // space (they can not be removed or can only be moved in the value space).
-  vtkSetMacro(LockPointsParameter, int);
+  virtual void SetLockPointsParameter(int);
   vtkBooleanMacro(LockPointsParameter, int);
   vtkGetMacro(LockPointsParameter, int);
 
@@ -537,7 +537,7 @@ public:
   // Set/Get if the end-points of the function are locked in the parameter
   // space (they can not be removed or can only be moved in the value space).
   // Superseded by LockPointsParameter
-  vtkSetMacro(LockEndPointsParameter, int);
+  virtual void SetLockEndPointsParameter(int);
   vtkBooleanMacro(LockEndPointsParameter, int);
   vtkGetMacro(LockEndPointsParameter, int);
 
@@ -545,7 +545,7 @@ public:
   // Set/Get if the points of the function are locked in the value
   // space (they can not be removed or can only be moved in the parameter 
   // space).
-  vtkSetMacro(LockPointsValue, int);
+  virtual void SetLockPointsValue(int);
   vtkBooleanMacro(LockPointsValue, int);
   vtkGetMacro(LockPointsValue, int);
 
