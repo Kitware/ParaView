@@ -32,7 +32,7 @@ pqCompoundProxyWizard::~pqCompoundProxyWizard()
 void pqCompoundProxyWizard::onLoad()
 {
   pqFileDialog* fileDialog = new pqFileDialog(
-    new pqLocalFileDialogModel(this), 
+    new pqLocalFileDialogModel(), 
     tr("Open Compound Proxy File:"),
     this,
     "fileOpenDialog");
