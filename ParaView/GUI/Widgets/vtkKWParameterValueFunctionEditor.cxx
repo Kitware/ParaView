@@ -34,7 +34,7 @@
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.80");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.81");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -560,6 +560,48 @@ int vtkKWParameterValueFunctionEditor::FunctionPointParameterIsLocked(int id)
 int vtkKWParameterValueFunctionEditor::FunctionPointValueIsLocked(int)
 {
  return (this->HasFunction() && this->LockPointsValue);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetLockPointsParameter(int arg)
+{
+  if (this->LockPointsParameter == arg)
+    {
+    return;
+    }
+
+  this->LockPointsParameter = arg;
+  this->Modified();
+
+  this->UpdatePointEntries(this->GetSelectedPoint());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetLockEndPointsParameter(int arg)
+{
+  if (this->LockEndPointsParameter == arg)
+    {
+    return;
+    }
+
+  this->LockEndPointsParameter = arg;
+  this->Modified();
+
+  this->UpdatePointEntries(this->GetSelectedPoint());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetLockPointsValue(int arg)
+{
+  if (this->LockPointsValue == arg)
+    {
+    return;
+    }
+
+  this->LockPointsValue = arg;
+  this->Modified();
+
+  this->UpdatePointEntries(this->GetSelectedPoint());
 }
 
 //----------------------------------------------------------------------------
