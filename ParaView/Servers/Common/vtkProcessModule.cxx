@@ -93,7 +93,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.34");
+vtkCxxRevisionMacro(vtkProcessModule, "1.35");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 //-----------------------------------------------------------------------------
@@ -824,14 +824,18 @@ void vtkProcessModule::SendPrepareProgress(vtkConnectionID connectionId)
     return;
     }
 
-  this->GUIHelper->SendPrepareProgress();
-  
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke 
-         << this->GetProcessModuleID() << "PrepareProgress" 
-         << vtkClientServerStream::End;
-  this->SendStream(connectionId,
-    vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
+  if (this->ProgressRequests == 0)
+    {
+    this->GUIHelper->SendPrepareProgress();
+    
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke 
+           << this->GetProcessModuleID() << "PrepareProgress" 
+           << vtkClientServerStream::End;
+    this->SendStream(connectionId,
+                     vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, 
+                     stream);
+    }
   this->ProgressRequests ++;
 }
 
