@@ -34,7 +34,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.63");
+vtkCxxRevisionMacro(vtkSMProxy, "1.64");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -1616,7 +1616,27 @@ vtkPVXMLElement* vtkSMProxy::SaveState(vtkPVXMLElement* root)
     proxyElement->Delete();
     }
 
+  // Now save subproxies.
+  this->SaveSubProxyIds(proxyElement);
+
   return proxyElement;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::SaveSubProxyIds(vtkPVXMLElement* root)
+{
+  vtkSMProxyInternals::ProxyMap::iterator iter =
+    this->Internals->SubProxies.begin();
+  for (; iter != this->Internals->SubProxies.end(); ++iter)
+    {
+    vtkPVXMLElement* subproxyElement = vtkPVXMLElement::New();
+    subproxyElement->SetName("SubProxy");
+    subproxyElement->AddAttribute("name", iter->first.c_str());
+    subproxyElement->AddAttribute("id", iter->second.GetPointer()->GetSelfIDAsString());
+    iter->second.GetPointer()->SaveSubProxyIds(subproxyElement);
+    root->AddNestedElement(subproxyElement);
+    subproxyElement->Delete();
+    }
 }
 
 //---------------------------------------------------------------------------
