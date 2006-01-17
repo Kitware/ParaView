@@ -34,7 +34,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.64");
+vtkCxxRevisionMacro(vtkSMProxy, "1.65");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -797,7 +797,6 @@ void vtkSMProxy::UpdateVTKObjects()
 
   vtkClientServerStream str;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SendPrepareProgress(this->ConnectionID);
 
   int old_SelfPropertiesModified = this->SelfPropertiesModified;
   
@@ -876,8 +875,6 @@ void vtkSMProxy::UpdateVTKObjects()
       wasModified = 1;
       }
     }
-
-  pm->SendCleanupPendingProgress(this->ConnectionID);
 
   this->InUpdateVTKObjects = 0;
   
