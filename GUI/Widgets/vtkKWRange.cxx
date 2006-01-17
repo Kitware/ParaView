@@ -24,7 +24,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.62");
+vtkCxxRevisionMacro(vtkKWRange, "1.63");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -1259,7 +1259,7 @@ void vtkKWRange::InvokeRangeCommand(const char *command,
     {
     // As a convenience, try to detect if we are manipulating integers, and
     // invoke the callback with the approriate type.
-    if ((double)((long int)r0) == r0 && (double)((long int)r1) == r1)
+    if ((double)((long int)this->Resolution) == this->Resolution)
       {
       this->Script("%s %ld %ld", command, (long int)r0, (long int)r1);
       }

@@ -252,7 +252,8 @@ public:
   // arguments in string form. If the object is NULL, the method is still
   // evaluated as a simple command. 
   // The following parameters are also passed to the command:
-  // - the current (sub-)range: double, double
+  // - the current range: int, int (if Resolution is integer); double, double
+  //   otherwise.
   virtual void SetCommand(vtkObject *object, const char *method);
   virtual void SetStartCommand(vtkObject *object, const char *method);
   virtual void SetEndCommand(vtkObject *object, const char *method);

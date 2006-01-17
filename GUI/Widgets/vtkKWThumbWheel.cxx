@@ -34,7 +34,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.46");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.47");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -1035,7 +1035,7 @@ void vtkKWThumbWheel::InvokeThumbWheelCommand(
     {
     // As a convenience, try to detect if we are manipulating integers, and
     // invoke the callback with the approriate type.
-    if ((double)((long int)value) == value)
+    if ((double)((long int)this->Resolution) == this->Resolution)
       {
       this->Script("%s %ld", command, (long int)value);
       }
