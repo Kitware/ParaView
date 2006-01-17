@@ -64,7 +64,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.471");
+vtkCxxRevisionMacro(vtkPVSource, "1.472");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -1298,6 +1298,12 @@ void vtkPVSource::CleanupDisplays()
     }
   if (this->PointLabelDisplayProxy)
     {
+    const char* proxyName = proxm->GetProxyName("displays",
+      this->PointLabelDisplayProxy);
+    if (proxyName)
+      {
+      proxm->UnRegisterProxy("displays", proxyName);
+      }
     this->RemoveDisplayFromRenderModule(this->PointLabelDisplayProxy);
     this->PointLabelDisplayProxy->Delete();
     this->PointLabelDisplayProxy = 0;
@@ -1386,6 +1392,11 @@ void vtkPVSource::SetupDisplays()
   else
     {
     ccpp->AddProxy(this->Proxy);
+    ostrstream str2;
+    str2 << this->GetName() << ".PointLabelDisplay" << ends;
+    proxm->RegisterProxy(
+      "displays", str2.str(), this->PointLabelDisplayProxy);
+    str2.rdbuf()->freeze(0);
     this->PointLabelDisplayProxy->UpdateVTKObjects();
     }
   this->PointLabelDisplayProxy->SetVisibilityCM(0);
