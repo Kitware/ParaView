@@ -131,11 +131,27 @@ public:
 
   // Description:
   // Specifies commands to associate with the widget. 
-  // 'Command' is invoked when the widget value is changed (i.e., during user
-  // interaction on the widget's slider).
-  // 'StartCommand' is invoked at the beginning of an interaction with
-  // the widget.
-  // 'EndCommand' is invoked at the end of an interaction with the widget.
+  // 'Command' is invoked when the widget value is changing (i.e. during
+  // user interaction).
+  // 'StartCommand' is invoked at the beginning of a user interaction with
+  // the widget (when a mouse button is pressed over the widget for example).
+  // 'EndCommand' is invoked at the end of the user interaction with the 
+  // widget (when the mouse button is released for example).
+  // The need for a 'Command', 'StartCommand' and 'EndCommand' can be
+  // explained as follows: 'EndCommand' can be used to be notified about any
+  // changes made to this widget *after* the corresponding user interaction has
+  // been performed (say, after releasing the mouse button that was dragging
+  // a slider, or after clicking on a checkbutton). 'Command' can be set
+  // *additionally* to be notified about the intermediate changes that
+  // occur *during* the corresponding user interaction (say, *while* dragging
+  // a slider). While setting 'EndCommand' is enough to be notified about
+  // any changes, setting 'Command' is an application-specific choice that
+  // is likely to depend on how fast you want (or can) answer to rapid changes
+  // occuring during a user interaction, if any. 'StartCommand' is rarely
+  // used but provides an opportunity for the application to modify its
+  // state and prepare itself for user-interaction; in that case, the
+  // 'EndCommand' is usually set in a symmetric fashion to set the application
+  // back to its previous state.
   // The 'object' argument is the object that will have the method called on
   // it. The 'method' argument is the name of the method to be called and any
   // arguments in string form. If the object is NULL, the method is still

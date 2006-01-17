@@ -209,6 +209,17 @@ public:
   // changed (i.e. at the end of the user interaction), whereas 
   // 'VolumePropertyChangingCommand' is invoked when the volume property is
   // changing (i.e. during the user interaction itself).
+  // The need for a '...ChangedCommand' and '...ChangingCommand' can be
+  // explained as follows: the former can be used to be notified about any
+  // changes made to this widget *after* the corresponding user interaction has
+  // been performed (say, after releasing the mouse button that was dragging
+  // a slider, or after clicking on a checkbutton). The later can be set
+  // *additionally* to be notified about the intermediate changes that
+  // occur *during* the corresponding user interaction (say, *while* dragging
+  // a slider). While setting '...ChangedCommand' is enough to be notified
+  // about any changes, setting '...ChangingCommand' is an application-specific
+  // choice that is likely to depend on how fast you want (or can) answer to
+  // rapid changes occuring during a user interaction, if any.
   // The 'object' argument is the object that will have the method called on
   // it. The 'method' argument is the name of the method to be called and any
   // arguments in string form. If the object is NULL, the method is still
