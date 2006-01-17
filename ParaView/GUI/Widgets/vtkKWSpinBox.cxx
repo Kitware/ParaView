@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSpinBox);
-vtkCxxRevisionMacro(vtkKWSpinBox, "1.10");
+vtkCxxRevisionMacro(vtkKWSpinBox, "1.11");
 
 //----------------------------------------------------------------------------
 vtkKWSpinBox::vtkKWSpinBox() 
@@ -68,6 +68,12 @@ void vtkKWSpinBox::SetRange(double from, double to)
 void vtkKWSpinBox::SetIncrement(double increment)
 {
   this->SetConfigurationOptionAsDouble("-increment", increment);
+}
+
+//----------------------------------------------------------------------------
+double vtkKWSpinBox::GetIncrement()
+{
+  return this->GetConfigurationOptionAsDouble("-increment");
 }
 
 //----------------------------------------------------------------------------
@@ -160,7 +166,8 @@ void vtkKWSpinBox::InvokeCommand(double value)
     {
     // As a convenience, try to detect if we are manipulating integers, and
     // invoke the callback with the approriate type.
-    if ((double)((long int)value) == value)
+    double increment = this->GetIncrement();
+    if ((double)((long int)increment) == increment)
       {
       this->Script("%s %ld", this->Command, (long int)value);
       }

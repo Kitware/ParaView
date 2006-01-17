@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.47");
+vtkCxxRevisionMacro(vtkKWExtent, "1.48");
 
 //----------------------------------------------------------------------------
 vtkKWExtent::vtkKWExtent()
@@ -313,9 +313,15 @@ void vtkKWExtent::InvokeExtentCommand(
     {
     // As a convenience, try to detect if we are manipulating integers, and
     // invoke the callback with the approriate type.
-    if ((double)((long int)x0) == x0 && (double)((long int)x1) == x1 &&
-        (double)((long int)y0) == y0 && (double)((long int)y1) == y1 &&
-        (double)((long int)z0) == z0 && (double)((long int)z1) == z1)
+    if ((!this->ExtentVisibility[0] || 
+         (double)((long int)this->Range[0]->GetResolution()) == 
+         this->Range[0]->GetResolution()) &&
+        (!this->ExtentVisibility[1] || 
+         (double)((long int)this->Range[1]->GetResolution()) == 
+         this->Range[1]->GetResolution()) &&
+        (!this->ExtentVisibility[2] || 
+         (double)((long int)this->Range[2]->GetResolution()) == 
+         this->Range[2]->GetResolution()))
       {
       this->Script("%s %ld %ld %ld %ld %ld %ld", 
                    command, 

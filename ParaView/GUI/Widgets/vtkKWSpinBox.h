@@ -46,6 +46,7 @@ public:
   // Description:
   // Set the increment value.
   virtual void SetIncrement(double increment);
+  virtual double GetIncrement();
 
   // Description:
   // Set/Get the current value.
@@ -91,7 +92,7 @@ public:
   // arguments in string form. If the object is NULL, the method is still
   // evaluated as a simple command. 
   // The following parameters are also passed to the command:
-  // - the current value: double
+  // - the current value: int (if Increment is integer); double otherwise
   virtual void SetCommand(vtkObject *object, const char *method);
 
   // Description:

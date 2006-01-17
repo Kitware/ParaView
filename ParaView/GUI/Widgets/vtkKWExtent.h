@@ -97,7 +97,9 @@ public:
   // arguments in string form. If the object is NULL, the method is still
   // evaluated as a simple command. 
   // The following parameters are also passed to the command:
-  // - the current extent: double, double, double, double, double, double
+  // - the current extent: int, int, int, int, int, int (if the Resolution of
+  //   all the visible ranges are integer); double, double, double, double, 
+  //   double, double otherwise.
   virtual void SetCommand(vtkObject *object, const char *method);
   virtual void SetStartCommand(vtkObject *object, const char *method);
   virtual void SetEndCommand(vtkObject *object, const char *method);
