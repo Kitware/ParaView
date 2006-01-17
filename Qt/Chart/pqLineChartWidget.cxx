@@ -15,6 +15,7 @@
 #include "pqChartMouseBox.h"
 #include "pqChartZoomPan.h"
 #include "pqLineChart.h"
+#include "pqChartLabel.h"
 
 #include <QCursor>
 #include <QEvent>
@@ -35,9 +36,11 @@
 pqLineChartWidget::pqLineChartWidget(QWidget *p)
   : QAbstractScrollArea(p)
 {
+  this->BackgroundColor = Qt::white;
   this->Mode = pqLineChartWidget::NoMode;
   this->Mouse = new pqChartMouseBox();
   this->ZoomPan = new pqChartZoomPan(this);
+  this->Title = 0;
   this->XAxis = 0;
   this->YAxis = 0;
   this->LineChart = 0;
@@ -62,6 +65,11 @@ pqLineChartWidget::pqLineChartWidget(QWidget *p)
         this, SLOT(layoutChart(int, int)));
     }
 
+  // Setup the chart title
+  this->Title = new pqChartLabel();
+  connect(this->Title, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
+  connect(this->Title, SIGNAL(repaintNeeded()), this, SLOT(repaintChart()));
+
   // Set up the line chart and the axes.
   QFont myFont = font();
   this->XAxis = new pqChartAxis(pqChartAxis::Bottom);
@@ -69,7 +77,7 @@ pqLineChartWidget::pqLineChartWidget(QWidget *p)
   if(this->XAxis)
     {
     this->XAxis->setNeigbors(this->YAxis, 0);
-    this->XAxis->setFont(myFont);
+    this->XAxis->setTickLabelFont(myFont);
     connect(this->XAxis, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
     connect(this->XAxis, SIGNAL(repaintNeeded()), this, SLOT(repaintChart()));
     }
@@ -77,7 +85,7 @@ pqLineChartWidget::pqLineChartWidget(QWidget *p)
   if(this->YAxis)
     {
     this->YAxis->setNeigbors(this->XAxis, 0);
-    this->YAxis->setFont(myFont);
+    this->YAxis->setTickLabelFont(myFont);
     connect(this->YAxis, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
     connect(this->YAxis, SIGNAL(repaintNeeded()), this, SLOT(repaintChart()));
     }
@@ -93,6 +101,8 @@ pqLineChartWidget::pqLineChartWidget(QWidget *p)
 
 pqLineChartWidget::~pqLineChartWidget()
 {
+  delete this->Title;
+  
   if(this->LineChart)
     delete this->LineChart;
   if(this->XAxis)
@@ -106,6 +116,17 @@ pqLineChartWidget::~pqLineChartWidget()
     delete this->Mouse;
 }
 
+void pqLineChartWidget::setBackgroundColor(const QColor& color)
+{
+  this->BackgroundColor = color;
+
+  if(this->ZoomPan)
+    {
+    this->layoutChart(this->ZoomPan->contentsWidth(),
+        this->ZoomPan->contentsHeight());
+    }
+}
+
 void pqLineChartWidget::setFont(const QFont &f)
 {
   QAbstractScrollArea::setFont(f);
@@ -117,14 +138,14 @@ void pqLineChartWidget::setFont(const QFont &f)
   if(this->XAxis)
     {
     this->XAxis->blockSignals(true);
-    this->XAxis->setFont(f);
+    this->XAxis->setTickLabelFont(f);
     this->XAxis->blockSignals(false);
     }
 
   if(this->YAxis)
     {
     this->YAxis->blockSignals(true);
-    this->YAxis->setFont(f);
+    this->YAxis->setTickLabelFont(f);
     this->YAxis->blockSignals(false);
     }
 
@@ -155,6 +176,11 @@ void pqLineChartWidget::repaintChart()
 void pqLineChartWidget::layoutChart(int w, int h)
 {
   QRect area(MARGIN, MARGIN, w - DBL_MARGIN, h - DBL_MARGIN);
+  
+  const QRect title_request = this->Title->getSizeRequest();
+  this->Title->setBounds(QRect(area.left(), area.top(), area.width(), title_request.height()));
+  area = QRect(area.left(), area.top() + title_request.height(), area.right(), area.height() - title_request.height());
+  
   if(this->XAxis)
     this->XAxis->layoutAxis(area);
   if(this->YAxis)
@@ -273,6 +299,9 @@ void pqLineChartWidget::paintEvent(QPaintEvent *e)
   // Set the widget font.
   painter->setFont(font());
 
+  // Paint the widget background.
+  painter->fillRect(area, this->BackgroundColor);
+
   // Draw in the axes and grid.
   if(this->YAxis)
     this->YAxis->drawAxis(painter, area);
@@ -288,6 +317,9 @@ void pqLineChartWidget::paintEvent(QPaintEvent *e)
     this->YAxis->drawAxisLine(painter);
   if(this->XAxis)
     this->XAxis->drawAxisLine(painter);
+
+  // Draw the chart title
+  this->Title->draw(*painter, area);
 
   if(this->Mouse && this->Mouse->Box.isValid())
     {

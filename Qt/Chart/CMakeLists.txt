@@ -18,6 +18,8 @@ SET(pqChart_SRCS
   pqChartCoordinate.cxx
   pqChartCoordinate.h
   pqChartExport.h
+  pqChartLabel.cxx
+  pqChartLabel.h
   pqChartMouseBox.cxx
   pqChartMouseBox.h
   pqChartValue.cxx
@@ -49,6 +51,7 @@ SET(pqChart_SRCS
 
 QT4_WRAP_CPP(pqChart_MOC_SRCS
   pqChartAxis.h
+  pqChartLabel.h
   pqChartZoomPan.h
   pqHistogramChart.h
   pqHistogramWidget.h

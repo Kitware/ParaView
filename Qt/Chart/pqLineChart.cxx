@@ -72,12 +72,6 @@ void pqLineChart::setAxes(pqChartAxis *xAxis, pqChartAxis *yAxis,
   this->XShared = shared;
 }
 
-void pqLineChart::setData(pqLinePlot *plot)
-{
-  this->clearData();
-  this->addData(plot);
-}
-
 void pqLineChart::addData(pqLinePlot *plot)
 {
   if(!this->Data || !this->XAxis || !this->YAxis)
@@ -225,6 +219,9 @@ void pqLineChart::drawChart(QPainter *p, const QRect &area)
   if(!clip.isValid())
     return;
 
+  p->save();
+  p->setRenderHint(QPainter::Antialiasing, true);
+
   // Set the clipping area to make sure the lines are drawn
   // inside the chart area.
   QRegion lastClip;
@@ -235,7 +232,6 @@ void pqLineChart::drawChart(QPainter *p, const QRect &area)
   p->setClipRect(clip);
 
   // Draw in all the plot items.
-  QPen linePen(Qt::black, 2);
   pqLineChartData::iterator iter = this->Data->begin();
   for( ; iter != this->Data->end(); iter++)
     {
@@ -243,9 +239,7 @@ void pqLineChart::drawChart(QPainter *p, const QRect &area)
     if(item && item->Plot && !item->Array.isEmpty())
       {
       // Set the drawing pen up for the plot.
-      linePen.setColor(item->Plot->getColor());
-      linePen.setWidth(item->Plot->getWidth());
-      p->setPen(linePen);
+      p->setPen(item->Plot->getPen());
 
       // Draw the line segments.
       if(item->Plot->isPolyLine())
@@ -264,6 +258,8 @@ void pqLineChart::drawChart(QPainter *p, const QRect &area)
   p->setClipping(wasClipping);
   if(wasClipping)
     p->setClipRegion(lastClip);
+    
+  p->restore();
 }
 
 void pqLineChart::handlePlotChanges(const pqLinePlot *plot)

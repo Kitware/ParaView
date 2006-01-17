@@ -57,19 +57,9 @@ public:
   void setAxes(pqChartAxis *xAxis, pqChartAxis *yAxis,
       bool shared=false);
 
-  /// \brief
-  ///   Sets the line plot displayed on the line chart.
-  ///
-  /// The line plot object is used by the line chart to draw the
-  /// function it represents on the chart area. Setting a line
-  /// plot with this method will clear any line plots currently
-  /// tied to the chart. To add another line plot, use the
-  /// \c addData method.
-  ///
-  /// \param plot The line plot to display.
-  /// \sa pqLineChart::setAxes(pqChartAxis *, pqChartAxis *),
-  ///     pqLineChart::addData(pqLinePlot *)
-  void setData(pqLinePlot *plot);
+  /// Removes any line plots current tied to the chart.  Use the
+  /// \c addData method to add plots to the chart.
+  void clearData();
 
   /// \brief
   ///   Adds another line plot to the chart.
@@ -121,10 +111,6 @@ public slots:
   void handlePlotChanges(const pqLinePlot *plot);
 
 private:
-  /// \brief
-  ///   Deletes all the line plots in the data list.
-  void clearData();
-
   /// \brief
   ///   Calculates the pixel point array for the given item.
   /// \param item The line chart item to process.

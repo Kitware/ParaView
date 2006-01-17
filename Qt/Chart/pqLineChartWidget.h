@@ -17,6 +17,7 @@
 #include <QAbstractScrollArea>
 
 class pqChartAxis;
+class pqChartLabel;
 class pqChartMouseBox;
 class pqChartZoomPan;
 class pqLineChart;
@@ -48,12 +49,23 @@ public:
   virtual ~pqLineChartWidget();
 
   /// \brief
+  ///   Sets the background color for the widget.
+  ///
+  /// All chart components are drawn on-top-of this color.
+  ///
+  /// \param color The color to use for the background.
+  void setBackgroundColor(const QColor &color);
+
+  /// \brief
   ///   Sets the font for the widget.
   ///
   /// The font is used for the labels on the histogram axes.
   ///
   /// \param font The font to use.
   virtual void setFont(const QFont &font);
+
+  /// Returns the chart title object
+  pqChartLabel& getTitle() {return *this->Title;}
 
   /// \name Interface Methods
   //@{
@@ -62,6 +74,18 @@ public:
   /// \return
   ///   A pointer to the line chart object.
   pqLineChart *getLineChart() {return this->LineChart;}
+
+  /// \brief
+  ///   Returns the chart X-axis.
+  /// \return
+  ///   A pointer to the axis.
+  pqChartAxis *getXAxis() {return this->XAxis;}
+
+  /// \brief
+  ///   Returns the chart Y-axis.
+  /// \return
+  ///   A pointer to the axis.
+  pqChartAxis *getYAxis() {return this->YAxis;}
 
   /// \brief
   ///   Gets the zoom/pan handler for the widget.
@@ -168,9 +192,11 @@ private:
   virtual bool viewportEvent(QEvent *e);
 
 private:
+  QColor BackgroundColor;  ///< Stores the background color.
   MouseMode Mode;          ///< Stores the current mouse state.
   pqChartMouseBox *Mouse;  ///< Stores the mouse drag box.
   pqChartZoomPan *ZoomPan; ///< Handles the zoom/pan interaction.
+  pqChartLabel* Title;     ///< Used to draw the chart title.
   pqChartAxis *XAxis;      ///< Used to draw the x-axis.
   pqChartAxis *YAxis;      ///< Used to draw the y-axis.
   pqLineChart *LineChart;  ///< Used to draw the line chart.

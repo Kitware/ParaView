@@ -18,6 +18,7 @@
 #include <QSize> // Needed for QSize return type.
 
 class pqChartAxis;
+class pqChartLabel;
 class pqChartMouseBox;
 class pqChartValue;
 class pqChartValueList;
@@ -112,6 +113,14 @@ public:
   virtual ~pqHistogramWidget();
 
   /// \brief
+  ///   Sets the background color for the widget.
+  ///
+  /// All chart components are drawn on-top-of this color.
+  ///
+  /// \param color The color to use for the background.
+  void setBackgroundColor(const QColor &color);
+
+  /// \brief
   ///   Sets the font for the widget.
   ///
   /// The font is used for the labels on the histogram axes.
@@ -126,13 +135,8 @@ public:
   /// \sa pqHistogramWidget::setInteractMode(InteractMode)
   InteractMode getInteractMode() const {return this->Interact;}
 
-  /// \name Color Methods
-  //@{
-  /// \brief
-  ///   Sets the histogram bar color scheme.
-  /// \param scheme The color scheme interface to use.
-  void setBinColorScheme(pqHistogramColor *scheme);
-  //@}
+  /// Returns the chart title object
+  pqChartLabel& getTitle() {return *this->Title;}
 
   /// \name Interface Methods
   //@{
@@ -303,9 +307,11 @@ private:
   void sendSelectionNotification();
 
 private:
+  QColor BackgroundColor;      ///< Stores the current background color.
   MouseMode Mode;              ///< Stores the current mouse state.
   InteractMode Interact;       ///< Stores the current interaction mode.
   InteractMode SelectMode;     ///< Stores the current selection type.
+  pqChartLabel* Title;         ///< Used to draw the chart title.
   pqChartAxis *XAxis;          ///< Used to draw the x-axis.
   pqChartAxis *YAxis;          ///< Used to draw the y-axis.
   pqChartAxis *FAxis;          ///< Used to draw the function axis.

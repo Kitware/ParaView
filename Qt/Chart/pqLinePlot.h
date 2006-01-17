@@ -13,7 +13,7 @@
 
 #include "pqChartExport.h"
 #include <QObject>
-#include <QColor> // Needed for color member.
+#include <QPen>
 
 class pqChartCoordinate;
 class pqChartValue;
@@ -110,30 +110,11 @@ public:
   bool isModified() const {return this->Modified;}
   //@}
 
-  /// \name Drawing Parameters
-  //@{
-  /// \brief
-  ///   Sets the color used to draw the line plot.
-  /// \param color The new color to draw the line plot.
-  void setColor(const QColor &color);
-
-  /// \brief
-  ///   Gets the color used to draw the line plot.
-  /// \return
-  ///   The color used to draw the line plot.
-  const QColor &getColor() const {return this->Color;}
-
-  /// \brief
-  ///   Sets the width used to draw the line plot.
-  /// \param width The new line width of the plot.
-  void setWidth(int width);
-
-  /// \brief
-  ///   Gets the width used to draw the line plot.
-  /// \return
-  ///   The drawing width of the line plot.
-  int getWidth() const {return this->Thickness;}
-  //@}
+  /// Sets the pen used to draw the line plot.
+  void setPen(const QPen& pen);
+  
+  /// Returns the pen used to draw the line plot.
+  const QPen getPen() const {return this->Pen;}
 
 signals:
   /// \brief
@@ -146,8 +127,7 @@ signals:
   void plotModified(const pqLinePlot *plot);
 
 private:
-  QColor Color;  ///< Stores the line plot's color.
-  int Thickness; ///< Stores the line thickness.
+  QPen Pen;      ///< Stores the pen used to plot the line
   bool Modified; ///< True if the data has changed.
 };
 

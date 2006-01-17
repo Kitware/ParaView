@@ -10,6 +10,8 @@
 #include "pqObjectLineChartWidget.h"
 #include "pqServer.h"
 
+#include <pqChartAxis.h>
+#include <pqChartLabel.h>
 #include <pqLineChart.h>
 #include <pqLineChartWidget.h>
 #include <pqPiecewiseLine.h>
@@ -50,6 +52,38 @@ struct pqObjectLineChartWidget::pqImplementation
     CurrentVariable(""),
     CurrentElementID(0)
   {
+    QFont h1;
+    h1.setBold(true);
+    h1.setPointSize(12.0);
+    h1.setStyleStrategy(QFont::PreferAntialias);
+  
+    QFont bold;
+    bold.setBold(true);
+    bold.setStyleStrategy(QFont::PreferAntialias);
+    
+    QFont italic;
+    italic.setItalic(true);
+    italic.setStyleStrategy(QFont::PreferAntialias);
+    
+    QFont bold_italic;
+    bold_italic.setBold(true);
+    bold_italic.setItalic(true);
+    bold_italic.setStyleStrategy(QFont::PreferAntialias);
+    
+    this->LineChartWidget.setBackgroundColor(Qt::white);
+    
+    this->LineChartWidget.getTitle().setFont(h1);
+    this->LineChartWidget.getTitle().setColor(Qt::darkGray);
+    
+    this->LineChartWidget.getXAxis()->setGridColor(Qt::lightGray);
+    this->LineChartWidget.getXAxis()->setAxisColor(Qt::darkGray);
+    this->LineChartWidget.getXAxis()->setTickLabelColor(Qt::darkGray);
+    this->LineChartWidget.getXAxis()->setTickLabelFont(italic);
+    
+    this->LineChartWidget.getYAxis()->setGridColor(Qt::lightGray);
+    this->LineChartWidget.getYAxis()->setAxisColor(Qt::darkGray);
+    this->LineChartWidget.getYAxis()->setTickLabelColor(Qt::darkGray);
+    this->LineChartWidget.getYAxis()->setTickLabelFont(bold);
   }
   
   ~pqImplementation()
@@ -121,6 +155,8 @@ struct pqObjectLineChartWidget::pqImplementation
     // Populate the current-variable combo-box with available variables
     // (we do this here because the set of available variables may change as properties
     // are modified in e.g: a source or a reader)
+    int current_index = 0;
+    
     this->Variables.clear();
     this->Variables.addItem(QString(), QString());
     
@@ -133,6 +169,11 @@ struct pqObjectLineChartWidget::pqImplementation
           continue;
         const char* const array_name = point_data->GetArrayName(i);
         this->Variables.addItem(QString(array_name) + " (point)", QString(array_name));
+        
+        if(this->CurrentVariable == array_name)
+          {
+          current_index = this->Variables.count() - 1;
+          }
         }
       }
       
@@ -145,15 +186,51 @@ struct pqObjectLineChartWidget::pqImplementation
           continue;
         const char* const array_name = cell_data->GetArrayName(i);
         this->Variables.addItem(QString(array_name) + " (cell)", QString(array_name));
+        
+        if(this->CurrentVariable == array_name)
+          {
+          current_index = this->Variables.count() - 1;
+          }
         }
       }
 
-    this->updateChart();
+   this->Variables.setCurrentIndex(current_index);
+   this->updateChart();
+  }
+  
+  void addPlot(vtkExodusReader& Reader, const int ID, const QPen& Pen)
+  {
+    const int id = ID + 1; // Exodus expects one-based cell ids
+    QByteArray name = this->CurrentVariable.toAscii();
+    const char* type = "CELL";
+    vtkFloatArray* const array = vtkFloatArray::New();
+    Reader.GetTimeSeriesData(id, name.data(), type, array); 
+    
+    pqChartCoordinateList coordinates;
+    for(vtkIdType i = 0; i != array->GetNumberOfTuples(); ++i)
+      {
+      double value = array->GetValue(i);
+      coordinates.pushBack(pqChartCoordinate(static_cast<double>(i), value));
+      }
+
+    array->Delete();
+      
+    pqPiecewiseLine* const plot = new pqPiecewiseLine();
+    plot->setCoordinates(coordinates);
+    plot->setPen(Pen);
+    
+    this->LineChartWidget.getLineChart()->addData(plot);
   }
   
   void updateChart()
   {
-    this->LineChartWidget.hide();
+    this->LineChartWidget.getLineChart()->clearData();
+    this->LineChartWidget.getTitle().setText("");
+    this->LineChartWidget.getXAxis()->setVisible(false);
+    this->LineChartWidget.getYAxis()->setVisible(false);
+    
+    if(this->CurrentVariable.isEmpty())
+      return;
     
     if(!this->SourceProxy)
       return;
@@ -167,27 +244,12 @@ struct pqObjectLineChartWidget::pqImplementation
       process_module->GetObjectFromID(this->SourceProxy->GetID(0)));
     if(!reader)
       return;
-    
-    const int id = this->CurrentElementID + 1; // Exodus expects one-based cell ids
-    QByteArray name = this->CurrentVariable.toAscii();
-    const char* type = "CELL";
-    vtkFloatArray* const array = vtkFloatArray::New();
-    reader->GetTimeSeriesData(id, name.data(), type, array); 
-    
-    pqChartCoordinateList coordinates;
-    for(vtkIdType i = 0; i != array->GetNumberOfTuples(); ++i)
-      {
-      double value = array->GetValue(i);
-      coordinates.pushBack(pqChartCoordinate(static_cast<double>(i), value));
-      }
-      
-    pqPiecewiseLine* const plot = new pqPiecewiseLine();
-    plot->setCoordinates(coordinates);
-    
-    this->LineChartWidget.getLineChart()->setData(plot);
-    this->LineChartWidget.show();
 
-    array->Delete();
+    this->LineChartWidget.getTitle().setText(this->CurrentVariable + " vs. Time");
+    this->LineChartWidget.getXAxis()->setVisible(true);
+    this->LineChartWidget.getYAxis()->setVisible(true);
+    
+    addPlot(*reader, this->CurrentElementID, QPen(Qt::darkBlue, 1.5));
   }
   
   vtkSMProxy* SourceProxy;

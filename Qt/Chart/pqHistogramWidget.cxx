@@ -18,6 +18,7 @@
 #include "pqHistogramSelection.h"
 #include "pqLineChart.h"
 #include "pqChartAxis.h"
+#include "pqChartLabel.h"
 
 #include <QCursor>
 #include <QEvent>
@@ -76,9 +77,11 @@ void pqHistogramWidgetData::cleanSelectionList()
 pqHistogramWidget::pqHistogramWidget(QWidget *p)
   : QAbstractScrollArea(p)
 {
+  this->BackgroundColor = Qt::white;
   this->Mode = pqHistogramWidget::NoMode;
   this->Interact = pqHistogramWidget::Bin;
   this->SelectMode = pqHistogramWidget::Bin;
+  this->Title = 0;
   this->XAxis = 0;
   this->YAxis = 0;
   this->FAxis = 0;
@@ -100,6 +103,11 @@ pqHistogramWidget::pqHistogramWidget(QWidget *p)
   this->viewport()->setPalette(newPalette);
   this->setAttribute(Qt::WA_KeyCompression);
 
+  // Setup the chart title
+  this->Title = new pqChartLabel();
+  connect(this->Title, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
+  connect(this->Title, SIGNAL(repaintNeeded()), this, SLOT(repaintChart()));
+
   // Set up the histogram and its parameters.
   QFont myFont = font();
   this->XAxis = new pqChartAxis(pqChartAxis::Bottom);
@@ -108,7 +116,7 @@ pqHistogramWidget::pqHistogramWidget(QWidget *p)
   if(this->XAxis)
     {
     this->XAxis->setNeigbors(this->YAxis, this->FAxis);
-    this->XAxis->setFont(myFont);
+    this->XAxis->setTickLabelFont(myFont);
     connect(this->XAxis, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
     connect(this->XAxis, SIGNAL(repaintNeeded()), this, SLOT(repaintChart()));
     }
@@ -116,7 +124,7 @@ pqHistogramWidget::pqHistogramWidget(QWidget *p)
   if(this->YAxis)
     {
     this->YAxis->setNeigbors(this->XAxis, 0);
-    this->YAxis->setFont(myFont);
+    this->YAxis->setTickLabelFont(myFont);
     connect(this->YAxis, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
     connect(this->YAxis, SIGNAL(repaintNeeded()), this, SLOT(repaintChart()));
     }
@@ -124,8 +132,8 @@ pqHistogramWidget::pqHistogramWidget(QWidget *p)
   if(this->FAxis)
     {
     this->FAxis->setNeigbors(this->XAxis, 0);
-    this->FAxis->setFont(myFont);
-    this->FAxis->setColor(Qt::darkBlue); // Differentiate the function grid.
+    this->FAxis->setTickLabelFont(myFont);
+    this->FAxis->setAxisColor(Qt::darkBlue); // Differentiate the function grid.
     connect(this->FAxis, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
     connect(this->FAxis, SIGNAL(repaintNeeded()), this, SLOT(repaintChart()));
     }
@@ -163,6 +171,8 @@ pqHistogramWidget::pqHistogramWidget(QWidget *p)
 
 pqHistogramWidget::~pqHistogramWidget()
 {
+  delete this->Title;
+
   if(this->Histogram)
     delete this->Histogram;
   if(this->LineChart)
@@ -182,6 +192,17 @@ pqHistogramWidget::~pqHistogramWidget()
     delete this->Mouse;
 }
 
+void pqHistogramWidget::setBackgroundColor(const QColor& color)
+{
+  this->BackgroundColor = color;
+
+  if(this->ZoomPan)
+    {
+    this->layoutChart(this->ZoomPan->contentsWidth(),
+        this->ZoomPan->contentsHeight());
+    }
+}
+
 void pqHistogramWidget::setFont(const QFont &f)
 {
   QAbstractScrollArea::setFont(f);
@@ -193,21 +214,21 @@ void pqHistogramWidget::setFont(const QFont &f)
   if(this->XAxis)
     {
     this->XAxis->blockSignals(true);
-    this->XAxis->setFont(f);
+    this->XAxis->setTickLabelFont(f);
     this->XAxis->blockSignals(false);
     }
 
   if(this->YAxis)
     {
     this->YAxis->blockSignals(true);
-    this->YAxis->setFont(f);
+    this->YAxis->setTickLabelFont(f);
     this->YAxis->blockSignals(false);
     }
 
   if(this->FAxis)
     {
     this->FAxis->blockSignals(true);
-    this->FAxis->setFont(f);
+    this->FAxis->setTickLabelFont(f);
     this->FAxis->blockSignals(false);
     }
 
@@ -216,12 +237,6 @@ void pqHistogramWidget::setFont(const QFont &f)
     this->layoutChart(this->ZoomPan->contentsWidth(),
         this->ZoomPan->contentsHeight());
     }
-}
-
-void pqHistogramWidget::setBinColorScheme(pqHistogramColor *scheme)
-{
-  if(this->Histogram)
-    this->Histogram->setBinColorScheme(scheme);
 }
 
 pqChartAxis *pqHistogramWidget::getAxis(AxisName name)
@@ -315,6 +330,11 @@ void pqHistogramWidget::repaintChart()
 void pqHistogramWidget::layoutChart(int w, int h)
 {
   QRect area(MARGIN, MARGIN, w - DBL_MARGIN, h - DBL_MARGIN);
+  
+  const QRect title_request = this->Title->getSizeRequest();
+  this->Title->setBounds(QRect(area.left(), area.top(), area.width(), title_request.height()));
+  area = QRect(area.left(), area.top() + title_request.height(), area.right(), area.height() - title_request.height());
+  
   if(this->XAxis)
     this->XAxis->layoutAxis(area);
   if(this->YAxis)
@@ -454,10 +474,10 @@ void pqHistogramWidget::paintEvent(QPaintEvent *e)
   area.translate(this->ZoomPan->contentsX(), this->ZoomPan->contentsY());
   painter->setClipRect(area);
 
-  // Set the widget font.
-  painter->setFont(this->font());
+  // Paint the widget background.
+  painter->fillRect(area, this->BackgroundColor);
 
-  // Paint the highlight background first.
+  // Paint the highlight background.
   if(this->Histogram)
     this->Histogram->drawBackground(painter, area);
 
@@ -484,6 +504,9 @@ void pqHistogramWidget::paintEvent(QPaintEvent *e)
     this->YAxis->drawAxisLine(painter);
   if(this->XAxis)
     this->XAxis->drawAxisLine(painter);
+
+  // Draw the chart title
+  this->Title->draw(*painter, area);
 
   if(this->Mouse && this->Mouse->Box.isValid())
     {

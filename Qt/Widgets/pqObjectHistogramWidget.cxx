@@ -10,8 +10,11 @@
 #include "pqObjectHistogramWidget.h"
 #include "pqServer.h"
 
+#include <pqChartAxis.h>
+#include <pqChartLabel.h>
 #include <pqChartValue.h>
 #include <pqHistogramChart.h>
+#include <pqHistogramColor.h>
 #include <pqHistogramWidget.h>
 
 #include <QComboBox>
@@ -32,6 +35,37 @@
 #include <vtkSMCompoundProxy.h>
 #include <vtkSphereSource.h>
 
+class pqHistogramColorRange : public pqHistogramColor
+{
+public:
+  pqHistogramColorRange(const QColor& begin, const QColor& end) :
+    Begin(begin),
+    End(end)
+  {
+  }
+  
+private:
+  static const QColor lerp(const QColor& A, const QColor& B, const double Mix)
+  {
+    return QColor::fromRgbF(
+      (A.redF() * (1.0 - Mix)) + (B.redF() * Mix),
+      (A.greenF() * (1.0 - Mix)) + (B.greenF() * Mix),
+      (A.blueF() * (1.0 - Mix)) + (B.blueF() * Mix),
+      (A.alphaF() * (1.0 - Mix)) + (B.alphaF() * Mix));
+  }
+
+  QColor getColor(int index, int total) const
+  {
+    if(!total)
+      return Begin;
+      
+    return lerp(Begin, End, static_cast<double>(index) / static_cast<double>(total));
+  }
+  
+  const QColor Begin;
+  const QColor End;
+};
+
 //////////////////////////////////////////////////////////////////////////////
 // pqObjectHistogramWidget::pqImplementation
 
@@ -42,6 +76,36 @@ struct pqObjectHistogramWidget::pqImplementation
     EventAdaptor(vtkEventQtSlotConnect::New()),
     BinCount(10)
   {
+    QFont h1;
+    h1.setBold(true);
+    h1.setPointSize(12.0);
+    h1.setStyleStrategy(QFont::PreferAntialias);
+  
+    QFont bold;
+    bold.setBold(true);
+    bold.setStyleStrategy(QFont::PreferAntialias);
+  
+    QFont italic;
+    italic.setItalic(true);
+    italic.setStyleStrategy(QFont::PreferAntialias);
+
+    this->HistogramWidget.setBackgroundColor(Qt::white);
+    
+    this->HistogramWidget.getTitle().setFont(h1);
+    this->HistogramWidget.getTitle().setColor(Qt::darkGray);
+    
+    this->HistogramWidget.getHistogram()->setBinColorScheme(new pqHistogramColorRange(Qt::blue, Qt::red));
+    this->HistogramWidget.getHistogram()->setBinOutlineStyle(pqHistogramChart::Black);
+
+    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setGridColor(Qt::lightGray);
+    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setAxisColor(Qt::darkGray);
+    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setTickLabelColor(Qt::darkGray);
+    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setTickLabelFont(bold);
+    
+    this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setGridColor(Qt::lightGray);
+    this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setAxisColor(Qt::darkGray);
+    this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setTickLabelColor(Qt::darkGray);
+    this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setTickLabelFont(italic);
   }
   
   ~pqImplementation()
@@ -114,6 +178,8 @@ struct pqObjectHistogramWidget::pqImplementation
     // Populate the current-variable combo-box with available variables
     // (we do this here because the set of available variables may change as properties
     // are modified in e.g: a source or a reader)
+    int current_index = 0;
+    
     this->Variables.clear();
     this->Variables.addItem(QString(), QString());
     
@@ -126,6 +192,11 @@ struct pqObjectHistogramWidget::pqImplementation
           continue;
         const char* const array_name = point_data->GetArrayName(i);
         this->Variables.addItem(QString(array_name) + " (point)", QString(array_name));
+        
+        if(this->CurrentVariable == array_name)
+          {
+          current_index = this->Variables.count() - 1;
+          }
         }
       }
       
@@ -138,9 +209,15 @@ struct pqObjectHistogramWidget::pqImplementation
           continue;
         const char* const array_name = cell_data->GetArrayName(i);
         this->Variables.addItem(QString(array_name) + " (cell)", QString(array_name));
+        
+        if(this->CurrentVariable == array_name)
+          {
+          current_index = this->Variables.count() - 1;
+          }
         }
       }
 
+    this->Variables.setCurrentIndex(current_index);
     this->updateChart();
   }
   
@@ -151,6 +228,14 @@ struct pqObjectHistogramWidget::pqImplementation
   
   void updateChart()
   {
+    this->HistogramWidget.getHistogram()->clearData();
+    this->HistogramWidget.getTitle().setText("");
+    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setVisible(false);
+    this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setVisible(false);
+    
+    if(this->CurrentVariable.isEmpty())
+      return;
+    
     if(!this->ClientSideData)
       return;
 
@@ -208,12 +293,19 @@ struct pqObjectHistogramWidget::pqImplementation
       list.pushBack(static_cast<double>(*bin));
       }
 
-    if(!bins.empty())
-      {
-      this->HistogramWidget.getHistogram()->setData(
-        list,
-        pqChartValue(value_min), pqChartValue(value_max));
-      }
+    if(bins.empty())
+      return;
+      
+    if(value_min == value_max)
+      return;
+      
+    this->HistogramWidget.getTitle().setText(this->CurrentVariable + " Histogram");
+    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setVisible(true);
+    this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setVisible(true);
+
+    this->HistogramWidget.getHistogram()->setData(
+      list,
+      pqChartValue(value_min), pqChartValue(value_max));
   }
   
   vtkSMClientSideDataProxy* ClientSideData;

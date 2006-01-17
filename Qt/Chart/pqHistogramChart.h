@@ -93,6 +93,9 @@ public:
   void setData(const pqChartValueList &values, const pqChartValue &min,
       const pqChartValue &max);
 
+  /// Clears data
+  void clearData();
+
   /// \brief
   ///   Gets the number of bins on the histogram.
   /// \return

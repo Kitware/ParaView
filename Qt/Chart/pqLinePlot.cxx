@@ -10,11 +10,9 @@
 
 #include "pqLinePlot.h"
 
-
 pqLinePlot::pqLinePlot(QObject *p)
-  : QObject(p), Color(Qt::black)
+  : QObject(p), Pen(Qt::black)
 {
-  this->Thickness = 1;
   this->Modified = true;
 }
 
@@ -27,16 +25,9 @@ void pqLinePlot::setModified(bool modified)
     }
 }
 
-void pqLinePlot::setColor(const QColor &color)
+void pqLinePlot::setPen(const QPen& pen)
 {
-  this->Color = color;
+  this->Pen = pen;
   emit this->plotModified(this);
 }
-
-void pqLinePlot::setWidth(int width)
-{
-  this->Thickness = width;
-  emit this->plotModified(this);
-}
-
 

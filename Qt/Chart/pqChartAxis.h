@@ -22,6 +22,7 @@
 #include <QColor> // Needed for grid and axis members.
 
 class pqChartAxisData;
+class pqChartLabel;
 class QPainter;
 class QFontMetrics;
 
@@ -226,19 +227,6 @@ public:
   bool isZeroInRange() const;
   //@}
 
-  /// \name Drawing Parameters
-  //@{
-  /// \brief
-  ///   Sets the font for the axis labels.
-  /// \param font The font to use.
-  void setFont(const QFont &font);
-
-  /// \brief
-  ///   Gets the font for the axis labels.
-  /// \return
-  ///   The font used to draw the axis labels.
-  QFont getFont() const {return this->Font;}
-
   /// \brief
   ///   Sets the axis color.
   ///
@@ -247,13 +235,13 @@ public:
   ///
   /// \param color The new axis color.
   /// \sa pqChartAxis::setGridColorType(AxisGridColor)
-  void setColor(const QColor &color);
+  void setAxisColor(const QColor &color);
 
   /// \brief
   ///   Gets the axis color.
   /// \return
   ///   The axis color.
-  const QColor &getColor() const {return this->Axis;}
+  const QColor &getAxisColor() const {return this->AxisColor;}
 
   /// \brief
   ///   Sets the axis grid color.
@@ -268,7 +256,7 @@ public:
   ///   Gets the axis grid color.
   /// \return
   ///   The axis grid color.
-  const QColor &getGridColor() const {return this->Grid;}
+  const QColor &getGridColor() const {return this->GridColor;}
 
   /// \brief
   ///   Sets the axis grid color type.
@@ -286,6 +274,31 @@ public:
   ///   The axis grid color type.
   /// \sa pqChartAxis::setGridColorType(AxisGridColor)
   AxisGridColor getGridColorType() const {return this->GridType;}
+
+  /// \brief
+  ///   Sets the axis tick label color.
+  ///
+  /// \param color The new axis tick label color.
+  void setTickLabelColor(const QColor &color);
+
+  /// \brief
+  ///   Gets the axis tick label color.
+  /// \return
+  ///   The axis tick label color.
+  const QColor &getTickLabelColor() const {return this->TickLabelColor;}
+
+  /// \name Drawing Parameters
+  //@{
+  /// \brief
+  ///   Sets the font for the axis tick labels.
+  /// \param font The font to use.
+  void setTickLabelFont(const QFont &font);
+
+  /// \brief
+  ///   Gets the font for the axis tick labels.
+  /// \return
+  ///   The font used to draw the axis tick labels.
+  QFont getTickLabelFont() const {return this->TickLabelFont;}
 
   /// \brief
   ///   Sets the decimal precision of the axis labels.
@@ -551,9 +564,10 @@ private:
   AxisScale Scale;          ///< Stores the axis type.
   AxisLayout Layout;        ///< Stores the axis layout type.
   AxisGridColor GridType;   ///< Stores the grid color type.
-  QColor Axis;              ///< Stores the axis color.
-  QColor Grid;              ///< Stores the grid color.
-  QFont Font;               ///< Stores the font for the axis.
+  QColor AxisColor;         ///< Stores the axis color.
+  QColor GridColor;         ///< Stores the grid color.
+  QColor TickLabelColor;    ///< Stores the color for the axis tick labels.
+  QFont TickLabelFont;      ///< Stores the font for the axis tick labels.
   pqChartAxisData *Data;    ///< Used to draw the axis and grid.
   const pqChartAxis *AtMin; ///< A pointer to the axis at the minimum.
   const pqChartAxis *AtMax; ///< A pointer to the axis at the maximum.

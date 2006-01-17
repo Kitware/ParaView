@@ -9,6 +9,7 @@
  */
 
 #include "pqChartAxis.h"
+#include "pqChartLabel.h"
 #include <QPainter>
 #include <QFontMetrics>
 
@@ -58,8 +59,9 @@ pqChartAxisPair::pqChartAxisPair()
 
 
 pqChartAxis::pqChartAxis(AxisLocation location, QObject *p)
-  : QObject(p), Bounds(), Axis(Qt::black), Grid(178, 178, 178),
-    Font(), ValueMin(), ValueMax(), TrueMin(), TrueMax()
+  : QObject(p), Bounds(), AxisColor(Qt::black), GridColor(178, 178, 178),
+    TickLabelColor(Qt::black), TickLabelFont(), ValueMin(), ValueMax(),
+    TrueMin(), TrueMax()
 {
   this->Location = location;
   this->Scale = pqChartAxis::Linear;
@@ -378,28 +380,22 @@ bool pqChartAxis::isZeroInRange() const
       (this->ValueMax <= 0 && this->ValueMin >= 0);
 }
 
-void pqChartAxis::setFont(const QFont &font)
+void pqChartAxis::setAxisColor(const QColor &color)
 {
-  this->Font = font;
-  this->calculateMaxWidth();
-}
-
-void pqChartAxis::setColor(const QColor &color)
-{
-  if(this->Axis != color)
+  if(this->AxisColor != color)
     {
-    this->Axis = color;
+    this->AxisColor = color;
     if(this->GridType == pqChartAxis::Lighter)
-      this->Grid = pqChartAxis::lighter(this->Axis);
+      this->GridColor = pqChartAxis::lighter(this->AxisColor);
     emit this->repaintNeeded();
     }
 }
 
 void pqChartAxis::setGridColor(const QColor &color)
 {
-  if(this->GridType == pqChartAxis::Lighter || this->Grid != color)
+  if(this->GridType == pqChartAxis::Lighter || this->GridColor != color)
     {
-    this->Grid = color;
+    this->GridColor = color;
     this->GridType = pqChartAxis::Lighter;
     emit this->repaintNeeded();
     }
@@ -412,10 +408,25 @@ void pqChartAxis::setGridColorType(AxisGridColor type)
     this->GridType = type;
     if(this->GridType == pqChartAxis::Lighter)
       {
-      this->Grid = pqChartAxis::lighter(this->Axis);
+      this->GridColor = pqChartAxis::lighter(this->AxisColor);
       emit this->repaintNeeded();
       }
     }
+}
+
+void pqChartAxis::setTickLabelColor(const QColor &color)
+{
+  if(this->TickLabelColor != color)
+    {
+    this->TickLabelColor = color;
+    emit this->repaintNeeded();
+    }
+}
+
+void pqChartAxis::setTickLabelFont(const QFont &font)
+{
+  this->TickLabelFont = font;
+  this->calculateMaxWidth();
 }
 
 void pqChartAxis::setPrecision(int precision)
@@ -454,7 +465,7 @@ void pqChartAxis::layoutAxis(const QRect &area)
   if(this->WidthMax <= 0 || !area.isValid())
     return;
 
-  QFontMetrics fm(this->Font);
+  QFontMetrics fm(this->TickLabelFont);
   int fontHeight = fm.height();
 
   // Set up the bounding rectangle. Then, set up the pixel range
@@ -556,6 +567,8 @@ void pqChartAxis::drawAxis(QPainter *p, const QRect &area)
     return;
     }
 
+  p->setFont(this->TickLabelFont);
+
   // Set up the grid area.
   QRect gridArea;
   if(this->AtMin || this->AtMax)
@@ -644,7 +657,7 @@ void pqChartAxis::drawAxis(QPainter *p, const QRect &area)
   bool vertical = this->Location == pqChartAxis::Left ||
       this->Location == pqChartAxis::Right;
   QString label;
-  QFontMetrics fm(this->Font);
+  QFontMetrics fm(this->TickLabelFont);
   int fontAscent = fm.ascent();
   int halfAscent = fontAscent/2;
   int fontDescent = fm.descent();
@@ -681,7 +694,7 @@ void pqChartAxis::drawAxis(QPainter *p, const QRect &area)
 
   // Draw the axis labels. Draw the axis grid lines if specified.
   int i = 0;
-  p->setPen(this->Axis);
+  p->setPen(this->AxisColor);
   pqChartAxisData::iterator iter = this->Data->begin();
   for( ; iter != this->Data->end(); ++iter, ++i)
     {
@@ -721,47 +734,56 @@ void pqChartAxis::drawAxis(QPainter *p, const QRect &area)
       {
       if(this->GridVisible)
         {
-        p->setPen(this->Grid);
+        p->setPen(this->GridColor);
         p->drawLine(gridArea.left(), y, gridArea.right(), y);
-        p->setPen(this->Axis);
         }
 
       if(this->Skip == 1 || i % this->Skip == 0)
         {
+        p->setPen(this->AxisColor);
         p->drawLine(tick, y, x, y);
         y += halfAscent;
+        p->setPen(this->TickLabelColor);
         if(this->Location == pqChartAxis::Left)
           p->drawText(x - fm.width(label) - TICK_MARGIN, y, label);
         else
           p->drawText(x + TICK_MARGIN, y, label);
         }
       else
+        {
+        p->setPen(this->AxisColor);
         p->drawLine(tickSmall, y, x, y);
+        }
       }
     else
       {
       if(this->GridVisible)
         {
-        p->setPen(this->Grid);
+        p->setPen(this->GridColor);
         p->drawLine(x, gridArea.top(), x, gridArea.bottom());
-        p->setPen(this->Axis);
         }
 
       if(this->Skip == 1 || i % this->Skip == 0)
         {
+        p->setPen(this->AxisColor);
         p->drawLine(x, tick, x, y);
         x -= fm.width(label)/2;
+        p->setPen(this->TickLabelColor);
         if(this->Location == pqChartAxis::Top)
           p->drawText(x, y - TICK_MARGIN - fontDescent, label);
         else
           p->drawText(x, y + TICK_MARGIN + fontAscent, label);
         }
       else
+        {
+        p->setPen(this->AxisColor);
         p->drawLine(x, tickSmall, x, y);
+        }
       }
     }
 
   // Draw the axis line in last to cover the grid lines.
+  p->setPen(this->AxisColor);
   if(vertical)
     {
     p->drawLine(x, this->PixelMin, x, this->PixelMax);
@@ -800,7 +822,7 @@ void pqChartAxis::drawAxisLine(QPainter *p)
     y = this->Bounds.top();
     }
 
-  p->setPen(this->Axis);
+  p->setPen(this->AxisColor);
   if(vertical)
     {
     p->drawLine(x, this->PixelMin, x, this->PixelMax);
@@ -876,7 +898,7 @@ void pqChartAxis::calculateMaxWidth()
 
   // Use a string of '8's to determine the maximum font width
   // in case the font is not fixed-pitch.
-  QFontMetrics fm(this->Font);
+  QFontMetrics fm(this->TickLabelFont);
   QString str;
   str.fill('8', length1);
   this->WidthMax = fm.width(str);
@@ -903,7 +925,7 @@ void pqChartAxis::calculateInterval()
     }
   else
     {
-    QFontMetrics fm(this->Font);
+    QFontMetrics fm(this->TickLabelFont);
     allowed = this->getPixelRange()/(2*fm.height());
     }
 
@@ -1123,7 +1145,7 @@ void pqChartAxis::calculateLogInterval()
     }
   else
     {
-    QFontMetrics fm(this->Font);
+    QFontMetrics fm(this->TickLabelFont);
     needed = 2*fm.height();
     }
 
@@ -1398,7 +1420,7 @@ void pqChartAxis::calculateFixedLayout()
     }
   else
     {
-    QFontMetrics fm(this->Font);
+    QFontMetrics fm(this->TickLabelFont);
     needed = 2*fm.height();
     }
 

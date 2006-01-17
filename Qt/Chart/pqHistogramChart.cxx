@@ -325,6 +325,11 @@ void pqHistogramChart::setData(const pqChartValueList &values,
     }
 }
 
+void pqHistogramChart::clearData()
+{
+  this->resetData();
+}
+
 int pqHistogramChart::getBinCount() const
 {
   if(this->Data)
