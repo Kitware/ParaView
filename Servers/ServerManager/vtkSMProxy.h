@@ -480,6 +480,9 @@ protected:
   // Returns the number of sub-proxies.
   unsigned int GetNumberOfSubProxies();
 
+  // Description:
+  // Save the ids for the subproxies.
+  void SaveSubProxyIds(vtkPVXMLElement* root);
 
   // Description:
   // Called by a proxy property, this adds the property,proxy
