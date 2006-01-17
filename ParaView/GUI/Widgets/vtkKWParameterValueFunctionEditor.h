@@ -835,6 +835,32 @@ public:
   vtkSetMacro(ChangeMouseCursor, int);
 
   // Description:
+  // Specifies function-related commands to associate with the widget.
+  // 'FunctionChanging' is called when the function is changing (as the result
+  // of a user interaction in progress, like moving a point). 
+  // 'FunctionChanged' is called when the function has changed (as the result
+  // of a user interaction that is now over, like a point added/(re)moved). 
+  // The need for a '...ChangedCommand' and '...ChangingCommand' can be
+  // explained as follows: the former can be used to be notified about any
+  // changes made to this widget *after* the corresponding user interaction has
+  // been performed (say, after releasing the mouse button that was dragging
+  // a slider, or after clicking on a checkbutton). The later can be set
+  // *additionally* to be notified about the intermediate changes that
+  // occur *during* the corresponding user interaction (say, *while* dragging
+  // a slider). While setting '...ChangedCommand' is enough to be notified
+  // about any changes, setting '...ChangingCommand' is an application-specific
+  // choice that is likely to depend on how fast you want (or can) answer to
+  // rapid changes occuring during a user interaction, if any.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  virtual void SetFunctionChangedCommand(
+    vtkObject *object, const char *method);
+  virtual void SetFunctionChangingCommand(
+    vtkObject *object, const char *method);
+
+  // Description:
   // Specifies point-related commands to associate with the widget.
   // 'PointAddedCommand' is called after a point was added.
   // 'PointChangingCommand' is called when a point is changing (as the
@@ -843,6 +869,20 @@ public:
   // result of a user interaction that is now over, like a point moved).
   // 'DoubleClickOnPointCommand' is called when double-clicking on a point.
   // 'PointRemovedCommand' is called after a point was removed.
+  // The need for a '...ChangedCommand' and '...ChangingCommand' can be
+  // explained as follows: the former can be used to be notified about any
+  // changes made to this widget *after* the corresponding user interaction has
+  // been performed (say, after releasing the mouse button that was dragging
+  // a slider, or after clicking on a checkbutton). The later can be set
+  // *additionally* to be notified about the intermediate changes that
+  // occur *during* the corresponding user interaction (say, *while* dragging
+  // a slider). While setting '...ChangedCommand' is enough to be notified
+  // about any changes, setting '...ChangingCommand' is an application-specific
+  // choice that is likely to depend on how fast you want (or can) answer to
+  // rapid changes occuring during a user interaction, if any.
+  // Those commands provide more granularity than function-wide commands like
+  // 'FunctionChangedCommand' and 'FunctionChangingCommand'. In most situations
+  // though (or in doubt), you should probably use the function-wide commands.
   // The 'object' argument is the object that will have the method called on
   // it. The 'method' argument is the name of the method to be called and any
   // arguments in string form. If the object is NULL, the method is still
@@ -875,27 +915,23 @@ public:
     vtkObject *object,const char *method);
 
   // Description:
-  // Specifies function-related commands to associate with the widget.
-  // 'FunctionChanging' is called when the function is changing (as the result
-  // of a user interaction in progress, like moving a point). 
-  // 'FunctionChanged' is called when the function has changed (as the result
-  // of a user interaction that is now over, like a point added/(re)moved). 
-  // The 'object' argument is the object that will have the method called on
-  // it. The 'method' argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method is still
-  // evaluated as a simple command. 
-  virtual void SetFunctionChangedCommand(
-    vtkObject *object, const char *method);
-  virtual void SetFunctionChangingCommand(
-    vtkObject *object, const char *method);
-
-  // Description:
   // Specifies range-related commands to associate with the widget.
   // 'VisibleRangeChangingCommand' is called whenever the visible range 
   // (in parameter or value domain) is changing (i.e. during user interaction).
   // 'VisibleRangeChangedCommand' is called whenever the visible range 
   // (in parameter or value domain) has changed (i.e. at the end of the
   // user interaction).
+  // The need for a '...ChangedCommand' and '...ChangingCommand' can be
+  // explained as follows: the former can be used to be notified about any
+  // changes made to this widget *after* the corresponding user interaction has
+  // been performed (say, after releasing the mouse button that was dragging
+  // a slider, or after clicking on a checkbutton). The later can be set
+  // *additionally* to be notified about the intermediate changes that
+  // occur *during* the corresponding user interaction (say, *while* dragging
+  // a slider). While setting '...ChangedCommand' is enough to be notified
+  // about any changes, setting '...ChangingCommand' is an application-specific
+  // choice that is likely to depend on how fast you want (or can) answer to
+  // rapid changes occuring during a user interaction, if any.
   // The 'object' argument is the object that will have the method called on
   // it. The 'method' argument is the name of the method to be called and any
   // arguments in string form. If the object is NULL, the method is still
