@@ -861,7 +861,7 @@ The Gradient filter computes the gradient vector at each point in an image or vo
   <Module name="UnstructuredGradient"
           menu_name="Gradient (Unstructured)" root_name="UGrad"
           module_type="Filter">
-    <Filter class="vtkImageGradient">
+    <Filter class="vtkGradientFilter">
       <Input name="Input" class="vtkPointSet">
         <ArrayRequirement components="1"/>
       </Input>
