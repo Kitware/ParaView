@@ -858,6 +858,31 @@ This filter operates on polygonal data and produces polygonal output.
 The Gradient filter computes the gradient vector at each point in an image or volume. The Input menu allows the user to select the data set to which this filter will be applied. The Scalars menu determines from which scalar array the gradient will be computed. The Dimensionality menu selects whether the gradient will be calculated in 2 or 3 dimensions. If only 2 dimensions are used, gradients are only computed in X and Y. This filter uses central differences to compute the gradients. The Gradient filter operates on uniform rectilinear (image) data and produces image data output.
     </Documentation>
   </Module>
+  <Module name="UnstructuredGradient"
+          menu_name="Gradient (Unstructured)" root_name="UGrad"
+          module_type="Filter">
+    <Filter class="vtkImageGradient">
+      <Input name="Input" class="vtkPointSet">
+        <ArrayRequirement components="1"/>
+      </Input>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               id="im" label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <FieldMenu id="fm" trace_name="FieldMenu" input_menu="im"
+               property="SelectInputScalars"
+               help="Choose the scalar array to compute gradients from."/>
+    <ArrayMenu id="am" property="SelectInputScalars"
+               trace_name="Scalars" label="Scalars" field_menu="fm"
+               help="Choose the threshold scalar array."/>
+    <StringEntry label="Result Array Name" property="ResultArrayName"
+                 trace_name="ResultArrayName"
+                 help="Provide a name for the output array containing the gradient vectors." />
+    <Documentation>
+The Gradient filter estimates the gradient vector at each point or cell.  The Input menu allows the user to select the data set to which this filter will be applied.  The Field and Scalars menus allow the user to select the scalar array from which to compute gradients.  The Scalars menu determines from which scalar array the gradient will be computed.  The Result Array Name box allows the user to specify the name of the output array holding the computed gradients.
+    </Documentation>
+  </Module>
   <Module name="GradientMagnitude"
           menu_name="Gradient Magnitude"
           root_name="GradM"
