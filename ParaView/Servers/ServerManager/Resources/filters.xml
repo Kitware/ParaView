@@ -903,6 +903,44 @@
    <!-- End Gradient -->
    </SourceProxy>
 
+   <SourceProxy name="UnstructuredGradient" class="vtkGradientFilter">
+     <InputProperty name="Input" command="SetInput">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkPointSet"/>
+       </DataTypeDomain>
+       <InputArrayDomain name="input_array" number_of_components="1">
+         <RequiredProperties>
+           <Property name="SelectInputScalars" function="FieldDataSelection"/>
+         </RequiredProperties>
+       </InputArrayDomain>
+     </InputProperty>
+
+     <StringVectorProperty name="SelectInputScalars"
+                           command="SetInputArrayToProcess"
+                           number_of_elements="5"
+                           element_types="0 0 0 0 2">
+       <ArrayListDomain name="array_list" attribute_type="Scalars">
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </ArrayListDomain>
+       <FieldDataDomain name="field_list">
+         <RequiredProperties>
+           <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </FieldDataDomain>
+     </StringVectorProperty>
+     <StringVectorProperty name="ResultArrayName"
+                           command="SetResultArrayName"
+                           number_of_elements="1"
+                           default_values="Gradients"/>
+   <!-- End UnstructuredGradient -->
+   </SourceProxy>
+
    <SourceProxy name="GradientMagnitude" class="vtkImageGradientMagnitude">
      <InputProperty
         name="Input"
