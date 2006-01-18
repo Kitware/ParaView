@@ -80,7 +80,8 @@ QWidget *pqObjectInspectorDelegate::createEditor(QWidget *p,
       editor = combo;
       }
     }
-  else if(data.type() == QVariant::String && domain.isValid())
+  else if(data.type() == QVariant::String && 
+         (domain.type() == QVariant::StringList || domain.type() == QVariant::List ))
     {
     QStringList names = domain.toStringList();
     QComboBox *combo = new QComboBox(p);
