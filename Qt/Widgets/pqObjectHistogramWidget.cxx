@@ -78,7 +78,7 @@ struct pqObjectHistogramWidget::pqImplementation
   {
     QFont h1;
     h1.setBold(true);
-    h1.setPointSize(12.0);
+    h1.setPointSize(12);
     h1.setStyleStrategy(QFont::PreferAntialias);
   
     QFont bold;
@@ -92,20 +92,28 @@ struct pqObjectHistogramWidget::pqImplementation
     this->HistogramWidget.setBackgroundColor(Qt::white);
     
     this->HistogramWidget.getTitle().setFont(h1);
-    this->HistogramWidget.getTitle().setColor(Qt::darkGray);
+    this->HistogramWidget.getTitle().setColor(Qt::black);
     
     this->HistogramWidget.getHistogram()->setBinColorScheme(new pqHistogramColorRange(Qt::blue, Qt::red));
     this->HistogramWidget.getHistogram()->setBinOutlineStyle(pqHistogramChart::Black);
-
-    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setGridColor(Qt::lightGray);
-    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setAxisColor(Qt::darkGray);
-    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setTickLabelColor(Qt::darkGray);
-    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setTickLabelFont(bold);
     
     this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setGridColor(Qt::lightGray);
     this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setAxisColor(Qt::darkGray);
     this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setTickLabelColor(Qt::darkGray);
     this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setTickLabelFont(italic);
+    
+    this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->getLabel().setText("Value");
+    this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->getLabel().setFont(bold);
+
+    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setGridColor(Qt::lightGray);
+    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setAxisColor(Qt::darkGray);
+    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setTickLabelColor(Qt::darkGray);
+    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setTickLabelFont(italic);
+    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setPrecision(0);
+
+    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->getLabel().setText("Count");
+    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->getLabel().setFont(bold);
+    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->getLabel().setOrientation(pqChartLabel::VERTICAL);
   }
   
   ~pqImplementation()

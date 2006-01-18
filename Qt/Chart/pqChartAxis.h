@@ -313,6 +313,9 @@ public:
   /// \sa pqChartValue::getString()
   int getPrecision() const {return this->Precision;}
 
+  /// Returns the (optional) axis label
+  pqChartLabel& getLabel() const { return *this->Label; }
+
   /// \brief
   ///   Sets whether or not the axis should be visible.
   /// \param visible True if the axis should be visible.
@@ -432,6 +435,9 @@ public:
   /// \param atMax The axis at the maximum value end.
   void setNeigbors(const pqChartAxis *atMin,
       const pqChartAxis *atMax);
+
+  /// Returns the width (for vertical axes) or height (for horizontal axes) of this axis.  Used to simplify layout for neighbors
+  const int getLayoutThickness() const;
 
   /// \brief
   ///   Used to layout the axis.
@@ -568,6 +574,7 @@ private:
   QColor GridColor;         ///< Stores the grid color.
   QColor TickLabelColor;    ///< Stores the color for the axis tick labels.
   QFont TickLabelFont;      ///< Stores the font for the axis tick labels.
+  pqChartLabel* Label;      ///< Stores the axis label
   pqChartAxisData *Data;    ///< Used to draw the axis and grid.
   const pqChartAxis *AtMin; ///< A pointer to the axis at the minimum.
   const pqChartAxis *AtMax; ///< A pointer to the axis at the maximum.

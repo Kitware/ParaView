@@ -54,7 +54,7 @@ struct pqObjectLineChartWidget::pqImplementation
   {
     QFont h1;
     h1.setBold(true);
-    h1.setPointSize(12.0);
+    h1.setPointSize(12);
     h1.setStyleStrategy(QFont::PreferAntialias);
   
     QFont bold;
@@ -73,17 +73,24 @@ struct pqObjectLineChartWidget::pqImplementation
     this->LineChartWidget.setBackgroundColor(Qt::white);
     
     this->LineChartWidget.getTitle().setFont(h1);
-    this->LineChartWidget.getTitle().setColor(Qt::darkGray);
+    this->LineChartWidget.getTitle().setColor(Qt::black);
     
     this->LineChartWidget.getXAxis()->setGridColor(Qt::lightGray);
     this->LineChartWidget.getXAxis()->setAxisColor(Qt::darkGray);
     this->LineChartWidget.getXAxis()->setTickLabelColor(Qt::darkGray);
     this->LineChartWidget.getXAxis()->setTickLabelFont(italic);
+
+    this->LineChartWidget.getXAxis()->getLabel().setText("Time");
+    this->LineChartWidget.getXAxis()->getLabel().setFont(bold);
     
     this->LineChartWidget.getYAxis()->setGridColor(Qt::lightGray);
     this->LineChartWidget.getYAxis()->setAxisColor(Qt::darkGray);
     this->LineChartWidget.getYAxis()->setTickLabelColor(Qt::darkGray);
-    this->LineChartWidget.getYAxis()->setTickLabelFont(bold);
+    this->LineChartWidget.getYAxis()->setTickLabelFont(italic);
+
+    this->LineChartWidget.getYAxis()->getLabel().setText("EQPS");
+    this->LineChartWidget.getYAxis()->getLabel().setFont(bold);
+    this->LineChartWidget.getYAxis()->getLabel().setOrientation(pqChartLabel::VERTICAL);
   }
   
   ~pqImplementation()

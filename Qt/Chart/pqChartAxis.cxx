@@ -67,6 +67,7 @@ pqChartAxis::pqChartAxis(AxisLocation location, QObject *p)
   this->Scale = pqChartAxis::Linear;
   this->Layout = pqChartAxis::BestInterval;
   this->GridType = pqChartAxis::Lighter;
+  this->Label = new pqChartLabel();
   this->Data = new pqChartAxisData();
   this->AtMin = 0;
   this->AtMax = 0;
@@ -85,6 +86,8 @@ pqChartAxis::pqChartAxis(AxisLocation location, QObject *p)
 
 pqChartAxis::~pqChartAxis()
 {
+  delete this->Label;
+  
   if(this->Data)
     {
     this->cleanData();
@@ -460,6 +463,21 @@ void pqChartAxis::setNeigbors(const pqChartAxis *atMin,
   this->AtMax = atMax;
 }
 
+const int pqChartAxis::getLayoutThickness() const
+{
+  switch(this->Location)
+    {
+    case pqChartAxis::Top:
+    case pqChartAxis::Bottom:
+      return TICK_MARGIN + QFontMetrics(this->TickLabelFont).height() + this->Label->getSizeRequest().height();
+    case pqChartAxis::Left:
+    case pqChartAxis::Right:
+      return TICK_MARGIN + this->getMaxWidth() + this->Label->getSizeRequest().width();
+    }
+    
+  return 0;
+}
+
 void pqChartAxis::layoutAxis(const QRect &area)
 {
   if(this->WidthMax <= 0 || !area.isValid())
@@ -467,6 +485,8 @@ void pqChartAxis::layoutAxis(const QRect &area)
 
   QFontMetrics fm(this->TickLabelFont);
   int fontHeight = fm.height();
+
+  QRect label_bounds;
 
   // Set up the bounding rectangle. Then, set up the pixel range
   // based on font, margin, visibility, bounds, and neighbors.
@@ -480,14 +500,22 @@ void pqChartAxis::layoutAxis(const QRect &area)
       this->Bounds.setTop(area.top());
       this->Bounds.setBottom(area.top());
       if(this->isVisible())
-        this->Bounds.setBottom(this->Bounds.bottom() + TICK_MARGIN + fontHeight);
+        {
+        label_bounds = QRect(area.left(), area.top(), area.width(), area.top() + this->Label->getSizeRequest().height());
+        this->Bounds.setTop(area.top() + this->Label->getSizeRequest().height());
+        this->Bounds.setBottom(area.top() + TICK_MARGIN + fontHeight + this->Label->getSizeRequest().height());
+        }
       }
     else
       {
       this->Bounds.setTop(area.bottom());
       this->Bounds.setBottom(area.bottom());
       if(this->isVisible())
-        this->Bounds.setTop(this->Bounds.top() - TICK_MARGIN - fontHeight);
+        {
+        this->Bounds.setTop(area.bottom() - TICK_MARGIN - fontHeight - this->Label->getSizeRequest().height());
+        this->Bounds.setBottom(area.bottom() - this->Label->getSizeRequest().height());
+        label_bounds = QRect(area.left(), this->Bounds.bottom(), area.width(), this->Label->getSizeRequest().height());
+        }
       }
 
     if(this->isVisible())
@@ -496,23 +524,21 @@ void pqChartAxis::layoutAxis(const QRect &area)
       this->PixelMin = 0;
     this->PixelMax = this->PixelMin;
 
-    int axisWidth = 0;
     if(this->AtMin && this->AtMin->isVisible())
       {
-      axisWidth = TICK_MARGIN + this->AtMin->getMaxWidth();
-      if(this->PixelMin < axisWidth)
-        this->PixelMin = axisWidth;
+      this->PixelMin = vtkstd::max(this->PixelMin, this->AtMin->getLayoutThickness());
       }
 
     if(this->AtMax && this->AtMax->isVisible())
       {
-      axisWidth = TICK_MARGIN + this->AtMax->getMaxWidth();
-      if(this->PixelMax < axisWidth)
-        this->PixelMax = axisWidth;
+      this->PixelMax = vtkstd::max(this->PixelMax, this->AtMax->getLayoutThickness());
       }
 
     this->PixelMin = this->Bounds.left() + this->PixelMin;
     this->PixelMax = this->Bounds.right() - this->PixelMax;
+    
+    label_bounds.setLeft(this->PixelMin);
+    label_bounds.setRight(this->PixelMax);
     }
   else
     {
@@ -523,14 +549,22 @@ void pqChartAxis::layoutAxis(const QRect &area)
       this->Bounds.setLeft(area.left());
       this->Bounds.setRight(area.left());
       if(this->isVisible())
-        this->Bounds.setRight(this->Bounds.right() + TICK_MARGIN + this->WidthMax);
+        {
+        label_bounds = QRect(area.left(), area.top(), this->Label->getSizeRequest().width(), area.height());
+        this->Bounds.setLeft(area.left() + this->Label->getSizeRequest().width());
+        this->Bounds.setRight(area.left() + this->Label->getSizeRequest().width() + TICK_MARGIN + this->WidthMax);
+        }
       }
     else
       {
       this->Bounds.setLeft(area.right());
       this->Bounds.setRight(area.right());
       if(this->isVisible())
-        this->Bounds.setLeft(this->Bounds.left() - TICK_MARGIN - this->WidthMax);
+        {
+        this->Bounds.setLeft(area.right() - TICK_MARGIN - this->WidthMax - this->Label->getSizeRequest().width());
+        this->Bounds.setRight(area.right() - this->Label->getSizeRequest().width());
+        label_bounds = QRect(area.right() - this->Label->getSizeRequest().width(), area.top(), this->Label->getSizeRequest().width(), area.height());
+        }
       }
 
     if(this->isVisible())
@@ -539,15 +573,24 @@ void pqChartAxis::layoutAxis(const QRect &area)
       this->PixelMin = 0;
     this->PixelMax = this->PixelMin;
 
-    int axisHeight = TICK_MARGIN + fontHeight;
-    if(this->AtMin && this->AtMin->isVisible() && this->PixelMin < axisHeight)
-      this->PixelMin = axisHeight;
-    if(this->AtMax && this->AtMax->isVisible() && this->PixelMax < axisHeight)
-      this->PixelMax = axisHeight;
+    if(this->AtMin && this->AtMin->isVisible())
+      {
+      this->PixelMin = vtkstd::max(this->PixelMin, this->AtMin->getLayoutThickness());
+      }
+      
+    if(this->AtMax && this->AtMax->isVisible())
+      {
+      this->PixelMax = vtkstd::max(this->PixelMax, this->AtMax->getLayoutThickness());
+      }
 
     this->PixelMin = this->Bounds.bottom() - this->PixelMin;
     this->PixelMax = this->Bounds.top() + this->PixelMax;
+    
+    label_bounds.setTop(this->PixelMax);
+    label_bounds.setBottom(this->PixelMin);
     }
+
+  this->Label->setBounds(label_bounds);
 
   // Set up the remaining parameters.
   this->cleanData();
@@ -792,6 +835,9 @@ void pqChartAxis::drawAxis(QPainter *p, const QRect &area)
     {
     p->drawLine(this->PixelMin, y, this->PixelMax, y);
     }
+    
+  // Draw the axis label
+  this->Label->draw(*p, area);
 }
 
 void pqChartAxis::drawAxisLine(QPainter *p)
