@@ -78,8 +78,10 @@ private:
   QDockWidget *ElementInspectorDock;
   QAction *ElementDockAction;
   QToolBar* CompoundProxyToolBar;
+  QToolBar* VariableSelectorToolBar;
 
   vtkEventQtSlotConnect* VTKConnector;
+  vtkSMProxy* CurrentProxy;
 
 private slots:
   
@@ -113,6 +115,9 @@ private slots:
   void onNewSelections(vtkSMProxy* p, vtkUnstructuredGrid* selections);
   void onCompoundProxyAdded(const QString&, const QString&);
   void onCreateCompoundProxy(QAction*);
+  
+  void onProxySelected(vtkSMProxy*);
+  void onVariableNameSelected(const QString&);
   
   void onRecordTest();
   void onRecordTest(const QStringList& Files);

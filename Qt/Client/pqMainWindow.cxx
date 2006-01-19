@@ -35,6 +35,9 @@
 #include "pqDataSetModel.h"
 #include "pqOpenExodusOptions.h"
 #include "pqCompoundProxyWizard.h"
+#include "pqVariableSelectorWidget.h"
+#include "pqPipelineObject.h"
+#include "pqPipelineWindow.h"
 
 #ifdef PARAQ_EMBED_PYTHON
 #include "pqPythonDialog.h"
@@ -71,6 +74,9 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkInteractorStyle.h>
 #include <vtkUnstructuredGrid.h>
+#include <vtkPVGeometryInformation.h>
+#include <vtkPVDataSetAttributesInformation.h>
+#include <vtkPVArrayInformation.h>
 
 #include <QVTKWidget.h>
 #include <vtkEventQtSlotConnect.h>
@@ -100,7 +106,9 @@ pqMainWindow::pqMainWindow() :
   ElementInspectorWidget(0),
   ElementInspectorDock(0),
   ElementDockAction(0),
-  CompoundProxyToolBar(0)
+  CompoundProxyToolBar(0),
+  VariableSelectorToolBar(0),
+  CurrentProxy(0)
 {
   this->setObjectName("mainWindow");
   this->setWindowTitle(QByteArray("ParaQ Client") + QByteArray(" ") + QByteArray(QT_CLIENT_VERSION));
@@ -353,6 +361,13 @@ pqMainWindow::pqMainWindow() :
   this->CompoundProxyToolBar = new QToolBar(this) << pqSetName("CompoundProxyToolBar");
   this->addToolBar(Qt::TopToolBarArea, this->CompoundProxyToolBar);
   this->connect(this->CompoundProxyToolBar, SIGNAL(actionTriggered(QAction*)), SLOT(onCreateCompoundProxy(QAction*)));
+  
+  this->VariableSelectorToolBar = new QToolBar(this) << pqSetName("VariableSelectorToolBar");
+  this->addToolBar(Qt::TopToolBarArea, this->VariableSelectorToolBar);
+  pqVariableSelectorWidget* varSelector = new pqVariableSelectorWidget(this->VariableSelectorToolBar) << pqSetName("VariableSelector");
+  this->VariableSelectorToolBar->addWidget(varSelector);
+  this->connect(this->PipelineList, SIGNAL(proxySelected(vtkSMProxy *)), SLOT(onProxySelected(vtkSMProxy *)));
+  this->connect(varSelector, SIGNAL(varNameChanged(const QString&)), SLOT(onVariableNameSelected(const QString&)));
 
   this->setServer(0);
   this->Adaptor = new pqSMAdaptor;
@@ -1031,6 +1046,86 @@ void pqMainWindow::onCompoundProxyAdded(const QString&, const QString& proxy)
 {
   this->CompoundProxyToolBar->addAction(QIcon(":/pqWidgets/pqFilter32.png"), proxy) 
     << pqSetName(proxy) << pqSetData(proxy);
+}
+
+
+void pqMainWindow::onProxySelected(vtkSMProxy* p)
+{
+
+  this->CurrentProxy = p;
+
+  // update variable selector widget
+
+  pqVariableSelectorWidget* selector = this->VariableSelectorToolBar->findChild<pqVariableSelectorWidget*>();
+  
+  selector->clearVarNames();
+
+  if(p)
+    {
+    vtkSMDisplayProxy* display = pqPipelineData::instance()->getObjectFor(p)->GetDisplayProxy();
+    if(display)
+      {
+      vtkPVDataInformation* geomInfo = display->GetGeometryInformation();
+      vtkPVDataSetAttributesInformation* cellinfo = geomInfo->GetCellDataInformation();
+      int i;
+      for(i=0; i<cellinfo->GetNumberOfArrays(); i++)
+        {
+        vtkPVArrayInformation* info = cellinfo->GetArrayInformation(i);
+        selector->addVarName(pqVariableSelectorWidget::TYPE_CELL, info->GetName());
+        }
+      
+      vtkPVDataSetAttributesInformation* pointinfo = geomInfo->GetPointDataInformation();
+      for(i=0; i<pointinfo->GetNumberOfArrays(); i++)
+        {
+        vtkPVArrayInformation* info = pointinfo->GetArrayInformation(i);
+        selector->addVarName(pqVariableSelectorWidget::TYPE_NODE, info->GetName());
+        }
+
+      // set to the active display scalar
+      vtkSMStringVectorProperty* d_svp = vtkSMStringVectorProperty::SafeDownCast(display->GetProperty("ColorArray"));
+      selector->setCurVarName(d_svp->GetElement(0));
+      vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(display->GetProperty("ScalarMode"));
+      int fieldtype = ivp->GetElement(0);
+      if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
+        {
+        selector->setCurVarType(pqVariableSelectorWidget::TYPE_CELL);
+        }
+      else
+        {
+        selector->setCurVarType(pqVariableSelectorWidget::TYPE_NODE);
+        }
+      }
+    }
+
+}
+
+void pqMainWindow::onVariableNameSelected(const QString& var)
+{
+  if(this->CurrentProxy)
+    {
+    pqPipelineObject* o = pqPipelineData::instance()->getObjectFor(this->CurrentProxy);
+    vtkSMDisplayProxy* display = o->GetDisplayProxy();
+    QWidget* widget = o->GetParent()->GetWidget();
+    pqVariableSelectorWidget* selector = this->VariableSelectorToolBar->findChild<pqVariableSelectorWidget*>();
+    
+    // set the display to show this var
+    if(selector->getCurVarTypeID() == pqVariableSelectorWidget::TYPE_CELL)
+      {
+      pqColorPart(display, var.toAscii().data(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+      
+      // set the histogram to show this var
+      pqObjectHistogramWidget* histogram = this->HistogramDock->findChild<pqObjectHistogramWidget*>();
+      histogram->setCurrentVariable(var);
+      }
+    else
+      {
+      pqColorPart(display, var.toAscii().data(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+      // histogram chokes on point data
+      }
+
+    widget->update();
+
+    }
 }
 
 

@@ -244,6 +244,9 @@ struct pqObjectHistogramWidget::pqImplementation
     if(this->CurrentVariable.isEmpty())
       return;
     
+    // what about cell and point arrays with the same name?
+    this->Variables.setCurrentIndex(this->Variables.findText(this->CurrentVariable, Qt::MatchStartsWith));
+    
     if(!this->ClientSideData)
       return;
 

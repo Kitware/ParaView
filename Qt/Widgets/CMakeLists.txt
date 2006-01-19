@@ -36,6 +36,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerBrowser.h
   pqServerFileDialogModel.h
   pqSMAdaptor.h
+  pqVariableSelectorWidget.h
 )
 
 SET(UI_FORMS
@@ -139,6 +140,8 @@ ADD_LIBRARY(QtWidgets
   pqSetName.h
   pqSMAdaptor.cxx
   pqSMAdaptor.h
+  pqVariableSelectorWidget.cxx
+  pqVariableSelectorWidget.h
   QtWidgetsExport.h
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}
