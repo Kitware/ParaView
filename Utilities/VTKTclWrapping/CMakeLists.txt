@@ -144,8 +144,8 @@ TARGET_LINK_LIBRARIES(vtkCommonTCL
   vtkCommon
   vtkIO
   vtkRendering
-  optimized ${TCL_LIBRARY} debug ${TCL_LIBRARY_DEBUG}
-  optimized ${TK_LIBRARY} debug ${TK_LIBRARY_DEBUG}
+  ${TCL_LIBRARY}
+  ${TK_LIBRARY}
   )
 
 IF(UNIX)
