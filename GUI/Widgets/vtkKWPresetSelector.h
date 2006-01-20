@@ -178,6 +178,8 @@ public:
   // An unlimited number of slots can be added to a preset. Each slot is
   // identified by a name (string). Convenience methods are provided to store
   // and retrieve various types of data (double, int, string, pointer).
+  // Note that setting the value of a slot will automatically call
+  // UpdatePresetRow for the specific preset.
   // Return 1 on success, 0 on error
   virtual int HasPresetUserSlot(
     int id, const char *slot_name);
@@ -571,6 +573,11 @@ protected:
   virtual int DeleteAllPresets();
 
 private:
+
+  // Description:
+  // Set the creation time of a preset
+  // Return 0 on error.
+  virtual int SetPresetCreationTime(int id, double value);
 
   vtkKWPresetSelector(const vtkKWPresetSelector&); // Not implemented
   void operator=(const vtkKWPresetSelector&); // Not implemented
