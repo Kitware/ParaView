@@ -1,8 +1,16 @@
 #include "pqChartLabel.h"
 #include <QPainter>
 
-pqChartLabel::pqChartLabel(QObject *p) :
-  QObject(p),
+pqChartLabel::pqChartLabel(QObject* parent) :
+  QObject(parent),
+  Color(Qt::black),
+  Orientation(HORIZONTAL)
+{
+}
+
+pqChartLabel::pqChartLabel(const QString& text, QObject* parent) :
+  QObject(parent),
+  Text(text),
   Color(Qt::black),
   Orientation(HORIZONTAL)
 {
@@ -55,6 +63,11 @@ void pqChartLabel::setBounds(const QRect& bounds)
 {
   this->Bounds = bounds;
   emit repaintNeeded();
+}
+
+const QRect pqChartLabel::getBounds() const
+{
+  return this->Bounds;
 }
 
 void pqChartLabel::draw(QPainter& painter, const QRect& /*area*/)

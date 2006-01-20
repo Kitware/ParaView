@@ -12,10 +12,11 @@
 #include "pqLineChartWidget.h"
 
 #include "pqChartAxis.h"
+#include "pqChartLabel.h"
+#include "pqChartLegend.h"
 #include "pqChartMouseBox.h"
 #include "pqChartZoomPan.h"
 #include "pqLineChart.h"
-#include "pqChartLabel.h"
 
 #include <QCursor>
 #include <QEvent>
@@ -33,14 +34,15 @@
 #define DBL_MARGIN 6
 
 
-pqLineChartWidget::pqLineChartWidget(QWidget *p)
-  : QAbstractScrollArea(p)
+pqLineChartWidget::pqLineChartWidget(QWidget *p) :
+  QAbstractScrollArea(p),
+  Title(new pqChartLabel()),
+  Legend(new pqChartLegend())
 {
   this->BackgroundColor = Qt::white;
   this->Mode = pqLineChartWidget::NoMode;
   this->Mouse = new pqChartMouseBox();
   this->ZoomPan = new pqChartZoomPan(this);
-  this->Title = 0;
   this->XAxis = 0;
   this->YAxis = 0;
   this->LineChart = 0;
@@ -66,9 +68,12 @@ pqLineChartWidget::pqLineChartWidget(QWidget *p)
     }
 
   // Setup the chart title
-  this->Title = new pqChartLabel();
   connect(this->Title, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
   connect(this->Title, SIGNAL(repaintNeeded()), this, SLOT(repaintChart()));
+
+  // Setup the chart legend
+  connect(this->Legend, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
+  connect(this->Legend, SIGNAL(repaintNeeded()), this, SLOT(repaintChart()));
 
   // Set up the line chart and the axes.
   QFont myFont = font();
@@ -102,6 +107,7 @@ pqLineChartWidget::pqLineChartWidget(QWidget *p)
 pqLineChartWidget::~pqLineChartWidget()
 {
   delete this->Title;
+  delete this->Legend;
   
   if(this->LineChart)
     delete this->LineChart;
@@ -177,9 +183,21 @@ void pqLineChartWidget::layoutChart(int w, int h)
 {
   QRect area(MARGIN, MARGIN, w - DBL_MARGIN, h - DBL_MARGIN);
   
+  // Leave space for the title ...
   const QRect title_request = this->Title->getSizeRequest();
-  this->Title->setBounds(QRect(area.left(), area.top(), area.width(), title_request.height()));
-  area = QRect(area.left(), area.top() + title_request.height(), area.right(), area.height() - title_request.height());
+  const QRect title_bounds = QRect(area.left(), area.top(), area.width(), title_request.height());
+  this->Title->setBounds(title_bounds);
+  area.setTop(title_bounds.bottom());
+  
+  // Leave space for the legend ...
+  const QRect legend_request = this->Legend->getSizeRequest();
+  const QRect legend_bounds = QRect(
+    area.right() - legend_request.width(),
+    area.center().y() - (legend_request.height() / 2),
+    legend_request.width(),
+    legend_request.height());
+  this->Legend->setBounds(legend_bounds);
+  area.setRight(legend_bounds.left());
   
   if(this->XAxis)
     this->XAxis->layoutAxis(area);
@@ -320,6 +338,9 @@ void pqLineChartWidget::paintEvent(QPaintEvent *e)
 
   // Draw the chart title
   this->Title->draw(*painter, area);
+
+  // Draw the chart legend
+  this->Legend->draw(*painter, area);
 
   if(this->Mouse && this->Mouse->Box.isValid())
     {

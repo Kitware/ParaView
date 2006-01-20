@@ -20,6 +20,8 @@ SET(pqChart_SRCS
   pqChartExport.h
   pqChartLabel.cxx
   pqChartLabel.h
+  pqChartLegend.cxx
+  pqChartLegend.h
   pqChartMouseBox.cxx
   pqChartMouseBox.h
   pqChartValue.cxx
@@ -52,6 +54,7 @@ SET(pqChart_SRCS
 QT4_WRAP_CPP(pqChart_MOC_SRCS
   pqChartAxis.h
   pqChartLabel.h
+  pqChartLegend.h
   pqChartZoomPan.h
   pqHistogramChart.h
   pqHistogramWidget.h

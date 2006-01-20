@@ -12,6 +12,7 @@
 
 #include <pqChartAxis.h>
 #include <pqChartLabel.h>
+#include <pqChartLegend.h>
 #include <pqLineChart.h>
 #include <pqLineChartWidget.h>
 #include <pqPiecewiseLine.h>
@@ -88,7 +89,6 @@ struct pqObjectLineChartWidget::pqImplementation
     this->LineChartWidget.getYAxis()->setTickLabelColor(Qt::darkGray);
     this->LineChartWidget.getYAxis()->setTickLabelFont(italic);
 
-    this->LineChartWidget.getYAxis()->getLabel().setText("EQPS");
     this->LineChartWidget.getYAxis()->getLabel().setFont(bold);
     this->LineChartWidget.getYAxis()->getLabel().setOrientation(pqChartLabel::VERTICAL);
   }
@@ -255,8 +255,16 @@ struct pqObjectLineChartWidget::pqImplementation
     this->LineChartWidget.getTitle().setText(this->CurrentVariable + " vs. Time");
     this->LineChartWidget.getXAxis()->setVisible(true);
     this->LineChartWidget.getYAxis()->setVisible(true);
+    this->LineChartWidget.getYAxis()->getLabel().setText(this->CurrentVariable);
+
+    this->LineChartWidget.getLegend().clear();
+    this->LineChartWidget.getLegend().addEntry(QPen(Qt::darkBlue, 1.5), new pqChartLabel(QString("Element %1").arg(this->CurrentElementID)));
+    this->LineChartWidget.getLegend().addEntry(QPen(Qt::darkGray, 1.0, Qt::DotLine), new pqChartLabel(QString("Element %1").arg(this->CurrentElementID + 1)));
+    this->LineChartWidget.getLegend().addEntry(QPen(Qt::lightGray, 1.0, Qt::DotLine), new pqChartLabel(QString("Element %1").arg(this->CurrentElementID + 2)));
     
     addPlot(*reader, this->CurrentElementID, QPen(Qt::darkBlue, 1.5));
+    addPlot(*reader, this->CurrentElementID + 1, QPen(Qt::darkGray, 1.0, Qt::DotLine));
+    addPlot(*reader, this->CurrentElementID + 2, QPen(Qt::lightGray, 1.0, Qt::DotLine));
   }
   
   vtkSMProxy* SourceProxy;

@@ -18,6 +18,7 @@
 
 class pqChartAxis;
 class pqChartLabel;
+class pqChartLegend;
 class pqChartMouseBox;
 class pqChartZoomPan;
 class pqLineChart;
@@ -66,6 +67,9 @@ public:
 
   /// Returns the chart title object
   pqChartLabel& getTitle() {return *this->Title;}
+
+  /// Returns the chart legend object
+  pqChartLegend& getLegend() {return *this->Legend;}
 
   /// \name Interface Methods
   //@{
@@ -196,9 +200,10 @@ private:
   MouseMode Mode;          ///< Stores the current mouse state.
   pqChartMouseBox *Mouse;  ///< Stores the mouse drag box.
   pqChartZoomPan *ZoomPan; ///< Handles the zoom/pan interaction.
-  pqChartLabel* Title;     ///< Used to draw the chart title.
+  pqChartLabel* const Title;     ///< Used to draw the chart title.
   pqChartAxis *XAxis;      ///< Used to draw the x-axis.
   pqChartAxis *YAxis;      ///< Used to draw the y-axis.
+  pqChartLegend* const Legend; ///< Used to draw the chart legend.
   pqLineChart *LineChart;  ///< Used to draw the line chart.
   bool MouseDown;          ///< Used for mouse interactions.
 };

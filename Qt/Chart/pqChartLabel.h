@@ -16,6 +16,7 @@ class QTCHART_EXPORT pqChartLabel :
 
 public:
   pqChartLabel(QObject *parent=0);
+  pqChartLabel(const QString& Text, QObject *parent=0);
 
   /// Enumerates the two drawing orientations for the text
   enum OrientationT
@@ -37,6 +38,7 @@ public:
   const QRect getSizeRequest();
   /// Sets the bounds within which the label will be drawn
   void setBounds(const QRect& bounds);
+  const QRect getBounds() const;
 
   /// Renders the label using the given painter and the stored label bounds
   void draw(QPainter &painter, const QRect &area);
