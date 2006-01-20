@@ -16,21 +16,23 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVServerManagerInstantiator.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMInformationHelper.h"
-#include "vtkPVServerManagerInstantiator.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
+#include "vtkSMStateLoader.h"
 #include "vtkSMSubPropertyIterator.h"
-#include "vtkSmartPointer.h"
+
 #include <vtkstd/vector>
 
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.40");
+vtkCxxRevisionMacro(vtkSMProperty, "1.41");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -391,7 +393,11 @@ int vtkSMProperty::LoadState(vtkPVXMLElement* propertyElement,
   for (unsigned int cc=0;  cc < numElems; cc++)
     {
     vtkPVXMLElement* child = propertyElement->GetNestedElement(cc);
-    if (child->GetName() && strcmp(child->GetName(),"Domain") == 0)
+    if (!child->GetName())
+      {
+      continue;
+      }
+    if (strcmp(child->GetName(),"Domain") == 0)
       {
       const char* name = child->GetAttribute("name");
       vtkSMDomain* domain = name? this->GetDomain(name) : 0;
@@ -399,6 +405,19 @@ int vtkSMProperty::LoadState(vtkPVXMLElement* propertyElement,
         {
         domain->LoadState(child, loader);
         }
+      }
+    else if (strcmp(child->GetName(), "ControllerProperty") == 0)
+      {
+      const char* pname = child->GetAttribute("name");
+      int id;
+      if (!child->GetScalarAttribute("id", &id) || !pname)
+        {
+        vtkWarningMacro("ControllerProperty element missing required attributes.");
+        continue;
+        }
+      vtkSMProxy* proxy = loader->NewProxy(id);
+      this->SetController(proxy, pname);
+      proxy->Delete();
       }
     }
   return 1;
