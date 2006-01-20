@@ -55,7 +55,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.29");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.30");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -78,10 +78,6 @@ public:
   {
   public:
     int Id;
-    vtksys_stl::string Group;
-    vtksys_stl::string Comment;
-    vtksys_stl::string FileName;
-    double CreationTime;
     vtkKWIcon *Thumbnail;
     vtkKWIcon *Screenshot;
 
@@ -720,11 +716,10 @@ int vtkKWPresetSelector::AddPreset()
     new vtkKWPresetSelectorInternals::PresetNode;
 
   node->Id = id;
-  node->CreationTime = vtksys::SystemTools::GetTime();
-
   this->Internals->PresetPool.push_back(node);
-  
-  this->UpdatePresetRow(id);
+
+  this->SetPresetCreationTime(id, vtksys::SystemTools::GetTime());
+  // this->UpdatePresetRow(id); // called by SetPresetCreationTime
 
   if (this->PresetList)
     {
@@ -755,120 +750,54 @@ int vtkKWPresetSelector::HasPreset(int id)
 //----------------------------------------------------------------------------
 int vtkKWPresetSelector::SetPresetGroup(int id, const char *group)
 {
-  if (this->Internals)
+  int res = this->SetPresetUserSlotAsString(id, "Group", group);
+  if (res)
     {
-    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
-      this->Internals->GetPresetNode(id);
-    if (it != this->Internals->PresetPool.end())
-      {
-      (*it)->Group = group ? group : "";
-      this->UpdatePresetRow(id);
-      this->Update(); // the number of visible widgets may have changed
-      return 1;
-      }
+    this->Update(); // the number of visible widgets may have changed
     }
-
-  return 0;
+  return res;
 }
 
 //----------------------------------------------------------------------------
 const char* vtkKWPresetSelector::GetPresetGroup(int id)
 {
-  if (this->Internals)
-    {
-    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
-      this->Internals->GetPresetNode(id);
-    if (it != this->Internals->PresetPool.end())
-      {
-      return (*it)->Group.c_str();
-      }
-    }
-
-  return NULL;
+  return this->GetPresetUserSlotAsString(id, "Group");
 }
 
 //----------------------------------------------------------------------------
 int vtkKWPresetSelector::SetPresetComment(int id, const char *comment)
 {
-  if (this->Internals)
-    {
-    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
-      this->Internals->GetPresetNode(id);
-    if (it != this->Internals->PresetPool.end())
-      {
-      (*it)->Comment = comment ? comment : "";
-      this->UpdatePresetRow(id);
-      return 1;
-      }
-    }
-
-  return 0;
+  return this->SetPresetUserSlotAsString(id, "Comment", comment);
 }
 
 //----------------------------------------------------------------------------
 const char* vtkKWPresetSelector::GetPresetComment(int id)
 {
-  if (this->Internals)
-    {
-    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
-      this->Internals->GetPresetNode(id);
-    if (it != this->Internals->PresetPool.end())
-      {
-      return (*it)->Comment.c_str();
-      }
-    }
-
-  return NULL;
+  return this->GetPresetUserSlotAsString(id, "Comment");
 }
 
 //----------------------------------------------------------------------------
 int vtkKWPresetSelector::SetPresetFileName(int id, const char *filename)
 {
-  if (this->Internals)
-    {
-    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
-      this->Internals->GetPresetNode(id);
-    if (it != this->Internals->PresetPool.end())
-      {
-      (*it)->FileName = filename ? filename : "";
-      this->UpdatePresetRow(id);
-      return 1;
-      }
-    }
-
-  return 0;
+  return this->SetPresetUserSlotAsString(id, "FileName", filename);
 }
 
 //----------------------------------------------------------------------------
 const char* vtkKWPresetSelector::GetPresetFileName(int id)
 {
-  if (this->Internals)
-    {
-    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
-      this->Internals->GetPresetNode(id);
-    if (it != this->Internals->PresetPool.end())
-      {
-      return (*it)->FileName.c_str();
-      }
-    }
+  return this->GetPresetUserSlotAsString(id, "FileName");
+}
 
-  return NULL;
+//----------------------------------------------------------------------------
+int vtkKWPresetSelector::SetPresetCreationTime(int id, double value)
+{
+  return this->SetPresetUserSlotAsDouble(id, "CreationTime", value);
 }
 
 //----------------------------------------------------------------------------
 double vtkKWPresetSelector::GetPresetCreationTime(int id)
 {
-  if (this->Internals)
-    {
-    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
-      this->Internals->GetPresetNode(id);
-    if (it != this->Internals->PresetPool.end())
-      {
-      return (*it)->CreationTime;
-      }
-    }
-
-  return 0;
+  return this->GetPresetUserSlotAsDouble(id, "CreationTime");
 }
 
 //----------------------------------------------------------------------------
@@ -1271,7 +1200,10 @@ int vtkKWPresetSelector::GetNumberOfPresetsWithGroup(const char *group)
       this->Internals->PresetPool.end();
     for (; it != end; ++it)
       {
-      if (!(*it)->Group.compare(group))
+      vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
+        (*it)->UserSlotPool.find("Group");
+      if (s_it != (*it)->UserSlotPool.end() &&
+          !s_it->second.StringValue.compare(group))
         {
         count++;
         }
@@ -1350,7 +1282,10 @@ int vtkKWPresetSelector::GetNthPresetWithGroupRank(
       this->Internals->PresetPool.end();
     for (int nth = 0; it != end; ++it, nth++)
       {
-      if (!(*it)->Group.compare(group))
+      vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
+        (*it)->UserSlotPool.find("Group");
+      if (s_it != (*it)->UserSlotPool.end() &&
+          !s_it->second.StringValue.compare(group))
         {
         index--;
         if (index < 0)
@@ -1461,7 +1396,10 @@ int vtkKWPresetSelector::RemoveAllPresetsWithGroup(const char *group)
     it = this->Internals->PresetPool.begin();
     for (; it != end; ++it)
       {
-      if (!(*it)->Group.compare(group))
+      vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
+        (*it)->UserSlotPool.find("Group");
+      if (s_it != (*it)->UserSlotPool.end() &&
+          !s_it->second.StringValue.compare(group))
         {
         this->DeAllocatePreset((*it)->Id);
         if (this->PresetList)
@@ -1485,7 +1423,10 @@ int vtkKWPresetSelector::RemoveAllPresetsWithGroup(const char *group)
       it = this->Internals->PresetPool.begin();
       for (; it != end; ++it)
         {
-        if (!(*it)->Group.compare(group))
+        vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
+          (*it)->UserSlotPool.find("Group");
+        if (s_it != (*it)->UserSlotPool.end() &&
+            !s_it->second.StringValue.compare(group))
           {
           delete (*it);
           this->Internals->PresetPool.erase(it);
@@ -1639,9 +1580,9 @@ int vtkKWPresetSelector::UpdatePresetRow(int id)
   int row = this->GetPresetRow(id);
 
   const char *group = this->GetPresetGroup(id);
-  
   int group_filter_exclude =
     this->GroupFilter && *this->GroupFilter && 
+    group && *group &&
     strcmp(group, this->GroupFilter);
 
   // Not found ? Insert it, or ignore it if the group filter does not match

@@ -32,18 +32,13 @@ const char *vtkKWWindowLevelPresetSelector::ModalityColumnName  = "Modality";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowLevelPresetSelector);
-vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.13");
+vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.14");
 
 //----------------------------------------------------------------------------
 int vtkKWWindowLevelPresetSelector::SetPresetWindow(
   int id, double val)
 {
-  int res = this->SetPresetUserSlotAsDouble(id, "Window", val);
-  if (res)
-    {
-    this->UpdatePresetRow(id);
-    }
-  return res;
+  return this->SetPresetUserSlotAsDouble(id, "Window", val);
 }
 
 //----------------------------------------------------------------------------
@@ -56,12 +51,7 @@ double vtkKWWindowLevelPresetSelector::GetPresetWindow(int id)
 int vtkKWWindowLevelPresetSelector::SetPresetLevel(
   int id, double val)
 {
-  int res = this->SetPresetUserSlotAsDouble(id, "Level", val);
-  if (res)
-    {
-    this->UpdatePresetRow(id);
-    }
-  return res;
+  return this->SetPresetUserSlotAsDouble(id, "Level", val);
 }
 
 //----------------------------------------------------------------------------
@@ -74,12 +64,7 @@ double vtkKWWindowLevelPresetSelector::GetPresetLevel(int id)
 int vtkKWWindowLevelPresetSelector::SetPresetModality(
   int id, const char *val)
 {
-  int res = this->SetPresetUserSlotAsString(id, "Modality", val);
-  if (res)
-    {
-    this->UpdatePresetRow(id);
-    }
-  return res;
+  return this->SetPresetUserSlotAsString(id, "Modality", val);
 }
 
 //----------------------------------------------------------------------------
