@@ -78,10 +78,15 @@ struct FileGroup
 };
 
 ///////////////////////////////////////////////////////////////////////
-// SortFileAlpha
+// SortFileByTypeThenAlpha
 
-bool SortFileAlpha(const QFileInfo& A, const QFileInfo& B)
+bool SortFileByTypeThenAlpha(const QFileInfo& A, const QFileInfo& B)
 {
+  // Sort directories before regular files
+  if(A.isDir() != B.isDir())
+    return A.isDir() > B.isDir();
+  
+  // Then sort alphabetically
   return A.absoluteFilePath() < B.absoluteFilePath();
 }
 
@@ -99,7 +104,7 @@ public:
     this->FileGroups.clear();
     
     QFileInfoList files = this->CurrentPath.entryInfoList();
-    qSort(files.begin(), files.end(), SortFileAlpha);
+    qSort(files.begin(), files.end(), SortFileByTypeThenAlpha);
     
     QRegExp regex("^(.*)\\.(\\d+)$");
     FileGroup numbered_files;
