@@ -231,6 +231,9 @@ public:
   // evaluated as a simple command. 
   // The following parameters are also passed to the command:
   // - the current value: int (if Resolution is integer); double otherwise
+  //   Note: the 'int' signature is for convenience, so that the command can
+  //   be set to a callback accepting 'int'. In doubt, implement the callback
+  //   using a 'double' signature that will accept both 'int' and 'double'.
   virtual void SetCommand(vtkObject *object, const char *method);
   virtual void SetStartCommand(vtkObject *object, const char *method);
   virtual void SetEndCommand(vtkObject *object, const char *method);
