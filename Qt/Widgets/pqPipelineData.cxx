@@ -1,6 +1,7 @@
 
 #include "pqPipelineData.h"
 
+#include "pqMultiView.h"
 #include "pqMultiViewFrame.h"
 #include "pqNameCount.h"
 #include "pqParts.h"
@@ -8,8 +9,11 @@
 #include "pqPipelineServer.h"
 #include "pqPipelineWindow.h"
 #include "pqServer.h"
+#include "pqSMMultiView.h"
+#include "pqXMLUtil.h"
 
 #include "QVTKWidget.h"
+#include "vtkPVXMLElement.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
@@ -82,6 +86,148 @@ pqPipelineData *pqPipelineData::instance()
   return pqPipelineData::Instance;
 }
 
+void pqPipelineData::saveState(vtkPVXMLElement *root, pqMultiView *multiView)
+{
+  if(!root || !this->Internal)
+    {
+    return;
+    }
+
+  // Create an element to hold the pipeline state.
+  vtkPVXMLElement *pipeline = vtkPVXMLElement::New();
+  pipeline->SetName("Pipeline");
+
+  // Save the state for each of the servers.
+  QString address;
+  pqServer *server = 0;
+  vtkPVXMLElement *element = 0;
+  QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
+  for( ; iter != this->Internal->Servers.end(); ++iter)
+    {
+    element = vtkPVXMLElement::New();
+    element->SetName("Server");
+
+    // Save the connection information.
+    server = (*iter)->GetServer();
+    address = server->getAddress();
+    element->AddAttribute("address", address.toAscii().data());
+    if(address != server->getFriendlyName())
+      {
+      element->AddAttribute("name", server->getFriendlyName().toAscii().data());
+      }
+
+    (*iter)->SaveState(element, multiView);
+    pipeline->AddNestedElement(element);
+    element->Delete();
+    }
+
+  // Add the pipeline element to the xml.
+  root->AddNestedElement(pipeline);
+  pipeline->Delete();
+}
+
+void pqPipelineData::loadState(vtkPVXMLElement *root, pqMultiView *multiView)
+{
+  if(!root || !this->Internal)
+    {
+    return;
+    }
+
+  // Find the pipeline element in the xml.
+  vtkPVXMLElement *pipeline = ParaQ::FindNestedElementByName(root, "Pipeline");
+  if(pipeline)
+    {
+    // Create a pqServer for each server element in the xml.
+    pqServer *server = 0;
+    QStringList address;
+    QString name;
+    vtkPVXMLElement *serverElement = 0;
+    unsigned int total = pipeline->GetNumberOfNestedElements();
+    for(unsigned int i = 0; i < total; i++)
+      {
+      serverElement = pipeline->GetNestedElement(i);
+      name = serverElement->GetName();
+      if(name == "Server")
+        {
+        // Get the server's address from the attribute.
+        address = QString(serverElement->GetAttribute("address")).split(":");
+        if(address.isEmpty())
+          {
+          continue;
+          }
+
+        if(address[0] == "localhost")
+          {
+          server = pqServer::CreateStandalone();
+          }
+        else
+          {
+          // TODO: Get the port number from the address.
+          }
+
+        // Add the server to the pipeline data.
+        if(server)
+          {
+          this->addServer(server);
+          vtkPVXMLElement *element = 0;
+
+          // Restore the multi-view windows for the server. Set up the
+          // display and object map.
+          if(multiView)
+            {
+            QList<int> list;
+            pqMultiViewFrame *frame = 0;
+            unsigned int count = serverElement->GetNumberOfNestedElements();
+            for(unsigned int j = 0; j < count; j++)
+              {
+              element = serverElement->GetNestedElement(j);
+              name = element->GetName();
+              if(name == "Window")
+                {
+                // Get the multi-view frame to put the window in.
+                list = ParaQ::GetIntListFromString(
+                    element->GetAttribute("windowID"));
+                frame = qobject_cast<pqMultiViewFrame *>(
+                    multiView->widgetOfIndex(list));
+                if(frame)
+                  {
+                  // Make a new QVTKWidget in the frame.
+                  ParaQ::AddQVTKWidget(frame, multiView, server);
+                  }
+                }
+              else if(name == "Display")
+                {
+                }
+              }
+            }
+
+          // Restore the server manager state. The server manager
+          // should call back with register events.
+          }
+        }
+      }
+    }
+}
+
+void pqPipelineData::clearPipeline()
+{
+  if(this->Internal)
+    {
+    // Clean up the server objects, which will clean up all the internal
+    // pipeline objects.
+    emit this->clearingPipeline();
+    QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
+    for( ; iter != this->Internal->Servers.end(); ++iter)
+      {
+      if(*iter)
+        {
+        delete *iter;
+        *iter = 0;
+        }
+      }
+    }
+}
+
 void pqPipelineData::addServer(pqServer *server)
 {
   if(!this->Internal || !server)
@@ -122,6 +268,43 @@ void pqPipelineData::removeServer(pqServer *server)
       break;
       }
     }
+}
+
+int pqPipelineData::getServerCount() const
+{
+  if(this->Internal)
+    {
+    return this->Internal->Servers.size();
+    }
+
+  return 0;
+}
+
+pqPipelineServer *pqPipelineData::getServer(int index) const
+{
+  if(this->Internal && index >= 0 && index < this->Internal->Servers.size())
+    {
+    return this->Internal->Servers[index];
+    }
+
+  return 0;
+}
+
+pqPipelineServer *pqPipelineData::getServerFor(pqServer *server)
+{
+  if(this->Internal)
+    {
+    QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
+    for( ; iter != this->Internal->Servers.end(); ++iter)
+      {
+      if((*iter)->GetServer() == server)
+        {
+        return *iter;
+        }
+      }
+    }
+
+  return 0;
 }
 
 void pqPipelineData::addWindow(QVTKWidget *window, pqServer *server)
@@ -381,6 +564,7 @@ vtkSMDisplayProxy* pqPipelineData::createDisplay(vtkSMSourceProxy* proxy, vtkSMP
     }
   
   // Get the object from the list of servers.
+  pqPipelineServer *server = 0;
   pqPipelineObject *object = 0;
   QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
   for( ; iter != this->Internal->Servers.end(); ++iter)
@@ -389,7 +573,10 @@ vtkSMDisplayProxy* pqPipelineData::createDisplay(vtkSMSourceProxy* proxy, vtkSMP
       {
       object = (*iter)->GetObject(rep);
       if(object)
+        {
+        server = *iter;
         break;
+        }
       }
     }
 
@@ -401,8 +588,20 @@ vtkSMDisplayProxy* pqPipelineData::createDisplay(vtkSMSourceProxy* proxy, vtkSMP
   vtkSMRenderModuleProxy *module = this->getRenderModule(window);
   if(!module)
     return NULL;
-      
+
+  // Create the display proxy and register it.
   vtkSMDisplayProxy* display = pqAddPart(module, proxy);
+  if(display)
+    {
+    QString name;
+    name.setNum(this->Names->GetCountAndIncrement("Display"));
+    name.prepend("Display");
+    vtkSMProxyManager *proxyManager = server->GetServer()->GetProxyManager();
+    proxyManager->RegisterProxy("displays", name.toAscii().data(), display);
+    display->Delete();
+    }
+
+  // Save the display proxy in the object as well.
   object->SetDisplayProxy(display);
 
   return display;

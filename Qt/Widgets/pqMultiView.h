@@ -6,6 +6,8 @@
 #include <QFrame>
 #include <QList>
 
+class QSplitter;
+
 /// class to manage locations of multiple view widgets
 class QTWIDGETS_EXPORT pqMultiView : public QFrame
 {
@@ -14,7 +16,12 @@ public:
   typedef QList<int> Index;
   
   pqMultiView(QWidget* parent = NULL);
-  ~pqMultiView();
+  virtual ~pqMultiView();
+
+  /// \brief
+  ///   Resets the multi-view to its original state.
+  /// \param removed Used to return all the removed widgets.
+  virtual void reset(QList<QWidget*> &removed);
 
   /// replace a widget at index with a new widget, returns the old one
   virtual QWidget* replaceView(Index index, QWidget* widget);
@@ -32,6 +39,8 @@ public:
   /// get the widget from an index
   QWidget* widgetOfIndex(Index index);
 
+private:
+  void cleanSplitter(QSplitter *splitter, QList<QWidget*> &removed);
 };
 
 

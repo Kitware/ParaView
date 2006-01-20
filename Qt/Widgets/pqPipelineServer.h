@@ -7,19 +7,25 @@
 #define _pqPipelineServer_h
 
 
+#include "QtWidgetsExport.h"
+
+class pqMultiView;
 class pqPipelineObject;
 class pqPipelineServerInternal;
 class pqPipelineWindow;
 class pqServer;
 class QWidget;
+class vtkPVXMLElement;
 class vtkSMProxy;
 
 
-class pqPipelineServer
+class QTWIDGETS_EXPORT pqPipelineServer
 {
 public:
   pqPipelineServer();
   ~pqPipelineServer();
+
+  void SaveState(vtkPVXMLElement *root, pqMultiView *multiView=0);
 
   void SetServer(pqServer *server) {this->Server = server;}
   pqServer *GetServer() const {return this->Server;}
@@ -42,6 +48,9 @@ public:
   pqPipelineWindow *GetWindow(int index) const;
 
   void ClearPipelines();
+
+private:
+  void UnregisterObject(pqPipelineObject *object);
 
 private:
   pqPipelineServerInternal *Internal;

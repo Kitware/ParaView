@@ -140,8 +140,12 @@ ADD_LIBRARY(QtWidgets
   pqSetName.h
   pqSMAdaptor.cxx
   pqSMAdaptor.h
+  pqSMMultiView.cxx
+  pqSMMultiView.h
   pqVariableSelectorWidget.cxx
   pqVariableSelectorWidget.h
+  pqXMLUtil.cxx
+  pqXMLUtil.h
   QtWidgetsExport.h
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}

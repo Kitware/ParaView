@@ -123,6 +123,8 @@ public:
   QModelIndex getIndexFor(QVTKWidget *window) const;
 
 public slots:
+  void clearPipeline();
+
   void addServer(pqPipelineServer *server);
   void removeServer(pqPipelineServer *server);
 

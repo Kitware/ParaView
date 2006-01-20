@@ -155,6 +155,8 @@ pqPipelineListModel::pqPipelineListModel(QObject *parentObject)
   pqPipelineData *pipeline = pqPipelineData::instance();
   if(pipeline)
     {
+    connect(pipeline, SIGNAL(clearingPipeline()),
+        this, SLOT(clearPipeline()));
     connect(pipeline, SIGNAL(serverAdded(pqPipelineServer *)),
         this, SLOT(addServer(pqPipelineServer *)));
     connect(pipeline, SIGNAL(removingServer(pqPipelineServer *)),
@@ -307,7 +309,7 @@ QVariant pqPipelineListModel::data(const QModelIndex &idx, int role) const
   return QVariant();
 }
 
-Qt::ItemFlags pqPipelineListModel::flags(const QModelIndex &/*idx*/) const
+Qt::ItemFlags pqPipelineListModel::flags(const QModelIndex &) const
 {
   return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 }
@@ -320,7 +322,9 @@ pqPipelineListModel::ItemType pqPipelineListModel::getTypeFor(
     pqPipelineListItem *item = reinterpret_cast<pqPipelineListItem *>(
         idx.internalPointer());
     if(item)
+      {
       return item->Type;
+      }
     }
 
   return pqPipelineListModel::Invalid;
@@ -394,6 +398,32 @@ QModelIndex pqPipelineListModel::getIndexFor(QVTKWidget *window) const
   }
 
   return QModelIndex();
+}
+
+void pqPipelineListModel::clearPipeline()
+{
+  // Clear out all the internal information.
+  if(this->Internal)
+  {
+    this->Internal->Lookup.clear();
+    this->Internal->Windows.clear();
+    this->Internal->CommandType = pqPipelineListInternal::NoCommands;
+    this->Internal->MoveOrCreate = 0;
+    this->Internal->Source = 0;
+    this->Internal->Sink = 0;
+  }
+
+  // Delete all the old pipeline objects.
+  if(this->Root)
+    {
+    delete this->Root;
+    }
+
+  // Create a new root item.
+  this->Root = new pqPipelineListItem();
+
+  // Notify the view that everything has changed.
+  this->reset();
 }
 
 void pqPipelineListModel::addServer(pqPipelineServer *server)

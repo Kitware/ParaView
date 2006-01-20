@@ -7,11 +7,13 @@
 #define _pqPipelineWindow_h
 
 
+#include "QtWidgetsExport.h"
+
 class pqPipelineServer;
 class QWidget;
 
 
-class pqPipelineWindow
+class QTWIDGETS_EXPORT pqPipelineWindow
 {
 public:
   pqPipelineWindow(QWidget *window);

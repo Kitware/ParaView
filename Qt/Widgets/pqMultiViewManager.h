@@ -4,6 +4,9 @@
 #define _pqMultiViewManager_h
 
 class pqMultiViewFrame;
+class QSplitter;
+class QWidget;
+class vtkPVXMLElement;
 
 #include "QtWidgetsExport.h"
 #include "pqMultiView.h"
@@ -14,7 +17,15 @@ class QTWIDGETS_EXPORT pqMultiViewManager : public pqMultiView
   Q_OBJECT
 public:
   pqMultiViewManager(QWidget* parent=NULL);
-  ~pqMultiViewManager();
+  virtual ~pqMultiViewManager();
+
+  /// \brief
+  ///   Resets the multi-view to its original state.
+  /// \param removed Used to return all the removed widgets.
+  virtual void reset(QList<QWidget*> &removed);
+
+  void saveState(vtkPVXMLElement *root);
+  void loadState(vtkPVXMLElement *root);
 
 signals:
   /// signal for new frame added
@@ -22,10 +33,12 @@ signals:
   /// signal for frame removed
   void frameRemoved(pqMultiViewFrame*);
 
+public slots:
+  void removeWidget(QWidget *widget);
+  void splitWidgetHorizontal(QWidget *widget);
+  void splitWidgetVertical(QWidget *widget);
+
 protected slots:
-  void removeWidget(QWidget*);
-  void splitWidgetHorizontal(QWidget*);
-  void splitWidgetVertical(QWidget*);
   void maximizeWidget(QWidget*);
   void restoreWidget(QWidget*);
 
@@ -36,6 +49,10 @@ protected:
 
   void setup(pqMultiViewFrame*);
   void cleanup(pqMultiViewFrame*);
+
+private:
+  void saveSplitter(vtkPVXMLElement *element, QSplitter *splitter, int index);
+  void restoreSplitter(QWidget *widget, vtkPVXMLElement *element);
 
 };
 

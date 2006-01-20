@@ -1,8 +1,10 @@
 #ifndef _pqPipelineData_h
 #define _pqPipelineData_h
 
+#include "QtWidgetsExport.h"
 #include <QObject>
 
+class pqMultiView;
 class pqNameCount;
 class pqPipelineDataInternal;
 class pqPipelineObject;
@@ -10,14 +12,13 @@ class pqPipelineServer;
 class pqPipelineWindow;
 class pqServer;
 class QVTKWidget;
+class vtkPVXMLElement;
 class vtkSMProxy;
 class vtkSMRenderModuleProxy;
 class vtkSMSourceProxy;
 class vtkSMCompoundProxy;
 class vtkSMDisplayProxy;
 
-#include "QtWidgetsExport.h"
-#include <QObject>
 
 /// interface for querying pipline state, also provides signals for pipeline changes
 class QTWIDGETS_EXPORT pqPipelineData : public QObject
@@ -30,8 +31,17 @@ public:
 
   static pqPipelineData *instance();
 
+  void saveState(vtkPVXMLElement *root, pqMultiView *multiView=0);
+  void loadState(vtkPVXMLElement *root, pqMultiView *multiView=0);
+
+  void clearPipeline();
+
   void addServer(pqServer *server);
   void removeServer(pqServer *server);
+
+  int getServerCount() const;
+  pqPipelineServer *getServer(int index) const;
+  pqPipelineServer *getServerFor(pqServer *server);
 
   void addWindow(QVTKWidget *window, pqServer *server);
   void removeWindow(QVTKWidget *window);
@@ -61,6 +71,8 @@ public:
   pqPipelineWindow *getObjectFor(QVTKWidget *window) const;
 
 signals:
+  void clearingPipeline();
+
   void serverAdded(pqPipelineServer *server);
   void removingServer(pqPipelineServer *server);
 

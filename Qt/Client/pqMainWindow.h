@@ -16,6 +16,8 @@
 class pqObjectInspectorWidget;
 class pqPipelineData;
 class pqPipelineListWidget;
+class pqPipelineServer;
+class pqPipelineWindow;
 class pqServer;
 class pqSMAdaptor;
 class pqMultiViewManager;
@@ -125,6 +127,13 @@ private slots:
   void onPlayTest(const QStringList& Files);
   
   void onPythonShell();
+
+  void onAddServer(pqPipelineServer *server);
+  void onRemoveServer(pqPipelineServer *server);
+  void onAddWindow(pqPipelineWindow *window);
+
+private:
+  void cleanUpWindow(QVTKWidget *window);
 };
 
 #endif // !_pqMainWindow_h

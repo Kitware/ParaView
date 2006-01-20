@@ -7,6 +7,7 @@
 #define _pqPipelineObject_h
 
 
+#include "QtWidgetsExport.h"
 #include <QString> // Needed for proxy name.
 
 class pqPipelineObjectInternal;
@@ -15,7 +16,7 @@ class vtkSMDisplayProxy;
 class vtkSMProxy;
 
 
-class pqPipelineObject
+class QTWIDGETS_EXPORT pqPipelineObject
 {
 public:
   enum ObjectType {
@@ -37,7 +38,7 @@ public:
   vtkSMProxy *GetProxy() const {return this->Proxy;}
   void SetProxy(vtkSMProxy *proxy) {this->Proxy = proxy;}
 
-  bool IsVisible() const {return this->Display != 0;}
+  // TODO: Store the display proxy name.
   vtkSMDisplayProxy *GetDisplayProxy() const {return this->Display;}
   void SetDisplayProxy(vtkSMDisplayProxy *display) {this->Display = display;}
 

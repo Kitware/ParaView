@@ -38,6 +38,31 @@ pqMultiView::~pqMultiView()
 {
 }
 
+void pqMultiView::reset(QList<QWidget*> &removed)
+{
+  // Remove all the widgets. Put them in the list. Then clean
+  // up all the extra splitters.
+  QWidget *widget = this->layout()->itemAt(0)->widget();
+  QSplitter *splitter = qobject_cast<QSplitter *>(widget);
+  if(splitter)
+    {
+    this->cleanSplitter(splitter, removed);
+
+    QSplitter *subsplitter = 0;
+    for(int i = splitter->count() - 1; i >= 0; i--)
+      {
+      subsplitter = qobject_cast<QSplitter *>(splitter->widget(i));
+      if(subsplitter)
+        {
+        delete subsplitter;
+        }
+      }
+
+    splitter->refresh();
+    splitter->addWidget(makeNewFrame());
+    }
+}
+
 QWidget* pqMultiView::replaceView(pqMultiView::Index index, QWidget* widget)
 {
   if(!widget)
@@ -269,6 +294,26 @@ QWidget* pqMultiView::widgetOfIndex(Index index)
     }
 
   return w;
+}
+
+void pqMultiView::cleanSplitter(QSplitter *splitter, QList<QWidget*> &removed)
+{
+  QWidget *widget = 0;
+  QSplitter *subsplitter = 0;
+  for(int i = splitter->count() - 1; i >= 0; i--)
+    {
+    widget = splitter->widget(i);
+    subsplitter = qobject_cast<QSplitter *>(widget);
+    if(subsplitter)
+      {
+      this->cleanSplitter(subsplitter, removed);
+      }
+    else if(widget)
+      {
+      widget->setParent(0);
+      removed.append(widget);
+      }
+    }
 }
 
 
