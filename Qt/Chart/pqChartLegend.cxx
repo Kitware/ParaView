@@ -70,7 +70,7 @@ void pqChartLegend::clear()
   this->Implementation->Labels.clear();
 }
 
-void pqChartLegend::addEntry(QPen& pen, pqChartLabel* label)
+void pqChartLegend::addEntry(const QPen& pen, pqChartLabel* label)
 {
   if(!label)
     return;

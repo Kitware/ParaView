@@ -55,7 +55,7 @@ public:
   /// Removes all entries from the legend
   void clear();
   /// Adds a line-plot entry to the legend (pqChartLegend takes ownership of the label)
-  void addEntry(QPen& pen, pqChartLabel* label);
+  void addEntry(const QPen& pen, pqChartLabel* label);
 
   /// Returns the legend's preferred size, based on font and orientation
   const QRect getSizeRequest();
