@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWVolumePropertyPresetSelector);
-vtkCxxRevisionMacro(vtkKWVolumePropertyPresetSelector, "1.3");
+vtkCxxRevisionMacro(vtkKWVolumePropertyPresetSelector, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWVolumePropertyPresetSelector::~vtkKWVolumePropertyPresetSelector()
@@ -45,8 +45,7 @@ void vtkKWVolumePropertyPresetSelector::DeAllocatePreset(int id)
 {
   this->Superclass::DeAllocatePreset(id);
 
-  vtkVolumeProperty *ptr = (vtkVolumeProperty*)
-    this->GetPresetUserSlotAsPointer(id, "VolumeProperty");
+  vtkVolumeProperty *ptr = this->GetPresetVolumeProperty(id);
   if (ptr)
     {
     ptr->Delete();
@@ -59,13 +58,23 @@ int vtkKWVolumePropertyPresetSelector::SetPresetVolumeProperty(
 {
   if (this->HasPreset(id))
     {
-    vtkVolumeProperty *ptr = (vtkVolumeProperty*)
-      this->GetPresetUserSlotAsPointer(id, "VolumeProperty");
-    if (!ptr)
+    vtkVolumeProperty *ptr = this->GetPresetVolumeProperty(id);
+    if (prop)
       {
-      ptr = vtkVolumeProperty::New();
+      if (!ptr)
+        {
+        ptr = vtkVolumeProperty::New();
+        }
+      this->DeepCopyVolumeProperty(ptr, prop);
       }
-    this->DeepCopyVolumeProperty(ptr, prop);
+    else
+      {
+      if (ptr)
+        {
+        ptr->Delete();
+        ptr = NULL;
+        }
+      }
     this->SetPresetUserSlotAsPointer(id, "VolumeProperty", ptr);
     return 1;
     }

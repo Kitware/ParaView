@@ -38,8 +38,8 @@ public:
 
   // Description:
   // Set/Get the volume property associated to the preset in the pool.
-  // Note that the volume property object passed as parameter is not
-  // stored or Register()'ed, only a copy is stored (and updated each
+  // Note that the volume property object passed as parameter is neither
+  // stored nor Register()'ed, only a copy is stored (and updated each
   // time this method is called later on).
   // Return 1 on success, 0 on error
   virtual int SetPresetVolumeProperty(int id, vtkVolumeProperty *prop);
