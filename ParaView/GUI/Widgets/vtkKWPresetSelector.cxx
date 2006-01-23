@@ -55,7 +55,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.30");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.31");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -78,13 +78,7 @@ public:
   {
   public:
     int Id;
-    vtkKWIcon *Thumbnail;
-    vtkKWIcon *Screenshot;
-
     UserSlotPoolType UserSlotPool;
-
-    PresetNode();
-    ~PresetNode();
   };
 
   static int PresetNodeCounter;
@@ -95,6 +89,13 @@ public:
   PresetPoolType PresetPool;
 
   PresetPoolIterator GetPresetNode(int id);
+
+  vtksys_stl::string GroupSlotName;
+  vtksys_stl::string CommentSlotName;
+  vtksys_stl::string FileNameSlotName;
+  vtksys_stl::string CreationTimeSlotName;
+  vtksys_stl::string ThumbnailSlotName;
+  vtksys_stl::string ScreenshotSlotName;
 };
 
 int vtkKWPresetSelectorInternals::PresetNodeCounter = 0;
@@ -117,25 +118,18 @@ vtkKWPresetSelectorInternals::GetPresetNode(int id)
   return end;
 }
 
-//---------------------------------------------------------------------------
-vtkKWPresetSelectorInternals::PresetNode::PresetNode()
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::DeAllocatePreset(int id)
 {
-  this->Thumbnail = NULL;
-  this->Screenshot = NULL;
-}
-
-//---------------------------------------------------------------------------
-vtkKWPresetSelectorInternals::PresetNode::~PresetNode()
-{
-  if (this->Thumbnail)
+  vtkKWIcon *thumbnail = this->GetPresetThumbnail(id);
+  if (thumbnail)
     {
-    this->Thumbnail->Delete();
-    this->Thumbnail = NULL;
+    thumbnail->Delete();
     }
-  if (this->Screenshot)
+  vtkKWIcon *screenshot = this->GetPresetScreenshot(id);
+  if (screenshot)
     {
-    this->Screenshot->Delete();
-    this->Screenshot = NULL;
+    screenshot->Delete();
     }
 }
 
@@ -143,6 +137,13 @@ vtkKWPresetSelectorInternals::PresetNode::~PresetNode()
 vtkKWPresetSelector::vtkKWPresetSelector()
 {
   this->Internals = new vtkKWPresetSelectorInternals;
+
+  this->Internals->GroupSlotName = "DefaultGroupSlot";
+  this->Internals->CommentSlotName = "DefaultCommentSlot";
+  this->Internals->FileNameSlotName = "DefaultFileNameSlot";
+  this->Internals->CreationTimeSlotName = "DefaultCreationTimeSlot";
+  this->Internals->ThumbnailSlotName = "DefaultThumbnailSlot";
+  this->Internals->ScreenshotSlotName = "DefaultScreenshotSlot";
 
   this->PresetAddCommand        = NULL;
   this->PresetUpdateCommand     = NULL;
@@ -748,9 +749,30 @@ int vtkKWPresetSelector::HasPreset(int id)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWPresetSelector::SetPresetGroupSlotName(const char *name)
+{
+  if (name && *name && 
+      this->Internals && this->Internals->GroupSlotName.compare(name))
+    {
+    this->Internals->GroupSlotName = name;
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWPresetSelector::GetPresetGroupSlotName()
+{
+  if (this->Internals)
+    {
+    return this->Internals->GroupSlotName.c_str();
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
 int vtkKWPresetSelector::SetPresetGroup(int id, const char *group)
 {
-  int res = this->SetPresetUserSlotAsString(id, "Group", group);
+  int res = this->SetPresetUserSlotAsString(
+    id, this->GetPresetGroupSlotName(), group);
   if (res)
     {
     this->Update(); // the number of visible widgets may have changed
@@ -761,43 +783,382 @@ int vtkKWPresetSelector::SetPresetGroup(int id, const char *group)
 //----------------------------------------------------------------------------
 const char* vtkKWPresetSelector::GetPresetGroup(int id)
 {
-  return this->GetPresetUserSlotAsString(id, "Group");
+  return this->GetPresetUserSlotAsString(id, this->GetPresetGroupSlotName());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::SetPresetCommentSlotName(const char *name)
+{
+  if (name && *name && 
+      this->Internals && this->Internals->CommentSlotName.compare(name))
+    {
+    this->Internals->CommentSlotName = name;
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWPresetSelector::GetPresetCommentSlotName()
+{
+  if (this->Internals)
+    {
+    return this->Internals->CommentSlotName.c_str();
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
 int vtkKWPresetSelector::SetPresetComment(int id, const char *comment)
 {
-  return this->SetPresetUserSlotAsString(id, "Comment", comment);
+  return this->SetPresetUserSlotAsString(
+    id, this->GetPresetCommentSlotName(), comment);
 }
 
 //----------------------------------------------------------------------------
 const char* vtkKWPresetSelector::GetPresetComment(int id)
 {
-  return this->GetPresetUserSlotAsString(id, "Comment");
+  return this->GetPresetUserSlotAsString(
+    id, this->GetPresetCommentSlotName());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::SetPresetFileNameSlotName(const char *name)
+{
+  if (name && *name && 
+      this->Internals && this->Internals->FileNameSlotName.compare(name))
+    {
+    this->Internals->FileNameSlotName = name;
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWPresetSelector::GetPresetFileNameSlotName()
+{
+  if (this->Internals)
+    {
+    return this->Internals->FileNameSlotName.c_str();
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
 int vtkKWPresetSelector::SetPresetFileName(int id, const char *filename)
 {
-  return this->SetPresetUserSlotAsString(id, "FileName", filename);
+  return this->SetPresetUserSlotAsString(
+    id, this->GetPresetFileNameSlotName(), filename);
 }
 
 //----------------------------------------------------------------------------
 const char* vtkKWPresetSelector::GetPresetFileName(int id)
 {
-  return this->GetPresetUserSlotAsString(id, "FileName");
+  return this->GetPresetUserSlotAsString(
+    id, this->GetPresetFileNameSlotName());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::SetPresetCreationTimeSlotName(const char *name)
+{
+  if (name && *name && 
+      this->Internals && this->Internals->CreationTimeSlotName.compare(name))
+    {
+    this->Internals->CreationTimeSlotName = name;
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWPresetSelector::GetPresetCreationTimeSlotName()
+{
+  if (this->Internals)
+    {
+    return this->Internals->CreationTimeSlotName.c_str();
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
 int vtkKWPresetSelector::SetPresetCreationTime(int id, double value)
 {
-  return this->SetPresetUserSlotAsDouble(id, "CreationTime", value);
+  return this->SetPresetUserSlotAsDouble(
+    id, this->GetPresetCreationTimeSlotName(), value);
 }
 
 //----------------------------------------------------------------------------
 double vtkKWPresetSelector::GetPresetCreationTime(int id)
 {
-  return this->GetPresetUserSlotAsDouble(id, "CreationTime");
+  return this->GetPresetUserSlotAsDouble(
+    id, this->GetPresetCreationTimeSlotName());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::SetPresetThumbnailSlotName(const char *name)
+{
+  if (name && *name && 
+      this->Internals && this->Internals->ThumbnailSlotName.compare(name))
+    {
+    this->Internals->ThumbnailSlotName = name;
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWPresetSelector::GetPresetThumbnailSlotName()
+{
+  if (this->Internals)
+    {
+    return this->Internals->ThumbnailSlotName.c_str();
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPresetSelector::SetPresetThumbnail(
+  int id, vtkKWIcon *icon)
+{
+  if (this->HasPreset(id))
+    {
+    vtkKWIcon *ptr = this->GetPresetThumbnail(id);
+    if (icon)
+      {
+      if (!ptr)
+        {
+        ptr = vtkKWIcon::New();
+        }
+      ptr->DeepCopy(icon);
+      }
+    else
+      {
+      if (ptr)
+        {
+        ptr->Delete();
+        ptr = NULL;
+        }
+      }
+    this->SetPresetUserSlotAsPointer(
+      id, this->GetPresetThumbnailSlotName(), ptr);
+    return 1;
+    }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+vtkKWIcon* vtkKWPresetSelector::GetPresetThumbnail(int id)
+{
+  return (vtkKWIcon*)this->GetPresetUserSlotAsPointer(
+    id, this->GetPresetThumbnailSlotName());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::SetPresetScreenshotSlotName(const char *name)
+{
+  if (name && *name && 
+      this->Internals && this->Internals->ScreenshotSlotName.compare(name))
+    {
+    this->Internals->ScreenshotSlotName = name;
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWPresetSelector::GetPresetScreenshotSlotName()
+{
+  if (this->Internals)
+    {
+    return this->Internals->ScreenshotSlotName.c_str();
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPresetSelector::SetPresetScreenshot(
+  int id, vtkKWIcon *icon)
+{
+  if (this->HasPreset(id))
+    {
+    vtkKWIcon *ptr = this->GetPresetScreenshot(id);
+    if (icon)
+      {
+      if (!ptr)
+        {
+        ptr = vtkKWIcon::New();
+        }
+      ptr->DeepCopy(icon);
+      }
+    else
+      {
+      if (ptr)
+        {
+        ptr->Delete();
+        ptr = NULL;
+        }
+      }
+    this->SetPresetUserSlotAsPointer(
+      id, this->GetPresetScreenshotSlotName(), ptr);
+    return 1;
+    }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+vtkKWIcon* vtkKWPresetSelector::GetPresetScreenshot(int id)
+{
+  return (vtkKWIcon*)this->GetPresetUserSlotAsPointer(
+    id, this->GetPresetScreenshotSlotName());
+}
+
+//---------------------------------------------------------------------------
+int vtkKWPresetSelector::BuildPresetThumbnailAndScreenshotFromImage(
+  int id, vtkImageData *image)
+{
+  if (!this->Internals)
+    {
+    return 0;
+    }
+
+  vtkKWPresetSelectorInternals::PresetPoolIterator it = 
+    this->Internals->GetPresetNode(id);
+  if (it == this->Internals->PresetPool.end())
+    {
+    return 0;
+    }
+
+  // Empty image, remove thumbnail/screenshot
+
+  int *image_dims = image ? image->GetDimensions() : NULL;
+  if (!image_dims ||
+      image_dims[0] == 0 || 
+      image_dims[1] == 0 || 
+      image_dims[2] == 0)
+    {
+    this->SetPresetThumbnail(id, NULL);
+    this->SetPresetScreenshot(id, NULL);
+    return 1;
+    }
+
+  double factor;
+  vtkImageData *resample_input, *resample_output;
+
+  // First, let's make sure we are processing the image as it
+  // is by clipping its UpdateExtent. By doing so, we prevent our resample
+  // and permute filter the process the image's *whole* extent.
+
+  vtkImageClip *clip = vtkImageClip::New();
+  clip->SetInput(image);
+  clip->SetOutputWholeExtent(image->GetUpdateExtent());
+  clip->Update();
+
+  // Permute, as a convenience
+
+  int *clip_dims = clip->GetOutput()->GetDimensions();
+
+  vtkImagePermute *permute = NULL;
+  if (clip_dims[2] != 1)
+    {
+    permute = vtkImagePermute::New();
+    permute->SetInput(clip->GetOutput());
+    if (clip_dims[0] == 1)
+      {
+      permute->SetFilteredAxes(1, 2, 0);
+      }
+    else
+      {
+      permute->SetFilteredAxes(0, 2, 1);
+      }
+    resample_input = permute->GetOutput();
+    }
+  else
+    {
+    resample_input = clip->GetOutput();
+    }
+
+  resample_input->Update();
+  int *resample_input_dims = resample_input->GetDimensions();
+  double *resample_input_spacing = resample_input->GetSpacing();
+
+  int large_dim = 0, small_dim = 1;
+  if (resample_input_dims[0] < resample_input_dims[1])
+    {
+    large_dim = 1; small_dim = 0;
+    }
+
+  vtkImageResample *resample = vtkImageResample::New();
+  resample->SetInput(resample_input);
+  resample->SetInterpolationModeToCubic();
+  resample->SetDimensionality(2);
+
+  // Create the screenshot
+
+  factor = 
+    (double)this->ScreenshotSize / (double)resample_input_dims[large_dim];
+  resample->SetAxisMagnificationFactor(large_dim, factor);
+  resample->SetAxisMagnificationFactor(
+    small_dim, factor * (resample_input_spacing[small_dim] / 
+                         resample_input_spacing[large_dim]));
+  resample->Update();
+  resample_output = resample->GetOutput();
+
+  vtkKWIcon *screenshot = vtkKWIcon::New();
+  screenshot->SetImage(
+    (const unsigned char*)resample_output->GetScalarPointer(),
+    resample_output->GetDimensions()[0],
+    resample_output->GetDimensions()[1],
+    3,
+    0,
+    vtkKWIcon::ImageOptionFlipVertical);
+  this->SetPresetScreenshot(id, screenshot);
+  screenshot->Delete();
+
+  // Create the thumbnail
+
+  factor = 
+    (double)this->ThumbnailSize / (double)resample_input_dims[large_dim];
+  resample->SetAxisMagnificationFactor(large_dim, factor);
+  resample->SetAxisMagnificationFactor(
+    small_dim, factor * (resample_input_spacing[small_dim] / 
+                         resample_input_spacing[large_dim]));
+  resample->Update();
+  resample_output = resample->GetOutput();
+
+  vtkKWIcon *thumbnail = vtkKWIcon::New();
+  thumbnail->SetImage(
+    (const unsigned char*)resample_output->GetScalarPointer(),
+    resample_output->GetDimensions()[0],
+    resample_output->GetDimensions()[1],
+    3,
+    0,
+    vtkKWIcon::ImageOptionFlipVertical);
+  this->SetPresetThumbnail(id, thumbnail);
+  thumbnail->Delete();
+
+  // Deallocate
+
+  clip->Delete();
+  resample->Delete();
+  if (permute)
+    {
+    permute->Delete();
+    }
+
+  // Update the icon cell
+
+  this->UpdatePresetRow(id);
+
+  return 1;
+}
+
+//---------------------------------------------------------------------------
+int vtkKWPresetSelector::BuildPresetThumbnailAndScreenshotFromRenderWindow(
+  int id, vtkRenderWindow *win)
+{
+  if (win)
+    {
+    vtkWindowToImageFilter *filter = vtkWindowToImageFilter::New();
+    filter->ShouldRerenderOff();
+    filter->SetInput(win);
+    filter->Update();
+    int res = this->BuildPresetThumbnailAndScreenshotFromImage(id, filter->GetOutput());
+    filter->Delete();
+    return res;
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -985,199 +1346,6 @@ void* vtkKWPresetSelector::GetPresetUserSlotAsPointer(
   return NULL;
 }
 
-//---------------------------------------------------------------------------
-int vtkKWPresetSelector::SetPresetImage(int id, vtkImageData *screenshot)
-{
-  if (!this->Internals)
-    {
-    return 0;
-    }
-
-  vtkKWPresetSelectorInternals::PresetPoolIterator it = 
-    this->Internals->GetPresetNode(id);
-  if (it == this->Internals->PresetPool.end())
-    {
-    return 0;
-    }
-
-  int *screenshot_dims = screenshot ? screenshot->GetDimensions() : NULL;
-  if (!screenshot_dims ||
-      screenshot_dims[0] == 0 || 
-      screenshot_dims[1] == 0 || 
-      screenshot_dims[2] == 0)
-    {
-    if ((*it)->Thumbnail)
-      {
-      (*it)->Thumbnail->Delete();
-      (*it)->Thumbnail = NULL;
-      }
-    if ((*it)->Screenshot)
-      {
-      (*it)->Screenshot->Delete();
-      (*it)->Screenshot = NULL;
-      }
-    return 1;
-    }
-
-  double factor;
-  vtkImageData *resample_input;
-
-  // First, let's make sure we are processing the screenshot as it
-  // is by clipping its UpdateExtent. By doing so, we prevent our resample
-  // and permute filter the process the screenshot's *whole* extent.
-
-  vtkImageClip *clip = vtkImageClip::New();
-  clip->SetInput(screenshot);
-  clip->SetOutputWholeExtent(screenshot->GetUpdateExtent());
-  clip->Update();
-
-  // Permute, as a convenience
-
-  int *clip_dims = clip->GetOutput()->GetDimensions();
-
-  vtkImagePermute *permute = NULL;
-  if (clip_dims[2] != 1)
-    {
-    permute = vtkImagePermute::New();
-    permute->SetInput(clip->GetOutput());
-    if (clip_dims[0] == 1)
-      {
-      permute->SetFilteredAxes(1, 2, 0);
-      }
-    else
-      {
-      permute->SetFilteredAxes(0, 2, 1);
-      }
-    resample_input = permute->GetOutput();
-    }
-  else
-    {
-    resample_input = clip->GetOutput();
-    }
-
-  // Create the thumbnail
-
-  resample_input->Update();
-  int *resample_input_dims = resample_input->GetDimensions();
-  double *resample_input_spacing = resample_input->GetSpacing();
-
-  int large_dim = 0, small_dim = 1;
-  if (resample_input_dims[0] < resample_input_dims[1])
-    {
-    large_dim = 1; small_dim = 0;
-    }
-
-  vtkImageResample *resample = vtkImageResample::New();
-  resample->SetInput(resample_input);
-  resample->SetInterpolationModeToCubic();
-  factor = 
-    (double)this->ThumbnailSize / (double)resample_input_dims[large_dim];
-  resample->SetAxisMagnificationFactor(large_dim, factor);
-  resample->SetAxisMagnificationFactor(
-    small_dim, factor * (resample_input_spacing[small_dim] / 
-                         resample_input_spacing[large_dim]));
-  resample->SetDimensionality(2);
-  resample->Update();
-  vtkImageData *resample_output = resample->GetOutput();
-
-  if (!(*it)->Thumbnail)
-    {
-    (*it)->Thumbnail = vtkKWIcon::New();
-    }
-  (*it)->Thumbnail->SetImage(
-    (const unsigned char*)resample_output->GetScalarPointer(),
-    resample_output->GetDimensions()[0],
-    resample_output->GetDimensions()[1],
-    3,
-    0,
-    vtkKWIcon::ImageOptionFlipVertical);
-
-  // Create the screenshot
-
-  factor = 
-    (double)this->ScreenshotSize / (double)resample_input_dims[large_dim];
-  resample->SetAxisMagnificationFactor(large_dim, factor);
-  resample->SetAxisMagnificationFactor(
-    small_dim, factor * (resample_input_spacing[small_dim] / 
-                         resample_input_spacing[large_dim]));
-  resample->Update();
-  resample_output = resample->GetOutput();
-
-  if (!(*it)->Screenshot)
-    {
-    (*it)->Screenshot = vtkKWIcon::New();
-    }
-  (*it)->Screenshot->SetImage(
-    (const unsigned char*)resample_output->GetScalarPointer(),
-    resample_output->GetDimensions()[0],
-    resample_output->GetDimensions()[1],
-    3,
-    0,
-    vtkKWIcon::ImageOptionFlipVertical);
-
-  clip->Delete();
-  resample->Delete();
-  if (permute)
-    {
-    permute->Delete();
-    }
-
-  // Update the icon cell
-
-  this->UpdatePresetRow(id);
-
-  return 1;
-}
-
-//---------------------------------------------------------------------------
-int vtkKWPresetSelector::SetPresetImageFromRenderWindow(
-  int id, vtkRenderWindow *win)
-{
-  if (win)
-    {
-    vtkWindowToImageFilter *filter = vtkWindowToImageFilter::New();
-    filter->ShouldRerenderOff();
-    filter->SetInput(win);
-    filter->Update();
-    int res = this->SetPresetImage(id, filter->GetOutput());
-    filter->Delete();
-    return res;
-    }
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-vtkKWIcon* vtkKWPresetSelector::GetPresetThumbnail(int id)
-{
-  if (this->Internals)
-    {
-    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
-      this->Internals->GetPresetNode(id);
-    if (it != this->Internals->PresetPool.end())
-      {
-      return (*it)->Thumbnail;
-      }
-    }
-
-  return NULL;
-}
-
-//----------------------------------------------------------------------------
-vtkKWIcon* vtkKWPresetSelector::GetPresetScreenshot(int id)
-{
-  if (this->Internals)
-    {
-    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
-      this->Internals->GetPresetNode(id);
-    if (it != this->Internals->PresetPool.end())
-      {
-      return (*it)->Screenshot;
-      }
-    }
-
-  return NULL;
-}
-
 //----------------------------------------------------------------------------
 int vtkKWPresetSelector::GetNumberOfPresets()
 {
@@ -1201,7 +1369,7 @@ int vtkKWPresetSelector::GetNumberOfPresetsWithGroup(const char *group)
     for (; it != end; ++it)
       {
       vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
-        (*it)->UserSlotPool.find("Group");
+        (*it)->UserSlotPool.find(this->GetPresetGroupSlotName());
       if (s_it != (*it)->UserSlotPool.end() &&
           !s_it->second.StringValue.compare(group))
         {
@@ -1283,7 +1451,7 @@ int vtkKWPresetSelector::GetNthPresetWithGroupRank(
     for (int nth = 0; it != end; ++it, nth++)
       {
       vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
-        (*it)->UserSlotPool.find("Group");
+        (*it)->UserSlotPool.find(this->GetPresetGroupSlotName());
       if (s_it != (*it)->UserSlotPool.end() &&
           !s_it->second.StringValue.compare(group))
         {
@@ -1397,7 +1565,7 @@ int vtkKWPresetSelector::RemoveAllPresetsWithGroup(const char *group)
     for (; it != end; ++it)
       {
       vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
-        (*it)->UserSlotPool.find("Group");
+        (*it)->UserSlotPool.find(this->GetPresetGroupSlotName());
       if (s_it != (*it)->UserSlotPool.end() &&
           !s_it->second.StringValue.compare(group))
         {
@@ -1424,7 +1592,7 @@ int vtkKWPresetSelector::RemoveAllPresetsWithGroup(const char *group)
       for (; it != end; ++it)
         {
         vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
-          (*it)->UserSlotPool.find("Group");
+          (*it)->UserSlotPool.find(this->GetPresetGroupSlotName());
         if (s_it != (*it)->UserSlotPool.end() &&
             !s_it->second.StringValue.compare(group))
           {

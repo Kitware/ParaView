@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMedicalImageViewerExample );
-vtkCxxRevisionMacro(vtkKWMedicalImageViewerExample, "1.1");
+vtkCxxRevisionMacro(vtkKWMedicalImageViewerExample, "1.2");
 
 //----------------------------------------------------------------------------
 int vtkKWMedicalImageViewerExample::Run(int argc, char *argv[])
@@ -336,6 +336,7 @@ void
 vtkKWMedicalImageViewerExample::WindowLevelPresetHasChangedCallback(
   int id)
 {
-  this->WindowLevelPresetSelector->SetPresetImageFromRenderWindow(
-    id, this->RenderWidget->GetRenderWindow());
+  this->WindowLevelPresetSelector->
+    BuildPresetThumbnailAndScreenshotFromRenderWindow(
+      id, this->RenderWidget->GetRenderWindow());
 }

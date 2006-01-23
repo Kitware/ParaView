@@ -156,7 +156,7 @@ proc wl_preset_update {id} {
 }
 
 proc wl_preset_has_changed {id} {
-  wl_preset_selector SetPresetImageFromRenderWindow $id [rw GetRenderWindow]
+  wl_preset_selector BuildPresetThumbnailAndScreenshotFromRenderWindow $id [rw GetRenderWindow]
 }
 
 # Create a simple animation widget

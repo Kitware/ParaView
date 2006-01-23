@@ -138,18 +138,18 @@ public:
   virtual double GetPresetCreationTime(int id);
 
   // Description:
-  // Assign an image/screenshot to a preset.
-  // The 'image' is not stored but is used right-away to create a thumbnail
-  // icon to be displayed in the thumbnail column, and a small screenshot to
-  // be displayed as a pop-up when the user hovers over that thumbnail. 
+  // Set/Get the thumbnail and screenshot associated to a preset.
+  // The thumbnail is displayed in the thumbnail column, and the screenshot 
+  // is displayed as a pop-up when the user hovers over that thumbnail. 
   // The thumbnail field is not displayed as a column by default, but this 
   // can be changed using the SetThumbnailColumnVisibility() method.
-  // If passed a vtkRenderWindow, grabs an image of the window contents.
-  // Both thumbnail and screenshot icons can be retrieved.
-  virtual int SetPresetImage(int id, vtkImageData *image);
-  virtual int SetPresetImageFromRenderWindow(int id, vtkRenderWindow *win);
+  // Note that the vtkKWIcon object passed as parameter is neither
+  // stored nor Register()'ed, only a copy is stored (and updated each
+  // time the Set... method is called later on).
   virtual vtkKWIcon* GetPresetThumbnail(int id);
+  virtual int SetPresetThumbnail(int id, vtkKWIcon *icon);
   virtual vtkKWIcon* GetPresetScreenshot(int id);
+  virtual int SetPresetScreenshot(int id, vtkKWIcon *icon);
 
   // Description:
   // Set/Get the visibility of the thumbnail column.
@@ -159,9 +159,26 @@ public:
   vtkBooleanMacro(ThumbnailColumnVisibility, int);
 
   // Description:
+  // Convenience method to build both the thumbnail and screenshot for a
+  // specific preset using a vtkImageData. The thumbnail is constructed by
+  // resampling the image to fit the ThumbnailSize constraint. The screenshot
+  // is constructed by resampling the image to fit the ScreenshotSize 
+  // constraint. This method is typically useful to build both thumbnail
+  // and screenshot from a single larger image (or screenshot).
+  // A similar method can be passed a vtkRenderWindow instead of a 
+  // vtkImageData; in that case, the window contents is grabbed and used
+  // to build both thumbnail and screenshot.
+  // Both thumbnail and screenshot icons can be retrieved.
+  virtual int BuildPresetThumbnailAndScreenshotFromImage(
+    int id, vtkImageData *image);
+  virtual int BuildPresetThumbnailAndScreenshotFromRenderWindow(
+    int id, vtkRenderWindow *win);
+
+  // Description:
   // Set/Get the thumbnail size.
   // Changing the size will not resize the current thumbnails, but will
-  // affect the presets added to the selector later on.
+  // affect the presets added to the selector later on using the
+  // BuildPresetThumbnailAndScreenshotFromImage method.
   vtkSetClampMacro(ThumbnailSize,int,8,512);
   vtkGetMacro(ThumbnailSize,int);
 
@@ -169,7 +186,8 @@ public:
   // Set/Get the screenshot size, i.e. the image that appears as
   // a popup when the mouse is on top of the thumbnail.
   // Changing the size will not resize the current screenshots, but will
-  // affect the presets added to the selector later on.
+  // affect the presets added to the selector later on using the
+  // BuildPresetThumbnailAndScreenshotFromImage method.
   vtkSetClampMacro(ScreenshotSize,int,8,2048);
   vtkGetMacro(ScreenshotSize,int);
 
@@ -199,6 +217,30 @@ public:
     int id, const char *slot_name, void *ptr);
   virtual void* GetPresetUserSlotAsPointer(
     int id, const char *slot_name);
+
+  // Description:
+  // Most (if not all) of the information associated to a preset (say group, 
+  // comment, filename, creation time, thumbnail and screenshot) is stored
+  // under the hood as user slots using the corresponding API (i.e. 
+  // Set/GetPresetUserSlotAs...()). Since each slot requires a unique name,
+  // the following methods are provided to retrieve the slot name for
+  // the default preset fields. This can be useful to avoid collision between
+  // the default slots and your own user slots. Note that the default slot
+  // names can be changed too, but doing so will not transfer the value
+  // stored at the old slot name to the new slot name (it is up to you to do
+  // so, if needed).
+  virtual void SetPresetGroupSlotName(const char *);
+  virtual const char* GetPresetGroupSlotName();
+  virtual void SetPresetCommentSlotName(const char *);
+  virtual const char* GetPresetCommentSlotName();
+  virtual void SetPresetFileNameSlotName(const char *);
+  virtual const char* GetPresetFileNameSlotName();
+  virtual void SetPresetCreationTimeSlotName(const char *);
+  virtual const char* GetPresetCreationTimeSlotName();
+  virtual void SetPresetThumbnailSlotName(const char *);
+  virtual const char* GetPresetThumbnailSlotName();
+  virtual void SetPresetScreenshotSlotName(const char *);
+  virtual const char* GetPresetScreenshotSlotName();
 
   // Description:
   // Get the number of presets, or the number of presets with a specific
@@ -479,7 +521,7 @@ protected:
   // Subclasses should override this method to release the memory allocated
   // by their own preset fields  (do not forget to call the superclass
   // first).
-  virtual void DeAllocatePreset(int vtkNotUsed(id)) {};
+  virtual void DeAllocatePreset(int id);
 
   // Description:
   // Update the preset row, i.e. add a row for that preset if it is not
