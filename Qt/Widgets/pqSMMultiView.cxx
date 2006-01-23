@@ -81,7 +81,12 @@ QVTKWidget *ParaQ::AddQVTKWidget(pqMultiViewFrame *frame, QWidget *topWidget,
     adaptor->setProperty(prop, 0.0);  // remote render
     }
   view->UpdateVTKObjects();
-
+  
+  // turn on vtk light kit
+  view->SetUseLight(1);
+  // turn off main light
+  vtkSMIntVectorProperty::SafeDownCast(view->GetProperty("LightSwitch"))->SetElement(0, 0);
+  
   QVTKWidget* widget = new QVTKWidget(frame);
   frame->setMainWidget(widget);
 

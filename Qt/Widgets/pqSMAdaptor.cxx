@@ -143,6 +143,7 @@ void pqSMAdaptor::setProperty(vtkSMProperty* Property, QVariant QtProperty)
     {
     this->setProperty(Property, i, props[i]);
     }
+  adapter->Delete();
 }
 
 QVariant pqSMAdaptor::getProperty(vtkSMProperty* Property)
