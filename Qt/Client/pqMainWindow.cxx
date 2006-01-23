@@ -36,7 +36,6 @@
 #include "pqSMAdaptor.h"
 #include "pqPicking.h"
 #include "pqDataSetModel.h"
-#include "pqOpenExodusOptions.h"
 #include "pqCompoundProxyWizard.h"
 #include "pqXMLUtil.h"
 #include "pqSMMultiView.h"
@@ -564,10 +563,6 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
       Adaptor->setProperty(source->GetProperty("FileName"), file);
       Adaptor->setProperty(source->GetProperty("FilePrefix"), file);
       Adaptor->setProperty(source->GetProperty("FilePattern"), "%s");
-      
-      pqOpenExodusOptions options(source, this);
-      options.exec();
-
       source->UpdateVTKObjects();
       this->Pipeline->setVisibility(this->Pipeline->createDisplay(source), true);
       }
