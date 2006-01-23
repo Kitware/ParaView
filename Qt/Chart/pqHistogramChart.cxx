@@ -352,14 +352,16 @@ int pqHistogramChart::getBinWidth() const
   return 0;
 }
 
-int pqHistogramChart::getBinAt(int x, int y) const
+int pqHistogramChart::getBinAt(int x, int y, bool entireBin) const
 {
   if(this->Data)
     {
     vtkstd::vector<pqHistogramItem *>::iterator iter = this->Data->Items.begin();
     for(int i = 0; iter != this->Data->Items.end(); iter++, i++)
       {
-      if(*iter && (*iter)->Bounds.isValid() && (*iter)->Bounds.contains(x, y))
+      if(entireBin && *iter && (*iter)->Bounds.isValid() && (*iter)->Bounds.left() < x && x < (*iter)->Bounds.right())
+        return i;
+      else if(*iter && (*iter)->Bounds.isValid() && (*iter)->Bounds.contains(x, y))
         return i;
       }
     }
@@ -438,17 +440,27 @@ bool pqHistogramChart::getValueRangeAt(int x, int y,
 }
 
 void pqHistogramChart::getBinsIn(const QRect &area,
-    pqHistogramSelectionList &list) const
+    pqHistogramSelectionList &list, bool entireBins) const
 {
   if(this->Data)
     {
     pqChartValue i((int)0);
     pqHistogramSelection *selection = 0;
     vtkstd::vector<pqHistogramItem *>::iterator iter = this->Data->Items.begin();
+    
     for( ; iter != this->Data->Items.end(); iter++, ++i)
       {
-      if(*iter && (*iter)->Bounds.isValid() &&
+        bool intersection = false;
+        
+        if(entireBins && *iter && (*iter)->Bounds.isValid() &&
+          (*iter)->Bounds.left() < area.right() &&
+          (*iter)->Bounds.right() > area.left())
+          intersection = true;
+        else if(*iter && (*iter)->Bounds.isValid() &&
           (*iter)->Bounds.intersects(area))
+          intersection = true;
+        
+        if(intersection)
         {
         selection = new pqHistogramSelection(i, i);
         if(selection)

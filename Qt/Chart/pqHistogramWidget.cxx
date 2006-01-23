@@ -80,6 +80,7 @@ pqHistogramWidget::pqHistogramWidget(QWidget *p)
   this->BackgroundColor = Qt::white;
   this->Mode = pqHistogramWidget::NoMode;
   this->Interact = pqHistogramWidget::Bin;
+  this->EasyBinSelection = true;
   this->SelectMode = pqHistogramWidget::Bin;
   this->Title = 0;
   this->XAxis = 0;
@@ -280,6 +281,11 @@ void pqHistogramWidget::setInteractMode(InteractMode mode)
 
     emit this->interactModeChanged(this->Interact);
     }
+}
+
+void pqHistogramWidget::setEasyBinSelection(bool Enable)
+{
+  this->EasyBinSelection = Enable;
 }
 
 void pqHistogramWidget::selectAll()
@@ -562,7 +568,7 @@ void pqHistogramWidget::mousePressEvent(QMouseEvent *e)
     pqHistogramSelection range;
     if(this->Interact == pqHistogramWidget::Bin)
       {
-      int bin = this->Histogram->getBinAt(point.x(), point.y());
+      int bin = this->Histogram->getBinAt(point.x(), point.y(), this->EasyBinSelection);
       range.setType(pqHistogramSelection::Bin);
       range.setRange(bin, bin);
       if(e->modifiers() & Qt::ShiftModifier)
@@ -889,7 +895,7 @@ void pqHistogramWidget::mouseMoveEvent(QMouseEvent *e)
         // get sent when the mouse is released.
         this->Histogram->blockSignals(true);
         pqHistogramSelectionList newSelection;
-        this->Histogram->getBinsIn(this->Mouse->Box, newSelection);
+        this->Histogram->getBinsIn(this->Mouse->Box, newSelection, this->EasyBinSelection);
         if(e->modifiers() & Qt::ShiftModifier)
           {
           if(!this->Data->Selection.isEmpty())

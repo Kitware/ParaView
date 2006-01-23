@@ -121,14 +121,15 @@ public:
   ///   Gets the bin index for the given location.
   ///
   /// If there is no bin in the given location, -1 is returned.
-  ///
+  ///  
   /// \param x The x pixel coordinate.
   /// \param y The y pixel coordinate.
+  /// \param entireBin Test the location against the entire bin, not just the "filled" portion.
   /// \return
   ///   The bin index for the given location.
   /// \sa pqHistogramChart::getBinsIn(const QRect &,
   ///         pqHistogramSelectionList &)
-  int getBinAt(int x, int y) const;
+  int getBinAt(int x, int y, bool entireBin = true) const;
 
   /// \brief
   ///   Gets the value for the given location.
@@ -155,8 +156,9 @@ public:
   ///   Gets a list of bin indexes within the given area.
   /// \param area The area of the chart to query.
   /// \param list Used to return the list of index ranges.
+  /// \param entireBins Test the area for intersection with entire bins, not just the "filled" portions.
   /// \sa pqHistogramChart::getBinAt(int, int)
-  void getBinsIn(const QRect &area, pqHistogramSelectionList &list) const;
+  void getBinsIn(const QRect &area, pqHistogramSelectionList &list, bool entireBins = true) const;
 
   /// \brief
   ///   Gets a list of values within the given area.

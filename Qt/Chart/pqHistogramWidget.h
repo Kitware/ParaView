@@ -135,6 +135,11 @@ public:
   /// \sa pqHistogramWidget::setInteractMode(InteractMode)
   InteractMode getInteractMode() const {return this->Interact;}
 
+  /// Sets whether the user has to hit the "filled" portion of a bin to select it or not
+  void setEasyBinSelection(bool Enable = true);
+  /// Returns whether the user has to hit the "filled" portion of a bin to select it or not
+  const bool getEasyBinSelection() { return this->EasyBinSelection; }
+
   /// Returns the chart title object
   pqChartLabel& getTitle() {return *this->Title;}
 
@@ -310,6 +315,7 @@ private:
   QColor BackgroundColor;      ///< Stores the current background color.
   MouseMode Mode;              ///< Stores the current mouse state.
   InteractMode Interact;       ///< Stores the current interaction mode.
+  bool EasyBinSelection;       ///< Stores whether the user has to hit the "filled" portion of a bin to select it
   InteractMode SelectMode;     ///< Stores the current selection type.
   pqChartLabel* Title;         ///< Used to draw the chart title.
   pqChartAxis *XAxis;          ///< Used to draw the x-axis.
