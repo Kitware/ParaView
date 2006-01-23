@@ -309,12 +309,12 @@ pqMainWindow::pqMainWindow() :
   this->LineChartDock->setAllowedAreas(Qt::BottomDockWidgetArea |
       Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-  pqObjectLineChartWidget* const line_plot = new pqObjectLineChartWidget(this->LineChartDock);  
-  this->LineChartDock->setWidget(line_plot);
+  pqObjectLineChartWidget* const line_chart = new pqObjectLineChartWidget(this->LineChartDock);  
+  this->LineChartDock->setWidget(line_chart);
   if(this->PipelineList)
     {
     connect(this->PipelineList, SIGNAL(proxySelected(vtkSMProxy*)),
-        line_plot, SLOT(setProxy(vtkSMProxy*)));
+        line_chart, SLOT(setProxy(vtkSMProxy*)));
     }
 
   this->addDockWidget(Qt::BottomDockWidgetArea, this->LineChartDock);
@@ -390,6 +390,8 @@ pqMainWindow::pqMainWindow() :
   this->VariableSelectorToolBar->addWidget(varSelector);
   this->connect(this->PipelineList, SIGNAL(proxySelected(vtkSMProxy *)), SLOT(onProxySelected(vtkSMProxy *)));
   this->connect(varSelector, SIGNAL(varNameChanged(const QString&)), SLOT(onVariableNameSelected(const QString&)));
+  this->connect(varSelector, SIGNAL(varNameChanged(const QString&)), histogram, SLOT(setCurrentVariable(const QString&)));
+  this->connect(varSelector, SIGNAL(varNameChanged(const QString&)), line_chart, SLOT(setCurrentVariable(const QString&)));
 
   this->CompoundProxyToolBar = new QToolBar(tr("Compound Proxies"), this) << pqSetName("CompoundProxyToolBar");
   this->addToolBar(Qt::TopToolBarArea, this->CompoundProxyToolBar);
@@ -1212,10 +1214,6 @@ void pqMainWindow::onVariableNameSelected(const QString& var)
     if(selector->getCurVarTypeID() == pqVariableSelectorWidget::TYPE_CELL)
       {
       pqColorPart(display, var.toAscii().data(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
-      
-      // set the histogram to show this var
-      pqObjectHistogramWidget* histogram = this->HistogramDock->findChild<pqObjectHistogramWidget*>();
-      histogram->setCurrentVariable(var);
       }
     else
       {

@@ -276,6 +276,9 @@ struct pqObjectHistogramWidget::pqImplementation
     if(!array)
       return;
 
+    if(array->GetNumberOfComponents() != 1)
+      return;
+
     double value_min = VTK_DOUBLE_MAX;
     double value_max = -VTK_DOUBLE_MAX;
     typedef vtkstd::vector<int> bins_t;
