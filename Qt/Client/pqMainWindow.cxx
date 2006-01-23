@@ -385,16 +385,16 @@ pqMainWindow::pqMainWindow() :
     this->ElementInspectorDock, SLOT(setVisible(bool)));
   this->ElementInspectorDock->installEventFilter(this);
 
-  this->CompoundProxyToolBar = new QToolBar("Toolbar", this) << pqSetName("CompoundProxyToolBar");
-  this->addToolBar(Qt::TopToolBarArea, this->CompoundProxyToolBar);
-  this->connect(this->CompoundProxyToolBar, SIGNAL(actionTriggered(QAction*)), SLOT(onCreateCompoundProxy(QAction*)));
-
-  this->VariableSelectorToolBar = new QToolBar(this) << pqSetName("VariableSelectorToolBar");
+  this->VariableSelectorToolBar = new QToolBar(tr("Variables"), this) << pqSetName("VariableSelectorToolBar");
   this->addToolBar(Qt::TopToolBarArea, this->VariableSelectorToolBar);
   pqVariableSelectorWidget* varSelector = new pqVariableSelectorWidget(this->VariableSelectorToolBar) << pqSetName("VariableSelector");
   this->VariableSelectorToolBar->addWidget(varSelector);
   this->connect(this->PipelineList, SIGNAL(proxySelected(vtkSMProxy *)), SLOT(onProxySelected(vtkSMProxy *)));
   this->connect(varSelector, SIGNAL(varNameChanged(const QString&)), SLOT(onVariableNameSelected(const QString&)));
+
+  this->CompoundProxyToolBar = new QToolBar(tr("Compound Proxies"), this) << pqSetName("CompoundProxyToolBar");
+  this->addToolBar(Qt::TopToolBarArea, this->CompoundProxyToolBar);
+  this->connect(this->CompoundProxyToolBar, SIGNAL(actionTriggered(QAction*)), SLOT(onCreateCompoundProxy(QAction*)));
 }
 
 pqMainWindow::~pqMainWindow()
