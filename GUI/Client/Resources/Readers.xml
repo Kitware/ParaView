@@ -445,6 +445,10 @@
                    property="GenerateBlockIdArray"
                    trace_name="blockid_flag"
                    help="Generate a cell array storing a unique blockId of each block"/>
+    <LabeledToggle label="Generate active block array"
+                   property="GenerateActiveBlockArray"
+                   trace_name="activeblock_flag"
+                   help="Generate a cell array that stores the active status of a block"/>
     <Scale property="TimeStep"
            label="Time step" trace_name="TimeStep"
            keeps_timesteps="1"

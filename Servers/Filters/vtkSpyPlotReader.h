@@ -102,6 +102,14 @@ public:
   vtkSetMacro(GenerateBlockIdArray,int);
   vtkGetMacro(GenerateBlockIdArray,int);
   vtkBooleanMacro(GenerateBlockIdArray,int);
+
+  // Description:
+  // If true, the reader generate a cell array in each block that
+  // corresponds to the Active field in the file.
+  // False by default.
+  vtkSetMacro(GenerateActiveBlockArray,int);
+  vtkGetMacro(GenerateActiveBlockArray,int);
+  vtkBooleanMacro(GenerateActiveBlockArray,int);
   
   // Description:
   // If true, the reader will convert volume fraction arrays to unsigned char.
@@ -230,6 +238,7 @@ protected:
   
   int GenerateLevelArray; // user flag
   int GenerateBlockIdArray; // user flag
+  int GenerateActiveBlockArray; // user flag
 
   int DownConvertVolumeFraction;
   

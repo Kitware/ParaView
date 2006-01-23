@@ -1,15 +1,15 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:    vtkSpyPlotReader.cxx
+Program:   Visualization Toolkit
+Module:    vtkSpyPlotReader.cxx
 
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+All rights reserved.
+See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 #include "vtkSpyPlotReader.h"
@@ -52,7 +52,7 @@
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.36.2.1");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.36.2.2");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -120,23 +120,23 @@ public:
   int MarkCellFieldDataFixed(int block, int field);
 
   struct CellMaterialField
-    {
+  {
     char Id[30];
     char Comment[80];
     int Index;
-    };
+  };
 
   struct Variable
-    {
+  {
     char* Name;
     int Material;
     int Index;
     CellMaterialField* MaterialField;
     vtkDataArray** DataBlocks;
     int *GhostCellsFixed;
-    };
+  };
   struct Block
-    {
+  {
     int Nx;
     int Ny;
     int Nz;
@@ -149,9 +149,9 @@ public:
     vtkFloatArray* ZArray;
     int VectorsFixedForGhostCells;
     int RemovedBadGhostCells[6];
-    };
+  };
   struct DataDump
-    {
+  {
     int NumVars;
     int* SavedVariables;
     vtkTypeInt64* SavedVariableOffsets;
@@ -159,7 +159,7 @@ public:
     int NumberOfBlocks;
     int ActualNumberOfBlocks;
     Block* Blocks;
-    };
+  };
 
   Block* GetDataBlock(int block);
 
@@ -243,7 +243,7 @@ private:
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.36.2.1");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.36.2.2");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -372,7 +372,7 @@ int vtkSpyPlotReadString(istream &ifs, char* str, size_t len)
 }
 
 //-----------------------------------------------------------------------------
-  template<class TypeName>
+template<class TypeName>
 int vtkSpyPlotReadSpecialType(istream &ifs, TypeName* val, int num)
 {
   void* vval = val;
@@ -383,13 +383,13 @@ int vtkSpyPlotReadSpecialType(istream &ifs, TypeName* val, int num)
     }
   vtkByteSwap::SwapBERange(val, num);
   /*
-  cout << " --- read [";
-  int cc;
-  for ( cc = 0; cc < num; cc ++ )
-  {
-  cout << " " << val[cc];
-  }
-  cout << " ]" << endl;
+    cout << " --- read [";
+    int cc;
+    for ( cc = 0; cc < num; cc ++ )
+    {
+    cout << " " << val[cc];
+    }
+    cout << " ]" << endl;
   */
   return 1;
 }
@@ -569,21 +569,21 @@ int vtkSpyPlotUniReader::ReadInformation()
   // Read group headers. Groups are also time steps
   const int MAX_DUMPS = 100;
   struct GroupHeader
-    {
+  {
     vtkTypeInt64 Offset;
     int NumberOfDataDumps;
     int DumpCycle[MAX_DUMPS];
     double DumpTime[MAX_DUMPS];
     vtkTypeInt64 DumpOffset[MAX_DUMPS];
-    };
+  };
 
   struct CummulativeGroupHeader
-    {
+  {
     int NumberOfDataDumps;
     int *DumpCycle;
     double *DumpTime;
     vtkTypeInt64 *DumpOffset;
-    };
+  };
 
   int dump;
   while ( 1 )
@@ -847,6 +847,7 @@ int vtkSpyPlotUniReader::ReadInformation()
         vtkErrorMacro( "Problem reading the block information" );
         return 0;
         }
+
       //printf("Read data block header: n %d allocated %d pos %ld\n", block, b->Allocated, l);
       if ( b->Allocated )
         {
@@ -898,9 +899,9 @@ int vtkSpyPlotUniReader::ReadInformation()
           vtkFloatArray* currentArray = 0;
           switch ( component )
             {
-          case 0: currentArray = b->XArray; break;
-          case 1: currentArray = b->YArray; break;
-          case 2: currentArray = b->ZArray; break;
+            case 0: currentArray = b->XArray; break;
+            case 1: currentArray = b->YArray; break;
+            case 2: currentArray = b->ZArray; break;
             }
           if ( !currentArray )
             {
@@ -992,7 +993,7 @@ int vtkSpyPlotUniReader::ReadData()
       }
     // Did we create data blocks that we do not need any more
     if ( !this->CellArraySelection->ArrayIsEnabled(var->Name) ||
-      this->DataTypeChanged && this->IsVolumeFraction(var) )
+         this->DataTypeChanged && this->IsVolumeFraction(var) )
       {
       if ( var->DataBlocks )
         {
@@ -1252,11 +1253,11 @@ void vtkSpyPlotUniReader::PrintInformation()
 /* Routine run-length-encodes the data pointed to by *data, placing
    the result in *out. n is the number of doubles to encode. n_out
    is the number of bytes used for the compression (and stored at
- *out). delta is the smallest change of adjacent values that will
- be accepted (changes smaller than delta will be ignored). 
+   *out). delta is the smallest change of adjacent values that will
+   be accepted (changes smaller than delta will be ignored). 
 
-Note: *out needs to be allocated by the calling application. 
-Its worst-case size is 5*n bytes. */
+   Note: *out needs to be allocated by the calling application. 
+   Its worst-case size is 5*n bytes. */
 
 
 
@@ -1301,7 +1302,7 @@ int vtkSpyPlotUniReader::RunLengthDeltaDecode(const unsigned char* in, int inSiz
       ptmp += 4;
       // Now populate the out data
       int k;
-        for (k=0; k<runLength; ++k)
+      for (k=0; k<runLength; ++k)
         {
         if ( outIndex >= outSize )
           {
@@ -1650,35 +1651,36 @@ public:
 
   void Initialize(const char *file)
     {
-    if ( !file || file != this->MasterFileName )
-      {
-      this->Clean(0);
-      }
+      if ( !file || file != this->MasterFileName )
+        {
+        this->Clean(0);
+        }
     }
   void Clean(vtkSpyPlotUniReader* save)
     {
-    MapOfStringToSPCTH::iterator it=this->Files.begin();
-    MapOfStringToSPCTH::iterator end=this->Files.end();
-    while(it!=end)
-      {
-      if ( it->second && it->second != save )
+      MapOfStringToSPCTH::iterator it=this->Files.begin();
+      MapOfStringToSPCTH::iterator end=this->Files.end();
+      while(it!=end)
         {
-        it->second->Delete();
-        it->second = 0;
+        if ( it->second && it->second != save )
+          {
+          it->second->Delete();
+          it->second = 0;
+          }
+        ++it;
         }
-      ++it;
-      }
-    this->Files.erase(this->Files.begin(),end);
+      this->Files.erase(this->Files.begin(),end);
     }
   vtkSpyPlotUniReader* GetReader(MapOfStringToSPCTH::iterator& it, vtkSpyPlotReader* parent)
     {
-    if ( !it->second )
-      {
-      it->second = vtkSpyPlotUniReader::New();
-      it->second->SetCellArraySelection(parent->GetCellDataArraySelection());
-      //cout << parent->GetController()->GetLocalProcessId() << "Create reader: " << it->second << endl;
-      }
-    return it->second;
+      if ( !it->second )
+        {
+        it->second = vtkSpyPlotUniReader::New();
+        it->second->SetCellArraySelection(parent->GetCellDataArraySelection());
+        it->second->SetFileName(it->first.c_str());
+        //cout << parent->GetController()->GetLocalProcessId() << "Create reader: " << it->second << endl;
+        }
+      return it->second;
     }
 };
 
@@ -1708,6 +1710,11 @@ public:
   // Description:
   // Go to first block if any.
   virtual void Start()=0;
+  
+  // Description:
+  // Returns the total number of blocks to be processed by this Processor.
+  // Can be called only after Init().
+  virtual int GetNumberOfBlocksToProcess()=0;
   
   // Description:
   // Is there no block at current position?
@@ -1764,21 +1771,21 @@ public:
 protected:
   vtkSpyPlotBlockIterator()
     {
-    this->NumberOfProcessors = 0;
-    this->ProcessorId = 0;
-    this->CurrentTimeStep = 0;
+      this->NumberOfProcessors = 0;
+      this->ProcessorId = 0;
+      this->CurrentTimeStep = 0;
 
-    this->NumberOfFiles = 0;
+      this->NumberOfFiles = 0;
 
-    this->Off = 0;
-    this->Block = 0;
-    this->NumberOfFields = 0;
-    this->FileIndex = 0;
+      this->Off = 0;
+      this->Block = 0;
+      this->NumberOfFields = 0;
+      this->FileIndex = 0;
 
-    this->BlockEnd = 0;
-    this->FileMap = 0;
-    this->UniReader = 0;
-    this->Parent = 0;
+      this->BlockEnd = 0;
+      this->FileMap = 0;
+      this->UniReader = 0;
+      this->Parent = 0;
     }
 
   virtual void FindFirstBlockOfCurrentOrNextFile()=0;
@@ -1816,6 +1823,43 @@ public:
       this->FindFirstBlockOfCurrentOrNextFile();
     }
   
+  virtual int GetNumberOfBlocksToProcess()
+    {
+      // When distributing blocks, each process is as such
+      // going to read each file, so it's okay if this method 
+      // creates reader for all files and reads information from them.
+      int total_num_blocks = 0;
+      vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator fileIterator;
+      fileIterator = this->FileMap->Files.begin();
+      int numFiles = this->FileMap->Files.size();
+      int cur_file = 1;
+      int progressInterval = numFiles/20 + 1;
+      for ( ;fileIterator != this->FileMap->Files.end(); fileIterator++, cur_file++)
+        {
+        if ( !(cur_file%progressInterval) )
+          {
+          this->Parent->UpdateProgress(0.2 * static_cast<double>(cur_file)/numFiles);
+          }
+        vtkSpyPlotUniReader* reader = this->FileMap->GetReader(fileIterator, 
+                                                               this->Parent);
+        reader->ReadInformation();
+        reader->SetCurrentTimeStep(this->CurrentTimeStep);
+        int numBlocks = reader->GetNumberOfDataBlocks();
+        int numBlocksPerProcess = ( numBlocks / this->NumberOfProcessors);
+        int leftOverBlocks = numBlocks - 
+          (numBlocksPerProcess*this->NumberOfProcessors);
+        if (this->ProcessorId < leftOverBlocks)
+          {
+          total_num_blocks += numBlocksPerProcess + 1;
+          }
+        else
+          {
+          total_num_blocks += numBlocksPerProcess;
+          }
+        }
+      return total_num_blocks;
+    }
+
 protected:
   virtual void FindFirstBlockOfCurrentOrNextFile()
     {
@@ -1878,8 +1922,8 @@ class vtkSpyPlotFileDistributionBlockIterator
 public:
   vtkSpyPlotFileDistributionBlockIterator()
     {
-    this->FileStart = 0;
-    this->FileEnd = 0;
+      this->FileStart = 0;
+      this->FileEnd = 0;
     }
   virtual ~vtkSpyPlotFileDistributionBlockIterator() {}
   virtual void Init(int numberOfProcessors,
@@ -1889,7 +1933,7 @@ public:
                     int currentTimeStep)
     {
       vtkSpyPlotBlockIterator::Init(numberOfProcessors,processorId,parent,fileMap,
-                             currentTimeStep);
+                                    currentTimeStep);
       
       if(this->ProcessorId>=this->NumberOfFiles)
         {
@@ -1932,7 +1976,35 @@ public:
         this->FindFirstBlockOfCurrentOrNextFile();
         }
     }
-  
+ 
+  virtual int GetNumberOfBlocksToProcess()
+    {
+      int total_num_blocks = 0;
+      vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator fileIterator;
+      fileIterator = this->FileMap->Files.begin();
+      int file_index = 0;
+      int numFiles = this->FileEnd - this->FileStart + 1;
+      int progressInterval = numFiles/ 20 + 1;
+      for ( ;fileIterator != this->FileMap->Files.end() && file_index <= this->FileEnd; 
+            fileIterator++, file_index++)
+        {
+        if (file_index < this->FileStart)
+          {
+          continue;
+          }
+        if ( !(file_index % progressInterval) )
+          {
+          this->Parent->UpdateProgress(0.2 * (file_index+1.0)/numFiles);
+          }
+        vtkSpyPlotUniReader* reader = this->FileMap->GetReader(fileIterator, 
+                                                               this->Parent);
+        reader->ReadInformation();
+        reader->SetCurrentTimeStep(this->CurrentTimeStep);
+        total_num_blocks += reader->GetNumberOfDataBlocks();
+        }
+      return total_num_blocks;
+    }
+
 protected:
   virtual void FindFirstBlockOfCurrentOrNextFile()
     {
@@ -2123,7 +2195,7 @@ static vtkstd::string GetFilenamePath(const vtkstd::string& filename)
 // if any data were read before the end-of-file was reached.
 // 
 static bool GetLineFromStream(istream& is,
-  vtkstd::string& line, bool *has_newline = 0)
+                              vtkstd::string& line, bool *has_newline = 0)
 {
   const int bufferSize = 1024;
   char buffer[bufferSize];
@@ -2176,7 +2248,7 @@ vtkSpyPlotReader::vtkSpyPlotReader()
     &vtkSpyPlotReader::SelectionModifiedCallback);
   this->SelectionObserver->SetClientData(this);
   this->CellDataArraySelection->AddObserver(vtkCommand::ModifiedEvent,
-    this->SelectionObserver);
+                                            this->SelectionObserver);
   this->TimeStep = 0;
   this->TimeStepRange[0] = 0;
   this->TimeStepRange[1] = 0;
@@ -2189,6 +2261,7 @@ vtkSpyPlotReader::vtkSpyPlotReader()
   this->DistributeFiles=0; // by default, distribute blocks, not files.
   this->GenerateLevelArray=0; // by default, do not generate level array.
   this->GenerateBlockIdArray=0; // by default, do not generate block id array.
+  this->GenerateActiveBlockArray = 0; // by default do not generate active array
 }
 
 //-----------------------------------------------------------------------------
@@ -2320,7 +2393,7 @@ int vtkSpyPlotReader::UpdateNoCaseFile(const char *ext,
   // Check to see if this is the same filename as before
   // if so then I already have the meta info, so just return
   if(this->GetCurrentFileName()!=0 &&
-    strcmp(this->FileName,this->GetCurrentFileName())==0)
+     strcmp(this->FileName,this->GetCurrentFileName())==0)
     {
     return 1;
     }
@@ -2487,8 +2560,8 @@ int vtkSpyPlotReader::UpdateMetaData(vtkInformation* request,
     {
     vtkInformation* outInfo = outputVector->GetInformationObject(0);
     outInfo->Set(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), 
-      uniReader->GetTimeArray(),
-      num_time_steps);
+                 uniReader->GetTimeArray(),
+                 num_time_steps);
     }
 
   this->CurrentTimeStep=this->TimeStep;
@@ -2560,15 +2633,15 @@ template<class DataType>
 int vtkSpyPlotRemoveBadGhostCells(DataType* dataType, vtkDataArray* dataArray, int realExtents[6], int realDims[3], int ptDims[3], int realPtDims[3])
 {
   /*
-  vtkDebugMacro( "//////////////////////////////////////////////////////////////////////////////////" );
-  vtkDebugMacro( << dataArray << " vtkSpyPlotRemoveBadGhostCells(" << dataArray->GetName() << ")" );
-  vtkDebugMacro( "DataArray: ");
-  dataArray->Print(cout);
-  vtkDebugMacro( "Real Extents: " << coutVector6(realExtents) );
-  vtkDebugMacro( "Real Dims:    " << coutVector3(realDims) );
-  vtkDebugMacro( "PT Dims:      " << coutVector3(ptDims) );
-  vtkDebugMacro( "Real PT Dims: " << coutVector3(realPtDims) );
-  vtkDebugMacro( "//////////////////////////////////////////////////////////////////////////////////" );
+    vtkDebugMacro( "//////////////////////////////////////////////////////////////////////////////////" );
+    vtkDebugMacro( << dataArray << " vtkSpyPlotRemoveBadGhostCells(" << dataArray->GetName() << ")" );
+    vtkDebugMacro( "DataArray: ");
+    dataArray->Print(cout);
+    vtkDebugMacro( "Real Extents: " << coutVector6(realExtents) );
+    vtkDebugMacro( "Real Dims:    " << coutVector3(realDims) );
+    vtkDebugMacro( "PT Dims:      " << coutVector3(ptDims) );
+    vtkDebugMacro( "Real PT Dims: " << coutVector3(realPtDims) );
+    vtkDebugMacro( "//////////////////////////////////////////////////////////////////////////////////" );
   */
   (void)* dataType;
   // skip some cell data.
@@ -2623,7 +2696,7 @@ int vtkSpyPlotReader::RequestData(
     return 0;
     }
   if (!info->Has(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()) ||
-    !info->Has(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()))
+      !info->Has(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()))
     {
     vtkErrorMacro("Expected information not found. "
                   "Cannot provide update extent.");
@@ -2928,12 +3001,20 @@ int vtkSpyPlotReader::RequestData(
   // Read all files
   
   //vtkDebugMacro("there is (are) "<<numFiles<<" file(s)");
-    // Read only the part of the file for this processNumber.
+  // Read only the part of the file for this processNumber.
 //    for ( block = startBlock; block <= endBlock; ++ block )
   
   blockIterator->Start();
+  int total_num_of_blocks = blockIterator->GetNumberOfBlocksToProcess();
+  int current_block_number = 1;
+  int progressInterval = total_num_of_blocks / 10 + 1;
   while(!blockIterator->IsOff())
     {
+    if ( !(current_block_number % progressInterval) )
+      {
+      this->UpdateProgress(0.6 + 
+                           0.4 * static_cast<double>(current_block_number)/total_num_of_blocks);
+      }
     block=blockIterator->GetBlock();
     int numFields=blockIterator->GetNumberOfFields();
     uniReader=blockIterator->GetUniReader();
@@ -3052,8 +3133,9 @@ int vtkSpyPlotReader::RequestData(
       
       ug->SetExtent(extents);
       ug->SetOrigin(origin);
-      
+
       cd = ug->GetCellData();
+
       }
     else
       {
@@ -3219,12 +3301,12 @@ int vtkSpyPlotReader::RequestData(
       vtkDebugMacro( "*******************" );
       vtkDebugMacro( "Coordinates: " );
       /*
-      int cor;
-      for ( cor = 0; cor < 3; cor ++ )
+        int cor;
+        for ( cor = 0; cor < 3; cor ++ )
         {
         coordinates[cor]->Print(cout);
         }
-      vtkDebugMacro( "*******************" );
+        vtkDebugMacro( "*******************" );
       */
       hb->SetDataSet(0, hb->GetNumberOfDataSets(0), rg);
       rg->Delete();
@@ -3237,6 +3319,7 @@ int vtkSpyPlotReader::RequestData(
       }
     vtkDebugMacro("Executing block: " << block);
     uniReader->ReadData();
+
     if(!hasBadGhostCells)
       {
       for ( field = 0; field < numFields; field ++ )
@@ -3257,6 +3340,7 @@ int vtkSpyPlotReader::RequestData(
           cd->AddArray(array);
           }
         }
+
       // Add a level array, for debugging
       if(this->GenerateLevelArray)
         {
@@ -3382,7 +3466,7 @@ int vtkSpyPlotReader::RequestData(
               {
               vtkTemplateMacro(
                 ::vtkSpyPlotRemoveBadGhostCells(static_cast<VTK_TT*>(0), array,
-                  realExtents, realDims, ptDims, realPtDims));
+                                                realExtents, realDims, ptDims, realPtDims));
               }
             uniReader->MarkCellFieldDataFixed(block, field);
             }
@@ -3480,8 +3564,25 @@ int vtkSpyPlotReader::RequestData(
         ++k;
         }
       }
+    // Add active block array, for debugging
+    if (this->GenerateActiveBlockArray)
+      {
+      vtkSpyPlotUniReader::Block* bk = uniReader->GetDataBlock(block);
+      vtkUnsignedCharArray* activeArray = vtkUnsignedCharArray::New();
+      activeArray->SetName("ActiveBlock");
+      vtkIdType numCells=realDims[0]*realDims[1]*realDims[2];
+      activeArray->SetNumberOfTuples(numCells);
+      for (vtkIdType myIdx=0; myIdx<numCells; myIdx++)
+        {
+        activeArray->SetValue(myIdx, bk->Active);
+        }
+      cd->AddArray(activeArray);
+      activeArray->Delete();
+      }
+
     //this->MergeVectors(cd);
     blockIterator->Next();
+    current_block_number++;
     } // while
   delete blockIterator;
   
@@ -3667,7 +3768,7 @@ int vtkSpyPlotReader::RequestData(
         i=0;
         while(i<globalIndex)
           {
-           hb->SetDataSet(level,i,0);
+          hb->SetDataSet(level,i,0);
           ++i;
           }
         }
@@ -3704,10 +3805,10 @@ int vtkSpyPlotReader::RequestData(
           
           vtkDataArray *array=cd->GetArray("blockId");
           if(array!=0)
-          {
-          cd->RemoveArray("blockId"); // if this is not the first step,
-          // make sure we have a clean array
-          }
+            {
+            cd->RemoveArray("blockId"); // if this is not the first step,
+            // make sure we have a clean array
+            }
           
           array = vtkIntArray::New();
           cd->AddArray(array);
@@ -3760,17 +3861,17 @@ int vtkSpyPlotReader::RequestData(
 #endif
   
   /*
-  vtkstd::vector<vtkRectilinearGrid*>::iterator it;
-  for ( it = grids.begin(); it != grids.end(); ++ it )
+    vtkstd::vector<vtkRectilinearGrid*>::iterator it;
+    for ( it = grids.begin(); it != grids.end(); ++ it )
     {
     (*it)->Print(cout);
     int cc;
     for ( cc = 0; cc < (*it)->GetCellData()->GetNumberOfArrays(); ++ cc )
-      {
-      (*it)->GetCellData()->GetArray(cc)->Print(cout);
-      }
+    {
+    (*it)->GetCellData()->GetArray(cc)->Print(cout);
     }
-    */
+    }
+  */
   
   return 1;
 }
@@ -3780,69 +3881,69 @@ void vtkSpyPlotReader::AddGhostLevelArray(int numLevels)
 {
   (void)numLevels;
   /*
-  int numCells = output->GetNumberOfCells();
-  int numBlocks = output->GetNumberOfBlocks();
-  vtkUnsignedCharArray* array = vtkUnsignedCharArray::New();
-  int blockId;
-  int dims[3];
-  int i, j, k;
-  unsigned char* ptr;
-  int iLevel, jLevel, kLevel, tmp;
+    int numCells = output->GetNumberOfCells();
+    int numBlocks = output->GetNumberOfBlocks();
+    vtkUnsignedCharArray* array = vtkUnsignedCharArray::New();
+    int blockId;
+    int dims[3];
+    int i, j, k;
+    unsigned char* ptr;
+    int iLevel, jLevel, kLevel, tmp;
 
-  output->SetNumberOfGhostLevels(numLevels);
-  array->SetNumberOfTuples(numCells);
-  ptr = (unsigned char*)(array->GetVoidPointer(0));
+    output->SetNumberOfGhostLevels(numLevels);
+    array->SetNumberOfTuples(numCells);
+    ptr = (unsigned char*)(array->GetVoidPointer(0));
 
 
-  for (blockId = 0; blockId < numBlocks; ++blockId)
+    for (blockId = 0; blockId < numBlocks; ++blockId)
     {
     output->GetBlockCellDimensions(blockId, dims);    
     for (k = 0; k < dims[2]; ++k)
-      {
-      kLevel = numLevels - k;
-      tmp = k - dims[2] + 1 + numLevels;
-      if (tmp > kLevel) { kLevel = tmp;}
-      if (dims[2] == 1) {kLevel = 0;}
-      for (j = 0; j < dims[1]; ++j)
-        {
-        jLevel = kLevel;
-        tmp = numLevels - j;
-        if (tmp > jLevel) { jLevel = tmp;}
-        tmp = j - dims[1] + 1 + numLevels;
-        if (tmp > jLevel) { jLevel = tmp;}
-        if (dims[1] == 1) {jLevel = 0;}
-        for (i = 0; i < dims[0]; ++i)
-          {
-          iLevel = jLevel;
-          tmp = numLevels - i;
-          if (tmp > iLevel) { iLevel = tmp;}
-          tmp = i - dims[0] + 1 + numLevels;
-          if (tmp > iLevel) { iLevel = tmp;}
-          if (dims[0] == 1) {iLevel = 0;}
-          if (iLevel <= 0)
-            {
-            *ptr = 0;
-            }
-          else
-            {
-            *ptr = iLevel;
-            }
-          ++ptr;
-          }
-        }
-      }
+    {
+    kLevel = numLevels - k;
+    tmp = k - dims[2] + 1 + numLevels;
+    if (tmp > kLevel) { kLevel = tmp;}
+    if (dims[2] == 1) {kLevel = 0;}
+    for (j = 0; j < dims[1]; ++j)
+    {
+    jLevel = kLevel;
+    tmp = numLevels - j;
+    if (tmp > jLevel) { jLevel = tmp;}
+    tmp = j - dims[1] + 1 + numLevels;
+    if (tmp > jLevel) { jLevel = tmp;}
+    if (dims[1] == 1) {jLevel = 0;}
+    for (i = 0; i < dims[0]; ++i)
+    {
+    iLevel = jLevel;
+    tmp = numLevels - i;
+    if (tmp > iLevel) { iLevel = tmp;}
+    tmp = i - dims[0] + 1 + numLevels;
+    if (tmp > iLevel) { iLevel = tmp;}
+    if (dims[0] == 1) {iLevel = 0;}
+    if (iLevel <= 0)
+    {
+    *ptr = 0;
+    }
+    else
+    {
+    *ptr = iLevel;
+    }
+    ++ptr;
+    }
+    }
+    }
     }
 
-  //array->SetName("Test");
-  array->SetName("vtkGhostLevels");
-  output->GetCellData()->AddArray(array);
-  array->Delete();
+    //array->SetName("Test");
+    array->SetName("vtkGhostLevels");
+    output->GetCellData()->AddArray(array);
+    array->Delete();
   */
 }
 
 //----------------------------------------------------------------------------
 void vtkSpyPlotReader::SelectionModifiedCallback(vtkObject*, unsigned long,
-  void* clientdata, void*)
+                                                 void* clientdata, void*)
 {
   static_cast<vtkSpyPlotReader*>(clientdata)->Modified();
 }
@@ -3926,9 +4027,9 @@ void vtkSpyPlotReader::MergeVectors(vtkDataSetAttributes* da)
 
 //-----------------------------------------------------------------------------
 // The templated execute function handles all the data types.
-  template <class T>
+template <class T>
 void vtkMergeVectorComponents(vtkIdType length,
-  T *p1, T *p2, T *p3, T *po)
+                              T *p1, T *p2, T *p3, T *po)
 {
   vtkIdType idx;
   if (p3)
@@ -3953,7 +4054,7 @@ void vtkMergeVectorComponents(vtkIdType length,
 
 //-----------------------------------------------------------------------------
 int vtkSpyPlotReader::MergeVectors(vtkDataSetAttributes* da, 
-  vtkDataArray * a1, vtkDataArray * a2, vtkDataArray * a3)
+                                   vtkDataArray * a1, vtkDataArray * a2, vtkDataArray * a3)
 {
   int prefixFlag = 0;
 
@@ -3962,7 +4063,7 @@ int vtkSpyPlotReader::MergeVectors(vtkDataSetAttributes* da,
     return 0;
     }
   if(a1->GetNumberOfTuples() != a2->GetNumberOfTuples() ||
-    a1->GetNumberOfTuples() != a3->GetNumberOfTuples())
+     a1->GetNumberOfTuples() != a3->GetNumberOfTuples())
     { // Sanity check.  Should never happen.
     return 0;
     }
@@ -3971,7 +4072,7 @@ int vtkSpyPlotReader::MergeVectors(vtkDataSetAttributes* da,
     return 0;
     }
   if(a1->GetNumberOfComponents()!=1 || a2->GetNumberOfComponents()!=1 ||
-    a3->GetNumberOfComponents()!=1)
+     a3->GetNumberOfComponents()!=1)
     {
     return 0;
     }
@@ -3994,7 +4095,7 @@ int vtkSpyPlotReader::MergeVectors(vtkDataSetAttributes* da,
   if (strncmp(n1+1,n2+1,e1)==0 && strncmp(n1+1,n3+1,e1)==0)
     { // Trailing characters are the same. Check for prefix XYZ.
     if ((n1[0]!='X' || n2[0]!='Y' || n3[0]!='Z') &&
-      (n1[0]!='x' || n2[0]!='x' || n3[0]!='x'))
+        (n1[0]!='x' || n2[0]!='x' || n3[0]!='x'))
       { // Since last characters are the same, there is no way
       // the names can have postfix XYZ.
       return 0;
@@ -4008,7 +4109,7 @@ int vtkSpyPlotReader::MergeVectors(vtkDataSetAttributes* da,
       return 0;
       }
     if ((n1[e1]!='X' || n2[e2]!='Y' || n3[e3]!='Z') &&
-      (n1[e1]!='x' || n2[e2]!='x' || n3[e3]!='x'))
+        (n1[e1]!='x' || n2[e2]!='x' || n3[e3]!='x'))
       { // Tails are the same, but postfix not XYZ.
       return 0;
       }
@@ -4030,9 +4131,9 @@ int vtkSpyPlotReader::MergeVectors(vtkDataSetAttributes* da,
                                 (VTK_TT*)p2,
                                 (VTK_TT*)p3,
                                 (VTK_TT*)pn));
-  default:
-    vtkErrorMacro(<< "Execute: Unknown ScalarType");
-    return 0;
+    default:
+      vtkErrorMacro(<< "Execute: Unknown ScalarType");
+      return 0;
     }
   if (prefixFlag)
     {
@@ -4056,7 +4157,7 @@ int vtkSpyPlotReader::MergeVectors(vtkDataSetAttributes* da,
 
 //-----------------------------------------------------------------------------
 int vtkSpyPlotReader::MergeVectors(vtkDataSetAttributes* da, 
-  vtkDataArray * a1, vtkDataArray * a2)
+                                   vtkDataArray * a1, vtkDataArray * a2)
 {
   int prefixFlag = 0;
 
@@ -4127,9 +4228,9 @@ int vtkSpyPlotReader::MergeVectors(vtkDataSetAttributes* da,
                                 (VTK_TT*)p2,
                                 (VTK_TT*)0,
                                 (VTK_TT*)pn));
-  default:
-    vtkErrorMacro(<< "Execute: Unknown ScalarType");
-    return 0;
+    default:
+      vtkErrorMacro(<< "Execute: Unknown ScalarType");
+      return 0;
     }
   if (prefixFlag)
     {
@@ -4187,7 +4288,7 @@ int vtkSpyPlotReader::CanReadFile(const char* fname)
     return 0;
     }
   if ( strncmp(magic, "spydata", 7) != 0 &&
-    strncmp(magic, "spycase", 7) != 0 )
+       strncmp(magic, "spycase", 7) != 0 )
     {
     return 0;
     }
@@ -4204,8 +4305,8 @@ void vtkSpyPlotReader::SetDownConvertVolumeFraction(int vf)
     }
   vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator mapIt;
   for ( mapIt = this->Map->Files.begin();
-    mapIt != this->Map->Files.end();
-    ++ mapIt )
+        mapIt != this->Map->Files.end();
+        ++ mapIt )
     {
     this->Map->GetReader(mapIt, this)->SetDownConvertVolumeFraction(vf);
     }
@@ -4251,6 +4352,16 @@ void vtkSpyPlotReader::PrintSelf(ostream& os, vtkIndent indent)
   
   os << "GenerateBlockIdArray: ";
   if(this->GenerateBlockIdArray)
+    {
+    os << "true"<<endl;
+    }
+  else
+    {
+    os << "false"<<endl;
+    }
+
+  os << "GenerateActiveBlockArray: ";
+  if(this->GenerateActiveBlockArray)
     {
     os << "true"<<endl;
     }
