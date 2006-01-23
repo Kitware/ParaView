@@ -114,6 +114,8 @@ struct pqObjectHistogramWidget::pqImplementation
     this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->getLabel().setText("Count");
     this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->getLabel().setFont(bold);
     this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->getLabel().setOrientation(pqChartLabel::VERTICAL);
+    
+    this->updateChart();
   }
   
   ~pqImplementation()
@@ -236,10 +238,13 @@ struct pqObjectHistogramWidget::pqImplementation
   
   void updateChart()
   {
+    // Set the default (no data) appearance of the chart
     this->HistogramWidget.getHistogram()->clearData();
-    this->HistogramWidget.getTitle().setText("");
-    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setVisible(false);
-    this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setVisible(false);
+    this->HistogramWidget.getTitle().setText("Histogram (no data)");
+    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setVisible(true);
+    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setValueRange(0.0, 100.0);
+    this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setVisible(true);
+    this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setValueRange(0.0, 100.0);
     
     if(this->CurrentVariable.isEmpty())
       return;

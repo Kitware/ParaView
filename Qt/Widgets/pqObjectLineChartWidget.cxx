@@ -91,6 +91,8 @@ struct pqObjectLineChartWidget::pqImplementation
 
     this->LineChartWidget.getYAxis()->getLabel().setFont(bold);
     this->LineChartWidget.getYAxis()->getLabel().setOrientation(pqChartLabel::VERTICAL);
+    
+    this->updateChart();
   }
   
   ~pqImplementation()
@@ -231,10 +233,18 @@ struct pqObjectLineChartWidget::pqImplementation
   
   void updateChart()
   {
+    // Set the default (no data) appearance of the chart ...
     this->LineChartWidget.getLineChart()->clearData();
-    this->LineChartWidget.getTitle().setText("");
-    this->LineChartWidget.getXAxis()->setVisible(false);
-    this->LineChartWidget.getYAxis()->setVisible(false);
+    this->LineChartWidget.getTitle().setText("Time Plot (no data)");
+    
+    this->LineChartWidget.getXAxis()->setVisible(true);
+    this->LineChartWidget.getXAxis()->setValueRange(0.0, 100.0);
+    
+    this->LineChartWidget.getYAxis()->getLabel().setText("Value");
+    this->LineChartWidget.getYAxis()->setVisible(true);
+    this->LineChartWidget.getYAxis()->setValueRange(0.0, 100.0);
+    
+    this->LineChartWidget.getLegend().clear();
     
     if(this->CurrentVariable.isEmpty())
       return;
