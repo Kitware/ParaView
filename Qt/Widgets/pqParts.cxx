@@ -56,11 +56,11 @@ vtkSMDisplayProxy* pqAddPart(vtkSMRenderModuleProxy* rm, vtkSMSourceProxy* Part)
   // Add the part display to the render module.
   pp = vtkSMProxyProperty::SafeDownCast(rm->GetProperty("Displays"));
   pp->AddProxy(partdisplay);
+  
+  rm->UpdateVTKObjects();
 
   // set default colors for display
   pqColorPart(partdisplay);
-
-  rm->UpdateVTKObjects();
 
   // Allow the render module proxy to maintain the part display.
 //  partdisplay->Delete();
