@@ -49,7 +49,7 @@ pqPicking::pqPicking(vtkSMRenderModuleProxy* rm, QObject* p)
   
   // thick red wire highlighting
   vtkSMDoubleVectorProperty *doubleProp = vtkSMDoubleVectorProperty::SafeDownCast(this->PickDisplay->GetProperty("Color"));
-  doubleProp->SetElements3(1,0,0);
+  doubleProp->SetElements3(1,1,1);
   doubleProp = vtkSMDoubleVectorProperty::SafeDownCast(this->PickDisplay->GetProperty("LineWidth"));
   doubleProp->SetElements1(3.0);
   vtkSMDataObjectDisplayProxy::SafeDownCast(this->PickDisplay)->SetRepresentationCM(vtkSMDataObjectDisplayProxy::WIREFRAME);
