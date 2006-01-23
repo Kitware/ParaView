@@ -32,6 +32,7 @@ public:
   static vtkKWIcon* New();
   vtkTypeRevisionMacro(vtkKWIcon,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
+  void DeepCopy(vtkKWIcon *p);
 
   //BTX
   // Description:

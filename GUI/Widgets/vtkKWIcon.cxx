@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.32");
+vtkCxxRevisionMacro(vtkKWIcon, "1.33");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -35,6 +35,12 @@ vtkKWIcon::vtkKWIcon()
 vtkKWIcon::~vtkKWIcon()
 {
   this->SetData(0, 0, 0, 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWIcon::DeepCopy(vtkKWIcon* icon)
+{
+  this->SetImage(icon);
 }
 
 //----------------------------------------------------------------------------
