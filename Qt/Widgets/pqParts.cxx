@@ -16,17 +16,15 @@
 #include <vtkSMProxyProperty.h>
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
-#include <vtkSMIntVectorProperty.h>
 #include <vtkPVDataSetAttributesInformation.h>
 #include <vtkPVGeometryInformation.h>
 #include <vtkPVArrayInformation.h>
-#include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMLookupTableProxy.h>
 #include <vtkSMProxyManager.h>
 #include <vtkProcessModule.h>
-#include <vtkSMStringVectorProperty.h>
 
 #include "pqPipelineData.h"
+#include "pqSMAdaptor.h"
 #include "pqPipelineObject.h"
 
 vtkSMDisplayProxy* pqAddPart(vtkSMRenderModuleProxy* rm, vtkSMSourceProxy* Part)
@@ -276,15 +274,11 @@ void pqColorPart(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype)
   
   if(fieldname == 0)
     {
-    vtkSMIntVectorProperty* ivp;
-    ivp = vtkSMIntVectorProperty::SafeDownCast(Part->GetProperty("ScalarVisibility"));
-    ivp->SetElement(0,0);
+    pqSMAdaptor::instance()->setProperty(Part->GetProperty("ScalarVisibility"), 0);
     }
   else
     {
     // create lut
-    vtkSMDoubleVectorProperty* dvp;
-    vtkSMIntVectorProperty* ivp;
     vtkPVDataInformation* geomInfo = Part->GetGeometryInformation();
     vtkSMLookupTableProxy* lut = vtkSMLookupTableProxy::SafeDownCast(
       vtkSMObject::GetProxyManager()->NewProxy("lookup_tables", "LookupTable"));
@@ -292,12 +286,10 @@ void pqColorPart(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype)
     pp = vtkSMProxyProperty::SafeDownCast(Part->GetProperty("LookupTable"));
     pp->AddProxy(lut);
     
-    ivp = vtkSMIntVectorProperty::SafeDownCast(Part->GetProperty("ScalarVisibility"));
-    ivp->SetElement(0,1);
-  
+    pqSMAdaptor::instance()->setProperty(Part->GetProperty("ScalarVisibility"), 1);
+    pqSMAdaptor::instance()->setProperty(Part->GetProperty("ScalarMode"), fieldtype);
+
     vtkPVArrayInformation* ai;
-    ivp = vtkSMIntVectorProperty::SafeDownCast(Part->GetProperty("ScalarMode"));
-    ivp->SetElement(0, fieldtype);
 
     if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
       {
@@ -308,13 +300,13 @@ void pqColorPart(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype)
       ai = geomInfo->GetPointDataInformation()->GetArrayInformation(fieldname);
       }
 
-    vtkSMStringVectorProperty* d_svp = vtkSMStringVectorProperty::SafeDownCast(Part->GetProperty("ColorArray"));
-    d_svp->SetElement(0, fieldname);
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(lut->GetProperty("ScalarRange"));
+    pqSMAdaptor::instance()->setProperty(Part->GetProperty("ColorArray"), fieldname);
     double range[2];
     ai->GetComponentRange(0, range);
-    dvp->SetElement(0,range[0]);
-    dvp->SetElement(1,range[1]);
+    QList<QVariant> tmp;
+    tmp += range[0];
+    tmp += range[1];
+    pqSMAdaptor::instance()->setProperty(lut->GetProperty("ScalarRange"), tmp);
     lut->UpdateVTKObjects();
     }
 

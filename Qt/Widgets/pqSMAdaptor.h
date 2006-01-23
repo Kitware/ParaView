@@ -18,6 +18,7 @@ class QWidget;
 
 #include "QtWidgetsExport.h"
 #include <QObject>
+#include <QVariant>
 
 /// Translates server manager events into Qt-compatible slots and signals
 class QTWIDGETS_EXPORT pqSMAdaptor : public QObject
