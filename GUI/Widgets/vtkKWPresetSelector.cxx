@@ -55,7 +55,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.31");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.32");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -755,6 +755,9 @@ void vtkKWPresetSelector::SetPresetGroupSlotName(const char *name)
       this->Internals && this->Internals->GroupSlotName.compare(name))
     {
     this->Internals->GroupSlotName = name;
+    // Changing the group of a preset may change the number of visible widgets
+    // (for example, if the visibility of presets is filtered by groups)
+    this->Update(); 
     }
 }
 
@@ -775,7 +778,9 @@ int vtkKWPresetSelector::SetPresetGroup(int id, const char *group)
     id, this->GetPresetGroupSlotName(), group);
   if (res)
     {
-    this->Update(); // the number of visible widgets may have changed
+    // Changing the group of a preset may change the number of visible widgets
+    // (for example, if the visibility of presets is filtered by groups)
+    this->Update(); 
     }
   return res;
 }
