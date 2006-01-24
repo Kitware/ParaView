@@ -55,7 +55,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.32");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.33");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -755,9 +755,7 @@ void vtkKWPresetSelector::SetPresetGroupSlotName(const char *name)
       this->Internals && this->Internals->GroupSlotName.compare(name))
     {
     this->Internals->GroupSlotName = name;
-    // Changing the group of a preset may change the number of visible widgets
-    // (for example, if the visibility of presets is filtered by groups)
-    this->Update(); 
+    this->UpdatePresetRows();
     }
 }
 
@@ -776,10 +774,11 @@ int vtkKWPresetSelector::SetPresetGroup(int id, const char *group)
 {
   int res = this->SetPresetUserSlotAsString(
     id, this->GetPresetGroupSlotName(), group);
-  if (res)
+  if (res && this->GroupFilter)
     {
     // Changing the group of a preset may change the number of visible widgets
-    // (for example, if the visibility of presets is filtered by groups)
+    // (for example, if the visibility of presets is filtered by groups), 
+    // which can enable/disable some buttons
     this->Update(); 
     }
   return res;
@@ -798,6 +797,7 @@ void vtkKWPresetSelector::SetPresetCommentSlotName(const char *name)
       this->Internals && this->Internals->CommentSlotName.compare(name))
     {
     this->Internals->CommentSlotName = name;
+    this->UpdatePresetRows();
     }
 }
 
@@ -832,6 +832,7 @@ void vtkKWPresetSelector::SetPresetFileNameSlotName(const char *name)
       this->Internals && this->Internals->FileNameSlotName.compare(name))
     {
     this->Internals->FileNameSlotName = name;
+    this->UpdatePresetRows();
     }
 }
 
@@ -866,6 +867,7 @@ void vtkKWPresetSelector::SetPresetCreationTimeSlotName(const char *name)
       this->Internals && this->Internals->CreationTimeSlotName.compare(name))
     {
     this->Internals->CreationTimeSlotName = name;
+    this->UpdatePresetRows();
     }
 }
 
@@ -900,6 +902,7 @@ void vtkKWPresetSelector::SetPresetThumbnailSlotName(const char *name)
       this->Internals && this->Internals->ThumbnailSlotName.compare(name))
     {
     this->Internals->ThumbnailSlotName = name;
+    this->UpdatePresetRows();
     }
 }
 
@@ -958,6 +961,7 @@ void vtkKWPresetSelector::SetPresetScreenshotSlotName(const char *name)
       this->Internals && this->Internals->ScreenshotSlotName.compare(name))
     {
     this->Internals->ScreenshotSlotName = name;
+    this->UpdatePresetRows();
     }
 }
 
@@ -1725,16 +1729,25 @@ void vtkKWPresetSelector::SetGroupFilter(const char* _arg)
 
   this->Modified();
 
-  this->UpdateRowsInPresetList();
+  this->UpdatePresetRows();
 } 
 
 //----------------------------------------------------------------------------
-void vtkKWPresetSelector::UpdateRowsInPresetList()
+void vtkKWPresetSelector::UpdatePresetRows()
 {
-  int i, nb_presets = this->GetNumberOfPresets();
-  for (i = 0; i < nb_presets; i++)
+  int nb_visible_presets = this->GetNumberOfVisiblePresets();
+  int nb_presets = this->GetNumberOfPresets();
+  for (int i = 0; i < nb_presets; i++)
     {
     this->UpdatePresetRow(this->GetNthPresetId(i));
+    }
+
+  // If the number of visible presets changed, this can enable/disable
+  // some buttons
+
+  if (nb_visible_presets != this->GetNumberOfVisiblePresets())
+    {
+    this->Update();
     }
 }
 
