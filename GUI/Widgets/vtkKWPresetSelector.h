@@ -560,7 +560,7 @@ protected:
 
   // Description:
   // Update all rows in the list
-  virtual void UpdateRowsInPresetList();
+  virtual void UpdatePresetRows();
 
   char *PresetAddCommand;
   virtual void InvokePresetAddCommand();
