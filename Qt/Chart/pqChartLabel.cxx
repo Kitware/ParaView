@@ -1,15 +1,15 @@
 #include "pqChartLabel.h"
 #include <QPainter>
 
-pqChartLabel::pqChartLabel(QObject* parent) :
-  QObject(parent),
+pqChartLabel::pqChartLabel(QObject* p) :
+  QObject(p),
   Color(Qt::black),
   Orientation(HORIZONTAL)
 {
 }
 
-pqChartLabel::pqChartLabel(const QString& text, QObject* parent) :
-  QObject(parent),
+pqChartLabel::pqChartLabel(const QString& text, QObject* p) :
+  QObject(p),
   Text(text),
   Color(Qt::black),
   Orientation(HORIZONTAL)
