@@ -22,8 +22,6 @@
 #include <vtkPVDataSetAttributesInformation.h>
 #include <vtkSMDataObjectDisplayProxy.h>
 #include <vtkPVArrayInformation.h>
-#include <vtkSMStringVectorProperty.h>
-#include <vtkSMIntVectorProperty.h>
 #include <vtkPVGeometryInformation.h>
 #include "pqParts.h"
 
@@ -430,13 +428,10 @@ void pqObjectInspector::setProxy(vtkSMProxy *sourceProxy)
         possibles.append(name);
         }
 
-      vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(display->GetProperty("ScalarVisibility"));
-      if(ivp->GetElement(0))
+      if(adapter->getProperty(display->GetProperty("ScalarVisibility")) == true)
         {
-        vtkSMStringVectorProperty* d_svp = vtkSMStringVectorProperty::SafeDownCast(display->GetProperty("ColorArray"));
-        const char* fieldname = d_svp->GetElement(0);
-        ivp = vtkSMIntVectorProperty::SafeDownCast(display->GetProperty("ScalarMode"));
-        int fieldtype = ivp->GetElement(0);
+        QString fieldname = adapter->getProperty(display->GetProperty("ColorArray")).toString();
+        QVariant fieldtype = adapter->getProperty(display->GetProperty("ScalarMode"));
         if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
           {
           item->setValue(QString(fieldname) + " (cell)");

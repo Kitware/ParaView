@@ -150,6 +150,11 @@ ADD_LIBRARY(QtWidgets
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}
   ${UI_BUILT_SOURCES}
+
+  vtkPVAxesWidget.cxx
+  vtkPVAxesWidget.h
+  vtkPVAxesActor.cxx
+  vtkPVAxesActor.h
 )
 
 TARGET_LINK_LIBRARIES(QtWidgets

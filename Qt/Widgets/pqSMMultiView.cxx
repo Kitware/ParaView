@@ -9,13 +9,63 @@
 
 #include <QObject>
 
+#include "vtkCommand.h"
+#include "vtkCollection.h"
+#include "vtkRenderer.h"
 #include "QVTKWidget.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMMultiViewRenderModuleProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
+#include "vtkPVAxesWidget.h"
 #include "vtkSMRenderModuleProxy.h"
+
+
+// delete items automatically when another object is deleted
+class vtkPiggyBackDelete : public vtkCommand
+{
+public:
+  vtkTypeMacro(vtkPiggyBackDelete,vtkCommand)
+  static vtkPiggyBackDelete* New()
+    {
+    return new vtkPiggyBackDelete;
+    }
+  
+  void AddRider(vtkObject* o)
+    {
+    this->Riders->AddItem(o);
+    }
+  void RemoveRider(vtkObject* o)
+    {
+    this->Riders->RemoveItem(o);
+    }
+
+protected:
+  vtkPiggyBackDelete() 
+    {
+    this->Riders = vtkCollection::New();
+    }
+  ~vtkPiggyBackDelete() 
+    {
+    this->Riders->Delete();
+    }
+
+  virtual void Execute(vtkObject* pig, unsigned long, void*)
+    {
+    this->Riders->InitTraversal();
+    vtkObject* o = Riders->GetNextItemAsObject();
+    for( ; o != NULL; o = Riders->GetNextItemAsObject())
+      {
+      o->Delete();
+      }
+    pig->RemoveObserver(this);
+    this->Delete();
+    }
+
+  vtkCollection* Riders;
+
+};
 
 
 class pqMultiViewRenderModuleUpdater : public QObject
@@ -86,6 +136,7 @@ QVTKWidget *ParaQ::AddQVTKWidget(pqMultiViewFrame *frame, QWidget *topWidget,
   view->SetUseLight(1);
   // turn off main light
   vtkSMIntVectorProperty::SafeDownCast(view->GetProperty("LightSwitch"))->SetElement(0, 0);
+
   
   QVTKWidget* widget = new QVTKWidget(frame);
   frame->setMainWidget(widget);
@@ -104,6 +155,17 @@ QVTKWidget *ParaQ::AddQVTKWidget(pqMultiViewFrame *frame, QWidget *topWidget,
   iren->SetPVRenderView(vp);
   vp->Delete();
   iren->Enable();
+  
+  // add a orientation axes
+  vtkPVAxesWidget* axes = vtkPVAxesWidget::New();
+  axes->SetParentRenderer(view->GetRenderer());
+  axes->SetViewport(0,0,0.25,0.25);
+  axes->SetInteractor(iren);
+  axes->SetEnabled(1);
+
+  vtkPiggyBackDelete* del = vtkPiggyBackDelete::New();
+  del->AddRider(axes);
+  view->AddObserver(vtkCommand::DeleteEvent, del);
   
   // Keep a map of window to render module. Add the new window to the
   // pipeline data structure.
