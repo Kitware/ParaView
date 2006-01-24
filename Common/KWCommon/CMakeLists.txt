@@ -38,10 +38,8 @@ INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 
 SET( KWCommon_SRCS
   vtkContainer.cxx
-  vtkKWArguments.cxx
   vtkKWProcessStatistics.cxx
   vtkKWRemoteExecute.cxx
-  vtkKWSerializer.cxx
   vtkQueue.cxx
   )
 
