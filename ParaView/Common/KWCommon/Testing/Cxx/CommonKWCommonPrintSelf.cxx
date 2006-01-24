@@ -13,18 +13,14 @@
 
 =========================================================================*/
 
-#include "vtkKWArguments.h"
 #include "vtkKWProcessStatistics.h"
 #include "vtkKWRemoteExecute.h"
-#include "vtkKWSerializer.h"
 
 int main(int , char* [])
 {
   vtkObject *c;
-  c = vtkKWArguments::New(); c->Print( cout ); c->Delete();
   c = vtkKWProcessStatistics::New(); c->Print( cout ); c->Delete();
   c = vtkKWRemoteExecute::New(); c->Print( cout ); c->Delete();
-  c = vtkKWSerializer::New(); c->Print( cout ); c->Delete();
 
   return 0;
 }
