@@ -26,6 +26,7 @@
 #if defined(_WIN32)
 # include <windows.h>   // FindFirstFile, FindNextFile, FindClose, ...
 # include <direct.h>    // _getcwd
+# include <shlobj.h>    // SHGetFolderPath
 # include <sys/stat.h>  // stat
 # define vtkPVServerFileListingGetCWD _getcwd
 #else
@@ -35,12 +36,13 @@
 # include <unistd.h>    // access, getcwd
 # include <errno.h>     // errno
 # include <string.h>    // strerror
+# include <stdlib.h>    // getenv
 # define vtkPVServerFileListingGetCWD getcwd
 #endif
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerFileListing);
-vtkCxxRevisionMacro(vtkPVServerFileListing, "1.5");
+vtkCxxRevisionMacro(vtkPVServerFileListing, "1.6");
 
 //----------------------------------------------------------------------------
 class vtkPVServerFileListingInternals
@@ -97,6 +99,58 @@ vtkPVServerFileListing::GetFileListing(const char* dirname, int save)
     {
     vtkErrorMacro("GetFileListing cannot work with a NULL directory.");
     }
+
+  return this->Internal->Result;
+}
+
+//----------------------------------------------------------------------------
+const vtkClientServerStream& vtkPVServerFileListing::GetSpecial()
+{
+  this->Internal->Result.Reset();
+
+  // Returns multiple replies, each reply contains:
+  // The special file label
+  // The special file path (absolute path)
+  // The special file type (0 -> directory, 1 -> drive, 2 -> file)
+
+#if defined (_WIN32)
+
+  // Return favorite directories ...
+  TCHAR szPath[MAX_PATH];
+
+  if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, szPath)))
+    this->Internal->Result << vtkClientServerStream::Reply << "My Projects" << szPath << 0 << vtkClientServerStream::End;
+    
+  if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, 0, szPath)))
+    this->Internal->Result << vtkClientServerStream::Reply << "Desktop" << szPath << 0 << vtkClientServerStream::End;
+    
+  if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_FAVORITES, NULL, 0, szPath)))
+    this->Internal->Result << vtkClientServerStream::Reply << "Favorites" << szPath << 0 << vtkClientServerStream::End;
+
+  // Return drive letters ...
+  char strings[1024];
+  DWORD n = GetLogicalDriveStrings(1024, strings);
+  char* start = strings;
+  char* end = start;
+  for(;end != strings+n; ++end)
+    {
+    if(*end == '\\')
+      {
+      *end = '/';
+      }
+    if(!*end)
+      {
+      this->Internal->Result << vtkClientServerStream::Reply << start << start << 1 << vtkClientServerStream::End;
+      start = end+1;
+      }
+    }
+
+#else // _WIN32
+
+  if(getenv("HOME"))
+    this->Internal->Result << vtkClientServerStream::Reply << "Home" << getenv("HOME") << 0 << vtkClientServerStream::End;
+
+#endif // !_WIN32  
 
   return this->Internal->Result;
 }

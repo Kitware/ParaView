@@ -36,6 +36,10 @@ public:
                                               int save);
 
   // Description:
+  // Returns a list of "special" files / directories on the server (includes Win32 drives, Win32 favorites, home directory, etc)
+  const vtkClientServerStream& GetSpecial();
+
+  // Description:
   // Get the current working directory of the process on the server.
   const char* GetCurrentWorkingDirectory();
 

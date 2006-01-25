@@ -101,7 +101,7 @@ struct pqObjectLineChartWidget::pqImplementation
     
     if(this->ClientSideData)
       {
-      this->ClientSideData->Delete();
+//      this->ClientSideData->Delete();
       this->ClientSideData = 0;
       }
   }

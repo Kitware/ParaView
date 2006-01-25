@@ -102,7 +102,7 @@ public:
     this->CurrentPath.setPath(QDir::cleanPath(Path));
     
     this->FileGroups.clear();
-    
+
     QFileInfoList files = this->CurrentPath.entryInfoList();
     qSort(files.begin(), files.end(), SortFileByTypeThenAlpha);
     
@@ -307,8 +307,6 @@ public:
 
     TCHAR szPath[MAX_PATH];
 
-    if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_HISTORY, NULL, 0, szPath)))
-      this->FavoriteList.push_back(FileInfo(tr("History"), szPath));
     if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, szPath)))
       this->FavoriteList.push_back(FileInfo(tr("My Projects"), szPath));
     if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, 0, szPath)))
@@ -321,7 +319,7 @@ public:
     this->FavoriteList.push_back(FileInfo(tr("Home"), QDir::home().absolutePath()));
 
 #endif // !WIN32
-  
+
     const QFileInfoList drives = QDir::drives();
     for(int i = 0; i != drives.size(); ++i)
       {

@@ -40,25 +40,39 @@ public:
   {
   }
 
-  FileInfo(const QString& filename, const bool isdir) :
-    FileName(filename),
-    IsDir(isdir)
+  FileInfo(const QString& label, const QString& filepath, const bool isdir, const bool isRoot) :
+    Label(label),
+    FilePath(filepath),
+    IsDir(isdir),
+    IsRoot(isRoot)
   {
   }
 
-  const QString& fileName() const 
+  const QString& label() const
   {
-    return FileName;
+    return this->Label;
+  }
+
+  const QString& filePath() const 
+  {
+    return this->FilePath;
   }
   
   const bool isDir() const
   {
-    return IsDir;
+    return this->IsDir;
+  }
+  
+  const bool isRoot() const
+  {
+    return this->IsRoot;
   }
 
 private:
-  QString FileName;
+  QString Label;
+  QString FilePath;
   bool IsDir;
+  bool IsRoot;
 };
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -78,11 +92,11 @@ public:
     this->CurrentPath.setPath(QDir::cleanPath(Path));
     this->FileList.clear();
 
-    this->FileList.push_back(FileInfo(".", true));
-    this->FileList.push_back(FileInfo("..", true));
+    this->FileList.push_back(FileInfo(".", ".", true, false));
+    this->FileList.push_back(FileInfo("..", "..", true, false));
 
     vtkClientServerStream stream;
-    const vtkClientServerID ID = ProcessModule->NewStreamObject("vtkPVServerFileListing", stream);
+    const vtkClientServerID ID = this->ProcessModule->NewStreamObject("vtkPVServerFileListing", stream);
     stream
       << vtkClientServerStream::Invoke
       << ID
@@ -90,11 +104,11 @@ public:
       << Path.toAscii().data()
       << 0
       << vtkClientServerStream::End;
-    ProcessModule->SendStream(
+    this->ProcessModule->SendStream(
       vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
       vtkProcessModule::DATA_SERVER_ROOT, stream);
     vtkClientServerStream result;
-    ProcessModule->GetLastResult(
+    this->ProcessModule->GetLastResult(
       vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
       vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &result);
 
@@ -106,7 +120,7 @@ public:
         const char* directory_name = 0;
         if(result.GetArgument(0, i, &directory_name))
           {
-          this->FileList.push_back(FileInfo(directory_name, true));
+          this->FileList.push_back(FileInfo(directory_name, directory_name, true, false));
           }
         }
 
@@ -116,14 +130,36 @@ public:
         const char* file_name = 0;
         if(result.GetArgument(1, i, &file_name))
           {
-          this->FileList.push_back(FileInfo(file_name, false));
+          this->FileList.push_back(FileInfo(file_name, file_name, false, false));
           }
         }
       }
-    ProcessModule->DeleteStreamObject(ID, stream);
+    this->ProcessModule->DeleteStreamObject(ID, stream);
 
     emit dataChanged(QModelIndex(), QModelIndex());
     emit layoutChanged();
+  }
+
+  QStringList getFilePaths(const QModelIndex& Index)
+  {
+    QStringList results;
+    
+    if(Index.row() < this->FileList.size())
+      { 
+      FileInfo& file = this->FileList[Index.row()];
+      results.push_back(QDir::convertSeparators(this->CurrentPath.path() + "/" + file.filePath()));
+      }
+      
+    return results;
+  }
+
+  bool isDir(const QModelIndex& Index)
+  {
+    if(Index.row() >= this->FileList.size())
+      return false;
+      
+    FileInfo& file = this->FileList[Index.row()];
+    return file.isDir();
   }
 
   int columnCount(const QModelIndex& /*p*/) const
@@ -147,7 +183,7 @@ public:
         switch(idx.column())
           {
           case 0:
-            return file.fileName();
+            return file.filePath();
           }
       case Qt::DecorationRole:
         switch(idx.column())
@@ -203,36 +239,123 @@ public:
   QList<FileInfo> FileList;
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////
-// pqFavoriteModel
+//////////////////////////////////////////////////////////////////
+// FavoriteModel
 
 class pqFavoriteModel :
   public QAbstractItemModel
 {
 public:
-  virtual int columnCount(const QModelIndex& /*p*/) const
+  pqFavoriteModel(vtkProcessModule* processModule) :
+    ProcessModule(processModule)
+  {
+    vtkClientServerStream stream;
+    const vtkClientServerID ID = this->ProcessModule->NewStreamObject("vtkPVServerFileListing", stream);
+    stream
+      << vtkClientServerStream::Invoke
+      << ID
+      << "GetSpecial"
+      << vtkClientServerStream::End;
+    this->ProcessModule->SendStream(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+      vtkProcessModule::DATA_SERVER_ROOT, stream);
+    vtkClientServerStream result;
+    this->ProcessModule->GetLastResult(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+      vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &result);
+
+    for(int i = 0; i < result.GetNumberOfMessages(); ++i)
+      {
+      if(result.GetNumberOfArguments(i) == 3)
+        {
+        const char* label = 0;
+        result.GetArgument(i, 0, &label);
+        
+        const char* path = 0;
+        result.GetArgument(i, 1, &path);
+        
+        int type = 0; // 0 == directory, 1 == drive letter, 2 == file
+        result.GetArgument(i, 2, &type);
+        
+        this->FavoriteList.push_back(FileInfo(label, path, type != 2, type == 1));
+        }
+      }
+      
+    this->ProcessModule->DeleteStreamObject(ID, stream);
+  }
+
+  QStringList getFilePaths(const QModelIndex& Index)
+  {
+    QStringList results;
+    
+    if(Index.row() < this->FavoriteList.size())
+      {
+      FileInfo& file = this->FavoriteList[Index.row()];
+      results.push_back(QDir::convertSeparators(file.filePath()));
+      }
+    
+    return results;
+  }
+
+  bool isDir(const QModelIndex& Index)
+  {
+    if(Index.row() >= this->FavoriteList.size())
+      return false;
+      
+    FileInfo& file = this->FavoriteList[Index.row()];
+    return file.isDir();
+  }
+
+  virtual int columnCount(const QModelIndex& /*parent*/) const
   {
     return 1;
   }
   
-  virtual QVariant data(const QModelIndex & /*idx*/, int /*role*/) const
+  virtual QVariant data(const QModelIndex& idx, int role) const
   {
+    if(!idx.isValid())
+      return QVariant();
+
+    if(idx.row() >= this->FavoriteList.size())
+      return QVariant();
+
+    const FileInfo& file = this->FavoriteList[idx.row()];
+    switch(role)
+      {
+      case Qt::DisplayRole:
+        switch(idx.column())
+          {
+          case 0:
+            return file.label();
+          }
+      case Qt::DecorationRole:
+        switch(idx.column())
+          {
+          case 0:
+            if(file.isRoot())
+              return Icons().icon(QFileIconProvider::Drive);
+            if(file.isDir())
+              return Icons().icon(QFileIconProvider::Folder);
+            return Icons().icon(QFileIconProvider::File);
+          }
+      }
+      
     return QVariant();
   }
   
-  virtual QModelIndex index(int row, int column, const QModelIndex& /*p*/) const
+  virtual QModelIndex index(int row, int column, const QModelIndex& /*parent*/) const
   {
     return createIndex(row, column);
   }
   
-  virtual QModelIndex parent(const QModelIndex& /*idx*/) const
+  virtual QModelIndex parent(const QModelIndex& /*index*/) const
   {
     return QModelIndex();
   }
   
-  virtual int rowCount(const QModelIndex& /*p*/) const
+  virtual int rowCount(const QModelIndex& /*parent*/) const
   {
-    return 0;
+    return this->FavoriteList.size();
   }
   
   virtual bool hasChildren(const QModelIndex& p) const
@@ -243,10 +366,23 @@ public:
     return false;
   }
   
-  virtual QVariant headerData(int /*section*/, Qt::Orientation /*orientation*/, int /*role*/) const
+  virtual QVariant headerData(int section, Qt::Orientation /*orientation*/, int role) const
   {
+    switch(role)
+      {
+      case Qt::DisplayRole:
+        switch(section)
+          {
+          case 0:
+            return tr("Favorites");
+          }
+      }
+      
     return QVariant();
   }
+  
+  vtkProcessModule* const ProcessModule;
+  QList<FileInfo> FavoriteList;
 };
 
 } // namespace
@@ -259,7 +395,7 @@ class pqServerFileDialogModel::pqImplementation
 public:
   pqImplementation(vtkProcessModule* processModule) :
     FileModel(new pqFileModel(processModule)),
-    FavoriteModel(new pqFavoriteModel())
+    FavoriteModel(new pqFavoriteModel(processModule))
   {
   }
   
@@ -322,15 +458,13 @@ QString pqServerFileDialogModel::getCurrentPath()
 
 QStringList pqServerFileDialogModel::getFilePaths(const QModelIndex& Index)
 {
-  QStringList results;
+  if(Index.model() == this->Implementation->FileModel)
+    return this->Implementation->FileModel->getFilePaths(Index);
   
-  if(Index.row() < this->Implementation->FileModel->FileList.size())
-    { 
-    FileInfo& file = this->Implementation->FileModel->FileList[Index.row()];
-    results.push_back(QDir::convertSeparators(this->Implementation->FileModel->CurrentPath.path() + "/" + file.fileName()));
-    }
-    
-  return results;
+  if(Index.model() == this->Implementation->FavoriteModel)
+    return this->Implementation->FavoriteModel->getFilePaths(Index);  
+
+  return QStringList();
 }
 
 QString pqServerFileDialogModel::getFilePath(const QString& Path)
@@ -350,11 +484,13 @@ QString pqServerFileDialogModel::getParentPath(const QString& Path)
 
 bool pqServerFileDialogModel::isDir(const QModelIndex& Index)
 {
-  if(Index.row() >= this->Implementation->FileModel->FileList.size())
-    return false;
-    
-  FileInfo& file = this->Implementation->FileModel->FileList[Index.row()];
-  return file.isDir();
+  if(Index.model() == this->Implementation->FileModel)
+    return this->Implementation->FileModel->isDir(Index);
+  
+  if(Index.model() == this->Implementation->FavoriteModel)
+    return this->Implementation->FavoriteModel->isDir(Index);  
+
+  return false;    
 }
 
 QStringList pqServerFileDialogModel::splitPath(const QString& Path)
