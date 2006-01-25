@@ -1,9 +1,8 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
   Module:    vtkKWWidgetsInitializeCommand.cxx
 
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
+  Copyright (c) Kitware, Inc.
   All rights reserved.
   See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
