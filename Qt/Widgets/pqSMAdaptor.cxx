@@ -193,11 +193,27 @@ void pqSMAdaptor::setProperty(vtkSMProperty* Property, int Index, QVariant QtPro
     }
   else if(adapter->GetPropertyType() == vtkSMPropertyAdaptor::SELECTION && Property->GetInformationProperty())
     {
-    const char* name = adapter->GetSelectionName(Index);
-    if(QtProperty.type() == QVariant::Bool)
-      QtProperty = QtProperty.toInt();
-    adapter->SetRangeValue(0, name);
-    adapter->SetRangeValue(1, QtProperty.toString().toAscii().data());
+    QString name;
+    QVariant value;
+    // support two ways of setting selection properties
+    // TODO: review this and pick one way to do it?
+    // I added this first one so it was easier to set properties from code that doesn't have an index
+    if(QtProperty.type() == QVariant::List)
+      {
+      name = QtProperty.toList()[0].toString();
+      value = QtProperty.toList()[1];
+      if(value.type() == QVariant::Bool)
+        value = value.toInt();
+      }
+    else
+      {
+      name = adapter->GetSelectionName(Index);
+      value = QtProperty;
+      if(value.type() == QVariant::Bool)
+        value = value.toInt();
+      }
+    adapter->SetRangeValue(0, name.toAscii().data());
+    adapter->SetRangeValue(1, value.toString().toAscii().data());
     Property->Modified();  // push to server  // TODO: this doesn't work
     }
   else

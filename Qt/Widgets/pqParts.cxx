@@ -279,7 +279,6 @@ void pqColorPart(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype)
   else
     {
     // create lut
-    vtkPVDataInformation* geomInfo = Part->GetGeometryInformation();
     vtkSMLookupTableProxy* lut = vtkSMLookupTableProxy::SafeDownCast(
       vtkSMObject::GetProxyManager()->NewProxy("lookup_tables", "LookupTable"));
     lut->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
@@ -293,20 +292,51 @@ void pqColorPart(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype)
 
     if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
       {
+      vtkPVDataInformation* geomInfo = Part->GetGeometryInformation();
       ai = geomInfo->GetCellDataInformation()->GetArrayInformation(fieldname);
       }
     else
       {
+      vtkPVDataInformation* geomInfo = Part->GetGeometryInformation();
       ai = geomInfo->GetPointDataInformation()->GetArrayInformation(fieldname);
       }
-
-    pqSMAdaptor::instance()->setProperty(Part->GetProperty("ColorArray"), fieldname);
-    double range[2];
-    ai->GetComponentRange(0, range);
+    
+    // array couldn't be found, look for it on the reader
+    // TODO: this support should be moved into the server manager and/or VTK
+    if(!ai)
+      {
+      pp = vtkSMProxyProperty::SafeDownCast(Part->GetProperty("Input"));
+      vtkSMProxy* reader = pp->GetProxy(0);
+      while((pp = vtkSMProxyProperty::SafeDownCast(reader->GetProperty("Input"))))
+        reader = pp->GetProxy(0);
+      QList<QVariant> property;
+      property += fieldname;
+      property += 1;
+      if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
+        {
+        pqSMAdaptor::instance()->setProperty(reader->GetProperty("CellArrayStatus"), 0, property);
+        reader->UpdateVTKObjects();
+        vtkPVDataInformation* geomInfo = Part->GetGeometryInformation();
+        ai = geomInfo->GetCellDataInformation()->GetArrayInformation(fieldname);
+        }
+      else
+        {
+        pqSMAdaptor::instance()->setProperty(reader->GetProperty("PointArrayStatus"), 0, property);
+        reader->UpdateVTKObjects();
+        vtkPVDataInformation* geomInfo = Part->GetGeometryInformation();
+        ai = geomInfo->GetPointDataInformation()->GetArrayInformation(fieldname);
+        }
+      }
+    double range[2] = {0,1};
+    if(ai)
+      {
+      ai->GetComponentRange(0, range);
+      }
     QList<QVariant> tmp;
     tmp += range[0];
     tmp += range[1];
     pqSMAdaptor::instance()->setProperty(lut->GetProperty("ScalarRange"), tmp);
+    pqSMAdaptor::instance()->setProperty(Part->GetProperty("ColorArray"), fieldname);
     lut->UpdateVTKObjects();
     }
 

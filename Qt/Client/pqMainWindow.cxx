@@ -616,20 +616,20 @@ void pqMainWindow::onFileOpenServerState(const QStringList& Files)
     vtkPVXMLElement *element = ParaQ::FindNestedElementByName(root, "MainWindow");
     if(element)
       {
-      int x = 0;
-      int y = 0;
-      if(element->GetScalarAttribute("x", &x) &&
-          element->GetScalarAttribute("y", &y))
+      int xpos = 0;
+      int ypos = 0;
+      if(element->GetScalarAttribute("x", &xpos) &&
+          element->GetScalarAttribute("y", &ypos))
         {
-        this->move(x, y);
+        this->move(xpos, ypos);
         }
 
-      int width = 0;
-      int height = 0;
-      if(element->GetScalarAttribute("width", &width) &&
-          element->GetScalarAttribute("height", &height))
+      int w = 0;
+      int h = 0;
+      if(element->GetScalarAttribute("width", &w) &&
+          element->GetScalarAttribute("height", &h))
         {
-        this->resize(width, height);
+        this->resize(w, h);
         }
       }
 
@@ -1094,13 +1094,13 @@ void pqMainWindow::onRemoveServer(pqPipelineServer *server)
 
   // Clean up all the views associated with the server.
   QWidget *widget = 0;
-  pqPipelineWindow *window = 0;
+  pqPipelineWindow *win = 0;
   int total = server->GetWindowCount();
   this->MultiViewManager->blockSignals(true);
   for(int i = 0; i < total; i++)
     {
-    window = server->GetWindow(i);
-    widget = window->GetWidget();
+    win = server->GetWindow(i);
+    widget = win->GetWidget();
 
     // Clean up the render module.
     this->cleanUpWindow(qobject_cast<QVTKWidget *>(widget));
@@ -1112,14 +1112,14 @@ void pqMainWindow::onRemoveServer(pqPipelineServer *server)
   this->MultiViewManager->blockSignals(false);
 }
 
-void pqMainWindow::onAddWindow(pqPipelineWindow *window)
+void pqMainWindow::onAddWindow(pqPipelineWindow *win)
 {
-  if(!window)
+  if(!win)
     {
     return;
     }
 
-  QVTKWidget *widget = qobject_cast<QVTKWidget *>(window->GetWidget());
+  QVTKWidget *widget = qobject_cast<QVTKWidget *>(win->GetWidget());
   if(widget)
     {
     // Get the render module from the view map. Use the render module,
@@ -1137,12 +1137,12 @@ void pqMainWindow::onAddWindow(pqPipelineWindow *window)
     }
 }
 
-void pqMainWindow::cleanUpWindow(QVTKWidget *window)
+void pqMainWindow::cleanUpWindow(QVTKWidget *win)
 {
-  if(window && this->Pipeline)
+  if(win && this->Pipeline)
     {
     // Remove the render module from the pipeline's view map and delete it.
-    vtkSMRenderModuleProxy *rm = this->Pipeline->removeViewMapping(window);
+    vtkSMRenderModuleProxy *rm = this->Pipeline->removeViewMapping(win);
     if(rm)
       {
       rm->Delete();
@@ -1164,7 +1164,13 @@ void pqMainWindow::onProxySelected(vtkSMProxy* p)
 
   if(p)
     {
-    vtkSMDisplayProxy* display = pqPipelineData::instance()->getObjectFor(p)->GetDisplayProxy();
+    pqPipelineObject* pqObject = pqPipelineData::instance()->getObjectFor(p);
+    vtkSMDisplayProxy* display = pqObject->GetDisplayProxy();
+    
+    pqPipelineObject* reader = pqObject;
+    while(reader->GetInput(0))
+      reader = reader->GetInput(0);
+
     if(display)
       {
       vtkPVDataInformation* geomInfo = display->GetGeometryInformation();
@@ -1176,11 +1182,34 @@ void pqMainWindow::onProxySelected(vtkSMProxy* p)
         selector->addVarName(pqVariableSelectorWidget::TYPE_CELL, info->GetName());
         }
       
+      // also include unloaded arrays if any
+      QList<QVariant> extraCellArrays = pqSMAdaptor::instance()->getProperty(reader->GetProxy()->GetProperty("CellArrayStatus")).toList();
+      for(i=0; i<extraCellArrays.size(); i++)
+        {
+        QList<QVariant> cell = extraCellArrays[i].toList();
+        if(cell[1] == false)
+          {
+          selector->addVarName(pqVariableSelectorWidget::TYPE_CELL, cell[0].toString());
+          }
+        }
+
+      
       vtkPVDataSetAttributesInformation* pointinfo = geomInfo->GetPointDataInformation();
       for(i=0; i<pointinfo->GetNumberOfArrays(); i++)
         {
         vtkPVArrayInformation* info = pointinfo->GetArrayInformation(i);
         selector->addVarName(pqVariableSelectorWidget::TYPE_NODE, info->GetName());
+        }
+      
+      // also include unloaded arrays if any
+      QList<QVariant> extraPointArrays = pqSMAdaptor::instance()->getProperty(reader->GetProxy()->GetProperty("PointArrayStatus")).toList();
+      for(i=0; i<extraPointArrays.size(); i++)
+        {
+        QList<QVariant> cell = extraPointArrays[i].toList();
+        if(cell[1] == false)
+          {
+          selector->addVarName(pqVariableSelectorWidget::TYPE_NODE, cell[0].toString());
+          }
         }
 
       // set to the active display scalar

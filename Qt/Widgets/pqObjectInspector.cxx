@@ -382,7 +382,8 @@ void pqObjectInspector::setProxy(vtkSMProxy *sourceProxy)
 
     // ************* display properties ***************
 
-    vtkSMDisplayProxy* display = pqPipelineData::instance()->getObjectFor(sourceProxy)->GetDisplayProxy();
+    pqPipelineObject* pqObject = pqPipelineData::instance()->getObjectFor(sourceProxy);
+    vtkSMDisplayProxy* display = pqObject->GetDisplayProxy();
     if(display)
       {
       this->Internal->Display = new pqObjectInspectorItem();
@@ -406,6 +407,11 @@ void pqObjectInspector::setProxy(vtkSMProxy *sourceProxy)
       item->setParent(this->Internal->Display);
       this->Internal->Display->addChild(item);
       item->setPropertyName("Color by");
+
+      // get the beginning of the pipeline
+      pqPipelineObject* reader = pqObject;
+      while(reader->GetInput(0))
+        reader = reader->GetInput(0);
       
       possibles.append("Default");
       vtkPVDataInformation* geomInfo = display->GetGeometryInformation();
@@ -418,6 +424,16 @@ void pqObjectInspector::setProxy(vtkSMProxy *sourceProxy)
         name += " (cell)";
         possibles.append(name);
         }
+      // also include unloaded arrays if any
+      QList<QVariant> extraCellArrays = adapter->getProperty(reader->GetProxy()->GetProperty("CellArrayStatus")).toList();
+      for(i=0; i<extraCellArrays.size(); i++)
+        {
+        QList<QVariant> cell = extraCellArrays[i].toList();
+        if(cell[1] == false)
+          {
+          possibles.append(cell[0].toString() + " (cell)");
+          }
+        }
       
       vtkPVDataSetAttributesInformation* pointinfo = geomInfo->GetPointDataInformation();
       for(i=0; i<pointinfo->GetNumberOfArrays(); i++)
@@ -426,6 +442,16 @@ void pqObjectInspector::setProxy(vtkSMProxy *sourceProxy)
         QString name = info->GetName();
         name += " (point)";
         possibles.append(name);
+        }
+      // also include unloaded arrays if any
+      QList<QVariant> extraPointArrays = adapter->getProperty(reader->GetProxy()->GetProperty("PointArrayStatus")).toList();
+      for(i=0; i<extraPointArrays.size(); i++)
+        {
+        QList<QVariant> cell = extraPointArrays[i].toList();
+        if(cell[1] == false)
+          {
+          possibles.append(cell[0].toString() + " (point)");
+          }
         }
 
       if(adapter->getProperty(display->GetProperty("ScalarVisibility")) == true)
@@ -870,15 +896,15 @@ void pqObjectInspector::updateDisplayProperties(pqObjectInspectorItem* item)
       }
     else
       {
-      bool cell = value.right(6) == "(cell)";
+      bool cell = value.right(strlen("(cell)")) == "(cell)";
       if(cell)
         {
-        value = value.left(value.size() - strlen(" (cell)"));
+        value.chop(strlen(" (cell)"));
         pqColorPart(display, value.toAscii().data(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
         }
       else
         {
-        value = value.left(value.size() - strlen(" (point)"));
+        value.chop(strlen(" (point)"));
         pqColorPart(display, value.toAscii().data(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
         }
       }
