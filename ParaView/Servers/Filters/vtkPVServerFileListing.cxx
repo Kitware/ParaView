@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerFileListing);
-vtkCxxRevisionMacro(vtkPVServerFileListing, "1.6");
+vtkCxxRevisionMacro(vtkPVServerFileListing, "1.7");
 
 //----------------------------------------------------------------------------
 class vtkPVServerFileListingInternals
@@ -115,17 +115,22 @@ const vtkClientServerStream& vtkPVServerFileListing::GetSpecial()
 
 #if defined (_WIN32)
 
+#if (_WIN32_IE >= 0x0400) // For SHGetSpecialFolderPath()
+  
   // Return favorite directories ...
+  
   TCHAR szPath[MAX_PATH];
 
-  if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, 0, szPath)))
+  if(SUCCEEDED(SHGetSpecialFolderPath(NULL, szPath, CSIDL_PERSONAL, false)))
     this->Internal->Result << vtkClientServerStream::Reply << "My Projects" << szPath << 0 << vtkClientServerStream::End;
     
-  if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, 0, szPath)))
+  if(SUCCEEDED(SHGetSpecialFolderPath(NULL, szPath, CSIDL_DESKTOPDIRECTORY, false)))
     this->Internal->Result << vtkClientServerStream::Reply << "Desktop" << szPath << 0 << vtkClientServerStream::End;
     
-  if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_FAVORITES, NULL, 0, szPath)))
+  if(SUCCEEDED(SHGetSpecialFolderPath(NULL, szPath, CSIDL_FAVORITES, false)))
     this->Internal->Result << vtkClientServerStream::Reply << "Favorites" << szPath << 0 << vtkClientServerStream::End;
+
+#endif // _WIN32_ID >= 0x0400
 
   // Return drive letters ...
   char strings[1024];
