@@ -15,73 +15,73 @@ set option_test [expr [lsearch -exact $argv "--test"] == -1 ? 0 : 1]
 # Restore the settings that have been saved to the registry, like
 # the geometry of the user interface so far.
 
-vtkKWApplication app
-app SetName "KWPolygonalObjectViewerExample"
+set app [vtkKWApplication New]
+$app SetName "KWPolygonalObjectViewerExample"
 if {$option_test} {
-  app SetRegistryLevel 0
-  app PromptBeforeExitOff
+  $app SetRegistryLevel 0
+  $app PromptBeforeExitOff
 }
-app RestoreApplicationSettingsFromRegistry
+$app RestoreApplicationSettingsFromRegistry
 
 # Set a help link. Can be a remote link (URL), or a local file
 
-app SetHelpDialogStartingPage "http://www.kwwidgets.org"
+$app SetHelpDialogStartingPage "http://www.kwwidgets.org"
 
 # Add a window
 # Set 'SupportHelp' to automatically add a menu entry for the help link
 
-vtkKWWindowBase win
-win SupportHelpOn
-app AddWindow win
-win Create
+set win [vtkKWWindowBase New]
+$win SupportHelpOn
+$app AddWindow $win
+$win Create
 
 # Add a render widget, attach it to the view frame, and pack
 
 # Create a render widget
 
-vtkKWRenderWidget rw
-rw SetParent [win GetViewFrame]
-rw Create
+set rw [vtkKWRenderWidget New]
+$rw SetParent [$win GetViewFrame]
+$rw Create
 
-pack [rw GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
+pack [$rw GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
 
 # Create a 3D object reader
 
-vtkXMLPolyDataReader reader
-reader SetFileName [file join [file dirname [info script]] ".." ".." Data teapot.vtp]
+set reader [vtkXMLPolyDataReader New]
+$reader SetFileName [file join [file dirname [info script]] ".." ".." Data teapot.vtp]
 
 # Create the mapper and actor
 
-vtkPolyDataMapper mapper
-mapper SetInputConnection [reader GetOutputPort]
+set mapper [vtkPolyDataMapper New]
+$mapper SetInputConnection [$reader GetOutputPort]
 
-vtkActor actor
-actor SetMapper mapper
+set actor [vtkActor New]
+$actor SetMapper $mapper
 
 # Add the actor to the scene
 
-rw AddViewProp actor
-rw ResetCamera
+$rw AddViewProp $actor
+$rw ResetCamera
 
 # Start the application
 # If --test was provided, do not enter the event loop and run this example
 # as a non-interactive test for software quality purposes.
 
 set ret 0
-win Display
+$win Display
 if {!$option_test} {
-  app Start
-  set ret [app GetExitStatus]
+  $app Start
+  set ret [$app GetExitStatus]
 }
-win Close
+$win Close
 
 # Deallocate and exit
 
-rw Delete
-reader Delete
-mapper Delete
-actor Delete
-win Delete
-app Delete
+$rw Delete
+$reader Delete
+$mapper Delete
+$actor Delete
+$win Delete
+$app Delete
 
 exit $ret

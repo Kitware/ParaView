@@ -4,23 +4,17 @@ proc vtkKWHSVColorSelectorEntryPoint {parent win} {
 
   # Create a color selector
 
-  vtkKWHSVColorSelector ccb
-  ccb SetParent $parent
-  ccb Create
-  ccb SetSelectionChangingCommand $parent "SetBackgroundColor"
-  ccb InvokeCommandsWithRGBOn
-  ccb SetBalloonHelpString "This HSV Color Selector changes the background color of its parent"
+  set ccb [vtkKWHSVColorSelector New]
+  $ccb SetParent $parent
+  $ccb Create
+  $ccb SetSelectionChangingCommand $parent "SetBackgroundColor"
+  $ccb InvokeCommandsWithRGBOn
+  $ccb SetBalloonHelpString "This HSV Color Selector changes the background color of its parent"
 
-  vtkMath math
-  eval ccb SetSelectedColor [eval math RGBToHSV [$parent GetBackgroundColor]]
-
-  pack [ccb GetWidgetName] -side top -anchor nw -expand y -padx 2 -pady 2
-
-  math Delete
+  set math [vtkMath New]
+  eval $ccb SetSelectedColor [eval $math RGBToHSV [$parent GetBackgroundColor]]
+  
+  pack [$ccb GetWidgetName] -side top -anchor nw -expand y -padx 2 -pady 2
 
   return "TypeComposite"
-}
-
-proc vtkKWHSVColorSelectorFinalizePoint {} {
-  ccb Delete
 }

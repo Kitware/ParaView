@@ -13,52 +13,52 @@ set option_test [expr [lsearch -exact $argv "--test"] == -1 ? 0 : 1]
 # Restore the settings that have been saved to the registry, like
 # the geometry of the user interface so far.
 
-vtkKWApplication app
-app SetName "KWWidgetsTourExample"
+set app [vtkKWApplication New]
+$app SetName "KWWidgetsTourExample"
 if {$option_test} {
-  app SetRegistryLevel 0
-  app PromptBeforeExitOff
+  $app SetRegistryLevel 0
+  $app PromptBeforeExitOff
 }
-app SupportSplashScreenOn
-app SplashScreenVisibilityOn
-app RestoreApplicationSettingsFromRegistry
+$app SupportSplashScreenOn
+$app SplashScreenVisibilityOn
+$app RestoreApplicationSettingsFromRegistry
 
 # Setup the splash screen
 
-[app GetSplashScreen] ReadImage [file join [file dirname [info script]] ".." ".." Resources "KWWidgetsSplashScreen.png"]
+[$app GetSplashScreen] ReadImage [file join [file dirname [info script]] ".." ".." Resources "KWWidgetsSplashScreen.png"]
 
 # Set a help link. Can be a remote link (URL), or a local file
 
-app SetHelpDialogStartingPage "http://www.kwwidgets.org"
+$app SetHelpDialogStartingPage "http://www.kwwidgets.org"
 
 # Add a window to the application
 # Set 'SupportHelp' to automatically add a menu entry for the help link
 
-vtkKWWindow win
-win SupportHelpOn
-win SetPanelLayoutToSecondaryBelowMainAndView
-app AddWindow win
-win Create
+set win [vtkKWWindow New]
+$win SupportHelpOn
+$win SetPanelLayoutToSecondaryBelowMainAndView
+$app AddWindow $win
+$win Create
 
 # Add a user interface panel to the main user interface manager
 
-vtkKWUserInterfacePanel widgets_panel
-widgets_panel SetName "Widgets Interface"
-widgets_panel SetUserInterfaceManager [win GetMainUserInterfaceManager]
-widgets_panel Create
+set widgets_panel [vtkKWUserInterfacePanel New]
+$widgets_panel SetName "Widgets Interface"
+$widgets_panel SetUserInterfaceManager [$win GetMainUserInterfaceManager]
+$widgets_panel Create
 
-widgets_panel AddPage "Widgets" "Select a widget" ""
-set page_widget [widgets_panel GetPageWidget "Widgets"]
+$widgets_panel AddPage "Widgets" "Select a widget" ""
+set page_widget [$widgets_panel GetPageWidget "Widgets"]
 
 # Add a list box to pick a widget example
 
-vtkKWTreeWithScrollbars widgets_tree
-widgets_tree SetParent $page_widget
-widgets_tree VerticalScrollbarVisibilityOn
-widgets_tree HorizontalScrollbarVisibilityOff
-widgets_tree Create
+set widgets_tree [vtkKWTreeWithScrollbars New]
+$widgets_tree SetParent $page_widget
+$widgets_tree VerticalScrollbarVisibilityOn
+$widgets_tree HorizontalScrollbarVisibilityOff
+$widgets_tree Create
 
-set tree [widgets_tree GetWidget]
+set tree [$widgets_tree GetWidget]
 $tree SetPadX 0;
 $tree SetBackgroundColor 1.0 1.0 1.0
 $tree RedrawOnIdleOn
@@ -71,38 +71,38 @@ foreach {node text} {"core" "Core Widgets" "composite" "Composite Widgets" "vtk"
   $tree SetNodeFontWeightToBold $node
 }
 
-pack [widgets_tree GetWidgetName] -side top -expand y -fill both -padx 2 -pady 2
+pack [$widgets_tree GetWidgetName] -side top -expand y -fill both -padx 2 -pady 2
 
-widgets_panel Raise
+$widgets_panel Raise
 
 # Add a user interface panel to the secondary user interface manager
 
-vtkKWUserInterfacePanel source_panel
-source_panel SetName "Source Interface"
-source_panel SetUserInterfaceManager [win GetSecondaryUserInterfaceManager]
-source_panel Create
-[win GetSecondaryNotebook] AlwaysShowTabsOff
+set source_panel [vtkKWUserInterfacePanel New]
+$source_panel SetName "Source Interface"
+$source_panel SetUserInterfaceManager [$win GetSecondaryUserInterfaceManager]
+$source_panel Create
+[$win GetSecondaryNotebook] AlwaysShowTabsOff
 
 # Add a page, and divide it using a split frame
 
-source_panel AddPage "Source" "Display the example source" ""
-set page_widget [source_panel GetPageWidget "Source"]
+$source_panel AddPage "Source" "Display the example source" ""
+set page_widget [$source_panel GetPageWidget "Source"]
 
-vtkKWSplitFrame source_split
-source_split SetParent $page_widget
-source_split SetExpandableFrameToBothFrames
-source_split Create
+set source_split [vtkKWSplitFrame New]
+$source_split SetParent $page_widget
+$source_split SetExpandableFrameToBothFrames
+$source_split Create
 
-pack [source_split GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
+pack [$source_split GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
 # Add text widget to display the Tcl example source
 
-vtkKWTextWithScrollbarsWithLabel tcl_source_text
-tcl_source_text SetParent [source_split GetFrame1]
-tcl_source_text Create
-tcl_source_text SetLabelPositionToTop
-tcl_source_text SetLabelText "Tcl Source"
+set tcl_source_text [vtkKWTextWithScrollbarsWithLabel New]
+$tcl_source_text SetParent [$source_split GetFrame1]
+$tcl_source_text Create
+$tcl_source_text SetLabelPositionToTop
+$tcl_source_text SetLabelText "Tcl Source"
 
-set text_widget [tcl_source_text GetWidget]
+set text_widget [$tcl_source_text GetWidget]
 $text_widget VerticalScrollbarVisibilityOn
 
 set text [$text_widget GetWidget]
@@ -113,17 +113,17 @@ $text AddTagMatcher "#\[^\n\]*" "_fg_navy_tag_"
 $text AddTagMatcher "\"\[^\"\]*\"" "_fg_blue_tag_"
 $text AddTagMatcher "vtk\[A-Z\]\[a-zA-Z0-9_\]+" "_fg_dark_green_tag_"
 
-pack [tcl_source_text GetWidgetName] -side top -expand y -fill both -padx 2 -pady 2
+pack [$tcl_source_text GetWidgetName] -side top -expand y -fill both -padx 2 -pady 2
 
 # Add text widget to display the C++ example source
 
-vtkKWTextWithScrollbarsWithLabel cxx_source_text
-cxx_source_text SetParent [source_split GetFrame2]
-cxx_source_text Create
-cxx_source_text SetLabelPositionToTop
-cxx_source_text SetLabelText "C++ Source"
+set cxx_source_text [vtkKWTextWithScrollbarsWithLabel New]
+$cxx_source_text SetParent [$source_split GetFrame2]
+$cxx_source_text Create
+$cxx_source_text SetLabelPositionToTop
+$cxx_source_text SetLabelText "C++ Source"
 
-set text_widget [cxx_source_text GetWidget]
+set text_widget [$cxx_source_text GetWidget]
 $text_widget VerticalScrollbarVisibilityOn
 
 set text [$text_widget GetWidget]
@@ -136,33 +136,31 @@ $text AddTagMatcher "\"\[^\"\]*\"" "_fg_blue_tag_"
 $text AddTagMatcher "<\[^>\]*>" "_fg_blue_tag_"
 $text AddTagMatcher "vtk\[A-Z\]\[a-zA-Z0-9_\]+" "_fg_dark_green_tag_"
 
-pack [cxx_source_text GetWidgetName] -side top -expand y -fill both -padx 2 -pady 2
+pack [$cxx_source_text GetWidgetName] -side top -expand y -fill both -padx 2 -pady 2
 
 # Populate the examples
 # Create a panel for each one, and pass the frame
 
-[win GetViewNotebook] ShowOnlyPagesWithSameTagOn
+[$win GetViewNotebook] ShowOnlyPagesWithSameTagOn
 
 set widgets [glob -path "[file join [file dirname [info script]] Widgets]/" *.tcl]
 foreach widget $widgets {
   set name [file rootname [file tail $widget]]
   lappend modules $name
 
-  set panel "panel$name"
-  vtkKWUserInterfacePanel $panel
+  set panel [vtkKWUserInterfacePanel New]
   $panel SetName $name
-  $panel SetUserInterfaceManager [win GetViewUserInterfaceManager]
+  $panel SetUserInterfaceManager [$win GetViewUserInterfaceManager]
   $panel Create
   $panel AddPage [$panel GetName] "" ""
-  lappend objects $panel
 
-  if {[app GetSplashScreenVisibility]} {
-    [app GetSplashScreen] SetProgressMessage $name
+  if {[$app GetSplashScreenVisibility]} {
+    [$app GetSplashScreen] SetProgressMessage $name
   }
 
   source $widget
   
-  set widget_type [${name}EntryPoint [$panel GetPageWidget [$panel GetName]] win]
+  set widget_type [${name}EntryPoint [$panel GetPageWidget [$panel GetName]] $win]
   if {$widget_type != ""} {
     set parent_node ""
     switch -- $widget_type {
@@ -176,7 +174,7 @@ foreach widget $widgets {
         set parent_node "vtk"
       }
     }
-    [widgets_tree GetWidget] AddNode $parent_node $name $name
+    [$widgets_tree GetWidget] AddNode $parent_node $name $name
 
     set tcl_source($name) [read [open "$widget"]]
 
@@ -194,41 +192,50 @@ foreach widget $widgets {
 # Raise the example panel
 
 proc selection_callback {} {
-  global tcl_source cxx_source
-  if [[widgets_tree GetWidget] HasSelection] {
-    win ShowViewUserInterface [[widgets_tree GetWidget] GetSelection]
-    [[tcl_source_text GetWidget] GetWidget] SetText $tcl_source([[widgets_tree GetWidget] GetSelection]) 
-    [[cxx_source_text GetWidget] GetWidget] SetText $cxx_source([[widgets_tree GetWidget] GetSelection])
+  global tcl_source cxx_source widgets_tree tcl_source_text cxx_source_text win
+  if [[$widgets_tree GetWidget] HasSelection] {
+    $win ShowViewUserInterface [[$widgets_tree GetWidget] GetSelection]
+    [[$tcl_source_text GetWidget] GetWidget] SetText $tcl_source([[$widgets_tree GetWidget] GetSelection]) 
+    [[$cxx_source_text GetWidget] GetWidget] SetText $cxx_source([[$widgets_tree GetWidget] GetSelection])
   } 
 }
 
-[widgets_tree GetWidget] SetSelectionChangedCommand "" selection_callback
+[$widgets_tree GetWidget] SetSelectionChangedCommand "" selection_callback
 
 # Start the application
 # If --test was provided, do not enter the event loop and run this example
 # as a non-interactive test for software quality purposes.
 
 set ret 0
-win Display
+$win Display
 if {!$option_test} {
-  app Start
-  set ret [app GetExitStatus]
+  $app Start
+  set ret [$app GetExitStatus]
 }
-win Close
+$win Close
 
 # Deallocate and exit
 
-foreach name $modules { catch {${name}FinalizePoint} }
+# A few objects need to be deleted first
 
-foreach object $objects { $object Delete }
-win Delete
-widgets_panel Delete
-widgets_tree Delete
-source_panel Delete
-source_split Delete
-tcl_source_text Delete
-cxx_source_text Delete
+foreach class {vtkImageViewer2 vtkKWRenderWidget} {
+  foreach obj [$class ListInstances] {
+    $obj Delete
+  }
+}
 
-app Delete
+$win Delete
+
+$widgets_panel Delete
+$widgets_tree Delete
+$source_panel Delete
+$source_split Delete
+$tcl_source_text Delete
+$cxx_source_text Delete
+$app Delete
+
+# And delete all the remaining objects that were created by each example
+
+vtkCommand DeleteAllObjects
 
 exit $ret

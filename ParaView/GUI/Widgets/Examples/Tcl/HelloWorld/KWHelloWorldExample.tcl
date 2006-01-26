@@ -13,50 +13,50 @@ set option_test [expr [lsearch -exact $argv "--test"] == -1 ? 0 : 1]
 # Restore the settings that have been saved to the registry, like
 # the geometry of the user interface so far.
 
-vtkKWApplication app
-app SetName "KWHelloWorldExample"
+set app [vtkKWApplication New]
+$app SetName "KWHelloWorldExample"
 if {$option_test} {
-  app SetRegistryLevel 0
-  app PromptBeforeExitOff
+  $app SetRegistryLevel 0
+  $app PromptBeforeExitOff
 }
-app RestoreApplicationSettingsFromRegistry
+$app RestoreApplicationSettingsFromRegistry
 
 # Set a help link. Can be a remote link (URL), or a local file
 
-app SetHelpDialogStartingPage "http://www.kwwidgets.org"
+$app SetHelpDialogStartingPage "http://www.kwwidgets.org"
 
 # Add a window
 # Set 'SupportHelp' to automatically add a menu entry for the help link
 
-vtkKWWindowBase win
-win SupportHelpOn
-app AddWindow win
-win Create
+set win [vtkKWWindowBase New]
+$win SupportHelpOn
+$app AddWindow $win
+$win Create
 
 # Add a label, attach it to the view frame, and pack
 
-vtkKWLabel hello_label
-hello_label SetParent [win GetViewFrame]
-hello_label Create
-hello_label SetText "Hello, World!"
-pack [hello_label GetWidgetName] -side left -anchor c -expand y
-hello_label Delete
+set hello_label [vtkKWLabel New]
+$hello_label SetParent [$win GetViewFrame]
+$hello_label Create
+$hello_label SetText "Hello, World!"
+pack [$hello_label GetWidgetName] -side left -anchor c -expand y
+$hello_label Delete
 
 # Start the application
 # If --test was provided, do not enter the event loop and run this example
 # as a non-interactive test for software quality purposes.
 
 set ret 0
-win Display
+$win Display
 if {!$option_test} {
-  app Start
-  set ret [app GetExitStatus]
+  $app Start
+  set ret [$app GetExitStatus]
 }
-win Close
+$win Close
 
 # Deallocate and exit
 
-win Delete
-app Delete
+$win Delete
+$app Delete
 
 exit $ret

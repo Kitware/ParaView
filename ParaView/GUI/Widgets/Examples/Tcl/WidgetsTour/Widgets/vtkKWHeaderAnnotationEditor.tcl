@@ -7,51 +7,44 @@ proc vtkKWHeaderAnnotationEditorEntryPoint {parent win} {
   # Create a render widget
   # Set the header annotation visibility and set some text
 
-  vtkKWRenderWidget hae_renderwidget
-  hae_renderwidget SetParent $parent
-  hae_renderwidget Create
+  set hae_renderwidget [vtkKWRenderWidget New]
+  $hae_renderwidget SetParent $parent
+  $hae_renderwidget Create
 
-  hae_renderwidget HeaderAnnotationVisibilityOn
-  hae_renderwidget SetHeaderAnnotationText "Hello World!"
+  $hae_renderwidget HeaderAnnotationVisibilityOn
+  $hae_renderwidget SetHeaderAnnotationText "Hello World!"
 
-  pack [hae_renderwidget GetWidgetName] -side right -fill both -expand y -padx 0 -pady 0
+  pack [$hae_renderwidget GetWidgetName] -side right -fill both -expand y -padx 0 -pady 0
 
   # -----------------------------------------------------------------------
 
   # Create a volume reader
 
-  vtkXMLImageDataReader hae_reader
-  hae_reader SetFileName [file join [file dirname [info script]] ".." ".." Data "head100x100x47.vti"]
+  set hae_reader [vtkXMLImageDataReader New]
+  $hae_reader SetFileName [file join [file dirname [info script]] ".." ".." Data "head100x100x47.vti"]
 
   # Create an image viewer
   # Use the render window and renderer of the renderwidget
 
-  vtkImageViewer2 hae_viewer
-  hae_viewer SetRenderWindow [hae_renderwidget GetRenderWindow] 
-  hae_viewer SetRenderer [hae_renderwidget GetRenderer] 
-  hae_viewer SetInput [hae_reader GetOutput] 
-  hae_viewer SetupInteractor [[hae_renderwidget GetRenderWindow] GetInteractor]
+  set hae_viewer [vtkImageViewer2 New]
+  $hae_viewer SetRenderWindow [$hae_renderwidget GetRenderWindow] 
+  $hae_viewer SetRenderer [$hae_renderwidget GetRenderer] 
+  $hae_viewer SetInput [$hae_reader GetOutput] 
+  $hae_viewer SetupInteractor [[$hae_renderwidget GetRenderWindow] GetInteractor]
 
-  hae_renderwidget ResetCamera
+  $hae_renderwidget ResetCamera
 
   # -----------------------------------------------------------------------
 
   # Create a header annotation editor
   # Connect it to the render widget
   
-  vtkKWHeaderAnnotationEditor hae_anno_editor
-  hae_anno_editor SetParent $parent
-  hae_anno_editor Create
-  hae_anno_editor SetRenderWidget hae_renderwidget
+  set hae_anno_editor [vtkKWHeaderAnnotationEditor New]
+  $hae_anno_editor SetParent $parent
+  $hae_anno_editor Create
+  $hae_anno_editor SetRenderWidget $hae_renderwidget
 
-  pack [hae_anno_editor GetWidgetName] -side left -anchor nw -expand n -padx 2 -pady 2
+  pack [$hae_anno_editor GetWidgetName] -side left -anchor nw -expand n -padx 2 -pady 2
 
   return "TypeVTK"
-}
-
-proc vtkKWHeaderAnnotationEditorFinalizePoint {} {
-  hae_anno_editor Delete
-  hae_reader Delete
-  hae_renderwidget Delete
-  hae_viewer Delete
 }
