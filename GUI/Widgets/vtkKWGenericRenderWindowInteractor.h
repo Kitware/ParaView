@@ -46,6 +46,7 @@ public:
   // Set the renderwidget associated to this interactor.
   // It is used to override the Render() method and allow the interactor styles
   // to communicate with the vtkKWRenderWidget (and subclasses) instance.
+  // It is not ref-counted.
   virtual void SetRenderWidget(vtkKWRenderWidget *widget);
   vtkGetObjectMacro(RenderWidget, vtkKWRenderWidget);
   

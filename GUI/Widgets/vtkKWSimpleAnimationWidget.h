@@ -46,7 +46,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Set/Get the renderwidget to perform the animation on
+  // Set/Get the renderwidget to perform the animation on.
+  // It is not ref-counted.
   vtkGetObjectMacro(RenderWidget, vtkKWRenderWidget);
   virtual void SetRenderWidget(vtkKWRenderWidget*);
 
