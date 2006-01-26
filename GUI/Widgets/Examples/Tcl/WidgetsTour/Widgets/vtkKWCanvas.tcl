@@ -4,21 +4,21 @@ proc vtkKWCanvasEntryPoint {parent win} {
 
   # Create a canvas
 
-  vtkKWCanvas canvas1
-  canvas1 SetParent $parent
-  canvas1 Create
-  canvas1 SetWidth 400
-  canvas1 SetHeight 200
-  canvas1 SetBorderWidth 2
-  canvas1 SetReliefToGroove
-  canvas1 SetBackgroundColor 0.4 0.6 0.9
+  set canvas1 [vtkKWCanvas New]
+  $canvas1 SetParent $parent
+  $canvas1 Create
+  $canvas1 SetWidth 400
+  $canvas1 SetHeight 200
+  $canvas1 SetBorderWidth 2
+  $canvas1 SetReliefToGroove
+  $canvas1 SetBackgroundColor 0.4 0.6 0.9
 
-  pack [canvas1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
+  pack [$canvas1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
 
   # There is no C++ API at the moment to access Tk's Canvas functions,
   # so let's just use Tk in the example:
 
-  set wname [canvas1 GetWidgetName] 
+  set wname [$canvas1 GetWidgetName] 
 
   $wname create arc 10 10 90 90 -start 20 -extent 120 -width 1
 
@@ -39,8 +39,4 @@ proc vtkKWCanvasEntryPoint {parent win} {
   # TODO: add a canvas with scrollbars
 
   return "TypeCore"
-}
-
-proc vtkKWCanvasFinalizePoint {} {
-  canvas1 Delete
 }

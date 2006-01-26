@@ -8,60 +8,53 @@ proc vtkKWTextEntryPoint {parent win} {
 
   # Create a text
 
-  vtkKWText text1
-  text1 SetParent $parent
-  text1 Create
-  text1 SetText $lorem_ipsum
-  text1 SetWidth 50
-  text1 SetHeight 12
-  text1 SetBalloonHelpString \
+  set text1 [vtkKWText New]
+  $text1 SetParent $parent
+  $text1 Create
+  $text1 SetText $lorem_ipsum
+  $text1 SetWidth 50
+  $text1 SetHeight 12
+  $text1 SetBalloonHelpString \
     "A text. The width and height are explicitly set to a given number of\
     characters"
 
-  pack [text1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
+  pack [$text1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
 
   # -----------------------------------------------------------------------
 
   # Create another text
 
-  vtkKWText text2
-  text2 SetParent $parent
-  text2 Create
-  text2 SetText $lorem_ipsum
-  text2 SetHeight 7
-  text2 SetWrapToChar
-  text2 ReadOnlyOn
-  text2 SetBalloonHelpString \
+  set text2 [vtkKWText New]
+  $text2 SetParent $parent
+  $text2 Create
+  $text2 SetText $lorem_ipsum
+  $text2 SetHeight 7
+  $text2 SetWrapToChar
+  $text2 ReadOnlyOn
+  $text2 SetBalloonHelpString \
     "Another text no explicit width is specified so that the text can expand\
     with the window word-wrapping is done at character boundary and the\
     the whole text area is read-only"
 
-  pack [text2 GetWidgetName] -side top -anchor nw -expand n -fill x -padx 2 -pady 6
+  pack [$text2 GetWidgetName] -side top -anchor nw -expand n -fill x -padx 2 -pady 6
 
   # -----------------------------------------------------------------------
 
   # Create another text with a label this time
 
-  vtkKWTextWithScrollbars text4
-  text4 SetParent $parent
-  text4 Create
-  [text4 GetWidget] SetText $lorem_ipsum
-  [text4 GetWidget] QuickFormattingOn 
-  [text4 GetWidget] SetWidth 25
-  text4 SetBalloonHelpString \
+  set text4 [vtkKWTextWithScrollbars New]
+  $text4 SetParent $parent
+  $text4 Create
+  [$text4 GetWidget] SetText $lorem_ipsum
+  [$text4 GetWidget] QuickFormattingOn 
+  [$text4 GetWidget] SetWidth 25
+  $text4 SetBalloonHelpString \
     "This is a vtkKWTextWithScrollbars i.e. a text associated to horizontal\
     and vertical scrollbars that can be displayed or not.\
     The QuickFormatting option is On, which enables basic formatting\
     features to be used with simple tags like **, ~~, or __"
 
-  pack [text4 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
+  pack [$text4 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 
   return "TypeCore"
 }
-
-proc vtkKWTextFinalizePoint {} {
-  text1 Delete
-  text2 Delete
-  text4 Delete
-}
-
