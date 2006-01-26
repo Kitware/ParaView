@@ -164,9 +164,9 @@ struct pqObjectLineChartWidget::pqImplementation
    this->updateChart();
   }
   
-  void addPlot(vtkExodusReader& Reader, const int ID, const QPen& Pen)
+  void addPlot(vtkExodusReader& Reader, const int ElementID, const QPen& Pen)
   {
-    const int id = ID + 1; // Exodus expects one-based cell ids
+    const int id = ElementID + 1; // Exodus expects one-based cell ids
     const char* type = this->VariableType == VARIABLE_TYPE_CELL ? "CELL" : "POINT";
     vtkFloatArray* const array = vtkFloatArray::New();
     Reader.GetTimeSeriesData(id, this->VariableName.toAscii().data(), type, array); 
@@ -185,6 +185,7 @@ struct pqObjectLineChartWidget::pqImplementation
     plot->setPen(Pen);
     
     this->LineChartWidget.getLineChart()->addData(plot);
+    this->LineChartWidget.getLegend().addEntry(Pen, new pqChartLabel(QString("Element %1").arg(ElementID)));
   }
   
   void updateChart()
@@ -218,16 +219,31 @@ struct pqObjectLineChartWidget::pqImplementation
     if(!reader)
       return;
 
+    int array_id = -1;
+    switch(this->VariableType)
+      {
+      case VARIABLE_TYPE_CELL:
+        array_id = reader->GetCellArrayID(this->VariableName.toAscii().data());
+        if(-1 == array_id)
+          return;
+        if(1 != reader->GetCellArrayNumberOfComponents(array_id))
+          return;
+        break;
+      case VARIABLE_TYPE_NODE:
+        array_id = reader->GetPointArrayID(this->VariableName.toAscii().data());
+        if(-1 == array_id)
+          return;
+        if(1 != reader->GetPointArrayNumberOfComponents(array_id))
+          return;
+        break;
+      }
+
     this->LineChartWidget.getTitle().setText(this->VariableName + " vs. Time");
     this->LineChartWidget.getXAxis()->setVisible(true);
     this->LineChartWidget.getYAxis()->setVisible(true);
     this->LineChartWidget.getYAxis()->getLabel().setText(this->VariableName);
 
     this->LineChartWidget.getLegend().clear();
-    this->LineChartWidget.getLegend().addEntry(QPen(Qt::darkBlue, 1.5), new pqChartLabel(QString("Element %1").arg(this->CurrentElementID)));
-    this->LineChartWidget.getLegend().addEntry(QPen(Qt::darkGray, 1.0, Qt::DotLine), new pqChartLabel(QString("Element %1").arg(this->CurrentElementID + 1)));
-    this->LineChartWidget.getLegend().addEntry(QPen(Qt::lightGray, 1.0, Qt::DotLine), new pqChartLabel(QString("Element %1").arg(this->CurrentElementID + 2)));
-    
     addPlot(*reader, this->CurrentElementID, QPen(Qt::darkBlue, 1.5));
     addPlot(*reader, this->CurrentElementID + 1, QPen(Qt::darkGray, 1.0, Qt::DotLine));
     addPlot(*reader, this->CurrentElementID + 2, QPen(Qt::lightGray, 1.0, Qt::DotLine));
@@ -256,7 +272,7 @@ pqObjectLineChartWidget::pqObjectLineChartWidget(QWidget *p) :
   QHBoxLayout* const hbox = new QHBoxLayout();
   hbox->setMargin(0);
   hbox->addWidget(element_label);
-  hbox->addWidget(&this->Implementation->ElementID);
+  hbox->addWidget(&this->Implementation->ElementID, 1);
 
   QVBoxLayout* const vbox = new QVBoxLayout();
   vbox->setMargin(0);
