@@ -43,6 +43,20 @@ static const int line_width = 15;
 class pqChartLegend::pqImplementation
 {
 public:
+  ~pqImplementation()
+  {
+    this->clear();
+  }
+
+  void clear()
+  {
+    for(unsigned int i = 0; i != this->Labels.size(); ++i)
+      delete this->Labels[i];
+      
+    this->Pens.clear();
+    this->Labels.clear();
+  }
+
   QRect Bounds;
   
   vtkstd::vector<QPen> Pens;
@@ -57,17 +71,13 @@ pqChartLegend::pqChartLegend(QObject* parent) :
 
 pqChartLegend::~pqChartLegend()
 {
-  this->clear();
   delete Implementation;
 }
 
 void pqChartLegend::clear()
 {
-  for(unsigned int i = 0; i != this->Implementation->Labels.size(); ++i)
-    delete this->Implementation->Labels[i];
-    
-  this->Implementation->Pens.clear();
-  this->Implementation->Labels.clear();
+  this->Implementation->clear();
+  emit layoutNeeded();
 }
 
 void pqChartLegend::addEntry(const QPen& pen, pqChartLabel* label)
@@ -77,6 +87,7 @@ void pqChartLegend::addEntry(const QPen& pen, pqChartLabel* label)
       
   this->Implementation->Pens.push_back(pen);
   this->Implementation->Labels.push_back(label);
+  emit layoutNeeded();
 }
 
 const QRect pqChartLegend::getSizeRequest()
