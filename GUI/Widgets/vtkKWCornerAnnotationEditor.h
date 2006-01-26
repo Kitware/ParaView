@@ -58,6 +58,7 @@ public:
   // Note that in vtkKWView mode, each view has a vtkKWCornerAnnotationEditor. 
   // In vtkKWRenderWidget, each widget has a vtkCornerAnnotation, which is 
   // controlled by a unique (decoupled) vtkKWCornerAnnotationEditor in the GUI.
+  // It is not ref-counted.
   virtual void SetRenderWidget(vtkKWRenderWidget*);
   vtkGetObjectMacro(RenderWidget,vtkKWRenderWidget);
 

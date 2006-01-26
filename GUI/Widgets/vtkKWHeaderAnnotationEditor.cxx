@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.13");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.14");
 
 //----------------------------------------------------------------------------
 vtkKWHeaderAnnotationEditor::vtkKWHeaderAnnotationEditor()
@@ -87,18 +87,7 @@ void vtkKWHeaderAnnotationEditor::SetRenderWidget(vtkKWRenderWidget *_arg)
     return;
     }
 
-  if (this->RenderWidget != NULL) 
-    { 
-    this->RenderWidget->UnRegister(this); 
-    }
-
   this->RenderWidget = _arg;
-
-  if (this->RenderWidget != NULL) 
-    { 
-    this->RenderWidget->Register(this); 
-    }
-
   this->Modified();
 
   // Update the GUI. Test if it is alive because we might be in the middle

@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.18");
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.19");
 
 //----------------------------------------------------------------------------
 vtkKWCornerAnnotationEditor::vtkKWCornerAnnotationEditor()
@@ -128,11 +128,6 @@ void vtkKWCornerAnnotationEditor::SetRenderWidget(vtkKWRenderWidget *_arg)
     return;
     }
 
-  if (this->RenderWidget != NULL) 
-    { 
-    this->RenderWidget->UnRegister(this); 
-    }
-
   this->RenderWidget = _arg;
 
   // We are now in vtkKWRenderWidget mode, the corner prop points to the
@@ -140,7 +135,6 @@ void vtkKWCornerAnnotationEditor::SetRenderWidget(vtkKWRenderWidget *_arg)
 
   if (this->RenderWidget != NULL) 
     { 
-    this->RenderWidget->Register(this); 
     this->CornerAnnotation = this->RenderWidget->GetCornerAnnotation();
     }
   else

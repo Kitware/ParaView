@@ -48,6 +48,7 @@ public:
 
   // Description:
   // Set/Get the vtkKWRenderWidget that owns the header annotation.
+  // It is not ref-counted.
   virtual void SetRenderWidget(vtkKWRenderWidget*);
   vtkGetObjectMacro(RenderWidget, vtkKWRenderWidget);
 
