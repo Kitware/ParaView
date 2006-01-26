@@ -10,6 +10,7 @@
 #ifndef _pqMainWindow_h
 #define _pqMainWindow_h
 
+#include <pqVariableType.h>
 #include <QMainWindow>
 #include <vtkIOStream.h>
 
@@ -119,7 +120,7 @@ private slots:
   void onCreateCompoundProxy(QAction*);
   
   void onProxySelected(vtkSMProxy*);
-  void onVariableNameSelected(const QString&);
+  void onVariableChanged(pqVariableType, const QString&);
   
   void onRecordTest();
   void onRecordTest(const QStringList& Files);

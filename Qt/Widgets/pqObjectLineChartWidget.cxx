@@ -50,7 +50,7 @@ struct pqObjectLineChartWidget::pqImplementation
     SourceProxy(0),
     ClientSideData(0),
     EventAdaptor(vtkEventQtSlotConnect::New()),
-    CurrentVariable(""),
+    VariableType(VARIABLE_TYPE_CELL),
     CurrentElementID(0)
   {
     QFont h1;
@@ -115,8 +115,7 @@ struct pqObjectLineChartWidget::pqImplementation
       }  
 
     this->SourceProxy = Proxy;
-
-    this->CurrentVariable = QString();
+    this->VariableName = QString();
 
     // TODO: hack -- figure out how compound proxies really fit in
     vtkSMCompoundProxy* cp = vtkSMCompoundProxy::SafeDownCast(Proxy);
@@ -138,9 +137,10 @@ struct pqObjectLineChartWidget::pqImplementation
     this->onInputChanged();
   }
   
-  void setCurrentVariable(const QString& Variable)
+  void setVariable(pqVariableType type, const QString& name)
   {
-    this->CurrentVariable = Variable;
+    this->VariableType = type;
+    this->VariableName = name;
     this->updateChart();
   }
   
@@ -161,59 +161,15 @@ struct pqObjectLineChartWidget::pqImplementation
     if(!data)
       return;
 
-    // Populate the current-variable combo-box with available variables
-    // (we do this here because the set of available variables may change as properties
-    // are modified in e.g: a source or a reader)
-    int current_index = 0;
-    
-    this->Variables.clear();
-    this->Variables.addItem(QString(), QString());
-    
-    if(vtkPointData* const point_data = data->GetPointData())
-      {
-      for(int i = 0; i != point_data->GetNumberOfArrays(); ++i)
-        {
-        vtkDataArray* const array = point_data->GetArray(i);
-        if(array->GetNumberOfComponents() != 1)
-          continue;
-        const char* const array_name = point_data->GetArrayName(i);
-        this->Variables.addItem(QString(array_name) + " (point)", QString(array_name));
-        
-        if(this->CurrentVariable == array_name)
-          {
-          current_index = this->Variables.count() - 1;
-          }
-        }
-      }
-      
-    if(vtkCellData* const cell_data = data->GetCellData())
-      {
-      for(int i = 0; i != cell_data->GetNumberOfArrays(); ++i)
-        {
-        vtkDataArray* const array = cell_data->GetArray(i);
-        if(array->GetNumberOfComponents() != 1)
-          continue;
-        const char* const array_name = cell_data->GetArrayName(i);
-        this->Variables.addItem(QString(array_name) + " (cell)", QString(array_name));
-        
-        if(this->CurrentVariable == array_name)
-          {
-          current_index = this->Variables.count() - 1;
-          }
-        }
-      }
-
-   this->Variables.setCurrentIndex(current_index);
    this->updateChart();
   }
   
   void addPlot(vtkExodusReader& Reader, const int ID, const QPen& Pen)
   {
     const int id = ID + 1; // Exodus expects one-based cell ids
-    QByteArray name = this->CurrentVariable.toAscii();
-    const char* type = "CELL";
+    const char* type = this->VariableType == VARIABLE_TYPE_CELL ? "CELL" : "POINT";
     vtkFloatArray* const array = vtkFloatArray::New();
-    Reader.GetTimeSeriesData(id, name.data(), type, array); 
+    Reader.GetTimeSeriesData(id, this->VariableName.toAscii().data(), type, array); 
     
     pqChartCoordinateList coordinates;
     for(vtkIdType i = 0; i != array->GetNumberOfTuples(); ++i)
@@ -246,7 +202,7 @@ struct pqObjectLineChartWidget::pqImplementation
     
     this->LineChartWidget.getLegend().clear();
     
-    if(this->CurrentVariable.isEmpty())
+    if(this->VariableName.isEmpty())
       return;
     
     if(!this->SourceProxy)
@@ -262,10 +218,10 @@ struct pqObjectLineChartWidget::pqImplementation
     if(!reader)
       return;
 
-    this->LineChartWidget.getTitle().setText(this->CurrentVariable + " vs. Time");
+    this->LineChartWidget.getTitle().setText(this->VariableName + " vs. Time");
     this->LineChartWidget.getXAxis()->setVisible(true);
     this->LineChartWidget.getYAxis()->setVisible(true);
-    this->LineChartWidget.getYAxis()->getLabel().setText(this->CurrentVariable);
+    this->LineChartWidget.getYAxis()->getLabel().setText(this->VariableName);
 
     this->LineChartWidget.getLegend().clear();
     this->LineChartWidget.getLegend().addEntry(QPen(Qt::darkBlue, 1.5), new pqChartLabel(QString("Element %1").arg(this->CurrentElementID)));
@@ -280,10 +236,10 @@ struct pqObjectLineChartWidget::pqImplementation
   vtkSMProxy* SourceProxy;
   vtkSMClientSideDataProxy* ClientSideData;
   vtkEventQtSlotConnect* EventAdaptor;
-  QComboBox Variables;
   QSpinBox ElementID;
   pqLineChartWidget LineChartWidget;
-  QString CurrentVariable;
+  pqVariableType VariableType;
+  QString VariableName;
   unsigned long CurrentElementID;
 };
 
@@ -299,9 +255,8 @@ pqObjectLineChartWidget::pqObjectLineChartWidget(QWidget *p) :
 
   QHBoxLayout* const hbox = new QHBoxLayout();
   hbox->setMargin(0);
-  hbox->addWidget(&this->Implementation->Variables, 4);
   hbox->addWidget(element_label);
-  hbox->addWidget(&this->Implementation->ElementID, 1);
+  hbox->addWidget(&this->Implementation->ElementID);
 
   QVBoxLayout* const vbox = new QVBoxLayout();
   vbox->setMargin(0);
@@ -313,12 +268,6 @@ pqObjectLineChartWidget::pqObjectLineChartWidget(QWidget *p) :
   this->Implementation->ElementID.setMaximum(VTK_LONG_MAX);
   this->Implementation->ElementID.setValue(this->Implementation->CurrentElementID);
 
-  QObject::connect(
-    &this->Implementation->Variables,
-    SIGNAL(activated(int)),
-    this,
-    SLOT(onCurrentVariableChanged(int)));
-    
   QObject::connect(
     &this->Implementation->ElementID,
     SIGNAL(valueChanged(int)),
@@ -345,9 +294,9 @@ void pqObjectLineChartWidget::setProxy(vtkSMProxy* proxy)
     }
 }
 
-void pqObjectLineChartWidget::setCurrentVariable(const QString& CurrentVariable)
+void pqObjectLineChartWidget::setVariable(pqVariableType type, const QString& name)
 {
-  this->Implementation->setCurrentVariable(CurrentVariable);
+  this->Implementation->setVariable(type, name);
 }
 
 void pqObjectLineChartWidget::setElementID(unsigned long ElementID)
@@ -358,11 +307,6 @@ void pqObjectLineChartWidget::setElementID(unsigned long ElementID)
 void pqObjectLineChartWidget::onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*)
 {
   this->Implementation->onInputChanged();
-}
-
-void pqObjectLineChartWidget::onCurrentVariableChanged(int Row)
-{
-  this->Implementation->setCurrentVariable(this->Implementation->Variables.itemData(Row).toString());
 }
 
 void pqObjectLineChartWidget::onElementIDChanged(int ElementID)

@@ -144,6 +144,7 @@ ADD_LIBRARY(QtWidgets
   pqSMMultiView.h
   pqVariableSelectorWidget.cxx
   pqVariableSelectorWidget.h
+  pqVariableType.h
   pqXMLUtil.cxx
   pqXMLUtil.h
   QtWidgetsExport.h

@@ -389,9 +389,9 @@ pqMainWindow::pqMainWindow() :
   pqVariableSelectorWidget* varSelector = new pqVariableSelectorWidget(this->VariableSelectorToolBar) << pqSetName("VariableSelector");
   this->VariableSelectorToolBar->addWidget(varSelector);
   this->connect(this->PipelineList, SIGNAL(proxySelected(vtkSMProxy *)), SLOT(onProxySelected(vtkSMProxy *)));
-  this->connect(varSelector, SIGNAL(varNameChanged(const QString&)), SLOT(onVariableNameSelected(const QString&)));
-  this->connect(varSelector, SIGNAL(varNameChanged(const QString&)), histogram, SLOT(setCurrentVariable(const QString&)));
-  this->connect(varSelector, SIGNAL(varNameChanged(const QString&)), line_chart, SLOT(setCurrentVariable(const QString&)));
+  this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), SLOT(onVariableChanged(pqVariableType, const QString&)));
+  this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), histogram, SLOT(setVariable(pqVariableType, const QString&)));
+  this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), line_chart, SLOT(setVariable(pqVariableType, const QString&)));
 
   this->CompoundProxyToolBar = new QToolBar(tr("Compound Proxies"), this) << pqSetName("CompoundProxyToolBar");
   this->addToolBar(Qt::TopToolBarArea, this->CompoundProxyToolBar);
@@ -1153,106 +1153,94 @@ void pqMainWindow::cleanUpWindow(QVTKWidget *win)
 
 void pqMainWindow::onProxySelected(vtkSMProxy* p)
 {
-
   this->CurrentProxy = p;
 
-  // update variable selector widget
-
   pqVariableSelectorWidget* selector = this->VariableSelectorToolBar->findChild<pqVariableSelectorWidget*>();
-  
-  selector->clearVarNames();
+  selector->clear();
 
-  if(p)
-    {
-    pqPipelineObject* pqObject = pqPipelineData::instance()->getObjectFor(p);
-    vtkSMDisplayProxy* display = pqObject->GetDisplayProxy();
+  if(!this->CurrentProxy)
+    return;
     
-    pqPipelineObject* reader = pqObject;
-    while(reader->GetInput(0))
-      reader = reader->GetInput(0);
+  pqPipelineObject* pqObject = pqPipelineData::instance()->getObjectFor(p);
+  vtkSMDisplayProxy* display = pqObject->GetDisplayProxy();
+  if(!display)
+    return;
+  
+  pqPipelineObject* reader = pqObject;
+  while(reader->GetInput(0))
+    reader = reader->GetInput(0);
 
-    if(display)
+  vtkPVDataInformation* geomInfo = display->GetGeometryInformation();
+  vtkPVDataSetAttributesInformation* cellinfo = geomInfo->GetCellDataInformation();
+  int i;
+  for(i=0; i<cellinfo->GetNumberOfArrays(); i++)
+    {
+    vtkPVArrayInformation* info = cellinfo->GetArrayInformation(i);
+    selector->addVariable(VARIABLE_TYPE_CELL, info->GetName());
+    }
+  
+  // also include unloaded arrays if any
+  QList<QVariant> extraCellArrays = pqSMAdaptor::instance()->getProperty(reader->GetProxy()->GetProperty("CellArrayStatus")).toList();
+  for(i=0; i<extraCellArrays.size(); i++)
+    {
+    QList<QVariant> cell = extraCellArrays[i].toList();
+    if(cell[1] == false)
       {
-      vtkPVDataInformation* geomInfo = display->GetGeometryInformation();
-      vtkPVDataSetAttributesInformation* cellinfo = geomInfo->GetCellDataInformation();
-      int i;
-      for(i=0; i<cellinfo->GetNumberOfArrays(); i++)
-        {
-        vtkPVArrayInformation* info = cellinfo->GetArrayInformation(i);
-        selector->addVarName(pqVariableSelectorWidget::TYPE_CELL, info->GetName());
-        }
-      
-      // also include unloaded arrays if any
-      QList<QVariant> extraCellArrays = pqSMAdaptor::instance()->getProperty(reader->GetProxy()->GetProperty("CellArrayStatus")).toList();
-      for(i=0; i<extraCellArrays.size(); i++)
-        {
-        QList<QVariant> cell = extraCellArrays[i].toList();
-        if(cell[1] == false)
-          {
-          selector->addVarName(pqVariableSelectorWidget::TYPE_CELL, cell[0].toString());
-          }
-        }
-
-      
-      vtkPVDataSetAttributesInformation* pointinfo = geomInfo->GetPointDataInformation();
-      for(i=0; i<pointinfo->GetNumberOfArrays(); i++)
-        {
-        vtkPVArrayInformation* info = pointinfo->GetArrayInformation(i);
-        selector->addVarName(pqVariableSelectorWidget::TYPE_NODE, info->GetName());
-        }
-      
-      // also include unloaded arrays if any
-      QList<QVariant> extraPointArrays = pqSMAdaptor::instance()->getProperty(reader->GetProxy()->GetProperty("PointArrayStatus")).toList();
-      for(i=0; i<extraPointArrays.size(); i++)
-        {
-        QList<QVariant> cell = extraPointArrays[i].toList();
-        if(cell[1] == false)
-          {
-          selector->addVarName(pqVariableSelectorWidget::TYPE_NODE, cell[0].toString());
-          }
-        }
-
-      // set to the active display scalar
-      vtkSMStringVectorProperty* d_svp = vtkSMStringVectorProperty::SafeDownCast(display->GetProperty("ColorArray"));
-      selector->setCurVarName(d_svp->GetElement(0));
-      vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(display->GetProperty("ScalarMode"));
-      int fieldtype = ivp->GetElement(0);
-      if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
-        {
-        selector->setCurVarType(pqVariableSelectorWidget::TYPE_CELL);
-        }
-      else
-        {
-        selector->setCurVarType(pqVariableSelectorWidget::TYPE_NODE);
-        }
+      selector->addVariable(VARIABLE_TYPE_CELL, cell[0].toString());
       }
     }
 
+  
+  vtkPVDataSetAttributesInformation* pointinfo = geomInfo->GetPointDataInformation();
+  for(i=0; i<pointinfo->GetNumberOfArrays(); i++)
+    {
+    vtkPVArrayInformation* info = pointinfo->GetArrayInformation(i);
+    selector->addVariable(VARIABLE_TYPE_NODE, info->GetName());
+    }
+  
+  // also include unloaded arrays if any
+  QList<QVariant> extraPointArrays = pqSMAdaptor::instance()->getProperty(reader->GetProxy()->GetProperty("PointArrayStatus")).toList();
+  for(i=0; i<extraPointArrays.size(); i++)
+    {
+    QList<QVariant> cell = extraPointArrays[i].toList();
+    if(cell[1] == false)
+      {
+      selector->addVariable(VARIABLE_TYPE_NODE, cell[0].toString());
+      }
+    }
+
+  // set to the active display scalar
+  vtkSMStringVectorProperty* d_svp = vtkSMStringVectorProperty::SafeDownCast(display->GetProperty("ColorArray"));
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(display->GetProperty("ScalarMode"));
+  int fieldtype = ivp->GetElement(0);
+  if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
+    {
+    selector->chooseVariable(VARIABLE_TYPE_CELL, d_svp->GetElement(0));
+    }
+  else
+    {
+    selector->chooseVariable(VARIABLE_TYPE_NODE, d_svp->GetElement(0));
+    }
 }
 
-void pqMainWindow::onVariableNameSelected(const QString& var)
+void pqMainWindow::onVariableChanged(pqVariableType type, const QString& name)
 {
   if(this->CurrentProxy)
     {
     pqPipelineObject* o = pqPipelineData::instance()->getObjectFor(this->CurrentProxy);
     vtkSMDisplayProxy* display = o->GetDisplayProxy();
     QWidget* widget = o->GetParent()->GetWidget();
-    pqVariableSelectorWidget* selector = this->VariableSelectorToolBar->findChild<pqVariableSelectorWidget*>();
-    
-    // set the display to show this var
-    if(selector->getCurVarTypeID() == pqVariableSelectorWidget::TYPE_CELL)
-      {
-      pqColorPart(display, var.toAscii().data(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
-      }
-    else
-      {
-      pqColorPart(display, var.toAscii().data(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
-      // histogram chokes on point data
-      }
 
+    switch(type)
+      {
+      case VARIABLE_TYPE_CELL:
+        pqColorPart(display, name.toAscii().data(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+        break;
+      case VARIABLE_TYPE_NODE:
+        pqColorPart(display, name.toAscii().data(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+        break;
+      }
+          
     widget->update();
-
     }
 }
-
-

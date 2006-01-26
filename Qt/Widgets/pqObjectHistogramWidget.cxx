@@ -17,7 +17,6 @@
 #include <pqHistogramColor.h>
 #include <pqHistogramWidget.h>
 
-#include <QComboBox>
 #include <QLabel>
 #include <QSpinBox>
 #include <QVBoxLayout>
@@ -74,7 +73,8 @@ struct pqObjectHistogramWidget::pqImplementation
   pqImplementation() :
     ClientSideData(0),
     EventAdaptor(vtkEventQtSlotConnect::New()),
-    BinCount(10)
+    BinCount(10),
+    VariableType(VARIABLE_TYPE_CELL)
   {
     QFont h1;
     h1.setBold(true);
@@ -137,7 +137,8 @@ struct pqObjectHistogramWidget::pqImplementation
       this->ClientSideData = 0;
       }  
     
-    this->CurrentVariable = QString();
+    this->VariableType = VARIABLE_TYPE_CELL;
+    this->VariableName = QString();
     
     // TODO: hack -- figure out how compound proxies really fit in
     vtkSMCompoundProxy* cp = vtkSMCompoundProxy::SafeDownCast(Proxy);
@@ -159,9 +160,10 @@ struct pqObjectHistogramWidget::pqImplementation
     this->onInputChanged();
   }
   
-  void setCurrentVariable(const QString& c)
+  void setVariable(pqVariableType type, const QString& name)
   {
-    this->CurrentVariable = c;
+    this->VariableType = type;
+    this->VariableName = name;
     this->updateChart();
   }
   
@@ -185,49 +187,6 @@ struct pqObjectHistogramWidget::pqImplementation
     if(!data)
       return;
 
-    // Populate the current-variable combo-box with available variables
-    // (we do this here because the set of available variables may change as properties
-    // are modified in e.g: a source or a reader)
-    int current_index = 0;
-    
-    this->Variables.clear();
-    this->Variables.addItem(QString(), QString());
-    
-    if(vtkPointData* const point_data = data->GetPointData())
-      {
-      for(int i = 0; i != point_data->GetNumberOfArrays(); ++i)
-        {
-        vtkDataArray* const array = point_data->GetArray(i);
-        if(array->GetNumberOfComponents() != 1)
-          continue;
-        const char* const array_name = point_data->GetArrayName(i);
-        this->Variables.addItem(QString(array_name) + " (point)", QString(array_name));
-        
-        if(this->CurrentVariable == array_name)
-          {
-          current_index = this->Variables.count() - 1;
-          }
-        }
-      }
-      
-    if(vtkCellData* const cell_data = data->GetCellData())
-      {
-      for(int i = 0; i != cell_data->GetNumberOfArrays(); ++i)
-        {
-        vtkDataArray* const array = cell_data->GetArray(i);
-        if(array->GetNumberOfComponents() != 1)
-          continue;
-        const char* const array_name = cell_data->GetArrayName(i);
-        this->Variables.addItem(QString(array_name) + " (cell)", QString(array_name));
-        
-        if(this->CurrentVariable == array_name)
-          {
-          current_index = this->Variables.count() - 1;
-          }
-        }
-      }
-
-    this->Variables.setCurrentIndex(current_index);
     this->updateChart();
   }
   
@@ -246,11 +205,8 @@ struct pqObjectHistogramWidget::pqImplementation
     this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setVisible(true);
     this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setValueRange(0.0, 100.0);
     
-    if(this->CurrentVariable.isEmpty())
+    if(this->VariableName.isEmpty())
       return;
-    
-    // what about cell and point arrays with the same name?
-    this->Variables.setCurrentIndex(this->Variables.findText(this->CurrentVariable, Qt::MatchStartsWith));
     
     if(!this->ClientSideData)
       return;
@@ -260,17 +216,14 @@ struct pqObjectHistogramWidget::pqImplementation
       return;
 
     vtkDataArray* array = 0;
-    if(vtkPointData* const point_data = data->GetPointData())
+    switch(this->VariableType)
       {
-      array = point_data->GetArray(this->CurrentVariable.toAscii().data());
-      }
-      
-    if(!array)
-      {
-      if(vtkCellData* const cell_data = data->GetCellData())
-        {
-        array = cell_data->GetArray(this->CurrentVariable.toAscii().data());
-        }
+      case VARIABLE_TYPE_NODE:
+        array = data->GetPointData()->GetArray(this->VariableName.toAscii().data());
+        break;
+      case VARIABLE_TYPE_CELL:
+        array = data->GetCellData()->GetArray(this->VariableName.toAscii().data());
+        break;
       }
       
     if(!array)
@@ -318,7 +271,7 @@ struct pqObjectHistogramWidget::pqImplementation
     if(value_min == value_max)
       return;
       
-    this->HistogramWidget.getTitle().setText(this->CurrentVariable + " Histogram");
+    this->HistogramWidget.getTitle().setText(this->VariableName + " Histogram");
     this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setVisible(true);
     this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setVisible(true);
 
@@ -329,10 +282,10 @@ struct pqObjectHistogramWidget::pqImplementation
   
   vtkSMClientSideDataProxy* ClientSideData;
   vtkEventQtSlotConnect* EventAdaptor;
-  QComboBox Variables;
   QSpinBox BinCountSpinBox;
   pqHistogramWidget HistogramWidget;
-  QString CurrentVariable;
+  pqVariableType VariableType;
+  QString VariableName;
   unsigned long BinCount;
 };
 
@@ -346,11 +299,8 @@ pqObjectHistogramWidget::pqObjectHistogramWidget(QWidget *p) :
   QLabel* const bin_label = new QLabel(tr("Bins:"));
   bin_label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-  this->Implementation->BinCountSpinBox.setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
   QHBoxLayout* const hbox = new QHBoxLayout();
   hbox->setMargin(0);
-  hbox->addWidget(&this->Implementation->Variables);
   hbox->addWidget(bin_label);
   hbox->addWidget(&this->Implementation->BinCountSpinBox);
 
@@ -365,12 +315,6 @@ pqObjectHistogramWidget::pqObjectHistogramWidget(QWidget *p) :
   
   this->setLayout(vbox);
   
-  QObject::connect(
-    &this->Implementation->Variables,
-    SIGNAL(activated(int)),
-    this,
-    SLOT(onCurrentVariableChanged(int)));
-    
   QObject::connect(
     &this->Implementation->BinCountSpinBox,
     SIGNAL(valueChanged(int)),
@@ -397,9 +341,9 @@ void pqObjectHistogramWidget::setProxy(vtkSMProxy* proxy)
     }
 }
 
-void pqObjectHistogramWidget::setCurrentVariable(const QString& CurrentVariable)
+void pqObjectHistogramWidget::setVariable(pqVariableType type, const QString& name)
 {
-  this->Implementation->setCurrentVariable(CurrentVariable);
+  this->Implementation->setVariable(type, name);
 }
 
 void pqObjectHistogramWidget::setBinCount(unsigned long Count)
@@ -410,11 +354,6 @@ void pqObjectHistogramWidget::setBinCount(unsigned long Count)
 void pqObjectHistogramWidget::onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*)
 {
   this->Implementation->onInputChanged();
-}
-
-void pqObjectHistogramWidget::onCurrentVariableChanged(int Row)
-{
-  this->Implementation->setCurrentVariable(this->Implementation->Variables.itemData(Row).toString());
 }
 
 void pqObjectHistogramWidget::onBinCountChanged(int Count)

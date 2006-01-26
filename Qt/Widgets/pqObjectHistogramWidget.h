@@ -10,6 +10,7 @@
 #ifndef _pqObjectHistogramWidget_h
 #define _pqObjectHistogramWidget_h
 
+#include "pqVariableType.h"
 #include "QtWidgetsExport.h"
 #include <QWidget>
 
@@ -30,14 +31,13 @@ public:
 public slots:
   /// Call this to set the proxy that will become the data source
   void setProxy(vtkSMProxy*);
-  /// Call this to set the current variable
-  void setCurrentVariable(const QString&);
+  /// Call this to set the current variable type and variable name
+  void setVariable(pqVariableType type, const QString& name);
   /// Call this to set the current bin count (defaults to 10)
   void setBinCount(unsigned long Count);
   
 private slots:
   void onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*);
-  void onCurrentVariableChanged(int);
   void onBinCountChanged(int);
 
 private:

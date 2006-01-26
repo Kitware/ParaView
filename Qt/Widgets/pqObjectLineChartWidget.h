@@ -10,6 +10,7 @@
 #ifndef _pqObjectLineChartWidget_h
 #define _pqObjectLineChartWidget_h
 
+#include "pqVariableType.h"
 #include "QtWidgetsExport.h"
 #include <QWidget>
 
@@ -31,13 +32,12 @@ public slots:
   /// Call this to set the proxy that will become the data source
   void setProxy(vtkSMProxy*);
   /// Call this to set the current variable
-  void setCurrentVariable(const QString&);
+  void setVariable(pqVariableType, const QString&);
   /// Call this to set the current element ID
   void setElementID(unsigned long Count);
   
 private slots:
   void onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*);
-  void onCurrentVariableChanged(int);
   void onElementIDChanged(int);
 
 private:
