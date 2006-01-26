@@ -59,6 +59,7 @@
 #include <QTreeView>
 #include <QListView>
 #include <QSignalMapper>
+#include <QDir>
 
 #include <vtkPVXMLElement.h>
 #include <vtkPVXMLParser.h>
@@ -460,6 +461,7 @@ void pqMainWindow::setServer(pqServer* Server)
 {
   if(this->CurrentServer)
     {
+    this->CompoundProxyToolBar->clear();
     this->Pipeline->removeServer(this->CurrentServer);
     delete this->CurrentServer;
     }
@@ -467,6 +469,19 @@ void pqMainWindow::setServer(pqServer* Server)
   this->CurrentServer = Server;
   if(this->CurrentServer)
     {
+    // preload compound proxies
+    QDir appDir = QCoreApplication::applicationDirPath();
+    if(appDir.cd("filters"))
+      {
+      QStringList files = appDir.entryList(QStringList() += "*.xml", QDir::Files | QDir::Readable);
+      pqCompoundProxyWizard* wizard = new pqCompoundProxyWizard(this->CurrentServer, this);
+      wizard->hide();
+      this->connect(wizard, SIGNAL(newCompoundProxy(const QString&, const QString&)),
+                            SLOT(onCompoundProxyAdded(const QString&, const QString&)));
+      wizard->onLoad(files);
+      delete wizard;
+      }
+    
     this->Pipeline->addServer(this->CurrentServer);
     this->onNewQVTKWidget(qobject_cast<pqMultiViewFrame *>(
         this->MultiViewManager->widgetOfIndex(pqMultiView::Index())));
