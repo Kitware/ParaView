@@ -14,6 +14,7 @@
 #include "QtWidgetsExport.h"
 #include <QWidget>
 
+class pqServer;
 class vtkCommand;
 class vtkObject;
 class vtkSMProxy;
@@ -29,6 +30,8 @@ public:
   ~pqObjectLineChartWidget();
 
 public slots:
+  /// Call this to set the current server
+  void setServer(pqServer*);
   /// Call this to set the proxy that will become the data source
   void setProxy(vtkSMProxy*);
   /// Call this to set the current variable

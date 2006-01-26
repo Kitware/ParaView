@@ -31,7 +31,6 @@
 #include <vtkFloatArray.h>
 #include <vtkPointData.h>
 #include <vtkPointSet.h>
-#include <vtkSMClientSideDataProxy.h>
 #include <vtkSMInputProperty.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMSourceProxy.h>
@@ -48,7 +47,6 @@ struct pqObjectLineChartWidget::pqImplementation
 {
   pqImplementation() :
     SourceProxy(0),
-    ClientSideData(0),
     EventAdaptor(vtkEventQtSlotConnect::New()),
     VariableType(VARIABLE_TYPE_CELL),
     CurrentElementID(0)
@@ -98,22 +96,10 @@ struct pqObjectLineChartWidget::pqImplementation
   ~pqImplementation()
   {
     this->EventAdaptor->Delete();
-    
-    if(this->ClientSideData)
-      {
-//      this->ClientSideData->Delete();
-      this->ClientSideData = 0;
-      }
   }
   
   void setProxy(vtkSMProxy* Proxy)
   {
-    if(this->ClientSideData)
-      {
-      this->ClientSideData->Delete();
-      this->ClientSideData = 0;
-      }  
-
     this->SourceProxy = Proxy;
     this->VariableName = QString();
 
@@ -128,16 +114,6 @@ struct pqObjectLineChartWidget::pqImplementation
           }
       }
 
-    if(!Proxy)
-      return;
-    
-    // Connect a client side data object to the input source
-    this->ClientSideData = vtkSMClientSideDataProxy::SafeDownCast(
-      Proxy->GetProxyManager()->NewProxy("displays", "ClientSideData"));
-    vtkSMInputProperty* const input = vtkSMInputProperty::SafeDownCast(
-      this->ClientSideData->GetProperty("Input"));
-    input->AddProxy(Proxy);
-    
     this->onInputChanged();
   }
   
@@ -156,16 +132,7 @@ struct pqObjectLineChartWidget::pqImplementation
   
   void onInputChanged()
   {
-    if(!this->ClientSideData)
-      return;
-    this->ClientSideData->UpdateVTKObjects();
-    this->ClientSideData->Update();
-
-    vtkDataSet* const data = this->ClientSideData->GetCollectedData();
-    if(!data)
-      return;
-
-   this->updateChart();
+    this->updateChart();
   }
   
   void addPlot(vtkExodusReader& Reader, const int ElementID, const QPen& Pen)
@@ -254,7 +221,6 @@ struct pqObjectLineChartWidget::pqImplementation
   }
   
   vtkSMProxy* SourceProxy;
-  vtkSMClientSideDataProxy* ClientSideData;
   vtkEventQtSlotConnect* EventAdaptor;
   QSpinBox ElementID;
   pqLineChartWidget LineChartWidget;
@@ -298,6 +264,11 @@ pqObjectLineChartWidget::pqObjectLineChartWidget(QWidget *p) :
 pqObjectLineChartWidget::~pqObjectLineChartWidget()
 {
   delete this->Implementation;
+}
+
+void pqObjectLineChartWidget::setServer(pqServer* server)
+{
+  this->setProxy(0);
 }
 
 void pqObjectLineChartWidget::setProxy(vtkSMProxy* proxy)

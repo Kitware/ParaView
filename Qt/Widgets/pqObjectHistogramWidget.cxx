@@ -16,6 +16,8 @@
 #include <pqHistogramChart.h>
 #include <pqHistogramColor.h>
 #include <pqHistogramWidget.h>
+#include <pqPipelineData.h>
+#include <pqPipelineObject.h>
 
 #include <QLabel>
 #include <QSpinBox>
@@ -26,43 +28,50 @@
 #include <vtkDataArray.h>
 #include <vtkDataSet.h>
 #include <vtkEventQtSlotConnect.h>
+#include <vtkLookupTable.h>
 #include <vtkPointData.h>
 #include <vtkPointSet.h>
+#include <vtkProcessModule.h>
 #include <vtkSMClientSideDataProxy.h>
 #include <vtkSMInputProperty.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMCompoundProxy.h>
 #include <vtkSMSourceProxy.h>
+#include <vtkSMLookupTableProxy.h>
 
-class pqHistogramColorRange : public pqHistogramColor
+//////////////////////////////////////////////////////////////////////////////
+// pqHistogramColorLookup
+
+/// Histogram color policy that uses a VTK lookup table
+class pqHistogramColorLookup : public pqHistogramColor
 {
 public:
-  pqHistogramColorRange(const QColor& begin, const QColor& end) :
-    Begin(begin),
-    End(end)
+  pqHistogramColorLookup(pqChartAxis* const axis, vtkLookupTable* const table) :
+    ChartAxis(axis),
+    LookupTable(table)
   {
-  }
-  
-private:
-  static const QColor lerp(const QColor& A, const QColor& B, const double Mix)
-  {
-    return QColor::fromRgbF(
-      (A.redF() * (1.0 - Mix)) + (B.redF() * Mix),
-      (A.greenF() * (1.0 - Mix)) + (B.greenF() * Mix),
-      (A.blueF() * (1.0 - Mix)) + (B.blueF() * Mix),
-      (A.alphaF() * (1.0 - Mix)) + (B.alphaF() * Mix));
   }
 
+private:
   QColor getColor(int index, int total) const
   {
-    if(!total)
-      return Begin;
+    if(this->ChartAxis && this->LookupTable)
+    {
+      const double lower_value = this->ChartAxis->getValueForIndex(index).getDoubleValue();
+      const double upper_value = this->ChartAxis->getValueForIndex(index+1).getDoubleValue();
+      const double value = (lower_value + upper_value) * 0.5;
       
-    return lerp(Begin, End, static_cast<double>(index) / static_cast<double>(total));
+      double rgb[3];
+      this->LookupTable->GetColor(value, rgb);
+
+      return QColor::fromRgbF(rgb[0], rgb[1], rgb[2]);
+    }
+   
+    return pqHistogramColor::getColor(index, total);
   }
   
-  const QColor Begin;
-  const QColor End;
+  pqChartAxis* const ChartAxis;
+  vtkLookupTable* const LookupTable;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -71,6 +80,7 @@ private:
 struct pqObjectHistogramWidget::pqImplementation
 {
   pqImplementation() :
+    CurrentProxy(0),
     ClientSideData(0),
     EventAdaptor(vtkEventQtSlotConnect::New()),
     BinCount(10),
@@ -94,7 +104,6 @@ struct pqObjectHistogramWidget::pqImplementation
     this->HistogramWidget.getTitle().setFont(h1);
     this->HistogramWidget.getTitle().setColor(Qt::black);
     
-    this->HistogramWidget.getHistogram()->setBinColorScheme(new pqHistogramColorRange(Qt::blue, Qt::red));
     this->HistogramWidget.getHistogram()->setBinOutlineStyle(pqHistogramChart::Black);
     
     this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setGridColor(Qt::lightGray);
@@ -124,7 +133,8 @@ struct pqObjectHistogramWidget::pqImplementation
     
     if(this->ClientSideData)
       {
-      this->ClientSideData->Delete();
+      /** \todo Plug this leak */
+//      this->ClientSideData->Delete();
       this->ClientSideData = 0;
       }
   }
@@ -133,7 +143,8 @@ struct pqObjectHistogramWidget::pqImplementation
   {
     if(this->ClientSideData)
       {
-      this->ClientSideData->Delete();
+      /** \todo Plug this leak */
+//      this->ClientSideData->Delete();
       this->ClientSideData = 0;
       }  
     
@@ -151,15 +162,18 @@ struct pqObjectHistogramWidget::pqImplementation
           }
       }
     
-    if(!Proxy)
-      return;
+    // Retain the proxy for later use ...
+    this->CurrentProxy = Proxy;
 
-    // Connect a client side data object to the input source
-    this->ClientSideData = vtkSMClientSideDataProxy::SafeDownCast(
-      Proxy->GetProxyManager()->NewProxy("displays", "ClientSideData"));
-    vtkSMInputProperty* const input = vtkSMInputProperty::SafeDownCast(
-      this->ClientSideData->GetProperty("Input"));
-    input->AddProxy(Proxy);
+    if(Proxy)
+      {
+      // Connect a client side data object to the input source
+      this->ClientSideData = vtkSMClientSideDataProxy::SafeDownCast(
+        Proxy->GetProxyManager()->NewProxy("displays", "ClientSideData"));
+      vtkSMInputProperty* const input = vtkSMInputProperty::SafeDownCast(
+        this->ClientSideData->GetProperty("Input"));
+      input->AddProxy(Proxy);
+      }
     
     this->onInputChanged();
   }
@@ -182,14 +196,11 @@ struct pqObjectHistogramWidget::pqImplementation
   
   void onInputChanged()
   {
-    if(!this->ClientSideData)
-      return;
-    this->ClientSideData->UpdateVTKObjects();
-    this->ClientSideData->Update();
-
-    vtkDataSet* const data = this->ClientSideData->GetCollectedData();
-    if(!data)
-      return;
+    if(this->ClientSideData)
+      {
+      this->ClientSideData->UpdateVTKObjects();
+      this->ClientSideData->Update();
+      }
 
     this->updateChart();
   }
@@ -208,7 +219,9 @@ struct pqObjectHistogramWidget::pqImplementation
     this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setValueRange(0.0, 100.0);
     this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setVisible(true);
     this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setValueRange(0.0, 100.0);
+    this->HistogramWidget.getHistogram()->setBinColorScheme(new pqHistogramColor());
     
+    // See if we can display the current variable, if not, we're done ...
     if(this->VariableName.isEmpty())
       return;
     
@@ -236,6 +249,7 @@ struct pqObjectHistogramWidget::pqImplementation
     if(array->GetNumberOfComponents() != 1)
       return;
 
+    // Bin the current variable data ...
     double value_min = VTK_DOUBLE_MAX;
     double value_max = -VTK_DOUBLE_MAX;
     typedef vtkstd::vector<int> bins_t;
@@ -274,7 +288,8 @@ struct pqObjectHistogramWidget::pqImplementation
       
     if(value_min == value_max)
       return;
-      
+    
+    // Display the results ...
     this->HistogramWidget.getTitle().setText(this->VariableName + " Histogram");
     this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setVisible(true);
     this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setVisible(true);
@@ -282,8 +297,18 @@ struct pqObjectHistogramWidget::pqImplementation
     this->HistogramWidget.getHistogram()->setData(
       list,
       pqChartValue(value_min), pqChartValue(value_max));
+
+    // Setup the histogram to use the same color as the display ...
+    pqPipelineObject* const pipeline_object = pqPipelineData::instance()->getObjectFor(this->CurrentProxy);
+    vtkSMDisplayProxy* const display_proxy = pipeline_object->GetDisplayProxy();
+    vtkSMProxyProperty* const lookup_table_property = vtkSMProxyProperty::SafeDownCast(display_proxy->GetProperty("LookupTable"));
+    vtkSMLookupTableProxy* const lookup_table_proxy = vtkSMLookupTableProxy::SafeDownCast(lookup_table_property->GetProxy(0));
+    vtkLookupTable* const lookup_table = vtkLookupTable::SafeDownCast(vtkProcessModule::GetProcessModule()->GetObjectFromID(lookup_table_proxy->GetID(0)));
+
+    this->HistogramWidget.getHistogram()->setBinColorScheme(new pqHistogramColorLookup(this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis), lookup_table));
   }
   
+  vtkSMProxy* CurrentProxy;
   vtkSMClientSideDataProxy* ClientSideData;
   vtkEventQtSlotConnect* EventAdaptor;
   QSpinBox BinCountSpinBox;
@@ -329,6 +354,11 @@ pqObjectHistogramWidget::pqObjectHistogramWidget(QWidget *p) :
 pqObjectHistogramWidget::~pqObjectHistogramWidget()
 {
   delete this->Implementation;
+}
+
+void pqObjectHistogramWidget::setServer(pqServer* server)
+{
+  this->setProxy(0);
 }
 
 void pqObjectHistogramWidget::setProxy(vtkSMProxy* proxy)
