@@ -164,13 +164,16 @@ $pv(vtkTemp632) SetVisibility 1
 $pv(vtkTemp705) SetVisibility 0
 $pv(vtkTemp801) SetVisibility 0
 set pv(vtkTemp571) [$pvWindow GetPVColorMap {Density} 1]
-$pv(vtkTemp571) VectorModeMagnitudeCallback
+$pv(vtkTemp571) SetVectorMode 0
+$pv(vtkTemp571) SetTitle "Density Magnitude"
 $pv(vtkTemp571) SetScalarRange 0.200965 0.638639
 set pv(vtkTemp740) [$pvWindow GetPVColorMap {Surface Flow} 1]
-$pv(vtkTemp740) VectorModeMagnitudeCallback
+$pv(vtkTemp740) SetVectorMode 0
+$pv(vtkTemp740) SetTitle "Surface Flow Magnitude"
 $pv(vtkTemp740) SetScalarRange -5285.36 -5285.36
 set pv(vtkTemp940) [$pvWindow GetPVColorMap {StagnationEnergy} 1]
-$pv(vtkTemp940) VectorModeMagnitudeCallback
+$pv(vtkTemp940) SetVectorMode 0
+$pv(vtkTemp940) SetTitle "StagnationEnergy Magnitude"
 $pv(vtkTemp940) SetScalarBarVisibility 1
 $pv(vtkTemp940) SetScalarBarPosition1 0.238571 0.036329
 $pv(vtkTemp940) SetScalarBarPosition2 0.500000 0.130000
@@ -179,7 +182,8 @@ set pv(vtkTemp870) [$pvWindow GetPVColorMap {Momentum} 3]
 $pv(vtkTemp870) SetScalarBarLabelFormat {%.0f}
 $pv(vtkTemp870) SetStartHSV 57.93 -26.85 -30.21
 $pv(vtkTemp870) SetEndHSV 57.93 26.85 30.21
-$pv(vtkTemp870) VectorModeMagnitudeCallback
+$pv(vtkTemp870) SetVectorMode 0
+$pv(vtkTemp870) SetTitle "Momentum Magnitude"
 $pv(vtkTemp870) SetScalarRange 0 20000
 $pv(vtkTemp870) SetScalarRangeLock 1
 $pv(vtkTemp870) SetScalarBarVisibility 1

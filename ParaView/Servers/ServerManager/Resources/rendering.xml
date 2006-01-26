@@ -1893,6 +1893,7 @@
           <Property name="Position2" />
           <Property name="Title" />
           <Property name="LabelFormat" />
+          <Property name="NumberOfLabels" />
           <!-- properties for Label -->
           <Property name="LabelColor"     />
           <Property name="LabelOpacity"   />

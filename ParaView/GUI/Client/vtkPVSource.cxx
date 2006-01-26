@@ -16,6 +16,7 @@
 #include "vtkPVSource.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVColorMap.h"
+#include "vtkPVColorMapUI.h"
 #include "vtkArrayMap.txx"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
@@ -64,7 +65,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.472");
+vtkCxxRevisionMacro(vtkPVSource, "1.473");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -1237,6 +1238,9 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     // causes the filter to execute.
     this->Notebook->Update();  
     }
+
+  this->GetPVRenderView()->GetColorMapUI()->UpdateParameterList(
+    this->GetPVWindow());
 
   this->GetPVRenderView()->UpdateTclButAvoidRendering();
 

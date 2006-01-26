@@ -22,13 +22,19 @@
 #include "vtkMath.h"
 
 vtkStandardNewMacro(vtkSMLookupTableProxy);
-vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.14");
 
 //---------------------------------------------------------------------------
 vtkSMLookupTableProxy::vtkSMLookupTableProxy()
 {
   this->SetVTKClassName("vtkLookupTable");
   this->ArrayName = 0;
+  this->LowOutOfRangeColor[0] = this->LowOutOfRangeColor[1] =
+    this->LowOutOfRangeColor[2] = 0;
+  this->HighOutOfRangeColor[0] = this->HighOutOfRangeColor[1] =
+    this->HighOutOfRangeColor[2] = 0;
+  this->UseLowOutOfRangeColor = 0;
+  this->UseHighOutOfRangeColor = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -99,6 +105,23 @@ void vtkSMLookupTableProxy::Build()
       { // not Sandia interpolation.
       stream << vtkClientServerStream::Invoke << this->GetID(i)
              << "ForceBuild" << vtkClientServerStream::End;
+      int numColors = (numberOfTableValues < 1) ? 1 : numberOfTableValues;
+      if (this->UseLowOutOfRangeColor)
+        {
+        stream << vtkClientServerStream::Invoke
+               << this->GetID(i) << "SetTableValue" << 0
+               << this->LowOutOfRangeColor[0] << this->LowOutOfRangeColor[1]
+               << this->LowOutOfRangeColor[2] << 1
+               << vtkClientServerStream::End;
+        }
+      if (this->UseHighOutOfRangeColor)
+        {
+        stream << vtkClientServerStream::Invoke << this->GetID(i)
+               << "SetTableValue" << numColors-1
+               << this->HighOutOfRangeColor[0] << this->HighOutOfRangeColor[1]
+               << this->HighOutOfRangeColor[2]
+               << 1 << vtkClientServerStream::End;
+        }
       }
     else
       {
@@ -133,6 +156,21 @@ void vtkSMLookupTableProxy::Build()
                << this->GetID(i) << "SetTableValue" << j
                << rgba[0] << rgba[1] << rgba[2] << rgba[3] 
                << vtkClientServerStream::End;
+        }
+      if (this->UseLowOutOfRangeColor)
+        {
+        stream << vtkClientServerStream::Invoke << this->GetID(i)
+               << "SetTableValue 0" << this->LowOutOfRangeColor[0]
+               << this->LowOutOfRangeColor[1] << this->LowOutOfRangeColor[2]
+               << 1 << vtkClientServerStream::End;
+        }
+      if (this->UseHighOutOfRangeColor)
+        {
+        stream << vtkClientServerStream::Invoke << this->GetID(i)
+               << "SetTableValue" << numColors-1
+               << this->HighOutOfRangeColor[0] << this->HighOutOfRangeColor[1]
+               << this->HighOutOfRangeColor[2]
+               << 1 << vtkClientServerStream::End;
         }
       }
     }
@@ -212,6 +250,16 @@ void vtkSMLookupTableProxy::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "ArrayName: "
      << (this->ArrayName?this->ArrayName:"(none)") << endl;
+  os << indent << "LowOutOfRangeColor: " << this->LowOutOfRangeColor[0]
+     << " " << this->LowOutOfRangeColor[1] << " "
+     << this->LowOutOfRangeColor[2] << endl;
+  os << indent << "HighOutOfRangeColor: " << this->HighOutOfRangeColor[0]
+     << " " << this->HighOutOfRangeColor[1] << " "
+     << this->HighOutOfRangeColor[2] << endl;
+  os << indent << "UseLowOutOfRangeColor: " << this->UseLowOutOfRangeColor
+     << endl;
+  os << indent << "UseHighOutOfRangeColor: " << this->UseHighOutOfRangeColor
+     << endl;
 }
 
 
