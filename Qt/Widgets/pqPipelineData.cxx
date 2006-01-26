@@ -529,6 +529,7 @@ vtkSMCompoundProxy *pqPipelineData::createCompoundProxy(const char *proxyName,
   // Create a proxy object on the server.
   vtkSMProxyManager *proxyManager = server->GetServer()->GetProxyManager();
   vtkSMCompoundProxy *proxy = vtkSMCompoundProxy::SafeDownCast(proxyManager->NewCompoundProxy(proxyName));
+  proxy->UpdateVTKObjects();
 
   // Register the proxy with the server manager. Use a unique name
   // based on the class name and a count.
@@ -655,10 +656,15 @@ void pqPipelineData::addInput(vtkSMProxy *proxy, vtkSMProxy *input)
     proxy = compoundProxy->GetMainProxy();
     }
   
+  // if we are connecting the output of a compound proxy to the input of another filter
   compoundProxy = vtkSMCompoundProxy::SafeDownCast(input);
   if(compoundProxy)
     {
-    input = compoundProxy->GetProxy(compoundProxy->GetNumberOfProxies()-1);
+    input = NULL; 
+    for(int i=compoundProxy->GetNumberOfProxies(); input == NULL && i>0; i--)
+      {
+      input = vtkSMSourceProxy::SafeDownCast(compoundProxy->GetProxy(i-1));
+      }
     }
 
   vtkSMInputProperty *inputProp = vtkSMInputProperty::SafeDownCast(

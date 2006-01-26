@@ -1056,7 +1056,11 @@ void pqMainWindow::onCreateCompoundProxy(QAction* action)
       {
       // TODO: how to decide which part of the compound proxy to display ????
       // for now just get the last one, and assuming it is a source proxy
-      vtkSMProxy* sourceDisplay = source->GetProxy(source->GetNumberOfProxies()-1);
+      vtkSMProxy* sourceDisplay = NULL;
+      for(int i=source->GetNumberOfProxies(); sourceDisplay == NULL && i>0; i--)
+        {
+        sourceDisplay = vtkSMSourceProxy::SafeDownCast(source->GetProxy(i-1));
+        }
       this->Pipeline->setVisibility(this->Pipeline->createDisplay(vtkSMSourceProxy::SafeDownCast(sourceDisplay), source), vis);
       //this->Pipeline->setVisibility(this->Pipeline->createDisplay(source), vis);
       }

@@ -371,9 +371,14 @@ void pqObjectInspector::setProxy(vtkSMProxy *sourceProxy)
         vtkSMCompoundProxy* cp = vtkSMCompoundProxy::SafeDownCast(sourceProxy);
         if(cp)
           {
-          // TODO: gotta figure out which proxy to really do an update on
-          vtkSMProxy* sourceDisplay = cp->GetProxy(cp->GetNumberOfProxies()-1);
-          vtkSMSourceProxy::SafeDownCast(sourceDisplay)->UpdatePipelineInformation();
+          for(int i=0; i<cp->GetNumberOfProxies(); i++)
+            {
+            vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(cp->GetProxy(i));
+            if(src)
+              {
+              src->UpdatePipelineInformation();
+              }
+            }
           }
         }
       }

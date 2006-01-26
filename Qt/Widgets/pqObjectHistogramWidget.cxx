@@ -32,7 +32,7 @@
 #include <vtkSMInputProperty.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMCompoundProxy.h>
-#include <vtkSphereSource.h>
+#include <vtkSMSourceProxy.h>
 
 class pqHistogramColorRange : public pqHistogramColor
 {
@@ -144,7 +144,11 @@ struct pqObjectHistogramWidget::pqImplementation
     vtkSMCompoundProxy* cp = vtkSMCompoundProxy::SafeDownCast(Proxy);
     if(cp)
       {
-        Proxy = cp->GetProxy(cp->GetNumberOfProxies()-1);
+        Proxy = NULL;
+        for(int i=cp->GetNumberOfProxies(); Proxy == NULL && i>0; i--)
+          {
+          Proxy = vtkSMSourceProxy::SafeDownCast(cp->GetProxy(i-1));
+          }
       }
     
     if(!Proxy)
