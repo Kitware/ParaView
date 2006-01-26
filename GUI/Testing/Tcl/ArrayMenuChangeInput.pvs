@@ -62,8 +62,8 @@ set kw(vtkTemp309) [$kw(vtkTemp273) GetPVOutput]
 #$kw(vtkTemp309) ColorByPointField {Normals} 3
 $kw(vtkTemp309) ColorByArray {Normals} 3
 set kw(vtkTemp310) [$kw(vtkTemp273) GetPVColorMap]
-$kw(vtkTemp310) VectorModeComponentCallback
-$kw(vtkTemp310) VectorComponentCallback 0
+$kw(vtkTemp310) SetVectorMode 1
+$kw(vtkTemp310) SetVectorComponent 0
 $kw(vtkTemp310) ResetScalarRange
 
 # Lets see if the array menu has the correct value.

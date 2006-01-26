@@ -76,7 +76,6 @@ public:
   // by this color map object.
   void SetScalarBarTitle(const char* Name);
   void SetScalarBarTitleNoTrace(const char* name);
-  vtkGetStringMacro(ScalarBarTitle);
 
   // Description:
   // This map is used for arrays with this name 
@@ -87,13 +86,11 @@ public:
   int MatchArrayName(const char* name, int numberOfComponents);
 
   void SetNumberOfVectorComponents(int num);
-  int GetNumberOfVectorComponents();
 
 
   // Description:
   // The format of the scalar bar labels.
   void SetScalarBarLabelFormat(const char* Name);
-  const char* GetScalarBarLabelFormat();
 
   // Description:
   // This method should be called immediately after the object is constructed.
@@ -111,7 +108,6 @@ public:
   // Descriptions:
   // Adds and removes scalar bar from renderer.
   void SetScalarBarVisibility(int val);
-  int GetScalarBarVisibility() { return this->ScalarBarVisibility;}  
 
   // Descriptions:
   // Set the position, the size, and orientation of scalar bar.
@@ -129,7 +125,6 @@ public:
   // Description:
   // Choose which component to color with.
   void SetVectorComponent(int component);
-  vtkGetMacro(VectorComponent,int);
 
   // Description:
   // Save out the mapper and actor to a file.
@@ -138,49 +133,20 @@ public:
   // --- UI Stuff ---
 
   // Description:
-  // Callbacks.
-  void ScalarBarCheckCallback();
-  void ScalarRangeWidgetCallback(double r0, double r1);
-  void LockCheckCallback(int state);
-
-  // Description:
   // Access for scripts.
   void SetScalarRangeLock(int val);
 
   // Description:
-  // This method returns the user to the source page.
-  // I would eventually like to replace this by 
-  // a more general back/forward ParaView navigation.
-  void BackButtonCallback();
-
-  // Description:
-  // This method is called when the user changes the name of the scalar bar.
-  void ScalarBarTitleEntryCallback();
-
-  // Description:
   // For setting the title suffix for vectors.
-  void ScalarBarVectorTitleEntryCallback();
   void SetScalarBarVectorTitle(const char* name);
 
   // Description:
-  // This method is called when the user changes the format of the scalar bar
-  // labels.
-  void ScalarBarLabelFormatEntryCallback();
-
-  // Description:
   // Callbacks to change the color map.
-  void StartColorButtonCallback(double r, double g, double b);
-  void EndColorButtonCallback(double r, double g, double b);
   void SetStartHSV(double h, double s, double v);
   void SetEndHSV(double h, double s, double v);
 
   // Description:
-  // Internal call used when the color map image changes shape.
-  void MapConfigureCallback(int width, int height);
-
-  // Description:
   // Called when the slider that select the resolution changes.
-  void NumberOfColorsScaleCallback(double value);
   void SetNumberOfColors(int num);
 
   // Description:
@@ -196,17 +162,6 @@ public:
   virtual void ExecuteEvent(vtkObject* wdg, unsigned long event,  
                             void* calldata);
 //ETX
-
-  // Description:
-  // GUI components access
-  vtkGetObjectMacro(ScalarBarCheck, vtkKWCheckButton);
-  vtkGetObjectMacro(TitleTextPropertyWidget, vtkPVTextPropertyEditor);
-  vtkGetObjectMacro(LabelTextPropertyWidget, vtkPVTextPropertyEditor);
-
-  // Call backs from the vector mode frame.
-  void VectorModeMagnitudeCallback();
-  void VectorModeComponentCallback();
-  void VectorComponentCallback(int component);
 
   // Description:
   // Data objects use this to "register" their use of the map.
@@ -231,27 +186,12 @@ public:
   // Description:
   // Sets the whole range of color map slider.
   void SetWholeScalarRange(double min, double max);
-  vtkGetVector2Macro(WholeScalarRange,double);
 
   // Description:
   // Sets the color range of all the mappers (all procs) and updates
   // the user interface as well.
   void SetScalarRange(double min, double max);
   void SetScalarRangeInternal(double min, double max);
-  vtkGetVector2Macro(ScalarRange,double);
-
-  // Description:
-  // Update the "enable" state of the object and its internal parts.
-  // Depending on different Ivars (this->Enabled, the application's 
-  // Limited Edition Mode, etc.), the "enable" state of the object is updated
-  // and propagated to its internal parts/subwidgets. This will, for example,
-  // enable/disable parts of the widget UI, enable/disable the visibility
-  // of 3D widgets, etc.
-  virtual void UpdateEnableState();
-
-  // Description:
-  // Callback when the text property for the title is changed
-  void TitleTextPropertyWidgetCallback();
 
   // Description:
   // Methods to modify the Title text property.
@@ -262,10 +202,6 @@ public:
   virtual void SetTitleItalic(int italic);
   virtual void SetTitleShadow(int shadow); 
   
-  // Description:
-  // Callback when the text property for the labels is changed
-  void LabelTextPropertyWidgetCallback();
-
   // Description:
   // Methods to modify the Labels text property.
   virtual void SetLabelColor(double r, double g, double b);
@@ -282,6 +218,40 @@ public:
   //  ScalarBarWidget:- vtkSMScalarBarWidgetProxy
   vtkSMProxy* GetProxyByName(const char* name);
 
+  // Description:
+  // Methods to access the scalar bar widget and lookup table from
+  // vtkPVColorMapUI
+  int GetScalarBarVisibility() { return this->ScalarBarVisibility;}  
+  int GetVectorMode() { return this->GetVectorModeInternal(); }
+  vtkGetMacro(VectorComponent,int);
+  int GetNumberOfVectorComponents();
+  vtkGetVector2Macro(WholeScalarRange,double);
+  vtkGetVector2Macro(ScalarRange,double);
+  vtkGetMacro(ScalarRangeLock, int);
+  vtkGetVector3Macro(StartColor, double);
+  vtkGetVector3Macro(EndColor, double);
+  unsigned char* GetMapData() { return this->MapData; }
+  int GetNumberOfColors();
+  vtkGetMacro(MapWidth, int);
+  vtkGetMacro(MapHeight, int);
+  vtkGetStringMacro(ScalarBarTitle);
+  vtkGetStringMacro(VectorMagnitudeTitle);
+  const char* GetVectorComponentTitle(int idx);
+  const char* GetScalarBarLabelFormat();
+  vtkGetObjectMacro(TitleTextProperty, vtkTextProperty);
+  vtkGetObjectMacro(LabelTextProperty, vtkTextProperty);
+  void UpdateMap(int width, int height);
+  void StartColorButtonCallback(double r, double g, double b);
+  void EndColorButtonCallback(double r, double g, double b);
+  void SetVectorMode(int mode);
+  void SetTitle(const char* name);  
+  void SetNumberOfLabels(int num);
+  void SetLowLookupTableValue(double color[3]);
+  void SetHighLookupTableValue(double color[3]);
+  void SetUseLowOutOfRangeColor(int val);
+  void SetUseHighOutOfRangeColor(int val);
+  int ComputeWholeScalarRange(double range[2]);
+
 protected:
   vtkPVColorMap();
   ~vtkPVColorMap();
@@ -289,7 +259,6 @@ protected:
   vtkPVColorMapObserver* ScalarBarObserver;
 
   void InitializeObservers();
-  void UpdateVectorComponentMenu();
   // Visibility depends on check and UseCount.
   void UpdateInternalScalarBarVisibility();
   void ComputeScalarRangeForSource(vtkPVSource* pvs, double* range);
@@ -307,47 +276,12 @@ protected:
   double WholeScalarRange[2];
   int ScalarRangeLock;
   
-  // User interaface.
-  vtkKWFrameWithLabel* ColorMapFrame;
-  vtkKWLabel*        ArrayNameLabel;
-  // Stuff for setting the range of the color map.
-  vtkKWFrame*       ScalarRangeFrame;
-  vtkKWCheckButton*  ScalarRangeLockCheck;
-  vtkKWRange*        ScalarRangeWidget;
-  vtkKWScaleWithEntry* NumberOfColorsScale;
-  // Stuff for selecting start and end colors.
-  vtkKWFrame*            ColorEditorFrame;
-  vtkKWChangeColorButton* StartColorButton;
-  vtkKWLabel*        Map;
-  vtkKWChangeColorButton* EndColorButton;
-
-  vtkKWFrameWithLabel* VectorFrame;
-  vtkKWMenuButton*   VectorModeMenu;
-  vtkKWMenuButton*   VectorComponentMenu;
-  vtkKWEntry*        ScalarBarVectorTitleEntry;
-
-  vtkKWFrameWithLabel* ScalarBarFrame;
-  vtkKWCheckButton*  ScalarBarCheck;
-  vtkKWFrame*        ScalarBarTitleFrame;
-  vtkKWLabel*        ScalarBarTitleLabel;
-  vtkKWEntry*        ScalarBarTitleEntry;
-  vtkKWFrame*        ScalarBarLabelFormatFrame;
-  vtkKWLabel*        ScalarBarLabelFormatLabel;
-  vtkKWEntry*        ScalarBarLabelFormatEntry;
-  
-  vtkPVTextPropertyEditor *TitleTextPropertyWidget;
-  vtkPVTextPropertyEditor *LabelTextPropertyWidget;
-  
   // For the map image.
   unsigned char *MapData;
   int MapDataSize;
   int MapWidth;
   int MapHeight;
-  void UpdateMap(int width, int height);
   void UpdateMap();
-
-  vtkKWMenuButton* PresetsMenuButton;  
-  vtkKWPushButton*   BackButton;
 
   vtkSMScalarBarWidgetProxy *ScalarBarProxy;
   char *ScalarBarProxyName;
@@ -371,6 +305,10 @@ protected:
   void UpdateScalarBarTitle();
   char* ArrayName; 
 
+  double StartColor[3];
+  double EndColor[3];
+  vtkSetVector3Macro(StartColor, double);
+  vtkSetVector3Macro(EndColor, double);
 
   // Description:
   // Get/Set the Title color from/to the Proxy
@@ -421,13 +359,8 @@ protected:
   void SetLabelShadowInternal(int shadow);
 
   // Description:
-  // Get/Set the complete Title for the Proxy
-  void SetTitleInternal(const char* name);
-  
-  // Description:
   // Get/Set the Vector mode from the Scalar bar Proxy
   int GetVectorModeInternal();
-  void SetVectorModeInternal(int mode);
 
   // Description:
   // Get/Set the Label format from the Scalarbar Proxy

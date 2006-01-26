@@ -126,19 +126,19 @@ set kw(vtkTemp426) [$kw(vtkTemp1) GetPVColorMap {RTData} 1]
 $kw(vtkTemp426) SetScalarRange 47.1256 265.206
 $kw(vtkTemp426) SetStartHSV 0.6667 1 1
 $kw(vtkTemp426) SetEndHSV 0 1 1
-$kw(vtkTemp426) VectorModeMagnitudeCallback
+$kw(vtkTemp426) SetVectorMode 0
 $kw(vtkTemp426) SetScalarBarVisibility 0
 set kw(vtkTemp834) [$kw(vtkTemp1) GetPVColorMap {Elevation} 1]
 $kw(vtkTemp834) SetScalarRange -0.974866 1
 $kw(vtkTemp834) SetStartHSV 0.6667 1 1
 $kw(vtkTemp834) SetEndHSV 0 1 1
-$kw(vtkTemp834) VectorModeMagnitudeCallback
+$kw(vtkTemp834) SetVectorMode 0
 $kw(vtkTemp834) SetScalarBarVisibility 0
 set kw(vtkTemp1507) [$kw(vtkTemp1) GetPVColorMap {ProcessId} 1]
 $kw(vtkTemp1507) ResetScalarRange
 $kw(vtkTemp1507) SetStartHSV 0.6667 1 1
 $kw(vtkTemp1507) SetEndHSV 0 1 1
-$kw(vtkTemp1507) VectorModeMagnitudeCallback
+$kw(vtkTemp1507) SetVectorMode 0
 $kw(vtkTemp1507) SetScalarBarVisibility 0
 $kw(vtkTemp24) SetRendererBackgroundColor 0.33 0.35 0.43
 $kw(vtkTemp24) ParallelProjectionOff

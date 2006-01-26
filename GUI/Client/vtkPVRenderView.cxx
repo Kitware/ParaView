@@ -48,11 +48,11 @@
 #include "vtkPVAxesWidget.h"
 #include "vtkPVCameraControl.h"
 #include "vtkPVCameraIcon.h"
+#include "vtkPVColorMapUI.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInteractorStyleControl.h"
 #include "vtkPVNavigationWindow.h"
-#include "vtkSMPart.h"
 #include "vtkProcessModule.h"
 #include "vtkPVRenderModuleUI.h"
 #include "vtkPVRenderView.h"
@@ -73,6 +73,7 @@
 #include "vtkPVTraceHelper.h"
 #include "vtkKWEntry.h"
 #include "vtkLightKit.h"
+#include "vtkSMPart.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProperty.h"
@@ -142,7 +143,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.411");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.412");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -237,6 +238,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->OrientationAxesOutlineColor = vtkKWChangeColorButton::New();
   this->OrientationAxesTextColor = vtkKWChangeColorButton::New();
   this->OrientationAxes = vtkPVAxesWidget::New();
+
+  this->ColorMapUI = vtkPVColorMapUI::New();
 
   for ( cc = 0; cc < 6; cc ++ )
     {
@@ -395,7 +398,9 @@ vtkPVRenderView::~vtkPVRenderView()
   this->OrientationAxesOutlineColor->Delete();
   this->OrientationAxesTextColor->Delete();
   this->OrientationAxes->Delete();
-  
+
+  this->ColorMapUI->Delete();
+
   if ( this->SelectionWindow )
     {
     this->SelectionWindow->Delete();
@@ -1681,6 +1686,12 @@ void vtkPVRenderView::CreateViewProperties()
     this->OrientationAxes->SetViewport(0, 0, 0.2, 0.2);
     }
   
+  // Scalar Color Bar
+  this->ColorMapUI->SetParent(this->AnnotationPropertiesFrame->GetFrame());
+  this->ColorMapUI->Create();
+  this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
+               this->ColorMapUI->GetWidgetName());
+
   // Camera settings
   this->Notebook->AddPage("Camera", 
                           "Camera and viewing navigation properties page");
@@ -3296,6 +3307,7 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
     os << "(none)" << endl;
     }
   os << indent << "RenderModuleProxy: " << this->RenderModuleProxy << endl;
+  os << indent << "ColorMapUI: " << this->ColorMapUI << endl;
 }
 
 //----------------------------------------------------------------------------

@@ -58,11 +58,29 @@ public:
  
   virtual void SaveInBatchScript(ofstream* file);
 
+  // Description:
+  // Set whether to use a separate color for values outside the lookup table's
+  // range.
+  vtkSetMacro(UseLowOutOfRangeColor, int);
+  vtkBooleanMacro(UseLowOutOfRangeColor, int);
+  vtkSetMacro(UseHighOutOfRangeColor, int);
+  vtkBooleanMacro(UseHighOutOfRangeColor, int);
+
+  // Description:
+  // Set the colors to use for values outside the range of the lookup table.
+  vtkSetVector3Macro(LowOutOfRangeColor, double);
+  vtkSetVector3Macro(HighOutOfRangeColor, double);
+
 protected:
   vtkSMLookupTableProxy();
   ~vtkSMLookupTableProxy();
 
   char* ArrayName;
+
+  int UseLowOutOfRangeColor;
+  int UseHighOutOfRangeColor;
+  double LowOutOfRangeColor[3];
+  double HighOutOfRangeColor[3];
 
 private:
   vtkSMLookupTableProxy(const vtkSMLookupTableProxy&); // Not implemented

@@ -137,7 +137,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.779");
+vtkCxxRevisionMacro(vtkPVWindow, "1.780");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -3949,6 +3949,7 @@ void vtkPVWindow::ShowCurrentSourceProperties()
 
   this->GetCurrentPVSource()->ResetCallback();
   this->GetCurrentPVSource()->Pack();
+  this->GetCurrentPVSource()->GetPVOutput()->Update();
 }
 
 //----------------------------------------------------------------------------

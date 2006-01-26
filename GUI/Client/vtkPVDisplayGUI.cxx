@@ -47,6 +47,7 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVColorMap.h"
+#include "vtkPVColorMapUI.h"
 #include "vtkPVColorSelectionWidget.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
@@ -96,7 +97,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.56");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.57");
 
 //----------------------------------------------------------------------------
 
@@ -1067,18 +1068,9 @@ void vtkPVDisplayGUI::Create()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::EditColorMapCallback()
 {
-  if (this->PVSource == 0 || this->PVSource->GetPVColorMap() == 0)
-    {
-    // We could get the color map from the window,
-    // but it must already be set for this button to be visible.
-    vtkErrorMacro("Expecting a color map.");
-    return;
-    }
-  this->Script("pack forget [pack slaves %s]",
-          this->GetPVRenderView()->GetPropertiesParent()->GetWidgetName());
-          
-  this->Script("pack %s -side top -fill both -expand t",
-          this->PVSource->GetPVColorMap()->GetWidgetName());
+  vtkPVRenderView *rv = this->GetPVRenderView();
+  rv->ShowViewProperties();
+  rv->GetNotebook()->RaisePage("Annotate");
 }
 
 //----------------------------------------------------------------------------
@@ -2130,8 +2122,14 @@ void vtkPVDisplayGUI::ScalarBarCheckCallback()
     vtkErrorMacro("Cannot find the color map.");
     return;
     }
-  this->PVSource->GetPVColorMap()->SetScalarBarVisibility(
-          this->ScalarBarCheck->GetSelectedState());
+  int state = this->ScalarBarCheck->GetSelectedState();
+  this->PVSource->GetPVColorMap()->SetScalarBarVisibility(state);
+  if (this->GetPVRenderView()->GetColorMapUI()->GetCurrentColorMap() ==
+      this->PVSource->GetPVColorMap())
+    {
+    this->GetPVRenderView()->GetColorMapUI()->VisibilityCheckCallback(state);
+    }
+
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();

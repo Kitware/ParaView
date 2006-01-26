@@ -37,6 +37,7 @@ class vtkKWPushButton;
 class vtkKWRadioButton;
 class vtkKWScaleWithEntry;
 class vtkKWTopLevel;
+class vtkPVColorMapUI;
 class vtkPVSourceNotebook;
 class vtkKWSplitFrame;
 class vtkMultiProcessController;
@@ -363,6 +364,7 @@ public:
   void              SetLightNoTrace(int type, int subtype, double value);
   void              SetLight(int type, int subtype, double value);
 
+  vtkGetObjectMacro(ColorMapUI, vtkPVColorMapUI);
 
 protected:
   vtkPVRenderView();
@@ -421,6 +423,8 @@ protected:
   vtkKWChangeColorButton *OrientationAxesOutlineColor;
   vtkKWChangeColorButton *OrientationAxesTextColor;
   vtkPVAxesWidget *OrientationAxes;
+
+  vtkPVColorMapUI *ColorMapUI;
 
   vtkKWSplitFrame *SplitFrame;
 

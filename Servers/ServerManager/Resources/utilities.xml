@@ -1400,6 +1400,14 @@
         animateable="0">
       </StringVectorProperty>
 
+      <IntVectorProperty
+        name="NumberOfLabels"
+        command="SetNumberOfLabels"
+        number_of_elements="1"
+        default_values="5">
+       <IntRangeDomain name="range" min="2"/>
+      </IntVectorProperty>
+
       <!--label text property -->
       <SubProxy>
         <Proxy name="LabelTextProperty"
