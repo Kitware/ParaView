@@ -39,9 +39,22 @@
 #endif
 
 #include <vtksys/stl/string>
+#include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.123");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.124");
+
+//----------------------------------------------------------------------------
+class vtkKWRenderWidgetInternals
+{
+public:
+
+  typedef vtksys_stl::vector<vtkRenderer*> RendererPoolType;
+  typedef vtksys_stl::vector<vtkRenderer*>::iterator RendererPoolIterator;
+
+  RendererPoolType RendererPool;
+  RendererPoolType OverlayRendererPool;
+};
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Register(vtkObjectBase* o)
@@ -58,24 +71,16 @@ void vtkKWRenderWidget::UnRegister(vtkObjectBase* o)
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
 {
+  this->Internals = new vtkKWRenderWidgetInternals;
+
   // The vtkTkRenderWidget
 
   this->VTKWidget = vtkKWCoreWidget::New();
 
-  // Create two renderers by default (main one and overlay)
-
-  this->Renderer = vtkRenderer::New();
-  this->Renderer->SetLayer(0);
-
-  this->OverlayRenderer = vtkRenderer::New();
-  this->OverlayRenderer->SetLayer(1);
-
-  // Create a render window and add two renderers
+  // Create a render window
 
   this->RenderWindow = vtkRenderWindow::New();
   this->RenderWindow->SetNumberOfLayers(2);
-  this->RenderWindow->AddRenderer(this->OverlayRenderer);
-  this->RenderWindow->AddRenderer(this->Renderer);
 
   // Create a default (generic) interactor, which is pretty much
   // the only way to interact with a VTK Tk render widget
@@ -120,19 +125,6 @@ vtkKWRenderWidget::vtkKWRenderWidget()
 
   this->DistanceUnits = NULL;
 
-  // Get the camera, use it in overlay renderer too
-
-  vtkCamera *cam = this->Renderer->GetActiveCamera();
-  if (cam)
-    {
-    cam->ParallelProjectionOn();
-    }
-
-  if (this->OverlayRenderer)
-    {
-    this->OverlayRenderer->SetActiveCamera(cam);
-    }
-
   // Current state (render mode, in expose, printing, etc)
 
   this->RenderMode         = vtkKWRenderWidget::StillRender;
@@ -153,17 +145,14 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
 {
   this->Close();
 
-  if (this->Renderer)
-    {
-    this->Renderer->Delete();
-    this->Renderer = NULL;
-    }
+  // Remove all renderers
 
-  if (this->OverlayRenderer)
-    {
-    this->OverlayRenderer->Delete();
-    this->OverlayRenderer = NULL;
-    }
+  this->RemoveAllRenderers();
+  this->RemoveAllOverlayRenderers();
+
+  // Delete our pool
+
+  delete this->Internals;
 
   if (this->RenderWindow)
     {
@@ -213,37 +202,486 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
 }
 
 //----------------------------------------------------------------------------
-vtkRenderer* vtkKWRenderWidget::GetNthRenderer(int id)
+void vtkKWRenderWidget::Create()
 {
-  if (id != 0)
+  // Check if already created
+
+  if (this->IsCreated())
+    {
+    vtkErrorMacro(<< this->GetClassName() << " already created");
+    return;
+    }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create();
+  
+  // Create the default renderers
+
+  this->CreateDefaultRenderers();
+
+  // Get the first renderer camera, set it to parallel
+  // then make sure all renderers use the same
+
+  vtkRenderer *ren = this->GetNthRenderer(0);
+  if (ren)
+    {
+    vtkCamera *cam = ren->GetActiveCamera();
+    if (cam)
+      {
+      cam->ParallelProjectionOn();
+      int i, nb_renderers = this->GetNumberOfRenderers();
+      for (i = 1; i < nb_renderers; i++)
+        {
+        ren = this->GetNthRenderer(i);
+        if (ren)
+          {
+          ren->SetActiveCamera(cam);
+          }
+        }
+      nb_renderers = this->GetNumberOfOverlayRenderers();
+      for (i = 0; i < nb_renderers; i++)
+        {
+        ren = this->GetNthOverlayRenderer(i);
+        if (ren)
+          {
+          ren->SetActiveCamera(cam);
+          }
+        }
+      }
+    }
+
+  // Install the renderers
+
+  this->InstallRenderers();
+
+  // Create the VTK Tk render widget in VTKWidget
+
+  char opts[256];
+  sprintf(opts, "-rw Addr=%p", this->RenderWindow);
+
+  this->VTKWidget->SetParent(this);
+  this->VTKWidget->CreateSpecificTkWidget("vtkTkRenderWidget", opts);
+
+  this->Script("grid rowconfigure %s 0 -weight 1", this->GetWidgetName());
+  this->Script("grid columnconfigure %s 0 -weight 1", this->GetWidgetName());
+  this->Script("grid %s -row 0 -column 0 -sticky nsew", 
+               this->VTKWidget->GetWidgetName());
+  
+  // When the render window is created by the Tk render widget, it
+  // is Render()'ed, which calls Initialize() on the interactor, which
+  // always reset its Enable state.
+
+  // Make the corner annotation visibile
+
+  this->SetCornerAnnotationVisibility(1);
+
+  // Add the bindings
+
+  this->AddBindings();
+
+  // Update enable state
+
+  this->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::CreateDefaultRenderers()
+{
+  // Create two renderers by default (main one and overlay)
+
+  if (this->GetNumberOfRenderers() <= 0)
+    {
+    vtkRenderer *renderer = vtkRenderer::New();
+    this->AddRenderer(renderer);
+    renderer->Delete();
+    }
+ 
+  if (this->GetNumberOfOverlayRenderers() <= 0)
+    {
+    vtkRenderer *renderer = vtkRenderer::New();
+    this->AddOverlayRenderer(renderer);
+    renderer->Delete();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::InstallRenderers()
+{
+  if (!this->RenderWindow)
+    {
+    return;
+    }
+
+  this->RenderWindow->GetRenderers()->RemoveAllItems();
+
+  int i, nb_renderers = this->GetNumberOfOverlayRenderers();
+  for (i = 0; i < nb_renderers; i++)
+    {
+    vtkRenderer *renderer = this->GetNthOverlayRenderer(i);
+    if (renderer)
+      {
+      this->RenderWindow->AddRenderer(renderer);
+      }
+    }
+
+  nb_renderers = this->GetNumberOfRenderers();
+  for (i = 0; i < nb_renderers; i++)
+    {
+    vtkRenderer *renderer = this->GetNthRenderer(i);
+    if (renderer)
+      {
+      this->RenderWindow->AddRenderer(renderer);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkRenderer* vtkKWRenderWidget::GetNthRenderer(int index)
+{
+  if (index < 0 || index >= this->GetNumberOfRenderers())
     {
     return NULL;
     }
 
-  return this->Renderer;
+  return this->Internals->RendererPool[index];
 }
 
 //----------------------------------------------------------------------------
 int vtkKWRenderWidget::GetNumberOfRenderers()
 {
-  return 1;
+  return this->Internals->RendererPool.size();
 }
 
 //----------------------------------------------------------------------------
 int vtkKWRenderWidget::GetRendererIndex(vtkRenderer *ren)
 {
-  if (!ren || ren != this->Renderer)
+  vtkKWRenderWidgetInternals::RendererPoolIterator it = 
+    this->Internals->RendererPool.begin();
+  vtkKWRenderWidgetInternals::RendererPoolIterator end = 
+    this->Internals->RendererPool.end();
+  int rank = 0;
+  for (; it != end; ++it, ++rank)
     {
-    return -1;
+    if (*it == ren)
+      {
+      return rank;
+      }
     }
 
+  return -1;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::AddRenderer(vtkRenderer *ren)
+{
+  if (this->GetRendererIndex(ren) >= 0)
+    {
+    return;
+    }
+
+  ren->SetLayer(0);
+  this->Internals->RendererPool.push_back(ren);
+  ren->Register(this);
+
+  this->InstallRenderers();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::RemoveRenderer(vtkRenderer *ren)
+{
+  this->RemoveNthRenderer(this->GetRendererIndex(ren));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::RemoveNthRenderer(int index)
+{
+  if (index < 0 || index >= this->GetNumberOfRenderers())
+    {
+    return;
+    }
+
+  vtkKWRenderWidgetInternals::RendererPoolIterator it = 
+    this->Internals->RendererPool.begin() + index;
+  (*it)->RemoveAllViewProps();
+  (*it)->Delete();
+  this->Internals->RendererPool.erase(it);
+  this->InstallRenderers();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::RemoveAllRenderers()
+{
+  vtkKWRenderWidgetInternals::RendererPoolIterator it = 
+    this->Internals->RendererPool.begin();
+  vtkKWRenderWidgetInternals::RendererPoolIterator end = 
+    this->Internals->RendererPool.end();
+  for (; it != end; ++it)
+    {
+    (*it)->RemoveAllViewProps();
+    (*it)->Delete();
+    }
+    
+  this->Internals->RendererPool.clear();
+
+  this->InstallRenderers();
+}
+
+//----------------------------------------------------------------------------
+vtkRenderer* vtkKWRenderWidget::GetNthOverlayRenderer(int index)
+{
+  if (index < 0 || index >= this->GetNumberOfOverlayRenderers())
+    {
+    return NULL;
+    }
+
+  return this->Internals->OverlayRendererPool[index];
+}
+
+//----------------------------------------------------------------------------
+int vtkKWRenderWidget::GetNumberOfOverlayRenderers()
+{
+  return this->Internals->OverlayRendererPool.size();
+}
+
+//----------------------------------------------------------------------------
+int vtkKWRenderWidget::GetOverlayRendererIndex(vtkRenderer *ren)
+{
+  vtkKWRenderWidgetInternals::RendererPoolIterator it = 
+    this->Internals->OverlayRendererPool.begin();
+  vtkKWRenderWidgetInternals::RendererPoolIterator end = 
+    this->Internals->OverlayRendererPool.end();
+  int rank = 0;
+  for (; it != end; ++it, ++rank)
+    {
+    if (*it == ren)
+      {
+      return rank;
+      }
+    }
+
+  return -1;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::AddOverlayRenderer(vtkRenderer *ren)
+{
+  if (this->GetOverlayRendererIndex(ren) >= 0)
+    {
+    return;
+    }
+
+  ren->SetLayer(1);
+  this->Internals->OverlayRendererPool.push_back(ren);
+  ren->Register(this);
+
+  this->InstallRenderers();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::RemoveOverlayRenderer(vtkRenderer *ren)
+{
+  this->RemoveNthOverlayRenderer(this->GetOverlayRendererIndex(ren));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::RemoveNthOverlayRenderer(int index)
+{
+  if (index < 0 || index >= this->GetNumberOfOverlayRenderers())
+    {
+    return;
+    }
+
+  vtkKWRenderWidgetInternals::RendererPoolIterator it = 
+    this->Internals->OverlayRendererPool.begin() + index;
+  (*it)->RemoveAllViewProps();
+  (*it)->Delete();
+  this->Internals->OverlayRendererPool.erase(it);
+  this->InstallRenderers();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::RemoveAllOverlayRenderers()
+{
+  vtkKWRenderWidgetInternals::RendererPoolIterator it = 
+    this->Internals->OverlayRendererPool.begin();
+  vtkKWRenderWidgetInternals::RendererPoolIterator end = 
+    this->Internals->OverlayRendererPool.end();
+  for (; it != end; ++it)
+    {
+    (*it)->RemoveAllViewProps();
+    (*it)->Delete();
+    }
+    
+  this->Internals->OverlayRendererPool.clear();
+  this->InstallRenderers();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::SetRendererBackgroundColor(double r, double g, double b)
+{
+  double color[3];
+  this->GetRendererBackgroundColor(color, color + 1, color + 2);
+  if (color[0] == r && color[1] == g && color[2] == b)
+    {
+    return;
+    }
+
+  if (r < 0 || g < 0 || b < 0)
+    {
+    return;
+    }
+  
+  int nb_renderers = this->GetNumberOfRenderers();
+  for (int i = 0; i < nb_renderers; i++)
+    {
+    vtkRenderer *renderer = this->GetNthRenderer(i);
+    if (renderer)
+      {
+      renderer->SetBackground(r, g, b);
+      }
+    }
+
+  this->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::GetRendererBackgroundColor(double *r, double *g, double *b)
+{
+  int nb_renderers = this->GetNumberOfRenderers();
+  for (int i = 0; i < nb_renderers; i++)
+    {
+    vtkRenderer *renderer = this->GetNthRenderer(i);
+    if (renderer)
+      {
+      renderer->GetBackground(*r, *g, *b);
+      return;
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::AddViewProp(vtkProp *prop)
+{
+  int i, nb_renderers = this->GetNumberOfRenderers();
+  for (i = 0; i < nb_renderers; i++)
+    {
+    vtkRenderer *renderer = this->GetNthRenderer(i);
+    if (renderer)
+      {
+      renderer->AddViewProp(prop);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::AddViewPropToNthRenderer(vtkProp *p, int index)
+{
+  vtkRenderer *ren = this->GetNthRenderer(index);
+  if (ren && !ren->GetViewProps()->IsItemPresent(p))
+    {
+    ren->AddViewProp(p);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::AddOverlayViewProp(vtkProp *prop)
+{
+  int i, nb_renderers = this->GetNumberOfOverlayRenderers();
+  for (i = 0; i < nb_renderers; i++)
+    {
+    vtkRenderer *renderer = this->GetNthOverlayRenderer(i);
+    if (renderer)
+      {
+      renderer->AddViewProp(prop);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::AddViewPropToNthOverlayRenderer(vtkProp *p, int index)
+{
+  vtkRenderer *ren = this->GetNthOverlayRenderer(index);
+  if (ren && !ren->GetViewProps()->IsItemPresent(p))
+    {
+    ren->AddViewProp(p);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWRenderWidget::HasViewProp(vtkProp *prop)
+{
+  int i, nb_renderers = this->GetNumberOfRenderers();
+  for (i = 0; i < nb_renderers; i++)
+    {
+    vtkRenderer *renderer = this->GetNthRenderer(i);
+    if (renderer && renderer->GetViewProps()->IsItemPresent(prop))
+      {
+      return 1;
+      }
+    }
+
+  nb_renderers = this->GetNumberOfOverlayRenderers();
+  for (i = 0; i < nb_renderers; i++)
+    {
+    vtkRenderer *renderer = this->GetNthOverlayRenderer(i);
+    if (renderer && renderer->GetViewProps()->IsItemPresent(prop))
+      {
+      return 1;
+      }
+    }
+  
   return 0;
 }
 
 //----------------------------------------------------------------------------
-vtkRenderer* vtkKWRenderWidget::GetOverlayRenderer()
+void vtkKWRenderWidget::RemoveViewProp(vtkProp* prop)
 {
-  return this->OverlayRenderer;
+  // safe to call both, vtkViewport does a check first
+
+  int i, nb_renderers = this->GetNumberOfRenderers();
+  for (i = 0; i < nb_renderers; i++)
+    {
+    vtkRenderer *renderer = this->GetNthRenderer(i);
+    if (renderer)
+      {
+      renderer->RemoveViewProp(prop);
+      }
+    }
+
+  nb_renderers = this->GetNumberOfOverlayRenderers();
+  for (i = 0; i < nb_renderers; i++)
+    {
+    vtkRenderer *renderer = this->GetNthOverlayRenderer(i);
+    if (renderer)
+      {
+      renderer->RemoveViewProp(prop);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::RemoveAllViewProps()
+{
+  int i, nb_renderers = this->GetNumberOfRenderers();
+  for (i = 0; i < nb_renderers; i++)
+    {
+    vtkRenderer *renderer = this->GetNthRenderer(i);
+    if (renderer)
+      {
+      renderer->RemoveAllViewProps();
+      }
+    }
+
+  nb_renderers = this->GetNumberOfOverlayRenderers();
+  for (i = 0; i < nb_renderers; i++)
+    {
+    vtkRenderer *renderer = this->GetNthOverlayRenderer(i);
+    if (renderer)
+      {
+      renderer->RemoveAllViewProps();
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -288,51 +726,6 @@ void vtkKWRenderWidget::SetDistanceUnits(const char* _arg)
   
   this->UpdateAccordingToUnits();
 } 
-
-//----------------------------------------------------------------------------
-void vtkKWRenderWidget::Create()
-{
-  // Check if already created
-
-  if (this->IsCreated())
-    {
-    vtkErrorMacro(<< this->GetClassName() << " already created");
-    return;
-    }
-
-  // Call the superclass to create the whole widget
-
-  this->Superclass::Create();
-  
-  // Create the VTK Tk render widget in VTKWidget
-
-  char opts[256];
-  sprintf(opts, "-rw Addr=%p", this->RenderWindow);
-
-  this->VTKWidget->SetParent(this);
-  this->VTKWidget->CreateSpecificTkWidget("vtkTkRenderWidget", opts);
-
-  this->Script("grid rowconfigure %s 0 -weight 1", this->GetWidgetName());
-  this->Script("grid columnconfigure %s 0 -weight 1", this->GetWidgetName());
-  this->Script("grid %s -row 0 -column 0 -sticky nsew", 
-               this->VTKWidget->GetWidgetName());
-  
-  // When the render window is created by the Tk render widget, it
-  // is Render()'ed, which calls Initialize() on the interactor, which
-  // always reset its Enable state.
-
-  // Make the corner annotation visibile
-
-  this->SetCornerAnnotationVisibility(1);
-
-  // Add the bindings
-
-  this->AddBindings();
-
-  // Update enable state
-
-  this->UpdateEnableState();
-}
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::AddBindings()
@@ -959,129 +1352,6 @@ void vtkKWRenderWidget::ResumeScreenRendering()
   vtkWin32OpenGLRenderWindow::
     SafeDownCast(this->RenderWindow)->ResumeScreenRendering();
 #endif
-}
-
-//----------------------------------------------------------------------------
-void vtkKWRenderWidget::AddViewProp(vtkProp *prop)
-{
-  int i, nb_renderers = this->GetNumberOfRenderers();
-  for (i = 0; i < nb_renderers; i++)
-    {
-    vtkRenderer *renderer = this->GetNthRenderer(i);
-    if (renderer)
-      {
-      renderer->AddViewProp(prop);
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWRenderWidget::AddOverlayViewProp(vtkProp *prop)
-{
-  vtkRenderer *overlay_ren = this->GetOverlayRenderer();
-  if (overlay_ren)
-    {
-    overlay_ren->AddViewProp(prop);
-    }
-}
-
-//----------------------------------------------------------------------------
-int vtkKWRenderWidget::HasViewProp(vtkProp *prop)
-{
-  vtkRenderer *ren = this->GetRenderer();
-  vtkRenderer *overlay_ren = this->GetOverlayRenderer();
-  if ((ren && ren->GetViewProps()->IsItemPresent(prop)) ||
-      (overlay_ren && overlay_ren->GetViewProps()->IsItemPresent(prop)))
-    {
-    return 1;
-    }
-  
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWRenderWidget::RemoveViewProp(vtkProp* prop)
-{
-  // safe to call both, vtkViewport does a check first
-
-  int i, nb_renderers = this->GetNumberOfRenderers();
-  for (i = 0; i < nb_renderers; i++)
-    {
-    vtkRenderer *renderer = this->GetNthRenderer(i);
-    if (renderer)
-      {
-      renderer->RemoveViewProp(prop);
-      }
-    }
-
-  vtkRenderer *overlay_ren = this->GetOverlayRenderer();
-  if (overlay_ren)
-    {
-    overlay_ren->RemoveViewProp(prop);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWRenderWidget::RemoveAllViewProps()
-{
-  int i, nb_renderers = this->GetNumberOfRenderers();
-  for (i = 0; i < nb_renderers; i++)
-    {
-    vtkRenderer *renderer = this->GetNthRenderer(i);
-    if (renderer)
-      {
-      renderer->RemoveAllViewProps();
-      }
-    }
-
-  vtkRenderer *overlay_ren = this->GetOverlayRenderer();
-  if (overlay_ren)
-    {
-    overlay_ren->RemoveAllViewProps();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetRendererBackgroundColor(double r, double g, double b)
-{
-  double color[3];
-  this->GetRendererBackgroundColor(color, color + 1, color + 2);
-  if (color[0] == r && color[1] == g && color[2] == b)
-    {
-    return;
-    }
-
-  if (r < 0 || g < 0 || b < 0)
-    {
-    return;
-    }
-  
-  int nb_renderers = this->GetNumberOfRenderers();
-  for (int i = 0; i < nb_renderers; i++)
-    {
-    vtkRenderer *renderer = this->GetNthRenderer(i);
-    if (renderer)
-      {
-      renderer->SetBackground(r, g, b);
-      }
-    }
-
-  this->Render();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWRenderWidget::GetRendererBackgroundColor(double *r, double *g, double *b)
-{
-  int nb_renderers = this->GetNumberOfRenderers();
-  for (int i = 0; i < nb_renderers; i++)
-    {
-    vtkRenderer *renderer = this->GetNthRenderer(i);
-    if (renderer)
-      {
-      renderer->GetBackground(*r, *g, *b);
-      return;
-      }
-    }
 }
 
 //----------------------------------------------------------------------------
