@@ -393,6 +393,9 @@ pqMainWindow::pqMainWindow() :
   this->CompoundProxyToolBar = new QToolBar(tr("Compound Proxies"), this) << pqSetName("CompoundProxyToolBar");
   this->addToolBar(Qt::TopToolBarArea, this->CompoundProxyToolBar);
   this->connect(this->CompoundProxyToolBar, SIGNAL(actionTriggered(QAction*)), SLOT(onCreateCompoundProxy(QAction*)));
+
+  // Work around for file new crash.
+  this->PipelineList->setFocus();
 }
 
 pqMainWindow::~pqMainWindow()

@@ -38,7 +38,7 @@ pqMultiView::~pqMultiView()
 {
 }
 
-void pqMultiView::reset(QList<QWidget*> &removed)
+void pqMultiView::reset(QList<QWidget*> &removed, QWidget *newWidget)
 {
   // Remove all the widgets. Put them in the list. Then clean
   // up all the extra splitters.
@@ -59,7 +59,14 @@ void pqMultiView::reset(QList<QWidget*> &removed)
       }
 
     splitter->refresh();
-    splitter->addWidget(makeNewFrame());
+    if(newWidget)
+      {
+      splitter->addWidget(newWidget);
+      }
+    else
+      {
+      splitter->addWidget(makeNewFrame());
+      }
     }
 }
 

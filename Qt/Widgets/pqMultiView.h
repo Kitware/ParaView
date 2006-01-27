@@ -21,7 +21,9 @@ public:
   /// \brief
   ///   Resets the multi-view to its original state.
   /// \param removed Used to return all the removed widgets.
-  virtual void reset(QList<QWidget*> &removed);
+  /// \param newWidget The new main widget for the reset multi-view.
+  ///   If no widget is passed in, the default frame will be used.
+  virtual void reset(QList<QWidget*> &removed, QWidget *newWidget=0);
 
   /// replace a widget at index with a new widget, returns the old one
   virtual QWidget* replaceView(Index index, QWidget* widget);

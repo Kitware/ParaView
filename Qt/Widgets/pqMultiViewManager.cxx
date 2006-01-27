@@ -37,12 +37,9 @@ pqMultiViewManager::~pqMultiViewManager()
 
 void pqMultiViewManager::reset(QList<QWidget*> &removed)
 {
-  pqMultiView::reset(removed);
-
-  // Replace the default view with a multi-view frame.
+  // Create a new multi-view frame for the reset view.
   pqMultiViewFrame* frame = new pqMultiViewFrame();
-  QWidget *old = this->replaceView(pqMultiView::Index(), frame);
-  delete old;
+  pqMultiView::reset(removed, frame);
   this->setup(frame);
 }
 
