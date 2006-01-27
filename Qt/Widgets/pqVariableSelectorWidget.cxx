@@ -69,6 +69,10 @@ void pqVariableSelectorWidget::clear()
 
 void pqVariableSelectorWidget::addVariable(pqVariableType type, const QString& name)
 {
+  // Don't allow duplicates to creep in ...
+  if(-1 != this->Variables->findData(this->variableData(type, name)))
+    return;
+
   switch(type)
     {
     case VARIABLE_TYPE_NODE:
