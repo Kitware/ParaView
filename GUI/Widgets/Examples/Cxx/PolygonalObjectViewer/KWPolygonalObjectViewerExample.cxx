@@ -1,12 +1,13 @@
 #include "vtkActor.h"
 #include "vtkKWApplication.h"
-#include "vtkKWFrame.h"
-#include "vtkGenericRenderWindowInteractor.h"
+#include "vtkKWFrameWithLabel.h"
 #include "vtkKWRenderWidget.h"
-#include "vtkKWWindowBase.h"
+#include "vtkKWSurfaceMaterialPropertyWidget.h"
+#include "vtkKWWindow.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderWindow.h"
 #include "vtkXMLPolyDataReader.h"
+#include "vtkKWSimpleAnimationWidget.h"
 
 #include "vtkKWWidgetsPaths.h"
 
@@ -56,10 +57,11 @@ int my_main(int argc, char *argv[])
   // Add a window
   // Set 'SupportHelp' to automatically add a menu entry for the help link
 
-  vtkKWWindowBase *win = vtkKWWindowBase::New();
+  vtkKWWindow *win = vtkKWWindow::New();
   win->SupportHelpOn();
   app->AddWindow(win);
   win->Create();
+  win->SecondaryPanelVisibilityOff();
 
   // Add a render widget, attach it to the view frame, and pack
   
@@ -97,6 +99,40 @@ int my_main(int argc, char *argv[])
   rw->AddViewProp(actor);
   rw->ResetCamera();
 
+  // Create a material property editor
+
+  vtkKWSurfaceMaterialPropertyWidget *mat_prop_widget = 
+    vtkKWSurfaceMaterialPropertyWidget::New();
+  mat_prop_widget->SetParent(win->GetMainPanelFrame());
+  mat_prop_widget->Create();
+  mat_prop_widget->SetPropertyChangedCommand(rw, "Render");
+  mat_prop_widget->SetPropertyChangingCommand(rw, "Render");
+
+  mat_prop_widget->SetProperty(actor->GetProperty());
+
+  app->Script("pack %s -side top -anchor nw -expand n -fill x",
+              mat_prop_widget->GetWidgetName());
+
+  // Create a simple animation widget
+
+  vtkKWFrameWithLabel *animation_frame = vtkKWFrameWithLabel::New();
+  animation_frame->SetParent(win->GetMainPanelFrame());
+  animation_frame->Create();
+  animation_frame->SetLabelText("Movie Creator");
+
+  app->Script("pack %s -side top -anchor nw -expand n -fill x -pady 2",
+              animation_frame->GetWidgetName());
+
+  vtkKWSimpleAnimationWidget *animation_widget = 
+    vtkKWSimpleAnimationWidget::New();
+  animation_widget->SetParent(animation_frame->GetFrame());
+  animation_widget->Create();
+  animation_widget->SetRenderWidget(rw);
+  animation_widget->SetAnimationTypeToCamera();
+
+  app->Script("pack %s -side top -anchor nw -expand n -fill x",
+              animation_widget->GetWidgetName());
+
   // Start the application
   // If --test was provided, do not enter the event loop and run this example
   // as a non-interactive test for software quality purposes.
@@ -112,6 +148,9 @@ int my_main(int argc, char *argv[])
 
   // Deallocate and exit
 
+  mat_prop_widget->Delete();
+  animation_frame->Delete();
+  animation_widget->Delete();
   reader->Delete();
   actor->Delete();
   mapper->Delete();

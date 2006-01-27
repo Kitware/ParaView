@@ -30,10 +30,11 @@ $app SetHelpDialogStartingPage "http://www.kwwidgets.org"
 # Add a window
 # Set 'SupportHelp' to automatically add a menu entry for the help link
 
-set win [vtkKWWindowBase New]
+set win [vtkKWWindow New]
 $win SupportHelpOn
 $app AddWindow $win
 $win Create
+$win SecondaryPanelVisibilityOff
 
 # Add a render widget, attach it to the view frame, and pack
 
@@ -63,6 +64,35 @@ $actor SetMapper $mapper
 $rw AddViewProp $actor
 $rw ResetCamera
 
+# Create a material property editor
+
+set mat_prop_widget [vtkKWSurfaceMaterialPropertyWidget New]
+$mat_prop_widget SetParent [$win GetMainPanelFrame]
+$mat_prop_widget Create
+$mat_prop_widget SetPropertyChangedCommand $rw "Render"
+$mat_prop_widget SetPropertyChangingCommand $rw "Render"
+
+$mat_prop_widget SetProperty [$actor GetProperty]
+
+pack [$mat_prop_widget GetWidgetName] -side top -anchor nw -expand n -fill x
+
+# Create a simple animation widget
+
+set animation_frame [vtkKWFrameWithLabel New]
+$animation_frame SetParent [$win GetMainPanelFrame] 
+$animation_frame Create
+$animation_frame SetLabelText "Movie Creator"
+
+pack [$animation_frame GetWidgetName] -side top -anchor nw -expand n -fill x -pady 2
+
+set animation_widget [vtkKWSimpleAnimationWidget New]
+$animation_widget SetParent [$animation_frame GetFrame] 
+$animation_widget Create
+$animation_widget SetRenderWidget $rw
+$animation_widget SetAnimationTypeToCamera
+
+pack [$animation_widget GetWidgetName] -side top -anchor nw -expand n -fill x
+
 # Start the application
 # If --test was provided, do not enter the event loop and run this example
 # as a non-interactive test for software quality purposes.
@@ -77,6 +107,9 @@ $win Close
 
 # Deallocate and exit
 
+$mat_prop_widget Delete
+$animation_frame Delete
+$animation_widget Delete
 $rw Delete
 $reader Delete
 $mapper Delete
