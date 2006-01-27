@@ -1959,6 +1959,13 @@ The Warp (vector) filter translates the points of the input data set using a spe
                     input_menu="im1"
                     help="Adjusts the parameters of the sphere to cut with."/>
       </Item>
+      <Item label="Box"
+            value="Box">
+        <BoxWidget use_label="0"
+                   trace_name="Box"
+                   input_menu="im1"
+                   help="Adjusts the parameters of the box to cut with."/>
+      </Item>
     </SelectWidget>
     <CutEntry label="Cut Offset Values"
               trace_name="Cut Values"
