@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMapUI);
-vtkCxxRevisionMacro(vtkPVColorMapUI, "1.1");
+vtkCxxRevisionMacro(vtkPVColorMapUI, "1.2");
 
 vtkCxxSetObjectMacro(vtkPVColorMapUI, CurrentColorMap, vtkPVColorMap);
 
@@ -1049,7 +1049,7 @@ void vtkPVColorMapUI::UpdateParameterList(vtkPVWindow *win)
 
   this->ParameterMenu->GetMenu()->DeleteAllMenuItems();
 
-  while (source = sources->GetNextPVSource())
+  while ((source = sources->GetNextPVSource()))
     {
     dProxy = source->GetDisplayProxy();
     geomInfo = dProxy->GetGeometryInformation();
@@ -1128,7 +1128,7 @@ void vtkPVColorMapUI::UpdateColorMapUI(const char* name, int numComponents)
   vtkPVSource *src;
   int visible = 0;
 
-  while (src = sources->GetNextPVSource())
+  while ((src = sources->GetNextPVSource()))
     {
     if (src->GetPVColorMap() == colorMap)
       {
