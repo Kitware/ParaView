@@ -38,7 +38,7 @@ int my_main(int argc, char *argv[])
   // the geometry of the user interface so far.
 
   vtkKWMyApplication *app = vtkKWMyApplication::New();
-  app->SetName("KWCallbackExample");
+  app->SetName("KWCallbacksExample");
   if (option_test)
     {
     app->SetRegistryLevel(0);
