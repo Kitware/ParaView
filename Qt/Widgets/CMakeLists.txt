@@ -17,6 +17,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCompoundProxyWizard.h
   pqConsoleWidget.h
   pqDataSetModel.h
+  pqElementInspectorWidget.h
   pqFileDialog.h
   pqFileDialogModel.h
   pqLocalFileDialogModel.h
@@ -80,6 +81,8 @@ ADD_LIBRARY(QtWidgets
   pqConsoleWidget.h
   pqDataSetModel.cxx
   pqDataSetModel.h
+  pqElementInspectorWidget.cxx
+  pqElementInspectorWidget.h
   pqFileDialog.cxx
   pqFileDialog.h
   pqFileDialogModel.cxx
@@ -96,8 +99,6 @@ ADD_LIBRARY(QtWidgets
   pqNameCount.h
   pqObjectHistogramWidget.cxx
   pqObjectHistogramWidget.h
-  pqObjectLineChartWidget.cxx
-  pqObjectLineChartWidget.h
   pqObjectInspector.cxx
   pqObjectInspector.h
   pqObjectInspectorDelegate.cxx
@@ -106,6 +107,8 @@ ADD_LIBRARY(QtWidgets
   pqObjectInspectorItem.h
   pqObjectInspectorWidget.cxx
   pqObjectInspectorWidget.h
+  pqObjectLineChartWidget.cxx
+  pqObjectLineChartWidget.h
   pqOpenExodusOptions.cxx
   pqOpenExodusOptions.h
   pqOptions.cxx
@@ -128,6 +131,10 @@ ADD_LIBRARY(QtWidgets
   pqPipelineWindow.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
+  pqSMAdaptor.cxx
+  pqSMAdaptor.h
+  pqSMMultiView.cxx
+  pqSMMultiView.h
   pqServer.cxx
   pqServer.h
   pqServerBrowser.cxx
@@ -138,10 +145,6 @@ ADD_LIBRARY(QtWidgets
   pqSetData.h
   pqSetName.cxx
   pqSetName.h
-  pqSMAdaptor.cxx
-  pqSMAdaptor.h
-  pqSMMultiView.cxx
-  pqSMMultiView.h
   pqVariableSelectorWidget.cxx
   pqVariableSelectorWidget.h
   pqVariableType.h

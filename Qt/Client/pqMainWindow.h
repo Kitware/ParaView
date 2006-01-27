@@ -77,7 +77,6 @@ private:
   QAction *HistogramDockAction;
   QAction *LineChartDockAction;
   pqMultiViewFrame* ActiveView;
-  QTreeView *ElementInspectorWidget;
   QDockWidget *ElementInspectorDock;
   QAction *ElementDockAction;
   QToolBar* CompoundProxyToolBar;

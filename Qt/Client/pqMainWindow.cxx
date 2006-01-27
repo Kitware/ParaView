@@ -10,6 +10,7 @@
 #include "pqAboutDialog.h"
 #include "pqConfig.h"
 #include "pqConnect.h"
+#include "pqElementInspectorWidget.h"
 #include "pqFileDialog.h"
 #include "pqObjectLineChartWidget.h"
 #include "pqObjectHistogramWidget.h"
@@ -109,7 +110,6 @@ pqMainWindow::pqMainWindow() :
   HistogramDockAction(0),
   LineChartDockAction(0),
   ActiveView(0),
-  ElementInspectorWidget(0),
   ElementInspectorDock(0),
   ElementDockAction(0),
   CompoundProxyToolBar(0),
@@ -325,24 +325,17 @@ pqMainWindow::pqMainWindow() :
   
   // Add the element inspector dock window.
   this->ElementInspectorDock = new QDockWidget("Element Inspector View", this);
-  if(this->ElementInspectorDock)
-    {
-    this->ElementInspectorDock->setObjectName("ElementInspectorDock");
-    this->ElementInspectorDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
-    this->ElementInspectorDock->setAllowedAreas(Qt::BottomDockWidgetArea |
-        Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+  this->ElementInspectorDock->setObjectName("ElementInspectorDock");
+  this->ElementInspectorDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
+  this->ElementInspectorDock->setAllowedAreas(Qt::BottomDockWidgetArea |
+      Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-    this->ElementInspectorWidget = new QTreeView(this->ElementInspectorDock);
-    if(this->ElementInspectorWidget)
-      {
-      this->ElementInspectorWidget->setObjectName("ElementInspectorWidget");
-      this->ElementInspectorWidget->setRootIsDecorated(false);
-      //this->ElementInspectorWidget->setAlternatingRowColors(true);
-      this->ElementInspectorDock->setWidget(this->ElementInspectorWidget);
-      }
+  pqElementInspectorWidget* const element_inspector = new pqElementInspectorWidget(this->ElementInspectorDock);
+  this->ElementInspectorDock->setWidget(element_inspector);
 
-    this->addDockWidget(Qt::BottomDockWidgetArea, this->ElementInspectorDock);
-    }
+  this->addDockWidget(Qt::BottomDockWidgetArea, this->ElementInspectorDock);
+
+  connect(element_inspector, SIGNAL(elementsChanged(vtkUnstructuredGrid*)), line_chart, SLOT(addElements(vtkUnstructuredGrid*)));
 
   // Set up the view menu items for the dock windows.
   this->PipelineDockAction = viewMenu->addAction(
@@ -1022,21 +1015,11 @@ void pqMainWindow::onFrameActive(QWidget* w)
 
 void pqMainWindow::onNewSelections(vtkSMProxy*, vtkUnstructuredGrid* selections)
 {
-  pqDataSetModel* model = qobject_cast<pqDataSetModel*>(
-      this->ElementInspectorWidget->model());
-  if(!model)
+  // Update the element inspector ...
+  if(pqElementInspectorWidget* const element_inspector = this->ElementInspectorDock->findChild<pqElementInspectorWidget*>())
     {
-    model = new pqDataSetModel(this->ElementInspectorWidget);
-    this->ElementInspectorWidget->setModel(model);
+    element_inspector->setElements(selections);
     }
-
-  if(model)
-    {
-    model->setDataSet(selections);
-    }
-  
-  this->ElementInspectorWidget->reset();
-  this->ElementInspectorWidget->update();
 }
 
 void pqMainWindow::onCreateCompoundProxy(QAction* action)

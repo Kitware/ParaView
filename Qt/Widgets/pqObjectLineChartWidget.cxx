@@ -18,6 +18,7 @@
 #include <pqPiecewiseLine.h>
 #include <pqLinearRamp.h>
 
+#include <QPushButton>
 #include <QComboBox>
 #include <QLabel>
 #include <QSpinBox>
@@ -36,9 +37,13 @@
 #include <vtkSMSourceProxy.h>
 #include <vtkSMCompoundProxy.h>
 #include <vtkSphereSource.h>
+#include <vtkUnstructuredGrid.h>
 
 #include <vtkExodusReader.h>
 #include <vtkProcessModule.h>
+
+#include <vtkstd/algorithm>
+#include <vtkstd/vector>
 
 //////////////////////////////////////////////////////////////////////////////
 // pqObjectLineChartWidget::pqImplementation
@@ -48,8 +53,7 @@ struct pqObjectLineChartWidget::pqImplementation
   pqImplementation() :
     SourceProxy(0),
     EventAdaptor(vtkEventQtSlotConnect::New()),
-    VariableType(VARIABLE_TYPE_CELL),
-    CurrentElementID(0)
+    VariableType(VARIABLE_TYPE_CELL)
   {
     QFont h1;
     h1.setBold(true);
@@ -124,9 +128,47 @@ struct pqObjectLineChartWidget::pqImplementation
     this->updateChart();
   }
   
-  void setCurrentElementID(unsigned long e)
+  void clearElements()
   {
-    this->CurrentElementID = e;
+    this->Elements.clear();
+    this->updateChart();
+  }
+  
+  void internalAddElements(vtkUnstructuredGrid* Elements)
+  {
+    for(int i = 0; i != Elements->GetCellData()->GetNumberOfArrays(); ++i)
+      {
+      const QString array_name = Elements->GetCellData()->GetArrayName(i);
+      if(array_name != "Id")
+        continue;
+      
+      vtkDataArray* const data = Elements->GetCellData()->GetArray(i);
+      if(!data)
+        break;
+      
+      for(int j = 0; j != Elements->GetNumberOfCells(); ++j)
+        {
+        const unsigned long id = static_cast<unsigned long>(data->GetTuple1(j));
+        if(!vtkstd::count(this->Elements.begin(), this->Elements.end(), id))
+          {
+          this->Elements.push_back(id);
+          }
+        }
+      
+      break;
+      }
+  }
+  
+  void addElements(vtkUnstructuredGrid* Elements)
+  {
+    internalAddElements(Elements);
+    this->updateChart();
+  }
+  
+  void setElements(vtkUnstructuredGrid* Elements)
+  {
+    this->Elements.clear();
+    internalAddElements(Elements);
     this->updateChart();
   }
   
@@ -164,17 +206,17 @@ struct pqObjectLineChartWidget::pqImplementation
     // Set the default (no data) appearance of the chart ...
     this->LineChartWidget.getLineChart()->clearData();
     this->LineChartWidget.getTitle().setText("Time Plot (no data)");
-    
     this->LineChartWidget.getXAxis()->setVisible(true);
     this->LineChartWidget.getXAxis()->setValueRange(0.0, 100.0);
-    
     this->LineChartWidget.getYAxis()->getLabel().setText("Value");
     this->LineChartWidget.getYAxis()->setVisible(true);
     this->LineChartWidget.getYAxis()->setValueRange(0.0, 100.0);
-    
     this->LineChartWidget.getLegend().clear();
-    
+
     if(this->VariableName.isEmpty())
+      return;
+
+    if(this->Elements.empty())
       return;
     
     if(!this->SourceProxy)
@@ -197,14 +239,10 @@ struct pqObjectLineChartWidget::pqImplementation
         array_id = reader->GetCellArrayID(this->VariableName.toAscii().data());
         if(-1 == array_id)
           return;
-        if(1 != reader->GetCellArrayNumberOfComponents(array_id))
-          return;
         break;
       case VARIABLE_TYPE_NODE:
         array_id = reader->GetPointArrayID(this->VariableName.toAscii().data());
         if(-1 == array_id)
-          return;
-        if(1 != reader->GetPointArrayNumberOfComponents(array_id))
           return;
         break;
       }
@@ -215,18 +253,21 @@ struct pqObjectLineChartWidget::pqImplementation
     this->LineChartWidget.getYAxis()->getLabel().setText(this->VariableName);
 
     this->LineChartWidget.getLegend().clear();
-    addPlot(*reader, this->CurrentElementID, QPen(Qt::darkBlue, 1.5));
-    addPlot(*reader, this->CurrentElementID + 1, QPen(Qt::darkGray, 1.0, Qt::DotLine));
-    addPlot(*reader, this->CurrentElementID + 2, QPen(Qt::lightGray, 1.0, Qt::DotLine));
+    unsigned long count = 0;
+    for(vtkstd::vector<unsigned long>::reverse_iterator element = this->Elements.rbegin(); element != this->Elements.rend(); ++element, ++count)
+      {
+      const double hue = static_cast<double>(count) / static_cast<double>(Elements.size());
+      const QColor color = QColor::fromHsvF(hue, 1.0, 1.0);
+      addPlot(*reader, *element, QPen(color, 1.5));
+      }
   }
   
   vtkSMProxy* SourceProxy;
   vtkEventQtSlotConnect* EventAdaptor;
-  QSpinBox ElementID;
   pqLineChartWidget LineChartWidget;
   pqVariableType VariableType;
   QString VariableName;
-  unsigned long CurrentElementID;
+  vtkstd::vector<unsigned long> Elements;
 };
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -236,29 +277,18 @@ pqObjectLineChartWidget::pqObjectLineChartWidget(QWidget *p) :
   QWidget(p),
   Implementation(new pqImplementation())
 {
-  QLabel* const element_label = new QLabel(tr("Element:"));
-  element_label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  QPushButton* const clear = new QPushButton(tr("Clear"));
+  connect(clear, SIGNAL(clicked()), SLOT(clearElements()));
 
   QHBoxLayout* const hbox = new QHBoxLayout();
+  hbox->addWidget(clear);
   hbox->setMargin(0);
-  hbox->addWidget(element_label);
-  hbox->addWidget(&this->Implementation->ElementID, 1);
 
   QVBoxLayout* const vbox = new QVBoxLayout();
   vbox->setMargin(0);
   vbox->addLayout(hbox);
   vbox->addWidget(&this->Implementation->LineChartWidget);
   this->setLayout(vbox);
-
-  this->Implementation->ElementID.setMinimum(0);
-  this->Implementation->ElementID.setMaximum(VTK_LONG_MAX);
-  this->Implementation->ElementID.setValue(this->Implementation->CurrentElementID);
-
-  QObject::connect(
-    &this->Implementation->ElementID,
-    SIGNAL(valueChanged(int)),
-    this,
-    SLOT(onElementIDChanged(int)));
 }
 
 pqObjectLineChartWidget::~pqObjectLineChartWidget()
@@ -290,9 +320,19 @@ void pqObjectLineChartWidget::setVariable(pqVariableType type, const QString& na
   this->Implementation->setVariable(type, name);
 }
 
-void pqObjectLineChartWidget::setElementID(unsigned long ElementID)
+void pqObjectLineChartWidget::clearElements()
 {
-  this->Implementation->setCurrentElementID(ElementID);
+  this->Implementation->clearElements();
+}
+
+void pqObjectLineChartWidget::addElements(vtkUnstructuredGrid* Elements)
+{
+  this->Implementation->addElements(Elements);
+}
+
+void pqObjectLineChartWidget::setElements(vtkUnstructuredGrid* Elements)
+{
+  this->Implementation->setElements(Elements);
 }
 
 void pqObjectLineChartWidget::onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*)
@@ -300,7 +340,3 @@ void pqObjectLineChartWidget::onInputChanged(vtkObject*,unsigned long, void*, vo
   this->Implementation->onInputChanged();
 }
 
-void pqObjectLineChartWidget::onElementIDChanged(int ElementID)
-{
-  this->Implementation->setCurrentElementID(ElementID);
-}

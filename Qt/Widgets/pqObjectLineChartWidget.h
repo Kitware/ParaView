@@ -18,6 +18,7 @@ class pqServer;
 class vtkCommand;
 class vtkObject;
 class vtkSMProxy;
+class vtkUnstructuredGrid;
 
 /// Displays a histogram based on data from a single proxy
 class QTWIDGETS_EXPORT pqObjectLineChartWidget :
@@ -36,12 +37,15 @@ public slots:
   void setProxy(vtkSMProxy*);
   /// Call this to set the current variable
   void setVariable(pqVariableType, const QString&);
-  /// Call this to set the current element ID
-  void setElementID(unsigned long Count);
+  /// Call this to clear the set of elements
+  void clearElements();
+  /// Call this to add a collection of element IDs to the set of elements
+  void addElements(vtkUnstructuredGrid* Elements);
+  /// Call this to set the collection of element IDs
+  void setElements(vtkUnstructuredGrid* Elements);
   
 private slots:
   void onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*);
-  void onElementIDChanged(int);
 
 private:
   struct pqImplementation;
