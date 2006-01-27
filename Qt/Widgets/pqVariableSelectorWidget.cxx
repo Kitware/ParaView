@@ -115,4 +115,6 @@ const QString pqVariableSelectorWidget::variableData(pqVariableType type, const 
     case VARIABLE_TYPE_CELL:
       return name + "|cell";
     }
+    
+  return QString();
 }
