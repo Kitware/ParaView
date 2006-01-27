@@ -295,6 +295,8 @@ The output of the Line source is polygonal data.
                resolution="1"
                display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="The limit on computational iterations. Values less than 2.0 after this many iterations are considered in the set."/>
+  <VectorEntry label="Subsample Rate" trace_name="SubsampleRate"
+               property="SubsampleRate" type="int"/>
   <Documentation>
 The Mandelbrot source can be used to add a uniform rectilinear grid with scalar values derived from the Mandelbrot set to the 3D scene. The equation used is z = z2 + C (where z and C are complex). The scalar values in the grid are the number of iterations of the equation it takes for the magnitude of the value to become greater than 2. In the equation, the initial value of z is 0. By default, the real component of C is mapped onto the X axis; the imaginary component of C is mapped onto the Y axis; and the imaginary component of the initial value is mapped onto the Z axis. If a two-dimensional extent is specified, the resulting image will be displayed. If a three-dimensional extent is used, then the bounding box of the volume will be displayed. The following parameters of the Mandelbrot source can be controlled.
 Extent: These six values indicate the X, Y, and Z extent of the output data. The first two numbers are the minimum and maximum X extent; the next two are the minimum and maximum Y extent; and the final two are the minimum and maximum Z extent. The numbers are inclusive, so the default values of 0, 250, 0, 250, 0, 0 indicate that the dimensions of the output will be 251 x 251 x 1.
@@ -337,54 +339,6 @@ Y resolution: This is the number of divisions along the Y axis of the parallelog
 The output of the Plane source is polygonal data.
   </Documentation>
 </Module>
-
-
-<!-- #ifdef PARAVIEW_BUILD_DEVELOPMENT -->
-<Module name="OctreeFractal" 
-        menu_name="Octree Fractal" 
-        root_name="OctreeFractal"
-        module_type="Source" 
-        long_help="Test source for octree with Mandelbrot fractal" 
-        short_help="OctreeFractal">
-  <Source class="vtkHyperOctreeFractalSource"/>
-<!-- should use widget that keeps values non-negative -->
-  <VectorEntry label="Dimension" trace_name="Dimension"
-               property="Dimension" type="int"
-               help="1D:Binary tree line,2D:Quadtree plane,3D:Octree volume."/>
-<!-- should use widget that keeps value non-negative -->
-  <VectorEntry label="MaximumLevel" trace_name="MaximumLevel"
-               property="MaximumLevel" type="int"
-               help="Determines how deep to refine the grid."/>
-<!-- should use widget that keeps value non-negative -->
-  <VectorEntry label="MinimumLevel" trace_name="MinimumLevel"
-               property="MinimumLevel" type="int"
-               help="Determines how deep to refine the grid."/>
-
-  <VectorEntry label="Sub-space" trace_name="SubSpace" 
-               property="ProjectionAxes" type="int" 
-               length="3"
-               help="Choose which axes of the data set to display" />
-  <VectorEntry label="Origin" trace_name="Origin" property="OriginCX" 
-               type="float" length="4"
-               help="Set the imaginary and real values for C (constant) and X (initial value)" />
-  <VectorEntry label="Size" trace_name="Size" property="SizeCX" type="float" 
-               length="4"
-               help="Set the inaginary and real values for the world size of the volume for C (constant) and X (initial value)" />
-  <Scale label="Max. iterations" trace_name="MaxIterations" 
-               property="MaximumNumberOfIterations"
-               resolution="1"
-               display_entry="1" display_value="0" entry_and_label_on_top="0"
-               help="The limit on computational iterations. Values less than 2.0 after this many iterations are considered in the set."/>
-
-  <VectorEntry label="Threshold" trace_name="Threshold" 
-               property="Threshold" type="float" 
-               length="1"
-               help="Data threshold helps determine when to subdivide node." />
-
-</Module>
-<!-- #endif -->
-
-
 
 <Module name="SphereSource" menu_name="Sphere" root_name="Sphere" 
         module_type="Source" 
@@ -529,6 +483,8 @@ The output of the Superquadric source is polygonal data with point normals and t
   <VectorEntry label="Standard dev." trace_name="StandardDeviation" 
                property="StandardDeviation" type="float"
                help="Standard deviation of the gaussian" />
+  <VectorEntry label="Subsample Rate" trace_name="SubsampleRate"
+               property="SubsampleRate" type="int" />
   <Documentation>
 The Wavelet source can be used to create a uniform rectilinear grid in up to three dimensions with values varying according to the following periodic function.
 OS = M * G * (XM * sin(XF * x) + YM * sin(YF * y) + ZM * cos(ZF * z))

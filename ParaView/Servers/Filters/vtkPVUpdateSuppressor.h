@@ -61,6 +61,9 @@ protected:
   vtkPVUpdateSuppressor();
   ~vtkPVUpdateSuppressor();
 
+  int RequestData(vtkInformation* request, vtkInformationVector **inputVector,
+                  vtkInformationVector *outputVector);
+
   int UpdatePiece;
   int UpdateNumberOfPieces;
 

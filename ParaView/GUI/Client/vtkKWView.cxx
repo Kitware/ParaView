@@ -17,10 +17,12 @@
 
 #include "vtkKWView.h"
 
+#include "vtkBMPReader.h"
 #include "vtkBMPWriter.h"
 #include "vtkCallbackCommand.h"
 #include "vtkErrorCode.h"
 #include "vtkImageData.h"
+#include "vtkJPEGReader.h"
 #include "vtkJPEGWriter.h"
 #include "vtkKWApplication.h"
 #include "vtkKWChangeColorButton.h"
@@ -39,15 +41,25 @@
 #include "vtkKWSaveImageDialog.h"
 #include "vtkKWSegmentedProgressGauge.h"
 #include "vtkKWUserInterfaceManager.h"
-#include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
+#include "vtkPNGReader.h"
 #include "vtkPNGWriter.h"
+#include "vtkPNMReader.h"
 #include "vtkPNMWriter.h"
+#include "vtkPVApplication.h"
 #include "vtkPVCornerAnnotationEditor.h"
+#include "vtkPVSource.h"
+#include "vtkPVSourceCollection.h"
 #include "vtkPVTraceHelper.h"
+#include "vtkPVWindow.h"
 #include "vtkPostScriptWriter.h"
 #include "vtkProperty2D.h"
 #include "vtkRenderer.h"
+#include "vtkSMDataObjectDisplayProxy.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkTIFFReader.h"
 #include "vtkTIFFWriter.h"
 #include "vtkTextActor.h"
 #include "vtkTextMapper.h"
@@ -89,7 +101,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.27");
+vtkCxxRevisionMacro(vtkKWView, "1.28");
 
 //----------------------------------------------------------------------------
 void KWViewAbortCheckMethod( vtkObject*, unsigned long, void* arg, void* )
@@ -758,11 +770,86 @@ void vtkKWView::SaveAsImage()
     }
   path = dlg->GetFileName();
 
+  vtkPVWindow *win = vtkPVWindow::SafeDownCast(this->GetParentWindow());
+  int rate = 1, stride[3];
+  stride[0] = stride[1] = stride[2] = 1;
+
+  if (win)
+    {
+    vtkPVSourceCollection *coll = win->GetSourceList("Sources");
+    coll->InitTraversal();
+    int i;
+    vtkPVSource *src;
+    for (i = 0; i < coll->GetNumberOfItems(); i++)
+      {
+      src = coll->GetNextPVSource();
+      if (!strcmp(src->GetSourceClassName(), "vtkRTAnalyticSource") ||
+          !strcmp(src->GetSourceClassName(), "vtkImageMandelbrotSource"))
+        {
+        vtkSMIntVectorProperty *prop = vtkSMIntVectorProperty::SafeDownCast(
+          src->GetProxy()->GetProperty("SubsampleRate"));
+        if (prop && prop->GetElement(0) > 1)
+          {
+          int ret = vtkKWMessageDialog::PopupYesNo(
+            this->GetApplication(),
+            this->ParentWindow,
+            "Streaming",
+            "Do you want to stream to get full-resolution data?");
+          if (ret)
+            {
+            rate = prop->GetElement(0);
+            prop->SetElement(0, 1);
+            src->GetProxy()->UpdateVTKObjects();
+            this->SetupStreaming();
+            }
+          break;
+          }
+        }
+      else if (!strcmp(src->GetSourceClassName(), "vtkXdmfReader"))
+        {
+        vtkSMIntVectorProperty *prop = vtkSMIntVectorProperty::SafeDownCast(
+          src->GetProxy()->GetProperty("Stride"));
+        if (prop && (prop->GetElement(0) > 1 || prop->GetElement(1) > 1 ||
+                     prop->GetElement(2) > 1))
+          {
+          int ret = vtkKWMessageDialog::PopupYesNo(
+            this->GetApplication(),
+            this->ParentWindow,
+            "Streaming",
+            "Do you want to stream to get full-resolution data?");
+          if (ret)
+            {
+            stride[0] = prop->GetElement(0);
+            stride[1] = prop->GetElement(1);
+            stride[2] = prop->GetElement(2);
+            prop->SetElement(0, 1);
+            prop->SetElement(1, 1);
+            prop->SetElement(2, 1);
+            src->GetProxy()->UpdateVTKObjects();
+            this->SetupStreaming();
+            }
+          break;
+          }
+        }
+      }
+    }
+
   // make sure we have a file name
   if (path && strlen(path) > 1)
     {
     this->SaveAsImage(path);
     }
+
+  if (rate > 1 || stride[0] > 1 || stride[1] > 1 || stride[2] > 1)
+    {
+    this->CleanupStreaming(rate, stride);
+    if (path && strlen(path) > 1)
+      {
+      this->Script("after idle {%s DisplaySavedImage %s}",
+                   this->GetTclName(), path);
+      }
+    }
+
   dlg->Delete();
 }
 
@@ -853,6 +940,68 @@ void vtkKWView::SaveAsImage(const char* filename)
       "There is insufficient disk space to save this image. The file will be "
       "deleted.");
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWView::DisplaySavedImage(const char* filename) 
+{
+  if ( !filename || !*filename )
+    {
+    vtkErrorMacro("Filename not specified");
+    return;
+    }
+  
+  vtkImageData *image = vtkImageData::New();
+
+  if (!strcmp(filename + strlen(filename) - 4,".bmp"))
+    {
+    vtkBMPReader *bmp = vtkBMPReader::New();
+    bmp->SetFileName((char *)filename);
+    bmp->Update();
+    image->ShallowCopy(bmp->GetOutput());
+    bmp->Delete();
+    }
+  else if (!strcmp(filename + strlen(filename) - 4,".tif"))
+    {
+    vtkTIFFReader *tif = vtkTIFFReader::New();
+    tif->SetFileName((char *)filename);
+    tif->Update();
+    image->ShallowCopy(tif->GetOutput());
+    tif->Delete();
+    }
+  else if (!strcmp(filename + strlen(filename) - 4,".ppm"))
+    {
+    vtkPNMReader *pnm = vtkPNMReader::New();
+    pnm->SetFileName((char *)filename);
+    pnm->Update();
+    image->ShallowCopy(pnm->GetOutput());
+    pnm->Delete();
+    }
+  else if (!strcmp(filename + strlen(filename) - 4,".png"))
+    {
+    vtkPNGReader *png = vtkPNGReader::New();
+    png->SetFileName((char *)filename);
+    png->Update();
+    image->ShallowCopy(png->GetOutput());
+    png->Delete();
+    }
+  else if (!strcmp(filename + strlen(filename) - 4,".jpg"))
+    {
+    vtkJPEGReader *jpg = vtkJPEGReader::New();
+    jpg->SetFileName((char *)filename);
+    jpg->Update();
+    image->ShallowCopy(jpg->GetOutput());
+    jpg->Delete();
+    }
+
+  int ext[6];
+  image->GetExtent(ext);
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(
+    this->GetApplication());
+  pvApp->GetRenderModuleProxy()->GetRenderWindow()->SetPixelData(
+    ext[0], ext[2], ext[1], ext[3],
+    (unsigned char*)(image->GetScalarPointer()), 1);
+  image->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -1304,6 +1453,91 @@ void vtkKWView::UpdateEnableState()
   this->PropagateEnableState(this->GeneralPropertiesFrame);
   this->PropagateEnableState(this->ColorsFrame);
   this->PropagateEnableState(this->RendererBackgroundColor);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWView::SetupStreaming()
+{
+  vtkPVWindow *win = vtkPVWindow::SafeDownCast(this->GetParentWindow());
+  if (!win)
+    {
+    return;
+    }
+  vtkPVSourceCollection *coll = win->GetSourceList("Sources");
+  coll->InitTraversal();
+  int i;
+  vtkPVSource *src;
+  vtkSMDataObjectDisplayProxy *dispProxy;
+  vtkSMIntVectorProperty *prop;
+  vtkSMProxyManager *proxm = vtkSMObject::GetProxyManager();
+
+  for (i = 0; i < coll->GetNumberOfItems(); i++)
+    {
+    src = coll->GetNextPVSource();
+    dispProxy = src->GetDisplayProxy();
+    prop = vtkSMIntVectorProperty::SafeDownCast(
+      dispProxy->GetProperty("NumberOfSubPieces"));
+    if (prop)
+      {
+      prop->SetElement(0, 200);
+      dispProxy->UpdateVTKObjects();
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWView::CleanupStreaming(int rate, int stride[3])
+{
+  vtkPVWindow *win = vtkPVWindow::SafeDownCast(this->GetParentWindow());
+  if (!win)
+    {
+    return;
+    }
+
+  vtkPVSourceCollection *coll = win->GetSourceList("Sources");
+  coll->InitTraversal();
+  int i;
+  vtkPVSource *src;
+  vtkSMDataObjectDisplayProxy *dispProxy;
+  vtkSMIntVectorProperty *prop;
+  vtkSMProxyManager *proxm = vtkSMObject::GetProxyManager();
+
+  for (i = 0; i < coll->GetNumberOfItems(); i++)
+    {
+    src = coll->GetNextPVSource();
+    if ((!strcmp(src->GetSourceClassName(), "vtkRTAnalyticSource") ||
+         !strcmp(src->GetSourceClassName(), "vtkImageMandelbrotSource")) &&
+      rate > 1)
+      {
+      vtkSMIntVectorProperty *prop = vtkSMIntVectorProperty::SafeDownCast(
+        src->GetProxy()->GetProperty("SubsampleRate"));
+      // This will not work properly if more than one RTAnalyticSource  or
+      // vtkImageMandelbrotSource has been created and the subsample rate did
+      // not come from the first one. This will set all of the
+      // vtkRTAnalyticSources and vtkImageMandelbrotSources back to the initial
+      // subsample rate of the one that was used.
+      prop->SetElement(0, rate);
+      src->GetProxy()->UpdateVTKObjects();
+      }
+    else if (!strcmp(src->GetSourceClassName(), "vtkXdmfReader"))
+      {
+      vtkSMIntVectorProperty *prop = vtkSMIntVectorProperty::SafeDownCast(
+        src->GetProxy()->GetProperty("Stride"));
+      // The same issue applies here as applies above for vtkRTAnalyticSource.
+      prop->SetElement(0, stride[0]);
+      prop->SetElement(1, stride[1]);
+      prop->SetElement(2, stride[2]);
+      }
+
+    dispProxy = src->GetDisplayProxy();
+    prop = vtkSMIntVectorProperty::SafeDownCast(
+      dispProxy->GetProperty("NumberOfSubPieces"));
+    if (prop)
+      {
+      prop->SetElement(0, 1);
+      dispProxy->UpdateVTKObjects();
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
