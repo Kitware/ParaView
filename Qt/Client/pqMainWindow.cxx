@@ -17,6 +17,7 @@
 #include "pqMainWindow.h"
 #include "pqMultiViewManager.h"
 #include "pqMultiViewFrame.h"
+#include "pqNameCount.h"
 #include "pqObjectInspector.h"
 #include "pqObjectInspectorWidget.h"
 #include "pqParts.h"
@@ -518,6 +519,7 @@ void pqMainWindow::onFileNew()
   if(this->Pipeline)
     {
     this->Pipeline->clearPipeline();
+    this->Pipeline->getNameCount()->Reset();
     }
 
   // Clean up the current server.

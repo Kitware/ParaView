@@ -2,6 +2,9 @@
     <qresource prefix="/pqWidgets" >
         <file alias="SplitViewHorizontal.png">Resources/SplitViewHorizontal.png</file>
         <file alias="SplitViewVertical.png">Resources/SplitViewVertical.png</file>
+        <file alias="pqBundle16.png">Resources/pqBundle16.png</file>
+        <file alias="pqBundle22.png">Resources/pqBundle22.png</file>
+        <file alias="pqBundle32.png">Resources/pqBundle32.png</file>
         <file alias="pqCamera16.png">Resources/pqCamera16.png</file>
         <file alias="pqCamerad16.png">Resources/pqCamerad16.png</file>
         <file alias="pqFilter16.png">Resources/pqFilter16.png</file>

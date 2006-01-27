@@ -6,12 +6,16 @@
 #include "pqPipelineWindow.h"
 #include "pqServer.h"
 #include "pqXMLUtil.h"
+
 #include <QHash>
 #include <QList>
 #include <QString>
+
 #include "vtkPVXMLElement.h"
 #include "vtkSMDisplayProxy.h"
+#include "vtkSMLookupTableProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
 
 
 class pqPipelineServerInternal
@@ -318,11 +322,22 @@ void pqPipelineServer::UnregisterObject(pqPipelineObject *object)
   if(this->Server)
     {
     vtkSMProxyManager *proxyManager = this->Server->GetProxyManager();
-    proxyManager->UnRegisterProxy(proxyManager->GetProxyName("displays",
-        object->GetDisplayProxy()));
+    vtkSMDisplayProxy *display = object->GetDisplayProxy();
+    vtkSMProxyProperty *property = vtkSMProxyProperty::SafeDownCast(
+        display->GetProperty("LookupTable"));
+    if(property && property->GetNumberOfProxies())
+      {
+      vtkSMLookupTableProxy *lookup = vtkSMLookupTableProxy::SafeDownCast(
+          property->GetProxy(0));
+      proxyManager->UnRegisterProxy(proxyManager->GetProxyName("lookup_tables",
+          lookup));
+      }
+
     object->SetDisplayProxy(0);
-    proxyManager->UnRegisterProxy(object->GetProxyName().toAscii().data());
+    proxyManager->UnRegisterProxy(proxyManager->GetProxyName("displays",
+        display));
     object->SetProxy(0);
+    proxyManager->UnRegisterProxy(object->GetProxyName().toAscii().data());
     object->SetProxyName("");
     }
 }

@@ -52,20 +52,25 @@ public:
   enum GroupedCommands {
     NoCommands = -1,
     CreateAndAppend = 0,
-    CreateAndInsert
+    CreateAndInsert,
+    DeleteAndConnect
   };
 
 public:
   pqPipelineListInternal();
   ~pqPipelineListInternal() {}
 
+  void ResetCommand();
+
 public:
   QHash<pqPipelineObject *, pqPipelineListItem *> Lookup;
   QHash<pqPipelineWindow *, pqPipelineListItem *> Windows;
   GroupedCommands CommandType;
-  pqPipelineObject *MoveOrCreate;
+  pqPipelineObject *Subject;
   pqPipelineObject *Source;
   pqPipelineObject *Sink;
+  QList<pqPipelineObject *> SourceList;
+  QList<pqPipelineObject *> SinkList;
 };
 
 
@@ -109,12 +114,22 @@ bool pqPipelineListItem::IsLast(pqPipelineListItem *child) const
 
 
 pqPipelineListInternal::pqPipelineListInternal()
-  : Lookup(), Windows()
+  : Lookup(), Windows(), SourceList(), SinkList()
 {
   this->CommandType = pqPipelineListInternal::NoCommands;
-  this->MoveOrCreate = 0;
+  this->Subject = 0;
   this->Source = 0;
   this->Sink = 0;
+}
+
+void pqPipelineListInternal::ResetCommand()
+{
+  this->CommandType = pqPipelineListInternal::NoCommands;
+  this->Subject = 0;
+  this->Source = 0;
+  this->Sink = 0;
+  this->SourceList.clear();
+  this->SinkList.clear();
 }
 
 
@@ -137,8 +152,8 @@ pqPipelineListModel::pqPipelineListModel(QObject *parentObject)
         ":/pqWidgets/pqSource16.png");
     this->PixmapList[pqPipelineListModel::Filter].load(
         ":/pqWidgets/pqFilter16.png");
-    //this->PixmapList[pqPipelineListModel::Bundle].load(
-    //    ":/pqWidgets/pqBundle16.png");
+    this->PixmapList[pqPipelineListModel::Bundle].load(
+        ":/pqWidgets/pqBundle16.png");
     this->PixmapList[pqPipelineListModel::LinkBack].load(
         ":/pqWidgets/pqLinkBack16.png");
     this->PixmapList[pqPipelineListModel::LinkOut].load(
@@ -169,6 +184,8 @@ pqPipelineListModel::pqPipelineListModel(QObject *parentObject)
         this, SLOT(addSource(pqPipelineObject *)));
     connect(pipeline, SIGNAL(filterCreated(pqPipelineObject *)),
         this, SLOT(addFilter(pqPipelineObject *)));
+    connect(pipeline, SIGNAL(removingObject(pqPipelineObject *)),
+        this, SLOT(removeObject(pqPipelineObject *)));
     connect(pipeline,
         SIGNAL(connectionCreated(pqPipelineObject *, pqPipelineObject *)),
         this, SLOT(addConnection(pqPipelineObject *, pqPipelineObject *)));
@@ -362,6 +379,25 @@ QWidget *pqPipelineListModel::getWidgetFor(const QModelIndex &idx) const
   return widget;
 }
 
+pqPipelineObject *pqPipelineListModel::getObjectFor(
+    const QModelIndex &idx) const
+{
+  pqPipelineObject *object = 0;
+  if(this->Internal && idx.isValid() && idx.model() == this)
+    {
+    pqPipelineListItem *item = reinterpret_cast<pqPipelineListItem *>(
+        idx.internalPointer());
+    if(item && (item->Type == pqPipelineListModel::Source || 
+        item->Type == pqPipelineListModel::Filter ||
+        item->Type == pqPipelineListModel::Bundle))
+      {
+      object = item->Data.Object;
+      }
+    }
+
+  return object;
+}
+
 QModelIndex pqPipelineListModel::getIndexFor(vtkSMProxy *proxy) const
 {
   pqPipelineData *pipeline = pqPipelineData::instance();
@@ -407,10 +443,7 @@ void pqPipelineListModel::clearPipeline()
   {
     this->Internal->Lookup.clear();
     this->Internal->Windows.clear();
-    this->Internal->CommandType = pqPipelineListInternal::NoCommands;
-    this->Internal->MoveOrCreate = 0;
-    this->Internal->Source = 0;
-    this->Internal->Sink = 0;
+    this->Internal->ResetCommand();
   }
 
   // Delete all the old pipeline objects.
@@ -551,8 +584,18 @@ void pqPipelineListModel::addSource(pqPipelineObject *source)
 
 void pqPipelineListModel::removeSource(pqPipelineObject *source)
 {
-  if(!this->Internal || !source || !source->GetParent())
+  if(!this->Internal || !source)
+    {
     return;
+    }
+
+  if(this->Internal->CommandType == pqPipelineListInternal::DeleteAndConnect)
+    {
+    if(source == this->Internal->Subject)
+      {
+      return;
+      }
+    }
 
   // Get the source item from the lookup table.
   QHash<pqPipelineObject *, pqPipelineListItem *>::Iterator iter =
@@ -560,21 +603,22 @@ void pqPipelineListModel::removeSource(pqPipelineObject *source)
   if(iter == this->Internal->Lookup.end())
     return;
 
+  // TODO: If the source is connected to multiple items, the
+  // subsequent chains will be orphaned forming multiple pipelines.
+  // Each splitter needs to be converted to a merge item.
+
   // Remove the item from the server and delete it. Remove it from
   // the hash table along with all of its children.
   pqPipelineListItem *item = *iter;
-  pqPipelineListItem *windowItem = item->Parent;
-
-  //int windowRow = windowItem->GetParent()->Internal.indexOf(windowItem);
-  //QModelIndex parentIndex = this->createIndex(windowRow, 0, windowItem);
-  //int row = windowItem->Internal.indexOf(item);
-  //this->beginRemoveRows(parentIndex, row, row);
-  windowItem->Internal.removeAll(item);
+  QModelIndex parentIndex = this->createIndex(
+      item->Parent->Parent->Internal.indexOf(item->Parent), 0, item->Parent);
+  int row = item->Parent->Internal.indexOf(item);
+  this->beginRemoveRows(parentIndex, row, row);
+  item->Parent->Internal.removeAll(item);
   this->Internal->Lookup.erase(iter);
   this->removeLookupItems(item);
+  this->endRemoveRows();
   delete item;
-  //this->endRemoveRows();
-  this->reset(); //TEMP
 }
 
 void pqPipelineListModel::addFilter(pqPipelineObject *filter)
@@ -585,11 +629,11 @@ void pqPipelineListModel::addFilter(pqPipelineObject *filter)
   if(this->Internal->CommandType == pqPipelineListInternal::CreateAndAppend ||
       this->Internal->CommandType == pqPipelineListInternal::CreateAndInsert)
   {
-    if(filter == this->Internal->MoveOrCreate)
+    if(filter == this->Internal->Subject)
       return;
 
-    if(this->Internal->MoveOrCreate == 0)
-      this->Internal->MoveOrCreate = filter;
+    if(this->Internal->Subject == 0)
+      this->Internal->Subject = filter;
     else
       this->addSubItem(filter, pqPipelineListModel::Filter);
   }
@@ -599,8 +643,18 @@ void pqPipelineListModel::addFilter(pqPipelineObject *filter)
 
 void pqPipelineListModel::removeFilter(pqPipelineObject *filter)
 {
-  if(!this->Internal || !filter || !filter->GetParent())
+  if(!this->Internal || !filter)
+    {
     return;
+    }
+
+  if(this->Internal->CommandType == pqPipelineListInternal::DeleteAndConnect)
+    {
+    if(filter == this->Internal->Subject)
+      {
+      return;
+      }
+    }
 
   // Get the filter item from the lookup table.
   QHash<pqPipelineObject *, pqPipelineListItem *>::Iterator iter =
@@ -608,21 +662,63 @@ void pqPipelineListModel::removeFilter(pqPipelineObject *filter)
   if(iter == this->Internal->Lookup.end())
     return;
 
+  // TODO: Check the surrounding pipeline. Removing the filter may
+  // require the pipeline list to be re-arranged.
+
   // Remove the item from the server and delete it. Remove it from
   // the hash table along with all of its children.
   pqPipelineListItem *item = *iter;
-  pqPipelineListItem *windowItem = item->Parent;
-
-  //int windowRow = windowItem->GetParent()->Internal.indexOf(windowItem);
-  //QModelIndex parentIndex = this->createIndex(windowRow, 0, windowItem);
-  //int row = windowItem->Internal.indexOf(item);
-  //this->beginRemoveRows(parentIndex, row, row);
-  windowItem->Internal.removeAll(item);
+  QModelIndex parentIndex = this->createIndex(
+      item->Parent->Parent->Internal.indexOf(item->Parent), 0, item->Parent);
+  int row = item->Parent->Internal.indexOf(item);
+  this->beginRemoveRows(parentIndex, row, row);
+  item->Parent->Internal.removeAll(item);
   this->Internal->Lookup.erase(iter);
   this->removeLookupItems(item);
+  this->endRemoveRows();
   delete item;
-  //this->endRemoveRows();
-  this->reset(); //TEMP
+}
+
+void pqPipelineListModel::removeObject(pqPipelineObject *object)
+{
+  if(!this->Internal || !object)
+    {
+    return;
+    }
+
+  if(this->Internal->CommandType == pqPipelineListInternal::DeleteAndConnect)
+    {
+    if(object == this->Internal->Subject)
+      {
+      return;
+      }
+    }
+
+  // Get the object item from the lookup table.
+  QHash<pqPipelineObject *, pqPipelineListItem *>::Iterator iter =
+      this->Internal->Lookup.find(object);
+  if(iter == this->Internal->Lookup.end())
+    return;
+
+  // TODO: If the source is connected to multiple items, the
+  // subsequent chains will be orphaned forming multiple pipelines.
+  // Each splitter needs to be converted to a merge item.
+
+  // TODO: Check the surrounding pipeline. Removing the filter may
+  // require the pipeline list to be re-arranged.
+
+  // Remove the item from the server and delete it. Remove it from
+  // the hash table along with all of its children.
+  pqPipelineListItem *item = *iter;
+  QModelIndex parentIndex = this->createIndex(
+      item->Parent->Parent->Internal.indexOf(item->Parent), 0, item->Parent);
+  int row = item->Parent->Internal.indexOf(item);
+  this->beginRemoveRows(parentIndex, row, row);
+  item->Parent->Internal.removeAll(item);
+  this->Internal->Lookup.erase(iter);
+  this->removeLookupItems(item);
+  this->endRemoveRows();
+  delete item;
 }
 
 void pqPipelineListModel::addConnection(pqPipelineObject *source,
@@ -635,7 +731,7 @@ void pqPipelineListModel::addConnection(pqPipelineObject *source,
   // handled later.
   if(this->Internal->CommandType == pqPipelineListInternal::CreateAndAppend)
     {
-    if(this->Internal->MoveOrCreate == sink)
+    if(this->Internal->Subject == sink)
       {
       this->Internal->Source = source;
       return;
@@ -644,14 +740,23 @@ void pqPipelineListModel::addConnection(pqPipelineObject *source,
   else if(this->Internal->CommandType ==
       pqPipelineListInternal::CreateAndInsert)
     {
-    if(this->Internal->MoveOrCreate == source)
+    if(this->Internal->Subject == source)
       {
       this->Internal->Sink = sink;
       return;
       }
-    else if(this->Internal->MoveOrCreate == sink)
+    else if(this->Internal->Subject == sink)
       {
       this->Internal->Source = source;
+      return;
+      }
+    }
+  else if(this->Internal->CommandType ==
+      pqPipelineListInternal::DeleteAndConnect)
+    {
+    if(this->Internal->SinkList.indexOf(sink) != -1)
+      {
+      this->Internal->SourceList.append(source);
       return;
       }
     }
@@ -682,6 +787,7 @@ void pqPipelineListModel::addConnection(pqPipelineObject *source,
     // the same parent.
     if(sourceItem->Parent == sinkItem->Parent)
       {
+      // TODO
       }
     else
       {
@@ -821,7 +927,7 @@ void pqPipelineListModel::addConnection(pqPipelineObject *source,
 
           // Move the source chain to the grandparent.
           i = sourceParent->Parent->Internal.size();
-          row = i + sourceParent->Internal.size();
+          row = i + sourceParent->Internal.size() - 1;
           this->beginInsertRows(parentIndex, i, row);
           jter = sourceParent->Internal.begin();
           for( ; jter != sourceParent->Internal.end(); ++jter)
@@ -831,6 +937,7 @@ void pqPipelineListModel::addConnection(pqPipelineObject *source,
             }
 
           this->endInsertRows();
+          sourceParent->Internal.clear();
           delete sourceParent;
 
           // If the sink chain is not being added to a splitter, set up
@@ -847,7 +954,7 @@ void pqPipelineListModel::addConnection(pqPipelineObject *source,
         parentIndex = this->createIndex(
             parentItem->Parent->Internal.indexOf(parentItem), 0, parentItem);
         i = parentItem->Internal.size();
-        row = i + sinkParent->Internal.size();
+        row = i + sinkParent->Internal.size() - 1;
         this->beginInsertRows(parentIndex, i, row);
         jter = sinkParent->Internal.begin();
         for( ; jter != sinkParent->Internal.end(); ++jter)
@@ -857,6 +964,7 @@ void pqPipelineListModel::addConnection(pqPipelineObject *source,
           }
 
         this->endInsertRows();
+        sinkParent->Internal.clear();
         delete sinkParent;
 
         // If the items are added to a new splitter, make sure the split
@@ -901,6 +1009,7 @@ void pqPipelineListModel::addConnection(pqPipelineObject *source,
     }
   else
     {
+    // TODO
     // Check to see if the source and sink are connected already.
 
     // Since the source and sink are in different windows, a link
@@ -908,18 +1017,33 @@ void pqPipelineListModel::addConnection(pqPipelineObject *source,
     }
 }
 
-void pqPipelineListModel::removeConnection(pqPipelineObject* /*source*/,
-                                           pqPipelineObject* /*sink*/)
+void pqPipelineListModel::removeConnection(pqPipelineObject *source,
+    pqPipelineObject *sink)
 {
+  if(!this->Internal || !source || !sink)
+    {
+    return;
+    }
+
+  if(this->Internal->CommandType == pqPipelineListInternal::DeleteAndConnect)
+    {
+    if(this->Internal->Subject == 0 || this->Internal->Subject == source)
+      {
+      this->Internal->Subject = source;
+      this->Internal->SinkList.append(sink);
+      return;
+      }
+    }
+
+  // TODO
 }
 
 void pqPipelineListModel::beginCreateAndAppend()
 {
   if(this->Internal)
     {
+    this->Internal->ResetCommand();
     this->Internal->CommandType = pqPipelineListInternal::CreateAndAppend;
-    this->Internal->MoveOrCreate = 0;
-    this->Internal->Source = 0;
     }
 }
 
@@ -931,11 +1055,9 @@ void pqPipelineListModel::finishCreateAndAppend()
     return;
     }
 
-  this->Internal->CommandType = pqPipelineListInternal::NoCommands;
-  pqPipelineObject *filter = this->Internal->MoveOrCreate;
+  pqPipelineObject *filter = this->Internal->Subject;
   pqPipelineObject *source = this->Internal->Source;
-  this->Internal->MoveOrCreate = 0;
-  this->Internal->Source = 0;
+  this->Internal->ResetCommand();
   if(!filter || !source)
     return;
 
@@ -990,10 +1112,8 @@ void pqPipelineListModel::beginCreateAndInsert()
 {
   if(this->Internal)
     {
+    this->Internal->ResetCommand();
     this->Internal->CommandType = pqPipelineListInternal::CreateAndInsert;
-    this->Internal->MoveOrCreate = 0;
-    this->Internal->Source = 0;
-    this->Internal->Sink = 0;
     }
 }
 
@@ -1005,13 +1125,10 @@ void pqPipelineListModel::finishCreateAndInsert()
     return;
     }
 
-  this->Internal->CommandType = pqPipelineListInternal::NoCommands;
-  pqPipelineObject *filter = this->Internal->MoveOrCreate;
+  pqPipelineObject *filter = this->Internal->Subject;
   pqPipelineObject *source = this->Internal->Source;
   pqPipelineObject *sink = this->Internal->Sink;
-  this->Internal->MoveOrCreate = 0;
-  this->Internal->Source = 0;
-  this->Internal->Sink = 0;
+  this->Internal->ResetCommand();
   if(!filter || !source || !sink)
     return;
 
@@ -1090,6 +1207,91 @@ void pqPipelineListModel::finishCreateAndInsert()
       }
 
     delete newItem;
+    }
+}
+
+void pqPipelineListModel::beginDeleteAndConnect()
+{
+  if(this->Internal)
+    {
+    this->Internal->ResetCommand();
+    this->Internal->CommandType = pqPipelineListInternal::DeleteAndConnect;
+    }
+}
+
+void pqPipelineListModel::finishDeleteAndConnect()
+{
+  if(!this->Internal || this->Internal->CommandType !=
+      pqPipelineListInternal::DeleteAndConnect)
+    {
+    return;
+    }
+
+  pqPipelineObject *object = this->Internal->Subject;
+  QList<pqPipelineObject *> sourceList = this->Internal->SourceList;
+  QList<pqPipelineObject *> sinkList = this->Internal->SinkList;
+  this->Internal->ResetCommand();
+  if(!object || sinkList.size() < 1)
+    {
+    return;
+    }
+
+  // Get the list item from the lookup table.
+  QHash<pqPipelineObject *, pqPipelineListItem *>::Iterator iter =
+      this->Internal->Lookup.find(object);
+  if(iter == this->Internal->Lookup.end())
+    {
+    return;
+    }
+
+  // Since the connections were re-established around the removed
+  // item, it can simply be removed.
+  pqPipelineListItem *item = *iter;
+  QModelIndex parentIndex = this->createIndex(
+      item->Parent->Parent->Internal.indexOf(item->Parent), 0, item->Parent);
+  int row = item->Parent->Internal.indexOf(item);
+  this->beginRemoveRows(parentIndex, row, row);
+  item->Parent->Internal.removeAll(item);
+  this->Internal->Lookup.erase(iter);
+  this->removeLookupItems(item);
+  this->endRemoveRows();
+  delete item;
+
+  // If the source list has more than one item, the link back items
+  // in the tree need to be updated.
+  if(sourceList.size() > 1)
+    {
+    iter = this->Internal->Lookup.find(sinkList[0]);
+    if(iter == this->Internal->Lookup.end())
+      {
+      return;
+      }
+
+    int row = 0;
+    pqPipelineListItem *sourceItem = 0;
+    pqPipelineListItem *sinkItem = *iter;
+    QList<pqPipelineObject *>::Iterator jter = sourceList.begin();
+    for( ; jter != sourceList.end(); ++jter)
+      {
+      iter = this->Internal->Lookup.find(*jter);
+      if(iter == this->Internal->Lookup.end())
+        {
+        continue;
+        }
+
+      // Find the link item in the source's parent. Change the link
+      // to point to the new sink item.
+      sourceItem = *iter;
+      row = sourceItem->Parent->Internal.indexOf(sourceItem) + 1;
+      if(row < sourceItem->Parent->Internal.size())
+        {
+        item = sourceItem->Parent->Internal[row];
+        if(item->Type == pqPipelineListModel::LinkBack)
+          {
+          item->Data.Link = sinkItem;
+          }
+        }
+      }
     }
 }
 

@@ -27,6 +27,8 @@ public:
   pqPipelineListWidget(QWidget *parent=0);
   virtual ~pqPipelineListWidget();
 
+  virtual bool eventFilter(QObject *object, QEvent *event);
+
   pqPipelineListModel *getListModel() const {return this->ListModel;}
   QTreeView *getTreeView() const {return this->TreeView;}
 
@@ -40,6 +42,9 @@ signals:
 public slots:
   void selectProxy(vtkSMProxy *proxy);
   void selectWindow(QVTKWidget *window);
+
+  void deleteSelected();
+  void deleteProxy(vtkSMProxy *proxy);
 
 private slots:
   void changeCurrent(const QModelIndex &current, const QModelIndex &previous);

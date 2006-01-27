@@ -10,12 +10,15 @@
 
 #include "pqPipelineData.h"
 #include "pqPipelineListModel.h"
+#include "pqPipelineObject.h"
 #include "QVTKWidget.h"
 #include "vtkSMProxy.h"
 #include "vtkSMSourceProxy.h"
 
+#include <QEvent>
 #include <QHeaderView>
 #include <QItemSelectionModel>
+#include <QKeyEvent>
 #include <QTreeView>
 #include <QVBoxLayout>
 
@@ -38,6 +41,7 @@ pqPipelineListWidget::pqPipelineListWidget(QWidget *p)
     this->TreeView->setObjectName("PipelineView");
     this->TreeView->header()->hide();
     this->TreeView->setModel(this->ListModel);
+    this->TreeView->installEventFilter(this);
 
     // Listen to the selection change signals.
     QItemSelectionModel *selection = this->TreeView->selectionModel();
@@ -68,6 +72,20 @@ pqPipelineListWidget::pqPipelineListWidget(QWidget *p)
 
 pqPipelineListWidget::~pqPipelineListWidget()
 {
+}
+
+bool pqPipelineListWidget::eventFilter(QObject *object, QEvent *event)
+{
+  if(object == this->TreeView && event->type() == QEvent::KeyPress)
+    {
+    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+    if(keyEvent->key() == Qt::Key_Delete)
+      {
+      this->deleteSelected();
+      }
+    }
+
+  return QWidget::eventFilter(object, event);
 }
 
 vtkSMProxy *pqPipelineListWidget::getSelectedProxy() const
@@ -148,6 +166,106 @@ void pqPipelineListWidget::selectWindow(QVTKWidget *win)
     this->TreeView->selectionModel()->setCurrentIndex(index,
         QItemSelectionModel::Select | QItemSelectionModel::Current |
         QItemSelectionModel::Clear);
+    }
+}
+
+void pqPipelineListWidget::deleteSelected()
+{
+  if(!this->ListModel || !this->TreeView)
+    {
+    return;
+    }
+
+  // Get the current index from the tree view.
+  QModelIndex current = this->TreeView->selectionModel()->currentIndex();
+  pqPipelineListModel::ItemType type = this->ListModel->getTypeFor(current);
+  if(type == pqPipelineListModel::Source ||
+      type == pqPipelineListModel::Filter ||
+      type == pqPipelineListModel::Bundle)
+    {
+    deleteProxy(this->ListModel->getProxyFor(current));
+    }
+}
+
+void pqPipelineListWidget::deleteProxy(vtkSMProxy *proxy)
+{
+  pqPipelineData *pipeline = pqPipelineData::instance();
+  if(!proxy || !this->ListModel || !pipeline)
+    {
+    return;
+    }
+
+  pqPipelineObject *object = pipeline->getObjectFor(proxy);
+  if(!object)
+    {
+    return;
+    }
+
+  // Make sure there is a valid index for the proxy as well.
+  if(!this->ListModel->getIndexFor(proxy).isValid())
+    {
+    return;
+    }
+
+  // Check the connections on the object. If the connections are
+  // simple enough, the item can be removed without any re-arranging.
+  // Otherwise, send the delete through the regular channel.
+  bool canReconnect = false;
+  if(object->GetInputCount() == 0)
+    {
+    canReconnect = object->GetOutputCount() == 1;
+    }
+  else if(object->GetInputCount() == 1)
+    {
+    canReconnect = object->GetOutputCount() >= 1;
+    }
+  else if(object->GetInputCount() > 1)
+    {
+    canReconnect = object->GetOutputCount() == 1;
+    }
+
+  if(canReconnect)
+    {
+    // Save the connections.
+    int i = 0;
+    QList<pqPipelineObject *> input;
+    QList<pqPipelineObject *> output;
+    QList<pqPipelineObject *>::Iterator iter;
+    for( ; i < object->GetInputCount(); i++)
+      {
+      input.append(object->GetInput(i));
+      }
+
+    for(i = 0; i < object->GetOutputCount(); i++)
+      {
+      output.append(object->GetOutput(i));
+      }
+
+    // Delete the proxy and reconnect the surrounding proxies.
+    this->ListModel->beginDeleteAndConnect();
+    pipeline->deleteProxy(proxy);
+    if(input.size() == 1)
+      {
+      vtkSMProxy *inputProxy = input[0]->GetProxy();
+      for(iter = output.begin(); iter != output.end(); ++iter)
+        {
+        pipeline->addInput((*iter)->GetProxy(), inputProxy);
+        }
+      }
+    else if(input.size() > 1)
+      {
+      vtkSMProxy *outputProxy = output[0]->GetProxy();
+      for(iter = input.begin(); iter != input.end(); ++iter)
+        {
+        pipeline->addInput(outputProxy, (*iter)->GetProxy());
+        }
+      }
+
+    this->ListModel->finishDeleteAndConnect();
+    }
+  else
+    {
+    pipeline->deleteProxy(proxy);
     }
 }
 

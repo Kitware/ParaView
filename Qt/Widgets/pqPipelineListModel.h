@@ -118,6 +118,7 @@ public:
 
   vtkSMProxy *getProxyFor(const QModelIndex &index) const;
   QWidget *getWidgetFor(const QModelIndex &index) const;
+  pqPipelineObject *getObjectFor(const QModelIndex &index) const;
 
   QModelIndex getIndexFor(vtkSMProxy *proxy) const;
   QModelIndex getIndexFor(QVTKWidget *window) const;
@@ -136,6 +137,7 @@ public slots:
 
   void addFilter(pqPipelineObject *filter);
   void removeFilter(pqPipelineObject *filter);
+  void removeObject(pqPipelineObject *object);
 
   void addConnection(pqPipelineObject *source, pqPipelineObject *sink);
   void removeConnection(pqPipelineObject *source, pqPipelineObject *sink);
@@ -144,6 +146,8 @@ public slots:
   void finishCreateAndAppend();
   void beginCreateAndInsert();
   void finishCreateAndInsert();
+  void beginDeleteAndConnect();
+  void finishDeleteAndConnect();
 
 signals:
   void childAdded(const QModelIndex &index);

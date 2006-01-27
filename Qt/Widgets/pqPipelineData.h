@@ -12,6 +12,9 @@ class pqPipelineServer;
 class pqPipelineWindow;
 class pqServer;
 class QVTKWidget;
+class vtkObject;
+class vtkCommand;
+class vtkEventQtSlotConnect;
 class vtkPVXMLElement;
 class vtkSMProxy;
 class vtkSMRenderModuleProxy;
@@ -30,6 +33,8 @@ public:
   virtual ~pqPipelineData();
 
   static pqPipelineData *instance();
+
+  pqNameCount *getNameCount() const {return this->Names;}
 
   void saveState(vtkPVXMLElement *root, pqMultiView *multiView=0);
   void loadState(vtkPVXMLElement *root, pqMultiView *multiView=0);
@@ -57,6 +62,8 @@ public:
   vtkSMSourceProxy *createFilter(const char *proxyName, QVTKWidget *window);
   vtkSMCompoundProxy *createCompoundProxy(const char *proxyName, QVTKWidget *window);
 
+  void deleteProxy(vtkSMProxy *proxy);
+
   // TODO: should take a window to create a display proxy in, but source proxy is already tied to window
   //! create a display proxy for a source proxy
   vtkSMDisplayProxy* createDisplay(vtkSMSourceProxy* source, vtkSMProxy* rep = NULL);
@@ -81,6 +88,7 @@ signals:
 
   void sourceCreated(pqPipelineObject *source);
   void filterCreated(pqPipelineObject *filter);
+  void removingObject(pqPipelineObject *object);
 
   void connectionCreated(pqPipelineObject *source, pqPipelineObject *sink);
   void removingConnection(pqPipelineObject *source, pqPipelineObject *sink);
@@ -101,12 +109,19 @@ public:
   /// get the current proxy
   vtkSMProxy* currentProxy() const;
 
+private slots:
+  void proxyRegistered(vtkObject* object, unsigned long event,
+      void* clientData, void* callData, vtkCommand* command);
+  void inputChanged(vtkObject* object, unsigned long event, void* clientData,
+      void* callData, vtkCommand* command);
+
 protected:
-  pqPipelineDataInternal *Internal; ///< Stores the pipeline objects.
-  pqNameCount *Names;               ///< Keeps track of the proxy names.
+  pqPipelineDataInternal *Internal;  ///< Stores the pipeline objects.
+  pqNameCount *Names;                ///< Keeps track of the proxy names.
+  vtkEventQtSlotConnect *VTKConnect; ///< Used to listen to proxy events.
   vtkSMProxy* CurrentProxy;
 
-  static pqPipelineData *Instance;  ///< Pointer to the pipeline instance.
+  static pqPipelineData *Instance;   ///< Pointer to the pipeline instance.
 };
 
 #endif // _pqPipelineData_h

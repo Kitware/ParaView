@@ -65,4 +65,29 @@ void pqNameCount::IncrementCount(const QString &name)
     }
 }
 
+void pqNameCount::SetCount(const QString &name, unsigned int count)
+{
+  if(this->Internal)
+    {
+    QHash<QString, unsigned int>::Iterator iter = this->Internal->find(name);
+    if(iter != this->Internal->end())
+      {
+      (*iter) = count;
+      }
+    else
+      {
+      // Add the new name into the map.
+      this->Internal->insert(name, count);
+      }
+    }
+}
+
+void pqNameCount::Reset()
+{
+  if(this->Internal)
+    {
+    this->Internal->clear();
+    }
+}
+
 

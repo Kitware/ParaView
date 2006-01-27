@@ -6,11 +6,13 @@
 #define _pqNameCount_h
 
 
+#include "QtWidgetsExport.h"
+
 class pqNameCountInternal;
 class QString;
 
 
-class pqNameCount
+class QTWIDGETS_EXPORT pqNameCount
 {
 public:
   pqNameCount();
@@ -19,6 +21,9 @@ public:
   unsigned int GetCount(const QString &name);
   unsigned int GetCountAndIncrement(const QString &name);
   void IncrementCount(const QString &name);
+  void SetCount(const QString &name, unsigned int count);
+
+  void Reset();
 
 private:
   pqNameCountInternal *Internal;

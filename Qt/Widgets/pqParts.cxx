@@ -23,9 +23,12 @@
 #include <vtkSMProxyManager.h>
 #include <vtkProcessModule.h>
 
+#include "pqNameCount.h"
 #include "pqPipelineData.h"
 #include "pqSMAdaptor.h"
 #include "pqPipelineObject.h"
+
+#include <QString>
 
 vtkSMDisplayProxy* pqAddPart(vtkSMRenderModuleProxy* rm, vtkSMSourceProxy* Part)
 {
@@ -284,7 +287,16 @@ void pqColorPart(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype)
     lut->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
     pp = vtkSMProxyProperty::SafeDownCast(Part->GetProperty("LookupTable"));
     pp->AddProxy(lut);
-    
+
+    // Register the lookup table with the server manager so save/restore
+    // works correctly.
+    QString name;
+    pqPipelineData *pipeline = pqPipelineData::instance();
+    name.setNum(pipeline->getNameCount()->GetCountAndIncrement("LookupTable"));
+    name.prepend("LookupTable");
+    vtkSMObject::GetProxyManager()->RegisterProxy("lookup_tables",
+        name.toAscii().data(), lut);
+
     pqSMAdaptor::instance()->setProperty(Part->GetProperty("ScalarVisibility"), 1);
     pqSMAdaptor::instance()->setProperty(Part->GetProperty("ScalarMode"), fieldtype);
 
