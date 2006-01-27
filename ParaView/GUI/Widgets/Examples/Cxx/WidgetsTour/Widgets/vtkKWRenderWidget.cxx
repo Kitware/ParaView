@@ -1,6 +1,5 @@
 #include "vtkActor.h"
 #include "vtkKWApplication.h"
-#include "vtkGenericRenderWindowInteractor.h"
 #include "vtkKWRenderWidget.h"
 #include "vtkKWWindow.h"
 #include "vtkPolyDataMapper.h"
