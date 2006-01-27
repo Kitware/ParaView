@@ -1093,7 +1093,7 @@ void pqMainWindow::onCreateCompoundProxy(QAction* action)
 
 void pqMainWindow::onCompoundProxyAdded(const QString&, const QString& proxy)
 {
-  this->CompoundProxyToolBar->addAction(QIcon(":/pqWidgets/pqFilter32.png"), proxy) 
+  this->CompoundProxyToolBar->addAction(QIcon(":/pqWidgets/pqBundle32.png"), proxy) 
     << pqSetName(proxy) << pqSetData(proxy);
 }
 
