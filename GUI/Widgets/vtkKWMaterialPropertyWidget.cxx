@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.24");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.25");
 
 //----------------------------------------------------------------------------
 class vtkKWMaterialPropertyWidgetInternals
@@ -49,8 +49,8 @@ public:
 //----------------------------------------------------------------------------
 vtkKWMaterialPropertyWidget::vtkKWMaterialPropertyWidget()
 {
-  this->PreviewSize      = 48;
-  this->PresetSize       = 48;
+  this->PreviewSize      = 40;
+  this->PresetSize       = 40;
   this->PopupPreviewSize = 24;
   this->GridOpacity      = 0.3;
   this->LightingParametersVisibility  = 1;
