@@ -108,6 +108,7 @@ class VTK_EXPORT vtkKWView : public vtkPVTracedWidget
   // Handle the file save as image menu option.
   virtual void SaveAsImage();
   virtual void SaveAsImage(const char* filename);
+  void DisplaySavedImage(const char* path);
 
   // Description
   // Printthe image. This may pop up a dialog box etc.
@@ -326,7 +327,7 @@ protected:
   ~vtkKWView();
 
   vtkPVCornerAnnotationEditor *CornerAnnotation;
-  
+
   vtkKWNotebook *Notebook;
   int InExpose;
   int SharedPropertiesParent;
@@ -377,6 +378,9 @@ protected:
              float minX, float minY, float scaleX, float scaleY);
 #endif
   
+  void SetupStreaming();
+  void CleanupStreaming(int rate, int stride[3]);
+
 private:
   vtkKWView(const vtkKWView&); // Not implemented
   void operator=(const vtkKWView&); // Not implemented

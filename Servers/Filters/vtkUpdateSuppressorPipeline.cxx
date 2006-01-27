@@ -18,7 +18,7 @@
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkUpdateSuppressorPipeline, "1.5");
+vtkCxxRevisionMacro(vtkUpdateSuppressorPipeline, "1.6");
 vtkStandardNewMacro(vtkUpdateSuppressorPipeline);
 
 
@@ -45,7 +45,12 @@ int vtkUpdateSuppressorPipeline::ProcessRequest(vtkInformation* request,
 {
   if(this->Algorithm && request->Has(REQUEST_DATA()))
     {
-    return 1;
+    vtkInformation *info = outInfo->GetInformationObject(0);
+    if (info->Get(
+          vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()) == 1)
+      {
+      return 1;
+      }
     }
   if(request->Has(REQUEST_UPDATE_EXTENT()))
     {

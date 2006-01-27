@@ -31,7 +31,7 @@
 // Only required for the prototype streaming feature.
 #include "vtkPolyDataStreamer.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.31");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.32");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -254,6 +254,31 @@ vtkExecutive* vtkPVUpdateSuppressor::CreateDefaultExecutive()
   return vtkUpdateSuppressorPipeline::New();
 }
 
+
+//----------------------------------------------------------------------------
+int vtkPVUpdateSuppressor::RequestData(vtkInformation *request,
+                                       vtkInformationVector **inputVector,
+                                       vtkInformationVector *outputVector)
+{
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  vtkDataSet *input = vtkDataSet::SafeDownCast(
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkDataSet *output = vtkDataSet::SafeDownCast(
+    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+  if (outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()) > 1)
+    {
+    input->SetUpdateNumberOfPieces(outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
+    input->SetUpdatePiece(outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
+    input->SetUpdateGhostLevel(outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
+    input->Update();
+    output->ShallowCopy(input);
+    return 1;
+    }
+
+  return this->Superclass::RequestData(request, inputVector, outputVector);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVUpdateSuppressor::PrintSelf(ostream& os, vtkIndent indent)

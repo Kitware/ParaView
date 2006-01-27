@@ -566,6 +566,12 @@
           <Group name="implicit_functions"/>
          </ProxyGroupDomain>
       </ProxyProperty>
+      <IntVectorProperty name="NumberOfSubPieces"
+                         command="SetNumberOfSubPieces"
+                         number_of_elements="1"
+                         default_values="1">
+        <IntRangeDomain name="range" min="1"/>
+      </IntVectorProperty>
     </SourceProxy>
 
     <SourceProxy name="ProjectedTetrahedraMapper" 
@@ -2134,6 +2140,7 @@
           <Property name="ScalarMode" />
           <Property name="ColorArray" />
           <Property name="ClippingPlanes" />
+          <Property name="NumberOfSubPieces" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
