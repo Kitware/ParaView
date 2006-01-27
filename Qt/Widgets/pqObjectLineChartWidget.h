@@ -38,7 +38,7 @@ public slots:
   /// Call this to set the current variable
   void setVariable(pqVariableType, const QString&);
   /// Call this to clear the set of elements
-  void clearElements();
+  void clear();
   /// Call this to add a collection of element IDs to the set of elements
   void addElements(vtkUnstructuredGrid* Elements);
   /// Call this to set the collection of element IDs

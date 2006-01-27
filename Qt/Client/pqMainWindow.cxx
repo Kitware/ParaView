@@ -335,7 +335,7 @@ pqMainWindow::pqMainWindow() :
 
   this->addDockWidget(Qt::BottomDockWidgetArea, this->ElementInspectorDock);
 
-  connect(element_inspector, SIGNAL(elementsChanged(vtkUnstructuredGrid*)), line_chart, SLOT(addElements(vtkUnstructuredGrid*)));
+  connect(element_inspector, SIGNAL(elementsChanged(vtkUnstructuredGrid*)), line_chart, SLOT(setElements(vtkUnstructuredGrid*)));
 
   // Set up the view menu items for the dock windows.
   this->PipelineDockAction = viewMenu->addAction(
@@ -1021,7 +1021,7 @@ void pqMainWindow::onNewSelections(vtkSMProxy*, vtkUnstructuredGrid* selections)
   // Update the element inspector ...
   if(pqElementInspectorWidget* const element_inspector = this->ElementInspectorDock->findChild<pqElementInspectorWidget*>())
     {
-    element_inspector->setElements(selections);
+    element_inspector->addElements(selections);
     }
 }
 

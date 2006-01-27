@@ -18,10 +18,7 @@
 #include <pqPiecewiseLine.h>
 #include <pqLinearRamp.h>
 
-#include <QPushButton>
-#include <QComboBox>
-#include <QLabel>
-#include <QSpinBox>
+#include <QHBoxLayout>
 #include <QVBoxLayout>
 
 #include <vtkCellData.h>
@@ -128,7 +125,7 @@ struct pqObjectLineChartWidget::pqImplementation
     this->updateChart();
   }
   
-  void clearElements()
+  void clear()
   {
     this->Elements.clear();
     this->updateChart();
@@ -277,11 +274,7 @@ pqObjectLineChartWidget::pqObjectLineChartWidget(QWidget *p) :
   QWidget(p),
   Implementation(new pqImplementation())
 {
-  QPushButton* const clear = new QPushButton(tr("Clear"));
-  connect(clear, SIGNAL(clicked()), SLOT(clearElements()));
-
   QHBoxLayout* const hbox = new QHBoxLayout();
-  hbox->addWidget(clear);
   hbox->setMargin(0);
 
   QVBoxLayout* const vbox = new QVBoxLayout();
@@ -320,9 +313,9 @@ void pqObjectLineChartWidget::setVariable(pqVariableType type, const QString& na
   this->Implementation->setVariable(type, name);
 }
 
-void pqObjectLineChartWidget::clearElements()
+void pqObjectLineChartWidget::clear()
 {
-  this->Implementation->clearElements();
+  this->Implementation->clear();
 }
 
 void pqObjectLineChartWidget::addElements(vtkUnstructuredGrid* Elements)
