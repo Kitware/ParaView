@@ -42,7 +42,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.124");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.125");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -1327,13 +1327,7 @@ void* vtkKWRenderWidget::GetMemoryDC()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetupMemoryRendering(
-#ifdef _WIN32
-  int x, int y, void *cd
-#else
-  int, int, void*
-#endif
-  )
+void vtkKWRenderWidget::SetupMemoryRendering( int x, int y, void *cd)
 {
 #ifdef _WIN32
   if (!cd)
@@ -1342,6 +1336,8 @@ void vtkKWRenderWidget::SetupMemoryRendering(
     }
   vtkWin32OpenGLRenderWindow::
     SafeDownCast(this->RenderWindow)->SetupMemoryRendering(x, y, (HDC)cd);
+#else
+  (void)x; (void)y; (void)cd;
 #endif
 }
 
