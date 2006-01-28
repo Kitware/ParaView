@@ -10,11 +10,23 @@ IF (NOT KWWidgets_SOURCE_DIR)
   INCLUDE(${KWWidgets_USE_FILE})
 ENDIF (NOT KWWidgets_SOURCE_DIR)
 
-# This example require the SOViewer package. If not found, quietly not build it
+# This example require the SOViewer package. 
+# If are building this example as a standalone external project, abort the
+# build process if the package was not found. If we are building it as part
+# of the whole KWWidgets source tree, just quietly ignore this example until
+# the user configures the SOV_DIR path manually.
 
-FIND_PACKAGE(SOV QUIET)
+IF (NOT KWWidgets_SOURCE_DIR)
+  FIND_PACKAGE(SOV REQUIRED)
+ELSE (NOT KWWidgets_SOURCE_DIR)
+  FIND_PACKAGE(SOV QUIET)
+  MARK_AS_ADVANCED(SOV_DIR)
+ENDIF (NOT KWWidgets_SOURCE_DIR)
+
 IF(SOV_FOUND)
+
 INCLUDE(${SOV_USE_FILE})
+MARK_AS_ADVANCED(FLTK_FLUID_EXECUTABLE)
 
 # The name of our targets (executable or libraries) will simply be based
 # on the project name, with an extra prefix and suffix.
