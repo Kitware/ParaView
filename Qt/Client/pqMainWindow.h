@@ -21,6 +21,7 @@ class pqPipelineServer;
 class pqPipelineWindow;
 class pqServer;
 class pqSMAdaptor;
+class pqSourceProxyInfo;
 class pqMultiViewManager;
 class pqMultiViewFrame;
 
@@ -82,6 +83,7 @@ private:
   QToolBar* CompoundProxyToolBar;
   QToolBar* VariableSelectorToolBar;
 
+  pqSourceProxyInfo* ProxyInfo;
   vtkEventQtSlotConnect* VTKConnector;
   vtkSMProxy* CurrentProxy;
 

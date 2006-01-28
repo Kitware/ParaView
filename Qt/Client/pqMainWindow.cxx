@@ -36,6 +36,7 @@
 #include "pqSetData.h"
 #include "pqSetName.h"
 #include "pqSMAdaptor.h"
+#include "pqSourceProxyInfo.h"
 #include "pqPicking.h"
 #include "pqDataSetModel.h"
 #include "pqCompoundProxyWizard.h"
@@ -114,6 +115,7 @@ pqMainWindow::pqMainWindow() :
   ElementDockAction(0),
   CompoundProxyToolBar(0),
   VariableSelectorToolBar(0),
+  ProxyInfo(0),
   CurrentProxy(0)
 {
   this->setObjectName("mainWindow");
@@ -122,6 +124,7 @@ pqMainWindow::pqMainWindow() :
   // Set up the main ParaQ items along with the central widget.
   this->Adaptor = new pqSMAdaptor();
   this->Pipeline = new pqPipelineData(this);
+  this->ProxyInfo = new pqSourceProxyInfo();
   this->VTKConnector = vtkEventQtSlotConnect::New();
 
   this->MultiViewManager = new pqMultiViewManager(this) << pqSetName("MultiViewManager");
@@ -419,6 +422,12 @@ pqMainWindow::~pqMainWindow()
     {
     delete this->MultiViewManager;
     this->MultiViewManager = 0;
+    }
+
+  if(this->ProxyInfo)
+    {
+    delete this->ProxyInfo;
+    this->ProxyInfo = 0;
     }
 
   this->VTKConnector->Delete();
@@ -810,13 +819,89 @@ void pqMainWindow::onUpdateSourcesFiltersMenu(pqServer* /*Server*/)
 
   if(this->CurrentServer)
     {
+    QMenu *alphabetical = this->FiltersMenu;
+    QMap<QString, QMenu *> categories;
+    QStringList::Iterator iter;
+    if(this->ProxyInfo)
+      {
+      // Load in the filter information if it is not present.
+      if(!this->ProxyInfo->IsFilterInfoLoaded())
+        {
+        QFile filterInfo(":/pqClient/ParaQFilters.xml");
+        if(filterInfo.open(QIODevice::ReadOnly))
+          {
+          vtkPVXMLParser *xmlParser = vtkPVXMLParser::New();
+          xmlParser->InitializeParser();
+          QByteArray data = filterInfo.read(1024);
+          while(!data.isEmpty())
+            {
+            xmlParser->ParseChunk(data.data(), data.length());
+            data = filterInfo.read(1024);
+            }
+
+          xmlParser->CleanupParser();
+
+          filterInfo.close();
+          vtkPVXMLElement *element = xmlParser->GetRootElement();
+          this->ProxyInfo->LoadFilterInfo(element);
+          xmlParser->Delete();
+          }
+        }
+
+      // Set up the filters menu based on the filter information.
+      QStringList menuNames;
+      this->ProxyInfo->GetFilterMenu(menuNames);
+      if(menuNames.size() > 0)
+        {
+        // Only use an alphabetical menu if requested.
+        alphabetical = 0;
+        }
+
+      for(iter = menuNames.begin(); iter != menuNames.end(); ++iter)
+        {
+        if((*iter).isEmpty())
+          {
+          this->FiltersMenu->addSeparator();
+          }
+        else
+          {
+          QMenu *menu = this->FiltersMenu->addMenu(*iter);
+          categories.insert(*iter, menu);
+          if((*iter) == "&Alphabetical" || (*iter) == "Alphabetical")
+            {
+            alphabetical = menu;
+            }
+          }
+        }
+      }
+
     vtkSMProxyManager* manager = this->CurrentServer->GetProxyManager();
     manager->InstantiateGroupPrototypes("filters");
     int numFilters = manager->GetNumberOfProxies("filters_prototypes");
     for(int i=0; i<numFilters; i++)
       {
-      const char* proxyName = manager->GetProxyName("filters_prototypes",i);
-      this->FiltersMenu->addAction(proxyName) << pqSetName(proxyName) << pqSetData(proxyName);
+      QStringList categoryList;
+      QString proxyName = manager->GetProxyName("filters_prototypes",i);
+      if(this->ProxyInfo)
+        {
+        this->ProxyInfo->GetFilterMenuCategories(proxyName, categoryList);
+        }
+
+      for(iter = categoryList.begin(); iter != categoryList.end(); ++iter)
+        {
+        QMap<QString, QMenu *>::Iterator jter = categories.find(*iter);
+        if(jter != categories.end())
+          {
+          (*jter)->addAction(proxyName) << pqSetName(proxyName)
+              << pqSetData(proxyName);
+          }
+        }
+
+      if(alphabetical)
+        {
+        alphabetical->addAction(proxyName) << pqSetName(proxyName)
+            << pqSetData(proxyName);
+        }
       }
 
 #if 1
@@ -836,6 +921,8 @@ void pqMainWindow::onUpdateSourcesFiltersMenu(pqServer* /*Server*/)
     this->SourcesMenu->addAction("Superquadric") << pqSetName("Superquadric") << pqSetData("SuperquadricSource");
     this->SourcesMenu->addAction("Wavelet") << pqSetName("Wavelet") << pqSetData("RTAnalyticSource");
 #else
+    // TODO: Add a sources xml file to organize the sources instead of
+    // hardcoding them.
     manager->InstantiateGroupPrototypes("sources");
     int numSources = manager->GetNumberOfProxies("sources_prototypes");
     for(int i=0; i<numSources; i++)

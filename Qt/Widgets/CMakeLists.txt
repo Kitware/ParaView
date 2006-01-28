@@ -131,10 +131,6 @@ ADD_LIBRARY(QtWidgets
   pqPipelineWindow.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
-  pqSMAdaptor.cxx
-  pqSMAdaptor.h
-  pqSMMultiView.cxx
-  pqSMMultiView.h
   pqServer.cxx
   pqServer.h
   pqServerBrowser.cxx
@@ -145,6 +141,12 @@ ADD_LIBRARY(QtWidgets
   pqSetData.h
   pqSetName.cxx
   pqSetName.h
+  pqSMAdaptor.cxx
+  pqSMAdaptor.h
+  pqSMMultiView.cxx
+  pqSMMultiView.h
+  pqSourceProxyInfo.cxx
+  pqSourceProxyInfo.h
   pqVariableSelectorWidget.cxx
   pqVariableSelectorWidget.h
   pqVariableType.h
