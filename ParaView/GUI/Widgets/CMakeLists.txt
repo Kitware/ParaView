@@ -411,6 +411,55 @@ VTK_WRAP_TCL3(
 
 SUBDIRS(Wrapping/Tcl)
 
+
+# --------------------------------------------------------------------------
+# Wrap the classes in Python
+
+IF(VTK_WRAP_PYTHON)
+
+  SET(KWWidgetsPythonExtra_SRCS)
+  IF(APPLE OR VTK_MAJOR_VERSION GREATER 4)
+    SET(KWWidgetsPython_LIBS vtkCommonPythonD)
+  ELSE(APPLE OR VTK_MAJOR_VERSION GREATER 4)
+    SET(KWWidgetsPython_LIBS vtkCommonPython)
+  ENDIF(APPLE OR VTK_MAJOR_VERSION GREATER 4)
+
+  INCLUDE("${VTK_CMAKE_DIR}/vtkWrapPython.cmake")
+
+  VTK_WRAP_PYTHON3(KWWidgetsPython KWWidgetsPython_SRCS
+                   "${KWWidgets_SRCS} ${KWWidgetsPythonExtra_SRCS}")
+
+  ADD_LIBRARY(KWWidgetsPythonD ${KWWidgetsPython_SRCS} 
+              ${KWWidgetsPythonExtra_SRCS})
+  TARGET_LINK_LIBRARIES(KWWidgetsPythonD KWWidgets ${KWWidgetsPython_LIBS})
+
+  IF(WIN32 OR APPLE)
+    TARGET_LINK_LIBRARIES(KWWidgetsPythonD ${VTK_PYTHON_LIBRARIES})
+  ENDIF(WIN32 OR APPLE)
+
+  ADD_LIBRARY(KWWidgetsPython MODULE KWWidgetsPythonExtraInit.cxx)
+  TARGET_LINK_LIBRARIES(KWWidgetsPython KWWidgetsPythonD)
+
+  IF(WIN32 OR APPLE)
+    TARGET_LINK_LIBRARIES(KWWidgetsPython ${VTK_PYTHON_LIBRARIES})
+  ENDIF(WIN32 OR APPLE)
+
+  FIND_PROGRAM(PYTHON_EXECUTABLE
+    NAMES python2.6 python2.5 python2.4 python2.3 python2.2 python
+    PATHS
+    [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.6\\InstallPath]
+    [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.5\\InstallPath]
+    [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.4\\InstallPath]
+    [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.3\\InstallPath]
+    [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.2\\InstallPath]
+  )
+  MARK_AS_ADVANCED(PYTHON_EXECUTABLE)
+
+  SUBDIRS(Wrapping/Python)
+
+ENDIF(VTK_WRAP_PYTHON)
+
+
 # If needed, copy the Tcl/Tk support files required at run-time 
 # to initialize Tcl/Tk. This is used by the examples or larger
 # projects that include KWWidgets directly in their source trees.
@@ -445,9 +494,11 @@ TARGET_LINK_LIBRARIES(KWWidgets vtkCommonTCL)
 IF(VTK_WRAP_TCL)
   IF(VTK_USE_RENDERING OR VTK_USE_RENDERING_ISSET)
     TARGET_LINK_LIBRARIES(KWWidgets vtkRenderingTCL)
-    TARGET_LINK_LIBRARIES(KWWidgets vtkVolumeRenderingTCL)
     TARGET_LINK_LIBRARIES(KWWidgets vtkHybridTCL)
-    TARGET_LINK_LIBRARIES(KWWidgets vtkWidgetsTCL)
+    IF(VTK_MAJOR_VERSION GREATER 4)
+      TARGET_LINK_LIBRARIES(KWWidgets vtkWidgetsTCL)
+      TARGET_LINK_LIBRARIES(KWWidgets vtkVolumeRenderingTCL)
+    ENDIF(VTK_MAJOR_VERSION GREATER 4)
   ENDIF(VTK_USE_RENDERING OR VTK_USE_RENDERING_ISSET)
   IF(VTK_USE_PARALLEL OR VTK_USE_PARALLEL_ISSET)
     TARGET_LINK_LIBRARIES(KWWidgets vtkParallelTCL)
@@ -455,9 +506,11 @@ IF(VTK_WRAP_TCL)
 ELSE(VTK_WRAP_TCL)
   IF(VTK_USE_RENDERING OR VTK_USE_RENDERING_ISSET)
     TARGET_LINK_LIBRARIES(KWWidgets vtkRendering)
-    TARGET_LINK_LIBRARIES(KWWidgets vtkVolumeRendering)
     TARGET_LINK_LIBRARIES(KWWidgets vtkHybrid)
-    TARGET_LINK_LIBRARIES(KWWidgets vtkWidgets)
+    IF(VTK_MAJOR_VERSION GREATER 4)
+      TARGET_LINK_LIBRARIES(KWWidgets vtkWidgets)
+      TARGET_LINK_LIBRARIES(KWWidgets vtkVolumeRendering)
+    ENDIF(VTK_MAJOR_VERSION GREATER 4)
   ENDIF(VTK_USE_RENDERING OR VTK_USE_RENDERING_ISSET)
   IF(VTK_USE_PARALLEL OR VTK_USE_PARALLEL_ISSET)
     TARGET_LINK_LIBRARIES(KWWidgets vtkParallel)

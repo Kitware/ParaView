@@ -1,0 +1,123 @@
+#!/usr/bin/env python
+
+"""
+setup.py for installing the VTK-Python bindings using distutils.
+
+Created by Prabhu Ramachandran, June 2002.
+
+Updated for install with configuration types by Brad King, August 2005.
+
+Modified for kwwidgets by David Gobbi, January 2005.
+
+"""
+
+import sys
+import string
+import os
+import os.path
+from types import StringType
+from distutils.core import setup
+from distutils.command.install_data import install_data
+from distutils.sysconfig import get_config_var
+
+# Support for Python Eggs:
+#  http://peak.telecommunity.com/DevCenter/PythonEggs
+#  http://peak.telecommunity.com/DevCenter/EasyInstall
+has_setup_tools = 0
+# Uncomment the following two lines if you need to build an Egg.
+# This is commented out by default since the install rule seems
+# broken for setuptools-0.5a13.
+#from setuptools import setup
+#has_setup_tools = 1
+
+# VTK build configuration settings.
+kwwidgets_version = "@KWWidgets_MAJOR_VERSION@.@KWWidgets_MINOR_VERSION@"
+kwwidgets_lib_dir = "@LIBRARY_OUTPUT_PATH@"
+kwwidgets_bin_dir = "@EXECUTABLE_OUTPUT_PATH@"
+kwwidgets_has_configuration_types = @KWWidgets_PYTHON_HAS_CONFIG_TYPES@
+
+# The build type ('Release', 'Debug' etc.).  If kwwidgets_has_configuration_types
+# is true this must be set.  It may be set on the command line by something
+# like 'BUILD_TYPE=Release'.  For example::
+#   python setup.py install --prefix=D:\\Python23 BUILD_TYPE=Release
+kwwidgets_build_type = @KWWidgets_PYTHON_BUILD_TYPE@
+
+# Construct the list of kit names to be installed.
+kwwidgets_kit_names = ['KWWidgets']
+
+# Construct the list of executable names to be installed.
+kwwidgets_exe_names = [] #['kwpython']
+#if kwwidgets_use_parallel and kwwidgets_use_mpi:
+#    kwwidgets_exe_names.extend(['pkwpython'])
+
+def get_libs():
+    """Returns a list of libraries to be installed.  """
+    libs = []
+
+    # Select platform-specific components of the module file names.
+    if os.name == 'posix':
+        dir = kwwidgets_lib_dir
+        prefix = 'lib'
+        suffix = 'Python' + get_config_var('SO')
+    else:
+        dir = kwwidgets_bin_dir.replace('/', '\\')
+        prefix = ''
+        suffix = 'Python.dll'
+
+    # If this build has configuration types append the selected configuration.
+    if kwwidgets_has_configuration_types:
+        dir = os.path.join(dir, kwwidgets_build_type)
+
+    # Enumerate ths list of module files.
+    for kit in kwwidgets_kit_names:
+        libs.append(os.path.abspath(os.path.join(dir, prefix+kit+suffix)))
+
+    return libs
+
+class my_install_data (install_data):
+    def finalize_options (self):
+        """Needed to make this thing work properly."""
+        self.set_undefined_options ('install',
+                                    ('install_lib', 'install_dir'),
+                                    ('root', 'root'),
+                                    ('force', 'force'),
+                                    )
+
+if __name__ == '__main__':
+    # Get the optional build type argument.
+    for x in sys.argv[:]:
+        if string.find(x, 'BUILD_TYPE') > -1:
+            kwwidgets_build_type = string.strip(string.split(x, '=')[1])
+            sys.argv.remove(x)
+            break
+
+    # Make sure a build type was specified if it is required.
+    if kwwidgets_has_configuration_types:
+        if not kwwidgets_build_type:
+            raise "ERROR: Must specify BUILD_TYPE=<config-name> on command line."
+
+    def mk_dict(**kw):
+        # Unnecessary in recent Pythons but handy for earlier
+        # versions.
+        return kw
+
+    # The options for setup.
+    opts = mk_dict(name              = "KWWidgets",
+                   version           = kwwidgets_version,
+                   description       = "KWWidgets",
+                   maintainer        = "KWWidgets Developers",
+                   maintainer_email  = "kwwidgets-developers@vtk.org",
+                   license           = "BSD",
+                   long_description  = "Tk-Based Widgets for VTK",
+                   url               = "http://www.kwwidgets.org/",
+                   platforms         = ['Any'],
+                   cmdclass          = {'install_data': my_install_data},
+                   py_modules        = ['kwwidgets'],
+                   data_files        = [('', get_libs())]
+                   )
+    # If setup_tools is available, then add an extra option to disable
+    # creation of a ZIP file.
+    if has_setup_tools:
+        opts['zip_safe'] = 0
+
+    setup(**opts)
