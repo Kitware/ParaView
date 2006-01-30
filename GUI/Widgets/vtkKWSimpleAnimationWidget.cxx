@@ -61,7 +61,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.12");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.13");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -1009,7 +1009,7 @@ void vtkKWSimpleAnimationWidget::PerformSliceAnimation(const char *file_root,
 
   if (!awriter || awriter->GetError() == 0)
     {
-    this->RenderWidget->Reset();
+    //this->RenderWidget->Reset();
     for (int i = 0; 
          i < num_frames && 
            this->AnimationStatus != vtkKWSimpleAnimationWidget::AnimationCancelled; i++)
