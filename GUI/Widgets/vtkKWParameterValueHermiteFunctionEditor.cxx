@@ -21,7 +21,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.15");
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.16");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";
@@ -63,6 +63,7 @@ vtkKWParameterValueHermiteFunctionEditor::vtkKWParameterValueHermiteFunctionEdit
   this->SelectedMidPointColor[2] = this->SelectedPointColor[2];
 
   this->SelectedMidPoint = -1;
+  this->LastMidPointSelectionCanvasCoordinateX    = 0;
   this->LastMidPointSelectionCanvasCoordinateY    = 0;
   this->LastMidPointSelectionSharpness    = 0.0;
 
@@ -782,49 +783,25 @@ int vtkKWParameterValueHermiteFunctionEditor::FindMidPointAtCanvasCoordinates(
     return 0;
     }
 
-  const char *canv = this->Canvas->GetWidgetName();
-
-  // If we are out of the canvas, clamp the coordinates
-
-  if (x < 0)
+  char item[256];
+  if (!this->FindClosestItemWithTagAtCanvasCoordinates(
+        x, y, 3, vtkKWParameterValueHermiteFunctionEditor::MidPointTag, 
+        c_x, c_y, item))
     {
-    x = 0;
+    return 0;
     }
-  else if (x > this->CanvasWidth - 1)
-    {
-    x = this->CanvasWidth - 1;
-    }
-
-  if (y < 0)
-    {
-    y = 0;
-    }
-  else if (y > this->CanvasHeight - 1)
-    {
-    y = this->CanvasHeight - 1;
-    }
-
-  // Get the real canvas coordinates
-
-  *c_x = atoi(this->Script("%s canvasx %d", canv, x));
-  *c_y = atoi(this->Script("%s canvasy %d", canv, y));
-
-  // Find the closest element
-  // Get its first tag, which should be a midpoint tag (in
-  // the form of m_pid, ex: m_p0)
 
   *id = -1;
 
-  const char *closest = 
-    this->Script("%s find closest %d %d", canv, *c_x, *c_y);
-  if (closest && *closest)
+  // Get its first tag, which should be a midpoint tag (in
+  // the form of m_pid, ex: m_p0)
+
+  const char *canv = this->Canvas->GetWidgetName();
+  const char *tag = 
+    this->Script("lindex [%s itemcget %s -tags] 0", canv, item);
+  if (tag && strlen(tag) > 3 && !strncmp(tag, "m_p", 3) && isdigit(tag[3]))
     {
-    const char *tag = 
-      this->Script("lindex [%s itemcget %s -tags] 0", canv, closest);
-    if (tag && strlen(tag) > 3 && !strncmp(tag, "m_p", 3) && isdigit(tag[3]))
-      {
-      *id = atoi(tag + 3);
-      }
+    *id = atoi(tag + 3);
     }
 
   return (*id < 0 || *id >= this->GetFunctionSize() - 1) ? 0 : 1;
@@ -1005,6 +982,14 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
                 << " "<< vtkKWParameterValueHermiteFunctionEditor::MidPointTag 
                 << " " << vtkKWParameterValueFunctionEditor::FunctionTag 
                 << "}" << endl;
+        }
+      if (this->GetSelectedMidPoint() == id1)
+        {
+        *tk_cmd << canv << " raise m_p" << id1 << " " 
+                << vtkKWParameterValueFunctionEditor::FunctionTag << endl;
+        }
+      else
+        {
         *tk_cmd << canv << " lower m_p" << id1 << " {p" << id1 << "||p" << id2
                 << "}" << endl;
         }
@@ -1573,11 +1558,50 @@ void
 vtkKWParameterValueHermiteFunctionEditor::StartInteractionCallback(
   int x, int y)
 {
-  int id, c_x, c_y;
+  int id, c_x, c_y, p_id, p_c_x, p_c_y;
 
-  // No midpoint found ? Proceed with the rest
+  // If the mid-point is stuck below the point itself, let's try to detect
+  // when the user tries to select twice on something already selected, and
+  // pick the one below
 
-  if (!this->FindMidPointAtCanvasCoordinates(x, y, &id, &c_x, &c_y))
+  int found_mid_point = 
+    this->FindMidPointAtCanvasCoordinates(x, y, &id, &c_x, &c_y);
+  int found_point = 
+    this->FindFunctionPointAtCanvasCoordinates(x, y, &p_id, &p_c_x, &p_c_y);
+
+  if (found_mid_point && found_point)
+    {
+    if (this->GetSelectedMidPoint() == id)
+      {
+      if (this->LastMidPointSelectionCanvasCoordinateX == x &&
+          this->LastMidPointSelectionCanvasCoordinateY == y &&
+          (!(this->LastSelectionCanvasCoordinateX == p_c_x &&
+             this->LastSelectionCanvasCoordinateY == p_c_y)))
+        {
+        found_mid_point = 0;
+        }
+      else
+        {
+        found_point = 0;
+        }
+      }
+    if (this->GetSelectedPoint() == p_id)
+      {
+      if (this->LastSelectionCanvasCoordinateX == p_c_x &&
+          this->LastSelectionCanvasCoordinateY == p_c_y &&
+          !((this->LastMidPointSelectionCanvasCoordinateX == x &&
+             this->LastMidPointSelectionCanvasCoordinateY == y)))
+        {
+        found_point = 0;
+        }
+      else
+        {
+        found_mid_point = 0;
+        }
+      }
+    }
+
+  if (!found_mid_point || found_point)
     {
     this->Superclass::StartInteractionCallback(x, y);
     return;
@@ -1585,10 +1609,8 @@ vtkKWParameterValueHermiteFunctionEditor::StartInteractionCallback(
 
   // Select the midpoint
 
-  double p;
   this->SelectMidPoint(id);
-  this->GetMidPointCanvasCoordinates(
-    this->GetSelectedMidPoint(), &c_x, &c_y, &p);
+  this->LastMidPointSelectionCanvasCoordinateX = x;
   this->LastMidPointSelectionCanvasCoordinateY = y;
   this->GetFunctionPointSharpness(
     this->GetSelectedMidPoint(),

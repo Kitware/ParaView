@@ -1454,6 +1454,13 @@ protected:
   // Convenience method to check if a given tag if of a given type
   virtual int CanvasCheckTagType(const char *prefix, int id, const char *type);
 
+  // Description:
+  // Find item with given tag closest to canvas coordinates x, y and a given
+  // halo distance. 
+  // Return 1 if found, 0 otherwise. 
+  int FindClosestItemWithTagAtCanvasCoordinates(
+    int x, int y, int halo, const char *tag, int *c_x, int *c_y, char *found);
+
   // Synchronization callbacks
 
   vtkCallbackCommand *SynchronizeCallbackCommand;

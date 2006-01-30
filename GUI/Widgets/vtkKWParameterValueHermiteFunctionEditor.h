@@ -276,6 +276,7 @@ protected:
   double MidPointColor[3];
   double SelectedMidPointColor[3];
   int    SelectedMidPoint;
+  int    LastMidPointSelectionCanvasCoordinateX;
   int    LastMidPointSelectionCanvasCoordinateY;
   double LastMidPointSelectionSharpness;
 
