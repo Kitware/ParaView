@@ -97,7 +97,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.57");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.58");
 
 //----------------------------------------------------------------------------
 
@@ -1574,6 +1574,19 @@ void vtkPVDisplayGUI::ColorByArray(const char* array, int field)
   this->PVSource->ColorByArray(array, field);
   this->ColorSelectionMenu->SetValue(array, field);
   
+  vtkPVRenderView *rv = this->GetPVRenderView();
+  if (this->PVSource)
+    {
+    vtkPVColorMap *colorMap = this->PVSource->GetPVColorMap();
+    if (colorMap)
+      {
+      rv->GetColorMapUI()->UpdateColorMapUI(
+        colorMap->GetArrayName(),
+        colorMap->GetNumberOfVectorComponents(),
+        this->PVSource->GetSavedColorArrayField());
+      }
+    }
+
   this->UpdateColorGUI(); // why?
 
   if ( this->GetPVRenderView() )

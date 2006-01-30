@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMapUI);
-vtkCxxRevisionMacro(vtkPVColorMapUI, "1.2");
+vtkCxxRevisionMacro(vtkPVColorMapUI, "1.3");
 
 vtkCxxSetObjectMacro(vtkPVColorMapUI, CurrentColorMap, vtkPVColorMap);
 
@@ -1073,7 +1073,8 @@ void vtkPVColorMapUI::UpdateParameterList(vtkPVWindow *win)
         {
         ostrstream method;
         method << "UpdateColorMapUI " << arrayInfo->GetName() << " "
-               << arrayInfo->GetNumberOfComponents() << ends;
+               << arrayInfo->GetNumberOfComponents() << " "
+               << vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA << ends;
         this->ParameterMenu->AddRadioButton(label.str(), this,
                                             method.str());
         method.rdbuf()->freeze(0);
@@ -1100,7 +1101,8 @@ void vtkPVColorMapUI::UpdateParameterList(vtkPVWindow *win)
         {
         ostrstream method;
         method << "UpdateColorMapUI " << arrayInfo->GetName() << " "
-               << arrayInfo->GetNumberOfComponents() << ends;
+               << arrayInfo->GetNumberOfComponents() << " "
+               << vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA << ends;
         this->ParameterMenu->AddRadioButton(label.str(), this,
                                             method.str());
         method.rdbuf()->freeze(0);
@@ -1116,12 +1118,31 @@ void vtkPVColorMapUI::UpdateParameterList(vtkPVWindow *win)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVColorMapUI::UpdateColorMapUI(const char* name, int numComponents)
+void vtkPVColorMapUI::UpdateColorMapUI(const char* name, int numComponents,
+                                       int field)
 {
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(
     this->GetApplication());
   vtkPVWindow *win = pvApp->GetMainWindow();
   vtkPVColorMap *colorMap = win->GetPVColorMap(name, numComponents);
+
+  ostrstream label;
+  if (field == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)
+    {
+    label << "Point ";
+    }
+  else
+    {
+    label << "Cell ";
+    }
+  label << name;
+  if (numComponents > 1)
+    {
+    label << " (" << numComponents << ")";
+    }
+  label << ends;
+  this->ParameterMenu->SetValue(label.str());
+  label.rdbuf()->freeze(0);
 
   vtkPVSourceCollection *sources = win->GetSourceList("Sources");
   sources->InitTraversal();
