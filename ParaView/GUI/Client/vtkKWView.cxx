@@ -101,7 +101,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.28");
+vtkCxxRevisionMacro(vtkKWView, "1.29");
 
 //----------------------------------------------------------------------------
 void KWViewAbortCheckMethod( vtkObject*, unsigned long, void* arg, void* )
@@ -1469,7 +1469,6 @@ void vtkKWView::SetupStreaming()
   vtkPVSource *src;
   vtkSMDataObjectDisplayProxy *dispProxy;
   vtkSMIntVectorProperty *prop;
-  vtkSMProxyManager *proxm = vtkSMObject::GetProxyManager();
 
   for (i = 0; i < coll->GetNumberOfItems(); i++)
     {
@@ -1500,7 +1499,6 @@ void vtkKWView::CleanupStreaming(int rate, int stride[3])
   vtkPVSource *src;
   vtkSMDataObjectDisplayProxy *dispProxy;
   vtkSMIntVectorProperty *prop;
-  vtkSMProxyManager *proxm = vtkSMObject::GetProxyManager();
 
   for (i = 0; i < coll->GetNumberOfItems(); i++)
     {
@@ -1509,7 +1507,7 @@ void vtkKWView::CleanupStreaming(int rate, int stride[3])
          !strcmp(src->GetSourceClassName(), "vtkImageMandelbrotSource")) &&
       rate > 1)
       {
-      vtkSMIntVectorProperty *prop = vtkSMIntVectorProperty::SafeDownCast(
+      prop = vtkSMIntVectorProperty::SafeDownCast(
         src->GetProxy()->GetProperty("SubsampleRate"));
       // This will not work properly if more than one RTAnalyticSource  or
       // vtkImageMandelbrotSource has been created and the subsample rate did
@@ -1521,7 +1519,7 @@ void vtkKWView::CleanupStreaming(int rate, int stride[3])
       }
     else if (!strcmp(src->GetSourceClassName(), "vtkXdmfReader"))
       {
-      vtkSMIntVectorProperty *prop = vtkSMIntVectorProperty::SafeDownCast(
+      prop = vtkSMIntVectorProperty::SafeDownCast(
         src->GetProxy()->GetProperty("Stride"));
       // The same issue applies here as applies above for vtkRTAnalyticSource.
       prop->SetElement(0, stride[0]);
