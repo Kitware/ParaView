@@ -70,8 +70,7 @@ public:
 
   // Description:
   // Set/Get the group associated to a preset.
-  // This provide a way of grouping presets and filter them out using
-  // the SetGroupFilter() method.
+  // This provide a way of grouping presets.
   // The group field is not displayed as a column by default, but this
   // can be changed using the SetGroupColumnVisibility() method.
   // This column can not be edited by default, but this can be changed by
@@ -92,13 +91,6 @@ public:
   // No effect if called before Create().
   virtual void SetGroupColumnTitle(const char *);
   virtual const char* GetGroupColumnTitle();
-
-  // Description:
-  // Set/Get the group filter.
-  // Set it to a specific group to show only those presets with a matching
-  // group. Set it to NULL to display all presets.
-  virtual void SetGroupFilter(const char *group);
-  vtkGetStringMacro(GroupFilter);
 
   // Description:
   // Set/Get the comment associated to a preset.
@@ -243,12 +235,49 @@ public:
   virtual const char* GetPresetScreenshotSlotName();
 
   // Description:
+  // Set/Get the preset filter constraints.
+  // The preset filter is a set of constraints that a preset has to match
+  // to be visible in the preset list. 
+  // At the moment, constraints are expressed as string values or 
+  // regular expressions that have to match specific user slots. An 
+  // unlimited number of constraints can be added. 
+  // For example, if 'slot_name' is 'Modality', and 'value' is
+  // 'CT', then only those presets which have a 'Modality' user slot with
+  // a string value of 'CT' will be displayed.
+  // Use a NULL value for to remove the constraint on a specific slot.
+  virtual void ClearPresetFilter();
+  virtual void SetPresetFilterUserSlotConstraint(
+    const char *slot_name, const char *value);
+  virtual const char* GetPresetFilterUserSlotConstraint(
+    const char *slot_name);
+  virtual void SetPresetFilterUserSlotConstraintToRegularExpression(
+    const char *slot_name);
+  virtual void SetPresetFilterUserSlotConstraintToString(
+    const char *slot_name);
+
+  // Description:
+  // Convenience method to add a preset filter constraint on the preset
+  // group field.
+  virtual void SetPresetFilterGroupConstraint(const char *value);
+  virtual const char* GetPresetFilterGroupConstraint();
+
+  // Description:
+  // Query if a given preset matches the current preset filter constraints.
+  virtual int IsPresetFiltered(int id);
+
+  // Description:
   // Get the number of presets, or the number of presets with a specific
   // group, or the number of visible presets, i.e. the presets that are
-  // displayed according to the GroupFilter for example.
+  // displayed according to the preset filters for example.
   virtual int GetNumberOfPresets();
   virtual int GetNumberOfPresetsWithGroup(const char *group);
   virtual int GetNumberOfVisiblePresets();
+
+  // Description:
+  // Query if a given preset is visible (i.e. displayed in the list).
+  // Some presets can be hidden, for example if they do not match
+  // the current preset filter constraints.
+  virtual int GetPresetVisibility(int id);
 
   // Description:
   // Retrieve the Id of the nth-preset, or the id of the
@@ -525,7 +554,7 @@ protected:
 
   // Description:
   // Update the preset row, i.e. add a row for that preset if it is not
-  // displayed already, hide it if it does not match GroupFilter, and
+  // displayed already, hide it if it does not match the filters, and
   // update the table columns with the corresponding preset fields.
   // Subclass should override this method to display their own fields.
   // Return 1 on success, 0 if the row was not (or can not be) updated.
@@ -546,8 +575,6 @@ protected:
   int ThumbnailSize;
   int ScreenshotSize;
   int PromptBeforeRemovePreset;
-
-  char* GroupFilter;
 
   // Description:
   // Called when the number of presets has changed
@@ -613,6 +640,14 @@ protected:
   // to both delete all presets and update the table accordingly.
   // Return the number of presets deleted
   virtual int DeleteAllPresets();
+
+  // Description:
+  // Update the preset buttons state/visibility
+  virtual void UpdatePresetButtons();
+
+  // Description:
+  // Return the number of selected presets with filename
+  virtual int GetNumberOfSelectedPresetsWithFileName();
 
 private:
 
