@@ -131,19 +131,19 @@ struct pqObjectLineChartWidget::pqImplementation
     this->updateChart();
   }
   
-  void internalAddElements(vtkUnstructuredGrid* Elements)
+  void internalAddElements(vtkUnstructuredGrid* elements)
   {
-    for(int i = 0; i != Elements->GetCellData()->GetNumberOfArrays(); ++i)
+    for(int i = 0; i != elements->GetCellData()->GetNumberOfArrays(); ++i)
       {
-      const QString array_name = Elements->GetCellData()->GetArrayName(i);
+      const QString array_name = elements->GetCellData()->GetArrayName(i);
       if(array_name != "Id")
         continue;
       
-      vtkDataArray* const data = Elements->GetCellData()->GetArray(i);
+      vtkDataArray* const data = elements->GetCellData()->GetArray(i);
       if(!data)
         break;
       
-      for(int j = 0; j != Elements->GetNumberOfCells(); ++j)
+      for(int j = 0; j != elements->GetNumberOfCells(); ++j)
         {
         const unsigned long id = static_cast<unsigned long>(data->GetTuple1(j));
         if(!vtkstd::count(this->Elements.begin(), this->Elements.end(), id))
@@ -156,16 +156,16 @@ struct pqObjectLineChartWidget::pqImplementation
       }
   }
   
-  void addElements(vtkUnstructuredGrid* Elements)
+  void addElements(vtkUnstructuredGrid* elements)
   {
-    internalAddElements(Elements);
+    internalAddElements(elements);
     this->updateChart();
   }
   
-  void setElements(vtkUnstructuredGrid* Elements)
+  void setElements(vtkUnstructuredGrid* elements)
   {
     this->Elements.clear();
-    internalAddElements(Elements);
+    internalAddElements(elements);
     this->updateChart();
   }
   
@@ -289,7 +289,7 @@ pqObjectLineChartWidget::~pqObjectLineChartWidget()
   delete this->Implementation;
 }
 
-void pqObjectLineChartWidget::setServer(pqServer* server)
+void pqObjectLineChartWidget::setServer(pqServer* /*server*/)
 {
   this->setProxy(0);
 }

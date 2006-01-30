@@ -83,8 +83,8 @@ struct pqObjectHistogramWidget::pqImplementation
     CurrentProxy(0),
     ClientSideData(0),
     EventAdaptor(vtkEventQtSlotConnect::New()),
-    BinCount(10),
-    VariableType(VARIABLE_TYPE_CELL)
+    VariableType(VARIABLE_TYPE_CELL),
+    BinCount(10)
   {
     QFont h1;
     h1.setBold(true);
@@ -356,7 +356,7 @@ pqObjectHistogramWidget::~pqObjectHistogramWidget()
   delete this->Implementation;
 }
 
-void pqObjectHistogramWidget::setServer(pqServer* server)
+void pqObjectHistogramWidget::setServer(pqServer* /*server*/)
 {
   this->setProxy(0);
 }

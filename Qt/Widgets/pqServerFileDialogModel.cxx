@@ -40,11 +40,11 @@ public:
   {
   }
 
-  FileInfo(const QString& label, const QString& filepath, const bool isdir, const bool isRoot) :
-    Label(label),
+  FileInfo(const QString& l, const QString& filepath, const bool isdir, const bool isroot) :
+    Label(l),
     FilePath(filepath),
     IsDir(isdir),
-    IsRoot(isRoot)
+    IsRoot(isroot)
   {
   }
 

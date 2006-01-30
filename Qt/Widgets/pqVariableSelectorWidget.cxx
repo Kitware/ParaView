@@ -96,11 +96,11 @@ void pqVariableSelectorWidget::chooseVariable(pqVariableType type, const QString
 
 void pqVariableSelectorWidget::onVariableActivated(int row)
 {
-  const QStringList data = this->Variables->itemData(row).toString().split("|");
-  if(data.size() == 2)
+  const QStringList d = this->Variables->itemData(row).toString().split("|");
+  if(d.size() == 2)
     {
-    const pqVariableType type = data[1] == "cell" ? VARIABLE_TYPE_CELL : VARIABLE_TYPE_NODE;
-    const QString name = data[0];
+    const pqVariableType type = d[1] == "cell" ? VARIABLE_TYPE_CELL : VARIABLE_TYPE_NODE;
+    const QString name = d[0];
     
     emit variableChanged(type, name);
     }

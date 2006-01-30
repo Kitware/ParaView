@@ -63,8 +63,8 @@ public:
   vtkstd::vector<pqChartLabel*> Labels;
 };
 
-pqChartLegend::pqChartLegend(QObject* parent) :
-  QObject(parent),
+pqChartLegend::pqChartLegend(QObject* p) :
+  QObject(p),
   Implementation(new pqImplementation())
 {
 }
