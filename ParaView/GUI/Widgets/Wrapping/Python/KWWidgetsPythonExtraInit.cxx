@@ -281,6 +281,7 @@ static PyObject *PyvtkKWApplication_InitializeTcl(PyObject *, PyObject *args)
 
   if ((PyArg_ParseTuple(args, (char*)"iO", &argc, &pyargv)))
     {
+    static char emptystring[1] = "";
     int errcheck = 0;
     int l = 1;
     int i;
@@ -295,7 +296,7 @@ static PyObject *PyvtkKWApplication_InitializeTcl(PyObject *, PyObject *args)
       }
 
     argv = (char **)malloc(l*sizeof(char *));
-    argv[0] = "";
+    argv[0] = emptystring;
 
     for (i = 0; i < argc && errcheck == 0; i++)
       {
@@ -360,6 +361,7 @@ static PyObject *PyvtkKWApplication_Start(PyObject *self, PyObject *args)
   if ((op = (vtkKWApplication *)PyArg_VTKParseTuple(self, args, (char*)"iO",
                                                     &argc, &pyargv)))
     {
+    static char emptystring[1] = "";
     int errcheck = 0;
     int l = 1;
     int i;
@@ -374,7 +376,7 @@ static PyObject *PyvtkKWApplication_Start(PyObject *self, PyObject *args)
       }
 
     argv = (char **)malloc(l*sizeof(char *));
-    argv[0] = "";
+    argv[0] = emptystring;
 
     for (i = 0; i < argc && errcheck == 0; i++)
       {
