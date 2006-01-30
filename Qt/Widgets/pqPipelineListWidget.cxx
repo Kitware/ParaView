@@ -74,18 +74,18 @@ pqPipelineListWidget::~pqPipelineListWidget()
 {
 }
 
-bool pqPipelineListWidget::eventFilter(QObject *object, QEvent *event)
+bool pqPipelineListWidget::eventFilter(QObject *object, QEvent *e)
 {
-  if(object == this->TreeView && event->type() == QEvent::KeyPress)
+  if(object == this->TreeView && e->type() == QEvent::KeyPress)
     {
-    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
     if(keyEvent->key() == Qt::Key_Delete)
       {
       this->deleteSelected();
       }
     }
 
-  return QWidget::eventFilter(object, event);
+  return QWidget::eventFilter(object, e);
 }
 
 vtkSMProxy *pqPipelineListWidget::getSelectedProxy() const

@@ -371,7 +371,7 @@ void pqObjectInspector::setProxy(vtkSMProxy *sourceProxy)
         vtkSMCompoundProxy* cp = vtkSMCompoundProxy::SafeDownCast(sourceProxy);
         if(cp)
           {
-          for(int i=0; i<cp->GetNumberOfProxies(); i++)
+          for(unsigned int i=0; i<cp->GetNumberOfProxies(); i++)
             {
             vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(cp->GetProxy(i));
             if(src)

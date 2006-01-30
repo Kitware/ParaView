@@ -27,7 +27,7 @@ public:
   pqPipelineListWidget(QWidget *parent=0);
   virtual ~pqPipelineListWidget();
 
-  virtual bool eventFilter(QObject *object, QEvent *event);
+  virtual bool eventFilter(QObject *object, QEvent *e);
 
   pqPipelineListModel *getListModel() const {return this->ListModel;}
   QTreeView *getTreeView() const {return this->TreeView;}

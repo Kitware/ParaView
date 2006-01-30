@@ -22,7 +22,7 @@ public:
   /// \brief
   ///   Resets the multi-view to its original state.
   /// \param removed Used to return all the removed widgets.
-  virtual void reset(QList<QWidget*> &removed);
+  virtual void reset(QList<QWidget*> &removed, QWidget *newWidget=0);
 
   void saveState(vtkPVXMLElement *root);
   void loadState(vtkPVXMLElement *root);

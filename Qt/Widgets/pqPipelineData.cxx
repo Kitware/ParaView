@@ -282,16 +282,16 @@ void pqPipelineData::loadState(vtkPVXMLElement *root, pqMultiView *multiView)
           for( ; jter != this->Internal->Connections.end(); ++jter)
             {
             pqPipelineObject *source = 0;
-            vtkSMProxyProperty *property = vtkSMProxyProperty::SafeDownCast(
+            vtkSMProxyProperty *prop = vtkSMProxyProperty::SafeDownCast(
                 (*jter)->GetProxy()->GetProperty("Input"));
-            if(!property)
+            if(!prop)
               {
               continue;
               }
 
-            for(unsigned int k = 0; k < property->GetNumberOfProxies(); k++)
+            for(unsigned int k = 0; k < prop->GetNumberOfProxies(); k++)
               {
-              source = this->getObjectFor(property->GetProxy(k));
+              source = this->getObjectFor(prop->GetProxy(k));
               source->AddOutput(*jter);
               (*jter)->AddInput(source);
               emit this->connectionCreated(source, *jter);
@@ -311,17 +311,17 @@ void pqPipelineData::loadState(vtkPVXMLElement *root, pqMultiView *multiView)
               if(module)
                 {
                 (*iter)->Display->UpdateSelfAndAllInputs();
-                vtkSMProxyProperty *property = vtkSMProxyProperty::SafeDownCast(
+                vtkSMProxyProperty *prop = vtkSMProxyProperty::SafeDownCast(
                     module->GetProperty("Displays"));
-                property->AddProxy((*iter)->Display);
+                prop->AddProxy((*iter)->Display);
                 module->UpdateVTKObjects();
 
                 // Add the display proxy to the object. Use the display's
                 // input to find the object.
-                property = vtkSMProxyProperty::SafeDownCast(
+                prop = vtkSMProxyProperty::SafeDownCast(
                     (*iter)->Display->GetProperty("Input"));
                 pqPipelineObject *object = (*iter)->Server->GetObject(
-                    property->GetProxy(0));
+                    prop->GetProxy(0));
                 if(object)
                   {
                   object->SetDisplayProxy((*iter)->Display);
@@ -1059,8 +1059,8 @@ void pqPipelineData::proxyRegistered(vtkObject*, unsigned long, void*,
                 this->Internal->Connections.append(object); // TEMP
                 // TODO: Why doesn't this work?
                 // Listen for input property change events.
-                //vtkSMProperty *property = info->Proxy->GetProperty("Input");
-                //this->VTKConnect->Connect(property, vtkCommand::ModifiedEvent,
+                //vtkSMProperty *prop = info->Proxy->GetProperty("Input");
+                //this->VTKConnect->Connect(prop, vtkCommand::ModifiedEvent,
                 //    this, SLOT(inputChanged(vtkObject*, unsigned long, void*, void*, vtkCommand*)),
                 //    info->Proxy, 1.0);
                 emit this->filterCreated(object);
@@ -1080,24 +1080,24 @@ void pqPipelineData::proxyRegistered(vtkObject*, unsigned long, void*,
     }
 }
 
-void pqPipelineData::inputChanged(vtkObject* object, unsigned long event,
+void pqPipelineData::inputChanged(vtkObject* object, unsigned long e,
     void* clientData, void* callData, vtkCommand*)
 {
   // Get the property name from the callData and the sink proxy
   // from the clientData.
   const char *name = reinterpret_cast<const char *>(callData);
   vtkSMProxy *sink = reinterpret_cast<vtkSMProxy *>(clientData);
-  vtkSMProxyProperty *property = vtkSMProxyProperty::SafeDownCast(object);
+  vtkSMProxyProperty *prop = vtkSMProxyProperty::SafeDownCast(object);
 
   // TODO: The connection may be needed when the pipeline can
   // be modified outside of ParaQ. For now, it is only needed
   // when restoring a session.
-  this->VTKConnect->Disconnect(object, event, this);
-  if(property && property->GetNumberOfProxies() && sink && name &&
+  this->VTKConnect->Disconnect(object, e, this);
+  if(prop && prop->GetNumberOfProxies() && sink && name &&
       strcmp(name, "Input") == 0)
     {
     // Get the source from the input property.
-    vtkSMProxy *source = property->GetProxy(0);
+    vtkSMProxy *source = prop->GetProxy(0);
 
     // Get the objects from the list of servers.
     pqPipelineObject *sourceItem = 0;

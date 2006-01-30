@@ -1267,7 +1267,6 @@ void pqPipelineListModel::finishDeleteAndConnect()
       return;
       }
 
-    int row = 0;
     pqPipelineListItem *sourceItem = 0;
     pqPipelineListItem *sinkItem = *iter;
     QList<pqPipelineObject *>::Iterator jter = sourceList.begin();

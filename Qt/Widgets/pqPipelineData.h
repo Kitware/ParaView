@@ -110,9 +110,9 @@ public:
   vtkSMProxy* currentProxy() const;
 
 private slots:
-  void proxyRegistered(vtkObject* object, unsigned long event,
-      void* clientData, void* callData, vtkCommand* command);
-  void inputChanged(vtkObject* object, unsigned long event, void* clientData,
+  void proxyRegistered(vtkObject* object, unsigned long e, void* clientData,
+      void* callData, vtkCommand* command);
+  void inputChanged(vtkObject* object, unsigned long e, void* clientData,
       void* callData, vtkCommand* command);
 
 protected:

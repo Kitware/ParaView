@@ -35,7 +35,7 @@ pqMultiViewManager::~pqMultiViewManager()
     }
 }
 
-void pqMultiViewManager::reset(QList<QWidget*> &removed)
+void pqMultiViewManager::reset(QList<QWidget*> &removed, QWidget *)
 {
   // Create a new multi-view frame for the reset view.
   pqMultiViewFrame* frame = new pqMultiViewFrame();
