@@ -46,6 +46,7 @@ class vtkKWMultiColumnListWithScrollbars;
 class vtkKWPresetSelectorInternals;
 class vtkKWPushButtonSet;
 class vtkRenderWindow;
+class vtkKWMenu;
 
 class KWWidgets_EXPORT vtkKWPresetSelector : public vtkKWCompositeWidget
 {
@@ -521,10 +522,15 @@ public:
   // Callbacks. Internal, do not use.
   virtual void PresetAddCallback();
   virtual void PresetApplyCallback();
+  virtual void PresetApplyCallback(int id);
   virtual void PresetUpdateCallback();
+  virtual void PresetUpdateCallback(int id);
   virtual void PresetRemoveCallback();
+  virtual void PresetRemoveCallback(int id);
   virtual void PresetEmailCallback();
+  virtual void PresetEmailCallback(int id);
   virtual void PresetLocateCallback();
+  virtual void PresetLocateCallback(int id);
   virtual void PresetSelectionCallback();
   virtual void PresetSelectionChangedCallback() {};
 
@@ -620,6 +626,12 @@ protected:
   // Subclass can override this method to change the help strings
   // associated to the buttons.
   virtual void SetDefaultHelpStrings();
+
+  // Description:
+  // Populate the pop-up context menu that is displayed when right-clicking
+  // on a give preset. It should replicate the commands available through the
+  // preset buttons.
+  virtual void PopulatePresetContextMenu(vtkKWMenu *menu, int id);
 
   // Description:
   // Some constants

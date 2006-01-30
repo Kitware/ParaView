@@ -21,6 +21,7 @@
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
+#include "vtkKWMenu.h"
 #include "vtkKWMultiColumnList.h"
 #include "vtkKWMultiColumnListWithScrollbars.h"
 #include "vtkKWPushButton.h"
@@ -56,7 +57,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.34");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.35");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -417,6 +418,180 @@ void vtkKWPresetSelector::CreatePresetButtons()
   pb->SetCommand(this, "PresetEmailCallback");
 }
 
+//---------------------------------------------------------------------------
+void vtkKWPresetSelector::UpdatePresetButtons()
+{
+  if (!this->PresetButtons)
+    {
+    return;
+    }
+
+  this->PresetButtons->SetEnabled(this->GetEnabled());
+
+  int has_selection = 
+    (this->PresetList && 
+     this->PresetList->GetWidget()->GetNumberOfSelectedCells());
+
+  int has_filenames_in_selection = 
+    has_selection ? this->GetNumberOfSelectedPresetsWithFileName() : 0;
+
+  int has_presets = this->GetNumberOfVisiblePresets();
+
+  // Select prev/next
+
+  this->PresetButtons->SetWidgetVisibility(
+    vtkKWPresetSelector::SelectPreviousButtonId, 
+    this->SelectSpinButtonsVisibility);
+
+  this->PresetButtons->GetWidget(
+    vtkKWPresetSelector::SelectPreviousButtonId)->SetEnabled(
+      has_presets ? this->PresetButtons->GetEnabled() : 0);
+
+  this->PresetButtons->SetWidgetVisibility(
+    vtkKWPresetSelector::SelectNextButtonId, 
+    this->SelectSpinButtonsVisibility);
+
+  this->PresetButtons->GetWidget(
+    vtkKWPresetSelector::SelectNextButtonId)->SetEnabled(
+      has_presets ? this->PresetButtons->GetEnabled() : 0);
+
+  // Add
+
+  this->PresetButtons->SetWidgetVisibility(
+    vtkKWPresetSelector::AddButtonId, 
+    (this->PresetAddCommand && *this->PresetAddCommand) ? 1 : 0);
+
+  // Apply
+
+  this->PresetButtons->SetWidgetVisibility(
+    vtkKWPresetSelector::ApplyButtonId, 
+    this->PresetApplyCommand && *this->PresetApplyCommand &&
+    !this->ApplyPresetOnSelection ? 1 : 0);
+
+  this->PresetButtons->GetWidget(
+    vtkKWPresetSelector::ApplyButtonId)->SetEnabled(
+      has_selection ? this->PresetButtons->GetEnabled() : 0);
+
+  // Update
+
+  this->PresetButtons->SetWidgetVisibility(
+    vtkKWPresetSelector::UpdateButtonId, 
+    (this->PresetUpdateCommand && *this->PresetUpdateCommand) ? 1 : 0);
+
+  this->PresetButtons->GetWidget(
+    vtkKWPresetSelector::UpdateButtonId)->SetEnabled(
+      has_selection ? this->PresetButtons->GetEnabled() : 0);
+
+  // Remove
+
+  this->PresetButtons->GetWidget(
+    vtkKWPresetSelector::RemoveButtonId)->SetEnabled(
+      has_selection ? this->PresetButtons->GetEnabled() : 0);
+
+  this->PresetButtons->SetWidgetVisibility(
+    vtkKWPresetSelector::RemoveButtonId, 
+    this->RemoveButtonVisibility ? 1 : 0);
+
+  // Locate
+
+  this->PresetButtons->SetWidgetVisibility(
+    vtkKWPresetSelector::LocateButtonId, 
+    this->LocateButtonVisibility ? 1 : 0);
+
+  this->PresetButtons->GetWidget(
+    vtkKWPresetSelector::LocateButtonId)->SetEnabled(
+      has_filenames_in_selection ? this->PresetButtons->GetEnabled() : 0);
+
+  // Email
+
+  this->PresetButtons->SetWidgetVisibility(
+    vtkKWPresetSelector::EmailButtonId, 
+    this->EmailButtonVisibility ? 1 : 0);
+
+  this->PresetButtons->GetWidget(
+    vtkKWPresetSelector::EmailButtonId)->SetEnabled(
+      has_filenames_in_selection ? this->PresetButtons->GetEnabled() : 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::SetDefaultHelpStrings()
+{
+  if (!this->PresetButtons)
+    {
+    return;
+    }
+
+  this->PresetButtons->GetWidget(vtkKWPresetSelector::SelectPreviousButtonId)->
+    SetBalloonHelpString("Select and apply previous preset");
+  
+  this->PresetButtons->GetWidget(vtkKWPresetSelector::SelectNextButtonId)->
+    SetBalloonHelpString("Select and apply next preset");
+
+  this->PresetButtons->GetWidget(vtkKWPresetSelector::AddButtonId)->
+    SetBalloonHelpString("Add a preset");
+
+  this->PresetButtons->GetWidget(vtkKWPresetSelector::ApplyButtonId)->
+    SetBalloonHelpString("Apply the selected preset(s)");
+
+  this->PresetButtons->GetWidget(vtkKWPresetSelector::UpdateButtonId)->
+    SetBalloonHelpString("Update the selected preset(s)");
+    
+  this->PresetButtons->GetWidget(vtkKWPresetSelector::RemoveButtonId)->
+    SetBalloonHelpString("Delete the selected preset(s)");
+
+  this->PresetButtons->GetWidget(vtkKWPresetSelector::LocateButtonId)->
+    SetBalloonHelpString("Locate the selected preset(s)");
+
+  this->PresetButtons->GetWidget(vtkKWPresetSelector::EmailButtonId)->
+    SetBalloonHelpString("Email the selected preset(s)");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::PopulatePresetContextMenu(vtkKWMenu *menu, int id)
+{
+  if (!this->HasPreset(id))
+    {
+    return;
+    }
+
+  char command[256];
+
+  const char *filename = this->GetPresetFileName(id);
+  int has_file = 
+    (filename && *filename && vtksys::SystemTools::FileExists(filename));
+  
+  // apply preset
+
+  sprintf(command, "PresetApplyCallback %d", id);
+  menu->AddCommand("Apply", this, command);
+
+  // update preset
+
+  sprintf(command, "PresetUpdateCallback %d", id);
+  menu->AddCommand("Update", this, command);
+
+  // remove preset
+
+  sprintf(command, "PresetRemoveCallback %d", id);
+  menu->AddCommand("Remove", this, command);
+
+  // locate preset
+
+  if (has_file)
+    {
+    sprintf(command, "PresetLocateCallback %d", id);
+    menu->AddCommand("Locate", this, command);
+    }
+
+  // email preset
+
+  if (has_file)
+    {
+    sprintf(command, "PresetEmailCallback %d", id);
+    menu->AddCommand("Email", this, command);
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkKWPresetSelector::Pack()
 {
@@ -478,39 +653,6 @@ void vtkKWPresetSelector::CreateColumns()
   list->SetColumnResizable(col, 1);
   list->SetColumnStretchable(col, 1);
   list->SetColumnEditable(col, 1);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWPresetSelector::SetDefaultHelpStrings()
-{
-  if (!this->PresetButtons)
-    {
-    return;
-    }
-
-  this->PresetButtons->GetWidget(vtkKWPresetSelector::SelectPreviousButtonId)->
-    SetBalloonHelpString("Select and apply previous preset");
-  
-  this->PresetButtons->GetWidget(vtkKWPresetSelector::SelectNextButtonId)->
-    SetBalloonHelpString("Select and apply next preset");
-
-  this->PresetButtons->GetWidget(vtkKWPresetSelector::AddButtonId)->
-    SetBalloonHelpString("Add a preset");
-
-  this->PresetButtons->GetWidget(vtkKWPresetSelector::ApplyButtonId)->
-    SetBalloonHelpString("Apply the selected preset(s)");
-
-  this->PresetButtons->GetWidget(vtkKWPresetSelector::UpdateButtonId)->
-    SetBalloonHelpString("Update the selected preset(s)");
-    
-  this->PresetButtons->GetWidget(vtkKWPresetSelector::RemoveButtonId)->
-    SetBalloonHelpString("Delete the selected preset(s)");
-
-  this->PresetButtons->GetWidget(vtkKWPresetSelector::LocateButtonId)->
-    SetBalloonHelpString("Locate the selected preset(s)");
-
-  this->PresetButtons->GetWidget(vtkKWPresetSelector::EmailButtonId)->
-    SetBalloonHelpString("Email the selected preset(s)");
 }
 
 //----------------------------------------------------------------------------
@@ -2063,6 +2205,15 @@ void vtkKWPresetSelector::PresetAddCallback()
 }
 
 //---------------------------------------------------------------------------
+void vtkKWPresetSelector::PresetApplyCallback(int id)
+{
+  if (this->HasPreset(id))
+    {
+    this->InvokePresetApplyCommand(id);
+    }
+}
+
+//---------------------------------------------------------------------------
 void vtkKWPresetSelector::PresetApplyCallback()
 {
   if (this->PresetList)
@@ -2072,13 +2223,18 @@ void vtkKWPresetSelector::PresetApplyCallback()
     int i, nb_selected_rows = list->GetSelectedRows(indices);
     for (i = 0; i < nb_selected_rows; i++)
       {
-      int id = this->GetPresetAtRowId(indices[i]);
-      if (this->HasPreset(id))
-        {
-        this->InvokePresetApplyCommand(id);
-        }
+      this->PresetApplyCallback(this->GetPresetAtRowId(indices[i]));
       }
     delete [] indices;
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkKWPresetSelector::PresetUpdateCallback(int id)
+{
+  if (this->HasPreset(id))
+    {
+    this->InvokePresetUpdateCommand(id);
     }
 }
 
@@ -2087,27 +2243,42 @@ void vtkKWPresetSelector::PresetUpdateCallback()
 {
   if (this->PresetList)
     {
-    vtkKWMultiColumnList *list = this->PresetList->GetWidget();
-
     // First collect the indices of the presets to update
     // Then update them
 
+    vtkKWMultiColumnList *list = this->PresetList->GetWidget();
     int *indices = new int [list->GetNumberOfRows()];
     int *ids = new int [list->GetNumberOfRows()];
-
     int i, nb_selected_rows = list->GetSelectedRows(indices);
     for (i = 0; i < nb_selected_rows; i++)
       {
       ids[i] = this->GetPresetAtRowId(indices[i]);
       }
-
     for (i = 0; i < nb_selected_rows; i++)
       {
-      this->InvokePresetUpdateCommand(ids[i]);
+      this->PresetUpdateCallback(ids[i]);
       }
-
     delete [] indices;
     delete [] ids;
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkKWPresetSelector::PresetRemoveCallback(int id)
+{
+  if (!this->PromptBeforeRemovePreset ||
+      vtkKWMessageDialog::PopupYesNo( 
+        this->GetApplication(), 
+        this->GetApplication()->GetNthWindow(0), 
+        "Delete Preset",
+        "Are you sure you want to delete the selected item?", 
+        vtkKWMessageDialog::WarningIcon | 
+        vtkKWMessageDialog::InvokeAtPointer))
+    {
+    if (this->InvokePresetRemoveCommand(id))
+      {
+      this->RemovePreset(id);
+      }
     }
 }
 
@@ -2116,42 +2287,21 @@ void vtkKWPresetSelector::PresetRemoveCallback()
 {
   if (this->PresetList)
     {
-    vtkKWMultiColumnList *list = this->PresetList->GetWidget();
-
     // First collect the indices of the presets to remove
+    // Then remove them
 
+    vtkKWMultiColumnList *list = this->PresetList->GetWidget();
     int *indices = new int [list->GetNumberOfRows()];
     int *ids = new int [list->GetNumberOfRows()];
-
     int i, nb_selected_rows = list->GetSelectedRows(indices);
     for (i = 0; i < nb_selected_rows; i++)
       {
       ids[i] = this->GetPresetAtRowId(indices[i]);
       }
-
-    // Then remove them
-
-    if (nb_selected_rows)
+    for (i = 0; i < nb_selected_rows; i++)
       {
-      if (!this->PromptBeforeRemovePreset ||
-          vtkKWMessageDialog::PopupYesNo( 
-            this->GetApplication(), 
-            this->GetApplication()->GetNthWindow(0), 
-            "Delete Preset",
-            "Are you sure you want to delete the selected item(s)?", 
-            vtkKWMessageDialog::WarningIcon | 
-            vtkKWMessageDialog::InvokeAtPointer))
-        {
-        for (i = 0; i < nb_selected_rows; i++)
-          {
-          if (this->InvokePresetRemoveCommand(ids[i]))
-            {
-            this->RemovePreset(ids[i]);
-            }
-          }
-        }
+      this->PresetRemoveCallback(ids[i]);
       }
-    
     delete [] indices;
     delete [] ids;
     }
@@ -2181,6 +2331,19 @@ int vtkKWPresetSelector::GetNumberOfSelectedPresetsWithFileName()
 }
 
 //---------------------------------------------------------------------------
+void vtkKWPresetSelector::PresetLocateCallback(int id)
+{
+  if (this->HasPreset(id))
+    {
+    const char *filename = this->GetPresetFileName(id);
+    if (filename && *filename && vtksys::SystemTools::FileExists(filename))
+      {
+      this->GetApplication()->ExploreLink(filename);
+      }
+    }
+}
+
+//---------------------------------------------------------------------------
 void vtkKWPresetSelector::PresetLocateCallback()
 {
   if (this->PresetList)
@@ -2190,15 +2353,69 @@ void vtkKWPresetSelector::PresetLocateCallback()
     int i, nb_selected_rows = list->GetSelectedRows(indices);
     for (i = 0; i < nb_selected_rows; i++)
       {
-      int id = this->GetPresetAtRowId(indices[i]);
-      const char *filename = this->GetPresetFileName(id);
-      if (filename && *filename && vtksys::SystemTools::FileExists(filename))
-        {
-        this->GetApplication()->ExploreLink(filename);
-        }
+      this->PresetLocateCallback(indices[i]);
       }
     delete [] indices;
     }
+}
+
+//---------------------------------------------------------------------------
+void vtkKWPresetSelector::PresetEmailCallback(int id)
+{
+  if (!this->HasPreset(id))
+    {
+    return;
+    }
+
+  const char *filename = this->GetPresetFileName(id);
+  if (!filename || !*filename ||!vtksys::SystemTools::FileExists(filename))
+    {
+    return;
+    }
+      
+  vtksys_stl::string collapsed_filename = 
+    vtksys::SystemTools::CollapseFullPath(filename);
+  vtksys_stl::string native_filename(collapsed_filename);
+#if _WIN32
+  vtksys::SystemTools::ReplaceString(native_filename, "/", "\\");
+#endif
+  
+  const char *comment = this->GetPresetComment(id);
+  
+  vtksys_stl::string subject;
+  subject = this->GetApplication()->GetPrettyName();
+  subject += ": \"";
+  subject += vtksys::SystemTools::GetFilenameName(native_filename);
+  subject += "\"";
+  if (comment && *comment)
+    {
+    subject += " (";
+    subject += comment;
+    subject += ")";
+    }
+
+  vtksys_stl::string message;
+  message = "This file was sent from ";
+  message += this->GetApplication()->GetPrettyName();
+  message += "\n\n";
+
+  message += "File: ";
+  message += native_filename;
+  message += "\n";
+
+  if (comment && *comment)
+    {
+    message += "Comment: ";
+    message += comment;
+    message += "\n";
+    }
+        
+  message += "Creation Time: ";
+  time_t t = (time_t)this->GetPresetCreationTime(id);
+  message += ctime(&t);
+
+  this->GetApplication()->SendEmail(
+    NULL, subject.c_str(), message.c_str(), native_filename.c_str(), NULL);
 }
 
 //---------------------------------------------------------------------------
@@ -2207,63 +2424,12 @@ void vtkKWPresetSelector::PresetEmailCallback()
   if (this->PresetList)
     {
     vtkKWMultiColumnList *list = this->PresetList->GetWidget();
-
     int *indices = new int [list->GetNumberOfRows()];
     int i, nb_selected_rows = list->GetSelectedRows(indices);
     for (i = 0; i < nb_selected_rows; i++)
       {
-      int id = this->GetPresetAtRowId(indices[i]);
-      const char *filename = this->GetPresetFileName(id);
-      if (!filename || !*filename ||!vtksys::SystemTools::FileExists(filename))
-        {
-        continue;
-        }
-      
-      vtksys_stl::string collapsed_filename = 
-        vtksys::SystemTools::CollapseFullPath(filename);
-      vtksys_stl::string native_filename(collapsed_filename);
-#if _WIN32
-      vtksys::SystemTools::ReplaceString(native_filename, "/", "\\");
-#endif
-
-      const char *comment = this->GetPresetComment(id);
-
-      vtksys_stl::string subject;
-      subject = this->GetApplication()->GetPrettyName();
-      subject += ": \"";
-      subject += vtksys::SystemTools::GetFilenameName(native_filename);
-      subject += "\"";
-      if (comment && *comment)
-        {
-        subject += " (";
-        subject += comment;
-        subject += ")";
-        }
-
-      vtksys_stl::string message;
-      message = "This file was sent from ";
-      message += this->GetApplication()->GetPrettyName();
-      message += "\n\n";
-
-      message += "File: ";
-      message += native_filename;
-      message += "\n";
-
-      if (comment && *comment)
-        {
-        message += "Comment: ";
-        message += comment;
-        message += "\n";
-        }
-        
-      message += "Creation Time: ";
-      time_t t = (time_t)this->GetPresetCreationTime(id);
-      message += ctime(&t);
-
-      this->GetApplication()->SendEmail(
-        NULL, subject.c_str(), message.c_str(), native_filename.c_str(), NULL);
+      this->PresetEmailCallback(indices[i]);
       }
-    
     delete [] indices;
     }
 }
@@ -2374,101 +2540,6 @@ void vtkKWPresetSelector::Update()
   this->UpdateEnableState();
 
   this->UpdatePresetButtons();
-}
-
-//---------------------------------------------------------------------------
-void vtkKWPresetSelector::UpdatePresetButtons()
-{
-  if (!this->PresetButtons)
-    {
-    return;
-    }
-
-  this->PresetButtons->SetEnabled(this->GetEnabled());
-
-  int has_selection = 
-    (this->PresetList && 
-     this->PresetList->GetWidget()->GetNumberOfSelectedCells());
-
-  int has_filenames_in_selection = 
-    has_selection ? this->GetNumberOfSelectedPresetsWithFileName() : 0;
-
-  int has_presets = this->GetNumberOfVisiblePresets();
-
-  // Select prev/next
-
-  this->PresetButtons->SetWidgetVisibility(
-    vtkKWPresetSelector::SelectPreviousButtonId, 
-    this->SelectSpinButtonsVisibility);
-
-  this->PresetButtons->GetWidget(
-    vtkKWPresetSelector::SelectPreviousButtonId)->SetEnabled(
-      has_presets ? this->PresetButtons->GetEnabled() : 0);
-
-  this->PresetButtons->SetWidgetVisibility(
-    vtkKWPresetSelector::SelectNextButtonId, 
-    this->SelectSpinButtonsVisibility);
-
-  this->PresetButtons->GetWidget(
-    vtkKWPresetSelector::SelectNextButtonId)->SetEnabled(
-      has_presets ? this->PresetButtons->GetEnabled() : 0);
-
-  // Add
-
-  this->PresetButtons->SetWidgetVisibility(
-    vtkKWPresetSelector::AddButtonId, 
-    (this->PresetAddCommand && *this->PresetAddCommand) ? 1 : 0);
-
-  // Apply
-
-  this->PresetButtons->SetWidgetVisibility(
-    vtkKWPresetSelector::ApplyButtonId, 
-    this->PresetApplyCommand && *this->PresetApplyCommand &&
-    !this->ApplyPresetOnSelection ? 1 : 0);
-
-  this->PresetButtons->GetWidget(
-    vtkKWPresetSelector::ApplyButtonId)->SetEnabled(
-      has_selection ? this->PresetButtons->GetEnabled() : 0);
-
-  // Update
-
-  this->PresetButtons->SetWidgetVisibility(
-    vtkKWPresetSelector::UpdateButtonId, 
-    (this->PresetUpdateCommand && *this->PresetUpdateCommand) ? 1 : 0);
-
-  this->PresetButtons->GetWidget(
-    vtkKWPresetSelector::UpdateButtonId)->SetEnabled(
-      has_selection ? this->PresetButtons->GetEnabled() : 0);
-
-  // Remove
-
-  this->PresetButtons->GetWidget(
-    vtkKWPresetSelector::RemoveButtonId)->SetEnabled(
-      has_selection ? this->PresetButtons->GetEnabled() : 0);
-
-  this->PresetButtons->SetWidgetVisibility(
-    vtkKWPresetSelector::RemoveButtonId, 
-    this->RemoveButtonVisibility ? 1 : 0);
-
-  // Locate
-
-  this->PresetButtons->SetWidgetVisibility(
-    vtkKWPresetSelector::LocateButtonId, 
-    this->LocateButtonVisibility ? 1 : 0);
-
-  this->PresetButtons->GetWidget(
-    vtkKWPresetSelector::LocateButtonId)->SetEnabled(
-      has_filenames_in_selection ? this->PresetButtons->GetEnabled() : 0);
-
-  // Email
-
-  this->PresetButtons->SetWidgetVisibility(
-    vtkKWPresetSelector::EmailButtonId, 
-    this->EmailButtonVisibility ? 1 : 0);
-
-  this->PresetButtons->GetWidget(
-    vtkKWPresetSelector::EmailButtonId)->SetEnabled(
-      has_filenames_in_selection ? this->PresetButtons->GetEnabled() : 0);
 }
 
 //----------------------------------------------------------------------------
