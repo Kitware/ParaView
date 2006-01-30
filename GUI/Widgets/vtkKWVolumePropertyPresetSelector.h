@@ -45,6 +45,30 @@ public:
   virtual int SetPresetVolumeProperty(int id, vtkVolumeProperty *prop);
   virtual vtkVolumeProperty* GetPresetVolumeProperty(int id);
 
+  // Description:
+  // Set/Get the modality for a given preset.
+  // This is just a convenience field, that can be useful if the presets
+  // are used on medical data.
+  // The modality field is not displayed as a column by default, but this
+  // can be changed using the SetModalityColumnVisibility() method.
+  // This column can not be edited.
+  // Return 1 on success, 0 otherwise
+  virtual int SetPresetModality(int id, const char *modality);
+  virtual const char* GetPresetModality(int id);
+
+  // Description:
+  // Set/Get the visibility of the modality column. Hidden by default.
+  // No effect if called before Create().
+  virtual void SetModalityColumnVisibility(int);
+  virtual int GetModalityColumnVisibility();
+  vtkBooleanMacro(ModalityColumnVisibility, int);
+
+  // Description:
+  // Some constants
+  //BTX
+  static const char *ModalityColumnName;
+  //ETX
+
 protected:
   vtkKWVolumePropertyPresetSelector() {};
   ~vtkKWVolumePropertyPresetSelector();
@@ -57,9 +81,30 @@ protected:
   virtual void DeAllocatePreset(int id);
 
   // Description:
+  // Create the columns.
+  // Subclasses should override this method to add their own columns and
+  // display their own preset fields (do not forget to call the superclass
+  // first).
+  virtual void CreateColumns();
+
+  // Description:
+  // Update the preset row, i.e. add a row for that preset if it is not
+  // displayed already, hide it if it does not match GroupFilter, and
+  // update the table columns with the corresponding preset fields.
+  // Subclass should override this method to display their own fields.
+  // Return 1 on success, 0 if the row was not (or can not be) updated.
+  // Subclasses should call the parent's UpdatePresetRow, and abort
+  // if the result is not 1.
+  virtual int UpdatePresetRow(int id);
+
+  // Description:
   // Deep copy contents of volume property 'source' into 'target'
   virtual void DeepCopyVolumeProperty(
     vtkVolumeProperty *target, vtkVolumeProperty *source);
+
+  // Description:
+  // Convenience methods to get the index of a given column
+  virtual int GetModalityColumnIndex();
 
 private:
 

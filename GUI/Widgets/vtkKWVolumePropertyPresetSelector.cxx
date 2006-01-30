@@ -18,12 +18,16 @@
 #include "vtkObjectFactory.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkColorTransferFunction.h"
+#include "vtkKWMultiColumnList.h"
+#include "vtkKWMultiColumnListWithScrollbars.h"
 
 #define VTK_KW_WLPS_TOLERANCE 0.005
 
+const char *vtkKWVolumePropertyPresetSelector::ModalityColumnName  = "Modality";
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWVolumePropertyPresetSelector);
-vtkCxxRevisionMacro(vtkKWVolumePropertyPresetSelector, "1.4");
+vtkCxxRevisionMacro(vtkKWVolumePropertyPresetSelector, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWVolumePropertyPresetSelector::~vtkKWVolumePropertyPresetSelector()
@@ -88,6 +92,89 @@ vtkVolumeProperty* vtkKWVolumePropertyPresetSelector::GetPresetVolumeProperty(
 {
   return (vtkVolumeProperty*)
     this->GetPresetUserSlotAsPointer(id, "VolumeProperty");
+}
+
+//----------------------------------------------------------------------------
+int vtkKWVolumePropertyPresetSelector::SetPresetModality(
+  int id, const char *val)
+{
+  return this->SetPresetUserSlotAsString(id, "Modality", val);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWVolumePropertyPresetSelector::GetPresetModality(int id)
+{
+  return this->GetPresetUserSlotAsString(id, "Modality");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWVolumePropertyPresetSelector::CreateColumns()
+{
+  this->Superclass::CreateColumns();
+
+  vtkKWMultiColumnList *list = this->PresetList->GetWidget();
+
+  int col;
+
+  // Modality
+
+  col = list->InsertColumn(
+    this->GetCommentColumnIndex(), 
+    vtkKWVolumePropertyPresetSelector::ModalityColumnName);
+
+  list->SetColumnName(col, 
+                      vtkKWVolumePropertyPresetSelector::ModalityColumnName);
+  list->SetColumnResizable(col, 1);
+  list->SetColumnStretchable(col, 0);
+  list->SetColumnEditable(col, 0);
+  list->ColumnVisibilityOff(col);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWVolumePropertyPresetSelector::GetModalityColumnIndex()
+{
+  return this->PresetList ? 
+    this->PresetList->GetWidget()->GetColumnIndexWithName(
+      vtkKWVolumePropertyPresetSelector::ModalityColumnName) : -1;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWVolumePropertyPresetSelector::SetModalityColumnVisibility(int arg)
+{
+  if (this->PresetList)
+    {
+    this->PresetList->GetWidget()->SetColumnVisibility(
+      this->GetModalityColumnIndex(), arg);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWVolumePropertyPresetSelector::GetModalityColumnVisibility()
+{
+  if (this->PresetList)
+    {
+    return this->PresetList->GetWidget()->GetColumnVisibility(
+      this->GetModalityColumnIndex());
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWVolumePropertyPresetSelector::UpdatePresetRow(int id)
+{
+  if (!this->Superclass::UpdatePresetRow(id))
+    {
+    return 0;
+    }
+
+  int row = this->GetPresetRow(id);
+
+  vtkKWMultiColumnList *list = this->PresetList->GetWidget();
+
+  list->SetCellText(
+    row, this->GetModalityColumnIndex(), this->GetPresetModality(id));
+  
+  return 1;
 }
 
 //----------------------------------------------------------------------------
