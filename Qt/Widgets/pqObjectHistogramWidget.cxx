@@ -364,7 +364,7 @@ void pqObjectHistogramWidget::setServer(pqServer* /*server*/)
 void pqObjectHistogramWidget::setProxy(vtkSMProxy* proxy)
 {
   this->Implementation->setProxy(proxy);
-  
+ 
   if(proxy)
     {
     this->Implementation->EventAdaptor->Connect(

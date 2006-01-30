@@ -430,7 +430,7 @@ void pqObjectInspector::setProxy(vtkSMProxy *sourceProxy)
         possibles.append(name);
         }
       // also include unloaded arrays if any
-      QList<QVariant> extraCellArrays = adapter->getProperty(reader->GetProxy()->GetProperty("CellArrayStatus")).toList();
+      QList<QVariant> extraCellArrays = adapter->getProperty(reader->GetProxy(), reader->GetProxy()->GetProperty("CellArrayStatus")).toList();
       for(i=0; i<extraCellArrays.size(); i++)
         {
         QList<QVariant> cell = extraCellArrays[i].toList();
@@ -449,7 +449,7 @@ void pqObjectInspector::setProxy(vtkSMProxy *sourceProxy)
         possibles.append(name);
         }
       // also include unloaded arrays if any
-      QList<QVariant> extraPointArrays = adapter->getProperty(reader->GetProxy()->GetProperty("PointArrayStatus")).toList();
+      QList<QVariant> extraPointArrays = adapter->getProperty(reader->GetProxy(), reader->GetProxy()->GetProperty("PointArrayStatus")).toList();
       for(i=0; i<extraPointArrays.size(); i++)
         {
         QList<QVariant> cell = extraPointArrays[i].toList();
@@ -459,10 +459,10 @@ void pqObjectInspector::setProxy(vtkSMProxy *sourceProxy)
           }
         }
 
-      if(adapter->getProperty(display->GetProperty("ScalarVisibility")) == true)
+      if(adapter->getProperty(display, display->GetProperty("ScalarVisibility")) == true)
         {
-        QString fieldname = adapter->getProperty(display->GetProperty("ColorArray")).toString();
-        QVariant fieldtype = adapter->getProperty(display->GetProperty("ScalarMode"));
+        QString fieldname = adapter->getProperty(display, display->GetProperty("ColorArray")).toString();
+        QVariant fieldtype = adapter->getProperty(display, display->GetProperty("ScalarMode"));
         if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
           {
           item->setValue(QString(fieldname) + " (cell)");
@@ -506,7 +506,7 @@ void pqObjectInspector::setProxy(vtkSMProxy *sourceProxy)
       if(prop->GetInformationOnly())
         continue;
 
-      QVariant value = adapter->getProperty(prop);
+      QVariant value = adapter->getProperty(propertyProxy, prop);
       if(!value.isValid())
         continue;
 
@@ -651,7 +651,7 @@ void pqObjectInspector::setProxy(vtkSMProxy *sourceProxy)
       mem.sprintf("%g MBytes", dataInfo->GetMemorySize()/1000.0);
       item->setValue(mem);
 
-      QVariant timeSteps = adapter->getProperty(dataInfoProxy->GetProperty("TimestepValues"));
+      QVariant timeSteps = adapter->getProperty(dataInfoProxy, dataInfoProxy->GetProperty("TimestepValues"));
       if(timeSteps.type() == QVariant::List)
         {
         item = new pqObjectInspectorItem();
@@ -788,7 +788,7 @@ void pqObjectInspector::commitChange(pqObjectInspectorItem *item)
     idx = this->itemIndex(item);
     prop = this->Proxy->GetProperty(
         item->parent()->propertyName().toAscii().data());
-    adapter->setProperty(prop, idx, item->value());
+    adapter->setProperty(this->Proxy, prop, idx, item->value());
     }
   else if(item->parent() && item->childCount() > 0)
     {
@@ -799,7 +799,7 @@ void pqObjectInspector::commitChange(pqObjectInspectorItem *item)
     for(idx = 0; idx < item->childCount(); idx++)
       {
       child = item->child(idx);
-      adapter->setProperty(prop, idx, child->value());
+      adapter->setProperty(this->Proxy, prop, idx, child->value());
       child->setModified(false);
       }
     }
@@ -807,7 +807,7 @@ void pqObjectInspector::commitChange(pqObjectInspectorItem *item)
     {
     prop = this->Proxy->GetProperty(
         item->propertyName().toAscii().data());
-    adapter->setProperty(prop, 0, item->value());
+    adapter->setProperty(this->Proxy, prop, 0, item->value());
     }
 }
 

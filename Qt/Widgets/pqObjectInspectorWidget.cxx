@@ -10,10 +10,28 @@
 
 #include "pqObjectInspector.h"
 #include "pqObjectInspectorDelegate.h"
+#include "pqPipelineData.h"
+#include "pqPipelineObject.h"
+#include "pqPipelineWindow.h"
+#include "pqSMAdaptor.h"
 
 #include <QHeaderView>
 #include <QTreeView>
+#include <QTabWidget>
 #include <QVBoxLayout>
+#include <QFile>
+#include <QFormBuilder>
+#include <QScrollArea>
+#include <QLineEdit>
+#include <QCheckBox>
+#include <QSlider>
+#include <QListWidget>
+#include <QListWidgetItem>
+
+#include <vtkSMProxy.h>
+#include <vtkSMSourceProxy.h>
+#include <vtkSMProperty.h>
+#include <vtkSMPropertyIterator.h>
 
 
 pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
@@ -22,6 +40,7 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->Inspector = 0;
   this->Delegate = 0;
   this->TreeView = 0;
+  this->TabWidget = 0;
 
   // Create the object inspector model.
   this->Inspector = new pqObjectInspector(this);
@@ -43,8 +62,21 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
       this->TreeView->setItemDelegate(this->Delegate);
     }
 
+  this->TabWidget = new QTabWidget(this);
+  QScrollArea* s = new QScrollArea();
+  s->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  s->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  s->setWidgetResizable(true);
+  s->setObjectName("InspectorScrollView");
+  QVBoxLayout *boxLayout = new QVBoxLayout(s);
+  boxLayout->setMargin(0);
+
+  this->TabWidget->addTab(s, "");
+  this->TabWidget->setObjectName("InspectorTabWidget");
+  this->TabWidget->hide();
+
   // Add the tree view to the layout.
-  QVBoxLayout *boxLayout = new QVBoxLayout(this);
+  boxLayout = new QVBoxLayout(this);
   if(boxLayout)
     {
     boxLayout->setMargin(0);
@@ -60,6 +92,62 @@ pqObjectInspectorWidget::~pqObjectInspectorWidget()
 
 void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
 {
+
+  QWidget* customForm = NULL;
+
+  if(proxy)
+    {
+    QString proxyui = QString(":/pqWidgets/") + QString(proxy->GetXMLName()) + QString(".ui");
+    QFile file(proxyui);
+    // if we have a custom form, use it
+    if(file.open(QFile::ReadOnly))
+      {
+      QFormBuilder builder;
+      customForm = builder.load(&file, NULL);
+      file.close();
+      }
+    }
+
+  // set up layout for with or without custom form
+  if(customForm && this->TabWidget->isHidden())
+    {
+    this->layout()->removeWidget(this->TreeView);
+    this->TreeView->setParent(NULL);
+    this->TabWidget->addTab(this->TreeView, "Advanced");
+
+    this->layout()->addWidget(this->TabWidget);
+    QScrollArea* s = qobject_cast<QScrollArea*>(this->TabWidget->widget(0));
+    s->setWidget(customForm);
+    this->TabWidget->setTabText(0, proxy->GetXMLName());
+    this->TabWidget->show();
+    }
+  else if(customForm && !this->TabWidget->isHidden())
+    {
+    QScrollArea* s = qobject_cast<QScrollArea*>(this->TabWidget->widget(0));
+    QWidget* lastform = s->takeWidget();
+    delete lastform;
+    s->setWidget(customForm);
+    this->TabWidget->setTabText(0, proxy->GetXMLName());
+    }
+  else if(!customForm && !this->TabWidget->isHidden())
+    {
+    // we don't have a custom form, make sure we don't show one, if we did previously
+    QScrollArea* s = qobject_cast<QScrollArea*>(this->TabWidget->widget(0));
+    QWidget* lastform = s->takeWidget();
+    delete lastform;
+    this->layout()->removeWidget(this->TabWidget);
+    this->TabWidget->removeTab(1);
+    this->TabWidget->hide();
+    this->TreeView->setParent(NULL);
+    this->layout()->addWidget(this->TreeView);
+    this->TreeView->show();
+    }
+
+  if(customForm)
+    {
+    this->setupCustomForm(proxy, customForm);
+    }
+
   if(this->Inspector)
     {
     // remember expanded items
@@ -84,6 +172,85 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
       {
       this->TreeView->setExpanded(this->Inspector->index(i,0), expanded[i]);
       }
+    }
+}
+
+void pqObjectInspectorWidget::setupCustomForm(vtkSMProxy* proxy, QWidget* w)
+{
+  vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(proxy);
+
+  // TODO, in future support more than source proxies
+  if(!sp)
+    return;
+
+  sp->UpdatePipelineInformation();
+  
+  pqSMAdaptor *adapter = pqSMAdaptor::instance();
+  
+  vtkSMPropertyIterator *iter = proxy->NewPropertyIterator();
+  for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProperty *prop = iter->GetProperty();
+    QWidget* widgetProperty = w->findChild<QWidget*>(iter->GetKey());
+    if(widgetProperty)
+      {
+      QLineEdit* le = qobject_cast<QLineEdit*>(widgetProperty);
+      if(le)
+        {
+        adapter->linkPropertyTo(proxy, prop, 0, le, "text");
+        adapter->linkPropertyTo(le, "text", SIGNAL(textChanged(const QString&)), proxy, prop, 0);
+        this->connect(le, SIGNAL(textChanged(const QString&)), SLOT(updateDisplayForPropertyChanged()), Qt::QueuedConnection);
+        }
+      QCheckBox* cb = qobject_cast<QCheckBox*>(widgetProperty);
+      if(cb)
+        {
+        adapter->linkPropertyTo(proxy, prop, 0, cb, "checked");
+        adapter->linkPropertyTo(cb, "checked", SIGNAL(stateChanged(int)), proxy, prop, 0);
+        this->connect(cb, SIGNAL(stateChanged(int)), SLOT(updateDisplayForPropertyChanged()), Qt::QueuedConnection);
+        }
+      QSlider* sb = qobject_cast<QSlider*>(widgetProperty);
+      if(sb)
+        {
+        // TODO: handle domains changes, during timesteps
+        adapter->linkPropertyTo(proxy, prop, 0, sb, "value");
+        adapter->linkPropertyTo(sb, "value", SIGNAL(valueChanged(int)), proxy, prop, 0);
+        QList<QVariant> range = adapter->getPropertyDomain(prop).toList();
+        sb->setMinimum(range[0].toInt());
+        sb->setMaximum(range[1].toInt());
+        this->connect(sb, SIGNAL(valueChanged(int)), SLOT(updateDisplayForPropertyChanged()), Qt::QueuedConnection);
+        }
+      QListWidget* lw = qobject_cast<QListWidget*>(widgetProperty);
+      if(lw)
+        {
+        QList<QVariant> items = adapter->getProperty(proxy, prop).toList();
+        for(int i=0; i<items.size(); i++)
+          {
+          QList<QVariant> item = items[i].toList();
+          QString name = item[0].toString();
+          pqCustomFormListItem* lwItem = new pqCustomFormListItem(name, lw);
+          adapter->linkPropertyTo(proxy, prop, i, lwItem, "value");
+          adapter->linkPropertyTo(lwItem, "value", SIGNAL(valueChanged()), proxy, prop, i);
+          this->connect(lwItem, SIGNAL(valueChanged()), SLOT(updateDisplayForPropertyChanged()), Qt::QueuedConnection);
+          }
+        }
+      }
+    }
+  iter->Delete();
+
+}
+
+void pqObjectInspectorWidget::updateDisplayForPropertyChanged()
+{
+  vtkSMProxy* proxy = this->Inspector->proxy();
+  if(!proxy)
+    {
+    return;
+    }
+  pqPipelineObject* obj = pqPipelineData::instance()->getObjectFor(proxy);
+  if(obj)
+    {
+    QWidget* widget = obj->GetParent()->GetWidget();
+    widget->update();
     }
 }
 

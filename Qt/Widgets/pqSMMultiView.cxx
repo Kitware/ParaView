@@ -128,7 +128,7 @@ QVTKWidget *ParaQ::AddQVTKWidget(pqMultiViewFrame *frame, QWidget *topWidget,
   pqSMAdaptor *adaptor = pqSMAdaptor::instance();
   if(prop && adaptor)
     {
-    adaptor->setProperty(prop, 0.0);  // remote render
+    adaptor->setProperty(view, prop, 0.0);  // remote render
     }
   view->UpdateVTKObjects();
   

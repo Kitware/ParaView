@@ -277,7 +277,7 @@ void pqColorPart(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype)
   
   if(fieldname == 0)
     {
-    pqSMAdaptor::instance()->setProperty(Part->GetProperty("ScalarVisibility"), 0);
+    pqSMAdaptor::instance()->setProperty(Part, Part->GetProperty("ScalarVisibility"), 0);
     }
   else
     {
@@ -297,8 +297,8 @@ void pqColorPart(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype)
     vtkSMObject::GetProxyManager()->RegisterProxy("lookup_tables",
         name.toAscii().data(), lut);
 
-    pqSMAdaptor::instance()->setProperty(Part->GetProperty("ScalarVisibility"), 1);
-    pqSMAdaptor::instance()->setProperty(Part->GetProperty("ScalarMode"), fieldtype);
+    pqSMAdaptor::instance()->setProperty(Part, Part->GetProperty("ScalarVisibility"), 1);
+    pqSMAdaptor::instance()->setProperty(Part, Part->GetProperty("ScalarMode"), fieldtype);
 
     vtkPVArrayInformation* ai;
 
@@ -326,14 +326,14 @@ void pqColorPart(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype)
       property += 1;
       if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
         {
-        pqSMAdaptor::instance()->setProperty(reader->GetProperty("CellArrayStatus"), 0, property);
+        pqSMAdaptor::instance()->setProperty(reader, reader->GetProperty("CellArrayStatus"), 0, property);
         reader->UpdateVTKObjects();
         vtkPVDataInformation* geomInfo = Part->GetGeometryInformation();
         ai = geomInfo->GetCellDataInformation()->GetArrayInformation(fieldname);
         }
       else
         {
-        pqSMAdaptor::instance()->setProperty(reader->GetProperty("PointArrayStatus"), 0, property);
+        pqSMAdaptor::instance()->setProperty(reader, reader->GetProperty("PointArrayStatus"), 0, property);
         reader->UpdateVTKObjects();
         vtkPVDataInformation* geomInfo = Part->GetGeometryInformation();
         ai = geomInfo->GetPointDataInformation()->GetArrayInformation(fieldname);
@@ -347,8 +347,8 @@ void pqColorPart(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype)
     QList<QVariant> tmp;
     tmp += range[0];
     tmp += range[1];
-    pqSMAdaptor::instance()->setProperty(lut->GetProperty("ScalarRange"), tmp);
-    pqSMAdaptor::instance()->setProperty(Part->GetProperty("ColorArray"), fieldname);
+    pqSMAdaptor::instance()->setProperty(lut, lut->GetProperty("ScalarRange"), tmp);
+    pqSMAdaptor::instance()->setProperty(Part, Part->GetProperty("ColorArray"), fieldname);
     lut->UpdateVTKObjects();
     }
 

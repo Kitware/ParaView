@@ -586,9 +586,9 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
       source = this->Pipeline->createSource("ExodusReader", win);
       this->CurrentServer->GetProxyManager()->RegisterProxy("paraq", "source1", source);
       source->Delete();
-      Adaptor->setProperty(source->GetProperty("FileName"), file);
-      Adaptor->setProperty(source->GetProperty("FilePrefix"), file);
-      Adaptor->setProperty(source->GetProperty("FilePattern"), "%s");
+      Adaptor->setProperty(source, source->GetProperty("FileName"), file);
+      Adaptor->setProperty(source, source->GetProperty("FilePrefix"), file);
+      Adaptor->setProperty(source, source->GetProperty("FilePattern"), "%s");
       source->UpdateVTKObjects();
       this->Pipeline->setVisibility(this->Pipeline->createDisplay(source), true);
       }
@@ -1276,7 +1276,8 @@ void pqMainWindow::onProxySelected(vtkSMProxy* p)
     }
   
   // also include unloaded arrays if any
-  QList<QVariant> extraCellArrays = pqSMAdaptor::instance()->getProperty(reader->GetProxy()->GetProperty("CellArrayStatus")).toList();
+  QList<QVariant> extraCellArrays = pqSMAdaptor::instance()->getProperty(reader->GetProxy(), 
+                    reader->GetProxy()->GetProperty("CellArrayStatus")).toList();
   for(i=0; i<extraCellArrays.size(); i++)
     {
     QList<QVariant> cell = extraCellArrays[i].toList();
@@ -1295,7 +1296,8 @@ void pqMainWindow::onProxySelected(vtkSMProxy* p)
     }
   
   // also include unloaded arrays if any
-  QList<QVariant> extraPointArrays = pqSMAdaptor::instance()->getProperty(reader->GetProxy()->GetProperty("PointArrayStatus")).toList();
+  QList<QVariant> extraPointArrays = pqSMAdaptor::instance()->getProperty(reader->GetProxy(), 
+               reader->GetProxy()->GetProperty("PointArrayStatus")).toList();
   for(i=0; i<extraPointArrays.size(); i++)
     {
     QList<QVariant> cell = extraPointArrays[i].toList();

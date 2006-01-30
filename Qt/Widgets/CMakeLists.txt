@@ -3,6 +3,7 @@ PROJECT(QtWidgets)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.2)
 
 FIND_PACKAGE(Qt4)
+SET(QT_USE_QTDESIGNER ON)
 INCLUDE(${QT_USE_FILE})
 
 INCLUDE_DIRECTORIES(
@@ -26,7 +27,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqMultiViewManager.h
   pqObjectHistogramWidget.h
   pqObjectLineChartWidget.h
-  pqOpenExodusOptions.h
   pqObjectInspector.h
   pqObjectInspectorItem.h
   pqObjectInspectorWidget.h
@@ -44,7 +44,6 @@ SET(UI_FORMS
   pqCompoundProxyWizard.ui
   pqFileDialog.ui
   pqMultiViewFrameMenu.ui
-  pqOpenExodusOptions.ui
   pqServerBrowser.ui
 )
 
@@ -109,8 +108,6 @@ ADD_LIBRARY(QtWidgets
   pqObjectInspectorWidget.h
   pqObjectLineChartWidget.cxx
   pqObjectLineChartWidget.h
-  pqOpenExodusOptions.cxx
-  pqOpenExodusOptions.h
   pqOptions.cxx
   pqOptions.h
   pqParts.cxx

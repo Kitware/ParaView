@@ -30,5 +30,6 @@
         <file alias="pqWindowd16.png">Resources/pqWindowd16.png</file>
         <file alias="pqWindowd22.png">Resources/pqWindowd22.png</file>
         <file alias="pqWindowd32.png">Resources/pqWindowd32.png</file>
+        <file alias="ExodusReader.ui">pqExodusReaderProperties.ui</file>
     </qresource>
 </RCC>

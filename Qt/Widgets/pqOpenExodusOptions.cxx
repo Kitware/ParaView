@@ -97,7 +97,7 @@ void pqOpenExodusOptions::accept()
     {
     QLayout* l = this->BlocksGroup->layout();
     QCheckBox* cb = qobject_cast<QCheckBox*>(l->itemAt(l->count() - blocks.size() + i)->widget());
-    PropertyAdaptor->setProperty(prop, i, cb->isChecked());
+    PropertyAdaptor->setProperty(this->ExodusReader, prop, i, cb->isChecked());
     this->ExodusReader->UpdateVTKObjects();  // TODO: get rid of this call
     }
 
@@ -108,7 +108,7 @@ void pqOpenExodusOptions::accept()
     {
     QLayout* l = this->ElementVariablesGroup->layout();
     QCheckBox* cb = qobject_cast<QCheckBox*>(l->itemAt(l->count() - cellArrays.size() + i)->widget());
-    PropertyAdaptor->setProperty(prop, i, cb->isChecked());
+    PropertyAdaptor->setProperty(this->ExodusReader, prop, i, cb->isChecked());
     this->ExodusReader->UpdateVTKObjects();  // TODO: get rid of this call
     }
   
@@ -119,7 +119,7 @@ void pqOpenExodusOptions::accept()
     {
     QLayout* l = this->NodeVariablesGroup->layout();
     QCheckBox* cb = qobject_cast<QCheckBox*>(l->itemAt(l->count() - pointArrays.size() + i)->widget());
-    PropertyAdaptor->setProperty(prop, i, cb->isChecked());
+    PropertyAdaptor->setProperty(this->ExodusReader, prop, i, cb->isChecked());
     this->ExodusReader->UpdateVTKObjects();  // TODO: get rid of this call
     }
   
@@ -130,7 +130,7 @@ void pqOpenExodusOptions::accept()
     {
     QLayout* l = this->SideSetGroup->layout();
     QCheckBox* cb = qobject_cast<QCheckBox*>(l->itemAt(l->count() - sideSetArrays.size() + i)->widget());
-    PropertyAdaptor->setProperty(prop, i, cb->isChecked());
+    PropertyAdaptor->setProperty(this->ExodusReader, prop, i, cb->isChecked());
     this->ExodusReader->UpdateVTKObjects();  // TODO: get rid of this call
     }
   
@@ -141,7 +141,7 @@ void pqOpenExodusOptions::accept()
     {
     QLayout* l = this->NodeSetGroup->layout();
     QCheckBox* cb = qobject_cast<QCheckBox*>(l->itemAt(l->count() - nodeSetArrays.size() + i)->widget());
-    PropertyAdaptor->setProperty(prop, i, cb->isChecked());
+    PropertyAdaptor->setProperty(this->ExodusReader, prop, i, cb->isChecked());
     this->ExodusReader->UpdateVTKObjects();  // TODO: get rid of this call
     }
 
