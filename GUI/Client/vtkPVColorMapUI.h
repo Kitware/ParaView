@@ -84,7 +84,7 @@ public:
 
   // Description:
   // Update the widgets when the selected parameter changes
-  void UpdateColorMapUI(const char *name, int numComponents);
+  void UpdateColorMapUI(const char *name, int numComponents, int field);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
