@@ -36,6 +36,7 @@
 #include <vtksys/stl/vector>
 #include <vtksys/stl/string>
 #include <vtksys/stl/map>
+#include <vtksys/RegularExpression.hxx>
 
 #include <time.h>
 
@@ -55,14 +56,18 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.33");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.34");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
 {
 public:
-  
-  class UserSlotType
+
+  // User slot
+
+  typedef vtksys_stl::string UserSlotNameType;
+
+  class UserSlotValueType
   {
   public:
     double DoubleValue;
@@ -71,8 +76,12 @@ public:
     void *PointerValue;
   };
 
-  typedef vtksys_stl::map<vtksys_stl::string, UserSlotType> UserSlotPoolType;
-  typedef vtksys_stl::map<vtksys_stl::string, UserSlotType>::iterator UserSlotPoolIterator;
+  // User slot pool
+
+  typedef vtksys_stl::map<UserSlotNameType, UserSlotValueType> UserSlotPoolType;
+  typedef vtksys_stl::map<UserSlotNameType, UserSlotValueType>::iterator UserSlotPoolIterator;
+
+  // Preset node
 
   class PresetNode
   {
@@ -80,6 +89,8 @@ public:
     int Id;
     UserSlotPoolType UserSlotPool;
   };
+
+  // Preset pool
 
   static int PresetNodeCounter;
 
@@ -90,12 +101,30 @@ public:
 
   PresetPoolIterator GetPresetNode(int id);
 
+  // User slot name for the default fields
+
   vtksys_stl::string GroupSlotName;
   vtksys_stl::string CommentSlotName;
   vtksys_stl::string FileNameSlotName;
   vtksys_stl::string CreationTimeSlotName;
   vtksys_stl::string ThumbnailSlotName;
   vtksys_stl::string ScreenshotSlotName;
+
+  // Filter constraint
+
+  class PresetFilterConstraint
+  {
+  public:
+    vtksys_stl::string StringValue;
+    int IsRegularExpression;
+  };
+
+  // Filter pool
+
+  typedef vtksys_stl::map<UserSlotNameType, PresetFilterConstraint> PresetFilterType;
+  typedef vtksys_stl::map<UserSlotNameType, PresetFilterConstraint>::iterator PresetFilterIterator;
+
+  PresetFilterType PresetFilter;
 };
 
 int vtkKWPresetSelectorInternals::PresetNodeCounter = 0;
@@ -164,8 +193,6 @@ vtkKWPresetSelector::vtkKWPresetSelector()
   this->ThumbnailSize = 32;
   this->ScreenshotSize = 144;
   this->PromptBeforeRemovePreset = 1;
-
-  this->GroupFilter = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -227,8 +254,6 @@ vtkKWPresetSelector::~vtkKWPresetSelector()
 
   delete this->Internals;
   this->Internals = NULL;
-
-  this->SetGroupFilter(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -774,7 +799,7 @@ int vtkKWPresetSelector::SetPresetGroup(int id, const char *group)
 {
   int res = this->SetPresetUserSlotAsString(
     id, this->GetPresetGroupSlotName(), group);
-  if (res && this->GroupFilter)
+  if (res && this->Internals && this->Internals->PresetFilter.size())
     {
     // Changing the group of a preset may change the number of visible widgets
     // (for example, if the visibility of presets is filtered by groups), 
@@ -1393,11 +1418,17 @@ int vtkKWPresetSelector::GetNumberOfPresetsWithGroup(const char *group)
 //----------------------------------------------------------------------------
 int vtkKWPresetSelector::GetNumberOfVisiblePresets()
 {
-  if (this->GroupFilter && *this->GroupFilter)
+  if (this->PresetList)
     {
-    return this->GetNumberOfPresetsWithGroup(this->GroupFilter);
+    return this->PresetList->GetWidget()->GetNumberOfRows();
     }
-  return this->GetNumberOfPresets();
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPresetSelector::GetPresetVisibility(int id)
+{
+  return this->GetPresetRow(id) >= 0 ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
@@ -1631,6 +1662,7 @@ void vtkKWPresetSelector::SelectPreset(int id)
     {
     this->PresetList->GetWidget()->SelectSingleRow(row);
     this->PresetList->GetWidget()->SeeRow(row);
+    this->UpdatePresetButtons();
     }
 }
 
@@ -1655,6 +1687,7 @@ void vtkKWPresetSelector::SelectPreviousPreset()
         }
       list->SelectSingleRow(prev_row);
       list->SeeRow(prev_row);
+      this->UpdatePresetButtons();
       }
     }
 }
@@ -1680,6 +1713,7 @@ void vtkKWPresetSelector::SelectNextPreset()
         }
       list->SelectSingleRow(next_row);
       list->SeeRow(next_row);
+      this->UpdatePresetButtons();
       }
     }
 }
@@ -1690,6 +1724,7 @@ void vtkKWPresetSelector::ClearSelection()
   if (this->PresetList)
     {
     this->PresetList->GetWidget()->ClearSelection();
+    this->UpdatePresetButtons();
     }
 }
 
@@ -1700,36 +1735,151 @@ void vtkKWPresetSelector::NumberOfPresetsHasChanged()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPresetSelector::SetGroupFilter(const char* _arg)
+void vtkKWPresetSelector::ClearPresetFilter()
 {
-  if (this->GroupFilter == NULL && _arg == NULL) 
-    { 
-    return;
-    }
-
-  if (this->GroupFilter && _arg && (!strcmp(this->GroupFilter, _arg))) 
-    { 
-    return;
-    }
-
-  if (this->GroupFilter) 
-    { 
-    delete [] this->GroupFilter; 
-    }
-
-  if (_arg)
+  if (this->Internals && this->Internals->PresetFilter.size())
     {
-    this->GroupFilter = new char[strlen(_arg)+1];
-    strcpy(this->GroupFilter,_arg);
+    this->Internals->PresetFilter.clear();
+    this->UpdatePresetRows();
     }
-   else
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::SetPresetFilterUserSlotConstraint(
+  const char *slot_name, const char *value)
+{
+  int update = 1;
+  vtkKWPresetSelectorInternals::PresetFilterIterator it =
+    this->Internals->PresetFilter.find(slot_name);
+  if (it != this->Internals->PresetFilter.end())
     {
-    this->GroupFilter = NULL;
+    if (value)
+      {
+      if ((*it).second.StringValue.compare(value))
+        {
+        (*it).second.StringValue = value;
+        }
+      else
+        {
+        update = 0;
+        }
+      }
+    else
+      {
+      this->Internals->PresetFilter.erase(it);
+      }
+    }
+  else
+    {
+    if (value)
+      {
+      this->Internals->PresetFilter[slot_name].StringValue = value;
+      }
+    else
+      {
+      update = 0;
+      }
+    }
+  if (update)
+    {
+    this->UpdatePresetRows();
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWPresetSelector::GetPresetFilterUserSlotConstraint(
+  const char *slot_name)
+{
+  vtkKWPresetSelectorInternals::PresetFilterIterator it =
+    this->Internals->PresetFilter.find(slot_name);
+  if (it != this->Internals->PresetFilter.end())
+    {
+    return (*it).second.StringValue.c_str();
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::SetPresetFilterUserSlotConstraintToRegularExpression(
+  const char *slot_name)
+{
+  vtkKWPresetSelectorInternals::PresetFilterIterator it =
+    this->Internals->PresetFilter.find(slot_name);
+  if (it != this->Internals->PresetFilter.end() && 
+      !(*it).second.IsRegularExpression)
+    {
+    (*it).second.IsRegularExpression = 1;
+    this->UpdatePresetRows();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::SetPresetFilterUserSlotConstraintToString(
+  const char *slot_name)
+{
+  vtkKWPresetSelectorInternals::PresetFilterIterator it =
+    this->Internals->PresetFilter.find(slot_name);
+  if (it != this->Internals->PresetFilter.end() && 
+      (*it).second.IsRegularExpression)
+    {
+    (*it).second.IsRegularExpression = 0;
+    this->UpdatePresetRows();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::SetPresetFilterGroupConstraint(const char *value)
+{
+  this->SetPresetFilterUserSlotConstraint(
+    this->GetPresetGroupSlotName(), value);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWPresetSelector::GetPresetFilterGroupConstraint()
+{
+  return this->GetPresetFilterUserSlotConstraint(
+    this->GetPresetGroupSlotName());
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPresetSelector::IsPresetFiltered(int id)
+{
+  if (this->Internals->PresetFilter.empty())
+    {
+    return 1;
     }
 
-  this->Modified();
-
-  this->UpdatePresetRows();
+  vtkKWPresetSelectorInternals::PresetFilterIterator it = 
+    this->Internals->PresetFilter.begin();
+  vtkKWPresetSelectorInternals::PresetFilterIterator end = 
+    this->Internals->PresetFilter.end();
+  for (; it != end; ++it)
+    {
+    const char *slot_name = (*it).first.c_str();
+    const char *slot_value = 
+      this->GetPresetUserSlotAsString(id, slot_name);
+    if (!slot_value)
+      {
+      return 0;
+      }
+    const char *filter_value = (*it).second.StringValue.c_str();
+    if ((*it).second.IsRegularExpression)
+      {
+      vtksys::RegularExpression re(filter_value);
+      if (!re.find(slot_value))
+        {
+        return 0;
+        }
+      }
+    else
+      {
+      if (strcmp(slot_value, filter_value))
+        {
+        return 0;
+        }
+      }
+    }
+  return 1;
 } 
 
 //----------------------------------------------------------------------------
@@ -1765,17 +1915,13 @@ int vtkKWPresetSelector::UpdatePresetRow(int id)
 
   int row = this->GetPresetRow(id);
 
-  const char *group = this->GetPresetGroup(id);
-  int group_filter_exclude =
-    this->GroupFilter && *this->GroupFilter && 
-    group && *group &&
-    strcmp(group, this->GroupFilter);
+  int is_preset_filtered = this->IsPresetFiltered(id);
 
   // Not found ? Insert it, or ignore it if the group filter does not match
 
   if (row < 0)
     {
-    if (group_filter_exclude)
+    if (!is_preset_filtered)
       {
       return 0;
       }
@@ -1791,7 +1937,7 @@ int vtkKWPresetSelector::UpdatePresetRow(int id)
 
   else
     {
-    if (group_filter_exclude)
+    if (!is_preset_filtered)
       {
       list->DeleteRow(row);
       return 0;
@@ -1818,7 +1964,7 @@ int vtkKWPresetSelector::UpdatePresetRow(int id)
     row, image_col_index, this->GetPresetCreationTime(id));
 
   list->SetCellText(
-    row, this->GetGroupColumnIndex(), group);
+    row, this->GetGroupColumnIndex(), this->GetPresetGroup(id));
 
   list->SetCellText(
     row, this->GetCommentColumnIndex(), this->GetPresetComment(id));
@@ -2012,12 +2158,34 @@ void vtkKWPresetSelector::PresetRemoveCallback()
 }
 
 //---------------------------------------------------------------------------
+int vtkKWPresetSelector::GetNumberOfSelectedPresetsWithFileName()
+{
+  int nb = 0;
+  if (this->PresetList)
+    {
+    vtkKWMultiColumnList *list = this->PresetList->GetWidget();
+    int *indices = new int [list->GetNumberOfRows()];
+    int i, nb_selected_rows = list->GetSelectedRows(indices);
+    for (i = 0; i < nb_selected_rows; i++)
+      {
+      int id = this->GetPresetAtRowId(indices[i]);
+      const char *filename = this->GetPresetFileName(id);
+      if (filename && *filename && vtksys::SystemTools::FileExists(filename))
+        {
+        nb++;
+        }
+      }
+    delete [] indices;
+    }
+  return nb;
+}
+
+//---------------------------------------------------------------------------
 void vtkKWPresetSelector::PresetLocateCallback()
 {
   if (this->PresetList)
     {
     vtkKWMultiColumnList *list = this->PresetList->GetWidget();
-
     int *indices = new int [list->GetNumberOfRows()];
     int i, nb_selected_rows = list->GetSelectedRows(indices);
     for (i = 0; i < nb_selected_rows; i++)
@@ -2029,7 +2197,6 @@ void vtkKWPresetSelector::PresetLocateCallback()
         this->GetApplication()->ExploreLink(filename);
         }
       }
-    
     delete [] indices;
     }
 }
@@ -2206,14 +2373,25 @@ void vtkKWPresetSelector::Update()
 {
   this->UpdateEnableState();
 
+  this->UpdatePresetButtons();
+}
+
+//---------------------------------------------------------------------------
+void vtkKWPresetSelector::UpdatePresetButtons()
+{
   if (!this->PresetButtons)
     {
     return;
     }
 
+  this->PresetButtons->SetEnabled(this->GetEnabled());
+
   int has_selection = 
     (this->PresetList && 
      this->PresetList->GetWidget()->GetNumberOfSelectedCells());
+
+  int has_filenames_in_selection = 
+    has_selection ? this->GetNumberOfSelectedPresetsWithFileName() : 0;
 
   int has_presets = this->GetNumberOfVisiblePresets();
 
@@ -2280,7 +2458,7 @@ void vtkKWPresetSelector::Update()
 
   this->PresetButtons->GetWidget(
     vtkKWPresetSelector::LocateButtonId)->SetEnabled(
-      has_selection ? this->PresetButtons->GetEnabled() : 0);
+      has_filenames_in_selection ? this->PresetButtons->GetEnabled() : 0);
 
   // Email
 
@@ -2290,7 +2468,7 @@ void vtkKWPresetSelector::Update()
 
   this->PresetButtons->GetWidget(
     vtkKWPresetSelector::EmailButtonId)->SetEnabled(
-      has_selection ? this->PresetButtons->GetEnabled() : 0);
+      has_filenames_in_selection ? this->PresetButtons->GetEnabled() : 0);
 }
 
 //----------------------------------------------------------------------------
