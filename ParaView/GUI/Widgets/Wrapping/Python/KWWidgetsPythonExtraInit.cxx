@@ -20,11 +20,15 @@
 #include <stdlib.h>
 
 // the init function for the python module
-#if defined(_WIN32) && !defined(__CYGWIN__)
-extern  "C" {void initKWWidgetsPython();}
-#else
-extern  "C" {void initlibKWWidgetsPython();}
-#endif
+#if defined(_WIN32)
+#if defined(__CYGWIN__)
+extern "C" {void __declspec(dllexport) initlibKWWidgetsPython();}
+#else /* defined(__CYGWIN__) */
+extern "C" {void __declspec(dllexport) initKWWidgetsPython();}
+#endif /* defined(__CYGWIN__) */
+#else /* defined(_WIN32) */
+extern "C" {void initlibKWWidgetsPython();}
+#endif /* defined(_WIN32) */
 
 // change the old "init" function into a pre-init function
 #define initlibKWWidgetsPython preInitKWWidgetsPython
@@ -455,12 +459,13 @@ void PyVTKClass_AddExtraMethods(PyVTKClass *self, PyMethodDef *methods)
     }
 }
 
+/* define the init function for the module, handle different platforms */ 
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
 void initKWWidgetsPython()
-#else
+#else /* defined(_WIN32) && !defined(__CYGWIN__) */
 void initlibKWWidgetsPython()
-#endif
+#endif /* defined(_WIN32) && !defined(__CYGWIN__) */
 {
   // call init function from KWWidgetsPythonInit.cxx
   preInitKWWidgetsPython();
