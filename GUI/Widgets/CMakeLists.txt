@@ -411,6 +411,27 @@ VTK_WRAP_TCL3(
 
 SUBDIRS(Wrapping/Tcl)
 
+# If needed, copy the Tcl/Tk support files required at run-time 
+# to initialize Tcl/Tk. This is used by the examples or larger
+# projects that include KWWidgets directly in their source trees.
+
+IF(TclTk_INSTALL_LIB_DIR)
+  SET(KWWidgets_TclTk_INSTALL_LIB_DIR "${TclTk_INSTALL_LIB_DIR}")
+ELSE(TclTk_INSTALL_LIB_DIR)
+  SET(KWWidgets_TclTk_INSTALL_LIB_DIR "${KWWidgets_INSTALL_LIB_DIR}/TclTk/lib")
+ENDIF(TclTk_INSTALL_LIB_DIR)
+
+IF(VTK_TCL_TK_COPY_SUPPORT_LIBRARY)
+  IF(VTK_TCL_SUPPORT_LIBRARY_PATH AND VTK_TK_SUPPORT_LIBRARY_PATH)
+    INCLUDE(${VTK_TCL_TK_MACROS_MODULE})
+    VTK_COPY_TCL_TK_SUPPORT_FILES_TO_DIR(
+      ${VTK_TCL_SUPPORT_LIBRARY_PATH} ${VTK_TK_SUPPORT_LIBRARY_PATH}
+      "${PROJECT_BINARY_DIR}/lib")
+    VTK_COPY_TCL_TK_SUPPORT_FILES_TO_DIR(
+      ${VTK_TCL_SUPPORT_LIBRARY_PATH} ${VTK_TK_SUPPORT_LIBRARY_PATH}
+      "${KWWidgets_TclTk_INSTALL_LIB_DIR}" INSTALL)
+  ENDIF(VTK_TCL_SUPPORT_LIBRARY_PATH AND VTK_TK_SUPPORT_LIBRARY_PATH)
+ENDIF(VTK_TCL_TK_COPY_SUPPORT_LIBRARY)
 
 # --------------------------------------------------------------------------
 # Wrap the classes in Python
@@ -437,7 +458,8 @@ IF(VTK_WRAP_PYTHON)
     TARGET_LINK_LIBRARIES(KWWidgetsPythonD ${VTK_PYTHON_LIBRARIES})
   ENDIF(WIN32 OR APPLE)
 
-  ADD_LIBRARY(KWWidgetsPython MODULE KWWidgetsPythonExtraInit.cxx)
+  ADD_LIBRARY(KWWidgetsPython MODULE 
+    Wrapping/Python/KWWidgetsPythonExtraInit.cxx)
   TARGET_LINK_LIBRARIES(KWWidgetsPython KWWidgetsPythonD)
 
   IF(WIN32 OR APPLE)
@@ -458,29 +480,6 @@ IF(VTK_WRAP_PYTHON)
   SUBDIRS(Wrapping/Python)
 
 ENDIF(VTK_WRAP_PYTHON)
-
-
-# If needed, copy the Tcl/Tk support files required at run-time 
-# to initialize Tcl/Tk. This is used by the examples or larger
-# projects that include KWWidgets directly in their source trees.
-
-IF(TclTk_INSTALL_LIB_DIR)
-  SET(KWWidgets_TclTk_INSTALL_LIB_DIR "${TclTk_INSTALL_LIB_DIR}")
-ELSE(TclTk_INSTALL_LIB_DIR)
-  SET(KWWidgets_TclTk_INSTALL_LIB_DIR "${KWWidgets_INSTALL_LIB_DIR}/TclTk/lib")
-ENDIF(TclTk_INSTALL_LIB_DIR)
-
-IF(VTK_TCL_TK_COPY_SUPPORT_LIBRARY)
-  IF(VTK_TCL_SUPPORT_LIBRARY_PATH AND VTK_TK_SUPPORT_LIBRARY_PATH)
-    INCLUDE(${VTK_TCL_TK_MACROS_MODULE})
-    VTK_COPY_TCL_TK_SUPPORT_FILES_TO_DIR(
-      ${VTK_TCL_SUPPORT_LIBRARY_PATH} ${VTK_TK_SUPPORT_LIBRARY_PATH}
-      "${PROJECT_BINARY_DIR}/lib")
-    VTK_COPY_TCL_TK_SUPPORT_FILES_TO_DIR(
-      ${VTK_TCL_SUPPORT_LIBRARY_PATH} ${VTK_TK_SUPPORT_LIBRARY_PATH}
-      "${KWWidgets_TclTk_INSTALL_LIB_DIR}" INSTALL)
-  ENDIF(VTK_TCL_SUPPORT_LIBRARY_PATH AND VTK_TK_SUPPORT_LIBRARY_PATH)
-ENDIF(VTK_TCL_TK_COPY_SUPPORT_LIBRARY)
 
 # --------------------------------------------------------------------------
 # Build the library
