@@ -33,8 +33,10 @@
 
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
+#include <vtksys/stl/algorithm>
+#include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.81");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.82");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -6842,10 +6844,11 @@ void vtkKWParameterValueFunctionEditor::VisibleValueRangeChangedCallback(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWParameterValueFunctionEditor::FindFunctionPointAtCanvasCoordinates(
-  int x, int y, int *id, int *c_x, int *c_y)
+int
+vtkKWParameterValueFunctionEditor::FindClosestItemWithTagAtCanvasCoordinates(
+  int x, int y, int halo, const char *tag, int *c_x, int *c_y, char *found)
 {
-  if (!this->IsCreated() || !this->HasFunction())
+  if (!this->IsCreated() || halo < 0 || !tag || !c_x || !c_y)
     {
     return 0;
     }
@@ -6877,22 +6880,64 @@ int vtkKWParameterValueFunctionEditor::FindFunctionPointAtCanvasCoordinates(
   *c_x = atoi(this->Script("%s canvasx %d", canv, x));
   *c_y = atoi(this->Script("%s canvasy %d", canv, y));
 
-  // Find the closest element
-  // Get its first tag, which should be either a point or a text (in
-  // the form of tid or pid, ex: t0, or p0)
+  // Find the overlapping items
+
+  const char *res = 
+    this->Script(
+      "%s find overlapping %d %d %d %d", 
+      canv, *c_x - halo, *c_y - halo, *c_x + halo, *c_y + halo);
+
+  vtksys_stl::vector<vtksys_stl::string> items;
+  vtksys::SystemTools::Split(res, items, ' ');
+  
+  // For each item, check the tags, and see if we have a match
+
+  vtksys_stl::vector<vtksys_stl::string>::iterator it = items.begin();
+  vtksys_stl::vector<vtksys_stl::string>::iterator end = items.end();
+  for (; it != end; it++)
+    {
+    res = this->Script("%s itemcget %s -tags", canv, (*it).c_str());
+    vtksys_stl::vector<vtksys_stl::string> tags;
+    vtksys::SystemTools::Split(res, tags, ' ');
+    vtksys_stl::vector<vtksys_stl::string>::iterator match =
+      vtksys_stl::find(tags.begin(), tags.end(), tag);
+    if (match != tags.end())
+      {
+      strcpy(found, (*it).c_str());
+      return 1;
+      }
+    }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::FindFunctionPointAtCanvasCoordinates(
+  int x, int y, int *id, int *c_x, int *c_y)
+{
+  if (!this->IsCreated() || !this->HasFunction())
+    {
+    return 0;
+    }
+
+  char item[256];
+  if (!this->FindClosestItemWithTagAtCanvasCoordinates(
+        x, y, 3, vtkKWParameterValueFunctionEditor::PointTag, c_x, c_y, item))
+    {
+    return 0;
+    }
 
   *id = -1;
 
-  const char *closest = 
-    this->Script("%s find closest %d %d", canv, *c_x, *c_y);
-  if (closest && *closest)
+  // Get its first tag, which should be a point tag (in
+  // the form of ppid or tpid, ex: p0 or t1)
+
+  const char *canv = this->Canvas->GetWidgetName();
+  const char *tag = 
+    this->Script("lindex [%s itemcget %s -tags] 0", canv, item);
+  if (tag && *tag && (tag[0] == 't' || tag[0] == 'p') && isdigit(tag[1]))
     {
-    const char *tag = 
-      this->Script("lindex [%s itemcget %s -tags] 0", canv, closest);
-    if (tag && *tag && (tag[0] == 't' || tag[0] == 'p') && isdigit(tag[1]))
-      {
-      *id = atoi(tag + 1);
-      }
+    *id = atoi(tag + 1);
     }
 
   return (*id < 0 || *id >= this->GetFunctionSize()) ? 0 : 1;
@@ -6949,7 +6994,6 @@ void vtkKWParameterValueFunctionEditor::StartInteractionCallback(int x, int y)
   // Select the point (that was found or just added)
 
   this->SelectPoint(id);
-  this->GetFunctionPointCanvasCoordinates(this->GetSelectedPoint(),&c_x, &c_y);
   this->LastSelectionCanvasCoordinateX = c_x;
   this->LastSelectionCanvasCoordinateY = c_y;
 
