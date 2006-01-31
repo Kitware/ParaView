@@ -70,6 +70,8 @@ $kw(vtkTemp300) AcceptCallback
 set kw(vtkTemp339) [$kw(vtkTemp300) GetPVOutput]
 $kw(vtkTemp336) SetColorSchemeToBlueRed
 $kw(vtkTemp336) SetColorSchemeToRedBlue
+$kw(vtkTemp336) SetUseLowOutOfRangeColor 0
+$kw(vtkTemp336) SetUseHighOutOfRangeColor 0
 update
 
 # Retrace

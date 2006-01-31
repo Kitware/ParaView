@@ -400,6 +400,9 @@ protected:
   void DrawVolumeBunykInternal();
   void DrawVolumeZSweepInternal();
 
+  // Update the color map GUI when the ColorSelectionMenu value changes.
+  void UpdateColorMapUI();
+
 //BTX
   friend class vtkPVDisplayGUIVRObserver;
   vtkPVDisplayGUIVRObserver *VRObserver;

@@ -53,7 +53,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.139");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.140");
 
 //===========================================================================
 //***************************************************************************
@@ -2250,6 +2250,9 @@ void vtkPVColorMap::SetNumberOfLabels(int num)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetLowLookupTableValue(double color[3])
 {
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetLowLookupTableValue %f %f %f",
+                                   this->GetTclName(),
+                                   color[0], color[1], color[2]);
   this->LookupTableProxy->SetLowOutOfRangeColor(color);
   this->LookupTableProxy->UpdateVTKObjects();
 }
@@ -2257,6 +2260,9 @@ void vtkPVColorMap::SetLowLookupTableValue(double color[3])
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetHighLookupTableValue(double color[3])
 {
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetHighLookupTableValue %f %f %f",
+                                   this->GetTclName(),
+                                   color[0], color[1], color[2]);
   this->LookupTableProxy->SetHighOutOfRangeColor(color);
   this->LookupTableProxy->UpdateVTKObjects();
 }
@@ -2264,6 +2270,8 @@ void vtkPVColorMap::SetHighLookupTableValue(double color[3])
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetUseLowOutOfRangeColor(int val)
 {
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetUseLowOutOfRangeColor %d",
+                                   this->GetTclName(), val);
   this->LookupTableProxy->SetUseLowOutOfRangeColor(val);
   this->LookupTableProxy->UpdateVTKObjects();
 }
@@ -2271,6 +2279,8 @@ void vtkPVColorMap::SetUseLowOutOfRangeColor(int val)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetUseHighOutOfRangeColor(int val)
 {
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetUseHighOutOfRangeColor %d",
+                                   this->GetTclName(), val);
   this->LookupTableProxy->SetUseHighOutOfRangeColor(val);
   this->LookupTableProxy->UpdateVTKObjects();
 }
