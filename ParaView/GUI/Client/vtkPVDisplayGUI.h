@@ -124,6 +124,11 @@ public:
   void OpacityChangedEndCallback(double value);
 
   // Description:
+  // Set the material applied to the actor.
+  // The argument is the name of the material to apply.
+  void SetMaterial(const char* name);
+  
+  // Description:
   // Create the widget.
   void Create();
   
@@ -345,6 +350,8 @@ protected:
   vtkKWMenuButton *RepresentationMenu;
   vtkKWLabel *InterpolationMenuLabel;
   vtkKWMenuButton *InterpolationMenu;
+  vtkKWLabel *MaterialMenuLabel;
+  vtkKWMenuButton *MaterialMenu;
 
   vtkKWLabel      *PointSizeLabel;
   vtkKWThumbWheel *PointSizeThumbWheel;
