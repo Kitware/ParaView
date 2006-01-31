@@ -1,1 +1,1 @@
-SUBDIRS(Cxx Tcl Data Resources)
+SUBDIRS(Cxx Tcl Python Data Resources)

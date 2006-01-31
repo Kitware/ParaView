@@ -14,7 +14,7 @@ def vtkKWCheckButtonEntryPoint(parent, win):
   cb1.SetText("A checkbutton")
 
   app.Script(
-    "pack %s -side top -anchor nw -expand n -padx 2 -pady 2" %
+    "pack %s -side top -anchor nw -expand n -padx 2 -pady 2",
     cb1.GetWidgetName())
 
   # -----------------------------------------------------------------------
