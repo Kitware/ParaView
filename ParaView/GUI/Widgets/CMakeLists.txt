@@ -395,6 +395,11 @@ INCLUDE_DIRECTORIES(
   )
 
 # --------------------------------------------------------------------------
+# Wrapping
+
+SUBDIRS(Wrapping)
+
+# --------------------------------------------------------------------------
 # Wrap the classes in Tcl
 
 SET(VTK_WRAP_HINTS ${KWWidgets_SOURCE_DIR}/hints)
@@ -408,8 +413,6 @@ VTK_WRAP_TCL3(
   "${KWWidgets_SRCS}" 
   "vtkKWWidgetsInitializeCommand" 
   "${KWWidgets_MAJOR_VERSION}.${KWWidgets_MINOR_VERSION}")
-
-SUBDIRS(Wrapping/Tcl)
 
 # If needed, copy the Tcl/Tk support files required at run-time 
 # to initialize Tcl/Tk. This is used by the examples or larger
@@ -480,8 +483,6 @@ IF(VTK_WRAP_PYTHON)
     [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\2.2\\InstallPath]
   )
   MARK_AS_ADVANCED(PYTHON_EXECUTABLE)
-
-  SUBDIRS(Wrapping/Python)
 
 ENDIF(VTK_WRAP_PYTHON)
 

@@ -1,0 +1,11 @@
+setenv PATH ${KWWidgets_PATHS}:$PATH
+if ( $?TCLLIBPATH ) then
+  setenv TCLLIBPATH '"${VTK_TCL_PATH}" "${KWWidgets_TCL_PATH}" '$TCLLIBPATH
+else
+  setenv TCLLIBPATH '"${VTK_TCL_PATH}" "${KWWidgets_TCL_PATH}"'
+endif
+if ( $?PYTHONPATH ) then
+  setenv PYTHONPATH ${VTK_PYTHON_PATH}:${KWWidgets_PYTHON_PATH}:${KWWidgets_LIBRARY_PATHS}:$PYTHONPATH
+else
+  setenv PYTHONPATH ${VTK_PYTHON_PATH}:${KWWidgets_PYTHON_PATH}:${KWWidgets_LIBRARY_PATHS}
+endif
