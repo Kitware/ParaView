@@ -400,6 +400,43 @@ public:
   };
 
 //ETX
+  
+  // Description:
+  // When this flag is set, it implies that the server (or client)
+  // can accept multiple remote connections. This class only affects when running
+  // in client-server mode.
+  vtkSetMacro(SupportMultipleConnections, int);
+  vtkGetMacro(SupportMultipleConnections, int);
+  vtkBooleanMacro(SupportMultipleConnections, int);
+  
+  // Description:
+  // Connect to remote process. Returns 1 on success, 0 on error. 
+  // This method is intended to be used when 
+  // SupportMultipleConnections is true, to connect to a server, in forward connection 
+  // mode. When SupportMultipleConnections is 1, the client does not connect to
+  // a server in the call to Start(), the GUI is expected to explicitly call this method
+  // to connect to the server. Also, it is the responsibility of the GUI to call the
+  // appropriate overloaded method when running in render client mode. 
+  // TODO: this method can work even on the server -- however, currently, 
+  // the server connects to a remote client only in reverse connection mode, in which
+  // case the server can connect to 1 and only 1 client, and that connection
+  // is established in Start() itselt. Hence this method has not useful.
+  int ConnectToRemote(const char* serverhost, int port);
+  int ConnectToRemote(const char* dataserver_host, int dataserver_port,
+    const char* renderserver_host, int renderserver_port);
+  
+
+  // Description:
+  // Checks if any new connections are available, if so, creates vtkConnections
+  // for them. The call will wait for a timeout of msec milliseconds for a
+  // new connection to arrive. Timeout of 0 will wait until a new connection arrives.
+  // This method is intended to be used on the client when running in reverse connection
+  // mode with SupportMultipleConnections set to 1. When SupportMultipleConnections is 
+  // set to 1 Start() does not wait for server to attempt to connect to the client.
+  // The gui must explicitly call this method to check if any new connections are
+  // pending.
+  int MonitorConnections(unsigned long msec);
+    
 protected:
   vtkProcessModule();
   ~vtkProcessModule();
@@ -420,7 +457,24 @@ protected:
   void ExecuteEvent(vtkObject* o, unsigned long event, void* calldata);
 
   // Description:
-  // Called to set up the connections, if any. 
+  // Starts the client. It will create the application
+  // and start the event loop. Returns 0 on success. This method is called
+  // only on the client process with the GUI.
+  virtual int StartClient(int argc, char** argv);
+
+  // Description:
+  // Starts the server node event loop. Return 0 on success. This method is 
+  // called only on the server root node.
+  // msec is the inactivity timeout. If no socket activity happens on the server
+  // for msec milliseconds, the server exists. Timeout of 0 implies no timeout, the
+  // server waits indefinitely.
+  virtual int StartServer(unsigned long msec);
+
+  // Description:
+  // Called to set up the connections, if any. Thus for processes
+  // that have server sockets, this call creates the sockets and binds them to
+  // appropriate ports. Note this this call does not create any remote connections;
+  // it simply prepares the state to accept connections.
   // Returns 0 on error, 1 on success.
   int InitializeConnections();
 
@@ -436,10 +490,9 @@ protected:
   int SetupWaitForConnection();
 
   // Description:
-  // Return 1 if the connection should wait, and 0 if the connet
+  // Return 1 if the connection should wait, and 0 otherwise.
   int ShouldWaitForConnection();
-  
-
+ 
   // Description:
   // Called on client in reverse connection mode. Returns after the
   // client has connected to a RenderServer/DataServer (in case of 
@@ -460,7 +513,6 @@ protected:
   // so that this class can access SetActiveConnection.
   friend class vtkRemoteConnection;
   //ETX
-
   
   vtkClientServerID UniqueID;
   
@@ -489,6 +541,12 @@ protected:
   ofstream *LogFile;
   vtkTimerLog* Timer;
   vtkKWProcessStatistics* MemoryInformation;
+
+  // Description:
+  // When this flag is set, it implies that the server (or client)
+  // can accept multiple remote connections. This class only affects when running
+  // in client-server mode.
+  int SupportMultipleConnections;
 
 private:
   vtkProcessModule(const vtkProcessModule&); // Not implemented.
