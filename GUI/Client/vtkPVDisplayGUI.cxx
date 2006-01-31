@@ -40,6 +40,7 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkKWView.h"
 #include "vtkKWWidget.h"
+#include "vtkMaterialLibrary.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
@@ -86,6 +87,8 @@
 #include "vtkToolkits.h"
 #include "vtkVolumeProperty.h"
 
+#include <vtksys/ios/sstream>
+
 #define VTK_PV_OUTLINE_LABEL              "Outline"
 #define VTK_PV_SURFACE_LABEL              "Surface"
 #define VTK_PV_WIREFRAME_LABEL            "Wireframe of Surface"
@@ -97,7 +100,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.59");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.60");
 
 //----------------------------------------------------------------------------
 
@@ -198,6 +201,9 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
   
   this->InterpolationMenuLabel = vtkKWLabel::New();
   this->InterpolationMenu = vtkKWMenuButton::New();
+
+  this->MaterialMenuLabel = 0;
+  this->MaterialMenu = 0;
   
   this->PointSizeLabel = vtkKWLabel::New();
   this->PointSizeThumbWheel = vtkKWThumbWheel::New();
@@ -304,6 +310,17 @@ vtkPVDisplayGUI::~vtkPVDisplayGUI()
   this->InterpolationMenuLabel = NULL;
   this->InterpolationMenu->Delete();
   this->InterpolationMenu = NULL;
+
+  if (this->MaterialMenuLabel)
+    {
+    this->MaterialMenuLabel->Delete();
+    this->MaterialMenuLabel = NULL;
+    }
+  if (this->MaterialMenu)
+    {
+    this->MaterialMenu->Delete();
+    this->MaterialMenu = NULL;
+    }
   
   this->PointSizeLabel->Delete();
   this->PointSizeLabel = NULL;
@@ -449,6 +466,7 @@ void vtkPVDisplayGUI::Create()
   // Call the superclass to create the whole widget
 
   this->Superclass::Create();
+  int cc;
 
   // We are going to 'grid' most of it, so let's define some const
 
@@ -735,6 +753,32 @@ void vtkPVDisplayGUI::Create()
   this->InterpolationMenu->SetBalloonHelpString(
     "Choose the method used to shade the geometry and interpolate point attributes.");
 
+  if (vtkMaterialLibrary::GetNumberOfMaterials() > 0)
+    {
+    this->MaterialMenuLabel = vtkKWLabel::New();
+    this->MaterialMenu = vtkKWMenuButton::New();
+
+    this->MaterialMenuLabel->SetParent(this->DisplayStyleFrame->GetFrame());
+    this->MaterialMenuLabel->Create();
+    this->MaterialMenuLabel->SetText("Material:");
+
+    this->MaterialMenu->SetParent(this->DisplayStyleFrame->GetFrame());
+    this->MaterialMenu->Create();
+    this->MaterialMenu->AddRadioButton("None", this, "SetMaterial {}");
+    this->MaterialMenu->SetBalloonHelpString(
+      "Choose the material to apply to the object.");
+    // Populate the material list.
+    const char** names = vtkMaterialLibrary::GetListOfMaterialNames();
+    for(cc=0; names[cc];cc++)
+      {
+      vtksys_ios::ostringstream stream;
+      stream << "SetMaterial " << names[cc];
+      this->MaterialMenu->AddRadioButton(names[cc], this,
+        stream.str().c_str());
+      }
+    }
+  
+
   this->PointSizeLabel->SetParent(this->DisplayStyleFrame->GetFrame());
   this->PointSizeLabel->Create();
   this->PointSizeLabel->SetText("Point size:");
@@ -822,6 +866,17 @@ void vtkPVDisplayGUI::Create()
   this->Script("grid %s -sticky news -padx %d -pady %d",
                this->InterpolationMenu->GetWidgetName(),
                col_1_padx, button_pady);
+
+  if (this->MaterialMenuLabel && this->MaterialMenu)
+    {
+    this->Script("grid %s %s -sticky wns",
+      this->MaterialMenuLabel->GetWidgetName(),
+      this->MaterialMenu->GetWidgetName());
+
+    this->Script("grid %s -sticky news -padx %d -pady %d",
+      this->MaterialMenu->GetWidgetName(),
+      col_1_padx, button_pady);
+    }
   
   this->Script("grid %s %s -sticky wns",
                this->PointSizeLabel->GetWidgetName(),
@@ -901,7 +956,6 @@ void vtkPVDisplayGUI::Create()
   this->OriginLabel->SetBalloonHelpString(
     "Set the origin point about which rotations take place.");
 
-  int cc;
   for ( cc = 0; cc < 3; cc ++ )
     {
     this->TranslateThumbWheel[cc]->SetParent(this->ActorControlFrame->GetFrame());
@@ -1224,6 +1278,25 @@ void vtkPVDisplayGUI::UpdateInternal()
     break;
   default:
     vtkErrorMacro("Unknown representation.");
+    }
+
+  // Material menu.
+  if (this->MaterialMenu)
+    {
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      pDisp->GetProperty("Shading"));
+    if (!ivp || ivp->GetElement(0) == 0)
+      {
+      this->MaterialMenu->SetValue("None");
+      }
+    else
+      {
+      vtkSMStringVectorProperty* svp = 
+        vtkSMStringVectorProperty::SafeDownCast(pDisp->GetProperty(
+            "Material"));
+      this->MaterialMenu->SetValue(svp->GetElement(0));
+
+      }
     }
   this->PointSizeThumbWheel->SetValue(pDisp->GetPointSizeCM());
   this->LineWidthThumbWheel->SetValue(pDisp->GetLineWidthCM());
@@ -2001,6 +2074,61 @@ void vtkPVDisplayGUI::SetInterpolationToGouraud()
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::SetMaterial(const char* name)
+{
+  if (!this->MaterialMenu)
+    {
+    if (name)
+      {
+      vtkWarningMacro("No materials are provided by the library.");
+      }
+    return;
+    }
+
+  vtkSMDataObjectDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    pDisp->GetProperty("Shading"));
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    pDisp->GetProperty("Material"));
+  if (!svp)
+    {
+    vtkErrorMacro("Failed to find property Material on display proxy.");
+    return;
+    }
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property Shading on display proxy.");
+    return;
+    }
+  if (!name || strlen(name) == 0)
+    {
+    ivp->SetElement(0, 0);
+    }
+  else
+    {
+    svp->SetElement(0, name);
+    ivp->SetElement(0, 1);
+    }
+  pDisp->UpdateVTKObjects();
+  if (this->GetPVRenderView())
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+  if (name && strlen(name) > 0)
+    {
+    this->GetTraceHelper()->AddEntry("$kw(%s) SetMaterial %s", 
+      this->GetTclName(), name);
+    this->MaterialMenu->SetValue(name);
+    }
+  else
+    {
+    this->GetTraceHelper()->AddEntry("$kw(%s) SetMaterial 0", 
+      this->GetTclName());
+    this->MaterialMenu->SetValue("None");
     }
 }
 

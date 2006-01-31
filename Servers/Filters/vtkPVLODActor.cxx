@@ -30,7 +30,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODActor);
-vtkCxxRevisionMacro(vtkPVLODActor, "1.4");
+vtkCxxRevisionMacro(vtkPVLODActor, "1.5");
 
 vtkCxxSetObjectMacro(vtkPVLODActor, LODMapper, vtkMapper);
 vtkCxxSetObjectMacro(vtkPVLODActor, RenderModuleHelper, vtkPVRenderModuleHelper);
@@ -132,6 +132,7 @@ void vtkPVLODActor::Render(vtkRenderer *ren, vtkMapper *vtkNotUsed(m))
   // Store information on time it takes to render.
   // We might want to estimate time from the number of polygons in mapper.
   this->Device->Render(ren,mapper);
+  this->Property->PostRender(this, ren);
   this->EstimatedRenderTime = mapper->GetTimeToDraw();
 
 }
@@ -170,6 +171,7 @@ int vtkPVLODActor::RenderOpaqueGeometry(vtkViewport *vp)
       this->Texture->Render(ren);
       }
     this->Render(ren,this->Mapper);
+    this->Property->PostRender(this, ren);
 
     renderedSomething = 1;
     }
