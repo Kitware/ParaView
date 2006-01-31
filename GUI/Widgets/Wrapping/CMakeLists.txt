@@ -38,6 +38,10 @@ IF(WIN32)
         "${LIBRARY_OUTPUT_PATH}/${config}")
       SET(VTK_TCL_PATH "${VTK_DIR}/Wrapping/Tcl/${config}")
       SET(KWWidgets_TCL_PATH "${KWWidgets_BINARY_DIR}/Wrapping/Tcl/${config}")
+      STRING(REGEX REPLACE "/cygdrive/(.)/" "\\1:/" 
+        VTK_PYTHON_PATH "${VTK_PYTHON_PATH}")
+      STRING(REGEX REPLACE "/cygdrive/(.)/" "\\1:/" 
+        KWWidgets_PYTHON_PATH "${KWWidgets_PYTHON_PATH}")
       CONFIGURE_FILE(
         ${KWWidgets_SOURCE_DIR}/Wrapping/KWWidgetsSetupPaths.bat.in
         ${EXECUTABLE_OUTPUT_PATH}/${config}/KWWidgetsSetupPaths.bat
@@ -68,6 +72,10 @@ IF(WIN32)
         IMMEDIATE)
     ENDFOREACH(config)
   ELSE(CMAKE_CONFIGURATION_TYPES)
+    STRING(REGEX REPLACE "/cygdrive/(.)/" "\\1:/" 
+      VTK_PYTHON_PATH "${VTK_PYTHON_PATH}")
+    STRING(REGEX REPLACE "/cygdrive/(.)/" "\\1:/" 
+      KWWidgets_PYTHON_PATH "${KWWidgets_PYTHON_PATH}")
     CONFIGURE_FILE(
       ${KWWidgets_SOURCE_DIR}/Wrapping/KWWidgetsSetupPaths.bat.in
       ${EXECUTABLE_OUTPUT_PATH}/KWWidgetsSetupPaths.bat
