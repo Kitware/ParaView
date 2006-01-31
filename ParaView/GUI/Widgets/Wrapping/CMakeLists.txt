@@ -105,6 +105,11 @@ IF(WIN32)
       ${EXECUTABLE_OUTPUT_PATH}/KWWidgetsSetupPaths.csh
       IMMEDIATE)
   ENDIF(CMAKE_CONFIGURATION_TYPES)
+  # one final switch back for security
+  STRING(REGEX REPLACE "/cygdrive/(.)/" "\\1:/" 
+    VTK_PYTHON_PATH "${VTK_PYTHON_PATH}")
+  STRING(REGEX REPLACE "/cygdrive/(.)/" "\\1:/" 
+    KWWidgets_PYTHON_PATH "${KWWidgets_PYTHON_PATH}")
 ELSE(WIN32)
   STRING(REGEX REPLACE ";" ":" KWWidgets_PATHS "${KWWidgets_PATHS}")
   STRING(REGEX REPLACE ";" ":" KWWidgets_LIBRARY_PATHS "${KWWidgets_LIBRARY_PATHS}")
