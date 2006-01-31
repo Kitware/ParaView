@@ -53,7 +53,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.140");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.141");
 
 //===========================================================================
 //***************************************************************************
@@ -2277,12 +2277,36 @@ void vtkPVColorMap::SetUseLowOutOfRangeColor(int val)
 }
 
 //----------------------------------------------------------------------------
+int vtkPVColorMap::GetUseLowOutOfRangeColor()
+{
+  return this->LookupTableProxy->GetUseLowOutOfRangeColor();
+}
+
+//----------------------------------------------------------------------------
+double* vtkPVColorMap::GetLowLookupTableValue()
+{
+  return this->LookupTableProxy->GetLowOutOfRangeColor();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVColorMap::SetUseHighOutOfRangeColor(int val)
 {
   this->GetTraceHelper()->AddEntry("$kw(%s) SetUseHighOutOfRangeColor %d",
                                    this->GetTclName(), val);
   this->LookupTableProxy->SetUseHighOutOfRangeColor(val);
   this->LookupTableProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVColorMap::GetUseHighOutOfRangeColor()
+{
+  return this->LookupTableProxy->GetUseHighOutOfRangeColor();
+}
+
+//----------------------------------------------------------------------------
+double* vtkPVColorMap::GetHighLookupTableValue()
+{
+  return this->LookupTableProxy->GetHighOutOfRangeColor();
 }
 
 //----------------------------------------------------------------------------

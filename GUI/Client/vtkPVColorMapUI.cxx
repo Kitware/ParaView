@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMapUI);
-vtkCxxRevisionMacro(vtkPVColorMapUI, "1.3");
+vtkCxxRevisionMacro(vtkPVColorMapUI, "1.4");
 
 vtkCxxSetObjectMacro(vtkPVColorMapUI, CurrentColorMap, vtkPVColorMap);
 
@@ -350,7 +350,6 @@ void vtkPVColorMapUI::Create()
 
   this->OutOfRangeCheck->SetParent(this->OutOfRangeFrame);
   this->OutOfRangeCheck->Create();
-  this->OutOfRangeCheck->SetSelectedState(1);
   this->OutOfRangeCheck->SetCommand(this, "OutOfRangeCheckCallback");
 
   this->LowColorLabel->SetParent(this->OutOfRangeFrame);
@@ -1217,6 +1216,17 @@ void vtkPVColorMapUI::UpdateColorMapUI(const char* name, int numComponents,
   this->LabelTextPropertyWidget->SetTextProperty(
     colorMap->GetLabelTextProperty());
 
+  int outOfRange = 0;
+  if (colorMap->GetUseLowOutOfRangeColor() ||
+      colorMap->GetUseHighOutOfRangeColor())
+    {
+    outOfRange = 1;
+    }
+  
+  this->OutOfRangeCheck->SetSelectedState(outOfRange);
+  this->LowColorButton->SetColor(colorMap->GetLowLookupTableValue());
+  this->HighColorButton->SetColor(colorMap->GetHighLookupTableValue());
+  
   vtkKWApplication *app = this->GetApplication();
   if (app->GetIntRegistryValue(2, "RunTime", "UseColorMapDefaults"))
     {
