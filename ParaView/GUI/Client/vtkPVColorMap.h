@@ -247,9 +247,13 @@ public:
   void SetTitle(const char* name);  
   void SetNumberOfLabels(int num);
   void SetLowLookupTableValue(double color[3]);
+  double* GetLowLookupTableValue();
   void SetHighLookupTableValue(double color[3]);
+  double* GetHighLookupTableValue();
   void SetUseLowOutOfRangeColor(int val);
+  int GetUseLowOutOfRangeColor();
   void SetUseHighOutOfRangeColor(int val);
+  int GetUseHighOutOfRangeColor();
   int ComputeWholeScalarRange(double range[2]);
 
 protected:

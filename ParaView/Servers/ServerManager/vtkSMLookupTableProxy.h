@@ -62,14 +62,18 @@ public:
   // Set whether to use a separate color for values outside the lookup table's
   // range.
   vtkSetMacro(UseLowOutOfRangeColor, int);
+  vtkGetMacro(UseLowOutOfRangeColor, int);
   vtkBooleanMacro(UseLowOutOfRangeColor, int);
   vtkSetMacro(UseHighOutOfRangeColor, int);
+  vtkGetMacro(UseHighOutOfRangeColor, int);
   vtkBooleanMacro(UseHighOutOfRangeColor, int);
 
   // Description:
   // Set the colors to use for values outside the range of the lookup table.
   vtkSetVector3Macro(LowOutOfRangeColor, double);
+  vtkGetVector3Macro(LowOutOfRangeColor, double);
   vtkSetVector3Macro(HighOutOfRangeColor, double);
+  vtkGetVector3Macro(HighOutOfRangeColor, double);
 
 protected:
   vtkSMLookupTableProxy();
