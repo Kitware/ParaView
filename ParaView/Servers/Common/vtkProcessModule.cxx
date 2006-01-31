@@ -93,7 +93,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.35");
+vtkCxxRevisionMacro(vtkProcessModule, "1.36");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 //-----------------------------------------------------------------------------
@@ -122,6 +122,8 @@ vtkProcessModule::vtkProcessModule()
   this->Timer = vtkTimerLog::New();
 
   this->ActiveRemoteConnection = 0 ;
+
+  this->SupportMultipleConnections = 0;
   
   this->MemoryInformation = vtkKWProcessStatistics::New();
   this->ServerInformation = vtkPVServerInformation::New();
@@ -271,56 +273,117 @@ int vtkProcessModule::Start(int argc, char** argv)
     {
     // Failed.
     this->Exit();
-    return 0;
+    return 1;
     }
 
   if (this->Options->GetClientMode() || 
     (!this->Options->GetServerMode() && !this->Options->GetRenderServerMode()))
     {
-    if (!this->GUIHelper)
-      {
-      vtkErrorMacro("GUIHelper must be set on the client.");
-      this->Exit();
-      return 1;
-      } 
-
-    if (this->Options->GetClientMode() && this->ShouldWaitForConnection())
-      {
-      if (!this->ClientWaitForConnection())
-        {
-        vtkErrorMacro("Could not connect to server(s). Exiting.");
-        this->Exit();
-        return 1;
-        }
-      }
-    // Since ParaView closes server sockets, we close them for now.
-    this->ConnectionManager->StopAcceptingAllConnections();
-    return this->GUIHelper->RunGUIStart(argc, argv, 1, 0);
+    // Starts the client event loop.
+    return this->StartClient(argc, argv);
     }
 
   // Running in server mode.
-  ret = 0;
+  return this->StartServer(0);
+}
+
+//-----------------------------------------------------------------------------
+int vtkProcessModule::StartClient(int argc, char** argv)
+{
+  if (!this->GUIHelper)
+    {
+    vtkErrorMacro("GUIHelper must be set on the client.");
+    this->Exit();
+    return 1;
+    }  
+
+  if (!this->SupportMultipleConnections)
+    {
+    // Before the Client event loop is started, ParaView needs a server connection.
+    // Note that this method is called in Client mode or when the paraview
+    // executable in run. We don't need a server connection in the latter case.
+    if (this->Options->GetClientMode())
+      {
+      if (this->ShouldWaitForConnection())
+        {
+        // Wait for the server(s) to connect. (Ofcouse servers means 1
+        // data server and 1 render server if running in render client mode.).
+        if (!this->ClientWaitForConnection())
+          {
+          vtkErrorMacro("Could not connect to server(s). Exiting.");
+          this->Exit();
+          return 1;
+          }
+        // Now, we dont want the client to receive any more connections,
+        // so close the socket that accepts new connections.
+        this->ConnectionManager->StopAcceptingAllConnections();
+        }
+      else
+        {
+        // Connect to the server(s). (Ofcouse servers means 1
+        // data server and 1 render server if running in render client mode.).
+        if (!this->ConnectToRemote())
+          {
+          // failed!
+          this->Exit();
+          return 1;
+          }
+        }
+      }
+    }
+  // if the PM supports multiple connections, its the responsibility of the GUI
+  // to connect to the server.
+  return this->GUIHelper->RunGUIStart(argc, argv, 1, 0);
+}
+
+//-----------------------------------------------------------------------------
+int vtkProcessModule::StartServer(unsigned long msec)
+{
+  // Running in server mode.
+  int ret = 0;
+  int support_multiple_connections = this->SupportMultipleConnections;
   if (this->ShouldWaitForConnection())
     {
     cout << "Waiting for client..." << endl;
     }
+  else
+    {
+    // Server in reverse connect mode, connect to the client.
+    // When in reverse connect mode, the server can connect to 
+    // one and only one client. 
+    // When the client disconnects, the server terminates.
+    if (!this->ConnectToRemote())
+      {
+      // failed -- in reverse connect mode, the client must be 
+      // up and running before the server tries to connect.
+      this->Exit();
+      return 1;
+      }
+    support_multiple_connections = 0;
+    }
 
-  while  ((ret = this->ConnectionManager->MonitorConnections(0)) >= 0)
+  while  ((ret = this->ConnectionManager->MonitorConnections(msec)) >= 0)
     {
     if (ret == 2)
       {
       cout << "Client connected." << endl;
-      // Since ParaView closes server sockets, we close them for now.
-      this->ConnectionManager->StopAcceptingAllConnections();
+      if (!support_multiple_connections)
+        {
+        // Don't accept any more connections.
+        this->ConnectionManager->StopAcceptingAllConnections();
+        }
       }
 
     else if (ret == 3)
       {
       // Connection dropped.
-      // In ParaView, we exit.
       cout << "Client connection closed." << endl;
-      ret = 0;
-      break;
+      if (!support_multiple_connections)
+        {
+        // since supporting only one connection, server can do nothing but exit.
+        ret = 0;
+        break;
+        }
       }
     }
   // We have to call exit explicitly on the Server since there is no
@@ -328,6 +391,7 @@ int vtkProcessModule::Start(int argc, char** argv)
   this->Exit(); 
   return (ret==-1)? 1 : 0;
 }
+
 
 //-----------------------------------------------------------------------------
 void vtkProcessModule::Exit()
@@ -353,7 +417,7 @@ int vtkProcessModule::InitializeConnections()
     {
     return this->SetupWaitForConnection();
     }
-  return this->ConnectToRemote();
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -435,6 +499,23 @@ int vtkProcessModule::SetupWaitForConnection()
 }
 
 //-----------------------------------------------------------------------------
+int vtkProcessModule::ConnectToRemote(const char* servername, int port)
+{
+  vtkConnectionID id = this->ConnectionManager->OpenConnection(
+    servername, port);
+  return (id.ID? 1 : 0);
+}
+
+//-----------------------------------------------------------------------------
+int vtkProcessModule::ConnectToRemote(const char* dataserver_host, 
+  int dataserver_port, const char* renderserver_host, int renderserver_port)
+{
+  vtkConnectionID id = this->ConnectionManager->OpenConnection(
+    dataserver_host, dataserver_port, renderserver_host, renderserver_port);
+  return (id.ID? 1 : 0);
+}
+
+//-----------------------------------------------------------------------------
 int vtkProcessModule::ConnectToRemote()
 {
   const char* message = "client";
@@ -507,6 +588,21 @@ int vtkProcessModule::ConnectToRemote()
         "the --client-render-server (-crs) argument.");
       this->GUIHelper->ExitApplication();
       return 0;
+      }
+    }
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+int vtkProcessModule::MonitorConnections(unsigned long msec)
+{
+  int ret;
+  while ((ret =this->ConnectionManager->MonitorConnections(msec)) != -1)
+    {
+    if (ret == 2)
+      {
+      // new connection established.
+      return 1;
       }
     }
   return 0;
@@ -1392,6 +1488,8 @@ void vtkProcessModule::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "LogThreshold: " << this->LogThreshold << endl;
   os << indent << "ProgressRequests: " << this->ProgressRequests << endl;
   os << indent << "ReportInterpreterErrors: " << this->ReportInterpreterErrors
+    << endl;
+  os << indent << "SupportMultipleConnections: " << this->SupportMultipleConnections
     << endl;
  
   os << indent << "Interpreter: " ;
