@@ -143,7 +143,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.412");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.413");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -1067,6 +1067,7 @@ void vtkPVRenderView::CreateViewProperties()
     this->ImmediateModeCheck->SetSelectedState(
       pvwindow->GetApplication()->GetIntRegistryValue(
         2, "RunTime", "UseImmediateMode"));
+    this->SetUseImmediateMode(this->ImmediateModeCheck->GetSelectedState());  
     }
   else
     {
