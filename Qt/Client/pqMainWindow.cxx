@@ -70,6 +70,7 @@
 #include <vtkSMDataObjectDisplayProxy.h>
 #include <vtkSMDisplayProxy.h>
 #include <vtkSMDoubleVectorProperty.h>
+#include <vtkSMIntRangeDomain.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMProxyProperty.h>
@@ -85,6 +86,8 @@
 #include <vtkPVGeometryInformation.h>
 #include <vtkPVDataSetAttributesInformation.h>
 #include <vtkPVArrayInformation.h>
+#include <vtkProcessModule.h>
+#include <vtkExodusReader.h>
 
 #include <QVTKWidget.h>
 #include <vtkEventQtSlotConnect.h>
@@ -92,6 +95,7 @@
 #include <pqEventPlayer.h>
 #include <pqEventPlayerXML.h>
 #include <pqRecordEventsDialog.h>
+#include <pqPlayControlsWidget.h>
 
 pqMainWindow::pqMainWindow() :
   CurrentServer(0),
@@ -115,6 +119,7 @@ pqMainWindow::pqMainWindow() :
   ElementDockAction(0),
   CompoundProxyToolBar(0),
   VariableSelectorToolBar(0),
+  VCRControlsToolBar(0),
   ProxyInfo(0),
   CurrentProxy(0)
 {
@@ -384,6 +389,18 @@ pqMainWindow::pqMainWindow() :
     this->ElementInspectorDock, SLOT(setVisible(bool)));
   this->ElementInspectorDock->installEventFilter(this);
 
+  // VCR controls
+  this->VCRControlsToolBar = new QToolBar(tr("VCR Controls"), this) << pqSetName("VCRControlsToolBar");
+  this->addToolBar(Qt::TopToolBarArea, this->VCRControlsToolBar);
+  pqPlayControlsWidget* const vcr_controls = new pqPlayControlsWidget(this->VCRControlsToolBar);
+  this->VCRControlsToolBar->addWidget(vcr_controls);
+  
+  this->connect(vcr_controls, SIGNAL(first()), SLOT(onFirstTimeStep()));
+  this->connect(vcr_controls, SIGNAL(back()), SLOT(onPreviousTimeStep()));
+  this->connect(vcr_controls, SIGNAL(forward()), SLOT(onNextTimeStep()));
+  this->connect(vcr_controls, SIGNAL(last()), SLOT(onLastTimeStep()));
+
+  // Current variable control
   this->VariableSelectorToolBar = new QToolBar(tr("Variables"), this) << pqSetName("VariableSelectorToolBar");
   this->addToolBar(Qt::TopToolBarArea, this->VariableSelectorToolBar);
   pqVariableSelectorWidget* varSelector = new pqVariableSelectorWidget(this->VariableSelectorToolBar) << pqSetName("VariableSelector");
@@ -393,6 +410,7 @@ pqMainWindow::pqMainWindow() :
   this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), histogram, SLOT(setVariable(pqVariableType, const QString&)));
   this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), line_chart, SLOT(setVariable(pqVariableType, const QString&)));
 
+  // Compound filter controls
   this->CompoundProxyToolBar = new QToolBar(tr("Compound Proxies"), this) << pqSetName("CompoundProxyToolBar");
   this->addToolBar(Qt::TopToolBarArea, this->CompoundProxyToolBar);
   this->connect(this->CompoundProxyToolBar, SIGNAL(actionTriggered(QAction*)), SLOT(onCreateCompoundProxy(QAction*)));
@@ -1340,5 +1358,157 @@ void pqMainWindow::onVariableChanged(pqVariableType type, const QString& name)
       }
           
     widget->update();
+    }
+}
+
+void pqMainWindow::onFirstTimeStep()
+{
+  if(!this->CurrentServer)
+    return;
+    
+  if(!this->CurrentProxy)
+    return;
+
+  const QString source_class = this->CurrentProxy->GetVTKClassName();
+  if(source_class != "vtkExodusReader" && source_class != "vtkPExodusReader")
+    return;
+
+  vtkSMIntVectorProperty* const timestep =
+    vtkSMIntVectorProperty::SafeDownCast(this->CurrentProxy->GetProperty("TimeStep"));
+    
+  if(!timestep)
+    return;
+
+  vtkSMIntRangeDomain* const timestep_range =
+    vtkSMIntRangeDomain::SafeDownCast(timestep->GetDomain("range"));
+    
+  if(!timestep_range)
+    return;
+
+  int exists = 0;
+  int first_step = timestep_range->GetMinimum(0, exists);
+
+  timestep->SetElement(0, first_step);
+  
+  this->CurrentProxy->UpdateVTKObjects();
+  if(pqPipelineData *pipeline = pqPipelineData::instance())
+    {
+    QVTKWidget *window = pipeline->getWindowFor(this->CurrentProxy);
+    if(window)
+      window->update();
+    }
+}
+
+void pqMainWindow::onPreviousTimeStep()
+{
+  if(!this->CurrentServer)
+    return;
+    
+  if(!this->CurrentProxy)
+    return;
+
+  const QString source_class = this->CurrentProxy->GetVTKClassName();
+  if(source_class != "vtkExodusReader" && source_class != "vtkPExodusReader")
+    return;
+
+  vtkSMIntVectorProperty* const timestep =
+    vtkSMIntVectorProperty::SafeDownCast(this->CurrentProxy->GetProperty("TimeStep"));
+    
+  if(!timestep)
+    return;
+
+  vtkSMIntRangeDomain* const timestep_range =
+    vtkSMIntRangeDomain::SafeDownCast(timestep->GetDomain("range"));
+    
+  if(!timestep_range)
+    return;
+
+  int exists = 0;
+  int first_step = timestep_range->GetMinimum(0, exists);
+
+  timestep->SetElement(0, vtkstd::max(first_step, timestep->GetElement(0) - 1));
+  
+  this->CurrentProxy->UpdateVTKObjects();
+  if(pqPipelineData *pipeline = pqPipelineData::instance())
+    {
+    QVTKWidget *window = pipeline->getWindowFor(this->CurrentProxy);
+    if(window)
+      window->update();
+    }
+}
+
+void pqMainWindow::onNextTimeStep()
+{
+  if(!this->CurrentServer)
+    return;
+    
+  if(!this->CurrentProxy)
+    return;
+
+  const QString source_class = this->CurrentProxy->GetVTKClassName();
+  if(source_class != "vtkExodusReader" && source_class != "vtkPExodusReader")
+    return;
+
+  vtkSMIntVectorProperty* const timestep =
+    vtkSMIntVectorProperty::SafeDownCast(this->CurrentProxy->GetProperty("TimeStep"));
+    
+  if(!timestep)
+    return;
+
+  vtkSMIntRangeDomain* const timestep_range =
+    vtkSMIntRangeDomain::SafeDownCast(timestep->GetDomain("range"));
+    
+  if(!timestep_range)
+    return;
+
+  int exists = 0;
+  int last_step = timestep_range->GetMaximum(0, exists);
+
+  timestep->SetElement(0, vtkstd::min(last_step, timestep->GetElement(0) + 1));
+  
+  this->CurrentProxy->UpdateVTKObjects();
+  if(pqPipelineData *pipeline = pqPipelineData::instance())
+    {
+    QVTKWidget *window = pipeline->getWindowFor(this->CurrentProxy);
+    if(window)
+      window->update();
+    }
+}
+
+void pqMainWindow::onLastTimeStep()
+{
+  if(!this->CurrentServer)
+    return;
+    
+  if(!this->CurrentProxy)
+    return;
+
+  const QString source_class = this->CurrentProxy->GetVTKClassName();
+  if(source_class != "vtkExodusReader" && source_class != "vtkPExodusReader")
+    return;
+
+  vtkSMIntVectorProperty* const timestep =
+    vtkSMIntVectorProperty::SafeDownCast(this->CurrentProxy->GetProperty("TimeStep"));
+    
+  if(!timestep)
+    return;
+
+  vtkSMIntRangeDomain* const timestep_range =
+    vtkSMIntRangeDomain::SafeDownCast(timestep->GetDomain("range"));
+    
+  if(!timestep_range)
+    return;
+
+  int exists = 0;
+  int last_step = timestep_range->GetMaximum(0, exists);
+
+  timestep->SetElement(0, last_step);
+  
+  this->CurrentProxy->UpdateVTKObjects();
+  if(pqPipelineData *pipeline = pqPipelineData::instance())
+    {
+    QVTKWidget *window = pipeline->getWindowFor(this->CurrentProxy);
+    if(window)
+      window->update();
     }
 }

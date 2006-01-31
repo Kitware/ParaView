@@ -82,6 +82,7 @@ private:
   QAction *ElementDockAction;
   QToolBar* CompoundProxyToolBar;
   QToolBar* VariableSelectorToolBar;
+  QToolBar* VCRControlsToolBar;
 
   pqSourceProxyInfo* ProxyInfo;
   vtkEventQtSlotConnect* VTKConnector;
@@ -133,6 +134,11 @@ private slots:
   void onAddServer(pqPipelineServer *server);
   void onRemoveServer(pqPipelineServer *server);
   void onAddWindow(pqPipelineWindow *window);
+
+  void onFirstTimeStep();
+  void onPreviousTimeStep();
+  void onNextTimeStep();
+  void onLastTimeStep();
 
 private:
   void cleanUpWindow(QVTKWidget *window);

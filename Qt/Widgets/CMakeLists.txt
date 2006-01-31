@@ -34,6 +34,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineData.h
   pqPipelineListModel.h
   pqPipelineListWidget.h
+  pqPlayControlsWidget.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
   pqSMAdaptor.h
@@ -126,6 +127,8 @@ ADD_LIBRARY(QtWidgets
   pqPipelineServer.h
   pqPipelineWindow.cxx
   pqPipelineWindow.h
+  pqPlayControlsWidget.cxx
+  pqPlayControlsWidget.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
   pqServer.cxx

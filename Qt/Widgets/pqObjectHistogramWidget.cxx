@@ -300,10 +300,24 @@ struct pqObjectHistogramWidget::pqImplementation
 
     // Setup the histogram to use the same color as the display ...
     pqPipelineObject* const pipeline_object = pqPipelineData::instance()->getObjectFor(this->CurrentProxy);
+    if(!pipeline_object)
+      return;
+      
     vtkSMDisplayProxy* const display_proxy = pipeline_object->GetDisplayProxy();
+    if(!display_proxy)
+      return;
+      
     vtkSMProxyProperty* const lookup_table_property = vtkSMProxyProperty::SafeDownCast(display_proxy->GetProperty("LookupTable"));
+    if(!lookup_table_property)
+      return;
+      
     vtkSMLookupTableProxy* const lookup_table_proxy = vtkSMLookupTableProxy::SafeDownCast(lookup_table_property->GetProxy(0));
+    if(!lookup_table_proxy)
+      return;
+      
     vtkLookupTable* const lookup_table = vtkLookupTable::SafeDownCast(vtkProcessModule::GetProcessModule()->GetObjectFromID(lookup_table_proxy->GetID(0)));
+    if(!lookup_table)
+      return;
 
     this->HistogramWidget.getHistogram()->setBinColorScheme(new pqHistogramColorLookup(this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis), lookup_table));
   }
