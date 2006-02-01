@@ -65,7 +65,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.473");
+vtkCxxRevisionMacro(vtkPVSource, "1.474");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -2392,10 +2392,15 @@ void vtkPVSource::SaveStateDisplay(ofstream *file)
       {
       for (unsigned int i=0; i < svp->GetNumberOfElements(); i++)
         {
-        *file << "[$pvDisp(" << this->GetTclName() << ") GetProperty "
-          << iter->GetKey() << "] SetElement " << i << " {"
-          <<  ( (svp->GetElement(i)? svp->GetElement(i) : "" )) << "}"
-          << endl;
+        const char* str_value =  svp->GetElement(i);
+        // Empty strings are not saved as the Lookmark managers messes them up.
+        if (str_value && strlen(str_value) > 0)
+          {
+          *file << "[$pvDisp(" << this->GetTclName() << ") GetProperty "
+            << iter->GetKey() << "] SetElement " << i << " {"
+            <<  str_value << "}"
+            << endl;
+          }
         }
       }
     }
