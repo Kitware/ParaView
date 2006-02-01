@@ -46,7 +46,7 @@
 # include <io.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.19");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.20");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
@@ -155,7 +155,29 @@ void vtkSMAnimationSceneProxy::SaveImages()
     {
     this->MovieWriter->SetInput(capture);
     this->MovieWriter->Write();
-    errcode = this->MovieWriter->GetErrorCode() + this->MovieWriter->GetError();
+
+    int alg_error = this->MovieWriter->GetErrorCode();
+    int movie_error = this->MovieWriter->GetError();
+
+    if (movie_error && !alg_error)
+      {
+      //An error that the moviewriter caught, without setting any error code.
+      //vtkGenericMovieWriter::GetStringFromErrorCode will result in
+      //Unassigned Error. If this happens the Writer should be changed to set
+      //a meaningful error code.
+
+      errcode = vtkErrorCode::UserError;      
+      }
+    else
+      {
+      //if 0, then everything went well
+
+      //< userError, means a vtkAlgorithm error (see vtkErrorCode.h)
+      //= userError, means an unknown Error (Unassigned error)
+      //> userError, means a vtkGenericMovieWriter error
+
+      errcode = alg_error;
+      }
     }
   if (errcode)
     {
@@ -264,25 +286,33 @@ int vtkSMAnimationSceneProxy::SaveImages(const char* fileRoot,
 
   if (this->ImageWriter)
     {
+    if (this->SaveFailed)
+      {
+      char* fileName = new char[strlen(this->FileRoot) + strlen(this->FileExtension) + 25];
+      for (int i=0; i < this->FileCount; i++)
+        {
+        sprintf(fileName, "%s%04d.%s", this->FileRoot, i, this->FileExtension);
+        unlink(fileName);
+        }
+      delete [] fileName;
+      }
+    
     this->ImageWriter->Delete();
     this->ImageWriter = NULL;
     }
   else if (this->MovieWriter)
     {
     this->MovieWriter->End();
+
+    if (this->SaveFailed)
+      {
+      char *fileName = this->MovieWriter->GetFileName();
+      unlink(fileName);
+      }
+
     this->MovieWriter->SetInput(0);
     this->MovieWriter->Delete();
     this->MovieWriter = NULL;
-    }
-  if (this->SaveFailed && this->ImageWriter)
-    {
-    char* fileName = new char[strlen(this->FileRoot) + strlen(this->FileExtension) + 25];
-    for (int i=0; i < this->FileCount; i++)
-      {
-      sprintf(fileName, "%s%04d.%s", this->FileRoot, i, this->FileExtension);
-      unlink(fileName);
-      }
-    delete [] fileName;
     }
   this->InSaveAnimation = 0;
   return this->SaveFailed;
