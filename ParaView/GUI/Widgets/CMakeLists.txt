@@ -387,6 +387,19 @@ FOREACH(WidgetType
 ENDFOREACH(WidgetType)
 
 # --------------------------------------------------------------------------
+# SOViewer support
+
+OPTION(KWWidgets_USE_SOVIEWER "Use the SOViewer library and build the corresponding support classes and examples." OFF)
+MARK_AS_ADVANCED(KWWidgets_USE_SOVIEWER)
+IF(KWWidgets_USE_SOVIEWER)
+  FIND_PACKAGE(SOV REQUIRED)
+  IF(SOV_FOUND)
+    INCLUDE(${SOV_USE_FILE})
+    MARK_AS_ADVANCED(FLTK_FLUID_EXECUTABLE)
+  ENDIF(SOV_FOUND)
+ENDIF(KWWidgets_USE_SOVIEWER)
+
+# --------------------------------------------------------------------------
 # Include dirs
 
 INCLUDE_DIRECTORIES(
