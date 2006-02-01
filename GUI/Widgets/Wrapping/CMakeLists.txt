@@ -140,7 +140,7 @@ MACRO(KWWidgets_GENERATE_ALL_SETTUPPATHS
       ENDFOREACH(dir)
 
       SET(kwwidgets_runtime_paths2)
-      FOREACH(dir ${kwwidgets_run_paths})
+      FOREACH(dir ${kwwidgets_runtime_paths})
         SET(kwwidgets_runtime_paths2 
           ${kwwidgets_runtime_paths2} "${dir}/${config}")
       ENDFOREACH(dir)
