@@ -58,8 +58,11 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
+#include "vtkGenericMovieWriter.h"
+
 #ifdef _WIN32
   #include "vtkAVIWriter.h"
+
 #endif
 
 #if !defined(_WIN32) || defined(__CYGWIN__)
@@ -69,7 +72,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.59.2.1");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.59.2.2");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 #define VTK_PV_TOOLBARS_ANIMATION_LABEL "Animation"
@@ -464,13 +467,37 @@ void vtkPVAnimationScene::SaveImages(const char* fileRoot, const char* ext,
   int savefailed = this->AnimationSceneProxy->SaveImages(fileRoot, ext, 
     width, height, framerate);
   this->OnEndPlay();
+    char *errstring = new char[256];
 
-  if (savefailed)
+    //may want separate error string functions for moviewriter and imagewriter 
+    //eventually but right now imagewriters don't use usererror codes
+    //so this will work alright
+
+    const char *reason = vtkGenericMovieWriter::GetStringFromErrorCode(savefailed);
+    
+    char *message = new char[80];
+    switch (savefailed)
+      {
+      case vtkErrorCode::OutOfDiskSpaceError:
+      {
+      strcpy(message, "There is insufficient disk space to save the images for this animation. ");
+      break;     
+      }
+     default:
+      {
+      message[0] = 0;
+      }
+      }
+
+    sprintf(errstring, "%.80s. %.80sAny file(s) already written have been deleted.", reason, message);
+
     {
     vtkKWMessageDialog::PopupMessage(
       this->GetApplication(), this->Window, "Write Error",
-      "There is insufficient disk space to save the images for this "
-      "animation. The file(s) already written will be deleted.");
+      errstring);
+    
+    delete [] errstring;
+    delete [] message;
     }
 }
 
