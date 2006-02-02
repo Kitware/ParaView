@@ -443,6 +443,11 @@ SET(VTKMPEG2_INCLUDE_DIRS
   "${ParaView_BINARY_DIR}/Utilities/vtkmpeg2")
 
 #########################################################################
+# Configure ffmpeg encoding
+MARK_AS_ADVANCED(CLEAR FFMPEG_INCLUDE_PATH)
+MARK_AS_ADVANCED(CLEAR FFMPEG_LIBRARY_PATH)
+
+#########################################################################
 # Configure IceT
 SET(ICET_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
 SET(ICET_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
