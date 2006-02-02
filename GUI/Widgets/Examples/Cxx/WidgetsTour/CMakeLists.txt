@@ -5,10 +5,10 @@ PROJECT(WidgetsTour)
 # file to create your own application based on KWWidgets, you only need the
 # FIND_PACKAGE(...) and INCLUDE(...) commands. 
 
-IF (NOT KWWidgets_SOURCE_DIR)
+IF(NOT KWWidgets_SOURCE_DIR)
   FIND_PACKAGE(KWWidgets REQUIRED)
   INCLUDE(${KWWidgets_USE_FILE})
-ENDIF (NOT KWWidgets_SOURCE_DIR)
+ENDIF(NOT KWWidgets_SOURCE_DIR)
 
 # The name of our targets (executable or libraries) will simply be based
 # on the project name, with an extra prefix and suffix.
@@ -23,8 +23,8 @@ SET(EXE_SRCS "${EXE_NAME}.cxx")
 # On Win32 platforms, let's configure the KWWidgets sample resource file
 # to get a nice application icon and some additional information.
 
-IF (WIN32)
-  IF (NOT BORLAND)
+IF(WIN32)
+  IF(NOT BORLAND)
     IF(NOT CYGWIN)
       INCLUDE_DIRECTORIES(${VTK_TK_RESOURCES_DIR})
       SET(RES_FILE "${CMAKE_CURRENT_BINARY_DIR}/${EXE_NAME}.rc")
@@ -32,8 +32,8 @@ IF (WIN32)
       SET(KWWidgets_RESOURCE_FILE_NAME "${EXE_NAME}")
       CONFIGURE_FILE(${KWWidgets_RESOURCES_DIR}/KWWidgets.rc.in ${RES_FILE})
     ENDIF(NOT CYGWIN)
-  ENDIF (NOT BORLAND)
-ENDIF (WIN32)
+  ENDIF(NOT BORLAND)
+ENDIF(WIN32)
 
 # This example uses some files from the KWWidgets distribution tree.
 # Let's configure KWWidgets's vtkKWWidgetsPaths.h.in into our
@@ -78,7 +78,7 @@ TARGET_LINK_LIBRARIES(${EXE_NAME} ${KWWidgets_LIBRARIES})
 # to initialize Tcl/Tk. This is only triggered if VTK was built
 # against a Tcl/Tk static library.
 
-IF (NOT KWWidgets_SOURCE_DIR)
+IF(NOT KWWidgets_SOURCE_DIR)
   IF(VTK_TCL_TK_COPY_SUPPORT_LIBRARY)
     IF(VTK_TCL_SUPPORT_LIBRARY_PATH AND VTK_TK_SUPPORT_LIBRARY_PATH)
       INCLUDE(${VTK_TCL_TK_MACROS_MODULE})
@@ -87,7 +87,7 @@ IF (NOT KWWidgets_SOURCE_DIR)
         "${PROJECT_BINARY_DIR}/lib")
     ENDIF(VTK_TCL_SUPPORT_LIBRARY_PATH AND VTK_TK_SUPPORT_LIBRARY_PATH)
   ENDIF(VTK_TCL_TK_COPY_SUPPORT_LIBRARY)
-ENDIF (NOT KWWidgets_SOURCE_DIR)
+ENDIF(NOT KWWidgets_SOURCE_DIR)
 
 # Install the example target. If you are using this CMakeLists.txt file
 # to create your own application based on KWWidgets, you can most likely 
@@ -115,4 +115,14 @@ ENDIF(BUILD_EXAMPLES)
 
 IF(BUILD_TESTING)
   ADD_TEST(Test${EXE_NAME} ${EXECUTABLE_OUTPUT_PATH}/${EXE_NAME} --test)
+  IF(KWWidgets_SOURCE_DIR)
+    ADD_TEST(Test${EXE_NAME}OutOfSource ${CMAKE_CTEST_COMMAND}
+      --build-and-test 
+      "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}OutOfSource"
+      --build-generator ${CMAKE_GENERATOR}
+      --build-makeprogram ${CMAKE_MAKE_PROGRAM}
+      --build-project ${PROJECT_NAME}
+      --build-options "-DKWWidgets_DIR:PATH=${KWWidgets_BINARY_DIR}"
+      --test-command ${EXE_NAME} --test)
+  ENDIF(KWWidgets_SOURCE_DIR)
 ENDIF(BUILD_TESTING)
