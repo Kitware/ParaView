@@ -81,7 +81,15 @@ public:
   //
   void AddDescriptionString(const char*);
   void AddExtensionString(const char*);
- 
+
+  // BTX
+  // Description:
+  // Get/Set the server from which to get the file listing.
+  // Typically DATA_SERVER_ROOT or RENDER_SERVER_ROOT. By default, 
+  // set to DATA_SERVER_ROOT. Must be set before calling Create().
+  vtkSetMacro(Servers, vtkTypeUInt32);
+  vtkGetMacro(Servers, vtkTypeUInt32);
+  // ETX
 protected:
   vtkPVServerFileDialog();
   ~vtkPVServerFileDialog();
@@ -130,6 +138,9 @@ protected:
   void CreateServerSide();
 
   vtkSMProxy* ServerFileListingProxy;
+  // BTX
+  vtkTypeUInt32 Servers;
+  // ETX
 
   vtkKWScrollbar* ScrollBar;
 

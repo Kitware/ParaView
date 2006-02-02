@@ -16,7 +16,6 @@
 
 #include "vtkCellData.h"
 #include "vtkCollection.h"
-#include "vtkCollection.h"
 #include "vtkColorTransferFunction.h"
 #include "vtkCommand.h"
 #include "vtkDataSetAttributes.h"
@@ -30,8 +29,6 @@
 #include "vtkKWFrameWithScrollbar.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
-#include "vtkKWMenu.h"
-#include "vtkKWMenuButton.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWPushButton.h"
@@ -46,7 +43,6 @@
 #include "vtkProcessModule.h"
 #include "vtkPVApplication.h"
 #include "vtkPVArrayInformation.h"
-#include "vtkPVArrayInformation.h"
 #include "vtkPVColorMap.h"
 #include "vtkPVColorMapUI.h"
 #include "vtkPVColorSelectionWidget.h"
@@ -58,6 +54,7 @@
 #include "vtkPVOptions.h"
 #include "vtkPVRenderModuleUI.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVServerFileDialog.h"
 #include "vtkPVSource.h"
 #include "vtkPVTraceHelper.h"
 #include "vtkPVVolumeAppearanceEditor.h"
@@ -87,7 +84,9 @@
 #include "vtkToolkits.h"
 #include "vtkVolumeProperty.h"
 
+#include <vtkstd/map>
 #include <vtksys/ios/sstream>
+#include <vtksys/SystemTools.hxx>
 
 #define VTK_PV_OUTLINE_LABEL              "Outline"
 #define VTK_PV_SURFACE_LABEL              "Surface"
@@ -97,10 +96,13 @@
 #define VTK_PV_VOLUME_PT_METHOD_LABEL     "Projection"
 #define VTK_PV_VOLUME_ZSWEEP_METHOD_LABEL "ZSweep"
 #define VTK_PV_VOLUME_BUNYK_METHOD_LABEL  "Bunyk Ray Cast"
+#define VTK_PV_MATERIAL_NONE_LABEL        "None"
+#define VTK_PV_MATERIAL_BROWSE_LABEL      "Browse..."
+#define VTK_PV_MATERIAL_BROWSE_HELP       "Browse Material description XML"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.60");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.61");
 
 //----------------------------------------------------------------------------
 
@@ -161,9 +163,18 @@ protected:
 
 
 //----------------------------------------------------------------------------
+struct vtkPVDisplayGUIInternal
+{
+  typedef vtkstd::map<vtkStdString, vtkStdString> MapOfStringToString;
+  // Map with key== material filename, value== label.
+  MapOfStringToString MaterialsMap;
+};
+
+//----------------------------------------------------------------------------
 vtkPVDisplayGUI::vtkPVDisplayGUI()
 {
   this->PVSource = 0;
+  this->Internal = new vtkPVDisplayGUIInternal;
   
   this->EditColorMapButtonVisible = 1;
   this->MapScalarsCheckVisible = 0;
@@ -257,6 +268,8 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
 vtkPVDisplayGUI::~vtkPVDisplayGUI()
 {  
   this->VRObserver->SetDisplayGUI( NULL );
+  delete this->Internal;
+  this->Internal = 0;
 
   if ( this->VolumeAppearanceEditor )
     {
@@ -764,19 +777,23 @@ void vtkPVDisplayGUI::Create()
 
     this->MaterialMenu->SetParent(this->DisplayStyleFrame->GetFrame());
     this->MaterialMenu->Create();
-    this->MaterialMenu->AddRadioButton("None", this, "SetMaterial {}");
+    this->MaterialMenu->AddRadioButton(VTK_PV_MATERIAL_NONE_LABEL, this, 
+      "SetMaterial {} {}");
     this->MaterialMenu->SetBalloonHelpString(
       "Choose the material to apply to the object.");
+    
     // Populate the material list.
     const char** names = vtkMaterialLibrary::GetListOfMaterialNames();
     for(cc=0; names[cc];cc++)
       {
       vtksys_ios::ostringstream stream;
-      stream << "SetMaterial " << names[cc];
+      stream << "SetMaterial {" << names[cc] << "} {" << names[cc] << "}";
       this->MaterialMenu->AddRadioButton(names[cc], this,
         stream.str().c_str());
       }
     }
+  this->MaterialMenu->AddRadioButton(VTK_PV_MATERIAL_BROWSE_LABEL, this,
+    "BrowseMaterial", VTK_PV_MATERIAL_BROWSE_HELP);
   
 
   this->PointSizeLabel->SetParent(this->DisplayStyleFrame->GetFrame());
@@ -1283,20 +1300,7 @@ void vtkPVDisplayGUI::UpdateInternal()
   // Material menu.
   if (this->MaterialMenu)
     {
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      pDisp->GetProperty("Shading"));
-    if (!ivp || ivp->GetElement(0) == 0)
-      {
-      this->MaterialMenu->SetValue("None");
-      }
-    else
-      {
-      vtkSMStringVectorProperty* svp = 
-        vtkSMStringVectorProperty::SafeDownCast(pDisp->GetProperty(
-            "Material"));
-      this->MaterialMenu->SetValue(svp->GetElement(0));
-
-      }
+    this->SetMaterialInternal(pDisp->GetMaterialCM(), 0); 
     }
   this->PointSizeThumbWheel->SetValue(pDisp->GetPointSizeCM());
   this->LineWidthThumbWheel->SetValue(pDisp->GetLineWidthCM());
@@ -2078,57 +2082,140 @@ void vtkPVDisplayGUI::SetInterpolationToGouraud()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::SetMaterial(const char* name)
+void vtkPVDisplayGUI::BrowseMaterial()
 {
   if (!this->MaterialMenu)
     {
-    if (name)
-      {
-      vtkWarningMacro("No materials are provided by the library.");
-      }
+    return;
+    }
+  
+  // This is a client side browser. The material file is located 
+  // on the client, and sent to the server(s) if required.
+  vtkKWLoadSaveDialog* dialog = vtkKWLoadSaveDialog::New(); 
+  dialog->SetApplication(this->GetPVApplication());
+  this->GetApplication()->RetrieveDialogLastPathRegistryValue(dialog,
+    "BrowseMaterial");
+  dialog->Create();
+  dialog->SetParent(this);
+  dialog->SetTitle("Open Material Xml");
+  dialog->SetFileTypes("{{Material Description XML} {.xml}} {{All Files} {*}}");
+  
+  if (dialog->Invoke())
+    {
+    this->SetMaterial(dialog->GetFileName(), 0);
+    this->GetPVApplication()->SaveDialogLastPathRegistryValue(dialog, 
+      "BrowseMaterial");
+    }
+  dialog->Delete();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::SetMaterial(const char* materialname, 
+  const char* menulabel)
+{
+  this->SetMaterialInternal(materialname, menulabel);
+  
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetMaterial {%s} {%s}", 
+    this->GetTclName(), (materialname? materialname: ""), 
+    (menulabel? menulabel: ""));
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::SetMaterialInternal(const char* materialname, 
+  const char* menulabel)
+{
+  if (!this->MaterialMenu)
+    {
     return;
     }
 
   vtkSMDataObjectDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    pDisp->GetProperty("Shading"));
-  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
-    pDisp->GetProperty("Material"));
-  if (!svp)
+  const char* old_material_name = pDisp->GetMaterialCM();
+  if (!materialname || strlen(materialname) == 0)
     {
-    vtkErrorMacro("Failed to find property Material on display proxy.");
+    if (old_material_name != 0)
+      {
+      pDisp->SetMaterialCM(0);
+      if ( this->GetPVRenderView() )
+        {
+        this->GetPVRenderView()->EventuallyRender();
+        }
+
+      }
+    this->MaterialMenu->SetValue(VTK_PV_MATERIAL_NONE_LABEL);
     return;
     }
-  if (!ivp)
+
+  vtkStdString label = (menulabel)? menulabel: "";
+  if (!menulabel || label == "")
     {
-    vtkErrorMacro("Failed to find property Shading on display proxy.");
-    return;
+    // Detemine the label from the material name.
+    vtkStdString filename = materialname; 
+    // First decide if the material name is a library name or a file name.
+    vtkStdString name = vtksys::SystemTools::GetFilenameWithoutLastExtension(
+      filename); 
+    if (name == filename)
+      {
+      // most certainly a library name --- in that case simply use the library 
+      // name as lable.
+      label = name;
+      }
+    else
+      {
+      // materialname is a xml file name.
+      // Was the file already assigned a label?
+      vtkPVDisplayGUIInternal::MapOfStringToString::iterator iter =
+        this->Internal->MaterialsMap.find(filename);
+
+      if (iter == this->Internal->MaterialsMap.end())
+        {
+        // This is a never-before used xml. Give it a nice label.
+        name += " (xml)";
+        label = name;
+        int count = 1;
+        // Add a new entry for this file.
+        while (this->MaterialMenu->GetMenu()->HasItem(label.c_str()))
+          {
+          vtksys_ios::ostringstream stream;
+          stream << name.c_str() << " " << count++;
+          label = stream.str();
+          }
+        this->Internal->MaterialsMap[filename] = label;
+        }
+      else
+        {
+        // Use the previously assigned label for this file.
+        label = iter->second;
+        }
+      }
     }
-  if (!name || strlen(name) == 0)
+
+  if (!this->MaterialMenu->GetMenu()->HasItem(label.c_str()))
     {
-    ivp->SetElement(0, 0);
+    this->MaterialMenu->GetMenu()->DeleteMenuItem(VTK_PV_MATERIAL_BROWSE_LABEL);
+
+    vtksys_ios::ostringstream stream;
+    stream << "SetMaterial {" << materialname << "} {" << label.c_str() << "}";
+    vtksys_ios::ostringstream help;
+    help << "Load Material " << materialname;
+    this->MaterialMenu->AddRadioButton(label.c_str(), this, stream.str().c_str(),
+      help.str().c_str());
+
+    // Since browse button must be the last button.
+    this->MaterialMenu->AddRadioButton(VTK_PV_MATERIAL_BROWSE_LABEL, this,
+      "BrowseMaterial", VTK_PV_MATERIAL_BROWSE_HELP);
     }
-  else
+  this->MaterialMenu->SetValue(label.c_str());
+
+  if (!old_material_name || strcmp(old_material_name, materialname) != 0)
     {
-    svp->SetElement(0, name);
-    ivp->SetElement(0, 1);
-    }
-  pDisp->UpdateVTKObjects();
-  if (this->GetPVRenderView())
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
-  if (name && strlen(name) > 0)
-    {
-    this->GetTraceHelper()->AddEntry("$kw(%s) SetMaterial %s", 
-      this->GetTclName(), name);
-    this->MaterialMenu->SetValue(name);
-    }
-  else
-    {
-    this->GetTraceHelper()->AddEntry("$kw(%s) SetMaterial 0", 
-      this->GetTclName());
-    this->MaterialMenu->SetValue("None");
+    pDisp->SetMaterialCM(materialname);
+    if ( this->GetPVRenderView() )
+      {
+      this->GetPVRenderView()->EventuallyRender();
+      }
+
     }
 }
 

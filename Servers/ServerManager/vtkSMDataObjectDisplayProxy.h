@@ -132,6 +132,16 @@ public:
     UNKNOWN_VOLUME_MAPPER
   };
   //ETX
+ 
+
+  // Description:
+  // Convienience method to set/get the material name.
+  void SetMaterialCM(const char* materialname);
+  // Description:
+  // Convienience method to set/get the material name.
+  // The material name is returned only when Shading is enabled.
+  // When Shading is disabled 0 is returned.
+  const char* GetMaterialCM();
   
   // Description:
   // Convenience method to get/set the Interpolation for this proxy.
