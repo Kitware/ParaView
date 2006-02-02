@@ -87,13 +87,6 @@ public:
   virtual int LoadModule(const char* name, const char* directory);
 
   // Description:
-  // Get/Set the experimental StreamBlock flag for this connection.
-  // Keeping this iVar on the vtkClientConnection does not make any sense,
-  // however, no harm in keeping it. Besides, it just simplities our life.
-  vtkSetMacro(StreamBlock, int);
-  vtkGetMacro(StreamBlock, int);
-
-  // Description:
   // When ever any irrecoverable communication errors are
   // detected, AbortConnection flag is set. 
   // vtkProcessModuleConnectionManager checks this flag
@@ -143,7 +136,6 @@ protected:
   vtkCommand* GetObserver();
 
   vtkMultiProcessController* Controller;
-  int StreamBlock;
 
   int AbortConnection;
  

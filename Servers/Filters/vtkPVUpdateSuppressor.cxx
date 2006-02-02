@@ -24,14 +24,12 @@
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
+#include "vtkProcessModule.h"
 #include "vtkSource.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkUpdateSuppressorPipeline.h"
 
-// Only required for the prototype streaming feature.
-#include "vtkPolyDataStreamer.h"
-
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.32");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.33");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -44,7 +42,6 @@ vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
   this->CachedGeometryLength = 0;
 
   this->OutputType = 0;
-  this->PreviousUpdateWasBlockedByStreaming = 0;  
 }
 
 //----------------------------------------------------------------------------
@@ -57,6 +54,11 @@ vtkPVUpdateSuppressor::~vtkPVUpdateSuppressor()
 //----------------------------------------------------------------------------
 void vtkPVUpdateSuppressor::ForceUpdate()
 {  
+  if (vtkProcessModule::GetStreamBlock())
+    {
+    return;
+    }
+
   vtkDataSet *input = vtkDataSet::SafeDownCast(this->GetInput());
   if (input == 0)
     {
@@ -92,31 +94,7 @@ void vtkPVUpdateSuppressor::ForceUpdate()
   input->SetUpdateNumberOfPieces(this->UpdateNumberOfPieces);
   input->SetUpdateGhostLevel(0);
 
-  // This conditional is only used for the temporary streaming feature.
-  // It can be removed when the streaming feature is removed.
-  vtkPolyData *pInput = vtkPolyData::SafeDownCast(input);
-  // TODO: For now I am disabling Streaming.
-  if (/*vtkPVProcessModule::GetGlobalStreamBlock()*/ 0)
-    {
-    this->PreviousUpdateWasBlockedByStreaming = 1;  
-    input->SetUpdatePiece(this->UpdatePiece*200);
-    input->SetUpdateNumberOfPieces(this->UpdateNumberOfPieces*200);
-    input->Update();
-    }
-  else if (this->PreviousUpdateWasBlockedByStreaming  && pInput)
-    { // stream
-    vtkPolyDataStreamer* streamer = vtkPolyDataStreamer::New();
-    streamer->SetInput(pInput);
-    streamer->SetNumberOfStreamDivisions(200);
-    streamer->Update();
-    pInput->ShallowCopy(streamer->GetOutput());
-    streamer->Delete();
-    }
-  else
-    { // This would stay when removing streaming.
-    input->Update();
-    this->PreviousUpdateWasBlockedByStreaming = 0;
-    }
+  input->Update();
 
   unsigned long t2 = 0;
   vtkDemandDrivenPipeline *ddp = 0;
@@ -260,6 +238,8 @@ int vtkPVUpdateSuppressor::RequestData(vtkInformation *request,
                                        vtkInformationVector **inputVector,
                                        vtkInformationVector *outputVector)
 {
+  // RequestData is not normally called. If it is called under a special
+  // condition (for example, streaming), shallow copy input to output.
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
   vtkDataSet *input = vtkDataSet::SafeDownCast(
@@ -269,10 +249,6 @@ int vtkPVUpdateSuppressor::RequestData(vtkInformation *request,
 
   if (outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()) > 1)
     {
-    input->SetUpdateNumberOfPieces(outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
-    input->SetUpdatePiece(outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
-    input->SetUpdateGhostLevel(outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
-    input->Update();
     output->ShallowCopy(input);
     return 1;
     }
