@@ -24,7 +24,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.63");
+vtkCxxRevisionMacro(vtkKWRange, "1.64");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -1574,6 +1574,23 @@ void vtkKWRange::GetSlidersPositions(int pos[2])
       (this->WholeRangeAdjusted[1] - this->WholeRangeAdjusted[0]);
     r0 = (this->RangeAdjusted[0] - this->WholeRangeAdjusted[0]) / whole_range;
     r1 = (this->RangeAdjusted[1] - this->WholeRangeAdjusted[0]) / whole_range;
+    if (r0 < 0)
+      {
+      r0 = 0;
+      }
+    if (r0 > 1)
+      {
+      r0 = 1;
+      }
+
+    if (r1 < 0)
+      {
+      r1 = 0;
+      }
+    if (r1 > 1)
+      {
+      r1 = 1;
+      }
     }
 
   pos[0] = (int)((double)pos_range * r0);
