@@ -48,6 +48,9 @@ class vtkPVVolumeAppearanceEditor;
 class vtkPVColorSelectionWidget;
 class vtkPVDisplayGUIVRObserver;
 
+//BTX
+struct vtkPVDisplayGUIInternal;
+//ETX
 // Try to eliminate this !!!!
 class vtkPVColorMap;
 
@@ -126,7 +129,13 @@ public:
   // Description:
   // Set the material applied to the actor.
   // The argument is the name of the material to apply.
-  void SetMaterial(const char* name);
+  // If label is not specified, a label is deduced from the materialname.
+  // label must be specified when loading a material from the library.
+  void SetMaterial(const char* materialname, const char* label);
+
+  // Description:
+  // Browse a material xml.
+  void BrowseMaterial();
   
   // Description:
   // Create the widget.
@@ -410,11 +419,14 @@ protected:
   // Update the color map GUI when the ColorSelectionMenu value changes.
   void UpdateColorMapUI();
 
+  void SetMaterialInternal(const char* name, const char* label);
+
 //BTX
   friend class vtkPVDisplayGUIVRObserver;
   vtkPVDisplayGUIVRObserver *VRObserver;
+  vtkPVDisplayGUIInternal* Internal;
 //ETX
-  
+
 private:
   vtkPVDisplayGUI(const vtkPVDisplayGUI&); // Not implemented
   void operator=(const vtkPVDisplayGUI&); // Not implemented

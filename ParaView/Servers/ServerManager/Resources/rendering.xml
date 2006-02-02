@@ -1048,12 +1048,6 @@
         animateable="0">
         <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
-      <StringVectorProperty
-        name="Material"
-        command="LoadMaterial"
-        number_of_elements="1"
-        animateable="0">
-      </StringVectorProperty>
       <IntVectorProperty
         name="Shading"
         command="SetShading"
@@ -2174,10 +2168,24 @@
           <Property name="PointSize" />
           <Property name="Interpolation" />
           <Property name="Color" />
-          <Property name="Material" />
           <Property name="Opacity" />
           <Property name="Shading" />
           <Property name="Specular" />
+        </ExposedProperties>
+      </SubProxy>
+      <SubProxy>
+        <!-- This is the helper that assures that the material xml is provided
+          to the servers from the client, when needed. Note that this is 
+          a client only proxy -->
+        <MaterialLoaderProxy name="MaterialLoader" >
+          <StringVectorProperty name="Material"
+            command="LoadMaterial"
+            number_of_elements="1"
+            update_self="1">
+          </StringVectorProperty>
+        </MaterialLoaderProxy>
+        <ExposedProperties>
+          <Property name="Material" />
         </ExposedProperties>
       </SubProxy>
     

@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.54");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.55");
 
 // Taken from source selection list  we need ne images.
 /* 
@@ -133,6 +133,8 @@ vtkPVServerFileDialog::vtkPVServerFileDialog()
 
   this->ScrollBar = vtkKWScrollbar::New();
   this->ServerFileListingProxy = 0;
+
+  this->Servers = vtkProcessModule::DATA_SERVER_ROOT;
 }
 
 //----------------------------------------------------------------------------
@@ -212,8 +214,7 @@ void vtkPVServerFileDialog::CreateServerSide()
       vtkErrorMacro("Failed to create proxy ServerFileListing.");
       return;
       }
-    this->ServerFileListingProxy->SetServers(
-      vtkProcessModule::DATA_SERVER_ROOT);
+    this->ServerFileListingProxy->SetServers(this->Servers);
     this->ServerFileListingProxy->UpdateVTKObjects();
     }
 }

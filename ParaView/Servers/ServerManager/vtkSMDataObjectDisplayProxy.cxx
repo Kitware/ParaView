@@ -28,6 +28,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMMaterialLoaderProxy.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
@@ -35,7 +36,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.8");
 
 
 //-----------------------------------------------------------------------------
@@ -162,6 +163,13 @@ void vtkSMDataObjectDisplayProxy::CreateVTKObjects(int numObjects)
     }
 
   this->Superclass::CreateVTKObjects(numObjects);
+
+  vtkSMMaterialLoaderProxy* mlp = vtkSMMaterialLoaderProxy::SafeDownCast(
+    this->GetSubProxy("MaterialLoader"));
+  if (mlp)
+    {
+    mlp->SetPropertyProxy(this->PropertyProxy);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1645,6 +1653,62 @@ int vtkSMDataObjectDisplayProxy::GetImmediateModeRenderingCM()
     }
   return ivp->GetElement(0);
 }
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetMaterialCM(const char* name)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("Shading"));
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->GetProperty("Material"));
+  if (!svp)
+    {
+    vtkErrorMacro("Failed to find property Material on display proxy.");
+    return;
+    }
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property Shading on display proxy.");
+    return;
+    }
+  if (!name || strlen(name) == 0)
+    {
+    ivp->SetElement(0, 0);
+    svp->SetElement(0, "");
+    }
+  else
+    {
+    svp->SetElement(0, name);
+    ivp->SetElement(0, 1);
+    }
+
+  this->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+const char* vtkSMDataObjectDisplayProxy::GetMaterialCM()
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("Shading"));
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->GetProperty("Material"));
+  if (!svp)
+    {
+    vtkErrorMacro("Failed to find property Material on display proxy.");
+    return 0;
+    }
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property Shading on display proxy.");
+    return 0;
+    }
+  if (!ivp->GetElement(0))
+    {
+    return 0;
+    }
+  return svp->GetElement(0);
+}
+
 //-----------------------------------------------------------------------------
 void vtkSMDataObjectDisplayProxy::PrintSelf(ostream& os, vtkIndent indent)
 {

@@ -65,6 +65,7 @@ SET(Kit_SRCS
   vtkSMLookupTableProxy.cxx
   vtkSMLODDisplayProxy.cxx
   vtkSMLODRenderModuleProxy.cxx
+  vtkSMMaterialLoaderProxy.cxx
   vtkSMMultiDisplayProxy.cxx
   vtkSMMultiDisplayRenderModuleProxy.cxx
   vtkSMMultiViewRenderModuleProxy.cxx
