@@ -38,6 +38,10 @@
 
 #ifdef _WIN32
   #include "vtkAVIWriter.h"
+#else
+#ifdef VTK_USE_FFMPEG_ENCODER
+  #include "vtkFFMPEGWriter.h"
+#endif
 #endif
 
 #if !defined(_WIN32) || defined(__CYGWIN__)
@@ -46,7 +50,7 @@
 # include <io.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.20");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.21");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
@@ -192,7 +196,8 @@ int vtkSMAnimationSceneProxy::SaveImages(const char* fileRoot,
                                          const char* ext, 
                                          int width, 
                                          int height, 
-                                         double framerate)
+                                         double framerate,
+                                         int quality)
 {
 
   if (this->InSaveAnimation || 
@@ -238,15 +243,27 @@ int vtkSMAnimationSceneProxy::SaveImages(const char* fileRoot,
     {
     this->ImageWriter = vtkPNGWriter::New();
     }
-  else if (strcmp(ext, "mp2") == 0)
+  else if (strcmp(ext, "mpg") == 0)
     {
     this->MovieWriter = vtkMPEG2Writer::New();
     }
 #ifdef _WIN32
   else if (strcmp(ext, "avi") == 0)
     {
-    this->MovieWriter = vtkAVIWriter::New();
+    vtkAVIWriter *aviwriter = vtkAVIWriter::New();
+    aviwriter->SetQuality(quality);
+    this->MovieWriter = aviwriter;
     }
+#else
+#ifdef VTK_USE_FFMPEG_ENCODER
+  else if (strcmp(ext, "avi") == 0)
+    {
+    vtkFFMPEGWriter *aviwriter = vtkFFMPEGWriter::New();
+    aviwriter->SetQuality(quality);
+    this->MovieWriter = aviwriter;
+    
+    }
+#endif
 #endif
   else
     {
@@ -254,6 +271,10 @@ int vtkSMAnimationSceneProxy::SaveImages(const char* fileRoot,
     this->InSaveAnimation = 0;
     return 1;
     }
+
+#ifndef VTK_USE_FFMPEG_ENCODER
+  quality = quality + 1; //prevent unused parameter warning when no AVI
+#endif
 
   this->SetFileRoot(fileRoot);
   this->SetFileExtension(ext);

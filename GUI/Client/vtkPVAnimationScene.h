@@ -147,7 +147,7 @@ public:
   // Called when user requests saving of an animation in a movie file
   // or as a set of images.
   void SaveImages(const char* fileRoot, const char* ext, int width, int height,
-    double framerate);
+    double framerate, int quality);
   // Description:
   // Called when the user requests saving of animation geometry.
   void SaveGeometry(const char* filename);

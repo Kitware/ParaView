@@ -19,5 +19,6 @@
 #define KWWidgets_TclTk_INSTALL_LIB_DIR "${KWWidgets_TclTk_INSTALL_LIB_DIR}"
 
 #cmakedefine VTK_USE_VIDEO_FOR_WINDOWS
+#cmakedefine VTK_USE_FFMPEG_ENCODER
 
 #endif
