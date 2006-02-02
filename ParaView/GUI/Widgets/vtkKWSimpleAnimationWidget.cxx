@@ -40,6 +40,10 @@
 
 #ifdef VTK_USE_VIDEO_FOR_WINDOWS 
 #include "vtkAVIWriter.h"
+#else
+#ifdef VTK_USE_FFMPEG_ENCODER
+#include "vtkFFMPEGWriter.h"
+#endif
 #endif
 
 #include <vtksys/SystemTools.hxx>
@@ -61,7 +65,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.13");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.14");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -531,12 +535,17 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
   save_dialog->Create();
   save_dialog->SetTitle("Save Animation");
   save_dialog->SaveDialogOn();
-#ifdef VTK_USE_VIDEO_FOR_WINDOWS 
-  save_dialog->SetFileTypes("{{AVI} {.avi}} {{MPEG2 movie file} {.mp2}}");
+#ifdef VTK_USE_VIDEO_FOR_WINDOWS
+  save_dialog->SetFileTypes("{{AVI movie file} {.avi}} {{MPEG2 movie file} {.mpg}}");
   save_dialog->SetDefaultExtension(".avi");
 #else
-  save_dialog->SetFileTypes("{{MPEG2 movie file} {.mp2}}");
-  save_dialog->SetDefaultExtension(".mp2");
+#ifdef VTK_USE_FFMPEG_ENCODER
+  save_dialog->SetFileTypes("{{AVI movie file} {.avi}} {{MPEG2 movie file} {.mpg}}");
+  save_dialog->SetDefaultExtension(".avi");
+#else
+  save_dialog->SetFileTypes("{{MPEG2 movie file} {.mpg}}");
+  save_dialog->SetDefaultExtension(".mpg");
+#endif
 #endif
   
   if (!save_dialog->Invoke())
@@ -581,9 +590,7 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
   int is_mpeg = 
     (!strcmp(ext.c_str(), ".mpg") || !strcmp(ext.c_str(), ".mpeg") ||
      !strcmp(ext.c_str(), ".MPG") || !strcmp(ext.c_str(), ".MPEG") ||
-     !strcmp(ext.c_str(), ".AVI") || !strcmp(ext.c_str(), ".avi") ||
      !strcmp(ext.c_str(), ".MP2") || !strcmp(ext.c_str(), ".mp2"));
-
   if (is_mpeg)
     {
     msg_dialog->SetText(
@@ -742,7 +749,7 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
     {
     if (ext)
       {
-      if (!strcmp(ext, ".mp2"))
+      if (!strcmp(ext, ".mpg"))
         {
         awriter = vtkMPEG2Writer::New();
         }
@@ -751,6 +758,13 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
         {
         awriter = vtkAVIWriter::New();
         }
+#else
+#ifdef VTK_USE_FFMPEG_ENCODER
+      else if (!strcmp(ext, ".avi"))
+        {
+        awriter = vtkFFMPEGWriter::New();
+        }
+#endif
 #endif
       if (!awriter)
         {
@@ -935,7 +949,7 @@ void vtkKWSimpleAnimationWidget::PerformSliceAnimation(const char *file_root,
 
   vtkWindowToImageFilter *w2i = NULL;
   vtkGenericMovieWriter *awriter = 0;
-  if (ext && !strcmp(ext, ".mp2"))
+  if (ext && !strcmp(ext, ".mpg"))
     {
     awriter = vtkMPEG2Writer::New();
     }
