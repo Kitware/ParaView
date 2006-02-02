@@ -255,6 +255,8 @@ public:
   void SetUseHighOutOfRangeColor(int val);
   int GetUseHighOutOfRangeColor();
   int ComputeWholeScalarRange(double range[2]);
+  vtkSetMacro(Displayed, int);
+  vtkGetMacro(Displayed, int);
 
 protected:
   vtkPVColorMap();
@@ -433,6 +435,11 @@ protected:
   //  This is used to make the scalar bar invisible when not used.
   int UseCount;
 
+  // Keep track of whether this color map has been displayed so we don't
+  // load default values from the registry each time it is displayed
+  // (over-riding selected values).
+  int Displayed;
+  
   void ComputeScalarRange(
     vtkPVDataSetAttributesInformation* attrInfo, double* range);
 

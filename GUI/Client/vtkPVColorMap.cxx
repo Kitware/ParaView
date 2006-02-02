@@ -53,7 +53,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.141");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.142");
 
 //===========================================================================
 //***************************************************************************
@@ -147,6 +147,8 @@ vtkPVColorMap::vtkPVColorMap()
 
   this->StartColor[0] = this->StartColor[1] = this->StartColor[2] = 0;
   this->EndColor[0] = this->EndColor[1] = this->EndColor[2] = 0;
+
+  this->Displayed = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -2338,4 +2340,5 @@ void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "EndColor: " << this->EndColor[0] << " "
      << this->EndColor[1] << " " << this->EndColor[2] << endl;
   os << indent << "ScalarRangeLock: " << this->ScalarRangeLock << endl;
+  os << indent << "Displayed: " << this->Displayed << endl;
 }

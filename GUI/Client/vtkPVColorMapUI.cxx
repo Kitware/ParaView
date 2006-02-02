@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMapUI);
-vtkCxxRevisionMacro(vtkPVColorMapUI, "1.4");
+vtkCxxRevisionMacro(vtkPVColorMapUI, "1.5");
 
 vtkCxxSetObjectMacro(vtkPVColorMapUI, CurrentColorMap, vtkPVColorMap);
 
@@ -195,7 +195,7 @@ void vtkPVColorMapUI::Create()
 
   this->ParameterMenu->SetParent(this->ParameterFrame);
   this->ParameterMenu->Create();
-  this->ParameterMenu->IndicatorVisibilityOn();
+//  this->ParameterMenu->IndicatorVisibilityOn();
   this->ParameterMenu->SetBalloonHelpString(
     "Select the parameter for which to display a scalar color bar.");
 
@@ -355,6 +355,7 @@ void vtkPVColorMapUI::Create()
   this->LowColorLabel->SetParent(this->OutOfRangeFrame);
   this->LowColorLabel->SetText("Low");
   this->LowColorLabel->Create();
+  this->LowColorLabel->EnabledOff();
 
   this->LowColorButton->SetParent(this->OutOfRangeFrame);
   this->LowColorButton->Create();
@@ -362,10 +363,12 @@ void vtkPVColorMapUI::Create()
   this->LowColorButton->SetColor(0, 0, 0);
   this->LowColorButton->SetCommand(this, "LowColorButtonCallback");
   this->LowColorButton->SetBalloonHelpString("Select the color for values below the low end of the scalar range.");
+  this->LowColorButton->EnabledOff();
 
   this->HighColorLabel->SetParent(this->OutOfRangeFrame);
   this->HighColorLabel->SetText("High");
   this->HighColorLabel->Create();
+  this->HighColorLabel->EnabledOff();
 
   this->HighColorButton->SetParent(this->OutOfRangeFrame);
   this->HighColorButton->Create();
@@ -373,6 +376,7 @@ void vtkPVColorMapUI::Create()
   this->HighColorButton->SetColor(1, 1, 1);
   this->HighColorButton->SetCommand(this, "HighColorButtonCallback");
   this->HighColorButton->SetBalloonHelpString("Select the color for values above the high end of the scalar range.");
+  this->HighColorButton->EnabledOff();
 
   this->Script("grid %s %s -sticky news %s",
                this->OutOfRangeLabel->GetWidgetName(),
@@ -874,6 +878,9 @@ void vtkPVColorMapUI::OutOfRangeCheckCallback(int state)
       {
       this->CurrentColorMap->SetUseLowOutOfRangeColor(0);
       this->CurrentColorMap->SetUseHighOutOfRangeColor(0);
+      this->CurrentColorMap->RenderView();
+      this->MapConfigureCallback(this->CurrentColorMap->GetMapWidth(),
+                                 this->CurrentColorMap->GetMapHeight());
       }
     }
   else
@@ -1065,7 +1072,7 @@ void vtkPVColorMapUI::UpdateParameterList(vtkPVWindow *win)
       numComp = arrayInfo->GetNumberOfComponents();
       if (numComp > 1)
         {
-        label << "(" << numComp << ")";
+        label << " (" << numComp << ")";
         }
       label << ends;
       if (this->ParameterMenu->GetMenu()->GetIndexOfItem(label.str()) < 0)
@@ -1093,7 +1100,7 @@ void vtkPVColorMapUI::UpdateParameterList(vtkPVWindow *win)
       numComp = arrayInfo->GetNumberOfComponents();
       if (numComp > 1)
         {
-        label << "(" << numComp << ")";
+        label << " (" << numComp << ")";
         }
       label << ends;
       if (this->ParameterMenu->GetMenu()->GetIndexOfItem(label.str()) < 0)
@@ -1228,7 +1235,8 @@ void vtkPVColorMapUI::UpdateColorMapUI(const char* name, int numComponents,
   this->HighColorButton->SetColor(colorMap->GetHighLookupTableValue());
   
   vtkKWApplication *app = this->GetApplication();
-  if (app->GetIntRegistryValue(2, "RunTime", "UseColorMapDefaults"))
+  if (app->GetIntRegistryValue(2, "RunTime", "UseColorMapDefaults") &&
+      !colorMap->GetDisplayed())
     {
     double rgb[3];
     app->RetrieveColorRegistryValue(2, "ColorMapStartColor", rgb);
@@ -1287,6 +1295,8 @@ void vtkPVColorMapUI::UpdateColorMapUI(const char* name, int numComponents,
     {
     this->MapConfigureCallback(oldWidth, oldHeight);
     }
+
+  colorMap->SetDisplayed(1);
 }
 
 //----------------------------------------------------------------------------
@@ -1503,6 +1513,10 @@ void vtkPVColorMapUI::UpdateOutOfRangeColors()
     {
     this->CurrentColorMap->SetUseHighOutOfRangeColor(0);
     }
+
+  this->CurrentColorMap->RenderView();
+  this->MapConfigureCallback(this->CurrentColorMap->GetMapWidth(),
+                             this->CurrentColorMap->GetMapHeight());
 }
 
 //----------------------------------------------------------------------------
