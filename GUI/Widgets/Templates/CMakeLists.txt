@@ -1,5 +1,3 @@
-SET(KWWidgets_SHARED_LIBS ${BUILD_SHARED_LIBS})
-
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/vtkKWWidgetsConfigure.h.in 
   ${KWWidgets_BINARY_DIR}/vtkKWWidgetsConfigure.h)
