@@ -102,7 +102,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.61");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.62");
 
 //----------------------------------------------------------------------------
 
@@ -781,7 +781,7 @@ void vtkPVDisplayGUI::Create()
       "SetMaterial {} {}");
     this->MaterialMenu->SetBalloonHelpString(
       "Choose the material to apply to the object.");
-    
+
     // Populate the material list.
     const char** names = vtkMaterialLibrary::GetListOfMaterialNames();
     for(cc=0; names[cc];cc++)
@@ -791,9 +791,10 @@ void vtkPVDisplayGUI::Create()
       this->MaterialMenu->AddRadioButton(names[cc], this,
         stream.str().c_str());
       }
+    this->MaterialMenu->AddRadioButton(VTK_PV_MATERIAL_BROWSE_LABEL, this,
+      "BrowseMaterial", VTK_PV_MATERIAL_BROWSE_HELP);
     }
-  this->MaterialMenu->AddRadioButton(VTK_PV_MATERIAL_BROWSE_LABEL, this,
-    "BrowseMaterial", VTK_PV_MATERIAL_BROWSE_HELP);
+
   
 
   this->PointSizeLabel->SetParent(this->DisplayStyleFrame->GetFrame());
