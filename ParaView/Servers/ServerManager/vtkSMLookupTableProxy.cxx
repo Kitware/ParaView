@@ -22,7 +22,7 @@
 #include "vtkMath.h"
 
 vtkStandardNewMacro(vtkSMLookupTableProxy);
-vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.15");
 
 //---------------------------------------------------------------------------
 vtkSMLookupTableProxy::vtkSMLookupTableProxy()
@@ -32,7 +32,7 @@ vtkSMLookupTableProxy::vtkSMLookupTableProxy()
   this->LowOutOfRangeColor[0] = this->LowOutOfRangeColor[1] =
     this->LowOutOfRangeColor[2] = 0;
   this->HighOutOfRangeColor[0] = this->HighOutOfRangeColor[1] =
-    this->HighOutOfRangeColor[2] = 0;
+    this->HighOutOfRangeColor[2] = 1;
   this->UseLowOutOfRangeColor = 0;
   this->UseHighOutOfRangeColor = 0;
 }
