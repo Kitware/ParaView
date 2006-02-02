@@ -53,6 +53,7 @@
 #include "vtkPVTraceHelper.h"
 #include "vtkPVWindow.h"
 #include "vtkPostScriptWriter.h"
+#include "vtkProcessModule.h"
 #include "vtkProperty2D.h"
 #include "vtkRenderer.h"
 #include "vtkSMDataObjectDisplayProxy.h"
@@ -101,7 +102,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.29");
+vtkCxxRevisionMacro(vtkKWView, "1.30");
 
 //----------------------------------------------------------------------------
 void KWViewAbortCheckMethod( vtkObject*, unsigned long, void* arg, void* )
@@ -774,6 +775,10 @@ void vtkKWView::SaveAsImage()
   int rate = 1, stride[3];
   stride[0] = stride[1] = stride[2] = 1;
 
+  // If any of the RT, image mandelbrot or xdmf reader sources has subsamplerate/
+  // stride set, ask the user if she wants to initiate streaming. If the answer
+  // is yes, full resolution image is generated using streaming. This feature
+  // is an initial demonstration version and should be improved upon.
   if (win)
     {
     vtkPVSourceCollection *coll = win->GetSourceList("Sources");
@@ -1458,6 +1463,9 @@ void vtkKWView::UpdateEnableState()
 //----------------------------------------------------------------------------
 void vtkKWView::SetupStreaming()
 {
+  vtkPVApplication *app=vtkPVApplication::SafeDownCast(this->GetApplication());
+  app->GetProcessModule()->SetStreamBlock(1);
+
   vtkPVWindow *win = vtkPVWindow::SafeDownCast(this->GetParentWindow());
   if (!win)
     {
@@ -1487,6 +1495,9 @@ void vtkKWView::SetupStreaming()
 //----------------------------------------------------------------------------
 void vtkKWView::CleanupStreaming(int rate, int stride[3])
 {
+  vtkPVApplication *app=vtkPVApplication::SafeDownCast(this->GetApplication());
+  app->GetProcessModule()->SetStreamBlock(0);
+
   vtkPVWindow *win = vtkPVWindow::SafeDownCast(this->GetParentWindow());
   if (!win)
     {
