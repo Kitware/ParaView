@@ -19,6 +19,7 @@
 #include "vtkKWFrame.h"
 #include "vtkKWFrameWithLabel.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVApplication.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
@@ -30,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.31");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.32");
 
 //----------------------------------------------------------------------------
 vtkPVApplicationSettingsInterface::vtkPVApplicationSettingsInterface()
@@ -44,7 +45,6 @@ vtkPVApplicationSettingsInterface::vtkPVApplicationSettingsInterface()
   this->ShowTraceFilesCheckButton = 0;
   this->CreateLogFilesCheckButton = 0;
   // This is only for the temorary prototype streaming feature.
-  this->StreamBlockCheckButton = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -80,12 +80,6 @@ vtkPVApplicationSettingsInterface::~vtkPVApplicationSettingsInterface()
     {
     this->CreateLogFilesCheckButton->Delete();
     this->CreateLogFilesCheckButton = NULL;
-    }
-  // This is only for the temorary prototype streaming feature.
-  if (this->StreamBlockCheckButton)
-    {
-    this->StreamBlockCheckButton->Delete();
-    this->StreamBlockCheckButton = NULL;
     }
 }
 
@@ -237,28 +231,6 @@ void vtkPVApplicationSettingsInterface::Create()
     << "  -side top -anchor w -expand no -fill none" << endl;
 
   // --------------------------------------------------------------
-  // Interface settings : stream block
-  // This is only for the temorary prototype streaming feature.
-
-  if (!this->StreamBlockCheckButton)
-    {
-    this->StreamBlockCheckButton = vtkKWCheckButton::New();
-    }
-
-  this->StreamBlockCheckButton->SetParent(frame);
-  this->StreamBlockCheckButton->Create();
-  this->StreamBlockCheckButton->SetText(
-    "Block updates for streaming");
-  this->StreamBlockCheckButton->SetCommand(
-    this, "StreamBlockCallback");
-  this->StreamBlockCheckButton->SetBalloonHelpString(
-    "When this option is on, data are not updated."
-    "Whole pipelines can be setup without processing any data.");
-
-  tk_cmd << "pack " << this->StreamBlockCheckButton->GetWidgetName()
-    << "  -side top -anchor w -expand no -fill none" << endl;
-
-  // --------------------------------------------------------------
   // Interface customization
 
   // Not really supported by ParaView... (only in App Settings notebook)
@@ -363,23 +335,6 @@ void vtkPVApplicationSettingsInterface::CreateLogFilesCallback(int state)
 {
   this->GetApplication()->SetRegistryValue(
     2, "RunTime", VTK_PV_ASI_CREATE_LOG_FILES_REG_KEY, "%d", state);
-}
-
-//----------------------------------------------------------------------------
-// This is only for the temorary prototype streaming feature.
-void vtkPVApplicationSettingsInterface::StreamBlockCallback(int state)
-{
-  vtkPVApplication *app=vtkPVApplication::SafeDownCast(this->GetApplication());
-//TODO: disabling Streaming stuff for time being.
-//  app->GetProcessModule()->SetGlobalStreamBlock(flag);
-  
-  if (state == 0)
-    { // Turning the normal update back on.
-    // Mark all sources that they need to update to have valid geometry.
-    app->GetRenderModuleProxy()->InvalidateAllGeometries();
-    // This will cause the visible sources to update.
-    app->GetMainView()->EventuallyRender();
-    }
 }
 
 //----------------------------------------------------------------------------
