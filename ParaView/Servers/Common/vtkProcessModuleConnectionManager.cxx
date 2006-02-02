@@ -39,7 +39,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.4");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.5");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
@@ -462,28 +462,6 @@ int vtkProcessModuleConnectionManager::LoadModule(vtkConnectionID connectionID,
       {
       vtkErrorMacro("Failed to load Module on connection "  << connectionID);
       }
-    }
-  return 0;
-}
-
-//-----------------------------------------------------------------------------
-void vtkProcessModuleConnectionManager::SetStreamBlock(vtkConnectionID id,
-  int val)
-{
-  vtkProcessModuleConnection* conn = this->GetConnectionFromID(id);
-  if (conn)
-    {
-    conn->SetStreamBlock(val);
-    }
-}
-
-//-----------------------------------------------------------------------------
-int vtkProcessModuleConnectionManager::GetStreamBlock(vtkConnectionID id)
-{
-  vtkProcessModuleConnection* conn = this->GetConnectionFromID(id);
-  if (conn)
-    {
-    return conn->GetStreamBlock();
     }
   return 0;
 }

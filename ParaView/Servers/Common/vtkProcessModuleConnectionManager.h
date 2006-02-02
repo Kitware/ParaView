@@ -228,16 +228,9 @@ public:
   int LoadModule(vtkConnectionID connectionID, const char* name, const char* dir);
 
   // Description:
-  // I am experimenting with streaming. This turns streaming on and off.
-  // When this value is zero, pipelines do not update.
-  // When the flag is turned on, then the pipeline streams.
-  void SetStreamBlock(vtkConnectionID id, int val);
-  int GetStreamBlock(vtkConnectionID id);
-
-  // Description:
-  // Earlier, the ServerInformation was synchronized with the ClientOptions.
-  // This no longer is appropriate. Hence, we provide access to the server information
-  // on each connection.
+  // Earlier, the ServerInformation was synchronized with the
+  // ClientOptions.  This no longer is appropriate. Hence, we provide
+  // access to the server information on each connection.
   vtkPVServerInformation* GetServerInformation(vtkConnectionID id);
 
   // Description:

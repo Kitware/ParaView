@@ -93,9 +93,12 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.36");
+vtkCxxRevisionMacro(vtkProcessModule, "1.37");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
+
+int vtkProcessModule::StreamBlockFlag = 0;
+
 //-----------------------------------------------------------------------------
 vtkProcessModule::vtkProcessModule()
 {
@@ -1207,41 +1210,41 @@ void vtkProcessModule::ResetLog()
 {
   vtkTimerLog::ResetLog();
 }
+
 //----------------------------------------------------------------------------
 void vtkProcessModule::SetEnableLog(int flag)
 {
   vtkTimerLog::SetLogging(flag);
 }
 
-
 //-----------------------------------------------------------------------------
-void vtkProcessModule::SetStreamBlock(vtkConnectionID id, int val)
+void vtkProcessModule::SetStreamBlock(int val)
 {
-  if (this->ConnectionManager->GetStreamBlock(id) == val)
+  if (this->StreamBlockFlag == val)
     {
     return;
     }
+  this->SetStreamBlockFlag(val);
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke
-    << this->GetProcessModuleID()
-    << "SetGlobalStreamBlockInternal" << val << vtkClientServerStream::End;
-  this->SendStream(id, vtkProcessModule::DATA_SERVER, stream);
+         << this->GetProcessModuleID()
+         << "SetStreamBlockFlag" << val << vtkClientServerStream::End;
+  this->SendStream(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(), 
+    vtkProcessModule::DATA_SERVER, stream);
 }
 
 //-----------------------------------------------------------------------------
-int vtkProcessModule::GetStreamBlock(vtkConnectionID id)
+int vtkProcessModule::GetStreamBlock()
 {
-  return this->ConnectionManager->GetStreamBlock(id);
+  return vtkProcessModule::StreamBlockFlag;
 }
 
 //-----------------------------------------------------------------------------
-void vtkProcessModule::SetStreamBlockInternal(int val)
+void vtkProcessModule::SetStreamBlockFlag(int val)
 {
-  this->ConnectionManager->SetStreamBlock(
-    vtkProcessModuleConnectionManager::GetSelfConnectionID(), val);
+  this->StreamBlockFlag = val;
 }
-
-
 
 //============================================================================
 // Stuff that is a part of render-process module.

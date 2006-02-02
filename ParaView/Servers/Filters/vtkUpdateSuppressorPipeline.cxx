@@ -18,7 +18,9 @@
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkUpdateSuppressorPipeline, "1.6");
+#include "vtkProcessModule.h"
+
+vtkCxxRevisionMacro(vtkUpdateSuppressorPipeline, "1.7");
 vtkStandardNewMacro(vtkUpdateSuppressorPipeline);
 
 
@@ -45,9 +47,13 @@ int vtkUpdateSuppressorPipeline::ProcessRequest(vtkInformation* request,
 {
   if(this->Algorithm && request->Has(REQUEST_DATA()))
     {
+    // If the number of pieces that was requested is larger than 1,
+    // paraview is running in streaming mode. Pass the request through
+    // so that the filters can execute on the requested piece.
     vtkInformation *info = outInfo->GetInformationObject(0);
-    if (info->Get(
-          vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()) == 1)
+    int numPieces = info->Get(
+      vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
+    if (numPieces == 1)
       {
       return 1;
       }
@@ -59,7 +65,15 @@ int vtkUpdateSuppressorPipeline::ProcessRequest(vtkInformation* request,
       {
       info->Set(MAXIMUM_NUMBER_OF_PIECES(), -1);
       }
-    return 1;
+    // If the number of pieces that was requested is larger than 1,
+    // paraview is running in streaming mode. Pass the request through
+    // so that the filters can execute on the requested piece.
+    int numPieces = info->Get(
+      vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
+    if (numPieces == 1)
+      {
+      return 1;
+      }
     }
   return this->Superclass::ProcessRequest(request, inInfo, outInfo);
 }

@@ -295,10 +295,10 @@ public:
   // I am experimenting with streaming. This turns streaming on and off.
   // When this value is zero, pipelines do not update.
   // When the flag is turned on, then the pipeline streams.
-  void SetStreamBlock(vtkConnectionID id, int val);
-  int GetStreamBlock(vtkConnectionID id);
+  void SetStreamBlock(int val);
+  static int GetStreamBlock();
 //ETX
-  void SetStreamBlockInternal(int val);
+  void SetStreamBlockFlag(int val);
 
   // Description:
   // We need to get the data path for the demo on the server.
@@ -547,6 +547,8 @@ protected:
   // can accept multiple remote connections. This class only affects when running
   // in client-server mode.
   int SupportMultipleConnections;
+
+  static int StreamBlockFlag;
 
 private:
   vtkProcessModule(const vtkProcessModule&); // Not implemented.
