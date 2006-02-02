@@ -14,7 +14,7 @@
 #ifndef __vtkKWWidgetsConfigure_h
 #define __vtkKWWidgetsConfigure_h
 
-#cmakedefine KWWidgets_SHARED_LIBS
+#cmakedefine KWWidgets_BUILD_SHARED_LIBS
 #cmakedefine KWWidgets_HAS_HTML_HELP
 #define KWWidgets_TclTk_INSTALL_LIB_DIR "${KWWidgets_TclTk_INSTALL_LIB_DIR}"
 
