@@ -47,6 +47,7 @@ class vtkClientServerStream;
 class vtkClientSocket;
 class vtkConnectionIterator;
 class vtkProcessModuleConnection;
+class vtkProcessModuleConnectionManagerObserver;
 class vtkProcessModuleConnectionManagerInternals;
 class vtkPVInformation;
 class vtkPVServerInformation;
@@ -187,6 +188,18 @@ public:
   // 3 when a connection is dropped/closed.
   int MonitorConnections(unsigned long msec = 0);
 
+
+  // Description:
+  // If a processes uses MonitorConnections(), aborted remote connections 
+  // are caught and cleaned up. However, the paraview client doesn't use 
+  // MonitorConnections() since the client is not listening for activity from
+  // the server. Hence, if the server connection is aborted due to communication
+  // error, altough it's flagged aborted, the connection is not cleanedup.
+  // There still exists the vtkProcessModuleConnection object associated with it.
+  // Call this method to clean up all such aborted connections.
+  // Returns the number of aborted connections that were dropped (or cleaned up).
+  int DropAbortedConnections();
+
   // Description:
   // Get a connection iterator.
   vtkConnectionIterator* NewIterator();
@@ -311,6 +324,10 @@ protected:
   // a server connection. When running in client-server mode, only remote
   // connections qualify as server connections.
   int IsServerConnection(vtkConnectionID connection);
+
+  // Description:
+  // Event callback.
+  virtual void ExecuteEvent(vtkObject* caller, unsigned long eventid, void* data);
 //BTX
   // A collection of all open sockets.
   vtkSocketCollection* SocketCollection;
@@ -321,6 +338,8 @@ protected:
   int ClientMode;
 
   friend class vtkConnectionIterator;
+  friend class vtkProcessModuleConnectionManagerObserver;
+  vtkProcessModuleConnectionManagerObserver* Observer;
 //ETX
 private:
   vtkProcessModuleConnectionManager(const vtkProcessModuleConnectionManager&); // Not implemented.

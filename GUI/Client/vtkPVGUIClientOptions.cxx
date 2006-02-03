@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGUIClientOptions);
-vtkCxxRevisionMacro(vtkPVGUIClientOptions, "1.8");
+vtkCxxRevisionMacro(vtkPVGUIClientOptions, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVGUIClientOptions::vtkPVGUIClientOptions()
@@ -33,6 +33,7 @@ vtkPVGUIClientOptions::vtkPVGUIClientOptions()
   this->ParaViewScriptName = 0;
   this->ParaViewDataName = 0;
   this->InternalScriptName = 0;
+  this->ClientServerConnectionTimeout = 0;
   this->SetProcessType(vtkPVOptions::PARAVIEW);
 }
 
@@ -58,6 +59,9 @@ void vtkPVGUIClientOptions::Initialize()
                            "For debugging purposes. This will make ParaView abort on errors.");
   this->AddBooleanArgument("--start-empty", "-e", &this->StartEmpty, 
                            "Start ParaView without any default modules.");
+  this->AddArgument("--server-time", "-st", &this->ClientServerConnectionTimeout,
+    "Time in minutes for the client server connection. When set to non zero value, the client "
+    "shows warnings before the time expires.", vtkPVOptions::PVCLIENT);
 
   // Add deprecated command line arguments for paraview
   this->AddDeprecatedArgument("--server", "-v", 

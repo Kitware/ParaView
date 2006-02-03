@@ -18,6 +18,7 @@
 #include "vtkClientServerID.h"
 #include "vtkClientServerStream.h"
 #include "vtkClientSocket.h"
+#include "vtkCommand.h"
 #include "vtkConnectionIterator.h"
 #include "vtkMPISelfConnection.h"
 #include "vtkObjectFactory.h"
@@ -37,14 +38,49 @@
 #include <vtkstd/map>
 #include <vtkstd/deque>
 
+class vtkProcessModuleConnectionManagerObserver : public vtkCommand
+{
+public:
+  static vtkProcessModuleConnectionManagerObserver* New()
+    {
+    return new vtkProcessModuleConnectionManagerObserver;
+    }
+
+  void SetTarget(vtkProcessModuleConnectionManager* t)
+    {
+    this->Target = t;
+    }
+  virtual void Execute(vtkObject* caller, unsigned long eventid,
+    void* calldata)
+    {
+    if (this->Target)
+      {
+      this->Target->ExecuteEvent(caller, eventid, calldata);
+      }
+    }
+protected:
+  vtkProcessModuleConnectionManagerObserver()
+    {
+    this->Target = 0;
+    }
+  ~vtkProcessModuleConnectionManagerObserver()
+    {
+    this->Target = 0;
+    }
+  vtkProcessModuleConnectionManager* Target;
+};
+
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.5");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.6");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
 {
   this->Internals = new vtkProcessModuleConnectionManagerInternals;
+  this->Observer = vtkProcessModuleConnectionManagerObserver::New();
+  this->Observer->SetTarget(this);
+  
   this->SocketCollection = vtkSocketCollection::New();
   this->UniqueConnectionID.ID = 5;
   this->UniqueServerSocketID = 0;
@@ -54,6 +90,8 @@ vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::~vtkProcessModuleConnectionManager()
 {
+  this->Observer->SetTarget(0);
+  this->Observer->Delete();
   delete this->Internals;
   this->SocketCollection->Delete();
 }
@@ -354,6 +392,27 @@ int vtkProcessModuleConnectionManager::MonitorConnections(
 }
 
 //-----------------------------------------------------------------------------
+int vtkProcessModuleConnectionManager::DropAbortedConnections()
+{
+  int ret = 0;
+  vtkConnectionIterator* iter = vtkConnectionIterator::New();
+  for (iter->Begin(); !iter->IsAtEnd(); )
+    {
+    vtkRemoteConnection* rc = vtkRemoteConnection::SafeDownCast(
+      iter->GetCurrentConnection());
+    iter->Next();
+
+    if (rc && rc->GetAbortConnection())
+      {
+      this->DropConnection(rc);
+      ret++;
+      }
+    }
+  iter->Delete();
+  return ret;
+}
+
+//-----------------------------------------------------------------------------
 int vtkProcessModuleConnectionManager::IsServerConnection(
   vtkConnectionID connection)
 {
@@ -584,6 +643,8 @@ void vtkProcessModuleConnectionManager::SetConnection(vtkConnectionID id,
 void vtkProcessModuleConnectionManager::DropConnection(
   vtkProcessModuleConnection* conn)
 {
+  conn->RemoveObserver(this->Observer);
+
   // Locate socket for this connection and close it.
   vtkProcessModuleConnectionManagerInternals::MapOfSocketToConnection::iterator iter;
   
@@ -623,11 +684,27 @@ unsigned int vtkProcessModuleConnectionManager::GetNumberOfConnections()
 //-----------------------------------------------------------------------------
 vtkRemoteConnection* vtkProcessModuleConnectionManager::NewRemoteConnection()
 {
+  vtkRemoteConnection* rc = 0;
   if (this->ClientMode)
     {
-    return vtkServerConnection::New();
+    rc = vtkServerConnection::New();
     }
-  return vtkClientConnection::New();
+  else
+    {
+    rc = vtkClientConnection::New();
+    }
+  rc->AddObserver(vtkCommand::AbortCheckEvent, this->Observer);
+  return rc;
+}
+
+//-----------------------------------------------------------------------------
+void vtkProcessModuleConnectionManager::ExecuteEvent(vtkObject* vtkNotUsed(caller), 
+  unsigned long eventid, void* vtkNotUsed(data))
+{
+  if (eventid == vtkCommand::AbortCheckEvent)
+    {
+    this->InvokeEvent(vtkCommand::AbortCheckEvent);
+    }
 }
 
 //-----------------------------------------------------------------------------

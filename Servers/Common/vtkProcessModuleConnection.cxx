@@ -57,7 +57,7 @@ protected:
 
 };
 
-vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.6");
+vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.7");
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnection::vtkProcessModuleConnection()
 {
@@ -141,6 +141,7 @@ void vtkProcessModuleConnection::OnSocketError()
     {
     vtkDebugMacro("Communication Error. Connection will be closed.");
     this->AbortConnection = 1;
+    this->InvokeEvent(vtkCommand::AbortCheckEvent);
     }
 }
 
@@ -218,28 +219,26 @@ void vtkProcessModuleConnection::GatherInformation(vtkTypeUInt32 ,
 int vtkProcessModuleConnection::SendStream(vtkTypeUInt32 servers, 
   vtkClientServerStream& stream)
 {
-  if (this->AbortConnection)
-    {
-    // Connection closed...don't send any more messages.
-    return 1;
-    }
-
   vtkTypeUInt32 sendflag = this->CreateSendFlag(servers);
-  if (sendflag & vtkProcessModule::DATA_SERVER)
+  if (!this->AbortConnection)
     {
-    this->SendStreamToDataServer(stream);
-    }
-  if(sendflag & vtkProcessModule::RENDER_SERVER)
-    {
-    this->SendStreamToRenderServer(stream);
-    }
-  if(sendflag & vtkProcessModule::DATA_SERVER_ROOT)
-    {
-    this->SendStreamToDataServerRoot(stream);
-    }
-  if(sendflag & vtkProcessModule::RENDER_SERVER_ROOT)
-    {
-    this->SendStreamToRenderServerRoot(stream);
+    // Dont send to servers if the connection has been aborted.
+    if (sendflag & vtkProcessModule::DATA_SERVER)
+      {
+      this->SendStreamToDataServer(stream);
+      }
+    if(sendflag & vtkProcessModule::RENDER_SERVER)
+      {
+      this->SendStreamToRenderServer(stream);
+      }
+    if(sendflag & vtkProcessModule::DATA_SERVER_ROOT)
+      {
+      this->SendStreamToDataServerRoot(stream);
+      }
+    if(sendflag & vtkProcessModule::RENDER_SERVER_ROOT)
+      {
+      this->SendStreamToRenderServerRoot(stream);
+      }
     }
   if (sendflag & vtkProcessModule::CLIENT)
     {

@@ -323,6 +323,11 @@ public:
   // Display the about dialog for this application.
   // Optionally provide a master window this dialog should be the slave of.
   virtual void DisplayAboutDialog(vtkKWWindowBase *master);
+
+  // Description:
+  // Internal method. Called by timer callback when a server connection drops.
+  void ServerConnectionClosedCallback();
+  void TimeoutWarningCallback();
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
@@ -380,7 +385,10 @@ protected:
   vtkSMRenderModuleProxy* RenderModuleProxy;
   char* RenderModuleProxyName;
   vtkSetStringMacro(RenderModuleProxyName);
-  
+
+  Tcl_TimerToken TimerToken;
+  Tcl_TimerToken TimeoutWarningTimerToken;
+  int TimeoutLeft;
 private:  
   vtkPVApplication(const vtkPVApplication&); // Not implemented
   void operator=(const vtkPVApplication&); // Not implemented
