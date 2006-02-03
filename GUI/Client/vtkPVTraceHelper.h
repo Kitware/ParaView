@@ -91,8 +91,9 @@ public:
 
   // Description:
   // If a callback initializes Object in a state file, it can indicate so by
-  // setting this flag.
-  vtkSetMacro(StateInitialized, int);
+  // setting this flag. When the flag is set, its state if propagated to the
+  // TraceHelper for the reference object.
+  void SetStateInitialized(int);
   vtkGetMacro(StateInitialized, int);
   vtkBooleanMacro(StateInitialized, int);
 

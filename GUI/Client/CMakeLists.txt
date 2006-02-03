@@ -61,47 +61,40 @@ SET( ParaViewClient_SRCS
   vtkKWView.cxx
   vtkPV3DWidget.cxx
   vtkPVAdvancedReaderModule.cxx
-  vtkPVTimeLine.cxx
   vtkPVActiveTrackSelector.cxx
   vtkPVAnimationScene.cxx
   vtkPVAnimationCue.cxx
   vtkPVAnimationCueTree.cxx
   vtkPVAnimationManager.cxx
-  vtkPVAttributeEditor.cxx
-  vtkPVRampKeyFrame.cxx
-  vtkPVBooleanKeyFrame.cxx
-  vtkPVCameraAnimationCue.cxx
-  vtkPVCameraKeyFrame.cxx
-  vtkPVExponentialKeyFrame.cxx
-  vtkPVSinusoidKeyFrame.cxx
-  vtkPVComparativeVisDialog.cxx
-  vtkPVComparativeVisManager.cxx
-  vtkPVComparativeVisManagerGUI.cxx
-  vtkPVComparativeVisProgressDialog.cxx
-  vtkPVComparativeVisPropertyWidget.cxx
-  vtkPVCredits.cxx
-  vtkPVHorizontalAnimationInterface.cxx
-  vtkPVVerticalAnimationInterface.cxx
   vtkPVApplicationResources.cxx
   vtkPVApplicationSettingsInterface.cxx
   vtkPVArrayMenu.cxx
   vtkPVArraySelection.cxx
-  vtkPVItemSelection.cxx
+  vtkPVAttributeEditor.cxx
+  vtkPVBooleanKeyFrame.cxx
   vtkPVBoundsDisplay.cxx
   vtkPVBoxWidget.cxx
   vtkPVCalculatorWidget.cxx
+  vtkPVCameraAnimationCue.cxx
   vtkPVCameraControl.cxx
   vtkPVCameraIcon.cxx
+  vtkPVCameraKeyFrame.cxx
   vtkPVCameraManipulator.cxx
   vtkPVCaveRenderModuleUI.cxx
   vtkPVColorMap.cxx
   vtkPVColorMapUI.cxx
   vtkPVColorSelectionWidget.cxx
+  vtkPVComparativeVisDialog.cxx
+  vtkPVComparativeVisManager.cxx
+  vtkPVComparativeVisManagerGUI.cxx
+  vtkPVComparativeVisProgressDialog.cxx
+  vtkPVComparativeVisPropertyWidget.cxx
   vtkPVCompositeRenderModuleUI.cxx
   vtkPVConnectDialog.cxx
   vtkPVContainerWidget.cxx
   vtkPVContourEntry.cxx
   vtkPVCornerAnnotationEditor.cxx
+  vtkPVCredits.cxx
   vtkPVCutEntry.cxx
   vtkPVIceTDesktopRenderModuleUI.cxx
   vtkPVDisplayGUI.cxx
@@ -113,6 +106,7 @@ SET( ParaViewClient_SRCS
   vtkPVEnSightReaderModule.cxx
   vtkPVErrorLogDisplay.cxx
   vtkPVEWriter.cxx
+  vtkPVExponentialKeyFrame.cxx
   vtkPVExtentEntry.cxx
   vtkPVExtractDataSetsWidget.cxx
   vtkPVExtractPartsWidget.cxx
@@ -120,6 +114,7 @@ SET( ParaViewClient_SRCS
   vtkPVFileEntry.cxx
   vtkPVGhostLevelDialog.cxx
   vtkPVGroupInputsWidget.cxx
+  vtkPVHorizontalAnimationInterface.cxx
   vtkPVIceTRenderModuleUI.cxx
   vtkPVImplicitPlaneWidget.cxx
   vtkPVInformationGUI.cxx
@@ -131,6 +126,7 @@ SET( ParaViewClient_SRCS
   vtkPVInputProperty.cxx
   vtkPVInputRequirement.cxx
   vtkPVInteractorStyleControl.cxx
+  vtkPVItemSelection.cxx
   vtkPVJoystickFly.cxx
   vtkPVJoystickFlyIn.cxx
   vtkPVJoystickFlyOut.cxx
@@ -157,6 +153,7 @@ SET( ParaViewClient_SRCS
   vtkPVProbe.cxx
   vtkPVPropertyKeyFrame.cxx
   vtkPVProxyKeyFrame.cxx
+  vtkPVRampKeyFrame.cxx
   vtkPVRawReaderModule.cxx
   vtkPVReaderModule.cxx
   vtkPVRenderModuleUI.cxx
@@ -172,6 +169,7 @@ SET( ParaViewClient_SRCS
   vtkPVSelectionList.cxx
   vtkPVServerFileDialog.cxx
   vtkPVSimpleAnimationCue.cxx
+  vtkPVSinusoidKeyFrame.cxx
   vtkPVSource.cxx
   vtkPVSourceCollection.cxx
   vtkPVSourceList.cxx
@@ -182,6 +180,7 @@ SET( ParaViewClient_SRCS
   vtkPVTempTessellatorEntry.cxx
   vtkPVTextPropertyEditor.cxx
   vtkPVThumbWheel.cxx
+  vtkPVTimeLine.cxx
   vtkPVTimerLogDisplay.cxx
   vtkPVTraceFileDialog.cxx
   vtkPVTraceHelper.cxx
@@ -195,6 +194,7 @@ SET( ParaViewClient_SRCS
   vtkPVValueList.cxx
   vtkPVVCRControl.cxx
   vtkPVVectorEntry.cxx
+  vtkPVVerticalAnimationInterface.cxx
   vtkPVVolumeAppearanceEditor.cxx
   vtkPVVolumePropertyWidget.cxx
   vtkPVWidget.cxx
