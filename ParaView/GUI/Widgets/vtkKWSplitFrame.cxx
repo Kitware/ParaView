@@ -17,7 +17,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.40");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.41");
 
 //----------------------------------------------------------------------------
 vtkKWSplitFrame::vtkKWSplitFrame()
@@ -536,6 +536,37 @@ void vtkKWSplitFrame::SetFrame2Size(int size)
     }
 
   this->Pack();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSplitFrame::SetSeparatorPosition(double pos)
+{
+  if (pos < 0.0)
+    {
+    pos = 0.0;
+    }
+  if (pos > 1.0)
+    {
+    pos = 1.0;
+    }
+  if (this->GetSeparatorPosition() == pos)
+    {
+    return;
+    }
+
+  double total_size = (double)(this->GetFrame1Size() + this->GetFrame2Size());
+  this->SetFrame1Size((int)(pos * total_size));
+}
+
+//----------------------------------------------------------------------------
+double vtkKWSplitFrame::GetSeparatorPosition()
+{
+  int total_size = this->GetFrame1Size() + this->GetFrame2Size();
+  if (total_size)
+    {
+    return (double)this->GetFrame1Size() / (double)total_size;
+    }
+  return 0.0;
 }
 
 //----------------------------------------------------------------------------
