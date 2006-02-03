@@ -48,6 +48,7 @@ IF(NOT VTK_SOURCE_DIR)
     ENABLE_TESTING()
   ENDIF(BUILD_TESTING)
   SET(BUILDNAME "${PROJECT_NAME}-${BUILDNAME}")
+  MARK_AS_ADVANCED(CMAKE_BACKWARDS_COMPATIBILITY)
 ENDIF(NOT VTK_SOURCE_DIR)
 
 # --------------------------------------------------------------------------
@@ -390,13 +391,14 @@ ENDFOREACH(WidgetType)
 # --------------------------------------------------------------------------
 # SOViewer support
 
-OPTION(KWWidgets_USE_SOVIEWER "Use the SOViewer library and build the corresponding support classes and examples." OFF)
+OPTION(KWWidgets_USE_SOVIEWER "Use the SOViewer library (SOV_DIR) and build the corresponding support classes and examples." OFF)
 MARK_AS_ADVANCED(KWWidgets_USE_SOVIEWER)
 IF(KWWidgets_USE_SOVIEWER)
   FIND_PACKAGE(SOV REQUIRED)
   IF(SOV_FOUND)
     INCLUDE(${SOV_USE_FILE})
     MARK_AS_ADVANCED(FLTK_FLUID_EXECUTABLE)
+    MARK_AS_ADVANCED(SOV_DIR)
   ENDIF(SOV_FOUND)
 ENDIF(KWWidgets_USE_SOVIEWER)
 
