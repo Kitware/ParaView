@@ -137,7 +137,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.780");
+vtkCxxRevisionMacro(vtkPVWindow, "1.781");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -3235,6 +3235,8 @@ void vtkPVWindow::SaveState(const char* filename)
   if (glyphSources->GetNumberOfItems() > 0)
     {
     *file << "\n# Glyph Sources" << endl;
+    // We don't need to clear the VisitedFlag for glyph sources
+    // since it is never set for glyph sources.
     while (!cit->IsDoneWithTraversal())
       {
       pvs = static_cast<vtkPVSource*>(cit->GetCurrentObject());

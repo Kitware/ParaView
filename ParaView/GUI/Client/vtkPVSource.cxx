@@ -65,7 +65,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.474");
+vtkCxxRevisionMacro(vtkPVSource, "1.475");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -2492,6 +2492,20 @@ void vtkPVSource::SaveState(ofstream *file)
   // Let the PVWidgets set up the object.
   numWidgets = this->Widgets->GetNumberOfItems();
   vtkCollectionIterator *it = this->Widgets->NewIterator();
+  it->InitTraversal();
+
+  for (i=0; i < numWidgets; i++)
+    {
+    // Before we start saving the state the TraceHelper needs to 
+    // realize that this is a fresh state for the widgets. Hence,
+    // we must clear the StateInitialized flag.
+    // Note that this will propagate the StateInitialized state to the 
+    // reference object for the widgets 
+    pvw = static_cast<vtkPVWidget*>(it->GetCurrentObject());
+    pvw->GetTraceHelper()->StateInitializedOff();
+    it->GoToNextItem();
+    }
+
   it->InitTraversal();
   for (i = 0; i < numWidgets; i++)
     {

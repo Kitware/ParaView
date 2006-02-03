@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTraceHelper );
-vtkCxxRevisionMacro(vtkPVTraceHelper, "1.5");
+vtkCxxRevisionMacro(vtkPVTraceHelper, "1.6");
 
 #if vtkPVTraceHelper_RefCountReferenceHelper
 vtkCxxSetObjectMacro(vtkPVTraceHelper, ReferenceHelper,
@@ -96,6 +96,16 @@ ofstream* vtkPVTraceHelper::GetFile()
 int vtkPVTraceHelper::Initialize()
 {
   return this->Initialize(NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVTraceHelper::SetStateInitialized(int init)
+{
+  if (this->ReferenceHelper)
+    {
+    this->ReferenceHelper->SetStateInitialized(init);
+    }
+  this->StateInitialized = init;
 }
 
 //----------------------------------------------------------------------------
