@@ -83,7 +83,7 @@ $source_panel SetUserInterfaceManager [$win GetSecondaryUserInterfaceManager]
 $source_panel Create
 [$win GetSecondaryNotebook] AlwaysShowTabsOff
 
-# Add a page, and divide it using a split frame
+# Add a page, and divide it using split frames
 
 $source_panel AddPage "Source" "Display the example source" ""
 set page_widget [$source_panel GetPageWidget "Source"]
@@ -94,6 +94,38 @@ $source_split SetExpandableFrameToBothFrames
 $source_split Create
 
 pack [$source_split GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
+
+set source_split2 [vtkKWSplitFrame New]
+$source_split2 SetParent [$source_split GetFrame2]
+$source_split2 SetExpandableFrameToBothFrames
+$source_split2 Create
+
+pack [$source_split2 GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
+
+# Add radiobuttons to show/hide the panels
+
+set panel_vis_buttons [vtkKWCheckButtonSet New]
+$panel_vis_buttons SetParent $page_widget
+$panel_vis_buttons PackHorizontallyOn 
+$panel_vis_buttons Create
+
+set cb [$panel_vis_buttons AddWidget 0]
+$cb SetText "Tcl"
+$cb SetCommand $source_split "SetFrame1Visibility"
+$cb SetSelectedState [$source_split GetFrame1Visibility]
+
+set cb [$panel_vis_buttons AddWidget 1]
+$cb SetText "C++"
+$cb SetCommand $source_split2 "SetFrame1Visibility"
+$cb SetSelectedState [$source_split2 GetFrame1Visibility]
+
+set cb [$panel_vis_buttons AddWidget 2]
+$cb SetText "Python"
+$cb SetCommand $source_split2 "SetFrame2Visibility"
+$cb SetSelectedState [$source_split2 GetFrame2Visibility]
+
+pack [$panel_vis_buttons GetWidgetName] -side top -anchor w
+
 # Add text widget to display the Tcl example source
 
 set tcl_source_text [vtkKWTextWithScrollbarsWithLabel New]
@@ -118,7 +150,7 @@ pack [$tcl_source_text GetWidgetName] -side top -expand y -fill both -padx 2 -pa
 # Add text widget to display the C++ example source
 
 set cxx_source_text [vtkKWTextWithScrollbarsWithLabel New]
-$cxx_source_text SetParent [$source_split GetFrame2]
+$cxx_source_text SetParent [$source_split2 GetFrame1]
 $cxx_source_text Create
 $cxx_source_text SetLabelPositionToTop
 $cxx_source_text SetLabelText "C++ Source"
@@ -137,6 +169,28 @@ $text AddTagMatcher "<\[^>\]*>" "_fg_blue_tag_"
 $text AddTagMatcher "vtk\[A-Z\]\[a-zA-Z0-9_\]+" "_fg_dark_green_tag_"
 
 pack [$cxx_source_text GetWidgetName] -side top -expand y -fill both -padx 2 -pady 2
+
+# Add text widget to display the Python example source
+
+set python_source_text [vtkKWTextWithScrollbarsWithLabel New]
+$python_source_text SetParent [$source_split2 GetFrame2]
+$python_source_text Create
+$python_source_text SetLabelPositionToTop
+$python_source_text SetLabelText "Python Source"
+
+set text_widget [$python_source_text GetWidget]
+$text_widget VerticalScrollbarVisibilityOn
+
+set text [$text_widget GetWidget]
+$text ReadOnlyOn
+$text SetWrapToNone
+$text SetHeight 3000
+$text AddTagMatcher "^from \[a-z\]+ import" "_fg_red_tag_"
+$text AddTagMatcher "#\[^\n\]*" "_fg_navy_tag_"
+$text AddTagMatcher "\"\[^\"\]*\"" "_fg_blue_tag_"
+$text AddTagMatcher "vtk\[A-Z\]\[a-zA-Z0-9_\]+" "_fg_dark_green_tag_"
+
+pack [$python_source_text GetWidgetName] -side top -expand y -fill both -padx 2 -pady 2
 
 # Populate the examples
 # Create a panel for each one, and pass the frame
@@ -178,7 +232,7 @@ foreach widget $widgets {
 
     set tcl_source($name) [read [open "$widget"]]
 
-    # Try to find the C++ source too
+    # Try to find the C++ source
 
     set cxx_source_name [file join [file dirname [info script]] ".." ".." Cxx WidgetsTour Widgets ${name}.cxx]
     if {[file exists $cxx_source_name]} {
@@ -186,17 +240,27 @@ foreach widget $widgets {
     } else {
       set cxx_source($name) {}
     }
+
+    # Try to find the Python source
+
+    set python_source_name [file join [file dirname [info script]] ".." ".." Python WidgetsTour Widgets ${name}.py]
+    if {[file exists $python_source_name]} {
+      set python_source($name) [read [open "$python_source_name"]]
+    } else {
+      set python_source($name) {}
+    }
   }
 }
 
 # Raise the example panel
 
 proc selection_callback {} {
-  global tcl_source cxx_source widgets_tree tcl_source_text cxx_source_text win
+  global tcl_source cxx_source python_source widgets_tree tcl_source_text cxx_source_text python_source_text win
   if [[$widgets_tree GetWidget] HasSelection] {
     $win ShowViewUserInterface [[$widgets_tree GetWidget] GetSelection]
     [[$tcl_source_text GetWidget] GetWidget] SetText $tcl_source([[$widgets_tree GetWidget] GetSelection]) 
     [[$cxx_source_text GetWidget] GetWidget] SetText $cxx_source([[$widgets_tree GetWidget] GetSelection])
+    [[$python_source_text GetWidget] GetWidget] SetText $python_source([[$widgets_tree GetWidget] GetSelection])
   } 
 }
 
@@ -208,6 +272,10 @@ proc selection_callback {} {
 
 set ret 0
 $win Display
+
+update
+$source_split SetSeparatorPosition 0.33
+
 if {!$option_test} {
   $app Start
   set ret [$app GetExitStatus]
@@ -226,12 +294,14 @@ foreach class {vtkImageViewer2 vtkKWRenderWidget} {
 
 $win Delete
 
+$panel_vis_buttons Delete
 $widgets_panel Delete
 $widgets_tree Delete
 $source_panel Delete
 $source_split Delete
 $tcl_source_text Delete
 $cxx_source_text Delete
+$python_source_text Delete
 $app Delete
 
 # And delete all the remaining objects that were created by each example
