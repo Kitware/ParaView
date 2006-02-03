@@ -254,9 +254,10 @@ int my_main(int argc, char *argv[])
   text->ReadOnlyOn();
   text->SetWrapToNone();
   text->SetHeight(3000);
-  text->AddTagMatcher("^from [a-z]+ import", "_fg_red_tag_");
+  text->AddTagMatcher("(^| +)(import|from) ", "_fg_red_tag_");
   text->AddTagMatcher("#[^\n]*", "_fg_navy_tag_");
   text->AddTagMatcher("\"[^\"]*\"", "_fg_blue_tag_");
+  text->AddTagMatcher("\'[^\']*\'", "_fg_blue_tag_");
   text->AddTagMatcher("vtk[A-Z][a-zA-Z0-9_]+", "_fg_dark_green_tag_");
 
   app->Script("pack %s -side top -expand y -fill both -padx 2 -pady 2", 

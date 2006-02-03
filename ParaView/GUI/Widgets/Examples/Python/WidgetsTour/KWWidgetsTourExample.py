@@ -109,7 +109,7 @@ def main(argv):
     source_panel.Create()
     win.GetSecondaryNotebook().AlwaysShowTabsOff()
 
-    # Add a page, and divide it using a split frame
+    # Add a page, and divide it using split frames
 
     source_panel.AddPage("Source", "Display the example source", None)
     page_widget = source_panel.GetPageWidget("Source")
@@ -122,10 +122,89 @@ def main(argv):
     app.Script("pack %s -side top -expand y -fill both -padx 0 -pady 0",
                source_split.GetWidgetName())
 
+    source_split2 = vtkKWSplitFrame()
+    source_split2.SetParent(source_split.GetFrame2())
+    source_split2.SetExpandableFrameToBothFrames()
+    source_split2.Create()
+
+    app.Script("pack %s -side top -expand y -fill both -padx 0 -pady 0",
+               source_split2.GetWidgetName())
+
+    # Add checkbuttons to show/hide the panels
+ 	 
+    panel_vis_buttons = vtkKWCheckButtonSet()
+    panel_vis_buttons.SetParent(page_widget)
+    panel_vis_buttons.PackHorizontallyOn()
+    panel_vis_buttons.Create()
+ 	 
+    cb = panel_vis_buttons.AddWidget(0)
+    cb.SetText("Tcl")
+    cb.SetCommand(source_split, "SetFrame1Visibility")
+    cb.SetSelectedState(source_split.GetFrame1Visibility())
+ 	 
+    cb = panel_vis_buttons.AddWidget(1)
+    cb.SetText("C++")
+    cb.SetCommand(source_split2, "SetFrame1Visibility")
+    cb.SetSelectedState(source_split2.GetFrame1Visibility())
+ 	 
+    cb = panel_vis_buttons.AddWidget(2)
+    cb.SetText("Python")
+    cb.SetCommand(source_split2, "SetFrame2Visibility")
+    cb.SetSelectedState(source_split2.GetFrame2Visibility())
+ 	 
+    app.Script("pack %s -side top -anchor w",
+               panel_vis_buttons.GetWidgetName())
+
+    # Add text widget to display the Tcl example source
+
+    tcl_source_text = vtkKWTextWithScrollbarsWithLabel()
+    tcl_source_text.SetParent(source_split.GetFrame1())
+    tcl_source_text.Create()
+    tcl_source_text.SetLabelPositionToTop()
+    tcl_source_text.SetLabelText("Tcl Source")
+
+    text_widget = tcl_source_text.GetWidget()
+    text_widget.VerticalScrollbarVisibilityOn()
+
+    text = text_widget.GetWidget()
+    text.ReadOnlyOn()
+    text.SetWrapToNone()
+    text.SetHeight(3000)
+    text.AddTagMatcher("#[^\n]*", "_fg_navy_tag_")
+    text.AddTagMatcher("\"[^\"]*\"", "_fg_blue_tag_")
+    text.AddTagMatcher("vtk[A-Z][a-zA-Z0-9_]+", "_fg_dark_green_tag_")
+
+    app.Script("pack %s -side top -expand y -fill both -padx 2 -pady 2",
+                tcl_source_text.GetWidgetName())
+    
+    # Add text widget to display the C++ example source
+
+    cxx_source_text = vtkKWTextWithScrollbarsWithLabel()
+    cxx_source_text.SetParent(source_split2.GetFrame1())
+    cxx_source_text.Create()
+    cxx_source_text.SetLabelPositionToTop()
+    cxx_source_text.SetLabelText("C++ Source")
+
+    text_widget = cxx_source_text.GetWidget()
+    text_widget.VerticalScrollbarVisibilityOn()
+
+    text = text_widget.GetWidget()
+    text.ReadOnlyOn()
+    text.SetWrapToNone()
+    text.SetHeight(3000)
+    text.AddTagMatcher("#[a-z]+", "_fg_red_tag_")
+    text.AddTagMatcher("//[^\n]*", "_fg_navy_tag_")
+    text.AddTagMatcher("\"[^\"]*\"", "_fg_blue_tag_")
+    text.AddTagMatcher("<[^>]*>", "_fg_blue_tag_")
+    text.AddTagMatcher("vtk[A-Z][a-zA-Z0-9_]+", "_fg_dark_green_tag_")
+
+    app.Script("pack %s -side top -expand y -fill both -padx 2 -pady 2",
+                cxx_source_text.GetWidgetName())
+    
     # Add text widget to display the Python example source
 
     python_source_text = vtkKWTextWithScrollbarsWithLabel()
-    python_source_text.SetParent(source_split.GetFrame1())
+    python_source_text.SetParent(source_split2.GetFrame2())
     python_source_text.Create()
     python_source_text.SetLabelPositionToTop()
     python_source_text.SetLabelText("Python Source")
@@ -146,31 +225,6 @@ def main(argv):
     app.Script("pack %s -side top -expand y -fill both -padx 2 -pady 2",
                 python_source_text.GetWidgetName())
     
-    # Add text widget to display the C++ example source
-
-    cxx_source_text = vtkKWTextWithScrollbarsWithLabel()
-    cxx_source_text.SetParent(source_split.GetFrame2())
-    cxx_source_text.Create()
-    cxx_source_text.SetLabelPositionToTop()
-    cxx_source_text.SetLabelText("C++ Source")
-
-    text_widget = cxx_source_text.GetWidget()
-    text_widget.VerticalScrollbarVisibilityOn()
-
-    text = text_widget.GetWidget()
-    text.ReadOnlyOn()
-    text.SetWrapToNone()
-    text.SetHeight(3000)
-    text.AddTagMatcher("#[a-z]+", "_fg_red_tag_")
-    text.AddTagMatcher("//[^\n]*", "_fg_navy_tag_")
-    text.AddTagMatcher("\"[^\"]*\"", "_fg_blue_tag_")
-    text.AddTagMatcher("<[^>]*>", "_fg_blue_tag_")
-    text.AddTagMatcher("vtk[A-Z][a-zA-Z0-9_]+", "_fg_dark_green_tag_")
-
-
-    app.Script("pack %s -side top -expand y -fill both -padx 2 -pady 2",
-                cxx_source_text.GetWidgetName())
-    
     # Populate the examples
     # Create a panel for each one, and pass the frame
 
@@ -183,6 +237,7 @@ def main(argv):
     modules = []
     python_source = {}
     cxx_source = {}
+    tcl_source = {}
 
     for widget in widgets:
         name = os.path.splitext(os.path.basename(widget))[0]
@@ -221,7 +276,7 @@ def main(argv):
             app.Script("set python_source(%s) {%s}",
                        name, python_source[name])
 
-            # Try to find the C++ source too
+            # Try to find the C++ source
 
             cxx_source_name = os.path.join(
                 os.path.dirname(os.path.abspath(__file__)), "..", "..",
@@ -237,6 +292,22 @@ def main(argv):
 
             app.Script("set cxx_source(%s) {%s}", name, cxx_source[name])
 
+            # Try to find the Tcl source too
+
+            tcl_source_name = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "..", "..",
+                "Tcl", "WidgetsTour", "Widgets", name + ".tcl")
+
+            try:
+                file = open(tcl_source_name, "r")
+                tcl_source[name] = file.read()
+                file.close()
+            except IOError:
+                print "Error"
+                tcl_source[name] = ""
+
+            app.Script("set tcl_source(%s) {%s}", name, tcl_source[name])
+
     # Raise the example panel
 
     command = ("if [%s HasSelection] {"
@@ -245,6 +316,9 @@ def main(argv):
                % (win.GetTclName(), widgets_tree.GetWidget().GetTclName()) +
                "%s SetText $cxx_source([%s GetSelection]) ; "
                % (cxx_source_text.GetWidget().GetWidget().GetTclName(),
+                  widgets_tree.GetWidget().GetTclName()) +
+               "%s SetText $tcl_source([%s GetSelection]) ; "
+               % (tcl_source_text.GetWidget().GetWidget().GetTclName(),
                   widgets_tree.GetWidget().GetTclName()) +
                "%s SetText $python_source([%s GetSelection]) }"
                % (python_source_text.GetWidget().GetWidget().GetTclName(),
@@ -258,6 +332,10 @@ def main(argv):
 
     ret = 0
     win.Display()
+
+    app.Script("update")
+    source_split.SetSeparatorPosition(0.33)
+    
     if not option_test:
         app.Start(len(sys.argv), sys.argv)
         ret = app.GetExitStatus()
