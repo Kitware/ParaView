@@ -102,7 +102,7 @@ $source_split2 Create
 
 pack [$source_split2 GetWidgetName] -side top -expand y -fill both -padx 0 -pady 0
 
-# Add radiobuttons to show/hide the panels
+# Add checkbuttons to show/hide the panels
 
 set panel_vis_buttons [vtkKWCheckButtonSet New]
 $panel_vis_buttons SetParent $page_widget
@@ -299,6 +299,7 @@ $widgets_panel Delete
 $widgets_tree Delete
 $source_panel Delete
 $source_split Delete
+$source_split2 Delete
 $tcl_source_text Delete
 $cxx_source_text Delete
 $python_source_text Delete

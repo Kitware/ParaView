@@ -1,5 +1,6 @@
 #include "vtkKWApplication.h"
-#include "vtkKWApplication.h"
+#include "vtkKWCheckButton.h"
+#include "vtkKWCheckButtonSet.h"
 #include "vtkKWFrame.h"
 #include "vtkKWTree.h"
 #include "vtkKWTreeWithScrollbars.h"
@@ -12,6 +13,7 @@
 #include "vtkKWUserInterfaceManager.h"
 #include "vtkKWUserInterfacePanel.h"
 #include "vtkKWWindow.h"
+#include "vtkKWTkUtilities.h"
 
 #include "vtkKWWidgetsPaths.h"
 
@@ -142,7 +144,7 @@ int my_main(int argc, char *argv[])
   source_panel->Create();
   win->GetSecondaryNotebook()->AlwaysShowTabsOff();
 
-  // Add a page, and divide it using a split frame
+  // Add a page, and divide it using split frames
 
   source_panel->AddPage("Source", "Display the example source", NULL);
   page_widget = source_panel->GetPageWidget("Source");
@@ -154,6 +156,39 @@ int my_main(int argc, char *argv[])
 
   app->Script("pack %s -side top -expand y -fill both -padx 0 -pady 0", 
               source_split->GetWidgetName());
+
+  vtkKWSplitFrame *source_split2 = vtkKWSplitFrame::New();
+  source_split2->SetParent(source_split->GetFrame2());
+  source_split2->SetExpandableFrameToBothFrames();
+  source_split2->Create();
+
+  app->Script("pack %s -side top -expand y -fill both -padx 0 -pady 0", 
+              source_split2->GetWidgetName());
+
+  // Add checkbuttons to show/hide the panels
+
+  vtkKWCheckButtonSet *panel_vis_buttons = vtkKWCheckButtonSet::New();
+  panel_vis_buttons->SetParent(page_widget);
+  panel_vis_buttons->PackHorizontallyOn();
+  panel_vis_buttons->Create();
+
+  vtkKWCheckButton *cb = panel_vis_buttons->AddWidget(0);
+  cb->SetText("Tcl");
+  cb->SetCommand(source_split, "SetFrame1Visibility");
+  cb->SetSelectedState(source_split->GetFrame1Visibility());
+
+  cb = panel_vis_buttons->AddWidget(1);
+  cb->SetText("C++");
+  cb->SetCommand(source_split2, "SetFrame1Visibility");
+  cb->SetSelectedState(source_split2->GetFrame1Visibility());
+
+  cb = panel_vis_buttons->AddWidget(2);
+  cb->SetText("Python");
+  cb->SetCommand(source_split2, "SetFrame2Visibility");
+  cb->SetSelectedState(source_split2->GetFrame2Visibility());
+
+  app->Script("pack %s -side top -anchor w", 
+              panel_vis_buttons->GetWidgetName());
 
   // Add text widget to display the Tcl example source
 
@@ -182,7 +217,7 @@ int my_main(int argc, char *argv[])
 
   vtkKWTextWithScrollbarsWithLabel *cxx_source_text = 
     vtkKWTextWithScrollbarsWithLabel::New();
-  cxx_source_text->SetParent(source_split->GetFrame2());
+  cxx_source_text->SetParent(source_split2->GetFrame1());
   cxx_source_text->Create();
   cxx_source_text->SetLabelPositionToTop();
   cxx_source_text->SetLabelText("C++ Source");
@@ -202,6 +237,30 @@ int my_main(int argc, char *argv[])
 
   app->Script("pack %s -side top -expand y -fill both -padx 2 -pady 2", 
               cxx_source_text->GetWidgetName());
+
+  // Add text widget to display the Python++ example source
+
+  vtkKWTextWithScrollbarsWithLabel *python_source_text = 
+    vtkKWTextWithScrollbarsWithLabel::New();
+  python_source_text->SetParent(source_split2->GetFrame2());
+  python_source_text->Create();
+  python_source_text->SetLabelPositionToTop();
+  python_source_text->SetLabelText("Python Source");
+
+  text_widget = python_source_text->GetWidget();
+  text_widget->VerticalScrollbarVisibilityOn();
+
+  text = text_widget->GetWidget();
+  text->ReadOnlyOn();
+  text->SetWrapToNone();
+  text->SetHeight(3000);
+  text->AddTagMatcher("^from [a-z]+ import", "_fg_red_tag_");
+  text->AddTagMatcher("#[^\n]*", "_fg_navy_tag_");
+  text->AddTagMatcher("\"[^\"]*\"", "_fg_blue_tag_");
+  text->AddTagMatcher("vtk[A-Z][a-zA-Z0-9_]+", "_fg_dark_green_tag_");
+
+  app->Script("pack %s -side top -expand y -fill both -padx 2 -pady 2", 
+              python_source_text->GetWidgetName());
 
   // Populate the examples
   // Create a panel for each one, and pass the frame
@@ -297,6 +356,30 @@ int my_main(int argc, char *argv[])
         {
         app->Script("set tcl_source(%s) {}", node_ptr->Name);
         }
+
+      // Try to find the Python source
+
+      sprintf(
+        buffer, 
+        "%s/Python/WidgetsTour/Widgets/%s.py", 
+        KWWidgets_EXAMPLES_DIR, node_ptr->Name);
+
+      if (!vtksys::SystemTools::FileExists(buffer))
+        {
+        sprintf(buffer, 
+                "%s/..%s/Examples/Python/WidgetsTour/Widgets/%s.py",
+                app->GetInstallationDirectory(), KWWidgets_INSTALL_DATA_DIR,
+                node_ptr->Name);
+        }
+      if (vtksys::SystemTools::FileExists(buffer))
+        {
+        app->Script("set python_source(%s) [read [open \"%s\"]]", 
+                    node_ptr->Name, buffer);
+        }
+      else
+        {
+        app->Script("set python_source(%s) {}", node_ptr->Name);
+        }
       }
     node_ptr++;
     }
@@ -308,13 +391,16 @@ int my_main(int argc, char *argv[])
           "if [%s HasSelection] {"
           "%s ShowViewUserInterface [%s GetSelection] ; "
           "%s SetText $cxx_source([%s GetSelection]) ; "
-          "%s SetText $tcl_source([%s GetSelection]) }",
+          "%s SetText $tcl_source([%s GetSelection]) ; "
+          "%s SetText $python_source([%s GetSelection]) }",
           widgets_tree->GetWidget()->GetTclName(),
           win->GetTclName(),
           widgets_tree->GetWidget()->GetTclName(),
           cxx_source_text->GetWidget()->GetWidget()->GetTclName(),
           widgets_tree->GetWidget()->GetTclName(),
           tcl_source_text->GetWidget()->GetWidget()->GetTclName(),
+          widgets_tree->GetWidget()->GetTclName(),
+          python_source_text->GetWidget()->GetWidget()->GetTclName(),
           widgets_tree->GetWidget()->GetTclName());
 
   widgets_tree->GetWidget()->SetSelectionChangedCommand(NULL, buffer);
@@ -325,6 +411,10 @@ int my_main(int argc, char *argv[])
 
   int ret = 0;
   win->Display();
+
+  vtkKWTkUtilities::ProcessPendingEvents(app);
+  source_split->SetSeparatorPosition(0.33);
+
   if (!option_test)
     {
     app->Start(argc, argv);
@@ -342,12 +432,16 @@ int my_main(int argc, char *argv[])
     }
 
   win->Delete();
+
+  panel_vis_buttons->Delete();
   widgets_panel->Delete();
   widgets_tree->Delete();
   source_panel->Delete();
   source_split->Delete();
+  source_split2->Delete();
   tcl_source_text->Delete();
   cxx_source_text->Delete();
+  python_source_text->Delete();
   app->Delete();
   
   return ret;
