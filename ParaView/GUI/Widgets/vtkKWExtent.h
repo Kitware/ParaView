@@ -40,17 +40,17 @@ public:
   // Set the Range of the Extent, this is the range of
   // acceptable values for the sliders. Specified as 
   // minx maxx miny maxy minz maxz
-  virtual void SetExtentRange(double*);
+  virtual void SetExtentRange(const double extent[6]);
   virtual void SetExtentRange(double, double, double, double, double, double);
   virtual double* GetExtentRange();
   virtual void GetExtentRange(
     double&, double&, double&, double&, double&, double&);
-  virtual void GetExtentRange(double*);
+  virtual void GetExtentRange(double extent[6]);
   
   // Description:
   // Set/Get the Extent.
   vtkGetVector6Macro(Extent,double);
-  virtual void SetExtent(double*);
+  virtual void SetExtent(const double extent[6]);
   virtual void SetExtent(double, double, double, double, double, double);
 
   // Description:

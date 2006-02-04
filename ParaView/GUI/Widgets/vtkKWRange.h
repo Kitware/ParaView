@@ -47,14 +47,14 @@ public:
   // Set/Get the whole range.
   vtkGetVector2Macro(WholeRange, double);
   virtual void SetWholeRange(double r0, double r1);
-  virtual void SetWholeRange(double range[2]) 
+  virtual void SetWholeRange(const double range[2]) 
     { this->SetWholeRange(range[0], range[1]); };
 
   // Description:
   // Set/Get the current (sub-)range.
   vtkGetVector2Macro(Range, double);
   virtual void SetRange(double r0, double r1);
-  virtual void SetRange(double *range) 
+  virtual void SetRange(const double range[2]) 
     { this->SetRange(range[0], range[1]); };
 
   // Description:
@@ -63,7 +63,7 @@ public:
   virtual void GetRelativeRange(double range[2])
     { this->GetRelativeRange(range[0], range[1]); };
   virtual void SetRelativeRange(double r0, double r1);
-  virtual void SetRelativeRange(double range[2])
+  virtual void SetRelativeRange(const double range[2])
     { this->SetRelativeRange(range[0], range[1]); };
   
   // Description:
