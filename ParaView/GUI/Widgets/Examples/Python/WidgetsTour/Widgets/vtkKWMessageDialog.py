@@ -1,4 +1,8 @@
-from kwwidgets import *
+from kwwidgets import vtkKWMessageDialog
+from kwwidgets import vtkKWPushButton
+from kwwidgets import vtkKWApplication
+from kwwidgets import vtkKWWindow
+
 
 
 def vtkKWMessageDialogEntryPoint(parent, win):

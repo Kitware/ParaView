@@ -1,4 +1,7 @@
-from kwwidgets import *
+from kwwidgets import vtkKWTree
+from kwwidgets import vtkKWApplication
+from kwwidgets import vtkKWWindow
+
 
 
 def vtkKWTreeEntryPoint(parent, win):

@@ -1,5 +1,11 @@
-from vtk import *
-from kwwidgets import *
+from kwwidgets import vtkKWFrameWithScrollbar
+from vtk import vtkColorTransferFunction
+from kwwidgets import vtkKWApplication
+from kwwidgets import vtkKWVolumePropertyWidget
+from kwwidgets import vtkKWWindow
+from vtk import vtkPiecewiseFunction
+from vtk import vtkVolumeProperty
+
 
 
 def vtkKWVolumePropertyWidgetEntryPoint(parent, win):
@@ -53,7 +59,7 @@ def vtkKWVolumePropertyWidgetEntryPoint(parent, win):
     vpw.SetVolumeProperty(vpw_vp)
     vpw.SetWindowLevel(128, 128)
     
-    #vpw->MergeScalarOpacityAndColorEditors();
+    #vpw.MergeScalarOpacityAndColorEditors()
     
     
     

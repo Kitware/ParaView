@@ -1,4 +1,8 @@
-from kwwidgets import *
+from kwwidgets import vtkKWChangeColorButton
+from kwwidgets import vtkKWApplication
+from kwwidgets import vtkKWWindow
+from kwwidgets import vtkKWLabel
+
 
 
 def vtkKWChangeColorButtonEntryPoint(parent, win):
@@ -16,7 +20,7 @@ def vtkKWChangeColorButtonEntryPoint(parent, win):
     ccb1.SetLabelPositionToLeft()
     ccb1.SetLabelText("Set Background Color")
     ccb1.SetCommand(parent, "SetBackgroundColor")
-    ccb1.SetColor(vtkKWCoreWidget.SafeDownCast(parent).GetBackgroundColor())
+    ccb1.SetColor(parent.GetBackgroundColor())
     ccb1.SetBalloonHelpString(
         "A color button. Note that the label is inside the button. Its position "
         "can be changed. It sets the background color of its parent.")

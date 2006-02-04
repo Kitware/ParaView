@@ -1,4 +1,10 @@
-from kwwidgets import *
+from kwwidgets import vtkKWCheckButton
+from kwwidgets import vtkKWCheckButtonWithLabel
+from kwwidgets import vtkKWCheckButtonSet
+from kwwidgets import vtkKWApplication
+from kwwidgets import vtkKWWindow
+from kwwidgets import vtkKWIcon
+
 
 
 def vtkKWCheckButtonEntryPoint(parent, win):
@@ -25,7 +31,7 @@ def vtkKWCheckButtonEntryPoint(parent, win):
     cb2 = vtkKWCheckButton()
     cb2.SetParent(parent)
     cb2.Create()
-    cb2.SetImageToPredefinedIcon(62)
+    cb2.SetImageToPredefinedIcon(vtkKWIcon.IconLock)
     cb2.IndicatorVisibilityOff()
     cb2.SetBalloonHelpString("This time, use one of the predefined icon")
     

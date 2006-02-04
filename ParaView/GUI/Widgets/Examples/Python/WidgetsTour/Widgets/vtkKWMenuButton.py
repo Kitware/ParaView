@@ -1,4 +1,9 @@
-from kwwidgets import *
+from kwwidgets import vtkKWMenuButton
+from kwwidgets import vtkKWMenuButtonWithSpinButtons
+from kwwidgets import vtkKWMenuButtonWithLabel
+from kwwidgets import vtkKWApplication
+from kwwidgets import vtkKWWindow
+
 
 
 def vtkKWMenuButtonEntryPoint(parent, win):

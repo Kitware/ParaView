@@ -1,4 +1,7 @@
-from kwwidgets import *
+from kwwidgets import vtkKWListBoxToListBoxSelectionEditor
+from kwwidgets import vtkKWApplication
+from kwwidgets import vtkKWWindow
+
 
 
 def vtkKWListBoxToListBoxSelectionEditorEntryPoint(parent, win):
