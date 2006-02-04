@@ -7,6 +7,7 @@ from kwwidgets import *
 import sys
 import os
 import imp
+import traceback
 from glob import glob
 
 # Process some command-line arguments
@@ -216,7 +217,7 @@ def main(argv):
     text.ReadOnlyOn()
     text.SetWrapToNone()
     text.SetHeight(3000)
-    text.AddTagMatcher("(^| +)(import|from) ", "_fg_red_tag_")
+    text.AddTagMatcher("(\n|^| )(import|from) ", "_fg_red_tag_")
     text.AddTagMatcher("#[^\n]*", "_fg_navy_tag_")
     text.AddTagMatcher("\"[^\"]*\"", "_fg_blue_tag_")
     text.AddTagMatcher("\'[^\']*\'", "_fg_blue_tag_")
@@ -239,6 +240,8 @@ def main(argv):
     cxx_source = {}
     tcl_source = {}
 
+    caught_exception = 0
+
     for widget in widgets:
         name = os.path.splitext(os.path.basename(widget))[0]
         modules.append(name)
@@ -253,60 +256,70 @@ def main(argv):
             app.GetSplashScreen().SetProgressMessage(name)
 
         file,directory,desc = imp.find_module(name, [os.path.dirname(widget)])
-        module = imp.load_module(name, file, directory, desc)
-        file.close()
-
-        entry_func = getattr(module, name + "EntryPoint")
-        widget_type = entry_func(panel.GetPageWidget(panel.GetName()), win)
-        if widget_type:
-            parent_nome = None
-            if widget_type == "TypeCore":
-                parent_node = "core"
-            elif widget_type == "TypeComposite":
-                parent_node = "composite"
-            elif widget_type == "TypeVTK":
-                parent_node = "vtk"
-
-            widgets_tree.GetWidget().AddNode(parent_node, name, name)
-
-            file = open(widget, "r")
-            python_source[name] = file.read()
-            file.close()
+        try:
+            module = imp.load_module(name, file, directory, desc)
             
-            app.Script("set python_source(%s) {%s}",
-                       name, python_source[name])
+            entry_func = getattr(module, name + "EntryPoint")            
+            widget_type = entry_func(panel.GetPageWidget(panel.GetName()), win)
+            if widget_type:
+                parent_nome = None
+                if widget_type == "TypeCore":
+                    parent_node = "core"
+                elif widget_type == "TypeComposite":
+                    parent_node = "composite"
+                elif widget_type == "TypeVTK":
+                    parent_node = "vtk"
 
-            # Try to find the C++ source
+                widgets_tree.GetWidget().AddNode(parent_node, name, name)
 
-            cxx_source_name = os.path.join(
-                os.path.dirname(os.path.abspath(__file__)), "..", "..",
-                "Cxx", "WidgetsTour", "Widgets", name + ".cxx")
-
-            try:
-                file = open(cxx_source_name, "r")
-                cxx_source[name] = file.read()
+                file = open(widget, "r")
+                python_source[name] = file.read()
                 file.close()
-            except IOError:
-                print "Error"
-                cxx_source[name] = ""
 
-            app.Script("set cxx_source(%s) {%s}", name, cxx_source[name])
+                app.Script("set python_source(%s) {%s}",
+                           name, python_source[name])
 
-            # Try to find the Tcl source too
+                # Try to find the C++ source
 
-            tcl_source_name = os.path.join(
-                os.path.dirname(os.path.abspath(__file__)), "..", "..",
-                "Tcl", "WidgetsTour", "Widgets", name + ".tcl")
+                cxx_source_name = os.path.join(
+                    os.path.dirname(os.path.abspath(__file__)), "..", "..",
+                    "Cxx", "WidgetsTour", "Widgets", name + ".cxx")
 
-            try:
-                file = open(tcl_source_name, "r")
-                tcl_source[name] = file.read()
-                file.close()
-            except IOError:
-                print "Error"
-                tcl_source[name] = ""
+                try:
+                    file = open(cxx_source_name, "r")
+                    cxx_source[name] = file.read()
+                    file.close()
+                except IOError:
+                    print "Error"
+                    cxx_source[name] = ""
 
-            app.Script("set tcl_source(%s) {%s}", name, tcl_source[name])
+                app.Script("set cxx_source(%s) {%s}", name, cxx_source[name])
+
+                # Try to find the Tcl source too
+
+                tcl_source_name = os.path.join(
+                    os.path.dirname(os.path.abspath(__file__)), "..", "..",
+                    "Tcl", "WidgetsTour", "Widgets", name + ".tcl")
+
+                try:
+                    file = open(tcl_source_name, "r")
+                    tcl_source[name] = file.read()
+                    file.close()
+                except IOError:
+                    print "Error"
+                    tcl_source[name] = ""
+
+                app.Script("set tcl_source(%s) {%s}", name, tcl_source[name])
+
+        except:
+            caught_exception = 1
+            errfile = sys.stdout
+            errfile.write("\nException in %s:\n" % name)
+            errfile.write('-'*60 + "\n")
+            traceback.print_exc(file=errfile)
+            errfile.write('-'*60 + "\n")
+            file.close()
+            continue
 
     # Raise the example panel
 
@@ -342,7 +355,7 @@ def main(argv):
 
     win.Close()
 
-    sys.exit(ret)
+    sys.exit(ret or caught_exception)
 
 if __name__ == "__main__":
     main(sys.argv)
