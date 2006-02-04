@@ -81,6 +81,24 @@ public:
   vtkGetMacro(ChooseDirectory, int);
 
   // Description:
+  // Set/Get the MultipleSelection ivar.
+  // If set to 1, the dialog will allow multiple files to be selected.
+  // If set to 0, only a single file can be selected (default)
+  vtkSetClampMacro(MultipleSelection, int, 0, 1);
+  vtkBooleanMacro(MultipleSelection, int);
+  vtkGetMacro(MultipleSelection, int);
+
+  // Description:
+  // Get the number of filenames that are selected.  This is meant
+  // for use with MultipleSelection mode.
+  vtkGetMacro(NumberOfFileNames, int);
+
+  // Description:
+  // Get one file path from a multiple selection of file paths.  An
+  // error will be generated if the index is out of range.
+  const char *GetNthFileName(int i);
+
+  // Description:
   // Set/Get last path
   vtkGetStringMacro(LastPath);
   vtkSetStringMacro(LastPath);
@@ -93,6 +111,10 @@ protected:
   vtkKWLoadSaveDialog();
   ~vtkKWLoadSaveDialog();
 
+  // Description:
+  // Reset the internal file list
+  void ResetFileNames();
+
   char *FileTypes;
   char *InitialFileName;
   char *FileName;
@@ -100,6 +122,9 @@ protected:
   char *LastPath;
   int SaveDialog;
   int ChooseDirectory;
+  int MultipleSelection;
+  int NumberOfFileNames;
+  char **FileNames;
   int Done;
 
 private:
