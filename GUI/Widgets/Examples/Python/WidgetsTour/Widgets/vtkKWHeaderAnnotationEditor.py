@@ -37,8 +37,8 @@ def vtkKWHeaderAnnotationEditorEntryPoint(parent, win):
     
     hae_reader = vtkXMLImageDataReader()
     hae_reader.SetFileName(os.path.join(
-        os.path.dirname(os.path.abspath(__name__)),
-        "..", "..", "Data", "head100x100x47.vti"))
+        os.path.dirname(os.path.abspath(__file__)),
+        "..", "..", "..", "Data", "head100x100x47.vti"))
     
     # Create an image viewer
     # Use the render window and renderer of the renderwidget

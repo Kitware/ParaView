@@ -31,8 +31,8 @@ def vtkKWRenderWidgetEntryPoint(parent, win):
     
     rw_reader = vtkXMLPolyDataReader()
     rw_reader.SetFileName(os.path.join(
-        os.path.dirname(os.path.abspath(__name__)),
-        "..", "..", "Data", "teapot.vtp"))
+        os.path.dirname(os.path.abspath(__file__)),
+        "..", "..", "..", "Data", "teapot.vtp"))
     
     # Create the mapper and actor
     
