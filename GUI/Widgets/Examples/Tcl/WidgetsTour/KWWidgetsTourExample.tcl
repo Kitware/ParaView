@@ -185,7 +185,7 @@ set text [$text_widget GetWidget]
 $text ReadOnlyOn
 $text SetWrapToNone
 $text SetHeight 3000
-$text AddTagMatcher "(^| +)(import|from) " "_fg_red_tag_"
+$text AddTagMatcher "(\n|^| )(import|from) " "_fg_red_tag_"
 $text AddTagMatcher "#\[^\n\]*" "_fg_navy_tag_"
 $text AddTagMatcher "\"\[^\"\]*\"" "_fg_blue_tag_"
 $text AddTagMatcher "\'\[^\'\]*\'" "_fg_blue_tag_"
