@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.47");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.48");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
@@ -34,6 +34,9 @@ vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 
   this->SaveDialog       = 0;
   this->ChooseDirectory  = 0;
+  this->MultipleSelection = 0;
+  this->NumberOfFileNames = 0;
+  this->FileNames        = NULL;
 
   this->SetTitle("Open Text Document");
   this->SetFileTypes("{{Text Document} {.txt}}");
@@ -47,6 +50,7 @@ vtkKWLoadSaveDialog::~vtkKWLoadSaveDialog()
   this->SetFileName(NULL);
   this->SetDefaultExtension(NULL);
   this->SetLastPath(NULL);
+  this->ResetFileNames();
 }
 
 //----------------------------------------------------------------------------
@@ -80,6 +84,8 @@ int vtkKWLoadSaveDialog::Invoke()
   this->GetApplication()->RegisterDialogUp(this);
   ostrstream command;
 
+  this->ResetFileNames();
+  
   int support_choose_dir = this->GetApplication()->EvaluateBooleanExpression(
     "string equal [info commands tk_chooseDirectory] tk_chooseDirectory");
 
@@ -97,6 +103,11 @@ int vtkKWLoadSaveDialog::Invoke()
           << ((this->LastPath && strlen(this->LastPath)>0)? this->LastPath:".")
           << "}";
 
+  if (this->MultipleSelection)
+    {
+    command << " -multiple 1";
+    }
+  
   if (this->ChooseDirectory)
     {
     if (support_choose_dir)
@@ -113,7 +124,7 @@ int vtkKWLoadSaveDialog::Invoke()
             << " -filetypes {" 
             << (this->FileTypes ? this->FileTypes : "") << "}";
     }
-  
+
   vtkKWWindowBase* window = this->GetParentWindow();
   if (window)
     {
@@ -125,10 +136,47 @@ int vtkKWLoadSaveDialog::Invoke()
 
   int res = 0;
 
-  if (path && strlen(path))
+  if (this->MultipleSelection)
     {
-    this->SetFileName(
-      this->ConvertTclStringToInternalString(path));
+    if (path && strlen(path) && strcmp(path, "{}") != 0)
+      {
+      int n = 0;
+      const char **files = 0;
+
+      if (Tcl_SplitList(this->GetApplication()->GetMainInterp(),
+                        path, &n, &files) == TCL_OK)
+        {
+        if (n > 0)
+          {
+          this->NumberOfFileNames = n;
+          this->FileNames = new char *[n];
+
+          for (int i = 0; i < n; i++)
+            {
+            const char *filename =
+              this->ConvertTclStringToInternalString(files[i]);
+            this->FileNames[i] = new char[strlen(filename) + 1];
+            strcpy(this->FileNames[i], filename);
+            }
+
+          this->GenerateLastPath(this->GetNthFileName(0));
+          this->SetFileName(this->GetNthFileName(0));
+
+          res = 1;
+          }
+        }
+      }
+    }
+  else if (path && strlen(path))
+    {
+    const char *filename = this->ConvertTclStringToInternalString(path);
+
+    this->SetFileName(filename);
+
+    this->NumberOfFileNames = 1;
+    this->FileNames = new char *[1];
+    this->FileNames[0] = new char[strlen(filename) + 1];
+    strcpy(this->FileNames[0], filename);
 
     if (this->ChooseDirectory && support_choose_dir)
       {
@@ -138,9 +186,12 @@ int vtkKWLoadSaveDialog::Invoke()
       {
       this->GenerateLastPath(this->GetFileName());
       }
+
     res = 1;
     }
-  else
+
+
+  if (res == 0)
     {
     this->SetFileName(0);
     }
@@ -178,6 +229,35 @@ const char* vtkKWLoadSaveDialog::GenerateLastPath(const char* path)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWLoadSaveDialog::ResetFileNames()
+{
+  // deallocate the list of files
+  if (this->FileNames)
+    {
+    for(int i =0; i < this->NumberOfFileNames; i++)
+      {          
+      delete [] this->FileNames[i];
+      }
+    delete [] this->FileNames;
+    }
+  this->FileNames = 0;
+  this->NumberOfFileNames = 0;
+}
+
+//----------------------------------------------------------------------------
+const char *vtkKWLoadSaveDialog::GetNthFileName(int i)
+{
+  if (i < 0 || i >= this->NumberOfFileNames)
+    {
+    vtkErrorMacro(<< this->GetClassName()
+                  << " index for GetFileName is out of range");
+    return NULL;
+    }
+
+  return this->FileNames[i];
+}
+
+//----------------------------------------------------------------------------
 void vtkKWLoadSaveDialog::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -195,5 +275,13 @@ void vtkKWLoadSaveDialog::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "SaveDialog: " << this->GetSaveDialog() << endl;
   os << indent << "ChooseDirectory: " << this->GetChooseDirectory() << endl;
+  os << indent << "MultipleSelection: " << this->GetMultipleSelection() << endl;
+  os << indent << "NumberOfFileNames: " << this->GetNumberOfFileNames() << endl;
+  os << indent << "FileNames: "
+     << (this->NumberOfFileNames == 0 ? "none" : "") << endl;
+  for (int i = 0; i < this->NumberOfFileNames; i++)
+    {
+    os << indent << "  " << this->GetNthFileName(i) << endl;
+    }
 }
 
