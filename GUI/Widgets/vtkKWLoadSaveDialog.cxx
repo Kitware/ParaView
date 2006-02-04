@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.48");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.49");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
@@ -153,10 +153,13 @@ int vtkKWLoadSaveDialog::Invoke()
 
           for (int i = 0; i < n; i++)
             {
-            const char *filename =
-              this->ConvertTclStringToInternalString(files[i]);
-            this->FileNames[i] = new char[strlen(filename) + 1];
-            strcpy(this->FileNames[i], filename);
+            // do conversion twice since ConvertTclStringToInternalString
+            //  creates a temporary char pointer
+            int stringLength =
+              strlen(this->ConvertTclStringToInternalString(files[i]));
+            this->FileNames[i] = new char[stringLength + 1];
+            strcpy(this->FileNames[i], 
+                   this->ConvertTclStringToInternalString(files[i]));
             }
 
           this->GenerateLastPath(this->GetNthFileName(0));
@@ -169,14 +172,12 @@ int vtkKWLoadSaveDialog::Invoke()
     }
   else if (path && strlen(path))
     {
-    const char *filename = this->ConvertTclStringToInternalString(path);
-
-    this->SetFileName(filename);
+    this->SetFileName(this->ConvertTclStringToInternalString(path));
 
     this->NumberOfFileNames = 1;
     this->FileNames = new char *[1];
-    this->FileNames[0] = new char[strlen(filename) + 1];
-    strcpy(this->FileNames[0], filename);
+    this->FileNames[0] = new char[strlen(this->GetFileName()) + 1];
+    strcpy(this->FileNames[0], this->GetFileName());
 
     if (this->ChooseDirectory && support_choose_dir)
       {
