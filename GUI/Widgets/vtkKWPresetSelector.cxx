@@ -57,7 +57,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.35");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.36");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -194,6 +194,8 @@ vtkKWPresetSelector::vtkKWPresetSelector()
   this->ThumbnailSize = 32;
   this->ScreenshotSize = 144;
   this->PromptBeforeRemovePreset = 1;
+
+  this->ContextMenu = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -255,6 +257,12 @@ vtkKWPresetSelector::~vtkKWPresetSelector()
 
   delete this->Internals;
   this->Internals = NULL;
+
+  if (this->ContextMenu)
+    {
+    this->ContextMenu->Delete();
+    this->ContextMenu = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -309,6 +317,7 @@ void vtkKWPresetSelector::Create()
   list->SetEditStartCommand(this, "PresetCellEditStartCallback");
   list->SetEditEndCommand(this, "PresetCellEditEndCallback");
   list->SetCellUpdatedCommand(this, "PresetCellUpdatedCallback");
+  list->SetRightClickCommand(this, "PresetRightClickCallback");
 
   this->CreateColumns();
 
@@ -2442,6 +2451,33 @@ void vtkKWPresetSelector::PresetSelectionCallback()
   if (this->ApplyPresetOnSelection)
     {
     this->PresetApplyCallback();
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkKWPresetSelector::PresetRightClickCallback(
+  int row, int col, int x, int y)
+{
+  int id = this->GetPresetAtRowId(row);
+  if (!this->HasPreset(id))
+    {
+    return;
+    }
+
+  if (!this->ContextMenu)
+    {
+    this->ContextMenu = vtkKWMenu::New();
+    }
+  if (!this->ContextMenu->IsCreated())
+    {
+    this->ContextMenu->SetParent(this);
+    this->ContextMenu->Create();
+    }
+  this->ContextMenu->DeleteAllMenuItems();
+  this->PopulatePresetContextMenu(this->ContextMenu, id);
+  if (this->ContextMenu->GetNumberOfItems())
+    {
+    this->ContextMenu->PopUp(x, y);
     }
 }
 

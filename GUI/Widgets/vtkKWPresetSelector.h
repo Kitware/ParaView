@@ -533,6 +533,7 @@ public:
   virtual void PresetLocateCallback(int id);
   virtual void PresetSelectionCallback();
   virtual void PresetSelectionChangedCallback() {};
+  virtual void PresetRightClickCallback(int row, int col, int x, int y);
 
 protected:
   vtkKWPresetSelector();
@@ -632,6 +633,10 @@ protected:
   // on a give preset. It should replicate the commands available through the
   // preset buttons.
   virtual void PopulatePresetContextMenu(vtkKWMenu *menu, int id);
+
+  // Context menu
+
+  vtkKWMenu *ContextMenu;
 
   // Description:
   // Some constants

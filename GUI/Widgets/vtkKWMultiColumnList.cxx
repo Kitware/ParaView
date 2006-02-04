@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.46");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.47");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -54,6 +54,7 @@ vtkKWMultiColumnList::vtkKWMultiColumnList()
   this->SelectionChangedCommand = NULL;
   this->PotentialCellColorsChangedCommand = NULL;
   this->ColumnSortedCommand = NULL;
+  this->RightClickCommand = NULL;
 
   this->Internals = new vtkKWMultiColumnListInternals;
 }
@@ -95,6 +96,11 @@ vtkKWMultiColumnList::~vtkKWMultiColumnList()
     {
     delete [] this->ColumnSortedCommand;
     this->ColumnSortedCommand = NULL;
+    }
+  if (this->RightClickCommand)
+    {
+    delete [] this->RightClickCommand;
+    this->RightClickCommand = NULL;
     }
   delete this->Internals;
 }
@@ -152,6 +158,9 @@ void vtkKWMultiColumnList::Create()
   this->AddBinding("<<TablelistCellUpdated>>", this, "CellUpdatedCallback");
   this->AddBinding("<<TablelistColumnSorted>>", this, "ColumnSortedCallback");
   this->AddBinding("<Enter>", this, "EnterCallback");
+
+  this->Script("bind [%s bodytag] <<Button3>> [list %s RightClickCallback %%W %%x %%y %%X %%Y]",
+               this->GetWidgetName(), this->GetTclName());
 
   // Update enable state
 
@@ -2676,6 +2685,20 @@ const char* vtkKWMultiColumnList::GetCellConfigurationOptionAsText(
 }
 
 //----------------------------------------------------------------------------
+int vtkKWMultiColumnList::FindCellAtRelativeCoordinates(
+  int x, int y, int *row_index, int *col_index)
+{
+  if (!row_index || !col_index || !this->IsCreated())
+    {
+    return 0;
+    }
+
+  vtksys_stl::string nearest(
+    this->Script("%s nearestcell %d %d", this->GetWidgetName(), x, y));
+  return sscanf(nearest.c_str(), "%d,%d", row_index, col_index) == 2 ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetBackgroundColor(double r, double g, double b)
 {
   this->Superclass::SetBackgroundColor(r, g, b);
@@ -3324,6 +3347,23 @@ void vtkKWMultiColumnList::InvokeColumnSortedCommand()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetRightClickCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->RightClickCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::InvokeRightClickCommand(
+  int row, int col, int x, int y)
+{
+  if (this->RightClickCommand && *this->RightClickCommand && this->IsCreated())
+    {
+    this->Script("%s %d %d %d %d", this->RightClickCommand, row, col, x, y);
+    }
+}
+
+//----------------------------------------------------------------------------
 const char* vtkKWMultiColumnList::EditStartCallback(
   const char *, int row, int col, const char *text)
 {
@@ -3509,6 +3549,20 @@ void vtkKWMultiColumnList::SetSortCommand(vtkObject *object,
 void vtkKWMultiColumnList::EnterCallback()
 {
   this->Focus();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::RightClickCallback(
+  const char *w, int x, int y, int root_x, int root_y)
+{
+  vtksys_stl::string convert(this->Script(
+    "lrange [tablelist::convEventFields %s %d %d] 1 2", w, x, y));
+  int row_index, col_index;
+  if (sscanf(convert.c_str(), "%d %d", &x, &y) == 2 &&
+      this->FindCellAtRelativeCoordinates(x, y, &row_index, &col_index))
+    {
+    this->InvokeRightClickCommand(row_index, col_index, root_x, root_y);
+    }
 }
 
 //----------------------------------------------------------------------------

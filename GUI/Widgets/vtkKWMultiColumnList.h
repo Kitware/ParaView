@@ -1127,6 +1127,17 @@ public:
   virtual void SetSortCommand(vtkObject *object, const char *method);
 
   // Description:
+  // Specifies a command to be invoked when the user right-click on a cell.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  // The following parameters are also passed to the command:
+  // - the cell location, i.e. its row and column indices: int, int
+  // - the pointer (x, y) absolute location the click occured at: int, int
+  virtual void SetRightClickCommand(vtkObject *object, const char *method);
+
+  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -1155,6 +1166,8 @@ public:
     const char*, int, int, const char*);
   virtual void ColumnSortedCallback();
   virtual void EnterCallback();
+  virtual void RightClickCallback(
+    const char *w, int x, int y, int root_x, int root_y);
 
 protected:
   vtkKWMultiColumnList();
@@ -1180,6 +1193,9 @@ protected:
 
   char *ColumnSortedCommand;
   void InvokeColumnSortedCommand();
+
+  char *RightClickCommand;
+  void InvokeRightClickCommand(int row, int col, int x, int y);
 
   // Description:
   // Called when the number of rows/columns changed
@@ -1241,6 +1257,11 @@ protected:
   // Description:
   // Check if the selection has changed and invoke the corresponding command
   virtual void HasSelectionChanged();
+
+  // Description:
+  // Find cell at relative coordinate x, y
+  virtual int FindCellAtRelativeCoordinates(
+    int x, int y, int *row_index, int *col_index);
 
 private:
   vtkKWMultiColumnList(const vtkKWMultiColumnList&); // Not implemented
