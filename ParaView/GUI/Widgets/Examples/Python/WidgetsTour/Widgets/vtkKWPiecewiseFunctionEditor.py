@@ -60,8 +60,8 @@ def vtkKWPiecewiseFunctionEditorEntryPoint(parent, win):
     
     pfed_reader = vtkXMLImageDataReader()
     pfed_reader.SetFileName(os.path.join(
-        os.path.dirname(os.path.abspath(__name__)),
-        "..", "..", "Data", "head100x100x47.vti"))
+        os.path.dirname(os.path.abspath(__file__)),
+        "..", "..", "..", "Data", "head100x100x47.vti"))
     
     # The build an histogram of the data, it will be used inside the editor
     # as if we were trying to tune a tfunc based on the real values
