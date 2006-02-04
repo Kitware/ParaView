@@ -1,4 +1,7 @@
-from kwwidgets import *
+from kwwidgets import vtkKWSplitFrame
+from kwwidgets import vtkKWApplication
+from kwwidgets import vtkKWWindow
+
 
 
 def vtkKWSplitFrameEntryPoint(parent, win):

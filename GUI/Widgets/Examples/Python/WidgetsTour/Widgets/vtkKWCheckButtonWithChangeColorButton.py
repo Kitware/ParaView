@@ -1,4 +1,9 @@
-from kwwidgets import *
+from kwwidgets import vtkKWCheckButtonWithChangeColorButton
+from kwwidgets import vtkKWCheckButton
+from kwwidgets import vtkKWChangeColorButton
+from kwwidgets import vtkKWApplication
+from kwwidgets import vtkKWWindow
+
 
 
 def vtkKWCheckButtonWithChangeColorButtonEntryPoint(parent, win):

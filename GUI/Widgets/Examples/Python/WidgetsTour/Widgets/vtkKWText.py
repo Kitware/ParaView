@@ -1,4 +1,10 @@
-from kwwidgets import *
+from kwwidgets import vtkKWText
+from kwwidgets import vtkKWTextWithScrollbars
+from kwwidgets import vtkKWApplication
+from kwwidgets import vtkKWWindow
+from kwwidgets import vtkKWLabel
+from kwwidgets import vtkKWIcon
+
 
 
 def vtkKWTextEntryPoint(parent, win):

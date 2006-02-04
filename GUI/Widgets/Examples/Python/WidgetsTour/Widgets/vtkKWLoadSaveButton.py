@@ -1,4 +1,8 @@
-from kwwidgets import *
+from kwwidgets import vtkKWLoadSaveButton
+from kwwidgets import vtkKWLoadSaveDialog
+from kwwidgets import vtkKWApplication
+from kwwidgets import vtkKWWindow
+
 
 
 def vtkKWLoadSaveButtonEntryPoint(parent, win):
@@ -13,7 +17,7 @@ def vtkKWLoadSaveButtonEntryPoint(parent, win):
     load_button1.SetParent(parent)
     load_button1.Create()
     load_button1.SetText("Click to Pick a File")
-    load_button1.GetLoadSaveDialog().SaveDialogOff()# load mode
+    load_button1.GetLoadSaveDialog().SaveDialogOff() # load mode
     
     app.Script(
         "pack %s -side top -anchor nw -expand n -padx 2 -pady 2",

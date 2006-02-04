@@ -1,4 +1,8 @@
-from kwwidgets import *
+from kwwidgets import vtkKWApplication
+from kwwidgets import vtkKWLabel
+from kwwidgets import vtkKWThumbWheel
+from kwwidgets import vtkKWWindow
+
 
 
 def vtkKWThumbWheelEntryPoint(parent, win):

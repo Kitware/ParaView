@@ -1,4 +1,9 @@
-from kwwidgets import *
+from kwwidgets import vtkKWComboBox
+from kwwidgets import vtkKWComboBoxWithLabel
+from kwwidgets import vtkKWComboBoxSet
+from kwwidgets import vtkKWApplication
+from kwwidgets import vtkKWWindow
+
 
 
 def vtkKWComboBoxEntryPoint(parent, win):

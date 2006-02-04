@@ -1,5 +1,8 @@
-from vtk import *
-from kwwidgets import *
+from vtk import vtkProperty
+from kwwidgets import vtkKWApplication
+from kwwidgets import vtkKWSurfaceMaterialPropertyWidget
+from kwwidgets import vtkKWWindow
+
 
 
 def vtkKWSurfaceMaterialPropertyWidgetEntryPoint(parent, win):

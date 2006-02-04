@@ -1,4 +1,8 @@
-from kwwidgets import *
+from kwwidgets import vtkKWSpinBox
+from kwwidgets import vtkKWSpinBoxWithLabel
+from kwwidgets import vtkKWApplication
+from kwwidgets import vtkKWWindow
+
 
 
 def vtkKWSpinBoxEntryPoint(parent, win):

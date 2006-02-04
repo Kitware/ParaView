@@ -1,5 +1,8 @@
-from vtk import *
-from kwwidgets import *
+from vtk import vtkVolumeProperty
+from kwwidgets import vtkKWApplication
+from kwwidgets import vtkKWVolumeMaterialPropertyWidget
+from kwwidgets import vtkKWWindow
+
 
 
 def vtkKWVolumeMaterialPropertyWidgetEntryPoint(parent, win):

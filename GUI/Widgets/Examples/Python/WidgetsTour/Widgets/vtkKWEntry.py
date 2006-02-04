@@ -1,4 +1,9 @@
-from kwwidgets import *
+from kwwidgets import vtkKWEntry
+from kwwidgets import vtkKWEntryWithLabel
+from kwwidgets import vtkKWEntrySet
+from kwwidgets import vtkKWApplication
+from kwwidgets import vtkKWWindow
+
 
 
 def vtkKWEntryEntryPoint(parent, win):

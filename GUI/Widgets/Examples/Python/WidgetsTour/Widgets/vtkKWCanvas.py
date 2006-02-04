@@ -1,4 +1,7 @@
-from kwwidgets import *
+from kwwidgets import vtkKWCanvas
+from kwwidgets import vtkKWApplication
+from kwwidgets import vtkKWWindow
+
 
 
 def vtkKWCanvasEntryPoint(parent, win):
