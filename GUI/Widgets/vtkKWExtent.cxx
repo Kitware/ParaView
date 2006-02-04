@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.48");
+vtkCxxRevisionMacro(vtkKWExtent, "1.49");
 
 //----------------------------------------------------------------------------
 vtkKWExtent::vtkKWExtent()
@@ -141,7 +141,7 @@ void vtkKWExtent::Pack()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::SetExtentRange(double er[6])
+void vtkKWExtent::SetExtentRange(const double er[6])
 {
   this->SetExtentRange(er[0], er[1], er[2], er[3], er[4], er[5]);
 }
@@ -238,7 +238,7 @@ void vtkKWExtent::SetExtent(double x1, double x2,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::SetExtent(double er[6])
+void vtkKWExtent::SetExtent(const double er[6])
 {
   this->SetExtent(er[0], er[1], er[2], er[3], er[4], er[5]);
 }
