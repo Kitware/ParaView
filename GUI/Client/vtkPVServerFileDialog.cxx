@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.55");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.56");
 
 // Taken from source selection list  we need ne images.
 /* 
@@ -1043,4 +1043,5 @@ void vtkPVServerFileDialog::AddExtensionString(const char* str)
 void vtkPVServerFileDialog::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);  
+  os << indent << "Servers: " << this->Servers << endl;
 }
