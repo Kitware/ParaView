@@ -5,12 +5,10 @@ SET(KWWidgets_BINARY_DIR "@KWWidgets_BINARY_DIR@")
 
 # Convert the prefix to a windows path if necessary.  The python
 # distutils implementation seems sensitive to the slash direction.
-IF(WIN32)
-  IF(NOT CYGWIN)
-    STRING(REGEX REPLACE "/" "\\\\" CMAKE_INSTALL_PREFIX
-      "${CMAKE_INSTALL_PREFIX}")
-  ENDIF(NOT CYGWIN)
-ENDIF(WIN32)
+IF(WIN32 AND NOT CYGWIN)
+  STRING(REGEX REPLACE "/" "\\\\" CMAKE_INSTALL_PREFIX
+    "${CMAKE_INSTALL_PREFIX}")
+ENDIF(WIN32 AND NOT CYGWIN)
 
 # Run python on setup.py to install the python modules.
 EXEC_PROGRAM("${PYTHON_EXECUTABLE}" "${KWWidgets_BINARY_DIR}/Wrapping/Python" ARGS

@@ -62,6 +62,10 @@ SET(KWWidgets_TEMPLATES_DIR_CONFIG
 SET(KWWidgets_RESOURCES_DIR_CONFIG 
   ${KWWidgets_RESOURCES_DIR})
 
+# The CMake macros dir.
+SET(KWWidgets_CMAKE_DIR_CONFIG 
+  ${KWWidgets_CMAKE_DIR})
+
 # The Tcl/Tk options.
 SET(KWWidgets_TCL_PACKAGE_INDEX_DIR_CONFIG 
   ${KWWidgets_BINARY_DIR}/Wrapping/Tcl)
@@ -131,6 +135,10 @@ SET(KWWidgets_TEMPLATES_DIR_CONFIG
 # The resources dir.
 SET(KWWidgets_RESOURCES_DIR_CONFIG 
   ${DOLLAR}{KWWidgets_INSTALL_PREFIX}${KWWidgets_INSTALL_DATA_DIR}/Resources)
+
+# The CMake macros dir.
+SET(KWWidgets_CMAKE_DIR_CONFIG 
+  ${DOLLAR}{KWWidgets_INSTALL_PREFIX}${KWWidgets_INSTALL_PACKAGE_DIR}/Cmake)
 
 # The Tcl/Tk options.
 SET(KWWidgets_TCL_PACKAGE_INDEX_DIR_CONFIG 
