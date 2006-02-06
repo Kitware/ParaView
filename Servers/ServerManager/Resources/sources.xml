@@ -410,6 +410,75 @@
    <!-- End Mandelbrot -->
    </SourceProxy>
 
+   <SourceProxy name="OctreeFractal" class="vtkHyperOctreeFractalSource">
+      <IntVectorProperty
+         name="Dimension"
+         command="SetDimension"
+         number_of_elements="1"
+         default_values="2" >
+        <IntRangeDomain name="range" min="1" max="3" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="MaximumLevel"
+         command="SetMaximumLevel"
+         number_of_elements="1"
+         default_values="5" >
+        <IntRangeDomain name="range" min="2" max="11" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="MinimumLevel"
+         command="SetMinimumLevel"
+         number_of_elements="1"
+         default_values="3" >
+        <IntRangeDomain name="range" min="1" max="10" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="ProjectionAxes"
+         command="SetProjectionAxes"
+         number_of_elements="3"
+         default_values="0 1 2" >
+        <IntRangeDomain name="range"/>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="OriginCX"
+         command="SetOriginCX"
+         number_of_elements="4"
+         default_values="-1.75 -1.25 0.0 0.0" >
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="SizeCX"
+         command="SetSizeCX"
+         number_of_elements="4"
+         default_values="2.5 2.5 2.0 1.5" >
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="MaximumNumberOfIterations"
+         command="SetMaximumNumberOfIterations"
+         number_of_elements="1"
+         animateable="1"
+         default_values="100" >
+        <IntRangeDomain name="range" min="1" max="5000" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="Threshold"
+         command="SetSpanThreshold"
+         number_of_elements="1"
+         default_values="2.0" >
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>      
+
+   <!-- End OctreeFractal -->
+   </SourceProxy>
+
    <SourceProxy name="PlaneSource" class="vtkPlaneSource">
       <DoubleVectorProperty
          name="Origin"
