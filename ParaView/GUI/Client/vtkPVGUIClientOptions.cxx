@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGUIClientOptions);
-vtkCxxRevisionMacro(vtkPVGUIClientOptions, "1.9");
+vtkCxxRevisionMacro(vtkPVGUIClientOptions, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVGUIClientOptions::vtkPVGUIClientOptions()
@@ -127,4 +127,6 @@ void vtkPVGUIClientOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ParaViewScriptName: " << (this->ParaViewScriptName?this->ParaViewScriptName:"(none)") << endl;
   os << indent << "InternalScriptName: " << (this->InternalScriptName?this->InternalScriptName:"(none)") << endl;
   os << indent << "ParaViewDataName: " << (this->ParaViewDataName?this->ParaViewDataName:"(none)") << endl;
+  os << indent << "ClientServerConnectionTimeout: " 
+    << this->ClientServerConnectionTimeout << endl;
 }
