@@ -17,6 +17,21 @@ static const unsigned char image_angle_tool[] =
 
 /* 
  * Resource generated for file:
+ *    bidimensional_tool.png (zlib, base64) (image file)
+ */
+static const unsigned int  image_bidimensional_tool_width          = 16;
+static const unsigned int  image_bidimensional_tool_height         = 16;
+static const unsigned int  image_bidimensional_tool_pixel_size     = 4;
+static const unsigned long image_bidimensional_tool_length         = 144;
+static const unsigned long image_bidimensional_tool_decoded_length = 1024;
+
+static const unsigned char image_bidimensional_tool[] = 
+  "eNr7//8/w38SMBAo/CdRD5JeCyB+A8SqOORliNBrg0NeFSpvQapeJHU26GYQqxebGaTqxW"
+  "IGyXrR3Iw1PIjUa4MtPIjViy9MSY1fQmYQE864zAACViC+Skw4Q82YiUWcldw8MdAYAF0B"
+  "WnU=";
+
+/* 
+ * Resource generated for file:
  *    bounding_box.png (zlib, base64) (image file)
  */
 static const unsigned int  image_bounding_box_width          = 16;
@@ -1040,7 +1055,7 @@ static const unsigned char image_window_level[] =
   "S9R2LL/2MSK5n3LfbJXWr+l5mlN/1ntf3vVvOqVWitMcZgbY8bHCEEYhxJUyJ/Mhtcdz15"
   "1aK7r++txblh85GUFp+vvaTiZ84zZrU=";
 
-/*
+/* 
  * Resource generated for file:
  *    contour_segment.png (zlib, base64) (image file)
  */
@@ -1050,7 +1065,7 @@ static const unsigned int  image_contour_segment_pixel_size     = 4;
 static const unsigned long image_contour_segment_length         = 400;
 static const unsigned long image_contour_segment_decoded_length = 1024;
 
-static const unsigned char image_contour_segment[] =
+static const unsigned char image_contour_segment[] = 
   "eNr7//8/w38smEEOuzgxGKSXQeYtkP5Nnn4GhnIzU2MQA4TfMLgF/keRR+Nj0f+vobbi/+"
   "nj+/+npST+B6kHij0FYiVC+oHgWkiQ//+nD27AMUh9SlIczD2PwObJYdXrAlKzad0KDP0g"
   "vG/XFjibQeYDRhgDwc/83EwUvchmwGhNDXWg/o/oeleAwgybXmQ3QMMCNTzl/oH0/58ysQ"
