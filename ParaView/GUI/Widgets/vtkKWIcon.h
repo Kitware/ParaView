@@ -42,6 +42,7 @@ public:
   enum { 
     IconNoIcon                    = 0,
     IconAngleTool                 = 14,
+    IconBiDimensionalTool         = 34,
     IconBoundingBox               = 13,
     IconCamera                    = 19,
     IconColorBarAnnotation        = 12,

@@ -10,6 +10,7 @@ KWConvertImageToHeader --zlib --base64 \
 KWConvertImageToHeader --zlib --base64 \
     vtkKWIconResources.h \
     angle_tool.png \
+    bidimensional_tool.png \
     bounding_box.png \
     camera.png \
     color_bar_annotation.png \

@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.33");
+vtkCxxRevisionMacro(vtkKWIcon, "1.34");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -158,6 +158,14 @@ void vtkKWIcon::SetImage(int image)
         image_angle_tool_width, image_angle_tool_height,
         image_angle_tool_pixel_size, 
         image_angle_tool_length);
+      break;
+
+    case vtkKWIcon::IconBiDimensionalTool:
+      this->SetImage(
+        image_bidimensional_tool, 
+        image_bidimensional_tool_width, image_bidimensional_tool_height,
+        image_bidimensional_tool_pixel_size, 
+        image_bidimensional_tool_length);
       break;
 
     case vtkKWIcon::IconBoundingBox:
