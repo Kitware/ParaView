@@ -15,6 +15,9 @@ SET(KWWidgets_LIBRARIES "@KWWidgets_LIBRARIES@")
 # The list of available languages.
 SET(KWWidgets_LANGUAGES "TCL")
 
+# The CMake macros dir.
+SET(KWWidgets_CMAKE_DIR "@KWWidgets_CMAKE_DIR_CONFIG@")
+
 # The configuration options.
 SET(KWWidgets_BUILD_SHARED_LIBS "@KWWidgets_BUILD_SHARED_LIBS@")
 
