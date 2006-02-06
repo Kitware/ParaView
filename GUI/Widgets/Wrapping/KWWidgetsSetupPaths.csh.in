@@ -1,4 +1,5 @@
 setenv PATH "${KWWidgets_PATH_ENV}:$PATH"
+setenv LD_LIBRARY_PATH "${KWWidgets_PATH_ENV}:$LD_LIBRARY_PATH"
 if ( $?TCLLIBPATH ) then
   setenv TCLLIBPATH '${KWWidgets_TCLLIBPATH_ENV} '$TCLLIBPATH
 else
