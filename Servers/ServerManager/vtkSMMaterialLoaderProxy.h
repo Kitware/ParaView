@@ -26,7 +26,7 @@
 #include "vtkSMProxy.h"
 class vtkProperty;
 
-class vtkSMMaterialLoaderProxy : public vtkSMProxy
+class VTK_EXPORT vtkSMMaterialLoaderProxy : public vtkSMProxy
 {
 public:
   static vtkSMMaterialLoaderProxy* New();
