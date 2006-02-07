@@ -328,6 +328,11 @@ public:
   // Internal method. Called by timer callback when a server connection drops.
   void ServerConnectionClosedCallback();
   void TimeoutWarningCallback();
+
+  // Description:
+  // Resets all the settings to default values.
+  void ResetSettingsToDefault();
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();

@@ -592,6 +592,9 @@ public:
   virtual void ShowMainUserInterface(const char *name)
     { this->Superclass::ShowMainUserInterface(name); }
 
+  // Description:
+  // Resets all the settings to default values.
+  void ResetSettingsToDefault();
 protected:
   vtkPVWindow();
   ~vtkPVWindow();

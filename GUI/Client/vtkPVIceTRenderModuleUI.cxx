@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.15");
+vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.16");
 
 //----------------------------------------------------------------------------
 vtkPVIceTRenderModuleUI::vtkPVIceTRenderModuleUI()
@@ -390,6 +390,13 @@ void vtkPVIceTRenderModuleUI::SetOrderedCompositingFlag(int state)
                                  "catch {$kw(%s) SetOrderedCompositingFlag %d}",
                                  this->GetTclName(),
                                  this->OrderedCompositingFlag);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVIceTRenderModuleUI::ResetSettingsToDefault()
+{
+  this->Superclass::ResetSettingsToDefault();
+  this->SetOrderedCompositingFlag(1);
 }
 
 //----------------------------------------------------------------------------

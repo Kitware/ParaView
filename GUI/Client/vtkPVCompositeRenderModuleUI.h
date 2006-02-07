@@ -83,6 +83,9 @@ public:
   // Export the render module state to a file.
   virtual void SaveState(ofstream *file);
   
+  // Description:
+  // Resets all the settings to default values.
+  virtual void ResetSettingsToDefault();
 protected:
   vtkPVCompositeRenderModuleUI();
   ~vtkPVCompositeRenderModuleUI();

@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDesktopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.10");
+vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.11");
 
 //----------------------------------------------------------------------------
 vtkPVIceTDesktopRenderModuleUI::vtkPVIceTDesktopRenderModuleUI()
@@ -93,6 +93,13 @@ void vtkPVIceTDesktopRenderModuleUI::Create()
 
   this->Script("pack %s -side top -anchor w",
                this->OrderedCompositingCheck->GetWidgetName());
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVIceTDesktopRenderModuleUI::ResetSettingsToDefault()
+{
+  this->Superclass::ResetSettingsToDefault();
+  this->SetOrderedCompositingFlag(1);
 }
 
 //-----------------------------------------------------------------------------

@@ -55,9 +55,13 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
 
+#define VTK_PV_DEFAULT_LOD_THRESHOLD 5.0
+#define VTK_PV_DEFAULT_LOD_RESOLUTION 50
+#define VTK_PV_DEFAULT_RENDER_INTERRUPTS_ENABLED 1
+#define VTK_PV_DEFAULT_OUTLINE_THRESHOLD (5.0 * 1000000.0)
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.36");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.37");
 
 //----------------------------------------------------------------------------
 vtkPVLODRenderModuleUI::vtkPVLODRenderModuleUI()
@@ -78,10 +82,11 @@ vtkPVLODRenderModuleUI::vtkPVLODRenderModuleUI()
   this->OutlineThresholdScale = vtkKWScale::New();
   this->OutlineThresholdValue = vtkKWLabel::New();
 
-  this->LODThreshold = 5.0;
-  this->LODResolution = 50;
+  this->LODThreshold = VTK_PV_DEFAULT_LOD_THRESHOLD;
+  this->LODResolution = VTK_PV_DEFAULT_LOD_RESOLUTION;
+  this->OutlineThreshold = VTK_PV_DEFAULT_OUTLINE_THRESHOLD;
 
-  this->RenderInterruptsEnabled = 1;
+  this->RenderInterruptsEnabled = VTK_PV_DEFAULT_RENDER_INTERRUPTS_ENABLED;
 }
 
 
@@ -578,6 +583,17 @@ void vtkPVLODRenderModuleUI::SetRenderInterruptsEnabled(int state)
   this->GetTraceHelper()->AddEntry("catch {$kw(%s) SetRenderInterruptsEnabled %d}",
                       this->GetTclName(),
                       this->RenderInterruptsEnabledCheck->GetSelectedState());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLODRenderModuleUI::ResetSettingsToDefault()
+{
+  this->Superclass::ResetSettingsToDefault();
+
+  this->SetLODThreshold(VTK_PV_DEFAULT_LOD_THRESHOLD);
+  this->SetLODResolution(150 - VTK_PV_DEFAULT_LOD_RESOLUTION);
+  this->SetOutlineThreshold(VTK_PV_DEFAULT_OUTLINE_THRESHOLD);
+  this->SetRenderInterruptsEnabled(VTK_PV_DEFAULT_RENDER_INTERRUPTS_ENABLED); 
 }
 
 //----------------------------------------------------------------------------
