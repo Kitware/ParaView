@@ -92,6 +92,7 @@ ENDIF(BUILD_EXAMPLES)
 IF(BUILD_TESTING)
   ADD_TEST(Test${EXE_NAME} ${EXECUTABLE_OUTPUT_PATH}/${EXE_NAME} --test)
   IF(KWWidgets_SOURCE_DIR)
+    INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsTestingMacros.cmake")
     KWWidgets_ADD_OUT_OF_SOURCE_TEST(
       Test${EXE_NAME}OutOfSource
       ${PROJECT_NAME}
