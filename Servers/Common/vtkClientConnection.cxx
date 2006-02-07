@@ -25,6 +25,9 @@
 #include "vtkPVOptions.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
+
+#include <vtkstd/new>
+
 //-----------------------------------------------------------------------------
 // RMI Callbacks.
 
@@ -40,18 +43,31 @@ void vtkClientConnectionLastResultRMI(void* localArg, void* , int, int)
 void vtkClientConnectionRMI(void *localArg, void *remoteArg,
   int remoteArgLength, int vtkNotUsed(remoteProcessId))
 {
-  vtkClientServerStream stream;
-  stream.SetData(reinterpret_cast<unsigned char*>(remoteArg), remoteArgLength);
+  try
+    {
+    vtkClientServerStream stream;
+    stream.SetData(reinterpret_cast<unsigned char*>(remoteArg), remoteArgLength);
 
-  vtkClientConnection* self = (vtkClientConnection*)localArg;
-  self->Activate();
-  
-  // Tell process module to send it to SelfConnection.
-  vtkProcessModule::GetProcessModule()->SendStream(
-    vtkProcessModuleConnectionManager::GetSelfConnectionID(),
-    vtkProcessModule::DATA_SERVER, stream);
+    vtkClientConnection* self = (vtkClientConnection*)localArg;
+    self->Activate();
 
-  self->Deactivate();
+    // Tell process module to send it to SelfConnection.
+    vtkProcessModule::GetProcessModule()->SendStream(
+      vtkProcessModuleConnectionManager::GetSelfConnectionID(),
+      vtkProcessModule::DATA_SERVER, stream);
+
+    self->Deactivate();
+    }
+  catch (vtkstd::bad_alloc)
+    {
+    vtkProcessModule::GetProcessModule()->ExceptionEvent(
+      vtkProcessModule::EXCEPTION_BAD_ALLOC);
+    }
+  catch (...)
+    {
+    vtkProcessModule::GetProcessModule()->ExceptionEvent(
+      vtkProcessModule::EXCEPTION_UNKNOWN);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -59,16 +75,31 @@ void vtkClientConnectionRMI(void *localArg, void *remoteArg,
 void vtkClientConnectionRootRMI(void *localArg, void *remoteArg,
   int remoteArgLength, int vtkNotUsed(remoteProcessId))
 {
-  vtkClientServerStream stream;
-  stream.SetData(reinterpret_cast<unsigned char*>(remoteArg), remoteArgLength);
+  try
+    {
+    vtkClientServerStream stream;
+    stream.SetData(reinterpret_cast<unsigned char*>(remoteArg), remoteArgLength);
 
-  vtkClientConnection* self = (vtkClientConnection*)localArg;
-  self->Activate();
-  // Tell process module to send it to SelfConnection Root.
-  vtkProcessModule::GetProcessModule()->SendStream(
-    vtkProcessModuleConnectionManager::GetSelfConnectionID(),
-    vtkProcessModule::DATA_SERVER_ROOT, stream);
-  self->Deactivate();
+    vtkClientConnection* self = (vtkClientConnection*)localArg;
+    self->Activate();
+
+    // Tell process module to send it to SelfConnection Root.
+    vtkProcessModule::GetProcessModule()->SendStream(
+      vtkProcessModuleConnectionManager::GetSelfConnectionID(),
+      vtkProcessModule::DATA_SERVER_ROOT, stream);
+
+    self->Deactivate();
+    }
+  catch (vtkstd::bad_alloc)
+    {
+    vtkProcessModule::GetProcessModule()->ExceptionEvent(
+      vtkProcessModule::EXCEPTION_BAD_ALLOC);
+    }
+  catch (...)
+    {
+    vtkProcessModule::GetProcessModule()->ExceptionEvent(
+      vtkProcessModule::EXCEPTION_UNKNOWN);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -76,17 +107,30 @@ void vtkClientConnectionRootRMI(void *localArg, void *remoteArg,
 void vtkClientConnectionGatherInformationRMI(void *localArg, 
   void *remoteArg, int remoteArgLength, int vtkNotUsed(remoteProcessId))
 {
-  vtkClientServerStream stream;
-  stream.SetData(reinterpret_cast<unsigned char*>(remoteArg), remoteArgLength);
-  
-  vtkClientConnection* self = (vtkClientConnection*)localArg;
-  self->SendInformation(stream);
+  try
+    {
+    vtkClientServerStream stream;
+    stream.SetData(reinterpret_cast<unsigned char*>(remoteArg), remoteArgLength);
+
+    vtkClientConnection* self = (vtkClientConnection*)localArg;
+    self->SendInformation(stream);
+    }
+  catch (vtkstd::bad_alloc)
+    {
+    vtkProcessModule::GetProcessModule()->ExceptionEvent(
+      vtkProcessModule::EXCEPTION_BAD_ALLOC);
+    }
+  catch (...)
+    {
+    vtkProcessModule::GetProcessModule()->ExceptionEvent(
+      vtkProcessModule::EXCEPTION_UNKNOWN);
+    }
 }
 
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkClientConnection);
-vtkCxxRevisionMacro(vtkClientConnection, "1.4");
+vtkCxxRevisionMacro(vtkClientConnection, "1.5");
 //-----------------------------------------------------------------------------
 vtkClientConnection::vtkClientConnection()
 {

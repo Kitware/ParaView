@@ -39,8 +39,9 @@
 #include "vtkPVServerInformation.h"
 #include "vtkPVServerOptions.h"
 #include "vtkServerConnection.h"
-#include "vtkStdString.h"
 #include "vtkSmartPointer.h"
+#include "vtkSocketController.h"
+#include "vtkStdString.h"
 #include "vtkStringList.h"
 #include "vtkTimerLog.h"
 
@@ -93,7 +94,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.38");
+vtkCxxRevisionMacro(vtkProcessModule, "1.39");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -127,6 +128,7 @@ vtkProcessModule::vtkProcessModule()
   this->ActiveRemoteConnection = 0 ;
 
   this->SupportMultipleConnections = 0;
+  this->ExceptionRaised = 0;
   
   this->MemoryInformation = vtkKWProcessStatistics::New();
   this->ServerInformation = vtkPVServerInformation::New();
@@ -367,7 +369,8 @@ int vtkProcessModule::StartServer(unsigned long msec)
     support_multiple_connections = 0;
     }
 
-  while  ((ret = this->ConnectionManager->MonitorConnections(msec)) >= 0)
+  while (!this->ExceptionRaised && 
+    (ret = this->ConnectionManager->MonitorConnections(msec)) >= 0)
     {
     if (ret == 2)
       {
@@ -391,6 +394,7 @@ int vtkProcessModule::StartServer(unsigned long msec)
         }
       }
     }
+
   // We have to call exit explicitly on the Server since there is no
   // GUIHelper that would call it (as is the case with the client).
   this->Exit(); 
@@ -979,6 +983,36 @@ void vtkProcessModule::PrepareProgress()
 void vtkProcessModule::CleanupPendingProgress()
 {
   this->ProgressHandler->CleanupPendingProgress(this);
+}
+
+//-----------------------------------------------------------------------------
+void vtkProcessModule::ExceptionEvent(const char* message)
+{
+  vtkErrorMacro("Received exception from server: " << message);
+}
+//-----------------------------------------------------------------------------
+void vtkProcessModule::ExceptionEvent(int type)
+{
+  this->ExceptionRaised = 1;
+  const char* msg = 0;
+  switch (type)
+    {
+  case vtkProcessModule::EXCEPTION_BAD_ALLOC:
+    msg = "Insufficient memory exception.";
+    break;
+  case vtkProcessModule::EXCEPTION_UNKNOWN:
+    msg = "Exception.";
+    break;
+    }
+  vtkErrorMacro("Exception: " << msg);
+  // Now send every client the message, for now,
+  // we send to only the active client, as only the active client
+  // is listening for messages from the server.
+  if (this->GetActiveSocketController())
+    {
+    this->GetActiveSocketController()->Send((char*)msg, strlen(msg)+1, 1,
+      vtkProcessModule::EXCEPTION_EVENT_TAG);
+    }
 }
 
 //-----------------------------------------------------------------------------

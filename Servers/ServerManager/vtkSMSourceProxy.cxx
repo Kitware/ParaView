@@ -34,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.37");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.38");
 
 struct vtkSMSourceProxyInternals
 {
@@ -319,6 +319,10 @@ void vtkSMSourceProxy::AddInput(vtkSMSourceProxy *input,
 
   input->CreateParts();
   int numInputs = input->GetNumberOfParts();
+  if (!numInputs)
+    {
+    return;
+    }
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
