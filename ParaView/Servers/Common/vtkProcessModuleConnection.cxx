@@ -57,7 +57,7 @@ protected:
 
 };
 
-vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.7");
+vtkCxxRevisionMacro(vtkProcessModuleConnection, "1.8");
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnection::vtkProcessModuleConnection()
 {
@@ -151,11 +151,12 @@ void vtkProcessModuleConnection::OnWrongTagEvent(vtkObject* caller,
 {
   int tag = -1;
   int len = -1;
-  char val = -1;
   const char* data = reinterpret_cast<const char*>(calldata);
   const char* ptr = data;
   memcpy(&tag, ptr, sizeof(tag));
-  if ( tag != vtkProcessModule::PROGRESS_EVENT_TAG )
+
+  if ( tag != vtkProcessModule::PROGRESS_EVENT_TAG 
+    && tag != vtkProcessModule::EXCEPTION_EVENT_TAG)
     {
     vtkErrorMacro("Internal ParaView Error: "
       "Socket Communicator received wrong tag: "
@@ -168,14 +169,23 @@ void vtkProcessModuleConnection::OnWrongTagEvent(vtkObject* caller,
   ptr += sizeof(tag);
   memcpy(&len, ptr, sizeof(len));
   ptr += sizeof(len);
-  val = *ptr;
-  ptr ++;
-  if ( val < 0 || val > 100 )
+  if (tag == vtkProcessModule::PROGRESS_EVENT_TAG)
     {
-    vtkErrorMacro("Received progres not in the range 0 - 100: " << (int)val);
-    return;
+    char val = -1;
+    val = *ptr;
+    ptr ++;
+    if ( val < 0 || val > 100 )
+      {
+      vtkErrorMacro("Received progres not in the range 0 - 100: " << (int)val);
+      return;
+      }
+    vtkProcessModule::GetProcessModule()->ProgressEvent(caller, val, ptr);
     }
-  vtkProcessModule::GetProcessModule()->ProgressEvent(caller, val, ptr);
+  else if (tag == vtkProcessModule::EXCEPTION_EVENT_TAG)
+    {
+    vtkProcessModule::GetProcessModule()->ExceptionEvent(ptr);
+    this->OnSocketError();
+    }
 }
 
 //-----------------------------------------------------------------------------

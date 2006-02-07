@@ -114,7 +114,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.384");
+vtkCxxRevisionMacro(vtkPVApplication, "1.385");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -1922,7 +1922,12 @@ void vtkPVApplication::ServerConnectionClosedCallback()
     break;
     }
 
-  window->Close();
+  if (this->IsDialogUp())
+    {
+    // Force the application to exit.
+    this->DialogUp =0;
+    }
+  exit(1);
 }
 
 //----------------------------------------------------------------------------

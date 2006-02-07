@@ -76,6 +76,13 @@ public:
     PROGRESS_EVENT_TAG = 31415
     };
 
+  enum ExceptionEventEnum
+    {
+    EXCEPTION_EVENT_TAG = 31416,
+    EXCEPTION_BAD_ALLOC = 31417,
+    EXCEPTION_UNKNOWN   = 31418
+    };
+
   static inline int GetRootId(int serverId)
     {
     if (serverId & CLIENT)
@@ -235,6 +242,16 @@ public:
   // Description:
   // Internal method--called when a progress event is received.
   void ProgressEvent(vtkObject *o, int val, const char* filter);
+
+  // Description:
+  // Internal method- called when an exception Tag is received 
+  // from the server.
+  void ExceptionEvent(const char* message);
+  // Description:
+  // Internal method - called on the server only. This method
+  // should report to all client why the server is exiting.
+  void ExceptionEvent(int type);
+
 //BTX
   // Description:
   virtual void SendPrepareProgress(vtkConnectionID);
@@ -547,6 +564,11 @@ protected:
   // can accept multiple remote connections. This class only affects when running
   // in client-server mode.
   int SupportMultipleConnections;
+
+  // This flag is set when ExceptionEvent method is called.
+  // On the server, connections are no longer monitored once
+  // ExceptionRaised is set.
+  int ExceptionRaised;
 
   static int StreamBlockFlag;
 
