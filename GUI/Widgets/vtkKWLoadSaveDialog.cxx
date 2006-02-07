@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.49");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.50");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
@@ -141,7 +141,7 @@ int vtkKWLoadSaveDialog::Invoke()
     if (path && strlen(path) && strcmp(path, "{}") != 0)
       {
       int n = 0;
-      const char **files = 0;
+      CONST84 char **files = 0;
 
       if (Tcl_SplitList(this->GetApplication()->GetMainInterp(),
                         path, &n, &files) == TCL_OK)
