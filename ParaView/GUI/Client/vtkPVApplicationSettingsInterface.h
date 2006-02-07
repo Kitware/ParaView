@@ -33,6 +33,7 @@
 #define VTK_PV_ASI_CREATE_LOG_FILES_REG_KEY "CreateLogFiles"
 
 class vtkKWCheckButton;
+class vtkKWPushButton;
 
 class VTK_EXPORT vtkPVApplicationSettingsInterface : public vtkKWApplicationSettingsInterface
 {
@@ -71,6 +72,9 @@ public:
   // Auto accept can be set by the accept button pull down method.
   void SetAutoAccept(int val);
 
+  // Description:
+  // Resets all the settings to default values.
+  void ResetSettingsToDefault();
 protected:
   vtkPVApplicationSettingsInterface();
   ~vtkPVApplicationSettingsInterface();
@@ -80,6 +84,8 @@ protected:
   vtkKWCheckButton *ShowTraceFilesCheckButton;
   vtkKWCheckButton *AutoAcceptCheckButton;
   vtkKWCheckButton *CreateLogFilesCheckButton;
+
+  vtkKWPushButton *ResetButton;
 
   int AutoAccept;
 

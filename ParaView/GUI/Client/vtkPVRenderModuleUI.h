@@ -65,6 +65,9 @@ public:
   // vtk objects.  This should eliminate circular references.
   void PrepareForDelete();
 
+  // Description:
+  // Resets all the settings to default values.
+  virtual void ResetSettingsToDefault();
 protected:
   vtkPVRenderModuleUI();
   ~vtkPVRenderModuleUI();

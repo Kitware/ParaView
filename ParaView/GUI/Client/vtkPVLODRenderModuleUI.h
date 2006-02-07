@@ -117,6 +117,9 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Resets all the settings to default values.
+  virtual void ResetSettingsToDefault();
 protected:
   vtkPVLODRenderModuleUI();
   ~vtkPVLODRenderModuleUI();

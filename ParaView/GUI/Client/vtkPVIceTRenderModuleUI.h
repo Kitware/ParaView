@@ -56,6 +56,9 @@ public:
   // Callback for the ordered composite check button.
   virtual void SetOrderedCompositingFlag(int state);
 
+  // Description:
+  // Resets all the settings to default values.
+  virtual void ResetSettingsToDefault();
 protected:
   vtkPVIceTRenderModuleUI();
   ~vtkPVIceTRenderModuleUI();

@@ -114,7 +114,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.383");
+vtkCxxRevisionMacro(vtkPVApplication, "1.384");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -1438,6 +1438,16 @@ vtkKWSplashScreen* vtkPVApplication::GetSplashScreen()
 void vtkPVApplication::DisplayAboutDialog(vtkKWWindowBase *master)
 {
   this->Credits->ShowAboutDialog(master);  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::ResetSettingsToDefault()
+{
+  vtkPVWindow *win = vtkPVApplication::MainApplication->GetMainWindow();
+  if (win)
+    {
+    win->ResetSettingsToDefault();
+    }
 }
 
 //----------------------------------------------------------------------------

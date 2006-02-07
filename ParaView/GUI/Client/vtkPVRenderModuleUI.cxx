@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.15");
+vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.16");
 vtkCxxSetObjectMacro(vtkPVRenderModuleUI, RenderModuleProxy, vtkSMRenderModuleProxy);
 //----------------------------------------------------------------------------
 
@@ -77,6 +77,11 @@ void vtkPVRenderModuleUI::Create()
   // Call the superclass to create the whole widget
 
   this->Superclass::Create();
+}
+//----------------------------------------------------------------------------
+void vtkPVRenderModuleUI::ResetSettingsToDefault()
+{
+  
 }
 
 //----------------------------------------------------------------------------

@@ -45,6 +45,10 @@ public:
 
   void EnableRenductionFactor();
 
+  // Description:
+  // Resets all the settings to default values.
+  virtual void ResetSettingsToDefault();
+
 protected:
   vtkPVIceTDesktopRenderModuleUI();
   ~vtkPVIceTDesktopRenderModuleUI();

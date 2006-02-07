@@ -366,6 +366,9 @@ public:
 
   vtkGetObjectMacro(ColorMapUI, vtkPVColorMapUI);
 
+  // Description:
+  // Resets all the settings to default values.
+  void ResetSettingsToDefault();
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView();
@@ -376,7 +379,15 @@ protected:
   vtkPVSourceNotebook* SourceNotebook;
 
   void CalculateBBox(char* name, int bbox[4]);
- 
+  
+  // Internal methods to perform the operation without adding
+  // it to the trace.
+  void SetDefaultLightSwitchNoTrace(int val);
+  void SetUseLightNoTrace(int s);
+  void SetMaintainLuminanceNoTrace(int s);
+
+  vtkKWPushButton *ResetButton;
+
   vtkKWFrameWithLabel *StandardViewsFrame;
   vtkKWPushButton   *XMaxViewButton; 
   vtkKWPushButton   *XMinViewButton; 

@@ -137,7 +137,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.781");
+vtkCxxRevisionMacro(vtkPVWindow, "1.782");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -2184,6 +2184,29 @@ vtkPVWindow::GetApplicationSettingsInterface()
       this->GetApplicationSettingsUserInterfaceManager());
     }
   return this->ApplicationSettingsInterface;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::ResetSettingsToDefault()
+{
+  this->MainView->ResetSettingsToDefault();
+
+  vtkPVApplicationSettingsInterface::SafeDownCast(
+    this->GetApplicationSettingsInterface())->ResetSettingsToDefault();
+
+  if (!this->CenterActorVisibility)
+    {
+    this->CenterActorVisibility = 1;
+    this->ShowCenterActor();
+    }
+  if (this->ResetCameraButton)
+    {
+    this->ResetCameraButton->SetCheckButtonState("ViewAngle", 0);
+    this->ResetCameraButton->SetCheckButtonState("CenterOfRotation", 0);
+    }
+
+  this->GetTraceHelper()->AddEntry(
+    "$kw(%s) ResetSettingsToDefault", this->GetTclName());
 }
 
 //----------------------------------------------------------------------------

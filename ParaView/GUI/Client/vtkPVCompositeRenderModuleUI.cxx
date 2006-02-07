@@ -35,9 +35,17 @@
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 
+#define VTK_PV_DEFAULT_COMPOSITE_THRESHOLD 10.0
+#define VTK_PV_DEFAULT_SQUIRT_LEVEL 3
+#define VTK_PV_DEFAULT_REDUCTION_FACTOR 2
+#define VTK_PV_DEFAULT_COMPOSITE_WITH_FLOAT 0
+#define VTK_PV_DEFAULT_COMPOSITE_WITH_RGB 0
+#define VTK_PV_DEFAULT_COMPOSITE_COMPRESSION 1
+#define VTK_PV_DEFAULT_COMPOSITE_OPTION_ENABLED 1
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.35");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.36");
 
 //----------------------------------------------------------------------------
 vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
@@ -52,26 +60,26 @@ vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
   this->CompositeCheck = vtkKWCheckButton::New();
   this->CompositeThresholdScale = vtkKWScale::New();
   this->CompositeThresholdLabel = vtkKWLabel::New();
-  this->CompositeThreshold = 10.0;
+  this->CompositeThreshold = VTK_PV_DEFAULT_COMPOSITE_THRESHOLD;
 
   this->SquirtLabel = vtkKWLabel::New();
   this->SquirtCheck = vtkKWCheckButton::New();
   this->SquirtLevelScale = vtkKWScale::New();
   this->SquirtLevelLabel = vtkKWLabel::New();
-  this->SquirtLevel = 3;
+  this->SquirtLevel = VTK_PV_DEFAULT_SQUIRT_LEVEL;
 
   this->ReductionLabel = vtkKWLabel::New();
   this->ReductionCheck = vtkKWCheckButton::New();
   this->ReductionFactorScale = vtkKWScale::New();
   this->ReductionFactorLabel = vtkKWLabel::New();
-  this->ReductionFactor = 2;
+  this->ReductionFactor = VTK_PV_DEFAULT_REDUCTION_FACTOR;
 
 
-  this->CompositeWithFloatFlag = 0;
-  this->CompositeWithRGBAFlag = 0;
-  this->CompositeCompressionFlag = 1;
+  this->CompositeWithFloatFlag = VTK_PV_DEFAULT_COMPOSITE_WITH_FLOAT;
+  this->CompositeWithRGBAFlag = VTK_PV_DEFAULT_COMPOSITE_WITH_RGB;
+  this->CompositeCompressionFlag = VTK_PV_DEFAULT_COMPOSITE_COMPRESSION;
 
-  this->CompositeOptionEnabled = 1;
+  this->CompositeOptionEnabled = VTK_PV_DEFAULT_COMPOSITE_OPTION_ENABLED;
 }
 
 //----------------------------------------------------------------------------
@@ -802,6 +810,23 @@ void vtkPVCompositeRenderModuleUI::SetCompositeOptionEnabled(int val)
   this->CompositeCheck->SetEnabled(val);
   this->CompositeCheckCallback(
     this->CompositeCheck->GetSelectedState());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCompositeRenderModuleUI::ResetSettingsToDefault()
+{
+  this->Superclass::ResetSettingsToDefault();
+
+  this->SetCompositeThreshold(VTK_PV_DEFAULT_COMPOSITE_THRESHOLD);
+  this->SetCompositeOptionEnabled(VTK_PV_DEFAULT_COMPOSITE_OPTION_ENABLED);
+  this->SetSquirtLevel(VTK_PV_DEFAULT_SQUIRT_LEVEL);
+  this->SetReductionFactor(VTK_PV_DEFAULT_REDUCTION_FACTOR);
+  if (this->GetPVApplication()->GetProcessModule()->GetNumberOfPartitions() > 1)
+    {
+    this->CompositeWithFloatCallback(VTK_PV_DEFAULT_COMPOSITE_WITH_FLOAT);
+    this->CompositeWithRGBACallback(VTK_PV_DEFAULT_COMPOSITE_WITH_RGB);
+    this->CompositeCompressionCallback(VTK_PV_DEFAULT_COMPOSITE_COMPRESSION);
+    }
 }
 
 //----------------------------------------------------------------------------

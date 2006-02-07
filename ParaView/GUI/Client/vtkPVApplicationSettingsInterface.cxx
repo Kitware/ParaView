@@ -15,9 +15,11 @@
 
 #include "vtkPVApplicationSettingsInterface.h"
 
+#include "vtkKWBalloonHelpManager.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
 #include "vtkKWFrameWithLabel.h"
+#include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVApplication.h"
@@ -26,12 +28,10 @@
 #include "vtkPVSourceNotebook.h"
 #include "vtkPVGUIClientOptions.h"
 
-// This is only for the temorary prototype streaming feature.
-#include "vtkSMRenderModuleProxy.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.32");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.33");
 
 //----------------------------------------------------------------------------
 vtkPVApplicationSettingsInterface::vtkPVApplicationSettingsInterface()
@@ -44,7 +44,7 @@ vtkPVApplicationSettingsInterface::vtkPVApplicationSettingsInterface()
   this->ShowSourcesNameCheckButton = 0;
   this->ShowTraceFilesCheckButton = 0;
   this->CreateLogFilesCheckButton = 0;
-  // This is only for the temorary prototype streaming feature.
+  this->ResetButton = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -80,6 +80,11 @@ vtkPVApplicationSettingsInterface::~vtkPVApplicationSettingsInterface()
     {
     this->CreateLogFilesCheckButton->Delete();
     this->CreateLogFilesCheckButton = NULL;
+    }
+  if (this->ResetButton)
+    {
+    this->ResetButton->Delete();
+    this->ResetButton = NULL;
     }
 }
 
@@ -238,6 +243,22 @@ void vtkPVApplicationSettingsInterface::Create()
   tk_cmd << "pack forget " 
          << this->InterfaceCustomizationFrame->GetWidgetName() << endl;
 
+
+  if (!this->ResetButton)
+    {
+    this->ResetButton = vtkKWPushButton::New();
+    this->ResetButton->SetParent(frame);
+    }
+  this->ResetButton->Create();
+  this->ResetButton->SetText("Reset");
+  this->ResetButton->SetWidth(20);
+  this->ResetButton->SetBalloonHelpString("Reset Interface Setting to default.");
+  this->ResetButton->SetCommand(this, "ResetSettingsToDefault");
+  tk_cmd << "pack " <<  this->ResetButton->GetWidgetName() 
+    << " -side top -anchor e -expand no -fill none -padx 2 -pady 10"
+    << endl;
+  
+
   // --------------------------------------------------------------
   // Pack 
 
@@ -277,6 +298,30 @@ void vtkPVApplicationSettingsInterface::Update()
     this->ShowSourcesNameCheckButton->SetSelectedState(
       app->GetSourcesBrowserAlwaysShowName());
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplicationSettingsInterface::ResetSettingsToDefault()
+{
+  this->GetApplication()->SetSaveUserInterfaceGeometry(1);
+  this->GetApplication()->SetSplashScreenVisibility(1);
+  this->GetApplication()->GetBalloonHelpManager()->SetVisibility(1);
+  this->Window->SetViewPanelPositionToRight();
+  this->ConfirmExitCallback(1);
+  
+  this->SetAutoAccept(0);
+  this->ShowSourcesDescriptionCallback(1);
+  this->ShowSourcesNameCallback(0);
+  this->ShowTraceFilesCallback(1);
+  this->CreateLogFilesCallback(0);
+
+  this->ShowSourcesDescriptionCheckButton->SetSelectedState(1);
+  this->ShowSourcesNameCheckButton->SetSelectedState(0);
+  this->ShowTraceFilesCheckButton->SetSelectedState(1);
+  this->CreateLogFilesCheckButton->SetSelectedState(0);
+
+  // Now update the GUI for the Application settings.
+  this->Update();
 }
 
 //----------------------------------------------------------------------------
