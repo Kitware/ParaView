@@ -18,3 +18,4 @@
 #cmakedefine VTK_USE_VIDEO_FOR_WINDOWS
 
 #endif
+#cmakedefine VTK_USE_FFMPEG_ENCODER

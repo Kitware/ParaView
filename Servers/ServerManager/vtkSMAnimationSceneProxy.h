@@ -39,7 +39,6 @@ public:
   vtkTypeRevisionMacro(vtkSMAnimationSceneProxy, vtkSMAnimationCueProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-
   virtual void SaveInBatchScript(ofstream*);
 
   void Play();
@@ -86,7 +85,7 @@ public:
   // Saves the animation as a sequence of images or a movie file.
   // The method is not accessible using property interface.
   // Return 0 on success.
-  int SaveImages(const char* fileRoot, const char* ext, int width, int height, double framerate);
+  int SaveImages(const char* fileRoot, const char* ext, int width, int height, double framerate, int quality);
 
   // Description:
   // Save the geometry of the animation.

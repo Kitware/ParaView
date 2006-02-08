@@ -443,6 +443,12 @@ ENDIF(VTK_USE_MPI)
 # Configure Common
 SUBDIRS(Common)
 
+# Configure ffmpeg encoding
+MARK_AS_ADVANCED(CLEAR FFMPEG_INCLUDE_PATH)
+MARK_AS_ADVANCED(CLEAR FFMPEG_LIBRARY_PATH)
+
+#########################################################################
+
 #########################################################################
 # Configure VTKClientServer wrapping
 SET(VTKCLIENTSERVER_INCLUDE_DIR

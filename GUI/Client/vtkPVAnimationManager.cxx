@@ -20,6 +20,9 @@
 #include "vtkCommand.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEntryWithLabel.h"
+#include "vtkKWRadioButtonSetWithLabel.h"
+#include "vtkKWRadioButtonSet.h"
+#include "vtkKWRadioButton.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -63,7 +66,7 @@
 #define VTK_PV_CAMERA_PROXYNAME "_dont_validate_.ActiveCamera"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.62.2.2");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.62.2.3");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizontalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1046,10 +1049,14 @@ void vtkPVAnimationManager::SaveAnimation()
   saveDialog->SetTitle("Save Animation Images");
   ostrstream ostr;
   ostr << "{{JPEG Images} {.jpg}} {{TIFF Images} {.tif}} {{PNG Images} {.png}}";
-  ostr << " {{MPEG2 movie file} {.mp2}}";
+  ostr << " {{MPEG2 movie file} {.mpg}}";
 
 #ifdef _WIN32
   ostr << " {{AVI movie file} {.avi}}";
+#else
+#ifdef VTK_USE_FFMPEG_ENCODER
+  ostr << " {{AVI movie file} {.avi}}";
+#endif
 #endif
 
   ostr << ends;
@@ -1085,10 +1092,10 @@ void vtkPVAnimationManager::SaveAnimation()
     dlg->SetMasterWindow(pvWin);
     dlg->Create(this->GetApplication());
     // is this a video format
-    int isMPEG = (!strcmp(ext, "mpg") || !strcmp(ext, "mpeg") ||
-      !strcmp(ext, "MPG") || !strcmp(ext, "MPEG") ||
-      !strcmp(ext, "AVI") || !strcmp(ext, "avi") ||
-      !strcmp(ext, "MP2") || !strcmp(ext, "mp2"));
+    int isMPEG = 
+      (!strcmp(ext, "mpg") || !strcmp(ext, "mpeg") ||
+       !strcmp(ext, "MPG") || !strcmp(ext, "MPEG") ||
+       !strcmp(ext, "MP2") || !strcmp(ext, "mp2"));
     if (isMPEG)
       {
       dlg->SetText(
@@ -1131,6 +1138,23 @@ void vtkPVAnimationManager::SaveAnimation()
     framerateEntry->Create(this->GetApplication());
     framerateEntry->GetWidget()->SetValueAsInt(1);
 
+    int isAVI = (!strcmp(ext, "AVI") || !strcmp(ext, "avi"));
+
+    vtkKWRadioButtonSetWithLabel *qualityEntryLabel = vtkKWRadioButtonSetWithLabel::New();
+    qualityEntryLabel->SetParent(frame);
+    qualityEntryLabel->SetLabelText("Compressed Quality:");
+    qualityEntryLabel->Create(this->GetApplication());
+    vtkKWRadioButtonSet *qualityEntry = qualityEntryLabel->GetWidget();
+    vtkKWRadioButton *lowButton = qualityEntry->AddWidget(0);
+    lowButton->SetText("Low");
+    lowButton->SetSelectedState(0);
+    vtkKWRadioButton *mediumButton = qualityEntry->AddWidget(1);
+    mediumButton->SetText("Medium");
+    mediumButton->SetSelectedState(0);
+    vtkKWRadioButton *highButton = qualityEntry->AddWidget(2);
+    highButton->SetText("High");
+    highButton->SetSelectedState(1);
+
     this->Script("pack %s %s -side left -fill both -expand t",
       widthEntry->GetWidgetName(), heightEntry->GetWidgetName());
     if (isMPEG)
@@ -1138,9 +1162,24 @@ void vtkPVAnimationManager::SaveAnimation()
       this->Script("pack %s -side left -fill both -expand t",
         framerateEntry->GetWidgetName());
       }
+    if (isAVI)
+      {
+      this->Script("pack %s -side left -fill both -expand t",
+        qualityEntryLabel->GetWidgetName());
+      }
     this->Script("pack %s -side top -pady 5", frame->GetWidgetName());
 
     dlg->Invoke();
+
+    int quality = 2;
+    if (lowButton->GetSelectedState())
+      {
+      quality = 0;
+      }
+    if (mediumButton->GetSelectedState())
+      {
+      quality = 1;
+      }
 
     int width = widthEntry->GetWidget()->GetValueAsInt();
     int height = origHeight;
@@ -1205,10 +1244,11 @@ void vtkPVAnimationManager::SaveAnimation()
     widthEntry->Delete();
     heightEntry->Delete();
     framerateEntry->Delete();
+    qualityEntryLabel->Delete();
     frame->Delete();
     dlg->Delete();
 
-    this->AnimationScene->SaveImages(fileRoot.c_str(), ext, width, height, framerate);
+    this->AnimationScene->SaveImages(fileRoot.c_str(), ext, width, height, framerate, quality);
     view->SetRenderWindowSize(origWidth, origHeight);
     }
 

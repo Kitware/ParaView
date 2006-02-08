@@ -63,6 +63,7 @@
 #ifdef _WIN32
   #include "vtkAVIWriter.h"
 
+
 #endif
 
 #if !defined(_WIN32) || defined(__CYGWIN__)
@@ -72,7 +73,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.59.2.2");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.59.2.3");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 #define VTK_PV_TOOLBARS_ANIMATION_LABEL "Animation"
@@ -458,14 +459,14 @@ void vtkPVAnimationScene::CreateProxy()
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::SaveImages(const char* fileRoot, const char* ext, 
-  int width, int height, double framerate)
+  int width, int height, double framerate, int quality)
 {
-  this->GetTraceHelper()->AddEntry("$kw(%s) SaveImages \"%s\" \"%s\" %d %d %f",
-    this->GetTclName(), fileRoot, ext, width, height, framerate);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SaveImages \"%s\" \"%s\" %d %d %f %d",
+    this->GetTclName(), fileRoot, ext, width, height, framerate, quality);
  
   this->OnBeginPlay();
   int savefailed = this->AnimationSceneProxy->SaveImages(fileRoot, ext, 
-    width, height, framerate);
+    width, height, framerate, quality);
   this->OnEndPlay();
     char *errstring = new char[256];
 

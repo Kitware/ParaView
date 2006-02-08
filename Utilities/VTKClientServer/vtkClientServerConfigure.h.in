@@ -27,4 +27,6 @@
 # define VTK_CLIENT_SERVER_EXPORT
 #endif
 
+#cmakedefine VTK_USE_FFMPEG_ENCODER
+
 #endif
