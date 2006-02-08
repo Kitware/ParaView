@@ -42,7 +42,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.125");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.126");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -1132,19 +1132,24 @@ void vtkKWRenderWidget::PopulateAnnotationMenu(vtkKWMenu *menu)
 
   // Header Annotation
 
-  label = "Header Annotation";
-  buttonvar = menu->CreateCheckButtonVariable(
-    this, "HeaderAnnotationVisibility");
-  menu->AddCheckButton(
-    label.c_str(), buttonvar, this, "ToggleHeaderAnnotationVisibility");
-  menu->CheckCheckButton(
-    this, "HeaderAnnotationVisibility", this->GetHeaderAnnotationVisibility());
-  delete [] buttonvar;
-  if (show_icons)
+  const char *header = this->GetHeaderAnnotationText();
+  if (header && header)
     {
-    menu->SetItemImageToPredefinedIcon(
-      label.c_str(), vtkKWIcon::IconHeaderAnnotation);
-    menu->SetItemCompoundMode(label.c_str(), 1);
+    label = "Header Annotation";
+    buttonvar = menu->CreateCheckButtonVariable(
+    this, "HeaderAnnotationVisibility");
+    menu->AddCheckButton(
+      label.c_str(), buttonvar, this, "ToggleHeaderAnnotationVisibility");
+    menu->CheckCheckButton(
+      this, "HeaderAnnotationVisibility", 
+      this->GetHeaderAnnotationVisibility());
+    delete [] buttonvar;
+    if (show_icons)
+      {
+      menu->SetItemImageToPredefinedIcon(
+        label.c_str(), vtkKWIcon::IconHeaderAnnotation);
+      menu->SetItemCompoundMode(label.c_str(), 1);
+      }
     }
 }
 
