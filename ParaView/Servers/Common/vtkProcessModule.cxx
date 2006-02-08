@@ -27,6 +27,7 @@
 #include "vtkInstantiator.h"
 #include "vtkKWProcessStatistics.h"
 #include "vtkObjectFactory.h"
+#include "vtkOutputWindow.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiThreader.h"
 #include "vtkProcessModuleConnectionManager.h"
@@ -46,6 +47,8 @@
 #include "vtkTimerLog.h"
 
 #include <vtkstd/map>
+#include <vtkstd/new>
+#include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemTools.hxx>
 
 vtkProcessModule* vtkProcessModule::ProcessModule = 0;
@@ -94,7 +97,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.39");
+vtkCxxRevisionMacro(vtkProcessModule, "1.40");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -346,6 +349,10 @@ int vtkProcessModule::StartClient(int argc, char** argv)
 //-----------------------------------------------------------------------------
 int vtkProcessModule::StartServer(unsigned long msec)
 {
+  // Observe errors on the server side so that they can be processed to
+  // detect out of memory errors.
+  vtkOutputWindow::GetInstance()->AddObserver(vtkCommand::ErrorEvent,
+    this->Observer);
   // Running in server mode.
   int ret = 0;
   int support_multiple_connections = this->SupportMultipleConnections;
@@ -1037,6 +1044,23 @@ void vtkProcessModule::ExecuteEvent(
 
   case vtkCommand::AbortCheckEvent:
     this->InvokeEvent(vtkCommand::AbortCheckEvent);
+    break;
+
+  case vtkCommand::ErrorEvent:
+    if (o == vtkOutputWindow::GetInstance())
+      {
+      vtksys::RegularExpression re("Unable to allocate");
+      const char* data = reinterpret_cast<const char*>(calldata);
+      if (data && re.find(data))
+        {
+        // We throw an exception instead of calling 
+        // this->ExceptionEvent() directly so that the the calls
+        // unwind. This makes it possible for the server to exit gracefully
+        // (although there might be some leaks). Otherwise, the server most
+        // likely will segfault or we will have to force exit (using exit()).
+        throw vtkstd::bad_alloc();
+        }
+      }
     break;
     }
 }
