@@ -21,7 +21,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.16");
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.17");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";
@@ -1664,7 +1664,7 @@ void vtkKWParameterValueHermiteFunctionEditor::MoveMidPointCallback(
 
   unsigned long mtime = this->GetFunctionMTime();
 
-  const char *cursor;
+  const char *cursor = NULL;
   if (button == 1)
     {
     cursor = "sb_h_double_arrow";

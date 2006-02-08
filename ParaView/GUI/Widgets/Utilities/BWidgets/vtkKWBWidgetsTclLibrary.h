@@ -26,18 +26,6 @@ static const unsigned char image_bwplus[] =
 
 /* 
  * Resource generated for file:
- *    bwplus.pno (zlib, base64) (binary file)
- */
-static const unsigned long file_bwplus_pno_length         = 156;
-static const unsigned long file_bwplus_pno_decoded_length = 118;
-
-static const unsigned char file_bwplus_pno[] = 
-  "eNrrDPBz5+WS4mJgYOD19HAJAtKcIMzIDCRvxU8JBlJsAT4hrkD6////S2/OvwtksZd4+r"
-  "qyX2UXEtEVeX7iIRtQSMLTxTGkYk5yQkLCivQEDXZldwlmjUMHGBi0pzLLxKpN+wBUw+Dp"
-  "6ueyzimhCQBm8R70";
-
-/* 
- * Resource generated for file:
  *    arrow.tcl (zlib, base64) (text file)
  */
 static const unsigned long file_arrow_tcl_length         = 4376;
