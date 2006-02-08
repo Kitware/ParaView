@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.46");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.47");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -271,7 +271,7 @@ int vtkKWPiecewiseFunctionEditor::SetFunctionPointValues(
 
   // Clamp
 
-  double value;
+  double value = 0.0;
   vtkMath::ClampValue(values[0], this->GetWholeValueRange(), &value);
 
 #if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
@@ -312,7 +312,7 @@ int vtkKWPiecewiseFunctionEditor::AddFunctionPoint(
   // Clamp
 
   vtkMath::ClampValue(&parameter, this->GetWholeParameterRange());
-  double value;
+  double value = 0.0;
   vtkMath::ClampValue(values[0], this->GetWholeValueRange(), &value);
 
   // Add the point
@@ -357,7 +357,7 @@ int vtkKWPiecewiseFunctionEditor::SetFunctionPoint(
   // Clamp
 
   vtkMath::ClampValue(&parameter, this->GetWholeParameterRange());
-  double value;
+  double value = 0.0;
   vtkMath::ClampValue(values[0], this->GetWholeValueRange(), &value);
 
   if (parameter != old_parameter)
@@ -1158,7 +1158,9 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointsFromWindowLevel(int interactive)
 
     // Set the points
 
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
     int size = this->GetFunctionSize();
+#endif
     for (id = 0; id < 4; id++)
       {
 #if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)

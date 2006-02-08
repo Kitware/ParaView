@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.74");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.75");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -2444,12 +2444,13 @@ int vtkKWTkUtilities::TakeScreenDump(Tcl_Interp *interp,
     {
     return 0;
     }
+  /*
   unsigned int buffer_size = ximage->bytes_per_line * ximage->height;
   if (ximage->format != ZPixmap)
     {
     buffer_size = ximage->bytes_per_line * ximage->height * ximage->depth;
     }
-
+  */
   vtkKWTkUtilitiesTkColormapData cdata;
   Colormap cmap;
   Visual *visual;
@@ -2466,6 +2467,12 @@ int vtkKWTkUtilities::TakeScreenDump(Tcl_Interp *interp,
   ncolors = visual->map_entries;
   cdata.colors = (XColor *) ckalloc(sizeof(XColor) * ncolors);
   cdata.ncolors = ncolors;
+  cdata.red_mask = 0;
+  cdata.green_mask = 0;
+  cdata.blue_mask = 0;
+  cdata.red_shift = 0;
+  cdata.green_shift = 0;
+  cdata.blue_shift = 0;
 
   if (visual->c_class == DirectColor || visual->c_class == TrueColor) 
     {
@@ -2473,9 +2480,6 @@ int vtkKWTkUtilities::TakeScreenDump(Tcl_Interp *interp,
     cdata.red_mask = visual->red_mask;
     cdata.green_mask = visual->green_mask;
     cdata.blue_mask = visual->blue_mask;
-    cdata.red_shift = 0;
-    cdata.green_shift = 0;
-    cdata.blue_shift = 0;
     while ((0x0001 & (cdata.red_mask >> cdata.red_shift)) == 0)
       cdata.red_shift ++;
     while ((0x0001 & (cdata.green_mask >> cdata.green_shift)) == 0)
