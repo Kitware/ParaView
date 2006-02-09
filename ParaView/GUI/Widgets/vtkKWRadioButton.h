@@ -55,8 +55,22 @@ public:
   // Note that the selected state is *not* passed as parameter, which is
   // the case for vtkKWCheckButton for example. In most cases, since the 
   // selected state is shared among many radiobuttons, this command will
-  // likely to perform a task related to the button meaning itself.
+  // likely to perform a task related to the meaning of the button itself.
   virtual void SetCommand(vtkObject *object, const char *method);
+
+  // Description:
+  // Events. The SelectedStateChangedEvent is triggered when the button
+  // is selected or deselected.
+  // The following parameters are also passed as client data:
+  // - the current selected state: int
+  // Yes, this is duplicated from vtkKWCheckButton, so that code does not
+  // break when vtkKWRadioButton is not a subclass of vtkKWCheckButton anymore.
+  //BTX
+  enum
+  {
+    SelectedStateChangedEvent = 10000
+  };
+  //ETX
 
   // Description:
   // Convenience method to set/get the button's associated variable directly
@@ -65,6 +79,10 @@ public:
   virtual void SetVariableValueAsInt(int v);
   virtual const char* GetVariableValue();
   virtual int GetVariableValueAsInt();
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void CommandCallback();
 
 protected:
   vtkKWRadioButton() {};

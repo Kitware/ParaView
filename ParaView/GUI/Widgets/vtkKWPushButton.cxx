@@ -18,18 +18,25 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPushButton );
-vtkCxxRevisionMacro(vtkKWPushButton, "1.28");
+vtkCxxRevisionMacro(vtkKWPushButton, "1.29");
 
 //----------------------------------------------------------------------------
 vtkKWPushButton::vtkKWPushButton()
 {
   this->ButtonText = 0;
+  this->Command      = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkKWPushButton::~vtkKWPushButton()
 {
   this->SetButtonText(0);
+
+  if (this->Command)
+    {
+    delete [] this->Command;
+    this->Command = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -45,6 +52,11 @@ void vtkKWPushButton::Create()
 
   this->SetTextOption("-text", this->ButtonText);
 
+  char *command = NULL;
+  this->SetObjectMethodCommand(&command, this, "CommandCallback");
+  this->SetConfigurationOption("-command", command);
+  delete [] command;
+  
   // Update enable state
 
   this->UpdateEnableState();
@@ -147,15 +159,22 @@ void vtkKWPushButton::SetImageToPixels(const unsigned char* pixels,
 }
 
 //----------------------------------------------------------------------------
+void vtkKWPushButton::CommandCallback()
+{
+  this->InvokeCommand();
+  this->InvokeEvent(vtkKWPushButton::InvokedEvent);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWPushButton::SetCommand(vtkObject *object, const char *method)
 {
-  if (this->IsCreated())
-    {
-    char *command = NULL;
-    this->SetObjectMethodCommand(&command, object, method);
-    this->SetConfigurationOption("-command", command);
-    delete [] command;
-    }
+  this->SetObjectMethodCommand(&this->Command, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::InvokeCommand()
+{
+  this->InvokeObjectMethodCommand(this->Command);
 }
 
 //----------------------------------------------------------------------------
