@@ -378,7 +378,7 @@ protected:
              float minX, float minY, float scaleX, float scaleY);
 #endif
   
-  void SetupStreaming();
+  void SetupStreaming(int numPartitions);
   void CleanupStreaming(int rate, int stride[3]);
 
 private:

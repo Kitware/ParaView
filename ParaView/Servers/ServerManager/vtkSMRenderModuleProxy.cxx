@@ -46,7 +46,7 @@
 #include "vtkWindowToImageFilter.h"
 
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.24");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.25");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -489,7 +489,10 @@ void vtkSMRenderModuleProxy::StillRender()
   // Interactive renders get called through the PVInteractorStyles
   // which cal ResetCameraClippingRange on the Renderer.
   // We could convert them to call a method on the module directly ...
-  this->GetRenderer()->ResetCameraClippingRange();
+  if ( ! vtkProcessModule::GetStreamBlock())
+    {
+    this->GetRenderer()->ResetCameraClippingRange();
+    }
   renWindow->SetDesiredUpdateRate(0.002);
 
   this->BeginStillRender();

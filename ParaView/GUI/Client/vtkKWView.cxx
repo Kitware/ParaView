@@ -67,7 +67,9 @@
 #include "vtkTextProperty.h"
 #include "vtkViewport.h"
 #include "vtkWindowToImageFilter.h"
-
+#include "vtkKWSimpleEntryDialog.h"
+#include "vtkKWEntryWithLabel.h"
+#include "vtkSMDoubleVectorProperty.h"
 #if defined(PARAVIEW_USE_WIN32_RW)
 #include "vtkWin32OpenGLRenderWindow.h"
 #elif defined(PARAVIEW_USE_CARBON_RW)
@@ -102,7 +104,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.30");
+vtkCxxRevisionMacro(vtkKWView, "1.31");
 
 //----------------------------------------------------------------------------
 void KWViewAbortCheckMethod( vtkObject*, unsigned long, void* arg, void* )
@@ -795,17 +797,33 @@ void vtkKWView::SaveAsImage()
           src->GetProxy()->GetProperty("SubsampleRate"));
         if (prop && prop->GetElement(0) > 1)
           {
-          int ret = vtkKWMessageDialog::PopupYesNo(
-            this->GetApplication(),
-            this->ParentWindow,
-            "Streaming",
+          vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
+          vtkKWSimpleEntryDialog* numPartitionsDialog = vtkKWSimpleEntryDialog::New();
+          numPartitionsDialog->SetApplication(pvApp);
+          numPartitionsDialog->SetStyleToYesNo();
+          //dlg2->SetMasterWindow(win);
+          numPartitionsDialog->SetOptions(vtkKWMessageDialog::YesDefault );
+          numPartitionsDialog->SetDialogName("Partitions");
+          numPartitionsDialog->Create();
+          numPartitionsDialog->SetText("Partitions:");  
+          numPartitionsDialog->GetEntry()->GetWidget()->SetValue("200");
+          numPartitionsDialog->SetTitle(
             "Do you want to stream to get full-resolution data?");
+          numPartitionsDialog->SetIcon();
+          int ret = numPartitionsDialog->Invoke();
+          int numPartitions = atoi(numPartitionsDialog->GetEntry()->GetWidget()->GetValue());
+          numPartitionsDialog->Delete();
+          //int ret = vtkKWMessageDialog::PopupYesNo(
+          //  this->GetApplication(),
+          //  this->ParentWindow,
+          //  "Streaming",
+          //  "Do you want to stream to get full-resolution data?");
           if (ret)
             {
             rate = prop->GetElement(0);
             prop->SetElement(0, 1);
             src->GetProxy()->UpdateVTKObjects();
-            this->SetupStreaming();
+            this->SetupStreaming(numPartitions);
             }
           break;
           }
@@ -817,11 +835,27 @@ void vtkKWView::SaveAsImage()
         if (prop && (prop->GetElement(0) > 1 || prop->GetElement(1) > 1 ||
                      prop->GetElement(2) > 1))
           {
-          int ret = vtkKWMessageDialog::PopupYesNo(
-            this->GetApplication(),
-            this->ParentWindow,
-            "Streaming",
+          //int ret = vtkKWMessageDialog::PopupYesNo(
+          //  this->GetApplication(),
+          //  this->ParentWindow,
+          //  "Streaming",
+          //  "Do you want to stream to get full-resolution data?");
+          vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
+          vtkKWSimpleEntryDialog* numPartitionsDialog = vtkKWSimpleEntryDialog::New();
+          numPartitionsDialog->SetApplication(pvApp);
+          numPartitionsDialog->SetStyleToYesNo();
+          //dlg2->SetMasterWindow(win);
+          numPartitionsDialog->SetOptions(vtkKWMessageDialog::YesDefault );
+          numPartitionsDialog->SetDialogName("Partitions");
+          numPartitionsDialog->Create();
+          numPartitionsDialog->SetText("Partitions:");  
+          numPartitionsDialog->GetEntry()->GetWidget()->SetValue("200");
+          numPartitionsDialog->SetTitle(
             "Do you want to stream to get full-resolution data?");
+          numPartitionsDialog->SetIcon();
+          int ret = numPartitionsDialog->Invoke();
+          int numPartitions = atoi(numPartitionsDialog->GetEntry()->GetWidget()->GetValue());
+          numPartitionsDialog->Delete();
           if (ret)
             {
             stride[0] = prop->GetElement(0);
@@ -831,7 +865,7 @@ void vtkKWView::SaveAsImage()
             prop->SetElement(1, 1);
             prop->SetElement(2, 1);
             src->GetProxy()->UpdateVTKObjects();
-            this->SetupStreaming();
+            this->SetupStreaming(numPartitions);
             }
           break;
           }
@@ -1461,11 +1495,28 @@ void vtkKWView::UpdateEnableState()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWView::SetupStreaming()
-{
-  vtkPVApplication *app=vtkPVApplication::SafeDownCast(this->GetApplication());
-  app->GetProcessModule()->SetStreamBlock(1);
-
+void vtkKWView::SetupStreaming(int numPartitions)
+{  
+  if (numPartitions < 1)
+    {
+    numPartitions = 1;
+    }
+  
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(
+    this->GetApplication());
+  pvApp->GetProcessModule()->SetStreamBlock(1);  
+ 
+  // Streaming does not work for collection because mapper iterates.
+  // Force compositing.
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    pvApp->GetRenderModuleProxy()->GetProperty("CompositeThreshold"));
+  if (dvp)
+    {
+    float threshold = 0.0;
+    dvp->SetElement(0, threshold);
+    pvApp->GetRenderModuleProxy()->UpdateVTKObjects();
+    }
+  
   vtkPVWindow *win = vtkPVWindow::SafeDownCast(this->GetParentWindow());
   if (!win)
     {
@@ -1486,11 +1537,34 @@ void vtkKWView::SetupStreaming()
       dispProxy->GetProperty("NumberOfSubPieces"));
     if (prop)
       {
-      prop->SetElement(0, 200);
+      // This should really be a value chosen by the user.
+      // Number of partitions.
+      prop->SetElement(0, numPartitions);
       dispProxy->UpdateVTKObjects();
       }
+    // We also have to make sure to set the base piece and number of pieces.
+    //... TODO ...
+
+    }
+  
+  // Just disable render interrups.
+  // TODO: If we keep streaming in ParaView then we must restore the state 
+  // if this parameter after streaming is finished.
+  // TODO: RenderInterrrupts should be disabled 
+  // for saving any image of animation.
+  // TODO: If we keep streaming, then all exposure events should be flushed
+  // before we put the final image in the render window.
+  vtkSMRenderModuleProxy* renderModuleProxy = pvApp->GetRenderModuleProxy();  
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    renderModuleProxy->GetProperty("RenderInterruptsEnabled"));
+  if (ivp)
+    {
+    int state = 0;
+    ivp->SetElement(0, state);
+    renderModuleProxy->UpdateVTKObjects();
     }
 }
+
 
 //----------------------------------------------------------------------------
 void vtkKWView::CleanupStreaming(int rate, int stride[3])
