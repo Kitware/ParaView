@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVSphereWidget - A widget to manipulate an implicit plane.
+// .NAME vtkPVSphereWidget - A widget to manipulate an implicit sphere.
 // .SECTION Description
 // vtkPVSphereWidget can be considered as equivalent to the combination of
 // vtkPVLineWidget and vtkPVLineSourceWidget.
