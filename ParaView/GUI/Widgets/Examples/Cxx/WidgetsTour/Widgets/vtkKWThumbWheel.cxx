@@ -3,16 +3,16 @@
 #include "vtkKWThumbWheel.h"
 #include "vtkKWWindow.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWThumbWheelItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeComposite; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWThumbWheelEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWThumbWheelItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -76,6 +76,14 @@ KWWidgetsTourItem* vtkKWThumbWheelEntryPoint(
   thumbwheel1->Delete();
   thumbwheel2->Delete();
   thumbwheel3->Delete();
+}
 
-  return new vtkKWThumbWheelItem;
+int vtkKWThumbWheelItem::GetType()
+{
+  return KWWidgetsTourItem::TypeComposite;
+}
+
+KWWidgetsTourItem* vtkKWThumbWheelEntryPoint()
+{
+  return new vtkKWThumbWheelItem();
 }

@@ -70,6 +70,8 @@ proc vtkKWRangeEntryPoint {parent win} {
   pack [$range3 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 
   # TODO: vertical range
+}
 
+proc vtkKWRangeGetType {} {
   return "TypeComposite"
 }

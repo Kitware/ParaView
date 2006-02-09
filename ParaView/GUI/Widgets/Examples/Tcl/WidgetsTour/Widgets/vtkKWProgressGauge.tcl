@@ -51,6 +51,8 @@ proc vtkKWProgressGaugeEntryPoint {parent win} {
   pack [$progress1_pbs GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 
   # TODO: add callbacks
+}
 
+proc vtkKWProgressGaugeGetType {} {
   return "TypeComposite"
 }

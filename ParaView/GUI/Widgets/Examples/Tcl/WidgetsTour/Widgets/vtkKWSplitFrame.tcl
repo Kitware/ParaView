@@ -23,6 +23,8 @@ proc vtkKWSplitFrameEntryPoint {parent win} {
 
   [$splitframe1 GetFrame1] SetBackgroundColor 0.2 0.2 0.95
   [$splitframe1 GetFrame2] SetBackgroundColor 0.95 0.2 0.2
+}
 
+proc vtkKWSplitFrameGetType {} {
   return "TypeComposite"
 }

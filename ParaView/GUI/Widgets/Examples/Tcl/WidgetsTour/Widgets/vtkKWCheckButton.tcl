@@ -83,6 +83,9 @@ proc vtkKWCheckButtonEntryPoint {parent win} {
   # -----------------------------------------------------------------------
 
   # TODO: use vtkKWCheckButtonSetWithLabel
+}
 
+proc vtkKWCheckButtonGetType {} {
   return "TypeCore"
 }
+

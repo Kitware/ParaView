@@ -6,16 +6,16 @@
 #include "vtkPiecewiseFunction.h"
 #include "vtkVolumeProperty.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWVolumePropertyWidgetItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeVTK; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWVolumePropertyWidgetEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWVolumePropertyWidgetItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -74,6 +74,14 @@ KWWidgetsTourItem* vtkKWVolumePropertyWidgetEntryPoint(
   vpw_ofun->Delete();
   vpw_gfun->Delete();
   vpw_vp->Delete();
+}
 
-  return new vtkKWVolumePropertyWidgetItem;
+int vtkKWVolumePropertyWidgetItem::GetType()
+{
+  return KWWidgetsTourItem::TypeVTK;
+}
+
+KWWidgetsTourItem* vtkKWVolumePropertyWidgetEntryPoint()
+{
+  return new vtkKWVolumePropertyWidgetItem();
 }

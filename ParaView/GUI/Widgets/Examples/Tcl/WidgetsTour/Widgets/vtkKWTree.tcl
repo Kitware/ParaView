@@ -30,6 +30,8 @@ proc vtkKWTreeEntryPoint {parent win} {
   $tree1 AddNode "kitware_node" "ken_node" "Ken Martin"
   
   pack [$tree1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
+}
 
+proc vtkKWTreeGetType {} {
   return "TypeCore"
 }

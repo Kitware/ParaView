@@ -3,16 +3,16 @@
 #include "vtkKWVolumeMaterialPropertyWidget.h"
 #include "vtkKWWindow.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWVolumeMaterialPropertyWidgetItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeVTK; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWVolumeMaterialPropertyWidgetEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWVolumeMaterialPropertyWidgetItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -73,6 +73,14 @@ KWWidgetsTourItem* vtkKWVolumeMaterialPropertyWidgetEntryPoint(
   volprop1_widget->Delete();
   volprop2_widget->Delete();
   volprop1->Delete();
+}
 
-  return new vtkKWVolumeMaterialPropertyWidgetItem;
+int vtkKWVolumeMaterialPropertyWidgetItem::GetType()
+{
+  return KWWidgetsTourItem::TypeVTK;
+}
+
+KWWidgetsTourItem* vtkKWVolumeMaterialPropertyWidgetEntryPoint()
+{
+  return new vtkKWVolumeMaterialPropertyWidgetItem();
 }

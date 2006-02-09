@@ -4,15 +4,16 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWScaleItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeCore; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWScaleItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -131,6 +132,14 @@ KWWidgetsTourItem* vtkKWScaleEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   scale2b->Delete();
   scale3->Delete();
   scale_set->Delete();
+}
 
-  return new vtkKWScaleItem;
+int vtkKWScaleItem::GetType()
+{
+  return KWWidgetsTourItem::TypeCore;
+}
+
+KWWidgetsTourItem* vtkKWScaleEntryPoint()
+{
+  return new vtkKWScaleItem();
 }

@@ -5,16 +5,16 @@
 #include "vtkKWWindow.h"
 
 #include <vtksys/stl/string>
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWProgressGaugeItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeComposite; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWProgressGaugeEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWProgressGaugeItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -79,6 +79,14 @@ KWWidgetsTourItem* vtkKWProgressGaugeEntryPoint(
   progress1_pbs->Delete();
 
   // TODO: add callbacks
+}
 
-  return new vtkKWProgressGaugeItem;
+int vtkKWProgressGaugeItem::GetType()
+{
+  return KWWidgetsTourItem::TypeComposite;
+}
+
+KWWidgetsTourItem* vtkKWProgressGaugeEntryPoint()
+{
+  return new vtkKWProgressGaugeItem();
 }

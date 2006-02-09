@@ -83,6 +83,8 @@ proc vtkKWRadioButtonEntryPoint {parent win} {
   # -----------------------------------------------------------------------
 
   # TODO: use vtkKWRadioButtonSetWithLabel and callbacks
+  }
 
+proc vtkKWRadioButtonGetType {} {
   return "TypeCore"
 }

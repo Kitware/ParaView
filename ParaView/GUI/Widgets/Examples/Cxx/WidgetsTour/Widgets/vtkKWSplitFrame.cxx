@@ -2,16 +2,16 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWSplitFrameItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeComposite; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWSplitFrameEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWSplitFrameItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -40,6 +40,14 @@ KWWidgetsTourItem* vtkKWSplitFrameEntryPoint(
   splitframe1->GetFrame2()->SetBackgroundColor(0.95, 0.2, 0.2);
 
   splitframe1->Delete();
+}
 
-  return new vtkKWSplitFrameItem;
+int vtkKWSplitFrameItem::GetType()
+{
+  return KWWidgetsTourItem::TypeComposite;
+}
+
+KWWidgetsTourItem* vtkKWSplitFrameEntryPoint()
+{
+  return new vtkKWSplitFrameItem();
 }

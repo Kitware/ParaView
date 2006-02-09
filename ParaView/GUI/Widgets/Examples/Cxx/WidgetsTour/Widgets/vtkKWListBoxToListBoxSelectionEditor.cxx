@@ -2,16 +2,16 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWListBoxToListBoxSelectionEditorItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeComposite; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWListBoxToListBoxSelectionEditorEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWListBoxToListBoxSelectionEditorItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -38,6 +38,14 @@ KWWidgetsTourItem* vtkKWListBoxToListBoxSelectionEditorEntryPoint(
     lb2lb1->GetWidgetName());
 
   lb2lb1->Delete();
+}
 
-  return new vtkKWListBoxToListBoxSelectionEditorItem;
+int vtkKWListBoxToListBoxSelectionEditorItem::GetType()
+{
+  return KWWidgetsTourItem::TypeComposite;
+}
+
+KWWidgetsTourItem* vtkKWListBoxToListBoxSelectionEditorEntryPoint()
+{
+  return new vtkKWListBoxToListBoxSelectionEditorItem();
 }

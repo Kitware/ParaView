@@ -8,16 +8,16 @@
 #include "vtkKWWindow.h"
 #include "vtkXMLImageDataReader.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWPiecewiseFunctionEditorItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeVTK; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWPiecewiseFunctionEditorEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWPiecewiseFunctionEditorItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -65,7 +65,7 @@ KWWidgetsTourItem* vtkKWPiecewiseFunctionEditorEntryPoint(
 
   vtkXMLImageDataReader *pfed_reader = vtkXMLImageDataReader::New();
   pfed_reader->SetFileName(
-    KWWidgetsTourItem::GetPathToExampleData(app, "head100x100x47.vti"));
+    vtkKWWidgetsTourExample::GetPathToExampleData(app, "head100x100x47.vti"));
 
   // The build an histogram of the data, it will be used inside the editor
   // as if we were trying to tune a tfunc based on the real values
@@ -151,6 +151,14 @@ KWWidgetsTourItem* vtkKWPiecewiseFunctionEditorEntryPoint(
   pfed_tfunc2->Delete();
   pfed_hist->Delete();
   pfed_reader->Delete();
+}
 
-  return new vtkKWPiecewiseFunctionEditorItem;
+int vtkKWPiecewiseFunctionEditorItem::GetType()
+{
+  return KWWidgetsTourItem::TypeVTK;
+}
+
+KWWidgetsTourItem* vtkKWPiecewiseFunctionEditorEntryPoint()
+{
+  return new vtkKWPiecewiseFunctionEditorItem();
 }

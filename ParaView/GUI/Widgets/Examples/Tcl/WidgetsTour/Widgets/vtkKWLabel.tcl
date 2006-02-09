@@ -135,5 +135,8 @@ proc vtkKWLabelEntryPoint {parent win} {
   [[$label_set2 GetWidget 2] GetWidget] SetText "Kitware Inc."
 
   pack [$label_set2 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
+}
+
+proc vtkKWLabelGetType {} {
   return "TypeCore"
 }

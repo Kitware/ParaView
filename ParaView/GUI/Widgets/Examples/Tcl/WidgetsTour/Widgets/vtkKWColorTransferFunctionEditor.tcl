@@ -105,6 +105,8 @@ proc vtkKWColorTransferFunctionEditorEntryPoint {parent win} {
   $cpsel_tfunc2_editor SetParameterTicksFormat "%-#6.0f"
 
   pack [$cpsel_tfunc2_editor GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 20
+}
 
+proc vtkKWColorTransferFunctionEditorGetType {} {
   return "TypeVTK"
 }

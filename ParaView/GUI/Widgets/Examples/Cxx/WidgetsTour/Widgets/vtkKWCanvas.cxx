@@ -2,15 +2,16 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWCanvasItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeCore; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWCanvasEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWCanvasItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -57,6 +58,14 @@ KWWidgetsTourItem* vtkKWCanvasEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   // TODO: add a canvas with scrollbars
 
   canvas1->Delete();
+}
 
-  return new vtkKWCanvasItem;
+int vtkKWCanvasItem::GetType()
+{
+  return KWWidgetsTourItem::TypeCore;
+}
+
+KWWidgetsTourItem* vtkKWCanvasEntryPoint()
+{
+  return new vtkKWCanvasItem();
 }

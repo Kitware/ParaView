@@ -49,6 +49,8 @@ proc vtkKWVolumeMaterialPropertyWidgetEntryPoint {parent win} {
 
   $volprop1_widget SetPropertyChangingCommand $volprop2_widget "Update"
   $volprop1_widget SetPropertyChangedCommand $volprop2_widget "Update"
+}
 
+proc vtkKWVolumeMaterialPropertyWidgetGetType {} {
   return "TypeVTK"
 }

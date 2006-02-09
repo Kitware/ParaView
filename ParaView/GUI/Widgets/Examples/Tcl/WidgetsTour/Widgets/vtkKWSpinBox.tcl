@@ -47,6 +47,8 @@ proc vtkKWSpinBoxEntryPoint {parent win} {
     label that can be positioned around the spinbox."
 
   pack [$spinbox3 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
+}
 
+proc vtkKWSpinBoxGetType {} {
   return "TypeCore"
 }

@@ -46,6 +46,8 @@ proc vtkKWVolumePropertyWidgetEntryPoint {parent win} {
 
   $vpw SetVolumeProperty $vpw_vp
   $vpw SetWindowLevel 128 128
+}
 
+proc vtkKWVolumePropertyWidgetGetType {} {
   return "TypeVTK"
 }

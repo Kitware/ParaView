@@ -6,16 +6,16 @@
 #include "vtkRenderWindow.h"
 #include "vtkXMLPolyDataReader.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWRenderWidgetItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeVTK; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWRenderWidgetEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWRenderWidgetItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -36,7 +36,7 @@ KWWidgetsTourItem* vtkKWRenderWidgetEntryPoint(
 
   vtkXMLPolyDataReader *rw_reader = vtkXMLPolyDataReader::New();
   rw_reader->SetFileName(
-    KWWidgetsTourItem::GetPathToExampleData(app, "teapot.vtp"));
+    vtkKWWidgetsTourExample::GetPathToExampleData(app, "teapot.vtp"));
 
   // Create the mapper and actor
 
@@ -55,6 +55,14 @@ KWWidgetsTourItem* vtkKWRenderWidgetEntryPoint(
   rw_actor->Delete();
   rw_mapper->Delete();
   rw_renderwidget->Delete();
+}
 
-  return new vtkKWRenderWidgetItem;
+int vtkKWRenderWidgetItem::GetType()
+{
+  return KWWidgetsTourItem::TypeVTK;
+}
+
+KWWidgetsTourItem* vtkKWRenderWidgetEntryPoint()
+{
+  return new vtkKWRenderWidgetItem();
 }

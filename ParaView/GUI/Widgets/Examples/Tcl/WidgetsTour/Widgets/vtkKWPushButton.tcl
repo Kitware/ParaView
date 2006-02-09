@@ -79,6 +79,8 @@ proc vtkKWPushButtonEntryPoint {parent win} {
   pack [$pushbutton_set GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 
   # TODO: add callbacks
+}
 
+proc vtkKWPushButtonGetType {} {
   return "TypeCore"
 }

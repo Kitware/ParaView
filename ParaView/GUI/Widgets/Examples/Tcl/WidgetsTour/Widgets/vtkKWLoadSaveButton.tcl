@@ -13,6 +13,8 @@ proc vtkKWLoadSaveButtonEntryPoint {parent win} {
   [$load_button1 GetLoadSaveDialog] SaveDialogOff
 
   pack [$load_button1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
+}
 
+proc vtkKWLoadSaveButtonGetType {} {
   return "TypeComposite"
 }

@@ -2,15 +2,16 @@
 #include "vtkKWApplication.h"
 #include "vtkKWRange.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWRangeItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeComposite; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWRangeEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWRangeItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -92,6 +93,14 @@ KWWidgetsTourItem* vtkKWRangeEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   range3->Delete();
 
   // TODO: vertical range
+}
 
-  return new vtkKWRangeItem;
+int vtkKWRangeItem::GetType()
+{
+  return KWWidgetsTourItem::TypeComposite;
+}
+
+KWWidgetsTourItem* vtkKWRangeEntryPoint()
+{
+  return new vtkKWRangeItem();
 }

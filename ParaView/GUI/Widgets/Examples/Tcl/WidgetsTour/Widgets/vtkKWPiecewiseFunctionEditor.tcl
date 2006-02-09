@@ -126,6 +126,8 @@ proc vtkKWPiecewiseFunctionEditorEntryPoint {parent win} {
       [$pfed_tfunc2_editor GetMidPointGuidelineValueFormat]
 
   pack [$pfed_tfunc2_editor GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 20
+}
 
+proc vtkKWPiecewiseFunctionEditorGetType {} {
   return "TypeVTK"
 }

@@ -1,7 +1,7 @@
 #ifndef __KWWidgetsTourExampleEntryPoints_h
 #define __KWWidgetsTourExampleEntryPoints_h
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 /* 
    Forward declare widget init functions

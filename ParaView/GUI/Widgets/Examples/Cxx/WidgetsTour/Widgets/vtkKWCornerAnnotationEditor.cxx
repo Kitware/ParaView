@@ -10,13 +10,15 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkXMLImageDataReader.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWCornerAnnotationEditorItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeVTK; };
-  vtkKWCornerAnnotationEditorItem(vtkKWWidget *parent, vtkKWWindow *);
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
+
+  vtkKWCornerAnnotationEditorItem();
   virtual ~vtkKWCornerAnnotationEditorItem();
 
 protected:
@@ -26,13 +28,7 @@ protected:
   vtkKWCornerAnnotationEditor *cae_anno_editor;
 };
 
-KWWidgetsTourItem* vtkKWCornerAnnotationEditorEntryPoint(vtkKWWidget *parent, vtkKWWindow *window)
-{
-  return new vtkKWCornerAnnotationEditorItem(parent, window);
-}
-
-vtkKWCornerAnnotationEditorItem::vtkKWCornerAnnotationEditorItem(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWCornerAnnotationEditorItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -55,7 +51,7 @@ vtkKWCornerAnnotationEditorItem::vtkKWCornerAnnotationEditorItem(
 
   this->cae_reader = vtkXMLImageDataReader::New();
   this->cae_reader->SetFileName(
-    KWWidgetsTourItem::GetPathToExampleData(app, "head100x100x47.vti"));
+    vtkKWWidgetsTourExample::GetPathToExampleData(app, "head100x100x47.vti"));
 
   // Create an image viewer
   // Use the render window and renderer of the renderwidget
@@ -105,10 +101,40 @@ vtkKWCornerAnnotationEditorItem::vtkKWCornerAnnotationEditorItem(
               this->cae_anno_editor->GetWidgetName());
 }
 
+int vtkKWCornerAnnotationEditorItem::GetType()
+{
+  return KWWidgetsTourItem::TypeVTK;
+}
+
+KWWidgetsTourItem* vtkKWCornerAnnotationEditorEntryPoint()
+{
+  return new vtkKWCornerAnnotationEditorItem();
+}
+
+vtkKWCornerAnnotationEditorItem::vtkKWCornerAnnotationEditorItem()
+{
+  this->cae_anno_editor = NULL;
+  this->cae_reader = NULL;
+  this->cae_renderwidget = NULL;
+  this->cae_viewer = NULL;
+}
+
 vtkKWCornerAnnotationEditorItem::~vtkKWCornerAnnotationEditorItem()
 {
-  this->cae_anno_editor->Delete();
-  this->cae_reader->Delete();
-  this->cae_renderwidget->Delete();
-  this->cae_viewer->Delete();
+  if (this->cae_anno_editor)
+    {
+    this->cae_anno_editor->Delete();
+    }
+  if (this->cae_reader)
+    {
+    this->cae_reader->Delete();
+    }
+  if (this->cae_renderwidget)
+    {
+    this->cae_renderwidget->Delete();
+    }
+  if (this->cae_viewer)
+    {
+    this->cae_viewer->Delete();
+    }
 }

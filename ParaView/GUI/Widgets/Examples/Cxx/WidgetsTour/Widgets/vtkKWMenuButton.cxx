@@ -4,15 +4,16 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWMenuButtonItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeCore; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWMenuButtonEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWMenuButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -96,6 +97,14 @@ KWWidgetsTourItem* vtkKWMenuButtonEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   menubutton2->Delete();
 
   // TODO: use callbacks
+}
 
-  return new vtkKWMenuButtonItem;
+int vtkKWMenuButtonItem::GetType()
+{
+  return KWWidgetsTourItem::TypeCore;
+}
+
+KWWidgetsTourItem* vtkKWMenuButtonEntryPoint()
+{
+  return new vtkKWMenuButtonItem();
 }

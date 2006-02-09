@@ -37,6 +37,8 @@ proc vtkKWCanvasEntryPoint {parent win} {
   $wname create rectangle 150 80 320 180 -outline #666666 -width 3
 
   # TODO: add a canvas with scrollbars
+}
 
+proc vtkKWCanvasGetType {} {
   return "TypeCore"
 }

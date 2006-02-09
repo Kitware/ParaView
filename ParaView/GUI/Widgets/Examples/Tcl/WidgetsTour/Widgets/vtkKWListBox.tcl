@@ -46,6 +46,8 @@ proc vtkKWListBoxEntryPoint {parent win} {
   pack [$listbox2 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 
   # TODO: use callbacks
+}
 
+proc vtkKWListBoxGetType {} {
   return "TypeCore"
 }

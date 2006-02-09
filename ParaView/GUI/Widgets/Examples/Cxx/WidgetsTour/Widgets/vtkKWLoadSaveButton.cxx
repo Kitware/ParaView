@@ -3,16 +3,16 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWLoadSaveButtonItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeComposite; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWLoadSaveButtonEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWLoadSaveButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -31,6 +31,14 @@ KWWidgetsTourItem* vtkKWLoadSaveButtonEntryPoint(
     load_button1->GetWidgetName());
 
   load_button1->Delete();
+}
 
-  return new vtkKWLoadSaveButtonItem;
+int vtkKWLoadSaveButtonItem::GetType()
+{
+  return KWWidgetsTourItem::TypeComposite;
+}
+
+KWWidgetsTourItem* vtkKWLoadSaveButtonEntryPoint()
+{
+  return new vtkKWLoadSaveButtonItem();
 }

@@ -3,16 +3,16 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWSpinBoxItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeCore; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWSpinBoxEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWSpinBoxItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -71,6 +71,14 @@ KWWidgetsTourItem* vtkKWSpinBoxEntryPoint(
   spinbox1->Delete();
   spinbox2->Delete();
   spinbox3->Delete();
+}
 
-  return new vtkKWSpinBoxItem;
+int vtkKWSpinBoxItem::GetType()
+{
+  return KWWidgetsTourItem::TypeCore;
+}
+
+KWWidgetsTourItem* vtkKWSpinBoxEntryPoint()
+{
+  return new vtkKWSpinBoxItem();
 }

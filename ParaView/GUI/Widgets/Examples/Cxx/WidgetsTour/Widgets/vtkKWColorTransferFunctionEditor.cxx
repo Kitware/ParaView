@@ -8,16 +8,16 @@
 #include "vtkKWWindow.h"
 #include "vtkXMLImageDataReader.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWColorTransferFunctionEditorItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeVTK; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWColorTransferFunctionEditorEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWColorTransferFunctionEditorItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -62,7 +62,7 @@ KWWidgetsTourItem* vtkKWColorTransferFunctionEditorEntryPoint(
 
   vtkXMLImageDataReader *cpsel_reader = vtkXMLImageDataReader::New();
   cpsel_reader->SetFileName(
-    KWWidgetsTourItem::GetPathToExampleData(app, "head100x100x47.vti"));
+    vtkKWWidgetsTourExample::GetPathToExampleData(app, "head100x100x47.vti"));
 
   // The build an histogram of the data, it will be used inside the editor
   // as if we were trying to tune a tfunc based on the real values
@@ -139,6 +139,14 @@ KWWidgetsTourItem* vtkKWColorTransferFunctionEditorEntryPoint(
   cpsel_tfunc2->Delete();
   cpsel_hist->Delete();
   cpsel_reader->Delete();
+}
 
-  return new vtkKWColorTransferFunctionEditorItem;
+int vtkKWColorTransferFunctionEditorItem::GetType()
+{
+  return KWWidgetsTourItem::TypeVTK;
+}
+
+KWWidgetsTourItem* vtkKWColorTransferFunctionEditorEntryPoint()
+{
+  return new vtkKWColorTransferFunctionEditorItem();
 }

@@ -3,16 +3,16 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWFrameItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeCore; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWFrameEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWFrameItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -54,6 +54,14 @@ KWWidgetsTourItem* vtkKWFrameEntryPoint(
 
   frame1->Delete();
   frame2->Delete();
+}
 
-  return new vtkKWFrameItem;
+int vtkKWFrameItem::GetType()
+{
+  return KWWidgetsTourItem::TypeCore;
+}
+
+KWWidgetsTourItem* vtkKWFrameEntryPoint()
+{
+  return new vtkKWFrameItem();
 }

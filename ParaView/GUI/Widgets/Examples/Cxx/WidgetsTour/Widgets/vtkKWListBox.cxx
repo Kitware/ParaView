@@ -3,15 +3,16 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWListBoxItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeCore; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWListBoxEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWListBoxItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -70,6 +71,14 @@ KWWidgetsTourItem* vtkKWListBoxEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
   listbox2->Delete();
 
   // TODO: use callbacks
+}
 
-  return new vtkKWListBoxItem;
+int vtkKWListBoxItem::GetType()
+{
+  return KWWidgetsTourItem::TypeCore;
+}
+
+KWWidgetsTourItem* vtkKWListBoxEntryPoint()
+{
+  return new vtkKWListBoxItem();
 }

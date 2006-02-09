@@ -29,6 +29,8 @@ proc vtkKWMessageDialogEntryPoint {parent win} {
   $msg_dlg_button1 SetCommand $msg_dlg1 "Invoke"
 
   pack [$msg_dlg_button1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
+}
 
+proc vtkKWMessageDialogGetType {} {
   return "TypeComposite"
 }
