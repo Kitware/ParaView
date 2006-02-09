@@ -3,15 +3,16 @@
 #include "vtkKWWindow.h"
 #include "vtkKWIcon.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWMultiColumnListItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeCore; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWMultiColumnListEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWMultiColumnListItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -141,6 +142,14 @@ KWWidgetsTourItem* vtkKWMultiColumnListEntryPoint(vtkKWWidget *parent, vtkKWWind
     mcl1->GetWidgetName());
 
   mcl1->Delete();
+}
 
-  return new vtkKWMultiColumnListItem;
+int vtkKWMultiColumnListItem::GetType()
+{
+  return KWWidgetsTourItem::TypeCore;
+}
+
+KWWidgetsTourItem* vtkKWMultiColumnListEntryPoint()
+{
+  return new vtkKWMultiColumnListItem();
 }

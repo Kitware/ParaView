@@ -41,6 +41,8 @@ proc vtkKWCheckButtonWithChangeColorButtonEntryPoint {parent win} {
     don't bother setting its color..."
 
   pack [$cbwcc2 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
+}
 
+proc vtkKWCheckButtonWithChangeColorButtonGetType {} {
   return "TypeComposite"
 }

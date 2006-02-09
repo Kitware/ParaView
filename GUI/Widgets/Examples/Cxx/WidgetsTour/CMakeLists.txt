@@ -15,6 +15,22 @@ ENDIF(NOT KWWidgets_SOURCE_DIR)
 
 SET(TARGET_BASE_NAME "KW${PROJECT_NAME}Example")
 
+# We actually define a class in this example, and we want to be able to
+# use its callbacks from our user interface. To do so, we need to create
+# a library and wrap it automatically for the Tcl language.
+
+SET(LIB_NAME "${TARGET_BASE_NAME}Lib")
+SET(LIB_SRCS "vtk${TARGET_BASE_NAME}.cxx")
+
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
+
+INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsWrappingMacros.cmake")
+KWWidgets_WRAP_TCL(${LIB_NAME} LIB_TCL_SRCS "${LIB_SRCS}" "")
+
+# Create the library (in static mode for convenience).
+
+ADD_LIBRARY(${LIB_NAME} STATIC ${LIB_TCL_SRCS} ${LIB_SRCS})
+
 # The name of our executable and the corresponding source file.
 
 SET(EXE_NAME "${TARGET_BASE_NAME}")
@@ -53,7 +69,7 @@ FOREACH(file ${WIDGETS_SRCS})
   SET(WIDGET_ENTRY_POINT "${WIDGET_NAME}EntryPoint")
   SET(WIDGETS_FORWARD_DECL
     "${WIDGETS_FORWARD_DECL}
-         extern KWWidgetsTourItem* ${WIDGET_ENTRY_POINT}(vtkKWWidget *parent, vtkKWWindow *win);")
+         extern KWWidgetsTourItem* ${WIDGET_ENTRY_POINT}();")
   SET(WIDGETS_NODES
     "${WIDGETS_NODES}
          {\"${WIDGET_NAME}\", ${WIDGET_ENTRY_POINT}},")
@@ -68,7 +84,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 # Create the executable, and link it against the KWWidgets libraries.
 
 ADD_EXECUTABLE(${EXE_NAME} WIN32 ${EXE_SRCS} ${WIDGETS_SRCS} ${RES_FILE})
-TARGET_LINK_LIBRARIES(${EXE_NAME} ${KWWidgets_LIBRARIES})
+TARGET_LINK_LIBRARIES(${EXE_NAME} ${KWWidgets_LIBRARIES} ${LIB_NAME})
 
 # If needed, copy the Tcl/Tk support files required at run-time 
 # to initialize Tcl/Tk. This is only triggered if VTK was built

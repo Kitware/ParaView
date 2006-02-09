@@ -3,16 +3,16 @@
 #include "vtkMath.h"
 #include "vtkKWWindow.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWHSVColorSelectorItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeComposite; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWHSVColorSelectorEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWHSVColorSelectorItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -33,6 +33,14 @@ KWWidgetsTourItem* vtkKWHSVColorSelectorEntryPoint(
               ccb->GetWidgetName());
 
   ccb->Delete();
+}
 
-  return new vtkKWHSVColorSelectorItem;
+int vtkKWHSVColorSelectorItem::GetType()
+{
+  return KWWidgetsTourItem::TypeComposite;
+}
+
+KWWidgetsTourItem* vtkKWHSVColorSelectorEntryPoint()
+{
+  return new vtkKWHSVColorSelectorItem();
 }

@@ -65,6 +65,8 @@ proc vtkKWCornerAnnotationEditorEntryPoint {parent win} {
   $cae_anno_editor SetRenderWidget $cae_renderwidget
 
   pack [$cae_anno_editor GetWidgetName] -side left -anchor nw -expand n -padx 2 -pady 2
+}
 
+proc vtkKWCornerAnnotationEditorGetType {} {
   return "TypeVTK"
 }

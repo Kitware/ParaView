@@ -2,15 +2,16 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWTreeItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeCore; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWTreeEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWTreeItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -46,6 +47,14 @@ KWWidgetsTourItem* vtkKWTreeEntryPoint(vtkKWWidget *parent, vtkKWWindow *)
     tree1->GetWidgetName());
 
   tree1->Delete();
+}
 
-  return new vtkKWTreeItem;
+int vtkKWTreeItem::GetType()
+{
+  return KWWidgetsTourItem::TypeCore;
+}
+
+KWWidgetsTourItem* vtkKWTreeEntryPoint()
+{
+  return new vtkKWTreeItem();
 }

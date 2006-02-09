@@ -31,6 +31,8 @@ proc vtkKWRenderWidgetEntryPoint {parent win} {
 
   $rw_renderwidget AddViewProp $rw_actor
   $rw_renderwidget ResetCamera
+}
 
+proc vtkKWRenderWidgetGetType {} {
   return "TypeVTK"
 }

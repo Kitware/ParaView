@@ -33,6 +33,8 @@ proc vtkKWFrameEntryPoint {parent win} {
     set explicitly here but should adjust automatically otherwise"
 
   pack [$frame2 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
+}
 
+proc vtkKWFrameGetType {} {
   return "TypeCore"
 }

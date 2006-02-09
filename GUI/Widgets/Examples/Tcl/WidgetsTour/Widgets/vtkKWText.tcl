@@ -55,6 +55,8 @@ proc vtkKWTextEntryPoint {parent win} {
     features to be used with simple tags like **, ~~, or __"
 
   pack [$text4 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
+}
 
+proc vtkKWTextGetType {} {
   return "TypeCore"
 }

@@ -3,16 +3,16 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWMessageDialogItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeComposite; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWMessageDialogEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *win)
+void vtkKWMessageDialogItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -48,6 +48,14 @@ KWWidgetsTourItem* vtkKWMessageDialogEntryPoint(
 
   msg_dlg1->Delete();
   msg_dlg_button1->Delete();
+}
 
-  return new vtkKWMessageDialogItem;
+int vtkKWMessageDialogItem::GetType()
+{
+  return KWWidgetsTourItem::TypeComposite;
+}
+
+KWWidgetsTourItem* vtkKWMessageDialogEntryPoint()
+{
+  return new vtkKWMessageDialogItem();
 }

@@ -8,13 +8,15 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkXMLImageDataReader.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWHeaderAnnotationEditorItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeVTK; };
-  vtkKWHeaderAnnotationEditorItem(vtkKWWidget *parent, vtkKWWindow *);
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
+
+  vtkKWHeaderAnnotationEditorItem();
   virtual ~vtkKWHeaderAnnotationEditorItem();
 
 protected:
@@ -24,13 +26,7 @@ protected:
   vtkKWHeaderAnnotationEditor *hae_anno_editor;
 };
 
-KWWidgetsTourItem* vtkKWHeaderAnnotationEditorEntryPoint(vtkKWWidget *parent, vtkKWWindow *window)
-{
-  return new vtkKWHeaderAnnotationEditorItem(parent, window);
-}
-
-vtkKWHeaderAnnotationEditorItem::vtkKWHeaderAnnotationEditorItem(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWHeaderAnnotationEditorItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -55,7 +51,7 @@ vtkKWHeaderAnnotationEditorItem::vtkKWHeaderAnnotationEditorItem(
 
   this->hae_reader = vtkXMLImageDataReader::New();
   this->hae_reader->SetFileName(
-    KWWidgetsTourItem::GetPathToExampleData(app, "head100x100x47.vti"));
+    vtkKWWidgetsTourExample::GetPathToExampleData(app, "head100x100x47.vti"));
 
   // Create an image viewer
   // Use the render window and renderer of the renderwidget
@@ -83,10 +79,40 @@ vtkKWHeaderAnnotationEditorItem::vtkKWHeaderAnnotationEditorItem(
               this->hae_anno_editor->GetWidgetName());
 }
 
+int vtkKWHeaderAnnotationEditorItem::GetType()
+{
+  return KWWidgetsTourItem::TypeVTK;
+}
+
+KWWidgetsTourItem* vtkKWHeaderAnnotationEditorEntryPoint()
+{
+  return new vtkKWHeaderAnnotationEditorItem();
+}
+
+vtkKWHeaderAnnotationEditorItem::vtkKWHeaderAnnotationEditorItem()
+{
+  this->hae_anno_editor = NULL;
+  this->hae_reader = NULL;
+  this->hae_renderwidget = NULL;
+  this->hae_viewer = NULL;
+}
+
 vtkKWHeaderAnnotationEditorItem::~vtkKWHeaderAnnotationEditorItem()
 {
-  this->hae_anno_editor->Delete();
-  this->hae_reader->Delete();
-  this->hae_renderwidget->Delete();
-  this->hae_viewer->Delete();
+  if (this->hae_anno_editor)
+    {
+    this->hae_anno_editor->Delete();
+    }
+  if (this->hae_reader)
+    {
+    this->hae_reader->Delete();
+    }
+  if (this->hae_renderwidget)
+    {
+    this->hae_renderwidget->Delete();
+    }
+  if (this->hae_viewer)
+    {
+    this->hae_viewer->Delete();
+    }
 }

@@ -15,6 +15,8 @@ proc vtkKWHSVColorSelectorEntryPoint {parent win} {
   eval $ccb SetSelectedColor [eval $math RGBToHSV [$parent GetBackgroundColor]]
   
   pack [$ccb GetWidgetName] -side top -anchor nw -expand y -padx 2 -pady 2
+}
 
+proc vtkKWHSVColorSelectorGetType {} {
   return "TypeComposite"
 }

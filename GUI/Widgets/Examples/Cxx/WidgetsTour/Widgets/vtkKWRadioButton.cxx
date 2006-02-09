@@ -6,16 +6,16 @@
 #include "vtkKWIcon.h"
 
 #include <vtksys/stl/string>
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWRadioButtonItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeCore; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWRadioButtonEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWRadioButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -114,6 +114,14 @@ KWWidgetsTourItem* vtkKWRadioButtonEntryPoint(
   // -----------------------------------------------------------------------
 
   // TODO: use vtkKWRadioButtonSetWithLabel and callbacks
+}
 
-  return new vtkKWRadioButtonItem;
+int vtkKWRadioButtonItem::GetType()
+{
+  return KWWidgetsTourItem::TypeCore;
+}
+
+KWWidgetsTourItem* vtkKWRadioButtonEntryPoint()
+{
+  return new vtkKWRadioButtonItem();
 }

@@ -203,19 +203,13 @@ foreach widget $widgets {
   set name [file rootname [file tail $widget]]
   lappend modules $name
 
-  set panel [vtkKWUserInterfacePanel New]
-  $panel SetName $name
-  $panel SetUserInterfaceManager [$win GetViewUserInterfaceManager]
-  $panel Create
-  $panel AddPage [$panel GetName] "" ""
-
   if {[$app GetSplashScreenVisibility]} {
     [$app GetSplashScreen] SetProgressMessage $name
   }
 
   source $widget
-  
-  set widget_type [${name}EntryPoint [$panel GetPageWidget [$panel GetName]] $win]
+
+  set widget_type [${name}GetType]
   if {$widget_type != ""} {
     set parent_node ""
     switch -- $widget_type {
@@ -230,42 +224,62 @@ foreach widget $widgets {
       }
     }
     [$widgets_tree GetWidget] AddNode $parent_node $name $name
-
-    set tcl_source($name) [read [open "$widget"]]
-
-    # Try to find the C++ source
-
-    set cxx_source_name [file join [file dirname [info script]] ".." ".." Cxx WidgetsTour Widgets ${name}.cxx]
-    if {[file exists $cxx_source_name]} {
-      set cxx_source($name) [read [open "$cxx_source_name"]]
-    } else {
-      set cxx_source($name) {}
-    }
-
-    # Try to find the Python source
-
-    set python_source_name [file join [file dirname [info script]] ".." ".." Python WidgetsTour Widgets ${name}.py]
-    if {[file exists $python_source_name]} {
-      set python_source($name) [read [open "$python_source_name"]]
-    } else {
-      set python_source($name) {}
-    }
   }
 }
+
+[$widgets_tree GetWidget] SetSelectionChangedCommand "" selection_callback
 
 # Raise the example panel
 
 proc selection_callback {} {
   global tcl_source cxx_source python_source widgets_tree tcl_source_text cxx_source_text python_source_text win
-  if [[$widgets_tree GetWidget] HasSelection] {
-    $win ShowViewUserInterface [[$widgets_tree GetWidget] GetSelection]
-    [[$tcl_source_text GetWidget] GetWidget] SetText $tcl_source([[$widgets_tree GetWidget] GetSelection]) 
-    [[$cxx_source_text GetWidget] GetWidget] SetText $cxx_source([[$widgets_tree GetWidget] GetSelection])
-    [[$python_source_text GetWidget] GetWidget] SetText $python_source([[$widgets_tree GetWidget] GetSelection])
-  } 
-}
 
-[$widgets_tree GetWidget] SetSelectionChangedCommand "" selection_callback
+  if ![[$widgets_tree GetWidget] HasSelection] {
+    return
+  }
+
+  set name [[$widgets_tree GetWidget] GetSelection]
+  $win ShowViewUserInterface $name
+  
+  set mgr [$win GetViewUserInterfaceManager]
+  
+  if {"[$mgr GetPanel $name]" == ""} {
+    set panel [vtkKWUserInterfacePanel New]
+    $panel SetName $name
+    $panel SetUserInterfaceManager $mgr
+    $panel Create
+    $panel AddPage [$panel GetName] "" ""
+    $panel Raise
+    ${name}EntryPoint [$panel GetPageWidget [$panel GetName]] $win
+  }
+
+  # Try to find the Tcl source
+  
+  set source {}
+  set tcl_source_name [file join [file dirname [info script]] ".." ".." Tcl WidgetsTour Widgets ${name}.tcl]
+  if {[file exists $tcl_source_name]} {
+    set source [read [open "$tcl_source_name"]]
+  }
+  [[$tcl_source_text GetWidget] GetWidget] SetText $source
+
+  # Try to find the C++ source
+  
+  set source {}
+  set cxx_source_name [file join [file dirname [info script]] ".." ".." Cxx WidgetsTour Widgets ${name}.cxx]
+  if {[file exists $cxx_source_name]} {
+    set source [read [open "$cxx_source_name"]]
+  }
+  [[$cxx_source_text GetWidget] GetWidget] SetText $source
+  
+  # Try to find the Python source
+  
+  set source {}
+  set python_source_name [file join [file dirname [info script]] ".." ".." Python WidgetsTour Widgets ${name}.py]
+  if {[file exists $python_source_name]} {
+    set source [read [open "$python_source_name"]]
+  }
+  [[$python_source_text GetWidget] GetWidget] SetText $source
+} 
 
 # Start the application
 # If --test was provided, do not enter the event loop and run this example

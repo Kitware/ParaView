@@ -56,6 +56,8 @@ proc vtkKWMessageEntryPoint {parent win} {
     Predefined icons include warning info error etc."
 
   pack [$message4 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
+}
 
+proc vtkKWMessageGetType {} {
   return "TypeCore"
 }

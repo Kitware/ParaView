@@ -107,6 +107,8 @@ proc vtkKWComboBoxEntryPoint {parent win} {
   [$combobox_set GetWidget 1] SetCommand [$combobox_set GetWidget 3] "AddValue"
 
   pack [$combobox_set GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
+  }
 
+proc vtkKWComboBoxGetType {} {
   return "TypeCore"
 }

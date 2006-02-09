@@ -2,16 +2,16 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWNotebookItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeComposite; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWNotebookEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWNotebookItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -40,6 +40,14 @@ KWWidgetsTourItem* vtkKWNotebookEntryPoint(
   notebook1->GetFrame(page_id)->SetBackgroundColor(0.9, 0.2, 0.2);
 
   notebook1->Delete();
+}
 
-  return new vtkKWNotebookItem;
+int vtkKWNotebookItem::GetType()
+{
+  return KWWidgetsTourItem::TypeComposite;
+}
+
+KWWidgetsTourItem* vtkKWNotebookEntryPoint()
+{
+  return new vtkKWNotebookItem();
 }

@@ -99,6 +99,8 @@ proc vtkKWScaleEntryPoint {parent win} {
     }
 
   pack [$scale_set GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
+  }
 
+proc vtkKWScaleGetType {} {
   return "TypeCore"
 }

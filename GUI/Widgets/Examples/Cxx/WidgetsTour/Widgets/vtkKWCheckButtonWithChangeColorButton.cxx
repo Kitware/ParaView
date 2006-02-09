@@ -4,16 +4,16 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWCheckButtonWithChangeColorButtonItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeComposite; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWCheckButtonWithChangeColorButtonEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWCheckButtonWithChangeColorButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -65,6 +65,14 @@ KWWidgetsTourItem* vtkKWCheckButtonWithChangeColorButtonEntryPoint(
 
   cbwcc1->Delete();
   cbwcc2->Delete();
+}
 
-  return new vtkKWCheckButtonWithChangeColorButtonItem;
+int vtkKWCheckButtonWithChangeColorButtonItem::GetType()
+{
+  return KWWidgetsTourItem::TypeComposite;
+}
+
+KWWidgetsTourItem* vtkKWCheckButtonWithChangeColorButtonEntryPoint()
+{
+  return new vtkKWCheckButtonWithChangeColorButtonItem();
 }

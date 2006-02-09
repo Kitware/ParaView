@@ -5,16 +5,16 @@
 #include "vtkKWLabel.h"
 #include "vtkKWIcon.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWMessageItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeCore; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWMessageEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWMessageItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -82,6 +82,14 @@ KWWidgetsTourItem* vtkKWMessageEntryPoint(
   message1->Delete();
   message2->Delete();
   message4->Delete();
+}
 
-  return new vtkKWMessageItem;
+int vtkKWMessageItem::GetType()
+{
+  return KWWidgetsTourItem::TypeCore;
+}
+
+KWWidgetsTourItem* vtkKWMessageEntryPoint()
+{
+  return new vtkKWMessageItem();
 }

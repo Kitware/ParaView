@@ -23,6 +23,8 @@ proc vtkKWNotebookEntryPoint {parent win} {
 
   set page_id [$notebook1 AddPage "Page Red"] 
   [$notebook1 GetFrame $page_id] SetBackgroundColor 0.9 0.2 0.2
+}
 
+proc vtkKWNotebookGetType {} {
   return "TypeComposite"
 }

@@ -4,16 +4,16 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWEntryItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeCore; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWEntryEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWEntryItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -104,6 +104,14 @@ KWWidgetsTourItem* vtkKWEntryEntryPoint(
   entry2->Delete();
   entry3->Delete();
   entry_set->Delete();
+}
 
-  return new vtkKWEntryItem;
+int vtkKWEntryItem::GetType()
+{
+  return KWWidgetsTourItem::TypeCore;
+}
+
+KWWidgetsTourItem* vtkKWEntryEntryPoint()
+{
+  return new vtkKWEntryItem();
 }

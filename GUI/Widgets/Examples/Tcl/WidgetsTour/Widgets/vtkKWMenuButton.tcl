@@ -70,6 +70,8 @@ proc vtkKWMenuButtonEntryPoint {parent win} {
   pack [$menubutton2 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 
   # TODO: use callbacks
-
+  }
+  
+proc vtkKWMenuButtonGetType {} {
   return "TypeCore"
 }

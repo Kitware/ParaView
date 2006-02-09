@@ -48,6 +48,8 @@ proc vtkKWSurfaceMaterialPropertyWidgetEntryPoint {parent win} {
 
   $sprop1_widget SetPropertyChangingCommand $sprop2_widget "Update"
   $sprop1_widget SetPropertyChangedCommand $sprop2_widget "Update"
+}
 
+proc vtkKWSurfaceMaterialPropertyWidgetGetType {} {
   return "TypeVTK"
 }

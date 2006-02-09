@@ -87,6 +87,8 @@ proc vtkKWMultiColumnListEntryPoint {parent win} {
     }
 
   pack [$mcl1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
+  }
 
+proc vtkKWMultiColumnListGetType {} {
   return "TypeCore"
 }

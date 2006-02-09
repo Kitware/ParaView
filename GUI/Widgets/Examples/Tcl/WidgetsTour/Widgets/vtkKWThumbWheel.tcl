@@ -51,6 +51,8 @@ proc vtkKWThumbWheelEntryPoint {parent win} {
   [$thumbwheel3 GetLabel] SetText "A popup thumbwheel:"
 
   pack [$thumbwheel3 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
+}
 
+proc vtkKWThumbWheelGetType {} {
   return "TypeComposite"
 }

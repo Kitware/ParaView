@@ -21,6 +21,8 @@ proc vtkKWListBoxToListBoxSelectionEditorEntryPoint {parent win} {
   $lb2lb1 AddFinalElement "Friday" 0
 
   pack [$lb2lb1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
+}
 
+proc vtkKWListBoxToListBoxSelectionEditorGetType {} {
   return "TypeComposite"
 }

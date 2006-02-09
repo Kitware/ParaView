@@ -52,6 +52,8 @@ proc vtkKWChangeColorButtonEntryPoint {parent win} {
     "A color button. Note that the label is now hidden."
 
   pack [$ccb3 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
+}
 
+proc vtkKWChangeColorButtonGetType {} {
   return "TypeComposite"
 }

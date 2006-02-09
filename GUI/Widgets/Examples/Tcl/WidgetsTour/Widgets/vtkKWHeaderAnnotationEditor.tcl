@@ -45,6 +45,8 @@ proc vtkKWHeaderAnnotationEditorEntryPoint {parent win} {
   $hae_anno_editor SetRenderWidget $hae_renderwidget
 
   pack [$hae_anno_editor GetWidgetName] -side left -anchor nw -expand n -padx 2 -pady 2
+}
 
+proc vtkKWHeaderAnnotationEditorGetType {} {
   return "TypeVTK"
 }

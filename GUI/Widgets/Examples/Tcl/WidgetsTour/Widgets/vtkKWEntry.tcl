@@ -76,6 +76,8 @@ proc vtkKWEntryEntryPoint {parent win} {
   [$entry_set GetWidget 0] SetCommand [$entry_set GetWidget 2] "SetValue"
 
   pack [$entry_set GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
+}
 
+proc vtkKWEntryGetType {} {
   return "TypeCore"
 }

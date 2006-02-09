@@ -4,16 +4,16 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWColorPresetSelectorItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeVTK; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWColorPresetSelectorEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWColorPresetSelectorItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -122,6 +122,14 @@ KWWidgetsTourItem* vtkKWColorPresetSelectorEntryPoint(
   cpsel2->Delete();
   cpsel3->Delete();
   cpsel_func->Delete();
+}
 
-  return new vtkKWColorPresetSelectorItem;
+int vtkKWColorPresetSelectorItem::GetType()
+{
+  return KWWidgetsTourItem::TypeVTK;
+}
+
+KWWidgetsTourItem* vtkKWColorPresetSelectorEntryPoint()
+{
+  return new vtkKWColorPresetSelectorItem();
 }

@@ -91,6 +91,8 @@ proc vtkKWColorPresetSelectorEntryPoint {parent win} {
   pack [$cpsel3 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
 
   pack [$cpsel_tfunc_editor GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 20
+}
 
+proc vtkKWColorPresetSelectorGetType {} {
   return "TypeVTK"
 }

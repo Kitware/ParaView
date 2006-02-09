@@ -8,16 +8,16 @@
 #include "vtkMath.h"
 
 #include <vtksys/stl/string>
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWLabelItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeCore; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWLabelEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWLabelItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
   int id;
@@ -175,6 +175,14 @@ KWWidgetsTourItem* vtkKWLabelEntryPoint(
   label4->Delete();
   label_set->Delete();
   label_set2->Delete();
+}
 
-  return new vtkKWLabelItem;
+int vtkKWLabelItem::GetType()
+{
+  return KWWidgetsTourItem::TypeCore;
+}
+
+KWWidgetsTourItem* vtkKWLabelEntryPoint()
+{
+  return new vtkKWLabelItem();
 }

@@ -7,16 +7,16 @@
 #include "vtkMath.h"
 
 #include <vtksys/stl/string>
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWPushButtonItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeCore; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWPushButtonEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWPushButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -110,6 +110,14 @@ KWWidgetsTourItem* vtkKWPushButtonEntryPoint(
   pushbutton_set->Delete();
 
   // TODO: add callbacks
+}
 
-  return new vtkKWPushButtonItem;
+int vtkKWPushButtonItem::GetType()
+{
+  return KWWidgetsTourItem::TypeCore;
+}
+
+KWWidgetsTourItem* vtkKWPushButtonEntryPoint()
+{
+  return new vtkKWPushButtonItem();
 }

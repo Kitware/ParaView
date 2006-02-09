@@ -4,16 +4,16 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWComboBoxItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeCore; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWComboBoxEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWComboBoxItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -141,6 +141,14 @@ KWWidgetsTourItem* vtkKWComboBoxEntryPoint(
   combobox2->Delete();
   combobox3->Delete();
   combobox_set->Delete();
+}
 
-  return new vtkKWComboBoxItem;
+int vtkKWComboBoxItem::GetType()
+{
+  return KWWidgetsTourItem::TypeCore;
+}
+
+KWWidgetsTourItem* vtkKWComboBoxEntryPoint()
+{
+  return new vtkKWComboBoxItem();
 }

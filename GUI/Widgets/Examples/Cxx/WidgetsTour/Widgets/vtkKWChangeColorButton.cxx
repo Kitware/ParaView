@@ -3,16 +3,16 @@
 #include "vtkKWWindow.h"
 #include "vtkKWLabel.h"
 
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWChangeColorButtonItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeComposite; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWChangeColorButtonEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWChangeColorButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -76,6 +76,14 @@ KWWidgetsTourItem* vtkKWChangeColorButtonEntryPoint(
   ccb1->Delete();
   ccb2->Delete();
   ccb3->Delete();
+}
 
-  return new vtkKWChangeColorButtonItem;
+int vtkKWChangeColorButtonItem::GetType()
+{
+  return KWWidgetsTourItem::TypeComposite;
+}
+
+KWWidgetsTourItem* vtkKWChangeColorButtonEntryPoint()
+{
+  return new vtkKWChangeColorButtonItem();
 }

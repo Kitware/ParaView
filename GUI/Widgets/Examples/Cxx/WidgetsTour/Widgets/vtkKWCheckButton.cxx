@@ -6,16 +6,16 @@
 #include "vtkKWIcon.h"
 
 #include <vtksys/stl/string>
-#include "KWWidgetsTourExampleTypes.h"
+#include "vtkKWWidgetsTourExample.h"
 
 class vtkKWCheckButtonItem : public KWWidgetsTourItem
 {
 public:
-  virtual int GetType() { return KWWidgetsTourItem::TypeCore; };
+  virtual int GetType();
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-KWWidgetsTourItem* vtkKWCheckButtonEntryPoint(
-  vtkKWWidget *parent, vtkKWWindow *)
+void vtkKWCheckButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
 {
   vtkKWApplication *app = parent->GetApplication();
 
@@ -113,6 +113,14 @@ KWWidgetsTourItem* vtkKWCheckButtonEntryPoint(
   cb2->Delete();
   cb3->Delete();
   cbs->Delete();
+}
 
-  return new vtkKWCheckButtonItem;
+int vtkKWCheckButtonItem::GetType()
+{
+  return KWWidgetsTourItem::TypeCore;
+}
+
+KWWidgetsTourItem* vtkKWCheckButtonEntryPoint()
+{
+  return new vtkKWCheckButtonItem();
 }

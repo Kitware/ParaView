@@ -68,6 +68,8 @@ proc vtkKWExtentEntryPoint {parent win} {
   pack [$extent3 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
 
   # TODO: vertical extent
+}
 
+proc vtkKWExtentGetType {} {
   return "TypeComposite"
 }
