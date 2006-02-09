@@ -63,9 +63,11 @@
 #define VTK_VV_ANIMATION_SCALE_ROLL_ID         5
 #define VTK_VV_ANIMATION_SCALE_ZOOM_ID         6
 
+#define VTK_VV_ANIMATION_SCALE_NB_FRAMES       500
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.14");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.15");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -86,6 +88,8 @@ vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
   this->SliceGetMinCommand         = NULL;
   this->SliceGetMaxCommand         = NULL;
   this->SliceSetCommand            = NULL;
+
+  this->ProvideEnoughFramesForSlices = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -189,7 +193,7 @@ void vtkKWSimpleAnimationWidget::Create()
   scale = this->Parameters->AddWidget(VTK_VV_ANIMATION_SCALE_NB_OF_FRAMES_ID);
   scale->SetLabelText("Number of frames:");
   scale->SetResolution(1);
-  scale->SetRange(1, 500);
+  scale->SetRange(1, VTK_VV_ANIMATION_SCALE_NB_FRAMES);
   scale->SetValue(20);
   scale->SetBalloonHelpString(
     "Specify the number of frames for this animation");
@@ -370,9 +374,7 @@ void vtkKWSimpleAnimationWidget::Update()
   int is_complete = 
     (this->RenderWidget &&
      (is_cam || (is_slice &&
-                 this->SliceSetCommand && *this->SliceSetCommand &&
-                 this->SliceGetMinCommand && *this->SliceGetMinCommand &&
-                 this->SliceGetMaxCommand && *this->SliceGetMaxCommand)));
+                 this->SliceSetCommand && *this->SliceSetCommand)));
 
   if (this->Parameters)
     {
@@ -408,21 +410,45 @@ void vtkKWSimpleAnimationWidget::Update()
       
       if (is_complete)
         {
-        int start = this->InvokeSliceGetMinCommand();
-        int end = this->InvokeSliceGetMaxCommand();
-      
-        scale_start->SetRange(start, end);
-        double v = scale_start->GetValue();
-        if (v < start || v > end)
+        if (this->SliceGetMinCommand && *this->SliceGetMinCommand &&
+            this->SliceGetMaxCommand && *this->SliceGetMaxCommand)
           {
-          scale_start->SetValue(start);
+          int start = this->InvokeSliceGetMinCommand();
+          int end = this->InvokeSliceGetMaxCommand();
+          
+          scale_start->SetRange(start, end);
+          double v = scale_start->GetValue();
+          if (v < start || v > end)
+            {
+            scale_start->SetValue(start);
+            }
+          
+          scale_end->SetRange(start, end);
+          v = scale_end->GetValue();
+          if (v < start || v > end)
+            {
+            scale_end->SetValue(end);
+            }
           }
+       
+        // Update the number of frames
         
-        scale_end->SetRange(start, end);
-        v = scale_end->GetValue();
-        if (v < start || v > end)
+        if (this->ProvideEnoughFramesForSlices)
           {
-          scale_end->SetValue(end);
+          vtkKWScaleWithEntry *scale_nb_of_frames = 
+            this->Parameters->GetWidget(
+              VTK_VV_ANIMATION_SCALE_NB_OF_FRAMES_ID);
+          if (scale_nb_of_frames && scale_start)
+            {
+            int nb_slices = 
+              abs(scale_start->GetRangeMax() - scale_start->GetRangeMin()) + 1;
+            if (scale_nb_of_frames->GetRangeMax() < nb_slices)
+              {
+              scale_nb_of_frames->SetRange(
+                scale_nb_of_frames->GetRangeMin(), 
+                scale_nb_of_frames->GetRangeMin() + nb_slices - 1);
+              }
+            }
           }
         }
       }
@@ -432,6 +458,58 @@ void vtkKWSimpleAnimationWidget::Update()
     {
     this->AnimationButtonSet->SetEnabled(0);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSimpleAnimationWidget::SetSliceRange(int min, int max)
+{
+  vtkKWScaleWithEntry *scale_start = 
+    this->Parameters->GetWidget(VTK_VV_ANIMATION_SCALE_SLICE_START_ID);
+  if (scale_start)
+    {
+    scale_start->SetRange(min, max);
+    int v = (int)scale_start->GetValue();
+    if (v < min || v > max)
+      {
+      scale_start->SetValue(min);
+      }
+    }
+  
+  vtkKWScaleWithEntry *scale_end = 
+    this->Parameters->GetWidget(VTK_VV_ANIMATION_SCALE_SLICE_END_ID);
+  if (scale_end)
+    {
+    scale_end->SetRange(min, max);
+    int v = (int)scale_end->GetValue();
+    if (v < min || v > max)
+      {
+      scale_end->SetValue(max);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSimpleAnimationWidget::SetMaximumNumberOfFrames(int max)
+{
+  vtkKWScaleWithEntry *scale_nb_of_frames = 
+    this->Parameters->GetWidget(VTK_VV_ANIMATION_SCALE_NB_OF_FRAMES_ID);
+  if (scale_nb_of_frames)
+    {
+    scale_nb_of_frames->SetRange(scale_nb_of_frames->GetRangeMin(), max);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSimpleAnimationWidget::SetProvideEnoughFramesForSlices(int val)
+{
+  if (this->ProvideEnoughFramesForSlices == val)
+    {
+    return;
+    }
+
+  this->ProvideEnoughFramesForSlices = val;
+  this->Modified();
+  this->Update();
 }
 
 //----------------------------------------------------------------------------
@@ -1153,6 +1231,7 @@ void vtkKWSimpleAnimationWidget::SetSliceGetCommand(
 {
   this->SetObjectMethodCommand(
     &this->SliceGetCommand, object, method);
+  this->Update();
 }
 
 //----------------------------------------------------------------------------
@@ -1208,6 +1287,7 @@ void vtkKWSimpleAnimationWidget::SetSliceSetCommand(
   vtkObject *object, const char *method)
 {
   this->SetObjectMethodCommand(&this->SliceSetCommand, object, method);
+  this->Update();
 }
 
 //----------------------------------------------------------------------------
