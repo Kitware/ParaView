@@ -172,8 +172,6 @@ $animation_widget SetRenderWidget $rw
 $animation_widget SetAnimationTypeToSlice
 $animation_widget SetSliceSetCommand $viewer "SetSlice"
 $animation_widget SetSliceGetCommand $viewer "GetSlice"
-$animation_widget SetSliceGetMinAndMaxCommands $viewer "GetSliceMin" "GetSliceMax"
-$animation_widget ProvideEnoughFramesForSlicesOn
 
 pack [$animation_widget GetWidgetName] -side top -anchor nw -expand n -fill x
 
@@ -181,10 +179,7 @@ proc update_slice_ranges {} {
   global slice_scale viewer animation_widget
   $slice_scale SetRange [$viewer GetSliceMin] [$viewer GetSliceMax]
   $slice_scale SetValue [$viewer GetSlice] 
-
-  # This will update the starting slice and ending slice sliders
-
-  $animation_widget Update
+  $animation_widget SetSliceRange [$viewer GetSliceMin] [$viewer GetSliceMax]
 }
 
 update_slice_ranges
