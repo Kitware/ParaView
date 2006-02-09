@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMedicalImageViewerExample );
-vtkCxxRevisionMacro(vtkKWMedicalImageViewerExample, "1.2");
+vtkCxxRevisionMacro(vtkKWMedicalImageViewerExample, "1.3");
 
 //----------------------------------------------------------------------------
 int vtkKWMedicalImageViewerExample::Run(int argc, char *argv[])
@@ -133,8 +133,6 @@ int vtkKWMedicalImageViewerExample::Run(int argc, char *argv[])
   this->SliceScale->Create();
   this->SliceScale->SetCommand(this, "SetSliceFromScaleCallback");
 
-  this->UpdateSliceScale();
-
   app->Script("pack %s -side top -expand n -fill x -padx 2 -pady 2", 
               this->SliceScale->GetWidgetName());
 
@@ -196,20 +194,21 @@ int vtkKWMedicalImageViewerExample::Run(int argc, char *argv[])
 
   app->Script("pack %s -side top -anchor nw -expand n -fill x -pady 2",
               animation_frame->GetWidgetName());
-
-  vtkKWSimpleAnimationWidget *animation_widget = 
-    vtkKWSimpleAnimationWidget::New();
-  animation_widget->SetParent(animation_frame->GetFrame());
-  animation_widget->Create();
-  animation_widget->SetRenderWidget(this->RenderWidget);
-  animation_widget->SetAnimationTypeToSlice();
-  animation_widget->SetSliceSetCommand(this, "SetSliceCallback");
-  animation_widget->SetSliceGetCommand(this, "GetSliceCallback");
-  animation_widget->SetSliceGetMinAndMaxCommands(
+  this->AnimationWidget = vtkKWSimpleAnimationWidget::New();
+  this->AnimationWidget->SetParent(animation_frame->GetFrame());
+  this->AnimationWidget->Create();
+  this->AnimationWidget->SetRenderWidget(this->RenderWidget);
+  this->AnimationWidget->SetAnimationTypeToSlice();
+  this->AnimationWidget->SetSliceSetCommand(this, "SetSliceCallback");
+  this->AnimationWidget->SetSliceGetCommand(this, "GetSliceCallback");
+  this->AnimationWidget->SetSliceGetMinAndMaxCommands(
     this, "GetSliceMinCallback", "GetSliceMaxCallback");
+  this->AnimationWidget->ProvideEnoughFramesForSlicesOn();
 
   app->Script("pack %s -side top -anchor nw -expand n -fill x",
-              animation_widget->GetWidgetName());
+              this->AnimationWidget->GetWidgetName());
+
+  this->UpdateSliceRanges();
 
   // Start the application
   // If --test was provided, do not enter the event loop and run this example
@@ -234,7 +233,7 @@ int vtkKWMedicalImageViewerExample::Run(int argc, char *argv[])
   wl_frame->Delete();
   this->WindowLevelPresetSelector->Delete();
   animation_frame->Delete();
-  animation_widget->Delete();
+  this->AnimationWidget->Delete();
   win->Delete();
 
   return ret;
@@ -272,32 +271,36 @@ int vtkKWMedicalImageViewerExample::GetSliceMaxCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMedicalImageViewerExample::UpdateSliceScale()
+void vtkKWMedicalImageViewerExample::UpdateSliceRanges()
 {
   this->SliceScale->SetRange(
     this->ImageViewer->GetSliceMin(), this->ImageViewer->GetSliceMax());
   this->SliceScale->SetValue(this->ImageViewer->GetSlice());
+
+  // This will update the starting slice and ending slice sliders
+
+  this->AnimationWidget->Update();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMedicalImageViewerExample::SetSliceOrientationToXYCallback()
 {
   this->ImageViewer->SetSliceOrientationToXY();
-  this->UpdateSliceScale();
+  this->UpdateSliceRanges();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMedicalImageViewerExample::SetSliceOrientationToXZCallback()
 {
   this->ImageViewer->SetSliceOrientationToXZ();
-  this->UpdateSliceScale();
+  this->UpdateSliceRanges();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMedicalImageViewerExample::SetSliceOrientationToYZCallback()
 {
   this->ImageViewer->SetSliceOrientationToYZ();
-  this->UpdateSliceScale();
+  this->UpdateSliceRanges();
 }
 
 //----------------------------------------------------------------------------

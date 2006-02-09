@@ -87,14 +87,6 @@ $slice_scale SetParent [$win GetViewPanelFrame]
 $slice_scale Create
 $slice_scale SetCommand $viewer "SetSlice"
 
-proc update_slice_scale {} { 
-  global slice_scale viewer
-  $slice_scale SetRange [$viewer GetSliceMin] [$viewer GetSliceMax]
-  $slice_scale SetValue [$viewer GetSlice] 
-}
-
-update_slice_scale
-
 pack [$slice_scale GetWidgetName] -side top -expand n -fill x -padx 2 -pady 2
 
 # Create a menu button to control the orientation
@@ -112,9 +104,9 @@ $orientation_menubutton SetReliefToGroove
 pack [$orientation_menubutton GetWidgetName] -side top -anchor nw -expand n -fill x
              
 set mb [[$orientation_menubutton GetWidget] GetWidget]
-$mb AddRadioButton "X-Y" "" "$viewer SetSliceOrientationToXY ; update_slice_scale" ""
-$mb AddRadioButton "X-Z" "" "$viewer SetSliceOrientationToXZ ; update_slice_scale" ""
-$mb AddRadioButton "Y-Z" "" "$viewer SetSliceOrientationToYZ ; update_slice_scale" ""
+$mb AddRadioButton "X-Y" "" "$viewer SetSliceOrientationToXY ; update_slice_ranges" ""
+$mb AddRadioButton "X-Z" "" "$viewer SetSliceOrientationToXZ ; update_slice_ranges" ""
+$mb AddRadioButton "Y-Z" "" "$viewer SetSliceOrientationToYZ ; update_slice_ranges" ""
 $mb SetValue "X-Y"
 
 # Create a window/level preset selector
@@ -181,8 +173,21 @@ $animation_widget SetAnimationTypeToSlice
 $animation_widget SetSliceSetCommand $viewer "SetSlice"
 $animation_widget SetSliceGetCommand $viewer "GetSlice"
 $animation_widget SetSliceGetMinAndMaxCommands $viewer "GetSliceMin" "GetSliceMax"
+$animation_widget ProvideEnoughFramesForSlicesOn
 
 pack [$animation_widget GetWidgetName] -side top -anchor nw -expand n -fill x
+
+proc update_slice_ranges {} { 
+  global slice_scale viewer animation_widget
+  $slice_scale SetRange [$viewer GetSliceMin] [$viewer GetSliceMax]
+  $slice_scale SetValue [$viewer GetSlice] 
+
+  # This will update the starting slice and ending slice sliders
+
+  $animation_widget Update
+}
+
+update_slice_ranges
 
 # Start the application
 # If --test was provided, do not enter the event loop and run this example

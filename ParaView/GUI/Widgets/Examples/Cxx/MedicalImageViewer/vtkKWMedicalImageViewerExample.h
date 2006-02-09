@@ -7,6 +7,7 @@ class vtkKWRenderWidget;
 class vtkImageViewer2;
 class vtkKWScale;
 class vtkKWWindowLevelPresetSelector;
+class vtkKWSimpleAnimationWidget;
 
 class vtkKWMedicalImageViewerExample : public vtkKWObject
 {
@@ -41,8 +42,9 @@ protected:
   vtkKWScale                     *SliceScale;
   vtkKWWindowLevelPresetSelector *WindowLevelPresetSelector;
   vtkKWRenderWidget              *RenderWidget;
+  vtkKWSimpleAnimationWidget     *AnimationWidget;
 
-  virtual void UpdateSliceScale();
+  virtual void UpdateSliceRanges();
 
 private:
   vtkKWMedicalImageViewerExample(const vtkKWMedicalImageViewerExample&);   // Not implemented.

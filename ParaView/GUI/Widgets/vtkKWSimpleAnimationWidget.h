@@ -79,6 +79,19 @@ public:
       vtkKWSimpleAnimationWidget::AnimationTypeSlice); };
 
   // Description:
+  // Set the slice range (i.e. the indices of the first and last slices
+  // available in the animation). Note that the SetSliceGetMinAndMaxCommands
+  // method can also be used to dynamically retrieve the range from
+  // another object.
+  virtual void SetSliceRange(int min, int max);
+  virtual void SetSliceRange(const int range[2]) 
+    { this->SetSliceRange(range[0], range[1]); };
+
+  // Description:
+  // Set the maximum number of frames
+  virtual void SetMaximumNumberOfFrames(int max);
+
+  // Description:
   // Set the command to invoke to set the slice value on an external
   // source when the animation is in 'slice' mode. 
   // This command is mandatory for the slice animation to work.
@@ -107,7 +120,11 @@ public:
   // Description:
   // Set the commands to invoke to get the minimum and maximum value of the
   // slice range from an external source when the animation is in 'slice' mode.
-  // These commands are mandatory for the slice animation to work.
+  // These commands can be useful to retrieve the slice range dynamically
+  // from another object; if there is no need for such complexity, you can
+  // just use the SetSliceRange method to set that range manually.
+  // Note that the range will be retrieved once call the Update()
+  // method.
   // The 'object' argument is the object that will have the method called on
   // it. The 'method' argument is the name of the method to be called and any
   // arguments in string form. If the object is NULL, the method is still
@@ -116,6 +133,18 @@ public:
   // - the slice value min or max: int
   virtual void SetSliceGetMinAndMaxCommands(
     vtkObject *object, const char *get_min_method, const char *get_max_method);
+
+  // Description:
+  // Set/Get if the maximum number of frames should be automatically set to
+  // provide enough frames for the available range of slices (default is off).
+  // Since the number of frames can always be specified through the 
+  // SetMaximumNumberOfFrames method, this variable is mainly useful when
+  // the SetSliceGetMinAndMaxCommands are set.
+  // Note that the number of frames will be changed once you call the Update()
+  // method.
+  virtual void SetProvideEnoughFramesForSlices(int);
+  vtkGetMacro(ProvideEnoughFramesForSlices, int);
+  vtkBooleanMacro(ProvideEnoughFramesForSlices, int);
 
   // Description:
   // Set a command to be invoked after the slice animation has been
@@ -171,6 +200,7 @@ protected:
   vtkKWLabelWithLabel    *HelpLabel;
 
   int AnimationType;
+  int ProvideEnoughFramesForSlices;
 
   // Description:
   // Animation status
