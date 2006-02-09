@@ -25,7 +25,7 @@
 #include "vtkSMInputProperty.h"
 
 vtkStandardNewMacro(vtkSMLODDisplayProxy);
-vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.9");
 //-----------------------------------------------------------------------------
 vtkSMLODDisplayProxy::vtkSMLODDisplayProxy()
 {
@@ -217,6 +217,23 @@ void vtkSMLODDisplayProxy::SetupDefaults()
       << vtkClientServerStream::End
       << vtkClientServerStream::Invoke
       << this->LODUpdateSuppressorProxy->GetID(i) << "SetUpdatePiece"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    // This is here just for streaming (can be removed if streaming is removed).      
+    stream
+      << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "GetNumberOfPartitions"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << this->LODMapperProxy->GetID(i) << "SetNumberOfPieces"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    stream
+      << vtkClientServerStream::Invoke
+      << pm->GetProcessModuleID() << "GetPartitionId"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << this->LODMapperProxy->GetID(i) << "SetPiece"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
     }
