@@ -67,7 +67,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.15");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.16");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -85,11 +85,7 @@ vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
   this->CameraPostAnimationCommand = NULL;
   this->SlicePostAnimationCommand  = NULL;
   this->SliceGetCommand            = NULL;
-  this->SliceGetMinCommand         = NULL;
-  this->SliceGetMaxCommand         = NULL;
   this->SliceSetCommand            = NULL;
-
-  this->ProvideEnoughFramesForSlices = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -129,18 +125,6 @@ vtkKWSimpleAnimationWidget::~vtkKWSimpleAnimationWidget()
     {
     delete [] this->SliceGetCommand;
     this->SliceGetCommand = NULL;
-    }
-
-  if (this->SliceGetMinCommand)
-    {
-    delete [] this->SliceGetMinCommand;
-    this->SliceGetMinCommand = NULL;
-    }
-
-  if (this->SliceGetMaxCommand)
-    {
-    delete [] this->SliceGetMaxCommand;
-    this->SliceGetMaxCommand = NULL;
     }
 
   if (this->SliceSetCommand)
@@ -407,50 +391,6 @@ void vtkKWSimpleAnimationWidget::Update()
       vtkKWScaleWithEntry *scale_end = 
         this->Parameters->GetWidget(VTK_VV_ANIMATION_SCALE_SLICE_END_ID);
       scale_end->SetEnabled(is_complete ? this->Parameters->GetEnabled():0);
-      
-      if (is_complete)
-        {
-        if (this->SliceGetMinCommand && *this->SliceGetMinCommand &&
-            this->SliceGetMaxCommand && *this->SliceGetMaxCommand)
-          {
-          int start = this->InvokeSliceGetMinCommand();
-          int end = this->InvokeSliceGetMaxCommand();
-          
-          scale_start->SetRange(start, end);
-          double v = scale_start->GetValue();
-          if (v < start || v > end)
-            {
-            scale_start->SetValue(start);
-            }
-          
-          scale_end->SetRange(start, end);
-          v = scale_end->GetValue();
-          if (v < start || v > end)
-            {
-            scale_end->SetValue(end);
-            }
-          }
-       
-        // Update the number of frames
-        
-        if (this->ProvideEnoughFramesForSlices)
-          {
-          vtkKWScaleWithEntry *scale_nb_of_frames = 
-            this->Parameters->GetWidget(
-              VTK_VV_ANIMATION_SCALE_NB_OF_FRAMES_ID);
-          if (scale_nb_of_frames && scale_start)
-            {
-            int nb_slices = 
-              abs(scale_start->GetRangeMax() - scale_start->GetRangeMin()) + 1;
-            if (scale_nb_of_frames->GetRangeMax() < nb_slices)
-              {
-              scale_nb_of_frames->SetRange(
-                scale_nb_of_frames->GetRangeMin(), 
-                scale_nb_of_frames->GetRangeMin() + nb_slices - 1);
-              }
-            }
-          }
-        }
       }
     }
 
@@ -497,19 +437,6 @@ void vtkKWSimpleAnimationWidget::SetMaximumNumberOfFrames(int max)
     {
     scale_nb_of_frames->SetRange(scale_nb_of_frames->GetRangeMin(), max);
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWSimpleAnimationWidget::SetProvideEnoughFramesForSlices(int val)
-{
-  if (this->ProvideEnoughFramesForSlices == val)
-    {
-    return;
-    }
-
-  this->ProvideEnoughFramesForSlices = val;
-  this->Modified();
-  this->Update();
 }
 
 //----------------------------------------------------------------------------
@@ -1241,43 +1168,6 @@ int vtkKWSimpleAnimationWidget::InvokeSliceGetCommand()
       this->GetApplication())
     {
     return atoi(this->Script(this->SliceGetCommand));
-    }
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWSimpleAnimationWidget::SetSliceGetMinAndMaxCommands(
-  vtkObject *object, const char *get_min_method, const char *get_max_method)
-{
-  // They have to be set at the same time, otherwise Update() will try to
-  // call get_min while get_max is still referring to a potentially non-
-  // existing object.
-
-  this->SetObjectMethodCommand(
-    &this->SliceGetMinCommand, object, get_min_method);
-  this->SetObjectMethodCommand(
-    &this->SliceGetMaxCommand, object, get_max_method);
-  this->Update();
-}
-
-//----------------------------------------------------------------------------
-int vtkKWSimpleAnimationWidget::InvokeSliceGetMinCommand()
-{
-  if (this->SliceGetMinCommand && *this->SliceGetMinCommand && 
-      this->GetApplication())
-    {
-    return atoi(this->Script(this->SliceGetMinCommand));
-    }
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWSimpleAnimationWidget::InvokeSliceGetMaxCommand()
-{
-  if (this->SliceGetMaxCommand && *this->SliceGetMaxCommand && 
-      this->GetApplication())
-    {
-    return atoi(this->Script(this->SliceGetMaxCommand));
     }
   return 0;
 }
