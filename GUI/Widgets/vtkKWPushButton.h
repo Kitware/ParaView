@@ -60,6 +60,15 @@ public:
   virtual void SetCommand(vtkObject *object, const char *method);
 
   // Description:
+  // Events. The InvokedEvent is triggered when the button is pressed.
+  //BTX
+  enum
+  {
+    InvokedEvent = 10000
+  };
+  //ETX
+
+  // Description:
   // Set/Get the anchoring.
   // Specifies how the information in a widget (e.g. text or a bitmap) is to
   // be displayed in the widget.
@@ -141,12 +150,19 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void CommandCallback();
+
 protected:
   vtkKWPushButton();
   ~vtkKWPushButton();
 
   vtkSetStringMacro(ButtonText);
   char* ButtonText;
+
+  char *Command;
+  virtual void InvokeCommand();
 
 private:
   vtkKWPushButton(const vtkKWPushButton&); // Not implemented

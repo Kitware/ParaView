@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.49");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.50");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -209,7 +209,9 @@ void vtkKWCheckButton::Configure()
 //----------------------------------------------------------------------------
 void vtkKWCheckButton::CommandCallback()
 {
-  this->InvokeCommand(this->GetSelectedState());
+  int state = this->GetSelectedState();
+  this->InvokeCommand(state);
+  this->InvokeEvent(vtkKWCheckButton::SelectedStateChangedEvent, &state);
 }
 
 //----------------------------------------------------------------------------

@@ -71,6 +71,18 @@ public:
   virtual void SetCommand(vtkObject *object, const char *method);
 
   // Description:
+  // Events. The SelectedStateChangedEvent is triggered when the button
+  // is selected or deselected.
+  // The following parameters are also passed as client data:
+  // - the current selected state: int
+  //BTX
+  enum
+  {
+    SelectedStateChangedEvent = 10000
+  };
+  //ETX
+
+  // Description:
   // Set/Get the anchoring.
   // Specifies how the information in a widget (e.g. text or a bitmap) is to
   // be displayed in the widget.
