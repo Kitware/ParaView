@@ -45,7 +45,7 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.71");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.72");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -760,7 +760,7 @@ void vtkPVSphereWidget::SetRadius(double r)
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::SetRadius()
 {
-  if(this-ValueChanged == 0)
+  if(this->ValueChanged == 0)
     {
     return;
     }
