@@ -216,6 +216,8 @@ int my_main(int argc, char *argv[])
 
   // Add some color button to the toolbars
   // Each button will set the label foreground or (a darker) background color
+
+  vtkKWIcon *color_icon = vtkKWIcon::New();
   
   const int nb_buttons = 10;
   for (i = 0; i < nb_buttons; i++)
@@ -231,8 +233,9 @@ int my_main(int argc, char *argv[])
     fg_button->Create();
     sprintf(buffer, "SetForegroundColor %lf %lf %lf", rgb[0], rgb[1], rgb[2]);
     fg_button->SetCommand(hello_label, buffer);
-    fg_button->SetImageToPredefinedIcon(vtkKWIcon::IconEmpty16x16);
-    fg_button->SetBackgroundColor(rgb);
+    color_icon->SetImage(vtkKWIcon::IconEmpty16x16);
+    color_icon->Flatten(rgb);
+    fg_button->SetImageToIcon(color_icon);
     fg_button->SetBalloonHelpString("Set the label foreground color");
     fg_toolbar->AddWidget(fg_button);
     fg_button->Delete();
@@ -244,13 +247,16 @@ int my_main(int argc, char *argv[])
     bg_button->Create();
     sprintf(buffer, "SetBackgroundColor %lf %lf %lf", rgb[0], rgb[1], rgb[2]);
     bg_button->SetCommand(hello_label, buffer);
-    bg_button->SetImageToPredefinedIcon(vtkKWIcon::IconEmpty16x16);
-    bg_button->SetBackgroundColor(rgb);
+    color_icon->SetImage(vtkKWIcon::IconEmpty16x16);
+    color_icon->Flatten(rgb);
+    bg_button->SetImageToIcon(color_icon);
     bg_button->SetBalloonHelpString("Set the label background color");
     bg_toolbar->AddWidget(bg_button);
     bg_button->Delete();
     }
   
+  color_icon->Delete();
+
   // Start the application
   // If --test was provided, do not enter the event loop and run this example
   // as a non-interactive test for software quality purposes.
