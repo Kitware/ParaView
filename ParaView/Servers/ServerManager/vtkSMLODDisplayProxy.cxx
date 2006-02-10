@@ -25,7 +25,7 @@
 #include "vtkSMInputProperty.h"
 
 vtkStandardNewMacro(vtkSMLODDisplayProxy);
-vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.11");
 //-----------------------------------------------------------------------------
 vtkSMLODDisplayProxy::vtkSMLODDisplayProxy()
 {
@@ -224,8 +224,6 @@ void vtkSMLODDisplayProxy::SetupDefaults()
 
   // This is here just for streaming (can be removed if streaming is removed).
   vtkClientServerStream stream2;
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  unsigned int i;
   for (i = 0; i < this->LODUpdateSuppressorProxy->GetNumberOfIDs(); i++)
     {
     stream2
