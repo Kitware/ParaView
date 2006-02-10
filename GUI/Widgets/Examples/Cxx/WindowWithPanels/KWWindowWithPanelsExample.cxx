@@ -1,5 +1,6 @@
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
+#include "vtkKWIcon.h"
 #include "vtkKWFrameWithLabel.h"
 #include "vtkKWHSVColorSelector.h"
 #include "vtkKWLabel.h"
@@ -230,7 +231,7 @@ int my_main(int argc, char *argv[])
     fg_button->Create();
     sprintf(buffer, "SetForegroundColor %lf %lf %lf", rgb[0], rgb[1], rgb[2]);
     fg_button->SetCommand(hello_label, buffer);
-    fg_button->SetWidth(2);
+    fg_button->SetImageToPredefinedIcon(vtkKWIcon::IconEmpty16x16);
     fg_button->SetBackgroundColor(rgb);
     fg_button->SetBalloonHelpString("Set the label foreground color");
     fg_toolbar->AddWidget(fg_button);
@@ -243,7 +244,7 @@ int my_main(int argc, char *argv[])
     bg_button->Create();
     sprintf(buffer, "SetBackgroundColor %lf %lf %lf", rgb[0], rgb[1], rgb[2]);
     bg_button->SetCommand(hello_label, buffer);
-    bg_button->SetWidth(2);
+    bg_button->SetImageToPredefinedIcon(vtkKWIcon::IconEmpty16x16);
     bg_button->SetBackgroundColor(rgb);
     bg_button->SetBalloonHelpString("Set the label background color");
     bg_toolbar->AddWidget(bg_button);
