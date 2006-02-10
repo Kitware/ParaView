@@ -12,7 +12,7 @@ public:
   virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
 };
 
-void vtkKWChangeColorButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
+void vtkKWChangeColorButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 

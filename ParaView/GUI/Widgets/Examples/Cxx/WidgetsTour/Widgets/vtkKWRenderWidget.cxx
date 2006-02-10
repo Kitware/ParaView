@@ -12,10 +12,10 @@ class vtkKWRenderWidgetItem : public KWWidgetsTourItem
 {
 public:
   virtual int GetType();
-  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *);
 };
 
-void vtkKWRenderWidgetItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
+void vtkKWRenderWidgetItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 

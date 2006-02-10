@@ -14,7 +14,7 @@ class vtkKWHeaderAnnotationEditorItem : public KWWidgetsTourItem
 {
 public:
   virtual int GetType();
-  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *);
 
   vtkKWHeaderAnnotationEditorItem();
   virtual ~vtkKWHeaderAnnotationEditorItem();
@@ -26,7 +26,7 @@ protected:
   vtkKWHeaderAnnotationEditor *hae_anno_editor;
 };
 
-void vtkKWHeaderAnnotationEditorItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
+void vtkKWHeaderAnnotationEditorItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 

@@ -9,10 +9,10 @@ class vtkKWSurfaceMaterialPropertyWidgetItem : public KWWidgetsTourItem
 {
 public:
   virtual int GetType();
-  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *);
 };
 
-void vtkKWSurfaceMaterialPropertyWidgetItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
+void vtkKWSurfaceMaterialPropertyWidgetItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 

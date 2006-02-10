@@ -8,10 +8,10 @@ class vtkKWSplitFrameItem : public KWWidgetsTourItem
 {
 public:
   virtual int GetType();
-  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *);
 };
 
-void vtkKWSplitFrameItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
+void vtkKWSplitFrameItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 

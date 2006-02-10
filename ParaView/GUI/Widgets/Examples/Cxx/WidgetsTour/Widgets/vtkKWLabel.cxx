@@ -14,10 +14,10 @@ class vtkKWLabelItem : public KWWidgetsTourItem
 {
 public:
   virtual int GetType();
-  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *);
 };
 
-void vtkKWLabelItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
+void vtkKWLabelItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
   int id;
