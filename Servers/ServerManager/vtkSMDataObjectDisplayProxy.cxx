@@ -36,7 +36,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.10");
 
 
 //-----------------------------------------------------------------------------
@@ -485,8 +485,17 @@ void vtkSMDataObjectDisplayProxy::SetupDefaults()
       << this->UpdateSuppressorProxy->GetID(i) << "SetUpdatePiece"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    // This is here just for streaming (can be removed if streaming is removed).
-    stream
+    }
+  pm->SendStream(this->ConnectionID,
+    this->UpdateSuppressorProxy->GetServers(), stream);
+
+  // This is here just for streaming (can be removed if streaming is removed).
+  vtkClientServerStream stream2;
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  unsigned int i;
+  for (i=0; i < this->UpdateSuppressorProxy->GetNumberOfIDs(); i++)
+    {
+    stream2
       << vtkClientServerStream::Invoke
       << pm->GetProcessModuleID() << "GetNumberOfPartitions"
       << vtkClientServerStream::End
@@ -494,7 +503,7 @@ void vtkSMDataObjectDisplayProxy::SetupDefaults()
       << this->MapperProxy->GetID(i) << "SetNumberOfPieces"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    stream
+    stream2
       << vtkClientServerStream::Invoke
       << pm->GetProcessModuleID() << "GetPartitionId"
       << vtkClientServerStream::End
@@ -502,11 +511,11 @@ void vtkSMDataObjectDisplayProxy::SetupDefaults()
       << this->MapperProxy->GetID(i) << "SetPiece"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-      
     }
+  // Do we need to client too?
   pm->SendStream(this->ConnectionID,
-    this->UpdateSuppressorProxy->GetServers(), stream);
-
+    vtkProcessModule::RENDER_SERVER, stream2);  
+  
   //  this->UpdateVTKObjects();
 }
 

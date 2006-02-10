@@ -25,7 +25,7 @@
 #include "vtkSMInputProperty.h"
 
 vtkStandardNewMacro(vtkSMLODDisplayProxy);
-vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.10");
 //-----------------------------------------------------------------------------
 vtkSMLODDisplayProxy::vtkSMLODDisplayProxy()
 {
@@ -194,9 +194,8 @@ void vtkSMLODDisplayProxy::SetupDefaults()
   this->LODDecimatorProxy->UpdateVTKObjects();
 
   // Initialize LODMapperProxy
-  // Will get intialzied with this->MapperProxy  in Superclass::SetupDefaults();
+  // Will get intialzied with this->MapperProxy in Superclass::SetupDefaults();
 
-  // I have no clue how to convert this stuff to properties.
   // Broadcast for subclasses.
   vtkClientServerStream stream;
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
@@ -219,8 +218,17 @@ void vtkSMLODDisplayProxy::SetupDefaults()
       << this->LODUpdateSuppressorProxy->GetID(i) << "SetUpdatePiece"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    // This is here just for streaming (can be removed if streaming is removed).      
-    stream
+    }
+  pm->SendStream(this->ConnectionID,
+    vtkProcessModule::CLIENT_AND_SERVERS, stream);
+
+  // This is here just for streaming (can be removed if streaming is removed).
+  vtkClientServerStream stream2;
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+  unsigned int i;
+  for (i = 0; i < this->LODUpdateSuppressorProxy->GetNumberOfIDs(); i++)
+    {
+    stream2
       << vtkClientServerStream::Invoke
       << pm->GetProcessModuleID() << "GetNumberOfPartitions"
       << vtkClientServerStream::End
@@ -228,7 +236,7 @@ void vtkSMLODDisplayProxy::SetupDefaults()
       << this->LODMapperProxy->GetID(i) << "SetNumberOfPieces"
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
-    stream
+    stream2
       << vtkClientServerStream::Invoke
       << pm->GetProcessModuleID() << "GetPartitionId"
       << vtkClientServerStream::End
@@ -237,8 +245,9 @@ void vtkSMLODDisplayProxy::SetupDefaults()
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
     }
+  // Do we need to client too?
   pm->SendStream(this->ConnectionID,
-    vtkProcessModule::CLIENT_AND_SERVERS, stream);
+    vtkProcessModule::RENDER_SERVER, stream2);
 }
 
 //-----------------------------------------------------------------------------
