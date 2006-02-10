@@ -146,7 +146,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.415");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.416");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -1079,9 +1079,7 @@ void vtkPVRenderView::CreateViewProperties()
     }
   else
     {
-    // Default to fast rendering with lists.
-    this->ImmediateModeCheck->SetSelectedState(0);
-    this->SetUseImmediateMode(0);  
+    this->ImmediateModeCheck->SetSelectedState(1);
     }
   this->ImmediateModeCheck->SetBalloonHelpString(
     "When this option is off, OpenGL display lists are used when rendering."
