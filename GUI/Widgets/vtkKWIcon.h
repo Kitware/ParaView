@@ -170,6 +170,8 @@ public:
   // If the icon has an alpha channel, this blends the image against
   // a 'r', 'g', 'b' background and discards the alpha channel.
   virtual void Flatten(double r, double g, double b);
+  virtual void Flatten(double rgb[3])
+    { this->Flatten(rgb[0], rgb[1], rgb[2]); };
 
 protected:
   vtkKWIcon();

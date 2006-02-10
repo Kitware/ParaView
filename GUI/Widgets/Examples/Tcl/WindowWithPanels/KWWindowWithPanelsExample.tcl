@@ -168,6 +168,8 @@ $bg_toolbar_label Delete
 # Add some color button to the toolbars
 # Each button will set the label foreground or (a darker) background color
 
+set color_icon [vtkKWIcon New]
+
 set nb_buttons 10
 set objects {}
 for {set i 0} {$i < $nb_buttons} {incr i} {
@@ -178,8 +180,9 @@ for {set i 0} {$i < $nb_buttons} {incr i} {
   $fg_button SetParent [$fg_toolbar GetFrame]
   $fg_button Create
   $fg_button SetCommand $hello_label "SetForegroundColor $rgb"
-  $fg_button SetImageToPredefinedIcon 6
-  eval $fg_button SetBackgroundColor $rgb
+  $color_icon SetImage 6
+  eval $color_icon Flatten $rgb
+  $fg_button SetImageToIcon $color_icon
   $fg_button SetBalloonHelpString "Set the label foreground color"
   $fg_toolbar AddWidget $fg_button
   lappend objects $fg_button
@@ -189,12 +192,15 @@ for {set i 0} {$i < $nb_buttons} {incr i} {
   $bg_button SetParent [$bg_toolbar GetFrame]
   $bg_button Create
   $bg_button SetCommand $hello_label "SetBackgroundColor $rgb"
-  $bg_button SetImageToPredefinedIcon 6
-  eval $bg_button SetBackgroundColor $rgb
+  $color_icon SetImage 6
+  eval $color_icon Flatten $rgb
+  $bg_button SetImageToIcon $color_icon
   $bg_button SetBalloonHelpString "Set the label background color"
   $bg_toolbar AddWidget $bg_button
   lappend objects $bg_button
 }
+
+$color_icon Delete
 
 # Start the application
 # If --test was provided, do not enter the event loop and run this example
