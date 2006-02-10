@@ -18,9 +18,9 @@ ENDIF(NOT KWWidgets_SOURCE_DIR)
 
 IF(NOT KWWidgets_SOURCE_DIR)
   FIND_PACKAGE(SOV REQUIRED)
-  INCLUDE(${SOV_USE_FILE})
   MARK_AS_ADVANCED(FLTK_FLUID_EXECUTABLE)
 ENDIF(NOT KWWidgets_SOURCE_DIR)
+INCLUDE(${SOV_USE_FILE})
 
 # The name of our targets (executable or libraries) will simply be based
 # on the project name, with an extra prefix and suffix.
