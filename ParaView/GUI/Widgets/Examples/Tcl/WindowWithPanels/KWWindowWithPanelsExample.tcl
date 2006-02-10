@@ -178,7 +178,7 @@ for {set i 0} {$i < $nb_buttons} {incr i} {
   $fg_button SetParent [$fg_toolbar GetFrame]
   $fg_button Create
   $fg_button SetCommand $hello_label "SetForegroundColor $rgb"
-  $fg_button SetWidth 2
+  $fg_button SetImageToPredefinedIcon 6
   eval $fg_button SetBackgroundColor $rgb
   $fg_button SetBalloonHelpString "Set the label foreground color"
   $fg_toolbar AddWidget $fg_button
@@ -189,7 +189,7 @@ for {set i 0} {$i < $nb_buttons} {incr i} {
   $bg_button SetParent [$bg_toolbar GetFrame]
   $bg_button Create
   $bg_button SetCommand $hello_label "SetBackgroundColor $rgb"
-  $bg_button SetWidth 2
+  $bg_button SetImageToPredefinedIcon 6
   eval $bg_button SetBackgroundColor $rgb
   $bg_button SetBalloonHelpString "Set the label background color"
   $bg_toolbar AddWidget $bg_button
