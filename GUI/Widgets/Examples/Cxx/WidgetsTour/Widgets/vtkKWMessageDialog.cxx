@@ -9,7 +9,7 @@ class vtkKWMessageDialogItem : public KWWidgetsTourItem
 {
 public:
   virtual int GetType();
-  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *);
 };
 
 void vtkKWMessageDialogItem::Create(vtkKWWidget *parent, vtkKWWindow *win)

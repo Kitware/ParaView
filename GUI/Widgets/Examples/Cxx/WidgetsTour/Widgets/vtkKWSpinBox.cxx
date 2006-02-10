@@ -9,10 +9,10 @@ class vtkKWSpinBoxItem : public KWWidgetsTourItem
 {
 public:
   virtual int GetType();
-  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *);
 };
 
-void vtkKWSpinBoxItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
+void vtkKWSpinBoxItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 

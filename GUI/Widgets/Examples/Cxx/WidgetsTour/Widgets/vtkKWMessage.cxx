@@ -11,10 +11,10 @@ class vtkKWMessageItem : public KWWidgetsTourItem
 {
 public:
   virtual int GetType();
-  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *);
 };
 
-void vtkKWMessageItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
+void vtkKWMessageItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 

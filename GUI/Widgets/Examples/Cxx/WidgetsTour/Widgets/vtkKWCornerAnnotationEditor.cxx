@@ -16,7 +16,7 @@ class vtkKWCornerAnnotationEditorItem : public KWWidgetsTourItem
 {
 public:
   virtual int GetType();
-  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *);
 
   vtkKWCornerAnnotationEditorItem();
   virtual ~vtkKWCornerAnnotationEditorItem();
@@ -28,7 +28,7 @@ protected:
   vtkKWCornerAnnotationEditor *cae_anno_editor;
 };
 
-void vtkKWCornerAnnotationEditorItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
+void vtkKWCornerAnnotationEditorItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 

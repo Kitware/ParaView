@@ -10,10 +10,10 @@ class vtkKWMenuButtonItem : public KWWidgetsTourItem
 {
 public:
   virtual int GetType();
-  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *);
 };
 
-void vtkKWMenuButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
+void vtkKWMenuButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 

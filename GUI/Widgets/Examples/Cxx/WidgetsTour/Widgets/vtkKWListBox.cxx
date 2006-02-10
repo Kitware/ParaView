@@ -9,10 +9,10 @@ class vtkKWListBoxItem : public KWWidgetsTourItem
 {
 public:
   virtual int GetType();
-  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *);
 };
 
-void vtkKWListBoxItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
+void vtkKWListBoxItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 

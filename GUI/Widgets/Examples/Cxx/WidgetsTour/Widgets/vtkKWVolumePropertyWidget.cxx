@@ -12,10 +12,10 @@ class vtkKWVolumePropertyWidgetItem : public KWWidgetsTourItem
 {
 public:
   virtual int GetType();
-  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *);
 };
 
-void vtkKWVolumePropertyWidgetItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
+void vtkKWVolumePropertyWidgetItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 

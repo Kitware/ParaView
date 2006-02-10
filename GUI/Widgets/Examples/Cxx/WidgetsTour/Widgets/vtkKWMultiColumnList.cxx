@@ -9,10 +9,10 @@ class vtkKWMultiColumnListItem : public KWWidgetsTourItem
 {
 public:
   virtual int GetType();
-  virtual void Create(vtkKWWidget *parent, vtkKWWindow *win);
+  virtual void Create(vtkKWWidget *parent, vtkKWWindow *);
 };
 
-void vtkKWMultiColumnListItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
+void vtkKWMultiColumnListItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 {
   vtkKWApplication *app = parent->GetApplication();
 
