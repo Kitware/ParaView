@@ -19,6 +19,62 @@
 
 #include <stdlib.h>
 
+/*
+To Do:
+
+Connect Tkinter:
+
+Widget.tk.interpaddr() will return the address of the interpreter as a
+long integer  The InitializeTcl() method should look for an
+interpaddr() method of its argument and call it.  It should probably
+also accept a SWIG string.
+
+The Tkinter_Create method in _tkinter is hard-coded to create a new
+interpreter, so mixed apps will need Tkinter's interpreter to be
+the primary.
+
+Tkinter.py defines a "Misc" class that is the base class of all
+Tcl objects, and a "BaseWidget" class that is the base of all
+widgets.  The widget works through self.tk, where tk is the tcl
+interpreter defined in _tkinter.c, and self._w, where _w is the
+tcl name for the widget.
+
+The BaseWidget __init__ method takes a "name" keyword that can
+be used to specify the name of an existing widget (just the name,
+not the full path: the path is obtained by consulting master._w
+where "master" is another keyword that must be set.
+
+For parenting, the following attributes are requested from the
+master:
+
+master.tk   the Tkapp interpreter
+master._w   the Tcl window name
+master._register(callback)  - set by variables
+master.deletecommand(cbname) - delete the callback
+master.children   - a dict of name : widget 
+
+For going in the other direction, the vtkKWWidget class has
+SetWidgetName, SetParent, and Create methods that can be
+used together to create a vtkKWWidget from a Tkinter widget.
+
+Since the "parent" must also be a vtkKWWidget, it seems that it
+is actually necessary for all Tkinter widgets to have a basic
+vtkKWWidget wrapper, which could be created on the fly whenever
+vtkKWWidgets sees an object that needs wrapping.
+
+
+Use python callbacks:
+
+The command callbacks in KWWidgets execute Tcl strings, which is not
+ideal for someone who is programming in python.
+
+Tkinter has code that can be used as an example of how a Tcl function
+can call a Python function.
+
+
+
+*/
+
 // the init function for the python module
 #if defined(_WIN32)
 #if defined(__CYGWIN__)
@@ -276,6 +332,43 @@ static PyObject *PyvtkKWApplication_EvaluateBooleanExpression(PyObject *self,
 
 static PyObject *PyvtkKWApplication_InitializeTcl(PyObject *, PyObject *args)
 {
+  // check to see if a Tkinter "tk" interpreter has been passed
+
+  PyObject *tkinter;
+
+  if ((PyArg_ParseTuple(args, (char*)"O", &tkinter)))
+    {
+    // check to see if this is a Tkinter Tkapp
+    PyObject *func = PyObject_GetAttrString(tkinter,(char*)"interpaddr");
+    if (func)
+      {
+      PyObject *arglist = Py_BuildValue((char*)"()");
+      PyObject *result = PyEval_CallObject(func, arglist);
+      Py_DECREF(arglist);
+      Py_DECREF(func);
+      if (result == NULL)
+        {
+        return NULL;
+        }
+      if (!PyInt_Check(result))
+        {
+        PyErr_SetString(PyExc_ValueError,"interpaddr() must return an int");
+        Py_DECREF(result);
+        return NULL;
+        }
+      // Tkinter in python 2.3 assumes long is big enough for a
+      // pointer, so we do the same here
+      Tcl_Interp *interp;
+      *((long *)(&interp)) = PyInt_AsLong(result);
+      vtkKWApplication::InitializeTcl(interp);
+      Py_INCREF(Py_None);
+      return Py_None;
+      }
+    }
+
+  // clear error and try (argc, argv) arguments
+  PyErr_Clear();
+
   int argc;
   PyObject *pyargv;
 
@@ -426,7 +519,7 @@ static PyMethodDef PyvtkKWApplicationPythonMethods[] = {
   {(char*)"Start",                (PyCFunction)PyvtkKWApplication_Start, 1,
    (char*)"V.Start()\nC++: virtual void Start ();\nV.Start(int argc, list argv)\nC++: virtual void Start (int argc, char *argv[])\n\n Start running the application, with or without arguments.\n"},
   {(char*)"InitializeTcl",                (PyCFunction)PyvtkKWApplication_InitializeTcl, 1,
-   (char*)"V.InitializeTcl(int argc, list argv)\nC++: static void InitializeTcl (int argc, char *argv[]);\n\nInitialize Tcl/Tk\n Return NULL on error (eventually provides an ostream where detailed\n error messages will be stored).\n One method takes argc/argv and will create an internal Tcl interpreter\n on the fly, the other takes a Tcl interpreter and uses it afterward\n (this is mainly intended for initialization as a Tcl package)\n"},
+   (char*)"V.InitializeTcl(int argc, list argv)\nC++: static void InitializeTcl(int argc, char *argv[]);\nV.InitializeTcl(tkapp tk)\nC++: static void InitializeTcl(Tcl_Interp *tcl);\n\n Initialize Tcl/Tk\n Return NULL on error (eventually provides an ostream where detailed\n error messages will be stored).\n One method takes argc/argv and will create an internal Tcl interpreter\n on the fly, the other takes a Tcl interpreter and uses it afterward\n (this is mainly intended for initialization as a Tcl package)\n"},
   {NULL,                       NULL, 0, NULL}
 };
 
