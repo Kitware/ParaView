@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.75");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.76");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -3235,6 +3235,31 @@ int vtkKWTkUtilities::GetScreenSize(
       w, h);
     }
   return 0;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkUtilities::GetWindowingSystem(vtkKWApplication *app)
+{
+  if (app)
+    {
+    return vtkKWTkUtilities::GetWindowingSystem(app->GetMainInterp());
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkUtilities::GetWindowingSystem(Tcl_Interp *interp)
+{
+  if (interp)
+    {
+    if (Tcl_GlobalEval(interp, "tk windowingsystem") != TCL_OK)
+      {
+      vtkGenericWarningMacro(<< "Unable to query windowing system! " 
+                             << Tcl_GetStringResult(interp));
+      return NULL;
+      }
+    return Tcl_GetStringResult(interp);
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------

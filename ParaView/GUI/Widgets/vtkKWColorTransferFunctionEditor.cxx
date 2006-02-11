@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.47");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.48");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -728,7 +728,7 @@ void vtkKWColorTransferFunctionEditor::CreateColorSpaceOptionMenu()
     this->ColorSpaceOptionMenu->SetParent(this->TopLeftFrame);
     this->ColorSpaceOptionMenu->Create();
     this->ColorSpaceOptionMenu->SetPadX(1);
-    this->ColorSpaceOptionMenu->SetPadY(0);
+    this->ColorSpaceOptionMenu->SetPadY(1);
     this->ColorSpaceOptionMenu->IndicatorVisibilityOff();
     this->ColorSpaceOptionMenu->SetBalloonHelpString(
       "Change the interpolation color space to RGB or HSV.");

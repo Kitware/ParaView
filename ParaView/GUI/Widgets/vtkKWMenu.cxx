@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.90");
+vtkCxxRevisionMacro(vtkKWMenu, "1.91");
 
 //----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
@@ -989,6 +989,24 @@ void vtkKWMenu::SetItemImage(int idx, const char *imagename)
     {
     return;
     }
+  
+  // -image is not supported on MacOS Aqua system
+
+  int tcl_major, tcl_minor, tcl_patch_level;
+  Tcl_GetVersion(&tcl_major, &tcl_minor, &tcl_patch_level, NULL);
+  if (tcl_major < 8 ||
+      (tcl_major == 8 && 
+       (tcl_minor < 4 || 
+        (tcl_minor == 4 && tcl_patch_level <= 12))))
+    {
+    vtksys_stl::string sys(
+      vtkKWTkUtilities::GetWindowingSystem(this->GetApplication()));
+    if (!sys.compare("aqua"))
+      {
+      return;
+      }
+    }
+
   this->Script("%s entryconfigure %d -image %s", 
                this->GetWidgetName(), idx, imagename);
 }
