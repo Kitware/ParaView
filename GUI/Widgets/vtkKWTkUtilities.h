@@ -627,6 +627,13 @@ public:
   static int GetScreenSize(
     vtkKWWidget *widget, int *w, int *h);
 
+  // Description:
+  // Get windowing system.
+  // Returns the current Tk windowing system, one of x11 (X11-based), 
+  // win32 (MS Windows), classic (Mac OS Classic), or aqua (Mac OS X Aqua). 
+  static const char* GetWindowingSystem(vtkKWApplication *app);
+  static const char* GetWindowingSystem(Tcl_Interp *interp);
+
 protected:
   vtkKWTkUtilities() {};
   ~vtkKWTkUtilities() {};

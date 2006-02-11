@@ -27,6 +27,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkImageBlend.h"
 #include "vtkKWMenuButton.h"
+#include "vtkKWMenu.h"
 #include "vtkKWIcon.h"
 
 #include <ctype.h>
@@ -36,7 +37,7 @@
 #include <vtksys/stl/algorithm>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.82");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.83");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -1480,10 +1481,12 @@ void vtkKWParameterValueFunctionEditor::CreateHistogramLogModeOptionMenu()
     this->HistogramLogModeOptionMenu->SetParent(this->TopLeftFrame);
     this->HistogramLogModeOptionMenu->Create();
     this->HistogramLogModeOptionMenu->SetPadX(1);
-    this->HistogramLogModeOptionMenu->SetPadY(0);
+    this->HistogramLogModeOptionMenu->SetPadY(1);
     this->HistogramLogModeOptionMenu->IndicatorVisibilityOff();
     this->HistogramLogModeOptionMenu->SetBalloonHelpString(
       "Change the histogram mode from log to linear.");
+
+    vtkKWMenu *menu = this->HistogramLogModeOptionMenu->GetMenu();
 
     vtksys_stl::string img_name;
 
@@ -1492,16 +1495,18 @@ void vtkKWParameterValueFunctionEditor::CreateHistogramLogModeOptionMenu()
     vtkKWTkUtilities::UpdatePhotoFromPredefinedIcon(
       this->GetApplication(), img_name.c_str(), vtkKWIcon::IconGridLinear);
     
-    this->HistogramLogModeOptionMenu->AddRadioButtonImage(
-      img_name.c_str(), this, "HistogramLogModeCallback 0");
+    this->HistogramLogModeOptionMenu->AddRadioButton(
+      "Lin.", this, "HistogramLogModeCallback 0");
+    menu->SetItemImage("Lin.", img_name.c_str());
 
     img_name = this->HistogramLogModeOptionMenu->GetWidgetName();
     img_name += ".img1";
     vtkKWTkUtilities::UpdatePhotoFromPredefinedIcon(
       this->GetApplication(), img_name.c_str(), vtkKWIcon::IconGridLog);
  
-    this->HistogramLogModeOptionMenu->AddRadioButtonImage(
-      img_name.c_str(), this, "HistogramLogModeCallback 1");
+    this->HistogramLogModeOptionMenu->AddRadioButton(
+      "Log.", this, "HistogramLogModeCallback 1");
+    menu->SetItemImage("Log.", img_name.c_str());
 
     this->UpdateHistogramLogModeOptionMenu();
     }
@@ -4067,6 +4072,7 @@ void vtkKWParameterValueFunctionEditor::SetHistogram(vtkKWHistogram *arg)
   
   this->LastHistogramBuildTime = 0;
 
+  this->UpdateHistogramLogModeOptionMenu();
   this->RedrawHistogram();
   if (this->ComputeValueTicksFromHistogram)
     {
@@ -4099,6 +4105,7 @@ void vtkKWParameterValueFunctionEditor::SetSecondaryHistogram(
   
   this->LastHistogramBuildTime = 0;
 
+  this->UpdateHistogramLogModeOptionMenu();
   this->RedrawHistogram();
 }
 
@@ -6381,7 +6388,8 @@ void vtkKWParameterValueFunctionEditor::ParameterEntryCallback(const char*)
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::UpdateHistogramLogModeOptionMenu()
 {
-  if (this->HistogramLogModeOptionMenu)
+  if (this->HistogramLogModeOptionMenu && 
+      this->HistogramLogModeOptionMenu->IsCreated())
     {
     vtkKWHistogram *hist = 
       this->Histogram ? this->Histogram : this->SecondaryHistogram;
@@ -6390,15 +6398,22 @@ void vtkKWParameterValueFunctionEditor::UpdateHistogramLogModeOptionMenu()
       {
       log_mode = hist->GetLogMode();
       }
-    ostrstream img_name;
-    img_name << this->HistogramLogModeOptionMenu->GetWidgetName() 
-             << ".img" << log_mode << ends;
-    this->HistogramLogModeOptionMenu->SetValue(img_name.str());
-    img_name.rdbuf()->freeze(0);
-    if (!hist)
+    vtkKWMenu *menu = this->HistogramLogModeOptionMenu->GetMenu();
+    const char* img_opt = menu->GetItemOption("Log.", "-image");
+    if (img_opt && *img_opt)
       {
-      this->HistogramLogModeOptionMenu->SetEnabled(0);
+      ostrstream img_name;
+      img_name << this->HistogramLogModeOptionMenu->GetWidgetName() 
+               << ".img" << log_mode << ends;
+      this->HistogramLogModeOptionMenu->SetValue(img_name.str());
+      img_name.rdbuf()->freeze(0);
       }
+    else
+      {
+      this->HistogramLogModeOptionMenu->SetValue(log_mode ? "Log." : "Lin.");
+      }
+    this->HistogramLogModeOptionMenu->SetEnabled(
+      !hist ? 0 : this->GetEnabled());
     }
 }
 
