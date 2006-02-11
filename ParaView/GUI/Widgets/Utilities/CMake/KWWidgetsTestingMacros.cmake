@@ -7,11 +7,7 @@ MACRO(KWWidgets_ADD_OUT_OF_SOURCE_TEST
   IF(VTK_WRAP_TCL)
 
     IF(CMAKE_CONFIGURATION_TYPES)
-      FOREACH(var ${CMAKE_CONFIGURATION_TYPES})
-        IF(NOT DEFINED FIRST_CONFIGURATION_TYPE)
-          SET(FIRST_CONFIGURATION_TYPE "${var}/")
-        ENDIF(NOT DEFINED FIRST_CONFIGURATION_TYPE)
-      ENDFOREACH(var)
+      SET(CONFIGURATION_TYPE "${CMAKE_BUILD_TYPE}/")
     ENDIF(CMAKE_CONFIGURATION_TYPES)
 
     ADD_TEST(${test_name} ${CMAKE_CTEST_COMMAND}
@@ -19,10 +15,11 @@ MACRO(KWWidgets_ADD_OUT_OF_SOURCE_TEST
       --build-generator ${CMAKE_GENERATOR}
       --build-makeprogram ${CMAKE_MAKE_PROGRAM}
       --build-project ${project_name}
+      --build-config ${CMAKE_BUILD_TYPE}
       --build-options 
       "-DKWWidgets_DIR:PATH=${KWWidgets_BINARY_DIR}" 
       "-DSOV_DIR:PATH=${SOV_DIR}"
-      --test-command "${FIRST_CONFIGURATION_TYPE}${exe_name}" "${exe_options}")
+      --test-command "${CONFIGURATION_TYPE}${exe_name}" "${exe_options}")
 
   ENDIF(VTK_WRAP_TCL)
 
