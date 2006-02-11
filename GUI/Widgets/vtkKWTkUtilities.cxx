@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.76");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.77");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -3244,6 +3244,7 @@ const char* vtkKWTkUtilities::GetWindowingSystem(vtkKWApplication *app)
     {
     return vtkKWTkUtilities::GetWindowingSystem(app->GetMainInterp());
     }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
