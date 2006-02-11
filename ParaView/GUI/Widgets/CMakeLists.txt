@@ -473,7 +473,12 @@ IF(VTK_WRAP_PYTHON)
   INCLUDE("${VTK_CMAKE_DIR}/vtkWrapPython.cmake")
 
   VTK_WRAP_PYTHON3(KWWidgetsPython KWWidgetsPython_SRCS
-                   "${KWWidgets_SRCS} ${KWWidgetsPythonExtra_SRCS}")
+    "${KWWidgets_SRCS} ${KWWidgetsPythonExtra_SRCS}")
+
+  IF(BORLAND)
+    WRITE_FILE(${LIBRARY_OUTPUT_PATH}/KWWidgetsPython.def
+      "EXPORTS\ninitKWWidgetsPython=_initKWWidgetsPython\n")
+  ENDIF(BORLAND)
 
   ADD_LIBRARY(KWWidgetsPythonD ${KWWidgetsPython_SRCS} 
               ${KWWidgetsPythonExtra_SRCS})
