@@ -19,6 +19,7 @@ MACRO(KWWidgets_ADD_OUT_OF_SOURCE_TEST
       --build-options 
       "-DKWWidgets_DIR:PATH=${KWWidgets_BINARY_DIR}" 
       "-DSOV_DIR:PATH=${SOV_DIR}"
+      "-DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}"
       --test-command "${CONFIGURATION_TYPE}${exe_name}" "${exe_options}")
 
   ENDIF(VTK_WRAP_TCL)
