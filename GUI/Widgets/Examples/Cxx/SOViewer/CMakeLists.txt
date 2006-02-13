@@ -11,7 +11,7 @@ IF(NOT KWWidgets_SOURCE_DIR)
 ENDIF(NOT KWWidgets_SOURCE_DIR)
 
 # This example require the SOViewer package. 
-# If are building this example as a standalone external project, abort the
+# If we are building this example as a standalone external project, abort the
 # build process if the package was not found. If we are building it as part
 # of the whole KWWidgets source tree, just quietly ignore this example until
 # the user configures the SOV_DIR path manually.
@@ -56,6 +56,16 @@ CONFIGURE_FILE(
 
 ADD_EXECUTABLE(${EXE_NAME} WIN32 ${EXE_SRCS} ${RES_FILE})
 TARGET_LINK_LIBRARIES(${EXE_NAME} ${KWWidgets_LIBRARIES} ${SOV_LIBRARIES})
+
+# Generate the default setup paths scripts
+# If we are building this example as a standalone external project, generate
+# some useful scripts that can be used to setup various environment variables
+# and launch the executable properly.
+
+IF(NOT KWWidgets_SOURCE_DIR)
+  INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsPathsMacros.cmake")
+  KWWidgets_GENERATE_DEFAULT_SETUP_PATHS("${CMAKE_CURRENT_BINARY_DIR}")
+ENDIF(NOT KWWidgets_SOURCE_DIR)
 
 # If needed, copy the Tcl/Tk support files required at run-time 
 # to initialize Tcl/Tk. This is only triggered if VTK was built

@@ -1,3 +1,7 @@
+# ---------------------------------------------------------------------------
+# KWWidgets_WRAP_TCL
+# Macro around various VTK wrapping macros and wrapping-related settings
+
 MACRO(KWWidgets_WRAP_TCL target src_list_name sources commands)
 
   IF(VTK_MAJOR_VERSION AND VTK_MAJOR_VERSION LESS 5)

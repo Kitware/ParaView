@@ -38,10 +38,10 @@ SET(KWWidgets_BUILD_SETTINGS_FILE_CONFIG
   ${KWWidgets_BINARY_DIR}/KWWidgetsBuildSettings.cmake)
 
 # The library directories.
-SET(KWWidgets_LIBRARY_DIRS_CONFIG ${LIBRARY_OUTPUT_PATH})
+SET(KWWidgets_LIBRARY_DIRS_CONFIG ${KWWidgets_LIBRARY_DIRS})
 
 # The runtime directories.
-SET(KWWidgets_RUNTIME_DIRS_CONFIG ${LIBRARY_OUTPUT_PATH})
+SET(KWWidgets_RUNTIME_DIRS_CONFIG ${KWWidgets_RUNTIME_DIRS})
 
 # The include directories.
 SET(KWWidgets_INCLUDE_DIRS_CONFIG ${KWWidgets_INCLUDE_PATH})
@@ -67,8 +67,10 @@ SET(KWWidgets_CMAKE_DIR_CONFIG
   ${KWWidgets_CMAKE_DIR})
 
 # The Tcl/Tk options.
-SET(KWWidgets_TCL_PACKAGE_INDEX_DIR_CONFIG 
-  ${KWWidgets_BINARY_DIR}/Wrapping/Tcl)
+SET(KWWidgets_TCL_PACKAGE_INDEX_DIR_CONFIG ${KWWidgets_TCL_PACKAGE_INDEX_DIR})
+
+# The Python options.
+SET(KWWidgets_PYTHON_MODULE_DIR_CONFIG ${KWWidgets_PYTHON_MODULE_DIR})
 
 # The Doxygen options.
 SET(KWWidgets_DOXYGEN_DIR_CONFIG 
@@ -78,7 +80,7 @@ SET(KWWidgets_DOXYGEN_DIR_CONFIG
 SET(KWWidgets_VTK_DIR_CONFIG ${VTK_DIR})
 
 # The build configuration information.
-SET(KWWidgets_CONFIGURATION_TYPES_CONFIG ${CMAKE_CONFIGURATION_TYPES})
+SET(KWWidgets_CONFIGURATION_TYPES_CONFIG ${KWWidgets_CONFIGURATION_TYPES})
 SET(KWWidgets_BUILD_TYPE_CONFIG ${CMAKE_BUILD_TYPE})
 
 # Configure KWWidgetsConfig.cmake for the build tree.
@@ -143,6 +145,10 @@ SET(KWWidgets_CMAKE_DIR_CONFIG
 # The Tcl/Tk options.
 SET(KWWidgets_TCL_PACKAGE_INDEX_DIR_CONFIG 
   ${DOLLAR}{KWWidgets_INSTALL_PREFIX}${KWWidgets_INSTALL_LIB_DIR}/tcl)
+
+# The Python options.
+SET(KWWidgets_PYTHON_MODULE_DIR_CONFIG 
+  ${DOLLAR}{KWWidgets_INSTALL_PREFIX}${KWWidgets_INSTALL_LIB_DIR}/../site-packages)
 
 # The Doxygen options.
 SET(KWWidgets_DOXYGEN_DIR_CONFIG 
