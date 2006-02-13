@@ -50,7 +50,7 @@
 #include "vtkHyperOctreeSurfaceFilter.h"
 
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.61");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.62");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -245,11 +245,6 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
   vtkPolyData *output = vtkPolyData::SafeDownCast(
     info->Get(vtkDataObject::DATA_OBJECT()));
   if (!output) {return 0;}
-
-  cerr << "Geometry execute: out num: " << info << ", " << info->Get(
-      vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()) << endl;   
-
-
 
   vtkDataObject *input = vtkDataSet::SafeDownCast(
     inInfo->Get(vtkDataObject::DATA_OBJECT()));
