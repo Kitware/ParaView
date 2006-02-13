@@ -1,0 +1,152 @@
+# ParaView State Version 2.5
+
+set kw(vtkTemp1) [$Application GetMainWindow]
+set kw(vtkTemp94) [$kw(vtkTemp1) GetMainView]
+
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $kw(vtkTemp94) $argv $argc
+
+set kw(vtkTemp1233) [$kw(vtkTemp1) GetAnimationManager]
+[$kw(vtkTemp1) GetRotateCameraButton] SetSelectedState 1
+$kw(vtkTemp1) ChangeInteractorStyle 1
+
+set kw(vtkTemp1177) [$kw(vtkTemp1) InitializeReadCustom "PhastaReader" "$DataDir/Data/sonic.pht"]
+$kw(vtkTemp1) ReadFileInformation $kw(vtkTemp1177) "$DataDir/Data/sonic.pht"
+$kw(vtkTemp1) FinalizeRead $kw(vtkTemp1177) "$DataDir/Data/sonic.pht"
+$kw(vtkTemp1177) SetLabel {sonic.pht}
+set kw(vtkTemp1185) [$kw(vtkTemp1177) GetPVWidget {Filename}]
+$kw(vtkTemp1185) SetValue "$DataDir/Data/sonic.pht"
+set kw(vtkTemp1178) [$kw(vtkTemp1177) GetPVWidget {TimeStep}]
+$kw(vtkTemp1178) SetValue 0
+$kw(vtkTemp1177) AcceptCallback
+# Saving state of the Display Proxy associated with the source
+set pvDisp(vtkTemp1177) [$kw(vtkTemp1177) GetDisplayProxy] 
+[$pvDisp(vtkTemp1177) GetProperty IsDistributedGeometryValid] SetElement 0 1
+[$pvDisp(vtkTemp1177) GetProperty LODResolution] SetElement 0 64
+[$pvDisp(vtkTemp1177) GetProperty OrderedCompositing] SetElement 0 0
+[$pvDisp(vtkTemp1177) GetProperty Representation] SetElement 0 1
+[$pvDisp(vtkTemp1177) GetProperty Visibility] SetElement 0 1
+[$pvDisp(vtkTemp1177) GetProperty Color] SetElement 0 1
+[$pvDisp(vtkTemp1177) GetProperty Color] SetElement 1 1
+[$pvDisp(vtkTemp1177) GetProperty Color] SetElement 2 1
+[$pvDisp(vtkTemp1177) GetProperty ColorArray] SetElement 0 {pressure}
+[$pvDisp(vtkTemp1177) GetProperty ColorMode] SetElement 0 0
+[$pvDisp(vtkTemp1177) GetProperty ColorSpace] SetElement 0 0
+[$pvDisp(vtkTemp1177) GetProperty HSVWrap] SetElement 0 0
+[$pvDisp(vtkTemp1177) GetProperty ImmediateModeRendering] SetElement 0 1
+[$pvDisp(vtkTemp1177) GetProperty InterpolateScalarsBeforeMapping] SetElement 0 1
+[$pvDisp(vtkTemp1177) GetProperty Interpolation] SetElement 0 1
+[$pvDisp(vtkTemp1177) GetProperty LineWidth] SetElement 0 4
+[$pvDisp(vtkTemp1177) GetProperty NumberOfSubPieces] SetElement 0 1
+[$pvDisp(vtkTemp1177) GetProperty Opacity] SetElement 0 1
+[$pvDisp(vtkTemp1177) GetProperty Orientation] SetElement 0 0
+[$pvDisp(vtkTemp1177) GetProperty Orientation] SetElement 1 0
+[$pvDisp(vtkTemp1177) GetProperty Orientation] SetElement 2 0
+[$pvDisp(vtkTemp1177) GetProperty Origin] SetElement 0 0
+[$pvDisp(vtkTemp1177) GetProperty Origin] SetElement 1 0
+[$pvDisp(vtkTemp1177) GetProperty Origin] SetElement 2 0
+[$pvDisp(vtkTemp1177) GetProperty PointSize] SetElement 0 1
+[$pvDisp(vtkTemp1177) GetProperty Position] SetElement 0 0
+[$pvDisp(vtkTemp1177) GetProperty Position] SetElement 1 0
+[$pvDisp(vtkTemp1177) GetProperty Position] SetElement 2 0
+[$pvDisp(vtkTemp1177) GetProperty ScalarMode] SetElement 0 3
+[$pvDisp(vtkTemp1177) GetProperty ScalarOpacityUnitDistance] SetElement 0 1
+[$pvDisp(vtkTemp1177) GetProperty ScalarVisibility] SetElement 0 1
+[$pvDisp(vtkTemp1177) GetProperty Scale] SetElement 0 1
+[$pvDisp(vtkTemp1177) GetProperty Scale] SetElement 1 1
+[$pvDisp(vtkTemp1177) GetProperty Scale] SetElement 2 1
+[$pvDisp(vtkTemp1177) GetProperty Shading] SetElement 0 0
+[$pvDisp(vtkTemp1177) GetProperty Specular] SetElement 0 0
+[$pvDisp(vtkTemp1177) GetProperty UseLookupTableScalarRange] SetElement 0 1
+[$pvDisp(vtkTemp1177) GetProperty UseStrips] SetElement 0 0
+$pvDisp(vtkTemp1177) UpdateVTKObjects
+[$kw(vtkTemp1177) GetPVOutput] ColorByArray {pressure} 3
+$kw(vtkTemp1177) SetVisibility 1
+set kw(vtkTemp1200) [$kw(vtkTemp1) GetPVColorMap {pressure} 1]
+$kw(vtkTemp1200) SetScalarBarTitle {pressure}
+$kw(vtkTemp1200) SetScalarBarVectorTitle {Magnitude}
+$kw(vtkTemp1200) SetScalarBarLabelFormat {%-#6.3g}
+$kw(vtkTemp1200) SetStartHSV 0.666667 1 1
+$kw(vtkTemp1200) SetEndHSV 0 1 1
+$kw(vtkTemp1200) SetNumberOfColors 256
+$kw(vtkTemp1200) SetScalarRange 0.714286 0.716286
+$kw(vtkTemp1200) SetScalarRangeLock 0
+$kw(vtkTemp1200) SetScalarBarVisibility 0
+$kw(vtkTemp1200) SetScalarBarPosition1 0.87 0.25
+$kw(vtkTemp1200) SetScalarBarPosition2 0.13 0.5
+$kw(vtkTemp1200) SetScalarBarOrientation 1
+$kw(vtkTemp94) SetRendererBackgroundColor 0.33 0.35 0.43
+$kw(vtkTemp94) ParallelProjectionOff
+$kw(vtkTemp94) SetCameraState 25.4437 -8.07417 4.50619 -18.5086 24.854 -14.0373 0.365719 0.776838 0.512614
+$kw(vtkTemp94) SetUseTriangleStrips 0
+$kw(vtkTemp94) SetUseImmediateMode 1
+set kw(vtkTemp451) [$kw(vtkTemp94) GetRenderModuleUI]
+catch {$kw(vtkTemp451) SetLODThreshold 6.3}
+catch {$kw(vtkTemp451) SetLODResolution 64}
+catch {$kw(vtkTemp451) SetOutlineThreshold 5.77e+07}
+catch {$kw(vtkTemp451) SetRenderInterruptsEnabled 1}
+catch {$kw(vtkTemp451) CompositeWithFloatCallback 0}
+catch {$kw(vtkTemp451) CompositeWithRGBACallback 0}
+catch {$kw(vtkTemp451) CompositeCompressionCallback 0}
+catch {$kw(vtkTemp451) SetCompositeThreshold 10}
+catch {$kw(vtkTemp451) SetReductionFactor 2}
+catch {$kw(vtkTemp451) SetSquirtLevel 3}
+set kw(vtkTemp395) [$kw(vtkTemp94) GetCornerAnnotation]
+$kw(vtkTemp395) SetVisibility 0
+$kw(vtkTemp395) SetCornerText {} 0
+$kw(vtkTemp395) SetCornerText {Time = [smGet Sources Phasta0 TimestepValues [smGet Sources Phasta0 TimeStep] 1.3e]} 1
+$kw(vtkTemp395) SetCornerText {} 2
+$kw(vtkTemp395) SetCornerText {} 3
+$kw(vtkTemp395) SetMaximumLineHeight 0.07
+set kw(vtkTemp415) [$kw(vtkTemp395) GetTextPropertyWidget]
+$kw(vtkTemp415) SetColor 1 1 1
+$kw(vtkTemp415) SetFontFamily 0
+$kw(vtkTemp415) SetBold 0
+$kw(vtkTemp415) SetItalic 0
+$kw(vtkTemp415) SetShadow 0
+$kw(vtkTemp415) SetOpacity 1
+$kw(vtkTemp94) SetOrientationAxesVisibility 0
+$kw(vtkTemp94) SetOrientationAxesInteractivity 0
+$kw(vtkTemp94) SetOrientationAxesOutlineColor 1 1 1
+$kw(vtkTemp94) SetOrientationAxesTextColor 1 1 1
+set kw(vtkTemp926) [$kw(vtkTemp94) GetManipulatorControl2D]
+$kw(vtkTemp926) SetCurrentManipulator 0 1 {Roll}
+$kw(vtkTemp926) SetCurrentManipulator 0 0 {Pan}
+$kw(vtkTemp926) SetCurrentManipulator 1 0 {Pan}
+$kw(vtkTemp926) SetCurrentManipulator 1 1 {Pan}
+$kw(vtkTemp926) SetCurrentManipulator 2 1 {Pan}
+$kw(vtkTemp926) SetCurrentManipulator 0 2 {Pan}
+$kw(vtkTemp926) SetCurrentManipulator 1 2 {Pan}
+$kw(vtkTemp926) SetCurrentManipulator 2 2 {Pan}
+$kw(vtkTemp926) SetCurrentManipulator 2 0 {Zoom}
+set kw(vtkTemp925) [$kw(vtkTemp94) GetManipulatorControl3D]
+$kw(vtkTemp925) SetCurrentManipulator 0 2 {FlyIn}
+$kw(vtkTemp925) SetCurrentManipulator 2 2 {FlyOut}
+$kw(vtkTemp925) SetCurrentManipulator 0 0 {Rotate}
+$kw(vtkTemp925) SetCurrentManipulator 1 1 {Rotate}
+$kw(vtkTemp925) SetCurrentManipulator 1 2 {Rotate}
+$kw(vtkTemp925) SetCurrentManipulator 0 1 {Roll}
+$kw(vtkTemp925) SetCurrentManipulator 1 0 {Pan}
+$kw(vtkTemp925) SetCurrentManipulator 2 1 {Pan}
+$kw(vtkTemp925) SetCurrentManipulator 2 0 {Zoom}
+$kw(vtkTemp94) SetUseLight 1
+$kw(vtkTemp94) SetMaintainLuminance 1
+$kw(vtkTemp94) SetLight 0 0 0.6
+$kw(vtkTemp94) SetLight 0 1 0.75
+$kw(vtkTemp94) SetLight 0 2 72
+$kw(vtkTemp94) SetLight 0 3 68
+$kw(vtkTemp94) SetLight 1 0 0.4
+$kw(vtkTemp94) SetLight 1 4 3
+$kw(vtkTemp94) SetLight 1 2 -75
+$kw(vtkTemp94) SetLight 1 3 -65
+$kw(vtkTemp94) SetLight 2 0 0.5
+$kw(vtkTemp94) SetLight 2 5 3.5
+$kw(vtkTemp94) SetLight 2 2 -42
+$kw(vtkTemp94) SetLight 2 3 97
+$kw(vtkTemp94) SetLight 3 0 0.5
+$kw(vtkTemp94) SetLight 3 6 3
+
+source [file join [file dirname [info script]] Compare.tcl]
+Compare $Application $argv $argc
+
+$Application Exit
