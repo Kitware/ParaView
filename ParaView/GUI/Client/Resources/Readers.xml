@@ -716,4 +716,19 @@
           file_description="PNG Image Files">
     <Source class="vtkPNGReader"/>
   </Module>
+
+  <Module name="PhastaReader"
+          class="vtkPVAdvancedReaderModule"
+          root_name="Phasta"
+          module_type="Reader"
+          extensions=".pht"
+          file_description="Phasta Files">
+    <Source class="vtkPPhastaReader"/>
+    <Scale property="TimeStep"
+           label="Time step" trace_name="TimeStep"
+           keeps_timesteps="1"
+           entry_and_label_on_top="0"
+           display_value="0"
+           help="Set the current timestep."/>
+  </Module>
 </ModuleInterfaces>
