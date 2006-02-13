@@ -1017,6 +1017,41 @@
    <!-- End P3DReader -->
    </SourceProxy>
 
+   <SourceProxy name="PhastaReader" 
+                class="vtkPPhastaReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
+
+     <IntVectorProperty 
+        name="TimeStepRangeInfo"
+        command="GetTimeStepRange"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="TimeStep"
+        command="SetTimeStepIndex"
+        number_of_elements="1"
+        default_values="0">
+       <IntRangeDomain name="range">
+          <RequiredProperties>
+             <Property name="TimeStepRangeInfo" function="Range"/>
+          </RequiredProperties>
+       </IntRangeDomain>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty 
+         name="TimestepValues"
+         information_only="1">
+        <TimeStepsInformationHelper/>
+     </DoubleVectorProperty>
+   </SourceProxy>
+
    <SourceProxy name="stlreader" class="vtkSTLReader">
      <StringVectorProperty
         name="FileName"
