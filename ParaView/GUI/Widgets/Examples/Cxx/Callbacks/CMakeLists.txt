@@ -65,6 +65,16 @@ CONFIGURE_FILE(
 ADD_EXECUTABLE(${EXE_NAME} WIN32 ${EXE_SRCS} ${RES_FILE})
 TARGET_LINK_LIBRARIES(${EXE_NAME} ${KWWidgets_LIBRARIES} ${LIB_NAME})
 
+# Generate the default setup paths scripts
+# If we are building this example as a standalone external project, generate
+# some useful scripts that can be used to setup various environment variables
+# and launch the executable properly.
+
+IF(NOT KWWidgets_SOURCE_DIR)
+  INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsPathsMacros.cmake")
+  KWWidgets_GENERATE_DEFAULT_SETUP_PATHS("${CMAKE_CURRENT_BINARY_DIR}")
+ENDIF(NOT KWWidgets_SOURCE_DIR)
+
 # If needed, copy the Tcl/Tk support files required at run-time 
 # to initialize Tcl/Tk. This is only triggered if VTK was built
 # against a Tcl/Tk static library.

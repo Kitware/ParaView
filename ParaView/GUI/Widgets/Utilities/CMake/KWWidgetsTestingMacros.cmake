@@ -1,3 +1,7 @@
+# ---------------------------------------------------------------------------
+# KWWidgets_ADD_OUT_OF_SOURCE_TEST
+# Add an out-of-source test 
+
 MACRO(KWWidgets_ADD_OUT_OF_SOURCE_TEST 
     test_name 
     project_name 

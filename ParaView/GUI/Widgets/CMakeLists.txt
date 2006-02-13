@@ -62,6 +62,8 @@ IF(NOT LIBRARY_OUTPUT_PATH)
   SET(LIBRARY_OUTPUT_PATH ${KWWidgets_BINARY_DIR}/bin CACHE INTERNAL 
     "Single output directory for building all libraries.")
 ENDIF(NOT LIBRARY_OUTPUT_PATH)
+SET(KWWidgets_LIBRARY_DIRS ${LIBRARY_OUTPUT_PATH})
+SET(KWWidgets_RUNTIME_DIRS ${LIBRARY_OUTPUT_PATH})
 
 IF(NOT EXECUTABLE_OUTPUT_PATH)
   SET(EXECUTABLE_OUTPUT_PATH ${KWWidgets_BINARY_DIR}/bin CACHE INTERNAL 
@@ -82,6 +84,8 @@ SET(KWWidgets_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 
 SET(KWWidgets_CMAKE_DIR "${KWWidgets_SOURCE_DIR}/Utilities/CMake")
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${KWWidgets_CMAKE_DIR}")
+
+SET(KWWidgets_CONFIGURATION_TYPES ${CMAKE_CONFIGURATION_TYPES})
 
 # --------------------------------------------------------------------------
 # Install directories
@@ -432,6 +436,9 @@ KWWidgets_WRAP_TCL(
   "vtkKWWidgetsInitializeCommand" 
   "${KWWidgets_MAJOR_VERSION}.${KWWidgets_MINOR_VERSION}")
 
+SET(KWWidgets_TCL_PACKAGE_INDEX_DIR 
+  ${KWWidgets_BINARY_DIR}/Wrapping/Tcl)
+
 # If needed, copy the Tcl/Tk support files required at run-time 
 # to initialize Tcl/Tk. This is used by the examples or larger
 # projects that include KWWidgets directly in their source trees.
@@ -474,6 +481,9 @@ IF(VTK_WRAP_PYTHON)
 
   VTK_WRAP_PYTHON3(KWWidgetsPython KWWidgetsPython_SRCS
     "${KWWidgets_SRCS} ${KWWidgetsPythonExtra_SRCS}")
+
+  SET(KWWidgets_PYTHON_MODULE_DIR 
+    ${KWWidgets_BINARY_DIR}/Wrapping/Python)
 
   IF(BORLAND)
     WRITE_FILE(${LIBRARY_OUTPUT_PATH}/KWWidgetsPython.def

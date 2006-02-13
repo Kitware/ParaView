@@ -6,9 +6,12 @@ IF(NOT KWWidgets_INSTALL_NO_DEVELOPMENT)
   INSTALL_FILES(${KWWidgets_INSTALL_INCLUDE_DIR} FILES 
     ${KWWidgets_BINARY_DIR}/vtkKWWidgetsConfigure.h)
   INSTALL_FILES(${KWWidgets_INSTALL_INCLUDE_DIR}/Templates FILES 
-    vtkKWWidgetsPaths.h.in
+    KWWidgetsSetupPaths.bat.in
+    KWWidgetsSetupPaths.csh.in
+    KWWidgetsSetupPaths.sh.in
     vtkKWWidgetSetSubclass.cxx.in
     vtkKWWidgetSetSubclass.h.in
+    vtkKWWidgetsPaths.h.in
     vtkKWWidgetWithLabelSubclass.cxx.in
     vtkKWWidgetWithLabelSubclass.h.in
     vtkKWWidgetWithScrollbarsSubclass.cxx.in
