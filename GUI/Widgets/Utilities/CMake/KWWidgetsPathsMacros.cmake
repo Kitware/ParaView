@@ -97,10 +97,20 @@ MACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS
 
     # Configure the Win32 batch file
 
+    SET(KWWidgets_SEP ";")
+
     CONFIGURE_FILE(
       ${KWWidgets_TEMPLATES_DIR}/KWWidgetsSetupPaths.bat.in
       ${dest_dir}/KWWidgetsSetupPaths.bat
       IMMEDIATE)
+
+    STRING(REGEX REPLACE "\"" "\\\\\"" 
+      KWWidgets_TCLLIBPATH_ENV_ESCAPED "${KWWidgets_TCLLIBPATH_ENV}")
+
+    CONFIGURE_FILE(
+      ${KWWidgets_TEMPLATES_DIR}/KWWidgetsSetupPaths.cmake.in
+      ${dest_dir}/KWWidgetsSetupPaths.cmake
+      IMMEDIATE @ONLY)
 
     # For Cygwin PATH (colon separated, use cygdrive)
     # Yes, we could use the cygpath tool in the file directly
@@ -108,7 +118,9 @@ MACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS
     STRING(REGEX REPLACE "(.):/" "/cygdrive/\\1/" 
       KWWidgets_PATH_ENV "${KWWidgets_PATH_ENV}")
 
-    STRING(REGEX REPLACE ";" ":" 
+    SET(KWWidgets_SEP ":")
+
+    STRING(REGEX REPLACE ";" ${KWWidgets_SEP}
       KWWidgets_PATH_ENV "${KWWidgets_PATH_ENV}")
 
     # For Win32 TCLLIBPATH (space separated, no cygdrive)
@@ -136,7 +148,9 @@ MACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS
 
     # For Unix PATH (colon separated)
 
-    STRING(REGEX REPLACE ";" ":" 
+    SET(KWWidgets_SEP ":")
+
+    STRING(REGEX REPLACE ";" ${KWWidgets_SEP}
       KWWidgets_PATH_ENV "${KWWidgets_PATH_ENV}")
 
     # For Unix TCLLIBPATH (space separated)
@@ -144,7 +158,7 @@ MACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS
     # For Unix PYTHONPATH (colon separated)
 
     SET(KWWidgets_PYTHONPATH_SEP ":")
-    STRING(REGEX REPLACE ";" ":" 
+    STRING(REGEX REPLACE ";" ${KWWidgets_PYTHONPATH_SEP}
       KWWidgets_PYTHONPATH_ENV "${KWWidgets_PYTHONPATH_ENV}")
 
     # Configure the Unix bash/tcsh file
@@ -158,6 +172,14 @@ MACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS
       ${KWWidgets_TEMPLATES_DIR}/KWWidgetsSetupPaths.csh.in
       ${dest_dir}/KWWidgetsSetupPaths.csh
       IMMEDIATE)
+
+    STRING(REGEX REPLACE "\"" "\\\\\"" 
+      KWWidgets_TCLLIBPATH_ENV_ESCAPED "${KWWidgets_TCLLIBPATH_ENV}")
+
+    CONFIGURE_FILE(
+      ${KWWidgets_TEMPLATES_DIR}/KWWidgetsSetupPaths.cmake.in
+      ${dest_dir}/KWWidgetsSetupPaths.cmake
+      IMMEDIATE @ONLY)
 
   ENDIF(WIN32)
 ENDMACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS)
