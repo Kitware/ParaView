@@ -27,6 +27,7 @@ SET(Filters_SRCS
   vtkMultiActorHelper.cxx
   vtkMultiDisplayManager.cxx
   vtkOrderedCompositeDistributor.cxx
+  vtkPPhastaReader.cxx
   vtkPVArrowSource.cxx
   vtkPVClipDataSet.cxx
   vtkPVCompositeBuffer.cxx
@@ -58,6 +59,7 @@ SET(Filters_SRCS
   vtkPVSummaryHelper.cxx
   vtkPVTreeComposite.cxx
   vtkPVUpdateSuppressor.cxx
+  vtkPhastaReader.cxx
   vtkPickFilter.cxx
   vtkSelectInputs.cxx
   vtkSpyPlotReader.cxx
