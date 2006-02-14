@@ -274,12 +274,8 @@ pqObjectLineChartWidget::pqObjectLineChartWidget(QWidget *p) :
   QWidget(p),
   Implementation(new pqImplementation())
 {
-  QHBoxLayout* const hbox = new QHBoxLayout();
-  hbox->setMargin(0);
-
   QVBoxLayout* const vbox = new QVBoxLayout();
   vbox->setMargin(0);
-  vbox->addLayout(hbox);
   vbox->addWidget(&this->Implementation->LineChartWidget);
   this->setLayout(vbox);
 }
