@@ -21,9 +21,9 @@ $kw(vtkTemp1178) SetValue 0
 $kw(vtkTemp1177) AcceptCallback
 # Saving state of the Display Proxy associated with the source
 set pvDisp(vtkTemp1177) [$kw(vtkTemp1177) GetDisplayProxy] 
-[$pvDisp(vtkTemp1177) GetProperty IsDistributedGeometryValid] SetElement 0 1
+catch {[$pvDisp(vtkTemp1177) GetProperty IsDistributedGeometryValid] SetElement 0 1}
 [$pvDisp(vtkTemp1177) GetProperty LODResolution] SetElement 0 64
-[$pvDisp(vtkTemp1177) GetProperty OrderedCompositing] SetElement 0 0
+catch {[$pvDisp(vtkTemp1177) GetProperty OrderedCompositing] SetElement 0 0}
 [$pvDisp(vtkTemp1177) GetProperty Representation] SetElement 0 1
 [$pvDisp(vtkTemp1177) GetProperty Visibility] SetElement 0 1
 [$pvDisp(vtkTemp1177) GetProperty Color] SetElement 0 1
