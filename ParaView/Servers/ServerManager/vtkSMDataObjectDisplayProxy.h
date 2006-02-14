@@ -253,7 +253,7 @@ protected:
   vtkSMDataObjectDisplayProxy();
   ~vtkSMDataObjectDisplayProxy();
 
-  void SetInputInternal(vtkSMSourceProxy* input);
+  virtual void SetInputInternal(vtkSMSourceProxy* input);
 
   void ResetTransferFunctions(vtkPVDataInformation* dataInfo,
     vtkPVArrayInformation* arrayInfo);

@@ -18,8 +18,9 @@
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVOptions.h"
 #include "vtkProcessModule.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVOptions.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPart.h"
@@ -29,7 +30,7 @@
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.16");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -760,6 +761,41 @@ void vtkSMCompositeDisplayProxy::SetupCollectionFilter(vtkSMProxy* collectProxy)
         << vtkClientServerStream::End;
       pm->SendStream(this->ConnectionID,
         vtkProcessModule::RENDER_SERVER, stream);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMCompositeDisplayProxy::SetInputInternal(vtkSMSourceProxy *input)
+{
+  this->Superclass::SetInputInternal(input);
+
+  if (this->HasVolumePipeline)
+    {
+    // Find out how many processes are in the render server.  This should really
+    // be done by the process module itself.
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << pm->GetProcessModuleID() << "GetNumberOfPartitions"
+           << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, stream);
+    int numRenderServerProcs;
+    if (!pm->GetLastResult(this->ConnectionID,
+                           vtkProcessModule::RENDER_SERVER)
+        .GetArgument(0, 0, &numRenderServerProcs))
+      {
+      vtkErrorMacro("Could not get the size of the render server.");
+      }
+
+    vtkIdType numCells = input->GetDataInformation()->GetNumberOfCells();
+    if (numCells/numRenderServerProcs < 1000000)
+      {
+      this->SupportsZSweepMapper = 1;
+      }
+    if (numCells/numRenderServerProcs < 500000)
+      {
+      this->SupportsBunykMapper = 1;
       }
     }
 }
