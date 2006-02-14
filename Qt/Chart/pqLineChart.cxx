@@ -13,10 +13,13 @@
 #include "pqChartAxis.h"
 #include "pqChartCoordinate.h"
 
+#include <QHelpEvent>
 #include <QPainter>
 #include <QPolygon>
-#include <vtkstd/list>
 
+#include <vtkMath.h>
+#include <vtkstd/vector>
+#include <vtkType.h>
 
 /// \class pqLineChartItem
 /// \brief
@@ -38,7 +41,7 @@ public:
 /// \brief
 ///   The pqLineChartData class hides the private data of the
 ///   pqLineChart class.
-class pqLineChartData : public vtkstd::list<pqLineChartItem *> {};
+class pqLineChartData : public vtkstd::vector<pqLineChartItem *> {};
 
 
 pqLineChartItem::pqLineChartItem()
@@ -260,6 +263,38 @@ void pqLineChart::drawChart(QPainter *p, const QRect &area)
     p->setClipRegion(lastClip);
     
   p->restore();
+}
+
+const double length(const QPoint p)
+{
+  return sqrt(static_cast<double>(p.x() * p.x() + p.y() * p.y()));
+}
+
+void pqLineChart::showTooltip(QHelpEvent& event)
+{
+  // Find the closest data ...
+  int line_index = -1;
+  int coordinate_index = -1;
+  double coordinate_distance = VTK_DOUBLE_MAX;
+  
+  for(int i = 0; i != this->Data->size(); ++i)
+    {
+    for(int j = 0; j != this->Data->at(i)->Array.size(); ++j)
+      {
+      double distance = length(this->Data->at(i)->Array[j] - event.pos());
+      if(distance < coordinate_distance)
+        {
+        line_index = i;
+        coordinate_index = j;        
+        coordinate_distance = distance;
+        }
+      }
+    }
+    
+  if(line_index == -1 || coordinate_index == -1 || coordinate_distance > 10)
+    return;
+  
+  this->Data->at(line_index)->Plot->showTooltip(coordinate_index, event);  
 }
 
 void pqLineChart::handlePlotChanges(const pqLinePlot *plot)

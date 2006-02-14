@@ -46,6 +46,8 @@ public:
 
   virtual void getMaxY(pqChartValue &value) const;
   virtual void getMinY(pqChartValue &value) const;
+  
+  virtual void showTooltip(int index, QHelpEvent& event) const;
   //@}
 
   /// \brief

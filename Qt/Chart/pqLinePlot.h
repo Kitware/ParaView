@@ -17,7 +17,7 @@
 
 class pqChartCoordinate;
 class pqChartValue;
-
+class QHelpEvent;
 
 /// \class pqLinePlot
 /// \brief
@@ -92,6 +92,9 @@ public:
   ///   Gets the minimum y-axis value for the plot.
   /// \param value Used to return the value.
   virtual void getMinY(pqChartValue &value) const = 0;
+
+  /// Displays a tooltip for the point at the given index (derivatives can use this to display any data they wish)
+  virtual void showTooltip(int index, QHelpEvent& event) const = 0;
 
   /// \brief
   ///   Sets whether of not the plot has been modified.

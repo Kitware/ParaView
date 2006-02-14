@@ -122,6 +122,9 @@ public:
   virtual QSize sizeHint() const;
 
 protected:
+  /// Called to handle tooltip events
+  bool event(QEvent *e);
+
   /// \brief
   ///   Called to handle user key press events.
   ///

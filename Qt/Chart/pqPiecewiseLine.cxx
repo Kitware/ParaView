@@ -13,6 +13,8 @@
 #include "pqChartValue.h"
 #include "pqChartCoordinate.h"
 
+#include <QHelpEvent>
+#include <QToolTip>
 
 /// \class pqPiecewiseLineData
 /// \brief
@@ -128,6 +130,18 @@ void pqPiecewiseLine::getMinY(pqChartValue &value) const
     value = (int)0;
 }
 
+void pqPiecewiseLine::showTooltip(int index, QHelpEvent& event) const
+{
+  if(!this->Data)
+    return;
+    
+  pqChartCoordinate data;
+  if(!this->getCoordinate(index, data))
+    return;
+    
+  QToolTip::showText(event.globalPos(), QString("%1, %2").arg(data.X.getDoubleValue()).arg(data.Y.getDoubleValue()));
+}
+
 void pqPiecewiseLine::setCoordinates(const pqChartCoordinateList &list)
 {
   if(!this->Data)
@@ -140,5 +154,4 @@ void pqPiecewiseLine::setCoordinates(const pqChartCoordinateList &list)
   // Signal the line chart that a change has been made.
   this->setModified(true);
 }
-
 

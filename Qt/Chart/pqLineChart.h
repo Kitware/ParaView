@@ -21,7 +21,7 @@ class pqLineChartData;
 class pqLineChartItem;
 class pqLinePlot;
 class QPainter;
-
+class QHelpEvent;
 
 /// \class pqLineChart
 /// \brief
@@ -94,6 +94,9 @@ public:
   /// \param area The area that needs to be painted.
   void drawChart(QPainter *p, const QRect &area);
   //@}
+
+  /// Displays a tooltip based on the position of the given event, relative to the chart data
+  void showTooltip(QHelpEvent& event);
 
 signals:
   /// \brief

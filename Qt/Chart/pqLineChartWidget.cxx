@@ -28,6 +28,7 @@
 #include <QPixmap>
 #include <QPoint>
 #include <QRect>
+#include <QToolTip>
 
 // Set up a margin around the chart.
 #define MARGIN 3
@@ -214,6 +215,17 @@ QSize pqLineChartWidget::sizeHint() const
   return QSize(f, f);
 }
 
+bool pqLineChartWidget::event(QEvent *event)
+{
+  if(event->type() == QEvent::ToolTip)
+    {
+    if(this->LineChart)
+      this->LineChart->showTooltip(*static_cast<QHelpEvent*>(event));
+    }
+  
+  return QAbstractScrollArea::event(event);
+}
+    
 void pqLineChartWidget::keyPressEvent(QKeyEvent *e)
 {
   bool handled = true;
