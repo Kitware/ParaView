@@ -84,6 +84,8 @@ protected:
   virtual void SetupVolumePipeline();
   virtual void SetupVolumeDefaults();
 
+  virtual void SetInputInternal(vtkSMSourceProxy* input);
+
 
   virtual void CreateVTKObjects(int numObjects);
   void SetupCollectionFilter(vtkSMProxy* collectProxy);
