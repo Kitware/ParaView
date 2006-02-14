@@ -77,7 +77,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.41");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.42");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationCue, PVSource, vtkPVSource);
 
@@ -764,7 +764,8 @@ void vtkPVAnimationCue::SaveState(ofstream* file)
   // We do remove all keyframes in the state file to get rid of any
   // default animations added while creating PVSources. We must remove the
   // animations, since the state saves the default animations (if any) also.
-  *file << "$kw(" << this->GetTclName() << ") RemoveAllKeyFrames" << endl;
+  *file << "catch {$kw(" << this->GetTclName() << ") RemoveAllKeyFrames}" 
+        << endl;
 
   vtkCollectionIterator* iter = this->PVKeyFrames->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())

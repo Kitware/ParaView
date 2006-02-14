@@ -65,7 +65,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.475");
+vtkCxxRevisionMacro(vtkPVSource, "1.476");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -2372,19 +2372,19 @@ void vtkPVSource::SaveStateDisplay(ofstream *file)
       {
       for (unsigned int i=0; i < ivp->GetNumberOfElements(); i++)
         {
-        *file << "[$pvDisp(" << this->GetTclName() << ") GetProperty "
-          << iter->GetKey() << "] SetElement " << i << " "
-          << ivp->GetElement(i)
-          << endl;
+        *file << "catch {[$pvDisp(" << this->GetTclName() << ") GetProperty "
+              << iter->GetKey() << "] SetElement " << i << " "
+              << ivp->GetElement(i) << "}"
+              << endl;
         }
       }
     else if (dvp)
       {
       for (unsigned int i=0; i < dvp->GetNumberOfElements(); i++)
         {
-        *file << "[$pvDisp(" << this->GetTclName() << ") GetProperty "
-          << iter->GetKey() << "] SetElement " << i << " "
-          << dvp->GetElement(i)
+        *file << "catch {[$pvDisp(" << this->GetTclName() << ") GetProperty "
+              << iter->GetKey() << "] SetElement " << i << " "
+              << dvp->GetElement(i) << "}"
           << endl;
         }
       }
@@ -2396,9 +2396,9 @@ void vtkPVSource::SaveStateDisplay(ofstream *file)
         // Empty strings are not saved as the Lookmark managers messes them up.
         if (str_value && strlen(str_value) > 0)
           {
-          *file << "[$pvDisp(" << this->GetTclName() << ") GetProperty "
-            << iter->GetKey() << "] SetElement " << i << " {"
-            <<  str_value << "}"
+          *file << "catch {[$pvDisp(" << this->GetTclName() << ") GetProperty "
+                << iter->GetKey() << "] SetElement " << i << " {"
+                <<  str_value << "}}"
             << endl;
           }
         }
