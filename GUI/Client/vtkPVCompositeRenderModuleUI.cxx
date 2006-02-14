@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.36");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.37");
 
 //----------------------------------------------------------------------------
 vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
@@ -91,22 +91,27 @@ vtkPVCompositeRenderModuleUI::~vtkPVCompositeRenderModuleUI()
     {
     pvapp->SetRegistryValue(2, "RunTime", "RenderInterruptsEnabled", "%d",
                              this->RenderInterruptsEnabled);
-    pvapp->SetRegistryValue(2, "RunTime", "UseFloatInComposite", "%d",
-                             this->CompositeWithFloatFlag);
-    pvapp->SetRegistryValue(2, "RunTime", "UseRGBAInComposite", "%d",
-                             this->CompositeWithRGBAFlag);
-    pvapp->SetRegistryValue(2, "RunTime", "UseCompressionInComposite", "%d",
-                             this->CompositeCompressionFlag);
-    // Do not store value if widget is not enabled.
-    if (this->CompositeCheck->GetEnabled())
+    if ((pvapp->GetOptions()->GetClientMode() || 
+         pvapp->GetProcessModule()->GetNumberOfPartitions() > 1) &&
+        !pvapp->GetOptions()->GetUseRenderingGroup())
       {
-      pvapp->SetRegistryValue(2, "RunTime", "CompositeThreshold", "%f",
-                              this->CompositeThreshold);
+      pvapp->SetRegistryValue(2, "RunTime", "UseFloatInComposite", "%d",
+                              this->CompositeWithFloatFlag);
+      pvapp->SetRegistryValue(2, "RunTime", "UseRGBAInComposite", "%d",
+                              this->CompositeWithRGBAFlag);
+      pvapp->SetRegistryValue(2, "RunTime", "UseCompressionInComposite", "%d",
+                              this->CompositeCompressionFlag);
+      // Do not store value if widget is not enabled.
+      if (this->CompositeCheck->GetEnabled())
+        {
+        pvapp->SetRegistryValue(2, "RunTime", "CompositeThreshold", "%f",
+                                this->CompositeThreshold);
+        }
+      pvapp->SetRegistryValue(2, "RunTime", "ReductionFactor", "%d",
+                              this->ReductionFactor);
+      pvapp->SetRegistryValue(2, "RunTime", "SquirtLevel", "%d",
+                              this->SquirtLevel);
       }
-    pvapp->SetRegistryValue(2, "RunTime", "ReductionFactor", "%d",
-                             this->ReductionFactor);
-    pvapp->SetRegistryValue(2, "RunTime", "SquirtLevel", "%d",
-                             this->SquirtLevel);
     }
 
   this->ParallelRenderParametersFrame->Delete();
@@ -167,7 +172,8 @@ void vtkPVCompositeRenderModuleUI::Create()
   
   // LOD parameters: collection threshold
   // Conditional interface should really be part of a module. !!!!
-  if ((pvapp->GetOptions()->GetClientMode() || pvapp->GetProcessModule()->GetNumberOfPartitions() > 1) &&
+  if ((pvapp->GetOptions()->GetClientMode() || 
+       pvapp->GetProcessModule()->GetNumberOfPartitions() > 1) &&
       !pvapp->GetOptions()->GetUseRenderingGroup())
     {
     // Determines when geometry is collected to process 0 for rendering.
