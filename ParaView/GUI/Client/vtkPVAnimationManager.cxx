@@ -56,6 +56,7 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMVectorProperty.h"
 #include "vtkSMXDMFPropertyDomain.h"
+#include "vtkToolkits.h"
 
 #include <vtkstd/map>
 #include <vtkstd/string>
@@ -66,7 +67,7 @@
 #define VTK_PV_CAMERA_PROXYNAME "_dont_validate_.ActiveCamera"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.66");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.67");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizontalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************

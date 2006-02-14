@@ -37,6 +37,7 @@
 #include "vtkKWRenderWidget.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkKWWindowBase.h"
+#include "vtkToolkits.h"
 
 #ifdef VTK_USE_VIDEO_FOR_WINDOWS 
 #include "vtkAVIWriter.h"
@@ -67,7 +68,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.16");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.17");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()

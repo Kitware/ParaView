@@ -35,6 +35,7 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMXMLPVAnimationWriterProxy.h"
 #include "vtkTIFFWriter.h"
+#include "vtkToolkits.h"
 
 #ifdef _WIN32
   #include "vtkAVIWriter.h"
@@ -50,7 +51,7 @@
 # include <io.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.21");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.22");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
