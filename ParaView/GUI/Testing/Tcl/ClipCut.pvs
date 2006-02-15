@@ -114,6 +114,7 @@ $pv(vtkTemp417) SetCenter 0.150 -0.650 0.500
 $pv(vtkTemp417) SetNormal 0 0 -1
 $pv(vtkTemp416) AcceptCallback
 [$pv(vtkTemp416) GetPVOutput] SetInterpolateColorsFlag 1
+[$pv(vtkTemp416) GetPVOutput] ColorByArray {Iterations} 3
 
 $pv(vtkTemp1) SetCurrentPVSourceCallback $pv(vtkTemp98)
 $pv(vtkTemp1) ShowCurrentSourcePropertiesCallback
