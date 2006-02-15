@@ -42,7 +42,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.126");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.127");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -1640,6 +1640,7 @@ void vtkKWRenderWidget::ProcessCallbackCommandEvents(vtkObject *caller,
 
   // Handle event for this class
 
+#if 0
   if (caller == this->RenderWindow)
     {
     const char *cptr = 0;
@@ -1700,6 +1701,7 @@ void vtkKWRenderWidget::ProcessCallbackCommandEvents(vtkObject *caller,
         break;
       }
     }
+#endif
 
   this->Superclass::ProcessCallbackCommandEvents(caller, event, calldata);
 }
