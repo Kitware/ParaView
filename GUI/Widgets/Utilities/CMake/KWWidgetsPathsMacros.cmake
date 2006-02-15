@@ -339,7 +339,19 @@ MACRO(KWWidgets_GENERATE_DEFAULT_SETUP_PATHS
   SET(VTK_TCL_PATHS "${VTK_TCL_HOME}")
 
   IF(VTK_INSTALL_PREFIX)
-    SET(VTK_PYTHON_PATHS "${VTK_TCL_HOME}/../site-packages")
+    IF(WIN32)
+      SET(VTK_PYTHON_PATHS "${VTK_TCL_HOME}/../site-packages")
+    ELSE(WIN32)
+      IF(PYTHON_EXECUTABLE)
+        EXEC_PROGRAM("${PYTHON_EXECUTABLE}" ARGS "-V" OUTPUT_VARIABLE version)
+        STRING(REGEX REPLACE "^(Python )([0-9]\\.[0-9])(.*)$" "\\2" 
+          major_minor "${version}")
+        SET(VTK_PYTHON_PATHS 
+          "${VTK_TCL_HOME}/../python${major_minor}/site-packages")
+      ELSE(PYTHON_EXECUTABLE)
+        SET(VTK_PYTHON_PATHS "${VTK_TCL_HOME}/../python2.4/site-packages")
+      ENDIF(PYTHON_EXECUTABLE)
+    ENDIF(WIN32)
   ELSE(VTK_INSTALL_PREFIX)
     SET(VTK_PYTHON_PATHS "${VTK_TCL_HOME}/../Python")
   ENDIF(VTK_INSTALL_PREFIX)
