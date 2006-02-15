@@ -30,7 +30,7 @@
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.17");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -836,6 +836,12 @@ vtkPVLODPartDisplayInformation* vtkSMCompositeDisplayProxy::GetLODInformation()
     // Update but with collection filter off.
     this->CollectionDecision = 0;
     this->LODCollectionDecision = 0;
+
+    // Changing the collection decision can change the ordered compositing
+    // distribution.
+    int oc = this->OrderedCompositing;
+    this->OrderedCompositing = 0;
+    this->SetOrderedCompositing(oc);
 
     vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
       this->CollectProxy->GetProperty("MoveMode"));
