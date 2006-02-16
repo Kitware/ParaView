@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.35");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.36");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -243,7 +243,10 @@ void vtkKWSplashScreen::SetProgressMessage(const char *txt)
   this->Script("%s itemconfigure msg -text \"%s\"",
                this->Canvas->GetWidgetName(), (val ? val : ""));
 
-  this->Display();
+  if (!this->IsMapped())
+    {
+    this->Display();
+    }
 }
 
 //----------------------------------------------------------------------------
