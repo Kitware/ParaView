@@ -448,9 +448,7 @@ SET(VTKMPEG2_INCLUDE_DIRS
 #########################################################################
 # Configure ffmpeg encoding
 MARK_AS_ADVANCED(CLEAR
-  FFMPEG_INCLUDE_DIR
-  FFMPEG_avcodec_LIBRARY
-  FFMPEG_avformat_LIBRARY
+  VTK_USE_FFMPEG_ENCODER
   )
 
 #########################################################################
