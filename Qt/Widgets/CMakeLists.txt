@@ -21,6 +21,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqElementInspectorWidget.h
   pqFileDialog.h
   pqFileDialogModel.h
+  pqImageTip.h
   pqLocalFileDialogModel.h
   pqMultiView.h
   pqMultiViewFrame.h
@@ -87,6 +88,8 @@ ADD_LIBRARY(QtWidgets
   pqFileDialog.h
   pqFileDialogModel.cxx
   pqFileDialogModel.h
+  pqImageTip.cxx
+  pqImageTip.h
   pqLocalFileDialogModel.cxx
   pqLocalFileDialogModel.h
   pqMultiView.cxx
