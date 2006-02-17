@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqImageTip_h
 #define _pqImageTip_h
 
+#include "QtWidgetsExport.h"
 #include <QLabel>
 
 class QBasicTimer;
@@ -40,7 +41,7 @@ class QPixmap;
 class QPoint;
 
 /// Provides tooltip-like behavior, but displays an image instead of text
-class pqImageTip :
+class QTWIDGETS_EXPORT pqImageTip :
   public QLabel
 {
   Q_OBJECT

@@ -20,6 +20,7 @@ SET(PARAVIEW_BUILD_GUI OFF CACHE BOOL "Build end user applications (ParaView, pv
 SET(PYTHON_DEBUG_LIBRARY "" CACHE FILEPATH "Purposely empty: work around CMake FindPythonLibs bug")
 
 SUBDIRS(
+  Applications
   ParaView
   Qt
 )
