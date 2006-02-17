@@ -73,7 +73,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.59.2.3");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.59.2.4");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 #define VTK_PV_TOOLBARS_ANIMATION_LABEL "Animation"
@@ -468,6 +468,9 @@ void vtkPVAnimationScene::SaveImages(const char* fileRoot, const char* ext,
   int savefailed = this->AnimationSceneProxy->SaveImages(fileRoot, ext, 
     width, height, framerate, quality);
   this->OnEndPlay();
+
+  if (savefailed)
+    {
     char *errstring = new char[256];
 
     //may want separate error string functions for moviewriter and imagewriter 
@@ -492,7 +495,6 @@ void vtkPVAnimationScene::SaveImages(const char* fileRoot, const char* ext,
 
     sprintf(errstring, "%.80s. %.80sAny file(s) already written have been deleted.", reason, message);
 
-    {
     vtkKWMessageDialog::PopupMessage(
       this->GetApplication(), this->Window, "Write Error",
       errstring);
