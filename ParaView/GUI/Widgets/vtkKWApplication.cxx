@@ -65,7 +65,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.272");
+vtkCxxRevisionMacro(vtkKWApplication, "1.273");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -457,6 +457,11 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
   Tcl_SetVar(interp, (char *)"argc", buf, TCL_GLOBAL_ONLY);
   Tcl_SetVar(interp, (char *)"argv0", argv[0], TCL_GLOBAL_ONLY);
   Tcl_SetVar(interp, (char *)"tcl_interactive", (char *)"0", TCL_GLOBAL_ONLY);
+
+#ifdef __CYGWIN__
+  Tcl_SetVar(interp, "tclDefaultLibrary", "/usr/share/tcl" TCL_VERSION, 
+             TCL_GLOBAL_ONLY);
+#endif
 
   const char* relative_dirs[] =
     {
@@ -1638,7 +1643,7 @@ int vtkKWApplication::GetCheckForUpdatesPath(ostream &
 //----------------------------------------------------------------------------
 int vtkKWApplication::HasCheckForUpdates()
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__CYGWIN__)
   ostrstream upd;
   int res = this->GetCheckForUpdatesPath(upd);
   upd.rdbuf()->freeze(0);
@@ -1656,7 +1661,7 @@ void vtkKWApplication::CheckForUpdates()
     return;
     }
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__CYGWIN__)
   ostrstream upd;
   if (this->GetCheckForUpdatesPath(upd))
     {
@@ -1674,7 +1679,7 @@ void vtkKWApplication::CheckForUpdates()
 //----------------------------------------------------------------------------
 int vtkKWApplication::CanEmailFeedback()
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__CYGWIN__)
   HMODULE g_hMAPI = ::LoadLibrary("MAPI32.DLL");
   int has_mapi = g_hMAPI ? 1 : 0;
   ::FreeLibrary(g_hMAPI);
@@ -1698,7 +1703,7 @@ void vtkKWApplication::AddEmailFeedbackBody(ostream &os)
     vtksys::SystemTools::GetOperatingSystemNameAndVersion();
   os << ver.c_str();
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__CYGWIN__)
   SYSTEM_INFO siSysInfo;
   GetSystemInfo(&siSysInfo); 
   os << ", " << siSysInfo.dwNumberOfProcessors << " CPU(s)";
@@ -1715,7 +1720,7 @@ void vtkKWApplication::AddEmailFeedbackSubject(ostream &os)
 
 //----------------------------------------------------------------------------
 int vtkKWApplication::SendEmail(
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__CYGWIN__)
   const char *to,
   const char *subject,
   const char *message,
@@ -1730,7 +1735,7 @@ int vtkKWApplication::SendEmail(
 #endif
 )
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__CYGWIN__)
 
   int retry = 1;
   ULONG err;

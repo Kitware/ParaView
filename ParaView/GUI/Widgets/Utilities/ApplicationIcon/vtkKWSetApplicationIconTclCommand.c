@@ -47,7 +47,7 @@ int vtkKWSetApplicationIconCmdInternal(Tcl_Interp *interp,
                                        int icon_res_id,
                                        int set_small)
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__CYGWIN__)
   char cmd[1024];
   int error;
   HWND winHandle;
@@ -161,7 +161,7 @@ int vtkKWSetApplicationIconCmd(ClientData clientdata,
 #endif
                                char *argv[])
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__CYGWIN__)
   int error;
   int icon_res_id;
   int set_small;

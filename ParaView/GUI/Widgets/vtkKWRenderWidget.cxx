@@ -42,7 +42,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.127");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.128");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -1270,7 +1270,7 @@ void vtkKWRenderWidget::SetPrinting(int arg)
 }
 
 //----------------------------------------------------------------------------
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__CYGWIN__)
 void vtkKWRenderWidget::SetupPrint(RECT &rcDest, HDC ghdc,
                                    int printerPageSizeX, int printerPageSizeY,
                                    int printerDPIX, int printerDPIY,

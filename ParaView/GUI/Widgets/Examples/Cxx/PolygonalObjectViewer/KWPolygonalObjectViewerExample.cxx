@@ -161,7 +161,7 @@ int my_main(int argc, char *argv[])
   return ret;
 }
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__CYGWIN__)
 #include <windows.h>
 int __stdcall WinMain(HINSTANCE, HINSTANCE, LPSTR lpCmdLine, int)
 {

@@ -70,7 +70,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.49");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.50");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -2141,12 +2141,13 @@ int vtkKWSelectionFrameLayoutManager::CopyScreenshotAllWidgetsToClipboard()
 
 //----------------------------------------------------------------------------
 int vtkKWSelectionFrameLayoutManager::PrintWidgets(
-#ifndef _WIN32
-  double, int)
-{
-#else
+#if defined(_WIN32) && !defined(__CYGWIN__)
   double dpi, int selection_only)
+#else
+  double, int)
+#endif
 {
+#if defined(_WIN32) && !defined(__CYGWIN__)
   vtkKWSelectionFrame *first_widget = this->GetNthWidget(0);
   if (!first_widget)
     {
