@@ -82,7 +82,10 @@ MACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS
 
   IF(WIN32)
 
-    # For Win32 PATH (semi-colon separated)
+    # For Win32 PATH (semi-colon separated, no cygdrive)
+
+    STRING(REGEX REPLACE "/cygdrive/(.)/" "\\1:/" 
+      KWWidgets_PATH_ENV "${KWWidgets_PATH_ENV}")
 
     # For Win32 TCLLIBPATH (space separated, no cygdrive)
 

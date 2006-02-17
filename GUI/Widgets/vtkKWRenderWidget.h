@@ -267,7 +267,7 @@ public:
   
   // Description:
   // Setup print parameters
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__CYGWIN__)
   virtual void SetupPrint(RECT &rcDest, HDC ghdc,
                           int printerPageSizeX, int printerPageSizeY,
                           int printerDPIX, int printerDPIY,
