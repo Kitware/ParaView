@@ -6,7 +6,9 @@ PROJECT(KWWidgetsExamples)
 # examples separately from the library (say, from an installed KWWidgets tree)
 # The relevant variables are:
 #   KWWidgets_DIR
+#   BUILD_SHARED_LIB
 #   TCL_TCLSH (for Tcl tests)
+#   TK_WISH (for Tcl tests)
 #   PYTHON_EXECUTABLE (for Python tests)
 #   KWWidgets_USE_SOVIEWER (for SOViewer tests)
 #   SOV_DIR (for SOViewer tests)
