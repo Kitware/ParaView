@@ -59,6 +59,29 @@ MACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS
     SET(KWWidgets_PATH_ENV ${KWWidgets_PATH_ENV} ${path})
   ENDIF(PYTHON_EXECUTABLE)
 
+  # For LD_LIBRARY_PATH or equivalent
+  
+  IF (WIN32)
+    # there is no equivalent on Windows, use LD_LIBRARY_PATH as fake
+    SET(SHARED_LIBRARY_PATH_VAR_NAME "LD_LIBRARY_PATH")
+    SET(KWWidgets_SHARED_LIBRARY_PATH_ENV "")
+  ELSE (WIN32)
+    # Try to inherit the path variable name from VTK
+    IF (VTK_RUNTIME_PATH_VAR_NAME)
+      SET (SHARED_LIBRARY_PATH_VAR_NAME ${VTK_RUNTIME_PATH_VAR_NAME})
+    ELSE (VTK_RUNTIME_PATH_VAR_NAME)
+      SET (SHARED_LIBRARY_PATH_VAR_NAME "LD_LIBRARY_PATH")
+      IF (APPLE)
+        SET (SHARED_LIBRARY_PATH_VAR_NAME "DYLD_LIBRARY_PATH")
+      ENDIF (APPLE)
+    ENDIF (VTK_RUNTIME_PATH_VAR_NAME)
+    SET(KWWidgets_SHARED_LIBRARY_PATH_ENV
+        ${vtk_runtime_paths}
+        ${itk_runtime_paths}
+        ${sov_runtime_paths}
+        ${kwwidgets_runtime_paths})
+  ENDIF (WIN32)
+
   # For TCLLIBPATH (space separated)
 
   SET(KWWidgets_TCLLIBPATH_ENV)
@@ -100,7 +123,7 @@ MACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS
 
     # Configure the Win32 batch file
 
-    SET(KWWidgets_SEP ";")
+    SET(KWWidgets_PATH_SEP ";")
 
     CONFIGURE_FILE(
       ${KWWidgets_TEMPLATES_DIR}/KWWidgetsSetupPaths.bat.in
@@ -121,9 +144,9 @@ MACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS
     STRING(REGEX REPLACE "(.):/" "/cygdrive/\\1/" 
       KWWidgets_PATH_ENV "${KWWidgets_PATH_ENV}")
 
-    SET(KWWidgets_SEP ":")
+    SET(KWWidgets_PATH_SEP ":")
 
-    STRING(REGEX REPLACE ";" ${KWWidgets_SEP}
+    STRING(REGEX REPLACE ";" ${KWWidgets_PATH_SEP}
       KWWidgets_PATH_ENV "${KWWidgets_PATH_ENV}")
 
     # For Win32 TCLLIBPATH (space separated, no cygdrive)
@@ -151,10 +174,15 @@ MACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS
 
     # For Unix PATH (colon separated)
 
-    SET(KWWidgets_SEP ":")
-
-    STRING(REGEX REPLACE ";" ${KWWidgets_SEP}
+    SET(KWWidgets_PATH_SEP ":")
+    STRING(REGEX REPLACE ";" ${KWWidgets_PATH_SEP}
       KWWidgets_PATH_ENV "${KWWidgets_PATH_ENV}")
+
+    # For Unix LD_LIBRARY_PATH (colon separated)
+
+    SET(KWWidgets_SHARED_LIBRARY_PATH_SEP ":")
+    STRING(REGEX REPLACE ";" ${KWWidgets_SHARED_LIBRARY_PATH_SEP}
+      KWWidgets_SHARED_LIBRARY_PATH_ENV "${KWWidgets_SHARED_LIBRARY_PATH_ENV}")
 
     # For Unix TCLLIBPATH (space separated)
 
