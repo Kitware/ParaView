@@ -75,9 +75,9 @@ MACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS
   
   SET(KWWidgets_PYTHONPATH_ENV 
     ${vtk_python_paths}
-    ${vtk_lib_paths}
+    ${vtk_runtime_paths}
     ${kwwidgets_python_paths}
-    ${kwwidgets_lib_paths}
+    ${kwwidgets_runtime_paths}
     )
 
   IF(WIN32)
