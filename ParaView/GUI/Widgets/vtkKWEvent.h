@@ -145,6 +145,8 @@ public:
     ReceiveRemoteSessionEvent,
     RenderEvent,
     RenderWidgetInSelectionFrameChangedEvent,
+    ResliceChangedEvent,
+    ResliceChangingEvent,
     RightMouseOptionChangedEvent,
     ScalarColorFunctionChangedEvent,
     ScalarColorFunctionPresetApplyEvent,

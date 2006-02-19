@@ -134,6 +134,8 @@ static const char *vtkKWEventStrings[] =
   "ReceiveRemoteSessionEvent",
   "RenderEvent",
   "RenderWidgetInSelectionFrameChangedEvent",
+  "ResliceChangedEvent",
+  "ResliceChangingEvent",
   "RightMouseOptionChangedEvent",
   "ScalarColorFunctionChangedEvent",
   "ScalarColorFunctionPresetApplyEvent",
