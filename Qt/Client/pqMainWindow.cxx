@@ -77,7 +77,6 @@
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSMStringVectorProperty.h>
-#include <vtkSMXMLParser.h>
 #include <vtkTesting.h>
 #include <vtkPVGenericRenderWindowInteractor.h>
 #include <vtkRenderWindowInteractor.h>
