@@ -22,7 +22,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.22");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.23");
 
 //----------------------------------------------------------------------------
 vtkKWTopLevel::vtkKWTopLevel()
@@ -70,9 +70,9 @@ void vtkKWTopLevel::Create()
 
   if (this->GetWindowClass())
     {
-    opts += " -class ";
+    opts += " -class {";
     opts += this->GetWindowClass();
-    opts += " ";
+    opts += "} ";
     }
   else if (this->GetMasterWindow())
     {
@@ -80,9 +80,9 @@ void vtkKWTopLevel::Create()
       vtkKWTopLevel::SafeDownCast(this->GetMasterWindow());
     if (master_top && master_top->GetWindowClass())
       {
-      opts += " -class ";
+      opts += " -class {";
       opts += master_top->GetWindowClass();
-      opts += " ";
+      opts += "} ";
       }
     }
   opts += " -visual best ";
