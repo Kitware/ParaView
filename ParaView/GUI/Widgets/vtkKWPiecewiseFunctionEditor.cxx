@@ -30,7 +30,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.47");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.48");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -232,7 +232,7 @@ int vtkKWPiecewiseFunctionEditor::GetFunctionPointParameter(
 }
 
 //----------------------------------------------------------------------------
-inline int vtkKWPiecewiseFunctionEditor::GetFunctionPointDimensionality()
+int vtkKWPiecewiseFunctionEditor::GetFunctionPointDimensionality()
 {
   return 1;
 }
