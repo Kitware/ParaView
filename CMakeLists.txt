@@ -447,9 +447,12 @@ SUBDIRS(Common)
 # Configure ffmpeg encoding
 MARK_AS_ADVANCED(CLEAR
   VTK_USE_FFMPEG_ENCODER
+  FFMPEG_INCLUDE_DIR
+  FFMPEG_avformat_LIBRARY
+  FFMPEG_avcodec_LIBRARY
+  FFMPEG_avutil_LIBRARY
   )
  
-#########################################################################
 # Configure VTKClientServer wrapping
 SET(VTKCLIENTSERVER_INCLUDE_DIR
   ${ParaView_SOURCE_DIR}/Utilities/VTKClientServer
