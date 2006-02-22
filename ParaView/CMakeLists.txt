@@ -448,7 +448,10 @@ SET(VTKMPEG2_INCLUDE_DIRS
 #########################################################################
 # Configure ffmpeg encoding
 MARK_AS_ADVANCED(CLEAR
-  VTK_USE_FFMPEG_ENCODER
+  FFMPEG_INCLUDE_DIR
+  FFMPEG_avformat_LIBRARY
+  FFMPEG_avcodec_LIBRARY
+  FFMPEG_avutil_LIBRARY
   )
 
 #########################################################################
@@ -472,6 +475,9 @@ IF(VTK_USE_MPI)
       )
     SUBDIRS(Utilities/IceT)
   ENDIF(PARAVIEW_USE_ICE_T)
+
+  # Needed for mpich 2
+  ADD_DEFINITIONS("-DMPICH_IGNORE_CXX_SEEK")
 ENDIF(VTK_USE_MPI)
 
 #########################################################################
@@ -771,3 +777,4 @@ IF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
     ENDFOREACH(ldir)
   ENDIF(NOT WIN32)
 ENDIF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
+
