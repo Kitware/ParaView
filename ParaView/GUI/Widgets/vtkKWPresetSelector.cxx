@@ -57,7 +57,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.37");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.38");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -1925,6 +1925,7 @@ void vtkKWPresetSelector::SetPresetFilterUserSlotConstraint(
     if (value)
       {
       this->Internals->PresetFilter[slot_name].StringValue = value;
+      this->Internals->PresetFilter[slot_name].IsRegularExpression = 0;
       }
     else
       {
