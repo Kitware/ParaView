@@ -25,7 +25,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVDisplayInformation);
-vtkCxxRevisionMacro(vtkPVDisplayInformation, "1.1");
+vtkCxxRevisionMacro(vtkPVDisplayInformation, "1.1.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVDisplayInformation::vtkPVDisplayInformation()
@@ -58,8 +58,8 @@ void vtkPVDisplayInformation::CopyFromObject(vtkObject* obj)
   if (pm->GetOptions()->GetUseOffscreenRendering())
     {
     this->CanOpenDisplay = 1;
+    return;
     }
-  return;
 # endif
 
   Display* dId = XOpenDisplay((char *)NULL); 
