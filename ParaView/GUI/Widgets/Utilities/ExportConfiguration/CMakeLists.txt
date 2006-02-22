@@ -147,8 +147,20 @@ SET(KWWidgets_TCL_PACKAGE_INDEX_DIR_CONFIG
   ${DOLLAR}{KWWidgets_INSTALL_PREFIX}${KWWidgets_INSTALL_LIB_DIR}/tcl)
 
 # The Python options.
+IF(WIN32)
+  SET(python_subdir "")
+ELSE(WIN32)
+  IF(PYTHON_EXECUTABLE)
+    EXEC_PROGRAM("${PYTHON_EXECUTABLE}" ARGS "-V" OUTPUT_VARIABLE version)
+    STRING(REGEX REPLACE "^(Python )([0-9]\\.[0-9])(.*)$" "\\2" 
+      major_minor "${version}")
+    SET(python_subdir "python${major_minor}/")
+  ELSE(PYTHON_EXECUTABLE)
+    SET(python_subdir "python2.4/")
+  ENDIF(PYTHON_EXECUTABLE)
+ENDIF(WIN32)
 SET(KWWidgets_PYTHON_MODULE_DIR_CONFIG 
-  ${DOLLAR}{KWWidgets_INSTALL_PREFIX}${KWWidgets_INSTALL_LIB_DIR}/../site-packages)
+  ${DOLLAR}{KWWidgets_INSTALL_PREFIX}${KWWidgets_INSTALL_LIB_DIR}/../${python_subdir}site-packages)
 
 # The Doxygen options.
 SET(KWWidgets_DOXYGEN_DIR_CONFIG 
