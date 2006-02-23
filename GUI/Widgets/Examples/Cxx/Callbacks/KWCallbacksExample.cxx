@@ -5,7 +5,7 @@
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/CommandLineArguments.hxx>
 
-extern "C" int Kwmylib_Init(Tcl_Interp *interp);
+extern "C" int Kwcallbacksexamplelib_Init(Tcl_Interp *interp);
 int my_main(int argc, char *argv[])
 {
   // Initialize Tcl
@@ -18,8 +18,9 @@ int my_main(int argc, char *argv[])
     }
 
   // Initialize our Tcl library (i.e. our classes wrapped in Tcl)
+  // Make sure it matches the name of the library that was created
 
-  Kwmylib_Init(interp);
+  Kwcallbacksexamplelib_Init(interp);
 
   // Process some command-line arguments
   // The --test option here is used to run this example as a non-interactive 

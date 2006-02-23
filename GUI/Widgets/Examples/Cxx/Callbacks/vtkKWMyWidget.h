@@ -2,10 +2,11 @@
 #define __vtkKWMyWidget_h
 
 #include "vtkKWCompositeWidget.h"
+#include "vtkKWCallbacksExampleWin32Header.h"
 
 class vtkKWScale;
 
-class vtkKWMyWidget : public vtkKWCompositeWidget
+class KWCallbacksExample_EXPORT vtkKWMyWidget : public vtkKWCompositeWidget
 {
 public:
   static vtkKWMyWidget* New();

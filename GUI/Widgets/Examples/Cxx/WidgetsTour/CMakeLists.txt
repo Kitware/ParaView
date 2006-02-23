@@ -27,9 +27,13 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsWrappingMacros.cmake")
 KWWidgets_WRAP_TCL(${LIB_NAME} LIB_TCL_SRCS "${LIB_SRCS}" "")
 
-# Create the library (in static mode for convenience).
+# Create the library. The library is built in static mode for convenience. 
+# Check the 'Callbacks' example for more information about building it in
+# shared mode, i.e. without the STATIC keyword (Win32 compilers requires
+# an additional header file to setup DLL export symbols correctly).
 
 ADD_LIBRARY(${LIB_NAME} STATIC ${LIB_TCL_SRCS} ${LIB_SRCS})
+TARGET_LINK_LIBRARIES(${LIB_NAME} ${KWWidgets_LIBRARIES})
 
 # The name of our executable and the corresponding source file.
 
@@ -84,7 +88,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 # Create the executable, and link it against the KWWidgets libraries.
 
 ADD_EXECUTABLE(${EXE_NAME} WIN32 ${EXE_SRCS} ${WIDGETS_SRCS} ${RES_FILE})
-TARGET_LINK_LIBRARIES(${EXE_NAME} ${KWWidgets_LIBRARIES} ${LIB_NAME})
+TARGET_LINK_LIBRARIES(${EXE_NAME} ${LIB_NAME})
 
 # Generate the default setup paths scripts
 # If we are building this example as a standalone external project, generate
