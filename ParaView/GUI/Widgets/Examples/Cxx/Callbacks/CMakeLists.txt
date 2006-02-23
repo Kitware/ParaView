@@ -19,7 +19,7 @@ SET(TARGET_BASE_NAME "KW${PROJECT_NAME}Example")
 # use its callbacks from our user interface. To do so, we need to create
 # a library and wrap it automatically for the Tcl language.
 
-SET(LIB_NAME "KWMyLib")
+SET(LIB_NAME "KW${PROJECT_NAME}ExampleLib")
 SET(LIB_SRCS 
   vtkKWMyApplication.cxx
   vtkKWMyWidget.cxx
@@ -32,7 +32,14 @@ KWWidgets_WRAP_TCL(${LIB_NAME} LIB_TCL_SRCS "${LIB_SRCS}" "")
 
 # Create the library (in static mode for convenience).
 
-ADD_LIBRARY(${LIB_NAME} STATIC ${LIB_TCL_SRCS} ${LIB_SRCS})
+ADD_LIBRARY(${LIB_NAME} ${LIB_TCL_SRCS} ${LIB_SRCS})
+TARGET_LINK_LIBRARIES(${LIB_NAME} ${KWWidgets_LIBRARIES})
+
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+SET(KWCallbacksExample_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkKWCallbacksExampleConfigure.h.in 
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkKWCallbacksExampleConfigure.h)
 
 # The name of our executable and the corresponding source file.
 
@@ -63,7 +70,7 @@ CONFIGURE_FILE(
 # own library.
 
 ADD_EXECUTABLE(${EXE_NAME} WIN32 ${EXE_SRCS} ${RES_FILE})
-TARGET_LINK_LIBRARIES(${EXE_NAME} ${KWWidgets_LIBRARIES} ${LIB_NAME})
+TARGET_LINK_LIBRARIES(${EXE_NAME} ${LIB_NAME})
 
 # Generate the default setup paths scripts
 # If we are building this example as a standalone external project, generate
