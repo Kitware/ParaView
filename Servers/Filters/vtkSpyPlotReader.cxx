@@ -52,7 +52,7 @@ PURPOSE.  See the above copyright notice for more information.
 #define coutVector6(x) (x)[0] << " " << (x)[1] << " " << (x)[2] << " " << (x)[3] << " " << (x)[4] << " " << (x)[5]
 #define coutVector3(x) (x)[0] << " " << (x)[1] << " " << (x)[2]
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.36.2.2");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.36.2.3");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -89,6 +89,7 @@ public:
   int ReadInformation();
   int ReadData();
   void PrintInformation();
+  void PrintMemoryUsage();
 
   int SetCurrentTime(double time);
   int SetCurrentTimeStep(int timeStep);
@@ -188,6 +189,7 @@ private:
   // Header information
   char FileDescription[128];
   int FileVersion;
+  int SizeOfFilePointer;
   int FileCompressionFlag;
   int FileProcessorId;
   int NumberOfProcessors;
@@ -210,6 +212,7 @@ private:
   int NumberOfDataDumps;
   int *DumpCycle;
   double *DumpTime;
+  double *DumpDT; // SPCTH 102 (What is this anyway?)
   vtkTypeInt64 *DumpOffset;
 
   DataDump* DataDumps;
@@ -236,6 +239,9 @@ private:
 
   Variable* GetCellField(int field);
   int IsVolumeFraction(Variable* var);
+
+  istream& Seek(istream* stream, vtkTypeInt64 offset, bool rel = false);
+  vtkTypeInt64 Tell(istream* stream);
 private:
   vtkSpyPlotUniReader(const vtkSpyPlotUniReader&); // Not implemented
   void operator=(const vtkSpyPlotUniReader&); // Not implemented
@@ -243,7 +249,7 @@ private:
 //=============================================================================
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.36.2.2");
+vtkCxxRevisionMacro(vtkSpyPlotUniReader, "1.36.2.3");
 vtkStandardNewMacro(vtkSpyPlotUniReader);
 vtkCxxSetObjectMacro(vtkSpyPlotUniReader, CellArraySelection, vtkDataArraySelection);
 
@@ -252,6 +258,7 @@ vtkSpyPlotUniReader::vtkSpyPlotUniReader()
 {
   this->FileName = 0;
   this->FileVersion = 0;
+  this->SizeOfFilePointer = 32;
   this->FileCompressionFlag = 0;
   this->FileProcessorId = 0;
   this->NumberOfProcessors = 0;
@@ -268,8 +275,9 @@ vtkSpyPlotUniReader::vtkSpyPlotUniReader()
   this->MaterialFields = 0;
 
   this->NumberOfDataDumps = 0;
-  this->DumpCycle = 0;
-  this->DumpTime = 0;
+  this->DumpCycle  = 0;
+  this->DumpTime   = 0;
+  this->DumpDT     = 0;
   this->DumpOffset = 0;
 
   this->DataDumps = 0;
@@ -297,6 +305,7 @@ vtkSpyPlotUniReader::~vtkSpyPlotUniReader()
   delete [] this->MaterialFields;
   delete [] this->DumpCycle;
   delete [] this->DumpTime;
+  delete [] this->DumpDT;
   delete [] this->DumpOffset;
 
   int dump;
@@ -435,6 +444,23 @@ int vtkSpyPlotUniReader::ReadFileOffset(istream &ifs, vtkTypeInt64* val, int num
 }
 
 //-----------------------------------------------------------------------------
+istream& vtkSpyPlotUniReader::Seek(istream* stream, vtkTypeInt64 offset, bool rel /*=false*/)
+{
+  // TODO: Implement 64 bit seeking.
+  if ( rel )
+    {
+    return stream->seekg(offset, ios::cur);
+    }
+  return stream->seekg(offset);
+}
+
+//-----------------------------------------------------------------------------
+vtkTypeInt64 vtkSpyPlotUniReader::Tell(istream* stream)
+{
+  return stream->tellg();
+}
+
+//-----------------------------------------------------------------------------
 int vtkSpyPlotUniReader::ReadInformation()
 {
   if ( !this->HaveInformation ) { vtkDebugMacro( << __LINE__ << " " << this << " Read: " << this->HaveInformation ); }
@@ -481,7 +507,32 @@ int vtkSpyPlotUniReader::ReadInformation()
     return 0;
     }
   //printf("here: %ld\n", ifs.tellg());
-  if ( !this->ReadInt(ifs, &(this->FileVersion), 8) )
+  if ( !this->ReadInt(ifs, &(this->FileVersion), 1) )
+    {
+    vtkErrorMacro( "Cannot read file version" );
+    return 0;
+    }
+  //cout << "File version: " << this->FileVersion << endl;
+  if ( this->FileVersion >= 102 )
+    {
+    if ( !this->ReadInt(ifs, &(this->SizeOfFilePointer), 1) )
+      {
+      vtkErrorMacro( "Cannot read the seize of file pointer" );
+      return 0;
+      }
+    switch ( this->SizeOfFilePointer )
+      {
+    case 32:
+    case 64:
+      break;
+    default:
+      vtkErrorMacro( "Unknown size of file pointer: " << this->SizeOfFilePointer
+        << ". Only handle 32 and 64 bit sizes." );
+      return 0;
+      }
+    //cout << "File pointer size: " << this->SizeOfFilePointer << endl;
+    }
+  if ( !this->ReadInt(ifs, &(this->FileCompressionFlag), 7) )
     {
     vtkErrorMacro( "Cannot read file version" );
     return 0;
@@ -574,6 +625,7 @@ int vtkSpyPlotUniReader::ReadInformation()
     int NumberOfDataDumps;
     int DumpCycle[MAX_DUMPS];
     double DumpTime[MAX_DUMPS];
+    double DumpDT[MAX_DUMPS]; // SPCTH 102 What is this anyway?
     vtkTypeInt64 DumpOffset[MAX_DUMPS];
   };
 
@@ -582,6 +634,7 @@ int vtkSpyPlotUniReader::ReadInformation()
     int NumberOfDataDumps;
     int *DumpCycle;
     double *DumpTime;
+    double *DumpDT; // SPCTH 102 What is this anyway?
     vtkTypeInt64 *DumpOffset;
   };
 
@@ -594,7 +647,7 @@ int vtkSpyPlotUniReader::ReadInformation()
       vtkErrorMacro( "Cannot get group header offset" );
       return 0;
       }
-    vtkTypeInt64 cpos = ifs.tellg();
+    vtkTypeInt64 cpos = this->Tell(&ifs);
     //vtkDebugMacro( "position: " << cpos );
     //vtkDebugMacro( "offset:   " << gh.Offset );
     if ( cpos > gh.Offset )
@@ -602,7 +655,7 @@ int vtkSpyPlotUniReader::ReadInformation()
       vtkErrorMacro("The offset is back in file: " << cpos << " > " << gh.Offset);
       return 0;
       }
-    ifs.seekg(gh.Offset);
+    this->Seek(&ifs, gh.Offset);
     if ( !this->ReadInt(ifs, &(gh.NumberOfDataDumps), 1) )
       {
       vtkErrorMacro( "Problem reading the num dumps" );
@@ -618,6 +671,15 @@ int vtkSpyPlotUniReader::ReadInformation()
       vtkErrorMacro( "Problem reading the dump times" );
       return 0;
       }
+    if ( this->FileVersion >= 102 )
+      {
+      //cout << "This is SPCTH " << this->FileVersion << " so read DumpDT's" << endl;
+      if ( !this->ReadDouble(ifs, gh.DumpDT, MAX_DUMPS) )
+        {
+        vtkErrorMacro( "Problem reading the dump DT's" );
+        return 0;
+        }
+      }
     if ( !this->ReadFileOffset(ifs, gh.DumpOffset, MAX_DUMPS) )
       {
       vtkErrorMacro( "Problem reading the dump offsets" );
@@ -632,23 +694,43 @@ int vtkSpyPlotUniReader::ReadInformation()
     nch.NumberOfDataDumps = this->NumberOfDataDumps + gh.NumberOfDataDumps;
     nch.DumpCycle  = new int[nch.NumberOfDataDumps];
     nch.DumpTime   = new double[nch.NumberOfDataDumps];
+    if ( this->FileVersion >= 102 )
+      {
+      nch.DumpDT = new double[nch.NumberOfDataDumps];
+      }
     nch.DumpOffset = new vtkTypeInt64[nch.NumberOfDataDumps];
     if ( this->DumpCycle )
       {
       memcpy(nch.DumpCycle,  this->DumpCycle,  this->NumberOfDataDumps * sizeof(int));
       memcpy(nch.DumpTime,   this->DumpTime,   this->NumberOfDataDumps * sizeof(double));
+      if ( this->FileVersion >= 102 )
+        {
+        memcpy(nch.DumpDT,   this->DumpDT,   this->NumberOfDataDumps * sizeof(double));
+        }
       memcpy(nch.DumpOffset, this->DumpOffset, this->NumberOfDataDumps * sizeof(vtkTypeInt64));
       delete [] this->DumpCycle;
       delete [] this->DumpTime;
+      if ( this->FileVersion >= 102 )
+        {
+        delete [] this->DumpDT;
+        }
       delete [] this->DumpOffset;
       }
     memcpy(nch.DumpCycle  + this->NumberOfDataDumps, gh.DumpCycle,  gh.NumberOfDataDumps * sizeof(int));
     memcpy(nch.DumpTime   + this->NumberOfDataDumps, gh.DumpTime,   gh.NumberOfDataDumps * sizeof(double));
+    if ( this->FileVersion >= 102 )
+      {
+      memcpy(nch.DumpDT   + this->NumberOfDataDumps, gh.DumpDT,     gh.NumberOfDataDumps * sizeof(double));
+      }
     memcpy(nch.DumpOffset + this->NumberOfDataDumps, gh.DumpOffset, gh.NumberOfDataDumps * sizeof(vtkTypeInt64));
 
     this->NumberOfDataDumps   = nch.NumberOfDataDumps;
     this->DumpCycle  = nch.DumpCycle;
     this->DumpTime   = nch.DumpTime;
+    if ( this->FileVersion >= 102 )
+      {
+      this->DumpDT     = nch.DumpDT;
+      }
     this->DumpOffset = nch.DumpOffset;
     memset(&nch, 0, sizeof(nch));
     if ( gh.NumberOfDataDumps != MAX_DUMPS )
@@ -664,13 +746,13 @@ int vtkSpyPlotUniReader::ReadInformation()
   this->DataDumps = new vtkSpyPlotUniReader::DataDump[this->NumberOfDataDumps];
   for ( dump = 0; dump < this->NumberOfDataDumps; ++dump )
     {
-    vtkTypeInt64 cpos = ifs.tellg();
+    vtkTypeInt64 cpos = this->Tell(&ifs);
     vtkTypeInt64 offset = this->DumpOffset[dump];
     if ( cpos > offset )
       {
       vtkDebugMacro(<< "The offset is back in file: " << cpos << " > " << offset);
       }
-    ifs.seekg(offset);
+    this->Seek(&ifs, offset);
     vtkSpyPlotUniReader::DataDump *dh = &this->DataDumps[dump];
     memset(dh, 0, sizeof(dh));
     if ( !this->ReadInt(ifs, &(dh->NumVars), 1) )
@@ -780,7 +862,7 @@ int vtkSpyPlotUniReader::ReadInformation()
           vtkErrorMacro( "Problem reading the num of tracers" );
           return 0;
           }
-        ifs.seekg(someSize, ios::cur);
+        this->Seek(&ifs, someSize, true);
         }
       }
 
@@ -793,14 +875,14 @@ int vtkSpyPlotUniReader::ReadInformation()
       }
     if ( numberOfIndicators > 0 )
       {
-      ifs.seekg(sizeof(int), ios::cur);
+      this->Seek(&ifs, sizeof(int), true);
       int ind;
       for ( ind = 0; ind < numberOfIndicators; ++ ind )
         {
-        ifs.seekg(
+        this->Seek(&ifs,
           sizeof(int) +
           sizeof(double) * 6,
-          ios::cur);
+          true);
         int numBins;
         if ( !this->ReadInt(ifs, &numBins, 1) )
           {
@@ -815,7 +897,7 @@ int vtkSpyPlotUniReader::ReadInformation()
             vtkErrorMacro( "Problem reading the num of tracers" );
             return 0;
             }
-          ifs.seekg(someSize, ios::cur);
+          this->Seek(&ifs, someSize, true);
           }
         }
       }
@@ -1036,7 +1118,7 @@ int vtkSpyPlotUniReader::ReadData()
 
     //vtkDebugMacro( "  Field: " << fieldCnt << " / " << dp->NumVars << " [" << var->Name << "]" );
     //vtkDebugMacro( "    Jump to: " << dp->SavedVariableOffsets[fieldCnt] );
-    ifs.seekg(dp->SavedVariableOffsets[fieldCnt]);
+    this->Seek(&ifs, dp->SavedVariableOffsets[fieldCnt]);
     int numBytes;
     int block;
     int actualBlockId = 0;
@@ -1114,6 +1196,26 @@ int vtkSpyPlotUniReader::ReadData()
     }
   this->DataTypeChanged = 0;
   return 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSpyPlotUniReader::PrintMemoryUsage()
+{
+  int cc;
+  cout << "Global size: " << sizeof(this) << endl;
+
+  long total = 0;
+  for ( cc = 0; cc < this->NumberOfPossibleCellFields; ++ cc )
+    {
+    total += sizeof(this->CellFields[cc]);
+    }
+  cout << "cell fields: " << total << endl;
+  total = 0;
+  for ( cc = 0; cc < this->NumberOfPossibleMaterialFields; ++ cc )
+    {
+    total += sizeof(this->MaterialFields[cc]);
+    }
+  cout << "material fields: " << total << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -2288,7 +2390,7 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
   if(this->Controller==0)
     {
     vtkErrorMacro("Controller not specified. This reader requires controller to be set.");
-    return 0;
+    //return 0;
     }
   if(!this->Superclass::RequestInformation(request,inputVector,outputVector))
     {
@@ -2873,56 +2975,21 @@ int vtkSpyPlotReader::RequestData(
   int leftHasBounds=0; // init is not useful, just for compiler warnings
   int rightHasBounds=0; // init is not useful, just for compiler warnings
   
-  if(left<numProcessors)
+  if ( this->Controller )
     {
-    // TODO WARNING if the child is empty the bounds are not initialized!
-    // Grab the bounds from left child
-    this->Controller->Receive(&leftHasBounds, 1, left,
-                              VTK_MSG_SPY_READER_HAS_BOUNDS);
-    
-    if(leftHasBounds)
+    if(left<numProcessors)
       {
-      this->Controller->Receive(otherBounds, 6, left,
-                                VTK_MSG_SPY_READER_LOCAL_BOUNDS);
-      
-      if(firstBlock) // impossible the current processor is not a leaf
+      // TODO WARNING if the child is empty the bounds are not initialized!
+      // Grab the bounds from left child
+      this->Controller->Receive(&leftHasBounds, 1, left,
+        VTK_MSG_SPY_READER_HAS_BOUNDS);
+
+      if(leftHasBounds)
         {
-        int cc=0;
-        while(cc<6)
-          {
-          this->Bounds[cc]=otherBounds[cc];
-          ++cc;
-          }
-        firstBlock=0;
-        }
-      else
-        {
-        int cc=0;
-        while(cc<3)
-          {
-          if(otherBounds[2*cc]<this->Bounds[2*cc])
-            {
-            this->Bounds[2*cc]=otherBounds[2*cc];
-            }
-          if(otherBounds[2*cc+1]>this->Bounds[2*cc+1])
-            {
-            this->Bounds[2*cc+1]=otherBounds[2*cc+1];
-            }
-          ++cc;
-          }
-        }
-      }
-    
-    if(right<numProcessors)
-      {
-      // Grab the bounds from right child
-      this->Controller->Receive(&rightHasBounds, 1, right,
-                                VTK_MSG_SPY_READER_HAS_BOUNDS);
-      if(rightHasBounds)
-        {
-        this->Controller->Receive(otherBounds, 6, right,
-                                  VTK_MSG_SPY_READER_LOCAL_BOUNDS);
-        if(firstBlock)// impossible the current processor is not a leaf
+        this->Controller->Receive(otherBounds, 6, left,
+          VTK_MSG_SPY_READER_LOCAL_BOUNDS);
+
+        if(firstBlock) // impossible the current processor is not a leaf
           {
           int cc=0;
           while(cc<6)
@@ -2949,46 +3016,84 @@ int vtkSpyPlotReader::RequestData(
             }
           }
         }
-      }
-    }
-  
-  // Send local to parent, Receive global from the parent.
-  if(processNumber>0) // not root (nothing to do if root)
-    {
-    int hasBounds=!firstBlock;
-    this->Controller->Send(&hasBounds, 1, parent,
-                           VTK_MSG_SPY_READER_HAS_BOUNDS);
-    if(hasBounds)
-      {
-      this->Controller->Send(this->Bounds, 6, parent,
-                             VTK_MSG_SPY_READER_LOCAL_BOUNDS);
-      
-      this->Controller->Receive(this->Bounds, 6, parent,
-                                VTK_MSG_SPY_READER_GLOBAL_BOUNDS);
-      }
-    }
-  
-  if(firstBlock) // empty, no bounds, nothing to do
-    {
-    info->Set(vtkExtractCTHPart::BOUNDS(),this->Bounds,6);
-    delete blockIterator;
-    return 1;
-    }
-  
-  // Send it to children.
-  if(left<numProcessors)
-    {
-    if(leftHasBounds)
-      {
-      this->Controller->Send(this->Bounds, 6, left,
-                             VTK_MSG_SPY_READER_GLOBAL_BOUNDS);
-      }
-    if(right<numProcessors)
-      {
-      if(rightHasBounds)
+
+      if(right<numProcessors)
         {
-        this->Controller->Send(this->Bounds, 6, right,
-                               VTK_MSG_SPY_READER_GLOBAL_BOUNDS);
+        // Grab the bounds from right child
+        this->Controller->Receive(&rightHasBounds, 1, right,
+          VTK_MSG_SPY_READER_HAS_BOUNDS);
+        if(rightHasBounds)
+          {
+          this->Controller->Receive(otherBounds, 6, right,
+            VTK_MSG_SPY_READER_LOCAL_BOUNDS);
+          if(firstBlock)// impossible the current processor is not a leaf
+            {
+            int cc=0;
+            while(cc<6)
+              {
+              this->Bounds[cc]=otherBounds[cc];
+              ++cc;
+              }
+            firstBlock=0;
+            }
+          else
+            {
+            int cc=0;
+            while(cc<3)
+              {
+              if(otherBounds[2*cc]<this->Bounds[2*cc])
+                {
+                this->Bounds[2*cc]=otherBounds[2*cc];
+                }
+              if(otherBounds[2*cc+1]>this->Bounds[2*cc+1])
+                {
+                this->Bounds[2*cc+1]=otherBounds[2*cc+1];
+                }
+              ++cc;
+              }
+            }
+          }
+        }
+      }
+
+    // Send local to parent, Receive global from the parent.
+    if(processNumber>0) // not root (nothing to do if root)
+      {
+      int hasBounds=!firstBlock;
+      this->Controller->Send(&hasBounds, 1, parent,
+        VTK_MSG_SPY_READER_HAS_BOUNDS);
+      if(hasBounds)
+        {
+        this->Controller->Send(this->Bounds, 6, parent,
+          VTK_MSG_SPY_READER_LOCAL_BOUNDS);
+
+        this->Controller->Receive(this->Bounds, 6, parent,
+          VTK_MSG_SPY_READER_GLOBAL_BOUNDS);
+        }
+      }
+
+    if(firstBlock) // empty, no bounds, nothing to do
+      {
+      info->Set(vtkExtractCTHPart::BOUNDS(),this->Bounds,6);
+      delete blockIterator;
+      return 1;
+      }
+
+    // Send it to children.
+    if(left<numProcessors)
+      {
+      if(leftHasBounds)
+        {
+        this->Controller->Send(this->Bounds, 6, left,
+          VTK_MSG_SPY_READER_GLOBAL_BOUNDS);
+        }
+      if(right<numProcessors)
+        {
+        if(rightHasBounds)
+          {
+          this->Controller->Send(this->Bounds, 6, right,
+            VTK_MSG_SPY_READER_GLOBAL_BOUNDS);
+          }
         }
       }
     }
@@ -3319,6 +3424,7 @@ int vtkSpyPlotReader::RequestData(
       }
     vtkDebugMacro("Executing block: " << block);
     uniReader->ReadData();
+    // uniReader->PrintMemoryUsage();
 
     if(!hasBadGhostCells)
       {
@@ -3598,7 +3704,7 @@ int vtkSpyPlotReader::RequestData(
   // Update the number of levels.
   unsigned int numberOfLevels=hb->GetNumberOfLevels();
   
-  if(this->IsAMR)
+  if(this->IsAMR && this->Controller)
     {
     unsigned long ulintMsgValue;
     // Update it from the children
@@ -3669,118 +3775,121 @@ int vtkSpyPlotReader::RequestData(
   
   // Update each level
   unsigned int level=0;
-  int intMsgValue;
-  while(level<numberOfLevels)
+  if ( this->Controller )
     {
-    int numberOfDataSets=hb->GetNumberOfDataSets(level);
-    int totalNumberOfDataSets=numberOfDataSets;
-    int leftNumberOfDataSets=0;
-    int rightNumberOfDataSets=0;
-    // Get number of dataset of each child
-    if(left<numProcessors)
+    int intMsgValue;
+    while(level<numberOfLevels)
       {
-      if(leftHasBounds)
+      int numberOfDataSets=hb->GetNumberOfDataSets(level);
+      int totalNumberOfDataSets=numberOfDataSets;
+      int leftNumberOfDataSets=0;
+      int rightNumberOfDataSets=0;
+      // Get number of dataset of each child
+      if(left<numProcessors)
         {
-        // Grab info the number of datasets from left child
-        this->Controller->Receive(&intMsgValue, 1, left,
-                                  VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_DATASETS);
-        leftNumberOfDataSets=intMsgValue;
-        }
-      if(right<numProcessors)
-        {
-        if(rightHasBounds)
+        if(leftHasBounds)
           {
-          // Grab info the number of datasets from right child
-          this->Controller->Receive(&intMsgValue, 1, right,
-                                    VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_DATASETS);
-          rightNumberOfDataSets=intMsgValue;
+          // Grab info the number of datasets from left child
+          this->Controller->Receive(&intMsgValue, 1, left,
+            VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_DATASETS);
+          leftNumberOfDataSets=intMsgValue;
+          }
+        if(right<numProcessors)
+          {
+          if(rightHasBounds)
+            {
+            // Grab info the number of datasets from right child
+            this->Controller->Receive(&intMsgValue, 1, right,
+              VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_DATASETS);
+            rightNumberOfDataSets=intMsgValue;
+            }
           }
         }
-      }
 
-    int globalIndex;
-    if(processNumber==0) // root
-      {
-      totalNumberOfDataSets=numberOfDataSets+leftNumberOfDataSets
-        +rightNumberOfDataSets;
-      globalIndex=0;
-      }
-    else
-      {
-      // Send local to parent, Receive global from the parent.
-      intMsgValue=numberOfDataSets+leftNumberOfDataSets+rightNumberOfDataSets;
-      this->Controller->Send(&intMsgValue, 1, parent,
-                             VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_DATASETS);
-      this->Controller->Receive(&intMsgValue, 1, parent,
-                                VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_DATASETS);
-      totalNumberOfDataSets=intMsgValue;
-      this->Controller->Receive(&intMsgValue, 1, parent,
-                                VTK_MSG_SPY_READER_GLOBAL_DATASETS_INDEX);
-      globalIndex=intMsgValue;
-      }
-    
-    // Send it to children.
-    if(left<numProcessors)
-      {
-      if(leftHasBounds)
+      int globalIndex;
+      if(processNumber==0) // root
         {
-        intMsgValue=totalNumberOfDataSets;
-        this->Controller->Send(&intMsgValue, 1, left,
-                               VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_DATASETS);
-        intMsgValue=globalIndex+numberOfDataSets;
-        this->Controller->Send(&intMsgValue, 1, left,
-                               VTK_MSG_SPY_READER_GLOBAL_DATASETS_INDEX);
+        totalNumberOfDataSets=numberOfDataSets+leftNumberOfDataSets
+          +rightNumberOfDataSets;
+        globalIndex=0;
         }
-      if(right<numProcessors)
+      else
         {
-        if(rightHasBounds)
+        // Send local to parent, Receive global from the parent.
+        intMsgValue=numberOfDataSets+leftNumberOfDataSets+rightNumberOfDataSets;
+        this->Controller->Send(&intMsgValue, 1, parent,
+          VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_DATASETS);
+        this->Controller->Receive(&intMsgValue, 1, parent,
+          VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_DATASETS);
+        totalNumberOfDataSets=intMsgValue;
+        this->Controller->Receive(&intMsgValue, 1, parent,
+          VTK_MSG_SPY_READER_GLOBAL_DATASETS_INDEX);
+        globalIndex=intMsgValue;
+        }
+
+      // Send it to children.
+      if(left<numProcessors)
+        {
+        if(leftHasBounds)
           {
           intMsgValue=totalNumberOfDataSets;
-          this->Controller->Send(&intMsgValue, 1, right,
-                                 VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_DATASETS);
-          intMsgValue=globalIndex+numberOfDataSets+leftNumberOfDataSets;
-          this->Controller->Send(&intMsgValue, 1, right,
-                                 VTK_MSG_SPY_READER_GLOBAL_DATASETS_INDEX);
+          this->Controller->Send(&intMsgValue, 1, left,
+            VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_DATASETS);
+          intMsgValue=globalIndex+numberOfDataSets;
+          this->Controller->Send(&intMsgValue, 1, left,
+            VTK_MSG_SPY_READER_GLOBAL_DATASETS_INDEX);
+          }
+        if(right<numProcessors)
+          {
+          if(rightHasBounds)
+            {
+            intMsgValue=totalNumberOfDataSets;
+            this->Controller->Send(&intMsgValue, 1, right,
+              VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_DATASETS);
+            intMsgValue=globalIndex+numberOfDataSets+leftNumberOfDataSets;
+            this->Controller->Send(&intMsgValue, 1, right,
+              VTK_MSG_SPY_READER_GLOBAL_DATASETS_INDEX);
+            }
           }
         }
-      }
-    
-    // Update the level.
-    if(totalNumberOfDataSets>numberOfDataSets)
-      {
-      hb->SetNumberOfDataSets(level,totalNumberOfDataSets);
-      int i;
-      if(globalIndex>0)
+
+      // Update the level.
+      if(totalNumberOfDataSets>numberOfDataSets)
         {
-        // move the datasets to the right indices
-        // we have to start at the end because the
-        // original blocks location and final location
-        // may overlap.
-        i=numberOfDataSets-1;
-        int j=globalIndex+numberOfDataSets-1;
-        while(i>=0)
+        hb->SetNumberOfDataSets(level,totalNumberOfDataSets);
+        int i;
+        if(globalIndex>0)
           {
-          hb->SetDataSet(level,j,hb->GetDataSet(level,i));
-          --i;
-          --j;
+          // move the datasets to the right indices
+          // we have to start at the end because the
+          // original blocks location and final location
+          // may overlap.
+          i=numberOfDataSets-1;
+          int j=globalIndex+numberOfDataSets-1;
+          while(i>=0)
+            {
+            hb->SetDataSet(level,j,hb->GetDataSet(level,i));
+            --i;
+            --j;
+            }
+          // add null pointers at the beginning
+          i=0;
+          while(i<globalIndex)
+            {
+            hb->SetDataSet(level,i,0);
+            ++i;
+            }
           }
-        // add null pointers at the beginning
-        i=0;
-        while(i<globalIndex)
+        // add null pointers at the end
+        i=globalIndex+numberOfDataSets;
+        while(i<totalNumberOfDataSets)
           {
           hb->SetDataSet(level,i,0);
           ++i;
           }
         }
-      // add null pointers at the end
-      i=globalIndex+numberOfDataSets;
-      while(i<totalNumberOfDataSets)
-        {
-        hb->SetDataSet(level,i,0);
-        ++i;
-        }
+      ++level;
       }
-    ++level;
     }
   
   // Set the unique block id cell data
