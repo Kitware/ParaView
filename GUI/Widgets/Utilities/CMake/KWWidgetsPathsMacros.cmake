@@ -1,6 +1,8 @@
 # ---------------------------------------------------------------------------
 # KWWidgets_GENERATE_ONE_SETUP_PATHS
 # Generate one set of setup path scripts
+# This macro can take an optional parameter 'basename' which will be used
+# as the basename for the generated setup scripts.
 
 MACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS
     dest_dir
@@ -17,6 +19,14 @@ MACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS
     kwwidgets_tcl_paths 
     kwwidgets_python_paths)
 
+  # Use last argument as basename
+
+  IF(NOT "${ARGN}" STREQUAL "")
+    SET(basename "${ARGN}")
+  ELSE(NOT "${ARGN}" STREQUAL "")
+    SET(basename "KWWidgetsSetupPaths")
+  ENDIF(NOT "${ARGN}" STREQUAL "")
+
   # For PATH
 
   SET(KWWidgets_PATH_ENV 
@@ -28,6 +38,8 @@ MACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS
     ${sov_lib_paths}
     ${kwwidgets_runtime_paths}
     ${kwwidgets_lib_paths}
+    ${EXECUTABLE_OUTPUT_PATH}
+    ${LIBRARY_OUTPUT_PATH}
     )
 
   # If we have no TCL_LIBRARY or TCL_TCLSH, then we are probably being invoked
@@ -127,7 +139,7 @@ MACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS
 
     CONFIGURE_FILE(
       ${KWWidgets_TEMPLATES_DIR}/KWWidgetsSetupPaths.bat.in
-      ${dest_dir}/KWWidgetsSetupPaths.bat
+      ${dest_dir}/${basename}.bat
       IMMEDIATE)
 
     STRING(REGEX REPLACE "\"" "\\\\\"" 
@@ -135,7 +147,7 @@ MACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS
 
     CONFIGURE_FILE(
       ${KWWidgets_TEMPLATES_DIR}/KWWidgetsSetupPaths.cmake.in
-      ${dest_dir}/KWWidgetsSetupPaths.cmake
+      ${dest_dir}/${basename}.cmake
       IMMEDIATE @ONLY)
 
     # For Cygwin PATH (colon separated, use cygdrive)
@@ -162,12 +174,12 @@ MACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS
 
     CONFIGURE_FILE(
       ${KWWidgets_TEMPLATES_DIR}/KWWidgetsSetupPaths.sh.in
-      ${dest_dir}/KWWidgetsSetupPaths.sh
+      ${dest_dir}/${basename}.sh
       IMMEDIATE)
     
     CONFIGURE_FILE(
       ${KWWidgets_TEMPLATES_DIR}/KWWidgetsSetupPaths.csh.in
-      ${dest_dir}/KWWidgetsSetupPaths.csh
+      ${dest_dir}/${basename}.csh
       IMMEDIATE)
 
   ELSE(WIN32)
@@ -196,12 +208,12 @@ MACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS
 
     CONFIGURE_FILE(
       ${KWWidgets_TEMPLATES_DIR}/KWWidgetsSetupPaths.sh.in
-      ${dest_dir}/KWWidgetsSetupPaths.sh
+      ${dest_dir}/${basename}.sh
       IMMEDIATE)
 
     CONFIGURE_FILE(
       ${KWWidgets_TEMPLATES_DIR}/KWWidgetsSetupPaths.csh.in
-      ${dest_dir}/KWWidgetsSetupPaths.csh
+      ${dest_dir}/${basename}.csh
       IMMEDIATE)
 
     STRING(REGEX REPLACE "\"" "\\\\\"" 
@@ -209,7 +221,7 @@ MACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS
 
     CONFIGURE_FILE(
       ${KWWidgets_TEMPLATES_DIR}/KWWidgetsSetupPaths.cmake.in
-      ${dest_dir}/KWWidgetsSetupPaths.cmake
+      ${dest_dir}/${basename}.cmake
       IMMEDIATE @ONLY)
 
   ENDIF(WIN32)
@@ -219,6 +231,8 @@ ENDMACRO(KWWidgets_GENERATE_ONE_SETUP_PATHS)
 # KWWidgets_GENERATE_ALL_SETUP_PATHS
 # Generate all sets of setup path scripts, i.e. one set for each configuration
 # types, if configuration types are supported
+# This macro can take an optional parameter 'basename' which will be used
+# as the basename for the generated setup scripts.
 
 MACRO(KWWidgets_GENERATE_ALL_SETUP_PATHS 
     output_path
@@ -333,7 +347,8 @@ MACRO(KWWidgets_GENERATE_ALL_SETUP_PATHS
         "${kwwidgets_lib_paths2}"
         "${kwwidgets_runtime_paths2}"
         "${kwwidgets_tcl_paths2}"
-        "${kwwidgets_python_paths}")
+        "${kwwidgets_python_paths}"
+        "${ARGN}")
       
     ENDFOREACH(config)
 
@@ -352,7 +367,8 @@ MACRO(KWWidgets_GENERATE_ALL_SETUP_PATHS
       "${kwwidgets_lib_paths}"
       "${kwwidgets_runtime_paths}"
       "${kwwidgets_tcl_paths}"
-      "${kwwidgets_python_paths}")
+      "${kwwidgets_python_paths}"
+      "${ARGN}")
 
   ENDIF(WIN32 AND CMAKE_CONFIGURATION_TYPES)
 ENDMACRO(KWWidgets_GENERATE_ALL_SETUP_PATHS)
@@ -361,6 +377,8 @@ ENDMACRO(KWWidgets_GENERATE_ALL_SETUP_PATHS)
 # KWWidgets_GENERATE_DEFAULT_SETUP_PATHS
 # Generate all sets of setup path scripts for the default paths configured
 # at the moment.
+# This macro can take an optional parameter 'basename' which will be used
+# as the basename for the generated setup scripts.
 
 MACRO(KWWidgets_GENERATE_DEFAULT_SETUP_PATHS 
     output_path)
@@ -404,7 +422,7 @@ MACRO(KWWidgets_GENERATE_DEFAULT_SETUP_PATHS
 
   SET(KWWidgets_PYTHON_PATHS ${KWWidgets_PYTHON_PATHS} 
     "${KWWidgets_PYTHON_MODULE_DIR}")
-  
+
   KWWidgets_GENERATE_ALL_SETUP_PATHS(
     "${output_path}"
     "${VTK_LIBRARY_DIRS}"
@@ -418,6 +436,7 @@ MACRO(KWWidgets_GENERATE_DEFAULT_SETUP_PATHS
     "${KWWidgets_LIBRARY_DIRS}"
     "${KWWidgets_RUNTIME_DIRS}"
     "${KWWidgets_TCL_PATHS}"
-    "${KWWidgets_PYTHON_PATHS}")
+    "${KWWidgets_PYTHON_PATHS}"
+    "${ARGN}")
   
 ENDMACRO(KWWidgets_GENERATE_DEFAULT_SETUP_PATHS)
