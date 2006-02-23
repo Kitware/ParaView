@@ -950,7 +950,8 @@ void pqHistogramChart::drawChart(QPainter *p, const QRect &area)
         QColor bin = Qt::red;
         if(this->Colors)
           bin = this->Colors->getColor(i, getBinCount());
-        p->fillRect(item->Bounds, bin);
+        p->fillRect(item->Bounds.x(), item->Bounds.y(),
+          item->Bounds.width() - 1, item->Bounds.height() - 1, bin);
 
         // Draw in the highlighted portion of the bar if it is selected
         // and fill highlighting is being used.

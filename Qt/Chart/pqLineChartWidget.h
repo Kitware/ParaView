@@ -12,7 +12,6 @@
 #ifndef _pqLineChartWidget_h
 #define _pqLineChartWidget_h
 
-
 #include "pqChartExport.h"
 #include <QAbstractScrollArea>
 
@@ -22,7 +21,7 @@ class pqChartLegend;
 class pqChartMouseBox;
 class pqChartZoomPan;
 class pqLineChart;
-
+class QPrinter;
 
 /// \class pqLineChartWidget
 /// \brief
@@ -31,16 +30,6 @@ class pqLineChart;
 class QTCHART_EXPORT pqLineChartWidget : public QAbstractScrollArea
 {
   Q_OBJECT
-
-public:
-  enum MouseMode {
-    NoMode,
-    MoveWait,
-    Pan,
-    Zoom,
-    ZoomBox,
-    SelectBox,
-  };
 
 public:
   /// \brief
@@ -77,26 +66,35 @@ public:
   ///   Gets the line chart object.
   /// \return
   ///   A pointer to the line chart object.
-  pqLineChart *getLineChart() {return this->LineChart;}
+  pqLineChart& getLineChart() {return *this->LineChart;}
 
   /// \brief
   ///   Returns the chart X-axis.
   /// \return
   ///   A pointer to the axis.
-  pqChartAxis *getXAxis() {return this->XAxis;}
+  pqChartAxis& getXAxis() {return *this->XAxis;}
 
   /// \brief
   ///   Returns the chart Y-axis.
   /// \return
   ///   A pointer to the axis.
-  pqChartAxis *getYAxis() {return this->YAxis;}
+  pqChartAxis& getYAxis() {return *this->YAxis;}
 
   /// \brief
   ///   Gets the zoom/pan handler for the widget.
   /// \return
   ///   The widget zoom/pan handler.
-  pqChartZoomPan *getZoomPanHandler() const {return this->ZoomPan;}
+  pqChartZoomPan& getZoomPanHandler() const {return *this->ZoomPan;}
   //@}
+
+  /// \brief
+  ///   Used to determine the prefered size of the widget.
+  /// \return
+  ///   The prefered size of the widget.
+  virtual QSize sizeHint() const;
+
+  /// Prints the chart using the given print parameters (can also be used to save to PDF, see QPrinter docs for details)
+  void printChart(QPrinter& printer);
 
 public slots:
   /// \brief
@@ -114,14 +112,7 @@ private slots:
   /// \param height The contents height.
   void layoutChart(int width, int height);
 
-public:
-  /// \brief
-  ///   Used to determine the prefered size of the widget.
-  /// \return
-  ///   The prefered size of the widget.
-  virtual QSize sizeHint() const;
-
-protected:
+private:
   /// Called to handle tooltip events
   bool event(QEvent *e);
 
@@ -186,7 +177,6 @@ protected:
   /// \param e Event specific data.
   virtual void contextMenuEvent(QContextMenuEvent *e);
 
-private:
   /// \brief
   ///   Called to handle viewport events.
   ///
@@ -198,16 +188,27 @@ private:
   /// \param e Event specific data.
   virtual bool viewportEvent(QEvent *e);
 
-private:
+  /// Draws the widget
+  void draw(QPainter& painter, QRect area);
+
+  enum MouseMode {
+    NoMode,
+    MoveWait,
+    Pan,
+    Zoom,
+    ZoomBox,
+    SelectBox,
+  };
+
   QColor BackgroundColor;  ///< Stores the background color.
   MouseMode Mode;          ///< Stores the current mouse state.
-  pqChartMouseBox *Mouse;  ///< Stores the mouse drag box.
-  pqChartZoomPan *ZoomPan; ///< Handles the zoom/pan interaction.
+  pqChartMouseBox* const Mouse;  ///< Stores the mouse drag box.
+  pqChartZoomPan* const ZoomPan; ///< Handles the zoom/pan interaction.
   pqChartLabel* const Title;     ///< Used to draw the chart title.
-  pqChartAxis *XAxis;      ///< Used to draw the x-axis.
-  pqChartAxis *YAxis;      ///< Used to draw the y-axis.
+  pqChartAxis* const XAxis;      ///< Used to draw the x-axis.
+  pqChartAxis* const YAxis;      ///< Used to draw the y-axis.
   pqChartLegend* const Legend; ///< Used to draw the chart legend.
-  pqLineChart *LineChart;  ///< Used to draw the line chart.
+  pqLineChart* const LineChart;  ///< Used to draw the line chart.
   bool MouseDown;          ///< Used for mouse interactions.
 };
 

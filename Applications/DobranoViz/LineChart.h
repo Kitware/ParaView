@@ -49,8 +49,15 @@ public slots:
   /// Adds to the set of CSV data to be displayed
   void addCSV(const QStringList& plot);
   
+  /// Prompts the user to choose CSV data to be displayed
   void onLoadCSV();
+  /// Displays a set of CSV files
   void onLoadCSV(const QStringList& files);
+  
+  /// Prompts the user to save the chart to a PDF file
+  void onSavePDF();
+  /// Saves the chart to one-to-many PDF files
+  void onSavePDF(const QStringList& files);
   
 private slots:
   /// Called when the Exodus data changes

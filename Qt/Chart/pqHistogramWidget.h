@@ -35,6 +35,7 @@ class QMouseEvent;
 class QPainter;
 class QPoint;
 class QPopupMenu;
+class QPrinter;
 class QRect;
 class QResizeEvent;
 class QTimer;
@@ -89,23 +90,6 @@ public:
     Function
   };
 
-  enum MouseMode {
-    NoMode,
-    MoveWait,
-    Pan,
-    Zoom,
-    ZoomBox,
-    SelectBox,
-    ValueDrag
-  };
-
-  enum AxisName {
-    HorizontalAxis,
-    HistogramAxis,
-    LineChartAxis
-  };
-
-public:
   /// \brief
   ///   Creates an interactive histogram chart.
   /// \param parent The parent widget to place the histogram in.
@@ -149,27 +133,30 @@ public:
   ///   Gets the histogram chart object.
   /// \return
   ///   A pointer to the histogram chart object.
-  pqHistogramChart *getHistogram() {return this->Histogram;}
+  pqHistogramChart& getHistogram() {return *this->Histogram;}
 
   /// \brief
   ///   Gets the line chart object.
   /// \return
   ///   A pointer to the line chart object.
-  pqLineChart *getLineChart() {return this->LineChart;}
+  pqLineChart& getLineChart() {return *this->LineChart;}
 
-  /// \brief
-  ///   Gets one of the chart axes.
-  /// \param name The name of the axis to get.
-  /// \return
-  ///   A pointer to the specified axis.
-  pqChartAxis *getAxis(AxisName name);
+  /// Returns the horizontal (histogram) axis
+  pqChartAxis& getHorizontalAxis() {return *this->XAxis;}
+  /// Returns the vertical (histogram) axis
+  pqChartAxis& getHistogramAxis() {return *this->YAxis;}
+  /// Returns the vertical (line chart) axis
+  pqChartAxis& getLineChartAxis() {return *this->FAxis;}
 
   /// \brief
   ///   Gets the zoom/pan handler for the widget.
   /// \return
   ///   The widget zoom/pan handler.
-  pqChartZoomPan *getZoomPanHandler() const {return this->ZoomPan;}
+  pqChartZoomPan& getZoomPanHandler() const {return *this->ZoomPan;}
   //@}
+
+  /// Prints the chart to the given device (can also be used to generate PDF output, see QPrinter for details)
+  void printChart(QPrinter& printer);
 
 public slots:
   /// \brief
@@ -297,6 +284,9 @@ protected:
   virtual void contextMenuEvent(QContextMenuEvent *e);
 
 private:
+  /// Draws the chart to the given painter
+  void draw(QPainter& painter, QRect area);
+
   /// \brief
   ///   Called to handle viewport events.
   ///
@@ -311,21 +301,30 @@ private:
   /// Does the work of sending a selection changed notification.
   void sendSelectionNotification();
 
-private:
+  enum MouseMode {
+    NoMode,
+    MoveWait,
+    Pan,
+    Zoom,
+    ZoomBox,
+    SelectBox,
+    ValueDrag
+  };
+
   QColor BackgroundColor;      ///< Stores the current background color.
   MouseMode Mode;              ///< Stores the current mouse state.
   InteractMode Interact;       ///< Stores the current interaction mode.
   bool EasyBinSelection;       ///< Stores whether the user has to hit the "filled" portion of a bin to select it
   InteractMode SelectMode;     ///< Stores the current selection type.
-  pqChartLabel* Title;         ///< Used to draw the chart title.
-  pqChartAxis *XAxis;          ///< Used to draw the x-axis.
-  pqChartAxis *YAxis;          ///< Used to draw the y-axis.
-  pqChartAxis *FAxis;          ///< Used to draw the function axis.
-  pqHistogramChart *Histogram; ///< Used to draw the histogram.
-  pqLineChart *LineChart;      ///< Used to draw the line chart.
-  pqHistogramWidgetData *Data; ///< Used in the selection interaction.
-  pqChartMouseBox *Mouse;      ///< Stores the mouse drag box.
-  pqChartZoomPan *ZoomPan;     ///< Handles the zoom/pan interaction.
+  pqChartLabel* const Title;         ///< Used to draw the chart title.
+  pqChartAxis* const XAxis;          ///< Used to draw the x-axis.
+  pqChartAxis* const YAxis;          ///< Used to draw the y-axis.
+  pqChartAxis* const FAxis;          ///< Used to draw the function axis.
+  pqHistogramChart* const Histogram; ///< Used to draw the histogram.
+  pqLineChart* const LineChart;      ///< Used to draw the line chart.
+  pqHistogramWidgetData* const Data; ///< Used in the selection interaction.
+  pqChartMouseBox* const Mouse;      ///< Stores the mouse drag box.
+  pqChartZoomPan* const ZoomPan;     ///< Handles the zoom/pan interaction.
   QTimer *MoveTimer;           ///< Used for the mouse interaction.
   int LastBin;                 ///< Stores the last bin click.
   int LastValueX;              ///< Stores the last value click.

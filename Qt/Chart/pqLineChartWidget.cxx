@@ -27,6 +27,8 @@
 #include <QPalette>
 #include <QPixmap>
 #include <QPoint>
+#include <QPrinter>
+#include <QPrintDialog>
 #include <QRect>
 #include <QToolTip>
 
@@ -37,18 +39,17 @@
 
 pqLineChartWidget::pqLineChartWidget(QWidget *p) :
   QAbstractScrollArea(p),
+  BackgroundColor(Qt::white),
+  Mode(pqLineChartWidget::NoMode),
+  Mouse(new pqChartMouseBox()),
+  ZoomPan(new pqChartZoomPan(this)),
   Title(new pqChartLabel()),
-  Legend(new pqChartLegend())
+  XAxis(new pqChartAxis(pqChartAxis::Bottom)),
+  YAxis(new pqChartAxis(pqChartAxis::Left)),
+  Legend(new pqChartLegend()),
+  LineChart(new pqLineChart()),
+  MouseDown(false)
 {
-  this->BackgroundColor = Qt::white;
-  this->Mode = pqLineChartWidget::NoMode;
-  this->Mouse = new pqChartMouseBox();
-  this->ZoomPan = new pqChartZoomPan(this);
-  this->XAxis = 0;
-  this->YAxis = 0;
-  this->LineChart = 0;
-  this->MouseDown = false;
-
   // Set up the default Qt properties.
   this->setFocusPolicy(Qt::ClickFocus);
   this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -61,12 +62,9 @@ pqLineChartWidget::pqLineChartWidget(QWidget *p) :
   this->setAttribute(Qt::WA_InputMethodEnabled);
 
   // Connect to the zoom/pan object signal.
-  if(this->ZoomPan)
-    {
-    this->ZoomPan->setObjectName("ZoomPan");
-    connect(this->ZoomPan, SIGNAL(contentsSizeChanging(int, int)),
-        this, SLOT(layoutChart(int, int)));
-    }
+  this->ZoomPan->setObjectName("ZoomPan");
+  connect(this->ZoomPan, SIGNAL(contentsSizeChanging(int, int)),
+      this, SLOT(layoutChart(int, int)));
 
   // Setup the chart title
   connect(this->Title, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
@@ -78,60 +76,38 @@ pqLineChartWidget::pqLineChartWidget(QWidget *p) :
 
   // Set up the line chart and the axes.
   QFont myFont = font();
-  this->XAxis = new pqChartAxis(pqChartAxis::Bottom);
-  this->YAxis = new pqChartAxis(pqChartAxis::Left);
-  if(this->XAxis)
-    {
-    this->XAxis->setNeigbors(this->YAxis, 0);
-    this->XAxis->setTickLabelFont(myFont);
-    connect(this->XAxis, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
-    connect(this->XAxis, SIGNAL(repaintNeeded()), this, SLOT(repaintChart()));
-    }
+  this->XAxis->setNeigbors(this->YAxis, 0);
+  this->XAxis->setTickLabelFont(myFont);
+  connect(this->XAxis, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
+  connect(this->XAxis, SIGNAL(repaintNeeded()), this, SLOT(repaintChart()));
 
-  if(this->YAxis)
-    {
-    this->YAxis->setNeigbors(this->XAxis, 0);
-    this->YAxis->setTickLabelFont(myFont);
-    connect(this->YAxis, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
-    connect(this->YAxis, SIGNAL(repaintNeeded()), this, SLOT(repaintChart()));
-    }
+  this->YAxis->setNeigbors(this->XAxis, 0);
+  this->YAxis->setTickLabelFont(myFont);
+  connect(this->YAxis, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
+  connect(this->YAxis, SIGNAL(repaintNeeded()), this, SLOT(repaintChart()));
 
-  this->LineChart = new pqLineChart();
-  if(this->LineChart)
-    {
-    this->LineChart->setAxes(this->XAxis, this->YAxis);
-    connect(this->LineChart, SIGNAL(repaintNeeded()), this,
-        SLOT(repaintChart()));
-    }
+  this->LineChart->setAxes(this->XAxis, this->YAxis);
+  connect(this->LineChart, SIGNAL(repaintNeeded()), this,
+      SLOT(repaintChart()));
 }
 
 pqLineChartWidget::~pqLineChartWidget()
 {
-  delete this->Title;
+  delete this->LineChart;
   delete this->Legend;
-  
-  if(this->LineChart)
-    delete this->LineChart;
-  if(this->XAxis)
-    delete this->XAxis;
-  if(this->YAxis)
-    delete this->YAxis;
-
-  if(this->ZoomPan)
-    delete this->ZoomPan;
-  if(this->Mouse)
-    delete this->Mouse;
+  delete this->YAxis;
+  delete this->XAxis;
+  delete this->Title;
+  delete this->ZoomPan;
+  delete this->Mouse;
 }
 
 void pqLineChartWidget::setBackgroundColor(const QColor& color)
 {
   this->BackgroundColor = color;
 
-  if(this->ZoomPan)
-    {
-    this->layoutChart(this->ZoomPan->contentsWidth(),
-        this->ZoomPan->contentsHeight());
-    }
+  this->layoutChart(this->ZoomPan->contentsWidth(),
+      this->ZoomPan->contentsHeight());
 }
 
 void pqLineChartWidget::setFont(const QFont &f)
@@ -142,37 +118,26 @@ void pqLineChartWidget::setFont(const QFont &f)
   // made. This avoids laying out the chart for each individual
   // change.
   QFontMetrics fm(f);
-  if(this->XAxis)
-    {
-    this->XAxis->blockSignals(true);
-    this->XAxis->setTickLabelFont(f);
-    this->XAxis->blockSignals(false);
-    }
 
-  if(this->YAxis)
-    {
-    this->YAxis->blockSignals(true);
-    this->YAxis->setTickLabelFont(f);
-    this->YAxis->blockSignals(false);
-    }
+  this->XAxis->blockSignals(true);
+  this->XAxis->setTickLabelFont(f);
+  this->XAxis->blockSignals(false);
 
-  if(this->ZoomPan)
-    {
-    this->layoutChart(this->ZoomPan->contentsWidth(),
-        this->ZoomPan->contentsHeight());
-    }
+  this->YAxis->blockSignals(true);
+  this->YAxis->setTickLabelFont(f);
+  this->YAxis->blockSignals(false);
+
+  this->layoutChart(this->ZoomPan->contentsWidth(),
+      this->ZoomPan->contentsHeight());
 }
 
 void pqLineChartWidget::updateLayout()
 {
   // All of the chart members' layouts are interrelated. When one
   // of them needs to be updated, they all need to be updated.
-  if(this->ZoomPan)
-    {
-    this->layoutChart(this->ZoomPan->contentsWidth(),
-        this->ZoomPan->contentsHeight());
-    this->viewport()->update();
-    }
+  this->layoutChart(this->ZoomPan->contentsWidth(),
+      this->ZoomPan->contentsHeight());
+  this->viewport()->update();
 }
 
 void pqLineChartWidget::repaintChart()
@@ -200,12 +165,9 @@ void pqLineChartWidget::layoutChart(int w, int h)
   this->Legend->setBounds(legend_bounds);
   area.setRight(legend_bounds.left());
   
-  if(this->XAxis)
-    this->XAxis->layoutAxis(area);
-  if(this->YAxis)
-    this->YAxis->layoutAxis(area);
-  if(this->LineChart)
-    this->LineChart->layoutChart();
+  this->XAxis->layoutAxis(area);
+  this->YAxis->layoutAxis(area);
+  this->LineChart->layoutChart();
 }
 
 QSize pqLineChartWidget::sizeHint() const
@@ -218,10 +180,7 @@ QSize pqLineChartWidget::sizeHint() const
 bool pqLineChartWidget::event(QEvent *event)
 {
   if(event->type() == QEvent::ToolTip)
-    {
-    if(this->LineChart)
-      this->LineChart->showTooltip(*static_cast<QHelpEvent*>(event));
-    }
+    this->LineChart->showTooltip(*static_cast<QHelpEvent*>(event));
   
   return QAbstractScrollArea::event(event);
 }
@@ -232,56 +191,45 @@ void pqLineChartWidget::keyPressEvent(QKeyEvent *e)
   if(e->key() == Qt::Key_Plus || e->key() == Qt::Key_Minus ||
       e->key() == Qt::Key_Equal)
     {
-    if(this->ZoomPan)
-      {
-      // If only the ctrl key is down, zoom only in the x. If only
-      // the alt key is down, zoom only in the y. Otherwise, zoom
-      // both axes by the same amount. Mask off the shift key since
-      // it is needed to press the plus key.
-      pqChartZoomPan::InteractFlags flags = pqChartZoomPan::ZoomBoth;
-      int state = e->modifiers() & (Qt::ControlModifier | Qt::AltModifier |
-          Qt::MetaModifier);
-      if(state == Qt::ControlModifier)
-        flags = pqChartZoomPan::ZoomXOnly;
-      else if(state == Qt::AltModifier)
-        flags = pqChartZoomPan::ZoomYOnly;
+    // If only the ctrl key is down, zoom only in the x. If only
+    // the alt key is down, zoom only in the y. Otherwise, zoom
+    // both axes by the same amount. Mask off the shift key since
+    // it is needed to press the plus key.
+    pqChartZoomPan::InteractFlags flags = pqChartZoomPan::ZoomBoth;
+    int state = e->modifiers() & (Qt::ControlModifier | Qt::AltModifier |
+        Qt::MetaModifier);
+    if(state == Qt::ControlModifier)
+      flags = pqChartZoomPan::ZoomXOnly;
+    else if(state == Qt::AltModifier)
+      flags = pqChartZoomPan::ZoomYOnly;
 
-      // Zoom in for the plus/equal key and out for the minus key.
-      if(e->key() == Qt::Key_Minus)
-        this->ZoomPan->zoomOut(flags);
-      else
-        this->ZoomPan->zoomIn(flags);
-      }
+    // Zoom in for the plus/equal key and out for the minus key.
+    if(e->key() == Qt::Key_Minus)
+      this->ZoomPan->zoomOut(flags);
+    else
+      this->ZoomPan->zoomIn(flags);
     }
   else if(e->key() == Qt::Key_Up)
     {
-    if(this->ZoomPan)
-      this->ZoomPan->panUp();
+    this->ZoomPan->panUp();
     }
   else if(e->key() == Qt::Key_Down)
     {
-    if(this->ZoomPan)
-      this->ZoomPan->panDown();
+    this->ZoomPan->panDown();
     }
   else if(e->key() == Qt::Key_Left)
     {
-    if(this->ZoomPan)
-      {
-      if(e->modifiers() == Qt::AltModifier)
-        this->ZoomPan->historyPrevious();
-      else
-        this->ZoomPan->panLeft();
-      }
+    if(e->modifiers() == Qt::AltModifier)
+      this->ZoomPan->historyPrevious();
+    else
+      this->ZoomPan->panLeft();
     }
   else if(e->key() == Qt::Key_Right)
     {
-    if(this->ZoomPan)
-      {
-      if(e->modifiers() == Qt::AltModifier)
-        this->ZoomPan->historyNext();
-      else
-        this->ZoomPan->panRight();
-      }
+    if(e->modifiers() == Qt::AltModifier)
+      this->ZoomPan->historyNext();
+    else
+      this->ZoomPan->panRight();
     }
   else
     handled = false;
@@ -295,111 +243,40 @@ void pqLineChartWidget::keyPressEvent(QKeyEvent *e)
 void pqLineChartWidget::showEvent(QShowEvent *e)
 {
   QAbstractScrollArea::showEvent(e);
-  if(this->ZoomPan)
-    this->ZoomPan->updateContentSize();
+  this->ZoomPan->updateContentSize();
 }
 
 void pqLineChartWidget::paintEvent(QPaintEvent *e)
 {
-  if(!this->ZoomPan)
-    return;
-
-  // Qt4 now handles the double buffering. Create a QPainter to
-  // handle the drawing.
-  QPainter *painter = new QPainter(this->viewport());
-  if(!painter)
-    return;
-
-  // Make sure the painter is usable.
-  if(!painter->isActive())
-    {
-    delete painter;
-    return;
-    }
-
   // Get the clip area from the paint event. Set the painter to
   // content coordinates.
   QRect area = e->rect();
   if(!area.isValid())
     return;
-  painter->translate(-this->ZoomPan->contentsX(), -this->ZoomPan->contentsY());
-  area.translate(this->ZoomPan->contentsX(), this->ZoomPan->contentsY());
-  painter->setClipRect(area);
-
-  // Set the widget font.
-  painter->setFont(font());
-
-  // Paint the widget background.
-  painter->fillRect(area, this->BackgroundColor);
-
-  // Draw in the axes and grid.
-  if(this->YAxis)
-    this->YAxis->drawAxis(painter, area);
-  if(this->XAxis)
-    this->XAxis->drawAxis(painter, area);
-
-  // Paint the chart.
-  if(this->LineChart)
-    this->LineChart->drawChart(painter, area);
-
-  // Draw in the axis lines again to ensure they are on top.
-  if(this->YAxis)
-    this->YAxis->drawAxisLine(painter);
-  if(this->XAxis)
-    this->XAxis->drawAxisLine(painter);
-
-  // Draw the chart title
-  this->Title->draw(*painter, area);
-
-  // Draw the chart legend
-  this->Legend->draw(*painter, area);
-
-  if(this->Mouse && this->Mouse->Box.isValid())
-    {
-    // Draw in mouse box selection or zoom if needed.
-    painter->setPen(Qt::black);
-    painter->setPen(Qt::DotLine);
-    if(this->Mode == pqLineChartWidget::ZoomBox)
-      {
-      painter->drawRect(this->Mouse->Box.x(), this->Mouse->Box.y(),
-          this->Mouse->Box.width() - 1, this->Mouse->Box.height() - 1);
-      }
-    }
-
-  // Clean up the painter.
-  delete painter;
+    
+  QPainter painter(this->viewport());
+    
+  this->draw(painter, area);
+  
+  e->accept();
 }
 
 void pqLineChartWidget::mousePressEvent(QMouseEvent *e)
 {
-  if(!this->ZoomPan)
-    return;
-
   // Get the current mouse position and convert it to contents coords.
   this->MouseDown = true;
   QPoint point = e->pos();
   point.rx() += this->ZoomPan->contentsX();
   point.ry() += this->ZoomPan->contentsY();
 
-  if(this->Mouse)
-    this->Mouse->Last = point;
+  this->Mouse->Last = point;
   this->ZoomPan->Last = e->globalPos();
-
-  // Make sure the timer is allocated and connected.
-  /*if(!this->moveTimer)
-    {
-    this->moveTimer = new QTimer(this, "MouseMoveTimeout");
-    connect(this->moveTimer, SIGNAL(timeout()), this, SLOT(moveTimeout()));
-    }*/
 
   e->accept();
 }
 
 void pqLineChartWidget::mouseReleaseEvent(QMouseEvent *e)
 {
-  if(!this->ZoomPan)
-    return;
-
   // Get the current mouse position and convert it to contents coords.
   this->MouseDown = false;
   QPoint point = e->pos();
@@ -440,7 +317,7 @@ void pqLineChartWidget::mouseReleaseEvent(QMouseEvent *e)
 
 void pqLineChartWidget::mouseDoubleClickEvent(QMouseEvent *e)
 {
-  if(e->button() == Qt::MidButton && this->ZoomPan)
+  if(e->button() == Qt::MidButton)
     this->ZoomPan->resetZoom();
 
   e->accept();
@@ -448,7 +325,7 @@ void pqLineChartWidget::mouseDoubleClickEvent(QMouseEvent *e)
 
 void pqLineChartWidget::mouseMoveEvent(QMouseEvent *e)
 {
-  if(!this->ZoomPan || !this->MouseDown)
+  if(!this->MouseDown)
     return;
 
   // Get the current mouse position and convert it to contents coords.
@@ -460,8 +337,6 @@ void pqLineChartWidget::mouseMoveEvent(QMouseEvent *e)
   // the timer so it does not send a selection update.
   if(this->Mode == pqLineChartWidget::MoveWait)
     {
-    //if(this->moveTimer)
-    //  this->moveTimer->stop();
     this->Mode = pqLineChartWidget::NoMode;
     }
 
@@ -532,28 +407,24 @@ void pqLineChartWidget::mouseMoveEvent(QMouseEvent *e)
 
 void pqLineChartWidget::wheelEvent(QWheelEvent *e)
 {
-  if(this->ZoomPan)
-    {
-    pqChartZoomPan::InteractFlags flags = pqChartZoomPan::ZoomBoth;
-    if(e->modifiers() == Qt::ControlModifier)
-      flags = pqChartZoomPan::ZoomXOnly;
-    else if(e->modifiers() == Qt::AltModifier)
-      flags = pqChartZoomPan::ZoomYOnly;
+  pqChartZoomPan::InteractFlags flags = pqChartZoomPan::ZoomBoth;
+  if(e->modifiers() == Qt::ControlModifier)
+    flags = pqChartZoomPan::ZoomXOnly;
+  else if(e->modifiers() == Qt::AltModifier)
+    flags = pqChartZoomPan::ZoomYOnly;
 
-    // Get the current mouse position and convert it to contents coords.
-    QPoint point = e->pos();
-    point.rx() += this->ZoomPan->contentsX();
-    point.ry() += this->ZoomPan->contentsY();
-    this->ZoomPan->handleWheelZoom(e->delta(), point, flags);
-    }
+  // Get the current mouse position and convert it to contents coords.
+  QPoint point = e->pos();
+  point.rx() += this->ZoomPan->contentsX();
+  point.ry() += this->ZoomPan->contentsY();
+  this->ZoomPan->handleWheelZoom(e->delta(), point, flags);
 
   e->accept();
 }
 
 void pqLineChartWidget::resizeEvent(QResizeEvent *)
 {
-  if(this->ZoomPan)
-    this->ZoomPan->updateContentSize();
+  this->ZoomPan->updateContentSize();
 }
 
 void pqLineChartWidget::contextMenuEvent(QContextMenuEvent *e)
@@ -575,4 +446,57 @@ bool pqLineChartWidget::viewportEvent(QEvent *e)
   return QAbstractScrollArea::viewportEvent(e);
 }
 
+void pqLineChartWidget::draw(QPainter& painter, QRect area)
+{
+  painter.translate(-this->ZoomPan->contentsX(), -this->ZoomPan->contentsY());
+  area.translate(this->ZoomPan->contentsX(), this->ZoomPan->contentsY());
+//  painter.setClipRect(area);
 
+  // Set the widget font.
+  painter.setFont(font());
+
+  // Paint the widget background.
+  painter.fillRect(area, this->BackgroundColor);
+
+  // Draw in the axes and grid.
+  this->YAxis->drawAxis(&painter, area);
+  this->XAxis->drawAxis(&painter, area);
+
+  // Paint the chart.
+  this->LineChart->drawChart(&painter, area);
+
+  // Draw in the axis lines again to ensure they are on top.
+  this->YAxis->drawAxisLine(&painter);
+  this->XAxis->drawAxisLine(&painter);
+
+  // Draw the chart title
+  this->Title->draw(painter, area);
+
+  // Draw the chart legend
+  this->Legend->draw(painter, area);
+
+  if(this->Mouse->Box.isValid())
+    {
+    // Draw in mouse box selection or zoom if needed.
+    painter.setPen(Qt::black);
+    painter.setPen(Qt::DotLine);
+    if(this->Mode == pqLineChartWidget::ZoomBox)
+      {
+      painter.drawRect(this->Mouse->Box.x(), this->Mouse->Box.y(),
+          this->Mouse->Box.width() - 1, this->Mouse->Box.height() - 1);
+      }
+    }
+}
+
+void pqLineChartWidget::printChart(QPrinter& printer)
+{
+  QSize viewport_size(this->rect().size());
+  viewport_size.scale(printer.pageRect().size(), Qt::KeepAspectRatio);
+
+  QPainter painter(&printer);
+  
+  painter.setWindow(this->rect());
+  painter.setViewport(QRect(0, 0, viewport_size.width(), viewport_size.height()));
+
+  this->draw(painter, this->rect());
+}

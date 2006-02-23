@@ -38,6 +38,11 @@ public slots:
   void setVariable(pqVariableType type, const QString& name);
   /// Call this to set the current bin count (defaults to 10)
   void setBinCount(unsigned long Count);
+
+  /// Prompts the user to save the chart to a PDF file
+  void onSavePDF();
+  /// Saves the chart to one-to-many PDF files
+  void onSavePDF(const QStringList& files);
   
 private slots:
   void onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*);

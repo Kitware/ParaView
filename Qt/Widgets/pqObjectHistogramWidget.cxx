@@ -13,13 +13,18 @@
 #include <pqChartAxis.h>
 #include <pqChartLabel.h>
 #include <pqChartValue.h>
+#include <pqConnect.h>
 #include <pqHistogramChart.h>
 #include <pqHistogramColor.h>
 #include <pqHistogramWidget.h>
+#include <pqFileDialog.h>
+#include <pqLocalFileDialogModel.h>
 #include <pqPipelineData.h>
 #include <pqPipelineObject.h>
 
 #include <QLabel>
+#include <QPrinter>
+#include <QPushButton>
 #include <QSpinBox>
 #include <QVBoxLayout>
 
@@ -104,25 +109,25 @@ struct pqObjectHistogramWidget::pqImplementation
     this->HistogramWidget.getTitle().setFont(h1);
     this->HistogramWidget.getTitle().setColor(Qt::black);
     
-    this->HistogramWidget.getHistogram()->setBinOutlineStyle(pqHistogramChart::Black);
+    this->HistogramWidget.getHistogram().setBinOutlineStyle(pqHistogramChart::Black);
     
-    this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setGridColor(Qt::lightGray);
-    this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setAxisColor(Qt::darkGray);
-    this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setTickLabelColor(Qt::darkGray);
-    this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setTickLabelFont(italic);
+    this->HistogramWidget.getHorizontalAxis().setGridColor(Qt::lightGray);
+    this->HistogramWidget.getHorizontalAxis().setAxisColor(Qt::darkGray);
+    this->HistogramWidget.getHorizontalAxis().setTickLabelColor(Qt::darkGray);
+    this->HistogramWidget.getHorizontalAxis().setTickLabelFont(italic);
     
-    this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->getLabel().setText("Value");
-    this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->getLabel().setFont(bold);
+    this->HistogramWidget.getHorizontalAxis().getLabel().setText("Value");
+    this->HistogramWidget.getHorizontalAxis().getLabel().setFont(bold);
 
-    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setGridColor(Qt::lightGray);
-    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setAxisColor(Qt::darkGray);
-    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setTickLabelColor(Qt::darkGray);
-    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setTickLabelFont(italic);
-    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setPrecision(0);
+    this->HistogramWidget.getHistogramAxis().setGridColor(Qt::lightGray);
+    this->HistogramWidget.getHistogramAxis().setAxisColor(Qt::darkGray);
+    this->HistogramWidget.getHistogramAxis().setTickLabelColor(Qt::darkGray);
+    this->HistogramWidget.getHistogramAxis().setTickLabelFont(italic);
+    this->HistogramWidget.getHistogramAxis().setPrecision(0);
 
-    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->getLabel().setText("Count");
-    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->getLabel().setFont(bold);
-    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->getLabel().setOrientation(pqChartLabel::VERTICAL);
+    this->HistogramWidget.getHistogramAxis().getLabel().setText("Count");
+    this->HistogramWidget.getHistogramAxis().getLabel().setFont(bold);
+    this->HistogramWidget.getHistogramAxis().getLabel().setOrientation(pqChartLabel::VERTICAL);
     
     this->updateChart();
   }
@@ -213,13 +218,13 @@ struct pqObjectHistogramWidget::pqImplementation
   void updateChart()
   {
     // Set the default (no data) appearance of the chart
-    this->HistogramWidget.getHistogram()->clearData();
+    this->HistogramWidget.getHistogram().clearData();
     this->HistogramWidget.getTitle().setText("Histogram (no data)");
-    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setVisible(true);
-    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setValueRange(0.0, 100.0);
-    this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setVisible(true);
-    this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setValueRange(0.0, 100.0);
-    this->HistogramWidget.getHistogram()->setBinColorScheme(new pqHistogramColor());
+    this->HistogramWidget.getHistogramAxis().setVisible(true);
+    this->HistogramWidget.getHistogramAxis().setValueRange(0.0, 100.0);
+    this->HistogramWidget.getHorizontalAxis().setVisible(true);
+    this->HistogramWidget.getHorizontalAxis().setValueRange(0.0, 100.0);
+    this->HistogramWidget.getHistogram().setBinColorScheme(new pqHistogramColor());
     
     // See if we can display the current variable, if not, we're done ...
     if(this->VariableName.isEmpty())
@@ -291,10 +296,10 @@ struct pqObjectHistogramWidget::pqImplementation
     
     // Display the results ...
     this->HistogramWidget.getTitle().setText(this->VariableName + " Histogram");
-    this->HistogramWidget.getAxis(pqHistogramWidget::HistogramAxis)->setVisible(true);
-    this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis)->setVisible(true);
+    this->HistogramWidget.getHistogramAxis().setVisible(true);
+    this->HistogramWidget.getHorizontalAxis().setVisible(true);
 
-    this->HistogramWidget.getHistogram()->setData(
+    this->HistogramWidget.getHistogram().setData(
       list,
       pqChartValue(value_min), pqChartValue(value_max));
 
@@ -319,7 +324,7 @@ struct pqObjectHistogramWidget::pqImplementation
     if(!lookup_table)
       return;
 
-    this->HistogramWidget.getHistogram()->setBinColorScheme(new pqHistogramColorLookup(this->HistogramWidget.getAxis(pqHistogramWidget::HorizontalAxis), lookup_table));
+    this->HistogramWidget.getHistogram().setBinColorScheme(new pqHistogramColorLookup(&this->HistogramWidget.getHorizontalAxis(), lookup_table));
   }
   
   vtkSMProxy* CurrentProxy;
@@ -342,10 +347,14 @@ pqObjectHistogramWidget::pqObjectHistogramWidget(QWidget *p) :
   QLabel* const bin_label = new QLabel(tr("Bins:"));
   bin_label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
+  QPushButton* const save_button = new QPushButton("Save .pdf");
+  this->connect(save_button, SIGNAL(clicked()), this, SLOT(onSavePDF()));
+
   QHBoxLayout* const hbox = new QHBoxLayout();
   hbox->setMargin(0);
   hbox->addWidget(bin_label);
   hbox->addWidget(&this->Implementation->BinCountSpinBox);
+  hbox->addWidget(save_button);
 
   QVBoxLayout* const vbox = new QVBoxLayout();
   vbox->setMargin(0);
@@ -407,4 +416,24 @@ void pqObjectHistogramWidget::onInputChanged(vtkObject*,unsigned long, void*, vo
 void pqObjectHistogramWidget::onBinCountChanged(int Count)
 {
   this->Implementation->setBinCount(Count);
+}
+
+void pqObjectHistogramWidget::onSavePDF()
+{
+  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save .pdf File:"), this, "fileSavePDFDialog")
+    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(onSavePDF(const QStringList&)));
+    
+  file_dialog->show();
+}
+
+void pqObjectHistogramWidget::onSavePDF(const QStringList& files)
+{
+  for(int i = 0; i != files.size(); ++i)
+    {
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(files[i]);
+    
+    this->Implementation->HistogramWidget.printChart(printer);
+    }
 }

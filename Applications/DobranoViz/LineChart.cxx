@@ -23,6 +23,7 @@
 #include <pqLinearRamp.h>
 
 #include <QHBoxLayout>
+#include <QPrinter>
 #include <QPushButton>
 #include <QVBoxLayout>
 
@@ -80,21 +81,21 @@ struct LineChart::pqImplementation
     this->LineChartWidget.getTitle().setFont(h1);
     this->LineChartWidget.getTitle().setColor(Qt::black);
     
-    this->LineChartWidget.getXAxis()->setGridColor(Qt::lightGray);
-    this->LineChartWidget.getXAxis()->setAxisColor(Qt::darkGray);
-    this->LineChartWidget.getXAxis()->setTickLabelColor(Qt::darkGray);
-    this->LineChartWidget.getXAxis()->setTickLabelFont(italic);
+    this->LineChartWidget.getXAxis().setGridColor(Qt::lightGray);
+    this->LineChartWidget.getXAxis().setAxisColor(Qt::darkGray);
+    this->LineChartWidget.getXAxis().setTickLabelColor(Qt::darkGray);
+    this->LineChartWidget.getXAxis().setTickLabelFont(italic);
 
-    this->LineChartWidget.getXAxis()->getLabel().setText("Time");
-    this->LineChartWidget.getXAxis()->getLabel().setFont(bold);
+    this->LineChartWidget.getXAxis().getLabel().setText("Time");
+    this->LineChartWidget.getXAxis().getLabel().setFont(bold);
     
-    this->LineChartWidget.getYAxis()->setGridColor(Qt::lightGray);
-    this->LineChartWidget.getYAxis()->setAxisColor(Qt::darkGray);
-    this->LineChartWidget.getYAxis()->setTickLabelColor(Qt::darkGray);
-    this->LineChartWidget.getYAxis()->setTickLabelFont(italic);
+    this->LineChartWidget.getYAxis().setGridColor(Qt::lightGray);
+    this->LineChartWidget.getYAxis().setAxisColor(Qt::darkGray);
+    this->LineChartWidget.getYAxis().setTickLabelColor(Qt::darkGray);
+    this->LineChartWidget.getYAxis().setTickLabelFont(italic);
 
-    this->LineChartWidget.getYAxis()->getLabel().setFont(bold);
-    this->LineChartWidget.getYAxis()->getLabel().setOrientation(pqChartLabel::VERTICAL);
+    this->LineChartWidget.getYAxis().getLabel().setFont(bold);
+    this->LineChartWidget.getYAxis().getLabel().setOrientation(pqChartLabel::VERTICAL);
     
     this->updateChart();
   }
@@ -204,7 +205,7 @@ struct LineChart::pqImplementation
     plot->setCoordinates(coordinates);
     plot->setPen(Pen);
     
-    this->LineChartWidget.getLineChart()->addData(plot);
+    this->LineChartWidget.getLineChart().addData(plot);
     this->LineChartWidget.getLegend().addEntry(Pen, new pqChartLabel(QString("Element %1").arg(ElementID)));
   }
   
@@ -223,20 +224,20 @@ struct LineChart::pqImplementation
     plot->setCoordinates(coordinates);
     plot->setPen(Pen);
     
-    this->LineChartWidget.getLineChart()->addData(plot);
+    this->LineChartWidget.getLineChart().addData(plot);
     this->LineChartWidget.getLegend().addEntry(Pen, new pqChartLabel(Plot[0]));
   }
   
   void updateChart()
   {
     // Set the default (no data) appearance of the chart ...
-    this->LineChartWidget.getLineChart()->clearData();
+    this->LineChartWidget.getLineChart().clearData();
     this->LineChartWidget.getTitle().setText("Time Plot (no data)");
-    this->LineChartWidget.getXAxis()->setVisible(true);
-    this->LineChartWidget.getXAxis()->setValueRange(0.0, 100.0);
-    this->LineChartWidget.getYAxis()->getLabel().setText("Value");
-    this->LineChartWidget.getYAxis()->setVisible(true);
-    this->LineChartWidget.getYAxis()->setValueRange(0.0, 100.0);
+    this->LineChartWidget.getXAxis().setVisible(true);
+    this->LineChartWidget.getXAxis().setValueRange(0.0, 100.0);
+    this->LineChartWidget.getYAxis().getLabel().setText("Value");
+    this->LineChartWidget.getYAxis().setVisible(true);
+    this->LineChartWidget.getYAxis().setValueRange(0.0, 100.0);
     this->LineChartWidget.getLegend().clear();
     
     if(CSVPlots.size())
@@ -288,9 +289,9 @@ struct LineChart::pqImplementation
     else
       this->LineChartWidget.getTitle().setText(this->ExodusVariableName + " vs. Time");
       
-    this->LineChartWidget.getXAxis()->setVisible(true);
-    this->LineChartWidget.getYAxis()->setVisible(true);
-    this->LineChartWidget.getYAxis()->getLabel().setText(this->ExodusVariableName);
+    this->LineChartWidget.getXAxis().setVisible(true);
+    this->LineChartWidget.getYAxis().setVisible(true);
+    this->LineChartWidget.getYAxis().getLabel().setText(this->ExodusVariableName);
 
     unsigned long count = 0;
     for(vtkstd::vector<unsigned long>::reverse_iterator element = this->ExodusElements.rbegin(); element != this->ExodusElements.rend(); ++element, ++count)
@@ -323,10 +324,14 @@ LineChart::LineChart(QWidget *p) :
   QPushButton* const clear_button = new QPushButton("Clear .csv");
   this->connect(clear_button, SIGNAL(clicked()), this, SLOT(clearCSV()));
 
+  QPushButton* const save_button = new QPushButton("Save .pdf");
+  this->connect(save_button, SIGNAL(clicked()), this, SLOT(onSavePDF()));
+
   QHBoxLayout* const hbox = new QHBoxLayout();
   hbox->setMargin(0);
   hbox->addWidget(csv_button);
   hbox->addWidget(clear_button);
+  hbox->addWidget(save_button);
 
   QVBoxLayout* const vbox = new QVBoxLayout();
   vbox->setMargin(0);
@@ -410,8 +415,27 @@ void LineChart::onLoadCSV(const QStringList& files)
     }
 }
 
+void LineChart::onSavePDF()
+{
+  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save .pdf File:"), this, "fileSavePDFDialog")
+    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(onSavePDF(const QStringList&)));
+    
+  file_dialog->show();
+}
+
+void LineChart::onSavePDF(const QStringList& files)
+{
+  for(int i = 0; i != files.size(); ++i)
+    {
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(files[i]);
+    
+    this->Implementation->LineChartWidget.printChart(printer);
+    }
+}
+
 void LineChart::onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*)
 {
   this->Implementation->onInputChanged();
 }
-

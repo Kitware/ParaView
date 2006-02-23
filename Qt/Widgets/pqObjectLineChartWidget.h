@@ -43,6 +43,11 @@ public slots:
   void addElements(vtkUnstructuredGrid* Elements);
   /// Call this to set the collection of element IDs
   void setElements(vtkUnstructuredGrid* Elements);
+
+  /// Prompts the user to save the chart to a PDF file
+  void onSavePDF();
+  /// Saves the chart to one-to-many PDF files
+  void onSavePDF(const QStringList& files);
   
 private slots:
   void onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*);
