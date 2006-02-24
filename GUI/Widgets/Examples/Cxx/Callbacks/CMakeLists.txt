@@ -77,10 +77,14 @@ TARGET_LINK_LIBRARIES(${EXE_NAME} ${LIB_NAME})
 # some useful scripts that can be used to setup various environment variables
 # and launch the executable properly.
 
-IF(NOT KWWidgets_SOURCE_DIR)
+IF(NOT KWWidgets_SOURCE_DIR OR BUILD_TESTING)
   INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsPathsMacros.cmake")
-  KWWidgets_GENERATE_DEFAULT_SETUP_PATHS("${CMAKE_CURRENT_BINARY_DIR}")
-ENDIF(NOT KWWidgets_SOURCE_DIR)
+  KWWidgets_GENERATE_SETUP_PATHS_SCRIPTS("${CMAKE_CURRENT_BINARY_DIR}")
+  SET(LAUNCHER_EXE_NAME "${EXE_NAME}Launcher")
+  KWWidgets_GENERATE_SETUP_PATHS_LAUNCHER(
+    "${CMAKE_CURRENT_BINARY_DIR}" "${LAUNCHER_EXE_NAME}" 
+    "${EXECUTABLE_OUTPUT_PATH}" "${EXE_NAME}")
+ENDIF(NOT KWWidgets_SOURCE_DIR OR BUILD_TESTING)
 
 # If needed, copy the Tcl/Tk support files required at run-time 
 # to initialize Tcl/Tk. This is only triggered if VTK was built
@@ -111,14 +115,14 @@ ENDIF(BUILD_EXAMPLES)
 # your application supports that feature too.
 
 IF(BUILD_TESTING)
-  ADD_TEST(Test${EXE_NAME} ${EXECUTABLE_OUTPUT_PATH}/${EXE_NAME} --test)
+  ADD_TEST(
+    Test${EXE_NAME} ${EXECUTABLE_OUTPUT_PATH}/${LAUNCHER_EXE_NAME} --test)
   IF(KWWidgets_SOURCE_DIR)
     INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsTestingMacros.cmake")
     KWWidgets_ADD_OUT_OF_SOURCE_TEST(
       Test${EXE_NAME}OutOfSource
       ${PROJECT_NAME}
       "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}OutOfSource"
-      ${EXE_NAME} --test)
+      ${LAUNCHER_EXE_NAME} --test)
   ENDIF(KWWidgets_SOURCE_DIR)
 ENDIF(BUILD_TESTING)
-

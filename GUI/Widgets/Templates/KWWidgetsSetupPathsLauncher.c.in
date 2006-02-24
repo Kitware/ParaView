@@ -1,0 +1,144 @@
+/*=========================================================================
+
+  Module:    KWWidgetsSetupPathsLauncher.c.in
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+#include <limits.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <stdio.h>
+
+#if defined(_WIN32) && !defined(__CYGWIN__)
+#include <io.h>
+#include <windows.h>
+#include <process.h>
+#else
+#include <unistd.h>
+#endif
+
+#if defined(PATH_MAX)
+#define MAXPATH PATH_MAX
+#elif defined(MAXPATHLEN)
+#define MAXPATH MAXPATHLEN
+#else
+#define MAXPATH 16384
+#endif
+
+int main(int argc, char** argv)
+{
+  char path_env[MAXPATH];
+  const char *old_path_env;
+
+  char ld_path_env[MAXPATH];
+  const char *old_ld_path_env;
+
+  char tcllibpath_env[MAXPATH];
+  const char *old_tcllibpath_env;
+
+  char pythonpath_env[MAXPATH];
+  const char *old_pythonpath_env;
+
+  char message[MAXPATH];
+  char **arg;
+
+#if defined(_WIN32) && !defined(__CYGWIN__)
+  DWORD original, length;
+#endif
+
+  /* PATH */
+
+  strcpy(path_env, 
+         "PATH=@KWWidgets_PATH_ENV@");
+  old_path_env = getenv("PATH");
+  if(old_path_env)
+    {
+    strcat(path_env, "@KWWidgets_PATH_SEP@");
+    strcat(path_env, old_path_env);
+    }
+  putenv(path_env);
+
+  /* LD_LIBRARY_PATH and such */
+
+  strcpy(ld_path_env, 
+         "@SHARED_LIBRARY_PATH_VAR_NAME@=@KWWidgets_SHARED_LIBRARY_PATH_ENV@");
+  old_ld_path_env = getenv("@SHARED_LIBRARY_PATH_VAR_NAME@");
+  if(old_ld_path_env)
+    {
+    strcat(ld_path_env, "@KWWidgets_SHARED_LIBRARY_PATH_SEP@");
+    strcat(ld_path_env, old_ld_path_env);
+    }
+  putenv(ld_path_env);
+
+  /* TCLLIBPATH */
+
+  strcpy(tcllibpath_env, 
+         "TCLLIBPATH=@KWWidgets_TCLLIBPATH_ENV_ESCAPED@");
+  old_tcllibpath_env = getenv("TCLLIBPATH");
+  if(old_tcllibpath_env)
+    {
+    strcat(tcllibpath_env, " ");
+    strcat(tcllibpath_env, old_tcllibpath_env);
+    }
+  putenv(tcllibpath_env);
+
+  /* PYTHONPATH */
+
+  strcpy(pythonpath_env, 
+         "PYTHONPATH=@KWWidgets_PYTHONPATH_ENV@");
+  old_pythonpath_env = getenv("PYTHONPATH");
+  if(old_pythonpath_env)
+    {
+    strcat(pythonpath_env, "@KWWidgets_PYTHONPATH_SEP@");
+    strcat(pythonpath_env, old_pythonpath_env);
+    }
+  putenv(pythonpath_env);
+
+  /* Replace this process with the real executable.  */
+
+  argv[0] = "@EXECUTABLE@";
+#if defined(_MSC_VER)
+  _execv(argv[0], argv);
+#else
+  execv(argv[0], argv);
+#endif
+
+  /* Report why execution failed.  */
+  
+#if defined(_WIN32) && !defined(__CYGWIN__)
+  original = GetLastError();
+  length = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+                         FORMAT_MESSAGE_IGNORE_INSERTS, 0, original,
+                         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                         message, MAXPATH, 0);
+  if(length < 1 || length > MAXPATH)
+    {
+    _snprintf(message, MAXPATH,
+              "Error 0x%X (FormatMessage failed with error 0x%X)",
+              original, GetLastError());
+    }
+#else
+  strcpy(message, strerror(errno));
+#endif
+
+  arg = argv;
+  fprintf(stderr, "Error running");
+  for(; *arg; ++arg)
+    {
+    fprintf(stderr, " \"%s\"", *arg);
+    }
+  fprintf(stderr, ": %s\n", message);
+
+  (void)argc;
+
+  return 1;
+}
