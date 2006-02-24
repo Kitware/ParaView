@@ -46,6 +46,8 @@ SET(pqChart_SRCS
   pqLineChartWidget.h
   pqLinePlot.cxx
   pqLinePlot.h
+  pqMarkerPen.cxx
+  pqMarkerPen.h
   pqPiecewiseLine.cxx
   pqPiecewiseLine.h
 )

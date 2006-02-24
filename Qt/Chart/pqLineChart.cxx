@@ -8,10 +8,11 @@
  * \date   August 1, 2005
  */
 
-#include "pqLineChart.h"
-#include "pqLinePlot.h"
 #include "pqChartAxis.h"
 #include "pqChartCoordinate.h"
+#include "pqLineChart.h"
+#include "pqLinePlot.h"
+#include "pqMarkerPen.h"
 
 #include <QHelpEvent>
 #include <QPainter>
@@ -241,16 +242,20 @@ void pqLineChart::drawChart(QPainter *p, const QRect &area)
     pqLineChartItem *item = *iter;
     if(item && item->Plot && !item->Array.isEmpty())
       {
-      // Set the drawing pen up for the plot.
-      p->setPen(item->Plot->getPen());
+      // Set the drawing pen up for the plot
+      pqMarkerPen& pen = item->Plot->getPen();
 
       // Draw the line segments.
       if(item->Plot->isPolyLine())
-        p->drawPolyline(item->Array);
+        {
+        pen.drawPolyline(*p, item->Array);
+        }
       else
         {
         for(int i = 1; i < item->Array.size(); i += 2)
-          p->drawLine(item->Array[i - 1], item->Array[i]);
+          {
+          pen.drawLine(*p, item->Array[i - 1], item->Array[i]);
+          }
         }
 
       // TODO: Draw in the user editable points.

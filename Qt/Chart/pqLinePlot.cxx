@@ -9,9 +9,11 @@
  */
 
 #include "pqLinePlot.h"
+#include "pqMarkerPen.h"
 
-pqLinePlot::pqLinePlot(QObject *p)
-  : QObject(p), Pen(Qt::black)
+pqLinePlot::pqLinePlot(QObject *p) :
+  QObject(p),
+  Pen(new pqNullMarkerPen(QPen(Qt::black)))
 {
   this->Modified = true;
 }
@@ -25,9 +27,11 @@ void pqLinePlot::setModified(bool modified)
     }
 }
 
-void pqLinePlot::setPen(const QPen& pen)
+void pqLinePlot::setPen(pqMarkerPen* pen)
 {
+  if(!pen)
+    return;
+    
   this->Pen = pen;
   emit this->plotModified(this);
 }
-

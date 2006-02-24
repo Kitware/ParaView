@@ -12,11 +12,12 @@
 #define _pqLinePlot_h
 
 #include "pqChartExport.h"
+
 #include <QObject>
-#include <QPen>
 
 class pqChartCoordinate;
 class pqChartValue;
+class pqMarkerPen;
 class QHelpEvent;
 
 /// \class pqLinePlot
@@ -113,11 +114,11 @@ public:
   bool isModified() const {return this->Modified;}
   //@}
 
-  /// Sets the pen used to draw the line plot.
-  void setPen(const QPen& pen);
+  /// Sets the pen used to draw the line plot (the plot takes ownership of the pen object)
+  void setPen(pqMarkerPen* Pen);
   
   /// Returns the pen used to draw the line plot.
-  const QPen getPen() const {return this->Pen;}
+  pqMarkerPen& getPen() {return *this->Pen;}
 
 signals:
   /// \brief
@@ -130,7 +131,7 @@ signals:
   void plotModified(const pqLinePlot *plot);
 
 private:
-  QPen Pen;      ///< Stores the pen used to plot the line
+  pqMarkerPen* Pen;      ///< Stores the pen used to plot the line
   bool Modified; ///< True if the data has changed.
 };
 

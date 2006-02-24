@@ -18,6 +18,7 @@
 #include <pqLineChart.h>
 #include <pqLineChartWidget.h>
 #include <pqLocalFileDialogModel.h>
+#include <pqMarkerPen.h>
 #include <pqPiecewiseLine.h>
 #include <pqLinearRamp.h>
 
@@ -197,10 +198,10 @@ struct pqObjectLineChartWidget::pqImplementation
       
     pqPiecewiseLine* const plot = new pqPiecewiseLine();
     plot->setCoordinates(coordinates);
-    plot->setPen(Pen);
+    plot->setPen(new pqNullMarkerPen(Pen));
     
     this->LineChartWidget.getLineChart().addData(plot);
-    this->LineChartWidget.getLegend().addEntry(Pen, new pqChartLabel(QString("Element %1").arg(ElementID)));
+    this->LineChartWidget.getLegend().addEntry(new pqNullMarkerPen(Pen), new pqChartLabel(QString("Element %1").arg(ElementID)));
   }
   
   void updateChart()

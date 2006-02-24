@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqChartLabel.h"
 #include "pqChartLegend.h"
+#include "pqMarkerPen.h"
 
 #include <vtkstd/vector>
 
@@ -50,6 +51,9 @@ public:
 
   void clear()
   {
+    for(unsigned int i = 0; i != this->Pens.size(); ++i)
+      delete this->Pens[i];
+  
     for(unsigned int i = 0; i != this->Labels.size(); ++i)
       delete this->Labels[i];
       
@@ -59,7 +63,7 @@ public:
 
   QRect Bounds;
   
-  vtkstd::vector<QPen> Pens;
+  vtkstd::vector<pqMarkerPen*> Pens;
   vtkstd::vector<pqChartLabel*> Labels;
 };
 
@@ -80,7 +84,7 @@ void pqChartLegend::clear()
   emit layoutNeeded();
 }
 
-void pqChartLegend::addEntry(const QPen& pen, pqChartLabel* label)
+void pqChartLegend::addEntry(pqMarkerPen* pen, pqChartLabel* label)
 {
   if(!label)
     return;
@@ -138,16 +142,16 @@ void pqChartLegend::draw(QPainter& painter, const QRect& area)
   
   for(unsigned int i = 0; i != this->Implementation->Labels.size(); ++i)
     {
-    painter.setPen(this->Implementation->Pens[i]);
     painter.setRenderHint(QPainter::Antialiasing, true);
     
     const QRect label_bounds = this->Implementation->Labels[i]->getBounds();
-    
-    painter.drawLine(
+
+    this->Implementation->Pens[i]->drawLine(
+      painter,
       this->Implementation->Bounds.left() + padding,
-      label_bounds.top(),
+      label_bounds.bottom(),
       this->Implementation->Bounds.left() + line_width,
-      label_bounds.bottom());
+      label_bounds.top());
     }
   
   for(unsigned int i = 0; i != this->Implementation->Labels.size(); ++i)

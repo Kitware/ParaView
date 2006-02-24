@@ -39,8 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QRect>
 
 class QPainter;
-class QPen;
 class pqChartLabel;
+class pqMarkerPen;
 
 /// Encapsulates a legend "box" that identifies data displayed in a chart (e.g. individual line plots)
 class QTCHART_EXPORT pqChartLegend :
@@ -54,8 +54,8 @@ public:
 
   /// Removes all entries from the legend
   void clear();
-  /// Adds a line-plot entry to the legend (pqChartLegend takes ownership of the label)
-  void addEntry(const QPen& pen, pqChartLabel* label);
+  /// Adds a line-plot entry to the legend (pqChartLegend takes ownership of the pen and label objects)
+  void addEntry(pqMarkerPen* pen, pqChartLabel* label);
 
   /// Returns the legend's preferred size, based on font and orientation
   const QRect getSizeRequest();

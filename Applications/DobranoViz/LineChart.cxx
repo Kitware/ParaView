@@ -21,6 +21,7 @@
 #include <pqLineChart.h>
 #include <pqLineChartWidget.h>
 #include <pqLinearRamp.h>
+#include <pqMarkerPen.h>
 
 #include <QHBoxLayout>
 #include <QPrinter>
@@ -203,10 +204,10 @@ struct LineChart::pqImplementation
     
     ImageLinePlot* const plot = new ImageLinePlot(QPixmap());
     plot->setCoordinates(coordinates);
-    plot->setPen(Pen);
+    plot->setPen(new pqCircleMarkerPen(Pen, QSize(4, 4), QPen(Pen.color(), 0.5), QBrush(Qt::white)));
     
     this->LineChartWidget.getLineChart().addData(plot);
-    this->LineChartWidget.getLegend().addEntry(Pen, new pqChartLabel(QString("Element %1").arg(ElementID)));
+    this->LineChartWidget.getLegend().addEntry(new pqCircleMarkerPen(Pen, QSize(4, 4), QPen(Pen.color(), 0.5), QBrush(Qt::white)), new pqChartLabel(QString("Element %1").arg(ElementID)));
   }
   
   void addCSVPlot(QStringList& Plot, const QPen& Pen)
@@ -219,13 +220,17 @@ struct LineChart::pqImplementation
       {
       coordinates.pushBack(pqChartCoordinate(static_cast<double>(i - 2), Plot[i].toDouble()));
       }
-      
-    ImageLinePlot* const plot = new ImageLinePlot(QPixmap(Plot[1]));
+
+    QPixmap image(Plot[1]);
+    if(image.width() > 300 || image.height() > 300)
+      image = image.scaled(QSize(300, 300), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+    ImageLinePlot* const plot = new ImageLinePlot(image);
     plot->setCoordinates(coordinates);
-    plot->setPen(Pen);
+    plot->setPen(new pqSquareMarkerPen(Pen, QSize(4, 4), QPen(Pen.color(), 0.5), QBrush(Qt::white)));
     
     this->LineChartWidget.getLineChart().addData(plot);
-    this->LineChartWidget.getLegend().addEntry(Pen, new pqChartLabel(Plot[0]));
+    this->LineChartWidget.getLegend().addEntry(new pqSquareMarkerPen(Pen, QSize(4, 4), QPen(Pen.color(), 0.5), QBrush(Qt::white)), new pqChartLabel(Plot[0]));
   }
   
   void updateChart()
@@ -298,7 +303,7 @@ struct LineChart::pqImplementation
       {
       const double hue = static_cast<double>(count) / static_cast<double>(ExodusElements.size());
       const QColor color = QColor::fromHsvF(hue, 1.0, 1.0);
-      addExodusPlot(*reader, *element, QPen(color, 1.5));
+      addExodusPlot(*reader, *element, QPen(color, 1.0));
       }
   }
   
