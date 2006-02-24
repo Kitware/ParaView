@@ -70,7 +70,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.50");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.51");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -1761,7 +1761,8 @@ void vtkKWSelectionFrameLayoutManager::UpdateSelectionLists()
 
 //----------------------------------------------------------------------------
 int vtkKWSelectionFrameLayoutManager::AppendWidgetsToImageData(
-  vtkImageData *image, int selection_only, int direct)
+  vtkImageData *image, int selection_only, int direct, 
+  int ForceUpdateOnScreenRendering)
 {
   int nb_slots = this->Resolution[0] * this->Resolution[1];
 
@@ -1810,7 +1811,10 @@ int vtkKWSelectionFrameLayoutManager::AppendWidgetsToImageData(
           int offscreen = rwwidget->GetOffScreenRendering();
           if (direct)
             {
-            w2i_filters[idx]->ShouldRerenderOff();
+		    if (!ForceUpdateOnScreenRendering) // true by default.
+			  {
+              w2i_filters[idx]->ShouldRerenderOff();
+			  }
             }
           else
             {
@@ -1887,9 +1891,13 @@ int vtkKWSelectionFrameLayoutManager::AppendWidgetsToImageData(
 
 //----------------------------------------------------------------------------
 int vtkKWSelectionFrameLayoutManager::AppendAllWidgetsToImageData(
-  vtkImageData *image)
+  vtkImageData *image, int OnScreenRendering)
 {
-  return this->AppendWidgetsToImageData(image, 0, 0);
+  if (OnScreenRendering)
+    {
+    return this->AppendWidgetsToImageData(image, 0, 1, OnScreenRendering);
+	}
+  return this->AppendWidgetsToImageData(image, 0, 0, OnScreenRendering);
 }
 
 //----------------------------------------------------------------------------
