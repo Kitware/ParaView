@@ -44,10 +44,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <qtimer.h>
 #include <qdebug.h>
 #include <QBasicTimer>
+#include <QTooltip>
 
 void pqImageTip::showTip(const QPixmap& image, const QPoint& pos)
 {
   static pqImageTip* instance = 0;
+  
+  if(instance && instance->pixmap() && instance->pixmap()->serialNumber() == image.serialNumber())
+    return;
+  
+  QToolTip::showText(QPoint(), "");
+  
   delete instance;
   instance = new pqImageTip(image, 0);
   instance->move(pos + QPoint(2, 24));
