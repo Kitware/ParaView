@@ -52,7 +52,7 @@ TARGET_LINK_LIBRARIES(${EXE_NAME} ${KWWidgets_LIBRARIES})
 
 IF(NOT KWWidgets_SOURCE_DIR)
   INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsPathsMacros.cmake")
-  KWWidgets_GENERATE_DEFAULT_SETUP_PATHS("${CMAKE_CURRENT_BINARY_DIR}")
+  KWWidgets_GENERATE_SETUP_PATHS_SCRIPTS("${CMAKE_CURRENT_BINARY_DIR}")
 ENDIF(NOT KWWidgets_SOURCE_DIR)
 
 # If needed, copy the Tcl/Tk support files required at run-time 
