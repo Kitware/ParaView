@@ -191,12 +191,13 @@ public:
   // Description:
   // Append widgets to image data.
   // The 'Fast' version of each method does not set the render widget to 
-  // Offscreen rendering and re-render them, the backbuffer of the
-  // render widget is taken as-is (this is useful for lower quality 
-  // screenshot or thumbnails).
+  // Offscreen rendering (unless OnScreenRendering is 1) 
+  // and re-render them, the backbuffer of the render widget is taken as-is 
+  // (this is useful for lower quality screenshot or thumbnails). 
   // Return 1 on success, 0 otherwise
   // GetVisibleRenderWidget() need to be implemented accordingly.
-  virtual int AppendAllWidgetsToImageData(vtkImageData *image);
+  virtual int AppendAllWidgetsToImageData(vtkImageData *image, 
+	                                    int OnScreenRendering = 0);
   virtual int AppendAllWidgetsToImageDataFast(vtkImageData *image);
   virtual int AppendSelectedWidgetToImageData(vtkImageData *image);
   virtual int AppendSelectedWidgetToImageDataFast(vtkImageData *image);
@@ -301,10 +302,13 @@ protected:
   // otherwise all of them. If direct is true, the renderwidgets are not
   // set to Offscreen rendering and re-rendered, the backbuffer of the
   // window is taken as-is (this is useful for lower quality screenshot or
-  // thumbnails).
+  // thumbnails). 
+  // If direct is true and ForceUpdateOnScreenRendering is 1, the render
+  // widgets are forcibly re-rendererd prior to grabbing the screenshot. 
   // Return 1 on success, 0 otherwise
   virtual int AppendWidgetsToImageData(
-    vtkImageData *image,int selection_only, int direct = 0);
+    vtkImageData *image,int selection_only, int direct = 0, 
+	int ForceUpdateOnScreenRendering = 0);
 
   // Description:
   // Called when the number of widgets has changed
