@@ -70,7 +70,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.51");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.52");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -1811,10 +1811,10 @@ int vtkKWSelectionFrameLayoutManager::AppendWidgetsToImageData(
           int offscreen = rwwidget->GetOffScreenRendering();
           if (direct)
             {
-		    if (!ForceUpdateOnScreenRendering) // true by default.
-			  {
+            if (!ForceUpdateOnScreenRendering) // true by default.
+              {
               w2i_filters[idx]->ShouldRerenderOff();
-			  }
+              }
             }
           else
             {
@@ -1896,7 +1896,7 @@ int vtkKWSelectionFrameLayoutManager::AppendAllWidgetsToImageData(
   if (OnScreenRendering)
     {
     return this->AppendWidgetsToImageData(image, 0, 1, OnScreenRendering);
-	}
+    }
   return this->AppendWidgetsToImageData(image, 0, 0, OnScreenRendering);
 }
 
