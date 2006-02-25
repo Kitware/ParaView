@@ -64,9 +64,14 @@ MACRO(KWWidgets_ADD_TEST_FROM_TCL_EXAMPLE
     KWWidgets_GENERATE_SETUP_PATHS_LAUNCHER(
       "${CMAKE_CURRENT_BINARY_DIR}" "${LAUNCHER_EXE_NAME}" 
       "" "${TCL_TCLSH}")
-    
+
+    # Seems to be needed on WIN32 to avoid problems with space in paths
+    IF(WIN32)
+      SET(q "\"")
+    ENDIF(WIN32)
+
     KWWidgets_ADD_TEST_FROM_EXAMPLE(
-      ${test_name} ${LAUNCHER_EXE_NAME} "\"${script_name}\"" "--test")
+      ${test_name} ${LAUNCHER_EXE_NAME} "${q}${script_name}${q}" "--test")
 
   ENDIF(KWWidgets_BUILD_SHARED_LIBS AND VTK_WRAP_TCL AND TCL_TCLSH)
 
@@ -89,8 +94,13 @@ MACRO(KWWidgets_ADD_TEST_FROM_PYTHON_EXAMPLE
       "${CMAKE_CURRENT_BINARY_DIR}" "${LAUNCHER_EXE_NAME}" 
       "" "${PYTHON_EXECUTABLE}")
 
+    # Seems to be needed on WIN32 to avoid problems with space in paths
+    IF(WIN32)
+      SET(q "\"")
+    ENDIF(WIN32)
+
     KWWidgets_ADD_TEST_FROM_EXAMPLE(
-      ${test_name} ${LAUNCHER_EXE_NAME} "\"${script_name}\"" "--test")
+      ${test_name} ${LAUNCHER_EXE_NAME} "${q}${script_name}${q}" "--test")
 
   ENDIF(KWWidgets_BUILD_SHARED_LIBS AND VTK_WRAP_PYTHON AND PYTHON_EXECUTABLE)
 
