@@ -10,6 +10,7 @@ IF(NOT KWWidgets_INSTALL_NO_DEVELOPMENT)
     KWWidgetsSetupPaths.cmake.in
     KWWidgetsSetupPaths.csh.in
     KWWidgetsSetupPaths.sh.in
+    KWWidgetsSetupPathsLauncher.c.in
     vtkKWWidgetSetSubclass.cxx.in
     vtkKWWidgetSetSubclass.h.in
     vtkKWWidgetsPaths.h.in
