@@ -27,8 +27,15 @@ ENDMACRO(KWWidgets_GENERATE_SETUP_PATHS_SCRIPTS)
 
 # ---------------------------------------------------------------------------
 # KWWidgets_GENERATE_SETUP_PATHS_LAUNCHER
-# Generate a very lightweight C executable that sets up the appropriate
-# environment variables required to run a given executable, and launch it.
+# Generate a lightweight C launcher for a *specific* executable.
+# The launcher sets up all the environments variables (PATH, TCLLIBPATH,
+# LD_LIBRARY_PATH, etc.) required by this executable and some known external 
+# third-party dependencie like VTK, ITK, SOV, etc., before launching the
+# executable itself. Note that the path to the executable to launch is 
+# hard-coded in the launcher: do not move the target exe around, or copy the
+# launcher to your installation tree, if any (ultimately, all the DLLs needed
+# by a project should/could be stored together in the installation tree, and a
+# launcher should not be needed in that case).
 # This macro also create the corresponding executable target.
 # 'output_path': location (dir) where to store the generated launcher C source
 # 'basename': basename for both the generated C source and launcher exe
