@@ -2,8 +2,8 @@
 # KWWidgets_GENERATE_SETUP_PATHS_SCRIPTS
 # Generate a set of small setup scripts (.bat, .sh, .csh) that can be sourced
 # to setup the environment variables required to run an executable built
-# against the current projector and all known third-party packages (VTK, ITK, 
-# SOViewer, etc.)
+# against the current project and some known third-party dependencies (VTK, 
+# ITK, SOViewer, KWWidgets, etc.)
 # 'output_path': location (dir) where to store the generated scripts
 # This macro can take an optional parameter 'basename':
 # 'basename': basename for generated scripts (extension of originals are kept)
@@ -29,9 +29,9 @@ ENDMACRO(KWWidgets_GENERATE_SETUP_PATHS_SCRIPTS)
 # KWWidgets_GENERATE_SETUP_PATHS_LAUNCHER
 # Generate a lightweight C launcher for a *specific* executable.
 # The launcher sets up all the environments variables (PATH, TCLLIBPATH,
-# LD_LIBRARY_PATH, etc.) required by this executable and some known external 
-# third-party dependencie like VTK, ITK, SOV, etc., before launching the
-# executable itself. Note that the path to the executable to launch is 
+# LD_LIBRARY_PATH, etc.) required by this executable and some known 
+# third-party dependencies (VTK, ITK, SOV, KWWidgets, etc.), before launching
+# the executable itself. Note that the path to the executable to launch is 
 # hard-coded in the launcher: do not move the target exe around, or copy the
 # launcher to your installation tree, if any (ultimately, all the DLLs needed
 # by a project should/could be stored together in the installation tree, and a
