@@ -583,10 +583,16 @@ SET(NEED_TO_BUILD_EXAMPLES ${BUILD_EXAMPLES})
 # --------------------------------------------------------------------------
 # Testing (requires some of the examples)
 
-IF(BUILD_TESTING AND NOT DISABLE_KWWIDGETS_TESTING)
+IF(BUILD_TESTING AND NOT DISABLE_KWWidgets_TESTING)
   SET(NEED_TO_BUILD_EXAMPLES 1)
+  OPTION(KWWidgets_TEST_OUT_OF_SOURCE "Perform existing tests as out-of-source tests. This checks that external projects can be built against a KWWidgets build tree." OFF)
+  MARK_AS_ADVANCED(KWWidgets_TEST_OUT_OF_SOURCE)
+  IF(KWWidgets_TEST_OUT_OF_SOURCE)
+    OPTION(KWWidgets_TEST_INSTALLATION "Perform existing out-of-source tests against an installed KWWidgets library as well. This checks that external projects can be built against a KWWidgets installation tree. Make sure CMAKE_INSTALL_PREFIX is set and KWWidgets has been installed properly before running the tests." OFF)
+    MARK_AS_ADVANCED(KWWidgets_TEST_INSTALLATION)
+  ENDIF(KWWidgets_TEST_OUT_OF_SOURCE)
   SUBDIRS(Testing)
-ENDIF(BUILD_TESTING AND NOT DISABLE_KWWIDGETS_TESTING)
+ENDIF(BUILD_TESTING AND NOT DISABLE_KWWidgets_TESTING)
 
 IF(NEED_TO_BUILD_EXAMPLES)
   SUBDIRS(Examples)

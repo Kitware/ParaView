@@ -36,6 +36,8 @@
 
 int main(int argc, char** argv)
 {
+  char exe_path[MAXPATH];
+
   char path_env[MAXPATH];
   const char *old_path_env;
 
@@ -53,6 +55,11 @@ int main(int argc, char** argv)
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
   DWORD original, length;
+  size_t exe_path_len;
+  char full_exe_path[MAXPATH];
+  char short_exe_path[MAXPATH] = "";
+#else
+  char real_exe_path[MAXPATH];
 #endif
 
   /* PATH */
@@ -105,10 +112,33 @@ int main(int argc, char** argv)
 
   /* Replace this process with the real executable.  */
 
-  argv[0] = "@EXECUTABLE@";
+  strcpy(exe_path, 
+         "@EXECUTABLE@");
+
+#if defined(_WIN32) 
+  exe_path_len = strlen(exe_path);
+  if (exe_path_len < 4 || (strcmp(exe_path + exe_path_len - 4, ".exe") && 
+                           strcmp(exe_path + exe_path_len - 4, ".EXE") &&
+                           strcmp(exe_path + exe_path_len - 4, ".com") &&
+                           strcmp(exe_path + exe_path_len - 4, ".COM")))
+    {
+    strcat(exe_path, ".exe");
+    }
+#endif
+  
 #if defined(_MSC_VER)
-  _execv(argv[0], argv);
+  /* If the exe_path contains space, args gets mixed up on the receiving end
+     of the _execv: "c:/my path/foo.exe" "--text" ends up as 3 arguments in
+     the launched executable: "c:/my path/foo.exe" "path/foo.exe" "--text" */
+  if (GetFullPathName(exe_path, MAXPATH, full_exe_path, 0) &&
+      GetShortPathName(full_exe_path, short_exe_path, MAXPATH))
+    {
+    argv[0] = short_exe_path;
+    _execv(argv[0], argv);
+    }
 #else
+  realpath(exe_path, real_exe_path);
+  argv[0] = real_exe_path;
   execv(argv[0], argv);
 #endif
 
