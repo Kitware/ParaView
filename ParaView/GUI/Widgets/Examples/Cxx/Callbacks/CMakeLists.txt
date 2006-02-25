@@ -72,7 +72,6 @@ CONFIGURE_FILE(
 ADD_EXECUTABLE(${EXE_NAME} WIN32 ${EXE_SRCS} ${RES_FILE})
 TARGET_LINK_LIBRARIES(${EXE_NAME} ${LIB_NAME})
 
-# Generate the default setup paths scripts
 # If we are building this example as a standalone external project:
 # - Generate a few small scripts (.bat, .sh, .csh) that can be sourced to set
 # the various environments variables (PATH, TCLLIBPATH, LD_LIBRARY_PATH, etc.) 
@@ -116,18 +115,10 @@ ENDIF(BUILD_EXAMPLES)
 # Register this example as a test. Our executable supports a --test
 # configuration option so that it can be run non-interactively as a test.
 # If you are using this CMakeLists.txt file to create your own application
-# based on KWWidgets, you can most likely omit this section too, unless
-# your application supports that feature too.
+# based on KWWidgets, you should omit this section, unless your application
+# supports that feature too and you checked how the macro is working.
 
 IF(BUILD_TESTING)
-  ADD_TEST(
-    Test${EXE_NAME} ${EXECUTABLE_OUTPUT_PATH}/${LAUNCHER_EXE_NAME} --test)
-  IF(KWWidgets_SOURCE_DIR)
-    INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsTestingMacros.cmake")
-    KWWidgets_ADD_OUT_OF_SOURCE_TEST(
-      Test${EXE_NAME}OutOfSource
-      ${PROJECT_NAME}
-      "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}OutOfSource"
-      ${LAUNCHER_EXE_NAME} --test)
-  ENDIF(KWWidgets_SOURCE_DIR)
+  INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsTestingMacros.cmake")
+  KWWidgets_ADD_TEST_FROM_C_EXAMPLE(Test${EXE_NAME} ${LAUNCHER_EXE_NAME})
 ENDIF(BUILD_TESTING)

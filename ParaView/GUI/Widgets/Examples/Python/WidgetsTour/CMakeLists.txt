@@ -41,15 +41,14 @@ IF(BUILD_EXAMPLES)
     .py ${WIDGETS_SRCS})
 ENDIF(BUILD_EXAMPLES)
 
-# Register this example as a test. Our executable script supports a --test
+# Register this example as a test. Our script supports a --test
 # configuration option so that it can be run non-interactively as a test.
 # If you are using this CMakeLists.txt file to create your own application
-# based on KWWidgets, you can most likely omit this section too, unless
-# your application supports that feature too.
+# based on KWWidgets, you should omit this section, unless your application
+# supports that feature too and you checked how the macro is working.
 
-IF(BUILD_TESTING AND KWWidgets_BUILD_SHARED_LIBS)
-  IF (VTK_WRAP_PYTHON AND PYTHON_EXECUTABLE)
-    ADD_TEST(Test${EXE_NAME}Python 
-      ${PYTHON_EXECUTABLE} "${CMAKE_CURRENT_SOURCE_DIR}/${EXE_NAME}.py" --test)
-  ENDIF (VTK_WRAP_PYTHON AND PYTHON_EXECUTABLE)
-ENDIF(BUILD_TESTING AND KWWidgets_BUILD_SHARED_LIBS)
+IF(BUILD_TESTING)
+  INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsTestingMacros.cmake")
+  KWWidgets_ADD_TEST_FROM_PYTHON_EXAMPLE(Test${EXE_NAME}Python
+    "${CMAKE_CURRENT_SOURCE_DIR}/${EXE_NAME}.py")
+ENDIF(BUILD_TESTING)

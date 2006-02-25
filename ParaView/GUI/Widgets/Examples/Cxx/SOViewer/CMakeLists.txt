@@ -57,15 +57,23 @@ CONFIGURE_FILE(
 ADD_EXECUTABLE(${EXE_NAME} WIN32 ${EXE_SRCS} ${RES_FILE})
 TARGET_LINK_LIBRARIES(${EXE_NAME} ${KWWidgets_LIBRARIES} ${SOV_LIBRARIES})
 
-# Generate the default setup paths scripts
-# If we are building this example as a standalone external project, generate
-# some useful scripts that can be used to setup various environment variables
-# and launch the executable properly.
+# If we are building this example as a standalone external project:
+# - Generate a few small scripts (.bat, .sh, .csh) that can be sourced to set
+# the various environments variables (PATH, TCLLIBPATH, LD_LIBRARY_PATH, etc.) 
+# required by this executable and its known third-party dependencies (VTK, ITK,
+# SOV, KWWidgets, etc.).
+# - Generate a lightweight C launcher for this *specific* executable. This 
+# launcher sets the above environment variables before launching the executable
+# itself. Note that the path to the executable to launch is hard-coded.
 
-IF(NOT KWWidgets_SOURCE_DIR)
+IF(NOT KWWidgets_SOURCE_DIR OR BUILD_TESTING)
   INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsPathsMacros.cmake")
   KWWidgets_GENERATE_SETUP_PATHS_SCRIPTS("${CMAKE_CURRENT_BINARY_DIR}")
-ENDIF(NOT KWWidgets_SOURCE_DIR)
+  SET(LAUNCHER_EXE_NAME "${EXE_NAME}Launcher")
+  KWWidgets_GENERATE_SETUP_PATHS_LAUNCHER(
+    "${CMAKE_CURRENT_BINARY_DIR}" "${LAUNCHER_EXE_NAME}" 
+    "${EXECUTABLE_OUTPUT_PATH}" "${EXE_NAME}")
+ENDIF(NOT KWWidgets_SOURCE_DIR OR BUILD_TESTING)
 
 # If needed, copy the Tcl/Tk support files required at run-time 
 # to initialize Tcl/Tk. This is only triggered if VTK was built
@@ -92,17 +100,10 @@ ENDIF(BUILD_EXAMPLES)
 # Register this example as a test. Our executable supports a --test
 # configuration option so that it can be run non-interactively as a test.
 # If you are using this CMakeLists.txt file to create your own application
-# based on KWWidgets, you can most likely omit this section too, unless
-# your application supports that feature too.
+# based on KWWidgets, you should omit this section, unless your application
+# supports that feature too and you checked how the macro is working.
 
 IF(BUILD_TESTING)
-  ADD_TEST(Test${EXE_NAME} ${EXECUTABLE_OUTPUT_PATH}/${EXE_NAME} --test)
-  IF(KWWidgets_SOURCE_DIR)
-    INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsTestingMacros.cmake")
-    KWWidgets_ADD_OUT_OF_SOURCE_TEST(
-      Test${EXE_NAME}OutOfSource
-      ${PROJECT_NAME}
-      "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}OutOfSource"
-      ${EXE_NAME} --test)
-  ENDIF(KWWidgets_SOURCE_DIR)
+  INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsTestingMacros.cmake")
+  KWWidgets_ADD_TEST_FROM_C_EXAMPLE(Test${EXE_NAME} ${LAUNCHER_EXE_NAME})
 ENDIF(BUILD_TESTING)
