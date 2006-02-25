@@ -73,9 +73,14 @@ ADD_EXECUTABLE(${EXE_NAME} WIN32 ${EXE_SRCS} ${RES_FILE})
 TARGET_LINK_LIBRARIES(${EXE_NAME} ${LIB_NAME})
 
 # Generate the default setup paths scripts
-# If we are building this example as a standalone external project, generate
-# some useful scripts that can be used to setup various environment variables
-# and launch the executable properly.
+# If we are building this example as a standalone external project:
+# - Generate a few small scripts (.bat, .sh, .csh) that can be sourced to set
+# the various environments variables (PATH, TCLLIBPATH, LD_LIBRARY_PATH, etc.) 
+# required by this executable and its known third-party dependencies (VTK, ITK,
+# SOV, KWWidgets, etc.).
+# - Generate a lightweight C launcher for this *specific* executable. This 
+# launcher sets the above environment variables before launching the executable
+# itself. Note that the path to the executable to launch is hard-coded.
 
 IF(NOT KWWidgets_SOURCE_DIR OR BUILD_TESTING)
   INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsPathsMacros.cmake")
