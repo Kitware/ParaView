@@ -92,7 +92,7 @@ int main(int argc, char** argv)
   /* TCLLIBPATH */
 
   strcpy(tcllibpath_env, 
-         "TCLLIBPATH=@KWWidgets_TCLLIBPATH_ENV_ESCAPED@");
+         "TCLLIBPATH=@KWWidgets_TCLLIBPATH_ENV@");
   old_tcllibpath_env = getenv("TCLLIBPATH");
   if(old_tcllibpath_env)
     {
@@ -117,6 +117,11 @@ int main(int argc, char** argv)
 
   strcpy(exe_path, 
          "@EXECUTABLE@");
+  if(strlen(exe_path) == 0)
+    {
+    argv++;
+    strcpy(exe_path, argv[0]);
+    }
 
 #if defined(_WIN32) 
   exe_path_len = strlen(exe_path);
