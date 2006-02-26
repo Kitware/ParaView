@@ -45,8 +45,7 @@ ENDMACRO(KWWidgets_GENERATE_SETUP_PATHS_SCRIPTS)
 MACRO(KWWidgets_GENERATE_SETUP_PATHS_LAUNCHER
     output_path
     basename
-    exe_dir
-    exe_name)
+    exe_dir exe_name)
 
   KWWidgets_GENERATE_SETUP_PATHS(
     "${output_path}"
@@ -73,9 +72,7 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS
     output_path
     basename
     generate_scripts
-    generate_launcher
-    exe_dir
-    exe_name)
+    generate_launcher exe_dir exe_name)
 
   # VTK
 
@@ -138,9 +135,7 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS
     "${output_path}"
     "${basename}"
     "${generate_scripts}"
-    "${generate_launcher}"
-    "${fixed_exe_dir}"
-    "${exe_name}"
+    "${generate_launcher}" "${fixed_exe_dir}" "${exe_name}"
     "${VTK_LIBRARY_DIRS}"
     "${VTK_RUNTIME_DIRS}"
     "${VTK_TCL_PATHS}"
@@ -174,9 +169,7 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ALL_CONFIGURATION_TYPES
     output_path
     basename
     generate_scripts
-    generate_launcher
-    exe_dir
-    exe_name
+    generate_launcher exe_dir exe_name
     vtk_lib_paths 
     vtk_runtime_paths 
     vtk_tcl_paths 
@@ -192,128 +185,64 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ALL_CONFIGURATION_TYPES
 
   IF(WIN32 AND CMAKE_CONFIGURATION_TYPES)
 
-    # Update all paths with the configuration type
+    # Scripts are generated first, then executable (below)
 
     FOREACH(config ${CMAKE_CONFIGURATION_TYPES})
-
-      # VTK
-
-      SET(vtk_lib_paths2)
-      SET(vtk_runtime_paths2)
-      SET(vtk_tcl_paths2)
-      IF(VTK_CONFIGURATION_TYPES)
-        FOREACH(dir ${vtk_lib_paths})
-          SET(vtk_lib_paths2 ${vtk_lib_paths2} "${dir}/${config}")
-        ENDFOREACH(dir)
-        FOREACH(dir ${vtk_runtime_paths})
-          SET(vtk_runtime_paths2 ${vtk_runtime_paths2} "${dir}/${config}")
-        ENDFOREACH(dir)
-        FOREACH(dir ${vtk_tcl_paths})
-          SET(vtk_tcl_paths2 ${vtk_tcl_paths2} "${dir}/${config}")
-        ENDFOREACH(dir)
-      ELSE(VTK_CONFIGURATION_TYPES)
-        SET(vtk_lib_paths2 ${vtk_lib_paths})
-        SET(vtk_runtime_paths2 ${vtk_runtime_paths})
-        SET(vtk_tcl_paths2 ${vtk_tcl_paths})
-      ENDIF(VTK_CONFIGURATION_TYPES)
-
-      # ITK
-
-      SET(itk_lib_paths2)
-      SET(itk_runtime_paths2)
-      IF(ITK_CONFIGURATION_TYPES)
-        FOREACH(dir ${itk_lib_paths})
-          SET(itk_lib_paths2 ${itk_lib_paths2} "${dir}/${config}")
-        ENDFOREACH(dir)
-        FOREACH(dir ${itk_runtime_paths})
-          SET(itk_runtime_paths2 ${itk_runtime_paths2} "${dir}/${config}")
-        ENDFOREACH(dir)
-      ELSE(ITK_CONFIGURATION_TYPES)
-        SET(itk_lib_paths2 ${itk_lib_paths})
-        SET(itk_runtime_paths2 ${itk_runtime_paths})
-      ENDIF(ITK_CONFIGURATION_TYPES)
-
-      # SOV
-
-      SET(sov_lib_paths2)
-      SET(sov_runtime_paths2)
-      IF(SOV_CONFIGURATION_TYPES)
-        FOREACH(dir ${sov_lib_paths})
-          SET(sov_lib_paths2 ${sov_lib_paths2} "${dir}/${config}")
-        ENDFOREACH(dir)
-        FOREACH(dir ${sov_runtime_paths})
-          SET(sov_runtime_paths2 ${sov_runtime_paths2} "${dir}/${config}")
-        ENDFOREACH(dir)
-      ELSE(SOV_CONFIGURATION_TYPES)
-        SET(sov_lib_paths2 ${sov_lib_paths})
-        SET(sov_runtime_paths2 ${sov_runtime_paths})
-      ENDIF(SOV_CONFIGURATION_TYPES)
-
-      # KWWidgets
-
-      SET(kwwidgets_lib_paths2)
-      SET(kwwidgets_runtime_paths2)
-      SET(kwwidgets_tcl_paths2)
-      IF(KWWidgets_CONFIGURATION_TYPES)
-        FOREACH(dir ${kwwidgets_lib_paths})
-          SET(kwwidgets_lib_paths2 
-            ${kwwidgets_lib_paths2} "${dir}/${config}")
-        ENDFOREACH(dir)
-        FOREACH(dir ${kwwidgets_runtime_paths})
-          SET(kwwidgets_runtime_paths2 
-            ${kwwidgets_runtime_paths2} "${dir}/${config}")
-        ENDFOREACH(dir)
-        FOREACH(dir ${kwwidgets_tcl_paths})
-          SET(kwwidgets_tcl_paths2 
-            ${kwwidgets_tcl_paths2} "${dir}/${config}")
-        ENDFOREACH(dir)
-      ELSE(KWWidgets_CONFIGURATION_TYPES)
-        SET(kwwidgets_lib_paths2 ${kwwidgets_lib_paths})
-        SET(kwwidgets_runtime_paths2 ${kwwidgets_runtime_paths})
-        SET(kwwidgets_tcl_paths2 ${kwwidgets_tcl_paths})
-      ENDIF(KWWidgets_CONFIGURATION_TYPES)
-
-      # Executable to launch
-
-      IF(NOT "${exe_dir}" STREQUAL "")
-        SET(exe_dir2 "${exe_dir}/${config}")
-      ELSE(NOT "${exe_dir}" STREQUAL "")
-        SET(exe_dir2 "${exe_dir}")
-      ENDIF(NOT "${exe_dir}" STREQUAL "")
-      
-      # Generate
 
       KWWidgets_GENERATE_SETUP_PATHS_FOR_ONE_CONFIGURATION_TYPE(
         "${output_path}/${config}"
         "${basename}"
+        "${config}"
         "${generate_scripts}"
-        "${generate_launcher}"
-        "${exe_dir2}"
-        "${exe_name}"
-        "${vtk_lib_paths2}" 
-        "${vtk_runtime_paths2}" 
-        "${vtk_tcl_paths2}" 
+        0 "" ""
+        "${vtk_lib_paths}" 
+        "${vtk_runtime_paths}" 
+        "${vtk_tcl_paths}" 
         "${vtk_python_paths}"
-        "${itk_lib_paths2}" 
-        "${itk_runtime_paths2}" 
-        "${sov_lib_paths2}" 
-        "${sov_runtime_paths2}" 
-        "${kwwidgets_lib_paths2}"
-        "${kwwidgets_runtime_paths2}"
-        "${kwwidgets_tcl_paths2}"
+        "${itk_lib_paths}" 
+        "${itk_runtime_paths}" 
+        "${sov_lib_paths}" 
+        "${sov_runtime_paths}" 
+        "${kwwidgets_lib_paths}"
+        "${kwwidgets_runtime_paths}"
+        "${kwwidgets_tcl_paths}"
         "${kwwidgets_python_paths}")
       
     ENDFOREACH(config)
+
+    # Executable to launch. We can not create one C file per config type
+    # since we can't have the same executable target points to different
+    # source files (one per each config type). Use the CMAKE_INTDIR
+    # substitution instead: at compile time, CMAKE_INTDIR is replaced by
+    # the right config type.
+
+    KWWidgets_GENERATE_SETUP_PATHS_FOR_ONE_CONFIGURATION_TYPE(
+      "${output_path}"
+      "${basename}"
+      "\"CMAKE_INTDIR\""
+      0
+      "${generate_launcher}" "${exe_dir}" "${exe_name}"
+      "${vtk_lib_paths}" 
+      "${vtk_runtime_paths}" 
+      "${vtk_tcl_paths}" 
+      "${vtk_python_paths}"
+      "${itk_lib_paths}" 
+      "${itk_runtime_paths}" 
+      "${sov_lib_paths}" 
+      "${sov_runtime_paths}" 
+      "${kwwidgets_lib_paths}"
+      "${kwwidgets_runtime_paths}"
+      "${kwwidgets_tcl_paths}"
+      "${kwwidgets_python_paths}")
 
   ELSE(WIN32 AND CMAKE_CONFIGURATION_TYPES)
 
     KWWidgets_GENERATE_SETUP_PATHS_FOR_ONE_CONFIGURATION_TYPE(
       "${output_path}"
       "${basename}"
+      ""
       "${generate_scripts}"
-      "${generate_launcher}"
-      "${exe_dir}"
-      "${exe_name}"
+      "${generate_launcher}" "${exe_dir}" "${exe_name}"
       "${vtk_lib_paths}" 
       "${vtk_runtime_paths}" 
       "${vtk_tcl_paths}" 
@@ -337,6 +266,7 @@ ENDMACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ALL_CONFIGURATION_TYPES)
 # type postfix (like Release/Debug, etc.)
 # 'output_path': location (dir) where to store the generated scripts/launcher
 # 'basename': basename for generated scripts (extension of originals are kept)
+# 'config': the specific config type (Debug, Release, etc.)
 # 'generate_scripts': if true generate setup path scripts (.bat, .sh, .csh)
 # 'generate_launcher': if true generate C launcher
 # 'exe_dir': location of the executable to generate a C launcher for
@@ -345,22 +275,121 @@ ENDMACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ALL_CONFIGURATION_TYPES)
 MACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ONE_CONFIGURATION_TYPE
     output_path
     basename
+    config
     generate_scripts
-    generate_launcher
-    exe_dir
-    exe_name
-    vtk_lib_paths 
-    vtk_runtime_paths 
-    vtk_tcl_paths 
+    generate_launcher _exe_dir exe_name
+    _vtk_lib_paths 
+    _vtk_runtime_paths 
+    _vtk_tcl_paths 
     vtk_python_paths
-    itk_lib_paths 
-    itk_runtime_paths 
-    sov_lib_paths 
-    sov_runtime_paths 
-    kwwidgets_lib_paths 
-    kwwidgets_runtime_paths 
-    kwwidgets_tcl_paths 
+    _itk_lib_paths 
+    _itk_runtime_paths 
+    _sov_lib_paths 
+    _sov_runtime_paths 
+    _kwwidgets_lib_paths 
+    _kwwidgets_runtime_paths 
+    _kwwidgets_tcl_paths 
     kwwidgets_python_paths)
+
+  SET(vtk_lib_paths ${_vtk_lib_paths})
+  SET(vtk_runtime_paths ${_vtk_runtime_paths})
+  SET(vtk_tcl_paths ${_vtk_tcl_paths})
+    
+  SET(itk_lib_paths ${_itk_lib_paths})
+  SET(itk_runtime_paths ${_itk_runtime_paths})
+    
+  SET(sov_lib_paths ${_sov_lib_paths})
+  SET(sov_runtime_paths ${_sov_runtime_paths})
+    
+  SET(kwwidgets_lib_paths ${_kwwidgets_lib_paths})
+  SET(kwwidgets_runtime_paths ${_kwwidgets_runtime_paths})
+  SET(kwwidgets_tcl_paths ${_kwwidgets_tcl_paths})
+  
+  SET(exe_dir ${_exe_dir})
+    
+  # Update some paths with the configuration type if needed
+
+  IF(NOT "${config}" STREQUAL "" AND WIN32 AND CMAKE_CONFIGURATION_TYPES)
+
+    # VTK
+
+    IF(VTK_CONFIGURATION_TYPES)
+      SET(vtk_lib_paths2)
+      SET(vtk_runtime_paths2)
+      SET(vtk_tcl_paths2)
+      FOREACH(dir ${_vtk_lib_paths})
+        SET(vtk_lib_paths2 ${vtk_lib_paths2} "${dir}/${config}")
+      ENDFOREACH(dir)
+      FOREACH(dir ${_vtk_runtime_paths})
+        SET(vtk_runtime_paths2 ${vtk_runtime_paths2} "${dir}/${config}")
+      ENDFOREACH(dir)
+      FOREACH(dir ${_vtk_tcl_paths})
+        SET(vtk_tcl_paths2 ${vtk_tcl_paths2} "${dir}/${config}")
+      ENDFOREACH(dir)
+      SET(vtk_lib_paths ${vtk_lib_paths2})
+      SET(vtk_runtime_paths ${vtk_runtime_paths2})
+      SET(vtk_tcl_paths ${vtk_tcl_paths2})
+    ENDIF(VTK_CONFIGURATION_TYPES)
+
+    # ITK
+
+    IF(ITK_CONFIGURATION_TYPES)
+      SET(itk_lib_paths2)
+      SET(itk_runtime_paths2)
+      FOREACH(dir ${_itk_lib_paths})
+        SET(itk_lib_paths2 ${itk_lib_paths2} "${dir}/${config}")
+      ENDFOREACH(dir)
+      FOREACH(dir ${_itk_runtime_paths})
+        SET(itk_runtime_paths2 ${itk_runtime_paths2} "${dir}/${config}")
+      ENDFOREACH(dir)
+      SET(itk_lib_paths ${itk_lib_paths2})
+      SET(itk_runtime_paths ${itk_runtime_paths2})
+    ENDIF(ITK_CONFIGURATION_TYPES)
+
+    # SOV
+
+    IF(SOV_CONFIGURATION_TYPES)
+      SET(sov_lib_paths2)
+      SET(sov_runtime_paths2)
+      FOREACH(dir ${_sov_lib_paths})
+        SET(sov_lib_paths2 ${sov_lib_paths2} "${dir}/${config}")
+      ENDFOREACH(dir)
+      FOREACH(dir ${_sov_runtime_paths})
+        SET(sov_runtime_paths2 ${sov_runtime_paths2} "${dir}/${config}")
+      ENDFOREACH(dir)
+      SET(sov_lib_paths ${sov_lib_paths2})
+      SET(sov_runtime_paths ${sov_runtime_paths2})
+    ENDIF(SOV_CONFIGURATION_TYPES)
+
+    # KWWidgets
+
+    IF(KWWidgets_CONFIGURATION_TYPES)
+      SET(kwwidgets_lib_paths2)
+      SET(kwwidgets_runtime_paths2)
+      SET(kwwidgets_tcl_paths2)
+      FOREACH(dir ${_kwwidgets_lib_paths})
+        SET(kwwidgets_lib_paths2 
+          ${kwwidgets_lib_paths2} "${dir}/${config}")
+      ENDFOREACH(dir)
+      FOREACH(dir ${_kwwidgets_runtime_paths})
+        SET(kwwidgets_runtime_paths2 
+          ${kwwidgets_runtime_paths2} "${dir}/${config}")
+      ENDFOREACH(dir)
+      FOREACH(dir ${_kwwidgets_tcl_paths})
+        SET(kwwidgets_tcl_paths2 
+          ${kwwidgets_tcl_paths2} "${dir}/${config}")
+      ENDFOREACH(dir)
+      SET(kwwidgets_lib_paths ${kwwidgets_lib_paths2})
+      SET(kwwidgets_runtime_paths ${kwwidgets_runtime_paths2})
+      SET(kwwidgets_tcl_paths ${kwwidgets_tcl_paths2})
+    ENDIF(KWWidgets_CONFIGURATION_TYPES)
+
+    SET(exe_dir ${_exe_dir})
+    IF(NOT "${exe_dir}" STREQUAL "")
+      SET(exe_dir "${exe_dir}/${config}")
+    ENDIF(NOT "${exe_dir}" STREQUAL "")
+
+  ENDIF(NOT "${config}" STREQUAL "" AND WIN32 AND CMAKE_CONFIGURATION_TYPES)
 
   # Executable to launch
 
@@ -444,11 +473,11 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ONE_CONFIGURATION_TYPE
   SET(KWWidgets_TCLLIBPATH_ENV)
   FOREACH(dir ${vtk_tcl_paths})
     SET(KWWidgets_TCLLIBPATH_ENV 
-      "${KWWidgets_TCLLIBPATH_ENV} \"${dir}\"")
+      "${KWWidgets_TCLLIBPATH_ENV} {${dir}}")
   ENDFOREACH(dir)
   FOREACH(dir ${kwwidgets_tcl_paths})
     SET(KWWidgets_TCLLIBPATH_ENV 
-      "${KWWidgets_TCLLIBPATH_ENV} \"${dir}\"")
+      "${KWWidgets_TCLLIBPATH_ENV} {${dir}}")
   ENDFOREACH(dir)
   
   # For PYTHONPATH
@@ -488,9 +517,6 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ONE_CONFIGURATION_TYPE
         ${output_path}/${basename}.bat
         IMMEDIATE)
     ENDIF(${generate_scripts})
-
-    STRING(REGEX REPLACE "\"" "\\\\\"" 
-      KWWidgets_TCLLIBPATH_ENV_ESCAPED "${KWWidgets_TCLLIBPATH_ENV}")
 
     IF(${generate_scripts})
       CONFIGURE_FILE(
@@ -575,9 +601,6 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ONE_CONFIGURATION_TYPE
         ${output_path}/${basename}.csh
         IMMEDIATE)
     ENDIF(${generate_scripts})
-
-    STRING(REGEX REPLACE "\"" "\\\\\"" 
-      KWWidgets_TCLLIBPATH_ENV_ESCAPED "${KWWidgets_TCLLIBPATH_ENV}")
 
     CONFIGURE_FILE(
       ${KWWidgets_TEMPLATES_DIR}/KWWidgetsSetupPaths.cmake.in
