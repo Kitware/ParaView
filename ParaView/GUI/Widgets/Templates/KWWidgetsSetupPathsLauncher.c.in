@@ -53,9 +53,12 @@ int main(int argc, char** argv)
   char message[MAXPATH];
   char **arg;
 
+#if defined(_WIN32)
+  size_t exe_path_len;
+#endif
+
 #if defined(_WIN32) && !defined(__CYGWIN__)
   DWORD original, length;
-  size_t exe_path_len;
   char full_exe_path[MAXPATH];
   char short_exe_path[MAXPATH] = "";
 #else
@@ -126,7 +129,7 @@ int main(int argc, char** argv)
     }
 #endif
   
-#if defined(_MSC_VER)
+#if defined(_WIN32) && !defined(__CYGWIN__)
   /* If the exe_path contains space, args gets mixed up on the receiving end
      of the _execv: "c:/my path/foo.exe" "--text" ends up as 3 arguments in
      the launched executable: "c:/my path/foo.exe" "path/foo.exe" "--text" */
@@ -134,13 +137,24 @@ int main(int argc, char** argv)
       GetShortPathName(full_exe_path, short_exe_path, MAXPATH))
     {
     argv[0] = short_exe_path;
-    _execv(argv[0], argv);
+    }
+  else
+    {
+    argv[0] = NULL;
     }
 #else
   realpath(exe_path, real_exe_path);
   argv[0] = real_exe_path;
-  execv(argv[0], argv);
 #endif
+
+  if(argv[0])
+    {
+#if defined(_MSC_VER)
+    _execv(argv[0], argv);
+#else
+    execv(argv[0], argv);
+#endif
+    }
 
   /* Report why execution failed.  */
   
