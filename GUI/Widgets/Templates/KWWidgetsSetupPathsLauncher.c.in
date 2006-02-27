@@ -63,7 +63,6 @@ int main(int argc, char** argv)
 #endif
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
-  DWORD original, length;
   char full_exe_path[MAXPATH];
   char short_exe_path[MAXPATH] = "";
 #else
@@ -175,7 +174,9 @@ int main(int argc, char** argv)
       }
     
 #if defined(_MSC_VER)
-    _execv(argv[0], argv);
+    // _execv can't be used as it does not property return the exit value
+    // of the process to execute.
+    return _spawnv(_P_WAIT, argv[0], argv);
 #else
     execv(argv[0], argv);
 #endif
@@ -184,17 +185,6 @@ int main(int argc, char** argv)
   /* Report why execution failed.  */
   
 #if defined(_WIN32) && !defined(__CYGWIN__)
-  original = GetLastError();
-  length = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-                         FORMAT_MESSAGE_IGNORE_INSERTS, 0, original,
-                         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                         message, MAXPATH, 0);
-  if(length < 1 || length > MAXPATH)
-    {
-    _snprintf(message, MAXPATH,
-              "Error 0x%X (FormatMessage failed with error 0x%X)",
-              original, GetLastError());
-    }
 #else
   strcpy(message, strerror(errno));
 #endif
