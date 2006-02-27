@@ -99,14 +99,14 @@ TARGET_LINK_LIBRARIES(${EXE_NAME} ${LIB_NAME})
 # launcher sets the above environment variables before launching the executable
 # itself. Note that the path to the executable to launch is hard-coded.
 
-IF(NOT KWWidgets_SOURCE_DIR OR BUILD_TESTING)
+IF(NOT KWWidgets_SOURCE_DIR)
   INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsPathsMacros.cmake")
   KWWidgets_GENERATE_SETUP_PATHS_SCRIPTS("${CMAKE_CURRENT_BINARY_DIR}")
   SET(LAUNCHER_EXE_NAME "${EXE_NAME}Launcher")
   KWWidgets_GENERATE_SETUP_PATHS_LAUNCHER(
     "${CMAKE_CURRENT_BINARY_DIR}" "${LAUNCHER_EXE_NAME}" 
     "${EXECUTABLE_OUTPUT_PATH}" "${EXE_NAME}")
-ENDIF(NOT KWWidgets_SOURCE_DIR OR BUILD_TESTING)
+ENDIF(NOT KWWidgets_SOURCE_DIR)
 
 # If needed, copy the Tcl/Tk support files required at run-time 
 # to initialize Tcl/Tk. This is only triggered if VTK was built
@@ -147,5 +147,5 @@ ENDIF(BUILD_EXAMPLES)
 
 IF(BUILD_TESTING)
   INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsTestingMacros.cmake")
-  KWWidgets_ADD_TEST_FROM_C_EXAMPLE(Test${EXE_NAME} ${LAUNCHER_EXE_NAME})
+  KWWidgets_ADD_TEST_FROM_C_EXAMPLE(Test${EXE_NAME} ${EXE_NAME})
 ENDIF(BUILD_TESTING)
