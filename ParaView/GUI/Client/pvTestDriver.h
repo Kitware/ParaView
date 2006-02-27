@@ -77,17 +77,19 @@ private:
   vtkstd::vector<vtkstd::string> MPIPreFlags;
   vtkstd::vector<vtkstd::string> MPIPostFlags;
   
-  // For tiled display testing, we need to explicitly specify the preflags to
-  // use, so we need an option of ignoring any MPIPreFlags that may have
-  // been set.
-  int IgnoreMPIPreFlags;
-
   // MPIClientFlags / MPIServerFlags allows you to specify flags specific for 
   // the client or the server
   vtkstd::vector<vtkstd::string> MPIClientPreFlags;
   vtkstd::vector<vtkstd::string> MPIServerPreFlags;
   vtkstd::vector<vtkstd::string> MPIClientPostFlags;
   vtkstd::vector<vtkstd::string> MPIServerPostFlags;
+
+  // TDClientFlags / TDServerFlags allows you to specify flags specific for 
+  // the client or the server when running in tiled display mode
+  vtkstd::vector<vtkstd::string> TDClientPreFlags;
+  vtkstd::vector<vtkstd::string> TDServerPreFlags;
+  vtkstd::vector<vtkstd::string> TDClientPostFlags;
+  vtkstd::vector<vtkstd::string> TDServerPostFlags;
 
   // PVSSHFlags allows user to pass ssh command to access distant machine
   // to do remote testing
@@ -109,6 +111,7 @@ private:
   int TestBatch;
   int TestRenderServer;
   int TestServer;
+  int TestTiledDisplay;
   int ArgStart;
   int AllowErrorInOutput;
   
