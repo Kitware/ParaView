@@ -40,8 +40,8 @@ pvTestDriver::pvTestDriver()
   this->TestRenderServer = 0;
   this->TestBatch = 0;
   this->TestServer = 0;
+  this->TestTiledDisplay = 0;
   this->ReverseConnection = 0;
-  this->IgnoreMPIPreFlags = 0;
 }
 
 pvTestDriver::~pvTestDriver()
@@ -150,6 +150,18 @@ void pvTestDriver::CollectConfiguredOptions()
 # ifdef VTK_MPI_SERVER_POSTFLAGS
   this->SeparateArguments(VTK_MPI_SERVER_POSTFLAGS, this->MPIServerPostFlags);
 # endif
+# ifdef VTK_MPI_CLIENT_TD_PREFLAGS
+  this->SeparateArguments(VTK_MPI_CLIENT_TD_PREFLAGS, this->TDClientPreFlags);
+# endif
+# ifdef VTK_MPI_CLIENT_TD_POSTFLAGS
+  this->SeparateArguments(VTK_MPI_CLIENT_TD_POSTFLAGS, this->TDClientPostFlags);
+# endif
+# ifdef VTK_MPI_SERVER_TD_PREFLAGS
+  this->SeparateArguments(VTK_MPI_SERVER_TD_PREFLAGS, this->TDServerPreFlags);
+# endif
+# ifdef VTK_MPI_SERVER_TD_POSTFLAGS
+  this->SeparateArguments(VTK_MPI_SERVER_TD_POSTFLAGS, this->TDServerPostFlags);
+# endif
 
 // For remote testing (via ssh)
 # ifdef PV_SSH_FLAGS
@@ -193,6 +205,13 @@ int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
       this->TestServer = 1;
       fprintf(stderr, "Test Server.\n");
       }
+    if(strcmp(argv[i], "--test-tiled") == 0)
+      {
+      this->ArgStart = i+1;
+      this->TestServer = 1;
+      this->TestTiledDisplay = 1;
+      fprintf(stderr, "Test Tiled Display.\n");
+      }
     if(strcmp(argv[i], "--one-mpi-np") == 0)
       {
       this->MPIClientNumProcessFlag = this->MPIServerNumProcessFlag = "1";
@@ -235,12 +254,6 @@ int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
       this->ArgStart = i+2;
       fprintf(stderr, "Extras server postflags were specified: %s\n", argv[i+1]);
       }
-    if (strncmp(argv[i], "--ignore-mpi-preflags", 21) == 0)
-      {
-      this->ArgStart = i+1;
-      this->IgnoreMPIPreFlags = 1;
-      fprintf(stderr, "Ignoring MPI PreFlags\n");
-      }
     }
 
   // check for the Other.pvs test
@@ -272,27 +285,47 @@ pvTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
     commandLine.push_back(this->MPIRun.c_str());
     commandLine.push_back(this->MPINumProcessFlag.c_str());
     commandLine.push_back(numProc);
-    if ( ! this->IgnoreMPIPreFlags )
+    if (!this->TestTiledDisplay)
       {
       for(unsigned int i = 0; i < this->MPIPreFlags.size(); ++i)
         {
         commandLine.push_back(this->MPIPreFlags[i].c_str());
         }
-      }
-    // If there is specific flags for the client to pass to mpirun, add them
-    if( strcmp( paraviewFlags, "--client" ) == 0)
-      {
-      for(unsigned int i = 0; i < this->MPIClientPreFlags.size(); ++i)
+
+      // If there is specific flags for the client to pass to mpirun, add them
+      if( strcmp( paraviewFlags, "--client" ) == 0)
         {
-        commandLine.push_back(this->MPIClientPreFlags[i].c_str());
+        for(unsigned int i = 0; i < this->MPIClientPreFlags.size(); ++i)
+          {
+          commandLine.push_back(this->MPIClientPreFlags[i].c_str());
+          }
+        }
+      // If there is specific flags for the server to pass to mpirun, add them
+      if( strcmp( paraviewFlags, "--server" ) == 0)
+        {
+        for(unsigned int i = 0; i < this->MPIServerPreFlags.size(); ++i)
+          {
+          commandLine.push_back(this->MPIServerPreFlags[i].c_str());
+          }
         }
       }
-    // If there is specific flags for the server to pass to mpirun, add them
-    if( strcmp( paraviewFlags, "--server" ) == 0)
+    else
       {
-      for(unsigned int i = 0; i < this->MPIServerPreFlags.size(); ++i)
+      // If there is specific flags for the client to pass to mpirun, add them
+      if( strcmp( paraviewFlags, "--client" ) == 0)
         {
-        commandLine.push_back(this->MPIServerPreFlags[i].c_str());
+        for(unsigned int i = 0; i < this->TDClientPreFlags.size(); ++i)
+          {
+          commandLine.push_back(this->TDClientPreFlags[i].c_str());
+          }
+        }
+      // If there is specific flags for the server to pass to mpirun, add them
+      if( strcmp( paraviewFlags, "--server" ) == 0)
+        {
+        for(unsigned int i = 0; i < this->TDServerPreFlags.size(); ++i)
+          {
+          commandLine.push_back(this->TDServerPreFlags[i].c_str());
+          }
         }
       }
     }
@@ -320,26 +353,49 @@ pvTestDriver::CreateCommandLine(vtksys_stl::vector<const char*>& commandLine,
       commandLine.push_back("-rc");
       }
 
-    for(unsigned int i = 0; i < this->MPIPostFlags.size(); ++i)
+    if (!this->TestTiledDisplay)
       {
-      commandLine.push_back(MPIPostFlags[i].c_str());
-      }
-    // If there is specific flags for the server to pass to paraview, add them
-    if( strcmp( paraviewFlags, "--client" ) == 0)
-      {
-      for(unsigned int i = 0; i < this->MPIClientPostFlags.size(); ++i)
+      for(unsigned int i = 0; i < this->MPIPostFlags.size(); ++i)
         {
-        commandLine.push_back(this->MPIClientPostFlags[i].c_str());
+        commandLine.push_back(MPIPostFlags[i].c_str());
+        }
+      // If there is specific flags for the server to pass to paraview, add them
+      if( strcmp( paraviewFlags, "--client" ) == 0)
+        {
+        for(unsigned int i = 0; i < this->MPIClientPostFlags.size(); ++i)
+          {
+          commandLine.push_back(this->MPIClientPostFlags[i].c_str());
+          }
+        }
+      // If there is specific flags for the server to pass to mpirun, add them
+      if( strcmp( paraviewFlags, "--server" ) == 0)
+        {
+        for(unsigned int i = 0; i < this->MPIServerPostFlags.size(); ++i)
+          {
+          commandLine.push_back(this->MPIServerPostFlags[i].c_str());
+          }
         }
       }
-    // If there is specific flags for the server to pass to mpirun, add them
-    if( strcmp( paraviewFlags, "--server" ) == 0)
+    else
       {
-      for(unsigned int i = 0; i < this->MPIServerPostFlags.size(); ++i)
+      // If there is specific flags for the server to pass to paraview, add them
+      if( strcmp( paraviewFlags, "--client" ) == 0)
         {
-        commandLine.push_back(this->MPIServerPostFlags[i].c_str());
+        for(unsigned int i = 0; i < this->TDClientPostFlags.size(); ++i)
+          {
+          commandLine.push_back(this->TDClientPostFlags[i].c_str());
+          }
+        }
+      // If there is specific flags for the server to pass to mpirun, add them
+      if( strcmp( paraviewFlags, "--server" ) == 0)
+        {
+        for(unsigned int i = 0; i < this->TDServerPostFlags.size(); ++i)
+          {
+          commandLine.push_back(this->TDServerPostFlags[i].c_str());
+          }
         }
       }
+
     if(strcmp(paraviewFlags, "-r2d") == 0)
       {
       commandLine.push_back(paraviewFlags);
