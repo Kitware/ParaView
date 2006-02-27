@@ -112,6 +112,14 @@ ENDIF(VTK_USE_MPI)
 # If this is the server:
 # ${VTK_MPIRUN_EXE} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS} ${VTK_MPI_SERVER_PREFLAGS} executable --server ${VTK_MPI_POSTFLAGS} ${VTK_MPI_SERVER_POSTFLAGS}
 # For more information you can also check for VTK_MPI_PREFLAGS / VTK_MPI_POSTFLAGS in VTK/CMakeLists.txt
+# 
+# For tiled display tests, another set of similar variables can be
+# defined
+# VTK_MPI_CLIENT_TD_PREFLAGS
+# VTK_MPI_CLIENT_TD_POSTFLAGS
+# VTK_MPI_SERVER_TD_PREFLAGS
+# VTK_MPI_SERVER_TD_POSTFLAGS
+
 
 # Foreach test add the following:
 # 1. the test (possibly with mpirun)
@@ -174,44 +182,20 @@ FOREACH (tfile ${PROJECT_TESTS})
     -V ${PVClientTestData}/Baseline/${tfile}.png)
   # repeat test in tiling mode if test tiling is on
   IF (PARAVIEW_TEST_TILED_DISPLAY)
-    IF (VTK_MPI_SERVER_TD_PREFLAGS)
-      ADD_TEST(${tfile}-ParaView-TILED-MPI 
-        ${PARAVIEW_CS_EXECUTABLE}     
-        --test-server
-        --ignore-mpi-preflags
-        ${TIMEOUT}
-        --client-preflags ${VTK_MPI_CLIENT_TD_PREFLAGS}
-        --server-preflags ${VTK_MPI_SERVER_TD_PREFLAGS}
-        --client-postflags ${VTK_MPI_CLIENT_TD_POSTFLAGS}
-        --disable-registry 
-        ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
-        -UC
-        -D ${PVClientTestData}
-        -C ${PVCompareImages}
-        -T ${ParaView_BINARY_DIR}/Testing/Temporary
-        -V ${PVClientTestData}/Baseline/${tfile}-TILED.png
-        -FrontBuffer
-        -NoRerender
-        )
-    ELSE (VTK_MPI_SERVER_TD_PREFLAGS)
-      ADD_TEST(${tfile}-ParaView-TILED-MPI 
-        ${PARAVIEW_CS_EXECUTABLE}     
-        --test-server
-        --ignore-mpi-preflags
-        ${TIMEOUT}
-        --client-preflags ${VTK_MPI_CLIENT_TD_PREFLAGS}
-        --client-postflags ${VTK_MPI_CLIENT_TD_POSTFLAGS}
-        --disable-registry 
-        ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
-        -UC
-        -D ${PVClientTestData}
-        -C ${PVCompareImages}
-        -T ${ParaView_BINARY_DIR}/Testing/Temporary
-        -V ${PVClientTestData}/Baseline/${tfile}-TILED.png
-        -FrontBuffer
-        -NoRerender
-        )
-    ENDIF (VTK_MPI_SERVER_TD_PREFLAGS)
+    ADD_TEST(${tfile}-ParaView-TILED-MPI 
+      ${PARAVIEW_CS_EXECUTABLE}     
+      --test-tiled
+      ${TIMEOUT}
+      --disable-registry 
+      ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
+      -UC
+      -D ${PVClientTestData}
+      -C ${PVCompareImages}
+      -T ${ParaView_BINARY_DIR}/Testing/Temporary
+      -V ${PVClientTestData}/Baseline/${tfile}-TILED.png
+      -FrontBuffer
+      -NoRerender
+      )
   ENDIF (PARAVIEW_TEST_TILED_DISPLAY)
 ENDFOREACH (tfile)
 
@@ -456,44 +440,20 @@ ENDIF (VTK_DATA_ROOT)
 
 # Test timings for tiled display (Ice-T)
 IF (PARAVIEW_TEST_TILED_DISPLAY)
-  IF (VTK_MPI_SERVER_TD_PREFLAGS)
-    ADD_TEST(TiledTiming
-      ${PARAVIEW_CS_EXECUTABLE}
-      --test-server
-      --ignore-mpi-preflags
-      ${TIMEOUT}
-      --client-preflags ${VTK_MPI_CLIENT_TD_PREFLAGS}
-      --server-preflags ${VTK_MPI_SERVER_TD_PREFLAGS}
-      --client-postflags ${VTK_MPI_CLIENT_TD_POSTFLAGS}
-      --disable-registry
-      ${PVClientTests_SOURCE_DIR}/Tcl/TiledTiming.pvs
-      -UC
-      -D ${PVClientTestData}
-      -C ${PVCompareImages}
-      -T ${ParaView_BINARY_DIR}/Testing/Temporary
-      -V ${PVClientTestData}/Baseline/${tfile}-TILED.png
-      -FrontBuffer
-      -NoRerender
-      )
-  ELSE (VTK_MPI_SERVER_TD_PREFLAGS)
-    ADD_TEST(TiledTiming
-      ${PARAVIEW_CS_EXECUTABLE}
-      --test-server
-      --ignore-mpi-preflags
-      ${TIMEOUT}
-      --client-preflags ${VTK_MPI_CLIENT_TD_PREFLAGS}
-      --client-postflags ${VTK_MPI_CLIENT_TD_POSTFLAGS}
-      --disable-registry
-      ${PVClientTests_SOURCE_DIR}/Tcl/TiledTiming.pvs
-      -UC
-      -D ${PVClientTestData}
-      -C ${PVCompareImages}
-      -T ${ParaView_BINARY_DIR}/Testing/Temporary
-      -V ${PVClientTestData}/Baseline/${tfile}-TILED.png
-      -FrontBuffer
-      -NoRerender
-      )
-  ENDIF (VTK_MPI_SERVER_TD_PREFLAGS)
+  ADD_TEST(TiledTiming
+    ${PARAVIEW_CS_EXECUTABLE}
+    --test-tiled
+    ${TIMEOUT}
+    --disable-registry
+    ${PVClientTests_SOURCE_DIR}/Tcl/TiledTiming.pvs
+    -UC
+    -D ${PVClientTestData}
+    -C ${PVCompareImages}
+    -T ${ParaView_BINARY_DIR}/Testing/Temporary
+    -V ${PVClientTestData}/Baseline/${tfile}-TILED.png
+    -FrontBuffer
+    -NoRerender
+    )
 ENDIF (PARAVIEW_TEST_TILED_DISPLAY)
 
 # Test the PVLocal plugin example.
