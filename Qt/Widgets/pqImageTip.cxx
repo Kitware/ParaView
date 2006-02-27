@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <qtimer.h>
 #include <qdebug.h>
 #include <QBasicTimer>
-#include <QTooltip>
+#include <QToolTip>
 
 void pqImageTip::showTip(const QPixmap& image, const QPoint& pos)
 {
