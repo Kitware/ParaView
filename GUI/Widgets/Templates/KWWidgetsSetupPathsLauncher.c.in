@@ -34,6 +34,8 @@
 #define MAXPATH 16384
 #endif
 
+#define MAX_QUOTED_ARGV 50
+
 int main(int argc, char** argv)
 {
   char exe_path[MAXPATH];
@@ -52,6 +54,9 @@ int main(int argc, char** argv)
 
   char message[MAXPATH];
   char **arg;
+
+  char quoted_argv[MAX_QUOTED_ARGV][MAXPATH];
+  int nb_quoted_argv;
 
 #if defined(_WIN32)
   size_t exe_path_len;
@@ -152,8 +157,23 @@ int main(int argc, char** argv)
   argv[0] = real_exe_path;
 #endif
 
+  /* Quote unquoted args, otherwise args seem to get mixed up */
+
   if(argv[0])
     {
+    for(argc = 0, nb_quoted_argv = 0; 
+        nb_quoted_argv < MAX_QUOTED_ARGV && argv[argc]; ++argc)
+      {
+      if (argv[argc][0] != '"' && strstr(argv[argc], " ") != NULL)
+        {
+        strcpy(quoted_argv[nb_quoted_argv], "\"");
+        strcat(quoted_argv[nb_quoted_argv], argv[argc]);
+        strcat(quoted_argv[nb_quoted_argv], "\"");
+        argv[argc] = quoted_argv[nb_quoted_argv];
+        nb_quoted_argv++;
+        }
+      }
+    
 #if defined(_MSC_VER)
     _execv(argv[0], argv);
 #else
@@ -179,15 +199,12 @@ int main(int argc, char** argv)
   strcpy(message, strerror(errno));
 #endif
 
-  arg = argv;
   fprintf(stderr, "Error running");
-  for(; *arg; ++arg)
+  for(arg = argv; *arg; ++arg)
     {
     fprintf(stderr, " \"%s\"", *arg);
     }
   fprintf(stderr, ": %s\n", message);
-
-  (void)argc;
 
   return 1;
 }
