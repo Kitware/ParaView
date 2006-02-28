@@ -42,7 +42,10 @@ ENDMACRO(KWWidgets_GENERATE_SETUP_PATHS_SCRIPTS)
 # 'exe_dir': location of the executable to generate a C launcher for
 # 'exe_name': name of the executable to generate a C launcher for
 # Note that if 'exe_name' is empty, the launcher will run the executable passed
-# as first parameter.
+# as first parameter. 
+# Note that if If 'exe_dir' is empty, the launcher will change its working
+# dir to the launcher directory, and therefore attempt to locate 'exe_name'
+# in that same directory.
 
 MACRO(KWWidgets_GENERATE_SETUP_PATHS_LAUNCHER
     output_path
@@ -116,28 +119,11 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS
   SET(KWWidgets_PYTHON_PATHS ${KWWidgets_PYTHON_PATHS} 
     "${KWWidgets_PYTHON_MODULE_DIR}")
 
-  # Exe dir
-  # If the directory is empty, and the exe_name is just a relative name, 
-  # assume we are referring to an executable in the EXECUTABLE_OUTPUT_PATH
-  # or CMAKE_CURRENT_BINARY_DIR, whichever is not empty.
-
-  SET(fixed_exe_dir "${exe_dir}")
-  IF(${generate_launcher} AND "${fixed_exe_dir}" STREQUAL "" AND NOT "${exe_name}" STREQUAL "")
-    GET_FILENAME_COMPONENT(exe_name_name "${exe_name}" NAME)
-    IF("${exe_name_name}" STREQUAL "${exe_name}")
-      IF(EXECUTABLE_OUTPUT_PATH)
-        SET(fixed_exe_dir "${EXECUTABLE_OUTPUT_PATH}")
-      ELSE(EXECUTABLE_OUTPUT_PATH)
-        SET(fixed_exe_dir "${CMAKE_CURRENT_BINARY_DIR}")
-      ENDIF(EXECUTABLE_OUTPUT_PATH)
-    ENDIF("${exe_name_name}" STREQUAL "${exe_name}")
-  ENDIF(${generate_launcher} AND "${fixed_exe_dir}" STREQUAL "" AND NOT "${exe_name}" STREQUAL "")
-
   KWWidgets_GENERATE_SETUP_PATHS_FOR_ALL_CONFIGURATION_TYPES(
     "${output_path}"
     "${basename}"
     "${generate_scripts}"
-    "${generate_launcher}" "${fixed_exe_dir}" "${exe_name}"
+    "${generate_launcher}" "${exe_dir}" "${exe_name}"
     "${VTK_LIBRARY_DIRS}"
     "${VTK_RUNTIME_DIRS}"
     "${VTK_TCL_PATHS}"
