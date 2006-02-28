@@ -2510,6 +2510,67 @@
    <!-- End ExtractGrid -->
    </SourceProxy>
 
+   <SourceProxy name="DataAnalysis" class="vtkDataAnalysisFilter">
+    <InputProperty
+       name="Input"
+       command="SetInput">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+            <DataType value="vtkMultiGroupDataSet"/>
+          </DataTypeDomain>
+          <NumberOfPartsDomain name="multi_part" multiplicity="single"/>
+          <NumberOfGroupsDomain name="multi_group" multiplicity="single"/>
+          <InputArrayDomain name="input_array" attribute_type="point"/>
+     </InputProperty>
+
+     <InputProperty
+        name="Source"
+        command="SetSource">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+           </ProxyGroupDomain>
+     </InputProperty>
+
+     <IntVectorProperty name="Mode"
+        command="SetMode"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry text="Probe" value="0" />
+          <Entry text="Pick" value="1" />
+        </EnumerationDomain>
+     </IntVectorProperty>
+     <IntVectorProperty name="Id"
+        command="SetId"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0" />
+     </IntVectorProperty>
+     <IntVectorProperty name="UseIdToPick"
+        command="SetUseIdToPick"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+     </IntVectorProperty>
+     <IntVectorProperty name="PickCell"
+        command="SetPickCell"
+        number_of_elements="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+     </IntVectorProperty>
+     <DoubleVectorProperty
+         name="WorldPoint"
+         command="SetWorldPoint"
+         number_of_elements="3"
+         default_values="0 0 0" >
+      </DoubleVectorProperty>
+   <!-- End PickProbe -->
+   </SourceProxy>
+
    <SourceProxy name="Probe" class="vtkPProbeFilter">
     <InputProperty
        name="Source"
@@ -3548,7 +3609,55 @@
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
    </SourceProxy>
-    
+
+   
+   <SourceProxy name="TemporalCache" class="vtkTemporalCacheFilter">
+     <InputProperty name="Input" command="SetInput">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkPointSet"/>
+       </DataTypeDomain>
+     </InputProperty>
+
+     <IntVectorProperty 
+        name="UseCache" 
+        command="SetUseCache" 
+        number_of_elements="1"
+        default_values="0" > 
+        <BooleanDomain name="bool" />
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="AttributeToCollect"
+        command="SetAttributeToCollect"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="PointData" />
+          <Entry value="1" text="CellData" />
+          <Entry value="2" text="FieldData" />
+        </EnumerationDomain>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="CollectAttributeData"
+        command="CollectAttributeData"
+        number_of_elements="1"
+        default_values="0">
+     </DoubleVectorProperty>
+
+     <Property
+        name="ClearCache"
+        command="ClearCache"
+        immediate_update="1">
+     </Property>
+   <!-- End TemporalCache -->
+   </SourceProxy>
+
+   
   </ProxyGroup>
 </ServerManagerConfiguration>
 

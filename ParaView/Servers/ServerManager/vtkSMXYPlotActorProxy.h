@@ -59,6 +59,12 @@ public:
   // Method to push the property values onto server objects.
   virtual void UpdateVTKObjects();
 
+  // Description:
+  // When set, the colors are computed for each array automatically by 
+  // this class. Set by default.
+  vtkSetMacro(ComputeColors, int);
+  vtkGetMacro(ComputeColors, int);
+  vtkBooleanMacro(ComputeColors, int);
 protected:
   vtkSMXYPlotActorProxy();
   ~vtkSMXYPlotActorProxy();
@@ -74,6 +80,10 @@ protected:
   // Called to build the XYActor inputs for the selected arrays.
   void SetupInputs();
 
+  // Description:
+  // Flag deciding if this class should compute the colors assigned to
+  // each array.
+  int ComputeColors;
 private:
   vtkSMXYPlotActorProxy(const vtkSMXYPlotActorProxy&); // Not implemented.
   void operator=(const vtkSMXYPlotActorProxy&); // Not implemented.

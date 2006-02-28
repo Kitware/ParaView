@@ -37,7 +37,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.77");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.78");
 
 //-----------------------------------------------------------------------------
 vtkPVSelectWidget::vtkPVSelectWidget()
@@ -258,6 +258,25 @@ void vtkPVSelectWidget::PostAccept()
     }
  }
 
+//-----------------------------------------------------------------------------
+vtkPVWidget* vtkPVSelectWidget::GetCurrentWidget()
+{
+  if (this->CurrentIndex >=0)
+    {
+    return (vtkPVWidget*)this->Widgets->GetItemAsObject(this->CurrentIndex);
+    }
+  return NULL;
+}
+
+//-----------------------------------------------------------------------------
+const char* vtkPVSelectWidget::GetCurrentLabel()
+{
+  if (this->CurrentIndex >=0)
+    {
+    return this->Labels->GetString(this->CurrentIndex);
+    }
+  return NULL;
+}
 //-----------------------------------------------------------------------------
 void vtkPVSelectWidget::Accept()
 {

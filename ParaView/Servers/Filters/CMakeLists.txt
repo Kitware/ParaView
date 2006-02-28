@@ -10,6 +10,7 @@ SET(Filters_SRCS
   vtkClientCompositeManager.cxx
   vtkColorByPart.cxx
   vtkCompleteArrays.cxx
+  vtkDataAnalysisFilter.cxx
   vtkDataSetSubdivisionAlgorithm.cxx
   vtkDesktopDeliveryClient.cxx
   vtkDesktopDeliveryServer.cxx
@@ -48,6 +49,7 @@ SET(Filters_SRCS
   vtkPVLODVolume.cxx
   vtkPVLinearExtrusionFilter.cxx
   vtkPVMain.cxx
+  vtkPPickFilter.cxx
   vtkPVRenderViewProxy.cxx
   vtkPVRenderModuleHelper.cxx
   vtkPVServerArraySelection.cxx
@@ -67,6 +69,9 @@ SET(Filters_SRCS
   vtkSubdivisionAlgorithm.cxx
   vtkSurfaceVectors.cxx
   vtkSquirtCompressor.cxx
+  vtkTemporalCacheFilter.cxx
+  vtkTemporalProbeFilter.cxx
+  vtkTemporalPickFilter.cxx
   vtkTessellatorFilter.cxx
   vtkTiledDisplaySchedule.cxx
   vtkUpdateSuppressorPipeline.cxx
@@ -74,8 +79,7 @@ SET(Filters_SRCS
   vtkXMLCollectionReader.cxx
   vtkXMLPVAnimationWriter.cxx
   vtkXMLPVDWriter.cxx
-  vtkTemporalProbeFilter.cxx
-  vtkTemporalPickFilter.cxx
+
   )
 
 SET_SOURCE_FILES_PROPERTIES(

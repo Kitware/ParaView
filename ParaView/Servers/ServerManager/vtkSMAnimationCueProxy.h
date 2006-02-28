@@ -133,6 +133,7 @@ protected:
 //BTX
   vtkSMAnimationCueProxyObserver* Observer;
   friend class vtkSMAnimationCueProxyObserver;
+  friend class vtkSMTemporalXYPlotDisplayProxy;
 //ETX
 
   int Caching; // flag indicating if the animation is to use Cache.

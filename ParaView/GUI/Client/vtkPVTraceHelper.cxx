@@ -13,8 +13,9 @@
 =========================================================================*/
 #include "vtkPVTraceHelper.h"
 
-#include "vtkPVApplication.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVWindow.h"
 
 #include <vtksys/SystemTools.hxx>
 #include <stdarg.h>
@@ -23,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTraceHelper );
-vtkCxxRevisionMacro(vtkPVTraceHelper, "1.6");
+vtkCxxRevisionMacro(vtkPVTraceHelper, "1.7");
 
 #if vtkPVTraceHelper_RefCountReferenceHelper
 vtkCxxSetObjectMacro(vtkPVTraceHelper, ReferenceHelper,
@@ -35,6 +36,7 @@ vtkPVTraceHelper::vtkPVTraceHelper()
 {
   this->Initialized      = 0;
   this->StateInitialized = 0;
+  this->InitializedStateFileId = 0;
   this->TraceObject      = NULL;
   this->ReferenceHelper  = NULL;
   this->ReferenceCommand = NULL;
@@ -93,19 +95,24 @@ ofstream* vtkPVTraceHelper::GetFile()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVTraceHelper::Initialize()
+vtkIdType vtkPVTraceHelper::GetApplicationStateFileId()
 {
-  return this->Initialize(NULL);
+  if (this->TraceObject)
+    {
+    vtkPVApplication *pvapp = vtkPVApplication::SafeDownCast(
+      this->TraceObject->GetApplication());
+    if (pvapp)
+      {
+      return vtkPVWindow::SafeDownCast(pvapp->GetMainWindow())->GetStateFileId();
+      }
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVTraceHelper::SetStateInitialized(int init)
+int vtkPVTraceHelper::Initialize()
 {
-  if (this->ReferenceHelper)
-    {
-    this->ReferenceHelper->SetStateInitialized(init);
-    }
-  this->StateInitialized = init;
+  return this->Initialize(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -124,6 +131,7 @@ int vtkPVTraceHelper::Initialize(ofstream* file)
   // for one file, and I do not like any possible solutions to extend this.
 
   ofstream *os = this->GetFile();
+  vtkIdType appSFId = 0;
   if (file == NULL || file == os)
     { 
     // Tracing:  Keep track of initialization.
@@ -135,6 +143,11 @@ int vtkPVTraceHelper::Initialize(ofstream* file)
     // Saving state: Ignore trace initialization; keep track of state
     // initialization.
     state_flag = 1;
+    appSFId = this->GetApplicationStateFileId();
+    if (this->InitializedStateFileId < appSFId)
+      {
+      this->StateInitialized = 0;
+      }
     init = &(this->StateInitialized);
     }
 
@@ -163,6 +176,10 @@ int vtkPVTraceHelper::Initialize(ofstream* file)
             << this->ReferenceHelper->GetTraceObject()->GetTclName() << ") "
             << this->ReferenceCommand << "]" << endl;
       *init = 1;
+      if (state_flag)
+        {
+        this->InitializedStateFileId = appSFId;
+        }
       return 1;
       }
     }
@@ -261,7 +278,7 @@ void vtkPVTraceHelper::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "Initialized: " << this->GetInitialized() << endl;
-  os << indent << "StateInitialized: " << this->GetStateInitialized() << endl;
+  os << indent << "StateInitialized: " << this->StateInitialized << endl;
   os << indent << "TraceObject: " << this->GetTraceObject() << endl;
   os << indent << "ReferenceHelper: " 
      << this->GetReferenceHelper() << endl;

@@ -595,6 +595,10 @@ public:
   // Description:
   // Resets all the settings to default values.
   void ResetSettingsToDefault();
+
+  // Description:
+  // Get the Id for the most recent state saved.
+  vtkGetMacro(StateFileId, vtkIdType);
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -775,6 +779,11 @@ protected:
   vtkPVTraceHelper* TraceHelper;
 
   int SaveVisibleSourcesOnlyFlag;
+
+  // When ever a PV GUI state file is being saved, we assign it a unique Id. 
+  // This Id helps the vtkPVTraceHelper to realize if the initialization
+  // code should be added to the state file (or if it has been already added.)
+  vtkIdType StateFileId;
 
   vtkKWToolbar *LookmarkToolbar;
   vtkKWPushButton *LookmarkButton;

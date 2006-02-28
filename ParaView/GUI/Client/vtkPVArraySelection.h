@@ -107,6 +107,10 @@ public:
 
   virtual void CheckButtonCallback(int);
 
+  // Description:
+  // Get the internal selection object.
+  vtkGetObjectMacro(Selection, vtkDataArraySelection);
+
 protected:
   vtkPVArraySelection();
   ~vtkPVArraySelection();
@@ -115,6 +119,7 @@ protected:
   virtual void Trace(ofstream *file);
 
   virtual void UpdateGUI();
+  virtual void CreateNewGUI();
   virtual void UpdateSelections(int fromReader);
   virtual void SetPropertyFromGUI();
 
