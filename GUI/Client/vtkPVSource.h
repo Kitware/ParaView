@@ -47,6 +47,7 @@ class vtkSMDataObjectDisplayProxy;
 class vtkSMDisplayProxy;
 class vtkSMPart;
 class vtkSMPointLabelDisplayProxy;
+class vtkSMProxy;
 class vtkSMSourceProxy;
 class vtkSource;
 class vtkStringList;
@@ -266,7 +267,8 @@ public:
   // to saveing a trace, except only the last state is stored.
   virtual void SaveState(ofstream *file);
   virtual void SaveStateVisibility(ofstream *file);
-  virtual void SaveStateDisplay(ofstream *file);
+  virtual void SaveStateDisplay(ofstream* file);
+
   
   // Description:
   // This flag determines whether a source will make its input invisible or
@@ -497,7 +499,7 @@ public:
   void SetAcceptButtonColorToModified();
 
   // Description:
-  void MarkSourcesForUpdate();
+  virtual void MarkSourcesForUpdate();
 
   // Description
   // If this source was created from a lookmark (state script), need to delete it from the lookmark's
@@ -524,6 +526,9 @@ protected:
   // Setups up the displays for this source
   virtual void SetupDisplays();
   virtual void CleanupDisplays();
+
+  virtual void SaveStateDisplayInternal(ofstream *file, 
+    const char* display_tcl_name, vtkSMProxy* display);
 
   // Description:
   // Set the color map and the field to use.

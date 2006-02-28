@@ -32,6 +32,7 @@
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMXYPlotActorProxy.h"
 #include "vtkXYPlotWidget.h"
 #include "vtkXYPlotActor.h"
 
@@ -59,7 +60,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.18");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.19");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -586,7 +587,7 @@ void vtkSMXYPlotDisplayProxy::ExecuteEvent(vtkObject*, unsigned long event,
   this->InvokeEvent(event); // just in case the GUI wants to know about interaction.
 }
 //-----------------------------------------------------------------------------
-vtkPolyData* vtkSMXYPlotDisplayProxy::GetCollectedData()
+vtkDataSet* vtkSMXYPlotDisplayProxy::GetCollectedData()
 {
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   
@@ -597,7 +598,7 @@ vtkPolyData* vtkSMXYPlotDisplayProxy::GetCollectedData()
     return NULL;
     }
 
-  return vtkPolyData::SafeDownCast(dp->GetOutput());
+  return dp->GetOutput();
 }
 
 //-----------------------------------------------------------------------------

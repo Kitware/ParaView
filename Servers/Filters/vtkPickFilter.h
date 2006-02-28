@@ -89,13 +89,13 @@ protected:
   vtkPickFilter();
   ~vtkPickFilter();
 
-  void Execute();
+  virtual void Execute();
   void PointExecute();
   void CellExecute();
   int CompareProcesses(double bestDist2);
   void CreateOutput(vtkIdList* regionCellIds);
 
-  void IdExecute();
+  virtual void IdExecute();
   int CellIdExecute(vtkDataSet* input, int inputIdx,  vtkAppendFilter* append);
   int PointIdExecute(vtkDataSet* input, int inputIdx, vtkAppendFilter* append);
 

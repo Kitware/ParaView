@@ -59,6 +59,10 @@ public:
   vtkPVWidget *GetPVWidget(const char* label);
 
   // Description:
+  // Access the currently selected widget.
+  vtkPVWidget* GetCurrentWidget();
+
+  // Description:
   // Set the label of the menu.
   void SetLabel(const char *label);
 
@@ -95,6 +99,10 @@ public:
   // Set and Get the widget selection.
   const char* GetCurrentVTKValue();
   const char* GetVTKValue(int i);
+
+  // Description:
+  // Get the label for the currently selected widget.
+  const char* GetCurrentLabel();
     
 //BTX
   // Description:

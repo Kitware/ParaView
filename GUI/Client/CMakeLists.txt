@@ -100,6 +100,7 @@ SET( ParaViewClient_SRCS
   vtkPVDisplayGUI.cxx
   vtkPVDReaderModule.cxx
   vtkPVDWriter.cxx
+  vtkPVDataAnalysis.cxx
   vtkPVDataSetReaderModule.cxx
   vtkPVBasicDSPFilterWidget.cxx
   vtkPVDummyWidget.cxx
@@ -150,6 +151,8 @@ SET( ParaViewClient_SRCS
   vtkPVPick.cxx
   vtkPVPickBoxWidget.cxx
   vtkPVPickSphereWidget.cxx
+  vtkPVPlotArraySelection.cxx
+  vtkPVPlotDisplayLabelPropertiesDialog.cxx
   vtkPVProbe.cxx
   vtkPVPropertyKeyFrame.cxx
   vtkPVProxyKeyFrame.cxx

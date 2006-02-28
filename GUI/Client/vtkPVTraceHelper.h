@@ -90,14 +90,6 @@ public:
   vtkBooleanMacro(Initialized, int);
 
   // Description:
-  // If a callback initializes Object in a state file, it can indicate so by
-  // setting this flag. When the flag is set, its state if propagated to the
-  // TraceHelper for the reference object.
-  void SetStateInitialized(int);
-  vtkGetMacro(StateInitialized, int);
-  vtkBooleanMacro(StateInitialized, int);
-
-  // Description:
   // Convenience method to get the trace file associated to the Object's
   // application, if any. Return NULL if Object's is not defined, has
   // no application, or no trace file.
@@ -139,6 +131,11 @@ protected:
   int StateInitialized;
 
   // Description:
+  // Id of the most recent state file in which this trace helper
+  // added the initialization code.
+  vtkIdType InitializedStateFileId;
+
+  // Description:
   // Unique trace name
   char *ObjectName;
   int ObjectNameState;
@@ -162,6 +159,9 @@ protected:
   static void OutputEntryInternal(
     ostream *os, int estimated_length, const char *format, va_list ap);
 
+  // Description:
+  // Gets the state file id from vtkPVWindow.
+  vtkIdType GetApplicationStateFileId();
 private:
 
   vtkPVTraceHelper(const vtkPVTraceHelper&); // Not implemented

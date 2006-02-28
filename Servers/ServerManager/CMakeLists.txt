@@ -110,6 +110,7 @@ SET(Kit_SRCS
   vtkSMStringVectorProperty.cxx
   vtkSMSubPropertyIterator.cxx
   vtkSMSummaryHelperProxy.cxx
+  vtkSMTemporalXYPlotDisplayProxy.cxx
   vtkSMTimeStepsInformationHelper.cxx
   vtkSMTransformProxy.cxx
   vtkSMXDMFInformationHelper.cxx
