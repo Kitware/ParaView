@@ -92,7 +92,6 @@ SET(PROJECT_TESTS
   XdmfReadStructuredGridCollection
   XdmfReadRectilinearGrid
   XdmfReadRectilinearGridCollection
-#  TestAnimationSaveLoad
   )
 
 # some tests require MPI because the classes do not get built otherwise
@@ -276,7 +275,7 @@ ADD_TEST(TestCTHAndCalc-ParaView
 
 # remove the following for the batch tests
 SET (PROJECT_TESTS_NO_BATCH 
-  #Animation
+  DataAnalysisCellIdTemporal
   DefaultAnimation
   DeleteSource
   DualSphereAnimation
@@ -289,8 +288,6 @@ SET (PROJECT_TESTS_NO_BATCH
   TestPackage
   Write
   TestComparativeVis
-#  TestAnimationSaveLoad
-#  XdmfRead
 )
 REMOVE (PROJECT_TESTS ${PROJECT_TESTS_NO_BATCH})
 
