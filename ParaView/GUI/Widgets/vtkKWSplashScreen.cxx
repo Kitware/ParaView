@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.36");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.37");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -80,16 +80,19 @@ void vtkKWSplashScreen::Create()
   this->Script("%s create image 0 0 -tags image -anchor nw", 
                this->Canvas->GetWidgetName());
 
-  if (this->ImageName)
-    {
-    this->Script("%s itemconfigure image -image %s", 
-                 this->Canvas->GetWidgetName(), this->ImageName);
-    }
-  
   // Insert the text
 
   this->Script("%s create text 0 0 -tags msg -anchor c", 
                this->Canvas->GetWidgetName());
+
+  if (this->ImageName)
+    {
+    this->Script("%s itemconfigure image -image %s", 
+                 this->Canvas->GetWidgetName(), this->ImageName);
+    this->UpdateCanvasSize();
+    }
+
+  this->UpdateProgressMessagePosition();
 }
 
 //----------------------------------------------------------------------------
@@ -104,6 +107,7 @@ void vtkKWSplashScreen::UpdateCanvasSize()
       vtkKWTkUtilities::GetPhotoWidth(app, this->ImageName));
     this->Canvas->SetHeight(
       vtkKWTkUtilities::GetPhotoHeight(app, this->ImageName));
+    this->UpdateProgressMessagePosition();
     }
 }
 
@@ -122,24 +126,6 @@ void vtkKWSplashScreen::UpdateProgressMessagePosition()
                   ? height + ProgressMessageVerticalOffset 
                   : ProgressMessageVerticalOffset));
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWSplashScreen::Display()
-{
-  // Update canvas size and message position
-
-  this->UpdateCanvasSize();
-  this->UpdateProgressMessagePosition();
-
-  this->Superclass::Display();
-
-  // As much as call to 'update' are evil, this is the only way to bring
-  // the splashscreen up-to-date and in front. 'update idletasks' will not
-  // do the trick because this code is usually executed during initialization
-  // or creation of the UI, not in the event loop
-
-  vtkKWTkUtilities::ProcessPendingEvents(this->GetApplication());
 }
 
 //----------------------------------------------------------------------------
@@ -177,6 +163,7 @@ void vtkKWSplashScreen::SetImageName (const char* _arg)
     const char *res = this->Canvas->Script(
       "%s itemconfigure image -image %s", 
       this->Canvas->GetWidgetName(), this->ImageName);
+    this->UpdateCanvasSize();
     if (res && *res)
       {
       vtkErrorMacro("Error setting ImageName: " << res);
@@ -225,6 +212,7 @@ int vtkKWSplashScreen::ReadImage(const char *filename)
     {
     this->SetImageName(new_image_name.c_str());
     }
+  this->UpdateCanvasSize();
 
   delete [] image_buffer;
   return res;
@@ -247,6 +235,13 @@ void vtkKWSplashScreen::SetProgressMessage(const char *txt)
     {
     this->Display();
     }
+
+  // As much as call to 'update' are evil, this is the only way to bring
+  // the splashscreen up-to-date and in front. 'update idletasks' will not
+  // do the trick because this code is usually executed during initialization
+  // or creation of the UI, not in the event loop
+
+  vtkKWTkUtilities::ProcessPendingEvents(this->GetApplication());
 }
 
 //----------------------------------------------------------------------------

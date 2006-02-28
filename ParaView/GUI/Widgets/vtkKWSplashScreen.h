@@ -34,11 +34,6 @@ public:
   virtual void Create();
 
   // Description:
-  // Display the splash screen
-  // Override to center it no matter what.
-  virtual void Display();
-  
-  // Description:
   // Set the text of the progress message
   void SetProgressMessage(const char *);
   
