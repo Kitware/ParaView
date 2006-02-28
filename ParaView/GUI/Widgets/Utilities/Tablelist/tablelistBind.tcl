@@ -890,6 +890,8 @@ proc tablelist::beginToggle {win row col} {
 	    }
 	}
     }
+
+    event generate $win <<TablelistSelect>>
 }
 
 #------------------------------------------------------------------------------
