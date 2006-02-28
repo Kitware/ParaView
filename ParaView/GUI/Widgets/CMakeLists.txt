@@ -594,10 +594,6 @@ IF(BUILD_TESTING AND NOT DISABLE_KWWidgets_TESTING)
   SUBDIRS(Testing)
 ENDIF(BUILD_TESTING AND NOT DISABLE_KWWidgets_TESTING)
 
-IF(NEED_TO_BUILD_EXAMPLES)
-  SUBDIRS(Examples)
-ENDIF(NEED_TO_BUILD_EXAMPLES)
-
 # --------------------------------------------------------------------------
 # Build the utilities
 
@@ -653,3 +649,14 @@ SUBDIRS(Resources)
 # Configure the export configuration
 
 SUBDIRS(Utilities/ExportConfiguration)
+
+# --------------------------------------------------------------------------
+# Build the examples
+# This need to be done *at the end*, so that the installation process
+# goes as far as possible before trying to install the examples; 
+# examples would stop the install process if they failed to build (say, if a
+# third-party lib like ITK or SOV was broken).
+
+IF(NEED_TO_BUILD_EXAMPLES)
+  SUBDIRS(Examples)
+ENDIF(NEED_TO_BUILD_EXAMPLES)
