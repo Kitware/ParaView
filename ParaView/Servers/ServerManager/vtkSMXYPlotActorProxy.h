@@ -60,11 +60,12 @@ public:
   virtual void UpdateVTKObjects();
 
   // Description:
-  // When set, the colors are computed for each array automatically by 
-  // this class. Set by default.
-  vtkSetMacro(ComputeColors, int);
-  vtkGetMacro(ComputeColors, int);
-  vtkBooleanMacro(ComputeColors, int);
+  // This class traditionally performed operations such as changing
+  // legend visibility, computing array colors etc. These "smart"
+  // actions are performed only if this flag is set. It is set by default.
+  vtkSetMacro(Smart, int);
+  vtkGetMacro(Smart, int);
+  vtkBooleanMacro(Smart, int);
 protected:
   vtkSMXYPlotActorProxy();
   ~vtkSMXYPlotActorProxy();
@@ -81,9 +82,7 @@ protected:
   void SetupInputs();
 
   // Description:
-  // Flag deciding if this class should compute the colors assigned to
-  // each array.
-  int ComputeColors;
+  int Smart;
 private:
   vtkSMXYPlotActorProxy(const vtkSMXYPlotActorProxy&); // Not implemented.
   void operator=(const vtkSMXYPlotActorProxy&); // Not implemented.

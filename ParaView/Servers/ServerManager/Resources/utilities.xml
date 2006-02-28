@@ -1264,8 +1264,8 @@
         </ArrayListDomain>
       </StringVectorProperty>
       <IntVectorProperty
-        name="ComputeColors"
-        command="SetComputeColors"
+        name="Smart"
+        command="SetSmart"
         number_of_elements="1"
         default_values="1"
         update_self="1">

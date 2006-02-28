@@ -654,6 +654,9 @@ protected:
   // Taking responsibility of saving inputs away from input menu.
   void SetInputsInBatchScript(ofstream *file);
 
+  // Save Widgets to batch script.
+  virtual void SaveWidgetsInBatchScript(ofstream* file);
+
   int UpdateSourceInBatch;
 
   int LabelSetByUser;

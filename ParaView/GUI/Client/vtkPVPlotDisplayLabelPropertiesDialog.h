@@ -33,6 +33,7 @@ class vtkKWPushButton;
 class vtkKWScaleWithEntry;
 class vtkSMDoubleVectorProperty;
 class vtkSMIntVectorProperty;
+class vtkSMProxy;
 class vtkSMStringVectorProperty;
 class vtkPVApplication;
 class vtkPVTraceHelper;
@@ -80,6 +81,8 @@ public:
   void SetNumberOfMinorTicksProperty(vtkSMIntVectorProperty*);
   void SetTitlePositionProperty(vtkSMDoubleVectorProperty*);
   void SetDataRangeProperty(vtkSMDoubleVectorProperty*);
+  void SetPlotDisplayProxy(vtkSMProxy*);
+    
 
   // Description:
   // API to set the text displayed in the TitlePositionLabel.
@@ -116,6 +119,7 @@ protected:
   vtkSMIntVectorProperty* NumberOfMinorTicksProperty;
   vtkSMDoubleVectorProperty* TitlePositionProperty;
   vtkSMDoubleVectorProperty* DataRangeProperty;
+  vtkSMProxy* PlotDisplayProxy;
    
   vtkPVTraceHelper* TraceHelper;
 private:

@@ -1986,7 +1986,6 @@
           <Property name="AdjustXLabels" />
           <Property name="AdjustYLabels" />
           <Property name="ArrayNames" />
-          <Property name="ComputeColors" />
           <Property name="LegendPosition" />
           <Property name="LegendVisibility" />
           <Property name="NumberOfXLabels" />
@@ -1996,6 +1995,7 @@
           <Property name="PlotColors" />
           <Property name="PlotLines" />
           <Property name="PlotPoints" />
+          <Property name="Smart" />
           <Property name="Title" />
           <Property name="TitlePosition" />
           <Property name="XLabelFormat" />

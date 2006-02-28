@@ -23,7 +23,6 @@ IF (VTK_USE_MPI)
 ENDIF (VTK_USE_MPI)
 
 SET(PROJECT_TESTS
-  #Animation
   ArrayMenuChangeInput
   Arrow
   Axes
@@ -39,6 +38,8 @@ SET(PROJECT_TESTS
   CTH
   CutContours
   Data
+  DataAnalysisPointId
+  DataAnalysisCellIdTemporal
   DefaultAnimation
   Delete
   DeleteSource

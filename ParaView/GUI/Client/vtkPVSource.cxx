@@ -66,7 +66,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.477");
+vtkCxxRevisionMacro(vtkPVSource, "1.478");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -2324,7 +2324,15 @@ void vtkPVSource::SaveFilterInBatchScript(ofstream *file)
         << " UnRegister {}" << endl;
 
   this->SetInputsInBatchScript(file);
+  this->SaveWidgetsInBatchScript(file);
 
+
+  *file << "  $pvTemp" << this->Proxy->GetSelfIDAsString()
+        << " UpdateVTKObjects" << endl;
+}
+//----------------------------------------------------------------------------
+void vtkPVSource::SaveWidgetsInBatchScript(ofstream* file)
+{
   // Let the PVWidgets set up the object.
   vtkCollectionIterator *it = this->Widgets->NewIterator();
   vtkPVWidget *pvw;
@@ -2336,9 +2344,6 @@ void vtkPVSource::SaveFilterInBatchScript(ofstream *file)
     it->GoToNextItem();
     }
   it->Delete();
-
-  *file << "  $pvTemp" << this->Proxy->GetSelfIDAsString()
-        << " UpdateVTKObjects" << endl;
 }
 
 //----------------------------------------------------------------------------

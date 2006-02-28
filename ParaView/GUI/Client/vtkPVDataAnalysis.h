@@ -160,6 +160,10 @@ public:
   // to saveing a trace, except only the last state is stored.
   virtual void SaveState(ofstream *file);
 
+  // Description:
+  // Overridden to save the plot display to batch.
+  virtual void SaveInBatchScript(ofstream *file);
+
   // Description:;
   // Get the plot display used by this source.
   vtkGetObjectMacro(PlotDisplayProxy, vtkSMTemporalXYPlotDisplayProxy);
@@ -175,6 +179,10 @@ protected:
   // The real AcceptCallback method.
   virtual void AcceptCallbackInternal();  
 
+  // Since all properties of vtkDataAnalysisFilter proxy are not exposed
+  // as GUI widgets, the superclass does not write all properties.
+  virtual void SaveWidgetsInBatchScript(ofstream* file);
+  
   // Description:
   // Setups up the displays for this source. Overridden to create/cleanup
   // the plot display.
