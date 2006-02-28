@@ -32,7 +32,7 @@
 #include "vtkKWMultiColumnList.h"
 #include "vtkKWMultiColumnListWithScrollbars.h"
 #include "vtkKWRange.h"
-#include "vtkPickProbeFilter.h"
+#include "vtkDataAnalysisFilter.h"
 #include "vtkPointData.h"
 #include "vtkPVApplication.h"
 #include "vtkPVPlotArraySelection.h"
@@ -86,7 +86,7 @@ protected:
 //*****************************************************************************
 
 vtkStandardNewMacro(vtkPVDataAnalysis);
-vtkCxxRevisionMacro(vtkPVDataAnalysis, "1.1");
+vtkCxxRevisionMacro(vtkPVDataAnalysis, "1.2");
 //-----------------------------------------------------------------------------
 vtkPVDataAnalysis::vtkPVDataAnalysis()
 {
@@ -614,7 +614,7 @@ void vtkPVDataAnalysis::UpdateVTKSourceParameters()
     proxy->GetProperty("Mode"));
   int mode = ivp->GetElement(0);
 
-  if (mode == vtkPickProbeFilter::PICK)
+  if (mode == vtkDataAnalysisFilter::PICK)
     {
     // Source is used only when in Probe mode.
     vtkSMProxyProperty* sourceProperty = vtkSMProxyProperty::SafeDownCast(
