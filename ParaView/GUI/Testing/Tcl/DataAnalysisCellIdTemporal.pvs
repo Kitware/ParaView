@@ -4,11 +4,11 @@ set kw(vtkTemp106) [$kw(vtkTemp2) GetMainView]
 source [file join [file dirname [info script]] CommandLineOptions.tcl]
 ParseCommandLine $kw(vtkTemp106) $argv $argc
 
-set kw(vtkTemp1185) [$kw(vtkTemp2) InitializeReadCustom "XMLStructuredGridReader" "/home/utkarsh/Kitware/ParaView/ParaView/Data/Data/multicomb_0.vts"]
-$kw(vtkTemp2) ReadFileInformation $kw(vtkTemp1185) "/home/utkarsh/Kitware/ParaView/ParaView/Data/Data/multicomb_0.vts"
-$kw(vtkTemp2) FinalizeRead $kw(vtkTemp1185) "/home/utkarsh/Kitware/ParaView/ParaView/Data/Data/multicomb_0.vts"
+set kw(vtkTemp1185) [$kw(vtkTemp2) InitializeReadCustom "XMLStructuredGridReader" "/Data/multicomb_0.vts"]
+$kw(vtkTemp2) ReadFileInformation $kw(vtkTemp1185) "$DataDir/Data/multicomb_0.vts"
+$kw(vtkTemp2) FinalizeRead $kw(vtkTemp1185) "$DataDir/Data/multicomb_0.vts"
 set kw(vtkTemp1199) [$kw(vtkTemp1185) GetPVWidget {Filename}]
-$kw(vtkTemp1199) SetValue "/home/utkarsh/Kitware/ParaView/ParaView/Data/Data/multicomb_0.vts"
+$kw(vtkTemp1199) SetValue "$DataDir/Data/multicomb_0.vts"
 set kw(vtkTemp1190) [$kw(vtkTemp1185) GetPVWidget {PointSelection}]
 $kw(vtkTemp1190) SetArrayStatus {Density} 1
 $kw(vtkTemp1190) SetArrayStatus {Momentum} 1
