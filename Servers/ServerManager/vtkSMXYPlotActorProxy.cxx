@@ -27,7 +27,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMXYPlotActorProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.8");
 vtkCxxSetObjectMacro(vtkSMXYPlotActorProxy, Input, vtkSMSourceProxy);
 
 class vtkSMXYPlotActorProxyInternals
@@ -43,7 +43,7 @@ vtkSMXYPlotActorProxy::vtkSMXYPlotActorProxy()
   this->Input = 0;
   this->Internals = new vtkSMXYPlotActorProxyInternals;
   this->SetExecutiveName(0);
-  this->ComputeColors = 1;
+  this->Smart = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -172,7 +172,7 @@ void vtkSMXYPlotActorProxy::SetupInputs()
       << sourceID << "SetPlotLabel" << arrayCount << arrayname
       << vtkClientServerStream::End;
     
-    if (this->ComputeColors)
+    if (this->Smart)
       {
       double r, g , b;
       vtkMath::HSVToRGB(color, 1.0, 1.0, &r, &g, &b);
@@ -187,22 +187,25 @@ void vtkSMXYPlotActorProxy::SetupInputs()
     arrayCount++;
     }
 
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->GetProperty("LegendVisibility"));
-  if (ivp)
+  if (this->Smart)
     {
-    ivp->SetElement(0, ( arrayCount > 1 ? 1 : 0));
-    }
-  else
-    {
-    vtkErrorMacro("Failed to find property LegendVisibility.");
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->GetProperty("LegendVisibility"));
+    if (ivp)
+      {
+      ivp->SetElement(0, ( arrayCount > 1 ? 1 : 0));
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property LegendVisibility.");
+      }
     }
   if (arrayCount == 1)
     {
     stream << vtkClientServerStream::Invoke
       << sourceID << "SetYTitle" << arrayname 
       << vtkClientServerStream::End;
-    if (this->ComputeColors)
+    if (this->Smart)
       {
       stream << vtkClientServerStream::Invoke
         << sourceID << "SetPlotColor" << 0 << 1 << 1 << 1
@@ -248,5 +251,5 @@ void vtkSMXYPlotActorProxy::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "ArrayNamesModified: " << this->ArrayNamesModified << endl;
   os << indent << "Input: " << this->Input << endl;
-  os << indent << "ComputeColors: " << this->ComputeColors << endl;
+  os << indent << "Smart: " << this->Smart << endl;
 }

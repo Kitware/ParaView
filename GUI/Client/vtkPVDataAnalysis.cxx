@@ -44,6 +44,7 @@
 #include "vtkPVSelectWidget.h"
 #include "vtkPVTraceHelper.h"
 #include "vtkPVWindow.h"
+#include "vtkSMAnimationCueProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMInputProperty.h"
@@ -86,7 +87,7 @@ protected:
 //*****************************************************************************
 
 vtkStandardNewMacro(vtkPVDataAnalysis);
-vtkCxxRevisionMacro(vtkPVDataAnalysis, "1.2");
+vtkCxxRevisionMacro(vtkPVDataAnalysis, "1.3");
 //-----------------------------------------------------------------------------
 vtkPVDataAnalysis::vtkPVDataAnalysis()
 {
@@ -731,6 +732,7 @@ void vtkPVDataAnalysis::PlotOverTimeInternal(int state)
     this->Script("pack forget %s", 
       this->DataInformationFrame->GetWidgetName());
     }
+  this->PlotOverTimeCheckButton->SetSelectedState(state);
 }
 
 //-----------------------------------------------------------------------------
@@ -1184,14 +1186,14 @@ void vtkPVDataAnalysis::SetupDisplays()
   // This property determines if the ServerManager should automatically decide 
   // the colors used for the plot curves. In this case, NO!
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->PlotDisplayProxy->GetProperty("ComputeColors"));
+    this->PlotDisplayProxy->GetProperty("Smart"));
   if (ivp)
     {
     ivp->SetElement(0, 0);
     }
   else
     {
-    vtkErrorMacro("Failed to locate property ComputeColors.");
+    vtkErrorMacro("Failed to locate property Smart.");
     }
   this->PlotDisplayProxy->UpdateVTKObjects();
 }
@@ -1680,6 +1682,7 @@ void vtkPVDataAnalysis::EditXLabelCallback(int popup_dialog)
       this->GetTraceHelper());
     this->LabelPropertiesDialog->GetTraceHelper()->SetReferenceCommand(
       "GetLabelPropertiesDialog");
+    this->LabelPropertiesDialog->SetPlotDisplayProxy(this->PlotDisplayProxy);
     }
 
   this->LabelPropertiesDialog->SetTitle("X Axes Label Properties Dialog");
@@ -1705,7 +1708,6 @@ void vtkPVDataAnalysis::EditXLabelCallback(int popup_dialog)
 
   if (popup_dialog && this->LabelPropertiesDialog->Invoke())
     {
-    this->PlotDisplayProxy->UpdateVTKObjects();
     this->GetPVRenderView()->EventuallyRender();
     }
 
@@ -1724,6 +1726,7 @@ void vtkPVDataAnalysis::EditYLabelCallback(int popup_dialog)
       this->GetTraceHelper());
     this->LabelPropertiesDialog->GetTraceHelper()->SetReferenceCommand(
       "GetLabelPropertiesDialog");
+    this->LabelPropertiesDialog->SetPlotDisplayProxy(this->PlotDisplayProxy);
     }
   this->LabelPropertiesDialog->SetTitle("Y Axes Label Properties Dialog");
   this->LabelPropertiesDialog->SetPositionLabelText("Y Axis Title Position ");
@@ -1747,7 +1750,6 @@ void vtkPVDataAnalysis::EditYLabelCallback(int popup_dialog)
       this->PlotDisplayProxy->GetProperty("YRange")));
   if (popup_dialog && this->LabelPropertiesDialog->Invoke())
     {
-    this->PlotDisplayProxy->UpdateVTKObjects();
     this->GetPVRenderView()->EventuallyRender();
     }
 }
@@ -1831,6 +1833,72 @@ void vtkPVDataAnalysis::SaveState(ofstream* file)
   // Save the state of the array selection widgets.
   this->PointArraySelection->SaveState(file);
   this->CellArraySelection->SaveState(file);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVDataAnalysis::SaveInBatchScript(ofstream* file)
+{
+  if (this->VisitedFlag)
+    {
+    return;
+    }
+  this->Superclass::SaveInBatchScript(file);
+
+  if (this->AnimationCueProxy)
+    {
+    *file << endl;
+    *file << "# Save the Animation Cue used for generating temporal plot." << endl;
+    vtkSMAnimationCueProxy::SafeDownCast(this->AnimationCueProxy)->SaveInBatchScript(file);
+    }
+
+  if (this->PlotDisplayProxy)
+    {
+    *file << endl;
+    *file << "# Save XY Plot Display." << endl;
+    this->PlotDisplayProxy->SaveInBatchScript(file);
+    }
+}
+
+
+//-----------------------------------------------------------------------------
+void vtkPVDataAnalysis::SaveWidgetsInBatchScript(ofstream* file)
+{
+  // Since all properties of vtkDataAnalysisFilter proxy are not exposed
+  // as GUI widgets, the superclass does not write all properties.
+  this->Superclass::SaveWidgetsInBatchScript(file);
+
+  const char* sourceID = this->GetProxy()->GetSelfIDAsString();
+  *file << "  [$pvTemp" << sourceID << " GetProperty Source] RemoveAllProxies" 
+    << endl;
+ 
+  vtkSMProxyProperty* pp;
+  vtkSMIntVectorProperty* ivp;
+  
+  pp = vtkSMProxyProperty::SafeDownCast(
+    this->GetProxy()->GetProperty("Source"));
+  if (pp && pp->GetNumberOfProxies() > 0 && pp->GetProxy(0))
+    {
+    // The source proxy used will have been written to batch by superclass.
+    *file << "  [$pvTemp" << sourceID << " GetProperty Source] AddProxy "
+      << "$pvTemp" << pp->GetProxy(0)->GetSelfIDAsString()
+      << endl;
+    }
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProxy()->GetProperty("UseIdToPick"));
+  if (ivp)
+    {
+    *file << "  [$pvTemp" << sourceID << " GetProperty UseIdToPick] "
+      "SetElement 0 " << ivp->GetElement(0) << endl;
+    }
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProxy()->GetProperty("PickCell"));
+  if (ivp)
+    {
+    *file << "  [$pvTemp" << sourceID << " GetProperty PickCell] "
+      "SetElement 0 " << ivp->GetElement(0) << endl;
+    }
 }
 
 //-----------------------------------------------------------------------------

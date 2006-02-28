@@ -26,10 +26,11 @@
 #include "vtkPVTraceHelper.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVPlotDisplayLabelPropertiesDialog);
-vtkCxxRevisionMacro(vtkPVPlotDisplayLabelPropertiesDialog, "1.1");
+vtkCxxRevisionMacro(vtkPVPlotDisplayLabelPropertiesDialog, "1.2");
 vtkCxxSetObjectMacro(vtkPVPlotDisplayLabelPropertiesDialog, LabelFormatProperty,
   vtkSMStringVectorProperty);
 vtkCxxSetObjectMacro(vtkPVPlotDisplayLabelPropertiesDialog, NumberOfLabelsProperty,
@@ -42,6 +43,8 @@ vtkCxxSetObjectMacro(vtkPVPlotDisplayLabelPropertiesDialog, TitlePositionPropert
   vtkSMDoubleVectorProperty);
 vtkCxxSetObjectMacro(vtkPVPlotDisplayLabelPropertiesDialog, DataRangeProperty,
   vtkSMDoubleVectorProperty);
+vtkCxxSetObjectMacro(vtkPVPlotDisplayLabelPropertiesDialog, PlotDisplayProxy,
+  vtkSMProxy);
 //-----------------------------------------------------------------------------
 vtkPVPlotDisplayLabelPropertiesDialog::vtkPVPlotDisplayLabelPropertiesDialog()
 {
@@ -71,6 +74,7 @@ vtkPVPlotDisplayLabelPropertiesDialog::vtkPVPlotDisplayLabelPropertiesDialog()
   this->NumberOfMinorTicksProperty = 0;
   this->TitlePositionProperty = 0;
   this->DataRangeProperty = 0;
+  this->PlotDisplayProxy = 0;
 
   this->TraceHelper = vtkPVTraceHelper::New();
   this->TraceHelper->SetTraceObject(this);
@@ -103,6 +107,7 @@ vtkPVPlotDisplayLabelPropertiesDialog::~vtkPVPlotDisplayLabelPropertiesDialog()
   this->SetNumberOfMinorTicksProperty(0);
   this->SetTitlePositionProperty(0);
   this->SetDataRangeProperty(0);
+  this->SetPlotDisplayProxy(0);
 
   this->TraceHelper->Delete();
 }
@@ -354,6 +359,10 @@ void vtkPVPlotDisplayLabelPropertiesDialog::PushWidgetValues(int from_gui)
       this->DataRangeMinWidget->GetWidget()->SetValueAsDouble(range[0]);
       this->DataRangeMaxWidget->GetWidget()->SetValueAsDouble(range[1]);
       this->SetDataRangeAuto((range[0]==range[1]));
+      }
+    if (this->PlotDisplayProxy)
+      {
+      this->PlotDisplayProxy->UpdateVTKObjects();
       }
     }
   this->GetTraceHelper()->AddEntry("$kw(%s) PushWidgetValues %d", 
