@@ -62,17 +62,15 @@ TARGET_LINK_LIBRARIES(${EXE_NAME} ${KWWidgets_LIBRARIES} ${SOV_LIBRARIES})
 # the various environments variables (PATH, TCLLIBPATH, LD_LIBRARY_PATH, etc.) 
 # required by this executable and its known third-party dependencies (VTK, ITK,
 # SOV, KWWidgets, etc.).
-# - Generate a lightweight C launcher for this *specific* executable. This 
-# launcher sets the above environment variables before launching the executable
-# itself. Note that the path to the executable to launch is hard-coded.
+# - Generate a lightweight C launcher for this *specific* executable: It sets
+# the above environment variables before launching the executable itself.
 
 IF(NOT KWWidgets_SOURCE_DIR)
   INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsPathsMacros.cmake")
   KWWidgets_GENERATE_SETUP_PATHS_SCRIPTS("${CMAKE_CURRENT_BINARY_DIR}")
   SET(LAUNCHER_EXE_NAME "${EXE_NAME}Launcher")
   KWWidgets_GENERATE_SETUP_PATHS_LAUNCHER(
-    "${CMAKE_CURRENT_BINARY_DIR}" "${LAUNCHER_EXE_NAME}" 
-    "${EXECUTABLE_OUTPUT_PATH}" "${EXE_NAME}")
+    "${CMAKE_CURRENT_BINARY_DIR}" "${LAUNCHER_EXE_NAME}" "" "${EXE_NAME}")
 ENDIF(NOT KWWidgets_SOURCE_DIR)
 
 # If needed, copy the Tcl/Tk support files required at run-time 
