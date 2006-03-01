@@ -65,7 +65,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.273");
+vtkCxxRevisionMacro(vtkKWApplication, "1.274");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -109,41 +109,52 @@ public:
 //----------------------------------------------------------------------------
 vtkKWApplication::vtkKWApplication()
 {
-  //  Do *ALL* simple inits *first* before a possible
-  //  early return due to an error condition. Avoids
-  //  crashing during destructor when some members have
-  //  not been properly NULL initialized...
-  //
-  this->Internals = NULL;
-  this->MajorVersion = 1;
-  this->MinorVersion = 0;
-  this->Name = NULL;
-  this->VersionName = NULL;
-  this->ReleaseName = NULL;
-  this->PrettyName = NULL;
-  this->LimitedEditionMode = 0;
-  this->LimitedEditionModeName = NULL;
-  this->HelpDialogStartingPage = NULL;
-  this->InstallationDirectory = NULL;
-  this->UserDataDirectory = NULL;
-  this->EmailFeedbackAddress  = NULL;
-  this->InExit     = 0;
-  this->ExitStatus = 0;
-  this->ExitAfterLoadScript = 0;
-  this->PromptBeforeExit = 1;
-  this->DialogUp = 0;
+  /* IMPORTANT:
+     Do *ALL* simple inits *first* before a possible
+     early return due to an error condition. Avoids
+     crashing during destructor when some members have
+     not been properly NULL initialized...
+  */
+
+  this->Internals                 = NULL;
+  this->MajorVersion              = 1;
+  this->MinorVersion              = 0;
+  this->Name                      = NULL;
+  this->VersionName               = NULL;
+  this->ReleaseName               = NULL;
+  this->PrettyName                = NULL;
+  this->LimitedEditionMode        = 0;
+  this->LimitedEditionModeName    = NULL;
+  this->HelpDialogStartingPage    = NULL;
+  this->InstallationDirectory     = NULL;
+  this->UserDataDirectory         = NULL;
+  this->EmailFeedbackAddress      = NULL;
+  this->InExit                    = 0;
+  this->ExitStatus                = 0;
+  this->ExitAfterLoadScript       = 0;
+  this->PromptBeforeExit          = 1;
+  this->DialogUp                  = 0;
   this->SaveUserInterfaceGeometry = 1;
-  this->RegistryHelper = NULL;
-  this->RegistryLevel = 10;
-  this->BalloonHelpManager = NULL;
-  this->CharacterEncoding = VTK_ENCODING_UNKNOWN;
-  this->AboutDialog      = NULL;
-  this->AboutDialogImage = NULL;
-  this->AboutRuntimeInfo = NULL;
-  this->SplashScreen = NULL;
-  this->SupportSplashScreen = 0;
-  this->SplashScreenVisibility = 1;
-  this->PrintTargetDPI        = 100.0;
+  this->RegistryHelper            = NULL;
+  this->RegistryLevel             = 10;
+  this->BalloonHelpManager        = NULL;
+  this->CharacterEncoding         = VTK_ENCODING_UNKNOWN;
+  this->AboutDialog               = NULL;
+  this->AboutDialogImage          = NULL;
+  this->AboutRuntimeInfo          = NULL;
+  this->SplashScreen              = NULL;
+  this->SupportSplashScreen       = 0;
+  this->SplashScreenVisibility    = 1;
+  this->PrintTargetDPI            = 100.0;
+
+  /* IMPORTANT:
+     Do *NOT* call anything that retrieves the application's TclName.
+     Doing so will force a mapping between a Tcl object and this class with
+     the wrong command function, i.e. a Tcl object will be created and
+     mapped to a vtkKWApplication Tcl command. As a result, any subclass
+     vtkFoo of vtkKWApplication will appear to be a vtkKWApplication instead
+     of a vtkFoo, and will be missing all the corresponding wrapped methods.
+  */
 
   // Setup Tcl
 
@@ -202,14 +213,6 @@ vtkKWApplication::vtkKWApplication()
   // Encoding...
 
   this->SetCharacterEncoding(VTK_ENCODING_ISO_8859_1);
-
-  // As a convenience, set the 'Application' Tcl variable to ourself
-
-  this->Script("set Application %s",this->GetTclName());
-  this->Script(
-    "proc bgerror { m } "
-    "{ global Application errorInfo; "
-    "$Application TclBgErrorCallback \"$m\n$errorInfo\"}");
 }
 
 //----------------------------------------------------------------------------
@@ -716,6 +719,8 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
     this->GetSplashScreen()->Withdraw();
     }
 
+  InstallTclBgErrorCallback();
+
   // If no windows has been mapped so far, then as a convenience,
   // map the first one
 
@@ -862,6 +867,15 @@ void vtkKWApplication::SaveApplicationSettingsToRegistry()
 void vtkKWApplication::DoOneTclEvent()
 {
   Tcl_DoOneEvent(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::InstallTclBgErrorCallback()
+{
+  this->Script(
+    "proc bgerror { m } "
+    "{ global Application errorInfo; "
+    "%s TclBgErrorCallback \"$m\n$errorInfo\"}", this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
