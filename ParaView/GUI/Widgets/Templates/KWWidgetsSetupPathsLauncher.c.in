@@ -166,6 +166,8 @@ int main(int argc, char** argv)
   realpath(exe_path, real_exe_path);
 #endif
 
+  argv[0] = real_exe_path;
+
   /* Quote unquoted args, otherwise args seem to get mixed up */
 
   for(argc = 0, nb_quoted_argv = 0; 
@@ -181,7 +183,6 @@ int main(int argc, char** argv)
       }
     }
     
-  argv[0] = real_exe_path;
 #if defined(_MSC_VER)
   // _execv can't be used as it does not property return the exit value
   // of the process to execute.
