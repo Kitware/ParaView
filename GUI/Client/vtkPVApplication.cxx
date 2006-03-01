@@ -114,7 +114,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.385");
+vtkCxxRevisionMacro(vtkPVApplication, "1.386");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -437,6 +437,10 @@ vtkPVApplication::vtkPVApplication()
   vtkKWFrameWithLabel::SetDefaultAllowFrameToCollapse(1);
   vtkKWFrameWithLabel::SetDefaultLabelFontWeightToBold();
   
+  // As a convenience, set the 'Application' Tcl variable to ourself
+
+  this->Script("set Application %s", this->GetTclName());
+
   // The following is necessary to make sure that the tcl object
   // created has the right command function. Without this,
   // the tcl object has the vtkKWApplication's command function
