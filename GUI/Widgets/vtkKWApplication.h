@@ -393,6 +393,16 @@ public:
   static int ExploreLink(const char *link);
 
   // Description:
+  // Install the Tcl background error callback. Individual applications
+  // can define a background error command if they wish to handle background
+  // errors. A background error is one that occurs in an event handler or
+  // some other command that didn't originate with the application. For
+  // example, if an error occurs while executing a command specified with
+  // asynchronously. The default implementation is to feed the Tcl error
+  // message to a vtkErrorMacro.
+  virtual void InstallTclBgErrorCallback();
+
+  // Description:
   // Some constants
   //BTX
   static const char *ExitDialogName;
