@@ -60,7 +60,7 @@ int main(int argc, char** argv)
   char quoted_argv[MAX_QUOTED_ARGV][MAXPATH];
   int nb_quoted_argv;
 
-  char current_dir[MAXPATH];
+  char current_exe[MAXPATH];
   char *slash_pos;
 
 #if defined(_WIN32)
@@ -115,10 +115,17 @@ int main(int argc, char** argv)
     }
   putenv(pythonpath_env);
 
-  /* Replace this process with the real executable. If no executable
-     was specified for EXECUTABLE, use the first argument that was passed */
+  /* Save the native form of the current executable path so that we can set
+     our working dir to its location later on. */
 
-  strcpy(current_dir, argv[0]);
+#if defined(_WIN32) && !defined(__CYGWIN__)
+  GetFullPathName(argv[0], MAXPATH, current_exe, 0);
+#else
+  realpath(argv[0], current_exe);
+#endif
+
+  /* Replace this process with the real executable. If no executable
+     was specified for EXECUTABLE, use the first argument that was passed. */
 
   strcpy(exe_path, 
          "@EXECUTABLE@");
@@ -128,7 +135,7 @@ int main(int argc, char** argv)
     strcpy(exe_path, argv[0]);
     }
 
-  /* Append .exe if it was not found */
+  /* Append .exe extension if it was not found */
 
 #if defined(_WIN32) 
   exe_path_len = strlen(exe_path);
@@ -141,24 +148,26 @@ int main(int argc, char** argv)
     }
 #endif
 
-  /* Change the current working dir */
+  /* Change the current working dir to the dir of the original executable 
+     so that the executable to launch can be found if is relative. */
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
-  slash_pos = strrchr(current_dir, '\\');
+  slash_pos = strrchr(current_exe, '\\');
 #else
-  slash_pos = strrchr(current_dir, '/');
+  slash_pos = strrchr(current_exe, '/');
 #endif
   if (slash_pos)
     {
     *slash_pos = '\0';
 #if defined(_WIN32) && (defined(_MSC_VER) || defined(__WATCOMC__) || defined(__MINGW32__)) 
-    _chdir(current_dir);
+    _chdir(current_exe);
 #else
-    chdir(current_dir);
+    chdir(current_exe);
 #endif
     }
   
-  /* Find the full path (will use the current dir if exe_path is relative) */
+  /* Retrieve the native path to the executable to launch; this will use the
+     current working dir if exe_path is relative. */
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
   GetFullPathName(exe_path, MAXPATH, real_exe_path, 0);
@@ -184,13 +193,13 @@ int main(int argc, char** argv)
       }
     }
 #endif
-    
+
 #if defined(_MSC_VER)
   // _execv can't be used as it does not property return the exit value
   // of the process to execute.
-  return _spawnv(_P_WAIT, argv[0], argv);
+  return _spawnv(_P_WAIT, real_exe_path, argv);
 #else
-  execv(argv[0], argv);
+  execv(real_exe_path, argv);
 #endif
 
   /* Report why execution failed.  */
