@@ -32,7 +32,7 @@ const char *vtkKWWindowLevelPresetSelector::ModalityColumnName  = "Modality";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowLevelPresetSelector);
-vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.14");
+vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.15");
 
 //----------------------------------------------------------------------------
 int vtkKWWindowLevelPresetSelector::SetPresetWindow(
@@ -167,6 +167,10 @@ int vtkKWWindowLevelPresetSelector::UpdatePresetRow(int id)
     }
 
   int row = this->GetPresetRow(id);
+  if (row < 0)
+    {
+    return 0;
+    }
 
   vtkKWMultiColumnList *list = this->PresetList->GetWidget();
 

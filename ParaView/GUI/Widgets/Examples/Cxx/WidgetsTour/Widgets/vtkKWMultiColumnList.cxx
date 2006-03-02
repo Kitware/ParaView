@@ -53,9 +53,9 @@ void vtkKWMultiColumnListItem::Create(vtkKWWidget *parent, vtkKWWindow *)
   mcl1->MovableColumnsOn();
   mcl1->SetWidth(0);
   mcl1->SetPotentialCellColorsChangedCommand(
-    mcl1, "RefreshColorsOfAllCellsWithWindowCommand");
+    mcl1, "ScheduleRefreshColorsOfAllCellsWithWindowCommand");
   mcl1->SetColumnSortedCommand(
-    mcl1, "RefreshColorsOfAllCellsWithWindowCommand");
+    mcl1, "ScheduleRefreshColorsOfAllCellsWithWindowCommand");
 
   int col_index;
 

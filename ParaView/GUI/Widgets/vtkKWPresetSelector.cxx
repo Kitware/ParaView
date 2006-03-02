@@ -57,7 +57,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.38");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.39");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -93,14 +93,21 @@ public:
 
   // Preset pool
 
-  static int PresetNodeCounter;
+  int PresetNodeCounter;
 
-  typedef vtksys_stl::vector<PresetNode*> PresetPoolType;
-  typedef vtksys_stl::vector<PresetNode*>::iterator PresetPoolIterator;
+  typedef vtksys_stl::map<int, PresetNode*> PresetPoolType;
+  typedef vtksys_stl::map<int, PresetNode*>::iterator PresetPoolIterator;
 
   PresetPoolType PresetPool;
 
-  PresetPoolIterator GetPresetNode(int id);
+  PresetNode* GetPresetNode(int id);
+  PresetPoolIterator GetPresetNodeIterator(int id);
+
+  // Timers for updating preset rows
+
+  typedef vtksys_stl::map<int,vtksys_stl::string> UpdatePresetRowTimerPoolType;
+  typedef vtksys_stl::map<int,vtksys_stl::string>::iterator UpdatePresetRowTimerPoolIterator;
+  UpdatePresetRowTimerPoolType UpdatePresetRowTimerPool;
 
   // User slot name for the default fields
 
@@ -128,24 +135,24 @@ public:
   PresetFilterType PresetFilter;
 };
 
-int vtkKWPresetSelectorInternals::PresetNodeCounter = 0;
-
 //---------------------------------------------------------------------------
-vtkKWPresetSelectorInternals::PresetPoolIterator 
+vtkKWPresetSelectorInternals::PresetNode*
 vtkKWPresetSelectorInternals::GetPresetNode(int id)
 {
   vtkKWPresetSelectorInternals::PresetPoolIterator it = 
-    this->PresetPool.begin();
-  vtkKWPresetSelectorInternals::PresetPoolIterator end = 
-    this->PresetPool.end();
-  for (; it != end; ++it)
+    this->PresetPool.find(id);
+  if (it != this->PresetPool.end())
     {
-    if ((*it)->Id == id)
-      {
-      return it;
-      }
+    return it->second;
     }
-  return end;
+  return NULL;
+}
+
+//---------------------------------------------------------------------------
+vtkKWPresetSelectorInternals::PresetPoolIterator
+vtkKWPresetSelectorInternals::GetPresetNodeIterator(int id)
+{
+  return this->PresetPool.find(id);
 }
 
 //----------------------------------------------------------------------------
@@ -167,6 +174,7 @@ void vtkKWPresetSelector::DeAllocatePreset(int id)
 vtkKWPresetSelector::vtkKWPresetSelector()
 {
   this->Internals = new vtkKWPresetSelectorInternals;
+  this->Internals->PresetNodeCounter = 0;
 
   this->Internals->GroupSlotName = "DefaultGroupSlot";
   this->Internals->CommentSlotName = "DefaultCommentSlot";
@@ -310,7 +318,7 @@ void vtkKWPresetSelector::Create()
   list->SetSelectionChangedCommand(
     this, "PresetSelectionChangedCallback");
   list->SetPotentialCellColorsChangedCommand(
-    list, "RefreshColorsOfAllCellsWithWindowCommand");
+    list, "ScheduleRefreshColorsOfAllCellsWithWindowCommand");
   // list->SetSelectionBackgroundColor(0.988, 1.0, 0.725);
   // list->ColumnLabelsVisibilityOff();
   list->ColumnSeparatorsVisibilityOn();
@@ -887,18 +895,18 @@ int vtkKWPresetSelector::AddPreset()
     return -1;
     }
 
-  int id =  vtkKWPresetSelectorInternals::PresetNodeCounter++;
+  int id =  this->Internals->PresetNodeCounter++;
 
   vtkKWPresetSelectorInternals::PresetNode *node = 
     new vtkKWPresetSelectorInternals::PresetNode;
 
   node->Id = id;
-  this->Internals->PresetPool.push_back(node);
+  this->Internals->PresetPool[id] = node;
 
   this->SetPresetCreationTime(id, vtksys::SystemTools::GetTime());
-  // this->UpdatePresetRow(id); // called by SetPresetCreationTime
+  // this->ScheduleUpdatePresetRow(id); // called by SetPresetCreationTime
 
-  if (this->PresetList)
+  if (this->PresetList && this->PresetList->IsMapped())
     {
     int row = this->GetPresetRow(id);
     if (row >= 0)
@@ -917,9 +925,9 @@ int vtkKWPresetSelector::HasPreset(int id)
 {
   if (this->Internals)
     {
-    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
+    vtkKWPresetSelectorInternals::PresetNode *node =
       this->Internals->GetPresetNode(id);
-    return (it != this->Internals->PresetPool.end()) ? 1 : 0;
+    return node ? 1 : 0;
     }
   return 0;
 }
@@ -1198,9 +1206,7 @@ int vtkKWPresetSelector::BuildPresetThumbnailAndScreenshotFromImage(
     return 0;
     }
 
-  vtkKWPresetSelectorInternals::PresetPoolIterator it = 
-    this->Internals->GetPresetNode(id);
-  if (it == this->Internals->PresetPool.end())
+  if (!this->HasPreset(id))
     {
     return 0;
     }
@@ -1324,7 +1330,7 @@ int vtkKWPresetSelector::BuildPresetThumbnailAndScreenshotFromImage(
 
   // Update the icon cell
 
-  this->UpdatePresetRow(id);
+  this->ScheduleUpdatePresetRow(id);
 
   return 1;
 }
@@ -1351,13 +1357,13 @@ int vtkKWPresetSelector::HasPresetUserSlot(int id, const char *slot_name)
 {
   if (this->Internals)
     {
-    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
+    vtkKWPresetSelectorInternals::PresetNode *node =
       this->Internals->GetPresetNode(id);
-    if (it != this->Internals->PresetPool.end())
+    if (node)
       {
       vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
-        (*it)->UserSlotPool.find(slot_name);
-      if (s_it != (*it)->UserSlotPool.end())
+        node->UserSlotPool.find(slot_name);
+      if (s_it != node->UserSlotPool.end())
         {
         return 1;
         }
@@ -1373,12 +1379,12 @@ int vtkKWPresetSelector::SetPresetUserSlotAsDouble(
 {
   if (this->Internals)
     {
-    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
+    vtkKWPresetSelectorInternals::PresetNode *node =
       this->Internals->GetPresetNode(id);
-    if (it != this->Internals->PresetPool.end())
+    if (node)
       {
-      (*it)->UserSlotPool[slot_name].DoubleValue = value;
-      this->UpdatePresetRow(id);
+      node->UserSlotPool[slot_name].DoubleValue = value;
+      this->ScheduleUpdatePresetRow(id);
       return 1;
       }
     }
@@ -1392,13 +1398,13 @@ double vtkKWPresetSelector::GetPresetUserSlotAsDouble(
 {
   if (this->Internals)
     {
-    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
+    vtkKWPresetSelectorInternals::PresetNode *node =
       this->Internals->GetPresetNode(id);
-    if (it != this->Internals->PresetPool.end())
+    if (node)
       {
       vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
-        (*it)->UserSlotPool.find(slot_name);
-      if (s_it != (*it)->UserSlotPool.end())
+        node->UserSlotPool.find(slot_name);
+      if (s_it != node->UserSlotPool.end())
         {
         return s_it->second.DoubleValue;
         }
@@ -1414,12 +1420,12 @@ int vtkKWPresetSelector::SetPresetUserSlotAsInt(
 {
   if (this->Internals)
     {
-    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
+    vtkKWPresetSelectorInternals::PresetNode *node =
       this->Internals->GetPresetNode(id);
-    if (it != this->Internals->PresetPool.end())
+    if (node)
       {
-      (*it)->UserSlotPool[slot_name].IntValue = value;
-      this->UpdatePresetRow(id);
+      node->UserSlotPool[slot_name].IntValue = value;
+      this->ScheduleUpdatePresetRow(id);
       return 1;
       }
     }
@@ -1433,13 +1439,13 @@ int vtkKWPresetSelector::GetPresetUserSlotAsInt(
 {
   if (this->Internals)
     {
-    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
+    vtkKWPresetSelectorInternals::PresetNode *node =
       this->Internals->GetPresetNode(id);
-    if (it != this->Internals->PresetPool.end())
+    if (node)
       {
       vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
-        (*it)->UserSlotPool.find(slot_name);
-      if (s_it != (*it)->UserSlotPool.end())
+        node->UserSlotPool.find(slot_name);
+      if (s_it != node->UserSlotPool.end())
         {
         return s_it->second.IntValue;
         }
@@ -1455,12 +1461,12 @@ int vtkKWPresetSelector::SetPresetUserSlotAsString(
 {
   if (this->Internals)
     {
-    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
+    vtkKWPresetSelectorInternals::PresetNode *node =
       this->Internals->GetPresetNode(id);
-    if (it != this->Internals->PresetPool.end())
+    if (node)
       {
-      (*it)->UserSlotPool[slot_name].StringValue = value ? value : "";
-      this->UpdatePresetRow(id);
+      node->UserSlotPool[slot_name].StringValue = value ? value : "";
+      this->ScheduleUpdatePresetRow(id);
       return 1;
       }
     }
@@ -1474,13 +1480,13 @@ const char* vtkKWPresetSelector::GetPresetUserSlotAsString(
 {
   if (this->Internals)
     {
-    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
+    vtkKWPresetSelectorInternals::PresetNode *node =
       this->Internals->GetPresetNode(id);
-    if (it != this->Internals->PresetPool.end())
+    if (node)
       {
       vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
-        (*it)->UserSlotPool.find(slot_name);
-      if (s_it != (*it)->UserSlotPool.end())
+        node->UserSlotPool.find(slot_name);
+      if (s_it != node->UserSlotPool.end())
         {
         return s_it->second.StringValue.c_str();
         }
@@ -1496,12 +1502,12 @@ int vtkKWPresetSelector::SetPresetUserSlotAsPointer(
 {
   if (this->Internals)
     {
-    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
+    vtkKWPresetSelectorInternals::PresetNode *node =
       this->Internals->GetPresetNode(id);
-    if (it != this->Internals->PresetPool.end())
+    if (node)
       {
-      (*it)->UserSlotPool[slot_name].PointerValue = value;
-      this->UpdatePresetRow(id);
+      node->UserSlotPool[slot_name].PointerValue = value;
+      this->ScheduleUpdatePresetRow(id);
       return 1;
       }
     }
@@ -1515,13 +1521,13 @@ void* vtkKWPresetSelector::GetPresetUserSlotAsPointer(
 {
   if (this->Internals)
     {
-    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
+    vtkKWPresetSelectorInternals::PresetNode *node =
       this->Internals->GetPresetNode(id);
-    if (it != this->Internals->PresetPool.end())
+    if (node)
       {
       vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
-        (*it)->UserSlotPool.find(slot_name);
-      if (s_it != (*it)->UserSlotPool.end())
+        node->UserSlotPool.find(slot_name);
+      if (s_it != node->UserSlotPool.end())
         {
         return s_it->second.PointerValue;
         }
@@ -1554,8 +1560,8 @@ int vtkKWPresetSelector::GetNumberOfPresetsWithGroup(const char *group)
     for (; it != end; ++it)
       {
       vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
-        (*it)->UserSlotPool.find(this->GetPresetGroupSlotName());
-      if (s_it != (*it)->UserSlotPool.end() &&
+        it->second->UserSlotPool.find(this->GetPresetGroupSlotName());
+      if (s_it != it->second->UserSlotPool.end() &&
           !s_it->second.StringValue.compare(group))
         {
         count++;
@@ -1587,7 +1593,14 @@ int vtkKWPresetSelector::GetNthPresetId(int index)
 {
   if (this->Internals && index >= 0 && index < this->GetNumberOfPresets())
     {
-    return this->Internals->PresetPool[index]->Id;
+    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
+      this->Internals->PresetPool.begin();
+    while (index > 0)
+      {
+      ++it;
+      --index;
+      }
+    return it->second->Id;
     }
 
   return -1;
@@ -1642,8 +1655,8 @@ int vtkKWPresetSelector::GetNthPresetWithGroupRank(
     for (int nth = 0; it != end; ++it, nth++)
       {
       vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
-        (*it)->UserSlotPool.find(this->GetPresetGroupSlotName());
-      if (s_it != (*it)->UserSlotPool.end() &&
+        it->second->UserSlotPool.find(this->GetPresetGroupSlotName());
+      if (s_it != it->second->UserSlotPool.end() &&
           !s_it->second.StringValue.compare(group))
         {
         index--;
@@ -1664,7 +1677,7 @@ int vtkKWPresetSelector::RemovePreset(int id)
   if (this->Internals)
     {
     vtkKWPresetSelectorInternals::PresetPoolIterator it = 
-      this->Internals->GetPresetNode(id);
+      this->Internals->GetPresetNodeIterator(id);
     if (it != this->Internals->PresetPool.end())
       {
       this->DeAllocatePreset(id);
@@ -1676,7 +1689,7 @@ int vtkKWPresetSelector::RemovePreset(int id)
           this->PresetList->GetWidget()->DeleteRow(row);
           }
         }
-      delete (*it);
+      delete it->second;
       this->Internals->PresetPool.erase(it);
       this->NumberOfPresetsHasChanged();
       return 1;
@@ -1702,7 +1715,7 @@ int vtkKWPresetSelector::DeleteAllPresets()
     it = this->Internals->PresetPool.begin();
     for (; it != end; ++it)
       {
-      this->DeAllocatePreset((*it)->Id);
+      this->DeAllocatePreset(it->second->Id);
       }
 
     // Then remove the presets
@@ -1710,7 +1723,7 @@ int vtkKWPresetSelector::DeleteAllPresets()
     it = this->Internals->PresetPool.begin();
     for (; it != end; ++it)
       {
-      delete (*it);
+      delete it->second;
       }
     this->Internals->PresetPool.clear();
 
@@ -1756,14 +1769,14 @@ int vtkKWPresetSelector::RemoveAllPresetsWithGroup(const char *group)
     for (; it != end; ++it)
       {
       vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
-        (*it)->UserSlotPool.find(this->GetPresetGroupSlotName());
-      if (s_it != (*it)->UserSlotPool.end() &&
+        it->second->UserSlotPool.find(this->GetPresetGroupSlotName());
+      if (s_it != it->second->UserSlotPool.end() &&
           !s_it->second.StringValue.compare(group))
         {
-        this->DeAllocatePreset((*it)->Id);
+        this->DeAllocatePreset(it->second->Id);
         if (this->PresetList)
           {
-          int row = this->GetPresetRow((*it)->Id);
+          int row = this->GetPresetRow(it->second->Id);
           if (row >= 0)
             {
             this->PresetList->GetWidget()->DeleteRow(row);
@@ -1783,11 +1796,11 @@ int vtkKWPresetSelector::RemoveAllPresetsWithGroup(const char *group)
       for (; it != end; ++it)
         {
         vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
-          (*it)->UserSlotPool.find(this->GetPresetGroupSlotName());
-        if (s_it != (*it)->UserSlotPool.end() &&
+          it->second->UserSlotPool.find(this->GetPresetGroupSlotName());
+        if (s_it != it->second->UserSlotPool.end() &&
             !s_it->second.StringValue.compare(group))
           {
-          delete (*it);
+          delete it->second;
           this->Internals->PresetPool.erase(it);
           nb_deleted++;
           done = 0;
@@ -2038,12 +2051,16 @@ int vtkKWPresetSelector::IsPresetFiltered(int id)
 void vtkKWPresetSelector::UpdatePresetRows()
 {
   int nb_visible_presets = this->GetNumberOfVisiblePresets();
-  int nb_presets = this->GetNumberOfPresets();
-  for (int i = 0; i < nb_presets; i++)
-    {
-    this->UpdatePresetRow(this->GetNthPresetId(i));
-    }
 
+  vtkKWPresetSelectorInternals::PresetPoolIterator it = 
+    this->Internals->PresetPool.begin();
+  vtkKWPresetSelectorInternals::PresetPoolIterator end = 
+    this->Internals->PresetPool.end();
+  for (; it != end; ++it)
+    {
+    this->UpdatePresetRow(it->second->Id);
+    }
+  
   // If the number of visible presets changed, this can enable/disable
   // some buttons
 
@@ -2077,8 +2094,8 @@ int vtkKWPresetSelector::UpdatePresetRow(int id)
       {
       return 0;
       }
-    list->AddRow();
-    row = list->GetNumberOfRows() - 1;
+    row = list->GetNumberOfRows();
+    list->InsertRow(row);
     if (row < 0)
       {
       return 0;
@@ -2099,9 +2116,7 @@ int vtkKWPresetSelector::UpdatePresetRow(int id)
   // Id (not shown, but useful to retrieve the id of a preset from
   // a cell position
 
-  char buffer[256];
-  sprintf(buffer, "%03d", id);
-  list->SetCellText(row, this->GetIdColumnIndex(), buffer);
+  list->SetCellTextAsInt(row, this->GetIdColumnIndex(), id);
 
   int image_col_index = this->GetThumbnailColumnIndex();
   list->SetCellWindowCommand(
@@ -2122,6 +2137,37 @@ int vtkKWPresetSelector::UpdatePresetRow(int id)
     row, this->GetCommentColumnIndex(), this->GetPresetComment(id));
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::ScheduleUpdatePresetRow(int id)
+{
+  // Already scheduled
+
+  vtkKWPresetSelectorInternals::UpdatePresetRowTimerPoolIterator it = 
+    this->Internals->UpdatePresetRowTimerPool.find(id);
+  if (it != this->Internals->UpdatePresetRowTimerPool.end())
+    {
+    return;
+    }
+
+  this->Internals->UpdatePresetRowTimerPool[id] =
+    this->Script("after idle {catch {%s UpdatePresetRowCallback %d}}", 
+                 this->GetTclName(), id);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::UpdatePresetRowCallback(int id)
+{
+  if (!this->GetApplication() || this->GetApplication()->GetInExit() ||
+      !this->IsAlive())
+    {
+    return;
+    }
+
+  this->UpdatePresetRow(id);
+  this->Internals->UpdatePresetRowTimerPool.erase(
+    this->Internals->UpdatePresetRowTimerPool.find(id));
 }
 
 //---------------------------------------------------------------------------

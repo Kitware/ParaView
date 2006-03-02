@@ -22,9 +22,9 @@ proc vtkKWMultiColumnListEntryPoint {parent win} {
   $mcl1 MovableColumnsOn
   $mcl1 SetWidth 0
   $mcl1 SetPotentialCellColorsChangedCommand \
-    $mcl1 "RefreshColorsOfAllCellsWithWindowCommand"
+    $mcl1 "ScheduleRefreshColorsOfAllCellsWithWindowCommand"
   $mcl1 SetColumnSortedCommand \
-    $mcl1 "RefreshColorsOfAllCellsWithWindowCommand"
+    $mcl1 "ScheduleRefreshColorsOfAllCellsWithWindowCommand"
 
   # Add the columns make some of them editable
 
