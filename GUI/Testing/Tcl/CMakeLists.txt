@@ -23,7 +23,6 @@ IF (VTK_USE_MPI)
 ENDIF (VTK_USE_MPI)
 
 SET(PROJECT_TESTS
-  #Animation
   ArrayMenuChangeInput
   Arrow
   Axes
@@ -39,6 +38,8 @@ SET(PROJECT_TESTS
   CTH
   CutContours
   Data
+  DataAnalysisPointId
+  DataAnalysisCellIdTemporal
   DefaultAnimation
   Delete
   DeleteSource
@@ -90,7 +91,6 @@ SET(PROJECT_TESTS
   XdmfReadStructuredGridCollection
   XdmfReadRectilinearGrid
   XdmfReadRectilinearGridCollection
-#  TestAnimationSaveLoad
   )
 
 # some tests require MPI because the classes do not get built otherwise
@@ -277,7 +277,7 @@ ADD_TEST("ArrowServer-ParaView-rc"
 
 # remove the following for the batch tests
 SET (PROJECT_TESTS_NO_BATCH 
-  #Animation
+  DataAnalysisCellIdTemporal
   DefaultAnimation
   DeleteSource
   DualSphereAnimation
@@ -290,8 +290,6 @@ SET (PROJECT_TESTS_NO_BATCH
   TestPackage
   Write
   TestComparativeVis
-#  TestAnimationSaveLoad
-#  XdmfRead
 )
 REMOVE (PROJECT_TESTS ${PROJECT_TESTS_NO_BATCH})
 

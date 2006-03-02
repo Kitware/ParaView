@@ -44,7 +44,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.76");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.76.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVArraySelection::vtkPVArraySelection()
@@ -249,8 +249,6 @@ void vtkPVArraySelection::UpdateSelections(int fromReader)
 //----------------------------------------------------------------------------
 void vtkPVArraySelection::UpdateGUI()
 {
-  vtkKWCheckButton* checkButton;
-
   // See if we need to create new check buttons.
   vtkPVArraySelectionArraySet newSet;
   int i;
@@ -262,38 +260,7 @@ void vtkPVArraySelection::UpdateGUI()
   if(newSet != *(this->ArraySet))
     {
     *(this->ArraySet) = newSet;
-
-    // Clear out any old check buttons.
-    this->Script("catch {eval pack forget [pack slaves %s]}",
-                 this->CheckFrame->GetWidgetName());
-    this->ArrayCheckButtons->RemoveAllItems();
-    
-    vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
-
-    // Create new check buttons.
-    if (sourceID.ID)
-      {
-      int numArrays, idx;
-      int row = 0;
-      numArrays = this->Selection->GetNumberOfArrays();
-      for (idx = 0; idx < numArrays; ++idx)
-        {
-        checkButton = vtkKWCheckButton::New();
-        checkButton->SetParent(this->CheckFrame);
-        checkButton->Create(this->GetApplication());
-        this->Script("%s SetText {%s}", checkButton->GetTclName(), 
-                     this->Selection->GetArrayName(idx));
-        this->Script("grid %s -row %d -sticky w", checkButton->GetWidgetName(), row);
-        ++row;
-        checkButton->SetCommand(this, "ModifiedCallback");
-        this->ArrayCheckButtons->AddItem(checkButton);
-        checkButton->Delete();
-        }
-      if ( numArrays == 0 )
-        {
-        this->Script("grid %s -row 0 -sticky w", this->NoArraysLabel->GetWidgetName());
-        }
-      }
+    this->CreateNewGUI();
     }
   
   vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
@@ -302,9 +269,45 @@ void vtkPVArraySelection::UpdateGUI()
     vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetCurrentObject());
     check->SetSelectedState(this->Selection->ArrayIsEnabled(check->GetText()));
     }
-  it->Delete();
+  it->Delete();  
+}
 
+//----------------------------------------------------------------------------
+void vtkPVArraySelection::CreateNewGUI()
+{
+  vtkKWCheckButton *checkButton;
+
+  // Clear out any old check buttons.
+  this->Script("catch {eval pack forget [pack slaves %s]}",
+               this->CheckFrame->GetWidgetName());
+  this->ArrayCheckButtons->RemoveAllItems();
   
+  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+
+  // Create new check buttons.
+  if (sourceID.ID)
+    {
+    int numArrays, idx;
+    int row = 0;
+    numArrays = this->Selection->GetNumberOfArrays();
+    for (idx = 0; idx < numArrays; ++idx)
+      {
+      checkButton = vtkKWCheckButton::New();
+      checkButton->SetParent(this->CheckFrame);
+      checkButton->Create(this->GetApplication());
+      this->Script("%s SetText {%s}", checkButton->GetTclName(), 
+                   this->Selection->GetArrayName(idx));
+      this->Script("grid %s -row %d -sticky w", checkButton->GetWidgetName(), row);
+      ++row;
+      checkButton->SetCommand(this, "ModifiedCallback");
+      this->ArrayCheckButtons->AddItem(checkButton);
+      checkButton->Delete();
+      }
+    if ( numArrays == 0 )
+      {
+      this->Script("grid %s -row 0 -sticky w", this->NoArraysLabel->GetWidgetName());
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -617,4 +620,5 @@ void vtkPVArraySelection::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "LabelText: " << (this->LabelText?this->LabelText:"none") << endl;
+  os << indent << "Selection: " << this->Selection << endl;
 }

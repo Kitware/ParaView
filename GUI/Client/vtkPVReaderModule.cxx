@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.68");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.68.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVReaderModule::vtkPVReaderModule()
@@ -292,7 +292,9 @@ void vtkPVReaderModule::SaveState(ofstream *file)
   it->InitTraversal();
   
   int numWidgets = this->Widgets->GetNumberOfItems();
-  for (int i = 0; i < numWidgets; i++)
+  int i;
+
+  for (i = 0; i < numWidgets; i++)
     {
     vtkPVWidget* widget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     widget->SaveState(file);

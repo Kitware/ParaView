@@ -64,6 +64,13 @@ public:
   // (the VTK object we are creating on the server side has not really an output)
   void UpdateInformation();
 
+  // Description:
+  // This class traditionally performed operations such as changing
+  // legend visibility, computing array colors etc. These "smart"
+  // actions are performed only if this flag is set. It is set by default.
+  vtkSetMacro(Smart, int);
+  vtkGetMacro(Smart, int);
+  vtkBooleanMacro(Smart, int);
 protected:
   vtkSMXYPlotActorProxy();
   ~vtkSMXYPlotActorProxy();
@@ -79,6 +86,8 @@ protected:
   // Called to build the XYActor inputs for the selected arrays.
   void SetupInputs();
 
+  // Description:
+  int Smart;
 private:
   vtkSMXYPlotActorProxy(const vtkSMXYPlotActorProxy&); // Not implemented.
   void operator=(const vtkSMXYPlotActorProxy&); // Not implemented.

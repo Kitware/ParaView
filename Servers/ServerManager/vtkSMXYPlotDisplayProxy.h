@@ -28,7 +28,7 @@ class vtkSMXYPlotDisplayProxyObserver;
 class vtkXYPlotWidget;
 class vtkSMRenderModuleProxy;
 class vtkSMSourceProxy;
-class vtkPolyData;
+class vtkDataSet;
 
 class VTK_EXPORT vtkSMXYPlotDisplayProxy : public vtkSMConsumerDisplayProxy
 {
@@ -54,7 +54,7 @@ public:
   // The Probe needs access to this to fill in the UI point values.
   // Only needed when probing one point only.
   // TODO: I have to find a means to get rid of this!!
-  vtkPolyData *GetCollectedData();
+  vtkDataSet *GetCollectedData();
   //ETX
   
   // Description:
@@ -71,7 +71,7 @@ public:
   
   // Description:
   // Marks for Update.
-  virtual void InvalidateGeometry();
+  virtual void InvalidateGeometry(int useCache=0);
 
   // Description:
   // Calls MarkConsumersAsModified() on all consumers. Sub-classes

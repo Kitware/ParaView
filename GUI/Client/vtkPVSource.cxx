@@ -61,9 +61,10 @@
 #include "vtkPVPick.h"
 
 #include <vtkstd/vector>
+#include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.457.2.1");
+vtkCxxRevisionMacro(vtkPVSource, "1.457.2.2");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -879,7 +880,8 @@ void vtkPVSource::SetPointLabelVisibility(int val)
     {
     return;
     }
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetPointLabelVisibility %d", this->GetTclName(), val);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetPointLabelVisibility %d", 
+    this->GetTclName(), val);
   this->SetPointLabelVisibilityNoTrace(val);
 }
 
@@ -1079,9 +1081,9 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   // about unspecified file names, etc., when ExecuteInformation is called on
   // the VTK source.  (The vtkPLOT3DReader is a good example of this.)
   this->UpdateVTKSourceParameters();
-
+ 
   this->MarkSourcesForUpdate();
-    
+
   // Initialize the output if necessary.
   if ( ! this->Initialized )
     { // This is the first time, initialize data. 
@@ -1359,7 +1361,7 @@ void vtkPVSource::SetupDisplays()
       "displays", str2.str(), this->CubeAxesDisplayProxy);
     str2.rdbuf()->freeze(0);
     }
-  this->CubeAxesDisplayProxy->SetVisibilityCM(0);
+  this->CubeAxesDisplayProxy->SetVisibilityCM(this->GetCubeAxesVisibility());
   this->AddDisplayToRenderModule(this->CubeAxesDisplayProxy);
 
   // Create the Point Label Display proxies.
@@ -1379,7 +1381,8 @@ void vtkPVSource::SetupDisplays()
     ccpp->AddProxy(this->Proxy);
     this->PointLabelDisplayProxy->UpdateVTKObjects();
     }
-  this->PointLabelDisplayProxy->SetVisibilityCM(0);
+  this->PointLabelDisplayProxy->SetVisibilityCM(
+    this->GetPointLabelVisibility());
   this->AddDisplayToRenderModule(this->PointLabelDisplayProxy);
 
   this->SetDisplayProxy(pDisp);
@@ -1898,6 +1901,9 @@ void vtkPVSource::DeleteCallback()
     }
   this->SetLookmark(0);
 
+  // Clean up the displays.
+  this->CleanupDisplays();
+
   if ( initialized )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -2280,7 +2286,11 @@ void vtkPVSource::SaveFilterInBatchScript(ofstream *file)
   *file << "  $pvTemp" << this->GetVTKSourceID(0) << " UnRegister {}" << endl;
 
   this->SetInputsInBatchScript(file);
-
+  this->SaveWidgetsInBatchScript(file);
+}
+//----------------------------------------------------------------------------
+void vtkPVSource::SaveWidgetsInBatchScript(ofstream* file)
+{
   // Let the PVWidgets set up the object.
   vtkCollectionIterator *it = this->Widgets->NewIterator();
   vtkPVWidget *pvw;
@@ -2306,15 +2316,11 @@ void vtkPVSource::SaveStateVisibility(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::SaveStateDisplay(ofstream *file)
+void vtkPVSource::SaveStateDisplayInternal(ofstream *file, const char* display_name,
+  vtkSMProxy* display)
 {
-  vtkSMPropertyIterator* iter = this->DisplayProxy->NewPropertyIterator();
-  *file << "# Saving state of the Display Proxy associated with the source" 
-    << endl;
-  
-  *file << "set pvDisp(" << this->GetTclName() 
-    << ") [$kw(" << this->GetTclName()
-    << ") GetDisplayProxy] " << endl;
+  vtkSMPropertyIterator* iter = display->NewPropertyIterator();
+
 
   // Even in state we have to use ServerManager API for displays.
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
@@ -2361,35 +2367,8 @@ void vtkPVSource::SaveStateDisplay(ofstream *file)
         }
       }
     }
-  *file << "$pvDisp(" << this->GetTclName() << ") UpdateVTKObjects" << endl;
+  *file << "$" << display_name << " UpdateVTKObjects" << endl;
   iter->Delete();
-  // We didn;t save the LUT in the above code. 
-  // Set the color map here for simplicity.
-  if (this->PVColorMap)
-    {
-    if (this->DisplayProxy->GetScalarModeCM() == 
-      vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)
-      {
-      *file << "[$kw(" << this->GetTclName()
-            << ") GetPVOutput] ColorByArray {" 
-            << this->PVColorMap->GetArrayName() << "} " 
-            << 3 << endl;
-      }
-    if (this->DisplayProxy->GetScalarModeCM() == 
-      vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
-      {
-      *file << "[$kw(" << this->GetTclName()
-            << ") GetPVOutput] ColorByArray {" 
-            << this->PVColorMap->GetArrayName() << "} " 
-            << 4 << endl;
-      }
-    }
-  else
-    {
-    *file << "[$kw(" << this->GetTclName() << ") GetPVOutput] Update\n";
-    *file << "[$kw(" << this->GetTclName()
-          << ") GetPVOutput] ColorByProperty\n";
-    }
   // We don;t have to save volume rendering state, as
   // that will get saved automatically when we iterated over 
   // the properties.
@@ -2464,6 +2443,50 @@ void vtkPVSource::SaveState(ofstream *file)
   if (!glyphSource)
     {
     this->SaveStateDisplay(file);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SaveStateDisplay(ofstream* file)
+{
+  *file << "# Saving state of the Display Proxy associated with the source" 
+    << endl;
+
+  vtksys_ios::ostringstream name;
+  name << "pvDisp(" << this->GetTclName() << ")";
+
+  *file << "set " << name.str().c_str() 
+    << " [$kw(" << this->GetTclName() << ") GetDisplayProxy] " << endl;
+
+  this->SaveStateDisplayInternal(file, name.str().c_str(), 
+    this->DisplayProxy);
+
+  // We didn;t save the LUT in the above code. 
+  // Set the color map here for simplicity.
+  if (this->PVColorMap)
+    {
+    if (this->DisplayProxy->GetScalarModeCM() == 
+      vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)
+      {
+      *file << "[$kw(" << this->GetTclName()
+        << ") GetPVOutput] ColorByArray {" 
+        << this->PVColorMap->GetArrayName() << "} " 
+        << 3 << endl;
+      }
+    if (this->DisplayProxy->GetScalarModeCM() == 
+      vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
+      {
+      *file << "[$kw(" << this->GetTclName()
+        << ") GetPVOutput] ColorByArray {" 
+        << this->PVColorMap->GetArrayName() << "} " 
+        << 4 << endl;
+      }
+    }
+  else
+    {
+    *file << "[$kw(" << this->GetTclName() << ") GetPVOutput] Update\n";
+    *file << "[$kw(" << this->GetTclName()
+      << ") GetPVOutput] ColorByProperty\n";
     }
 }
 

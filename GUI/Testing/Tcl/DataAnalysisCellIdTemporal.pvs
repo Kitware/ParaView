@@ -1,0 +1,87 @@
+set kw(vtkTemp2) [$Application GetMainWindow]
+set kw(vtkTemp106) [$kw(vtkTemp2) GetMainView]
+
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $kw(vtkTemp106) $argv $argc
+
+set kw(vtkTemp1185) [$kw(vtkTemp2) InitializeReadCustom "XMLStructuredGridReader" "$DataDir/Data/multicomb_0.vts"]
+$kw(vtkTemp2) ReadFileInformation $kw(vtkTemp1185) "$DataDir/Data/multicomb_0.vts"
+$kw(vtkTemp2) FinalizeRead $kw(vtkTemp1185) "$DataDir/Data/multicomb_0.vts"
+set kw(vtkTemp1199) [$kw(vtkTemp1185) GetPVWidget {Filename}]
+$kw(vtkTemp1199) SetValue "$DataDir/Data/multicomb_0.vts"
+set kw(vtkTemp1190) [$kw(vtkTemp1185) GetPVWidget {PointSelection}]
+$kw(vtkTemp1190) SetArrayStatus {Density} 1
+$kw(vtkTemp1190) SetArrayStatus {Momentum} 1
+$kw(vtkTemp1190) SetArrayStatus {StagnationEnergy} 1
+set kw(vtkTemp1196) [$kw(vtkTemp1185) GetPVWidget {CellSelection}]
+$kw(vtkTemp2) SetCenterOfRotation 3.457902 0.000000 28.223000
+$kw(vtkTemp2) SetCenterOfRotation 3.457902 0.000000 28.223000
+set kw(vtkTemp1262) [$kw(vtkTemp2) GetAnimationManager]
+set kw(vtkTemp808) [$kw(vtkTemp1262) GetAnimationScene]
+$kw(vtkTemp808) SetPlayMode 0
+$kw(vtkTemp1185) AcceptCallback
+set kw(vtkTemp1263) [$kw(vtkTemp2) CreatePVSource DataAnalysis]
+set kw(vtkTemp1264) [$kw(vtkTemp1263) GetPVWidget {Input}]
+$kw(vtkTemp1264) SetCurrentValue $kw(vtkTemp1185)
+set kw(vtkTemp1312) [$kw(vtkTemp1263) GetPVWidget {QueryMethod}]
+set kw(vtkTemp1306) [$kw(vtkTemp1312) GetPVWidget {Cell Id}]
+$kw(vtkTemp1306) SetValue 0
+$kw(vtkTemp1312) SetCurrentValue {Cell Id}
+$kw(vtkTemp1306) SetValue 0
+$kw(vtkTemp1263) AcceptCallback
+set kw(vtkTemp1411) [$kw(vtkTemp1263) GetCellArraySelection]
+$kw(vtkTemp1411) SetArrayStatus {Id} 1 1 0 0
+set kw(vtkTemp123) [$kw(vtkTemp1263) GetPVOutput]
+$kw(vtkTemp123) DrawWireframe
+$kw(vtkTemp123) ColorByProperty
+$kw(vtkTemp123) ChangeActorColor 0.800000 0.000000 0.200000
+$kw(vtkTemp123) SetLineWidth 2
+$kw(vtkTemp1263) SetXAxisLabel {Samples}
+$kw(vtkTemp1263) SetPlotOverTime 1
+$kw(vtkTemp1263) SetXAxisLabel {Time}
+$kw(vtkTemp1263) AcceptCallback
+$kw(vtkTemp1263) SetPlotDisplayVisibility 1
+$kw(vtkTemp1411) AllOffCallback
+$kw(vtkTemp1411) SetArrayStatus {Id} 1 1 0 0
+$kw(vtkTemp1263) SetLockTemporalCache 1
+$kw(vtkTemp1263) GenerateTemporalPlot
+$kw(vtkTemp1263) SetLegendVisibility 1
+$kw(vtkTemp1263) SetLegendPosition 0.800000 0.250000
+$kw(vtkTemp1263) EditXLabelCallback 0
+set kw(vtkTemp1417) [$kw(vtkTemp1263) GetLabelPropertiesDialog]
+$kw(vtkTemp1417) PushWidgetValues 0
+$kw(vtkTemp1417) SetDataRangeAuto 1
+$kw(vtkTemp1417) PushWidgetValues 1
+$kw(vtkTemp1417) SetDataRange 0.000000 0.250000
+$kw(vtkTemp1263) EditYLabelCallback 0
+$kw(vtkTemp1417) SetNumberOfLabels 5
+$kw(vtkTemp1417) SetNumberOfMinorTicks 0
+$kw(vtkTemp1417) SetDataRangeAuto 1
+$kw(vtkTemp1417) PushWidgetValues 0
+$kw(vtkTemp1417) SetDataRangeAuto 0
+$kw(vtkTemp1417) SetDataRange -0.250000 0.000000
+$kw(vtkTemp1417) SetAutoAdjust 0
+$kw(vtkTemp1417) SetDataRange -0.250000 0.250000
+$kw(vtkTemp1417) SetNumberOfLabels 3
+$kw(vtkTemp1417) SetNumberOfMinorTicks 5
+$kw(vtkTemp1417) PushWidgetValues 1
+$kw(vtkTemp1263) SetPointLabelVisibility 0
+$kw(vtkTemp1263) SetPlotTitle {Temporal Plot}
+
+$kw(vtkTemp2) ResetCameraCallback
+
+## Retrace
+update
+$Application StopRecordingScript
+[ $Application GetMainWindow ] DeleteAllSources
+# Source the trace to regenerate the sources.
+if {[catch {set channel [open test.tmp w]}] == 0 } {
+   close $channel
+   file delete -force test.tmp
+   source "[$Application GetTraceFileName]"
+}
+
+source [file join [file dirname [info script]] Compare.tcl]
+Compare $Application $argv $argc
+
+$Application Exit

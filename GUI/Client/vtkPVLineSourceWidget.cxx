@@ -24,12 +24,13 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSM3DWidgetProxy.h"
 #include "vtkPVWindow.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.34");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.34.4.1");
 
 vtkCxxSetObjectMacro(vtkPVLineSourceWidget, InputMenu, vtkPVInputMenu);
 
@@ -128,7 +129,10 @@ void vtkPVLineSourceWidget::Initialize()
   
   this->PlaceWidget();
 
-  this->Accept();
+  // Calling the accept here changes the property that this widget was controlling
+  // which is incorrect. Since the property should not be changed until 
+  // actual accept.
+  // this->Accept();
 }
 
 //----------------------------------------------------------------------------
@@ -196,8 +200,17 @@ void vtkPVLineSourceWidget::Accept()
       {
       resp->SetElement(0, this->GetResolutionInternal());
       }
+
     this->SourceProxy->UpdateVTKObjects();
     this->SourceProxy->UpdatePipeline();
+    }
+
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (pp && (pp->GetNumberOfProxies()!= 1 || pp->GetProxy(0) != this->SourceProxy) )
+    {
+    pp->RemoveAllProxies();
+    pp->AddProxy(this->SourceProxy);
     }
   // 3DWidgets need to explictly call UpdateAnimationInterface on accept
   // since the animatable proxies might have been registered/unregistered

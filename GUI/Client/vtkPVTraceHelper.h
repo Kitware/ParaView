@@ -138,6 +138,11 @@ protected:
   int StateInitialized;
 
   // Description:
+  // Id of the most recent state file in which this trace helper
+  // added the initialization code.
+  vtkIdType InitializedStateFileId;
+
+  // Description:
   // Unique trace name
   char *ObjectName;
   int ObjectNameState;
@@ -161,6 +166,9 @@ protected:
   static void OutputEntryInternal(
     ostream *os, int estimated_length, const char *format, va_list ap);
 
+  // Description:
+  // Gets the state file id from vtkPVWindow.
+  vtkIdType GetApplicationStateFileId();
 private:
 
   vtkPVTraceHelper(const vtkPVTraceHelper&); // Not implemented

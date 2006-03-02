@@ -2169,6 +2169,61 @@ The Pick filter displays the underlying data nearest to a user-selected point. A
 The Pick filter operates on any type of data and produces unstructured grid output.
     </Documentation>
   </Module>
+  <Module name="DataAnalysis"
+          menu_name="Data Analysis (Pick/Probe)"
+          class="vtkPVDataAnalysis"
+          root_name="DataAnalysis"
+          module_type="Filter"
+          button_image="PVPickButton"
+          button_help="Pick a cell or point and display its attributes."
+          long_help="Sample point data at a point or along a line or by point id. Select cell at a point or by cell id. Data can be plotted on an XY plot."
+          short_help="Pick a cell or point.">
+    <Filter class="vtkDataAnalysisFilter">
+      <Input name="Input"
+             class="vtkDataSet">
+        <GroupRequirement quantity="Single"/>
+        <ArrayRequirement attribute="Point" components="1"/>
+      </Input>
+      <Input name="Input"
+             class="vtkMultiGroupDataSet">
+        <GroupRequirement quantity="Single"/>
+        <ArrayRequirement attribute="Point" components="1"/>
+      </Input>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               id="im"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <SelectWidget label="Query Method"
+                  trace_name="QueryMethod"
+                  property="Mode">
+      <Item label="Point" value="0">
+        <PointSourceWidget trace_name="Point" default_radius="0" input_menu="im"
+          default_number_of_points="1" show_entries="0" bind_radius_to_input="0"
+          property="Source"/>
+      </Item>
+      <Item label="Cell" value="1">
+        <PointWidget trace_name="Point" variable="WorldPoint"
+          help="Pick cell or point closest to this world point. The 'p' key can be used to select a point under the cursor."
+          />
+      </Item>
+      <Item label="Line" value="0">
+        <LineSourceWidget trace_name="Line" input_menu="im" property="Source"/>
+      </Item>
+      <Item label="Cell Id" value="1">
+        <VectorEntry label="Cell Id" property="Id" trace_name="CellId"
+          type="int" length="1" help="The Id for the cell to pick." />
+      </Item>
+      <Item label="Point Id" value="1">
+        <VectorEntry label="Point Id" property="Id" trace_name="PointId"
+          type="int" length="1" help="The Id for the point to pick." />
+      </Item>
+    </SelectWidget>
+    <Documentation>
+    The Data Analysis filter provides the ability to query either cell or point data in a given data set. The data may be plotted as an plot. If the "Query Method" is "Point", the filter outputs the interpolated point data at the selected point. If the "Query Method" is "Cell", the filter outputs the cell data at the closest cell to the choosen point. If the "Query Method" is "Line", the filter interpolates the point data at the sample points on the line. If the "Query Method" is "Cell Id", the filter outputs the cell data for the cell with the given Id. If the "Query Method" is "Point Id", the filter outpus the point data for the point with the given Id. The data can be plotted on an XY plot. Additionally, if the input supports multiple timesteps, this filter can be used to plot the queried data over time.
+    </Documentation>
+  </Module>
   <Module name="Probe"
           class="vtkPVProbe"
           root_name="Probe"

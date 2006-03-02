@@ -1889,11 +1889,118 @@
           proxygroup="annotations" proxyname="XYPlotActor">
         </Proxy>
         <ExposedProperties>
+          <Property name="AdjustTitlePosition" />
+          <Property name="AdjustXLabels" />
+          <Property name="AdjustYLabels" />
           <Property name="ArrayNames" />
+          <Property name="LegendPosition" />
+          <Property name="LegendVisibility" />
+          <Property name="NumberOfXLabels" />
+          <Property name="NumberOfYLabels" />
+          <Property name="NumberOfXMinorTicks" />
+          <Property name="NumberOfYMinorTicks" />
+          <Property name="PlotColors" />
+          <Property name="PlotLines" />
+          <Property name="PlotPoints" />
+          <Property name="Smart" />
+          <Property name="Title" />
+          <Property name="TitlePosition" />
+          <Property name="XLabelFormat" />
+          <Property name="XRange" />
+          <Property name="XTitle" />
+          <Property name="XTitleInfo" />
+          <Property name="XTitlePosition" />
+          <Property name="YLabelFormat" />
+          <Property name="YRange" />
+          <Property name="YTitle" />
+          <Property name="YTitleInfo" />
+          <Property name="YTitlePosition" />
         </ExposedProperties>
       </SubProxy>
     </XYPlotDisplayProxy>
     
+    <TemporalXYPlotDisplayProxy name="TemporalXYPlotDisplay"
+      base_proxygroup="displays" base_proxyname="XYPlotDisplay">
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        update_self="1"
+        information_only="1">
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        update_self="1"
+        information_only="1">
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="PointArrayNames"
+        command="AddPointArrayName"
+        update_self="1"
+        clean_command="RemoveAllPointArrayNames"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+        <StringListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="PointArrayInfo" function="ArrayList" />
+          </RequiredProperties>
+        </StringListDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="CellArrayNames"
+        command="AddCellArrayName"
+        update_self="1"
+        clean_command="RemoveAllCellArrayNames"
+        repeat_command="1"
+        number_of_elements_per_command="1">
+        <StringListDomain name="array_list" attribute_type="Scalars">
+          <RequiredProperties>
+            <Property name="CellArrayInfo" function="ArrayList" />
+          </RequiredProperties>
+        </StringListDomain>
+     </StringVectorProperty>
+
+     <IntVectorProperty
+        name="PlotPointData"
+        command="SetPlotPointData"
+        number_of_elements="1"
+        update_self="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+     </IntVectorProperty>
+
+     <IntVectorProperty
+        name="LockTemporalCache"
+        command="SetLockTemporalCache"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+        <BooleanDomain name="bool" />
+     </IntVectorProperty>
+
+     <ProxyProperty
+        name="AnimationCue"
+        command="SetAnimationCueProxy"
+        update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="animation"/>
+        </ProxyGroupDomain>
+     </ProxyProperty>
+
+      <SubProxy>
+        <Proxy name="TemporalCache" 
+          proxygroup="filters" proxyname="TemporalCache">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="UseCache" />
+          <Property name="AttributeToCollect" />
+        </ExposedProperties>
+      </SubProxy>
+      <!-- End of TemporalXYPlotDisplay -->
+    </TemporalXYPlotDisplayProxy>
+
     <CubeAxesDisplayProxy name="CubeAxesDisplay">
        <InputProperty
         name="Input"
@@ -1932,7 +2039,7 @@
         default_values="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
-
+ 
       <SubProxy>
         <Proxy name="Prop2D" 
           proxygroup="annotations" proxyname="CubeAxesActor2D">

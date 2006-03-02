@@ -1,0 +1,101 @@
+set kw(vtkTemp1) [$Application GetMainWindow]
+set kw(vtkTemp105) [$kw(vtkTemp1) GetMainView]
+
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $kw(vtkTemp105) $argv $argc
+
+$kw(vtkTemp105) SetOrientationAxesVisibility 0
+
+set kw(vtkTemp1184) [$kw(vtkTemp1) CreatePVSource RTAnalyticSource]
+set kw(vtkTemp1185) [$kw(vtkTemp1184) GetPVWidget {WholeExtent}]
+$kw(vtkTemp1185) SetValue -10 10 -10 10 -10 10
+set kw(vtkTemp1193) [$kw(vtkTemp1184) GetPVWidget {Center}]
+$kw(vtkTemp1193) SetValue 0 0 0
+set kw(vtkTemp1198) [$kw(vtkTemp1184) GetPVWidget {Maximum}]
+$kw(vtkTemp1198) SetValue 255
+set kw(vtkTemp1201) [$kw(vtkTemp1184) GetPVWidget {XFreq}]
+$kw(vtkTemp1201) SetValue 60
+set kw(vtkTemp1204) [$kw(vtkTemp1184) GetPVWidget {YFreq}]
+$kw(vtkTemp1204) SetValue 30
+set kw(vtkTemp1207) [$kw(vtkTemp1184) GetPVWidget {ZFreq}]
+$kw(vtkTemp1207) SetValue 40
+set kw(vtkTemp1210) [$kw(vtkTemp1184) GetPVWidget {XMag}]
+$kw(vtkTemp1210) SetValue 10
+set kw(vtkTemp1213) [$kw(vtkTemp1184) GetPVWidget {YMag}]
+$kw(vtkTemp1213) SetValue 18
+set kw(vtkTemp1216) [$kw(vtkTemp1184) GetPVWidget {ZMag}]
+$kw(vtkTemp1216) SetValue 5
+set kw(vtkTemp1219) [$kw(vtkTemp1184) GetPVWidget {StandardDeviation}]
+$kw(vtkTemp1219) SetValue 0.5
+$kw(vtkTemp1) SetCenterOfRotation 0.000000 0.000000 0.000000
+$kw(vtkTemp1) SetCenterOfRotation 0.000000 0.000000 0.000000
+$kw(vtkTemp1184) AcceptCallback
+set kw(vtkTemp1286) [$kw(vtkTemp1) CreatePVSource DataAnalysis]
+set kw(vtkTemp1287) [$kw(vtkTemp1286) GetPVWidget {Input}]
+$kw(vtkTemp1287) SetCurrentValue $kw(vtkTemp1184)
+set kw(vtkTemp1335) [$kw(vtkTemp1286) GetPVWidget {QueryMethod}]
+set kw(vtkTemp1332) [$kw(vtkTemp1335) GetPVWidget {Point Id}]
+$kw(vtkTemp1332) SetValue 25
+$kw(vtkTemp1335) SetCurrentValue {Point Id}
+$kw(vtkTemp1332) SetValue 25
+$kw(vtkTemp1286) AcceptCallback
+set kw(vtkTemp1415) [$kw(vtkTemp1286) GetPointArraySelection]
+$kw(vtkTemp1415) SetArrayStatus {RTData} 1 1 0 0
+set kw(vtkTemp122) [$kw(vtkTemp1286) GetPVOutput]
+$kw(vtkTemp122) DrawWireframe
+$kw(vtkTemp122) ColorByProperty
+$kw(vtkTemp122) ChangeActorColor 0.800000 0.000000 0.200000
+$kw(vtkTemp122) SetLineWidth 2
+$kw(vtkTemp1286) SetXAxisLabel {Samples}
+$kw(vtkTemp1286) AcceptCallback
+$kw(vtkTemp1286) SetPlotDisplayVisibility 1
+$kw(vtkTemp1415) SetArrayStatus {RTData} 1 1 0 0
+$kw(vtkTemp1415) SetArrayStatus {RTData} 1 1 0.694118 0
+$kw(vtkTemp1286) SetPlotTitle {Simple Plot}
+$kw(vtkTemp1286) SetPlotTitle {Simple Plot}
+$kw(vtkTemp1286) SetLegendPosition 0.800000 0.300000
+set kw(vtkTemp1428) [$kw(vtkTemp1) CreatePVSource Glyph]
+set kw(vtkTemp1429) [$kw(vtkTemp1428) GetPVWidget {Input}]
+$kw(vtkTemp1429) SetCurrentValue $kw(vtkTemp1286)
+set kw(vtkTemp1432) [$kw(vtkTemp1428) GetPVWidget {Glyph}]
+set kw(vtkTemp1109) [$kw(vtkTemp1) GetPVSource GlyphSources Sphere0]
+$kw(vtkTemp1432) SetCurrentValue $kw(vtkTemp1109)
+set kw(vtkTemp1448) [$kw(vtkTemp1428) GetPVWidget {Max Glyphs}]
+$kw(vtkTemp1448) SetValue 5000
+set kw(vtkTemp1455) [$kw(vtkTemp1428) GetPVWidget {MaskPoints}]
+$kw(vtkTemp1455) SetSelectedState 1
+set kw(vtkTemp1458) [$kw(vtkTemp1428) GetPVWidget {RandomMask}]
+$kw(vtkTemp1458) SetSelectedState 1
+$kw(vtkTemp1428) AcceptCallback
+set kw(vtkTemp1444) [$kw(vtkTemp1428) GetPVWidget {OrientScale}]
+$kw(vtkTemp1444) SetOrientMode {Off}
+$kw(vtkTemp1444) SetScaleMode {Scalar}
+$kw(vtkTemp1444) SetScalars {RTData}
+$kw(vtkTemp1444) SetVectors {None}
+$kw(vtkTemp1444) SetScaleFactor 0.01
+$kw(vtkTemp1428) AcceptCallback
+$kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp1286)
+$kw(vtkTemp1332) SetValue 100
+$kw(vtkTemp1335) SetCurrentValue {Point Id}
+$kw(vtkTemp1332) SetValue 100
+$kw(vtkTemp1286) AcceptCallback
+
+$kw(vtkTemp1415) AllOffCallback
+$kw(vtkTemp1415) SetArrayStatus {RTData} 1 1 0.694118 0
+$kw(vtkTemp1286) SetLegendVisibility 1
+
+## Retrace
+update
+$Application StopRecordingScript
+[ $Application GetMainWindow ] DeleteAllSources
+# Source the trace to regenerate the sources.
+if {[catch {set channel [open test.tmp w]}] == 0 } {
+   close $channel
+   file delete -force test.tmp
+   source "[$Application GetTraceFileName]"
+}
+
+source [file join [file dirname [info script]] Compare.tcl]
+Compare $Application $argv $argc
+
+$Application Exit

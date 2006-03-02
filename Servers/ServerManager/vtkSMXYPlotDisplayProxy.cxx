@@ -20,6 +20,7 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMXYPlotActorProxy.h"
 #include "vtkCommand.h"
 #include "vtkXYPlotWidget.h"
 #include "vtkXYPlotActor.h"
@@ -60,7 +61,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.13.2.1");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -575,7 +576,7 @@ void vtkSMXYPlotDisplayProxy::ExecuteEvent(vtkObject*, unsigned long event,
   this->InvokeEvent(event); // just in case the GUI wants to know about interaction.
 }
 //-----------------------------------------------------------------------------
-vtkPolyData* vtkSMXYPlotDisplayProxy::GetCollectedData()
+vtkDataSet* vtkSMXYPlotDisplayProxy::GetCollectedData()
 {
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   
@@ -586,18 +587,22 @@ vtkPolyData* vtkSMXYPlotDisplayProxy::GetCollectedData()
     return NULL;
     }
 
-  return vtkPolyData::SafeDownCast(dp->GetOutput());
+  return dp->GetOutput();
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMXYPlotDisplayProxy::InvalidateGeometry()
+void vtkSMXYPlotDisplayProxy::InvalidateGeometry(int useCache)
 {
-  this->GeometryIsValid = 0;
-  if (this->UpdateSuppressorProxy)
+  if (!useCache)
     {
-    vtkSMProperty *p = this->UpdateSuppressorProxy->GetProperty("RemoveAllCaches");
-    p->Modified();
-    this->UpdateSuppressorProxy->UpdateVTKObjects();
+    this->GeometryIsValid = 0;
+    if (this->UpdateSuppressorProxy)
+      {
+      vtkSMProperty *p =
+        this->UpdateSuppressorProxy->GetProperty("RemoveAllCaches");
+      p->Modified();
+      this->UpdateSuppressorProxy->UpdateVTKObjects();
+      }
     }
 }
 

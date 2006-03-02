@@ -285,6 +285,11 @@ public:
   // should add their functionality and call this.
   virtual void MarkConsumersAsModified();
 
+  // Description:
+  // Returns the self ID as string. If the name was overwritten
+  // with SetName(), it returns that instead.
+  const char* GetSelfIDAsString();
+
 protected:
   vtkSMProxy();
   ~vtkSMProxy();

@@ -28,6 +28,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSM3DWidgetProxy.h"
 #include "vtkPVWindow.h"
@@ -35,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.48");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.48.4.1");
 
 vtkCxxSetObjectMacro(vtkPVPointSourceWidget, InputMenu, vtkPVInputMenu);
 
@@ -66,6 +67,7 @@ vtkPVPointSourceWidget::vtkPVPointSourceWidget()
   this->DefaultNumberOfPoints = 1;
   this->InputMenu = NULL;
   this->ShowEntries = 1;
+  this->BindRadiusToInput = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -215,7 +217,7 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   vtkSMBoundsDomain *bd = vtkSMBoundsDomain::New();
   vtkPVInputMenu *input = vtkPVInputMenu::SafeDownCast(
     this->GetPVSource()->GetPVWidget("Input"));
-  if (input)
+  if (input && this->BindRadiusToInput)
     {
     bd->AddRequiredProperty(input->GetSMProperty(), "Input");
     }
@@ -283,8 +285,10 @@ int vtkPVPointSourceWidget::GetModifiedFlag()
 void vtkPVPointSourceWidget::Initialize()
 {
   this->PlaceWidget();
-
-  this->Accept();
+  // Calling the accept here changes the property that this widget was controlling
+  // which is incorrect. Since the property should not be changed until 
+  // actual accept.
+  // this->Accept();
 }
 
 //-----------------------------------------------------------------------------
@@ -331,6 +335,14 @@ void vtkPVPointSourceWidget::Accept()
     this->NumberOfPointsWidget->Accept();
     this->SourceProxy->UpdateVTKObjects();
     this->SourceProxy->UpdatePipeline();
+    }
+
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (pp && (pp->GetNumberOfProxies()!= 1 || pp->GetProxy(0) != this->SourceProxy) )
+    {
+    pp->RemoveAllProxies();
+    pp->AddProxy(this->SourceProxy);
     }
   // 3DWidgets need to explictly call UpdateAnimationInterface on accept
   // since the animatable proxies might have been registered/unregistered
@@ -388,6 +400,11 @@ int vtkPVPointSourceWidget::ReadXMLAttributes(vtkPVXMLElement *element,
     this->SetInputMenu(imw);
     imw->Delete();
     }
+  if (!element->GetScalarAttribute("bind_radius_to_input",
+      &this->BindRadiusToInput))
+    {
+    this->BindRadiusToInput = 1;
+    }
 
   if (!element->GetScalarAttribute("radius_scale_factor",
       &this->RadiusScaleFactor))
@@ -438,6 +455,7 @@ void vtkPVPointSourceWidget::CopyProperties(
     psw->GetNumberOfPointsWidget()->SetDataType(VTK_INT);
     psw->GetNumberOfPointsWidget()->SetSMPropertyName(
       this->NumberOfPointsWidget->GetSMPropertyName());
+    psw->SetBindRadiusToInput(this->BindRadiusToInput);
     }
 }
 
@@ -484,4 +502,5 @@ void vtkPVPointSourceWidget::PrintSelf(ostream& os, vtkIndent indent)
     << endl;
   os << indent << "RadiusScaleFactor: " << this->RadiusScaleFactor << endl;
   os << indent << "ShowEntries: " << this->ShowEntries << endl;
+  os << indent << "BindRadiusToInput: " << this->BindRadiusToInput << endl;
 }

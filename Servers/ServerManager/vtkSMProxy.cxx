@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.43");
+vtkCxxRevisionMacro(vtkSMProxy, "1.43.2.1");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -164,6 +164,17 @@ vtkSMProxy::~vtkSMProxy()
   this->SetXMLGroup(0);
   this->SetXMLName(0);
   this->SetXMLElement(0);
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMProxy::GetSelfIDAsString()
+{
+  if (!this->Name)
+    {
+    this->GetSelfID();
+    }
+
+  return this->Name;
 }
 
 //---------------------------------------------------------------------------

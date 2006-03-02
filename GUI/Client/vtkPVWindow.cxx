@@ -135,13 +135,14 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.770.2.4");
+vtkCxxRevisionMacro(vtkPVWindow, "1.770.2.5");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
 //-----------------------------------------------------------------------------
 vtkPVWindow::vtkPVWindow()
 {
+  this->StateFileId = 0;
   this->SupportHelp = 1;
   this->SupportPrint = 1;
 
@@ -3149,6 +3150,8 @@ void vtkPVWindow::SaveState(const char* filename)
     delete file;
     return;
     }
+  // register a new Id for this state file.
+  this->StateFileId++;
 
   *file << "# ParaView State Version " 
         << this->GetPVApplication()->GetMajorVersion()
@@ -5186,6 +5189,8 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
     os << "(none)" << endl;
     }
   os << indent << "LookmarkToolbar: " << this->GetLookmarkToolbar() << endl;
+
+  os << indent << "StateFileId: " << this->StateFileId << endl;
 
 }
 

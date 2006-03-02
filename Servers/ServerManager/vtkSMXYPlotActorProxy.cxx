@@ -27,7 +27,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMXYPlotActorProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.4.2.1");
 vtkCxxSetObjectMacro(vtkSMXYPlotActorProxy, Input, vtkSMSourceProxy);
 
 class vtkSMXYPlotActorProxyInternals
@@ -43,6 +43,7 @@ vtkSMXYPlotActorProxy::vtkSMXYPlotActorProxy()
   this->Input = 0;
   this->Internals = new vtkSMXYPlotActorProxyInternals;
   this->SetExecutiveName(0);
+  this->Smart = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -176,36 +177,45 @@ void vtkSMXYPlotActorProxy::SetupInputs()
       << sourceID << "SetPlotLabel" << arrayCount << arrayname
       << vtkClientServerStream::End;
     
-    double r, g , b;
-    vtkMath::HSVToRGB(color, 1.0, 1.0, &r, &g, &b);
+    if (this->Smart)
+      {
+      double r, g , b;
+      vtkMath::HSVToRGB(color, 1.0, 1.0, &r, &g, &b);
 
-    stream << vtkClientServerStream::Invoke
-      << sourceID << "SetPlotColor"
-      << arrayCount << r << g << b 
-      << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke
+        << sourceID << "SetPlotColor"
+        << arrayCount << r << g << b 
+        << vtkClientServerStream::End;
+      }
 
     color += color_step;
     arrayCount++;
     }
 
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->GetProperty("LegendVisibility"));
-  if (ivp)
+  if (this->Smart)
     {
-    ivp->SetElement(0, ( arrayCount > 1 ? 1 : 0));
-    }
-  else
-    {
-    vtkErrorMacro("Failed to find property LegendVisibility.");
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->GetProperty("LegendVisibility"));
+    if (ivp)
+      {
+      ivp->SetElement(0, ( arrayCount > 1 ? 1 : 0));
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property LegendVisibility.");
+      }
     }
   if (arrayCount == 1)
     {
     stream << vtkClientServerStream::Invoke
       << sourceID << "SetYTitle" << arrayname 
       << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke
-      << sourceID << "SetPlotColor" << 0 << 1 << 1 << 1
-      << vtkClientServerStream::End;
+    if (this->Smart)
+      {
+      stream << vtkClientServerStream::Invoke
+        << sourceID << "SetPlotColor" << 0 << 1 << 1 << 1
+        << vtkClientServerStream::End;
+      }
     }
   pm->SendStream(this->GetServers(), stream);
   this->UpdateVTKObjects(); // this is required for LegendVisibility. 
@@ -246,4 +256,5 @@ void vtkSMXYPlotActorProxy::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "ArrayNamesModified: " << this->ArrayNamesModified << endl;
   os << indent << "Input: " << this->Input << endl;
+  os << indent << "Smart: " << this->Smart << endl;
 }

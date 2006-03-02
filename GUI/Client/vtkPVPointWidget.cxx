@@ -35,7 +35,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.57");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.57.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVPointWidget::vtkPVPointWidget()
@@ -87,6 +87,7 @@ void vtkPVPointWidget::PositionResetCallback()
   this->SetPosition(0.5*(bds[0]+bds[1]),
                   0.5*(bds[2]+bds[3]),
                   0.5*(bds[4]+bds[5]));
+  this->Render();
 }
 
 

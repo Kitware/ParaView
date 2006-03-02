@@ -84,6 +84,7 @@ public:
   vtkSetMacro(DefaultRadius, float);
   vtkSetMacro(DefaultNumberOfPoints, int);
   vtkSetMacro(ShowEntries, int);
+  vtkSetMacro(BindRadiusToInput, int);
   void SetInputMenu(vtkPVInputMenu *im);
 
   // Description:
@@ -140,6 +141,7 @@ protected:
   vtkPVInputMenu *InputMenu;
   int DefaultNumberOfPoints;
   int ShowEntries;
+  int BindRadiusToInput;
   
   vtkPVPointSourceWidget(const vtkPVPointSourceWidget&); // Not implemented
   void operator=(const vtkPVPointSourceWidget&); // Not implemented

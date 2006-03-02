@@ -56,7 +56,7 @@
 #include <vtksys/ios/sstream>
  
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.164");
+vtkCxxRevisionMacro(vtkPVProbe, "1.164.2.1");
 
 #define PV_TAG_PROBE_OUTPUT 759362
 
@@ -436,7 +436,7 @@ void vtkPVProbe::AcceptCallbackInternal()
     // Get the collected data from the display.
     this->TemporalProbeProxy->UpdateVTKObjects();
     this->PlotDisplayProxy->Update();
-    vtkPolyData* d = this->PlotDisplayProxy->GetCollectedData();
+    vtkDataSet* d = this->PlotDisplayProxy->GetCollectedData();
     vtkPointData* pd = d->GetPointData();
   
     // update the ui to see the point data for the probed point

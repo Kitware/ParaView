@@ -18,7 +18,7 @@ if { ![$Application GetExitStatus] } {
         # update
 
         $Application LoadScript "$batchName.pvb"
-        catch { file delete -force "$batchName.pvb" }
+#        catch { file delete -force "$batchName.pvb" }
         $Application ExitAfterLoadScriptOn
 
         set batchValid {}
