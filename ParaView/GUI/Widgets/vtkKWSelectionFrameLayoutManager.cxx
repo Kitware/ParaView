@@ -70,7 +70,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.52");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.53");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -2094,7 +2094,7 @@ int vtkKWSelectionFrameLayoutManager::CopyScreenshotAllWidgetsToClipboard()
   if (::OpenClipboard((HWND)rwwidget->GetRenderWindow()->GetGenericWindowId()))
     {
     extent = iData->GetWholeExtent();
-
+    
     int size[2];
     size[0] = extent[1] - extent[0] + 1;
     size[1] = extent[3] - extent[2] + 1;
@@ -2143,24 +2143,20 @@ int vtkKWSelectionFrameLayoutManager::CopyScreenshotAllWidgetsToClipboard()
 #endif
 
   iData->Delete();
-
+  
   return 1;
 }
 
 //----------------------------------------------------------------------------
 int vtkKWSelectionFrameLayoutManager::PrintWidgets(
-#if defined(_WIN32) && !defined(__CYGWIN__)
   double dpi, int selection_only)
-#else
-  double, int)
-#endif
 {
 #if defined(_WIN32) && !defined(__CYGWIN__)
   vtkKWSelectionFrame *first_widget = this->GetNthWidget(0);
   if (!first_widget)
     {
     }
-
+  
   PRINTDLG pd;
   DOCINFO di;
   RECT rcDest = { 0, 0, 0, 0};
@@ -2197,7 +2193,7 @@ int vtkKWSelectionFrameLayoutManager::PrintWidgets(
   if (this->IsCreated())
     {
     vtkKWTkUtilities::SetTopLevelMouseCursor(this, "watch");
-    vtkKWTkUtilities::ProcessPendingEvents(this->GetApplication());
+    this->GetApplication()->ProcessPendingEvents();
     }
   
   di.cbSize = sizeof(DOCINFO);
@@ -2341,8 +2337,12 @@ int vtkKWSelectionFrameLayoutManager::PrintWidgets(
 
   if (this->IsCreated())
     {
-    vtkKWTkUtilities::ProcessPendingEvents(this->GetApplication());
+    this->GetApplication()->ProcessPendingEvents();
     }
+#else
+
+  (void)dpi;
+  (void)selection_only;
 
 #endif
 

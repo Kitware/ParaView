@@ -30,7 +30,6 @@
 #include "vtkRenderer.h"
 #include "vtkKWScaleWithEntry.h"
 #include "vtkKWScaleWithEntrySet.h"
-#include "vtkKWTkUtilities.h"
 #include "vtkMPEG2Writer.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
@@ -68,7 +67,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.17");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.18");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -847,7 +846,7 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
         win->GetProgressGauge()->SetValue((int)(100.0 * i / num_frames));
         }
       // process pending events... necessary for being able to interrupt
-      vtkKWTkUtilities::ProcessPendingEvents(this->GetApplication());
+      this->GetApplication()->ProcessPendingEvents();
       cam->Azimuth(azimuth);
       cam->Elevation(elev);
       cam->Roll(roll);
@@ -1039,7 +1038,7 @@ void vtkKWSimpleAnimationWidget::PerformSliceAnimation(const char *file_root,
         win->GetProgressGauge()->SetValue((int)(100.0 * i / num_frames));
         }
       // process pending events... necessary for being able to interrupt
-      vtkKWTkUtilities::ProcessPendingEvents(this->GetApplication());
+      this->GetApplication()->ProcessPendingEvents();
       int slice_num = (int)(min + inc * i);
       if ((slice_num > max && dir > 0) || (slice_num < max && dir < 0))
         {

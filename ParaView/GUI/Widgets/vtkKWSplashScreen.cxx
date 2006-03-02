@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.37");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.38");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -241,7 +241,7 @@ void vtkKWSplashScreen::SetProgressMessage(const char *txt)
   // do the trick because this code is usually executed during initialization
   // or creation of the UI, not in the event loop
 
-  vtkKWTkUtilities::ProcessPendingEvents(this->GetApplication());
+  this->GetApplication()->ProcessPendingEvents();
 }
 
 //----------------------------------------------------------------------------

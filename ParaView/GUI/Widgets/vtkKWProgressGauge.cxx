@@ -16,12 +16,13 @@
 #include "vtkKWCanvas.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkKWApplication.h"
 
 #include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.36");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.37");
 
 //----------------------------------------------------------------------------
 vtkKWProgressGauge::vtkKWProgressGauge()
@@ -278,7 +279,7 @@ void vtkKWProgressGauge::Redraw()
   this->Script(tk_cmd.str());
   tk_cmd.rdbuf()->freeze(0);
 
-  vtkKWTkUtilities::ProcessIdleTasks(this->GetApplication());
+  this->GetApplication()->ProcessIdleTasks();
 
   if (!enabled)
     {
