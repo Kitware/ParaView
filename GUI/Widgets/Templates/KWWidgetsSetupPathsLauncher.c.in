@@ -170,6 +170,7 @@ int main(int argc, char** argv)
 
   /* Quote unquoted args, otherwise args seem to get mixed up */
 
+#if defined(_WIN32) && !defined(__CYGWIN__)
   for(argc = 0, nb_quoted_argv = 0; 
       nb_quoted_argv < MAX_QUOTED_ARGV && argv[argc]; ++argc)
     {
@@ -182,6 +183,7 @@ int main(int argc, char** argv)
       nb_quoted_argv++;
       }
     }
+#endif
     
 #if defined(_MSC_VER)
   // _execv can't be used as it does not property return the exit value
