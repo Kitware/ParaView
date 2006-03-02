@@ -53,7 +53,9 @@ public:
   virtual void SetApplication (vtkKWApplication*);
   
   // Description:
-  // Start running the application, with or without arguments.
+  // Start running the application, with or without arguments, and enter the
+  // event loop. The application will exit the event loop once every 
+  // windows has been closed.
   virtual void Start();
   virtual void Start(int argc, char *argv[]);
 
@@ -391,6 +393,18 @@ public:
   // On Win32, this will launch the Explorer, open it in the directory
   // of the link, and eventually select that link itself in the directory.
   static int ExploreLink(const char *link);
+
+  // Description:
+  // Process/update pending events. This method brings the 
+  // application "up to date" by entering the event loop repeatedly until
+  // all pending events (including idle callbacks) have been processed. 
+  virtual void ProcessPendingEvents();
+
+  // Description:
+  // Process/update idle tasks. This causes operations that are normally 
+  // deferred, such as display updates and window layout calculations, to be
+  // performed immediately. 
+  virtual void ProcessIdleTasks();
 
   // Description:
   // Install the Tcl background error callback. Individual applications

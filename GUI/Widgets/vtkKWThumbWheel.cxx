@@ -20,6 +20,7 @@
 #include "vtkKWTopLevel.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWApplication.h"
 
 #include <vtksys/stl/string>
 
@@ -34,7 +35,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.47");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.48");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -805,7 +806,7 @@ void vtkKWThumbWheel::DisplayPopupCallback()
     }
 
   this->TopLevel->SetPosition(x, y);
-  vtkKWTkUtilities::ProcessPendingEvents(this->GetApplication());
+  this->GetApplication()->ProcessPendingEvents();
   this->TopLevel->DeIconify();
   this->TopLevel->Raise();
 }

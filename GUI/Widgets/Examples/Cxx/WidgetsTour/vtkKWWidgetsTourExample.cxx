@@ -16,7 +16,6 @@
 #include "vtkKWUserInterfaceManager.h"
 #include "vtkKWUserInterfacePanel.h"
 #include "vtkKWWindow.h"
-#include "vtkKWTkUtilities.h"
 
 #include "vtkKWWidgetsPaths.h"
 
@@ -40,7 +39,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidgetsTourExample );
-vtkCxxRevisionMacro(vtkKWWidgetsTourExample, "1.1");
+vtkCxxRevisionMacro(vtkKWWidgetsTourExample, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWWidgetsTourExample::vtkKWWidgetsTourExample()
@@ -354,7 +353,7 @@ int vtkKWWidgetsTourExample::Run(int argc, char *argv[])
   int ret = 0;
   this->Window->Display();
 
-  vtkKWTkUtilities::ProcessPendingEvents(app);
+  app->ProcessPendingEvents();
   source_split->SetSeparatorPosition(0.33);
   
   vtkKWWidgetsTourExampleInternals::KWWidgetsTourItemsContainerIterator end = 

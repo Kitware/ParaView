@@ -15,10 +15,10 @@
 #include "vtkKWFrame.h"
 #include "vtkKWSegmentedProgressGauge.h"
 #include "vtkObjectFactory.h"
-#include "vtkKWTkUtilities.h"
+#include "vtkKWApplication.h"
 
 vtkStandardNewMacro(vtkKWSegmentedProgressGauge);
-vtkCxxRevisionMacro(vtkKWSegmentedProgressGauge, "1.16");
+vtkCxxRevisionMacro(vtkKWSegmentedProgressGauge, "1.17");
 
 vtkKWSegmentedProgressGauge::vtkKWSegmentedProgressGauge()
 {
@@ -151,7 +151,7 @@ void vtkKWSegmentedProgressGauge::SetValue(int segment, int value)
                    this->Height);
       }
     }
-  vtkKWTkUtilities::ProcessIdleTasks(this->GetApplication());
+  this->GetApplication()->ProcessIdleTasks();
 }
 
 void vtkKWSegmentedProgressGauge::SetNumberOfSegments(int number)

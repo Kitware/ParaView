@@ -22,7 +22,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.23");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.24");
 
 //----------------------------------------------------------------------------
 vtkKWTopLevel::vtkKWTopLevel()
@@ -422,7 +422,7 @@ int vtkKWTopLevel::GetRequestedWidth()
 
   // The call to 'update' enable the geometry manager to compute the layout
   // of the widget behind the scene, and return proper values.
-  vtkKWTkUtilities::ProcessIdleTasks(this->GetApplication());
+  this->GetApplication()->ProcessIdleTasks();
   return atoi(this->Script("winfo reqwidth %s", this->GetWidgetName()));
 }
 
@@ -436,7 +436,7 @@ int vtkKWTopLevel::GetRequestedHeight()
 
   // The call to 'update' enable the geometry manager to compute the layout
   // of the widget behind the scene, and return proper values.
-  vtkKWTkUtilities::ProcessIdleTasks(this->GetApplication());
+  this->GetApplication()->ProcessIdleTasks();
   return atoi(this->Script("winfo reqheight %s", this->GetWidgetName()));
 }
 

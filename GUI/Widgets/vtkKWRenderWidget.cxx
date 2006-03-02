@@ -42,7 +42,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.128");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.129");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -1073,7 +1073,7 @@ void vtkKWRenderWidget::ExposeCallback()
     }
   
   this->InExpose = 1;
-  vtkKWTkUtilities::ProcessPendingEvents(this->GetApplication());
+  this->GetApplication()->ProcessPendingEvents();
   this->Render();
   this->InExpose = 0;
 }

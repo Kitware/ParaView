@@ -65,7 +65,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.274");
+vtkCxxRevisionMacro(vtkKWApplication, "1.275");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -741,7 +741,7 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
   // ADD_EXECUTABLE(... foo.rc)
 
 #ifdef _WIN32
-  vtkKWTkUtilities::ProcessPendingEvents(this->MainInterp);
+  this->ProcessPendingEvents();
   vtkKWSetApplicationIcon(this->MainInterp, NULL, IDI_KWWidgetsICO);
   vtkKWSetApplicationSmallIcon(this->MainInterp, NULL, IDI_KWWidgetsICOSMALL);
 #endif
@@ -927,6 +927,18 @@ int vtkKWApplication::ExploreLink(const char *
     }
 #endif
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::ProcessPendingEvents()
+{
+  vtkKWTkUtilities::ProcessPendingEvents(this);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::ProcessIdleTasks()
+{
+  vtkKWTkUtilities::ProcessIdleTasks(this);
 }
 
 //----------------------------------------------------------------------------

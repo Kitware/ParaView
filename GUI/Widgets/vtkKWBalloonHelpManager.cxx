@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBalloonHelpManager );
-vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.11");
+vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.12");
 
 //----------------------------------------------------------------------------
 vtkKWBalloonHelpManager::vtkKWBalloonHelpManager()
@@ -246,7 +246,7 @@ void vtkKWBalloonHelpManager::DisplayCallback(vtkKWWidget *widget)
   // Place the balloon
 
   this->TopLevel->SetPosition(x, y + 15);
-  vtkKWTkUtilities::ProcessPendingEvents(this->GetApplication());
+  this->GetApplication()->ProcessPendingEvents();
 
   // Map the balloon
 
