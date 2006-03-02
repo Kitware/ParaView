@@ -57,14 +57,15 @@ int main(int argc, char** argv)
   char message[MAXPATH];
   char **arg;
 
-  char quoted_argv[MAX_QUOTED_ARGV][MAXPATH];
-  int nb_quoted_argv;
-
   char current_exe[MAXPATH];
   char *slash_pos;
 
 #if defined(_WIN32)
   size_t exe_path_len;
+#if !defined(__CYGWIN__)
+  char quoted_argv[MAX_QUOTED_ARGV][MAXPATH];
+  int nb_quoted_argv;
+#endif
 #endif
 
   /* PATH */
@@ -215,6 +216,8 @@ int main(int argc, char** argv)
     fprintf(stderr, " \"%s\"", *arg);
     }
   fprintf(stderr, ": %s\n", message);
+
+  (void)argc;
 
   return 1;
 }
