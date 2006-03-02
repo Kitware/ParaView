@@ -534,6 +534,7 @@ public:
   virtual void PresetSelectionCallback();
   virtual void PresetSelectionChangedCallback() {};
   virtual void PresetRightClickCallback(int row, int col, int x, int y);
+  virtual void UpdatePresetRowCallback(int id);
 
 protected:
   vtkKWPresetSelector();
@@ -568,6 +569,7 @@ protected:
   // Subclasses should call the parent's UpdatePresetRow, and abort
   // if the result is not 1.
   virtual int UpdatePresetRow(int id);
+  virtual void ScheduleUpdatePresetRow(int id);
 
   vtkKWMultiColumnListWithScrollbars *PresetList;
   vtkKWFrame                         *PresetControlFrame;

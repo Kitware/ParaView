@@ -25,18 +25,22 @@
 #include <vtksys/stl/vector>
 #include <vtksys/stl/algorithm>
 #include <vtksys/SystemTools.hxx>
+#include <vtksys/stl/map>
 
 #include "Utilities/Tablelist/vtkKWTablelistInit.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.47");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.48");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
 {
 public:
   
+  vtksys_stl::string ScheduleRefreshColorsOfAllCellsWithWindowCommandTimerId;
+  vtksys_stl::string ScheduleRefreshAllCellsWithWindowCommandTimerId;
+
   vtksys_stl::vector<int> LastSelectionRowIndices;
   vtksys_stl::vector<int> LastSelectionColIndices;
 
@@ -1099,7 +1103,7 @@ void vtkKWMultiColumnList::NumberOfRowsChanged()
   // Trigger this because inserting/removing rows can change the background
   // color of a row (given the stripes, or the specific row colors, etc.)
 
-  this->InvokePotentialCellColorsChangedCommand();
+   this->InvokePotentialCellColorsChangedCommand();
 }
 
 //----------------------------------------------------------------------------
@@ -1428,29 +1432,42 @@ void vtkKWMultiColumnList::InsertCellText(
 void vtkKWMultiColumnList::InsertCellTextAsInt(
   int row_index, int col_index, int value)
 {
-  char tmp[1024];
-  sprintf(tmp, "%d", value);
-  this->InsertCellText(row_index, col_index, tmp);
+  if (this->IsCreated())
+    {
+    while (row_index > this->GetNumberOfRows() - 1)
+      {
+      this->AddRow();
+      }
+    this->SetCellTextAsInt(row_index, col_index, value);
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::InsertCellTextAsDouble(
   int row_index, int col_index, double value)
 {
-  char tmp[1024];
-  sprintf(tmp, "%.5g", value);
-  this->InsertCellText(row_index, col_index, tmp);
+  if (this->IsCreated())
+    {
+    while (row_index > this->GetNumberOfRows() - 1)
+      {
+      this->AddRow();
+      }
+    this->SetCellTextAsDouble(row_index, col_index, value);
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::InsertCellTextAsFormattedDouble(
   int row_index, int col_index, double value, int size)
 {
-  char format[1024];
-  sprintf(format, "%%.%dg", size);
-  char tmp[1024];
-  sprintf(tmp, format, value);
-  this->InsertCellText(row_index, col_index, tmp);
+  if (this->IsCreated())
+    {
+    while (row_index > this->GetNumberOfRows() - 1)
+      {
+      this->AddRow();
+      }
+    this->SetCellTextAsFormattedDouble(row_index, col_index, value, size);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1470,29 +1487,41 @@ void vtkKWMultiColumnList::SetCellText(
 void vtkKWMultiColumnList::SetCellTextAsInt(
   int row_index, int col_index, int value)
 {
-  char tmp[1024];
-  sprintf(tmp, "%d", value);
-  this->SetCellText(row_index, col_index, tmp);
+  int old_state = this->GetState();
+  if (this->GetState() != vtkKWTkOptions::StateNormal)
+    {
+    this->SetStateToNormal();
+    }
+  this->SetCellConfigurationOptionAsInt(row_index, col_index, "-text", value);
+  this->SetState(old_state);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetCellTextAsDouble(
   int row_index, int col_index, double value)
 {
-  char tmp[1024];
-  sprintf(tmp, "%.5g", value);
-  this->SetCellText(row_index, col_index, tmp);
+  int old_state = this->GetState();
+  if (this->GetState() != vtkKWTkOptions::StateNormal)
+    {
+    this->SetStateToNormal();
+    }
+  this->SetCellConfigurationOptionAsDouble(
+    row_index, col_index, "-text", value);
+  this->SetState(old_state);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetCellTextAsFormattedDouble(
   int row_index, int col_index, double value, int size)
 {
-  char format[1024];
-  sprintf(format, "%%.%dg", size);
-  char tmp[1024];
-  sprintf(tmp, format, value);
-  this->SetCellText(row_index, col_index, tmp);
+  int old_state = this->GetState();
+  if (this->GetState() != vtkKWTkOptions::StateNormal)
+    {
+    this->SetStateToNormal();
+    }
+  this->SetCellConfigurationOptionAsFormattedDouble(
+    row_index, col_index, "-text", value, size);
+  this->SetState(old_state);
 }
 
 //----------------------------------------------------------------------------
@@ -1504,13 +1533,14 @@ const char* vtkKWMultiColumnList::GetCellText(int row_index, int col_index)
 //----------------------------------------------------------------------------
 int vtkKWMultiColumnList::GetCellTextAsInt(int row_index, int col_index)
 {
-  return atoi(this->GetCellConfigurationOption(row_index, col_index, "-text"));
+  return this->GetCellConfigurationOptionAsInt(row_index, col_index, "-text");
 }
 
 //----------------------------------------------------------------------------
 double vtkKWMultiColumnList::GetCellTextAsDouble(int row_index, int col_index)
 {
-  return atof(this->GetCellConfigurationOption(row_index, col_index, "-text"));
+  return this->GetCellConfigurationOptionAsDouble(
+    row_index, col_index, "-text");
 }
 
 //----------------------------------------------------------------------------
@@ -2104,6 +2134,34 @@ void vtkKWMultiColumnList::RefreshAllCellsWithWindowCommand()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWMultiColumnList::ScheduleRefreshAllCellsWithWindowCommand()
+{
+  // Already scheduled
+
+  if (this->Internals->ScheduleRefreshAllCellsWithWindowCommandTimerId.size())
+    {
+    return;
+    }
+
+  this->Internals->ScheduleRefreshAllCellsWithWindowCommandTimerId =
+    this->Script(
+      "after idle {catch {%s RefreshAllCellsWithWindowCommandCallback}}", this->GetTclName());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::RefreshAllCellsWithWindowCommandCallback()
+{
+  if (!this->GetApplication() || this->GetApplication()->GetInExit() ||
+      !this->IsAlive())
+    {
+    return;
+    }
+
+  this->RefreshAllCellsWithWindowCommand();
+  this->Internals->ScheduleRefreshAllCellsWithWindowCommandTimerId = "";
+}
+
+//----------------------------------------------------------------------------
 void vtkKWMultiColumnList::RefreshColorsOfCellWithWindowCommand(
   int row_index, 
   int col_index)
@@ -2178,6 +2236,34 @@ void vtkKWMultiColumnList::RefreshColorsOfAllCellsWithWindowCommand()
       this->RefreshColorsOfCellWithWindowCommand(row, col);
       }
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::ScheduleRefreshColorsOfAllCellsWithWindowCommand()
+{
+  // Already scheduled
+
+  if (this->Internals->ScheduleRefreshColorsOfAllCellsWithWindowCommandTimerId.size())
+    {
+    return;
+    }
+
+  this->Internals->ScheduleRefreshColorsOfAllCellsWithWindowCommandTimerId =
+    this->Script(
+      "after idle {catch {%s RefreshColorsOfAllCellsWithWindowCommandCallback}}", this->GetTclName());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::RefreshColorsOfAllCellsWithWindowCommandCallback()
+{
+  if (!this->GetApplication() || this->GetApplication()->GetInExit() ||
+      !this->IsAlive())
+    {
+    return;
+    }
+
+  this->RefreshColorsOfAllCellsWithWindowCommand();
+  this->Internals->ScheduleRefreshColorsOfAllCellsWithWindowCommandTimerId = "";
 }
 
 //----------------------------------------------------------------------------
@@ -2459,19 +2545,14 @@ int vtkKWMultiColumnList::FindCellText(
       text && row_index && col_index)
     {
     int nb_cols = this->GetNumberOfColumns();
-    int nb_rows = this->GetNumberOfRows();
-
-    for (int j = 0; j < nb_rows; j++)
+    for (int i = 0; i < nb_cols; i++)
       {
-      for (int i = 0; i < nb_cols; i++)
+      int found = this->FindCellTextInColumn(i, text);
+      if (found >= 0)
         {
-        const char *cell_text = this->GetCellText(j, i);
-        if (cell_text && !strcmp(cell_text, text))
-          {
-          *row_index = j;
-          *col_index = i;
-          return 1;
-          }
+        *row_index = found;
+        *col_index = i;
+        return 1;
         }
       }
     }
@@ -2496,15 +2577,9 @@ int vtkKWMultiColumnList::FindCellTextInColumn(
 {
   if (this->IsCreated() && text)
     {
-    int nb_rows = this->GetNumberOfRows();
-    for (int j = 0; j < nb_rows; j++)
-      {
-      const char *cell_text = this->GetCellText(j, col_index);
-      if (cell_text && !strcmp(cell_text, text))
-        {
-        return j;
-        }
-      }
+    return atoi(this->Script(
+                  "lsearch -exact [%s getcolumns {%d}] {%s}", 
+                  this->GetWidgetName(), col_index, text));
     }
 
   return -1;
@@ -2516,14 +2591,9 @@ int vtkKWMultiColumnList::FindCellTextAsIntInColumn(
 {
   if (this->IsCreated() && col_index >= 0)
     {
-    int nb_rows = this->GetNumberOfRows();
-    for (int j = 0; j < nb_rows; j++)
-      {
-      if (value == this->GetCellTextAsInt(j, col_index))
-        {
-        return j;
-        }
-      }
+    return atoi(this->Script(
+                  "lsearch -exact [%s getcolumns {%d}] %d", 
+                  this->GetWidgetName(), col_index, value));
     }
 
   return -1;
@@ -2564,6 +2634,20 @@ void vtkKWMultiColumnList::RejectInput()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWMultiColumnList::ReportErrorOnSetCellConfigurationOption(
+  int row_index, int col_index, const char *option, const char *res)
+{
+  vtksys_stl::string err_msg(res);
+  vtksys_stl::string tcl_name(this->GetTclName());
+  vtksys_stl::string widget_name(this->GetWidgetName());
+  vtksys_stl::string type(this->GetType());
+  vtkErrorMacro(
+    "Error configuring " << tcl_name.c_str() << " (" << type.c_str() << ": " 
+    << widget_name.c_str() << ") at cell: " << row_index << "," << col_index
+    << " with option: [" << option << "]  => " << err_msg.c_str());
+}
+
+//----------------------------------------------------------------------------
 int vtkKWMultiColumnList::SetCellConfigurationOption(
   int row_index, int col_index, const char *option, const char *value)
 {
@@ -2588,17 +2672,150 @@ int vtkKWMultiColumnList::SetCellConfigurationOption(
 
   if (res && *res)
     {
-    vtksys_stl::string err_msg(res);
-    vtksys_stl::string tcl_name(this->GetTclName());
-    vtksys_stl::string widget_name(this->GetWidgetName());
-    vtksys_stl::string type(this->GetType());
-    vtkErrorMacro(
-      "Error configuring " << tcl_name.c_str() << " (" << type.c_str() << ": " 
-      << widget_name.c_str() << ") at cell: " << row_index << "," << col_index
-      << " with option: [" << option 
-      << "] and value [" << value << "] => " << err_msg.c_str());
+    this->ReportErrorOnSetCellConfigurationOption(
+      row_index, col_index, option, res);
     return 0;
     }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMultiColumnList::SetCellConfigurationOptionAsText(
+  int row_index, int col_index, const char *option, const char *value)
+{
+  if (!this->IsCreated())
+    {
+    vtkWarningMacro("Widget is not created yet !");
+    return 0;
+    }
+
+  if (!option)
+    {
+    vtkWarningMacro("Wrong option or value !");
+    return 0;
+    }
+
+  const char *val = this->ConvertInternalStringToTclString(
+    value, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
+
+  const char *res = 
+    this->Script("%s cellconfigure %d,%d %s \"%s\"", 
+                 this->GetWidgetName(), 
+                 row_index, col_index, option, val ? val : "");
+
+  // 'configure' is not supposed to return anything, so let's assume
+  // any output is an error
+
+  if (res && *res)
+    {
+    this->ReportErrorOnSetCellConfigurationOption(
+      row_index, col_index, option, res);
+    return 0;
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMultiColumnList::SetCellConfigurationOptionAsInt(
+  int row_index, int col_index, const char *option, int value)
+{
+  if (!this->IsCreated())
+    {
+    vtkWarningMacro("Widget is not created yet !");
+    return 0;
+    }
+
+  if (!option)
+    {
+    vtkWarningMacro("Wrong option or value !");
+    return 0;
+    }
+
+  const char *res = 
+    this->Script("%s cellconfigure %d,%d %s %d", 
+                 this->GetWidgetName(), row_index, col_index, option, value);
+
+  // 'configure' is not supposed to return anything, so let's assume
+  // any output is an error
+
+  if (res && *res)
+    {
+    this->ReportErrorOnSetCellConfigurationOption(
+      row_index, col_index, option, res);
+    return 0;
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMultiColumnList::SetCellConfigurationOptionAsDouble(
+  int row_index, int col_index, const char *option, double value)
+{
+  if (!this->IsCreated())
+    {
+    vtkWarningMacro("Widget is not created yet !");
+    return 0;
+    }
+
+  if (!option)
+    {
+    vtkWarningMacro("Wrong option or value !");
+    return 0;
+    }
+
+  const char *res = 
+    this->Script("%s cellconfigure %d,%d %s %.5g", 
+                 this->GetWidgetName(), row_index, col_index, option, value);
+
+  // 'configure' is not supposed to return anything, so let's assume
+  // any output is an error
+
+  if (res && *res)
+    {
+    this->ReportErrorOnSetCellConfigurationOption(
+      row_index, col_index, option, res);
+    return 0;
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMultiColumnList::SetCellConfigurationOptionAsFormattedDouble(
+  int row_index, int col_index, const char *option, double value, int size)
+{
+  if (!this->IsCreated())
+    {
+    vtkWarningMacro("Widget is not created yet !");
+    return 0;
+    }
+
+  if (!option)
+    {
+    vtkWarningMacro("Wrong option or value !");
+    return 0;
+    }
+
+  char format[1024];
+  sprintf(format, "%%s cellconfigure %%d,%%d %%s %%.%dg", size);
+
+  const char *res = 
+    this->Script(format, 
+                 this->GetWidgetName(), row_index, col_index, option, value);
+
+  // 'configure' is not supposed to return anything, so let's assume
+  // any output is an error
+
+  if (res && *res)
+    {
+    this->ReportErrorOnSetCellConfigurationOption(
+      row_index, col_index, option, res);
+    return 0;
+    }
+
   return 1;
 }
 
@@ -2622,53 +2839,26 @@ int vtkKWMultiColumnList::HasCellConfigurationOption(
 const char* vtkKWMultiColumnList::GetCellConfigurationOption(
   int row_index, int col_index, const char* option)
 {
-  if (!this->HasCellConfigurationOption(row_index, col_index, option))
-    {
-    return NULL;
-    }
-
   return this->Script(
     "%s cellcget %d,%d %s", this->GetWidgetName(), row_index,col_index,option);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWMultiColumnList::SetCellConfigurationOptionAsInt(
-  int row_index, int col_index, const char *option, int value)
-{
-  char buffer[20];
-  sprintf(buffer, "%d", value);
-  return 
-    this->SetCellConfigurationOption(row_index, col_index, option, buffer);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWMultiColumnList::GetCellConfigurationOptionAsInt(
   int row_index, int col_index, const char* option)
 {
-  if (!this->HasCellConfigurationOption(row_index, col_index, option))
-    {
-    return 0;
-    }
-
   return atoi(
     this->Script("%s cellcget %d,%d %s", 
                  this->GetWidgetName(), row_index, col_index, option));
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMultiColumnList::SetCellConfigurationOptionAsText(
-  int row_index, int col_index, const char *option, const char *value)
+double vtkKWMultiColumnList::GetCellConfigurationOptionAsDouble(
+  int row_index, int col_index, const char* option)
 {
-  if (!option || !this->IsCreated())
-    {
-    return;
-    }
-
-  const char *val = this->ConvertInternalStringToTclString(
-    value, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
-  this->Script("%s cellconfigure %d,%d %s \"%s\"", 
-               this->GetWidgetName(), 
-               row_index, col_index, option, val ? val : "");
+  return atof(
+    this->Script("%s cellcget %d,%d %s", 
+                 this->GetWidgetName(), row_index, col_index, option));
 }
 
 //----------------------------------------------------------------------------
@@ -3572,7 +3762,7 @@ void vtkKWMultiColumnList::UpdateEnableState()
 
   this->SetState(this->GetEnabled());
 
-  this->RefreshAllCellsWithWindowCommand();
+  this->ScheduleRefreshAllCellsWithWindowCommand();
 }
 
 //----------------------------------------------------------------------------

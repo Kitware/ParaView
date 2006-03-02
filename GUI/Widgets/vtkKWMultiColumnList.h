@@ -591,7 +591,7 @@ public:
   //   - use images that do not have an alpha component, or 
   //   - refresh the image periodically (each time a row is added/removed)
   //     also check SetPotentialCellColorsChangedCommand and
-  //     RefreshAllCellWindowCommands.
+  //     ScheduleRefreshAllCellWindowCommands.
   virtual void SetCellImage(int row_index, int col_index, const char *);
   virtual void SetCellImageToIcon(
     int row_index, int col_index, vtkKWIcon *icon);
@@ -654,7 +654,7 @@ public:
   // Since the background and foreground colors of the cell change dynamically
   // depending on the sorting order and the selected rows, you should set
   // the SetPotentialCellColorsChangedCommand to this object's own
-  // RefreshColorsOfAllCellsWithWindowCommand method so that each time
+  // ScheduleRefreshColorsOfAllCellsWithWindowCommand method so that each time
   // the cell colors change, this user-defined widget is refreshed.
   // Also, if you have set a text contents in the same cell (using SetCellText)
   // you may want to hide it automatically using 
@@ -742,8 +742,12 @@ public:
   // Force a cell (or all cells) for which a WindowCommand has been defined
   // to recreate its dynamic content. It does so by setting the WindowCommand
   // to NULL, than setting it to its previous value (per author's suggestion).
+  // The ScheduleRefreshAllCellsWithWindowCommand method will
+  // schedule RefreshAllCellsWithWindowCommand when the application
+  // is idle.
   virtual void RefreshCellWithWindowCommand(int row_index, int col_index);
   virtual void RefreshAllCellsWithWindowCommand();
+  virtual void ScheduleRefreshAllCellsWithWindowCommand();
 
   // Description:
   // Force a cell (or all cells) for which a WindowCommand has been defined
@@ -756,10 +760,15 @@ public:
   // for the first level children of the widget inside that cell.
   // This can be useful when the cell contents is an image with an alpha
   // channel (transparency), or a user-defined dynamic widget 
-  // (see SetCellWindowCommand)
+  // (see SetCellWindowCommand and SetPotentialCellColorsChangedCommand). 
+  // The ScheduleRefreshColorsOfAllCellsWithWindowCommand method will
+  // schedule RefreshColorsOfAllCellsWithWindowCommand when the application
+  // is idle: this is especially useful in conjonction with the 
+  // SetPotentialCellColorsChangedCommand method.
   virtual void RefreshColorsOfCellWithWindowCommand(
     int row_index, int col_index);
   virtual void RefreshColorsOfAllCellsWithWindowCommand();
+  virtual void ScheduleRefreshColorsOfAllCellsWithWindowCommand();
 
   // Description:
   // Retrieve the path of the window contained in the cell as created by 
@@ -787,7 +796,7 @@ public:
   virtual void AddBindingsToWidgetAndChildren(vtkKWWidget *widget);
 
   // Description:
-  // Find contents of cell in all table or single row
+  // Find contents of cell in all table or single column
   // One FindCellText signature returns 1 if found, 0 otherwise, and
   // assign the position to row_index, col_index. The other FindCellText
   // method returns a pointer to an array of 2 ints (row and col index) if
@@ -1168,6 +1177,8 @@ public:
   virtual void EnterCallback();
   virtual void RightClickCallback(
     const char *w, int x, int y, int root_x, int root_y);
+  virtual void RefreshColorsOfAllCellsWithWindowCommandCallback();
+  virtual void RefreshAllCellsWithWindowCommandCallback();
 
 protected:
   vtkKWMultiColumnList();
@@ -1244,10 +1255,18 @@ protected:
     int row_index, int col_index, const char* option);
   virtual int SetCellConfigurationOptionAsInt(
     int row_index, int col_index, const char* option, int value);
-  virtual void SetCellConfigurationOptionAsText(
+  virtual double GetCellConfigurationOptionAsDouble(
+    int row_index, int col_index, const char* option);
+  virtual int SetCellConfigurationOptionAsDouble(
+    int row_index, int col_index, const char* option, double value);
+  virtual int SetCellConfigurationOptionAsFormattedDouble(
+    int row_index, int col_index, const char* option, double value, int size);
+  virtual int SetCellConfigurationOptionAsText(
     int row_index, int col_index, const char *option, const char *value);
   virtual const char* GetCellConfigurationOptionAsText(
     int row_index, int col_index, const char *option);
+  virtual void ReportErrorOnSetCellConfigurationOption(
+    int row_index, int col_index, const char* option, const char *res);
 
   // PIMPL Encapsulation for STL containers
   //BTX
