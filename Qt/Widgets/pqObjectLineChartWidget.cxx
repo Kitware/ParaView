@@ -11,7 +11,7 @@
 #include "pqServer.h"
 
 #include <pqChartAxis.h>
-#include <pqChartcoordinate.h>
+#include <pqChartCoordinate.h>
 #include <pqChartLabel.h>
 #include <pqChartLegend.h>
 #include <pqConnect.h>
