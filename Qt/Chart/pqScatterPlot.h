@@ -1,21 +1,31 @@
-#ifndef _pqLinePlot_h
-#define _pqLinePlot_h
+/*!
+ * \file pqScatterPlot.h
+ *
+ * \brief
+ *   The pqScatterPlot class is used to draw a piecewise linear
+ *   function.
+ *
+ * \author Mark Richardson
+ * \date   August 22, 2005
+ */
+
+#ifndef _pqScatterPlot_h
+#define _pqScatterPlot_h
 
 #include "pqChartExport.h"
 #include "pqAbstractPlot.h"
 
+class pqChartValue;
 class pqMarkerPen;
 
-/// Displays a line plot
-class QTCHART_EXPORT pqLinePlot :
+/// Displays a scatter-plot of X/Y coordinates
+class QTCHART_EXPORT pqScatterPlot :
   public pqAbstractPlot
 {
 public:
-  /// pqLinePlot assumes ownership of the given pen
-  pqLinePlot(pqMarkerPen* pen, const pqChartCoordinateList& coords);
-  /// pqLinePlot assumes ownership of the given pen
-  pqLinePlot(pqMarkerPen* pen, const pqChartCoordinate& p1, const pqChartCoordinate& p2);
-  virtual ~pqLinePlot();
+  /// Assumes ownership of the given pen
+  pqScatterPlot(pqMarkerPen* pen, const pqChartCoordinateList& coords);
+  virtual ~pqScatterPlot();
 
   /// \name pqAbstractPlot Methods
   //@{

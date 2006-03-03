@@ -8,7 +8,7 @@
  */
 
 #include "ImageLinePlot.h"
-#include "LineChart.h"
+#include "LineChartAdapter.h"
 
 #include <pqConnect.h>
 #include <pqChartCoordinate.h>
@@ -24,6 +24,8 @@
 #include <pqLinePlot.h>
 #include <pqMarkerPen.h>
 
+#include <QDir>
+#include <QFileInfo>
 #include <QHBoxLayout>
 #include <QPrinter>
 #include <QPushButton>
@@ -51,14 +53,15 @@
 #include <vtkstd/vector>
 
 //////////////////////////////////////////////////////////////////////////////
-// LineChart::pqImplementation
+// LineChartAdapter::pqImplementation
 
-struct LineChart::pqImplementation
+struct LineChartAdapter::pqImplementation
 {
-  pqImplementation() :
+  pqImplementation(pqLineChartWidget& chart) :
     SourceProxy(0),
     EventAdaptor(vtkEventQtSlotConnect::New()),
-    ExodusVariableType(VARIABLE_TYPE_CELL)
+    ExodusVariableType(VARIABLE_TYPE_CELL),
+    Chart(chart)
   {
     QFont h1;
     h1.setBold(true);
@@ -78,26 +81,26 @@ struct LineChart::pqImplementation
     bold_italic.setItalic(true);
     bold_italic.setStyleStrategy(QFont::PreferAntialias);
     
-    this->LineChartWidget.setBackgroundColor(Qt::white);
+    this->Chart.setBackgroundColor(Qt::white);
     
-    this->LineChartWidget.getTitle().setFont(h1);
-    this->LineChartWidget.getTitle().setColor(Qt::black);
+    this->Chart.getTitle().setFont(h1);
+    this->Chart.getTitle().setColor(Qt::black);
     
-    this->LineChartWidget.getXAxis().setGridColor(Qt::lightGray);
-    this->LineChartWidget.getXAxis().setAxisColor(Qt::darkGray);
-    this->LineChartWidget.getXAxis().setTickLabelColor(Qt::darkGray);
-    this->LineChartWidget.getXAxis().setTickLabelFont(italic);
+    this->Chart.getXAxis().setGridColor(Qt::lightGray);
+    this->Chart.getXAxis().setAxisColor(Qt::darkGray);
+    this->Chart.getXAxis().setTickLabelColor(Qt::darkGray);
+    this->Chart.getXAxis().setTickLabelFont(italic);
 
-    this->LineChartWidget.getXAxis().getLabel().setText("Time");
-    this->LineChartWidget.getXAxis().getLabel().setFont(bold);
+    this->Chart.getXAxis().getLabel().setText("Time");
+    this->Chart.getXAxis().getLabel().setFont(bold);
     
-    this->LineChartWidget.getYAxis().setGridColor(Qt::lightGray);
-    this->LineChartWidget.getYAxis().setAxisColor(Qt::darkGray);
-    this->LineChartWidget.getYAxis().setTickLabelColor(Qt::darkGray);
-    this->LineChartWidget.getYAxis().setTickLabelFont(italic);
+    this->Chart.getYAxis().setGridColor(Qt::lightGray);
+    this->Chart.getYAxis().setAxisColor(Qt::darkGray);
+    this->Chart.getYAxis().setTickLabelColor(Qt::darkGray);
+    this->Chart.getYAxis().setTickLabelFont(italic);
 
-    this->LineChartWidget.getYAxis().getLabel().setFont(bold);
-    this->LineChartWidget.getYAxis().getLabel().setOrientation(pqChartLabel::VERTICAL);
+    this->Chart.getYAxis().getLabel().setFont(bold);
+    this->Chart.getYAxis().getLabel().setOrientation(pqChartLabel::VERTICAL);
     
     this->updateChart();
   }
@@ -169,16 +172,66 @@ struct LineChart::pqImplementation
     internalAddExodusElements(elements);
     this->updateChart();
   }
-  
-  void clearCSV()
+
+  void startParsing(const QString& file)
   {
-    this->CSVPlots.clear();
+  this->CSVFile = file;
+  }
+  
+  void startParsing()
+  {
+    this->CSVSeries.clear();
+  }
+
+  void parseSeries(const QStringList& series)
+  {
+    this->CSVSeries.push_back(series);
+  }
+  
+  void finishParsing()
+  {
+    if(this->CSVSeries.size() < 2)
+      return;
+
+    QStringList& time = this->CSVSeries[0];
+    if(time.size() < 3)
+      return;
+      
+    for(int i = 1; i < this->CSVSeries.size() - 2; i += 3)
+      {
+      QStringList& plot = this->CSVSeries[i];
+      QStringList& upper_bound = this->CSVSeries[i+1];
+      QStringList& lower_bound = this->CSVSeries[i+2];
+      
+      if(plot.size() < 3)
+        continue;
+
+      const QString label(plot[0]);
+
+      const QString pixmap_file = QFileInfo(this->CSVFile).absoluteDir().absoluteFilePath(QDir::cleanPath(plot[1]));
+      QPixmap pixmap(pixmap_file);
+      if(pixmap.width() > 300 || pixmap.height() > 300)
+        pixmap = pixmap.scaled(QSize(300, 300), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        
+      pqLineErrorPlot::CoordinatesT plot_coordinates;
+      for(int i = 2; i < time.size() && i < plot.size() && i < upper_bound.size() && i < lower_bound.size(); i += 200)
+        {
+        plot_coordinates.push_back(pqLineErrorPlot::Coordinate(time[i].toDouble(), plot[i].toDouble(), upper_bound[i].toDouble(), lower_bound[i].toDouble()));
+        }
+
+      this->CSVLabels.push_back(label);
+      this->CSVPixmaps.push_back(pixmap);
+      this->CSVPlots.push_back(plot_coordinates);
+      }
+    
     this->updateChart();
   }
   
-  void addCSV(const QStringList& plot)
+  void clearCSV()
   {
-    this->CSVPlots.push_back(plot);
+    this->CSVLabels.clear();
+    this->CSVPixmaps.clear();
+    this->CSVPlots.clear();
     this->updateChart();
   }
   
@@ -207,56 +260,43 @@ struct LineChart::pqImplementation
       new pqCircleMarkerPen(Pen, QSize(4, 4), QPen(Pen.color(), 0.5), QBrush(Qt::white)),
       coordinates);
     
-    this->LineChartWidget.getLineChart().addData(plot);
-    this->LineChartWidget.getLegend().addEntry(new pqCircleMarkerPen(Pen, QSize(4, 4), QPen(Pen.color(), 0.5), QBrush(Qt::white)), new pqChartLabel(QString("Element %1").arg(ElementID)));
+    this->Chart.getLineChart().addData(plot);
+    this->Chart.getLegend().addEntry(new pqCircleMarkerPen(Pen, QSize(4, 4), QPen(Pen.color(), 0.5), QBrush(Qt::white)), new pqChartLabel(QString("Element %1").arg(ElementID)));
   }
   
-  void addCSVPlot(QStringList& Plot, const QPen& Pen)
+  void addCSVPlot(const QString& label, const QPixmap& pixmap, pqLineErrorPlot::CoordinatesT& coordinates, const QPen& plot_pen, const QPen& whisker_pen)
   {
-    if(Plot.size() < 3)
-      return;
-      
-    pqChartCoordinateList coordinates;
-    for(int i = 2; i < Plot.size(); i += 50)
-      {
-      coordinates.pushBack(pqChartCoordinate(static_cast<double>(i - 2), Plot[i].toDouble()));
-      }
-
-    QPixmap image(Plot[1]);
-    if(image.width() > 300 || image.height() > 300)
-      image = image.scaled(QSize(300, 300), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-
     ImageLinePlot* const plot = new ImageLinePlot(
-      new pqNullMarkerPen(Pen),
-      Pen,
-      25,
+      new pqNullMarkerPen(plot_pen),
+      whisker_pen,
+      1,
       coordinates,
-      image);
+      pixmap);
     
-    this->LineChartWidget.getLineChart().addData(plot);
-    this->LineChartWidget.getLegend().addEntry(new pqNullMarkerPen(Pen), new pqChartLabel(Plot[0]));
+    this->Chart.getLineChart().addData(plot);
+    this->Chart.getLegend().addEntry(new pqNullMarkerPen(plot_pen), new pqChartLabel(label));
   }
   
   void updateChart()
   {
     // Set the default (no data) appearance of the chart ...
-    this->LineChartWidget.getLineChart().clearData();
-    this->LineChartWidget.getTitle().setText("Time Plot (no data)");
-    this->LineChartWidget.getXAxis().setVisible(true);
-    this->LineChartWidget.getXAxis().setValueRange(0.0, 100.0);
-    this->LineChartWidget.getYAxis().getLabel().setText("Value");
-    this->LineChartWidget.getYAxis().setVisible(true);
-    this->LineChartWidget.getYAxis().setValueRange(0.0, 100.0);
-    this->LineChartWidget.getLegend().clear();
+    this->Chart.getLineChart().clearData();
+    this->Chart.getTitle().setText("Time Plot (no data)");
+    this->Chart.getXAxis().setVisible(true);
+    this->Chart.getXAxis().setValueRange(0.0, 100.0);
+    this->Chart.getYAxis().getLabel().setText("Value");
+    this->Chart.getYAxis().setVisible(true);
+    this->Chart.getYAxis().setValueRange(0.0, 100.0);
+    this->Chart.getLegend().clear();
     
     if(CSVPlots.size())
-      this->LineChartWidget.getTitle().setText("External Data");
+      this->Chart.getTitle().setText("External Data");
       
     for(int i = 0; i != CSVPlots.size(); ++i)
       {
       const double hue = static_cast<double>(i) / static_cast<double>(CSVPlots.size());
-      const QColor color = QColor::fromHsvF(hue, 1.0, 1.0);
-      addCSVPlot(CSVPlots[i], QPen(color, 1.0, Qt::DotLine));
+      const QColor color = QColor::fromHsvF(hue, 1.0, 0.5);
+      addCSVPlot(CSVLabels[i], CSVPixmaps[i], CSVPlots[i], QPen(color, 1.2), QPen(color, 0.5));
       }
 
     if(this->ExodusVariableName.isEmpty())
@@ -294,13 +334,13 @@ struct LineChart::pqImplementation
       }
 
     if(this->CSVPlots.size())
-      this->LineChartWidget.getTitle().setText(this->ExodusVariableName + " vs. Time / External Data");
+      this->Chart.getTitle().setText(this->ExodusVariableName + " vs. Time / External Data");
     else
-      this->LineChartWidget.getTitle().setText(this->ExodusVariableName + " vs. Time");
+      this->Chart.getTitle().setText(this->ExodusVariableName + " vs. Time");
       
-    this->LineChartWidget.getXAxis().setVisible(true);
-    this->LineChartWidget.getYAxis().setVisible(true);
-    this->LineChartWidget.getYAxis().getLabel().setText(this->ExodusVariableName);
+    this->Chart.getXAxis().setVisible(true);
+    this->Chart.getYAxis().setVisible(true);
+    this->Chart.getYAxis().getLabel().setText(this->ExodusVariableName);
 
     unsigned long count = 0;
     for(vtkstd::vector<unsigned long>::reverse_iterator element = this->ExodusElements.rbegin(); element != this->ExodusElements.rend(); ++element, ++count)
@@ -313,54 +353,39 @@ struct LineChart::pqImplementation
   
   vtkSMProxy* SourceProxy;
   vtkEventQtSlotConnect* EventAdaptor;
-  pqLineChartWidget LineChartWidget;
+  pqLineChartWidget& Chart;
+  
   pqVariableType ExodusVariableType;
   QString ExodusVariableName;
   vtkstd::vector<unsigned long> ExodusElements;
-  QVector<QStringList> CSVPlots;
+
+  QString CSVFile;
+  QVector<QStringList> CSVSeries;
+
+  QVector<QString> CSVLabels;  
+  QVector<QPixmap> CSVPixmaps;
+  QVector<pqLineErrorPlot::CoordinatesT> CSVPlots;
 };
 
 /////////////////////////////////////////////////////////////////////////////////
-// LineChart
+// LineChartAdapter
 
-LineChart::LineChart(QWidget *p) :
-  QWidget(p),
-  Implementation(new pqImplementation())
+LineChartAdapter::LineChartAdapter(pqLineChartWidget& chart) :
+  Implementation(new pqImplementation(chart))
 {
-  QPushButton* const csv_button = new QPushButton("Load .csv");
-  this->connect(csv_button, SIGNAL(clicked()), this, SLOT(onLoadCSV()));
-  
-  QPushButton* const clear_button = new QPushButton("Clear .csv");
-  this->connect(clear_button, SIGNAL(clicked()), this, SLOT(clearCSV()));
-
-  QPushButton* const save_button = new QPushButton("Save .pdf");
-  this->connect(save_button, SIGNAL(clicked()), this, SLOT(onSavePDF()));
-
-  QHBoxLayout* const hbox = new QHBoxLayout();
-  hbox->setMargin(0);
-  hbox->addWidget(csv_button);
-  hbox->addWidget(clear_button);
-  hbox->addWidget(save_button);
-
-  QVBoxLayout* const vbox = new QVBoxLayout();
-  vbox->setMargin(0);
-  vbox->addLayout(hbox);
-  vbox->addWidget(&this->Implementation->LineChartWidget);
-  
-  this->setLayout(vbox);
 }
 
-LineChart::~LineChart()
+LineChartAdapter::~LineChartAdapter()
 {
   delete this->Implementation;
 }
 
-void LineChart::setServer(pqServer* /*server*/)
+void LineChartAdapter::setServer(pqServer* /*server*/)
 {
   this->setExodusProxy(0);
 }
 
-void LineChart::setExodusProxy(vtkSMProxy* proxy)
+void LineChartAdapter::setExodusProxy(vtkSMProxy* proxy)
 {
   this->Implementation->setExodusProxy(proxy);
   
@@ -374,65 +399,47 @@ void LineChart::setExodusProxy(vtkSMProxy* proxy)
     }
 }
 
-void LineChart::setExodusVariable(pqVariableType type, const QString& name)
+void LineChartAdapter::setExodusVariable(pqVariableType type, const QString& name)
 {
   this->Implementation->setExodusVariable(type, name);
 }
 
-void LineChart::clearExodusElements()
+void LineChartAdapter::clearExodusElements()
 {
   this->Implementation->clearExodusElements();
 }
 
-void LineChart::addExodusElements(vtkUnstructuredGrid* elements)
+void LineChartAdapter::addExodusElements(vtkUnstructuredGrid* elements)
 {
   this->Implementation->addExodusElements(elements);
 }
 
-void LineChart::setExodusElements(vtkUnstructuredGrid* elements)
+void LineChartAdapter::setExodusElements(vtkUnstructuredGrid* elements)
 {
   this->clearExodusElements();
   this->addExodusElements(elements);
 }
 
-void LineChart::clearCSV()
+void LineChartAdapter::clearCSV()
 {
   this->Implementation->clearCSV();
 }
 
-void LineChart::addCSV(const QStringList& plot)
-{
-  this->Implementation->addCSV(plot);
-}
-
-void LineChart::onLoadCSV()
-{
-  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Open .csv File:"), this, "fileOpenDialog")
-    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(onLoadCSV(const QStringList&)));
-    
-  file_dialog->show();
-}
-
-void LineChart::onLoadCSV(const QStringList& files)
+void LineChartAdapter::onLoadCSV(const QStringList& files)
 {
   pqDelimitedTextParser parser(pqDelimitedTextParser::COLUMN_SERIES, ',');
-  QObject::connect(&parser, SIGNAL(parseSeries(const QStringList&)), this, SLOT(addCSV(const QStringList&)));
+  QObject::connect(&parser, SIGNAL(startParsing()), this, SLOT(startParsing()));
+  QObject::connect(&parser, SIGNAL(parseSeries(const QStringList&)), this, SLOT(parseSeries(const QStringList&)));
+  QObject::connect(&parser, SIGNAL(finishParsing()), this, SLOT(finishParsing()));
 
   for(int i = 0; i != files.size(); ++i)
     {
+    this->Implementation->startParsing(files[i]);
     parser.parse(files[i]);
     }
 }
 
-void LineChart::onSavePDF()
-{
-  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save .pdf File:"), this, "fileSavePDFDialog")
-    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(onSavePDF(const QStringList&)));
-    
-  file_dialog->show();
-}
-
-void LineChart::onSavePDF(const QStringList& files)
+void LineChartAdapter::onSavePDF(const QStringList& files)
 {
   for(int i = 0; i != files.size(); ++i)
     {
@@ -440,11 +447,26 @@ void LineChart::onSavePDF(const QStringList& files)
     printer.setOutputFormat(QPrinter::PdfFormat);
     printer.setOutputFileName(files[i]);
     
-    this->Implementation->LineChartWidget.printChart(printer);
+    this->Implementation->Chart.printChart(printer);
     }
 }
 
-void LineChart::onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*)
+void LineChartAdapter::onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*)
 {
   this->Implementation->onInputChanged();
+}
+
+void LineChartAdapter::startParsing()
+{
+  this->Implementation->startParsing();
+}
+
+void LineChartAdapter::parseSeries(const QStringList& plot)
+{
+  this->Implementation->parseSeries(plot);
+}
+
+void LineChartAdapter::finishParsing()
+{
+  this->Implementation->finishParsing();
 }

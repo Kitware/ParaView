@@ -7,88 +7,87 @@
  * statement of authorship are reproduced on all copies.
  */
 
-#include "pqConnect.h"
-#include "pqElementInspectorWidget.h"
-#include "pqFileDialog.h"
-#include "LineChart.h"
-#include "pqObjectHistogramWidget.h"
-#include "pqLocalFileDialogModel.h"
 #include "DobranoVizWindow.h"
-#include "pqMultiViewManager.h"
-#include "pqMultiViewFrame.h"
-#include "pqNameCount.h"
-#include "pqObjectInspector.h"
-#include "pqObjectInspectorWidget.h"
-#include "pqParts.h"
-#include "pqPipelineData.h"
-#include "pqPipelineListModel.h"
-#include "pqPipelineListWidget.h"
-#include "pqPipelineServer.h"
-#include "pqPipelineWindow.h"
-#include "pqPipelineObject.h"
-#include "pqRenderViewProxy.h"
-#include "vtkSMMultiViewRenderModuleProxy.h"
-#include "pqServer.h"
-#include "pqServerBrowser.h"
-#include "pqServerFileDialogModel.h"
-#include "pqSetData.h"
-#include "pqSetName.h"
-#include "pqSMAdaptor.h"
-#include "pqSourceProxyInfo.h"
-#include "pqPicking.h"
-#include "pqDataSetModel.h"
-#include "pqCompoundProxyWizard.h"
-#include "pqXMLUtil.h"
-#include "pqSMMultiView.h"
-#include "pqVariableSelectorWidget.h"
+#include "LineChartAdapter.h"
 
+#include <pqCompoundProxyWizard.h>
+#include <pqConnect.h>
+#include <pqDataSetModel.h>
+#include <pqElementInspectorWidget.h>
+#include <pqEventPlayer.h>
+#include <pqEventPlayerXML.h>
+#include <pqFileDialog.h>
 #include <pqImageComparison.h>
+#include <pqLineChartWidget.h>
+#include <pqLocalFileDialogModel.h>
+#include <pqMultiViewFrame.h>
+#include <pqMultiViewManager.h>
+#include <pqNameCount.h>
+#include <pqObjectHistogramWidget.h>
+#include <pqObjectInspector.h>
+#include <pqObjectInspectorWidget.h>
+#include <pqParts.h>
+#include <pqPicking.h>
+#include <pqPipelineData.h>
+#include <pqPipelineListModel.h>
+#include <pqPipelineListWidget.h>
+#include <pqPipelineObject.h>
+#include <pqPipelineServer.h>
+#include <pqPipelineWindow.h>
+#include <pqPlayControlsWidget.h>
+#include <pqRecordEventsDialog.h>
+#include <pqRenderViewProxy.h>
+#include <pqSMAdaptor.h>
+#include <pqSMMultiView.h>
+#include <pqServer.h>
+#include <pqServerBrowser.h>
+#include <pqServerFileDialogModel.h>
+#include <pqSetData.h>
+#include <pqSetName.h>
+#include <pqSourceProxyInfo.h>
+#include <pqVariableSelectorWidget.h>
+#include <pqXMLUtil.h>
 
-#include <QApplication>
-#include <QCheckBox>
-#include <QDockWidget>
-#include <QFileInfo>
-#include <QHeaderView>
-#include <QMenu>
-#include <QMenuBar>
-#include <QMessageBox>
-#include <QToolBar>
-#include <QTreeView>
-#include <QListView>
-#include <QSignalMapper>
-#include <QDir>
-
+#include <QVTKWidget.h>
+#include <vtkEventQtSlotConnect.h>
+#include <vtkExodusReader.h>
+#include <vtkInteractorStyle.h>
+#include <vtkPVArrayInformation.h>
+#include <vtkPVDataSetAttributesInformation.h>
+#include <vtkPVGenericRenderWindowInteractor.h>
+#include <vtkPVGeometryInformation.h>
 #include <vtkPVXMLElement.h>
 #include <vtkPVXMLParser.h>
+#include <vtkProcessModule.h>
 #include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
 #include <vtkSMDataObjectDisplayProxy.h>
 #include <vtkSMDisplayProxy.h>
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMIntRangeDomain.h>
 #include <vtkSMIntVectorProperty.h>
+#include <vtkSMMultiViewRenderModuleProxy.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMProxyProperty.h>
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSMStringVectorProperty.h>
 #include <vtkTesting.h>
-#include <vtkPVGenericRenderWindowInteractor.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkInteractorStyle.h>
 #include <vtkUnstructuredGrid.h>
-#include <vtkPVGeometryInformation.h>
-#include <vtkPVDataSetAttributesInformation.h>
-#include <vtkPVArrayInformation.h>
-#include <vtkProcessModule.h>
-#include <vtkExodusReader.h>
 
-#include <QVTKWidget.h>
-#include <vtkEventQtSlotConnect.h>
-
-#include <pqEventPlayer.h>
-#include <pqEventPlayerXML.h>
-#include <pqRecordEventsDialog.h>
-#include <pqPlayControlsWidget.h>
+#include <QApplication>
+#include <QCheckBox>
+#include <QDir>
+#include <QDockWidget>
+#include <QFileInfo>
+#include <QHeaderView>
+#include <QListView>
+#include <QMenu>
+#include <QMenuBar>
+#include <QMessageBox>
+#include <QSignalMapper>
+#include <QToolBar>
+#include <QTreeView>
 
 DobranoVizWindow::DobranoVizWindow() :
   CurrentServer(0),
@@ -105,6 +104,7 @@ DobranoVizWindow::DobranoVizWindow() :
   PipelineDockAction(0),
   HistogramDock(0),
   LineChartDock(0),
+  LineChart(0),
   HistogramDockAction(0),
   LineChartDockAction(0),
   ActiveView(0),
@@ -112,7 +112,6 @@ DobranoVizWindow::DobranoVizWindow() :
   ElementDockAction(0),
   CompoundProxyToolBar(0),
   VariableSelectorToolBar(0),
-  VCRControlsToolBar(0),
   ProxyInfo(0),
   CurrentProxy(0)
 {
@@ -309,14 +308,40 @@ DobranoVizWindow::DobranoVizWindow() :
   this->LineChartDock->setAllowedAreas(Qt::BottomDockWidgetArea |
       Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-  LineChart* const line_chart = new LineChart(this->LineChartDock);  
-  this->LineChartDock->setWidget(line_chart);
+  pqLineChartWidget* const line_chart_widget = new pqLineChartWidget(this->LineChartDock);
+  this->LineChart = new LineChartAdapter(*line_chart_widget);
+
+  QPushButton* const csv_button = new QPushButton("Load .csv");
+  this->connect(csv_button, SIGNAL(clicked()), this, SLOT(onLoadCSV()));
+  
+  QPushButton* const clear_button = new QPushButton("Clear .csv");
+  this->connect(clear_button, SIGNAL(clicked()), this->LineChart, SLOT(clearCSV()));
+
+  QPushButton* const save_button = new QPushButton("Save .pdf");
+  this->connect(save_button, SIGNAL(clicked()), this, SLOT(onSavePDF()));
+
+  QHBoxLayout* const hbox = new QHBoxLayout();
+  hbox->setMargin(0);
+  hbox->addWidget(csv_button);
+  hbox->addWidget(clear_button);
+  hbox->addWidget(save_button);
+
+  QVBoxLayout* const vbox = new QVBoxLayout();
+  vbox->setMargin(0);
+  vbox->addLayout(hbox);
+  vbox->addWidget(line_chart_widget);
+  
+  QWidget* const widget = new QWidget();
+  widget->setLayout(vbox);
+  
+  this->LineChartDock->setWidget(widget);
+
   if(this->PipelineList)
     {
     connect(this->PipelineList, SIGNAL(proxySelected(vtkSMProxy*)),
-        line_chart, SLOT(setExodusProxy(vtkSMProxy*)));
+        this->LineChart, SLOT(setExodusProxy(vtkSMProxy*)));
     }
-  connect(this, SIGNAL(serverChanged(pqServer*)), line_chart, SLOT(setServer(pqServer*)));
+  connect(this, SIGNAL(serverChanged(pqServer*)), this->LineChart, SLOT(setServer(pqServer*)));
 
   this->addDockWidget(Qt::BottomDockWidgetArea, this->LineChartDock);
   
@@ -332,7 +357,7 @@ DobranoVizWindow::DobranoVizWindow() :
 
   this->addDockWidget(Qt::BottomDockWidgetArea, this->ElementInspectorDock);
 
-  connect(element_inspector, SIGNAL(elementsChanged(vtkUnstructuredGrid*)), line_chart, SLOT(setExodusElements(vtkUnstructuredGrid*)));
+  connect(element_inspector, SIGNAL(elementsChanged(vtkUnstructuredGrid*)), this->LineChart, SLOT(setExodusElements(vtkUnstructuredGrid*)));
 
   // Set up the view menu items for the dock windows.
   this->PipelineDockAction = viewMenu->addAction(
@@ -379,10 +404,10 @@ DobranoVizWindow::DobranoVizWindow() :
   this->ElementInspectorDock->installEventFilter(this);
 
   // VCR controls
-  this->VCRControlsToolBar = new QToolBar(tr("VCR Controls"), this) << pqSetName("VCRControlsToolBar");
-  this->addToolBar(Qt::TopToolBarArea, this->VCRControlsToolBar);
-  pqPlayControlsWidget* const vcr_controls = new pqPlayControlsWidget(this->VCRControlsToolBar);
-  this->VCRControlsToolBar->addWidget(vcr_controls);
+  QToolBar* const vcr_toolbar = new QToolBar(tr("VCR Controls"), this) << pqSetName("VCRControlsToolBar");
+  this->addToolBar(Qt::TopToolBarArea, vcr_toolbar);
+  pqPlayControlsWidget* const vcr_controls = new pqPlayControlsWidget(vcr_toolbar);
+  vcr_toolbar->addWidget(vcr_controls);
   
   this->connect(vcr_controls, SIGNAL(first()), SLOT(onFirstTimeStep()));
   this->connect(vcr_controls, SIGNAL(back()), SLOT(onPreviousTimeStep()));
@@ -397,7 +422,7 @@ DobranoVizWindow::DobranoVizWindow() :
   this->connect(this->PipelineList, SIGNAL(proxySelected(vtkSMProxy *)), SLOT(onProxySelected(vtkSMProxy *)));
   this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), SLOT(onVariableChanged(pqVariableType, const QString&)));
   this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), histogram, SLOT(setVariable(pqVariableType, const QString&)));
-  this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), line_chart, SLOT(setExodusVariable(pqVariableType, const QString&)));
+  this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), this->LineChart, SLOT(setExodusVariable(pqVariableType, const QString&)));
 
   // Compound filter controls
   this->CompoundProxyToolBar = new QToolBar(tr("Compound Proxies"), this) << pqSetName("CompoundProxyToolBar");
@@ -1486,4 +1511,20 @@ void DobranoVizWindow::onLastTimeStep()
     if(window)
       window->update();
     }
+}
+
+void DobranoVizWindow::onLoadCSV()
+{
+  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Open .csv File:"), this, "fileOpenDialog")
+    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChart, SLOT(onLoadCSV(const QStringList&)));
+    
+  file_dialog->show();
+}
+
+void DobranoVizWindow::onSavePDF()
+{
+  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save .pdf File:"), this, "fileSavePDFDialog")
+    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChart, SLOT(onSavePDF(const QStringList&)));
+    
+  file_dialog->show();
 }

@@ -1,8 +1,8 @@
 /*!
- * \file pqLinePlot.cxx
+ * \file pqScatterPlot.cxx
  *
  * \brief
- *   The pqLinePlot class is used to draw a piecewise linear
+ *   The pqScatterPlot class is used to draw a piecewise linear
  *   function.
  *
  * \author Mark Richardson
@@ -12,7 +12,7 @@
 #include "pqChartAxis.h"
 #include "pqChartValue.h"
 #include "pqMarkerPen.h"
-#include "pqLinePlot.h"
+#include "pqScatterPlot.h"
 
 #include <QHelpEvent>
 #include <QPolygon>
@@ -21,9 +21,9 @@
 #include <vtkType.h>
 
 /////////////////////////////////////////////////////////////////////////
-// pqLinePlot::pqImplementation
+// pqScatterPlot::pqImplementation
 
-class pqLinePlot::pqImplementation
+class pqScatterPlot::pqImplementation
 {
 public:
   pqImplementation(pqMarkerPen* pen) :
@@ -66,41 +66,31 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////
-// pqLinePlot
+// pqScatterPlot
 
-pqLinePlot::pqLinePlot(pqMarkerPen* pen, const pqChartCoordinateList& coords) :
+pqScatterPlot::pqScatterPlot(pqMarkerPen* pen, const pqChartCoordinateList& coords) :
   pqAbstractPlot(),
   Implementation(new pqImplementation(pen))
 {
   this->Implementation->setCoordinates(coords);
 }
 
-pqLinePlot::pqLinePlot(pqMarkerPen* pen, const pqChartCoordinate& p1, const pqChartCoordinate& p2) :
-  pqAbstractPlot(),
-  Implementation(new pqImplementation(pen))
-{
-  pqChartCoordinateList coords;
-  coords.pushBack(p1);
-  coords.pushBack(p2);
-  this->Implementation->setCoordinates(coords);
-}
-
-pqLinePlot::~pqLinePlot()
+pqScatterPlot::~pqScatterPlot()
 {
   delete this->Implementation;
 }
 
-const pqChartCoordinate pqLinePlot::getMinimum() const
+const pqChartCoordinate pqScatterPlot::getMinimum() const
 {
   return this->Implementation->WorldMin;
 }
 
-const pqChartCoordinate pqLinePlot::getMaximum() const
+const pqChartCoordinate pqScatterPlot::getMaximum() const
 {
   return this->Implementation->WorldMax;
 }
 
-void pqLinePlot::layoutPlot(const pqChartAxis& XAxis, const pqChartAxis& YAxis)
+void pqScatterPlot::layoutPlot(const pqChartAxis& XAxis, const pqChartAxis& YAxis)
 {
   this->Implementation->ScreenCoords.resize(this->Implementation->WorldCoords.getSize());
   for(int i = 0; i != this->Implementation->WorldCoords.getSize(); ++i)
@@ -110,12 +100,12 @@ void pqLinePlot::layoutPlot(const pqChartAxis& XAxis, const pqChartAxis& YAxis)
     }
 }
 
-void pqLinePlot::drawPlot(QPainter& painter, const QRect& area, const pqChartAxis& XAxis, const pqChartAxis& YAxis)
+void pqScatterPlot::drawPlot(QPainter& painter, const QRect& area, const pqChartAxis& XAxis, const pqChartAxis& YAxis)
 {
-  this->Implementation->Pen->drawPolyline(painter, this->Implementation->ScreenCoords);
+  this->Implementation->Pen->drawPoints(painter, this->Implementation->ScreenCoords);
 }
 
-const double pqLinePlot::getDistance(const QPoint& coords) const
+const double pqScatterPlot::getDistance(const QPoint& coords) const
 {
   double distance = VTK_DOUBLE_MAX;
   for(int i = 0; i != this->Implementation->ScreenCoords.size(); ++i)
@@ -123,7 +113,7 @@ const double pqLinePlot::getDistance(const QPoint& coords) const
   return distance;
 }
 
-void pqLinePlot::showChartTip(QHelpEvent& event) const
+void pqScatterPlot::showChartTip(QHelpEvent& event) const
 {
   double tip_distance = VTK_DOUBLE_MAX;
   pqChartCoordinate tip_coordinate;

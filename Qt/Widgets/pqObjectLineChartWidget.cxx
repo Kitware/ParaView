@@ -11,6 +11,7 @@
 #include "pqServer.h"
 
 #include <pqChartAxis.h>
+#include <pqChartcoordinate.h>
 #include <pqChartLabel.h>
 #include <pqChartLegend.h>
 #include <pqConnect.h>
@@ -19,8 +20,7 @@
 #include <pqLineChartWidget.h>
 #include <pqLocalFileDialogModel.h>
 #include <pqMarkerPen.h>
-#include <pqPiecewiseLine.h>
-#include <pqLinearRamp.h>
+#include <pqLinePlot.h>
 
 #include <QHBoxLayout>
 #include <QPrinter>
@@ -196,9 +196,7 @@ struct pqObjectLineChartWidget::pqImplementation
 
     array->Delete();
       
-    pqPiecewiseLine* const plot = new pqPiecewiseLine();
-    plot->setCoordinates(coordinates);
-    plot->setPen(new pqNullMarkerPen(Pen));
+    pqLinePlot* const plot = new pqLinePlot(new pqNullMarkerPen(Pen), coordinates);
     
     this->LineChartWidget.getLineChart().addData(plot);
     this->LineChartWidget.getLegend().addEntry(new pqNullMarkerPen(Pen), new pqChartLabel(QString("Element %1").arg(ElementID)));

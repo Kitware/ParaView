@@ -50,7 +50,6 @@ signals:
   /// Called when the label needs to be repainted.
   void repaintNeeded();
 
-
 private:
   /// Stores the label text
   QString Text;

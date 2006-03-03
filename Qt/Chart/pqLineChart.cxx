@@ -11,7 +11,7 @@
 #include "pqChartAxis.h"
 #include "pqChartCoordinate.h"
 #include "pqLineChart.h"
-#include "pqLinePlot.h"
+#include "pqAbstractPlot.h"
 #include "pqMarkerPen.h"
 
 #include <QHelpEvent>
@@ -19,502 +19,190 @@
 #include <QPolygon>
 
 #include <vtkMath.h>
+#include <vtkstd/algorithm>
 #include <vtkstd/vector>
 #include <vtkType.h>
 
-/// \class pqLineChartItem
-/// \brief
-///   The pqLineChartItem class is used by the pqLineChart class
-///   to store a function and its pixel equivalent.
-class pqLineChartItem
+//////////////////////////////////////////////////////////////////////
+// pqLineChart::pqImplementation
+
+class pqLineChart::pqImplementation :
+  public vtkstd::vector<pqAbstractPlot*>
 {
 public:
-  pqLineChartItem();
-  ~pqLineChartItem() {}
+  pqImplementation() :
+    XAxis(0),
+    YAxis(0),
+    XShared(false)
+  {
+  }
+  
+  ~pqImplementation()
+  {
+    this->clear();
+  }
+  
+  void clear()
+  {
+    for(int i = 0; i != this->size(); ++i)
+      delete this->at(i);
+      
+    vtkstd::vector<pqAbstractPlot*>::clear();
+  }
 
-public:
-  QPolygon Array;   ///< Stores the pixel coordinates.
-  pqLinePlot *Plot; ///< Stores the line plot interface.
+  pqChartAxis* XAxis;    ///< Stores the x-axis object.
+  pqChartAxis* YAxis;    ///< Stores the y-axis object.
+  bool XShared;          ///< True if the x-axis is shared.
 };
 
+///////////////////////////////////////////////////////////////////////
+// pqLineChart
 
-/// \class pqLineChartData
-/// \brief
-///   The pqLineChartData class hides the private data of the
-///   pqLineChart class.
-class pqLineChartData : public vtkstd::vector<pqLineChartItem *> {};
-
-
-pqLineChartItem::pqLineChartItem()
-  : Array()
+pqLineChart::pqLineChart(QObject *p) :
+  QObject(p),
+  Implementation(new pqImplementation())
 {
-  this->Plot = 0;
-}
-
-
-pqLineChart::pqLineChart(QObject *p)
-  : QObject(p), Bounds()
-{
-  this->XAxis = 0;
-  this->YAxis = 0;
-  this->Data = new pqLineChartData();
-  this->XShared = false;
 }
 
 pqLineChart::~pqLineChart()
 {
-  clearData();
-  if(this->Data)
-    delete this->Data;
+  delete this->Implementation;
 }
 
 void pqLineChart::setAxes(pqChartAxis *xAxis, pqChartAxis *yAxis,
     bool shared)
 {
-  this->XAxis = xAxis;
-  this->YAxis = yAxis;
-  this->XShared = shared;
+  this->Implementation->XAxis = xAxis;
+  this->Implementation->YAxis = yAxis;
+  this->Implementation->XShared = shared;
 }
 
-void pqLineChart::addData(pqLinePlot *plot)
+void pqLineChart::addData(pqAbstractPlot* plot)
 {
-  if(!this->Data || !this->XAxis || !this->YAxis)
+  if(!plot)
+    return;
+    
+  if(vtkstd::find(this->Implementation->begin(), this->Implementation->end(), plot) != this->Implementation->end())
     return;
 
-  // Don't allow the pointer to be added more than once.
-  pqLineChartItem *item = 0;
-  pqLineChartData::iterator iter = this->Data->begin();
-  for( ; iter != this->Data->end(); iter++)
-    {
-    item = *iter;
-    if(item && item->Plot == plot)
-      return;
-    }
+  this->Implementation->push_back(plot);
 
-  // Create a new pqLineChartItem for the plot.
-  item = new pqLineChartItem();
-  if(item)
-    {
-    item->Plot = plot;
-    this->Data->push_back(item);
-
-    // Listen to the plot changed signal.
-    connect(item->Plot, SIGNAL(plotModified(const pqLinePlot *)), this,
-        SLOT(handlePlotChanges(const pqLinePlot *)));
-
-    pqChartCoordinate min;
-    pqChartCoordinate max;
-    item->Plot->getMinX(min.X);
-    item->Plot->getMinY(min.Y);
-    item->Plot->getMaxX(max.X);
-    item->Plot->getMaxY(max.Y);
-
-    // If neither of the axes needs to be changed, the new plot
-    // can be layed out using the current pixel maping. Setting
-    // the axis min and/or max should cause the entire chart to
-    // be layed out again.
-    if(!this->updateAxes(min, max, true))
-      {
-      // Make sure the chart gets repainted after laying out the item.
-      this->layoutItem(item);
-      emit this->repaintNeeded();
-      }
-    }
+  this->updateAxes();
+  plot->layoutPlot(*this->Implementation->XAxis, *this->Implementation->YAxis);
+  emit this->repaintNeeded();
 }
 
-void pqLineChart::removeData(pqLinePlot *plot)
+void pqLineChart::removeData(pqAbstractPlot *plot)
 {
-  if(!this->Data || !this->XAxis || !this->YAxis)
-    return;
+  this->Implementation->erase(
+    vtkstd::remove(this->Implementation->begin(), this->Implementation->end(), plot),
+    this->Implementation->end());
 
-  // Find the chart min/max while searching for the item.
-  bool firstItem = true;
-  bool found = false;
-  pqChartValue value;
-  pqChartCoordinate min;
-  pqChartCoordinate max;
-  pqLineChartItem *item = 0;
-  pqLineChartData::iterator iter = this->Data->begin();
-  while(iter != this->Data->end())
-    {
-    item = *iter;
-    if(item)
-      {
-      if(item->Plot == plot)
-        {
-        // Disconnect from the plot's signals.
-        disconnect(item->Plot, 0, this, 0);
-
-        // Remove the item from the list.
-        iter = this->Data->erase(iter);
-        delete item;
-        found = true;
-        }
-      else
-        {
-        if(firstItem)
-          {
-          item->Plot->getMinX(min.X);
-          item->Plot->getMinY(min.Y);
-          item->Plot->getMaxX(max.X);
-          item->Plot->getMaxY(max.Y);
-          firstItem = false;
-          }
-        else
-          {
-          item->Plot->getMinX(value);
-          if(value < min.X)
-            min.X = value;
-          item->Plot->getMinY(value);
-          if(value < min.Y)
-            min.Y = value;
-          item->Plot->getMaxX(value);
-          if(value > max.X)
-            max.X = value;
-          item->Plot->getMaxY(value);
-          if(value > max.Y)
-            max.Y = value;
-          }
-
-        ++iter;
-        }
-      }
-    else
-      {
-      // Remove the empty item.
-      iter = this->Data->erase(iter);
-      }
-    }
-
-  // Don't resize the min/max if there are no plots to display.
-  if(found && this->Data->size() > 0)
-    this->updateAxes(min, max, false);
+  this->updateAxes();
+  emit this->repaintNeeded();    
 }
 
 void pqLineChart::layoutChart()
 {
-  if(!this->Data || !this->XAxis || !this->YAxis)
+  if(!this->Implementation->XAxis || !this->Implementation->YAxis)
     return;
 
   // Make sure the axes are valid.
-  if(!this->XAxis->isValid() || !this->YAxis->isValid())
+  if(!this->Implementation->XAxis->isValid() || !this->Implementation->YAxis->isValid())
     return;
+
+  // Give all of the plots a chance to update their internal state
+  for(pqImplementation::iterator plot = this->Implementation->begin(); plot != this->Implementation->end(); ++plot)
+    {
+    (*plot)->layoutPlot(*this->Implementation->XAxis, *this->Implementation->YAxis);
+    }
 
   // Set up the chart area based on the remaining space.
-  this->Bounds.setTop(this->YAxis->getMaxPixel());
-  this->Bounds.setLeft(this->XAxis->getMinPixel());
-  this->Bounds.setRight(this->XAxis->getMaxPixel());
-  this->Bounds.setBottom(this->YAxis->getMinPixel());
-
-  // Loop through all the plot items to create the point arrays.
-  pqLineChartData::iterator iter = this->Data->begin();
-  for( ; iter != this->Data->end(); iter++)
-    this->layoutItem(*iter);
+  this->Bounds.setTop(this->Implementation->YAxis->getMaxPixel());
+  this->Bounds.setLeft(this->Implementation->XAxis->getMinPixel());
+  this->Bounds.setRight(this->Implementation->XAxis->getMaxPixel());
+  this->Bounds.setBottom(this->Implementation->YAxis->getMinPixel());
 }
 
-void pqLineChart::drawChart(QPainter *p, const QRect &area)
+void pqLineChart::drawChart(QPainter& painter, const QRect& area)
 {
-  if(!this->Data || !p || !p->isActive() || !area.isValid())
+  if(!painter.isActive() || !area.isValid())
     return;
-  if(!this->Bounds.isValid() || this->Data->empty())
+    
+  if(!this->Bounds.isValid() || this->Implementation->empty())
     return;
 
   QRect clip = area.intersect(this->Bounds);
   if(!clip.isValid())
     return;
 
-  p->save();
-  p->setRenderHint(QPainter::Antialiasing, true);
+  painter.save();
+  painter.setRenderHint(QPainter::Antialiasing, true);
+  painter.setClipping(true);
+  painter.setClipRect(clip);
 
-  // Set the clipping area to make sure the lines are drawn
-  // inside the chart area.
-  QRegion lastClip;
-  bool wasClipping = p->hasClipping();
-  if(wasClipping)
-    lastClip = p->clipRegion();
-  p->setClipping(true);
-  p->setClipRect(clip);
-
-  // Draw in all the plot items.
-  pqLineChartData::iterator iter = this->Data->begin();
-  for( ; iter != this->Data->end(); iter++)
+  // Give all of the plots a chance to draw themselves
+  for(pqImplementation::iterator plot = this->Implementation->begin(); plot != this->Implementation->end(); ++plot)
     {
-    pqLineChartItem *item = *iter;
-    if(item && item->Plot && !item->Array.isEmpty())
-      {
-      // Set the drawing pen up for the plot
-      pqMarkerPen& pen = item->Plot->getPen();
-
-      // Draw the line segments.
-      if(item->Plot->isPolyLine())
-        {
-        pen.drawPolyline(*p, item->Array);
-        }
-      else
-        {
-        for(int i = 1; i < item->Array.size(); i += 2)
-          {
-          pen.drawLine(*p, item->Array[i - 1], item->Array[i]);
-          }
-        }
-
-      // TODO: Draw in the user editable points.
-      }
+    (*plot)->drawPlot(painter, area, *this->Implementation->XAxis, *this->Implementation->YAxis);
     }
 
-  // Restore the clipping to its previous state.
-  p->setClipping(wasClipping);
-  if(wasClipping)
-    p->setClipRegion(lastClip);
-    
-  p->restore();
-}
-
-const double length(const QPoint p)
-{
-  return sqrt(static_cast<double>(p.x() * p.x() + p.y() * p.y()));
+  painter.restore();
 }
 
 void pqLineChart::showTooltip(QHelpEvent& event)
 {
-  // Find the closest data ...
-  int line_index = -1;
-  int coordinate_index = -1;
-  double coordinate_distance = VTK_DOUBLE_MAX;
+  int plot_index = -1;
+  double plot_distance = VTK_DOUBLE_MAX;
   
-  for(int i = 0; i != this->Data->size(); ++i)
+  for(int i = 0; i != this->Implementation->size(); ++i)
     {
-    for(int j = 0; j != this->Data->at(i)->Array.size(); ++j)
+    const double distance = this->Implementation->at(i)->getDistance(event.pos());
+    if(distance < plot_distance)
       {
-      double distance = length(this->Data->at(i)->Array[j] - event.pos());
-      if(distance < coordinate_distance)
-        {
-        line_index = i;
-        coordinate_index = j;        
-        coordinate_distance = distance;
-        }
+      plot_index = i;
+      plot_distance = distance;
       }
     }
+
+  if(plot_index == -1 || plot_distance > 10)
+    return;
     
-  if(line_index == -1 || coordinate_index == -1 || coordinate_distance > 10)
-    return;
-  
-  this->Data->at(line_index)->Plot->showTooltip(coordinate_index, event);  
-}
-
-void pqLineChart::handlePlotChanges(const pqLinePlot *plot)
-{
-  if(!plot || !this->Data || !this->XAxis || !this->YAxis)
-    return;
-
-  // Make sure the axes are valid.
-  if(!this->XAxis->isValid() || !this->YAxis->isValid())
-    return;
-
-  // Check to see if the plot item belongs to this chart.
-  // Find the chart bounding rectangle while searching.
-  bool firstItem = true;
-  pqChartValue value;
-  pqChartCoordinate min;
-  pqChartCoordinate max;
-  pqLineChartItem *item = 0;
-  pqLineChartItem *match = 0;
-  pqLineChartData::iterator iter = this->Data->begin();
-  for( ; iter != this->Data->end(); iter++)
-    {
-    item = *iter;
-    if(item)
-      {
-      if(item->Plot == plot)
-        {
-        match = item;
-        if(!item->Plot->isModified())
-          break;
-        }
-
-      if(plot->isModified())
-        {
-        if(firstItem)
-          {
-          item->Plot->getMinX(min.X);
-          item->Plot->getMinY(min.Y);
-          item->Plot->getMaxX(max.X);
-          item->Plot->getMaxY(max.Y);
-          firstItem = false;
-          }
-        else
-          {
-          item->Plot->getMinX(value);
-          if(value < min.X)
-            min.X = value;
-          item->Plot->getMinY(value);
-          if(value < min.Y)
-            min.Y = value;
-          item->Plot->getMaxX(value);
-          if(value > max.X)
-            max.X = value;
-          item->Plot->getMaxY(value);
-          if(value > max.Y)
-            max.Y = value;
-          }
-        }
-      }
-    }
-
-  if(!match)
-    return;
-
-  if(plot->isModified())
-    {
-    // If neither of the axes needs to be changed, the plot can
-    // be layed out again using the current pixel maping. Setting
-    // the axis min and/or max should cause the entire chart to
-    // be layed out again.
-    if(!this->updateAxes(min, max, false))
-      {
-      // Make sure the chart gets repainted after laying out the item.
-      this->layoutItem(match);
-      emit this->repaintNeeded();
-      }
-    }
-  else
-    {
-    // The color or line width has changed so the plot needs to
-    // be repainted.
-    emit this->repaintNeeded();
-    }
+  this->Implementation->at(plot_index)->showChartTip(event);
 }
 
 void pqLineChart::clearData()
 {
-  if(this->Data)
-    {
-    pqLineChartData::iterator iter = this->Data->begin();
-    for( ; iter != this->Data->end(); iter++)
-      delete *iter;
-    this->Data->clear();
-    }
+  this->Implementation->clear();
 }
 
-void pqLineChart::layoutItem(pqLineChartItem *item)
+void pqLineChart::updateAxes()
 {
-  if(!item || !item->Plot)
+  if(this->Implementation->empty())
     return;
 
-  // Flag the item as not modified.
-  item->Plot->setModified(false);
+  pqChartCoordinate minimum(VTK_DOUBLE_MAX, VTK_DOUBLE_MAX);
+  pqChartCoordinate maximum(-VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX);
 
-  // Make sure the array can hold the data.
-  int total = item->Plot->getCoordinateCount();
-  item->Array.resize(total);
-
-  // Transform the plot data into pixel coordinates.
-  int px = 0;
-  int py = 0;
-  pqChartCoordinate coord;
-  for(int i = 0; i < total; i++)
+  for(pqImplementation::iterator plot = this->Implementation->begin(); plot != this->Implementation->end(); ++plot)
     {
-    if(item->Plot->getCoordinate(i, coord))
-      {
-      px = this->XAxis->getPixelFor(coord.X);
-      py = this->YAxis->getPixelFor(coord.Y);
-      }
+    const pqChartCoordinate plot_minimum = (*plot)->getMinimum();
+    const pqChartCoordinate plot_maximum = (*plot)->getMaximum();
+    
+    minimum.X = vtkstd::min(minimum.X, plot_minimum.X);
+    minimum.Y = vtkstd::min(minimum.Y, plot_minimum.Y);
+    maximum.X = vtkstd::max(maximum.X, plot_maximum.X);
+    maximum.Y = vtkstd::max(maximum.Y, plot_maximum.Y);
+    }
 
-    item->Array.setPoint(i, px, py);
+  if(!this->Implementation->XShared &&
+    this->Implementation->XAxis->getLayoutType() != pqChartAxis::FixedInterval)
+    {
+    this->Implementation->XAxis->setValueRange(minimum.X, maximum.X);
+    }
+    
+  if(this->Implementation->YAxis->getLayoutType() != pqChartAxis::FixedInterval)
+    {
+    this->Implementation->YAxis->setValueRange(minimum.Y, maximum.Y);
     }
 }
-
-bool pqLineChart::updateAxes(pqChartCoordinate &min, pqChartCoordinate &max,
-    bool fromAdd)
-{
-  bool xChanged = false;
-  bool yChanged = false;
-
-  // Make sure the x and y axes are large enough to contain the plot.
-  // Only try to update a best interval axis. Changing the max on a
-  // fixed interval axis can mess up the interval.
-  if(!this->XShared &&
-      this->XAxis->getLayoutType() != pqChartAxis::FixedInterval)
-    {
-    if(fromAdd)
-      {
-      if(this->Data->size() > 1)
-        {
-        xChanged = min.X < this->XAxis->getMinValue() ||
-            max.X > this->XAxis->getMaxValue();
-        if(xChanged)
-          {
-          if(min.X > this->XAxis->getMinValue())
-            {
-            min.X = this->XAxis->getMinValue();
-            }
-          if(max.X < this->XAxis->getMaxValue())
-            {
-            max.X = this->XAxis->getMaxValue();
-            }
-          }
-        }
-      else
-        {
-        xChanged = true;
-        }
-      }
-    else
-      {
-      xChanged = min.X != this->XAxis->getMinValue() ||
-          max.X != this->XAxis->getMaxValue();
-      }
-    }
-
-  if(this->YAxis->getLayoutType() != pqChartAxis::FixedInterval)
-    {
-    if(fromAdd)
-      {
-      if(this->Data->size() > 1)
-        {
-        yChanged = min.Y < this->YAxis->getMinValue() ||
-            max.Y > this->YAxis->getMaxValue();
-        if(yChanged)
-          {
-          if(min.Y > this->YAxis->getMinValue())
-            {
-            min.Y = this->YAxis->getMinValue();
-            }
-          if(max.Y < this->YAxis->getMaxValue())
-            {
-            max.Y = this->YAxis->getMaxValue();
-            }
-          }
-        }
-      else
-        {
-        yChanged = true;
-        }
-      }
-    else
-      {
-      yChanged = min.Y != this->YAxis->getMinValue() ||
-          max.Y != this->YAxis->getMaxValue();
-      }
-    }
-
-  if(yChanged)
-    {
-    // If the x-axis has changed too, block the y-axis update
-    // signal to avoid laying out the chart twice.
-    if(xChanged)
-      this->YAxis->blockSignals(true);
-    this->YAxis->setValueRange(min.Y, max.Y);
-    if(xChanged)
-      this->YAxis->blockSignals(false);
-    }
-
-  if(xChanged)
-    {
-    this->XAxis->setValueRange(min.X, max.X);
-    }
-
-  return xChanged || yChanged;
-}
-
-

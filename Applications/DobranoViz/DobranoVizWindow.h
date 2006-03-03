@@ -11,25 +11,28 @@
 #define _DobranoVizWindow_h
 
 #include <pqVariableType.h>
-#include <QMainWindow>
 #include <vtkIOStream.h>
+#include <QMainWindow>
 
+class LineChartAdapter;
+
+class pqMultiViewFrame;
+class pqMultiViewManager;
 class pqObjectInspectorWidget;
 class pqPipelineData;
 class pqPipelineListWidget;
 class pqPipelineServer;
 class pqPipelineWindow;
-class pqServer;
 class pqSMAdaptor;
+class pqServer;
 class pqSourceProxyInfo;
-class pqMultiViewManager;
-class pqMultiViewFrame;
+
+class vtkEventQtSlotConnect;
+class vtkSMProxy;
+class vtkSMRenderModuleProxy;
+class vtkUnstructuredGrid;
 
 class QVTKWidget;
-class vtkSMRenderModuleProxy;
-class vtkEventQtSlotConnect;
-class vtkUnstructuredGrid;
-class vtkSMProxy;
 
 class QAction;
 class QDockWidget;
@@ -55,45 +58,10 @@ public:
 signals:
   void serverChanged(pqServer*);
   
-private:
-  void setServer(pqServer* Server);
-
-  pqServer* CurrentServer;
-  QToolBar* PropertyToolbar;
-  pqMultiViewManager* MultiViewManager;
-  QAction* ServerDisconnectAction;
-  pqSMAdaptor *Adaptor;
-  pqPipelineData *Pipeline;
-  QMenu* SourcesMenu;
-  QMenu* FiltersMenu;
-  QMenu* ToolsMenu;
-  pqObjectInspectorWidget *Inspector;
-  QDockWidget *InspectorDock;
-  QAction *InspectorDockAction;
-  pqPipelineListWidget *PipelineList;
-  QDockWidget *PipelineDock;
-  QAction *PipelineDockAction;
-  QDockWidget *HistogramDock;
-  QDockWidget *LineChartDock;
-  QAction *HistogramDockAction;
-  QAction *LineChartDockAction;
-  pqMultiViewFrame* ActiveView;
-  QDockWidget *ElementInspectorDock;
-  QAction *ElementDockAction;
-  QToolBar* CompoundProxyToolBar;
-  QToolBar* VariableSelectorToolBar;
-  QToolBar* VCRControlsToolBar;
-
-  pqSourceProxyInfo* ProxyInfo;
-  vtkEventQtSlotConnect* VTKConnector;
-  vtkSMProxy* CurrentProxy;
-
 private slots:
-  
   void onNewQVTKWidget(pqMultiViewFrame* parent);
   void onDeleteQVTKWidget(pqMultiViewFrame* parent);
   void onFrameActive(QWidget*);
-
   void onFileNew();
   void onFileNew(pqServer* Server);
   void onFileOpen();
@@ -115,11 +83,9 @@ private slots:
   void onCreateFilter(QAction*);
   void onOpenLinkEditor();
   void onOpenCompoundFilterWizard();
-
   void onNewSelections(vtkSMProxy* p, vtkUnstructuredGrid* selections);
   void onCompoundProxyAdded(const QString&, const QString&);
   void onCreateCompoundProxy(QAction*);
-  
   void onProxySelected(vtkSMProxy*);
   void onVariableChanged(pqVariableType, const QString&);
   
@@ -137,8 +103,42 @@ private slots:
   void onNextTimeStep();
   void onLastTimeStep();
 
+  void onLoadCSV();
+  void onSavePDF();
+
 private:
   void cleanUpWindow(QVTKWidget *window);
+  void setServer(pqServer* Server);
+
+  pqServer* CurrentServer;
+  QToolBar* PropertyToolbar;
+  pqMultiViewManager* MultiViewManager;
+  QAction* ServerDisconnectAction;
+  pqSMAdaptor *Adaptor;
+  pqPipelineData *Pipeline;
+  QMenu* SourcesMenu;
+  QMenu* FiltersMenu;
+  QMenu* ToolsMenu;
+  pqObjectInspectorWidget *Inspector;
+  QDockWidget *InspectorDock;
+  QAction *InspectorDockAction;
+  pqPipelineListWidget *PipelineList;
+  QDockWidget *PipelineDock;
+  QAction *PipelineDockAction;
+  QDockWidget *HistogramDock;
+  QDockWidget *LineChartDock;
+  LineChartAdapter *LineChart;
+  QAction *HistogramDockAction;
+  QAction *LineChartDockAction;
+  pqMultiViewFrame* ActiveView;
+  QDockWidget *ElementInspectorDock;
+  QAction *ElementDockAction;
+  QToolBar* CompoundProxyToolBar;
+  QToolBar* VariableSelectorToolBar;
+
+  pqSourceProxyInfo* ProxyInfo;
+  vtkEventQtSlotConnect* VTKConnector;
+  vtkSMProxy* CurrentProxy;
 };
 
 #endif // !_DobranoVizWindow_h

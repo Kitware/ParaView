@@ -17,9 +17,7 @@
 
 class pqChartAxis;
 class pqChartCoordinate;
-class pqLineChartData;
-class pqLineChartItem;
-class pqLinePlot;
+class pqAbstractPlot;
 class QPainter;
 class QHelpEvent;
 
@@ -31,7 +29,8 @@ class QHelpEvent;
 /// same chart. The line chart can also be drawn over a
 /// histogram as well. When combined with another chart, the
 /// x-axis should be marked as a shared axis.
-class QTCHART_EXPORT pqLineChart : public QObject
+class QTCHART_EXPORT pqLineChart :
+  public QObject
 {
   Q_OBJECT
 
@@ -64,12 +63,12 @@ public:
   /// \brief
   ///   Adds another line plot to the chart.
   /// \param plot The line plot to add.
-  void addData(pqLinePlot *plot);
+  void addData(pqAbstractPlot *plot);
 
   /// \brief
   ///   Removes the specified line plot from the chart.
   /// \param plot The line plot to remove.
-  void removeData(pqLinePlot *plot);
+  void removeData(pqAbstractPlot *plot);
   //@}
 
   /// \name Layout Methods
@@ -92,55 +91,29 @@ public:
   ///
   /// \param p The painter to use.
   /// \param area The area that needs to be painted.
-  void drawChart(QPainter *p, const QRect &area);
+  void drawChart(QPainter& painter, const QRect& area);
   //@}
 
   /// Displays a tooltip based on the position of the given event, relative to the chart data
   void showTooltip(QHelpEvent& event);
 
 signals:
-  /// \brief
-  ///   Called when the line chart needs to be repainted.
+  /// Called when the line chart needs to be layed-out
+  void layoutNeeded();
+  /// Called when the line chart needs to be repainted.
   void repaintNeeded();
 
-public slots:
-  /// \brief
-  ///   Updates the chart for changes to the specified plot.
-  ///
-  /// The changes to the line plot may require the line chart to
-  /// be repainted or layed out again.
-  ///
-  /// \param plot The line plot that has changed.
-  void handlePlotChanges(const pqLinePlot *plot);
-
 private:
-  /// \brief
-  ///   Calculates the pixel point array for the given item.
-  /// \param item The line chart item to process.
-  void layoutItem(pqLineChartItem *item);
-
-  /// \brief
-  ///   Called to update the min/max values for the axes.
-  ///
-  /// If an axis is using the fixed interval layout, it will not
-  /// be changed by this method.
-  ///
-  /// \param min The necessary y,x minimum coordinate.
-  /// \param max The necessary y,x maximum coordinate.
-  /// \param fromAdd True if the method is called from \c addData.
-  /// \return
-  ///   False if neither of the axes were changed.
-  bool updateAxes(pqChartCoordinate &min, pqChartCoordinate &max,
-      bool fromAdd);
+  /// Internal implementation detail
+  void updateAxes();
 
 public:
   QRect Bounds;          ///< Stores the chart area.
 
 private:
-  pqChartAxis *XAxis;    ///< Stores the x-axis object.
-  pqChartAxis *YAxis;    ///< Stores the y-axis object.
-  pqLineChartData *Data; ///< Stores the function objects.
-  bool XShared;          ///< True if the x-axis is shared.
+  /// Private implementation details
+  class pqImplementation;
+  pqImplementation* const Implementation;
 };
 
 #endif

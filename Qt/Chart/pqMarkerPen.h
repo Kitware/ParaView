@@ -23,6 +23,9 @@ class QSize;
 class QTCHART_EXPORT pqMarkerPen
 {
 public:
+  /// Returns the pen that will be used to draw lines (without the markers)
+  QPen getPen();
+
   //@{
   /**
   Methods for drawing lines and points with markers.  These methods are intentionally modelled on the
@@ -45,10 +48,6 @@ public:
   
   */
   
-//  void drawConvexPolygon(QPainter& painter, const QPointF* points, int pointCount);
-//  void drawConvexPolygon(QPainter& painter, const QPoint* points, int pointCount);
-//  void drawConvexPolygon(QPainter& painter, const QPolygonF& polygon);
-//  void drawConvexPolygon(QPainter& painter, const QPolygon& polygon);
   void drawLine(QPainter& painter, const QLineF& line);
   void drawLine(QPainter& painter, const QLine& line);
   void drawLine(QPainter& painter, const QPoint& p1, const QPoint& p2);
@@ -69,10 +68,6 @@ public:
   void drawPoints(QPainter& painter, const QPoint* points, int pointCount);
   void drawPoints(QPainter& painter, const QPolygonF& points);
   void drawPoints(QPainter& painter, const QPolygon& points);
-//  void drawPolygon(QPainter& painter, const QPointF* points, int pointCount, Qt::FillRule fillRule = Qt::OddEvenFill);
-//  void drawPolygon(QPainter& painter, const QPoint* points, int pointCount, Qt::FillRule fillRule = Qt::OddEvenFill);
-//  void drawPolygon(QPainter& painter, const QPolygonF& points, Qt::FillRule fillRule = Qt::OddEvenFill);
-//  void drawPolygon(QPainter& painter, const QPolygon& points, Qt::FillRule fillRule = Qt::OddEvenFill);
   void drawPolyline(QPainter& painter, const QPointF* points, int pointCount);
   void drawPolyline(QPainter& painter, const QPoint* points, int pointCount);
   void drawPolyline(QPainter& painter, const QPolygonF& points);

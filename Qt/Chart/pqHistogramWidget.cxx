@@ -924,7 +924,7 @@ void pqHistogramWidget::draw(QPainter& painter, QRect area)
   this->Histogram->drawChart(&painter, area);
 
   // Paint the line chart on top of the histogram.
-  this->LineChart->drawChart(&painter, area);
+  this->LineChart->drawChart(painter, area);
 
   // Draw in the axis lines again to ensure they are on top.
   this->FAxis->drawAxisLine(&painter);

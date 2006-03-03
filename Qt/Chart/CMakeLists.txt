@@ -13,6 +13,8 @@ ENDIF(NOT QT4_FOUND)
 
 
 SET(pqChart_SRCS
+  pqAbstractPlot.cxx
+  pqAbstractPlot.h
   pqChartAxis.cxx
   pqChartAxis.h
   pqChartCoordinate.cxx
@@ -38,18 +40,18 @@ SET(pqChart_SRCS
   pqHistogramSelection.h
   pqHistogramWidget.cxx
   pqHistogramWidget.h
-  pqLinearRamp.cxx
-  pqLinearRamp.h
   pqLineChart.cxx
   pqLineChart.h
   pqLineChartWidget.cxx
   pqLineChartWidget.h
+  pqLineErrorPlot.cxx
+  pqLineErrorPlot.h
   pqLinePlot.cxx
   pqLinePlot.h
   pqMarkerPen.cxx
   pqMarkerPen.h
-  pqPiecewiseLine.cxx
-  pqPiecewiseLine.h
+  pqScatterPlot.cxx
+  pqScatterPlot.h
 )
 
 
@@ -62,7 +64,6 @@ QT4_WRAP_CPP(pqChart_MOC_SRCS
   pqHistogramWidget.h
   pqLineChart.h
   pqLineChartWidget.h
-  pqLinePlot.h
 )
 
 
@@ -135,4 +136,3 @@ TARGET_LINK_LIBRARIES(pqChartPlugin
   pqChart
   ${QT_LIBRARIES}
 )
-

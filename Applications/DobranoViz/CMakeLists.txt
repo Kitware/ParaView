@@ -43,7 +43,7 @@ ENDIF(VTK_USE_MPI)
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   DobranoVizWindow.h
-  LineChart.h
+  LineChartAdapter.h
   ${PYTHON_MOC_SOURCES}
 )
 
@@ -66,8 +66,8 @@ ADD_EXECUTABLE(DobranoViz WIN32 MACOSX_BUNDLE
   DobranoVizWindow.h
   ImageLinePlot.cxx
   ImageLinePlot.h
-  LineChart.cxx
-  LineChart.h
+  LineChartAdapter.cxx
+  LineChartAdapter.h
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES}
 )

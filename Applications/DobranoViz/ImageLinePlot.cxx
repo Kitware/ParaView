@@ -1,23 +1,25 @@
 #include "ImageLinePlot.h"
 
 #include <pqImageTip.h>
+#include <pqMarkerPen.h>
 
 #include <QHelpEvent>
+#include <QPen>
 
 //////////////////////////////////////////////////////////////////////////////////////
 // ImageLinePlot
 
-ImageLinePlot::ImageLinePlot(const QPixmap& image) :
-  pqPiecewiseLine(0),
+ImageLinePlot::ImageLinePlot(pqMarkerPen* pen, const QPen& whisker_pen, double whisker_size, const pqLineErrorPlot::CoordinatesT& coords, const QPixmap& image) :
+  pqLineErrorPlot(pen, whisker_pen, whisker_size, coords),
   Image(image)
 {
 }
 
-void ImageLinePlot::showTooltip(int index, QHelpEvent& event) const
+void ImageLinePlot::showChartTip(QHelpEvent& event) const
 {
   if(this->Image.isNull())
     {
-    pqPiecewiseLine::showTooltip(index, event);
+    pqLineErrorPlot::showChartTip(event);
     return;
     }
   

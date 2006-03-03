@@ -87,6 +87,8 @@ pqLineChartWidget::pqLineChartWidget(QWidget *p) :
   connect(this->YAxis, SIGNAL(repaintNeeded()), this, SLOT(repaintChart()));
 
   this->LineChart->setAxes(this->XAxis, this->YAxis);
+  connect(this->LineChart, SIGNAL(layoutNeeded()), this,
+      SLOT(updateLayout()));
   connect(this->LineChart, SIGNAL(repaintNeeded()), this,
       SLOT(repaintChart()));
 }
@@ -463,7 +465,7 @@ void pqLineChartWidget::draw(QPainter& painter, QRect area)
   this->XAxis->drawAxis(&painter, area);
 
   // Paint the chart.
-  this->LineChart->drawChart(&painter, area);
+  this->LineChart->drawChart(painter, area);
 
   // Draw in the axis lines again to ensure they are on top.
   this->YAxis->drawAxisLine(&painter);

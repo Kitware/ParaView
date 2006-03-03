@@ -9,6 +9,11 @@ pqMarkerPen::pqMarkerPen(const QPen& pen) :
 {
 }
 
+QPen pqMarkerPen::getPen()
+{
+  return this->Pen;
+}
+
 void pqMarkerPen::drawLine(QPainter& painter, const QLineF& line)
 {
   painter.save();
