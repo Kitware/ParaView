@@ -65,7 +65,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.275");
+vtkCxxRevisionMacro(vtkKWApplication, "1.276");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -213,6 +213,8 @@ vtkKWApplication::vtkKWApplication()
   // Encoding...
 
   this->SetCharacterEncoding(VTK_ENCODING_ISO_8859_1);
+
+  vtksys::SystemTools::EnableMSVCDebugHook();
 }
 
 //----------------------------------------------------------------------------
