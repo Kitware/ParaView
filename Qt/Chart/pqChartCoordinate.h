@@ -152,6 +152,7 @@ public:
 
 public:
   pqChartCoordinateList();
+  pqChartCoordinateList(const pqChartCoordinateList&);
   ~pqChartCoordinateList();
 
   /// \name List Navigation Methods
@@ -245,7 +246,7 @@ public:
   //@}
 
 private:
-  pqChartCoordinateListData *Data; ///< Stores the list of coordinates.
+  pqChartCoordinateListData* const Data; ///< Stores the list of coordinates.
 };
 
 #endif

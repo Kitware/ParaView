@@ -312,15 +312,25 @@ pqChartCoordinateConstIterator &pqChartCoordinateConstIterator::operator=(
 }
 
 
-pqChartCoordinateList::pqChartCoordinateList()
+pqChartCoordinateList::pqChartCoordinateList() :
+  Data(new pqChartCoordinateListData())
 {
-  this->Data = new pqChartCoordinateListData();
+}
+
+pqChartCoordinateList::pqChartCoordinateList(const pqChartCoordinateList& rhs) :
+  Data(new pqChartCoordinateListData(*rhs.Data))
+{
+}
+
+pqChartCoordinateList& pqChartCoordinateList::operator=(const pqChartCoordinateList& list)
+{
+  *(this->Data) = *(list.Data);
+  return *this;
 }
 
 pqChartCoordinateList::~pqChartCoordinateList()
 {
-  if(this->Data)
-    delete this->Data;
+  delete this->Data;
 }
 
 pqChartCoordinateList::Iterator pqChartCoordinateList::begin()
@@ -395,19 +405,6 @@ void pqChartCoordinateList::pushBack(const pqChartCoordinate &coord)
 {
   if(this->Data)
     this->Data->push_back(coord);
-}
-
-pqChartCoordinateList &pqChartCoordinateList::operator=(
-    const pqChartCoordinateList &list)
-{
-  this->clear();
-  if(this->Data && list.Data)
-  {
-    vtkstd::vector<pqChartCoordinate>::iterator iter = list.Data->begin();
-    for( ; iter != list.Data->end(); iter++)
-      this->Data->push_back(*iter);
-  }
-  return *this;
 }
 
 pqChartCoordinateList &pqChartCoordinateList::operator+=(
