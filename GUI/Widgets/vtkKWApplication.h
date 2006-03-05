@@ -56,6 +56,10 @@ public:
   // Start running the application, with or without arguments, and enter the
   // event loop. The application will exit the event loop once every 
   // windows has been closed.
+  // As a convenience, if one (or more) window has been added to the 
+  // application (using AddWindow()), and none of them has been mapped
+  // on the screen yet, the application will automatically display the first
+  // window by calling its Display() method.
   virtual void Start();
   virtual void Start(int argc, char *argv[]);
 
