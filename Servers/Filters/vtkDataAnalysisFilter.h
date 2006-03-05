@@ -95,7 +95,7 @@ public:
   //BTX
   enum FilterModes {
     PROBE,
-    PICK,
+    PICK
   };
   //ETX
 
