@@ -87,7 +87,7 @@ protected:
 //*****************************************************************************
 
 vtkStandardNewMacro(vtkPVDataAnalysis);
-vtkCxxRevisionMacro(vtkPVDataAnalysis, "1.3.2.1");
+vtkCxxRevisionMacro(vtkPVDataAnalysis, "1.3.2.2");
 //-----------------------------------------------------------------------------
 vtkPVDataAnalysis::vtkPVDataAnalysis()
 {
@@ -724,6 +724,18 @@ void vtkPVDataAnalysis::SetPlotOverTime(int state)
     && strcmp(svp->GetElement(0), "Time") == 0)
     {
     this->SetXAxisLabel("Samples");
+    }
+
+  // Update the way X axis is plotted.
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->PlotDisplayProxy->GetProperty("XValues"));
+  if (ivp)
+    {
+    ivp->SetElement(0, (state? 3 : 0));
+    }
+  else
+    {
+    vtkErrorMacro("Failed to locate property XValues.");
     }
   
   this->PlotDisplayProxy->UpdateVTKObjects();
