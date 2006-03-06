@@ -30,7 +30,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVPlotDisplayLabelPropertiesDialog);
-vtkCxxRevisionMacro(vtkPVPlotDisplayLabelPropertiesDialog, "1.2.2.2");
+vtkCxxRevisionMacro(vtkPVPlotDisplayLabelPropertiesDialog, "1.2.2.3");
 vtkCxxSetObjectMacro(vtkPVPlotDisplayLabelPropertiesDialog, LabelFormatProperty,
   vtkSMStringVectorProperty);
 vtkCxxSetObjectMacro(vtkPVPlotDisplayLabelPropertiesDialog, NumberOfLabelsProperty,
@@ -434,7 +434,8 @@ void vtkPVPlotDisplayLabelPropertiesDialog::SetAutoAdjust(int state)
 //-----------------------------------------------------------------------------
 void vtkPVPlotDisplayLabelPropertiesDialog::NumberOfMinorTicksScaleCallback()
 {
-  this->SetNumberOfMinorTicks(this->NumberOfMinorTicksScale->GetValue());
+  this->SetNumberOfMinorTicks(
+    static_cast<int>(this->NumberOfMinorTicksScale->GetValue()));
 }
 
 //-----------------------------------------------------------------------------
