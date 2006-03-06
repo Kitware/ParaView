@@ -92,7 +92,7 @@ MACRO(KWWidgets_ADD_TEST_FROM_EXAMPLE
     KWWidgets_ADD_OUT_OF_SOURCE_TEST(
       ${test_name}OutOfSource
       ${PROJECT_NAME}
-      "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}OutOfSource"
+      "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}OoS"
       ${out_of_source_exe_name} ${out_of_source_exe_options} ${ARGN})
   ENDIF(KWWidgets_SOURCE_DIR AND KWWidgets_TEST_OUT_OF_SOURCE)
 
@@ -241,7 +241,7 @@ MACRO(KWWidgets_ADD_OUT_OF_SOURCE_TEST
 
     IF(KWWidgets_TEST_INSTALLATION AND CMAKE_INSTALL_PREFIX)
       ADD_TEST("${test_name}UsingInst" ${CMAKE_CTEST_COMMAND}
-        --build-and-test "${src_dir}" "${bin_dir}UsingInst"
+        --build-and-test "${src_dir}" "${bin_dir}UsIn"
         --build-generator ${CMAKE_GENERATOR}
         --build-makeprogram ${CMAKE_MAKE_PROGRAM}
         --build-project ${project_name}
