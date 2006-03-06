@@ -41,16 +41,21 @@ public slots:
   /// Clears the set of Exodus elements to be displayed
   void clearExodusElements();
   /// Adds to the set of Exodus elements to be displayed
-  void addExodusElements(vtkUnstructuredGrid* Elements);
+  void addExodusElements(vtkUnstructuredGrid*);
   /// Overrides the set of Exodus elements to be displayed
-  void setExodusElements(vtkUnstructuredGrid* Elements);
+  void setExodusElements(vtkUnstructuredGrid*);
+
+  /// Sets the number of samples to extract from the CSV data
+  void setSamples(int);
+  /// Enables / disables plotting of CSV data differences
+  void showDifferences(bool);
 
   /// Clears the set of CSV data to be displayed
   void clearCSV();
   /// Loads a set of CSV files
-  void onLoadCSV(const QStringList& files); 
+  void onLoadCSV(const QStringList&); 
   /// Saves the chart to a PDF file
-  void onSavePDF(const QStringList& files);
+  void onSavePDF(const QStringList&);
   
 private slots:
   /// Called when the Exodus data changes
@@ -59,7 +64,7 @@ private slots:
   /// Called when parsing of a CSV file begins
   void startParsing();
   /// Called once for each series of data within a CSV file
-  void parseSeries(const QStringList& plot);
+  void parseSeries(const QStringList&);
   /// Called when parsing of a CSV file ends
   void finishParsing();
 

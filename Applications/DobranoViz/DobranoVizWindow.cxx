@@ -116,7 +116,7 @@ DobranoVizWindow::DobranoVizWindow() :
   CurrentProxy(0)
 {
   this->setObjectName("mainWindow");
-  this->setWindowTitle("Dobran-O-Viz 0.1");
+  this->setWindowTitle("Dobran-O-Viz 0.2");
 
   // Set up the main ParaQ items along with the central widget.
   this->Adaptor = new pqSMAdaptor();
@@ -326,9 +326,27 @@ DobranoVizWindow::DobranoVizWindow() :
   hbox->addWidget(clear_button);
   hbox->addWidget(save_button);
 
+  QLabel* const sample_size_label = new QLabel(tr("Samples:"));
+
+  QSpinBox* const sample_size_box = new QSpinBox();
+  sample_size_box->setMinimum(1);
+  sample_size_box->setMaximum(999999);
+  sample_size_box->setValue(50);
+  this->connect(sample_size_box, SIGNAL(valueChanged(int)), this->LineChart, SLOT(setSamples(int)));
+
+  QCheckBox* const difference_button = new QCheckBox("Plot Differences");
+  this->connect(difference_button, SIGNAL(toggled(bool)), this->LineChart, SLOT(showDifferences(bool)));
+
+  QHBoxLayout* const hbox2 = new QHBoxLayout();
+  hbox2->setMargin(0);
+  hbox2->addWidget(sample_size_label);
+  hbox2->addWidget(sample_size_box);
+  hbox2->addWidget(difference_button);
+
   QVBoxLayout* const vbox = new QVBoxLayout();
   vbox->setMargin(0);
   vbox->addLayout(hbox);
+  vbox->addLayout(hbox2);
   vbox->addWidget(line_chart_widget);
   
   QWidget* const widget = new QWidget();

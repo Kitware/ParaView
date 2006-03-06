@@ -57,11 +57,21 @@
 
 struct LineChartAdapter::pqImplementation
 {
+  struct CSVPlot
+  {
+    QString Label;
+    QPixmap Pixmap;
+    double DeltaX;
+    pqLineErrorPlot::CoordinatesT Coordinates;
+  };
+
   pqImplementation(pqLineChartWidget& chart) :
     SourceProxy(0),
     EventAdaptor(vtkEventQtSlotConnect::New()),
     ExodusVariableType(VARIABLE_TYPE_CELL),
-    Chart(chart)
+    Chart(chart),
+    Samples(50),
+    Differences(false)
   {
     QFont h1;
     h1.setBold(true);
@@ -193,50 +203,108 @@ struct LineChartAdapter::pqImplementation
     if(this->CSVSeries.size() < 2)
       return;
 
+    // The first column in the file will be time
     QStringList& time = this->CSVSeries[0];
     if(time.size() < 3)
       return;
-      
+    
+    QVector<CSVPlot> plots;
+    QVector<CSVPlot> difference_plots;
+    
+    // Next, each group of three columns form a plot with upper and lower error bounds
     for(int i = 1; i < this->CSVSeries.size() - 2; i += 3)
       {
-      QStringList& plot = this->CSVSeries[i];
-      QStringList& upper_bound = this->CSVSeries[i+1];
-      QStringList& lower_bound = this->CSVSeries[i+2];
+      QStringList& values = this->CSVSeries[i];
+      QStringList& upper_bounds = this->CSVSeries[i+1];
+      QStringList& lower_bounds = this->CSVSeries[i+2];
       
-      if(plot.size() < 3)
+      if(values.size() < 3)
         continue;
 
-      const QString label(plot[0]);
-
-      const QString pixmap_file = QFileInfo(this->CSVFile).absoluteDir().absoluteFilePath(QDir::cleanPath(plot[1]));
-      QPixmap pixmap(pixmap_file);
-      if(pixmap.width() > 300 || pixmap.height() > 300)
-        pixmap = pixmap.scaled(QSize(300, 300), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        
-      pqLineErrorPlot::CoordinatesT plot_coordinates;
-      for(int i = 2; i < time.size() && i < plot.size() && i < upper_bound.size() && i < lower_bound.size(); i += 200)
+      CSVPlot plot;
+      plot.Label = values[0];
+      
+      const QString pixmap_file = QFileInfo(this->CSVFile).absoluteDir().absoluteFilePath(QDir::cleanPath(values[1]));
+      plot.Pixmap = QPixmap(pixmap_file);
+      if(plot.Pixmap.width() > 300 || plot.Pixmap.height() > 300)
+        plot.Pixmap = plot.Pixmap.scaled(QSize(300, 300), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+      
+      plot.DeltaX = VTK_DOUBLE_MAX;
+      
+      const int sample_size = values.size() > 2 * this->Samples ? values.size() / this->Samples : 1;
+      for(int i = 2; i < time.size() && i < values.size() && i < upper_bounds.size() && i < lower_bounds.size(); i += sample_size)
         {
-        plot_coordinates.push_back(pqLineErrorPlot::Coordinate(time[i].toDouble(), plot[i].toDouble(), upper_bound[i].toDouble(), lower_bound[i].toDouble()));
+        if(i != 2)
+          {
+          plot.DeltaX = vtkstd::min(plot.DeltaX, time[i].toDouble() - time[i - sample_size].toDouble());
+          }
+          
+        plot.Coordinates.push_back(
+          pqLineErrorPlot::Coordinate(
+            time[i].toDouble(),
+            values[i].toDouble(),
+            upper_bounds[i].toDouble(),
+            lower_bounds[i].toDouble()));
         }
 
-      this->CSVLabels.push_back(label);
-      this->CSVPixmaps.push_back(pixmap);
-      this->CSVPlots.push_back(plot_coordinates);
+      if(plot.Coordinates.size() > 1)
+        {
+        plots.push_back(plot);
+        }
       }
-    
+
+    // Last, create a "difference" plot for each pair of input plots
+    for(int i = 0; i < plots.size() - 1; i += 2)
+      {
+      CSVPlot& a = plots[i];
+      CSVPlot& b = plots[i+1];
+      
+      CSVPlot c;
+      c.Label = a.Label + " - " + b.Label;
+      c.Pixmap = a.Pixmap;
+      c.DeltaX = a.DeltaX;
+      
+      for(int i = 0; i < a.Coordinates.size() && i < b.Coordinates.size(); ++i)
+        {
+        c.Coordinates.push_back(
+          pqLineErrorPlot::Coordinate(
+            a.Coordinates[i].X,
+            a.Coordinates[i].Y - b.Coordinates[i].Y,
+            sqrt(pow(a.Coordinates[i].UpperBound, 2.0) + pow(b.Coordinates[i].UpperBound, 2.0)),
+            sqrt(pow(a.Coordinates[i].LowerBound, 2.0) + pow(b.Coordinates[i].LowerBound, 2.0))));
+        }
+        
+      difference_plots.push_back(c);
+      }
+
+    this->CSVPlots += plots;
+    this->CSVDifferences += difference_plots;
+
     this->updateChart();
   }
   
   void clearCSV()
   {
-    this->CSVLabels.clear();
-    this->CSVPixmaps.clear();
     this->CSVPlots.clear();
+    this->CSVDifferences.clear();
+    
     this->updateChart();
   }
   
   void onInputChanged()
   {
+    this->updateChart();
+  }
+  
+  void setSamples(int samples)
+  {
+    this->Samples = samples;
+    this->clearCSV();
+  }
+  
+  void showDifferences(bool state)
+  {
+    this->Differences = state;
     this->updateChart();
   }
   
@@ -264,17 +332,17 @@ struct LineChartAdapter::pqImplementation
     this->Chart.getLegend().addEntry(new pqCircleMarkerPen(Pen, QSize(4, 4), QPen(Pen.color(), 0.5), QBrush(Qt::white)), new pqChartLabel(QString("Element %1").arg(ElementID)));
   }
   
-  void addCSVPlot(const QString& label, const QPixmap& pixmap, pqLineErrorPlot::CoordinatesT& coordinates, const QPen& plot_pen, const QPen& whisker_pen)
+  void addCSVPlot(const CSVPlot& plot, const QPen& plot_pen, const QPen& whisker_pen)
   {
-    ImageLinePlot* const plot = new ImageLinePlot(
+    ImageLinePlot* const line_plot = new ImageLinePlot(
       new pqNullMarkerPen(plot_pen),
       whisker_pen,
-      1,
-      coordinates,
-      pixmap);
+      plot.DeltaX * 0.7,
+      plot.Coordinates,
+      plot.Pixmap);
+    this->Chart.getLineChart().addData(line_plot);
     
-    this->Chart.getLineChart().addData(plot);
-    this->Chart.getLegend().addEntry(new pqNullMarkerPen(plot_pen), new pqChartLabel(label));
+    this->Chart.getLegend().addEntry(new pqNullMarkerPen(plot_pen), new pqChartLabel(plot.Label));
   }
   
   void updateChart()
@@ -289,14 +357,26 @@ struct LineChartAdapter::pqImplementation
     this->Chart.getYAxis().setValueRange(0.0, 100.0);
     this->Chart.getLegend().clear();
     
-    if(CSVPlots.size())
-      this->Chart.getTitle().setText("External Data");
+    if(CSVPlots.size() || CSVDifferences.size())
+      this->Chart.getTitle().setText("CSV Data");
       
-    for(int i = 0; i != CSVPlots.size(); ++i)
+    if(this->Differences)
       {
-      const double hue = static_cast<double>(i) / static_cast<double>(CSVPlots.size());
-      const QColor color = QColor::fromHsvF(hue, 1.0, 0.5);
-      addCSVPlot(CSVLabels[i], CSVPixmaps[i], CSVPlots[i], QPen(color, 1.2), QPen(color, 0.5));
+      for(int i = 0; i != CSVDifferences.size(); ++i)
+        {
+        const double hue = static_cast<double>(i) / static_cast<double>(CSVDifferences.size());
+        const QColor color = QColor::fromHsvF(hue, 1.0, 0.5);
+        addCSVPlot(CSVDifferences[i], QPen(color, 2), QPen(color, 1));
+        }
+      }
+    else
+      {
+      for(int i = 0; i != CSVPlots.size(); ++i)
+        {
+        const double hue = static_cast<double>(i) / static_cast<double>(CSVPlots.size());
+        const QColor color = QColor::fromHsvF(hue, 1.0, 0.5);
+        addCSVPlot(CSVPlots[i], QPen(color, 2), QPen(color, 1));
+        }
       }
 
     if(this->ExodusVariableName.isEmpty())
@@ -362,9 +442,10 @@ struct LineChartAdapter::pqImplementation
   QString CSVFile;
   QVector<QStringList> CSVSeries;
 
-  QVector<QString> CSVLabels;  
-  QVector<QPixmap> CSVPixmaps;
-  QVector<pqLineErrorPlot::CoordinatesT> CSVPlots;
+  int Samples;
+  bool Differences;
+  QVector<CSVPlot> CSVPlots;
+  QVector<CSVPlot> CSVDifferences;
 };
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -418,6 +499,16 @@ void LineChartAdapter::setExodusElements(vtkUnstructuredGrid* elements)
 {
   this->clearExodusElements();
   this->addExodusElements(elements);
+}
+
+void LineChartAdapter::setSamples(int samples)
+{
+  this->Implementation->setSamples(samples);
+}
+
+void LineChartAdapter::showDifferences(bool state)
+{
+  this->Implementation->showDifferences(state);
 }
 
 void LineChartAdapter::clearCSV()
