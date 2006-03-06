@@ -236,7 +236,7 @@ vtkClientServerStream::Write(const void* data, size_t length)
 
   // Copy the value into the data.
   this->Internal->Data.resize(this->Internal->Data.size() + length);
-  memcpy(&*this->Internal->Data.end() - length, data, length);
+  memcpy(&*(this->Internal->Data.end() - length), data, length);
   return *this;
 }
 
