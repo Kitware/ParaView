@@ -9,6 +9,10 @@ pqMarkerPen::pqMarkerPen(const QPen& pen) :
 {
 }
 
+pqMarkerPen::~pqMarkerPen()
+{
+}
+
 QPen pqMarkerPen::getPen()
 {
   return this->Pen;
@@ -228,11 +232,11 @@ pqNullMarkerPen::pqNullMarkerPen(const QPen& pen) :
 {
 }
 
-void pqNullMarkerPen::setupPainter(QPainter& painter)
+void pqNullMarkerPen::setupPainter(QPainter& /*painter*/)
 {
 }
 
-void pqNullMarkerPen::drawMarker(QPainter& painter)
+void pqNullMarkerPen::drawMarker(QPainter& /*painter*/)
 {
 }
 

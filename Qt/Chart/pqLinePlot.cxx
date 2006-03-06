@@ -110,7 +110,7 @@ void pqLinePlot::layoutPlot(const pqChartAxis& XAxis, const pqChartAxis& YAxis)
     }
 }
 
-void pqLinePlot::drawPlot(QPainter& painter, const QRect& area, const pqChartAxis& XAxis, const pqChartAxis& YAxis)
+void pqLinePlot::drawPlot(QPainter& painter, const QRect& /*area*/, const pqChartAxis& /*XAxis*/, const pqChartAxis& /*YAxis*/)
 {
   this->Implementation->Pen->drawPolyline(painter, this->Implementation->ScreenCoords);
 }

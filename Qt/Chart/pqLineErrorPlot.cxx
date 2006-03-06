@@ -28,10 +28,10 @@ class pqLineErrorPlot::pqImplementation
 {
 public:
   pqImplementation(pqMarkerPen* pen, const QPen& whisker_pen, double whisker_size, const CoordinatesT coords) :
+    WorldCoords(coords),
     Pen(pen),
     WhiskerPen(whisker_pen),
-    WhiskerSize(whisker_size * 0.5),
-    WorldCoords(coords)
+    WhiskerSize(whisker_size * 0.5)
   {
     double minx = VTK_DOUBLE_MAX;
     double miny = VTK_DOUBLE_MAX;
@@ -41,13 +41,13 @@ public:
     this->WorldMin = pqChartCoordinate(VTK_DOUBLE_MAX, VTK_DOUBLE_MAX);
     this->WorldMax = pqChartCoordinate(-VTK_DOUBLE_MAX, -VTK_DOUBLE_MAX);
     
-    for(CoordinatesT::const_iterator coords = this->WorldCoords.begin(); coords != this->WorldCoords.end(); ++coords)
+    for(CoordinatesT::const_iterator c = this->WorldCoords.begin(); c != this->WorldCoords.end(); ++c)
       {
-      minx = vtkstd::min(minx, coords->X);
-      maxx = vtkstd::max(maxx, coords->X);
+      minx = vtkstd::min(minx, c->X);
+      maxx = vtkstd::max(maxx, c->X);
       
-      miny = vtkstd::min(miny, coords->Y - coords->LowerBound);
-      maxy = vtkstd::max(maxy, coords->Y + coords->UpperBound);
+      miny = vtkstd::min(miny, c->Y - c->LowerBound);
+      maxy = vtkstd::max(maxy, c->Y + c->UpperBound);
       }
       
     this->WorldMin = pqChartCoordinate(minx, miny);
@@ -131,7 +131,7 @@ void pqLineErrorPlot::layoutPlot(const pqChartAxis& XAxis, const pqChartAxis& YA
     }
 }
 
-void pqLineErrorPlot::drawPlot(QPainter& painter, const QRect& area, const pqChartAxis& XAxis, const pqChartAxis& YAxis)
+void pqLineErrorPlot::drawPlot(QPainter& painter, const QRect& /*area*/, const pqChartAxis& /*XAxis*/, const pqChartAxis& /*YAxis*/)
 {
   // Draw the error "whiskers" ...
   painter.setPen(this->Implementation->WhiskerPen);

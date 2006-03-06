@@ -44,7 +44,7 @@ public:
   
   void clear()
   {
-    for(int i = 0; i != this->size(); ++i)
+    for(unsigned int i = 0; i != this->size(); ++i)
       delete this->at(i);
       
     vtkstd::vector<pqAbstractPlot*>::clear();
@@ -150,14 +150,14 @@ void pqLineChart::drawChart(QPainter& painter, const QRect& area)
   painter.restore();
 }
 
-void pqLineChart::showTooltip(QHelpEvent& event)
+void pqLineChart::showTooltip(QHelpEvent& e)
 {
   int plot_index = -1;
   double plot_distance = VTK_DOUBLE_MAX;
   
-  for(int i = 0; i != this->Implementation->size(); ++i)
+  for(unsigned int i = 0; i != this->Implementation->size(); ++i)
     {
-    const double distance = this->Implementation->at(i)->getDistance(event.pos());
+    const double distance = this->Implementation->at(i)->getDistance(e.pos());
     if(distance < plot_distance)
       {
       plot_index = i;
@@ -168,7 +168,7 @@ void pqLineChart::showTooltip(QHelpEvent& event)
   if(plot_index == -1 || plot_distance > 10)
     return;
     
-  this->Implementation->at(plot_index)->showChartTip(event);
+  this->Implementation->at(plot_index)->showChartTip(e);
 }
 
 void pqLineChart::clearData()

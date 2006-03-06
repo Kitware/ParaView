@@ -23,6 +23,8 @@ class QSize;
 class QTCHART_EXPORT pqMarkerPen
 {
 public:
+  virtual ~pqMarkerPen();
+
   /// Returns the pen that will be used to draw lines (without the markers)
   QPen getPen();
 

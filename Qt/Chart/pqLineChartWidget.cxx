@@ -179,12 +179,12 @@ QSize pqLineChartWidget::sizeHint() const
   return QSize(f, f);
 }
 
-bool pqLineChartWidget::event(QEvent *event)
+bool pqLineChartWidget::event(QEvent *e)
 {
-  if(event->type() == QEvent::ToolTip)
-    this->LineChart->showTooltip(*static_cast<QHelpEvent*>(event));
+  if(e->type() == QEvent::ToolTip)
+    this->LineChart->showTooltip(*static_cast<QHelpEvent*>(e));
   
-  return QAbstractScrollArea::event(event);
+  return QAbstractScrollArea::event(e);
 }
     
 void pqLineChartWidget::keyPressEvent(QKeyEvent *e)
