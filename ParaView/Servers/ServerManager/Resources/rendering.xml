@@ -2003,6 +2003,7 @@
           <Property name="XTitle" />
           <Property name="XTitleInfo" />
           <Property name="XTitlePosition" />
+          <Property name="XValues" />
           <Property name="YLabelFormat" />
           <Property name="YRange" />
           <Property name="YTitle" />
