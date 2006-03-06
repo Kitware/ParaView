@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWResourceUtilities);
-vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.16");
+vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.17");
 
 //----------------------------------------------------------------------------
 int vtkKWResourceUtilities::ReadImage(
@@ -554,7 +554,7 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
     out << endl << " */" << endl;
 
     int section_idx = 0;
-    unsigned long max_bytes = 65530;
+    unsigned long max_bytes = 32760; // 65530; was too high for AIX
 
     const char *pixel_byte_type = "const unsigned char";
     
