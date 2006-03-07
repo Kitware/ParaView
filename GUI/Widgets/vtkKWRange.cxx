@@ -24,7 +24,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.64");
+vtkCxxRevisionMacro(vtkKWRange, "1.65");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -524,12 +524,12 @@ void vtkKWRange::Bind()
     tk_cmd << canv << " bind " <<  VTK_KW_RANGE_SLIDER1_TAG 
            << " <B1-Motion> {" << this->GetTclName() 
            << " SliderMotionCallback " 
-           << vtkKWRange::SliderIndex1 << " %%x %%y}" << endl;
+           << vtkKWRange::SliderIndex0 << " %%x %%y}" << endl;
 
     tk_cmd << canv << " bind " <<  VTK_KW_RANGE_SLIDER2_TAG 
            << " <B1-Motion> {" << this->GetTclName() 
            << " SliderMotionCallback " 
-           << vtkKWRange::SliderIndex2 << " %%x %%y}" << endl;
+           << vtkKWRange::SliderIndex1 << " %%x %%y}" << endl;
     }
 
   tk_cmd << ends;
@@ -625,11 +625,11 @@ void vtkKWRange::SetRange(double r0, double r1)
 
     if (old_sliders_pos[0] != sliders_pos[0])
       {
-      this->RedrawSlider(sliders_pos[0], vtkKWRange::SliderIndex1);
+      this->RedrawSlider(sliders_pos[0], vtkKWRange::SliderIndex0);
       }
     if (old_sliders_pos[1] != sliders_pos[1])
       {
-      this->RedrawSlider(sliders_pos[1], vtkKWRange::SliderIndex2);
+      this->RedrawSlider(sliders_pos[1], vtkKWRange::SliderIndex1);
       }
 
     this->UpdateEntriesValue(this->Range);
@@ -1762,8 +1762,8 @@ void vtkKWRange::RedrawSliders()
 
   // Draw the sliders
 
-  this->RedrawSlider(pos[0], vtkKWRange::SliderIndex1);
-  this->RedrawSlider(pos[1], vtkKWRange::SliderIndex2);
+  this->RedrawSlider(pos[0], vtkKWRange::SliderIndex0);
+  this->RedrawSlider(pos[1], vtkKWRange::SliderIndex1);
 }
 
 //----------------------------------------------------------------------------
@@ -1775,7 +1775,7 @@ void vtkKWRange::RedrawSlider(int pos, int slider_idx)
     }
 
   const char *tag = "";
-  if (slider_idx == SliderIndex1)
+  if (slider_idx == SliderIndex0)
     {
     tag = VTK_KW_RANGE_SLIDER1_TAG;
     }
@@ -1823,9 +1823,9 @@ void vtkKWRange::RedrawSlider(int pos, int slider_idx)
   y_min = 0;
   y_max = this->Thickness - 1;
 #else
-  y_min = (slider_idx == SliderIndex1 ? 
+  y_min = (slider_idx == SliderIndex0 ? 
            0 : (this->Thickness - in_thick) / 2);
-  y_max = (slider_idx == SliderIndex1 ? 
+  y_max = (slider_idx == SliderIndex0 ? 
            (this->Thickness + in_thick) / 2 - 1 : this->Thickness - 1);
 #endif
 
@@ -2161,6 +2161,9 @@ void vtkKWRange::SliderMotionCallback(int slider_idx, int x, int y)
     return;
     }
 
+  int sliders_pos[2];
+  this->GetSlidersPositions(sliders_pos);
+
   double whole_range = 
     this->WholeRangeAdjusted[1] - this->WholeRangeAdjusted[0];
 
@@ -2181,22 +2184,67 @@ void vtkKWRange::SliderMotionCallback(int slider_idx, int x, int y)
     max = this->Canvas->GetHeight() - 1;
     }
 
-  double new_value;
+  // Prevent the sliders to go on top of each other
+
+  if (!this->SliderCanPush)
+    {
+    int delta = (this->SliderSize * 2) + 1;
+    if (this->Inverted)
+      {
+      if (slider_idx == vtkKWRange::SliderIndex0)
+        {
+        if ((pos - sliders_pos[1]) < delta)
+          {
+          pos = sliders_pos[1] + delta;
+          }
+        }
+      else
+        {
+        if ((sliders_pos[0] - pos) < delta)
+          {
+          pos = sliders_pos[0] - delta;
+          }
+        }
+      }
+    else
+      {
+      if (slider_idx == vtkKWRange::SliderIndex0)
+        {
+        if ((sliders_pos[1] - pos) < delta)
+          {
+          pos = sliders_pos[1] - delta;
+          }
+        }
+      else
+        {
+        if ((pos - sliders_pos[0]) < delta)
+          {
+          pos = sliders_pos[0] + delta;
+          }
+        }
+      }
+    }
+
+  // Are we inverted ?
+
   if (this->Inverted)
     {
-    new_value = (double)(max - pos);
+    pos = (double)(max - pos);
     }
   else
     {
-    new_value = (double)(pos - min);
+    pos = (double)(pos - min);
     }
-  new_value = (double)
+
+  // New value
+
+  double new_value = (double)
     ((double)this->WholeRangeAdjusted[0] + 
-     ((double)new_value / (double)(max - min)) * whole_range);
+     ((double)pos / (double)(max - min)) * whole_range);
 
   double new_range[2];
 
-  if (slider_idx == vtkKWRange::SliderIndex1)
+  if (slider_idx == vtkKWRange::SliderIndex0)
     {
     new_range[0] = new_value;
     new_range[1] = this->RangeAdjusted[1];
