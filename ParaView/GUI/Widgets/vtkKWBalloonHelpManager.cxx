@@ -18,6 +18,7 @@
 #include "vtkKWTopLevel.h"
 #include "vtkKWApplication.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkKWWindowBase.h"
 
 #include "vtkObjectFactory.h"
 
@@ -25,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBalloonHelpManager );
-vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.12");
+vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.13");
 
 //----------------------------------------------------------------------------
 vtkKWBalloonHelpManager::vtkKWBalloonHelpManager()
@@ -213,39 +214,69 @@ void vtkKWBalloonHelpManager::DisplayCallback(vtkKWWidget *widget)
 
   // Get the position of the mouse
 
-  int x, y;
-  vtkKWTkUtilities::GetMousePointerCoordinates(widget, &x, &y);
+  int pointer_x, pointer_y;
+  vtkKWTkUtilities::GetMousePointerCoordinates(widget, &pointer_x, &pointer_y);
 
-  // Get the position in and size of the parent window of the one needing help
+  // Get the position of the upper-left corner of the parent in its screen
 
-  int xw;
-  vtkKWTkUtilities::GetWidgetCoordinates(widget->GetParent(), &xw, NULL);
+  int parent_x;
+  vtkKWTkUtilities::GetWidgetCoordinates(widget->GetParent(), &parent_x, NULL);
 
-  int dxw;
-  vtkKWTkUtilities::GetWidgetSize(widget->GetParent(), &dxw, NULL);
+  // Get the size of the parent
+
+  int parent_width;
+  vtkKWTkUtilities::GetWidgetSize(widget->GetParent(), &parent_width, NULL);
 
   // Get the size of the balloon window
 
-  int dx;
-  vtkKWTkUtilities::GetWidgetRequestedSize(this->Label, &dx, NULL);
+  int balloon_width, balloon_height;
+  vtkKWTkUtilities::GetWidgetRequestedSize(
+    this->Label, &balloon_width, &balloon_height);
   
   // Set the position of the widget relative to the mouse
   // Try to keep the help from going past the right edge of the widget
   // If it goes too far right, move it to the left, 
   // but not past the left edge of the parent widget
 
-  if (x + dx > xw + dxw)
+  if (pointer_x + balloon_width > parent_x + parent_width)
     {
-    x = xw + dxw - dx;
-    if (x < xw)
+    pointer_x = parent_x + parent_width - balloon_width;
+    if (pointer_x < parent_x)
       {
-      x = xw;
+      pointer_x = parent_x;
+      }
+    }
+
+  // Try to put the balloon under the mouse cursor, unless we found a
+  // vtkKWRenderWidget. This is done for convenience, to avoid popping up
+  // something on top of a render window; once the balloon disappears, this
+  // would trigger a re-render...
+
+  int distance_y_to_widget = 15;
+  int balloon_bottom_y = pointer_y + distance_y_to_widget + balloon_height;
+
+  vtkKWWindowBase *win = widget->GetParentWindow();
+
+  vtkKWWidget *found_rw = vtkKWTkUtilities::ContainsCoordinatesForSpecificType(
+    win, pointer_x, balloon_bottom_y, "vtkKWRenderWidget");
+  if (!found_rw)
+    {
+    found_rw = vtkKWTkUtilities::ContainsCoordinatesForSpecificType(
+      win, pointer_x + balloon_width, balloon_bottom_y, "vtkKWRenderWidget");
+    }
+
+  if (found_rw)
+    {
+    distance_y_to_widget = -distance_y_to_widget - balloon_height;
+    if (pointer_y + distance_y_to_widget < 0)
+      {
+      distance_y_to_widget = -pointer_y;
       }
     }
 
   // Place the balloon
 
-  this->TopLevel->SetPosition(x, y + 15);
+  this->TopLevel->SetPosition(pointer_x, pointer_y + distance_y_to_widget);
   this->GetApplication()->ProcessPendingEvents();
 
   // Map the balloon
