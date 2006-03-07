@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.48");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.49");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -2122,15 +2122,35 @@ void vtkKWMultiColumnList::RefreshCellWithWindowCommand(int row_index,
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::RefreshAllCellsWithWindowCommand()
 {
+  // Instead of calling RefreshCellWithWindowCommand, unwrap the loop
+  // to avoid the change of State (especially since this is called
+  // from UpdateEnableState())
+
+  int old_state = this->GetState();
+  if (this->GetState() != vtkKWTkOptions::StateNormal)
+    {
+    this->SetStateToNormal();
+    }
+  vtksys_stl::string command_str;
   int nb_rows = this->GetNumberOfRows();
   int nb_cols = this->GetNumberOfColumns();
   for (int row = 0; row < nb_rows; row++)
     {
     for (int col = 0; col < nb_cols; col++)
       {
-      this->RefreshCellWithWindowCommand(row, col);
+      const char *command = 
+        this->GetCellConfigurationOption(row, col, "-window");
+      if (command && *command)
+        {
+        command_str = command;
+        this->SetCellConfigurationOption(
+          row, col, "-window", "");
+        this->SetCellConfigurationOption(
+          row, col, "-window", command_str.c_str());
+        }
       }
     }
+  this->SetState(old_state);
 }
 
 //----------------------------------------------------------------------------
@@ -2664,9 +2684,11 @@ int vtkKWMultiColumnList::SetCellConfigurationOption(
     }
 
   const char *res = 
-    this->Script("%s cellconfigure %d,%d %s {%s}", 
-                 this->GetWidgetName(), row_index, col_index, option, value);
+    //this->Script("%s cellconfigure %d,%d %s {%s}", 
+    this->Script("tablelist::doCellConfig %d %d %s %s {%s}", 
+                 row_index, col_index, this->GetWidgetName(), option, value);
 
+#if 0
   // 'configure' is not supposed to return anything, so let's assume
   // any output is an error
 
@@ -2676,6 +2698,7 @@ int vtkKWMultiColumnList::SetCellConfigurationOption(
       row_index, col_index, option, res);
     return 0;
     }
+#endif
 
   return 1;
 }
@@ -2700,10 +2723,12 @@ int vtkKWMultiColumnList::SetCellConfigurationOptionAsText(
     value, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
 
   const char *res = 
-    this->Script("%s cellconfigure %d,%d %s \"%s\"", 
-                 this->GetWidgetName(), 
-                 row_index, col_index, option, val ? val : "");
+    //this->Script("%s cellconfigure %d,%d %s \"%s\"", 
+    this->Script("tablelist::doCellConfig %d %d %s %s \"%s\"", 
+                 row_index, col_index, this->GetWidgetName(), 
+                 option, val ? val : "");
 
+#if 0
   // 'configure' is not supposed to return anything, so let's assume
   // any output is an error
 
@@ -2713,6 +2738,7 @@ int vtkKWMultiColumnList::SetCellConfigurationOptionAsText(
       row_index, col_index, option, res);
     return 0;
     }
+#endif
 
   return 1;
 }
@@ -2734,9 +2760,11 @@ int vtkKWMultiColumnList::SetCellConfigurationOptionAsInt(
     }
 
   const char *res = 
-    this->Script("%s cellconfigure %d,%d %s %d", 
-                 this->GetWidgetName(), row_index, col_index, option, value);
+    //this->Script("%s cellconfigure %d,%d %s %d", 
+    this->Script("tablelist::doCellConfig %d %d %s %s %d", 
+                 row_index, col_index, this->GetWidgetName(), option, value);
 
+#if 0
   // 'configure' is not supposed to return anything, so let's assume
   // any output is an error
 
@@ -2746,6 +2774,7 @@ int vtkKWMultiColumnList::SetCellConfigurationOptionAsInt(
       row_index, col_index, option, res);
     return 0;
     }
+#endif
 
   return 1;
 }
@@ -2767,9 +2796,11 @@ int vtkKWMultiColumnList::SetCellConfigurationOptionAsDouble(
     }
 
   const char *res = 
-    this->Script("%s cellconfigure %d,%d %s %.5g", 
-                 this->GetWidgetName(), row_index, col_index, option, value);
+    //this->Script("%s cellconfigure %d,%d %s %.5g", 
+    this->Script("tablelist::doCellConfig %d %d %s %s %.5g", 
+                 row_index, col_index, this->GetWidgetName(), option, value);
 
+#if 0
   // 'configure' is not supposed to return anything, so let's assume
   // any output is an error
 
@@ -2779,6 +2810,7 @@ int vtkKWMultiColumnList::SetCellConfigurationOptionAsDouble(
       row_index, col_index, option, res);
     return 0;
     }
+#endif
 
   return 1;
 }
@@ -2800,12 +2832,14 @@ int vtkKWMultiColumnList::SetCellConfigurationOptionAsFormattedDouble(
     }
 
   char format[1024];
-  sprintf(format, "%%s cellconfigure %%d,%%d %%s %%.%dg", size);
+  //sprintf(format, "%%s cellconfigure %%d,%%d %%s %%.%dg", size);
+  sprintf(format, "tablelist::doCellConfig %%d %%d %%s %%s %%.%dg", size);
 
   const char *res = 
     this->Script(format, 
-                 this->GetWidgetName(), row_index, col_index, option, value);
+                 row_index, col_index, this->GetWidgetName(), option, value);
 
+#if 0
   // 'configure' is not supposed to return anything, so let's assume
   // any output is an error
 
@@ -2815,6 +2849,7 @@ int vtkKWMultiColumnList::SetCellConfigurationOptionAsFormattedDouble(
       row_index, col_index, option, res);
     return 0;
     }
+#endif
 
   return 1;
 }
@@ -2840,25 +2875,29 @@ const char* vtkKWMultiColumnList::GetCellConfigurationOption(
   int row_index, int col_index, const char* option)
 {
   return this->Script(
-    "%s cellcget %d,%d %s", this->GetWidgetName(), row_index,col_index,option);
+    //"%s cellcget %d,%d %s", 
+    "tablelist::doCellCget %d %d %s %s", 
+    row_index, col_index, this->GetWidgetName(), option);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWMultiColumnList::GetCellConfigurationOptionAsInt(
   int row_index, int col_index, const char* option)
 {
-  return atoi(
-    this->Script("%s cellcget %d,%d %s", 
-                 this->GetWidgetName(), row_index, col_index, option));
+  return atoi(this->Script(
+                // "%s cellcget %d,%d %s", 
+                "tablelist::doCellCget %d %d %s %s", 
+                row_index, col_index, this->GetWidgetName(), option));
 }
 
 //----------------------------------------------------------------------------
 double vtkKWMultiColumnList::GetCellConfigurationOptionAsDouble(
   int row_index, int col_index, const char* option)
 {
-  return atof(
-    this->Script("%s cellcget %d,%d %s", 
-                 this->GetWidgetName(), row_index, col_index, option));
+  return atof(this->Script(
+                // "%s cellcget %d,%d %s", 
+                "tablelist::doCellCget %d %d %s %s", 
+                row_index, col_index, this->GetWidgetName(), option));
 }
 
 //----------------------------------------------------------------------------
