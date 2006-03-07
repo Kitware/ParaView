@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.77");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.78");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -639,6 +639,38 @@ int vtkKWTkUtilities::ContainsCoordinates(vtkKWWidget *widget,
     widget->GetApplication()->GetMainInterp(),
     widget->GetWidgetName(),
     x, y);
+}
+
+//----------------------------------------------------------------------------
+vtkKWWidget* vtkKWTkUtilities::ContainsCoordinatesForSpecificType(
+  vtkKWWidget *widget,
+  int x, int y,
+  const char *classname)
+{
+  if (!widget || !widget->IsCreated() || 
+      !classname || 
+      !vtkKWTkUtilities::ContainsCoordinates(widget, x, y))
+    {
+    return NULL;
+    }
+
+  if (widget->IsA(classname))
+    {
+    return widget;
+    }
+
+  int i, nb_children = widget->GetNumberOfChildren();
+  for (i = 0; i < nb_children; i++)
+    {
+    vtkKWWidget *child = widget->GetNthChild(i);
+    if (vtkKWTkUtilities::ContainsCoordinatesForSpecificType(
+          child, x, y, classname))
+      {
+      return child;
+      }
+    }
+
+  return NULL;
 }
 
 //----------------------------------------------------------------------------

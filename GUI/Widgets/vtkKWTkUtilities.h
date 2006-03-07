@@ -163,11 +163,17 @@ public:
   // by the widget given by 'widget' (say, .foo.bar).
   // Return 1 if inside, 0 otherwise.
   // A convenience method is provided to query a vtkKWWidget directly.
+  // ContainsCoordinatesForSpecificType will check if 'widget' is of a
+  // specific type (or a subclass of that type), and if not will inspect
+  // its children. It will return the widget that contains the coordinates
+  // or NULL if not found.
   static int ContainsCoordinates(Tcl_Interp *interp,
                                  const char *widget, 
                                  int x, int y);
   static int ContainsCoordinates(vtkKWWidget *widget,
                                  int x, int y);
+  static vtkKWWidget* ContainsCoordinatesForSpecificType(
+    vtkKWWidget *widget, int x, int y, const char *classname);
   
   // Description:
   // Update a Tk photo given by its name 'photo_name' using pixels stored in
