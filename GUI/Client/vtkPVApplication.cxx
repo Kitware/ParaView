@@ -114,7 +114,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.386");
+vtkCxxRevisionMacro(vtkPVApplication, "1.387");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -1075,11 +1075,14 @@ void vtkPVApplication::TimeoutWarningCallback()
 void vtkPVApplication::Start(int argc, char*argv[])
 {
   this->Initialize();
+
   if (!this->SetupRenderModule())
     {
     vtkErrorMacro("Failed to setup Render Module. Aborting.");
     vtkPVApplication::Abort();
     }
+
+  this->InstallTclBgErrorCallback();
   // set the font size to be small
 #ifdef _WIN32
   this->Script("option add *font {{Tahoma} 8}");
