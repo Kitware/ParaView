@@ -241,7 +241,7 @@ MACRO(KWWidgets_ADD_OUT_OF_SOURCE_TEST
 
     IF(KWWidgets_TEST_INSTALLATION AND CMAKE_INSTALL_PREFIX)
       ADD_TEST("${test_name}UsingInst" ${CMAKE_CTEST_COMMAND}
-        --build-and-test "${src_dir}" "${bin_dir}UsIn"
+        --build-and-test "${src_dir}" "${bin_dir}UsingInst"
         --build-generator ${CMAKE_GENERATOR}
         --build-makeprogram ${CMAKE_MAKE_PROGRAM}
         --build-project ${project_name}
