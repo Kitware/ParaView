@@ -24,7 +24,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.65");
+vtkCxxRevisionMacro(vtkKWRange, "1.66");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -2229,11 +2229,11 @@ void vtkKWRange::SliderMotionCallback(int slider_idx, int x, int y)
 
   if (this->Inverted)
     {
-    pos = (double)(max - pos);
+    pos = (max - pos);
     }
   else
     {
-    pos = (double)(pos - min);
+    pos = (pos - min);
     }
 
   // New value
