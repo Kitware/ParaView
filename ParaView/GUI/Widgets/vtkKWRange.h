@@ -300,8 +300,8 @@ public:
   //BTX
   enum
   {
-    SliderIndex1 = 1,
-    SliderIndex2 = 2
+    SliderIndex0 = 0,
+    SliderIndex1 = 1
   };
   //ETX
   virtual void ConfigureCallback();
