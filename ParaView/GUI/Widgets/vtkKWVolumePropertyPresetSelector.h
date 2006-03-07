@@ -71,14 +71,7 @@ public:
 
 protected:
   vtkKWVolumePropertyPresetSelector() {};
-  ~vtkKWVolumePropertyPresetSelector();
-
-  // Description:
-  // Deallocate a preset.
-  // Subclasses should override this method to release the memory allocated
-  // by their own preset fields  (do not forget to call the superclass
-  // first).
-  virtual void DeAllocatePreset(int id);
+  ~vtkKWVolumePropertyPresetSelector() {};
 
   // Description:
   // Create the columns.
