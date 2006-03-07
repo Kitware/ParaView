@@ -27,34 +27,7 @@ const char *vtkKWVolumePropertyPresetSelector::ModalityColumnName  = "Modality";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWVolumePropertyPresetSelector);
-vtkCxxRevisionMacro(vtkKWVolumePropertyPresetSelector, "1.6");
-
-//----------------------------------------------------------------------------
-vtkKWVolumePropertyPresetSelector::~vtkKWVolumePropertyPresetSelector()
-{
-  // Delete all presets
-
-  // We do not have much choice here but to call DeleteAllPresets(), even
-  // though it is done in the destructor of the superclass too. The problem
-  // with this code is that we override the virtual function DeAllocatePreset()
-  // which is used by DeleteAllPresets(). At the time it is called by
-  // the superclass, the virtual table of the subclass is gone, and
-  // our DeAllocatePreset() is never called.
-
-  this->DeleteAllPresets();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWVolumePropertyPresetSelector::DeAllocatePreset(int id)
-{
-  this->Superclass::DeAllocatePreset(id);
-
-  vtkVolumeProperty *ptr = this->GetPresetVolumeProperty(id);
-  if (ptr)
-    {
-    ptr->Delete();
-    }
-}
+vtkCxxRevisionMacro(vtkKWVolumePropertyPresetSelector, "1.7");
 
 //----------------------------------------------------------------------------
 int vtkKWVolumePropertyPresetSelector::SetPresetVolumeProperty(
@@ -62,24 +35,26 @@ int vtkKWVolumePropertyPresetSelector::SetPresetVolumeProperty(
 {
   if (this->HasPreset(id))
     {
-    vtkVolumeProperty *ptr = this->GetPresetVolumeProperty(id);
     if (prop)
       {
+      vtkVolumeProperty *ptr = this->GetPresetVolumeProperty(id);
       if (!ptr)
         {
         ptr = vtkVolumeProperty::New();
+        this->DeepCopyVolumeProperty(ptr, prop);
+        this->SetPresetUserSlotAsObject(id, "VolumeProperty", ptr);
+        ptr->Delete();
         }
-      this->DeepCopyVolumeProperty(ptr, prop);
+      else
+        {
+        this->DeepCopyVolumeProperty(ptr, prop);
+        this->ScheduleUpdatePresetRow(id);
+        }
       }
     else
       {
-      if (ptr)
-        {
-        ptr->Delete();
-        ptr = NULL;
-        }
+      this->DeletePresetUserSlot(id, "VolumeProperty");
       }
-    this->SetPresetUserSlotAsPointer(id, "VolumeProperty", ptr);
     return 1;
     }
 

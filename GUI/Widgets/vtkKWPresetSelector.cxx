@@ -31,7 +31,6 @@
 #include "vtkWindowToImageFilter.h"
 #include "vtkImagePermute.h"
 #include "vtkImageClip.h"
-#include "vtkKWIcon.h"
 
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/stl/vector>
@@ -57,7 +56,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.39");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.40");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -71,10 +70,14 @@ public:
   class UserSlotValueType
   {
   public:
+    int Type;
     double DoubleValue;
     int IntValue;
     vtksys_stl::string StringValue;
     void *PointerValue;
+    vtkObject *ObjectValue;
+    
+    void DeAllocate();
   };
 
   // User slot pool
@@ -155,18 +158,35 @@ vtkKWPresetSelectorInternals::GetPresetNodeIterator(int id)
   return this->PresetPool.find(id);
 }
 
+//---------------------------------------------------------------------------
+void vtkKWPresetSelectorInternals::UserSlotValueType::DeAllocate()
+{
+  if (this->Type == vtkKWPresetSelector::UserSlotObjectType &&
+      this->ObjectValue)
+    {
+    this->ObjectValue->UnRegister(NULL);
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkKWPresetSelector::DeAllocatePreset(int id)
 {
-  vtkKWIcon *thumbnail = this->GetPresetThumbnail(id);
-  if (thumbnail)
+  if (this->Internals)
     {
-    thumbnail->Delete();
-    }
-  vtkKWIcon *screenshot = this->GetPresetScreenshot(id);
-  if (screenshot)
-    {
-    screenshot->Delete();
+    vtkKWPresetSelectorInternals::PresetNode *node =
+      this->Internals->GetPresetNode(id);
+    if (node)
+      {
+      vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
+        node->UserSlotPool.begin();
+      vtkKWPresetSelectorInternals::UserSlotPoolIterator s_end =
+        node->UserSlotPool.end();
+      while (s_it != s_end)
+        {
+        s_it->second.DeAllocate();
+        ++s_it;
+        }
+      }
     }
 }
 
@@ -1106,25 +1126,27 @@ int vtkKWPresetSelector::SetPresetThumbnail(
 {
   if (this->HasPreset(id))
     {
-    vtkKWIcon *ptr = this->GetPresetThumbnail(id);
     if (icon)
       {
+      vtkKWIcon *ptr = this->GetPresetThumbnail(id);
       if (!ptr)
         {
         ptr = vtkKWIcon::New();
+        ptr->DeepCopy(icon);
+        this->SetPresetUserSlotAsObject(
+          id, this->GetPresetThumbnailSlotName(), ptr);
+        ptr->Delete();
         }
-      ptr->DeepCopy(icon);
+      else
+        {
+        ptr->DeepCopy(icon);
+        this->ScheduleUpdatePresetRow(id);
+        }
       }
     else
       {
-      if (ptr)
-        {
-        ptr->Delete();
-        ptr = NULL;
-        }
+      this->DeletePresetUserSlot(id, this->GetPresetThumbnailSlotName());
       }
-    this->SetPresetUserSlotAsPointer(
-      id, this->GetPresetThumbnailSlotName(), ptr);
     return 1;
     }
 
@@ -1134,7 +1156,7 @@ int vtkKWPresetSelector::SetPresetThumbnail(
 //----------------------------------------------------------------------------
 vtkKWIcon* vtkKWPresetSelector::GetPresetThumbnail(int id)
 {
-  return (vtkKWIcon*)this->GetPresetUserSlotAsPointer(
+  return (vtkKWIcon*)this->GetPresetUserSlotAsObject(
     id, this->GetPresetThumbnailSlotName());
 }
 
@@ -1165,25 +1187,27 @@ int vtkKWPresetSelector::SetPresetScreenshot(
 {
   if (this->HasPreset(id))
     {
-    vtkKWIcon *ptr = this->GetPresetScreenshot(id);
     if (icon)
       {
+      vtkKWIcon *ptr = this->GetPresetScreenshot(id);
       if (!ptr)
         {
         ptr = vtkKWIcon::New();
+        ptr->DeepCopy(icon);
+        this->SetPresetUserSlotAsObject(
+          id, this->GetPresetScreenshotSlotName(), ptr);
+        ptr->Delete();
         }
-      ptr->DeepCopy(icon);
+      else
+        {
+        ptr->DeepCopy(icon);
+        this->ScheduleUpdatePresetRow(id);
+        }
       }
     else
       {
-      if (ptr)
-        {
-        ptr->Delete();
-        ptr = NULL;
-        }
+      this->DeletePresetUserSlot(id, this->GetPresetScreenshotSlotName());
       }
-    this->SetPresetUserSlotAsPointer(
-      id, this->GetPresetScreenshotSlotName(), ptr);
     return 1;
     }
 
@@ -1193,7 +1217,7 @@ int vtkKWPresetSelector::SetPresetScreenshot(
 //----------------------------------------------------------------------------
 vtkKWIcon* vtkKWPresetSelector::GetPresetScreenshot(int id)
 {
-  return (vtkKWIcon*)this->GetPresetUserSlotAsPointer(
+  return (vtkKWIcon*)this->GetPresetUserSlotAsObject(
     id, this->GetPresetScreenshotSlotName());
 }
 
@@ -1374,6 +1398,51 @@ int vtkKWPresetSelector::HasPresetUserSlot(int id, const char *slot_name)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWPresetSelector::GetPresetUserSlotType(int id, const char *slot_name)
+{
+  if (this->Internals)
+    {
+    vtkKWPresetSelectorInternals::PresetNode *node =
+      this->Internals->GetPresetNode(id);
+    if (node)
+      {
+      vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
+        node->UserSlotPool.find(slot_name);
+      if (s_it != node->UserSlotPool.end())
+        {
+        return s_it->second.Type;
+        }
+      }
+    }
+
+  return vtkKWPresetSelector::UserSlotUnknownType;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPresetSelector::DeletePresetUserSlot(int id, const char *slot_name)
+{
+  if (this->Internals)
+    {
+    vtkKWPresetSelectorInternals::PresetNode *node =
+      this->Internals->GetPresetNode(id);
+    if (node)
+      {
+      vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
+        node->UserSlotPool.find(slot_name);
+      if (s_it != node->UserSlotPool.end())
+        {
+        s_it->second.DeAllocate();
+        node->UserSlotPool.erase(s_it);
+        this->ScheduleUpdatePresetRow(id);
+        return 1;
+        }
+      }
+    }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
 int vtkKWPresetSelector::SetPresetUserSlotAsDouble(
   int id, const char *slot_name, double value)
 {
@@ -1383,7 +1452,21 @@ int vtkKWPresetSelector::SetPresetUserSlotAsDouble(
       this->Internals->GetPresetNode(id);
     if (node)
       {
-      node->UserSlotPool[slot_name].DoubleValue = value;
+      vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
+        node->UserSlotPool.find(slot_name);
+      if (s_it != node->UserSlotPool.end())
+        {
+        if (s_it->second.Type == vtkKWPresetSelector::UserSlotDoubleType &&
+            s_it->second.DoubleValue == value)
+          {
+          return 1;
+          }
+        s_it->second.DeAllocate();
+        }
+      vtkKWPresetSelectorInternals::UserSlotValueType &slot = 
+        node->UserSlotPool[slot_name];
+      slot.DoubleValue = value;
+      slot.Type = vtkKWPresetSelector::UserSlotDoubleType;
       this->ScheduleUpdatePresetRow(id);
       return 1;
       }
@@ -1424,7 +1507,21 @@ int vtkKWPresetSelector::SetPresetUserSlotAsInt(
       this->Internals->GetPresetNode(id);
     if (node)
       {
-      node->UserSlotPool[slot_name].IntValue = value;
+      vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
+        node->UserSlotPool.find(slot_name);
+      if (s_it != node->UserSlotPool.end())
+        {
+        if (s_it->second.Type == vtkKWPresetSelector::UserSlotIntType &&
+            s_it->second.IntValue == value)
+          {
+          return 1;
+          }
+        s_it->second.DeAllocate();
+        }
+      vtkKWPresetSelectorInternals::UserSlotValueType &slot = 
+        node->UserSlotPool[slot_name];
+      slot.IntValue = value;
+      slot.Type = vtkKWPresetSelector::UserSlotIntType;
       this->ScheduleUpdatePresetRow(id);
       return 1;
       }
@@ -1465,7 +1562,22 @@ int vtkKWPresetSelector::SetPresetUserSlotAsString(
       this->Internals->GetPresetNode(id);
     if (node)
       {
-      node->UserSlotPool[slot_name].StringValue = value ? value : "";
+      const char *fixed_value = value ? value : "";
+      vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
+        node->UserSlotPool.find(slot_name);
+      if (s_it != node->UserSlotPool.end())
+        {
+        if (s_it->second.Type == vtkKWPresetSelector::UserSlotStringType &&
+            s_it->second.StringValue == fixed_value)
+          {
+          return 1;
+          }
+        s_it->second.DeAllocate();
+        }
+      vtkKWPresetSelectorInternals::UserSlotValueType &slot = 
+        node->UserSlotPool[slot_name];
+      slot.StringValue = fixed_value;
+      slot.Type = vtkKWPresetSelector::UserSlotStringType;
       this->ScheduleUpdatePresetRow(id);
       return 1;
       }
@@ -1506,7 +1618,21 @@ int vtkKWPresetSelector::SetPresetUserSlotAsPointer(
       this->Internals->GetPresetNode(id);
     if (node)
       {
-      node->UserSlotPool[slot_name].PointerValue = value;
+      vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
+        node->UserSlotPool.find(slot_name);
+      if (s_it != node->UserSlotPool.end())
+        {
+        if (s_it->second.Type == vtkKWPresetSelector::UserSlotPointerType &&
+            s_it->second.PointerValue == value)
+          {
+          return 1;
+          }
+        s_it->second.DeAllocate();
+        }
+      vtkKWPresetSelectorInternals::UserSlotValueType &slot = 
+        node->UserSlotPool[slot_name];
+      slot.PointerValue = value;
+      slot.Type = vtkKWPresetSelector::UserSlotPointerType;
       this->ScheduleUpdatePresetRow(id);
       return 1;
       }
@@ -1530,6 +1656,65 @@ void* vtkKWPresetSelector::GetPresetUserSlotAsPointer(
       if (s_it != node->UserSlotPool.end())
         {
         return s_it->second.PointerValue;
+        }
+      }
+    }
+
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPresetSelector::SetPresetUserSlotAsObject(
+  int id, const char *slot_name, vtkObject *value)
+{
+  if (this->Internals)
+    {
+    vtkKWPresetSelectorInternals::PresetNode *node =
+      this->Internals->GetPresetNode(id);
+    if (node)
+      {
+      vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
+        node->UserSlotPool.find(slot_name);
+      if (s_it != node->UserSlotPool.end())
+        {
+        if (s_it->second.Type == vtkKWPresetSelector::UserSlotObjectType &&
+            s_it->second.ObjectValue == value)
+          {
+          return 1;
+          }
+        s_it->second.DeAllocate();
+        }
+      vtkKWPresetSelectorInternals::UserSlotValueType &slot = 
+        node->UserSlotPool[slot_name];
+      slot.ObjectValue = value;
+      slot.Type = vtkKWPresetSelector::UserSlotObjectType;
+      if (value)
+        {
+        value->Register(this);
+        }
+      this->ScheduleUpdatePresetRow(id);
+      return 1;
+      }
+    }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+vtkObject* vtkKWPresetSelector::GetPresetUserSlotAsObject(
+  int id, const char *slot_name)
+{
+  if (this->Internals)
+    {
+    vtkKWPresetSelectorInternals::PresetNode *node =
+      this->Internals->GetPresetNode(id);
+    if (node)
+      {
+      vtkKWPresetSelectorInternals::UserSlotPoolIterator s_it =
+        node->UserSlotPool.find(slot_name);
+      if (s_it != node->UserSlotPool.end())
+        {
+        return s_it->second.ObjectValue;
         }
       }
     }

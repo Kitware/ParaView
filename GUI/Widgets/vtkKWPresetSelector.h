@@ -188,11 +188,31 @@ public:
   // Set/Get a preset user slot.
   // An unlimited number of slots can be added to a preset. Each slot is
   // identified by a name (string). Convenience methods are provided to store
-  // and retrieve various types of data (double, int, string, pointer).
+  // and retrieve various types of data (double, int, string, generic pointer, 
+  // pointer to vtkObject). Note a SetPresetUserSlotAsObject *does* call
+  // Register() on the object passed as parameter, and will call UnRegister()
+  // once it is time to remove/deallocate all presets (either automatically
+  // when this instance is deleted or programatically).
   // Note that setting the value of a slot will automatically call
-  // UpdatePresetRow for the specific preset.
+  // ScheduleUpdatePresetRow for the specific preset if the value was
+  // different than the previous value.
   // Return 1 on success, 0 on error
+  //BTX
+  enum 
+  {
+    UserSlotDoubleType = 0,
+    UserSlotIntType,
+    UserSlotStringType,
+    UserSlotPointerType,
+    UserSlotObjectType,
+    UserSlotUnknownType
+  };
+  //ETX
   virtual int HasPresetUserSlot(
+    int id, const char *slot_name);
+  virtual int GetPresetUserSlotType(
+    int id, const char *slot_name);
+  virtual int DeletePresetUserSlot(
     int id, const char *slot_name);
   virtual int SetPresetUserSlotAsDouble(
     int id, const char *slot_name, double value);
@@ -209,6 +229,10 @@ public:
   virtual int SetPresetUserSlotAsPointer(
     int id, const char *slot_name, void *ptr);
   virtual void* GetPresetUserSlotAsPointer(
+    int id, const char *slot_name);
+  virtual int SetPresetUserSlotAsObject(
+    int id, const char *slot_name, vtkObject *obj);
+  virtual vtkObject* GetPresetUserSlotAsObject(
     int id, const char *slot_name);
 
   // Description:
