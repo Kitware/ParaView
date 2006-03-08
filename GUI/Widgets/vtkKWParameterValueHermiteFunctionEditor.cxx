@@ -21,7 +21,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.17");
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.18");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";
@@ -962,9 +962,13 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
 
   // Create/update the midpoint
 
+  int midpoint_exists = this->CanvasHasTag("m_p", &id1);
   if (is_not_valid)
     {
-    *tk_cmd << canv << " delete m_p" << id1 << endl;
+    if (midpoint_exists)
+      {
+      *tk_cmd << canv << " delete m_p" << id1 << endl;
+      }
     }
   else
     {
@@ -972,11 +976,14 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
         !this->GetMidPointVisibility() || 
         !this->CanvasVisibility)
       {
-      *tk_cmd << canv << " itemconfigure m_p" << id1 << " -state hidden"<<endl;
+      if (midpoint_exists)
+        {
+        *tk_cmd << canv << " itemconfigure m_p" << id1 << " -state hidden\n";
+        }
       }
     else
       {
-      if (!this->CanvasHasTag("m_p", &id1))
+      if (!midpoint_exists)
         {
         *tk_cmd << canv << " create rectangle" << " 0 0 0 0 -tags {m_p" << id1 
                 << " "<< vtkKWParameterValueHermiteFunctionEditor::MidPointTag 
@@ -1010,9 +1017,13 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
 
   // Create/update the midpoint guideline
 
+  int midpoint_guide_exists = this->CanvasHasTag("m_g", &id1);
   if (is_not_valid)
     {
-    *tk_cmd << canv << " delete m_g" << id1 << endl;
+    if (midpoint_guide_exists)
+      {
+      *tk_cmd << canv << " delete m_g" << id1 << endl;
+      }
     }
   else
     {
@@ -1020,11 +1031,14 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
         !this->MidPointGuidelineVisibility || 
         !this->CanvasVisibility)
       {
-      *tk_cmd << canv << " itemconfigure m_g" << id1 << " -state hidden"<<endl;
+      if (midpoint_guide_exists)
+        {
+        *tk_cmd << canv << " itemconfigure m_g" << id1 << " -state hidden\n";
+        }
       }
     else
       {
-      if (!this->CanvasHasTag("m_g", &id1))
+      if (!midpoint_guide_exists)
         {
         *tk_cmd 
           << canv << " create line 0 0 0 0 -fill black -width 1 " 
@@ -1064,9 +1078,14 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
     {
     const char *gv_canv = this->GuidelineValueCanvas->GetWidgetName();
   
+    int midpoint_guidevalue_exists = 
+      this->CanvasHasTag("m_g", &id1, this->GuidelineValueCanvas);
     if (is_not_valid)
       {
-      *tk_cmd << gv_canv << " delete m_g" << id1 << endl;
+      if (midpoint_guidevalue_exists)
+        {
+        *tk_cmd << gv_canv << " delete m_g" << id1 << endl;
+        }
       }
     else
       {
@@ -1074,12 +1093,14 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
           !this->MidPointGuidelineVisibility || 
           !this->MidPointGuidelineValueVisibility)
         {
-        *tk_cmd << gv_canv << " itemconfigure m_g" << id1 << " -state hidden" 
-                << endl;
+        if (midpoint_guidevalue_exists)
+          {
+          *tk_cmd << gv_canv << " itemconfigure m_g"<<id1<<" -state hidden\n";
+          }
         }
       else
         {
-        if (!this->CanvasHasTag("m_g", &id1, this->GuidelineValueCanvas))
+        if (!midpoint_guidevalue_exists)
           {
           *tk_cmd 
             << gv_canv << " create text 0 0 -text {} -anchor s " 

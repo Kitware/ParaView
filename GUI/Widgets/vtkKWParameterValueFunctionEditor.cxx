@@ -37,7 +37,7 @@
 #include <vtksys/stl/algorithm>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.83");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.84");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -222,6 +222,7 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->ParameterCursorPosition     = this->ParameterRange->GetRange()[0];
 
   this->LastRedrawFunctionTime      = 0;
+  this->LastRedrawFunctionSize      = 0;
 
   this->LastSelectionCanvasCoordinateX    = 0;
   this->LastSelectionCanvasCoordinateY    = 0;
@@ -5034,9 +5035,13 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
 
   // Create the text item (index at each point)
   
+  int text_exists = this->CanvasHasTag("t", &id);
   if (is_not_valid)
     {
-    *tk_cmd << canv << " delete t" << id << endl;
+    if (text_exists)
+      {
+      *tk_cmd << canv << " delete t" << id << endl;
+      }
     }
   else
     {
@@ -5044,13 +5049,17 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
         !this->CanvasVisibility ||
         !this->PointVisibility || 
         !(this->PointIndexVisibility ||
-          (this->SelectedPointIndexVisibility && id == this->GetSelectedPoint())))
+          (this->SelectedPointIndexVisibility && 
+           id == this->GetSelectedPoint())))
       {
-      *tk_cmd << canv << " itemconfigure t" << id << " -state hidden" << endl;
+      if (text_exists)
+        {
+        *tk_cmd << canv << " itemconfigure t" << id << " -state hidden\n"; 
+        }
       }
     else
       {
-      if (!this->CanvasHasTag("t", &id))
+      if (!text_exists)
         {
         *tk_cmd << canv << " create text 0 0 -text {} " 
                 << "-tags {t" << id 
@@ -5079,9 +5088,13 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
 
   // Create the point
 
+  int point_exists = this->CanvasHasTag("p", &id);
   if (is_not_valid)
     {
-    *tk_cmd << canv << " delete p" << id << endl;
+    if (point_exists)
+      {
+      *tk_cmd << canv << " delete p" << id << endl;
+      }
     }
   else
     {
@@ -5089,7 +5102,10 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
         !this->PointVisibility || 
         !this->CanvasVisibility)
       {
-      *tk_cmd << canv << " itemconfigure p" << id << " -state hidden" << endl;
+      if (point_exists)
+        {
+        *tk_cmd << canv << " itemconfigure p" << id << " -state hidden\n";
+        }
       }
     else
       {
@@ -5127,7 +5143,6 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
 
       // Check if we need to recreate it
 
-      int point_exists = this->CanvasHasTag("p", &id);
       if (point_exists && must_check_for_type)
         {
         int must_delete_point = 0;
@@ -5268,9 +5283,13 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
 
   // Create and/or update the point guideline
 
+  int guide_exists = this->CanvasHasTag("g", &id);
   if (is_not_valid)
     {
-    *tk_cmd << canv << " delete g" << id << endl;
+    if (guide_exists)
+      {
+      *tk_cmd << canv << " delete g" << id << endl;
+      }
     }
   else
     {
@@ -5278,11 +5297,14 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
         !this->PointGuidelineVisibility || 
         !this->CanvasVisibility)
       {
-      *tk_cmd << canv << " itemconfigure g" << id << " -state hidden" << endl;
+      if (guide_exists)
+        {
+        *tk_cmd << canv << " itemconfigure g" << id << " -state hidden\n";
+        }
       }
     else
       {
-      if (!this->CanvasHasTag("g", &id))
+      if (!guide_exists)
         {
         *tk_cmd << canv << " create line 0 0 0 0 -fill black -width 1 " 
                 << " -tags {g" << id << " " 
@@ -5406,9 +5428,13 @@ void vtkKWParameterValueFunctionEditor::RedrawLine(
   
   // Create the line item
   
+  int line_exists = this->CanvasHasTag("l", &id2);
   if (is_not_valid)
     {
-    *tk_cmd << canv << " delete l" << id2 << endl;
+    if (line_exists)
+      {
+      *tk_cmd << canv << " delete l" << id2 << endl;
+      }
     }
   else
     {
@@ -5420,15 +5446,18 @@ void vtkKWParameterValueFunctionEditor::RedrawLine(
         !this->CanvasVisibility ||
         !this->FunctionLineIsInVisibleRangeBetweenPoints(id1, id2))
       {
-      //*tk_cmd << canv << " itemconfigure l" << id2 << " -state hidden"<<endl;
-      *tk_cmd << canv << " delete l" << id2 << endl;
+      if (line_exists)
+        {
+        //*tk_cmd << canv << " itemconfigure l" << id2 << " -state hidden\n";
+        *tk_cmd << canv << " delete l" << id2 << endl;
+        }
       }
     else
       {
       // Create the poly-line between the points
       // The line id is the id of the second end-point (id2)
   
-      if (!this->CanvasHasTag("l", &id2))
+      if (!line_exists)
         {
         *tk_cmd << canv << " create line 0 0 0 0 -fill black " 
                 << " -tags {l" << id2 
@@ -5548,9 +5577,8 @@ void vtkKWParameterValueFunctionEditor::RedrawFunction()
 
   // Are we going to create or delete points ?
 
-  int c_nb_points = 
-    this->CanvasHasTag(vtkKWParameterValueFunctionEditor::PointTag);
-  int nb_points_changed = (c_nb_points != this->GetFunctionSize());
+  int nb_points_changed = 
+    (this->LastRedrawFunctionSize != this->GetFunctionSize());
 
   // Try to save the selection before (eventually) creating new points
 
@@ -5567,19 +5595,19 @@ void vtkKWParameterValueFunctionEditor::RedrawFunction()
   
   ostrstream tk_cmd;
 
-  int i, nb_points = this->GetFunctionSize();
-  if (nb_points < c_nb_points)
+  int i, nb_potential_points = this->GetFunctionSize();
+  if (nb_potential_points < this->LastRedrawFunctionSize)
     {
-    nb_points = c_nb_points;
+    nb_potential_points = this->LastRedrawFunctionSize;
     }
 
   // Note that we redraw the points that are out of the function id range
   // this is OK since this will delete them automatically
 
-  if (nb_points)
+  if (nb_potential_points)
     {
     this->RedrawPoint(0, &tk_cmd);
-    for (i = 1; i < nb_points; i++)
+    for (i = 1; i < nb_potential_points; i++)
       {
       this->RedrawPoint(i, &tk_cmd);
       this->RedrawLine(i - 1, i, &tk_cmd);
@@ -5592,6 +5620,7 @@ void vtkKWParameterValueFunctionEditor::RedrawFunction()
   this->Script(tk_cmd.str());
   tk_cmd.rdbuf()->freeze(0);
 
+  this->LastRedrawFunctionSize = this->GetFunctionSize();
   this->LastRedrawFunctionTime = this->GetFunctionMTime();
 
   // Try to restore the selection
@@ -5599,7 +5628,7 @@ void vtkKWParameterValueFunctionEditor::RedrawFunction()
   if (nb_points_changed && this->HasSelection())
     {
     int p_x = 0, p_y = 0;
-    for (i = 0; i < nb_points; i++)
+    for (i = 0; i < this->LastRedrawFunctionSize; i++)
       {
       this->GetFunctionPointCanvasCoordinates(i, &p_x, &p_y);
       if (p_x == s_x && p_y == s_y)
