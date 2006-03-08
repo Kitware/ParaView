@@ -61,8 +61,8 @@ void pqImageTip::showTip(const QPixmap& image, const QPoint& pos)
   instance->show();
 }
 
-pqImageTip::pqImageTip(const QPixmap& image, QWidget* parent) :
-  QLabel(parent, Qt::ToolTip),
+pqImageTip::pqImageTip(const QPixmap& image, QWidget* p) :
+  QLabel(p, Qt::ToolTip),
   hideTimer(new QBasicTimer())
 {
   this->setPixmap(image);
