@@ -90,7 +90,7 @@ MACRO(KWWidgets_ADD_TEST_FROM_EXAMPLE
 
   IF(KWWidgets_SOURCE_DIR AND KWWidgets_TEST_OUT_OF_SOURCE)
     KWWidgets_ADD_OUT_OF_SOURCE_TEST(
-      ${test_name}OutOfSource
+      ${test_name}OoS
       ${PROJECT_NAME}
       "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}OoS"
       ${out_of_source_exe_name} ${out_of_source_exe_options} ${ARGN})
