@@ -54,8 +54,9 @@ public:
   virtual void Update();
 
   // Description:
-  // Get/Set a specific function to display in the color ramp. If not
-  // specified, the ColorTransferFunction will be used.
+  // Get/Set an optional color transfer function to be used to retrieve
+  // the color of each point. It is likely you may want to turn
+  // ComputePointColorFromValue to On too.
   vtkGetObjectMacro(PointColorTransferFunction, vtkColorTransferFunction);
   virtual void SetPointColorTransferFunction(vtkColorTransferFunction*);
 
