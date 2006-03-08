@@ -56,7 +56,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.40");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.41");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -108,9 +108,11 @@ public:
 
   // Timers for updating preset rows
 
-  typedef vtksys_stl::map<int,vtksys_stl::string> UpdatePresetRowTimerPoolType;
-  typedef vtksys_stl::map<int,vtksys_stl::string>::iterator UpdatePresetRowTimerPoolIterator;
-  UpdatePresetRowTimerPoolType UpdatePresetRowTimerPool;
+  typedef vtksys_stl::map<int,vtksys_stl::string> ScheduleUpdatePresetRowTimerPoolType;
+  typedef vtksys_stl::map<int,vtksys_stl::string>::iterator ScheduleUpdatePresetRowTimerPoolIterator;
+  ScheduleUpdatePresetRowTimerPoolType ScheduleUpdatePresetRowTimerPool;
+
+  vtksys_stl::string ScheduleUpdatePresetRowsTimerId;
 
   // User slot name for the default fields
 
@@ -959,7 +961,7 @@ void vtkKWPresetSelector::SetPresetGroupSlotName(const char *name)
       this->Internals && this->Internals->GroupSlotName.compare(name))
     {
     this->Internals->GroupSlotName = name;
-    this->UpdatePresetRows();
+    this->ScheduleUpdatePresetRows();
     }
 }
 
@@ -1001,7 +1003,7 @@ void vtkKWPresetSelector::SetPresetCommentSlotName(const char *name)
       this->Internals && this->Internals->CommentSlotName.compare(name))
     {
     this->Internals->CommentSlotName = name;
-    this->UpdatePresetRows();
+    this->ScheduleUpdatePresetRows();
     }
 }
 
@@ -1036,7 +1038,7 @@ void vtkKWPresetSelector::SetPresetFileNameSlotName(const char *name)
       this->Internals && this->Internals->FileNameSlotName.compare(name))
     {
     this->Internals->FileNameSlotName = name;
-    this->UpdatePresetRows();
+    this->ScheduleUpdatePresetRows();
     }
 }
 
@@ -1071,7 +1073,7 @@ void vtkKWPresetSelector::SetPresetCreationTimeSlotName(const char *name)
       this->Internals && this->Internals->CreationTimeSlotName.compare(name))
     {
     this->Internals->CreationTimeSlotName = name;
-    this->UpdatePresetRows();
+    this->ScheduleUpdatePresetRows();
     }
 }
 
@@ -1106,7 +1108,7 @@ void vtkKWPresetSelector::SetPresetThumbnailSlotName(const char *name)
       this->Internals && this->Internals->ThumbnailSlotName.compare(name))
     {
     this->Internals->ThumbnailSlotName = name;
-    this->UpdatePresetRows();
+    this->ScheduleUpdatePresetRows();
     }
 }
 
@@ -1167,7 +1169,7 @@ void vtkKWPresetSelector::SetPresetScreenshotSlotName(const char *name)
       this->Internals && this->Internals->ScreenshotSlotName.compare(name))
     {
     this->Internals->ScreenshotSlotName = name;
-    this->UpdatePresetRows();
+    this->ScheduleUpdatePresetRows();
     }
 }
 
@@ -2089,7 +2091,7 @@ void vtkKWPresetSelector::ClearPresetFilter()
   if (this->Internals && this->Internals->PresetFilter.size())
     {
     this->Internals->PresetFilter.clear();
-    this->UpdatePresetRows();
+    this->ScheduleUpdatePresetRows();
     }
 }
 
@@ -2132,7 +2134,7 @@ void vtkKWPresetSelector::SetPresetFilterUserSlotConstraint(
     }
   if (update)
     {
-    this->UpdatePresetRows();
+    this->ScheduleUpdatePresetRows();
     }
 }
 
@@ -2159,7 +2161,7 @@ void vtkKWPresetSelector::SetPresetFilterUserSlotConstraintToRegularExpression(
       !(*it).second.IsRegularExpression)
     {
     (*it).second.IsRegularExpression = 1;
-    this->UpdatePresetRows();
+    this->ScheduleUpdatePresetRows();
     }
 }
 
@@ -2173,7 +2175,7 @@ void vtkKWPresetSelector::SetPresetFilterUserSlotConstraintToString(
       (*it).second.IsRegularExpression)
     {
     (*it).second.IsRegularExpression = 0;
-    this->UpdatePresetRows();
+    this->ScheduleUpdatePresetRows();
     }
 }
 
@@ -2232,6 +2234,8 @@ int vtkKWPresetSelector::IsPresetFiltered(int id)
   return 1;
 } 
 
+#include <time.h>
+
 //----------------------------------------------------------------------------
 void vtkKWPresetSelector::UpdatePresetRows()
 {
@@ -2245,7 +2249,7 @@ void vtkKWPresetSelector::UpdatePresetRows()
     {
     this->UpdatePresetRow(it->second->Id);
     }
-  
+
   // If the number of visible presets changed, this can enable/disable
   // some buttons
 
@@ -2253,6 +2257,34 @@ void vtkKWPresetSelector::UpdatePresetRows()
     {
     this->Update();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::ScheduleUpdatePresetRows()
+{
+  // Already scheduled
+
+  if (this->Internals->ScheduleUpdatePresetRowsTimerId.size())
+    {
+    return;
+    }
+
+  this->Internals->ScheduleUpdatePresetRowsTimerId =
+    this->Script(
+      "after idle {catch {%s UpdatePresetRowsCallback}}", this->GetTclName());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPresetSelector::UpdatePresetRowsCallback()
+{
+  if (!this->GetApplication() || this->GetApplication()->GetInExit() ||
+      !this->IsAlive())
+    {
+    return;
+    }
+
+  this->UpdatePresetRows();
+  this->Internals->ScheduleUpdatePresetRowsTimerId = "";
 }
 
 //----------------------------------------------------------------------------
@@ -2329,14 +2361,14 @@ void vtkKWPresetSelector::ScheduleUpdatePresetRow(int id)
 {
   // Already scheduled
 
-  vtkKWPresetSelectorInternals::UpdatePresetRowTimerPoolIterator it = 
-    this->Internals->UpdatePresetRowTimerPool.find(id);
-  if (it != this->Internals->UpdatePresetRowTimerPool.end())
+  vtkKWPresetSelectorInternals::ScheduleUpdatePresetRowTimerPoolIterator it = 
+    this->Internals->ScheduleUpdatePresetRowTimerPool.find(id);
+  if (it != this->Internals->ScheduleUpdatePresetRowTimerPool.end())
     {
     return;
     }
 
-  this->Internals->UpdatePresetRowTimerPool[id] =
+  this->Internals->ScheduleUpdatePresetRowTimerPool[id] =
     this->Script("after idle {catch {%s UpdatePresetRowCallback %d}}", 
                  this->GetTclName(), id);
 }
@@ -2351,8 +2383,8 @@ void vtkKWPresetSelector::UpdatePresetRowCallback(int id)
     }
 
   this->UpdatePresetRow(id);
-  this->Internals->UpdatePresetRowTimerPool.erase(
-    this->Internals->UpdatePresetRowTimerPool.find(id));
+  this->Internals->ScheduleUpdatePresetRowTimerPool.erase(
+    this->Internals->ScheduleUpdatePresetRowTimerPool.find(id));
 }
 
 //---------------------------------------------------------------------------
@@ -2367,7 +2399,7 @@ void vtkKWPresetSelector::PresetCellThumbnailCallback(
   vtkKWMultiColumnList *list = this->PresetList->GetWidget();
 
   int id = this->GetPresetAtRowId(row);
-  if (this->HasPreset(id))
+  if (id >= 0)
     {
     vtkKWLabel *child = vtkKWLabel::New();
     child->SetWidgetName(widget);
