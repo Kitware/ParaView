@@ -2174,7 +2174,7 @@ The Pick filter operates on any type of data and produces unstructured grid outp
           class="vtkPVDataAnalysis"
           root_name="DataAnalysis"
           module_type="Filter"
-          button_image="PVPickButton"
+          button_image="PVDataAnalysisButton"
           button_help="Pick a cell or point and display its attributes."
           long_help="Sample point data at a point or along a line or by point id. Select cell at a point or by cell id. Data can be plotted on an XY plot."
           short_help="Pick a cell or point.">

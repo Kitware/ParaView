@@ -39,6 +39,7 @@
 #include "Resources/vtkPVClipButton.h"
 #include "Resources/vtkPVContourButton.h"
 #include "Resources/vtkPVCutButton.h"
+#include "Resources/vtkPVDataAnalysisButton.h"
 #include "Resources/vtkPVEditCenterButtonClose.h"
 #include "Resources/vtkPVEditCenterButtonOpen.h"
 #include "Resources/vtkPVExtractGridButton.h"
@@ -217,6 +218,13 @@ void vtkPVApplication::CreateButtonPhotos()
                     image_PVCalculatorButton_height,
                     image_PVCalculatorButton_pixel_size,
                     image_PVCalculatorButton_length);
+
+  this->CreatePhoto("PVDataAnalysisButton", 
+                    image_PVDataAnalysisButton, 
+                    image_PVDataAnalysisButton_width, 
+                    image_PVDataAnalysisButton_height,
+                    image_PVDataAnalysisButton_pixel_size,
+                    image_PVDataAnalysisButton_length);
 
   this->CreatePhoto("PVThresholdButton", 
                     image_PVThresholdButton, 
