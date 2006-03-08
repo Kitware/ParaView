@@ -559,6 +559,7 @@ public:
   virtual void PresetSelectionChangedCallback() {};
   virtual void PresetRightClickCallback(int row, int col, int x, int y);
   virtual void UpdatePresetRowCallback(int id);
+  virtual void UpdatePresetRowsCallback();
 
 protected:
   vtkKWPresetSelector();
@@ -621,6 +622,7 @@ protected:
   // Description:
   // Update all rows in the list
   virtual void UpdatePresetRows();
+  virtual void ScheduleUpdatePresetRows();
 
   char *PresetAddCommand;
   virtual void InvokePresetAddCommand();
