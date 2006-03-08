@@ -1412,6 +1412,7 @@ protected:
   };
   Ranges        LastRanges;
   unsigned long LastRedrawFunctionTime;
+  int           LastRedrawFunctionSize;
   //ETX
 
   double DisplayedWholeParameterRange[2];
