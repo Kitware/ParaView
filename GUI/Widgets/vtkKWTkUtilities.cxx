@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.78");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.79");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -945,12 +945,12 @@ void vtkKWTkUtilities::SetImageOptionToPixels(
     {
     image_option = "-image";
     }
-
+/*
   if (!widget->HasConfigurationOption(image_option))
     {
     return;
     }
-
+*/
   vtksys_stl::string image_name(widget->GetWidgetName());
   image_name += ".";
   image_name += &image_option[1];
