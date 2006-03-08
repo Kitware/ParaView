@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVLogoSmall.png (zlib, base64)
+ *    PVLogoSmall.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVLogoSmall_width          = 95;
 static const unsigned int  image_PVLogoSmall_height         = 16;

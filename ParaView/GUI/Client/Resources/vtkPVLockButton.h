@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVUnlockedButton.png (zlib, base64)
+ *    PVUnlockedButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVUnlockedButton_width          = 15;
 static const unsigned int  image_PVUnlockedButton_height         = 15;
@@ -16,7 +16,7 @@ static const unsigned char image_PVUnlockedButton[] =
 
 /* 
  * Resource generated for file:
- *    PVLockedButton.png (zlib, base64)
+ *    PVLockedButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVLockedButton_width          = 15;
 static const unsigned int  image_PVLockedButton_height         = 15;

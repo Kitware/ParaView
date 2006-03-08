@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVRecord.png (zlib, base64)
+ *    PVRecord.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVRecord_width          = 16;
 static const unsigned int  image_PVRecord_height         = 16;

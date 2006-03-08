@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVToolbarPullDownArrow.png (zlib, base64)
+ *    PVToolbarPullDownArrow.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVToolbarPullDownArrow_width          = 9;
 static const unsigned int  image_PVToolbarPullDownArrow_height         = 32;

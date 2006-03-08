@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVIntegrateFlowButton.png (zlib, base64)
+ *    PVIntegrateFlowButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVIntegrateFlowButton_width          = 32;
 static const unsigned int  image_PVIntegrateFlowButton_height         = 32;

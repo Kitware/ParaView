@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVMandelbrotButton.png (zlib, base64)
+ *    PVMandelbrotButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVMandelbrotButton_width          = 32;
 static const unsigned int  image_PVMandelbrotButton_height         = 32;

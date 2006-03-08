@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVPullDownArrow.png (zlib, base64)
+ *    PVPullDownArrow.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVPullDownArrow_width          = 9;
 static const unsigned int  image_PVPullDownArrow_height         = 6;

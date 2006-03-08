@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVStep.png (zlib, base64)
+ *    PVStep.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVStep_width          = 32;
 static const unsigned int  image_PVStep_height         = 32;

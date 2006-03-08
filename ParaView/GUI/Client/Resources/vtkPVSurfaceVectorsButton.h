@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVSurfaceVectorsButton.png (zlib, base64)
+ *    PVSurfaceVectorsButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVSurfaceVectorsButton_width          = 32;
 static const unsigned int  image_PVSurfaceVectorsButton_height         = 32;

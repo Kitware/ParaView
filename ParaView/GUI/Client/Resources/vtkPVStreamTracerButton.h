@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVStreamTracerButton.png (zlib, base64)
+ *    PVStreamTracerButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVStreamTracerButton_width          = 32;
 static const unsigned int  image_PVStreamTracerButton_height         = 32;

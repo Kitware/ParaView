@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVRamp.png (zlib, base64)
+ *    PVRamp.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVRamp_width          = 32;
 static const unsigned int  image_PVRamp_height         = 32;

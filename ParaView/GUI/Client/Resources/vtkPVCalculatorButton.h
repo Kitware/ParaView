@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVCalculatorButton.png (zlib, base64)
+ *    PVCalculatorButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVCalculatorButton_width          = 32;
 static const unsigned int  image_PVCalculatorButton_height         = 32;

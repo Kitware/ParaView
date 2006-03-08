@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVGlyphButton.png (zlib, base64)
+ *    PVGlyphButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVGlyphButton_width          = 32;
 static const unsigned int  image_PVGlyphButton_height         = 32;

@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVAMRPartButton.png (zlib, base64)
+ *    PVAMRPartButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVAMRPartButton_width          = 32;
 static const unsigned int  image_PVAMRPartButton_height         = 32;

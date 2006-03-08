@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVThresholdButton.png (zlib, base64)
+ *    PVThresholdButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVThresholdButton_width          = 32;
 static const unsigned int  image_PVThresholdButton_height         = 32;

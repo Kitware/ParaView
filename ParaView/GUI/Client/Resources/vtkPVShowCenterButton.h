@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVShowCenterButton.png (zlib, base64)
+ *    PVShowCenterButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVShowCenterButton_width          = 32;
 static const unsigned int  image_PVShowCenterButton_height         = 32;

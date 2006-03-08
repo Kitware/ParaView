@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVCutButton.png (zlib, base64)
+ *    PVCutButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVCutButton_width          = 32;
 static const unsigned int  image_PVCutButton_height         = 32;

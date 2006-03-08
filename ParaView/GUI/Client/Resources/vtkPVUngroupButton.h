@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVUngroupButton.png (zlib, base64)
+ *    PVUngroupButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVUngroupButton_width          = 32;
 static const unsigned int  image_PVUngroupButton_height         = 32;

@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVMovie.png (zlib, base64)
+ *    PVMovie.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVMovie_width          = 16;
 static const unsigned int  image_PVMovie_height         = 16;

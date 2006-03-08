@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVPickButton.png (zlib, base64)
+ *    PVPickButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVPickButton_width          = 32;
 static const unsigned int  image_PVPickButton_height         = 32;

@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVSelectionWindowButton.png (zlib, base64)
+ *    PVSelectionWindowButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVSelectionWindowButton_width          = 13;
 static const unsigned int  image_PVSelectionWindowButton_height         = 13;
@@ -13,7 +13,7 @@ static const unsigned char image_PVSelectionWindowButton[] =
 
 /* 
  * Resource generated for file:
- *    PVNavigationWindowButton.png (zlib, base64)
+ *    PVNavigationWindowButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVNavigationWindowButton_width          = 13;
 static const unsigned int  image_PVNavigationWindowButton_height         = 13;
