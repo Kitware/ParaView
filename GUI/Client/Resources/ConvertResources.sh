@@ -204,4 +204,6 @@ KWConvertImageToHeader --zlib --base64 \
     vtkPVLookmarkButton.h \
     PVLookmarkButton.png
 
-
+KWConvertImageToHeader --zlib --base64 \
+    vtkPVDataAnalysisButton.h \
+    PVDataAnalysisButton.png
