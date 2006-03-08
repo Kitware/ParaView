@@ -52,7 +52,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.36");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.37");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -1064,8 +1064,7 @@ void vtkKWVolumePropertyWidget::Update()
         this->VolumeProperty->GetRGBTransferFunction(this->SelectedComponent);
       this->ScalarColorFunctionEditor->SetColorTransferFunction(cfun);
 
-      if (this->UseScalarColorFunctionInScalarOpacityEditor && 
-          this->ScalarOpacityFunctionEditor)
+      if (this->UseScalarColorFunctionInScalarOpacityEditor)
         {
         this->ScalarOpacityFunctionEditor->SetPointColorTransferFunction(cfun);
         }
@@ -1729,6 +1728,7 @@ void vtkKWVolumePropertyWidget::MergeScalarOpacityAndColorEditors()
       "Scalar Opacity And Color Mapping:");
     this->ScalarOpacityFunctionEditor->WindowLevelModeButtonVisibilityOff();
     this->ScalarOpacityFunctionEditor->ParameterRangeVisibilityOff();
+    this->ScalarOpacityFunctionEditor->ComputePointColorFromValueOn();
     }
 
   if (this->ScalarColorFunctionEditor)
