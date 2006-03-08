@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.56");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.57");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -47,7 +47,9 @@ vtkPVMinMax::vtkPVMinMax()
   this->MinLabel = vtkKWLabel::New();
   this->MaxLabel = vtkKWLabel::New();
   this->MinScale = vtkKWScaleWithEntry::New();
+  this->MinScale->SetEntryVisibility(0);
   this->MaxScale = vtkKWScaleWithEntry::New();
+  this->MaxScale->SetEntryVisibility(0);
   // Disabling Clamp to allow advanced user full interaction
   this->MinScale->ClampValueOff();
   this->MaxScale->ClampValueOff();
