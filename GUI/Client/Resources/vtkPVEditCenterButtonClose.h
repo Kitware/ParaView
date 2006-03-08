@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVEditCenterButtonClose.png (zlib, base64)
+ *    PVEditCenterButtonClose.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVEditCenterButtonClose_width          = 32;
 static const unsigned int  image_PVEditCenterButtonClose_height         = 32;

@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVRotateViewButton.png (zlib, base64)
+ *    PVRotateViewButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVRotateViewButton_width          = 32;
 static const unsigned int  image_PVRotateViewButton_height         = 32;
@@ -27,7 +27,7 @@ static const unsigned char image_PVRotateViewButton[] =
 
 /* 
  * Resource generated for file:
- *    PVRotateViewButtonActive.png (zlib, base64)
+ *    PVRotateViewButtonActive.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVRotateViewButtonActive_width          = 32;
 static const unsigned int  image_PVRotateViewButtonActive_height         = 32;

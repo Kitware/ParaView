@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PV3DCursorButton.png (zlib, base64)
+ *    PV3DCursorButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PV3DCursorButton_width          = 21;
 static const unsigned int  image_PV3DCursorButton_height         = 21;
@@ -14,7 +14,7 @@ static const unsigned char image_PV3DCursorButton[] =
 
 /* 
  * Resource generated for file:
- *    PV3DCursorButtonActive.png (zlib, base64)
+ *    PV3DCursorButtonActive.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PV3DCursorButtonActive_width          = 21;
 static const unsigned int  image_PV3DCursorButtonActive_height         = 21;

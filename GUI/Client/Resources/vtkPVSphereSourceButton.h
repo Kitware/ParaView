@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVSphereSourceButton.png (zlib, base64)
+ *    PVSphereSourceButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVSphereSourceButton_width          = 32;
 static const unsigned int  image_PVSphereSourceButton_height         = 32;

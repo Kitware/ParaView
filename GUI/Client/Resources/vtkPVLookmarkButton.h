@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVLookmarkButton.png (zlib, base64)
+ *    PVLookmarkButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVLookmarkButton_width          = 35;
 static const unsigned int  image_PVLookmarkButton_height         = 31;

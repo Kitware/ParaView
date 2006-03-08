@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVContourButton.png (zlib, base64)
+ *    PVContourButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVContourButton_width          = 32;
 static const unsigned int  image_PVContourButton_height         = 32;

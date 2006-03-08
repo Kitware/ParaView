@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVTranslateViewButton.png (zlib, base64)
+ *    PVTranslateViewButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVTranslateViewButton_width          = 32;
 static const unsigned int  image_PVTranslateViewButton_height         = 32;
@@ -27,7 +27,7 @@ static const unsigned char image_PVTranslateViewButton[] =
 
 /* 
  * Resource generated for file:
- *    PVTranslateViewButtonActive.png (zlib, base64)
+ *    PVTranslateViewButtonActive.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVTranslateViewButtonActive_width          = 32;
 static const unsigned int  image_PVTranslateViewButtonActive_height         = 32;

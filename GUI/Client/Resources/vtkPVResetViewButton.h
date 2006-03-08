@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVResetViewButton.png (zlib, base64)
+ *    PVResetViewButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVResetViewButton_width          = 32;
 static const unsigned int  image_PVResetViewButton_height         = 32;

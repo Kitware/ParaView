@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVInitState.png (zlib, base64)
+ *    PVInitState.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVInitState_width          = 32;
 static const unsigned int  image_PVInitState_height         = 32;

@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVSuperquadricButton.png (zlib, base64)
+ *    PVSuperquadricButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVSuperquadricButton_width          = 32;
 static const unsigned int  image_PVSuperquadricButton_height         = 32;

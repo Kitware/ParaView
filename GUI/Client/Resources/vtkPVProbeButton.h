@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVProbeButton.png (zlib, base64)
+ *    PVProbeButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVProbeButton_width          = 32;
 static const unsigned int  image_PVProbeButton_height         = 32;

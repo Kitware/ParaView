@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVFlyButton.png (zlib, base64)
+ *    PVFlyButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVFlyButton_width          = 32;
 static const unsigned int  image_PVFlyButton_height         = 32;
@@ -21,7 +21,7 @@ static const unsigned char image_PVFlyButton[] =
 
 /* 
  * Resource generated for file:
- *    PVFlyButtonActive.png (zlib, base64)
+ *    PVFlyButtonActive.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVFlyButtonActive_width          = 32;
 static const unsigned int  image_PVFlyButtonActive_height         = 32;

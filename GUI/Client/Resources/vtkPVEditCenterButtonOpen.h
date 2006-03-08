@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVEditCenterButtonOpen.png (zlib, base64)
+ *    PVEditCenterButtonOpen.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVEditCenterButtonOpen_width          = 32;
 static const unsigned int  image_PVEditCenterButtonOpen_height         = 32;

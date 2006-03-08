@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVAMRSurfaceButton.png (zlib, base64)
+ *    PVAMRSurfaceButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVAMRSurfaceButton_width          = 32;
 static const unsigned int  image_PVAMRSurfaceButton_height         = 32;

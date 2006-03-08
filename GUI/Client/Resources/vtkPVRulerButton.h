@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVRulerButton.png (zlib, base64)
+ *    PVRulerButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVRulerButton_width          = 32;
 static const unsigned int  image_PVRulerButton_height         = 32;

@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVHideCenterButton.png (zlib, base64)
+ *    PVHideCenterButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVHideCenterButton_width          = 32;
 static const unsigned int  image_PVHideCenterButton_height         = 32;

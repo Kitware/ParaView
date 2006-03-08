@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVExponential.png (zlib, base64)
+ *    PVExponential.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVExponential_width          = 32;
 static const unsigned int  image_PVExponential_height         = 32;

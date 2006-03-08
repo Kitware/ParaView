@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVExtractGridButton.png (zlib, base64)
+ *    PVExtractGridButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVExtractGridButton_width          = 32;
 static const unsigned int  image_PVExtractGridButton_height         = 32;

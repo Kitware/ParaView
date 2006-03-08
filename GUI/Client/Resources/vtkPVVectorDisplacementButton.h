@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVVectorDisplacementButton.png (zlib, base64)
+ *    PVVectorDisplacementButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVVectorDisplacementButton_width          = 32;
 static const unsigned int  image_PVVectorDisplacementButton_height         = 32;

@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVAMROutlineButton.png (zlib, base64)
+ *    PVAMROutlineButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVAMROutlineButton_width          = 32;
 static const unsigned int  image_PVAMROutlineButton_height         = 32;

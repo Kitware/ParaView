@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVWaveletButton.png (zlib, base64)
+ *    PVWaveletButton.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVWaveletButton_width          = 32;
 static const unsigned int  image_PVWaveletButton_height         = 32;

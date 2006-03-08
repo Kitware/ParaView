@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVKeyFrameChanges.png (zlib, base64)
+ *    PVKeyFrameChanges.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVKeyFrameChanges_width          = 32;
 static const unsigned int  image_PVKeyFrameChanges_height         = 32;

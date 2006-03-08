@@ -1,6 +1,6 @@
 /* 
  * Resource generated for file:
- *    PVSinusoid.png (zlib, base64)
+ *    PVSinusoid.png (zlib, base64) (image file)
  */
 static const unsigned int  image_PVSinusoid_width          = 32;
 static const unsigned int  image_PVSinusoid_height         = 32;
