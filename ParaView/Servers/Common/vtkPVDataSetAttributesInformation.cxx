@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetAttributesInformation);
-vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.6");
+vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVDataSetAttributesInformation::vtkPVDataSetAttributesInformation()
@@ -307,6 +307,11 @@ vtkPVDataSetAttributesInformation
       {
       ai2->SetIsPartial(1);
       this->ArrayInformation->AddItem(ai2);
+      int attribute = info->IsArrayAnAttribute(idx2);
+      if (attribute > -1 && this->AttributeIndices[attribute] == -1)
+        {
+        this->AttributeIndices[attribute] = idx2;
+        }
       }
     }
 }
