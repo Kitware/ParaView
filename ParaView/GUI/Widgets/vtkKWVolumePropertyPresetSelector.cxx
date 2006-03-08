@@ -27,7 +27,7 @@ const char *vtkKWVolumePropertyPresetSelector::ModalityColumnName  = "Modality";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWVolumePropertyPresetSelector);
-vtkCxxRevisionMacro(vtkKWVolumePropertyPresetSelector, "1.7");
+vtkCxxRevisionMacro(vtkKWVolumePropertyPresetSelector, "1.8");
 
 //----------------------------------------------------------------------------
 int vtkKWVolumePropertyPresetSelector::SetPresetVolumeProperty(
@@ -66,7 +66,7 @@ vtkVolumeProperty* vtkKWVolumePropertyPresetSelector::GetPresetVolumeProperty(
   int id)
 {
   return (vtkVolumeProperty*)
-    this->GetPresetUserSlotAsPointer(id, "VolumeProperty");
+    this->GetPresetUserSlotAsObject(id, "VolumeProperty");
 }
 
 //----------------------------------------------------------------------------
