@@ -23,10 +23,13 @@
 #include <pqLineChartWidget.h>
 #include <pqLinePlot.h>
 #include <pqMarkerPen.h>
+#include <pqWaitCursor.h>
 
 #include <QDir>
+#include <QDomDocument>
 #include <QFileInfo>
 #include <QHBoxLayout>
+#include <QMessageBox>
 #include <QPrinter>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -35,8 +38,10 @@
 #include <vtkCommand.h>
 #include <vtkDataArray.h>
 #include <vtkDataSet.h>
+#include <vtkExecutive.h>
 #include <vtkEventQtSlotConnect.h>
 #include <vtkFloatArray.h>
+#include <vtkInformation.h>
 #include <vtkPointData.h>
 #include <vtkPointSet.h>
 #include <vtkSMInputProperty.h>
@@ -44,6 +49,7 @@
 #include <vtkSMSourceProxy.h>
 #include <vtkSMCompoundProxy.h>
 #include <vtkSphereSource.h>
+#include <vtkStreamingDemandDrivenPipeline.h>
 #include <vtkUnstructuredGrid.h>
 
 #include <vtkExodusReader.h>
@@ -57,12 +63,27 @@
 
 struct LineChartAdapter::pqImplementation
 {
-  struct CSVPlot
+  struct ExperimentalDataT
   {
     QString Label;
-    QPixmap Pixmap;
-    double DeltaX;
-    pqLineErrorPlot::CoordinatesT Coordinates;
+    QVector<double> Times;
+    QVector<double> Values;
+  };
+  
+  struct ExperimentalUncertaintyT
+  {
+    QString Label;
+    QVector<double> Times;
+    QVector<double> UpperBounds;
+    QVector<double> LowerBounds;
+  };
+  
+  struct SimulationUncertaintyT
+  {
+    QString Label;
+    QVector<double> Times;
+    QVector<double> UpperBounds;
+    QVector<double> LowerBounds;
   };
 
   pqImplementation(pqLineChartWidget& chart) :
@@ -71,6 +92,7 @@ struct LineChartAdapter::pqImplementation
     ExodusVariableType(VARIABLE_TYPE_CELL),
     Chart(chart),
     Samples(50),
+    ErrorBarWidth(0.5),
     Differences(false)
   {
     QFont h1;
@@ -111,8 +133,6 @@ struct LineChartAdapter::pqImplementation
 
     this->Chart.getYAxis().getLabel().setFont(bold);
     this->Chart.getYAxis().getLabel().setOrientation(pqChartLabel::VERTICAL);
-    
-    this->updateChart();
   }
   
   ~pqImplementation()
@@ -143,7 +163,6 @@ struct LineChartAdapter::pqImplementation
   {
     this->ExodusVariableType = type;
     this->ExodusVariableName = name;
-    this->updateChart();
   }
 
   void internalAddExodusElements(vtkUnstructuredGrid* elements)
@@ -174,121 +193,170 @@ struct LineChartAdapter::pqImplementation
   void clearExodusElements()
   {
     this->ExodusElements.clear();
-    this->updateChart();
   }
   
   void addExodusElements(vtkUnstructuredGrid* elements)
   {
     internalAddExodusElements(elements);
-    this->updateChart();
   }
 
-  void startParsing(const QString& file)
+  void clearExperimentalData()
   {
-  this->CSVFile = file;
+    this->ExperimentalData.clear();
   }
   
-  void startParsing()
+  void clearExperimentalUncertainty()
+  {
+    this->ExperimentalUncertainty.clear();
+  }
+  
+  void clearSimulationUncertainty()
+  {
+    this->SimulationUncertainty.clear();
+  }
+  
+  void clearExperimentSimulationMap()
+  {
+    this->ExperimentSimulationMap.clear();
+  }
+
+  void startParsingExperimentalData()
   {
     this->CSVSeries.clear();
   }
-
-  void parseSeries(const QStringList& series)
+  
+  void parseExperimentalData(const QStringList& series)
   {
     this->CSVSeries.push_back(series);
   }
   
-  void finishParsing()
+  void finishParsingExperimentalData()
   {
     if(this->CSVSeries.size() < 2)
       return;
 
     // The first column in the file will be time
     QStringList& time = this->CSVSeries[0];
-    if(time.size() < 3)
+    if(time.size() < 2)
       return;
     
-    QVector<CSVPlot> plots;
-    QVector<CSVPlot> difference_plots;
-    
-    // Next, each group of three columns form a plot with upper and lower error bounds
-    for(int i = 1; i < this->CSVSeries.size() - 2; i += 3)
+    // Each column after the first is experimental data
+    for(int i = 1; i != this->CSVSeries.size(); ++i)
       {
-      QStringList& values = this->CSVSeries[i];
-      QStringList& upper_bounds = this->CSVSeries[i+1];
-      QStringList& lower_bounds = this->CSVSeries[i+2];
-      
-      if(values.size() < 3)
+      QStringList& file_data = this->CSVSeries[i];
+      if(file_data.size() != time.size())
         continue;
 
-      CSVPlot plot;
-      plot.Label = values[0];
-      
-      const QString pixmap_file = QFileInfo(this->CSVFile).absoluteDir().absoluteFilePath(QDir::cleanPath(values[1]));
-      plot.Pixmap = QPixmap(pixmap_file);
-      if(plot.Pixmap.width() > 300 || plot.Pixmap.height() > 300)
-        plot.Pixmap = plot.Pixmap.scaled(QSize(300, 300), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-      
-      plot.DeltaX = VTK_DOUBLE_MAX;
-      
-      const int sample_size = values.size() > 2 * this->Samples ? values.size() / this->Samples : 1;
-      for(int i = 2; i < time.size() && i < values.size() && i < upper_bounds.size() && i < lower_bounds.size(); i += sample_size)
-        {
-        if(i != 2)
-          {
-          plot.DeltaX = vtkstd::min(plot.DeltaX, time[i].toDouble() - time[i - sample_size].toDouble());
-          }
-          
-        plot.Coordinates.push_back(
-          pqLineErrorPlot::Coordinate(
-            time[i].toDouble(),
-            values[i].toDouble(),
-            upper_bounds[i].toDouble(),
-            lower_bounds[i].toDouble()));
-        }
+      ExperimentalDataT data;
+      data.Label = file_data[0];
 
-      if(plot.Coordinates.size() > 1)
+      this->VisibleData = file_data[0];
+
+      for(int i = 1; i != file_data.size(); ++i)
         {
-        plots.push_back(plot);
+        data.Times.push_back(time[i].toDouble());
+        data.Values.push_back(file_data[i].toDouble());
         }
+      
+      this->ExperimentalData.push_back(data);  
       }
 
-    // Last, create a "difference" plot for each pair of input plots
-    for(int i = 0; i < plots.size() - 1; i += 2)
-      {
-      CSVPlot& a = plots[i];
-      CSVPlot& b = plots[i+1];
-      
-      CSVPlot c;
-      c.Label = a.Label + " - " + b.Label;
-      c.Pixmap = a.Pixmap;
-      c.DeltaX = a.DeltaX;
-      
-      for(int i = 0; i < a.Coordinates.size() && i < b.Coordinates.size(); ++i)
-        {
-        c.Coordinates.push_back(
-          pqLineErrorPlot::Coordinate(
-            a.Coordinates[i].X,
-            a.Coordinates[i].Y - b.Coordinates[i].Y,
-            sqrt(pow(a.Coordinates[i].UpperBound, 2.0) + pow(b.Coordinates[i].UpperBound, 2.0)),
-            sqrt(pow(a.Coordinates[i].LowerBound, 2.0) + pow(b.Coordinates[i].LowerBound, 2.0))));
-        }
-        
-      difference_plots.push_back(c);
-      }
-
-    this->CSVPlots += plots;
-    this->CSVDifferences += difference_plots;
-
-    this->updateChart();
+    this->CSVSeries.clear();
   }
   
-  void clearCSV()
+  void startParsingExperimentalUncertainty()
   {
-    this->CSVPlots.clear();
-    this->CSVDifferences.clear();
+    this->CSVSeries.clear();
+  }
+  
+  void parseExperimentalUncertainty(const QStringList& series)
+  {
+    this->CSVSeries.push_back(series);
+  }
+  
+  void finishParsingExperimentalUncertainty()
+  {
+    if(this->CSVSeries.size() < 3)
+      return;
+
+    // The first column in the file will be time
+    QStringList& time = this->CSVSeries[0];
+    if(time.size() < 2)
+      return;
     
-    this->updateChart();
+    // Each group of two columns after the first is upper and lower bounds of uncertainty
+    for(int i = 1; i < this->CSVSeries.size() - 1; i += 2)
+      {
+      QStringList& upper_bounds = this->CSVSeries[i];
+      QStringList& lower_bounds = this->CSVSeries[i + 1];
+      
+      if(upper_bounds.size() != time.size() || lower_bounds.size() != time.size())
+        continue;
+        
+      if(upper_bounds[0] != lower_bounds[0])
+        continue;
+
+      ExperimentalUncertaintyT uncertainty;
+      uncertainty.Label = upper_bounds[0];
+
+      for(int i = 1; i != upper_bounds.size(); ++i)
+        {
+        uncertainty.Times.push_back(time[i].toDouble());
+        uncertainty.UpperBounds.push_back(upper_bounds[i].toDouble());
+        uncertainty.LowerBounds.push_back(lower_bounds[i].toDouble());
+        }
+      
+      this->ExperimentalUncertainty.push_back(uncertainty);  
+      }
+
+    this->CSVSeries.clear();
+  }
+  
+  void startParsingSimulationUncertainty()
+  {
+    this->CSVSeries.clear();
+  }
+  
+  void parseSimulationUncertainty(const QStringList& series)
+  {
+    this->CSVSeries.push_back(series);
+  }
+  
+  void finishParsingSimulationUncertainty()
+  {
+    this->CSVSeries.clear();
+  }
+
+  void startParsingExperimentSimulationMap()
+  {
+    this->CSVSeries.clear();
+  }
+  
+  void parseExperimentSimulationMap(const QStringList& series)
+  {
+    this->CSVSeries.push_back(series);
+  }
+  
+  void finishParsingExperimentSimulationMap()
+  {
+    if(this->CSVSeries.size() < 2)
+      return;
+
+    QStringList& experimental = this->CSVSeries[0];
+    QStringList& simulation = this->CSVSeries[1];
+
+    if(experimental.size() != simulation.size())
+      return;
+
+    if(experimental.size() < 2 || simulation.size() < 2)
+      return;
+
+    for(int i = 1; i < experimental.size(); ++i)    
+      {
+      this->ExperimentSimulationMap[experimental[i]] = simulation[i];
+      }
+
+    this->CSVSeries.clear();
   }
   
   void onInputChanged()
@@ -296,33 +364,120 @@ struct LineChartAdapter::pqImplementation
     this->updateChart();
   }
   
+  void showData(const QString& data)
+  {
+    this->VisibleData = data;
+  }
+  
   void setSamples(int samples)
   {
-    this->Samples = samples;
-    this->clearCSV();
+    this->Samples = vtkstd::max(2, samples);
+  }
+  
+  void setErrorBarWidth(double width)
+  {
+    this->ErrorBarWidth = width;
   }
   
   void showDifferences(bool state)
   {
     this->Differences = state;
-    this->updateChart();
   }
   
-  void addExodusPlot(vtkExodusReader& Reader, const int ElementID, const QPen& Pen)
+  void addExperimentalPlot(const ExperimentalDataT& data, const QPen& plot_pen, const QPen& whisker_pen)
   {
+    const int sample_size = data.Values.size() > 2 * this->Samples ? data.Values.size() / this->Samples : 1;
+
+    // Look for matching experimental uncertainty data ...
+    for(int i = 0; i != this->ExperimentalUncertainty.size(); ++i)
+      {
+      ExperimentalUncertaintyT& uncertainty = this->ExperimentalUncertainty[i];
+      
+      // The labels have to match ...
+      if(uncertainty.Label != data.Label)
+        continue;
+        
+      // The size of the data must match ...
+      if(uncertainty.Times.size() != data.Times.size())
+        continue;
+        
+      // Found matching uncertainty data, so create a line plot with whiskers ...
+      double time_delta = VTK_DOUBLE_MAX;
+      pqLineErrorPlot::CoordinatesT coordinates;
+      for(int i = 0; i < data.Times.size(); i += sample_size)
+        {
+        if(i != 0)
+          {
+          time_delta = vtkstd::min(time_delta, data.Times[i] - data.Times[i - sample_size]);
+          }
+          
+        coordinates.push_back(
+          pqLineErrorPlot::Coordinate(
+            data.Times[i],
+            data.Values[i],
+            uncertainty.UpperBounds[i],
+            uncertainty.LowerBounds[i]));
+        }
+    
+      this->Chart.getLineChart().addData(
+        new pqLineErrorPlot(
+          new pqNullMarkerPen(plot_pen),
+          whisker_pen,
+          this->ErrorBarWidth * time_delta,
+          coordinates));
+      
+      this->Chart.getLegend().addEntry(
+        new pqNullMarkerPen(plot_pen),
+        new pqChartLabel(data.Label));
+          
+        return;
+      }
+    
+    // No uncertainty data, so create a line plot without whiskers ...
+    pqChartCoordinateList coordinates;
+    for(int i = 0; i < data.Times.size(); i += sample_size)
+      {
+      coordinates.pushBack(pqChartCoordinate(data.Times[i], data.Values[i]));
+      }
+  
+    this->Chart.getLineChart().addData(
+      new pqLinePlot(
+        new pqCircleMarkerPen(plot_pen, QSize(3, 3), QPen(plot_pen.color()), QBrush(Qt::white)),
+        coordinates));
+    
+    this->Chart.getLegend().addEntry(
+        new pqCircleMarkerPen(plot_pen, QSize(3, 3), QPen(plot_pen.color()), QBrush(Qt::white)),
+      new pqChartLabel(data.Label));
+  }
+  
+  void addSimulationPlot(vtkExodusReader& Reader, const int ElementID, const QPen& Pen)
+  {
+    // Get timestep data from the reader ...
+    vtkInformation* const information = Reader.GetExecutive()->GetOutputInformation(0);
+    if(!information)
+      return;
+    const int time_step_count = information->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    QVector<double> time_steps(time_step_count);
+    information->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), time_steps.data());
+  
+    // Get values from the reader ...
     const int id = ElementID + 1; // Exodus expects one-based cell ids
     const char* type = this->ExodusVariableType == VARIABLE_TYPE_CELL ? "CELL" : "POINT";
-    vtkFloatArray* const array = vtkFloatArray::New();
-    Reader.GetTimeSeriesData(id, this->ExodusVariableName.toAscii().data(), type, array); 
+    vtkFloatArray* const values = vtkFloatArray::New();
+    Reader.GetTimeSeriesData(id, this->ExodusVariableName.toAscii().data(), type, values); 
+    
+    if(time_steps.size() != values->GetNumberOfTuples())
+      return;
     
     pqChartCoordinateList coordinates;
-    for(vtkIdType i = 0; i != array->GetNumberOfTuples(); ++i)
+    for(vtkIdType i = 0; i != values->GetNumberOfTuples(); ++i)
       {
-      double value = array->GetValue(i);
-      coordinates.pushBack(pqChartCoordinate(static_cast<double>(i), value));
+      const double time = time_steps[i];
+      const double value = values->GetValue(i) - 273.15;
+      coordinates.pushBack(pqChartCoordinate(time, value));
       }
 
-    array->Delete();
+    values->Delete();
     
     pqLinePlot* const plot = new pqLinePlot(
       new pqCircleMarkerPen(Pen, QSize(4, 4), QPen(Pen.color(), 0.5), QBrush(Qt::white)),
@@ -331,20 +486,7 @@ struct LineChartAdapter::pqImplementation
     this->Chart.getLineChart().addData(plot);
     this->Chart.getLegend().addEntry(new pqCircleMarkerPen(Pen, QSize(4, 4), QPen(Pen.color(), 0.5), QBrush(Qt::white)), new pqChartLabel(QString("Element %1").arg(ElementID)));
   }
-  
-  void addCSVPlot(const CSVPlot& plot, const QPen& plot_pen, const QPen& whisker_pen)
-  {
-    ImageLinePlot* const line_plot = new ImageLinePlot(
-      new pqNullMarkerPen(plot_pen),
-      whisker_pen,
-      plot.DeltaX * 0.7,
-      plot.Coordinates,
-      plot.Pixmap);
-    this->Chart.getLineChart().addData(line_plot);
-    
-    this->Chart.getLegend().addEntry(new pqNullMarkerPen(plot_pen), new pqChartLabel(plot.Label));
-  }
-  
+
   void updateChart()
   {
     // Set the default (no data) appearance of the chart ...
@@ -356,33 +498,21 @@ struct LineChartAdapter::pqImplementation
     this->Chart.getYAxis().setVisible(true);
     this->Chart.getYAxis().setValueRange(0.0, 100.0);
     this->Chart.getLegend().clear();
+ 
+    for(int i = 0; i != ExperimentalData.size(); ++i)
+      {
+      if(ExperimentalData[i].Label != this->VisibleData)
+        continue;
+        
+      const double hue = static_cast<double>(i) / static_cast<double>(ExperimentalData.size());
+      const QColor color = QColor::fromHsvF(hue, 1.0, 0.5);
+      addExperimentalPlot(ExperimentalData[i], QPen(color, 2), QPen(color, 1));
+      }
     
-    if(CSVPlots.size() || CSVDifferences.size())
-      this->Chart.getTitle().setText("CSV Data");
-      
-    if(this->Differences)
-      {
-      for(int i = 0; i != CSVDifferences.size(); ++i)
-        {
-        const double hue = static_cast<double>(i) / static_cast<double>(CSVDifferences.size());
-        const QColor color = QColor::fromHsvF(hue, 1.0, 0.5);
-        addCSVPlot(CSVDifferences[i], QPen(color, 2), QPen(color, 1));
-        }
-      }
-    else
-      {
-      for(int i = 0; i != CSVPlots.size(); ++i)
-        {
-        const double hue = static_cast<double>(i) / static_cast<double>(CSVPlots.size());
-        const QColor color = QColor::fromHsvF(hue, 1.0, 0.5);
-        addCSVPlot(CSVPlots[i], QPen(color, 2), QPen(color, 1));
-        }
-      }
-
     if(this->ExodusVariableName.isEmpty())
       return;
 
-    if(this->ExodusElements.empty())
+    if(this->ExodusElements.empty() && this->ExperimentSimulationMap.empty())
       return;
     
     if(!this->SourceProxy)
@@ -398,6 +528,22 @@ struct LineChartAdapter::pqImplementation
     if(!reader)
       return;
 
+    // Plot the corresponding simulation data, if available ...
+    for(int i = 0; i != ExperimentalData.size(); ++i)
+      {
+      if(ExperimentalData[i].Label != this->VisibleData)
+        continue;
+        
+      const QString element = this->ExperimentSimulationMap[ExperimentalData[i].Label];
+      if(element.isEmpty())
+        continue;
+
+      const double hue = static_cast<double>(i) / static_cast<double>(ExperimentalData.size());
+      const QColor color = QColor::fromHsvF(hue, 1.0, 0.5);
+      
+      addSimulationPlot(*reader, element.toInt(), QPen(color, 2, Qt::DashLine));
+      }
+    
     int array_id = -1;
     switch(this->ExodusVariableType)
       {
@@ -413,13 +559,6 @@ struct LineChartAdapter::pqImplementation
         break;
       }
 
-    if(this->CSVPlots.size())
-      this->Chart.getTitle().setText(this->ExodusVariableName + " vs. Time / External Data");
-    else
-      this->Chart.getTitle().setText(this->ExodusVariableName + " vs. Time");
-      
-    this->Chart.getXAxis().setVisible(true);
-    this->Chart.getYAxis().setVisible(true);
     this->Chart.getYAxis().getLabel().setText(this->ExodusVariableName);
 
     unsigned long count = 0;
@@ -427,7 +566,7 @@ struct LineChartAdapter::pqImplementation
       {
       const double hue = static_cast<double>(count) / static_cast<double>(ExodusElements.size());
       const QColor color = QColor::fromHsvF(hue, 1.0, 1.0);
-      addExodusPlot(*reader, *element, QPen(color, 1.0));
+      addSimulationPlot(*reader, *element, QPen(color, 1));
       }
   }
   
@@ -439,13 +578,18 @@ struct LineChartAdapter::pqImplementation
   QString ExodusVariableName;
   vtkstd::vector<unsigned long> ExodusElements;
 
-  QString CSVFile;
+  QString VisibleData;
+  int Samples;
+  double ErrorBarWidth;
+  bool Differences;
+
+  /// Temporary storage for CSV data during parsing
   QVector<QStringList> CSVSeries;
 
-  int Samples;
-  bool Differences;
-  QVector<CSVPlot> CSVPlots;
-  QVector<CSVPlot> CSVDifferences;
+  QVector<ExperimentalDataT> ExperimentalData;
+  QVector<ExperimentalUncertaintyT> ExperimentalUncertainty;
+  QVector<SimulationUncertaintyT> SimulationUncertainty;
+  QMap<QString, QString> ExperimentSimulationMap;
 };
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -482,56 +626,217 @@ void LineChartAdapter::setExodusProxy(vtkSMProxy* proxy)
 
 void LineChartAdapter::setExodusVariable(pqVariableType type, const QString& name)
 {
+  pqWaitCursor cursor;
   this->Implementation->setExodusVariable(type, name);
 }
 
 void LineChartAdapter::clearExodusElements()
 {
+  pqWaitCursor cursor;
   this->Implementation->clearExodusElements();
+  this->Implementation->updateChart();
 }
 
 void LineChartAdapter::addExodusElements(vtkUnstructuredGrid* elements)
 {
+  pqWaitCursor cursor;
   this->Implementation->addExodusElements(elements);
+  this->Implementation->updateChart();
 }
 
 void LineChartAdapter::setExodusElements(vtkUnstructuredGrid* elements)
 {
-  this->clearExodusElements();
-  this->addExodusElements(elements);
+  pqWaitCursor cursor;
+  this->Implementation->clearExodusElements();
+  this->Implementation->addExodusElements(elements);
+  this->Implementation->updateChart();
 }
 
 void LineChartAdapter::setSamples(int samples)
 {
+  pqWaitCursor cursor;
   this->Implementation->setSamples(samples);
+  this->Implementation->updateChart();
+}
+
+void LineChartAdapter::setErrorBarWidth(double width)
+{
+  pqWaitCursor cursor;
+  this->Implementation->setErrorBarWidth(width);
+  this->Implementation->updateChart();
 }
 
 void LineChartAdapter::showDifferences(bool state)
 {
+  pqWaitCursor cursor;
   this->Implementation->showDifferences(state);
+  this->Implementation->updateChart();
 }
 
-void LineChartAdapter::clearCSV()
+void LineChartAdapter::clearExperimentalData()
 {
-  this->Implementation->clearCSV();
+  pqWaitCursor cursor;
+  this->Implementation->clearExperimentalData();
+  this->Implementation->updateChart();
+  this->emitExperimentalDataChanged();
 }
 
-void LineChartAdapter::onLoadCSV(const QStringList& files)
+void LineChartAdapter::loadExperimentalData(const QStringList& files)
 {
-  pqDelimitedTextParser parser(pqDelimitedTextParser::COLUMN_SERIES, ',');
-  QObject::connect(&parser, SIGNAL(startParsing()), this, SLOT(startParsing()));
-  QObject::connect(&parser, SIGNAL(parseSeries(const QStringList&)), this, SLOT(parseSeries(const QStringList&)));
-  QObject::connect(&parser, SIGNAL(finishParsing()), this, SLOT(finishParsing()));
-
+  pqWaitCursor cursor;
   for(int i = 0; i != files.size(); ++i)
     {
-    this->Implementation->startParsing(files[i]);
-    parser.parse(files[i]);
+    this->loadExperimentalData(files[i]);
     }
+    
+  this->Implementation->updateChart();
+  this->emitExperimentalDataChanged();
 }
 
-void LineChartAdapter::onSavePDF(const QStringList& files)
+void LineChartAdapter::loadExperimentalData(const QString& file)
 {
+  pqDelimitedTextParser parser(pqDelimitedTextParser::COLUMN_SERIES, ',');
+  QObject::connect(&parser, SIGNAL(startParsing()), this, SLOT(startParsingExperimentalData()));
+  QObject::connect(&parser, SIGNAL(parseSeries(const QStringList&)), this, SLOT(parseExperimentalData(const QStringList&)));
+  QObject::connect(&parser, SIGNAL(finishParsing()), this, SLOT(finishParsingExperimentalData()));
+  parser.parse(file);
+}
+
+void LineChartAdapter::clearExperimentalUncertainty()
+{
+  pqWaitCursor cursor;
+  this->Implementation->clearExperimentalUncertainty();
+  this->Implementation->updateChart();
+}
+
+void LineChartAdapter::loadExperimentalUncertainty(const QStringList& files)
+{
+  pqWaitCursor cursor;
+  for(int i = 0; i != files.size(); ++i)
+    {
+    loadExperimentalUncertainty(files[i]);
+    }
+
+  this->Implementation->updateChart();
+}
+
+void LineChartAdapter::loadExperimentalUncertainty(const QString& file)
+{
+  pqDelimitedTextParser parser(pqDelimitedTextParser::COLUMN_SERIES, ',');
+  QObject::connect(&parser, SIGNAL(startParsing()), this, SLOT(startParsingExperimentalUncertainty()));
+  QObject::connect(&parser, SIGNAL(parseSeries(const QStringList&)), this, SLOT(parseExperimentalUncertainty(const QStringList&)));
+  QObject::connect(&parser, SIGNAL(finishParsing()), this, SLOT(finishParsingExperimentalUncertainty()));
+  parser.parse(file);
+}
+
+void LineChartAdapter::clearSimulationUncertainty()
+{
+  pqWaitCursor cursor;
+  this->Implementation->clearSimulationUncertainty();
+  this->Implementation->updateChart();
+}
+
+void LineChartAdapter::loadSimulationUncertainty(const QStringList& files)
+{
+  pqWaitCursor cursor;
+  for(int i = 0; i != files.size(); ++i)
+    {
+    this->loadSimulationUncertainty(files[i]);
+    }
+
+  this->Implementation->updateChart();
+}
+
+void LineChartAdapter::loadSimulationUncertainty(const QString& file)
+{
+  pqDelimitedTextParser parser(pqDelimitedTextParser::COLUMN_SERIES, ',');
+  QObject::connect(&parser, SIGNAL(startParsing()), this, SLOT(startParsingSimulationUncertainty()));
+  QObject::connect(&parser, SIGNAL(parseSeries(const QStringList&)), this, SLOT(parseSimulationUncertainty(const QStringList&)));
+  QObject::connect(&parser, SIGNAL(finishParsing()), this, SLOT(finishParsingSimulationUncertainty()));
+  parser.parse(file);
+}
+
+void LineChartAdapter::clearExperimentSimulationMap()
+{
+  pqWaitCursor cursor;
+  this->Implementation->clearExperimentSimulationMap();
+  this->Implementation->updateChart();
+}
+
+void LineChartAdapter::loadExperimentSimulationMap(const QStringList& files)
+{
+  pqWaitCursor cursor;
+  for(int i = 0; i != files.size(); ++i)
+    {
+    loadExperimentSimulationMap(files[i]);
+    }
+
+  this->Implementation->updateChart();
+}
+
+void LineChartAdapter::loadExperimentSimulationMap(const QString& file)
+{
+  pqDelimitedTextParser parser(pqDelimitedTextParser::COLUMN_SERIES, ',');
+  QObject::connect(&parser, SIGNAL(startParsing()), this, SLOT(startParsingExperimentSimulationMap()));
+  QObject::connect(&parser, SIGNAL(parseSeries(const QStringList&)), this, SLOT(parseExperimentSimulationMap(const QStringList&)));
+  QObject::connect(&parser, SIGNAL(finishParsing()), this, SLOT(finishParsingExperimentSimulationMap()));
+  parser.parse(file);
+}
+
+void LineChartAdapter::loadSetup(const QStringList& files)
+{
+  pqWaitCursor cursor;
+  for(int i = 0; i != files.size(); ++i)
+    {
+    QFile file(files[i]);
+    QDomDocument xml_document;
+    xml_document.setContent(&file, false);
+
+    QDomElement xml_setup = xml_document.documentElement();
+    if(xml_setup.nodeName() != "setup")
+      {
+      QMessageBox::warning(0, "Dobran-O-Viz Error:", files[i] + " is not a Dobran-O-Viz setup file");
+      continue;
+      }
+
+    for(QDomNode xml_file = xml_setup.firstChild(); !xml_file.isNull(); xml_file = xml_file.nextSibling())
+      {
+      if(!xml_file.isElement())
+        continue;
+      
+      if(xml_file.nodeName() == "experimental")
+        {
+        loadExperimentalData(xml_file.toElement().text());
+        }
+      else if(xml_file.nodeName() == "experimental_uncertainty")
+        {
+        loadExperimentalUncertainty(xml_file.toElement().text());
+        }
+      else if(xml_file.nodeName() == "simulation_uncertainty")
+        {
+        loadSimulationUncertainty(xml_file.toElement().text());
+        }
+      else if(xml_file.nodeName() == "experiment_simulation_map")
+        {
+        loadExperimentSimulationMap(xml_file.toElement().text());
+        }
+      }
+    }
+
+  this->Implementation->updateChart();
+  this->emitExperimentalDataChanged();
+}
+
+void LineChartAdapter::showData(const QString& label)
+{
+  pqWaitCursor cursor;
+  this->Implementation->showData(label);
+  this->Implementation->updateChart();
+}
+
+void LineChartAdapter::savePDF(const QStringList& files)
+{
+  pqWaitCursor cursor;
   for(int i = 0; i != files.size(); ++i)
     {
     QPrinter printer(QPrinter::HighResolution);
@@ -547,17 +852,73 @@ void LineChartAdapter::onInputChanged(vtkObject*,unsigned long, void*, void*, vt
   this->Implementation->onInputChanged();
 }
 
-void LineChartAdapter::startParsing()
+void LineChartAdapter::startParsingExperimentalData()
 {
-  this->Implementation->startParsing();
+  this->Implementation->startParsingExperimentalData();
 }
 
-void LineChartAdapter::parseSeries(const QStringList& plot)
+void LineChartAdapter::parseExperimentalData(const QStringList& series)
 {
-  this->Implementation->parseSeries(plot);
+  this->Implementation->parseExperimentalData(series);
 }
 
-void LineChartAdapter::finishParsing()
+void LineChartAdapter::finishParsingExperimentalData()
 {
-  this->Implementation->finishParsing();
+  this->Implementation->finishParsingExperimentalData();
+}
+
+void LineChartAdapter::startParsingExperimentalUncertainty()
+{
+  this->Implementation->startParsingExperimentalUncertainty();
+}
+
+void LineChartAdapter::parseExperimentalUncertainty(const QStringList& series)
+{
+  this->Implementation->parseExperimentalUncertainty(series);
+}
+
+void LineChartAdapter::finishParsingExperimentalUncertainty()
+{
+  this->Implementation->finishParsingExperimentalUncertainty();
+}
+
+void LineChartAdapter::startParsingSimulationUncertainty()
+{
+  this->Implementation->startParsingSimulationUncertainty();
+}
+
+void LineChartAdapter::parseSimulationUncertainty(const QStringList& series)
+{
+  this->Implementation->parseSimulationUncertainty(series);
+}
+
+void LineChartAdapter::finishParsingSimulationUncertainty()
+{
+  this->Implementation->finishParsingSimulationUncertainty();
+}
+
+void LineChartAdapter::startParsingExperimentSimulationMap()
+{
+  this->Implementation->startParsingExperimentSimulationMap();
+}
+
+void LineChartAdapter::parseExperimentSimulationMap(const QStringList& series)
+{
+  this->Implementation->parseExperimentSimulationMap(series);
+}
+
+void LineChartAdapter::finishParsingExperimentSimulationMap()
+{
+  this->Implementation->finishParsingExperimentSimulationMap();
+}
+
+void LineChartAdapter::emitExperimentalDataChanged()
+{
+  QStringList data;
+  for(int i = 0; i != this->Implementation->ExperimentalData.size(); ++i)
+    {
+    data.push_back(this->Implementation->ExperimentalData[i].Label);
+    }
+    
+  emit experimentalDataChanged(data);
 }

@@ -30,6 +30,10 @@ public:
   LineChartAdapter(pqLineChartWidget& chart);
   ~LineChartAdapter();
 
+signals:
+  /// Signal emitted when the set of experimental data changes - sends the list of experimental data labels
+  void experimentalDataChanged(const QStringList&);
+
 public slots:
   /// Call this to set the current server
   void setServer(pqServer*);
@@ -47,26 +51,70 @@ public slots:
 
   /// Sets the number of samples to extract from the CSV data
   void setSamples(int);
+  /// Sets the width of error bars, as a percentage of the distance between samples
+  void setErrorBarWidth(double);
   /// Enables / disables plotting of CSV data differences
   void showDifferences(bool);
 
-  /// Clears the set of CSV data to be displayed
-  void clearCSV();
-  /// Loads a set of CSV files
-  void onLoadCSV(const QStringList&); 
+  /// Clears experimental data
+  void clearExperimentalData();
+  /// Load experimental data
+  void loadExperimentalData(const QStringList&);
+  
+  /// Clears experimental uncertainty data
+  void clearExperimentalUncertainty();
+  /// Load experimental uncertainty data
+  void loadExperimentalUncertainty(const QStringList&);
+  
+  /// Clears simulation uncertainty data
+  void clearSimulationUncertainty();
+  /// Load simulation uncertainty data
+  void loadSimulationUncertainty(const QStringList&);
+  
+  /// Clears experiment / simulation mapping
+  void clearExperimentSimulationMap();
+  /// Load experiment / simulation mapping
+  void loadExperimentSimulationMap(const QStringList&);
+  
+  /// Loads a "setup" file, which contains experimental, experimental uncertainty, simulation uncertainty, and experiment / simulation mapping data
+  void loadSetup(const QStringList&);
+  
+  /// Sets the experimental data that should be visible (using its label)
+  void showData(const QString&);
+  
   /// Saves the chart to a PDF file
-  void onSavePDF(const QStringList&);
+  void savePDF(const QStringList&);
   
 private slots:
   /// Called when the Exodus data changes
   void onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*);
 
-  /// Called when parsing of a CSV file begins
-  void startParsing();
-  /// Called once for each series of data within a CSV file
-  void parseSeries(const QStringList&);
-  /// Called when parsing of a CSV file ends
-  void finishParsing();
+  // Called during parsing of experimental data
+  void loadExperimentalData(const QString& path);
+  void startParsingExperimentalData();
+  void parseExperimentalData(const QStringList&);
+  void finishParsingExperimentalData();
+  
+  // Called during parsing of experimental uncertainty data
+  void loadExperimentalUncertainty(const QString& path);
+  void startParsingExperimentalUncertainty();
+  void parseExperimentalUncertainty(const QStringList&);
+  void finishParsingExperimentalUncertainty();
+
+  // Called during parsing of simulation uncertainty data
+  void loadSimulationUncertainty(const QString& path);
+  void startParsingSimulationUncertainty();
+  void parseSimulationUncertainty(const QStringList&);
+  void finishParsingSimulationUncertainty();
+
+  // Called during parsing of the experiment / simulation mapping
+  void loadExperimentSimulationMap(const QString& path);
+  void startParsingExperimentSimulationMap();
+  void parseExperimentSimulationMap(const QStringList&);
+  void finishParsingExperimentSimulationMap();
+
+  // Called to emit the experimentalDataChanged signal
+  void emitExperimentalDataChanged();
 
 private:
   struct pqImplementation;

@@ -35,6 +35,7 @@ class vtkUnstructuredGrid;
 class QVTKWidget;
 
 class QAction;
+class QComboBox;
 class QDockWidget;
 class QToolBar;
 class QTreeView;
@@ -103,9 +104,15 @@ private slots:
   void onNextTimeStep();
   void onLastTimeStep();
 
-  void onLoadCSV();
+  void onLoadExperimentalData();
+  void onLoadExperimentalUncertainty();
+  void onLoadSimulationUncertainty();
+  void onLoadExperimentSimulationMap();
+  void onLoadSetup();
   void onSavePDF();
 
+  void onExperimentalDataChanged(const QStringList&);
+  
 private:
   void cleanUpWindow(QVTKWidget *window);
   void setServer(pqServer* Server);
@@ -135,6 +142,8 @@ private:
   QAction *ElementDockAction;
   QToolBar* CompoundProxyToolBar;
   QToolBar* VariableSelectorToolBar;
+
+  QComboBox* ChooseDataCombo;
 
   pqSourceProxyInfo* ProxyInfo;
   vtkEventQtSlotConnect* VTKConnector;
