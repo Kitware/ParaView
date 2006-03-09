@@ -32,21 +32,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-const char *vtkKWWindow::MainPanelSizeRegKey = "MainPanelSize";
-const char *vtkKWWindow::MainPanelVisibilityRegKey = "MainPanelVisibility";
-const char *vtkKWWindow::MainPanelVisibilityKeyAccelerator = "F5";
-const char *vtkKWWindow::HideMainPanelMenuLabel = "Hide Left Panel";
-const char *vtkKWWindow::ShowMainPanelMenuLabel = "Show Left Panel";
-const char *vtkKWWindow::SecondaryPanelSizeRegKey = "SecondaryPanelSize";
-const char *vtkKWWindow::SecondaryPanelVisibilityRegKey = "SecondaryPanelVisibility";
-const char *vtkKWWindow::SecondaryPanelVisibilityKeyAccelerator = "F6";
-const char *vtkKWWindow::HideSecondaryPanelMenuLabel = "Hide Bottom Panel";
-const char *vtkKWWindow::ShowSecondaryPanelMenuLabel = "Show Bottom Panel";
-const char *vtkKWWindow::DefaultViewPanelName = "View";
-const char *vtkKWWindow::TclInteractorMenuLabel = "Command Prompt";
-const char *vtkKWWindow::ViewPanelPositionRegKey = "ViewPanelPosition";
-
-vtkCxxRevisionMacro(vtkKWWindow, "1.271");
+vtkCxxRevisionMacro(vtkKWWindow, "1.272");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -86,6 +72,35 @@ vtkKWWindow::vtkKWWindow()
   this->ApplicationSettingsUserInterfaceManager = NULL;
 
   this->StatusFramePosition = vtkKWWindow::StatusFramePositionWindow;
+
+  // Some const
+
+  this->MainPanelSizeRegKey = 
+    vtksys::SystemTools::DuplicateString("MainPanelSize");
+  this->MainPanelVisibilityRegKey = 
+    vtksys::SystemTools::DuplicateString("MainPanelVisibility");
+  this->MainPanelVisibilityKeyAccelerator = 
+    vtksys::SystemTools::DuplicateString("F5");
+  this->HideMainPanelMenuLabel = 
+    vtksys::SystemTools::DuplicateString("Hide Left Panel");
+  this->ShowMainPanelMenuLabel = 
+    vtksys::SystemTools::DuplicateString("Show Left Panel");
+  this->SecondaryPanelSizeRegKey = 
+    vtksys::SystemTools::DuplicateString("SecondaryPanelSize");
+  this->SecondaryPanelVisibilityRegKey = 
+    vtksys::SystemTools::DuplicateString("SecondaryPanelVisibility");
+  this->SecondaryPanelVisibilityKeyAccelerator = 
+    vtksys::SystemTools::DuplicateString("F6");
+  this->HideSecondaryPanelMenuLabel = 
+    vtksys::SystemTools::DuplicateString("Hide Bottom Panel");
+  this->ShowSecondaryPanelMenuLabel = 
+    vtksys::SystemTools::DuplicateString("Show Bottom Panel");
+  this->DefaultViewPanelName = 
+    vtksys::SystemTools::DuplicateString("View");
+  this->TclInteractorMenuLabel = 
+    vtksys::SystemTools::DuplicateString("Command Prompt");
+  this->ViewPanelPositionRegKey = 
+    vtksys::SystemTools::DuplicateString("ViewPanelPosition");
 }
 
 //----------------------------------------------------------------------------
@@ -158,6 +173,20 @@ vtkKWWindow::~vtkKWWindow()
     this->ApplicationSettingsInterface->Delete();
     this->ApplicationSettingsInterface = NULL;
     }
+
+  this->SetMainPanelSizeRegKey(NULL);
+  this->SetMainPanelVisibilityRegKey(NULL);
+  this->SetMainPanelVisibilityKeyAccelerator(NULL);
+  this->SetHideMainPanelMenuLabel(NULL);
+  this->SetShowMainPanelMenuLabel(NULL);
+  this->SetSecondaryPanelSizeRegKey(NULL);
+  this->SetSecondaryPanelVisibilityRegKey(NULL);
+  this->SetSecondaryPanelVisibilityKeyAccelerator(NULL);
+  this->SetHideSecondaryPanelMenuLabel(NULL);
+  this->SetShowSecondaryPanelMenuLabel(NULL);
+  this->SetDefaultViewPanelName(NULL);
+  this->SetTclInteractorMenuLabel(NULL);
+  this->SetViewPanelPositionRegKey(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -685,6 +714,7 @@ void vtkKWWindow::SetMainPanelVisibility(int arg)
 void vtkKWWindow::MainPanelVisibilityCallback()
 {
   this->SetMainPanelVisibility(!this->GetMainPanelVisibility());
+  this->UpdateMenuState();
 }
 
 //----------------------------------------------------------------------------
@@ -1300,6 +1330,11 @@ void vtkKWWindow::UpdateMenuState()
         : vtkKWWindow::ShowSecondaryPanelMenuLabel;
       label += "}";
       this->WindowMenu->ConfigureItem(idx, label.c_str());
+      this->WindowMenu->SetItemState(
+        idx, 
+        ((this->PanelLayout == vtkKWWindow::PanelLayoutSecondaryBelowMain &&
+          !this->GetMainPanelVisibility()) ?
+         vtkKWTkOptions::StateDisabled : this->WindowMenu->GetEnabled()));
       }
     }
 }
