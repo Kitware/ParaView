@@ -350,30 +350,28 @@ public:
   virtual void PrepareForDelete();
 
   // Description:
-  // Some constants
-  //BTX
-  static const char *MainPanelSizeRegKey;
-  static const char *MainPanelVisibilityRegKey;
-  static const char *MainPanelVisibilityKeyAccelerator;
-  static const char *HideMainPanelMenuLabel;
-  static const char *ShowMainPanelMenuLabel;
-  static const char *SecondaryPanelSizeRegKey;
-  static const char *SecondaryPanelVisibilityRegKey;
-  static const char *SecondaryPanelVisibilityKeyAccelerator;
-  static const char *HideSecondaryPanelMenuLabel;
-  static const char *ShowSecondaryPanelMenuLabel;
-  static const char *DefaultViewPanelName;
-  static const char *TclInteractorMenuLabel;
-  static const char *ViewPanelPositionRegKey;
-  //ETX
-
-  // Description:
   // Callbacks. Internal, do not use.
   virtual void MainPanelVisibilityCallback();
   virtual void SecondaryPanelVisibilityCallback();
   virtual void PrintSettingsCallback();
   virtual void ToolbarVisibilityChangedCallback(vtkKWToolbar*);
   virtual void NumberOfToolbarsChangedCallback();
+
+  // Description:
+  // Some constants
+  vtkGetStringMacro(MainPanelSizeRegKey);
+  vtkGetStringMacro(MainPanelVisibilityRegKey);
+  vtkGetStringMacro(MainPanelVisibilityKeyAccelerator);
+  vtkGetStringMacro(HideMainPanelMenuLabel);
+  vtkGetStringMacro(ShowMainPanelMenuLabel);
+  vtkGetStringMacro(SecondaryPanelSizeRegKey);
+  vtkGetStringMacro(SecondaryPanelVisibilityRegKey);
+  vtkGetStringMacro(SecondaryPanelVisibilityKeyAccelerator);
+  vtkGetStringMacro(HideSecondaryPanelMenuLabel);
+  vtkGetStringMacro(ShowSecondaryPanelMenuLabel);
+  vtkGetStringMacro(DefaultViewPanelName);
+  vtkGetStringMacro(TclInteractorMenuLabel);
+  vtkGetStringMacro(ViewPanelPositionRegKey);
 
 protected:
   vtkKWWindow();
@@ -412,7 +410,39 @@ protected:
 
   int             StatusFramePosition;
 
+  // Description:
+  // Some constants
+  vtkSetStringMacro(MainPanelSizeRegKey);
+  vtkSetStringMacro(MainPanelVisibilityRegKey);
+  vtkSetStringMacro(MainPanelVisibilityKeyAccelerator);
+  vtkSetStringMacro(HideMainPanelMenuLabel);
+  vtkSetStringMacro(ShowMainPanelMenuLabel);
+  vtkSetStringMacro(SecondaryPanelSizeRegKey);
+  vtkSetStringMacro(SecondaryPanelVisibilityRegKey);
+  vtkSetStringMacro(SecondaryPanelVisibilityKeyAccelerator);
+  vtkSetStringMacro(HideSecondaryPanelMenuLabel);
+  vtkSetStringMacro(ShowSecondaryPanelMenuLabel);
+  vtkSetStringMacro(DefaultViewPanelName);
+  vtkSetStringMacro(TclInteractorMenuLabel);
+  vtkSetStringMacro(ViewPanelPositionRegKey);
+
 private:
+
+  // Description:
+  // Some constants
+  char *MainPanelSizeRegKey;
+  char *MainPanelVisibilityRegKey;
+  char *MainPanelVisibilityKeyAccelerator;
+  char *HideMainPanelMenuLabel;
+  char *ShowMainPanelMenuLabel;
+  char *SecondaryPanelSizeRegKey;
+  char *SecondaryPanelVisibilityRegKey;
+  char *SecondaryPanelVisibilityKeyAccelerator;
+  char *HideSecondaryPanelMenuLabel;
+  char *ShowSecondaryPanelMenuLabel;
+  char *DefaultViewPanelName;
+  char *TclInteractorMenuLabel;
+  char *ViewPanelPositionRegKey;
 
   vtkKWNotebook   *MainNotebook;
   vtkKWNotebook   *SecondaryNotebook;
