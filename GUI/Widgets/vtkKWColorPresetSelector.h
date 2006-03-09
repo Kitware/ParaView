@@ -112,16 +112,22 @@ public:
   virtual void SetPreviewSize(int);
 
   // Description:
-  // Hide solid color presets.
-  vtkGetMacro(HideSolidColorPresets, int);
-  vtkBooleanMacro(HideSolidColorPresets, int);
-  virtual void SetHideSolidColorPresets(int);
+  // Set/get visibility of solid color presets in menu.
+  vtkGetMacro(SolidColorPresetsVisibility, int);
+  vtkBooleanMacro(SolidColorPresetsVisibility, int);
+  virtual void SetSolidColorPresetsVisibility(int);
 
   // Description:
-  // Hide gradient presets (i.e. anything that is not a solid color).
-  vtkGetMacro(HideGradientPresets, int);
-  vtkBooleanMacro(HideGradientPresets, int);
-  virtual void SetHideGradientPresets(int);
+  // Set/get visibility of gradient presets in menu.
+  vtkGetMacro(GradientPresetsVisibility, int);
+  vtkBooleanMacro(GradientPresetsVisibility, int);
+  virtual void SetGradientPresetsVisibility(int);
+
+  // Description:
+  // Set/Get the preset name visibility in the menu.
+  vtkGetMacro(PresetNameVisibility, int);
+  vtkBooleanMacro(PresetNameVisibility, int);
+  virtual void SetPresetNameVisibility(int);
 
   // Description:
   // Create the widget.
@@ -149,9 +155,10 @@ protected:
   double ScalarRange[2];
   vtkColorTransferFunction *ColorTransferFunction;
   int PreviewSize;
-  int HideSolidColorPresets;
-  int HideGradientPresets;
+  int SolidColorPresetsVisibility;
+  int GradientPresetsVisibility;
   int ApplyPresetBetweenEndPoints;
+  int PresetNameVisibility;
 
   char *PresetSelectedCommand;
   virtual void InvokePresetSelectedCommand(const char *name);

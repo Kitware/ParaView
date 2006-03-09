@@ -68,7 +68,7 @@ def vtkKWColorPresetSelectorEntryPoint(parent, win):
     cpsel2.SetParent(parent)
     cpsel2.Create()
     cpsel2.SetLabelText("Solid Color Presets:")
-    cpsel2.HideGradientPresetsOn()
+    cpsel2.GradientPresetsVisibilityOff()
     cpsel2.SetColorTransferFunction(cpsel_func)
     cpsel2.SetPresetSelectedCommand(None, "update_editor")
     cpsel2.SetBalloonHelpString(
