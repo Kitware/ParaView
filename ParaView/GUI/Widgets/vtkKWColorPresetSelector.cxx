@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWColorPresetSelector);
-vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.24");
+vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.25");
 
 vtkCxxSetObjectMacro(vtkKWColorPresetSelector,ColorTransferFunction,vtkColorTransferFunction);
 
@@ -66,9 +66,10 @@ vtkKWColorPresetSelector::vtkKWColorPresetSelector()
   this->Internals = new vtkKWColorPresetSelectorInternals;
 
   this->PreviewSize                 = 12;
-  this->HideSolidColorPresets       = 0;
-  this->HideGradientPresets         = 0;
+  this->SolidColorPresetsVisibility = 1;
+  this->GradientPresetsVisibility   = 1;
   this->ApplyPresetBetweenEndPoints = 0;
+  this->PresetNameVisibility        = 1;
 
   this->PresetSelectedCommand = NULL;
 
@@ -687,14 +688,14 @@ void vtkKWColorPresetSelector::SetPreviewSize(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWColorPresetSelector::SetHideSolidColorPresets(int arg)
+void vtkKWColorPresetSelector::SetSolidColorPresetsVisibility(int arg)
 {
-  if (this->HideSolidColorPresets == arg)
+  if (this->SolidColorPresetsVisibility == arg)
     {
     return;
     }
 
-  this->HideSolidColorPresets = arg;
+  this->SolidColorPresetsVisibility = arg;
 
   this->Modified();
 
@@ -702,14 +703,29 @@ void vtkKWColorPresetSelector::SetHideSolidColorPresets(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWColorPresetSelector::SetHideGradientPresets(int arg)
+void vtkKWColorPresetSelector::SetGradientPresetsVisibility(int arg)
 {
-  if (this->HideGradientPresets == arg)
+  if (this->GradientPresetsVisibility == arg)
     {
     return;
     }
 
-  this->HideGradientPresets = arg;
+  this->GradientPresetsVisibility = arg;
+
+  this->Modified();
+
+  this->PopulatePresetMenu();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWColorPresetSelector::SetPresetNameVisibility(int arg)
+{
+  if (this->PresetNameVisibility == arg)
+    {
+    return;
+    }
+
+  this->PresetNameVisibility = arg;
 
   this->Modified();
 
@@ -744,7 +760,7 @@ void vtkKWColorPresetSelector::PopulatePresetMenu()
       // Check if the preset should be shown or not
 
       int show_preset = 1;
-      if (this->HideSolidColorPresets || this->HideGradientPresets)
+      if (this->SolidColorPresetsVisibility || this->GradientPresetsVisibility)
         {
         int is_solid_color = 1;
         data_start = it->ColorTransferFunction->GetDataPointer() + 1;
@@ -761,8 +777,8 @@ void vtkKWColorPresetSelector::PopulatePresetMenu()
             }
           data_ptr += 4;
           }
-        if ((is_solid_color && this->HideSolidColorPresets) ||
-            (!is_solid_color && this->HideGradientPresets))
+        if ((is_solid_color && this->SolidColorPresetsVisibility) ||
+            (!is_solid_color && this->GradientPresetsVisibility))
           {
           show_preset = 0;
           }
@@ -773,6 +789,7 @@ void vtkKWColorPresetSelector::PopulatePresetMenu()
       preset_label = " ";
       preset_label += it->Name;
       preset_label += "   ";
+      
       
       if (show_preset)
         {
@@ -816,7 +833,8 @@ void vtkKWColorPresetSelector::PopulatePresetMenu()
           }
         
         menu->SetItemImage(preset_label.c_str(), img_name.c_str());
-        menu->SetItemCompoundMode(preset_label.c_str(), 1);
+        menu->SetItemCompoundMode(
+          preset_label.c_str(), this->PresetNameVisibility ? 1 : 0);
         menu->SetItemMarginVisibility(preset_label.c_str(), 0);
         }
       }
@@ -926,11 +944,14 @@ void vtkKWColorPresetSelector::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ApplyPresetBetweenEndPoints: " 
      << (this->ApplyPresetBetweenEndPoints ? "On" : "Off") << endl;
 
-  os << indent << "HideSolidColorPresets: " 
-     << (this->HideSolidColorPresets ? "On" : "Off") << endl;
+  os << indent << "PresetNameVisibility: " 
+     << (this->PresetNameVisibility ? "On" : "Off") << endl;
 
-  os << indent << "HideGradientPresets: " 
-     << (this->HideGradientPresets ? "On" : "Off") << endl;
+  os << indent << "SolidColorPresetsVisibility: " 
+     << (this->SolidColorPresetsVisibility ? "On" : "Off") << endl;
+
+  os << indent << "GradientPresetsVisibility: " 
+     << (this->GradientPresetsVisibility ? "On" : "Off") << endl;
 
   os << indent << "PreviewSize: " << this->PreviewSize << endl;
 }
