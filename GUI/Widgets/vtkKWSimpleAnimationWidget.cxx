@@ -67,7 +67,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.18");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.19");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -463,6 +463,9 @@ void vtkKWSimpleAnimationWidget::DisableButtonsButCancel()
   this->AnimationButtonSet
     ->GetWidget(VTK_VV_ANIMATION_BUTTON_CREATE_ID)->SetEnabled(0);
   this->AnimationButtonSet
+    ->GetWidget(VTK_VV_ANIMATION_BUTTON_CANCEL_ID)->SetEnabled(
+      this->GetEnabled());
+  this->AnimationButtonSet
     ->GetWidget(VTK_VV_ANIMATION_BUTTON_CANCEL_ID)->Grab();
 }
 
@@ -491,6 +494,8 @@ void vtkKWSimpleAnimationWidget::EnableButtonsButCancel()
   this->AnimationButtonSet
     ->GetWidget(VTK_VV_ANIMATION_BUTTON_CREATE_ID)->SetEnabled(
       this->GetEnabled());
+  this->AnimationButtonSet
+    ->GetWidget(VTK_VV_ANIMATION_BUTTON_CANCEL_ID)->SetEnabled(0);
   this->AnimationButtonSet
     ->GetWidget(VTK_VV_ANIMATION_BUTTON_CANCEL_ID)->ReleaseGrab();
 }
@@ -1198,6 +1203,13 @@ void vtkKWSimpleAnimationWidget::UpdateEnableState()
   this->PropagateEnableState(this->Parameters);
   this->PropagateEnableState(this->HelpLabel);
   this->PropagateEnableState(this->AnimationButtonSet);
+  
+  if (this->AnimationButtonSet &&
+      !(this->AnimationStatus & vtkKWSimpleAnimationWidget::AnimationPlaying))
+    {
+    this->AnimationButtonSet
+      ->GetWidget(VTK_VV_ANIMATION_BUTTON_CANCEL_ID)->SetEnabled(0);
+    }
 }
 
 //----------------------------------------------------------------------------
