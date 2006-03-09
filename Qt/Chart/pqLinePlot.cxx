@@ -113,6 +113,8 @@ void pqLinePlot::layoutPlot(const pqChartAxis& XAxis, const pqChartAxis& YAxis)
 void pqLinePlot::drawPlot(QPainter& painter, const QRect& /*area*/, const pqChartAxis& /*XAxis*/, const pqChartAxis& /*YAxis*/)
 {
   this->Implementation->Pen->drawPolyline(painter, this->Implementation->ScreenCoords);
+  if(this->Implementation->ScreenCoords.size())
+    this->Implementation->Pen->drawPoint(painter, this->Implementation->ScreenCoords.back());
 }
 
 const double pqLinePlot::getDistance(const QPoint& coords) const
