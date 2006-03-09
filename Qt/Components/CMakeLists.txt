@@ -42,6 +42,8 @@ SOURCE_GROUP("Generated" FILES
 ADD_LIBRARY(QtComponents
   pqDelimitedTextParser.cxx
   pqDelimitedTextParser.h
+  pqWaitCursor.cxx
+  pqWaitCursor.h
   QtComponentsExport.h
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}
