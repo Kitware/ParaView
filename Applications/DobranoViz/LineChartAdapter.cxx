@@ -219,6 +219,12 @@ struct LineChartAdapter::pqImplementation
   void clearExperimentSimulationMap()
   {
     this->ExperimentSimulationMap.clear();
+    this->ExperimentImageMap.clear();
+  }
+
+  void setFilePath(const QString& path)
+  {
+    this->CSVFilePath = path;
   }
 
   void startParsingExperimentalData()
@@ -340,6 +346,7 @@ struct LineChartAdapter::pqImplementation
   
   void finishParsingExperimentSimulationMap()
   {
+    // Handle the mapping of experimental data to simulation data
     if(this->CSVSeries.size() < 2)
       return;
 
@@ -355,6 +362,26 @@ struct LineChartAdapter::pqImplementation
     for(int i = 1; i < experimental.size(); ++i)    
       {
       this->ExperimentSimulationMap[experimental[i]] = simulation[i];
+      }
+
+    // Handle the mapping of experimental data to reference images
+    while(this->CSVSeries.size() == 3)
+      {
+      QStringList& images = this->CSVSeries[2];
+      
+      if(experimental.size() != images.size())
+        break;
+
+      for(int i = 1; i < experimental.size(); ++i)
+        {
+        QFileInfo image_info(images[i]);
+        if(image_info.isRelative())
+          image_info = QFileInfo(this->CSVFilePath).absoluteDir().absoluteFilePath(images[i]);
+          
+        this->ExperimentImageMap[experimental[i]] = image_info.absoluteFilePath();
+        }
+        
+      break;   
       }
 
     this->CSVSeries.clear();
@@ -394,6 +421,16 @@ struct LineChartAdapter::pqImplementation
   {
     const int sample_size = data.Values.size() > 2 * this->Samples ? data.Values.size() / this->Samples : 1;
 
+    // Get the reference image (if any) for this plot ...
+    QPixmap reference_image;
+    if(reference_image.load(this->ExperimentImageMap[data.Label]))
+      {
+      if(reference_image.width() > 200 || reference_image.height() > 200)
+        {
+        reference_image = reference_image.scaled(200, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        }
+      }
+
     // Look for matching experimental uncertainty data ...
     for(int i = 0; i != this->ExperimentalUncertainty.size(); ++i)
       {
@@ -426,11 +463,12 @@ struct LineChartAdapter::pqImplementation
         }
     
       this->Chart.getLineChart().addData(
-        new pqLineErrorPlot(
+        new ImageLineErrorPlot(
           new pqNullMarkerPen(plot_pen),
           whisker_pen,
           this->ErrorBarWidth * time_delta,
-          coordinates));
+          coordinates,
+          reference_image));
       
       this->Chart.getLegend().addEntry(
         new pqNullMarkerPen(plot_pen),
@@ -447,9 +485,10 @@ struct LineChartAdapter::pqImplementation
       }
   
     this->Chart.getLineChart().addData(
-      new pqLinePlot(
+      new ImageLinePlot(
         new pqCircleMarkerPen(plot_pen, QSize(3, 3), QPen(plot_pen.color()), QBrush(Qt::white)),
-        coordinates));
+        coordinates,
+        reference_image));
     
     this->Chart.getLegend().addEntry(
         new pqCircleMarkerPen(plot_pen, QSize(3, 3), QPen(plot_pen.color()), QBrush(Qt::white)),
@@ -621,6 +660,8 @@ struct LineChartAdapter::pqImplementation
   bool ShowData;
   bool ShowDifferences;
 
+  /// Temporary storage for file paths during parsing
+  QString CSVFilePath;
   /// Temporary storage for CSV data during parsing
   QVector<QStringList> CSVSeries;
 
@@ -628,6 +669,7 @@ struct LineChartAdapter::pqImplementation
   QVector<ExperimentalUncertaintyT> ExperimentalUncertainty;
   QVector<SimulationUncertaintyT> SimulationUncertainty;
   QMap<QString, QString> ExperimentSimulationMap;
+  QMap<QString, QString> ExperimentImageMap;
 };
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -741,6 +783,7 @@ void LineChartAdapter::loadExperimentalData(const QStringList& files)
 
 void LineChartAdapter::loadExperimentalData(const QString& file)
 {
+  this->Implementation->setFilePath(file);
   pqDelimitedTextParser parser(pqDelimitedTextParser::COLUMN_SERIES, ',');
   QObject::connect(&parser, SIGNAL(startParsing()), this, SLOT(startParsingExperimentalData()));
   QObject::connect(&parser, SIGNAL(parseSeries(const QStringList&)), this, SLOT(parseExperimentalData(const QStringList&)));
@@ -768,6 +811,7 @@ void LineChartAdapter::loadExperimentalUncertainty(const QStringList& files)
 
 void LineChartAdapter::loadExperimentalUncertainty(const QString& file)
 {
+  this->Implementation->setFilePath(file);
   pqDelimitedTextParser parser(pqDelimitedTextParser::COLUMN_SERIES, ',');
   QObject::connect(&parser, SIGNAL(startParsing()), this, SLOT(startParsingExperimentalUncertainty()));
   QObject::connect(&parser, SIGNAL(parseSeries(const QStringList&)), this, SLOT(parseExperimentalUncertainty(const QStringList&)));
@@ -795,6 +839,7 @@ void LineChartAdapter::loadSimulationUncertainty(const QStringList& files)
 
 void LineChartAdapter::loadSimulationUncertainty(const QString& file)
 {
+  this->Implementation->setFilePath(file);
   pqDelimitedTextParser parser(pqDelimitedTextParser::COLUMN_SERIES, ',');
   QObject::connect(&parser, SIGNAL(startParsing()), this, SLOT(startParsingSimulationUncertainty()));
   QObject::connect(&parser, SIGNAL(parseSeries(const QStringList&)), this, SLOT(parseSimulationUncertainty(const QStringList&)));
@@ -822,6 +867,7 @@ void LineChartAdapter::loadExperimentSimulationMap(const QStringList& files)
 
 void LineChartAdapter::loadExperimentSimulationMap(const QString& file)
 {
+  this->Implementation->setFilePath(file);
   pqDelimitedTextParser parser(pqDelimitedTextParser::COLUMN_SERIES, ',');
   QObject::connect(&parser, SIGNAL(startParsing()), this, SLOT(startParsingExperimentSimulationMap()));
   QObject::connect(&parser, SIGNAL(parseSeries(const QStringList&)), this, SLOT(parseExperimentSimulationMap(const QStringList&)));
@@ -834,6 +880,7 @@ void LineChartAdapter::loadSetup(const QStringList& files)
   pqWaitCursor cursor;
   for(int i = 0; i != files.size(); ++i)
     {
+    QFileInfo setup_file_info(files[i]);
     QFile file(files[i]);
     QDomDocument xml_document;
     xml_document.setContent(&file, false);
@@ -849,22 +896,26 @@ void LineChartAdapter::loadSetup(const QStringList& files)
       {
       if(!xml_file.isElement())
         continue;
+
+      QFileInfo file_info(xml_file.toElement().text());
+      if(file_info.isRelative())
+        file_info = setup_file_info.absoluteDir().absoluteFilePath(xml_file.toElement().text());
       
       if(xml_file.nodeName() == "experimental")
         {
-        loadExperimentalData(xml_file.toElement().text());
+        loadExperimentalData(file_info.absoluteFilePath());
         }
       else if(xml_file.nodeName() == "experimental_uncertainty")
         {
-        loadExperimentalUncertainty(xml_file.toElement().text());
+        loadExperimentalUncertainty(file_info.absoluteFilePath());
         }
       else if(xml_file.nodeName() == "simulation_uncertainty")
         {
-        loadSimulationUncertainty(xml_file.toElement().text());
+        loadSimulationUncertainty(file_info.absoluteFilePath());
         }
       else if(xml_file.nodeName() == "experiment_simulation_map")
         {
-        loadExperimentSimulationMap(xml_file.toElement().text());
+        loadExperimentSimulationMap(file_info.absoluteFilePath());
         }
       }
     }
