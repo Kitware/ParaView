@@ -46,6 +46,7 @@ INCLUDE_DIRECTORIES(
   ${QtTesting_SOURCE_DIR}
   ${QtWidgets_BINARY_DIR}
   ${QtWidgets_SOURCE_DIR}
+  ${QtComponents_SOURCE_DIR}
   ${PYTHON_INCLUDE_DIRECTORIES}
   ${ParaQ_SOURCE_DIR}/ParaView/VTK/Graphics
   ${ParaQ_SOURCE_DIR}/ParaView/VTK/Hybrid
@@ -106,6 +107,7 @@ ADD_EXECUTABLE(pqClient WIN32 MACOSX_BUNDLE
 
 TARGET_LINK_LIBRARIES(pqClient
   QtWidgets
+  QtComponents
   QtTesting
   ${PYTHON_LINK_LIBRARIES}
 )

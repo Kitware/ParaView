@@ -21,6 +21,8 @@ class pqChartLegend;
 class pqChartMouseBox;
 class pqChartZoomPan;
 class pqLineChart;
+
+class QMenu;
 class QPrinter;
 
 /// \class pqLineChartWidget
@@ -93,8 +95,8 @@ public:
   ///   The prefered size of the widget.
   virtual QSize sizeHint() const;
 
-  /// Prints the chart using the given print parameters (can also be used to save to PDF, see QPrinter docs for details)
-  void printChart(QPrinter& printer);
+  /// Adds actions to the given menu object
+  void addMenuActions(QMenu& menu);
 
 public slots:
   /// \brief
@@ -104,6 +106,19 @@ public slots:
   /// \brief
   ///   Initiates a repaint of the chart when a change is made.
   void repaintChart();
+
+  /// Prompt the user with a print dialog and print the chart contents
+  void printChart();
+  /// Prints the chart to the given device
+  void printChart(QPrinter& printer);
+  /// Prompt the user for a filename and save the chart as a PDF file
+  void savePDF();
+  /// Save the chart as a PDF file
+  void savePDF(const QStringList&);
+  /// Prompt the user for a filename and save the chart as a PNG file
+  void savePNG();
+  /// Save the chart as a PNG file
+  void savePNG(const QStringList&);
 
 private slots:
   /// \brief
@@ -210,6 +225,7 @@ private:
   pqChartLegend* const Legend; ///< Used to draw the chart legend.
   pqLineChart* const LineChart;  ///< Used to draw the line chart.
   bool MouseDown;          ///< Used for mouse interactions.
+  bool SkipContextMenu; ///< Used to prevent the context menu from appearing during interactive panning
 };
 
 #endif

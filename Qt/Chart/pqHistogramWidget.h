@@ -31,6 +31,7 @@ class pqLineChart;
 
 class QContextMenuEvent;
 class QKeyEvent;
+class QMenu;
 class QMouseEvent;
 class QPainter;
 class QPoint;
@@ -155,8 +156,8 @@ public:
   pqChartZoomPan& getZoomPanHandler() const {return *this->ZoomPan;}
   //@}
 
-  /// Prints the chart to the given device (can also be used to generate PDF output, see QPrinter for details)
-  void printChart(QPrinter& printer);
+  /// Adds actions to a menu for this object
+  void addMenuActions(QMenu& menu);
 
 public slots:
   /// \brief
@@ -184,6 +185,19 @@ public slots:
   /// \brief
   ///   Initiates a repaint of the chart when a change is made.
   void repaintChart();
+
+  /// Prompt the user with a print dialog and print the chart contents
+  void printChart();
+  /// Prints the chart to the given device
+  void printChart(QPrinter& printer);
+  /// Prompt the user for a filename and save the chart as a PDF file
+  void savePDF();
+  /// Save the chart as a PDF file
+  void savePDF(const QStringList&);
+  /// Prompt the user for a filename and save the chart as a PNG file
+  void savePNG();
+  /// Save the chart as a PNG file
+  void savePNG(const QStringList&);
 
 private slots:
   /// \brief
@@ -329,6 +343,7 @@ private:
   int LastBin;                 ///< Stores the last bin click.
   int LastValueX;              ///< Stores the last value click.
   bool MouseDown;              ///< Used for mouse interactions.
+  bool SkipContextMenu;       ///< Used to prevent a popup menu during interactive panning
 };
 
 #endif

@@ -347,14 +347,10 @@ pqObjectHistogramWidget::pqObjectHistogramWidget(QWidget *p) :
   QLabel* const bin_label = new QLabel(tr("Bins:"));
   bin_label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-  QPushButton* const save_button = new QPushButton("Save .pdf");
-  this->connect(save_button, SIGNAL(clicked()), this, SLOT(onSavePDF()));
-
   QHBoxLayout* const hbox = new QHBoxLayout();
   hbox->setMargin(0);
   hbox->addWidget(bin_label);
   hbox->addWidget(&this->Implementation->BinCountSpinBox);
-  hbox->addWidget(save_button);
 
   QVBoxLayout* const vbox = new QVBoxLayout();
   vbox->setMargin(0);
@@ -416,24 +412,4 @@ void pqObjectHistogramWidget::onInputChanged(vtkObject*,unsigned long, void*, vo
 void pqObjectHistogramWidget::onBinCountChanged(int Count)
 {
   this->Implementation->setBinCount(Count);
-}
-
-void pqObjectHistogramWidget::onSavePDF()
-{
-  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save .pdf File:"), this, "fileSavePDFDialog")
-    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(onSavePDF(const QStringList&)));
-    
-  file_dialog->show();
-}
-
-void pqObjectHistogramWidget::onSavePDF(const QStringList& files)
-{
-  for(int i = 0; i != files.size(); ++i)
-    {
-    QPrinter printer(QPrinter::HighResolution);
-    printer.setOutputFormat(QPrinter::PdfFormat);
-    printer.setOutputFileName(files[i]);
-    
-    this->Implementation->HistogramWidget.printChart(printer);
-    }
 }

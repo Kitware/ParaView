@@ -1,4 +1,3 @@
-
 PROJECT(pqChart)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.2)
@@ -11,6 +10,9 @@ IF(NOT QT4_FOUND)
    MESSAGE(SEND_ERROR "Qt4 not found.  Qt4 is required to build QtSNLChart.")
 ENDIF(NOT QT4_FOUND)
 
+INCLUDE_DIRECTORIES(
+  ${QtComponents_SOURCE_DIR}
+)
 
 SET(pqChart_SRCS
   pqAbstractPlot.cxx
@@ -92,7 +94,10 @@ ADD_LIBRARY(pqChart
   ${pqChart_QRC_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(pqChart ${QT_LIBRARIES})
+TARGET_LINK_LIBRARIES(pqChart
+  QtComponents
+  ${QT_LIBRARIES}
+)
 
 
 # -----------------------------------------------------------------------------
@@ -122,7 +127,6 @@ QT4_WRAP_CPP(pqChartPlugin_MOC_SRCS
   pqLineChartWidgetPlugin.h
 )
 
-
 ADD_DEFINITIONS(-DQT_PLUGIN)
 
 ADD_LIBRARY(pqChartPlugin
@@ -130,7 +134,6 @@ ADD_LIBRARY(pqChartPlugin
   ${pqChartPlugin_SRCS}
   ${pqChartPlugin_MOC_SRCS}
 )
-
 
 TARGET_LINK_LIBRARIES(pqChartPlugin 
   pqChart

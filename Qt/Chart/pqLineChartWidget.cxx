@@ -9,20 +9,24 @@
  * \date   September 27, 2005
  */
 
-#include "pqLineChartWidget.h"
-
 #include "pqChartAxis.h"
 #include "pqChartLabel.h"
 #include "pqChartLegend.h"
 #include "pqChartMouseBox.h"
 #include "pqChartZoomPan.h"
 #include "pqLineChart.h"
+#include "pqLineChartWidget.h"
+
+#include <pqConnect.h>
+#include <pqFileDialog.h>
+#include <pqLocalFileDialogModel.h>
 
 #include <QCursor>
 #include <QEvent>
 #include <QFont>
 #include <QFontMetrics>
 #include <QKeyEvent>
+#include <QMenu>
 #include <QPainter>
 #include <QPalette>
 #include <QPixmap>
@@ -48,7 +52,8 @@ pqLineChartWidget::pqLineChartWidget(QWidget *p) :
   YAxis(new pqChartAxis(pqChartAxis::Left)),
   Legend(new pqChartLegend()),
   LineChart(new pqLineChart()),
-  MouseDown(false)
+  MouseDown(false),
+  SkipContextMenu(false)
 {
   // Set up the default Qt properties.
   this->setFocusPolicy(Qt::ClickFocus);
@@ -307,13 +312,7 @@ void pqLineChartWidget::mouseReleaseEvent(QMouseEvent *e)
     this->Mode = pqLineChartWidget::NoMode;
     this->setCursor(Qt::ArrowCursor);
     }
-  else if(e->button() == Qt::RightButton)
-    {
-    // Display the context menu.
-    QContextMenuEvent cme(QContextMenuEvent::Mouse, e->pos(), e->globalPos());
-    QAbstractScrollArea::viewportEvent(&cme);
-    }
-
+    
   e->accept();
 }
 
@@ -361,6 +360,7 @@ void pqLineChartWidget::mouseMoveEvent(QMouseEvent *e)
       }
     else if(e->buttons() == Qt::RightButton)
       {
+      this->SkipContextMenu = true;
       this->Mode = pqLineChartWidget::Pan;
       this->ZoomPan->startInteraction(pqChartZoomPan::Pan);
       }
@@ -429,22 +429,39 @@ void pqLineChartWidget::resizeEvent(QResizeEvent *)
   this->ZoomPan->updateContentSize();
 }
 
+void pqLineChartWidget::addMenuActions(QMenu& menu)
+{
+  menu.addAction("Print Chart")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(printChart()));
+
+  menu.addAction("Save .pdf")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(savePDF()));
+    
+  menu.addAction("Save .png")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(savePNG()));
+}
+
 void pqLineChartWidget::contextMenuEvent(QContextMenuEvent *e)
 {
-  // TODO: Display the default context menu.
   e->accept();
+
+  QMenu popup_menu;
+  this->addMenuActions(popup_menu);
+  popup_menu.exec(QCursor::pos());
 }
 
 bool pqLineChartWidget::viewportEvent(QEvent *e)
 {
-  // Make sure that the context menu is not called for a mouse down.
-  if(e->type() == QEvent::ContextMenu)
+  if(e->type() == QEvent::ContextMenu)  
     {
-    QContextMenuEvent *cme = static_cast<QContextMenuEvent *>(e);
-    if(cme->reason() == QContextMenuEvent::Mouse)
-      return false;
+    if(this->SkipContextMenu)
+      {
+      this->SkipContextMenu = false;
+      e->accept();
+      return true;
+      }
     }
-
+    
   return QAbstractScrollArea::viewportEvent(e);
 }
 
@@ -490,15 +507,62 @@ void pqLineChartWidget::draw(QPainter& painter, QRect area)
     }
 }
 
+void pqLineChartWidget::printChart()
+{
+  QPrinter printer(QPrinter::HighResolution);
+
+  QPrintDialog print_dialog(&printer);
+  if(print_dialog.exec() != QDialog::Accepted)
+    return;
+    
+  this->printChart(printer);
+}
+
 void pqLineChartWidget::printChart(QPrinter& printer)
 {
   QSize viewport_size(this->rect().size());
   viewport_size.scale(printer.pageRect().size(), Qt::KeepAspectRatio);
 
   QPainter painter(&printer);
-  
   painter.setWindow(this->rect());
   painter.setViewport(QRect(0, 0, viewport_size.width(), viewport_size.height()));
 
   this->draw(painter, this->rect());
+}
+
+void pqLineChartWidget::savePDF()
+{
+  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save .pdf File:"), this, "fileSavePDFDialog")
+    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(savePDF(const QStringList&)));
+    
+  file_dialog->show();
+}
+
+void pqLineChartWidget::savePDF(const QStringList& files)
+{
+  for(int i = 0; i != files.size(); ++i)
+    {
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(files[i]);
+    
+    this->printChart(printer);
+    }
+}
+
+void pqLineChartWidget::savePNG()
+{
+  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save .png File:"), this, "fileSavePNGDialog")
+    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(savePNG(const QStringList&)));
+    
+  file_dialog->show();
+}
+
+void pqLineChartWidget::savePNG(const QStringList& files)
+{
+  const QPixmap grab = QPixmap::grabWidget(this);
+  for(int i = 0; i != files.size(); ++i)
+    {
+    grab.save(files[i], "PNG");
+    }
 }

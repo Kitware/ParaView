@@ -7,13 +7,19 @@ SET(QT_USE_QTDESIGNER ON)
 INCLUDE(${QT_USE_FILE})
 
 INCLUDE_DIRECTORIES(
+  ${QtComponents_BINARY_DIR}
 )
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDelimitedTextParser.h
+  pqFileDialog.h
+  pqFileDialogModel.h
+  pqLocalFileDialogModel.h
+  pqServerFileDialogModel.h
 )
 
 SET(UI_FORMS
+  pqFileDialog.ui
 )
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
@@ -40,8 +46,22 @@ SOURCE_GROUP("Generated" FILES
 )
 
 ADD_LIBRARY(QtComponents
+  pqConnect.cxx
+  pqConnect.h
   pqDelimitedTextParser.cxx
   pqDelimitedTextParser.h
+  pqFileDialog.cxx
+  pqFileDialog.h
+  pqFileDialogModel.cxx
+  pqFileDialogModel.h
+  pqLocalFileDialogModel.cxx
+  pqLocalFileDialogModel.h
+  pqServerFileDialogModel.cxx
+  pqServerFileDialogModel.h
+  pqSetData.cxx
+  pqSetData.h
+  pqSetName.cxx
+  pqSetName.h
   pqWaitCursor.cxx
   pqWaitCursor.h
   QtComponentsExport.h
@@ -51,6 +71,9 @@ ADD_LIBRARY(QtComponents
 )
 
 TARGET_LINK_LIBRARIES(QtComponents
+  vtkCommon
+  vtkPVServerCommon
+  vtkClientServer
   ${QT_LIBRARIES}
 )
 

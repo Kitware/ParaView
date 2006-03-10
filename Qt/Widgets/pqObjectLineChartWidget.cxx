@@ -278,16 +278,8 @@ pqObjectLineChartWidget::pqObjectLineChartWidget(QWidget *p) :
   QWidget(p),
   Implementation(new pqImplementation())
 {
-  QPushButton* const save_button = new QPushButton("Save .pdf");
-  this->connect(save_button, SIGNAL(clicked()), this, SLOT(onSavePDF()));
-
-  QHBoxLayout* const hbox = new QHBoxLayout();
-  hbox->setMargin(0);
-  hbox->addWidget(save_button);
-
   QVBoxLayout* const vbox = new QVBoxLayout();
   vbox->setMargin(0);
-  vbox->addLayout(hbox);
   vbox->addWidget(&this->Implementation->LineChartWidget);
   this->setLayout(vbox);
 }
@@ -339,24 +331,4 @@ void pqObjectLineChartWidget::setElements(vtkUnstructuredGrid* Elements)
 void pqObjectLineChartWidget::onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*)
 {
   this->Implementation->onInputChanged();
-}
-
-void pqObjectLineChartWidget::onSavePDF()
-{
-  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save .pdf File:"), this, "fileSavePDFDialog")
-    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(onSavePDF(const QStringList&)));
-    
-  file_dialog->show();
-}
-
-void pqObjectLineChartWidget::onSavePDF(const QStringList& files)
-{
-  for(int i = 0; i != files.size(); ++i)
-    {
-    QPrinter printer(QPrinter::HighResolution);
-    printer.setOutputFormat(QPrinter::PdfFormat);
-    printer.setOutputFileName(files[i]);
-    
-    this->Implementation->LineChartWidget.printChart(printer);
-    }
 }

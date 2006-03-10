@@ -9,6 +9,7 @@ INCLUDE(${QT_USE_FILE})
 INCLUDE_DIRECTORIES(
   ${QtWidgets_BINARY_DIR}
   ${QtWidgets_SOURCE_DIR}
+  ${QtComponents_SOURCE_DIR}
   ${ParaQ_SOURCE_DIR}/Qt/Chart
   ${ParaQ_SOURCE_DIR}/ParaView/VTK/Graphics
   ${ParaQ_SOURCE_DIR}/ParaView/VTK/Hybrid
@@ -19,10 +20,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqConsoleWidget.h
   pqDataSetModel.h
   pqElementInspectorWidget.h
-  pqFileDialog.h
-  pqFileDialogModel.h
   pqImageTip.h
-  pqLocalFileDialogModel.h
   pqMultiView.h
   pqMultiViewFrame.h
   pqMultiViewManager.h
@@ -37,14 +35,12 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineListWidget.h
   pqPlayControlsWidget.h
   pqServerBrowser.h
-  pqServerFileDialogModel.h
   pqSMAdaptor.h
   pqVariableSelectorWidget.h
 )
 
 SET(UI_FORMS
   pqCompoundProxyWizard.ui
-  pqFileDialog.ui
   pqMultiViewFrameMenu.ui
   pqServerBrowser.ui
 )
@@ -76,22 +72,14 @@ SOURCE_GROUP("Generated" FILES
 ADD_LIBRARY(QtWidgets
   pqCompoundProxyWizard.cxx
   pqCompoundProxyWizard.h
-  pqConnect.cxx
-  pqConnect.h
   pqConsoleWidget.cxx
   pqConsoleWidget.h
   pqDataSetModel.cxx
   pqDataSetModel.h
   pqElementInspectorWidget.cxx
   pqElementInspectorWidget.h
-  pqFileDialog.cxx
-  pqFileDialog.h
-  pqFileDialogModel.cxx
-  pqFileDialogModel.h
   pqImageTip.cxx
   pqImageTip.h
-  pqLocalFileDialogModel.cxx
-  pqLocalFileDialogModel.h
   pqMultiView.cxx
   pqMultiView.h
   pqMultiViewFrame.cxx
@@ -138,12 +126,6 @@ ADD_LIBRARY(QtWidgets
   pqServer.h
   pqServerBrowser.cxx
   pqServerBrowser.h
-  pqServerFileDialogModel.cxx
-  pqServerFileDialogModel.h
-  pqSetData.cxx
-  pqSetData.h
-  pqSetName.cxx
-  pqSetName.h
   pqSMAdaptor.cxx
   pqSMAdaptor.h
   pqSMMultiView.cxx

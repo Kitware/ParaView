@@ -9,23 +9,29 @@
  * \date   May 10, 2005
  */
 
-#include "pqHistogramWidget.h"
+#include "pqChartAxis.h"
+#include "pqChartLabel.h"
 #include "pqChartMouseBox.h"
 #include "pqChartValue.h"
 #include "pqChartZoomPan.h"
 #include "pqHistogramChart.h"
 #include "pqHistogramColor.h"
 #include "pqHistogramSelection.h"
+#include "pqHistogramWidget.h"
 #include "pqLineChart.h"
-#include "pqChartAxis.h"
-#include "pqChartLabel.h"
+
+#include <pqConnect.h>
+#include <pqFileDialog.h>
+#include <pqLocalFileDialogModel.h>
 
 #include <QCursor>
 #include <QEvent>
 #include <QKeyEvent>
+#include <QMenu>
 #include <QPainter>
 #include <QPixmap>
 #include <QPrinter>
+#include <QPrintDialog>
 #include <QTimer>
 
 // Set up a margin around the histogram.
@@ -94,7 +100,8 @@ pqHistogramWidget::pqHistogramWidget(QWidget *p) :
   MoveTimer(0),
   LastBin(-1),
   LastValueX(-1),
-  MouseDown(false)
+  MouseDown(false),
+  SkipContextMenu(false)
 {
   // Set up the default Qt properties.
   this->setFocusPolicy(Qt::ClickFocus);
@@ -598,12 +605,6 @@ void pqHistogramWidget::mouseReleaseEvent(QMouseEvent *e)
     this->Mode = pqHistogramWidget::NoMode;
     this->setCursor(Qt::ArrowCursor);
     }
-  else if(e->button() == Qt::RightButton)
-    {
-    // Display the context menu.
-    QContextMenuEvent cme(QContextMenuEvent::Mouse, e->pos(), e->globalPos());
-    QAbstractScrollArea::viewportEvent(&cme);
-    }
 
   e->accept();
 }
@@ -672,6 +673,7 @@ void pqHistogramWidget::mouseMoveEvent(QMouseEvent *e)
       }
     else if(e->buttons() == Qt::RightButton)
       {
+      this->SkipContextMenu = true;
       this->Mode = pqHistogramWidget::Pan;
       this->ZoomPan->startInteraction(pqChartZoomPan::Pan);
       }
@@ -871,20 +873,34 @@ void pqHistogramWidget::resizeEvent(QResizeEvent *)
   this->ZoomPan->updateContentSize();
 }
 
+void pqHistogramWidget::addMenuActions(QMenu& menu)
+{
+  menu.addAction("Print Chart")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(printChart()));
+
+  menu.addAction("Save .pdf")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(savePDF()));
+    
+  menu.addAction("Save .png")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(savePNG()));
+}
+
 void pqHistogramWidget::contextMenuEvent(QContextMenuEvent *e)
 {
-  // TODO: Display the default context menu.
   e->accept();
+  
+  QMenu popup_menu;
+  this->addMenuActions(popup_menu);
+  popup_menu.exec(QCursor::pos());
 }
 
 bool pqHistogramWidget::viewportEvent(QEvent *e)
 {
-  // Make sure that the context menu is not called for a mouse down.
-  if(e->type() == QEvent::ContextMenu)
+  if(e->type() == QEvent::ContextMenu && this->SkipContextMenu)
     {
-    QContextMenuEvent *cme = static_cast<QContextMenuEvent *>(e);
-    if(cme->reason() == QContextMenuEvent::Mouse)
-      return false;
+    this->SkipContextMenu = false;
+    e->accept();
+    return true;
     }
 
   return QAbstractScrollArea::viewportEvent(e);
@@ -948,6 +964,17 @@ void pqHistogramWidget::draw(QPainter& painter, QRect area)
     }
 }
 
+void pqHistogramWidget::printChart()
+{
+  QPrinter printer(QPrinter::HighResolution);
+
+  QPrintDialog print_dialog(&printer);
+  if(print_dialog.exec() != QDialog::Accepted)
+    return;
+    
+  this->printChart(printer);
+}
+
 void pqHistogramWidget::printChart(QPrinter& printer)
 {
   QSize viewport_size(this->rect().size());
@@ -958,4 +985,41 @@ void pqHistogramWidget::printChart(QPrinter& printer)
   painter.setViewport(QRect(0, 0, viewport_size.width(), viewport_size.height()));
 
   this->draw(painter, this->rect());
+}
+
+void pqHistogramWidget::savePDF()
+{
+  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save .pdf File:"), this, "fileSavePDFDialog")
+    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(savePDF(const QStringList&)));
+    
+  file_dialog->show();
+}
+
+void pqHistogramWidget::savePDF(const QStringList& files)
+{
+  for(int i = 0; i != files.size(); ++i)
+    {
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);
+    printer.setOutputFileName(files[i]);
+    
+    this->printChart(printer);
+    }
+}
+
+void pqHistogramWidget::savePNG()
+{
+  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save .png File:"), this, "fileSavePNGDialog")
+    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(savePNG(const QStringList&)));
+    
+  file_dialog->show();
+}
+
+void pqHistogramWidget::savePNG(const QStringList& files)
+{
+  const QPixmap grab = QPixmap::grabWidget(this);
+  for(int i = 0; i != files.size(); ++i)
+    {
+    grab.save(files[i], "PNG");
+    }
 }
