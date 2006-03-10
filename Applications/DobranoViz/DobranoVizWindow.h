@@ -139,8 +139,8 @@ private:
   QAction *PipelineDockAction;
   QDockWidget *HistogramDock;
   QDockWidget *LineChartDock;
-  pqLineChartWidget* LineChart;
-  LineChartAdapter* LineChartAdapter;
+  pqLineChartWidget* LineChartWidget;
+  LineChartAdapter* LineChart;
   QAction *HistogramDockAction;
   QAction *LineChartDockAction;
   pqMultiViewFrame* ActiveView;

@@ -104,8 +104,8 @@ DobranoVizWindow::DobranoVizWindow() :
   PipelineDockAction(0),
   HistogramDock(0),
   LineChartDock(0),
+  LineChartWidget(0),
   LineChart(0),
-  LineChartAdapter(0),
   HistogramDockAction(0),
   LineChartDockAction(0),
   ActiveView(0),
@@ -309,17 +309,17 @@ DobranoVizWindow::DobranoVizWindow() :
   this->LineChartDock->setAllowedAreas(Qt::BottomDockWidgetArea |
       Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-  this->LineChart = new pqLineChartWidget(this->LineChartDock);
-  this->LineChart->setContextMenuPolicy(Qt::CustomContextMenu);
-  this->connect(this->LineChart, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(onLineChartContextMenu(const QPoint&)));
+  this->LineChartWidget = new pqLineChartWidget(this->LineChartDock);
+  this->LineChartWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+  this->connect(this->LineChartWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(onLineChartContextMenu(const QPoint&)));
   
-  this->LineChartAdapter = new ::LineChartAdapter(*this->LineChart);
+  this->LineChart = new ::LineChartAdapter(*this->LineChartWidget);
 
-  this->connect(this->LineChartAdapter, SIGNAL(experimentalDataChanged(const QStringList&)), this, SLOT(onExperimentalDataChanged(const QStringList&)));
+  this->connect(this->LineChart, SIGNAL(experimentalDataChanged(const QStringList&)), this, SLOT(onExperimentalDataChanged(const QStringList&)));
 
   this->ChooseDataCombo = new QComboBox();
-  this->connect(this->ChooseDataCombo, SIGNAL(activated(const QString&)),  this->LineChartAdapter, SLOT(setVisibleData(const QString&)));
-  this->connect(this->LineChartAdapter, SIGNAL(visibleDataChanged(const QString&)), this->ChooseDataCombo, SLOT(setEditText(const QString&)));
+  this->connect(this->ChooseDataCombo, SIGNAL(activated(const QString&)),  this->LineChart, SLOT(setVisibleData(const QString&)));
+  this->connect(this->LineChart, SIGNAL(visibleDataChanged(const QString&)), this->ChooseDataCombo, SLOT(setEditText(const QString&)));
 
   QLabel* const sample_size_label = new QLabel(tr("Samples:"));
   sample_size_label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -328,7 +328,7 @@ DobranoVizWindow::DobranoVizWindow() :
   sample_size_box->setMinimum(2);
   sample_size_box->setMaximum(999999);
   sample_size_box->setValue(50);
-  this->connect(sample_size_box, SIGNAL(valueChanged(int)), this->LineChartAdapter, SLOT(setSamples(int)));
+  this->connect(sample_size_box, SIGNAL(valueChanged(int)), this->LineChart, SLOT(setSamples(int)));
 
   QLabel* const error_bar_size_label = new QLabel(tr("Error Bar Width:"));
   error_bar_size_label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -338,14 +338,14 @@ DobranoVizWindow::DobranoVizWindow() :
   error_bar_size_box->setMaximum(1);
   error_bar_size_box->setSingleStep(0.05);
   error_bar_size_box->setValue(0.5);
-  this->connect(error_bar_size_box, SIGNAL(valueChanged(double)), this->LineChartAdapter, SLOT(setErrorBarWidth(double)));
+  this->connect(error_bar_size_box, SIGNAL(valueChanged(double)), this->LineChart, SLOT(setErrorBarWidth(double)));
 
   QCheckBox* const show_data_button = new QCheckBox(tr("Show Data"));
-  this->connect(show_data_button, SIGNAL(toggled(bool)), this->LineChartAdapter, SLOT(showData(bool)));
+  this->connect(show_data_button, SIGNAL(toggled(bool)), this->LineChart, SLOT(showData(bool)));
   show_data_button->setChecked(true);
 
   QCheckBox* const show_differences_button = new QCheckBox(tr("Show Differences"));
-  this->connect(show_differences_button, SIGNAL(toggled(bool)), this->LineChartAdapter, SLOT(showDifferences(bool)));
+  this->connect(show_differences_button, SIGNAL(toggled(bool)), this->LineChart, SLOT(showDifferences(bool)));
   show_differences_button->setChecked(false);
 
   QHBoxLayout* const hbox5 = new QHBoxLayout();
@@ -361,7 +361,7 @@ DobranoVizWindow::DobranoVizWindow() :
   QVBoxLayout* const vbox = new QVBoxLayout();
   vbox->setMargin(0);
   vbox->addLayout(hbox5);
-  vbox->addWidget(this->LineChart);
+  vbox->addWidget(this->LineChartWidget);
   
   QWidget* const widget = new QWidget();
   widget->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -374,9 +374,9 @@ DobranoVizWindow::DobranoVizWindow() :
   if(this->PipelineList)
     {
     connect(this->PipelineList, SIGNAL(proxySelected(vtkSMProxy*)),
-        this->LineChartAdapter, SLOT(setExodusProxy(vtkSMProxy*)));
+        this->LineChart, SLOT(setExodusProxy(vtkSMProxy*)));
     }
-  connect(this, SIGNAL(serverChanged(pqServer*)), this->LineChartAdapter, SLOT(setServer(pqServer*)));
+  connect(this, SIGNAL(serverChanged(pqServer*)), this->LineChart, SLOT(setServer(pqServer*)));
 
   this->addDockWidget(Qt::BottomDockWidgetArea, this->LineChartDock);
   
@@ -392,7 +392,7 @@ DobranoVizWindow::DobranoVizWindow() :
 
   this->addDockWidget(Qt::BottomDockWidgetArea, this->ElementInspectorDock);
 
-  connect(element_inspector, SIGNAL(elementsChanged(vtkUnstructuredGrid*)), this->LineChartAdapter, SLOT(setExodusElements(vtkUnstructuredGrid*)));
+  connect(element_inspector, SIGNAL(elementsChanged(vtkUnstructuredGrid*)), this->LineChart, SLOT(setExodusElements(vtkUnstructuredGrid*)));
 
   // Set up the view menu items for the dock windows.
   this->PipelineDockAction = viewMenu->addAction(
@@ -457,7 +457,7 @@ DobranoVizWindow::DobranoVizWindow() :
   this->connect(this->PipelineList, SIGNAL(proxySelected(vtkSMProxy *)), SLOT(onProxySelected(vtkSMProxy *)));
   this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), SLOT(onVariableChanged(pqVariableType, const QString&)));
   this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), histogram, SLOT(setVariable(pqVariableType, const QString&)));
-  this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), this->LineChartAdapter, SLOT(setExodusVariable(pqVariableType, const QString&)));
+  this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), this->LineChart, SLOT(setExodusVariable(pqVariableType, const QString&)));
 
   // Compound filter controls
   this->CompoundProxyToolBar = new QToolBar(tr("Compound Proxies"), this) << pqSetName("CompoundProxyToolBar");
@@ -1551,7 +1551,7 @@ void DobranoVizWindow::onLastTimeStep()
 void DobranoVizWindow::onLoadSetup()
 {
   pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Open Setup:"), this, "fileOpenDialog")
-    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChartAdapter, SLOT(loadSetup(const QStringList&)));
+    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChart, SLOT(loadSetup(const QStringList&)));
     
   file_dialog->show();
 }
@@ -1559,7 +1559,7 @@ void DobranoVizWindow::onLoadSetup()
 void DobranoVizWindow::onSavePDF()
 {
   pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save .pdf File:"), this, "fileSavePDFDialog")
-    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChartAdapter, SLOT(savePDF(const QStringList&)));
+    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChart, SLOT(savePDF(const QStringList&)));
     
   file_dialog->show();
 }
@@ -1567,7 +1567,7 @@ void DobranoVizWindow::onSavePDF()
 void DobranoVizWindow::onSavePNG()
 {
   pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save .png File:"), this, "fileSavePNGDialog")
-    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChartAdapter, SLOT(saveImage(const QStringList&)));
+    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChart, SLOT(saveImage(const QStringList&)));
     
   file_dialog->show();
 }
@@ -1575,7 +1575,7 @@ void DobranoVizWindow::onSavePNG()
 void DobranoVizWindow::onLoadExperimentalData()
 {
   pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Open Experimental Data:"), this, "fileOpenDialog")
-    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChartAdapter, SLOT(loadExperimentalData(const QStringList&)));
+    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChart, SLOT(loadExperimentalData(const QStringList&)));
     
   file_dialog->show();
 }
@@ -1583,7 +1583,7 @@ void DobranoVizWindow::onLoadExperimentalData()
 void DobranoVizWindow::onLoadExperimentalUncertainty()
 {
   pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Open Experimental Uncertainty Data:"), this, "fileOpenDialog")
-    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChartAdapter, SLOT(loadExperimentalUncertainty(const QStringList&)));
+    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChart, SLOT(loadExperimentalUncertainty(const QStringList&)));
     
   file_dialog->show();
 }
@@ -1591,7 +1591,7 @@ void DobranoVizWindow::onLoadExperimentalUncertainty()
 void DobranoVizWindow::onLoadSimulationUncertainty()
 {
   pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Open Simulation Uncertainty Data:"), this, "fileOpenDialog")
-    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChartAdapter, SLOT(loadSimulationUncertainty(const QStringList&)));
+    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChart, SLOT(loadSimulationUncertainty(const QStringList&)));
     
   file_dialog->show();
 }
@@ -1599,7 +1599,7 @@ void DobranoVizWindow::onLoadSimulationUncertainty()
 void DobranoVizWindow::onLoadExperimentSimulationMap()
 {
   pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Open Experiment / Simulation Map:"), this, "fileOpenDialog")
-    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChartAdapter, SLOT(loadExperimentSimulationMap(const QStringList&)));
+    << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChart, SLOT(loadExperimentSimulationMap(const QStringList&)));
     
   file_dialog->show();
 }
@@ -1616,17 +1616,17 @@ void DobranoVizWindow::onLineChartContextMenu(const QPoint& position)
   QMenu popup_menu;
 
   popup_menu.addAction("Clear All")
-    << pqConnect(SIGNAL(triggered()), this->LineChartAdapter, SLOT(clearExperimentalData()))
-    << pqConnect(SIGNAL(triggered()), this->LineChartAdapter, SLOT(clearExperimentalUncertainty()))
-    << pqConnect(SIGNAL(triggered()), this->LineChartAdapter, SLOT(clearSimulationUncertainty()))
-    << pqConnect(SIGNAL(triggered()), this->LineChartAdapter, SLOT(clearExperimentSimulationMap()));
+    << pqConnect(SIGNAL(triggered()), this->LineChart, SLOT(clearExperimentalData()))
+    << pqConnect(SIGNAL(triggered()), this->LineChart, SLOT(clearExperimentalUncertainty()))
+    << pqConnect(SIGNAL(triggered()), this->LineChart, SLOT(clearSimulationUncertainty()))
+    << pqConnect(SIGNAL(triggered()), this->LineChart, SLOT(clearExperimentSimulationMap()));
 
   popup_menu.addAction("Load Setup")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onLoadSetup()));
 
   popup_menu.addSeparator();
 
-  this->LineChart->addMenuActions(popup_menu);
+  this->LineChartWidget->addMenuActions(popup_menu);
 
   popup_menu.addSeparator();
   
@@ -1634,7 +1634,7 @@ void DobranoVizWindow::onLineChartContextMenu(const QPoint& position)
     << pqConnect(SIGNAL(triggered()), this, SLOT(onLoadExperimentalData()));
 
   popup_menu.addAction("Clear Experimental Data")
-    << pqConnect(SIGNAL(triggered()), this->LineChartAdapter, SLOT(clearExperimentalData()));
+    << pqConnect(SIGNAL(triggered()), this->LineChart, SLOT(clearExperimentalData()));
 
   popup_menu.addSeparator();
   
@@ -1642,7 +1642,7 @@ void DobranoVizWindow::onLineChartContextMenu(const QPoint& position)
     << pqConnect(SIGNAL(triggered()), this, SLOT(onLoadExperimentalUncertainty()));
 
   popup_menu.addAction("Clear Experimental Uncertainty")
-    << pqConnect(SIGNAL(triggered()), this->LineChartAdapter, SLOT(clearExperimentalUncertainty()));
+    << pqConnect(SIGNAL(triggered()), this->LineChart, SLOT(clearExperimentalUncertainty()));
 
   popup_menu.addSeparator();
   
@@ -1650,7 +1650,7 @@ void DobranoVizWindow::onLineChartContextMenu(const QPoint& position)
     << pqConnect(SIGNAL(triggered()), this, SLOT(onLoadSimulationUncertainty()));
 
   popup_menu.addAction("Clear Simulation Uncertainty")
-    << pqConnect(SIGNAL(triggered()), this->LineChartAdapter, SLOT(clearSimulationUncertainty()));
+    << pqConnect(SIGNAL(triggered()), this->LineChart, SLOT(clearSimulationUncertainty()));
 
   popup_menu.addSeparator();
   
@@ -1658,7 +1658,7 @@ void DobranoVizWindow::onLineChartContextMenu(const QPoint& position)
     << pqConnect(SIGNAL(triggered()), this, SLOT(onLoadExperimentSimulationMap()));
 
   popup_menu.addAction("Clear Experiment / Simulation Map")
-    << pqConnect(SIGNAL(triggered()), this->LineChartAdapter, SLOT(clearExperimentSimulationMap()));
+    << pqConnect(SIGNAL(triggered()), this->LineChart, SLOT(clearExperimentSimulationMap()));
 
   popup_menu.exec(QCursor::pos());
 }
