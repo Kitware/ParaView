@@ -179,6 +179,7 @@ public:
   virtual int HasMainUserInterfaceManager();
   virtual vtkKWUserInterfaceManager* GetMainUserInterfaceManager();
   virtual void ShowMainUserInterface(const char *name);
+  vtkGetObjectMacro(MainSplitFrame, vtkKWSplitFrame);
 
   // Description:
   // Secondary panel. 
@@ -192,6 +193,7 @@ public:
   virtual int HasSecondaryUserInterfaceManager();
   virtual vtkKWUserInterfaceManager* GetSecondaryUserInterfaceManager();
   virtual void ShowSecondaryUserInterface(const char *name);
+  vtkGetObjectMacro(SecondarySplitFrame, vtkKWSplitFrame);
 
   // Description:
   // Set the panel layout type. 
