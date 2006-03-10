@@ -33,6 +33,8 @@ public:
 signals:
   /// Signal emitted when the set of experimental data changes - sends the list of experimental data labels
   void experimentalDataChanged(const QStringList&);
+  /// Signal emitted when the choice of visible data changes
+  void visibleDataChanged(const QString&);
 
 public slots:
   /// Call this to set the current server
@@ -53,7 +55,9 @@ public slots:
   void setSamples(int);
   /// Sets the width of error bars, as a percentage of the distance between samples
   void setErrorBarWidth(double);
-  /// Enables / disables plotting of CSV data differences
+  /// Enables / disables plotting of experimental / simulation data pairs
+  void showData(bool);
+  /// Enables / disables plotting of experimental / simulation difference plots
   void showDifferences(bool);
 
   /// Clears experimental data
@@ -80,10 +84,7 @@ public slots:
   void loadSetup(const QStringList&);
   
   /// Sets the experimental data that should be visible (using its label)
-  void showData(const QString&);
-  
-  /// Saves the chart to a PDF file
-  void savePDF(const QStringList&);
+  void setVisibleData(const QString&);
   
 private slots:
   /// Called when the Exodus data changes

@@ -29,8 +29,8 @@
 #include <QDomDocument>
 #include <QFileInfo>
 #include <QHBoxLayout>
+#include <QMap>
 #include <QMessageBox>
-#include <QPrinter>
 #include <QPushButton>
 #include <QVBoxLayout>
 
@@ -93,7 +93,8 @@ struct LineChartAdapter::pqImplementation
     Chart(chart),
     Samples(50),
     ErrorBarWidth(0.5),
-    Differences(false)
+    ShowData(true),
+    ShowDifferences(false)
   {
     QFont h1;
     h1.setBold(true);
@@ -364,7 +365,7 @@ struct LineChartAdapter::pqImplementation
     this->updateChart();
   }
   
-  void showData(const QString& data)
+  void setVisibleData(const QString& data)
   {
     this->VisibleData = data;
   }
@@ -379,9 +380,14 @@ struct LineChartAdapter::pqImplementation
     this->ErrorBarWidth = width;
   }
   
+  void showData(bool state)
+  {
+    this->ShowData = state;
+  }
+  
   void showDifferences(bool state)
   {
-    this->Differences = state;
+    this->ShowDifferences = state;
   }
   
   void addExperimentalPlot(const ExperimentalDataT& data, const QPen& plot_pen, const QPen& whisker_pen)
@@ -499,14 +505,18 @@ struct LineChartAdapter::pqImplementation
     this->Chart.getYAxis().setValueRange(0.0, 100.0);
     this->Chart.getLegend().clear();
  
-    for(int i = 0; i != ExperimentalData.size(); ++i)
+    // Plot experimental data ...
+    if(this->ShowData)
       {
-      if(ExperimentalData[i].Label != this->VisibleData)
-        continue;
-        
-      const double hue = static_cast<double>(i) / static_cast<double>(ExperimentalData.size());
-      const QColor color = QColor::fromHsvF(hue, 1.0, 0.5);
-      addExperimentalPlot(ExperimentalData[i], QPen(color, 2), QPen(color, 1));
+      for(int i = 0; i != ExperimentalData.size(); ++i)
+        {
+        if(ExperimentalData[i].Label != this->VisibleData)
+          continue;
+          
+        const double hue = static_cast<double>(i) / static_cast<double>(ExperimentalData.size());
+        const QColor color = QColor::fromHsvF(hue, 1.0, 0.5);
+        addExperimentalPlot(ExperimentalData[i], QPen(color, 2), QPen(color, 1));
+        }
       }
     
     if(this->ExodusVariableName.isEmpty())
@@ -529,20 +539,44 @@ struct LineChartAdapter::pqImplementation
       return;
 
     // Plot the corresponding simulation data, if available ...
-    for(int i = 0; i != ExperimentalData.size(); ++i)
+    if(this->ShowData)
       {
-      if(ExperimentalData[i].Label != this->VisibleData)
-        continue;
-        
-      const QString element = this->ExperimentSimulationMap[ExperimentalData[i].Label];
-      if(element.isEmpty())
-        continue;
+      for(int i = 0; i != ExperimentalData.size(); ++i)
+        {
+        if(ExperimentalData[i].Label != this->VisibleData)
+          continue;
+          
+        const QString element = this->ExperimentSimulationMap[ExperimentalData[i].Label];
+        if(element.isEmpty())
+          continue;
 
-      const double hue = static_cast<double>(i) / static_cast<double>(ExperimentalData.size());
-      const QColor color = QColor::fromHsvF(hue, 1.0, 0.5);
-      
-      addSimulationPlot(*reader, element.toInt(), QPen(color, 2, Qt::DashLine));
+        const double hue = static_cast<double>(i) / static_cast<double>(ExperimentalData.size());
+        const QColor color = QColor::fromHsvF(hue, 1.0, 0.5);
+        
+        addSimulationPlot(*reader, element.toInt(), QPen(color, 2, Qt::DashLine));
+        }
       }
+
+/*    
+    // Plot difference data, if available ...
+    if(this->ShowDifference)
+      {
+      for(int i = 0; i != ExperimentalData.size(); ++i)
+        {
+        if(ExperimentalData[i].Label != this->VisibleData)
+          continue;
+          
+        const QString element = this->ExperimentSimulationMap[ExperimentalData[i].Label];
+        if(element.isEmpty())
+          continue;
+
+        const double hue = static_cast<double>(i) / static_cast<double>(ExperimentalData.size());
+        const QColor color = QColor::fromHsvF(hue, 1.0, 0.5);
+        
+        addDifferencePlot(*reader, element.toInt(), QPen(color, 2, Qt::DashLine));
+        }
+      }
+*/
     
     int array_id = -1;
     switch(this->ExodusVariableType)
@@ -561,12 +595,15 @@ struct LineChartAdapter::pqImplementation
 
     this->Chart.getYAxis().getLabel().setText(this->ExodusVariableName);
 
-    unsigned long count = 0;
-    for(vtkstd::vector<unsigned long>::reverse_iterator element = this->ExodusElements.rbegin(); element != this->ExodusElements.rend(); ++element, ++count)
+    if(this->ShowData)
       {
-      const double hue = static_cast<double>(count) / static_cast<double>(ExodusElements.size());
-      const QColor color = QColor::fromHsvF(hue, 1.0, 1.0);
-      addSimulationPlot(*reader, *element, QPen(color, 1));
+      unsigned long count = 0;
+      for(vtkstd::vector<unsigned long>::reverse_iterator element = this->ExodusElements.rbegin(); element != this->ExodusElements.rend(); ++element, ++count)
+        {
+        const double hue = static_cast<double>(count) / static_cast<double>(ExodusElements.size());
+        const QColor color = QColor::fromHsvF(hue, 1.0, 1.0);
+        addSimulationPlot(*reader, *element, QPen(color, 1));
+        }
       }
   }
   
@@ -581,7 +618,8 @@ struct LineChartAdapter::pqImplementation
   QString VisibleData;
   int Samples;
   double ErrorBarWidth;
-  bool Differences;
+  bool ShowData;
+  bool ShowDifferences;
 
   /// Temporary storage for CSV data during parsing
   QVector<QStringList> CSVSeries;
@@ -666,6 +704,13 @@ void LineChartAdapter::setErrorBarWidth(double width)
   this->Implementation->updateChart();
 }
 
+void LineChartAdapter::showData(bool state)
+{
+  pqWaitCursor cursor;
+  this->Implementation->showData(state);
+  this->Implementation->updateChart();
+}
+
 void LineChartAdapter::showDifferences(bool state)
 {
   pqWaitCursor cursor;
@@ -691,6 +736,7 @@ void LineChartAdapter::loadExperimentalData(const QStringList& files)
     
   this->Implementation->updateChart();
   this->emitExperimentalDataChanged();
+  emit visibleDataChanged(this->Implementation->VisibleData);
 }
 
 void LineChartAdapter::loadExperimentalData(const QString& file)
@@ -825,26 +871,16 @@ void LineChartAdapter::loadSetup(const QStringList& files)
 
   this->Implementation->updateChart();
   this->emitExperimentalDataChanged();
+  emit visibleDataChanged(this->Implementation->VisibleData);
 }
 
-void LineChartAdapter::showData(const QString& label)
+void LineChartAdapter::setVisibleData(const QString& label)
 {
   pqWaitCursor cursor;
-  this->Implementation->showData(label);
+  this->Implementation->setVisibleData(label);
   this->Implementation->updateChart();
-}
-
-void LineChartAdapter::savePDF(const QStringList& files)
-{
-  pqWaitCursor cursor;
-  for(int i = 0; i != files.size(); ++i)
-    {
-    QPrinter printer(QPrinter::HighResolution);
-    printer.setOutputFormat(QPrinter::PdfFormat);
-    printer.setOutputFileName(files[i]);
-    
-    this->Implementation->Chart.printChart(printer);
-    }
+  
+  emit visibleDataChanged(this->Implementation->VisibleData);
 }
 
 void LineChartAdapter::onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*)

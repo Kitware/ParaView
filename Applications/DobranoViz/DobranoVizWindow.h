@@ -16,6 +16,7 @@
 
 class LineChartAdapter;
 
+class pqLineChartWidget;
 class pqMultiViewFrame;
 class pqMultiViewManager;
 class pqObjectInspectorWidget;
@@ -37,6 +38,7 @@ class QVTKWidget;
 class QAction;
 class QComboBox;
 class QDockWidget;
+class QPoint;
 class QToolBar;
 class QTreeView;
 class QTabWidget;
@@ -104,14 +106,17 @@ private slots:
   void onNextTimeStep();
   void onLastTimeStep();
 
+  void onLoadSetup();
+  void onSavePDF();
+  void onSavePNG();
+
   void onLoadExperimentalData();
   void onLoadExperimentalUncertainty();
   void onLoadSimulationUncertainty();
   void onLoadExperimentSimulationMap();
-  void onLoadSetup();
-  void onSavePDF();
 
   void onExperimentalDataChanged(const QStringList&);
+  void onLineChartContextMenu(const QPoint&);
   
 private:
   void cleanUpWindow(QVTKWidget *window);
@@ -134,7 +139,8 @@ private:
   QAction *PipelineDockAction;
   QDockWidget *HistogramDock;
   QDockWidget *LineChartDock;
-  LineChartAdapter *LineChart;
+  pqLineChartWidget* LineChart;
+  LineChartAdapter* LineChartAdapter;
   QAction *HistogramDockAction;
   QAction *LineChartDockAction;
   pqMultiViewFrame* ActiveView;
