@@ -51,7 +51,7 @@ void vtkMPISelfConnectionGatherInformationRMI(void *localArg,
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkMPISelfConnection);
-vtkCxxRevisionMacro(vtkMPISelfConnection, "1.1");
+vtkCxxRevisionMacro(vtkMPISelfConnection, "1.2");
 //-----------------------------------------------------------------------------
 vtkMPISelfConnection::vtkMPISelfConnection()
 {
@@ -365,6 +365,7 @@ int vtkMPISelfConnection::LoadModule(const char* name, const char* directory)
   const char* paths[] = { directory, 0};
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int localResult = pm->GetInterpreter()->Load(name, paths);
+
 #ifdef VTK_USE_MPI
   vtkMPICommunicator* communicator = vtkMPICommunicator::SafeDownCast(
     this->Controller->GetCommunicator());
@@ -379,7 +380,7 @@ int vtkMPISelfConnection::LoadModule(const char* name, const char* directory)
   if (numProcs > 1)
     {
     int* results = new int[numProcs];
-    communicator->Gather(&localResult, results, numProcs, 0);
+    communicator->Gather(&localResult, results, 1, 0);
 
     int globalResult = 1;
     if(myid == 0)
