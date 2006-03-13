@@ -37,7 +37,7 @@
 #include <vtksys/stl/algorithm>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.84");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.85");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -806,7 +806,7 @@ int vtkKWParameterValueFunctionEditor::GetFunctionPointCanvasCoordinatesAtParame
            vtkKWParameterValueFunctionEditor::PointPositionCenter ||
            this->GetFunctionPointDimensionality() != 1)
     {
-    *y = vtkMath::Floor(
+    *y = (int)floor(
       (v_w_range[1] - (v_v_range[1] + v_v_range[0]) * 0.5) * factors[1]);
     }
 
