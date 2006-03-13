@@ -353,6 +353,14 @@
         default_values="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+
+      <DoubleVectorProperty
+        name="EyeAngle"
+        command="SetEyeAngle"
+        number_of_elements="1"
+        default_values="2.0">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
     </Proxy> <!-- end of Camera Proxy -->
   </ProxyGroup>
     
@@ -1276,6 +1284,7 @@
           <Property name="CameraParallelScaleInfo" />
           <Property name="CameraParallelScale" />
           <Property name="CameraParallelProjection" />
+          <Property name="EyeAngle" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
