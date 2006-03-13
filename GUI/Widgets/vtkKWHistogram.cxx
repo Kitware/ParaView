@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWHistogram);
-vtkCxxRevisionMacro(vtkKWHistogram, "1.4");
+vtkCxxRevisionMacro(vtkKWHistogram, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWHistogram::vtkKWHistogram()
@@ -862,11 +862,11 @@ vtkImageData* vtkKWHistogram::GetImage(
     if (value >= this->Range[0] && value < this->Range[1])
       {
       bin_real = (value - this->Range[0]) / bin_width;
-      bin      = vtkMath::Floor(bin_real);
+      bin      = (vtkIdType)floor(bin_real);
      
       next_value = desc->Range[0] + x_scale * (double)(x+1);
       next_bin_real = (next_value - this->Range[0]) / bin_width;
-      next_bin       = vtkMath::Floor(next_bin_real);
+      next_bin       = (vtkIdType)floor(next_bin_real);
       if (next_bin > this->GetNumberOfBins())
         {
         next_bin = this->GetNumberOfBins();
