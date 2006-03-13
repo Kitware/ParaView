@@ -22,7 +22,7 @@ public:
   static vtkLocalConeSource* New();
 
 protected:
-  vtkLocalConeSource();
+  vtkLocalConeSource(int res=6);
   ~vtkLocalConeSource();
 
 private:

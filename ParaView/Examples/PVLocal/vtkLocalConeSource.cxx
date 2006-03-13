@@ -6,11 +6,11 @@ wishing to create their own ParaView plugin classes locally.
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkLocalConeSource, "1.2");
+vtkCxxRevisionMacro(vtkLocalConeSource, "1.3");
 vtkStandardNewMacro(vtkLocalConeSource);
 
 //----------------------------------------------------------------------------
-vtkLocalConeSource::vtkLocalConeSource()
+vtkLocalConeSource::vtkLocalConeSource(int /*res*/)
 {
 }
 
