@@ -194,6 +194,9 @@ int main(int argc, char* argv[])
   MPI_Comm_rank(MPI_COMM_WORLD,&myId);
 #endif
 
+  // Create the main window
+  QApplication application(argc, argv);
+
   bool quit = false;
   bool error = false;
 
@@ -205,9 +208,6 @@ int main(int argc, char* argv[])
     
   if(quit)
     return error ? 1 : 0;  
-
-  // Create the main window
-  QApplication application(argc, argv);
 
 /** \todo Figure-out how to export Qt's resource symbols from a DLL, so we can use them here */
 #if !(defined(WIN32) && defined(PARAQ_BUILD_SHARED_LIBS))
