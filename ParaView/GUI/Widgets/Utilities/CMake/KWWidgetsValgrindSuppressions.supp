@@ -1,0 +1,296 @@
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:_dl_relocate_object
+   fun:dl_main
+   fun:_dl_sysdep_start
+   fun:_dl_start
+   obj:/lib/ld-2.3.5.so
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:_dl_relocate_object
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.1
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Free
+}
+{
+   <insert a suppression name here>
+   Memcheck:Cond
+   fun:PyObject_Realloc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Free
+}
+{
+   <insert a suppression name here>
+   Memcheck:Value4
+   fun:PyObject_Realloc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Free
+}
+{
+   <insert a suppression name here>
+   Memcheck:Addr4
+   fun:PyObject_Realloc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:strdup
+   fun:Py_InitializeEx
+   fun:Py_Initialize
+   fun:Py_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib/libpython2.4.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:PyList_New
+   obj:/usr/lib/libpython2.4.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_dl_map_object_deps
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.1
+   fun:_PyImport_GetDynLoadFunc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_dl_new_object
+   fun:_dl_map_object_from_fd
+   fun:_dl_map_object
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.1
+   fun:_PyImport_GetDynLoadFunc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:expand_dynamic_string_token
+   fun:_dl_map_object
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.1
+   fun:_PyImport_GetDynLoadFunc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:realloc
+   obj:/usr/lib/libpython2.4.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:PyThread_allocate_lock
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:PyObject_Malloc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:PyMem_Malloc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:PyStructSequence_InitType
+   fun:initposix
+   obj:/usr/lib/libpython2.4.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   obj:/usr/lib/libpython2.4.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.1
+   fun:_PyImport_GetDynLoadFunc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_dl_check_map_versions
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.1
+   fun:_PyImport_GetDynLoadFunc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:calloc
+   fun:_dl_new_object
+   fun:_dl_map_object_from_fd
+   fun:_dl_map_object
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.1
+   fun:_PyImport_GetDynLoadFunc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:realloc
+   obj:/usr/lib/libpython2.4.so.1.0
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:realloc
+   fun:PyObject_Realloc
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:TclpAlloc
+   fun:Tcl_Alloc
+   fun:TclCreateExecEnv
+   fun:Tcl_CreateInterp
+   fun:Tcl_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:realloc
+   fun:TclpRealloc
+   fun:Tcl_AttemptRealloc
+   fun:Tcl_AttemptSetObjLength
+   fun:AppendUtfToUtfRep
+   fun:TclpNativeJoinPath
+   fun:Tcl_FSJoinPath
+   fun:TclFileDirname
+   fun:Tcl_FileObjCmd
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:Tcl_EvalObjEx
+   fun:Tcl_NamespaceObjCmd
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalEx
+   fun:Tcl_FSEvalFile
+   fun:Tcl_SourceObjCmd
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalObjv
+   fun:Tcl_EvalObjEx
+   fun:Tcl_UplevelObjCmd
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:TclpAlloc
+   fun:Tcl_Alloc
+   fun:TclAllocateFreeObjects
+   fun:Tcl_NewObj
+   fun:TclpInitLibraryPath
+   fun:TclFindEncodings
+   fun:Tcl_FindExecutable
+   fun:Tcl_Main
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN9__gnu_cxx6__poolILb1EE13_M_initializeEPFvPvE
+   obj:/usr/lib/libstdc++.so.6.0.5
+   obj:/usr/lib/libstdc++.so.6.0.5
+   fun:_ZNSs4_Rep9_S_createEjjRKSaIcE
+   obj:/usr/lib/libstdc++.so.6.0.5
+   fun:_ZNSsC1EPKcRKSaIcE
+   fun:_ZN5cmsys11SystemTools18AddTranslationPathEPKcS2_
+   fun:_ZN5cmsys11SystemTools15ClassInitializeEv
+   fun:_Z41__static_initialization_and_destruction_0ii
+   obj:/home/barre/build/CMake-CMake-2-2-cvs-release/bin/ctest
+   obj:/home/barre/build/CMake-CMake-2-2-cvs-release/bin/ctest
+   fun:__libc_csu_init
+   fun:__libc_start_main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_ZN9__gnu_cxx6__poolILb1EE16_M_reserve_blockEjj
+   obj:/usr/lib/libstdc++.so.6.0.5
+   fun:_ZNSs4_Rep9_S_createEjjRKSaIcE
+   obj:/usr/lib/libstdc++.so.6.0.5
+   fun:_ZNSsC1EPKcRKSaIcE
+   fun:_ZN5cmsys11SystemTools18AddTranslationPathEPKcS2_
+   fun:_ZN5cmsys11SystemTools15ClassInitializeEv
+   fun:_Z41__static_initialization_and_destruction_0ii
+   obj:/home/barre/build/CMake-CMake-2-2-cvs-release/bin/ctest
+   obj:/home/barre/build/CMake-CMake-2-2-cvs-release/bin/ctest
+   fun:__libc_csu_init
+   fun:__libc_start_main
+}
