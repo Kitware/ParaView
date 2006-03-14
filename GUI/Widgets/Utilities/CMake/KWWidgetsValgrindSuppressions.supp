@@ -248,6 +248,34 @@
 {
    <insert a suppression name here>
    Memcheck:Leak
+   fun:realloc
+   fun:TclpRealloc
+   fun:Tcl_Realloc
+   fun:Tcl_SetObjLength
+   fun:TclpNativeJoinPath
+   fun:Tcl_FSJoinPath
+   fun:Tcl_FSJoinToPath
+   fun:SetFsPathFromAny
+   fun:Tcl_ConvertToType
+   fun:Tcl_FSConvertToPathType
+   fun:Tcl_FSGetNormalizedPath
+   fun:Tcl_FSOpenFileChannel
+   fun:Tcl_OpenObjCmd
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:TclObjInterpProc
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:Tcl_EvalObjEx
+   fun:Tcl_ForeachObjCmd
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalEx
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
    fun:malloc
    fun:TclpAlloc
    fun:Tcl_Alloc
