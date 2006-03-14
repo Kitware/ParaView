@@ -32,8 +32,8 @@ IF(PARAQ_EMBED_PYTHON)
   SET(PYTHON_LINK_LIBRARIES
     pqPython
     QtPython
-    vtkPVServerCommonPython
-    vtkPVServerManagerPython
+    vtkPVServerCommonPythonD
+    vtkPVServerManagerPythonD
     ${PYTHON_LIBRARIES}
   )
 ENDIF(PARAQ_EMBED_PYTHON)
