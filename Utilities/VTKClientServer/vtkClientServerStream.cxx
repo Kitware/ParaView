@@ -1199,16 +1199,16 @@ int vtkClientServerStream::SetData(const unsigned char* data, size_t length)
 //----------------------------------------------------------------------------
 int vtkClientServerStream::ParseData()
 {
-  // We are not modifying the vector size.  It is safe to use pointers
-  // into it.
-  unsigned char* begin = &*this->Internal->Data.begin();
-  unsigned char* end = &*this->Internal->Data.end();
-
   // Make sure we have at least one byte.
-  if(begin == end)
+  if(this->Internal->Data.empty())
     {
     return 0;
     }
+
+  // We are not modifying the vector size.  It is safe to use pointers
+  // into it.
+  unsigned char* begin = &*this->Internal->Data.begin();
+  unsigned char* end = begin + this->Internal->Data.size();
 
   // Save the byte order.
   int order = *begin;
