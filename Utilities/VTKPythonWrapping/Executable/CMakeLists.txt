@@ -50,15 +50,17 @@ IF(VTK_USE_CARBON)
 ENDIF(VTK_USE_CARBON)
 
 
-FIND_LIBRARY(PYTHON_UTIL_LIBRARY
-  NAMES util
-  PATHS /usr/lib
-  DOC "Utility library needed for pvpython"
-  )
-MARK_AS_ADVANCED(PYTHON_UTIL_LIBRARY)
-IF(PYTHON_UTIL_LIBRARY)
-  SET(PYTHON_UTIL_LIBRARY_LIB ${PYTHON_UTIL_LIBRARY})
-ENDIF(PYTHON_UTIL_LIBRARY)
+IF(NOT APPLE)
+  FIND_LIBRARY(PYTHON_UTIL_LIBRARY
+    NAMES util
+    PATHS /usr/lib
+    DOC "Utility library needed for pvpython"
+    )
+  MARK_AS_ADVANCED(PYTHON_UTIL_LIBRARY)
+  IF(PYTHON_UTIL_LIBRARY)
+    SET(PYTHON_UTIL_LIBRARY_LIB ${PYTHON_UTIL_LIBRARY})
+  ENDIF(PYTHON_UTIL_LIBRARY)
+ENDIF(NOT APPLE)
 
 
 IF (APPLE)
@@ -67,7 +69,7 @@ ENDIF (APPLE)
 
 # Link against all the kit wrappers.
 TARGET_LINK_LIBRARIES(pvpython
-  vtkPVServerManagerPython
+  vtkPVServerManagerPythonD
   vtkCommon 
   vtkFiltering
   vtkIO

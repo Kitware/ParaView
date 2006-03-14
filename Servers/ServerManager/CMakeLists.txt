@@ -234,7 +234,7 @@ IF (PARAVIEW_WRAP_PYTHON)
   SET(Kit_PYTHON_EXTRA_SRCS
     )
   SET(KIT_PYTHON_LIBS
-    vtkPVServerCommonPython vtk${KIT}
+    vtkPVServerCommonPythonD vtk${KIT}
     )
   # Tell vtkWrapPython.cmake to set VTK_PYTHON_LIBRARIES for us.
   SET(VTK_WRAP_PYTHON_FIND_LIBS 1)
