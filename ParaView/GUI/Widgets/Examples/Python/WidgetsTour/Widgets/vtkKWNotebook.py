@@ -1,8 +1,7 @@
 from kwwidgets import vtkKWNotebook
 from kwwidgets import vtkKWApplication
 from kwwidgets import vtkKWWindow
-
-
+from kwwidgets import vtkKWPushButton
 
 def vtkKWNotebookEntryPoint(parent, win):
 
@@ -48,5 +47,19 @@ def vtkKWNotebookEntryPoint(parent, win):
     app.Script(
         "pack %s -side top -anchor nw -expand y -fill both -padx 2 -pady 2", 
         notebook2.GetWidgetName())
+    
+    # -----------------------------------------------------------------------
+
+    # Create a button inside one of the page (as a test)
+
+    page_id = notebook2.AddPage("Button Page")
+    
+    pushbutton1 = vtkKWPushButton()
+    pushbutton1.SetParent(notebook2.GetFrame(page_id))
+    pushbutton1.Create()
+    pushbutton1.SetText("A push button")
+    
+    app.Script("pack %s -side top -anchor c -expand y", 
+                pushbutton1.GetWidgetName())
     
     return "TypeComposite"

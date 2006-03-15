@@ -1,6 +1,7 @@
 #include "vtkKWNotebook.h"
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
+#include "vtkKWPushButton.h"
 
 #include "vtkKWWidgetsTourExample.h"
 
@@ -59,6 +60,22 @@ void vtkKWNotebookItem::Create(vtkKWWidget *parent, vtkKWWindow *)
     notebook2->GetWidgetName());
 
   notebook2->Delete();
+
+  // -----------------------------------------------------------------------
+
+  // Create a button inside one of the page (as a test)
+
+  page_id = notebook2->AddPage("Button Page");
+
+  vtkKWPushButton *pushbutton1 = vtkKWPushButton::New();
+  pushbutton1->SetParent(notebook2->GetFrame(page_id));
+  pushbutton1->Create();
+  pushbutton1->SetText("A push button");
+
+  app->Script("pack %s -side top -anchor c -expand y", 
+              pushbutton1->GetWidgetName());
+
+  pushbutton1->Delete();
 }
 
 int vtkKWNotebookItem::GetType()

@@ -38,6 +38,19 @@ proc vtkKWNotebookEntryPoint {parent win} {
   $notebook2 AddPage "Page B"
 
   pack [$notebook2 GetWidgetName] -side top -anchor nw -expand y -fill both -padx 2 -pady 2
+
+  # -----------------------------------------------------------------------
+
+  # Create a button inside one of the page (as a test)
+
+  set page_id [$notebook2 AddPage "Button Page"] 
+
+  set pushbutton1 [vtkKWPushButton New]
+  $pushbutton1 SetParent [$notebook2 GetFrame $page_id]
+  $pushbutton1 Create
+  $pushbutton1 SetText "A push button"
+
+  pack [$pushbutton1 GetWidgetName] -side top -anchor c -expand y
 }
 
 proc vtkKWNotebookGetType {} {
