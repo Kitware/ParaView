@@ -32,6 +32,21 @@ def vtkKWNotebookEntryPoint(parent, win):
     page_id = notebook1.AddPage("Page Red")
     notebook1.GetFrame(page_id).SetBackgroundColor(0.9, 0.2, 0.2)
     
+    # -----------------------------------------------------------------------
+
+    # Create a notebook inside one of the page (because we can)
+
+    page_id = notebook1.AddPage("Sub Notebook")
+
+    notebook2 = vtkKWNotebook()
+    notebook2.SetParent(notebook1.GetFrame(page_id))
+    notebook2.Create()
     
+    notebook2.AddPage("Page A")
+    notebook2.AddPage("Page B")
+    
+    app.Script(
+        "pack %s -side top -anchor nw -expand y -fill both -padx 2 -pady 2", 
+        notebook2.GetWidgetName())
     
     return "TypeComposite"
