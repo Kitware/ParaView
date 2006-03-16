@@ -89,7 +89,7 @@ public:
   /// Separating the layout and drawing functions improves the
   /// repainting performance.
   ///
-  /// \param p The painter to use.
+  /// \param painter The painter to use.
   /// \param area The area that needs to be painted.
   void drawChart(QPainter& painter, const QRect& area);
   //@}

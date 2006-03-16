@@ -30,9 +30,6 @@ class QRect;
 class QTCHART_EXPORT pqAbstractPlot
 {
 public:
-  /// \brief
-  ///   Creates a line plot instance.
-  /// \param parent The parent object.
   virtual ~pqAbstractPlot() {}
 
   /// Returns the minimum coordinates for the plot

@@ -2,7 +2,7 @@
 /// \file pqObjectInspectorWidget.h
 /// \brief
 ///   The pqObjectInspectorWidget class is used to display the properties
-///   of an object in an editable list.
+///   of an object in an editable form.
 ///
 /// \date 11/25/2005
 
@@ -20,6 +20,11 @@ class QTabWidget;
 class vtkSMProxy;
 class QListWidgetItem;
 
+
+/// \class pqObjectInspectorWidget
+/// \brief
+///   The pqObjectInspectorWidget class is used to display the properties
+///   of an object in an editable form.
 class QTWIDGETS_EXPORT pqObjectInspectorWidget : public QWidget
 {
   Q_OBJECT

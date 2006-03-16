@@ -2,7 +2,7 @@
 /// \file pqPipelineListWidget.h
 /// \brief
 ///   The pqPipelineListWidget class is used to display the pipeline
-///   in the form of a list.
+///   in the form of a tree.
 ///
 /// \date 11/25/2005
 
@@ -19,6 +19,11 @@ class QTreeView;
 class QVTKWidget;
 class vtkSMProxy;
 
+
+/// \class pqPipelineListWidget
+/// \brief
+///   The pqPipelineListWidget class is used to display the pipeline
+///   in the form of a tree.
 class QTWIDGETS_EXPORT pqPipelineListWidget : public QWidget
 {
   Q_OBJECT
