@@ -32,7 +32,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.272");
+vtkCxxRevisionMacro(vtkKWWindow, "1.273");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -82,9 +82,9 @@ vtkKWWindow::vtkKWWindow()
   this->MainPanelVisibilityKeyAccelerator = 
     vtksys::SystemTools::DuplicateString("F5");
   this->HideMainPanelMenuLabel = 
-    vtksys::SystemTools::DuplicateString("Hide Left Panel");
+    vtksys::SystemTools::DuplicateString("Hide Main Panel");
   this->ShowMainPanelMenuLabel = 
-    vtksys::SystemTools::DuplicateString("Show Left Panel");
+    vtksys::SystemTools::DuplicateString("Show Main Panel");
   this->SecondaryPanelSizeRegKey = 
     vtksys::SystemTools::DuplicateString("SecondaryPanelSize");
   this->SecondaryPanelVisibilityRegKey = 
