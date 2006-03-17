@@ -34,7 +34,7 @@ const char *vtkKWText::TagFgDarkGreen = "_fg_dark_green_tag_";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.46");
+vtkCxxRevisionMacro(vtkKWText, "1.47");
 
 //----------------------------------------------------------------------------
 class vtkKWTextInternals
@@ -321,7 +321,9 @@ void vtkKWText::Create()
 
   this->Script("%s tag config %s -foreground #006400", 
                wname, vtkKWText::TagFgDarkGreen);
-  
+
+  this->SetHeight(5);
+
   // Update enable state
 
   this->UpdateEnableState();
