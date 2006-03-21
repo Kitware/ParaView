@@ -30,7 +30,7 @@
 
 #include <QString>
 
-vtkSMDisplayProxy* pqAddPart(vtkSMRenderModuleProxy* rm, vtkSMSourceProxy* Part)
+vtkSMDisplayProxy* pqPart::Add(vtkSMRenderModuleProxy* rm, vtkSMSourceProxy* Part)
 {
   // without this, you will get runtime errors from the part display
   // (connected below). this should be fixed
@@ -61,22 +61,13 @@ vtkSMDisplayProxy* pqAddPart(vtkSMRenderModuleProxy* rm, vtkSMSourceProxy* Part)
   rm->UpdateVTKObjects();
 
   // set default colors for display
-  pqColorPart(partdisplay);
+  pqPart::Color(partdisplay);
 
   // Allow the render module proxy to maintain the part display.
 //  partdisplay->Delete();
 
   return partdisplay;
 }
-
-void pqRemovePart(vtkSMRenderModuleProxy* rm, vtkSMDisplayProxy* Part)
-{
-  vtkSMProxyProperty *pp
-    = vtkSMProxyProperty::SafeDownCast(rm->GetProperty("Displays"));
-  pp->RemoveProxy(Part);
-  rm->UpdateVTKObjects();
-}
-
 
 static void pqGetColorArray(
   vtkPVDataSetAttributesInformation* attrInfo,
@@ -107,7 +98,7 @@ static void pqGetColorArray(
 
 
 /// color the part to its default color
-void pqColorPart(vtkSMDisplayProxy* Part)
+void pqPart::Color(vtkSMDisplayProxy* Part)
 {
   // if the source created a new point scalar, use it
   // else if the source created a new cell scalar, use it
@@ -158,7 +149,7 @@ void pqColorPart(vtkSMDisplayProxy* Part)
   pqGetColorArray(attrInfo, inAttrInfo, arrayInfo);
   if(arrayInfo)
     {
-    pqColorPart(Part, arrayInfo->GetName(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+    pqPart::Color(Part, arrayInfo->GetName(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
     return;
     }
     
@@ -175,7 +166,7 @@ void pqColorPart(vtkSMDisplayProxy* Part)
   pqGetColorArray(attrInfo, inAttrInfo, arrayInfo);
   if(arrayInfo)
     {
-    pqColorPart(Part, arrayInfo->GetName(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+    pqPart::Color(Part, arrayInfo->GetName(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
     return;
     }
     
@@ -204,7 +195,7 @@ void pqColorPart(vtkSMDisplayProxy* Part)
     pqGetColorArray(attrInfo, inAttrInfo, arrayInfo);
     if(arrayInfo)
       {
-      pqColorPart(Part, arrayInfo->GetName(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+      pqPart::Color(Part, arrayInfo->GetName(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
       return;
       }
     }
@@ -216,7 +207,7 @@ void pqColorPart(vtkSMDisplayProxy* Part)
     pqGetColorArray(attrInfo, inAttrInfo, arrayInfo);
     if(arrayInfo)
       {
-      pqColorPart(Part, arrayInfo->GetName(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+      pqPart::Color(Part, arrayInfo->GetName(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
       return;
       }
     }
@@ -266,11 +257,11 @@ void pqColorPart(vtkSMDisplayProxy* Part)
 #endif
 
   // Color by property.
-  pqColorPart(Part, NULL, 0);
+  pqPart::Color(Part, NULL, 0);
 }
 
 /// color the part by a specific field, if fieldname is NULL, colors by actor color
-void pqColorPart(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype)
+void pqPart::Color(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype)
 {
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(Part->GetProperty("LookupTable"));
   pp->RemoveAllProxies();

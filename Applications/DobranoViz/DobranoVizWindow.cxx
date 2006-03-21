@@ -829,7 +829,7 @@ void DobranoVizWindow::onFileSaveScreenshot(const QStringList& Files)
 
   for(int i = 0; i != Files.size(); ++i)
     {
-    if(!pqImageComparison::pqSaveScreenshot(render_window, Files[i]))
+    if(!pqImageComparison::SaveScreenshot(render_window, Files[i]))
       QMessageBox::critical(this, tr("Save Screenshot:"), tr("Error saving file"));
     }
 }
@@ -842,7 +842,7 @@ bool DobranoVizWindow::compareView(const QString& ReferenceImage, double Thresho
   if(!render_window)
     return false;
     
-  return pqImageComparison::pqCompareImage(render_window, ReferenceImage, Threshold, Output, TempDirectory);
+  return pqImageComparison::CompareImage(render_window, ReferenceImage, Threshold, Output, TempDirectory);
 }
 
 void DobranoVizWindow::onServerConnect()
@@ -1385,10 +1385,10 @@ void DobranoVizWindow::onVariableChanged(pqVariableType type, const QString& nam
     switch(type)
       {
       case VARIABLE_TYPE_CELL:
-        pqColorPart(display, name.toAscii().data(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+        pqPart::Color(display, name.toAscii().data(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
         break;
       case VARIABLE_TYPE_NODE:
-        pqColorPart(display, name.toAscii().data(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+        pqPart::Color(display, name.toAscii().data(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
         break;
       }
           

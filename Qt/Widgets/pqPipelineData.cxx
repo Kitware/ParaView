@@ -781,7 +781,7 @@ vtkSMDisplayProxy* pqPipelineData::createDisplay(vtkSMSourceProxy* proxy, vtkSMP
     return NULL;
 
   // Create the display proxy and register it.
-  vtkSMDisplayProxy* display = pqAddPart(module, proxy);
+  vtkSMDisplayProxy* display = pqPart::Add(module, proxy);
   if(display)
     {
     QString name;

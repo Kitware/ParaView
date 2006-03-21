@@ -897,7 +897,7 @@ void pqObjectInspector::updateDisplayProperties(pqObjectInspectorItem* item)
     QString value = item->value().toString();
     if(value == "Default")
       {
-      pqColorPart(display);
+      pqPart::Color(display);
       }
     else
       {
@@ -905,12 +905,12 @@ void pqObjectInspector::updateDisplayProperties(pqObjectInspectorItem* item)
       if(cell)
         {
         value.chop(strlen(" (cell)"));
-        pqColorPart(display, value.toAscii().data(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+        pqPart::Color(display, value.toAscii().data(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
         }
       else
         {
         value.chop(strlen(" (point)"));
-        pqColorPart(display, value.toAscii().data(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+        pqPart::Color(display, value.toAscii().data(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
         }
       }
     }

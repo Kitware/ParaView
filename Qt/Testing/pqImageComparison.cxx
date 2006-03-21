@@ -38,7 +38,7 @@ bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
   return result;
 }
 
-bool pqImageComparison::pqSaveScreenshot(vtkRenderWindow* RenderWindow, const QString& File)
+bool pqImageComparison::SaveScreenshot(vtkRenderWindow* RenderWindow, const QString& File)
 {
   vtkWindowToImageFilter* const capture = vtkWindowToImageFilter::New();
   capture->SetInput(RenderWindow);
@@ -63,7 +63,7 @@ bool pqImageComparison::pqSaveScreenshot(vtkRenderWindow* RenderWindow, const QS
   return success;
 }
 
-bool pqImageComparison::pqCompareImage(vtkRenderWindow* RenderWindow, const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory)
+bool pqImageComparison::CompareImage(vtkRenderWindow* RenderWindow, const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory)
 {
   // Verify the reference image exists
   if(!QFileInfo(ReferenceImage).exists())
@@ -143,4 +143,3 @@ bool pqImageComparison::pqCompareImage(vtkRenderWindow* RenderWindow, const QStr
 
   return false;
 }
-
