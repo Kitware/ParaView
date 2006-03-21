@@ -26,7 +26,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVPlotArraySelection);
-vtkCxxRevisionMacro(vtkPVPlotArraySelection, "1.1");
+vtkCxxRevisionMacro(vtkPVPlotArraySelection, "1.2");
 vtkCxxSetObjectMacro(vtkPVPlotArraySelection, ColorProperty, 
   vtkSMDoubleVectorProperty);
 //-----------------------------------------------------------------------------
@@ -84,8 +84,18 @@ void vtkPVPlotArraySelection::CreateNewGUI()
       button = vtkKWChangeColorButton::SafeDownCast(
         this->ArrayColorButtons->GetItemAsObject(idx));
       }
-    this->Script("grid %s -row %d -column 0 -sticky w",
-      button->GetWidgetName(), idx);
+    vtkKWCheckButton* checkbutton = vtkKWCheckButton::SafeDownCast(
+      this->ArrayCheckButtons->GetItemAsObject(idx));
+    if (checkbutton)
+      {
+      this->Script("grid forget %s", checkbutton->GetWidgetName());
+      this->Script("grid %s %s -row %d -sticky w",
+        button->GetWidgetName(), checkbutton->GetWidgetName(), idx);
+      }
+    else
+      {
+      vtkErrorMacro("There must be same number of checkboxes as color widgets.");
+      }
     }
   
 }

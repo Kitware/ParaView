@@ -43,7 +43,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.83");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.84");
 
 //----------------------------------------------------------------------------
 vtkPVArraySelection::vtkPVArraySelection()
@@ -295,7 +295,7 @@ void vtkPVArraySelection::CreateNewGUI()
       checkButton->Create();
       this->Script("%s SetText {%s}", checkButton->GetTclName(), 
         this->Selection->GetArrayName(idx));
-      this->Script("grid %s -row %d -column 1 -sticky w", checkButton->GetWidgetName(), row);
+      this->Script("grid %s -row %d -sticky w", checkButton->GetWidgetName(), row);
       ++row;
       checkButton->SetCommand(this, "CheckButtonCallback");
       this->ArrayCheckButtons->AddItem(checkButton);
