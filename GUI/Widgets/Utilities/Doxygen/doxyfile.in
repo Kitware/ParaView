@@ -24,7 +24,6 @@ GENERATE_RTF         = NO
 GENERATE_TAGFILE     = "@KWWidgets_BINARY_DIR@/Utilities/Doxygen/KWWidgets.tag"
 
 HAVE_DOT             = YES
-#HAVE_DOT            = NO
 DOT_PATH             = "@DOT_PATH@"
 CLASS_GRAPH          = YES
 COLLABORATION_GRAPH  = YES

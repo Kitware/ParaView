@@ -34,7 +34,7 @@ SET(KWWidgets_MINOR_VERSION 0)
 # We need VTK
 
 IF(NOT VTK_SOURCE_DIR)
-  FIND_PACKAGE(VTK REQUIRED) 
+  FIND_PACKAGE(VTK REQUIRED)
   INCLUDE(${VTK_USE_FILE})
   IF(NOT VTK_WRAP_TCL)
     MESSAGE(FATAL_ERROR "Please set VTK_WRAP_TCL to ON in VTK")
@@ -59,14 +59,14 @@ ENDIF(NOT VTK_SOURCE_DIR)
 # Output directories
 
 IF(NOT LIBRARY_OUTPUT_PATH)
-  SET(LIBRARY_OUTPUT_PATH ${KWWidgets_BINARY_DIR}/bin CACHE INTERNAL 
+  SET(LIBRARY_OUTPUT_PATH ${KWWidgets_BINARY_DIR}/bin CACHE INTERNAL
     "Single output directory for building all libraries.")
 ENDIF(NOT LIBRARY_OUTPUT_PATH)
 SET(KWWidgets_LIBRARY_DIRS ${LIBRARY_OUTPUT_PATH})
 SET(KWWidgets_RUNTIME_DIRS ${LIBRARY_OUTPUT_PATH})
 
 IF(NOT EXECUTABLE_OUTPUT_PATH)
-  SET(EXECUTABLE_OUTPUT_PATH ${KWWidgets_BINARY_DIR}/bin CACHE INTERNAL 
+  SET(EXECUTABLE_OUTPUT_PATH ${KWWidgets_BINARY_DIR}/bin CACHE INTERNAL
     "Single output directory for building all executables.")
 ENDIF(NOT EXECUTABLE_OUTPUT_PATH)
 
@@ -77,7 +77,7 @@ INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
 IF(CMAKE_COMPILER_2005)
   ADD_DEFINITIONS(-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE)
-ENDIF(CMAKE_COMPILER_2005) 
+ENDIF(CMAKE_COMPILER_2005)
 
 SET(BUILD_SHARED_LIBS ${VTK_BUILD_SHARED_LIBS})
 SET(KWWidgets_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
@@ -141,71 +141,71 @@ ENDIF(KWWidgets_BUILD_SHARED_LIBS)
 # Sources
 
 SET(KWWidgets_SRCS
-  vtkKWApplication.cxx 
+  vtkKWApplication.cxx
   vtkKWApplicationSettingsInterface.cxx
   vtkKWBalloonHelpManager.cxx
-  vtkKWCanvas.cxx 
-  vtkKWChangeColorButton.cxx 
-  vtkKWCheckButton.cxx 
+  vtkKWCanvas.cxx
+  vtkKWChangeColorButton.cxx
+  vtkKWCheckButton.cxx
   vtkKWCheckButtonWithChangeColorButton.cxx
-  vtkKWCheckButtonWithPopupFrame.cxx 
+  vtkKWCheckButtonWithPopupFrame.cxx
   vtkKWColorPresetSelector.cxx
   vtkKWColorTransferFunctionEditor.cxx
   vtkKWComboBox.cxx
   vtkKWCompositeWidget.cxx
   vtkKWCoreWidget.cxx
-  vtkKWCornerAnnotationEditor.cxx 
-  vtkKWDialog.cxx 
+  vtkKWCornerAnnotationEditor.cxx
+  vtkKWDialog.cxx
   vtkKWDragAndDropTargetSet.cxx
-  vtkKWEntry.cxx 
+  vtkKWEntry.cxx
   vtkKWEvent.cxx
   vtkKWEventMap.cxx
-  vtkKWExtent.cxx 
+  vtkKWExtent.cxx
   vtkKWFrame.cxx
-  vtkKWFrameWithLabel.cxx 
+  vtkKWFrameWithLabel.cxx
   vtkKWFrameWithScrollbar.cxx
   vtkKWGenericRenderWindowInteractor.cxx
   vtkKWHSVColorSelector.cxx
-  vtkKWHeaderAnnotationEditor.cxx 
+  vtkKWHeaderAnnotationEditor.cxx
   vtkKWHistogram.cxx
   vtkKWHistogramSet.cxx
   vtkKWIcon.cxx
   vtkKWLabel.cxx
-  vtkKWListBox.cxx 
+  vtkKWListBox.cxx
   vtkKWListBoxToListBoxSelectionEditor.cxx
   vtkKWLoadSaveButton.cxx
   vtkKWLoadSaveDialog.cxx
   vtkKWMaterialPropertyWidget.cxx
-  vtkKWMenu.cxx 
-  vtkKWMenuButton.cxx 
-  vtkKWMessage.cxx 
-  vtkKWMessageDialog.cxx 
+  vtkKWMenu.cxx
+  vtkKWMenuButton.cxx
+  vtkKWMessage.cxx
+  vtkKWMessageDialog.cxx
   vtkKWMostRecentFilesManager.cxx
   vtkKWMultiColumnList.cxx
-  vtkKWNotebook.cxx 
-  vtkKWObject.cxx 
+  vtkKWNotebook.cxx
+  vtkKWObject.cxx
   vtkKWParameterValueFunctionEditor.cxx
   vtkKWParameterValueFunctionInterface.cxx
   vtkKWParameterValueHermiteFunctionEditor.cxx
   vtkKWPiecewiseFunctionEditor.cxx
-  vtkKWPopupButton.cxx 
-  vtkKWPopupFrame.cxx 
+  vtkKWPopupButton.cxx
+  vtkKWPopupFrame.cxx
   vtkKWPresetSelector.cxx
-  vtkKWProgressGauge.cxx 
-  vtkKWPushButton.cxx 
-  vtkKWPushButtonWithMenu.cxx 
-  vtkKWRadioButton.cxx 
-  vtkKWRadioButtonSet.cxx 
-  vtkKWRange.cxx 
+  vtkKWProgressGauge.cxx
+  vtkKWPushButton.cxx
+  vtkKWPushButtonWithMenu.cxx
+  vtkKWRadioButton.cxx
+  vtkKWRadioButtonSet.cxx
+  vtkKWRange.cxx
   vtkKWRegistryHelper.cxx
-  vtkKWRenderWidget.cxx 
-  vtkKWResourceUtilities.cxx 
-  vtkKWSaveImageDialog.cxx 
-  vtkKWScalarBarAnnotation.cxx 
+  vtkKWRenderWidget.cxx
+  vtkKWResourceUtilities.cxx
+  vtkKWSaveImageDialog.cxx
+  vtkKWScalarBarAnnotation.cxx
   vtkKWScalarComponentSelectionWidget.cxx
-  vtkKWScale.cxx 
-  vtkKWScaleWithEntry.cxx 
-  vtkKWScrollbar.cxx 
+  vtkKWScale.cxx
+  vtkKWScaleWithEntry.cxx
+  vtkKWScrollbar.cxx
   vtkKWSegmentedProgressGauge.cxx
   vtkKWSelectionFrame.cxx
   vtkKWSelectionFrameLayoutManager.cxx
@@ -218,16 +218,16 @@ SET(KWWidgets_SRCS
   vtkKWSplitFrame.cxx
   vtkKWSurfaceMaterialPropertyWidget.cxx
   vtkKWTclInteractor.cxx
-  vtkKWText.cxx 
+  vtkKWText.cxx
   vtkKWTextPropertyEditor.cxx
   vtkKWThumbWheel.cxx
   vtkKWTkOptions.cxx
   vtkKWTkUtilities.cxx
   vtkKWTkcon.cxx
-  vtkKWToolbar.cxx 
-  vtkKWToolbarSet.cxx 
-  vtkKWTopLevel.cxx 
-  vtkKWTree.cxx 
+  vtkKWToolbar.cxx
+  vtkKWToolbarSet.cxx
+  vtkKWTopLevel.cxx
+  vtkKWTree.cxx
   vtkKWUserInterfaceManager.cxx
   vtkKWUserInterfaceManagerDialog.cxx
   vtkKWUserInterfaceManagerNotebook.cxx
@@ -235,14 +235,14 @@ SET(KWWidgets_SRCS
   vtkKWVolumeMaterialPropertyWidget.cxx
   vtkKWVolumePropertyPresetSelector.cxx
   vtkKWVolumePropertyWidget.cxx
-  vtkKWWidget.cxx 
-  vtkKWWidgetSet.cxx 
-  vtkKWWidgetWithLabel.cxx 
-  vtkKWWidgetWithScrollbars.cxx 
-  vtkKWWidgetWithSpinButtons.cxx 
-  vtkKWWindow.cxx 
-  vtkKWWindowBase.cxx 
-  vtkKWWindowLevelPresetSelector.cxx 
+  vtkKWWidget.cxx
+  vtkKWWidgetSet.cxx
+  vtkKWWidgetWithLabel.cxx
+  vtkKWWidgetWithScrollbars.cxx
+  vtkKWWidgetWithSpinButtons.cxx
+  vtkKWWindow.cxx
+  vtkKWWindowBase.cxx
+  vtkKWWindowLevelPresetSelector.cxx
 # vtkKWColorPicker.cxx
 )
 
@@ -264,7 +264,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkKWParameterValueFunctionInterface.cxx
   vtkKWUserInterfaceManager.cxx
   vtkKWWidgetSet.cxx
-  vtkKWWidgetWithScrollbars.cxx 
+  vtkKWWidgetWithScrollbars.cxx
   ${KWWidgets_UTILS_SRCS}
   ABSTRACT
   )
@@ -288,7 +288,7 @@ IF(WIN32)
     ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ApplicationIcon/vtkKWSetApplicationIconTclCommand.c
     WRAP_EXCLUDE)
 ELSE(WIN32)
-  SET(KWWidgets_SRCS ${KWWidgets_SRCS} 
+  SET(KWWidgets_SRCS ${KWWidgets_SRCS}
     vtkKWUNIXRegistryHelper.cxx)
 ENDIF(WIN32)
 
@@ -304,7 +304,7 @@ MACRO(KWWidgets_AUTOGENERATE_CLASS template build_dir class suffix src_list)
   SET(WidgetType ${class})
   CONFIGURE_FILE(
     ${template}.h.in
-    ${build_dir}/${class}${suffix}.h 
+    ${build_dir}/${class}${suffix}.h
     IMMEDIATE)
   CONFIGURE_FILE(
     ${template}.cxx.in
@@ -316,8 +316,8 @@ ENDMACRO(KWWidgets_AUTOGENERATE_CLASS)
 # The "set of widgets" are automatically generated from some core widgets
 # (i.e., vtkKWCheckButton => vtkKWCheckButtonSet).
 
-FOREACH(WidgetType 
-    vtkKWCheckButton 
+FOREACH(WidgetType
+    vtkKWCheckButton
     vtkKWComboBox
     vtkKWEntry
     vtkKWLabel
@@ -337,8 +337,8 @@ ENDFOREACH(WidgetType)
 # The "labeled widgets" are automatically generated from some core widgets
 # (i.e., vtkKWCheckButton => vtkKWCheckButtonWithLabel)
 
-FOREACH(WidgetType 
-    vtkKWCheckButton 
+FOREACH(WidgetType
+    vtkKWCheckButton
     vtkKWCheckButtonSet
     vtkKWComboBox
     vtkKWEntry
@@ -369,12 +369,12 @@ ENDFOREACH(WidgetType)
 # widgets
 # (i.e., vtkKWText => vtkKWTextWithScrollbars)
 
-FOREACH(WidgetType 
+FOREACH(WidgetType
     vtkKWCanvas
     vtkKWListBox
     vtkKWMultiColumnList
-    vtkKWText 
-    vtkKWTree 
+    vtkKWText
+    vtkKWTree
     )
   KWWidgets_AUTOGENERATE_CLASS(
     ${KWWidgets_TEMPLATES_DIR}/vtkKWWidgetWithScrollbarsSubclass
@@ -388,7 +388,7 @@ ENDFOREACH(WidgetType)
 # core widgets
 # (i.e., vtkKWMenuButton => vtkKWMenuButtonWithSpinButtons)
 
-FOREACH(WidgetType 
+FOREACH(WidgetType
     vtkKWMenuButton
     )
   KWWidgets_AUTOGENERATE_CLASS(
@@ -430,16 +430,16 @@ SUBDIRS(Wrapping)
 INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsWrappingMacros.cmake")
 SET(VTK_WRAP_HINTS ${KWWidgets_SOURCE_DIR}/hints)
 KWWidgets_WRAP_TCL(
-  KWWidgets 
-  KWWidgetsTCL_SRCS 
-  "${KWWidgets_SRCS}" 
-  "vtkKWWidgetsInitializeCommand" 
+  KWWidgets
+  KWWidgetsTCL_SRCS
+  "${KWWidgets_SRCS}"
+  "vtkKWWidgetsInitializeCommand"
   "${KWWidgets_MAJOR_VERSION}.${KWWidgets_MINOR_VERSION}")
 
-SET(KWWidgets_TCL_PACKAGE_INDEX_DIR 
+SET(KWWidgets_TCL_PACKAGE_INDEX_DIR
   ${KWWidgets_BINARY_DIR}/Wrapping/Tcl)
 
-# If needed, copy the Tcl/Tk support files required at run-time 
+# If needed, copy the Tcl/Tk support files required at run-time
 # to initialize Tcl/Tk. This is used by the examples or larger
 # projects that include KWWidgets directly in their source trees.
 
@@ -478,7 +478,7 @@ IF(VTK_WRAP_PYTHON)
   VTK_WRAP_PYTHON3(KWWidgetsPython KWWidgetsPython_SRCS
     "${KWWidgets_SRCS} ${KWWidgetsPythonExtra_SRCS}")
 
-  SET(KWWidgets_PYTHON_MODULE_DIR 
+  SET(KWWidgets_PYTHON_MODULE_DIR
     ${KWWidgets_BINARY_DIR}/Wrapping/Python)
 
   IF(BORLAND)
@@ -486,7 +486,7 @@ IF(VTK_WRAP_PYTHON)
       "EXPORTS\ninitKWWidgetsPython=_initKWWidgetsPython\n")
   ENDIF(BORLAND)
 
-  ADD_LIBRARY(KWWidgetsPythonD ${KWWidgetsPython_SRCS} 
+  ADD_LIBRARY(KWWidgetsPythonD ${KWWidgetsPython_SRCS}
               ${KWWidgetsPythonExtra_SRCS})
   TARGET_LINK_LIBRARIES(KWWidgetsPythonD KWWidgets ${KWWidgetsPython_LIBS})
 
@@ -496,12 +496,12 @@ IF(VTK_WRAP_PYTHON)
 
   IF(NOT KWWidgets_INSTALL_NO_LIBRARIES)
     INSTALL_TARGETS(
-      ${KWWidgets_INSTALL_LIB_DIR} 
-      RUNTIME_DIRECTORY ${KWWidgets_INSTALL_BIN_DIR} 
+      ${KWWidgets_INSTALL_LIB_DIR}
+      RUNTIME_DIRECTORY ${KWWidgets_INSTALL_BIN_DIR}
       KWWidgetsPythonD)
   ENDIF(NOT KWWidgets_INSTALL_NO_LIBRARIES)
 
-  ADD_LIBRARY(KWWidgetsPython MODULE 
+  ADD_LIBRARY(KWWidgetsPython MODULE
     Wrapping/Python/KWWidgetsPythonExtraInit.cxx)
   TARGET_LINK_LIBRARIES(KWWidgetsPython KWWidgetsPythonD)
 
@@ -525,9 +525,9 @@ ENDIF(VTK_WRAP_PYTHON)
 # --------------------------------------------------------------------------
 # Build the library
 
-ADD_LIBRARY(KWWidgets 
-  ${KWWidgetsTCL_SRCS} 
-  ${KWWidgets_SRCS} 
+ADD_LIBRARY(KWWidgets
+  ${KWWidgetsTCL_SRCS}
+  ${KWWidgets_SRCS}
   ${KWWidgets_UTILS_SRCS})
 
 TARGET_LINK_LIBRARIES(KWWidgets vtkCommonTCL)
@@ -557,14 +557,14 @@ ELSE(VTK_WRAP_TCL)
   ENDIF(VTK_USE_PARALLEL OR VTK_USE_PARALLEL_ISSET)
 ENDIF(VTK_WRAP_TCL)
 
-TARGET_LINK_LIBRARIES(KWWidgets 
+TARGET_LINK_LIBRARIES(KWWidgets
   vtkpng
   vtksys)
 
 IF(NOT KWWidgets_INSTALL_NO_LIBRARIES)
   INSTALL_TARGETS(
-    ${KWWidgets_INSTALL_LIB_DIR} 
-    RUNTIME_DIRECTORY ${KWWidgets_INSTALL_BIN_DIR} 
+    ${KWWidgets_INSTALL_LIB_DIR}
+    RUNTIME_DIRECTORY ${KWWidgets_INSTALL_BIN_DIR}
     ${KWWidgets_LIBRARIES})
 ENDIF(NOT KWWidgets_INSTALL_NO_LIBRARIES)
 
@@ -628,7 +628,7 @@ ENDIF(NOT KWWidgets_INSTALL_NO_DEVELOPMENT)
 
 # --------------------------------------------------------------------------
 # The Resources/KWWidgets.rc.in can be configured to be used
-# from examples, samples, or apps. Here are some defaults values. 
+# from examples, samples, or apps. Here are some defaults values.
 # Typically, you should then use:
 # CONFIGURE_FILE(${KWWidgets_RESOURCES_DIR}/KWWidgets.rc.in foo.rc)
 # ADD_EXECUTABLE(... foo.rc)
@@ -653,7 +653,7 @@ SUBDIRS(Utilities/ExportConfiguration)
 # --------------------------------------------------------------------------
 # Build the examples
 # This need to be done *at the end*, so that the installation process
-# goes as far as possible before trying to install the examples; 
+# goes as far as possible before trying to install the examples;
 # examples would stop the install process if they failed to build (say, if a
 # third-party lib like ITK or SOV was broken).
 
