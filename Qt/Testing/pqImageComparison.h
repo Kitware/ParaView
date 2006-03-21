@@ -16,8 +16,15 @@
 class QString;
 class vtkRenderWindow;
 
-QTTESTING_EXPORT bool pqSaveScreenshot(vtkRenderWindow* RenderWindow, const QString& File);
-QTTESTING_EXPORT bool pqCompareImage(vtkRenderWindow* RenderWindow, const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
+/// Provides functionality for generating and comparing reference images for regression testing
+class QTTESTING_EXPORT pqImageComparison
+{
+public:
+  /// Saves the contents of a render window to a file for later use as a reference image
+  static bool pqSaveScreenshot(vtkRenderWindow* RenderWindow, const QString& File);
+  /// Compares the contents of a render window to a reference image, returning true iff the two match within a given threshold
+  static bool pqCompareImage(vtkRenderWindow* RenderWindow, const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
+};
 
 #endif // !_pqImageComparison_h
 

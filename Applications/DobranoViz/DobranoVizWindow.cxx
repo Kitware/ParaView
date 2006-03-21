@@ -829,7 +829,7 @@ void DobranoVizWindow::onFileSaveScreenshot(const QStringList& Files)
 
   for(int i = 0; i != Files.size(); ++i)
     {
-    if(!pqSaveScreenshot(render_window, Files[i]))
+    if(!pqImageComparison::pqSaveScreenshot(render_window, Files[i]))
       QMessageBox::critical(this, tr("Save Screenshot:"), tr("Error saving file"));
     }
 }
@@ -842,7 +842,7 @@ bool DobranoVizWindow::compareView(const QString& ReferenceImage, double Thresho
   if(!render_window)
     return false;
     
-  return pqCompareImage(render_window, ReferenceImage, Threshold, Output, TempDirectory);
+  return pqImageComparison::pqCompareImage(render_window, ReferenceImage, Threshold, Output, TempDirectory);
 }
 
 void DobranoVizWindow::onServerConnect()
