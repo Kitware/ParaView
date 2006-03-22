@@ -27,40 +27,25 @@ ENDIF(PARAQ_VERSION_MINOR MATCHES "[02468]$")
 
 #########################################################################
 # build VTK/Qt support
-SET(VTK_USE_GUISUPPORT ON CACHE BOOL "Build VTK with GUI Support" FORCE)
-SET(VTK_USE_QVTK ON CACHE BOOL "Build VTK with Qt Support" FORCE)
-SET(DESIRED_QT_VERSION 4 CACHE STRING "Use Qt4" FORCE)
+OPTION(PARAQ_BUILD_GUI "Build ParaQ Client. This requires Qt." ON)
+MARK_AS_ADVANCED(PARAQ_BUILD_GUI)
+IF (PARAQ_BUILD_GUI)
+  SET(VTK_USE_GUISUPPORT ON CACHE BOOL "Build VTK with GUI Support" FORCE)
+  SET(VTK_USE_QVTK ON CACHE BOOL "Build VTK with Qt Support" FORCE)
+  SET(DESIRED_QT_VERSION 4 CACHE STRING "Use Qt4" FORCE)
+ENDIF (PARAQ_BUILD_GUI)
 
 
 # Work around CMake 2.2.x FindPythonLibs bug.
 # Do not find Python subdirectory as python debug library.
 SET(PYTHON_DEBUG_LIBRARY "" CACHE FILEPATH "Purposely empty: work around CMake FindPythonLibs bug")
 
-#########################################################################
-# Setup Qt
-FIND_PACKAGE(Qt4)
-SET(QT_USE_QTDESIGNER ON)
-SET(QT_USE_QTXML TRUE)
-# This ensures that the Qt includes dir etc are set properly.
-# We don't need to find the Qt4 package or include the use file
-# in any of the SUBDIRS in this directory.
-INCLUDE(${QT_USE_FILE})
-
-ADD_DEFINITIONS(-DVERSION=${PARAQ_VERSION})
-
-#########################################################################
-# Include the file that most of the environment setup (except GUI).
-SET(ParaView_SOURCE_DIR ${ParaQ_SOURCE_DIR})
-SET(ParaView_BINARY_DIR ${ParaQ_BINARY_DIR})
-INCLUDE(${ParaQ_SOURCE_DIR}/CMake/ParaViewCommon.cmake)
 
 #########################################################################
 # Configure Testing
 OPTION(BUILD_TESTING "Build ParaQ Testing" ON)
 IF(BUILD_TESTING)
-  SET(PARAQ_TEST_DIR
-    ${ParaView_BINARY_DIR}/Testing/Temporary
-  )
+  SET(PARAQ_TEST_DIR    ${ParaQ_BINARY_DIR}/Testing/Temporary)
   MAKE_DIRECTORY(${PARAQ_TEST_DIR})
   ENABLE_TESTING()
   INCLUDE (CTest)
@@ -88,6 +73,12 @@ IF(BUILD_SHARED_LIBS)
 ENDIF(BUILD_SHARED_LIBS)
 
 #########################################################################
+# Include the file that most of the environment setup (except GUI).
+SET(ParaView_SOURCE_DIR ${ParaQ_SOURCE_DIR})
+SET(ParaView_BINARY_DIR ${ParaQ_BINARY_DIR})
+INCLUDE(${ParaQ_SOURCE_DIR}/CMake/ParaViewCommon.cmake)
+
+#########################################################################
 IF(BUILD_DOCUMENTATION)
   SUBDIRS(Utilities/Doxygen)
 ENDIF(BUILD_DOCUMENTATION)
@@ -98,8 +89,12 @@ CONFIGURE_FILE(${ParaView_SOURCE_DIR}/vtkPQConfig.h.in
   ESCAPE_QUOTES)
 
 #########################################################################
-SUBDIRS(GUI)
-
+IF (PARAQ_BUILD_GUI)
+  SUBDIRS(GUI)
+ENDIF (PARAQ_BUILD_GUI)
 
 #########################################################################
-SUBDIRS(Applications)
+OPTION(PARAQ_BUILD_APPLICATIONS "Build Applications suite." ON)
+IF (PARAQ_BUILD_APPLICATIONS)
+  SUBDIRS(Applications)
+ENDIF (PARAQ_BUILD_APPLICATIONS)
