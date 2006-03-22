@@ -13,7 +13,8 @@ ENDIF(INSOURCE)
 SET(PARAQ_VERSION_MAJOR 0)
 SET(PARAQ_VERSION_MINOR 9)
 SET(PARAQ_VERSION_PATCH 0)
-SET(PARAQ_VERSION ${PARAQ_VERSION_MAJOR}.${PARAQ_VERSION_MINOR})
+SET(PARAQ_VERSION "${PARAQ_VERSION_MAJOR}.${PARAQ_VERSION_MINOR}")
+SET(PARAQ_VERSION_FULL "${PARAQ_VERSION}.${PARAQ_VERSION_PATCH}")
 
 # See VTK/CMakeLists.txt for an explanation of this default selection.
 IF(PARAQ_VERSION_MINOR MATCHES "[02468]$")
@@ -79,6 +80,11 @@ ENDIF(BUILD_SHARED_LIBS)
 IF(BUILD_DOCUMENTATION)
   SUBDIRS(Utilities/Doxygen)
 ENDIF(BUILD_DOCUMENTATION)
+
+#########################################################################
+CONFIGURE_FILE(${ParaView_SOURCE_DIR}/vtkPQConfig.h.in
+  ${ParaView_BINARY_DIR}/vtkPQConfig.h
+  ESCAPE_QUOTES)
 
 #########################################################################
 SUBDIRS(GUI)

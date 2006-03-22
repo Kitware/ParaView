@@ -15,7 +15,7 @@
 #endif // PARAQ_EMBED_PYTHON
 
 #include <pqCompoundProxyWizard.h>
-#include <pqConfig.h>
+#include <vtkPQConfig.h>
 #include <pqConnect.h>
 #include <pqDataSetModel.h>
 #include <pqElementInspectorWidget.h>
@@ -121,7 +121,7 @@ pqMainWindow::pqMainWindow() :
   CurrentProxy(0)
 {
   this->setObjectName("mainWindow");
-  this->setWindowTitle(QByteArray("ParaQ Client") + QByteArray(" ") + QByteArray(QT_CLIENT_VERSION));
+  this->setWindowTitle(QByteArray("ParaQ Client") + QByteArray(" ") + QByteArray(PARAQ_VERSION_FULL));
 
   // Set up the main ParaQ items along with the central widget.
   this->Adaptor = new pqSMAdaptor();
@@ -237,7 +237,7 @@ pqMainWindow::pqMainWindow() :
   QMenu* const helpMenu = this->menuBar()->addMenu(tr("&Help"))
     << pqSetName("helpMenu");
 
-  helpMenu->addAction(QString(tr("&About %1 %2")).arg("ParaQ").arg(QT_CLIENT_VERSION))
+  helpMenu->addAction(QString(tr("&About %1 %2")).arg("ParaQ").arg(PARAQ_VERSION_FULL))
     << pqSetName("About")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onHelpAbout()));
 

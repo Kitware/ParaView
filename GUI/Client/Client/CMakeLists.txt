@@ -117,6 +117,3 @@ IF(BUILD_TESTING)
   ADD_TEST(QtClientCompoundProxy  ${TEST_BINARY} --run-test ${TEST_XML}/CompoundProxy.xml --exit)
 ENDIF(BUILD_TESTING)
 
-CONFIGURE_FILE(${QtClient_SOURCE_DIR}/pqConfig.h.in
-               ${QtClient_BINARY_DIR}/pqConfig.h)
-
