@@ -11,8 +11,6 @@ SET(QT_USE_QTXML TRUE)
 # in any of the SUBDIRS in this directory.
 INCLUDE(${QT_USE_FILE})
 
-ADD_DEFINITIONS(-DVERSION=${PARAQ_VERSION})
-
 #########################################################################
 # Include Qt dependent code.
 SUBDIRS(Widgets)
