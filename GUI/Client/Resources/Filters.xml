@@ -2175,7 +2175,7 @@ The Pick filter operates on any type of data and produces unstructured grid outp
           root_name="DataAnalysis"
           module_type="Filter"
           button_image="PVDataAnalysisButton"
-          button_help="Pick a cell or point and display its attributes."
+          button_help="Analyze point or cell data by selecting a point or cell and plot the data over time."
           long_help="Sample point data at a point or along a line or by point id. Select cell at a point or by cell id. Data can be plotted on an XY plot."
           short_help="Pick a cell or point.">
     <Filter class="vtkDataAnalysisFilter">
@@ -2198,15 +2198,15 @@ The Pick filter operates on any type of data and produces unstructured grid outp
     <SelectWidget label="Query Method"
                   trace_name="QueryMethod"
                   property="Mode">
-      <Item label="Point" value="0">
-        <PointSourceWidget trace_name="Point" default_radius="0" input_menu="im"
-          default_number_of_points="1" show_entries="0" bind_radius_to_input="0"
-          property="Source"/>
-      </Item>
       <Item label="Cell" value="1">
         <PointWidget trace_name="Point" variable="WorldPoint"
           help="Pick cell or point closest to this world point. The 'p' key can be used to select a point under the cursor."
           />
+      </Item>
+      <Item label="Point (Interpolated)" value="0">
+        <PointSourceWidget trace_name="Point" default_radius="0" input_menu="im"
+          default_number_of_points="1" show_entries="0" bind_radius_to_input="0"
+          property="Source"/>
       </Item>
       <Item label="Line" value="0">
         <LineSourceWidget trace_name="Line" input_menu="im" property="Source"/>

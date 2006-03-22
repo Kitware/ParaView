@@ -2465,7 +2465,7 @@
      <IntVectorProperty name="Mode"
         command="SetMode"
         number_of_elements="1"
-        default_values="0">
+        default_values="1">
         <EnumerationDomain name="enum">
           <Entry text="Probe" value="0" />
           <Entry text="Pick" value="1" />
@@ -2486,7 +2486,7 @@
      <IntVectorProperty name="PickCell"
         command="SetPickCell"
         number_of_elements="1"
-        default_values="0">
+        default_values="1">
         <BooleanDomain name="bool" />
      </IntVectorProperty>
      <DoubleVectorProperty
