@@ -23,20 +23,9 @@ INCLUDE_DIRECTORIES(
   ${QtWidgets_BINARY_DIR}
   ${QtWidgets_SOURCE_DIR}
   ${PYTHON_INCLUDE_DIRECTORIES}
-  ${ParaQ_SOURCE_DIR}/ParaView/Servers/Common
-  ${ParaQ_SOURCE_DIR}/ParaView/Servers/Filters
-  ${ParaQ_SOURCE_DIR}/ParaView/Servers/ServerManager
-  ${ParaQ_SOURCE_DIR}/ParaView/Utilities/VTKClientServer
-  ${ParaQ_BINARY_DIR}/ParaView/Utilities/VTKClientServer
-  ${ParaQ_SOURCE_DIR}/ParaView/VTK/Common
-  ${ParaQ_SOURCE_DIR}/ParaView/VTK/Filtering
-  ${ParaQ_SOURCE_DIR}/ParaView/VTK/Graphics
-  ${ParaQ_SOURCE_DIR}/ParaView/VTK/GUISupport/Qt
-  ${ParaQ_SOURCE_DIR}/ParaView/VTK/Hybrid
-  ${ParaQ_SOURCE_DIR}/ParaView/VTK/IO
-  ${ParaQ_SOURCE_DIR}/ParaView/VTK/Rendering
-  ${ParaQ_SOURCE_DIR}/Components/GeoViz
-  ${ParaQ_BINARY_DIR}/ParaView/VTK
+  ${VTK_INCLUDE_DIR}
+  ${ParaQ_SOURCE_DIR}/VTK/GUISupport/Qt
+  ${PARAVIEW_INCLUDE_DIRS}
 )
 IF(VTK_USE_MPI)
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})

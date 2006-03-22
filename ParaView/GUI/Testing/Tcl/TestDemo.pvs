@@ -1,8 +1,0 @@
-set kw(vtkTemp1) [$Application GetMainWindow]
-set kw(vtkTemp22) [$kw(vtkTemp1) GetMainView]
-
-source [file join [file dirname [info script]] CommandLineOptions.tcl]
-ParseCommandLine $kw(vtkTemp22) $argv $argc
-
-$Application PlayDemo 1
-$Application Exit
