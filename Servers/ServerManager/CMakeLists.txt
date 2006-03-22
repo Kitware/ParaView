@@ -296,9 +296,15 @@ SET_SOURCE_FILES_PROPERTIES(vtkSMApplication.cxx PROPERTIES OBJECT_DEPENDS
   ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h)
 
 IF(NOT PV_INSTALL_NO_LIBRARIES)
+  SET (tcl_kit_to_install)
+  IF (PARAVIEW_BUILD_GUI)
+    SET (tcl_kit_to_install
+      vtk${KIT}TCL)
+  ENDIF (PARAVIEW_BUILD_GUI)
+    
   INSTALL_TARGETS(${PV_INSTALL_LIB_DIR}
-    vtk${KIT}TCL
     vtk${KIT}
+    ${tcl_kit_to_install}
     )
 ENDIF(NOT PV_INSTALL_NO_LIBRARIES)
 IF(NOT PV_INSTALL_NO_RUNTIME)
