@@ -1,6 +1,14 @@
+# Configuration options that can be exported
+
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/vtkKWWidgetsConfigure.h.in 
   ${KWWidgets_BINARY_DIR}/vtkKWWidgetsConfigure.h)
+
+# Configuration options that are relevant to the build tree only
+
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkKWWidgetsBuildConfigure.h.in 
+  ${KWWidgets_BINARY_DIR}/vtkKWWidgetsBuildConfigure.h)
 
 IF(NOT KWWidgets_INSTALL_NO_DEVELOPMENT)
   INSTALL_FILES(${KWWidgets_INSTALL_INCLUDE_DIR} FILES 

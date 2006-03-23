@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWWidgetsConfigure.h.in
+  Module:    vtkKWWidgetsBuildConfigure.h.in
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,11 +11,19 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __vtkKWWidgetsConfigure_h
-#define __vtkKWWidgetsConfigure_h
+#ifndef __vtkKWWidgetsBuildConfigure_h
+#define __vtkKWWidgetsBuildConfigure_h
 
-#cmakedefine KWWidgets_BUILD_SHARED_LIBS
-#cmakedefine KWWidgets_USE_HTML_HELP
-#cmakedefine KWWidgets_USE_INTERNATIONALIZATION
+#ifndef KWWidgets_TclTk_INSTALL_LIB_DIR
+#define KWWidgets_TclTk_INSTALL_LIB_DIR "${KWWidgets_TclTk_INSTALL_LIB_DIR}"
+#endif
+
+#ifndef KWWidgets_INSTALL_DATA_DIR
+#define KWWidgets_INSTALL_DATA_DIR "${KWWidgets_INSTALL_DATA_DIR}"
+#endif
+
+#ifndef VTK_USE_VIDEO_FOR_WINDOWS
+#cmakedefine VTK_USE_VIDEO_FOR_WINDOWS
+#endif
 
 #endif
