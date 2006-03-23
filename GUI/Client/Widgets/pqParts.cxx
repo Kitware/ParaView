@@ -1,13 +1,34 @@
-// -*- c++ -*-
+/*=========================================================================
 
-/*
- * Copyright 2004 Sandia Corporation.
- * Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
- * license for use of this work by or on behalf of the
- * U.S. Government. Redistribution and use in source and binary forms, with
- * or without modification, are permitted provided that this Notice and any
- * statement of authorship are reproduced on all copies.
- */
+   Program:   ParaQ
+   Module:    pqParts.cxx
+
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaQ is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaQ license version 1.1. 
+
+   See License_v1.1.txt for the full ParaQ license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=========================================================================*/
 
 #include "pqParts.h"
 
@@ -268,7 +289,7 @@ void pqPart::Color(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype
   
   if(fieldname == 0)
     {
-    pqSMAdaptor::instance()->setProperty(Part, Part->GetProperty("ScalarVisibility"), 0);
+    pqSMAdaptor::setElementProperty(Part, Part->GetProperty("ScalarVisibility"), 0);
     }
   else
     {
@@ -288,8 +309,8 @@ void pqPart::Color(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype
     vtkSMObject::GetProxyManager()->RegisterProxy("lookup_tables",
         name.toAscii().data(), lut);
 
-    pqSMAdaptor::instance()->setProperty(Part, Part->GetProperty("ScalarVisibility"), 1);
-    pqSMAdaptor::instance()->setProperty(Part, Part->GetProperty("ScalarMode"), fieldtype);
+    pqSMAdaptor::setElementProperty(Part, Part->GetProperty("ScalarVisibility"), 1);
+    pqSMAdaptor::setEnumerationProperty(Part, Part->GetProperty("ScalarMode"), fieldtype);
 
     vtkPVArrayInformation* ai;
 
@@ -312,19 +333,21 @@ void pqPart::Color(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype
       vtkSMProxy* reader = pp->GetProxy(0);
       while((pp = vtkSMProxyProperty::SafeDownCast(reader->GetProperty("Input"))))
         reader = pp->GetProxy(0);
-      QList<QVariant> property;
-      property += fieldname;
-      property += 1;
+      QList<QVariant> prop;
+      prop += fieldname;
+      prop += 1;
+      QList<QList<QVariant> > property;
+      property.push_back(prop);
       if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
         {
-        pqSMAdaptor::instance()->setProperty(reader, reader->GetProperty("CellArrayStatus"), 0, property);
+        pqSMAdaptor::setSelectionProperty(reader, reader->GetProperty("CellArrayStatus"), property);
         reader->UpdateVTKObjects();
         vtkPVDataInformation* geomInfo = Part->GetGeometryInformation();
         ai = geomInfo->GetCellDataInformation()->GetArrayInformation(fieldname);
         }
       else
         {
-        pqSMAdaptor::instance()->setProperty(reader, reader->GetProperty("PointArrayStatus"), 0, property);
+        pqSMAdaptor::setSelectionProperty(reader, reader->GetProperty("PointArrayStatus"), property);
         reader->UpdateVTKObjects();
         vtkPVDataInformation* geomInfo = Part->GetGeometryInformation();
         ai = geomInfo->GetPointDataInformation()->GetArrayInformation(fieldname);
@@ -338,8 +361,8 @@ void pqPart::Color(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype
     QList<QVariant> tmp;
     tmp += range[0];
     tmp += range[1];
-    pqSMAdaptor::instance()->setProperty(lut, lut->GetProperty("ScalarRange"), tmp);
-    pqSMAdaptor::instance()->setProperty(Part, Part->GetProperty("ColorArray"), fieldname);
+    pqSMAdaptor::setMultipleElementProperty(lut, lut->GetProperty("ScalarRange"), tmp);
+    pqSMAdaptor::setElementProperty(Part, Part->GetProperty("ColorArray"), fieldname);
     lut->UpdateVTKObjects();
     }
 

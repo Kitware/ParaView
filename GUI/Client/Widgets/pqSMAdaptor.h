@@ -19,6 +19,8 @@ class QWidget;
 #include "QtWidgetsExport.h"
 #include <QObject>
 #include <QVariant>
+#include <QList>
+#include "pqSMProxy.h"
 
 /// Translates server manager events into Qt-compatible slots and signals
 class QTWIDGETS_EXPORT pqSMAdaptor : public QObject
@@ -29,26 +31,81 @@ public:
   pqSMAdaptor();
   ~pqSMAdaptor();
 
+  /// enumeration for types of properties this class handles
+  enum PropertyType
+    {
+    UNKNOWN,
+    PROXY,
+    PROXYLIST,
+    SELECTION,
+    ENUMERATION,
+    SINGLE_ELEMENT,
+    MULTIPLE_ELEMENTS
+    };
+
 
   /// Get the global adapter instance.
   static pqSMAdaptor* instance();
 
-  /// Set the specified property of a proxy property index 0 is assumed if Value is not a QList
-  void setProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QVariant Value);
-  /// Get the specified property of a proxy if property has more than one element, 
-  /// a QList is returned or
-  /// a QList<QList<QVariant>> ( a list of name/value pairs can be returned -- these names are omitted when setting the property )
-  QVariant getProperty(vtkSMProxy* Proxy, vtkSMProperty* Property);
-  
-  /// Set the specified property of a proxy
-  void setProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index, QVariant Value);
-  /// Get the specified property of a proxy
-  QVariant getProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index);
+  /// Get the type of the property
+  static PropertyType getPropertyType(vtkSMProperty* Property);
 
-  /// Get the domain of a property
-  QVariant getPropertyDomain(vtkSMProperty* Property);
+  /// get the proxy for a property, for example, glyph filter accepts a source (proxy) to glyph with
+  static pqSMProxy getProxyProperty(vtkSMProxy* Proxy, vtkSMProperty* Property);
+  /// get the proxy for a property, for example, glyph filter accepts a source (proxy) to glyph with
+  static void setProxyProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, pqSMProxy Value);
   
+  /// get the list of proxies for a property, for example, append filter accepts a list of proxies
+  static QList<pqSMProxy> getProxyListProperty(vtkSMProxy* Proxy, vtkSMProperty* Property);
+  /// get the list of proxies for a property, for example, append filter accepts a list of proxies
+  static void setProxyListProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QList<pqSMProxy> Value);
+
+  /// get the list of possible proxies for a property
+  static QList<pqSMProxy> getProxyPropertyDomain(vtkSMProxy* Proxy, vtkSMProperty* Property);
+
+
+  /// get the pairs of selections for a selection property
+  static QList<QList<QVariant> > getSelectionProperty(vtkSMProxy* Proxy, vtkSMProperty* Property);
+  /// set the pairs of selections for a selection property
+  static void setSelectionProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QList<QList<QVariant> > Value);
+  /// get the possible names for the selection property
+  static QList<QVariant> getSelectionPropertyDomain(vtkSMProperty* Property);
   
+  /// get the enumeration for a property
+  static QVariant getEnumerationProperty(vtkSMProxy* Proxy, vtkSMProperty* Property);
+  /// set the enumeration for a property
+  static void setEnumerationProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QVariant Value);
+  /// get the possible enumerations (string) for a property
+  static QList<QVariant> getEnumerationPropertyDomain(vtkSMProperty* Property);
+
+  /// get the single element of a property (integer, string, real, etc..)
+  static QVariant getElementProperty(vtkSMProxy* Proxy, vtkSMProperty* Property);
+  /// set the single element of a property (integer, string, real, etc..)
+  static void setElementProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QVariant Value);
+  /// get the range of possible values to set the single element of a property
+  static QList<QVariant> getElementPropertyDomain(vtkSMProperty* Property);
+  
+  /// get the multiple elements of a property (integer, string, real, etc..)
+  static QList<QVariant> getMultipleElementProperty(vtkSMProxy* Proxy, vtkSMProperty* Property);
+  /// set the multiple elements of a property (integer, string, real, etc..)
+  static void setMultipleElementProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QList<QVariant> Value);
+  /// get the ranges of possible values to set the multiple elements of a property
+  static QList<QList<QVariant> > getMultipleElementPropertyDomain(vtkSMProperty* Property);
+  /// get one of the multiple elements of a property (integer, string, real, etc..)
+  static QVariant getMultipleElementProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index);
+  /// set one of the multiple elements of a property (integer, string, real, etc..)
+  static void setMultipleElementProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index, QVariant Value);
+  /// get one of the ranges of possible values to set the multiple elements of a property
+  static QList<QVariant> getMultipleElementPropertyDomain(vtkSMProperty* Property, int Index);
+
+private:
+  void setProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QVariant QtProperty);
+  QVariant getProperty(vtkSMProxy* Proxy, vtkSMProperty* Property);
+  void setProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index, QVariant QtProperty);
+  QVariant getProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index);
+  QVariant pqSMAdaptor::getPropertyDomain(vtkSMProperty* Property);
+public:
+
   // Property Linking
 
   /// Link a property of a proxy to a property of a QObject. The QObject property follows the vtkSMProperty.

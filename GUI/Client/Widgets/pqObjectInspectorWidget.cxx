@@ -1,10 +1,34 @@
+/*=========================================================================
 
-/// \file pqObjectInspectorWidget.cxx
-/// \brief
-///   The pqObjectInspectorWidget class is used to display the properties
-///   of an object in an editable list.
-///
-/// \date 11/25/2005
+   Program:   ParaQ
+   Module:    pqObjectInspectorWidget.cxx
+
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaQ is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaQ license version 1.1. 
+
+   See License_v1.1.txt for the full ParaQ license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=========================================================================*/
 
 #include "pqObjectInspectorWidget.h"
 
@@ -214,7 +238,7 @@ void pqObjectInspectorWidget::setupCustomForm(vtkSMProxy* proxy, QWidget* w)
         // TODO: handle domains changes, during timesteps
         adapter->linkPropertyTo(proxy, prop, 0, sb, "value");
         adapter->linkPropertyTo(sb, "value", SIGNAL(valueChanged(int)), proxy, prop, 0);
-        QList<QVariant> range = adapter->getPropertyDomain(prop).toList();
+        QList<QVariant> range = adapter->getElementPropertyDomain(prop);
         sb->setMinimum(range[0].toInt());
         sb->setMaximum(range[1].toInt());
         this->connect(sb, SIGNAL(valueChanged(int)), SLOT(updateDisplayForPropertyChanged()), Qt::QueuedConnection);
@@ -222,10 +246,10 @@ void pqObjectInspectorWidget::setupCustomForm(vtkSMProxy* proxy, QWidget* w)
       QListWidget* lw = qobject_cast<QListWidget*>(widgetProperty);
       if(lw)
         {
-        QList<QVariant> items = adapter->getProperty(proxy, prop).toList();
+        QList<QList<QVariant> > items = adapter->getSelectionProperty(proxy, prop);
         for(int i=0; i<items.size(); i++)
           {
-          QList<QVariant> item = items[i].toList();
+          QList<QVariant> item = items[i];
           QString name = item[0].toString();
           pqCustomFormListItem* lwItem = new pqCustomFormListItem(name, lw);
           adapter->linkPropertyTo(proxy, prop, i, lwItem, "value");

@@ -1,9 +1,34 @@
+/*=========================================================================
 
-/// \file pqObjectInspector.cxx
-/// \brief
-///   The pqObjectInspector class is a model for an object's properties.
-///
-/// \date 11/7/2005
+   Program:   ParaQ
+   Module:    pqObjectInspector.cxx
+
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaQ is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaQ license version 1.1. 
+
+   See License_v1.1.txt for the full ParaQ license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=========================================================================*/
 
 #include "pqObjectInspector.h"
 
@@ -249,16 +274,40 @@ QVariant pqObjectInspector::data(const QModelIndex &idx, int role) const
             QStringList names = dom.toStringList();
             return QVariant(names[item->value().toInt()]);
             }
+          else if(item->value().value<pqSMProxy>())
+            {
+            pqSMProxy p = item->value().value<pqSMProxy>();
+            pqPipelineObject* o = pqPipelineData::instance()->getObjectFor(p);
+            if(o)
+              {
+              return pqPipelineData::instance()->getObjectFor(p)->GetProxyName();
+              }
+            else
+              {
+              return QString("No Name");
+              }
+            }
           else
+            {
             return QVariant(item->value().toString());
+            }
           }
         }
       case Qt::EditRole:
         {
         if(idx.column() == 0)
           return QVariant(item->propertyName());
+        else if(item->value().value<pqSMProxy>())
+          {
+          pqSMProxy p = item->value().value<pqSMProxy>();
+          QVariant v;
+          v.setValue(p);
+          return v;
+          }
         else
+          {
           return item->value();
+          }
         }
       }
     }
@@ -279,7 +328,7 @@ bool pqObjectInspector::setData(const QModelIndex &idx,
       // coming from the delegate might not preserve the correct
       // property type.
       QVariant localValue = value;
-      if(localValue.convert(item->value().type()))
+      if(localValue.type() == QVariant::UserType || localValue.convert(item->value().type()))
         {
         item->setValue(localValue);
 
@@ -430,10 +479,10 @@ void pqObjectInspector::setProxy(vtkSMProxy *sourceProxy)
         possibles.append(name);
         }
       // also include unloaded arrays if any
-      QList<QVariant> extraCellArrays = adapter->getProperty(reader->GetProxy(), reader->GetProxy()->GetProperty("CellArrayStatus")).toList();
+      QList<QList<QVariant> > extraCellArrays = adapter->getSelectionProperty(reader->GetProxy(), reader->GetProxy()->GetProperty("CellArrayStatus"));
       for(i=0; i<extraCellArrays.size(); i++)
         {
-        QList<QVariant> cell = extraCellArrays[i].toList();
+        QList<QVariant> cell = extraCellArrays[i];
         if(cell[1] == false)
           {
           possibles.append(cell[0].toString() + " (cell)");
@@ -449,20 +498,20 @@ void pqObjectInspector::setProxy(vtkSMProxy *sourceProxy)
         possibles.append(name);
         }
       // also include unloaded arrays if any
-      QList<QVariant> extraPointArrays = adapter->getProperty(reader->GetProxy(), reader->GetProxy()->GetProperty("PointArrayStatus")).toList();
+      QList<QList<QVariant> > extraPointArrays = adapter->getSelectionProperty(reader->GetProxy(), reader->GetProxy()->GetProperty("PointArrayStatus"));
       for(i=0; i<extraPointArrays.size(); i++)
         {
-        QList<QVariant> cell = extraPointArrays[i].toList();
+        QList<QVariant> cell = extraPointArrays[i];
         if(cell[1] == false)
           {
           possibles.append(cell[0].toString() + " (point)");
           }
         }
 
-      if(adapter->getProperty(display, display->GetProperty("ScalarVisibility")) == true)
+      if(adapter->getElementProperty(display, display->GetProperty("ScalarVisibility")) == true)
         {
-        QString fieldname = adapter->getProperty(display, display->GetProperty("ColorArray")).toString();
-        QVariant fieldtype = adapter->getProperty(display, display->GetProperty("ScalarMode"));
+        QString fieldname = adapter->getElementProperty(display, display->GetProperty("ColorArray")).toString();
+        QVariant fieldtype = adapter->getElementProperty(display, display->GetProperty("ScalarMode"));
         if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
           {
           item->setValue(QString(fieldname) + " (cell)");
@@ -506,70 +555,89 @@ void pqObjectInspector::setProxy(vtkSMProxy *sourceProxy)
       if(prop->GetInformationOnly())
         continue;
 
-      QVariant value = adapter->getProperty(propertyProxy, prop);
-      if(!value.isValid())
-        continue;
+      pqSMAdaptor::PropertyType pt = adapter->getPropertyType(prop);
 
-      // Add the valid property to the list. If the property value
-      // is a list, create child items. Link the values to the vtk
-      // properties.
-      item = new pqObjectInspectorItem();
-      if(item)
+      if(pt != pqSMAdaptor::UNKNOWN)
         {
+        item = new pqObjectInspectorItem();
         item->setParent(this->Internal->Parameters);
         this->Internal->Parameters->addChild(item);
-
         item->setPropertyName(iter->GetKey());
-        if(value.type() == QVariant::List)
+        
+        if(pt == pqSMAdaptor::PROXY)
           {
-          QList<QVariant> list = value.toList();
-          QList<QVariant>::Iterator li = list.begin();
-          for(int i = 0; li != list.end(); ++li, ++i)
-            {
-            QString num;
-            QVariant subvalue;
-            if(li->type() == QVariant::List)
-              {
-              QList<QVariant> sublist = li->toList();
-              num = sublist[0].toString();
-              subvalue = sublist[1];
-              }
-            else
-              {
-              num.setNum(i + 1);
-              subvalue = *li;
-              }
-
-            child = new pqObjectInspectorItem();
-            if(child)
-              {
-              child->setPropertyName(num);
-              child->setValue(subvalue);
-              child->setParent(item);
-              item->addChild(child);
-              adapter->linkPropertyTo(propertyProxy, prop, i,
-                  child, "value");
-              connect(child, SIGNAL(valueChanged(pqObjectInspectorItem *)),
-                  this, SLOT(handleValueChange(pqObjectInspectorItem *)));
-              }
-            }
+          pqSMProxy p = adapter->getProxyProperty(propertyProxy, prop);
+          QVariant v;
+          v.setValue(p);
+          item->setValue(v);
+          adapter->linkPropertyTo(propertyProxy, prop, 0, item, "value");
+          connect(item, SIGNAL(valueChanged(pqObjectInspectorItem *)),
+              this, SLOT(handleValueChange(pqObjectInspectorItem *)));
           }
-        else
+        else if(pt == pqSMAdaptor::SINGLE_ELEMENT)
           {
+          QVariant value = adapter->getElementProperty(propertyProxy, prop);
           item->setValue(value);
           adapter->linkPropertyTo(propertyProxy, prop, 0, item, "value");
           connect(item, SIGNAL(valueChanged(pqObjectInspectorItem *)),
               this, SLOT(handleValueChange(pqObjectInspectorItem *)));
           }
+        else if(pt == pqSMAdaptor::ENUMERATION)
+          {
+          QVariant value = adapter->getEnumerationProperty(propertyProxy, prop);
+          item->setValue(value);
+          adapter->linkPropertyTo(propertyProxy, prop, 0, item, "value");
+          connect(item, SIGNAL(valueChanged(pqObjectInspectorItem *)),
+              this, SLOT(handleValueChange(pqObjectInspectorItem *)));
+          }
+        else if(pt == pqSMAdaptor::SELECTION)
+          {
+          QList<QList<QVariant> > list = adapter->getSelectionProperty(propertyProxy, prop);
+          QList<QList<QVariant> >::Iterator li = list.begin();
+          for(int i = 0; li != list.end(); ++li, ++i)
+            {
+            QString num = (*li)[0].toString();
+            QVariant subvalue = (*li)[1];
+            child = new pqObjectInspectorItem();
+            child->setPropertyName(num);
+            child->setValue(subvalue);
+            child->setParent(item);
+            item->addChild(child);
+            adapter->linkPropertyTo(propertyProxy, prop, i,
+                child, "value");
+            connect(child, SIGNAL(valueChanged(pqObjectInspectorItem *)),
+                this, SLOT(handleValueChange(pqObjectInspectorItem *)));
+            }
+          }
+        else if(pt == pqSMAdaptor::MULTIPLE_ELEMENTS)
+          {
+          QList<QVariant> list = adapter->getMultipleElementProperty(propertyProxy, prop);
+          QList<QVariant>::Iterator li = list.begin();
+          for(int i = 0; li != list.end(); ++li, ++i)
+            {
+            QString num;
+            num.setNum(i+1);
+            QVariant subvalue = *li;
+            child = new pqObjectInspectorItem();
+            child->setPropertyName(num);
+            child->setValue(subvalue);
+            child->setParent(item);
+            item->addChild(child);
+            adapter->linkPropertyTo(propertyProxy, prop, i,
+                child, "value");
+            connect(child, SIGNAL(valueChanged(pqObjectInspectorItem *)),
+                this, SLOT(handleValueChange(pqObjectInspectorItem *)));
+            }
+          }
+        }
 
         // Set up the property domain information and link it to the server.
-        item->updateDomain(prop);
+        item->updateDomain(this->Proxy, prop);
         // TODO  fix pqSMAdaptor to recognize QObject deletions
         /*
         adapter->connectDomain(prop, item,
             SLOT(updateDomain(vtkSMProperty*)));
             */
-        }
       }
     iter->Delete();
 
@@ -651,8 +719,8 @@ void pqObjectInspector::setProxy(vtkSMProxy *sourceProxy)
       mem.sprintf("%g MBytes", dataInfo->GetMemorySize()/1000.0);
       item->setValue(mem);
 
-      QVariant timeSteps = adapter->getProperty(dataInfoProxy, dataInfoProxy->GetProperty("TimestepValues"));
-      if(timeSteps.type() == QVariant::List)
+      QVariant timeSteps = adapter->getMultipleElementProperty(dataInfoProxy, dataInfoProxy->GetProperty("TimestepValues"));
+      if(timeSteps.isValid())
         {
         item = new pqObjectInspectorItem();
         item->setParent(this->Internal->Information);
@@ -788,7 +856,25 @@ void pqObjectInspector::commitChange(pqObjectInspectorItem *item)
     idx = this->itemIndex(item);
     prop = this->Proxy->GetProperty(
         item->parent()->propertyName().toAscii().data());
-    adapter->setProperty(this->Proxy, prop, idx, item->value());
+    pqSMAdaptor::PropertyType pt = pqSMAdaptor::getPropertyType(prop);
+    if(pt == pqSMAdaptor::SELECTION)
+      {
+      QList<QList<QVariant> > selproperty;
+      QList<QVariant> seldomain = adapter->getSelectionPropertyDomain(prop);
+      QList<QVariant> selprop;
+      selprop.push_back(seldomain[idx]);
+      selprop.push_back(item->value());
+      selproperty.push_back(selprop);
+      adapter->setSelectionProperty(this->Proxy, prop, selproperty);
+      }
+    else if(pt == pqSMAdaptor::MULTIPLE_ELEMENTS)
+      {
+      adapter->setMultipleElementProperty(this->Proxy, prop, idx, item->value());
+      }
+    else
+      {
+      assert("asdf" == NULL);
+      }
     }
   else if(item->parent() && item->childCount() > 0)
     {
@@ -796,18 +882,57 @@ void pqObjectInspector::commitChange(pqObjectInspectorItem *item)
     pqObjectInspectorItem *child = 0;
     prop = this->Proxy->GetProperty(
         item->propertyName().toAscii().data());
-    for(idx = 0; idx < item->childCount(); idx++)
+    pqSMAdaptor::PropertyType pt = pqSMAdaptor::getPropertyType(prop);
+    if(pt == pqSMAdaptor::SELECTION)
       {
-      child = item->child(idx);
-      adapter->setProperty(this->Proxy, prop, idx, child->value());
-      child->setModified(false);
+      assert("asdf" == NULL);
+      }
+    else if(pt == pqSMAdaptor::MULTIPLE_ELEMENTS)
+      {
+      for(idx = 0; idx < item->childCount(); idx++)
+        {
+        child = item->child(idx);
+        adapter->setMultipleElementProperty(this->Proxy, prop, idx, child->value());
+        child->setModified(false);
+        }
+      }
+    else
+      {
+      assert("asdf" == NULL);
       }
     }
   else
     {
-    prop = this->Proxy->GetProperty(
-        item->propertyName().toAscii().data());
-    adapter->setProperty(this->Proxy, prop, 0, item->value());
+    if(item->parent() == this->Internal->Display)
+      {
+      pqPipelineObject* pqObject = pqPipelineData::instance()->getObjectFor(this->Proxy);
+      vtkSMDisplayProxy* display = pqObject->GetDisplayProxy();
+      prop = display->GetProperty(item->propertyName().toAscii().data());
+      }
+    else
+      {
+      prop = this->Proxy->GetProperty(item->propertyName().toAscii().data());
+      }
+    pqSMAdaptor::PropertyType pt = pqSMAdaptor::getPropertyType(prop);
+    if(pt == pqSMAdaptor::PROXY)
+      {
+      adapter->setProxyProperty(this->Proxy, prop, item->value().value<pqSMProxy>());
+      }
+    else if(pt == pqSMAdaptor::ENUMERATION)
+      {
+      adapter->setEnumerationProperty(this->Proxy, prop, item->value());
+      }
+    else if(pt == pqSMAdaptor::SINGLE_ELEMENT)
+      {
+      adapter->setElementProperty(this->Proxy, prop, item->value());
+      }
+    else if(pt == pqSMAdaptor::UNKNOWN)
+      {
+      }
+    else
+      {
+      assert("asdf" == NULL);
+      }
     }
 }
 

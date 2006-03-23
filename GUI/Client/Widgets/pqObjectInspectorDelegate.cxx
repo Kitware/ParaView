@@ -1,14 +1,37 @@
+/*=========================================================================
 
-/// \file pqObjectInspectorDelegate.cxx
-/// \brief
-///   The pqObjectInspectorDelegate class is used to edit the
-///   pqObjectInspector model from the view.
-///
-/// \date 11/7/2005
+   Program:   ParaQ
+   Module:    pqObjectInspectorDelegate.cxx
+
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
+
+   ParaQ is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaQ license version 1.1. 
+
+   See License_v1.1.txt for the full ParaQ license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=========================================================================*/
 
 #include "pqObjectInspectorDelegate.h"
 
-#include "pqObjectInspector.h"
 
 #include <QAbstractItemModel>
 #include <QComboBox>
@@ -20,6 +43,10 @@
 #include <QStringList>
 #include <QVariant>
 
+#include "pqObjectInspector.h"
+#include "pqSMProxy.h"
+#include "pqPipelineData.h"
+#include "pqPipelineObject.h"
 
 pqObjectInspectorDelegate::pqObjectInspectorDelegate(QObject *p)
   : QItemDelegate(p)
@@ -81,12 +108,31 @@ QWidget *pqObjectInspectorDelegate::createEditor(QWidget *p,
       }
     }
   else if(data.type() == QVariant::String && 
-         (domain.type() == QVariant::StringList || domain.type() == QVariant::List ))
+         (domain.canConvert(QVariant::StringList)))
     {
     QStringList names = domain.toStringList();
     QComboBox *combo = new QComboBox(p);
     for(QStringList::Iterator it = names.begin(); it != names.end(); ++it)
       combo->addItem(*it);
+    editor = combo;
+    }
+  else if(data.value<pqSMProxy>())
+    {
+    QList<QVariant> proxies = domain.toList();
+    QComboBox *combo = new QComboBox(p);
+    foreach(QVariant v, proxies)
+      {
+      pqSMProxy proxy = v.value<pqSMProxy>();
+      pqPipelineObject* o = pqPipelineData::instance()->getObjectFor(proxy);
+      if(o)
+        {
+        combo->addItem(o->GetProxyName());
+        }
+      else
+        {
+        combo->addItem("No Name");
+        }
+      }
     editor = combo;
     }
 
@@ -97,6 +143,7 @@ QWidget *pqObjectInspectorDelegate::createEditor(QWidget *p,
   if(editor)
     editor->installEventFilter(const_cast<pqObjectInspectorDelegate *>(this));
   return editor;
+        
 }
 
 void pqObjectInspectorDelegate::setEditorData(QWidget *editor,
@@ -117,6 +164,14 @@ void pqObjectInspectorDelegate::setEditorData(QWidget *editor,
     else if(data.type() == QVariant::String)
       {
       combo->setCurrentIndex(combo->findText(data.toString()));
+      }
+    else if(data.value<pqSMProxy>())
+      {
+      pqPipelineObject* o = pqPipelineData::instance()->getObjectFor(data.value<pqSMProxy>());
+      if(o)
+        {
+        combo->setCurrentIndex(combo->findText(o->GetProxyName()));
+        }
       }
     return;
     }
@@ -139,6 +194,9 @@ void pqObjectInspectorDelegate::setEditorData(QWidget *editor,
 void pqObjectInspectorDelegate::setModelData(QWidget *editor,
     QAbstractItemModel *model, const QModelIndex &index) const
 {
+  const pqObjectInspector *realmodel = qobject_cast<const pqObjectInspector *>(
+      index.model());
+
   QVariant value;
   QVariant data = model->data(index, Qt::EditRole);
   QComboBox *combo = qobject_cast<QComboBox *>(editor);
@@ -147,6 +205,12 @@ void pqObjectInspectorDelegate::setModelData(QWidget *editor,
     if(data.type() == QVariant::String)
       {
       value = combo->currentText();
+      }
+    else if(data.value<pqSMProxy>())
+      {
+      QList<QVariant> domain = realmodel->domain(index).toList();
+      int currentIndex = combo->currentIndex();
+      value = domain[currentIndex];
       }
     else
       {

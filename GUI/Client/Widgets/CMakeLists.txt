@@ -122,6 +122,8 @@ ADD_LIBRARY(QtWidgets
   pqSMAdaptor.h
   pqSMMultiView.cxx
   pqSMMultiView.h
+  pqSMProxy.cxx
+  pqSMProxy.h
   pqSourceProxyInfo.cxx
   pqSourceProxyInfo.h
   pqVariableSelectorWidget.cxx

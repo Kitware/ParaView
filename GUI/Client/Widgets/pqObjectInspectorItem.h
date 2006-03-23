@@ -15,6 +15,7 @@
 
 class pqObjectInspectorItemInternal;
 class vtkSMProperty;
+class vtkSMProxy;
 
 
 /// \class pqObjectInspectorItem
@@ -141,7 +142,7 @@ public slots:
   /// \param property The property to get domain information from.
   /// \sa pqObjectInspectorItem::convertLimit(const char *, int),
   ///     pqObjectInspectorDelegate
-  void updateDomain(vtkSMProperty *property);
+  void updateDomain(vtkSMProxy* proxy, vtkSMProperty *property);
 
 signals:
   /// \brief
