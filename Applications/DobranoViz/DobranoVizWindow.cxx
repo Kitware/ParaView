@@ -653,9 +653,9 @@ void DobranoVizWindow::onFileOpen(const QStringList& Files)
       source = this->Pipeline->createSource("ExodusReader", win);
       this->CurrentServer->GetProxyManager()->RegisterProxy("paraq", "source1", source);
       source->Delete();
-      Adaptor->setProperty(source, source->GetProperty("FileName"), file);
-      Adaptor->setProperty(source, source->GetProperty("FilePrefix"), file);
-      Adaptor->setProperty(source, source->GetProperty("FilePattern"), "%s");
+      pqSMAdaptor::setElementProperty(source, source->GetProperty("FileName"), file);
+      pqSMAdaptor::setElementProperty(source, source->GetProperty("FilePrefix"), file);
+      pqSMAdaptor::setElementProperty(source, source->GetProperty("FilePattern"), "%s");
       source->UpdateVTKObjects();
       this->Pipeline->setVisibility(this->Pipeline->createDisplay(source), true);
       }
@@ -1329,11 +1329,11 @@ void DobranoVizWindow::onProxySelected(vtkSMProxy* p)
     }
   
   // also include unloaded arrays if any
-  QList<QVariant> extraCellArrays = pqSMAdaptor::instance()->getProperty(reader->GetProxy(), 
-                    reader->GetProxy()->GetProperty("CellArrayStatus")).toList();
+  QList<QList<QVariant> > extraCellArrays = pqSMAdaptor::getSelectionProperty(reader->GetProxy(), 
+                    reader->GetProxy()->GetProperty("CellArrayStatus"));
   for(i=0; i<extraCellArrays.size(); i++)
     {
-    QList<QVariant> cell = extraCellArrays[i].toList();
+    QList<QVariant> cell = extraCellArrays[i];
     if(cell[1] == false)
       {
       selector->addVariable(VARIABLE_TYPE_CELL, cell[0].toString());
@@ -1349,11 +1349,11 @@ void DobranoVizWindow::onProxySelected(vtkSMProxy* p)
     }
   
   // also include unloaded arrays if any
-  QList<QVariant> extraPointArrays = pqSMAdaptor::instance()->getProperty(reader->GetProxy(), 
-               reader->GetProxy()->GetProperty("PointArrayStatus")).toList();
+  QList<QList<QVariant> > extraPointArrays = pqSMAdaptor::getSelectionProperty(reader->GetProxy(), 
+               reader->GetProxy()->GetProperty("PointArrayStatus"));
   for(i=0; i<extraPointArrays.size(); i++)
     {
-    QList<QVariant> cell = extraPointArrays[i].toList();
+    QList<QVariant> cell = extraPointArrays[i];
     if(cell[1] == false)
       {
       selector->addVariable(VARIABLE_TYPE_NODE, cell[0].toString());
