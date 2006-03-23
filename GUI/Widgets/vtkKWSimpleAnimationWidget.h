@@ -179,7 +179,7 @@ protected:
     AnimationPreviewing = 1,
     AnimationCreating   = 2,
     AnimationPlaying    = 3,
-    AnimationCancelled  = 4
+    AnimationCanceled  = 4
   };
   //ETX
   int AnimationStatus;

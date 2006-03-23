@@ -38,6 +38,8 @@
 #include "vtkKWWindowBase.h"
 #include "vtkToolkits.h"
 
+#include "vtkKWWidgetsBuildConfigure.h" // VTK_USE_VIDEO_FOR_WINDOWS
+
 #ifdef VTK_USE_VIDEO_FOR_WINDOWS 
 #include "vtkAVIWriter.h"
 #else
@@ -67,7 +69,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.19");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.20");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -710,7 +712,7 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
 //----------------------------------------------------------------------------
 void vtkKWSimpleAnimationWidget::CancelAnimationCallback()
 {
-  this->AnimationStatus = vtkKWSimpleAnimationWidget::AnimationCancelled;
+  this->AnimationStatus = vtkKWSimpleAnimationWidget::AnimationCanceled;
 }
 
 //----------------------------------------------------------------------------
@@ -844,7 +846,7 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
     {
     for (int i = 0; 
          i < num_frames && 
-           this->AnimationStatus != vtkKWSimpleAnimationWidget::AnimationCancelled; i++)
+           this->AnimationStatus != vtkKWSimpleAnimationWidget::AnimationCanceled; i++)
       {
       if (win)
         {
@@ -880,7 +882,7 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
     end_msg += " -- ";
     if (this->AnimationStatus != status)
       {
-      end_msg += "Cancelled";
+      end_msg += "Canceled";
       }
     else
       {
@@ -1036,7 +1038,7 @@ void vtkKWSimpleAnimationWidget::PerformSliceAnimation(const char *file_root,
     //this->RenderWidget->Reset();
     for (int i = 0; 
          i < num_frames && 
-           this->AnimationStatus != vtkKWSimpleAnimationWidget::AnimationCancelled; i++)
+           this->AnimationStatus != vtkKWSimpleAnimationWidget::AnimationCanceled; i++)
       {
       if (win)
         {
@@ -1072,7 +1074,7 @@ void vtkKWSimpleAnimationWidget::PerformSliceAnimation(const char *file_root,
     end_msg += " -- ";
     if (this->AnimationStatus != status)
       {
-      end_msg += "Cancelled";
+      end_msg += "Canceled";
       }
     else
       {
