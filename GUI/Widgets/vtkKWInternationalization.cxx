@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWInternationalization);
-vtkCxxRevisionMacro(vtkKWInternationalization, "1.1");
+vtkCxxRevisionMacro(vtkKWInternationalization, "1.2");
 
 //----------------------------------------------------------------------------
 void vtkKWInternationalization::SetCurrentTextDomain(const char *domain_name)
@@ -310,10 +310,10 @@ char* kww_sgettext(const char *msgid)
   char *msgval = gettext(msgid);
   if (msgval == msgid)
 #else
-  char *msgval = (char*)msgid;
+  char *msgval = const_cast<char*>(msgid);
 #endif
     {
-    char *sep = strrchr(msgid, '|');
+    char *sep = const_cast<char*>(strrchr(msgid, '|'));
     if (sep)
       {
       msgval = sep + 1;
@@ -329,10 +329,10 @@ char* kww_sdgettext(const char *domain_name, const char *msgid)
   char *msgval = dgettext(domain_name, msgid);
   if (msgval == msgid)
 #else
-  char *msgval = (char*)msgid;
+  char *msgval = const_cast<char*>(msgid);
 #endif
     {
-    char *sep = strrchr(msgid, '|');
+    char *sep = const_cast<char*>(strrchr(msgid, '|'));
     if (sep)
       {
       msgval = sep + 1;

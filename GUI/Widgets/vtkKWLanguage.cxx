@@ -15,6 +15,8 @@
 
 #ifdef _WIN32
 #include "windows.h"
+#else
+#include <locale.h>
 #endif
 
 #include "vtkObjectFactory.h"
@@ -22,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLanguage);
-vtkCxxRevisionMacro(vtkKWLanguage, "1.1");
+vtkCxxRevisionMacro(vtkKWLanguage, "1.2");
 
 //----------------------------------------------------------------------------
 void vtkKWLanguage::SetCurrentLanguage(int lang)
