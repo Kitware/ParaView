@@ -20,6 +20,8 @@ SET(KWWidgets_CMAKE_DIR "@KWWidgets_CMAKE_DIR_CONFIG@")
 
 # The configuration options.
 SET(KWWidgets_BUILD_SHARED_LIBS "@KWWidgets_BUILD_SHARED_LIBS@")
+SET(KWWidgets_USE_HTML_HELP "@KWWidgets_USE_HTML_HELP@")
+SET(KWWidgets_USE_INTERNATIONALIZATION "@KWWidgets_USE_INTERNATIONALIZATION@")
 
 # The C and C++ flags added to the cmake-configured flags.
 SET(KWWidgets_REQUIRED_C_FLAGS 
