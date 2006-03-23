@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWInternationalization);
-vtkCxxRevisionMacro(vtkKWInternationalization, "1.2");
+vtkCxxRevisionMacro(vtkKWInternationalization, "1.3");
 
 //----------------------------------------------------------------------------
 void vtkKWInternationalization::SetCurrentTextDomain(const char *domain_name)
@@ -137,7 +137,7 @@ const char* vtkKWInternationalization::FindTextDomainBinding(
       vtksys::SystemTools::GetFilenamePath(module_path));
     }
 
-#endif _WIN32
+#endif
 
   // Try to find the exec in the PATH environment variable
 
