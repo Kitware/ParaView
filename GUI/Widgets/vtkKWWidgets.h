@@ -26,4 +26,10 @@
 # define KWWidgets_EXPORT
 #endif
 
+#ifdef __cplusplus
+#define KWWidgets_EXTERN extern "C"
+#else
+#define KWWidgets_EXTERN extern
+#endif
+
 #endif

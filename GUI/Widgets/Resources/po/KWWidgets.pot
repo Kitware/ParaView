@@ -1,0 +1,56 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Kitware, Inc.
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-03-23 15:57-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../vtkKWApplication.cxx:976
+#, c-format
+msgid "Are you sure you want to exit %s?"
+msgstr ""
+
+#: ../../vtkKWApplication.cxx:979
+#, c-format
+msgid "Exit Dialog|Title|Exit %s"
+msgstr ""
+
+#: ../../vtkKWMessageDialog.cxx:56 ../../vtkKWMessageDialog.cxx:162
+msgid "Message Dialog|Button|OK"
+msgstr ""
+
+#: ../../vtkKWMessageDialog.cxx:59 ../../vtkKWMessageDialog.cxx:166
+msgid "Message Dialog|Button|Cancel"
+msgstr ""
+
+#: ../../vtkKWMessageDialog.cxx:62
+msgid "Message Dialog|Button|Other"
+msgstr ""
+
+#: ../../vtkKWMessageDialog.cxx:130
+msgid "Message Dialog|Do not show this dialog anymore."
+msgstr ""
+
+#: ../../vtkKWMessageDialog.cxx:157
+msgid "Message Dialog|Button|Yes"
+msgstr ""
+
+#: ../../vtkKWMessageDialog.cxx:158
+msgid "Message Dialog|Button|No"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:339
+#, c-format
+msgid "Menu|Help|About %s"
+msgstr ""

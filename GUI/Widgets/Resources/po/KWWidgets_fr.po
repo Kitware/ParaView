@@ -1,0 +1,57 @@
+# French translations for PACKAGE package
+# Traduction anglaise du package PACKAGE.
+# Copyright (C) 2006 Kitware, Inc.
+# This file is distributed under the same license as the PACKAGE package.
+# <EMAIL@ADDRESS>, 2006.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-03-23 15:57-0500\n"
+"PO-Revision-Date: 2006-03-23 15:59-0500\n"
+"Last-Translator: <EMAIL@ADDRESS>\n"
+"Language-Team: French\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: ../../vtkKWApplication.cxx:976
+#, c-format
+msgid "Are you sure you want to exit %s?"
+msgstr "Êtes vous certain de vouloir quitter %s?"
+
+#: ../../vtkKWApplication.cxx:979
+#, c-format
+msgid "Exit Dialog|Title|Exit %s"
+msgstr "Quitter %s"
+
+#: ../../vtkKWMessageDialog.cxx:56 ../../vtkKWMessageDialog.cxx:162
+msgid "Message Dialog|Button|OK"
+msgstr "OK"
+
+#: ../../vtkKWMessageDialog.cxx:59 ../../vtkKWMessageDialog.cxx:166
+msgid "Message Dialog|Button|Cancel"
+msgstr "Annuler"
+
+#: ../../vtkKWMessageDialog.cxx:62
+msgid "Message Dialog|Button|Other"
+msgstr "Autre"
+
+#: ../../vtkKWMessageDialog.cxx:130
+msgid "Message Dialog|Do not show this dialog anymore."
+msgstr "Ne plus afficher cette boîte de dialogue."
+
+#: ../../vtkKWMessageDialog.cxx:157
+msgid "Message Dialog|Button|Yes"
+msgstr "Oui"
+
+#: ../../vtkKWMessageDialog.cxx:158
+msgid "Message Dialog|Button|No"
+msgstr "Non"
+
+#: ../../vtkKWWindowBase.cxx:339
+#, c-format
+msgid "Menu|Help|About %s"
+msgstr "A propos de %s"

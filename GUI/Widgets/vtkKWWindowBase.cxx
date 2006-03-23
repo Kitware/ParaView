@@ -29,6 +29,7 @@
 #include "vtkKWToolbar.h"
 #include "vtkKWToolbarSet.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWInternationalization.h"
 
 #include <vtksys/SystemTools.hxx>
 
@@ -49,7 +50,7 @@ const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
 
 const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.40");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.41");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -294,6 +295,7 @@ void vtkKWWindowBase::Create()
   vtksys_stl::string cmd;
   vtksys_stl::string label;
   vtkKWMenu *menu = NULL;
+  char buffer[512];
 
   this->SetIconName(app->GetPrettyName());
 
@@ -334,11 +336,10 @@ void vtkKWWindowBase::Create()
     }
   
   menu->AddSeparator();
-  label = "About ";
-  label += app->GetPrettyName();
+  sprintf(buffer, ks_("Menu|Help|About %s"), app->GetPrettyName());
   cmd = "DisplayAboutDialog ";
   cmd += this->GetTclName();
-  menu->AddCommand(label.c_str(), this->GetApplication(), cmd.c_str(), 0);
+  menu->AddCommand(buffer, this->GetApplication(), cmd.c_str(), 0);
 
   // Menubar separator
 

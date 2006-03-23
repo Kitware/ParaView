@@ -32,6 +32,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
 #include "vtkTclUtil.h"
+#include "vtkKWInternationalization.h"
 
 #include <stdarg.h>
 
@@ -41,6 +42,7 @@
 
 #include "Resources/KWWidgets.rc.h"
 #include "vtkKWWidgetsConfigure.h"
+#include "vtkKWWidgetsBuildConfigure.h"
 
 #include "vtkToolkits.h"
 
@@ -51,7 +53,7 @@ static Tcl_Interp *Et_Interp = 0;
 #include <shellapi.h>
 #include <process.h>
 #include <mapi.h>
-#ifdef KWWidgets_HAS_HTML_HELP
+#ifdef KWWidgets_USE_HTML_HELP
 #include <htmlhelp.h>
 #endif
 #include "Utilities/ApplicationIcon/vtkKWSetApplicationIconTclCommand.h"
@@ -65,7 +67,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.276");
+vtkCxxRevisionMacro(vtkKWApplication, "1.277");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -501,6 +503,12 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
 //----------------------------------------------------------------------------
 Tcl_Interp *vtkKWApplication::InitializeTcl(Tcl_Interp *interp, ostream *err)
 {
+  // As a convenience, try to find the text domain binding for
+  // KWWidgets right now
+
+  vtkKWInternationalization::FindTextDomainBinding(
+    "KWWidgets", KWWidgets_INSTALL_DATA_DIR);
+
   if (Et_Interp)
     {
     return NULL;
@@ -946,8 +954,7 @@ void vtkKWApplication::ProcessIdleTasks()
 //----------------------------------------------------------------------------
 int vtkKWApplication::DisplayExitDialog(vtkKWWindowBase *master)
 {
-  vtksys_stl::string title = "Exit ";
-  title += this->GetPrettyName();
+  char buffer[500];
 
   vtksys_stl::string msg = "Are you sure you want to exit ";
   msg += this->GetPrettyName();
@@ -964,8 +971,13 @@ int vtkKWApplication::DisplayExitDialog(vtkKWWindowBase *master)
     vtkKWMessageDialog::YesDefault);
   dialog->SetDialogName(vtkKWApplication::ExitDialogName);
   dialog->Create();
-  dialog->SetText(msg.c_str());
-  dialog->SetTitle(title.c_str());
+
+  sprintf(buffer, 
+          k_("Are you sure you want to exit %s?"), this->GetPrettyName());
+  dialog->SetText(buffer);
+
+  sprintf(buffer, k_("Exit Dialog|Title|Exit %s"), this->GetPrettyName());
+  dialog->SetTitle(buffer);
 
   int ret = dialog->Invoke();
   dialog->Delete();
@@ -1012,7 +1024,7 @@ void vtkKWApplication::DisplayHelpDialog(vtkKWWindowBase* master)
   vtksys_stl::string msg;
 
 #ifdef _WIN32
-#ifdef KWWidgets_HAS_HTML_HELP
+#ifdef KWWidgets_USE_HTML_HELP
   // .chm ?
 
   if (strstr(helplink.c_str(), ".chm") || 
@@ -1204,6 +1216,10 @@ void vtkKWApplication::AddAboutCopyrights(ostream &os)
      << "  - Copyright (c) 1994 The Australian National University." << endl
      << "  - Copyright (c) 1994-1998 Sun Microsystems, Inc." << endl
      << "  - Copyright (c) 1998-2000 Ajuba Solutions." << endl;
+
+#ifdef KWWidgets_USE_INTERNATIONALIZATION
+  os << "GNU gettext runtime library (LGPL)" << endl;
+#endif
 }
 
 //----------------------------------------------------------------------------

@@ -1,0 +1,39 @@
+# French translations for PACKAGE package
+# Traduction anglaise du package PACKAGE.
+# Copyright (C) 2006 Kitware, Inc.
+# This file is distributed under the same license as the PACKAGE package.
+# <EMAIL@ADDRESS>, 2006.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-03-23 16:03-0500\n"
+"PO-Revision-Date: 2006-03-22 14:40-0500\n"
+"Last-Translator: <EMAIL@ADDRESS>\n"
+"Language-Team: French\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: ../KWInternationalizationExample.cxx:81
+#: ../KWInternationalizationExample.cxx:133
+#: ../KWInternationalizationExample.cxx:138
+msgid "Button|English"
+msgstr "Anglais"
+
+#: ../KWInternationalizationExample.cxx:82
+msgid "Button|French"
+msgstr "Français"
+
+#: ../KWInternationalizationExample.cxx:89
+msgid "A simple dialog box!"
+msgstr "Une simple boîte de dialogue!"
+
+#: ../KWInternationalizationExample.cxx:104
+#: ../KWInternationalizationExample.cxx:130
+#: ../KWInternationalizationExample.cxx:135
+#, c-format
+msgid "The string '%s' has %d characters."
+msgstr "Il y a %2$d caractères dans la chaîne '%1$s'."
