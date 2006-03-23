@@ -33,6 +33,9 @@ IF(NOT KWWidgets_USE_FILE_INCLUDED)
   # Add link directories needed to use KWWidgets.
   LINK_DIRECTORIES(${KWWidgets_LIBRARY_DIRS})
 
+  # Add cmake module path.
+  SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${KWWidgets_CMAKE_DIR}")
+
   # Use VTK.
   IF(NOT KWWidgets_NO_USE_VTK)
     SET(VTK_DIR ${KWWidgets_VTK_DIR})
