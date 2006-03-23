@@ -148,7 +148,7 @@ MACRO(KWWidgets_CREATE_GETTEXT_TARGETS)
   SET(prev_arg_was_list 0)
   SET(unknown_parameters)
   
-  STRING(REPLACE ";;" ";FOREACH_FIX;" parameter_list "${ARGV}")
+  STRING(REGEX REPLACE ";;" ";FOREACH_FIX;" parameter_list "${ARGV}")
   FOREACH(arg ${parameter_list})
 
     IF("${arg}" STREQUAL "FOREACH_FIX")
