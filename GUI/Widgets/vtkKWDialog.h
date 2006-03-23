@@ -35,10 +35,11 @@ public:
 
   // Description:
   // Invoke the dialog, display it and enter an event loop until the user
-  // confirm (OK) or cancel the dialog.
+  // confirms or cancels the dialog.
   // Note that a dialog is a modal toplevel by default.
   // This method returns a zero if the dialog was killed or 
-  // canceled, nonzero otherwise.
+  // canceled, nonzero otherwise. The status can be further refined
+  // by querying GetStatus().
   virtual int Invoke();
 
   // Description:
@@ -47,18 +48,15 @@ public:
   virtual void Display();
 
   // Description:
-  // Cancel the action and close this dialog
-  virtual void Cancel();
-
-  // Description:
-  // Confirm the action and close this dialog
-  virtual void OK();
-
-  // Description:
-  // Returns:
-  // 0 if the dialog is active e.g. displayed
-  // 1 if it was Canceled 
-  // 2 if it was OK.
+  // Status of the dialog (active e.g. displayed, canceled, OK'ed)
+  //BTX
+  enum 
+  {
+    StatusActive = 0,
+    StatusCanceled = 1,
+    StatusOK = 2
+  };
+  //ETX
   int GetStatus() { return this->Done; };
 
   // Description:
@@ -75,6 +73,14 @@ public:
   // Sets the beep type
   vtkSetMacro(BeepType, int);
   vtkGetMacro(BeepType, int);
+
+  // Description:
+  // Callback. Cancel the action and close this dialog
+  virtual void Cancel();
+
+  // Description:
+  // Callback. Confirm the action and close this dialog
+  virtual void OK();
 
   // Description:
   // Dialog can be also used by performing individual steps of Invoke. These

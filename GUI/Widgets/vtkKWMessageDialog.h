@@ -45,6 +45,17 @@ public:
   virtual int GetTextWidth();
 
   // Description:
+  // Status of the dialog. This subclass defines a new 'Other' status on
+  // top of the usual one (active e.g. displayed, canceled, OK'ed). This
+  // status is triggered by pressing the 'Other' button.
+  //BTX
+  enum 
+  {
+    StatusOther = 100
+  };
+  //ETX
+
+  // Description:
   // Set the style of the message box.
   // No effect if called after Create()
   //BTX
@@ -69,11 +80,6 @@ public:
     { this->SetStyle(vtkKWMessageDialog::StyleOkOtherCancel); };
   void SetStyleToCancel() 
     { this->SetStyle(vtkKWMessageDialog::StyleCancel); };
-
-  // Description:
-  // Set or get the message dialog name
-  vtkSetStringMacro(DialogName);
-  vtkGetStringMacro(DialogName);
 
   // Description:
   // Set different options for the dialog.
@@ -151,9 +157,16 @@ public:
   vtkGetObjectMacro(CancelButton, vtkKWPushButton);
   vtkGetObjectMacro(OtherButton, vtkKWPushButton);
 
-  // Description::
-  // Close this Dialog (for the third button)
-  virtual void Other();
+  // Description:
+  // Set or get the message dialog name. This name is use to save/restore
+  // information about this specific dialog in the registry (for example,
+  // bypass the dialog altogether by clicking on a specific button 
+  // automatically). 
+  // This should not be confused with
+  // the message dialog title that can be set using the superclass
+  // SetTitle() method. 
+  vtkSetStringMacro(DialogName);
+  vtkGetStringMacro(DialogName);
 
   // Description:
   // Convenience static method to store/retrieve a message dialog response
@@ -176,6 +189,10 @@ public:
   // and checking for IsUserDoneWithDialog().
   virtual int PreInvoke();
   virtual void PostInvoke();
+
+  // Description::
+  // Callback. Close this Dialog (for the third button)
+  virtual void Other();
 
 protected:
   vtkKWMessageDialog();

@@ -18,16 +18,17 @@
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMessage.h"
 #include "vtkKWPushButton.h"
-#include "vtkObjectFactory.h"
 #include "vtkKWRegistryHelper.h"
 #include "vtkKWWindowBase.h"
+#include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.89");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.90");
 
 //----------------------------------------------------------------------------
 vtkKWMessageDialog::vtkKWMessageDialog()
@@ -52,13 +53,13 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   this->DialogText = 0;
 
   this->OKButtonText = 0;
-  this->SetOKButtonText("OK");
+  this->SetOKButtonText(ks_("Message Dialog|Button|OK"));
 
   this->CancelButtonText = 0;
-  this->SetCancelButtonText("Cancel");
+  this->SetCancelButtonText(ks_("Message Dialog|Button|Cancel"));
 
   this->OtherButtonText = 0;
-  this->SetOtherButtonText("Other");
+  this->SetOtherButtonText(ks_("Message Dialog|Button|Other"));
 }
 
 //----------------------------------------------------------------------------
@@ -125,7 +126,8 @@ void vtkKWMessageDialog::Create()
 
   if ( this->GetDialogName() )
     {
-    this->CheckButton->SetText("Do not show this dialog anymore.");
+    this->CheckButton->SetText(
+      ks_("Message Dialog|Do not show this dialog anymore."));
     this->Script("pack %s -side top -fill x -padx 20 -pady 5",
                  this->CheckButton->GetWidgetName());
     }
@@ -152,16 +154,16 @@ void vtkKWMessageDialog::Create()
 
   if (this->Style == vtkKWMessageDialog::StyleYesNo)
     {
-    this->SetOKButtonText("Yes");
-    this->SetCancelButtonText("No");
+    this->SetOKButtonText(ks_("Message Dialog|Button|Yes"));
+    this->SetCancelButtonText(ks_("Message Dialog|Button|No"));
     }
   else if (this->Style == vtkKWMessageDialog::StyleMessage)
     {
-    this->SetOKButtonText("OK");
+    this->SetOKButtonText(ks_("Message Dialog|Button|OK"));
     }
   else if (this->Style == vtkKWMessageDialog::StyleCancel)
     {
-    this->SetOKButtonText("Cancel");
+    this->SetOKButtonText(ks_("Message Dialog|Button|Cancel"));
     }
 
   // Pack buttons
@@ -315,12 +317,12 @@ int vtkKWMessageDialog::PreInvoke()
       this->GetApplication(), this->DialogName);
     if (res == 1) 
       {
-      this->Done = 2;
+      this->Done = vtkKWDialog::StatusOK;
       return 1;
       }
     if (res == -1)
       {
-      this->Done = 1;
+      this->Done = vtkKWDialog::StatusCanceled;
       return 1;
       }
     }
@@ -362,14 +364,12 @@ void vtkKWMessageDialog::PostInvoke()
 {
   this->Superclass::PostInvoke();
 
-  int res = this->Done -1;
-
   // Check if the user specified a default answer for this one, and store it
   // in the registry
 
   if (this->DialogName && this->GetRememberMessage())
     {
-    int ires = res;
+    int ires = (this->Done == vtkKWDialog::StatusCanceled ? 0 : 1);
     if (this->Options & vtkKWMessageDialog::RememberYes)
       {
       ires = 1;
@@ -505,9 +505,7 @@ int vtkKWMessageDialog::GetRememberMessage()
 //----------------------------------------------------------------------------
 void vtkKWMessageDialog::Other()
 {
-  this->Withdraw();
-  this->ReleaseGrab();
-  this->Done = 3;  
+  this->Done = vtkKWMessageDialog::StatusOther;
 }
 
 //----------------------------------------------------------------------------

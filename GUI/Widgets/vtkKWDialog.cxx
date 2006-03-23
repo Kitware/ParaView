@@ -20,12 +20,12 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.56");
+vtkCxxRevisionMacro(vtkKWDialog, "1.57");
 
 //----------------------------------------------------------------------------
 vtkKWDialog::vtkKWDialog()
 {
-  this->Done = 1;
+  this->Done = vtkKWDialog::StatusCanceled;
   this->Beep = 0;
   this->BeepType = 0;
   this->Modal = 1;
@@ -34,7 +34,7 @@ vtkKWDialog::vtkKWDialog()
 //----------------------------------------------------------------------------
 int vtkKWDialog::PreInvoke()
 {
-  this->Done = 0;
+  this->Done = vtkKWDialog::StatusActive;
 
   if (!this->IsMapped())
     {
@@ -63,7 +63,7 @@ void vtkKWDialog::PostInvoke()
 //----------------------------------------------------------------------------
 int vtkKWDialog::IsUserDoneWithDialog()
 {
-  return this->Done;
+  return this->Done != vtkKWDialog::StatusActive;
 }
 
 //----------------------------------------------------------------------------
@@ -88,26 +88,26 @@ int vtkKWDialog::Invoke()
 
   this->PostInvoke();
 
-  return (this->Done - 1);
+  return (this->Done == vtkKWDialog::StatusCanceled ? 0 : 1);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWDialog::Display()
 {
-  this->Done = 0;
+  this->Done = vtkKWDialog::StatusActive;
   this->Superclass::Display();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWDialog::Cancel()
 {
-  this->Done = 1;  
+  this->Done = vtkKWDialog::StatusCanceled;  
 }
 
 //----------------------------------------------------------------------------
 void vtkKWDialog::OK()
 {
-  this->Done = 2;  
+  this->Done = vtkKWDialog::StatusOK;  
 }
 
 //----------------------------------------------------------------------------
