@@ -79,7 +79,8 @@ int vtkCommandOptionsXMLParserInternal::SetArgument(const char* arg, const char*
     vtkCommandOptionsXMLParserArgumentStructure tmp = 
       this->ArgumentToVariableMap[arg];
     if(!(tmp.ProcessType & this->ProcessType || 
-         tmp.ProcessType == vtkCommandOptions::EVERYBODY))
+         tmp.ProcessType == vtkCommandOptions::EVERYBODY || 
+         this->ProcessType == vtkCommandOptions::EVERYBODY))
       {
       // Silently skip argument in xml because the process type does not match
       return 1;
@@ -157,7 +158,7 @@ void vtkCommandOptionsXMLParserInternal::AddArgument(
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCommandOptionsXMLParser);
-vtkCxxRevisionMacro(vtkCommandOptionsXMLParser, "1.2");
+vtkCxxRevisionMacro(vtkCommandOptionsXMLParser, "1.3");
 
 //----------------------------------------------------------------------------
 vtkCommandOptionsXMLParser::vtkCommandOptionsXMLParser()
