@@ -7,7 +7,7 @@
  * statement of authorship are reproduced on all copies.
  */
 
-#include "DobranoVizWindow.h"
+#include "MainWindow.h"
 #include "LineChartAdapter.h"
 
 #include <pqCompoundProxyWizard.h>
@@ -89,7 +89,7 @@
 #include <QToolBar>
 #include <QTreeView>
 
-DobranoVizWindow::DobranoVizWindow() :
+MainWindow::MainWindow() :
   CurrentServer(0),
   PropertyToolbar(0),
   MultiViewManager(0),
@@ -468,7 +468,7 @@ DobranoVizWindow::DobranoVizWindow() :
   this->PipelineList->setFocus();
 }
 
-DobranoVizWindow::~DobranoVizWindow()
+MainWindow::~MainWindow()
 {
   // Clean up the model before deleting the adaptor.
   if(this->Inspector)
@@ -502,7 +502,7 @@ DobranoVizWindow::~DobranoVizWindow()
   delete this->Adaptor;
 }
 
-bool DobranoVizWindow::eventFilter(QObject* watched, QEvent* e)
+bool MainWindow::eventFilter(QObject* watched, QEvent* e)
 {
   if(e->type() == QEvent::Hide || e->type() == QEvent::Show)
     {
@@ -532,7 +532,7 @@ bool DobranoVizWindow::eventFilter(QObject* watched, QEvent* e)
   return QMainWindow::eventFilter(watched, e);
 }
 
-void DobranoVizWindow::setServer(pqServer* Server)
+void MainWindow::setServer(pqServer* Server)
 {
   if(this->CurrentServer)
     {
@@ -565,7 +565,7 @@ void DobranoVizWindow::setServer(pqServer* Server)
   emit serverChanged(this->CurrentServer);
 }
 
-void DobranoVizWindow::onFileNew()
+void MainWindow::onFileNew()
 {
   // Reset the multi-view. Use the removed widget list to clean
   // up the render modules. Then, delete the widgets.
@@ -605,12 +605,12 @@ void DobranoVizWindow::onFileNew()
   emit serverChanged(this->CurrentServer);
 }
 
-void DobranoVizWindow::onFileNew(pqServer* Server)
+void MainWindow::onFileNew(pqServer* Server)
 {
   setServer(Server);
 }
 
-void DobranoVizWindow::onFileOpen()
+void MainWindow::onFileOpen()
 {
   if(!this->CurrentServer)
     {
@@ -625,7 +625,7 @@ void DobranoVizWindow::onFileOpen()
     }
 }
 
-void DobranoVizWindow::onFileOpen(pqServer* Server)
+void MainWindow::onFileOpen(pqServer* Server)
 {
   if(this->CurrentServer != Server)
     setServer(Server);
@@ -636,7 +636,7 @@ void DobranoVizWindow::onFileOpen(pqServer* Server)
   file_dialog->show();
 }
 
-void DobranoVizWindow::onFileOpen(const QStringList& Files)
+void MainWindow::onFileOpen(const QStringList& Files)
 {
   if(!this->Pipeline || !this->PipelineList)
     return;
@@ -669,7 +669,7 @@ void DobranoVizWindow::onFileOpen(const QStringList& Files)
     }
 }
 
-void DobranoVizWindow::onFileOpenServerState()
+void MainWindow::onFileOpenServerState()
 {
   pqFileDialog *fileDialog = new pqFileDialog(new pqLocalFileDialogModel(),
       tr("Open Server State File:"), this, "fileOpenDialog");
@@ -679,11 +679,11 @@ void DobranoVizWindow::onFileOpenServerState()
   fileDialog->show();
 }
 
-void DobranoVizWindow::onFileOpenServerState(pqServer* /*Server*/)
+void MainWindow::onFileOpenServerState(pqServer* /*Server*/)
 {
 }
 
-void DobranoVizWindow::onFileOpenServerState(const QStringList& Files)
+void MainWindow::onFileOpenServerState(const QStringList& Files)
 {
   if(Files.size() == 0)
     {
@@ -745,7 +745,7 @@ void DobranoVizWindow::onFileOpenServerState(const QStringList& Files)
   xmlParser->Delete();
 }
 
-void DobranoVizWindow::onFileSaveServerState()
+void MainWindow::onFileSaveServerState()
 {
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save Server State:"), this, "fileSaveDialog");
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -753,7 +753,7 @@ void DobranoVizWindow::onFileSaveServerState()
   file_dialog->show();
 }
 
-void DobranoVizWindow::onFileSaveServerState(const QStringList& Files)
+void MainWindow::onFileSaveServerState(const QStringList& Files)
 {
   if(Files.size() == 0)
     {
@@ -799,7 +799,7 @@ void DobranoVizWindow::onFileSaveServerState(const QStringList& Files)
   root->Delete();
 }
 
-void DobranoVizWindow::onFileSaveScreenshot()
+void MainWindow::onFileSaveScreenshot()
 {
   if(!this->CurrentServer)
     {
@@ -822,7 +822,7 @@ void DobranoVizWindow::onFileSaveScreenshot()
   file_dialog->show();
 }
 
-void DobranoVizWindow::onFileSaveScreenshot(const QStringList& Files)
+void MainWindow::onFileSaveScreenshot(const QStringList& Files)
 {
   vtkRenderWindow* const render_window =
     this->ActiveView ? qobject_cast<QVTKWidget*>(this->ActiveView->mainWidget())->GetRenderWindow() : 0;
@@ -834,7 +834,7 @@ void DobranoVizWindow::onFileSaveScreenshot(const QStringList& Files)
     }
 }
 
-bool DobranoVizWindow::compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory)
+bool MainWindow::compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory)
 {
   vtkRenderWindow* const render_window =
     this->ActiveView ? qobject_cast<QVTKWidget*>(this->ActiveView->mainWidget())->GetRenderWindow() : 0;
@@ -845,7 +845,7 @@ bool DobranoVizWindow::compareView(const QString& ReferenceImage, double Thresho
   return pqImageComparison::CompareImage(render_window, ReferenceImage, Threshold, Output, TempDirectory);
 }
 
-void DobranoVizWindow::onServerConnect()
+void MainWindow::onServerConnect()
 {
   setServer(0);
   
@@ -855,17 +855,17 @@ void DobranoVizWindow::onServerConnect()
   server_browser->show();
 }
 
-void DobranoVizWindow::onServerConnect(pqServer* Server)
+void MainWindow::onServerConnect(pqServer* Server)
 {
   setServer(Server);
 }
 
-void DobranoVizWindow::onServerDisconnect()
+void MainWindow::onServerDisconnect()
 {
   setServer(0);
 }
 
-void DobranoVizWindow::onUpdateWindows()
+void MainWindow::onUpdateWindows()
 {
   /*
   if(this->CurrentServer)
@@ -873,7 +873,7 @@ void DobranoVizWindow::onUpdateWindows()
     */
 }
 
-void DobranoVizWindow::onUpdateSourcesFiltersMenu(pqServer* /*Server*/)
+void MainWindow::onUpdateSourcesFiltersMenu(pqServer* /*Server*/)
 {
   this->FiltersMenu->clear();
   this->SourcesMenu->clear();
@@ -1001,7 +1001,7 @@ void DobranoVizWindow::onUpdateSourcesFiltersMenu(pqServer* /*Server*/)
     }
 }
 
-void DobranoVizWindow::onCreateSource(QAction* action)
+void MainWindow::onCreateSource(QAction* action)
 {
   if(!action || !this->Pipeline || !this->PipelineList)
     return;
@@ -1019,7 +1019,7 @@ void DobranoVizWindow::onCreateSource(QAction* action)
     }
 }
 
-void DobranoVizWindow::onCreateFilter(QAction* action)
+void MainWindow::onCreateFilter(QAction* action)
 {
   if(!action || !this->Pipeline || !this->PipelineList)
     return;
@@ -1059,11 +1059,11 @@ void DobranoVizWindow::onCreateFilter(QAction* action)
     }
 }
 
-void DobranoVizWindow::onOpenLinkEditor()
+void MainWindow::onOpenLinkEditor()
 {
 }
 
-void DobranoVizWindow::onOpenCompoundFilterWizard()
+void MainWindow::onOpenCompoundFilterWizard()
 {
   pqCompoundProxyWizard* wizard = new pqCompoundProxyWizard(this->CurrentServer, this);
   wizard->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
@@ -1075,7 +1075,7 @@ void DobranoVizWindow::onOpenCompoundFilterWizard()
 }
 
 
-void DobranoVizWindow::onRecordTest()
+void MainWindow::onRecordTest()
 {
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Record Test:"), this, "fileSaveDialog");
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -1083,7 +1083,7 @@ void DobranoVizWindow::onRecordTest()
   file_dialog->show();
 }
 
-void DobranoVizWindow::onRecordTest(const QStringList& Files)
+void MainWindow::onRecordTest(const QStringList& Files)
 {
   for(int i = 0; i != Files.size(); ++i)
     {
@@ -1092,7 +1092,7 @@ void DobranoVizWindow::onRecordTest(const QStringList& Files)
     }
 }
 
-void DobranoVizWindow::onPlayTest()
+void MainWindow::onPlayTest()
 {
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Record Test:"), this, "fileSaveDialog");
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -1100,7 +1100,7 @@ void DobranoVizWindow::onPlayTest()
   file_dialog->show();
 }
 
-void DobranoVizWindow::onPlayTest(const QStringList& Files)
+void MainWindow::onPlayTest(const QStringList& Files)
 {
   pqEventPlayer player(*this);
   player.addDefaultWidgetEventPlayers();
@@ -1112,7 +1112,7 @@ void DobranoVizWindow::onPlayTest(const QStringList& Files)
     }
 }
 
-void DobranoVizWindow::onNewQVTKWidget(pqMultiViewFrame* frame)
+void MainWindow::onNewQVTKWidget(pqMultiViewFrame* frame)
 {
   QVTKWidget *widget = ParaQ::AddQVTKWidget(frame, this->MultiViewManager,
       this->CurrentServer);
@@ -1130,7 +1130,7 @@ void DobranoVizWindow::onNewQVTKWidget(pqMultiViewFrame* frame)
     }
 }
 
-void DobranoVizWindow::onDeleteQVTKWidget(pqMultiViewFrame* p)
+void MainWindow::onDeleteQVTKWidget(pqMultiViewFrame* p)
 {
   QVTKWidget* w = qobject_cast<QVTKWidget*>(p->mainWidget());
   this->cleanUpWindow(w);
@@ -1144,7 +1144,7 @@ void DobranoVizWindow::onDeleteQVTKWidget(pqMultiViewFrame* p)
     }
 }
 
-void DobranoVizWindow::onFrameActive(QWidget* w)
+void MainWindow::onFrameActive(QWidget* w)
 {
   if(this->ActiveView && this->ActiveView != w)
     {
@@ -1156,7 +1156,7 @@ void DobranoVizWindow::onFrameActive(QWidget* w)
   this->ActiveView = qobject_cast<pqMultiViewFrame*>(w);
 }
 
-void DobranoVizWindow::onNewSelections(vtkSMProxy*, vtkUnstructuredGrid* selections)
+void MainWindow::onNewSelections(vtkSMProxy*, vtkUnstructuredGrid* selections)
 {
   // Update the element inspector ...
   if(pqElementInspectorWidget* const element_inspector = this->ElementInspectorDock->findChild<pqElementInspectorWidget*>())
@@ -1165,7 +1165,7 @@ void DobranoVizWindow::onNewSelections(vtkSMProxy*, vtkUnstructuredGrid* selecti
     }
 }
 
-void DobranoVizWindow::onCreateCompoundProxy(QAction* action)
+void MainWindow::onCreateCompoundProxy(QAction* action)
 {
   if(!action || !this->Pipeline || !this->PipelineList)
     return;
@@ -1217,13 +1217,13 @@ void DobranoVizWindow::onCreateCompoundProxy(QAction* action)
     }
 }
 
-void DobranoVizWindow::onCompoundProxyAdded(const QString&, const QString& proxy)
+void MainWindow::onCompoundProxyAdded(const QString&, const QString& proxy)
 {
   this->CompoundProxyToolBar->addAction(QIcon(":/pqWidgets/pqBundle32.png"), proxy) 
     << pqSetName(proxy) << pqSetData(proxy);
 }
 
-void DobranoVizWindow::onAddServer(pqPipelineServer *server)
+void MainWindow::onAddServer(pqPipelineServer *server)
 {
   // When restoring a state file, the PipelineData object will
   // create the pqServer. Make sure the CurrentServer gets set.
@@ -1234,7 +1234,7 @@ void DobranoVizWindow::onAddServer(pqPipelineServer *server)
     }
 }
 
-void DobranoVizWindow::onRemoveServer(pqPipelineServer *server)
+void MainWindow::onRemoveServer(pqPipelineServer *server)
 {
   if(!server || !this->MultiViewManager)
     {
@@ -1261,7 +1261,7 @@ void DobranoVizWindow::onRemoveServer(pqPipelineServer *server)
   this->MultiViewManager->blockSignals(false);
 }
 
-void DobranoVizWindow::onAddWindow(pqPipelineWindow *win)
+void MainWindow::onAddWindow(pqPipelineWindow *win)
 {
   if(!win)
     {
@@ -1286,7 +1286,7 @@ void DobranoVizWindow::onAddWindow(pqPipelineWindow *win)
     }
 }
 
-void DobranoVizWindow::cleanUpWindow(QVTKWidget *win)
+void MainWindow::cleanUpWindow(QVTKWidget *win)
 {
   if(win && this->Pipeline)
     {
@@ -1300,7 +1300,7 @@ void DobranoVizWindow::cleanUpWindow(QVTKWidget *win)
 }
 
 
-void DobranoVizWindow::onProxySelected(vtkSMProxy* p)
+void MainWindow::onProxySelected(vtkSMProxy* p)
 {
   this->CurrentProxy = p;
 
@@ -1374,7 +1374,7 @@ void DobranoVizWindow::onProxySelected(vtkSMProxy* p)
     }
 }
 
-void DobranoVizWindow::onVariableChanged(pqVariableType type, const QString& name)
+void MainWindow::onVariableChanged(pqVariableType type, const QString& name)
 {
   if(this->CurrentProxy)
     {
@@ -1396,7 +1396,7 @@ void DobranoVizWindow::onVariableChanged(pqVariableType type, const QString& nam
     }
 }
 
-void DobranoVizWindow::onFirstTimeStep()
+void MainWindow::onFirstTimeStep()
 {
   if(!this->CurrentServer)
     return;
@@ -1434,7 +1434,7 @@ void DobranoVizWindow::onFirstTimeStep()
     }
 }
 
-void DobranoVizWindow::onPreviousTimeStep()
+void MainWindow::onPreviousTimeStep()
 {
   if(!this->CurrentServer)
     return;
@@ -1472,7 +1472,7 @@ void DobranoVizWindow::onPreviousTimeStep()
     }
 }
 
-void DobranoVizWindow::onNextTimeStep()
+void MainWindow::onNextTimeStep()
 {
   if(!this->CurrentServer)
     return;
@@ -1510,7 +1510,7 @@ void DobranoVizWindow::onNextTimeStep()
     }
 }
 
-void DobranoVizWindow::onLastTimeStep()
+void MainWindow::onLastTimeStep()
 {
   if(!this->CurrentServer)
     return;
@@ -1548,7 +1548,7 @@ void DobranoVizWindow::onLastTimeStep()
     }
 }
 
-void DobranoVizWindow::onLoadSetup()
+void MainWindow::onLoadSetup()
 {
   pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Open Setup:"), this, "fileOpenDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChart, SLOT(loadSetup(const QStringList&)));
@@ -1556,7 +1556,7 @@ void DobranoVizWindow::onLoadSetup()
   file_dialog->show();
 }
 
-void DobranoVizWindow::onSavePDF()
+void MainWindow::onSavePDF()
 {
   pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save .pdf File:"), this, "fileSavePDFDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChart, SLOT(savePDF(const QStringList&)));
@@ -1564,7 +1564,7 @@ void DobranoVizWindow::onSavePDF()
   file_dialog->show();
 }
 
-void DobranoVizWindow::onSavePNG()
+void MainWindow::onSavePNG()
 {
   pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save .png File:"), this, "fileSavePNGDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChart, SLOT(saveImage(const QStringList&)));
@@ -1572,7 +1572,7 @@ void DobranoVizWindow::onSavePNG()
   file_dialog->show();
 }
 
-void DobranoVizWindow::onLoadExperimentalData()
+void MainWindow::onLoadExperimentalData()
 {
   pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Open Experimental Data:"), this, "fileOpenDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChart, SLOT(loadExperimentalData(const QStringList&)));
@@ -1580,7 +1580,7 @@ void DobranoVizWindow::onLoadExperimentalData()
   file_dialog->show();
 }
 
-void DobranoVizWindow::onLoadExperimentalUncertainty()
+void MainWindow::onLoadExperimentalUncertainty()
 {
   pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Open Experimental Uncertainty Data:"), this, "fileOpenDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChart, SLOT(loadExperimentalUncertainty(const QStringList&)));
@@ -1588,7 +1588,7 @@ void DobranoVizWindow::onLoadExperimentalUncertainty()
   file_dialog->show();
 }
 
-void DobranoVizWindow::onLoadSimulationUncertainty()
+void MainWindow::onLoadSimulationUncertainty()
 {
   pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Open Simulation Uncertainty Data:"), this, "fileOpenDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChart, SLOT(loadSimulationUncertainty(const QStringList&)));
@@ -1596,7 +1596,7 @@ void DobranoVizWindow::onLoadSimulationUncertainty()
   file_dialog->show();
 }
 
-void DobranoVizWindow::onLoadExperimentSimulationMap()
+void MainWindow::onLoadExperimentSimulationMap()
 {
   pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Open Experiment / Simulation Map:"), this, "fileOpenDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this->LineChart, SLOT(loadExperimentSimulationMap(const QStringList&)));
@@ -1604,18 +1604,18 @@ void DobranoVizWindow::onLoadExperimentSimulationMap()
   file_dialog->show();
 }
 
-void DobranoVizWindow::onExperimentalDataChanged(const QStringList& data)
+void MainWindow::onExperimentalDataChanged(const QStringList& data)
 {
   this->ChooseDataCombo->clear();
   this->ChooseDataCombo->addItems(data);
 }
 
-void DobranoVizWindow::onVisibleDataChanged(const QString& data)
+void MainWindow::onVisibleDataChanged(const QString& data)
 {
   this->ChooseDataCombo->setCurrentIndex(this->ChooseDataCombo->findText(data));
 }
 
-void DobranoVizWindow::onLineChartContextMenu(const QPoint& position)
+void MainWindow::onLineChartContextMenu(const QPoint& position)
 {
   QMenu popup_menu;
 

@@ -10,7 +10,7 @@
  */
 
 
-#include "DobranoVizWindow.h"
+#include "MainWindow.h"
 #include <QApplication>
 
 #ifdef VTK_USE_MPI
@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
   Q_INIT_RESOURCE(pqWidgets);
 #endif
   
-  DobranoVizWindow main_window;
+  MainWindow main_window;
   main_window.resize(800, 600);
   main_window.show();
 

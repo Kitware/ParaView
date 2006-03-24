@@ -2,10 +2,6 @@ PROJECT(DobranoViz)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.2)
 
-FIND_PACKAGE(Qt4)
-SET(QT_USE_QTXML TRUE)
-INCLUDE(${QT_USE_FILE})
-
 SET(QT_CLIENT_VERSION_MAJOR 0)
 SET(QT_CLIENT_VERSION_MINOR 9)
 SET(QT_CLIENT_VERSION_PATCH 0)
@@ -23,16 +19,14 @@ INCLUDE_DIRECTORIES(
   ${QtWidgets_BINARY_DIR}
   ${QtWidgets_SOURCE_DIR}
   ${PYTHON_INCLUDE_DIRECTORIES}
-  ${VTK_INCLUDE_DIR}
-  ${ParaQ_SOURCE_DIR}/VTK/GUISupport/Qt
-  ${PARAVIEW_INCLUDE_DIRS}
 )
+
 IF(VTK_USE_MPI)
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
 ENDIF(VTK_USE_MPI)
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
-  DobranoVizWindow.h
+  MainWindow.h
   LineChartAdapter.h
   ${PYTHON_MOC_SOURCES}
 )
@@ -51,13 +45,13 @@ IF(WIN32)
 ENDIF(WIN32)
 
 ADD_EXECUTABLE(DobranoViz WIN32 MACOSX_BUNDLE
-  main.cxx
-  DobranoVizWindow.cxx
-  DobranoVizWindow.h
   ImageLinePlot.cxx
   ImageLinePlot.h
   LineChartAdapter.cxx
   LineChartAdapter.h
+  MainWindow.cxx
+  MainWindow.h
+  main.cxx
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES}
 )

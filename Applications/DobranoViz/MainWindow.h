@@ -7,8 +7,8 @@
  * statement of authorship are reproduced on all copies.
  */
 
-#ifndef _DobranoVizWindow_h
-#define _DobranoVizWindow_h
+#ifndef _MainWindow_h
+#define _MainWindow_h
 
 #include <pqVariableType.h>
 #include <vtkIOStream.h>
@@ -44,14 +44,14 @@ class QTreeView;
 class QTabWidget;
 
 /// Provides the main window for the ParaQ application
-class DobranoVizWindow :
+class MainWindow :
         public QMainWindow
 {
   Q_OBJECT
 
 public:
-  DobranoVizWindow();
-  virtual ~DobranoVizWindow();
+  MainWindow();
+  virtual ~MainWindow();
 
   virtual bool eventFilter(QObject* watched, QEvent* e);
 
@@ -157,5 +157,5 @@ private:
   vtkSMProxy* CurrentProxy;
 };
 
-#endif // !_DobranoVizWindow_h
+#endif // !_MainWindow_h
 
