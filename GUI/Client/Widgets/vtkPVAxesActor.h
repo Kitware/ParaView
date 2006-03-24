@@ -1,23 +1,40 @@
 /*=========================================================================
 
-  Program:   ParaView
-  Module:    vtkPVAxesActor.h
+   Program:   ParaQ
+   Module:    $RCS $
 
-  Copyright (c) Kitware, Inc.
-  All rights reserved.
-  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+   Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
+   All rights reserved.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
+   ParaQ is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaQ license version 1.1. 
+
+   See License_v1.1.txt for the full ParaQ license.
+   A copy of this license can be obtained by contacting
+   Kitware Inc.
+   28 Corporate Drive
+   Clifton Park, NY 12065
+   USA
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 // .NAME vtkPVAxesActor - a 3D axes representation
 // .SECTION Description
 // 
-// vtkPVAxesActor is used to represent 3D axes in the scene. The user can define the
-// geometry to use for the shaft and the tip, and the user can set the text for the
-// three axes. The text will follow the camera.
+// vtkPVAxesActor is used to represent 3D axes in the scene. The user can
+// define the geometry to use for the shaft and the tip, and the user can
+// set the text for the three axes. The text will follow the camera.
 
 
 #ifndef __vtkPVAxesActor_h
