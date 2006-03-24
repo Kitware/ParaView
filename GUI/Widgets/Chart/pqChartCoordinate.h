@@ -159,23 +159,24 @@ private:
   pqChartCoordinateConstIteratorData *Data;
 };
 
-
-/// \class pqChartCoordinateList
-/// \brief
-///   The pqChartCoordinateList class contains a list of pqChartCoordinate
-///   objects.
-///
-/// The list can be navigated using a coordinate list iterator. There
-/// are iterators available for mutable and immutable lists. The
-/// following example shows how to iterate through the list:
-///
-/// \code
-/// pqChartCoordinateList::Iterator iter = list.begin();
-/// for( ; iter != list.end(); ++iter)
-/// {
-///    ...
-/// }
-/// \endcode
+/*!
+ *  \class pqChartCoordinateList
+ *  \brief
+ *    The pqChartCoordinateList class contains a list of pqChartCoordinate
+ *    objects.
+ * 
+ *  The list can be navigated using a coordinate list iterator. There
+ *  are iterators available for mutable and immutable lists. The
+ *  following example shows how to iterate through the list:
+ * 
+ *  \code
+ *  pqChartCoordinateList::Iterator iter = list.begin();
+ *  for( ; iter != list.end(); ++iter)
+ *  {
+ *     ...
+ *  }
+ *  \endcode
+ */
 class QTCHART_EXPORT pqChartCoordinateList
 {
 public:

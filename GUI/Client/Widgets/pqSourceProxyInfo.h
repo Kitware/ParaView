@@ -69,38 +69,40 @@ public:
   ///   True if the filter information has been loaded
   bool IsFilterInfoLoaded() const;
 
-  /// \brief
-  ///   Loads the filter grouping information from an xml structure.
-  ///
-  /// The current filter information will be cleared before reading in
-  /// the new information. The xml structure should define categories
-  /// inside of category groups. Grouping the categories determines
-  /// where to put the menu separators.
-  ///
-  /// The xml should be formatted as follows:
-  /// \code
-  /// <SomeRootName>
-  ///   <CategoryGroup>
-  ///     <Category name="Favorites" menuName="&Favorites">
-  ///       <Filter name="Clip" />
-  ///       ...
-  ///     </Category>
-  ///     <Category name="Alphbetical" menuName="&Alphbetical" />
-  ///   </CategoryGroup>
-  ///   <CategoryGroup>
-  ///     ...
-  ///   </CategoryGroup>
-  ///   ...
-  /// <\SomeRootName>
-  /// \endcode
-  /// The xml root name can be anything. The other elements should be
-  /// named accordint to the example. The category menu name is optional.
-  /// if there is no menu name, the menu will display the name. The menu
-  /// name can be used to specify a keyboard shortcut for the menu. Each
-  /// of the sub-elements can be entered multiple times. There is no limit
-  /// to the number of filters that can be added to a category, etc.
-  ///
-  /// \param root The root of the filter information in the xml.
+  /*!
+      \brief
+        Loads the filter grouping information from an xml structure.
+     
+      The current filter information will be cleared before reading in
+      the new information. The xml structure should define categories
+      inside of category groups. Grouping the categories determines
+      where to put the menu separators.
+     
+      The xml should be formatted as follows:
+      \code
+      <SomeRootName>
+        <CategoryGroup>
+          <Category name="Favorites" menuName="&Favorites">
+            <Filter name="Clip" />
+            ...
+          </Category>
+          <Category name="Alphbetical" menuName="&Alphbetical" />
+        </CategoryGroup>
+        <CategoryGroup>
+          ...
+        </CategoryGroup>
+        ...
+      <\SomeRootName>
+      \endcode
+      The xml root name can be anything. The other elements should be
+      named accordint to the example. The category menu name is optional.
+      if there is no menu name, the menu will display the name. The menu
+      name can be used to specify a keyboard shortcut for the menu. Each
+      of the sub-elements can be entered multiple times. There is no limit
+      to the number of filters that can be added to a category, etc.
+     
+      \param root The root of the filter information in the xml.
+   */
   void LoadFilterInfo(vtkPVXMLElement *root);
 
   /// \brief

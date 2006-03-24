@@ -52,147 +52,148 @@ class QRect;
 class QAbstractScrollArea;
 class pqChartZoomHistory;
 
-
-/// \class pqChartZoomPan
-/// \brief
-///   The pqChartZoomPan class is used to handle the zoom and pan
-///   interaction for a chart widget.
-///
-/// The zoom factors and contents positions can be saved in a
-/// history list for user navigation. The zoom/pan object does not
-/// dictate the key or mouse events that initiate the zooming or
-/// panning. Those decisions are left to the object using the
-/// zoom/pan class.
-///
-/// The pqChartZoomPan object works with a QAbstractScrollArea object
-/// to provide the functionality. The QAbstractScrollArea should be
-/// set in the constructor. Without the scroll view, the zoom/pan object
-/// will not function correctly. The \c contentsSizeChanging signal
-/// should be used to update the chart layout.
-/// \code
-/// SomeChart::SomeChart(QWidget *parent)
-///   : QAbstractScrollArea(parent)
-/// {
-///    this->zoomPan = new pqChartZoomPan(this);
-///    ...
-///    connect(this->zoomPan, SIGNAL(contentsSizeChanging(int, int)),
-///       this, SLOT(layoutChart(int, int)));
-/// }
-/// \endcode
-///
-/// The pqChartZoomPan object will store the contents position and
-/// width for the scroll view. It will automatically adjust the
-/// scrollbars when the contents position or size has changed. The
-/// \c updateContentSize() method should be called when the widget
-/// is shown and when the viewport is resized.
-///
-/// After creating and connecting the zoom/pan object, the keyboard
-/// and mouse interactions can be hooked up. The following shows the
-/// key press event handler. The arrow keys will be hooked up to the
-/// pan functions. The +/- keys will be hooked up to the zoom
-/// functions. The Alt+Left and Alt+Right will be hooked up to the
-/// zoom history.
-/// \code
-/// void SomeChart::keyPressEvent(QKeyEvent *e)
-/// {
-///    if(e->key() == Qt::Key_Plus || e->key() == Qt::Key_Equal ||
-///       e->key() == Qt::Key_Minus)
-///    {
-///       pqChartZoomPan::InteractFlags flags = pqChartZoomPan::ZoomBoth;
-///       int state = e->modifiers() & (Qt::ControlModifier |
-///          Qt::AltModifier | Qt::MetaModifier);
-///       if(state == Qt::ControlModifier)
-///          flags = pqChartZoomPan::ZoomXOnly;
-///       else if(state == Qt::AltModifier)
-///          flags = pqChartZoomPan::ZoomYOnly;
-///
-///       if(e->key() == Qt::Key_Minus)
-///          this->zoomPan->zoomOut(flags);
-///       else
-///          this->zoomPan->zoomIn(flags);
-///    }
-///    else if(e->key() == Qt::Key_Up)
-///       this->zoomPan->panUp();
-///    else if(e->key() == Qt::Key_Down)
-///       this->zoomPan->panDown();
-///    else if(e->key() == Qt::Key_Left)
-///    {
-///       if(e->modifiers() == Qt::AltModifier)
-///          this->zoomPan->historyPrevious();
-///       else
-///          this->zoomPan->panLeft();
-///    }
-///    else if(e->key() == Qt::Key_Right)
-///    {
-///       if(e->modifiers() == Qt::AltModifier)
-///          this->zoomPan->historyNext();
-///       else
-///          this->zoomPan->panRight();
-///    }
-/// }
-/// \endcode
-///
-/// The mouse interactions need to be put in the mouse press, mouse
-/// move, and mouse release events. The following example doesn't
-/// show the zoom box interaction. For details on that see the
-/// pqChartMouseBox class.
-/// \code
-/// void SomeChart::mousePressEvent(QMouseEvent *e)
-/// {
-///    this->zoomPan->Last = e->globalPos();
-/// }
-/// \endcode
-///
-/// Store the mouse position, in global coordinates, during the
-/// mouse press event. The zoom/pan object will update the last
-/// position as it needs to after that. The mouse move event will
-/// indicate the start and continuation of a zoom/pan interaction.
-/// The following example uses the middle and right mouse buttons
-/// for zoom and pan respectively. This frees up the left mouse
-/// button for picking.
-/// \code
-/// void SomeChart::mouseMoveEvent(QMouseEvent *e)
-/// {
-///    if(this->mouseMode == NoMode)
-///    {
-///       if(e->buttons() == Qt::MidButton)
-///       {
-///          this->mouseMode = ZoomMode;
-///          this->zoomPan->startInteraction(pqChartZoomPan::Zoom);
-///       }
-///       else if(e->buttons() == Qt::RightButton)
-///       {
-///          this->mouseMode = PanMode;
-///          this->zoomPan->startInteraction(pqChartZoomPan::Pan);
-///       }
-///    }
-///
-///    if(this->mouseMode == ZoomMode)
-///    {
-///       pqChartZoomPan::InteractFlags flags = pqChartZoomPan::ZoomBoth;
-///       if(e->modifiers() == Qt::ControlModifier)
-///          flags = pqChartZoomPan::ZoomXOnly;
-///       else if(e->modifiers() == Qt::AltModifier)
-///          flags = pqChartZoomPan::ZoomYOnly;
-///       this->zoomPan->interact(e->globalPos(), flags);
-///    }
-///    else if(this->mouseMode == PanMode)
-///       this->zoomPan->interact(e->globalPos(), pqChartZoomPan::NoFlags);
-/// }
-/// \endcode
-///
-/// The mouse release event signals the end of an interaction mode.
-/// clear the state of the zoom/pan object in this method.
-/// \code
-/// void SomeChart::mouseReleaseEvent(QMouseEvent *e)
-/// {
-///    if(this->mouseMode == ZoomMode || this->mouseMode == PanMode)
-///    {
-///       this->mouseMode = NoMode;
-///       this->zoomPan->finishInteraction();
-///    }
-/// }
-/// \endcode
+/*!
+    \class pqChartZoomPan
+    \brief
+      The pqChartZoomPan class is used to handle the zoom and pan
+      interaction for a chart widget.
+   
+    The zoom factors and contents positions can be saved in a
+    history list for user navigation. The zoom/pan object does not
+    dictate the key or mouse events that initiate the zooming or
+    panning. Those decisions are left to the object using the
+    zoom/pan class.
+   
+    The pqChartZoomPan object works with a QAbstractScrollArea object
+    to provide the functionality. The QAbstractScrollArea should be
+    set in the constructor. Without the scroll view, the zoom/pan object
+    will not function correctly. The \c contentsSizeChanging signal
+    should be used to update the chart layout.
+    \code
+    SomeChart::SomeChart(QWidget *parent)
+      : QAbstractScrollArea(parent)
+    {
+       this->zoomPan = new pqChartZoomPan(this);
+       ...
+       connect(this->zoomPan, SIGNAL(contentsSizeChanging(int, int)),
+          this, SLOT(layoutChart(int, int)));
+    }
+    \endcode
+   
+    The pqChartZoomPan object will store the contents position and
+    width for the scroll view. It will automatically adjust the
+    scrollbars when the contents position or size has changed. The
+    \c updateContentSize() method should be called when the widget
+    is shown and when the viewport is resized.
+   
+    After creating and connecting the zoom/pan object, the keyboard
+    and mouse interactions can be hooked up. The following shows the
+    key press event handler. The arrow keys will be hooked up to the
+    pan functions. The +/- keys will be hooked up to the zoom
+    functions. The Alt+Left and Alt+Right will be hooked up to the
+    zoom history.
+    \code
+    void SomeChart::keyPressEvent(QKeyEvent *e)
+    {
+       if(e->key() == Qt::Key_Plus || e->key() == Qt::Key_Equal ||
+          e->key() == Qt::Key_Minus)
+       {
+          pqChartZoomPan::InteractFlags flags = pqChartZoomPan::ZoomBoth;
+          int state = e->modifiers() & (Qt::ControlModifier |
+             Qt::AltModifier | Qt::MetaModifier);
+          if(state == Qt::ControlModifier)
+             flags = pqChartZoomPan::ZoomXOnly;
+          else if(state == Qt::AltModifier)
+             flags = pqChartZoomPan::ZoomYOnly;
+   
+          if(e->key() == Qt::Key_Minus)
+             this->zoomPan->zoomOut(flags);
+          else
+             this->zoomPan->zoomIn(flags);
+       }
+       else if(e->key() == Qt::Key_Up)
+          this->zoomPan->panUp();
+       else if(e->key() == Qt::Key_Down)
+          this->zoomPan->panDown();
+       else if(e->key() == Qt::Key_Left)
+       {
+          if(e->modifiers() == Qt::AltModifier)
+             this->zoomPan->historyPrevious();
+          else
+             this->zoomPan->panLeft();
+       }
+       else if(e->key() == Qt::Key_Right)
+       {
+          if(e->modifiers() == Qt::AltModifier)
+             this->zoomPan->historyNext();
+          else
+             this->zoomPan->panRight();
+       }
+    }
+    \endcode
+   
+    The mouse interactions need to be put in the mouse press, mouse
+    move, and mouse release events. The following example doesn't
+    show the zoom box interaction. For details on that see the
+    pqChartMouseBox class.
+    \code
+    void SomeChart::mousePressEvent(QMouseEvent *e)
+    {
+       this->zoomPan->Last = e->globalPos();
+    }
+    \endcode
+   
+    Store the mouse position, in global coordinates, during the
+    mouse press event. The zoom/pan object will update the last
+    position as it needs to after that. The mouse move event will
+    indicate the start and continuation of a zoom/pan interaction.
+    The following example uses the middle and right mouse buttons
+    for zoom and pan respectively. This frees up the left mouse
+    button for picking.
+    \code
+    void SomeChart::mouseMoveEvent(QMouseEvent *e)
+    {
+       if(this->mouseMode == NoMode)
+       {
+          if(e->buttons() == Qt::MidButton)
+          {
+             this->mouseMode = ZoomMode;
+             this->zoomPan->startInteraction(pqChartZoomPan::Zoom);
+          }
+          else if(e->buttons() == Qt::RightButton)
+          {
+             this->mouseMode = PanMode;
+             this->zoomPan->startInteraction(pqChartZoomPan::Pan);
+          }
+       }
+   
+       if(this->mouseMode == ZoomMode)
+       {
+          pqChartZoomPan::InteractFlags flags = pqChartZoomPan::ZoomBoth;
+          if(e->modifiers() == Qt::ControlModifier)
+             flags = pqChartZoomPan::ZoomXOnly;
+          else if(e->modifiers() == Qt::AltModifier)
+             flags = pqChartZoomPan::ZoomYOnly;
+          this->zoomPan->interact(e->globalPos(), flags);
+       }
+       else if(this->mouseMode == PanMode)
+          this->zoomPan->interact(e->globalPos(), pqChartZoomPan::NoFlags);
+    }
+    \endcode
+   
+    The mouse release event signals the end of an interaction mode.
+    clear the state of the zoom/pan object in this method.
+    \code
+    void SomeChart::mouseReleaseEvent(QMouseEvent *e)
+    {
+       if(this->mouseMode == ZoomMode || this->mouseMode == PanMode)
+       {
+          this->mouseMode = NoMode;
+          this->zoomPan->finishInteraction();
+       }
+    }
+    \endcode
+ */
 class QTCHART_EXPORT pqChartZoomPan : public QObject
 {
   Q_OBJECT

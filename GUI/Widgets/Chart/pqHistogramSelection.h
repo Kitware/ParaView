@@ -241,43 +241,44 @@ private:
   pqHistogramSelectionConstIteratorData *Data;
 };
 
-
-/// \class pqHistogramSelectionList
-/// \brief
-///   The pqHistogramSelectionList class contains a list of
-///   pqHistogramSelection objects.
-///
-/// The pqHistogramSelectionList can be used as a simple list or to
-/// perform boolean operations on a list of selection ranges. To
-/// create a simple list, use the \c pushBack method to add items
-/// to the list. The \c unite, \c subtract, and \c Xor methods can
-/// be used to perform the boolean operations.
-///
-/// The list can be navigated using a selection list iterator. There
-/// are iterators available for mutable and immutable lists. The
-/// following example shows how to iterate through the list:
-///
-/// \code
-/// pqHistogramSelectionList::Iterator iter = list.begin();
-/// for( ; iter != list.end(); ++iter)
-/// {
-///    ...
-/// }
-/// \endcode
-///
-/// The pqHistogramSelectionList class does not take responsibility
-/// for any selection object memory. The memory allocated for the
-/// selection items must be deleted by the list user before clearing
-/// the list. All of the boolean operators have a parameter used to
-/// return items that are no longer used in the list.
-///
-/// \sa pqHistogramSelectionList::pushBack(pqHistogramSelection *),
-///     pqHistogramSelectionList::unite(pqHistogramSelection *,
-///         pqHistogramSelectionList &),
-///     pqHistogramSelectionList::subtract(pqHistogramSelection *,
-///         pqHistogramSelectionList &),
-///     pqHistogramSelectionList::Xor(pqHistogramSelection *,
-///         pqHistogramSelectionList &)
+/*!
+ *  \class pqHistogramSelectionList
+ *  \brief
+ *    The pqHistogramSelectionList class contains a list of
+ *    pqHistogramSelection objects.
+ * 
+ *  The pqHistogramSelectionList can be used as a simple list or to
+ *  perform boolean operations on a list of selection ranges. To
+ *  create a simple list, use the \c pushBack method to add items
+ *  to the list. The \c unite, \c subtract, and \c Xor methods can
+ *  be used to perform the boolean operations.
+ * 
+ *  The list can be navigated using a selection list iterator. There
+ *  are iterators available for mutable and immutable lists. The
+ *  following example shows how to iterate through the list:
+ * 
+ *  \code
+ *  pqHistogramSelectionList::Iterator iter = list.begin();
+ *  for( ; iter != list.end(); ++iter)
+ *  {
+ *     ...
+ *  }
+ *  \endcode
+ * 
+ *  The pqHistogramSelectionList class does not take responsibility
+ *  for any selection object memory. The memory allocated for the
+ *  selection items must be deleted by the list user before clearing
+ *  the list. All of the boolean operators have a parameter used to
+ *  return items that are no longer used in the list.
+ * 
+ *  \sa pqHistogramSelectionList::pushBack(pqHistogramSelection *),
+ *      pqHistogramSelectionList::unite(pqHistogramSelection *,
+ *          pqHistogramSelectionList &),
+ *      pqHistogramSelectionList::subtract(pqHistogramSelection *,
+ *          pqHistogramSelectionList &),
+ *      pqHistogramSelectionList::Xor(pqHistogramSelection *,
+ *          pqHistogramSelectionList &)
+ */
 class QTCHART_EXPORT pqHistogramSelectionList
 {
 public:

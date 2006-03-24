@@ -18,12 +18,12 @@ IF (BUILD_DOCUMENTATION)
        "\"${ParaQ_SOURCE_DIR}/Utilities/Xdmf/vtk\" \\
         \"${ParaQ_SOURCE_DIR}/Utilities/pqPython\" \\
         \"${ParaQ_SOURCE_DIR}/GUI/Widgets\" \\
+        \"${ParaQ_SOURCE_DIR}/GUI/Widgets/Chart\" \\
+        \"${ParaQ_SOURCE_DIR}/GUI/Widgets/Testing\" \\
         \"${ParaQ_SOURCE_DIR}/GUI/Client/Client\" \\
-        \"${ParaQ_SOURCE_DIR}/GUI/Client/Chart\" \\
         \"${ParaQ_SOURCE_DIR}/GUI/Client/Widgets\" \\
         \"${ParaQ_SOURCE_DIR}/GUI/Client/Components\" \\
         \"${ParaQ_SOURCE_DIR}/GUI/Client/Python\" \\
-        \"${ParaQ_SOURCE_DIR}/GUI/Client/Testing\" \\
         \"${ParaQ_SOURCE_DIR}/Common/KWCommon\" \\
         \"${ParaQ_SOURCE_DIR}/Servers/Common\" \\
         \"${ParaQ_SOURCE_DIR}/Servers/Filters\" \\
@@ -35,12 +35,12 @@ IF (BUILD_DOCUMENTATION)
       " \"${CMAKE_CURRENT_BINARY_DIR}/dox/Utilities/Xdmf/vtk\" \\
         \"${ParaQ_SOURCE_DIR}/Utilities/pqPython\" \\
         \"${ParaQ_SOURCE_DIR}/GUI/Widgets\" \\
+        \"${ParaQ_SOURCE_DIR}/GUI/Widgets/Chart\" \\
+        \"${ParaQ_SOURCE_DIR}/GUI/Widgets/Testing\" \\
         \"${ParaQ_SOURCE_DIR}/GUI/Client/Client\" \\
-        \"${ParaQ_SOURCE_DIR}/GUI/Client/Chart\" \\
         \"${ParaQ_SOURCE_DIR}/GUI/Client/Widgets\" \\
         \"${ParaQ_SOURCE_DIR}/GUI/Client/Components\" \\
         \"${ParaQ_SOURCE_DIR}/GUI/Client/Python\" \\
-        \"${ParaQ_SOURCE_DIR}/GUI/Client/Testing\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/GUI/Client/Widgets\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Common/KWCommon\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Servers/Common\" \\

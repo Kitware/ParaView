@@ -47,42 +47,43 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartExport.h"
 #include <QColor> // Needed for QColor return type.
 
-
-/// \class pqHistogramColor
-/// \brief
-///   The pqHistogramColor class is used to control the bar colors on
-///   a pqHistogramChart.
-///
-/// The \c getColor method is used to get the color for a specific
-/// histogram bar. The default implementation returns a color from
-/// red to blue based on the bar's index. To get a different color
-/// scheme, create a new class that inherits from pqHistogramColor
-/// and overload the \c getColor method. The following example shows
-/// how to make all the histogram bars the same color.
-/// \code
-/// class OneColor : public pqHistogramColor
-/// {
-///    public:
-///       OneColor();
-///       virtual ~OneColor() {}
-///
-///       virtual QColor getColor(int index, int total) const;
-///       void setColor(QColor color) {this->color = color;}
-///
-///    private:
-///       QColor color;
-/// };
-///
-/// OneColor::OneColor()
-///    : color(Qt::red)
-/// {
-/// }
-///
-/// QColor OneColor::getColor(int, int) const
-/// {
-///    return this->color;
-/// }
-/// \endcode
+/*!
+ *  \class pqHistogramColor
+ *  \brief
+ *    The pqHistogramColor class is used to control the bar colors on
+ *    a pqHistogramChart.
+ * 
+ *  The \c getColor method is used to get the color for a specific
+ *  histogram bar. The default implementation returns a color from
+ *  red to blue based on the bar's index. To get a different color
+ *  scheme, create a new class that inherits from pqHistogramColor
+ *  and overload the \c getColor method. The following example shows
+ *  how to make all the histogram bars the same color.
+ *  \code
+ *  class OneColor : public pqHistogramColor
+ *  {
+ *     public:
+ *        OneColor();
+ *        virtual ~OneColor() {}
+ * 
+ *        virtual QColor getColor(int index, int total) const;
+ *        void setColor(QColor color) {this->color = color;}
+ * 
+ *     private:
+ *        QColor color;
+ *  };
+ * 
+ *  OneColor::OneColor()
+ *     : color(Qt::red)
+ *  {
+ *  }
+ * 
+ *  QColor OneColor::getColor(int, int) const
+ *  {
+ *     return this->color;
+ *  }
+ *  \endcode
+ */
 class QTCHART_EXPORT pqHistogramColor
 {
 public:

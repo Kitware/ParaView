@@ -74,38 +74,39 @@ class QResizeEvent;
 class QTimer;
 class QWheelEvent;
 
-
-/// \class pqHistogramWidget
-/// \brief
-///   The pqHistogramWidget class is used to display an interactive
-///   histogram chart.
-///
-/// The histogram is displayed in a scroll view to allow the chart
-/// to be zoomed in and out. The axes can be zoomed independently as
-/// well. The zoom factors and viewport location can be set
-/// programatically. The user can use the mouse and keyboard to zoom
-/// and pan. The keyboard shortcuts are as follows:
-/// \code
-/// Plus...................Zoom in.
-/// Minus..................Zoom out.
-/// Ctrl+Plus..............Horizontally zoom in.
-/// Ctrl+minus.............Horizontally zoom out.
-/// Alt+Plus...............Vertically zoom in.
-/// Alt+minus..............Vertically zoom out.
-/// Up.....................Pan up.
-/// Down...................Pan down.
-/// Left...................Pan left.
-/// Right..................Pan right.
-/// Alt+Left...............Go to previous view in the history.
-/// Alt+Right..............Go to next view in the history.
-/// \endcode
-///
-/// Based on the interaction mode, the histogram can highlight values
-/// or bins. When switching between selection modes, the current
-/// selection can be erased. This prevents errors when combining bin
-/// and value selection. When calling any of the selection methods,
-/// the selection mode will be maintained. If you try to set a value
-/// selection during bin mode, it will be ignored.
+/*!
+ *  \class pqHistogramWidget
+ *  \brief
+ *    The pqHistogramWidget class is used to display an interactive
+ *    histogram chart.
+ * 
+ *  The histogram is displayed in a scroll view to allow the chart
+ *  to be zoomed in and out. The axes can be zoomed independently as
+ *  well. The zoom factors and viewport location can be set
+ *  programatically. The user can use the mouse and keyboard to zoom
+ *  and pan. The keyboard shortcuts are as follows:
+ *  \code
+ *  Plus...................Zoom in.
+ *  Minus..................Zoom out.
+ *  Ctrl+Plus..............Horizontally zoom in.
+ *  Ctrl+minus.............Horizontally zoom out.
+ *  Alt+Plus...............Vertically zoom in.
+ *  Alt+minus..............Vertically zoom out.
+ *  Up.....................Pan up.
+ *  Down...................Pan down.
+ *  Left...................Pan left.
+ *  Right..................Pan right.
+ *  Alt+Left...............Go to previous view in the history.
+ *  Alt+Right..............Go to next view in the history.
+ *  \endcode
+ * 
+ *  Based on the interaction mode, the histogram can highlight values
+ *  or bins. When switching between selection modes, the current
+ *  selection can be erased. This prevents errors when combining bin
+ *  and value selection. When calling any of the selection methods,
+ *  the selection mode will be maintained. If you try to set a value
+ *  selection during bin mode, it will be ignored.
+ */
 class QTCHART_EXPORT pqHistogramWidget : public QAbstractScrollArea
 {
   Q_OBJECT

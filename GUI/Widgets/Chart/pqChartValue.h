@@ -472,23 +472,24 @@ private:
   pqChartValueConstIteratorData *Data;
 };
 
-
-/// \class pqChartValueList
-/// \brief
-///   The pqChartValueList class contains a list of pqChartValue
-///   objects.
-///
-/// The list can be navigated using a value list iterator. There
-/// are iterators available for mutable and immutable lists. The
-/// following example shows how to iterate through the list:
-///
-/// \code
-/// pqChartValueList::Iterator iter = list.begin();
-/// for( ; iter != list.end(); ++iter)
-/// {
-///    ...
-/// }
-/// \endcode
+/*!
+ *  \class pqChartValueList
+ *  \brief
+ *    The pqChartValueList class contains a list of pqChartValue
+ *    objects.
+ * 
+ *  The list can be navigated using a value list iterator. There
+ *  are iterators available for mutable and immutable lists. The
+ *  following example shows how to iterate through the list:
+ * 
+ *  \code
+ *  pqChartValueList::Iterator iter = list.begin();
+ *  for( ; iter != list.end(); ++iter)
+ *  {
+ *     ...
+ *  }
+ *  \endcode
+ */
 class QTCHART_EXPORT pqChartValueList
 {
 public:
