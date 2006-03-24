@@ -1,5 +1,9 @@
 PROJECT (Widgets)
 
+INCLUDE_DIRECTORIES(
+  ${VTK_INCLUDE_DIR}
+)
+
 SUBDIRS(
   Chart
   Testing
