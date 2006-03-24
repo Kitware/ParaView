@@ -40,7 +40,7 @@ IF(NOT EXISTS "${po_build_file}")
     ENDIF(NOT "${GETTEXT_MSGINIT_EXECUTABLE}" STREQUAL "")
   ENDIF(EXISTS "${po_file}")
 ELSE(NOT EXISTS "${po_build_file}")
-  MESSAGE("Merging PO file ${po_build_file} with POT file ${pot_build_file}")
+#  MESSAGE("Merging PO file ${po_build_file} with POT file ${pot_build_file}")
   # --output-file and --update are mutually exclusive. If --update is
   # specified, the PO file will not be re-written if the result of
   # the merge produces no modification. This can be problematic if the POT
