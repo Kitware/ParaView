@@ -9,6 +9,7 @@
 #  GETTEXT_XGETTEXT_EXECUTABLE = xgettext tool
 #  GETTEXT_MSGINIT_EXECUTABLE  = msginit tool
 #  GETTEXT_MSGMERGE_EXECUTABLE = msgmerge tool
+#  GETTEXT_MSGCAT_EXECUTABLE   = msgcat tool
 #  GETTEXT_MSGCONV_EXECUTABLE  = msgconv tool
 #  GETTEXT_MSGFMT_EXECUTABLE   = msgfmt tool
 #  GETTEXT_TOOLS_FOUND         = true if all the tools were found
@@ -30,6 +31,7 @@ MACRO(GETTEXT_FIND_POTENTIAL_DIRS)
       "${GETTEXT_XGETTEXT_EXECUTABLE}"
       "${GETTEXT_MSGINIT_EXECUTABLE}"
       "${GETTEXT_MSGMERGE_EXECUTABLE}"
+      "${GETTEXT_MSGCAT_EXECUTABLE}"
       "${GETTEXT_MSGCONV_EXECUTABLE}"
       "${GETTEXT_MSGFMT_EXECUTABLE}"
       )
@@ -119,6 +121,7 @@ MACRO(GETTEXT_FIND_TOOLS)
       xgettext
       msginit
       msgmerge
+      msgcat
       msgconv
       msgfmt
       )
