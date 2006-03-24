@@ -449,12 +449,11 @@ ENDIF(WIN32)
 OPTION(KWWidgets_USE_INTERNATIONALIZATION "Enable internationalization support in KWWidgets." OFF)
 MARK_AS_ADVANCED(KWWidgets_USE_INTERNATIONALIZATION)
 IF(KWWidgets_USE_INTERNATIONALIZATION)
-  CMAKE_MINIMUM_REQUIRED(VERSION 2.2.2) # We need FILE(RELATIVE_PATH...)
   FIND_PACKAGE(Gettext)
   IF(GETTEXT_FOUND)
+    INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsInternationalizationMacros.cmake")
     SET(KWWidgets_INCLUDE_PATH ${KWWidgets_INCLUDE_PATH}
       ${GETTEXT_INCLUDE_DIR} CACHE INTERNAL "" FORCE)
-    INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsInternationalizationMacros.cmake")
     KWWidgets_CREATE_GETTEXT_TARGETS(
       DOMAIN_NAME "KWWidgets"
       LOCALE_LIST "fr"

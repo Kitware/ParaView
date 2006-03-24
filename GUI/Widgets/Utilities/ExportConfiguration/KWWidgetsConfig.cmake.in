@@ -95,6 +95,12 @@ SET(KWWidgets_DOXYGEN_DIR "@KWWidgets_DOXYGEN_DIR_CONFIG@")
 # The VTK options.
 SET(KWWidgets_VTK_DIR "@KWWidgets_VTK_DIR_CONFIG@")
 
+# The gettext library. This is only defined for build dirs to help projects
+# find the gettext library (it is safe to assume we are on the same machine;
+# we could not guarantee that if we are building against an installed 
+# KWWidgets though).
+SET(GETTEXT_SEARCH_PATH ${GETTEXT_SEARCH_PATH} "@GETTEXT_SEARCH_PATH_CONFIG@")
+
 # An install tree always provides one build configuration.
 # A build tree may provide either one or multiple build
 # configurations depending on the CMake generator used. Since

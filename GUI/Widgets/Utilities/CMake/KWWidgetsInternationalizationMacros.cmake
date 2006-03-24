@@ -104,6 +104,8 @@
 #    CREATE_MO_TARGET was true.
 #    Default to 0.
 
+CMAKE_MINIMUM_REQUIRED(VERSION 2.2.2) # We need FILE(RELATIVE_PATH...)
+
 MACRO(KWWidgets_CREATE_GETTEXT_TARGETS)
 
   SET(notset_value             "__not_set__")
@@ -419,16 +421,17 @@ MACRO(KWWidgets_CREATE_POT_TARGET
   # --join-existing ?
 
   FILE(MAKE_DIRECTORY ${pot_dir})
-  ADD_CUSTOM_COMMAND(
-    OUTPUT ${pot_file}
-    DEPENDS ${abs_sources}
-    COMMAND ${CMAKE_COMMAND} 
-    ARGS -E chdir ${po_dir} ${GETTEXT_XGETTEXT_EXECUTABLE} --output=${pot_file} --output-dir=${pot_dir} --default-domain=${domain_name} --foreign-user --keyword=_ --flag=_:1:pass-c-format --keyword=N_ --flag=N_:1:pass-c-format --flag=autosprintf:1:c-format --keyword=kww_sgettext --flag=kww_sgettext:1:pass-c-format --keyword=kww_sdgettext:2 --flag=kww_sdgettext:2:pass-c-format --keyword=k_ --flag=k_:1:pass-c-format --keyword=ks_ --flag=ks_:1:pass-c-format --keyword=s_ --flag=s_:1:pass-c-format --flag=kww_printf:1:c-format --flag=kww_sprintf:2:c-format --flag=kww_fprintf:2:c-format ${keywords} --copyright-holder=${copyright_holder} ${rel_sources}
-    )
-
-  IF(create_pot_target)
-    ADD_CUSTOM_TARGET(${target_basename}_pot DEPENDS ${pot_file})
-  ENDIF(create_pot_target)
+  IF(NOT "${GETTEXT_XGETTEXT_EXECUTABLE}" STREQUAL "")
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${pot_file}
+      DEPENDS ${abs_sources}
+      COMMAND ${CMAKE_COMMAND} 
+      ARGS -E chdir ${po_dir} ${GETTEXT_XGETTEXT_EXECUTABLE} --output=${pot_file} --output-dir=${pot_dir} --default-domain=${domain_name} --foreign-user --keyword=_ --flag=_:1:pass-c-format --keyword=N_ --flag=N_:1:pass-c-format --flag=autosprintf:1:c-format --keyword=kww_sgettext --flag=kww_sgettext:1:pass-c-format --keyword=kww_sdgettext:2 --flag=kww_sdgettext:2:pass-c-format --keyword=k_ --flag=k_:1:pass-c-format --keyword=ks_ --flag=ks_:1:pass-c-format --keyword=s_ --flag=s_:1:pass-c-format --flag=kww_printf:1:c-format --flag=kww_sprintf:2:c-format --flag=kww_fprintf:2:c-format ${keywords} --copyright-holder=${copyright_holder} ${rel_sources}
+      )
+    IF(create_pot_target)
+      ADD_CUSTOM_TARGET(${target_basename}_pot DEPENDS ${pot_file})
+    ENDIF(create_pot_target)
+  ENDIF(NOT "${GETTEXT_XGETTEXT_EXECUTABLE}" STREQUAL "")
 
 ENDMACRO(KWWidgets_CREATE_POT_TARGET)
 
@@ -476,7 +479,7 @@ MACRO(KWWidgets_CREATE_PO_TARGETS
       OUTPUT ${po_file}
       DEPENDS ${pot_file}
       COMMAND ${CMAKE_COMMAND} 
-      ARGS -Dpo_file:STRING=${po_file} -Ddefault_po_encoding:STRING=${default_po_encoding} -Dpot_file:STRING=${pot_file} -Dlocale:STRING=${locale} -DGETTEXT_MSGINIT_EXECUTABLE:STRING=${GETTEXT_MSGINIT_EXECUTABLE} -DGETTEXT_MSGCONV_EXECUTABLE:STRING=${GETTEXT_MSGCONV_EXECUTABLE} -DGETTEXT_MSGMERGE_EXECUTABLE:STRING=${GETTEXT_MSGMERGE_EXECUTABLE} -P "${KWWidgets_CMAKE_DIR}/KWWidgetsMsgmergeMsginitMacros.cmake"
+      ARGS -E chdir ${po_dir} ${CMAKE_COMMAND} -Dpo_file:STRING=${po_file} -Ddefault_po_encoding:STRING=${default_po_encoding} -Dpot_file:STRING=${pot_file} -Dlocale:STRING=${locale} -DGETTEXT_MSGINIT_EXECUTABLE:STRING=${GETTEXT_MSGINIT_EXECUTABLE} -DGETTEXT_MSGCONV_EXECUTABLE:STRING=${GETTEXT_MSGCONV_EXECUTABLE} -DGETTEXT_MSGMERGE_EXECUTABLE:STRING=${GETTEXT_MSGMERGE_EXECUTABLE} -P "${KWWidgets_CMAKE_DIR}/KWWidgetsMsgmergeMsginitMacros.cmake"
       )
     IF(create_po_locale_targets)
       ADD_CUSTOM_TARGET(${target_basename}_po_${locale} DEPENDS ${po_file})
@@ -524,36 +527,40 @@ MACRO(KWWidgets_CREATE_MO_TARGETS
 
   SET(mo_files)
 
-  FOREACH(locale ${locale_list})
-    KWWidgets_GET_PO_FILENAME(po_file "${po_dir}" "${po_prefix}" "${locale}")
-    KWWidgets_GET_MO_FILENAME(mo_file 
-      "${domain_name}" "${mo_build_dir}" "${locale}")
-    GET_FILENAME_COMPONENT(mo_dir "${mo_file}" PATH)
-    FILE(MAKE_DIRECTORY ${mo_dir})
-    SET(mo_files ${mo_files} ${mo_file})
-    ADD_CUSTOM_COMMAND(
-      OUTPUT ${mo_file}
-      DEPENDS ${po_file}
-      COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} 
-      ARGS --output-file=${mo_file} --check-format ${po_file}
-      )
-    IF(create_mo_locale_targets)
-      ADD_CUSTOM_TARGET(${target_basename}_mo_${locale} DEPENDS ${mo_file})
-    ENDIF(create_mo_locale_targets)
+  IF(NOT "${GETTEXT_MSGFMT_EXECUTABLE}" STREQUAL "")
 
-    IF(NOT "${mo_install_dir}" STREQUAL "")
-      INSTALL_FILES("${mo_install_dir}/${locale}/LC_MESSAGES" FILES ${mo_file})
-    ENDIF(NOT "${mo_install_dir}" STREQUAL "")
+    FOREACH(locale ${locale_list})
+      KWWidgets_GET_PO_FILENAME(po_file "${po_dir}" "${po_prefix}" "${locale}")
+      KWWidgets_GET_MO_FILENAME(mo_file 
+        "${domain_name}" "${mo_build_dir}" "${locale}")
+      GET_FILENAME_COMPONENT(mo_dir "${mo_file}" PATH)
+      FILE(MAKE_DIRECTORY ${mo_dir})
+      SET(mo_files ${mo_files} ${mo_file})
+      ADD_CUSTOM_COMMAND(
+        OUTPUT ${mo_file}
+        DEPENDS ${po_file}
+        COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} 
+        ARGS --output-file=${mo_file} --check-format ${po_file}
+        )
+      IF(create_mo_locale_targets)
+        ADD_CUSTOM_TARGET(${target_basename}_mo_${locale} DEPENDS ${mo_file})
+      ENDIF(create_mo_locale_targets)
+      
+      IF(NOT "${mo_install_dir}" STREQUAL "")
+        INSTALL_FILES(
+          "${mo_install_dir}/${locale}/LC_MESSAGES" FILES ${mo_file})
+      ENDIF(NOT "${mo_install_dir}" STREQUAL "")
+    ENDFOREACH(locale ${locale_list})
 
-  ENDFOREACH(locale ${locale_list})
-
-  IF(create_mo_target OR add_mo_target_to_all)
-    SET(target_name "${target_basename}_mo")
-    IF(add_mo_target_to_all)
-      ADD_CUSTOM_TARGET(${target_name} ALL DEPENDS ${mo_files})
-    ELSE(add_mo_target_to_all)
-      ADD_CUSTOM_TARGET(${target_name} DEPENDS ${mo_files})
-    ENDIF(add_mo_target_to_all)
-  ENDIF(create_mo_target OR add_mo_target_to_all)
+    IF(create_mo_target OR add_mo_target_to_all)
+      SET(target_name "${target_basename}_mo")
+      IF(add_mo_target_to_all)
+        ADD_CUSTOM_TARGET(${target_name} ALL DEPENDS ${mo_files})
+      ELSE(add_mo_target_to_all)
+        ADD_CUSTOM_TARGET(${target_name} DEPENDS ${mo_files})
+      ENDIF(add_mo_target_to_all)
+    ENDIF(create_mo_target OR add_mo_target_to_all)
+    
+  ENDIF(NOT "${GETTEXT_MSGFMT_EXECUTABLE}" STREQUAL "")
 
 ENDMACRO(KWWidgets_CREATE_MO_TARGETS)

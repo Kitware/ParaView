@@ -18,23 +18,31 @@
 # GETTEXT_MSGCONV_EXECUTABLE (string): path to the 'msgconv' executable 
 # GETTEXT_MSGMERGE_EXECUTABLE (string): path to the 'msgmerge' executable 
 
-IF(NOT EXISTS ${po_file})
-  EXEC_PROGRAM(${GETTEXT_MSGINIT_EXECUTABLE} 
-    ARGS --input=${pot_file} --output-file=${po_file} --locale=${locale})
-#    OUTPUT_VARIABLE msginit_output)
-  IF(NOT default_po_encoding)
-    SET(default_po_encoding "utf-8")
-  ENDIF(NOT default_po_encoding)
-  EXEC_PROGRAM(${GETTEXT_MSGCONV_EXECUTABLE} 
-    ARGS --output-file=${po_file} --to-code="${default_po_encoding}" ${po_file})
-#    OUTPUT_VARIABLE msgconv_output)
-ELSE(NOT EXISTS ${po_file})
+IF(NOT EXISTS "${po_file}")
+#  MESSAGE(FATAL_ERROR "\n** Initializing PO file ${po_file}\n")
+  IF(NOT "${GETTEXT_MSGINIT_EXECUTABLE}" STREQUAL "")
+    EXEC_PROGRAM(${GETTEXT_MSGINIT_EXECUTABLE} 
+      ARGS --input=${pot_file} --output-file=${po_file} --locale=${locale}
+      OUTPUT_VARIABLE msginit_output)
+    IF(NOT "${GETTEXT_MSGCONV_EXECUTABLE}" STREQUAL "")
+      IF(NOT default_po_encoding)
+        SET(default_po_encoding "utf-8")
+      ENDIF(NOT default_po_encoding)
+      EXEC_PROGRAM(${GETTEXT_MSGCONV_EXECUTABLE} 
+        ARGS --output-file=${po_file} --to-code="${default_po_encoding}" ${po_file})
+      #    OUTPUT_VARIABLE msgconv_output)
+    ENDIF(NOT "${GETTEXT_MSGCONV_EXECUTABLE}" STREQUAL "")
+  ENDIF(NOT "${GETTEXT_MSGINIT_EXECUTABLE}" STREQUAL "")
+ELSE(NOT EXISTS "${po_file}")
+#  MESSAGE("\n** Merging PO file ${po_file} with POT file ${pot_file}\n")
   # --output-file and --update are mutually exclusive. If --update is
   # specified, the PO file will not be re-written if the result of
   # the merge produces no modification. This can be problematic if the POT
   # file is newer than the PO file, and a MO file is generated from the PO
   # file: this seems to force the MO to always be regenerated.
-  EXEC_PROGRAM(${GETTEXT_MSGMERGE_EXECUTABLE} 
-    ARGS --output-file=${po_file} ${po_file} ${pot_file})
-#    OUTPUT_VARIABLE msgmerge_output)
-ENDIF(NOT EXISTS ${po_file})
+  IF(NOT "${GETTEXT_MSGMERGE_EXECUTABLE}" STREQUAL "")
+    EXEC_PROGRAM(${GETTEXT_MSGMERGE_EXECUTABLE} 
+      ARGS --output-file=${po_file} ${po_file} ${pot_file})
+    #    OUTPUT_VARIABLE msgmerge_output)
+  ENDIF(NOT "${GETTEXT_MSGMERGE_EXECUTABLE}" STREQUAL "")
+ENDIF(NOT EXISTS "${po_file}")

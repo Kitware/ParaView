@@ -79,6 +79,13 @@ SET(KWWidgets_DOXYGEN_DIR_CONFIG
 # The VTK options.
 SET(KWWidgets_VTK_DIR_CONFIG ${VTK_DIR})
 
+# The gettext library. This is only defined for build dirs to help projects
+# find the gettext library (it is safe to assume we are on the same machine;
+# we could not guarantee that if we are building against an installed 
+# KWWidgets though).
+GET_FILENAME_COMPONENT(
+  GETTEXT_SEARCH_PATH_CONFIG "${GETTEXT_INTL_LIBRARY}" PATH)
+
 # The build configuration information.
 SET(KWWidgets_CONFIGURATION_TYPES_CONFIG ${KWWidgets_CONFIGURATION_TYPES})
 SET(KWWidgets_BUILD_TYPE_CONFIG ${CMAKE_BUILD_TYPE})
@@ -182,6 +189,12 @@ IF(VTK_BINARY_DIR)
 ELSE(VTK_BINARY_DIR)
   SET(KWWidgets_VTK_DIR_CONFIG ${VTK_DIR})
 ENDIF(VTK_BINARY_DIR)
+
+# The gettext library. This is only defined for build dirs to help projects
+# find the gettext library (it is safe to assume we are on the same machine;
+# we could not guarantee that if we are building against an installed 
+# KWWidgets though).
+SET(GETTEXT_SEARCH_PATH_CONFIG)
 
 # The build configuration information.
 # The install tree only has one configuration.

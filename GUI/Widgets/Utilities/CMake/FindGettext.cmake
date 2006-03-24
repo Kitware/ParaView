@@ -13,7 +13,9 @@
 #  GETTEXT_MSGFMT_EXECUTABLE   = msgfmt tool
 #  GETTEXT_TOOLS_FOUND         = true if all the tools were found
 #  GETTEXT_FOUND               = true if both runtime and tools were found
-
+# As a convenience, the following variables can be set before including
+# this module to make its life easier:
+#  GETTEXT_SEARCH_PATH         = list of path to search gettext components for
 # --------------------------------------------------------------------------
 # As a convenience, try to find everything as soon as we set any one of
 # the cache variables.
@@ -39,6 +41,7 @@ MACRO(GETTEXT_FIND_POTENTIAL_DIRS)
 
   FOREACH(path 
       "${GETTEXT_INCLUDE_DIR}"
+      "${GETTEXT_SEARCH_PATH}"
       )
     SET(potential_bin_dirs ${potential_bin_dirs} "${path}/../bin")
     SET(potential_lib_dirs ${potential_lib_dirs} "${path}/../lib")
@@ -164,6 +167,5 @@ ELSE(GETTEXT_RUNTIME_FOUND AND GETTEXT_TOOLS_FOUND)
 ENDIF(GETTEXT_RUNTIME_FOUND AND GETTEXT_TOOLS_FOUND)
 
 IF(NOT GETTEXT_FOUND AND NOT Gettext_FIND_QUIETLY AND Gettext_FIND_REQUIRED)
-  MESSAGE(FATAL_ERROR "Could not find gettext runtime library and tools.\n\n${GETTEXT_INFO_MSG}")
+  MESSAGE(FATAL_ERROR "Could not find gettext runtime library and tools for internationalization purposes.\n\n${GETTEXT_INFO_MSG}")
 ENDIF(NOT GETTEXT_FOUND AND NOT Gettext_FIND_QUIETLY AND Gettext_FIND_REQUIRED)
- 
