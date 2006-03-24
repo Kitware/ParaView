@@ -127,15 +127,15 @@ int my_main(int argc, char *argv[])
   if (option_test)
     {
     vtkKWLanguage::SetCurrentLanguage(vtkKWLanguage::FRENCH);
-    sprintf(buffer, _("The string '%s' has %d characters."), "foo", 3);
+    sprintf(buffer, _("Test foo = %s and 3 = %d."), "foo", 3);
 #ifdef KWWidgets_USE_INTERNATIONALIZATION
-    ret += (strcmp(buffer, "Il y a 3 caractères dans la chaîne 'foo'.") ||
-            strcmp(s_("Button|English"), "Anglais")) ? 1 : 0;
+    ret += strcmp(buffer, "Test 3 = 3 et foo = foo.") ? 1 : 0;
+    ret += strcmp(s_("Button|English"), "Anglais") ? 1 : 0;
     vtkKWLanguage::SetCurrentLanguage(vtkKWLanguage::ENGLISH);
-    sprintf(buffer, _("The string '%s' has %d characters."), "foo", 3);
+    sprintf(buffer, _("Test foo = %s and 3 = %d."), "foo", 3);
 #endif
-    ret += (strcmp(buffer, "The string 'foo' has 3 characters.") ||
-            strcmp(s_("Button|English"), "English")) ? 1 : 0;
+    ret += strcmp(buffer, "Test foo = foo and 3 = 3.") ? 1 : 0;
+    ret += strcmp(s_("Button|English"), "English") ? 1 : 0;
     }
 
   // Deallocate and exit
