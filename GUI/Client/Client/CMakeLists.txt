@@ -42,11 +42,18 @@ INCLUDE_DIRECTORIES(
 
 ADD_DEFINITIONS(-DVERSION=${PARAQ_VERSION})
 
+# Reduce the number of dirs that get included on moc command line
+# since it causes issues on Windows 2000.
+GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
+SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
+
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqAboutDialog.h
   pqMainWindow.h
   ${PYTHON_MOC_SOURCES}
 )
+
+SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
 SET(UI_FORMS
   pqAbout.ui

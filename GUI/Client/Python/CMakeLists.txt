@@ -7,10 +7,17 @@ INCLUDE_DIRECTORIES(
   ${PYTHON_INCLUDE_PATH}
 )
 
+# Reduce the number of dirs that get included on moc command line
+# since it causes issues on Windows 2000.
+GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
+SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
+
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPythonShell.h
   pqPythonStream.h
 )
+
+SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
 ADD_LIBRARY(QtPython
   pqPythonShell.cxx
