@@ -31,7 +31,6 @@ IF (BUILD_DOCUMENTATION)
         \"${ParaQ_SOURCE_DIR}/GUI/Widgets\" \\
         \"${ParaQ_SOURCE_DIR}/GUI/Widgets/Chart\" \\
         \"${ParaQ_SOURCE_DIR}/GUI/Widgets/Testing\" \\
-        \"${ParaQ_SOURCE_DIR}/GUI/Client/Client\" \\
         \"${ParaQ_SOURCE_DIR}/GUI/Client/Widgets\" \\
         \"${ParaQ_SOURCE_DIR}/GUI/Client/Components\" \\
         \"${ParaQ_SOURCE_DIR}/GUI/Client/Python\" \\
@@ -48,7 +47,6 @@ IF (BUILD_DOCUMENTATION)
         \"${ParaQ_SOURCE_DIR}/GUI/Widgets\" \\
         \"${ParaQ_SOURCE_DIR}/GUI/Widgets/Chart\" \\
         \"${ParaQ_SOURCE_DIR}/GUI/Widgets/Testing\" \\
-        \"${ParaQ_SOURCE_DIR}/GUI/Client/Client\" \\
         \"${ParaQ_SOURCE_DIR}/GUI/Client/Widgets\" \\
         \"${ParaQ_SOURCE_DIR}/GUI/Client/Components\" \\
         \"${ParaQ_SOURCE_DIR}/GUI/Client/Python\" \\
