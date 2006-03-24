@@ -1,6 +1,7 @@
 PROJECT(pqChart)
 
 INCLUDE_DIRECTORIES(
+  ${VTK_INCLUDE_DIR}
   ${QtComponents_SOURCE_DIR}
 )
 
@@ -134,3 +135,5 @@ TARGET_LINK_LIBRARIES(pqChartPlugin
   pqChart
   ${QT_LIBRARIES}
 )
+
+

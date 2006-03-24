@@ -1,5 +1,9 @@
 PROJECT (Widgets)
 
+SUBDIRS(
+  Chart
+)
+
 ## Add the source (*.cxx,*.h) files here.
 #SET(Widgets_SRCS
 #

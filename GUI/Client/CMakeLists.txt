@@ -24,7 +24,6 @@ ENDIF(PARAQ_EMBED_PYTHON)
 
 SUBDIRS(
   Components
-  Chart
   Testing
   Widgets)
 
