@@ -2,6 +2,7 @@ PROJECT (Widgets)
 
 SUBDIRS(
   Chart
+  Testing
 )
 
 ## Add the source (*.cxx,*.h) files here.
