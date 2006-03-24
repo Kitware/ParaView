@@ -18,6 +18,7 @@ INCLUDE_DIRECTORIES(
 )
 
 SUBDIRS(
-  DobranoViz
+  Client
+  Dobranoviz
 )
 

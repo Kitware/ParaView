@@ -30,31 +30,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqAboutDialog_h
-#define _pqAboutDialog_h
+#include "AboutDialog.h"
 
-#include "ui_pqAbout.h"
-
-/// Provides an about dialog
-class pqAboutDialog :
-  public QDialog
+AboutDialog::AboutDialog(QWidget* Parent) :
+  QDialog(Parent)
 {
-  Q_OBJECT
+  this->Ui.setupUi(this);
+  this->setObjectName("aboutDialog");
+}
 
-public:
-  pqAboutDialog(QWidget* Parent);
+AboutDialog::~AboutDialog()
+{
+}
 
-private:
-  ~pqAboutDialog();
-  pqAboutDialog(const pqAboutDialog&);
-  pqAboutDialog& operator=(const pqAboutDialog&);
-  
-  Ui::pqAboutDialog Ui;
-  
-private slots:
-  void accept();
-  void reject();
-};
+void AboutDialog::accept()
+{
+  QDialog::accept();
+  delete this;
+}
 
-#endif // !_pqAboutDialog_h
+void AboutDialog::reject()
+{
+  QDialog::reject();
+  delete this;
+}
 

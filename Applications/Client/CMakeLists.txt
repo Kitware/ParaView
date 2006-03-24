@@ -8,14 +8,14 @@ IF(PARAQ_EMBED_PYTHON)
     ${QtPython_SOURCE_DIR}
   )
   SET(PYTHON_UI_FORMS
-    pqPython.ui
+    PythonDialog.ui
   )
   SET(PYTHON_MOC_SOURCES
-    pqPythonDialog.h
+    PythonDialog.h
   )
   SET(PYTHON_SOURCES
-    pqPythonDialog.cxx
-    pqPythonDialog.h
+    PythonDialog.cxx
+    PythonDialog.h
   )
   SET(PYTHON_LINK_LIBRARIES
     pqPython
@@ -48,15 +48,15 @@ GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
-  pqAboutDialog.h
-  pqMainWindow.h
+  AboutDialog.h
+  MainWindow.h
   ${PYTHON_MOC_SOURCES}
 )
 
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
 SET(UI_FORMS
-  pqAbout.ui
+  AboutDialog.ui
   ${PYTHON_UI_FORMS}
 )
 
@@ -65,7 +65,7 @@ QT4_WRAP_UI(UI_BUILT_SOURCES
 )
 
 SET(UI_RESOURCES
-  pqClient.qrc
+  Resources.qrc
 )
 
 QT4_ADD_RESOURCES(RCS_SOURCES
@@ -88,11 +88,11 @@ IF(WIN32)
 ENDIF(WIN32)
 
 ADD_EXECUTABLE(pqClient WIN32 MACOSX_BUNDLE
+  AboutDialog.cxx
+  AboutDialog.h
+  MainWindow.cxx
+  MainWindow.h
   main.cxx
-  pqAboutDialog.cxx
-  pqAboutDialog.h
-  pqMainWindow.cxx
-  pqMainWindow.h
   ${PYTHON_SOURCES}
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}

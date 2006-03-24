@@ -2,14 +2,14 @@
  <author></author>
  <comment></comment>
  <exportmacro></exportmacro>
- <class>pqAboutDialog</class>
- <widget class="QDialog" name="pqAboutDialog" >
+ <class>AboutDialog</class>
+ <widget class="QDialog" name="AboutDialog" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>364</width>
-    <height>227</height>
+    <width>462</width>
+    <height>266</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -47,7 +47,7 @@
       <string/>
      </property>
      <property name="pixmap" >
-      <pixmap resource="pqClient.qrc" >:/pqClient/ParaQLogo.png</pixmap>
+      <pixmap resource="Resources.qrc" >:/pqClient/ParaQLogo.png</pixmap>
      </property>
     </widget>
    </item>
@@ -85,13 +85,13 @@
  </widget>
  <pixmapfunction></pixmapfunction>
  <resources>
-  <include location="pqClient.qrc" />
+  <include location="Resources.qrc" />
  </resources>
  <connections>
   <connection>
    <sender>okButton</sender>
    <signal>clicked()</signal>
-   <receiver>pqAboutDialog</receiver>
+   <receiver>AboutDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel" >

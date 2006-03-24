@@ -6,13 +6,11 @@ SET (MOC_INCLUDE_DIRS
   ${CMAKE_CURRENT_SOURCE_DIR}/Components
   ${CMAKE_CURRENT_SOURCE_DIR}/Testing
   ${CMAKE_CURRENT_SOURCE_DIR}/Widgets
-  ${CMAKE_CURRENT_SOURCE_DIR}/Client
 
   #${CMAKE_CURRENT_BINARY_DIR}/Chart
   #${CMAKE_CURRENT_BINARY_DIR}/Components
   #${CMAKE_CURRENT_BINARY_DIR}/Testing
   #${CMAKE_CURRENT_BINARY_DIR}/Widgets
-  #${CMAKE_CURRENT_BINARY_DIR}/Client
   )
 
 IF(PARAQ_EMBED_PYTHON)
@@ -28,8 +26,7 @@ SUBDIRS(
   Components
   Chart
   Testing
-  Widgets
-  Client)
+  Widgets)
 
 
 

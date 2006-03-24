@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqMainWindow_h
-#define _pqMainWindow_h
+#ifndef _MainWindow_h
+#define _MainWindow_h
 
 #include <pqVariableType.h>
 #include <QMainWindow>
@@ -61,14 +61,14 @@ class QTreeView;
 class QTabWidget;
 
 /// Provides the main window for the ParaQ application
-class pqMainWindow :
+class MainWindow :
         public QMainWindow
 {
   Q_OBJECT
 
 public:
-  pqMainWindow();
-  virtual ~pqMainWindow();
+  MainWindow();
+  virtual ~MainWindow();
 
   virtual bool eventFilter(QObject* watched, QEvent* e);
 
@@ -167,5 +167,5 @@ private:
   void cleanUpWindow(QVTKWidget *window);
 };
 
-#endif // !_pqMainWindow_h
+#endif // !_MainWindow_h
 

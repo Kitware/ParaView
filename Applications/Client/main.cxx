@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include <vtkToolkits.h>
-#include "pqMainWindow.h"
+#include "MainWindow.h"
 #include <QApplication>
 
 #ifdef VTK_USE_MPI
@@ -161,7 +161,7 @@ const arguments_t handleImageThreshold(const arguments_t& Arguments, bool& /*Qui
 }
 
 /// Parses command-line arguments for the --compare-view flag, returning unused arguments
-const arguments_t handleCompareView(const arguments_t& Arguments, pqMainWindow& MainWindow, bool& Quit, bool& Error)
+const arguments_t handleCompareView(const arguments_t& Arguments, MainWindow& MainWindow, bool& Quit, bool& Error)
 {
   arguments_t unused;
   
@@ -235,7 +235,7 @@ int main(int argc, char* argv[])
   Q_INIT_RESOURCE(pqWidgets);
 #endif
   
-  pqMainWindow main_window;
+  MainWindow main_window;
   main_window.resize(800, 600);
   main_window.show();
 

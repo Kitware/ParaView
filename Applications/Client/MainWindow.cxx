@@ -30,11 +30,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqAboutDialog.h"
-#include "pqMainWindow.h"
+#include "AboutDialog.h"
+#include "MainWindow.h"
 
 #ifdef PARAQ_EMBED_PYTHON
-#include "pqPythonDialog.h"
+#include "PythonDialog.h"
 #endif // PARAQ_EMBED_PYTHON
 
 #include <pqCompoundProxyWizard.h>
@@ -117,7 +117,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkTesting.h>
 #include <vtkUnstructuredGrid.h>
 
-pqMainWindow::pqMainWindow() :
+MainWindow::MainWindow() :
   CurrentServer(0),
   PropertyToolbar(0),
   MultiViewManager(0),
@@ -439,7 +439,7 @@ pqMainWindow::pqMainWindow() :
   this->PipelineList->setFocus();
 }
 
-pqMainWindow::~pqMainWindow()
+MainWindow::~MainWindow()
 {
   // Clean up the model before deleting the adaptor.
   if(this->Inspector)
@@ -473,7 +473,7 @@ pqMainWindow::~pqMainWindow()
   delete this->Adaptor;
 }
 
-bool pqMainWindow::eventFilter(QObject* watched, QEvent* e)
+bool MainWindow::eventFilter(QObject* watched, QEvent* e)
 {
   if(e->type() == QEvent::Hide || e->type() == QEvent::Show)
     {
@@ -503,7 +503,7 @@ bool pqMainWindow::eventFilter(QObject* watched, QEvent* e)
   return QMainWindow::eventFilter(watched, e);
 }
 
-void pqMainWindow::setServer(pqServer* Server)
+void MainWindow::setServer(pqServer* Server)
 {
   if(this->CurrentServer)
     {
@@ -536,7 +536,7 @@ void pqMainWindow::setServer(pqServer* Server)
   emit serverChanged(this->CurrentServer);
 }
 
-void pqMainWindow::onFileNew()
+void MainWindow::onFileNew()
 {
   // Reset the multi-view. Use the removed widget list to clean
   // up the render modules. Then, delete the widgets.
@@ -576,12 +576,12 @@ void pqMainWindow::onFileNew()
   emit serverChanged(this->CurrentServer);
 }
 
-void pqMainWindow::onFileNew(pqServer* Server)
+void MainWindow::onFileNew(pqServer* Server)
 {
   setServer(Server);
 }
 
-void pqMainWindow::onFileOpen()
+void MainWindow::onFileOpen()
 {
   if(!this->CurrentServer)
     {
@@ -596,7 +596,7 @@ void pqMainWindow::onFileOpen()
     }
 }
 
-void pqMainWindow::onFileOpen(pqServer* Server)
+void MainWindow::onFileOpen(pqServer* Server)
 {
   if(this->CurrentServer != Server)
     setServer(Server);
@@ -607,7 +607,7 @@ void pqMainWindow::onFileOpen(pqServer* Server)
   file_dialog->show();
 }
 
-void pqMainWindow::onFileOpen(const QStringList& Files)
+void MainWindow::onFileOpen(const QStringList& Files)
 {
   if(!this->Pipeline || !this->PipelineList)
     return;
@@ -640,7 +640,7 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
     }
 }
 
-void pqMainWindow::onFileOpenServerState()
+void MainWindow::onFileOpenServerState()
 {
   pqFileDialog *fileDialog = new pqFileDialog(new pqLocalFileDialogModel(),
       tr("Open Server State File:"), this, "fileOpenDialog");
@@ -650,11 +650,11 @@ void pqMainWindow::onFileOpenServerState()
   fileDialog->show();
 }
 
-void pqMainWindow::onFileOpenServerState(pqServer* /*Server*/)
+void MainWindow::onFileOpenServerState(pqServer* /*Server*/)
 {
 }
 
-void pqMainWindow::onFileOpenServerState(const QStringList& Files)
+void MainWindow::onFileOpenServerState(const QStringList& Files)
 {
   if(Files.size() == 0)
     {
@@ -716,7 +716,7 @@ void pqMainWindow::onFileOpenServerState(const QStringList& Files)
   xmlParser->Delete();
 }
 
-void pqMainWindow::onFileSaveServerState()
+void MainWindow::onFileSaveServerState()
 {
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save Server State:"), this, "fileSaveDialog");
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -724,7 +724,7 @@ void pqMainWindow::onFileSaveServerState()
   file_dialog->show();
 }
 
-void pqMainWindow::onFileSaveServerState(const QStringList& Files)
+void MainWindow::onFileSaveServerState(const QStringList& Files)
 {
   if(Files.size() == 0)
     {
@@ -770,7 +770,7 @@ void pqMainWindow::onFileSaveServerState(const QStringList& Files)
   root->Delete();
 }
 
-void pqMainWindow::onFileSaveScreenshot()
+void MainWindow::onFileSaveScreenshot()
 {
   if(!this->CurrentServer)
     {
@@ -793,7 +793,7 @@ void pqMainWindow::onFileSaveScreenshot()
   file_dialog->show();
 }
 
-void pqMainWindow::onFileSaveScreenshot(const QStringList& Files)
+void MainWindow::onFileSaveScreenshot(const QStringList& Files)
 {
   vtkRenderWindow* const render_window =
     this->ActiveView ? qobject_cast<QVTKWidget*>(this->ActiveView->mainWidget())->GetRenderWindow() : 0;
@@ -805,7 +805,7 @@ void pqMainWindow::onFileSaveScreenshot(const QStringList& Files)
     }
 }
 
-bool pqMainWindow::compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory)
+bool MainWindow::compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory)
 {
   vtkRenderWindow* const render_window =
     this->ActiveView ? qobject_cast<QVTKWidget*>(this->ActiveView->mainWidget())->GetRenderWindow() : 0;
@@ -816,7 +816,7 @@ bool pqMainWindow::compareView(const QString& ReferenceImage, double Threshold, 
   return pqImageComparison::CompareImage(render_window, ReferenceImage, Threshold, Output, TempDirectory);
 }
 
-void pqMainWindow::onServerConnect()
+void MainWindow::onServerConnect()
 {
   setServer(0);
   
@@ -826,17 +826,17 @@ void pqMainWindow::onServerConnect()
   server_browser->show();
 }
 
-void pqMainWindow::onServerConnect(pqServer* Server)
+void MainWindow::onServerConnect(pqServer* Server)
 {
   setServer(Server);
 }
 
-void pqMainWindow::onServerDisconnect()
+void MainWindow::onServerDisconnect()
 {
   setServer(0);
 }
 
-void pqMainWindow::onUpdateWindows()
+void MainWindow::onUpdateWindows()
 {
   /*
   if(this->CurrentServer)
@@ -844,7 +844,7 @@ void pqMainWindow::onUpdateWindows()
     */
 }
 
-void pqMainWindow::onUpdateSourcesFiltersMenu(pqServer* /*Server*/)
+void MainWindow::onUpdateSourcesFiltersMenu(pqServer* /*Server*/)
 {
   this->FiltersMenu->clear();
   this->SourcesMenu->clear();
@@ -972,7 +972,7 @@ void pqMainWindow::onUpdateSourcesFiltersMenu(pqServer* /*Server*/)
     }
 }
 
-void pqMainWindow::onCreateSource(QAction* action)
+void MainWindow::onCreateSource(QAction* action)
 {
   if(!action || !this->Pipeline || !this->PipelineList)
     return;
@@ -990,7 +990,7 @@ void pqMainWindow::onCreateSource(QAction* action)
     }
 }
 
-void pqMainWindow::onCreateFilter(QAction* action)
+void MainWindow::onCreateFilter(QAction* action)
 {
   if(!action || !this->Pipeline || !this->PipelineList)
     return;
@@ -1030,11 +1030,11 @@ void pqMainWindow::onCreateFilter(QAction* action)
     }
 }
 
-void pqMainWindow::onOpenLinkEditor()
+void MainWindow::onOpenLinkEditor()
 {
 }
 
-void pqMainWindow::onOpenCompoundFilterWizard()
+void MainWindow::onOpenCompoundFilterWizard()
 {
   pqCompoundProxyWizard* wizard = new pqCompoundProxyWizard(this->CurrentServer, this);
   wizard->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
@@ -1046,13 +1046,13 @@ void pqMainWindow::onOpenCompoundFilterWizard()
 }
 
 
-void pqMainWindow::onHelpAbout()
+void MainWindow::onHelpAbout()
 {
-  pqAboutDialog* const dialog = new pqAboutDialog(this);
+  AboutDialog* const dialog = new AboutDialog(this);
   dialog->show();
 }
 
-void pqMainWindow::onRecordTest()
+void MainWindow::onRecordTest()
 {
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Record Test:"), this, "fileSaveDialog");
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -1060,7 +1060,7 @@ void pqMainWindow::onRecordTest()
   file_dialog->show();
 }
 
-void pqMainWindow::onRecordTest(const QStringList& Files)
+void MainWindow::onRecordTest(const QStringList& Files)
 {
   for(int i = 0; i != Files.size(); ++i)
     {
@@ -1069,7 +1069,7 @@ void pqMainWindow::onRecordTest(const QStringList& Files)
     }
 }
 
-void pqMainWindow::onPlayTest()
+void MainWindow::onPlayTest()
 {
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Record Test:"), this, "fileSaveDialog");
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -1077,7 +1077,7 @@ void pqMainWindow::onPlayTest()
   file_dialog->show();
 }
 
-void pqMainWindow::onPlayTest(const QStringList& Files)
+void MainWindow::onPlayTest(const QStringList& Files)
 {
   pqEventPlayer player(*this);
   player.addDefaultWidgetEventPlayers();
@@ -1089,15 +1089,15 @@ void pqMainWindow::onPlayTest(const QStringList& Files)
     }
 }
 
-void pqMainWindow::onPythonShell()
+void MainWindow::onPythonShell()
 {
 #ifdef PARAQ_EMBED_PYTHON
-  pqPythonDialog* const dialog = new pqPythonDialog(this);
+  PythonDialog* const dialog = new PythonDialog(this);
   dialog->show();
 #endif // PARAQ_EMBED_PYTHON
 }
 
-void pqMainWindow::onNewQVTKWidget(pqMultiViewFrame* frame)
+void MainWindow::onNewQVTKWidget(pqMultiViewFrame* frame)
 {
   QVTKWidget *widget = ParaQ::AddQVTKWidget(frame, this->MultiViewManager,
       this->CurrentServer);
@@ -1115,7 +1115,7 @@ void pqMainWindow::onNewQVTKWidget(pqMultiViewFrame* frame)
     }
 }
 
-void pqMainWindow::onDeleteQVTKWidget(pqMultiViewFrame* p)
+void MainWindow::onDeleteQVTKWidget(pqMultiViewFrame* p)
 {
   QVTKWidget* w = qobject_cast<QVTKWidget*>(p->mainWidget());
   this->cleanUpWindow(w);
@@ -1129,7 +1129,7 @@ void pqMainWindow::onDeleteQVTKWidget(pqMultiViewFrame* p)
     }
 }
 
-void pqMainWindow::onFrameActive(QWidget* w)
+void MainWindow::onFrameActive(QWidget* w)
 {
   if(this->ActiveView && this->ActiveView != w)
     {
@@ -1141,7 +1141,7 @@ void pqMainWindow::onFrameActive(QWidget* w)
   this->ActiveView = qobject_cast<pqMultiViewFrame*>(w);
 }
 
-void pqMainWindow::onNewSelections(vtkSMProxy*, vtkUnstructuredGrid* selections)
+void MainWindow::onNewSelections(vtkSMProxy*, vtkUnstructuredGrid* selections)
 {
   // Update the element inspector ...
   if(pqElementInspectorWidget* const element_inspector = this->ElementInspectorDock->findChild<pqElementInspectorWidget*>())
@@ -1150,7 +1150,7 @@ void pqMainWindow::onNewSelections(vtkSMProxy*, vtkUnstructuredGrid* selections)
     }
 }
 
-void pqMainWindow::onCreateCompoundProxy(QAction* action)
+void MainWindow::onCreateCompoundProxy(QAction* action)
 {
   if(!action || !this->Pipeline || !this->PipelineList)
     return;
@@ -1202,13 +1202,13 @@ void pqMainWindow::onCreateCompoundProxy(QAction* action)
     }
 }
 
-void pqMainWindow::onCompoundProxyAdded(const QString&, const QString& proxy)
+void MainWindow::onCompoundProxyAdded(const QString&, const QString& proxy)
 {
   this->CompoundProxyToolBar->addAction(QIcon(":/pqWidgets/pqBundle32.png"), proxy) 
     << pqSetName(proxy) << pqSetData(proxy);
 }
 
-void pqMainWindow::onAddServer(pqPipelineServer *server)
+void MainWindow::onAddServer(pqPipelineServer *server)
 {
   // When restoring a state file, the PipelineData object will
   // create the pqServer. Make sure the CurrentServer gets set.
@@ -1219,7 +1219,7 @@ void pqMainWindow::onAddServer(pqPipelineServer *server)
     }
 }
 
-void pqMainWindow::onRemoveServer(pqPipelineServer *server)
+void MainWindow::onRemoveServer(pqPipelineServer *server)
 {
   if(!server || !this->MultiViewManager)
     {
@@ -1246,7 +1246,7 @@ void pqMainWindow::onRemoveServer(pqPipelineServer *server)
   this->MultiViewManager->blockSignals(false);
 }
 
-void pqMainWindow::onAddWindow(pqPipelineWindow *win)
+void MainWindow::onAddWindow(pqPipelineWindow *win)
 {
   if(!win)
     {
@@ -1271,7 +1271,7 @@ void pqMainWindow::onAddWindow(pqPipelineWindow *win)
     }
 }
 
-void pqMainWindow::cleanUpWindow(QVTKWidget *win)
+void MainWindow::cleanUpWindow(QVTKWidget *win)
 {
   if(win && this->Pipeline)
     {
@@ -1285,7 +1285,7 @@ void pqMainWindow::cleanUpWindow(QVTKWidget *win)
 }
 
 
-void pqMainWindow::onProxySelected(vtkSMProxy* p)
+void MainWindow::onProxySelected(vtkSMProxy* p)
 {
   this->CurrentProxy = p;
 
@@ -1359,7 +1359,7 @@ void pqMainWindow::onProxySelected(vtkSMProxy* p)
     }
 }
 
-void pqMainWindow::onVariableChanged(pqVariableType type, const QString& name)
+void MainWindow::onVariableChanged(pqVariableType type, const QString& name)
 {
   if(this->CurrentProxy)
     {
@@ -1381,7 +1381,7 @@ void pqMainWindow::onVariableChanged(pqVariableType type, const QString& name)
     }
 }
 
-void pqMainWindow::onFirstTimeStep()
+void MainWindow::onFirstTimeStep()
 {
   if(!this->CurrentServer)
     return;
@@ -1419,7 +1419,7 @@ void pqMainWindow::onFirstTimeStep()
     }
 }
 
-void pqMainWindow::onPreviousTimeStep()
+void MainWindow::onPreviousTimeStep()
 {
   if(!this->CurrentServer)
     return;
@@ -1457,7 +1457,7 @@ void pqMainWindow::onPreviousTimeStep()
     }
 }
 
-void pqMainWindow::onNextTimeStep()
+void MainWindow::onNextTimeStep()
 {
   if(!this->CurrentServer)
     return;
@@ -1495,7 +1495,7 @@ void pqMainWindow::onNextTimeStep()
     }
 }
 
-void pqMainWindow::onLastTimeStep()
+void MainWindow::onLastTimeStep()
 {
   if(!this->CurrentServer)
     return;
