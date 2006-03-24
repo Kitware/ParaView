@@ -30,13 +30,15 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWInternationalization);
-vtkCxxRevisionMacro(vtkKWInternationalization, "1.3");
+vtkCxxRevisionMacro(vtkKWInternationalization, "1.4");
 
 //----------------------------------------------------------------------------
 void vtkKWInternationalization::SetCurrentTextDomain(const char *domain_name)
 {
 #ifdef KWWidgets_USE_INTERNATIONALIZATION
   textdomain(domain_name);
+#else
+  (void)domain_name;
 #endif
 }
 
@@ -56,6 +58,9 @@ void vtkKWInternationalization::SetTextDomainBinding(
 {
 #ifdef KWWidgets_USE_INTERNATIONALIZATION
   bindtextdomain(domain_name, dir);
+#else
+  (void)domain_name;
+  (void)dir;
 #endif
 }
 
@@ -66,6 +71,7 @@ const char* vtkKWInternationalization::GetTextDomainBinding(
 #ifdef KWWidgets_USE_INTERNATIONALIZATION
   return bindtextdomain(domain_name, NULL);
 #else
+  (void)domain_name;
   return NULL;
 #endif
 }
@@ -292,7 +298,9 @@ const char* vtkKWInternationalization::FindTextDomainBinding(
 
     return vtkKWInternationalization::GetTextDomainBinding(domain_name);
     }
-
+#else
+  (void)domain_name;
+  (void)dirs_to_search;
 #endif
   return NULL;
 }
@@ -329,6 +337,7 @@ char* kww_sdgettext(const char *domain_name, const char *msgid)
   char *msgval = dgettext(domain_name, msgid);
   if (msgval == msgid)
 #else
+  (void)domain_name;
   char *msgval = const_cast<char*>(msgid);
 #endif
     {

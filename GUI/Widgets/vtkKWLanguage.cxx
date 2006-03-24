@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLanguage);
-vtkCxxRevisionMacro(vtkKWLanguage, "1.2");
+vtkCxxRevisionMacro(vtkKWLanguage, "1.3");
 
 //----------------------------------------------------------------------------
 void vtkKWLanguage::SetCurrentLanguage(int lang)
@@ -1793,6 +1793,7 @@ int vtkKWLanguage::GetWin32LANGIDFromLanguage(int lang)
       return (int)MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
     }
 #else
+  (void)lang;
   return 0;
 #endif
 }
@@ -2104,7 +2105,8 @@ int vtkKWLanguage::GetLanguageFromWin32LANGID(int win32langid)
     return vtkKWLanguage::UZBEK_LATIN;
   if (primary == LANG_VIETNAMESE && sub == SUBLANG_DEFAULT)
     return vtkKWLanguage::VIETNAMESE;
-  
+#else  
+  (void)win32langid;
 #endif
   return vtkKWLanguage::UNKNOWN;
 }
