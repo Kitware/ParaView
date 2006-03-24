@@ -44,6 +44,7 @@
 #include <vtkInformation.h>
 #include <vtkPointData.h>
 #include <vtkPointSet.h>
+#include <vtkSmartPointer.h>
 #include <vtkSMInputProperty.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMSourceProxy.h>
@@ -82,6 +83,15 @@ struct LineChartAdapter::pqImplementation
   {
     QString Label;
     QVector<double> Times;
+    QVector<double> UpperBounds;
+    QVector<double> LowerBounds;
+  };
+
+  struct DataT
+  {
+    QString Label;
+    QVector<double> Times;
+    QVector<double> Values;
     QVector<double> UpperBounds;
     QVector<double> LowerBounds;
   };
@@ -331,6 +341,39 @@ struct LineChartAdapter::pqImplementation
   
   void finishParsingSimulationUncertainty()
   {
+    if(this->CSVSeries.size() < 3)
+      return;
+
+    // The first column in the file will be time
+    QStringList& time = this->CSVSeries[0];
+    if(time.size() < 2)
+      return;
+    
+    // Each group of two columns after the first is upper and lower bounds of uncertainty
+    for(int i = 1; i < this->CSVSeries.size() - 1; i += 2)
+      {
+      QStringList& upper_bounds = this->CSVSeries[i];
+      QStringList& lower_bounds = this->CSVSeries[i + 1];
+      
+      if(upper_bounds.size() != time.size() || lower_bounds.size() != time.size())
+        continue;
+        
+      if(upper_bounds[0] != lower_bounds[0])
+        continue;
+
+      SimulationUncertaintyT uncertainty;
+      uncertainty.Label = upper_bounds[0];
+
+      for(int i = 1; i != upper_bounds.size(); ++i)
+        {
+        uncertainty.Times.push_back(time[i].toDouble());
+        uncertainty.UpperBounds.push_back(upper_bounds[i].toDouble());
+        uncertainty.LowerBounds.push_back(lower_bounds[i].toDouble());
+        }
+      
+      this->SimulationUncertainty.push_back(uncertainty);  
+      }
+
     this->CSVSeries.clear();
   }
 
@@ -416,120 +459,244 @@ struct LineChartAdapter::pqImplementation
   {
     this->ShowDifferences = state;
   }
-  
-  void addExperimentalPlot(const ExperimentalDataT& data, const QPen& plot_pen, const QPen& whisker_pen)
-  {
-    const int sample_size = data.Values.size() > 2 * this->Samples ? data.Values.size() / this->Samples : 1;
 
-    // Get the reference image (if any) for this plot ...
-    QPixmap reference_image;
-    if(reference_image.load(this->ExperimentImageMap[data.Label]))
+  /// Given experimental data, returns the corresponding reference image (if any)
+  const QPixmap getReferenceImage(const ExperimentalDataT& data)
+  {
+    QPixmap result;
+    if(result.load(this->ExperimentImageMap[data.Label]))
       {
-      if(reference_image.width() > 200 || reference_image.height() > 200)
+      if(result.width() > 200 || result.height() > 200)
         {
-        reference_image = reference_image.scaled(200, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        result = result.scaled(200, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         }
       }
+      
+    return result;
+  }
+  
+  /// Returns experimental data plus (optional) uncertainty.  If uncertainty is unavailable, the uncertainty values will all be zero
+  const DataT getExperimentalData(const ExperimentalDataT& data)
+  {
+    DataT result;
+    result.Label = data.Label;
+    result.Times = data.Times;
+    result.Values = data.Values;
 
-    // Look for matching experimental uncertainty data ...
+    // Find uncertainty data (if any) ...
     for(int i = 0; i != this->ExperimentalUncertainty.size(); ++i)
       {
-      ExperimentalUncertaintyT& uncertainty = this->ExperimentalUncertainty[i];
-      
-      // The labels have to match ...
-      if(uncertainty.Label != data.Label)
+      if(this->ExperimentalUncertainty[i].Label != data.Label)
         continue;
-        
-      // The size of the data must match ...
-      if(uncertainty.Times.size() != data.Times.size())
+
+      if(this->ExperimentalUncertainty[i].Times.size() != data.Times.size())
         continue;
-        
-      // Found matching uncertainty data, so create a line plot with whiskers ...
-      double time_delta = VTK_DOUBLE_MAX;
-      pqLineErrorPlot::CoordinatesT coordinates;
-      for(int i = 0; i < data.Times.size(); i += sample_size)
-        {
-        if(i != 0)
-          {
-          time_delta = vtkstd::min(time_delta, data.Times[i] - data.Times[i - sample_size]);
-          }
-          
-        coordinates.push_back(
-          pqLineErrorPlot::Coordinate(
-            data.Times[i],
-            data.Values[i],
-            uncertainty.UpperBounds[i],
-            uncertainty.LowerBounds[i]));
-        }
-    
-      this->Chart.getLineChart().addData(
-        new ImageLineErrorPlot(
-          new pqNullMarkerPen(plot_pen),
-          whisker_pen,
-          this->ErrorBarWidth * time_delta,
-          coordinates,
-          reference_image));
+
+      result.UpperBounds = this->ExperimentalUncertainty[i].UpperBounds;        
+      result.LowerBounds = this->ExperimentalUncertainty[i].LowerBounds;        
       
-      this->Chart.getLegend().addEntry(
-        new pqNullMarkerPen(plot_pen),
-        new pqChartLabel(data.Label));
-          
-        return;
+      return result;
       }
+
+    result.UpperBounds = QVector<double>(data.Times.size(), 0.0);
+    result.LowerBounds = QVector<double>(data.Times.size(), 0.0);
     
-    // No uncertainty data, so create a line plot without whiskers ...
-    pqChartCoordinateList coordinates;
-    for(int i = 0; i < data.Times.size(); i += sample_size)
-      {
-      coordinates.pushBack(pqChartCoordinate(data.Times[i], data.Values[i]));
-      }
+    return result;
+  }
   
-    this->Chart.getLineChart().addData(
-      new ImageLinePlot(
-        new pqCircleMarkerPen(plot_pen, QSize(3, 3), QPen(plot_pen.color()), QBrush(Qt::white)),
-        coordinates,
-        reference_image));
+  /// Returns simulation data plus (optional) uncertainty.  If uncertainty is unavailable, the uncertainty values will all be zero
+  const DataT getSimulationData(vtkExodusReader& reader, const int simulation_element_id)
+  {
+    DataT result;
+    result.Label = QString("Element %1").arg(simulation_element_id);
+
+    // Get timestep data from the reader ...
+    vtkInformation* const information = reader.GetExecutive()->GetOutputInformation(0);
+    if(!information)
+      return DataT();
+      
+    const int time_step_count = information->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
+    result.Times.resize(time_step_count);
+    information->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), result.Times.data());
+  
+    // Get simulation values from the reader ...
+    const int id = simulation_element_id + 1; // Exodus expects one-based cell ids
+    const char* type = this->ExodusVariableType == VARIABLE_TYPE_CELL ? "CELL" : "POINT";
+    vtkSmartPointer<vtkFloatArray> values = vtkSmartPointer<vtkFloatArray>::New();
+    reader.GetTimeSeriesData(id, this->ExodusVariableName.toAscii().data(), type, values); 
     
+    if(time_step_count != values->GetNumberOfTuples())
+      return DataT();
+
+    for(int i = 0; i != time_step_count; ++i)
+      result.Values.push_back(values->GetValue(i));
+
+    // Get the simulation uncertainty data (if any) for this element ...
+    for(int i = 0; i != this->SimulationUncertainty.size(); ++i)
+      {
+      if(this->SimulationUncertainty[i].Label != QString("%1").arg(simulation_element_id))
+        continue;
+        
+      if(this->SimulationUncertainty[i].Times.size() != result.Times.size())
+        continue;
+
+      result.UpperBounds = this->SimulationUncertainty[i].UpperBounds;
+      result.LowerBounds = this->SimulationUncertainty[i].LowerBounds;
+
+      return result;
+      }
+
+    result.UpperBounds = QVector<double>(time_step_count, 0.0);
+    result.LowerBounds = QVector<double>(time_step_count, 0.0);
+    
+    return result;
+  }
+
+  void addExperimentalPlot(const ExperimentalDataT& experimental_data, const QPen& plot_pen, const QPen& whisker_pen)
+  {
+    const DataT data = getExperimentalData(experimental_data);
+  
+    const int samples = vtkstd::min(data.Values.size(), this->Samples);
+
+    double time_delta = VTK_DOUBLE_MAX;
+    pqLineErrorPlot::CoordinatesT coordinates;
+    for(int i = 0; i != samples; ++i)
+      {
+      const int index = static_cast<int>(static_cast<double>(i) / static_cast<double>(samples - 1) * (data.Times.size() - 1));
+
+      // Keep track of the distance between samples so we can size our error-bar whiskers appropriately ...
+      if(i != 0)
+        {
+        const int index2 = static_cast<int>(static_cast<double>(i-1) / static_cast<double>(samples - 1) * (data.Times.size() - 1));
+        time_delta = vtkstd::min(time_delta, data.Times[index] - data.Times[index2]);
+        }
+        
+      coordinates.push_back(
+        pqLineErrorPlot::Coordinate(
+          data.Times[index],
+          data.Values[index],
+          data.UpperBounds[index],
+          data.LowerBounds[index]));
+      }
+
+    this->Chart.getLineChart().addData(
+      new ImageLineErrorPlot(
+        new pqCircleMarkerPen(plot_pen, QSize(4, 4), QPen(plot_pen.color(), 0.5), QBrush(Qt::white)),
+        whisker_pen,
+        this->ErrorBarWidth * time_delta,
+        coordinates,
+        getReferenceImage(experimental_data)));
+
     this->Chart.getLegend().addEntry(
-        new pqCircleMarkerPen(plot_pen, QSize(3, 3), QPen(plot_pen.color()), QBrush(Qt::white)),
+      new pqCircleMarkerPen(plot_pen, QSize(4, 4), QPen(plot_pen.color(), 0.5), QBrush(Qt::white)),
       new pqChartLabel(data.Label));
   }
   
-  void addSimulationPlot(vtkExodusReader& Reader, const int ElementID, const QPen& Pen)
+  void addSimulationPlot(vtkExodusReader& reader, const int simulation_element_id, const QPen& pen)
   {
-    // Get timestep data from the reader ...
-    vtkInformation* const information = Reader.GetExecutive()->GetOutputInformation(0);
-    if(!information)
-      return;
-    const int time_step_count = information->Length(vtkStreamingDemandDrivenPipeline::TIME_STEPS());
-    QVector<double> time_steps(time_step_count);
-    information->Get(vtkStreamingDemandDrivenPipeline::TIME_STEPS(), time_steps.data());
-  
-    // Get values from the reader ...
-    const int id = ElementID + 1; // Exodus expects one-based cell ids
-    const char* type = this->ExodusVariableType == VARIABLE_TYPE_CELL ? "CELL" : "POINT";
-    vtkFloatArray* const values = vtkFloatArray::New();
-    Reader.GetTimeSeriesData(id, this->ExodusVariableName.toAscii().data(), type, values); 
-    
-    if(time_steps.size() != values->GetNumberOfTuples())
-      return;
-    
-    pqChartCoordinateList coordinates;
-    for(vtkIdType i = 0; i != values->GetNumberOfTuples(); ++i)
+    const DataT data = getSimulationData(reader, simulation_element_id);
+
+    double time_delta = VTK_DOUBLE_MAX;
+    pqLineErrorPlot::CoordinatesT coordinates;
+    for(int i = 0; i != data.Times.size(); ++i)
       {
-      const double time = time_steps[i];
-      const double value = values->GetValue(i) - 273.15;
-      coordinates.pushBack(pqChartCoordinate(time, value));
+      // Keep track of the distance between samples so we can size our error-bar whiskers appropriately ...
+      if(i != 0)
+        {
+        time_delta = vtkstd::min(time_delta, data.Times[i] - data.Times[i-1]);
+        }
+        
+      coordinates.push_back(
+        pqLineErrorPlot::Coordinate(
+          data.Times[i],
+          data.Values[i],
+          data.UpperBounds[i],
+          data.LowerBounds[i]));
       }
 
-    values->Delete();
-    
-    pqLinePlot* const plot = new pqLinePlot(
-      new pqCircleMarkerPen(Pen, QSize(4, 4), QPen(Pen.color(), 0.5), QBrush(Qt::white)),
-      coordinates);
-    
-    this->Chart.getLineChart().addData(plot);
-    this->Chart.getLegend().addEntry(new pqCircleMarkerPen(Pen, QSize(4, 4), QPen(Pen.color(), 0.5), QBrush(Qt::white)), new pqChartLabel(QString("Element %1").arg(ElementID)));
+    this->Chart.getLineChart().addData(
+      new pqLineErrorPlot(
+        new pqCircleMarkerPen(pen, QSize(4, 4), QPen(pen.color(), 0.5), QBrush(Qt::white)),
+        pen,
+        this->ErrorBarWidth * time_delta,
+        coordinates));
+
+    this->Chart.getLegend().addEntry(
+      new pqCircleMarkerPen(pen, QSize(4, 4), QPen(pen.color(), 0.5), QBrush(Qt::white)),
+      new pqChartLabel(data.Label));
+  }
+
+  static inline double lerp(const double A, const double B, const double Amount)
+  {
+    return (1.0 - Amount) * A + (Amount) * B;
+  }
+
+  void addDifferencePlot(const ExperimentalDataT& experimental, vtkExodusReader& reader, const int simulation_element_id)
+  {
+    const DataT experimental_data = getExperimentalData(experimental);
+    const DataT simulation_data = getSimulationData(reader, simulation_element_id);
+  
+    const int samples = vtkstd::min(experimental_data.Values.size(), this->Samples);
+
+    // For each experimental value ...   
+    double time_delta = VTK_DOUBLE_MAX;
+    pqLineErrorPlot::CoordinatesT coordinates;
+    for(int i = 0; i != samples; ++i)
+      {
+      const int index = static_cast<int>(static_cast<double>(i) / static_cast<double>(samples - 1) * (experimental_data.Times.size() - 1));
+
+      // Keep track of the distance between samples so we can size our error-bar whiskers appropriately ...
+      if(i != 0)
+        {
+        const int index2 = static_cast<int>(static_cast<double>(i-1) / static_cast<double>(samples - 1) * (experimental_data.Times.size() - 1));
+        time_delta = vtkstd::min(time_delta, experimental_data.Times[index] - experimental_data.Times[index2]);
+        }
+        
+      const double experimental_time = experimental_data.Times[index];
+      const double experimental_value = experimental_data.Values[index];
+      const double experimental_upper_bound = experimental_data.UpperBounds[index];
+      const double experimental_lower_bound = experimental_data.LowerBounds[index];
+
+      // Find two simulation values that bracket it in time ...
+      int s1 = -1;
+      int s2 = -1;
+      for(s2 = 0; s2 != simulation_data.Times.size(); ++s2)
+        {
+        if(simulation_data.Times[s2] > experimental_time)
+          {
+          s1 = s2 - 1;
+          break;
+          }
+        }
+        
+      if(s1 < 0 || s2 == simulation_data.Times.size())
+        continue;
+      
+      // Get the simulation value and bounds through linear interpolation ...
+      const double amount = (experimental_time - simulation_data.Times[s1]) / (simulation_data.Times[s2] - simulation_data.Times[s1]);
+      
+      const double simulation_value = lerp(simulation_data.Values[s1], simulation_data.Values[s2], amount);
+      const double simulation_upper_bound = lerp(simulation_data.UpperBounds[s1], simulation_data.UpperBounds[s2], amount);
+      const double simulation_lower_bound = lerp(simulation_data.LowerBounds[s1], simulation_data.LowerBounds[s2], amount);
+      
+      coordinates.push_back(
+        pqLineErrorPlot::Coordinate(
+          experimental_time,
+          simulation_value - experimental_value,
+          sqrt(experimental_upper_bound * experimental_upper_bound + simulation_upper_bound * simulation_upper_bound),
+          sqrt(experimental_lower_bound * experimental_lower_bound + simulation_lower_bound * simulation_lower_bound)));
+      }
+
+    this->Chart.getLineChart().addData(
+      new pqLineErrorPlot(
+        new pqCircleMarkerPen(QPen(Qt::gray), QSize(4, 4), QPen(Qt::gray, 0.5), QBrush(Qt::white)),
+        QPen(Qt::gray),
+        this->ErrorBarWidth * time_delta,
+        coordinates));
+
+    this->Chart.getLegend().addEntry(
+      new pqCircleMarkerPen(QPen(Qt::gray), QSize(4, 4), QPen(Qt::gray, 0.5), QBrush(Qt::white)),
+      new pqChartLabel(QString("Element %1 Error").arg(simulation_element_id)));
   }
 
   void updateChart()
@@ -596,26 +763,21 @@ struct LineChartAdapter::pqImplementation
         }
       }
 
-/*    
     // Plot difference data, if available ...
-    if(this->ShowDifference)
+    if(this->ShowDifferences)
       {
       for(int i = 0; i != ExperimentalData.size(); ++i)
         {
         if(ExperimentalData[i].Label != this->VisibleData)
           continue;
           
-        const QString element = this->ExperimentSimulationMap[ExperimentalData[i].Label];
-        if(element.isEmpty())
+        const QString element_id = this->ExperimentSimulationMap[ExperimentalData[i].Label];
+        if(element_id.isEmpty())
           continue;
 
-        const double hue = static_cast<double>(i) / static_cast<double>(ExperimentalData.size());
-        const QColor color = QColor::fromHsvF(hue, 1.0, 0.5);
-        
-        addDifferencePlot(*reader, element.toInt(), QPen(color, 2, Qt::DashLine));
+        addDifferencePlot(ExperimentalData[i], *reader, element_id.toInt());
         }
       }
-*/
     
     int array_id = -1;
     switch(this->ExodusVariableType)

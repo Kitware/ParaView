@@ -116,6 +116,7 @@ private slots:
   void onLoadExperimentSimulationMap();
 
   void onExperimentalDataChanged(const QStringList&);
+  void onVisibleDataChanged(const QString&);
   void onLineChartContextMenu(const QPoint&);
   
 private:

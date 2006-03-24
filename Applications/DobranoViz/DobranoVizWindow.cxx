@@ -316,10 +316,10 @@ DobranoVizWindow::DobranoVizWindow() :
   this->LineChart = new ::LineChartAdapter(*this->LineChartWidget);
 
   this->connect(this->LineChart, SIGNAL(experimentalDataChanged(const QStringList&)), this, SLOT(onExperimentalDataChanged(const QStringList&)));
+  this->connect(this->LineChart, SIGNAL(visibleDataChanged(const QString&)), this, SLOT(onVisibleDataChanged(const QString&)));
 
   this->ChooseDataCombo = new QComboBox();
   this->connect(this->ChooseDataCombo, SIGNAL(activated(const QString&)),  this->LineChart, SLOT(setVisibleData(const QString&)));
-  this->connect(this->LineChart, SIGNAL(visibleDataChanged(const QString&)), this->ChooseDataCombo, SLOT(setEditText(const QString&)));
 
   QLabel* const sample_size_label = new QLabel(tr("Samples:"));
   sample_size_label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -630,7 +630,7 @@ void DobranoVizWindow::onFileOpen(pqServer* Server)
   if(this->CurrentServer != Server)
     setServer(Server);
 
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(this->CurrentServer->GetProcessModule()), tr("Open File:"), this, "fileOpenDialog");
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(vtkProcessModule::GetProcessModule()), tr("Open File:"), this, "fileOpenDialog");
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileOpen(const QStringList&)));
   file_dialog->show();
@@ -1608,7 +1608,11 @@ void DobranoVizWindow::onExperimentalDataChanged(const QStringList& data)
 {
   this->ChooseDataCombo->clear();
   this->ChooseDataCombo->addItems(data);
-  this->ChooseDataCombo->setCurrentIndex(0);
+}
+
+void DobranoVizWindow::onVisibleDataChanged(const QString& data)
+{
+  this->ChooseDataCombo->setCurrentIndex(this->ChooseDataCombo->findText(data));
 }
 
 void DobranoVizWindow::onLineChartContextMenu(const QPoint& position)
