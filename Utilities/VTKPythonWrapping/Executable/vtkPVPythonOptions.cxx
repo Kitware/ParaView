@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPythonOptions);
-vtkCxxRevisionMacro(vtkPVPythonOptions, "1.1");
+vtkCxxRevisionMacro(vtkPVPythonOptions, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVPythonOptions::vtkPVPythonOptions()
@@ -66,7 +66,9 @@ int vtkPVPythonOptions::WrongArgument(const char* argument)
     return 1;
     }
 
-  return this->Superclass::WrongArgument(argument);
+  this->Superclass::WrongArgument(argument);
+  // All arguments are simply passed to the python interpretor.
+  return 1;
 }
 
 //----------------------------------------------------------------------------

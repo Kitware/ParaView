@@ -67,6 +67,9 @@ ENDIF(PARAVIEW_VERSION_MINOR MATCHES "[02468]$")
 OPTION(DISABLE_KWWIDGETS_TESTING "Disable the testing of KWWidgets." OFF)
 MARK_AS_ADVANCED(DISABLE_KWWIDGETS_TESTING)
 
+# Set the ServerManager test data dir,
+SET(PVServerManagerTestData ${ParaView_SOURCE_DIR}/Data)
+
 # KWWidgets should install only the components paraview does.
 
 SET(KWWidgets_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})

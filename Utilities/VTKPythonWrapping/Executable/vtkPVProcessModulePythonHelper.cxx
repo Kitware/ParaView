@@ -39,7 +39,7 @@ extern "C" {
 }
 
 
-vtkCxxRevisionMacro(vtkPVProcessModulePythonHelper, "1.5");
+vtkCxxRevisionMacro(vtkPVProcessModulePythonHelper, "1.6");
 vtkStandardNewMacro(vtkPVProcessModulePythonHelper);
 
 //----------------------------------------------------------------------------
@@ -66,7 +66,7 @@ void vtkPVProcessModulePythonHelper::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVProcessModulePythonHelper::RunGUIStart(int /*argc*/, char **argv, int numServerProcs, int myId)
+int vtkPVProcessModulePythonHelper::RunGUIStart(int argc, char **argv, int numServerProcs, int myId)
 {
   (void)myId;
   (void)numServerProcs;
@@ -119,6 +119,14 @@ int vtkPVProcessModulePythonHelper::RunGUIStart(int /*argc*/, char **argv, int n
   if ( boptions->GetPythonScriptName() )
     {
     vArg.push_back(vtkPVStrDup(boptions->GetPythonScriptName()));
+    }
+  else if (argc > 1)
+    {
+    vArg.push_back(vtkPVStrDup("-"));
+    }
+  for (int cc=1; cc < argc; cc++)
+    {
+    vArg.push_back(vtkPVStrDup(argv[cc]));
     }
 
   res = Py_Main(vArg.size(), &*vArg.begin());
