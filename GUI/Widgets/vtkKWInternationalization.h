@@ -15,8 +15,7 @@
 #define __vtkKWInternationalization_h
 
 #include "vtkObject.h"
-#include "vtkKWWidgets.h"
-#include <stdio.h>
+#include "vtkKWWidgets.h"  // Needed for export symbols directives
 
 /* ----------------------------------------------------------------------
    If Internationalization is supported, provide simple macros to 
@@ -29,7 +28,7 @@
  */
 
 #ifdef KWWidgets_USE_INTERNATIONALIZATION
-#include <libintl.h>
+#include <libintl.h>  // Bring gettext
 #define _(string) gettext(string)
 #define k_(string) dgettext(GETTEXT_DOMAIN, string)
 #else
