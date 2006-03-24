@@ -40,7 +40,8 @@ INPUT                = \
  "@CMAKE_CURRENT_BINARY_DIR@/dox/doc_@DOXYGEN_PROJECT_NAME@_index.dox" \
  @DOXYGEN_PARSED_INPUT_DIRS@
 
-TAGFILES             = "@CMAKE_CURRENT_BINARY_DIR@/vtkNightlyDoc.tag=http://www.vtk.org/doc/nightly/html"
+#TAGFILES             = "@CMAKE_CURRENT_BINARY_DIR@/vtkNightlyDoc.tag=http://www.vtk.org/doc/nightly/html"
+TAGFILES             = @TAGFILES@
 
 EXTRACT_ALL          = YES
 EXTRACT_PRIVATE      = NO

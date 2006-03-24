@@ -4,6 +4,17 @@
 INCLUDE (Documentation)
 
 IF (BUILD_DOCUMENTATION)
+  SET (INCLUDE_QT_DOCUMENTATION OFF CACHE BOOL "Specify if Qt documentation should be linked to.")
+  IF (INCLUDE_QT_DOCUMENTATION)
+    SET(QT_DOC_DIR CACHE FILEPATH "Path to the directory containing Qt html documentation.")
+    FIND_PROGRAM (DOXYTAG
+      doxytag
+      "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\doxygen_is1;Inno Setup: App Path]/bin"
+      /Applications/Doxygen.app/Contents/Resources
+      /Applications/Doxygen.app/Contents/MacOS
+      )
+    SET (QT_TAG_FILE "${CMAKE_CURRENT_BINARY_DIR}/Qt.tag")
+  ENDIF (INCLUDE_QT_DOCUMENTATION)
   SET(BUILD_DOXYGEN ON)
   SET(DOCUMENTATION_DOWNLOAD_VTK_TAGFILE ON)
   SET(DOCUMENTATION_HTML_TARZ ON)
@@ -46,6 +57,7 @@ IF (BUILD_DOCUMENTATION)
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Servers/Common\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Servers/Filters\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Servers/ServerManager\"")
+         
 
   SET(DOXYGEN_IGNORE_PREFIX "vtkPV vtkSM vtk pq")
 
@@ -55,6 +67,11 @@ IF (BUILD_DOCUMENTATION)
   IF(NOT DOT_PATH)
     GET_FILENAME_COMPONENT(DOT_PATH ${DOT} PATH)
   ENDIF(NOT DOT_PATH)
+
+  SET(TAGFILES "\"${CMAKE_CURRENT_BINARY_DIR}/vtkNightlyDoc.tag=http://www.vtk.org/doc/nightly/html\"")
+  IF(INCLUDE_QT_DOCUMENTATION)
+    SET (TAGFILES "${TAGFILES} \"${QT_TAG_FILE}=http://doc.trolltech.com/4.1\"")
+  ENDIF(INCLUDE_QT_DOCUMENTATION)
 
   CONFIGURE_FILE(
     ${CMAKE_CURRENT_SOURCE_DIR}/doxyfile.in
@@ -67,5 +84,12 @@ IF (BUILD_DOCUMENTATION)
   ADD_CUSTOM_TARGET(${DOXYGEN_PROJECT_NAME}DoxygenDoc
     ${BASH}
     ${CMAKE_CURRENT_BINARY_DIR}/doc_makeall.sh)
+
+  IF(INCLUDE_QT_DOCUMENTATION)
+    ADD_CUSTOM_TARGET(QtDoxygenTags ALL
+      COMMAND ${DOXYTAG} -t ${QT_TAG_FILE} ${QT_DOC_DIR})
+    ADD_DEPENDENCIES(${DOXYGEN_PROJECT_NAME}DoxygenDoc
+      QtDoxygenTags)
+  ENDIF(INCLUDE_QT_DOCUMENTATION)
 
 ENDIF (BUILD_DOCUMENTATION)
