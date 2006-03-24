@@ -13,9 +13,10 @@
 #include <QWidget>
 #include <QListWidgetItem>
 
-class pqObjectInspector;
-class pqObjectInspectorDelegate;
-class QTreeView;
+//class pqObjectInspector;
+//class pqObjectInspectorDelegate;
+//class QTreeView;
+class pqObjectEditor;
 class QTabWidget;
 class vtkSMProxy;
 class QListWidgetItem;
@@ -32,8 +33,8 @@ public:
   pqObjectInspectorWidget(QWidget *parent=0);
   virtual ~pqObjectInspectorWidget();
 
-  pqObjectInspector *getObjectModel() const {return this->Inspector;}
-  QTreeView *getTreeView() const {return this->TreeView;}
+  //pqObjectInspector *getObjectModel() const {return this->Inspector;}
+  //QTreeView *getTreeView() const {return this->TreeView;}
 
 public slots:
   void setProxy(vtkSMProxy *proxy);
@@ -47,9 +48,10 @@ protected slots:
   void updateDisplayForPropertyChanged();
 
 private:
-  pqObjectInspector *Inspector;
-  pqObjectInspectorDelegate *Delegate;
-  QTreeView *TreeView;
+  //pqObjectInspector *Inspector;
+  //pqObjectInspectorDelegate *Delegate;
+  //QTreeView *TreeView;
+  pqObjectEditor* ObjectEditor;
   QTabWidget* TabWidget;
 };
 

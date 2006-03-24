@@ -43,7 +43,6 @@ public:
     MULTIPLE_ELEMENTS
     };
 
-
   /// Get the global adapter instance.
   static pqSMAdaptor* instance();
 

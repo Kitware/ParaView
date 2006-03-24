@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqObjectInspector.h"
 
+#include <assert.h>
+
 #include "pqObjectInspectorItem.h"
 #include "pqPipelineData.h"
 #include "pqPipelineObject.h"
