@@ -111,6 +111,7 @@ SET(Kit_SRCS
   vtkSMSubPropertyIterator.cxx
   vtkSMSummaryHelperProxy.cxx
   vtkSMTemporalXYPlotDisplayProxy.cxx
+  vtkSMTesting.cxx
   vtkSMTimeStepsInformationHelper.cxx
   vtkSMTransformProxy.cxx
   vtkSMXDMFInformationHelper.cxx

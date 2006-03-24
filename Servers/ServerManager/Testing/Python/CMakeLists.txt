@@ -1,0 +1,44 @@
+# Requires that PVServerManagerTestData is set
+# for any of the tests to be added.
+
+###############################################################################
+# For python test that simply load the SM state.
+#
+# To load state files in python and perform regression testing
+# add them here.
+SET (SMSTATE_FILES
+  ${PYTHON_SMSTATE_FILES}
+  )
+
+IF (PVServerManagerTestData)
+  FOREACH (tfile ${SMSTATE_FILES})
+    ADD_TEST("${tfile}-ServerManagerPython"
+      ${EXECUTABLE_OUTPUT_PATH}/pvpython
+      ${CMAKE_CURRENT_SOURCE_DIR}/SMPythonTesting.py
+      -D ${PVServerManagerTestData}
+      -T ${ParaView_BINARY_DIR}/Testing/Temporary
+      -V ${PVServerManagerTestData}/Baseline/${tfile}.png
+      --state ${SMSTATE_FILE_DIR}/${tfile}.pvsm)
+  ENDFOREACH (tfile)
+ENDIF (PVServerManagerTestData)
+  
+###############################################################################
+# For python scripts for testing.
+#
+
+# Add python script names here.
+SET (PY_TESTS
+  )
+
+IF (PVServerManagerTestData)
+  FOREACH (tfile ${PY_TESTS})
+    ADD_TEST("$tfile}-ServerManagerPython"
+      ${EXECUTABLE_OUTPUT_PATH}/pvpython
+      ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
+      -D ${PVServerManagerTestData}
+      -T ${ParaView_BINARY_DIR}/Testing/Temporary
+      -V ${PVServerManagerTestData}/Baseline/${file}.png)
+  ENDFOREACH(tfile)
+ENDIF (PVServerManagerTestData)
+
+###############################################################################
