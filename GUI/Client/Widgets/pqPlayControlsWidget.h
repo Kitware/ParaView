@@ -72,9 +72,8 @@ private:
   };
 
   static const char *Name[NUM_BUTTONS];
-  static char **Image[NUM_BUTTONS];
+  static const char *Image[NUM_BUTTONS];
 
-  QPixmap *Pixmap[NUM_BUTTONS];
   QToolButton *Button[NUM_BUTTONS];
   QHBoxLayout *Layout;
 };

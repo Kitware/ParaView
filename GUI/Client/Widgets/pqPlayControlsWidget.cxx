@@ -37,12 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLayout>
 #include <QToolButton>
 
-#include "Resources/First.xpm"
-#include "Resources/Last.xpm"
-#include "Resources/Forward.xpm"
-#include "Resources/Back.xpm"
-//#include "Resources/Play.xpm"
-//#include "Resources/Pause.xpm"
 
 const char *pqPlayControlsWidget::Name[NUM_BUTTONS] = {
   "First",
@@ -52,13 +46,13 @@ const char *pqPlayControlsWidget::Name[NUM_BUTTONS] = {
 //  "Pause",
 //  "Play"
 };
-char **pqPlayControlsWidget::Image[NUM_BUTTONS] = {
-  First,
-  Back,
-  Forward,
-  Last,
-//  Pause,
-//  Play
+const char *pqPlayControlsWidget::Image[NUM_BUTTONS] = {
+  ":pqWidgets/pqVcrFirst22.png",
+  ":pqWidgets/pqVcrBack22.png",
+  ":pqWidgets/pqVcrForward22.png",
+  ":pqWidgets/pqVcrLast22.png",
+//  ":pqWidgets/pqVcrPause22.png",
+//  ":pqWidgets/pqVcrPlay22.png"
 };
 
 pqPlayControlsWidget::pqPlayControlsWidget(QWidget *parent)
@@ -76,11 +70,9 @@ pqPlayControlsWidget::pqPlayControlsWidget(QWidget *parent)
   this->Layout->setMargin(0);
   this->Layout->setSpacing(0);
 
-  int max_dim = 15;
+  int max_dim = 22;
   for ( int i=0;i<pqPlayControlsWidget::NUM_BUTTONS;i++ )
     {
-    this->Pixmap[i] = new QPixmap( 
-      const_cast<const char **>( pqPlayControlsWidget::Image[i] ) );
     this->Button[i] = new QToolButton( this ); 
     this->Button[i]->setAutoRaise( true );
     QSizePolicy sizePolicy = this->Button[i]->sizePolicy();
@@ -92,7 +84,7 @@ pqPlayControlsWidget::pqPlayControlsWidget(QWidget *parent)
     this->Button[i]->setMaximumSize( QSize( max_dim, max_dim ) );
     // this->Button[i]->setText( tr( "..." ) );
     // this->Button[i]->setFocusPolicy( QWidget::NoFocus );
-    this->Button[i]->setIcon( QIcon(*(this->Pixmap[i])) );
+    this->Button[i]->setIcon( QIcon(pqPlayControlsWidget::Image[i]) );
     this->Button[i]->setToolTip(pqPlayControlsWidget::Name[i]);
     this->Button[i]->setStatusTip(pqPlayControlsWidget::Name[i]);
     this->Layout->addWidget( this->Button[i] );
@@ -122,11 +114,6 @@ pqPlayControlsWidget::~pqPlayControlsWidget()
       {
       delete this->Button[i];
       this->Button[i] = NULL;
-      }
-    if ( this->Pixmap[i] )
-      {
-      delete this->Pixmap[i];
-      this->Pixmap[i] = NULL;
       }
     }
   if ( this->Layout )
