@@ -120,14 +120,17 @@ void pqLineErrorPlot::layoutPlot(const pqChartAxis& XAxis, const pqChartAxis& YA
 
     this->Implementation->PlotScreenCoords.push_back(QPoint(x, y));
     
-    this->Implementation->WhiskerScreenCoords.push_back(QPoint(x1, y1));
-    this->Implementation->WhiskerScreenCoords.push_back(QPoint(x2, y1));
+    if(y1 != y || y2 != y)
+      {
+      this->Implementation->WhiskerScreenCoords.push_back(QPoint(x1, y1));
+      this->Implementation->WhiskerScreenCoords.push_back(QPoint(x2, y1));
 
-    this->Implementation->WhiskerScreenCoords.push_back(QPoint(x1, y2));
-    this->Implementation->WhiskerScreenCoords.push_back(QPoint(x2, y2));
+      this->Implementation->WhiskerScreenCoords.push_back(QPoint(x1, y2));
+      this->Implementation->WhiskerScreenCoords.push_back(QPoint(x2, y2));
 
-    this->Implementation->WhiskerScreenCoords.push_back(QPoint(x, y1));
-    this->Implementation->WhiskerScreenCoords.push_back(QPoint(x, y2));
+      this->Implementation->WhiskerScreenCoords.push_back(QPoint(x, y1));
+      this->Implementation->WhiskerScreenCoords.push_back(QPoint(x, y2));
+      }
     }
 }
 
