@@ -53,8 +53,6 @@ IF(KWWidgets_USE_INTERNATIONALIZATION)
     PO_DIR "${CMAKE_CURRENT_SOURCE_DIR}/po"
     MO_INSTALL_DIR "${install_locale_dir}"
     ADD_MO_TARGET_TO_ALL)
-  # Make sure the translation catalogs for KWWidgets are up-to-date.
-  ADD_DEPENDENCIES(${EXE_NAME} KWWidgets_mo)
 ENDIF(KWWidgets_USE_INTERNATIONALIZATION)
 
 # If we are building this example as a standalone external project:

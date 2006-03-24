@@ -461,7 +461,8 @@ IF(KWWidgets_USE_INTERNATIONALIZATION)
       COPYRIGHT_HOLDER "Kitware, Inc."
       SOURCES "${KWWidgets_SRCS};${KWWidgets_TEMPLATE_SRCS}"
       PO_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Resources/po"
-      MO_INSTALL_DIR "${KWWidgets_INSTALL_DATA_DIR}/locale")
+      MO_INSTALL_DIR "${KWWidgets_INSTALL_DATA_DIR}/locale"
+      ADD_MO_TARGET_TO_ALL)
   ELSE(GETTEXT_FOUND)
     SET(msg "KWWidgets_USE_INTERNATIONALIZATION is ON but the gettext runtime library and tools were not found.\n\nMore information about internationalization support in KWWidgets can be found at http://public.kitware.com/Wiki/KWWidgets/i18n.\n\n${GETTEXT_INFO_MSG}")
     MESSAGE(FATAL_ERROR "${msg}")
