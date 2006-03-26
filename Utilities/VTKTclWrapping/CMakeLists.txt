@@ -103,6 +103,7 @@ IF(BUILD_TESTING)
     "${VTK_SOURCE_DIR}/Filtering/vtkDataObject.cxx"
     "${VTK_SOURCE_DIR}/Filtering/vtkDataSet.cxx"
     "${VTK_SOURCE_DIR}/Filtering/vtkImageData.cxx"
+    "${VTK_SOURCE_DIR}/IO/vtkMedicalImageProperties.cxx"
   )
   SET_SOURCE_FILES_PROPERTIES(
     "${VTK_SOURCE_DIR}/Filtering/vtkDataSet.cxx"
