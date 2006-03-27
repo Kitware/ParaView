@@ -37,22 +37,9 @@ MARK_AS_ADVANCED(VTK_WRAP_HINTS)
 SET(VTK_GENERATE_TK_INTERNALS 1)
 
 #########################################################################
-# Configure Tcl wrapping
-IF (PARAVIEW_BUILD_GUI)
-  SET(VTKTclWrapping_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
-  SET(VTKTclWrapping_INSTALL_NO_RUNTIME ${PV_INSTALL_NO_RUNTIME})
-  SET(VTKTclWrapping_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
-  SET(VTKTclWrapping_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
-ENDIF (PARAVIEW_BUILD_GUI)
-
-#########################################################################
 # Include the file that most of the environment setup (except GUI).
 INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewCommon.cmake)
 
-#########################################################################
-IF (PARAVIEW_BUILD_GUI)
-  SUBDIRS(Utilities/VTKTclWrapping)
-ENDIF (PARAVIEW_BUILD_GUI)
 #########################################################################
 # Common settings
 #

@@ -379,6 +379,17 @@ IF(PARAVIEW_WRAP_PYTHON)
   SET(VTKPythonWrapping_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
 ENDIF(PARAVIEW_WRAP_PYTHON)
 
+#########################################################################
+# Configure Tcl Wraping.
+# We can't remove this from ParaViewCommon.cmake since it must be
+# included after VTK has been included but before ServerManager.
+IF (PARAVIEW_BUILD_GUI)
+  SUBDIRS(Utilities/VTKTclWrapping)
+  SET(VTKTclWrapping_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
+  SET(VTKTclWrapping_INSTALL_NO_RUNTIME ${PV_INSTALL_NO_RUNTIME})
+  SET(VTKTclWrapping_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
+  SET(VTKTclWrapping_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
+ENDIF (PARAVIEW_BUILD_GUI)
 
 #########################################################################
 # Import external projects, such as SAF.
