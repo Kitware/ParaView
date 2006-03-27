@@ -462,7 +462,8 @@ MACRO(KWWidgets_CREATE_POT_TARGET
   SET(files_from "${safe_build_dir}/${domain_name}_srcs.txt")
 
   STRING(REGEX REPLACE ";" "\n" contents "${rel_sources}")
-  CONFIGURE_FILE(${KWWidgets_TEMPLATES_DIR}/KWWidgetsContents.in ${files_from})
+  FILE(WRITE "${files_from}" "${contents}")
+  #CONFIGURE_FILE(${KWWidgets_TEMPLATES_DIR}/KWWidgetsContents.in ${files_from})
 
   # We need a dummy file that will just say: this POT target is up to date as
   # far as its dependencies are concerned. This will prevent the POT
