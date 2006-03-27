@@ -14,6 +14,7 @@ IF(NOT KWWidgets_INSTALL_NO_DEVELOPMENT)
   INSTALL_FILES(${KWWidgets_INSTALL_INCLUDE_DIR} FILES 
     ${KWWidgets_BINARY_DIR}/vtkKWWidgetsConfigure.h)
   INSTALL_FILES(${KWWidgets_INSTALL_INCLUDE_DIR}/Templates FILES 
+    KWWidgetsContents.in
     KWWidgetsSetupPaths.bat.in
     KWWidgetsSetupPaths.cmake.in
     KWWidgetsSetupPaths.csh.in
