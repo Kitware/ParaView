@@ -15,8 +15,15 @@
 // .NAME vtkConnectionIterator - iterates over all connections.
 // .SECTION Description
 // vtkConnectionIterator iterates over all the connections
-// in the vtkProcessModuleConnectionManager. It MatchConnectionID is set,
-// it iterates over only those connection that match the id. 
+// in the vtkProcessModuleConnectionManager. It \c MatchConnectionID is set,
+// it iterates over only those connection that match the id. By default,
+// \c MatchConnectionID is to set to match all connections present in the
+// vtkProcessModuleConnectionManager. Special connection Ids such as those
+// returned by \c vtkProcessModuleConnectionManager::GetRootServerConnectionID()
+// or \c vtkProcessModuleConnectionManager::GetAllServerConnectionsID() can be 
+// used to match a particular type of connections.
+// .SECTION See Also
+// vtkProcessModuleConnectionManager
 
 #ifndef __vtkConnectionIterator_h
 #define __vtkConnectionIterator_h

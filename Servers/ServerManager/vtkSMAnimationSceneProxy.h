@@ -14,11 +14,12 @@
 =========================================================================*/
 // .NAME vtkSMAnimationSceneProxy - proxy for vtkAnimationScene
 // .SECTION Description
-// Proxy for animation scene. Also supports writing out animation 
-// images (movie) and animation geometry.
+// Proxy for animation scene. A scene is an animation setup that can be played.
+// Also supports writing out animation images (movie) and animation geometry.
+// Like all animation proxies, this is a client side proxy with not server 
+// side VTK objects created.
 // .SECTION See Also
-// vtkSMProxy vtkSMAnimationCueProxy
-//
+// vtkAnimationScene vtkSMAnimationCueProxy
 
 #ifndef __vtkSMAnimationSceneProxy_h
 #define __vtkSMAnimationSceneProxy_h
@@ -39,15 +40,36 @@ public:
   vtkTypeRevisionMacro(vtkSMAnimationSceneProxy, vtkSMAnimationCueProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Save the state of this proxy in the batch file.
   virtual void SaveInBatchScript(ofstream*);
 
+  // Description:
+  // Start playing the animation. On every \c Tick, 
+  // \c vtkCommand::AnimationCueTickEvent is fired. One can call \c Stop()
+  // in the event handler for this event to abort playing of the animation.
+  // If \c Loop is set, the animation will be played in a loop.
+  // This function returns only after the animation playing has stopped.
   void Play();
+
+  // Description:
+  // Stops playing the animation. This method has any effect only when
+  // called within the vtkCommand::AnimationCueTickEvent event handler. 
+  // This event is fired when playing the animation.
   void Stop();
+
+  // Description:
+  // Returns the status of the player. True when the animation is being played.
   int IsInPlay();
-  
+ 
+  // Description:
+  // Set/Get if the animation should be played in a loop.
   void SetLoop(int loop);
   int GetLoop();
 
+  // Description;
+  // Set/Get the frame rate for the animation. Frame rate is used only when
+  // the play mode is \c vtkAnimationScene::PLAYMODE_SEQUENCE.
   void SetFrameRate(double framerate);
   double GetFrameRate();
 
@@ -78,7 +100,10 @@ public:
   // Note that it is not reference counted.
   void SetRenderModuleProxy(vtkSMRenderModuleProxy* ren)
     { this->RenderModuleProxy = ren; } 
-  
+ 
+  // Description:
+  // Method to set the current time. This updates the proxies to reflect the state
+  // at the indicated time.
   void SetAnimationTime(double time);
 
   // Description:

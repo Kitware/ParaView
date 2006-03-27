@@ -12,11 +12,24 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMAnimationCueManipulatorProxy
+// .NAME vtkSMAnimationCueManipulatorProxy - abstract proxy for manipulators
+// used in animation.
 // .SECTION Description
-// Manipulator provides means to animate with various time functions.
+// An animation cue proxy delegates the operation of modifying the property 
+// on the proxy being animated to a \b Manipulator. An example of a manipulator 
+// is a vtkSMKeyFrameAnimationCueManipulatorProxy. Subclasses must override
+// \c UpdateValue to perform the actual property manipulation. 
+// Just like all proxies involved in Animation, this is a client side proxy, 
+// with no VTK objects created on the server.
+// A manipulator fires two kinds of events:
+// \li \b vtkSMAnimationCueManipulatorProxy::StateModifiedEvent is fired when 
+// the manipulator modifies the animated proxy.
+// \li \b vtkCommand::Modified is fired when properties of the manipulator 
+// are changed which affects the way the animation is generated e.g in case 
+// of vtkSMKeyFrameAnimationCueManipulatorProxy, this event is fired when
+// the key frames are changed i.e. added/removed/modified.
 // .SECTION See Also
-// vtkSMAnimationCueProxy
+// vtkSMAnimationCueProxy vtkAnimationCue
 
 #ifndef __vtkSMAnimationCueManipulatorProxy_h
 #define __vtkSMAnimationCueManipulatorProxy_h
@@ -31,6 +44,10 @@ public:
   vtkTypeRevisionMacro(vtkSMAnimationCueManipulatorProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 //BTX
+  // Description:
+  // Returns the SelfID for this proxy. This method is a residue
+  // from the old days when GetSelfID() was not a public method.
+  // Eventually this should be removed in favour of GetSelfID().
   vtkClientServerID GetID() {return this->GetSelfID();}
 //ETX
 

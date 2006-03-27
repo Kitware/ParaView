@@ -12,9 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkServerConnection
+// .NAME vtkServerConnection -- represents a connection with a server 
+// (data/render).
 // .SECTION Description
-// This is a remote connection "to" a Server. This class is only instantiated 
+// This is a remote connection with a \b Server. This class is only instantiated 
 // on the Client. It encapsulates the channel to the server.
 // It maintains separate channels for RenderServer and DataServer, if needed.
 
@@ -130,11 +131,12 @@ protected:
   // Overridden to flag an error on the client.
   virtual void OnSocketError();
   
-  // RenderServerSocketController is not created by default. It will only be instantiated 
-  // when SetRenderServerSocket() is called.
+  // RenderServerSocketController is not created by default. It will only be 
+  // instantiated when SetRenderServerSocket() is called.
   vtkSocketController* RenderServerSocketController;
 
-  // The documentation says that this is used to choose filters. So we keep it for now.
+  // The documentation says that this is used to choose filters. So we keep 
+  // it for now.
   int NumberOfServerProcesses;
 
   // ID of the connector between RenderServer/DataServer, if any.

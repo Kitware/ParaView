@@ -12,14 +12,20 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMKeyFrameAnimationCueManipulatorProxy
+// .NAME vtkSMKeyFrameAnimationCueManipulatorProxy - animation manipulator
+// that uses keyframes to generate the animation.
 // .SECTION Description
-// Base class for manipulators that support key framing.
+// This is a Manipulator that support key framing.
 // Key frames are stored in a vector ordered by their keyframe time. Ordering
-// of keyframes with same key time is arbritary.
-// vtkSMAnimationCueManipulatorProxy::StateModifiedEvent - 
+// of keyframes with same key time is arbritary. This class ensures that the 
+// keyframes are always maintained in the correct order.
+// How the values for the animated property are interpolated between successive
+// keyframes depends on the the type of the preceding keyframe. Thus this class 
+// doesn't perform the interpolation instead delegates it to the keyframe object
+// affecting the property at the current time value.
+// \li \c vtkSMAnimationCueManipulatorProxy::StateModifiedEvent - 
 // This event is fired when the manipulator modifies the animated proxy.
-// vtkCommand::Modified - is fired when the keyframes are changed i.e. added/removed/modified.
+// \li \c vtkCommand::Modified - is fired when the keyframes are changed i.e. added/removed/modified.
 // 
 // .SECTION See Also
 // vtkSMAnimationCueProxy vtkSMAnimationCueManipulatorProxy

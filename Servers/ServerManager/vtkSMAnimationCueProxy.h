@@ -12,10 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMAnimationCueProxy - proxy for vtkAnimationCue on a server.
+// .NAME vtkSMAnimationCueProxy - proxy for vtkAnimationCue.
 // .SECTION Description
+// This is a proxy for vtkAnimationCue. All animation proxies are client 
+// side proxies, i.e. they don't create any VTK objects on the server.
+// This class needs a vtkSMAnimationCueManipulatorProxy. The \b Manipulator
+// performs the actual interpolation.
 // .SECTION See Also
-// vtkSMProxy vtkSMAnimationSceneProxy 
+// vtkAnimationCue vtkSMAnimationSceneProxy 
 //
 
 #ifndef __vtkSMAnimationCueProxy_h
@@ -60,7 +64,13 @@ public:
 
   // Description:
   // The domain name for the domain of the property to be used
-  // to change the property value when animating. 
+  // to change the property value when animating. If domain is 
+  // not set the first domain on the property is used. Note that 
+  // domain is essential since the change of value on the property
+  // is not directly performed by changing the property
+  // instead delegated to the domain. This makes it possible to
+  // using \c double (or \c int) values even for String 
+  // properties such as Filenames.
   vtkGetStringMacro(AnimatedDomainName);
   vtkSetStringMacro(AnimatedDomainName);
 
@@ -104,6 +114,10 @@ public:
   vtkGetMacro(Caching, int);
   
 //BTX
+  // Description:
+  // Simply returns the \c SelfID for this class. Legacy 
+  // from the days when \c GetSelfID was not public. Will
+  // eventually be deprecated in favour of \c GetSelfID().
   vtkClientServerID GetID() { return this->GetSelfID(); }
 //ETX
  

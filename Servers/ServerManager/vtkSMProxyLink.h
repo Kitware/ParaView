@@ -12,8 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMProxyLink -
+// .NAME vtkSMProxyLink - creates a link between two proxies.
 // .SECTION Description
+// When a link is created between proxy A->B, whenever any property
+// on proxy A is modified, a property with the same name as the modified
+// property (if any) on proxy B is also modified to be the same as the property
+// on the proxy A. Similary whenever proxy A->UpdateVTKObjects() is called,
+// B->UpdateVTKObjects() is also fired.
 
 #ifndef __vtkSMProxyLink_h
 #define __vtkSMProxyLink_h
