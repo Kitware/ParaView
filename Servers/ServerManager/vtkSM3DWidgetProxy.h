@@ -12,8 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSM3DWidgetProxy - 
+// .NAME vtkSM3DWidgetProxy - abstract base class for 3DWiget proxies.
 // .SECTION Description
+// This is an abstract base class fo 3D Widget proxies. 3D Widget proxies are 
+// display proxies which require interactor. The interactors on the servers 
+// are dummy interactors and not used to perform any opertations. However, 
+// they are required, due to the way 3D widgets are desgined.
 
 
 #ifndef __vtkSM3DWidgetProxy_h

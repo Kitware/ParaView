@@ -14,6 +14,9 @@
 =========================================================================*/
 // .NAME vtkSMLink - Abstract base class for proxy/property links.
 // .SECTION Description
+// Abstract base class for proxy/property links. Links provide a means
+// to connect two properies(or proxies) together, thus when on is updated,
+// the dependent is also updated accordingly.
 
 #ifndef __vtkSMLink_h
 #define __vtkSMLink_h

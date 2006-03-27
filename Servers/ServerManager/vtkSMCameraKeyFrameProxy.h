@@ -16,6 +16,9 @@
 // .SECTION Description
 // Special key frame for animating Camera. Unlike typical keyframes,
 // this keyframe interpolates a proxy and not a property of the proxy.
+// A vtkSMCameraManipulatorProxy can only take vtkSMCameraKeyFrameProxy.
+// Like all animation proxies, this is a client side only proxy with no
+// VTK objects created on the server side.
 
 #ifndef __vtkSMCameraKeyFrameProxy_h
 #define __vtkSMCameraKeyFrameProxy_h
@@ -66,7 +69,6 @@ protected:
   ~vtkSMCameraKeyFrameProxy();
   vtkCamera* Camera;
   
-
 private:
   vtkSMCameraKeyFrameProxy(const vtkSMCameraKeyFrameProxy&); // Not implemented.
   void operator=(const vtkSMCameraKeyFrameProxy&); // Not implemented.

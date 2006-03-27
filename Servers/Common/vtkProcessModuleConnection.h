@@ -12,10 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkProcessModuleConnection
+// .NAME vtkProcessModuleConnection - abstract base class for
+// client-server connections.
 // .SECTION Description
 // This class encapsulates every connection that process modules has
-// with servers(data/render) or client. 
+// with servers(data/render) or client. There are two basic types of
+// connections:
+// \li Self Connection: connections  between the root node and the 
+// satellite processes.
+// \li Remote Connection: connections between client and remote servers.
 
 #ifndef __vtkProcessModuleConnection_h
 #define __vtkProcessModuleConnection_h
@@ -137,6 +142,8 @@ protected:
 
   vtkMultiProcessController* Controller;
 
+  // Flag used to determine if the connection should be aborted. This
+  // flag is set when SocketError occurs.
   int AbortConnection;
  
   // Every connection is assigned a vtkClientServerID.

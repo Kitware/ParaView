@@ -12,7 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkRemoteConnection
+// .NAME vtkRemoteConnection - asbtract base class for connections that 
+// need a socket.
 // .SECTION Description
 // This is an abstract superclass for connections that go over a socket
 // i.e. those that use a SocketController. These kind of connections

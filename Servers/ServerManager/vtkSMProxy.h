@@ -41,9 +41,9 @@
 //
 // 
 // There are several special XML features available for subproxies.
-// 1) It is possible to share properties among subproxies.
+// \li 1) It is possible to share properties among subproxies.
 //    eg.
-//
+//    \code
 //    <Proxy name="Display" class="Alpha">
 //      <SubProxy>
 //        <Proxy name="Mapper" class="vtkPolyDataMapper">
@@ -71,21 +71,25 @@
 //        </ShareProperties>
 //      </SubProxy>
 //    </Proxy>
+//    \endcode
 //    Thus, subproxies Mapper and Mapper2 share the properties that are 
 //    common to both; except those listed as exceptions using the "Exception" 
 //    tag.
 //
-//  2) It is possible for a subproxy to use proxy definition defined elsewhere
+// \li 2) It is possible for a subproxy to use proxy definition defined elsewhere
 //     by identifying the interface with attribues "proxygroup" and "proxyname".
 //     eg.
+//     \code
 //     <SubProxy>
 //       <Proxy name="Mapper" proxygroup="mappers" proxyname="PolyDataMapper" />
 //     </SubProxy>
+//     \endcode
 //
-//  3) It is possible to scope the properties exposed by a subproxy and expose
+// \li 3) It is possible to scope the properties exposed by a subproxy and expose
 //     only a fixed set of properties to be accessible from outside. Also,
 //     while exposing the property, it can be exposed with a different name. 
 //     eg.
+//     \code
 //     <Proxy name="Alpha" ....>
 //       ....
 //       <SubProxy>
@@ -95,6 +99,7 @@
 //         </ExposedProperties>
 //       </SubProxy>
 //     </Proxy>
+//     \endcode
 //     Here, for the proxy Alpha, the property with the name LookupTable from its 
 //     subproxy "Mapper" can be obtained by calling GetProperty("MapperLookupTable")
 //     on an instance of the proxy Alpha. "exposed_name" attribute is optional, if 
@@ -163,15 +168,13 @@ public:
   // traverse the dependence tree and update starting from the source.
   // This allows instantiating a whole pipeline (including connectivity)
   // without having to worry about the order. Here is how to do it:
-  // @verbatim
-  // * Create all proxies
-  // * Set all property values - make sure that input properties
+  // \li * Create all proxies
+  // \li * Set all property values - make sure that input properties
   //      do not auto update by calling 
   //      vtkSMInputProperty::SetInputsUpdateImmediately(0); 
-  // * Call UpdateSelfAndAllInputs() on either all proxies or
+  // \li * Call UpdateSelfAndAllInputs() on either all proxies or
   //   one that depends on all others (usually one or more DisplayWindows)
-  // * If necessary vtkSMInputProperty::SetInputsUpdateImmediately(1); 
-  // @endverbatim
+  // \li * If necessary vtkSMInputProperty::SetInputsUpdateImmediately(1); 
   virtual void UpdateSelfAndAllInputs();
 
   // Description:
@@ -287,7 +290,7 @@ public:
 
   // Description:
   // Copies values of all the properties and sub-proxies from src.
-  // NOTE: This does NOT create properties and sub-proxies. Only
+  // \b NOTE: This does NOT create properties and sub-proxies. Only
   // copies values. Mismatched property and sub-proxy pairs are
   // ignored.
   // Properties of type exceptionClass are not copied. This
@@ -412,10 +415,11 @@ protected:
   // The modified flag of each property associated with a proxy is
   // stored in the proxy object instead of in the property itself.
   // Here is a brief explanation of how modified flags are used:
-  // 1. When a property is modified, the modified flag is set
-  // 2. In UpdateVTKObjects(), the proxy visits all properties and
+  // \li 1. When a property is modified, the modified flag is set
+  // \li 2. In UpdateVTKObjects(), the proxy visits all properties and
   //    calls AppendCommandToStream() on each modified property.
   //    It also resets the modified flag.
+  //
   // The reason why the modified flag is stored in the proxy instead
   // of property is in item 2 above. If multiple proxies were sharing the same
   // property, the first one would reset the modified flag in
@@ -439,7 +443,7 @@ protected:
 
   // Description:
   // Add a property to either self (subProxyName = 0) or a sub-proxy.
-  // IMPORTANT: If subProxyName = 0, AddProperty() checks for a
+  // \b IMPORTANT: If subProxyName = 0, AddProperty() checks for a
   // proxy with the given name in self and all sub-proxies, if one
   // exists, it replaces it. In this special case, it is possible for
   // the property to be added to a sub-proxy as opposed to self.

@@ -17,7 +17,10 @@
 // This is the manipulator for animating camera.
 // Unlike the base class, interpolation is not done by the Keyframe objects.
 // Instead, this class does the interpolation using the values in 
-// the keyframe objects.
+// the keyframe objects. All the keyframes added to a 
+// vtkSMCameraManipulatorProxy must be vtkSMCameraKeyFrameProxy.
+// Like all animation proxies, this is a client side only proxy with no
+// VTK objects created on the server side.
 
 #ifndef __vtkSMCameraManipulatorProxy_h
 #define __vtkSMCameraManipulatorProxy_h

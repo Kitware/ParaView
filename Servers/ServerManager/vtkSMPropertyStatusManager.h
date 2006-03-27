@@ -14,7 +14,14 @@
 =========================================================================*/
 // .NAME vtkSMPropertyStatusManager - keeps track of modified properties.
 // .SECTION Description
-// This class can only manage the status of Vector properties.
+// vtkSMProperty throws a vtkCommand::Modified event everything time
+// the property is modified. It does not imply that the value of the
+// property actually changed. This class provides a mechanism to check
+// if the value of a property actually changed. This class can only manage 
+// the status of vtkSMVectorProperty subclasses. One must use
+// RegisterProperty to register all the properties whose status we are 
+// intersted in. Then, one can use InitializeStatus(), HasPropertyChanged()
+// to reset/query the manager.
 
 #ifndef __vtkSMPropertyStatusManager_h
 #define __vtkSMPropertyStatusManager_h
@@ -63,6 +70,12 @@ public:
   // Same as InitializeStatus except for a single property.
   void InitializePropertyStatus(vtkSMVectorProperty* property);
 
+  // Description:
+  // Internal property is the property with which the status of the property
+  // is compared. Whenever a property is registered an internal property
+  // similar to the property is created. The values of this internal property
+  // reflect the state of the property when InitializePropertyStatus() was last
+  // called.
   vtkSMVectorProperty* GetInternalProperty(vtkSMVectorProperty* property);
 
 protected:

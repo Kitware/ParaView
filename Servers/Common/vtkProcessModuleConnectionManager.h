@@ -12,10 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkProcessModuleConnectionManager
+// .NAME vtkProcessModuleConnectionManager - manager for connections
+// in a ProcessModule.
 // .SECTION Description
 // This is a manager of the simultaneous connections in ProcessModule.
-// The first connection in the Manager is always the "Self" connection.
+// The first connection in the Manager is always the \b "Self" connection.
 // This is the connection used to communicate with all the MPI processes
 // of this node. All other connections (if any), are client-server connections
 // using sockets. SendStream() on ConnectionManager ensures that the stream
@@ -30,10 +31,27 @@
 // it gets added to the internal collection of connections.
 //
 // ConnectionManager can be simply told to open a connection with a remote host
-// socket. In that case, it set up a socket (vtkClientSocket) and attempts to connect 
-// the given host, If successfully connected and authenticated, it will
+// socket. In that case, it set up a socket (vtkClientSocket) and attempts to 
+// connect the given host, If successfully connected and authenticated, it will
 // add the connection to the internal store.
-
+// 
+// Every connection is assigned an unique connection Id. Special connection Ids
+// are available to represent a particular type of connection. eg.
+// \li SelfConnectionID - represents the connection between the root node and 
+//     the satellites.
+// \li AllConnectionsID - represents all the connections present including
+//     the SelfConnection and any Remote Connections.
+// \li RootServerConnectionID - represents the first \b server connection. 
+//     What connection qualifies a  server depends on the mode of operation. 
+//     When in ParaView mode (with or without MPI), the SelfConnection is 
+//     indeed a ServerConnection. When running in client mode (where it 
+//     connects/accepts connections from remote data (and render) servers), 
+//     SelfConnection is not a ServerConnection. Only remote connections are 
+//     ServerConnections in such a case. Providing this ID makes this decision 
+//     completely transparent to the ServerManager.
+// \li AllServerConnectionsID - represents all \b server connections. Refer to 
+//     description of RootServerConnectionID for details about what qualifies
+//     as a \b server connection.
 
 #ifndef __vtkProcessModuleConnectionManager_h
 #define __vtkProcessModuleConnectionManager_h

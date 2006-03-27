@@ -20,7 +20,7 @@
 #include "vtkClientServerID.h"
 
 #include <vtkstd/vector>
-vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.13");
 vtkStandardNewMacro(vtkSMKeyFrameAnimationCueManipulatorProxy);
 
 //****************************************************************************
@@ -272,22 +272,6 @@ vtkSMKeyFrameProxy* vtkSMKeyFrameAnimationCueManipulatorProxy::GetNextKeyFrame(
       }
     }
   return NULL;
-  /*
-  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::DoubleToKeyFrameMap::
-  iterator it = this->Internals->KeyFrames.find(keyFrame->GetKeyTime());
-  if (it == this->Internals->KeyFrames.end())
-  {
-  vtkErrorMacro("Key frame does not exists in the sequence");
-  return NULL;
-  }
-  it++;
-  if (it == this->Internals->KeyFrames.end())
-  {
-  // no next keyframe.
-  return NULL;
-  }
-  return it->second;
-  */
 }
 
 //----------------------------------------------------------------------------
@@ -307,22 +291,6 @@ vtkSMKeyFrameProxy* vtkSMKeyFrameAnimationCueManipulatorProxy::GetPreviousKeyFra
     proxy = *it;
     }  
   return NULL;
-/*
-  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::DoubleToKeyFrameMap::
-    iterator it = this->Internals->KeyFrames.find(keyFrame->GetKeyTime());
-  if (it == this->Internals->KeyFrames.end())
-    {
-    vtkErrorMacro("Key frame does not exists in the sequence");
-    return NULL;
-    }
-  if (it == this->Internals->KeyFrames.begin())
-    {
-    // no previous key frame.
-    return NULL;
-    }
-  it--;
-  return it->second;
-  */
 }
 
 //----------------------------------------------------------------------------

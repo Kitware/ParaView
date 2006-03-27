@@ -12,10 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkClientConnection
+// .NAME vtkClientConnection - represent a connection with a client.
 // .SECTION Description
 // This is a remote connection "to" a Client. This class is only instantiated on 
-// this server.
+// the server (data/render).
 
 #ifndef __vtkClientConnection_h
 #define __vtkClientConnection_h
@@ -35,8 +35,6 @@ public:
   // This sets up the RMIs and returns. 
   virtual int Initialize(int argc, char** argv); 
  
-
-
   // Description:
   // Send the last result over to the client.
   void SendLastResult();
