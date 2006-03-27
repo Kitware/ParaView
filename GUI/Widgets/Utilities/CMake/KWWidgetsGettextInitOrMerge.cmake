@@ -10,47 +10,78 @@
 # this file instead, and execute it using CMake with the relevant parameters.
 # Given the parameters, this file will either use 'msginit' or 'msgmerge'.
 #
-# po_file (string): the original PO file in the source tree, if any
-# po_build_file (string): the build PO file to initialize or merge
-# default_po_encoding (string): default encoding to initialize PO file with
-# pot_build_file (string): the POT file this PO file depends on
-# locale (string): the locale this PO file represents (say, "fr")
+# 'po_file' (string): the original PO file in the source tree, if any
+# 'po_build_file' (string): the build PO file to initialize or merge
+# 'po_uptodate_file' (string): the dummy file which will be up to date
+# 'default_po_encoding' (string): default encoding to initialize PO file with
+# 'pot_build_file' (string): the POT file this PO file depends on
+# 'locale' (string): the locale this PO file represents (say, "fr")
 # GETTEXT_MSGINIT_EXECUTABLE (string): path to the 'msginit' executable
 # GETTEXT_MSGCONV_EXECUTABLE (string): path to the 'msgconv' executable 
 # GETTEXT_MSGMERGE_EXECUTABLE (string): path to the 'msgmerge' executable 
 
 IF(NOT EXISTS "${po_build_file}")
+
+  # Initialize PO file or copy from existing PO file
+
   IF(EXISTS "${po_file}")
     MESSAGE("Initializing PO file ${po_build_file} as a copy of ${po_file}")
     CONFIGURE_FILE("${po_file}" "${po_build_file}" COPYONLY)
   ELSE(EXISTS "${po_file}")
     IF(NOT "${GETTEXT_MSGINIT_EXECUTABLE}" STREQUAL "")
+
+      # Initialize PO file
+
       MESSAGE("Initializing PO file ${po_build_file}")
       EXEC_PROGRAM(${GETTEXT_MSGINIT_EXECUTABLE} 
-        ARGS --input=${pot_build_file} --output-file=${po_build_file} --locale=${locale}
-        OUTPUT_VARIABLE msginit_output)
+        RETURN_VALUE msginit_return
+        OUTPUT_VARIABLE msginit_output
+        ARGS --input=${pot_build_file} --output-file=${po_build_file} --locale=${locale})
+      IF(msginit_output)
+        IF(NOT WIN32 OR NOT "${msginit_output}" MATCHES "Bad file desc")
+          MESSAGE("OUCH ${msginit_output}")
+        ENDIF(NOT WIN32 OR NOT "${msginit_output}" MATCHES "Bad file desc")
+      ENDIF(msginit_output)
+
+      # Change initialized PO file encoding
+
       IF(NOT "${GETTEXT_MSGCONV_EXECUTABLE}" STREQUAL "")
         IF(NOT default_po_encoding)
           SET(default_po_encoding "utf-8")
         ENDIF(NOT default_po_encoding)
         EXEC_PROGRAM(${GETTEXT_MSGCONV_EXECUTABLE} 
+          RETURN_VALUE msgconv_return
+          OUTPUT_VARIABLE msgconv_output
           ARGS --output-file=${po_build_file} --to-code="${default_po_encoding}" ${po_build_file})
-        #    OUTPUT_VARIABLE msgconv_output)
+        IF(msgconv_output)
+          MESSAGE("${msgconv_output}")
+        ENDIF(msgconv_output)
       ENDIF(NOT "${GETTEXT_MSGCONV_EXECUTABLE}" STREQUAL "")
     ENDIF(NOT "${GETTEXT_MSGINIT_EXECUTABLE}" STREQUAL "")
   ENDIF(EXISTS "${po_file}")
+
 ELSE(NOT EXISTS "${po_build_file}")
-#  MESSAGE("Merging PO file ${po_build_file} with POT file ${pot_build_file}")
+
+  # Merge PO file with POT file
+
+  #MESSAGE("Merging PO file ${po_build_file} with POT file ${pot_build_file}")
   # --output-file and --update are mutually exclusive. If --update is
   # specified, the PO file will not be re-written if the result of
   # the merge produces no modification. This can be problematic if the POT
   # file is newer than the PO file, and a MO file is generated from the PO
   # file: this seems to force the MO to always be regenerated.
+  # --output-file=${po_build_file}
+
   IF(NOT "${GETTEXT_MSGMERGE_EXECUTABLE}" STREQUAL "")
     EXEC_PROGRAM(${GETTEXT_MSGMERGE_EXECUTABLE} 
-      ARGS --output-file=${po_build_file} ${po_build_file} ${pot_build_file})
-    #    OUTPUT_VARIABLE msgmerge_output)
+      RETURN_VALUE msgmerge_return
+      OUTPUT_VARIABLE msgmerge_output
+      ARGS --update --backup=none ${po_build_file} ${pot_build_file})
+    IF(msgmerge_output)
+      MESSAGE("${msgmerge_output}")
+    ENDIF(msgmerge_output)
   ENDIF(NOT "${GETTEXT_MSGMERGE_EXECUTABLE}" STREQUAL "")
+
   # msggrep.exe -T -e "#-#-#" would have done the trick but not in 0.13.1
 #   IF(NOT "${GETTEXT_MSGCAT_EXECUTABLE}" STREQUAL "" AND EXISTS "${po_file}")
 #     EXEC_PROGRAM(${GETTEXT_MSGCAT_EXECUTABLE} 
@@ -63,3 +94,12 @@ ELSE(NOT EXISTS "${po_build_file}")
 
 #   ENDIF(NOT "${GETTEXT_MSGCAT_EXECUTABLE}" STREQUAL "" AND EXISTS "${po_file}")
 ENDIF(NOT EXISTS "${po_build_file}")
+
+# Update the dummy file to say: this PO target is up to date as 
+# far as its dependencies are concerned. This will prevent the PO
+# targets to be triggered again and again because the POT file is older
+# than the PO, but the PO does not really need to be changed, etc.
+
+FILE(WRITE "${po_uptodate_file}" 
+  "${po_build_file} is *really* up-to-date.")
+

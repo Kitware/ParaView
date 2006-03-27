@@ -51,10 +51,13 @@ IF(KWWidgets_USE_INTERNATIONALIZATION)
     LOCALE_LIST "fr"
     COPYRIGHT_HOLDER "Kitware, Inc."
     SOURCES "${EXE_SRCS}"
+    POT_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/po"
     PO_DIR "${CMAKE_CURRENT_SOURCE_DIR}/po"
+    PO_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/po"
     MO_INSTALL_DIR "${install_locale_dir}"
     ADD_MO_TARGET_TO_ALL)
 ENDIF(KWWidgets_USE_INTERNATIONALIZATION)
+
 
 # If we are building this example as a standalone external project:
 # - Generate a few small scripts (.bat, .sh, .csh) that can be sourced to set

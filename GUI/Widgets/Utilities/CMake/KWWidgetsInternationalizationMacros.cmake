@@ -271,6 +271,7 @@ MACRO(KWWidgets_CREATE_GETTEXT_TARGETS)
 
   KWWidgets_CREATE_MO_TARGETS(
     "${domain_name}"
+    "${po_dir}"
     "${po_build_dir}"
     "${po_prefix}"
     "${locale_list}"
@@ -312,6 +313,27 @@ MACRO(KWWidgets_GET_PO_FILENAME varname po_dir po_prefix locale)
   SET(${varname} "${po_dir}/${po_prefix}${locale}.po")
 
 ENDMACRO(KWWidgets_GET_PO_FILENAME)
+
+# ---------------------------------------------------------------------------
+# KWWidgets_GET_PO_SAFE_BUILD_DIR
+# Given a PO directory, a PO build directory, returns either the
+# PO build directory if it is different than the PO directory, or
+# a directory in the build tree. This macro is used to get a safe place
+# to write PO related files
+# 'varname': name of the var the PO safe build dir should be stored into
+# 'po_dir': path to the po directory where the PO file are stored
+# 'po_build_dir': build path where up-to-date PO files should be stored
+ 
+MACRO(KWWidgets_GET_PO_SAFE_BUILD_DIR varname po_dir po_build_dir)
+
+  IF("${po_build_dir}" STREQUAL "${po_dir}")
+    SET(${varname} "${CMAKE_CURRENT_BINARY_DIR}/po")
+    #SET_DIRECTORY_PROPERTIES(PROPERTIES CLEAN_NO_CUSTOM 1)
+  ELSE("${po_build_dir}" STREQUAL "${po_dir}")
+    SET(${varname} "${po_build_dir}")
+  ENDIF("${po_build_dir}" STREQUAL "${po_dir}")
+
+ENDMACRO(KWWidgets_GET_PO_SAFE_BUILD_DIR)
 
 # ---------------------------------------------------------------------------
 # KWWidgets_GET_MO_FILENAME
@@ -428,17 +450,51 @@ MACRO(KWWidgets_CREATE_POT_TARGET
   SET_SOURCE_FILES_PROPERTIES(${sources}
     COMPILE_FLAGS "-DGETTEXT_DOMAIN=\\\"${domain_name}\\\"")  
 
-  # Extract strings to translate to template file (pot)
-  # --join-existing ?
-
   FILE(MAKE_DIRECTORY ${pot_build_dir})
+
+  # Output the list of sources to a file. This fill will be read
+  # by xgettext (so that we do not have to pass it as a huge command
+  # line argument below)
+
+  KWWidgets_GET_PO_SAFE_BUILD_DIR(
+    safe_build_dir "${po_dir}" "${pot_build_dir}")
+
+  SET(files_from "${safe_build_dir}/${domain_name}_srcs.txt")
+
+  STRING(REGEX REPLACE ";" "\n" contents "${rel_sources}")
+  CONFIGURE_FILE(${KWWidgets_TEMPLATES_DIR}/KWWidgetsContents.in ${files_from})
+
+  # We need a dummy file that will just say: this POT target is up to date as
+  # far as its dependencies are concerned. This will prevent the POT
+  # target to be triggered again and again because the sources are older
+  # than the POT, but the POT does not really need to be changed, etc.
+
+  KWWidgets_GET_POT_FILENAME(pot_uptodate_file 
+    "${domain_name}" "${safe_build_dir}")
+  SET(pot_uptodate_file "${pot_uptodate_file}.upd")
+
+  # Extract strings to translate to template file (pot)
+
   IF(NOT "${GETTEXT_XGETTEXT_EXECUTABLE}" STREQUAL "")
+    SET(options "--foreign-user")
+    SET(keywords ${keyword}
+      "--keyword=_" "--flag=_:1:pass-c-format"
+      "--keyword=N_" "--flag=N_:1:pass-c-format"
+      "--flag=autosprintf:1:c-format"
+      "--keyword=kww_sgettext" "--flag=kww_sgettext:1:pass-c-format"
+      "--keyword=kww_sdgettext:2" "--flag=kww_sdgettext:2:pass-c-format"
+      "--keyword=k_" "--flag=k_:1:pass-c-format"
+      "--keyword=ks_" "--flag=ks_:1:pass-c-format"
+      "--keyword=s_" "--flag=s_:1:pass-c-format"
+      "--flag=kww_printf:1:c-format" 
+      "--flag=kww_sprintf:2:c-format" 
+      "--flag=kww_fprintf:2:c-format")
+
     ADD_CUSTOM_COMMAND(
-      OUTPUT ${pot_build_file}
+      OUTPUT ${pot_uptodate_file}
       DEPENDS ${abs_sources}
       COMMAND ${CMAKE_COMMAND} 
-      ARGS -E chdir ${po_dir} ${GETTEXT_XGETTEXT_EXECUTABLE} --output=${pot_build_file} --output-dir=${pot_build_dir} --default-domain=${domain_name} --foreign-user --keyword=_ --flag=_:1:pass-c-format --keyword=N_ --flag=N_:1:pass-c-format --flag=autosprintf:1:c-format --keyword=kww_sgettext --flag=kww_sgettext:1:pass-c-format --keyword=kww_sdgettext:2 --flag=kww_sdgettext:2:pass-c-format --keyword=k_ --flag=k_:1:pass-c-format --keyword=ks_ --flag=ks_:1:pass-c-format --keyword=s_ --flag=s_:1:pass-c-format --flag=kww_printf:1:c-format --flag=kww_sprintf:2:c-format --flag=kww_fprintf:2:c-format ${keywords} --copyright-holder=${copyright_holder} ${rel_sources}
-      )
+      ARGS -E chdir ${po_dir} ${CMAKE_COMMAND} -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=${CMAKE_BACKWARDS_COMPATIBILITY} -Dpot_build_file:STRING="${pot_build_file}" -Dpot_uptodate_file:STRING="${pot_uptodate_file}" -Dpo_dir:STRING="${po_dir}" -Doptions:STRING="${options}" -Dkeywords:STRING="${keywords}" -Dcopyright_holder:STRING="${copyright_holder}" -Dfiles_from:STRING="${files_from}" -DGETTEXT_XGETTEXT_EXECUTABLE:STRING="${GETTEXT_XGETTEXT_EXECUTABLE}" -P "${KWWidgets_CMAKE_DIR}/KWWidgetsGettextExtract.cmake")
     IF(create_pot_target)
       ADD_CUSTOM_TARGET(${target_basename}_pot DEPENDS ${pot_build_file})
     ENDIF(create_pot_target)
@@ -484,6 +540,17 @@ MACRO(KWWidgets_CREATE_PO_TARGETS
 
   FILE(MAKE_DIRECTORY ${po_build_dir})
 
+  # We need dummy files that will just say: this PO target is up to date as 
+  # far as its dependencies are concerned. This will prevent the PO
+  # targets to be triggered again and again because the POT file is older
+  # than the PO, but the PO does not really need to be changed, etc.
+
+  KWWidgets_GET_PO_SAFE_BUILD_DIR(safe_build_dir "${po_dir}" "${po_build_dir}")
+
+  KWWidgets_GET_POT_FILENAME(pot_uptodate_file 
+    "${domain_name}" "${safe_build_dir}")
+  SET(pot_uptodate_file "${pot_uptodate_file}.upd")
+
   SET(po_build_files)
 
   FOREACH(locale ${locale_list})
@@ -491,21 +558,24 @@ MACRO(KWWidgets_CREATE_PO_TARGETS
       "${po_dir}" "${po_prefix}" "${locale}")
     KWWidgets_GET_PO_FILENAME(po_build_file 
       "${po_build_dir}" "${po_prefix}" "${locale}")
-    SET(po_build_files ${po_build_files} ${po_build_file})
+    KWWidgets_GET_PO_FILENAME(po_uptodate_file 
+      "${safe_build_dir}" "${po_prefix}" "${locale}")
+    SET(po_uptodate_file "${po_uptodate_file}.upd")
+    SET(po_uptodate_files ${po_uptodate_files} ${po_uptodate_file})
     ADD_CUSTOM_COMMAND(
-      OUTPUT ${po_build_file}
-      DEPENDS ${pot_build_file}
+      OUTPUT ${po_uptodate_file}
+      DEPENDS ${pot_uptodate_file}
       COMMAND ${CMAKE_COMMAND} 
-      ARGS -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=${CMAKE_BACKWARDS_COMPATIBILITY} -Dpo_file:STRING=${po_file} -Dpo_build_file:STRING=${po_build_file} -Ddefault_po_encoding:STRING=${default_po_encoding} -Dpot_build_file:STRING=${pot_build_file} -Dlocale:STRING=${locale} -DGETTEXT_MSGINIT_EXECUTABLE:STRING=${GETTEXT_MSGINIT_EXECUTABLE} -DGETTEXT_MSGCONV_EXECUTABLE:STRING=${GETTEXT_MSGCONV_EXECUTABLE} -DGETTEXT_MSGMERGE_EXECUTABLE:STRING=${GETTEXT_MSGMERGE_EXECUTABLE} -DGETTEXT_MSGCAT_EXECUTABLE:STRING=${GETTEXT_MSGCAT_EXECUTABLE} -P "${KWWidgets_CMAKE_DIR}/KWWidgetsMsgmergeMsginitMacros.cmake"
+      ARGS -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=${CMAKE_BACKWARDS_COMPATIBILITY} -Dpo_file:STRING="${po_file}" -Dpo_build_file:STRING="${po_build_file}" -Dpo_uptodate_file:STRING="${po_uptodate_file}" -Ddefault_po_encoding:STRING="${default_po_encoding}" -Dpot_build_file:STRING="${pot_build_file}" -Dlocale:STRING="${locale}" -DGETTEXT_MSGINIT_EXECUTABLE:STRING="${GETTEXT_MSGINIT_EXECUTABLE}" -DGETTEXT_MSGCONV_EXECUTABLE:STRING="${GETTEXT_MSGCONV_EXECUTABLE}" -DGETTEXT_MSGMERGE_EXECUTABLE:STRING="${GETTEXT_MSGMERGE_EXECUTABLE}" -DGETTEXT_MSGCAT_EXECUTABLE:STRING="${GETTEXT_MSGCAT_EXECUTABLE}" -P "${KWWidgets_CMAKE_DIR}/KWWidgetsGettextInitOrMerge.cmake"
       )
     IF(create_po_locale_targets)
       ADD_CUSTOM_TARGET(
-        ${target_basename}_po_${locale} DEPENDS ${po_build_file})
+        ${target_basename}_po_${locale} DEPENDS ${po_uptodate_file})
     ENDIF(create_po_locale_targets)
   ENDFOREACH(locale ${locale_list})
 
   IF(create_po_target)
-    ADD_CUSTOM_TARGET(${target_basename}_po DEPENDS ${po_build_files})
+    ADD_CUSTOM_TARGET(${target_basename}_po DEPENDS ${po_uptodate_files})
   ENDIF(create_po_target)
 
 ENDMACRO(KWWidgets_CREATE_PO_TARGETS)
@@ -520,6 +590,7 @@ ENDMACRO(KWWidgets_CREATE_PO_TARGETS)
 # translation file in 'mo_build_dir'/locale/LC_MESSAGES/'domain_name'.mo 
 # (say, 'mo_build_dir'/fr/LC_MESSAGES/'domain_name'.mo).
 # 'domain_name': translation domain name (i.e. name of application or library)
+# 'po_dir': path to where the original PO file are found
 # 'po_build_dir': build path to where up-to-date PO files are stored
 # 'po_prefix': string that is used to prefix each translation file (po).
 # 'locale_list': semicolon-separated list of locale to generate targets for.
@@ -532,6 +603,7 @@ ENDMACRO(KWWidgets_CREATE_PO_TARGETS)
 
 MACRO(KWWidgets_CREATE_MO_TARGETS
     domain_name
+    po_dir
     po_build_dir
     po_prefix
     locale_list
@@ -545,11 +617,16 @@ MACRO(KWWidgets_CREATE_MO_TARGETS
 
   SET(mo_files)
 
+  KWWidgets_GET_PO_SAFE_BUILD_DIR(safe_build_dir "${po_dir}" "${po_build_dir}")
+
   IF(NOT "${GETTEXT_MSGFMT_EXECUTABLE}" STREQUAL "")
 
     FOREACH(locale ${locale_list})
       KWWidgets_GET_PO_FILENAME(po_build_file 
         "${po_build_dir}" "${po_prefix}" "${locale}")
+      KWWidgets_GET_PO_FILENAME(po_uptodate_file 
+        "${safe_build_dir}" "${po_prefix}" "${locale}")
+      SET(po_uptodate_file "${po_uptodate_file}.upd")
       KWWidgets_GET_MO_FILENAME(mo_file 
         "${domain_name}" "${mo_build_dir}" "${locale}")
       GET_FILENAME_COMPONENT(mo_dir "${mo_file}" PATH)
@@ -557,7 +634,7 @@ MACRO(KWWidgets_CREATE_MO_TARGETS
       SET(mo_files ${mo_files} ${mo_file})
       ADD_CUSTOM_COMMAND(
         OUTPUT ${mo_file}
-        DEPENDS ${po_build_file}
+        DEPENDS ${po_uptodate_file}
         COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} 
         ARGS --output-file=${mo_file} --check-format ${po_build_file}
         )
