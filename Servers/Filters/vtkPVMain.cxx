@@ -39,8 +39,9 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.11");
+vtkCxxRevisionMacro(vtkPVMain, "1.12");
 
+int vtkPVMain::InitializeMPI = 1;
 
 
 //----------------------------------------------------------------------------
@@ -67,17 +68,20 @@ vtkPVMain::~vtkPVMain()
 void vtkPVMain::Initialize(int* argc, char** argv[])
 {
 #ifdef VTK_USE_MPI
-  // This is here to avoid false leak messages from vtkDebugLeaks when
-  // using mpich. It appears that the root process which spawns all the
-  // main processes waits in MPI_Init() and calls exit() when
-  // the others are done, causing apparent memory leaks for any objects
-  // created before MPI_Init().
-  int myId = 0;
-  MPI_Init(argc, argv);
-  // Might as well get our process ID here.  I use it to determine
-  // Whether to initialize tk.  Once again, splitting Tk and Tcl 
-  // initialization would clean things up.
-  MPI_Comm_rank(MPI_COMM_WORLD,&myId); 
+  if (vtkPVMain::InitializeMPI)
+    {
+    // This is here to avoid false leak messages from vtkDebugLeaks when
+    // using mpich. It appears that the root process which spawns all the
+    // main processes waits in MPI_Init() and calls exit() when
+    // the others are done, causing apparent memory leaks for any objects
+    // created before MPI_Init().
+    int myId = 0;
+    MPI_Init(argc, argv);
+    // Might as well get our process ID here.  I use it to determine
+    // Whether to initialize tk.  Once again, splitting Tk and Tcl 
+    // initialization would clean things up.
+    MPI_Comm_rank(MPI_COMM_WORLD,&myId); 
+    }
 #else
   (void)argc;
   (void)argv;
@@ -90,7 +94,10 @@ void vtkPVMain::Initialize(int* argc, char** argv[])
 void vtkPVMain::Finalize()
 {
 #ifdef VTK_USE_MPI
-  MPI_Finalize();
+  if (vtkPVMain::InitializeMPI)
+    {
+    MPI_Finalize();
+    }
 #endif
 #ifdef PARAVIEW_BUILD_WITH_ADAPTOR
   vtkPVAdaptorDispose();
@@ -182,7 +189,8 @@ int vtkPVMain::Initialize(vtkPVOptions* options,
   // Only the root server processes args.
   
   this->ProcessModule = vtkPVCreateProcessModule::CreateProcessModule(options);
-
+  // PM can use MPI only if MPI was initialized.
+  this->ProcessModule->SetUseMPI(vtkPVMain::InitializeMPI);
   if(helper)
     {
     helper->SetProcessModule(this->ProcessModule);

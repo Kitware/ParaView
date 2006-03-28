@@ -14,29 +14,14 @@
 =========================================================================*/
 
 #include "vtkTestingProcessModuleGUIHelper.h"
+
 #include "vtkObjectFactory.h"
-
-
-/*=========================================================================
-
-Program:   ParaView
-Module:    ServerManagerStateLoader.cxx
-
-Copyright (c) Kitware, Inc.
-All rights reserved.
-See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
-
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
-#include "vtkToolkits.h" // For VTK_USE_MPI
+#include "vtkProcessModule.h"
 #include "vtkPVConfig.h" // Required to get build options for paraview
 #include "vtkPVMain.h"
-#include "vtkProcessModule.h"
 #include "vtkTestingProcessModuleGUIHelper.h"
 #include "vtkTestingOptions.h"
+#include "vtkToolkits.h" // For VTK_USE_MPI
 
 /*
  * Make sure all the kits register their classes with vtkInstantiator.
@@ -66,7 +51,8 @@ static void ParaViewInitializeInterpreter(vtkProcessModule* pm);
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-  vtkPVMain::Initialize(&argc, &argv); // MPI must be initialized before any vtk object
+  vtkPVMain::SetInitializeMPI(0); // don't use MPI at all.
+  vtkPVMain::Initialize(&argc, &argv); 
   vtkPVMain* pvmain = vtkPVMain::New();
   vtkTestingOptions* options = vtkTestingOptions::New();
   options->SetProcessType(vtkPVOptions::PVBATCH);
