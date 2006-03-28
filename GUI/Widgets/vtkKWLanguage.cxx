@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLanguage);
-vtkCxxRevisionMacro(vtkKWLanguage, "1.3");
+vtkCxxRevisionMacro(vtkKWLanguage, "1.4");
 
 //----------------------------------------------------------------------------
 void vtkKWLanguage::SetCurrentLanguage(int lang)
@@ -55,6 +55,17 @@ void vtkKWLanguage::SetCurrentLanguage(int lang)
 #ifdef _WIN32
   ::SetThreadLocale(
     MAKELCID(vtkKWLanguage::GetWin32LANGIDFromLanguage(lang), SORT_DEFAULT));
+#endif  
+}
+
+//----------------------------------------------------------------------------
+int vtkKWLanguage::GetCurrentLanguage()
+{
+#ifndef _WIN32
+  return vtkKWLanguage::GetLanguageFromXPG(setlocale(LC_MESSAGES, "NULL"));
+#else
+  return vtkKWLanguage::GetLanguageFromWin32LANGID(
+    LANGIDFROMLCID(::GetThreadLocale()));
 #endif  
 }
 

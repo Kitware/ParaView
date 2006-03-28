@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-03-23 15:57-0500\n"
+"POT-Creation-Date: 2006-03-28 12:04-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,12 +16,12 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../../vtkKWApplication.cxx:976
+#: ../../vtkKWApplication.cxx:977
 #, c-format
 msgid "Are you sure you want to exit %s?"
 msgstr ""
 
-#: ../../vtkKWApplication.cxx:979
+#: ../../vtkKWApplication.cxx:980
 #, c-format
 msgid "Exit Dialog|Title|Exit %s"
 msgstr ""

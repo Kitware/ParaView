@@ -21,6 +21,7 @@
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWObject.h"
+#include "vtkKWLanguage.h"
 #include "vtkKWRegistryHelper.h"
 #include "vtkKWSeparator.h"
 #include "vtkKWSplashScreen.h"
@@ -67,7 +68,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.277");
+vtkCxxRevisionMacro(vtkKWApplication, "1.278");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -1201,6 +1202,32 @@ void vtkKWApplication::AddAboutText(ostream &os)
     os << ")";
     }
   os << endl;
+
+#ifdef KWWidgets_USE_INTERNATIONALIZATION
+  int lang = vtkKWLanguage::GetCurrentLanguage();
+  const char *lang_name = vtkKWLanguage::GetLanguageName(lang);
+  const char *lang_xpg = vtkKWLanguage::GetXPGFromLanguage(lang);
+  if (lang_name)
+    {
+    os << lang_name;
+    }
+  if (lang_xpg)
+    {
+    if (lang_name)
+      {
+      os << " (";
+      }
+    os << lang_xpg;
+    if (lang_name)
+      {
+      os << ")";
+      }
+    }
+  if (lang_name || lang_xpg)
+    {
+    os << endl;
+    }
+#endif KWWidgets_USE_INTERNATIONALIZATION
 }
 
 //----------------------------------------------------------------------------

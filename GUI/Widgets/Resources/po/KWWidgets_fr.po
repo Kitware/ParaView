@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-03-23 15:57-0500\n"
+"POT-Creation-Date: 2006-03-28 12:04-0500\n"
 "PO-Revision-Date: 2006-03-23 15:59-0500\n"
 "Last-Translator: <EMAIL@ADDRESS>\n"
 "Language-Team: French\n"
@@ -17,12 +17,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ../../vtkKWApplication.cxx:976
+#: ../../vtkKWApplication.cxx:977
 #, c-format
 msgid "Are you sure you want to exit %s?"
 msgstr "Êtes vous certain de vouloir quitter %s?"
 
-#: ../../vtkKWApplication.cxx:979
+#: ../../vtkKWApplication.cxx:980
 #, c-format
 msgid "Exit Dialog|Title|Exit %s"
 msgstr "Quitter %s"

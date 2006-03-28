@@ -267,11 +267,12 @@ public:
   //ETX
 
   // Description:
-  // Set the current language. This is done by setting the LC_MESSAGES locale
-  // as well as setting the LC_MESSAGES environment variable. On Windows
-  // platform where LC_MESSAGES is not supported, a call to SetThreadLocale()
-  // will change the language accordingly.
+  // Set/Get the current language. Setting the language is done by setting 
+  // the LC_MESSAGES locale as well as setting the LC_MESSAGES environment 
+  // variable. On Windows platform where LC_MESSAGES is not supported, a 
+  // call to SetThreadLocale() will change the language accordingly.
   static void SetCurrentLanguage(int lang);
+  static int GetCurrentLanguage();
 
   // Description:
   // Get short English name of language (or NULL if unknown/error).
