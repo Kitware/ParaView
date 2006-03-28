@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqSetName.h
+   Module:    pqDelimitedTextParser.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,26 +30,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqSetName_h
-#define _pqSetName_h
+#ifndef _pqDelimitedTextParser_h
+#define _pqDelimitedTextParser_h
 
-#include "QtComponentsExport.h"
-#include <QString>
+#include "QtWidgetsExport.h"
+#include <QObject>
 
-/// Helper class for setting a Qt object name
-struct QTCOMPONENTS_EXPORT pqSetName
+class QIODevice;
+
+/// Parses a delimited text file (e.g. a CSV or tab-delimited file), and emits signals that represent data series from the file.
+class QTWIDGETS_EXPORT pqDelimitedTextParser :
+  public QObject
 {
-  pqSetName(const QString& Name);
-  const QString Name;
+  Q_OBJECT
+  
+public:
+  enum SeriesT
+  {
+    /// Data series are organized in columns
+    COLUMN_SERIES
+  };
+  
+  /// Initializes the parser with the delimiter that will be used to separate fields on the same line within parsed files.
+  pqDelimitedTextParser(SeriesT series, char delimiter);
+  
+  /// Call this to parse a filesystem file.
+  void parse(const QString& path);
+  
+signals:
+  /// Signal emitted when parsing begins.
+  void startParsing();
+  /// Signal that will be emitted once for each data series contained in the parsed file.
+  void parseSeries(const QStringList&);
+  /// Signal emitted when parsing ends.
+  void finishParsing();
+
+private:
+  const SeriesT Series;
+  const char Delimiter;
+  
+  void parseColumns(QIODevice& stream);
 };
 
-/// Sets a Qt object's name
-template<typename T>
-T* operator<<(T* LHS, const pqSetName& RHS)
-{
-  LHS->setObjectName(RHS.Name);
-  return LHS;
-}
-
-#endif // !_pqSetName_h
-
+#endif

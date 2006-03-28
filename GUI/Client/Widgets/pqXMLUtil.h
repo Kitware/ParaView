@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqXMLUtil_h
 
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 #include <QList>
 #include <QString>
 
@@ -47,11 +47,11 @@ class vtkPVXMLElement;
 
 namespace ParaQ
 {
-  QTWIDGETS_EXPORT vtkPVXMLElement *FindNestedElementByName(
+  PQWIDGETS_EXPORT vtkPVXMLElement *FindNestedElementByName(
       vtkPVXMLElement *element, const char *name);
 
-  QTWIDGETS_EXPORT QString GetStringFromIntList(const QList<int> &list);
-  QTWIDGETS_EXPORT QList<int> GetIntListFromString(const char *value);
+  PQWIDGETS_EXPORT QString GetStringFromIntList(const QList<int> &list);
+  PQWIDGETS_EXPORT QList<int> GetIntListFromString(const char *value);
 };
 
 #endif

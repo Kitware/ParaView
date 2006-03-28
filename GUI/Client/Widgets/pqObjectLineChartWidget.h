@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqObjectLineChartWidget_h
 
 #include "pqVariableType.h"
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 #include <QWidget>
 
 class pqServer;
@@ -44,7 +44,7 @@ class vtkSMProxy;
 class vtkUnstructuredGrid;
 
 /// Displays a histogram based on data from a single proxy
-class QTWIDGETS_EXPORT pqObjectLineChartWidget :
+class PQWIDGETS_EXPORT pqObjectLineChartWidget :
   public QWidget
 {
   Q_OBJECT

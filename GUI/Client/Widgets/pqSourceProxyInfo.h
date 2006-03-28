@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqSourceProxyInfo_h
 
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 
 class pqSourceProxyInfoInternal;
 class QString;
@@ -54,7 +54,7 @@ class vtkPVXMLElement;
 /// \brief
 ///   The pqSourceProxyInfo class is used to group items in the filter
 ///   menu.
-class QTWIDGETS_EXPORT pqSourceProxyInfo
+class PQWIDGETS_EXPORT pqSourceProxyInfo
 {
 public:
   pqSourceProxyInfo();

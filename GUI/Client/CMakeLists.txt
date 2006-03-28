@@ -2,37 +2,22 @@ PROJECT(PQCLIENT)
 
 # Set the variable for include directories for moc.
 SET (MOC_INCLUDE_DIRS
-  ${CMAKE_CURRENT_SOURCE_DIR}/Chart
-  ${CMAKE_CURRENT_SOURCE_DIR}/Components
   ${CMAKE_CURRENT_SOURCE_DIR}/Widgets
-
-  #${CMAKE_CURRENT_BINARY_DIR}/Chart
-  #${CMAKE_CURRENT_BINARY_DIR}/Components
   #${CMAKE_CURRENT_BINARY_DIR}/Widgets
   )
 
-IF(PARAQ_EMBED_PYTHON)
-  SUBDIRS(Python)
-  SET (MOC_INCLUDE_DIRS
-    ${MOC_INCLUDE_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/Python
-    # ${CMAKE_CURRENT_BINARY_DIR}/Python
-    )
-ENDIF(PARAQ_EMBED_PYTHON)
-
 SUBDIRS(
-  Components
   Widgets)
-
-
 
 # Everything under Client uses VTK/ParaView ServerManager.
 INCLUDE_DIRECTORIES(
   ${VTK_INCLUDE_DIR}
   ${PARAVIEW_INCLUDE_DIRS}
   ${ParaQ_SOURCE_DIR}/VTK/GUISupport/Qt
-  ${Widgets_SOURCE_DIR}
-  ${Widgets_BINARY_DIR}
+  ${QtWidgets_SOURCE_DIR}
+  ${QtWidgets_BINARY_DIR}
+  ${QtChart_SOURCE_DIR}
+  ${QtChart_BINARY_DIR}
 )
 
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/CTestCustom.ctest.in"

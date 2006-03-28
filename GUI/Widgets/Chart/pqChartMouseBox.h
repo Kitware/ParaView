@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqChartMouseBox_h
 
 
-#include "pqChartExport.h"
+#include "QtChartExport.h"
 #include <QRect>  // Needed for QRect member.
 #include <QPoint> // Needed for QPoint member.
 

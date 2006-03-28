@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqServerFileDialogModel.h
+   Module:    pqConnect.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,41 +30,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqServerFileDialogModel_h
-#define _pqServerFileDialogModel_h
+#ifndef _pqConnect_h
+#define _pqConnect_h
 
-#include "QtComponentsExport.h"
-#include "pqFileDialogModel.h"
+#include "QtWidgetsExport.h"
 
-class vtkProcessModule;
+class QObject;
 
-/// Implementation of pqFileDialogModel that allows remote browsing of a connected ParaView server's filesystem
-class QTCOMPONENTS_EXPORT pqServerFileDialogModel :
-  public pqFileDialogModel
+/// Helper class for making Qt connections
+struct QTWIDGETS_EXPORT pqConnect
 {
-  typedef pqFileDialogModel base;
+  pqConnect(const char* Signal, const QObject* Receiver, const char* Method);
   
-  Q_OBJECT
-
-public:
-  pqServerFileDialogModel(vtkProcessModule* ProcessModule, QObject* Parent = 0);
-  ~pqServerFileDialogModel();
-
-  QString getStartPath();
-  void setCurrentPath(const QString&);
-  QString getCurrentPath();
-  bool isDir(const QModelIndex&);
-  QStringList getFilePaths(const QModelIndex&);
-  QString getFilePath(const QString&);
-  QString getParentPath(const QString&);
-  QStringList splitPath(const QString&);
-  QAbstractItemModel* fileModel();
-  QAbstractItemModel* favoriteModel();
-
-private:
-  class pqImplementation;
-  pqImplementation* const Implementation;
+  const char* Signal;
+  const QObject* Receiver;
+  const char* Method;
 };
 
-#endif // !_pqServerFileDialogModel_h
+/// Makes a Qt connection
+template<typename T>
+T* operator<<(T* LHS, const pqConnect& RHS)
+{
+  LHS->connect(LHS, RHS.Signal, RHS.Receiver, RHS.Method);
+  return LHS;
+}
+
+#endif // !_pqConnect_h
 

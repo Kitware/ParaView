@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqObjectInspectorWidget_h
 #define _pqObjectInspectorWidget_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 #include <QWidget>
 #include <QListWidgetItem>
 
@@ -57,7 +57,7 @@ class QListWidgetItem;
 /// \brief
 ///   The pqObjectInspectorWidget class is used to display the properties
 ///   of an object in an editable form.
-class QTWIDGETS_EXPORT pqObjectInspectorWidget : public QWidget
+class PQWIDGETS_EXPORT pqObjectInspectorWidget : public QWidget
 {
   Q_OBJECT
 public:

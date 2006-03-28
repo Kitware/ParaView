@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqMarkerPen_h
 #define _pqMarkerPen_h
 
-#include "pqChartExport.h"
+#include "QtChartExport.h"
 
 #include <QBrush>
 #include <QPen>

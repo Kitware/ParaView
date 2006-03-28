@@ -38,13 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPipelineWindow_h
 
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 
 class pqPipelineServer;
 class QWidget;
 
 
-class QTWIDGETS_EXPORT pqPipelineWindow
+class PQWIDGETS_EXPORT pqPipelineWindow
 {
 public:
   pqPipelineWindow(QWidget *window);

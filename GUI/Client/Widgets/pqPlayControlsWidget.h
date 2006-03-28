@@ -33,14 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPlayControlsWidget_h
 #define _pqPlayControlsWidget_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 
 #include "qwidget.h"
 
 class QHBoxLayout;
 class QToolButton;
 
-class QTWIDGETS_EXPORT pqPlayControlsWidget :
+class PQWIDGETS_EXPORT pqPlayControlsWidget :
   public QWidget
 {
   Q_OBJECT

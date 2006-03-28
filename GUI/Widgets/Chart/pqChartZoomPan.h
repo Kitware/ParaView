@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqChartZoomPan_h
 #define _pqChartZoomPan_h
 
-#include "pqChartExport.h"
+#include "QtChartExport.h"
 #include <QObject>
 #include <QPoint> // Needed for QPoint member.
 

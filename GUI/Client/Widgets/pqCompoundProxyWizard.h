@@ -36,12 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QtGui/QDialog>
 #include "ui_pqCompoundProxyWizard.h"
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 
 class pqServer;
 
 /// wizard to manage loading/saving of compound proxies
-class QTWIDGETS_EXPORT pqCompoundProxyWizard : public QDialog, 
+class PQWIDGETS_EXPORT pqCompoundProxyWizard : public QDialog, 
                                                public Ui::pqCompoundProxyWizard
 {
   Q_OBJECT

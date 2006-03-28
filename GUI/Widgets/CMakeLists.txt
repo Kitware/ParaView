@@ -1,71 +1,102 @@
-PROJECT (Widgets)
-
-INCLUDE_DIRECTORIES(
-  ${VTK_INCLUDE_DIR}
-)
+PROJECT (QtWidgets)
 
 SUBDIRS(
   Chart
   Testing
 )
 
+IF(PARAQ_EMBED_PYTHON)
+  SUBDIRS(Python)
+  SET (MOC_INCLUDE_DIRS
+    ${MOC_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/Python
+    # ${CMAKE_CURRENT_BINARY_DIR}/Python
+    )
+ENDIF(PARAQ_EMBED_PYTHON)
+
+INCLUDE_DIRECTORIES(
+  ${QtWidgets_SOURCE_DIR}
+  ${QtWidgets_BINARY_DIR}
+  ${VTK_INCLUDE_DIR}
+)
+
 ## Add the source (*.cxx,*.h) files here.
-#SET(Widgets_SRCS
-#
-#  )
-#
-##########################################################################
-#INCLUDE_DIRECTORIES(
-#  ${Widgets_SOURCE_DIR}
-#  ${Widgets_BINARY_DIR}
-#)
-#
+SET(QtWidgets_SRCS
+  pqConnect.cxx
+  pqConnect.h
+  pqConsoleWidget.cxx
+  pqConsoleWidget.h
+  pqDelimitedTextParser.cxx
+  pqDelimitedTextParser.h
+  pqFileDialog.cxx
+  pqFileDialog.h
+  pqFileDialogModel.cxx
+  pqFileDialogModel.h
+  pqLocalFileDialogModel.cxx
+  pqLocalFileDialogModel.h
+  pqSetData.cxx
+  pqSetData.h
+  pqSetName.cxx
+  pqSetName.h
+  pqWaitCursor.cxx
+  pqWaitCursor.h
+  QtWidgetsExport.h
+)
+
 ##########################################################################
 ## Add the header files that need to moc processed.
-#QT4_WRAP_CPP(MOC_BUILT_SOURCES
-#
-#)
-#
+
+QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
+  pqConsoleWidget.h
+  pqDelimitedTextParser.h
+  pqFileDialog.h
+  pqFileDialogModel.h
+  pqLocalFileDialogModel.h
+)
+
 ##########################################################################
 ## Add *.ui files to be uic processed.
-#SET(UI_FORMS
-#)
-#
-#QT4_WRAP_UI(UI_BUILT_SOURCES
-#  ${UI_FORMS}
-#)
-#
+SET(QtWidgets_UI_FORMS
+  pqFileDialog.ui
+)
+
+QT4_WRAP_UI(QtWidgets_UI_BUILT_SOURCES
+  ${QtWidgets_UI_FORMS}
+)
+
 ##########################################################################
 ## Add resources.
-#SET(UI_RESOURCES
-#)
-#
-#QT4_ADD_RESOURCES(RCS_SOURCES
-#  ${UI_RESOURCES}
-#)
-#
-#
-#SOURCE_GROUP("Resources" FILES
-#  ${UI_RESOURCES}
-#  ${UI_FORMS}
-#)
-#
-#SOURCE_GROUP("Generated" FILES
-#  ${MOC_BUILT_SOURCES}
-#  ${RCS_SOURCES}
-#  ${UI_BUILT_SOURCES}
-#)
-#
-#
+SET(UI_RESOURCES
+)
+
+QT4_ADD_RESOURCES(RCS_SOURCES
+  ${UI_RESOURCES}
+)
+
+
+SOURCE_GROUP("Resources" FILES
+  ${UI_RESOURCES}
+  ${QtWidgets_UI_FORMS}
+)
+
+SOURCE_GROUP("Generated" FILES
+  ${QtWidgets_MOC_SOURCES}
+  ${RCS_SOURCES}
+  ${QtWidgets_UI_BUILT_SOURCES}
+)
+
+
 ##########################################################################
-#ADD_LIBRARY(Widgets
-#  ${Widgets_SRCS}  
-#  ${MOC_BUILT_SOURCES}
-#  ${RCS_SOURCES}
-#  ${UI_BUILT_SOURCES}
-#)
-#
-#
+ADD_LIBRARY(QtWidgets
+  ${QtWidgets_SRCS}  
+  ${QtWidgets_MOC_SOURCES}
+  ${RCS_SOURCES}
+  ${QtWidgets_UI_BUILT_SOURCES}
+)
+
+
 ## Widgets does not depend on VTK/ParaView. Only Qt.
-#TARGET_LINK_LIBRARIES(Widgets
-#  ${QT_LIBRARIES})
+TARGET_LINK_LIBRARIES(QtWidgets
+  ${QT_LIBRARIES}
+)
+

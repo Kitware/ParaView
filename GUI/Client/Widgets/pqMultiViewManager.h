@@ -38,11 +38,11 @@ class QSplitter;
 class QWidget;
 class vtkPVXMLElement;
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 #include "pqMultiView.h"
 
 /// multi-view manager
-class QTWIDGETS_EXPORT pqMultiViewManager : public pqMultiView
+class PQWIDGETS_EXPORT pqMultiViewManager : public pqMultiView
 {
   Q_OBJECT
 public:

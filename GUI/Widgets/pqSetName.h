@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqWaitCursor.h
+   Module:    pqSetName.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,17 +30,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqWaitCursor_h
-#define _pqWaitCursor_h
+#ifndef _pqSetName_h
+#define _pqSetName_h
 
-#include "QtComponentsExport.h"
+#include "QtWidgetsExport.h"
+#include <QString>
 
-/// RAII component that displays a wait cursor during a long operation
-class QTCOMPONENTS_EXPORT pqWaitCursor
+/// Helper class for setting a Qt object name
+struct QTWIDGETS_EXPORT pqSetName
 {
-public:
-  pqWaitCursor();
-  ~pqWaitCursor();
+  pqSetName(const QString& Name);
+  const QString Name;
 };
 
-#endif
+/// Sets a Qt object's name
+template<typename T>
+T* operator<<(T* LHS, const pqSetName& RHS)
+{
+  LHS->setObjectName(RHS.Name);
+  return LHS;
+}
+
+#endif // !_pqSetName_h
+

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    $RCS $
+   Module:    pqServerFileDialogModel.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,35 +30,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/*!
- * \file pqChartExport.h
- * \brief
- *   Used to switch between dll import and export on windows.
- * \date August 19, 2005
- */
+#ifndef _pqServerFileDialogModel_h
+#define _pqServerFileDialogModel_h
 
-#ifndef __pqChartExport_h
-#define __pqChartExport_h
+#include "pqWidgetsExport.h"
+#include "pqFileDialogModel.h"
 
-#if defined(WIN32) && defined(PARAQ_BUILD_SHARED_LIBS)
-# if defined(pqChart_EXPORTS)
-#   define QTCHART_EXPORT __declspec(dllexport)
-# else
-#   define QTCHART_EXPORT __declspec(dllimport) 
-# endif
-#else
-# define QTCHART_EXPORT
-#endif
+class vtkProcessModule;
 
-// The plugin is always dynamic.
-#if defined(WIN32)
-# if defined(pqChartPlugin_EXPORTS)
-#   define QTCHARTPLUGIN_EXPORT __declspec(dllexport)
-# else
-#   define QTCHARTPLUGIN_EXPORT __declspec(dllimport)
-# endif
-#else
-# define QTCHARTPLUGIN_EXPORT
-#endif
+/// Implementation of pqFileDialogModel that allows remote browsing of a connected ParaView server's filesystem
+class PQWIDGETS_EXPORT pqServerFileDialogModel :
+  public pqFileDialogModel
+{
+  typedef pqFileDialogModel base;
+  
+  Q_OBJECT
 
-#endif
+public:
+  pqServerFileDialogModel(vtkProcessModule* ProcessModule, QObject* Parent = 0);
+  ~pqServerFileDialogModel();
+
+  QString getStartPath();
+  void setCurrentPath(const QString&);
+  QString getCurrentPath();
+  bool isDir(const QModelIndex&);
+  QStringList getFilePaths(const QModelIndex&);
+  QString getFilePath(const QString&);
+  QString getParentPath(const QString&);
+  QStringList splitPath(const QString&);
+  QAbstractItemModel* fileModel();
+  QAbstractItemModel* favoriteModel();
+
+private:
+  class pqImplementation;
+  pqImplementation* const Implementation;
+};
+
+#endif // !_pqServerFileDialogModel_h
+

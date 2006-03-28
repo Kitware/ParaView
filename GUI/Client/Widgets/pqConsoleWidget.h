@@ -33,13 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqConsoleWidget_h
 #define _pqConsoleWidget_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 
 #include <QWidget>
 #include <QTextCharFormat>
 
 /// Qt widget that provides an interactive console - send text to the console by calling printString(), and connect to the executeCommand() slot to receive user input
-class QTWIDGETS_EXPORT pqConsoleWidget :
+class PQWIDGETS_EXPORT pqConsoleWidget :
   public QWidget
 {
   Q_OBJECT

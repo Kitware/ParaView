@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqLineChartWidget_h
 #define _pqLineChartWidget_h
 
-#include "pqChartExport.h"
+#include "QtChartExport.h"
 #include <QAbstractScrollArea>
 
 class pqChartAxis;

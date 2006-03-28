@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqLocalFileDialogModel.h
+   Module:    pqFileDialog.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,37 +30,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqLocalFileDialogModel_h
-#define _pqLocalFileDialogModel_h
+#ifndef _pqFileDialog_h
+#define _pqFileDialog_h
 
-#include "QtComponentsExport.h"
-#include "pqFileDialogModel.h"
+#include "QtWidgetsExport.h"
+#include <QDialog>
 
-/// Implementation of pqFileDialogModel that provides browsing capabilities for the local filesystem
-class QTCOMPONENTS_EXPORT pqLocalFileDialogModel :
-  public pqFileDialogModel
+class pqFileDialogModel;
+namespace Ui { class pqFileDialog; }
+class QModelIndex;
+
+/// Provides a standard file dialog "front-end" for the pqFileDialogModel "back-end", i.e. it can be used for both local and remote file browsing
+class QTWIDGETS_EXPORT pqFileDialog :
+  public QDialog
 {
-  Q_OBJECT
-
-public:
-  pqLocalFileDialogModel(QObject* Parent = 0);
-  ~pqLocalFileDialogModel();
-
-  QString getStartPath();
-  void setCurrentPath(const QString&);
-  QString getCurrentPath();
-  bool isDir(const QModelIndex&);
-  QStringList getFilePaths(const QModelIndex&);
-  QString getFilePath(const QString&);
-  QString getParentPath(const QString&);
-  QStringList splitPath(const QString&);
-  QAbstractItemModel* fileModel();
-  QAbstractItemModel* favoriteModel();
+  typedef QDialog base;
   
+  Q_OBJECT
+  
+public:
+  pqFileDialog(pqFileDialogModel* Model, const QString& Title, QWidget* Parent, const char* const Name);
+
+signals:
+  /// Signal emitted when the user has chosen a set of files and accepted the dialog
+  void filesSelected(const QStringList&);
+
 private:
-  class pqImplementation;
-  pqImplementation* const Implementation;
+  ~pqFileDialog();
+  pqFileDialog(const pqFileDialog&);
+  pqFileDialog& operator=(const pqFileDialog&);
+
+  void accept();
+  
+  pqFileDialogModel* const Model;
+  Ui::pqFileDialog* const Ui;
+  const QModelIndex* Temp;
+  
+private slots:
+  void onDataChanged(const QModelIndex&, const QModelIndex&);
+  void onActivated(const QModelIndex&);
+  void onManualEntry(const QString&);
+  void onNavigate(const QString&);
+  void onNavigateUp();
+  void onNavigateDown();
 };
 
-#endif // !_pqLocalFileDialogModel_h
-
+#endif // !_pqFileDialog_h

@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqHistogramSelection_h
 #define _pqHistogramSelection_h
 
-#include "pqChartExport.h"
+#include "QtChartExport.h"
 #include "pqChartValue.h" // Needed for first and second members.
 
 class pqHistogramSelectionListData;

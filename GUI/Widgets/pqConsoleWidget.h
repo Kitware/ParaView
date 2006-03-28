@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqConnect.h
+   Module:    $RCS $
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,30 +30,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqConnect_h
-#define _pqConnect_h
+#ifndef _pqConsoleWidget_h
+#define _pqConsoleWidget_h
 
-#include "QtComponentsExport.h"
+#include "QtWidgetsExport.h"
 
-class QObject;
+#include <QWidget>
+#include <QTextCharFormat>
 
-/// Helper class for making Qt connections
-struct QTCOMPONENTS_EXPORT pqConnect
+/// Qt widget that provides an interactive console - send text to the console by calling printString(), and connect to the executeCommand() slot to receive user input
+class QTWIDGETS_EXPORT pqConsoleWidget :
+  public QWidget
 {
-  pqConnect(const char* Signal, const QObject* Receiver, const char* Method);
+  Q_OBJECT
   
-  const char* Signal;
-  const QObject* Receiver;
-  const char* Method;
+public:
+  pqConsoleWidget(QWidget* Parent);
+  virtual ~pqConsoleWidget();
+
+public slots:
+  /// Returns the current formatting that will be used by printString
+  QTextCharFormat getFormat();
+  /// Sets formatting that will be used by printString
+  void setFormat(const QTextCharFormat& Format);
+  /// Writes the supplied text to the console
+  void printString(const QString& Text);
+
+signals:
+  /// Signal emitted whenever the user enters a command
+  void executeCommand(const QString& Command);
+
+private slots:
+  void onCursorPositionChanged();
+  void onSelectionChanged();
+
+private:
+  pqConsoleWidget(const pqConsoleWidget&);
+  pqConsoleWidget& operator=(const pqConsoleWidget&);
+
+  void internalExecuteCommand(const QString& Command);
+
+  class pqImplementation;
+  pqImplementation* const Implementation;
 };
 
-/// Makes a Qt connection
-template<typename T>
-T* operator<<(T* LHS, const pqConnect& RHS)
-{
-  LHS->connect(LHS, RHS.Signal, RHS.Receiver, RHS.Method);
-  return LHS;
-}
-
-#endif // !_pqConnect_h
+#endif // !_pqConsoleWidget_h
 

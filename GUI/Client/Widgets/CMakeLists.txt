@@ -1,10 +1,8 @@
-PROJECT(QtWidgets)
+PROJECT(pqWidgets)
 
 INCLUDE_DIRECTORIES(
-  ${QtWidgets_BINARY_DIR}
-  ${QtWidgets_SOURCE_DIR}
-  ${QtComponents_SOURCE_DIR}
-  ${pqChart_SOURCE_DIR}
+  ${pqWidgets_BINARY_DIR}
+  ${pqWidgets_SOURCE_DIR}
 )
 
 # Reduce the number of dirs that get included on moc command line
@@ -14,7 +12,6 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCompoundProxyWizard.h
-  pqConsoleWidget.h
   pqDataSetModel.h
   pqElementInspectorWidget.h
   pqImageTip.h
@@ -23,15 +20,18 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqMultiViewManager.h
   pqObjectEditor.h
   pqObjectHistogramWidget.h
-  pqObjectLineChartWidget.h
+  pqObjectInspector.h
+  pqObjectInspectorItem.h
   pqObjectInspectorWidget.h
+  pqObjectLineChartWidget.h
   pqPicking.h
   pqPipelineData.h
   pqPipelineListModel.h
   pqPipelineListWidget.h
   pqPlayControlsWidget.h
-  pqServerBrowser.h
   pqSMAdaptor.h
+  pqServerBrowser.h
+  pqServerFileDialogModel.h
   pqVariableSelectorWidget.h
 )
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
@@ -66,11 +66,9 @@ SOURCE_GROUP("Generated" FILES
   ${UI_BUILT_SOURCES}
 )
 
-ADD_LIBRARY(QtWidgets
+ADD_LIBRARY(pqWidgets
   pqCompoundProxyWizard.cxx
   pqCompoundProxyWizard.h
-  pqConsoleWidget.cxx
-  pqConsoleWidget.h
   pqDataSetModel.cxx
   pqDataSetModel.h
   pqElementInspectorWidget.cxx
@@ -89,6 +87,10 @@ ADD_LIBRARY(QtWidgets
   pqObjectEditor.h
   pqObjectHistogramWidget.cxx
   pqObjectHistogramWidget.h
+  pqObjectInspector.cxx
+  pqObjectInspector.h
+  pqObjectInspectorItem.cxx
+  pqObjectInspectorItem.h
   pqObjectInspectorWidget.cxx
   pqObjectInspectorWidget.h
   pqObjectLineChartWidget.cxx
@@ -115,24 +117,26 @@ ADD_LIBRARY(QtWidgets
   pqPlayControlsWidget.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
-  pqServer.cxx
-  pqServer.h
-  pqServerBrowser.cxx
-  pqServerBrowser.h
   pqSMAdaptor.cxx
   pqSMAdaptor.h
   pqSMMultiView.cxx
   pqSMMultiView.h
   pqSMProxy.cxx
   pqSMProxy.h
+  pqServer.cxx
+  pqServer.h
+  pqServerBrowser.cxx
+  pqServerBrowser.h
+  pqServerFileDialogModel.cxx
+  pqServerFileDialogModel.h
   pqSourceProxyInfo.cxx
   pqSourceProxyInfo.h
   pqVariableSelectorWidget.cxx
   pqVariableSelectorWidget.h
   pqVariableType.h
+  pqWidgetsExport.h
   pqXMLUtil.cxx
   pqXMLUtil.h
-  QtWidgetsExport.h
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}
   ${UI_BUILT_SOURCES}
@@ -143,8 +147,9 @@ ADD_LIBRARY(QtWidgets
   vtkPVAxesActor.h
 )
 
-TARGET_LINK_LIBRARIES(QtWidgets
-  pqChart
+TARGET_LINK_LIBRARIES(pqWidgets
+  QtChart
+  QtWidgets
   vtkPVServerManager
   QVTK
 )
@@ -152,5 +157,4 @@ TARGET_LINK_LIBRARIES(QtWidgets
 IF(BUILD_TESTING)
   SUBDIRS(Testing)
 ENDIF(BUILD_TESTING)
-
 

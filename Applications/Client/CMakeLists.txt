@@ -1,4 +1,4 @@
-PROJECT(QtClient)
+PROJECT(pqClient)
 
 IF(PARAQ_EMBED_PYTHON)
   FIND_PACKAGE(PythonLibs)
@@ -31,14 +31,9 @@ IF(VTK_USE_MPI)
 ENDIF(VTK_USE_MPI)
 
 INCLUDE_DIRECTORIES(
-  ${QtPython_SOURCE_DIR}
-  ${QtComponents_SOURCE_DIR}
-  ${QtWidgets_SOURCE_DIR}
-  ${QtWidgets_BINARY_DIR}
-  ${QtTesting_SOURCE_DIR}
-  ${QtClient_SOURCE_DIR}
-  ${QtClient_BINARY_DIR}
-  )
+  ${pqClient_SOURCE_DIR}
+  ${pqClient_BINARY_DIR}
+)
 
 ADD_DEFINITIONS(-DVERSION=${PARAQ_VERSION})
 
@@ -100,8 +95,9 @@ ADD_EXECUTABLE(pqClient WIN32 MACOSX_BUNDLE
 )
 
 TARGET_LINK_LIBRARIES(pqClient
+  pqWidgets
   QtWidgets
-  QtComponents
+  QtChart
   QtTesting
   ${PYTHON_LINK_LIBRARIES}
 )

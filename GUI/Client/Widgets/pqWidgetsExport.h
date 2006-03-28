@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqFileDialog.h
+   Module:    $RCS $
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,49 +30,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqFileDialog_h
-#define _pqFileDialog_h
+#ifndef _pqWidgetsExport_h
+#define _pqWidgetsExport_h
 
-#include "QtComponentsExport.h"
-#include <QDialog>
+#if defined(WIN32) && defined(PARAQ_BUILD_SHARED_LIBS)
+# if defined(pqWidgets_EXPORTS)
+#   define PQWIDGETS_EXPORT __declspec(dllexport)
+# else
+#   define PQWIDGETS_EXPORT __declspec(dllimport)
+# endif
+#else
+# define PQWIDGETS_EXPORT
+#endif
 
-class pqFileDialogModel;
-namespace Ui { class pqFileDialog; }
-class QModelIndex;
-
-/// Provides a standard file dialog "front-end" for the pqFileDialogModel "back-end", i.e. it can be used for both local and remote file browsing
-class QTCOMPONENTS_EXPORT pqFileDialog :
-  public QDialog
-{
-  typedef QDialog base;
-  
-  Q_OBJECT
-  
-public:
-  pqFileDialog(pqFileDialogModel* Model, const QString& Title, QWidget* Parent, const char* const Name);
-
-signals:
-  /// Signal emitted when the user has chosen a set of files and accepted the dialog
-  void filesSelected(const QStringList&);
-
-private:
-  ~pqFileDialog();
-  pqFileDialog(const pqFileDialog&);
-  pqFileDialog& operator=(const pqFileDialog&);
-
-  void accept();
-  
-  pqFileDialogModel* const Model;
-  Ui::pqFileDialog* const Ui;
-  const QModelIndex* Temp;
-  
-private slots:
-  void onDataChanged(const QModelIndex&, const QModelIndex&);
-  void onActivated(const QModelIndex&);
-  void onManualEntry(const QString&);
-  void onNavigate(const QString&);
-  void onNavigateUp();
-  void onNavigateDown();
-};
-
-#endif // !_pqFileDialog_h
+#endif // !_pqWidgetsExport_h

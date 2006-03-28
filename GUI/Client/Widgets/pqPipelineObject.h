@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPipelineObject_h
 
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 #include <QString> // Needed for proxy name.
 
 class pqPipelineObjectInternal;
@@ -47,7 +47,7 @@ class vtkSMDisplayProxy;
 class vtkSMProxy;
 
 
-class QTWIDGETS_EXPORT pqPipelineObject
+class PQWIDGETS_EXPORT pqPipelineObject
 {
 public:
   enum ObjectType {

@@ -33,13 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqRenderViewProxy_h
 #define _pqRenderViewProxy_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 #include "vtkPVRenderViewProxy.h"
 
 class vtkSMRenderModuleProxy;
 
 /// Integrates the PVS render window with the Qt window
-class QTWIDGETS_EXPORT pqRenderViewProxy : public vtkPVRenderViewProxy
+class PQWIDGETS_EXPORT pqRenderViewProxy : public vtkPVRenderViewProxy
 {
 public:
   static pqRenderViewProxy* New();

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    $RCS $
+   Module:    pqSetData.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,39 +30,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqLinePlot_h
-#define _pqLinePlot_h
+#ifndef _pqSetData_h
+#define _pqSetData_h
 
-#include "QtChartExport.h"
-#include "pqAbstractPlot.h"
+#include "QtWidgetsExport.h"
+#include <QVariant>
 
-class pqMarkerPen;
-
-/// Displays a line plot
-class QTCHART_EXPORT pqLinePlot :
-  public pqAbstractPlot
+/// Helper class for setting custom Qt object data
+struct QTWIDGETS_EXPORT pqSetData
 {
-public:
-  /// pqLinePlot assumes ownership of the given pen
-  pqLinePlot(pqMarkerPen* pen, const pqChartCoordinateList& coords);
-  /// pqLinePlot assumes ownership of the given pen
-  pqLinePlot(pqMarkerPen* pen, const pqChartCoordinate& p1, const pqChartCoordinate& p2);
-  virtual ~pqLinePlot();
-
-  /// \name pqAbstractPlot Methods
-  //@{
-  virtual const pqChartCoordinate getMinimum() const;
-  virtual const pqChartCoordinate getMaximum() const;
-  virtual void layoutPlot(const pqChartAxis& XAxis, const pqChartAxis& YAxis);
-  virtual void drawPlot(QPainter& painter, const QRect& area, const pqChartAxis& XAxis, const pqChartAxis& YAxis);
-  virtual const double getDistance(const QPoint& coords) const;
-  virtual void showChartTip(QHelpEvent& event) const;
-  //@}
-
-private:
-  /// Private implementation details
-  class pqImplementation;
-  pqImplementation* const Implementation;
+  pqSetData(const QVariant& Data);
+  const QVariant Data;
 };
 
-#endif
+/// Sets custom data for a Qt object
+template<typename T>
+T* operator<<(T* LHS, const pqSetData& RHS)
+{
+  LHS->setData(RHS.Data);
+  return LHS;
+}
+
+#endif // !_pqSetData_h
+

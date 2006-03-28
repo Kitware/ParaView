@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqObjectInspectorDelegate_h
 #define _pqObjectInspectorDelegate_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 #include <QItemDelegate>
 
 /// \class pqObjectInspectorDelegate
@@ -52,7 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// an editor. The type of editor created is based on the property
 /// value and domain. The delegate is also used to move the property
 /// value back and forth between the model and the editor.
-class QTWIDGETS_EXPORT pqObjectInspectorDelegate : public QItemDelegate
+class PQWIDGETS_EXPORT pqObjectInspectorDelegate : public QItemDelegate
 {
 public:
   /// \brief

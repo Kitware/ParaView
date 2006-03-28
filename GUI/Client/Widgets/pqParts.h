@@ -34,13 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqParts_h
 #define _pqParts_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 
 class vtkSMRenderModuleProxy;
 class vtkSMDisplayProxy;
 class vtkSMSourceProxy;
 
-class QTWIDGETS_EXPORT pqPart
+class PQWIDGETS_EXPORT pqPart
 {
 public:
   /**

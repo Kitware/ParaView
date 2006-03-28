@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqSMMultiView_h
 #define _pqSMMultiView_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 
 class pqMultiViewFrame;
 class pqServer;
@@ -47,7 +47,7 @@ class QWidget;
 
 namespace ParaQ
 {
-  QTWIDGETS_EXPORT QVTKWidget *AddQVTKWidget(pqMultiViewFrame *frame,
+  PQWIDGETS_EXPORT QVTKWidget *AddQVTKWidget(pqMultiViewFrame *frame,
       QWidget *topWidget, pqServer *server);
 };
 

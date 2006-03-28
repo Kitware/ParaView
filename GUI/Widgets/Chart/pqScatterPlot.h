@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqScatterPlot_h
 #define _pqScatterPlot_h
 
-#include "pqChartExport.h"
+#include "QtChartExport.h"
 #include "pqAbstractPlot.h"
 
 class pqChartValue;

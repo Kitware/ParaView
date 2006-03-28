@@ -33,13 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqOpenExodusOptions_h
 #define _pqOpenExodusOptions_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 #include <QDialog>
 #include "ui_pqOpenExodusOptions.h"
 
 class vtkSMSourceProxy;
 
-class QTWIDGETS_EXPORT pqOpenExodusOptions : public QDialog,
+class PQWIDGETS_EXPORT pqOpenExodusOptions : public QDialog,
     public Ui::pqOpenExodusOptions
 {
   Q_OBJECT

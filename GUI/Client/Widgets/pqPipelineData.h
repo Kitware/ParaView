@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPipelineData_h
 #define _pqPipelineData_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 #include <QObject>
 
 class pqMultiView;
@@ -56,7 +56,7 @@ class vtkSMDisplayProxy;
 
 
 /// interface for querying pipline state, also provides signals for pipeline changes
-class QTWIDGETS_EXPORT pqPipelineData : public QObject
+class PQWIDGETS_EXPORT pqPipelineData : public QObject
 {
   Q_OBJECT
 

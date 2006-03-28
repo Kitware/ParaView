@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqChartValue_h
 #define _pqChartValue_h
 
-#include "pqChartExport.h"
+#include "QtChartExport.h"
 #include <QString> // Needed for QString return type.
 
 class pqChartValueListData;

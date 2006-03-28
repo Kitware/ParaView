@@ -1,18 +1,16 @@
-PROJECT(pqChart)
+PROJECT(QtChart)
 
 INCLUDE_DIRECTORIES(
   ${VTK_INCLUDE_DIR}
-  ${QtComponents_SOURCE_DIR}
 )
 
-SET(pqChart_SRCS
+SET(QtChart_SRCS
   pqAbstractPlot.cxx
   pqAbstractPlot.h
   pqChartAxis.cxx
   pqChartAxis.h
   pqChartCoordinate.cxx
   pqChartCoordinate.h
-  pqChartExport.h
   pqChartLabel.cxx
   pqChartLabel.h
   pqChartLegend.cxx
@@ -45,6 +43,7 @@ SET(pqChart_SRCS
   pqMarkerPen.h
   pqScatterPlot.cxx
   pqScatterPlot.h
+  QtChartExport.h
 )
 
 # Reduce the number of dirs that get included on moc command line
@@ -52,7 +51,7 @@ SET(pqChart_SRCS
 GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 
-QT4_WRAP_CPP(pqChart_MOC_SRCS
+QT4_WRAP_CPP(QtChart_MOC_SRCS
   pqChartAxis.h
   pqChartLabel.h
   pqChartLegend.h
@@ -64,37 +63,33 @@ QT4_WRAP_CPP(pqChart_MOC_SRCS
 )
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
-
 SET(UI_RESOURCES
   pqChart.qrc
 )
 
-QT4_ADD_RESOURCES(pqChart_QRC_SRCS
+QT4_ADD_RESOURCES(QtChart_QRC_SRCS
   ${UI_RESOURCES}
 )
-
 
 SOURCE_GROUP("Resources" FILES
   ${UI_RESOURCES}
 )
 
 SOURCE_GROUP("Generated" FILES
-  ${pqChart_MOC_SRCS}
-  ${pqChart_QRC_SRCS}
+  ${QtChart_MOC_SRCS}
+  ${QtChart_QRC_SRCS}
 )
 
-
-ADD_LIBRARY(pqChart
-  ${pqChart_SRCS}
-  ${pqChart_MOC_SRCS}
-  ${pqChart_QRC_SRCS}
+ADD_LIBRARY(QtChart
+  ${QtChart_SRCS}
+  ${QtChart_MOC_SRCS}
+  ${QtChart_QRC_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(pqChart
-  QtComponents
+TARGET_LINK_LIBRARIES(QtChart
+  QtWidgets
   ${QT_LIBRARIES}
 )
-
 
 # -----------------------------------------------------------------------------
 # plugin
@@ -110,14 +105,14 @@ IF(NOT BUILD_SHARED_LIBS)
 ENDIF(NOT BUILD_SHARED_LIBS)
 
 
-SET(pqChartPlugin_SRCS
+SET(QtChartPlugin_SRCS
   pqChartPlugin.cxx
   pqChartPlugin.h
   pqHistogramWidgetPlugin.h
   pqLineChartWidgetPlugin.h
 )
 
-QT4_WRAP_CPP(pqChartPlugin_MOC_SRCS
+QT4_WRAP_CPP(QtChartPlugin_MOC_SRCS
   pqChartPlugin.h
   pqHistogramWidgetPlugin.h
   pqLineChartWidgetPlugin.h
@@ -125,15 +120,13 @@ QT4_WRAP_CPP(pqChartPlugin_MOC_SRCS
 
 ADD_DEFINITIONS(-DQT_PLUGIN)
 
-ADD_LIBRARY(pqChartPlugin
+ADD_LIBRARY(QtChartPlugin
   SHARED
-  ${pqChartPlugin_SRCS}
-  ${pqChartPlugin_MOC_SRCS}
+  ${QtChartPlugin_SRCS}
+  ${QtChartPlugin_MOC_SRCS}
 )
 
-TARGET_LINK_LIBRARIES(pqChartPlugin 
-  pqChart
+TARGET_LINK_LIBRARIES(QtChartPlugin 
+  QtChart
   ${QT_LIBRARIES}
 )
-
-

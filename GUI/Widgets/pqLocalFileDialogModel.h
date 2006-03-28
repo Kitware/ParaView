@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    $RCS $
+   Module:    pqLocalFileDialogModel.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,17 +30,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _QtComponentsExport_h
-#define _QtComponentsExport_h
+#ifndef _pqLocalFileDialogModel_h
+#define _pqLocalFileDialogModel_h
 
-#if defined(WIN32) && defined(PARAQ_BUILD_SHARED_LIBS)
-# if defined(QtComponents_EXPORTS)
-#   define QTCOMPONENTS_EXPORT __declspec(dllexport)
-# else
-#   define QTCOMPONENTS_EXPORT __declspec(dllimport)
-# endif
-#else
-# define QTCOMPONENTS_EXPORT
-#endif
+#include "QtWidgetsExport.h"
+#include "pqFileDialogModel.h"
 
-#endif // !_QtComponentsExport_h
+/// Implementation of pqFileDialogModel that provides browsing capabilities for the local filesystem
+class QTWIDGETS_EXPORT pqLocalFileDialogModel :
+  public pqFileDialogModel
+{
+  Q_OBJECT
+
+public:
+  pqLocalFileDialogModel(QObject* Parent = 0);
+  ~pqLocalFileDialogModel();
+
+  QString getStartPath();
+  void setCurrentPath(const QString&);
+  QString getCurrentPath();
+  bool isDir(const QModelIndex&);
+  QStringList getFilePaths(const QModelIndex&);
+  QString getFilePath(const QString&);
+  QString getParentPath(const QString&);
+  QStringList splitPath(const QString&);
+  QAbstractItemModel* fileModel();
+  QAbstractItemModel* favoriteModel();
+  
+private:
+  class pqImplementation;
+  pqImplementation* const Implementation;
+};
+
+#endif // !_pqLocalFileDialogModel_h
+

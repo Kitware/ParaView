@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqHistogramColor_h
 #define _pqHistogramColor_h
 
-#include "pqChartExport.h"
+#include "QtChartExport.h"
 #include <QColor> // Needed for QColor return type.
 
 /*!

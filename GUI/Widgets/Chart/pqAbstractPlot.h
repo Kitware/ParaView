@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqAbstractPlot_h
 
 #include "pqChartCoordinate.h"
-#include "pqChartExport.h"
+#include "QtChartExport.h"
 
 class pqChartAxis;
 class QHelpEvent;

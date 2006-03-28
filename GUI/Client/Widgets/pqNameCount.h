@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqNameCount_h
 
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 
 class pqNameCountInternal;
 class QString;
@@ -52,7 +52,7 @@ class QString;
 ///
 /// The count associated with a name string can be incremented or
 /// set to a specific value. The name/count map can be reset as well.
-class QTWIDGETS_EXPORT pqNameCount
+class PQWIDGETS_EXPORT pqNameCount
 {
 public:
   pqNameCount();

@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPipelineListWidget_h
 #define _pqPipelineListWidget_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 #include <QWidget>
 
 class pqPipelineListModel;
@@ -55,7 +55,7 @@ class vtkSMProxy;
 /// \brief
 ///   The pqPipelineListWidget class is used to display the pipeline
 ///   in the form of a tree.
-class QTWIDGETS_EXPORT pqPipelineListWidget : public QWidget
+class PQWIDGETS_EXPORT pqPipelineListWidget : public QWidget
 {
   Q_OBJECT
 

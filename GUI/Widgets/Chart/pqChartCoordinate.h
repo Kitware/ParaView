@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqChartCoordinate_h
 #define _pqChartCoordinate_h
 
-#include "pqChartExport.h"
+#include "QtChartExport.h"
 #include "pqChartValue.h" // Needed for x and y members.
 
 class pqChartCoordinateListData;

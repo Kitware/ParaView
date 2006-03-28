@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqDelimitedTextParser.h
+   Module:    $RCS $
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,46 +30,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqDelimitedTextParser_h
-#define _pqDelimitedTextParser_h
+/*!
+ * \file QtChartExport.h
+ * \brief
+ *   Used to switch between dll import and export on windows.
+ * \date August 19, 2005
+ */
 
-#include "QtComponentsExport.h"
-#include <QObject>
+#ifndef __QtChartExport_h
+#define __QtChartExport_h
 
-class QIODevice;
+#if defined(WIN32) && defined(PARAQ_BUILD_SHARED_LIBS)
+# if defined(QtChart_EXPORTS)
+#   define QTCHART_EXPORT __declspec(dllexport)
+# else
+#   define QTCHART_EXPORT __declspec(dllimport) 
+# endif
+#else
+# define QTCHART_EXPORT
+#endif
 
-/// Parses a delimited text file (e.g. a CSV or tab-delimited file), and emits signals that represent data series from the file.
-class QTCOMPONENTS_EXPORT pqDelimitedTextParser :
-  public QObject
-{
-  Q_OBJECT
-  
-public:
-  enum SeriesT
-  {
-    /// Data series are organized in columns
-    COLUMN_SERIES
-  };
-  
-  /// Initializes the parser with the delimiter that will be used to separate fields on the same line within parsed files.
-  pqDelimitedTextParser(SeriesT series, char delimiter);
-  
-  /// Call this to parse a filesystem file.
-  void parse(const QString& path);
-  
-signals:
-  /// Signal emitted when parsing begins.
-  void startParsing();
-  /// Signal that will be emitted once for each data series contained in the parsed file.
-  void parseSeries(const QStringList&);
-  /// Signal emitted when parsing ends.
-  void finishParsing();
-
-private:
-  const SeriesT Series;
-  const char Delimiter;
-  
-  void parseColumns(QIODevice& stream);
-};
+// The plugin is always dynamic.
+#if defined(WIN32)
+# if defined(QtChartPlugin_EXPORTS)
+#   define QTCHARTPLUGIN_EXPORT __declspec(dllexport)
+# else
+#   define QTCHARTPLUGIN_EXPORT __declspec(dllimport)
+# endif
+#else
+# define QTCHARTPLUGIN_EXPORT
+#endif
 
 #endif

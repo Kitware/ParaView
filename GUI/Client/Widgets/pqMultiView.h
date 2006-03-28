@@ -33,14 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqMultiView_h
 #define _pqMultiView_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 #include <QFrame>
 #include <QList>
 
 class QSplitter;
 
 /// class to manage locations of multiple view widgets
-class QTWIDGETS_EXPORT pqMultiView : public QFrame
+class PQWIDGETS_EXPORT pqMultiView : public QFrame
 {
   Q_OBJECT
 public:

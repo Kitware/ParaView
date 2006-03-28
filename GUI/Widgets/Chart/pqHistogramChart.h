@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqHistogramChart_h
 
 
-#include "pqChartExport.h"
+#include "QtChartExport.h"
 #include <QObject>
 
 #include <QColor> // Needed for select member.

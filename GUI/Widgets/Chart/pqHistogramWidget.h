@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqHistogramWidget_h
 
 
-#include "pqChartExport.h"
+#include "QtChartExport.h"
 #include <QAbstractScrollArea>
 #include <QSize> // Needed for QSize return type.
 

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqLineErrorPlot_h
 #define _pqLineErrorPlot_h
 
-#include "pqChartExport.h"
+#include "QtChartExport.h"
 #include "pqAbstractPlot.h"
 
 #include <QVector>

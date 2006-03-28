@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqObjectHistogramWidget_h
 
 #include "pqVariableType.h"
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 #include <QWidget>
 
 class pqServer;
@@ -43,7 +43,7 @@ class vtkObject;
 class vtkSMProxy;
 
 /// Displays a histogram based on data from a single proxy
-class QTWIDGETS_EXPORT pqObjectHistogramWidget :
+class PQWIDGETS_EXPORT pqObjectHistogramWidget :
   public QWidget
 {
   Q_OBJECT

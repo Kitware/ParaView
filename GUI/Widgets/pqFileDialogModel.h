@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqFileDialogModel_h
 #define _pqFileDialogModel_h
 
+#include "QtWidgetsExport.h"
 #include <QObject>
 
 class QAbstractItemModel;
@@ -40,7 +41,7 @@ class QModelIndex;
 class QString;
 
 /// Abstract interface to a file-browsing "back-end" that can be used by the pqFileDialog "front-end"
-class pqFileDialogModel :
+class QTWIDGETS_EXPORT pqFileDialogModel :
   public QObject
 {
   Q_OBJECT
@@ -75,4 +76,3 @@ protected:
 };
 
 #endif // !_pqFileDialogModel_h
-

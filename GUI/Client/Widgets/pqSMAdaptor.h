@@ -39,14 +39,14 @@ class vtkSMProxy;
 class vtkObject;
 class QWidget;
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 #include <QObject>
 #include <QVariant>
 #include <QList>
 #include "pqSMProxy.h"
 
 /// Translates server manager events into Qt-compatible slots and signals
-class QTWIDGETS_EXPORT pqSMAdaptor : public QObject
+class PQWIDGETS_EXPORT pqSMAdaptor : public QObject
 {
   Q_OBJECT
   

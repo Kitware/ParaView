@@ -10,15 +10,8 @@ SET(QT_CLIENT_VERSION ${QT_CLIENT_VERSION_MAJOR}.${QT_CLIENT_VERSION_MINOR})
 ADD_DEFINITIONS(-DVERSION=${QT_CLIENT_VERSION})
 
 INCLUDE_DIRECTORIES(
+  ${DobranoViz_SOURCE_DIR}
   ${DobranoViz_BINARY_DIR}
-  ${pqChart_BINARY_DIR}
-  ${pqChart_SOURCE_DIR}
-  ${QtComponents_SOURCE_DIR}
-  ${QtTesting_BINARY_DIR}
-  ${QtTesting_SOURCE_DIR}
-  ${QtWidgets_BINARY_DIR}
-  ${QtWidgets_SOURCE_DIR}
-  ${PYTHON_INCLUDE_DIRECTORIES}
 )
 
 IF(VTK_USE_MPI)
@@ -57,9 +50,10 @@ ADD_EXECUTABLE(DobranoViz WIN32 MACOSX_BUNDLE
 )
 
 TARGET_LINK_LIBRARIES(DobranoViz
-  QtComponents
-  QtWidgets
+  pqWidgets
+  QtChart
   QtTesting
+  QtWidgets
   ${QT_XML_LIBRARIES}
 )
 

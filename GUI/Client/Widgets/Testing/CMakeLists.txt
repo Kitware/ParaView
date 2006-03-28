@@ -1,4 +1,3 @@
-
 PROJECT(QtWidgetsTesting)
 
 INCLUDE_DIRECTORIES(${QtTesting_SOURCE_DIR})
@@ -12,7 +11,7 @@ ADD_EXECUTABLE(QtWidgetsMultiViewTest MACOSX_BUNDLE pqMultiViewTest.cxx
                ${MULTIVIEW_TEST_SRCS} ${MULTIVIEW_TEST_RESOURCES} 
                ${MULTIVIEW_TEST_UIS} ${MULTIVIEW_TEST_MOCS}
                )
-TARGET_LINK_LIBRARIES(QtWidgetsMultiViewTest QtWidgets QtTesting ${QT_LIBRARIES})
+TARGET_LINK_LIBRARIES(QtWidgetsMultiViewTest pqWidgets QtWidgets QtTesting ${QT_LIBRARIES})
 
 ADD_TEST(QtWidgetsMultiView  ${EXECUTABLE_OUTPUT_PATH}/QtWidgetsMultiViewTest 
          --run-test ${QtWidgetsTesting_SOURCE_DIR}/pqMultiViewTest.xml 

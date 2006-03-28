@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPipelineServer_h
 
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 
 class pqMultiView;
 class pqPipelineObject;
@@ -50,7 +50,7 @@ class vtkPVXMLElement;
 class vtkSMProxy;
 
 
-class QTWIDGETS_EXPORT pqPipelineServer
+class PQWIDGETS_EXPORT pqPipelineServer
 {
 public:
   pqPipelineServer();

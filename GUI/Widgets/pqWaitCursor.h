@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqSetData.h
+   Module:    pqWaitCursor.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,26 +30,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqSetData_h
-#define _pqSetData_h
+#ifndef _pqWaitCursor_h
+#define _pqWaitCursor_h
 
-#include "QtComponentsExport.h"
-#include <QVariant>
+#include "QtWidgetsExport.h"
 
-/// Helper class for setting custom Qt object data
-struct QTCOMPONENTS_EXPORT pqSetData
+/// RAII component that displays a wait cursor during a long operation
+class QTWIDGETS_EXPORT pqWaitCursor
 {
-  pqSetData(const QVariant& Data);
-  const QVariant Data;
+public:
+  pqWaitCursor();
+  ~pqWaitCursor();
 };
 
-/// Sets custom data for a Qt object
-template<typename T>
-T* operator<<(T* LHS, const pqSetData& RHS)
-{
-  LHS->setData(RHS.Data);
-  return LHS;
-}
-
-#endif // !_pqSetData_h
-
+#endif

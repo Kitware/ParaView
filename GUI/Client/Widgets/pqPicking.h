@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPicking_h
 #define _pqPicking_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 #include <QObject>
 #include <vtkType.h>
 class vtkObject;
@@ -47,7 +47,7 @@ class vtkSMPointLabelDisplayProxy;
 class vtkUnstructuredGrid;
 
 /// class to do picking
-class QTWIDGETS_EXPORT pqPicking : public QObject
+class PQWIDGETS_EXPORT pqPicking : public QObject
 {
   Q_OBJECT
 public:

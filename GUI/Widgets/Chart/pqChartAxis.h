@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqChartAxis_h
 
 
-#include "pqChartExport.h"
+#include "QtChartExport.h"
 #include "pqChartValue.h" // Needed for min, max, etc. members.
 
 #include <QObject>

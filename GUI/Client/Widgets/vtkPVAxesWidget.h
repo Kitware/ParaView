@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVAxesWidget_h
 
 #include "vtkInteractorObserver.h"
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 
 class vtkActor2D;
 class vtkKWApplication;
@@ -48,7 +48,7 @@ class vtkPVAxesActor;
 class vtkPVAxesWidgetObserver;
 class vtkRenderer;
 
-class QTWIDGETS_EXPORT vtkPVAxesWidget : public vtkInteractorObserver
+class PQWIDGETS_EXPORT vtkPVAxesWidget : public vtkInteractorObserver
 {
 public:
   static vtkPVAxesWidget* New();

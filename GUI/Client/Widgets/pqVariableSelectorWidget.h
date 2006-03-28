@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqVariableSelectorWidget_h
 
 #include "pqVariableType.h"
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 
 #include <QWidget>
 #include <QString>
@@ -43,7 +43,7 @@ class QComboBox;
 class QHBoxLayout;
 
 /// Provides a standard user interface for selecting among a collection of dataset variables (both cell and node variables).
-class QTWIDGETS_EXPORT pqVariableSelectorWidget : public QWidget
+class PQWIDGETS_EXPORT pqVariableSelectorWidget : public QWidget
 {
   Q_OBJECT
 

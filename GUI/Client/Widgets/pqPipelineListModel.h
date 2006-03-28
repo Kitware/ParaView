@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPipelineListModel_h
 
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 #include <QAbstractItemModel>
 
 class pqPipelineListInternal;
@@ -59,7 +59,7 @@ class vtkSMProxy;
 /// \brief
 ///   The pqPipelineListModel class is used to represent the pipeline
 ///   in the form of a list.
-class QTWIDGETS_EXPORT pqPipelineListModel : public QAbstractItemModel
+class PQWIDGETS_EXPORT pqPipelineListModel : public QAbstractItemModel
 {
   Q_OBJECT
 

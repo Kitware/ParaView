@@ -33,13 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqServerBrowser_h
 #define _pqServerBrowser_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 #include "ui_pqServerBrowser.h"
 
 class pqServer;
 
 /// Provides a user-interface component for creating server connections
-class QTWIDGETS_EXPORT pqServerBrowser :
+class PQWIDGETS_EXPORT pqServerBrowser :
   public QDialog
 {
   typedef QDialog base;

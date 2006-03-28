@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqChartLabel_h
 #define _pqChartLabel_h
 
-#include "pqChartExport.h"
+#include "QtChartExport.h"
 
 #include <QObject>
 #include <QRect>  // Needed for bounds member.

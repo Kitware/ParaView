@@ -33,13 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqElementInspectorWidget_h
 #define _pqElementInspectorWidget_h
 
-#include "QtWidgetsExport.h"
+#include "pqWidgetsExport.h"
 #include <QWidget>
 
 class vtkUnstructuredGrid;
 
 /// Displays a collection of data set elements in spreadsheet form
-class QTWIDGETS_EXPORT pqElementInspectorWidget :
+class PQWIDGETS_EXPORT pqElementInspectorWidget :
   public QWidget
 {
   Q_OBJECT
