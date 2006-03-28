@@ -31,4 +31,4 @@ IF(BUILD_TESTING)
   ENABLE_TESTING()
 ENDIF(BUILD_TESTING)
 
-SUBDIRS(Cxx Tcl Python Data Resources)
+SUBDIRS(Data Resources Cxx Tcl Python)
