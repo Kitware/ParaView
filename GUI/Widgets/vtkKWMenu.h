@@ -167,6 +167,7 @@ public:
   // Tcl interpreter last evaluation (be careful).
   int GetItemLabel(int position, char* label, int maxlen);
   const char* GetItemLabel(int position);
+  int SetItemLabel(int position, const char* label);
 
   // Description:
   // Get the option of an entry

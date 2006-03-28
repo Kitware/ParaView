@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.91");
+vtkCxxRevisionMacro(vtkKWMenu, "1.92");
 
 //----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
@@ -443,10 +443,22 @@ char* vtkKWMenu::CreateRadioButtonVariable(vtkKWObject* object,
   const char *objname = object->GetTclName();
   if (objname && varname)
     {
-    char *clean_name = vtksys::SystemTools::RemoveChars(varname, " ");
-    buffer = new char[strlen(objname) + strlen(clean_name) + 1]; 
-    sprintf(buffer, "%s%s", objname, clean_name);
-    delete [] clean_name;
+    size_t objname_len = strlen(objname);
+    size_t varname_len = strlen(varname);
+    buffer = new char[objname_len + varname_len + 1]; 
+    sprintf(buffer, "%s", objname);
+    char *buffer_ptr = buffer + objname_len;
+    const char *varname_end = varname + varname_len;
+    while (varname < varname_end)
+      {
+      if (*varname >= 0 && *varname < 128 && *varname != ' ')
+        {
+        *buffer_ptr = *varname;
+        buffer_ptr++;
+        }
+      varname++;
+      }
+    *buffer_ptr = '\0';
     }
   return buffer;
 }
@@ -716,7 +728,7 @@ int vtkKWMenu::GetIndexOfItem(const char *label)
   // Check if it is a number
 
   const char *ptr = label;
-  while (*ptr && isdigit(*ptr))
+  while (*ptr && *ptr > 0 && isdigit(*ptr))
     {
     ++ptr;
     }
@@ -806,6 +818,21 @@ const char* vtkKWMenu::GetItemLabel(int position)
       {
       return this->Script("%s entrycget %d -label", 
                           this->GetWidgetName(), position);
+      }
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::SetItemLabel(int position, const char* label)
+{
+  if (this->IsCreated())
+    {
+    if (position >= 0 && position < this->GetNumberOfItems())
+      {
+      this->Script("%s entryconfigure %d -label {%s}", 
+                   this->GetWidgetName(), position, label);
+      return 1;
       }
     }
   return 0;
