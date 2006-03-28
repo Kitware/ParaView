@@ -25,10 +25,11 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWSelectionFrameLayoutManager.h"
 
-#include "vtkKWApplication.h"
 #include "vtkImageData.h"
+#include "vtkKWApplication.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEntryWithLabel.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
@@ -39,10 +40,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWSimpleEntryDialog.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWToolbar.h"
+#include "vtkKWWindowBase.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
 #include "vtkWindows.h"
-#include "vtkKWWindowBase.h"
 
 // Readers / Writers
 
@@ -70,7 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.53");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.54");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -530,7 +531,8 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
   if (!this->ResolutionEntriesToolbar)
     {
     this->ResolutionEntriesToolbar = vtkKWToolbar::New();
-    this->ResolutionEntriesToolbar->SetName("Window Layout");
+    this->ResolutionEntriesToolbar->SetName(
+      ks_("Toolbar|Window Layout"));
     }
 
   if (!this->ResolutionEntriesToolbar->IsCreated())
@@ -1640,11 +1642,13 @@ int vtkKWSelectionFrameLayoutManager::ChangeWidgetTitleCallback(
   vtkKWSimpleEntryDialog *dlg = vtkKWSimpleEntryDialog::New();
   dlg->SetMasterWindow(this->GetParentWindow());
   dlg->SetDisplayPositionToPointer();
-  dlg->SetTitle("Change frame title");
+  dlg->SetTitle(
+    ks_("Selection Frame Dialog|Title|Change frame title"));
   dlg->SetStyleToOkCancel();
   dlg->Create();
   dlg->GetEntry()->GetLabel()->SetText("Name:");
-  dlg->SetText("Enter a new value for this frame title");
+  dlg->SetText(
+    ks_("Selection Frame Dialog|Enter a new title for this frame"));
 
   int ok = dlg->Invoke();
   if (ok)
@@ -1655,8 +1659,8 @@ int vtkKWSelectionFrameLayoutManager::ChangeWidgetTitleCallback(
       {
       vtkKWMessageDialog::PopupMessage(
         this->GetApplication(), this->GetParentWindow(), 
-        "Change frame title - Error",
-        "There was a problem with the new title you provided.\n",
+        ks_("Selection Frame Dialog|Title|Change frame title - Error!"),
+        ks_("Selection Frame Dialog|There is a problem with the new title you provided."),
         vtkKWMessageDialog::ErrorIcon);
       }
     else
@@ -1932,7 +1936,8 @@ int vtkKWSelectionFrameLayoutManager::SaveScreenshotAllWidgets()
   vtkKWSaveImageDialog *save_dialog = vtkKWSaveImageDialog::New();
   save_dialog->SetParent(this->GetParentWindow());
   save_dialog->Create();
-  save_dialog->SetTitle("Save Screenshot");
+  save_dialog->SetTitle(
+    ks_("Selection Frame Dialog|Title|Save Screenshot"));
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(
     save_dialog, "SavePath");
   
@@ -1940,7 +1945,8 @@ int vtkKWSelectionFrameLayoutManager::SaveScreenshotAllWidgets()
   if (save_dialog->Invoke() && 
       this->SaveScreenshotAllWidgetsToFile(save_dialog->GetFileName()))
     {
-    this->GetApplication()->SaveDialogLastPathRegistryValue(save_dialog, "SavePath");
+    this->GetApplication()->SaveDialogLastPathRegistryValue(
+      save_dialog, "SavePath");
     res = 1;
     }
 
@@ -2045,10 +2051,11 @@ int vtkKWSelectionFrameLayoutManager::SaveScreenshotAllWidgetsToFile(
   if (!success)
     {
     vtkKWMessageDialog::PopupMessage(
-      this->GetApplication(), this->GetParentWindow(), "Write Error",
-      "There was a problem writing the image file.\n"
-      "Please check the location and make sure you have write\n"
-      "permissions and enough disk space.",
+      this->GetApplication(), this->GetParentWindow(), 
+      ks_("Selection Frame Dialog|Title|Save Screenshot - Error!"),
+      k_("There was a problem writing the image file.\n"
+         "Please check the location and make sure you have write\n"
+         "permissions and enough disk space."),
       vtkKWMessageDialog::ErrorIcon);
     }
   iData->Delete();

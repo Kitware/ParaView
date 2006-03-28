@@ -16,6 +16,7 @@
 
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWMenu.h"
 #include "vtkKWSeparator.h"
 #include "vtkKWTkUtilities.h"
@@ -29,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.37");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.38");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarSetInternals
@@ -827,6 +828,7 @@ void vtkKWToolbarSet::PopulateToolbarsVisibilityMenu(vtkKWMenu *menu)
       this->Internals->Toolbars.begin();
     vtkKWToolbarSetInternals::ToolbarsContainerIterator end = 
       this->Internals->Toolbars.end();
+    char buffer[500];
     for (; it != end; ++it)
       {
       if (*it && 
@@ -842,13 +844,11 @@ void vtkKWToolbarSet::PopulateToolbarsVisibilityMenu(vtkKWMenu *menu)
           vtksys_stl::string command("ToggleToolbarVisibility ");
           command += (*it)->Toolbar->GetTclName();
 
-          vtksys_stl::string help("Show/Hide the ");
-          help += (*it)->Toolbar->GetName();
-          help += " toolbar";
-        
+          sprintf(buffer, k_("Show/Hide the '%s' toolbar"), 
+                  (*it)->Toolbar->GetName());
           menu->AddCheckButton(
             (*it)->Toolbar->GetName(), rbv, 
-            this, command.c_str(), help.c_str());
+            this, command.c_str(), buffer);
           delete [] rbv;
           }
         }

@@ -430,6 +430,21 @@ protected:
 
 private:
 
+  vtkKWNotebook   *MainNotebook;
+  vtkKWNotebook   *SecondaryNotebook;
+  vtkKWNotebook   *ViewNotebook;
+
+  vtkKWToolbarSet *SecondaryToolbarSet;
+
+  vtkKWUserInterfaceManagerNotebook *MainUserInterfaceManager;
+  vtkKWUserInterfaceManagerNotebook *SecondaryUserInterfaceManager;
+  vtkKWUserInterfaceManagerNotebook *ViewUserInterfaceManager;
+
+  vtkKWUserInterfaceManagerDialog *ApplicationSettingsUserInterfaceManager;
+
+  vtkKWWindow(const vtkKWWindow&); // Not implemented
+  void operator=(const vtkKWWindow&); // Not implemented
+
   // Description:
   // Some constants
   char *MainPanelSizeRegKey;
@@ -445,21 +460,6 @@ private:
   char *DefaultViewPanelName;
   char *TclInteractorMenuLabel;
   char *ViewPanelPositionRegKey;
-
-  vtkKWNotebook   *MainNotebook;
-  vtkKWNotebook   *SecondaryNotebook;
-  vtkKWNotebook   *ViewNotebook;
-
-  vtkKWToolbarSet *SecondaryToolbarSet;
-
-  vtkKWUserInterfaceManagerNotebook *MainUserInterfaceManager;
-  vtkKWUserInterfaceManagerNotebook *SecondaryUserInterfaceManager;
-  vtkKWUserInterfaceManagerNotebook *ViewUserInterfaceManager;
-
-  vtkKWUserInterfaceManagerDialog *ApplicationSettingsUserInterfaceManager;
-
-  vtkKWWindow(const vtkKWWindow&); // Not implemented
-  void operator=(const vtkKWWindow&); // Not implemented
 };
 
 #endif

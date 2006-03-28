@@ -19,10 +19,11 @@
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
 #include "vtkKWFrameWithLabel.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
-#include "vtkKWMessageDialog.h"
-#include "vtkKWMenuButtonWithLabel.h"
 #include "vtkKWMenuButton.h"
+#include "vtkKWMenuButtonWithLabel.h"
+#include "vtkKWMessageDialog.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWToolbar.h"
 #include "vtkKWToolbarSet.h"
@@ -39,12 +40,13 @@ const char *vtkKWApplicationSettingsInterface::PrintSettingsLabel = "Print Setti
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.51");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.52");
 
 //----------------------------------------------------------------------------
 vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
 {
-  this->SetName(VTK_KW_APPLICATION_SETTINGS_UIP_LABEL);
+  this->SetName(
+    ks_("Application Settings|Title|Application Settings"));
 
   this->Window = 0;
 

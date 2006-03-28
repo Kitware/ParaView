@@ -17,6 +17,7 @@
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMenu.h"
@@ -24,33 +25,15 @@
 #include "vtkKWMostRecentFilesManager.h"
 #include "vtkKWProgressGauge.h"
 #include "vtkKWSeparator.h"
-#include "vtkKWTkcon.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkKWTkcon.h"
 #include "vtkKWToolbar.h"
 #include "vtkKWToolbarSet.h"
 #include "vtkObjectFactory.h"
-#include "vtkKWInternationalization.h"
 
 #include <vtksys/SystemTools.hxx>
 
-const char *vtkKWWindowBase::PrintOptionsMenuLabel = "Print Settings...";
-const char *vtkKWWindowBase::FileMenuLabel = "File";
-const char *vtkKWWindowBase::FileCloseMenuLabel = "Close";
-const char *vtkKWWindowBase::FileExitMenuLabel = "Exit";
-const char *vtkKWWindowBase::EditMenuLabel = "Edit";
-const char *vtkKWWindowBase::ViewMenuLabel = "View";
-const char *vtkKWWindowBase::WindowMenuLabel = "Window";
-const char *vtkKWWindowBase::HelpMenuLabel = "Help";
-const char *vtkKWWindowBase::HelpTopicsMenuLabel = "Help Topics";
-const char *vtkKWWindowBase::HelpCheckForUpdatesMenuLabel = "Check for Updates";
-const char *vtkKWWindowBase::ToolbarsVisibilityMenuLabel = "Toolbars";
-
-const char *vtkKWWindowBase::OpenRecentFileMenuLabel = "Open Recent File";
-const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
-
-const char *vtkKWWindowBase::DefaultGeometry = "900x700+0+0";
-
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.41");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.42");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -112,6 +95,38 @@ vtkKWWindowBase::vtkKWWindowBase()
 
   this->ScriptType            = NULL;
   this->SetScriptType("Tcl");
+
+  // Some constants
+  
+  this->FileMenuLabel = 
+    vtksys::SystemTools::DuplicateString(ks_("Menu|File"));
+  this->OpenRecentFileMenuLabel = 
+    vtksys::SystemTools::DuplicateString(ks_("Menu|File|Open Recent File"));
+  this->PrintOptionsMenuLabel = 
+    vtksys::SystemTools::DuplicateString(ks_("Menu|File|Print Settings..."));
+  this->FileCloseMenuLabel = 
+    vtksys::SystemTools::DuplicateString(ks_("Menu|File|Close"));
+  this->FileExitMenuLabel = 
+    vtksys::SystemTools::DuplicateString(ks_("Menu|File|Exit"));
+  this->EditMenuLabel = 
+    vtksys::SystemTools::DuplicateString(ks_("Menu|Edit"));
+  this->ViewMenuLabel =  
+    vtksys::SystemTools::DuplicateString(ks_("Menu|View"));
+  this->WindowMenuLabel = 
+    vtksys::SystemTools::DuplicateString(ks_("Menu|Window"));
+  this->HelpMenuLabel = 
+    vtksys::SystemTools::DuplicateString(ks_("Menu|Help"));
+  this->HelpTopicsMenuLabel = 
+    vtksys::SystemTools::DuplicateString(ks_("Menu|Help|Help Topics"));
+  this->HelpCheckForUpdatesMenuLabel = 
+    vtksys::SystemTools::DuplicateString(ks_("Menu|Help|Check for Updates"));
+  this->ToolbarsVisibilityMenuLabel = 
+    vtksys::SystemTools::DuplicateString(ks_("Menu|Window|Toolbars"));
+
+  this->WindowGeometryRegKey = 
+    vtksys::SystemTools::DuplicateString("WindowGeometry");
+  this->DefaultGeometry = 
+    vtksys::SystemTools::DuplicateString("900x700+0+0");
 }
 
 //----------------------------------------------------------------------------
@@ -235,6 +250,23 @@ vtkKWWindowBase::~vtkKWWindowBase()
 
   this->SetScriptExtension(NULL);
   this->SetScriptType(NULL);
+
+  // Some constants
+
+  this->SetPrintOptionsMenuLabel(NULL);
+  this->SetFileMenuLabel(NULL);
+  this->SetFileCloseMenuLabel(NULL);
+  this->SetFileExitMenuLabel(NULL);
+  this->SetOpenRecentFileMenuLabel(NULL);
+  this->SetEditMenuLabel(NULL);
+  this->SetViewMenuLabel(NULL);
+  this->SetWindowMenuLabel(NULL);
+  this->SetHelpMenuLabel(NULL);
+  this->SetHelpTopicsMenuLabel(NULL);
+  this->SetHelpCheckForUpdatesMenuLabel(NULL);
+  this->SetToolbarsVisibilityMenuLabel(NULL);
+  this->SetWindowGeometryRegKey(NULL);
+  this->SetDefaultGeometry(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -289,7 +321,7 @@ void vtkKWWindowBase::Create()
     }
   else
     {
-    this->SetGeometry(vtkKWWindowBase::DefaultGeometry);
+    this->SetGeometry(this->GetDefaultGeometry());
     }
 
   vtksys_stl::string cmd;
@@ -306,14 +338,14 @@ void vtkKWWindowBase::Create()
   if (this->SupportPrint)
     {
     menu->AddCommand(
-      vtkKWWindowBase::PrintOptionsMenuLabel, this, "PrintSettingsCallback",4);
+      this->GetPrintOptionsMenuLabel(), this, "PrintSettingsCallback",4);
     menu->AddSeparator();
     }
 
   menu->AddCommand(
-    vtkKWWindowBase::FileCloseMenuLabel, this, "Close", 0);
+    this->GetFileCloseMenuLabel(), this, "Close", 0);
   menu->AddCommand(
-    vtkKWWindowBase::FileExitMenuLabel, app, "Exit", 1);
+    this->GetFileExitMenuLabel(), app, "Exit", 1);
 
   this->MostRecentFilesManager->SetApplication(app);
 
@@ -326,13 +358,13 @@ void vtkKWWindowBase::Create()
     cmd = "DisplayHelpDialog ";
     cmd += this->GetTclName();
     menu->AddCommand(
-      vtkKWWindowBase::HelpTopicsMenuLabel, app, cmd.c_str(), 0);
+      this->GetHelpTopicsMenuLabel(), app, cmd.c_str(), 0);
     }
 
   if (app->HasCheckForUpdates())
     {
     menu->AddCommand(
-      vtkKWWindowBase::HelpCheckForUpdatesMenuLabel,app,"CheckForUpdates",0);
+      this->GetHelpCheckForUpdatesMenuLabel(), app, "CheckForUpdates",0);
     }
   
   menu->AddSeparator();
@@ -551,7 +583,7 @@ void vtkKWWindowBase::Pack()
       if (!this->StatusToolbar)
         {
         this->StatusToolbar = vtkKWToolbar::New();
-        this->StatusToolbar->SetName("Status");
+        this->StatusToolbar->SetName(ks_("Toolbar|Status And Progress"));
         }
       if (!this->StatusToolbar->IsCreated() && this->IsCreated())
         {
@@ -647,8 +679,9 @@ int vtkKWWindowBase::DisplayCloseDialog()
     vtkKWMessageDialog::Beep | 
     vtkKWMessageDialog::YesDefault);
   dialog->Create();
-  dialog->SetText("Are you sure you want to close this window?");
-  dialog->SetTitle(vtkKWWindowBase::FileCloseMenuLabel);
+  dialog->SetText(
+    ks_("Close Dialog|Are you sure you want to close this window?"));
+  dialog->SetTitle(this->GetFileCloseMenuLabel());
   int ret = dialog->Invoke();
   dialog->Delete();
   return ret;
@@ -705,7 +738,7 @@ void vtkKWWindowBase::SaveWindowGeometryToRegistry()
 
   vtksys_stl::string geometry = this->GetGeometry();
   this->GetApplication()->SetRegistryValue(
-    2, "Geometry", vtkKWWindowBase::WindowGeometryRegKey, "%s", 
+    2, "Geometry", this->GetWindowGeometryRegKey(), "%s", 
     geometry.c_str());
 }
 
@@ -718,18 +751,18 @@ void vtkKWWindowBase::RestoreWindowGeometryFromRegistry()
     }
 
   if (this->GetApplication()->HasRegistryValue(
-        2, "Geometry", vtkKWWindowBase::WindowGeometryRegKey))
+        2, "Geometry", this->GetWindowGeometryRegKey()))
     {
     char geometry[40];
     if (this->GetApplication()->GetRegistryValue(
-          2, "Geometry", vtkKWWindowBase::WindowGeometryRegKey, geometry))
+          2, "Geometry", this->GetWindowGeometryRegKey(), geometry))
       {
       this->SetGeometry(geometry);
       }
     }
   else
     {
-    this->SetGeometry(vtkKWWindowBase::DefaultGeometry);
+    this->SetGeometry(this->GetDefaultGeometry());
     }
 }
 
@@ -772,7 +805,7 @@ vtkKWMenu *vtkKWWindowBase::GetFileMenu()
     this->FileMenu->SetTearOff(0);
     this->FileMenu->Create();
     this->GetMenu()->InsertCascade(
-      0, vtkKWWindowBase::FileMenuLabel, this->FileMenu, 0);
+      0, this->GetFileMenuLabel(), this->FileMenu, 0);
     }
   
   return this->FileMenu;
@@ -788,23 +821,23 @@ int vtkKWWindowBase::GetFileMenuInsertPosition()
 
   // First find the print-related menu commands
 
-  if (this->GetFileMenu()->HasItem(vtkKWWindowBase::PrintOptionsMenuLabel))
+  if (this->GetFileMenu()->HasItem(this->GetPrintOptionsMenuLabel()))
     {
     return this->GetFileMenu()->GetIndexOfItem(
-      vtkKWWindowBase::PrintOptionsMenuLabel);
+      this->GetPrintOptionsMenuLabel());
     }
 
   // Otherwise find Close or Exit if Close was removed
 
-  if (this->GetFileMenu()->HasItem(vtkKWWindowBase::FileCloseMenuLabel))
+  if (this->GetFileMenu()->HasItem(this->GetFileCloseMenuLabel()))
     {
     return this->GetFileMenu()->GetIndexOfItem(
-      vtkKWWindowBase::FileCloseMenuLabel);  
+      this->GetFileCloseMenuLabel());  
     }
 
-  if (this->GetFileMenu()->HasItem(vtkKWWindowBase::FileExitMenuLabel))
+  if (this->GetFileMenu()->HasItem(this->GetFileExitMenuLabel()))
     {
-    return this->GetFileMenu()->GetIndexOfItem(vtkKWWindowBase::FileExitMenuLabel);  
+    return this->GetFileMenu()->GetIndexOfItem(this->GetFileExitMenuLabel());  
     }
 
   return this->GetFileMenu()->GetNumberOfItems();
@@ -825,7 +858,7 @@ vtkKWMenu *vtkKWWindowBase::GetEditMenu()
     this->EditMenu->Create();
     // Usually after the File Menu (i.e., pos 1)
     this->GetMenu()->InsertCascade(
-      1, vtkKWWindowBase::EditMenuLabel, this->EditMenu, 0);
+      1, this->GetEditMenuLabel(), this->EditMenu, 0);
     }
   
   return this->EditMenu;
@@ -847,7 +880,7 @@ vtkKWMenu *vtkKWWindowBase::GetViewMenu()
     // Usually after the Edit Menu (do not use GetEditMenu() here)
     this->GetMenu()->InsertCascade(
       1 + (this->EditMenu ? 1 : 0), 
-      vtkKWWindowBase::ViewMenuLabel, this->ViewMenu, 0);
+      this->GetViewMenuLabel(), this->ViewMenu, 0);
     }
 
   return this->ViewMenu;
@@ -875,7 +908,7 @@ vtkKWMenu *vtkKWWindowBase::GetWindowMenu()
     // Usually after View Menu (do not use GetEditMenu()/GetViewMenu() here)
     this->GetMenu()->InsertCascade(
       1 + (this->EditMenu ? 1 : 0) + (this->ViewMenu ? 1 : 0), 
-      vtkKWWindowBase::WindowMenuLabel, this->WindowMenu, 0);
+      this->GetWindowMenuLabel(), this->WindowMenu, 0);
     }
   
   return this->WindowMenu;
@@ -896,7 +929,7 @@ vtkKWMenu *vtkKWWindowBase::GetHelpMenu()
     this->HelpMenu->Create();
     // Usually at the end
     this->GetMenu()->AddCascade(
-      vtkKWWindowBase::HelpMenuLabel, this->HelpMenu, 0);
+      this->GetHelpMenuLabel(), this->HelpMenu, 0);
     }
   
   return this->HelpMenu;
@@ -912,9 +945,12 @@ int vtkKWWindowBase::GetHelpMenuInsertPosition()
 
   // Find about
 
-  if (this->GetHelpMenu()->HasItem("About*"))
+  char buffer[500];
+  sprintf(buffer, ks_("Menu|Help|About %s"), 
+          this->GetApplication()->GetPrettyName());
+  if (this->GetHelpMenu()->HasItem(buffer))
     {
-    return this->GetHelpMenu()->GetIndexOfItem("About*") - 1;
+    return this->GetHelpMenu()->GetIndexOfItem(buffer) - 1;
     }
 
   return this->GetHelpMenu()->GetNumberOfItems();
@@ -936,8 +972,9 @@ vtkKWMenu *vtkKWWindowBase::GetToolbarsVisibilityMenu()
     this->ToolbarsVisibilityMenu->SetTearOff(0);
     this->ToolbarsVisibilityMenu->Create();
     this->GetWindowMenu()->InsertCascade(
-      2, vtkKWWindowBase::ToolbarsVisibilityMenuLabel, 
-      this->ToolbarsVisibilityMenu, 1, "Set Toolbars Visibility");
+      2, this->GetToolbarsVisibilityMenuLabel(), 
+      this->ToolbarsVisibilityMenu, 1, 
+      ks_("Menu|Window|Show/Hide Toolbars"));
     }
   
   return this->ToolbarsVisibilityMenu;
@@ -965,14 +1002,14 @@ void vtkKWWindowBase::InsertRecentFilesMenu(
   // Remove the menu if already there (in case that function was used to
   // move the menu)
 
-  if (this->GetFileMenu()->HasItem(vtkKWWindowBase::OpenRecentFileMenuLabel))
+  if (this->GetFileMenu()->HasItem(this->GetOpenRecentFileMenuLabel()))
     {
     this->GetFileMenu()->DeleteMenuItem(
-      vtkKWWindowBase::OpenRecentFileMenuLabel);
+      this->GetOpenRecentFileMenuLabel());
     }
 
   this->GetFileMenu()->InsertCascade(
-    pos, vtkKWWindowBase::OpenRecentFileMenuLabel, mrf_menu, 6);
+    pos, this->GetOpenRecentFileMenuLabel(), mrf_menu, 6);
 
   // Fill the recent files vector with recent files stored in registry
   // this will also update the menu
@@ -1029,12 +1066,17 @@ void vtkKWWindowBase::LoadScript()
   load_dialog->SetTitle("Load Script");
   load_dialog->SetDefaultExtension(this->ScriptExtension);
 
+  char buffer[500];
+  sprintf(buffer, ks_("Load Script Dialog|File Type|%s Scripts"));
+
   vtksys_stl::string filetypes;
   filetypes += "{{";
-  filetypes += this->ScriptType;
-  filetypes += " Scripts} {";
+  filetypes += buffer;
+  filetypes += "} {";
   filetypes += this->ScriptExtension;
-  filetypes += "}} {{All Files} {.*}}";
+  filetypes += "}} {{";
+  filetypes += ks_("Load Script Dialog|File Type|All Files");
+  filetypes += "} {.*}}";
   load_dialog->SetFileTypes(filetypes.c_str());
 
   int enabled = this->GetEnabled();
@@ -1070,7 +1112,8 @@ void vtkKWWindowBase::LoadScript(const char *filename)
 void vtkKWWindowBase::WarningMessage(const char* message)
 {
   vtkKWMessageDialog::PopupMessage(
-    this->GetApplication(), this, "Warning",
+    this->GetApplication(), this, 
+    ks_("Warning Dialog|Title|Warning!"),
     message, vtkKWMessageDialog::WarningIcon);
   this->SetErrorIconToRed();
   this->InvokeEvent(vtkKWEvent::WarningMessageEvent, (void*)message);
@@ -1080,7 +1123,8 @@ void vtkKWWindowBase::WarningMessage(const char* message)
 void vtkKWWindowBase::ErrorMessage(const char* message)
 {
   vtkKWMessageDialog::PopupMessage(
-    this->GetApplication(), this, "Error",
+    this->GetApplication(), this, 
+    ks_("Error Dialog|Title|Error!"),
     message, vtkKWMessageDialog::ErrorIcon);
   this->SetErrorIconToRed();
   this->InvokeEvent(vtkKWEvent::ErrorMessageEvent, (void*)message);
@@ -1168,7 +1212,7 @@ void vtkKWWindowBase::DisplayTclInteractor()
       title += this->GetTitle();
       title += " : ";
       }
-    title += "Tcl Interactor";
+    title += ks_("Tcl Interactor Dialog|Title|Tcl Interactor");
     tcl_interactor->SetTitle(title.c_str());
     tcl_interactor->Display();
     }
@@ -1295,10 +1339,17 @@ void vtkKWWindowBase::UpdateEnableState()
 
   // Given the state, can we close or not ?
 
-  this->SetDeleteWindowProtocolCommand(
-    this, this->GetEnabled() ? 
-    vtkKWWindowBase::FileCloseMenuLabel : 
-    "SetStatusText \"Can not close while UI is disabled\"");
+  if (this->GetEnabled())
+    {
+    this->SetDeleteWindowProtocolCommand(this, "Close");
+    }
+  else
+    {
+    char buffer[500];
+    sprintf(buffer, "SetStatusText \"%s\"", 
+            k_("Can not close window while it is disabled"));
+    this->SetDeleteWindowProtocolCommand(this, buffer);
+    }
 
   // Update the menus
 
@@ -1335,10 +1386,10 @@ void vtkKWWindowBase::UpdateMenuState()
       this->GetApplication(), about_command.c_str());
     if (pos >= 0)
       {
-      vtksys_stl::string label("-label {About ");
-      label += this->GetApplication()->GetPrettyName();
-      label += "}";
-      this->GetHelpMenu()->ConfigureItem(pos, label.c_str());
+      char buffer[500];
+      sprintf(buffer, ks_("Menu|Help|About %s"), 
+              this->GetApplication()->GetPrettyName());
+      this->GetHelpMenu()->SetItemLabel(pos, buffer);
       }
     }
 }

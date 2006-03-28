@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-03-28 12:04-0500\n"
+"POT-Creation-Date: 2006-03-28 16:27-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,6 +24,10 @@ msgstr ""
 #: ../../vtkKWApplication.cxx:980
 #, c-format
 msgid "Exit Dialog|Title|Exit %s"
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:49 ../../vtkKWWindow.cxx:522
+msgid "Application Settings|Title|Application Settings"
 msgstr ""
 
 #: ../../vtkKWMessageDialog.cxx:56 ../../vtkKWMessageDialog.cxx:162
@@ -50,7 +54,158 @@ msgstr ""
 msgid "Message Dialog|Button|No"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:339
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:535
+msgid "Toolbar|Window Layout"
+msgstr ""
+
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1646
+msgid "Selection Frame Dialog|Title|Change frame title"
+msgstr ""
+
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1651
+msgid "Selection Frame Dialog|Enter a new title for this frame"
+msgstr ""
+
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1662
+msgid "Selection Frame Dialog|Title|Change frame title - Error!"
+msgstr ""
+
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1663
+msgid ""
+"Selection Frame Dialog|There is a problem with the new title you provided."
+msgstr ""
+
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1940
+msgid "Selection Frame Dialog|Title|Save Screenshot"
+msgstr ""
+
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:2055
+msgid "Selection Frame Dialog|Title|Save Screenshot - Error!"
+msgstr ""
+
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:2056
+msgid ""
+"There was a problem writing the image file.\n"
+"Please check the location and make sure you have write\n"
+"permissions and enough disk space."
+msgstr ""
+
+#: ../../vtkKWToolbarSet.cxx:847
+#, c-format
+msgid "Show/Hide the '%s' toolbar"
+msgstr ""
+
+#: ../../vtkKWWindow.cxx:80
+msgid "Menu|Window|Hide Main Panel"
+msgstr ""
+
+#: ../../vtkKWWindow.cxx:82
+msgid "Menu|Window|Show Main Panel"
+msgstr ""
+
+#: ../../vtkKWWindow.cxx:84
+msgid "Menu|Window|Hide Bottom Panel"
+msgstr ""
+
+#: ../../vtkKWWindow.cxx:86
+msgid "Menu|Window|Show Bottom Panel"
+msgstr ""
+
+#: ../../vtkKWWindow.cxx:88
+msgid "Menu|Window|Tcl Interactor"
+msgstr ""
+
+#: ../../vtkKWWindow.cxx:326
+msgid "Display a prompt to interact with the Tcl engine"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:102
+msgid "Menu|File"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:104
+msgid "Menu|File|Open Recent File"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:106
+msgid "Menu|File|Print Settings..."
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:108
+msgid "Menu|File|Close"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:110
+msgid "Menu|File|Exit"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:112
+msgid "Menu|Edit"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:114
+msgid "Menu|View"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:116
+msgid "Menu|Window"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:118
+msgid "Menu|Help"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:120
+msgid "Menu|Help|Help Topics"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:122
+msgid "Menu|Help|Check for Updates"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:124
+msgid "Menu|Window|Toolbars"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:371 ../../vtkKWWindowBase.cxx:949
+#: ../../vtkKWWindowBase.cxx:1390
 #, c-format
 msgid "Menu|Help|About %s"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:586
+msgid "Toolbar|Status And Progress"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:683
+msgid "Close Dialog|Are you sure you want to close this window?"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:977
+msgid "Menu|Window|Show/Hide Toolbars"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:1070
+#, c-format
+msgid "Load Script Dialog|File Type|%s Scripts"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:1078
+msgid "Load Script Dialog|File Type|All Files"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:1116
+msgid "Warning Dialog|Title|Warning!"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:1127
+msgid "Error Dialog|Title|Error!"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:1215
+msgid "Tcl Interactor Dialog|Title|Tcl Interactor"
+msgstr ""
+
+#: ../../vtkKWWindowBase.cxx:1350
+msgid "Can not close window while it is disabled"
 msgstr ""

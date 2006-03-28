@@ -17,6 +17,7 @@
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWFrame.h"
 #include "vtkKWFrameWithLabel.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
@@ -32,7 +33,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.273");
+vtkCxxRevisionMacro(vtkKWWindow, "1.274");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -73,32 +74,33 @@ vtkKWWindow::vtkKWWindow()
 
   this->StatusFramePosition = vtkKWWindow::StatusFramePositionWindow;
 
-  // Some const
+  // Some constants
 
+  this->HideMainPanelMenuLabel = 
+    vtksys::SystemTools::DuplicateString(ks_("Menu|Window|Hide Main Panel"));
+  this->ShowMainPanelMenuLabel = 
+    vtksys::SystemTools::DuplicateString(ks_("Menu|Window|Show Main Panel"));
+  this->HideSecondaryPanelMenuLabel = 
+    vtksys::SystemTools::DuplicateString(ks_("Menu|Window|Hide Bottom Panel"));
+  this->ShowSecondaryPanelMenuLabel = 
+    vtksys::SystemTools::DuplicateString(ks_("Menu|Window|Show Bottom Panel"));
+  this->TclInteractorMenuLabel = 
+    vtksys::SystemTools::DuplicateString(ks_("Menu|Window|Tcl Interactor"));
+
+  this->DefaultViewPanelName = 
+    vtksys::SystemTools::DuplicateString("View");
   this->MainPanelSizeRegKey = 
     vtksys::SystemTools::DuplicateString("MainPanelSize");
   this->MainPanelVisibilityRegKey = 
     vtksys::SystemTools::DuplicateString("MainPanelVisibility");
   this->MainPanelVisibilityKeyAccelerator = 
     vtksys::SystemTools::DuplicateString("F5");
-  this->HideMainPanelMenuLabel = 
-    vtksys::SystemTools::DuplicateString("Hide Main Panel");
-  this->ShowMainPanelMenuLabel = 
-    vtksys::SystemTools::DuplicateString("Show Main Panel");
   this->SecondaryPanelSizeRegKey = 
     vtksys::SystemTools::DuplicateString("SecondaryPanelSize");
   this->SecondaryPanelVisibilityRegKey = 
     vtksys::SystemTools::DuplicateString("SecondaryPanelVisibility");
   this->SecondaryPanelVisibilityKeyAccelerator = 
     vtksys::SystemTools::DuplicateString("F6");
-  this->HideSecondaryPanelMenuLabel = 
-    vtksys::SystemTools::DuplicateString("Hide Bottom Panel");
-  this->ShowSecondaryPanelMenuLabel = 
-    vtksys::SystemTools::DuplicateString("Show Bottom Panel");
-  this->DefaultViewPanelName = 
-    vtksys::SystemTools::DuplicateString("View");
-  this->TclInteractorMenuLabel = 
-    vtksys::SystemTools::DuplicateString("Command Prompt");
   this->ViewPanelPositionRegKey = 
     vtksys::SystemTools::DuplicateString("ViewPanelPosition");
 }
@@ -279,26 +281,26 @@ void vtkKWWindow::Create()
   // Menu : Window
 
   menu = this->GetWindowMenu();
-  menu->AddCommand(vtkKWWindow::HideMainPanelMenuLabel, 
+  menu->AddCommand(this->GetHideMainPanelMenuLabel(), 
                    this, "MainPanelVisibilityCallback", 5);
   menu->SetItemAccelerator(
-    vtkKWWindow::HideMainPanelMenuLabel,
-    vtkKWWindow::MainPanelVisibilityKeyAccelerator);
+    this->GetHideMainPanelMenuLabel(),
+    this->GetMainPanelVisibilityKeyAccelerator());
   event = "<Key-";
-  event += vtkKWWindow::MainPanelVisibilityKeyAccelerator;
+  event += this->GetMainPanelVisibilityKeyAccelerator();
   event += ">";
   this->AddBinding(event.c_str(), this, "MainPanelVisibilityCallback");
 
   // Menu : Window
 
   menu = this->GetWindowMenu();
-  menu->AddCommand(vtkKWWindow::HideSecondaryPanelMenuLabel, 
+  menu->AddCommand(this->GetHideSecondaryPanelMenuLabel(), 
                    this, "SecondaryPanelVisibilityCallback", 5);
   menu->SetItemAccelerator(
-    vtkKWWindow::HideSecondaryPanelMenuLabel,
-    vtkKWWindow::SecondaryPanelVisibilityKeyAccelerator);
+    this->GetHideSecondaryPanelMenuLabel(),
+    this->GetSecondaryPanelVisibilityKeyAccelerator());
   event = "<Key-";
-  event += vtkKWWindow::SecondaryPanelVisibilityKeyAccelerator;
+  event += this->GetSecondaryPanelVisibilityKeyAccelerator();
   event += ">";
   this->AddBinding(event.c_str(), this, "SecondaryPanelVisibilityCallback");
 
@@ -319,9 +321,9 @@ void vtkKWWindow::Create()
   this->GetWindowMenu()->AddSeparator();
 
   this->GetWindowMenu()->AddCommand(
-    vtkKWWindow::TclInteractorMenuLabel, 
+    this->GetTclInteractorMenuLabel(), 
     this, "DisplayTclInteractor", 8, 
-    "Display a prompt to interact with the Tcl engine");
+    k_("Display a prompt to interact with the Tcl engine"));
 
   // Udpate the enable state
 
@@ -516,7 +518,8 @@ vtkKWWindow::GetApplicationSettingsUserInterfaceManager()
     vtkKWTopLevel *toplevel = 
       this->ApplicationSettingsUserInterfaceManager->GetTopLevel();
     toplevel->SetMasterWindow(this);
-    toplevel->SetTitle("Application Settings");
+    toplevel->SetTitle(
+      ks_("Application Settings|Title|Application Settings"));
     this->ApplicationSettingsUserInterfaceManager->PageNodeVisibilityOff();
     }
 
@@ -860,7 +863,7 @@ vtkKWFrame* vtkKWWindow::GetViewFrame()
   if (uim)
     {
     vtkKWUserInterfacePanel *panel = 
-      uim->GetPanel(vtkKWWindow::DefaultViewPanelName);
+      uim->GetPanel(this->GetDefaultViewPanelName());
     if (panel)
       {
       return vtkKWFrame::SafeDownCast(panel->GetPageWidget(panel->GetName()));
@@ -934,7 +937,7 @@ vtkKWUserInterfaceManager* vtkKWWindow::GetViewUserInterfaceManager()
     // Also create a default page for the view
 
     vtkKWUserInterfacePanel *panel = vtkKWUserInterfacePanel::New();
-    panel->SetName(vtkKWWindow::DefaultViewPanelName);
+    panel->SetName(this->GetDefaultViewPanelName());
     panel->SetUserInterfaceManager(this->ViewUserInterfaceManager);
     panel->Create();
     panel->Delete();
@@ -1056,21 +1059,21 @@ void vtkKWWindow::SaveWindowGeometryToRegistry()
   // Main panel
 
   this->GetApplication()->SetRegistryValue(
-    2, "Geometry", vtkKWWindow::MainPanelSizeRegKey, "%d", 
+    2, "Geometry", this->GetMainPanelSizeRegKey(), "%d", 
     this->MainSplitFrame->GetFrame1Size());
 
   this->GetApplication()->SetRegistryValue(
-    2, "Geometry", vtkKWWindow::MainPanelVisibilityRegKey, "%d", 
+    2, "Geometry", this->GetMainPanelVisibilityRegKey(), "%d", 
     this->GetMainPanelVisibility());
 
   // Secondary panel
 
   this->GetApplication()->SetRegistryValue(
-    2, "Geometry", vtkKWWindow::SecondaryPanelSizeRegKey, "%d", 
+    2, "Geometry", this->GetSecondaryPanelSizeRegKey(), "%d", 
     this->SecondarySplitFrame->GetFrame1Size());
 
   this->GetApplication()->SetRegistryValue(
-    2, "Geometry", vtkKWWindow::SecondaryPanelVisibilityRegKey, "%d", 
+    2, "Geometry", this->GetSecondaryPanelVisibilityRegKey(), "%d", 
     this->GetSecondaryPanelVisibility());
 
   // View panel
@@ -1087,7 +1090,7 @@ void vtkKWWindow::SaveWindowGeometryToRegistry()
   if (pos)
     {
     this->GetApplication()->SetRegistryValue(
-      2, "Geometry", vtkKWWindow::ViewPanelPositionRegKey, "%s", pos);
+      2, "Geometry", this->GetViewPanelPositionRegKey(), "%s", pos);
     }
 }
 
@@ -1104,10 +1107,10 @@ void vtkKWWindow::RestoreWindowGeometryFromRegistry()
   // Main panel
 
   if (this->GetApplication()->HasRegistryValue(
-        2, "Geometry", vtkKWWindow::MainPanelSizeRegKey))
+        2, "Geometry", this->GetMainPanelSizeRegKey()))
     {
     int reg_size = this->GetApplication()->GetIntRegistryValue(
-      2, "Geometry", vtkKWWindow::MainPanelSizeRegKey);
+      2, "Geometry", this->GetMainPanelSizeRegKey());
     if (reg_size >= this->MainSplitFrame->GetFrame1MinimumSize())
       {
       this->MainSplitFrame->SetFrame1Size(reg_size);
@@ -1115,20 +1118,20 @@ void vtkKWWindow::RestoreWindowGeometryFromRegistry()
     }
 
   if (this->GetApplication()->HasRegistryValue(
-        2, "Geometry", vtkKWWindow::MainPanelVisibilityRegKey))
+        2, "Geometry", this->GetMainPanelVisibilityRegKey()))
     {
     this->SetMainPanelVisibility(
       this->GetApplication()->GetIntRegistryValue(
-        2, "Geometry", vtkKWWindow::MainPanelVisibilityRegKey));
+        2, "Geometry", this->GetMainPanelVisibilityRegKey()));
     }
 
   // Secondary panel
 
   if (this->GetApplication()->HasRegistryValue(
-        2, "Geometry", vtkKWWindow::SecondaryPanelSizeRegKey))
+        2, "Geometry", this->GetSecondaryPanelSizeRegKey()))
     {
     int reg_size = this->GetApplication()->GetIntRegistryValue(
-      2, "Geometry", vtkKWWindow::SecondaryPanelSizeRegKey);
+      2, "Geometry", this->GetSecondaryPanelSizeRegKey());
     if (reg_size >= this->SecondarySplitFrame->GetFrame1MinimumSize())
       {
       this->SecondarySplitFrame->SetFrame1Size(reg_size);
@@ -1136,18 +1139,18 @@ void vtkKWWindow::RestoreWindowGeometryFromRegistry()
     }
   
   if (this->GetApplication()->HasRegistryValue(
-        2, "Geometry", vtkKWWindow::SecondaryPanelVisibilityRegKey))
+        2, "Geometry", this->GetSecondaryPanelVisibilityRegKey()))
     {
     this->SetSecondaryPanelVisibility(
       this->GetApplication()->GetIntRegistryValue(
-        2, "Geometry", vtkKWWindow::SecondaryPanelVisibilityRegKey));
+        2, "Geometry", this->GetSecondaryPanelVisibilityRegKey()));
     }
 
   // View panel
 
   char pos[vtkKWRegistryHelper::RegistryKeyValueSizeMax];
   if (this->GetApplication()->GetRegistryValue(
-        2, "Geometry", vtkKWWindow::ViewPanelPositionRegKey, pos))
+        2, "Geometry", this->GetViewPanelPositionRegKey(), pos))
     {
     if (!strcmp(pos, "Left"))
       {
@@ -1285,24 +1288,23 @@ void vtkKWWindow::UpdateMenuState()
   if (this->WindowMenu)
     {
     int idx = -1;
-    if (this->WindowMenu->HasItem(vtkKWWindow::HideMainPanelMenuLabel))
+    if (this->WindowMenu->HasItem(this->GetHideMainPanelMenuLabel()))
       {
       idx = this->WindowMenu->GetIndexOfItem(
-        vtkKWWindow::HideMainPanelMenuLabel);
+        this->GetHideMainPanelMenuLabel());
       }
-    else if (this->WindowMenu->HasItem(vtkKWWindow::ShowMainPanelMenuLabel))
+    else if (this->WindowMenu->HasItem(this->GetShowMainPanelMenuLabel()))
       {
       idx = this->WindowMenu->GetIndexOfItem(
-        vtkKWWindow::ShowMainPanelMenuLabel);
+        this->GetShowMainPanelMenuLabel());
       }
     if (idx >= 0)
       {
-      vtksys_stl::string label("-label {");
+      vtksys_stl::string label;
       label += this->GetMainPanelVisibility()
-        ? vtkKWWindow::HideMainPanelMenuLabel 
-        : vtkKWWindow::ShowMainPanelMenuLabel;
-      label += "}";
-      this->WindowMenu->ConfigureItem(idx, label.c_str());
+        ? this->GetHideMainPanelMenuLabel() 
+        : this->GetShowMainPanelMenuLabel();
+      this->WindowMenu->SetItemLabel(idx, label.c_str());
       }
     }
 
@@ -1311,25 +1313,24 @@ void vtkKWWindow::UpdateMenuState()
   if (this->WindowMenu)
     {
     int idx = -1;
-    if (this->WindowMenu->HasItem(vtkKWWindow::HideSecondaryPanelMenuLabel))
+    if (this->WindowMenu->HasItem(this->GetHideSecondaryPanelMenuLabel()))
       {
       idx = this->WindowMenu->GetIndexOfItem(
-        vtkKWWindow::HideSecondaryPanelMenuLabel);
+        this->GetHideSecondaryPanelMenuLabel());
       }
     else if (this->WindowMenu->HasItem(
-               vtkKWWindow::ShowSecondaryPanelMenuLabel))
+               this->GetShowSecondaryPanelMenuLabel()))
       {
       idx = this->WindowMenu->GetIndexOfItem(
-        vtkKWWindow::ShowSecondaryPanelMenuLabel);
+        this->GetShowSecondaryPanelMenuLabel());
       }
     if (idx >= 0)
       {
-      vtksys_stl::string label("-label {");
+      vtksys_stl::string label;
       label += this->GetSecondaryPanelVisibility()
-        ? vtkKWWindow::HideSecondaryPanelMenuLabel 
-        : vtkKWWindow::ShowSecondaryPanelMenuLabel;
-      label += "}";
-      this->WindowMenu->ConfigureItem(idx, label.c_str());
+        ? this->GetHideSecondaryPanelMenuLabel() 
+        : this->GetShowSecondaryPanelMenuLabel();
+      this->WindowMenu->SetItemLabel(idx, label.c_str());
       this->WindowMenu->SetItemState(
         idx, 
         ((this->PanelLayout == vtkKWWindow::PanelLayoutSecondaryBelowMain &&

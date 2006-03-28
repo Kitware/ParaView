@@ -289,22 +289,20 @@ public:
 
   // Description:
   // Some constants
-  //BTX
-  static const char *PrintOptionsMenuLabel;
-  static const char *FileMenuLabel;
-  static const char *FileCloseMenuLabel;
-  static const char *FileExitMenuLabel;
-  static const char *OpenRecentFileMenuLabel;
-  static const char *EditMenuLabel;
-  static const char *ViewMenuLabel;
-  static const char *WindowMenuLabel;
-  static const char *HelpMenuLabel;
-  static const char *HelpTopicsMenuLabel;
-  static const char *HelpCheckForUpdatesMenuLabel;
-  static const char *ToolbarsVisibilityMenuLabel;
-  static const char *WindowGeometryRegKey;
-  static const char *DefaultGeometry;
-  //ETX
+  vtkGetStringMacro(PrintOptionsMenuLabel);
+  vtkGetStringMacro(FileMenuLabel);
+  vtkGetStringMacro(FileCloseMenuLabel);
+  vtkGetStringMacro(FileExitMenuLabel);
+  vtkGetStringMacro(OpenRecentFileMenuLabel);
+  vtkGetStringMacro(EditMenuLabel);
+  vtkGetStringMacro(ViewMenuLabel);
+  vtkGetStringMacro(WindowMenuLabel);
+  vtkGetStringMacro(HelpMenuLabel);
+  vtkGetStringMacro(HelpTopicsMenuLabel);
+  vtkGetStringMacro(HelpCheckForUpdatesMenuLabel);
+  vtkGetStringMacro(ToolbarsVisibilityMenuLabel);
+  vtkGetStringMacro(WindowGeometryRegKey);
+  vtkGetStringMacro(DefaultGeometry);
 
   // Description:
   // Callbacks. Internal, do not use.
@@ -384,7 +382,41 @@ protected:
 
   vtkKWTclInteractor *TclInteractor;
 
+  // Description:
+  // Some constants
+  vtkSetStringMacro(PrintOptionsMenuLabel);
+  vtkSetStringMacro(FileMenuLabel);
+  vtkSetStringMacro(FileCloseMenuLabel);
+  vtkSetStringMacro(FileExitMenuLabel);
+  vtkSetStringMacro(OpenRecentFileMenuLabel);
+  vtkSetStringMacro(EditMenuLabel);
+  vtkSetStringMacro(ViewMenuLabel);
+  vtkSetStringMacro(WindowMenuLabel);
+  vtkSetStringMacro(HelpMenuLabel);
+  vtkSetStringMacro(HelpTopicsMenuLabel);
+  vtkSetStringMacro(HelpCheckForUpdatesMenuLabel);
+  vtkSetStringMacro(ToolbarsVisibilityMenuLabel);
+  vtkSetStringMacro(WindowGeometryRegKey);
+  vtkSetStringMacro(DefaultGeometry);
+
 private:
+
+  // Description:
+  // Some constants
+  char *PrintOptionsMenuLabel;
+  char *FileMenuLabel;
+  char *FileCloseMenuLabel;
+  char *FileExitMenuLabel;
+  char *OpenRecentFileMenuLabel;
+  char *EditMenuLabel;
+  char *ViewMenuLabel;
+  char *WindowMenuLabel;
+  char *HelpMenuLabel;
+  char *HelpTopicsMenuLabel;
+  char *HelpCheckForUpdatesMenuLabel;
+  char *ToolbarsVisibilityMenuLabel;
+  char *WindowGeometryRegKey;
+  char *DefaultGeometry;
 
   vtkKWWindowBase(const vtkKWWindowBase&); // Not implemented
   void operator=(const vtkKWWindowBase&); // Not implemented
