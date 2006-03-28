@@ -453,7 +453,17 @@ public:
   // The gui must explicitly call this method to check if any new connections are
   // pending.
   int MonitorConnections(unsigned long msec);
-    
+  
+  // Description:
+  // Clear this flag to override using of MPI for self connection.
+  // This flag should be changed, if at all, only before calling 
+  // vtkProcessModule::Initialize() after which it has no effect. By default,
+  // this flag is set, i.e. MPI is used for self connection if available i.e.
+  // VTK is built with MPI. Typically, one does not need to change this flag manually,
+  // vtkPVMain sets this flag depending upon whether MPI was initialized or not.
+  vtkSetMacro(UseMPI, int);
+  vtkGetMacro(UseMPI, int);
+  
 protected:
   vtkProcessModule();
   ~vtkProcessModule();
@@ -572,6 +582,7 @@ protected:
 
   static int StreamBlockFlag;
 
+  int UseMPI;
 private:
   vtkProcessModule(const vtkProcessModule&); // Not implemented.
   void operator=(const vtkProcessModule&); // Not implemented.

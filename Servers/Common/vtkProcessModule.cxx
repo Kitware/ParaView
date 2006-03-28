@@ -97,7 +97,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.40");
+vtkCxxRevisionMacro(vtkProcessModule, "1.41");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -135,6 +135,8 @@ vtkProcessModule::vtkProcessModule()
   
   this->MemoryInformation = vtkKWProcessStatistics::New();
   this->ServerInformation = vtkPVServerInformation::New();
+
+  this->UseMPI = 1;
 }
 
 //-----------------------------------------------------------------------------

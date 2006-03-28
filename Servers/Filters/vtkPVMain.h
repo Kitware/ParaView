@@ -55,6 +55,12 @@ public:
   // However, if helper is not present, eg. renderserver, then 
   // we call this method to call this->ProcessModule->Start().
   int Run(vtkPVOptions*);
+
+  // Description:
+  // This flag is set by default. If cleared, MPI is not initialized.
+  // This flag is ignored if VTK_USE_MPI is not defined, i.e. VTK
+  // was not build with MPI support.
+  static void SetInitializeMPI(int s) {vtkPVMain::InitializeMPI = s; }
 protected:
   // Description:
   // Default constructor.
@@ -63,6 +69,8 @@ protected:
   // Description:
   // Destructor.
   virtual ~vtkPVMain();
+
+  static int InitializeMPI;
 private:
   vtkProcessModule* ProcessModule;
   vtkPVMain(const vtkPVMain&); // Not implemented
