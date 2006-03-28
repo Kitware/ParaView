@@ -32,13 +32,11 @@
 // ConnectionID must be set immediately after instantiating the proxy (if at all).
 // Chanding the ConnectionID after that can be dangerous.
 // 
-// 
 // When defining a proxy in the XML configuration file,
 // to derrive the property interface from another proxy definition,
 // we can use attributes "base_proxygroup" and "base_proxyname" which 
 // identify the proxy group and proxy name of another proxy. Base interfaces
 // can be defined recursively, however care must be taken to avoid cycles.
-//
 // 
 // There are several special XML features available for subproxies.
 // \li 1) It is possible to share properties among subproxies.
@@ -114,6 +112,7 @@
 //     by the container class are no longer applicable.
 //     If two exposed properties are exposed with the same name, then a Warning is
 //     flagged -- only one of the two exposed properties will get exposed. 
+//
 // .SECTION See Also
 // vtkSMProxyManager vtkSMProperty vtkSMSourceProxy vtkSMPropertyIterator
 
@@ -330,6 +329,7 @@ protected:
     const char* property_name, const char* exposed_name);
 
 //BTX
+  // Description:
   // These classes have been declared as friends to minimize the
   // public interface exposed by vtkSMProxy. Each of these classes
   // use a small subset of protected methods. This should be kept
@@ -369,12 +369,12 @@ protected:
   // However, it does not remove the properties.
   void UnRegisterVTKObjects();
 
+
+  // Description:
   // IDs are used to access server objects using the stream-based wrappers.
   // The following methods manage the IDs of objects maintained by the proxy.
   // Note that the IDs are assigned by the proxy at creation time. They
   // can not be set.
-
-  // Description:
   // Add an ID to be managed by the proxy. In this case, the proxy
   // takes control of the reference (it unassigns the ID in destructor).
   // One easy of creating an empty proxy and assigning IDs to it is:
@@ -384,15 +384,13 @@ protected:
   // proxy->SetID(1, id2);
   virtual void SetID(unsigned int idx, vtkClientServerID id);
 
+  // Description:
   // Server IDs determine on which server(s) the VTK objects are
   // instantiated. Use the following methods to set/get the server
   // IDs. Server IDs have to be set before the object is created.
   // Changing them after creation has no effect.
   // See vtkProcessModule.h for a list of all server types.
   // To add a server, OR it's value with the servers ivar.
-
-
-  // Description:
   // Set server ids on self
   void SetServersSelf(vtkTypeUInt32 servers);
 
@@ -401,6 +399,7 @@ protected:
   void SetConnectionIDSelf(vtkConnectionID id);
 
 //BTX
+  // Description:
   // This is a convenience method that pushes the value of one property
   // to one server alone. This is most commonly used by sub-classes
   // to make calls on the server manager through the stream interface.
@@ -411,6 +410,13 @@ protected:
                     vtkTypeUInt32 servers);
 //ETX
 
+  // Description:
+  // Cleanup code. Remove all observers from all properties assigned to
+  // this proxy.  Called before deleting properties.
+  // This also removes observers on subproxies.
+  void RemoveAllObservers();
+
+  // Description:
   // Note on property modified flags:
   // The modified flag of each property associated with a proxy is
   // stored in the proxy object instead of in the property itself.
@@ -429,15 +435,6 @@ protected:
   // This is done by adding observers to the properties. When a property
   // is modified, it invokes all observers and the observers set the
   // appropriate flags in the proxies. 
-
-
-  // Description:
-  // Cleanup code. Remove all observers from all properties assigned to
-  // this proxy.  Called before deleting properties.
-  // This also removes observers on subproxies.
-  void RemoveAllObservers();
-
-  // Description:
   // Changes the modified flag of a property. Used by the observers
   void SetPropertyModifiedFlag(const char* name, int flag);
 
@@ -543,14 +540,18 @@ protected:
   vtkTypeUInt32 Servers;
   int DoNotModifyProperty;
 
+  // Description:
   // Avoids calls to UpdateVTKObjects in UpdateVTKObjects.
   // UpdateVTKObjects call it self recursively until no
   // properties are modified.
   int InUpdateVTKObjects;
 
+  // Description:
   // Flag used to help speed up UpdateVTKObjects and ArePropertiesModified
   // calls.
   int SelfPropertiesModified;
+
+  // Description:
   // Indicates if any properties are modified.
   int ArePropertiesModified(int selfOnly = 0);
 
@@ -573,10 +574,13 @@ protected:
 private:
   vtkSMProxyInternals* Internals;
   vtkSMProxyObserver* SubProxyObserver;
-  vtkClientServerID SelfID; 
+
+  // Description:
   // SelfID is private to avoid direct access by subclasses.
   // They must use GetSelfID().
+  vtkClientServerID SelfID; 
 
+  // Description:
   // PVEE only
   // DO NOT USE THIS. THIS IS TEMPORARY AND TO BE USED
   // IN PVEE ONLY
