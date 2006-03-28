@@ -565,7 +565,7 @@ MACRO(KWWidgets_CREATE_PO_TARGETS
     SET(po_uptodate_files ${po_uptodate_files} ${po_uptodate_file})
     ADD_CUSTOM_COMMAND(
       OUTPUT ${po_uptodate_file}
-      DEPENDS ${pot_uptodate_file}
+      DEPENDS ${pot_uptodate_file} ${po_file}
       COMMAND ${CMAKE_COMMAND} 
       ARGS -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=${CMAKE_BACKWARDS_COMPATIBILITY} -Dpo_file:STRING="${po_file}" -Dpo_build_file:STRING="${po_build_file}" -Dpo_uptodate_file:STRING="${po_uptodate_file}" -Ddefault_po_encoding:STRING="${default_po_encoding}" -Dpot_build_file:STRING="${pot_build_file}" -Dlocale:STRING="${locale}" -DGETTEXT_MSGINIT_EXECUTABLE:STRING="${GETTEXT_MSGINIT_EXECUTABLE}" -DGETTEXT_MSGCONV_EXECUTABLE:STRING="${GETTEXT_MSGCONV_EXECUTABLE}" -DGETTEXT_MSGMERGE_EXECUTABLE:STRING="${GETTEXT_MSGMERGE_EXECUTABLE}" -DGETTEXT_MSGCAT_EXECUTABLE:STRING="${GETTEXT_MSGCAT_EXECUTABLE}" -P "${KWWidgets_CMAKE_DIR}/KWWidgetsGettextInitOrMerge.cmake"
       )
