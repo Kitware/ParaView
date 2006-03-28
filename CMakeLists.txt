@@ -72,6 +72,11 @@ IF(BUILD_SHARED_LIBS)
   ADD_DEFINITIONS(-DPARAQ_BUILD_SHARED_LIBS)
 ENDIF(BUILD_SHARED_LIBS)
 
+
+#########################################################################
+# Set the ServerManager test data dir,
+SET(PVServerManagerTestData ${PARAQ_DATA_ROOT})
+
 #########################################################################
 # Include the file that most of the environment setup (except GUI).
 SET(ParaView_SOURCE_DIR ${ParaQ_SOURCE_DIR})
