@@ -232,6 +232,7 @@ MainWindow::MainWindow() :
   // Help menu.
   QMenu* const helpMenu = this->menuBar()->addMenu(tr("&Help"))
     << pqSetName("helpMenu");
+  (void)helpMenu;
 
   // Set up the dock window corners to give the vertical docks
   // more room.
@@ -899,11 +900,11 @@ void MainWindow::onUpdateSourcesFiltersMenu(pqServer* /*Server*/)
           {
           vtkPVXMLParser *xmlParser = vtkPVXMLParser::New();
           xmlParser->InitializeParser();
-          QByteArray data = filterInfo.read(1024);
-          while(!data.isEmpty())
+          QByteArray filter_data = filterInfo.read(1024);
+          while(!filter_data.isEmpty())
             {
-            xmlParser->ParseChunk(data.data(), data.length());
-            data = filterInfo.read(1024);
+            xmlParser->ParseChunk(filter_data.data(), filter_data.length());
+            filter_data = filterInfo.read(1024);
             }
 
           xmlParser->CleanupParser();
@@ -1428,9 +1429,9 @@ void MainWindow::onFirstTimeStep()
   this->CurrentProxy->UpdateVTKObjects();
   if(pqPipelineData *pipeline = pqPipelineData::instance())
     {
-    QVTKWidget *window = pipeline->getWindowFor(this->CurrentProxy);
-    if(window)
-      window->update();
+    QVTKWidget *win= pipeline->getWindowFor(this->CurrentProxy);
+    if(win)
+      win->update();
     }
 }
 
@@ -1466,9 +1467,9 @@ void MainWindow::onPreviousTimeStep()
   this->CurrentProxy->UpdateVTKObjects();
   if(pqPipelineData *pipeline = pqPipelineData::instance())
     {
-    QVTKWidget *window = pipeline->getWindowFor(this->CurrentProxy);
-    if(window)
-      window->update();
+    QVTKWidget *win= pipeline->getWindowFor(this->CurrentProxy);
+    if(win)
+      win->update();
     }
 }
 
@@ -1504,9 +1505,9 @@ void MainWindow::onNextTimeStep()
   this->CurrentProxy->UpdateVTKObjects();
   if(pqPipelineData *pipeline = pqPipelineData::instance())
     {
-    QVTKWidget *window = pipeline->getWindowFor(this->CurrentProxy);
-    if(window)
-      window->update();
+    QVTKWidget *win= pipeline->getWindowFor(this->CurrentProxy);
+    if(win)
+      win->update();
     }
 }
 
@@ -1542,9 +1543,9 @@ void MainWindow::onLastTimeStep()
   this->CurrentProxy->UpdateVTKObjects();
   if(pqPipelineData *pipeline = pqPipelineData::instance())
     {
-    QVTKWidget *window = pipeline->getWindowFor(this->CurrentProxy);
-    if(window)
-      window->update();
+    QVTKWidget *win= pipeline->getWindowFor(this->CurrentProxy);
+    if(win)
+      win->update();
     }
 }
 
@@ -1604,18 +1605,18 @@ void MainWindow::onLoadExperimentSimulationMap()
   file_dialog->show();
 }
 
-void MainWindow::onExperimentalDataChanged(const QStringList& data)
+void MainWindow::onExperimentalDataChanged(const QStringList& changed_data)
 {
   this->ChooseDataCombo->clear();
-  this->ChooseDataCombo->addItems(data);
+  this->ChooseDataCombo->addItems(changed_data);
 }
 
-void MainWindow::onVisibleDataChanged(const QString& data)
+void MainWindow::onVisibleDataChanged(const QString& text)
 {
-  this->ChooseDataCombo->setCurrentIndex(this->ChooseDataCombo->findText(data));
+  this->ChooseDataCombo->setCurrentIndex(this->ChooseDataCombo->findText(text));
 }
 
-void MainWindow::onLineChartContextMenu(const QPoint& position)
+void MainWindow::onLineChartContextMenu(const QPoint& vtkNotUsed(position))
 {
   QMenu popup_menu;
 
