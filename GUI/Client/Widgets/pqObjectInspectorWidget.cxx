@@ -32,8 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqObjectInspectorWidget.h"
 
-#include "pqObjectInspector.h"
-#include "pqObjectInspectorDelegate.h"
+//#include "pqObjectInspector.h"
+//#include "pqObjectInspectorDelegate.h"
+#include "pqObjectEditor.h"
 #include "pqPipelineData.h"
 #include "pqPipelineObject.h"
 #include "pqPipelineWindow.h"
@@ -61,11 +62,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   : QWidget(p)
 {
+#if 0
   this->Inspector = 0;
   this->Delegate = 0;
   this->TreeView = 0;
+#endif
   this->TabWidget = 0;
 
+#if 0
   // Create the object inspector model.
   this->Inspector = new pqObjectInspector(this);
   if(this->Inspector)
@@ -85,12 +89,22 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
     if(this->Delegate)
       this->TreeView->setItemDelegate(this->Delegate);
     }
+#else
+
+  this->ObjectEditor = new pqObjectEditor(this);
+  this->ObjectEditor->setObjectName("Object Editor");
+
+#endif
 
   this->TabWidget = new QTabWidget(this);
   QScrollArea* s = new QScrollArea();
   s->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   s->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+#if 0
   s->setWidgetResizable(true);
+#else
+  s->setWidgetResizable(false);
+#endif
   s->setObjectName("InspectorScrollView");
   QVBoxLayout *boxLayout = new QVBoxLayout(s);
   boxLayout->setMargin(0);
@@ -104,14 +118,20 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   if(boxLayout)
     {
     boxLayout->setMargin(0);
+#if 0
     boxLayout->addWidget(this->TreeView);
+#else
+    boxLayout->addWidget(this->ObjectEditor);
+#endif
     }
 }
 
 pqObjectInspectorWidget::~pqObjectInspectorWidget()
 {
+#if 0
   if(this->TreeView)
     this->TreeView->setModel(0);
+#endif
 }
 
 void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
@@ -135,9 +155,15 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
   // set up layout for with or without custom form
   if(customForm && this->TabWidget->isHidden())
     {
+#if 0
     this->layout()->removeWidget(this->TreeView);
     this->TreeView->setParent(NULL);
     this->TabWidget->addTab(this->TreeView, "Advanced");
+#else
+    this->layout()->removeWidget(this->ObjectEditor);
+    this->ObjectEditor->setParent(NULL);
+    this->TabWidget->addTab(this->ObjectEditor, "Advanced");
+#endif
 
     this->layout()->addWidget(this->TabWidget);
     QScrollArea* s = qobject_cast<QScrollArea*>(this->TabWidget->widget(0));
@@ -162,9 +188,15 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
     this->layout()->removeWidget(this->TabWidget);
     this->TabWidget->removeTab(1);
     this->TabWidget->hide();
+#if 0
     this->TreeView->setParent(NULL);
     this->layout()->addWidget(this->TreeView);
     this->TreeView->show();
+#else
+    this->ObjectEditor->setParent(NULL);
+    this->layout()->addWidget(this->ObjectEditor);
+    this->ObjectEditor->show();
+#endif
     }
 
   if(customForm)
@@ -172,6 +204,7 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
     this->setupCustomForm(proxy, customForm);
     }
 
+#if 0
   if(this->Inspector)
     {
     // remember expanded items
@@ -197,6 +230,9 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
       this->TreeView->setExpanded(this->Inspector->index(i,0), expanded[i]);
       }
     }
+#else
+  this->ObjectEditor->setProxy(proxy);
+#endif
 }
 
 void pqObjectInspectorWidget::setupCustomForm(vtkSMProxy* proxy, QWidget* w)
@@ -265,7 +301,11 @@ void pqObjectInspectorWidget::setupCustomForm(vtkSMProxy* proxy, QWidget* w)
 
 void pqObjectInspectorWidget::updateDisplayForPropertyChanged()
 {
+#if 0
   vtkSMProxy* proxy = this->Inspector->proxy();
+#else
+  vtkSMProxy* proxy = this->ObjectEditor->proxy();
+#endif
   if(!proxy)
     {
     return;

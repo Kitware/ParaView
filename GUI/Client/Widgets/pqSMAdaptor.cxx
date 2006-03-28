@@ -199,6 +199,10 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
       {
       type = pqSMAdaptor::SELECTION;
       }
+    else if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::ENUMERATION)
+      {
+      type = pqSMAdaptor::ENUMERATION;
+      }
     else 
       {
       vtkSMVectorProperty* VectorProperty = vtkSMVectorProperty::SafeDownCast(Property);
@@ -447,10 +451,24 @@ QVariant pqSMAdaptor::getEnumerationProperty(vtkSMProxy* Proxy, vtkSMProperty* P
 
   vtkSMPropertyAdaptor* adaptor = vtkSMPropertyAdaptor::New();
   adaptor->SetProperty(Property);
+
+  if(!adaptor->GetNumberOfEnumerationElements())
+    {
+    return var;
+    }
+  
   if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::ENUMERATION)
     {
     var = adaptor->GetEnumerationValue();
+    var = adaptor->GetEnumerationName(var.toInt());
     }
+
+  if(adaptor->GetElementType() == vtkSMPropertyAdaptor::BOOLEAN)
+    {
+    var.convert(QVariant::Int);
+    var.convert(QVariant::Bool);
+    }
+  
   adaptor->Delete();
 
   return var;
@@ -460,10 +478,25 @@ void pqSMAdaptor::setEnumerationProperty(vtkSMProxy* Proxy, vtkSMProperty* Prope
 {
   vtkSMPropertyAdaptor* adaptor = vtkSMPropertyAdaptor::New();
   adaptor->SetProperty(Property);
-  if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::ENUMERATION && 
-     adaptor->GetElementType() == vtkSMPropertyAdaptor::INT)
+  if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::ENUMERATION &&
+     adaptor->GetElementType() == vtkSMPropertyAdaptor::BOOLEAN)
     {
+    Value.convert(QVariant::Int);
     adaptor->SetEnumerationValue(Value.toString().toAscii().data());
+    }
+  else if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::ENUMERATION)
+    {
+    QString val = Value.toString();
+    int num = adaptor->GetNumberOfEnumerationElements();
+    for(int i=0; i<num; i++)
+      {
+      if(val == adaptor->GetEnumerationName(i))
+        {
+        val.setNum(i);
+        adaptor->SetEnumerationValue(val.toAscii().data());
+        i = num;
+        }
+      }
     Proxy->UpdateVTKObjects();
     }
   adaptor->Delete();
@@ -564,7 +597,8 @@ QList<QVariant> pqSMAdaptor::getElementPropertyDomain(vtkSMProperty* Property)
   vtkSMPropertyAdaptor* adaptor = vtkSMPropertyAdaptor::New();
   adaptor->SetProperty(Property);
   
-  if(vtkSMPropertyAdaptor::RANGE == adaptor->GetPropertyType())
+  if(vtkSMPropertyAdaptor::STRING != adaptor->GetElementType() && 
+     vtkSMPropertyAdaptor::RANGE == adaptor->GetPropertyType())
     {
       domain.push_back(adaptor->GetRangeMinimum(0));
       domain.push_back(adaptor->GetRangeMaximum(0));

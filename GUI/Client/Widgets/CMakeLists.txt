@@ -21,10 +21,9 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqMultiView.h
   pqMultiViewFrame.h
   pqMultiViewManager.h
+  pqObjectEditor.h
   pqObjectHistogramWidget.h
   pqObjectLineChartWidget.h
-  pqObjectInspector.h
-  pqObjectInspectorItem.h
   pqObjectInspectorWidget.h
   pqPicking.h
   pqPipelineData.h
@@ -86,14 +85,10 @@ ADD_LIBRARY(QtWidgets
   pqMultiViewManager.h
   pqNameCount.cxx
   pqNameCount.h
+  pqObjectEditor.cxx
+  pqObjectEditor.h
   pqObjectHistogramWidget.cxx
   pqObjectHistogramWidget.h
-  pqObjectInspector.cxx
-  pqObjectInspector.h
-  pqObjectInspectorDelegate.cxx
-  pqObjectInspectorDelegate.h
-  pqObjectInspectorItem.cxx
-  pqObjectInspectorItem.h
   pqObjectInspectorWidget.cxx
   pqObjectInspectorWidget.h
   pqObjectLineChartWidget.cxx
