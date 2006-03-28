@@ -108,17 +108,17 @@ IF(WIN32)
   )
 ENDIF(WIN32)
 
-#IF(BUILD_TESTING)
-#  SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/pqClient --test-directory ${PARAQ_TEST_DIR})
-#  SET(TEST_XML ${QtClient_SOURCE_DIR}/Testing/XML)
-#  SET(TEST_IMAGE ${PARAQ_DATA_ROOT}/Baseline)
-#
-#  ADD_TEST(QtClientStartup        ${TEST_BINARY} --exit)
-#  ADD_TEST(QtClientAboutDialog    ${TEST_BINARY} --run-test ${TEST_XML}/AboutDialog.xml --exit)
-#  ADD_TEST(QtClientFileDialog     ${TEST_BINARY} --run-test ${TEST_XML}/FileDialog.xml --exit)
-#  ADD_TEST(QtClientCreateSource   ${TEST_BINARY} --run-test ${TEST_XML}/CreateSource.xml --compare-view ${TEST_IMAGE}/CreateSource.png)
-#  CONFIGURE_FILE(${QtClient_SOURCE_DIR}/Testing/XML/filters.xml
-#                 ${QtClient_BINARY_DIR}/Testing/XML/filters.xml COPYONLY)
-#  ADD_TEST(QtClientCompoundProxy  ${TEST_BINARY} --run-test ${TEST_XML}/CompoundProxy.xml --exit)
-#ENDIF(BUILD_TESTING)
+IF(BUILD_TESTING)
+  SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/pqClient --test-directory ${PARAQ_TEST_DIR})
+  SET(TEST_XML ${pqClient_SOURCE_DIR}/Testing/XML)
+  SET(TEST_IMAGE ${PARAQ_DATA_ROOT}/Baseline)
+
+  ADD_TEST(pqClientStartup        ${TEST_BINARY} --exit)
+  ADD_TEST(pqClientAboutDialog    ${TEST_BINARY} --run-test ${TEST_XML}/AboutDialog.xml --exit)
+  ADD_TEST(pqClientFileDialog     ${TEST_BINARY} --run-test ${TEST_XML}/FileDialog.xml --exit)
+  ADD_TEST(pqClientCreateSource   ${TEST_BINARY} --run-test ${TEST_XML}/CreateSource.xml --compare-view ${TEST_IMAGE}/CreateSource.png)
+  CONFIGURE_FILE(${pqClient_SOURCE_DIR}/Testing/XML/filters.xml
+                 ${pqClient_BINARY_DIR}/Testing/XML/filters.xml COPYONLY)
+  ADD_TEST(pqClientCompoundProxy  ${TEST_BINARY} --run-test ${TEST_XML}/CompoundProxy.xml --exit)
+ENDIF(BUILD_TESTING)
 
