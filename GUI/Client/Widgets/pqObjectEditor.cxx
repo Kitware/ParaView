@@ -67,15 +67,15 @@ pqObjectEditor::pqObjectEditor(QWidget* p)
   QBoxLayout* buttonlayout = new QHBoxLayout();
   mainlayout->addLayout(buttonlayout);
 
-  QScrollArea* scroll = new QScrollArea(this);
-  scroll->setObjectName("Object Editor Scroll");
+  QScrollArea* qscroll = new QScrollArea(this);
+  qscroll->setObjectName("Object Editor Scroll");
   QWidget* w = new QWidget;
   w->setObjectName("Object Editor Panel");
   w->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-  scroll->setWidgetResizable(true);
-  scroll->setWidget(w);
+  qscroll->setWidgetResizable(true);
+  qscroll->setWidget(w);
   this->PanelLayout = new QGridLayout(w);
-  mainlayout->addWidget(scroll);
+  mainlayout->addWidget(qscroll);
   
   QPushButton* acceptButton = new QPushButton(this);
   acceptButton->setObjectName("Accept");
@@ -95,13 +95,13 @@ pqObjectEditor::~pqObjectEditor()
 }
 
 /// set the proxy to display properties for
-void pqObjectEditor::setProxy(pqSMProxy proxy)
+void pqObjectEditor::setProxy(pqSMProxy p)
 {
   if(this->Proxy)
     {
     this->deleteWidgets();
     }
-  this->Proxy = proxy;
+  this->Proxy = p;
   if(this->Proxy)
     {
     this->createWidgets();
@@ -122,10 +122,10 @@ void pqObjectEditor::accept()
   this->setServerManagerProperties();
   
   // cause the screen to update
-  QVTKWidget *window = pqPipelineData::instance()->getWindowFor(this->Proxy);
-  if(window)
+  QVTKWidget *qwindow = pqPipelineData::instance()->getWindowFor(this->Proxy);
+  if(qwindow)
     {
-      window->update();
+      qwindow->update();
     }
 }
 
@@ -186,8 +186,9 @@ void pqObjectEditor::createWidgets()
     else if(pt == pqSMAdaptor::ENUMERATION)
       {
       // TODO: filenames show up in combo boxes .. gotta fix that
-      QVariant property = pqSMAdaptor::getEnumerationProperty(this->Proxy, SMProperty);
-      if(property.type() == QVariant::Bool)
+      QVariant enum_property = pqSMAdaptor::getEnumerationProperty(this->Proxy, 
+        SMProperty);
+      if(enum_property.type() == QVariant::Bool)
         {
         // check box for true/false
         QCheckBox* check = new QCheckBox(iter->GetKey(), this->PanelLayout->parentWidget());
@@ -218,9 +219,9 @@ void pqObjectEditor::createWidgets()
       }
     else if(pt == pqSMAdaptor::SINGLE_ELEMENT)
       {
-      QVariant property = pqSMAdaptor::getElementProperty(this->Proxy, SMProperty);
+      QVariant elem_property = pqSMAdaptor::getElementProperty(this->Proxy, SMProperty);
       QList<QVariant> propertyDomain = pqSMAdaptor::getElementPropertyDomain(SMProperty);
-      if(property.type() == QVariant::String && propertyDomain.size())
+      if(elem_property.type() == QVariant::String && propertyDomain.size())
         {
         // combo box with strings
         QComboBox* combo = new QComboBox(this->PanelLayout->parentWidget());
@@ -246,7 +247,7 @@ void pqObjectEditor::createWidgets()
       }
     else if(pt == pqSMAdaptor::MULTIPLE_ELEMENTS)
       {
-      QList<QVariant> property = pqSMAdaptor::getMultipleElementProperty(this->Proxy, SMProperty);
+      QList<QVariant> list_property = pqSMAdaptor::getMultipleElementProperty(this->Proxy, SMProperty);
       QLabel* label = new QLabel(this->PanelLayout->parentWidget());
       label->setText(iter->GetKey());
       this->PanelLayout->addWidget(label, rowCount, 0, 1, 1);
@@ -255,7 +256,7 @@ void pqObjectEditor::createWidgets()
       this->PanelLayout->addItem(hlayout, rowCount, 1, 1, 1);
       
       int i=0;
-      foreach(QVariant v, property)
+      foreach(QVariant v, list_property)
         {
         QLineEdit* lineEdit = new QLineEdit(this->PanelLayout->parentWidget());
         QString num;
@@ -344,24 +345,27 @@ void pqObjectEditor::getServerManagerProperties()
         QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget);
         if(checkBox)
           {
-          QVariant property = pqSMAdaptor::getEnumerationProperty(this->Proxy, SMProperty);
-          checkBox->setChecked(property.toBool());
+          QVariant enum_property = pqSMAdaptor::getEnumerationProperty(
+            this->Proxy, SMProperty);
+          checkBox->setChecked(enum_property.toBool());
           }
         else if(comboBox)
           {
-          QVariant property = pqSMAdaptor::getEnumerationProperty(this->Proxy, SMProperty);
+          QVariant enum_property = pqSMAdaptor::getEnumerationProperty(
+            this->Proxy, SMProperty);
           QList<QVariant> domain = pqSMAdaptor::getEnumerationPropertyDomain(SMProperty);
           comboBox->clear();
           foreach(QVariant v, domain)
             {
             comboBox->addItem(v.toString());
             }
-          comboBox->setCurrentIndex(comboBox->findText(property.toString()));
+          comboBox->setCurrentIndex(comboBox->findText(enum_property.toString()));
           }
         else if(lineEdit)
           {
-          QVariant property = pqSMAdaptor::getEnumerationProperty(this->Proxy, SMProperty);
-          lineEdit->setText(property.toString());
+          QVariant enum_property = pqSMAdaptor::getEnumerationProperty(
+            this->Proxy, SMProperty);
+          lineEdit->setText(enum_property.toString());
           }
         }
       else if(pt == pqSMAdaptor::SELECTION)
@@ -371,8 +375,9 @@ void pqObjectEditor::getServerManagerProperties()
         if(listWidget)
           {
           listWidget->clear();
-          QList<QList<QVariant> > property = pqSMAdaptor::getSelectionProperty(this->Proxy, SMProperty);; 
-          foreach(QList<QVariant> v, property)
+          QList<QList<QVariant> > sel_property = pqSMAdaptor::getSelectionProperty(
+            this->Proxy, SMProperty);; 
+          foreach(QList<QVariant> v, sel_property)
             {
             QListWidgetItem* item = new QListWidgetItem(v[0].toString(), listWidget);
             if(v[1].toBool())
@@ -392,13 +397,14 @@ void pqObjectEditor::getServerManagerProperties()
         if(comboBox)
           {
           QList<pqSMProxy> propertyDomain = pqSMAdaptor::getProxyPropertyDomain(this->Proxy, SMProperty);
-          pqSMProxy property = pqSMAdaptor::getProxyProperty(this->Proxy, SMProperty);
+          pqSMProxy proxy_property = pqSMAdaptor::getProxyProperty(
+            this->Proxy, SMProperty);
           comboBox->clear();
           int currentIndex=0;
           int i=0;
           foreach(pqSMProxy v, propertyDomain)
             {
-            if(property == v)
+            if(proxy_property == v)
               {
               currentIndex = i;
               }
@@ -422,14 +428,15 @@ void pqObjectEditor::getServerManagerProperties()
         QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget);
         if(comboBox)
           {
-          QVariant property = pqSMAdaptor::getElementProperty(this->Proxy, SMProperty);
+          QVariant elem_property = pqSMAdaptor::getElementProperty(
+            this->Proxy, SMProperty);
           QList<QVariant> domain = pqSMAdaptor::getElementPropertyDomain(SMProperty);
           comboBox->clear();
           int currentIndex=0;
           int i=0;
           foreach(QVariant v, domain)
             {
-            if(property == v)
+            if(elem_property == v)
               {
               currentIndex = i;
               }
@@ -508,16 +515,16 @@ void pqObjectEditor::setServerManagerProperties()
         QListWidget* listWidget = qobject_cast<QListWidget*>(widget);
         if(listWidget)
           {
-          QList<QList<QVariant> > property; 
+          QList<QList<QVariant> > list_property; 
           for(int i=0; i<listWidget->count(); i++)
             {
             QListWidgetItem* item = listWidget->item(i);
             QList<QVariant> prop;
             prop.append(item->text());
             prop.append(item->checkState() == Qt::Checked);
-            property.append(prop);
+            list_property.append(prop);
             }
-          pqSMAdaptor::setSelectionProperty(this->Proxy, SMProperty, property);
+          pqSMAdaptor::setSelectionProperty(this->Proxy, SMProperty, list_property);
           }
         }
       else if(pt == pqSMAdaptor::PROXY)

@@ -55,8 +55,8 @@ const char *pqPlayControlsWidget::Image[NUM_BUTTONS] = {
 //  ":pqWidgets/pqVcrPlay22.png"
 };
 
-pqPlayControlsWidget::pqPlayControlsWidget(QWidget *parent)
-  : QWidget( parent)
+pqPlayControlsWidget::pqPlayControlsWidget(QWidget *_parent)
+  : QWidget( _parent)
 {
   // this->Frame = new QFrame( this, "pqPlayControlsWidget" );
   // this->Frame->setEnabled( TRUE );
@@ -75,12 +75,12 @@ pqPlayControlsWidget::pqPlayControlsWidget(QWidget *parent)
     {
     this->Button[i] = new QToolButton( this ); 
     this->Button[i]->setAutoRaise( true );
-    QSizePolicy sizePolicy = this->Button[i]->sizePolicy();
-    sizePolicy.setHorizontalPolicy(QSizePolicy::Minimum);
-    sizePolicy.setVerticalPolicy(QSizePolicy::Minimum);
-    sizePolicy.setHorizontalStretch(0);
-    sizePolicy.setVerticalStretch(0);
-    this->Button[i]->setSizePolicy(sizePolicy);
+    QSizePolicy size_policy = this->Button[i]->sizePolicy();
+    size_policy.setHorizontalPolicy(QSizePolicy::Minimum);
+    size_policy.setVerticalPolicy(QSizePolicy::Minimum);
+    size_policy.setHorizontalStretch(0);
+    size_policy.setVerticalStretch(0);
+    this->Button[i]->setSizePolicy(size_policy);
     this->Button[i]->setMaximumSize( QSize( max_dim, max_dim ) );
     // this->Button[i]->setText( tr( "..." ) );
     // this->Button[i]->setFocusPolicy( QWidget::NoFocus );
