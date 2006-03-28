@@ -104,7 +104,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.31");
+vtkCxxRevisionMacro(vtkKWView, "1.32");
 
 //----------------------------------------------------------------------------
 void KWViewAbortCheckMethod( vtkObject*, unsigned long, void* arg, void* )
@@ -1146,10 +1146,10 @@ void vtkKWView::Select(vtkKWWindow *pw)
     // add the Print option
     // If there is a "Page Setup" menu, insert below
     if (pw->GetFileMenu()->HasItem(
-          vtkKWWindowBase::PrintOptionsMenuLabel))
+          pw->GetPrintOptionsMenuLabel()))
       {
       idx = pw->GetFileMenu()->GetIndexOfItem(
-        vtkKWWindowBase::PrintOptionsMenuLabel) + 1;  
+        pw->GetPrintOptionsMenuLabel()) + 1;  
       }
     else
       {
