@@ -30,7 +30,7 @@
 #include <vtksys/SystemTools.hxx>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkTestingProcessModuleGUIHelper, "1.2");
+vtkCxxRevisionMacro(vtkTestingProcessModuleGUIHelper, "1.3");
 vtkStandardNewMacro(vtkTestingProcessModuleGUIHelper);
 
 //----------------------------------------------------------------------------
@@ -133,9 +133,14 @@ int vtkTestingProcessModuleGUIHelper::RunGUIStart(int , char **,
       }
     testing->Delete();
     }
-  cout << "ERROR: Regression tests not performed since no baseline or temp directory "
-    "specified." << endl;
-
+  else
+    {
+    cout << "ERROR: Regression tests not performed since no baseline or temp directory "
+      "specified." << endl;
+    cout << "Press a key to exit." << endl;
+    char c;
+    cin >> c;
+    }
   this->ProcessModule->Exit();
 
   // Exiting:  CLean up.
