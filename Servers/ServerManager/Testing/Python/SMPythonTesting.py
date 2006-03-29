@@ -134,8 +134,8 @@ if __name__ == "__main__":
         ret = 0
   else:
     Error("No ServerManager state file specified")
-if ret:
-  # This leads to vtkDebugLeaks reporting leaks, hence we do this
-  # only when the tests failed.
-  sys.exit(ret)
+  if ret:
+    # This leads to vtkDebugLeaks reporting leaks, hence we do this
+    # only when the tests failed.
+    sys.exit(ret)
 
