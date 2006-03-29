@@ -10,6 +10,7 @@ SET (SMSTATE_FILES
   BoundsDisplay
   CalcInput
   # ClipCut
+  DataAnalysisLinePlot
   )
 
 # Path to the state files.
