@@ -1,7 +1,11 @@
 import re
-
-from libvtkPVServerCommonPython import *
-from libvtkPVServerManagerPython import *
+import os
+if os.name == "posix":
+  from libvtkPVServerCommonPython import *
+  from libvtkPVServerManagerPython import *
+else:
+  from vtkPVServerCommonPython import *
+  from vtkPVServerManagerPython import *
 
 class pyProxy:
     """
