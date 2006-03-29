@@ -137,7 +137,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.783");
+vtkCxxRevisionMacro(vtkPVWindow, "1.784");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -762,7 +762,7 @@ void vtkPVWindow::InitializeMenus()
 
   menu = this->GetFileMenu();
 
-  menu->DeleteMenuItem(vtkKWWindowBase::FileCloseMenuLabel);
+  menu->DeleteMenuItem(this->GetFileCloseMenuLabel());
 
   idx = this->GetFileMenuInsertPosition();
 
@@ -4999,7 +4999,7 @@ void vtkPVWindow::UpdateMenuState()
     {
     vtkKWMenu* menu = this->GetMenu();
     menu->SetState(vtkKWTkOptions::StateDisabled);
-    this->GetMenu()->SetItemState(vtkKWWindowBase::WindowMenuLabel,  menu_state);
+    this->GetMenu()->SetItemState(this->GetWindowMenuLabel(),  menu_state);
     if (this->WindowMenu)
       {
       this->WindowMenu->SetState(vtkKWTkOptions::StateDisabled);
@@ -5011,9 +5011,9 @@ void vtkPVWindow::UpdateMenuState()
 
     if (this->FileMenu)
       {
-      this->GetMenu()->SetItemState(vtkKWWindowBase::FileMenuLabel,  menu_state);
+      this->GetMenu()->SetItemState(this->GetFileMenuLabel(),  menu_state);
       this->FileMenu->SetState(vtkKWTkOptions::StateDisabled);
-      this->FileMenu->SetItemState(vtkPVWindow::FileExitMenuLabel, menu_state);
+      this->FileMenu->SetItemState(this->GetFileExitMenuLabel(), menu_state);
       }
     return;
     }
@@ -5047,12 +5047,11 @@ void vtkPVWindow::UpdateMenuState()
 
   if (!source_grabbed)
     {
-    this->GetMenu()->SetItemState(vtkKWWindowBase::FileMenuLabel,  menu_state);
-    this->GetMenu()->SetItemState(vtkKWWindowBase::EditMenuLabel,  menu_state);
-    this->GetMenu()->SetItemState(vtkKWWindowBase::ViewMenuLabel,  menu_state);
-    this->GetMenu()->SetItemState(vtkKWWindowBase::WindowMenuLabel,  menu_state);
-    this->GetMenu()->SetItemState(
-      vtkKWWindowBase::HelpMenuLabel,  menu_state);
+    this->GetMenu()->SetItemState(this->GetFileMenuLabel(),  menu_state);
+    this->GetMenu()->SetItemState(this->GetEditMenuLabel(),  menu_state);
+    this->GetMenu()->SetItemState(this->GetViewMenuLabel(),  menu_state);
+    this->GetMenu()->SetItemState(this->GetWindowMenuLabel(),  menu_state);
+    this->GetMenu()->SetItemState(this->GetHelpMenuLabel(),  menu_state);
     }
 
   // Disable or enable the select menu. Checks if there are any valid
