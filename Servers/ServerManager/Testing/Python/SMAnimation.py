@@ -11,7 +11,7 @@ import sys
 SMPythonTesting.ProcessCommandLineArguments()
 
 pvsm_file = os.path.join(SMPythonTesting.SMStatesDir, "Animation.pvsm")
-print pvsm_file
+print "State file: %s" % pvsm_file
 
 SMPythonTesting.LoadServerManagerState(pvsm_file)
 pxm = vtkSMObject.GetProxyManager()
