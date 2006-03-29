@@ -20,6 +20,7 @@
 #include "vtkSMBooleanDomain.h"
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMEnumerationDomain.h"
+#include "vtkSMFileListDomain.h"
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMProxyGroupDomain.h"
 #include "vtkSMStringListDomain.h"
@@ -32,7 +33,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPropertyAdaptor);
-vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.16");
+vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.17");
 
 //---------------------------------------------------------------------------
 vtkSMPropertyAdaptor::vtkSMPropertyAdaptor()
@@ -87,31 +88,43 @@ void vtkSMPropertyAdaptor::SetDomain(vtkSMDomain* domain)
   if (!this->BooleanDomain)
     {
     this->BooleanDomain = vtkSMBooleanDomain::SafeDownCast(domain);
+    return;
     }
   if (!this->DoubleRangeDomain)
     {
     this->DoubleRangeDomain = vtkSMDoubleRangeDomain::SafeDownCast(domain);
+    return;
     }
   if (!this->EnumerationDomain)
     {
     this->EnumerationDomain = vtkSMEnumerationDomain::SafeDownCast(domain);
+    return;
     }
   if (!this->IntRangeDomain)
     {
     this->IntRangeDomain = vtkSMIntRangeDomain::SafeDownCast(domain);
+    return;
     }
   if (!this->ProxyGroupDomain)
     {
     this->ProxyGroupDomain = vtkSMProxyGroupDomain::SafeDownCast(domain);
+    return;
+    }
+  if (!this->FileListDomain)
+    {
+    this->FileListDomain = vtkSMFileListDomain::SafeDownCast(domain);
+    return;
     }
   if (!this->StringListDomain)
     {
     this->StringListDomain = vtkSMStringListDomain::SafeDownCast(domain);
+    return;
     }
   if (!this->StringListRangeDomain)
     {
     this->StringListRangeDomain = 
       vtkSMStringListRangeDomain::SafeDownCast(domain);
+    return;
     }
 }
 
@@ -121,6 +134,7 @@ void vtkSMPropertyAdaptor::InitializeDomains()
   this->BooleanDomain = 0;
   this->DoubleRangeDomain = 0;
   this->EnumerationDomain = 0;
+  this->FileListDomain = 0;
   this->IntRangeDomain = 0;
   this->ProxyGroupDomain = 0;
   this->StringListDomain = 0;
@@ -168,6 +182,11 @@ int vtkSMPropertyAdaptor::GetPropertyType()
   if (this->StringListDomain)
     {
     return vtkSMPropertyAdaptor::ENUMERATION;
+    }
+
+  if (this->FileListDomain)
+    {
+    return vtkSMPropertyAdaptor::FILE_LIST;
     }
 
   if (this->StringListRangeDomain)
@@ -386,6 +405,10 @@ unsigned int vtkSMPropertyAdaptor::GetNumberOfEnumerationElements()
     {
     return this->StringListDomain->GetNumberOfStrings();
     }
+  if (this->FileListDomain)
+    {
+    return this->FileListDomain->GetNumberOfStrings();
+    }
   return 0;
 }
 
@@ -407,6 +430,10 @@ const char* vtkSMPropertyAdaptor::GetEnumerationName(unsigned int idx)
   if (this->ProxyGroupDomain)
     {
     return this->ProxyGroupDomain->GetProxyName(idx);
+    }
+  if (this->FileListDomain)
+    {
+    return this->FileListDomain->GetString(idx);
     }
   if (this->StringListDomain)
     {
@@ -449,8 +476,9 @@ const char* vtkSMPropertyAdaptor::GetEnumerationValue()
       }
     }
 
-  if (this->StringListDomain && this->StringVectorProperty 
-    && this->StringVectorProperty->GetNumberOfElements() > 0)
+  if ((this->StringListDomain || this->FileListDomain) && 
+      this->StringVectorProperty && 
+      this->StringVectorProperty->GetNumberOfElements() > 0)
     {
     unsigned int nos = this->StringVectorProperty->GetNumberOfElements();
     for (unsigned int i=0; i < nos; i++)
@@ -521,7 +549,8 @@ int vtkSMPropertyAdaptor::SetEnumerationValue(const char* sidx)
       0, this->EnumerationDomain->GetEntryValue(idx) );
     }
 
-  if (this->StringListDomain && this->StringVectorProperty)
+  if ((this->StringListDomain || this->FileListDomain) && 
+      this->StringVectorProperty)
     {
     unsigned int nos = this->StringVectorProperty->GetNumberOfElements();
     for (unsigned int i=0; i < nos ; i++)
