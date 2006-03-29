@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.92");
+vtkCxxRevisionMacro(vtkKWMenu, "1.93");
 
 //----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
@@ -451,7 +451,7 @@ char* vtkKWMenu::CreateRadioButtonVariable(vtkKWObject* object,
     const char *varname_end = varname + varname_len;
     while (varname < varname_end)
       {
-      if (*varname >= 0 && *varname < 128 && *varname != ' ')
+      if (*varname >= 0 && *varname != ' ')
         {
         *buffer_ptr = *varname;
         buffer_ptr++;
