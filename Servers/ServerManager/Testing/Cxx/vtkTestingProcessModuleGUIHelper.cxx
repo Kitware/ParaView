@@ -30,7 +30,7 @@
 #include <vtksys/SystemTools.hxx>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkTestingProcessModuleGUIHelper, "1.3");
+vtkCxxRevisionMacro(vtkTestingProcessModuleGUIHelper, "1.4");
 vtkStandardNewMacro(vtkTestingProcessModuleGUIHelper);
 
 //----------------------------------------------------------------------------
@@ -111,6 +111,7 @@ int vtkTestingProcessModuleGUIHelper::RunGUIStart(int , char **,
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   pxm->UpdateRegisteredProxies("sources", 0);
+  pxm->UpdateRegisteredProxies("filters", 0);
   pxm->UpdateRegisteredProxies(0);
 
   vtkSMRenderModuleProxy* rm = vtkSMRenderModuleProxy::SafeDownCast(

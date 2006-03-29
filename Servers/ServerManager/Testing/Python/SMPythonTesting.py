@@ -81,6 +81,7 @@ def LoadServerManagerState(filename):
   if loader.LoadState(root,0):
     pxm = vtkSMObject.GetProxyManager()
     pxm.UpdateRegisteredProxies("sources", 0)
+    pxm.UpdateRegisteredProxies("filters", 0)
     pxm.UpdateRegisteredProxies(0)
     return True
   return Error("Failed to load state file %s" % filename)
@@ -133,5 +134,8 @@ if __name__ == "__main__":
         ret = 0
   else:
     Error("No ServerManager state file specified")
+if ret:
+  # This leads to vtkDebugLeaks reporting leaks, hence we do this
+  # only when the tests failed.
   sys.exit(ret)
 
