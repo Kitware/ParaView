@@ -203,6 +203,10 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
       {
       type = pqSMAdaptor::ENUMERATION;
       }
+    else if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::FILE_LIST)
+      {
+      type = pqSMAdaptor::FILE_LIST;
+      }
     else 
       {
       vtkSMVectorProperty* VectorProperty = vtkSMVectorProperty::SafeDownCast(Property);
@@ -768,6 +772,31 @@ QList<QVariant> pqSMAdaptor::getMultipleElementPropertyDomain(vtkSMProperty* Pro
 
   return domain;
 }
+
+QString pqSMAdaptor::getFileListProperty(vtkSMProxy* Proxy, vtkSMProperty* Property)
+{
+  QString file;
+  vtkSMPropertyAdaptor* adaptor = vtkSMPropertyAdaptor::New();
+  adaptor->SetProperty(Property);
+  if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::FILE_LIST)
+    {
+    file = adaptor->GetRangeValue(0);
+    }
+  adaptor->Delete();
+  return file;
+}
+
+void pqSMAdaptor::setFileListProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QString Value)
+{
+  vtkSMPropertyAdaptor* adaptor = vtkSMPropertyAdaptor::New();
+  adaptor->SetProperty(Property);
+  if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::FILE_LIST)
+    {
+    adaptor->SetRangeValue(0, Value.toAscii().data());
+    }
+  adaptor->Delete();
+}
+
 
 void pqSMAdaptor::setProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QVariant QtProperty)
 {

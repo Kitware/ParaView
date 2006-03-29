@@ -63,7 +63,8 @@ public:
     SELECTION,
     ENUMERATION,
     SINGLE_ELEMENT,
-    MULTIPLE_ELEMENTS
+    MULTIPLE_ELEMENTS,
+    FILE_LIST
     };
 
   /// Get the global adapter instance.
@@ -119,6 +120,12 @@ public:
   static void setMultipleElementProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index, QVariant Value);
   /// get one of the ranges of possible values to set the multiple elements of a property
   static QList<QVariant> getMultipleElementPropertyDomain(vtkSMProperty* Property, int Index);
+
+  /// get the single element of a property (integer, string, real, etc..)
+  static QString getFileListProperty(vtkSMProxy* Proxy, vtkSMProperty* Property);
+  /// set the single element of a property (integer, string, real, etc..)
+  static void setFileListProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QString Value);
+
 
 private:
   void setProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QVariant QtProperty);

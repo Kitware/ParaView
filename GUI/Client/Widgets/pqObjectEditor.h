@@ -51,6 +51,11 @@ public:
   void setProxy(pqSMProxy proxy);
   /// get the proxy for which properties are displayed
   pqSMProxy proxy();
+  
+  /// populate widgets with properties from the server manager
+  static void getServerManagerProperties(pqSMProxy proxy, QWidget* w);
+  /// set the properties in the server manager with properties in the widgets
+  static void setServerManagerProperties(pqSMProxy proxy, QWidget* w);
 
 public slots:
   /// accept the changes made to the properties
@@ -59,17 +64,14 @@ public slots:
   /// reset the changes made
   /// editor will query properties from the server manager
   void reset();
-
+  
+  
 protected:
 
   /// populate this widget with widgets to represent the properties
   void createWidgets();
   /// delete the widgets representing properties
   void deleteWidgets();
-  /// populate widgets with properties from the server manager
-  void getServerManagerProperties();
-  /// set the properties in the server manager with properties in the widgets
-  void setServerManagerProperties();
 
   pqSMProxy Proxy;
   QGridLayout* PanelLayout;

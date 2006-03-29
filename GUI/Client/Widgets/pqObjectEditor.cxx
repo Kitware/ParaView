@@ -105,7 +105,7 @@ void pqObjectEditor::setProxy(pqSMProxy p)
   if(this->Proxy)
     {
     this->createWidgets();
-    this->getServerManagerProperties();
+    this->getServerManagerProperties(this->Proxy, this);
     }
 }
 
@@ -119,7 +119,7 @@ pqSMProxy pqObjectEditor::proxy()
 /// changes will be propogated down to the server manager
 void pqObjectEditor::accept()
 {
-  this->setServerManagerProperties();
+  this->setServerManagerProperties(this->Proxy, this);
   
   // cause the screen to update
   QVTKWidget *qwindow = pqPipelineData::instance()->getWindowFor(this->Proxy);
@@ -133,7 +133,7 @@ void pqObjectEditor::accept()
 /// editor will query properties from the server manager
 void pqObjectEditor::reset()
 {
-  this->getServerManagerProperties();
+  this->getServerManagerProperties(this->Proxy, this);
 }
 
 void pqObjectEditor::createWidgets()
@@ -268,7 +268,17 @@ void pqObjectEditor::createWidgets()
         }
         rowCount++;
       }
-
+    else if(pt == pqSMAdaptor::FILE_LIST)
+      {
+      QLineEdit* lineEdit = new QLineEdit(this->PanelLayout->parentWidget());
+      lineEdit->setObjectName(iter->GetKey());
+      QLabel* label = new QLabel(this->PanelLayout->parentWidget());
+      label->setText(iter->GetKey());
+      
+      this->PanelLayout->addWidget(label, rowCount, 0, 1, 1);
+      this->PanelLayout->addWidget(lineEdit, rowCount, 1, 1, 1);
+      rowCount++;
+      }
     }
   iter->Delete();
   this->PanelLayout->addItem(new QSpacerItem(0,0,QSizePolicy::Expanding,QSizePolicy::Expanding), rowCount, 0, 1, 2);
@@ -302,9 +312,9 @@ void pqObjectEditor::deleteWidgets()
     }
 }
 
-void pqObjectEditor::getServerManagerProperties()
+void pqObjectEditor::getServerManagerProperties(pqSMProxy proxy, QWidget* widget)
 {
-  vtkSMPropertyIterator *iter = this->Proxy->NewPropertyIterator();
+  vtkSMPropertyIterator *iter = proxy->NewPropertyIterator();
   for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMProperty* SMProperty = iter->GetProperty();
@@ -313,7 +323,7 @@ void pqObjectEditor::getServerManagerProperties()
       continue;
       }
 
-    QWidget* widget = this->findChild<QWidget*>(iter->GetKey());
+    QWidget* foundWidget = widget->findChild<QWidget*>(iter->GetKey());
     pqSMAdaptor::PropertyType pt = pqSMAdaptor::getPropertyType(SMProperty);
 
     // a layout was found with the name of the property
@@ -326,33 +336,31 @@ void pqObjectEditor::getServerManagerProperties()
         QString name;
         name.setNum(i);
         name = QString(iter->GetKey()) + QString(":") + name;
-        QLineEdit* le = this->findChild<QLineEdit*>(name);
+        QLineEdit* le = foundWidget->findChild<QLineEdit*>(name);
         if(le)
           {
-          QVariant prop = pqSMAdaptor::getMultipleElementProperty(this->Proxy, SMProperty, i);
+          QVariant prop = pqSMAdaptor::getMultipleElementProperty(proxy, SMProperty, i);
           le->setText(prop.toString());
           }
         }
       }
     // a layout was found with the name of the property
-    else if(widget)
+    else if(foundWidget)
       {
       if(pt == pqSMAdaptor::ENUMERATION)
         {
         // enumerations can be combo boxes or check boxes
-        QCheckBox* checkBox = qobject_cast<QCheckBox*>(widget);
-        QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
-        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget);
+        QCheckBox* checkBox = qobject_cast<QCheckBox*>(foundWidget);
+        QComboBox* comboBox = qobject_cast<QComboBox*>(foundWidget);
+        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundWidget);
         if(checkBox)
           {
-          QVariant enum_property = pqSMAdaptor::getEnumerationProperty(
-            this->Proxy, SMProperty);
+          QVariant enum_property = pqSMAdaptor::getEnumerationProperty(proxy, SMProperty);
           checkBox->setChecked(enum_property.toBool());
           }
         else if(comboBox)
           {
-          QVariant enum_property = pqSMAdaptor::getEnumerationProperty(
-            this->Proxy, SMProperty);
+          QVariant enum_property = pqSMAdaptor::getEnumerationProperty(proxy, SMProperty);
           QList<QVariant> domain = pqSMAdaptor::getEnumerationPropertyDomain(SMProperty);
           comboBox->clear();
           foreach(QVariant v, domain)
@@ -363,20 +371,18 @@ void pqObjectEditor::getServerManagerProperties()
           }
         else if(lineEdit)
           {
-          QVariant enum_property = pqSMAdaptor::getEnumerationProperty(
-            this->Proxy, SMProperty);
+          QVariant enum_property = pqSMAdaptor::getEnumerationProperty(proxy, SMProperty);
           lineEdit->setText(enum_property.toString());
           }
         }
       else if(pt == pqSMAdaptor::SELECTION)
         {
         // selections can be list widgets
-        QListWidget* listWidget = qobject_cast<QListWidget*>(widget);
+        QListWidget* listWidget = qobject_cast<QListWidget*>(foundWidget);
         if(listWidget)
           {
           listWidget->clear();
-          QList<QList<QVariant> > sel_property = pqSMAdaptor::getSelectionProperty(
-            this->Proxy, SMProperty);; 
+          QList<QList<QVariant> > sel_property = pqSMAdaptor::getSelectionProperty(proxy, SMProperty);; 
           foreach(QList<QVariant> v, sel_property)
             {
             QListWidgetItem* item = new QListWidgetItem(v[0].toString(), listWidget);
@@ -393,12 +399,11 @@ void pqObjectEditor::getServerManagerProperties()
         }
       else if(pt == pqSMAdaptor::PROXY)
         {
-        QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+        QComboBox* comboBox = qobject_cast<QComboBox*>(foundWidget);
         if(comboBox)
           {
-          QList<pqSMProxy> propertyDomain = pqSMAdaptor::getProxyPropertyDomain(this->Proxy, SMProperty);
-          pqSMProxy proxy_property = pqSMAdaptor::getProxyProperty(
-            this->Proxy, SMProperty);
+          QList<pqSMProxy> propertyDomain = pqSMAdaptor::getProxyPropertyDomain(proxy, SMProperty);
+          pqSMProxy proxy_property = pqSMAdaptor::getProxyProperty(proxy, SMProperty);
           comboBox->clear();
           int currentIndex=0;
           int i=0;
@@ -424,12 +429,11 @@ void pqObjectEditor::getServerManagerProperties()
         }
       else if(pt == pqSMAdaptor::SINGLE_ELEMENT)
         {
-        QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
-        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget);
+        QComboBox* comboBox = qobject_cast<QComboBox*>(foundWidget);
+        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundWidget);
         if(comboBox)
           {
-          QVariant elem_property = pqSMAdaptor::getElementProperty(
-            this->Proxy, SMProperty);
+          QVariant elem_property = pqSMAdaptor::getElementProperty(proxy, SMProperty);
           QList<QVariant> domain = pqSMAdaptor::getElementPropertyDomain(SMProperty);
           comboBox->clear();
           int currentIndex=0;
@@ -447,7 +451,15 @@ void pqObjectEditor::getServerManagerProperties()
           }
         else if(lineEdit)
           {
-          lineEdit->setText(pqSMAdaptor::getElementProperty(this->Proxy, SMProperty).toString());
+          lineEdit->setText(pqSMAdaptor::getElementProperty(proxy, SMProperty).toString());
+          }
+        }
+      else if(pt == pqSMAdaptor::FILE_LIST)
+        {
+        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundWidget);
+        if(lineEdit)
+          {
+          lineEdit->setText(pqSMAdaptor::getFileListProperty(proxy, SMProperty));
           }
         }
       }
@@ -456,9 +468,9 @@ void pqObjectEditor::getServerManagerProperties()
 
 }
 
-void pqObjectEditor::setServerManagerProperties()
+void pqObjectEditor::setServerManagerProperties(pqSMProxy proxy, QWidget* widget)
 {
-  vtkSMPropertyIterator *iter = this->Proxy->NewPropertyIterator();
+  vtkSMPropertyIterator *iter = proxy->NewPropertyIterator();
   for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMProperty* SMProperty = iter->GetProperty();
@@ -467,7 +479,7 @@ void pqObjectEditor::setServerManagerProperties()
       continue;
       }
 
-    QWidget* widget = this->findChild<QWidget*>(iter->GetKey());
+    QWidget* foundWidget = widget->findChild<QWidget*>(iter->GetKey());
     pqSMAdaptor::PropertyType pt = pqSMAdaptor::getPropertyType(SMProperty);
 
     // a layout was found with the name of the property
@@ -480,39 +492,39 @@ void pqObjectEditor::setServerManagerProperties()
         QString name;
         name.setNum(i);
         name = QString(iter->GetKey()) + QString(":") + name;
-        QLineEdit* le = this->findChild<QLineEdit*>(name);
+        QLineEdit* le = foundWidget->findChild<QLineEdit*>(name);
         if(le)
           {
-          pqSMAdaptor::setMultipleElementProperty(this->Proxy, SMProperty, i, le->text());
+          pqSMAdaptor::setMultipleElementProperty(proxy, SMProperty, i, le->text());
           }
         }
       }
     // a layout was found with the name of the property
-    else if(widget)
+    else if(foundWidget)
       {
       if(pt == pqSMAdaptor::ENUMERATION)
         {
         // enumerations can be combo boxes or check boxes
-        QCheckBox* checkBox = qobject_cast<QCheckBox*>(widget);
-        QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
-        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget);
+        QCheckBox* checkBox = qobject_cast<QCheckBox*>(foundWidget);
+        QComboBox* comboBox = qobject_cast<QComboBox*>(foundWidget);
+        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundWidget);
         if(checkBox)
           {
-          pqSMAdaptor::setEnumerationProperty(this->Proxy, SMProperty, checkBox->isChecked());
+          pqSMAdaptor::setEnumerationProperty(proxy, SMProperty, checkBox->isChecked());
           }
         else if(comboBox && comboBox->count())
           {
-          pqSMAdaptor::setEnumerationProperty(this->Proxy, SMProperty, comboBox->currentText());
+          pqSMAdaptor::setEnumerationProperty(proxy, SMProperty, comboBox->currentText());
           }
         else if(lineEdit)
           {
-          pqSMAdaptor::setEnumerationProperty(this->Proxy, SMProperty, lineEdit->text());
+          pqSMAdaptor::setEnumerationProperty(proxy, SMProperty, lineEdit->text());
           }
         }
       else if(pt == pqSMAdaptor::SELECTION)
         {
         // selections can be list widgets
-        QListWidget* listWidget = qobject_cast<QListWidget*>(widget);
+        QListWidget* listWidget = qobject_cast<QListWidget*>(foundWidget);
         if(listWidget)
           {
           QList<QList<QVariant> > list_property; 
@@ -524,35 +536,43 @@ void pqObjectEditor::setServerManagerProperties()
             prop.append(item->checkState() == Qt::Checked);
             list_property.append(prop);
             }
-          pqSMAdaptor::setSelectionProperty(this->Proxy, SMProperty, list_property);
+          pqSMAdaptor::setSelectionProperty(proxy, SMProperty, list_property);
           }
         }
       else if(pt == pqSMAdaptor::PROXY)
         {
-        QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
+        QComboBox* comboBox = qobject_cast<QComboBox*>(foundWidget);
         if(comboBox && comboBox->count())
           {
-          QList<pqSMProxy> propertyDomain = pqSMAdaptor::getProxyPropertyDomain(this->Proxy, SMProperty);
-          pqSMAdaptor::setProxyProperty(this->Proxy, SMProperty, propertyDomain[comboBox->currentIndex()]);
+          QList<pqSMProxy> propertyDomain = pqSMAdaptor::getProxyPropertyDomain(proxy, SMProperty);
+          pqSMAdaptor::setProxyProperty(proxy, SMProperty, propertyDomain[comboBox->currentIndex()]);
           }
         }
       else if(pt == pqSMAdaptor::SINGLE_ELEMENT)
         {
-        QComboBox* comboBox = qobject_cast<QComboBox*>(widget);
-        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(widget);
+        QComboBox* comboBox = qobject_cast<QComboBox*>(foundWidget);
+        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundWidget);
         if(comboBox && comboBox->count())
           {
-          pqSMAdaptor::setElementProperty(this->Proxy, SMProperty, comboBox->currentText());
+          pqSMAdaptor::setElementProperty(proxy, SMProperty, comboBox->currentText());
           }
         else if(lineEdit)
           {
-          pqSMAdaptor::setElementProperty(this->Proxy, SMProperty, lineEdit->text());
+          pqSMAdaptor::setElementProperty(proxy, SMProperty, lineEdit->text());
+          }
+        }
+      else if(pt == pqSMAdaptor::FILE_LIST)
+        {
+        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundWidget);
+        if(lineEdit)
+          {
+          pqSMAdaptor::setFileListProperty(proxy, SMProperty, lineEdit->text());
           }
         }
       }
     }
   iter->Delete();
-  this->Proxy->UpdateVTKObjects();
+  proxy->UpdateVTKObjects();
 }
 
 
