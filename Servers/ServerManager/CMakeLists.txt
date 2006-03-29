@@ -45,6 +45,7 @@ SET(Kit_SRCS
   vtkSMExponentialKeyFrameProxy.cxx
   vtkSMExtentDomain.cxx
   vtkSMFieldDataDomain.cxx
+  vtkSMFileListDomain.cxx
   vtkSMFixedTypeDomain.cxx
   vtkSMIceTDesktopRenderModuleProxy.cxx
   vtkSMIceTMultiDisplayProxy.cxx
