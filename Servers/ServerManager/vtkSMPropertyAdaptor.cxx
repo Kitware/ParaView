@@ -33,7 +33,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPropertyAdaptor);
-vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.17");
+vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.18");
 
 //---------------------------------------------------------------------------
 vtkSMPropertyAdaptor::vtkSMPropertyAdaptor()
@@ -88,43 +88,35 @@ void vtkSMPropertyAdaptor::SetDomain(vtkSMDomain* domain)
   if (!this->BooleanDomain)
     {
     this->BooleanDomain = vtkSMBooleanDomain::SafeDownCast(domain);
-    return;
     }
   if (!this->DoubleRangeDomain)
     {
     this->DoubleRangeDomain = vtkSMDoubleRangeDomain::SafeDownCast(domain);
-    return;
     }
   if (!this->EnumerationDomain)
     {
     this->EnumerationDomain = vtkSMEnumerationDomain::SafeDownCast(domain);
-    return;
     }
   if (!this->IntRangeDomain)
     {
     this->IntRangeDomain = vtkSMIntRangeDomain::SafeDownCast(domain);
-    return;
     }
   if (!this->ProxyGroupDomain)
     {
     this->ProxyGroupDomain = vtkSMProxyGroupDomain::SafeDownCast(domain);
-    return;
     }
   if (!this->FileListDomain)
     {
     this->FileListDomain = vtkSMFileListDomain::SafeDownCast(domain);
-    return;
     }
   if (!this->StringListDomain)
     {
     this->StringListDomain = vtkSMStringListDomain::SafeDownCast(domain);
-    return;
     }
   if (!this->StringListRangeDomain)
     {
     this->StringListRangeDomain = 
       vtkSMStringListRangeDomain::SafeDownCast(domain);
-    return;
     }
 }
 
