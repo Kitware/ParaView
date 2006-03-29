@@ -1,11 +1,15 @@
 # This is a module for Server Manager testing using Python. 
 # This provides several utility functions useful for testing
-from libvtkPVServerCommonPython import *
-from libvtkPVServerManagerPython import *
-
 import os
 import re
 import sys
+
+if os.name == "posix":
+  from libvtkPVServerCommonPython import *
+  from libvtkPVServerManagerPython import *
+else:
+  from vtkPVServerCommonPython import *
+  from vtkPVServerManagerPython import *
 
 __ProcessedCommandLineArguments__ = False
 DataDir = ""

@@ -1,12 +1,17 @@
 # Tests animation.
 
-from libvtkPVServerCommonPython import *
-from libvtkPVServerManagerPython import *
-
 import SMPythonTesting
 
 import os.path
 import sys
+
+if os.name == "posix":
+  from libvtkPVServerCommonPython import *
+  from libvtkPVServerManagerPython import *
+else:
+  from vtkPVServerCommonPython import *
+  from vtkPVServerManagerPython import *
+
 
 SMPythonTesting.ProcessCommandLineArguments()
 

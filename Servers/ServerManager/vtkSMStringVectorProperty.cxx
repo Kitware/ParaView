@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.22");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.23");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -365,10 +365,7 @@ void vtkSMStringVectorProperty::Copy(vtkSMProperty* src)
     this->ImmediateUpdate = imUpdate;
     }
 
-  if (this->ImmediateUpdate)
-    {
-    this->Modified();
-    }
+  this->Modified();
 }
 
 //---------------------------------------------------------------------------

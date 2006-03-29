@@ -1,13 +1,17 @@
 # Tests links between proxies and properties.
 
-from libvtkPVServerCommonPython import *
-from libvtkPVServerManagerPython import *
-
-import SMPythonTesting
-
+import os
 import os.path
 import sys
 
+if os.name == "posix":
+  from libvtkPVServerCommonPython import *
+  from libvtkPVServerManagerPython import *
+else:
+  from vtkPVServerCommonPython import *
+  from vtkPVServerManagerPython import *
+import SMPythonTesting
+  
 SMPythonTesting.ProcessCommandLineArguments()
 
 pvsm_file = os.path.join(SMPythonTesting.SMStatesDir, "ProxyPropertyLinks.pvsm")
