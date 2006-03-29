@@ -2004,6 +2004,8 @@
           <Property name="PlotColors" />
           <Property name="PlotLines" />
           <Property name="PlotPoints" />
+          <Property name="Position" />
+          <Property name="Position2" />
           <Property name="Smart" />
           <Property name="Title" />
           <Property name="TitlePosition" />
