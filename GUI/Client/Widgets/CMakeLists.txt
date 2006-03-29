@@ -15,6 +15,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDataSetModel.h
   pqElementInspectorWidget.h
   pqImageTip.h
+  pqMainWindow.h
   pqMultiView.h
   pqMultiViewFrame.h
   pqMultiViewManager.h
@@ -75,6 +76,8 @@ ADD_LIBRARY(pqWidgets
   pqElementInspectorWidget.h
   pqImageTip.cxx
   pqImageTip.h
+  pqMainWindow.cxx
+  pqMainWindow.h
   pqMultiView.cxx
   pqMultiView.h
   pqMultiViewFrame.cxx

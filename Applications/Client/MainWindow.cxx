@@ -125,18 +125,9 @@ MainWindow::MainWindow() :
   Adaptor(0),
   Pipeline(0),
   Inspector(0),
-  InspectorDock(0),
-  InspectorDockAction(0),
   PipelineList(0),
-  PipelineDock(0),
-  PipelineDockAction(0),
-  HistogramDock(0),
-  LineChartDock(0),
-  HistogramDockAction(0),
-  LineChartDockAction(0),
   ActiveView(0),
   ElementInspectorDock(0),
-  ElementDockAction(0),
   CompoundProxyToolBar(0),
   VariableSelectorToolBar(0),
   VCRControlsToolBar(0),
@@ -173,7 +164,7 @@ MainWindow::MainWindow() :
   this->menuBar() << pqSetName("menuBar");
 
   // File menu.
-  QMenu* const fileMenu = this->menuBar()->addMenu(tr("&File"))
+  QMenu* const fileMenu = this->createFileMenu()
     << pqSetName("fileMenu");
 
   fileMenu->addAction(tr("&New"))
@@ -202,7 +193,7 @@ MainWindow::MainWindow() :
     << pqConnect(SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));
 
   // View menu
-  QMenu* viewMenu = this->menuBar()->addMenu(tr("&View"))
+  QMenu* viewMenu = this->createViewMenu()
     << pqSetName("viewMenu");
 
   // Server menu.
@@ -270,60 +261,58 @@ MainWindow::MainWindow() :
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
   // Add the pipeline list dock window.
-  this->PipelineDock = new QDockWidget("Pipeline Inspector", this);
-  if(this->PipelineDock)
+  QDockWidget* const pipeline_dock = new QDockWidget("Pipeline Inspector", this);
+  pipeline_dock->setObjectName("PipelineDock");
+  pipeline_dock->setAllowedAreas(
+    Qt::LeftDockWidgetArea |
+    Qt::RightDockWidgetArea);
+  pipeline_dock->setFeatures(QDockWidget::AllDockWidgetFeatures);
+
+  // Make sure the pipeline data instance is created before the
+  // pipeline list model. This ensures that the connections will
+  // work.
+  this->PipelineList = new pqPipelineListWidget(pipeline_dock);
+  if(this->PipelineList)
     {
-    this->PipelineDock->setObjectName("PipelineDock");
-    this->PipelineDock->setAllowedAreas(
-        Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    this->PipelineDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
-
-    // Make sure the pipeline data instance is created before the
-    // pipeline list model. This ensures that the connections will
-    // work.
-    this->PipelineList = new pqPipelineListWidget(this->PipelineDock);
-    if(this->PipelineList)
-      {
-      this->PipelineList->setObjectName("PipelineList");
-      this->PipelineDock->setWidget(this->PipelineList);
-      }
-
-    this->addDockWidget(Qt::LeftDockWidgetArea, this->PipelineDock);
+    this->PipelineList->setObjectName("PipelineList");
+    pipeline_dock->setWidget(this->PipelineList);
     }
+
+  this->simpleAddDockWidget(Qt::LeftDockWidgetArea, pipeline_dock, QIcon(":pqWidgets/pqPipelineList22.png"));
 
   // Add the object inspector dock window.
-  this->InspectorDock = new QDockWidget("Object Inspector", this);
-  if(this->InspectorDock)
+  QDockWidget* const object_inspector_dock = new QDockWidget("Object Inspector", this);
+  object_inspector_dock->setObjectName("InspectorDock");
+  object_inspector_dock->setAllowedAreas(
+      Qt::LeftDockWidgetArea |
+      Qt::RightDockWidgetArea);
+  object_inspector_dock->setFeatures(QDockWidget::AllDockWidgetFeatures);
+
+  this->Inspector = new pqObjectInspectorWidget(object_inspector_dock);
+  if(this->Inspector)
     {
-    this->InspectorDock->setObjectName("InspectorDock");
-    this->InspectorDock->setAllowedAreas(
-        Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    this->InspectorDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
-
-    this->Inspector = new pqObjectInspectorWidget(this->InspectorDock);
-    if(this->Inspector)
+    this->Inspector->setObjectName("Inspector");
+    object_inspector_dock->setWidget(this->Inspector);
+    if(this->PipelineList)
       {
-      this->Inspector->setObjectName("Inspector");
-      this->InspectorDock->setWidget(this->Inspector);
-      if(this->PipelineList)
-        {
-        connect(this->PipelineList, SIGNAL(proxySelected(vtkSMProxy *)),
-            this->Inspector, SLOT(setProxy(vtkSMProxy *)));
-        }
+      connect(this->PipelineList, SIGNAL(proxySelected(vtkSMProxy *)),
+          this->Inspector, SLOT(setProxy(vtkSMProxy *)));
       }
-
-    this->addDockWidget(Qt::LeftDockWidgetArea, this->InspectorDock);
     }
 
-  // Add the histogram dock window.
-  this->HistogramDock = new QDockWidget("Histogram View", this);
-  this->HistogramDock->setObjectName("HistogramDock");
-  this->HistogramDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
-  this->HistogramDock->setAllowedAreas(Qt::BottomDockWidgetArea |
-      Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+  this->simpleAddDockWidget(Qt::LeftDockWidgetArea, object_inspector_dock, QIcon());
 
-  pqObjectHistogramWidget* const histogram = new pqObjectHistogramWidget(this->HistogramDock);  
-  this->HistogramDock->setWidget(histogram);
+  // Add the histogram dock window.
+  QDockWidget* const histogram_dock = new QDockWidget("Histogram View", this);
+  histogram_dock->setObjectName("HistogramDock");
+  histogram_dock->setFeatures(QDockWidget::AllDockWidgetFeatures);
+  histogram_dock->setAllowedAreas(
+    Qt::BottomDockWidgetArea |
+    Qt::LeftDockWidgetArea |
+    Qt::RightDockWidgetArea);
+
+  pqObjectHistogramWidget* const histogram = new pqObjectHistogramWidget(histogram_dock);  
+  histogram_dock->setWidget(histogram);
   if(this->PipelineList)
     {
     connect(this->PipelineList, SIGNAL(proxySelected(vtkSMProxy*)),
@@ -331,17 +320,19 @@ MainWindow::MainWindow() :
     }
   connect(this, SIGNAL(serverChanged(pqServer*)), histogram, SLOT(setServer(pqServer*)));
 
-  this->addDockWidget(Qt::LeftDockWidgetArea, this->HistogramDock);
+  this->simpleAddDockWidget(Qt::LeftDockWidgetArea, histogram_dock, QIcon(":pqChart/pqHistogram22.png"));
 
   // Add the line plot dock window.
-  this->LineChartDock = new QDockWidget("Line Chart View", this);
-  this->LineChartDock->setObjectName("LineChartDock");
-  this->LineChartDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
-  this->LineChartDock->setAllowedAreas(Qt::BottomDockWidgetArea |
-      Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+  QDockWidget* const line_chart_dock = new QDockWidget("Line Chart View", this);
+  line_chart_dock->setObjectName("LineChartDock");
+  line_chart_dock->setFeatures(QDockWidget::AllDockWidgetFeatures);
+  line_chart_dock->setAllowedAreas(
+    Qt::BottomDockWidgetArea |
+    Qt::LeftDockWidgetArea |
+    Qt::RightDockWidgetArea);
 
-  pqObjectLineChartWidget* const line_chart = new pqObjectLineChartWidget(this->LineChartDock);  
-  this->LineChartDock->setWidget(line_chart);
+  pqObjectLineChartWidget* const line_chart = new pqObjectLineChartWidget(line_chart_dock);  
+  line_chart_dock->setWidget(line_chart);
   if(this->PipelineList)
     {
     connect(this->PipelineList, SIGNAL(proxySelected(vtkSMProxy*)),
@@ -349,65 +340,23 @@ MainWindow::MainWindow() :
     }
   connect(this, SIGNAL(serverChanged(pqServer*)), line_chart, SLOT(setServer(pqServer*)));
 
-  this->addDockWidget(Qt::BottomDockWidgetArea, this->LineChartDock);
+  this->simpleAddDockWidget(Qt::BottomDockWidgetArea, line_chart_dock, QIcon(":pqChart/pqLineChart22.png"));
   
   // Add the element inspector dock window.
   this->ElementInspectorDock = new QDockWidget("Element Inspector View", this);
   this->ElementInspectorDock->setObjectName("ElementInspectorDock");
   this->ElementInspectorDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
-  this->ElementInspectorDock->setAllowedAreas(Qt::BottomDockWidgetArea |
-      Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+  this->ElementInspectorDock->setAllowedAreas(
+    Qt::BottomDockWidgetArea |
+    Qt::LeftDockWidgetArea |
+    Qt::RightDockWidgetArea);
 
   pqElementInspectorWidget* const element_inspector = new pqElementInspectorWidget(this->ElementInspectorDock);
   this->ElementInspectorDock->setWidget(element_inspector);
 
-  this->addDockWidget(Qt::BottomDockWidgetArea, this->ElementInspectorDock);
+  this->simpleAddDockWidget(Qt::BottomDockWidgetArea, this->ElementInspectorDock, QIcon());
 
   connect(element_inspector, SIGNAL(elementsChanged(vtkUnstructuredGrid*)), line_chart, SLOT(setElements(vtkUnstructuredGrid*)));
-
-  // Set up the view menu items for the dock windows.
-  this->PipelineDockAction = viewMenu->addAction(
-    QIcon(":pqWidgets/pqPipelineList22.png"), tr("&Pipeline Inspector"))
-    << pqSetName("Pipeline");
-  this->PipelineDockAction->setCheckable(true);
-  this->PipelineDockAction->setChecked(true);
-  this->PipelineDockAction << pqConnect(SIGNAL(triggered(bool)),
-    this->PipelineDock, SLOT(setVisible(bool)));
-  this->PipelineDock->installEventFilter(this);
-
-  this->InspectorDockAction = viewMenu->addAction(tr("&Object Inspector"))
-    << pqSetName("Inspector");
-  this->InspectorDockAction->setCheckable(true);
-  this->InspectorDockAction->setChecked(true);
-  this->InspectorDockAction << pqConnect(SIGNAL(triggered(bool)),
-    this->InspectorDock, SLOT(setVisible(bool)));
-  this->InspectorDock->installEventFilter(this);
-
-  this->HistogramDockAction = viewMenu->addAction(
-    QIcon(":pqChart/pqHistogram22.png"), tr("&Histogram View"))
-    << pqSetName("Histogram");
-  this->HistogramDockAction->setCheckable(true);
-  this->HistogramDockAction->setChecked(true);
-  this->HistogramDockAction << pqConnect(SIGNAL(triggered(bool)),
-    this->HistogramDock, SLOT(setVisible(bool)));
-  this->HistogramDock->installEventFilter(this);
-
-  this->LineChartDockAction = viewMenu->addAction(
-    QIcon(":pqChart/pqLineChart22.png"), tr("&Line Chart View"))
-    << pqSetName("LineChart");
-  this->LineChartDockAction->setCheckable(true);
-  this->LineChartDockAction->setChecked(true);
-  this->LineChartDockAction << pqConnect(SIGNAL(triggered(bool)),
-    this->LineChartDock, SLOT(setVisible(bool)));
-  this->LineChartDock->installEventFilter(this);
-
-  this->ElementDockAction = viewMenu->addAction(tr("&Element Inspector"))
-    << pqSetName("Element");
-  this->ElementDockAction->setCheckable(true);
-  this->ElementDockAction->setChecked(true);
-  this->ElementDockAction << pqConnect(SIGNAL(triggered(bool)),
-    this->ElementInspectorDock, SLOT(setVisible(bool)));
-  this->ElementInspectorDock->installEventFilter(this);
 
   // VCR controls
   this->VCRControlsToolBar = new QToolBar(tr("VCR Controls"), this) << pqSetName("VCRControlsToolBar");
@@ -471,36 +420,6 @@ MainWindow::~MainWindow()
   this->VTKConnector->Delete();
   delete this->CurrentServer;
   delete this->Adaptor;
-}
-
-bool MainWindow::eventFilter(QObject* watched, QEvent* e)
-{
-  if(e->type() == QEvent::Hide || e->type() == QEvent::Show)
-    {
-    bool checked = e->type() == QEvent::Show;
-    if(watched == this->PipelineDock)
-      {
-      this->PipelineDockAction->setChecked(checked);
-      }
-    else if(watched == this->InspectorDock)
-      {
-      this->InspectorDockAction->setChecked(checked);
-      }
-    else if(watched == this->HistogramDock)
-      {
-      this->HistogramDockAction->setChecked(checked);
-      }
-    else if(watched == this->LineChartDock)
-      {
-      this->LineChartDockAction->setChecked(checked);
-      }
-    else if(watched == this->ElementInspectorDock)
-      {
-      this->ElementDockAction->setChecked(checked);
-      }
-    }
-
-  return QMainWindow::eventFilter(watched, e);
 }
 
 void MainWindow::setServer(pqServer* Server)

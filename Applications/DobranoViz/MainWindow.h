@@ -10,9 +10,9 @@
 #ifndef _MainWindow_h
 #define _MainWindow_h
 
+#include <pqMainWindow.h>
 #include <pqVariableType.h>
 #include <vtkIOStream.h>
-#include <QMainWindow>
 
 class LineChartAdapter;
 
@@ -43,17 +43,15 @@ class QToolBar;
 class QTreeView;
 class QTabWidget;
 
-/// Provides the main window for the ParaQ application
+/// Provides the main window for the Dobran-O-Viz application
 class MainWindow :
-        public QMainWindow
+  public pqMainWindow
 {
   Q_OBJECT
 
 public:
   MainWindow();
   virtual ~MainWindow();
-
-  virtual bool eventFilter(QObject* watched, QEvent* e);
 
   /// Compares the contents of the window with the given reference image, returns true iff they "match" within some tolerance
   bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
@@ -133,20 +131,10 @@ private:
   QMenu* FiltersMenu;
   QMenu* ToolsMenu;
   pqObjectInspectorWidget *Inspector;
-  QDockWidget *InspectorDock;
-  QAction *InspectorDockAction;
   pqPipelineListWidget *PipelineList;
-  QDockWidget *PipelineDock;
-  QAction *PipelineDockAction;
-  QDockWidget *HistogramDock;
-  QDockWidget *LineChartDock;
   pqLineChartWidget* LineChartWidget;
   LineChartAdapter* LineChart;
-  QAction *HistogramDockAction;
-  QAction *LineChartDockAction;
   pqMultiViewFrame* ActiveView;
-  QDockWidget *ElementInspectorDock;
-  QAction *ElementDockAction;
   QToolBar* CompoundProxyToolBar;
   QToolBar* VariableSelectorToolBar;
 
@@ -155,6 +143,8 @@ private:
   pqSourceProxyInfo* ProxyInfo;
   vtkEventQtSlotConnect* VTKConnector;
   vtkSMProxy* CurrentProxy;
+
+  QDockWidget* ElementInspectorDock;
 };
 
 #endif // !_MainWindow_h
