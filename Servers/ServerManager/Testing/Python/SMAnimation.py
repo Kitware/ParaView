@@ -24,6 +24,6 @@ amScene.Play()
 
 amScene.SetAnimationTime(69)
 if not SMPythonTesting.DoRegressionTesting():
+  # This will lead to VTK object leaks.
   sys.exit(1)
-
 
