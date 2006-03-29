@@ -33,7 +33,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPropertyAdaptor);
-vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.18");
+vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.19");
 
 //---------------------------------------------------------------------------
 vtkSMPropertyAdaptor::vtkSMPropertyAdaptor()
@@ -171,14 +171,14 @@ int vtkSMPropertyAdaptor::GetPropertyType()
     return vtkSMPropertyAdaptor::ENUMERATION;
     }
 
-  if (this->StringListDomain)
-    {
-    return vtkSMPropertyAdaptor::ENUMERATION;
-    }
-
   if (this->FileListDomain)
     {
     return vtkSMPropertyAdaptor::FILE_LIST;
+    }
+
+  if (this->StringListDomain)
+    {
+    return vtkSMPropertyAdaptor::ENUMERATION;
     }
 
   if (this->StringListRangeDomain)
