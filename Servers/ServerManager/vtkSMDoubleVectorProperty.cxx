@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.28");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.29");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -391,10 +391,7 @@ void vtkSMDoubleVectorProperty::Copy(vtkSMProperty* src)
     this->ImmediateUpdate = imUpdate;
     }
 
-  if (this->ImmediateUpdate)
-    {
-    this->Modified();
-    }
+  this->Modified();
 }
 
 //---------------------------------------------------------------------------

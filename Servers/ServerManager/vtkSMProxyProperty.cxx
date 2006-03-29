@@ -31,7 +31,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.28");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.29");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -606,10 +606,7 @@ void vtkSMProxyProperty::Copy(vtkSMProperty* src)
     this->ImmediateUpdate = imUpdate;
     }
 
-  if (this->ImmediateUpdate)
-    {
-    this->Modified();
-    }
+  this->Modified();
 }
 
 //---------------------------------------------------------------------------

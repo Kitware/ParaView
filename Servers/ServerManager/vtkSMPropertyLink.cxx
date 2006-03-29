@@ -26,7 +26,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMPropertyLink);
-vtkCxxRevisionMacro(vtkSMPropertyLink, "1.4");
+vtkCxxRevisionMacro(vtkSMPropertyLink, "1.5");
 //-----------------------------------------------------------------------------
 struct vtkSMPropertyLinkInternals
 {
@@ -159,13 +159,7 @@ void vtkSMPropertyLink::UpdateProperties(vtkSMProxy* fromProxy, const char* pnam
       if (toProp)
         {
         toProp->Copy(fromProp);
-        // Since vtkProperty::Copy does not trigger modified, 
-        // except on Immediate update properties, we do that 
-        // explicitly here.
-        if (!toProp->GetImmediateUpdate())
-          {
-          toProp->Modified();
-          }
+        toProp->Modified();
         }
       }
     }
