@@ -104,6 +104,7 @@ if __name__ == "__main__":
   if StateXMLFileName:
     if LoadServerManagerState(StateXMLFileName):
       pxm = vtkSMObject.GetProxyManager()
+      pxm.UpdateRegisteredProxies("sources", 0)
       pxm.UpdateRegisteredProxies(0)
       if DoRegressionTesting():
         ret = 0

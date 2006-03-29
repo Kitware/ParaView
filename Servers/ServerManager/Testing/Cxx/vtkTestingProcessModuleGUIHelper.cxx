@@ -30,7 +30,7 @@
 #include <vtksys/SystemTools.hxx>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkTestingProcessModuleGUIHelper, "1.1");
+vtkCxxRevisionMacro(vtkTestingProcessModuleGUIHelper, "1.2");
 vtkStandardNewMacro(vtkTestingProcessModuleGUIHelper);
 
 //----------------------------------------------------------------------------
@@ -81,7 +81,7 @@ int vtkTestingProcessModuleGUIHelper::RunGUIStart(int , char **,
 
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
   ifstream ifp;
-  ifp.open(options->GetSMStateXMLName());
+  ifp.open(options->GetSMStateXMLName(), ios::in | ios::binary);
 
   // get length of file.
   ifp.seekg(0, ios::end);
@@ -110,6 +110,7 @@ int vtkTestingProcessModuleGUIHelper::RunGUIStart(int , char **,
   parser->Delete();
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  pxm->UpdateRegisteredProxies("sources", 0);
   pxm->UpdateRegisteredProxies(0);
 
   vtkSMRenderModuleProxy* rm = vtkSMRenderModuleProxy::SafeDownCast(
@@ -117,25 +118,23 @@ int vtkTestingProcessModuleGUIHelper::RunGUIStart(int , char **,
   
   rm->StillRender();
 
-  vtkSMTesting* testing = vtkSMTesting::New();
-  if (options->GetBaselineImage())
+  if (options->GetBaselineImage() && options->GetTempDir())
     {
+    vtkSMTesting* testing = vtkSMTesting::New();
     testing->AddArgument("-V");
     testing->AddArgument(options->GetBaselineImage());
-    }
-  if (options->GetTempDir())
-    {
     testing->AddArgument("-T");
     testing->AddArgument(options->GetTempDir());
+    testing->SetRenderModuleProxy(rm);
+    if (testing->RegressionTest(options->GetThreshold()) != vtkTesting::PASSED)
+      {
+      vtkErrorMacro("Regression Test Failed!");
+      res = 1;
+      }
+    testing->Delete();
     }
-  
-  testing->SetRenderModuleProxy(rm);
-  if (testing->RegressionTest(options->GetThreshold()) != vtkTesting::PASSED)
-    {
-    vtkErrorMacro("Regression Test Failed!");
-    res = 1;
-    }
-  testing->Delete();
+  cout << "ERROR: Regression tests not performed since no baseline or temp directory "
+    "specified." << endl;
 
   this->ProcessModule->Exit();
 
