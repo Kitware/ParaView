@@ -12,6 +12,7 @@ DataDir = ""
 TempDir = ""
 BaselineImage = ""
 Threshold = 10.0
+SMStatesDir = ""
 StateXMLFileName = ""
 UseSavedStateForRegressionTests = False
 
@@ -27,6 +28,7 @@ def ProcessCommandLineArguments():
   global Threshold
   global StateXMLFileName
   global UseSavedStateForRegressionTests
+  global SMStatesDir
   global __ProcessedCommandLineArguments__
   if __ProcessedCommandLineArguments__:
     return
@@ -43,6 +45,8 @@ def ProcessCommandLineArguments():
       BaselineImage = value
     elif key == "-T":
       TempDir = value
+    elif key == "-S":
+      SMStatesDir = value
     elif key == "--threshold":
       Threshold = float(value)
     elif key == "--state":

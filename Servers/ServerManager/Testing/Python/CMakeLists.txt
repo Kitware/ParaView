@@ -39,6 +39,7 @@ ENDIF (PVServerManagerTestData)
 
 # Add python script names here.
 SET (PY_TESTS
+  SMAnimation
   )
 
 IF (PVServerManagerTestData)
@@ -48,7 +49,8 @@ IF (PVServerManagerTestData)
       ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
       -D ${PVServerManagerTestData}
       -T ${ParaView_BINARY_DIR}/Testing/Temporary
-      -V ${PVServerManagerTestData}/Baseline/${file}.png)
+      -V ${PVServerManagerTestData}/Baseline/${tfile}.png
+      -S ${SMSTATE_FILE_DIR})
   ENDFOREACH(tfile)
 ENDIF (PVServerManagerTestData)
 
