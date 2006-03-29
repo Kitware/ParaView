@@ -97,7 +97,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.41");
+vtkCxxRevisionMacro(vtkProcessModule, "1.42");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -1560,6 +1560,7 @@ void vtkProcessModule::PrintSelf(ostream& os, vtkIndent indent)
     << endl;
   os << indent << "SupportMultipleConnections: " << this->SupportMultipleConnections
     << endl;
+  os << indent << "UseMPI: " << this->UseMPI << endl;
  
   os << indent << "Interpreter: " ;
   if (this->Interpreter)
