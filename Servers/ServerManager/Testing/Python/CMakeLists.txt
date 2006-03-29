@@ -20,6 +20,17 @@ IF (PVServerManagerTestData)
       -V ${PVServerManagerTestData}/Baseline/${tfile}.png
       --state ${SMSTATE_FILE_DIR}/${tfile}.pvsm)
   ENDFOREACH (tfile)
+
+  # This is a test that saves a temporary SM state and uses that saved
+  # state for regression testing.
+  ADD_TEST("LoadSave-ServerManagerPython"
+      ${EXECUTABLE_OUTPUT_PATH}/pvpython
+      ${CMAKE_CURRENT_SOURCE_DIR}/SMPythonTesting.py
+      -D ${PVServerManagerTestData}
+      -T ${ParaView_BINARY_DIR}/Testing/Temporary
+      -V ${PVServerManagerTestData}/Baseline/Arrow.png
+      --state ${SMSTATE_FILE_DIR}/Arrow.pvsm
+      --use_saved_state)
 ENDIF (PVServerManagerTestData)
   
 ###############################################################################
@@ -32,7 +43,7 @@ SET (PY_TESTS
 
 IF (PVServerManagerTestData)
   FOREACH (tfile ${PY_TESTS})
-    ADD_TEST("$tfile}-ServerManagerPython"
+    ADD_TEST("${tfile}-ServerManagerPython"
       ${EXECUTABLE_OUTPUT_PATH}/pvpython
       ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
       -D ${PVServerManagerTestData}
