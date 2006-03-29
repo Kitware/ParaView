@@ -8,7 +8,7 @@
         command="SetFileName"
         animateable="1"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
    <!-- End DEMReader -->
@@ -20,7 +20,7 @@
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
    <!-- End MultiBlockDataReader -->
    </SourceProxy>
@@ -31,7 +31,7 @@
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
    <!-- End MultiGroupDataReader -->
    </SourceProxy>
@@ -42,7 +42,7 @@
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
    <!-- End HierarchicalDataReader -->
    </SourceProxy>
@@ -53,7 +53,7 @@
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
    <!-- End HierarchicalBoxDataReader -->
    </SourceProxy>
@@ -64,7 +64,7 @@
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
      <IntVectorProperty 
         name="TimeStepRangeInfo"
@@ -94,7 +94,7 @@
         command="SetFileName"
         animateable="1"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <StringVectorProperty 
@@ -148,7 +148,7 @@
         command="SetFileName"
         animateable="1"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <StringVectorProperty 
@@ -202,7 +202,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <StringVectorProperty 
@@ -256,7 +256,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <StringVectorProperty 
@@ -310,7 +310,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <StringVectorProperty 
@@ -364,7 +364,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <StringVectorProperty 
@@ -419,7 +419,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <StringVectorProperty 
@@ -473,7 +473,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <StringVectorProperty 
@@ -527,7 +527,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <StringVectorProperty 
@@ -581,7 +581,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <StringVectorProperty 
@@ -635,7 +635,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
    <!-- End legacyreader -->
    </SourceProxy>
@@ -647,7 +647,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-       <StringListDomain name="files"/>
+       <FileListDomain name="files"/>
      </StringVectorProperty>
    <!-- End pvtkfile -->
    </SourceProxy>
@@ -658,7 +658,7 @@
         name="CaseFileName"
         command="SetCaseFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <IntVectorProperty 
@@ -731,7 +731,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <StringVectorProperty 
@@ -770,7 +770,7 @@
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <DoubleVectorProperty 
@@ -869,7 +869,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
    <!-- End vrmlreader -->
    </SourceProxy>
@@ -880,7 +880,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
    <!-- End plyreader -->
    </SourceProxy>
@@ -891,7 +891,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
    <!-- End pdbreader -->
    </SourceProxy>
@@ -901,7 +901,7 @@
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <IntVectorProperty
@@ -921,7 +921,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <StringVectorProperty
@@ -929,7 +929,7 @@
         command="SetQFileName"
         animateable="1"
         number_of_elements="1">
-       <StringListDomain name="files"/>
+       <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <IntVectorProperty 
@@ -1023,7 +1023,7 @@
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <IntVectorProperty 
@@ -1058,7 +1058,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
    <!-- End stlreader -->
    </SourceProxy>
@@ -1069,7 +1069,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
    <!-- End stlreader -->
    </SourceProxy>
@@ -1080,7 +1080,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
       <DoubleVectorProperty
@@ -1107,7 +1107,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
       <DoubleVectorProperty
@@ -1142,7 +1142,7 @@
         name="CaseFileName"
         command="SetCaseFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <IntVectorProperty 
@@ -1215,7 +1215,7 @@
         name="FilePrefix"
         command="SetFilePrefix"
         number_of_elements="1">
-       <StringListDomain name="files"/>
+       <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <StringVectorProperty
@@ -1306,7 +1306,7 @@
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <StringVectorProperty 
@@ -1402,7 +1402,7 @@
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <StringVectorProperty 
@@ -1416,11 +1416,11 @@
         name="XMLFileName"
         command="SetXMLFileName"
         number_of_elements="1">
-       <StringListDomain name="default_value" optional="1">
+       <FileListDomain name="default_value" optional="1">
           <RequiredProperties>
              <Property name="XMLFileNameInfo" function="XMLFileName"/>
           </RequiredProperties>
-       </StringListDomain>
+       </FileListDomain>
      </StringVectorProperty>
 
      <StringVectorProperty 
@@ -1434,11 +1434,11 @@
         name="FilePrefix"
         command="SetFilePrefix"
         number_of_elements="1" >
-       <StringListDomain name="default_value" optional="1">
+       <FileListDomain name="default_value" optional="1">
           <RequiredProperties>
              <Property name="FilePrefixInfo" function="Prefix"/>
           </RequiredProperties>
-       </StringListDomain>
+       </FileListDomain>
      </StringVectorProperty>
 
      <StringVectorProperty 
@@ -1452,11 +1452,11 @@
         name="FilePattern"
         command="SetFilePattern"
         number_of_elements="1" >
-       <StringListDomain name="default_value" optional="1">
+       <FileListDomain name="default_value" optional="1">
           <RequiredProperties>
              <Property name="FilePatternInfo" function="Pattern"/>
           </RequiredProperties>
-       </StringListDomain>
+       </FileListDomain>
      </StringVectorProperty>
 
      <IntVectorProperty 
@@ -1721,7 +1721,7 @@
         name="FileName"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <StringVectorProperty 
@@ -1796,7 +1796,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
 
      <StringVectorProperty 
@@ -1850,7 +1850,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
    <!-- End Facet Reader -->
    </SourceProxy>
@@ -1862,7 +1862,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
    <!-- End Meta Image Reader -->
    </SourceProxy>
@@ -1874,7 +1874,7 @@
         animateable="1"
         command="SetFileName"
         number_of_elements="1">
-        <StringListDomain name="files"/>
+        <FileListDomain name="files"/>
      </StringVectorProperty>
    <!-- End PNGReader -->
    </SourceProxy>
