@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include <QListWidget>
 #include <QScrollArea>
+#include <QGroupBox>
 
 // VTK includes
 #include "QVTKWidget.h"
@@ -71,7 +72,7 @@ pqObjectEditor::pqObjectEditor(QWidget* p)
   qscroll->setObjectName("Object Editor Scroll");
   QWidget* w = new QWidget;
   w->setObjectName("Object Editor Panel");
-  w->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+  w->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
   qscroll->setWidgetResizable(true);
   qscroll->setWidget(w);
   this->PanelLayout = new QGridLayout(w);
@@ -143,6 +144,8 @@ void pqObjectEditor::createWidgets()
     {
     return;
     }
+
+  this->setUpdatesEnabled(false);
 
   int rowCount = 0;
 
@@ -248,25 +251,29 @@ void pqObjectEditor::createWidgets()
     else if(pt == pqSMAdaptor::MULTIPLE_ELEMENTS)
       {
       QList<QVariant> list_property = pqSMAdaptor::getMultipleElementProperty(this->Proxy, SMProperty);
-      QLabel* label = new QLabel(this->PanelLayout->parentWidget());
-      label->setText(iter->GetKey());
-      this->PanelLayout->addWidget(label, rowCount, 0, 1, 1);
-      QHBoxLayout* hlayout = new QHBoxLayout;
-      hlayout->setObjectName(iter->GetKey());
-      this->PanelLayout->addItem(hlayout, rowCount, 1, 1, 1);
+      QGroupBox* grpBox = new QGroupBox(iter->GetKey(), this->PanelLayout->parentWidget());
+      grpBox->setObjectName(iter->GetKey());
+      this->PanelLayout->addWidget(grpBox, rowCount, 0, 1, 2);
+      
+      QGridLayout* glayout = new QGridLayout(grpBox);
       
       int i=0;
       foreach(QVariant v, list_property)
         {
-        QLineEdit* lineEdit = new QLineEdit(this->PanelLayout->parentWidget());
+        QLabel* label = new QLabel(grpBox);
         QString num;
         num.setNum(i);
+        label->setText(num);
+        QLineEdit* lineEdit = new QLineEdit(grpBox);
         lineEdit->setObjectName(QString(iter->GetKey()) + QString(":") + num);
-        hlayout->addWidget(lineEdit);
+        
+        glayout->addWidget(label, i, 0, 1, 1);
+        glayout->addWidget(lineEdit, i, 1, 1, 1);
         lineEdit->show();
         i++;
         }
         rowCount++;
+      glayout->invalidate();
       }
     else if(pt == pqSMAdaptor::FILE_LIST)
       {
@@ -282,6 +289,9 @@ void pqObjectEditor::createWidgets()
     }
   iter->Delete();
   this->PanelLayout->addItem(new QSpacerItem(0,0,QSizePolicy::Expanding,QSizePolicy::Expanding), rowCount, 0, 1, 2);
+  this->PanelLayout->invalidate();
+  
+  this->setUpdatesEnabled(true);
 }
 
 static void pqObjectEditorDeleteWidgets(QLayoutItem* item)

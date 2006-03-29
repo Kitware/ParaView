@@ -405,6 +405,9 @@ void pqSMAdaptor::setSelectionProperty(vtkSMProxy* Proxy, vtkSMProperty* Propert
   adaptor->SetProperty(Property);
   if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::SELECTION)
     {
+
+    QList<QVariant> domain = pqSMAdaptor::getSelectionPropertyDomain(Property);
+
     foreach(QList<QVariant> l, Value)
       {
       if(l.size() < 2)
@@ -418,13 +421,25 @@ void pqSMAdaptor::setSelectionProperty(vtkSMProxy* Proxy, vtkSMProperty* Propert
         {
         value = value.toInt();
         }
+
+      for(int i=0; i<domain.size(); i++)
+        {
+        if(domain[i] == name)
+          {
+          adaptor->SetSelectionValue(i, value.toString().toAscii().data());
+          }
+        }
       
+      /*
       pqSMAdaptorInternal::SettingMultipleProperty = true;
       adaptor->SetRangeValue(0, name.toAscii().data());
       adaptor->SetRangeValue(1, value.toString().toAscii().data());
+      */
       Proxy->UpdateVTKObjects();
+      /*
       pqSMAdaptorInternal::SettingMultipleProperty = false;
       Property->Modified();  // let ourselves know it was modified, since we blocked it previously
+      */
       }
     }
   adaptor->Delete();
