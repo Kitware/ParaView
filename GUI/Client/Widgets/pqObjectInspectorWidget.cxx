@@ -275,8 +275,11 @@ void pqObjectInspectorWidget::setupCustomForm(vtkSMProxy* proxy, QWidget* w)
         adapter->linkPropertyTo(proxy, prop, 0, sb, "value");
         adapter->linkPropertyTo(sb, "value", SIGNAL(valueChanged(int)), proxy, prop, 0);
         QList<QVariant> range = adapter->getElementPropertyDomain(prop);
-        sb->setMinimum(range[0].toInt());
-        sb->setMaximum(range[1].toInt());
+        if(range.size() == 2)
+          {
+          sb->setMinimum(range[0].toInt());
+          sb->setMaximum(range[1].toInt());
+          }
         this->connect(sb, SIGNAL(valueChanged(int)), SLOT(updateDisplayForPropertyChanged()), Qt::QueuedConnection);
         }
       QListWidget* lw = qobject_cast<QListWidget*>(widgetProperty);
