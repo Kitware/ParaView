@@ -3,8 +3,9 @@
 from libvtkPVServerCommonPython import *
 from libvtkPVServerManagerPython import *
 
-import sys
+import os
 import re
+import sys
 
 __ProcessedCommandLineArguments__ = False
 DataDir = ""
@@ -12,6 +13,7 @@ TempDir = ""
 BaselineImage = ""
 Threshold = 10.0
 StateXMLFileName = ""
+UseSavedStateForRegressionTests = False
 
 def Error(message):
   print "ERROR: %s" % message
@@ -24,6 +26,7 @@ def ProcessCommandLineArguments():
   global BaselineImage
   global Threshold
   global StateXMLFileName
+  global UseSavedStateForRegressionTests
   global __ProcessedCommandLineArguments__
   if __ProcessedCommandLineArguments__:
     return
@@ -44,6 +47,9 @@ def ProcessCommandLineArguments():
       Threshold = float(value)
     elif key == "--state":
       StateXMLFileName = value
+    elif key == "--use_saved_state":
+      UseSavedStateForRegressionTests = True
+      index -= 1
     else:
       index -=1
   return
@@ -69,6 +75,9 @@ def LoadServerManagerState(filename):
   loader = vtkSMStateLoader()
   root = parser.GetRootElement()
   if loader.LoadState(root,0):
+    pxm = vtkSMObject.GetProxyManager()
+    pxm.UpdateRegisteredProxies("sources", 0)
+    pxm.UpdateRegisteredProxies(0)
     return True
   return Error("Failed to load state file %s" % filename)
 
@@ -99,13 +108,23 @@ def DoRegressionTesting():
   
   
 if __name__ == "__main__":
+  # This script loads the state, saves out a temp state and loads the saved state.
+  # This saved state is used for testing -- this will ensure load/save SM state
+  # is working fine.
   ProcessCommandLineArguments()
   ret = 1
   if StateXMLFileName:
     if LoadServerManagerState(StateXMLFileName):
       pxm = vtkSMObject.GetProxyManager()
-      pxm.UpdateRegisteredProxies("sources", 0)
-      pxm.UpdateRegisteredProxies(0)
+      if UseSavedStateForRegressionTests:
+        saved_state = os.path.join(TempDir, "temp.pvsm")
+        pxm.SaveState(saved_state)
+        pxm.UnRegisterProxies();
+        LoadServerManagerState(saved_state)
+        try:
+          os.remove(saved_state)
+        except:
+          pass
       if DoRegressionTesting():
         ret = 0
   else:
