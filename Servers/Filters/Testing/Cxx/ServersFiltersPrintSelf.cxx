@@ -88,7 +88,6 @@
 #include "vtkTiledDisplaySchedule.h"
 #include "vtkUpdateSuppressorPipeline.h"
 #include "vtkVRMLSource.h"
-#include "vtkWeightedRedistributePolyData.h"
 #include "vtkXMLCollectionReader.h"
 #include "vtkXMLPVAnimationWriter.h"
 #include "vtkXMLPVDWriter.h"
