@@ -1392,9 +1392,9 @@
   </Proxy>
   <Proxy group="sources" type="PhastaReader" id="505">
     <Property name="FileName" id="505.FileName" number_of_elements="1">
-      <Element index="0" value="/home/utkarsh/Kitware/PVEE/PVEE/ParaView/Data/Data/sonic.pht"/>
+      <Element index="0" value="${DataDir}/Data/sonic.pht"/>
       <Domain name="files" id="505.FileName.files">
-        <String text="/home/utkarsh/Kitware/PVEE/PVEE/ParaView/Data/Data/sonic.pht"/>
+        <String text="${DataDir}/Data/sonic.pht"/>
       </Domain>
     </Property>
     <Property name="TimeStep" id="505.TimeStep" number_of_elements="1">
