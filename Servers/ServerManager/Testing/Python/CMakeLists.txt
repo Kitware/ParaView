@@ -41,6 +41,7 @@ ENDIF (PVServerManagerTestData)
 SET (PY_TESTS
   SMAnimation
   ProxyPropertyLinks
+  SMTemporalDataAnalysisCellId
   )
 
 IF (PVServerManagerTestData)
