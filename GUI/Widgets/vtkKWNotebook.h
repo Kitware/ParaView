@@ -347,6 +347,7 @@ protected:
     int             Visibility;
     int             Pinned;
     int             Tag;
+    int             Enabled;
     char            *Title;
     vtkKWFrame      *Frame;
     vtkKWFrame      *TabFrame;

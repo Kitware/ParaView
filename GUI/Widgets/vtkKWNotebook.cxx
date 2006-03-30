@@ -58,7 +58,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.96");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.97");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -135,6 +135,7 @@ void vtkKWNotebook::Page::SetEnabled(int s)
     {
     this->ImageLabel->SetEnabled(s);
     }
+  this->Enabled = s;
 }
 
 //----------------------------------------------------------------------------
@@ -983,7 +984,7 @@ void vtkKWNotebook::RaisePage(const char *title, int tag)
 //----------------------------------------------------------------------------
 void vtkKWNotebook::RaisePage(vtkKWNotebook::Page *page)
 {
-  if (page == NULL || !this->IsCreated() || !page->GetEnabled())
+  if (page == NULL || !this->IsCreated())
     {
     return;
     }
@@ -1829,7 +1830,7 @@ void vtkKWNotebook::TogglePagePinned(const char *title, int tag)
 //----------------------------------------------------------------------------
 void vtkKWNotebook::TogglePagePinned(vtkKWNotebook::Page *page)
 {
-  if (page == NULL || !this->IsCreated() || !page->GetEnabled())
+  if (page == NULL || !this->IsCreated())
     {
     return;
     }
@@ -1936,30 +1937,22 @@ void vtkKWNotebook::SendEventForPage(unsigned long event, int id)
 //----------------------------------------------------------------------------
 void vtkKWNotebook::RaiseCallback(int id)
 {
-  vtkKWNotebook::Page *page = this->GetPage(id);
-  if (page && page->GetEnabled())
-    {
-    this->RaisePage(id);
-    this->SendEventForPage(vtkKWEvent::NotebookRaisePageEvent, id);
-    }
+  this->RaisePage(id);
+  this->SendEventForPage(vtkKWEvent::NotebookRaisePageEvent, id);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWNotebook::TogglePagePinnedCallback(int id)
 {
-  vtkKWNotebook::Page *page = this->GetPage(id);
-  if (page && page->GetEnabled())
-    {
-    this->TogglePagePinned(id);
+  this->TogglePagePinned(id);
 
-    if (this->GetPagePinned(id))
-      {
-      this->SendEventForPage(vtkKWEvent::NotebookPinPageEvent, id);
-      }
-    else
-      {
-      this->SendEventForPage(vtkKWEvent::NotebookUnpinPageEvent, id);
-      }
+  if (this->GetPagePinned(id))
+    {
+    this->SendEventForPage(vtkKWEvent::NotebookPinPageEvent, id);
+    }
+  else
+    {
+    this->SendEventForPage(vtkKWEvent::NotebookUnpinPageEvent, id);
     }
 }
 
@@ -1988,7 +1981,7 @@ void vtkKWNotebook::PageTabContextMenuCallback(int id, int x, int y)
 
   vtkKWNotebook::Page *page = this->GetPage(id);
 
-  if (page == NULL || !page->Visibility || !page->GetEnabled())
+  if (page == NULL || !page->Visibility)
     {
     return;
     }
@@ -2706,7 +2699,7 @@ void vtkKWNotebook::UpdateEnableState()
       {
       if (*it)
         {
-        (*it)->SetEnabled(this->GetEnabled());
+        (*it)->SetEnabled(this->GetEnabled() & (*it)->GetEnabled());
         if (this->GetEnabled())
           {
           this->BindPage(*it);
