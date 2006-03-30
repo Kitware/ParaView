@@ -58,7 +58,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.95");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.96");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -137,6 +137,16 @@ void vtkKWNotebook::Page::SetEnabled(int s)
     }
 }
 
+//----------------------------------------------------------------------------
+int vtkKWNotebook::Page::GetEnabled()
+{
+  if (this->Frame)
+    {
+    return this->Frame->GetEnabled();
+    }
+  return 0;
+}
+  
 //----------------------------------------------------------------------------
 vtkKWNotebook::vtkKWNotebook()
 {
@@ -973,7 +983,7 @@ void vtkKWNotebook::RaisePage(const char *title, int tag)
 //----------------------------------------------------------------------------
 void vtkKWNotebook::RaisePage(vtkKWNotebook::Page *page)
 {
-  if (page == NULL || !this->IsCreated())
+  if (page == NULL || !this->IsCreated() || !page->GetEnabled())
     {
     return;
     }
@@ -1503,6 +1513,36 @@ void vtkKWNotebook::HideAllPages()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWNotebook::SetPageEnabled(int id, int flag)
+{
+  this->SetPageEnabled(this->GetPage(id), flag);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::SetPageEnabled(const char *title, int flag)
+{
+  this->SetPageEnabled(this->GetPage(title), flag);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::SetPageEnabled(const char *title, int tag, int flag)
+{
+  this->SetPageEnabled(this->GetPage(title, tag), flag);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::SetPageEnabled(vtkKWNotebook::Page *page, int flag)
+{
+  if (page == NULL || !this->IsCreated() || 
+     !((page->GetEnabled()) ^ flag))
+    {
+    return;
+    }
+  
+  page->SetEnabled(flag);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWNotebook::ShowPagesMatchingTag(int tag)
 {
   if (this->Internals)
@@ -1789,7 +1829,7 @@ void vtkKWNotebook::TogglePagePinned(const char *title, int tag)
 //----------------------------------------------------------------------------
 void vtkKWNotebook::TogglePagePinned(vtkKWNotebook::Page *page)
 {
-  if (page == NULL || !this->IsCreated())
+  if (page == NULL || !this->IsCreated() || !page->GetEnabled())
     {
     return;
     }
@@ -1896,23 +1936,30 @@ void vtkKWNotebook::SendEventForPage(unsigned long event, int id)
 //----------------------------------------------------------------------------
 void vtkKWNotebook::RaiseCallback(int id)
 {
-  this->RaisePage(id);
-
-  this->SendEventForPage(vtkKWEvent::NotebookRaisePageEvent, id);
+  vtkKWNotebook::Page *page = this->GetPage(id);
+  if (page && page->GetEnabled())
+    {
+    this->RaisePage(id);
+    this->SendEventForPage(vtkKWEvent::NotebookRaisePageEvent, id);
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWNotebook::TogglePagePinnedCallback(int id)
 {
-  this->TogglePagePinned(id);
+  vtkKWNotebook::Page *page = this->GetPage(id);
+  if (page && page->GetEnabled())
+    {
+    this->TogglePagePinned(id);
 
-  if (this->GetPagePinned(id))
-    {
-    this->SendEventForPage(vtkKWEvent::NotebookPinPageEvent, id);
-    }
-  else
-    {
-    this->SendEventForPage(vtkKWEvent::NotebookUnpinPageEvent, id);
+    if (this->GetPagePinned(id))
+      {
+      this->SendEventForPage(vtkKWEvent::NotebookPinPageEvent, id);
+      }
+    else
+      {
+      this->SendEventForPage(vtkKWEvent::NotebookUnpinPageEvent, id);
+      }
     }
 }
 
@@ -1941,7 +1988,7 @@ void vtkKWNotebook::PageTabContextMenuCallback(int id, int x, int y)
 
   vtkKWNotebook::Page *page = this->GetPage(id);
 
-  if (page == NULL || !page->Visibility)
+  if (page == NULL || !page->Visibility || !page->GetEnabled())
     {
     return;
     }

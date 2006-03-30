@@ -151,6 +151,14 @@ public:
   void HideAllPages();
 
   // Description:
+  // Enable/Disable a tab. Note that this differs from show/hide a tab in the
+  // sense that the tab will still be visible but disabled. All tabs are 
+  // enabled by default.
+  void SetPageEnabled( int id, int flag);
+  void SetPageEnabled( const char *title, int flag);
+  void SetPageEnabled(const char *title, int tag, int fkag);
+  
+  // Description:
   // Return the number of visible pages in the notebook.
   unsigned int GetNumberOfVisiblePages();
   unsigned int GetNumberOfVisiblePagesMatchingTag(int tag);
@@ -333,6 +341,7 @@ protected:
   public:
     void Delete();
     void SetEnabled(int);
+    int  GetEnabled();
 
     int             Id;
     int             Visibility;
@@ -389,6 +398,7 @@ protected:
   const char* GetPageTitle(Page*);
   void BindPage(Page*);
   void UnBindPage(Page*);
+  void SetPageEnabled(Page*, int flag);
 
   int AddToMostRecentPages(Page*);
   int RemoveFromMostRecentPages(Page*);
