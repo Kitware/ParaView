@@ -163,7 +163,6 @@ void pqMultiView::removeView(QWidget* widget)
       // get sizes
       QList<int> sizes = parentSplitter->sizes();
       // in Qt 4.0.1, setParent has a side effect of calling XFlush, so we see some intermediate stuff
-      otherWidget->setParent(NULL);   
       splitter->setParent(NULL);
       parentSplitter->insertWidget(location, otherWidget);
       // restore sizes
