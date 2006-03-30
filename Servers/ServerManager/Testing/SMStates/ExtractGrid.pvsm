@@ -2135,9 +2135,9 @@
   </Proxy>
   <Proxy group="sources" type="legacyreader" id="924">
     <Property name="FileName" id="924.FileName" number_of_elements="1">
-      <Element index="0" value="/home/utkarsh/Kitware/PVEE/PVEE/ParaView/Data/Data/iron protein.vtk"/>
+      <Element index="0" value="${DataDir}/Data/iron protein.vtk"/>
       <Domain name="files" id="924.FileName.files">
-        <String text="/home/utkarsh/Kitware/PVEE/PVEE/ParaView/Data/Data/iron protein.vtk"/>
+        <String text="${DataDir}/Data/iron protein.vtk"/>
       </Domain>
     </Property>
   </Proxy>
