@@ -113,12 +113,38 @@ IF(BUILD_TESTING)
   SET(TEST_XML ${pqClient_SOURCE_DIR}/Testing/XML)
   SET(TEST_IMAGE ${PARAQ_DATA_ROOT}/Baseline)
 
-  ADD_TEST(pqClientStartup        ${TEST_BINARY} --exit)
-  ADD_TEST(pqClientAboutDialog    ${TEST_BINARY} --run-test ${TEST_XML}/AboutDialog.xml --exit)
-  ADD_TEST(pqClientFileDialog     ${TEST_BINARY} --run-test ${TEST_XML}/FileDialog.xml --exit)
-  ADD_TEST(pqClientCreateSource   ${TEST_BINARY} --run-test ${TEST_XML}/CreateSource.xml --compare-view ${TEST_IMAGE}/CreateSource.png)
+  SET (TESTS_WITH_BASELINES
+    CreateSource
+    CompoundProxy
+    )
+
+  SET (TESTS_WITHOUT_BASELINES
+    AboutDialog
+    FileDialog
+    )
+
   CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Testing/XML/filters.xml.in
                  ${CMAKE_CURRENT_BINARY_DIR}/Testing/XML/filters.xml COPYONLY)
-  ADD_TEST(pqClientCompoundProxy  ${TEST_BINARY} --run-test ${TEST_XML}/CompoundProxy.xml --exit)
+               
+  FOREACH(test ${TESTS_WITHOUT_BASELINES})
+    ADD_TEST(pqClient${test}
+      ${TEST_BINARY} --run-test ${TEST_XML}/${test}.xml --exit)
+  ENDFOREACH(test)
+   
+  FOREACH(test ${TESTS_WITH_BASELINES})
+    ADD_TEST(pqClient${test}
+      ${TEST_BINARY} --run-test ${TEST_XML}/${test}.xml 
+      --compare-view ${TEST_IMAGE}/${test}.png
+      --exit)
+  ENDFOREACH(test) 
+  
+
+# ADD_TEST(pqClientStartup        ${TEST_BINARY} --exit)
+# ADD_TEST(pqClientAboutDialog    ${TEST_BINARY} --run-test ${TEST_XML}/AboutDialog.xml --exit)
+# ADD_TEST(pqClientFileDialog     ${TEST_BINARY} --run-test ${TEST_XML}/FileDialog.xml --exit)
+# ADD_TEST(pqClientCreateSource   ${TEST_BINARY} --run-test ${TEST_XML}/CreateSource.xml --compare-view ${TEST_IMAGE}/CreateSource.png)
+# ADD_TEST(pqClientCompoundProxy  ${TEST_BINARY} --run-test ${TEST_XML}/CompoundProxy.xml 
+#   --compare-view ${TEST_IMAGE}/CompoundProxy.png
+#   --exit)
 ENDIF(BUILD_TESTING)
 
