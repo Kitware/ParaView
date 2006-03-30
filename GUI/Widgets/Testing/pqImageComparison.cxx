@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageDifference.h>
 #include <vtkImageShiftScale.h>
 #include <vtkRenderWindow.h>
+#include <vtkTesting.h>
 
 #include <QDir>
 #include <QFileInfo>
@@ -86,83 +87,19 @@ bool pqImageComparison::SaveScreenshot(vtkRenderWindow* RenderWindow, const QStr
   return success;
 }
 
-bool pqImageComparison::CompareImage(vtkRenderWindow* RenderWindow, const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory)
+bool pqImageComparison::CompareImage(vtkRenderWindow* RenderWindow, 
+  const QString& ReferenceImage, double Threshold, 
+  ostream& vtkNotUsed(Output), const QString& TempDirectory)
 {
-  // Verify the reference image exists
-  if(!QFileInfo(ReferenceImage).exists())
+  vtkSmartPointer<vtkTesting> testing = vtkSmartPointer<vtkTesting>::New();
+  testing->AddArgument("-T");
+  testing->AddArgument(TempDirectory.toAscii().data());
+  testing->AddArgument("-V");
+  testing->AddArgument(ReferenceImage.toAscii().data());
+  testing->SetRenderWindow(RenderWindow);
+  if (testing->RegressionTest(Threshold) == vtkTesting::PASSED)
     {
-    Output << "<DartMeasurement name=\"ImageNotFound\" type=\"text/string\">";
-    Output << ReferenceImage.toAscii().data();
-    Output << "</DartMeasurement>" << endl;
-
-    return false;
-    }
-
-  // Load the reference image
-  vtkSmartPointer<vtkPNGReader> reference_image = vtkSmartPointer<vtkPNGReader>::New();
-  reference_image->SetFileName(ReferenceImage.toAscii().data()); 
-  reference_image->Update();
-  
-  // Get a screenshot
-  vtkSmartPointer<vtkWindowToImageFilter> screenshot = vtkSmartPointer<vtkWindowToImageFilter>::New();
-  screenshot->SetInput(RenderWindow);
-  screenshot->Update();
-
-  // Compute the difference between the reference image and the screenshot
-  vtkSmartPointer<vtkImageDifference> difference = vtkSmartPointer<vtkImageDifference>::New();
-  difference->SetInput(screenshot->GetOutput());
-  difference->SetImage(reference_image->GetOutput());
-  difference->Update();
-
-  Output << "<DartMeasurement name=\"ImageError\" type=\"numeric/double\">";
-  Output << difference->GetThresholdedError();
-  Output << "</DartMeasurement>" << endl;
-
-  Output << "<DartMeasurement name=\"ImageThreshold\" type=\"numeric/double\">";
-  Output << Threshold;
-  Output << "</DartMeasurement>" << endl;
-
-  // If the difference didn't exceed the threshold, we're done
-  if(difference->GetThresholdedError() <= Threshold)
     return true;
-
-  // Write the reference image to a file
-  const QString reference_file = QDir(TempDirectory).filePath(QFileInfo(ReferenceImage).baseName() + ".reference.png");
-  vtkSmartPointer<vtkPNGWriter> reference_writer = vtkSmartPointer<vtkPNGWriter>::New();
-  reference_writer->SetInput(reference_image->GetOutput());
-  reference_writer->SetFileName(reference_file.toAscii().data());
-  reference_writer->Write();
-
-  // Write the screenshot to a file
-  const QString screenshot_file = QDir(TempDirectory).filePath(QFileInfo(ReferenceImage).baseName() + ".screenshot.png");
-  vtkSmartPointer<vtkPNGWriter> screenshot_writer = vtkSmartPointer<vtkPNGWriter>::New();
-  screenshot_writer->SetInput(screenshot->GetOutput());
-  screenshot_writer->SetFileName(screenshot_file.toAscii().data());
-  screenshot_writer->Write();
-
-  // Write the difference to a file, increasing the contrast to make discrepancies stand out
-  vtkSmartPointer<vtkImageShiftScale> scale_image = vtkSmartPointer<vtkImageShiftScale>::New();
-  scale_image->SetShift(0);
-  scale_image->SetScale(10);
-  scale_image->SetInput(difference->GetOutput());
-  
-  const QString difference_file = QDir(TempDirectory).filePath(QFileInfo(ReferenceImage).baseName() + ".difference.png");
-  vtkSmartPointer<vtkPNGWriter> difference_writer = vtkSmartPointer<vtkPNGWriter>::New();
-  difference_writer->SetInput(scale_image->GetOutput());
-  difference_writer->SetFileName(difference_file.toAscii().data());
-  difference_writer->Write();
-
-  Output << "<DartMeasurementFile name=\"ValidImage\" type=\"image/jpeg\">";
-  Output << reference_file.toAscii().data();
-  Output << "</DartMeasurementFile>" << endl;
- 
-  Output << "<DartMeasurementFile name=\"TestImage\" type=\"image/jpeg\">";
-  Output << screenshot_file.toAscii().data();
-  Output << "</DartMeasurementFile>" << endl;
-  
-  Output << "<DartMeasurementFile name=\"DifferenceImage\" type=\"image/jpeg\">";
-  Output << difference_file.toAscii().data();
-  Output << "</DartMeasurementFile>" << endl;
-
+    }
   return false;
 }

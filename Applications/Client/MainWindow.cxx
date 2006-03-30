@@ -730,9 +730,22 @@ bool MainWindow::compareView(const QString& ReferenceImage, double Threshold, os
     this->ActiveView ? qobject_cast<QVTKWidget*>(this->ActiveView->mainWidget())->GetRenderWindow() : 0;
     
   if(!render_window)
+    {
+    Output << "ERROR: Could not locate the Render Window." << endl;
     return false;
-    
-  return pqImageComparison::CompareImage(render_window, ReferenceImage, Threshold, Output, TempDirectory);
+    }
+
+  // All tests need a 300x300 render window size.
+  int size[2];
+  int *cur_size = render_window->GetSize();
+  size[0] = cur_size[0];
+  size[1] = cur_size[1];
+  render_window->SetSize(300, 300);
+  bool ret = pqImageComparison::CompareImage(render_window, ReferenceImage, 
+    Threshold, Output, TempDirectory);
+  render_window->SetSize(size);
+  render_window->Render();
+  return ret;
 }
 
 void MainWindow::onServerConnect()
@@ -1030,7 +1043,10 @@ void MainWindow::onNewQVTKWidget(pqMultiViewFrame* frame)
     QObject::connect(frame, SIGNAL(activeChanged(bool)), sm, SLOT(map()));
     QObject::connect(sm, SIGNAL(mapped(QWidget*)), this, SLOT(onFrameActive(QWidget*)));
 
-    //frame->setActive(1);
+    if (!this->ActiveView)
+      {
+      frame->setActive(1);
+      }
     }
 }
 
