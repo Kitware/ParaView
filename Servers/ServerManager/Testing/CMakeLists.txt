@@ -11,6 +11,7 @@ SET (SMSTATE_FILES
   CalcInput
   # ClipCut
   DataAnalysisLinePlot
+  TestPHT
   )
 
 # Path to the state files.
