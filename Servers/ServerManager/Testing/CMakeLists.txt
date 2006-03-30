@@ -11,6 +11,7 @@ SET (SMSTATE_FILES
   CalcInput
   # ClipCut
   DataAnalysisLinePlot
+  ExtractGrid
   TestPHT
   )
 
