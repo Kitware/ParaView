@@ -1771,11 +1771,11 @@
       <Domain name="array_list" id="505.CellArrayStatus.array_list"/>
     </Property>
     <Property name="FileName" id="505.FileName" number_of_elements="1">
-      <Element index="0" value="/home/utkarsh/Kitware/ParaView/ParaView/Data/Data/multicomb_0.vts"/>
+      <Element index="0" value="${DataDir}/Data/multicomb_0.vts"/>
       <Domain name="files" id="505.FileName.files">
-        <String text="/home/utkarsh/Kitware/ParaView/ParaView/Data/Data/multicomb_0.vts"/>
-        <String text="/home/utkarsh/Kitware/ParaView/ParaView/Data/Data/multicomb_1.vts"/>
-        <String text="/home/utkarsh/Kitware/ParaView/ParaView/Data/Data/multicomb_2.vts"/>
+        <String text="${DataDir}/Data/multicomb_0.vts"/>
+        <String text="${DataDir}/Data/multicomb_1.vts"/>
+        <String text="${DataDir}/Data/multicomb_2.vts"/>
       </Domain>
     </Property>
     <Property name="PointArrayInfo" id="505.PointArrayInfo" number_of_elements="6">
