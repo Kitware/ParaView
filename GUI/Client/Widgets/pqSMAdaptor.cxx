@@ -790,6 +790,7 @@ QList<QVariant> pqSMAdaptor::getMultipleElementPropertyDomain(vtkSMProperty* Pro
 
 QString pqSMAdaptor::getFileListProperty(vtkSMProxy* Proxy, vtkSMProperty* Property)
 {
+  Proxy->UpdatePropertyInformation(Property);
   QString file;
   vtkSMPropertyAdaptor* adaptor = vtkSMPropertyAdaptor::New();
   adaptor->SetProperty(Property);
@@ -810,6 +811,7 @@ void pqSMAdaptor::setFileListProperty(vtkSMProxy* Proxy, vtkSMProperty* Property
     adaptor->SetRangeValue(0, Value.toAscii().data());
     }
   adaptor->Delete();
+  Proxy->UpdateVTKObjects();
 }
 
 
