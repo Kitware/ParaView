@@ -117,8 +117,8 @@ IF(BUILD_TESTING)
   ADD_TEST(pqClientAboutDialog    ${TEST_BINARY} --run-test ${TEST_XML}/AboutDialog.xml --exit)
   ADD_TEST(pqClientFileDialog     ${TEST_BINARY} --run-test ${TEST_XML}/FileDialog.xml --exit)
   ADD_TEST(pqClientCreateSource   ${TEST_BINARY} --run-test ${TEST_XML}/CreateSource.xml --compare-view ${TEST_IMAGE}/CreateSource.png)
-  CONFIGURE_FILE(${pqClient_SOURCE_DIR}/Testing/XML/filters.xml
-                 ${pqClient_BINARY_DIR}/Testing/XML/filters.xml COPYONLY)
+  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Testing/XML/filters.xml.in
+                 ${CMAKE_CURRENT_BINARY_DIR}/Testing/XML/filters.xml COPYONLY)
   ADD_TEST(pqClientCompoundProxy  ${TEST_BINARY} --run-test ${TEST_XML}/CompoundProxy.xml --exit)
 ENDIF(BUILD_TESTING)
 
