@@ -97,7 +97,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.42");
+vtkCxxRevisionMacro(vtkProcessModule, "1.43");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -767,20 +767,28 @@ void vtkProcessModule::InitializeInterpreter()
   if(getenv("VTK_CLIENT_SERVER_LOG"))
     {
     needLog = true;
-    if(this->Options->GetClientMode())
+    if (!this->Options)
       {
-      needLog = false;
-      this->GetInterpreter()->SetLogFile("paraviewClient.log");
+      vtkErrorMacro("Options must be set before calling "
+        "InitializeInterpreter().");
       }
-    if(this->Options->GetServerMode())
+    else
       {
-      needLog = false;
-      this->GetInterpreter()->SetLogFile("paraviewServer.log");
-      }
-    if(this->Options->GetRenderServerMode())
-      {
-      needLog = false;
-      this->GetInterpreter()->SetLogFile("paraviewRenderServer.log");
+      if(this->Options->GetClientMode())
+        {
+        needLog = false;
+        this->GetInterpreter()->SetLogFile("paraviewClient.log");
+        }
+      if(this->Options->GetServerMode())
+        {
+        needLog = false;
+        this->GetInterpreter()->SetLogFile("paraviewServer.log");
+        }
+      if(this->Options->GetRenderServerMode())
+        {
+        needLog = false;
+        this->GetInterpreter()->SetLogFile("paraviewRenderServer.log");
+        }
       }
     } 
   if(needLog)
