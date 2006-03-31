@@ -33,7 +33,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPropertyAdaptor);
-vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.19");
+vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.20");
 
 //---------------------------------------------------------------------------
 vtkSMPropertyAdaptor::vtkSMPropertyAdaptor()
@@ -633,13 +633,27 @@ int vtkSMPropertyAdaptor::SetSelectionValue(unsigned int idx, const char* value)
         {
         return 0;
         }
-      for(unsigned int i=0; i<numElems; i+=2)
+      unsigned int i;
+      for(i=0; i<numElems; i+=2)
         {
         if (strcmp(this->StringVectorProperty->GetElement(i), name)==0)
           {
           return this->StringVectorProperty->SetElement(i+1, value);
           }
         }
+      // If we didn't find the name, find the first empty spot
+      for(i=0; i<numElems; i+=2)
+        {
+        const char* elem = this->StringVectorProperty->GetElement(i);
+        if (!elem || elem[0] == '\0')
+          {
+          this->StringVectorProperty->SetElement(i, name);
+          return this->StringVectorProperty->SetElement(i+1, value);
+          }
+        }
+      // If we didn't find any empty spots, append to the vector
+      this->StringVectorProperty->SetElement(numElems, name);
+      return this->StringVectorProperty->SetElement(numElems+1, value);
       }
     }
   return 0;
