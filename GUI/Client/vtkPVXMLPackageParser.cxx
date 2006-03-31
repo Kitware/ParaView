@@ -38,7 +38,7 @@
 #include <ctype.h>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.53");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.53.2.1");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -600,6 +600,7 @@ int vtkPVXMLPackageParser::ParseVTKFilter(vtkPVXMLElement* filterElement,
     }
 
   // Loop over inputs of filter.
+  int numMultiple = 0;
   unsigned int filterIdx;
   for(filterIdx=0; filterIdx < filterElement->GetNumberOfNestedElements(); ++filterIdx)
     {
@@ -632,14 +633,14 @@ int vtkPVXMLPackageParser::ParseVTKFilter(vtkPVXMLElement* filterElement,
         if (strcmp(quantityAttr, "Multiple") == 0 ||
             strcmp(quantityAttr, "multiple") == 0)
           {
+          numMultiple++;
           pvm->SetVTKMultipleInputsFlag(1);
           }
         }
 
       // We allow only one input with quantity "Multiple".
       // Let the user know of a violation.
-      if (pvm->GetVTKMultipleInputsFlag() &&
-          pvm->GetNumberOfInputProperties() > 1)
+      if (numMultiple > 1)
         {
         vtkWarningMacro("Only one 'multiple' input is allowed. " << classAttr);
         return 0;
