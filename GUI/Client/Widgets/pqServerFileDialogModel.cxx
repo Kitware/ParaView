@@ -105,8 +105,8 @@ class pqFileModel :
   public QAbstractItemModel
 {
 public:
-  pqFileModel(vtkProcessModule* processModule) :
-    ProcessModule(processModule)
+  pqFileModel() :
+    ProcessModule(vtkProcessModule::GetProcessModule())
   {
   } 
 
@@ -269,8 +269,8 @@ class pqFavoriteModel :
   public QAbstractItemModel
 {
 public:
-  pqFavoriteModel(vtkProcessModule* processModule) :
-    ProcessModule(processModule)
+  pqFavoriteModel() :
+    ProcessModule(vtkProcessModule::GetProcessModule())
   {
     vtkClientServerStream stream;
     const vtkClientServerID ID = this->ProcessModule->NewStreamObject("vtkPVServerFileListing", stream);
@@ -416,9 +416,9 @@ public:
 class pqServerFileDialogModel::pqImplementation
 {
 public:
-  pqImplementation(vtkProcessModule* processModule) :
-    FileModel(new pqFileModel(processModule)),
-    FavoriteModel(new pqFavoriteModel(processModule))
+  pqImplementation() :
+    FileModel(new pqFileModel()),
+    FavoriteModel(new pqFavoriteModel())
   {
   }
   
@@ -435,9 +435,9 @@ public:
 //////////////////////////////////////////////////////////////////////////
 // pqServerFileDialogModel
 
-pqServerFileDialogModel::pqServerFileDialogModel(vtkProcessModule* ProcessModule, QObject* Parent) :
+pqServerFileDialogModel::pqServerFileDialogModel(QObject* Parent) :
   base(Parent),
-  Implementation(new pqImplementation(ProcessModule))
+  Implementation(new pqImplementation())
 {
 }
 

@@ -640,7 +640,7 @@ void pqMainWindow::onFileOpen(pqServer* Server)
   if(this->Implementation->CurrentServer != Server)
     setServer(Server);
 
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(this->Implementation->CurrentServer->GetProcessModule()), tr("Open File:"), this, "fileOpenDialog");
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(), tr("Open File:"), this, "fileOpenDialog");
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileOpen(const QStringList&)));
   file_dialog->show();

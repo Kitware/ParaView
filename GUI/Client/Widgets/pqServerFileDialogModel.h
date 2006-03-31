@@ -47,7 +47,7 @@ class PQWIDGETS_EXPORT pqServerFileDialogModel :
   Q_OBJECT
 
 public:
-  pqServerFileDialogModel(vtkProcessModule* ProcessModule, QObject* Parent = 0);
+  pqServerFileDialogModel(QObject* Parent = 0);
   ~pqServerFileDialogModel();
 
   QString getStartPath();
