@@ -1,6 +1,20 @@
 PROJECT(pqWidgets)
 
+IF(PARAQ_EMBED_PYTHON)
+  FIND_PACKAGE(PythonLibs)
+
+  SET(PYTHON_LINK_LIBRARIES
+    pqPython
+    QtPython
+    vtkPVServerCommonPythonD
+    vtkPVServerManagerPythonD
+    ${PYTHON_LIBRARIES}
+  )
+ENDIF(PARAQ_EMBED_PYTHON)
+
 INCLUDE_DIRECTORIES(
+  ${QtPython_BINARY_DIR}
+  ${QtPython_SOURCE_DIR}
   ${pqWidgets_BINARY_DIR}
   ${pqWidgets_SOURCE_DIR}
 )
@@ -20,16 +34,13 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqMultiViewFrame.h
   pqMultiViewManager.h
   pqObjectEditor.h
-  pqObjectHistogramWidget.h
   pqObjectInspector.h
   pqObjectInspectorItem.h
   pqObjectInspectorWidget.h
-  pqObjectLineChartWidget.h
   pqPicking.h
   pqPipelineData.h
   pqPipelineListModel.h
   pqPipelineListWidget.h
-  pqPlayControlsWidget.h
   pqSMAdaptor.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
@@ -88,16 +99,12 @@ ADD_LIBRARY(pqWidgets
   pqNameCount.h
   pqObjectEditor.cxx
   pqObjectEditor.h
-  pqObjectHistogramWidget.cxx
-  pqObjectHistogramWidget.h
   pqObjectInspector.cxx
   pqObjectInspector.h
   pqObjectInspectorItem.cxx
   pqObjectInspectorItem.h
   pqObjectInspectorWidget.cxx
   pqObjectInspectorWidget.h
-  pqObjectLineChartWidget.cxx
-  pqObjectLineChartWidget.h
   pqOptions.cxx
   pqOptions.h
   pqParts.cxx
@@ -116,8 +123,6 @@ ADD_LIBRARY(pqWidgets
   pqPipelineServer.h
   pqPipelineWindow.cxx
   pqPipelineWindow.h
-  pqPlayControlsWidget.cxx
-  pqPlayControlsWidget.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
   pqSMAdaptor.cxx
@@ -152,9 +157,11 @@ ADD_LIBRARY(pqWidgets
 
 TARGET_LINK_LIBRARIES(pqWidgets
   QtChart
+  QtTesting
   QtWidgets
   vtkPVServerManager
   QVTK
+  ${PYTHON_LINK_LIBRARIES}
 )
 
 IF(BUILD_TESTING)

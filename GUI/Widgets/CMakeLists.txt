@@ -34,6 +34,8 @@ SET(QtWidgets_SRCS
   pqFileDialogModel.h
   pqLocalFileDialogModel.cxx
   pqLocalFileDialogModel.h
+  pqPlayControlsWidget.cxx
+  pqPlayControlsWidget.h
   pqSetData.cxx
   pqSetData.h
   pqSetName.cxx
@@ -52,6 +54,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqFileDialog.h
   pqFileDialogModel.h
   pqLocalFileDialogModel.h
+  pqPlayControlsWidget.h
 )
 
 ##########################################################################

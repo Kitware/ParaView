@@ -2,8 +2,8 @@
  <author></author>
  <comment></comment>
  <exportmacro></exportmacro>
- <class>PythonDialog</class>
- <widget class="QDialog" name="PythonDialog" >
+ <class>pqPythonDialog</class>
+ <widget class="QDialog" name="pqPythonDialog" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -85,7 +85,7 @@
   <connection>
    <sender>closeButton</sender>
    <signal>clicked()</signal>
-   <receiver>PythonDialog</receiver>
+   <receiver>pqPythonDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel" >

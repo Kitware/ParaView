@@ -30,32 +30,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _PythonDialog_h
-#define _PythonDialog_h
+#ifndef _pqPythonDialog_h
+#define _pqPythonDialog_h
 
+#include "QtPythonExport.h"
 #include <QDialog>
 
 /// Provides an about dialog
-class PythonDialog :
+class QTPYTHON_EXPORT pqPythonDialog :
   public QDialog
 {
   Q_OBJECT
 
 public:
-  PythonDialog(QWidget* Parent);
+  pqPythonDialog(QWidget* Parent);
   
 private slots:
   void accept();
   void reject();
 
 private:
-  ~PythonDialog();
-  PythonDialog(const PythonDialog&);
-  PythonDialog& operator=(const PythonDialog&);
+  ~pqPythonDialog();
+  pqPythonDialog(const pqPythonDialog&);
+  pqPythonDialog& operator=(const pqPythonDialog&);
   
   struct pqImplementation;
   pqImplementation* const Implementation;
 };
 
-#endif // !_PythonDialog_h
+#endif // !_pqPythonDialog_h
 

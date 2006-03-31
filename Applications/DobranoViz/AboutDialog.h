@@ -30,49 +30,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqObjectLineChartWidget_h
-#define _pqObjectLineChartWidget_h
+#ifndef _AboutDialog_h
+#define _AboutDialog_h
 
-#include "pqVariableType.h"
-#include "pqWidgetsExport.h"
-#include <QWidget>
+#include "ui_AboutDialog.h"
 
-class pqServer;
-class vtkCommand;
-class vtkObject;
-class vtkSMProxy;
-class vtkUnstructuredGrid;
-
-/// Displays a histogram based on data from a single proxy
-class PQWIDGETS_EXPORT pqObjectLineChartWidget :
-  public QWidget
+/// Provides an about dialog
+class AboutDialog :
+  public QDialog
 {
   Q_OBJECT
-  
+
 public:
-  pqObjectLineChartWidget(QWidget* parent);
-  ~pqObjectLineChartWidget();
-
-public slots:
-  /// Call this to set the current server
-  void setServer(pqServer*);
-  /// Call this to set the proxy that will become the data source
-  void setProxy(vtkSMProxy*);
-  /// Call this to set the current variable
-  void setVariable(pqVariableType, const QString&);
-  /// Call this to clear the set of elements
-  void clear();
-  /// Call this to add a collection of element IDs to the set of elements
-  void addElements(vtkUnstructuredGrid* Elements);
-  /// Call this to set the collection of element IDs
-  void setElements(vtkUnstructuredGrid* Elements);
-
-private slots:
-  void onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*);
+  AboutDialog(QWidget* Parent);
 
 private:
-  struct pqImplementation;
-  pqImplementation* const Implementation;
+  ~AboutDialog();
+  AboutDialog(const AboutDialog&);
+  AboutDialog& operator=(const AboutDialog&);
+  
+  Ui::AboutDialog Ui;
+  
+private slots:
+  void accept();
+  void reject();
 };
 
-#endif
+#endif // !_AboutDialog_h
+

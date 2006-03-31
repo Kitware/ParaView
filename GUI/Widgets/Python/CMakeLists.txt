@@ -12,20 +12,28 @@ INCLUDE_DIRECTORIES(
 GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 
-QT4_WRAP_CPP(MOC_BUILT_SOURCES
+QT4_WRAP_CPP(QtPython_MOC_BUILT_SOURCES
+  pqPythonDialog.h
   pqPythonShell.h
   pqPythonStream.h
+)
+
+QT4_WRAP_UI(QtPython_UI_BUILT_SOURCES
+  pqPythonDialog.ui
 )
 
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
 ADD_LIBRARY(QtPython
+  pqPythonDialog.cxx
+  pqPythonDialog.h
   pqPythonShell.cxx
   pqPythonShell.h
   pqPythonStream.cxx
   pqPythonStream.h
   QtPythonExport.h
-  ${MOC_BUILT_SOURCES}
+  ${QtPython_MOC_BUILT_SOURCES}
+  ${QtPython_UI_BUILT_SOURCES}
 )
 
 TARGET_LINK_LIBRARIES(QtPython
@@ -41,6 +49,7 @@ CONFIGURE_FILE(
 )
 
 SOURCE_GROUP("Generated Files" FILES
-  ${MOC_BUILT_SOURCES}
+  ${QtPython_MOC_BUILT_SOURCES}
+  ${QtPython_UI_BUILT_SOURCES}
 )
 

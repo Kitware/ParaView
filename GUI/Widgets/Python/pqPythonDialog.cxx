@@ -30,45 +30,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqObjectHistogramWidget_h
-#define _pqObjectHistogramWidget_h
+#include "pqPythonDialog.h"
+#include "ui_pqPythonDialog.h"
 
-#include "pqVariableType.h"
-#include "pqWidgetsExport.h"
-#include <QWidget>
+//////////////////////////////////////////////////////////////////////
+// pqPythonDialog::pqImplementation
 
-class pqServer;
-class vtkCommand;
-class vtkObject;
-class vtkSMProxy;
-
-/// Displays a histogram based on data from a single proxy
-class PQWIDGETS_EXPORT pqObjectHistogramWidget :
-  public QWidget
+struct pqPythonDialog::pqImplementation
 {
-  Q_OBJECT
-  
-public:
-  pqObjectHistogramWidget(QWidget* parent);
-  ~pqObjectHistogramWidget();
-
-public slots:
-  /// Call this to set the current server
-  void setServer(pqServer*);
-  /// Call this to set the proxy that will become the data source
-  void setProxy(vtkSMProxy*);
-  /// Call this to set the current variable type and variable name
-  void setVariable(pqVariableType type, const QString& name);
-  /// Call this to set the current bin count (defaults to 10)
-  void setBinCount(unsigned long Count);
-
-private slots:
-  void onInputChanged(vtkObject*,unsigned long, void*, void*, vtkCommand*);
-  void onBinCountChanged(int);
-
-private:
-  struct pqImplementation;
-  pqImplementation* const Implementation;
+  Ui::pqPythonDialog Ui;
 };
 
-#endif
+pqPythonDialog::pqPythonDialog(QWidget* Parent) :
+  QDialog(Parent),
+  Implementation(new pqImplementation())
+{
+  this->Implementation->Ui.setupUi(this);
+  this->setObjectName("pythonDialog");
+  this->setWindowTitle(tr("Python Shell"));
+}
+
+pqPythonDialog::~pqPythonDialog()
+{
+  delete Implementation;
+}
+
+void pqPythonDialog::accept()
+{
+  QDialog::accept();
+  delete this;
+}
+
+void pqPythonDialog::reject()
+{
+  QDialog::reject();
+  delete this;
+}
+

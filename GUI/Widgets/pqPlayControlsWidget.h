@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    $RCS $
+   Module:    pqPlayControlsWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,40 +30,54 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "PythonDialog.h"
-#include "ui_PythonDialog.h"
+#ifndef _pqPlayControlsWidget_h
+#define _pqPlayControlsWidget_h
 
-//////////////////////////////////////////////////////////////////////
-// PythonDialog::pqImplementation
+#include "QtWidgetsExport.h"
 
-struct PythonDialog::pqImplementation
+#include "qwidget.h"
+
+class QHBoxLayout;
+class QToolButton;
+
+class QTWIDGETS_EXPORT pqPlayControlsWidget :
+  public QWidget
 {
-  Ui::PythonDialog Ui;
+  Q_OBJECT
+
+public:
+  pqPlayControlsWidget(QWidget *parent);
+  ~pqPlayControlsWidget();
+
+signals:
+  void play();
+  void pause();
+  void forward();
+  void back();
+  void first();
+  void last();
+
+  void showTip(const QString&);
+  void removeTip();
+
+private: 
+  enum {
+    FIRST,
+    BACK,
+    FORWARD,
+    LAST,
+//    PAUSE,
+//    PLAY,
+    NUM_BUTTONS
+  };
+
+  static const char *Name[NUM_BUTTONS];
+  static const char *Image[NUM_BUTTONS];
+
+  QToolButton *Button[NUM_BUTTONS];
+  QHBoxLayout *Layout;
 };
 
-PythonDialog::PythonDialog(QWidget* Parent) :
-  QDialog(Parent),
-  Implementation(new pqImplementation())
-{
-  this->Implementation->Ui.setupUi(this);
-  this->setObjectName("pythonDialog");
-  this->setWindowTitle(tr("Python Shell"));
-}
+#endif
 
-PythonDialog::~PythonDialog()
-{
-  delete Implementation;
-}
-
-void PythonDialog::accept()
-{
-  QDialog::accept();
-  delete this;
-}
-
-void PythonDialog::reject()
-{
-  QDialog::reject();
-  delete this;
-}
 

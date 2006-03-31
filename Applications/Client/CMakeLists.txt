@@ -1,31 +1,5 @@
 PROJECT(pqClient)
 
-IF(PARAQ_EMBED_PYTHON)
-  FIND_PACKAGE(PythonLibs)
-
-  SET(PYTHON_INCLUDE_DIRECTORIES
-    ${QtPython_BINARY_DIR}
-    ${QtPython_SOURCE_DIR}
-  )
-  SET(PYTHON_UI_FORMS
-    PythonDialog.ui
-  )
-  SET(PYTHON_MOC_SOURCES
-    PythonDialog.h
-  )
-  SET(PYTHON_SOURCES
-    PythonDialog.cxx
-    PythonDialog.h
-  )
-  SET(PYTHON_LINK_LIBRARIES
-    pqPython
-    QtPython
-    vtkPVServerCommonPythonD
-    vtkPVServerManagerPythonD
-    ${PYTHON_LIBRARIES}
-  )
-ENDIF(PARAQ_EMBED_PYTHON)
-
 IF(VTK_USE_MPI)
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
 ENDIF(VTK_USE_MPI)
@@ -45,14 +19,12 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   AboutDialog.h
   MainWindow.h
-  ${PYTHON_MOC_SOURCES}
 )
 
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
 SET(UI_FORMS
   AboutDialog.ui
-  ${PYTHON_UI_FORMS}
 )
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
@@ -88,7 +60,6 @@ ADD_EXECUTABLE(pqClient WIN32 MACOSX_BUNDLE
   MainWindow.cxx
   MainWindow.h
   main.cxx
-  ${PYTHON_SOURCES}
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}
   ${UI_BUILT_SOURCES}
@@ -99,7 +70,6 @@ TARGET_LINK_LIBRARIES(pqClient
   QtWidgets
   QtChart
   QtTesting
-  ${PYTHON_LINK_LIBRARIES}
 )
 
 IF(WIN32)

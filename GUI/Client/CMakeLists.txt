@@ -18,6 +18,8 @@ INCLUDE_DIRECTORIES(
   ${QtWidgets_BINARY_DIR}
   ${QtChart_SOURCE_DIR}
   ${QtChart_BINARY_DIR}
+  ${QtTesting_SOURCE_DIR}
+  ${QtTesting_BINARY_DIR}
 )
 
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/CTestCustom.ctest.in"
