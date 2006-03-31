@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.75");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.75.2.1");
 
 
 //----------------------------------------------------------------------------
@@ -398,6 +398,9 @@ void vtkPVInputMenu::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVInputMenu::Initialize()
 {
+  // The list of possible inputs could have changed.
+  this->AddSources(this->Sources);
+
   // If there is not an input yet, default to the current source
   // or the first one in the list.
   if (this->CurrentValue == NULL)
@@ -409,20 +412,14 @@ void vtkPVInputMenu::Initialize()
       }
     else
       {
-      this->Sources->InitTraversal();
-      vtkPVSource* pvs = vtkPVSource::SafeDownCast(
-        this->Sources->GetNextItemAsObject());
-      if (pvs)
+      if (this->Menu->GetMenu()->GetNumberOfItems() > 0)
         {
-        this->CurrentValue = pvs;
+        this->Menu->GetMenu()->Invoke(0);
         }
       }
     this->PVSource->SetPVInput(
       this->InputName, this->GetPVInputIndex(), this->CurrentValue);
     }
-
-  // The list of possible inputs could have changed.
-  this->AddSources(this->Sources);
 
   // Update any widgets that depend on this input menu.
   this->Update();
