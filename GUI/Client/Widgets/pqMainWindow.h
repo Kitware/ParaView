@@ -46,6 +46,7 @@ class pqPipelineWindow;
 class pqServer;
 
 class vtkSMProxy;
+class vtkSMSourceProxy;
 class vtkUnstructuredGrid;
 
 class QIcon;
@@ -113,6 +114,9 @@ public:
   /// Adds a dock widget to the window, automatically adding it to the view menu, and setting the initial visibility  
   void addStandardDockWidget(Qt::DockWidgetArea area, QDockWidget* dockwidget, const QIcon& icon, bool visible = true);
 
+  /// Creates a source proxy by name, adding it to the current render window
+  vtkSMProxy* createSource(const QString&);
+
   /// Compares the contents of the window with the given reference image, returns true iff they "match" within some tolerance
   bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
   
@@ -173,6 +177,7 @@ private slots:
   void onCreateCompoundProxy(QAction*);
   
   void onProxySelected(vtkSMProxy*);
+  void onUpdateVariableSelector(vtkSMProxy*);
   void onVariableChanged(pqVariableType, const QString&);
   
   void onAddServer(pqPipelineServer *server);

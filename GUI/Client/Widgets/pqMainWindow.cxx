@@ -409,6 +409,8 @@ void pqMainWindow::createStandardVariableToolBar()
   this->addToolBar(Qt::TopToolBarArea, this->Implementation->VariableSelectorToolBar);
   pqVariableSelectorWidget* varSelector = new pqVariableSelectorWidget(this->Implementation->VariableSelectorToolBar) << pqSetName("VariableSelector");
   this->Implementation->VariableSelectorToolBar->addWidget(varSelector);
+
+  this->connect(this->Implementation->PipelineList, SIGNAL(proxySelected(vtkSMProxy*)), this, SLOT(onUpdateVariableSelector(vtkSMProxy*)));
   
   this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), this, SIGNAL(variableChanged(pqVariableType, const QString&)));
   this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), this, SLOT(onVariableChanged(pqVariableType, const QString&)));
@@ -1014,22 +1016,32 @@ void pqMainWindow::onUpdateSourcesFiltersMenu(pqServer*)
     }
 }
 
+vtkSMProxy* pqMainWindow::createSource(const QString& source_name)
+{
+  if(!this->Implementation->Pipeline || !this->Implementation->PipelineList)
+    return 0;
+
+  QVTKWidget* const win = this->Implementation->PipelineList->getCurrentWindow();
+  if(!win)
+    return 0;
+    
+  vtkSMSourceProxy* source = this->Implementation->Pipeline->createSource(source_name.toAscii().data(), win);
+  this->Implementation->Pipeline->setVisibility(this->Implementation->Pipeline->createDisplay(source), true);
+  vtkSMRenderModuleProxy* rm = this->Implementation->Pipeline->getRenderModule(win);
+  rm->ResetCamera();
+  win->update();
+  this->Implementation->PipelineList->selectProxy(source);
+  
+  return source;
+}
+
 void pqMainWindow::onCreateSource(QAction* action)
 {
-  if(!action || !this->Implementation->Pipeline || !this->Implementation->PipelineList)
+  if(!action)
     return;
 
   QByteArray sourceName = action->data().toString().toAscii();
-  QVTKWidget* win = this->Implementation->PipelineList->getCurrentWindow();
-  if(win)
-    {
-    vtkSMSourceProxy* source = this->Implementation->Pipeline->createSource(sourceName, win);
-    this->Implementation->Pipeline->setVisibility(this->Implementation->Pipeline->createDisplay(source), true);
-    vtkSMRenderModuleProxy* rm = this->Implementation->Pipeline->getRenderModule(win);
-    rm->ResetCamera();
-    win->update();
-    this->Implementation->PipelineList->selectProxy(source);
-    }
+  this->createSource(sourceName);  
 }
 
 void pqMainWindow::onCreateFilter(QAction* action)
@@ -1330,8 +1342,14 @@ void pqMainWindow::cleanUpWindow(QVTKWidget *win)
 void pqMainWindow::onProxySelected(vtkSMProxy* p)
 {
   this->Implementation->CurrentProxy = p;
+}
 
+void pqMainWindow::onUpdateVariableSelector(vtkSMProxy* p)
+{
   pqVariableSelectorWidget* selector = this->Implementation->VariableSelectorToolBar->findChild<pqVariableSelectorWidget*>();
+  if(!selector)
+    return;
+    
   selector->clear();
 
   if(!this->Implementation->CurrentProxy)
