@@ -40,7 +40,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.39");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.40");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScalarProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMVectorProperty, vtkSMProperty);
@@ -202,9 +202,9 @@ void vtkPVOrientScaleWidget::Create()
   this->OrientModeLabel->SetWidth(18); 
   this->OrientModeLabel->SetText("Orient Mode");
   this->OrientModeMenu->Create();
-  this->OrientModeMenu->AddRadioButton(
+  this->OrientModeMenu->GetMenu()->AddRadioButton(
     "Off", this, "OrientModeMenuCallback");
-  this->OrientModeMenu->AddRadioButton(
+  this->OrientModeMenu->GetMenu()->AddRadioButton(
     "Vector", this, "OrientModeMenuCallback");
   this->OrientModeMenu->SetValue("Vector");
   this->SetCurrentOrientMode("Vector");
@@ -218,14 +218,14 @@ void vtkPVOrientScaleWidget::Create()
   this->ScaleModeLabel->SetWidth(18); 
   this->ScaleModeLabel->SetText("Scale Mode");
   this->ScaleModeMenu->Create();
-  this->ScaleModeMenu->AddRadioButton("Scalar", this,
-                                      "ScaleModeMenuCallback");
-  this->ScaleModeMenu->AddRadioButton("Vector Magnitude", this,
-                                      "ScaleModeMenuCallback");
-  this->ScaleModeMenu->AddRadioButton("Vector Components", this,
-                                      "ScaleModeMenuCallback");
-  this->ScaleModeMenu->AddRadioButton("Data Scaling Off", this,
-                                      "ScaleModeMenuCallback");
+  this->ScaleModeMenu->GetMenu()->AddRadioButton(
+    "Scalar", this, "ScaleModeMenuCallback");
+  this->ScaleModeMenu->GetMenu()->AddRadioButton(
+    "Vector Magnitude", this, "ScaleModeMenuCallback");
+  this->ScaleModeMenu->GetMenu()->AddRadioButton(
+    "Vector Components", this, "ScaleModeMenuCallback");
+  this->ScaleModeMenu->GetMenu()->AddRadioButton(
+    "Data Scaling Off", this, "ScaleModeMenuCallback");
   this->ScaleModeMenu->SetValue("Vector Magnitude");
   this->SetCurrentScaleMode("Vector Magnitude");
   
@@ -329,8 +329,8 @@ void vtkPVOrientScaleWidget::UpdateArrayMenus()
   const char *firstVector = NULL;
 
   // Regenerate the menus, and look for the specified array.
-  this->ScalarsMenu->GetMenu()->DeleteAllMenuItems();
-  this->VectorsMenu->GetMenu()->DeleteAllMenuItems();
+  this->ScalarsMenu->GetMenu()->DeleteAllItems();
+  this->VectorsMenu->GetMenu()->DeleteAllItems();
 
   vtkSMProperty *scalarProp = this->GetSMScalarProperty();
   vtkSMProperty *vectorProp = this->GetSMVectorProperty();
@@ -367,8 +367,8 @@ void vtkPVOrientScaleWidget::UpdateArrayMenus()
       if (scalarDom->GetString(i))
         {
         sprintf(methodAndArgs, "ScalarsMenuEntryCallback");
-        this->ScalarsMenu->AddRadioButton(scalarDom->GetString(i),
-                                          this, methodAndArgs);
+        this->ScalarsMenu->GetMenu()->AddRadioButton(
+          scalarDom->GetString(i), this, methodAndArgs);
         if (firstScalar == NULL)
           {
           firstScalar = scalarDom->GetString(i);
@@ -410,8 +410,8 @@ void vtkPVOrientScaleWidget::UpdateArrayMenus()
       if (vectorDom->GetString(i))
         {
         sprintf(methodAndArgs, "VectorsMenuEntryCallback");
-        this->VectorsMenu->AddRadioButton(vectorDom->GetString(i),
-                                          this, methodAndArgs);
+        this->VectorsMenu->GetMenu()->AddRadioButton(
+          vectorDom->GetString(i), this, methodAndArgs);
         if (firstVector == NULL)
           {
           firstVector = vectorDom->GetString(i);
@@ -460,7 +460,8 @@ void vtkPVOrientScaleWidget::UpdateModeMenus()
   if (numScalars == 0)
     {
     // disabled
-    scaleMenu->SetItemState("Scalar", vtkKWTkOptions::StateDisabled);
+    scaleMenu->SetItemState(
+      scaleMenu->GetIndexOfItem("Scalar"), vtkKWTkOptions::StateDisabled);
     if (!strcmp(scaleMode, "Scalar"))
       {
       if (numVectors == 0)
@@ -477,15 +478,19 @@ void vtkPVOrientScaleWidget::UpdateModeMenus()
   else
     {
     // normal
-    scaleMenu->SetItemState("Scalar", vtkKWTkOptions::StateNormal);
+    scaleMenu->SetItemState(
+      scaleMenu->GetIndexOfItem("Scalar"), vtkKWTkOptions::StateNormal);
     }
   
   if (numVectors == 0)
     {
     // disabled
-    orientMenu->SetItemState("Vector", vtkKWTkOptions::StateDisabled);
-    scaleMenu->SetItemState("Vector Magnitude", vtkKWTkOptions::StateDisabled);
-    scaleMenu->SetItemState("Vector Components", vtkKWTkOptions::StateDisabled);
+    orientMenu->SetItemState(scaleMenu->GetIndexOfItem("Vector"), 
+                             vtkKWTkOptions::StateDisabled);
+    scaleMenu->SetItemState(scaleMenu->GetIndexOfItem("Vector Magnitude"), 
+                            vtkKWTkOptions::StateDisabled);
+    scaleMenu->SetItemState(scaleMenu->GetIndexOfItem("Vector Components"), 
+                            vtkKWTkOptions::StateDisabled);
     if (!strcmp(this->OrientModeMenu->GetValue(), "Vector"))
       {
       this->OrientModeMenu->SetValue("Off");

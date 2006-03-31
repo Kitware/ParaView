@@ -73,7 +73,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.65");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.66");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 #define VTK_PV_TOOLBARS_ANIMATION_LABEL "Animation"
@@ -302,6 +302,9 @@ void vtkPVAnimationScene::Create()
 
   this->CreateProxy();
 
+  vtkKWMenu *menu;
+  int index;
+
   //vtkKWIcon* icon = vtkKWIcon::New();
   
   this->Script("grid propagate %s 1",
@@ -384,12 +387,19 @@ void vtkPVAnimationScene::Create()
   this->PlayModeMenuButton->Create();
   this->PlayModeMenuButton->SetBalloonHelpString("Change the mode in which the "
     "animation is played.");
-  this->PlayModeMenuButton->GetMenu()->AddCommand(
-    VTK_PV_PLAYMODE_SEQUENCE_TITLE, this,
-    "SetPlayMode 0", "Plays the animation as a sequence of images.");
-  this->PlayModeMenuButton->GetMenu()->AddCommand(
-    VTK_PV_PLAYMODE_REALTIME_TITLE, this,
-    "SetPlayMode 1", "Plays the animation in real time mode.");
+
+  menu = this->PlayModeMenuButton->GetMenu();
+
+  index = menu->AddCommand(
+    VTK_PV_PLAYMODE_SEQUENCE_TITLE, this, "SetPlayMode 0");
+  menu->SetItemHelpString(
+    index, "Plays the animation as a sequence of images.");
+
+  index = menu->AddCommand(
+    VTK_PV_PLAYMODE_REALTIME_TITLE, this, "SetPlayMode 1");
+  menu->SetItemHelpString(
+    index, "Plays the animation in real time mode.");
+
   this->SetPlayModeToSequence();
   
   this->Script("grid %s %s -sticky ew",

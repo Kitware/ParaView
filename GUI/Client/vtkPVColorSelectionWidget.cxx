@@ -26,7 +26,7 @@
 #include "vtkSMDataObjectDisplayProxy.h"
 
 vtkStandardNewMacro(vtkPVColorSelectionWidget);
-vtkCxxRevisionMacro(vtkPVColorSelectionWidget, "1.8");
+vtkCxxRevisionMacro(vtkPVColorSelectionWidget, "1.9");
 //-----------------------------------------------------------------------------
 vtkPVColorSelectionWidget::vtkPVColorSelectionWidget()
 {
@@ -62,7 +62,7 @@ void vtkPVColorSelectionWidget::Update(int remove_all /*=1*/)
     }
   if (remove_all)
     {
-    this->GetMenu()->DeleteAllMenuItems();
+    this->GetMenu()->DeleteAllItems();
     }
 
   vtkPVDataSetAttributesInformation* attrInfo;
@@ -110,7 +110,7 @@ void vtkPVColorSelectionWidget::AddArray(
 
     if (!this->GetMenu()->HasItem(label))
       {
-      this->AddRadioButton(label, this->Target,  command);
+      this->GetMenu()->AddRadioButton(label, this->Target,  command);
       if (setFirstValue)
         {
         this->SetValue(label);

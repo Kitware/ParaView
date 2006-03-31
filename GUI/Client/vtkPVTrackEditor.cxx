@@ -35,7 +35,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVTrackEditor);
-vtkCxxRevisionMacro(vtkPVTrackEditor, "1.18");
+vtkCxxRevisionMacro(vtkPVTrackEditor, "1.19");
 //-----------------------------------------------------------------------------
 class vtkPVTrackEditorObserver : public vtkCommand
 {
@@ -240,34 +240,40 @@ void vtkPVTrackEditor::Create()
 void vtkPVTrackEditor::BuildTypeMenu()
 {
   vtkKWMenu* menu = this->TypeMenuButton->GetMenu();
-  char* var = menu->CreateRadioButtonVariable(this, "Radio");
+  int index;
+  const char* var = "Radio";
   
-  menu->AddRadioButton(VTK_PV_RAMP_INDEX, 
-    VTK_PV_RAMP_LABEL, var, this, "SetKeyFrameType 0", 
-    "Set the following Interpolator to Ramp.");
-  menu->ConfigureItem(VTK_PV_RAMP_INDEX,"-image PVRamp"); 
-  delete [] var;
+  index = menu->AddRadioButton(
+    VTK_PV_RAMP_LABEL, this, "SetKeyFrameType 0"); 
+  menu->SetItemGroupName(index, var);
+  menu->SetItemSelectedValueAsInt(index, VTK_PV_RAMP_INDEX);
+  menu->SetItemImage(index, "PVRamp"); 
+  menu->SetItemHelpString(
+    index, "Set the following Interpolator to Ramp.");
 
-  var = menu->CreateRadioButtonVariable(this, "Radio");
-  menu->AddRadioButton(VTK_PV_STEP_INDEX, 
-    VTK_PV_STEP_LABEL, var, this, "SetKeyFrameType 1",
-    "Set the following Interpolator to Step.");
-  menu->ConfigureItem(VTK_PV_STEP_INDEX,"-image PVStep");
-  delete [] var;
+  index = menu->AddRadioButton(
+    VTK_PV_STEP_LABEL, this, "SetKeyFrameType 1");
+  menu->SetItemGroupName(index, var);
+  menu->SetItemSelectedValueAsInt(index, VTK_PV_STEP_INDEX);
+  menu->SetItemImage(index, "PVStep"); 
+  menu->SetItemHelpString(
+    index, "Set the following Interpolator to Step.");
 
-  var = menu->CreateRadioButtonVariable(this, "Radio");
-  menu->AddRadioButton(VTK_PV_EXPONENTIAL_INDEX, 
-    VTK_PV_EXPONENTIAL_LABEL, var, this, "SetKeyFrameType 2",
-    "Set the following Interpolator to Exponential.");
-  menu->ConfigureItem(VTK_PV_EXPONENTIAL_INDEX,"-image PVExponential");
-  delete [] var;
+  index = menu->AddRadioButton(
+    VTK_PV_EXPONENTIAL_LABEL, this, "SetKeyFrameType 2");
+  menu->SetItemGroupName(index, var);
+  menu->SetItemSelectedValueAsInt(index, VTK_PV_EXPONENTIAL_INDEX);
+  menu->SetItemImage(index, "PVExponential"); 
+  menu->SetItemHelpString(
+    index, "Set the following Interpolator to Exponential.");
 
-  var = menu->CreateRadioButtonVariable(this, "Radio");
-  menu->AddRadioButton(VTK_PV_SINUSOID_INDEX,
-    VTK_PV_SINUSOID_LABEL, var, this, "SetKeyFrameType 3",
-    "Set the following Interpolator to Sinusoid.");
-  menu->ConfigureItem(VTK_PV_SINUSOID_INDEX, "-image PVSinusoid");
-  delete [] var;
+  index = menu->AddRadioButton(
+    VTK_PV_SINUSOID_LABEL, this, "SetKeyFrameType 3");
+  menu->SetItemGroupName(index, var);
+  menu->SetItemSelectedValueAsInt(index, VTK_PV_SINUSOID_INDEX);
+  menu->SetItemImage(index, "PVSinusoid"); 
+  menu->SetItemHelpString(
+    index, "Set the following Interpolator to Sinusoid.");
 }
 
 //-----------------------------------------------------------------------------
@@ -408,28 +414,29 @@ void vtkPVTrackEditor::SetActiveKeyFrame(vtkPVKeyFrame* keyframe)
 //-----------------------------------------------------------------------------
 void vtkPVTrackEditor::UpdateTypeImage(vtkPVKeyFrame* keyframe)
 {
+  const char *rbv = "Radio";
   if (vtkPVRampKeyFrame::SafeDownCast(keyframe))
     {
-    this->TypeMenuButton->GetMenu()->CheckRadioButton(this, "Radio", 
-      VTK_PV_RAMP_INDEX);
+    this->TypeMenuButton->GetMenu()->SelectItemInGroupWithSelectedValueAsInt(
+      rbv, VTK_PV_RAMP_INDEX);
     this->TypeImage->SetConfigurationOption("-image", "PVRamp");
     }
   else if (vtkPVBooleanKeyFrame::SafeDownCast(keyframe))
     {
-    this->TypeMenuButton->GetMenu()->CheckRadioButton(this, "Radio", 
-      VTK_PV_STEP_INDEX);
+    this->TypeMenuButton->GetMenu()->SelectItemInGroupWithSelectedValueAsInt(
+      rbv, VTK_PV_STEP_INDEX);
     this->TypeImage->SetConfigurationOption("-image", "PVStep");
     }
   else if (vtkPVExponentialKeyFrame::SafeDownCast(keyframe))
     {
-    this->TypeMenuButton->GetMenu()->CheckRadioButton(this, "Radio", 
-      VTK_PV_EXPONENTIAL_INDEX);
+    this->TypeMenuButton->GetMenu()->SelectItemInGroupWithSelectedValueAsInt(
+      rbv, VTK_PV_EXPONENTIAL_INDEX);
     this->TypeImage->SetConfigurationOption("-image", "PVExponential");
     }
   else if (vtkPVSinusoidKeyFrame::SafeDownCast(keyframe))
     {
-    this->TypeMenuButton->GetMenu()->CheckRadioButton(this, "Radio",
-      VTK_PV_SINUSOID_INDEX);
+    this->TypeMenuButton->GetMenu()->SelectItemInGroupWithSelectedValueAsInt(
+      rbv, VTK_PV_SINUSOID_INDEX);
     this->TypeImage->SetConfigurationOption("-image", "PVSinusoid");
     }
   else

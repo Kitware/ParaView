@@ -57,7 +57,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBasicDSPFilterWidget);
-vtkCxxRevisionMacro(vtkPVBasicDSPFilterWidget, "1.6");
+vtkCxxRevisionMacro(vtkPVBasicDSPFilterWidget, "1.7");
 
 //20 weights, 5 cutoff freqs(.3, .4, .5, .6, .7)
 const double g_butter_lp_numerator_coeffs[5][20]={
@@ -554,11 +554,16 @@ void vtkPVBasicDSPFilterWidget::CreateCutoffFreqToggle(vtkKWWidget *topframe)
   this->CutoffFreqLabel->SetBalloonHelpString("Select the normalized cutoff frequency");
   this->CutoffFreqMenu->SetParent(this->CutoffFreqSubFrame);
   this->CutoffFreqMenu->Create();
-  this->CutoffFreqMenu->AddRadioButton(".3", this, "ChangeCutoffFreq 3");
-  this->CutoffFreqMenu->AddRadioButton(".4", this, "ChangeCutoffFreq 4");
-  this->CutoffFreqMenu->AddRadioButton(".5", this, "ChangeCutoffFreq 5");
-  this->CutoffFreqMenu->AddRadioButton(".6", this, "ChangeCutoffFreq 6");
-  this->CutoffFreqMenu->AddRadioButton(".7", this, "ChangeCutoffFreq 7");
+  this->CutoffFreqMenu->GetMenu()->AddRadioButton(
+    ".3", this, "ChangeCutoffFreq 3");
+  this->CutoffFreqMenu->GetMenu()->AddRadioButton(
+    ".4", this, "ChangeCutoffFreq 4");
+  this->CutoffFreqMenu->GetMenu()->AddRadioButton(
+    ".5", this, "ChangeCutoffFreq 5");
+  this->CutoffFreqMenu->GetMenu()->AddRadioButton(
+    ".6", this, "ChangeCutoffFreq 6");
+  this->CutoffFreqMenu->GetMenu()->AddRadioButton(
+    ".7", this, "ChangeCutoffFreq 7");
   this->CutoffFreqMenu->SetValue(".5");
   this->CutoffFreqMenu->SetBalloonHelpString("Select the normalized cutoff frequency");
   this->Script("pack %s %s -side left -pady 1m",
@@ -1232,7 +1237,7 @@ bool vtkPVBasicDSPFilterWidget::UpdateTogglesWithFileInformation()
     char *l_command = (char *)malloc( strlen(l_name)+64 );
     sprintf(l_command,"ChangeInputVar %s",l_name);
 
-    this->InputVarMenu->AddRadioButton(l_name, this, l_command);
+    this->InputVarMenu->GetMenu()->AddRadioButton(l_name, this, l_command);
     if(!i) this->InputVarMenu->SetValue(l_name);
 
     free(l_command);
@@ -1288,18 +1293,18 @@ void vtkPVBasicDSPFilterWidget::Create()
 
 
 
-  this->DSPFilterModeMenu->AddRadioButton("Smoothing Filter (BSpline)", this,
-    "ChangeDSPFilterMode smoothing");
-  this->DSPFilterModeMenu->AddRadioButton("Low Pass Filter (19th order Butterworth)", this,
-    "ChangeDSPFilterMode lowpass");
-  this->DSPFilterModeMenu->AddRadioButton("High Pass Filter (19th order Butterworth)", this,
-    "ChangeDSPFilterMode highpass");
-  this->DSPFilterModeMenu->AddRadioButton("User Defined Filter", this,
-    "ChangeDSPFilterMode userdef");
-  this->DSPFilterModeMenu->AddRadioButton("Integral", this,
-    "ChangeDSPFilterMode integral");
-  this->DSPFilterModeMenu->AddRadioButton("Derivative", this,
-    "ChangeDSPFilterMode derivative");
+  this->DSPFilterModeMenu->GetMenu()->AddRadioButton(
+    "Smoothing Filter (BSpline)", this, "ChangeDSPFilterMode smoothing");
+  this->DSPFilterModeMenu->GetMenu()->AddRadioButton(
+    "Low Pass Filter (19th order Butterworth)", this, "ChangeDSPFilterMode lowpass");
+  this->DSPFilterModeMenu->GetMenu()->AddRadioButton(
+    "High Pass Filter (19th order Butterworth)", this, "ChangeDSPFilterMode highpass");
+  this->DSPFilterModeMenu->GetMenu()->AddRadioButton(
+    "User Defined Filter", this, "ChangeDSPFilterMode userdef");
+  this->DSPFilterModeMenu->GetMenu()->AddRadioButton(
+    "Integral", this, "ChangeDSPFilterMode integral");
+  this->DSPFilterModeMenu->GetMenu()->AddRadioButton(
+    "Derivative", this, "ChangeDSPFilterMode derivative");
 
 
 

@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.84");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.85");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -391,7 +391,7 @@ void vtkPVArrayMenu::UpdateArrayMenu()
 
   // Regenerate the menu, and look for the specified array.
 
-  this->ArrayMenu->GetMenu()->DeleteAllMenuItems();
+  this->ArrayMenu->GetMenu()->DeleteAllItems();
 
   vtkSMProperty* property = this->GetSMProperty();
   if (property)
@@ -417,7 +417,8 @@ void vtkPVArrayMenu::UpdateArrayMenu()
         }
       aname << ends;
       sprintf(methodAndArgs, "ArrayMenuEntryCallback {%s}", arrayName);
-      this->ArrayMenu->AddRadioButton(aname.str(), this, methodAndArgs);
+      this->ArrayMenu->GetMenu()->AddRadioButton(
+        aname.str(), this, methodAndArgs);
       delete[] aname.str();
       }
 

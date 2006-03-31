@@ -66,7 +66,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.478");
+vtkCxxRevisionMacro(vtkPVSource, "1.479");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -1221,7 +1221,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     this->GetPVWindow()->UpdateEnableState();
     }
 
-  window->GetViewMenu()->CheckRadioButton(window->GetViewMenu(), "Radio", 2);
+  window->GetViewMenu()->SelectItemInGroupWithSelectedValueAsInt("Radio", 2);
   this->UpdateProperties();
   this->GetPVRenderView()->EventuallyRender();
 

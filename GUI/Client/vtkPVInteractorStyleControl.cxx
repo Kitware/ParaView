@@ -43,7 +43,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.54");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.55");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -195,14 +195,15 @@ void vtkPVInteractorStyleControl::UpdateMenus()
     int cc;
     for ( cc = 0; cc < 9; cc ++ )
       {
-      this->Menus[cc]->GetMenu()->DeleteAllMenuItems();
+      this->Menus[cc]->GetMenu()->DeleteAllItems();
       char command[100];
       for ( it = this->Internals->Manipulators.begin();
         it != this->Internals->Manipulators.end();
         ++it )
         {
         sprintf(command, "SetCurrentManipulator %d {%s}", cc, it->first.c_str());
-        this->Menus[cc]->AddRadioButton(it->first.c_str(), this, command);
+        this->Menus[cc]->GetMenu()->AddRadioButton(
+          it->first.c_str(), this, command);
         }
       if ( this->GetManipulator(cc) == 0 && this->DefaultManipulator )
         {

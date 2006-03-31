@@ -102,7 +102,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.62");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.63");
 
 //----------------------------------------------------------------------------
 
@@ -740,14 +740,14 @@ void vtkPVDisplayGUI::Create()
 
   this->RepresentationMenu->SetParent(this->DisplayStyleFrame->GetFrame());
   this->RepresentationMenu->Create();
-  this->RepresentationMenu->AddRadioButton(VTK_PV_OUTLINE_LABEL, this,
-                                                "DrawOutline");
-  this->RepresentationMenu->AddRadioButton(VTK_PV_SURFACE_LABEL, this,
-                                                "DrawSurface");
-  this->RepresentationMenu->AddRadioButton(VTK_PV_WIREFRAME_LABEL, this,
-                                                "DrawWireframe");
-  this->RepresentationMenu->AddRadioButton(VTK_PV_POINTS_LABEL, this,
-                                                "DrawPoints");
+  this->RepresentationMenu->GetMenu()->AddRadioButton(
+    VTK_PV_OUTLINE_LABEL, this, "DrawOutline");
+  this->RepresentationMenu->GetMenu()->AddRadioButton(
+    VTK_PV_SURFACE_LABEL, this, "DrawSurface");
+  this->RepresentationMenu->GetMenu()->AddRadioButton(
+    VTK_PV_WIREFRAME_LABEL, this, "DrawWireframe");
+  this->RepresentationMenu->GetMenu()->AddRadioButton(
+    VTK_PV_POINTS_LABEL, this, "DrawPoints");
 
   this->RepresentationMenu->SetBalloonHelpString(
     "Choose what geometry should be used to represent the dataset.");
@@ -758,10 +758,10 @@ void vtkPVDisplayGUI::Create()
 
   this->InterpolationMenu->SetParent(this->DisplayStyleFrame->GetFrame());
   this->InterpolationMenu->Create();
-  this->InterpolationMenu->AddRadioButton("Flat", this,
-                                               "SetInterpolationToFlat");
-  this->InterpolationMenu->AddRadioButton("Gouraud", this,
-                                               "SetInterpolationToGouraud");
+  this->InterpolationMenu->GetMenu()->AddRadioButton(
+    "Flat", this, "SetInterpolationToFlat");
+  this->InterpolationMenu->GetMenu()->AddRadioButton(
+    "Gouraud", this, "SetInterpolationToGouraud");
   this->InterpolationMenu->SetValue("Gouraud");
   this->InterpolationMenu->SetBalloonHelpString(
     "Choose the method used to shade the geometry and interpolate point attributes.");
@@ -777,8 +777,8 @@ void vtkPVDisplayGUI::Create()
 
     this->MaterialMenu->SetParent(this->DisplayStyleFrame->GetFrame());
     this->MaterialMenu->Create();
-    this->MaterialMenu->AddRadioButton(VTK_PV_MATERIAL_NONE_LABEL, this, 
-      "SetMaterial {} {}");
+    this->MaterialMenu->GetMenu()->AddRadioButton(
+      VTK_PV_MATERIAL_NONE_LABEL, this, "SetMaterial {} {}");
     this->MaterialMenu->SetBalloonHelpString(
       "Choose the material to apply to the object.");
 
@@ -788,11 +788,13 @@ void vtkPVDisplayGUI::Create()
       {
       vtksys_ios::ostringstream stream;
       stream << "SetMaterial {" << names[cc] << "} {" << names[cc] << "}";
-      this->MaterialMenu->AddRadioButton(names[cc], this,
-        stream.str().c_str());
+      this->MaterialMenu->GetMenu()->AddRadioButton(
+        names[cc], this, stream.str().c_str());
       }
-    this->MaterialMenu->AddRadioButton(VTK_PV_MATERIAL_BROWSE_LABEL, this,
-      "BrowseMaterial", VTK_PV_MATERIAL_BROWSE_HELP);
+    int index = this->MaterialMenu->GetMenu()->AddRadioButton(
+      VTK_PV_MATERIAL_BROWSE_LABEL, this, "BrowseMaterial");
+    this->MaterialMenu->GetMenu()->SetItemHelpString(
+      index, VTK_PV_MATERIAL_BROWSE_HELP);
     }
 
   
@@ -1451,9 +1453,9 @@ void vtkPVDisplayGUI::UpdateColorMenu()
     }
       
   // Populate menus
-  this->ColorSelectionMenu->GetMenu()->DeleteAllMenuItems();
-  this->ColorSelectionMenu->AddRadioButton("Property", 
-    this, "ColorByProperty");
+  this->ColorSelectionMenu->GetMenu()->DeleteAllItems();
+  this->ColorSelectionMenu->GetMenu()->AddRadioButton(
+    "Property", this, "ColorByProperty");
   this->ColorSelectionMenu->SetPVSource(this->PVSource);
 
   this->ColorSelectionMenu->Update(0);
@@ -1554,7 +1556,9 @@ void vtkPVDisplayGUI::UpdateVolumeGUI()
   // volume rendering option
   if ( this->RepresentationMenu->GetMenu()->HasItem( VTK_PV_VOLUME_LABEL ) )
     {
-    this->RepresentationMenu->GetMenu()->DeleteMenuItem( VTK_PV_VOLUME_LABEL );
+    this->RepresentationMenu->GetMenu()->DeleteItem(
+      this->RepresentationMenu->GetMenu()->GetIndexOfItem(
+        VTK_PV_VOLUME_LABEL));
     }
   
   if (!pDisp->GetHasVolumePipeline())
@@ -1562,8 +1566,8 @@ void vtkPVDisplayGUI::UpdateVolumeGUI()
     this->VolumeRenderMode = 0;
     return;
     }
-  this->RepresentationMenu->AddRadioButton(VTK_PV_VOLUME_LABEL, this,
-    "DrawVolume");
+  this->RepresentationMenu->GetMenu()->AddRadioButton(
+    VTK_PV_VOLUME_LABEL, this, "DrawVolume");
 
   // Update the transfer functions    
   // I wonder if this needs to be done here
@@ -1583,18 +1587,18 @@ void vtkPVDisplayGUI::UpdateVolumeGUI()
     "VolumeRenderByArray");
   this->VolumeScalarSelectionWidget->Update();
   
-  this->VolumeRenderMethodMenu->GetMenu()->DeleteAllMenuItems();
-  this->VolumeRenderMethodMenu->AddRadioButton(
+  this->VolumeRenderMethodMenu->GetMenu()->DeleteAllItems();
+  this->VolumeRenderMethodMenu->GetMenu()->AddRadioButton(
     VTK_PV_VOLUME_PT_METHOD_LABEL, this, "DrawVolumePT" );
   
   if (pDisp->GetSupportsZSweepMapper() )
     {
-    this->VolumeRenderMethodMenu->AddRadioButton(
+    this->VolumeRenderMethodMenu->GetMenu()->AddRadioButton(
       VTK_PV_VOLUME_ZSWEEP_METHOD_LABEL, this, "DrawVolumeZSweep" );
     }
   if (pDisp->GetSupportsBunykMapper() )
     {
-    this->VolumeRenderMethodMenu->AddRadioButton(
+    this->VolumeRenderMethodMenu->GetMenu()->AddRadioButton(
       VTK_PV_VOLUME_BUNYK_METHOD_LABEL, this, "DrawVolumeBunyk" );
     }
   
@@ -2194,18 +2198,24 @@ void vtkPVDisplayGUI::SetMaterialInternal(const char* materialname,
 
   if (!this->MaterialMenu->GetMenu()->HasItem(label.c_str()))
     {
-    this->MaterialMenu->GetMenu()->DeleteMenuItem(VTK_PV_MATERIAL_BROWSE_LABEL);
+    this->MaterialMenu->GetMenu()->DeleteItem(
+      this->MaterialMenu->GetMenu()->GetIndexOfItem(
+        VTK_PV_MATERIAL_BROWSE_LABEL));
 
     vtksys_ios::ostringstream stream;
     stream << "SetMaterial {" << materialname << "} {" << label.c_str() << "}";
     vtksys_ios::ostringstream help;
     help << "Load Material " << materialname;
-    this->MaterialMenu->AddRadioButton(label.c_str(), this, stream.str().c_str(),
-      help.str().c_str());
+    int index = this->MaterialMenu->GetMenu()->AddRadioButton(
+      label.c_str(), this, stream.str().c_str());
+    this->MaterialMenu->GetMenu()->SetItemHelpString(
+      index, help.str().c_str());
 
     // Since browse button must be the last button.
-    this->MaterialMenu->AddRadioButton(VTK_PV_MATERIAL_BROWSE_LABEL, this,
-      "BrowseMaterial", VTK_PV_MATERIAL_BROWSE_HELP);
+    index = this->MaterialMenu->GetMenu()->AddRadioButton(
+      VTK_PV_MATERIAL_BROWSE_LABEL, this, "BrowseMaterial");
+    this->MaterialMenu->GetMenu()->SetItemHelpString(
+      index , VTK_PV_MATERIAL_BROWSE_HELP);
     }
   this->MaterialMenu->SetValue(label.c_str());
 

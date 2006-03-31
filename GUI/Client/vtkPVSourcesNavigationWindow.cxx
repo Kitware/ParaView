@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.32");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.33");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -183,40 +183,86 @@ void vtkPVSourcesNavigationWindow::Create()
   this->PopupMenu->SetParent(this);
   this->PopupMenu->Create();
   this->PopupMenu->SetTearOff(0);
-  this->PopupMenu->AddCommand("Delete", this, "PopupDeleteCallback", 0, 
-       "Delete the module.  Module that are used by filters cannot be deleted.");
-  char *var = this->PopupMenu->CreateCheckButtonVariable(this, "Visibility");
-  this->PopupMenu->AddCheckButton("Visibility", var, 
-                                  this, "PopupVisibilityCallback", 0,
-                                  "Set the visibility for this module.");  
+
+  int index;
+  index = this->PopupMenu->AddCommand("Delete", this, "PopupDeleteCallback");
+  this->PopupMenu->SetItemUnderline(index, 0);
+  this->PopupMenu->SetItemHelpString(
+    index, 
+    "Delete the module.  Module that are used by filters cannot be deleted.");
+
+  char *var = this->PopupMenu->CreateItemVariableName(this, "Visibility");
+
+  index = this->PopupMenu->AddCheckButton(
+    "Visibility", this, "PopupVisibilityCallback");  
+  this->PopupMenu->SetItemVariable(index, var);
+  this->PopupMenu->SetItemUnderline(index, 0);
+  this->PopupMenu->SetItemHelpString(
+    index, "Set the visibility for this module.");
+
   delete [] var;
 
   // Representation
+
   this->PopupMenu->AddSeparator();
-  var = this->PopupMenu->CreateRadioButtonVariable(this, "Representation");
-  this->PopupMenu->AddRadioButton(vtkSMDataObjectDisplayProxy::OUTLINE, "Outline", var, 
-      this, "PopupOutlineRepresentationCallback",
-      "Outline is edges of the bounding box.");
-  this->PopupMenu->AddRadioButton(vtkSMDataObjectDisplayProxy::SURFACE, "Surface", var,
-      this, "PopupSurfaceRepresentationCallback",
-      "Only external (non shared) faces of cells are displayed.");
-  this->PopupMenu->AddRadioButton(vtkSMDataObjectDisplayProxy::WIREFRAME, "Wireframe of Surface", var,
-      this, "PopupWireframeRepresentationCallback",
-      "Wirefrace of surface (non shared) faces.");
-  this->PopupMenu->AddRadioButton(vtkSMDataObjectDisplayProxy::POINTS, "Points of Surface", var,
-      this, "PopupPointsRepresentationCallback",
-      "Points of surface (non shared) faces.");
+  var = this->PopupMenu->CreateItemVariableName(this, "Representation");
+
+  index = this->PopupMenu->AddRadioButton(
+    "Outline", this, "PopupOutlineRepresentationCallback");
+  this->PopupMenu->SetItemVariable(index, var);
+  this->PopupMenu->SetItemSelectedValueAsInt(
+    index, vtkSMDataObjectDisplayProxy::OUTLINE);
+  this->PopupMenu->SetItemHelpString(
+    index, "Outline is edges of the bounding box.");
+
+  index = this->PopupMenu->AddRadioButton(
+    "Surface", this, "PopupSurfaceRepresentationCallback");
+  this->PopupMenu->SetItemVariable(index, var);
+  this->PopupMenu->SetItemSelectedValueAsInt(
+    index, vtkSMDataObjectDisplayProxy::SURFACE);
+  this->PopupMenu->SetItemHelpString(
+    index, "Only external (non shared) faces of cells are displayed.");
+
+  index = this->PopupMenu->AddRadioButton(
+    "Wireframe of Surface", this, "PopupWireframeRepresentationCallback");
+  this->PopupMenu->SetItemVariable(index, var);
+  this->PopupMenu->SetItemSelectedValueAsInt(
+    index, vtkSMDataObjectDisplayProxy::WIREFRAME);
+  this->PopupMenu->SetItemHelpString(
+    index, "Wirefrace of surface (non shared) faces.");
+
+  index = this->PopupMenu->AddRadioButton(
+    "Points of Surface", this, "PopupPointsRepresentationCallback");
+  this->PopupMenu->SetItemVariable(index, var);
+  this->PopupMenu->SetItemSelectedValueAsInt(
+    index, vtkSMDataObjectDisplayProxy::POINTS);
+  this->PopupMenu->SetItemHelpString(
+    index, "Points of surface (non shared) faces.");
+
   delete [] var;
 
   // Interpolation
+
   this->PopupMenu->AddSeparator();
-  var = this->PopupMenu->CreateRadioButtonVariable(this, "Interpolation");
-  this->PopupMenu->AddRadioButton(vtkSMDataObjectDisplayProxy::FLAT, "Flat", var, 
-                                  this, "PopupFlatInterpolationCallback",
-                                  "Flat shading makes the surfaace look faceted.");
-  this->PopupMenu->AddRadioButton(vtkSMDataObjectDisplayProxy::GOURAND, "Gouraud", var,
-      this, "PopupGouraudInterpolationCallback",
-      "When the data has normals, Gouraud shading make the surface look smooth.");
+
+  var = this->PopupMenu->CreateItemVariableName(this, "Interpolation");
+
+  index = this->PopupMenu->AddRadioButton(
+    "Flat", this, "PopupFlatInterpolationCallback");
+  this->PopupMenu->SetItemVariable(index, var);
+  this->PopupMenu->SetItemSelectedValueAsInt(
+    index, vtkSMDataObjectDisplayProxy::FLAT);
+  this->PopupMenu->SetItemHelpString(
+    index, "Flat shading makes the surfaace look faceted.");
+
+  index = this->PopupMenu->AddRadioButton(
+    "Gouraud", this, "PopupGouraudInterpolationCallback");
+  this->PopupMenu->SetItemVariable(index, var);
+  this->PopupMenu->SetItemSelectedValueAsInt(
+    index, vtkSMDataObjectDisplayProxy::GOURAND);
+  this->PopupMenu->SetItemHelpString(
+    index, "When the data has normals, Gouraud shading make the surface look smooth.");
+
   delete [] var;
   
   this->ChildCreate();
@@ -307,15 +353,21 @@ void vtkPVSourcesNavigationWindow::DisplayModulePopupMenu(vtkPVSource* module,
     this->PopupMenu->SetItemState("Delete", vtkKWTkOptions::StateDisabled);
     }
 
-  this->PopupMenu->CheckCheckButton(this, "Visibility", 
-                                    module->GetVisibility());
+  char *rbv = this->PopupMenu->CreateItemVariableName(this, "Visibility");
+  this->PopupMenu->SetItemVariableValueAsInt(rbv, module->GetVisibility());
+  delete [] rbv;
 
-  this->PopupMenu->CheckRadioButton(this, "Interpolation", 
-            module->GetDisplayProxy()->GetInterpolationCM() );
+  rbv = this->PopupMenu->CreateItemVariableName(this, "Interpolation");
+  this->PopupMenu->SetItemVariableValueAsInt(
+    rbv, module->GetDisplayProxy()->GetInterpolationCM());
+  delete [] rbv;
 
   // Set the value of the representation radio button.
-  this->PopupMenu->CheckRadioButton(this, "Representation", 
-            module->GetDisplayProxy()->GetRepresentationCM());
+
+  rbv = this->PopupMenu->CreateItemVariableName(this, "Representation");
+  this->PopupMenu->SetItemVariableValueAsInt(
+    rbv, module->GetDisplayProxy()->GetRepresentationCM());
+  delete [] rbv;
 
   // Show the popup menu in correct location (x, y is cursor position).
   this->PopupMenu->PopUp(x, y);
@@ -329,7 +381,8 @@ void vtkPVSourcesNavigationWindow::PopupDeleteCallback()
 //-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::PopupVisibilityCallback()
 {
-  if (this->PopupMenu->GetCheckButtonValue(this, "Visibility"))
+  char *rbv = this->PopupMenu->CreateItemVariableName(this, "Visibility");
+  if (this->PopupMenu->GetItemVariableValueAsInt(rbv))
     {
     this->PopupModule->SetVisibility(1);
     }
@@ -337,6 +390,7 @@ void vtkPVSourcesNavigationWindow::PopupVisibilityCallback()
     {
     this->PopupModule->SetVisibility(0);
     }
+  delete [] rbv;
 }
 //-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::PopupFlatInterpolationCallback()

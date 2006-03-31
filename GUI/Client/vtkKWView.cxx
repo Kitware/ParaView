@@ -104,7 +104,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.32");
+vtkCxxRevisionMacro(vtkKWView, "1.33");
 
 //----------------------------------------------------------------------------
 void KWViewAbortCheckMethod( vtkObject*, unsigned long, void* arg, void* )
@@ -487,8 +487,8 @@ void vtkKWView::ShowViewProperties()
   if (this->MenuEntryName)
     {
     // make sure the variable is set, otherwise set it
-    this->ParentWindow->GetViewMenu()->CheckRadioButton(
-      this->ParentWindow->GetViewMenu(), "Radio", VTK_KW_VIEW_MENU_INDEX);
+    this->ParentWindow->GetViewMenu()->SelectItemInGroupWithSelectedValueAsInt(
+      "Radio", VTK_KW_VIEW_MENU_INDEX);
     }
 
   // unpack any current children
@@ -1112,33 +1112,29 @@ void vtkKWView::Select(vtkKWWindow *pw)
   if (this->MenuEntryName)
     {
     // now add property options
-    char *rbv = pw->GetViewMenu()->CreateRadioButtonVariable(
-      pw->GetViewMenu(),"Radio");
+    const char *rbv = "Radio";
     idx = pw->GetViewMenuInsertPosition();
-    pw->GetViewMenu()->InsertRadioButton(
-      idx,
-      VTK_KW_VIEW_MENU_INDEX, 
-      this->MenuEntryName, 
-      rbv, 
-      this, 
-      "ShowViewProperties", 
-      this->GetMenuEntryUnderline(),
-      this->MenuEntryHelp ? 
-      this->MenuEntryHelp :
-      this->MenuEntryName
-      );
-    delete [] rbv;
+    idx = pw->GetViewMenu()->InsertRadioButton(
+      idx, this->MenuEntryName, this, "ShowViewProperties"); 
+    pw->GetViewMenu()->SetItemGroupName(idx, rbv);
+    pw->GetViewMenu()->SetItemSelectedValueAsInt(idx, VTK_KW_VIEW_MENU_INDEX);
+    pw->GetViewMenu()->SetItemUnderline(idx, this->GetMenuEntryUnderline());
+    pw->GetViewMenu()->SetItemHelpString(
+      idx, this->MenuEntryHelp ? this->MenuEntryHelp :this->MenuEntryName);
     }
 
   if ( this->SupportSaveAsImage )
     {
     // add the save as image option
-    pw->GetFileMenu()->InsertCommand(this->ParentWindow->GetFileMenuInsertPosition(),
-                                     "Save View Image",
-                                     this, 
-                                     "SaveAsImage", 8,
-                                     "Save an image of the current view contents");
-    pw->GetFileMenu()->InsertSeparator(this->ParentWindow->GetFileMenuInsertPosition());
+    idx = pw->GetFileMenu()->InsertCommand(
+      this->ParentWindow->GetFileMenuInsertPosition(),
+      "Save View Image", this, "SaveAsImage");
+    pw->GetFileMenu()->SetItemUnderline(idx, 8);
+    pw->GetFileMenu()->SetItemHelpString(
+      idx, "Save an image of the current view contents");
+
+    pw->GetFileMenu()->InsertSeparator(
+      this->ParentWindow->GetFileMenuInsertPosition());
     }
   
   if ( this->SupportPrint )
@@ -1155,14 +1151,18 @@ void vtkKWView::Select(vtkKWWindow *pw)
       {
       idx = this->ParentWindow->GetFileMenuInsertPosition();  
       }
-    pw->GetFileMenu()->InsertCommand(idx, "Print", this, "PrintView", 0);
+    idx = pw->GetFileMenu()->InsertCommand(idx, "Print", this, "PrintView");
+    pw->GetFileMenu()->SetItemUnderline(idx, 0);
     }
   
   if ( this->SupportCopy )
     {
 #ifdef _WIN32
-  // add the edit copy option
-  pw->GetEditMenu()->AddCommand("Copy View Image",this,"EditCopy", "Copy an image of current view contents to the clipboard");
+    // add the edit copy option
+    idx = pw->GetEditMenu()->AddCommand(
+      "Copy View Image", this, "EditCopy");
+    pw->GetEditMenu()->SetItemHelpString(
+      idx, "Copy an image of current view contents to the clipboard");
 #endif
     }
   
@@ -1174,8 +1174,11 @@ void vtkKWView::Select(vtkKWWindow *pw)
   if (this->SharedPropertiesParent && this->MenuEntryName)
     {
     // if the window prop is empty then pack this one
-    if (this->ParentWindow->GetViewMenu()->GetRadioButtonValue(
-      this->ParentWindow->GetViewMenu(), "Radio") >= VTK_KW_VIEW_MENU_INDEX)
+    int val = 
+      this->ParentWindow->GetViewMenu()->GetItemSelectedValueAsInt(
+        this->ParentWindow->GetViewMenu()->GetIndexOfSelectedItemInGroup(
+          "Radio"));
+    if (val >= VTK_KW_VIEW_MENU_INDEX)
       {
       this->Script("pack %s -side left -anchor nw -fill y",
                    this->PropertiesParent->GetWidgetName());
@@ -1191,24 +1194,27 @@ void vtkKWView::Deselect(vtkKWWindow *pw)
 {
   if (this->MenuEntryName)
     {
-    pw->GetViewMenu()->DeleteMenuItem(this->MenuEntryName);
+    pw->GetViewMenu()->DeleteItem(
+      pw->GetViewMenu()->GetIndexOfItem(this->MenuEntryName));
     }
       
   if ( this->SupportPrint )
     {
-    pw->GetFileMenu()->DeleteMenuItem("Print");
+    pw->GetFileMenu()->DeleteItem(
+      pw->GetFileMenu()->GetIndexOfItem("Print"));
     }
   
   if ( this->SupportSaveAsImage )
     {
-    pw->GetFileMenu()->DeleteMenuItem("Save Image");
+    pw->GetFileMenu()->DeleteItem(
+      pw->GetFileMenu()->GetIndexOfItem("Save Image"));
     }
   
   if ( this->SupportCopy )
     {
 #ifdef _WIN32
   // add the edit copy option
-  pw->GetEditMenu()->DeleteMenuItem("Copy");
+  pw->GetEditMenu()->DeleteItem(pw->GetEditMenu()->GetIndexOfItem("Copy"));
 #endif
     }
   

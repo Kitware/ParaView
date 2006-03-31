@@ -146,7 +146,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.416");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.417");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -914,7 +914,7 @@ void vtkPVRenderView::SwitchBackAndForthToViewProperties()
 
   // First check where we are in the view menu
 
-  int position = viewmenu->GetCheckedRadioButtonItem(viewmenu, "Radio");
+  int position = viewmenu->GetIndexOfSelectedItemInGroup("Radio");
   if (position < 0)
     {
     return;
@@ -927,7 +927,7 @@ void vtkPVRenderView::SwitchBackAndForthToViewProperties()
     {
     this->SetMenuLabelSwitchBackAndForthToViewProperties(this->Script(
       "%s entrycget %d -label", viewmenu->GetWidgetName(), position));
-    viewmenu->Invoke(prop_position);
+    viewmenu->InvokeItem(prop_position);
     }
   else
     {
@@ -936,13 +936,16 @@ void vtkPVRenderView::SwitchBackAndForthToViewProperties()
       {
       // This entry of the view menu must be in "normal" state to switch
       // between source and 3D views.
-      int state = viewmenu->GetItemState(this->MenuLabelSwitchBackAndForthToViewProperties);
-      viewmenu->SetItemState(this->MenuLabelSwitchBackAndForthToViewProperties,
-                         vtkKWTkOptions::StateNormal);
-      viewmenu->Invoke(
-        viewmenu->GetIndexOfItem(this->MenuLabelSwitchBackAndForthToViewProperties));
-      viewmenu->SetItemState(this->MenuLabelSwitchBackAndForthToViewProperties,
-                         state);
+      int state = viewmenu->GetItemState(
+        this->MenuLabelSwitchBackAndForthToViewProperties);
+      viewmenu->SetItemState(
+        this->MenuLabelSwitchBackAndForthToViewProperties,
+        vtkKWTkOptions::StateNormal);
+      viewmenu->InvokeItem(
+        viewmenu->GetIndexOfItem(
+          this->MenuLabelSwitchBackAndForthToViewProperties));
+      viewmenu->SetItemState(
+        this->MenuLabelSwitchBackAndForthToViewProperties, state);
       }
     }
 }

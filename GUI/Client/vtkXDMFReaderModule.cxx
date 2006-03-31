@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.48");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.49");
 
 class vtkXDMFReaderModuleInternal
 {
@@ -384,7 +384,7 @@ void vtkXDMFReaderModule::UpdateDomains()
     }
 
   // Fill the domain menu with the name of each domain.
-  this->DomainMenu->GetMenu()->DeleteAllMenuItems();
+  this->DomainMenu->GetMenu()->DeleteAllItems();
   for(int i = 0; i < numDomains; ++i)
     {
     stream << vtkClientServerStream::Invoke
@@ -398,7 +398,7 @@ void vtkXDMFReaderModule::UpdateDomains()
         vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
         vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &dname))
       {
-      this->DomainMenu->AddRadioButton(dname, this, "UpdateGrids");
+      this->DomainMenu->GetMenu()->AddRadioButton(dname, this, "UpdateGrids");
 
       // Set the menu selection to the first entry.
       if(i == 0)

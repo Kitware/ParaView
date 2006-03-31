@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.77");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.78");
 
 
 //----------------------------------------------------------------------------
@@ -185,7 +185,7 @@ int vtkPVInputMenu::AddEntry(vtkPVSource *pvs)
   sprintf(methodAndArgs, "MenuEntryCallback %s", pvs->GetTclName());
 
   char* label = this->GetPVApplication()->GetTextRepresentation(pvs);
-  this->Menu->AddRadioButton(label, this, methodAndArgs);
+  this->Menu->GetMenu()->AddRadioButton(label, this, methodAndArgs);
   delete[] label;
   
   return 1;
@@ -557,7 +557,7 @@ vtkPVSourceCollection *vtkPVInputMenu::GetSources()
 //----------------------------------------------------------------------------
 void vtkPVInputMenu::DeleteAllEntries() 
 { 
-  this->Menu->GetMenu()->DeleteAllMenuItems();
+  this->Menu->GetMenu()->DeleteAllItems();
 }
 
 //----------------------------------------------------------------------------

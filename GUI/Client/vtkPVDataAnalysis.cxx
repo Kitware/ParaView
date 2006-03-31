@@ -87,7 +87,7 @@ protected:
 //*****************************************************************************
 
 vtkStandardNewMacro(vtkPVDataAnalysis);
-vtkCxxRevisionMacro(vtkPVDataAnalysis, "1.4");
+vtkCxxRevisionMacro(vtkPVDataAnalysis, "1.5");
 //-----------------------------------------------------------------------------
 vtkPVDataAnalysis::vtkPVDataAnalysis()
 {
@@ -233,6 +233,8 @@ void vtkPVDataAnalysis::CreateProperties()
 {
   this->Superclass::CreateProperties();
   
+  int index;
+
   this->PlotParametersFrame->SetParent(this->ParameterFrame->GetFrame());
   this->PlotParametersFrame->Create();
   this->PlotParametersFrame->SetLabelText("XY Scalar Plot");
@@ -523,13 +525,18 @@ void vtkPVDataAnalysis::CreateProperties()
   this->PlotTypeMenuButton->SetParent(
     this->PlotDisplayPropertiesFrame->GetFrame());
   this->PlotTypeMenuButton->Create();
-  this->PlotTypeMenuButton->AddRadioButton("Points",
-    this, "SetPlotTypeToPoints", "Plot data values as points.");
-  this->PlotTypeMenuButton->AddRadioButton("Lines",
-    this, "SetPlotTypeToLines", "Plot data values as lines.");
-  this->PlotTypeMenuButton->AddRadioButton("Points & Lines",
-    this, "SetPlotTypeToPointsAndLines",
-    "Plot data values as points joined by lines.");
+  index = this->PlotTypeMenuButton->GetMenu()->AddRadioButton(
+    "Points", this, "SetPlotTypeToPoints");
+  this->PlotTypeMenuButton->GetMenu()->SetItemHelpString(
+    index, "Plot data values as points.");
+  index = this->PlotTypeMenuButton->GetMenu()->AddRadioButton(
+    "Lines", this, "SetPlotTypeToLines");
+  this->PlotTypeMenuButton->GetMenu()->SetItemHelpString(
+    index, "Plot data values as lines.");
+  index = this->PlotTypeMenuButton->GetMenu()->AddRadioButton(
+    "Points & Lines", this, "SetPlotTypeToPointsAndLines");
+  this->PlotTypeMenuButton->GetMenu()->SetItemHelpString(
+    index, "Plot data values as points joined by lines.");
   this->PlotTypeMenuButton->SetValue("Points & Lines");
 
   this->Script("grid %s %s - x x x -sticky w",

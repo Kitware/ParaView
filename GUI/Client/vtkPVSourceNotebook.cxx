@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.28");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.29");
 
 //----------------------------------------------------------------------------
 vtkPVSourceNotebook::vtkPVSourceNotebook()
@@ -355,16 +355,25 @@ void vtkPVSourceNotebook::Create()
     }
 
   vtkKWMenu* menu = this->AcceptButton->GetMenu();
-  char* var = menu->CreateRadioButtonVariable(this, "Auto");
-  menu->AddRadioButton(0, "Manual", var, 
-      this, "SetAutoAccept 0",
-      "You have to press accept after changes to a modules parameters.");
-  menu->AddRadioButton(1, "Auto", var, 
-      this, "SetAutoAccept 1",
-      "Accept is automatically called every time a module is modified.");
+  int index;
+  char* var = menu->CreateItemVariableName(this, "Auto");
+
+  index = menu->AddRadioButton("Manual", this, "SetAutoAccept 0");
+  menu->SetItemVariable(index, var);
+  menu->SetItemSelectedValueAsInt(index, 0);
+  menu->SetItemHelpString(
+    index, "You have to press accept after changes to a modules parameters.");
+
+  index = menu->AddRadioButton("Auto", this, "SetAutoAccept 1");
+  menu->SetItemVariable(index, var);
+  menu->SetItemSelectedValueAsInt(index, 1);
+  menu->SetItemHelpString(
+    index, "Accept is automatically called every time a module is modified.");
+
   //menu->AddRadioButton(2, "Interactive", var, 
   //    this, "SetAutoAccept 2",
   //    "Accept is automatically called every time a module is modified.");
+
   this->Script("set %s %d", var, this->AutoAccept);
   delete [] var;
 

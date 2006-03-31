@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.32");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.33");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -261,7 +261,7 @@ void vtkPVFieldMenu::Update()
 
   this->UpdateProperty();
 
-  this->FieldMenu->GetMenu()->DeleteAllMenuItems();
+  this->FieldMenu->GetMenu()->DeleteAllItems();
   if (prop)
     {
     vtkSMEnumerationDomain* edom = vtkSMEnumerationDomain::SafeDownCast(
@@ -274,7 +274,7 @@ void vtkPVFieldMenu::Update()
         {
         ostrstream com;
         com << "SetValue " << edom->GetEntryValue(i) << ends;
-        this->FieldMenu->AddRadioButton(
+        this->FieldMenu->GetMenu()->AddRadioButton(
           edom->GetEntryText(i), this, com.str());
         delete[] com.str();
         if (this->Value == edom->GetEntryValue(i))

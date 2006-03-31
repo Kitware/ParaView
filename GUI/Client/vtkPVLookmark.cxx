@@ -24,6 +24,7 @@
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 #include "vtkKWMessageDialog.h"
+#include "vtkKWMenu.h"
 #include "vtkKWIcon.h"
 #include "vtkPVLookmarkManager.h"
 #include "vtkPVRenderView.h"
@@ -83,7 +84,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.66");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.67");
 
 
 //*****************************************************************************
@@ -277,7 +278,7 @@ vtkPVSource* vtkPVLookmark::GetSourceForMacro(vtkPVSourceCollection *sources,cha
   while(!itChoices->IsDoneWithTraversal())
     {
     pvs2 = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
-    menu->AddRadioButton(pvs2->GetModuleName());
+    menu->GetMenu()->AddRadioButton(pvs2->GetModuleName());
     if(strcmp(name,pvs2->GetModuleName())==0)
       {
       defaultValue = name;
@@ -407,7 +408,8 @@ vtkPVSource* vtkPVLookmark::GetReaderForMacro(vtkPVSourceCollection *readers, ch
     {
     pvs = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
     mod = vtkPVReaderModule::SafeDownCast(pvs);
-    menu->AddRadioButton(mod->RemovePath(mod->GetFileEntry()->GetValue()));
+    menu->GetMenu()->AddRadioButton(
+      mod->RemovePath(mod->GetFileEntry()->GetValue()));
     if(strcmp(mod->RemovePath(name),mod->RemovePath(mod->GetFileEntry()->GetValue()))==0)
       {
       defaultValue = mod->RemovePath(mod->GetFileEntry()->GetValue());
@@ -522,7 +524,8 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,
         {
         pvs = static_cast<vtkPVSource*>( itChoices->GetCurrentObject() );
         mod = vtkPVReaderModule::SafeDownCast(pvs);
-        menu->AddRadioButton(mod->RemovePath(mod->GetFileEntry()->GetValue()));
+        menu->GetMenu()->AddRadioButton(
+          mod->RemovePath(mod->GetFileEntry()->GetValue()));
         if(strcmp(mod->RemovePath(name),mod->RemovePath(mod->GetFileEntry()->GetValue()))==0)
           {
           defaultValue = mod->RemovePath(mod->GetFileEntry()->GetValue());

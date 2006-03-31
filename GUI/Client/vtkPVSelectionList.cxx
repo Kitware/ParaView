@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.64");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.65");
 
 //----------------------------------------------------------------------------
 vtkPVSelectionList::vtkPVSelectionList()
@@ -126,7 +126,7 @@ void vtkPVSelectionList::Create()
     if (name)
       {
       sprintf(tmp, "SelectCallback {%s} %d", name, i);
-      this->Menu->AddRadioButton(name, this, tmp);
+      this->Menu->GetMenu()->AddRadioButton(name, this, tmp);
       }
     }
   name = this->Names->GetString(this->CurrentValue);
@@ -271,7 +271,7 @@ void vtkPVSelectionList::AddItem(const char *name, int value)
   if (this->GetApplication())
     {
     sprintf(tmp, "SelectCallback {%s} %d", name, value);
-    this->Menu->AddRadioButton(name, this, tmp);
+    this->Menu->GetMenu()->AddRadioButton(name, this, tmp);
     
     if (value == this->CurrentValue)
       {
@@ -293,7 +293,7 @@ void vtkPVSelectionList::RemoveAllItems()
   this->Names->RemoveAllItems();
   if (this->Menu->IsCreated())
     {
-    this->Menu->GetMenu()->DeleteAllMenuItems();
+    this->Menu->GetMenu()->DeleteAllItems();
     }
   this->Modified();
 }

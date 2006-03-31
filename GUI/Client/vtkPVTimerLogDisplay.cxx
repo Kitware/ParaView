@@ -21,6 +21,7 @@
 #include "vtkKWCheckButton.h"
 #include "vtkKWLabel.h"
 #include "vtkKWFrame.h"
+#include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWText.h"
@@ -34,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.41");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.42");
 
 //----------------------------------------------------------------------------
 vtkPVTimerLogDisplay::vtkPVTimerLogDisplay()
@@ -173,10 +174,14 @@ void vtkPVTimerLogDisplay::Create()
   this->ThresholdLabel->SetBalloonHelpString("This option filters out short duration events.");
   this->ThresholdMenu->SetParent(this->ControlFrame);
   this->ThresholdMenu->Create();
-  this->ThresholdMenu->AddRadioButton("0.0", this, "SetThreshold 0.001");
-  this->ThresholdMenu->AddRadioButton("0.001", this, "SetThreshold 0.001");
-  this->ThresholdMenu->AddRadioButton("0.01", this, "SetThreshold 0.01");
-  this->ThresholdMenu->AddRadioButton("0.1", this, "SetThreshold 0.1");
+  this->ThresholdMenu->GetMenu()->AddRadioButton(
+    "0.0", this, "SetThreshold 0.001");
+  this->ThresholdMenu->GetMenu()->AddRadioButton(
+    "0.001", this, "SetThreshold 0.001");
+  this->ThresholdMenu->GetMenu()->AddRadioButton(
+    "0.01", this, "SetThreshold 0.01");
+  this->ThresholdMenu->GetMenu()->AddRadioButton(
+    "0.1", this, "SetThreshold 0.1");
   this->ThresholdMenu->SetValue("0.01");
   this->SetThreshold(0.01);
 
@@ -191,10 +196,14 @@ void vtkPVTimerLogDisplay::Create()
   this->BufferLengthLabel->SetBalloonHelpString("Set how many entries the log can have.");
   this->BufferLengthMenu->SetParent(this->ControlFrame);
   this->BufferLengthMenu->Create();
-  this->BufferLengthMenu->AddRadioButton("100", this, "SetBufferLength 100");
-  this->BufferLengthMenu->AddRadioButton("500", this, "SetBufferLength 500");
-  this->BufferLengthMenu->AddRadioButton("1000", this, "SetBufferLength 1000");
-  this->BufferLengthMenu->AddRadioButton("5000", this, "SetBufferLength 5000");
+  this->BufferLengthMenu->GetMenu()->AddRadioButton(
+    "100", this, "SetBufferLength 100");
+  this->BufferLengthMenu->GetMenu()->AddRadioButton(
+    "500", this, "SetBufferLength 500");
+  this->BufferLengthMenu->GetMenu()->AddRadioButton(
+    "1000", this, "SetBufferLength 1000");
+  this->BufferLengthMenu->GetMenu()->AddRadioButton(
+    "5000", this, "SetBufferLength 5000");
   this->BufferLengthMenu->SetValue("500");
   this->SetBufferLength(500);
   this->BufferLengthMenu->SetBalloonHelpString("Set how many entries the log can have.");

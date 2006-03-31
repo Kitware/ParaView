@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.77");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.78");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -241,6 +241,8 @@ void vtkPVLookmarkManager::Create()
   this->SetGeometry("380x700+0+0");
   this->SetDisplayPositionToScreenCenterFirst();
 
+  int index;
+
   // Menu : File
 
   vtkKWMenu *root_menu = this->GetMenu();
@@ -253,19 +255,34 @@ void vtkPVLookmarkManager::Create()
   this->MenuImportLmkFile->SetParent(this->MenuImport);
   this->MenuImportLmkFile->SetTearOff(0);
   this->MenuImportLmkFile->Create();
-  this->MenuImport->AddCascade("Lookmark File",this->MenuImportLmkFile,0);
-  char* rbv = 
-    this->MenuImportLmkFile->CreateRadioButtonVariable(this, "ImportLookmarkFileButtonVar");
-  this->Script( "set %s 0", rbv );
-  this->MenuImportLmkFile->AddRadioButton(0, "Replace", rbv, this, "ImportLookmarkFileCallback", 0);
-  this->MenuImportLmkFile->AddRadioButton(1, "Append", rbv, this, "ImportLookmarkFileCallback", 1);
-  delete [] rbv;
+  index = this->MenuImport->AddCascade(
+    "Lookmark File", this->MenuImportLmkFile);
+  this->MenuImport->SetItemUnderline(index, 0);
+
+  const char* rbv = "ImportLookmarkFileButtonVar";
+
+  index = this->MenuImportLmkFile->AddRadioButton(
+    "Replace", this, "ImportLookmarkFileCallback");
+  this->MenuImportLmkFile->SetItemUnderline(index, 0);
+  this->MenuImportLmkFile->SetItemGroupName(index, rbv);
+  this->MenuImportLmkFile->SetItemSelectedValueAsInt(index, 0);
+  
+  index = this->MenuImportLmkFile->AddRadioButton(
+    "Append", this, "ImportLookmarkFileCallback");
+  this->MenuImportLmkFile->SetItemUnderline(index, 1);
+  this->MenuImportLmkFile->SetItemGroupName(index, rbv);
+  this->MenuImportLmkFile->SetItemSelectedValueAsInt(index, 1);
+
+  this->MenuImportLmkFile->SelectItemInGroupWithSelectedValue(rbv, 0);
+
   this->MenuImportBoundingBoxFile->SetParent(this->MenuImport);
   this->MenuImportBoundingBoxFile->SetTearOff(0);
   this->MenuImportBoundingBoxFile->Create();
   this->MenuImport->AddCommand("Bounding Box File",this,"ImportBoundingBoxFileCallback");
-  root_menu->AddCascade("File", this->MenuFile, 0);
-  this->MenuFile->AddCascade("Import", this->MenuImport,0);
+  index = root_menu->AddCascade("File", this->MenuFile);
+  root_menu->SetItemUnderline(index, 0);
+  index = this->MenuFile->AddCascade("Import", this->MenuImport);
+  this->MenuFile->SetItemUnderline(index, 0);
   this->MenuFile->AddCommand("Save As", this, "SaveAllCallback");
   this->MenuFile->AddCommand("Export Folder", this, "ExportFolderCallback");
   this->MenuFile->AddCommand("Close", this, "Withdraw");
@@ -275,14 +292,16 @@ void vtkPVLookmarkManager::Create()
   this->MenuEdit->SetParent(root_menu);
   this->MenuEdit->SetTearOff(0);
   this->MenuEdit->Create();
-  root_menu->AddCascade("Edit", this->MenuEdit, 0);
+  index = root_menu->AddCascade("Edit", this->MenuEdit);
+  root_menu->SetItemUnderline(index, 0);
   this->MenuEdit->AddCommand("Undo", this, "UndoCallback");
   this->MenuEdit->AddCommand("Redo", this, "RedoCallback");
   this->MenuEdit->AddSeparator();
   this->MenuExamples->SetParent(this->MenuEdit);
   this->MenuExamples->SetTearOff(0);
   this->MenuExamples->Create();
-  this->MenuEdit->AddCascade("Add Existing Macro", this->MenuExamples,0);
+  index = this->MenuEdit->AddCascade("Add Existing Macro", this->MenuExamples);
+  this->MenuEdit->SetItemUnderline(index, 0);
   sprintf(methodAndArgs,"CreateLookmarkCallback 1");
   this->MenuEdit->AddCommand("Create Macro", this, methodAndArgs);
   this->MenuEdit->AddSeparator();
@@ -307,7 +326,8 @@ void vtkPVLookmarkManager::Create()
   this->MenuHelp->SetParent(root_menu);
   this->MenuHelp->SetTearOff(0);
   this->MenuHelp->Create();
-  root_menu->AddCascade("Help", this->MenuHelp, 0);
+  index = root_menu->AddCascade("Help", this->MenuHelp);
+  root_menu->SetItemUnderline(index, 0);
   this->MenuHelp->AddCommand("Quick Start Guide", this, "DisplayQuickStartGuide");
   this->MenuHelp->AddCommand("User's Tutorial", this, "DisplayUsersTutorial");
 
@@ -1278,8 +1298,10 @@ void vtkPVLookmarkManager::ImportLookmarkFileCallback()
 
   this->Checkpoint();
 
-  this->ImportLookmarkFile(filename,this->MenuImportLmkFile->GetCheckedRadioButtonItem(this,"ImportLookmarkFileButtonVar"));
-
+  this->ImportLookmarkFile(
+    filename,
+    this->MenuImportLmkFile->GetIndexOfSelectedItemInGroup(
+      "ImportLookmarkFileButtonVar"));
 }
 
 //----------------------------------------------------------------------------

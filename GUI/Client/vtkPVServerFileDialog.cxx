@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.56");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.57");
 
 // Taken from source selection list  we need ne images.
 /* 
@@ -667,7 +667,7 @@ void vtkPVServerFileDialog::UpdateExtensionsMenu()
     return;
     }
   this->FileTypeStrings->RemoveAllItems();
-  this->ExtensionsMenuButton->GetMenu()->DeleteAllMenuItems();
+  this->ExtensionsMenuButton->GetMenu()->DeleteAllItems();
   
   this->FileTypeDescriptions->RemoveAllItems();
   this->FileTypeStrings->RemoveAllItems();

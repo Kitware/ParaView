@@ -17,6 +17,7 @@
 #include "vtkArrayMap.txx"
 #include "vtkKWFrame.h"
 #include "vtkKWFrameWithLabel.h"
+#include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPV3DWidget.h"
@@ -37,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.78");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.79");
 
 //-----------------------------------------------------------------------------
 vtkPVSelectWidget::vtkPVSelectWidget()
@@ -127,7 +128,7 @@ void vtkPVSelectWidget::Create()
   for(i=0; i<len; i++)
     {
     label = this->Labels->GetString(i);
-    this->Menu->AddRadioButton(label, this, "MenuCallback");
+    this->Menu->GetMenu()->AddRadioButton(label, this, "MenuCallback");
     }
   if (len > 0 && this->CurrentIndex < 0)
     {
@@ -538,7 +539,7 @@ void vtkPVSelectWidget::AddItem(const char* labelVal, vtkPVWidget *pvw,
 
   if (this->GetApplication())
     {
-    this->Menu->AddRadioButton(labelVal, this, "MenuCallback");
+    this->Menu->GetMenu()->AddRadioButton(labelVal, this, "MenuCallback");
     if (this->CurrentIndex < 0)
       {
       this->Menu->SetValue(labelVal);

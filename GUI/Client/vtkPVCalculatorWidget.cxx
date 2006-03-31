@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.51");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.52");
 
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMFunctionProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMScalarVariableProperty,
@@ -277,10 +277,10 @@ void vtkPVCalculatorWidget::Create()
     "Select whether to operate on point or cell data");
   this->AttributeModeMenu->SetParent(this->AttributeModeFrame);
   this->AttributeModeMenu->Create();
-  this->AttributeModeMenu->AddRadioButton("Point Data", this,
-                                               "ChangeAttributeMode point");
-  this->AttributeModeMenu->AddRadioButton("Cell Data", this,
-                                               "ChangeAttributeMode cell");
+  this->AttributeModeMenu->GetMenu()->AddRadioButton(
+    "Point Data", this, "ChangeAttributeMode point");
+  this->AttributeModeMenu->GetMenu()->AddRadioButton(
+    "Cell Data", this, "ChangeAttributeMode cell");
   this->AttributeModeMenu->SetValue("Point Data");
   this->AttributeModeMenu->SetBalloonHelpString(
     "Select whether to operate on point or cell data");
@@ -583,8 +583,8 @@ void vtkPVCalculatorWidget::ChangeAttributeMode(const char* newMode)
                         this->GetTclName(), newMode);
     }
   
-  this->ScalarsMenu->GetMenu()->DeleteAllMenuItems();
-  this->VectorsMenu->GetMenu()->DeleteAllMenuItems();
+  this->ScalarsMenu->GetMenu()->DeleteAllItems();
+  this->VectorsMenu->GetMenu()->DeleteAllItems();
   this->FunctionLabel->SetValue("");
 
   this->AddAllVariables(1);

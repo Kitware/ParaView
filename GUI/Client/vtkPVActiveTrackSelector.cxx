@@ -43,7 +43,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVActiveTrackSelector);
-vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.14");
+vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.15");
 //-----------------------------------------------------------------------------
 vtkPVActiveTrackSelector::vtkPVActiveTrackSelector()
 {
@@ -243,7 +243,8 @@ void vtkPVActiveTrackSelector::RemoveSource(vtkPVAnimationCueTree* cue)
     {
     this->CleanupSource();
     }
-  this->SourceMenuButton->GetMenu()->DeleteMenuItem(cue->GetLabelText());
+  this->SourceMenuButton->GetMenu()->DeleteItem(
+    this->SourceMenuButton->GetMenu()->GetIndexOfItem(cue->GetLabelText()));
   this->Internals->SourceCueTrees.erase(iter);
 }
 
@@ -309,7 +310,7 @@ void vtkPVActiveTrackSelector::SelectSourceCallbackInternal(
 //-----------------------------------------------------------------------------
 void vtkPVActiveTrackSelector::CleanupPropertiesMenu()
 {
-  this->PropertyMenuButton->GetMenu()->DeleteAllMenuItems();
+  this->PropertyMenuButton->GetMenu()->DeleteAllItems();
   this->Internals->PropertyCues.clear();
   this->PropertyMenuButton->SetValue("Unselected");
 }

@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMapUI);
-vtkCxxRevisionMacro(vtkPVColorMapUI, "1.5");
+vtkCxxRevisionMacro(vtkPVColorMapUI, "1.6");
 
 vtkCxxSetObjectMacro(vtkPVColorMapUI, CurrentColorMap, vtkPVColorMap);
 
@@ -163,6 +163,7 @@ void vtkPVColorMapUI::Create()
   this->Superclass::Create();
 
   const char *grid_settings = "-padx 1 -pady 2";
+  int index;
 
   this->ScalarColorBarFrame->SetParent(this);
   this->ScalarColorBarFrame->Create();
@@ -207,10 +208,10 @@ void vtkPVColorMapUI::Create()
   
   this->VectorModeMenu->SetParent(this->ParameterFrame);
   this->VectorModeMenu->Create();
-  this->VectorModeMenu->AddRadioButton("Magnitude", this, 
-                                       "VectorModeMagnitudeCallback");
-  this->VectorModeMenu->AddRadioButton("Component", this, 
-                                       "VectorModeComponentCallback");
+  this->VectorModeMenu->GetMenu()->AddRadioButton(
+    "Magnitude", this, "VectorModeMagnitudeCallback");
+  this->VectorModeMenu->GetMenu()->AddRadioButton(
+    "Component", this, "VectorModeComponentCallback");
   this->VectorModeMenu->SetValue("Magnitude");
   this->VectorModeMenu->EnabledOff();
 
@@ -298,18 +299,26 @@ void vtkPVColorMapUI::Create()
   this->PresetsMenuButton->Create();
   this->PresetsMenuButton->IndicatorVisibilityOff();
   this->PresetsMenuButton->SetBalloonHelpString("Select a preset color map.");
-  this->PresetsMenuButton->GetMenu()->AddCommand(
-    "Blue to Red", 
-    this, "SetColorSchemeToBlueRed", "Set Color Scheme to Blue-Red");
-  this->PresetsMenuButton->GetMenu()->AddCommand(
-    "Red to Blue", 
-    this, "SetColorSchemeToRedBlue", "Set Color Scheme to Red-Blue");
-  this->PresetsMenuButton->GetMenu()->AddCommand(
-    "Grayscale", 
-    this, "SetColorSchemeToGrayscale", "Set Color Scheme to Grayscale");
-  this->PresetsMenuButton->GetMenu()->AddCommand(
-    "CIELab Blue to Red", 
-    this, "SetColorSchemeToLabBlueRed", "Set Color Scheme to Lab Blue To Red");
+
+  index = this->PresetsMenuButton->GetMenu()->AddCommand(
+    "Blue to Red", this, "SetColorSchemeToBlueRed");
+  this->PresetsMenuButton->GetMenu()->SetItemHelpString(
+    index, "Set Color Scheme to Blue-Red");
+
+  index = this->PresetsMenuButton->GetMenu()->AddCommand(
+    "Red to Blue", this, "SetColorSchemeToRedBlue");
+  this->PresetsMenuButton->GetMenu()->SetItemHelpString(
+    index, "Set Color Scheme to Red-Blue");
+
+  index = this->PresetsMenuButton->GetMenu()->AddCommand(
+    "Grayscale", this, "SetColorSchemeToGrayscale");
+  this->PresetsMenuButton->GetMenu()->SetItemHelpString(
+    index, "Set Color Scheme to Grayscale");
+
+  index = this->PresetsMenuButton->GetMenu()->AddCommand(
+    "CIELab Blue to Red", this, "SetColorSchemeToLabBlueRed");
+  this->PresetsMenuButton->GetMenu()->SetItemHelpString(
+    index, "Set Color Scheme to Lab Blue To Red");
   
   this->PresetsMenuButton->SetImageToPixels(image_presets, 
                                             image_presets_width, 
@@ -1053,7 +1062,7 @@ void vtkPVColorMapUI::UpdateParameterList(vtkPVWindow *win)
   int i, numArrays, numComp;
   int arraysFound = 0;
 
-  this->ParameterMenu->GetMenu()->DeleteAllMenuItems();
+  this->ParameterMenu->GetMenu()->DeleteAllItems();
 
   while ((source = sources->GetNextPVSource()))
     {
@@ -1081,8 +1090,8 @@ void vtkPVColorMapUI::UpdateParameterList(vtkPVWindow *win)
         method << "UpdateColorMapUI " << arrayInfo->GetName() << " "
                << arrayInfo->GetNumberOfComponents() << " "
                << vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA << ends;
-        this->ParameterMenu->AddRadioButton(label.str(), this,
-                                            method.str());
+        this->ParameterMenu->GetMenu()->AddRadioButton(
+          label.str(), this, method.str());
         method.rdbuf()->freeze(0);
         }
       label.rdbuf()->freeze(0);
@@ -1109,8 +1118,8 @@ void vtkPVColorMapUI::UpdateParameterList(vtkPVWindow *win)
         method << "UpdateColorMapUI " << arrayInfo->GetName() << " "
                << arrayInfo->GetNumberOfComponents() << " "
                << vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA << ends;
-        this->ParameterMenu->AddRadioButton(label.str(), this,
-                                            method.str());
+        this->ParameterMenu->GetMenu()->AddRadioButton(
+          label.str(), this, method.str());
         method.rdbuf()->freeze(0);
         }
       label.rdbuf()->freeze(0);
@@ -1373,14 +1382,14 @@ void vtkPVColorMapUI::UpdateVectorComponentMenu()
 {
   int numComps = this->CurrentColorMap->GetNumberOfVectorComponents();
   int comp = this->CurrentColorMap->GetVectorComponent();
-  this->VectorComponentMenu->GetMenu()->DeleteAllMenuItems();
+  this->VectorComponentMenu->GetMenu()->DeleteAllItems();
 
   int i;
   for (i = 0; i < numComps; i++)
     {
     ostrstream cmd;
     cmd << "VectorComponentMenuCallback " << i << ends;
-    this->VectorComponentMenu->AddRadioButton(
+    this->VectorComponentMenu->GetMenu()->AddRadioButton(
       this->CurrentColorMap->GetVectorComponentTitle(i), this, cmd.str());
     cmd.rdbuf()->freeze(0);
     }
