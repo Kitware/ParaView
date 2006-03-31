@@ -127,8 +127,8 @@ void pqInitializeServer(pqOptions* options, vtkProcessModule*& process_module, v
   if(!process_module)
     return;
 
-  process_module->Initialize();
   process_module->SetOptions(options);
+  process_module->Initialize();
   process_module->SetGUIHelper(pqProcessModuleGUIHelper::New());
 
   vtkCommonCS_Initialize(process_module->GetInterpreter());
