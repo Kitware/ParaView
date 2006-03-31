@@ -15,6 +15,7 @@
 #include "vtkTestingProcessModuleGUIHelper.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkOutputWindow.h"
 #include "vtkProcessModule.h"
 #include "vtkPVXMLParser.h"
 #include "vtkRenderWindow.h"
@@ -30,12 +31,69 @@
 #include <vtksys/SystemTools.hxx>
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkTestingProcessModuleGUIHelper, "1.4");
+
+//----------------------------------------------------------------------------
+// Output window which prints out the process id
+// with the error or warning messages
+class VTK_EXPORT vtkTestingOutputWindow : public vtkOutputWindow
+{
+public:
+  vtkTypeMacro(vtkTestingOutputWindow,vtkOutputWindow);
+  static vtkTestingOutputWindow* New();
+
+  void DisplayDebugText(const char* t)
+    {
+    this->PVDisplayText(t);
+    }
+
+  void DisplayWarningText(const char* t)
+    {
+    this->PVDisplayText(t);
+    }
+
+  void DisplayErrorText(const char* t)
+    {
+    this->PVDisplayText(t, 1);
+    }
+
+  void DisplayGenericWarningText(const char* t)
+    {
+    this->PVDisplayText(t);
+    }
+  void DisplayText(const char* t)
+    {
+    this->PVDisplayText(t, 0);
+    }
+  void PVDisplayText(const char* t, int error = 0)
+    {
+    (void)error;
+    cerr << t << endl;
+    }
+
+protected:
+  vtkTestingOutputWindow() {}
+  ~vtkTestingOutputWindow() {}
+
+private:
+  vtkTestingOutputWindow(const vtkTestingOutputWindow&);
+  void operator=(const vtkTestingOutputWindow&);
+};
+
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkTestingOutputWindow);
+
+
+
+vtkCxxRevisionMacro(vtkTestingProcessModuleGUIHelper, "1.5");
 vtkStandardNewMacro(vtkTestingProcessModuleGUIHelper);
 
 //----------------------------------------------------------------------------
 vtkTestingProcessModuleGUIHelper::vtkTestingProcessModuleGUIHelper()
 {
+  vtkTestingOutputWindow* win = vtkTestingOutputWindow::New();
+  vtkOutputWindow::SetInstance(win);
+  win->Delete();
+
   this->SMApplication = vtkSMApplication::New();
   this->ShowProgress = 0;
   this->Filter = 0;
@@ -136,14 +194,14 @@ int vtkTestingProcessModuleGUIHelper::RunGUIStart(int , char **,
     }
   else
     {
-    cout << "ERROR: Regression tests not performed since no baseline or temp directory "
-      "specified." << endl;
+    vtkErrorMacro("Regression tests not performed since no baseline or temp directory "
+      "specified.")
     cout << "Press a key to exit." << endl;
     char c;
     cin >> c;
     }
   this->ProcessModule->Exit();
-
+  
   // Exiting:  CLean up.
   return res;
 }
