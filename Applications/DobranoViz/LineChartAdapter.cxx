@@ -99,8 +99,8 @@ struct LineChartAdapter::pqImplementation
   pqImplementation(pqLineChartWidget& chart) :
     SourceProxy(0),
     EventAdaptor(vtkEventQtSlotConnect::New()),
-    ExodusVariableType(VARIABLE_TYPE_CELL),
     Chart(chart),
+    ExodusVariableType(VARIABLE_TYPE_CELL),
     Samples(50),
     ErrorBarWidth(0.5),
     ShowData(true),
@@ -269,10 +269,10 @@ struct LineChartAdapter::pqImplementation
 
       this->VisibleData = file_data[0];
 
-      for(int i = 1; i != file_data.size(); ++i)
+      for(int j = 1; j != file_data.size(); ++j)
         {
-        data.Times.push_back(time[i].toDouble());
-        data.Values.push_back(file_data[i].toDouble());
+        data.Times.push_back(time[j].toDouble());
+        data.Values.push_back(file_data[j].toDouble());
         }
       
       this->ExperimentalData.push_back(data);  
@@ -316,11 +316,11 @@ struct LineChartAdapter::pqImplementation
       ExperimentalUncertaintyT uncertainty;
       uncertainty.Label = upper_bounds[0];
 
-      for(int i = 1; i != upper_bounds.size(); ++i)
+      for(int j = 1; j != upper_bounds.size(); ++j)
         {
-        uncertainty.Times.push_back(time[i].toDouble());
-        uncertainty.UpperBounds.push_back(upper_bounds[i].toDouble());
-        uncertainty.LowerBounds.push_back(lower_bounds[i].toDouble());
+        uncertainty.Times.push_back(time[j].toDouble());
+        uncertainty.UpperBounds.push_back(upper_bounds[j].toDouble());
+        uncertainty.LowerBounds.push_back(lower_bounds[j].toDouble());
         }
       
       this->ExperimentalUncertainty.push_back(uncertainty);  
@@ -364,11 +364,11 @@ struct LineChartAdapter::pqImplementation
       SimulationUncertaintyT uncertainty;
       uncertainty.Label = upper_bounds[0];
 
-      for(int i = 1; i != upper_bounds.size(); ++i)
+      for(int j = 1; j != upper_bounds.size(); ++j)
         {
-        uncertainty.Times.push_back(time[i].toDouble());
-        uncertainty.UpperBounds.push_back(upper_bounds[i].toDouble());
-        uncertainty.LowerBounds.push_back(lower_bounds[i].toDouble());
+        uncertainty.Times.push_back(time[j].toDouble());
+        uncertainty.UpperBounds.push_back(upper_bounds[j].toDouble());
+        uncertainty.LowerBounds.push_back(lower_bounds[j].toDouble());
         }
       
       this->SimulationUncertainty.push_back(uncertainty);  
