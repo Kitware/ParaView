@@ -1,3 +1,4 @@
+from kwwidgets import vtkKWMenu
 from kwwidgets import vtkKWMenuButton
 from kwwidgets import vtkKWMenuButtonWithSpinButtons
 from kwwidgets import vtkKWMenuButtonWithLabel
@@ -23,7 +24,7 @@ def vtkKWMenuButtonEntryPoint(parent, win):
     menubutton1.SetBalloonHelpString("A simple menu button")
     
     for i in range(0,len(days)):
-        menubutton1.AddRadioButton(days[i])
+        menubutton1.GetMenu().AddRadioButton(days[i])
         
     
     app.Script(
@@ -44,7 +45,7 @@ def vtkKWMenuButtonEntryPoint(parent, win):
         "increment and decrement the value")
     
     for i in range(0,len(days)):
-        menubutton1b.GetWidget().AddRadioButton(days[i])
+        menubutton1b.GetWidget().GetMenu().AddRadioButton(days[i])
         
     
     app.Script(
@@ -71,7 +72,7 @@ def vtkKWMenuButtonEntryPoint(parent, win):
         "hidden, and the width is set explicitly")
     
     for i in range(0,len(days)):
-        menubutton2.GetWidget().AddRadioButton(days[i])
+        menubutton2.GetWidget().GetMenu().AddRadioButton(days[i])
         
     
     menubutton2.GetWidget().SetValue(days[0])

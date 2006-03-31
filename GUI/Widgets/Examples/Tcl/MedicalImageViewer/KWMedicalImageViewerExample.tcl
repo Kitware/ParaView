@@ -104,9 +104,12 @@ $orientation_menubutton SetReliefToGroove
 pack [$orientation_menubutton GetWidgetName] -side top -anchor nw -expand n -fill x
              
 set mb [[$orientation_menubutton GetWidget] GetWidget]
-$mb AddRadioButton "X-Y" "" "$viewer SetSliceOrientationToXY ; update_slice_ranges" ""
-$mb AddRadioButton "X-Z" "" "$viewer SetSliceOrientationToXZ ; update_slice_ranges" ""
-$mb AddRadioButton "Y-Z" "" "$viewer SetSliceOrientationToYZ ; update_slice_ranges" ""
+set menu [$mb GetMenu]
+
+$menu AddRadioButton "X-Y" "" "$viewer SetSliceOrientationToXY ; update_slice_ranges"
+$menu AddRadioButton "X-Z" "" "$viewer SetSliceOrientationToXZ ; update_slice_ranges"
+$menu AddRadioButton "Y-Z" "" "$viewer SetSliceOrientationToYZ ; update_slice_ranges"
+
 $mb SetValue "X-Y"
 
 # Create a window/level preset selector

@@ -16,7 +16,7 @@ proc vtkKWMenuButtonEntryPoint {parent win} {
 
   for {set i 0} {$i < [llength $days]} {incr i} {
 
-    $menubutton1 AddRadioButton [lindex $days $i]
+    [$menubutton1 GetMenu] AddRadioButton [lindex $days $i]
   }
 
   pack [$menubutton1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
@@ -36,7 +36,7 @@ proc vtkKWMenuButtonEntryPoint {parent win} {
 
   for {set i 0} {$i < [llength $days]} {incr i} {
 
-    [$menubutton1b GetWidget] AddRadioButton [lindex $days $i]
+    [[$menubutton1b GetWidget] GetMenu] AddRadioButton [lindex $days $i]
   }
 
   pack [$menubutton1b GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 6
@@ -62,7 +62,7 @@ proc vtkKWMenuButtonEntryPoint {parent win} {
 
   for {set i 0} {$i < [llength $days]} {incr i} {
 
-    [$menubutton2 GetWidget] AddRadioButton [lindex $days $i]
+    [[$menubutton2 GetWidget] GetMenu] AddRadioButton [lindex $days $i]
     }
 
   [$menubutton2 GetWidget] SetValue [lindex $days 0]
