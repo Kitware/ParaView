@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.78");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.79");
 
 
 //----------------------------------------------------------------------------
@@ -414,7 +414,7 @@ void vtkPVInputMenu::Initialize()
       {
       if (this->Menu->GetMenu()->GetNumberOfItems() > 0)
         {
-        this->Menu->GetMenu()->Invoke(0);
+        this->Menu->GetMenu()->InvokeItem(0);
         }
       }
     this->PVSource->SetPVInput(
