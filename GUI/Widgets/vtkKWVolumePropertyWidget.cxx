@@ -22,12 +22,12 @@
 #include "vtkKWEntryWithLabel.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
-#include "vtkKWFrame.h"
 #include "vtkKWFrameWithLabel.h"
 #include "vtkKWHSVColorSelector.h"
 #include "vtkKWHistogramSet.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
+#include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWMenuButtonWithLabel.h"
 #include "vtkKWPiecewiseFunctionEditor.h"
@@ -52,7 +52,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.37");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.38");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -266,10 +266,10 @@ void vtkKWVolumePropertyWidget::Create()
   this->Superclass::Create();
 
   ostrstream tk_cmd;
-
   int label_width = 12;
   int menu_width = 6;
   char command[256];
+  vtkKWMenu *menu;
 
   // --------------------------------------------------------------
   // Frame
@@ -294,10 +294,10 @@ void vtkKWVolumePropertyWidget::Create()
   this->ComponentSelectionWidget->SetSelectedComponentChangedCommand(
     this, "SelectedComponentCallback");
 
-  vtkKWMenuButtonWithLabel *omenu = 
+  vtkKWMenuButtonWithLabel *menubuttonwl = 
     this->ComponentSelectionWidget->GetSelectedComponentOptionMenu();
-  omenu->SetLabelWidth(label_width);
-  omenu->GetWidget()->SetWidth(menu_width);
+  menubuttonwl->SetLabelWidth(label_width);
+  menubuttonwl->GetWidget()->SetWidth(menu_width);
 
   // --------------------------------------------------------------
   // Interpolation type
@@ -316,7 +316,8 @@ void vtkKWVolumePropertyWidget::Create()
   this->InterpolationTypeOptionMenu->SetBalloonHelpString(
     "Set the interpolation type used for sampling the volume.");
 
-  vtkKWMenuButton *menu = this->InterpolationTypeOptionMenu->GetWidget();
+  vtkKWMenuButton *menubutton = this->InterpolationTypeOptionMenu->GetWidget();
+  menu = menubutton->GetMenu();
 
   char callback[128];
 
@@ -526,10 +527,10 @@ void vtkKWVolumePropertyWidget::Create()
   this->EnableGradientOpacityOptionMenu->SetBalloonHelpString(
     "Enable modulation of the opacity by the magnitude of the gradient "
     "according to the specified function.");
-  this->EnableGradientOpacityOptionMenu->AddRadioButton(
-    "On", this, "EnableGradientOpacityCallback 1");
-  this->EnableGradientOpacityOptionMenu->AddRadioButton(
-    "Off", this, "EnableGradientOpacityCallback 0");
+
+  menu = this->EnableGradientOpacityOptionMenu->GetMenu();
+  menu->AddRadioButton("On", this, "EnableGradientOpacityCallback 1");
+  menu->AddRadioButton("Off", this, "EnableGradientOpacityCallback 0");
 
   tk_cmd << "pack " << this->EnableGradientOpacityOptionMenu->GetWidgetName() 
          << " -side left -fill both -padx 0" << endl;

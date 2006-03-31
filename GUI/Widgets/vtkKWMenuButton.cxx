@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.33");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.34");
 
 //----------------------------------------------------------------------------
 vtkKWMenuButton::vtkKWMenuButton()
@@ -45,12 +45,47 @@ vtkKWMenuButton::~vtkKWMenuButton()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWMenuButton::Create()
+{
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->Superclass::CreateSpecificTkWidget("menubutton"))
+    {
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    return;
+    }
+
+  this->Menu->SetParent(this);
+  this->Menu->Create();
+  this->Menu->SetTearOff(0);
+
+  this->IndicatorVisibilityOn();
+  this->SetReliefToRaised();
+  this->SetBorderWidth(2);
+  this->SetHighlightThickness(0);
+  this->SetAnchorToCenter();
+
+  this->SetConfigurationOption("-direction", "flush");
+  this->SetConfigurationOption("-menu", this->Menu->GetWidgetName());
+
+  this->Script("set %sValue {}", this->GetTclName());
+  this->Script("trace variable %sValue w {%s TracedVariableChangedCallback}",
+               this->GetTclName(), this->GetTclName());
+
+  this->AddCallbackCommandObservers();
+
+  // Update enable state
+
+  this->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
 const char *vtkKWMenuButton::GetValue()
 {
   if (this->IsCreated())
     {
-    // Why we we re-assign to CurrentValue each time GetValue() is 
-    // called
+    // Why do we re-assign to CurrentValue each time GetValue() is 
+    // called ?
     // That's because the value of the internal variable is set by Tk
     // through the -variable settings of the radiobutton entries that
     // have been added to the menu. Therefore, if a radiobutton entry has
@@ -58,7 +93,7 @@ const char *vtkKWMenuButton::GetValue()
     // guarantee the variable has been changed before or after calling the
     // callback. To ensure it is true, always refresh the value from
     // the variable itself.
-    this->SetCurrentValue(this->Script("set %sValue", this->GetWidgetName()));
+    this->SetCurrentValue(this->Script("set %sValue", this->GetTclName()));
     }
   return this->CurrentValue;  
 }
@@ -68,7 +103,7 @@ void vtkKWMenuButton::SetValue(const char *s)
 {
   if (this->IsCreated() && s && strcmp(s, this->GetValue()))
     {
-    this->Script("set %sValue {%s}", this->GetWidgetName(), s);
+    this->Script("set %sValue {%s}", this->GetTclName(), s);
 
     if (this->Menu && *s)
       {
@@ -107,7 +142,7 @@ void vtkKWMenuButton::NextValue()
       pos = 0;
       }
     }
-  this->Menu->Invoke(pos);
+  this->Menu->InvokeItem(pos);
 }
 
 //----------------------------------------------------------------------------
@@ -131,18 +166,18 @@ void vtkKWMenuButton::PreviousValue()
       pos = this->Menu->GetNumberOfItems() - 1;
       }
     }
-  this->Menu->Invoke(pos);
+  this->Menu->InvokeItem(pos);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMenuButton::TracedVariableChangedCallback(
   const char *, const char *, const char *)
 {
-  this->UpdateOptionMenuLabel();
+  this->UpdateMenuButtonLabel();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenuButton::UpdateOptionMenuLabel()
+void vtkKWMenuButton::UpdateMenuButtonLabel()
 {
   if (this->IsCreated())
     {
@@ -171,77 +206,7 @@ void vtkKWMenuButton::SetMaximumLabelWidth(int arg)
   this->MaximumLabelWidth = arg;
   this->Modified();
 
-  this->UpdateOptionMenuLabel();
-}
- 
-//----------------------------------------------------------------------------
-void vtkKWMenuButton::AddRadioButton(const char *label)
-{
-  this->AddRadioButton(label, 0, 0, 0);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenuButton::AddRadioButton(const char *label, 
-                                     vtkObject *object, 
-                                     const char *method,
-                                     const char *help)
-{
-  vtksys_stl::string options("-variable ");
-  options += this->GetWidgetName();
-  options += "Value";
-  this->Menu->AddGeneric(
-    "radiobutton", label, object, method, options.c_str(), help);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenuButton::AddRadioButtonImage(const char *image_name, 
-                                          vtkObject *object, 
-                                          const char *method,
-                                          const char *help)
-{
-  vtksys_stl::string options("-variable ");
-  options += this->GetWidgetName();
-  options += "Value";
-  options += " -image ";
-  options += image_name;
-  options += " -selectimage ";
-  options += image_name;
-
-  this->Menu->AddGeneric(
-    "radiobutton", image_name, object, method, options.c_str(), help);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenuButton::Create()
-{
-  // Call the superclass to create the widget and set the appropriate flags
-
-  if (!this->Superclass::CreateSpecificTkWidget("menubutton"))
-    {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
-    return;
-    }
-
-  this->Menu->SetParent(this);
-  this->Menu->Create();
-  this->Menu->SetTearOff(0);
-
-  this->IndicatorVisibilityOn();
-  this->SetReliefToRaised();
-  this->SetBorderWidth(2);
-  this->SetHighlightThickness(0);
-  this->SetAnchorToCenter();
-
-  this->SetConfigurationOption("-direction", "flush");
-  this->SetConfigurationOption("-menu", this->Menu->GetWidgetName());
-
-  this->Script("set %sValue {}", this->GetWidgetName());
-  this->Script("trace variable %sValue w {%s TracedVariableChangedCallback}",
-               this->GetWidgetName(), this->GetTclName());
-
-  // Update enable state
-
-  this->UpdateEnableState();
+  this->UpdateMenuButtonLabel();
 }
 
 //----------------------------------------------------------------------------
@@ -320,6 +285,50 @@ void vtkKWMenuButton::UpdateEnableState()
 
   this->SetState(this->GetEnabled());
   this->PropagateEnableState(this->Menu);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::AddCallbackCommandObservers()
+{
+  this->Superclass::AddCallbackCommandObservers();
+
+  this->AddCallbackCommandObserver(
+    this->Menu, vtkKWMenu::RadioButtonItemAddedEvent);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::RemoveCallbackCommandObservers()
+{
+  this->Superclass::RemoveCallbackCommandObservers();
+
+  this->RemoveCallbackCommandObserver(
+    this->Menu, vtkKWMenu::RadioButtonItemAddedEvent);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::ProcessCallbackCommandEvents(vtkObject *caller,
+                                                     unsigned long event,
+                                                     void *calldata)
+{
+  // Make sure all radiobuttons share the same variable as we 
+  // are using internally.
+
+  if (caller == this->Menu)
+    {
+    int index = *(static_cast<int*>(calldata));
+    switch (event)
+      {
+      case vtkKWMenu::RadioButtonItemAddedEvent:
+        vtksys_stl::string varname(this->GetTclName());
+        varname += "Value";
+        this->Menu->SetItemVariable(index, varname.c_str());
+        this->Menu->SetItemSelectedValue(
+          index, this->Menu->GetItemLabel(index));
+        break;
+      }
+    }
+
+  this->Superclass::ProcessCallbackCommandEvents(caller, event, calldata);
 }
 
 //----------------------------------------------------------------------------

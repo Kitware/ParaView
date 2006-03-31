@@ -51,6 +51,8 @@ void vtkKWNotebookItem::Create(vtkKWWidget *parent, vtkKWWindow *)
   vtkKWNotebook *notebook2 = vtkKWNotebook::New();
   notebook2->SetParent(notebook1->GetFrame(page_id));
   notebook2->Create();
+  notebook2->EnablePageTabContextMenuOn();
+  notebook2->PagesCanBePinnedOn();
 
   notebook2->AddPage("Page A");
   notebook2->AddPage("Page B");

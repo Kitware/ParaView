@@ -22,15 +22,21 @@
 #include <ctype.h>
 
 #include <vtksys/SystemTools.hxx>
+#include <vtksys/stl/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.93");
+vtkCxxRevisionMacro(vtkKWMenu, "1.94");
+
+#define VTK_KW_MENU_CB_VARNAME_PATTERN "CB_group%d"
+#define VTK_KW_MENU_RB_DEFAULT_GROUP "RB_group"
+#define VTK_KW_MENU_VAR_SEPARATOR "_"
 
 //----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
 {
   this->TearOff = 0;
+  this->ItemCounter = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -50,7 +56,7 @@ void vtkKWMenu::Create()
     }
 
   this->SetConfigurationOptionAsInt("-tearoff", this->TearOff);
-  this->SetBinding("<<MenuSelect>>", this, "DisplayHelp %W");
+  this->SetBinding("<<MenuSelect>>", this, "DisplayHelpCallback %W");
 
   // Update enable state
   
@@ -58,180 +64,792 @@ void vtkKWMenu::Create()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetTearOff(int val)
+int vtkKWMenu::GetLabelWithoutUnderline(
+  const char *label, char **clean_label, int *underline_index)
 {
-  if (val == this->TearOff)
+  const char marker = '&';
+
+  // Find the marker (should not be the last char, or followed by space)
+
+  char *found = strchr(label, marker);
+  while(found)
+    {
+    ++found;
+    if(*found && *found != ' ')
+      {
+      break;
+      }
+    found = strchr(const_cast<const char*>(found), marker);
+    }
+
+  // Not found, sorry
+
+  if (!found)
+    {
+    *clean_label = const_cast<char*>(label);
+    *underline_index = -1;
+    return 0;
+    }
+
+  // Create the clean one
+
+  *underline_index = found - label - 1;
+  size_t clean_label_len = *underline_index + strlen(found);
+  *clean_label = new char [clean_label_len + 1];
+  if (*underline_index)
+    {
+    memcpy(*clean_label, label, *underline_index); // contents before marker
+    }
+  memcpy(*clean_label + *underline_index, const_cast<const char*>(found), 
+         clean_label_len - *underline_index); // contents after marker
+  (*clean_label)[clean_label_len] = '\0';
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::AddGeneric(const char* type, 
+                          const char *label,
+                          vtkObject *object,
+                          const char *method,
+                          const char* extra)
+{
+  if (!this->IsCreated())
+    {
+    return -1;
+    }
+
+  ostrstream str;
+  str << this->GetWidgetName() << " add " << type;
+
+  char *clean_label = NULL;
+  int underline_index, cleaned;
+  if (label)
+    {
+    cleaned = 
+      this->GetLabelWithoutUnderline(label, &clean_label, &underline_index);
+    str << " -label {" << clean_label << "}";
+    }
+
+  if (object || method)
+    {
+    char *command = NULL;
+    this->SetObjectMethodCommand(&command, object, method);
+    str << " -command {" << command << "}" ;
+    delete [] command;
+    }
+
+  if(extra)
+    {
+    str << " " << extra;
+    }
+
+  str << ends;
+  
+  this->Script(str.str());
+  str.rdbuf()->freeze(0);
+
+  int index = this->GetNumberOfItems() - 1;
+  if (label)
+    {
+    this->SetItemHelpString(index, clean_label);
+    if (cleaned)
+      {
+      this->SetItemUnderline(index, underline_index);
+      delete [] clean_label;
+      }
+    }
+
+  return index;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::InsertGeneric(int index, 
+                             const char* type, 
+                             const char *label, 
+                             vtkObject *object,
+                             const char *method, 
+                             const char* extra)
+{
+  if (!this->IsCreated())
+    {
+    return -1;
+    }
+
+  if (index == 0)
+    {
+    if (this->TearOff) // If tearoff, then entry 0 is always taken
+      {
+      index = 1;
+      }
+    } 
+  else
+    {
+    int nb_items = this->GetNumberOfItems(); // cap the index
+    if (index > nb_items)
+      {
+      index = nb_items;
+      }
+    }
+
+  ostrstream str;
+  str << this->GetWidgetName() << " insert " << index << " " << type;
+
+  char *clean_label = NULL;
+  int underline_index, cleaned;
+  if (label)
+    {
+    cleaned = 
+      this->GetLabelWithoutUnderline(label, &clean_label, &underline_index);
+    str << " -label {" << clean_label << "}";
+    }
+
+  if (object || method)
+    {
+    char *command = NULL;
+    this->SetObjectMethodCommand(&command, object, method);
+    str << " -command {" << command << "}" ;
+    delete [] command;
+    }
+
+  if(extra)
+    {
+    str << " " << extra;
+    }
+
+  str << ends;
+  
+  this->Script(str.str());
+  str.rdbuf()->freeze(0);
+
+  if (label)
+    {
+    this->SetItemHelpString(index, clean_label);
+    if (cleaned)
+      {
+      this->SetItemUnderline(index, underline_index);
+      delete [] clean_label;
+      }
+    }
+  
+  return index;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::AddCommand(const char *label, 
+                          vtkObject *object, const char *method)
+{
+  int index = this->AddGeneric("command", label, object, method, NULL);
+  if (index >= 0)
+    {
+    this->InvokeEvent(vtkKWMenu::CommandItemAddedEvent, &index);
+    }
+  return index;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::InsertCommand(int index, 
+                             const char *label, 
+                             vtkObject *object, const char *method)
+{
+  index = this->InsertGeneric(index, "command", label, object, method, NULL);
+  if (index >= 0)
+    {
+    this->InvokeEvent(vtkKWMenu::CommandItemAddedEvent, &index);
+    }
+  return index;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemCommand(int index, 
+                                vtkObject *object, 
+                                const char *method)
+{
+  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems())
     {
     return;
     }
-  this->Modified();
-  this->TearOff = val;
 
-  this->SetConfigurationOptionAsInt("-tearoff", this->TearOff);
+  char *command = NULL;
+  this->SetObjectMethodCommand(&command, object, method);
+  this->Script("%s entryconfigure %d -command {%s}", 
+               this->GetWidgetName(), index, command);
+  delete [] command;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::DisplayHelp(const char* widget)
+const char* vtkKWMenu::GetItemCommand(int index)
 {
-  const char* tname = this->GetTclName();
-  const char * res = this->Script(
-    "if [catch {set %sTemp $%sHelpArray([%s entrycget active -label])} %sTemp ]"
-    " { set %sTemp \"\"}; set %sTemp", 
-    tname, tname, widget, tname, tname, tname );
-  if(res)
+  return this->GetItemOption(index, "-command");
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::AddCheckButton(const char *label)
+{ 
+  return this->AddCheckButton(label, NULL, NULL);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::AddCheckButton(const char *label,
+                              vtkObject *object, const char *method)
+{ 
+  int index = this->AddGeneric("checkbutton", label, object, method, NULL);
+  if (index >= 0)
     {
-    vtkKWWindowBase* window = this->GetParentWindow();
-    if ( window )
-      {
-      window->SetStatusText(res);
-      }
+    char group_name[200];
+    sprintf(group_name, VTK_KW_MENU_CB_VARNAME_PATTERN, this->ItemCounter++);
+    this->SetItemVariable(index, this, group_name);
+    this->SetItemSelectedValueAsInt(index, 1);
+    this->SetItemDeselectedValueAsInt(index, 0);
+    this->InvokeEvent(vtkKWMenu::CheckButtonItemAddedEvent, &index);
+    }
+  return index;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::InsertCheckButton(int index, 
+                                 const char *label)
+{ 
+  return this->InsertCheckButton(index, label, NULL, NULL);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::InsertCheckButton(int index, 
+                                 const char *label,
+                                 vtkObject *object, const char *method)
+{ 
+  index = 
+    this->InsertGeneric(index, "checkbutton", label, object, method, NULL);
+  if (index >= 0)
+    {
+    char group_name[200];
+    sprintf(group_name, VTK_KW_MENU_CB_VARNAME_PATTERN, this->ItemCounter++);
+    this->SetItemVariable(index, this, group_name);
+    this->SetItemSelectedValueAsInt(index, 1);
+    this->SetItemDeselectedValueAsInt(index, 0);
+    this->InvokeEvent(vtkKWMenu::CheckButtonItemAddedEvent, &index);
+    }
+  return index;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SelectItem(int index)
+{
+  const char *temp = this->GetItemVariable(index);
+  if (temp)
+    {
+    vtksys_stl::string varname(temp);
+    this->SetItemVariableValue(
+      varname.c_str(), this->GetItemSelectedValue(index));
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::AddGeneric(const char* addtype, 
-                           const char* label,
-                           vtkObject *object,
-                           const char *method,
-                           const char* extra, 
-                           const char* help)
+void vtkKWMenu::SelectItem(const char *label)
+{
+  this->SelectItem(this->GetIndexOfItem(label));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::DeselectItem(int index)
+{
+  const char *temp = this->GetItemVariable(index);
+  if (temp)
+    {
+    vtksys_stl::string varname(temp);
+    this->SetItemVariableValue(
+      varname.c_str(), this->GetItemDeselectedValue(index));
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::DeselectItem(const char *label)
+{
+  this->DeselectItem(this->GetIndexOfItem(label));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemSelectedState(int index, int state)
+{
+  if (state)
+    {
+    this->SelectItem(index);
+    }
+  else
+    {
+    this->DeselectItem(index);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemSelectedState(const char *label, int state)
+{
+  this->SetItemSelectedState(this->GetIndexOfItem(label), state);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::GetItemSelectedState(int index)
+{
+  const char *temp = this->GetItemVariableValue(this->GetItemVariable(index));
+  if (temp)
+    {
+    vtksys_stl::string current_val(temp);
+    temp = this->GetItemSelectedValue(index);
+    if (temp)
+      {
+      return !strcmp(current_val.c_str(), temp) ? 1 : 0;
+      }
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::GetItemSelectedState(const char *label)
+{
+  return this->GetItemSelectedState(this->GetIndexOfItem(label));
+}
+
+//----------------------------------------------------------------------------
+char* vtkKWMenu::CreateItemVariableName(vtkKWObject *object, 
+                                        const char *suffix)
+{
+  char *buffer = NULL;
+  const char *objname = object->GetTclName();
+  if (objname && suffix)
+    {
+    size_t objname_len = strlen(objname);
+    size_t suffix_len = strlen(suffix);
+    size_t sep_len = strlen(VTK_KW_MENU_VAR_SEPARATOR);
+    buffer = new char[objname_len + sep_len + suffix_len + 1]; 
+    sprintf(buffer, "%s%s", objname, VTK_KW_MENU_VAR_SEPARATOR);
+    char *buffer_ptr = buffer + objname_len + sep_len;
+    const char *suffix_end = suffix + suffix_len;
+    while (suffix < suffix_end)
+      {
+      if (*suffix >= 0 && *suffix < 128 && *suffix != ' ')
+        {
+        *buffer_ptr = *suffix;
+        buffer_ptr++;
+        }
+      suffix++;
+      }
+    *buffer_ptr = '\0';
+    }
+  return buffer;
+}
+  
+//----------------------------------------------------------------------------
+const char* vtkKWMenu::GetSuffixOutOfCreatedItemVariableName(
+  const char *varname)
+{
+  if (varname)
+    {
+    return varname + 
+      strlen(this->GetTclName()) + 
+      strlen(VTK_KW_MENU_VAR_SEPARATOR);
+    }
+  return NULL;
+}
+  
+//----------------------------------------------------------------------------
+const char* vtkKWMenu::GetItemVariableValue(const char *varname)
+{
+  if (varname && *varname)
+    {
+    return this->Script("set %s", varname);
+    }
+  return NULL;
+}
+    
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemVariableValue(const char *varname, const char *value)
+{
+  this->Script("if {![info exists %s] || \"$%s\" ne \"%s\"} {set %s \"%s\"}",
+               varname, varname, value, varname, value);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::GetItemVariableValueAsInt(const char *varname)
+{
+  const char *temp = this->GetItemVariableValue(varname);
+  if (temp)
+    {
+    return atoi(temp);
+    }
+  return 0;
+}
+    
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemVariableValueAsInt(const char *varname, int value)
+{
+  this->Script("if {![info exists %s] || $%s != %d} {set %s %d}",
+               varname, varname, value, varname, value);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemVariable(int index, const char *varname)
+{
+  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems())
+    {
+    return;
+    }
+  this->Script("%s entryconfigure %d -variable {%s}", 
+               this->GetWidgetName(), index, varname);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemVariable(int index, 
+                                vtkKWObject *object, 
+                                const char *suffix)
+{
+  char *varname = this->CreateItemVariableName(object, suffix);
+  this->SetItemVariable(index, varname);
+  delete [] varname;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWMenu::GetItemVariable(int index)
+{
+  return this->GetItemOption(index, "-variable");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemSelectedValue(int index, const char* value)
 {
   if (!this->IsCreated())
     {
     return;
     }
 
-  ostrstream str;
-  str << this->GetWidgetName() << " add " << addtype;
+  vtksys_stl::string value_safe(value ? value : "");
 
-  if (label)
+  if (index < 0 || index >= this->GetNumberOfItems())
     {
-    str << " -label {" << label << "}";
+    return;
     }
 
-  if (object || method)
+  vtksys_stl::string type(
+    this->Script("%s type %d", this->GetWidgetName(), index));
+  if (!strcmp("radiobutton", type.c_str()))
     {
-    char *command = NULL;
-    this->SetObjectMethodCommand(&command, object, method);
-    str << " -command {" << command << "}" ;
-    delete [] command;
+    this->Script("%s entryconfigure %d -value {%s}", 
+                 this->GetWidgetName(), index, value_safe.c_str());
     }
-
-  if(extra)
+  else if (!strcmp("checkbutton", type.c_str()))
     {
-    str << " " << extra;
+    this->Script("%s entryconfigure %d -onvalue {%s}", 
+                 this->GetWidgetName(), index, value_safe.c_str());
     }
-
-  str << ends;
-  
-  this->Script(str.str());
-  str.rdbuf()->freeze(0);
-
-  if(!help)
-    {
-    help = label;
-    }
-
-  this->Script("set {%sHelpArray(%s)} {%s}", this->GetTclName(), 
-               label, help);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::InsertGeneric(int position, const char* addtype, 
-                              const char* label, 
-                              vtkObject *object,
-                              const char *method, 
-                              const char* extra, 
-                              const char* help)
+const char* vtkKWMenu::GetItemSelectedValue(int index)
 {
-  ostrstream str;
-  str << this->GetWidgetName() << " insert " << position << " " << addtype;
-
-  if (label)
+  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems())
     {
-    str << " -label {" << label << "}";
+    return NULL;
     }
 
-  if (object || method)
+  vtksys_stl::string type(
+    this->Script("%s type %d", this->GetWidgetName(), index));
+  if (!strcmp("radiobutton", type.c_str()))
     {
-    char *command = NULL;
-    this->SetObjectMethodCommand(&command, object, method);
-    str << " -command {" << command << "}" ;
-    delete [] command;
+    return this->GetItemOption(index, "-value");
+    }
+  else if (!strcmp("checkbutton", type.c_str()))
+    {
+    return this->GetItemOption(index, "-onvalue");
     }
 
-  if(extra)
-    {
-    str << " " << extra;
-    }
-
-  str << ends;
-  
-  this->Script(str.str());
-  str.rdbuf()->freeze(0);
-
-  if(!help)
-    {
-    help = label;
-    }
-
-  this->Script("set {%sHelpArray(%s)} {%s}", this->GetTclName(), 
-               label, help);
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::AddCascade(const char* label, 
-                           vtkKWMenu* menu, 
-                           int underline, 
-                           const char* help)
+void vtkKWMenu::SetItemSelectedValueAsInt(int index, int value)
 {
-  ostrstream str;
-  str << this->GetWidgetName() << " add cascade -label {" << label << "}"
-      << " -underline " << underline << ends;
-  this->Script(str.str());
-  str.rdbuf()->freeze(0);
-
-  if(!help)
-    {
-    help = label;
-    }
-  this->Script("set {%sHelpArray(%s)} {%s}", 
-               this->GetTclName(), label, help);
-
-  this->SetCascade(label, menu);
+  char buffer[50];
+  sprintf(buffer, "%d", value);
+  this->SetItemSelectedValue(index, buffer);
 }
 
 //----------------------------------------------------------------------------
-void  vtkKWMenu::InsertCascade(int position, 
-                               const char* label, 
-                               vtkKWMenu* menu, 
-                               int underline, 
-                               const char* help)
+int vtkKWMenu::GetItemSelectedValueAsInt(int index)
 {
-  ostrstream str;
-  
-  str << this->GetWidgetName() << " insert " << position 
-      << " cascade -label {" << label << "} -underline " << underline << ends;
-  this->Script(str.str());
-  str.rdbuf()->freeze(0);
-
-  if(!help)
-    {
-    help = label;
-    }
-  this->Script("set {%sHelpArray(%s)} {%s}", 
-               this->GetTclName(), label, help);
-
-  this->SetCascade(label, menu);
+  return atoi(this->GetItemSelectedValue(index));
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMenu::GetCascadeIndex(vtkKWMenu* menu)
+void vtkKWMenu::SetItemDeselectedValue(int index, const char* value)
+{
+  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems())
+    {
+    return;
+    }
+
+  this->Script("%s entryconfigure %d -offvalue {%s}", 
+               this->GetWidgetName(), index, value ? value : "");
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWMenu::GetItemDeselectedValue(int index)
+{
+  return this->GetItemOption(index, "-offvalue");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemDeselectedValueAsInt(int index, int value)
+{
+  char buffer[50];
+  sprintf(buffer, "%d", value);
+  this->SetItemDeselectedValue(index, buffer);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::GetItemDeselectedValueAsInt(int index)
+{
+  return atoi(this->GetItemDeselectedValue(index));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::AddRadioButton(const char *label)
+{
+  return this->AddRadioButton(label, NULL, NULL);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::AddRadioButton(const char *label,
+                              vtkObject *object, const char *method)
+{
+  int index = 
+    this->AddGeneric("radiobutton", label, object, method, NULL);
+  if (index >= 0)
+    {
+    this->SetItemVariable(index, this, VTK_KW_MENU_RB_DEFAULT_GROUP);
+    this->SetItemSelectedValue(index, label);
+    this->InvokeEvent(vtkKWMenu::RadioButtonItemAddedEvent, &index);
+    }
+  return index;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::AddRadioButtonImage(const char *imgname)
+{
+  return this->AddRadioButtonImage(imgname, NULL, NULL);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::AddRadioButtonImage(const char *imgname,
+                                   vtkObject *object, const char *method)
+{
+  vtksys_stl::string str("-image ");
+  str += imgname;
+  str += " -selectimage ";
+  str += imgname;
+  // Uses the imgname as label, so that the help string can work.
+  int index = 
+    this->AddGeneric("radiobutton", imgname, object, method, str.c_str());
+  if (index >= 0)
+    {
+    this->SetItemVariable(index, this, VTK_KW_MENU_RB_DEFAULT_GROUP);
+    this->SetItemSelectedValue(index, imgname);
+    this->InvokeEvent(vtkKWMenu::RadioButtonItemAddedEvent, &index);
+    }
+  return index;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::InsertRadioButton(int index, 
+                                 const char *label)
+{
+  return this->InsertRadioButton(index, label, NULL, NULL);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::InsertRadioButton(int index, 
+                                 const char *label,
+                                 vtkObject *object, const char *method)
+{
+  index = 
+    this->InsertGeneric(index, "radiobutton", label, object, method, NULL);
+  if (index >= 0)
+    {
+    this->SetItemVariable(index, this, VTK_KW_MENU_RB_DEFAULT_GROUP);
+    this->SetItemSelectedValue(index, label);
+    this->InvokeEvent(vtkKWMenu::RadioButtonItemAddedEvent, &index);
+    }
+  return index;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::InsertRadioButtonImage(int index, const char *imgname)
+{
+  return this->InsertRadioButtonImage(index, imgname, NULL, NULL);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::InsertRadioButtonImage(int index, const char *imgname,
+                                      vtkObject *object, const char *method)
+{
+  vtksys_stl::string str("-image ");
+  str += imgname;
+  str += " -selectimage ";
+  str += imgname;
+  // Uses the imgname as label, so that the help string can work.
+  index = this->InsertGeneric(
+    index, "radiobutton", imgname, object, method, str.c_str());
+  if (index >= 0)
+    {
+    this->SetItemVariable(index, this, VTK_KW_MENU_RB_DEFAULT_GROUP);
+    this->SetItemSelectedValue(index, imgname);
+    this->InvokeEvent(vtkKWMenu::RadioButtonItemAddedEvent, &index);
+    }
+  return index;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::PutItemInGroup(int index, int index_g)
+{
+  this->SetItemGroupName(
+    index, this->GetItemGroupName(index_g));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemGroupName(int index, const char *group_name)
+{
+  char *varname = this->CreateItemVariableName(this, group_name);
+  this->SetItemVariable(index, varname);
+  delete [] varname;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWMenu::GetItemGroupName(int index)
+{
+  return this->GetSuffixOutOfCreatedItemVariableName(
+    this->GetItemVariable(index));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::GetIndexOfItemUsingVariableAndSelectedValue(
+  const char *varname, const char *selected_value)
+{
+  if (varname && selected_value)
+    {
+    vtksys_stl::string varname_safe(varname);
+    vtksys_stl::string selected_value_safe(selected_value);
+
+    int nb_of_items = this->GetNumberOfItems();
+    for(int i = 0; i < nb_of_items; i++)
+      {
+      vtksys_stl::string type(
+        this->Script("%s type %d", this->GetWidgetName(), i));
+      if (!strcmp("radiobutton", type.c_str()))
+        {
+        const char *temp = this->GetItemVariable(i);
+        if (temp && !strcmp(varname_safe.c_str(), temp))
+          {
+          temp = this->GetItemSelectedValue(i);
+          if (temp && !strcmp(temp, selected_value_safe.c_str()))
+            {
+            return i;
+            }
+          }
+        }
+      }
+    }
+  
+  return -1;
+}
+    
+//----------------------------------------------------------------------------
+int vtkKWMenu::SelectItemInGroupWithSelectedValue(
+  const char *group_name, const char *selected_value)
+{
+  char *varname = this->CreateItemVariableName(this, group_name);
+  int index = this->GetIndexOfItemUsingVariableAndSelectedValue(
+    varname, selected_value);
+  if (index >= 0)
+    {
+    this->SelectItem(index);
+    }
+  return index;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::SelectItemInGroupWithSelectedValueAsInt(
+  const char *group_name, int selected_value)
+{
+  char buffer[50];
+  sprintf(buffer, "%d", selected_value);
+  return this->SelectItemInGroupWithSelectedValue(
+    group_name, buffer);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::GetIndexOfSelectedItemInGroup(const char *group_name)
+{
+  int index = -1;
+  char *varname = this->CreateItemVariableName(this, group_name);
+  const char *temp = this->GetItemVariableValue(varname);
+  if (temp)
+    {
+    vtksys_stl::string varvalue(temp);
+    index = this->GetIndexOfItemUsingVariableAndSelectedValue(
+      varname, varvalue.c_str());
+    }
+  delete [] varname;
+  return index;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::AddSeparator()
+{
+  int index = this->AddGeneric("separator", NULL, NULL, NULL, NULL);
+  this->InvokeEvent(vtkKWMenu::SeparatorItemAddedEvent, &index);
+  return index;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::InsertSeparator(int index)
+{
+  index = this->InsertGeneric(index, "separator", NULL, NULL, NULL, NULL);
+  this->InvokeEvent(vtkKWMenu::SeparatorItemAddedEvent, &index);
+  return index;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::AddCascade(const char *label, 
+                           vtkKWMenu* menu)
+{
+  int index = this->AddGeneric("cascade", label, NULL, NULL, NULL);
+  if (index >= 0)
+    {
+    this->SetItemCascade(index, menu);
+    this->InvokeEvent(vtkKWMenu::CascadeItemAddedEvent, &index);
+    }
+  return index;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::InsertCascade(int index, 
+                             const char *label, 
+                             vtkKWMenu* menu)
+{
+  index = this->InsertGeneric(index, "cascade", label, NULL, NULL, NULL);
+  if (index >= 0)
+    {
+    this->SetItemCascade(index, menu);
+    this->InvokeEvent(vtkKWMenu::CascadeItemAddedEvent, &index);
+    }
+  return index;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::GetIndexOfCascadeItem(vtkKWMenu *menu)
 {
   if (menu && menu->IsCreated())
     {
-    int nb_of_items = this->GetNumberOfItems();
-    for (int i = 0; i < nb_of_items; i++)
+    int i, nb_of_items = this->GetNumberOfItems();
+    for (i = 0; i < nb_of_items; i++)
       {
       const char *menu_opt = this->GetItemOption(i, "-menu");
       if (menu_opt && !strcmp(menu_opt, menu->GetWidgetName()))
@@ -240,18 +858,18 @@ int vtkKWMenu::GetCascadeIndex(vtkKWMenu* menu)
         }
       }
     }
-
   return -1;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetCascade(int index, const char* menu_name)
+void vtkKWMenu::SetItemCascade(int index, const char *menu_name)
 {
   if (!menu_name)
     {
     return;
     }
 
+  vtksys_stl::string menu_name_safe(menu_name);
   const char *wname = this->GetWidgetName();
 
   ostrstream str;
@@ -262,19 +880,19 @@ void vtkKWMenu::SetCascade(int index, const char* menu_name)
   // If not, clone it.
 
   int parent_length = (int)(strlen(wname));
-  int child_length = (int)(strlen(menu_name));
+  int child_length = (int)(menu_name_safe.size());
 
   if (child_length < (parent_length + 2) || 
-      strncmp(wname, menu_name, parent_length) ||
-      menu_name[parent_length] != '.')
+      strncmp(wname, menu_name_safe.c_str(), parent_length) ||
+      menu_name_safe[parent_length] != '.')
     {
     ostrstream clone_menu;
     clone_menu << wname << ".clone_";
-    const char *res = 
-      this->Script("string trim [%s entrycget %d -label]",  wname, index);
-    if (res && *res)
+    vtksys_stl::string res(
+      this->Script("string trim [%s entrycget %d -label]",  wname, index));
+    if (res.size())
       {
-      clone_menu << res;
+      clone_menu << res.c_str();
       }
     else
       {
@@ -282,13 +900,13 @@ void vtkKWMenu::SetCascade(int index, const char* menu_name)
       }
     clone_menu << ends;
     this->Script("catch { destroy %s } \n %s clone %s", 
-                 clone_menu.str(), menu_name, clone_menu.str());
+                 clone_menu.str(), menu_name_safe.c_str(), clone_menu.str());
     str << " -menu {" << clone_menu.str() << "}" << ends;
     clone_menu.rdbuf()->freeze(0); 
     }
   else
     {
-    str << " -menu {" << menu_name << "}" << ends;
+    str << " -menu {" << menu_name_safe.c_str() << "}" << ends;
     }
 
   this->Script(str.str());
@@ -296,419 +914,12 @@ void vtkKWMenu::SetCascade(int index, const char* menu_name)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetCascade(int index, vtkKWMenu* menu)
+void vtkKWMenu::SetItemCascade(int index, vtkKWMenu *menu)
 {
-  if (!menu)
+  if (menu)
     {
-    return;
+    this->SetItemCascade(index, menu->GetWidgetName());
     }
-  this->SetCascade(index, menu->GetWidgetName());
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::SetCascade(const char *label, vtkKWMenu* menu)
-{
-  if (!menu || !this->HasItem(label))
-    {
-    return;
-    }
-  this->SetCascade(this->GetIndexOfItem(label), menu->GetWidgetName());
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::SetCascade(const char *label, const char* menu_name)
-{
-  if (!menu_name || !this->HasItem(label))
-    {
-    return;
-    }
-  this->SetCascade(this->GetIndexOfItem(label), menu_name);
-}
-
-//----------------------------------------------------------------------------
-void  vtkKWMenu::AddCheckButton(const char* label, const char* ButtonVar, 
-                                vtkObject *object, 
-                                const char *method, 
-                                const char* help )
-{ 
-  this->AddCheckButton(label, ButtonVar, object, method, -1, help);
-}
- 
-//----------------------------------------------------------------------------
-void  vtkKWMenu::AddCheckButton(const char* label, const char* ButtonVar, 
-                                vtkObject *object, 
-                                const char *method, 
-                                int underline, const char* help )
-{ 
-  ostrstream str;
-  str << "-variable " << ButtonVar;
-  if ( underline >= 0 )
-    {
-    str << " -underline " << underline;
-    }
-  str << ends;
-  this->AddGeneric("checkbutton", label, object, 
-                   method, str.str(), help);
-  str.rdbuf()->freeze(0);
-}
-
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::InsertCheckButton(int position, 
-                                  const char* label, const char* ButtonVar, 
-                                  vtkObject *object, 
-                                  const char *method, const char* help )
-{ 
-  this->InsertCheckButton( position, label, ButtonVar, object, method,
-                           -1, help );
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::InsertCheckButton(int position, 
-                                  const char* label, const char* ButtonVar, 
-                                  vtkObject *object, 
-                                  const char *method, 
-                                  int underline, const char* help )
-{ 
-  ostrstream str;
-  str << "-variable " << ButtonVar;
-  if ( underline >= 0 )
-    {
-    str << " -underline " << underline;
-    }
-  str << ends;
-  this->InsertGeneric(position, "checkbutton", label, object, 
-                      method, str.str(), help);
-  str.rdbuf()->freeze(0);
-}
-
-
-//----------------------------------------------------------------------------
-void  vtkKWMenu::AddCommand(const char* label, vtkObject *object,
-                            const char *method,
-                            int underline, 
-                            const char* help)
-{
-  ostrstream str;
-  if ( underline >= 0 )
-    {
-    str << " -underline " << underline;
-    }
-  str << ends;
-  this->AddGeneric("command", label, object, 
-                   method, str.str(), help);
-  str.rdbuf()->freeze(0);
-}
-
-//----------------------------------------------------------------------------
-void  vtkKWMenu::AddCommand(const char* label, vtkObject *object,
-                            const char *method ,
-                            const char* help)
-{
-  this->AddGeneric("command", label, object, 
-                   method, NULL, help);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::InsertCommand(int position, const char* label, vtkObject *object,
-                              const char *method,
-                              int underline, 
-                              const char* help)
-{
-  ostrstream str;
-  if ( underline >= 0 )
-    {
-    str << " -underline " << underline;
-    }
-  str << ends;
-  this->InsertGeneric(position, "command", label, object,
-                      method, str.str(), help);
-  str.rdbuf()->freeze(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::InsertCommand(int position, const char* label, vtkObject *object,
-                              const char *method,
-                              const char* help)
-{
-  this->InsertGeneric(position, "command", label, object,
-                      method, NULL, help);
-}
-
-//----------------------------------------------------------------------------
-char* vtkKWMenu::CreateRadioButtonVariable(vtkKWObject* object, 
-                                           const char* varname)
-{
-  char *buffer = NULL;
-  const char *objname = object->GetTclName();
-  if (objname && varname)
-    {
-    size_t objname_len = strlen(objname);
-    size_t varname_len = strlen(varname);
-    buffer = new char[objname_len + varname_len + 1]; 
-    sprintf(buffer, "%s", objname);
-    char *buffer_ptr = buffer + objname_len;
-    const char *varname_end = varname + varname_len;
-    while (varname < varname_end)
-      {
-      if (*varname >= 0 && *varname != ' ')
-        {
-        *buffer_ptr = *varname;
-        buffer_ptr++;
-        }
-      varname++;
-      }
-    *buffer_ptr = '\0';
-    }
-  return buffer;
-}
-  
-//----------------------------------------------------------------------------
-int vtkKWMenu::GetRadioButtonValue(vtkKWObject* object, 
-                                   const char* varname)
-{
-  int res;
-  
-  char *rbv = 
-    this->CreateRadioButtonVariable(object,varname);
-  res = atoi(this->Script("set %s",rbv));
-  delete [] rbv;
-  return res;
-}
-    
-//----------------------------------------------------------------------------
-int vtkKWMenu::GetCheckedRadioButtonItem(vtkKWObject* object, 
-                                         const char* varname)
-{
-  char *rbv = this->CreateRadioButtonVariable(object,varname);
-  int value = this->GetCheckButtonValue(object,varname);
-
-  int numEntries = this->GetNumberOfItems();
-  for(int i = 0; i < numEntries; i++)
-    {
-    const char *res = this->Script("%s type %d", this->GetWidgetName(), i);
-    if (!strcmp("radiobutton", res))
-      {
-      res = 
-        this->Script("%s entrycget %i -variable", this->GetWidgetName(), i);
-      if (!strcmp(rbv, res))
-        {
-        if (atoi(
-              this->Script("%s entrycget %i -value", 
-                           this->GetWidgetName(), i)) == value)
-          {
-          delete [] rbv;
-          return i;
-          }
-        }
-      }
-    }
-
-  delete [] rbv;
-  return -1;
-}
-    
-//----------------------------------------------------------------------------
-void vtkKWMenu::CheckRadioButton(vtkKWObject* object, 
-                                 const char* varname, int id)
-{
-  char *rbv = this->CreateRadioButtonVariable(object,varname);
-  this->Script("if {![info exists %s] || $%s != %d} {set %s %d}",
-               rbv, rbv, id, rbv, id);
-  delete [] rbv;
-}
-
-//----------------------------------------------------------------------------
-char* vtkKWMenu::CreateCheckButtonVariable(vtkKWObject* object, 
-                                           const char* varname)
-{
-  return this->CreateRadioButtonVariable(object, varname);
-}
-  
-//----------------------------------------------------------------------------
-int vtkKWMenu::GetCheckButtonValue(vtkKWObject* object, 
-                                   const char* name)
-{
-  int res;
-  
-  char *rbv = 
-    this->CreateCheckButtonVariable(object,name);
-  res = atoi(this->Script("set %s",rbv));
-  delete [] rbv;
-  return res;
-}
-    
-//----------------------------------------------------------------------------
-void vtkKWMenu::CheckCheckButton(vtkKWObject* object, 
-                                 const char* name, int id)
-{
-  char *rbv = this->CreateCheckButtonVariable(object,name);
-  this->Script("if {![info exists %s] || $%s != %d} {set %s %d}",
-               rbv, rbv, id, rbv, id);
-  delete [] rbv;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::AddRadioButton(int value, 
-                               const char* label, 
-                               const char* buttonVar, 
-                               vtkObject *object, 
-                               const char *method,
-                               int underline, 
-                               const char* help)
-{
-  ostrstream str;
-  str << "-value " << value << " -variable " << buttonVar;
-  if ( underline >= 0 )
-    {
-    str << " -underline " << underline;
-    }
-  str << ends;
-  this->AddGeneric("radiobutton", label, object,
-                   method, str.str(), help);
-  str.rdbuf()->freeze(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::AddRadioButton(int value, const char* label, const char* buttonVar, 
-                               vtkObject *object, 
-                               const char *method,
-                               const char* help)
-{
-  this->AddRadioButton(value, label, buttonVar, object, method,
-                       -1, help);
-}
-
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::AddRadioButtonImage(int value, 
-                                    const char* imgname, 
-                                    const char* buttonVar, 
-                                    vtkObject *object, 
-                                    const char *method,
-                                    const char* help)
-{
-  ostrstream str;
-  str << "-image " << imgname 
-      << " -selectimage " << imgname 
-      << " -value " << value 
-      << " -variable " << buttonVar
-      << ends;
-  // Uses the imgname as label, so that the help string can work.
-  this->AddGeneric("radiobutton", imgname, object,
-                   method, str.str(), help);
-  str.rdbuf()->freeze(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::InsertRadioButton(int position, int value, const char* label, 
-                                  const char* buttonVar, 
-                                  vtkObject *object, 
-                                  const char *method,
-                                  const char* help)
-{
-  this->InsertRadioButton( position, value, label, buttonVar, object,
-                           method, -1, help );
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::InsertRadioButton(int position, int value, const char* label, 
-                                  const char* buttonVar, 
-                                  vtkObject *object, 
-                                  const char *method,
-                                  int underline,
-                                  const char* help)
-{
-  ostrstream str;
-  str << "-value " << value << " -variable " << buttonVar;
-  if ( underline >= 0 )
-    {
-    str << " -underline " << underline;
-    }
-  str << ends;
-  this->InsertGeneric(position, "radiobutton", label, object,
-                      method, str.str(), help);
-  str.rdbuf()->freeze(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::Invoke(int position)
-{
-  this->Script("%s invoke %d", this->GetWidgetName(), position);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::Invoke(const char *label)
-{
-  if (!this->HasItem(label))
-    {
-    return;
-    }
-  this->Invoke(this->GetIndexOfItem(label));
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::DeleteMenuItem(int position)
-{
-  const char *wname = this->GetWidgetName();
-  this->Script(
-    "catch {%s delete %d} ; set {%sHelpArray([%s entrycget %d -label])} {}", 
-    wname, position, 
-    wname, wname, position);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::DeleteMenuItem(const char *label)
-{
-  if (!this->HasItem(label))
-    {
-    return;
-    }
-  this->DeleteMenuItem(this->GetIndexOfItem(label));
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::DeleteAllMenuItems()
-{
-  int nb_items = this->GetNumberOfItems();
-  if (!nb_items)
-    {
-    return;
-    }
-
-  ostrstream tk_cmd;
-  const char *wname = this->GetWidgetName();
-
-  for (int i = nb_items - 1; i >= 0; --i)
-    {
-    tk_cmd << "catch {" << wname << " delete " << i << "}" << endl
-           << "set {" << wname << "HelpArray([" 
-           << wname << " entrycget " << i << " -label])} {}" << endl;
-    }
-
-  tk_cmd << ends;
-  this->Script(tk_cmd.str());
-  tk_cmd.rdbuf()->freeze(0);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWMenu::GetNumberOfItems()
-{
-  if (this->IsAlive())
-    {
-    const char *end = this->Script("%s index end", this->GetWidgetName());
-    if (strcmp(end, "none"))
-      {
-      return atoi(end) + 1;
-      }
-    }
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWMenu::HasItem(const char *label)
-{
-  return this->GetIndexOfItem(label) >= 0 ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
@@ -742,9 +953,18 @@ int vtkKWMenu::GetIndexOfItem(const char *label)
       strcmp(label, "none") &&
       *label != '@')
     {
+    char *clean_label = NULL;
+    int underline_index, cleaned =
+      this->GetLabelWithoutUnderline(label, &clean_label, &underline_index);
+
     int not_ok = atoi(
       this->Script("catch {%s index {%s}} %s_getindex", 
-                   this->GetWidgetName(), label, this->GetTclName()));
+                   this->GetWidgetName(), clean_label, this->GetTclName()));
+    if (cleaned)
+      {
+      delete [] clean_label;
+      }
+
     if (not_ok)
       {
       return -1;
@@ -754,21 +974,37 @@ int vtkKWMenu::GetIndexOfItem(const char *label)
 
   // OK, it is either a number or one of the special keywords, check manually
 
-  int nb_of_items = this->GetNumberOfItems();
+
+  int found = -1, nb_of_items = this->GetNumberOfItems();
   for (int i = 0; i < nb_of_items; i++)
     {
     const char *label_opt = this->GetItemOption(i, "-label");
     if (label_opt && *label_opt && !strcmp(label_opt, label))
       {
-      return i;
+      found = i;
+      break;
       }
     }
 
+  return found;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::GetIndexOfActiveItem(const char *widget_name)
+{
+  if (widget_name)
+    {
+    const char *index_active = this->Script("%s index active", widget_name);
+    if (strcmp(index_active, "none"))
+      {
+      return atoi(index_active);
+      }
+    }
   return -1;
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMenu::GetIndexOfCommand(
+int vtkKWMenu::GetIndexOfCommandItem(
   vtkObject *object, const char *method)
 {
   if (object || method)
@@ -793,79 +1029,105 @@ int vtkKWMenu::GetIndexOfCommand(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMenu::GetItemLabel(int position, char* label, int maxlen)
+int vtkKWMenu::HasItem(const char *label)
 {
-  if (!this->IsCreated() || !label)
-    {
-    return VTK_ERROR;
-    }
-  const char* lbl = 
-    this->Script("%s entrycget %d -label", this->GetWidgetName(), position);
-  if (!lbl[0]) 
-    {
-    return VTK_ERROR;
-    }
-  strncpy(label, lbl, maxlen);
-  return VTK_OK;
+  return this->GetIndexOfItem(label) >= 0 ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWMenu::GetItemLabel(int position)
+int vtkKWMenu::SetItemLabel(int index, const char *label)
 {
-  if (this->IsCreated())
+  if (this->IsCreated() && index >= 0 && index < this->GetNumberOfItems())
     {
-    if (position >= 0 && position < this->GetNumberOfItems())
+    char *clean_label = NULL;
+    int underline_index, cleaned =
+      this->GetLabelWithoutUnderline(label, &clean_label, &underline_index);
+
+    this->Script("%s entryconfigure %d -label {%s}", 
+                 this->GetWidgetName(), index, clean_label);
+
+    const char *help = this->GetItemHelpString(index);
+    if(!help || !*help)
       {
-      return this->Script("%s entrycget %d -label", 
-                          this->GetWidgetName(), position);
+      this->SetItemHelpString(index, clean_label);
       }
+
+    if (cleaned)
+      {
+      this->SetItemUnderline(index, underline_index);
+      delete [] clean_label;
+      }
+    return 1;
     }
+
   return 0;
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMenu::SetItemLabel(int position, const char* label)
+const char* vtkKWMenu::GetItemLabel(int index)
 {
-  if (this->IsCreated())
+  return this->GetItemOption(index, "-label");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::InvokeItem(int index)
+{
+  this->Script("%s invoke %d", this->GetWidgetName(), index);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::DeleteItem(int index)
+{
+  const char *wname = this->GetWidgetName();
+  this->Script(
+    "catch {%s delete %d} ; set {%sHelpArray([%s entrycget %d -label])} {}", 
+    wname, index, 
+    wname, wname, index);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::DeleteAllItems()
+{
+  int nb_of_items = this->GetNumberOfItems();
+  if (!nb_of_items)
     {
-    if (position >= 0 && position < this->GetNumberOfItems())
+    return;
+    }
+
+  ostrstream tk_cmd;
+  const char *wname = this->GetWidgetName();
+
+  for (int i = nb_of_items - 1; i >= 0; --i)
+    {
+    tk_cmd << "catch {" << wname << " delete " << i << "}" << endl
+           << "set {" << wname << "HelpArray([" 
+           << wname << " entrycget " << i << " -label])} {}" << endl;
+    }
+
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::GetNumberOfItems()
+{
+  if (this->IsAlive())
+    {
+    const char *end = this->Script("%s index end", this->GetWidgetName());
+    if (strcmp(end, "none"))
       {
-      this->Script("%s entryconfigure %d -label {%s}", 
-                   this->GetWidgetName(), position, label);
-      return 1;
+      return atoi(end) + 1;
       }
     }
   return 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::AddSeparator()
-{
-  this->Script( "%s add separator", this->GetWidgetName());
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::InsertSeparator(int position)
-{
-  this->Script( "%s insert %d separator", this->GetWidgetName(), position);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWMenu::GetItemState(int index)
 {
-  const char *state = 
-    this->Script("%s entrycget %d -state", this->GetWidgetName(), index);
-  return vtkKWTkOptions::GetStateFromTkOptionValue(state);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWMenu::GetItemState(const char *label)
-{
-  if (!this->HasItem(label))
-    {
-    return vtkKWTkOptions::StateUnknown;
-    }
-  return this->GetItemState(this->GetIndexOfItem(label));
+  return vtkKWTkOptions::GetStateFromTkOptionValue(
+    this->GetItemOption(index, "-state"));
 }
 
 //----------------------------------------------------------------------------
@@ -881,20 +1143,22 @@ void vtkKWMenu::SetItemState(int index, int state)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWMenu::GetItemState(const char *label)
+{
+  return this->GetItemState(this->GetIndexOfItem(label));
+}
+
+//----------------------------------------------------------------------------
 void vtkKWMenu::SetItemState(const char *label, int state)
 {
-  if (!this->HasItem(label))
-    {
-    return;
-    }
   this->SetItemState(this->GetIndexOfItem(label), state);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMenu::SetState(int state)
 {
-  int nb_items = this->GetNumberOfItems();
-  if (!nb_items)
+  int nb_of_items = this->GetNumberOfItems();
+  if (!nb_of_items)
     {
     return;
     }
@@ -904,7 +1168,7 @@ void vtkKWMenu::SetState(int state)
 
   const char *statestr = vtkKWTkOptions::GetStateAsTkOptionValue(state);
 
-  for (int i = 0; i < nb_items; i++)
+  for (int i = 0; i < nb_of_items; i++)
     {
     tk_cmd << "catch {" << wname << " entryconfigure " << i 
            << " -state " << statestr << "}" << endl;
@@ -916,103 +1180,9 @@ void vtkKWMenu::SetState(int state)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::ConfigureItem(int index, const char* conf)
+void vtkKWMenu::SetItemImage(int index, const char *imgname)
 {
-  ostrstream str;
-  str << this->GetWidgetName() << " entryconfigure "
-      << index << " " << conf << ends;
-  this->Script(str.str());
-  str.rdbuf()->freeze(0);
-}
-
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::SetEntryCommand(int index, vtkObject *object, 
-                           const char *method)
-{
-  char *command = NULL;
-  this->SetObjectMethodCommand(&command, object, method);
-  this->SetEntryCommand(index, command);
-  delete [] command;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::SetEntryCommand(int idx, const char *method)
-{
-  if ( !this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems() )
-    {
-    return;
-    }
-  ostrstream str;
-  str << this->GetWidgetName() << " entryconfigure "
-      << idx << " -command {" << method << "}" << ends;
-  this->Script(str.str());
-  str.rdbuf()->freeze(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::SetEntryCommand(const char *label, const char *method)
-{
-  if (!this->HasItem(label))
-    {
-    return;
-    }
-  this->SetEntryCommand(this->GetIndexOfItem(label), method);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::SetEntryCommand(const char *label, vtkObject *object, 
-                           const char *method)
-{
-  if ( !this->HasItem(label))
-    {
-    return;
-    }
-  this->SetEntryCommand(
-    this->GetIndexOfItem(label), object, method);
-}
-
-
-//----------------------------------------------------------------------------
-int vtkKWMenu::HasItemOption(int idx, const char *option)
-{
-  if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
-    {
-    return 0;
-    }
- 
-  return !this->GetApplication()->EvaluateBooleanExpression(
-    "catch {%s entrycget %d %s}",
-    this->GetWidgetName(), idx, option);
-}
-
-//----------------------------------------------------------------------------
-const char* vtkKWMenu::GetItemOption(int idx, const char *option)
-{
-  if (!this->HasItemOption(idx, option))
-    {
-    return 0;
-    }
-  return this->Script("%s entrycget %d %s", 
-                      this->GetWidgetName(), idx, option);
-}
-
-//----------------------------------------------------------------------------
-const char* vtkKWMenu::GetItemOption(const char *label, const char *option)
-{
-  return this->GetItemOption(this->GetIndexOfItem(label), option);
-}
-
-//----------------------------------------------------------------------------
-const char* vtkKWMenu::GetItemCommand(int idx)
-{
-  return this->GetItemOption(idx, "-command");
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::SetItemImage(int idx, const char *imagename)
-{
-  if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
+  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems())
     {
     return;
     }
@@ -1035,19 +1205,13 @@ void vtkKWMenu::SetItemImage(int idx, const char *imagename)
     }
 
   this->Script("%s entryconfigure %d -image %s", 
-               this->GetWidgetName(), idx, imagename);
+               this->GetWidgetName(), index, imgname);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetItemImage(const char *label, const char *imagename)
+void vtkKWMenu::SetItemImageToPredefinedIcon(int index, int icon_index)
 {
-  this->SetItemImage(this->GetIndexOfItem(label), imagename);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::SetItemImageToPredefinedIcon(int idx, int icon_index)
-{
-  if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
+  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems())
     {
     return;
     }
@@ -1062,7 +1226,7 @@ void vtkKWMenu::SetItemImageToPredefinedIcon(int idx, int icon_index)
     }
 
 #if 0
-  this->SetItemSelectImage(idx, buffer);
+  this->SetItemSelectImage(index, buffer);
 
   sprintf(buffer, "%s.PredefinedIconFaded%d", this->GetTclName(), icon_index);
   if (!vtkKWTkUtilities::FindPhoto(this->GetApplication(), buffer))
@@ -1075,39 +1239,27 @@ void vtkKWMenu::SetItemImageToPredefinedIcon(int idx, int icon_index)
       this->GetApplication(), buffer, icon_faded);
     icon_faded->Delete();
     }
-  this->SetItemIndicatorVisibility(idx, 0);
+  this->SetItemIndicatorVisibility(index, 0);
 #endif
 
-  this->SetItemImage(idx, buffer);
+  this->SetItemImage(index, buffer);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetItemImageToPredefinedIcon(const char *label, int icon_index)
+void vtkKWMenu::SetItemSelectImage(int index, const char *imgname)
 {
-  this->SetItemImageToPredefinedIcon(this->GetIndexOfItem(label), icon_index);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::SetItemSelectImage(int idx, const char *imagename)
-{
-  if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
+  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems())
     {
     return;
     }
   this->Script("%s entryconfigure %d -selectimage %s", 
-               this->GetWidgetName(), idx, imagename);
+               this->GetWidgetName(), index, imgname);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetItemSelectImage(const char *label, const char *imagename)
+void vtkKWMenu::SetItemSelectImageToPredefinedIcon(int index, int icon_index)
 {
-  this->SetItemSelectImage(this->GetIndexOfItem(label), imagename);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::SetItemSelectImageToPredefinedIcon(int idx, int icon_index)
-{
-  if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
+  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems())
     {
     return;
     }
@@ -1119,83 +1271,122 @@ void vtkKWMenu::SetItemSelectImageToPredefinedIcon(int idx, int icon_index)
     vtkKWTkUtilities::UpdatePhotoFromPredefinedIcon(
       this->GetApplication(), buffer, icon_index);
     }
-  this->SetItemSelectImage(idx, buffer);
+  this->SetItemSelectImage(index, buffer);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetItemSelectImageToPredefinedIcon(
-  const char *label, int icon_index)
+void vtkKWMenu::SetItemCompoundMode(int index, int flag)
 {
-  this->SetItemSelectImageToPredefinedIcon(
-    this->GetIndexOfItem(label), icon_index);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::SetItemCompoundMode(int idx, int flag)
-{
-  if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
+  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems())
     {
     return;
     }
   this->Script("%s entryconfigure %d -compound %s", 
-               this->GetWidgetName(), idx, (flag ? "left" : "none"));
+               this->GetWidgetName(), index, (flag ? "left" : "none"));
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetItemCompoundMode(const char *label, int mode)
+void vtkKWMenu::SetItemMarginVisibility(int index, int flag)
 {
-  this->SetItemCompoundMode(this->GetIndexOfItem(label), mode);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::SetItemMarginVisibility(int idx, int flag)
-{
-  if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
+  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems())
     {
     return;
     }
   this->Script("%s entryconfigure %d -hidemargin %d", 
-               this->GetWidgetName(), idx, flag ? 0 : 1);
+               this->GetWidgetName(), index, flag ? 0 : 1);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetItemMarginVisibility(const char *label, int flag)
+void vtkKWMenu::SetItemIndicatorVisibility(int index, int flag)
 {
-  this->SetItemMarginVisibility(this->GetIndexOfItem(label), flag);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::SetItemIndicatorVisibility(int idx, int flag)
-{
-  if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
+  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems())
     {
     return;
     }
   this->Script("%s entryconfigure %d -indicatoron %d", 
-               this->GetWidgetName(), idx, flag ? 1 : 0);
+               this->GetWidgetName(), index, flag ? 1 : 0);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetItemIndicatorVisibility(const char *label, int flag)
+void vtkKWMenu::SetItemAccelerator(int index, const char *accelerator)
 {
-  this->SetItemIndicatorVisibility(this->GetIndexOfItem(label), flag);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::SetItemAccelerator(int idx, const char *accelerator)
-{
-  if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
+  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems())
     {
     return;
     }
   this->Script("%s entryconfigure %d -accelerator {%s}", 
-               this->GetWidgetName(), idx, accelerator);
+               this->GetWidgetName(), index, accelerator);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::SetItemAccelerator(const char *label, const char *accelerator)
+void vtkKWMenu::SetItemHelpString(int index, const char *help)
 {
-  this->SetItemAccelerator(this->GetIndexOfItem(label), accelerator);
+  vtksys_stl::string help_safe(help ? help : "");
+
+  const char *label = this->GetItemLabel(index);
+  if (!label || !*label)
+    {
+    return;
+    }
+
+  vtksys_stl::string label_safe(label);
+  this->Script("set {%sHelpArray(%s)} {%s}", 
+               this->GetTclName(), label_safe.c_str(), help_safe.c_str());
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWMenu::GetItemHelpString(int index)
+{
+  const char *label = this->GetItemLabel(index);
+  if (!label || !*label)
+    {
+    return NULL;
+    }
+
+  // This hack should be cleaned
+
+  vtksys_stl::string label_safe(label);
+  const char *tname = this->GetTclName();
+  return this->Script(
+    "if [catch {set %sTemp $%sHelpArray(%s)} %sTemp ]"
+    " { set %sTemp \"\"}; set %sTemp", 
+    tname, tname, label_safe.c_str(), tname, tname, tname);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemUnderline(int index, int underline_index)
+{
+  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems() 
+      || underline_index < 0)
+    {
+    return;
+    }
+  this->Script("%s entryconfigure %d -underline %d", 
+               this->GetWidgetName(), index, underline_index);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemColumnBreak(int index, int flag)
+{
+  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems())
+    {
+    return;
+    }
+  this->Script("%s entryconfigure %d -columnbreak %d", 
+               this->GetWidgetName(), index, flag);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetTearOff(int val)
+{
+  if (val == this->TearOff)
+    {
+    return;
+    }
+  this->Modified();
+  this->TearOff = val;
+
+  this->SetConfigurationOptionAsInt("-tearoff", this->TearOff);
 }
 
 //----------------------------------------------------------------------------
@@ -1227,6 +1418,46 @@ void vtkKWMenu::UpdateEnableState()
   this->Superclass::UpdateEnableState();
 
   this->SetState(this->GetEnabled());
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::HasItemOption(int index, const char *option)
+{
+  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems())
+    {
+    return 0;
+    }
+ 
+  return !this->GetApplication()->EvaluateBooleanExpression(
+    "catch {%s entrycget %d %s}",
+    this->GetWidgetName(), index, option);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWMenu::GetItemOption(int index, const char *option)
+{
+  if (!this->HasItemOption(index, option))
+    {
+    return NULL;
+    }
+  return this->Script("%s entrycget %d %s", 
+                      this->GetWidgetName(), index, option);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::DisplayHelpCallback(const char* widget_name)
+{
+  const char *help = this->GetItemHelpString(
+    this->GetIndexOfActiveItem(widget_name));
+  if(help)
+    {
+    vtksys_stl::string help_safe(help);
+    vtkKWWindowBase *window = this->GetParentWindow();
+    if (window)
+      {
+      window->SetStatusText(help_safe.c_str());
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -24,7 +24,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTkcon );
-vtkCxxRevisionMacro(vtkKWTkcon, "1.4");
+vtkCxxRevisionMacro(vtkKWTkcon, "1.5");
 
 //----------------------------------------------------------------------------
 class vtkKWTkconInternals
@@ -150,7 +150,7 @@ void vtkKWTkcon::Create()
   int nb_items;
   for (size_t i = 0; i < sizeof(menus) / sizeof(menus[0]); i++)
     {
-    menus[i]->DeleteMenuItem("Console");
+    menus[i]->DeleteItem(menus[i]->GetIndexOfItem("Console"));
 
     vtkKWMenu *filemenu = vtkKWMenu::New();
     name = menus[i]->GetWidgetName();
@@ -159,9 +159,9 @@ void vtkKWTkcon::Create()
     filemenu->SetWidgetName(name.c_str());
     filemenu->vtkKWCoreWidget::Create();
     nb_items = filemenu->GetNumberOfItems();
-    filemenu->DeleteMenuItem(nb_items - 1); // Quit
-    filemenu->DeleteMenuItem(nb_items - 2); // separator
-    filemenu->DeleteMenuItem("Quit"); // to make sure
+    filemenu->DeleteItem(nb_items - 1); // Quit
+    filemenu->DeleteItem(nb_items - 2); // separator
+    filemenu->DeleteItem(menus[i]->GetIndexOfItem("Quit")); // to make sure
     filemenu->Delete();
 
     /*
@@ -175,9 +175,9 @@ void vtkKWTkcon::Create()
     interpmenu->SetWidgetName(name.c_str());
     interpmenu->vtkKWCoreWidget::Create();
     nb_items = interpmenu->GetNumberOfItems();
-    interpmenu->DeleteMenuItem(nb_items - 1); // Send tkcon commands
-    interpmenu->DeleteMenuItem(nb_items - 2); // separator
-    interpmenu->DeleteMenuItem("Send tkcon Commands"); // to make sure
+    interpmenu->DeleteItem(nb_items - 1); // Send tkcon commands
+    interpmenu->DeleteItem(nb_items - 2); // separator
+    interpmenu->DeleteItem("Send tkcon Commands"); // to make sure
     interpmenu->Delete();
     */
     }

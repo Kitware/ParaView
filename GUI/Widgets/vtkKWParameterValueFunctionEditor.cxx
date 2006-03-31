@@ -37,7 +37,7 @@
 #include <vtksys/stl/algorithm>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.85");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.86");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -1496,18 +1496,18 @@ void vtkKWParameterValueFunctionEditor::CreateHistogramLogModeOptionMenu()
     vtkKWTkUtilities::UpdatePhotoFromPredefinedIcon(
       this->GetApplication(), img_name.c_str(), vtkKWIcon::IconGridLinear);
     
-    this->HistogramLogModeOptionMenu->AddRadioButton(
+    int index = menu->AddRadioButton(
       "Lin.", this, "HistogramLogModeCallback 0");
-    menu->SetItemImage("Lin.", img_name.c_str());
+    menu->SetItemImage(index, img_name.c_str());
 
     img_name = this->HistogramLogModeOptionMenu->GetWidgetName();
     img_name += ".img1";
     vtkKWTkUtilities::UpdatePhotoFromPredefinedIcon(
       this->GetApplication(), img_name.c_str(), vtkKWIcon::IconGridLog);
  
-    this->HistogramLogModeOptionMenu->AddRadioButton(
+    index = menu->AddRadioButton(
       "Log.", this, "HistogramLogModeCallback 1");
-    menu->SetItemImage("Log.", img_name.c_str());
+    menu->SetItemImage(index, img_name.c_str());
 
     this->UpdateHistogramLogModeOptionMenu();
     }
@@ -6428,7 +6428,8 @@ void vtkKWParameterValueFunctionEditor::UpdateHistogramLogModeOptionMenu()
       log_mode = hist->GetLogMode();
       }
     vtkKWMenu *menu = this->HistogramLogModeOptionMenu->GetMenu();
-    const char* img_opt = menu->GetItemOption("Log.", "-image");
+    const char* img_opt = menu->GetItemOption(
+      menu->GetIndexOfItem("Log."), "-image");
     if (img_opt && *img_opt)
       {
       ostrstream img_name;

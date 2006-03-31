@@ -21,6 +21,7 @@
 #include "vtkKWFrameWithLabel.h"
 #include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
+#include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWMenuButtonWithLabel.h"
 #include "vtkKWMessageDialog.h"
@@ -40,7 +41,7 @@ const char *vtkKWApplicationSettingsInterface::PrintSettingsLabel = "Print Setti
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.52");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.53");
 
 //----------------------------------------------------------------------------
 vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
@@ -197,6 +198,7 @@ void vtkKWApplicationSettingsInterface::Create()
   ostrstream tk_cmd;
   vtkKWWidget *page;
   vtkKWFrame *frame;
+  vtkKWMenu *menu;
 
   // --------------------------------------------------------------
   // Add a "Preferences" page
@@ -318,10 +320,9 @@ void vtkKWApplicationSettingsInterface::Create()
   this->ViewPanelPositionOptionMenu->GetLabel()->SetText(
     "View panel position:");
 
-  this->ViewPanelPositionOptionMenu->GetWidget()->AddRadioButton(
-    "Left", this, "ViewPanelPositionCallback");
-  this->ViewPanelPositionOptionMenu->GetWidget()->AddRadioButton(
-    "Right", this, "ViewPanelPositionCallback");
+  menu = this->ViewPanelPositionOptionMenu->GetWidget()->GetMenu();
+  menu->AddRadioButton("Left", this, "ViewPanelPositionCallback");
+  menu->AddRadioButton("Right", this, "ViewPanelPositionCallback");
 
   tk_cmd << "pack " << this->ViewPanelPositionOptionMenu->GetWidgetName()
          << " -side top -anchor w -padx 2 -pady 2" << endl;
@@ -461,7 +462,7 @@ void vtkKWApplicationSettingsInterface::Create()
     char label[128], command[128];
     sprintf(command, "DPICallback %lf", dpis[i]);
     sprintf(label, VTK_KW_APPLICATION_SETTINGS_DPI_FORMAT, dpis[i]);
-    this->DPIOptionMenu->GetWidget()->AddRadioButton(
+    this->DPIOptionMenu->GetWidget()->GetMenu()->AddRadioButton(
       label, this, command);
     }
 

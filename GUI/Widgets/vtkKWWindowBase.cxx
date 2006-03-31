@@ -33,7 +33,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.42");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.43");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -99,29 +99,31 @@ vtkKWWindowBase::vtkKWWindowBase()
   // Some constants
   
   this->FileMenuLabel = 
-    vtksys::SystemTools::DuplicateString(ks_("Menu|File"));
+    vtksys::SystemTools::DuplicateString(ks_("Menu|&File"));
   this->OpenRecentFileMenuLabel = 
-    vtksys::SystemTools::DuplicateString(ks_("Menu|File|Open Recent File"));
+    vtksys::SystemTools::DuplicateString(ks_("Menu|File|Open &Recent File"));
   this->PrintOptionsMenuLabel = 
-    vtksys::SystemTools::DuplicateString(ks_("Menu|File|Print Settings..."));
+    vtksys::SystemTools::DuplicateString(ks_("Menu|File|Pri&nt Settings..."));
   this->FileCloseMenuLabel = 
-    vtksys::SystemTools::DuplicateString(ks_("Menu|File|Close"));
+    vtksys::SystemTools::DuplicateString(ks_("Menu|File|&Close"));
   this->FileExitMenuLabel = 
-    vtksys::SystemTools::DuplicateString(ks_("Menu|File|Exit"));
+    vtksys::SystemTools::DuplicateString(ks_("Menu|File|&Exit"));
   this->EditMenuLabel = 
-    vtksys::SystemTools::DuplicateString(ks_("Menu|Edit"));
+    vtksys::SystemTools::DuplicateString(ks_("Menu|&Edit"));
   this->ViewMenuLabel =  
-    vtksys::SystemTools::DuplicateString(ks_("Menu|View"));
+    vtksys::SystemTools::DuplicateString(ks_("Menu|&View"));
   this->WindowMenuLabel = 
-    vtksys::SystemTools::DuplicateString(ks_("Menu|Window"));
+    vtksys::SystemTools::DuplicateString(ks_("Menu|&Window"));
   this->HelpMenuLabel = 
-    vtksys::SystemTools::DuplicateString(ks_("Menu|Help"));
+    vtksys::SystemTools::DuplicateString(ks_("Menu|&Help"));
   this->HelpTopicsMenuLabel = 
-    vtksys::SystemTools::DuplicateString(ks_("Menu|Help|Help Topics"));
+    vtksys::SystemTools::DuplicateString(ks_("Menu|Help|Help &Topics"));
+  this->HelpAboutMenuLabel = 
+    vtksys::SystemTools::DuplicateString(ks_("Menu|Help|&About %s"));
   this->HelpCheckForUpdatesMenuLabel = 
-    vtksys::SystemTools::DuplicateString(ks_("Menu|Help|Check for Updates"));
+    vtksys::SystemTools::DuplicateString(ks_("Menu|Help|Check for &Updates"));
   this->ToolbarsVisibilityMenuLabel = 
-    vtksys::SystemTools::DuplicateString(ks_("Menu|Window|Toolbars"));
+    vtksys::SystemTools::DuplicateString(ks_("Menu|Window|&Toolbars"));
 
   this->WindowGeometryRegKey = 
     vtksys::SystemTools::DuplicateString("WindowGeometry");
@@ -263,6 +265,7 @@ vtkKWWindowBase::~vtkKWWindowBase()
   this->SetWindowMenuLabel(NULL);
   this->SetHelpMenuLabel(NULL);
   this->SetHelpTopicsMenuLabel(NULL);
+  this->SetHelpAboutMenuLabel(NULL);
   this->SetHelpCheckForUpdatesMenuLabel(NULL);
   this->SetToolbarsVisibilityMenuLabel(NULL);
   this->SetWindowGeometryRegKey(NULL);
@@ -338,14 +341,14 @@ void vtkKWWindowBase::Create()
   if (this->SupportPrint)
     {
     menu->AddCommand(
-      this->GetPrintOptionsMenuLabel(), this, "PrintSettingsCallback",4);
+      this->GetPrintOptionsMenuLabel(), this, "PrintSettingsCallback");
     menu->AddSeparator();
     }
 
   menu->AddCommand(
-    this->GetFileCloseMenuLabel(), this, "Close", 0);
+    this->GetFileCloseMenuLabel(), this, "Close");
   menu->AddCommand(
-    this->GetFileExitMenuLabel(), app, "Exit", 1);
+    this->GetFileExitMenuLabel(), app, "Exit");
 
   this->MostRecentFilesManager->SetApplication(app);
 
@@ -357,21 +360,20 @@ void vtkKWWindowBase::Create()
     {
     cmd = "DisplayHelpDialog ";
     cmd += this->GetTclName();
-    menu->AddCommand(
-      this->GetHelpTopicsMenuLabel(), app, cmd.c_str(), 0);
+    menu->AddCommand(this->GetHelpTopicsMenuLabel(), app, cmd.c_str());
     }
 
   if (app->HasCheckForUpdates())
     {
     menu->AddCommand(
-      this->GetHelpCheckForUpdatesMenuLabel(), app, "CheckForUpdates",0);
+      this->GetHelpCheckForUpdatesMenuLabel(), app, "CheckForUpdates");
     }
   
   menu->AddSeparator();
-  sprintf(buffer, ks_("Menu|Help|About %s"), app->GetPrettyName());
+  sprintf(buffer, this->GetHelpAboutMenuLabel(), app->GetPrettyName());
   cmd = "DisplayAboutDialog ";
   cmd += this->GetTclName();
-  menu->AddCommand(buffer, this->GetApplication(), cmd.c_str(), 0);
+  menu->AddCommand(buffer, this->GetApplication(), cmd.c_str());
 
   // Menubar separator
 
@@ -805,7 +807,7 @@ vtkKWMenu *vtkKWWindowBase::GetFileMenu()
     this->FileMenu->SetTearOff(0);
     this->FileMenu->Create();
     this->GetMenu()->InsertCascade(
-      0, this->GetFileMenuLabel(), this->FileMenu, 0);
+      0, this->GetFileMenuLabel(), this->FileMenu);
     }
   
   return this->FileMenu;
@@ -858,7 +860,7 @@ vtkKWMenu *vtkKWWindowBase::GetEditMenu()
     this->EditMenu->Create();
     // Usually after the File Menu (i.e., pos 1)
     this->GetMenu()->InsertCascade(
-      1, this->GetEditMenuLabel(), this->EditMenu, 0);
+      1, this->GetEditMenuLabel(), this->EditMenu);
     }
   
   return this->EditMenu;
@@ -880,7 +882,7 @@ vtkKWMenu *vtkKWWindowBase::GetViewMenu()
     // Usually after the Edit Menu (do not use GetEditMenu() here)
     this->GetMenu()->InsertCascade(
       1 + (this->EditMenu ? 1 : 0), 
-      this->GetViewMenuLabel(), this->ViewMenu, 0);
+      this->GetViewMenuLabel(), this->ViewMenu);
     }
 
   return this->ViewMenu;
@@ -908,7 +910,7 @@ vtkKWMenu *vtkKWWindowBase::GetWindowMenu()
     // Usually after View Menu (do not use GetEditMenu()/GetViewMenu() here)
     this->GetMenu()->InsertCascade(
       1 + (this->EditMenu ? 1 : 0) + (this->ViewMenu ? 1 : 0), 
-      this->GetWindowMenuLabel(), this->WindowMenu, 0);
+      this->GetWindowMenuLabel(), this->WindowMenu);
     }
   
   return this->WindowMenu;
@@ -929,7 +931,7 @@ vtkKWMenu *vtkKWWindowBase::GetHelpMenu()
     this->HelpMenu->Create();
     // Usually at the end
     this->GetMenu()->AddCascade(
-      this->GetHelpMenuLabel(), this->HelpMenu, 0);
+      this->GetHelpMenuLabel(), this->HelpMenu);
     }
   
   return this->HelpMenu;
@@ -946,7 +948,7 @@ int vtkKWWindowBase::GetHelpMenuInsertPosition()
   // Find about
 
   char buffer[500];
-  sprintf(buffer, ks_("Menu|Help|About %s"), 
+  sprintf(buffer, this->GetHelpAboutMenuLabel(), 
           this->GetApplication()->GetPrettyName());
   if (this->GetHelpMenu()->HasItem(buffer))
     {
@@ -971,10 +973,11 @@ vtkKWMenu *vtkKWWindowBase::GetToolbarsVisibilityMenu()
     this->ToolbarsVisibilityMenu->SetParent(this->GetWindowMenu());
     this->ToolbarsVisibilityMenu->SetTearOff(0);
     this->ToolbarsVisibilityMenu->Create();
-    this->GetWindowMenu()->InsertCascade(
+    int index = this->GetWindowMenu()->InsertCascade(
       2, this->GetToolbarsVisibilityMenuLabel(), 
-      this->ToolbarsVisibilityMenu, 1, 
-      ks_("Menu|Window|Show/Hide Toolbars"));
+      this->ToolbarsVisibilityMenu);
+    this->GetWindowMenu()->SetItemHelpString(
+      index, ks_("Menu|Window|Show/Hide Toolbars"));
     }
   
   return this->ToolbarsVisibilityMenu;
@@ -1004,12 +1007,12 @@ void vtkKWWindowBase::InsertRecentFilesMenu(
 
   if (this->GetFileMenu()->HasItem(this->GetOpenRecentFileMenuLabel()))
     {
-    this->GetFileMenu()->DeleteMenuItem(
-      this->GetOpenRecentFileMenuLabel());
+    this->GetFileMenu()->DeleteItem(
+      this->GetFileMenu()->GetIndexOfItem(this->GetOpenRecentFileMenuLabel()));
     }
 
   this->GetFileMenu()->InsertCascade(
-    pos, this->GetOpenRecentFileMenuLabel(), mrf_menu, 6);
+    pos, this->GetOpenRecentFileMenuLabel(), mrf_menu);
 
   // Fill the recent files vector with recent files stored in registry
   // this will also update the menu
@@ -1382,12 +1385,12 @@ void vtkKWWindowBase::UpdateMenuState()
     {
     vtksys_stl::string about_command = "DisplayAbout ";
     about_command +=  this->GetTclName();
-    int pos = this->GetHelpMenu()->GetIndexOfCommand(
+    int pos = this->GetHelpMenu()->GetIndexOfCommandItem(
       this->GetApplication(), about_command.c_str());
     if (pos >= 0)
       {
       char buffer[500];
-      sprintf(buffer, ks_("Menu|Help|About %s"), 
+      sprintf(buffer, this->GetHelpAboutMenuLabel(), 
               this->GetApplication()->GetPrettyName());
       this->GetHelpMenu()->SetItemLabel(pos, buffer);
       }

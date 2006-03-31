@@ -1,3 +1,4 @@
+#include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWMenuButtonWithSpinButtons.h"
 #include "vtkKWMenuButtonWithLabel.h"
@@ -33,7 +34,7 @@ void vtkKWMenuButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 
   for (i = 0; i < sizeof(days) / sizeof(days[0]); i++)
     {
-    menubutton1->AddRadioButton(days[i]);
+    menubutton1->GetMenu()->AddRadioButton(days[i]);
     }
 
   app->Script(
@@ -55,7 +56,7 @@ void vtkKWMenuButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 
   for (i = 0; i < sizeof(days) / sizeof(days[0]); i++)
     {
-    menubutton1b->GetWidget()->AddRadioButton(days[i]);
+    menubutton1b->GetWidget()->GetMenu()->AddRadioButton(days[i]);
     }
 
   app->Script(
@@ -83,7 +84,7 @@ void vtkKWMenuButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *)
 
   for (i = 0; i < sizeof(days) / sizeof(days[0]); i++)
     {
-    menubutton2->GetWidget()->AddRadioButton(days[i]);
+    menubutton2->GetWidget()->GetMenu()->AddRadioButton(days[i]);
     }
 
   menubutton2->GetWidget()->SetValue(days[0]);

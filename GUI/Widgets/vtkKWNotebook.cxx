@@ -58,7 +58,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.97");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.98");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -1996,38 +1996,41 @@ void vtkKWNotebook::PageTabContextMenuCallback(int id, int x, int y)
     this->TabPopupMenu->Create();
     }
 
-  this->TabPopupMenu->DeleteAllMenuItems();
-  char *var;
+  this->TabPopupMenu->DeleteAllItems();
   
   // Visibility
 
-  var = this->TabPopupMenu->CreateCheckButtonVariable(this, "Show");
   ostrstream visibility;
   visibility << "TogglePageVisibilityCallback " << id << ends;
-  this->TabPopupMenu->AddCheckButton(
-    "Show", var, this, visibility.str(), "Show/Hide this notebook page");
-  this->TabPopupMenu->CheckCheckButton(
-    this, "Show", this->GetPageVisibility(page));
+
+  int index;
+
+  index = this->TabPopupMenu->AddCheckButton(
+    "Show", this, visibility.str());
   visibility.rdbuf()->freeze(0);
-  delete [] var;
-    
+  this->TabPopupMenu->SetItemHelpString(
+    index, "Show/Hide this notebook page");
+  this->TabPopupMenu->SetItemSelectedState(
+    index, this->GetPageVisibility(page));
+
   // Pin
 
   if (this->PagesCanBePinned)
     {
-    var = this->TabPopupMenu->CreateCheckButtonVariable(this, "Pin");
     ostrstream pin;
     pin << "TogglePagePinnedCallback " << id << ends;
-    this->TabPopupMenu->InsertCheckButton(
-      0, "Pin", var, this, pin.str(), "Pin/Unpin this notebook page");
-    this->TabPopupMenu->CheckCheckButton(this, "Pin", page->Pinned);
+
+    index = this->TabPopupMenu->InsertCheckButton(
+      0, "Pin", this, pin.str());
     pin.rdbuf()->freeze(0);
-    delete [] var;
+    this->TabPopupMenu->SetItemHelpString(
+      index, "Pin/Unpin this notebook page");
 
     // If a page is pinned, it can not be hidden. Unpin it first :)
 
     if (page->Pinned)
       {
+      this->TabPopupMenu->SelectItem(index);
       this->TabPopupMenu->SetItemState("Show", vtkKWTkOptions::StateDisabled);
       }
     }

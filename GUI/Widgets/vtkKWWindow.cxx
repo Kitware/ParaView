@@ -33,7 +33,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.274");
+vtkCxxRevisionMacro(vtkKWWindow, "1.275");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -77,15 +77,20 @@ vtkKWWindow::vtkKWWindow()
   // Some constants
 
   this->HideMainPanelMenuLabel = 
-    vtksys::SystemTools::DuplicateString(ks_("Menu|Window|Hide Main Panel"));
+    vtksys::SystemTools::DuplicateString(
+      ks_("Menu|Window|Hide &Main Panel"));
   this->ShowMainPanelMenuLabel = 
-    vtksys::SystemTools::DuplicateString(ks_("Menu|Window|Show Main Panel"));
+    vtksys::SystemTools::DuplicateString(
+      ks_("Menu|Window|Show &Main Panel"));
   this->HideSecondaryPanelMenuLabel = 
-    vtksys::SystemTools::DuplicateString(ks_("Menu|Window|Hide Bottom Panel"));
+    vtksys::SystemTools::DuplicateString(
+      ks_("Menu|Window|Hide &Bottom Panel"));
   this->ShowSecondaryPanelMenuLabel = 
-    vtksys::SystemTools::DuplicateString(ks_("Menu|Window|Show Bottom Panel"));
+    vtksys::SystemTools::DuplicateString(
+      ks_("Menu|Window|Show &Bottom Panel"));
   this->TclInteractorMenuLabel = 
-    vtksys::SystemTools::DuplicateString(ks_("Menu|Window|Tcl Interactor"));
+    vtksys::SystemTools::DuplicateString(
+      ks_("Menu|Window|&Tcl Interactor"));
 
   this->DefaultViewPanelName = 
     vtksys::SystemTools::DuplicateString("View");
@@ -281,11 +286,10 @@ void vtkKWWindow::Create()
   // Menu : Window
 
   menu = this->GetWindowMenu();
-  menu->AddCommand(this->GetHideMainPanelMenuLabel(), 
-                   this, "MainPanelVisibilityCallback", 5);
+  idx = menu->AddCommand(this->GetHideMainPanelMenuLabel(), 
+                         this, "MainPanelVisibilityCallback");
   menu->SetItemAccelerator(
-    this->GetHideMainPanelMenuLabel(),
-    this->GetMainPanelVisibilityKeyAccelerator());
+    idx, this->GetMainPanelVisibilityKeyAccelerator());
   event = "<Key-";
   event += this->GetMainPanelVisibilityKeyAccelerator();
   event += ">";
@@ -294,11 +298,10 @@ void vtkKWWindow::Create()
   // Menu : Window
 
   menu = this->GetWindowMenu();
-  menu->AddCommand(this->GetHideSecondaryPanelMenuLabel(), 
-                   this, "SecondaryPanelVisibilityCallback", 5);
+  idx = menu->AddCommand(this->GetHideSecondaryPanelMenuLabel(), 
+                         this, "SecondaryPanelVisibilityCallback");
   menu->SetItemAccelerator(
-    this->GetHideSecondaryPanelMenuLabel(),
-    this->GetSecondaryPanelVisibilityKeyAccelerator());
+    idx, this->GetSecondaryPanelVisibilityKeyAccelerator());
   event = "<Key-";
   event += this->GetSecondaryPanelVisibilityKeyAccelerator();
   event += ">";
@@ -314,16 +317,17 @@ void vtkKWWindow::Create()
   cmd += "}";
   menu->InsertCommand(
     idx++, this->GetApplicationSettingsInterface()->GetName(), 
-    this, cmd.c_str(), 0);
+    this, cmd.c_str());
 
   // Menu : Window : Tcl Interactor
 
   this->GetWindowMenu()->AddSeparator();
 
-  this->GetWindowMenu()->AddCommand(
+  idx = this->GetWindowMenu()->AddCommand(
     this->GetTclInteractorMenuLabel(), 
-    this, "DisplayTclInteractor", 8, 
-    k_("Display a prompt to interact with the Tcl engine"));
+    this, "DisplayTclInteractor");
+  this->GetWindowMenu()->SetItemHelpString(
+    idx, k_("Display a prompt to interact with the Tcl engine"));
 
   // Udpate the enable state
 

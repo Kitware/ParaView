@@ -26,7 +26,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.55");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.56");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -894,7 +894,7 @@ void vtkKWSelectionFrame::UpdateSelectionList()
   vtksys_stl::string callback;
 
   vtkKWMenu *menu = this->SelectionList->GetMenu();
-  menu->DeleteAllMenuItems();
+  menu->DeleteAllItems();
   
   vtkKWSelectionFrameInternals::PoolIterator it = 
     this->Internals->Pool.begin();
@@ -911,8 +911,7 @@ void vtkKWSelectionFrame::UpdateSelectionList()
       callback = "SelectionListCallback {";
       callback += *it;
       callback += "}";
-      this->SelectionList->AddRadioButton(
-        (*it).c_str(), this, callback.c_str());
+      menu->AddRadioButton((*it).c_str(), this, callback.c_str());
       }
     }
 
@@ -924,15 +923,17 @@ void vtkKWSelectionFrame::UpdateSelectionList()
       {
       menu->AddSeparator();
       }
+    int index;
     if (this->AllowChangeTitle)
       {
-      menu->AddCommand(
-        "Change Title", this, "ChangeTitleCallback", "Change frame title");
+      index = menu->AddCommand(
+        "Change Title", this, "ChangeTitleCallback");
+      menu->SetItemHelpString(index, "Change frame title");
       }
     if (this->AllowClose)
       {
-      menu->AddCommand(
-        "Close", this, "CloseCallback", "Close frame");
+      index = menu->AddCommand("Close", this, "CloseCallback");
+      menu->SetItemHelpString(index, "Close frame");
       }
     }
 

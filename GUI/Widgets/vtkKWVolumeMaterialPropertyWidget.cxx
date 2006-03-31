@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWVolumeMaterialPropertyWidget);
-vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.20");
+vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.21");
 
 //----------------------------------------------------------------------------
 vtkKWVolumeMaterialPropertyWidget::vtkKWVolumeMaterialPropertyWidget()
@@ -128,9 +128,9 @@ void vtkKWVolumeMaterialPropertyWidget::Create()
   this->ComponentSelectionWidget->SetSelectedComponentChangedCommand(
     this, "SelectedComponentCallback");
 
-  vtkKWMenuButtonWithLabel *omenu = 
+  vtkKWMenuButtonWithLabel *menubuttonwl = 
     this->ComponentSelectionWidget->GetSelectedComponentOptionMenu();
-  omenu->SetLabelWidth(label_width);
+  menubuttonwl->SetLabelWidth(label_width);
 
   this->Script("pack %s -side top -padx 2 -pady 2 -anchor w",
                this->ComponentSelectionWidget->GetWidgetName());

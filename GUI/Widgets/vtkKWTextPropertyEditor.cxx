@@ -17,13 +17,14 @@
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWCheckButtonSet.h"
-#include "vtkKWLabel.h"
 #include "vtkKWCheckButtonSetWithLabel.h"
-#include "vtkKWMenuButtonWithLabel.h"
-#include "vtkKWPushButtonSetWithLabel.h"
+#include "vtkKWLabel.h"
+#include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
+#include "vtkKWMenuButtonWithLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWPushButtonSet.h"
+#include "vtkKWPushButtonSetWithLabel.h"
 #include "vtkKWScaleWithEntry.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
@@ -99,7 +100,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextPropertyEditor);
-vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.19");
+vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.20");
 
 // ----------------------------------------------------------------------------
 vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
@@ -223,14 +224,16 @@ void vtkKWTextPropertyEditor::Create()
   this->FontFamilyOptionMenu->ExpandWidgetOff();
   this->FontFamilyOptionMenu->SetBalloonHelpString("Select the font.");
 
-  vtkKWMenuButton *omenu = this->FontFamilyOptionMenu->GetWidget();
-  omenu->SetWidth(7);
-  omenu->SetPadX(0);
-  omenu->SetPadY(2);
+  vtkKWMenuButton *menubutton = this->FontFamilyOptionMenu->GetWidget();
+  vtkKWMenu *menu = menubutton->GetMenu();
 
-  omenu->AddRadioButton(VTK_KW_TEXT_PROP_ARIAL, this, "FontFamilyCallback");
-  omenu->AddRadioButton(VTK_KW_TEXT_PROP_COURIER, this, "FontFamilyCallback");
-  omenu->AddRadioButton(VTK_KW_TEXT_PROP_TIMES, this, "FontFamilyCallback");
+  menubutton->SetWidth(7);
+  menubutton->SetPadX(0);
+  menubutton->SetPadY(2);
+
+  menu->AddRadioButton(VTK_KW_TEXT_PROP_ARIAL, this, "FontFamilyCallback");
+  menu->AddRadioButton(VTK_KW_TEXT_PROP_COURIER, this, "FontFamilyCallback");
+  menu->AddRadioButton(VTK_KW_TEXT_PROP_TIMES, this, "FontFamilyCallback");
 
   // Styles (bold, italic, shadow)
 

@@ -6,6 +6,7 @@
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
 #include "vtkKWFrameWithLabel.h"
+#include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWMenuButtonWithSpinButtons.h"
 #include "vtkKWMenuButtonWithSpinButtonsWithLabel.h"
@@ -28,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMedicalImageViewerExample );
-vtkCxxRevisionMacro(vtkKWMedicalImageViewerExample, "1.4");
+vtkCxxRevisionMacro(vtkKWMedicalImageViewerExample, "1.5");
 
 //----------------------------------------------------------------------------
 int vtkKWMedicalImageViewerExample::Run(int argc, char *argv[])
@@ -153,9 +154,12 @@ int vtkKWMedicalImageViewerExample::Run(int argc, char *argv[])
               orientation_menubutton->GetWidgetName());
 
   vtkKWMenuButton *mb = orientation_menubutton->GetWidget()->GetWidget();
-  mb->AddRadioButton("X-Y", this, "SetSliceOrientationToXYCallback");
-  mb->AddRadioButton("X-Z", this, "SetSliceOrientationToXZCallback");
-  mb->AddRadioButton("Y-Z", this, "SetSliceOrientationToYZCallback");
+  vtkKWMenu *menu = mb->GetMenu();
+
+  menu->AddRadioButton("X-Y", this, "SetSliceOrientationToXYCallback");
+  menu->AddRadioButton("X-Z", this, "SetSliceOrientationToXZCallback");
+  menu->AddRadioButton("Y-Z", this, "SetSliceOrientationToYZCallback");
+
   mb->SetValue("X-Y");
 
   // Create a window/level preset selector

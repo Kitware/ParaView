@@ -20,6 +20,7 @@
 #include "vtkKWLabel.h"
 #include "vtkKWEntryWithLabel.h"
 #include "vtkKWScaleWithEntry.h"
+#include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWRange.h"
 #include "vtkKWCanvas.h"
@@ -30,7 +31,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.48");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.49");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -734,14 +735,11 @@ void vtkKWColorTransferFunctionEditor::CreateColorSpaceOptionMenu()
       "Change the interpolation color space to RGB or HSV.");
 
     const char callback[] = "ColorSpaceCallback";
-    this->ColorSpaceOptionMenu->AddRadioButton(
-      VTK_KW_CTFE_RGB_LABEL, this, callback);
-    
-    this->ColorSpaceOptionMenu->AddRadioButton(
-      VTK_KW_CTFE_HSV_LABEL, this, callback);
 
-    this->ColorSpaceOptionMenu->AddRadioButton(
-      VTK_KW_CTFE_HSV_NO_WRAP_LABEL, this, callback);
+    vtkKWMenu *menu = this->ColorSpaceOptionMenu->GetMenu();
+    menu->AddRadioButton(VTK_KW_CTFE_RGB_LABEL, this, callback);
+    menu->AddRadioButton(VTK_KW_CTFE_HSV_LABEL, this, callback);
+    menu->AddRadioButton(VTK_KW_CTFE_HSV_NO_WRAP_LABEL, this, callback);
 
     this->UpdateColorSpaceOptionMenu();
     }

@@ -52,24 +52,6 @@ public:
   // Get the menu object
   vtkGetObjectMacro(Menu, vtkKWMenu);
 
-  // Description:
-  // Add/Insert radiobutton entries to the internal menu. The following
-  // methods are just convenience calls to the internal vtkKWMenu's
-  // AddRadioButton methods, but we make sure all radiobuttons share
-  // the same internal variable reference so that they behave as if
-  // they were part of the same group.
-  // The 'object' argument is the object that will have the method called on
-  // it. The 'method' argument is the name of the method to be called and any
-  // arguments in string form. If the object is NULL, the method is still
-  // evaluated as a simple command. 
-  virtual void AddRadioButton(const char *label);
-  virtual void AddRadioButton(
-    const char *label, vtkObject *object, const char *method, 
-    const char *help = 0);
-  virtual void AddRadioButtonImage(
-    const char *image_name, vtkObject *object, const char *method, 
-    const char *help = 0);
-
   // Description
   // Set the indicator On/Off. To be called after creation.
   virtual void SetIndicatorVisibility(int ind);
@@ -154,6 +136,14 @@ public:
   virtual void TracedVariableChangedCallback(
     const char *, const char *, const char *);
 
+  // Description:
+  // Add all the default observers needed by that object, or remove
+  // all the observers that were added through AddCallbackCommandObserver.
+  // Subclasses can override these methods to add/remove their own default
+  // observers, but should call the superclass too.
+  virtual void AddCallbackCommandObservers();
+  virtual void RemoveCallbackCommandObservers();
+
 protected:
   vtkKWMenuButton();
   ~vtkKWMenuButton();
@@ -165,8 +155,15 @@ protected:
   vtkKWMenu *Menu;
   int       MaximumLabelWidth;
 
-  virtual void UpdateOptionMenuLabel();
+  virtual void UpdateMenuButtonLabel();
 
+  // Description:
+  // Processes the events that are passed through CallbackCommand (or others).
+  // Subclasses can oberride this method to process their own events, but
+  // should call the superclass too.
+  virtual void ProcessCallbackCommandEvents(
+    vtkObject *caller, unsigned long event, void *calldata);
+  
 private:
   vtkKWMenuButton(const vtkKWMenuButton&); // Not implemented
   void operator=(const vtkKWMenuButton&); // Not implemented

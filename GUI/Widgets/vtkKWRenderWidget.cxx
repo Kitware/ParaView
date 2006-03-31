@@ -42,7 +42,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.129");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.130");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -961,7 +961,7 @@ void vtkKWRenderWidget::MouseButtonPressCallback(
       this->ContextMenu->SetParent(this);
       this->ContextMenu->Create();
       }
-    this->ContextMenu->DeleteAllMenuItems();
+    this->ContextMenu->DeleteAllItems();
     this->PopulateContextMenu(this->ContextMenu);
     if (this->ContextMenu->GetNumberOfItems())
       {
@@ -1109,25 +1109,18 @@ void vtkKWRenderWidget::PopulateAnnotationMenu(vtkKWMenu *menu)
     menu->AddSeparator();
     }
 
-  vtksys_stl::string label;
-  char *buttonvar;
-  int show_icons = 0;
+  int index, show_icons = 0;
 
   // Corner Annotation
 
-  label = "Corner Annotation";
-  buttonvar = menu->CreateCheckButtonVariable(
-    this, "CornerAnnotationVisibility");
-  menu->AddCheckButton(
-    label.c_str(), buttonvar, this, "ToggleCornerAnnotationVisibility");
-  menu->CheckCheckButton(
-    this, "CornerAnnotationVisibility", this->GetCornerAnnotationVisibility());
-  delete [] buttonvar;
+  index = menu->AddCheckButton(
+    "Corner Annotation", this, "ToggleCornerAnnotationVisibility");
+  menu->SetItemSelectedState(index, this->GetCornerAnnotationVisibility());
   if (show_icons)
     {
     menu->SetItemImageToPredefinedIcon(
-      label.c_str(), vtkKWIcon::IconCornerAnnotation);
-    menu->SetItemCompoundMode(label.c_str(), 1);
+      index, vtkKWIcon::IconCornerAnnotation);
+    menu->SetItemCompoundMode(index, 1);
     }
 
   // Header Annotation
@@ -1135,20 +1128,14 @@ void vtkKWRenderWidget::PopulateAnnotationMenu(vtkKWMenu *menu)
   const char *header = this->GetHeaderAnnotationText();
   if (header && header)
     {
-    label = "Header Annotation";
-    buttonvar = menu->CreateCheckButtonVariable(
-    this, "HeaderAnnotationVisibility");
-    menu->AddCheckButton(
-      label.c_str(), buttonvar, this, "ToggleHeaderAnnotationVisibility");
-    menu->CheckCheckButton(
-      this, "HeaderAnnotationVisibility", 
-      this->GetHeaderAnnotationVisibility());
-    delete [] buttonvar;
+    index = menu->AddCheckButton(
+      "Header Annotation", this, "ToggleHeaderAnnotationVisibility");
+    menu->SetItemSelectedState(index, this->GetHeaderAnnotationVisibility());
     if (show_icons)
       {
       menu->SetItemImageToPredefinedIcon(
-        label.c_str(), vtkKWIcon::IconHeaderAnnotation);
-      menu->SetItemCompoundMode(label.c_str(), 1);
+        index, vtkKWIcon::IconHeaderAnnotation);
+      menu->SetItemCompoundMode(index, 1);
       }
     }
 }

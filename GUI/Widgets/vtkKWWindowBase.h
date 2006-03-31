@@ -298,6 +298,7 @@ public:
   vtkGetStringMacro(ViewMenuLabel);
   vtkGetStringMacro(WindowMenuLabel);
   vtkGetStringMacro(HelpMenuLabel);
+  vtkGetStringMacro(HelpAboutMenuLabel);
   vtkGetStringMacro(HelpTopicsMenuLabel);
   vtkGetStringMacro(HelpCheckForUpdatesMenuLabel);
   vtkGetStringMacro(ToolbarsVisibilityMenuLabel);
@@ -394,6 +395,7 @@ protected:
   vtkSetStringMacro(WindowMenuLabel);
   vtkSetStringMacro(HelpMenuLabel);
   vtkSetStringMacro(HelpTopicsMenuLabel);
+  vtkSetStringMacro(HelpAboutMenuLabel);
   vtkSetStringMacro(HelpCheckForUpdatesMenuLabel);
   vtkSetStringMacro(ToolbarsVisibilityMenuLabel);
   vtkSetStringMacro(WindowGeometryRegKey);
@@ -413,6 +415,7 @@ private:
   char *WindowMenuLabel;
   char *HelpMenuLabel;
   char *HelpTopicsMenuLabel;
+  char *HelpAboutMenuLabel;
   char *HelpCheckForUpdatesMenuLabel;
   char *ToolbarsVisibilityMenuLabel;
   char *WindowGeometryRegKey;

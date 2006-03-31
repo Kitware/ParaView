@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWPushButtonWithMenu );
-vtkCxxRevisionMacro(vtkKWPushButtonWithMenu, "1.7");
+vtkCxxRevisionMacro(vtkKWPushButtonWithMenu, "1.8");
 
 //----------------------------------------------------------------------------
 vtkKWPushButtonWithMenu::vtkKWPushButtonWithMenu()
@@ -53,36 +53,10 @@ void vtkKWPushButtonWithMenu::PopupCallback(int x, int y)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPushButtonWithMenu::AddCheckButton(const char* label, 
-                                             const char* varName,
-                                             int defaultState,
-                                             const char* help)
-{
-  char* buttonVar = this->Menu->CreateCheckButtonVariable(this, varName);
-  this->Menu->AddCheckButton(label, buttonVar, 0, "", help);
-  this->Script("set %s %d",buttonVar,defaultState);  
-  delete [] buttonVar;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWPushButtonWithMenu::GetCheckButtonState(const char* varName)
-{
-  return this->Menu->GetCheckButtonValue(this, varName);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWPushButtonWithMenu::SetCheckButtonState(const char* varName, 
-                                                  int state)
-{
-  this->Menu->CheckCheckButton(this, varName, state);
-}
-
-//----------------------------------------------------------------------------
 vtkKWMenu* vtkKWPushButtonWithMenu::GetMenu()
 {
   return this->Menu;
 }
-
 
 //----------------------------------------------------------------------------
 void vtkKWPushButtonWithMenu::UpdateEnableState()

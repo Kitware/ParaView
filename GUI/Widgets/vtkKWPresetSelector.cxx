@@ -56,7 +56,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.41");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.42");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -2737,7 +2737,7 @@ void vtkKWPresetSelector::PresetRightClickCallback(
     this->ContextMenu->SetParent(this);
     this->ContextMenu->Create();
     }
-  this->ContextMenu->DeleteAllMenuItems();
+  this->ContextMenu->DeleteAllItems();
   this->PopulatePresetContextMenu(this->ContextMenu, id);
   if (this->ContextMenu->GetNumberOfItems())
     {

@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWColorPresetSelector);
-vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.25");
+vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.26");
 
 vtkCxxSetObjectMacro(vtkKWColorPresetSelector,ColorTransferFunction,vtkColorTransferFunction);
 
@@ -741,7 +741,7 @@ void vtkKWColorPresetSelector::PopulatePresetMenu()
     }
 
   vtkKWMenu *menu = this->GetWidget()->GetMenu();
-  menu->DeleteAllMenuItems();
+  menu->DeleteAllItems();
 
   vtksys_stl::string callback, preset_label, img_name;
   char func_addr[128];
@@ -777,8 +777,8 @@ void vtkKWColorPresetSelector::PopulatePresetMenu()
             }
           data_ptr += 4;
           }
-        if ((is_solid_color && this->SolidColorPresetsVisibility) ||
-            (!is_solid_color && this->GradientPresetsVisibility))
+        if ((is_solid_color && !this->SolidColorPresetsVisibility) ||
+            (!is_solid_color && !this->GradientPresetsVisibility))
           {
           show_preset = 0;
           }
@@ -797,15 +797,15 @@ void vtkKWColorPresetSelector::PopulatePresetMenu()
         callback = "PresetSelectedCallback {";
         callback += it->Name;
         callback += "}";
-        menu->AddCommand(preset_label.c_str(), this, callback.c_str());
+        int index = menu->AddCommand(
+          preset_label.c_str(), this, callback.c_str());
 
         // Switch to next column every n-th preset
 
         ++count;
         if (!(count % 9))
           {
-          menu->ConfigureItem(menu->GetIndexOfItem(preset_label.c_str()), 
-                              "-columnbreak 1");
+          menu->SetItemColumnBreak(index, 1);
           }
 
         // Do we have a preview, if not create one, if yes check its size
@@ -832,10 +832,9 @@ void vtkKWColorPresetSelector::PopulatePresetMenu()
             it->ColorTransferFunction, img_name.c_str());
           }
         
-        menu->SetItemImage(preset_label.c_str(), img_name.c_str());
-        menu->SetItemCompoundMode(
-          preset_label.c_str(), this->PresetNameVisibility ? 1 : 0);
-        menu->SetItemMarginVisibility(preset_label.c_str(), 0);
+        menu->SetItemImage(index, img_name.c_str());
+        menu->SetItemCompoundMode(index, this->PresetNameVisibility ? 1 : 0);
+        menu->SetItemMarginVisibility(index, 0);
         }
       }
     }

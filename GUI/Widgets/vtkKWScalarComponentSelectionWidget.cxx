@@ -21,7 +21,7 @@
 #include "vtkKWMenu.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.18");
+vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.19");
 vtkStandardNewMacro(vtkKWScalarComponentSelectionWidget);
 
 //----------------------------------------------------------------------------
@@ -135,12 +135,14 @@ void vtkKWScalarComponentSelectionWidget::Update()
 
   if (this->SelectedComponentOptionMenu)
     {
-    vtkKWMenuButton *menu = this->SelectedComponentOptionMenu->GetWidget();
+    vtkKWMenuButton *menubutton = 
+      this->SelectedComponentOptionMenu->GetWidget();
+    vtkKWMenu *menu = menubutton->GetMenu();
 
     if (this->SelectedComponentOptionMenu->IsCreated() &&
-        menu->GetMenu()->GetNumberOfItems() != this->NumberOfComponents)
+        menu->GetNumberOfItems() != this->NumberOfComponents)
       {
-      menu->GetMenu()->DeleteAllMenuItems();
+      menu->DeleteAllItems();
       for (i = 0; i < this->NumberOfComponents; ++i)
         {
         ostrstream cmd_name, cmd_method;
@@ -155,16 +157,16 @@ void vtkKWScalarComponentSelectionWidget::Update()
         }
       }
     
-    if (menu->GetMenu()->GetNumberOfItems() && this->IndependentComponents)
+    if (menu->GetNumberOfItems() && this->IndependentComponents)
       {
       ostrstream v;
       v << this->SelectedComponent + 1 << ends;
-      menu->SetValue(v.str());
+      menubutton->SetValue(v.str());
       v.rdbuf()->freeze(0);
       }
     else
       {
-      menu->SetValue("");
+      menubutton->SetValue("");
       }
 
     if (!this->IndependentComponents || this->NumberOfComponents <= 1)

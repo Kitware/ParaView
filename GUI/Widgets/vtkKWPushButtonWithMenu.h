@@ -35,15 +35,8 @@ public:
   virtual void Create();
     
   // Description: 
-  // Append a check button to the menu.
-  void AddCheckButton(const char* label, const char* varName, 
-                      int defaultState, const char* help);
-  int GetCheckButtonState(const char* varName);
-  void SetCheckButtonState(const char* varName, int state);
-  
-  // Description: 
   // Access to the menu
-  vtkKWMenu* GetMenu();
+  virtual vtkKWMenu* GetMenu();
   
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -56,7 +49,7 @@ public:
 
   // Description:
   // Callbacks. Internal, do not use.
-  void PopupCallback(int x, int y);
+  virtual void PopupCallback(int x, int y);
 
 protected:
   vtkKWPushButtonWithMenu();

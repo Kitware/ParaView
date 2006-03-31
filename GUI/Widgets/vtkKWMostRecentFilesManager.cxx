@@ -21,7 +21,7 @@
 #include <vtksys/stl/list>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.13");
+vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.14");
 vtkStandardNewMacro(vtkKWMostRecentFilesManager );
 
 #define VTK_KW_MRF_REGISTRY_FILENAME_KEYNAME_PATTERN "File%02d"
@@ -429,7 +429,7 @@ void vtkKWMostRecentFilesManager::PopulateMenu(
     return;
     }
 
-  menu->DeleteAllMenuItems();
+  menu->DeleteAllItems();
 
   // Fill the menu
   
@@ -509,12 +509,16 @@ void vtkKWMostRecentFilesManager::PopulateMenu(
             }
           }
 
-        menu->AddCommand(
-          label.c_str(), 
-          target_object, 
-          cmd.c_str(), 
-          (count < 10 ? 0 : -1),
-          filename);
+        int index = menu->AddCommand(
+          label.c_str(), target_object, cmd.c_str());
+        if (index >= 0)
+          {
+          menu->SetItemHelpString(index, filename);
+          if (count < 10)
+            {
+            menu->SetItemUnderline(index, 0);
+            }
+          }
         count++;
         }
       }
@@ -556,7 +560,7 @@ void vtkKWMostRecentFilesManager::UpdateMenuStateInParent()
       vtkKWMenu::SafeDownCast(this->Menu->GetParent());
     if (parent)
       {
-      int index = parent->GetCascadeIndex(this->Menu);
+      int index = parent->GetIndexOfCascadeItem(this->Menu);
       if (index >= 0)
         {
         int nb_items = this->Menu->GetNumberOfItems();

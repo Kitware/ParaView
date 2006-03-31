@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.38");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.39");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarSetInternals
@@ -828,7 +828,7 @@ void vtkKWToolbarSet::PopulateToolbarsVisibilityMenu(vtkKWMenu *menu)
       this->Internals->Toolbars.begin();
     vtkKWToolbarSetInternals::ToolbarsContainerIterator end = 
       this->Internals->Toolbars.end();
-    char buffer[500];
+    char help[500];
     for (; it != end; ++it)
       {
       if (*it && 
@@ -838,18 +838,14 @@ void vtkKWToolbarSet::PopulateToolbarsVisibilityMenu(vtkKWMenu *menu)
         {
         if (!menu->HasItem((*it)->Toolbar->GetName()))
           {
-          char *rbv = menu->CreateCheckButtonVariable(
-            menu, (*it)->Toolbar->GetName());
-
           vtksys_stl::string command("ToggleToolbarVisibility ");
           command += (*it)->Toolbar->GetTclName();
 
-          sprintf(buffer, k_("Show/Hide the '%s' toolbar"), 
+          sprintf(help, k_("Show/Hide the '%s' toolbar"), 
                   (*it)->Toolbar->GetName());
-          menu->AddCheckButton(
-            (*it)->Toolbar->GetName(), rbv, 
-            this, command.c_str(), buffer);
-          delete [] rbv;
+          int index = menu->AddCheckButton(
+            (*it)->Toolbar->GetName(), this, command.c_str());
+          menu->SetItemHelpString(index, help);
           }
         }
       }
@@ -870,8 +866,8 @@ void vtkKWToolbarSet::UpdateToolbarsVisibilityMenu(vtkKWMenu *menu)
       {
       if (*it && (*it)->Toolbar && (*it)->Toolbar->GetName())
         {
-        menu->CheckCheckButton(
-          menu, (*it)->Toolbar->GetName(), (*it)->Visibility);
+        menu->SetItemSelectedState(
+          (*it)->Toolbar->GetName(), (*it)->Visibility);
         }
       }
     }

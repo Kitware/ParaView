@@ -71,7 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.54");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.55");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -456,8 +456,8 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesMenu(
 
   // Allowed resolutions
 
-  vtksys_stl::string rbv(this->GetWidgetName());
-  rbv += "reschoice";
+  vtksys_stl::string varname(this->GetWidgetName());
+  varname += "reschoice";
 
   char label[64], command[128], help[128];  
 
@@ -471,8 +471,12 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesMenu(
             res[idx][0], res[idx][1]);
     int value = 
       ((res[idx][0] - 1) * VTK_KW_SFLMGR_MAX_SIZE + res[idx][1] - 1);
-    this->ResolutionEntriesMenu->AddRadioButton(
-      value, label, rbv.c_str(), this, command, 0, help);
+    int index = this->ResolutionEntriesMenu->AddRadioButton(
+      label, this, command);
+    this->ResolutionEntriesMenu->SetItemVariable(
+      index, varname.c_str());
+    this->ResolutionEntriesMenu->SetItemSelectedValueAsInt(index, value);
+    this->ResolutionEntriesMenu->SetItemHelpString(index, help);
     }
 
   this->UpdateResolutionEntriesMenu();

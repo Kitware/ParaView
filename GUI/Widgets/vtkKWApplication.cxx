@@ -68,7 +68,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.279");
+vtkCxxRevisionMacro(vtkKWApplication, "1.280");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -443,6 +443,18 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
                                             char *argv[], 
                                             ostream *err)
 {
+  // Command line args: language
+  // This is also done in Start(), but this is should be as early
+  // as we can change the language.
+
+  int index = 0, pos = 0;
+  if (vtkKWApplication::CheckForValuedArgument(
+        argc, argv, "--lang", index, pos) == VTK_OK)
+    {
+    vtkKWLanguage::SetCurrentLanguage(
+      vtkKWLanguage::GetLanguageFromXPG(argv[index] + pos));
+    }
+
   Tcl_Interp *interp;
   char *args;
   char buf[100];
@@ -721,8 +733,18 @@ void vtkKWApplication::Start()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
+void vtkKWApplication::Start(int argc, char **argv)
 { 
+  // Command line args: language
+  
+  int index = 0, pos = 0;
+  if (vtkKWApplication::CheckForValuedArgument(
+        argc, argv, "--lang", index, pos) == VTK_OK)
+    {
+    vtkKWLanguage::SetCurrentLanguage(
+      vtkKWLanguage::GetLanguageFromXPG(argv[index] + pos));
+    }
+
   // As a convenience, hide any splash screen
 
   if (this->SupportSplashScreen && this->SplashScreen)
