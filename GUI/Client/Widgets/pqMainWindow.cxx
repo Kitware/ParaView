@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerBrowser.h"
 #include "pqServerFileDialogModel.h"
 #include "pqSMAdaptor.h"
-#include "pqSMMultiview.h"
+#include "pqSMMultiView.h"
 #include "pqSourceProxyInfo.h"
 #include "pqVariableSelectorWidget.h"
 #include "pqXMLUtil.h"
