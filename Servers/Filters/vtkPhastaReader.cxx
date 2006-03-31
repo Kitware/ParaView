@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPointSet.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPhastaReader, "1.3");
+vtkCxxRevisionMacro(vtkPhastaReader, "1.4");
 vtkStandardNewMacro(vtkPhastaReader);
 
 #define swap_char(A,B) { ucTmp = A; A = B ; B = ucTmp; }
@@ -255,7 +255,7 @@ void vtkPhastaReader::openfile( const char filename[],
   // Stripping a filename is not correct, since 
   // filenames can certainly have spaces.
   // char* fname = StringStripper( filename );
-  char* fname = filename;
+  const char* fname = filename;
   char* imode = StringStripper( mode );
 
   if ( cscompare( "read", imode ) ) 
@@ -282,7 +282,6 @@ void vtkPhastaReader::openfile( const char filename[],
     header_type.push_back( sizeof(int) );
     *fileDescriptor = fileArray.size();
     }
-  delete [] fname;
   delete [] imode;
 }
 
