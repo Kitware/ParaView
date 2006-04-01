@@ -44,7 +44,9 @@ def vtkKWNotebookEntryPoint(parent, win):
     notebook2.PagesCanBePinnedOn()
     
     notebook2.AddPage("Page A")
-    notebook2.AddPage("Page B")
+
+    page_id = notebook2.AddPage("Page Disabled")
+    notebook2.SetPageEnabled(page_id, 0)
     
     app.Script(
         "pack %s -side top -anchor nw -expand y -fill both -padx 2 -pady 2", 

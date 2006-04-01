@@ -151,11 +151,14 @@ public:
   void HideAllPages();
 
   // Description:
-  // Enable/Disable a tab. Note that this differs from show/hide a tab in the
+  // Enable/Disable a page. Note that this differs from show/hide a tab in the
   // sense that the tab will still be visible but disabled. All tabs are 
-  // enabled by default.
-  void SetPageEnabled( int id, int flag);
-  void SetPageEnabled( const char *title, int flag);
+  // enabled by default. Calling SetEnabled(flag) on this notebook will
+  // set the state of all pages to 'flag' unless the page itself has been
+  // disabled. The only way to re-enable a page that was disabled using
+  // SetPageEnabled is to call SetPageEnabled again.
+  void SetPageEnabled(int id, int flag);
+  void SetPageEnabled(const char *title, int flag);
   void SetPageEnabled(const char *title, int tag, int fkag);
   
   // Description:
@@ -340,8 +343,7 @@ protected:
   {
   public:
     void Delete();
-    void SetEnabled(int);
-    int  GetEnabled();
+    void UpdateEnableState();
 
     int             Id;
     int             Visibility;

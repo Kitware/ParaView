@@ -58,7 +58,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.98");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.99");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -114,40 +114,43 @@ void vtkKWNotebook::Page::Delete()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWNotebook::Page::SetEnabled(int s)
+void vtkKWNotebook::Page::UpdateEnableState()
 {
+  vtkKWNotebook *nb = vtkKWNotebook::SafeDownCast(
+    this->Frame->GetParent()->GetParent());
+
+  int state = this->Enabled & nb->GetEnabled();
+
+  if (state)
+    {
+    nb->BindPage(this);
+    }
+  else
+    {
+    nb->UnBindPage(this);
+    }
+
   if (this->Frame)
     {
-    this->Frame->SetEnabled(s);
+    this->Frame->SetEnabled(state);
     }
 
   if (this->TabFrame)
     {
-    this->TabFrame->SetEnabled(s);
+    this->TabFrame->SetEnabled(state);
     }
 
   if (this->Label)
     {
-    this->Label->SetEnabled(s);
+    this->Label->SetEnabled(state);
     }
 
   if (this->ImageLabel)
     {
-    this->ImageLabel->SetEnabled(s);
+    this->ImageLabel->SetEnabled(state);
     }
-  this->Enabled = s;
 }
 
-//----------------------------------------------------------------------------
-int vtkKWNotebook::Page::GetEnabled()
-{
-  if (this->Frame)
-    {
-    return this->Frame->GetEnabled();
-    }
-  return 0;
-}
-  
 //----------------------------------------------------------------------------
 vtkKWNotebook::vtkKWNotebook()
 {
@@ -766,15 +769,8 @@ int vtkKWNotebook::AddPage(const char *title,
   this->Script(cmd.str());
   cmd.rdbuf()->freeze(0);
 
-  page->SetEnabled(this->GetEnabled());
-  if (this->GetEnabled())
-    {
-    this->BindPage(page);
-    }
-  else
-    {
-    this->UnBindPage(page);
-    }
+  page->Enabled = 1;
+  page->UpdateEnableState();
 
   // Show the page. Set Visibility to Off first. If this page can really
   // be shown, Visibility will be set to On automatically.
@@ -1534,13 +1530,14 @@ void vtkKWNotebook::SetPageEnabled(const char *title, int tag, int flag)
 //----------------------------------------------------------------------------
 void vtkKWNotebook::SetPageEnabled(vtkKWNotebook::Page *page, int flag)
 {
-  if (page == NULL || !this->IsCreated() || 
-     !((page->GetEnabled()) ^ flag))
+  if (page == NULL || !this->IsCreated() || page->Enabled == flag)
     {
     return;
     }
+
+  page->Enabled = flag;
   
-  page->SetEnabled(flag);
+  page->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
@@ -2702,15 +2699,7 @@ void vtkKWNotebook::UpdateEnableState()
       {
       if (*it)
         {
-        (*it)->SetEnabled(this->GetEnabled() & (*it)->GetEnabled());
-        if (this->GetEnabled())
-          {
-          this->BindPage(*it);
-          }
-        else
-          {
-          this->UnBindPage(*it);
-          }
+        (*it)->UpdateEnableState();
         }
       }
     }
