@@ -13,9 +13,7 @@
 =========================================================================*/
 // .NAME vtkKWMenu - a menu widget
 // .SECTION Description
-// This class is the Menu abstraction for the
-// Kitware toolkit. It provides a c++ interface to
-// the TK menu widgets used by the Kitware toolkit.
+// This class is the Menu abstraction.
 
 #ifndef __vtkKWMenu_h
 #define __vtkKWMenu_h
