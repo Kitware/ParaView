@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.94");
+vtkCxxRevisionMacro(vtkKWMenu, "1.95");
 
 #define VTK_KW_MENU_CB_VARNAME_PATTERN "CB_group%d"
 #define VTK_KW_MENU_RB_DEFAULT_GROUP "RB_group"
@@ -740,18 +740,13 @@ int vtkKWMenu::GetIndexOfItemUsingVariableAndSelectedValue(
     int nb_of_items = this->GetNumberOfItems();
     for(int i = 0; i < nb_of_items; i++)
       {
-      vtksys_stl::string type(
-        this->Script("%s type %d", this->GetWidgetName(), i));
-      if (!strcmp("radiobutton", type.c_str()))
+      const char *temp = this->GetItemVariable(i);
+      if (temp && !strcmp(varname_safe.c_str(), temp))
         {
-        const char *temp = this->GetItemVariable(i);
-        if (temp && !strcmp(varname_safe.c_str(), temp))
+        temp = this->GetItemSelectedValue(i);
+        if (temp && !strcmp(temp, selected_value_safe.c_str()))
           {
-          temp = this->GetItemSelectedValue(i);
-          if (temp && !strcmp(temp, selected_value_safe.c_str()))
-            {
-            return i;
-            }
+          return i;
           }
         }
       }
@@ -764,12 +759,16 @@ int vtkKWMenu::GetIndexOfItemUsingVariableAndSelectedValue(
 int vtkKWMenu::SelectItemInGroupWithSelectedValue(
   const char *group_name, const char *selected_value)
 {
+  int index = -1;
   char *varname = this->CreateItemVariableName(this, group_name);
-  int index = this->GetIndexOfItemUsingVariableAndSelectedValue(
-    varname, selected_value);
-  if (index >= 0)
+  if (varname)
     {
-    this->SelectItem(index);
+    index = this->GetIndexOfItemUsingVariableAndSelectedValue(
+      varname, selected_value);
+    if (index >= 0)
+      {
+      this->SelectItem(index);
+      }
     }
   return index;
 }

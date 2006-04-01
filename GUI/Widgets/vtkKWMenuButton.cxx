@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.34");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.35");
 
 //----------------------------------------------------------------------------
 vtkKWMenuButton::vtkKWMenuButton()
@@ -68,8 +68,8 @@ void vtkKWMenuButton::Create()
   this->SetConfigurationOption("-direction", "flush");
   this->SetConfigurationOption("-menu", this->Menu->GetWidgetName());
 
-  this->Script("set %sValue {}", this->GetTclName());
-  this->Script("trace variable %sValue w {%s TracedVariableChangedCallback}",
+  this->Script("set %s_Value {}", this->GetTclName());
+  this->Script("trace variable %s_Value w {%s TracedVariableChangedCallback}",
                this->GetTclName(), this->GetTclName());
 
   this->AddCallbackCommandObservers();
@@ -93,7 +93,7 @@ const char *vtkKWMenuButton::GetValue()
     // guarantee the variable has been changed before or after calling the
     // callback. To ensure it is true, always refresh the value from
     // the variable itself.
-    this->SetCurrentValue(this->Script("set %sValue", this->GetTclName()));
+    this->SetCurrentValue(this->Script("set %s_Value", this->GetTclName()));
     }
   return this->CurrentValue;  
 }
@@ -103,7 +103,7 @@ void vtkKWMenuButton::SetValue(const char *s)
 {
   if (this->IsCreated() && s && strcmp(s, this->GetValue()))
     {
-    this->Script("set %sValue {%s}", this->GetTclName(), s);
+    this->Script("set %s_Value {%s}", this->GetTclName(), s);
 
     if (this->Menu && *s)
       {
@@ -320,7 +320,7 @@ void vtkKWMenuButton::ProcessCallbackCommandEvents(vtkObject *caller,
       {
       case vtkKWMenu::RadioButtonItemAddedEvent:
         vtksys_stl::string varname(this->GetTclName());
-        varname += "Value";
+        varname += "_Value";
         this->Menu->SetItemVariable(index, varname.c_str());
         this->Menu->SetItemSelectedValue(
           index, this->Menu->GetItemLabel(index));
