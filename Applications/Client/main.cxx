@@ -169,7 +169,7 @@ const arguments_t handleCompareView(const arguments_t& Arguments, MainWindow& Ma
     {
     if(*argument == "--compare-view" && ++argument != Arguments.end())
       {
-      Quit = true;
+      //Quit = true;
       Error = !MainWindow.compareView(argument->c_str(), g_image_threshold, cout, g_test_directory);
       continue;
       }
