@@ -168,15 +168,19 @@ public:
   // Description:
   // Events. The ScaleValueChangingEvent is triggered when the widget value
   // is changed (i.e., during user interaction on the widget's slider),
-  // the ScaleValueChangedEvent is invoked at the end of an interaction with 
-  // the widget.
+  // the ScaleValueStartChangingEvent is invoked at the beginning of an 
+  // interaction with the widget, the ScaleValueChangedEvent is invoked at the
+  // end of an interaction with the widget. They are similar in concept as
+  // the 'Command', 'StartCommand', and 'EndCommand' callbacks but can be
+  // used by multiple listeners/observers at a time.
   // The following parameters are also passed as client data:
   // - the current value: double
   //BTX
   enum
   {
     ScaleValueChangingEvent = 10000,
-    ScaleValueChangedEvent
+    ScaleValueChangedEvent,
+    ScaleValueStartChangingEvent
   };
   //ETX
 

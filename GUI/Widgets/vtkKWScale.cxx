@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.114");
+vtkCxxRevisionMacro(vtkKWScale, "1.115");
 
 //----------------------------------------------------------------------------
 vtkKWScale::vtkKWScale()
@@ -339,6 +339,7 @@ void vtkKWScale::SetStartCommand(vtkObject *object, const char * method)
 void vtkKWScale::InvokeStartCommand(double value)
 {
   this->InvokeScaleCommand(this->StartCommand, value);
+  this->InvokeEvent(vtkKWScale::ScaleValueStartChangingEvent, &value);
 }
 
 //----------------------------------------------------------------------------
