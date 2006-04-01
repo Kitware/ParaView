@@ -196,8 +196,8 @@ int main(int argc, char** argv)
 #endif
 
 #if defined(_MSC_VER)
-  // _execv can't be used as it does not property return the exit value
-  // of the process to execute.
+  /* _execv can't be used as it does not property return the exit value
+     of the process to execute. */
   return _spawnv(_P_WAIT, real_exe_path, argv);
 #else
   execv(real_exe_path, argv);
