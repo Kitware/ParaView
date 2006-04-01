@@ -856,14 +856,11 @@ bool pqMainWindow::compareView(const QString& ReferenceImage, double Threshold, 
   }
     
   // All tests need a 300x300 render window size.
-  int size[2];
-  int *cur_size = render_window->GetSize();
-  size[0] = cur_size[0];
-  size[1] = cur_size[1];
-  render_window->SetSize(300, 300);
+  QSize cur_size = this->Implementation->ActiveView->mainWidget()->size();
+  this->Implementation->ActiveView->mainWidget()->resize(300,300);
   bool ret = pqImageComparison::CompareImage(render_window, ReferenceImage, 
     Threshold, Output, TempDirectory);
-  render_window->SetSize(size);
+  this->Implementation->ActiveView->mainWidget()->resize(cur_size);
   render_window->Render();
   return ret;
 }
