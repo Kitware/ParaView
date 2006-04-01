@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2006-03-31 14:28-0500\n"
-"PO-Revision-Date: 2006-03-28 16:31-0500\n"
+"PO-Revision-Date: 2006-04-01 11:49-0500\n"
 "Last-Translator: <EMAIL@ADDRESS>\n"
 "Language-Team: French\n"
 "MIME-Version: 1.0\n"
@@ -100,98 +100,81 @@ msgid "Show/Hide the '%s' toolbar"
 msgstr "Montrer/Cacher la barre d'outil '%s'"
 
 #: ../../vtkKWWindow.cxx:81
-#, fuzzy
 msgid "Menu|Window|Hide &Main Panel"
-msgstr "Cacher le Panneau Principal"
+msgstr "Cacher le Panneau &Principal"
 
 #: ../../vtkKWWindow.cxx:84
-#, fuzzy
 msgid "Menu|Window|Show &Main Panel"
-msgstr "Montrer le Panneau Principal"
+msgstr "Montrer le Panneau &Principal"
 
 #: ../../vtkKWWindow.cxx:87
-#, fuzzy
 msgid "Menu|Window|Hide &Bottom Panel"
-msgstr "Cacher le Panneau Inférieur"
+msgstr "Cacher le Panneau &Inférieur"
 
 #: ../../vtkKWWindow.cxx:90
-#, fuzzy
 msgid "Menu|Window|Show &Bottom Panel"
-msgstr "Montrer le Panneau Inférieur"
+msgstr "Montrer le Panneau &Inférieur"
 
 #: ../../vtkKWWindow.cxx:93
-#, fuzzy
 msgid "Menu|Window|&Tcl Interactor"
-msgstr "Interacteur Tcl"
+msgstr "Interacteur &Tcl"
 
 #: ../../vtkKWWindow.cxx:330
 msgid "Display a prompt to interact with the Tcl engine"
 msgstr "Afficher une interface d'interaction avec le moteur Tcl"
 
 #: ../../vtkKWWindowBase.cxx:102
-#, fuzzy
 msgid "Menu|&File"
-msgstr "Fichier"
+msgstr "&Fichier"
 
 #: ../../vtkKWWindowBase.cxx:104
-#, fuzzy
 msgid "Menu|File|Open &Recent File"
-msgstr "Ouvrir un Fichier Récent"
+msgstr "Ouvrir un Fichier &Récent"
 
 #: ../../vtkKWWindowBase.cxx:106
-#, fuzzy
 msgid "Menu|File|Pri&nt Settings..."
-msgstr "Paramétres d'Impression"
+msgstr "Paramétres d'Impressio&n"
 
 #: ../../vtkKWWindowBase.cxx:108
-#, fuzzy
 msgid "Menu|File|&Close"
-msgstr "Fermer"
+msgstr "&Fermer"
 
 #: ../../vtkKWWindowBase.cxx:110
-#, fuzzy
 msgid "Menu|File|&Exit"
-msgstr "Quitter"
+msgstr "&Quitter"
 
 #: ../../vtkKWWindowBase.cxx:112
-#, fuzzy
 msgid "Menu|&Edit"
-msgstr "Édition"
+msgstr "&Édition"
 
 #: ../../vtkKWWindowBase.cxx:114
-#, fuzzy
 msgid "Menu|&View"
-msgstr "Affichage"
+msgstr "&Affichage"
 
 #: ../../vtkKWWindowBase.cxx:116
-#, fuzzy
 msgid "Menu|&Window"
-msgstr "Fenêtre"
+msgstr "&Fenêtre"
 
 #: ../../vtkKWWindowBase.cxx:118
-#, fuzzy
 msgid "Menu|&Help"
-msgstr "Aide"
+msgstr "&Aide"
 
 #: ../../vtkKWWindowBase.cxx:120
-#, fuzzy
 msgid "Menu|Help|Help &Topics"
-msgstr "Index"
+msgstr "&Index"
 
 #: ../../vtkKWWindowBase.cxx:122
-#, fuzzy, c-format
+#, c-format
 msgid "Menu|Help|&About %s"
-msgstr "À propos de %s"
+msgstr "&À propos de %s"
 
 #: ../../vtkKWWindowBase.cxx:124
-#, fuzzy
 msgid "Menu|Help|Check for &Updates"
-msgstr "Rechercher une Mise à Jour"
+msgstr "Rechercher une Mise à &Jour"
 
 #: ../../vtkKWWindowBase.cxx:126
-#, fuzzy
 msgid "Menu|Window|&Toolbars"
-msgstr "Barres d'Outils"
+msgstr "Barres d'&Outils"
 
 #: ../../vtkKWWindowBase.cxx:588
 msgid "Toolbar|Status And Progress"
