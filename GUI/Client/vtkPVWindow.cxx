@@ -137,7 +137,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.785");
+vtkCxxRevisionMacro(vtkPVWindow, "1.786");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -489,14 +489,14 @@ void vtkPVWindow::PrepareForDelete()
     if (this->ResetCameraButton)
       {
       char *rbv = this->ResetCameraButton->GetMenu()->CreateItemVariableName(
-        this, "ViewAngle");
+        this->ResetCameraButton->GetMenu(), "ViewAngle");
       state = 
         this->ResetCameraButton->GetMenu()->GetItemVariableValueAsInt(rbv);
       delete [] rbv;
       this->GetApplication()->SetRegistryValue(
         2, "RunTime", "ResetViewResetsViewAngle", "%d", state);
       rbv = this->ResetCameraButton->GetMenu()->CreateItemVariableName(
-        this, "CenterOfRotation");
+        this->ResetCameraButton->GetMenu(), "CenterOfRotation");
       state = 
         this->ResetCameraButton->GetMenu()->GetItemVariableValueAsInt(rbv);
       this->GetApplication()->SetRegistryValue(
@@ -2271,12 +2271,12 @@ void vtkPVWindow::ResetSettingsToDefault()
   if (this->ResetCameraButton)
     {
     char *rbv = this->ResetCameraButton->GetMenu()->CreateItemVariableName(
-      this, "ViewAngle");
+      this->ResetCameraButton->GetMenu(), "ViewAngle");
     this->ResetCameraButton->GetMenu()->SetItemVariableValueAsInt(rbv, 0);
     delete [] rbv;
 
     rbv = this->ResetCameraButton->GetMenu()->CreateItemVariableName(
-      this, "CenterOfRotation");
+      this->ResetCameraButton->GetMenu(), "CenterOfRotation");
     this->ResetCameraButton->GetMenu()->SetItemVariableValueAsInt(rbv, 0);
     delete [] rbv;
     }
@@ -3821,7 +3821,7 @@ void vtkPVWindow::ResetCameraCallback()
                                           this->GetTclName());
 
   char *rbv = this->ResetCameraButton->GetMenu()->CreateItemVariableName(
-    this, "ViewAngle");
+    this->ResetCameraButton->GetMenu(), "ViewAngle");
   if (this->ResetCameraButton->GetMenu()->GetItemVariableValueAsInt(rbv))
     {
     this->MainView->StandardViewCallback(0,0,1);
@@ -3829,7 +3829,7 @@ void vtkPVWindow::ResetCameraCallback()
   delete [] rbv;
 
   rbv = this->ResetCameraButton->GetMenu()->CreateItemVariableName(
-    this, "CenterOfRotation");
+    this->ResetCameraButton->GetMenu(), "CenterOfRotation");
   if (this->ResetCameraButton->GetMenu()->GetItemVariableValueAsInt(rbv))
     {
     this->ResetCenterCallback();
