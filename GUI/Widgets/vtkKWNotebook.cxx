@@ -58,7 +58,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.99");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.100");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -123,11 +123,11 @@ void vtkKWNotebook::Page::UpdateEnableState()
 
   if (state)
     {
-    nb->BindPage(this);
+    this->Bind();
     }
   else
     {
-    nb->UnBindPage(this);
+    this->UnBind();
     }
 
   if (this->Frame)
@@ -148,6 +148,62 @@ void vtkKWNotebook::Page::UpdateEnableState()
   if (this->ImageLabel)
     {
     this->ImageLabel->SetEnabled(state);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::Page::Bind()
+{
+  vtkKWNotebook *nb = vtkKWNotebook::SafeDownCast(
+    this->Frame->GetParent()->GetParent());
+
+  if (!nb->IsCreated())
+    {
+    return;
+    }
+
+  char callback[50];
+
+  if (this->Label)
+    {
+    sprintf(callback, "RaiseCallback %d", this->Id);
+    this->Label->SetBinding("<Button-1>", nb, callback);
+
+    sprintf(callback, "TogglePagePinnedCallback %d", this->Id);
+    this->Label->SetBinding("<Double-1>", nb, callback);
+
+    sprintf(callback, "PageTabContextMenuCallback %d %%X %%Y", this->Id);
+    this->Label->SetBinding("<Button-3>", nb, callback);
+    }
+
+  if (this->ImageLabel)
+    {
+    sprintf(callback, "RaiseCallback %d", this->Id);
+    this->ImageLabel->SetBinding("<Button-1>", nb, callback);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::Page::UnBind()
+{
+  vtkKWNotebook *nb = vtkKWNotebook::SafeDownCast(
+    this->Frame->GetParent()->GetParent());
+
+  if (!nb->IsCreated())
+    {
+    return;
+    }
+
+  if (this->Label)
+    {
+    this->Label->RemoveBinding("<Button-1>");
+    this->Label->RemoveBinding("<Double-1>");
+    this->Label->RemoveBinding("<Button-3>");
+    }
+
+  if (this->ImageLabel)
+    {
+    this->ImageLabel->RemoveBinding("<Button-1>");
     }
 }
 
@@ -786,56 +842,6 @@ int vtkKWNotebook::AddPage(const char *title,
     }
 
   return page->Id;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWNotebook::BindPage(vtkKWNotebook::Page *page)
-{
-  if (!page || !this->IsCreated())
-    {
-    return;
-    }
-
-  char callback[50];
-
-  if (page->Label)
-    {
-    sprintf(callback, "RaiseCallback %d", page->Id);
-    page->Label->SetBinding("<Button-1>", this, callback);
-
-    sprintf(callback, "TogglePagePinnedCallback %d", page->Id);
-    page->Label->SetBinding("<Double-1>", this, callback);
-
-    sprintf(callback, "PageTabContextMenuCallback %d %%X %%Y", page->Id);
-    page->Label->SetBinding("<Button-3>", this, callback);
-    }
-
-  if (page->ImageLabel)
-    {
-    sprintf(callback, "RaiseCallback %d", page->Id);
-    page->ImageLabel->SetBinding("<Button-1>", this, callback);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWNotebook::UnBindPage(vtkKWNotebook::Page *page)
-{
-  if (!page || !this->IsCreated())
-    {
-    return;
-    }
-
-  if (page->Label)
-    {
-    page->Label->RemoveBinding("<Button-1>");
-    page->Label->RemoveBinding("<Double-1>");
-    page->Label->RemoveBinding("<Button-3>");
-    }
-
-  if (page->ImageLabel)
-    {
-    page->ImageLabel->RemoveBinding("<Button-1>");
-    }
 }
 
 //----------------------------------------------------------------------------

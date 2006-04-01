@@ -344,6 +344,8 @@ protected:
   public:
     void Delete();
     void UpdateEnableState();
+    void Bind();
+    void UnBind();
 
     int             Id;
     int             Visibility;
@@ -399,8 +401,6 @@ protected:
   int  GetPageTag(Page*);
   int  GetPagePinned(Page*);
   const char* GetPageTitle(Page*);
-  void BindPage(Page*);
-  void UnBindPage(Page*);
   void SetPageEnabled(Page*, int flag);
 
   int AddToMostRecentPages(Page*);

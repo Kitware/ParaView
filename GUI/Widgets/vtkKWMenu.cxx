@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.95");
+vtkCxxRevisionMacro(vtkKWMenu, "1.96");
 
 #define VTK_KW_MENU_CB_VARNAME_PATTERN "CB_group%d"
 #define VTK_KW_MENU_RB_DEFAULT_GROUP "RB_group"
@@ -71,7 +71,7 @@ int vtkKWMenu::GetLabelWithoutUnderline(
 
   // Find the marker (should not be the last char, or followed by space)
 
-  char *found = strchr(label, marker);
+  char *found = const_cast<char*>(strchr(label, marker));
   while(found)
     {
     ++found;
@@ -426,7 +426,7 @@ char* vtkKWMenu::CreateItemVariableName(vtkKWObject *object,
     const char *suffix_end = suffix + suffix_len;
     while (suffix < suffix_end)
       {
-      if (*suffix >= 0 && *suffix < 128 && *suffix != ' ')
+      if (*suffix >= 0 && *suffix != ' ')
         {
         *buffer_ptr = *suffix;
         buffer_ptr++;
