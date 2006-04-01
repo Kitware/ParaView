@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.96");
+vtkCxxRevisionMacro(vtkKWMenu, "1.97");
 
 #define VTK_KW_MENU_CB_VARNAME_PATTERN "CB_group%d"
 #define VTK_KW_MENU_RB_DEFAULT_GROUP "RB_group"
@@ -79,7 +79,7 @@ int vtkKWMenu::GetLabelWithoutUnderline(
       {
       break;
       }
-    found = strchr(const_cast<const char*>(found), marker);
+    found = const_cast<char*>(strchr(const_cast<const char*>(found), marker));
     }
 
   // Not found, sorry
