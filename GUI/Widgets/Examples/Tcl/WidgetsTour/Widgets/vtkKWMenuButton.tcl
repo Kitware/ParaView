@@ -18,7 +18,7 @@ proc vtkKWMenuButtonEntryPoint {parent win} {
 
     [$menubutton1 GetMenu] AddRadioButton [lindex $days $i]
   }
-
+  
   pack [$menubutton1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2
 
   # -----------------------------------------------------------------------
