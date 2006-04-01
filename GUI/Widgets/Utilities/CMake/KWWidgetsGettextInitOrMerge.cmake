@@ -71,15 +71,41 @@ ELSE(NOT EXISTS "${po_build_file}")
   # file is newer than the PO file, and a MO file is generated from the PO
   # file: this seems to force the MO to always be regenerated.
   # --output-file=${po_build_file}
+  # UPDATE: apparently --update still touches the file... 
 
   IF(NOT "${GETTEXT_MSGMERGE_EXECUTABLE}" STREQUAL "")
+
+    # Merge the strings, store the result in a variable instead of a PO file
+
     EXEC_PROGRAM(${GETTEXT_MSGMERGE_EXECUTABLE} 
       RETURN_VALUE msgmerge_return
       OUTPUT_VARIABLE msgmerge_output
-      ARGS --update --backup=none ${po_build_file} ${pot_build_file})
-    IF(msgmerge_output)
+      ARGS --quiet --output-file="-" ${po_build_file} ${pot_build_file})
+    IF(msgmerge_return)
       MESSAGE("${msgmerge_output}")
-    ENDIF(msgmerge_output)
+    ENDIF(msgmerge_return)
+
+    SET(msgmerge_output "${msgmerge_output}\n")
+
+    # Check if the new PO file would be different than the old one
+
+    SET(update_po_file 0)
+    IF(EXISTS ${po_build_file})
+      FILE(READ "${po_build_file}" po_old)
+      IF(NOT "${msgmerge_output}" STREQUAL "${po_old}")
+        SET(update_po_file 1)
+      ENDIF(NOT "${msgmerge_output}" STREQUAL "${po_old}")
+    ELSE(EXISTS ${po_build_file})
+      SET(update_po_file 1)
+    ENDIF(EXISTS ${po_build_file})
+
+    # Create the PO file if it is really needed
+
+    IF(update_po_file)
+      MESSAGE("Updating ${po_build_file}")
+      FILE(WRITE "${po_build_file}" "${msgmerge_output}")
+    ENDIF(update_po_file)
+
   ENDIF(NOT "${GETTEXT_MSGMERGE_EXECUTABLE}" STREQUAL "")
 
   # msggrep.exe -T -e "#-#-#" would have done the trick but not in 0.13.1
