@@ -14,7 +14,7 @@ proc applyAllFiltersUns {} {
         if {[$fmenu GetItemState $i]} {
             set label [$fmenu GetItemLabel $i]
             if {$label != "AttributeEditor" && $label != "Calculator"} {
-                $fmenu Invoke $i
+                $fmenu InvokeItem $i
                 [$window GetCurrentPVSource] AcceptCallback
                 [$window GetCurrentPVSource] DeleteCallback
             }
@@ -44,7 +44,7 @@ proc applyAllFiltersStru {} {
         if {[$fmenu GetItemState $i]} {
             set label [$fmenu GetItemLabel $i]
             if {$label != "AttributeEditor" && $label != "Tessellate" && $label != "Calculator" && $label != "Append Attributes"} {
-                $fmenu Invoke $i
+                $fmenu InvokeItem $i
                 [$window GetCurrentPVSource] AcceptCallback
                 [$window GetCurrentPVSource] DeleteCallback
             }
