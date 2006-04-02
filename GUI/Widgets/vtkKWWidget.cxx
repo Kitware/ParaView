@@ -15,7 +15,7 @@
 #include "vtkKWWidget.h"
 
 #include "vtkKWApplication.h"
-#include "vtkKWWindowBase.h"
+#include "vtkKWTopLevel.h"
 #include "vtkKWDragAndDropTargetSet.h"
 #include "vtkKWBalloonHelpManager.h"
 #include "vtkObjectFactory.h"
@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.143");
+vtkCxxRevisionMacro(vtkKWWidget, "1.144");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetInternals
@@ -523,19 +523,19 @@ void vtkKWWidget::AddBalloonHelpBindings()
 }
 
 //----------------------------------------------------------------------------
-vtkKWWindowBase* vtkKWWidget::GetParentWindow()
+vtkKWTopLevel* vtkKWWidget::GetParentTopLevel()
 {
-  vtkKWWindowBase* win =0;
+  vtkKWTopLevel* toplevel =0;
   vtkKWWidget* widget = this->GetParent();
   while(widget)
     {
-    if((win = vtkKWWindowBase::SafeDownCast(widget)))
+    if((toplevel = vtkKWTopLevel::SafeDownCast(widget)))
       {
-      return win;
+      return toplevel;
       }
     widget = widget->GetParent();
     }
-  return win;
+  return toplevel;
 }
 
 //----------------------------------------------------------------------------

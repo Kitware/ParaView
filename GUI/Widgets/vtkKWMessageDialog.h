@@ -126,18 +126,23 @@ public:
   // icon is a enumerated icon type described in vtkKWIcon.
   // title is a title string of the dialog. name is the dialog name
   // used for the registry. message is the text message displayed
-  // in the dialog.
-  static void PopupMessage(vtkKWApplication *app, vtkKWWindowBase *masterWin,
+  // in the dialog. masterwin is a pointer to a widget belonging to the window
+  // you want this message dialog to be a child of (or the window directly).
+  static void PopupMessage(vtkKWApplication *app, 
+                           vtkKWWidget *masterWin,
                            const char* title, 
                            const char* message, int options = 0);
-  static int PopupYesNo(vtkKWApplication *app,  vtkKWWindowBase *masterWin,
+  static int PopupYesNo(vtkKWApplication *app,  
+                        vtkKWWidget *masterWin,
                         const char* title, 
                         const char* message, int options = 0);
-  static int PopupYesNo(vtkKWApplication *app,  vtkKWWindowBase *masterWin, 
+  static int PopupYesNo(vtkKWApplication *app,  
+                        vtkKWWidget *masterWin, 
                         const char* name, 
                         const char* title, const char* message, 
                         int options = 0);
-  static int PopupOkCancel(vtkKWApplication *app, vtkKWWindowBase *masterWin,
+  static int PopupOkCancel(vtkKWApplication *app, 
+                           vtkKWWidget *masterWin,
                            const char* title, 
                            const char* message, int options = 0);
 

@@ -319,6 +319,8 @@ public:
 
   // Description:
   // Set the accelerator for a given item specified by its index.
+  // As a convenience, the accelerator is also added as a binding to
+  // the toplevel (vtkKWTopLevel) this menu is a child (or sub-child) of.
   virtual void SetItemAccelerator(int index, const char *accelerator);
 
   // Description:
@@ -517,6 +519,10 @@ protected:
   // Get the suffix out of variable name that was created using 
   // CreateItemVariableName
   const char* GetSuffixOutOfCreatedItemVariableName(const char *varname);
+
+  // Description:
+  // Add accelerator binding to toplevel
+  virtual void SetItemAcceleratorBindingOnToplevel(int index);
   
 private:
 

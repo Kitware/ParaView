@@ -104,7 +104,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.33");
+vtkCxxRevisionMacro(vtkKWView, "1.34");
 
 //----------------------------------------------------------------------------
 void KWViewAbortCheckMethod( vtkObject*, unsigned long, void* arg, void* )
@@ -599,7 +599,7 @@ void vtkKWView::PrintView()
 
   vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
   double DPI=0;
-  if (this->GetParentWindow())
+  if (this->GetParentTopLevel())
     {
     // Is this right? Should DPI be int or float?
     DPI = this->GetApplication()->GetPrintTargetDPI();
@@ -678,7 +678,7 @@ void vtkKWView::Print(HDC ghdc, HDC,
                    scaleX, scaleY, size[0], size[1]);
   double scale;
   // target DPI specified here
-  if (this->GetParentWindow())
+  if (this->GetParentTopLevel())
     {
     scale = printerDPIX/this->GetApplication()->GetPrintTargetDPI();
     }
@@ -711,7 +711,7 @@ void vtkKWView::SetupPrint(RECT &rcDest, HDC ghdc,
   int cyDIB = screenSizeY;         // Size of DIB - y
   
   // target DPI specified here
-  if (this->GetParentWindow())
+  if (this->GetParentTopLevel())
     {
     scale = printerDPIX/this->GetApplication()->GetPrintTargetDPI();
     }
@@ -754,7 +754,8 @@ void vtkKWView::SaveAsImage()
 {
   char *path = 0;
   
-  vtkKWWindowBase* window = this->GetParentWindow();
+  vtkKWWindowBase* window = vtkKWWindowBase::SafeDownCast(
+    this->GetParentTopLevel());
 
   // first get the file name
   vtkKWSaveImageDialog *dlg = vtkKWSaveImageDialog::New();
@@ -773,7 +774,7 @@ void vtkKWView::SaveAsImage()
     }
   path = dlg->GetFileName();
 
-  vtkPVWindow *win = vtkPVWindow::SafeDownCast(this->GetParentWindow());
+  vtkPVWindow *win = vtkPVWindow::SafeDownCast(this->GetParentTopLevel());
   int rate = 1, stride[3];
   stride[0] = stride[1] = stride[2] = 1;
 
@@ -1523,7 +1524,7 @@ void vtkKWView::SetupStreaming(int numPartitions)
     pvApp->GetRenderModuleProxy()->UpdateVTKObjects();
     }
   
-  vtkPVWindow *win = vtkPVWindow::SafeDownCast(this->GetParentWindow());
+  vtkPVWindow *win = vtkPVWindow::SafeDownCast(this->GetParentTopLevel());
   if (!win)
     {
     return;
@@ -1578,7 +1579,7 @@ void vtkKWView::CleanupStreaming(int rate, int stride[3])
   vtkPVApplication *app=vtkPVApplication::SafeDownCast(this->GetApplication());
   app->GetProcessModule()->SetStreamBlock(0);
 
-  vtkPVWindow *win = vtkPVWindow::SafeDownCast(this->GetParentWindow());
+  vtkPVWindow *win = vtkPVWindow::SafeDownCast(this->GetParentTopLevel());
   if (!win)
     {
     return;
@@ -1647,7 +1648,6 @@ void vtkKWView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Notebook: " << this->GetNotebook() << endl;
   os << indent << "NumberOfStillUpdates: " << this->GetNumberOfStillUpdates()
      << endl;
-  os << indent << "ParentWindow: " << this->GetParentWindow() << endl;
   os << indent << "Printing: " << this->GetPrinting() << endl;
   os << indent << "ProgressGauge: " << this->ProgressGauge << endl;
   os << indent << "RenderMode: " << this->GetRenderMode() << endl;

@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBalloonHelpManager );
-vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.13");
+vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.14");
 
 //----------------------------------------------------------------------------
 vtkKWBalloonHelpManager::vtkKWBalloonHelpManager()
@@ -255,7 +255,8 @@ void vtkKWBalloonHelpManager::DisplayCallback(vtkKWWidget *widget)
   int distance_y_to_widget = 15;
   int balloon_bottom_y = pointer_y + distance_y_to_widget + balloon_height;
 
-  vtkKWWindowBase *win = widget->GetParentWindow();
+  vtkKWWindowBase *win = vtkKWWindowBase::SafeDownCast(
+    widget->GetParentTopLevel());
 
   vtkKWWidget *found_rw = vtkKWTkUtilities::ContainsCoordinatesForSpecificType(
     win, pointer_x, balloon_bottom_y, "vtkKWRenderWidget");

@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.97");
+vtkCxxRevisionMacro(vtkKWMenu, "1.98");
 
 #define VTK_KW_MENU_CB_VARNAME_PATTERN "CB_group%d"
 #define VTK_KW_MENU_RB_DEFAULT_GROUP "RB_group"
@@ -275,6 +275,7 @@ void vtkKWMenu::SetItemCommand(int index,
   this->Script("%s entryconfigure %d -command {%s}", 
                this->GetWidgetName(), index, command);
   delete [] command;
+  this->SetItemAcceleratorBindingOnToplevel(index);
 }
 
 //----------------------------------------------------------------------------
@@ -1309,12 +1310,38 @@ void vtkKWMenu::SetItemIndicatorVisibility(int index, int flag)
 //----------------------------------------------------------------------------
 void vtkKWMenu::SetItemAccelerator(int index, const char *accelerator)
 {
-  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems())
+  if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems() || 
+      !accelerator)
     {
     return;
     }
   this->Script("%s entryconfigure %d -accelerator {%s}", 
                this->GetWidgetName(), index, accelerator);
+
+  this->SetItemAcceleratorBindingOnToplevel(index);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemAcceleratorBindingOnToplevel(int index)
+{
+  const char *accelerator = this->GetItemOption(index, "-accelerator");
+  if (accelerator && *accelerator)
+    {
+    vtksys_stl::string accelerator_safe(accelerator);
+    const char *command = this->GetItemCommand(index);
+    if (command && *command)
+      {
+      vtksys_stl::string command_safe(command);
+      vtkKWTopLevel *toplevel = this->GetParentTopLevel();
+      if (toplevel)
+        {
+        vtksys_stl::string key("<Key-");
+        key += accelerator_safe;
+        key += ">";
+        toplevel->SetBinding(key.c_str(), command_safe.c_str());
+        }
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1451,7 +1478,8 @@ void vtkKWMenu::DisplayHelpCallback(const char* widget_name)
   if(help)
     {
     vtksys_stl::string help_safe(help);
-    vtkKWWindowBase *window = this->GetParentWindow();
+    vtkKWWindowBase *window = vtkKWWindowBase::SafeDownCast(
+      this->GetParentTopLevel());
     if (window)
       {
       window->SetStatusText(help_safe.c_str());

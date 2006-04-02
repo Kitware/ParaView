@@ -22,6 +22,7 @@
 #include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWMenu.h"
+#include "vtkKWWindowBase.h"
 #include "vtkKWMultiColumnList.h"
 #include "vtkKWMultiColumnListWithScrollbars.h"
 #include "vtkKWPushButton.h"
@@ -56,7 +57,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.42");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.43");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals

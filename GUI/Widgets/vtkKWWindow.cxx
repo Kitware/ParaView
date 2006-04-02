@@ -33,7 +33,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.275");
+vtkCxxRevisionMacro(vtkKWWindow, "1.276");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -290,10 +290,6 @@ void vtkKWWindow::Create()
                          this, "MainPanelVisibilityCallback");
   menu->SetItemAccelerator(
     idx, this->GetMainPanelVisibilityKeyAccelerator());
-  event = "<Key-";
-  event += this->GetMainPanelVisibilityKeyAccelerator();
-  event += ">";
-  this->AddBinding(event.c_str(), this, "MainPanelVisibilityCallback");
 
   // Menu : Window
 
@@ -302,10 +298,6 @@ void vtkKWWindow::Create()
                          this, "SecondaryPanelVisibilityCallback");
   menu->SetItemAccelerator(
     idx, this->GetSecondaryPanelVisibilityKeyAccelerator());
-  event = "<Key-";
-  event += this->GetSecondaryPanelVisibilityKeyAccelerator();
-  event += ">";
-  this->AddBinding(event.c_str(), this, "SecondaryPanelVisibilityCallback");
 
   // Menu : View : Application Settings
 

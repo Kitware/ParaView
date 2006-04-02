@@ -25,7 +25,7 @@
 
 #include "vtkKWObject.h"
 
-class vtkKWWindowBase;
+class vtkKWTopLevel;
 class vtkKWDragAndDropTargetSet;
 class vtkKWWidgetInternals;
 class vtkKWBalloonHelpManager;
@@ -111,10 +111,11 @@ public:
     const char *event, vtkObject *object, const char *method);
 
   // Description:
-  // Convenience method to get the parent vtkKWWindowBase for
-  // this Widget if there is one.
-  // NOTE: this may return NULL if the Widget is not in a window.
-  vtkKWWindowBase* GetParentWindow();
+  // Convenience method to get the parent vtkKWTopLevel for
+  // this widget if there is one (by recursively tracking the parents).
+  // This can be safe-downcasted to a vtkKWWindowBase or vtkKWWindow.
+  // NOTE: this may return NULL if the widget is not in a toplevel.
+  vtkKWTopLevel* GetParentTopLevel();
 
   // Description:
   // Query if widget is packed

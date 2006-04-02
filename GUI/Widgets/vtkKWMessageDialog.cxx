@@ -23,12 +23,11 @@
 #include "vtkKWMessage.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWRegistryHelper.h"
-#include "vtkKWWindowBase.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.90");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.91");
 
 //----------------------------------------------------------------------------
 vtkKWMessageDialog::vtkKWMessageDialog()
@@ -425,7 +424,8 @@ void vtkKWMessageDialog::SetIcon()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMessageDialog::PopupMessage(vtkKWApplication *app, vtkKWWindowBase *win,
+void vtkKWMessageDialog::PopupMessage(vtkKWApplication *app, 
+                                      vtkKWWidget *win,
                                       const char* title, 
                                       const char*message, int options)
 {
@@ -444,7 +444,8 @@ void vtkKWMessageDialog::PopupMessage(vtkKWApplication *app, vtkKWWindowBase *wi
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindowBase *win,
+int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, 
+                                   vtkKWWidget *win,
                                    const char* name, 
                                    const char* title, const char* message,
                                    int options)
@@ -467,7 +468,8 @@ int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindowBase *win,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindowBase *win,
+int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, 
+                                   vtkKWWidget *win,
                                    const char* title, 
                                    const char*message, int options)
 {
@@ -476,7 +478,8 @@ int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindowBase *win,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMessageDialog::PopupOkCancel(vtkKWApplication *app, vtkKWWindowBase *win,
+int vtkKWMessageDialog::PopupOkCancel(vtkKWApplication *app, 
+                                      vtkKWWidget *win,
                                       const char* title, 
                                       const char*message, int options)
 {

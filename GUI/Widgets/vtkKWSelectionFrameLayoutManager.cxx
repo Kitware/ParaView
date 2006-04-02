@@ -71,7 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.55");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.56");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -1644,7 +1644,7 @@ int vtkKWSelectionFrameLayoutManager::ChangeWidgetTitleCallback(
   // Create a dialog to ask for a new title
 
   vtkKWSimpleEntryDialog *dlg = vtkKWSimpleEntryDialog::New();
-  dlg->SetMasterWindow(this->GetParentWindow());
+  dlg->SetMasterWindow(this->GetParentTopLevel());
   dlg->SetDisplayPositionToPointer();
   dlg->SetTitle(
     ks_("Selection Frame Dialog|Title|Change frame title"));
@@ -1662,7 +1662,7 @@ int vtkKWSelectionFrameLayoutManager::ChangeWidgetTitleCallback(
     if (!ok)
       {
       vtkKWMessageDialog::PopupMessage(
-        this->GetApplication(), this->GetParentWindow(), 
+        this->GetApplication(), this->GetParentTopLevel(), 
         ks_("Selection Frame Dialog|Title|Change frame title - Error!"),
         ks_("Selection Frame Dialog|There is a problem with the new title you provided."),
         vtkKWMessageDialog::ErrorIcon);
@@ -1938,7 +1938,7 @@ int vtkKWSelectionFrameLayoutManager::SaveScreenshotAllWidgets()
     }
 
   vtkKWSaveImageDialog *save_dialog = vtkKWSaveImageDialog::New();
-  save_dialog->SetParent(this->GetParentWindow());
+  save_dialog->SetParent(this->GetParentTopLevel());
   save_dialog->Create();
   save_dialog->SetTitle(
     ks_("Selection Frame Dialog|Title|Save Screenshot"));
@@ -2055,7 +2055,7 @@ int vtkKWSelectionFrameLayoutManager::SaveScreenshotAllWidgetsToFile(
   if (!success)
     {
     vtkKWMessageDialog::PopupMessage(
-      this->GetApplication(), this->GetParentWindow(), 
+      this->GetApplication(), this->GetParentTopLevel(), 
       ks_("Selection Frame Dialog|Title|Save Screenshot - Error!"),
       k_("There was a problem writing the image file.\n"
          "Please check the location and make sure you have write\n"

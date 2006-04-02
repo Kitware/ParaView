@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.50");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.51");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
@@ -125,7 +125,8 @@ int vtkKWLoadSaveDialog::Invoke()
             << (this->FileTypes ? this->FileTypes : "") << "}";
     }
 
-  vtkKWWindowBase* window = this->GetParentWindow();
+  vtkKWWindowBase* window = vtkKWWindowBase::SafeDownCast(
+    this->GetParentTopLevel());
   if (window)
     {
     command << " -parent " << window->GetWidgetName();

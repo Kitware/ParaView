@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-03-31 14:28-0500\n"
+"POT-Creation-Date: 2006-04-02 15:43-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,31 +26,31 @@ msgstr ""
 msgid "Exit Dialog|Title|Exit %s"
 msgstr ""
 
-#: ../../vtkKWApplicationSettingsInterface.cxx:50 ../../vtkKWWindow.cxx:526
+#: ../../vtkKWApplicationSettingsInterface.cxx:50 ../../vtkKWWindow.cxx:518
 msgid "Application Settings|Title|Application Settings"
 msgstr ""
 
-#: ../../vtkKWMessageDialog.cxx:56 ../../vtkKWMessageDialog.cxx:162
+#: ../../vtkKWMessageDialog.cxx:55 ../../vtkKWMessageDialog.cxx:161
 msgid "Message Dialog|Button|OK"
 msgstr ""
 
-#: ../../vtkKWMessageDialog.cxx:59 ../../vtkKWMessageDialog.cxx:166
+#: ../../vtkKWMessageDialog.cxx:58 ../../vtkKWMessageDialog.cxx:165
 msgid "Message Dialog|Button|Cancel"
 msgstr ""
 
-#: ../../vtkKWMessageDialog.cxx:62
+#: ../../vtkKWMessageDialog.cxx:61
 msgid "Message Dialog|Button|Other"
 msgstr ""
 
-#: ../../vtkKWMessageDialog.cxx:130
+#: ../../vtkKWMessageDialog.cxx:129
 msgid "Message Dialog|Do not show this dialog anymore."
 msgstr ""
 
-#: ../../vtkKWMessageDialog.cxx:157
+#: ../../vtkKWMessageDialog.cxx:156
 msgid "Message Dialog|Button|Yes"
 msgstr ""
 
-#: ../../vtkKWMessageDialog.cxx:158
+#: ../../vtkKWMessageDialog.cxx:157
 msgid "Message Dialog|Button|No"
 msgstr ""
 
@@ -115,7 +115,7 @@ msgstr ""
 msgid "Menu|Window|&Tcl Interactor"
 msgstr ""
 
-#: ../../vtkKWWindow.cxx:330
+#: ../../vtkKWWindow.cxx:322
 msgid "Display a prompt to interact with the Tcl engine"
 msgstr ""
 

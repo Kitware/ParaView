@@ -71,7 +71,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.22");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.23");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -454,7 +454,7 @@ void vtkKWSimpleAnimationWidget::DisableButtonsButCancel()
   // It seems the grab has no impact on the menubar, so try to disable
   // it manually
 
-  vtkKWWindowBase *win = this->GetParentWindow();
+  vtkKWTopLevel *win = this->GetParentTopLevel();
   if (win)
     {
     win->GetMenu()->SetEnabled(0);
@@ -484,7 +484,8 @@ void vtkKWSimpleAnimationWidget::EnableButtonsButCancel()
   // It seems the grab has no impact on the menubar, so try to re-enable
   // it since we disabled it manually in DisableButtonsButCancel
 
-  vtkKWWindowBase *win = this->GetParentWindow();
+  vtkKWWindowBase *win = vtkKWWindowBase::SafeDownCast(
+    this->GetParentTopLevel());
   if (win)
     {
     win->UpdateMenuState();
@@ -543,7 +544,7 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
     }
 
   vtkKWLoadSaveDialog *save_dialog = vtkKWLoadSaveDialog::New();
-  save_dialog->SetParent(this->GetParentWindow());
+  save_dialog->SetParent(this->GetParentTopLevel());
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(
     save_dialog, "SavePath");
   save_dialog->Create();
@@ -607,7 +608,7 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
     // Prompt for the size of the movie
     
     vtkKWMessageDialog *msg_dialog = vtkKWMessageDialog::New();
-    msg_dialog->SetMasterWindow(this->GetParentWindow());
+    msg_dialog->SetMasterWindow(this->GetParentTopLevel());
     msg_dialog->SetTitle("Create Animation: Size Check");
     msg_dialog->Create();
 
@@ -752,7 +753,8 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
     }
 
   int previewing = !file_root;
-  vtkKWWindowBase *win = this->GetParentWindow();
+  vtkKWWindowBase *win = vtkKWWindowBase::SafeDownCast(
+    this->GetParentTopLevel());
 
   int old_render_mode = 0, old_size[2], status;
 
@@ -993,7 +995,8 @@ void vtkKWSimpleAnimationWidget::PerformSliceAnimation(const char *file_root,
     }
 
   int previewing = !file_root;
-  vtkKWWindowBase *win = this->GetParentWindow();
+  vtkKWWindowBase *win = vtkKWWindowBase::SafeDownCast(
+    this->GetParentTopLevel());
   
   int slice = this->InvokeSliceGetCommand();
   int old_size[2], status;

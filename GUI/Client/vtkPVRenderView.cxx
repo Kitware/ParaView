@@ -146,7 +146,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.417");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.418");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -2725,7 +2725,7 @@ void vtkPVRenderView::SetUseLight(int s)
 //----------------------------------------------------------------------------
 vtkPVWindow *vtkPVRenderView::GetPVWindow()
 {
-  vtkPVWindow *pvWin = vtkPVWindow::SafeDownCast(this->GetParentWindow());
+  vtkPVWindow *pvWin = vtkPVWindow::SafeDownCast(this->GetParentTopLevel());
 
   return pvWin;
 }
@@ -3204,7 +3204,7 @@ void vtkPVRenderView::PrintView()
   
   vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
   double DPI=0;
-  if (this->GetParentWindow())
+  if (this->GetParentTopLevel())
     {
     // Is this right? Should DPI be int or float?
     DPI = this->GetApplication()->GetPrintTargetDPI();

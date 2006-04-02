@@ -42,7 +42,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.130");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.131");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -1681,9 +1681,9 @@ void vtkKWRenderWidget::ProcessCallbackCommandEvents(vtkObject *caller,
             cptr = "hand2";
             break;
           }
-        if (this->GetParentWindow())
+        if (this->GetParentTopLevel())
           {
-          this->GetParentWindow()->SetConfigurationOption("-cursor", cptr);
+          this->GetParentTopLevel()->SetConfigurationOption("-cursor", cptr);
           }
         break;
       }
