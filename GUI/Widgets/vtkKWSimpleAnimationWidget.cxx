@@ -71,7 +71,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.21");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.22");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -588,11 +588,10 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
     return;
     }
 
-  // Prompt for the size of the movie
+  int orig_width = this->RenderWidget->GetRenderWindow()->GetSize()[0];
+  int orig_height = this->RenderWidget->GetRenderWindow()->GetSize()[1];
 
-  vtkKWMessageDialog *msg_dialog = vtkKWMessageDialog::New();
-  msg_dialog->SetMasterWindow(this->GetParentWindow());
-  msg_dialog->Create();
+  int width, height;
 
   // Is this a video format
 
@@ -600,92 +599,108 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
     (!strcmp(ext.c_str(), ".mpg") || !strcmp(ext.c_str(), ".mpeg") ||
      !strcmp(ext.c_str(), ".MPG") || !strcmp(ext.c_str(), ".MPEG") ||
      !strcmp(ext.c_str(), ".MP2") || !strcmp(ext.c_str(), ".mp2"));
-  if (is_mpeg)
+  int is_avi = 
+    (!strcmp(ext.c_str(), ".avi") || !strcmp(ext.c_str(), ".AVI"));
+
+  if (is_mpeg || is_avi)
     {
-    msg_dialog->SetText(
-      "Specify the width and height of the mpeg to be saved from this "
-      "animation. The width must be a multiple of 32 and the height a "
-      "multiple of 8. Each will be resized to the next smallest multiple "
-      "if it does not meet this criterion. The maximum size allowed is "
-      "1920 by 1080");
+    // Prompt for the size of the movie
+    
+    vtkKWMessageDialog *msg_dialog = vtkKWMessageDialog::New();
+    msg_dialog->SetMasterWindow(this->GetParentWindow());
+    msg_dialog->SetTitle("Create Animation: Size Check");
+    msg_dialog->Create();
+
+    if (is_mpeg)
+      {
+      msg_dialog->SetText(
+        "Specify the width and height of the mpeg to be saved from this "
+        "animation. The width must be a multiple of 32 and the height a "
+        "multiple of 8. Each will be resized to the next smallest multiple "
+        "if it does not meet this criterion. The maximum size allowed is "
+        "1920 by 1080");
+      }
+    else if (is_avi)
+      { 
+      msg_dialog->SetText(
+        "Specify the width and height of the images to be saved from this "
+        "animation. Each dimension must be a multiple of 4. Each will be "
+        "resized to the next smallest multiple of 4 if it does not meet this "
+        "criterion.");
+      }
+  
+    vtkKWFrame *frame = vtkKWFrame::New();
+    frame->SetParent(msg_dialog->GetTopFrame());
+    frame->Create();
+  
+    vtkKWEntryWithLabel *width_entry = vtkKWEntryWithLabel::New();
+    width_entry->SetParent(frame);
+    width_entry->Create();
+    width_entry->SetLabelText("Width:");
+    width_entry->GetWidget()->SetValueAsInt(orig_width);
+    
+    vtkKWEntryWithLabel *height_entry = vtkKWEntryWithLabel::New();
+    height_entry->SetParent(frame);
+    height_entry->Create();
+    height_entry->SetLabelText("Height:");
+    height_entry->GetWidget()->SetValueAsInt(orig_height);
+  
+    this->Script("pack %s %s -side left -fill both -expand t",
+                 width_entry->GetWidgetName(), 
+                 height_entry->GetWidgetName());
+    
+    this->Script("pack %s -side top -pady 5", 
+                 frame->GetWidgetName());
+    
+    msg_dialog->Invoke();
+    
+    // Fix the size
+
+    width = width_entry->GetWidget()->GetValueAsInt();
+    height = height_entry->GetWidget()->GetValueAsInt();
+
+    if (is_mpeg)
+      {
+      if ((width % 32) > 0)
+        {
+        width -= width % 32;
+        }
+      if ((height % 8) > 0)
+        {
+        height -= height % 8;
+        }
+      if (width > 1920)
+        {
+        width = 1920;
+        }
+      if (height > 1080)
+        {
+        height = 1080;
+        }      
+      }
+    else if (is_avi)
+      {
+      if ((width % 4) > 0)
+        {
+        width -= width % 4;
+        }
+      if ((height % 4) > 0)
+        {
+        height -= height % 4;
+        }
+      }
+  
+    width_entry->Delete();
+    height_entry->Delete();
+    frame->Delete();
+    msg_dialog->Delete();
     }
   else
-    { 
-    msg_dialog->SetText(
-      "Specify the width and height of the images to be saved from this "
-      "animation. Each dimension must be a multiple of 4. Each will be "
-      "resized to the next smallest multiple of 4 if it does not meet this "
-      "criterion.");
-    }
-  
-  vtkKWFrame *frame = vtkKWFrame::New();
-  frame->SetParent(msg_dialog->GetTopFrame());
-  frame->Create();
-  
-  int orig_width = this->RenderWidget->GetRenderWindow()->GetSize()[0];
-  int orig_height = this->RenderWidget->GetRenderWindow()->GetSize()[1];
-  
-  vtkKWEntryWithLabel *width_entry = vtkKWEntryWithLabel::New();
-  width_entry->SetParent(frame);
-  width_entry->Create();
-  width_entry->SetLabelText("Width:");
-  width_entry->GetWidget()->SetValueAsInt(orig_width);
-  
-  vtkKWEntryWithLabel *height_entry = vtkKWEntryWithLabel::New();
-  height_entry->SetParent(frame);
-  height_entry->Create();
-  height_entry->SetLabelText("Height:");
-  height_entry->GetWidget()->SetValueAsInt(orig_height);
-  
-  this->Script("pack %s %s -side left -fill both -expand t",
-               width_entry->GetWidgetName(), 
-               height_entry->GetWidgetName());
-
-  this->Script("pack %s -side top -pady 5", 
-               frame->GetWidgetName());
-  
-  msg_dialog->Invoke();
-
-  // Fix the size
-
-  int width = width_entry->GetWidget()->GetValueAsInt();
-  int height = height_entry->GetWidget()->GetValueAsInt();
-
-  if (is_mpeg)
     {
-    if ((width % 32) > 0)
-      {
-      width -= width % 32;
-      }
-    if ((height % 8) > 0)
-      {
-      height -= height % 8;
-      }
-    if (width > 1920)
-      {
-      width = 1920;
-      }
-    if (height > 1080)
-      {
-      height = 1080;
-      }      
+    width = orig_width;
+    height = orig_height;
     }
-  else
-    {
-    if ((width % 4) > 0)
-      {
-      width -= width % 4;
-      }
-    if ((height % 4) > 0)
-      {
-      height -= height % 4;
-      }
-    }
-  
-  width_entry->Delete();
-  height_entry->Delete();
-  frame->Delete();
-  msg_dialog->Delete();
+
   save_dialog->Delete();
 
   // Create the animation
