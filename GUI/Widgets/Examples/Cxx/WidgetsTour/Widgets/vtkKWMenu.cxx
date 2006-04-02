@@ -189,6 +189,7 @@ void vtkKWMenuItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
   is_selected = menu1->GetItemSelectedState(
     menu1->GetIndexOfSelectedItemInGroup("Bold"));
 
+  (void)is_selected;
   message1->Delete();
   submenu1->Delete();
   submenu2->Delete();
