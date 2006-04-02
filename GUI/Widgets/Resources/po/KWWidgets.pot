@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-04-02 15:43-0400\n"
+"POT-Creation-Date: 2006-04-02 16:13-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -128,7 +128,7 @@ msgid "Menu|File|Open &Recent File"
 msgstr ""
 
 #: ../../vtkKWWindowBase.cxx:106
-msgid "Menu|File|Pri&nt Settings..."
+msgid "Menu|File|Page Set&up..."
 msgstr ""
 
 #: ../../vtkKWWindowBase.cxx:108
@@ -136,7 +136,7 @@ msgid "Menu|File|&Close"
 msgstr ""
 
 #: ../../vtkKWWindowBase.cxx:110
-msgid "Menu|File|&Exit"
+msgid "Menu|File|E&xit"
 msgstr ""
 
 #: ../../vtkKWWindowBase.cxx:112
@@ -172,39 +172,39 @@ msgstr ""
 msgid "Menu|Window|&Toolbars"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:588
+#: ../../vtkKWWindowBase.cxx:590
 msgid "Toolbar|Status And Progress"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:685
+#: ../../vtkKWWindowBase.cxx:687
 msgid "Close Dialog|Are you sure you want to close this window?"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:980
+#: ../../vtkKWWindowBase.cxx:982
 msgid "Menu|Window|Show/Hide Toolbars"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:1073
+#: ../../vtkKWWindowBase.cxx:1076
 #, c-format
 msgid "Load Script Dialog|File Type|%s Scripts"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:1081
+#: ../../vtkKWWindowBase.cxx:1084
 msgid "Load Script Dialog|File Type|All Files"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:1119
+#: ../../vtkKWWindowBase.cxx:1122
 msgid "Warning Dialog|Title|Warning!"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:1130
+#: ../../vtkKWWindowBase.cxx:1133
 msgid "Error Dialog|Title|Error!"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:1218
+#: ../../vtkKWWindowBase.cxx:1221
 msgid "Tcl Interactor Dialog|Title|Tcl Interactor"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:1353
+#: ../../vtkKWWindowBase.cxx:1356
 msgid "Can not close window while it is disabled"
 msgstr ""

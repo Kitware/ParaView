@@ -34,14 +34,14 @@
 
 //----------------------------------------------------------------------------
 
-const char *vtkKWApplicationSettingsInterface::PrintSettingsLabel = "Print Settings";
+const char *vtkKWApplicationSettingsInterface::PrintSettingsLabel = "Page Setup";
 
 #define VTK_KW_APPLICATION_SETTINGS_UIP_LABEL "Application Settings"
 #define VTK_KW_APPLICATION_SETTINGS_DPI_FORMAT "%.1lf"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.53");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.54");
 
 //----------------------------------------------------------------------------
 vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()

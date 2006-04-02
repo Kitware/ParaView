@@ -33,7 +33,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.43");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.44");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -103,11 +103,11 @@ vtkKWWindowBase::vtkKWWindowBase()
   this->OpenRecentFileMenuLabel = 
     vtksys::SystemTools::DuplicateString(ks_("Menu|File|Open &Recent File"));
   this->PrintOptionsMenuLabel = 
-    vtksys::SystemTools::DuplicateString(ks_("Menu|File|Pri&nt Settings..."));
+    vtksys::SystemTools::DuplicateString(ks_("Menu|File|Page Set&up..."));
   this->FileCloseMenuLabel = 
     vtksys::SystemTools::DuplicateString(ks_("Menu|File|&Close"));
   this->FileExitMenuLabel = 
-    vtksys::SystemTools::DuplicateString(ks_("Menu|File|&Exit"));
+    vtksys::SystemTools::DuplicateString(ks_("Menu|File|E&xit"));
   this->EditMenuLabel = 
     vtksys::SystemTools::DuplicateString(ks_("Menu|&Edit"));
   this->ViewMenuLabel =  
@@ -330,6 +330,7 @@ void vtkKWWindowBase::Create()
   vtksys_stl::string cmd;
   vtksys_stl::string label;
   vtkKWMenu *menu = NULL;
+  int index;
   char buffer[512];
 
   this->SetIconName(app->GetPrettyName());
@@ -360,7 +361,8 @@ void vtkKWWindowBase::Create()
     {
     cmd = "DisplayHelpDialog ";
     cmd += this->GetTclName();
-    menu->AddCommand(this->GetHelpTopicsMenuLabel(), app, cmd.c_str());
+    index = menu->AddCommand(this->GetHelpTopicsMenuLabel(), app, cmd.c_str());
+    menu->SetItemAccelerator(index, "F1");
     }
 
   if (app->HasCheckForUpdates())
@@ -1011,7 +1013,7 @@ void vtkKWWindowBase::InsertRecentFilesMenu(
       this->GetFileMenu()->GetIndexOfItem(this->GetOpenRecentFileMenuLabel()));
     }
 
-  this->GetFileMenu()->InsertCascade(
+  int index = this->GetFileMenu()->InsertCascade(
     pos, this->GetOpenRecentFileMenuLabel(), mrf_menu);
 
   // Fill the recent files vector with recent files stored in registry

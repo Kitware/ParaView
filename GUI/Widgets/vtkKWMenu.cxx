@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.98");
+vtkCxxRevisionMacro(vtkKWMenu, "1.99");
 
 #define VTK_KW_MENU_CB_VARNAME_PATTERN "CB_group%d"
 #define VTK_KW_MENU_RB_DEFAULT_GROUP "RB_group"
@@ -1335,10 +1335,34 @@ void vtkKWMenu::SetItemAcceleratorBindingOnToplevel(int index)
       vtkKWTopLevel *toplevel = this->GetParentTopLevel();
       if (toplevel)
         {
-        vtksys_stl::string key("<Key-");
-        key += accelerator_safe;
-        key += ">";
-        toplevel->SetBinding(key.c_str(), command_safe.c_str());
+        // Let's try to transform it into a binding
+        vtksys::SystemTools::ReplaceString(
+          accelerator_safe, "+", "-");
+        vtksys::SystemTools::ReplaceString(
+          accelerator_safe, "Ctrl", "Control");
+
+        // Accelerator are usually specified as Ctrl-O, with the letter
+        // in uppercase. Switch it to lowercase
+
+        vtksys_stl::string::size_type accel_size = accelerator_safe.size();
+        vtksys_stl::string::size_type last_sep = accelerator_safe.rfind("-");
+        if((last_sep != vtksys_stl::string::npos &&
+            last_sep == accel_size - 2) ||
+           (last_sep == vtksys_stl::string::npos && accel_size == 1))
+          {
+          accelerator_safe[accel_size - 1] =
+            static_cast<vtksys_stl::string::value_type>(
+              tolower(accelerator_safe[accel_size - 1]));
+          }
+
+        vtksys_stl::string binding("<");
+        if(last_sep == vtksys_stl::string::npos)
+          {
+          binding += "Key-";
+          }
+        binding += accelerator_safe;
+        binding += ">";
+        toplevel->SetBinding(binding.c_str(), command_safe.c_str());
         }
       }
     }

@@ -318,9 +318,13 @@ public:
   virtual void SetItemIndicatorVisibility(int index, int flag);
 
   // Description:
-  // Set the accelerator for a given item specified by its index.
-  // As a convenience, the accelerator is also added as a binding to
-  // the toplevel (vtkKWTopLevel) this menu is a child (or sub-child) of.
+  // Specifies a string to display at the right side of the menu entry. 
+  // Normally describes an accelerator keystroke sequence that may be typed
+  // to invoke the same function as the menu entry. This is an arbitrary
+  // string, not a key binding per say; yet, as a convenience, the 
+  // accelerator will also be interpreted and added as a key binding to
+  // the toplevel this menu is a child (or sub-child) of. It can recognizes
+  // keyword like Ctrl+0.
   virtual void SetItemAccelerator(int index, const char *accelerator);
 
   // Description:
