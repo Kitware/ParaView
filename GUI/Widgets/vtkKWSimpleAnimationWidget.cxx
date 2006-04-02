@@ -37,7 +37,9 @@
 #include "vtkWindowToImageFilter.h"
 #include "vtkKWWindowBase.h"
 #include "vtkToolkits.h"
-
+#include "vtkImageWriter.h"
+#include "vtkJPEGWriter.h"
+#include "vtkTIFFWriter.h"
 #include "vtkKWWidgetsBuildConfigure.h" // VTK_USE_VIDEO_FOR_WINDOWS
 
 #ifdef VTK_USE_VIDEO_FOR_WINDOWS 
@@ -69,7 +71,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.20");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.21");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -547,17 +549,12 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
   save_dialog->Create();
   save_dialog->SetTitle("Save Animation");
   save_dialog->SaveDialogOn();
-#ifdef VTK_USE_VIDEO_FOR_WINDOWS
-  save_dialog->SetFileTypes("{{AVI movie file} {.avi}} {{MPEG2 movie file} {.mpg}}");
+#if defined(VTK_USE_VIDEO_FOR_WINDOWS) || defined(VTK_USE_FFMPEG_ENCODER)
+  save_dialog->SetFileTypes("{{AVI movie file} {.avi}} {{MPEG2 movie file} {.mpg}} {{JPEG Images} {.jpg}} {{TIFF Images} {.tif}}");
   save_dialog->SetDefaultExtension(".avi");
 #else
-#ifdef VTK_USE_FFMPEG_ENCODER
-  save_dialog->SetFileTypes("{{AVI movie file} {.avi}} {{MPEG2 movie file} {.mpg}}");
-  save_dialog->SetDefaultExtension(".avi");
-#else
-  save_dialog->SetFileTypes("{{MPEG2 movie file} {.mpg}}");
+  save_dialog->SetFileTypes("{{MPEG2 movie file} {.mpg}} {{JPEG Images} {.jpg}} {{TIFF Images} {.tif}}");
   save_dialog->SetDefaultExtension(".mpg");
-#endif
 #endif
   
   if (!save_dialog->Invoke())
@@ -745,7 +742,9 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
   int old_render_mode = 0, old_size[2], status;
 
   vtkWindowToImageFilter *w2i = NULL;
-  vtkGenericMovieWriter *awriter = NULL;
+  vtkGenericMovieWriter *movie_writer = NULL;
+  vtkImageWriter *image_writer = 0;
+  char *image_filename = 0;
 
   if (previewing)
     {
@@ -763,25 +762,28 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
       {
       if (!strcmp(ext, ".mpg"))
         {
-        awriter = vtkMPEG2Writer::New();
+        movie_writer = vtkMPEG2Writer::New();
         }
 #ifdef VTK_USE_VIDEO_FOR_WINDOWS 
       else if (!strcmp(ext, ".avi"))
         {
-        awriter = vtkAVIWriter::New();
+        movie_writer = vtkAVIWriter::New();
         }
 #else
 #ifdef VTK_USE_FFMPEG_ENCODER
       else if (!strcmp(ext, ".avi"))
         {
-        awriter = vtkFFMPEGWriter::New();
+        movie_writer = vtkFFMPEGWriter::New();
         }
 #endif
 #endif
-      if (!awriter)
+      else if (!strcmp(ext, ".jpg"))
         {
-        vtkErrorMacro("Failed to create a movie writer for extension: "<< ext);
-        return;
+        image_writer = vtkJPEGWriter::New();
+        }
+      else if (!strcmp(ext, ".tif"))
+        {
+        image_writer = vtkTIFFWriter::New();
         }
       }
 
@@ -801,12 +803,19 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
 
     w2i = vtkWindowToImageFilter::New();
     w2i->SetInput(this->RenderWidget->GetRenderWindow());
-    awriter->SetInput(w2i->GetOutput());
-
-    vtksys_stl::string filename(file_root);
-    filename += ext;
-    awriter->SetFileName(filename.c_str());
-    awriter->Start();
+    if(movie_writer)
+      {
+      movie_writer->SetInput(w2i->GetOutput());
+      vtksys_stl::string filename(file_root);
+      filename += ext;
+      movie_writer->SetFileName(filename.c_str());
+      movie_writer->Start();
+      }
+    else if(image_writer)
+      {
+      image_writer->SetInput(w2i->GetOutput());
+      image_filename = new char[strlen(file_root) + strlen(ext) + 25];
+      }
     }
 
   this->AnimationStatus = status;
@@ -842,11 +851,12 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
 
   // Perform the animation
 
-  if (!awriter || awriter->GetError() == 0)
+  if (!movie_writer || movie_writer->GetError() == 0)
     {
     for (int i = 0; 
          i < num_frames && 
-           this->AnimationStatus != vtkKWSimpleAnimationWidget::AnimationCanceled; i++)
+           this->AnimationStatus != 
+           vtkKWSimpleAnimationWidget::AnimationCanceled; i++)
       {
       if (win)
         {
@@ -860,17 +870,26 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
       cam->Zoom(zoom);
       cam->OrthogonalizeViewUp();
       this->RenderWidget->Render();
-      if (w2i && awriter)
+      if (w2i)
         {
         w2i->Modified();
-        awriter->Write();
+        if (movie_writer)
+          {
+          movie_writer->Write();
+          }
+        else if(image_writer)
+          {
+          sprintf(image_filename, "%s.%04d%s", file_root, i, ext);
+          image_writer->SetFileName(image_filename);
+          image_writer->Write();
+          }
         }
       }
 
-    if (awriter)
+    if (movie_writer)
       {
-      awriter->End();
-      awriter->SetInput(0);
+      movie_writer->End();
+      movie_writer->SetInput(0);
       }
     }
 
@@ -923,9 +942,14 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
     {
     w2i->Delete();
     }
-  if (awriter)
+  if (movie_writer)
     {
-    awriter->Delete();
+    movie_writer->Delete();
+    }
+  if (image_writer)
+    {
+    delete [] image_filename;
+    image_writer->Delete();
     }
 }
 
@@ -960,17 +984,9 @@ void vtkKWSimpleAnimationWidget::PerformSliceAnimation(const char *file_root,
   int old_size[2], status;
 
   vtkWindowToImageFilter *w2i = NULL;
-  vtkGenericMovieWriter *awriter = 0;
-  if (ext && !strcmp(ext, ".mpg"))
-    {
-    awriter = vtkMPEG2Writer::New();
-    }
-#ifdef VTK_USE_VIDEO_FOR_WINDOWS 
-  else if (ext && !strcmp(ext, ".avi"))
-    {
-    awriter = vtkAVIWriter::New();
-    }
-#endif
+  vtkGenericMovieWriter *movie_writer = 0;
+  vtkImageWriter *image_writer = 0;
+  char *image_filename = 0;
 
   if (previewing)
     {
@@ -982,26 +998,65 @@ void vtkKWSimpleAnimationWidget::PerformSliceAnimation(const char *file_root,
     }
   else
     {
+    if (ext)
+      {
+      if (!strcmp(ext, ".mpg"))
+        {
+        movie_writer = vtkMPEG2Writer::New();
+        }
+#ifdef VTK_USE_VIDEO_FOR_WINDOWS 
+      else if (!strcmp(ext, ".avi"))
+        {
+        movie_writer = vtkAVIWriter::New();
+        }
+#else
+#ifdef VTK_USE_FFMPEG_ENCODER
+      else if (!strcmp(ext, ".avi"))
+        {
+        movie_writer = vtkFFMPEGWriter::New();
+        }
+#endif
+#endif
+      else if (!strcmp(ext, ".jpg"))
+        {
+        image_writer = vtkJPEGWriter::New();
+        }
+      else if (!strcmp(ext, ".tif"))
+        {
+        image_writer = vtkTIFFWriter::New();
+        }
+      }
+
     this->RenderWidget->OffScreenRenderingOn();
     old_size[0] = this->RenderWidget->GetRenderWindow()->GetSize()[0];
     old_size[1] = this->RenderWidget->GetRenderWindow()->GetSize()[1];
     this->RenderWidget->GetRenderWindow()->SetSize(width, height);
+    if (width > 0)
+      {
+      this->RenderWidget->GetRenderWindow()->SetSize(width, height);
+      }
     if (win)
       {
       win->SetStatusText(
         "Generating an animation (rendering to memory; please wait)");
       }
-
     status = vtkKWSimpleAnimationWidget::AnimationCreating;
 
     w2i = vtkWindowToImageFilter::New();
     w2i->SetInput(this->RenderWidget->GetRenderWindow());
-    awriter->SetInput(w2i->GetOutput());
-
-    vtksys_stl::string filename(file_root);
-    filename += ext;
-    awriter->SetFileName(filename.c_str());
-    awriter->Start();
+    if(movie_writer)
+      {
+      movie_writer->SetInput(w2i->GetOutput());
+      vtksys_stl::string filename(file_root);
+      filename += ext;
+      movie_writer->SetFileName(filename.c_str());
+      movie_writer->Start();
+      }
+    else if(image_writer)
+      {
+      image_writer->SetInput(w2i->GetOutput());
+      image_filename = new char[strlen(file_root) + strlen(ext) + 25];
+      }
     }
 
   this->AnimationStatus = status;
@@ -1033,12 +1088,13 @@ void vtkKWSimpleAnimationWidget::PerformSliceAnimation(const char *file_root,
 
   // Perform the animation
 
-  if (!awriter || awriter->GetError() == 0)
+  if (!movie_writer || movie_writer->GetError() == 0)
     {
     //this->RenderWidget->Reset();
     for (int i = 0; 
          i < num_frames && 
-           this->AnimationStatus != vtkKWSimpleAnimationWidget::AnimationCanceled; i++)
+           this->AnimationStatus != 
+           vtkKWSimpleAnimationWidget::AnimationCanceled; i++)
       {
       if (win)
         {
@@ -1052,17 +1108,26 @@ void vtkKWSimpleAnimationWidget::PerformSliceAnimation(const char *file_root,
         slice_num = max;
         }
       this->InvokeSliceSetCommand(slice_num);
-      if (w2i && awriter)
+      if (w2i)
         {
         w2i->Modified();
-        awriter->Write();
+        if (movie_writer)
+          {
+          movie_writer->Write();
+          }
+        else if(image_writer)
+          {
+          sprintf(image_filename, "%s.%04d%s", file_root, i, ext);
+          image_writer->SetFileName(image_filename);
+          image_writer->Write();
+          }
         }
       }
 
-    if (awriter)
+    if (movie_writer)
       {
-      awriter->End();
-      awriter->SetInput(0);
+      movie_writer->End();
+      movie_writer->SetInput(0);
       }
     }
 
@@ -1112,9 +1177,14 @@ void vtkKWSimpleAnimationWidget::PerformSliceAnimation(const char *file_root,
     {
     w2i->Delete();
     }
-  if (awriter)
+  if (movie_writer)
     {
-    awriter->Delete();
+    movie_writer->Delete();
+    }
+  if (image_writer)
+    {
+    delete [] image_filename;
+    image_writer->Delete();
     }
 }
 
