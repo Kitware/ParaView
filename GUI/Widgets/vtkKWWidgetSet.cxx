@@ -21,7 +21,7 @@
 #include <vtksys/stl/vector>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWWidgetSet, "1.14");
+vtkCxxRevisionMacro(vtkKWWidgetSet, "1.15");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetSetInternals
@@ -121,7 +121,7 @@ int vtkKWWidgetSet::GetNumberOfWidgets()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWWidgetSet::GetNthWidgetId(int rank)
+int vtkKWWidgetSet::GetIdOfNthWidget(int rank)
 {
   vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
     this->Internals->Widgets.begin();

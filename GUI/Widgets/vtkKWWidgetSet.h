@@ -45,7 +45,7 @@ public:
 
   // Description:
   // Retrieve the id of the n-th vtkKWWidget (-1 if not found)
-  virtual int GetNthWidgetId(int rank);
+  virtual int GetIdOfNthWidget(int rank);
 
   // Description:
   // Check if a vtkKWWidget is in the set, given its unique id.

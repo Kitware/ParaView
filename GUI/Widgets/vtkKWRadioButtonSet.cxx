@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWRadioButtonSet);
-vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.22");
+vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.23");
 
 //----------------------------------------------------------------------------
 vtkKWRadioButton* vtkKWRadioButtonSet::GetWidget(int id)
@@ -66,7 +66,7 @@ vtkKWWidget* vtkKWRadioButtonSet::AllocateAndCreateWidget()
 
   if (this->GetNumberOfWidgets())
     {
-    vtkKWRadioButton *first = this->GetWidget(this->GetNthWidgetId(0));
+    vtkKWRadioButton *first = this->GetWidget(this->GetIdOfNthWidget(0));
     if (first)
       {
       widget->SetVariableName(first->GetVariableName());

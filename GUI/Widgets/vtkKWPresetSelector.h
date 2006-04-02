@@ -117,9 +117,13 @@ public:
   // This field is neither used nor displayed in this implementation
   // but is provided as a convenience for subclasses that need to
   // save preset to disks and keep track of the corresponding filename.
-  // Return 1 on success, 0 on error
+  // A method is available to retrieve the Id of the preset that has
+  // been assigned a specific filename (if passed a relative name, compare
+  // the filenames without their paths).
+  // Return 1 on success, 0 on error (id on success, -1 otherwise)
   virtual int SetPresetFileName(int id, const char *filename);
   virtual const char* GetPresetFileName(int id);
+  virtual int GetIdOfPresetWithFileName(const char *filename);
 
   // Description:
   // Get the creation time of a preset, as returned by
@@ -308,23 +312,23 @@ public:
   // Retrieve the Id of the nth-preset, or the id of the
   // nth preset with a given group.
   // Return id on success, -1 otherwise
-  virtual int GetNthPresetId(int index);
-  virtual int GetNthPresetWithGroupId(int index, const char *group);
+  virtual int GetIdOfNthPreset(int index);
+  virtual int GetIdOfNthPresetWithGroup(int index, const char *group);
 
   // Description:
   // Retrieve the Id of the preset at a given row in the table, or
   // the row of a given preset.
   // Return id or row index on success, -1 otherwise
-  virtual int GetPresetAtRowId(int row_index);
+  virtual int GetIdOfPresetAtRow(int row_index);
   virtual int GetPresetRow(int id);
 
   // Description:
   // Retrieve the rank of the nth preset with a given group
   // (i.e. the nth-preset with a given group).
   // This rank can then be used to retrieve the preset id using
-  // the GetNthPresetId() method.
+  // the GetIdOfNthPreset() method.
   // Return rank on success, -1 otherwise
-  virtual int GetNthPresetWithGroupRank(int index, const char *group);
+  virtual int GetRankOfNthPresetWithGroup(int index, const char *group);
 
   // Description:
   // Remove a preset, or all of them, or all of the presets

@@ -32,7 +32,7 @@ const char *vtkKWWindowLevelPresetSelector::ModalityColumnName  = "Modality";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowLevelPresetSelector);
-vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.15");
+vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.16");
 
 //----------------------------------------------------------------------------
 int vtkKWWindowLevelPresetSelector::SetPresetWindow(
@@ -192,7 +192,7 @@ const char* vtkKWWindowLevelPresetSelector::PresetCellEditEndCallback(
 {
   static char buffer[256];
 
-  int id = this->GetPresetAtRowId(row);
+  int id = this->GetIdOfPresetAtRow(row);
   if (this->HasPreset(id))
     {
     if (col == this->GetWindowColumnIndex() || 
@@ -210,7 +210,7 @@ const char* vtkKWWindowLevelPresetSelector::PresetCellEditEndCallback(
 void vtkKWWindowLevelPresetSelector::PresetCellUpdatedCallback(
   int row, int col, const char *text)
 {
-  int id = this->GetPresetAtRowId(row);
+  int id = this->GetIdOfPresetAtRow(row);
   if (this->HasPreset(id))
     {
     if (col == this->GetWindowColumnIndex() || 
@@ -244,7 +244,7 @@ int vtkKWWindowLevelPresetSelector::HasPresetWithGroupWithWindowLevel(
   int i, nb_presets = this->GetNumberOfPresetsWithGroup(group);
   for (i = 0; i < nb_presets; i++)
     {
-    int id = this->GetNthPresetWithGroupId(i, group);
+    int id = this->GetIdOfNthPresetWithGroup(i, group);
     if (this->GetPresetWindow(id) == window && 
         this->GetPresetLevel(id) == level)
       {

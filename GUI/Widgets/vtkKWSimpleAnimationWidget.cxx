@@ -71,7 +71,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.23");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.24");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -245,7 +245,7 @@ void vtkKWSimpleAnimationWidget::Create()
 
   for (i = 0; i < this->Parameters->GetNumberOfWidgets(); i++)
     {
-    scale = this->Parameters->GetWidget(this->Parameters->GetNthWidgetId(i));
+    scale = this->Parameters->GetWidget(this->Parameters->GetIdOfNthWidget(i));
     if (scale)
       {
       scale->SetEntryWidth(entry_width);

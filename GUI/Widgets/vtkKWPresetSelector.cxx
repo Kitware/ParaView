@@ -57,7 +57,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.43");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.44");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -1068,6 +1068,45 @@ const char* vtkKWPresetSelector::GetPresetFileName(int id)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWPresetSelector::GetIdOfPresetWithFileName(const char *filename)
+{
+  if (this->Internals && filename)
+    {
+    int is_full = vtksys::SystemTools::FileIsFullPath(filename) ? 1 : 0;
+
+    vtkKWPresetSelectorInternals::PresetPoolIterator it = 
+      this->Internals->PresetPool.begin();
+    vtkKWPresetSelectorInternals::PresetPoolIterator end = 
+      this->Internals->PresetPool.end();
+    for (; it != end; it++)
+      {
+      const char *it_filename = this->GetPresetFileName(it->second->Id);
+      if (it_filename)
+        {
+        if (is_full)
+          {
+          if (!strcmp(it_filename, filename))
+            {
+            return it->second->Id;
+            }
+          }
+        else
+          {
+          vtksys_stl::string it_name = 
+            vtksys::SystemTools::GetFilenameName(it_filename);
+          if (!strcmp(it_name.c_str(), filename))
+            {
+            return it->second->Id;
+            }
+          }
+        }
+      }
+    }
+
+  return -1;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWPresetSelector::SetPresetCreationTimeSlotName(const char *name)
 {
   if (name && *name && 
@@ -1777,7 +1816,7 @@ int vtkKWPresetSelector::GetPresetVisibility(int id)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWPresetSelector::GetNthPresetId(int index)
+int vtkKWPresetSelector::GetIdOfNthPreset(int index)
 {
   if (this->Internals && index >= 0 && index < this->GetNumberOfPresets())
     {
@@ -1795,18 +1834,18 @@ int vtkKWPresetSelector::GetNthPresetId(int index)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWPresetSelector::GetNthPresetWithGroupId(int index, const char *group)
+int vtkKWPresetSelector::GetIdOfNthPresetWithGroup(int index, const char *group)
 {
-  int rank = this->GetNthPresetWithGroupRank(index, group);
+  int rank = this->GetRankOfNthPresetWithGroup(index, group);
   if (rank >= 0)
     {
-    return this->GetNthPresetId(rank);
+    return this->GetIdOfNthPreset(rank);
     }
   return -1;
 }
 
 //----------------------------------------------------------------------------
-int vtkKWPresetSelector::GetPresetAtRowId(int row_index)
+int vtkKWPresetSelector::GetIdOfPresetAtRow(int row_index)
 {
   if (this->PresetList)
     {
@@ -1831,7 +1870,7 @@ int vtkKWPresetSelector::GetPresetRow(int id)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWPresetSelector::GetNthPresetWithGroupRank(
+int vtkKWPresetSelector::GetRankOfNthPresetWithGroup(
   int index, const char *group)
 {
   if (this->Internals && index >= 0 && group && *group)
@@ -2399,7 +2438,7 @@ void vtkKWPresetSelector::PresetCellThumbnailCallback(
 
   vtkKWMultiColumnList *list = this->PresetList->GetWidget();
 
-  int id = this->GetPresetAtRowId(row);
+  int id = this->GetIdOfPresetAtRow(row);
   if (id >= 0)
     {
     vtkKWLabel *child = vtkKWLabel::New();
@@ -2460,7 +2499,7 @@ const char* vtkKWPresetSelector::PresetCellEditEndCallback(
 void vtkKWPresetSelector::PresetCellUpdatedCallback(
   int row, int col, const char *text)
 {
-  int id = this->GetPresetAtRowId(row);
+  int id = this->GetIdOfPresetAtRow(row);
   if (this->HasPreset(id))
     {
     if (col == this->GetCommentColumnIndex())
@@ -2497,7 +2536,7 @@ void vtkKWPresetSelector::PresetApplyCallback()
     int i, nb_selected_rows = list->GetSelectedRows(indices);
     for (i = 0; i < nb_selected_rows; i++)
       {
-      this->PresetApplyCallback(this->GetPresetAtRowId(indices[i]));
+      this->PresetApplyCallback(this->GetIdOfPresetAtRow(indices[i]));
       }
     delete [] indices;
     }
@@ -2526,7 +2565,7 @@ void vtkKWPresetSelector::PresetUpdateCallback()
     int i, nb_selected_rows = list->GetSelectedRows(indices);
     for (i = 0; i < nb_selected_rows; i++)
       {
-      ids[i] = this->GetPresetAtRowId(indices[i]);
+      ids[i] = this->GetIdOfPresetAtRow(indices[i]);
       }
     for (i = 0; i < nb_selected_rows; i++)
       {
@@ -2570,7 +2609,7 @@ void vtkKWPresetSelector::PresetRemoveCallback()
     int i, nb_selected_rows = list->GetSelectedRows(indices);
     for (i = 0; i < nb_selected_rows; i++)
       {
-      ids[i] = this->GetPresetAtRowId(indices[i]);
+      ids[i] = this->GetIdOfPresetAtRow(indices[i]);
       }
     for (i = 0; i < nb_selected_rows; i++)
       {
@@ -2592,7 +2631,7 @@ int vtkKWPresetSelector::GetNumberOfSelectedPresetsWithFileName()
     int i, nb_selected_rows = list->GetSelectedRows(indices);
     for (i = 0; i < nb_selected_rows; i++)
       {
-      int id = this->GetPresetAtRowId(indices[i]);
+      int id = this->GetIdOfPresetAtRow(indices[i]);
       const char *filename = this->GetPresetFileName(id);
       if (filename && *filename && vtksys::SystemTools::FileExists(filename))
         {
@@ -2723,7 +2762,7 @@ void vtkKWPresetSelector::PresetSelectionCallback()
 void vtkKWPresetSelector::PresetRightClickCallback(
   int row, int vtkNotUsed(col), int x, int y)
 {
-  int id = this->GetPresetAtRowId(row);
+  int id = this->GetIdOfPresetAtRow(row);
   if (!this->HasPreset(id))
     {
     return;
