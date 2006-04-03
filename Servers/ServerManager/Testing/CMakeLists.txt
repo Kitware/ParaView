@@ -13,6 +13,7 @@ SET (SMSTATE_FILES
   DataAnalysisLinePlot
   ExtractGrid
   TestPHT
+  SPCTH
   )
 
 # Path to the state files.
