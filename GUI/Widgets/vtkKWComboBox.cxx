@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWComboBox);
-vtkCxxRevisionMacro(vtkKWComboBox, "1.11");
+vtkCxxRevisionMacro(vtkKWComboBox, "1.12");
 
 //----------------------------------------------------------------------------
 vtkKWComboBox::vtkKWComboBox()
@@ -78,6 +78,14 @@ void vtkKWComboBox::AddValue(const char* value)
 
   this->Script("%s configure -values [concat [%s cget -values] {\"%s\"}]", 
     this->GetWidgetName(), this->GetWidgetName(), value);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWComboBox::AddValueAsInt(int value)
+{
+  char buffer[256];
+  sprintf(buffer, "%d", value);
+  this->AddValue(buffer);
 }
 
 //----------------------------------------------------------------------------

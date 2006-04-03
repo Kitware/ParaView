@@ -43,6 +43,7 @@ public:
   // Description:
   // Add and delete values to put in the list.
   virtual void AddValue(const char* value);
+  virtual void AddValueAsInt(int value);
   virtual void DeleteValue(int idx);
   virtual int HasValue(const char* value);
   virtual int GetValueIndex(const char* value);
