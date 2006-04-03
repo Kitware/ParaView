@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.50");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.51");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -59,6 +59,7 @@ vtkKWMultiColumnList::vtkKWMultiColumnList()
   this->PotentialCellColorsChangedCommand = NULL;
   this->ColumnSortedCommand = NULL;
   this->RightClickCommand = NULL;
+  this->UneditableCellDoubleClickCommand = NULL;
 
   this->Internals = new vtkKWMultiColumnListInternals;
 }
@@ -106,7 +107,12 @@ vtkKWMultiColumnList::~vtkKWMultiColumnList()
     delete [] this->RightClickCommand;
     this->RightClickCommand = NULL;
     }
-  delete this->Internals;
+  if (this->UneditableCellDoubleClickCommand)
+    {
+    delete [] this->UneditableCellDoubleClickCommand;
+    this->UneditableCellDoubleClickCommand = NULL;
+    }
+   delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
@@ -160,6 +166,7 @@ void vtkKWMultiColumnList::Create()
   this->AddBinding("<<TablelistSelect>>", this, "SelectionCallback");
   this->AddBinding("<<TablelistSelectionLost>>", this, "SelectionCallback");
   this->AddBinding("<<TablelistCellUpdated>>", this, "CellUpdatedCallback");
+  this->AddBinding("<<TablelistUneditableCellSelected>>", this, "UneditableCellDoubleClickCallback");
   this->AddBinding("<<TablelistColumnSorted>>", this, "ColumnSortedCallback");
   this->AddBinding("<Enter>", this, "EnterCallback");
 
@@ -3589,6 +3596,19 @@ void vtkKWMultiColumnList::InvokeRightClickCommand(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetUneditableCellDoubleClickCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->UneditableCellDoubleClickCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::InvokeUneditableCellDoubleClickCommand()
+{
+  this->InvokeObjectMethodCommand(this->UneditableCellDoubleClickCommand);
+}
+
+//----------------------------------------------------------------------------
 const char* vtkKWMultiColumnList::EditStartCallback(
   const char *, int row, int col, const char *text)
 {
@@ -3679,6 +3699,12 @@ void vtkKWMultiColumnList::CellUpdatedCallback()
     }
 
   this->InvokeCellUpdatedCommand(row, col, this->GetCellText(row, col));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::UneditableCellDoubleClickCallback()
+{
+  this->InvokeUneditableCellDoubleClickCommand();
 }
 
 //----------------------------------------------------------------------------

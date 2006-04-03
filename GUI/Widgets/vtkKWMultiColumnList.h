@@ -1145,6 +1145,17 @@ public:
   // - the cell location, i.e. its row and column indices: int, int
   // - the pointer (x, y) absolute location the click occured at: int, int
   virtual void SetRightClickCommand(vtkObject *object, const char *method);
+  
+  // Description:
+  // The command is invoked when the user double-clicks on any uneditable 
+  // cell of the listbox. The command is not invoked on a double click on
+  // an editable cell. 
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  virtual void SetUneditableCellDoubleClickCommand(
+    vtkObject *object, const char *method);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -1161,6 +1172,7 @@ public:
   virtual void CellWindowDestroyRemoveChildCallback(
     const char*, int, int, const char*);
   virtual void CellUpdatedCallback();
+  virtual void UneditableCellDoubleClickCallback();
   virtual const char* EditStartCallback(
     const char *widget, int row, int col, const char *text);
   virtual const char* EditEndCallback(
@@ -1207,6 +1219,9 @@ protected:
 
   char *RightClickCommand;
   void InvokeRightClickCommand(int row, int col, int x, int y);
+
+  char *UneditableCellDoubleClickCommand;
+  virtual void InvokeUneditableCellDoubleClickCommand();
 
   // Description:
   // Called when the number of rows/columns changed
