@@ -52,7 +52,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.39");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.40");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -994,7 +994,8 @@ void vtkKWVolumePropertyWidget::Update()
 
       has_scalar_range = 
         this->GetDataSetAdjustedScalarRange(scalar_field, scalar_range);
-      ofun->GetRange(tfunc_range);
+      tfunc_range[0] = ofun->GetRange()[0];
+      tfunc_range[1] = ofun->GetRange()[1];
       tfunc_size = this->ScalarOpacityFunctionEditor->GetFunctionSize();
 
       if (has_scalar_range &&
@@ -1245,7 +1246,8 @@ void vtkKWVolumePropertyWidget::Update()
         scalar_range[1] = 0.25 * (scalar_range[1] - scalar_range[0]);
         scalar_range[0] = 0.0;
         }
-      gfun->GetRange(tfunc_range);
+      tfunc_range[0] = gfun->GetRange()[0];
+      tfunc_range[1] = gfun->GetRange()[1];
       tfunc_size = this->GradientOpacityFunctionEditor->GetFunctionSize();
 
       if (has_scalar_range &&
