@@ -57,6 +57,9 @@ public:
   /// set the properties in the server manager with properties in the widgets
   static void setServerManagerProperties(pqSMProxy proxy, QWidget* w);
 
+  /// hint for sizing this widget
+  QSize sizeHint() const;
+
 public slots:
   /// accept the changes made to the properties
   /// changes will be propogated down to the server manager

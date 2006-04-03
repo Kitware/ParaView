@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGroupBox>
 #include <QSlider>
 #include <QDoubleSpinBox>
+#include <QApplication>
 
 // VTK includes
 #include "QVTKWidget.h"
@@ -64,6 +65,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqObjectEditor::pqObjectEditor(QWidget* p)
   : QWidget(p), Proxy(NULL)
 {
+  this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
   QBoxLayout* mainlayout = new QVBoxLayout(this);
   mainlayout->setMargin(0);
   
@@ -97,6 +100,21 @@ pqObjectEditor::~pqObjectEditor()
 {
 }
 
+QSize pqObjectEditor::sizeHint() const
+{
+  // return a size hint that would reasonably fit several properties
+  ensurePolished();
+  QFontMetrics fm(font());
+  int h = 20 * (qMax(fm.lineSpacing(), 14));
+  int w = fm.width('x') * 25;
+  QStyleOptionFrame opt;
+  opt.rect = rect();
+  opt.palette = palette();
+  opt.state = QStyle::State_None;
+  return (style()->sizeFromContents(QStyle::CT_LineEdit, &opt, QSize(w, h).
+                                    expandedTo(QApplication::globalStrut()), this));
+}
+
 /// set the proxy to display properties for
 void pqObjectEditor::setProxy(pqSMProxy p)
 {
@@ -122,6 +140,11 @@ pqSMProxy pqObjectEditor::proxy()
 /// changes will be propogated down to the server manager
 void pqObjectEditor::accept()
 {
+  if(!this->Proxy)
+    {
+    return;
+    }
+
   this->setServerManagerProperties(this->Proxy, this);
   
   // cause the screen to update
@@ -136,6 +159,10 @@ void pqObjectEditor::accept()
 /// editor will query properties from the server manager
 void pqObjectEditor::reset()
 {
+  if(!this->Proxy)
+    {
+    return;
+    }
   this->getServerManagerProperties(this->Proxy, this);
 }
 
