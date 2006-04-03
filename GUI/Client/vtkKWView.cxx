@@ -104,7 +104,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.34");
+vtkCxxRevisionMacro(vtkKWView, "1.35");
 
 //----------------------------------------------------------------------------
 void KWViewAbortCheckMethod( vtkObject*, unsigned long, void* arg, void* )
@@ -1651,6 +1651,7 @@ void vtkKWView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Printing: " << this->GetPrinting() << endl;
   os << indent << "ProgressGauge: " << this->ProgressGauge << endl;
   os << indent << "RenderMode: " << this->GetRenderMode() << endl;
+  os << indent << "ParentWindow: " << this->GetParentWindow() << endl;
   os << indent << "RenderState: " << this->GetRenderState() << endl;
   //os << indent << "RenderWindow: " << this->GetRenderWindow() << endl;
   //os << indent << "Renderer: " << this->GetRenderer() << endl;
