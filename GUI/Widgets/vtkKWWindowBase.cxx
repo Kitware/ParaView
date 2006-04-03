@@ -33,7 +33,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.44");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.45");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -1013,7 +1013,7 @@ void vtkKWWindowBase::InsertRecentFilesMenu(
       this->GetFileMenu()->GetIndexOfItem(this->GetOpenRecentFileMenuLabel()));
     }
 
-  int index = this->GetFileMenu()->InsertCascade(
+  this->GetFileMenu()->InsertCascade(
     pos, this->GetOpenRecentFileMenuLabel(), mrf_menu);
 
   // Fill the recent files vector with recent files stored in registry
