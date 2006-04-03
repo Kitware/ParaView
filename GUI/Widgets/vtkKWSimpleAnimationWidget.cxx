@@ -16,8 +16,8 @@
 #include "vtkKWApplication.h"
 #include "vtkCamera.h"
 #include "vtkImageData.h"
-#include "vtkKWEntryWithLabel.h"
-#include "vtkKWEntry.h"
+#include "vtkKWComboBoxWithLabel.h"
+#include "vtkKWComboBox.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabelWithLabel.h"
@@ -71,7 +71,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.24");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.25");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -543,6 +543,9 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
     return;
     }
 
+  int res;
+  vtksys_stl::string filename;
+
   vtkKWLoadSaveDialog *save_dialog = vtkKWLoadSaveDialog::New();
   save_dialog->SetParent(this->GetParentTopLevel());
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(
@@ -557,18 +560,20 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
   save_dialog->SetFileTypes("{{MPEG2 movie file} {.mpg}} {{JPEG Images} {.jpg}} {{TIFF Images} {.tif}}");
   save_dialog->SetDefaultExtension(".mpg");
 #endif
-  
-  if (!save_dialog->Invoke())
+
+  res = save_dialog->Invoke();
+  if (res)
     {
-    save_dialog->Delete();
-    return;
+    filename = save_dialog->GetFileName();
+    this->GetApplication()->SaveDialogLastPathRegistryValue(
+      save_dialog, "SavePath");
     }
 
-  vtksys_stl::string filename(save_dialog->GetFileName());
-
-  // Disable buttons but preview
-
-  this->DisableButtonsButCancel();
+  save_dialog->Delete();
+  if (!res)
+    {
+    return;
+    }
 
   // Split into root and extension.
 
@@ -603,106 +608,149 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
   int is_avi = 
     (!strcmp(ext.c_str(), ".avi") || !strcmp(ext.c_str(), ".AVI"));
 
-  if (is_mpeg || is_avi)
+  // Prompt for the size of the movie
+    
+  vtkKWMessageDialog *msg_dialog = vtkKWMessageDialog::New();
+  msg_dialog->SetMasterWindow(this->GetParentTopLevel());
+  msg_dialog->SetTitle("Create Animation: Size");
+  msg_dialog->SetStyleToOkCancel();
+  msg_dialog->Create();
+
+  vtksys_stl::string msg(
+      "Specify the width and height of each frame to be saved from this "
+      "animation.");
+  
+  if (is_mpeg)
     {
-    // Prompt for the size of the movie
-    
-    vtkKWMessageDialog *msg_dialog = vtkKWMessageDialog::New();
-    msg_dialog->SetMasterWindow(this->GetParentTopLevel());
-    msg_dialog->SetTitle("Create Animation: Size Check");
-    msg_dialog->Create();
-
-    if (is_mpeg)
-      {
-      msg_dialog->SetText(
-        "Specify the width and height of the mpeg to be saved from this "
-        "animation. The width must be a multiple of 32 and the height a "
-        "multiple of 8. Each will be resized to the next smallest multiple "
-        "if it does not meet this criterion. The maximum size allowed is "
-        "1920 by 1080");
-      }
-    else if (is_avi)
-      { 
-      msg_dialog->SetText(
-        "Specify the width and height of the images to be saved from this "
-        "animation. Each dimension must be a multiple of 4. Each will be "
-        "resized to the next smallest multiple of 4 if it does not meet this "
-        "criterion.");
-      }
-  
-    vtkKWFrame *frame = vtkKWFrame::New();
-    frame->SetParent(msg_dialog->GetTopFrame());
-    frame->Create();
-  
-    vtkKWEntryWithLabel *width_entry = vtkKWEntryWithLabel::New();
-    width_entry->SetParent(frame);
-    width_entry->Create();
-    width_entry->SetLabelText("Width:");
-    width_entry->GetWidget()->SetValueAsInt(orig_width);
-    
-    vtkKWEntryWithLabel *height_entry = vtkKWEntryWithLabel::New();
-    height_entry->SetParent(frame);
-    height_entry->Create();
-    height_entry->SetLabelText("Height:");
-    height_entry->GetWidget()->SetValueAsInt(orig_height);
-  
-    this->Script("pack %s %s -side left -fill both -expand t",
-                 width_entry->GetWidgetName(), 
-                 height_entry->GetWidgetName());
-    
-    this->Script("pack %s -side top -pady 5", 
-                 frame->GetWidgetName());
-    
-    msg_dialog->Invoke();
-    
-    // Fix the size
-
-    width = width_entry->GetWidget()->GetValueAsInt();
-    height = height_entry->GetWidget()->GetValueAsInt();
-
-    if (is_mpeg)
-      {
-      if ((width % 32) > 0)
-        {
-        width -= width % 32;
-        }
-      if ((height % 8) > 0)
-        {
-        height -= height % 8;
-        }
-      if (width > 1920)
-        {
-        width = 1920;
-        }
-      if (height > 1080)
-        {
-        height = 1080;
-        }      
-      }
-    else if (is_avi)
-      {
-      if ((width % 4) > 0)
-        {
-        width -= width % 4;
-        }
-      if ((height % 4) > 0)
-        {
-        height -= height % 4;
-        }
-      }
-  
-    width_entry->Delete();
-    height_entry->Delete();
-    frame->Delete();
-    msg_dialog->Delete();
+    msg += " ";
+    msg += 
+      "The width must be a multiple of 32 and the height a "
+      "multiple of 8. Each will be resized to the next smallest multiple "
+      "if it does not meet this criterion. The maximum size allowed is "
+      "1920 by 1080";
     }
-  else
-    {
-    width = orig_width;
-    height = orig_height;
+  else if (is_avi)
+    { 
+    msg += " ";
+    msg += 
+      "Each dimension must be a multiple of 4. Each will be "
+      "resized to the next smallest multiple of 4 if it does not meet this "
+      "criterion.";
     }
 
-  save_dialog->Delete();
+  msg_dialog->SetText(msg.c_str());
+  
+  vtkKWFrame *frame = vtkKWFrame::New();
+  frame->SetParent(msg_dialog->GetTopFrame());
+  frame->Create();
+
+  char buffer[1024];
+  int nb_scanned, key_w, key_h;
+
+  vtkKWApplication *app = this->GetApplication();
+
+  if (app->HasRegistryValue(2, "RunTime", "SimpleAnimationSize") &&
+      app->GetRegistryValue(2, "RunTime", "SimpleAnimationSize", buffer))
+    {
+    nb_scanned = sscanf(buffer, "%dx%d", &key_w, &key_h);
+    }
+
+  vtkKWComboBox *combobox;
+
+  vtkKWComboBoxWithLabel *width_combobox = vtkKWComboBoxWithLabel::New();
+  width_combobox->SetParent(frame);
+  width_combobox->Create();
+  width_combobox->SetLabelText("Width:");
+
+  combobox = width_combobox->GetWidget();
+  combobox->SetValueAsInt(orig_width);
+  if (nb_scanned == 2)
+    {
+    combobox->AddValueAsInt(key_w);
+    }
+  combobox->AddValueAsInt(640);
+  combobox->AddValueAsInt(800);
+  combobox->AddValueAsInt(1024);
+  combobox->AddValueAsInt(1280);
+  combobox->AddValueAsInt(1680);
+    
+  vtkKWComboBoxWithLabel *height_combobox = vtkKWComboBoxWithLabel::New();
+  height_combobox->SetParent(frame);
+  height_combobox->Create();
+  height_combobox->SetLabelText("Height:");
+
+  combobox = height_combobox->GetWidget();
+  combobox->SetValueAsInt(orig_height);
+  if (nb_scanned == 2)
+    {
+    combobox->AddValueAsInt(key_h);
+    }
+  combobox->AddValueAsInt(600);
+  combobox->AddValueAsInt(768);
+  combobox->AddValueAsInt(800);
+  combobox->AddValueAsInt(1024);
+  combobox->AddValueAsInt(1050);
+
+  this->Script("pack %s %s -side left -fill both -expand t",
+               width_combobox->GetWidgetName(), 
+               height_combobox->GetWidgetName());
+    
+  this->Script("pack %s -side top -pady 5", frame->GetWidgetName());
+    
+  res = msg_dialog->Invoke();
+    
+  width = width_combobox->GetWidget()->GetValueAsInt();
+  height = height_combobox->GetWidget()->GetValueAsInt();
+
+  width_combobox->Delete();
+  height_combobox->Delete();
+  frame->Delete();
+  msg_dialog->Delete();
+
+  if (!res)
+    {
+    return;
+    }
+
+  app->SetRegistryValue(
+    2, "RunTime", "SimpleAnimationSize", "%dx%d", width, height);
+
+  // Fix the size
+
+  if (is_mpeg)
+    {
+    if ((width % 32) > 0)
+      {
+      width -= width % 32;
+      }
+    if ((height % 8) > 0)
+      {
+      height -= height % 8;
+      }
+    if (width > 1920)
+      {
+      width = 1920;
+      }
+    if (height > 1080)
+      {
+      height = 1080;
+      }      
+    }
+  else if (is_avi)
+    {
+    if ((width % 4) > 0)
+      {
+      width -= width % 4;
+      }
+    if ((height % 4) > 0)
+      {
+      height -= height % 4;
+      }
+    }
+  
+  // Disable buttons but preview
+
+  this->DisableButtonsButCancel();
 
   // Create the animation
 
