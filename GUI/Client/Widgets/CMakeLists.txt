@@ -37,6 +37,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqObjectInspector.h
   pqObjectInspectorItem.h
   pqObjectInspectorWidget.h
+  pqOutputWindow.h
+  pqOutputWindowAdapter.h
   pqPicking.h
   pqPipelineData.h
   pqPipelineListModel.h
@@ -51,6 +53,7 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 SET(UI_FORMS
   pqCompoundProxyWizard.ui
   pqMultiViewFrameMenu.ui
+  pqOutputWindow.ui
   pqServerBrowser.ui
 )
 
@@ -107,6 +110,10 @@ ADD_LIBRARY(pqWidgets
   pqObjectInspectorWidget.h
   pqOptions.cxx
   pqOptions.h
+  pqOutputWindow.cxx
+  pqOutputWindow.h
+  pqOutputWindowAdapter.cxx
+  pqOutputWindowAdapter.h
   pqParts.cxx
   pqParts.h
   pqPicking.cxx

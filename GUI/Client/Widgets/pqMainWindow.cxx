@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMultiViewManager.h"
 #include "pqNameCount.h"
 #include "pqObjectInspectorWidget.h"
+#include "pqOutputWindow.h"
+#include "pqOutputWindowAdapter.h"
 #include "pqParts.h"
 #include "pqPicking.h"
 #include "pqPipelineData.h"
@@ -109,6 +111,8 @@ class pqMainWindow::pqImplementation
 {
 public:
   pqImplementation() :
+    OutputWindowAdapter(vtkSmartPointer<pqOutputWindowAdapter>::New()),
+    OutputWindow(new pqOutputWindow(0)),
     FileMenu(0),
     ViewMenu(0),
     ServerMenu(0),
@@ -132,6 +136,12 @@ public:
     VTKConnector(0),
     Inspector(0)
   {
+    this->OutputWindow->connect(this->OutputWindowAdapter, SIGNAL(displayText(const QString&)), this->OutputWindow, SLOT(onDisplayText(const QString&)));
+    this->OutputWindow->connect(this->OutputWindowAdapter, SIGNAL(displayErrorText(const QString&)), this->OutputWindow, SLOT(onDisplayErrorText(const QString&)));
+    this->OutputWindow->connect(this->OutputWindowAdapter, SIGNAL(displayWarningText(const QString&)), this->OutputWindow, SLOT(onDisplayWarningText(const QString&)));
+    this->OutputWindow->connect(this->OutputWindowAdapter, SIGNAL(displayGenericWarningText(const QString&)), this->OutputWindow, SLOT(onDisplayGenericWarningText(const QString&)));
+
+    vtkOutputWindow::SetInstance(OutputWindowAdapter);
   }
   
   ~pqImplementation()
@@ -160,7 +170,14 @@ public:
     
     delete this->Adaptor;
     this->Adaptor = 0;
+    
+    delete this->OutputWindow;
   }
+
+  /// Converts VTK debug output into Qt signals
+  vtkSmartPointer<pqOutputWindowAdapter> OutputWindowAdapter;
+  /// Displays VTK debug output in a console window
+  pqOutputWindow* const OutputWindow;
 
   // Stores standard menus
   QMenu* FileMenu;
