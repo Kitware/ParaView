@@ -615,14 +615,16 @@ QList<QVariant> pqSMAdaptor::getElementPropertyDomain(vtkSMProperty* Property)
   
   vtkSMPropertyAdaptor* adaptor = vtkSMPropertyAdaptor::New();
   adaptor->SetProperty(Property);
-  
-  if(vtkSMPropertyAdaptor::STRING != adaptor->GetElementType() && 
-     vtkSMPropertyAdaptor::RANGE == adaptor->GetPropertyType())
-    {
-      domain.push_back(adaptor->GetRangeMinimum(0));
-      domain.push_back(adaptor->GetRangeMaximum(0));
-    }
 
+  const char* min = adaptor->GetRangeMinimum(0);
+  const char* max = adaptor->GetRangeMaximum(0);
+
+  if(min && max)
+    {
+    domain.push_back(min);
+    domain.push_back(max);
+    }
+  
   adaptor->Delete();
 
   return domain;
@@ -694,8 +696,13 @@ QList<QList<QVariant> > pqSMAdaptor::getMultipleElementPropertyDomain(vtkSMPrope
     for(int i=0; i<num; i++)
       {
       QList<QVariant> domain;
-      domain.push_back(adaptor->GetRangeMinimum(i));
-      domain.push_back(adaptor->GetRangeMaximum(i));
+      const char* min = adaptor->GetRangeMinimum(0);
+      const char* max = adaptor->GetRangeMaximum(0);
+      if(min && max)
+        {
+        domain.push_back(min);
+        domain.push_back(max);
+        }
       domains.append(domain);
       }
     }
@@ -779,8 +786,13 @@ QList<QVariant> pqSMAdaptor::getMultipleElementPropertyDomain(vtkSMProperty* Pro
   
   if(vtkSMPropertyAdaptor::RANGE == adaptor->GetPropertyType())
     {
-      domain.push_back(adaptor->GetRangeMinimum(Index));
-      domain.push_back(adaptor->GetRangeMaximum(Index));
+    const char* min = adaptor->GetRangeMinimum(Index);
+    const char* max = adaptor->GetRangeMaximum(Index);
+    if(min && max)
+      {
+      domain.push_back(min);
+      domain.push_back(max);
+      }
     }
 
   adaptor->Delete();
