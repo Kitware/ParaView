@@ -55,7 +55,7 @@ protected:
   void SetDocumentationElement(vtkPVXMLElement*);
   vtkPVXMLElement* DocumentationElement;
 private:
-  vtkSMDocumentation(vtkSMDocumentation&); // Not implemented.
+  vtkSMDocumentation(const vtkSMDocumentation&); // Not implemented.
   void operator=(const vtkSMDocumentation&); // Not implemented.
 };
 
