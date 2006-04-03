@@ -29,6 +29,7 @@ INCLUDE_DIRECTORIES(
 
 SUBDIRS(
   Client
+  CustomServer
   DobranoViz
 )
 
