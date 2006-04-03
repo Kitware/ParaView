@@ -20,7 +20,7 @@
 
 #include "vtkObject.h"
 #include "vtkKWWidgets.h" // Needed for export symbols directives
-#include "vtkTcl.h" // Needed for Tcl interpreter
+#include "vtkTcl.h"       // Needed for Tcl interpreter
 
 class KWWidgets_EXPORT vtkKWTablelistInit : public vtkObject
 {
