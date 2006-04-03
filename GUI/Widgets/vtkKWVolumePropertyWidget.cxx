@@ -52,7 +52,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.38");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.39");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -77,7 +77,10 @@ vtkKWVolumePropertyWidget::vtkKWVolumePropertyWidget()
   this->MaterialPropertyVisibility        = 1;
   this->GradientOpacityFunctionVisibility = 1;
   this->ComponentWeightsVisibility        = 1;
-  this->MaterialPropertyPosition   = vtkKWVolumePropertyWidget::MaterialPropertyPositionTop;
+  this->MaterialPropertyPosition   = 
+    vtkKWVolumePropertyWidget::MaterialPropertyPositionTop;
+  this->WholeRangeComputationMethod   = 
+    vtkKWVolumePropertyWidget::WholeRangeComputationMethodData;
 
   this->UseScalarColorFunctionInScalarOpacityEditor        = 0;
 
@@ -857,8 +860,8 @@ void vtkKWVolumePropertyWidget::Update()
     this->SelectedComponent = 0;
     }
 
-  int i;
-  double p_range[2];
+  int i, has_scalar_range, tfunc_size;
+  double scalar_range[2], tfunc_range[2];
 
   // Component selection menu
 
@@ -989,14 +992,31 @@ void vtkKWVolumePropertyWidget::Update()
         this->VolumeProperty->GetScalarOpacity(this->SelectedComponent);
       this->ScalarOpacityFunctionEditor->SetPiecewiseFunction(ofun);
 
-      if (this->GetDataSetAdjustedScalarRange(scalar_field, p_range))
+      has_scalar_range = 
+        this->GetDataSetAdjustedScalarRange(scalar_field, scalar_range);
+      ofun->GetRange(tfunc_range);
+      tfunc_size = this->ScalarOpacityFunctionEditor->GetFunctionSize();
+
+      if (has_scalar_range &&
+          (this->WholeRangeComputationMethod ==
+           vtkKWVolumePropertyWidget::WholeRangeComputationMethodData ||
+           !tfunc_size))
         {
-        this->ScalarOpacityFunctionEditor->SetWholeParameterRange(p_range);
+        this->ScalarOpacityFunctionEditor->SetWholeParameterRange(
+          scalar_range);
         }
+      else if (tfunc_size &&
+               (this->WholeRangeComputationMethod ==
+        vtkKWVolumePropertyWidget::WholeRangeComputationMethodFunctionPoints ||
+                !has_scalar_range))
+        {
+        this->ScalarOpacityFunctionEditor->SetWholeParameterRange(tfunc_range);
+        } 
       else
         {
         this->ScalarOpacityFunctionEditor->SetWholeParameterRange(
-          ofun->GetRange());
+          scalar_range[0] < tfunc_range[0] ? scalar_range[0] : tfunc_range[0],
+          scalar_range[1] > tfunc_range[1] ? scalar_range[1] : tfunc_range[1]);
         }
 
       this->ScalarOpacityFunctionEditor->SetWholeValueRange(0.0, 1.0);
@@ -1074,14 +1094,30 @@ void vtkKWVolumePropertyWidget::Update()
         this->ScalarOpacityFunctionEditor->SetPointColorTransferFunction(NULL);
         }
 
-      if (this->GetDataSetAdjustedScalarRange(scalar_field, p_range))
+      has_scalar_range = 
+        this->GetDataSetAdjustedScalarRange(scalar_field, scalar_range);
+      cfun->GetRange(tfunc_range);
+      tfunc_size = this->ScalarColorFunctionEditor->GetFunctionSize();
+
+      if (has_scalar_range &&
+          (this->WholeRangeComputationMethod ==
+           vtkKWVolumePropertyWidget::WholeRangeComputationMethodData ||
+           !tfunc_size))
         {
-        this->ScalarColorFunctionEditor->SetWholeParameterRange(p_range);
+        this->ScalarColorFunctionEditor->SetWholeParameterRange(scalar_range);
         }
+      else if (tfunc_size &&
+               (this->WholeRangeComputationMethod ==
+        vtkKWVolumePropertyWidget::WholeRangeComputationMethodFunctionPoints ||
+                !has_scalar_range))
+        {
+        this->ScalarColorFunctionEditor->SetWholeParameterRange(tfunc_range);
+        } 
       else
         {
         this->ScalarColorFunctionEditor->SetWholeParameterRange(
-          cfun->GetRange());
+          scalar_range[0] < tfunc_range[0] ? scalar_range[0] : tfunc_range[0],
+          scalar_range[1] > tfunc_range[1] ? scalar_range[1] : tfunc_range[1]);
         }
       }
     else
@@ -1200,20 +1236,41 @@ void vtkKWVolumePropertyWidget::Update()
        this->VolumeProperty->GetStoredGradientOpacity(this->SelectedComponent);
       this->GradientOpacityFunctionEditor->SetPiecewiseFunction(gfun);
 
-      if (this->GetDataSetScalarRange(scalar_field, p_range))
+      has_scalar_range = 
+        this->GetDataSetAdjustedScalarRange(scalar_field, scalar_range);
+      if (has_scalar_range)
         {
         // WARNING: hard-coded value here according to the raycast mapper
         // behaviour (1/4 of the range)
-
-        p_range[1] = (float)(0.25 * ((double)p_range[1] - (double)p_range[0]));
-        p_range[0] = 0.0;
-        this->GradientOpacityFunctionEditor->SetWholeParameterRange(p_range);
+        scalar_range[1] = 0.25 * (scalar_range[1] - scalar_range[0]);
+        scalar_range[0] = 0.0;
         }
+      gfun->GetRange(tfunc_range);
+      tfunc_size = this->GradientOpacityFunctionEditor->GetFunctionSize();
+
+      if (has_scalar_range &&
+          (this->WholeRangeComputationMethod ==
+           vtkKWVolumePropertyWidget::WholeRangeComputationMethodData ||
+           !tfunc_size))
+        {
+        this->GradientOpacityFunctionEditor->SetWholeParameterRange(
+          scalar_range);
+        }
+      else if (tfunc_size &&
+               (this->WholeRangeComputationMethod ==
+        vtkKWVolumePropertyWidget::WholeRangeComputationMethodFunctionPoints ||
+                !has_scalar_range))
+        {
+        this->GradientOpacityFunctionEditor->SetWholeParameterRange(
+          tfunc_range);
+        } 
       else
         {
         this->GradientOpacityFunctionEditor->SetWholeParameterRange(
-          gfun->GetRange());
+          scalar_range[0] < tfunc_range[0] ? scalar_range[0] : tfunc_range[0],
+          scalar_range[1] > tfunc_range[1] ? scalar_range[1] : tfunc_range[1]);
         }
+
       this->GradientOpacityFunctionEditor->SetWholeValueRange(0.0, 1.0);
       }
     else
@@ -1625,6 +1682,81 @@ void vtkKWVolumePropertyWidget::SetMaterialPropertyPosition(int arg)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWVolumePropertyWidget::SetMaterialPropertyPositionToTop()
+{ 
+  this->SetMaterialPropertyPosition(
+    vtkKWVolumePropertyWidget::MaterialPropertyPositionTop); 
+};
+
+//----------------------------------------------------------------------------
+void vtkKWVolumePropertyWidget::SetMaterialPropertyPositionToBottomFrame()
+{ 
+  this->SetMaterialPropertyPosition(
+    vtkKWVolumePropertyWidget::MaterialPropertyPositionBottomFrame); 
+};
+
+//----------------------------------------------------------------------------
+void vtkKWVolumePropertyWidget::SetMaterialPropertyPositionToScalarOpacityUserFrame()
+{ 
+  this->SetMaterialPropertyPosition(
+    vtkKWVolumePropertyWidget::MaterialPropertyPositionScalarOpacityUserFrame);
+};
+
+//----------------------------------------------------------------------------
+void vtkKWVolumePropertyWidget::SetMaterialPropertyPositionToScalarColorUserFrame()
+{ 
+this->SetMaterialPropertyPosition(
+  vtkKWVolumePropertyWidget::MaterialPropertyPositionScalarColorUserFrame); 
+};
+
+//----------------------------------------------------------------------------
+void vtkKWVolumePropertyWidget::SetWholeRangeComputationMethod(int arg)
+{
+  if (arg < vtkKWVolumePropertyWidget::WholeRangeComputationMethodData)
+    {
+    arg = vtkKWVolumePropertyWidget::WholeRangeComputationMethodData;
+    }
+  else if (arg > 
+     vtkKWVolumePropertyWidget::WholeRangeComputationMethodDataAndFunctionPoints)
+    {
+    arg = vtkKWVolumePropertyWidget::WholeRangeComputationMethodDataAndFunctionPoints;
+    }
+
+  if (this->WholeRangeComputationMethod == arg)
+    {
+    return;
+    }
+
+  this->WholeRangeComputationMethod = arg;
+
+  this->Modified();
+
+  this->Update();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWVolumePropertyWidget::SetWholeRangeComputationMethodToData()
+{ 
+  this->SetWholeRangeComputationMethod(
+    vtkKWVolumePropertyWidget::WholeRangeComputationMethodData); 
+};
+
+//----------------------------------------------------------------------------
+void vtkKWVolumePropertyWidget::SetWholeRangeComputationMethodToFunctionPoints()
+{ 
+  this->SetWholeRangeComputationMethod(
+    vtkKWVolumePropertyWidget::WholeRangeComputationMethodFunctionPoints); 
+};
+
+//----------------------------------------------------------------------------
+void vtkKWVolumePropertyWidget::SetWholeRangeComputationMethodToDataAndFunctionPoints()
+{ 
+  this->SetWholeRangeComputationMethod(
+    vtkKWVolumePropertyWidget::WholeRangeComputationMethodDataAndFunctionPoints); 
+};
+
+
+//----------------------------------------------------------------------------
 void vtkKWVolumePropertyWidget::SetGradientOpacityFunctionVisibility(int arg)
 {
   if (this->GradientOpacityFunctionVisibility == arg)
@@ -1741,6 +1873,11 @@ void vtkKWVolumePropertyWidget::MergeScalarOpacityAndColorEditors()
     this->ScalarColorFunctionEditor->HistogramLogModeOptionMenuVisibilityOff();
     this->ScalarColorFunctionEditor->ColorSpaceOptionMenuVisibilityOff();
     this->ScalarColorFunctionEditor->UserFrameVisibilityOff();
+    if (this->ScalarOpacityFunctionEditor)
+      {
+      this->ScalarColorFunctionEditor->SetLockEndPointsParameter(
+        this->ScalarOpacityFunctionEditor->GetLockEndPointsParameter());
+      }
     }
 
   for (int i = 0; i < VTK_MAX_VRCOMP; i++)
@@ -2249,7 +2386,10 @@ void vtkKWVolumePropertyWidget::PrintSelf(ostream& os, vtkIndent indent)
      << (this->HSVColorSelectorVisibility ? "On" : "Off") << endl;
   os << indent << "InterpolationTypeVisibility: "
      << (this->InterpolationTypeVisibility ? "On" : "Off") << endl;
-  os << indent << "MaterialPropertyPosition: " << this->MaterialPropertyPosition << endl;
+  os << indent << "MaterialPropertyPosition: " 
+     << this->MaterialPropertyPosition << endl;
+  os << indent << "WholeRangeComputationMethod: " 
+     << this->WholeRangeComputationMethod << endl;
   os << indent << "MaterialPropertyVisibility: "
      << (this->MaterialPropertyVisibility ? "On" : "Off") << endl;
   os << indent << "GradientOpacityFunctionVisibility: "

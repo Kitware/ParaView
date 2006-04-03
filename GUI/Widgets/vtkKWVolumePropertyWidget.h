@@ -146,18 +146,10 @@ public:
   //ETX
   virtual void SetMaterialPropertyPosition(int);
   vtkGetMacro(MaterialPropertyPosition, int);
-  virtual void SetMaterialPropertyPositionToTop()
-    { this->SetMaterialPropertyPosition(
-      vtkKWVolumePropertyWidget::MaterialPropertyPositionTop); };
-  virtual void SetMaterialPropertyPositionToBottomFrame()
-    { this->SetMaterialPropertyPosition(
-      vtkKWVolumePropertyWidget::MaterialPropertyPositionBottomFrame); };
-  virtual void SetMaterialPropertyPositionToScalarOpacityUserFrame()
-    { this->SetMaterialPropertyPosition(
-      vtkKWVolumePropertyWidget::MaterialPropertyPositionScalarOpacityUserFrame); };
-  virtual void SetMaterialPropertyPositionToScalarColorUserFrame()
-    { this->SetMaterialPropertyPosition(
-      vtkKWVolumePropertyWidget::MaterialPropertyPositionScalarColorUserFrame); };
+  virtual void SetMaterialPropertyPositionToTop();
+  virtual void SetMaterialPropertyPositionToBottomFrame();
+  virtual void SetMaterialPropertyPositionToScalarOpacityUserFrame();
+  virtual void SetMaterialPropertyPositionToScalarColorUserFrame();
   
   // Description:
   // Set/Get the gradient opacity function visibility
@@ -236,6 +228,27 @@ public:
   vtkBooleanMacro(DisableCommands, int);
 
   // Description:
+  // Set the method used to compute the whole range of the various transfer
+  // function editors. If set to Data, the scalar range of the data is used.
+  // If no data is available or set to FunctionPoints, the range of the
+  // function points already in the editor is used. If set to 
+  // DataAndFunctionPointsthe the largest of the two ranges mentioned 
+  // previously is used.
+  //BTX
+  enum
+  {
+    WholeRangeComputationMethodData                  = 1,
+    WholeRangeComputationMethodFunctionPoints        = 2,
+    WholeRangeComputationMethodDataAndFunctionPoints = 3
+  };
+  //ETX
+  virtual void SetWholeRangeComputationMethod(int);
+  vtkGetMacro(WholeRangeComputationMethod, int);
+  virtual void SetWholeRangeComputationMethodToData();
+  virtual void SetWholeRangeComputationMethodToFunctionPoints();
+  virtual void SetWholeRangeComputationMethodToDataAndFunctionPoints();
+  
+  // Description:
   // Access the objects
   vtkGetObjectMacro(ScalarOpacityFunctionEditor, vtkKWPiecewiseFunctionEditor);
   vtkGetObjectMacro(ScalarColorFunctionEditor, vtkKWColorTransferFunctionEditor);
@@ -295,6 +308,7 @@ protected:
   int   DisableCommands;
   int   EnableShadingForAllComponents;
   int   MaterialPropertyPosition;
+  int   WholeRangeComputationMethod;
   int   InteractiveApplyMode;
   int   InteractiveApplyButtonVisibility;
   int   ScalarOpacityUnitDistanceVisibility;
