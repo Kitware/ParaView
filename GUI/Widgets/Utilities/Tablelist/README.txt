@@ -38,6 +38,18 @@ The changes are:
   and replace:
     if {$existsAux && [info exists data($name)] && [string compare $val $data($name)] == 0} {
 
+
+- If an uneditable cell in a tablelist is double-clicked, a virtual event is
+  generated. Find the lines in tablelistBind.tcl and add the part after else.
+      #
+    	# Finish a possibly active cell editing
+    	#
+	    if {$data(editRow) >= 0} {
+	        finisheditingSubCmd $win
+    	  } else {
+        event generate $win <<TablelistUneditableCellSelected>>
+      }
+
 --------------------------------------------------------------------------
 
                The Multi-Column Listbox Package Tablelist

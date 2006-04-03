@@ -429,7 +429,9 @@ proc tablelist::condEditContainingCell {win x y} {
 	#
 	if {$data(editRow) >= 0} {
 	    finisheditingSubCmd $win
-	}
+	  } else {
+    event generate $win <<TablelistUneditableCellSelected>>
+  }
     }
 }
 
