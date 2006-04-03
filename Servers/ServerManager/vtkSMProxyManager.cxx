@@ -21,6 +21,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSMCompoundProxyDefinitionLoader.h"
+#include "vtkSMDocumentation.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMStateLoader.h"
@@ -80,7 +81,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.33");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.34");
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -190,6 +191,37 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(vtkPVXMLElement* pelement,
   return proxy;
 }
 
+
+//---------------------------------------------------------------------------
+vtkSMDocumentation* vtkSMProxyManager::NewProxyDocumentation(
+  const char* groupName, const char* proxyName)
+{
+  if (!groupName || !proxyName)
+    {
+    return 0;
+    }
+  // Find the XML element from which the proxy can be instantiated and
+  // initialized
+  vtkPVXMLElement* element = this->GetProxyElement(groupName, 
+    proxyName);
+  if (element)
+    {
+    vtkSMDocumentation* doc = vtkSMDocumentation::New();
+    for (unsigned int cc=0; cc < element->GetNumberOfNestedElements(); cc++)
+      {
+      vtkPVXMLElement* doc_elem = element->GetNestedElement(cc);
+      if (strcmp(doc_elem->GetName(), "Documentation") == 0)
+        {
+        doc->SetDocumentationElement(doc_elem);
+        break;
+        }
+      }
+    return doc;
+    }
+  vtkErrorMacro("Failed to locate documentation for proxy: " 
+    << groupName << ", " <<proxyName);
+  return NULL;
+}
 
 //---------------------------------------------------------------------------
 int vtkSMProxyManager::ProxyElementExists(const char* groupName, 

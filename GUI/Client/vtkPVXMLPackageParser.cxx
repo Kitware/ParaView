@@ -31,6 +31,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkParaViewInstantiator.h"
 #include "vtkSMApplication.h"
+#include "vtkSMDocumentation.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkStringList.h"
@@ -39,7 +40,7 @@
 #include <ctype.h>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.56");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.57");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -377,6 +378,17 @@ void vtkPVXMLPackageParser::CreateSourceModule(vtkPVXMLElement* me)
     return;
     }
 
+  // Set the documentation.
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMDocumentation* documentation = pxm->NewProxyDocumentation(
+    "sources", pvm->GetModuleName());
+  if (documentation)
+    {
+    pvm->SetShortHelp(documentation->GetShortHelp());
+    pvm->SetLongHelp(documentation->GetLongHelp());
+    documentation->Delete();
+    }
+  
   // Add the source prototype.
   pvm->InitializePrototype();
   this->Window->AddPrototype(name, pvm);
@@ -430,6 +442,17 @@ void vtkPVXMLPackageParser::CreateFilterModule(vtkPVXMLElement* me)
     pvm->Delete();
     return;
     }
+  
+  // Set the documentation.
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMDocumentation* documentation = pxm->NewProxyDocumentation(
+    "filters", pvm->GetModuleName());
+  if (documentation)
+    {
+    pvm->SetShortHelp(documentation->GetShortHelp());
+    pvm->SetLongHelp(documentation->GetLongHelp());
+    documentation->Delete();
+    }
 
   // Add the source prototype.
   pvm->InitializePrototype();
@@ -468,12 +491,6 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     vtkErrorMacro("Module missing root_name attribute.");
     return 0;
     }
-
-  const char* short_help = me->GetAttribute("short_help");
-  if(short_help) { pvm->SetShortHelp(short_help); }
-
-  const char* long_help = me->GetAttribute("long_help");
-  if(long_help) { pvm->SetLongHelp(long_help); }
 
   const char* multiprocess_support = me->GetAttribute("multiprocess_support");
   if(multiprocess_support)

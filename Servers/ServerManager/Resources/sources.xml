@@ -1,6 +1,14 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="sources">
    <SourceProxy name="GlyphSource2D" class="vtkGlyphSource2D">
+     <Documentation
+        long_help="2D glyph source"
+        short_help="Create a 3D arrow">
+The 2D Glyph source is used for generating a family of 2D glyphs, each of which lies in the x-y plane. There are two parameters for 2D Glyphs.
+Glyph type: The types of 2D glyphs that can be created are Vertex, Dash, Cross, Thick Cross, Triangle, Square, Circle, Diamond, Arrow, and Thick Arrow. The default is Arrow.
+Filled: If the glyph is filled, it is drawn as a solid polygon; otherwise it is drawn with only lines. By default Filled is off.
+The output of the 2D Glyph source is polygonal data.
+     </Documentation>
      <IntVectorProperty 
         name="GlyphType" 
         command="SetGlyphType" 
@@ -39,6 +47,13 @@
    </SourceProxy>
 
    <SourceProxy name="VectorText" class="vtkVectorText">
+     <Documentation
+        long_help="3D geometric representation of a text string." 
+        short_help="Create a 3D text object">
+The 3D Text source displays a text string as polygonal text. There is only one parameter for 3D Text.
+Text: Specify the text string to be displayed. The ASCII alphanumeric characters a-z, A-Z, and 0-9 are supported; so are ASCII punctuation marks. The only supported control character is "\n", which inserts a new line in the text string. The default value is "3D Text".
+The output of the 3D Text source is polygonal data.
+     </Documentation>
      <StringVectorProperty
         name="Text"
         command="SetText"
@@ -49,6 +64,17 @@
    </SourceProxy>
 
    <SourceProxy name="ArrowSource" class="vtkPVArrowSource">
+      <Documentation
+        long_help="3D arrow with a long cylindrical shaft and a cone for the tip." 
+        short_help="Create a 3D arrow">
+The Arrow source appends a cylinder to a cone to form a 3D arrow. The parameters for the Arrow source are as follows.
+Tip resolution: Set the number of faces in the representation of the tip of the arrow (the cone). As the resolution increases, the cone will become smoother. The default value is 6.
+Tip radius: Specify the radius of the tip of the arrow (the cone). The length of the whole arrow is 1.0 unit. The default value is 0.1 units.
+Tip length: Specify the length of the tip. The value ranges between 0.0 units and 1.0 unit (the length of the whole arrow). The default is 0.35 units.
+Shaft resolution: Set the number of faces of the shaft of the arrow (the cylinder). As the resolution increases, the cylinder will become smoother. The default value is 6.
+Shaft radius: Specify the radius of the shaft of the arrow (the cylinder). The length of the whole arrow is 1.0 unit. The default value is 0.03 unit.
+The output of the Arrow source is polygonal data. This polygonal data will not contain normals, so rendering of the arrow will be performed using flat shading. The appearance of the arrow can be improved without significantly increasing the resolution of the tip and shaft by generating normals (Normals generation filter).
+      </Documentation>
       <IntVectorProperty
          name="TipResolution"
          command="SetTipResolution"
@@ -93,6 +119,15 @@
    </SourceProxy>
 
    <SourceProxy name="Axes" class="vtkAxes">
+      <Documentation
+         long_help="Three lines representing the axes - red line along X, green line along Y, and blue line along Z." 
+         short_help="Create three lines representing X, Y and Z axes">
+The Axes source can be used to add a representation of the coordinate system axes to the 3D scene. The X axis will be drawn as a blue line, the Y axis as a green line, and the Z axis as a red line. The axes can be drawn either as three lines drawn in the positive direction from the origin or as three lines crossing at the origin (drawn in both the positive and negative directions). The Axes source has the following parameters.
+Scale: By default the axes lines have a length of 1 (or 1 in each direction, for a total length of 2, if the Symmetric option is selected). This value can be changed to make the axes larger or smaller.
+Origin: These entry boxes can be used to change the origin of the axes. The default origin of the axes is at (0, 0, 0).
+Symmetric: When the Symmetric option is selected, the axes extend along both the positive and negative directions for a distance equal to the scale value. When unchecked (the default) the axes extend only in the positive direction.
+The output of the Axes source is polygonal data. This polygonal data has a scalar per line so that the lines can be colored. It also has normals defined.
+      </Documentation>
       <DoubleVectorProperty
          name="ScaleFactor"
          command="SetScaleFactor"
@@ -120,6 +155,16 @@
    </SourceProxy>
 
    <SourceProxy name="CubeSource" class="vtkCubeSource">
+      <Documentation
+         long_help="3D box with specified X, Y, and Z lengths." 
+         short_help="Create a box with specified X, Y, and Z lengths.">
+The Box source can be used to add a box to the 3D scene. The Box source has the following parameters.
+X Length: This value specifies the length of the box along the X axis. By default the X length of the box is 1.
+Y Length: This value specifies the length of the box along the Y axis. By default the Y length of the box is 1.
+Z Length: This value specifies the length of the box along the Z axis. By default the Z length of the box is 1.
+Center: These three values represent the coordinate at the center of the box. By default the box is centered at (0, 0, 0).
+The output of the Box source is polygonal data containing both normals and texture coordinates.
+      </Documentation>
       <DoubleVectorProperty
          name="XLength"
          command="SetXLength"
@@ -159,6 +204,16 @@
    </SourceProxy>
 
    <SourceProxy name="ConeSource" class="vtkConeSource">
+      <Documentation
+        long_help="3D cone of a given radius and height." 
+        short_help="Create a 3D cone of a given radius and height">
+The Cone source can be used to add a polygonal cone to the 3D scene. The Cone source has the following parameters.
+Resolution: This value indicates the number of divisions around the cone. The higher this number, the closer the polygonal approximation will come to representing a cone, and the more polygons it will contain. The default resolution is 6.
+Radius: This is the radius of the cone. The default value is 0.5.
+Height: This is the height of the cone. The default value is 1.0.
+Capping: This check box indicates whether the cone is capped (i.e., there is a polygon closing off the wide end of the cone) or open. By default the cone is capped.
+The output of the Cone source is polygonal data.
+      </Documentation>
       <IntVectorProperty
          name="Resolution"
          command="SetResolution"
@@ -206,6 +261,10 @@
    </SourceProxy>
 
    <SourceProxy name="HierarchicalFractal" class="vtkHierarchicalFractal">
+      <Documentation
+        long_help="Test source for AMR with HierarchicalDataSet" 
+        short_help="HierarchicalFractal">
+      </Documentation>
       <IntVectorProperty
          name="Dimensions"
          command="SetDimensions"
@@ -285,6 +344,17 @@
    </SourceProxy>
 
    <SourceProxy name="CylinderSource" class="vtkCylinderSource">
+      <Documentation
+         long_help="3D cylinder of a given radius and height." 
+          short_help="Create a 3D cylinder of a given radius and height">
+The Cylinder source can be used to add a polygonal cylinder to the 3D scene. The following parameters can be set for the Cylinder source.
+Resolution: This value indicates the number of divisions around the cylinder. The higher this number, the closer the polygonal approximation will come to representing a cylinder, and the more polygons it will contain. The default resolution is 6.
+Height: This is the height of the cylinder. The default value is 1.0.
+Radius: This is the radius of the cylinder. The default value is 0.5.
+Center: These three values represent the coordinate value at the center of the cylinder. By default, the cylinder is centered at (0, 0, 0).
+Capping: This check box indicates whether the cylinder is capped (i.e., each end of the cylinder is closed off by a polygon) or open. By default the cylinder is capped.
+The output of the Cylinder source is polygonal data containing both normals and texture coordinates.
+      </Documentation>
       <IntVectorProperty
          name="Resolution"
          command="SetResolution"
@@ -330,6 +400,16 @@
    </SourceProxy>
 
    <SourceProxy name="LineSource" class="vtkLineSource">
+      <Documentation
+         long_help="Line between two points. The resolution indicates how many segments are in the line." 
+         short_help="Create a line between two points">
+The Line source can be used to interactively (using a 3D widget) or manually (using the entries on the user interface) add a line to the 3D scene. The Line source has the following parameters.
+Point 1: These three values indicate the coordinates of one of the two end points of the line. Moving one of the end points of the 3D widget will change these values. The default coordinates of Point 1 are (-0.5, 0, 0).
+Point 2: These three values indicate the coordinates of the other of the two end points of the line. Moving the other end point of the 3D widget will change these values. The default coordinates of Point 2 are (0.5, 0, 0).
+Resolution: This value represents the number of line segments in the output line. By default this value is 1. As opposed to some other sources (e.g., the sphere, cone, and cylinder), increasing the resolution does not increase the accuracy of the line; it simply increases the number of colinear line segments defining the line. This can sometimes be useful when using the output as input to a filter.
+There is also a Visibility check box in the Line Widget area of the parameters. This check box toggles the visibility of the 3D line widget.
+The output of the Line source is polygonal data.
+      </Documentation>
       <DoubleVectorProperty
          name="Point1"
          command="SetPoint1"
@@ -359,6 +439,17 @@
    </SourceProxy>
 
    <SourceProxy name="ImageMandelbrotSource" class="vtkImageMandelbrotSource">
+      <Documentation
+        long_help="Representation (unsigned char ) of the Mandlebrot set in up to 3 dimensions." 
+        short_help="Create a Mandelbrot representation">
+The Mandelbrot source can be used to add a uniform rectilinear grid with scalar values derived from the Mandelbrot set to the 3D scene. The equation used is z = z2 + C (where z and C are complex). The scalar values in the grid are the number of iterations of the equation it takes for the magnitude of the value to become greater than 2. In the equation, the initial value of z is 0. By default, the real component of C is mapped onto the X axis; the imaginary component of C is mapped onto the Y axis; and the imaginary component of the initial value is mapped onto the Z axis. If a two-dimensional extent is specified, the resulting image will be displayed. If a three-dimensional extent is used, then the bounding box of the volume will be displayed. The following parameters of the Mandelbrot source can be controlled.
+Extent: These six values indicate the X, Y, and Z extent of the output data. The first two numbers are the minimum and maximum X extent; the next two are the minimum and maximum Y extent; and the final two are the minimum and maximum Z extent. The numbers are inclusive, so the default values of 0, 250, 0, 250, 0, 0 indicate that the dimensions of the output will be 251 x 251 x 1.
+Sub-space: These three values allow you to set the projection from the 4D space to the axes of the 3D volume. By default, the real component of C (represented by 0) is mapped to the X axis; the imaginary component of C (represented by 1) is mapped to the Y axis; and the real component of X, the initial value (represented by 2) is mapped to the Z axis. The imaginary component of X is represented by 3. All values entered must be between 0 and 3, inclusive.
+Origin: These four values indicate the components of C (real and imaginary) and the components of the initial value, X (real and imaginary). The first two numbers represent the real and imaginary components of C, and the last two indicate the real and imaginary components of X. The default values are -1.75, -1.25, 0, and 0.
+Size: These four values indicate the length of the output in each of the four dimensions. (The three dimensions specified in the Sub-space will determine which of these values specify the length of the axes in the output.) The default values are 2.5, 2.5, 2, and 1.5
+Max. iterations: This number indicates the maximum number of iteration to perform in order to determine if the value will go above 2. The default value is 100.
+The output of the Mandelbrot source is image (uniform rectilinear) data.
+      </Documentation>
       <IntVectorProperty
          name="WholeExtent"
          command="SetWholeExtent"
@@ -411,6 +502,10 @@
    </SourceProxy>
 
    <SourceProxy name="OctreeFractal" class="vtkHyperOctreeFractalSource">
+      <Documentation
+         long_help="Test source for octree with Mandelbrot fractal" 
+         short_help="OctreeFractal">
+      </Documentation>
       <IntVectorProperty
          name="Dimension"
          command="SetDimension"
@@ -480,6 +575,17 @@
    </SourceProxy>
 
    <SourceProxy name="PlaneSource" class="vtkPlaneSource">
+      <Documentation
+        long_help="Parallelogram given an origin and two points. The resolution indicates the number of division along each axis of the plane." 
+        short_help="Create a parallelogram from an origin and two points">
+The Plane source can be used to add a polygonal parallelogram to the 3D scene. Unlike the sphere, cone, and cylinder sources, the parallelogram is exactly represented at the lowest resolution, but higher resolutions may be desired if this plane is to be used as an input to a filter. The Plane source has the following parameters.
+Origin: The origin is the location of one of the corners of the parallelogram. By default this coordinate is (-0.5, -0.5, 0).
+First point: This coordinate represents the location of a second corner of the parallelogram. One edge of the parallelogram will be the line connecting the origin with this first point. This will be considered the X axis of the parallelogram. The default coordinate of the First point is (0.5, -0.5, 0).
+Second point: This coordinate represents the location of a third corner of the parallelogram. One edge of the parallelogram will be the line connecting the origin with this second point. This will be considered the Y axis of the parallelogram. The default coordinate of the Second point is (-0.5, 0.5, 0).
+X resolution: This is the number of divisions along the X axis of the parallelogram. By default this value is 1.
+Y resolution: This is the number of divisions along the Y axis of the parallelogram. By default this value is 1.
+The output of the Plane source is polygonal data.
+      </Documentation>
       <DoubleVectorProperty
          name="Origin"
          command="SetOrigin"
@@ -556,6 +662,21 @@
    </SourceProxy>
 
    <SourceProxy name="SphereSource" class="vtkSphereSource">
+      <Documentation
+         long_help="3D sphere given a center and radius." 
+         short_help="Create a 3D sphere">
+The Sphere source can be used to add a polygonal sphere to the 3D scene. The following parameters are available for the Sphere source.
+Center: This coordinate represents the center of the sphere. By default this value is (0, 0, 0).
+Radius: This is the radius of the sphere. The default value is 0.5.
+Theta Resolution: This number represents the number of divisions between Start Theta and End Theta around the sphere. The theta divisions are similar to longitude lines on the earth. The higher the resolution, the closer the approximation will come to a sphere, and the more polygons there will be. The default Theta Resolution is 8.
+Start Theta: To form a complete sphere, the Start Theta value should be 0 degrees, and the End Theta value should be 360 degrees. The Start Theta value can be adjusted to form only a portion of a sphere. The default value is 0 degrees.
+End Theta: The End Theta value can be adjusted to form only a portion of a sphere. The default End Theta value is 360 degrees.
+Phi Resolution: This number represents the number of divisions between Start Phi and End Phi on the sphere. The phi divisions are similar to latitude lines on the earth. The default Phi Resolution value is 8.
+Start Phi: To form a complete sphere, the Start Phi value should be 0 degrees, and the End Phi value should be 180 degrees. The Start Phi value can be adjusted to form only a portion of a sphere. The default value is 0 degrees.
+End Phi: The End Phi value can be adjusted to form only a portion of a sphere. The default End Phi value is 180 degrees.
+The output of the Sphere source is polygonal data with point normals defined.
+      </Documentation>
+       
       <DoubleVectorProperty
          name="Center"
          command="SetCenter"
@@ -629,6 +750,22 @@
    </SourceProxy>
 
    <SourceProxy name="SuperquadricSource" class="vtkSuperquadricSource">
+      <Documentation
+         long_help="Superquadric according to the theta and phi roundness parameters. This one function can generate a wide variety of 3D objects including a box, a sphere, or a torus." 
+         short_help="Create a superquadric according to the theta and phi roundness parameters">
+The Superquadric source can be used to add a polygonal superquadric to the 3D scene. This source can be used to create a wide variety of shapes (e.g., a sphere, a box, or a torus) by adjusting the roundness parameters. The Superquadric source has the following parameters.
+Center: This coordinate represents the center of the superquadric. By default this value is (0, 0, 0).
+Scale: These three values can be used to scale the superquadric in X, Y, and Z. The normals will be computed correctly even with anisotropic scaling. By default all three values are set to 1.
+Theta resolution: This number represents the number of divisions in the theta (longitudinal) direction. The default Theta Resolution value is 16. This value will be rounded to the nearest multiple of 8.
+Phi resolution: This number represents the number of divisions in the phi (latitudinal) direction. The default Phi Resolution value is 16. This number will be rounded to the nearest multiple of 4.
+Thickness: If the Toroidal box is checked, this value represents the thickness of the object as a value between 0 and 1. A value close to 0 leads to a thin object with a large hole, and a value near 1 leads to a thick object with a very small hole.
+Theta roundness: Define the roundness in the theta (longitudinal) direction. A value of 0 represents a rectangular shape, a value of 1 represents a circular shape, and values greater than 1 produce higher order shapes. The default value is 1.
+Phi roundness: Define the roundness in the phi (latitudinal) direction. A value of 0 represents a rectangular shape, a value of 1 represents a circular shape, and values greater than 1 produce higher order shapes. The default value is 1.
+Size: This value represents an isotropic size of the superquadric. By default it is 0.5. Note that both the Size and Thickness parameters control coefficients of superquadric generation, so the Size value may not exactly describe the size of the superquadric.
+Toroidal: If this box is not checked (the default), the generated superquadric will not contain a hole. If checked, a toroidal object is generated.
+The output of the Superquadric source is polygonal data with point normals and texture coordinates defined.
+      </Documentation>
+       
       <DoubleVectorProperty
          name="Center"
          command="SetCenter"
@@ -708,6 +845,24 @@
    </SourceProxy>
 
    <SourceProxy name="RTAnalyticSource" class="vtkRTAnalyticSource">
+      <Documentation
+         long_help="Regular rectilinear grid in up to three dimensions with values varying according to a periodic function."
+         short_help="Create a Wavelet">
+The Wavelet source can be used to create a uniform rectilinear grid in up to three dimensions with values varying according to the following periodic function.
+OS = M * G * (XM * sin(XF * x) + YM * sin(YF * y) + ZM * cos(ZF * z))
+OS is the output scalar; M represents the maximum value; G represents the Gaussian; XM, YM, and ZM are the X, Y, and Z magnitude values; and XF, YF, and ZF are the X, Y, and Z frequency values. If a two-dimensional extent is specified, the resulting image will be displayed. If a three-dimensional extent is used, then the bounding box of the volume will be displayed. The Wavelet source has the following parameters.
+Extent: These six values indicate the X, Y, and Z extent of the output data. The first two values represent the minimum and maximum X indices, the next two are the minimum and maximum Y indices, and the last two are the minimum and maximum Z indices. By default each axis ranges from -10 to 10.
+Center: This coordinate represents the center of the output data. By default this is (0, 0, 0).
+Maximum: This value is used to scale the scalar values in the output. The default value is 255.
+X Freq.: This is the XF value from the above equation. The default value is 60.
+Y Freq.: This is the YF value from the above equation. The default value is 30.
+Z Freq.: This is the ZF value from the above equation. The default value is 40.
+X Mag.: This is the XM value from the above equation. The default value is 10.
+Y Mag.: This is the YM value from the above equation. The default value is 18.
+Z Mag.: This is the ZM value from the above equation. The default value is 5.
+Standard dev.: The standard deviation is used in the generation of the Gaussian value in the above equation. The default value is 0.5.
+The output of the Wavelet source is image (uniform rectilinear) data.
+      </Documentation>
       <IntVectorProperty
          name="WholeExtent"
          command="SetWholeExtent"

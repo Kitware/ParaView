@@ -127,6 +127,7 @@
 struct vtkSMProxyInternals;
 //ETX
 class vtkPVXMLElement;
+class vtkSMDocumentation;
 class vtkSMProperty;
 class vtkSMPropertyIterator;
 class vtkSMProxyManager;
@@ -317,6 +318,9 @@ public:
   // with SetName(), it returns that instead.
   const char* GetSelfIDAsString();
 
+  // Description:
+  // Returns the documentation for this proxy.
+  vtkGetObjectMacro(Documentation, vtkSMDocumentation);
 protected:
   vtkSMProxy();
   ~vtkSMProxy();
@@ -571,6 +575,7 @@ protected:
   // proxy exists, if at all. By default, it is the RootServerConnectionID.
   vtkConnectionID ConnectionID;
 
+  vtkSMDocumentation* Documentation;
 private:
   vtkSMProxyInternals* Internals;
   vtkSMProxyObserver* SubProxyObserver;

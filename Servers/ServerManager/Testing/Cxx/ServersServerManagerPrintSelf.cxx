@@ -29,6 +29,7 @@
 #include "vtkSMBooleanDomain.h"
 #include "vtkSMBoundsDomain.h"
 #include "vtkSMDataTypeDomain.h"
+#include "vtkSMDocumentation.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleRangeDomain.h"
@@ -113,6 +114,7 @@ int main(int , char *[])
   c = vtkSMBooleanDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMBoundsDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMDataTypeDomain::New(); c->Print( cout ); c->Delete();
+  c = vtkSMDocumentation::New(); c->Print( cout ); c->Delete();
   c = vtkSMDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMDomainIterator::New(); c->Print( cout ); c->Delete();
   c = vtkSMDoubleRangeDomain::New(); c->Print( cout ); c->Delete();
