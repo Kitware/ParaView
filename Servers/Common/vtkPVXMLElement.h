@@ -51,6 +51,10 @@ public:
   const char* GetAttribute(const char* name);
 
   // Description:
+  // Get the character data for the element.
+  const char* GetCharacterData();
+
+  // Description:
   // Get the attribute with the given name and converted to a scalar
   // value.  Returns whether value was extracted.
   int GetScalarAttribute(const char* name, int* value);

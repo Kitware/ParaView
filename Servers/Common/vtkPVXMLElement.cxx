@@ -16,7 +16,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.8");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.9");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 #include <vtkstd/string>
@@ -27,6 +27,7 @@ struct vtkPVXMLElementInternals
   vtkstd::vector<vtkstd::string> AttributeNames;
   vtkstd::vector<vtkstd::string> AttributeValues;
   vtkstd::vector<vtkSmartPointer<vtkPVXMLElement> > NestedElements;
+  vtkstd::string CharacterData;
 };
 
 //----------------------------------------------------------------------------
@@ -184,8 +185,9 @@ void vtkPVXMLElement::AddNestedElement(vtkPVXMLElement* element, int setParent)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXMLElement::AddCharacterData(const char*, int)
+void vtkPVXMLElement::AddCharacterData(const char* data, int length)
 {
+  this->Internal->CharacterData.append(data, length);
 }
 
 //----------------------------------------------------------------------------
@@ -201,6 +203,12 @@ const char* vtkPVXMLElement::GetAttribute(const char* name)
       }
     }
   return 0;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVXMLElement::GetCharacterData()
+{
+  return this->Internal->CharacterData.c_str();
 }
 
 //----------------------------------------------------------------------------
