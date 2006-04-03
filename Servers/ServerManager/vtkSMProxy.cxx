@@ -17,6 +17,7 @@
 #include "vtkClientServerInterpreter.h"
 #include "vtkCommand.h"
 #include "vtkDebugLeaks.h"
+#include "vtkSMDocumentation.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
@@ -34,7 +35,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.65");
+vtkCxxRevisionMacro(vtkSMProxy, "1.66");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -125,6 +126,8 @@ vtkSMProxy::vtkSMProxy()
 
   this->SubProxyObserver = vtkSMProxyObserver::New();
   this->SubProxyObserver->SetProxy(this);
+
+  this->Documentation = vtkSMDocumentation::New();
 }
 
 //---------------------------------------------------------------------------
@@ -162,6 +165,7 @@ vtkSMProxy::~vtkSMProxy()
     this->SubProxyObserver->SetProxy(0);
     this->SubProxyObserver->Delete();
     }
+  this->Documentation->Delete();
 }
 
 //---------------------------------------------------------------------------
@@ -1343,6 +1347,17 @@ int vtkSMProxy::ReadXMLAttributes(
   if (!this->CreateProxyHierarchy(pm, element))
     {
     return 0;
+    }
+
+  // Locate documentation.
+  for (unsigned int cc=0; cc < element->GetNumberOfNestedElements(); ++cc)
+    {
+    vtkPVXMLElement* doc_elem = element->GetNestedElement(cc);
+    if (strcmp(doc_elem->GetName(), "Documentation") == 0)
+      {
+      this->Documentation->SetDocumentationElement(doc_elem);
+      break;
+      }
     }
   this->SetXMLElement(0);
   return 1;

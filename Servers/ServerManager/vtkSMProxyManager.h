@@ -34,6 +34,7 @@
 
 class vtkPVXMLElement;
 class vtkSMCompoundProxy;
+class vtkSMDocumentation;
 class vtkSMLink;
 class vtkSMProperty;
 class vtkSMProxy;
@@ -59,6 +60,14 @@ public:
   // the deletion of object created through other methods. Use
   // UnRegister instead.
   vtkSMProxy* NewProxy(const char* groupName, const char* proxyName);
+
+  // Description:
+  // Creates a returns a new vtkSMDocumentation object with the documentation
+  // for the proxy with given name and group name. Note that the name and group
+  // name are not those with the which the proxy is registered, but those
+  // with which the proxy is created i.e. the arguments used for NewProxy().
+  vtkSMDocumentation* NewProxyDocumentation(const char* groupName, 
+    const char* proxyName);
 
   // Description:
   // Used to pass the control of the proxy to the manager. The user code can

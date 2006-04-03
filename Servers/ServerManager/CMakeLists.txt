@@ -37,6 +37,7 @@ SET(Kit_SRCS
   vtkSMDataObjectDisplayProxy.cxx
   vtkSMDataTypeDomain.cxx
   vtkSMDisplayProxy.cxx
+  vtkSMDocumentation.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx
   vtkSMDoubleRangeDomain.cxx
