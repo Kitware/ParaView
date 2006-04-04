@@ -72,12 +72,11 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
   this->CloseButton->setDefaultAction(a);
 
 
-  // queued connections because these signals can potentially modify/delete this object
-  this->connect(this->ActiveButton->defaultAction(), SIGNAL(triggered(bool)), SLOT(setActive(bool)), Qt::QueuedConnection);
-  this->connect(this->CloseButton->defaultAction(), SIGNAL(triggered(bool)), SLOT(close()), Qt::QueuedConnection);
-  this->connect(this->MaximizeButton->defaultAction(), SIGNAL(triggered(bool)), SLOT(maximize()), Qt::QueuedConnection);
-  this->connect(this->SplitVerticalButton->defaultAction(), SIGNAL(triggered(bool)), SLOT(splitVertical()), Qt::QueuedConnection);
-  this->connect(this->SplitHorizontalButton->defaultAction(), SIGNAL(triggered(bool)), SLOT(splitHorizontal()), Qt::QueuedConnection);
+  this->connect(this->ActiveButton->defaultAction(), SIGNAL(triggered(bool)), SLOT(setActive(bool)));
+  this->connect(this->CloseButton->defaultAction(), SIGNAL(triggered(bool)), SLOT(close()));
+  this->connect(this->MaximizeButton->defaultAction(), SIGNAL(triggered(bool)), SLOT(maximize()));
+  this->connect(this->SplitVerticalButton->defaultAction(), SIGNAL(triggered(bool)), SLOT(splitVertical()));
+  this->connect(this->SplitHorizontalButton->defaultAction(), SIGNAL(triggered(bool)), SLOT(splitHorizontal()));
   
   // setup the context menu
   this->Menu->setContextMenuPolicy(Qt::ActionsContextMenu);

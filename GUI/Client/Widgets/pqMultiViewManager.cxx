@@ -225,7 +225,7 @@ void pqMultiViewManager::setup(pqMultiViewFrame* frame)
   QObject::connect(frame, SIGNAL(closePressed()), 
                    CloseSignalMapper, SLOT(map()));
   QObject::connect(CloseSignalMapper, SIGNAL(mapped(QWidget*)), 
-                   this, SLOT(removeWidget(QWidget*)));
+                   this, SLOT(removeWidget(QWidget*)), Qt::QueuedConnection);
 
   // connect split buttons
   QObject::connect(frame, SIGNAL(splitHorizontalPressed()), 
