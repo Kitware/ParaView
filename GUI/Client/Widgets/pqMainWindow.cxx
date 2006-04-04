@@ -136,11 +136,14 @@ public:
     VTKConnector(0),
     Inspector(0)
   {
+    // Redirect Qt debug output to VTK ...
+    qInstallMsgHandler(QtMessageOutput);
+    
+    // Redirect VTK debug output to our window ...
     this->OutputWindow->connect(this->OutputWindowAdapter, SIGNAL(displayText(const QString&)), this->OutputWindow, SLOT(onDisplayText(const QString&)));
     this->OutputWindow->connect(this->OutputWindowAdapter, SIGNAL(displayErrorText(const QString&)), this->OutputWindow, SLOT(onDisplayErrorText(const QString&)));
     this->OutputWindow->connect(this->OutputWindowAdapter, SIGNAL(displayWarningText(const QString&)), this->OutputWindow, SLOT(onDisplayWarningText(const QString&)));
     this->OutputWindow->connect(this->OutputWindowAdapter, SIGNAL(displayGenericWarningText(const QString&)), this->OutputWindow, SLOT(onDisplayGenericWarningText(const QString&)));
-
     vtkOutputWindow::SetInstance(OutputWindowAdapter);
   }
   
@@ -174,6 +177,25 @@ public:
     delete this->OutputWindow;
   }
 
+  static void QtMessageOutput(QtMsgType type, const char *msg)
+  {
+    switch(type)
+      {
+      case QtDebugMsg:
+        vtkOutputWindow::GetInstance()->DisplayText(msg);
+        break;
+      case QtWarningMsg:
+        vtkOutputWindow::GetInstance()->DisplayWarningText(msg);
+        break;
+      case QtCriticalMsg:
+        vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
+        break;
+      case QtFatalMsg:
+        vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
+        break;
+      }
+  }
+    
   /// Converts VTK debug output into Qt signals
   vtkSmartPointer<pqOutputWindowAdapter> OutputWindowAdapter;
   /// Displays VTK debug output in a console window
