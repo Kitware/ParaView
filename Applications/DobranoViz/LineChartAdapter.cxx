@@ -33,6 +33,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QtDebug>
 
 #include <vtkCellData.h>
 #include <vtkCommand.h>
@@ -463,13 +464,20 @@ struct LineChartAdapter::pqImplementation
   /// Given experimental data, returns the corresponding reference image (if any)
   const QPixmap getReferenceImage(const ExperimentalDataT& data)
   {
+    const QString path = this->ExperimentImageMap[data.Label];
+    if(path.isEmpty())
+      return QPixmap();
+      
     QPixmap result;
-    if(result.load(this->ExperimentImageMap[data.Label]))
+    if(!result.load(path))
       {
-      if(result.width() > 200 || result.height() > 200)
-        {
-        result = result.scaled(200, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        }
+      qWarning() << "Error loading reference image [" << path << "]";
+      return QPixmap();
+      }
+      
+    if(result.width() > 200 || result.height() > 200)
+      {
+      result = result.scaled(200, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation);
       }
       
     return result;

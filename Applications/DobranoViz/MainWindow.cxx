@@ -31,7 +31,7 @@ MainWindow::MainWindow() :
   LineChart(0),
   ChooseDataCombo(0)
 {
-  this->setWindowTitle("Dobran-O-Viz 0.2");
+  this->setWindowTitle("Dobran-O-Viz 0.3");
 
   this->createStandardFileMenu();
   this->createStandardViewMenu();
@@ -58,7 +58,7 @@ MainWindow::MainWindow() :
     Qt::LeftDockWidgetArea |
     Qt::RightDockWidgetArea);
 
-  this->LineChartWidget = new pqLineChartWidget(line_chart_dock);
+  this->LineChartWidget = new pqLineChartWidget(0);
   this->LineChartWidget->setContextMenuPolicy(Qt::CustomContextMenu);
   this->connect(this->LineChartWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(onLineChartContextMenu(const QPoint&)));
   
