@@ -63,21 +63,11 @@ pqOutputWindow::~pqOutputWindow()
 void pqOutputWindow::onDisplayText(const QString& text)
 {
   QTextCharFormat format = this->Implementation->Ui.consoleWidget->getFormat();
-  format.setForeground(Qt::black);
+  format.setForeground(Qt::darkGreen);
+  format.clearBackground();
   this->Implementation->Ui.consoleWidget->setFormat(format);
   
-  this->Implementation->Ui.consoleWidget->printString(text);
-
-  this->show();
-}
-
-void pqOutputWindow::onDisplayErrorText(const QString& text)
-{
-  QTextCharFormat format = this->Implementation->Ui.consoleWidget->getFormat();
-  format.setForeground(Qt::red);
-  this->Implementation->Ui.consoleWidget->setFormat(format);
-  
-  this->Implementation->Ui.consoleWidget->printString(text);
+  this->Implementation->Ui.consoleWidget->printString(text + "\n");
 
   this->show();
 }
@@ -86,9 +76,10 @@ void pqOutputWindow::onDisplayWarningText(const QString& text)
 {
   QTextCharFormat format = this->Implementation->Ui.consoleWidget->getFormat();
   format.setForeground(Qt::darkRed);
+  format.clearBackground();
   this->Implementation->Ui.consoleWidget->setFormat(format);
   
-  this->Implementation->Ui.consoleWidget->printString(text);
+  this->Implementation->Ui.consoleWidget->printString(text + "\n");
 
   this->show();
 }
@@ -97,9 +88,22 @@ void pqOutputWindow::onDisplayGenericWarningText(const QString& text)
 {
   QTextCharFormat format = this->Implementation->Ui.consoleWidget->getFormat();
   format.setForeground(Qt::darkRed);
+  format.clearBackground();
   this->Implementation->Ui.consoleWidget->setFormat(format);
   
-  this->Implementation->Ui.consoleWidget->printString(text);
+  this->Implementation->Ui.consoleWidget->printString(text + "\n");
+
+  this->show();
+}
+
+void pqOutputWindow::onDisplayErrorText(const QString& text)
+{
+  QTextCharFormat format = this->Implementation->Ui.consoleWidget->getFormat();
+  format.setForeground(Qt::white);
+  format.setBackground(Qt::red);
+  this->Implementation->Ui.consoleWidget->setFormat(format);
+  
+  this->Implementation->Ui.consoleWidget->printString(text + "\n");
 
   this->show();
 }
