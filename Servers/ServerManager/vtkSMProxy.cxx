@@ -35,7 +35,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.66");
+vtkCxxRevisionMacro(vtkSMProxy, "1.67");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -1766,6 +1766,7 @@ void vtkSMProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "XMLGroup: " 
     << (this->XMLGroup ? this->XMLGroup : "(null)")
     << endl;
+  os << indent << "Documentation: " << this->Documentation << endl;
 
   vtkSMPropertyIterator* iter = this->NewPropertyIterator();
   if (iter)
