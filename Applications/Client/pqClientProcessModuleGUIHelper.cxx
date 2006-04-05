@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqServerFileDialogModel.h
+Module:    pqClientProcessModuleGUIHelper.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,44 +30,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqServerFileDialogModel_h
-#define _pqServerFileDialogModel_h
+#include "pqClientProcessModuleGUIHelper.h"
 
-#include "pqWidgetsExport.h"
-#include "pqFileDialogModel.h"
+#include "vtkObjectFactory.h"
+#include "MainWindow.h"
 
-class vtkProcessModule;
-class pqServer;
-
-/// Implementation of pqFileDialogModel that allows remote browsing of a connected ParaView server's filesystem
-class PQWIDGETS_EXPORT pqServerFileDialogModel :
-  public pqFileDialogModel
+vtkStandardNewMacro(pqClientProcessModuleGUIHelper);
+vtkCxxRevisionMacro(pqClientProcessModuleGUIHelper, "1.1");
+//-----------------------------------------------------------------------------
+pqClientProcessModuleGUIHelper::pqClientProcessModuleGUIHelper()
 {
-  typedef pqFileDialogModel base;
-  
-  Q_OBJECT
+}
 
-public:
-  /// server is the server for which we need the listing.
-  pqServerFileDialogModel(QObject* Parent, pqServer* server);
-  ~pqServerFileDialogModel();
+//-----------------------------------------------------------------------------
+pqClientProcessModuleGUIHelper::~pqClientProcessModuleGUIHelper()
+{
+}
 
-  QString getStartPath();
-  void setCurrentPath(const QString&);
-  QString getCurrentPath();
-  bool isDir(const QModelIndex&);
-  QStringList getFilePaths(const QModelIndex&);
-  QString getFilePath(const QString&);
-  QString getParentPath(const QString&);
-  QStringList splitPath(const QString&);
-  QAbstractItemModel* fileModel();
-  QAbstractItemModel* favoriteModel();
-  
-private:
-  class pqImplementation;
-  pqImplementation* const Implementation;
-  pqServer* Server;
-};
+//-----------------------------------------------------------------------------
+void pqClientProcessModuleGUIHelper::CreateMainWindow()
+{
+  // Should rename class MainWindow(). It should be prefixed with pq/vtk something
+  // otherwise we get funny looking statements like this.
+  this->MainWindow = new ::MainWindow();
+  this->MainWindow->resize(800, 600);
+}
 
-#endif // !_pqServerFileDialogModel_h
+//-----------------------------------------------------------------------------
+void pqClientProcessModuleGUIHelper::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
 

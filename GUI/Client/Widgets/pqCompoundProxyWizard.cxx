@@ -83,21 +83,28 @@ void pqCompoundProxyWizard::onLoad(const QStringList& files)
     parser->SetFileName(file.toAscii().data());
     parser->Parse();
 
-    vtkSMProxyManager* pm = pqServer::GetProxyManager();
-    pm->LoadCompoundProxyDefinitions(parser->GetRootElement());
-
-    // get names of all the compound proxies   
-    // TODO: proxy manager should probably give us a handle back on newly loaded compound proxies
-    unsigned int numElems = parser->GetRootElement()->GetNumberOfNestedElements();
-    for (unsigned int i=0; i<numElems; i++)
+    if (parser->GetRootElement())
       {
-      vtkPVXMLElement* currentElement = parser->GetRootElement()->GetNestedElement(i);
-      if (currentElement->GetName() &&
-          strcmp(currentElement->GetName(), "CompoundProxyDefinition") == 0)
+      vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+      pm->LoadCompoundProxyDefinitions(parser->GetRootElement());
+
+      // get names of all the compound proxies   
+      // TODO: proxy manager should probably give us a handle back on newly loaded compound proxies
+      unsigned int numElems = parser->GetRootElement()->GetNumberOfNestedElements();
+      for (unsigned int i=0; i<numElems; i++)
         {
-        const char* name = currentElement->GetAttribute("name");
-        emit this->newCompoundProxy(file, name);
+        vtkPVXMLElement* currentElement = parser->GetRootElement()->GetNestedElement(i);
+        if (currentElement->GetName() &&
+          strcmp(currentElement->GetName(), "CompoundProxyDefinition") == 0)
+          {
+          const char* name = currentElement->GetAttribute("name");
+          emit this->newCompoundProxy(file, name);
+          }
         }
+      }
+    else
+      {
+      //error.
       }
 
     parser->Delete();

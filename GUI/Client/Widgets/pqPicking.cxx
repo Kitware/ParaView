@@ -58,8 +58,9 @@ pqPicking::pqPicking(vtkSMRenderModuleProxy* rm, QObject* p)
   // quietly setup picking and highlighting pipeline
 
   // create the pick filter
-  vtkSMProxyManager *proxyManager = pqServer::GetProxyManager();
+  vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
   this->PickFilter = proxyManager->NewProxy("filters", "Pick");
+  this->PickFilter->SetConnectionID(rm->GetConnectionID());
   //this->PickFilter->CreateParts();  // needed?
 
   // specify we want to use points to pick with
@@ -88,6 +89,7 @@ pqPicking::pqPicking(vtkSMRenderModuleProxy* rm, QObject* p)
   
   // proxy to retrieve pick results
   this->PickRetriever = vtkSMPointLabelDisplayProxy::SafeDownCast(proxyManager->NewProxy("displays", "PointLabelDisplay"));
+  this->PickRetriever->SetConnectionID(rm->GetConnectionID());
   vtkSMInputProperty *inputProp;
   inputProp = vtkSMInputProperty::SafeDownCast(this->PickRetriever->GetProperty("Input"));
   inputProp->AddProxy(this->PickFilter);

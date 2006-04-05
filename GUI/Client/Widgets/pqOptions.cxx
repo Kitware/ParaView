@@ -35,76 +35,67 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkObjectFactory.h>
 
-vtkCxxRevisionMacro(pqOptions, "1.3");
 vtkStandardNewMacro(pqOptions);
+vtkCxxRevisionMacro(pqOptions, "1.4");
 
 //-----------------------------------------------------------------------------
-
 pqOptions::pqOptions()
 {
-  // The client/server mode is actually determined by the ProcessType.
-  // However, because that is an enumeration, we have to set it in post
-  // processing based on the ClientMode flag.
-  this->ClientMode = 0;
+  this->BaselineImage = 0;
+  this->TestDirectory = 0;
+  this->TestFileName = 0;
+  this->ImageThreshold = 10;
+  this->ExitBeforeEventLoop = 0;
 }
-
-pqOptions::~pqOptions()
-{
-}
-
-void pqOptions::PrintSelf(ostream &os, vtkIndent indent)
-{
-  os << indent << "ClientMode: " << this->ClientMode << endl;
-
-  this->Superclass::PrintSelf(os, indent);
-}
-
-void pqOptions::SetClientMode(int Mode)
-{
-  this->ClientMode = Mode;
-}
-
-void pqOptions::SetServerHost(const char* const Host)
-{
-  strcpy(ServerHostName, Host);
-}
-
-void pqOptions::SetServerPort(int Port)
-{
-  this->ServerPort = Port;
-}
-
 
 //-----------------------------------------------------------------------------
+pqOptions::~pqOptions()
+{
+  this->SetBaselineImage(0);
+  this->SetTestDirectory(0);
+  this->SetTestFileName(0);
+}
 
+//-----------------------------------------------------------------------------
 void pqOptions::Initialize()
 {
   this->Superclass::Initialize();
+  
+  this->AddArgument("--compare-view", NULL, 
+    &this->BaselineImage,
+    "Compare the viewport to a reference image, and exit.");
+  
+  this->AddArgument("--test-directory", NULL,
+    &this->TestDirectory,
+    "Set the temporary directory where test-case output will be stored.");
+  
+  this->AddArgument("--run-test", NULL,
+    &this->TestFileName,  "Run a recorded test case.");
+  
+  this->AddArgument("--image-threshold", NULL, &this->ImageThreshold,
+    "Set the threshold beyond which viewport-image comparisons fail.");
 
-  // Use AddArgument methods to add new arguments here.
-  this->AddBooleanArgument("--client", "-c", &this->ClientMode,
-                           "Run as a client to a ParaView server "
-                           "(which must be launched separately.");
+  this->AddBooleanArgument("--exit", NULL, &this->ExitBeforeEventLoop,
+    "Exit before starting the event loop. Use for testing.");
 }
 
 //-----------------------------------------------------------------------------
-
 int pqOptions::PostProcess(int argc, const char * const *argv)
 {
-  // Do any post processing of arguments (for example, if one argument
-  // implies another argument).
-
-  // ParaView now selects the client/server mode by generating different
-  // executables for each one.  While that may be a better approach, this
-  // simple example just uses a flag.
-  if (this->ClientMode)
-    {
-    this->SetProcessType(vtkPVOptions::PVCLIENT);
-    }
-  else
-    {
-    this->SetProcessType(vtkPVOptions::PARAVIEW);
-    }
-
   return this->Superclass::PostProcess(argc, argv);
+}
+
+//-----------------------------------------------------------------------------
+void pqOptions::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "ImageThreshold: " << this->ImageThreshold
+    << endl;
+  os << indent << "BaselineImage: " << (this->BaselineImage?
+    this->BaselineImage : "(none)") << endl;
+  os << indent << "TestDirectory: " << (this->TestDirectory?
+    this->TestDirectory : "(none)") << endl;
+  os << indent << "TestFileName: " << (this->TestFileName?
+    this->TestFileName : "(none)") << endl;
 }

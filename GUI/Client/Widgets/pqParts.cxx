@@ -296,6 +296,7 @@ void pqPart::Color(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype
     // create lut
     vtkSMLookupTableProxy* lut = vtkSMLookupTableProxy::SafeDownCast(
       vtkSMObject::GetProxyManager()->NewProxy("lookup_tables", "LookupTable"));
+    lut->SetConnectionID(Part->GetConnectionID());
     lut->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
     pp = vtkSMProxyProperty::SafeDownCast(Part->GetProperty("LookupTable"));
     pp->AddProxy(lut);

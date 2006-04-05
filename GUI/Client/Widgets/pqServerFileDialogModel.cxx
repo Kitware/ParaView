@@ -32,10 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqServerFileDialogModel.h"
 
+#include <pqServer.h>
 #include <vtkClientServerStream.h>
 #include <vtkProcessModule.h>
-#include <vtkProcessModuleConnectionManager.h>
-
+#include <vtkSmartPointer.h>
+#include <vtkSMProxy.h>
+#include <vtkSMProxyManager.h>
+#include <vtkSMStringVectorProperty.h>
+#include <vtkStringList.h>
 #include <QFileIconProvider>
 
 namespace
@@ -101,12 +105,10 @@ private:
 /////////////////////////////////////////////////////////////////////////////////
 // pqFileModel
 
-class pqFileModel :
-  public QAbstractItemModel
+class pqFileModel :  public QAbstractItemModel
 {
 public:
-  pqFileModel() :
-    ProcessModule(vtkProcessModule::GetProcessModule())
+  pqFileModel(pqServer* server) : Server(server)
   {
   } 
 
@@ -117,48 +119,29 @@ public:
 
     this->FileList.push_back(FileInfo(".", ".", true, false));
     this->FileList.push_back(FileInfo("..", "..", true, false));
-
-    vtkClientServerStream stream;
-    const vtkClientServerID ID = this->ProcessModule->NewStreamObject("vtkPVServerFileListing", stream);
-    stream
-      << vtkClientServerStream::Invoke
-      << ID
-      << "GetFileListing"
-      << Path.toAscii().data()
-      << 0
-      << vtkClientServerStream::End;
-    this->ProcessModule->SendStream(
-      vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
-      vtkProcessModule::DATA_SERVER_ROOT, stream);
-    vtkClientServerStream result;
-    this->ProcessModule->GetLastResult(
-      vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
-      vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &result);
-
-    if(result.GetNumberOfMessages() == 2)
+    
+    vtkSmartPointer<vtkStringList> dirs = vtkSmartPointer<vtkStringList>::New();
+    vtkSmartPointer<vtkStringList> files = vtkSmartPointer<vtkStringList>::New();
+    
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    if (!pm->GetDirectoryListing(this->Server->GetConnectionID(),
+      Path.toAscii().data(), dirs.GetPointer(), files.GetPointer(), 0))
       {
-      // The first message lists directories.
-      for(int i = 0; i < result.GetNumberOfArguments(0); ++i)
-        {
-        const char* directory_name = 0;
-        if(result.GetArgument(0, i, &directory_name))
-          {
-          this->FileList.push_back(FileInfo(directory_name, directory_name, true, false));
-          }
-        }
-
-      // The second message lists files.
-      for(int i = 0; i < result.GetNumberOfArguments(1); ++i)
-        {
-        const char* file_name = 0;
-        if(result.GetArgument(1, i, &file_name))
-          {
-          this->FileList.push_back(FileInfo(file_name, file_name, false, false));
-          }
-        }
+      // error failed to obtain directory listing.
+      return;
       }
-    this->ProcessModule->DeleteStreamObject(ID, stream);
 
+    int cc;
+    for (cc=0; cc < dirs->GetNumberOfStrings(); cc++)
+      {
+      const char* directory_name = dirs->GetString(cc);
+      this->FileList.push_back(FileInfo(directory_name, directory_name, true, false));
+      }
+    for (cc=0; cc < files->GetNumberOfStrings(); cc++)
+      {
+      const char* file_name = files->GetString(cc);
+      this->FileList.push_back(FileInfo(file_name, file_name, false, false));
+      }
     emit dataChanged(QModelIndex(), QModelIndex());
     emit layoutChanged();
   }
@@ -257,7 +240,7 @@ public:
     return QVariant();
   }
 
-  vtkProcessModule* const ProcessModule;
+  pqServer* Server;  // Connection from which the dir listing is to be fetched.
   QDir CurrentPath;
   QList<FileInfo> FileList;
 };
@@ -269,22 +252,20 @@ class pqFavoriteModel :
   public QAbstractItemModel
 {
 public:
-  pqFavoriteModel() :
-    ProcessModule(vtkProcessModule::GetProcessModule())
+  pqFavoriteModel(pqServer* server):
+    Server(server)
   {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();  
+    
     vtkClientServerStream stream;
-    const vtkClientServerID ID = this->ProcessModule->NewStreamObject("vtkPVServerFileListing", stream);
-    stream
-      << vtkClientServerStream::Invoke
-      << ID
-      << "GetSpecial"
-      << vtkClientServerStream::End;
-    this->ProcessModule->SendStream(
-      vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+    const vtkClientServerID ID = pm->NewStreamObject("vtkPVServerFileListing", stream);
+    stream << vtkClientServerStream::Invoke << ID
+      << "GetSpecial" << vtkClientServerStream::End;
+    pm->SendStream(this->Server->GetConnectionID(),
       vtkProcessModule::DATA_SERVER_ROOT, stream);
+    
     vtkClientServerStream result;
-    this->ProcessModule->GetLastResult(
-      vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+    pm->GetLastResult(this->Server->GetConnectionID(),
       vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &result);
 
     for(int i = 0; i < result.GetNumberOfMessages(); ++i)
@@ -304,7 +285,9 @@ public:
         }
       }
       
-    this->ProcessModule->DeleteStreamObject(ID, stream);
+    pm->DeleteStreamObject(ID, stream);
+    pm->SendStream(this->Server->GetConnectionID(), 
+      vtkProcessModule::DATA_SERVER_ROOT, stream);
   }
 
   QStringList getFilePaths(const QModelIndex& Index)
@@ -403,8 +386,8 @@ public:
       
     return QVariant();
   }
-  
-  vtkProcessModule* const ProcessModule;
+ 
+  pqServer* Server;
   QList<FileInfo> FavoriteList;
 };
 
@@ -416,9 +399,9 @@ public:
 class pqServerFileDialogModel::pqImplementation
 {
 public:
-  pqImplementation() :
-    FileModel(new pqFileModel()),
-    FavoriteModel(new pqFavoriteModel())
+  pqImplementation(pqServer* server) :
+    FileModel(new pqFileModel(server)),
+    FavoriteModel(new pqFavoriteModel(server))
   {
   }
   
@@ -435,10 +418,11 @@ public:
 //////////////////////////////////////////////////////////////////////////
 // pqServerFileDialogModel
 
-pqServerFileDialogModel::pqServerFileDialogModel(QObject* Parent) :
+pqServerFileDialogModel::pqServerFileDialogModel(QObject* Parent, pqServer* server) :
   base(Parent),
-  Implementation(new pqImplementation())
+  Implementation(new pqImplementation(server))
 {
+  this->Server = server;
 }
 
 pqServerFileDialogModel::~pqServerFileDialogModel()
@@ -448,24 +432,17 @@ pqServerFileDialogModel::~pqServerFileDialogModel()
 
 QString pqServerFileDialogModel::getStartPath()
 {
-  vtkClientServerStream stream;
-  const vtkClientServerID id = this->Implementation->FileModel->ProcessModule->NewStreamObject("vtkPVServerFileListing", stream);
-  stream
-    << vtkClientServerStream::Invoke
-    << id
-    << "GetCurrentWorkingDirectory"
-    << vtkClientServerStream::End;
-    
-  this->Implementation->FileModel->ProcessModule->SendStream(
-    vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
-    vtkProcessModule::DATA_SERVER_ROOT, stream);
-  const char* cwd = "";
-  this->Implementation->FileModel->ProcessModule->GetLastResult(
-    vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
-    vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &cwd);
-  QString result = cwd;
-  this->Implementation->FileModel->ProcessModule->DeleteStreamObject(id, stream);
+  vtkSMProxy* proxy = vtkSMObject::GetProxyManager()->NewProxy("file_listing",
+    "ServerFileListing");
+  proxy->SetConnectionID(this->Server->GetConnectionID());
+  proxy->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
+  proxy->UpdateVTKObjects();
+  proxy->UpdatePropertyInformation();
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    proxy->GetProperty("CurrentWorkingDirectory"));
+  const char* cwd = (svp)? svp->GetElement(0) : "";
   
+  QString result = cwd;
   return result;
 }
 

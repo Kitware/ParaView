@@ -108,7 +108,7 @@ void pqPipelineServer::SaveState(vtkPVXMLElement *root, pqMultiView *multiView)
 
     // Save display proxy to window relationships. Each object in the
     // map should have a display proxy.
-    vtkSMProxyManager *proxyManager = this->Server->GetProxyManager();
+    vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
     QHash<vtkSMProxy *, pqPipelineObject *>::Iterator jter =
         this->Internal->Objects.begin();
     for( ; jter != this->Internal->Objects.end(); ++jter)
@@ -130,7 +130,8 @@ void pqPipelineServer::SaveState(vtkPVXMLElement *root, pqMultiView *multiView)
   // Save the pipeline information.
   element = vtkPVXMLElement::New();
   element->SetName("ServerManagerState");
-  this->Server->GetProxyManager()->SaveState(element);
+  // TODO: Save state and multiple connections....how to they interact?
+  vtkSMObject::GetProxyManager()->SaveState(element);
   root->AddNestedElement(element);
   element->Delete();
 }
@@ -352,7 +353,7 @@ void pqPipelineServer::UnregisterObject(pqPipelineObject *object)
 {
   if(this->Server)
     {
-    vtkSMProxyManager *proxyManager = this->Server->GetProxyManager();
+    vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
     vtkSMDisplayProxy *display = object->GetDisplayProxy();
     vtkSMProxyProperty *property = vtkSMProxyProperty::SafeDownCast(
         display->GetProperty("LookupTable"));

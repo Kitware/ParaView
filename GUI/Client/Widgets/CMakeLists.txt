@@ -130,6 +130,8 @@ ADD_LIBRARY(pqWidgets
   pqPipelineServer.h
   pqPipelineWindow.cxx
   pqPipelineWindow.h
+  pqProcessModuleGUIHelper.cxx
+  pqProcessModuleGUIHelper.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
   pqSMAdaptor.cxx

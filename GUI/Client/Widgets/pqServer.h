@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqServer_h
 #define _pqServer_h
 
-class pqOptions;
 class vtkProcessModule;
+class vtkPVOptions;
 class vtkSMApplication;
 class vtkSMProxyManager;
 class vtkSMMultiViewRenderModuleProxy;
@@ -42,6 +42,8 @@ class vtkSMMultiViewRenderModuleProxy;
 #include "pqWidgetsExport.h"
 #include <QObject>
 #include <QString>
+#include "vtkConnectionID.h" // needed for connection Id.
+#include "vtkSmartPointer.h"
 
 /// Abstracts the concept of a "server connection" so that ParaQ clients may: have more than one connect at a time / open and close connections at-will
 class PQWIDGETS_EXPORT pqServer : public QObject
@@ -51,26 +53,40 @@ public:
   static pqServer* CreateStandalone();
   /// Constructs a server connection to a remote host, returns NULL on failure
   static pqServer* CreateConnection(const char* const hostName, const int portNumber);
+  static pqServer* CreateConnection(const char* const ds_hostName, const int ds_portNumber,
+    const char* const rs_hostName, const int rs_portNumber);
+
   virtual ~pqServer();
 
+  /// getAddress() will start reporting the correct address once, there is a separate 
+  /// vtkPVOptions per connection, until then, avoid using it.
   QString getAddress() const;
+
   const QString& getFriendlyName() const {return this->FriendlyName;}
   void setFriendlyName(const QString& name);
 
-  vtkProcessModule* GetProcessModule();
-  static vtkSMProxyManager* GetProxyManager();
+  /// Returns the multi view manager proxy for this connection.
   vtkSMMultiViewRenderModuleProxy* GetRenderModule();
 
-private:
-  pqServer(pqOptions*, vtkProcessModule*, vtkSMApplication*, vtkSMMultiViewRenderModuleProxy*);
-  pqServer(const pqServer&);
-  pqServer& operator=(const pqServer&);
+  vtkConnectionID GetConnectionID() { return this->ConnectionID; }
+protected:
+  pqServer(vtkConnectionID, vtkPVOptions*);
 
+  /// Creates vtkSMMultiViewRenderModuleProxy for this connection and 
+  /// initializes it to create render modules of correct type 
+  /// depending upon the connection.
+  void CreateRenderModule();
+private:
+  pqServer(const pqServer&);  // Not implemented.
+  pqServer& operator=(const pqServer&); // Not implemented.
+
+  vtkConnectionID ConnectionID;
   QString FriendlyName;
-  pqOptions* const Options;
-  vtkProcessModule* const ProcessModule;
-  static vtkSMApplication* ServerManager;
-  vtkSMMultiViewRenderModuleProxy* const RenderModule;
+  vtkSmartPointer<vtkSMMultiViewRenderModuleProxy> RenderModule;
+  // TODO:
+  // Each connection will eventually have a PVOptions object. 
+  // For now, this is same as the vtkProcessModule::Options.
+  vtkSmartPointer<vtkPVOptions> Options;
 };
 
 #endif // !_pqServer_h

@@ -34,20 +34,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqOptions_h
 
 #include <vtkPVOptions.h>
-
-/// This is a pqServer implementation detail
-/** \todo Make this private to pqServer */
+/*! \brief Command line options for pqClient.
+ *
+ * pqOptions extends vtkPVOptions to handle pqClient specific command line 
+ * options.
+ */
 class pqOptions : public vtkPVOptions
 {
 public:
-  vtkTypeRevisionMacro(pqOptions, vtkPVOptions);
   static pqOptions *New();
+  vtkTypeRevisionMacro(pqOptions, vtkPVOptions);
   void PrintSelf(ostream &os, vtkIndent indent);
 
-  void SetClientMode(int Mode);
-  void SetServerHost(const char* const HostName);
-  void SetServerPort(int Port);
-
+  vtkGetStringMacro(TestFileName);
+  vtkGetStringMacro(TestDirectory);
+  vtkGetStringMacro(BaselineImage);
+  vtkGetMacro(ImageThreshold, int);
+  vtkGetMacro(ExitBeforeEventLoop, int);
 protected:
   pqOptions();
   virtual ~pqOptions();
@@ -55,6 +58,16 @@ protected:
   virtual void Initialize();
   virtual int PostProcess(int argc, const char * const *argv);
 
+  char* TestFileName;
+  char* TestDirectory;
+  char* BaselineImage;
+  int ImageThreshold;
+  int ExitBeforeEventLoop;
+    
+  vtkSetStringMacro(TestFileName);
+  vtkSetStringMacro(TestDirectory);
+  vtkSetStringMacro(BaselineImage);
+  
 private:
   pqOptions(const pqOptions &);
   void operator=(const pqOptions &);

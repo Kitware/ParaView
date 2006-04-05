@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqServerFileDialogModel.h
+Module:    pqClientProcessModuleGUIHelper.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,45 +29,35 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#ifndef __pqClientProcessModudeGUIHelper_h
+#define __pqClientProcessModudeGUIHelper_h
 
-#ifndef _pqServerFileDialogModel_h
-#define _pqServerFileDialogModel_h
-
-#include "pqWidgetsExport.h"
-#include "pqFileDialogModel.h"
-
-class vtkProcessModule;
-class pqServer;
-
-/// Implementation of pqFileDialogModel that allows remote browsing of a connected ParaView server's filesystem
-class PQWIDGETS_EXPORT pqServerFileDialogModel :
-  public pqFileDialogModel
+#include "pqProcessModuleGUIHelper.h"
+/*!
+ * pqClientProcessModuleGUIHelper extends pqProcessModuleGUIHelper
+ * so that we can create the type of MainWindow needed for pqClient.
+ *
+ */
+class pqClientProcessModuleGUIHelper : public pqProcessModuleGUIHelper
 {
-  typedef pqFileDialogModel base;
-  
-  Q_OBJECT
-
 public:
-  /// server is the server for which we need the listing.
-  pqServerFileDialogModel(QObject* Parent, pqServer* server);
-  ~pqServerFileDialogModel();
+  static pqClientProcessModuleGUIHelper* New();
+  vtkTypeRevisionMacro(pqClientProcessModuleGUIHelper, pqProcessModuleGUIHelper);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
-  QString getStartPath();
-  void setCurrentPath(const QString&);
-  QString getCurrentPath();
-  bool isDir(const QModelIndex&);
-  QStringList getFilePaths(const QModelIndex&);
-  QString getFilePath(const QString&);
-  QString getParentPath(const QString&);
-  QStringList splitPath(const QString&);
-  QAbstractItemModel* fileModel();
-  QAbstractItemModel* favoriteModel();
-  
+protected:
+  pqClientProcessModuleGUIHelper();
+  ~pqClientProcessModuleGUIHelper();
+
+  /// subclasses can override this method to create their own
+  /// subclass of pqMainWindow as the Main Window.
+  virtual void CreateMainWindow();
+
 private:
-  class pqImplementation;
-  pqImplementation* const Implementation;
-  pqServer* Server;
+  pqClientProcessModuleGUIHelper(const pqClientProcessModuleGUIHelper&); // Not implemented.
+  void operator=(const pqClientProcessModuleGUIHelper&); // Not implemented.
 };
 
-#endif // !_pqServerFileDialogModel_h
+#endif
+
 

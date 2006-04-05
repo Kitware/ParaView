@@ -580,6 +580,7 @@ bool pqMainWindow::eventFilter(QObject* watched, QEvent* e)
 
 void pqMainWindow::setServer(pqServer* Server)
 {
+  /*
   if(this->Implementation->CurrentServer)
     {
     if(this->Implementation->CompoundProxyToolBar)
@@ -589,7 +590,7 @@ void pqMainWindow::setServer(pqServer* Server)
     this->Implementation->Pipeline->removeServer(this->Implementation->CurrentServer);
     delete this->Implementation->CurrentServer;
     }
-
+  */
   this->Implementation->CurrentServer = Server;
   if(this->Implementation->CurrentServer)
     {
@@ -679,7 +680,8 @@ void pqMainWindow::onFileOpen(pqServer* Server)
   if(this->Implementation->CurrentServer != Server)
     setServer(Server);
 
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(), tr("Open File:"), this, "fileOpenDialog");
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(NULL, Server), 
+    tr("Open File:"), this, "fileOpenDialog");
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileOpen(const QStringList&)));
   file_dialog->show();
@@ -700,7 +702,7 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
       QString file = Files[i];
       
       source = this->Implementation->Pipeline->createSource("ExodusReader", win);
-      this->Implementation->CurrentServer->GetProxyManager()->RegisterProxy("paraq", "source1", source);
+      vtkSMObject::GetProxyManager()->RegisterProxy("paraq", "source1", source);
       source->Delete();
       pqSMAdaptor::setElementProperty(source, source->GetProperty("FileName"), file);
       pqSMAdaptor::setElementProperty(source, source->GetProperty("FilePrefix"), file);
@@ -906,7 +908,7 @@ bool pqMainWindow::compareView(const QString& ReferenceImage, double Threshold, 
 
 void pqMainWindow::onServerConnect()
 {
-  setServer(0);
+  this->setServer(0);
   
   pqServerBrowser* const server_browser = new pqServerBrowser(this);
   server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
@@ -916,12 +918,20 @@ void pqMainWindow::onServerConnect()
 
 void pqMainWindow::onServerConnect(pqServer* Server)
 {
-  setServer(Server);
+  this->setServer(Server);
 }
 
 void pqMainWindow::onServerDisconnect()
 {
-  setServer(0);
+  // Get the active server and close the connection.
+  pqServer* server = this->Implementation->CurrentServer;
+  if (!server)
+    {
+    // nothing to disconnect from.
+    return;
+    }
+  this->Implementation->Pipeline->removeServer(server);
+  delete server;
 }
 
 void pqMainWindow::onUpdateSourcesFiltersMenu(pqServer*)
@@ -993,7 +1003,7 @@ void pqMainWindow::onUpdateSourcesFiltersMenu(pqServer*)
         }
       }
 
-    vtkSMProxyManager* manager = this->Implementation->CurrentServer->GetProxyManager();
+    vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
     manager->InstantiateGroupPrototypes("filters");
     int numFilters = manager->GetNumberOfProxies("filters_prototypes");
     for(int i=0; i<numFilters; i++)

@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqOutputWindow.h"
 #include "ui_pqOutputWindow.h"
-
+#include "vtkObjectFactory.h"
 //#include <QTextCharFormat>
 
 //////////////////////////////////////////////////////////////////////
@@ -68,6 +68,7 @@ void pqOutputWindow::onDisplayText(const QString& text)
   this->Implementation->Ui.consoleWidget->setFormat(format);
   
   this->Implementation->Ui.consoleWidget->printString(text + "\n");
+  cerr << text.toAscii().data() << endl;
 
   this->show();
 }
@@ -80,6 +81,7 @@ void pqOutputWindow::onDisplayWarningText(const QString& text)
   this->Implementation->Ui.consoleWidget->setFormat(format);
   
   this->Implementation->Ui.consoleWidget->printString(text + "\n");
+  cerr << text.toAscii().data() << endl;
 
   this->show();
 }
@@ -92,6 +94,7 @@ void pqOutputWindow::onDisplayGenericWarningText(const QString& text)
   this->Implementation->Ui.consoleWidget->setFormat(format);
   
   this->Implementation->Ui.consoleWidget->printString(text + "\n");
+  cerr << text.toAscii().data() << endl;
 
   this->show();
 }
@@ -104,6 +107,7 @@ void pqOutputWindow::onDisplayErrorText(const QString& text)
   this->Implementation->Ui.consoleWidget->setFormat(format);
   
   this->Implementation->Ui.consoleWidget->printString(text + "\n");
+  cerr << text.toAscii().data() << endl;
 
   this->show();
 }

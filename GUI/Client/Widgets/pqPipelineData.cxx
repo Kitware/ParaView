@@ -304,7 +304,8 @@ void pqPipelineData::loadState(vtkPVXMLElement *root, pqMultiView *multiView)
               "ServerManagerState");
           if(element)
             {
-            server->GetProxyManager()->LoadState(element);
+            vtkSMObject::GetProxyManager()->LoadState(element, 
+              server->GetConnectionID());
             }
 
           // TEMP: Update the pipeline connection information.
@@ -413,7 +414,7 @@ void pqPipelineData::addServer(pqServer *server)
     this->Internal->Servers.append(object);
 
     // Listen for pipeline events from the server.
-    vtkSMProxyManager *proxyManager = server->GetProxyManager();
+    vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
     this->VTKConnect->Connect(proxyManager, vtkCommand::RegisterEvent, this,
         SLOT(proxyRegistered(vtkObject*, unsigned long, void*, void*, vtkCommand*)),
         NULL, 1.0);
@@ -607,8 +608,10 @@ vtkSMSourceProxy *pqPipelineData::createSource(const char *proxyName,
     return 0;
 
   // Create a proxy object on the server.
-  vtkSMProxyManager *proxyManager = server->GetServer()->GetProxyManager();
-  vtkSMSourceProxy *proxy = vtkSMSourceProxy::SafeDownCast(proxyManager->NewProxy("sources", proxyName));
+  vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
+  vtkSMSourceProxy *proxy = 
+    vtkSMSourceProxy::SafeDownCast(proxyManager->NewProxy("sources", proxyName));
+  proxy->SetConnectionID(server->GetServer()->GetConnectionID());
 
   // Register the proxy with the server manager. Use a unique name
   // based on the class name and a count.
@@ -653,8 +656,10 @@ vtkSMSourceProxy *pqPipelineData::createFilter(const char *proxyName,
     return 0;
 
   // Create a proxy object on the server.
-  vtkSMProxyManager *proxyManager = server->GetServer()->GetProxyManager();
-  vtkSMSourceProxy *proxy = vtkSMSourceProxy::SafeDownCast(proxyManager->NewProxy("filters", proxyName));
+  vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
+  vtkSMSourceProxy *proxy = 
+    vtkSMSourceProxy::SafeDownCast(proxyManager->NewProxy("filters", proxyName));
+  proxy->SetConnectionID(server->GetServer()->GetConnectionID());
 
   // Register the proxy with the server manager. Use a unique name
   // based on the class name and a count.
@@ -699,8 +704,10 @@ vtkSMCompoundProxy *pqPipelineData::createCompoundProxy(const char *proxyName,
     return 0;
 
   // Create a proxy object on the server.
-  vtkSMProxyManager *proxyManager = server->GetServer()->GetProxyManager();
-  vtkSMCompoundProxy *proxy = vtkSMCompoundProxy::SafeDownCast(proxyManager->NewCompoundProxy(proxyName));
+  vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
+  vtkSMCompoundProxy *proxy = vtkSMCompoundProxy::SafeDownCast(
+    proxyManager->NewCompoundProxy(proxyName));
+  proxy->SetConnectionID(server->GetServer()->GetConnectionID());
   proxy->UpdateVTKObjects();
 
   // Register the proxy with the server manager. Use a unique name
@@ -818,7 +825,7 @@ vtkSMDisplayProxy* pqPipelineData::createDisplay(vtkSMSourceProxy* proxy, vtkSMP
     QString name;
     name.setNum(this->Names->GetCountAndIncrement("Display"));
     name.prepend("Display");
-    vtkSMProxyManager *proxyManager = server->GetServer()->GetProxyManager();
+    vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
     proxyManager->RegisterProxy("displays", name.toAscii().data(), display);
     display->Delete();
     }

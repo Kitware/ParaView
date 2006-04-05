@@ -59,7 +59,9 @@ ADD_EXECUTABLE(pqClient WIN32 MACOSX_BUNDLE
   AboutDialog.h
   MainWindow.cxx
   MainWindow.h
-  main.cxx
+  pqClient.cxx
+  pqClientProcessModuleGUIHelper.cxx
+  pqClientProcessModuleGUIHelper.h
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}
   ${UI_BUILT_SOURCES}
@@ -79,7 +81,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 IF(BUILD_TESTING)
-  SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/pqClient --test-directory ${PARAQ_TEST_DIR})
+  SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/pqClient --test-directory=${PARAQ_TEST_DIR})
   SET(TEST_XML ${pqClient_SOURCE_DIR}/Testing/XML)
   SET(TEST_IMAGE ${PARAQ_DATA_ROOT}/Baseline)
 
@@ -98,13 +100,13 @@ IF(BUILD_TESTING)
                
   FOREACH(test ${TESTS_WITHOUT_BASELINES})
     ADD_TEST(pqClient${test}
-      ${TEST_BINARY} --run-test ${TEST_XML}/${test}.xml --exit)
+      ${TEST_BINARY} --run-test=${TEST_XML}/${test}.xml --exit)
   ENDFOREACH(test)
    
   FOREACH(test ${TESTS_WITH_BASELINES})
     ADD_TEST(pqClient${test}
-      ${TEST_BINARY} --run-test ${TEST_XML}/${test}.xml 
-      --compare-view ${TEST_IMAGE}/${test}.png
+      ${TEST_BINARY} --run-test=${TEST_XML}/${test}.xml
+      --compare-view=${TEST_IMAGE}/${test}.png
       --exit)
   ENDFOREACH(test) 
   
