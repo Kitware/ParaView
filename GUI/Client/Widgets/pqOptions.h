@@ -33,13 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqOptions_h
 #define __pqOptions_h
 
+#include "pqWidgetsExport.h"
 #include <vtkPVOptions.h>
 /*! \brief Command line options for pqClient.
  *
  * pqOptions extends vtkPVOptions to handle pqClient specific command line 
  * options.
  */
-class pqOptions : public vtkPVOptions
+class PQWIDGETS_EXPORT pqOptions : public vtkPVOptions
 {
 public:
   static pqOptions *New();
