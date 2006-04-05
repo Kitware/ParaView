@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTheme);
-vtkCxxRevisionMacro(vtkKWTheme, "1.1");
+vtkCxxRevisionMacro(vtkKWTheme, "1.2");
 
 //----------------------------------------------------------------------------
 void vtkKWTheme::Install()
@@ -36,9 +36,9 @@ void vtkKWTheme::Install()
   // we should save the options we are about to replace here and
   // restore them in Uninstall
 
+#if 0
   vtkKWOptionDataBase *odb = this->GetApplication()->GetOptionDataBase();
 
-#if 0
   odb->AddEntryAsInt("vtkKWLabel", "Relief", vtkKWTkOptions::ReliefRidge);
   odb->AddEntryAsInt("vtkKWLabel", "BorderWidth", 2);
   odb->AddEntryAsDouble3("vtkKWLabel", "BackgroundColor", 0.2, 0.3, 0.6);

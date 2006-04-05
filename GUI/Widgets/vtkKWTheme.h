@@ -13,6 +13,8 @@
 =========================================================================*/
 // .NAME vtkKWTheme - a theme superclass
 // .SECTION Description
+// This class provides very simple/basic theming capabilities. 
+// It is under development right now.
 // .SECTION Thanks
 // This work is part of the National Alliance for Medical Image
 // Computing (NAMIC), funded by the National Institutes of Health

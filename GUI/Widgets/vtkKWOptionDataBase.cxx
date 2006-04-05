@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWOptionDataBase);
-vtkCxxRevisionMacro(vtkKWOptionDataBase, "1.1");
+vtkCxxRevisionMacro(vtkKWOptionDataBase, "1.2");
 
 //----------------------------------------------------------------------------
 class vtkKWOptionDataBaseInternals
@@ -183,6 +183,8 @@ void vtkKWOptionDataBase::ConfigureObject(vtkKWObject *obj)
   this->ConfigureObject(obj, "*");
 
   // Process the class hierarchy
+  // TODO: this should be class in a map of list of class names
+  // i.e.: vtkKWScale: vtkObject, vtkKWObject, vtkkWWidget, vtkKWCoreWidget...
 
   ostrstream revisions;
   obj->PrintRevisions(revisions);
@@ -213,6 +215,8 @@ void vtkKWOptionDataBase::ConfigureObject(vtkKWObject *obj,
     return;
     }
 
+  // TODO: this should be made much faster
+  // i.e. construct a string for all options to apply, *then* script it
   vtkKWOptionDataBaseInternals::EntryPoolIterator p_it = 
     this->Internals->EntryPool.find(pattern);
   if (p_it == this->Internals->EntryPool.end())
