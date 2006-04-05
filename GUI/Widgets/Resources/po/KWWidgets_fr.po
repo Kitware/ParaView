@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-04-04 21:03-0400\n"
-"PO-Revision-Date: 2006-04-02 16:52-0400\n"
+"POT-Creation-Date: 2006-04-05 17:59-0400\n"
+"PO-Revision-Date: 2006-04-05 17:59-0400\n"
 "Last-Translator: <EMAIL@ADDRESS>\n"
 "Language-Team: French\n"
 "MIME-Version: 1.0\n"
@@ -27,8 +27,8 @@ msgstr "Êtes vous certain de vouloir quitter %s?"
 msgid "Exit Dialog|Title|Exit %s"
 msgstr "Quitter %s"
 
-#: ../../vtkKWApplicationSettingsInterface.cxx:50 ../../vtkKWWindow.cxx:519
-msgid "Application Settings|Title|Application Settings"
+#: ../../vtkKWApplicationSettingsInterface.cxx:50
+msgid "Application Settings Panel|Title|Application Settings"
 msgstr "Paramètres de l'Application"
 
 #: ../../vtkKWMessageDialog.cxx:55 ../../vtkKWMessageDialog.cxx:163
@@ -123,6 +123,10 @@ msgstr "Interacteur &Tcl"
 msgid "Display a prompt to interact with the Tcl engine"
 msgstr "Afficher une interface d'interaction avec le moteur Tcl"
 
+#: ../../vtkKWWindow.cxx:519
+msgid "Application Settings|Title|Application Settings"
+msgstr "Paramètres de l'Application"
+
 #: ../../vtkKWWindowBase.cxx:102
 msgid "Menu|&File"
 msgstr "&Fichier"
@@ -180,35 +184,35 @@ msgstr "Barres d'&Outils"
 msgid "Toolbar|Status And Progress"
 msgstr "État et Progression"
 
-#: ../../vtkKWWindowBase.cxx:687
-msgid "Close Dialog|Are you sure you want to close this window?"
+#: ../../vtkKWWindowBase.cxx:686
+msgid "Are you sure you want to close this window?"
 msgstr "Êtes vous certain de vouloir quitter %s?"
 
-#: ../../vtkKWWindowBase.cxx:982
+#: ../../vtkKWWindowBase.cxx:981
 msgid "Menu|Window|Show/Hide Toolbars"
 msgstr "Montrer/Cacher les Barres d'Outils"
 
-#: ../../vtkKWWindowBase.cxx:1074
+#: ../../vtkKWWindowBase.cxx:1073
 #, c-format
 msgid "Load Script Dialog|File Type|%s Scripts"
 msgstr "Scripts %s"
 
-#: ../../vtkKWWindowBase.cxx:1082
+#: ../../vtkKWWindowBase.cxx:1081
 msgid "Load Script Dialog|File Type|All Files"
 msgstr "Tous les Fichiers"
 
-#: ../../vtkKWWindowBase.cxx:1119
+#: ../../vtkKWWindowBase.cxx:1118
 msgid "Warning Dialog|Title|Warning!"
 msgstr "Attention!"
 
-#: ../../vtkKWWindowBase.cxx:1130
+#: ../../vtkKWWindowBase.cxx:1129
 msgid "Error Dialog|Title|Error!"
 msgstr "Erreur!"
 
-#: ../../vtkKWWindowBase.cxx:1218
+#: ../../vtkKWWindowBase.cxx:1217
 msgid "Tcl Interactor Dialog|Title|Tcl Interactor"
 msgstr "Interacteur Tcl"
 
-#: ../../vtkKWWindowBase.cxx:1353
+#: ../../vtkKWWindowBase.cxx:1352
 msgid "Can not close window while it is disabled"
 msgstr "La fenêtre ne peut être fermée lorsqu'elle est desactivée"

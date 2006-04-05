@@ -41,13 +41,13 @@ const char *vtkKWApplicationSettingsInterface::PrintSettingsLabel = "Page Setup"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.54");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.55");
 
 //----------------------------------------------------------------------------
 vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
 {
   this->SetName(
-    ks_("Application Settings|Title|Application Settings"));
+    ks_("Application Settings Panel|Title|Application Settings"));
 
   this->Window = 0;
 

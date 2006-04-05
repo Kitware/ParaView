@@ -33,7 +33,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.46");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.47");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -683,8 +683,7 @@ int vtkKWWindowBase::DisplayCloseDialog()
     vtkKWMessageDialog::Beep | 
     vtkKWMessageDialog::YesDefault);
   dialog->Create();
-  dialog->SetText(
-    ks_("Close Dialog|Are you sure you want to close this window?"));
+  dialog->SetText(ks_("Are you sure you want to close this window?"));
   dialog->SetTitle(this->GetFileCloseMenuLabel());
   int ret = dialog->Invoke();
   dialog->Delete();

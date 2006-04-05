@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-04-04 21:03-0400\n"
+"POT-Creation-Date: 2006-04-05 17:59-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,8 +26,8 @@ msgstr ""
 msgid "Exit Dialog|Title|Exit %s"
 msgstr ""
 
-#: ../../vtkKWApplicationSettingsInterface.cxx:50 ../../vtkKWWindow.cxx:519
-msgid "Application Settings|Title|Application Settings"
+#: ../../vtkKWApplicationSettingsInterface.cxx:50
+msgid "Application Settings Panel|Title|Application Settings"
 msgstr ""
 
 #: ../../vtkKWMessageDialog.cxx:55 ../../vtkKWMessageDialog.cxx:163
@@ -119,6 +119,10 @@ msgstr ""
 msgid "Display a prompt to interact with the Tcl engine"
 msgstr ""
 
+#: ../../vtkKWWindow.cxx:519
+msgid "Application Settings|Title|Application Settings"
+msgstr ""
+
 #: ../../vtkKWWindowBase.cxx:102
 msgid "Menu|&File"
 msgstr ""
@@ -176,35 +180,35 @@ msgstr ""
 msgid "Toolbar|Status And Progress"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:687
-msgid "Close Dialog|Are you sure you want to close this window?"
+#: ../../vtkKWWindowBase.cxx:686
+msgid "Are you sure you want to close this window?"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:982
+#: ../../vtkKWWindowBase.cxx:981
 msgid "Menu|Window|Show/Hide Toolbars"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:1074
+#: ../../vtkKWWindowBase.cxx:1073
 #, c-format
 msgid "Load Script Dialog|File Type|%s Scripts"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:1082
+#: ../../vtkKWWindowBase.cxx:1081
 msgid "Load Script Dialog|File Type|All Files"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:1119
+#: ../../vtkKWWindowBase.cxx:1118
 msgid "Warning Dialog|Title|Warning!"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:1130
+#: ../../vtkKWWindowBase.cxx:1129
 msgid "Error Dialog|Title|Error!"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:1218
+#: ../../vtkKWWindowBase.cxx:1217
 msgid "Tcl Interactor Dialog|Title|Tcl Interactor"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:1353
+#: ../../vtkKWWindowBase.cxx:1352
 msgid "Can not close window while it is disabled"
 msgstr ""
