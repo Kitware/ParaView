@@ -16,14 +16,15 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWFrame);
-vtkCxxRevisionMacro(vtkKWFrame, "1.31");
+vtkCxxRevisionMacro(vtkKWFrame, "1.32");
 
 //----------------------------------------------------------------------------
 void vtkKWFrame::Create()
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget("frame"))
+  if (!this->Superclass::CreateSpecificTkWidget(
+        "frame", "-highlightthickness 0"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRadioButton );
-vtkCxxRevisionMacro(vtkKWRadioButton, "1.27");
+vtkCxxRevisionMacro(vtkKWRadioButton, "1.28");
 
 //----------------------------------------------------------------------------
 void vtkKWRadioButton::Create()
@@ -25,7 +25,7 @@ void vtkKWRadioButton::Create()
   // Call the superclass to create the widget and set the appropriate flags
 
   if (!this->vtkKWWidget::CreateSpecificTkWidget(
-        "radiobutton", "-value 1"))
+        "radiobutton", "-value 1 -highlightthickness 0"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

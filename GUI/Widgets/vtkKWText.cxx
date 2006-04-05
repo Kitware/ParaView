@@ -34,7 +34,7 @@ const char *vtkKWText::TagFgDarkGreen = "_fg_dark_green_tag_";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.48");
+vtkCxxRevisionMacro(vtkKWText, "1.49");
 
 //----------------------------------------------------------------------------
 class vtkKWTextInternals
@@ -280,7 +280,7 @@ void vtkKWText::Create()
   // Call the superclass to set the appropriate flags then create manually
 
   if (!this->Superclass::CreateSpecificTkWidget(
-        "text", "-width 20 -wrap word -height 5"))
+        "text", "-width 20 -wrap word -height 5 -highlightthickness 0"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
