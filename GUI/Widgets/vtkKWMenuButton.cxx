@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.35");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.36");
 
 //----------------------------------------------------------------------------
 vtkKWMenuButton::vtkKWMenuButton()
@@ -49,7 +49,8 @@ void vtkKWMenuButton::Create()
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::CreateSpecificTkWidget("menubutton"))
+  if (!this->Superclass::CreateSpecificTkWidget(
+        "menubutton", "-indicatoron 1 -relief raised -bd 2 -highlightthickness 0 -anchor center -direction flush"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -59,13 +60,6 @@ void vtkKWMenuButton::Create()
   this->Menu->Create();
   this->Menu->SetTearOff(0);
 
-  this->IndicatorVisibilityOn();
-  this->SetReliefToRaised();
-  this->SetBorderWidth(2);
-  this->SetHighlightThickness(0);
-  this->SetAnchorToCenter();
-
-  this->SetConfigurationOption("-direction", "flush");
   this->SetConfigurationOption("-menu", this->Menu->GetWidgetName());
 
   this->Script("set %s_Value {}", this->GetTclName());
@@ -234,11 +228,225 @@ int vtkKWMenuButton::GetWidth()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWMenuButton::GetBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWMenuButton::GetBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-background");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::SetBackgroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::GetForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-foreground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWMenuButton::GetForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-foreground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::SetForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-foreground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::SetHighlightThickness(int width)
+{
+  this->SetConfigurationOptionAsInt("-highlightthickness", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenuButton::GetHighlightThickness()
+{
+  return this->GetConfigurationOptionAsInt("-highlightthickness");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::GetActiveBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-activebackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWMenuButton::GetActiveBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-activebackground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::SetActiveBackgroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-activebackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::GetActiveForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-activeforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWMenuButton::GetActiveForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-activeforeground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::SetActiveForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-activeforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::GetDisabledForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-disabledforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWMenuButton::GetDisabledForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-disabledforeground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::SetDisabledForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-disabledforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::SetBorderWidth(int width)
+{
+  this->SetConfigurationOptionAsInt("-bd", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenuButton::GetBorderWidth()
+{
+  return this->GetConfigurationOptionAsInt("-bd");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::SetRelief(int relief)
+{
+  this->SetConfigurationOption(
+    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+}
+
+void vtkKWMenuButton::SetReliefToRaised()     
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+};
+void vtkKWMenuButton::SetReliefToSunken() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+};
+void vtkKWMenuButton::SetReliefToFlat() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+};
+void vtkKWMenuButton::SetReliefToRidge() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+};
+void vtkKWMenuButton::SetReliefToSolid() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+};
+void vtkKWMenuButton::SetReliefToGroove() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+};
+
+//----------------------------------------------------------------------------
+int vtkKWMenuButton::GetRelief()
+{
+  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+    this->GetConfigurationOption("-relief"));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::SetPadX(int arg)
+{
+  this->SetConfigurationOptionAsInt("-padx", arg);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenuButton::GetPadX()
+{
+  return this->GetConfigurationOptionAsInt("-padx");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::SetPadY(int arg)
+{
+  this->SetConfigurationOptionAsInt("-pady", arg);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenuButton::GetPadY()
+{
+  return this->GetConfigurationOptionAsInt("-pady");
+}
+
+//----------------------------------------------------------------------------
 void vtkKWMenuButton::SetAnchor(int anchor)
 {
   this->SetConfigurationOption(
     "-anchor", vtkKWTkOptions::GetAnchorAsTkOptionValue(anchor));
 }
+
+void vtkKWMenuButton::SetAnchorToNorth() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorNorth); 
+};
+void vtkKWMenuButton::SetAnchorToNorthEast() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorNorthEast); 
+};
+void vtkKWMenuButton::SetAnchorToEast() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorEast); 
+};
+void vtkKWMenuButton::SetAnchorToSouthEast() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorSouthEast); 
+};
+void vtkKWMenuButton::SetAnchorToSouth() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorSouth); 
+};
+void vtkKWMenuButton::SetAnchorToSouthWest() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorSouthWest); 
+};
+void vtkKWMenuButton::SetAnchorToWest() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorWest); 
+};
+void vtkKWMenuButton::SetAnchorToNorthWest() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorNorthWest); 
+};
+void vtkKWMenuButton::SetAnchorToCenter() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorCenter); 
+};
 
 //----------------------------------------------------------------------------
 int vtkKWMenuButton::GetAnchor()

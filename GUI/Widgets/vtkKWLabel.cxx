@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.47");
+vtkCxxRevisionMacro(vtkKWLabel, "1.48");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -93,13 +93,12 @@ void vtkKWLabel::Create()
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget("label"))
+  if (!this->Superclass::CreateSpecificTkWidget(
+        "label", "-justify left"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  this->SetJustificationToLeft();
 
   this->UpdateText();
 
@@ -201,11 +200,201 @@ void vtkKWLabel::SetJustification(int justification)
     vtkKWTkOptions::GetJustificationAsTkOptionValue(justification));
 }
 
+void vtkKWLabel::SetJustificationToLeft() 
+{ 
+  this->SetJustification(vtkKWTkOptions::JustificationLeft); 
+};
+void vtkKWLabel::SetJustificationToCenter() 
+{ 
+  this->SetJustification(vtkKWTkOptions::JustificationCenter); 
+};
+void vtkKWLabel::SetJustificationToRight() 
+{ 
+  this->SetJustification(vtkKWTkOptions::JustificationRight); 
+};
+
 //----------------------------------------------------------------------------
 int vtkKWLabel::GetJustification()
 {
   return vtkKWTkOptions::GetJustificationFromTkOptionValue(
     this->GetConfigurationOption("-justify"));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::GetBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWLabel::GetBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-background");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::SetBackgroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::GetForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-foreground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWLabel::GetForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-foreground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::SetForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-foreground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::SetHighlightThickness(int width)
+{
+  this->SetConfigurationOptionAsInt("-highlightthickness", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWLabel::GetHighlightThickness()
+{
+  return this->GetConfigurationOptionAsInt("-highlightthickness");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::GetActiveBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-activebackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWLabel::GetActiveBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-activebackground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::SetActiveBackgroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-activebackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::GetActiveForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-activeforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWLabel::GetActiveForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-activeforeground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::SetActiveForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-activeforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::GetDisabledForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-disabledforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWLabel::GetDisabledForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-disabledforeground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::SetDisabledForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-disabledforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::SetBorderWidth(int width)
+{
+  this->SetConfigurationOptionAsInt("-bd", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWLabel::GetBorderWidth()
+{
+  return this->GetConfigurationOptionAsInt("-bd");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::SetRelief(int relief)
+{
+  this->SetConfigurationOption(
+    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+}
+
+void vtkKWLabel::SetReliefToRaised()     
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+};
+void vtkKWLabel::SetReliefToSunken() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+};
+void vtkKWLabel::SetReliefToFlat() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+};
+void vtkKWLabel::SetReliefToRidge() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+};
+void vtkKWLabel::SetReliefToSolid() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+};
+void vtkKWLabel::SetReliefToGroove() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+};
+
+//----------------------------------------------------------------------------
+int vtkKWLabel::GetRelief()
+{
+  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+    this->GetConfigurationOption("-relief"));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::SetPadX(int arg)
+{
+  this->SetConfigurationOptionAsInt("-padx", arg);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWLabel::GetPadX()
+{
+  return this->GetConfigurationOptionAsInt("-padx");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::SetPadY(int arg)
+{
+  this->SetConfigurationOptionAsInt("-pady", arg);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWLabel::GetPadY()
+{
+  return this->GetConfigurationOptionAsInt("-pady");
 }
 
 //----------------------------------------------------------------------------
@@ -226,6 +415,43 @@ void vtkKWLabel::SetAnchor(int anchor)
   this->SetConfigurationOption(
     "-anchor", vtkKWTkOptions::GetAnchorAsTkOptionValue(anchor));
 }
+
+void vtkKWLabel::SetAnchorToNorth() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorNorth); 
+};
+void vtkKWLabel::SetAnchorToNorthEast() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorNorthEast); 
+};
+void vtkKWLabel::SetAnchorToEast() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorEast); 
+};
+void vtkKWLabel::SetAnchorToSouthEast() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorSouthEast); 
+};
+void vtkKWLabel::SetAnchorToSouth() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorSouth); 
+};
+void vtkKWLabel::SetAnchorToSouthWest() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorSouthWest); 
+};
+void vtkKWLabel::SetAnchorToWest() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorWest); 
+};
+void vtkKWLabel::SetAnchorToNorthWest() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorNorthWest); 
+};
+void vtkKWLabel::SetAnchorToCenter() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorCenter); 
+};
 
 //----------------------------------------------------------------------------
 int vtkKWLabel::GetAnchor()

@@ -102,7 +102,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.63");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.64");
 
 //----------------------------------------------------------------------------
 
@@ -2098,8 +2098,7 @@ void vtkPVDisplayGUI::BrowseMaterial()
   // on the client, and sent to the server(s) if required.
   vtkKWLoadSaveDialog* dialog = vtkKWLoadSaveDialog::New(); 
   dialog->SetApplication(this->GetPVApplication());
-  this->GetApplication()->RetrieveDialogLastPathRegistryValue(dialog,
-    "BrowseMaterial");
+  dialog->RetrieveLastPathFromRegistry("BrowseMaterial");
   dialog->Create();
   dialog->SetParent(this);
   dialog->SetTitle("Open Material Xml");
@@ -2108,8 +2107,7 @@ void vtkPVDisplayGUI::BrowseMaterial()
   if (dialog->Invoke())
     {
     this->SetMaterial(dialog->GetFileName(), 0);
-    this->GetPVApplication()->SaveDialogLastPathRegistryValue(dialog, 
-      "BrowseMaterial");
+    dialog->SaveLastPathToRegistry("BrowseMaterial");
     }
   dialog->Delete();
 }

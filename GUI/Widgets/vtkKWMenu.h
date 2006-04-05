@@ -85,7 +85,7 @@ public:
   virtual int GetItemSelectedState(const char *label);
 
   // Description: 
-  // Convenience method to select/deselect a checkbutton or radiobutton.
+  // Select/Deselect a checkbutton or radiobutton.
   // These methods are just front-end to SetItemSelectedState. The same
   // constraints apply, i.e. you can *not* deselect a radiobutton (but
   // should select another radiobutton in the same group).
@@ -167,7 +167,7 @@ public:
 
   // Description:
   // Set/Get the value associated to the selected state of a checkbutton
-  // or radiobutton menu item. Convenience methods are provided to set/get
+  // or radiobutton menu item. Convenience methods are provided to Set/Get
   // that value as an integer.
   // By default, checkbutton are assigned a selected value of 1. Radiobuttons
   // are assigned a value corresponding to their own label (or image name).
@@ -277,7 +277,7 @@ public:
   virtual int GetItemState(const char *label);
 
   // Description:
-  // Convenience method to set the state of all entries.
+  // Set the state of all entries.
   // Valid constants can be found in vtkKWTkOptions::StateType.
   // This should not be used directly, this is done by 
   // SetEnabled()/UpdateEnableState(). 
@@ -440,6 +440,81 @@ public:
     CascadeItemAddedEvent
   };
   //ETX
+
+  // Description:
+  // Set/Get the background color of the widget.
+  virtual void GetBackgroundColor(double *r, double *g, double *b);
+  virtual double* GetBackgroundColor();
+  virtual void SetBackgroundColor(double r, double g, double b);
+  virtual void SetBackgroundColor(double rgb[3])
+    { this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+  
+  // Description:
+  // Set/Get the foreground color of the widget.
+  virtual void GetForegroundColor(double *r, double *g, double *b);
+  virtual double* GetForegroundColor();
+  virtual void SetForegroundColor(double r, double g, double b);
+  virtual void SetForegroundColor(double rgb[3])
+    { this->SetForegroundColor(rgb[0], rgb[1], rgb[2]); };
+
+  // Description:
+  // Set/Get the active background color of the widget. An element
+  // (a widget or portion of a widget) is active if the mouse cursor is
+  // positioned over the element and pressing a mouse button will cause some
+  // action to occur.
+  virtual void GetActiveBackgroundColor(double *r, double *g, double *b);
+  virtual double* GetActiveBackgroundColor();
+  virtual void SetActiveBackgroundColor(double r, double g, double b);
+  virtual void SetActiveBackgroundColor(double rgb[3])
+    { this->SetActiveBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+  
+  // Description:
+  // Set/Get the active foreground color of the widget. An element
+  // (a widget or portion of a widget) is active if the mouse cursor is
+  // positioned over the element and pressing a mouse button will cause some
+  // action to occur.
+  virtual void GetActiveForegroundColor(double *r, double *g, double *b);
+  virtual double* GetActiveForegroundColor();
+  virtual void SetActiveForegroundColor(double r, double g, double b);
+  virtual void SetActiveForegroundColor(double rgb[3])
+    { this->SetActiveForegroundColor(rgb[0], rgb[1], rgb[2]); };
+  
+  // Description:
+  // Set/Get the foreground color of the widget when it is disabled.
+  virtual void GetDisabledForegroundColor(double *r, double *g, double *b);
+  virtual double* GetDisabledForegroundColor();
+  virtual void SetDisabledForegroundColor(double r, double g, double b);
+  virtual void SetDisabledForegroundColor(double rgb[3])
+    { this->SetDisabledForegroundColor(rgb[0], rgb[1], rgb[2]); };
+
+  // Description:
+  // Set/Get the background color to use when the widget is selected.
+  virtual void GetSelectColor(double *r, double *g, double *b);
+  virtual double* GetSelectColor();
+  virtual void SetSelectColor(double r, double g, double b);
+  virtual void SetSelectColor(double rgb[3])
+    { this->SetSelectColor(rgb[0], rgb[1], rgb[2]); };
+
+  // Description:
+  // Set/Get the border width, a non-negative value indicating the width of
+  // the 3-D border to draw around the outside of the widget (if such a border
+  // is being drawn; the Relief option typically determines this).
+  virtual void SetBorderWidth(int);
+  virtual int GetBorderWidth();
+  
+  // Description:
+  // Set/Get the 3-D effect desired for the widget. 
+  // The value indicates how the interior of the widget should appear
+  // relative to its exterior. 
+  // Valid constants can be found in vtkKWTkOptions::ReliefType.
+  virtual void SetRelief(int);
+  virtual int GetRelief();
+  virtual void SetReliefToRaised();
+  virtual void SetReliefToSunken();
+  virtual void SetReliefToFlat();
+  virtual void SetReliefToRidge();
+  virtual void SetReliefToSolid();
+  virtual void SetReliefToGroove();
 
   // Description:
   // Set or get enabled state.

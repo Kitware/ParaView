@@ -85,8 +85,7 @@ public:
   // title, the page which match both title *and* tag is considered.
   // GetRaisedPageId() returns the id of the page raised at the moment, -1 if
   // none is raised.
-  // RaiseFirstPageMatchingTag() is a convenience method use to raise the first
-  // page matching a given tag.
+  // RaiseFirstPageMatchingTag() raises the first page matching a given tag.
   void RaisePage(int id);
   void RaisePage(const char *title);
   void RaisePage(const char *title, int tag);
@@ -116,7 +115,7 @@ public:
   int RemovePage(const char *title);
 
   // Description:
-  // Convenience method to remove all pages matching a tag.
+  // Remove all pages matching a tag.
   void RemovePagesMatchingTag(int tag);
   
   // Description:
@@ -175,9 +174,8 @@ public:
   int GetVisiblePageId(int idx);
   
   // Description:
-  // Convenience methods provided to show/hide all page tabs matching or not
-  // matching a given tag. ShowPagesMatchingTagReverse processes pages starting
-  // from the last one.
+  // Show/Hide all page tabs matching or not matching a given tag. 
+  // ShowPagesMatchingTagReverse processes pages starting from the last one.
   void HidePagesMatchingTag(int tag);
   void ShowPagesMatchingTag(int tag);
   void ShowPagesMatchingTagReverse(int tag);
@@ -237,8 +235,7 @@ public:
   int  GetPagePinned(const char *title, int tag);
   
   // Description:
-  // Convenience methods provided to pin/unpin all page tabs 
-  // matching a given tag.
+  // Pin/Unpin all page tabs matching a given tag.
   void PinPagesMatchingTag(int tag);
   void UnpinPagesMatchingTag(int tag);
 

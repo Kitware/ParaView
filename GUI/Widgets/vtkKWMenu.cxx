@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.99");
+vtkCxxRevisionMacro(vtkKWMenu, "1.100");
 
 #define VTK_KW_MENU_CB_VARNAME_PATTERN "CB_group%d"
 #define VTK_KW_MENU_RB_DEFAULT_GROUP "RB_group"
@@ -1509,6 +1509,165 @@ void vtkKWMenu::DisplayHelpCallback(const char* widget_name)
       window->SetStatusText(help_safe.c_str());
       }
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::GetBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWMenu::GetBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-background");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetBackgroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::GetForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-foreground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWMenu::GetForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-foreground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-foreground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::GetActiveBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-activebackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWMenu::GetActiveBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-activebackground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetActiveBackgroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-activebackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::GetActiveForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-activeforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWMenu::GetActiveForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-activeforeground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetActiveForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-activeforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetBorderWidth(int width)
+{
+  this->SetConfigurationOptionAsInt("-bd", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::GetBorderWidth()
+{
+  return this->GetConfigurationOptionAsInt("-bd");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetRelief(int relief)
+{
+  this->SetConfigurationOption(
+    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+}
+
+void vtkKWMenu::SetReliefToRaised()     
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+};
+void vtkKWMenu::SetReliefToSunken() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+};
+void vtkKWMenu::SetReliefToFlat() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+};
+void vtkKWMenu::SetReliefToRidge() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+};
+void vtkKWMenu::SetReliefToSolid() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+};
+void vtkKWMenu::SetReliefToGroove() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+};
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::GetRelief()
+{
+  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+    this->GetConfigurationOption("-relief"));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::GetDisabledForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-disabledforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWMenu::GetDisabledForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-disabledforeground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetDisabledForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-disabledforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::GetSelectColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-selectcolor", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWMenu::GetSelectColor()
+{
+  return this->GetConfigurationOptionAsColor("-selectcolor");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetSelectColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-selectcolor", r, g, b);
 }
 
 //----------------------------------------------------------------------------

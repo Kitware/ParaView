@@ -71,7 +71,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.25");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.26");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -548,8 +548,7 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
 
   vtkKWLoadSaveDialog *save_dialog = vtkKWLoadSaveDialog::New();
   save_dialog->SetParent(this->GetParentTopLevel());
-  this->GetApplication()->RetrieveDialogLastPathRegistryValue(
-    save_dialog, "SavePath");
+  save_dialog->RetrieveLastPathFromRegistry("SavePath");
   save_dialog->Create();
   save_dialog->SetTitle("Save Animation");
   save_dialog->SaveDialogOn();
@@ -565,8 +564,7 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
   if (res)
     {
     filename = save_dialog->GetFileName();
-    this->GetApplication()->SaveDialogLastPathRegistryValue(
-      save_dialog, "SavePath");
+    save_dialog->SaveLastPathToRegistry("SavePath");
     }
 
   save_dialog->Delete();

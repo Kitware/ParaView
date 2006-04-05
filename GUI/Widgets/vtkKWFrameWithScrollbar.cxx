@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithScrollbar );
-vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.10");
+vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.11");
 
 //----------------------------------------------------------------------------
 vtkKWFrameWithScrollbar::vtkKWFrameWithScrollbar()
@@ -54,26 +54,20 @@ void vtkKWFrameWithScrollbar::Create()
 
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget("ScrolledWindow"))
+  if (!this->Superclass::CreateSpecificTkWidget(
+        "ScrolledWindow", "-relief flat -bd 2 -auto both"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  // The widget itself is a BWidget's ScrolledWindow
-
-  this->SetReliefToFlat();
-  this->SetBorderWidth(2);
-  this->SetConfigurationOption("-auto", "both");
 
   // ScrollableFrame is a BWidget's ScrollableFrame
   // attached to the ScrolledWindow
 
   this->ScrollableFrame = vtkKWCoreWidget::New();
   this->ScrollableFrame->SetParent(this);
-  this->ScrollableFrame->CreateSpecificTkWidget("ScrollableFrame");
-  this->ScrollableFrame->SetConfigurationOptionAsInt("-height", 1024);
-  this->ScrollableFrame->SetConfigurationOptionAsInt("-constrainedwidth", 1);
+  this->ScrollableFrame->CreateSpecificTkWidget(
+    "ScrollableFrame", "-height 1024 -constrainedwidth 1");
 
   this->Script("%s setwidget %s", 
                this->GetWidgetName(), this->ScrollableFrame->GetWidgetName());
@@ -127,6 +121,75 @@ int vtkKWFrameWithScrollbar::GetHeight()
     return this->ScrollableFrame->GetConfigurationOptionAsInt("-height");
     }
   return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWFrameWithScrollbar::GetBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWFrameWithScrollbar::GetBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-background");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWFrameWithScrollbar::SetBackgroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWFrameWithScrollbar::SetBorderWidth(int width)
+{
+  this->SetConfigurationOptionAsInt("-bd", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWFrameWithScrollbar::GetBorderWidth()
+{
+  return this->GetConfigurationOptionAsInt("-bd");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWFrameWithScrollbar::SetRelief(int relief)
+{
+  this->SetConfigurationOption(
+    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+}
+
+void vtkKWFrameWithScrollbar::SetReliefToRaised()     
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+};
+void vtkKWFrameWithScrollbar::SetReliefToSunken() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+};
+void vtkKWFrameWithScrollbar::SetReliefToFlat() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+};
+void vtkKWFrameWithScrollbar::SetReliefToRidge() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+};
+void vtkKWFrameWithScrollbar::SetReliefToSolid() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+};
+void vtkKWFrameWithScrollbar::SetReliefToGroove() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+};
+
+//----------------------------------------------------------------------------
+int vtkKWFrameWithScrollbar::GetRelief()
+{
+  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+    this->GetConfigurationOption("-relief"));
 }
 
 //----------------------------------------------------------------------------

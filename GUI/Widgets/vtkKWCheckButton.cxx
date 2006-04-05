@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.50");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.51");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -231,11 +231,225 @@ void vtkKWCheckButton::InvokeCommand(int state)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWCheckButton::GetBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWCheckButton::GetBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-background");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetBackgroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::GetForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-foreground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWCheckButton::GetForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-foreground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-foreground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetHighlightThickness(int width)
+{
+  this->SetConfigurationOptionAsInt("-highlightthickness", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWCheckButton::GetHighlightThickness()
+{
+  return this->GetConfigurationOptionAsInt("-highlightthickness");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::GetActiveBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-activebackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWCheckButton::GetActiveBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-activebackground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetActiveBackgroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-activebackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::GetActiveForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-activeforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWCheckButton::GetActiveForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-activeforeground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetActiveForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-activeforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::GetDisabledForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-disabledforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWCheckButton::GetDisabledForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-disabledforeground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetDisabledForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-disabledforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetBorderWidth(int width)
+{
+  this->SetConfigurationOptionAsInt("-bd", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWCheckButton::GetBorderWidth()
+{
+  return this->GetConfigurationOptionAsInt("-bd");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetRelief(int relief)
+{
+  this->SetConfigurationOption(
+    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+}
+
+void vtkKWCheckButton::SetReliefToRaised()     
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+};
+void vtkKWCheckButton::SetReliefToSunken() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+};
+void vtkKWCheckButton::SetReliefToFlat() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+};
+void vtkKWCheckButton::SetReliefToRidge() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+};
+void vtkKWCheckButton::SetReliefToSolid() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+};
+void vtkKWCheckButton::SetReliefToGroove() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+};
+
+//----------------------------------------------------------------------------
+int vtkKWCheckButton::GetRelief()
+{
+  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+    this->GetConfigurationOption("-relief"));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetPadX(int arg)
+{
+  this->SetConfigurationOptionAsInt("-padx", arg);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWCheckButton::GetPadX()
+{
+  return this->GetConfigurationOptionAsInt("-padx");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetPadY(int arg)
+{
+  this->SetConfigurationOptionAsInt("-pady", arg);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWCheckButton::GetPadY()
+{
+  return this->GetConfigurationOptionAsInt("-pady");
+}
+
+//----------------------------------------------------------------------------
 void vtkKWCheckButton::SetAnchor(int anchor)
 {
   this->SetConfigurationOption(
     "-anchor", vtkKWTkOptions::GetAnchorAsTkOptionValue(anchor));
 }
+
+void vtkKWCheckButton::SetAnchorToNorth() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorNorth); 
+};
+void vtkKWCheckButton::SetAnchorToNorthEast() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorNorthEast); 
+};
+void vtkKWCheckButton::SetAnchorToEast() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorEast); 
+};
+void vtkKWCheckButton::SetAnchorToSouthEast() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorSouthEast); 
+};
+void vtkKWCheckButton::SetAnchorToSouth() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorSouth); 
+};
+void vtkKWCheckButton::SetAnchorToSouthWest() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorSouthWest); 
+};
+void vtkKWCheckButton::SetAnchorToWest() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorWest); 
+};
+void vtkKWCheckButton::SetAnchorToNorthWest() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorNorthWest); 
+};
+void vtkKWCheckButton::SetAnchorToCenter() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorCenter); 
+};
 
 //----------------------------------------------------------------------------
 int vtkKWCheckButton::GetAnchor()
@@ -251,6 +465,31 @@ void vtkKWCheckButton::SetOffRelief(int relief)
     "-offrelief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
 }
 
+void vtkKWCheckButton::SetOffReliefToRaised()     
+{ 
+  this->SetOffRelief(vtkKWTkOptions::ReliefRaised); 
+};
+void vtkKWCheckButton::SetOffReliefToSunken() 
+{ 
+  this->SetOffRelief(vtkKWTkOptions::ReliefSunken); 
+};
+void vtkKWCheckButton::SetOffReliefToFlat() 
+{ 
+  this->SetOffRelief(vtkKWTkOptions::ReliefFlat); 
+};
+void vtkKWCheckButton::SetOffReliefToRidge() 
+{ 
+  this->SetOffRelief(vtkKWTkOptions::ReliefRidge); 
+};
+void vtkKWCheckButton::SetOffReliefToSolid() 
+{ 
+  this->SetOffRelief(vtkKWTkOptions::ReliefSolid); 
+};
+void vtkKWCheckButton::SetOffReliefToGroove() 
+{ 
+  this->SetOffRelief(vtkKWTkOptions::ReliefGroove); 
+};
+
 //----------------------------------------------------------------------------
 int vtkKWCheckButton::GetOffRelief()
 {
@@ -264,6 +503,35 @@ void vtkKWCheckButton::SetOverRelief(int relief)
   this->SetConfigurationOption(
     "-overrelief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
 }
+
+void vtkKWCheckButton::SetOverReliefToRaised()     
+{ 
+  this->SetOverRelief(vtkKWTkOptions::ReliefRaised); 
+};
+void vtkKWCheckButton::SetOverReliefToSunken() 
+{ 
+  this->SetOverRelief(vtkKWTkOptions::ReliefSunken); 
+};
+void vtkKWCheckButton::SetOverReliefToFlat() 
+{ 
+  this->SetOverRelief(vtkKWTkOptions::ReliefFlat); 
+};
+void vtkKWCheckButton::SetOverReliefToRidge() 
+{ 
+  this->SetOverRelief(vtkKWTkOptions::ReliefRidge); 
+};
+void vtkKWCheckButton::SetOverReliefToSolid() 
+{ 
+  this->SetOverRelief(vtkKWTkOptions::ReliefSolid); 
+};
+void vtkKWCheckButton::SetOverReliefToGroove() 
+{ 
+  this->SetOverRelief(vtkKWTkOptions::ReliefGroove); 
+};
+void vtkKWCheckButton::SetOverReliefToNone() 
+{ 
+  this->SetOverRelief(vtkKWTkOptions::ReliefUnknown); 
+};
 
 //----------------------------------------------------------------------------
 int vtkKWCheckButton::GetOverRelief()
@@ -305,6 +573,24 @@ void vtkKWCheckButton::SetImageToPixels(
 
   vtkKWTkUtilities::SetImageOptionToPixels(
     this, pixels, width, height, pixel_size, buffer_length, "-selectimage");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::GetSelectColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-selectcolor", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWCheckButton::GetSelectColor()
+{
+  return this->GetConfigurationOptionAsColor("-selectcolor");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetSelectColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-selectcolor", r, g, b);
 }
 
 // ---------------------------------------------------------------------------

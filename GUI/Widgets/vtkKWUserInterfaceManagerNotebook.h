@@ -146,8 +146,8 @@ public:
   virtual void UpdatePanel(vtkKWUserInterfacePanel *panel);
 
   // Description:
-  // Convenience method to get the panel from a page
-  // ID (return the ID of the panel that holds that page).
+  // Get the panel from a page ID (return the ID of the panel that holds
+  // that page).
   virtual vtkKWUserInterfacePanel* GetPanelFromPageId(int page_id);
 
   // Description:
@@ -164,8 +164,7 @@ public:
   virtual int DeleteAllDragAndDropEntries();
 
   // Description:
-  // Convenience function used to save/restore Drag&Drop entries to
-  // a text file. 
+  // Save/restore Drag&Drop entries to a text file. 
   // GetDragAndDropEntry() can be used to get a Drag&Drop entry parameters 
   // as plain text string. 
   // DragAndDropWidget() will perform a Drag&Drop given parameters similar

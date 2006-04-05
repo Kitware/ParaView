@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.51");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.52");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -126,32 +126,21 @@ void vtkKWMultiColumnList::Create()
 
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget("tablelist::tablelist"))
+  vtksys_stl::string options("-bg #fafafa -stripebackground #dfe7ef -showseparators 1 -showarrow 0  -highlightthickness 0 -selectmode browse -relief sunken -bd 2 -spacing 2 -exportselection 0 -activestyle none");
+#ifdef _WIN32
+  options += " -selectbackground #092369";
+#else
+  options += " -selectbackground #fbffb8";
+#endif
+
+  if (!this->Superclass::CreateSpecificTkWidget(
+        "tablelist::tablelist", options.c_str()))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->SetBackgroundColor(0.98, 0.98, 0.98);
-  this->SetStripeBackgroundColor(0.878, 0.909, 0.941);
-
-#ifdef _WIN32
-  this->SetSelectionBackgroundColor(0.0392157, 0.141176, 0.415686);
-#else
-  this->SetSelectionBackgroundColor(0.988, 1.0, 0.725);
-#endif
-
-  this->SetColumnSeparatorsVisibility(1);
-  this->SetSortArrowVisibility(0);
-  this->SetHighlightThickness(0);
-  this->SetSelectionModeToBrowse();
   this->SetLabelCommand(NULL, "tablelist::sortByColumn");
-  this->SetReliefToSunken();
-  this->SetBorderWidth(2);
-  this->SetRowSpacing(2);
-  this->ExportSelectionOff();
-
-  this->SetConfigurationOption("-activestyle", "none");
 
   char *command = NULL;
   this->SetObjectMethodCommand(&command, this, "EditStartCallback");
@@ -2205,9 +2194,12 @@ void vtkKWMultiColumnList::RefreshColorsOfCellWithWindowCommand(
         this->GetChildWidgetWithName(child_name));
       if (child)
         {
-        int is_frame = vtkKWFrame::SafeDownCast(child) ? 1 : 0;
-        int is_check = (vtkKWCheckButton::SafeDownCast(child) || 
-                        vtkKWRadioButton::SafeDownCast(child)) ? 1 : 0;
+        vtkKWFrame *child_as_frame = vtkKWFrame::SafeDownCast(child);
+        vtkKWCheckButton *child_as_checkbutton = 
+          vtkKWCheckButton::SafeDownCast(child);
+        vtkKWRadioButton *child_as_radiobutton = 
+          vtkKWRadioButton::SafeDownCast(child);
+
         double br, bg, bb, fr, fg, fb;
         this->GetCellCurrentBackgroundColor(
           row_index, col_index, &br, &bg, &bb);
@@ -2219,16 +2211,17 @@ void vtkKWMultiColumnList::RefreshColorsOfCellWithWindowCommand(
         // frame is used for a specific purpose other than being just
         // a container, and don't modify its color (maybe a color button ?)
         // unless the widget is disabled in that case do it anyhow
-        if (!(is_frame && nb_grand_children == 0) || !this->GetEnabled())
+        if (!(child_as_frame && nb_grand_children == 0) || !this->GetEnabled())
           {
-          child->SetBackgroundColor(br, bg, bb);
+          child->SetConfigurationOptionAsColor("-bg", br, bg, bb);
           }
         // If it a frame, no foreground color option. If it is a check
         // or radio button, do not change its foreground color since it
         // controls the color of the 'tick' mark
-        if (!is_frame && !is_check)
+        if (!child_as_frame && 
+            !child_as_checkbutton && !child_as_radiobutton)
           {
-          child->SetForegroundColor(fr, fg, fb);
+          child->SetConfigurationOptionAsColor("-fg", fr, fg, fb);
           }
         for (int i = 0; i < nb_grand_children; i++)
           {
@@ -2236,13 +2229,14 @@ void vtkKWMultiColumnList::RefreshColorsOfCellWithWindowCommand(
             child->GetNthChild(i));
           if (grand_child)
             {
-            is_frame = vtkKWFrame::SafeDownCast(grand_child) ? 1 : 0;
-            is_check = (vtkKWCheckButton::SafeDownCast(child) || 
-                        vtkKWRadioButton::SafeDownCast(child)) ? 1 : 0;
-            grand_child->SetBackgroundColor(br, bg, bb);
-            if (!is_frame && !is_check)
+            child_as_frame = vtkKWFrame::SafeDownCast(grand_child);
+            child_as_checkbutton = vtkKWCheckButton::SafeDownCast(grand_child);
+            child_as_radiobutton = vtkKWRadioButton::SafeDownCast(grand_child);
+            grand_child->SetConfigurationOptionAsColor("-bg", br, bg, bb);
+            if (!child_as_frame && 
+                !child_as_checkbutton && !child_as_radiobutton)
               {
-              grand_child->SetForegroundColor(fr, fg, fb);
+              grand_child->SetConfigurationOptionAsColor("-fg", fr, fg, fb);
               }
             }
           }
@@ -2931,17 +2925,104 @@ int vtkKWMultiColumnList::FindCellAtRelativeCoordinates(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWMultiColumnList::GetBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWMultiColumnList::GetBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-background");
+}
+
+//----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetBackgroundColor(double r, double g, double b)
 {
-  this->Superclass::SetBackgroundColor(r, g, b);
+  this->SetConfigurationOptionAsColor("-background", r, g, b);
   this->InvokePotentialCellColorsChangedCommand();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::GetForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-foreground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWMultiColumnList::GetForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-foreground");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::SetForegroundColor(double r, double g, double b)
 {
-  this->Superclass::SetForegroundColor(r, g, b);
+  this->SetConfigurationOptionAsColor("-foreground", r, g, b);
   this->InvokePotentialCellColorsChangedCommand();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetHighlightThickness(int width)
+{
+  this->SetConfigurationOptionAsInt("-highlightthickness", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMultiColumnList::GetHighlightThickness()
+{
+  return this->GetConfigurationOptionAsInt("-highlightthickness");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetBorderWidth(int width)
+{
+  this->SetConfigurationOptionAsInt("-bd", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMultiColumnList::GetBorderWidth()
+{
+  return this->GetConfigurationOptionAsInt("-bd");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMultiColumnList::SetRelief(int relief)
+{
+  this->SetConfigurationOption(
+    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+}
+
+void vtkKWMultiColumnList::SetReliefToRaised()     
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+};
+void vtkKWMultiColumnList::SetReliefToSunken() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+};
+void vtkKWMultiColumnList::SetReliefToFlat() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+};
+void vtkKWMultiColumnList::SetReliefToRidge() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+};
+void vtkKWMultiColumnList::SetReliefToSolid() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+};
+void vtkKWMultiColumnList::SetReliefToGroove() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+};
+
+//----------------------------------------------------------------------------
+int vtkKWMultiColumnList::GetRelief()
+{
+  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+    this->GetConfigurationOption("-relief"));
 }
 
 //----------------------------------------------------------------------------

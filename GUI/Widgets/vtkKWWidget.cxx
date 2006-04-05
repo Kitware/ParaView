@@ -20,6 +20,7 @@
 #include "vtkKWBalloonHelpManager.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWIcon.h"
+#include "vtkKWOptionDataBase.h"
 
 #include <vtksys/stl/vector>
 #include <vtksys/stl/algorithm>
@@ -27,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.144");
+vtkCxxRevisionMacro(vtkKWWidget, "1.145");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetInternals
@@ -237,6 +238,8 @@ int vtkKWWidget::CreateSpecificTkWidget(const char *type,
       }
 
     this->WidgetIsCreated = 1;
+
+    app->GetOptionDataBase()->ConfigureObject(this);
 
     /* Update enable state
        At this point, the widget is considered created, although for all 

@@ -174,8 +174,8 @@ public:
   vtkGetStringMacro(DialogName);
 
   // Description:
-  // Convenience static method to store/retrieve a message dialog response
-  // for a given application in/from the registry.
+  // Store/retrieve a message dialog response for a given application 
+  // in/from the registry.
   // This can be used to prevent the user from answering the same question
   // again and again (for ex: "Are you sure you want to exit the application").
   // 'dialogname' is the name of a dialog (most likely its DialogName ivar).

@@ -115,8 +115,8 @@ public:
   // Description:
   // Set/Get the filename associated to a preset.
   // This field is neither used nor displayed in this implementation
-  // but is provided as a convenience for subclasses that need to
-  // save preset to disks and keep track of the corresponding filename.
+  // but is provided for subclasses that need to save preset to disks
+  // and keep track of the corresponding filename.
   // A method is available to retrieve the Id of the preset that has
   // been assigned a specific filename (if passed a relative name, compare
   // the filenames without their paths).
@@ -156,11 +156,11 @@ public:
   vtkBooleanMacro(ThumbnailColumnVisibility, int);
 
   // Description:
-  // Convenience method to build both the thumbnail and screenshot for a
-  // specific preset using a vtkImageData. The thumbnail is constructed by
-  // resampling the image to fit the ThumbnailSize constraint. The screenshot
-  // is constructed by resampling the image to fit the ScreenshotSize 
-  // constraint. This method is typically useful to build both thumbnail
+  // Build both the thumbnail and screenshot for a specific preset using a
+  // vtkImageData. The thumbnail is constructed by resampling the image to
+  // fit the ThumbnailSize constraint. The screenshot is constructed by
+  // resampling the image to fit the ScreenshotSize  constraint. 
+  // This method is typically useful to build both thumbnail
   // and screenshot from a single larger image (or screenshot).
   // A similar method can be passed a vtkRenderWindow instead of a 
   // vtkImageData; in that case, the window contents is grabbed and used
@@ -191,7 +191,7 @@ public:
   // Description:
   // Set/Get a preset user slot.
   // An unlimited number of slots can be added to a preset. Each slot is
-  // identified by a name (string). Convenience methods are provided to store
+  // identified by a name (string). Methods are provided to store
   // and retrieve various types of data (double, int, string, generic pointer, 
   // pointer to vtkObject). Note a SetPresetUserSlotAsObject *does* call
   // Register() on the object passed as parameter, and will call UnRegister()
@@ -285,8 +285,7 @@ public:
     const char *slot_name);
 
   // Description:
-  // Convenience method to add a preset filter constraint on the preset
-  // group field.
+  // Add a preset filter constraint on the preset group field.
   virtual void SetPresetFilterGroupConstraint(const char *value);
   virtual const char* GetPresetFilterGroupConstraint();
 
@@ -644,7 +643,7 @@ protected:
   virtual void InvokePresetHasChangedCommand(int id);
 
   // Description:
-  // Convenience methods to get the index of a given column
+  // Get the index of a given column.
   virtual int GetIdColumnIndex();
   virtual int GetThumbnailColumnIndex();
   virtual int GetGroupColumnIndex();

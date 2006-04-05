@@ -66,7 +66,7 @@ public:
   vtkBooleanMacro(RenderState, int);
   
   // Description:
-  // Set/get the rendering mode.
+  // Set/Get the rendering mode.
   //BTX
   enum
   {
@@ -210,8 +210,8 @@ public:
     { this->SetRendererBackgroundColor(rgb[0], rgb[1], rgb[2]); };
 
   // Description:
-  // Convenience method to add props (actors) to *all* widget renderer(s)
-  // or *all*  overlay renderer(s), or to specific ones.
+  // Add props (actors) to *all* widget renderer(s) or *all*  overlay
+  // renderer(s), or to specific ones.
   // Note that no default renderers exist before Create() is called.
   virtual void AddViewProp(vtkProp *prop);
   virtual void AddViewPropToNthRenderer(vtkProp *p, int index);

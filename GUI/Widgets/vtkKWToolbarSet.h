@@ -72,7 +72,7 @@ public:
   virtual void SetToolbarsWidgetsFlatAspect(int);
 
   // Description:
-  // Convenience method to set the visibility of a toolbar
+  // Set the visibility of a toolbar.
   virtual void HideToolbar(vtkKWToolbar *toolbar);
   virtual void ShowToolbar(vtkKWToolbar *toolbar);
   virtual void SetToolbarVisibility(vtkKWToolbar *toolbar, int flag);
@@ -128,8 +128,8 @@ public:
   vtkSetMacro(SynchronizeToolbarsVisibilityWithRegistry, int); 
 
   // Description:
-  // Convenience method to create and update a menu that can be used to control
-  // the visibility of all toolbars.
+  // Create and update a menu that can be used to control the visibility of
+  // all toolbars.
   // The Populate...() method will repopulate the menu (note that it does 
   // *not* remove all entries, so that this menu can be used for several
   // toolbar sets).

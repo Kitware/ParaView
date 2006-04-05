@@ -57,14 +57,14 @@ public:
   virtual int HasLabel();
 
   // Description:
-  // Convenience method to set/get the contents label.
+  // Set/Get the contents label.
   // IMPORTANT: SetLabelText will create the label on the fly, use it only if
   // you are confident that you will indeed display the label.
   virtual void SetLabelText(const char *);
   const char* GetLabelText();
   
   // Description:
-  // Convenience method to set/get the label width.
+  // Set/Get the label width.
   // IMPORTANT: this method will create the label on the fly, use it only if
   // you are confident that you will indeed display the label.
   virtual void SetLabelWidth(int width);

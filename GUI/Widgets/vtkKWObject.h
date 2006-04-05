@@ -49,8 +49,7 @@ public:
 
   //BTX
   // Description:
-  // Convenience method to invoke some Tcl script code and
-  // perform argument substitution.
+  // Invoke some Tcl script code and perform argument substitution.
   virtual const char* Script(const char *EventString, ...);
   //ETX
   

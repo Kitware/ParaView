@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.78");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.79");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -694,7 +694,7 @@ void vtkPVLookmarkManager::ConfigureQuickStartGuide()
     text->SetWrapToWord();
     text->ReadOnlyOn();
     double r, g, b;
-    vtkKWCoreWidget *parent = vtkKWCoreWidget::SafeDownCast(text->GetParent());
+    vtkKWFrame *parent = vtkKWFrame::SafeDownCast(text->GetParent());
     parent->GetBackgroundColor(&r, &g, &b);
     text->SetBackgroundColor(r, g, b);
     }
@@ -777,7 +777,7 @@ void vtkPVLookmarkManager::ConfigureUsersTutorial()
     text->SetWrapToWord();
     text->ReadOnlyOn();
     double r, g, b;
-    vtkKWCoreWidget *parent = vtkKWCoreWidget::SafeDownCast(text->GetParent());
+    vtkKWFrame *parent = vtkKWFrame::SafeDownCast(text->GetParent());
     parent->GetBackgroundColor(&r, &g, &b);
     text->SetBackgroundColor(r, g, b);
     }

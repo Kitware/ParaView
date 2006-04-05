@@ -67,14 +67,14 @@ public:
   vtkGetMacro(AnnotationChangedEvent, int);
 
   // Description:
-  // Set/get the volume property that can be used to set the LUT of the
+  // Set/Get the volume property that can be used to set the LUT of the
   // scalar bar actor (i.e. allow the user to choose which component to
   // visualize)
   virtual void SetVolumeProperty(vtkVolumeProperty *prop);
   vtkGetObjectMacro(VolumeProperty, vtkVolumeProperty);
 
   // Description:
-  // Set/get the number of components corresponding to the data represented
+  // Set/Get the number of components corresponding to the data represented
   // by the volume property
   virtual void SetNumberOfComponents(int);
   vtkGetMacro(NumberOfComponents, int);

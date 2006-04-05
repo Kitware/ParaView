@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.91");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.92");
 
 //----------------------------------------------------------------------------
 vtkKWMessageDialog::vtkKWMessageDialog()
@@ -143,13 +143,15 @@ void vtkKWMessageDialog::Create()
   this->Script("pack %s -side top -fill x -pady 2 -expand y",
                this->ButtonFrame->GetWidgetName());
 
-  int one_b = (this->Style == vtkKWMessageDialog::StyleMessage ||
-               this->Style == vtkKWMessageDialog::StyleCancel) ? 1 : 0;
-  int two_b = (this->Style == vtkKWMessageDialog::StyleYesNo || 
-               this->Style == vtkKWMessageDialog::StyleOkCancel) ? 2 : 0;
-  int three_b = 
-    (this->Style == vtkKWMessageDialog::StyleOkOtherCancel)  ? 3 : 0;
-  int nb_buttons = one_b + two_b + three_b;
+  int has_ok = (this->Style == vtkKWMessageDialog::StyleMessage ||
+                this->Style == vtkKWMessageDialog::StyleYesNo ||
+                this->Style == vtkKWMessageDialog::StyleOkCancel ||
+                this->Style == vtkKWMessageDialog::StyleOkOtherCancel);
+  int has_cancel = (this->Style == vtkKWMessageDialog::StyleCancel ||
+                    this->Style == vtkKWMessageDialog::StyleYesNo ||
+                    this->Style == vtkKWMessageDialog::StyleOkCancel ||
+                    this->Style == vtkKWMessageDialog::StyleOkOtherCancel);
+  int has_other = (this->Style == vtkKWMessageDialog::StyleOkOtherCancel);
 
   if (this->Style == vtkKWMessageDialog::StyleYesNo)
     {
@@ -162,7 +164,7 @@ void vtkKWMessageDialog::Create()
     }
   else if (this->Style == vtkKWMessageDialog::StyleCancel)
     {
-    this->SetOKButtonText(ks_("Message Dialog|Button|Cancel"));
+    this->SetCancelButtonText(ks_("Message Dialog|Button|Cancel"));
     }
 
   // Pack buttons
@@ -177,7 +179,7 @@ void vtkKWMessageDialog::Create()
     pack_opt << "-side left -expand yes -padx 2" << ends;
     }
 
-  if (nb_buttons >= 1)
+  if (has_ok)
     {
     this->OKFrame->SetParent(this->ButtonFrame);
     this->OKFrame->Create();
@@ -193,7 +195,7 @@ void vtkKWMessageDialog::Create()
                  this->OKFrame->GetWidgetName(), pack_opt.str());
     }
 
-  if (nb_buttons >= 3)
+  if (has_other)
     {
     this->OtherFrame->SetParent(this->ButtonFrame);  
     this->OtherFrame->Create();
@@ -209,7 +211,7 @@ void vtkKWMessageDialog::Create()
                  this->OtherFrame->GetWidgetName(), pack_opt.str());
     }
 
-  if (nb_buttons >= 2)
+  if (has_cancel)
     {
     this->CancelFrame->SetParent(this->ButtonFrame);  
     this->CancelFrame->Create();

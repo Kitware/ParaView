@@ -70,7 +70,7 @@ public:
   virtual void SetHistogramSet(vtkKWHistogramSet*);
 
   // Description:
-  // Set/get the current component controlled by the widget
+  // Set/Get the current component controlled by the widget
   virtual void SetSelectedComponent(int);
   vtkGetMacro(SelectedComponent, int);
 
@@ -187,7 +187,7 @@ public:
   vtkGetMacro(UseScalarColorFunctionInScalarOpacityEditor, int);
 
   // Description:
-  // Convenience method to merge both scalar opacity and color editors.
+  // Merge both scalar opacity and color editors.
   // This will put both editors in synchronized/locked mode, the scalar
   // color function in the editor will be hidden (only the color ramp will
   // remain), and the opacity editor will use the scalar color function
@@ -222,7 +222,7 @@ public:
     vtkObject *object,const char *method);
 
   // Description:
-  // Set/get whether the above commands should be called or not.
+  // Set/Get whether the above commands should be called or not.
   vtkSetMacro(DisableCommands, int);
   vtkGetMacro(DisableCommands, int);
   vtkBooleanMacro(DisableCommands, int);

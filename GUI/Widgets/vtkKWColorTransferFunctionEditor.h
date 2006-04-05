@@ -97,7 +97,7 @@ public:
       vtkKWColorTransferFunctionEditor::ColorRampPositionCanvas); };
 
   // Description:
-  // Set/get the color ramp outline style.
+  // Set/Get the color ramp outline style.
   //BTX
   enum
   {

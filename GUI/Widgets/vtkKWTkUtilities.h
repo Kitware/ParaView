@@ -79,7 +79,7 @@ public:
     vtkKWApplication *app, const char *str);
 
   // Description:
-  // Convenience method that can be used to create a Tcl callback command.
+  // Create a Tcl callback command.
   // The 'command' argument is a pointer to the command to be created.
   // The 'object' argument is the object that will have the method called on
   // it. The 'method' argument is the name of the method to be called and any

@@ -40,12 +40,12 @@ public:
   vtkBooleanMacro(IndependentComponents, int);
   
   // Description:
-  // Set/get the number of components controlled by the widget
+  // Set/Get the number of components controlled by the widget
   virtual void SetNumberOfComponents(int);
   vtkGetMacro(NumberOfComponents, int);
 
   // Description:
-  // Set/get the current component controlled by the widget (if controllable)
+  // Set/Get the current component controlled by the widget (if controllable)
   virtual void SetSelectedComponent(int);
   vtkGetMacro(SelectedComponent, int);
 

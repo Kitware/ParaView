@@ -42,7 +42,7 @@ public:
   vtkGetObjectMacro(LoadSaveDialog, vtkKWLoadSaveDialog);
 
   // Description:
-  // Convenience method to retrieve the filename.
+  // Retrieve the filename.
   virtual char* GetFileName();
 
   // Description:

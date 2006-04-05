@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWListBox);
-vtkCxxRevisionMacro(vtkKWListBox, "1.48");
+vtkCxxRevisionMacro(vtkKWListBox, "1.49");
 
 //----------------------------------------------------------------------------
 vtkKWListBox::vtkKWListBox()
@@ -31,6 +31,22 @@ vtkKWListBox::~vtkKWListBox()
 {
   delete [] this->Item;
   delete [] this->CurrentSelection;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBox::Create()
+{
+  // Call the superclass to set the appropriate flags then create manually
+
+  if (!this->Superclass::CreateSpecificTkWidget("listbox"))
+    {
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    return;
+    }
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
@@ -237,22 +253,6 @@ int vtkKWListBox::Append(const char* name)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListBox::Create()
-{
-  // Call the superclass to set the appropriate flags then create manually
-
-  if (!this->Superclass::CreateSpecificTkWidget("listbox"))
-    {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
-    return;
-    }
-
-  // Update enable state
-
-  this->UpdateEnableState();
-}
-
-//----------------------------------------------------------------------------
 void vtkKWListBox::SetWidth(int w)
 {
   this->SetConfigurationOptionAsInt("-width", w);
@@ -290,6 +290,23 @@ void vtkKWListBox::SetSelectionMode(int relief)
     "-selectmode", vtkKWTkOptions::GetSelectionModeAsTkOptionValue(relief));
 }
 
+void vtkKWListBox::SetSelectionModeToSingle() 
+{ 
+  this->SetSelectionMode(vtkKWTkOptions::SelectionModeSingle); 
+};
+void vtkKWListBox::SetSelectionModeToBrowse() 
+{ 
+  this->SetSelectionMode(vtkKWTkOptions::SelectionModeBrowse); 
+};
+void vtkKWListBox::SetSelectionModeToMultiple() 
+{ 
+  this->SetSelectionMode(vtkKWTkOptions::SelectionModeMultiple); 
+};
+void vtkKWListBox::SetSelectionModeToExtended() 
+{ 
+  this->SetSelectionMode(vtkKWTkOptions::SelectionModeExtended); 
+};
+
 //----------------------------------------------------------------------------
 int vtkKWListBox::GetSelectionMode()
 {
@@ -307,6 +324,123 @@ void vtkKWListBox::SetExportSelection(int arg)
 int vtkKWListBox::GetExportSelection()
 {
   return this->GetConfigurationOptionAsInt("-exportselection");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBox::GetBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWListBox::GetBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-background");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBox::SetBackgroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBox::GetForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-foreground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWListBox::GetForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-foreground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBox::SetForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-foreground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBox::GetDisabledForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-disabledforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWListBox::GetDisabledForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-disabledforeground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBox::SetDisabledForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-disabledforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBox::SetHighlightThickness(int width)
+{
+  this->SetConfigurationOptionAsInt("-highlightthickness", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWListBox::GetHighlightThickness()
+{
+  return this->GetConfigurationOptionAsInt("-highlightthickness");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBox::SetBorderWidth(int width)
+{
+  this->SetConfigurationOptionAsInt("-bd", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWListBox::GetBorderWidth()
+{
+  return this->GetConfigurationOptionAsInt("-bd");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBox::SetRelief(int relief)
+{
+  this->SetConfigurationOption(
+    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+}
+
+void vtkKWListBox::SetReliefToRaised()     
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+};
+void vtkKWListBox::SetReliefToSunken() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+};
+void vtkKWListBox::SetReliefToFlat() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+};
+void vtkKWListBox::SetReliefToRidge() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+};
+void vtkKWListBox::SetReliefToSolid() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+};
+void vtkKWListBox::SetReliefToGroove() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+};
+
+//----------------------------------------------------------------------------
+int vtkKWListBox::GetRelief()
+{
+  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+    this->GetConfigurationOption("-relief"));
 }
 
 //----------------------------------------------------------------------------

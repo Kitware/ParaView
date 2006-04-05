@@ -71,8 +71,8 @@ public:
   virtual void RemoveAllWidgets();
 
   // Description:
-  // Convenience method to retrieve a widget given its name. The name is
-  // looked up in common Tk options like -label, -text, -image, -selectimage
+  // Retrieve a widget given its name. The name is looked up in common Tk
+  // options like -label, -text, -image, -selectimage
   virtual vtkKWWidget* GetWidget(const char *name);
 
   // Description:
@@ -80,7 +80,7 @@ public:
   virtual vtkKWWidget* GetNthWidget(int rank);
 
   // Description:
-  // Convenience method to create and add a specific type of widget 
+  // Create and add a specific type of widget.
   // Note: for radiobutton, the variable_name should be the same for
   //       each radiobutton in the set of radiobuttons.
   //       for checkbutton, this is only optional (can be NULL)

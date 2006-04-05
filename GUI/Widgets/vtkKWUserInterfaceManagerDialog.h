@@ -179,8 +179,8 @@ public:
   virtual int IsPanelVisible(vtkKWUserInterfacePanel *panel);
   
   // Description:
-  // Convenience method to get the panel from a page
-  // ID (return the ID of the panel that holds that page).
+  // Get the panel from a page ID (return the ID of the panel that holds
+  // that page).
   virtual vtkKWUserInterfacePanel* GetPanelFromPageId(int page_id);
 
   // Description:

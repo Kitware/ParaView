@@ -63,17 +63,17 @@ public:
   virtual void AddNode(const char *parent, const char *node, const char *text);
 
   // Description:
-  // Set/Get the label of the node
+  // Set/Get the label of the node.
   virtual const char* GetNodeText(const char *node);
   virtual void SetNodeText(const char *node, const char *text);
 
   // Description:
-  // Set/Get if node can be selected
+  // Set/Get if node can be selected.
   virtual int GetNodeSelectableFlag(const char *node);
   virtual void SetNodeSelectableFlag(const char *node, int flag);
 
   // Description:
-  // Set/Get the node font
+  // Set/Get the node font.
   virtual const char* GetNodeFont(const char *node);
   virtual void SetNodeFont(const char *node, const char *font);
   virtual void SetNodeFontWeightToBold(const char *node);
@@ -137,7 +137,7 @@ public:
   virtual int HasSelection();
 
   // Description:
-  // Convenience method to select/deselect all the node's children.
+  // Select/Deselect all the node's children.
   // Note that this selecting more than one node is likely not to work if
   // the SelectionMode is not Multiple.
   virtual void SelectNodeChildren(const char *node);
@@ -183,6 +183,47 @@ public:
   vtkBooleanMacro(SelectionFill, int);
   virtual void SetSelectionFill(int);
   virtual int GetSelectionFill();
+
+  // Description:
+  // Set/Get the background color of the widget.
+  virtual void GetBackgroundColor(double *r, double *g, double *b);
+  virtual double* GetBackgroundColor();
+  virtual void SetBackgroundColor(double r, double g, double b);
+  virtual void SetBackgroundColor(double rgb[3])
+    { this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+  
+  // Description:
+  // Set/Get the highlight thickness, a non-negative value indicating the
+  // width of the highlight rectangle to draw around the outside of the
+  // widget when it has the input focus.
+  virtual void SetHighlightThickness(int);
+  virtual int GetHighlightThickness();
+  
+  // Description:
+  // Set/Get the border width, a non-negative value indicating the width of
+  // the 3-D border to draw around the outside of the widget (if such a border
+  // is being drawn; the Relief option typically determines this).
+  virtual void SetBorderWidth(int);
+  virtual int GetBorderWidth();
+  
+  // Description:
+  // Set/Get the 3-D effect desired for the widget. 
+  // The value indicates how the interior of the widget should appear
+  // relative to its exterior. 
+  // Valid constants can be found in vtkKWTkOptions::ReliefType.
+  virtual void SetRelief(int);
+  virtual int GetRelief();
+  virtual void SetReliefToRaised();
+  virtual void SetReliefToSunken();
+  virtual void SetReliefToFlat();
+  virtual void SetReliefToRidge();
+  virtual void SetReliefToSolid();
+  virtual void SetReliefToGroove();
+
+  // Description:
+  // Set/Get the distance between image or window and text of the nodes.
+  virtual void SetPadX(int);
+  virtual int GetPadX();
 
   // Description:
   // Set/Get the selection foreground and background color
@@ -232,8 +273,8 @@ public:
     const char *event, vtkObject *object, const char *method);
 
   // Description:
-  // Convenience method to set the command for single click and double
-  // click on a node. This, in turn, just calls SetBindText.
+  // Set the command for single click and double click on a node. This, 
+  // in turn, just calls SetBindText.
   // The 'object' argument is the object that will have the method called on
   // it. The 'method' argument is the name of the method to be called and any
   // arguments in string form. If the object is NULL, the method is still

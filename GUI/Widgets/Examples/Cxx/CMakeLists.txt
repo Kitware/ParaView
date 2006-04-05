@@ -3,6 +3,7 @@ SUBDIRS(
   HelloWorld
   MedicalImageViewer
   PolygonalObjectViewer
+  Theme
   WidgetsTour
   WindowWithPanels
 )

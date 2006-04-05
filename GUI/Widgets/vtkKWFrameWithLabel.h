@@ -68,7 +68,11 @@ public:
   vtkGetMacro(AllowFrameToCollapse, int);
 
   // Description:
-  // Globally set/get if the frame can be collapsed.
+  // Globally Set/Get if the frame can be collapsed.
+  // NOTE: this is a *static* method that defines the behaviour for *all*
+  // instances of this class to be created afterwards. This is typically
+  // called in your application class or your main executable, before 
+  // creating any UI; this will ensure all instances have a consistent look.
   // By default it is globally enabled.
   static int GetDefaultAllowFrameToCollapse();
   static void SetDefaultAllowFrameToCollapse(int);
@@ -80,6 +84,10 @@ public:
   // Description:
   // Globally override the case of the label to ensure GUI consistency.
   // This will change the label when SetLabelText() is called.
+  // NOTE: this is a *static* method that defines the behaviour for *all*
+  // instances of this class to be created afterwards. This is typically
+  // called in your application class or your main executable, before 
+  // creating any UI; this will ensure all instances have a consistent look.
   // Defaults to LabelCaseUppercaseFirst.
   //BTX
   enum
@@ -103,6 +111,10 @@ public:
 
   // Description:
   // Globally enable or disable the font weight of the label.
+  // NOTE: this is a *static* method that defines the behaviour for *all*
+  // instances of this class to be created afterwards. This is typically
+  // called in your application class or your main executable, before 
+  // creating any UI; this will ensure all instances have a consistent look.
   // By default it is set to bold.
   //BTX
   enum

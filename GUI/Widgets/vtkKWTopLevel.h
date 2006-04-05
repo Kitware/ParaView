@@ -81,6 +81,56 @@ public:
   vtkGetMacro(Modal, int);
 
   // Description:
+  // Set/Get the background color of the widget.
+  virtual void GetBackgroundColor(double *r, double *g, double *b);
+  virtual double* GetBackgroundColor();
+  virtual void SetBackgroundColor(double r, double g, double b);
+  virtual void SetBackgroundColor(double rgb[3])
+    { this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+  
+  // Description:
+  // Set/Get the border width, a non-negative value indicating the width of
+  // the 3-D border to draw around the outside of the widget (if such a border
+  // is being drawn; the Relief option typically determines this).
+  virtual void SetBorderWidth(int);
+  virtual int GetBorderWidth();
+  
+  // Description:
+  // Set/Get the highlight thickness, a non-negative value indicating the
+  // width of the highlight rectangle to draw around the outside of the
+  // widget when it has the input focus.
+  virtual void SetHighlightThickness(int);
+  virtual int GetHighlightThickness();
+  
+  // Description:
+  // Set/Get the 3-D effect desired for the widget. 
+  // The value indicates how the interior of the widget should appear
+  // relative to its exterior. 
+  // Valid constants can be found in vtkKWTkOptions::ReliefType.
+  virtual void SetRelief(int);
+  virtual int GetRelief();
+  virtual void SetReliefToRaised();
+  virtual void SetReliefToSunken();
+  virtual void SetReliefToFlat();
+  virtual void SetReliefToRidge();
+  virtual void SetReliefToSolid();
+  virtual void SetReliefToGroove();
+
+  // Description:
+  // Set/Get the padding that will be applied around each widget (in pixels).
+  // Specifies a non-negative value indicating how much extra space to request
+  // for the widget in the X and Y-direction. When computing how large a
+  // window it needs, the widget will add this amount to the width it would
+  // normally need (as determined by the width of the things displayed
+  // in the widget); if the geometry manager can satisfy this request, the 
+  // widget will end up with extra internal space around what it displays 
+  // inside. 
+  virtual void SetPadX(int);
+  virtual int GetPadX();
+  virtual void SetPadY(int);
+  virtual int GetPadY();
+
+  // Description:
   // Set/Get the position this toplevel should be centered at when Display()
   // is called. The default setting, Default, is to not set/change the
   // position at all and let the user or the window manager place the toplevel.
@@ -140,32 +190,30 @@ public:
   vtkGetStringMacro(Title);
 
   // Description:
-  // Convenience method to set the title to the same title as another
-  // widget's toplevel.
+  // Set the title to the same title as another widget's toplevel.
   virtual void SetTitleToTopLevelTitle(vtkKWWidget*);
 
   // Description:
-  // Convenience method to set/get the window position in screen pixel
-  // coordinates. No effect if called before Create()
+  // Set/Get the window position in screen pixel coordinates. No effect if
+  // called before Create()
   // Return 1 on success, 0 otherwise.
   virtual int SetPosition(int x, int y);
   virtual int GetPosition(int *x, int *y);
 
   // Description:
-  // Convenience method to set/get the window size in pixels 
-  // No effect if called before Create()
+  // Set/Get the window size in pixels.  No effect if called before Create()
   // This will in turn call GetWidget() and GetHeight()
   // Return 1 on success, 0 otherwise.
   virtual int SetSize(int w, int h);
   virtual int GetSize(int *w, int *h);
 
   // Description:
-  // Convenience method to guess the width/height of the toplevel.
+  // Get the width/height of the toplevel.
   virtual int GetWidth();
   virtual int GetHeight();
 
   // Description:
-  // Convenience method to set/get the minimum window size. 
+  // Set/Get the minimum window size. 
   // For gridded windows the dimensions are specified in grid units; 
   // otherwise they are specified in pixel units. The window manager will
   // restrict the window's dimensions to be greater than or equal to width
@@ -176,7 +224,7 @@ public:
   virtual int GetMinimumSize(int *w, int *h);
 
   // Description:
-  // Convenience method to set/get the window size and position in screen pixel
+  // Set/Get the window size and position in screen pixel
   // coordinates as a geometry format wxh+x+y (ex: 800x700+20+50). 
   // No effect if called before Create()
   // SetGeometry will return 1 on success, 0 otherwise.
@@ -213,8 +261,7 @@ public:
     vtkObject *object, const char *method);
 
   // Description:
-  // Convenience method to set the name inside the icon associated to this
-  // window/toplevel.
+  // Set the name inside the icon associated to this window/toplevel.
   virtual void SetIconName(const char *name);
 
   // Description:
@@ -249,7 +296,7 @@ protected:
   int DisplayPosition;
 
   // Description:
-  // Convenience method to get the width/height of the toplevel as requested
+  // Get the width/height of the toplevel as requested
   // by the window manager. Not exposed in public since it is so Tk
   // related. Is is usually used to get the geometry of a window before
   // it is mapped to screen, as requested by the geometry manager.

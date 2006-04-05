@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry);
-vtkCxxRevisionMacro(vtkKWEntry, "1.75");
+vtkCxxRevisionMacro(vtkKWEntry, "1.76");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -241,6 +241,159 @@ void vtkKWEntry::SetWidth(int width)
     {
     this->SetConfigurationOptionAsInt("-width", this->Width);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::GetBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWEntry::GetBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-background");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::SetBackgroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::GetForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-foreground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWEntry::GetForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-foreground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::SetForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-foreground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::GetDisabledBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-disabledbackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWEntry::GetDisabledBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-disabledbackground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::SetDisabledBackgroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-disabledbackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::GetDisabledForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-disabledforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWEntry::GetDisabledForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-disabledforeground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::SetDisabledForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-disabledforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::GetReadOnlyBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-readonlybackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWEntry::GetReadOnlyBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-readonlybackground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::SetReadOnlyBackgroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-readonlybackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::SetHighlightThickness(int width)
+{
+  this->SetConfigurationOptionAsInt("-highlightthickness", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWEntry::GetHighlightThickness()
+{
+  return this->GetConfigurationOptionAsInt("-highlightthickness");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::SetBorderWidth(int width)
+{
+  this->SetConfigurationOptionAsInt("-bd", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWEntry::GetBorderWidth()
+{
+  return this->GetConfigurationOptionAsInt("-bd");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::SetRelief(int relief)
+{
+  this->SetConfigurationOption(
+    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+}
+
+void vtkKWEntry::SetReliefToRaised()     
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+};
+void vtkKWEntry::SetReliefToSunken() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+};
+void vtkKWEntry::SetReliefToFlat() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+};
+void vtkKWEntry::SetReliefToRidge() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+};
+void vtkKWEntry::SetReliefToSolid() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+};
+void vtkKWEntry::SetReliefToGroove() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+};
+
+//----------------------------------------------------------------------------
+int vtkKWEntry::GetRelief()
+{
+  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+    this->GetConfigurationOption("-relief"));
 }
 
 //----------------------------------------------------------------------------

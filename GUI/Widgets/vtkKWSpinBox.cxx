@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSpinBox);
-vtkCxxRevisionMacro(vtkKWSpinBox, "1.11");
+vtkCxxRevisionMacro(vtkKWSpinBox, "1.12");
 
 //----------------------------------------------------------------------------
 vtkKWSpinBox::vtkKWSpinBox() 
@@ -145,6 +145,195 @@ void vtkKWSpinBox::SetExportSelection(int arg)
 int vtkKWSpinBox::GetExportSelection()
 {
   return this->GetConfigurationOptionAsInt("-exportselection");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::GetBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWSpinBox::GetBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-background");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::SetBackgroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::GetForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-foreground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWSpinBox::GetForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-foreground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::SetForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-foreground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::GetDisabledBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-disabledbackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWSpinBox::GetDisabledBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-disabledbackground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::SetDisabledBackgroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-disabledbackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::GetDisabledForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-disabledforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWSpinBox::GetDisabledForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-disabledforeground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::SetDisabledForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-disabledforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::GetReadOnlyBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-readonlybackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWSpinBox::GetReadOnlyBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-readonlybackground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::SetReadOnlyBackgroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-readonlybackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::GetButtonBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-buttonbackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWSpinBox::GetButtonBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-buttonbackground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::SetButtonBackgroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-buttonbackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::SetHighlightThickness(int width)
+{
+  this->SetConfigurationOptionAsInt("-highlightthickness", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSpinBox::GetHighlightThickness()
+{
+  return this->GetConfigurationOptionAsInt("-highlightthickness");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::GetActiveBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-activebackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWSpinBox::GetActiveBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-activebackground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::SetActiveBackgroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-activebackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::SetBorderWidth(int width)
+{
+  this->SetConfigurationOptionAsInt("-bd", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWSpinBox::GetBorderWidth()
+{
+  return this->GetConfigurationOptionAsInt("-bd");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::SetRelief(int relief)
+{
+  this->SetConfigurationOption(
+    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+}
+
+void vtkKWSpinBox::SetReliefToRaised()     
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+};
+void vtkKWSpinBox::SetReliefToSunken() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+};
+void vtkKWSpinBox::SetReliefToFlat() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+};
+void vtkKWSpinBox::SetReliefToRidge() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+};
+void vtkKWSpinBox::SetReliefToSolid() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+};
+void vtkKWSpinBox::SetReliefToGroove() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+};
+
+//----------------------------------------------------------------------------
+int vtkKWSpinBox::GetRelief()
+{
+  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+    this->GetConfigurationOption("-relief"));
 }
 
 //----------------------------------------------------------------------------

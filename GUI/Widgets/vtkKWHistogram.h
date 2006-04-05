@@ -44,7 +44,7 @@ public:
   vtkGetObjectMacro(Bins, vtkDoubleArray);
 
   // Description:
-  // Convenience method to get the number of bins
+  // Get the number of bins
   virtual vtkIdType GetNumberOfBins();
 
   // Description:
@@ -54,7 +54,7 @@ public:
   vtkGetMacro(MaximumNumberOfBins, vtkIdType);
 
   // Description:
-  // Convenience method to get min, max, total occurence
+  // Get min, max, total occurence
   virtual double GetMinimumOccurence();
   virtual double GetMaximumOccurence();
   virtual double GetTotalOccurence();

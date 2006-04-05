@@ -31,7 +31,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkPVCredits);
-vtkCxxRevisionMacro(vtkPVCredits, "1.5");
+vtkCxxRevisionMacro(vtkPVCredits, "1.6");
 //-----------------------------------------------------------------------------
 vtkPVCredits::vtkPVCredits()
 {
@@ -203,7 +203,7 @@ void vtkPVCredits::ConfigureAboutDialog()
     text->ReadOnlyOn();
 
     double r, g, b;
-    vtkKWCoreWidget *parent = vtkKWCoreWidget::SafeDownCast(text->GetParent());
+    vtkKWFrame *parent = vtkKWFrame::SafeDownCast(text->GetParent());
     parent->GetBackgroundColor(&r, &g, &b);
     text->SetBackgroundColor(r, g, b);
     this->AboutRuntimeInfo->Script("pack %s -side top -padx 2 -expand 1 -fill both",
@@ -327,8 +327,7 @@ void vtkPVCredits::AddAboutCopyrights(ostream &os)
 void vtkPVCredits::SaveRuntimeInformation()
 {
   vtkKWLoadSaveDialog *dialog = vtkKWLoadSaveDialog::New();
-  this->GetApplication()->RetrieveDialogLastPathRegistryValue(dialog, 
-    "RuntimeInformationPath");
+  dialog->RetrieveLastPathFromRegistry("RuntimeInformationPath");
   dialog->SaveDialogOn();
   dialog->SetParent(this->AboutDialog);
   dialog->SetTitle("Save Runtime Information");
@@ -350,8 +349,7 @@ void vtkPVCredits::SaveRuntimeInformation()
     this->AddAboutText(file);
     file << endl;
     this->AddAboutCopyrights(file);
-    this->GetApplication()->SaveDialogLastPathRegistryValue(dialog, 
-      "RuntimeInformationPath");
+    dialog->SaveLastPathToRegistry("RuntimeInformationPath");
     }
   dialog->Delete();
 }

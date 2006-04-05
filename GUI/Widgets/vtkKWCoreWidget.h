@@ -40,95 +40,8 @@ public:
   virtual void Create();
 
   // Description:
-  // Convenience method to Set/Get the current background and foreground colors
-  // of the widget
-  virtual void GetBackgroundColor(double *r, double *g, double *b);
-  virtual double* GetBackgroundColor();
-  virtual void SetBackgroundColor(double r, double g, double b);
-  virtual void SetBackgroundColor(double rgb[3])
-    { this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]); };
-  virtual void GetForegroundColor(double *r, double *g, double *b);
-  virtual double* GetForegroundColor();
-  virtual void SetForegroundColor(double r, double g, double b);
-  virtual void SetForegroundColor(double rgb[3])
-    { this->SetForegroundColor(rgb[0], rgb[1], rgb[2]); };
-  
-  // Description:
-  // Set/get the highlight thickness, a non-negative value indicating the
-  // width of the highlight rectangle to draw around the outside of the
-  // widget when it has the input focus.
-  virtual void SetHighlightThickness(int);
-  virtual int GetHighlightThickness();
-  
-  // Description:
-  // Set/get the border width, a non-negative value
-  // indicating the width of the 3-D border to draw around the outside of
-  // the widget (if such a border is being drawn; the Relief option typically
-  // determines this).
-  virtual void SetBorderWidth(int);
-  virtual int GetBorderWidth();
-  
-  // Description:
-  // Set/Get the 3-D effect desired for the widget. 
-  // The value indicates how the interior of the widget should appear
-  // relative to its exterior. 
-  // Valid constants can be found in vtkKWTkOptions::ReliefType.
-  virtual void SetRelief(int);
-  virtual int GetRelief();
-  virtual void SetReliefToRaised() 
-    { this->SetRelief(vtkKWTkOptions::ReliefRaised); };
-  virtual void SetReliefToSunken() 
-    { this->SetRelief(vtkKWTkOptions::ReliefSunken); };
-  virtual void SetReliefToFlat() 
-    { this->SetRelief(vtkKWTkOptions::ReliefFlat); };
-  virtual void SetReliefToRidge() 
-    { this->SetRelief(vtkKWTkOptions::ReliefRidge); };
-  virtual void SetReliefToSolid() 
-    { this->SetRelief(vtkKWTkOptions::ReliefSolid); };
-  virtual void SetReliefToGroove() 
-    { this->SetRelief(vtkKWTkOptions::ReliefGroove); };
-
-  // Description:
-  // Set/Get the padding that will be applied around each widget (in pixels).
-  // Specifies a non-negative value indicating how much extra space to request
-  // for the widget in the X and Y-direction. When computing how large a
-  // window it needs, the widget will add this amount to the width it would
-  // normally need (as determined by the width of the things displayed
-  // in the widget); if the geometry manager can satisfy this request, the 
-  // widget will end up with extra internal space around what it displays 
-  // inside. 
-  virtual void SetPadX(int);
-  virtual int GetPadX();
-  virtual void SetPadY(int);
-  virtual int GetPadY();
-
-  // Description:
-  // Set/Get a Tk configuration option (ex: "-bg") 
-  // Please make sure you check the class (and subclasses) API for
-  // a C++ method acting as a front-end for the corresponding Tk option.
-  // For example, the SetBackgroundColor() method should be used to set the 
-  // corresponding -bg Tk option. 
-  // Note that SetConfigurationOption will enclose the value inside
-  // curly braces {} as a convenience.
-  // SetConfigurationOption returns 1 on success, 0 otherwise.
-  virtual int SetConfigurationOption(const char* option, const char *value);
-  virtual int HasConfigurationOption(const char* option);
-  virtual const char* GetConfigurationOption(const char* option);
-  virtual int GetConfigurationOptionAsInt(const char* option);
-  virtual int SetConfigurationOptionAsInt(const char* option, int value);
-  virtual double GetConfigurationOptionAsDouble(const char* option);
-  virtual int SetConfigurationOptionAsDouble(const char* option, double value);
-  virtual void GetConfigurationOptionAsColor(
-    const char* option, double *r, double *g, double *b);
-  virtual double* GetConfigurationOptionAsColor(const char* option);
-  virtual void SetConfigurationOptionAsColor(
-    const char* option, double r, double g, double b);
-  virtual void SetConfigurationOptionAsColor(const char* option, double rgb[3])
-    { this->SetConfigurationOptionAsColor(option, rgb[0], rgb[1], rgb[2]); };
-
-  // Description:
-  // Convenience method to Set/Get the -state option to "normal" (1) or
-  // "disabled" (0) or "readonly" (2, if supported).
+  // Set/Get the -state option to "normal" (1) or "disabled" (0) or "readonly"
+  // (2, if supported).
   // Valid constants can be found in vtkKWTkOptions::StateType.
   // This should not be used directly, this is done by 
   // SetEnabled()/UpdateEnableState(). 
@@ -146,6 +59,30 @@ public:
   // Arranges for window to be displayed above all of its siblings in the
   // stacking order.
   virtual void Raise();
+
+  // Description:
+  // Set/Get a Tk configuration option (ex: "-bg").
+  // Make *sure* you check the class (and subclasses) API for a
+  // C++ method that would already act as a front-end to the Tk option.
+  // For example, the SetBackgroundColor() method should be used instead of
+  // accessing the -bg Tk option. 
+  // Note that SetConfigurationOption will enclose the value inside
+  // curly braces {} as a convenience.
+  // SetConfigurationOption returns 1 on success, 0 otherwise.
+  virtual int SetConfigurationOption(const char* option, const char *value);
+  virtual int HasConfigurationOption(const char* option);
+  virtual const char* GetConfigurationOption(const char* option);
+  virtual int GetConfigurationOptionAsInt(const char* option);
+  virtual int SetConfigurationOptionAsInt(const char* option, int value);
+  virtual double GetConfigurationOptionAsDouble(const char* option);
+  virtual int SetConfigurationOptionAsDouble(const char* option, double value);
+  virtual void GetConfigurationOptionAsColor(
+    const char* option, double *r, double *g, double *b);
+  virtual double* GetConfigurationOptionAsColor(const char* option);
+  virtual void SetConfigurationOptionAsColor(
+    const char* option, double r, double g, double b);
+  virtual void SetConfigurationOptionAsColor(const char* option, double rgb[3])
+    { this->SetConfigurationOptionAsColor(option, rgb[0], rgb[1], rgb[2]); };
 
 protected:
   vtkKWCoreWidget() {};
@@ -179,7 +116,7 @@ protected:
   //ETX
 
   // Description:
-  // Set/Get a textual Tk configuration option (ex: "-bg") 
+  // Set/Get a textual Tk configuration option (ex: "-bg").
   // This should be used instead of SetConfigurationOption as it performs
   // various characted encoding and escaping tricks.
   // The characted encoding used in the string will be retrieved by querying

@@ -68,6 +68,74 @@ public:
   vtkGetMacro(ReadOnly, int);
 
   // Description:
+  // Set/Get the background color of the widget.
+  virtual void GetBackgroundColor(double *r, double *g, double *b);
+  virtual double* GetBackgroundColor();
+  virtual void SetBackgroundColor(double r, double g, double b);
+  virtual void SetBackgroundColor(double rgb[3])
+    { this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+  
+  // Description:
+  // Set/Get the foreground color of the widget.
+  virtual void GetForegroundColor(double *r, double *g, double *b);
+  virtual double* GetForegroundColor();
+  virtual void SetForegroundColor(double r, double g, double b);
+  virtual void SetForegroundColor(double rgb[3])
+    { this->SetForegroundColor(rgb[0], rgb[1], rgb[2]); };
+
+  // Description:
+  // Set/Get the background color of the widget when it is disabled.
+  virtual void GetDisabledBackgroundColor(double *r, double *g, double *b);
+  virtual double* GetDisabledBackgroundColor();
+  virtual void SetDisabledBackgroundColor(double r, double g, double b);
+  virtual void SetDisabledBackgroundColor(double rgb[3])
+    { this->SetDisabledBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+  
+  // Description:
+  // Set/Get the foreground color of the widget when it is disabled.
+  virtual void GetDisabledForegroundColor(double *r, double *g, double *b);
+  virtual double* GetDisabledForegroundColor();
+  virtual void SetDisabledForegroundColor(double r, double g, double b);
+  virtual void SetDisabledForegroundColor(double rgb[3])
+    { this->SetDisabledForegroundColor(rgb[0], rgb[1], rgb[2]); };
+
+  // Description:
+  // Set/Get the background color of the widget when it is read-only.
+  virtual void GetReadOnlyBackgroundColor(double *r, double *g, double *b);
+  virtual double* GetReadOnlyBackgroundColor();
+  virtual void SetReadOnlyBackgroundColor(double r, double g, double b);
+  virtual void SetReadOnlyBackgroundColor(double rgb[3])
+    { this->SetReadOnlyBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+  
+  // Description:
+  // Set/Get the highlight thickness, a non-negative value indicating the
+  // width of the highlight rectangle to draw around the outside of the
+  // widget when it has the input focus.
+  virtual void SetHighlightThickness(int);
+  virtual int GetHighlightThickness();
+  
+  // Description:
+  // Set/Get the border width, a non-negative value indicating the width of
+  // the 3-D border to draw around the outside of the widget (if such a border
+  // is being drawn; the Relief option typically determines this).
+  virtual void SetBorderWidth(int);
+  virtual int GetBorderWidth();
+  
+  // Description:
+  // Set/Get the 3-D effect desired for the widget. 
+  // The value indicates how the interior of the widget should appear
+  // relative to its exterior. 
+  // Valid constants can be found in vtkKWTkOptions::ReliefType.
+  virtual void SetRelief(int);
+  virtual int GetRelief();
+  virtual void SetReliefToRaised();
+  virtual void SetReliefToSunken();
+  virtual void SetReliefToFlat();
+  virtual void SetReliefToRidge();
+  virtual void SetReliefToSolid();
+  virtual void SetReliefToGroove();
+
+  // Description:
   // Specifies a command to associate with the widget. This command is 
   // typically invoked when the return key is pressed, or the focus is lost.
   // The 'object' argument is the object that will have the method called on

@@ -73,8 +73,7 @@ public:
   //ETX
 
   // Description:
-  // Convenience method to set/get the button's associated variable directly
-  // to a specific value.
+  // Set/Get the button's associated variable directly to a specific value.
   virtual void SetVariableValue(const char *v);
   virtual void SetVariableValueAsInt(int v);
   virtual const char* GetVariableValue();

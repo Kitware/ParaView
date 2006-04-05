@@ -67,7 +67,7 @@ public:
     { this->SetRelativeRange(range[0], range[1]); };
   
   // Description:
-  // Method to set/get the resolution of the slider.
+  // Set/Get the resolution of the slider.
   // The whole range and sub range are not snapped to this resolution.
   // Both ranges can be set to any floating point number. 
   // Think of the sliders and the resolution as a way to set the bounds of
@@ -263,7 +263,7 @@ public:
   virtual void SetEntriesCommand(vtkObject *object, const char *method);
 
   // Description:
-  // Set/get whether the above commands should be called or not.
+  // Set/Get whether the above commands should be called or not.
   // This allow you to disable the commands while you are setting the range
   // value for example.
   vtkSetMacro(DisableCommands, int);
@@ -408,7 +408,7 @@ protected:
   virtual void UpdateColors();
 
   // Description:
-  // Convenience method to look for a tag
+  // Look for a tag
   virtual int HasTag(const char *tag, const char *suffix = 0);
 
   // Description:

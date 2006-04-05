@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.33");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.34");
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::vtkKWLookmarkFolder()
@@ -347,10 +347,10 @@ void vtkKWLookmarkFolder::ToggleNestedLabels(vtkKWWidget *widget, int onoff)
       double fr, fg, fb, br, bg, bb;
       vtkKWCoreWidget *anchor_as_core = vtkKWCoreWidget::SafeDownCast(
         lmkWidget->GetDragAndDropTargetSet()->GetSourceAnchor());
-      anchor_as_core->GetForegroundColor(&fr, &fg, &fb);
-      anchor_as_core->GetBackgroundColor(&br, &bg, &bb);
-      anchor_as_core->SetForegroundColor(br, bg, bb);
-      anchor_as_core->SetBackgroundColor(fr, fg, fb);
+      anchor_as_core->GetConfigurationOptionAsColor("-fg", &fr, &fg, &fb);
+      anchor_as_core->GetConfigurationOptionAsColor("-bg", &br, &bg, &bb);
+      anchor_as_core->SetConfigurationOptionAsColor("-fg", br, bg, bb);
+      anchor_as_core->SetConfigurationOptionAsColor("-bg", fr, fg, fb);
       }
     }
   else if( widget->IsA("vtkKWLookmarkFolder") && widget->IsPacked())
@@ -361,10 +361,10 @@ void vtkKWLookmarkFolder::ToggleNestedLabels(vtkKWWidget *widget, int onoff)
       double fr, fg, fb, br, bg, bb;
       vtkKWCoreWidget *anchor_as_core = vtkKWCoreWidget::SafeDownCast(
         lmkFolder->GetDragAndDropTargetSet()->GetSourceAnchor());
-      anchor_as_core->GetForegroundColor(&fr, &fg, &fb);
-      anchor_as_core->GetBackgroundColor(&br, &bg, &bb);
-      anchor_as_core->SetForegroundColor(br, bg, bb);
-      anchor_as_core->SetBackgroundColor(fr, fg, fb);
+      anchor_as_core->GetConfigurationOptionAsColor("-fg", &fr, &fg, &fb);
+      anchor_as_core->GetConfigurationOptionAsColor("-bg", &br, &bg, &bb);
+      anchor_as_core->SetConfigurationOptionAsColor("-fg", br, bg, bb);
+      anchor_as_core->SetConfigurationOptionAsColor("-bg", fr, fg, fb);
 
       lmkFolder->ToggleNestedLabels(lmkFolder->GetLabelFrame()->GetFrame(), onoff);
       }

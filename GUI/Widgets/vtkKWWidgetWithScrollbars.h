@@ -47,8 +47,8 @@ public:
 
   // Description:
   // Access the internal scrollbars.
-  vtkGetObjectMacro(VerticalScrollBar, vtkKWScrollbar);
-  vtkGetObjectMacro(HorizontalScrollBar, vtkKWScrollbar);
+  vtkGetObjectMacro(VerticalScrollbar, vtkKWScrollbar);
+  vtkGetObjectMacro(HorizontalScrollbar, vtkKWScrollbar);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -70,8 +70,8 @@ protected:
 
   // Description:
   // Scrollbars
-  vtkKWScrollbar *VerticalScrollBar;
-  vtkKWScrollbar *HorizontalScrollBar;
+  vtkKWScrollbar *VerticalScrollbar;
+  vtkKWScrollbar *HorizontalScrollbar;
 
   // Description:
   // Create scrollbars and associate the scrollbars to a widget by

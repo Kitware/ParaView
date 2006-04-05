@@ -186,6 +186,7 @@ SET(KWWidgets_SRCS
   vtkKWMultiColumnList.cxx
   vtkKWNotebook.cxx
   vtkKWObject.cxx
+  vtkKWOptionDataBase.cxx
   vtkKWParameterValueFunctionEditor.cxx
   vtkKWParameterValueFunctionInterface.cxx
   vtkKWParameterValueHermiteFunctionEditor.cxx
@@ -222,6 +223,7 @@ SET(KWWidgets_SRCS
   vtkKWTclInteractor.cxx
   vtkKWText.cxx
   vtkKWTextPropertyEditor.cxx
+  vtkKWTheme.cxx
   vtkKWThumbWheel.cxx
   vtkKWTkOptions.cxx
   vtkKWTkUtilities.cxx

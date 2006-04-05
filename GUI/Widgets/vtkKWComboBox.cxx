@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWComboBox);
-vtkCxxRevisionMacro(vtkKWComboBox, "1.12");
+vtkCxxRevisionMacro(vtkKWComboBox, "1.13");
 
 //----------------------------------------------------------------------------
 vtkKWComboBox::vtkKWComboBox()
@@ -221,6 +221,13 @@ void vtkKWComboBox::SetListboxWidth(int n)
     {
     this->SetConfigurationOptionAsInt("-listboxwidth", n);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWComboBox::SetBackgroundColor(double r, double g, double b)
+{
+  this->Superclass::SetBackgroundColor(r, g, b);
+  this->SetConfigurationOptionAsColor("-entrybg", r, g, b);
 }
 
 //----------------------------------------------------------------------------

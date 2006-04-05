@@ -100,7 +100,7 @@ public:
   vtkSetMacro(MaximumNumberOfFilesInRegistry, int);
 
   // Description:
-  // Get a convenience most recent files menu object. 
+  // Get a most recent files menu object. 
   // This menu is updated automatically as entries are added and removed,
   // up to MaximumNumberOfFilesInMenu entries.
   // It is up to the caller to set its parent, and it should be done as soon as
@@ -136,8 +136,7 @@ public:
   virtual void UpdateMenuStateInParent();
 
   // Description:
-  // Convenience method to populate a given menu with up to 'max_nb' 
-  // most recent files entries.
+  // Populate a given menu with up to 'max_nb' most recent files entries.
   // You do not need to call this method on GetMenu(), the
   // internal menu is updated automatically.
   virtual void PopulateMenu(vtkKWMenu*, int max_nb);

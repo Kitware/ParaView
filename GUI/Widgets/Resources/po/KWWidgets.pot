@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-04-02 16:13-0400\n"
+"POT-Creation-Date: 2006-04-04 21:03-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,25 +16,25 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../../vtkKWApplication.cxx:999
+#: ../../vtkKWApplication.cxx:1009
 #, c-format
 msgid "Are you sure you want to exit %s?"
 msgstr ""
 
-#: ../../vtkKWApplication.cxx:1002
+#: ../../vtkKWApplication.cxx:1012
 #, c-format
 msgid "Exit Dialog|Title|Exit %s"
 msgstr ""
 
-#: ../../vtkKWApplicationSettingsInterface.cxx:50 ../../vtkKWWindow.cxx:518
+#: ../../vtkKWApplicationSettingsInterface.cxx:50 ../../vtkKWWindow.cxx:519
 msgid "Application Settings|Title|Application Settings"
 msgstr ""
 
-#: ../../vtkKWMessageDialog.cxx:55 ../../vtkKWMessageDialog.cxx:161
+#: ../../vtkKWMessageDialog.cxx:55 ../../vtkKWMessageDialog.cxx:163
 msgid "Message Dialog|Button|OK"
 msgstr ""
 
-#: ../../vtkKWMessageDialog.cxx:58 ../../vtkKWMessageDialog.cxx:165
+#: ../../vtkKWMessageDialog.cxx:58 ../../vtkKWMessageDialog.cxx:167
 msgid "Message Dialog|Button|Cancel"
 msgstr ""
 
@@ -46,11 +46,11 @@ msgstr ""
 msgid "Message Dialog|Do not show this dialog anymore."
 msgstr ""
 
-#: ../../vtkKWMessageDialog.cxx:156
+#: ../../vtkKWMessageDialog.cxx:158
 msgid "Message Dialog|Button|Yes"
 msgstr ""
 
-#: ../../vtkKWMessageDialog.cxx:157
+#: ../../vtkKWMessageDialog.cxx:159
 msgid "Message Dialog|Button|No"
 msgstr ""
 
@@ -79,11 +79,11 @@ msgstr ""
 msgid "Selection Frame Dialog|Title|Save Screenshot"
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:2059
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:2057
 msgid "Selection Frame Dialog|Title|Save Screenshot - Error!"
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:2060
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:2058
 msgid ""
 "There was a problem writing the image file.\n"
 "Please check the location and make sure you have write\n"
@@ -184,27 +184,27 @@ msgstr ""
 msgid "Menu|Window|Show/Hide Toolbars"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:1076
+#: ../../vtkKWWindowBase.cxx:1074
 #, c-format
 msgid "Load Script Dialog|File Type|%s Scripts"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:1084
+#: ../../vtkKWWindowBase.cxx:1082
 msgid "Load Script Dialog|File Type|All Files"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:1122
+#: ../../vtkKWWindowBase.cxx:1119
 msgid "Warning Dialog|Title|Warning!"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:1133
+#: ../../vtkKWWindowBase.cxx:1130
 msgid "Error Dialog|Title|Error!"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:1221
+#: ../../vtkKWWindowBase.cxx:1218
 msgid "Tcl Interactor Dialog|Title|Tcl Interactor"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:1356
+#: ../../vtkKWWindowBase.cxx:1353
 msgid "Can not close window while it is disabled"
 msgstr ""

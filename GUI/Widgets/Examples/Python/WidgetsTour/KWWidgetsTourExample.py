@@ -84,8 +84,6 @@ def main(argv):
     widgets_tree.Create()
 
     tree = widgets_tree.GetWidget()
-    tree.SetPadX(0)
-    tree.SetBackgroundColor(1.0, 1.0, 1.0)
     tree.RedrawOnIdleOn()
     tree.SelectionFillOn()
 

@@ -67,7 +67,7 @@
 #define VTK_PV_CAMERA_PROXYNAME "_dont_validate_.ActiveCamera"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.67");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.68");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizontalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1043,7 +1043,7 @@ void vtkPVAnimationManager::SaveAnimation()
   vtkPVRenderView* view = pvWin->GetMainView();
 
   vtkKWLoadSaveDialog* saveDialog = vtkKWLoadSaveDialog::New();
-  this->GetApplication()->RetrieveDialogLastPathRegistryValue(saveDialog, "SaveAnimationFile2");
+  saveDialog->RetrieveLastPathFromRegistry("SaveAnimationFile2");
   saveDialog->SetParent(this);
   saveDialog->SaveDialogOn();
   saveDialog->Create();
@@ -1068,7 +1068,7 @@ void vtkPVAnimationManager::SaveAnimation()
   if ( saveDialog->Invoke() &&
     strlen(saveDialog->GetFileName())>0 )
     {
-    this->GetApplication()->SaveDialogLastPathRegistryValue(saveDialog, "SaveAnimationFile2");
+    saveDialog->SaveLastPathToRegistry("SaveAnimationFile2");
     const char* filename = saveDialog->GetFileName();  
     vtksys_stl::string filename_stl = filename;
     vtksys_stl::string ext_stl = vtksys::SystemTools::GetFilenameLastExtension(filename);
@@ -1261,7 +1261,7 @@ void vtkPVAnimationManager::SaveGeometry()
 {
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
   vtkKWLoadSaveDialog* saveDialog = pvApp->NewLoadSaveDialog();
-  this->GetApplication()->RetrieveDialogLastPathRegistryValue(saveDialog, "SaveGeometryFile");
+  saveDialog->RetrieveLastPathFromRegistry("SaveGeometryFile");
   saveDialog->SetParent(this);
   saveDialog->SaveDialogOn();
   saveDialog->Create();
@@ -1269,7 +1269,7 @@ void vtkPVAnimationManager::SaveGeometry()
   saveDialog->SetFileTypes("{{ParaView Data Files} {.pvd}}");
   if(saveDialog->Invoke() && (strlen(saveDialog->GetFileName()) > 0))
     {
-    this->GetApplication()->SaveDialogLastPathRegistryValue(saveDialog, "SaveGeometryFile");
+    saveDialog->SaveLastPathToRegistry("SaveGeometryFile");
 //    this->SaveGeometry(saveDialog->GetFileName(), numPartitions);
     this->AnimationScene->SaveGeometry(saveDialog->GetFileName());
     }

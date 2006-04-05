@@ -60,12 +60,48 @@ public:
   virtual void Create();
 
   // Description:
-  // Convenience function to set the width and height of the canvas
+  // Set the width and height of the canvas.
   // No effect before Create() is called.
   virtual void SetWidth(int);
   virtual int GetWidth();
   virtual void SetHeight(int);
   virtual int GetHeight();
+
+  // Description:
+  // Set/Get the background color of the widget.
+  virtual void GetBackgroundColor(double *r, double *g, double *b);
+  virtual double* GetBackgroundColor();
+  virtual void SetBackgroundColor(double r, double g, double b);
+  virtual void SetBackgroundColor(double rgb[3])
+    { this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+  
+  // Description:
+  // Set/Get the highlight thickness, a non-negative value indicating the
+  // width of the highlight rectangle to draw around the outside of the
+  // widget when it has the input focus.
+  virtual void SetHighlightThickness(int);
+  virtual int GetHighlightThickness();
+  
+  // Description:
+  // Set/Get the border width, a non-negative value indicating the width
+  // of the 3-D border to draw around the outside of the widget (if such
+  // a border is being drawn; the Relief option typically determines this).
+  virtual void SetBorderWidth(int);
+  virtual int GetBorderWidth();
+  
+  // Description:
+  // Set/Get the 3-D effect desired for the widget. 
+  // The value indicates how the interior of the widget should appear
+  // relative to its exterior. 
+  // Valid constants can be found in vtkKWTkOptions::ReliefType.
+  virtual void SetRelief(int);
+  virtual int GetRelief();
+  virtual void SetReliefToRaised();
+  virtual void SetReliefToSunken();
+  virtual void SetReliefToFlat();
+  virtual void SetReliefToRidge();
+  virtual void SetReliefToSolid();
+  virtual void SetReliefToGroove();
 
   // Description:
   // Update the "enable" state of the object and its internal parts.

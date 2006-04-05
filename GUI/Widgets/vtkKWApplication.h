@@ -25,17 +25,19 @@
 #include "vtkTcl.h" // Needed for Tcl_Interp
 #include "vtkTk.h"  // Needed for Tk_Window
 
-class vtkKWLabel;
-class vtkKWMessageDialog;
-class vtkKWRegistryHelper;
+class vtkKWApplicationInternals;
 class vtkKWBalloonHelpManager;
+class vtkKWLabel;
+class vtkKWLoadSaveDialog;
+class vtkKWMessageDialog;
+class vtkKWOptionDataBase;
+class vtkKWRegistryHelper;
 class vtkKWSplashScreen;
-class vtkKWWidget;
-class vtkKWWindowBase;
 class vtkKWText;
 class vtkKWTextWithScrollbars;
-class vtkKWApplicationInternals;
-class vtkKWLoadSaveDialog;
+class vtkKWTheme;
+class vtkKWWidget;
+class vtkKWWindowBase;
 
 class KWWidgets_EXPORT vtkKWApplication : public vtkKWObject
 {
@@ -131,7 +133,7 @@ public:
   vtkGetStringMacro(ReleaseName);
 
   // Description:
-  // Convenience method to get the "pretty" name of the application. 
+  // Get the "pretty" name of the application. 
   // This is typically used for windows or dialogs title, About boxes, etc. 
   // It combines the application name, its version, and other relevant
   // informations (like its limited edition mode).
@@ -148,10 +150,9 @@ public:
   //ETX
 
   // Descrition:
-  // Convenience method that will return the limited edition mode and 
-  // optionally warn the user ; if the limited edition mode is true, 
-  // it will display a popup warning stating that 'feature' is not available
-  // in this mode.
+  // Return the limited edition mode and optionally warn the user ; 
+  // if the limited edition mode is true, display a popup warning stating
+  // that 'feature' is not available in this mode.
   virtual int GetLimitedEditionModeAndWarn(const char *feature);
 
   // Descrition:
@@ -163,13 +164,13 @@ public:
   virtual const char *GetLimitedEditionModeName();
 
   // Description:
-  // Set/Get the directory in which the current application is supposed
+  // Set/Get the directory in which the application is supposed
   // to be installed. 
   vtkGetStringMacro(InstallationDirectory);
   vtkSetStringMacro(InstallationDirectory);
   
   // Description:
-  // Set/Get the directory in which the current application can store
+  // Set/Get the directory in which the application can store
   // user data. 
   virtual char* GetUserDataDirectory();
   vtkSetStringMacro(UserDataDirectory);
@@ -211,7 +212,7 @@ public:
   vtkGetMacro(RegistryLevel, int);
 
   // Description:
-  // Set/get/delete/query a registry value for the application.
+  // Set/Get/Delete/Query a registry value for the application.
   // When storing multiple arguments, separate them with spaces.
   // Note that if the 'level' is greater than the current registry level, 
   // the operation will be ignored.
@@ -228,8 +229,8 @@ public:
     int level, const char* subkey, const char* key);
   
   // Description:
-  // Convenience methods to retrieve a value from the registry and convert
-  // it to a type (boolean, float, int). 
+  // Retrieve a value from the registry and convert it to a type
+  // (boolean, float, int). 
   // Return 0 if the value was not found.
   // For GetBooleanRegistryValue(), perform a boolean check of the value in
   // the registry. If the value at the key is equal to 'trueval', then return
@@ -242,7 +243,7 @@ public:
     int level, const char* subkey, const char* key, const char* trueval);
   
   // Description:
-  // Convenience methods to save/retrieve color to/from the registry. 
+  // Save/retrieve color to/from the registry. 
   // If the color does not exist, it will retrieve -1, -1 ,-1 and return 0
   // (1 if success).
   // Note that the subkey used here is "Colors".
@@ -251,21 +252,18 @@ public:
   virtual int RetrieveColorRegistryValue(
     int level, const char *key, double rgb[3]);
 
-  // Description:
-  // Convenience methods to save/retrieve the last path of a dialog
-  // to/from the registry.
-  // Note that the subkey used here is "RunTime".
-  virtual void SaveDialogLastPathRegistryValue(
-    vtkKWLoadSaveDialog *dlg, const char *key);
-  virtual void RetrieveDialogLastPathRegistryValue(
-    vtkKWLoadSaveDialog *dlg, const char *key);
-
   // Descrition:
   // Save/Retrieve the application settings to/from registry.
   // Do not call that method before the application name is known and the
   // proper registry level set (if any).
   virtual void RestoreApplicationSettingsFromRegistry();
   virtual void SaveApplicationSettingsToRegistry();
+
+  // Description:
+  // Get the database option object.
+  //BTX
+  vtkKWOptionDataBase *GetOptionDataBase();
+  //ETX
 
   // Description:
   // Set/Get if this application supports a splash screen
@@ -281,8 +279,8 @@ public:
 
   // Description:
   // Retrieve the splash screen object
-  // As a convenience, this will also call vtkKWSplashScreen::Create() to
-  // create the splash screen widget itself.
+  // This will also call vtkKWSplashScreen::Create() to create the splash
+  // screen widget itself.
   virtual vtkKWSplashScreen* GetSplashScreen();
 
   // Description:
@@ -306,6 +304,11 @@ public:
   virtual int HasCheckForUpdates();
   virtual void CheckForUpdates();
 
+  // Description:
+  // Get/Set the current theme. This will install the theme automatically.
+  virtual void SetTheme(vtkKWTheme *theme);
+  vtkGetObjectMacro(Theme, vtkKWTheme);
+  
   // Description:
   // Get if we have some logic to report feedback by email and
   // email that feedback.
@@ -345,8 +348,7 @@ public:
   vtkKWBalloonHelpManager *GetBalloonHelpManager();
 
   // Description:
-  // Convenience methods to evaluate Tcl script/code and
-  // perform argument substitutions.
+  // Evaluate Tcl script/code and perform argument substitutions.
   //BTX
   virtual const char* Script(const char* format, ...);
   int EvaluateBooleanExpression(const char* format, ...);
@@ -535,6 +537,10 @@ protected:
   double PrintTargetDPI;
 
   // Description:
+  // Current theme
+  vtkKWTheme *Theme;
+
+  // Description:
   // Check for an argument (example: --foo, /C, -bar, etc).
   // Return VTK_OK if found and set 'index' to the position of the 
   // argument in argv[].
@@ -568,6 +574,7 @@ protected:
 private:
 
   vtkKWRegistryHelper *RegistryHelper;
+  vtkKWOptionDataBase *OptionDataBase;
   vtkKWSplashScreen *SplashScreen;
   vtkKWBalloonHelpManager *BalloonHelpManager;
 

@@ -207,7 +207,7 @@ protected:
   virtual void GetValueFromCoordinate(int y, double &value);
 
   // Description:
-  // Convenience method to look for a tag in a canvas. 
+  // Look for a tag in a canvas. 
   virtual int CanvasHasTag(const char *canvas, const char *tag);
 
 private:

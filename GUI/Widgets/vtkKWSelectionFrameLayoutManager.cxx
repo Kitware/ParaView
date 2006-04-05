@@ -71,7 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.56");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.57");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -1942,15 +1942,13 @@ int vtkKWSelectionFrameLayoutManager::SaveScreenshotAllWidgets()
   save_dialog->Create();
   save_dialog->SetTitle(
     ks_("Selection Frame Dialog|Title|Save Screenshot"));
-  this->GetApplication()->RetrieveDialogLastPathRegistryValue(
-    save_dialog, "SavePath");
+  save_dialog->RetrieveLastPathFromRegistry("SavePath");
   
   int res = 0;
   if (save_dialog->Invoke() && 
       this->SaveScreenshotAllWidgetsToFile(save_dialog->GetFileName()))
     {
-    this->GetApplication()->SaveDialogLastPathRegistryValue(
-      save_dialog, "SavePath");
+    save_dialog->SaveLastPathToRegistry("SavePath");
     res = 1;
     }
 

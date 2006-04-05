@@ -125,8 +125,7 @@ public:
     { return this->GetWidgetAtPosition(pos[0], pos[1]); }
 
   // Description:
-  // Switch widgets position (convenience method to set the position of
-  // two widgets)
+  // Switch widgets position (set the position of two widgets)
   // Return 1 (or widget) on success, 0 (or NULL) on error
   virtual int SwitchWidgetsPosition(
     vtkKWSelectionFrame *w1, vtkKWSelectionFrame *w2);
@@ -197,7 +196,7 @@ public:
   // Return 1 on success, 0 otherwise
   // GetVisibleRenderWidget() need to be implemented accordingly.
   virtual int AppendAllWidgetsToImageData(vtkImageData *image, 
-	                                    int OnScreenRendering = 0);
+                                          int OnScreenRendering = 0);
   virtual int AppendAllWidgetsToImageDataFast(vtkImageData *image);
   virtual int AppendSelectedWidgetToImageData(vtkImageData *image);
   virtual int AppendSelectedWidgetToImageDataFast(vtkImageData *image);
@@ -308,7 +307,7 @@ protected:
   // Return 1 on success, 0 otherwise
   virtual int AppendWidgetsToImageData(
     vtkImageData *image,int selection_only, int direct = 0, 
-	int ForceUpdateOnScreenRendering = 0);
+    int ForceUpdateOnScreenRendering = 0);
 
   // Description:
   // Called when the number of widgets has changed

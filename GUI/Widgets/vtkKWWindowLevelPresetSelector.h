@@ -120,7 +120,7 @@ protected:
   virtual int UpdatePresetRow(int id);
 
   // Description:
-  // Convenience methods to get the index of a given column
+  // Get the index of a given column
   virtual int GetWindowColumnIndex();
   virtual int GetLevelColumnIndex();
   virtual int GetModalityColumnIndex();

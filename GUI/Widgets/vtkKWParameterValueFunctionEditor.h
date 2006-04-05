@@ -67,9 +67,9 @@ public:
     { this->SetWholeParameterRange(range[0], range[1]); };
 
   // Description:
-  // Convenience method to set the whole parameter range to the
-  // function parameter range. Note that for safety reasons it will maintain
-  // the same relative visible parameter range.
+  // Set the whole parameter range to the function parameter range. 
+  // Note that for safety reasons it will maintain the same relative visible
+  // parameter range.
   virtual void SetWholeParameterRangeToFunctionRange();
 
   // Description:
@@ -87,8 +87,7 @@ public:
     { this->SetVisibleParameterRange(range[0], range[1]); };
 
   // Description:
-  // Convenience method to set the visible parameter range to the
-  // whole parameter range
+  // Set the visible parameter range to the whole parameter range
   virtual void SetVisibleParameterRangeToWholeParameterRange();
 
   // Description:
@@ -959,7 +958,7 @@ public:
     vtkObject *object, const char *method);
 
   // Description:
-  // Set/get whether the above commands should be called or not.
+  // Set/Get whether the above commands should be called or not.
   // This allow you to disable the commands while you are setting the range
   // value for example. Events are still invoked.
   vtkSetMacro(DisableCommands, int);
@@ -1439,20 +1438,20 @@ protected:
   virtual void UpdateParameterEntry(int id);
 
   // Description:
-  // Convenience method to look for a tag in the Canvas. 
+  // Look for a tag in the Canvas. 
   // Return the number of elements matching tag+suffix, in default
   // canvas or specified one.
   virtual int CanvasHasTag(
     const char *tag, int *suffix = 0, vtkKWCanvas *canv = NULL);
 
   // Description:
-  // Convenience method to remove everything with a given tag.
+  // Remove everything with a given tag.
   virtual void CanvasRemoveTag(const char *tag, const char *canv_name = NULL);
   virtual void CanvasRemoveTag(
     const char *prefix, int id, const char *canv_name = NULL);
 
   // Description:
-  // Convenience method to check if a given tag if of a given type
+  // Check if a given tag if of a given type
   virtual int CanvasCheckTagType(const char *prefix, int id, const char *type);
 
   // Description:

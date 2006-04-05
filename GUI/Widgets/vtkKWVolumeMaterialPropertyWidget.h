@@ -35,19 +35,19 @@ public:
   virtual void Create();
   
   // Description:
-  // Set/get the volume property to edit with this widget
+  // Set/Get the volume property to edit with this widget
   virtual void SetVolumeProperty(vtkVolumeProperty *prop);
   vtkGetObjectMacro(VolumeProperty, vtkVolumeProperty);
 
   // Description:
-  // Set/get the component controlled by the widget
+  // Set/Get the component controlled by the widget
   virtual void SetSelectedComponent(int);
   vtkGetMacro(SelectedComponent, int);
   vtkGetObjectMacro(ComponentSelectionWidget, 
                     vtkKWScalarComponentSelectionWidget);
 
   // Description:
-  // Set/get the number of components controlled by the widget
+  // Set/Get the number of components controlled by the widget
   virtual void SetNumberOfComponents(int);
   vtkGetMacro(NumberOfComponents, int);
 

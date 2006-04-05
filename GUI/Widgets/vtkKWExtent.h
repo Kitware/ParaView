@@ -108,12 +108,12 @@ public:
   virtual void SetEndCommand(vtkObject *object, const char *method);
 
   // Description:
-  // Set/get whether the above commands should be called or not.
+  // Set/Get whether the above commands should be called or not.
   virtual void SetDisableCommands(int);
   vtkBooleanMacro(DisableCommands, int);
 
   // Description:
-  // Convenience method to set the ranges orientations and item positions.
+  // Set the ranges orientations and item positions.
   // This just propagates the same method to the internal ranges.
   virtual void SetOrientation(int);
   virtual void SetOrientationToHorizontal()

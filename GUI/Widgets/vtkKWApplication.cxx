@@ -17,23 +17,25 @@
 #include "vtkKWEntry.h"
 #include "vtkKWEntryWithLabel.h"
 #include "vtkKWFrame.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
+#include "vtkKWLanguage.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWObject.h"
-#include "vtkKWLanguage.h"
+#include "vtkKWOptionDataBase.h"
 #include "vtkKWRegistryHelper.h"
 #include "vtkKWSeparator.h"
 #include "vtkKWSplashScreen.h"
 #include "vtkKWText.h"
 #include "vtkKWTextWithScrollbars.h"
+#include "vtkKWTheme.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWToolbar.h"
 #include "vtkKWWindowBase.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
 #include "vtkTclUtil.h"
-#include "vtkKWInternationalization.h"
 
 #include <stdarg.h>
 
@@ -68,7 +70,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.280");
+vtkCxxRevisionMacro(vtkKWApplication, "1.281");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -139,6 +141,7 @@ vtkKWApplication::vtkKWApplication()
   this->DialogUp                  = 0;
   this->SaveUserInterfaceGeometry = 1;
   this->RegistryHelper            = NULL;
+  this->OptionDataBase            = NULL;
   this->RegistryLevel             = 10;
   this->BalloonHelpManager        = NULL;
   this->CharacterEncoding         = VTK_ENCODING_UNKNOWN;
@@ -149,6 +152,7 @@ vtkKWApplication::vtkKWApplication()
   this->SupportSplashScreen       = 0;
   this->SplashScreenVisibility    = 1;
   this->PrintTargetDPI            = 100.0;
+  this->Theme                     = NULL;
 
   /* IMPORTANT:
      Do *NOT* call anything that retrieves the application's TclName.
@@ -245,6 +249,12 @@ vtkKWApplication::~vtkKWApplication()
     {
     this->RegistryHelper->Delete();
     this->RegistryHelper = NULL;
+    }
+
+  if (this->OptionDataBase )
+    {
+    this->OptionDataBase->Delete();
+    this->OptionDataBase = NULL;
     }
 }
 
@@ -1179,7 +1189,7 @@ void vtkKWApplication::ConfigureAboutDialog()
     text->ReadOnlyOn();
 
     double r, g, b;
-    vtkKWCoreWidget *parent = vtkKWCoreWidget::SafeDownCast(text->GetParent());
+    vtkKWFrame *parent = vtkKWFrame::SafeDownCast(text->GetParent());
     parent->GetBackgroundColor(&r, &g, &b);
     text->SetBackgroundColor(r, g, b);
     this->Script("pack %s -side top -padx 2 -expand 1 -fill both",
@@ -1291,6 +1301,16 @@ vtkKWRegistryHelper *vtkKWApplication::GetRegistryHelper()
     this->RegistryHelper = vtkKWRegistryHelper::New();
     }
   return this->RegistryHelper;
+}
+
+//----------------------------------------------------------------------------
+vtkKWOptionDataBase *vtkKWApplication::GetOptionDataBase()
+{
+  if (!this->OptionDataBase)
+    {
+    this->OptionDataBase = vtkKWOptionDataBase::New();
+    }
+  return this->OptionDataBase;
 }
 
 //----------------------------------------------------------------------------
@@ -1462,32 +1482,6 @@ int vtkKWApplication::RetrieveColorRegistryValue(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplication::SaveDialogLastPathRegistryValue(
-  vtkKWLoadSaveDialog *dialog, const char* key)
-{
-  if (dialog && dialog->GetLastPath())
-    {
-    this->SetRegistryValue(
-      1, "RunTime", key, dialog->GetLastPath());
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWApplication::RetrieveDialogLastPathRegistryValue(
-  vtkKWLoadSaveDialog *dialog, const char* key)
-{
-  if (dialog)
-    {
-    char buffer[1024];
-    if (this->GetRegistryValue(1, "RunTime", key, buffer) &&
-        *buffer)
-      {
-      dialog->SetLastPath(buffer);
-      }  
-    }
-}
-
-//----------------------------------------------------------------------------
 int vtkKWApplication::LoadScript(const char* filename)
 {
   int res = 1;
@@ -1645,6 +1639,33 @@ void vtkKWApplication::SetCharacterEncoding(int val)
     }
 
   this->CharacterEncoding = val;
+  
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::SetTheme(vtkKWTheme *val)
+{
+  if (val == this->Theme)
+    {
+    return;
+    }
+
+  if (this->Theme)
+    {
+    this->Theme->Uninstall();
+    }
+
+  this->Theme = val;
+
+  if (this->Theme)
+    {
+    if (!this->Theme->GetApplication())
+      {
+      this->Theme->SetApplication(this);
+      }
+    this->Theme->Install();
+    }
   
   this->Modified();
 }
@@ -2247,6 +2268,15 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "LimitedEditionMode: " 
      << (this->LimitedEditionMode ? "On" : "Off") << endl;
   os << indent << "CharacterEncoding: " << this->CharacterEncoding << "\n";
+  os << indent << "Theme: ";
+  if (this->Theme)
+    {
+    os << this->Theme << endl;
+    }
+  else
+    {
+    os << "NULL" << endl;
+    }
   os << indent << "LimitedEditionModeName: " 
      << (this->LimitedEditionModeName ? this->LimitedEditionModeName
          : "None") << endl;

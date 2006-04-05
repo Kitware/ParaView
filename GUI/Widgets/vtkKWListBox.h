@@ -35,18 +35,66 @@ public:
   virtual void Create();
 
   // Description:
+  // Set/Get the background color of the widget.
+  virtual void GetBackgroundColor(double *r, double *g, double *b);
+  virtual double* GetBackgroundColor();
+  virtual void SetBackgroundColor(double r, double g, double b);
+  virtual void SetBackgroundColor(double rgb[3])
+    { this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+  
+  // Description:
+  // Set/Get the foreground color of the widget.
+  virtual void GetForegroundColor(double *r, double *g, double *b);
+  virtual double* GetForegroundColor();
+  virtual void SetForegroundColor(double r, double g, double b);
+  virtual void SetForegroundColor(double rgb[3])
+    { this->SetForegroundColor(rgb[0], rgb[1], rgb[2]); };
+
+  // Description:
+  // Set/Get the foreground color of the widget when it is disabled.
+  virtual void GetDisabledForegroundColor(double *r, double *g, double *b);
+  virtual double* GetDisabledForegroundColor();
+  virtual void SetDisabledForegroundColor(double r, double g, double b);
+  virtual void SetDisabledForegroundColor(double rgb[3])
+    { this->SetDisabledForegroundColor(rgb[0], rgb[1], rgb[2]); };
+
+  // Description:
+  // Set/Get the highlight thickness, a non-negative value indicating the
+  // width of the highlight rectangle to draw around the outside of the
+  // widget when it has the input focus.
+  virtual void SetHighlightThickness(int);
+  virtual int GetHighlightThickness();
+  
+  // Description:
+  // Set/Get the border width, a non-negative value indicating the width of
+  // the 3-D border to draw around the outside of the widget (if such a border
+  // is being drawn; the Relief option typically determines this).
+  virtual void SetBorderWidth(int);
+  virtual int GetBorderWidth();
+  
+  // Description:
+  // Set/Get the 3-D effect desired for the widget. 
+  // The value indicates how the interior of the widget should appear
+  // relative to its exterior. 
+  // Valid constants can be found in vtkKWTkOptions::ReliefType.
+  virtual void SetRelief(int);
+  virtual int GetRelief();
+  virtual void SetReliefToRaised();
+  virtual void SetReliefToSunken();
+  virtual void SetReliefToFlat();
+  virtual void SetReliefToRidge();
+  virtual void SetReliefToSolid();
+  virtual void SetReliefToGroove();
+
+  // Description:
   // Set/Get the one of several styles for manipulating the selection. 
   // Valid constants can be found in vtkKWTkOptions::SelectionModeType.
   virtual void SetSelectionMode(int);
   virtual int GetSelectionMode();
-  virtual void SetSelectionModeToSingle() 
-    { this->SetSelectionMode(vtkKWTkOptions::SelectionModeSingle); };
-  virtual void SetSelectionModeToBrowse() 
-    { this->SetSelectionMode(vtkKWTkOptions::SelectionModeBrowse); };
-  virtual void SetSelectionModeToMultiple() 
-    { this->SetSelectionMode(vtkKWTkOptions::SelectionModeMultiple); };
-  virtual void SetSelectionModeToExtended() 
-    { this->SetSelectionMode(vtkKWTkOptions::SelectionModeExtended); };
+  virtual void SetSelectionModeToSingle(); 
+  virtual void SetSelectionModeToBrowse(); 
+  virtual void SetSelectionModeToMultiple();
+  virtual void SetSelectionModeToExtended();
 
   // Description:
   // Specifies whether or not a selection in the widget should also be the X

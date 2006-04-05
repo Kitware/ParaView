@@ -49,7 +49,7 @@ public:
   virtual void SetImageName(const char*);
   
   // Description:
-  // Convenience method to read an image and use it as the splash image
+  // Read an image and use it as the splash image.
   // If ImageName is set, this method will update the corresponding
   // Tk image, otherwise it will create a new one and assign its name to
   // ImageName.
@@ -79,7 +79,7 @@ protected:
   void UpdateProgressMessagePosition();
 
   // Description:
-  // Convenience method to get the width/height of the toplevel as requested
+  // Get the width/height of the toplevel as requested
   // by the window manager. Not exposed in public since it is so Tk
   // related. Is is usually used to get the geometry of a window before
   // it is mapped to screen, as requested by the geometry manager.

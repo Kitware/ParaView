@@ -79,8 +79,8 @@ public:
   virtual int GetNumberOfPanels();
 
   // Description:
-  // Convenience method to get the panel from its name or ID, from a page
-  // ID (return the ID of the panel that holds that page), or the nth panel
+  // Get the panel from its name or ID, from a page ID (return the ID of the
+  // panel that holds that page), or the nth panel.
   virtual vtkKWUserInterfacePanel* GetPanel(const char *panel_name);
   virtual vtkKWUserInterfacePanel* GetPanel(int id);
   virtual vtkKWUserInterfacePanel* GetPanelFromPageId(int id) = 0;
@@ -153,7 +153,7 @@ public:
     { return this->ShowPanel(panel); };
 
   // Description:
-  // Convenience method to show/hide all panels.
+  // Show/hide all panels.
   virtual void ShowAllPanels();
   virtual void HideAllPanels();
 

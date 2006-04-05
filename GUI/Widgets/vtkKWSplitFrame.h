@@ -130,9 +130,8 @@ public:
   vtkBooleanMacro(Frame2Visibility, int);  
 
   // Description:
-  // Convenience method to set the size of both frames by setting
-  // the relative position of the separator. This will not work
-  // until the widget has been mapped on screen.
+  // Set the size of both frames by setting the relative position of the
+  // separator. This will not work until the widget has been mapped on screen.
   virtual void SetSeparatorPosition(double pos);
   virtual double GetSeparatorPosition();
 

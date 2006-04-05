@@ -85,6 +85,13 @@ public:
   // Specify the width of the listbox in the dropdown. 
   virtual void SetListboxWidth(int n);
 
+  // Description:
+  // Set/Get the background color of the widget.
+  // Override the super to make sure all elements are set correctly.
+  virtual void SetBackgroundColor(double r, double g, double b);
+  virtual void SetBackgroundColor(double rgb[3])
+    { this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+
 protected:
   vtkKWComboBox();
   ~vtkKWComboBox() {};

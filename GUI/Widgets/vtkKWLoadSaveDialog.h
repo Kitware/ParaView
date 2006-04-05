@@ -107,6 +107,12 @@ public:
   // Figure out last path out of the file name.
   const char* GenerateLastPath(const char* path);
 
+  // Description:
+  // Save/retrieve the last path to/from the registry.
+  // Note that the subkey used here is "RunTime".
+  virtual void SaveLastPathToRegistry(const char *key);
+  virtual void RetrieveLastPathFromRegistry(const char *key);
+
 protected:
   vtkKWLoadSaveDialog();
   ~vtkKWLoadSaveDialog();

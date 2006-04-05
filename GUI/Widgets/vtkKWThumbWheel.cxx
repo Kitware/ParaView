@@ -35,7 +35,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.48");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.49");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -1221,7 +1221,7 @@ void vtkKWThumbWheel::UpdateThumbWheelImage(double pos)
   // Show position indicator ? Compute range
 
   int posx_start = 0, posx_end = 0;
-  double indicator_hsv[3];
+  double indicator_hsv[3], bg_hsv[3];
   if (this->DisplayThumbWheelPositionIndicator && 
       this->State == vtkKWThumbWheel::InMotion)
     {
@@ -1240,6 +1240,8 @@ void vtkKWThumbWheel::UpdateThumbWheelImage(double pos)
       }
     vtkMath::RGBToHSV(this->ThumbWheelPositionIndicatorColor, indicator_hsv);
     }
+
+  vtkMath::RGBToHSV(this->GetBackgroundColor(), bg_hsv);
 
   double width2 = 0.5 * (double)(this->ThumbWheelWidth - 1);
 
@@ -1273,6 +1275,7 @@ void vtkKWThumbWheel::UpdateThumbWheelImage(double pos)
   unsigned char *img_ptr_s1 = img_ptr_s0 + img_row_size;
   unsigned char *img_ptr    = img_ptr_s1 + img_row_size;
 
+  double r, g, b;
   int x;
   for (x = 0; x < this->ThumbWheelWidth; x++)
     {
@@ -1333,34 +1336,49 @@ void vtkKWThumbWheel::UpdateThumbWheelImage(double pos)
         this->State == vtkKWThumbWheel::InMotion &&
         x >= posx_start && x <= posx_end)
       {
-      double r, g, b;
-
-      vtkMath::HSVToRGB(indicator_hsv[0], indicator_hsv[1], (double)gray / 255.0,
-                        &r, &g, &b);
+      vtkMath::HSVToRGB(
+        indicator_hsv[0], indicator_hsv[1], (double)gray / 255.0,
+        &r, &g, &b);
       *img_ptr++ = (int)(r * 255.0);
       *img_ptr++ = (int)(g * 255.0);
       *img_ptr++ = (int)(b * 255.0);
 
-      vtkMath::HSVToRGB(indicator_hsv[0], indicator_hsv[1], (double)gray_s0/255.0,
-                        &r, &g, &b);
+      vtkMath::HSVToRGB(
+        indicator_hsv[0], indicator_hsv[1], (double)gray_s0/255.0,
+        &r, &g, &b);
       *img_ptr_s0++ = (int)(r * 255.0);
       *img_ptr_s0++ = (int)(g * 255.0);
       *img_ptr_s0++ = (int)(b * 255.0);
 
-      vtkMath::HSVToRGB(indicator_hsv[0], indicator_hsv[1], (double)gray_s1/255.0,
-                        &r, &g, &b);
+      vtkMath::HSVToRGB(
+        indicator_hsv[0], indicator_hsv[1], (double)gray_s1/255.0,
+        &r, &g, &b);
       *img_ptr_s1++ = (int)(r * 255.0);
       *img_ptr_s1++ = (int)(g * 255.0);
       *img_ptr_s1++ = (int)(b * 255.0);
-
       }
     else
       {
-      *img_ptr++ = gray; *img_ptr++ = gray; *img_ptr++ = gray;
+      vtkMath::HSVToRGB(
+        bg_hsv[0], bg_hsv[1], (double)gray / 255.0,
+        &r, &g, &b);
+      *img_ptr++ = (int)(r * 255.0);
+      *img_ptr++ = (int)(g * 255.0);
+      *img_ptr++ = (int)(b * 255.0);
 
-      *img_ptr_s0++ = gray_s0; *img_ptr_s0++ = gray_s0; *img_ptr_s0++ = gray_s0;
+      vtkMath::HSVToRGB(
+        bg_hsv[0], bg_hsv[1], (double)gray_s0/255.0,
+        &r, &g, &b);
+      *img_ptr_s0++ = (int)(r * 255.0);
+      *img_ptr_s0++ = (int)(g * 255.0);
+      *img_ptr_s0++ = (int)(b * 255.0);
 
-      *img_ptr_s1++ = gray_s1; *img_ptr_s1++ = gray_s1; *img_ptr_s1++ = gray_s1;
+      vtkMath::HSVToRGB(
+        bg_hsv[0], bg_hsv[1], (double)gray_s1/255.0,
+        &r, &g, &b);
+      *img_ptr_s1++ = (int)(r * 255.0);
+      *img_ptr_s1++ = (int)(g * 255.0);
+      *img_ptr_s1++ = (int)(b * 255.0);
       }
     }
 

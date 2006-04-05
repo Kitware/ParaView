@@ -29,7 +29,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Set/get the volume property to edit with this widget
+  // Set/Get the volume property to edit with this widget
   virtual void SetProperty(vtkProperty *prop);
   vtkGetObjectMacro(Property, vtkProperty);
 

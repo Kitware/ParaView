@@ -155,7 +155,7 @@ public:
   virtual void UpdateEnableState();
 
   // Description:
-  // Convenience method to set the text properties
+  // Set the text properties
   virtual void SetColor(double, double, double);
   virtual void SetColor(double *v) { this->SetColor(v[0], v[1], v[2]); };
   virtual double* GetColor();

@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCoreWidget );
-vtkCxxRevisionMacro(vtkKWCoreWidget, "1.16");
+vtkCxxRevisionMacro(vtkKWCoreWidget, "1.17");
 
 //----------------------------------------------------------------------------
 void vtkKWCoreWidget::Create()
@@ -37,104 +37,6 @@ void vtkKWCoreWidget::Create()
   // Call the superclass to create the whole widget
 
   this->Superclass::Create();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWCoreWidget::GetBackgroundColor(double *r, double *g, double *b)
-{
-  this->GetConfigurationOptionAsColor("-background", r, g, b);
-}
-
-//----------------------------------------------------------------------------
-double* vtkKWCoreWidget::GetBackgroundColor()
-{
-  return this->GetConfigurationOptionAsColor("-background");
-}
-
-//----------------------------------------------------------------------------
-void vtkKWCoreWidget::SetBackgroundColor(double r, double g, double b)
-{
-  this->SetConfigurationOptionAsColor("-background", r, g, b);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWCoreWidget::GetForegroundColor(double *r, double *g, double *b)
-{
-  this->GetConfigurationOptionAsColor("-foreground", r, g, b);
-}
-
-//----------------------------------------------------------------------------
-double* vtkKWCoreWidget::GetForegroundColor()
-{
-  return this->GetConfigurationOptionAsColor("-foreground");
-}
-
-//----------------------------------------------------------------------------
-void vtkKWCoreWidget::SetForegroundColor(double r, double g, double b)
-{
-  this->SetConfigurationOptionAsColor("-foreground", r, g, b);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWCoreWidget::SetHighlightThickness(int width)
-{
-  this->SetConfigurationOptionAsInt("-highlightthickness", width);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWCoreWidget::GetHighlightThickness()
-{
-  return this->GetConfigurationOptionAsInt("-highlightthickness");
-}
-
-//----------------------------------------------------------------------------
-void vtkKWCoreWidget::SetBorderWidth(int width)
-{
-  this->SetConfigurationOptionAsInt("-bd", width);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWCoreWidget::GetBorderWidth()
-{
-  return this->GetConfigurationOptionAsInt("-bd");
-}
-
-//----------------------------------------------------------------------------
-void vtkKWCoreWidget::SetRelief(int relief)
-{
-  this->SetConfigurationOption(
-    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
-}
-
-//----------------------------------------------------------------------------
-int vtkKWCoreWidget::GetRelief()
-{
-  return vtkKWTkOptions::GetReliefFromTkOptionValue(
-    this->GetConfigurationOption("-relief"));
-}
-
-//----------------------------------------------------------------------------
-void vtkKWCoreWidget::SetPadX(int arg)
-{
-  this->SetConfigurationOptionAsInt("-padx", arg);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWCoreWidget::GetPadX()
-{
-  return this->GetConfigurationOptionAsInt("-padx");
-}
-
-//----------------------------------------------------------------------------
-void vtkKWCoreWidget::SetPadY(int arg)
-{
-  this->SetConfigurationOptionAsInt("-pady", arg);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWCoreWidget::GetPadY()
-{
-  return this->GetConfigurationOptionAsInt("-pady");
 }
 
 //----------------------------------------------------------------------------

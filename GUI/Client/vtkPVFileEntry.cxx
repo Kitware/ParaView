@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.124");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.125");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -339,7 +339,7 @@ void vtkPVFileEntry::BrowseCallback()
     }
   else
     {
-      this->GetApplication()->RetrieveDialogLastPathRegistryValue(loadDialog, "OpenPath");
+      loadDialog->RetrieveLastPathFromRegistry("OpenPath");
     }
   loadDialog->Create();
   if (win) 

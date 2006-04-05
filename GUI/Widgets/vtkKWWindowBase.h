@@ -82,7 +82,7 @@ public:
   virtual const char *GetStatusText();
   
   // Description:
-  // Convenience methods to popup a warning/error message.
+  // Popup a warning/error message.
   // This can be overriden in a subclass to redirect errors and warnings
   // to log files or more elaborate log windows.
   virtual void WarningMessage(const char* message);
@@ -217,11 +217,6 @@ public:
   virtual int GetFileMenuInsertPosition();
   virtual int GetHelpMenuInsertPosition();
   virtual int GetViewMenuInsertPosition();
-
-  // Description:
-  // Convenience method that return the position where to safely insert 
-  // entries in the help menu without interferring with entries that should
-  // stay at the end of the menu .
 
   // Description:
   // Set/Get a hint about help support. Disabled by default.

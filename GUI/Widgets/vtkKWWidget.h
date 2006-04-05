@@ -111,8 +111,8 @@ public:
     const char *event, vtkObject *object, const char *method);
 
   // Description:
-  // Convenience method to get the parent vtkKWTopLevel for
-  // this widget if there is one (by recursively tracking the parents).
+  // Get the parent vtkKWTopLevel for this widget if there is one (by
+  // recursively tracking the parents).
   // This can be safe-downcasted to a vtkKWWindowBase or vtkKWWindow.
   // NOTE: this may return NULL if the widget is not in a toplevel.
   vtkKWTopLevel* GetParentTopLevel();
@@ -254,8 +254,8 @@ protected:
   vtkKWWidgetInternals *Internals;
 
   // Description:
-  // Convenience function to that propagates the Enabled state of
-  // the instance to another subwidget (preferably a sub-widget).
+  // Propagates the Enabled state of the instance to another subwidget
+  // (preferably a sub-widget).
   // It calls SetEnabled(this->GetEnabled()) on the 'widget' parameter
   virtual void PropagateEnableState(vtkKWWidget* widget);
 

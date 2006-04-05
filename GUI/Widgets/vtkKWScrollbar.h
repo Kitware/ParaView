@@ -33,6 +33,61 @@ public:
   virtual void Create();
 
   // Description:
+  // Set/Get the background color of the widget.
+  virtual void GetBackgroundColor(double *r, double *g, double *b);
+  virtual double* GetBackgroundColor();
+  virtual void SetBackgroundColor(double r, double g, double b);
+  virtual void SetBackgroundColor(double rgb[3])
+    { this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+  
+  // Description:
+  // Set/Get the foreground color of the widget.
+  virtual void GetForegroundColor(double *r, double *g, double *b);
+  virtual double* GetForegroundColor();
+  virtual void SetForegroundColor(double r, double g, double b);
+  virtual void SetForegroundColor(double rgb[3])
+    { this->SetForegroundColor(rgb[0], rgb[1], rgb[2]); };
+
+  // Description:
+  // Set/Get the highlight thickness, a non-negative value indicating the
+  // width of the highlight rectangle to draw around the outside of the
+  // widget when it has the input focus.
+  virtual void SetHighlightThickness(int);
+  virtual int GetHighlightThickness();
+  
+  // Description:
+  // Set/Get the active background color of the widget. An element
+  // (a widget or portion of a widget) is active if the mouse cursor is
+  // positioned over the element and pressing a mouse button will cause some
+  // action to occur.
+  virtual void GetActiveBackgroundColor(double *r, double *g, double *b);
+  virtual double* GetActiveBackgroundColor();
+  virtual void SetActiveBackgroundColor(double r, double g, double b);
+  virtual void SetActiveBackgroundColor(double rgb[3])
+    { this->SetActiveBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+  
+  // Description:
+  // Set/Get the border width, a non-negative value indicating the width of
+  // the 3-D border to draw around the outside of the widget (if such a border
+  // is being drawn; the Relief option typically determines this).
+  virtual void SetBorderWidth(int);
+  virtual int GetBorderWidth();
+  
+  // Description:
+  // Set/Get the 3-D effect desired for the widget. 
+  // The value indicates how the interior of the widget should appear
+  // relative to its exterior. 
+  // Valid constants can be found in vtkKWTkOptions::ReliefType.
+  virtual void SetRelief(int);
+  virtual int GetRelief();
+  virtual void SetReliefToRaised();
+  virtual void SetReliefToSunken();
+  virtual void SetReliefToFlat();
+  virtual void SetReliefToRidge();
+  virtual void SetReliefToSolid();
+  virtual void SetReliefToGroove();
+
+  // Description:
   // Set/Get the orientation type.
   // For widgets that can lay themselves out with either a horizontal or
   // vertical orientation, such as scrollbars, this option specifies which 
@@ -44,6 +99,16 @@ public:
     { this->SetOrientation(vtkKWTkOptions::OrientationHorizontal); };
   virtual void SetOrientationToVertical() 
     { this->SetOrientation(vtkKWTkOptions::OrientationVertical); };
+
+  // Description:
+  // Set/Get the trough color, i.e. the color to use for the rectangular
+  // trough areas in widgets such as scrollbars and scales.
+  // Ignored on Windows though (not supported by native widget)
+  virtual void GetTroughColor(double *r, double *g, double *b);
+  virtual double* GetTroughColor();
+  virtual void SetTroughColor(double r, double g, double b);
+  virtual void SetTroughColor(double rgb[3])
+    { this->SetTroughColor(rgb[0], rgb[1], rgb[2]); };
 
   // Description:
   // Specifies a command to associate with the widget. This command is 
@@ -64,8 +129,4 @@ private:
   void operator=(const vtkKWScrollbar&); // Not implemented
 };
 
-
 #endif
-
-
-

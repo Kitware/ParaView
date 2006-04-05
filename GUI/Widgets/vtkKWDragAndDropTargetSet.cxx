@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDragAndDropTargetSet );
-vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.14");
+vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.15");
 
 //----------------------------------------------------------------------------
 class vtkKWDragAndDropTargetSetInternals
@@ -521,10 +521,10 @@ void vtkKWDragAndDropTargetSet::StartCallback(int x, int y)
           anchor_as_core->HasConfigurationOption("-bg"))
         {
         double fr, fg, fb, br, bg, bb;
-        anchor_as_core->GetForegroundColor(&fr, &fg, &fb);
-        anchor_as_core->GetBackgroundColor(&br, &bg, &bb);
-        anchor_as_core->SetForegroundColor(br, bg, bb);
-        anchor_as_core->SetBackgroundColor(fr, fg, fb);
+        anchor_as_core->GetConfigurationOptionAsColor("-fg", &fr, &fg, &fb);
+        anchor_as_core->GetConfigurationOptionAsColor("-bg", &br, &bg, &bb);
+        anchor_as_core->SetConfigurationOptionAsColor("-fg", br, bg, bb);
+        anchor_as_core->SetConfigurationOptionAsColor("-bg", fr, fg, fb);
         }
       }
 
@@ -620,10 +620,10 @@ void vtkKWDragAndDropTargetSet::EndCallback(int x, int y)
           anchor_as_core->HasConfigurationOption("-bg"))
         {
         double fr, fg, fb, br, bg, bb;
-        anchor_as_core->GetForegroundColor(&fr, &fg, &fb);
-        anchor_as_core->GetBackgroundColor(&br, &bg, &bb);
-        anchor_as_core->SetForegroundColor(br, bg, bb);
-        anchor_as_core->SetBackgroundColor(fr, fg, fb);
+        anchor_as_core->GetConfigurationOptionAsColor("-fg", &fr, &fg, &fb);
+        anchor_as_core->GetConfigurationOptionAsColor("-bg", &br, &bg, &bb);
+        anchor_as_core->SetConfigurationOptionAsColor("-fg", br, bg, bb);
+        anchor_as_core->SetConfigurationOptionAsColor("-bg", fr, fg, fb);
         }
       }
 

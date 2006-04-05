@@ -96,7 +96,7 @@ protected:
     vtkVolumeProperty *target, vtkVolumeProperty *source);
 
   // Description:
-  // Convenience methods to get the index of a given column
+  // Get the index of a given column.
   virtual int GetModalityColumnIndex();
 
 private:

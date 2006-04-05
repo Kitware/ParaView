@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.51");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.52");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
@@ -257,6 +257,30 @@ const char *vtkKWLoadSaveDialog::GetNthFileName(int i)
     }
 
   return this->FileNames[i];
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLoadSaveDialog::SaveLastPathToRegistry(const char* key)
+{
+  if (this->IsCreated() && this->GetLastPath())
+    {
+    this->GetApplication()->SetRegistryValue(
+      1, "RunTime", key, this->GetLastPath());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLoadSaveDialog::RetrieveLastPathFromRegistry(const char* key)
+{
+  if (this->IsCreated())
+    {
+    char buffer[1024];
+    if (this->GetApplication()->GetRegistryValue(1, "RunTime", key, buffer) &&
+        *buffer)
+      {
+      this->SetLastPath(buffer);
+      }  
+    }
 }
 
 //----------------------------------------------------------------------------

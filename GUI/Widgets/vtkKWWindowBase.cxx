@@ -33,7 +33,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.45");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.46");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -1063,8 +1063,7 @@ void vtkKWWindowBase::ToolbarVisibilityChangedCallback(vtkKWToolbar*)
 void vtkKWWindowBase::LoadScript()
 {
   vtkKWLoadSaveDialog* load_dialog = vtkKWLoadSaveDialog::New();
-  this->GetApplication()->RetrieveDialogLastPathRegistryValue(
-    load_dialog, "LoadScriptLastPath");
+  load_dialog->RetrieveLastPathFromRegistry("LoadScriptLastPath");
   load_dialog->SetParent(this);
   load_dialog->Create();
   load_dialog->SaveDialogOff();
@@ -1097,8 +1096,7 @@ void vtkKWWindowBase::LoadScript()
       }
     else
       {
-      this->GetApplication()->SaveDialogLastPathRegistryValue(
-        load_dialog, "LoadScriptLastPath");
+      load_dialog->SaveLastPathToRegistry("LoadScriptLastPath");
       this->LoadScript(load_dialog->GetFileName());
       }
     }

@@ -73,8 +73,7 @@ public:
 
   // Description:
   // Add a color preset. 
-  // Convenience methods to add a preset given a solid color, in RGB or
-  // HSV format.
+  // Add a preset given a solid color, in RGB or HSV format.
   virtual int AddSolidRGBPreset(const char *name, double rgb[3]);
   virtual int AddSolidRGBPreset(const char *name, double r,double g, double b);
   virtual int AddSolidHSVPreset(const char *name, double hsv[3]);
@@ -82,8 +81,8 @@ public:
 
   // Description:
   // Add a color preset. 
-  // Convenience methods to add a gradient preset given the endpoints of
-  // the gradient, in RGB or HSV format.
+  // Add a gradient preset given the endpoints of the gradient, in RGB or HSV
+  // format.
   virtual int AddGradientRGBPreset(
     const char *name, double rgb1[3], double rgb2[3]);
   virtual int AddGradientRGBPreset(
@@ -99,9 +98,9 @@ public:
 
   // Description:
   // Add a color preset. 
-  // Convenience methods to add a "flag" preset given the number of colors
-  // in the flag, a pointer to those colors, and the number of time the
-  // flag should be repeated in the scalar range.
+  // Add a "flag" preset given the number of colors in the flag, a pointer
+  // to those colors, and the number of time the flag should be repeated in
+  // the scalar range.
   virtual int AddFlagRGBPreset(
     const char *name, int nb_colors, double **rgb, int repeat);
 
@@ -112,13 +111,13 @@ public:
   virtual void SetPreviewSize(int);
 
   // Description:
-  // Set/get visibility of solid color presets in menu.
+  // Set/Get visibility of solid color presets in menu.
   vtkGetMacro(SolidColorPresetsVisibility, int);
   vtkBooleanMacro(SolidColorPresetsVisibility, int);
   virtual void SetSolidColorPresetsVisibility(int);
 
   // Description:
-  // Set/get visibility of gradient presets in menu.
+  // Set/Get visibility of gradient presets in menu.
   vtkGetMacro(GradientPresetsVisibility, int);
   vtkBooleanMacro(GradientPresetsVisibility, int);
   virtual void SetGradientPresetsVisibility(int);

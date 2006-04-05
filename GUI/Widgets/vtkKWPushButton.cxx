@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPushButton );
-vtkCxxRevisionMacro(vtkKWPushButton, "1.29");
+vtkCxxRevisionMacro(vtkKWPushButton, "1.30");
 
 //----------------------------------------------------------------------------
 vtkKWPushButton::vtkKWPushButton()
@@ -100,11 +100,225 @@ int vtkKWPushButton::GetHeight()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWPushButton::GetBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWPushButton::GetBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-background");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::SetBackgroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-background", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::GetForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-foreground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWPushButton::GetForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-foreground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::SetForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-foreground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::SetHighlightThickness(int width)
+{
+  this->SetConfigurationOptionAsInt("-highlightthickness", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPushButton::GetHighlightThickness()
+{
+  return this->GetConfigurationOptionAsInt("-highlightthickness");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::GetActiveBackgroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-activebackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWPushButton::GetActiveBackgroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-activebackground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::SetActiveBackgroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-activebackground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::GetActiveForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-activeforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWPushButton::GetActiveForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-activeforeground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::SetActiveForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-activeforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::GetDisabledForegroundColor(double *r, double *g, double *b)
+{
+  this->GetConfigurationOptionAsColor("-disabledforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+double* vtkKWPushButton::GetDisabledForegroundColor()
+{
+  return this->GetConfigurationOptionAsColor("-disabledforeground");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::SetDisabledForegroundColor(double r, double g, double b)
+{
+  this->SetConfigurationOptionAsColor("-disabledforeground", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::SetBorderWidth(int width)
+{
+  this->SetConfigurationOptionAsInt("-bd", width);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPushButton::GetBorderWidth()
+{
+  return this->GetConfigurationOptionAsInt("-bd");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::SetRelief(int relief)
+{
+  this->SetConfigurationOption(
+    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+}
+
+void vtkKWPushButton::SetReliefToRaised()     
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+};
+void vtkKWPushButton::SetReliefToSunken() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+};
+void vtkKWPushButton::SetReliefToFlat() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+};
+void vtkKWPushButton::SetReliefToRidge() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+};
+void vtkKWPushButton::SetReliefToSolid() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+};
+void vtkKWPushButton::SetReliefToGroove() 
+{ 
+  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+};
+
+//----------------------------------------------------------------------------
+int vtkKWPushButton::GetRelief()
+{
+  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+    this->GetConfigurationOption("-relief"));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::SetPadX(int arg)
+{
+  this->SetConfigurationOptionAsInt("-padx", arg);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPushButton::GetPadX()
+{
+  return this->GetConfigurationOptionAsInt("-padx");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::SetPadY(int arg)
+{
+  this->SetConfigurationOptionAsInt("-pady", arg);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPushButton::GetPadY()
+{
+  return this->GetConfigurationOptionAsInt("-pady");
+}
+
+//----------------------------------------------------------------------------
 void vtkKWPushButton::SetAnchor(int anchor)
 {
   this->SetConfigurationOption(
     "-anchor", vtkKWTkOptions::GetAnchorAsTkOptionValue(anchor));
 }
+
+void vtkKWPushButton::SetAnchorToNorth() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorNorth); 
+};
+void vtkKWPushButton::SetAnchorToNorthEast() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorNorthEast); 
+};
+void vtkKWPushButton::SetAnchorToEast() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorEast); 
+};
+void vtkKWPushButton::SetAnchorToSouthEast() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorSouthEast); 
+};
+void vtkKWPushButton::SetAnchorToSouth() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorSouth); 
+};
+void vtkKWPushButton::SetAnchorToSouthWest() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorSouthWest); 
+};
+void vtkKWPushButton::SetAnchorToWest() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorWest); 
+};
+void vtkKWPushButton::SetAnchorToNorthWest() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorNorthWest); 
+};
+void vtkKWPushButton::SetAnchorToCenter() 
+{ 
+  this->SetAnchor(vtkKWTkOptions::AnchorCenter); 
+};
 
 //----------------------------------------------------------------------------
 void vtkKWPushButton::SetOverRelief(int relief)
@@ -112,6 +326,35 @@ void vtkKWPushButton::SetOverRelief(int relief)
   this->SetConfigurationOption(
     "-overrelief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
 }
+
+void vtkKWPushButton::SetOverReliefToRaised()     
+{ 
+  this->SetOverRelief(vtkKWTkOptions::ReliefRaised); 
+};
+void vtkKWPushButton::SetOverReliefToSunken() 
+{ 
+  this->SetOverRelief(vtkKWTkOptions::ReliefSunken); 
+};
+void vtkKWPushButton::SetOverReliefToFlat() 
+{ 
+  this->SetOverRelief(vtkKWTkOptions::ReliefFlat); 
+};
+void vtkKWPushButton::SetOverReliefToRidge() 
+{ 
+  this->SetOverRelief(vtkKWTkOptions::ReliefRidge); 
+};
+void vtkKWPushButton::SetOverReliefToSolid() 
+{ 
+  this->SetOverRelief(vtkKWTkOptions::ReliefSolid); 
+};
+void vtkKWPushButton::SetOverReliefToGroove() 
+{ 
+  this->SetOverRelief(vtkKWTkOptions::ReliefGroove); 
+};
+void vtkKWPushButton::SetOverReliefToNone() 
+{ 
+  this->SetOverRelief(vtkKWTkOptions::ReliefUnknown); 
+};
 
 //----------------------------------------------------------------------------
 int vtkKWPushButton::GetOverRelief()

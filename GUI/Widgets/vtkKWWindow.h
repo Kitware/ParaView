@@ -239,7 +239,7 @@ public:
     { this->SetViewPanelPosition(vtkKWWindow::ViewPanelPositionRight);};
 
   // Description:
-  // Convenience method to get the frame available for "viewing". 
+  // Get the frame available for "viewing". 
   // Override the superclass to return a page in the notebook of the
   // view user interface manager (located in the first part of the 
   // SecondarySplitFrame).

@@ -57,7 +57,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.44");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.45");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -342,8 +342,6 @@ void vtkKWPresetSelector::Create()
     this, "PresetSelectionChangedCallback");
   list->SetPotentialCellColorsChangedCommand(
     list, "ScheduleRefreshColorsOfAllCellsWithWindowCommand");
-  // list->SetSelectionBackgroundColor(0.988, 1.0, 0.725);
-  // list->ColumnLabelsVisibilityOff();
   list->ColumnSeparatorsVisibilityOn();
   list->SetEditStartCommand(this, "PresetCellEditStartCallback");
   list->SetEditEndCommand(this, "PresetCellEditEndCallback");

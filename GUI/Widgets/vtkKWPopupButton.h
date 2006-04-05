@@ -44,7 +44,7 @@ public:
   vtkGetObjectMacro(PopupCloseButton, vtkKWPushButton);
 
   // Description:
-  // Convenience method to set the popup title
+  // Set the popup title.
   virtual void SetPopupTitle(const char* title);
 
   // Description:

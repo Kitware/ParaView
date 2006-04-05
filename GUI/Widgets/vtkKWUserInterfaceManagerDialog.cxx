@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceManagerDialog);
-vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.13");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.14");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceManagerDialogInternals
@@ -168,9 +168,6 @@ void vtkKWUserInterfaceManagerDialog::Create()
 
   vtkKWTree *tree = this->Tree->GetWidget();
   tree->SetHighlightThickness(0);
-  tree->SetBackgroundColor(1.0, 1.0, 1.0);
-  tree->SetSelectionForegroundColor(1.0, 1.0, 1.0);
-  tree->SetSelectionBackgroundColor(0.0, 0.0, 0.7);
   tree->RedrawOnIdleOn();
   tree->SelectionFillOn();
   tree->SetWidth(350 / 8);

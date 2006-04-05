@@ -17,20 +17,20 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRadioButton );
-vtkCxxRevisionMacro(vtkKWRadioButton, "1.26");
+vtkCxxRevisionMacro(vtkKWRadioButton, "1.27");
 
 //----------------------------------------------------------------------------
 void vtkKWRadioButton::Create()
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::CreateSpecificTkWidget("radiobutton"))
+  if (!this->vtkKWWidget::CreateSpecificTkWidget(
+        "radiobutton", "-value 1"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
-  this->SetConfigurationOptionAsInt("-value", 1);
   this->Configure();
 
   // Update enable state

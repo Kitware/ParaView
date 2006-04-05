@@ -74,7 +74,7 @@ public:
   virtual double GetValue();
 
   // Description:
-  // Method to set/get the resolution of the slider.
+  // Set/Get the resolution of the slider.
   virtual void SetResolution(double r);
   virtual double GetResolution();
 
@@ -92,7 +92,7 @@ public:
     { return this->GetWidget(); };
   
   // Description:
-  // Set/get whether to display the range of the scale.
+  // Set/Get whether to display the range of the scale.
   // If the scale orientation is horizontal, the min is displayed on the
   // left of the scale, the max range on the right. For vertical orientation,
   // min is on top, max at the bottom. In popup mode, the range is
@@ -114,7 +114,7 @@ public:
   vtkGetMacro(EntryVisibility, int);
 
   // Description:
-  // Convenience method to set the contents label.
+  // Set the contents label.
   // IMPORTANT: this method will create the label on the fly, use it only if
   // you are confident that you will indeed display the label.
   // Override the superclass so that the label is packed/unpacked if the
@@ -132,7 +132,7 @@ public:
   virtual int HasEntry();
 
   // Description:
-  // Convenience method to set/get the entry width.
+  // Set/Get the entry width.
   // IMPORTANT: this method will create the entry on the fly, use it only if
   // you are confident that you will indeed display the entry.
   virtual void SetEntryWidth(int width);
@@ -170,8 +170,8 @@ public:
     { this->SetEntryPosition(vtkKWScaleWithEntry::EntryPositionRight); };
 
   // Description:
-  // Convenience method to set both the label and entry position to the
-  // top of the scale (label in the left corner, entry in the right corner)
+  // Set both the label and entry position to the top of the scale
+  // (label in the left corner, entry in the right corner)
   virtual void SetLabelAndEntryPositionToTop();
 
   // Description:
@@ -248,7 +248,7 @@ public:
   virtual void SetEntryCommand(vtkObject *object, const char *method);
 
   // Description:
-  // Set/get whether the above commands should be called or not.
+  // Set/Get whether the above commands should be called or not.
   // This make it easier to disable the commands while setting the scale
   // value for example.
   virtual void SetDisableCommands(int);

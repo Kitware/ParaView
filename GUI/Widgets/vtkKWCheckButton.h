@@ -83,30 +83,109 @@ public:
   //ETX
 
   // Description:
+  // Set/Get the background color of the widget.
+  virtual void GetBackgroundColor(double *r, double *g, double *b);
+  virtual double* GetBackgroundColor();
+  virtual void SetBackgroundColor(double r, double g, double b);
+  virtual void SetBackgroundColor(double rgb[3])
+    { this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+  
+  // Description:
+  // Set/Get the foreground color of the widget.
+  virtual void GetForegroundColor(double *r, double *g, double *b);
+  virtual double* GetForegroundColor();
+  virtual void SetForegroundColor(double r, double g, double b);
+  virtual void SetForegroundColor(double rgb[3])
+    { this->SetForegroundColor(rgb[0], rgb[1], rgb[2]); };
+
+  // Description:
+  // Set/Get the highlight thickness, a non-negative value indicating the
+  // width of the highlight rectangle to draw around the outside of the
+  // widget when it has the input focus.
+  virtual void SetHighlightThickness(int);
+  virtual int GetHighlightThickness();
+  
+  // Description:
+  // Set/Get the active background color of the widget. An element
+  // (a widget or portion of a widget) is active if the mouse cursor is
+  // positioned over the element and pressing a mouse button will cause some
+  // action to occur.
+  virtual void GetActiveBackgroundColor(double *r, double *g, double *b);
+  virtual double* GetActiveBackgroundColor();
+  virtual void SetActiveBackgroundColor(double r, double g, double b);
+  virtual void SetActiveBackgroundColor(double rgb[3])
+    { this->SetActiveBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+  
+  // Description:
+  // Set/Get the active foreground color of the widget. An element
+  // (a widget or portion of a widget) is active if the mouse cursor is
+  // positioned over the element and pressing a mouse button will cause some
+  // action to occur.
+  virtual void GetActiveForegroundColor(double *r, double *g, double *b);
+  virtual double* GetActiveForegroundColor();
+  virtual void SetActiveForegroundColor(double r, double g, double b);
+  virtual void SetActiveForegroundColor(double rgb[3])
+    { this->SetActiveForegroundColor(rgb[0], rgb[1], rgb[2]); };
+  
+  // Description:
+  // Set/Get the foreground color of the widget when it is disabled.
+  virtual void GetDisabledForegroundColor(double *r, double *g, double *b);
+  virtual double* GetDisabledForegroundColor();
+  virtual void SetDisabledForegroundColor(double r, double g, double b);
+  virtual void SetDisabledForegroundColor(double rgb[3])
+    { this->SetDisabledForegroundColor(rgb[0], rgb[1], rgb[2]); };
+
+  // Description:
+  // Set/Get the border width, a non-negative value indicating the width of
+  // the 3-D border to draw around the outside of the widget (if such a border
+  // is being drawn; the Relief option typically determines this).
+  virtual void SetBorderWidth(int);
+  virtual int GetBorderWidth();
+  
+  // Description:
+  // Set/Get the 3-D effect desired for the widget. 
+  // The value indicates how the interior of the widget should appear
+  // relative to its exterior. 
+  // Valid constants can be found in vtkKWTkOptions::ReliefType.
+  virtual void SetRelief(int);
+  virtual int GetRelief();
+  virtual void SetReliefToRaised();
+  virtual void SetReliefToSunken();
+  virtual void SetReliefToFlat();
+  virtual void SetReliefToRidge();
+  virtual void SetReliefToSolid();
+  virtual void SetReliefToGroove();
+
+  // Description:
+  // Set/Get the padding that will be applied around each widget (in pixels).
+  // Specifies a non-negative value indicating how much extra space to request
+  // for the widget in the X and Y-direction. When computing how large a
+  // window it needs, the widget will add this amount to the width it would
+  // normally need (as determined by the width of the things displayed
+  // in the widget); if the geometry manager can satisfy this request, the 
+  // widget will end up with extra internal space around what it displays 
+  // inside. 
+  virtual void SetPadX(int);
+  virtual int GetPadX();
+  virtual void SetPadY(int);
+  virtual int GetPadY();
+
+  // Description:
   // Set/Get the anchoring.
   // Specifies how the information in a widget (e.g. text or a bitmap) is to
   // be displayed in the widget.
   // Valid constants can be found in vtkKWTkOptions::AnchorType.
   virtual void SetAnchor(int);
   virtual int GetAnchor();
-  virtual void SetAnchorToNorth() 
-    { this->SetAnchor(vtkKWTkOptions::AnchorNorth); };
-  virtual void SetAnchorToNorthEast() 
-    { this->SetAnchor(vtkKWTkOptions::AnchorNorthEast); };
-  virtual void SetAnchorToEast() 
-    { this->SetAnchor(vtkKWTkOptions::AnchorEast); };
-  virtual void SetAnchorToSouthEast() 
-    { this->SetAnchor(vtkKWTkOptions::AnchorSouthEast); };
-  virtual void SetAnchorToSouth() 
-    { this->SetAnchor(vtkKWTkOptions::AnchorSouth); };
-  virtual void SetAnchorToSouthWest() 
-    { this->SetAnchor(vtkKWTkOptions::AnchorSouthWest); };
-  virtual void SetAnchorToWest() 
-    { this->SetAnchor(vtkKWTkOptions::AnchorWest); };
-  virtual void SetAnchorToNorthWest() 
-    { this->SetAnchor(vtkKWTkOptions::AnchorNorthWest); };
-  virtual void SetAnchorToCenter() 
-    { this->SetAnchor(vtkKWTkOptions::AnchorCenter); };
+  virtual void SetAnchorToNorth();
+  virtual void SetAnchorToNorthEast();
+  virtual void SetAnchorToEast();
+  virtual void SetAnchorToSouthEast();
+  virtual void SetAnchorToSouth();
+  virtual void SetAnchorToSouthWest();
+  virtual void SetAnchorToWest();
+  virtual void SetAnchorToNorthWest();
+  virtual void SetAnchorToCenter();
 
   // Description:
   // Set/Get the 3-D effect desired for the widget. 
@@ -121,18 +200,12 @@ public:
   // Valid constants can be found in vtkKWTkOptions::ReliefType.
   virtual void SetOffRelief(int);
   virtual int GetOffRelief();
-  virtual void SetOffReliefToRaised() 
-    { this->SetOffRelief(vtkKWTkOptions::ReliefRaised); };
-  virtual void SetOffReliefToSunken() 
-    { this->SetOffRelief(vtkKWTkOptions::ReliefSunken); };
-  virtual void SetOffReliefToFlat() 
-    { this->SetOffRelief(vtkKWTkOptions::ReliefFlat); };
-  virtual void SetOffReliefToRidge() 
-    { this->SetOffRelief(vtkKWTkOptions::ReliefRidge); };
-  virtual void SetOffReliefToSolid() 
-    { this->SetOffRelief(vtkKWTkOptions::ReliefSolid); };
-  virtual void SetOffReliefToGroove() 
-    { this->SetOffRelief(vtkKWTkOptions::ReliefGroove); };
+  virtual void SetOffReliefToRaised();
+  virtual void SetOffReliefToSunken();
+  virtual void SetOffReliefToFlat();
+  virtual void SetOffReliefToRidge();
+  virtual void SetOffReliefToSolid();
+  virtual void SetOffReliefToGroove();
 
   // Description:
   // Set/Get the 3-D effect desired for the widget. 
@@ -144,20 +217,13 @@ public:
   // when the mouse cursor is over the checkbutton. 
   virtual void SetOverRelief(int);
   virtual int GetOverRelief();
-  virtual void SetOverReliefToRaised() 
-    { this->SetOverRelief(vtkKWTkOptions::ReliefRaised); };
-  virtual void SetOverReliefToSunken() 
-    { this->SetOverRelief(vtkKWTkOptions::ReliefSunken); };
-  virtual void SetOverReliefToFlat() 
-    { this->SetOverRelief(vtkKWTkOptions::ReliefFlat); };
-  virtual void SetOverReliefToRidge() 
-    { this->SetOverRelief(vtkKWTkOptions::ReliefRidge); };
-  virtual void SetOverReliefToSolid() 
-    { this->SetOverRelief(vtkKWTkOptions::ReliefSolid); };
-  virtual void SetOverReliefToGroove() 
-    { this->SetOverRelief(vtkKWTkOptions::ReliefGroove); };
-  virtual void SetOverReliefToNone()
-    { this->SetOverRelief(vtkKWTkOptions::ReliefUnknown); };
+  virtual void SetOverReliefToRaised();
+  virtual void SetOverReliefToSunken();
+  virtual void SetOverReliefToFlat();
+  virtual void SetOverReliefToRidge();
+  virtual void SetOverReliefToSolid();
+  virtual void SetOverReliefToGroove();
+  virtual void SetOverReliefToNone();
 
   // Description:
   // Specifies an image to display in the widget. Typically, if the image
@@ -181,6 +247,14 @@ public:
     const unsigned char *pixels, int width, int height, int pixel_size,
     unsigned long buffer_length = 0);
   
+  // Description:
+  // Set/Get the background color to use when the widget is selected.
+  virtual void GetSelectColor(double *r, double *g, double *b);
+  virtual double* GetSelectColor();
+  virtual void SetSelectColor(double r, double g, double b);
+  virtual void SetSelectColor(double rgb[3])
+    { this->SetSelectColor(rgb[0], rgb[1], rgb[2]); };
+
   // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
