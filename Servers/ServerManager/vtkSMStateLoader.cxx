@@ -16,6 +16,7 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkSMCompoundProxy.h"
 #include "vtkSMPropertyLink.h"
 #include "vtkSMProxy.h"
@@ -26,7 +27,7 @@
 #include <vtkstd/map>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.8");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.9");
 
 struct vtkSMStateLoaderInternals
 {
@@ -39,6 +40,8 @@ vtkSMStateLoader::vtkSMStateLoader()
 {
   this->Internal = new vtkSMStateLoaderInternals;
   this->RootElement = 0;
+  this->ConnectionID = 
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID();
 }
 
 //---------------------------------------------------------------------------
@@ -87,6 +90,7 @@ vtkSMProxy* vtkSMStateLoader::NewProxyFromElement(
                     << type);
       return 0;
       }
+    proxy->SetConnectionID(this->ConnectionID);
     }
   else if (strcmp(proxyElement->GetName(), "CompoundProxy") == 0)
     {

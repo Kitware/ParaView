@@ -31,7 +31,7 @@
 
 
 vtkStandardNewMacro(vtkServerConnection);
-vtkCxxRevisionMacro(vtkServerConnection, "1.3");
+vtkCxxRevisionMacro(vtkServerConnection, "1.4");
 //-----------------------------------------------------------------------------
 vtkServerConnection::vtkServerConnection()
 {
@@ -80,8 +80,10 @@ void vtkServerConnection::Finalize()
   
   if (this->RenderServerSocketController)
     {
+    this->RenderServerSocketController->CloseConnection();
     this->RenderServerSocketController->Finalize(1);
     }
+  this->GetSocketController()->CloseConnection();
   this->Superclass::Finalize();
 }
 

@@ -28,9 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCompoundProxy);
-vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.7");
-
-vtkCxxSetObjectMacro(vtkSMCompoundProxy, MainProxy, vtkSMProxy);
+vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.8");
 
 struct vtkSMCompoundProxyInternals
 {
@@ -55,6 +53,26 @@ vtkSMCompoundProxy::~vtkSMCompoundProxy()
   this->MainProxy = 0;
 
   delete this->Internal;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMCompoundProxy::SetMainProxy(vtkSMProxy* p)
+{
+  vtkSetObjectBodyMacro(MainProxy, vtkSMProxy, p);
+  if (this->MainProxy && !this->MainProxy->ObjectsCreated)
+    {
+    this->MainProxy->SetConnectionID(this->ConnectionID);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMCompoundProxy::SetConnectionID(vtkConnectionID id)
+{
+  if (this->MainProxy)
+    {
+    this->MainProxy->SetConnectionID(id);
+    }
+  this->Superclass::SetConnectionID(id);
 }
 
 //----------------------------------------------------------------------------

@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMXMLPVAnimationWriterProxy);
-vtkCxxRevisionMacro(vtkSMXMLPVAnimationWriterProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMXMLPVAnimationWriterProxy, "1.5");
 //*****************************************************************************
 class vtkSMXMLPVAnimationWriterProxyInternals
 {
@@ -86,7 +86,7 @@ void vtkSMXMLPVAnimationWriterProxy::CreateVTKObjects(int numObjects)
   this->Superclass::CreateVTKObjects(numObjects);
   vtkClientServerStream stream;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  int numPartitions = pm->GetNumberOfPartitions();
+  int numPartitions = pm->GetNumberOfPartitions(this->ConnectionID);
   
   for (unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
     {
@@ -110,7 +110,7 @@ void vtkSMXMLPVAnimationWriterProxy::AddInput(vtkSMSourceProxy *input,
 {
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  int numPartitions = pm->GetNumberOfPartitions();
+  int numPartitions = pm->GetNumberOfPartitions(this->ConnectionID);
   vtkClientServerStream stream;
  
   this->CreateVTKObjects(1);
@@ -192,7 +192,7 @@ void vtkSMXMLPVAnimationWriterProxy::Start()
   
   // Check if SummaryHelperProxy is needed.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  int numPartitions = pm->GetNumberOfPartitions();
+  int numPartitions = pm->GetNumberOfPartitions(this->ConnectionID);
   if (numPartitions > 1)
     {
     if (!this->SummaryHelperProxy)
@@ -200,6 +200,10 @@ void vtkSMXMLPVAnimationWriterProxy::Start()
       vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
       this->SummaryHelperProxy = vtkSMSummaryHelperProxy::SafeDownCast(
         pxm->NewProxy("writers","SummaryHelper"));
+      if (this->SummaryHelperProxy)
+        {
+        this->SummaryHelperProxy->SetConnectionID(this->ConnectionID);
+        }
       }
     if (!this->SummaryHelperProxy)
       {

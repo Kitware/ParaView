@@ -51,7 +51,7 @@
 # include <io.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.22");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.23");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
@@ -369,7 +369,8 @@ int vtkSMAnimationSceneProxy::SaveGeometry(const char* filename)
     vtkErrorMacro("Failed to create XMLPVAnimationWriter proxy.");
     return 1;
     }
-  
+  animWriter->SetConnectionID(this->ConnectionID);
+
   this->SaveFailed = 0;
   this->SetAnimationTime(0);
   this->GeometryWriter = animWriter;
