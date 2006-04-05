@@ -58,7 +58,7 @@ MainWindow::MainWindow()
   
   this->createStandardPipelineBrowser();
   this->createStandardObjectInspector();
-  this->createStandardElementInspector();
+  this->createStandardElementInspector(false);
   
   this->createStandardVCRToolBar();
   this->createStandardVariableToolBar();
