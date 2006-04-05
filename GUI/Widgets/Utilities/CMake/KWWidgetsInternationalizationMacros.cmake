@@ -633,11 +633,12 @@ MACRO(KWWidgets_CREATE_MO_TARGETS
       GET_FILENAME_COMPONENT(mo_dir "${mo_file}" PATH)
       FILE(MAKE_DIRECTORY ${mo_dir})
       SET(mo_files ${mo_files} ${mo_file})
+      # --check-accelerators 
       ADD_CUSTOM_COMMAND(
         OUTPUT ${mo_file}
         DEPENDS ${po_uptodate_file}
         COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} 
-        ARGS --output-file=${mo_file} --check-format --check-accelerators ${po_build_file}
+        ARGS --output-file=${mo_file} --check-format ${po_build_file}
         )
       IF(create_mo_locale_targets)
         ADD_CUSTOM_TARGET(${target_basename}_mo_${locale} DEPENDS ${mo_file})
