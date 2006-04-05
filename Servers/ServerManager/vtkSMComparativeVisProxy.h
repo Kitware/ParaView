@@ -163,6 +163,11 @@ public:
   vtkSetMacro(NumberOfYFrames, unsigned int);
   vtkGetMacro(NumberOfYFrames, unsigned int);
 
+  //BTX
+  // Description:
+  // Overridden to set the connection Id for the MultiActorHelper.
+  virtual void SetConnectionID(vtkConnectionID id);
+  //ETX
 protected:
   vtkSMComparativeVisProxy();
   ~vtkSMComparativeVisProxy();

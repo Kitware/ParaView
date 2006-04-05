@@ -130,7 +130,7 @@ void vtkClientConnectionGatherInformationRMI(void *localArg,
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkClientConnection);
-vtkCxxRevisionMacro(vtkClientConnection, "1.5");
+vtkCxxRevisionMacro(vtkClientConnection, "1.6");
 //-----------------------------------------------------------------------------
 vtkClientConnection::vtkClientConnection()
 {
@@ -161,6 +161,13 @@ int vtkClientConnection::Initialize(int vtkNotUsed(argc), char** vtkNotUsed(argv
   this->SetupRMIs();
   
   return 0;
+}
+
+//-----------------------------------------------------------------------------
+void vtkClientConnection::Finalize()
+{
+  this->GetSocketController()->CloseConnection();
+  this->Superclass::Finalize();
 }
 
 //-----------------------------------------------------------------------------

@@ -15,6 +15,7 @@
 #include "vtkSMProxyManager.h"
 
 #include "vtkCommand.h"
+#include "vtkConnectionID.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModuleConnectionManager.h"
@@ -81,7 +82,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.34");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.35");
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -644,26 +645,41 @@ void vtkSMProxyManager::UnMarkProxyAsModified(vtkSMProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadState(const char* filename)
+void vtkSMProxyManager::LoadState(const char* filename, vtkConnectionID id)
 {
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
   parser->SetFileName(filename);
   parser->Parse();
-
-  this->LoadState(parser->GetRootElement());
+  
+  this->LoadState(parser->GetRootElement(), id);
   parser->Delete();
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement)
+void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement, vtkConnectionID id)
 {
   if (!rootElement)
     {
     return;
     }
   vtkSMStateLoader* loader = vtkSMStateLoader::New();
+  loader->SetConnectionID(id);
   loader->LoadState(rootElement);
   loader->Delete();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::LoadState(const char* filename)
+{
+  this->LoadState(filename, 
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID());
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement)
+{
+  this->LoadState(rootElement,
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID());
 }
 
 //---------------------------------------------------------------------------

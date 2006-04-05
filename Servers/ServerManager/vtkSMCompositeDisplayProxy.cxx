@@ -30,7 +30,7 @@
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.17");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.18");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -831,7 +831,8 @@ vtkPVLODPartDisplayInformation* vtkSMCompositeDisplayProxy::GetLODInformation()
     }
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!this->LODGeometryIsValid &&
-      (pm->GetOptions()->GetClientMode() || pm->GetNumberOfPartitions() >= 2))
+      (pm->GetOptions()->GetClientMode() || 
+       pm->GetNumberOfPartitions(this->ConnectionID) >= 2))
     { 
     // Update but with collection filter off.
     this->CollectionDecision = 0;

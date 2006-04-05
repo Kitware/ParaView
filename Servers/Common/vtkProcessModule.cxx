@@ -97,7 +97,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.43");
+vtkCxxRevisionMacro(vtkProcessModule, "1.44");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -517,6 +517,27 @@ int vtkProcessModule::SetupWaitForConnection()
 }
 
 //-----------------------------------------------------------------------------
+int vtkProcessModule::ConnectToRemote(const char* servername, int port, 
+  vtkConnectionID& cid)
+{
+  vtkConnectionID id = this->ConnectionManager->OpenConnection(
+    servername, port);
+  cid = id;
+  return (id.ID? 1 : 0);
+}
+
+//-----------------------------------------------------------------------------
+int vtkProcessModule::ConnectToRemote(const char* dataserver_host, 
+  int dataserver_port, const char* renderserver_host, int renderserver_port,
+  vtkConnectionID& cid)
+{
+  vtkConnectionID id = this->ConnectionManager->OpenConnection(
+    dataserver_host, dataserver_port, renderserver_host, renderserver_port);
+  cid = id;
+  return (id.ID? 1 : 0);
+}
+
+//-----------------------------------------------------------------------------
 int vtkProcessModule::ConnectToRemote(const char* servername, int port)
 {
   vtkConnectionID id = this->ConnectionManager->OpenConnection(
@@ -531,6 +552,12 @@ int vtkProcessModule::ConnectToRemote(const char* dataserver_host,
   vtkConnectionID id = this->ConnectionManager->OpenConnection(
     dataserver_host, dataserver_port, renderserver_host, renderserver_port);
   return (id.ID? 1 : 0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkProcessModule::Disconnect(vtkConnectionID id)
+{
+  this->ConnectionManager->CloseConnection(id);
 }
 
 //-----------------------------------------------------------------------------
@@ -884,14 +911,6 @@ int vtkProcessModule::GetPartitionId()
 //-----------------------------------------------------------------------------
 int vtkProcessModule::GetNumberOfPartitions()
 {
-  if (this->Options && this->Options->GetClientMode())
-    {
-    // TODO: This is again legacy. 
-    // How can the client know which server is the caller interested in?
-    return this->ConnectionManager->GetNumberOfPartitions(
-      vtkProcessModuleConnectionManager::GetRootServerConnectionID());
-    }
-  
   if (vtkMultiProcessController::GetGlobalController())
     {
     return vtkMultiProcessController::GetGlobalController()->
@@ -899,6 +918,23 @@ int vtkProcessModule::GetNumberOfPartitions()
     }
   return 1;
 }
+
+//-----------------------------------------------------------------------------
+int vtkProcessModule::GetNumberOfPartitions(vtkConnectionID id)
+{
+  if (this->Options && this->Options->GetClientMode() && 
+    id != vtkProcessModuleConnectionManager::GetSelfConnectionID())
+    {
+    return this->ConnectionManager->GetNumberOfPartitions(id);
+    }
+  if (vtkMultiProcessController::GetGlobalController())
+    {
+    return vtkMultiProcessController::GetGlobalController()->
+      GetNumberOfProcesses();
+    }
+  return 1;
+}
+
 //-----------------------------------------------------------------------------
 vtkClientServerID vtkProcessModule::GetUniqueID()
 {

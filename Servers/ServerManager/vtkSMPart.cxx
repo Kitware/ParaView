@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.22");
+vtkCxxRevisionMacro(vtkSMPart, "1.23");
 
 
 //----------------------------------------------------------------------------
@@ -137,7 +137,7 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
     // Don't add anything if we are only using one processes.
     // Image can still benifit from its cache so this check
     // is specific for unstructured data.
-    if (pm->GetNumberOfPartitions() == 1)
+    if (pm->GetNumberOfPartitions(this->ConnectionID) == 1)
       {
       return;
       }  
@@ -198,7 +198,7 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
     // Don't add anything if we are only using one processes.
     // Image can still benifit from its cache so this check
     // is specific for unstructured data.
-    if (pm->GetNumberOfPartitions() == 1)
+    if (pm->GetNumberOfPartitions(this->ConnectionID) == 1)
       {
       return;
       }
@@ -260,7 +260,7 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
   else if (!strcmp(className, "vtkMultiGroupDataSet") ||
            !strcmp(className, "vtkMultiBlockDataSet"))
     {
-    if (pm->GetNumberOfPartitions() == 1)
+    if (pm->GetNumberOfPartitions(this->ConnectionID) == 1)
       {
       // We're only operating with one processor, so it should have
       // all the data.
@@ -424,7 +424,7 @@ void vtkSMPart::Update()
              << vtkClientServerStream::Invoke
              << this->GetID(0) << "SetUpdateExtent"
              << vtkClientServerStream::LastResult 
-             << pm->GetNumberOfPartitions() * 200 << 0
+             << pm->GetNumberOfPartitions(this->ConnectionID) * 200 << 0
              << vtkClientServerStream::End; 
       }
     else
@@ -435,7 +435,7 @@ void vtkSMPart::Update()
              << vtkClientServerStream::Invoke
              << this->GetID(0) << "SetUpdateExtent"
              << vtkClientServerStream::LastResult 
-             << pm->GetNumberOfPartitions() << 0
+             << pm->GetNumberOfPartitions(this->ConnectionID) << 0
              << vtkClientServerStream::End; 
        }   
     stream << vtkClientServerStream::Invoke 

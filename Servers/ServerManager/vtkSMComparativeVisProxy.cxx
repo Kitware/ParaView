@@ -40,7 +40,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMComparativeVisProxy);
-vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.16");
 
 vtkCxxSetObjectMacro(vtkSMComparativeVisProxy, RenderModule, vtkSMRenderModuleProxy);
 
@@ -116,6 +116,7 @@ vtkSMComparativeVisProxy::vtkSMComparativeVisProxy()
   vtkSMProxyManager* proxMan = vtkSMProxy::GetProxyManager();
   this->MultiActorHelper = 
     proxMan->NewProxy("ComparativeVisHelpers", "MultiActorHelper");
+  this->MultiActorHelper->SetConnectionID(this->ConnectionID);
   this->VisName = 0;
 
   this->InFirstShow = 1;
@@ -149,6 +150,16 @@ vtkSMComparativeVisProxy::~vtkSMComparativeVisProxy()
 
   this->Adaptor->Delete();
   this->Adaptor = 0;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMComparativeVisProxy::SetConnectionID(vtkConnectionID id)
+{
+  this->Superclass::SetConnectionID(id);
+  if (this->MultiActorHelper)
+    {
+    this->MultiActorHelper->SetConnectionID(id);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -457,6 +468,7 @@ void vtkSMComparativeVisProxy::StoreGeometry()
   
   // Create the label
   vtkSMProxy* label = proxM->NewProxy("displays", "LabelDisplay");
+  label->SetConnectionID(this->ConnectionID);
   label->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->Internal->Labels[prevSize] = label;
   vtkSMStringVectorProperty* text = 
@@ -530,6 +542,7 @@ void vtkSMComparativeVisProxy::StoreGeometry()
       // and cache them.
       vtkSMProxy* proxy = 
         proxM->NewProxy("ComparativeVisHelpers", "GeometryCache");
+      proxy->SetConnectionID(this->ConnectionID);
       vtkSMProxyProperty* prop = 
         vtkSMProxyProperty::SafeDownCast(proxy->GetProperty("AddGeometry"));
       prop->AddProxy(pDisp->GetGeometryFilterProxy());
@@ -540,6 +553,7 @@ void vtkSMComparativeVisProxy::StoreGeometry()
 
       // Create the display and copy setting from original.
       vtkSMProxy* display = proxM->NewProxy("displays", pDisp->GetXMLName());
+      display->SetConnectionID(this->ConnectionID);
       if (display)
         {
         vtkSMProxyProperty* input = 
@@ -765,6 +779,7 @@ int vtkSMComparativeVisProxy::Show()
         
         vtkSMProxy* planeR = 
           proxM->NewProxy("implicit_functions", "Plane");
+        planeR->SetConnectionID(this->ConnectionID);
         planeR->SetServers(
           vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
         clipPlanes->AddProxy(planeR);
@@ -782,6 +797,7 @@ int vtkSMComparativeVisProxy::Show()
         
         vtkSMProxy* planeL = 
           proxM->NewProxy("implicit_functions", "Plane");
+        planeL->SetConnectionID(this->ConnectionID);
         planeL->SetServers(
           vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
         clipPlanes->AddProxy(planeL);
@@ -799,6 +815,7 @@ int vtkSMComparativeVisProxy::Show()
         
         vtkSMProxy* planeD = 
           proxM->NewProxy("implicit_functions", "Plane");
+        planeD->SetConnectionID(this->ConnectionID);
         planeD->SetServers(
           vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
         clipPlanes->AddProxy(planeD);
@@ -816,6 +833,7 @@ int vtkSMComparativeVisProxy::Show()
         
         vtkSMProxy* planeU = 
           proxM->NewProxy("implicit_functions", "Plane");
+        planeU->SetConnectionID(this->ConnectionID);
         planeU->SetServers(
           vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
         clipPlanes->AddProxy(planeU);

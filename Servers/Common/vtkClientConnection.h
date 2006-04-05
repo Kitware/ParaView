@@ -36,6 +36,10 @@ public:
   virtual int Initialize(int argc, char** argv); 
  
   // Description:
+  // Finalizes the connection.
+  virtual void Finalize();
+
+  // Description:
   // Send the last result over to the client.
   void SendLastResult();
 

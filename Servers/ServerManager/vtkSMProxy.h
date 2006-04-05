@@ -273,7 +273,7 @@ public:
 
   // Description:
   // Set the server connection ID on self and sub-proxies.
-  void SetConnectionID(vtkConnectionID id);
+  virtual void SetConnectionID(vtkConnectionID id);
 
   // Description:
   // Returns the server connection ID.

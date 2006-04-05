@@ -28,7 +28,7 @@
 #include "vtkPVServerInformation.h"
 
 vtkStandardNewMacro(vtkSMCaveRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.9");
 //-----------------------------------------------------------------------------
 vtkSMCaveRenderModuleProxy::vtkSMCaveRenderModuleProxy()
 {
@@ -73,7 +73,7 @@ void vtkSMCaveRenderModuleProxy::InitializeCompositingPipeline()
 
   // We had trouble with SGI/aliasing with compositing.
   if (this->GetRenderWindow()->IsA("vtkOpenGLRenderWindow") &&
-      (pm->GetNumberOfPartitions() > 1))
+      (pm->GetNumberOfPartitions(this->ConnectionID ) > 1))
     {
     for (i=0; i < this->RenderWindowProxy->GetNumberOfIDs(); i++)
       {
@@ -121,7 +121,7 @@ void vtkSMCaveRenderModuleProxy::InitializeCompositingPipeline()
   if (pm->GetOptions()->GetClientMode())
     {
     int numDisplays;
-    numDisplays = pm->GetNumberOfPartitions();
+    numDisplays = pm->GetNumberOfPartitions(this->ConnectionID);
     // Setup the tiles.
     // We need a better way to retreive the number of processes
     vtkMPIMToNSocketConnection* m2n = NULL;

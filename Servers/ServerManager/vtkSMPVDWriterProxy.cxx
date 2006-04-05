@@ -33,7 +33,7 @@ void vtkSMPVDWriterProxy::UpdatePipeline()
     str << vtkClientServerStream::Invoke
         << this->GetID(idx)
         << "SetNumberOfPieces"
-        << pm->GetNumberOfPartitions()
+        << pm->GetNumberOfPartitions(this->ConnectionID)
         << vtkClientServerStream::End;
     str << vtkClientServerStream::Invoke
         << pm->GetProcessModuleID()

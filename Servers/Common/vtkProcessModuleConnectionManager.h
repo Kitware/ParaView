@@ -193,6 +193,13 @@ public:
   vtkConnectionID OpenConnection(const char* datahostname, int dataport,
   const char* renderhostname, int renderport);
 
+//BTX
+  // Description:
+  // Close the connection with the given connection Id. Must be
+  // a remote connection.
+  void CloseConnection(vtkConnectionID id);
+//ETX
+
   // Description:
   // Monitors all managed connections for activity as well as
   // monitors all ports accepting connections for activity.

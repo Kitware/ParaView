@@ -72,7 +72,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.7");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.8");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
@@ -389,6 +389,18 @@ int vtkProcessModuleConnectionManager::MonitorConnections(
     }
   
   return ret;  
+}
+
+//-----------------------------------------------------------------------------
+void vtkProcessModuleConnectionManager::CloseConnection(vtkConnectionID id)
+{
+  vtkRemoteConnection* rc = vtkRemoteConnection::SafeDownCast(
+    this->GetConnectionFromID(id));
+  if (rc)
+    {
+    rc->Finalize();
+    this->DropConnection(rc);
+    }
 }
 
 //-----------------------------------------------------------------------------

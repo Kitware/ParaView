@@ -111,7 +111,11 @@ public:
   // responsibility to delete the returned element. If root is NULL,
   // the returned element will be a top level element.
   virtual vtkPVXMLElement* SaveDefinition(vtkPVXMLElement* root);
-
+//BTX
+  // Description:
+  // Set the connection ID.
+  virtual void SetConnectionID(vtkConnectionID id);
+//ETX
 protected:
   vtkSMCompoundProxy();
   ~vtkSMCompoundProxy();

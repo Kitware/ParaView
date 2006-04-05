@@ -219,9 +219,16 @@ public:
   virtual int GetPartitionId();
 
   // Description:
-  // Get the number of processes participating in sharing the data.
+  // This overrload is internal for call thru CS stream alone.
+  // Use GetNumberOfPartitions(vtkConnectionID id) with appropriate connection
+  // Id to get the number of server partition. This method simply returns the number
+  // of partition on the local process.
   virtual int GetNumberOfPartitions();
 //BTX 
+  // Description:
+  // Get the number of processes participating in sharing the data.
+  virtual int GetNumberOfPartitions(vtkConnectionID id);
+
   // Description:
   // Get a unique vtkClientServerID for this process module.
   vtkClientServerID GetUniqueID();
@@ -442,6 +449,20 @@ public:
   int ConnectToRemote(const char* dataserver_host, int dataserver_port,
     const char* renderserver_host, int renderserver_port);
   
+  //BTX
+  
+  // Description:
+  // Same as above except that these method return the connection id of
+  // the newly created connection.
+  int ConnectToRemote(const char* serverhost, int port, vtkConnectionID& id);
+  int ConnectToRemote(const char* dataserver_host, int dataserver_port,
+    const char* renderserver_host, int renderserver_port, vtkConnectionID& id);
+
+  // Description:
+  // Close the connection. The connection must be a remote connection.
+  void Disconnect(vtkConnectionID id);
+  
+  //ETX
 
   // Description:
   // Checks if any new connections are available, if so, creates vtkConnections

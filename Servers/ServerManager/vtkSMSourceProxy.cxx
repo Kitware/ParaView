@@ -34,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.38");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.39");
 
 struct vtkSMSourceProxyInternals
 {
@@ -258,6 +258,7 @@ void vtkSMSourceProxy::CreatePartsInternal(vtkSMProxy* op)
              << vtkClientServerStream::End;
 
       vtkSMPart* part = vtkSMPart::New();
+      part->SetConnectionID(this->ConnectionID);
       part->CreateVTKObjects(0);
       part->SetID(0, dataID);
       this->PInternals->Parts.push_back(part);

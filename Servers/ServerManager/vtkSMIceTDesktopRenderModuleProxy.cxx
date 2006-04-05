@@ -29,7 +29,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.13");
 
 vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderModuleProxy, 
                      ServerRenderWindowProxy,
@@ -209,7 +209,7 @@ void vtkSMIceTDesktopRenderModuleProxy::CreateVTKObjects(int numObjects)
 
   // Anti-aliasing screws up the compositing.  Turn it off.
   if (this->GetRenderWindow()->IsA("vtkOpenGLRenderWindow") &&
-    (pm->GetNumberOfPartitions() > 1))
+    (pm->GetNumberOfPartitions(this->ConnectionID) > 1))
     {
     stream1 << vtkClientServerStream::Invoke
             << this->RenderWindowProxy->GetID(0) << "SetMultiSamples" << 0

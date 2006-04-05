@@ -25,7 +25,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMMPIRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMMPIRenderModuleProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMMPIRenderModuleProxy, "1.9");
 //-----------------------------------------------------------------------------
 vtkSMMPIRenderModuleProxy::vtkSMMPIRenderModuleProxy()
 {
@@ -136,6 +136,7 @@ void vtkSMMPIRenderModuleProxy::CreateCompositeManager()
     vtkErrorMacro("Failed to create CompositeManagerProxy.");
     return;
     }
+  cm->SetConnectionID(this->ConnectionID);
   cm->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);  
   this->AddSubProxy("CompositeManager", cm);
 
@@ -161,7 +162,7 @@ void vtkSMMPIRenderModuleProxy::InitializeCompositingPipeline()
 
   // We had trouble with SGI/aliasing with compositing.
   if (this->GetRenderWindow()->IsA("vtkOpenGLRenderWindow") &&
-      (pm->GetNumberOfPartitions() > 1))
+      (pm->GetNumberOfPartitions(this->ConnectionID) > 1))
     {
     for (i=0; i < this->RenderWindowProxy->GetNumberOfIDs(); i++)
       {
@@ -236,6 +237,7 @@ void vtkSMMPIRenderModuleProxy::SetCompositer(const char* proxyname)
     vtkErrorMacro("Failed to create compositer " << proxyname);
     return;
     }
+  compositer->SetConnectionID(this->ConnectionID);
   compositer->SetServers(this->GetServers());
   compositer->UpdateVTKObjects();
 

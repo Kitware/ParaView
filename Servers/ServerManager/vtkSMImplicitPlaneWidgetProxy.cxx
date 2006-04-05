@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMImplicitPlaneWidgetProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.14");
 
 //----------------------------------------------------------------------------
 vtkSMImplicitPlaneWidgetProxy::vtkSMImplicitPlaneWidgetProxy()
@@ -52,7 +52,7 @@ void vtkSMImplicitPlaneWidgetProxy::CreateVTKObjects(int numObjects)
   
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   float opacity = 1.0;
-  if (pm->GetNumberOfPartitions() == 1)
+  if (pm->GetNumberOfPartitions(this->ConnectionID) == 1)
     { 
     opacity = .25;
     }
