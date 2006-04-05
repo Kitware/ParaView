@@ -25,6 +25,8 @@ void vtkKWMessageDialogItem::Create(vtkKWWidget *parent, vtkKWWindow *win)
   msg_dlg1->SetMasterWindow(win);
   msg_dlg1->SetStyleToOkCancel();
   msg_dlg1->Create();
+  //msg_dlg1->SetPosition(10, 10);
+  //msg_dlg1->SetSize(300, 300);
   msg_dlg1->SetTitle("Your attention please!");
   msg_dlg1->SetText(
     "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Nunc felis. "

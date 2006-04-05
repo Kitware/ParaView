@@ -39,7 +39,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidgetsTourExample );
-vtkCxxRevisionMacro(vtkKWWidgetsTourExample, "1.2");
+vtkCxxRevisionMacro(vtkKWWidgetsTourExample, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWWidgetsTourExample::vtkKWWidgetsTourExample()
@@ -148,8 +148,6 @@ int vtkKWWidgetsTourExample::Run(int argc, char *argv[])
   this->WidgetsTree->Create();
 
   vtkKWTree *tree = this->WidgetsTree->GetWidget();
-  tree->SetPadX(0);
-  tree->SetBackgroundColor(1.0, 1.0, 1.0);
   tree->RedrawOnIdleOn();
   tree->SelectionFillOn();
 

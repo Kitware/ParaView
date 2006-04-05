@@ -162,8 +162,8 @@ int my_main(int argc, char *argv[])
   ccb->InvokeCommandsWithRGBOn();
   ccb->SetBalloonHelpString("Set the view background color");
 
-  vtkKWCoreWidget *parent = 
-    vtkKWCoreWidget::SafeDownCast(hello_label->GetParent());
+  vtkKWFrame *parent = 
+    vtkKWFrame::SafeDownCast(hello_label->GetParent());
   ccb->SetSelectedColor(
     vtkMath::RGBToHSV(parent->GetBackgroundColor()));
 

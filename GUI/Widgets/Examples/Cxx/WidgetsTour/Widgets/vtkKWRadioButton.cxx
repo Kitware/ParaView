@@ -1,5 +1,4 @@
 #include "vtkKWRadioButton.h"
-#include "vtkKWRadioButton.h"
 #include "vtkKWRadioButtonSet.h"
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"

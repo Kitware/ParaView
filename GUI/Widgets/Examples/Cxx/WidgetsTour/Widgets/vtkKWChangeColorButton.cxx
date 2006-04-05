@@ -2,6 +2,7 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 #include "vtkKWLabel.h"
+#include "vtkKWFrame.h"
 
 #include "vtkKWWidgetsTourExample.h"
 
@@ -27,7 +28,7 @@ void vtkKWChangeColorButtonItem::Create(vtkKWWidget *parent, vtkKWWindow *)
   ccb1->SetLabelPositionToLeft();
   ccb1->SetLabelText("Set Background Color");
   ccb1->SetCommand(parent, "SetBackgroundColor");
-  ccb1->SetColor(vtkKWCoreWidget::SafeDownCast(parent)->GetBackgroundColor());
+  ccb1->SetColor(vtkKWFrame::SafeDownCast(parent)->GetBackgroundColor());
   ccb1->SetBalloonHelpString(
     "A color button. Note that the label is inside the button. Its position "
     "can be changed. It sets the background color of its parent.");

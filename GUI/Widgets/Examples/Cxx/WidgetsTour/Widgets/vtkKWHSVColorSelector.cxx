@@ -27,7 +27,7 @@ void vtkKWHSVColorSelectorItem::Create(vtkKWWidget *parent, vtkKWWindow *)
     "This HSV Color Selector changes the background color of its parent");
   ccb->SetSelectedColor(
     vtkMath::RGBToHSV(
-      vtkKWCoreWidget::SafeDownCast(parent)->GetBackgroundColor()));
+      vtkKWFrame::SafeDownCast(parent)->GetBackgroundColor()));
 
   app->Script("pack %s -side top -anchor nw -expand y -padx 2 -pady 2", 
               ccb->GetWidgetName());
