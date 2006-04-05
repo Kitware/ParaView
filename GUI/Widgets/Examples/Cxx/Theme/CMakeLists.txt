@@ -103,14 +103,3 @@ ENDIF(NOT KWWidgets_SOURCE_DIR AND VTK_TCL_TK_COPY_SUPPORT_LIBRARY)
 IF(BUILD_EXAMPLES)
   INSTALL_TARGETS(${KWWidgets_INSTALL_BIN_DIR} ${EXE_NAME})
 ENDIF(BUILD_EXAMPLES)
-
-# Register this example as a test. Our executable supports a --test
-# configuration option so that it can be run non-interactively as a test.
-# If you are using this CMakeLists.txt file to create your own application
-# based on KWWidgets, you should omit this section, unless your application
-# supports that feature too and you checked how the macro is working.
-
-IF(BUILD_TESTING)
-  INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsTestingMacros.cmake")
-  KWWidgets_ADD_TEST_FROM_C_EXAMPLE(TestKW${PROJECT_NAME} ${EXE_NAME})
-ENDIF(BUILD_TESTING)
