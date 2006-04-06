@@ -115,28 +115,28 @@ int main(int argc, char** argv)
   QApplication app(argc, argv);
   Q_INIT_RESOURCE(pqMultiViewTest);
 
-  pqMultiView* mv = new pqMultiView;
-  mv->resize(400, 300);
-  mv->show();
+  pqMultiView mv;
+  mv.resize(400, 300);
+  mv.show();
   
   QTextEdit* te1 = new QTextEdit;
   QTextEdit* te2 = new QTextEdit;
   pqMultiView::Index idx;
-  delete mv->replaceView(idx, te1);
-  idx = mv->splitView(idx, Qt::Horizontal);
-  delete mv->replaceView(idx, te2);
+  delete mv.replaceView(idx, te1);
+  idx = mv.splitView(idx, Qt::Horizontal);
+  delete mv.replaceView(idx, te2);
 
   QCoreApplication::processEvents();
 
-  pqMultiViewManager* mv2 = new pqMultiViewManager();
-  mv2->resize(600, 400);
-  mv2->setObjectName("multiviewtest");
-  mv2->show();
+  pqMultiViewManager mv2;
+  mv2.resize(600, 400);
+  mv2.setObjectName("multiviewtest");
+  mv2.show();
   
   QCoreApplication::processEvents();
   
-  arguments = handleTestRecording(arguments, *mv2);
-  arguments = handleTestCases(arguments, *mv2, quit, error);
+  arguments = handleTestRecording(arguments, mv2);
+  arguments = handleTestCases(arguments, mv2, quit, error);
   arguments = handleExit(arguments, quit, error);
   
   if(quit)
