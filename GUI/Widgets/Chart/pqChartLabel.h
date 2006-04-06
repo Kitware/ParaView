@@ -57,8 +57,9 @@ public:
     VERTICAL
   };
 
-  /// Sets the text to be displayed by the label
+  /// Sets/Gets the text to be displayed by the label
   void setText(const QString& text);
+  QString getText(){return this->Text;};
   /// Sets the label color
   void setColor(const QColor& color);
   /// Sets the label font
