@@ -62,12 +62,6 @@ public:
   virtual void UpdateEnableState();
 
   // Description:
-  // Some constants
-  //BTX
-  static const char *PrintSettingsLabel;
-  //ETX
-
-  // Description:
   // Callbacks. Internal, do not use.
   virtual void ConfirmExitCallback(int state);
   virtual void SaveUserInterfaceGeometryCallback(int state);

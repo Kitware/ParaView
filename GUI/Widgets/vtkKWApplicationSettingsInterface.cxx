@@ -34,14 +34,11 @@
 
 //----------------------------------------------------------------------------
 
-const char *vtkKWApplicationSettingsInterface::PrintSettingsLabel = "Page Setup";
-
-#define VTK_KW_APPLICATION_SETTINGS_UIP_LABEL "Application Settings"
 #define VTK_KW_APPLICATION_SETTINGS_DPI_FORMAT "%.1lf"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.55");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.56");
 
 //----------------------------------------------------------------------------
 vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
@@ -203,7 +200,7 @@ void vtkKWApplicationSettingsInterface::Create()
   // --------------------------------------------------------------
   // Add a "Preferences" page
 
-  this->AddPage(this->GetName(), "Change the application settings");
+  this->AddPage(this->GetName());
   page = this->GetPageWidget(this->GetName());
   
   // --------------------------------------------------------------
@@ -216,7 +213,8 @@ void vtkKWApplicationSettingsInterface::Create()
 
   this->InterfaceSettingsFrame->SetParent(this->GetPagesParentWidget());
   this->InterfaceSettingsFrame->Create();
-  this->InterfaceSettingsFrame->SetLabelText("Interface Settings");
+  this->InterfaceSettingsFrame->SetLabelText(
+    ks_("Application Settings|Interface Settings"));
     
   tk_cmd << "pack " << this->InterfaceSettingsFrame->GetWidgetName()
          << " -side top -anchor nw -fill x -padx 2 -pady 2 " 
@@ -234,10 +232,11 @@ void vtkKWApplicationSettingsInterface::Create()
 
   this->ConfirmExitCheckButton->SetParent(frame);
   this->ConfirmExitCheckButton->Create();
-  this->ConfirmExitCheckButton->SetText("Confirm on exit");
+  this->ConfirmExitCheckButton->SetText(
+    ks_("Application Settings|Confirm on exit"));
   this->ConfirmExitCheckButton->SetCommand(this, "ConfirmExitCallback");
   this->ConfirmExitCheckButton->SetBalloonHelpString(
-    "A confirmation dialog will be presented to the user on exit.");
+    k_("A confirmation dialog will be presented to the user on exit."));
 
   tk_cmd << "pack " << this->ConfirmExitCheckButton->GetWidgetName()
          << "  -side top -anchor w -expand no -fill none" << endl;
@@ -253,12 +252,12 @@ void vtkKWApplicationSettingsInterface::Create()
   this->SaveUserInterfaceGeometryCheckButton->SetParent(frame);
   this->SaveUserInterfaceGeometryCheckButton->Create();
   this->SaveUserInterfaceGeometryCheckButton->SetText(
-    "Save user interface geometry on exit");
+    ks_("Application Settings|Save user interface geometry on exit"));
   this->SaveUserInterfaceGeometryCheckButton->SetCommand(
     this, "SaveUserInterfaceGeometryCallback");
   this->SaveUserInterfaceGeometryCheckButton->SetBalloonHelpString(
-    "Save the user interface size and location on exit and restore it "
-    "on startup.");
+    k_("Save the user interface size and location on exit and restore it "
+       "on startup."));
 
   tk_cmd << "pack " 
          << this->SaveUserInterfaceGeometryCheckButton->GetWidgetName()
@@ -276,11 +275,12 @@ void vtkKWApplicationSettingsInterface::Create()
 
     this->SplashScreenVisibilityCheckButton->SetParent(frame);
     this->SplashScreenVisibilityCheckButton->Create();
-    this->SplashScreenVisibilityCheckButton->SetText("Show splash screen");
+    this->SplashScreenVisibilityCheckButton->SetText(
+      ks_("Application Settings|Show splash screen"));
     this->SplashScreenVisibilityCheckButton->SetCommand(
       this, "SplashScreenVisibilityCallback");
     this->SplashScreenVisibilityCheckButton->SetBalloonHelpString(
-      "Display the splash information screen at startup.");
+      k_("Display the splash information screen at startup."));
 
     tk_cmd << "pack " << this->SplashScreenVisibilityCheckButton->GetWidgetName()
            << "  -side top -anchor w -expand no -fill none" << endl;
@@ -296,12 +296,13 @@ void vtkKWApplicationSettingsInterface::Create()
 
   this->BalloonHelpVisibilityCheckButton->SetParent(frame);
   this->BalloonHelpVisibilityCheckButton->Create();
-  this->BalloonHelpVisibilityCheckButton->SetText("Show balloon help");
+  this->BalloonHelpVisibilityCheckButton->SetText(
+    ks_("Application Settings|Show balloon help"));
   this->BalloonHelpVisibilityCheckButton->SetCommand(
     this, "BalloonHelpVisibilityCallback");
   this->BalloonHelpVisibilityCheckButton->SetBalloonHelpString(
-    "Display help in a yellow popup-box on the screen when you rest the "
-    "mouse over an item that supports it.");
+    k_("Display help in a yellow popup-box on the screen when you rest the "
+       "mouse over an item that supports it."));
 
   tk_cmd << "pack " << this->BalloonHelpVisibilityCheckButton->GetWidgetName()
          << "  -side top -anchor w -expand no -fill none" << endl;
@@ -318,11 +319,13 @@ void vtkKWApplicationSettingsInterface::Create()
   this->ViewPanelPositionOptionMenu->Create();
 
   this->ViewPanelPositionOptionMenu->GetLabel()->SetText(
-    "View panel position:");
+    ks_("Application Settings|View panel position:"));
 
   menu = this->ViewPanelPositionOptionMenu->GetWidget()->GetMenu();
-  menu->AddRadioButton("Left", this, "ViewPanelPositionCallback");
-  menu->AddRadioButton("Right", this, "ViewPanelPositionCallback");
+  menu->AddRadioButton(ks_("Position|Left"), 
+                       this, "ViewPanelPositionCallback");
+  menu->AddRadioButton(ks_("Position|Right"), 
+                       this, "ViewPanelPositionCallback");
 
   tk_cmd << "pack " << this->ViewPanelPositionOptionMenu->GetWidgetName()
          << " -side top -anchor w -padx 2 -pady 2" << endl;
@@ -337,7 +340,8 @@ void vtkKWApplicationSettingsInterface::Create()
 
   this->InterfaceCustomizationFrame->SetParent(this->GetPagesParentWidget());
   this->InterfaceCustomizationFrame->Create();
-  this->InterfaceCustomizationFrame->SetLabelText("Drag & Drop Settings");
+  this->InterfaceCustomizationFrame->SetLabelText(
+    ks_("Application Settings|Drag & Drop Settings"));
     
   tk_cmd << "pack " << this->InterfaceCustomizationFrame->GetWidgetName()
          << " -side top -anchor nw -fill x -padx 2 -pady 2 " 
@@ -355,16 +359,17 @@ void vtkKWApplicationSettingsInterface::Create()
 
   this->ResetDragAndDropButton->SetParent(frame);
   this->ResetDragAndDropButton->Create();
-  this->ResetDragAndDropButton->SetText("Reset Interface To Default State");
+  this->ResetDragAndDropButton->SetText(
+    ks_("Application Settings|Reset Interface To Default State"));
   this->ResetDragAndDropButton->SetCommand(this, "ResetDragAndDropCallback");
   this->ResetDragAndDropButton->SetBalloonHelpString(
-    "You can drag & drop elements of the "
-    "interface within the same panel or from one panel to the other. "
-    "To do so, drag the title of a labeled frame to reposition it within "
-    "a panel, or drop it on another tab to move it to a different panel. "
-    "Press this button to reset the placement of all user interface elements "
-    "to their default position. You will need to restart the application for "
-    "the interface to be reset.");
+    k_("You can drag & drop elements of the "
+       "interface within the same panel or from one panel to the other. "
+       "To do so, drag the title of a labeled frame to reposition it within "
+       "a panel, or drop it on another tab to move it to a different panel. "
+       "Press this button to reset the placement of all user interface " 
+       "elements to their default position. You will need to restart the "
+       "application for the interface to be reset."));
 
   tk_cmd << "pack " << this->ResetDragAndDropButton->GetWidgetName()
          << "  -side top -anchor w -expand y -fill x -padx 2 -pady 2" 
@@ -380,7 +385,8 @@ void vtkKWApplicationSettingsInterface::Create()
 
   this->ToolbarSettingsFrame->SetParent(this->GetPagesParentWidget());
   this->ToolbarSettingsFrame->Create();
-  this->ToolbarSettingsFrame->SetLabelText("Toolbar Settings");
+  this->ToolbarSettingsFrame->SetLabelText(
+    ks_("Application Settings|Toolbar Settings"));
     
   tk_cmd << "pack " << this->ToolbarSettingsFrame->GetWidgetName()
          << " -side top -anchor nw -fill x -padx 2 -pady 2 "  
@@ -398,10 +404,11 @@ void vtkKWApplicationSettingsInterface::Create()
 
   this->FlatFrameCheckButton->SetParent(frame);
   this->FlatFrameCheckButton->Create();
-  this->FlatFrameCheckButton->SetText("Flat frame");
+  this->FlatFrameCheckButton->SetText(
+    ks_("Application Settings|Flat frame"));
   this->FlatFrameCheckButton->SetCommand(this, "FlatFrameCallback");
   this->FlatFrameCheckButton->SetBalloonHelpString(
-    "Display the toolbar frames using a flat aspect.");  
+    k_("Display the toolbar frames using a flat aspect."));  
 
   tk_cmd << "pack " << this->FlatFrameCheckButton->GetWidgetName()
          << "  -side top -anchor w -expand no -fill none" << endl;
@@ -416,10 +423,11 @@ void vtkKWApplicationSettingsInterface::Create()
 
   this->FlatButtonsCheckButton->SetParent(frame);
   this->FlatButtonsCheckButton->Create();
-  this->FlatButtonsCheckButton->SetText("Flat buttons");
+  this->FlatButtonsCheckButton->SetText(
+    ks_("Application Settings|Flat buttons"));
   this->FlatButtonsCheckButton->SetCommand(this, "FlatButtonsCallback");
   this->FlatButtonsCheckButton->SetBalloonHelpString(
-    "Display the toolbar buttons using a flat aspect.");  
+    k_("Display the toolbar buttons using a flat aspect."));  
   
   tk_cmd << "pack " << this->FlatButtonsCheckButton->GetWidgetName()
          << "  -side top -anchor w -expand no -fill none" << endl;
@@ -435,7 +443,7 @@ void vtkKWApplicationSettingsInterface::Create()
   this->PrintSettingsFrame->SetParent(this->GetPagesParentWidget());
   this->PrintSettingsFrame->Create();
   this->PrintSettingsFrame->SetLabelText(
-    vtkKWApplicationSettingsInterface::PrintSettingsLabel);
+    ks_("Application Settings|Page Setup"));
     
   tk_cmd << "pack " << this->PrintSettingsFrame->GetWidgetName()
          << " -side top -anchor nw -fill x -padx 2 -pady 2 "  
@@ -454,7 +462,8 @@ void vtkKWApplicationSettingsInterface::Create()
   this->DPIOptionMenu->SetParent(frame);
   this->DPIOptionMenu->Create();
 
-  this->DPIOptionMenu->GetLabel()->SetText("DPI:");
+  this->DPIOptionMenu->GetLabel()->SetText(
+    ks_("Application Settings|Page Setup|DPI:"));
 
   double dpis[] = { 100.0, 150.0, 300.0, 600.0 };
   for (unsigned int i = 0; i < sizeof(dpis) / sizeof(double); i++)
@@ -537,12 +546,14 @@ void vtkKWApplicationSettingsInterface::Update()
     if (this->Window->GetViewPanelPosition() == 
         vtkKWWindow::ViewPanelPositionLeft)
       {
-      this->ViewPanelPositionOptionMenu->GetWidget()->SetValue("Left");
+      this->ViewPanelPositionOptionMenu->GetWidget()->SetValue(
+        ks_("Position|Left"));
       }
     else if (this->Window->GetViewPanelPosition() == 
              vtkKWWindow::ViewPanelPositionRight)
       {
-      this->ViewPanelPositionOptionMenu->GetWidget()->SetValue("Right");
+      this->ViewPanelPositionOptionMenu->GetWidget()->SetValue(
+        ks_("Position|Right"));
       }
     }
 
@@ -631,11 +642,11 @@ void vtkKWApplicationSettingsInterface::ViewPanelPositionCallback()
       this->ViewPanelPositionOptionMenu->GetWidget()->GetValue();
     if (pos)
       {
-      if (!strcmp(pos, "Left"))
+      if (!strcmp(pos, ks_("Position|Left")))
         {
         this->Window->SetViewPanelPositionToLeft();
         }
-      else if (!strcmp(pos, "Right"))
+      else if (!strcmp(pos, ks_("Position|Right")))
         {
         this->Window->SetViewPanelPositionToRight();
         }
@@ -653,10 +664,10 @@ void vtkKWApplicationSettingsInterface::ResetDragAndDropCallback()
 
   vtkKWMessageDialog::PopupMessage( 
         this->GetApplication(), this->Window, 
-        "Reset Interface", 
-        "All Drag & Drop events performed so far will be discarded. "
-        "Note that the interface will be reset the next time you "
-        "start this application.",
+        ks_("Application Settings|Reset Interface"), 
+        k_("All Drag & Drop events performed so far will be discarded. "
+           "Note that the interface will be reset the next time you "
+           "start this application."),
         vtkKWMessageDialog::WarningIcon);
 
   if (this->Window->HasMainUserInterfaceManager())

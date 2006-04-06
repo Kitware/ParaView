@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-04-06 11:27-0400\n"
+"POT-Creation-Date: 2006-04-06 17:39-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,18 +16,217 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../../vtkKWApplication.cxx:1009
+#: ../../vtkKWApplication.cxx:518
+msgid "The application failed to initialize Tcl/Tk!"
+msgstr ""
+
+#: ../../vtkKWApplication.cxx:519
+msgid "Initialization Error!"
+msgstr ""
+
+#: ../../vtkKWApplication.cxx:1006
 #, c-format
 msgid "Are you sure you want to exit %s?"
 msgstr ""
 
-#: ../../vtkKWApplication.cxx:1012
+#: ../../vtkKWApplication.cxx:1009
 #, c-format
 msgid "Exit Dialog|Title|Exit %s"
 msgstr ""
 
-#: ../../vtkKWApplicationSettingsInterface.cxx:50
+#: ../../vtkKWApplication.cxx:1078
+#, c-format
+msgid "Please check the help resource %s for more information."
+msgstr ""
+
+#: ../../vtkKWApplication.cxx:1080 ../../vtkKWApplication.cxx:1091
+msgid "Help Error!"
+msgstr ""
+
+#: ../../vtkKWApplication.cxx:1087
+#, c-format
+msgid ""
+"The help resource %s cannot be displayed. This can be a result of the "
+"program being wrongly installed or the help file being corrupted."
+msgstr ""
+
+#: ../../vtkKWApplication.cxx:1185
+#, c-format
+msgid "About Dialog|Title|About %s"
+msgstr ""
+
+#: ../../vtkKWApplication.cxx:1524
+#, c-format
+msgid ""
+"You are running in '%s' mode. The feature you are trying to use (%s) is not "
+"available in this mode."
+msgstr ""
+
+#: ../../vtkKWApplication.cxx:1531
+#, c-format
+msgid ""
+"You are running in '%s' mode. The feature you are trying to use is not "
+"available in this mode."
+msgstr ""
+
+#: ../../vtkKWApplication.cxx:1821
+msgid "Email Feedback|Subject|User Feedback"
+msgstr ""
+
+#: ../../vtkKWApplication.cxx:1912
+msgid ""
+"Sorry, an error occurred while trying to send an email.\n"
+"\n"
+"Please make sure that your default email client has been configured "
+"properly. The Microsoft Simple MAPI (Messaging Application Program "
+"Interface) is used to perform this operation and it might not be accessible "
+"if your default email client is not running."
+msgstr ""
+
+#: ../../vtkKWApplication.cxx:1928
+msgid "Email Feedback Dialog|Send Email Error!"
+msgstr ""
+
+#: ../../vtkKWApplication.cxx:1930
+msgid "Email Feedback Dialog|Buttons|Retry"
+msgstr ""
+
+#: ../../vtkKWApplication.cxx:1935
+msgid "Email Feedback Dialog|Buttons|Locate attachment"
+msgstr ""
+
+#: ../../vtkKWApplication.cxx:1952
+msgid "Email Feedback Dialog|To:"
+msgstr ""
+
+#: ../../vtkKWApplication.cxx:1966
+msgid "Email Feedback Dialog|Subject:"
+msgstr ""
+
+#: ../../vtkKWApplication.cxx:1981
+msgid "Email Feedback Dialog|Attachment:"
+msgstr ""
+
+#: ../../vtkKWApplication.cxx:2057
+#, c-format
+msgid ""
+"If you continue to experience problems please use your email client to send "
+"us feedback at %s."
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:47
 msgid "Application Settings Panel|Title|Application Settings"
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:217
+msgid "Application Settings|Interface Settings"
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:236
+msgid "Application Settings|Confirm on exit"
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:239
+msgid "A confirmation dialog will be presented to the user on exit."
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:255
+msgid "Application Settings|Save user interface geometry on exit"
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:259
+msgid ""
+"Save the user interface size and location on exit and restore it on startup."
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:279
+msgid "Application Settings|Show splash screen"
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:283
+msgid "Display the splash information screen at startup."
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:300
+msgid "Application Settings|Show balloon help"
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:304
+msgid ""
+"Display help in a yellow popup-box on the screen when you rest the mouse "
+"over an item that supports it."
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:322
+msgid "Application Settings|View panel position:"
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:325
+#: ../../vtkKWApplicationSettingsInterface.cxx:550
+#: ../../vtkKWApplicationSettingsInterface.cxx:645
+msgid "Position|Left"
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:327
+#: ../../vtkKWApplicationSettingsInterface.cxx:556
+#: ../../vtkKWApplicationSettingsInterface.cxx:649
+msgid "Position|Right"
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:344
+msgid "Application Settings|Drag & Drop Settings"
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:363
+msgid "Application Settings|Reset Interface To Default State"
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:366
+msgid ""
+"You can drag & drop elements of the interface within the same panel or from "
+"one panel to the other. To do so, drag the title of a labeled frame to "
+"reposition it within a panel, or drop it on another tab to move it to a "
+"different panel. Press this button to reset the placement of all user "
+"interface elements to their default position. You will need to restart the "
+"application for the interface to be reset."
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:389
+msgid "Application Settings|Toolbar Settings"
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:408
+msgid "Application Settings|Flat frame"
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:411
+msgid "Display the toolbar frames using a flat aspect."
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:427
+msgid "Application Settings|Flat buttons"
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:430
+msgid "Display the toolbar buttons using a flat aspect."
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:446 ../../vtkKWWindow.cxx:1038
+msgid "Application Settings|Page Setup"
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:466
+msgid "Application Settings|Page Setup|DPI:"
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:667
+msgid "Application Settings|Reset Interface"
+msgstr ""
+
+#: ../../vtkKWApplicationSettingsInterface.cxx:668
+msgid ""
+"All Drag & Drop events performed so far will be discarded. Note that the "
+"interface will be reset the next time you start this application."
 msgstr ""
 
 #: ../../vtkKWMessageDialog.cxx:55 ../../vtkKWMessageDialog.cxx:163

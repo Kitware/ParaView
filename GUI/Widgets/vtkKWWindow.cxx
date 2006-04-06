@@ -33,7 +33,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.277");
+vtkCxxRevisionMacro(vtkKWWindow, "1.278");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -1035,7 +1035,7 @@ void vtkKWWindow::PrintSettingsCallback()
     app_settings_uim->RaiseSection(
       app_settings, 
       NULL, 
-      vtkKWApplicationSettingsInterface:: PrintSettingsLabel);
+      ks_("Application Settings|Page Setup"));
     }
   else
     {

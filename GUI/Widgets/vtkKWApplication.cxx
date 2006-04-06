@@ -70,7 +70,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.282");
+vtkCxxRevisionMacro(vtkKWApplication, "1.283");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -515,7 +515,8 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
   if (!res && err)
     {
     MessageBox(NULL, 
-               "The application failed to initialize Tcl/Tk!", "Error",
+               k_("The application failed to initialize Tcl/Tk!"),
+               k_("Initialization Error!"),
                MB_ICONERROR | MB_OK);
     }
 #endif
@@ -987,12 +988,6 @@ void vtkKWApplication::ProcessIdleTasks()
 //----------------------------------------------------------------------------
 int vtkKWApplication::DisplayExitDialog(vtkKWWindowBase *master)
 {
-  char buffer[500];
-
-  vtksys_stl::string msg = "Are you sure you want to exit ";
-  msg += this->GetPrettyName();
-  msg += "?";
-  
   vtkKWMessageDialog *dialog = vtkKWMessageDialog::New();
   dialog->SetApplication(this);
   dialog->SetStyleToYesNo();
@@ -1005,11 +1000,13 @@ int vtkKWApplication::DisplayExitDialog(vtkKWWindowBase *master)
   dialog->SetDialogName(vtkKWApplication::ExitDialogName);
   dialog->Create();
 
+  char buffer[500];
+
   sprintf(buffer, 
           k_("Are you sure you want to exit %s?"), this->GetPrettyName());
   dialog->SetText(buffer);
 
-  sprintf(buffer, k_("Exit Dialog|Title|Exit %s"), this->GetPrettyName());
+  sprintf(buffer, ks_("Exit Dialog|Title|Exit %s"), this->GetPrettyName());
   dialog->SetTitle(buffer);
 
   int ret = dialog->Invoke();
@@ -1054,7 +1051,10 @@ void vtkKWApplication::DisplayHelpDialog(vtkKWWindowBase* master)
   helplink += this->HelpDialogStartingPage;
   
   int status = 1;
-  vtksys_stl::string msg;
+  char buffer[500];
+
+  const char *res = vtksys::SystemTools::FileExists(helplink.c_str()) 
+    ? helplink.c_str() : this->HelpDialogStartingPage;
 
 #ifdef _WIN32
 #ifdef KWWidgets_USE_HTML_HELP
@@ -1074,36 +1074,21 @@ void vtkKWApplication::DisplayHelpDialog(vtkKWWindowBase* master)
     status = this->OpenLink(helplink.c_str());
     }
 #else
-  msg = "Please check the help resource ";
-  if (vtksys::SystemTools::FileExists(helplink.c_str()))
-    {
-    msg += helplink.c_str();
-    }
-  else
-    {
-    msg += this->HelpDialogStartingPage;
-    }
-  msg += " for more information.";
-  
+  sprintf(buffer, 
+          k_("Please check the help resource %s for more information."), res);
   vtkKWMessageDialog::PopupMessage(
-    this, master, "Help", msg.c_str(), vtkKWMessageDialog::WarningIcon);
+    this, master, k_("Help Error!"), buffer, vtkKWMessageDialog::WarningIcon);
 #endif
 
   if (!status)
     {
-    msg = "The help resource ";
-    if (vtksys::SystemTools::FileExists(helplink.c_str()))
-      {
-      msg += helplink.c_str();
-      }
-    else
-      {
-      msg += this->HelpDialogStartingPage;
-      }
-    msg += " cannot be displayed. This can be a result of "
-      "the program being wrongly installed or the help file being corrupted.";
+    sprintf(
+      buffer, 
+      k_("The help resource %s cannot be displayed. This can be a result of "
+         "the program being wrongly installed or the help file being "
+         "corrupted."), res);
     vtkKWMessageDialog::PopupMessage(
-      this, master, "Help Error", msg.c_str(), vtkKWMessageDialog::ErrorIcon);
+      this, master, k_("Help Error!"), buffer, vtkKWMessageDialog::ErrorIcon);
     }
 }
 
@@ -1196,10 +1181,9 @@ void vtkKWApplication::ConfigureAboutDialog()
                  this->AboutRuntimeInfo->GetWidgetName());
     }
 
-  ostrstream title;
-  title << "About " << this->GetPrettyName() << ends;
-  this->AboutDialog->SetTitle(title.str());
-  title.rdbuf()->freeze(0);
+  char buffer[500];
+  sprintf(buffer, ks_("About Dialog|Title|About %s"), this->GetPrettyName());
+  this->AboutDialog->SetTitle(buffer);
 
   ostrstream str;
   this->AddAboutText(str);
@@ -1529,28 +1513,27 @@ int vtkKWApplication::GetLimitedEditionModeAndWarn(const char *feature)
 {
   if (this->LimitedEditionMode)
     {
-    ostrstream feature_str;
-    if (feature)
-      {
-      feature_str << " (" << feature << ")";
-      }
-    feature_str << ends;
-
     const char *lem_name = this->GetLimitedEditionModeName() 
       ? this->GetLimitedEditionModeName() : "Limited Edition";
 
-    ostrstream msg_str;
-    msg_str << "You are running in \"" << lem_name << "\" mode. "
-            << "The feature you are trying to use" << feature_str.str() 
-            << " is not available in this mode. "
-            << ends;
+    char buffer[500];
+    if (feature)
+      {
+      sprintf(
+        buffer, 
+        k_("You are running in \'%s' mode. The feature you are trying to use "
+           "(%s) is not available in this mode."), lem_name, feature);
+      }
+    else
+      {
+      sprintf(
+        buffer, 
+        k_("You are running in \'%s' mode. The feature you are trying to use "
+           "is not available in this mode."), lem_name);
+      }
 
     vtkKWMessageDialog::PopupMessage(
-      this, 0, this->GetPrettyName(), msg_str.str(), 
-      vtkKWMessageDialog::WarningIcon);
-
-    feature_str.rdbuf()->freeze(0);
-    msg_str.rdbuf()->freeze(0);
+      this, 0, this->GetPrettyName(), buffer, vtkKWMessageDialog::WarningIcon);
     }
 
   return this->LimitedEditionMode;
@@ -1834,7 +1817,8 @@ void vtkKWApplication::AddEmailFeedbackBody(ostream &os)
 //----------------------------------------------------------------------------
 void vtkKWApplication::AddEmailFeedbackSubject(ostream &os)
 {
-  os << this->GetPrettyName() << " User Feedback";
+  os << this->GetPrettyName() << " " 
+     << ks_("Email Feedback|Subject|User Feedback");
 }
 
 //----------------------------------------------------------------------------
@@ -1925,12 +1909,12 @@ int vtkKWApplication::SendEmail(
     if (err != SUCCESS_SUCCESS)
       {
       vtksys_stl::string msg =
-        "Sorry, an error occurred while trying to send an email.\n\n"
-        "Please make sure that your default email client has been "
-        "configured properly. The Microsoft Simple MAPI (Messaging "
-        "Application Program Interface) is used to perform this "
-        "operation and it might not be accessible if your "
-        "default email client is not running.";
+        k_("Sorry, an error occurred while trying to send an email.\n\n"
+           "Please make sure that your default email client has been "
+           "configured properly. The Microsoft Simple MAPI (Messaging "
+           "Application Program Interface) is used to perform this "
+           "operation and it might not be accessible if your "
+           "default email client is not running.");
       if (extra_error_msg)
         {
         msg += "\n\n";
@@ -1941,13 +1925,14 @@ int vtkKWApplication::SendEmail(
       dlg->SetApplication(this);
       dlg->SetStyleToOkCancel();
       dlg->SetOptions(vtkKWMessageDialog::ErrorIcon);
-      dlg->SetTitle("Send Email Error");
+      dlg->SetTitle(ks_("Email Feedback Dialog|Send Email Error!"));
       dlg->SetText(msg.c_str());
-      dlg->SetOKButtonText("Retry");
+      dlg->SetOKButtonText(ks_("Email Feedback Dialog|Buttons|Retry"));
       if (attachment_filename)
         {
         dlg->SetStyleToOkOtherCancel();
-        dlg->SetOtherButtonText("Locate attachment");
+        dlg->SetOtherButtonText(
+          ks_("Email Feedback Dialog|Buttons|Locate attachment"));
         }
       dlg->Create();
       dlg->SetIcon();
@@ -1964,7 +1949,7 @@ int vtkKWApplication::SendEmail(
       vtkKWEntryWithLabel *to_entry = vtkKWEntryWithLabel::New();
       to_entry->SetParent(dlg->GetBottomFrame());
       to_entry->Create();
-      to_entry->SetLabelText("To:");
+      to_entry->SetLabelText(ks_("Email Feedback Dialog|To:"));
       to_entry->SetLabelWidth(label_width);
       to_entry->GetWidget()->SetValue(to ? to : "");
       to_entry->GetWidget()->ReadOnlyOn();
@@ -1978,7 +1963,7 @@ int vtkKWApplication::SendEmail(
       vtkKWEntryWithLabel *subject_entry = vtkKWEntryWithLabel::New();
       subject_entry->SetParent(dlg->GetBottomFrame());
       subject_entry->Create();
-      subject_entry->SetLabelText("Subject:");
+      subject_entry->SetLabelText(ks_("Email Feedback Dialog|Subject:"));
       subject_entry->SetLabelWidth(label_width);
       subject_entry->GetWidget()->SetValue(subject ? subject : "");
       subject_entry->GetWidget()->ReadOnlyOn();
@@ -1992,7 +1977,8 @@ int vtkKWApplication::SendEmail(
       vtkKWEntryWithLabel *attachment_entry = vtkKWEntryWithLabel::New();
       attachment_entry->SetParent(dlg->GetBottomFrame());
       attachment_entry->Create();
-      attachment_entry->SetLabelText("Attachment:");
+      attachment_entry->SetLabelText(
+        ks_("Email Feedback Dialog|Attachment:"));
       attachment_entry->SetLabelWidth(label_width);
       attachment_entry->GetWidget()->SetValue(
         attachment_filename ? attachment_filename : "");
@@ -2065,18 +2051,18 @@ void vtkKWApplication::EmailFeedback()
   this->AddEmailFeedbackBody(message);
   message << endl << ends;
 
-  ostrstream extra_error_msg;
-  extra_error_msg 
-    << "If you continue to experience problems please use your email "
-    << "client to send us feedback at " << this->EmailFeedbackAddress 
-    << "." << ends;
+  char buffer[500];
+  sprintf(
+    buffer, 
+    k_("If you continue to experience problems please use your email "
+       "client to send us feedback at %s."), this->EmailFeedbackAddress);
 
   this->SendEmail(
     this->EmailFeedbackAddress,
     email_subject.str(),
     message.str(),
     NULL,
-    extra_error_msg.str());
+    buffer);
 }
 
 //----------------------------------------------------------------------------
