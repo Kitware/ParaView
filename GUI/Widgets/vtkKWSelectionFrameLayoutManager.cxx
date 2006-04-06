@@ -71,7 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.57");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.58");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -466,7 +466,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesMenu(
     {
     sprintf(label, VTK_KW_SFLMGR_LABEL_PATTERN, 
             res[idx][0], res[idx][1]);
-    sprintf(command, "SetResolution %d %d", res[idx][0], res[idx][1]);
+    sprintf(command, "ResolutionCallback %d %d", res[idx][0], res[idx][1]);
     sprintf(help, VTK_KW_SFLMGR_HELP_PATTERN, 
             res[idx][0], res[idx][1]);
     int value = 
@@ -623,7 +623,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
   int res[][2] = VTK_KW_SFLMGR_RESOLUTIONS;
   for (size_t idx = 0; idx < sizeof(res) / sizeof(res[0]); idx++)
     {
-    sprintf(command, "SetResolution %d %d", 
+    sprintf(command, "ResolutionCallback %d %d", 
             res[idx][0], res[idx][1]);
     sprintf(help, VTK_KW_SFLMGR_HELP_PATTERN, 
             res[idx][0], res[idx][1]);
@@ -1558,7 +1558,7 @@ void vtkKWSelectionFrameLayoutManager::SelectAndMaximizeWidgetCallback(
   vtkKWSelectionFrame *selection)
 {
   this->SelectWidget(selection);
-  this->ToggleMaximizeWidget(selection);
+  this->MaximizeWidget(selection);
 }
 
 //---------------------------------------------------------------------------
@@ -1686,6 +1686,21 @@ int vtkKWSelectionFrameLayoutManager::CanWidgetTitleBeChanged(
           new_title && 
           *new_title && 
           (!widget->GetTitle() || strcmp(widget->GetTitle(), new_title)));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrameLayoutManager::ResolutionCallback(int i, int j)
+{
+  int old_i, old_j;
+  this->GetResolution(old_i, old_j);
+  this->SetResolution(i, j);
+  this->GetResolution(i, j);
+  if (i != old_i || j != old_j)
+    {
+    this->InvokeEvent(
+      vtkKWSelectionFrameLayoutManager::ResolutionChangedEvent, 
+      NULL);
+    }
 }
 
 //----------------------------------------------------------------------------

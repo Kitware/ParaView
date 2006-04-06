@@ -215,6 +215,8 @@ public:
   // Create a resolution entries menu (specifies its parent).
   // Get the menu (so that it can be added as a cascade).
   // Update the menu entries state, given the number of widgets.
+  // If the resolution is changed using a menu entry, a
+  // ResolutionChangedEvent event is sent.
   virtual void CreateResolutionEntriesMenu(vtkKWMenu *parent);
   vtkGetObjectMacro(ResolutionEntriesMenu, vtkKWMenu);
   virtual void UpdateResolutionEntriesMenu();
@@ -223,9 +225,20 @@ public:
   // Create a resolution entries toolbar (specifies its parent).
   // Get the toolbar.
   // Update the menu entries state, given the number of widgets.
+  // If the resolution is changed using a toolbar button, a
+  // ResolutionChangedEvent event is sent.
   virtual void CreateResolutionEntriesToolbar(vtkKWWidget *parent);
   vtkGetObjectMacro(ResolutionEntriesToolbar, vtkKWToolbar);
   virtual void UpdateResolutionEntriesToolbar();
+
+  // Description:
+  // Events. 
+  //BTX
+  enum
+  {
+    ResolutionChangedEvent = 10000
+  };
+  //ETX
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -249,6 +262,7 @@ public:
   virtual void WidgetTitleChangedCallback(vtkKWSelectionFrame*);
   virtual void SwitchWidgetCallback(
     const char *title, vtkKWSelectionFrame *widget);
+  virtual void ResolutionCallback(int i, int j);
 
 protected:
   vtkKWSelectionFrameLayoutManager();

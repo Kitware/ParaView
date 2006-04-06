@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-04-05 17:59-0400\n"
+"POT-Creation-Date: 2006-04-06 11:27-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -75,15 +75,15 @@ msgid ""
 "Selection Frame Dialog|There is a problem with the new title you provided."
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:1944
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1959
 msgid "Selection Frame Dialog|Title|Save Screenshot"
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:2057
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:2072
 msgid "Selection Frame Dialog|Title|Save Screenshot - Error!"
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:2058
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:2073
 msgid ""
 "There was a problem writing the image file.\n"
 "Please check the location and make sure you have write\n"
