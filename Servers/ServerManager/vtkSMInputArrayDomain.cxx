@@ -25,7 +25,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMInputArrayDomain);
-vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.9");
+vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.9.2.1");
 
 //---------------------------------------------------------------------------
 static const char* const vtkSMInputArrayDomainAttributeTypes[] = {
@@ -214,7 +214,7 @@ int vtkSMInputArrayDomain::AttributeInfoContainsArray(
   for (int idx = 0; idx < num; ++idx)
     {
     vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(idx);
-    if (this->IsFieldValid(proxy, arrayInfo))
+    if (this->IsFieldValid(proxy, arrayInfo, 1))
       {
       return 1;
       }
