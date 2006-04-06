@@ -29,12 +29,18 @@
 
 #ifdef KWWidgets_USE_INTERNATIONALIZATION
 #include <libintl.h>  // Bring gettext
+#undef _
 #define _(string) gettext(string)
+#undef k_
 #define k_(string) dgettext(GETTEXT_DOMAIN, string)
 #else
+#undef _
 #define _(string) string
+#undef k_
 #define k_(string) string
+#undef gettext
 #define gettext(string) string
+#undef dgettext
 #define dgettext(domain,string) string
 #ifndef GETTEXT_DOMAIN
 #define GETTEXT_DOMAIN ""
