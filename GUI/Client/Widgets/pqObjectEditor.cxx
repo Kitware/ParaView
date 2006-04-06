@@ -409,8 +409,9 @@ void pqObjectEditor::getServerManagerProperties(pqSMProxy proxy, QWidget* widget
       }
 
     QList<QWidget*> foundWidgets = widget->findChildren<QWidget*>(iter->GetKey());
-    foreach(QWidget* foundWidget, foundWidgets)
+    for(int i=0; i<foundWidgets.size(); i++)
       {
+      QWidget* foundWidget = foundWidgets[i];
       pqSMAdaptor::PropertyType pt = pqSMAdaptor::getPropertyType(SMProperty);
 
       // a layout was found with the name of the property
