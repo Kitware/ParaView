@@ -32,8 +32,70 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqObjectNaming.h"
 
+#include <QAction>
+#include <QHeaderView>
+#include <QLayout>
 #include <QSet>
+#include <QSignalMapper>
+#include <QStandardItemModel>
 #include <QtDebug>
+
+/// Returns true iff the given object needs to have its name validated
+static bool ValidateName(QObject& Object)
+{
+  const QString class_name = Object.metaObject()->className();
+  
+  // Skip separators ...
+  if(QAction* const action = qobject_cast<QAction*>(&Object))
+    {
+    if(action->isSeparator())
+      return false;
+    }
+  
+  // Skip layouts ...
+  if(qobject_cast<QLayout*>(&Object))
+    {
+    return false;
+    }
+
+  // Skip mappers ...
+  if(qobject_cast<QSignalMapper*>(&Object))
+    {
+    return false;
+    }
+
+  // Skip headers ...
+  if(qobject_cast<QHeaderView*>(&Object))
+    {
+    return false;
+    }
+
+  // Skip MVC models ...
+  if(qobject_cast<QStandardItemModel*>(&Object))
+    {
+    return false;
+    }
+
+  // Skip some weird docking implementation widgets ...
+  if(
+    class_name == "QDockSeparator"
+    || class_name == "QDockWidgetSeparator"
+    || class_name == "QDockWidgetTitleButton"
+    || class_name == "QWidgetResizeHandler")
+    {
+    return false;
+    }
+
+  // Skip some weird toolbar implementation widgets ...
+  if(
+    class_name == "QToolBarHandle"
+    || class_name == "QToolBarWidgetAction")
+    {
+    return false;
+    }  
+  
+  return true;
+}
 
 bool pqObjectNaming::Validate(QObject& Parent)
 {
@@ -49,7 +111,7 @@ bool pqObjectNaming::Validate(QObject& Parent)
 
 bool pqObjectNaming::Validate(QObject& Parent, const QString& Path)
 {
-  qDebug() << Path << "\n";
+//  qDebug() << Path << ": " << &Parent << "\n";
 
   bool result = true;
   
@@ -58,21 +120,26 @@ bool pqObjectNaming::Validate(QObject& Parent, const QString& Path)
   for(int i = 0; i != children.size(); ++i)
     {
     QObject* child = children[i];
-    const QString name = child->objectName();
-    if(name.isEmpty())
+
+    // Only validate names for objects that require them ...
+    if(ValidateName(*child))
       {
-      qWarning() << Path << " - unnamed widget: " << child << "\n";
-      result = false;
-      }
-    else
-      {
-      if(names.contains(name))
+      const QString name = child->objectName();
+      if(name.isEmpty())
         {
-        qWarning() << Path << " - duplicate widget name [" << name << "]: " << child << "\n";
+        qWarning() << Path << " - unnamed child widget: " << child << "\n";
         result = false;
         }
-        
-      names.insert(name);
+      else
+        {
+        if(names.contains(name))
+          {
+          qWarning() << Path << " - duplicate child widget name [" << name << "]: " << child << "\n";
+          result = false;
+          }
+          
+        names.insert(name);
+        }
       
       if(!pqObjectNaming::Validate(*child, Path + "/" + name))
         {

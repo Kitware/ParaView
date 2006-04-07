@@ -87,6 +87,7 @@ pqPlayControlsWidget::pqPlayControlsWidget(QWidget *_parent)
     this->Button[i]->setIcon( QIcon(pqPlayControlsWidget::Image[i]) );
     this->Button[i]->setToolTip(pqPlayControlsWidget::Name[i]);
     this->Button[i]->setStatusTip(pqPlayControlsWidget::Name[i]);
+    this->Button[i]->setObjectName(pqPlayControlsWidget::Name[i]);
     this->Layout->addWidget( this->Button[i] );
     }
 

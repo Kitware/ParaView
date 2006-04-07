@@ -437,10 +437,16 @@ void pqMainWindow::createStandardElementInspector(bool visible)
 
 void pqMainWindow::createStandardVCRToolBar()
 {
-  QToolBar* const toolbar = new QToolBar(tr("VCR Controls"), this) << pqSetName("VCRControlsToolBar");
+  QToolBar* const toolbar = new QToolBar(tr("VCR Controls"), this)
+    << pqSetName("VCRControlsToolBar");
+
+  pqPlayControlsWidget* const vcr_controls = new pqPlayControlsWidget(toolbar)
+    << pqSetName("VCRControls");
+  
+  toolbar->addWidget(vcr_controls)
+    << pqSetName("foo");
+
   this->addToolBar(Qt::TopToolBarArea, toolbar);
-  pqPlayControlsWidget* const vcr_controls = new pqPlayControlsWidget(toolbar);
-  toolbar->addWidget(vcr_controls);
   
   this->connect(vcr_controls, SIGNAL(first()), SLOT(onFirstTimeStep()));
   this->connect(vcr_controls, SIGNAL(back()), SLOT(onPreviousTimeStep()));
