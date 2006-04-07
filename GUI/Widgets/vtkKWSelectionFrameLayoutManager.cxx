@@ -64,14 +64,13 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "Resources/vtkKWWindowLayoutResources.h"
 
 #define VTK_KW_SFLMGR_LABEL_PATTERN "%d x %d"
-#define VTK_KW_SFLMGR_HELP_PATTERN "Set window layout to %d column(s) by %d row(s)"
 #define VTK_KW_SFLMGR_ICON_PATTERN "KWWindowLayout%dx%d"
 #define VTK_KW_SFLMGR_RESOLUTIONS {{ 1, 1}, { 1, 2}, { 2, 1}, { 2, 2}, { 2, 3}, { 3, 2}}
 #define VTK_KW_SFLMGR_MAX_SIZE 100
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.59");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.60");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -467,8 +466,10 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesMenu(
     sprintf(label, VTK_KW_SFLMGR_LABEL_PATTERN, 
             res[idx][0], res[idx][1]);
     sprintf(command, "ResolutionCallback %d %d", res[idx][0], res[idx][1]);
-    sprintf(help, VTK_KW_SFLMGR_HELP_PATTERN, 
-            res[idx][0], res[idx][1]);
+    sprintf(
+      help, 
+      ks_("Selection Frame Manager|Set window layout to %d column(s) by %d row(s)"), 
+      res[idx][0], res[idx][1]);
     int value = 
       ((res[idx][0] - 1) * VTK_KW_SFLMGR_MAX_SIZE + res[idx][1] - 1);
     int index = this->ResolutionEntriesMenu->AddRadioButton(
@@ -625,8 +626,10 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     {
     sprintf(command, "ResolutionCallback %d %d", 
             res[idx][0], res[idx][1]);
-    sprintf(help, VTK_KW_SFLMGR_HELP_PATTERN, 
-            res[idx][0], res[idx][1]);
+    sprintf(
+      help, 
+      ks_("Selection Frame Manager|Set window layout to %d column(s) by %d row(s)"), 
+      res[idx][0], res[idx][1]);
     sprintf(icon, VTK_KW_SFLMGR_ICON_PATTERN, 
             res[idx][0], res[idx][1]);
     int value = 
@@ -1515,6 +1518,10 @@ int vtkKWSelectionFrameLayoutManager::UndoMaximizeWidget()
 {
   if (this->Resolution[0] == 1 && this->Resolution[1] == 1 && this->Internals)
     {
+#if 0
+    // I don't want to see hardcoded values in KWWidgets.
+    // the problem can be solved correctly.
+
     const int nw = this->GetNumberOfWidgets();
     
     // If we have only one widget, do not go back (to having nothing)
@@ -1547,7 +1554,7 @@ int vtkKWSelectionFrameLayoutManager::UndoMaximizeWidget()
         }
       return 1;
       }
-    
+#endif    
     this->SetResolution(this->Internals->ResolutionBeforeMaximize);
 
     vtkKWSelectionFrame *at00 = this->GetWidgetAtPosition(0, 0);
@@ -1591,7 +1598,7 @@ void vtkKWSelectionFrameLayoutManager::SelectAndMaximizeWidgetCallback(
   vtkKWSelectionFrame *selection)
 {
   this->SelectWidget(selection);
-  this->ToggleMaximizeWidget(selection);
+  this->MaximizeWidget(selection);
 }
 
 //---------------------------------------------------------------------------
@@ -1680,12 +1687,13 @@ int vtkKWSelectionFrameLayoutManager::ChangeWidgetTitleCallback(
   dlg->SetMasterWindow(this->GetParentTopLevel());
   dlg->SetDisplayPositionToPointer();
   dlg->SetTitle(
-    ks_("Selection Frame Dialog|Title|Change frame title"));
+    ks_("Selection Frame Manager|Dialog|Title|Change frame title"));
   dlg->SetStyleToOkCancel();
   dlg->Create();
-  dlg->GetEntry()->GetLabel()->SetText("Name:");
+  dlg->GetEntry()->GetLabel()->SetText(
+    ks_("Selection Frame Manager|Dialog|Name:"));
   dlg->SetText(
-    ks_("Selection Frame Dialog|Enter a new title for this frame"));
+    ks_("Selection Frame Manager|Dialog|Enter a new title for this frame"));
 
   int ok = dlg->Invoke();
   if (ok)
@@ -1696,8 +1704,8 @@ int vtkKWSelectionFrameLayoutManager::ChangeWidgetTitleCallback(
       {
       vtkKWMessageDialog::PopupMessage(
         this->GetApplication(), this->GetParentTopLevel(), 
-        ks_("Selection Frame Dialog|Title|Change frame title - Error!"),
-        ks_("Selection Frame Dialog|There is a problem with the new title you provided."),
+        ks_("Selection Frame Manager|Dialog|Title|Change frame title - Error!"),
+        ks_("Selection Frame Manager|There is a problem with the new title you provided."),
         vtkKWMessageDialog::ErrorIcon);
       }
     else
@@ -1989,7 +1997,7 @@ int vtkKWSelectionFrameLayoutManager::SaveScreenshotAllWidgets()
   save_dialog->SetParent(this->GetParentTopLevel());
   save_dialog->Create();
   save_dialog->SetTitle(
-    ks_("Selection Frame Dialog|Title|Save Screenshot"));
+    ks_("Selection Frame Manager|Dialog|Title|Save Screenshot"));
   save_dialog->RetrieveLastPathFromRegistry("SavePath");
   
   int res = 0;
@@ -2102,7 +2110,7 @@ int vtkKWSelectionFrameLayoutManager::SaveScreenshotAllWidgetsToFile(
     {
     vtkKWMessageDialog::PopupMessage(
       this->GetApplication(), this->GetParentTopLevel(), 
-      ks_("Selection Frame Dialog|Title|Save Screenshot - Error!"),
+      ks_("Selection Frame Manager|Dialog|Title|Save Screenshot - Error!"),
       k_("There was a problem writing the image file.\n"
          "Please check the location and make sure you have write\n"
          "permissions and enough disk space."),

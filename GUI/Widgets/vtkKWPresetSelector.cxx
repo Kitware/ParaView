@@ -19,6 +19,7 @@
 #include "vtkImageResample.h"
 #include "vtkKWBalloonHelpManager.h"
 #include "vtkKWIcon.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWMenu.h"
@@ -57,7 +58,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.45");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.46");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -560,28 +561,29 @@ void vtkKWPresetSelector::SetDefaultHelpStrings()
     }
 
   this->PresetButtons->GetWidget(vtkKWPresetSelector::SelectPreviousButtonId)->
-    SetBalloonHelpString("Select and apply previous preset");
+    SetBalloonHelpString(
+      ks_("Preset Selector|Select and apply previous preset"));
   
   this->PresetButtons->GetWidget(vtkKWPresetSelector::SelectNextButtonId)->
-    SetBalloonHelpString("Select and apply next preset");
+    SetBalloonHelpString(ks_("Preset Selector|Select and apply next preset"));
 
   this->PresetButtons->GetWidget(vtkKWPresetSelector::AddButtonId)->
-    SetBalloonHelpString("Add a preset");
+    SetBalloonHelpString(ks_("Preset Selector|Add a preset"));
 
   this->PresetButtons->GetWidget(vtkKWPresetSelector::ApplyButtonId)->
-    SetBalloonHelpString("Apply the selected preset(s)");
+    SetBalloonHelpString(ks_("Preset Selector|Apply the selected preset(s)"));
 
   this->PresetButtons->GetWidget(vtkKWPresetSelector::UpdateButtonId)->
-    SetBalloonHelpString("Update the selected preset(s)");
+    SetBalloonHelpString(ks_("Preset Selector|Update the selected preset(s)"));
     
   this->PresetButtons->GetWidget(vtkKWPresetSelector::RemoveButtonId)->
-    SetBalloonHelpString("Delete the selected preset(s)");
+    SetBalloonHelpString(ks_("Preset Selector|Delete the selected preset(s)"));
 
   this->PresetButtons->GetWidget(vtkKWPresetSelector::LocateButtonId)->
-    SetBalloonHelpString("Locate the selected preset(s)");
+    SetBalloonHelpString(ks_("Preset Selector|Locate the selected preset(s)"));
 
   this->PresetButtons->GetWidget(vtkKWPresetSelector::EmailButtonId)->
-    SetBalloonHelpString("Email the selected preset(s)");
+    SetBalloonHelpString(ks_("Preset Selector|Email the selected preset(s)"));
 }
 
 //----------------------------------------------------------------------------
@@ -659,13 +661,13 @@ void vtkKWPresetSelector::CreateColumns()
 
   // We need that column to retrieve the Id
 
-  col = list->AddColumn(vtkKWPresetSelector::IdColumnName);
+  col = list->AddColumn(ks_("Preset Selector|Column|Id"));
   list->SetColumnName(col, vtkKWPresetSelector::IdColumnName);
   list->ColumnVisibilityOff(col);
 
   // Thumbnail
 
-  col = list->AddColumn(vtkKWPresetSelector::ThumbnailColumnName);
+  col = list->AddColumn(ks_("Preset Selector|Column|Image"));
   list->SetColumnName(col, vtkKWPresetSelector::ThumbnailColumnName);
   list->SetColumnWidth(col, -this->ThumbnailSize);
   list->SetColumnResizable(col, 0);
@@ -677,7 +679,7 @@ void vtkKWPresetSelector::CreateColumns()
 
   // Group
 
-  col = list->AddColumn(vtkKWPresetSelector::GroupColumnName);
+  col = list->AddColumn(ks_("Preset Selector|Column|Group"));
   list->SetColumnName(col, vtkKWPresetSelector::GroupColumnName);
   list->SetColumnResizable(col, 1);
   list->SetColumnStretchable(col, 0);
@@ -686,7 +688,7 @@ void vtkKWPresetSelector::CreateColumns()
 
   // Comment
 
-  col = list->AddColumn(vtkKWPresetSelector::CommentColumnName);
+  col = list->AddColumn(ks_("Preset Selector|Column|Comment"));
   list->SetColumnName(col, vtkKWPresetSelector::CommentColumnName);
   list->SetColumnResizable(col, 1);
   list->SetColumnStretchable(col, 1);
@@ -2581,8 +2583,8 @@ void vtkKWPresetSelector::PresetRemoveCallback(int id)
       vtkKWMessageDialog::PopupYesNo( 
         this->GetApplication(), 
         this->GetApplication()->GetNthWindow(0), 
-        "Delete Preset",
-        "Are you sure you want to delete the selected item?", 
+        ks_("Preset Selector|Delete Preset Dialog|Title|Delete Preset ?"),
+        k_("Are you sure you want to delete the selected item?"), 
         vtkKWMessageDialog::WarningIcon | 
         vtkKWMessageDialog::InvokeAtPointer))
     {
@@ -2706,22 +2708,30 @@ void vtkKWPresetSelector::PresetEmailCallback(int id)
     }
 
   vtksys_stl::string message;
-  message = "This file was sent from ";
-  message += this->GetApplication()->GetPrettyName();
+
+  char buffer[500];
+  sprintf(buffer,
+          ks_("Preset Selector|Email Preset|This file was sent from %s"), 
+          this->GetApplication()->GetPrettyName());
+
+  message = buffer;
   message += "\n\n";
 
-  message += "File: ";
+  message += ks_("Preset Selector|Email Preset|File:");
+  message += " ";
   message += native_filename;
   message += "\n";
 
   if (comment && *comment)
     {
-    message += "Comment: ";
+    message += ks_("Preset Selector|Email Preset|Comment:");
+    message += " ";
     message += comment;
     message += "\n";
     }
         
-  message += "Creation Time: ";
+  message += ks_("Preset Selector|Email Preset|Creation Time:");
+  message += " ";
   time_t t = (time_t)this->GetPresetCreationTime(id);
   message += ctime(&t);
 

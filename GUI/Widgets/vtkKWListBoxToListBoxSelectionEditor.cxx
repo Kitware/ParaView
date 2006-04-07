@@ -15,6 +15,7 @@
 
 #include "vtkKWIcon.h"
 #include "vtkCommand.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
 #include "vtkKWListBox.h"
 #include "vtkKWListBoxWithScrollbars.h"
@@ -28,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBoxToListBoxSelectionEditor );
-vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.14");
+vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.15");
 
 //----------------------------------------------------------------------------
 vtkKWListBoxToListBoxSelectionEditor::vtkKWListBoxToListBoxSelectionEditor()
@@ -93,22 +94,23 @@ void vtkKWListBoxToListBoxSelectionEditor::Create()
 
   this->AddButton->SetParent(frame);
   this->AddButton->Create();
-  this->AddButton->SetText("Add");
+  this->AddButton->SetText(ks_("List Box To List Box|Button|Add"));
   this->AddButton->SetCommand(this, "AddCallback");
 
   this->AddAllButton->SetParent(frame);
   this->AddAllButton->Create();
-  this->AddAllButton->SetText("Add All");
+  this->AddAllButton->SetText(ks_("List Box To List Box|Button|Add All"));
   this->AddAllButton->SetCommand(this, "AddAllCallback");
 
   this->RemoveButton->SetParent(frame);
   this->RemoveButton->Create();
-  this->RemoveButton->SetText("Remove");
+  this->RemoveButton->SetText(ks_("List Box To List Box|Button|Remove"));
   this->RemoveButton->SetCommand(this, "RemoveCallback");
 
   this->RemoveAllButton->SetParent(frame);
   this->RemoveAllButton->Create();
-  this->RemoveAllButton->SetText("RemoveAll");
+  this->RemoveAllButton->SetText(
+    ks_("List Box To List Box|Button|Remove All"));
   this->RemoveAllButton->SetCommand(this, "RemoveAllCallback");
 
   this->Script("pack %s %s %s %s -side top -fill x -padx 2 -pady 1",
@@ -138,12 +140,12 @@ void vtkKWListBoxToListBoxSelectionEditor::Create()
 
   this->UpButton->SetParent(btframe);
   this->UpButton->Create();
-  this->UpButton->SetText("Up");
+  this->UpButton->SetText(ks_("List Box To List Box|Button|Up"));
   this->UpButton->SetCommand(this, "UpCallback");
 
   this->DownButton->SetParent(btframe);
   this->DownButton->Create();
-  this->DownButton->SetText("Down");
+  this->DownButton->SetText(ks_("List Box To List Box|Button|Down"));
   this->DownButton->SetCommand(this, "DownCallback");
 
   this->Script("pack %s %s -side left -fill x -expand y -padx 1 -pady 2",
@@ -407,7 +409,8 @@ void vtkKWListBoxToListBoxSelectionEditor::DisplayEllipsis()
     {
     return;
     }
-  this->SourceList->GetWidget()->InsertEntry(0, "...");
+  this->SourceList->GetWidget()->InsertEntry(
+    0, ks_("List Box To List Box|Ellipsis|..."));
   this->SourceList->GetWidget()->SetBinding(
     "<Double-1>", this, "EllipsisCallback");
   this->EllipsisDisplayed = 1;

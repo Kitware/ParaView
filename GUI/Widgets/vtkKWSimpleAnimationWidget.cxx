@@ -19,6 +19,7 @@
 #include "vtkKWComboBoxWithLabel.h"
 #include "vtkKWComboBox.h"
 #include "vtkKWIcon.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabelWithLabel.h"
 #include "vtkKWLoadSaveDialog.h"
@@ -71,7 +72,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.26");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.27");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -179,12 +180,12 @@ void vtkKWSimpleAnimationWidget::Create()
   // Number of frames
 
   scale = this->Parameters->AddWidget(VTK_VV_ANIMATION_SCALE_NB_OF_FRAMES_ID);
-  scale->SetLabelText("Number of frames:");
+  scale->SetLabelText(ks_("Animation|Number of frames:"));
   scale->SetResolution(1);
   scale->SetRange(1, VTK_VV_ANIMATION_SCALE_NB_FRAMES);
   scale->SetValue(20);
   scale->SetBalloonHelpString(
-    "Specify the number of frames for this animation");
+    k_("Specify the number of frames for this animation"));
 
   // 3D animation : Azimuth scale
 
@@ -195,18 +196,18 @@ void vtkKWSimpleAnimationWidget::Create()
   scale->SetResolution(res);
   scale->SetRange(-rotate_max, rotate_max);
   scale->SetValue(0.0);
-  scale->SetLabelText("X rotation:");
+  scale->SetLabelText(ks_("Animation|X rotation:"));
   scale->SetBalloonHelpString(
-    "Set the total amount of rotation in X (in degrees)");
+    k_("Set the total amount of rotation in X (in degrees)"));
 
   // 3D animation : Elevation scale
 
   scale = this->Parameters->AddWidget(VTK_VV_ANIMATION_SCALE_ELEVATION_ID);
   scale->SetResolution(res);
   scale->SetRange(-rotate_max, rotate_max);
-  scale->SetLabelText("Y rotation:");
+  scale->SetLabelText(ks_("Animation|Y rotation:"));
   scale->SetBalloonHelpString(
-    "Set the total amount of rotation in Y (in degrees)");
+    k_("Set the total amount of rotation in Y (in degrees)"));
   
   // 3D animation : Roll scale
 
@@ -214,9 +215,9 @@ void vtkKWSimpleAnimationWidget::Create()
   scale->SetResolution(res);
   scale->SetRange(-rotate_max, rotate_max);
   scale->SetValue(0.0);
-  scale->SetLabelText("Z Rotation:");
+  scale->SetLabelText(ks_("Animation|Z Rotation:"));
   scale->SetBalloonHelpString(
-    "Set the total amount of rotation in Z (in degrees)");
+    k_("Set the total amount of rotation in Z (in degrees)"));
 
   // 3D animation : Zoom scale
 
@@ -224,24 +225,24 @@ void vtkKWSimpleAnimationWidget::Create()
   scale->SetResolution(0.01);
   scale->SetRange(scale->GetResolution(), 10.0);
   scale->SetValue(1.0);
-  scale->SetLabelText("Zoom factor:");
-  scale->SetBalloonHelpString("Set the total zoom factor");
+  scale->SetLabelText(ks_("Animation|Zoom factor:"));
+  scale->SetBalloonHelpString(k_("Set the total zoom factor"));
 
   // 2D animation : Starting slice scale
 
   scale = this->Parameters->AddWidget(VTK_VV_ANIMATION_SCALE_SLICE_START_ID);
   scale->SetValue(0);
-  scale->SetLabelText("Starting slice:");
+  scale->SetLabelText(ks_("Animation|Starting slice:"));
   scale->SetBalloonHelpString(
-    "Set the slice number with which to begin the animation");
+    k_("Set the slice number with which to begin the animation"));
   
   // 2D animation : Ending slice scale
 
   scale = this->Parameters->AddWidget(VTK_VV_ANIMATION_SCALE_SLICE_END_ID);
   scale->SetValue(0);
-  scale->SetLabelText("Ending slice:");
+  scale->SetLabelText(ks_("Animation|Ending slice:"));
   scale->SetBalloonHelpString(
-    "Set the slice number with which to end the animation");
+    k_("Set the slice number with which to end the animation"));
 
   for (i = 0; i < this->Parameters->GetNumberOfWidgets(); i++)
     {
@@ -273,19 +274,21 @@ void vtkKWSimpleAnimationWidget::Create()
   // Preview, Create, and Cancel buttons
 
   pb = this->AnimationButtonSet->AddWidget(VTK_VV_ANIMATION_BUTTON_PREVIEW_ID);
-  pb->SetText("Preview");
+  pb->SetText(ks_("Animation|Button|Preview"));
   pb->SetCommand(this, "PreviewAnimationCallback");
-  pb->SetBalloonHelpString("Preview the animation you are about to create");
+  pb->SetBalloonHelpString(
+    k_("Preview the animation you are about to create"));
 
   pb = this->AnimationButtonSet->AddWidget(VTK_VV_ANIMATION_BUTTON_CREATE_ID);
-  pb->SetText("Create...");
+  pb->SetText(ks_("Animation|Button|Create..."));
   pb->SetCommand(this, "CreateAnimationCallback");
-  pb->SetBalloonHelpString("Create the animation");
+  pb->SetBalloonHelpString(k_("Create the animation"));
 
   pb = this->AnimationButtonSet->AddWidget(VTK_VV_ANIMATION_BUTTON_CANCEL_ID);
-  pb->SetText("Cancel");
+  pb->SetText(ks_("Animation|Button|Cancel"));
   pb->SetCommand(this, "CancelAnimationCallback");
-  pb->SetBalloonHelpString("Cancel the preview or creation of an animation");
+  pb->SetBalloonHelpString(
+    k_("Cancel the preview or creation of an animation"));
 
   // --------------------------------------------------------------
   // Label that is visible regardless of the animation type
@@ -302,9 +305,9 @@ void vtkKWSimpleAnimationWidget::Create()
   this->HelpLabel->ExpandWidgetOn();
   this->HelpLabel->GetWidget()->AdjustWrapLengthToWidthOn();
   this->HelpLabel->GetWidget()->SetText(
-    "Preview images will be generated using a low level-of-detail. When the "
-    "animation is created, the best available level-of-detail will be used."
-    );
+    k_("Preview images will be generated using a low level-of-detail. When "
+       "the animation is created, the best available level-of-detail will be "
+       "used."));
   
   tk_cmd << "pack " << this->HelpLabel->GetWidgetName()
          << " -side top -anchor w -expand y -fill x" << endl;
@@ -550,13 +553,14 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
   save_dialog->SetParent(this->GetParentTopLevel());
   save_dialog->RetrieveLastPathFromRegistry("SavePath");
   save_dialog->Create();
-  save_dialog->SetTitle("Save Animation");
+  save_dialog->SetTitle(
+    ks_("Animation|Save Animation Dialog|Title|Save Animation"));
   save_dialog->SaveDialogOn();
 #if defined(VTK_USE_VIDEO_FOR_WINDOWS) || defined(VTK_USE_FFMPEG_ENCODER)
-  save_dialog->SetFileTypes("{{AVI movie file} {.avi}} {{MPEG2 movie file} {.mpg}} {{JPEG Images} {.jpg}} {{TIFF Images} {.tif}}");
+  save_dialog->SetFileTypes("{{AVI} {.avi}} {{MPEG2} {.mpg}} {{JPEG} {.jpg}} {{TIFF} {.tif}}");
   save_dialog->SetDefaultExtension(".avi");
 #else
-  save_dialog->SetFileTypes("{{MPEG2 movie file} {.mpg}} {{JPEG Images} {.jpg}} {{TIFF Images} {.tif}}");
+  save_dialog->SetFileTypes("{{MPEG2} {.mpg}} {{JPEG} {.jpg}} {{TIFF} {.tif}}");
   save_dialog->SetDefaultExtension(".mpg");
 #endif
 
@@ -610,30 +614,31 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
     
   vtkKWMessageDialog *msg_dialog = vtkKWMessageDialog::New();
   msg_dialog->SetMasterWindow(this->GetParentTopLevel());
-  msg_dialog->SetTitle("Create Animation: Size");
+  msg_dialog->SetTitle(
+    ks_("Animation|Create Animation Dialog|Title|Frame Size"));
   msg_dialog->SetStyleToOkCancel();
   msg_dialog->Create();
 
   vtksys_stl::string msg(
-      "Specify the width and height of each frame to be saved from this "
-      "animation.");
+      k_("Specify the width and height of each frame to be saved from this "
+         "animation."));
   
   if (is_mpeg)
     {
     msg += " ";
     msg += 
-      "The width must be a multiple of 32 and the height a "
-      "multiple of 8. Each will be resized to the next smallest multiple "
-      "if it does not meet this criterion. The maximum size allowed is "
-      "1920 by 1080";
+      k_("The width must be a multiple of 32 and the height a "
+         "multiple of 8. Each will be resized to the next smallest multiple "
+         "if it does not meet this criterion. The maximum size allowed is "
+         "1920 by 1080.");
     }
   else if (is_avi)
     { 
     msg += " ";
     msg += 
-      "Each dimension must be a multiple of 4. Each will be "
-      "resized to the next smallest multiple of 4 if it does not meet this "
-      "criterion.";
+      k_("Each dimension must be a multiple of 4. Each will be "
+         "resized to the next smallest multiple of 4 if it does not meet this "
+         "criterion.");
     }
 
   msg_dialog->SetText(msg.c_str());
@@ -658,7 +663,8 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
   vtkKWComboBoxWithLabel *width_combobox = vtkKWComboBoxWithLabel::New();
   width_combobox->SetParent(frame);
   width_combobox->Create();
-  width_combobox->SetLabelText("Width:");
+  width_combobox->SetLabelText(
+    ks_("Animation|Create Animation Dialog|Frame Size|Width:"));
 
   combobox = width_combobox->GetWidget();
   combobox->SetValueAsInt(orig_width);
@@ -675,7 +681,8 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
   vtkKWComboBoxWithLabel *height_combobox = vtkKWComboBoxWithLabel::New();
   height_combobox->SetParent(frame);
   height_combobox->Create();
-  height_combobox->SetLabelText("Height:");
+  height_combobox->SetLabelText(
+    ks_("Animation|Create Animation Dialog|Frame Size|Height:"));
 
   combobox = height_combobox->GetWidget();
   combobox->SetValueAsInt(orig_height);
@@ -815,7 +822,7 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
     this->RenderWidget->SetRenderModeToInteractive();
     if (win)
       {
-      win->SetStatusText("Previewing animation");
+      win->SetStatusText(ks_("Progress|Previewing animation"));
       }
     status = vtkKWSimpleAnimationWidget::AnimationPreviewing;
     }
@@ -860,7 +867,7 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
     if (win)
       {
       win->SetStatusText(
-        "Generating an animation (rendering to memory; please wait)");
+        ks_("Progress|Generating animation (rendering to memory; please wait)"));
       }
     status = vtkKWSimpleAnimationWidget::AnimationCreating;
 
@@ -964,11 +971,11 @@ void vtkKWSimpleAnimationWidget::PerformCameraAnimation(const char *file_root,
     end_msg += " -- ";
     if (this->AnimationStatus != status)
       {
-      end_msg += "Canceled";
+      end_msg += ks_("Progress|Canceled");
       }
     else
       {
-      end_msg += "Done";
+      end_msg += ks_("Progress|Done");
       }
     win->SetStatusText(end_msg.c_str());
     win->GetProgressGauge()->SetValue(0);
@@ -1056,7 +1063,7 @@ void vtkKWSimpleAnimationWidget::PerformSliceAnimation(const char *file_root,
     {
     if (win)
       {
-      win->SetStatusText("Previewing animation");
+      win->SetStatusText(ks_("Progress|Previewing animation"));
       }
     status = vtkKWSimpleAnimationWidget::AnimationPreviewing;
     }
@@ -1102,7 +1109,7 @@ void vtkKWSimpleAnimationWidget::PerformSliceAnimation(const char *file_root,
     if (win)
       {
       win->SetStatusText(
-        "Generating an animation (rendering to memory; please wait)");
+        ks_("Progress|Generating animation (rendering to memory; please wait)"));
       }
     status = vtkKWSimpleAnimationWidget::AnimationCreating;
 
@@ -1203,11 +1210,11 @@ void vtkKWSimpleAnimationWidget::PerformSliceAnimation(const char *file_root,
     end_msg += " -- ";
     if (this->AnimationStatus != status)
       {
-      end_msg += "Canceled";
+      end_msg += ks_("Progress|Canceled");
       }
     else
       {
-      end_msg += "Done";
+      end_msg += ks_("Progress|Done");
       }
     win->SetStatusText(end_msg.c_str());
     win->GetProgressGauge()->SetValue(0);

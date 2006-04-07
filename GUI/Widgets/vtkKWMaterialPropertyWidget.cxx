@@ -16,6 +16,7 @@
 #include "vtkKWCheckButton.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
 #include "vtkKWFrameWithLabel.h"
 #include "vtkKWLabelWithLabel.h"
@@ -33,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.25");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.26");
 
 //----------------------------------------------------------------------------
 class vtkKWMaterialPropertyWidgetInternals
@@ -223,7 +224,7 @@ void vtkKWMaterialPropertyWidget::AddDefaultPresets()
   preset->Specular = 0.0;
   preset->SpecularPower = 1.0;
   preset->HelpString = vtksys::SystemTools::DuplicateString(
-    "Full ambient eliminating all directional shading.");
+    ks_("Material Preset|Full ambient eliminating all directional shading."));
   this->Internals->Presets.push_back(preset);
 
   // Presets : Dull
@@ -234,7 +235,7 @@ void vtkKWMaterialPropertyWidget::AddDefaultPresets()
   preset->Specular = 0.0;
   preset->SpecularPower = 1.0;
   preset->HelpString = vtksys::SystemTools::DuplicateString(
-    "Dull material properties (no specular lighting)");
+    ks_("Material Preset|Dull material properties (no specular lighting)"));
   this->Internals->Presets.push_back(preset);
   
   // Presets : Smooth
@@ -245,7 +246,7 @@ void vtkKWMaterialPropertyWidget::AddDefaultPresets()
   preset->Specular = 0.2;
   preset->SpecularPower = 10.0;
   preset->HelpString = vtksys::SystemTools::DuplicateString(
-    "Smooth material properties (moderate specular lighting");
+    ks_("Material Preset|Smooth material properties (moderate specular lighting"));
   this->Internals->Presets.push_back(preset);
   
   // Presets : Shiny
@@ -256,7 +257,7 @@ void vtkKWMaterialPropertyWidget::AddDefaultPresets()
   preset->Specular = 0.5;
   preset->SpecularPower = 40.0;
   preset->HelpString = vtksys::SystemTools::DuplicateString(
-    "Shiny material properties (high specular lighting)");
+    ks_("Material Preset|Shiny material properties (high specular lighting)"));
   this->Internals->Presets.push_back(preset);
 } 
 
@@ -289,9 +290,11 @@ void vtkKWMaterialPropertyWidget::Create()
     
     this->PopupButton->SetParent(this);
     this->PopupButton->Create();
-    this->PopupButton->GetLabel()->SetText("Material:");
+    this->PopupButton->GetLabel()->SetText(
+      ks_("Material Property Editor|Material:"));
     this->PopupButton->GetWidget()->SetText("");
-    this->PopupButton->GetWidget()->SetPopupTitle("Material Properties");
+    this->PopupButton->GetWidget()->SetPopupTitle(
+      ks_("Material Property Editor|Material Properties"));
 
     this->Script("pack %s -side left -anchor w -fill x",
                  this->PopupButton->GetWidgetName());
@@ -312,7 +315,8 @@ void vtkKWMaterialPropertyWidget::Create()
     this->MaterialPropertiesFrame->SetParent(this);
     }
   this->MaterialPropertiesFrame->Create();
-  this->MaterialPropertiesFrame->SetLabelText("Material Properties");
+  this->MaterialPropertiesFrame->SetLabelText(
+    ks_("Material Property Editor|Material Properties"));
 
   this->Script("pack %s -padx 0 -pady 0 -fill x -expand yes -anchor w",
                this->MaterialPropertiesFrame->GetWidgetName());
@@ -344,11 +348,11 @@ void vtkKWMaterialPropertyWidget::Create()
   this->AmbientScale->SetEndCommand(this, "PropertyChangedCallback");
   this->AmbientScale->SetEntryCommand(this, "PropertyChangedCallback");
   this->AmbientScale->SetEntryWidth(entry_width);
-  this->AmbientScale->SetLabelText("Ambient:");
+  this->AmbientScale->SetLabelText(ks_("Material Property Editor|Ambient:"));
   this->AmbientScale->SetLabelWidth(label_width);
   this->AmbientScale->SetRange(0, 100);
   this->AmbientScale->SetBalloonHelpString(
-    "Set the ambient coefficient within the range [0,100] for lighting");
+    k_("Set the ambient coefficient within the range [0,100] for lighting"));
   
   this->Script("grid %s -padx 2 -pady 2 -sticky news -row %d",
                this->AmbientScale->GetWidgetName(), row++);
@@ -365,11 +369,11 @@ void vtkKWMaterialPropertyWidget::Create()
   this->DiffuseScale->SetEndCommand(this, "PropertyChangedCallback");
   this->DiffuseScale->SetEntryCommand(this, "PropertyChangedCallback");
   this->DiffuseScale->SetEntryWidth(entry_width);
-  this->DiffuseScale->SetLabelText("Diffuse:");
+  this->DiffuseScale->SetLabelText(ks_("Material Property Editor|Diffuse:"));
   this->DiffuseScale->SetLabelWidth(label_width);
   this->DiffuseScale->SetRange(0, 100);
   this->DiffuseScale->SetBalloonHelpString(
-    "Set the diffuse coefficient within the range [0,100] for lighting");
+    k_("Set the diffuse coefficient within the range [0,100] for lighting"));
   
   this->Script("grid %s -padx 2 -pady 2 -sticky news -row %d",
                this->DiffuseScale->GetWidgetName(), row++);
@@ -383,11 +387,12 @@ void vtkKWMaterialPropertyWidget::Create()
   this->SpecularScale->SetEndCommand(this, "PropertyChangedCallback");
   this->SpecularScale->SetEntryCommand(this, "PropertyChangedCallback");
   this->SpecularScale->SetEntryWidth(entry_width);
-  this->SpecularScale->SetLabelText("Specular:");
+  this->SpecularScale->SetLabelText(
+    ks_("Material Property Editor|Specular:"));
   this->SpecularScale->SetLabelWidth(label_width);
   this->SpecularScale->SetRange(0, 100);
   this->SpecularScale->SetBalloonHelpString(
-    "Set the specular coefficient within the range [0,100] for lighting");
+    k_("Set the specular coefficient within the range [0,100] for lighting"));
 
   this->Script("grid %s -padx 2 -pady 2 -sticky news -row %d",
                this->SpecularScale->GetWidgetName(), row++);
@@ -401,11 +406,12 @@ void vtkKWMaterialPropertyWidget::Create()
   this->SpecularPowerScale->SetEndCommand(this, "PropertyChangedCallback");
   this->SpecularPowerScale->SetEntryCommand(this, "PropertyChangedCallback");
   this->SpecularPowerScale->SetEntryWidth(entry_width);
-  this->SpecularPowerScale->SetLabelText("Power:");
+  this->SpecularPowerScale->SetLabelText(
+    ks_("Material Property Editor|Power:"));
   this->SpecularPowerScale->SetLabelWidth(label_width);
   this->SpecularPowerScale->SetRange(1, 50);
   this->SpecularPowerScale->SetBalloonHelpString(
-    "Set the specular power within the range [0,50] for lighting");
+    k_("Set the specular power within the range [0,50] for lighting"));
   
   this->Script("grid %s -padx 2 -pady 2 -sticky news -row %d",
                this->SpecularPowerScale->GetWidgetName(), row++);
@@ -423,7 +429,8 @@ void vtkKWMaterialPropertyWidget::Create()
   this->PreviewLabel->SetLabelPositionToTop();
   this->PreviewLabel->ExpandWidgetOff();
   this->PreviewLabel->Create();
-  this->PreviewLabel->GetLabel()->SetText("Preview:");
+  this->PreviewLabel->GetLabel()->SetText(
+    ks_("Material Property Editor|Preview:"));
   
   this->Script("pack %s -side left -padx 2 -pady 2 -anchor nw",
                this->PreviewLabel->GetWidgetName());
@@ -433,7 +440,8 @@ void vtkKWMaterialPropertyWidget::Create()
 
   this->PresetPushButtonSet->SetParent(this->PresetsFrame);
   this->PresetPushButtonSet->SetLabelPositionToTop();
-  this->PresetPushButtonSet->GetLabel()->SetText("Presets:");
+  this->PresetPushButtonSet->GetLabel()->SetText(
+    ks_("Material Property Editor|Presets:"));
   this->PresetPushButtonSet->Create();
   this->PresetPushButtonSet->ExpandWidgetOff();
 

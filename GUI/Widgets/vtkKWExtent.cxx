@@ -16,10 +16,11 @@
 #include "vtkKWRange.h"
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWInternationalization.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.49");
+vtkCxxRevisionMacro(vtkKWExtent, "1.50");
 
 //----------------------------------------------------------------------------
 vtkKWExtent::vtkKWExtent()
@@ -92,9 +93,9 @@ void vtkKWExtent::Create()
     this->Range[i]->AdjustResolutionOn();
     }
 
-  this->Range[0]->GetLabel()->SetText("X (Units)");
-  this->Range[1]->GetLabel()->SetText("Y (Units)");
-  this->Range[2]->GetLabel()->SetText("Z (Units)");
+  this->Range[0]->GetLabel()->SetText(ks_("Extent|Dimension|X (Units)"));
+  this->Range[1]->GetLabel()->SetText(ks_("Extent|Dimension|Y (Units)"));
+  this->Range[2]->GetLabel()->SetText(ks_("Extent|Dimension|Z (Units)"));
   
   // Pack the label and the option menu
 

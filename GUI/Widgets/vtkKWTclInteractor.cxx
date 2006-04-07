@@ -16,6 +16,7 @@
 #include "vtkKWApplication.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWText.h"
@@ -26,7 +27,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.44");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.45");
 
 //----------------------------------------------------------------------------
 vtkKWTclInteractor::vtkKWTclInteractor()
@@ -40,7 +41,7 @@ vtkKWTclInteractor::vtkKWTclInteractor()
   
   this->DisplayText = vtkKWTextWithScrollbars::New();
   
-  this->SetTitle("Tcl Interactor");
+  this->SetTitle(ks_("Tcl Interactor Dialog|Title|Tcl Interactor"));
   
   this->TagNumber = 1;
   this->CommandIndex = 0;
@@ -88,7 +89,7 @@ void vtkKWTclInteractor::Create()
   this->DismissButton->SetParent(this->ButtonFrame);
   this->DismissButton->Create();
   this->DismissButton->SetCommand(this, "Withdraw");
-  this->DismissButton->SetText("Dismiss");
+  this->DismissButton->SetText(ks_("Tcl Interactor Dialog|Button|Dismiss"));
   this->Script("pack %s -side left -expand 1 -fill x",
                this->DismissButton->GetWidgetName());
 
@@ -97,7 +98,7 @@ void vtkKWTclInteractor::Create()
   
   this->CommandLabel->SetParent(this->CommandFrame);
   this->CommandLabel->Create();
-  this->CommandLabel->SetText("Command:");
+  this->CommandLabel->SetText(ks_("Tcl Interactor Dialog|Command:"));
   
   this->CommandEntry->SetParent(this->CommandFrame);
   this->CommandEntry->Create();

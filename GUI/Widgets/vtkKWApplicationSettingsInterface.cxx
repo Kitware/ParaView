@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.56");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.57");
 
 //----------------------------------------------------------------------------
 vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
@@ -319,7 +319,7 @@ void vtkKWApplicationSettingsInterface::Create()
   this->ViewPanelPositionOptionMenu->Create();
 
   this->ViewPanelPositionOptionMenu->GetLabel()->SetText(
-    ks_("Application Settings|View panel position:"));
+    ks_("Application Settings|Position of view panel:"));
 
   menu = this->ViewPanelPositionOptionMenu->GetWidget()->GetMenu();
   menu->AddRadioButton(ks_("Position|Left"), 
@@ -405,7 +405,7 @@ void vtkKWApplicationSettingsInterface::Create()
   this->FlatFrameCheckButton->SetParent(frame);
   this->FlatFrameCheckButton->Create();
   this->FlatFrameCheckButton->SetText(
-    ks_("Application Settings|Flat frame"));
+    ks_("Application Settings|Toolbar Settings|Flat frame"));
   this->FlatFrameCheckButton->SetCommand(this, "FlatFrameCallback");
   this->FlatFrameCheckButton->SetBalloonHelpString(
     k_("Display the toolbar frames using a flat aspect."));  
@@ -424,7 +424,7 @@ void vtkKWApplicationSettingsInterface::Create()
   this->FlatButtonsCheckButton->SetParent(frame);
   this->FlatButtonsCheckButton->Create();
   this->FlatButtonsCheckButton->SetText(
-    ks_("Application Settings|Flat buttons"));
+    ks_("Application Settings|Toolbar Settings|Flat buttons"));
   this->FlatButtonsCheckButton->SetCommand(this, "FlatButtonsCallback");
   this->FlatButtonsCheckButton->SetBalloonHelpString(
     k_("Display the toolbar buttons using a flat aspect."));  

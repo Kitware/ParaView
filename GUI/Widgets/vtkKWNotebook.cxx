@@ -16,6 +16,7 @@
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWTkUtilities.h"
@@ -58,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.100");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.101");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -2009,10 +2010,10 @@ void vtkKWNotebook::PageTabContextMenuCallback(int id, int x, int y)
   int index;
 
   index = this->TabPopupMenu->AddCheckButton(
-    "Show", this, visibility.str());
+    ks_("Notebook|Page|Show"), this, visibility.str());
   visibility.rdbuf()->freeze(0);
   this->TabPopupMenu->SetItemHelpString(
-    index, "Show/Hide this notebook page");
+    index, k_("Show/Hide this notebook page"));
   this->TabPopupMenu->SetItemSelectedState(
     index, this->GetPageVisibility(page));
 
@@ -2024,17 +2025,18 @@ void vtkKWNotebook::PageTabContextMenuCallback(int id, int x, int y)
     pin << "TogglePagePinnedCallback " << id << ends;
 
     index = this->TabPopupMenu->InsertCheckButton(
-      0, "Pin", this, pin.str());
+      0, ks_("Notebook|Page|Pin"), this, pin.str());
     pin.rdbuf()->freeze(0);
     this->TabPopupMenu->SetItemHelpString(
-      index, "Pin/Unpin this notebook page");
+      index, k_("Pin/Unpin this notebook page"));
 
     // If a page is pinned, it can not be hidden. Unpin it first :)
 
     if (page->Pinned)
       {
       this->TabPopupMenu->SelectItem(index);
-      this->TabPopupMenu->SetItemState("Show", vtkKWTkOptions::StateDisabled);
+      this->TabPopupMenu->SetItemState(
+        ks_("Notebook|Page|Show"), vtkKWTkOptions::StateDisabled);
       }
     }
 

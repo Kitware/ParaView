@@ -70,7 +70,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.283");
+vtkCxxRevisionMacro(vtkKWApplication, "1.284");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -1077,7 +1077,9 @@ void vtkKWApplication::DisplayHelpDialog(vtkKWWindowBase* master)
   sprintf(buffer, 
           k_("Please check the help resource %s for more information."), res);
   vtkKWMessageDialog::PopupMessage(
-    this, master, k_("Help Error!"), buffer, vtkKWMessageDialog::WarningIcon);
+    this, master, 
+    ks_("Display Help Dialog|Title|Help Error!"), 
+    buffer, vtkKWMessageDialog::WarningIcon);
 #endif
 
   if (!status)
@@ -1088,7 +1090,9 @@ void vtkKWApplication::DisplayHelpDialog(vtkKWWindowBase* master)
          "the program being wrongly installed or the help file being "
          "corrupted."), res);
     vtkKWMessageDialog::PopupMessage(
-      this, master, k_("Help Error!"), buffer, vtkKWMessageDialog::ErrorIcon);
+      this, master, 
+      ks_("Display Help Dialog|Title|Help Error!"), 
+      buffer, vtkKWMessageDialog::ErrorIcon);
     }
 }
 
@@ -1925,14 +1929,14 @@ int vtkKWApplication::SendEmail(
       dlg->SetApplication(this);
       dlg->SetStyleToOkCancel();
       dlg->SetOptions(vtkKWMessageDialog::ErrorIcon);
-      dlg->SetTitle(ks_("Email Feedback Dialog|Send Email Error!"));
+      dlg->SetTitle(ks_("Email Feedback Dialog|Title|Send Email Error!"));
       dlg->SetText(msg.c_str());
-      dlg->SetOKButtonText(ks_("Email Feedback Dialog|Buttons|Retry"));
+      dlg->SetOKButtonText(ks_("Email Feedback Dialog|Button|Retry"));
       if (attachment_filename)
         {
         dlg->SetStyleToOkOtherCancel();
         dlg->SetOtherButtonText(
-          ks_("Email Feedback Dialog|Buttons|Locate attachment"));
+          ks_("Email Feedback Dialog|Button|Locate attachment"));
         }
       dlg->Create();
       dlg->SetIcon();
@@ -1949,7 +1953,7 @@ int vtkKWApplication::SendEmail(
       vtkKWEntryWithLabel *to_entry = vtkKWEntryWithLabel::New();
       to_entry->SetParent(dlg->GetBottomFrame());
       to_entry->Create();
-      to_entry->SetLabelText(ks_("Email Feedback Dialog|To:"));
+      to_entry->SetLabelText(ks_("Email Feedback Dialog|Field|To:"));
       to_entry->SetLabelWidth(label_width);
       to_entry->GetWidget()->SetValue(to ? to : "");
       to_entry->GetWidget()->ReadOnlyOn();
@@ -1963,7 +1967,7 @@ int vtkKWApplication::SendEmail(
       vtkKWEntryWithLabel *subject_entry = vtkKWEntryWithLabel::New();
       subject_entry->SetParent(dlg->GetBottomFrame());
       subject_entry->Create();
-      subject_entry->SetLabelText(ks_("Email Feedback Dialog|Subject:"));
+      subject_entry->SetLabelText(ks_("Email Feedback Dialog|Field|Subject:"));
       subject_entry->SetLabelWidth(label_width);
       subject_entry->GetWidget()->SetValue(subject ? subject : "");
       subject_entry->GetWidget()->ReadOnlyOn();
@@ -1978,7 +1982,7 @@ int vtkKWApplication::SendEmail(
       attachment_entry->SetParent(dlg->GetBottomFrame());
       attachment_entry->Create();
       attachment_entry->SetLabelText(
-        ks_("Email Feedback Dialog|Attachment:"));
+        ks_("Email Feedback Dialog|Field|Attachment:"));
       attachment_entry->SetLabelWidth(label_width);
       attachment_entry->GetWidget()->SetValue(
         attachment_filename ? attachment_filename : "");

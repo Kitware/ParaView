@@ -16,6 +16,7 @@
 #include "vtkKWApplication.h"
 #include "vtkKWDragAndDropTargetSet.h"
 #include "vtkKWFrame.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabelWithLabel.h"
@@ -26,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithLabel );
-vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.6");
+vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.7");
 
 int vtkKWFrameWithLabel::DefaultLabelCase = vtkKWFrameWithLabel::LabelCaseUppercaseFirst;
 int vtkKWFrameWithLabel::DefaultLabelFontWeight = vtkKWFrameWithLabel::LabelFontWeightBold;
@@ -152,11 +153,9 @@ void vtkKWFrameWithLabel::Create()
   const char *lem_name = this->GetApplication()->GetLimitedEditionModeName() 
     ? this->GetApplication()->GetLimitedEditionModeName() : "Limited Edition";
   
-  ostrstream balloon_str;
-  balloon_str << "This feature is not available in \"" << lem_name 
-              << "\" mode." << ends;
-  this->GetLabelIcon()->SetBalloonHelpString(balloon_str.str());
-  balloon_str.rdbuf()->freeze(0);
+  char buffer[500];
+  sprintf(buffer, k_("This feature is not available in '%s'mode."), lem_name);
+  this->GetLabelIcon()->SetBalloonHelpString(buffer);
 
   if (vtkKWFrameWithLabel::DefaultLabelFontWeight ==
       vtkKWFrameWithLabel::LabelFontWeightBold)
@@ -169,7 +168,8 @@ void vtkKWFrameWithLabel::Create()
   this->Icon->SetParent(this);
   this->Icon->Create();
   this->Icon->SetImageToIcon(this->IconData);
-  this->Icon->SetBalloonHelpString("Shrink or expand the frame");
+  this->Icon->SetBalloonHelpString(
+    ks_("Frame With Label|Shrink or expand the frame"));
   
   this->Script(
     "pack %s -fill x -expand y -side top", this->Border->GetWidgetName());

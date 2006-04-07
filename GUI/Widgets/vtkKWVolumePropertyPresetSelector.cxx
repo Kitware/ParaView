@@ -15,6 +15,7 @@
 #include "vtkKWVolumePropertyPresetSelector.h"
 
 #include "vtkVolumeProperty.h"
+#include "vtkKWInternationalization.h"
 #include "vtkObjectFactory.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkColorTransferFunction.h"
@@ -27,7 +28,7 @@ const char *vtkKWVolumePropertyPresetSelector::ModalityColumnName  = "Modality";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWVolumePropertyPresetSelector);
-vtkCxxRevisionMacro(vtkKWVolumePropertyPresetSelector, "1.8");
+vtkCxxRevisionMacro(vtkKWVolumePropertyPresetSelector, "1.9");
 
 //----------------------------------------------------------------------------
 int vtkKWVolumePropertyPresetSelector::SetPresetVolumeProperty(
@@ -95,7 +96,7 @@ void vtkKWVolumePropertyPresetSelector::CreateColumns()
 
   col = list->InsertColumn(
     this->GetCommentColumnIndex(), 
-    vtkKWVolumePropertyPresetSelector::ModalityColumnName);
+    ks_("Volume Property Preset Selector|Column|Modality"));
 
   list->SetColumnName(col, 
                       vtkKWVolumePropertyPresetSelector::ModalityColumnName);

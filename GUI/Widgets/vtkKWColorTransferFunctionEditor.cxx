@@ -19,6 +19,7 @@
 #include "vtkKWHistogram.h"
 #include "vtkKWLabel.h"
 #include "vtkKWEntryWithLabel.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWScaleWithEntry.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
@@ -31,11 +32,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.49");
-
-#define VTK_KW_CTFE_RGB_LABEL "RGB"
-#define VTK_KW_CTFE_HSV_LABEL "HSV"
-#define VTK_KW_CTFE_HSV_NO_WRAP_LABEL "HSVNoWrap"
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.50");
 
 #define VTK_KW_CTFE_COLOR_RAMP_TAG "color_ramp_tag"
 
@@ -620,30 +617,30 @@ void vtkKWColorTransferFunctionEditor::UpdatePointEntriesLabel()
       {
       if (this->ValueEntries[0])
         {
-        this->ValueEntries[0]->GetLabel()->SetText("H:");
+        this->ValueEntries[0]->GetLabel()->SetText(ks_("Color Space|Hue|H:"));
         }
       if (this->ValueEntries[1])
         {
-        this->ValueEntries[1]->GetLabel()->SetText("S:");
+        this->ValueEntries[1]->GetLabel()->SetText(ks_("Color Space|Saturation|S:"));
         }
       if (this->ValueEntries[2])
         {
-        this->ValueEntries[2]->GetLabel()->SetText("V:");
+        this->ValueEntries[2]->GetLabel()->SetText(ks_("Color Space|Value|V:"));
         }
       }
     else if (this->ColorTransferFunction->GetColorSpace() == VTK_CTF_RGB)
       {
       if (this->ValueEntries[0])
         {
-        this->ValueEntries[0]->GetLabel()->SetText("R:");
+        this->ValueEntries[0]->GetLabel()->SetText(ks_("Color Space|Red|R:"));
         }
       if (this->ValueEntries[1])
         {
-        this->ValueEntries[1]->GetLabel()->SetText("G:");
+        this->ValueEntries[1]->GetLabel()->SetText(ks_("Color Space|Green|G:"));
         }
       if (this->ValueEntries[2])
         {
-        this->ValueEntries[2]->GetLabel()->SetText("B:");
+        this->ValueEntries[2]->GetLabel()->SetText(ks_("Color Space|Blue|B:"));
         }
       }
     }
@@ -663,13 +660,13 @@ void vtkKWColorTransferFunctionEditor::UpdateColorSpaceOptionMenu()
       {
       case VTK_CTF_HSV:
         if (this->ColorTransferFunction->GetHSVWrap())
-          this->ColorSpaceOptionMenu->SetValue(VTK_KW_CTFE_HSV_LABEL);
+          this->ColorSpaceOptionMenu->SetValue(ks_("Color Space|HSV"));
         else
-          this->ColorSpaceOptionMenu->SetValue(VTK_KW_CTFE_HSV_NO_WRAP_LABEL);
+          this->ColorSpaceOptionMenu->SetValue(ks_("Color Space|HSV (2)"));
         break;
       default:
       case VTK_CTF_RGB:
-        this->ColorSpaceOptionMenu->SetValue(VTK_KW_CTFE_RGB_LABEL);
+        this->ColorSpaceOptionMenu->SetValue(ks_("Color Space|RGB"));
         break;
       }
     }
@@ -732,14 +729,14 @@ void vtkKWColorTransferFunctionEditor::CreateColorSpaceOptionMenu()
     this->ColorSpaceOptionMenu->SetPadY(1);
     this->ColorSpaceOptionMenu->IndicatorVisibilityOff();
     this->ColorSpaceOptionMenu->SetBalloonHelpString(
-      "Change the interpolation color space to RGB or HSV.");
+      k_("Change the interpolation color space to RGB or HSV."));
 
     const char callback[] = "ColorSpaceCallback";
 
     vtkKWMenu *menu = this->ColorSpaceOptionMenu->GetMenu();
-    menu->AddRadioButton(VTK_KW_CTFE_RGB_LABEL, this, callback);
-    menu->AddRadioButton(VTK_KW_CTFE_HSV_LABEL, this, callback);
-    menu->AddRadioButton(VTK_KW_CTFE_HSV_NO_WRAP_LABEL, this, callback);
+    menu->AddRadioButton(ks_("Color Space|RGB"), this, callback);
+    menu->AddRadioButton(ks_("Color Space|HSV"), this, callback);
+    menu->AddRadioButton(ks_("Color Space|HSV (2)"), this, callback);
 
     this->UpdateColorSpaceOptionMenu();
     }
@@ -955,7 +952,7 @@ void vtkKWColorTransferFunctionEditor::ColorSpaceCallback()
   if (this->ColorTransferFunction)
     {
     const char * value = this->ColorSpaceOptionMenu->GetValue();
-    if( strcmp(value, VTK_KW_CTFE_RGB_LABEL) == 0)
+    if( strcmp(value, ks_("Color Space|RGB")) == 0)
       {
       if( this->ColorTransferFunction->GetColorSpace() != VTK_CTF_RGB )
         {
@@ -968,7 +965,7 @@ void vtkKWColorTransferFunctionEditor::ColorSpaceCallback()
         this->InvokeFunctionChangedCommand();
         }
       }
-    else if( strcmp(value, VTK_KW_CTFE_HSV_LABEL) == 0)
+    else if( strcmp(value, ks_("Color Space|HSV")) == 0)
       {
       if( this->ColorTransferFunction->GetColorSpace() != VTK_CTF_HSV ||
           !this->ColorTransferFunction->GetHSVWrap() )
@@ -983,7 +980,7 @@ void vtkKWColorTransferFunctionEditor::ColorSpaceCallback()
         this->InvokeFunctionChangedCommand();
         }
       }
-    else if( strcmp(value, VTK_KW_CTFE_HSV_NO_WRAP_LABEL ) == 0)
+    else if( strcmp(value, ks_("Color Space|HSV (2)") ) == 0)
       {
       if( this->ColorTransferFunction->GetColorSpace() != VTK_CTF_HSV ||
           this->ColorTransferFunction->GetHSVWrap() )

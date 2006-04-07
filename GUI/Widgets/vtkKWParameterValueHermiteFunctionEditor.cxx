@@ -16,12 +16,13 @@
 #include "vtkKWScaleWithEntry.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWCanvas.h"
+#include "vtkKWInternationalization.h"
 #include "vtkMath.h"
 #include "vtkCallbackCommand.h"
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.18");
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.19");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";
@@ -177,12 +178,13 @@ void vtkKWParameterValueHermiteFunctionEditor::CreateMidPointEntry()
     this->MidPointEntry->PopupModeOn();
     this->MidPointEntry->Create();
     this->MidPointEntry->SetEntryWidth(7);
-    this->MidPointEntry->SetLabelText("M:");
+    this->MidPointEntry->SetLabelText(
+      ks_("Transfer Function Editor|MidPoint|M:"));
     this->MidPointEntry->SetLength(100);
     this->MidPointEntry->RangeVisibilityOff();
     this->MidPointEntry->SetBalloonHelpString(
-      "Midpoint position. Enter a new value, drag the scale slider, or drag "
-      "the midpoint horizontally with the left mouse button.");
+      k_("Midpoint position. Enter a new value, drag the scale slider, or "
+         "drag the midpoint horizontally with the left mouse button."));
 
     this->UpdateMidPointEntry(this->GetSelectedMidPoint());
 
@@ -228,12 +230,13 @@ void vtkKWParameterValueHermiteFunctionEditor::CreateSharpnessEntry()
     this->SharpnessEntry->PopupModeOn();
     this->SharpnessEntry->Create();
     this->SharpnessEntry->SetEntryWidth(7);
-    this->SharpnessEntry->SetLabelText("S:");
+    this->SharpnessEntry->SetLabelText(
+      ks_("Transfer Function Editor|Sharpness|S:"));
     this->SharpnessEntry->SetLength(100);
     this->SharpnessEntry->RangeVisibilityOff();
     this->SharpnessEntry->SetBalloonHelpString(
-      "Sharpness. Enter a new value, drag the scale slider, or drag "
-      "the midpoint vertically with the right mouse button.");
+      k_("Sharpness. Enter a new value, drag the scale slider, or drag "
+         "the midpoint vertically with the right mouse button."));
 
     this->UpdateSharpnessEntry(this->GetSelectedMidPoint());
 

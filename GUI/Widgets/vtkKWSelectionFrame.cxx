@@ -16,6 +16,7 @@
 
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWPushButton.h"
@@ -26,7 +27,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.56");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.57");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -46,7 +47,7 @@ vtkKWSelectionFrame::vtkKWSelectionFrame()
   this->OuterSelectionFrame   = vtkKWFrame::New();
   this->TitleBarFrame         = vtkKWFrame::New();
   this->Title                 = vtkKWLabel::New();
-  this->Title->SetText("<Click to Select>");
+  this->Title->SetText(ks_("Selection Frame|<Click to Select>"));
   this->SelectionList         = vtkKWMenuButton::New();
   this->CloseButton           = vtkKWPushButton::New();
   this->BodyFrame             = vtkKWFrame::New();
@@ -248,7 +249,8 @@ void vtkKWSelectionFrame::Create()
   this->CloseButton->Create();
   this->CloseButton->SetImageToPredefinedIcon(vtkKWIcon::IconShrink);
   this->CloseButton->SetCommand(this, "CloseCallback");
-  this->CloseButton->SetBalloonHelpString("Close window");
+  this->CloseButton->SetBalloonHelpString(
+    ks_("Selection Frame|Close window"));
 
   // The title itself
 
@@ -927,13 +929,15 @@ void vtkKWSelectionFrame::UpdateSelectionList()
     if (this->AllowChangeTitle)
       {
       index = menu->AddCommand(
-        "Change Title", this, "ChangeTitleCallback");
-      menu->SetItemHelpString(index, "Change frame title");
+        ks_("Selection Frame|Change Title"), this, "ChangeTitleCallback");
+      menu->SetItemHelpString(
+        index, ks_("Selection Frame|Change frame title"));
       }
     if (this->AllowClose)
       {
-      index = menu->AddCommand("Close", this, "CloseCallback");
-      menu->SetItemHelpString(index, "Close frame");
+      index = menu->AddCommand(
+        ks_("Selection Frame|Close"), this, "CloseCallback");
+      menu->SetItemHelpString(index, ks_("Selection Frame|Close frame"));
       }
     }
 

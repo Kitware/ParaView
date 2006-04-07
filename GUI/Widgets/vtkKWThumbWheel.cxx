@@ -14,6 +14,7 @@
 #include "vtkKWThumbWheel.h"
 
 #include "vtkKWEntry.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWTkUtilities.h"
@@ -35,7 +36,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.49");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.50");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -1183,7 +1184,10 @@ void vtkKWThumbWheel::SetBalloonHelpString(const char *string)
     if (string)
       {
       ostrstream temp;
-      temp << string << " (press this button to display a thumbwheel)" << ends;
+      temp 
+        << string << " " 
+        << ks_("Popup ThumbWheel|(press this button to display a thumbwheel)") 
+        << ends;
       this->PopupPushButton->SetBalloonHelpString(temp.str());
       temp.rdbuf()->freeze(0);
       }

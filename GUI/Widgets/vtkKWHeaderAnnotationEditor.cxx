@@ -17,6 +17,7 @@
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
 #include "vtkKWEntryWithLabel.h"
 #include "vtkKWFrameWithLabel.h"
@@ -30,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.14");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.15");
 
 //----------------------------------------------------------------------------
 vtkKWHeaderAnnotationEditor::vtkKWHeaderAnnotationEditor()
@@ -122,21 +123,22 @@ void vtkKWHeaderAnnotationEditor::Create()
 
   if (this->PopupMode)
     {
-    this->PopupButton->SetText("Edit...");
+    this->PopupButton->SetText(ks_("Header Annotation Editor|Edit..."));
     }
 
   // --------------------------------------------------------------
   // Edit the labeled frame
 
-  this->Frame->SetLabelText("Header annotation");
+  this->Frame->SetLabelText(ks_("Header Annotation Editor|Header annotation"));
 
   // --------------------------------------------------------------
   // Edit the check button (Annotation visibility)
 
-  this->CheckButton->SetText("Display header annotation");
+  this->CheckButton->SetText(
+    ks_("Header Annotation Editor|Display header annotation"));
 
   this->CheckButton->SetBalloonHelpString(
-    "Toggle the visibility of the header annotation text");
+    k_("Toggle the visibility of the header annotation text"));
 
   // --------------------------------------------------------------
   // Text frame
@@ -152,13 +154,14 @@ void vtkKWHeaderAnnotationEditor::Create()
 
   this->TextEntry->SetParent(this->TextFrame);
   this->TextEntry->Create();
-  this->TextEntry->GetLabel()->SetText("Header:");
+  this->TextEntry->GetLabel()->SetText(
+    ks_("Header Annotation Editor|Header:"));
   this->TextEntry->GetWidget()->SetWidth(20);
   this->TextEntry->GetWidget()->SetCommand(this, "HeaderTextCallback");
 
   this->TextEntry->SetBalloonHelpString(
-    "Set the header annotation. The text will automatically scale "
-    "to fit within the allocated space");
+    k_("Set the header annotation. The text will automatically scale "
+       "to fit within the allocated space"));
 
   this->Script("pack %s -padx 2 -pady 2 -side %s -anchor nw -expand y -fill x",
                this->TextEntry->GetWidgetName(),
@@ -175,8 +178,10 @@ void vtkKWHeaderAnnotationEditor::Create()
       }
     this->TextPropertyPopupButton->SetParent(this->TextFrame);
     this->TextPropertyPopupButton->Create();
-    this->TextPropertyPopupButton->GetLabel()->SetText("Header properties:");
-    this->TextPropertyPopupButton->GetWidget()->SetText("Edit...");
+    this->TextPropertyPopupButton->GetLabel()->SetText(
+      ks_("Header Annotation Editor|Header properties:"));
+    this->TextPropertyPopupButton->GetWidget()->SetText(
+      ks_("Header Annotation Editor|Edit..."));
 
     vtkKWFrame *popupframe = 
       this->TextPropertyPopupButton->GetWidget()->GetPopupFrame();
@@ -201,7 +206,8 @@ void vtkKWHeaderAnnotationEditor::Create()
   this->TextPropertyWidget->LabelOnTopOn();
   this->TextPropertyWidget->LabelVisibilityOn();
   this->TextPropertyWidget->Create();
-  this->TextPropertyWidget->GetLabel()->SetText("Header properties:");
+  this->TextPropertyWidget->GetLabel()->SetText(
+    ks_("Header Annotation Editor|Header properties:"));
   this->TextPropertyWidget->SetChangedCommand(this, "TextPropertyCallback");
 
   this->Script("pack %s -padx 2 -pady %d -side top -anchor nw -fill y", 

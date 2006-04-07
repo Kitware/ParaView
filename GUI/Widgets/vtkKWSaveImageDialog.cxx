@@ -14,12 +14,13 @@
 #include "vtkKWSaveImageDialog.h"
 
 #include "vtkKWLoadSaveDialog.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSaveImageDialog );
-vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.30");
+vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.31");
 
 //----------------------------------------------------------------------------
 int vtkKWSaveImageDialog::Invoke()
@@ -28,10 +29,10 @@ int vtkKWSaveImageDialog::Invoke()
 
   this->SaveDialogOn();
   this->SetFileTypes("{{Windows Bitmap} {.bmp}} "
-                     "{{JPEG Images} {.jpg}} "
-                     "{{PNG Images} {.png}} "
+                     "{{JPEG} {.jpg}} "
+                     "{{PNG} {.png}} "
                      "{{Binary PPM} {.ppm}} "
-                     "{{TIFF Images} {.tif}}");
+                     "{{TIFF} {.tif}}");
 
   int done = 0;
   while (!done)
@@ -58,10 +59,12 @@ int vtkKWSaveImageDialog::Invoke()
       else
         {
         vtkKWMessageDialog::PopupMessage( 
-          this->GetApplication(), 0, "Save Image Error", 
-          "A valid file extension was not found.\n"
-          "Please use a .bmp, .jpg, .png, .ppm, or .tif file extension\n"
-          "when naming your file.", vtkKWMessageDialog::ErrorIcon);
+          this->GetApplication(), 0, 
+          ks_("Save Image Dialog|Title|Save Image Error!"), 
+          k_("A valid file extension was not found. "
+             "Please use a .bmp, .jpg, .png, .ppm, or .tif file extension "
+             "when naming your file."), 
+             vtkKWMessageDialog::ErrorIcon);
         }
       }
     }
@@ -82,7 +85,7 @@ void vtkKWSaveImageDialog::Create()
 
   this->Superclass::Create();
 
-  this->SetTitle("Save As Image");
+  this->SetTitle(ks_("Save Image Dialog|Title|Save As Image"));
 }
 
 //----------------------------------------------------------------------------

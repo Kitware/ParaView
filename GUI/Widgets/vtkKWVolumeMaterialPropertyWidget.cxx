@@ -15,6 +15,7 @@
 
 #include "vtkKWCheckButton.h"
 #include "vtkKWCheckButtonWithLabel.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWFrameWithLabel.h"
@@ -29,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWVolumeMaterialPropertyWidget);
-vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.21");
+vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.22");
 
 //----------------------------------------------------------------------------
 vtkKWVolumeMaterialPropertyWidget::vtkKWVolumeMaterialPropertyWidget()
@@ -140,7 +141,8 @@ void vtkKWVolumeMaterialPropertyWidget::Create()
 
   this->EnableShadingCheckButton->SetParent(this->ControlFrame); 
   this->EnableShadingCheckButton->Create();
-  this->EnableShadingCheckButton->GetLabel()->SetText("Enable Shading");
+  this->EnableShadingCheckButton->GetLabel()->SetText(
+    ks_("Material Property Editor|Enable Shading"));
   this->EnableShadingCheckButton->SetLabelWidth(label_width);
   this->EnableShadingCheckButton->GetWidget()->SetText("");
   this->EnableShadingCheckButton->GetWidget()->SetCommand(

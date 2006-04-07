@@ -21,13 +21,14 @@
 #include "vtkKWMenuButton.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWInternationalization.h"
 
 #include <vtksys/stl/list>
 #include <vtksys/stl/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWColorPresetSelector);
-vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.26");
+vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.27");
 
 vtkCxxSetObjectMacro(vtkKWColorPresetSelector,ColorTransferFunction,vtkColorTransferFunction);
 
@@ -448,7 +449,7 @@ void vtkKWColorPresetSelector::CreateDefaultPresets()
   func->AddRGBPoint(r0, blue[0], blue[1], blue[2]);
   func->AddRGBPoint(r0 + rd * 0.5, green[0], green[1], green[2]);
   func->AddRGBPoint(r1, red[0], red[1], red[2]);
-  this->AddPreset("Rainbow", func, range);
+  this->AddPreset(ks_("Color Preset|Rainbow"), func, range);
   func->Delete();
 
   // Jet (a variant of Rainbow, more saturated)
@@ -459,7 +460,7 @@ void vtkKWColorPresetSelector::CreateDefaultPresets()
   func->AddRGBPoint(r0, blue_pure[0], blue_pure[1], blue_pure[2]);
   func->AddRGBPoint(r0 + rd * 0.5,green_pure[0], green_pure[1], green_pure[2]);
   func->AddRGBPoint(r1, red_pure[0], red_pure[1], red_pure[2]);
-  this->AddPreset("Jet", func, range);
+  this->AddPreset(ks_("Color Preset|Jet"), func, range);
   func->Delete();
 
   // HSV (a variant of Rainbow or Jet)
@@ -470,24 +471,26 @@ void vtkKWColorPresetSelector::CreateDefaultPresets()
   func->AddHSVPoint(r0, 0.0, 1.0, 1.0);
   func->AddHSVPoint(r0 + rd * 0.5, 0.5, 1.0, 1.0);
   func->AddHSVPoint(r1, 0.999999, 1.0, 1.0);
-  this->AddPreset("HSV", func, range);
+  this->AddPreset(ks_("Color Preset|HSV"), func, range);
   func->Delete();
   
   // Spring (shades of magenta and yellow color map)
 
-  this->AddGradientRGBPreset("Spring", 1, 0, 1, 1, 1, 0);
+  this->AddGradientRGBPreset(ks_("Color Preset|Spring"), 1, 0, 1, 1, 1, 0);
   
   // Summer (shades of green and yellow colormap)
 
-  this->AddGradientRGBPreset("Summer", 0, 0.5, 0.4, 1, 1, 0.4);
+  this->AddGradientRGBPreset(
+    ks_("Color Preset|Summer"), 0, 0.5, 0.4, 1, 1, 0.4);
   
   // Autumn (shades of red and yellow color map)
 
-  this->AddGradientRGBPreset("Autumn", 1, 0, 0, 1, 1, 0);
+  this->AddGradientRGBPreset(ks_("Color Preset|Autumn"), 1, 0, 0, 1, 1, 0);
   
   // Winter (shades of blue and green color map)
 
-  this->AddGradientRGBPreset("Winter", 0, 0, 0.75, 0, 1, 0.25);
+  this->AddGradientRGBPreset(
+    ks_("Color Preset|Winter"), 0, 0, 0.75, 0, 1, 0.25);
   
   // Hot (black-red-yellow-white color map)
   
@@ -501,12 +504,12 @@ void vtkKWColorPresetSelector::CreateDefaultPresets()
   func->AddRGBPoint(r0 + rd * p2, 1, 0, 0);
   func->AddRGBPoint(r0 + rd * p3, 1, 1, 0);
   func->AddRGBPoint(r1,           1, 1, 1);
-  this->AddPreset("Hot", func, range);
+  this->AddPreset(ks_("Color Preset|Hot"), func, range);
   func->Delete();
   
   // Cool (shades of cyan and magenta color map)
 
-  this->AddGradientRGBPreset("Cool", 0, 1, 1, 1, 0, 1);
+  this->AddGradientRGBPreset(ks_("Color Preset|Cool"), 0, 1, 1, 1, 0, 1);
   
   // Bone (gray-scale with a tinge of blue color map)
 
@@ -522,7 +525,7 @@ void vtkKWColorPresetSelector::CreateDefaultPresets()
                     f1 * p3 + f2 * 0, f1 * p3 + f2 * 1, f1 * p3 + f2 * 1);
   func->AddRGBPoint(r1, 
                     f1 * p4 + f2 * 1, f1 * p4 + f2 * 1, f1 * p4 + f2 * 1);
-  this->AddPreset("Bone", func, range);
+  this->AddPreset(ks_("Color Preset|Bone"), func, range);
   func->Delete();
   
   // Pink (pastel shades of pink color map)
@@ -547,7 +550,7 @@ void vtkKWColorPresetSelector::CreateDefaultPresets()
                     sqrt(f1 * p4 + f2 * 1), 
                     sqrt(f1 * p4 + f2 * 1), 
                     sqrt(f1 * p4 + f2 * 1));
-  this->AddPreset("Pink", func, range);
+  this->AddPreset(ks_("Color Preset|Pink"), func, range);
   func->Delete();
   
   // Copper (linear copper-tone color map)
@@ -559,28 +562,28 @@ void vtkKWColorPresetSelector::CreateDefaultPresets()
   func->AddRGBPoint(r0 + rd * p1, 
                     p1 * 1.25, p1 * 0.7812, p1 * 0.4975);
   func->AddRGBPoint(r1, 1.0, 0.7812, 0.4975);
-  this->AddPreset("Copper", func, range);
+  this->AddPreset(ks_("Color Preset|Copper"), func, range);
   func->Delete();
   
   // Grayscale (linear gray-scale color map)
 
-  this->AddGradientRGBPreset("Gray", black, white);
+  this->AddGradientRGBPreset(ks_("Color Preset|Gray"), black, white);
   
   // Solid colors
 
-  this->AddSolidRGBPreset("White", white);
+  this->AddSolidRGBPreset(ks_("Color Preset|White"), white);
 
-  this->AddSolidRGBPreset("Red", red);
+  this->AddSolidRGBPreset(ks_("Color Preset|Red"), red);
 
-  this->AddSolidRGBPreset("Green", green);
+  this->AddSolidRGBPreset(ks_("Color Preset|Green"), green);
 
-  this->AddSolidRGBPreset("Blue", blue);
+  this->AddSolidRGBPreset(ks_("Color Preset|Blue"), blue);
 
-  this->AddSolidRGBPreset("Cyan", cyan);
+  this->AddSolidRGBPreset(ks_("Color Preset|Cyan"), cyan);
 
-  this->AddSolidRGBPreset("Magenta", magenta);
+  this->AddSolidRGBPreset(ks_("Color Preset|Magenta"), magenta);
 
-  this->AddSolidRGBPreset("Yellow", yellow);
+  this->AddSolidRGBPreset(ks_("Color Preset|Yellow"), yellow);
 
   // Flag (alternating red, white, blue, and black color map)
 
@@ -592,7 +595,7 @@ void vtkKWColorPresetSelector::CreateDefaultPresets()
   flag_colors[2] = blue_pure;
   flag_colors[3] = black;
 
-  this->AddFlagRGBPreset("Flag", 4, flag_colors, 8);
+  this->AddFlagRGBPreset(ks_("Color Preset|Flag"), 4, flag_colors, 8);
 
   // Flag (alternating red, orange, yellow, green, blue, violet)
 
@@ -603,7 +606,7 @@ void vtkKWColorPresetSelector::CreateDefaultPresets()
   flag_colors[4] = blue_pure;
   flag_colors[5] = violet;
 
-  this->AddFlagRGBPreset("Prism", 6, flag_colors, 6);
+  this->AddFlagRGBPreset(ks_("Color Preset|Prism"), 6, flag_colors, 6);
 }
 
 // ---------------------------------------------------------------------------
@@ -624,8 +627,7 @@ void vtkKWColorPresetSelector::Create()
     this->GetLabel()->SetText("Color Presets:");
     }
   this->SetBalloonHelpString(
-    "Preset transfer functions for mapping scalar value to color. Select a "
-    "preset to use it.");
+    ks_("Color Preset Selector|Select a preset to use the transfer function that will map scalar values to colors."));
 
   this->GetWidget()->IndicatorVisibilityOff();
   this->GetWidget()->SetImageToPredefinedIcon(vtkKWIcon::IconFolder);

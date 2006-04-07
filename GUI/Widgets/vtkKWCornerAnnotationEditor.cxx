@@ -19,6 +19,7 @@
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWFrameWithLabel.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWPopupButtonWithLabel.h"
 #include "vtkKWTextWithLabel.h"
 #include "vtkKWPopupButton.h"
@@ -32,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.19");
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.20");
 
 //----------------------------------------------------------------------------
 vtkKWCornerAnnotationEditor::vtkKWCornerAnnotationEditor()
@@ -180,21 +181,22 @@ void vtkKWCornerAnnotationEditor::Create()
 
   if (this->PopupMode)
     {
-    this->PopupButton->SetText("Edit...");
+    this->PopupButton->SetText(ks_("Corner Annotation Editor|Edit..."));
     }
 
   // --------------------------------------------------------------
   // Edit the labeled frame
 
-  this->Frame->SetLabelText("Corner annotation");
+  this->Frame->SetLabelText(ks_("Corner Annotation Editor|Corner annotation"));
 
   // --------------------------------------------------------------
   // Edit the check button (Annotation visibility)
 
-  this->CheckButton->SetText("Display corner annotation");
+  this->CheckButton->SetText(
+    ks_("Corner Annotation Editor|Display corner annotation"));
 
   this->CheckButton->SetBalloonHelpString(
-    "Toggle the visibility of the corner annotation text");
+    k_("Toggle the visibility of the corner annotation text"));
 
   // --------------------------------------------------------------
   // Corners text
@@ -221,26 +223,29 @@ void vtkKWCornerAnnotationEditor::Create()
     text->SetBinding("<FocusOut>", this, buffer);
     }
 
-  this->CornerText[0]->GetLabel()->SetText("Lower left:");
-  this->CornerText[1]->GetLabel()->SetText("Lower right:");
-  this->CornerText[2]->GetLabel()->SetText("Upper left:");
-  this->CornerText[3]->GetLabel()->SetText("Upper right:");
-
+  this->CornerText[0]->GetLabel()->SetText(
+    ks_("Corner Annotation Editor|Corner|Lower left:"));
   this->CornerText[0]->SetBalloonHelpString(
-    "Set the lower left corner annotation. The text will automatically scale "
-    "to fit within the allocated space");
+    k_("Set the lower left corner annotation. The text will automatically "
+       "scale to fit within the allocated space"));
 
+  this->CornerText[1]->GetLabel()->SetText(
+    ks_("Corner Annotation Editor|Corner|Lower right:"));
   this->CornerText[1]->SetBalloonHelpString(
-    "Set the lower right corner annotation. The text will automatically scale "
-    "to fit within the allocated space");
+    k_("Set the lower right corner annotation. The text will automatically  "
+       "scale to fit within the allocated space"));
 
+  this->CornerText[2]->GetLabel()->SetText(
+    ks_("Corner Annotation Editor|Corner|Upper left:"));
   this->CornerText[2]->SetBalloonHelpString(
-    "Set the upper left corner annotation. The text will automatically scale "
-    "to fit within the allocated space");
+    k_("Set the upper left corner annotation. The text will automatically "
+       "scale to fit within the allocated space"));
 
+  this->CornerText[3]->GetLabel()->SetText(
+    ks_("Corner Annotation Editor|Corner|Upper right:"));
   this->CornerText[3]->SetBalloonHelpString(
-    "Set the upper right corner annotation. The text will automatically scale "
-    "to fit within the allocated space");
+    k_("Set the upper right corner annotation. The text will automatically "
+       "scale to fit within the allocated space"));
 
   this->Script("grid %s %s -row 0 -sticky news -padx 2 -pady 0 -ipady 0",
                this->CornerText[2]->GetWidgetName(), 
@@ -280,8 +285,8 @@ void vtkKWCornerAnnotationEditor::Create()
   this->MaximumLineHeightScale->SetEntryWidth(5);
 
   this->MaximumLineHeightScale->SetBalloonHelpString(
-    "Set the maximum height of a line of text as a percentage of the vertical "
-    "area allocated to this scaled text actor.");
+    k_("Set the maximum height of a line of text as a percentage of the "
+       "vertical area allocated to this scaled text actor."));
 
   this->MaximumLineHeightScale->SetCommand(
     this, "MaximumLineHeightCallback");
@@ -307,8 +312,10 @@ void vtkKWCornerAnnotationEditor::Create()
       }
     this->TextPropertyPopupButton->SetParent(this->PropertiesFrame);
     this->TextPropertyPopupButton->Create();
-    this->TextPropertyPopupButton->GetLabel()->SetText("Text properties:");
-    this->TextPropertyPopupButton->GetWidget()->SetText("Edit...");
+    this->TextPropertyPopupButton->GetLabel()->SetText(
+      ks_("Corner Annotation Editor|Text properties:"));
+    this->TextPropertyPopupButton->GetWidget()->SetText(
+      ks_("Corner Annotation Editor|Edit..."));
 
     vtkKWFrame *popupframe = 
       this->TextPropertyPopupButton->GetWidget()->GetPopupFrame();
@@ -333,7 +340,8 @@ void vtkKWCornerAnnotationEditor::Create()
   this->TextPropertyWidget->LabelOnTopOn();
   this->TextPropertyWidget->LabelVisibilityOn();
   this->TextPropertyWidget->Create();
-  this->TextPropertyWidget->GetLabel()->SetText("Text properties:");
+  this->TextPropertyWidget->GetLabel()->SetText(
+    ks_("Corner Annotation Editor|Text properties:"));
   this->TextPropertyWidget->SetChangedCommand(this, "TextPropertyCallback");
 
   this->Script("pack %s -padx 2 -pady %d -side top -anchor nw -fill y", 

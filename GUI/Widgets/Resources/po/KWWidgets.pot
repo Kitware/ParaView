@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-04-06 17:39-0400\n"
+"POT-Creation-Date: 2006-04-07 00:03-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,41 +39,41 @@ msgstr ""
 msgid "Please check the help resource %s for more information."
 msgstr ""
 
-#: ../../vtkKWApplication.cxx:1080 ../../vtkKWApplication.cxx:1091
-msgid "Help Error!"
+#: ../../vtkKWApplication.cxx:1081 ../../vtkKWApplication.cxx:1094
+msgid "Display Help Dialog|Title|Help Error!"
 msgstr ""
 
-#: ../../vtkKWApplication.cxx:1087
+#: ../../vtkKWApplication.cxx:1089
 #, c-format
 msgid ""
 "The help resource %s cannot be displayed. This can be a result of the "
 "program being wrongly installed or the help file being corrupted."
 msgstr ""
 
-#: ../../vtkKWApplication.cxx:1185
+#: ../../vtkKWApplication.cxx:1189
 #, c-format
 msgid "About Dialog|Title|About %s"
 msgstr ""
 
-#: ../../vtkKWApplication.cxx:1524
+#: ../../vtkKWApplication.cxx:1528
 #, c-format
 msgid ""
 "You are running in '%s' mode. The feature you are trying to use (%s) is not "
 "available in this mode."
 msgstr ""
 
-#: ../../vtkKWApplication.cxx:1531
+#: ../../vtkKWApplication.cxx:1535
 #, c-format
 msgid ""
 "You are running in '%s' mode. The feature you are trying to use is not "
 "available in this mode."
 msgstr ""
 
-#: ../../vtkKWApplication.cxx:1821
+#: ../../vtkKWApplication.cxx:1825
 msgid "Email Feedback|Subject|User Feedback"
 msgstr ""
 
-#: ../../vtkKWApplication.cxx:1912
+#: ../../vtkKWApplication.cxx:1916
 msgid ""
 "Sorry, an error occurred while trying to send an email.\n"
 "\n"
@@ -83,31 +83,31 @@ msgid ""
 "if your default email client is not running."
 msgstr ""
 
-#: ../../vtkKWApplication.cxx:1928
-msgid "Email Feedback Dialog|Send Email Error!"
+#: ../../vtkKWApplication.cxx:1932
+msgid "Email Feedback Dialog|Title|Send Email Error!"
 msgstr ""
 
-#: ../../vtkKWApplication.cxx:1930
-msgid "Email Feedback Dialog|Buttons|Retry"
+#: ../../vtkKWApplication.cxx:1934
+msgid "Email Feedback Dialog|Button|Retry"
 msgstr ""
 
-#: ../../vtkKWApplication.cxx:1935
-msgid "Email Feedback Dialog|Buttons|Locate attachment"
+#: ../../vtkKWApplication.cxx:1939
+msgid "Email Feedback Dialog|Button|Locate attachment"
 msgstr ""
 
-#: ../../vtkKWApplication.cxx:1952
-msgid "Email Feedback Dialog|To:"
+#: ../../vtkKWApplication.cxx:1956
+msgid "Email Feedback Dialog|Field|To:"
 msgstr ""
 
-#: ../../vtkKWApplication.cxx:1966
-msgid "Email Feedback Dialog|Subject:"
+#: ../../vtkKWApplication.cxx:1970
+msgid "Email Feedback Dialog|Field|Subject:"
 msgstr ""
 
-#: ../../vtkKWApplication.cxx:1981
-msgid "Email Feedback Dialog|Attachment:"
+#: ../../vtkKWApplication.cxx:1985
+msgid "Email Feedback Dialog|Field|Attachment:"
 msgstr ""
 
-#: ../../vtkKWApplication.cxx:2057
+#: ../../vtkKWApplication.cxx:2061
 #, c-format
 msgid ""
 "If you continue to experience problems please use your email client to send "
@@ -158,7 +158,7 @@ msgid ""
 msgstr ""
 
 #: ../../vtkKWApplicationSettingsInterface.cxx:322
-msgid "Application Settings|View panel position:"
+msgid "Application Settings|Position of view panel:"
 msgstr ""
 
 #: ../../vtkKWApplicationSettingsInterface.cxx:325
@@ -196,7 +196,7 @@ msgid "Application Settings|Toolbar Settings"
 msgstr ""
 
 #: ../../vtkKWApplicationSettingsInterface.cxx:408
-msgid "Application Settings|Flat frame"
+msgid "Application Settings|Toolbar Settings|Flat frame"
 msgstr ""
 
 #: ../../vtkKWApplicationSettingsInterface.cxx:411
@@ -204,7 +204,7 @@ msgid "Display the toolbar frames using a flat aspect."
 msgstr ""
 
 #: ../../vtkKWApplicationSettingsInterface.cxx:427
-msgid "Application Settings|Flat buttons"
+msgid "Application Settings|Toolbar Settings|Flat buttons"
 msgstr ""
 
 #: ../../vtkKWApplicationSettingsInterface.cxx:430
@@ -227,6 +227,372 @@ msgstr ""
 msgid ""
 "All Drag & Drop events performed so far will be discarded. Note that the "
 "interface will be reset the next time you start this application."
+msgstr ""
+
+#: ../../vtkKWChangeColorButton.cxx:44
+msgid "Change Color Button|Set Color..."
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:452
+msgid "Color Preset|Rainbow"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:463
+msgid "Color Preset|Jet"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:474
+msgid "Color Preset|HSV"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:479
+msgid "Color Preset|Spring"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:484
+msgid "Color Preset|Summer"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:488
+msgid "Color Preset|Autumn"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:493
+msgid "Color Preset|Winter"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:507
+msgid "Color Preset|Hot"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:512
+msgid "Color Preset|Cool"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:528
+msgid "Color Preset|Bone"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:553
+msgid "Color Preset|Pink"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:565
+msgid "Color Preset|Copper"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:570
+msgid "Color Preset|Gray"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:574
+msgid "Color Preset|White"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:576
+msgid "Color Preset|Red"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:578
+msgid "Color Preset|Green"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:580
+msgid "Color Preset|Blue"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:582
+msgid "Color Preset|Cyan"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:584
+msgid "Color Preset|Magenta"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:586
+msgid "Color Preset|Yellow"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:598
+msgid "Color Preset|Flag"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:609
+msgid "Color Preset|Prism"
+msgstr ""
+
+#: ../../vtkKWColorPresetSelector.cxx:630
+msgid ""
+"Color Preset Selector|Select a preset to use the transfer function that will "
+"map scalar values to colors."
+msgstr ""
+
+#: ../../vtkKWColorTransferFunctionEditor.cxx:620
+msgid "Color Space|Hue|H:"
+msgstr ""
+
+#: ../../vtkKWColorTransferFunctionEditor.cxx:624
+msgid "Color Space|Saturation|S:"
+msgstr ""
+
+#: ../../vtkKWColorTransferFunctionEditor.cxx:628
+msgid "Color Space|Value|V:"
+msgstr ""
+
+#: ../../vtkKWColorTransferFunctionEditor.cxx:635
+msgid "Color Space|Red|R:"
+msgstr ""
+
+#: ../../vtkKWColorTransferFunctionEditor.cxx:639
+msgid "Color Space|Green|G:"
+msgstr ""
+
+#: ../../vtkKWColorTransferFunctionEditor.cxx:643
+msgid "Color Space|Blue|B:"
+msgstr ""
+
+#: ../../vtkKWColorTransferFunctionEditor.cxx:663
+#: ../../vtkKWColorTransferFunctionEditor.cxx:738
+#: ../../vtkKWColorTransferFunctionEditor.cxx:968
+msgid "Color Space|HSV"
+msgstr ""
+
+#: ../../vtkKWColorTransferFunctionEditor.cxx:665
+#: ../../vtkKWColorTransferFunctionEditor.cxx:739
+#: ../../vtkKWColorTransferFunctionEditor.cxx:983
+msgid "Color Space|HSV (2)"
+msgstr ""
+
+#: ../../vtkKWColorTransferFunctionEditor.cxx:669
+#: ../../vtkKWColorTransferFunctionEditor.cxx:737
+#: ../../vtkKWColorTransferFunctionEditor.cxx:955
+msgid "Color Space|RGB"
+msgstr ""
+
+#: ../../vtkKWColorTransferFunctionEditor.cxx:732
+msgid "Change the interpolation color space to RGB or HSV."
+msgstr ""
+
+#: ../../vtkKWCornerAnnotationEditor.cxx:184
+#: ../../vtkKWCornerAnnotationEditor.cxx:318
+msgid "Corner Annotation Editor|Edit..."
+msgstr ""
+
+#: ../../vtkKWCornerAnnotationEditor.cxx:190
+msgid "Corner Annotation Editor|Corner annotation"
+msgstr ""
+
+#: ../../vtkKWCornerAnnotationEditor.cxx:196
+msgid "Corner Annotation Editor|Display corner annotation"
+msgstr ""
+
+#: ../../vtkKWCornerAnnotationEditor.cxx:199
+msgid "Toggle the visibility of the corner annotation text"
+msgstr ""
+
+#: ../../vtkKWCornerAnnotationEditor.cxx:227
+msgid "Corner Annotation Editor|Corner|Lower left:"
+msgstr ""
+
+#: ../../vtkKWCornerAnnotationEditor.cxx:229
+msgid ""
+"Set the lower left corner annotation. The text will automatically scale to "
+"fit within the allocated space"
+msgstr ""
+
+#: ../../vtkKWCornerAnnotationEditor.cxx:233
+msgid "Corner Annotation Editor|Corner|Lower right:"
+msgstr ""
+
+#: ../../vtkKWCornerAnnotationEditor.cxx:235
+msgid ""
+"Set the lower right corner annotation. The text will automatically  scale to "
+"fit within the allocated space"
+msgstr ""
+
+#: ../../vtkKWCornerAnnotationEditor.cxx:239
+msgid "Corner Annotation Editor|Corner|Upper left:"
+msgstr ""
+
+#: ../../vtkKWCornerAnnotationEditor.cxx:241
+msgid ""
+"Set the upper left corner annotation. The text will automatically scale to "
+"fit within the allocated space"
+msgstr ""
+
+#: ../../vtkKWCornerAnnotationEditor.cxx:245
+msgid "Corner Annotation Editor|Corner|Upper right:"
+msgstr ""
+
+#: ../../vtkKWCornerAnnotationEditor.cxx:247
+msgid ""
+"Set the upper right corner annotation. The text will automatically scale to "
+"fit within the allocated space"
+msgstr ""
+
+#: ../../vtkKWCornerAnnotationEditor.cxx:288
+msgid ""
+"Set the maximum height of a line of text as a percentage of the vertical "
+"area allocated to this scaled text actor."
+msgstr ""
+
+#: ../../vtkKWCornerAnnotationEditor.cxx:316
+#: ../../vtkKWCornerAnnotationEditor.cxx:344
+msgid "Corner Annotation Editor|Text properties:"
+msgstr ""
+
+#: ../../vtkKWExtent.cxx:96
+msgid "Extent|Dimension|X (Units)"
+msgstr ""
+
+#: ../../vtkKWExtent.cxx:97
+msgid "Extent|Dimension|Y (Units)"
+msgstr ""
+
+#: ../../vtkKWExtent.cxx:98
+msgid "Extent|Dimension|Z (Units)"
+msgstr ""
+
+#: ../../vtkKWFrameWithLabel.cxx:157
+#, c-format
+msgid "This feature is not available in '%s'mode."
+msgstr ""
+
+#: ../../vtkKWFrameWithLabel.cxx:172
+msgid "Frame With Label|Shrink or expand the frame"
+msgstr ""
+
+#: ../../vtkKWHSVColorSelector.cxx:148
+msgid "Color Space|Hue/Saturation:"
+msgstr ""
+
+#: ../../vtkKWHSVColorSelector.cxx:155
+msgid "Color Space|Value:"
+msgstr ""
+
+#: ../../vtkKWHeaderAnnotationEditor.cxx:126
+#: ../../vtkKWHeaderAnnotationEditor.cxx:184
+msgid "Header Annotation Editor|Edit..."
+msgstr ""
+
+#: ../../vtkKWHeaderAnnotationEditor.cxx:132
+msgid "Header Annotation Editor|Header annotation"
+msgstr ""
+
+#: ../../vtkKWHeaderAnnotationEditor.cxx:138
+msgid "Header Annotation Editor|Display header annotation"
+msgstr ""
+
+#: ../../vtkKWHeaderAnnotationEditor.cxx:141
+msgid "Toggle the visibility of the header annotation text"
+msgstr ""
+
+#: ../../vtkKWHeaderAnnotationEditor.cxx:158
+msgid "Header Annotation Editor|Header:"
+msgstr ""
+
+#: ../../vtkKWHeaderAnnotationEditor.cxx:163
+msgid ""
+"Set the header annotation. The text will automatically scale to fit within "
+"the allocated space"
+msgstr ""
+
+#: ../../vtkKWHeaderAnnotationEditor.cxx:182
+#: ../../vtkKWHeaderAnnotationEditor.cxx:210
+msgid "Header Annotation Editor|Header properties:"
+msgstr ""
+
+#: ../../vtkKWListBoxToListBoxSelectionEditor.cxx:97
+msgid "List Box To List Box|Button|Add"
+msgstr ""
+
+#: ../../vtkKWListBoxToListBoxSelectionEditor.cxx:102
+msgid "List Box To List Box|Button|Add All"
+msgstr ""
+
+#: ../../vtkKWListBoxToListBoxSelectionEditor.cxx:107
+msgid "List Box To List Box|Button|Remove"
+msgstr ""
+
+#: ../../vtkKWListBoxToListBoxSelectionEditor.cxx:113
+msgid "List Box To List Box|Button|Remove All"
+msgstr ""
+
+#: ../../vtkKWListBoxToListBoxSelectionEditor.cxx:143
+msgid "List Box To List Box|Button|Up"
+msgstr ""
+
+#: ../../vtkKWListBoxToListBoxSelectionEditor.cxx:148
+msgid "List Box To List Box|Button|Down"
+msgstr ""
+
+#: ../../vtkKWListBoxToListBoxSelectionEditor.cxx:413
+msgid "List Box To List Box|Ellipsis|..."
+msgstr ""
+
+#: ../../vtkKWMaterialPropertyWidget.cxx:227
+msgid "Material Preset|Full ambient eliminating all directional shading."
+msgstr ""
+
+#: ../../vtkKWMaterialPropertyWidget.cxx:238
+msgid "Material Preset|Dull material properties (no specular lighting)"
+msgstr ""
+
+#: ../../vtkKWMaterialPropertyWidget.cxx:249
+msgid "Material Preset|Smooth material properties (moderate specular lighting"
+msgstr ""
+
+#: ../../vtkKWMaterialPropertyWidget.cxx:260
+msgid "Material Preset|Shiny material properties (high specular lighting)"
+msgstr ""
+
+#: ../../vtkKWMaterialPropertyWidget.cxx:294
+msgid "Material Property Editor|Material:"
+msgstr ""
+
+#: ../../vtkKWMaterialPropertyWidget.cxx:297
+#: ../../vtkKWMaterialPropertyWidget.cxx:319
+msgid "Material Property Editor|Material Properties"
+msgstr ""
+
+#: ../../vtkKWMaterialPropertyWidget.cxx:351
+msgid "Material Property Editor|Ambient:"
+msgstr ""
+
+#: ../../vtkKWMaterialPropertyWidget.cxx:355
+msgid "Set the ambient coefficient within the range [0,100] for lighting"
+msgstr ""
+
+#: ../../vtkKWMaterialPropertyWidget.cxx:372
+msgid "Material Property Editor|Diffuse:"
+msgstr ""
+
+#: ../../vtkKWMaterialPropertyWidget.cxx:376
+msgid "Set the diffuse coefficient within the range [0,100] for lighting"
+msgstr ""
+
+#: ../../vtkKWMaterialPropertyWidget.cxx:391
+msgid "Material Property Editor|Specular:"
+msgstr ""
+
+#: ../../vtkKWMaterialPropertyWidget.cxx:395
+msgid "Set the specular coefficient within the range [0,100] for lighting"
+msgstr ""
+
+#: ../../vtkKWMaterialPropertyWidget.cxx:410
+msgid "Material Property Editor|Power:"
+msgstr ""
+
+#: ../../vtkKWMaterialPropertyWidget.cxx:414
+msgid "Set the specular power within the range [0,50] for lighting"
+msgstr ""
+
+#: ../../vtkKWMaterialPropertyWidget.cxx:433
+msgid "Material Property Editor|Preview:"
+msgstr ""
+
+#: ../../vtkKWMaterialPropertyWidget.cxx:444
+msgid "Material Property Editor|Presets:"
 msgstr ""
 
 #: ../../vtkKWMessageDialog.cxx:55 ../../vtkKWMessageDialog.cxx:163
@@ -253,45 +619,636 @@ msgstr ""
 msgid "Message Dialog|Button|No"
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:539
+#: ../../vtkKWNotebook.cxx:2013 ../../vtkKWNotebook.cxx:2039
+msgid "Notebook|Page|Show"
+msgstr ""
+
+#: ../../vtkKWNotebook.cxx:2016
+msgid "Show/Hide this notebook page"
+msgstr ""
+
+#: ../../vtkKWNotebook.cxx:2028
+msgid "Notebook|Page|Pin"
+msgstr ""
+
+#: ../../vtkKWNotebook.cxx:2031
+msgid "Pin/Unpin this notebook page"
+msgstr ""
+
+#: ../../vtkKWParameterValueFunctionEditor.cxx:1467
+msgid "Transfer Function Editor|Parameter|P:"
+msgstr ""
+
+#: ../../vtkKWParameterValueFunctionEditor.cxx:1490
+msgid "Change the histogram mode from log to linear."
+msgstr ""
+
+#: ../../vtkKWParameterValueFunctionEditor.cxx:1502
+#: ../../vtkKWParameterValueFunctionEditor.cxx:6450
+msgid "Transfer Function Editor|Histogram|Linear|Lin."
+msgstr ""
+
+#: ../../vtkKWParameterValueFunctionEditor.cxx:1512
+#: ../../vtkKWParameterValueFunctionEditor.cxx:6449
+msgid "Transfer Function Editor|Histogram|Logarithmic|Log."
+msgstr ""
+
+#: ../../vtkKWParameterValueHermiteFunctionEditor.cxx:182
+msgid "Transfer Function Editor|MidPoint|M:"
+msgstr ""
+
+#: ../../vtkKWParameterValueHermiteFunctionEditor.cxx:186
+msgid ""
+"Midpoint position. Enter a new value, drag the scale slider, or drag the "
+"midpoint horizontally with the left mouse button."
+msgstr ""
+
+#: ../../vtkKWParameterValueHermiteFunctionEditor.cxx:234
+msgid "Transfer Function Editor|Sharpness|S:"
+msgstr ""
+
+#: ../../vtkKWParameterValueHermiteFunctionEditor.cxx:238
+msgid ""
+"Sharpness. Enter a new value, drag the scale slider, or drag the midpoint "
+"vertically with the right mouse button."
+msgstr ""
+
+#: ../../vtkKWPiecewiseFunctionEditor.cxx:724
+msgid "Place the editor in window/level mode."
+msgstr ""
+
+#: ../../vtkKWPiecewiseFunctionEditor.cxx:742
+msgid "Transfer Function Editor|Value|V:"
+msgstr ""
+
+#: ../../vtkKWPresetSelector.cxx:565
+msgid "Preset Selector|Select and apply previous preset"
+msgstr ""
+
+#: ../../vtkKWPresetSelector.cxx:568
+msgid "Preset Selector|Select and apply next preset"
+msgstr ""
+
+#: ../../vtkKWPresetSelector.cxx:571
+msgid "Preset Selector|Add a preset"
+msgstr ""
+
+#: ../../vtkKWPresetSelector.cxx:574
+msgid "Preset Selector|Apply the selected preset(s)"
+msgstr ""
+
+#: ../../vtkKWPresetSelector.cxx:577
+msgid "Preset Selector|Update the selected preset(s)"
+msgstr ""
+
+#: ../../vtkKWPresetSelector.cxx:580
+msgid "Preset Selector|Delete the selected preset(s)"
+msgstr ""
+
+#: ../../vtkKWPresetSelector.cxx:583
+msgid "Preset Selector|Locate the selected preset(s)"
+msgstr ""
+
+#: ../../vtkKWPresetSelector.cxx:586
+msgid "Preset Selector|Email the selected preset(s)"
+msgstr ""
+
+#: ../../vtkKWPresetSelector.cxx:664
+msgid "Preset Selector|Column|Id"
+msgstr ""
+
+#: ../../vtkKWPresetSelector.cxx:670
+msgid "Preset Selector|Column|Image"
+msgstr ""
+
+#: ../../vtkKWPresetSelector.cxx:682
+msgid "Preset Selector|Column|Group"
+msgstr ""
+
+#: ../../vtkKWPresetSelector.cxx:691
+msgid "Preset Selector|Column|Comment"
+msgstr ""
+
+#: ../../vtkKWPresetSelector.cxx:2586
+msgid "Preset Selector|Delete Preset Dialog|Title|Delete Preset ?"
+msgstr ""
+
+#: ../../vtkKWPresetSelector.cxx:2587
+msgid "Are you sure you want to delete the selected item?"
+msgstr ""
+
+#: ../../vtkKWPresetSelector.cxx:2714
+#, c-format
+msgid "Preset Selector|Email Preset|This file was sent from %s"
+msgstr ""
+
+#: ../../vtkKWPresetSelector.cxx:2720
+msgid "Preset Selector|Email Preset|File:"
+msgstr ""
+
+#: ../../vtkKWPresetSelector.cxx:2727
+msgid "Preset Selector|Email Preset|Comment:"
+msgstr ""
+
+#: ../../vtkKWPresetSelector.cxx:2733
+msgid "Preset Selector|Email Preset|Creation Time:"
+msgstr ""
+
+#: ../../vtkKWRenderWidget.cxx:1118
+msgid "Annotation|Corner Annotation"
+msgstr ""
+
+#: ../../vtkKWRenderWidget.cxx:1134
+msgid "Annotation|Header Annotation"
+msgstr ""
+
+#: ../../vtkKWSaveImageDialog.cxx:63
+msgid "Save Image Dialog|Title|Save Image Error!"
+msgstr ""
+
+#: ../../vtkKWSaveImageDialog.cxx:64
+msgid ""
+"A valid file extension was not found. Please use a .bmp, .jpg, .png, .ppm, "
+"or .tif file extension when naming your file."
+msgstr ""
+
+#: ../../vtkKWSaveImageDialog.cxx:88
+msgid "Save Image Dialog|Title|Save As Image"
+msgstr ""
+
+#: ../../vtkKWScalarBarAnnotation.cxx:203
+#: ../../vtkKWScalarBarAnnotation.cxx:272
+#: ../../vtkKWScalarBarAnnotation.cxx:344
+msgid "Scalar Bar Annotation Editor|Edit..."
+msgstr ""
+
+#: ../../vtkKWScalarBarAnnotation.cxx:209
+msgid "Scalar Bar Annotation Editor|Scalar Bar"
+msgstr ""
+
+#: ../../vtkKWScalarBarAnnotation.cxx:215
+msgid "Scalar Bar Annotation Editor|Display scalar bar"
+msgstr ""
+
+#: ../../vtkKWScalarBarAnnotation.cxx:218
+msgid ""
+"Toggle the visibility of the scalar bar representing the mapping of scalar "
+"value to RGB color"
+msgstr ""
+
+#: ../../vtkKWScalarBarAnnotation.cxx:251
+msgid ""
+"Set the scalar bar title. The text will automatically scale to fit within "
+"the allocated space"
+msgstr ""
+
+#: ../../vtkKWScalarBarAnnotation.cxx:270
+#: ../../vtkKWScalarBarAnnotation.cxx:298
+msgid "Scalar Bar Annotation Editor|Title properties:"
+msgstr ""
+
+#: ../../vtkKWScalarBarAnnotation.cxx:322
+msgid "Scalar Bar Annotation Editor|Label format:"
+msgstr ""
+
+#: ../../vtkKWScalarBarAnnotation.cxx:328
+msgid "Set the scalar bar label format."
+msgstr ""
+
+#: ../../vtkKWScalarBarAnnotation.cxx:342
+msgid "Scalar Bar Annotation Editor|Label properties:"
+msgstr ""
+
+#: ../../vtkKWScalarBarAnnotation.cxx:367
+msgid "Scalar Bar Annotation Editor|Label text properties:"
+msgstr ""
+
+#: ../../vtkKWScalarBarAnnotation.cxx:388
+msgid "Scalar Bar Annotation Editor|Maximum number of colors:"
+msgstr ""
+
+#: ../../vtkKWScalarBarAnnotation.cxx:393
+msgid "Set the maximum number of scalar bar segments to show."
+msgstr ""
+
+#: ../../vtkKWScalarBarAnnotation.cxx:411
+msgid "Scalar Bar Annotation Editor|Number of labels:"
+msgstr ""
+
+#: ../../vtkKWScalarBarAnnotation.cxx:415
+msgid "Set the number of labels to show."
+msgstr ""
+
+#: ../../vtkKWScalarComponentSelectionWidget.cxx:85
+msgid "Scalar Component|Component:"
+msgstr ""
+
+#: ../../vtkKWScalarComponentSelectionWidget.cxx:87
+msgid "Select the component this interface will control."
+msgstr ""
+
+#: ../../vtkKWScaleWithEntry.cxx:1074
+msgid "Popup Scale|(press this button to display the scale)"
+msgstr ""
+
+#: ../../vtkKWSelectionFrame.cxx:50
+msgid "Selection Frame|<Click to Select>"
+msgstr ""
+
+#: ../../vtkKWSelectionFrame.cxx:253
+msgid "Selection Frame|Close window"
+msgstr ""
+
+#: ../../vtkKWSelectionFrame.cxx:932
+msgid "Selection Frame|Change Title"
+msgstr ""
+
+#: ../../vtkKWSelectionFrame.cxx:934
+msgid "Selection Frame|Change frame title"
+msgstr ""
+
+#: ../../vtkKWSelectionFrame.cxx:939
+msgid "Selection Frame|Close"
+msgstr ""
+
+#: ../../vtkKWSelectionFrame.cxx:940
+msgid "Selection Frame|Close frame"
+msgstr ""
+
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:471
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:631
+#, c-format
+msgid "Selection Frame Manager|Set window layout to %d column(s) by %d row(s)"
+msgstr ""
+
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:540
 msgid "Toolbar|Window Layout"
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:1650
-msgid "Selection Frame Dialog|Title|Change frame title"
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1653
+msgid "Selection Frame Manager|Dialog|Title|Change frame title"
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:1655
-msgid "Selection Frame Dialog|Enter a new title for this frame"
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1657
+msgid "Selection Frame Manager|Dialog|Name:"
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:1666
-msgid "Selection Frame Dialog|Title|Change frame title - Error!"
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1659
+msgid "Selection Frame Manager|Dialog|Enter a new title for this frame"
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:1667
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1670
+msgid "Selection Frame Manager|Dialog|Title|Change frame title - Error!"
+msgstr ""
+
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1671
 msgid ""
-"Selection Frame Dialog|There is a problem with the new title you provided."
+"Selection Frame Manager|There is a problem with the new title you provided."
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:1959
-msgid "Selection Frame Dialog|Title|Save Screenshot"
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1963
+msgid "Selection Frame Manager|Dialog|Title|Save Screenshot"
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:2072
-msgid "Selection Frame Dialog|Title|Save Screenshot - Error!"
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:2076
+msgid "Selection Frame Manager|Dialog|Title|Save Screenshot - Error!"
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:2073
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:2077
 msgid ""
 "There was a problem writing the image file.\n"
 "Please check the location and make sure you have write\n"
 "permissions and enough disk space."
 msgstr ""
 
+#: ../../vtkKWSimpleAnimationWidget.cxx:183
+msgid "Animation|Number of frames:"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:188
+msgid "Specify the number of frames for this animation"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:199
+msgid "Animation|X rotation:"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:201
+msgid "Set the total amount of rotation in X (in degrees)"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:208
+msgid "Animation|Y rotation:"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:210
+msgid "Set the total amount of rotation in Y (in degrees)"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:218
+msgid "Animation|Z Rotation:"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:220
+msgid "Set the total amount of rotation in Z (in degrees)"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:228
+msgid "Animation|Zoom factor:"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:229
+msgid "Set the total zoom factor"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:235
+msgid "Animation|Starting slice:"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:237
+msgid "Set the slice number with which to begin the animation"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:243
+msgid "Animation|Ending slice:"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:245
+msgid "Set the slice number with which to end the animation"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:277
+msgid "Animation|Button|Preview"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:280
+msgid "Preview the animation you are about to create"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:283
+msgid "Animation|Button|Create..."
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:285
+msgid "Create the animation"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:288
+msgid "Animation|Button|Cancel"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:291
+msgid "Cancel the preview or creation of an animation"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:308
+msgid ""
+"Preview images will be generated using a low level-of-detail. When the "
+"animation is created, the best available level-of-detail will be used."
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:557
+msgid "Animation|Save Animation Dialog|Title|Save Animation"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:618
+msgid "Animation|Create Animation Dialog|Title|Frame Size"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:623
+msgid ""
+"Specify the width and height of each frame to be saved from this animation."
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:630
+msgid ""
+"The width must be a multiple of 32 and the height a multiple of 8. Each will "
+"be resized to the next smallest multiple if it does not meet this criterion. "
+"The maximum size allowed is 1920 by 1080."
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:639
+msgid ""
+"Each dimension must be a multiple of 4. Each will be resized to the next "
+"smallest multiple of 4 if it does not meet this criterion."
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:667
+msgid "Animation|Create Animation Dialog|Frame Size|Width:"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:685
+msgid "Animation|Create Animation Dialog|Frame Size|Height:"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:825
+#: ../../vtkKWSimpleAnimationWidget.cxx:1066
+msgid "Progress|Previewing animation"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:870
+#: ../../vtkKWSimpleAnimationWidget.cxx:1112
+msgid "Progress|Generating animation (rendering to memory; please wait)"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:974
+#: ../../vtkKWSimpleAnimationWidget.cxx:1213
+msgid "Progress|Canceled"
+msgstr ""
+
+#: ../../vtkKWSimpleAnimationWidget.cxx:978
+#: ../../vtkKWSimpleAnimationWidget.cxx:1217
+msgid "Progress|Done"
+msgstr ""
+
+#: ../../vtkKWTclInteractor.cxx:44 ../../vtkKWWindowBase.cxx:1217
+msgid "Tcl Interactor Dialog|Title|Tcl Interactor"
+msgstr ""
+
+#: ../../vtkKWTclInteractor.cxx:92
+msgid "Tcl Interactor Dialog|Button|Dismiss"
+msgstr ""
+
+#: ../../vtkKWTclInteractor.cxx:101
+msgid "Tcl Interactor Dialog|Command:"
+msgstr ""
+
+#: ../../vtkKWTextPropertyEditor.cxx:215
+msgid "Text Property Editor|Select the text color."
+msgstr ""
+
+#: ../../vtkKWTextPropertyEditor.cxx:217
+msgid "Text Property Editor|Text Color"
+msgstr ""
+
+#: ../../vtkKWTextPropertyEditor.cxx:225
+msgid "Text Property Editor|Select the font."
+msgstr ""
+
+#: ../../vtkKWTextPropertyEditor.cxx:234 ../../vtkKWTextPropertyEditor.cxx:680
+#: ../../vtkKWTextPropertyEditor.cxx:703
+msgid "Font|Arial"
+msgstr ""
+
+#: ../../vtkKWTextPropertyEditor.cxx:235 ../../vtkKWTextPropertyEditor.cxx:684
+#: ../../vtkKWTextPropertyEditor.cxx:707
+msgid "Font|Courier"
+msgstr ""
+
+#: ../../vtkKWTextPropertyEditor.cxx:236 ../../vtkKWTextPropertyEditor.cxx:688
+#: ../../vtkKWTextPropertyEditor.cxx:711
+msgid "Font|Times"
+msgstr ""
+
+#: ../../vtkKWTextPropertyEditor.cxx:243
+msgid "Text Property Editor|Select the font style."
+msgstr ""
+
+#: ../../vtkKWTextPropertyEditor.cxx:252
+msgid "Text Property Editor|Select bold style."
+msgstr ""
+
+#: ../../vtkKWTextPropertyEditor.cxx:265
+msgid "Text Property Editor|Select italic style."
+msgstr ""
+
+#: ../../vtkKWTextPropertyEditor.cxx:278
+msgid "Text Property Editor|Select shadow style."
+msgstr ""
+
+#: ../../vtkKWTextPropertyEditor.cxx:302
+msgid "Text Property Editor|Select the text opacity."
+msgstr ""
+
+#: ../../vtkKWTextPropertyEditor.cxx:349
+msgid "Text Property Editor|Color:"
+msgstr ""
+
+#: ../../vtkKWTextPropertyEditor.cxx:354
+msgid "Text Property Editor|Font:"
+msgstr ""
+
+#: ../../vtkKWTextPropertyEditor.cxx:358
+msgid "Text Property Editor|Style:"
+msgstr ""
+
+#: ../../vtkKWTextPropertyEditor.cxx:362
+msgid "Text Property Editor|Opacity:"
+msgstr ""
+
+#: ../../vtkKWTextPropertyEditor.cxx:365
+msgid "Text Property Editor|Functions:"
+msgstr ""
+
+#: ../../vtkKWThumbWheel.cxx:1189
+msgid "Popup ThumbWheel|(press this button to display a thumbwheel)"
+msgstr ""
+
 #: ../../vtkKWToolbarSet.cxx:844
 #, c-format
 msgid "Show/Hide the '%s' toolbar"
+msgstr ""
+
+#: ../../vtkKWUserInterfaceManagerDialog.cxx:193
+msgid "User Interface Manager Dialog|Button|Close"
+msgstr ""
+
+#: ../../vtkKWVolumeMaterialPropertyWidget.cxx:145
+msgid "Material Property Editor|Enable Shading"
+msgstr ""
+
+#: ../../vtkKWVolumePropertyPresetSelector.cxx:99
+msgid "Volume Property Preset Selector|Column|Modality"
+msgstr ""
+
+#: ../../vtkKWVolumePropertyWidget.cxx:284
+msgid "Volume Property Editor|Title|Volume Appearance Settings"
+msgstr ""
+
+#: ../../vtkKWVolumePropertyWidget.cxx:319
+msgid "Volume Property Editor|Interpolation:"
+msgstr ""
+
+#: ../../vtkKWVolumePropertyWidget.cxx:323
+msgid "Set the interpolation type used for sampling the volume."
+msgstr ""
+
+#: ../../vtkKWVolumePropertyWidget.cxx:342
+msgid "Volume Property Editor|Enable Shading"
+msgstr ""
+
+#: ../../vtkKWVolumePropertyWidget.cxx:344
+msgid "Enable shading (for all components)."
+msgstr ""
+
+#: ../../vtkKWVolumePropertyWidget.cxx:371
+msgid "Volume Property Editor|Interactive Apply"
+msgstr ""
+
+#: ../../vtkKWVolumePropertyWidget.cxx:375
+msgid ""
+"Toggle whether changes are applied to the volume window and image windows as "
+"nodes in the transfer functions are modified, or only after the mouse button "
+"is released."
+msgstr ""
+
+#: ../../vtkKWVolumePropertyWidget.cxx:387
+msgid "Volume Property Editor|Scalar Opacity Mapping:"
+msgstr ""
+
+#: ../../vtkKWVolumePropertyWidget.cxx:401
+msgid "Volume Property Editor|Scalar|S:"
+msgstr ""
+
+#: ../../vtkKWVolumePropertyWidget.cxx:403
+#: ../../vtkKWVolumePropertyWidget.cxx:526
+msgid "Volume Property Editor|Opacity|O:"
+msgstr ""
+
+#: ../../vtkKWVolumePropertyWidget.cxx:427
+msgid "Volume Property Editor|Unit Distance|Scale:"
+msgstr ""
+
+#: ../../vtkKWVolumePropertyWidget.cxx:435
+msgid ""
+"Set the unit distance on which the scalar opacity transfer function is "
+"defined."
+msgstr ""
+
+#: ../../vtkKWVolumePropertyWidget.cxx:446
+msgid "Volume Property Editor|Scalar Color Mapping:"
+msgstr ""
+
+#: ../../vtkKWVolumePropertyWidget.cxx:485
+msgid "Volume Property Editor|Lock Opacity And Color|Lock"
+msgstr ""
+
+#: ../../vtkKWVolumePropertyWidget.cxx:487
+msgid "Lock the opacity and color functions together."
+msgstr ""
+
+#: ../../vtkKWVolumePropertyWidget.cxx:505
+msgid "Volume Property Editor|Gradient Opacity Mapping:"
+msgstr ""
+
+#: ../../vtkKWVolumePropertyWidget.cxx:544
+msgid ""
+"Enable modulation of the opacity by the magnitude of the gradient according "
+"to the specified function."
+msgstr ""
+
+#: ../../vtkKWVolumePropertyWidget.cxx:549
+#: ../../vtkKWVolumePropertyWidget.cxx:1244
+msgid "Volume Property Editor|Enable Gradient|On"
+msgstr ""
+
+#: ../../vtkKWVolumePropertyWidget.cxx:552
+#: ../../vtkKWVolumePropertyWidget.cxx:1243
+msgid "Volume Property Editor|Enable Gradient|Off"
+msgstr ""
+
+#: ../../vtkKWVolumePropertyWidget.cxx:564
+msgid "Volume Property Editor|Component Weights:"
 msgstr ""
 
 #: ../../vtkKWWindow.cxx:81
@@ -404,10 +1361,18 @@ msgstr ""
 msgid "Error Dialog|Title|Error!"
 msgstr ""
 
-#: ../../vtkKWWindowBase.cxx:1217
-msgid "Tcl Interactor Dialog|Title|Tcl Interactor"
-msgstr ""
-
 #: ../../vtkKWWindowBase.cxx:1352
 msgid "Can not close window while it is disabled"
+msgstr ""
+
+#: ../../vtkKWWindowLevelPresetSelector.cxx:90
+msgid "Window/Level Preset Selector|Column|Modality"
+msgstr ""
+
+#: ../../vtkKWWindowLevelPresetSelector.cxx:100
+msgid "Window/Level Preset Selector|Column|Window|W"
+msgstr ""
+
+#: ../../vtkKWWindowLevelPresetSelector.cxx:111
+msgid "Window/Level Preset Selector|Level|L"
 msgstr ""

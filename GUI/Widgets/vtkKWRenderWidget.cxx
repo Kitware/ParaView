@@ -21,6 +21,7 @@
 #include "vtkKWEvent.h"
 #include "vtkKWGenericRenderWindowInteractor.h"
 #include "vtkKWIcon.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWMenu.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWWindow.h"
@@ -42,7 +43,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.131");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.132");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -1114,7 +1115,8 @@ void vtkKWRenderWidget::PopulateAnnotationMenu(vtkKWMenu *menu)
   // Corner Annotation
 
   index = menu->AddCheckButton(
-    "Corner Annotation", this, "ToggleCornerAnnotationVisibility");
+    ks_("Annotation|Corner Annotation"), 
+    this, "ToggleCornerAnnotationVisibility");
   menu->SetItemSelectedState(index, this->GetCornerAnnotationVisibility());
   if (show_icons)
     {
@@ -1129,7 +1131,8 @@ void vtkKWRenderWidget::PopulateAnnotationMenu(vtkKWMenu *menu)
   if (header && header)
     {
     index = menu->AddCheckButton(
-      "Header Annotation", this, "ToggleHeaderAnnotationVisibility");
+      ks_("Annotation|Header Annotation"), 
+      this, "ToggleHeaderAnnotationVisibility");
     menu->SetItemSelectedState(index, this->GetHeaderAnnotationVisibility());
     if (show_icons)
       {

@@ -19,6 +19,7 @@
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWHistogram.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
 #include "vtkKWEntryWithLabel.h"
 #include "vtkKWRange.h"
@@ -37,7 +38,7 @@
 #include <vtksys/stl/algorithm>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.86");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.87");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -1462,7 +1463,8 @@ void vtkKWParameterValueFunctionEditor::CreateParameterEntry()
     this->ParameterEntry->SetParent(this->PointEntriesFrame);
     this->ParameterEntry->Create();
     this->ParameterEntry->GetWidget()->SetWidth(7);
-    this->ParameterEntry->GetLabel()->SetText("P:");
+    this->ParameterEntry->GetLabel()->SetText(
+      ks_("Transfer Function Editor|Parameter|P:"));
 
     this->UpdateParameterEntry(this->GetSelectedPoint());
 
@@ -1485,7 +1487,7 @@ void vtkKWParameterValueFunctionEditor::CreateHistogramLogModeOptionMenu()
     this->HistogramLogModeOptionMenu->SetPadY(1);
     this->HistogramLogModeOptionMenu->IndicatorVisibilityOff();
     this->HistogramLogModeOptionMenu->SetBalloonHelpString(
-      "Change the histogram mode from log to linear.");
+      k_("Change the histogram mode from log to linear."));
 
     vtkKWMenu *menu = this->HistogramLogModeOptionMenu->GetMenu();
 
@@ -1497,7 +1499,8 @@ void vtkKWParameterValueFunctionEditor::CreateHistogramLogModeOptionMenu()
       this->GetApplication(), img_name.c_str(), vtkKWIcon::IconGridLinear);
     
     int index = menu->AddRadioButton(
-      "Lin.", this, "HistogramLogModeCallback 0");
+      ks_("Transfer Function Editor|Histogram|Linear|Lin."), 
+      this, "HistogramLogModeCallback 0");
     menu->SetItemImage(index, img_name.c_str());
 
     img_name = this->HistogramLogModeOptionMenu->GetWidgetName();
@@ -1506,7 +1509,8 @@ void vtkKWParameterValueFunctionEditor::CreateHistogramLogModeOptionMenu()
       this->GetApplication(), img_name.c_str(), vtkKWIcon::IconGridLog);
  
     index = menu->AddRadioButton(
-      "Log.", this, "HistogramLogModeCallback 1");
+      ks_("Transfer Function Editor|Histogram|Logarithmic|Log."), 
+      this, "HistogramLogModeCallback 1");
     menu->SetItemImage(index, img_name.c_str());
 
     this->UpdateHistogramLogModeOptionMenu();
@@ -6440,7 +6444,10 @@ void vtkKWParameterValueFunctionEditor::UpdateHistogramLogModeOptionMenu()
       }
     else
       {
-      this->HistogramLogModeOptionMenu->SetValue(log_mode ? "Log." : "Lin.");
+      this->HistogramLogModeOptionMenu->SetValue(
+        log_mode 
+        ? ks_("Transfer Function Editor|Histogram|Logarithmic|Log.") 
+        : ks_("Transfer Function Editor|Histogram|Linear|Lin."));
       }
     this->HistogramLogModeOptionMenu->SetEnabled(
       !hist ? 0 : this->GetEnabled());

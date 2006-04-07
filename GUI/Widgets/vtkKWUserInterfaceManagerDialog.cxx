@@ -16,6 +16,7 @@
 
 #include "vtkKWApplication.h"
 #include "vtkKWFrameWithLabel.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWPushButton.h"
@@ -35,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceManagerDialog);
-vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.14");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.15");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceManagerDialogInternals
@@ -188,7 +189,8 @@ void vtkKWUserInterfaceManagerDialog::Create()
 
   this->CloseButton->SetParent(parent);
   this->CloseButton->Create();
-  this->CloseButton->SetText("Close");
+  this->CloseButton->SetText(
+    ks_("User Interface Manager Dialog|Button|Close"));
   this->CloseButton->SetWidth(20);
   this->CloseButton->SetCommand(this->TopLevel, "Withdraw");
   

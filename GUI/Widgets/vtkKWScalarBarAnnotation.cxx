@@ -29,6 +29,7 @@
 #include "vtkKWThumbWheel.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindowInteractor.h"
+#include "vtkKWInternationalization.h"
 #include "vtkScalarBarActor.h"
 #include "vtkScalarBarWidget.h"
 #include "vtkTextProperty.h"
@@ -36,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.30");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.31");
 
 //----------------------------------------------------------------------------
 vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
@@ -199,22 +200,23 @@ void vtkKWScalarBarAnnotation::Create()
 
   if (this->PopupMode)
     {
-    this->PopupButton->SetText("Edit...");
+    this->PopupButton->SetText(ks_("Scalar Bar Annotation Editor|Edit..."));
     }
 
   // --------------------------------------------------------------
   // Edit the labeled frame
 
-  this->Frame->SetLabelText("Scalar Bar");
+  this->Frame->SetLabelText(ks_("Scalar Bar Annotation Editor|Scalar Bar"));
 
   // --------------------------------------------------------------
   // Edit the check button (Annotation visibility)
 
-  this->CheckButton->SetText("Display scalar bar");
+  this->CheckButton->SetText(
+    ks_("Scalar Bar Annotation Editor|Display scalar bar"));
 
   this->CheckButton->SetBalloonHelpString(
-    "Toggle the visibility of the scalar bar representing the mapping "
-    "of scalar value to RGB color");
+    k_("Toggle the visibility of the scalar bar representing the mapping "
+       "of scalar value to RGB color"));
 
   // --------------------------------------------------------------
   // Component selection
@@ -246,8 +248,8 @@ void vtkKWScalarBarAnnotation::Create()
   this->TitleEntry->GetWidget()->SetCommand(this, "ScalarBarTitleCallback");
 
   this->TitleEntry->SetBalloonHelpString(
-    "Set the scalar bar title. The text will automatically scale "
-    "to fit within the allocated space");
+    k_("Set the scalar bar title. The text will automatically scale "
+       "to fit within the allocated space"));
 
   this->Script("pack %s -padx 2 -pady 2 -side %s -anchor nw -expand y -fill x",
                this->TitleEntry->GetWidgetName(),
@@ -264,8 +266,10 @@ void vtkKWScalarBarAnnotation::Create()
       }
     this->TitleTextPropertyPopupButton->SetParent(this->TitleFrame);
     this->TitleTextPropertyPopupButton->Create();
-    this->TitleTextPropertyPopupButton->GetLabel()->SetText("Title properties:");
-    this->TitleTextPropertyPopupButton->GetWidget()->SetText("Edit...");
+    this->TitleTextPropertyPopupButton->GetLabel()->SetText(
+      ks_("Scalar Bar Annotation Editor|Title properties:"));
+    this->TitleTextPropertyPopupButton->GetWidget()->SetText(
+      ks_("Scalar Bar Annotation Editor|Edit..."));
 
     vtkKWFrame *popupframe = 
       this->TitleTextPropertyPopupButton->GetWidget()->GetPopupFrame();
@@ -290,7 +294,8 @@ void vtkKWScalarBarAnnotation::Create()
   this->TitleTextPropertyWidget->LabelOnTopOn();
   this->TitleTextPropertyWidget->LabelVisibilityOn();
   this->TitleTextPropertyWidget->Create();
-  this->TitleTextPropertyWidget->GetLabel()->SetText("Title properties:");
+  this->TitleTextPropertyWidget->GetLabel()->SetText(
+    ks_("Scalar Bar Annotation Editor|Title properties:"));
   this->TitleTextPropertyWidget->SetChangedCommand(
     this, "TitleTextPropertyCallback");
 
@@ -313,13 +318,14 @@ void vtkKWScalarBarAnnotation::Create()
 
   this->LabelFormatEntry->SetParent(this->LabelFrame);
   this->LabelFormatEntry->Create();
-  this->LabelFormatEntry->GetLabel()->SetText("Label format:");
+  this->LabelFormatEntry->GetLabel()->SetText(
+    ks_("Scalar Bar Annotation Editor|Label format:"));
   this->LabelFormatEntry->GetWidget()->SetWidth(20);
   this->LabelFormatEntry->GetWidget()->SetCommand(
     this, "ScalarBarLabelFormatCallback");
 
   this->LabelFormatEntry->SetBalloonHelpString(
-    "Set the scalar bar label format.");
+    k_("Set the scalar bar label format."));
 
   // --------------------------------------------------------------
   // Scalar Bar label text property : popup button if needed
@@ -332,8 +338,10 @@ void vtkKWScalarBarAnnotation::Create()
       }
     this->LabelTextPropertyPopupButton->SetParent(this->LabelFrame);
     this->LabelTextPropertyPopupButton->Create();
-    this->LabelTextPropertyPopupButton->GetLabel()->SetText("Label properties:");
-    this->LabelTextPropertyPopupButton->GetWidget()->SetText("Edit...");
+    this->LabelTextPropertyPopupButton->GetLabel()->SetText(
+      ks_("Scalar Bar Annotation Editor|Label properties:"));
+    this->LabelTextPropertyPopupButton->GetWidget()->SetText(
+      ks_("Scalar Bar Annotation Editor|Edit..."));
 
     vtkKWFrame *popupframe = 
       this->LabelTextPropertyPopupButton->GetWidget()->GetPopupFrame();
@@ -356,7 +364,7 @@ void vtkKWScalarBarAnnotation::Create()
   this->LabelTextPropertyWidget->LabelVisibilityOn();
   this->LabelTextPropertyWidget->Create();
   this->LabelTextPropertyWidget->GetLabel()->SetText(
-    "Label text properties:");
+    ks_("Scalar Bar Annotation Editor|Label text properties:"));
   this->LabelTextPropertyWidget->SetChangedCommand(
     this, "LabelTextPropertyCallback");
 
@@ -376,12 +384,13 @@ void vtkKWScalarBarAnnotation::Create()
   this->MaximumNumberOfColorsThumbWheel->SetResolution(1);
   this->MaximumNumberOfColorsThumbWheel->Create();
   this->MaximumNumberOfColorsThumbWheel->DisplayLabelOn();
-  this->MaximumNumberOfColorsThumbWheel->GetLabel()->SetText("Maximum number of colors:");
+  this->MaximumNumberOfColorsThumbWheel->GetLabel()->SetText(
+    ks_("Scalar Bar Annotation Editor|Maximum number of colors:"));
   this->MaximumNumberOfColorsThumbWheel->DisplayEntryOn();
   this->MaximumNumberOfColorsThumbWheel->GetEntry()->SetWidth(5);
 
   this->MaximumNumberOfColorsThumbWheel->SetBalloonHelpString(
-    "Set the maximum number of scalar bar segments to show.");
+    k_("Set the maximum number of scalar bar segments to show."));
 
   this->MaximumNumberOfColorsThumbWheel->SetEndCommand(
     this, "MaximumNumberOfColorsEndCallback");
@@ -398,11 +407,12 @@ void vtkKWScalarBarAnnotation::Create()
   this->NumberOfLabelsScale->SetRange(
     foo->GetNumberOfLabelsMinValue(), foo->GetNumberOfLabelsMaxValue());
   this->NumberOfLabelsScale->SetResolution(1);
-  this->NumberOfLabelsScale->SetLabelText("Number of labels:");
+  this->NumberOfLabelsScale->SetLabelText(
+    ks_("Scalar Bar Annotation Editor|Number of labels:"));
   this->NumberOfLabelsScale->SetEntryWidth(5);
 
   this->NumberOfLabelsScale->SetBalloonHelpString(
-    "Set the number of labels to show.");
+    k_("Set the number of labels to show."));
 
   this->NumberOfLabelsScale->SetEndCommand(
     this, "NumberOfLabelsEndCallback");

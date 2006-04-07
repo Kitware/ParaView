@@ -18,6 +18,7 @@
 #include "vtkKWCheckButton.h"
 #include "vtkKWCheckButtonSet.h"
 #include "vtkKWCheckButtonSetWithLabel.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
@@ -30,10 +31,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkProperty2D.h"
 #include "vtkTextProperty.h"
-
-#define VTK_KW_TEXT_PROP_ARIAL   "Arial"
-#define VTK_KW_TEXT_PROP_COURIER "Courier"
-#define VTK_KW_TEXT_PROP_TIMES   "Times"
 
 #define VTK_KW_TEXT_PROP_BOLD_ID   0
 #define VTK_KW_TEXT_PROP_ITALIC_ID 1
@@ -100,7 +97,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextPropertyEditor);
-vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.20");
+vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.21");
 
 // ----------------------------------------------------------------------------
 vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
@@ -214,15 +211,18 @@ void vtkKWTextPropertyEditor::Create()
   this->ChangeColorButton->LabelOutsideButtonOn();
   this->ChangeColorButton->Create();
   this->ChangeColorButton->SetCommand(this, "ChangeColorButtonCallback");
-  this->ChangeColorButton->SetBalloonHelpString("Select the text color.");
-  this->ChangeColorButton->SetDialogTitle("Text Color");
+  this->ChangeColorButton->SetBalloonHelpString(
+    ks_("Text Property Editor|Select the text color."));
+  this->ChangeColorButton->SetDialogTitle(
+    ks_("Text Property Editor|Text Color"));
 
   // Font Family
 
   this->FontFamilyOptionMenu->SetParent(this);
   this->FontFamilyOptionMenu->Create();
   this->FontFamilyOptionMenu->ExpandWidgetOff();
-  this->FontFamilyOptionMenu->SetBalloonHelpString("Select the font.");
+  this->FontFamilyOptionMenu->SetBalloonHelpString(
+    ks_("Text Property Editor|Select the font."));
 
   vtkKWMenuButton *menubutton = this->FontFamilyOptionMenu->GetWidget();
   vtkKWMenu *menu = menubutton->GetMenu();
@@ -231,15 +231,16 @@ void vtkKWTextPropertyEditor::Create()
   menubutton->SetPadX(0);
   menubutton->SetPadY(2);
 
-  menu->AddRadioButton(VTK_KW_TEXT_PROP_ARIAL, this, "FontFamilyCallback");
-  menu->AddRadioButton(VTK_KW_TEXT_PROP_COURIER, this, "FontFamilyCallback");
-  menu->AddRadioButton(VTK_KW_TEXT_PROP_TIMES, this, "FontFamilyCallback");
+  menu->AddRadioButton(ks_("Font|Arial"), this, "FontFamilyCallback");
+  menu->AddRadioButton(ks_("Font|Courier"), this, "FontFamilyCallback");
+  menu->AddRadioButton(ks_("Font|Times"), this, "FontFamilyCallback");
 
   // Styles (bold, italic, shadow)
 
   this->StylesCheckButtonSet->SetParent(this);
   this->StylesCheckButtonSet->Create();
-  this->StylesCheckButtonSet->SetBalloonHelpString("Select the font style.");
+  this->StylesCheckButtonSet->SetBalloonHelpString(
+    ks_("Text Property Editor|Select the font style."));
 
   vtkKWCheckButtonSet *cbs = this->StylesCheckButtonSet->GetWidget();
   cbs->PackHorizontallyOn();
@@ -248,7 +249,7 @@ void vtkKWTextPropertyEditor::Create()
 
   cb = cbs->AddWidget(VTK_KW_TEXT_PROP_BOLD_ID);
   cb->SetCommand(this, "BoldCallback");
-  cb->SetBalloonHelpString("Select bold style.");
+  cb->SetBalloonHelpString(ks_("Text Property Editor|Select bold style."));
   cb->IndicatorVisibilityOff();
   cb->SetPadX(0);
   cb->SetPadY(0);
@@ -261,7 +262,7 @@ void vtkKWTextPropertyEditor::Create()
 
   cb = cbs->AddWidget(VTK_KW_TEXT_PROP_ITALIC_ID);
   cb->SetCommand(this, "ItalicCallback");
-  cb->SetBalloonHelpString("Select italic style.");
+  cb->SetBalloonHelpString(ks_("Text Property Editor|Select italic style."));
   cb->IndicatorVisibilityOff();
   cb->SetPadX(0);
   cb->SetPadY(0);
@@ -274,7 +275,7 @@ void vtkKWTextPropertyEditor::Create()
 
   cb = cbs->AddWidget(VTK_KW_TEXT_PROP_SHADOW_ID);
   cb->SetCommand(this, "ShadowCallback");
-  cb->SetBalloonHelpString("Select shadow style.");
+  cb->SetBalloonHelpString(ks_("Text Property Editor|Select shadow style."));
   cb->IndicatorVisibilityOff();
   cb->SetPadX(0);
   cb->SetPadY(0);
@@ -297,7 +298,8 @@ void vtkKWTextPropertyEditor::Create()
   this->OpacityScale->SetCommand(this, "OpacityCallback");
   this->OpacityScale->SetEndCommand(this, "OpacityEndCallback");
   this->OpacityScale->SetEntryCommand(this, "OpacityEndCallback");
-  this->OpacityScale->SetBalloonHelpString("Select the text opacity.");
+  this->OpacityScale->SetBalloonHelpString(
+    ks_("Text Property Editor|Select the text opacity."));
 
   // Buttons
 
@@ -343,19 +345,24 @@ void vtkKWTextPropertyEditor::Pack()
 
   if (this->LongFormat)
     {
-    this->ChangeColorButton->GetLabel()->SetText("Color:");
+    this->ChangeColorButton->GetLabel()->SetText(
+      ks_("Text Property Editor|Color:"));
     this->ChangeColorButton->LabelVisibilityOn();
 
     this->FontFamilyOptionMenu->GetWidget()->IndicatorVisibilityOn();
-    this->FontFamilyOptionMenu->GetLabel()->SetText("Font:");
+    this->FontFamilyOptionMenu->GetLabel()->SetText(
+      ks_("Text Property Editor|Font:"));
     this->FontFamilyOptionMenu->LabelVisibilityOn();
 
-    this->StylesCheckButtonSet->GetLabel()->SetText("Style:");
+    this->StylesCheckButtonSet->GetLabel()->SetText(
+      ks_("Text Property Editor|Style:"));
     this->StylesCheckButtonSet->LabelVisibilityOn();
 
-    this->OpacityScale->SetLabelText("Opacity:");
+    this->OpacityScale->SetLabelText(
+      ks_("Text Property Editor|Opacity:"));
 
-    this->PushButtonSet->GetLabel()->SetText("Functions:");
+    this->PushButtonSet->GetLabel()->SetText(
+      ks_("Text Property Editor|Functions:"));
     this->PushButtonSet->LabelVisibilityOn();
 
     int row = 0, col = 0;
@@ -670,15 +677,15 @@ void vtkKWTextPropertyEditor::UpdateFontFamilyOptionMenu()
       {
       case VTK_ARIAL:
         this->FontFamilyOptionMenu->GetWidget()->SetValue(
-          VTK_KW_TEXT_PROP_ARIAL);
+          ks_("Font|Arial"));
         break;
       case VTK_COURIER:
         this->FontFamilyOptionMenu->GetWidget()->SetValue(
-          VTK_KW_TEXT_PROP_COURIER);
+          ks_("Font|Courier"));
         break;
       case VTK_TIMES:
         this->FontFamilyOptionMenu->GetWidget()->SetValue(
-          VTK_KW_TEXT_PROP_TIMES);
+          ks_("Font|Times"));
         break;
       }
     this->Script("grid %s %s",
@@ -693,15 +700,15 @@ void vtkKWTextPropertyEditor::FontFamilyCallback()
   if (this->FontFamilyOptionMenu->IsCreated())
     {
     const char *value = this->FontFamilyOptionMenu->GetWidget()->GetValue();
-    if (!strcmp(value, VTK_KW_TEXT_PROP_ARIAL))
+    if (!strcmp(value, ks_("Font|Arial")))
       {
       this->SetFontFamily(VTK_ARIAL);
       }
-    else if (!strcmp(value, VTK_KW_TEXT_PROP_COURIER))
+    else if (!strcmp(value, ks_("Font|Courier")))
       {
       this->SetFontFamily(VTK_COURIER);
       }
-    else if (!strcmp(value, VTK_KW_TEXT_PROP_TIMES))
+    else if (!strcmp(value, ks_("Font|Times")))
       {
       this->SetFontFamily(VTK_TIMES);
       }

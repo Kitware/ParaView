@@ -17,10 +17,11 @@
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkKWInternationalization.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.70");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.71");
 
 //----------------------------------------------------------------------------
 vtkKWChangeColorButton::vtkKWChangeColorButton()
@@ -40,7 +41,7 @@ vtkKWChangeColorButton::vtkKWChangeColorButton()
   
   this->ButtonDown = 0;
 
-  this->GetLabel()->SetText("Set Color...");
+  this->GetLabel()->SetText(ks_("Change Color Button|Set Color..."));
 }
 
 //----------------------------------------------------------------------------

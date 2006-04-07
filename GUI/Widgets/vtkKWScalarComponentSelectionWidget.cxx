@@ -19,9 +19,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
+#include "vtkKWInternationalization.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.19");
+vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.20");
 vtkStandardNewMacro(vtkKWScalarComponentSelectionWidget);
 
 //----------------------------------------------------------------------------
@@ -80,9 +81,10 @@ void vtkKWScalarComponentSelectionWidget::Create()
   this->SelectedComponentOptionMenu->SetParent(this);
   this->SelectedComponentOptionMenu->Create();
   this->SelectedComponentOptionMenu->ExpandWidgetOff();
-  this->SelectedComponentOptionMenu->GetLabel()->SetText("Component:");
+  this->SelectedComponentOptionMenu->GetLabel()->SetText(
+    ks_("Scalar Component|Component:"));
   this->SelectedComponentOptionMenu->SetBalloonHelpString(
-    "Select the component this interface will control.");
+    k_("Select the component this interface will control."));
 
   // Pack
 

@@ -19,6 +19,7 @@
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
+#include "vtkKWInternationalization.h"
 #include "vtkKWLabel.h"
 #include "vtkKWRange.h"
 #include "vtkKWScaleWithEntry.h"
@@ -30,7 +31,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.48");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.49");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -720,7 +721,7 @@ void vtkKWPiecewiseFunctionEditor::CreateWindowLevelModeCheckButton()
     this->WindowLevelModeCheckButton->SetHighlightThickness(0);
     this->WindowLevelModeCheckButton->IndicatorVisibilityOff();
     this->WindowLevelModeCheckButton->SetBalloonHelpString(
-      "Place the editor in window/level mode.");
+      k_("Place the editor in window/level mode."));
     this->WindowLevelModeCheckButton->SetCommand(
       this, "WindowLevelModeCallback");
     this->WindowLevelModeCheckButton->SetImageToPredefinedIcon(
@@ -737,7 +738,8 @@ void vtkKWPiecewiseFunctionEditor::CreateValueEntry()
     this->ValueEntry->SetParent(this->PointEntriesFrame);
     this->ValueEntry->Create();
     this->ValueEntry->GetWidget()->SetWidth(6);
-    this->ValueEntry->GetLabel()->SetText("V:");
+    this->ValueEntry->GetLabel()->SetText(
+      ks_("Transfer Function Editor|Value|V:"));
 
     this->UpdatePointEntries(this->GetSelectedPoint());
 

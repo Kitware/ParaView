@@ -25,6 +25,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkObjectFactory.h"
 #include "vtkKWMultiColumnList.h"
 #include "vtkKWMultiColumnListWithScrollbars.h"
+#include "vtkKWInternationalization.h"
 
 const char *vtkKWWindowLevelPresetSelector::WindowColumnName = "Window";
 const char *vtkKWWindowLevelPresetSelector::LevelColumnName  = "Level";
@@ -32,7 +33,7 @@ const char *vtkKWWindowLevelPresetSelector::ModalityColumnName  = "Modality";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowLevelPresetSelector);
-vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.16");
+vtkCxxRevisionMacro(vtkKWWindowLevelPresetSelector, "1.17");
 
 //----------------------------------------------------------------------------
 int vtkKWWindowLevelPresetSelector::SetPresetWindow(
@@ -84,8 +85,9 @@ void vtkKWWindowLevelPresetSelector::CreateColumns()
 
   // Modality
 
-  col = list->InsertColumn(this->GetCommentColumnIndex(), 
-                           vtkKWWindowLevelPresetSelector::ModalityColumnName);
+  col = list->InsertColumn(
+    this->GetCommentColumnIndex(), 
+    ks_("Window/Level Preset Selector|Column|Modality"));
   list->SetColumnName(col, vtkKWWindowLevelPresetSelector::ModalityColumnName);
   list->SetColumnResizable(col, 1);
   list->SetColumnStretchable(col, 0);
@@ -94,7 +96,8 @@ void vtkKWWindowLevelPresetSelector::CreateColumns()
 
   // Window
 
-  col = list->InsertColumn(col + 1, "W");
+  col = list->InsertColumn(
+    col + 1, ks_("Window/Level Preset Selector|Column|Window|W"));
   list->SetColumnName(col, vtkKWWindowLevelPresetSelector::WindowColumnName);
   list->SetColumnWidth(col, 6);
   list->SetColumnResizable(col, 1);
@@ -104,7 +107,8 @@ void vtkKWWindowLevelPresetSelector::CreateColumns()
 
   // Level
 
-  col = list->InsertColumn(col + 1, "L");
+  col = list->InsertColumn(
+    col + 1, ks_("Window/Level Preset Selector|Level|L"));
   list->SetColumnName(col, vtkKWWindowLevelPresetSelector::LevelColumnName);
   list->SetColumnWidth(col, 6);
   list->SetColumnResizable(col, 1);
