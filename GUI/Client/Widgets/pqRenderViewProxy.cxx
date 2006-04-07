@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    $RCS $
+   Module:    pqRenderViewProxy.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkSMRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(pqRenderViewProxy, "1.2");
+vtkCxxRevisionMacro(pqRenderViewProxy, "1.3");
 vtkStandardNewMacro(pqRenderViewProxy);
 
 pqRenderViewProxy::pqRenderViewProxy()

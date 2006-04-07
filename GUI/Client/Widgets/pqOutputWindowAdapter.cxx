@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    $RCS $
+   Module:    pqOutputWindowAdapter.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkObjectFactory.h>
 
-vtkCxxRevisionMacro(pqOutputWindowAdapter, "1.1");
+vtkCxxRevisionMacro(pqOutputWindowAdapter, "1.2");
 vtkStandardNewMacro(pqOutputWindowAdapter);
 
 pqOutputWindowAdapter::pqOutputWindowAdapter()

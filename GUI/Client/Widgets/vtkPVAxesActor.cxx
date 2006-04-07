@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    $RCS $
+   Module:    vtkPVAxesActor.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPVAxesActor, "1.2");
+vtkCxxRevisionMacro(vtkPVAxesActor, "1.3");
 vtkStandardNewMacro(vtkPVAxesActor);
 
 vtkCxxSetObjectMacro( vtkPVAxesActor, UserDefinedTip, vtkPolyData );
