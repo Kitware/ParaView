@@ -70,6 +70,8 @@ ADD_LIBRARY(QtTesting
   pqMenuEventTranslator.h
   pqMenuEventTranslatorAdaptor.cxx
   pqMenuEventTranslatorAdaptor.h
+  pqObjectNaming.cxx
+  pqObjectNaming.h
   pqRecordEventsDialog.cxx
   pqRecordEventsDialog.h
   pqSpinBoxEventTranslator.cxx

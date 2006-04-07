@@ -35,6 +35,9 @@ MainWindow::MainWindow() :
 
   this->createStandardFileMenu();
   this->createStandardViewMenu();
+  this->createStandardServerMenu();
+  this->createStandardSourcesMenu();
+  this->createStandardFiltersMenu();
   this->createStandardToolsMenu();
 
   QMenu* const help_menu = this->helpMenu();
@@ -48,6 +51,7 @@ MainWindow::MainWindow() :
   
   this->createStandardVCRToolBar();
   this->createStandardVariableToolBar();
+  this->createStandardCompoundProxyToolBar();
 
   // Add the line plot dock window.
   QDockWidget* const line_chart_dock = new QDockWidget("Line Chart View", this);

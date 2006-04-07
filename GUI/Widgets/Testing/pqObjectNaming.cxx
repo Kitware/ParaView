@@ -30,51 +30,56 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef __pqOptions_h
-#define __pqOptions_h
+#include "pqObjectNaming.h"
 
-#include "pqWidgetsExport.h"
-#include <vtkPVOptions.h>
-/*! \brief Command line options for pqClient.
- *
- * pqOptions extends vtkPVOptions to handle pqClient specific command line 
- * options.
- */
-class PQWIDGETS_EXPORT pqOptions : public vtkPVOptions
+#include <QSet>
+#include <QtDebug>
+
+bool pqObjectNaming::Validate(QObject& Parent)
 {
-public:
-  static pqOptions *New();
-  vtkTypeRevisionMacro(pqOptions, vtkPVOptions);
-  void PrintSelf(ostream &os, vtkIndent indent);
-
-  vtkGetMacro(TestUINames, int);
-  vtkGetStringMacro(TestFileName);
-  vtkGetStringMacro(TestDirectory);
-  vtkGetStringMacro(BaselineImage);
-  vtkGetMacro(ImageThreshold, int);
-  vtkGetMacro(ExitBeforeEventLoop, int);
-protected:
-  pqOptions();
-  virtual ~pqOptions();
-
-  virtual void Initialize();
-  virtual int PostProcess(int argc, const char * const *argv);
-
-  int TestUINames;
-  char* TestFileName;
-  char* TestDirectory;
-  char* BaselineImage;
-  int ImageThreshold;
-  int ExitBeforeEventLoop;
+  const QString name = Parent.objectName();
+  if(name.isEmpty())
+    {
+    qWarning() << "Unnamed root widget\n";
+    return false;
+    }
     
-  vtkSetStringMacro(TestFileName);
-  vtkSetStringMacro(TestDirectory);
-  vtkSetStringMacro(BaselineImage);
+  return pqObjectNaming::Validate(Parent, "/" + name);
+}
+
+bool pqObjectNaming::Validate(QObject& Parent, const QString& Path)
+{
+  qDebug() << Path << "\n";
+
+  bool result = true;
   
-private:
-  pqOptions(const pqOptions &);
-  void operator=(const pqOptions &);
-};
-
-#endif //__pqOptions_h
-
+  QSet<QString> names;
+  const QObjectList children = Parent.children();
+  for(int i = 0; i != children.size(); ++i)
+    {
+    QObject* child = children[i];
+    const QString name = child->objectName();
+    if(name.isEmpty())
+      {
+      qWarning() << Path << " - unnamed widget: " << child << "\n";
+      result = false;
+      }
+    else
+      {
+      if(names.contains(name))
+        {
+        qWarning() << Path << " - duplicate widget name [" << name << "]: " << child << "\n";
+        result = false;
+        }
+        
+      names.insert(name);
+      
+      if(!pqObjectNaming::Validate(*child, Path + "/" + name))
+        {
+        result = false;
+        }
+      }
+    }
+  
+  return result;
+}

@@ -40,16 +40,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMApplication.h"
 #include "vtkSMProperty.h"
 
+#include <pqObjectNaming.h>
+
 #include <QApplication>
 
-vtkStandardNewMacro(pqProcessModuleGUIHelper);
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.1");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.2");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper()
 {
   this->SMApplication = vtkSMApplication::New();
   this->Application = 0;
-  this->MainWindow = 0;
+  this->Window = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -57,9 +58,9 @@ pqProcessModuleGUIHelper::~pqProcessModuleGUIHelper()
 {
   this->SMApplication->Finalize();
   this->SMApplication->Delete();
-  if (this->MainWindow)
+  if (this->Window)
     {
-    delete this->MainWindow;
+    delete this->Window;
     }
   if (this->Application)
     {
@@ -81,9 +82,9 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
     }
   
   int status = 1;
-  if (this->Application && this->MainWindow)
+  if (this->Application && this->Window)
     {
-    this->MainWindow->show();
+    this->Window->show();
     
     // Check is options specified to run tests.
     pqOptions* options = pqOptions::SafeDownCast(
@@ -92,9 +93,14 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
     int dont_start_event_loop = 0;
     if (options)
       {
+      if(options->GetTestUINames())
+        {
+        status = !pqObjectNaming::Validate(*this->Window);
+        }
+
       if (options->GetTestFileName())
         {
-        pqEventPlayer player(*this->MainWindow);
+        pqEventPlayer player(*this->Window);
         player.addDefaultWidgetEventPlayers();
         pqEventPlayerXML xml_player;
         status = !xml_player.playXML(player, options->GetTestFileName());
@@ -102,7 +108,7 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
 
       if (options->GetBaselineImage())
         {
-        status = !this->MainWindow->compareView(options->GetBaselineImage(),
+        status = !this->Window->compareView(options->GetBaselineImage(),
           options->GetImageThreshold(), cout, options->GetTestDirectory());
         dont_start_event_loop = 1;
         }
@@ -131,7 +137,7 @@ int pqProcessModuleGUIHelper::InitializeApplication(int argc, char** argv)
 #if !(defined(WIN32) && defined(PARAQ_BUILD_SHARED_LIBS))
   Q_INIT_RESOURCE(pqWidgets);
 #endif
-  this->CreateMainWindow();
+  this->Window = this->CreateMainWindow();
 
   return 1;
 }
@@ -139,15 +145,8 @@ int pqProcessModuleGUIHelper::InitializeApplication(int argc, char** argv)
 //-----------------------------------------------------------------------------
 void pqProcessModuleGUIHelper::FinalizeApplication()
 {
-  delete this->MainWindow;
-  this->MainWindow = NULL;
-}
-
-//-----------------------------------------------------------------------------
-void pqProcessModuleGUIHelper::CreateMainWindow()
-{
-  this->MainWindow = new pqMainWindow();
-  this->MainWindow->resize(800, 600);
+  delete this->Window;
+  this->Window = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -165,8 +164,8 @@ void pqProcessModuleGUIHelper::SetLocalProgress(const char* vtkNotUsed(name),
   int vtkNotUsed(progress))
 {
   // Here we would call something like
-  // this->MainWindow->SetProgress(name, progress). 
-  // Then the MainWindow can update the progress bar, or something.
+  // this->Window->SetProgress(name, progress). 
+  // Then the Window can update the progress bar, or something.
 }
 
 //-----------------------------------------------------------------------------

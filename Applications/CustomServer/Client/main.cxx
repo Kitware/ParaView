@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    $RCS $
+  Module:    main.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,38 +30,108 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "MainWindow.h"
-#include <QApplication>
+#include "ProcessModuleGUIHelper.h"
 
-#ifdef VTK_USE_MPI
-# include <mpi.h>
-#endif
+#include "vtkToolkits.h" // For VTK_USE_MPI
+#include "vtkPVConfig.h" // Required to get build options for paraview
+#include "vtkPVMain.h"
+#include "vtkProcessModule.h"
+#include "pqOptions.h"
+#include "vtkPQConfig.h"
 
+/*
+ * Make sure all the kits register their classes with vtkInstantiator.
+ * Since ParaView uses Tcl wrapping, all of VTK is already compiled in
+ * anyway.  The instantiators will add no more code for the linker to
+ * collect.
+ */
+#include "vtkCommonInstantiator.h"
+#include "vtkFilteringInstantiator.h"
+#include "vtkGenericFilteringInstantiator.h"
+#include "vtkIOInstantiator.h"
+#include "vtkImagingInstantiator.h"
+#include "vtkGraphicsInstantiator.h"
+
+#include "vtkRenderingInstantiator.h"
+#include "vtkVolumeRenderingInstantiator.h"
+#include "vtkHybridInstantiator.h"
+#include "vtkParallelInstantiator.h"
+
+#include "vtkPVServerCommonInstantiator.h"
+#include "vtkPVFiltersInstantiator.h"
+#include "vtkPVServerManagerInstantiator.h"
+#include "vtkClientServerInterpreter.h"
+
+// forward declare the initialize function
+static void ParaQInitializeInterpreter(vtkProcessModule* pm);
+
+//----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-#ifdef VTK_USE_MPI
-  int myId =0;
-  MPI_Init(&argc, &argv);
-  MPI_Comm_rank(MPI_COMM_WORLD,&myId);
-#endif
+  vtkPVMain::SetInitializeMPI(0);  // pvClient never runs with MPI.
+  vtkPVMain::Initialize(&argc, &argv); // Perform any initializations.
 
-  // Create the main window
-  QApplication application(argc, argv);
+  vtkPVMain* pvmain = vtkPVMain::New();
+  pqOptions* options = pqOptions::New();
+  // We may define a PQCLIENT enum, if necessary.
+  options->SetProcessType(vtkPVOptions::PVCLIENT);
+ 
+  // Create the appropriate GUI Helper.
+  pqProcessModuleGUIHelper* helper = ProcessModuleGUIHelper::New();
 
-/** \todo Figure-out how to export Qt's resource symbols from a DLL, so we can use them here */
-#if !(defined(WIN32) && defined(PARAQ_BUILD_SHARED_LIBS))
-  Q_INIT_RESOURCE(pqWidgets);
-#endif
-  
-  MainWindow main_window;
-  main_window.resize(800, 600);
-  main_window.show();
+  // This creates the Process Module and initializes it.
+  int ret = pvmain->Initialize(options, helper, ParaQInitializeInterpreter, argc, argv);
+  if (!ret)
+    {
+    // Tell process module that we support Multiple connections.
+    // This must be set before starting the event loop.
+    vtkProcessModule::GetProcessModule()->SupportMultipleConnectionsOn();
+    ret = helper->Run(options);
+    }
 
-  int ret = application.exec();
-
-#ifdef VTK_USE_MPI
-  MPI_Finalize();
-#endif
-
+  helper->Delete();
+  pvmain->Delete();
+  options->Delete();
+  vtkPVMain::Finalize();
+  vtkProcessModule::SetProcessModule(0);
   return ret;
 }
+
+//----------------------------------------------------------------------------
+// ClientServer wrapper initialization functions.
+extern "C" void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkFilteringCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkGenericFilteringCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkImagingCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkGraphicsCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkIOCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkRenderingCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkVolumeRenderingCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkHybridCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkWidgetsCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkParallelCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkPVServerCommonCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
+
+extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
+
+//----------------------------------------------------------------------------
+void ParaQInitializeInterpreter(vtkProcessModule* pm)
+{
+  // Initialize built-in wrapper modules.
+  vtkCommonCS_Initialize(pm->GetInterpreter());
+  vtkFilteringCS_Initialize(pm->GetInterpreter());
+  vtkGenericFilteringCS_Initialize(pm->GetInterpreter());
+  vtkImagingCS_Initialize(pm->GetInterpreter());
+  vtkGraphicsCS_Initialize(pm->GetInterpreter());
+  vtkIOCS_Initialize(pm->GetInterpreter());
+  vtkRenderingCS_Initialize(pm->GetInterpreter());
+  vtkVolumeRenderingCS_Initialize(pm->GetInterpreter());
+  vtkHybridCS_Initialize(pm->GetInterpreter());
+  vtkWidgetsCS_Initialize(pm->GetInterpreter());
+  vtkParallelCS_Initialize(pm->GetInterpreter());
+  vtkPVServerCommonCS_Initialize(pm->GetInterpreter());
+  vtkPVFiltersCS_Initialize(pm->GetInterpreter());
+  vtkXdmfCS_Initialize(pm->GetInterpreter());
+}
+

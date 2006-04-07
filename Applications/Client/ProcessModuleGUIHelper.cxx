@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-Module:    pqClientProcessModuleGUIHelper.h
+Module:    ProcessModuleGUIHelper.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,35 +29,35 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqClientProcessModudeGUIHelper_h
-#define __pqClientProcessModudeGUIHelper_h
 
-#include "pqProcessModuleGUIHelper.h"
-/*!
- * pqClientProcessModuleGUIHelper extends pqProcessModuleGUIHelper
- * so that we can create the type of MainWindow needed for pqClient.
- *
- */
-class pqClientProcessModuleGUIHelper : public pqProcessModuleGUIHelper
+#include "ProcessModuleGUIHelper.h"
+
+#include "vtkObjectFactory.h"
+#include "MainWindow.h"
+
+vtkStandardNewMacro(ProcessModuleGUIHelper);
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.1");
+//-----------------------------------------------------------------------------
+ProcessModuleGUIHelper::ProcessModuleGUIHelper()
 {
-public:
-  static pqClientProcessModuleGUIHelper* New();
-  vtkTypeRevisionMacro(pqClientProcessModuleGUIHelper, pqProcessModuleGUIHelper);
-  void PrintSelf(ostream& os, vtkIndent indent);
+}
 
-protected:
-  pqClientProcessModuleGUIHelper();
-  ~pqClientProcessModuleGUIHelper();
+//-----------------------------------------------------------------------------
+ProcessModuleGUIHelper::~ProcessModuleGUIHelper()
+{
+}
 
-  /// subclasses can override this method to create their own
-  /// subclass of pqMainWindow as the Main Window.
-  virtual void CreateMainWindow();
+//-----------------------------------------------------------------------------
+pqMainWindow* ProcessModuleGUIHelper::CreateMainWindow()
+{
+  pqMainWindow* const window = new MainWindow();
+  window->resize(800, 600);
+  return window;
+}
 
-private:
-  pqClientProcessModuleGUIHelper(const pqClientProcessModuleGUIHelper&); // Not implemented.
-  void operator=(const pqClientProcessModuleGUIHelper&); // Not implemented.
-};
-
-#endif
-
+//-----------------------------------------------------------------------------
+void ProcessModuleGUIHelper::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
 

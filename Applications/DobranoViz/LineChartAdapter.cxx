@@ -418,6 +418,9 @@ struct LineChartAdapter::pqImplementation
 
       for(int i = 1; i < experimental.size(); ++i)
         {
+        if(images[i].isEmpty())
+          continue;
+          
         QFileInfo image_info(images[i]);
         if(image_info.isRelative())
           image_info = QFileInfo(this->CSVFilePath).absoluteDir().absoluteFilePath(images[i]);

@@ -140,14 +140,14 @@ void pqEventTranslator::onRecordEvent(QObject* Object, const QString& Command, c
     {
     if(p->objectName().isEmpty())
       {
-      qWarning() << "Incompletely-named object " << Object;
-//      return;
+      qWarning() << "Cannot record event for incompletely-named object " << Object;
+      return;
       }
       
     name = p->objectName() + "/" + name;
     }
   
-  qDebug() << "Event: " << name << " " << Command << " " << Arguments;
+  // qDebug() << "Event: " << name << " " << Command << " " << Arguments;
   emit recordEvent(name, Command, Arguments);
 }
 

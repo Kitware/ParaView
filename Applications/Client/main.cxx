@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-  Module:    pqClient.cxx
+  Module:    main.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,12 +29,14 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+
+#include "ProcessModuleGUIHelper.h"
+
 #include "vtkToolkits.h" // For VTK_USE_MPI
 #include "vtkPVConfig.h" // Required to get build options for paraview
 #include "vtkPVMain.h"
 #include "vtkProcessModule.h"
 #include "pqOptions.h"
-#include "pqClientProcessModuleGUIHelper.h"
 #include "vtkPQConfig.h"
 
 /*
@@ -75,7 +77,7 @@ int main(int argc, char* argv[])
   options->SetProcessType(vtkPVOptions::PVCLIENT);
  
   // Create the appropriate GUI Helper.
-  pqProcessModuleGUIHelper* helper = pqClientProcessModuleGUIHelper::New();
+  pqProcessModuleGUIHelper* helper = ProcessModuleGUIHelper::New();
 
   // This creates the Process Module and initializes it.
   int ret = pvmain->Initialize(options, helper, ParaQInitializeInterpreter, argc, argv);

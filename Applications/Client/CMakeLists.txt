@@ -59,9 +59,9 @@ ADD_EXECUTABLE(pqClient WIN32 MACOSX_BUNDLE
   AboutDialog.h
   MainWindow.cxx
   MainWindow.h
-  pqClient.cxx
-  pqClientProcessModuleGUIHelper.cxx
-  pqClientProcessModuleGUIHelper.h
+  main.cxx
+  ProcessModuleGUIHelper.cxx
+  ProcessModuleGUIHelper.h
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}
   ${UI_BUILT_SOURCES}
@@ -97,6 +97,9 @@ IF(BUILD_TESTING)
 
   CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/Testing/XML/filters.xml.in
                  ${CMAKE_CURRENT_BINARY_DIR}/Testing/XML/filters.xml COPYONLY)
+
+  # Special-case test to see that Qt widgets are all named properly for test playback
+  ADD_TEST(pqClientWidgetNaming  ${TEST_BINARY} --test-ui-names --exit)
                
   FOREACH(test ${TESTS_WITHOUT_BASELINES})
     ADD_TEST(pqClient${test}

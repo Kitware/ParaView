@@ -62,6 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqFileDialog.h>
 #include <pqImageComparison.h>
 #include <pqLocalFileDialogModel.h>
+#include <pqObjectNaming.h>
 #include <pqPlayControlsWidget.h>
 #include <pqRecordEventsDialog.h>
 #include <pqSetData.h>
@@ -354,6 +355,11 @@ void pqMainWindow::createStandardToolsMenu()
     << pqConnect(SIGNAL(triggered(bool)), this, SLOT(onOpenLinkEditor()));
 
   menu->addSeparator();
+  
+  menu->addAction(tr("Validate Widget Names"))
+    << pqSetName("Validate")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(onValidateWidgetNames()));
+  
   menu->addAction(tr("&Record Test"))
     << pqSetName("Record")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onRecordTest()));
@@ -560,6 +566,12 @@ void pqMainWindow::addStandardDockWidget(Qt::DockWidgetArea area, QDockWidget* d
   this->Implementation->DockWidgetVisibleActions[dockwidget] = action;
     
   dockwidget->installEventFilter(this);
+}
+
+void pqMainWindow::disableOutputWindow()
+{
+  this->Implementation->OutputWindowAdapter = vtkSmartPointer<pqOutputWindowAdapter>::New();
+  vtkOutputWindow::SetInstance(this->Implementation->OutputWindowAdapter);
 }
 
 bool pqMainWindow::eventFilter(QObject* watched, QEvent* e)
@@ -1145,6 +1157,10 @@ void pqMainWindow::onOpenCompoundFilterWizard()
   wizard->show();
 }
 
+void pqMainWindow::onValidateWidgetNames()
+{
+  pqObjectNaming::Validate(*this);
+}
 
 void pqMainWindow::onRecordTest()
 {

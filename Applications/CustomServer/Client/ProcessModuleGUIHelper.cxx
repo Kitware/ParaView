@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    $RCS $
+Module:    ProcessModuleGUIHelper.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,51 +30,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef __pqOptions_h
-#define __pqOptions_h
+#include "ProcessModuleGUIHelper.h"
 
-#include "pqWidgetsExport.h"
-#include <vtkPVOptions.h>
-/*! \brief Command line options for pqClient.
- *
- * pqOptions extends vtkPVOptions to handle pqClient specific command line 
- * options.
- */
-class PQWIDGETS_EXPORT pqOptions : public vtkPVOptions
+#include "vtkObjectFactory.h"
+#include "MainWindow.h"
+
+vtkStandardNewMacro(ProcessModuleGUIHelper);
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.1");
+//-----------------------------------------------------------------------------
+ProcessModuleGUIHelper::ProcessModuleGUIHelper()
 {
-public:
-  static pqOptions *New();
-  vtkTypeRevisionMacro(pqOptions, vtkPVOptions);
-  void PrintSelf(ostream &os, vtkIndent indent);
+}
 
-  vtkGetMacro(TestUINames, int);
-  vtkGetStringMacro(TestFileName);
-  vtkGetStringMacro(TestDirectory);
-  vtkGetStringMacro(BaselineImage);
-  vtkGetMacro(ImageThreshold, int);
-  vtkGetMacro(ExitBeforeEventLoop, int);
-protected:
-  pqOptions();
-  virtual ~pqOptions();
+//-----------------------------------------------------------------------------
+ProcessModuleGUIHelper::~ProcessModuleGUIHelper()
+{
+}
 
-  virtual void Initialize();
-  virtual int PostProcess(int argc, const char * const *argv);
+//-----------------------------------------------------------------------------
+pqMainWindow* ProcessModuleGUIHelper::CreateMainWindow()
+{
+  pqMainWindow* const window = new MainWindow();
+  window->resize(800, 600);
+  return window;
+}
 
-  int TestUINames;
-  char* TestFileName;
-  char* TestDirectory;
-  char* BaselineImage;
-  int ImageThreshold;
-  int ExitBeforeEventLoop;
-    
-  vtkSetStringMacro(TestFileName);
-  vtkSetStringMacro(TestDirectory);
-  vtkSetStringMacro(BaselineImage);
-  
-private:
-  pqOptions(const pqOptions &);
-  void operator=(const pqOptions &);
-};
-
-#endif //__pqOptions_h
+//-----------------------------------------------------------------------------
+void ProcessModuleGUIHelper::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}
 

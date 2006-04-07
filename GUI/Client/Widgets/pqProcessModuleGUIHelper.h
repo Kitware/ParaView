@@ -51,12 +51,11 @@ class QApplication;
 class PQWIDGETS_EXPORT pqProcessModuleGUIHelper : public vtkProcessModuleGUIHelper
 {
 public:
-  static pqProcessModuleGUIHelper* New();
   vtkTypeRevisionMacro(pqProcessModuleGUIHelper, vtkProcessModuleGUIHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /// Get the main window for the application.
-  pqMainWindow* getMainWindow(){ return this->MainWindow;}
+  pqMainWindow* getWindow(){ return this->Window;}
 
   /// Start the GUI event loop.
   virtual int RunGUIStart(int argc, char** argv, int numServerProcs, int myId);
@@ -77,10 +76,12 @@ public:
   // Description:
   // Get the application singleton. 
   QApplication* GetApplication();
+
 protected:
   pqProcessModuleGUIHelper(); 
   ~pqProcessModuleGUIHelper(); 
-
+  
+private:
   /// InitializeApplication initializes the QApplication and 
   /// the MainWindow.
   virtual int InitializeApplication(int argc, char** argv);
@@ -90,12 +91,12 @@ protected:
 
   /// subclasses can override this method to create their own
   /// subclass of pqMainWindow as the Main Window.
-  virtual void CreateMainWindow();
+  virtual pqMainWindow* CreateMainWindow() = 0;
   
   QApplication* Application;
-  pqMainWindow* MainWindow;
+  pqMainWindow* Window;
   vtkSMApplication* SMApplication;
-private:
+
   pqProcessModuleGUIHelper(pqProcessModuleGUIHelper&); // Not implemented.
   void operator=(const pqProcessModuleGUIHelper&); // Not implemented.
 };

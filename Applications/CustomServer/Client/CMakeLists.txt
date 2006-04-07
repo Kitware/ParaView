@@ -32,6 +32,8 @@ ADD_EXECUTABLE(csClient WIN32 MACOSX_BUNDLE
   MainWindow.cxx
   MainWindow.h
   main.cxx
+  ProcessModuleGUIHelper.cxx
+  ProcessModuleGUIHelper.h
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES}
 )

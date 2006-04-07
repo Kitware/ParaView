@@ -30,51 +30,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef __pqOptions_h
-#define __pqOptions_h
+#ifndef _pqObjectNaming_h
+#define _pqObjectNaming_h
 
-#include "pqWidgetsExport.h"
-#include <vtkPVOptions.h>
-/*! \brief Command line options for pqClient.
- *
- * pqOptions extends vtkPVOptions to handle pqClient specific command line 
- * options.
- */
-class PQWIDGETS_EXPORT pqOptions : public vtkPVOptions
+#include "QtTestingExport.h"
+
+class QObject;
+class QString;
+class vtkRenderWindow;
+
+/// Provides functionality for ensuring that Qt objects are named correctly for use with regression testing
+class QTTESTING_EXPORT pqObjectNaming
 {
 public:
-  static pqOptions *New();
-  vtkTypeRevisionMacro(pqOptions, vtkPVOptions);
-  void PrintSelf(ostream &os, vtkIndent indent);
-
-  vtkGetMacro(TestUINames, int);
-  vtkGetStringMacro(TestFileName);
-  vtkGetStringMacro(TestDirectory);
-  vtkGetStringMacro(BaselineImage);
-  vtkGetMacro(ImageThreshold, int);
-  vtkGetMacro(ExitBeforeEventLoop, int);
-protected:
-  pqOptions();
-  virtual ~pqOptions();
-
-  virtual void Initialize();
-  virtual int PostProcess(int argc, const char * const *argv);
-
-  int TestUINames;
-  char* TestFileName;
-  char* TestDirectory;
-  char* BaselineImage;
-  int ImageThreshold;
-  int ExitBeforeEventLoop;
-    
-  vtkSetStringMacro(TestFileName);
-  vtkSetStringMacro(TestDirectory);
-  vtkSetStringMacro(BaselineImage);
+  /// Recursively validates that every child of the given QObject is named correctly for regression test recording/playback
+  static bool Validate(QObject& Parent);
   
 private:
-  pqOptions(const pqOptions &);
-  void operator=(const pqOptions &);
+  static bool Validate(QObject& Parent, const QString& Path);
 };
 
-#endif //__pqOptions_h
+#endif // !_pqObjectNaming_h
 
