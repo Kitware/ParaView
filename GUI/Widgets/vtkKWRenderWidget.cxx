@@ -43,7 +43,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.132");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.133");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -1630,18 +1630,19 @@ void vtkKWRenderWidget::ProcessCallbackCommandEvents(vtkObject *caller,
 
   // Handle event for this class
 
-#if 0
+#if 1
   if (caller == this->RenderWindow)
     {
     const char *cptr = 0;
     switch (event)
       {
       case vtkCommand::CursorChangedEvent:
-        cptr = "left_ptr";
         switch (*(static_cast<int*>(calldata))) 
           {
-          case VTK_CURSOR_ARROW:
-            cptr = "arrow";
+          // Tk Cursors:
+          // http://www.xed.ch/lwm/tcltkref/tk.cursor.html
+          case VTK_CURSOR_DEFAULT:
+            cptr = "";
             break;
           case VTK_CURSOR_SIZENE:
 #ifdef _WIN32
@@ -1678,15 +1679,20 @@ void vtkKWRenderWidget::ProcessCallbackCommandEvents(vtkObject *caller,
             cptr = "sb_h_double_arrow";
             break;
           case VTK_CURSOR_SIZEALL:
+#ifdef _WIN32
+            cptr = "fleur"; // should be "size" if we upgrade to Tcl/Tk > 8.4.5
+#else
             cptr = "fleur";
+#endif
             break;
           case VTK_CURSOR_HAND:
             cptr = "hand2";
             break;
           }
-        if (this->GetParentTopLevel())
+        if (this->GetParentTopLevel() && cptr)
           {
-          this->GetParentTopLevel()->SetConfigurationOption("-cursor", cptr);
+          this->GetParentTopLevel()->SetConfigurationOption(
+            "-cursor", cptr);
           }
         break;
       }
