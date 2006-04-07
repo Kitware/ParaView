@@ -27,6 +27,7 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCompoundProxyWizard.h
   pqDataSetModel.h
+  pqDisplayProxyEditor.h
   pqElementInspectorWidget.h
   pqImageTip.h
   pqMainWindow.h
@@ -43,6 +44,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineData.h
   pqPipelineListModel.h
   pqPipelineListWidget.h
+  pqPropertyLinks.h
   pqSMAdaptor.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
@@ -52,6 +54,7 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
 SET(UI_FORMS
   pqCompoundProxyWizard.ui
+  pqDisplayProxyEditor.ui
   pqMultiViewFrameMenu.ui
   pqOutputWindow.ui
   pqServerBrowser.ui
@@ -86,6 +89,8 @@ ADD_LIBRARY(pqWidgets
   pqCompoundProxyWizard.h
   pqDataSetModel.cxx
   pqDataSetModel.h
+  pqDisplayProxyEditor.cxx
+  pqDisplayProxyEditor.h
   pqElementInspectorWidget.cxx
   pqElementInspectorWidget.h
   pqImageTip.cxx
@@ -134,6 +139,8 @@ ADD_LIBRARY(pqWidgets
   pqProcessModuleGUIHelper.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
+  pqPropertyLinks.cxx
+  pqPropertyLinks.h
   pqSMAdaptor.cxx
   pqSMAdaptor.h
   pqSMMultiView.cxx

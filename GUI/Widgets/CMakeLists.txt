@@ -40,6 +40,8 @@ SET(QtWidgets_SRCS
   pqSetData.h
   pqSetName.cxx
   pqSetName.h
+  pqSignalAdaptors.cxx
+  pqSignalAdaptors.h
   pqWaitCursor.cxx
   pqWaitCursor.h
   QtWidgetsExport.h
@@ -55,6 +57,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqFileDialogModel.h
   pqLocalFileDialogModel.h
   pqPlayControlsWidget.h
+  pqSignalAdaptors.h
 )
 
 ##########################################################################

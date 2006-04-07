@@ -30,65 +30,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqPipelineListWidget.h
-/// \brief
-///   The pqPipelineListWidget class is used to display the pipeline
-///   in the form of a tree.
-///
-/// \date 11/25/2005
+#ifndef pq_SignalAdaptors_h
+#define pq_SignalAdaptors_h
 
-#ifndef _pqPipelineListWidget_h
-#define _pqPipelineListWidget_h
-
-#include "pqWidgetsExport.h"
-#include <QWidget>
-
-class pqPipelineListModel;
-class QModelIndex;
-class QString;
-class QTreeView;
-class QVTKWidget;
-class vtkSMProxy;
+#include <QObject>
+#include <QString>
+class QComboBox;
 
 
-/// \class pqPipelineListWidget
-/// \brief
-///   The pqPipelineListWidget class is used to display the pipeline
-///   in the form of a tree.
-class PQWIDGETS_EXPORT pqPipelineListWidget : public QWidget
+/// signal adaptor to allow getting/setting/observing of a pseudo 'currentText' property of a combo box 
+/// the QComboBox currentIndexChanged signal is forwarded to this currentTextChanged signal
+class pqSignalAdaptorComboBox : public QObject
 {
   Q_OBJECT
-
+  Q_PROPERTY(QString currentText READ currentText WRITE setCurrentText)
 public:
-  pqPipelineListWidget(QWidget *parent=0);
-  virtual ~pqPipelineListWidget();
-
-  virtual bool eventFilter(QObject *object, QEvent *e);
-
-  pqPipelineListModel *getListModel() const {return this->ListModel;}
-  QTreeView *getTreeView() const {return this->TreeView;}
-
-  vtkSMProxy *getSelectedProxy() const;
-  vtkSMProxy *getNextProxy() const; // TEMP
-  QVTKWidget *getCurrentWindow() const;
-
+  /// constructor requires a QComboBox
+  pqSignalAdaptorComboBox(QComboBox* p);
+  /// get the current text of a combo box
+  QString currentText() const;
 signals:
-  void proxySelected(vtkSMProxy *proxy);
-
+  /// signal text changed in a combo box
+  void currentTextChanged(const QString&);  
 public slots:
-  void selectProxy(vtkSMProxy *proxy);
-  void selectWindow(QVTKWidget *window);
-
-  void deleteSelected();
-  void deleteProxy(vtkSMProxy *proxy);
-
-private slots:
-  void changeCurrent(const QModelIndex &current, const QModelIndex &previous);
-  void doViewContextMenu(const QPoint& pos);
-
-private:
-  pqPipelineListModel *ListModel;
-  QTreeView *TreeView;
+  /// set the current text of a combo box (actually sets the index for the text)
+  void setCurrentText(const QString&);
+protected:
 };
 
 #endif
+

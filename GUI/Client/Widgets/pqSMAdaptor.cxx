@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 
 #include <assert.h>
-#include <map>
+#include <vtkstd/map>
 
 #include <QString>
 #include <QVariant>
@@ -502,6 +502,7 @@ void pqSMAdaptor::setEnumerationProperty(vtkSMProxy* Proxy, vtkSMProperty* Prope
     {
     Value.convert(QVariant::Int);
     adaptor->SetEnumerationValue(Value.toString().toAscii().data());
+    Proxy->UpdateVTKObjects();
     }
   else if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::ENUMERATION)
     {

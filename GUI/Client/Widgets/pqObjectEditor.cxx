@@ -421,15 +421,15 @@ void pqObjectEditor::getServerManagerProperties(pqSMProxy proxy, QWidget* widget
         if(propertyLayout)
           {
           QList<QList<QVariant> > domain = pqSMAdaptor::getMultipleElementPropertyDomain(SMProperty);
-          for(int i=0; i<domain.size(); i++)
+          for(int j=0; j<domain.size(); j++)
             {
             QString name;
-            name.setNum(i);
+            name.setNum(j);
             name = QString(iter->GetKey()) + QString(":") + name;
             QLineEdit* le = propertyLayout->parentWidget()->findChild<QLineEdit*>(name);
             if(le)
               {
-              QVariant prop = pqSMAdaptor::getMultipleElementProperty(proxy, SMProperty, i);
+              QVariant prop = pqSMAdaptor::getMultipleElementProperty(proxy, SMProperty, j);
               le->setText(prop.toString());
               }
             }
@@ -494,14 +494,14 @@ void pqObjectEditor::getServerManagerProperties(pqSMProxy proxy, QWidget* widget
           pqSMProxy proxy_property = pqSMAdaptor::getProxyProperty(proxy, SMProperty);
           comboBox->clear();
           int currentIndex=0;
-          int i=0;
+          int j=0;
           foreach(pqSMProxy v, propertyDomain)
             {
             if(proxy_property == v)
               {
-              currentIndex = i;
+              currentIndex = j;
               }
-            i++;
+            j++;
             pqPipelineObject* o = pqPipelineData::instance()->getObjectFor(v);
             if(o)
               {
@@ -527,14 +527,14 @@ void pqObjectEditor::getServerManagerProperties(pqSMProxy proxy, QWidget* widget
           QList<QVariant> domain = pqSMAdaptor::getElementPropertyDomain(SMProperty);
           comboBox->clear();
           int currentIndex=0;
-          int i=0;
+          int j=0;
           foreach(QVariant v, domain)
             {
             if(elem_property == v)
               {
-              currentIndex = i;
+              currentIndex = j;
               }
-            i++;
+            j++;
             comboBox->addItem(v.toString());
             }
           comboBox->setCurrentIndex(currentIndex);

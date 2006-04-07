@@ -39,19 +39,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPipelineListWidget.h"
 
-#include "pqPipelineData.h"
-#include "pqPipelineListModel.h"
-#include "pqPipelineObject.h"
-#include "QVTKWidget.h"
-#include "vtkSMProxy.h"
-#include "vtkSMSourceProxy.h"
-
 #include <QEvent>
 #include <QHeaderView>
 #include <QItemSelectionModel>
 #include <QKeyEvent>
 #include <QTreeView>
 #include <QVBoxLayout>
+#include <QMenu>
+#include <QDialog>
+
+#include "pqPipelineData.h"
+#include "pqPipelineListModel.h"
+#include "pqPipelineObject.h"
+#include "QVTKWidget.h"
+#include "vtkSMProxy.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMDisplayProxy.h"
+#include "pqDisplayProxyEditor.h"
 
 
 pqPipelineListWidget::pqPipelineListWidget(QWidget *p)
@@ -90,6 +94,11 @@ pqPipelineListWidget::pqPipelineListWidget(QWidget *p)
       connect(this->ListModel, SIGNAL(childAdded(const QModelIndex &)),
           this->TreeView, SLOT(expand(const QModelIndex &)));
       }
+
+    this->TreeView->setContextMenuPolicy(Qt::CustomContextMenu);
+    QObject::connect(this->TreeView, SIGNAL(customContextMenuRequested(const QPoint&)),
+                     this, SLOT(doViewContextMenu(const QPoint&)));
+    
     }
 
   // Add the tree view to the layout.
@@ -311,4 +320,38 @@ void pqPipelineListWidget::changeCurrent(const QModelIndex &current,
     }
 }
 
+void pqPipelineListWidget::doViewContextMenu(const QPoint& position)
+{
+  // get the current selection, and do a QMenu based on that
+  QModelIndex selection = this->TreeView->currentIndex();
+  if(selection.isValid())
+    {
+    pqPipelineListModel::ItemType type = this->ListModel->getTypeFor(selection);
+    if(type == pqPipelineListModel::Source ||
+       type == pqPipelineListModel::Filter ||
+       type == pqPipelineListModel::Bundle)
+      {
+      pqPipelineObject* po = this->ListModel->getObjectFor(selection);
+      vtkSMDisplayProxy* display = po ? po->GetDisplayProxy() : NULL;
+      if(display)
+        {
+        static const char* DisplaySettingString = "Display Settings...";
+        QMenu menu;
+        menu.addAction(DisplaySettingString);
+        QAction* action = menu.exec(this->TreeView->mapToGlobal(position));
+        if(action && action->text() == DisplaySettingString)
+          {
+          QDialog* dialog = new QDialog;
+          dialog->setWindowFlags(Qt::WindowStaysOnTopHint);
+          dialog->setWindowTitle("Display Settings");
+          QHBoxLayout* l = new QHBoxLayout(dialog);
+          pqDisplayProxyEditor* editor = new pqDisplayProxyEditor(dialog);
+          editor->setDisplayProxy(display, po->GetProxy());
+          l->addWidget(editor);
+          dialog->show();
+          }
+        }
+      }
+    }
+}
 
