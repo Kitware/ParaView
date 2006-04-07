@@ -71,7 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.58");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.59");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -1515,6 +1515,39 @@ int vtkKWSelectionFrameLayoutManager::UndoMaximizeWidget()
 {
   if (this->Resolution[0] == 1 && this->Resolution[1] == 1 && this->Internals)
     {
+    const int nw = this->GetNumberOfWidgets();
+    
+    // If we have only one widget, do not go back (to having nothing)
+    if ( nw == 1 )
+      {
+      return 0;
+      }
+
+    // And if the previous resolution is 0 and we have more than one
+    // widget (yes this case occurs), estimate a sensible resolution.
+    if ( this->Internals->ResolutionBeforeMaximize[0] == 0 && 
+         this->Internals->ResolutionBeforeMaximize[1] == 0 &&
+         nw > 1 )
+      {
+      if (nw > 6)
+        {
+        this->SetResolution( 2, 3 );
+        }
+      else if (nw >= 4)
+        {
+        this->SetResolution( 2, 2 );
+        }
+      else if (nw >= 2)
+        { 
+        this->SetResolution( 2, 1 );
+        }
+      else
+        {
+        this->SetResolution( 1, 1 );
+        }
+      return 1;
+      }
+    
     this->SetResolution(this->Internals->ResolutionBeforeMaximize);
 
     vtkKWSelectionFrame *at00 = this->GetWidgetAtPosition(0, 0);
@@ -1558,7 +1591,7 @@ void vtkKWSelectionFrameLayoutManager::SelectAndMaximizeWidgetCallback(
   vtkKWSelectionFrame *selection)
 {
   this->SelectWidget(selection);
-  this->MaximizeWidget(selection);
+  this->ToggleMaximizeWidget(selection);
 }
 
 //---------------------------------------------------------------------------
