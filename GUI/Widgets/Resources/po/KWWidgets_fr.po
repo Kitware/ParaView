@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-04-07 00:03-0400\n"
+"POT-Creation-Date: 2006-04-07 13:06-0400\n"
 "PO-Revision-Date: 2006-04-07 00:04-0400\n"
 "Last-Translator: <EMAIL@ADDRESS>\n"
 "Language-Team: French\n"
@@ -886,36 +886,36 @@ msgstr ""
 msgid "Toolbar|Window Layout"
 msgstr "Disposition des Fenêtres"
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:1653
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1690
 msgid "Selection Frame Manager|Dialog|Title|Change frame title"
 msgstr "Changer le titre de la fenêtre"
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:1657
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1694
 msgid "Selection Frame Manager|Dialog|Name:"
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:1659
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1696
 msgid "Selection Frame Manager|Dialog|Enter a new title for this frame"
 msgstr "Entrez une nouveau titre pour cette fenêtre"
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:1670
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1707
 msgid "Selection Frame Manager|Dialog|Title|Change frame title - Error!"
 msgstr "Change le titre de la fenêtre - Erreur!"
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:1671
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1708
 msgid ""
 "Selection Frame Manager|There is a problem with the new title you provided."
 msgstr "Le nouveau titre est problématique."
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:1963
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:2000
 msgid "Selection Frame Manager|Dialog|Title|Save Screenshot"
 msgstr "Enregistrer une copie d'écran"
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:2076
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:2113
 msgid "Selection Frame Manager|Dialog|Title|Save Screenshot - Error!"
 msgstr "Enregistrer une copie d'écran - Erreur!"
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:2077
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:2114
 msgid ""
 "There was a problem writing the image file.\n"
 "Please check the location and make sure you have write\n"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-04-07 00:03-0400\n"
+"POT-Creation-Date: 2006-04-07 13:06-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -885,36 +885,36 @@ msgstr ""
 msgid "Toolbar|Window Layout"
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:1653
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1690
 msgid "Selection Frame Manager|Dialog|Title|Change frame title"
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:1657
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1694
 msgid "Selection Frame Manager|Dialog|Name:"
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:1659
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1696
 msgid "Selection Frame Manager|Dialog|Enter a new title for this frame"
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:1670
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1707
 msgid "Selection Frame Manager|Dialog|Title|Change frame title - Error!"
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:1671
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:1708
 msgid ""
 "Selection Frame Manager|There is a problem with the new title you provided."
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:1963
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:2000
 msgid "Selection Frame Manager|Dialog|Title|Save Screenshot"
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:2076
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:2113
 msgid "Selection Frame Manager|Dialog|Title|Save Screenshot - Error!"
 msgstr ""
 
-#: ../../vtkKWSelectionFrameLayoutManager.cxx:2077
+#: ../../vtkKWSelectionFrameLayoutManager.cxx:2114
 msgid ""
 "There was a problem writing the image file.\n"
 "Please check the location and make sure you have write\n"
