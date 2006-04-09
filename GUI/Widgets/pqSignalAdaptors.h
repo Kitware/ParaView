@@ -36,15 +36,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QString>
 class QComboBox;
+#include "QtWidgetsExport.h"
 
 
 /// signal adaptor to allow getting/setting/observing of a pseudo 'currentText' property of a combo box 
 /// the QComboBox currentIndexChanged signal is forwarded to this currentTextChanged signal
-class pqSignalAdaptorComboBox : public QObject
+class QTWIDGETS_EXPORT pqSignalAdaptorComboBox : public QObject
 {
   Q_OBJECT
   Q_CLASSINFO("Author", "$Author: clinton $")
-  Q_CLASSINFO("Revision", "$Revision: 1.2 $")
+  Q_CLASSINFO("Revision", "$Revision: 1.3 $")
   Q_PROPERTY(QString currentText READ currentText WRITE setCurrentText)
 public:
   /// constructor requires a QComboBox
