@@ -75,6 +75,9 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "ranlib: file: .+ has no symbols"
   "could not be inlined"
   "qt3/include/q"
+  ".include.QtCore"
+  "/usr/include/features"
+  "GUI/Widgets/Python/pqPythonStream"
   )
 
 SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
