@@ -347,11 +347,12 @@ void pqMainWindow::createStandardToolsMenu()
   QMenu* const menu = this->toolsMenu();
   
   QAction* compoundFilterAction = menu->addAction(tr("&Compound Filters..."))
-    << pqConnect(SIGNAL(triggered(bool)), this, SLOT(onOpenCompoundFilterWizard()))
-    << pqSetName("CompoundFilterAction");
+    << pqSetName("CompoundFilter")
+    << pqConnect(SIGNAL(triggered(bool)), this, SLOT(onOpenCompoundFilterWizard()));
   compoundFilterAction->setEnabled(false);
 
   menu->addAction(tr("&Link Editor..."))
+    << pqSetName("LinkEditor")
     << pqConnect(SIGNAL(triggered(bool)), this, SLOT(onOpenLinkEditor()));
 
   menu->addSeparator();
@@ -377,8 +378,11 @@ void pqMainWindow::createStandardToolsMenu()
 
 void pqMainWindow::createStandardPipelineBrowser(bool visible)
 {
-  QDockWidget* const pipeline_dock = new QDockWidget("Pipeline Inspector", this);
-  pipeline_dock->setObjectName("PipelineDock");
+  QDockWidget* const pipeline_dock = new QDockWidget("Pipeline Inspector", this)
+    << pqSetName("pipelineInspectorDock");
+    
+  pipeline_dock->toggleViewAction() << pqSetName("toggleView");
+    
   pipeline_dock->setAllowedAreas(
     Qt::LeftDockWidgetArea |
     Qt::RightDockWidgetArea);
@@ -399,8 +403,11 @@ void pqMainWindow::createStandardPipelineBrowser(bool visible)
 
 void pqMainWindow::createStandardObjectInspector(bool visible)
 {
-  QDockWidget* const object_inspector_dock = new QDockWidget("Object Inspector", this);
-  object_inspector_dock->setObjectName("InspectorDock");
+  QDockWidget* const object_inspector_dock = new QDockWidget("Object Inspector", this)
+    << pqSetName("objectInspectorDock");
+    
+  object_inspector_dock->toggleViewAction() << pqSetName("toggleView");
+    
   object_inspector_dock->setAllowedAreas(
       Qt::LeftDockWidgetArea |
       Qt::RightDockWidgetArea);
@@ -420,13 +427,16 @@ void pqMainWindow::createStandardObjectInspector(bool visible)
 
 void pqMainWindow::createStandardElementInspector(bool visible)
 {
-  this->Implementation->ElementInspectorDock = new QDockWidget("Element Inspector View", this);
-  this->Implementation->ElementInspectorDock->setObjectName("ElementInspectorDock");
-  this->Implementation->ElementInspectorDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
+  this->Implementation->ElementInspectorDock = new QDockWidget("Element Inspector View", this)
+    << pqSetName("elementInspectorDock");
+    
+  this->Implementation->ElementInspectorDock->toggleViewAction() << pqSetName("toggleView");
+    
   this->Implementation->ElementInspectorDock->setAllowedAreas(
     Qt::BottomDockWidgetArea |
     Qt::LeftDockWidgetArea |
     Qt::RightDockWidgetArea);
+  this->Implementation->ElementInspectorDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
 
   pqElementInspectorWidget* const element_inspector = new pqElementInspectorWidget(this->Implementation->ElementInspectorDock);
   this->Implementation->ElementInspectorDock->setWidget(element_inspector);
@@ -439,41 +449,53 @@ void pqMainWindow::createStandardVCRToolBar()
 {
   QToolBar* const toolbar = new QToolBar(tr("VCR Controls"), this)
     << pqSetName("VCRControlsToolBar");
+  
+  toolbar->toggleViewAction() << pqSetName("toggleView");
 
   pqPlayControlsWidget* const vcr_controls = new pqPlayControlsWidget(toolbar)
     << pqSetName("VCRControls");
   
   toolbar->addWidget(vcr_controls)
-    << pqSetName("foo");
+    << pqSetName("VCRControls");
 
-  this->addToolBar(Qt::TopToolBarArea, toolbar);
-  
   this->connect(vcr_controls, SIGNAL(first()), SLOT(onFirstTimeStep()));
   this->connect(vcr_controls, SIGNAL(back()), SLOT(onPreviousTimeStep()));
   this->connect(vcr_controls, SIGNAL(forward()), SLOT(onNextTimeStep()));
   this->connect(vcr_controls, SIGNAL(last()), SLOT(onLastTimeStep()));
+
+  this->addToolBar(Qt::TopToolBarArea, toolbar);
 }
 
 void pqMainWindow::createStandardVariableToolBar()
 {
-  this->Implementation->VariableSelectorToolBar = new QToolBar(tr("Variables"), this) << pqSetName("VariableSelectorToolBar");
-  this->addToolBar(Qt::TopToolBarArea, this->Implementation->VariableSelectorToolBar);
-  pqVariableSelectorWidget* varSelector = new pqVariableSelectorWidget(this->Implementation->VariableSelectorToolBar) << pqSetName("VariableSelector");
+  this->Implementation->VariableSelectorToolBar = new QToolBar(tr("Variables"), this)
+    << pqSetName("VariableSelectorToolBar");
+    
+  this->Implementation->VariableSelectorToolBar->toggleViewAction() << pqSetName("toggleView");
+  
+  pqVariableSelectorWidget* varSelector = new pqVariableSelectorWidget(this->Implementation->VariableSelectorToolBar)
+    << pqSetName("VariableSelector");
+    
   this->Implementation->VariableSelectorToolBar->addWidget(varSelector);
 
   this->connect(this->Implementation->PipelineList, SIGNAL(proxySelected(vtkSMProxy*)), this, SLOT(onUpdateVariableSelector(vtkSMProxy*)));
-  
   this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), this, SIGNAL(variableChanged(pqVariableType, const QString&)));
   this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), this, SLOT(onVariableChanged(pqVariableType, const QString&)));
+    
+  this->addToolBar(Qt::TopToolBarArea, this->Implementation->VariableSelectorToolBar);
 }
 
 void pqMainWindow::createStandardCompoundProxyToolBar()
 {
-  this->Implementation->CompoundProxyToolBar = new QToolBar(tr("Compound Proxies"), this) << pqSetName("CompoundProxyToolBar");
+  this->Implementation->CompoundProxyToolBar = new QToolBar(tr("Compound Proxies"), this)
+    << pqSetName("CompoundProxyToolBar");
+    
+  this->Implementation->CompoundProxyToolBar->toggleViewAction() << pqSetName("toggleView");
+  
   this->addToolBar(Qt::TopToolBarArea, this->Implementation->CompoundProxyToolBar);
   this->connect(this->Implementation->CompoundProxyToolBar, SIGNAL(actionTriggered(QAction*)), SLOT(onCreateCompoundProxy(QAction*)));
 
-  // Work around for file new crash.
+  // Workaround for file new crash.
   this->Implementation->PipelineList->setFocus();
 }
 
@@ -483,6 +505,8 @@ QMenu* pqMainWindow::fileMenu()
     {
     this->Implementation->FileMenu = this->menuBar()->addMenu(tr("&File"))
       << pqSetName("fileMenu");
+      
+    this->Implementation->FileMenu->menuAction() << pqSetName("menuAction");
     }
     
   return this->Implementation->FileMenu;
@@ -494,6 +518,8 @@ QMenu* pqMainWindow::viewMenu()
     {
     this->Implementation->ViewMenu = this->menuBar()->addMenu(tr("&View"))
       << pqSetName("viewMenu");
+      
+    this->Implementation->ViewMenu->menuAction() << pqSetName("menuAction");
     }
     
   return this->Implementation->ViewMenu;
@@ -505,6 +531,8 @@ QMenu* pqMainWindow::serverMenu()
     {
     this->Implementation->ServerMenu = this->menuBar()->addMenu(tr("&Server"))
       << pqSetName("serverMenu");
+      
+    this->Implementation->ServerMenu->menuAction() << pqSetName("menuAction");
     }
     
   return this->Implementation->ServerMenu;
@@ -516,6 +544,8 @@ QMenu* pqMainWindow::sourcesMenu()
     {
     this->Implementation->SourcesMenu = this->menuBar()->addMenu(tr("&Sources"))
       << pqSetName("sourcesMenu");
+
+    this->Implementation->SourcesMenu->menuAction() << pqSetName("menuAction");
     }
     
   return this->Implementation->SourcesMenu;
@@ -527,6 +557,8 @@ QMenu* pqMainWindow::filtersMenu()
     {
     this->Implementation->FiltersMenu = this->menuBar()->addMenu(tr("&Filters"))
       << pqSetName("filtersMenu");
+
+    this->Implementation->FiltersMenu->menuAction() << pqSetName("menuAction");
     }
     
   return this->Implementation->FiltersMenu;
@@ -538,6 +570,8 @@ QMenu* pqMainWindow::toolsMenu()
     {
     this->Implementation->ToolsMenu = this->menuBar()->addMenu(tr("&Tools"))
       << pqSetName("toolsMenu");
+
+    this->Implementation->ToolsMenu->menuAction() << pqSetName("menuAction");
     }
     
   return this->Implementation->ToolsMenu;
@@ -549,6 +583,8 @@ QMenu* pqMainWindow::helpMenu()
     {
     this->Implementation->HelpMenu = this->menuBar()->addMenu(tr("&Help"))
       << pqSetName("helpMenu");
+
+    this->Implementation->HelpMenu->menuAction() << pqSetName("menuAction");
     }
     
   return this->Implementation->HelpMenu;
@@ -959,7 +995,7 @@ void pqMainWindow::onUpdateSourcesFiltersMenu(pqServer*)
 
   // Update the menu items for the server and compound filters too.
   QAction* compoundFilterAction = this->Implementation->ToolsMenu->findChild<QAction*>(
-      "CompoundFilterAction");
+      "CompoundFilter");
   compoundFilterAction->setEnabled(this->Implementation->CurrentServer);
   this->Implementation->ServerDisconnectAction->setEnabled(this->Implementation->CurrentServer);
 

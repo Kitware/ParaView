@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAction>
 #include <QHeaderView>
 #include <QLayout>
+#include <QScrollBar>
 #include <QSet>
 #include <QSignalMapper>
 #include <QStandardItemModel>
@@ -76,7 +77,13 @@ static bool ValidateName(QObject& Object)
     return false;
     }
 
-  // Skip some weird docking implementation widgets ...
+  // Skip scrollbars ...
+  if(qobject_cast<QScrollBar*>(&Object))
+    {
+    return false;
+    }
+
+  // Skip some weird dockwindow implementation widgets ...
   if(
     class_name == "QDockSeparator"
     || class_name == "QDockWidgetSeparator"
