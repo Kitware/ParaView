@@ -721,6 +721,7 @@ void pqMainWindow::onFileOpen()
     pqServerBrowser* const server_browser = new pqServerBrowser(this);
     server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
     QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, SLOT(onFileOpen(pqServer*)));
+    server_browser->setModal(true);
     server_browser->show();
     }
   else
@@ -967,6 +968,7 @@ void pqMainWindow::onServerConnect()
   pqServerBrowser* const server_browser = new pqServerBrowser(this);
   server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
   QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, SLOT(onServerConnect(pqServer*)));
+  server_browser->setModal(true);
   server_browser->show();
 }
 
