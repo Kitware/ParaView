@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 #include "pqSMProxy.h"
 #include "pqPipelineData.h"
+#include "pqParts.h"
 
 class pqDisplayProxyEditorInternal : public Ui::pqDisplayProxyEditor
 {
@@ -74,6 +75,7 @@ pqDisplayProxyEditor::pqDisplayProxyEditor(QWidget* p)
 {
   this->Internal = new pqDisplayProxyEditorInternal;
   this->Internal->setupUi(this);
+
 }
 /// destructor
 pqDisplayProxyEditor::~pqDisplayProxyEditor()
@@ -82,7 +84,7 @@ pqDisplayProxyEditor::~pqDisplayProxyEditor()
 }
 
 /// set the proxy to display properties for
-void pqDisplayProxyEditor::setDisplayProxy(pqSMProxy display, pqSMProxy sourceProxy)
+void pqDisplayProxyEditor::setDisplayProxy(vtkSMDisplayProxy* display, pqSMProxy sourceProxy)
 {
   if(this->DisplayProxy == display)
     {
@@ -100,9 +102,27 @@ void pqDisplayProxyEditor::setDisplayProxy(pqSMProxy display, pqSMProxy sourcePr
                                              this->DisplayProxy->GetProperty("Visibility"));
     QObject::disconnect(this->Internal->ViewData, SIGNAL(stateChanged(int)),
                         this, SLOT(updateView()));
+
+    // clean up color by array
+    QObject::disconnect(this->Internal->ColorBy, SIGNAL(currentIndexChanged(const QString&)),
+                     this, SLOT(colorByChanged(const QString&)));
+    this->Internal->ColorBy->clear();
+
+    // clean up actor color
+    QObject* signalAdaptor = this->Internal->ColorActorColor->findChild<QObject*>("ActorColorAdaptor");
+    if(signalAdaptor)
+      {
+      this->Internal->Links->removePropertyLink(signalAdaptor,
+                                             "chosenColor",
+                                             SIGNAL(colorChanged(const QVariant&)),
+                                             this->DisplayProxy,
+                                             this->DisplayProxy->GetProperty("Color"));
+      delete signalAdaptor;
+      }
+
     
     // clean up representation
-    QObject* signalAdaptor = this->Internal->StyleRepresentation->findChild<QObject*>("StyleRepresentationAdapator");
+    signalAdaptor = this->Internal->StyleRepresentation->findChild<QObject*>("StyleRepresentationAdapator");
     if(signalAdaptor)
       {
       this->Internal->Links->removePropertyLink(signalAdaptor,
@@ -271,11 +291,8 @@ void pqDisplayProxyEditor::setDisplayProxy(pqSMProxy display, pqSMProxy sourcePr
                      this, SLOT(updateView()));
     }
   
-  if(vtkSMDisplayProxy::SafeDownCast(display))
-    {
-    this->DisplayProxy = display;
-    this->SourceProxy = sourceProxy;
-    }
+  this->DisplayProxy = display;
+  this->SourceProxy = sourceProxy;
 
   if(this->DisplayProxy)
     {
@@ -289,7 +306,36 @@ void pqDisplayProxyEditor::setDisplayProxy(pqSMProxy display, pqSMProxy sourcePr
                                            this->DisplayProxy->GetProperty("Visibility"));
     QObject::connect(this->Internal->ViewData, SIGNAL(stateChanged(int)),
                      this, SLOT(updateView()));
-    
+
+
+    // set color by array
+    this->Internal->ColorBy->addItems(pqPart::GetColorFields(this->DisplayProxy));
+    QString currentArray = pqPart::GetColorField(this->DisplayProxy);
+    this->Internal->ColorBy->setCurrentIndex(this->Internal->ColorBy->findText(currentArray));
+    if(currentArray == "Property")
+      {
+      this->Internal->ColorActorColor->setEnabled(true);
+      }
+    else
+      {
+      this->Internal->ColorActorColor->setEnabled(false);
+      }
+    QObject::connect(this->Internal->ColorBy, SIGNAL(currentIndexChanged(const QString&)),
+                     this, SLOT(colorByChanged(const QString&)));
+
+    // set up actor color
+    QObject* signalAdaptor = new pqSignalAdaptorColor(this->Internal->ColorActorColor, 
+                                                      "chosenColor",
+                                                      SIGNAL(chosenColorChanged(const QColor&)));
+    signalAdaptor->setObjectName("ActorColorAdaptor");
+    this->Internal->Links->addPropertyLink(signalAdaptor,
+                                           "color",
+                                           SIGNAL(colorChanged(const QVariant&)),
+                                           this->DisplayProxy,
+                                           this->DisplayProxy->GetProperty("Color"));
+    QObject::connect(signalAdaptor, SIGNAL(colorChanged(const QVariant&)),
+                     this, SLOT(updateView()));
+
 
     // setup for representation
     QList<QVariant> items = pqSMAdaptor::getEnumerationPropertyDomain(
@@ -298,7 +344,7 @@ void pqDisplayProxyEditor::setDisplayProxy(pqSMProxy display, pqSMProxy sourcePr
       {
       this->Internal->StyleRepresentation->addItem(item.toString());
       }
-    QObject* signalAdaptor = new pqSignalAdaptorComboBox(this->Internal->StyleRepresentation);
+    signalAdaptor = new pqSignalAdaptorComboBox(this->Internal->StyleRepresentation);
     signalAdaptor->setObjectName("StyleRepresentationAdapator");
     this->Internal->Links->addPropertyLink(signalAdaptor,
                                            "currentText",
@@ -472,7 +518,7 @@ void pqDisplayProxyEditor::setDisplayProxy(pqSMProxy display, pqSMProxy sourcePr
 }
 
 /// get the proxy for which properties are displayed
-pqSMProxy pqDisplayProxyEditor::displayProxy()
+vtkSMDisplayProxy* pqDisplayProxyEditor::displayProxy()
 {
   return this->DisplayProxy;
 }
@@ -485,4 +531,20 @@ void pqDisplayProxyEditor::updateView()
     widget->update();
     }
 }
+
+void pqDisplayProxyEditor::colorByChanged(const QString& val)
+{
+  if(val == "Property")
+    {
+    this->Internal->ColorActorColor->setEnabled(true);
+    pqPart::Color(this->DisplayProxy, NULL, 0);
+    }
+  else
+    {
+    this->Internal->ColorActorColor->setEnabled(false);
+    pqPart::SetColorField(this->DisplayProxy, val);
+    }
+  this->updateView();
+}
+
 

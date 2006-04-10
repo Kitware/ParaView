@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqParts_h
 
 #include "pqWidgetsExport.h"
+#include <QList>
+#include <QString>
 
 class vtkSMRenderModuleProxy;
 class vtkSMDisplayProxy;
@@ -58,6 +60,14 @@ public:
 
   /// color the part by a specific field, if fieldname is NULL, colors by actor color
   static void Color(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype);
+  
+  /// get the names of the arrays that a part may be colored by
+  static QList<QString> GetColorFields(vtkSMDisplayProxy* Part);
+  /// set the array to color the part by
+  static void SetColorField(vtkSMDisplayProxy* Part, const QString& field);
+  /// get the array the part is colored by
+  static QString GetColorField(vtkSMDisplayProxy* Part);
+
 };
 
 #endif //_pqParts_h

@@ -34,8 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqDisplayProxyEditor_h
 
 #include <QWidget>
-#include "pqSMProxy.h"
 #include "pqWidgetsExport.h"
+#include "pqSMProxy.h"
+class vtkSMDisplayProxy;
 
 class pqDisplayProxyEditorInternal;
 
@@ -50,19 +51,20 @@ public:
   ~pqDisplayProxyEditor();
 
   /// set the proxy to display properties for  TODO: fix pqPipelineData so we don't need the sourceProxy
-  void setDisplayProxy(pqSMProxy displayProxy, pqSMProxy sourceProxy);
+  void setDisplayProxy(vtkSMDisplayProxy* displayProxy, pqSMProxy sourceProxy);
   /// get the proxy for which properties are displayed
-  pqSMProxy displayProxy();
+  vtkSMDisplayProxy* displayProxy();
 
 protected slots:
 
   /// internally used to update the graphics window when a property changes
   void updateView();
+  void colorByChanged(const QString& val);
   
 protected:
 
   // the display proxy
-  pqSMProxy DisplayProxy;
+  vtkSmartPointer<vtkSMDisplayProxy> DisplayProxy;
   // the source proxy for the display (TODO remove this when pqPipeLineData can do it for us)
   pqSMProxy SourceProxy;
   pqDisplayProxyEditorInternal* Internal;
