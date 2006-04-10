@@ -677,9 +677,14 @@ void pqSMAdaptor::setMultipleElementProperty(vtkSMProxy* Proxy, vtkSMProperty* P
 
   for(i=0; i<num; i++)
     {
-    pqSMAdaptor::setMultipleElementProperty(Proxy, Property, i, Value[i]);
+    QVariant val = Value[i];
+    if(val.type() == QVariant::Bool)
+      {
+      val = val.toInt();
+      }
+    adaptor->SetRangeValue(i, val.toString().toAscii().data());
     }
-
+  Proxy->UpdateVTKObjects();
   adaptor->Delete();
 }
 

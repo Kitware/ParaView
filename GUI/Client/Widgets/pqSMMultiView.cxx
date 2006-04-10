@@ -192,6 +192,7 @@ QVTKWidget *ParaQ::AddQVTKWidget(pqMultiViewFrame *frame, QWidget *topWidget,
   axes->SetViewport(0,0,0.25,0.25);
   axes->SetInteractor(iren);
   axes->SetEnabled(1);
+  axes->SetInteractive(0);
 
   vtkPiggyBackDelete* del = vtkPiggyBackDelete::New();
   del->AddRider(axes);

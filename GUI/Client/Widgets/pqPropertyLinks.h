@@ -55,11 +55,11 @@ public:
 
   /// link a property
   void addPropertyLink(QObject* qObject, const char* qProperty, const char* signal,
-                       vtkSMProxy* Proxy, vtkSMProperty* Property, int Index=0);
+                       vtkSMProxy* Proxy, vtkSMProperty* Property, int Index=-1);
   
   /// un-link a property
   void removePropertyLink(QObject* qObject, const char* qProperty, const char* signal,
-                          vtkSMProxy* Proxy, vtkSMProperty* Property, int Index=0);
+                          vtkSMProxy* Proxy, vtkSMProperty* Property, int Index=-1);
 
   /// TODO: domain change events
   /// TODO: do domain changes possibly affect our links?

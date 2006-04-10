@@ -372,16 +372,6 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1" colspan="2" >
-       <widget class="QPushButton" name="ColorActorColor" >
-        <property name="enabled" >
-         <bool>false</bool>
-        </property>
-        <property name="text" >
-         <string>Actor Color...</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="1" colspan="2" >
        <widget class="QComboBox" name="ColorBy" >
         <property name="enabled" >
@@ -396,6 +386,16 @@
         </property>
         <property name="text" >
          <string>Edit Color Map...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="2" >
+       <widget class="pqColorChooserButton" name="ColorActorColor" >
+        <property name="enabled" >
+         <bool>true</bool>
+        </property>
+        <property name="text" >
+         <string>Actor Color...</string>
         </property>
        </widget>
       </item>
@@ -489,6 +489,15 @@
   </layout>
  </widget>
  <pixmapfunction></pixmapfunction>
+ <customwidgets>
+  <customwidget>
+   <class>pqColorChooserButton</class>
+   <extends>QPushButton</extends>
+   <header>pqColorChooserButton.h</header>
+   <container>0</container>
+   <pixmap></pixmap>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>ViewData</tabstop>
   <tabstop>ViewZoomToData</tabstop>

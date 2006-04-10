@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 #include "vtkSMDisplayProxy.h"
 #include "pqDisplayProxyEditor.h"
+#include "pqRenderViewEditor.h"
 
 
 pqPipelineListWidget::pqPipelineListWidget(QWidget *p)
@@ -326,6 +327,11 @@ void pqPipelineListWidget::doViewContextMenu(const QPoint& position)
   QModelIndex selection = this->TreeView->currentIndex();
   if(selection.isValid())
     {
+    QWidget* topParent = this;
+    while(topParent->parentWidget())
+      {
+      topParent = topParent->parentWidget();
+      }
     pqPipelineListModel::ItemType type = this->ListModel->getTypeFor(selection);
     if(type == pqPipelineListModel::Source ||
        type == pqPipelineListModel::Filter ||
@@ -341,12 +347,33 @@ void pqPipelineListWidget::doViewContextMenu(const QPoint& position)
         QAction* action = menu.exec(this->TreeView->mapToGlobal(position));
         if(action && action->text() == DisplaySettingString)
           {
-          QDialog* dialog = new QDialog;
-          dialog->setWindowFlags(Qt::WindowStaysOnTopHint);
+          QDialog* dialog = new QDialog(topParent);
           dialog->setWindowTitle("Display Settings");
           QHBoxLayout* l = new QHBoxLayout(dialog);
           pqDisplayProxyEditor* editor = new pqDisplayProxyEditor(dialog);
           editor->setDisplayProxy(display, po->GetProxy());
+          l->addWidget(editor);
+          dialog->show();
+          }
+        }
+      }
+    else if(type == pqPipelineListModel::Window)
+      {
+      QWidget* widget = this->ListModel->getWidgetFor(selection);
+      vtkSMRenderModuleProxy* pw = pqPipelineData::instance()->getRenderModule(qobject_cast<QVTKWidget*>(widget));
+      if(pw)
+        {
+        static const char* ViewSettingString = "View Settings...";
+        QMenu menu;
+        menu.addAction(ViewSettingString);
+        QAction* action = menu.exec(this->TreeView->mapToGlobal(position));
+        if(action && action->text() == ViewSettingString)
+          {
+          QDialog* dialog = new QDialog(topParent);
+          dialog->setWindowTitle("View Settings");
+          QHBoxLayout* l = new QHBoxLayout(dialog);
+          pqRenderViewEditor* editor = new pqRenderViewEditor(dialog);
+          editor->setRenderView(pw);
           l->addWidget(editor);
           dialog->show();
           }

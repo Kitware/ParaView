@@ -198,10 +198,21 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged() const
       break;
       case pqSMAdaptor::MULTIPLE_ELEMENTS:
         {
-        prop = pqSMAdaptor::getMultipleElementProperty(this->Internal->Proxy, this->Internal->Property, this->Internal->Index);
-        if(prop != old)
+        if(this->Internal->Index == -1)
           {
-          this->Internal->QtObject->setProperty(this->Internal->QtProperty, prop);
+          prop = pqSMAdaptor::getMultipleElementProperty(this->Internal->Proxy, this->Internal->Property);
+          if(prop != old)
+            {
+            this->Internal->QtObject->setProperty(this->Internal->QtProperty, prop);
+            }
+          }
+        else
+          {
+          prop = pqSMAdaptor::getMultipleElementProperty(this->Internal->Proxy, this->Internal->Property, this->Internal->Index);
+          if(prop != old)
+            {
+            this->Internal->QtObject->setProperty(this->Internal->QtProperty, prop);
+            }
           }
         }
       break;
@@ -241,10 +252,21 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
       break;
       case pqSMAdaptor::MULTIPLE_ELEMENTS:
         {
-        old = pqSMAdaptor::getMultipleElementProperty(this->Internal->Proxy, this->Internal->Property, this->Internal->Index);
-        if(prop != old)
+        if(this->Internal->Index == -1)
           {
-          pqSMAdaptor::setMultipleElementProperty(this->Internal->Proxy, this->Internal->Property, this->Internal->Index, prop);
+          old = pqSMAdaptor::getMultipleElementProperty(this->Internal->Proxy, this->Internal->Property);
+          if(prop != old)
+            {
+            pqSMAdaptor::setMultipleElementProperty(this->Internal->Proxy, this->Internal->Property, prop.toList());
+            }
+          }
+        else
+          {
+          old = pqSMAdaptor::getMultipleElementProperty(this->Internal->Proxy, this->Internal->Property, this->Internal->Index);
+          if(prop != old)
+            {
+            pqSMAdaptor::setMultipleElementProperty(this->Internal->Proxy, this->Internal->Property, this->Internal->Index, prop);
+            }
           }
         }
       break;

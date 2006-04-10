@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes
 #include <QComboBox>
+#include <QSlider>
 
 
 pqSignalAdaptorComboBox::pqSignalAdaptorComboBox(QComboBox* p)
@@ -53,5 +54,78 @@ void pqSignalAdaptorComboBox::setCurrentText(const QString& text)
 {
   QComboBox* combo = static_cast<QComboBox*>(this->parent());
   combo->setCurrentIndex(combo->findText(text));
+}
+
+pqSignalAdaptorColor::pqSignalAdaptorColor(QObject* p, 
+              const char* colorProperty, const char* signal)
+  : QObject(p), PropertyName(colorProperty)
+{
+  // assumes signal named after property 
+  QObject::connect(p, signal,
+                   this, SLOT(handleColorChanged()));
+}
+
+QVariant pqSignalAdaptorColor::color() const
+{
+  QColor col = this->parent()->property(this->PropertyName).value<QColor>();
+  QList<QVariant> rgba;
+  if(col.isValid())
+    {
+    rgba.append(col.red() / 255.0);
+    rgba.append(col.green() / 255.0);
+    rgba.append(col.blue() / 255.0);
+    rgba.append(col.alpha() / 255.0);
+    }
+  return rgba;
+}
+
+void pqSignalAdaptorColor::setColor(const QVariant& var)
+{
+  QColor col;
+  QList<QVariant> rgba = var.toList();
+  if(rgba.size() >= 3)
+    {
+    int r = qRound(rgba[0].toDouble() * 255.0);
+    int g = qRound(rgba[1].toDouble() * 255.0);
+    int b = qRound(rgba[2].toDouble() * 255.0);
+    int a = 255;
+    if(rgba.size() == 4)
+      {
+      a = qRound(rgba[3].toDouble() * 255.0);
+      }
+    this->parent()->setProperty(this->PropertyName, QColor(r,g,b,a));
+    }
+}
+
+void pqSignalAdaptorColor::handleColorChanged()
+{
+  QVariant col = this->color();
+  emit this->colorChanged(col);
+}
+
+pqSignalAdaptorSliderRange::pqSignalAdaptorSliderRange(QSlider* p)
+  : QObject(p)
+{
+  QObject::connect(p, SIGNAL(valueChanged(int)), 
+                   this, SLOT(handleValueChanged()));
+}
+
+double pqSignalAdaptorSliderRange::value() const
+{
+  QSlider* slider = static_cast<QSlider*>(this->parent());
+  double factor = slider->maximum() - slider->minimum();
+  return slider->value() / factor;
+}
+
+void pqSignalAdaptorSliderRange::setValue(double val)
+{
+  QSlider* slider = static_cast<QSlider*>(this->parent());
+  double factor = slider->maximum() - slider->minimum();
+  slider->setValue(qRound(val * factor));
+}
+
+void pqSignalAdaptorSliderRange::handleValueChanged()
+{
+  emit this->valueChanged(this->value());
 }
 

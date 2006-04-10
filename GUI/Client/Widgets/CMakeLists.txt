@@ -45,6 +45,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineListModel.h
   pqPipelineListWidget.h
   pqPropertyLinks.h
+  pqRenderViewEditor.h
   pqSMAdaptor.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
@@ -57,6 +58,7 @@ SET(UI_FORMS
   pqDisplayProxyEditor.ui
   pqMultiViewFrameMenu.ui
   pqOutputWindow.ui
+  pqRenderViewEditor.ui
   pqServerBrowser.ui
 )
 
@@ -139,6 +141,8 @@ ADD_LIBRARY(pqWidgets
   pqProcessModuleGUIHelper.h
   pqRenderViewProxy.cxx
   pqRenderViewProxy.h
+  pqRenderViewEditor.cxx
+  pqRenderViewEditor.h
   pqPropertyLinks.cxx
   pqPropertyLinks.h
   pqSMAdaptor.cxx
