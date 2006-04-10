@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqAbstractButtonEventTranslator.h"
+#include "pqAbstractItemViewEventTranslator.h"
 #include "pqAbstractSliderEventTranslator.h"
 #include "pqComboBoxEventTranslator.h"
 #include "pqDoubleSpinBoxEventTranslator.h"
@@ -81,6 +82,7 @@ pqEventTranslator::~pqEventTranslator()
 void pqEventTranslator::addDefaultWidgetEventTranslators()
 {
   addWidgetEventTranslator(new pqAbstractButtonEventTranslator());
+  addWidgetEventTranslator(new pqAbstractItemViewEventTranslator());
   addWidgetEventTranslator(new pqAbstractSliderEventTranslator());
   addWidgetEventTranslator(new pqComboBoxEventTranslator());
   addWidgetEventTranslator(new pqDoubleSpinBoxEventTranslator());

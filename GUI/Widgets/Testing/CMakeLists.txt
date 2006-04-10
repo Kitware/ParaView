@@ -13,6 +13,7 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqAbstractButtonEventTranslator.h
+  pqAbstractItemViewEventTranslator.h
   pqAbstractSliderEventTranslator.h
   pqComboBoxEventTranslator.h
   pqDoubleSpinBoxEventTranslator.h
@@ -44,6 +45,10 @@ ADD_LIBRARY(QtTesting
   pqAbstractDoubleEventPlayer.h
   pqAbstractIntEventPlayer.cxx
   pqAbstractIntEventPlayer.h
+  pqAbstractItemViewEventPlayer.cxx
+  pqAbstractItemViewEventPlayer.h
+  pqAbstractItemViewEventTranslator.cxx
+  pqAbstractItemViewEventTranslator.h
   pqAbstractSliderEventTranslator.cxx
   pqAbstractSliderEventTranslator.h
   pqAbstractStringEventPlayer.cxx
