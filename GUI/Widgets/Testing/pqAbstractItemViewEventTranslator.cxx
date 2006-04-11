@@ -80,7 +80,7 @@ bool pqAbstractItemViewEventTranslator::translateEvent(QObject* Object, QEvent* 
   return true;
 }
 
-void pqAbstractItemViewEventTranslator::onCurrentChanged(const QModelIndex& current, const QModelIndex& previous)
+void pqAbstractItemViewEventTranslator::onCurrentChanged(const QModelIndex& current, const QModelIndex& /*previous*/)
 {
   emit recordEvent(this->CurrentObject, "currentChanged", str(current));
 }
