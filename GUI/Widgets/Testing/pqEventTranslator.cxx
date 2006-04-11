@@ -134,7 +134,7 @@ void pqEventTranslator::onRecordEvent(QObject* Object, const QString& Command, c
   QString name = Object->objectName();
   if(name.isEmpty())
     {
-    qWarning() << "Cannot record event for unnamed object " << Object;
+    qCritical() << "Cannot record event for unnamed object " << Object;
     return;
     }
   
@@ -142,7 +142,7 @@ void pqEventTranslator::onRecordEvent(QObject* Object, const QString& Command, c
     {
     if(p->objectName().isEmpty())
       {
-      qWarning() << "Cannot record event for incompletely-named object " << Object;
+      qCritical() << "Cannot record event for incompletely-named object " << Object;
       return;
       }
       
