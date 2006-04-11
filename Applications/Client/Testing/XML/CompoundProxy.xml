@@ -2,7 +2,7 @@
 <pqevents>
   <pqevent object="mainWindow/menuBar/serverMenu/Connect" command="activate" arguments="" />
   <pqevent object="mainWindow/serverBrowser/layoutWidget_3/okButton" command="activate" arguments="" />
-  <pqevent object="mainWindow/menuBar/toolsMenu/CompoundFilterAction" command="activate" arguments="" />
+  <pqevent object="mainWindow/menuBar/toolsMenu/CompoundFilter" command="activate" arguments="" />
   <pqevent object="mainWindow/pqCompoundProxyWizard/LoadButton" command="activate" arguments="" />
   <pqevent object="mainWindow/pqCompoundProxyWizard/fileOpenDialog/fileName" command="set_string" arguments="Testing/XML/filters.xml" />
   <pqevent object="mainWindow/pqCompoundProxyWizard/fileOpenDialog/buttonOk" command="activate" arguments="" />
