@@ -243,6 +243,9 @@ pqMainWindow::pqMainWindow() :
 
   this->menuBar() << pqSetName("menuBar");
 
+  // Register ourselves with the regression test system as a top-level window.
+  pqObjectNaming::AddTopLevel(*this);
+
   // Set up the main ParaQ items along with the central widget.
   this->Implementation->Adaptor = new pqSMAdaptor();
   this->Implementation->Pipeline = new pqPipelineData(this);
@@ -1233,7 +1236,8 @@ void pqMainWindow::onPlayTest()
 
 void pqMainWindow::onPlayTest(const QStringList& Files)
 {
-  pqEventPlayer player(*this);
+  pqEventPlayer player;
+//  player.addWidgetEventPlayer(new pqPipelineListWidgetPlayer());
   player.addDefaultWidgetEventPlayers();
 
   for(int i = 0; i != Files.size(); ++i)

@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QApplication>
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.2");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.3");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper()
 {
@@ -100,7 +100,7 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
 
       if (options->GetTestFileName())
         {
-        pqEventPlayer player(*this->Window);
+        pqEventPlayer player;
         player.addDefaultWidgetEventPlayers();
         pqEventPlayerXML xml_player;
         status = !xml_player.playXML(player, options->GetTestFileName());
