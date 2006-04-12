@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRecordEventsDialog.h"
 #include "pqEventPlayer.h"
 #include "pqEventPlayerXML.h"
+#include "pqObjectNaming.h"
 #include "vtkIOStream.h"
 #include "vtkstd/algorithm"
 
@@ -54,7 +55,7 @@ const arguments_t handleTestCases(const arguments_t& Arguments, QObject& RootObj
     {
     if(*argument == "--run-test" && ++argument != Arguments.end())
       {
-      pqEventPlayer player(RootObject);
+      pqEventPlayer player;
       player.addDefaultWidgetEventPlayers();
 
       pqEventPlayerXML xml_player;
@@ -119,6 +120,8 @@ int main(int argc, char** argv)
   mv.resize(400, 300);
   mv.show();
   
+  pqObjectNaming::AddTopLevel(mv);
+  
   QTextEdit* te1 = new QTextEdit;
   QTextEdit* te2 = new QTextEdit;
   pqMultiView::Index idx;
@@ -132,6 +135,8 @@ int main(int argc, char** argv)
   mv2.resize(600, 400);
   mv2.setObjectName("multiviewtest");
   mv2.show();
+  
+  pqObjectNaming::AddTopLevel(mv2);
   
   QCoreApplication::processEvents();
   
