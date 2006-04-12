@@ -76,8 +76,9 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "could not be inlined"
   "qt3/include/q"
   ".include.QtCore"
-  "/usr/include/features"
+  "include/features.h"
   "GUI/Widgets/Python/pqPythonStream"
+  "python.+/pyconfig.h"
   )
 
 SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
