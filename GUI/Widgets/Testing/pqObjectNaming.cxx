@@ -104,6 +104,18 @@ static bool ValidateName(QObject& Object)
   return true;
 }
 
+/// Stores the global list of top-level Qt objects
+typedef QSet<QObject*> TopLevelObjectsT;
+static TopLevelObjectsT TopLevelObjects;
+
+/////////////////////////////////////////////////////////////////////////////
+// pqObjectNaming
+
+void pqObjectNaming::AddTopLevel(QObject& Object)
+{
+  TopLevelObjects.insert(&Object);
+}
+
 bool pqObjectNaming::Validate(QObject& Parent)
 {
   const QString name = Parent.objectName();
@@ -156,4 +168,54 @@ bool pqObjectNaming::Validate(QObject& Parent, const QString& Path)
     }
   
   return result;
+}
+
+const QString pqObjectNaming::GetName(QObject& Object)
+{
+  QString name = Object.objectName();
+  if(name.isEmpty())
+    {
+    qCritical() << "Cannot record event for unnamed object " << &Object;
+    return QString();
+    }
+  
+  for(QObject* p = Object.parent(); p; p = p->parent())
+    {
+    if(p->objectName().isEmpty())
+      {
+      qCritical() << "Cannot record event for incompletely-named object " << name << " " << &Object << " with parent " << p;
+      return QString();
+      }
+      
+    name = p->objectName() + "/" + name;
+    
+    if(!p->parent() && !TopLevelObjects.contains(p))
+      {
+      qCritical() << "Top level object " << p << " not registered\n";
+      return QString();
+      }
+    }
+
+  return name;
+}
+
+
+QObject* pqObjectNaming::GetObject(const QString& Name)
+{
+  /// Given a slash-delimited "path", lookup a Qt object hierarchically
+  for(TopLevelObjectsT::const_iterator root = TopLevelObjects.begin(); root != TopLevelObjects.end(); ++root)
+    {
+    QObject* object = *root;
+    const QStringList paths = Name.split("/");
+    for(int i = 1; i < paths.size(); ++i) // Note - we're ignoring the top-level path, since it already represents the root node
+      {
+      if(object)
+        object = object->findChild<QObject*>(paths[i]);
+      }
+      
+    if(object)
+      return object;
+    }
+  
+  return 0;
 }

@@ -35,7 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqWidgetEventTranslator.h"
 
+class QAbstractItemView;
 class QModelIndex;
+class QPoint;
 
 /// Translates low-level Qt slider events into high-level ParaQ events that can be recorded as test cases
 class pqAbstractItemViewEventTranslator :
@@ -52,10 +54,11 @@ private:
   pqAbstractItemViewEventTranslator(const pqAbstractItemViewEventTranslator&);
   pqAbstractItemViewEventTranslator& operator=(const pqAbstractItemViewEventTranslator&);
 
-  QObject* CurrentObject;
+  QAbstractItemView* CurrentObject;
   
 private slots:
   void onCurrentChanged(const QModelIndex&, const QModelIndex&);
+  void onCustomContextMenuRequested(const QPoint&);
 };
 
 #endif // !_pqAbstractItemViewEventTranslator_h

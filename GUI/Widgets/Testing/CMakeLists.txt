@@ -35,6 +35,7 @@ QT4_WRAP_UI(UI_BUILT_SOURCES
 )
 
 ADD_LIBRARY(QtTesting
+  QtTestingExport.h
   pqAbstractActivateEventPlayer.cxx
   pqAbstractActivateEventPlayer.h
   pqAbstractBooleanEventPlayer.cxx
@@ -81,9 +82,10 @@ ADD_LIBRARY(QtTesting
   pqRecordEventsDialog.h
   pqSpinBoxEventTranslator.cxx
   pqSpinBoxEventTranslator.h
+  pqTesting.cxx
+  pqTesting.h
   pqWidgetEventPlayer.h
   pqWidgetEventTranslator.h
-  QtTestingExport.h
   ${MOC_BUILT_SOURCES}
   ${UI_BUILT_SOURCES}
 )

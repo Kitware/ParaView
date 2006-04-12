@@ -31,8 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqAbstractActivateEventPlayer.h"
+#include "pqTesting.h"
 
 #include <QAction>
+#include <QApplication>
+#include <QKeyEvent>
+#include <QMenu>
 #include <QPushButton>
 #include <QtDebug>
 
@@ -47,6 +51,19 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object, const QString& Co
 
   if(QAction* const object = qobject_cast<QAction*>(Object))
     {
+    if(QMenu* const menu = qobject_cast<QMenu*>(object->parent()))
+      {
+      menu->setActiveAction(object);
+
+      pqTesting::NonBlockingSleep(1000);
+
+      QKeyEvent key_press(QEvent::KeyPress, Qt::Key_Escape, 0);
+      QApplication::sendEvent(menu, &key_press);
+
+      QKeyEvent key_release(QEvent::KeyRelease, Qt::Key_Escape, 0);
+      QApplication::sendEvent(menu, &key_release);
+      }
+      
     object->activate(QAction::Trigger);
     return true;
     }

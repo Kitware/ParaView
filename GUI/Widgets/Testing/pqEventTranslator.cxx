@@ -35,11 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAbstractSliderEventTranslator.h"
 #include "pqComboBoxEventTranslator.h"
 #include "pqDoubleSpinBoxEventTranslator.h"
+#include "pqEventTranslator.h"
 #include "pqLineEditEventTranslator.h"
 #include "pqMenuEventTranslator.h"
+#include "pqObjectNaming.h"
 #include "pqSpinBoxEventTranslator.h"
-
-#include "pqEventTranslator.h"
 
 #include <QCoreApplication>
 #include <QtDebug>
@@ -131,25 +131,10 @@ void pqEventTranslator::onRecordEvent(QObject* Object, const QString& Command, c
   if(this->Implementation->IgnoredObjects.contains(Object))
     return;
 
-  QString name = Object->objectName();
+  const QString name = pqObjectNaming::GetName(*Object);
   if(name.isEmpty())
-    {
-    qCritical() << "Cannot record event for unnamed object " << Object;
     return;
-    }
-  
-  for(QObject* p = Object->parent(); p; p = p->parent())
-    {
-    if(p->objectName().isEmpty())
-      {
-      qCritical() << "Cannot record event for incompletely-named object " << Object;
-      return;
-      }
-      
-    name = p->objectName() + "/" + name;
-    }
-  
-  // qDebug() << "Event: " << name << " " << Command << " " << Arguments;
+    
+//  qDebug() << "Event: " << name << " " << Command << " " << Arguments;
   emit recordEvent(name, Command, Arguments);
 }
-

@@ -36,35 +36,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAbstractIntEventPlayer.h"
 #include "pqAbstractItemViewEventPlayer.h"
 #include "pqAbstractStringEventPlayer.h"
-
 #include "pqEventPlayer.h"
+#include "pqObjectNaming.h"
 
 #include <QApplication>
 #include <QObject>
 #include <QStringList>
 #include <QtDebug>
 
-namespace
-{
-
-/// Given a slash-delimited "path", lookup a Qt object hierarchically
-QObject* pqFindObjectByTree(QObject& Root, const QString& Path)
-{
-  QObject* object = &Root;
-  const QStringList paths = Path.split("/");
-  for(int i = 1; i < paths.size(); ++i) // Note - we're ignoring the top-level path, since it already represents the root node
-    {
-    if(object)
-      object = object->findChild<QObject*>(paths[i]);
-    }  
-  
-  return object;
-}
-
-} // namespace
-
-pqEventPlayer::pqEventPlayer(QObject& root) :
-  RootObject(root)
+pqEventPlayer::pqEventPlayer()
 {
 }
 
@@ -94,7 +74,7 @@ void pqEventPlayer::addWidgetEventPlayer(pqWidgetEventPlayer* Player)
 
 bool pqEventPlayer::playEvent(const QString& Object, const QString& Command, const QString& Arguments)
 {
-  QObject* object = pqFindObjectByTree(RootObject, Object);
+  QObject* const object = pqObjectNaming::GetObject(Object);
   if(!object)
     {
     qCritical() << "could not locate object " << Object;

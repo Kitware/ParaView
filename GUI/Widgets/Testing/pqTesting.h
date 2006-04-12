@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqObjectNaming.h
+   Module:    pqTesting.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,33 +30,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqObjectNaming_h
-#define _pqObjectNaming_h
+#ifndef _pqTesting_h
+#define _pqTesting_h
 
 #include "QtTestingExport.h"
 
-class QObject;
-class QString;
-class vtkRenderWindow;
-
-/// Provides functionality to ensuring that Qt objects can be uniquely identified for recording and playback of regression tests
-class QTTESTING_EXPORT pqObjectNaming
+/// General-purpose regression-test-related functionality that doesn't fit anywhere else
+class QTTESTING_EXPORT pqTesting
 {
 public:
-  /// Adds a Qt object to the global list of top-level objects
-  static void AddTopLevel(QObject& Object);
-
-  /// Recursively validates that every child of the given QObject is named correctly for testing
-  static bool Validate(QObject& Parent);
-
-  /// Returns a unique identifier for the given object that can be serialized for later regression test playback
-  static const QString GetName(QObject& Object);
-  /// Given a unique identifier returned by GetName(), returns the corresponding object, or NULL
-  static QObject* GetObject(const QString& Name);
-  
-private:
-  static bool Validate(QObject& Parent, const QString& Path);
+  /// Provides a portable Sleep() that doesn't block processing of UI events
+  static void NonBlockingSleep(int Milliseconds);  
 };
 
-#endif // !_pqObjectNaming_h
+#endif // !_pqTesting_h
 

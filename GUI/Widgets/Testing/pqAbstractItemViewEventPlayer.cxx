@@ -33,7 +33,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAbstractItemViewEventPlayer.h"
 
 #include <QAbstractItemView>
+#include <QApplication>
+#include <QMouseEvent>
+#include <QTime>
+#include <QTreeView>
 #include <QtDebug>
+
+/// Converts a string representation of a model index into the real thing
+static QModelIndex GetIndex(QAbstractItemView& View, const QString& Name)
+{
+    QStringList rows = Name.split('/', QString::SkipEmptyParts);
+    QString column;
+    
+    if(rows.size())
+      {
+      column = rows.back().split('|').at(1);
+      rows.back() = rows.back().split('|').at(0);
+      }
+    
+    QModelIndex index;
+    for(int i = 0; i != rows.size(); ++i)
+      {
+      index = View.model()->index(rows[i].toInt(), column.toInt(), index);
+      }
+      
+    return index;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// pqAbstractItemViewEventPlayer
 
 pqAbstractItemViewEventPlayer::pqAbstractItemViewEventPlayer()
 {
@@ -49,22 +77,45 @@ bool pqAbstractItemViewEventPlayer::playEvent(QObject* Object, const QString& Co
     
   if(Command == "currentChanged")
     {
-    QStringList rows = Arguments.split('/', QString::SkipEmptyParts);
-    QString column;
-    
-    if(rows.size())
-      {
-      column = rows.back().split('|').at(1);
-      rows.back() = rows.back().split('|').at(0);
-      }
-    
-    QModelIndex index;
-    for(int i = 0; i != rows.size(); ++i)
-      {
-      index = object->model()->index(rows[i].toInt(), column.toInt(), index);
-      }
-    
+    const QModelIndex index = GetIndex(*object, Arguments);
+    if(!index.isValid())
+      return false;
+      
     object->setCurrentIndex(index);
+    return true;
+    }
+    
+  if(Command == "contextMenu")
+    {
+    // Get the model index where the context menu was clicked ...
+    const QModelIndex index = GetIndex(*object, Arguments);
+    if(!index.isValid())
+      {
+      Error = true;
+      return true;
+      }
+
+    // Ensure that the item in question is visible ...
+    object->scrollTo(index);
+
+    if(QTreeView* const view = qobject_cast<QTreeView*>(Object))
+      {
+      const QPoint position = view->visualRect(index).center();
+      
+      QContextMenuEvent event(QContextMenuEvent::Keyboard, position);
+      if(!QApplication::sendEvent(object, &event))
+        {
+        Error = true;
+        return true;
+        }
+      }
+    else
+      {
+      qCritical() << "Unknown QAbstractItemView derivative: " << Object << "\n";
+      Error = true;
+      return true;
+      }
+ 
     return true;
     }
 

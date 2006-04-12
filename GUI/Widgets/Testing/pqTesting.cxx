@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqObjectNaming.h
+   Module:    pqTesting.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,33 +30,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqObjectNaming_h
-#define _pqObjectNaming_h
+#include "pqTesting.h"
 
-#include "QtTestingExport.h"
+#include <QCoreApplication>
+#include <QTime>
 
-class QObject;
-class QString;
-class vtkRenderWindow;
+#ifdef Q_OS_UNIX
+  #include <time.h>
+#endif
 
-/// Provides functionality to ensuring that Qt objects can be uniquely identified for recording and playback of regression tests
-class QTTESTING_EXPORT pqObjectNaming
+#ifdef Q_OS_WIN32
+  #include <windows.h>
+#endif
+
+void pqTesting::NonBlockingSleep(int Milliseconds)
 {
-public:
-  /// Adds a Qt object to the global list of top-level objects
-  static void AddTopLevel(QObject& Object);
-
-  /// Recursively validates that every child of the given QObject is named correctly for testing
-  static bool Validate(QObject& Parent);
-
-  /// Returns a unique identifier for the given object that can be serialized for later regression test playback
-  static const QString GetName(QObject& Object);
-  /// Given a unique identifier returned by GetName(), returns the corresponding object, or NULL
-  static QObject* GetObject(const QString& Name);
-  
-private:
-  static bool Validate(QObject& Parent, const QString& Path);
-};
-
-#endif // !_pqObjectNaming_h
-
+  QTime timer;
+  timer.start();
+  while(timer.elapsed() < Milliseconds)
+    {
+    QCoreApplication::processEvents(QEventLoop::AllEvents, Milliseconds);
+    
+#ifdef Q_OS_WIN32
+    Sleep(Milliseconds);
+#else
+    struct timespec ts = { 0, 0 };
+    ts.tv_nsec = Milliseconds * 1000 * 1000;
+    nanosleep(&ts, NULL);
+#endif
+    }
+}

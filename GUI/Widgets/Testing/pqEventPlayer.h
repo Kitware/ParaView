@@ -45,7 +45,7 @@ class pqWidgetEventPlayer;
 class QTTESTING_EXPORT pqEventPlayer
 {
 public:
-  pqEventPlayer(QObject& RootObject);
+  pqEventPlayer();
   ~pqEventPlayer();
 
   /// Adds the default set of widget players to the current working set.  Players are executed in-order, so you can call addWidgetEventPlayer() before this function to override default players.
@@ -62,8 +62,6 @@ private:
 
   /// Stores the working set of widget players  
   QVector<pqWidgetEventPlayer*> Players;
-  /// Stores the root of the Qt object hierarchy
-  QObject& RootObject;
 };
 
 #endif // !_pqEventPlayer_h
