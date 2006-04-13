@@ -62,6 +62,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   : QWidget(p)
 {
+  this->setObjectName("ObjectInspectorWidget");
+
 #if 0
   this->Inspector = 0;
   this->Delegate = 0;
@@ -72,8 +74,7 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
 #if 0
   // Create the object inspector model.
   this->Inspector = new pqObjectInspector(this);
-  if(this->Inspector)
-    this->Inspector->setObjectName("Inspector");
+  this->Inspector->setObjectName("Inspector");
 
   // Create the delegate to work with the model.
   this->Delegate = new pqObjectInspectorDelegate(this);
@@ -82,7 +83,7 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->TreeView = new QTreeView(this);
   if(this->TreeView)
     {
-    this->TreeView->setObjectName("InspectorView");
+    this->TreeView->setObjectName("View");
     this->TreeView->setAlternatingRowColors(true);
     this->TreeView->header()->hide();
     this->TreeView->setModel(this->Inspector);
@@ -92,7 +93,7 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
 #else
 
   this->ObjectEditor = new pqObjectEditor(this);
-  this->ObjectEditor->setObjectName("Object Editor");
+  this->ObjectEditor->setObjectName("Editor");
 
 #endif
 
@@ -105,12 +106,12 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
 #else
   s->setWidgetResizable(false);
 #endif
-  s->setObjectName("InspectorScrollView");
+  s->setObjectName("ScrollView");
   QVBoxLayout *boxLayout = new QVBoxLayout(s);
   boxLayout->setMargin(0);
 
   this->TabWidget->addTab(s, "");
-  this->TabWidget->setObjectName("InspectorTabWidget");
+  this->TabWidget->setObjectName("TabWidget");
   this->TabWidget->hide();
 
   // Add the tree view to the layout.

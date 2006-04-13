@@ -77,7 +77,6 @@ bool pqEventPlayer::playEvent(const QString& Object, const QString& Command, con
   QObject* const object = pqObjectNaming::GetObject(Object);
   if(!object)
     {
-    qCritical() << "could not locate object " << Object;
     return false;
     }
 
@@ -88,7 +87,7 @@ bool pqEventPlayer::playEvent(const QString& Object, const QString& Command, con
       {
       if(error)
         {
-        qCritical() << "error playing command " << Command << " object " << object;
+        qCritical() << "Error playing command " << Command << " object " << object;
         return false;
         }
         
@@ -97,7 +96,7 @@ bool pqEventPlayer::playEvent(const QString& Object, const QString& Command, con
       }
     }
 
-  qCritical() << "no player for command " << Command << " object " << object;
+  qCritical() << "No player for command " << Command << " object " << object;
   return false;
 }
 

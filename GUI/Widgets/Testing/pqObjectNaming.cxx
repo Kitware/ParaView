@@ -44,8 +44,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QScrollBar>
 #include <QSet>
 #include <QSignalMapper>
+#include <QStackedWidget>
+#include <QTabBar>
+#include <QTabWidget>
 #include <QToolBar>
+#include <QToolButton>
 #include <QtDebug>
+
+/// Returns the name of an object.  In some cases, assigns a name as a convenience
+static const QString InternalGetName(QObject& Object)
+{
+  if(Object.objectName().isEmpty())
+    {
+    if(QStackedWidget* const stacked = qobject_cast<QStackedWidget*>(&Object))
+      {
+      if(qobject_cast<QTabWidget*>(Object.parent()))
+        {
+        Object.setObjectName("qt_stacked_widget");
+        }
+      }
+    }
+    
+  return Object.objectName();
+}
 
 /// Returns true iff the given object needs to have its name validated
 static bool ValidateName(QObject& Object)
@@ -84,6 +105,15 @@ static bool ValidateName(QObject& Object)
         return false;
         }
       }
+    }
+  
+  // Skip tab widget implementation details ...
+  if(QTabWidget* const tab_widget = qobject_cast<QTabWidget*>(Object.parent()))
+    {
+      if(qobject_cast<QTabBar*>(&Object) || qobject_cast<QToolButton*>(&Object))
+        {
+        return false;
+        }
     }
   
   // Skip layouts ...
@@ -148,7 +178,7 @@ static bool ValidateName(QObject& Object)
 
 bool pqObjectNaming::Validate(QObject& Parent)
 {
-  const QString name = Parent.objectName();
+  const QString name = InternalGetName(Parent);
   if(name.isEmpty())
     {
     qWarning() << "Unnamed root widget\n";
@@ -160,7 +190,7 @@ bool pqObjectNaming::Validate(QObject& Parent)
 
 bool pqObjectNaming::Validate(QObject& Parent, const QString& Path)
 {
-//  qDebug() << Path << ": " << &Parent << "\n";
+//  qDebug() << Path << ": " << &Parent;
 
   bool result = true;
   
@@ -173,7 +203,7 @@ bool pqObjectNaming::Validate(QObject& Parent, const QString& Path)
     // Only validate names for objects that require them ...
     if(ValidateName(*child))
       {
-      const QString name = child->objectName();
+      const QString name = InternalGetName(*child);
       if(name.isEmpty())
         {
         qWarning() << Path << " - unnamed child object: " << child;
@@ -202,7 +232,7 @@ bool pqObjectNaming::Validate(QObject& Parent, const QString& Path)
 
 const QString pqObjectNaming::GetName(QObject& Object)
 {
-  QString name = Object.objectName();
+  QString name = InternalGetName(Object);
   if(name.isEmpty())
     {
     qCritical() << "Cannot record event for unnamed object " << &Object;
@@ -211,13 +241,15 @@ const QString pqObjectNaming::GetName(QObject& Object)
   
   for(QObject* p = Object.parent(); p; p = p->parent())
     {
-    if(p->objectName().isEmpty())
+    const QString parent_name = InternalGetName(*p);
+    
+    if(parent_name.isEmpty())
       {
       qCritical() << "Cannot record event for incompletely-named object " << name << " " << &Object << " with parent " << p;
       return QString();
       }
       
-    name = p->objectName() + "/" + name;
+    name = parent_name + "/" + name;
     
     if(!p->parent() && !QApplication::topLevelWidgets().contains(qobject_cast<QWidget*>(p)))
       {
@@ -229,24 +261,46 @@ const QString pqObjectNaming::GetName(QObject& Object)
   return name;
 }
 
-
 QObject* pqObjectNaming::GetObject(const QString& Name)
 {
-  /// Given a slash-delimited "path", lookup a Qt object hierarchically
+  QObject* result = 0;
+  const QStringList names = Name.split("/");
+  if(names.empty())
+    return 0;
+  
   const QWidgetList top_level_widgets = QApplication::topLevelWidgets();
   for(int i = 0; i != top_level_widgets.size(); ++i)
     {
     QObject* object = top_level_widgets[i];
-    const QStringList paths = Name.split("/");
-    for(int i = 1; i < paths.size(); ++i) // Note - we're ignoring the top-level path, since it already represents the root node
+    const QString name = InternalGetName(*object);
+    
+    if(name == names[0])
       {
-      if(object)
-        object = object->findChild<QObject*>(paths[i]);
+      result = object;
+      break;
       }
-      
-    if(object)
-      return object;
     }
+    
+  for(int j = 1; j < names.size(); ++j)
+    {
+    const QObjectList& children = result ? result->children() : QObjectList();
+    
+    result = 0;
+    for(int k = 0; k != children.size(); ++k)
+      {
+      QObject* child = children[k];
+      const QString name = InternalGetName(*child);
+      
+      if(name == names[j])
+        {
+        result = child;
+        break;
+        }
+      }
+    }
+    
+  if(result)
+    return result;
   
   qCritical() << "Couldn't find object " << Name;
   return 0;

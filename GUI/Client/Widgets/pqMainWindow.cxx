@@ -425,7 +425,6 @@ void pqMainWindow::createStandardObjectInspector(bool visible)
   object_inspector_dock->setFeatures(QDockWidget::AllDockWidgetFeatures);
 
   this->Implementation->Inspector = new pqObjectInspectorWidget(object_inspector_dock);
-  this->Implementation->Inspector->setObjectName("Inspector");
   object_inspector_dock->setWidget(this->Implementation->Inspector);
   if(this->Implementation->PipelineList)
     {
