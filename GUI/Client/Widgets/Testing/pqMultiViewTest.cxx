@@ -47,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 typedef vtkstd::vector<vtkstd::string> arguments_t;
 
 /// Parses command-line arguments for the --run-test flag, returning unused arguments
-const arguments_t handleTestCases(const arguments_t& Arguments, QObject& RootObject, bool& Quit, bool& Error)
+const arguments_t handleTestCases(const arguments_t& Arguments, bool& Quit, bool& Error)
 {
   arguments_t unused;
   
@@ -141,7 +141,7 @@ int main(int argc, char** argv)
   QCoreApplication::processEvents();
   
   arguments = handleTestRecording(arguments, mv2);
-  arguments = handleTestCases(arguments, mv2, quit, error);
+  arguments = handleTestCases(arguments, quit, error);
   arguments = handleExit(arguments, quit, error);
   
   if(quit)
