@@ -60,15 +60,20 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
 
   // set up actions
   QAction* a = new QAction(this->ActiveButton->icon(), tr("Active"), this->Menu);
+  a->setObjectName("ActiveAction");
   a->setCheckable(true);
   this->ActiveButton->setDefaultAction(a);
   a = new QAction(this->SplitHorizontalButton->icon(), this->SplitHorizontalButton->text(), this->Menu);
+  a->setObjectName("SplitHorizontalAction");
   this->SplitHorizontalButton->setDefaultAction(a);
   a = new QAction(this->SplitVerticalButton->icon(), this->SplitVerticalButton->text(), this->Menu);
+  a->setObjectName("SplitVerticalAction");
   this->SplitVerticalButton->setDefaultAction(a);
   a = new QAction(this->MaximizeButton->icon(), this->MaximizeButton->text(), this->Menu);
+  a->setObjectName("MaximizeAction");
   this->MaximizeButton->setDefaultAction(a);
   a = new QAction(this->CloseButton->icon(), this->CloseButton->text(), this->Menu);
+  a->setObjectName("CloseAction");
   this->CloseButton->setDefaultAction(a);
 
 
