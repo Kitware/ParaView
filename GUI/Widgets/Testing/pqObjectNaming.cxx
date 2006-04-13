@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectNaming.h"
 
 #include <QAction>
+#include <QApplication>
 #include <QHeaderView>
 #include <QLayout>
 #include <QScrollBar>
@@ -104,17 +105,8 @@ static bool ValidateName(QObject& Object)
   return true;
 }
 
-/// Stores the global list of top-level Qt objects
-typedef QSet<QObject*> TopLevelObjectsT;
-static TopLevelObjectsT TopLevelObjects;
-
 /////////////////////////////////////////////////////////////////////////////
 // pqObjectNaming
-
-void pqObjectNaming::AddTopLevel(QObject& Object)
-{
-  TopLevelObjects.insert(&Object);
-}
 
 bool pqObjectNaming::Validate(QObject& Parent)
 {
@@ -189,9 +181,9 @@ const QString pqObjectNaming::GetName(QObject& Object)
       
     name = p->objectName() + "/" + name;
     
-    if(!p->parent() && !TopLevelObjects.contains(p))
+    if(!p->parent() && !QApplication::topLevelWidgets().contains(qobject_cast<QWidget*>(p)))
       {
-      qCritical() << "Top level object " << p << " not registered\n";
+      qCritical() << "Object " << p << " is not a top-level widget\n";
       return QString();
       }
     }
@@ -203,9 +195,10 @@ const QString pqObjectNaming::GetName(QObject& Object)
 QObject* pqObjectNaming::GetObject(const QString& Name)
 {
   /// Given a slash-delimited "path", lookup a Qt object hierarchically
-  for(TopLevelObjectsT::const_iterator root = TopLevelObjects.begin(); root != TopLevelObjects.end(); ++root)
+  const QWidgetList top_level_widgets = QApplication::topLevelWidgets();
+  for(int i = 0; i != top_level_widgets.size(); ++i)
     {
-    QObject* object = *root;
+    QObject* object = top_level_widgets[i];
     const QStringList paths = Name.split("/");
     for(int i = 1; i < paths.size(); ++i) // Note - we're ignoring the top-level path, since it already represents the root node
       {
@@ -217,5 +210,6 @@ QObject* pqObjectNaming::GetObject(const QString& Name)
       return object;
     }
   
+  qCritical() << "Couldn't find object " << Name << "\n";
   return 0;
 }

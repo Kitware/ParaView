@@ -255,9 +255,6 @@ pqMainWindow::pqMainWindow() :
 
   this->menuBar() << pqSetName("menuBar");
 
-  // Register ourselves with the regression test system as a top-level window.
-  pqObjectNaming::AddTopLevel(*this);
-
   // Set up the main ParaQ items along with the central widget.
   this->Implementation->Adaptor = new pqSMAdaptor();
   this->Implementation->Pipeline = new pqPipelineData(this);

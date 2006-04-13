@@ -43,9 +43,6 @@ class vtkRenderWindow;
 class QTTESTING_EXPORT pqObjectNaming
 {
 public:
-  /// Adds a Qt object to the global list of top-level objects
-  static void AddTopLevel(QObject& Object);
-
   /// Recursively validates that every child of the given QObject is named correctly for testing
   static bool Validate(QObject& Parent);
 
