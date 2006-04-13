@@ -32,14 +32,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqObjectNaming.h"
 
+#include <QAbstractItemDelegate>
+#include <QAbstractItemModel>
 #include <QAction>
 #include <QApplication>
 #include <QHeaderView>
+#include <QItemSelectionModel>
 #include <QLayout>
+#include <QMenu>
 #include <QScrollBar>
 #include <QSet>
 #include <QSignalMapper>
-#include <QStandardItemModel>
+#include <QToolBar>
 #include <QtDebug>
 
 /// Returns true iff the given object needs to have its name validated
@@ -73,7 +77,13 @@ static bool ValidateName(QObject& Object)
     }
 
   // Skip MVC models ...
-  if(qobject_cast<QStandardItemModel*>(&Object))
+  if(qobject_cast<QAbstractItemModel*>(&Object))
+    {
+    return false;
+    }
+
+  // Skip MVC implementation objects ...
+  if(qobject_cast<QAbstractItemDelegate*>(&Object) || qobject_cast<QItemSelectionModel*>(&Object))
     {
     return false;
     }
@@ -84,7 +94,25 @@ static bool ValidateName(QObject& Object)
     return false;
     }
 
-  // Skip some weird dockwindow implementation widgets ...
+  // Skip menu implementation details ...
+  if(QMenu* const menu = qobject_cast<QMenu*>(Object.parent()))
+    {
+    if(menu->menuAction() == &Object)
+      {
+      return false;
+      }
+    }
+
+  // Skip toolbar implementation details ...
+  if(QToolBar* const toolbar = qobject_cast<QToolBar*>(Object.parent()))
+    {
+    if(toolbar->toggleViewAction() == &Object)
+      {
+      return false;
+      }
+    }
+
+  // Skip some weird dockwindow implementation details ...
   if(
     class_name == "QDockSeparator"
     || class_name == "QDockWidgetSeparator"
@@ -94,7 +122,7 @@ static bool ValidateName(QObject& Object)
     return false;
     }
 
-  // Skip some weird toolbar implementation widgets ...
+  // Skip some weird toolbar implementation details ...
   if(
     class_name == "QToolBarHandle"
     || class_name == "QToolBarWidgetAction")
@@ -138,14 +166,14 @@ bool pqObjectNaming::Validate(QObject& Parent, const QString& Path)
       const QString name = child->objectName();
       if(name.isEmpty())
         {
-        qWarning() << Path << " - unnamed child widget: " << child << "\n";
+        qWarning() << Path << " - unnamed child object: " << child << "\n";
         result = false;
         }
       else
         {
         if(names.contains(name))
           {
-          qWarning() << Path << " - duplicate child widget name [" << name << "]: " << child << "\n";
+          qWarning() << Path << " - duplicate child object name [" << name << "]: " << child << "\n";
           result = false;
           }
           

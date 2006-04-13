@@ -96,9 +96,11 @@ pqElementInspectorWidget::pqElementInspectorWidget(QWidget *p) :
 {
   this->setObjectName("ElementInspectorWidget");
   
+  this->Implementation->ClearButton.setObjectName("Clear");
   this->Implementation->ClearButton.hide();
   connect(&this->Implementation->ClearButton, SIGNAL(clicked()), SLOT(clear()));
   
+  this->Implementation->TreeView.setObjectName("View");
   this->Implementation->TreeView.setRootIsDecorated(false);
   this->Implementation->TreeView.setAlternatingRowColors(true);
   this->Implementation->TreeView.setModel(new pqDataSetModel(&this->Implementation->TreeView));

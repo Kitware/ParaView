@@ -169,12 +169,15 @@ public:
     delete this->MultiViewManager;
     this->MultiViewManager = 0;
 
-    delete this->ProxyInfo;
-    this->ProxyInfo = 0;
-
     this->VTKConnector->Delete();
     this->VTKConnector = 0;
   
+    delete this->ProxyInfo;
+    this->ProxyInfo = 0;
+
+    delete this->Pipeline;
+    this->Pipeline = 0;
+
 /** \todo Workaround for shutdown crash */  
 //    delete this->CurrentServer;
     this->CurrentServer = 0;
@@ -257,7 +260,7 @@ pqMainWindow::pqMainWindow() :
 
   // Set up the main ParaQ items along with the central widget.
   this->Implementation->Adaptor = new pqSMAdaptor();
-  this->Implementation->Pipeline = new pqPipelineData(this);
+  this->Implementation->Pipeline = new pqPipelineData();
   this->Implementation->ProxyInfo = new pqSourceProxyInfo();
   this->Implementation->VTKConnector = vtkEventQtSlotConnect::New();
 
@@ -462,8 +465,6 @@ void pqMainWindow::createStandardVCRToolBar()
   QToolBar* const toolbar = new QToolBar(tr("VCR Controls"), this)
     << pqSetName("VCRControlsToolBar");
   
-  toolbar->toggleViewAction() << pqSetName("toggleView");
-
   pqPlayControlsWidget* const vcr_controls = new pqPlayControlsWidget(toolbar)
     << pqSetName("VCRControls");
   
@@ -512,8 +513,6 @@ void pqMainWindow::createStandardVariableToolBar()
   this->Implementation->VariableSelectorToolBar = new QToolBar(tr("Variables"), this)
     << pqSetName("VariableSelectorToolBar");
     
-  this->Implementation->VariableSelectorToolBar->toggleViewAction() << pqSetName("toggleView");
-  
   pqVariableSelectorWidget* varSelector = new pqVariableSelectorWidget(this->Implementation->VariableSelectorToolBar)
     << pqSetName("VariableSelector");
     
@@ -531,8 +530,6 @@ void pqMainWindow::createStandardCompoundProxyToolBar()
   this->Implementation->CompoundProxyToolBar = new QToolBar(tr("Compound Proxies"), this)
     << pqSetName("CompoundProxyToolBar");
     
-  this->Implementation->CompoundProxyToolBar->toggleViewAction() << pqSetName("toggleView");
-  
   this->addToolBar(Qt::TopToolBarArea, this->Implementation->CompoundProxyToolBar);
   this->connect(this->Implementation->CompoundProxyToolBar, SIGNAL(actionTriggered(QAction*)), SLOT(onCreateCompoundProxy(QAction*)));
 
@@ -546,8 +543,6 @@ QMenu* pqMainWindow::fileMenu()
     {
     this->Implementation->FileMenu = this->menuBar()->addMenu(tr("&File"))
       << pqSetName("fileMenu");
-      
-    this->Implementation->FileMenu->menuAction() << pqSetName("menuAction");
     }
     
   return this->Implementation->FileMenu;
@@ -559,8 +554,6 @@ QMenu* pqMainWindow::viewMenu()
     {
     this->Implementation->ViewMenu = this->menuBar()->addMenu(tr("&View"))
       << pqSetName("viewMenu");
-      
-    this->Implementation->ViewMenu->menuAction() << pqSetName("menuAction");
     }
     
   return this->Implementation->ViewMenu;
@@ -572,8 +565,6 @@ QMenu* pqMainWindow::serverMenu()
     {
     this->Implementation->ServerMenu = this->menuBar()->addMenu(tr("&Server"))
       << pqSetName("serverMenu");
-      
-    this->Implementation->ServerMenu->menuAction() << pqSetName("menuAction");
     }
     
   return this->Implementation->ServerMenu;
@@ -585,8 +576,6 @@ QMenu* pqMainWindow::sourcesMenu()
     {
     this->Implementation->SourcesMenu = this->menuBar()->addMenu(tr("&Sources"))
       << pqSetName("sourcesMenu");
-
-    this->Implementation->SourcesMenu->menuAction() << pqSetName("menuAction");
     }
     
   return this->Implementation->SourcesMenu;
@@ -598,8 +587,6 @@ QMenu* pqMainWindow::filtersMenu()
     {
     this->Implementation->FiltersMenu = this->menuBar()->addMenu(tr("&Filters"))
       << pqSetName("filtersMenu");
-
-    this->Implementation->FiltersMenu->menuAction() << pqSetName("menuAction");
     }
     
   return this->Implementation->FiltersMenu;
@@ -611,8 +598,6 @@ QMenu* pqMainWindow::toolsMenu()
     {
     this->Implementation->ToolsMenu = this->menuBar()->addMenu(tr("&Tools"))
       << pqSetName("toolsMenu");
-
-    this->Implementation->ToolsMenu->menuAction() << pqSetName("menuAction");
     }
     
   return this->Implementation->ToolsMenu;
@@ -624,8 +609,6 @@ QMenu* pqMainWindow::helpMenu()
     {
     this->Implementation->HelpMenu = this->menuBar()->addMenu(tr("&Help"))
       << pqSetName("helpMenu");
-
-    this->Implementation->HelpMenu->menuAction() << pqSetName("menuAction");
     }
     
   return this->Implementation->HelpMenu;
@@ -1090,7 +1073,7 @@ void pqMainWindow::onUpdateSourcesFiltersMenu(pqServer*)
           }
         else
           {
-          QMenu *menu = this->Implementation->FiltersMenu->addMenu(*iter);
+          QMenu *menu = this->Implementation->FiltersMenu->addMenu(*iter) << pqSetName(*iter);
           categories.insert(*iter, menu);
           if((*iter) == "&Alphabetical" || (*iter) == "Alphabetical")
             {
