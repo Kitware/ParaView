@@ -21,20 +21,69 @@
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkPVInformation.h"
+#include "vtkPVXMLElement.h"
+#include "vtkUndoSet.h"
+#include "vtkUndoStack.h"
+//-----------------------------------------------------------------------------
+class vtkSelfConnectionUndoSet : public vtkUndoSet
+{
+public:
+  static vtkSelfConnectionUndoSet* New();
+  vtkTypeRevisionMacro(vtkSelfConnectionUndoSet, vtkUndoSet);
+ 
+  virtual int Undo() 
+    {
+    return 1;
+    }
+  
+  virtual int Redo() 
+    {
+    return 1;
+    }
+
+  void SetXMLElement(vtkPVXMLElement*);
+  vtkGetObjectMacro(XMLElement, vtkPVXMLElement);
+
+protected:
+  vtkSelfConnectionUndoSet() 
+    {
+    this->XMLElement = 0;
+    };
+  ~vtkSelfConnectionUndoSet()
+    { 
+    this->SetXMLElement(0);
+    };
+
+  vtkPVXMLElement* XMLElement;
+private:
+  vtkSelfConnectionUndoSet(const vtkSelfConnectionUndoSet&);
+  void operator=(const vtkSelfConnectionUndoSet&);
+};
+
+vtkStandardNewMacro(vtkSelfConnectionUndoSet);
+vtkCxxRevisionMacro(vtkSelfConnectionUndoSet, "1.2");
+vtkCxxSetObjectMacro(vtkSelfConnectionUndoSet, XMLElement, vtkPVXMLElement);
+//-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSelfConnection);
-vtkCxxRevisionMacro(vtkSelfConnection, "1.1");
+vtkCxxRevisionMacro(vtkSelfConnection, "1.2");
 //-----------------------------------------------------------------------------
 vtkSelfConnection::vtkSelfConnection()
 {
   this->Controller = vtkDummyController::New();
   vtkMultiProcessController::SetGlobalController(this->Controller);
+  this->UndoRedoStack = NULL; // created if needed.
 }
 
 //-----------------------------------------------------------------------------
 vtkSelfConnection::~vtkSelfConnection()
 {
   vtkMultiProcessController::SetGlobalController(0);
+  if (this->UndoRedoStack)
+    {
+    this->UndoRedoStack->Delete();
+    this->UndoRedoStack = NULL;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -108,6 +157,53 @@ int vtkSelfConnection::LoadModule(const char* name, const char* directory)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   int localResult = pm->GetInterpreter()->Load(name, paths);
   return localResult;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSelfConnection::PushUndo(const char* label, vtkPVXMLElement* root)
+{
+  if (!this->UndoRedoStack)
+    {
+    this->UndoRedoStack = vtkUndoStack::New();
+    }
+  vtkSelfConnectionUndoSet* elem = vtkSelfConnectionUndoSet::New();
+  elem->SetXMLElement(root);
+  this->UndoRedoStack->Push(label, elem);
+  elem->Delete();
+}
+
+//-----------------------------------------------------------------------------
+vtkPVXMLElement* vtkSelfConnection::NewNextUndo()
+{
+  if (!this->UndoRedoStack || !this->UndoRedoStack->CanUndo())
+    {
+    vtkErrorMacro("Nothing to undo.");
+    return 0;
+    }
+  vtkSelfConnectionUndoSet* set = vtkSelfConnectionUndoSet::SafeDownCast(
+    this->UndoRedoStack->GetNextUndoSet());
+  this->UndoRedoStack->PopUndoStack();
+
+  vtkPVXMLElement* elem = set->GetXMLElement();
+  elem->Register(this); // so that caller can call Delete();
+  return elem;
+}
+
+//-----------------------------------------------------------------------------
+vtkPVXMLElement* vtkSelfConnection::NewNextRedo()
+{
+  if (!this->UndoRedoStack || !this->UndoRedoStack->CanRedo())
+    {
+    vtkErrorMacro("Nothing to redo.");
+    return 0;
+    }
+  vtkSelfConnectionUndoSet* set = vtkSelfConnectionUndoSet::SafeDownCast(
+    this->UndoRedoStack->GetNextRedoSet());
+  this->UndoRedoStack->PopRedoStack();
+
+   vtkPVXMLElement* elem = set->GetXMLElement();
+  elem->Register(this); // so that caller can call Delete();
+  return elem;
 }
 
 //-----------------------------------------------------------------------------

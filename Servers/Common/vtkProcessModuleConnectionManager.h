@@ -69,6 +69,7 @@ class vtkProcessModuleConnectionManagerObserver;
 class vtkProcessModuleConnectionManagerInternals;
 class vtkPVInformation;
 class vtkPVServerInformation;
+class vtkPVXMLElement;
 class vtkRemoteConnection;
 class vtkSocket;
 class vtkSocketCollection;
@@ -282,6 +283,25 @@ public:
   // data server processes on the server.
   // vtkClientConnection does not support this call, returns 1.
   int GetNumberOfPartitions(vtkConnectionID id);
+
+  // Description:
+  // Push an undo set xml state on the undo stack for the given connection.
+  void PushUndo(vtkConnectionID id, const char* label, vtkPVXMLElement* root);
+
+  // Description:
+  // Get the next undo  xml from the connection.
+  // This method allocates  a new vtkPVXMLElement. It is the responsibility 
+  // of caller to \c Delete it. 
+  // \returns NULL on failure, otherwise the XML element is returned.
+  vtkPVXMLElement* NewNextUndo(vtkConnectionID id);
+ 
+  // Description:
+  // Get the next redo  xml from the connection.
+  // This method allocates  a new vtkPVXMLElement. It is the responsibility 
+  // of caller to \c Delete it. 
+  // \returns NULL on failure, otherwise the XML element is returned.
+  vtkPVXMLElement* NewNextRedo(vtkConnectionID id);
+ 
 //ETX
 protected:
   vtkProcessModuleConnectionManager();

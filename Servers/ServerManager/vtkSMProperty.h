@@ -212,6 +212,7 @@ protected:
   friend class vtkSMDomainIterator;
   friend class vtkSMSourceProxy;
   friend class vtkSMDomain;
+  friend class vtkSMPropertyModificationUndoElement;
 
   // Description:
   // Append a command to update the vtk object with the property values(s).
@@ -278,13 +279,18 @@ protected:
   // Description:
   // Save the state in XML.
   virtual void SaveState(vtkPVXMLElement* parent, const char* property_name, 
-    const char* uid, int saveDomains=1);
-  virtual void ChildSaveState(vtkPVXMLElement* propertyElement);
+    const char* uid, int saveDomains=1, int saveLastPushedValues=0);
+  virtual void ChildSaveState(vtkPVXMLElement* propertyElement, 
+    int saveLastPushedValues);
   void SaveDomainState(vtkPVXMLElement* propertyElement, const char* uid);
 
   // Description:
   // Updates state from an XML element. Returns 0 on failure.
-  virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoader* loader);
+  // If \c loadLastPushedValues is set, then last pushed values
+  // are loaded from the xml if present. If not present, the value 
+  // of the property remains unchanged.
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoader* loader,
+    int loadLastPushedValues=0);
 
   // Description:
   // Set from the XML file, information helpers fill in the property

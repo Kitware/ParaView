@@ -31,7 +31,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.30");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.31");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -42,6 +42,8 @@ struct vtkSMProxyPropertyInternals
           PreviousProxiesType;
   PreviousProxiesType PreviousProxies;
   vtkstd::vector<vtkSMProxy*> UncheckedProxies;
+
+  PreviousProxiesVectorType LastPushedProxies;
 };
 
 //---------------------------------------------------------------------------
@@ -157,39 +159,48 @@ void vtkSMProxyProperty::AppendCommandToStream(
     {
     this->AppendCommandToStreamWithRemoveCommand(
       cons, str, objectId);
-    return;
     }
-
-  if (this->CleanCommand)
+  else // no remove command.
     {
-    *str << vtkClientServerStream::Invoke
-      << objectId << this->CleanCommand
-      << vtkClientServerStream::End;
-    }
-
-  unsigned int numProxies = this->GetNumberOfProxies();
-  if (numProxies < 1)
-    {
-    return;
-    }
-
-  // Remove all consumers (using previous proxies)
-  this->RemoveConsumerFromPreviousProxies(cons);
-  // Remove all previous proxies before adding new ones.
-  this->RemoveAllPreviousProxies(cons);
-  
-  for (unsigned int idx=0; idx < numProxies; idx++)
-    {
-    vtkSMProxy* proxy = this->GetProxy(idx);
-    // Keep track of all proxies that point to this as a
-    // consumer so that we can remove this from the consumer
-    // list later if necessary
-    this->AddPreviousProxy(cons, proxy);
-    if (proxy)
+    if (this->CleanCommand)
       {
-      proxy->AddConsumer(this, cons);
+      *str << vtkClientServerStream::Invoke
+        << objectId << this->CleanCommand
+        << vtkClientServerStream::End;
       }
-    this->AppendProxyToStream(proxy, cons, str, objectId, 0);
+
+    unsigned int numProxies = this->GetNumberOfProxies();
+    if (numProxies < 1)
+      {
+      return;
+      }
+
+    // Remove all consumers (using previous proxies)
+    this->RemoveConsumerFromPreviousProxies(cons);
+    // Remove all previous proxies before adding new ones.
+    this->RemoveAllPreviousProxies(cons);
+
+    for (unsigned int idx=0; idx < numProxies; idx++)
+      {
+      vtkSMProxy* proxy = this->GetProxy(idx);
+      // Keep track of all proxies that point to this as a
+      // consumer so that we can remove this from the consumer
+      // list later if necessary
+      this->AddPreviousProxy(cons, proxy);
+      if (proxy)
+        {
+        proxy->AddConsumer(this, cons);
+        }
+      this->AppendProxyToStream(proxy, cons, str, objectId, 0);
+      }
+    }
+  
+  // Update the LastPushedProxies.
+  unsigned int numProxies = this->GetNumberOfProxies();
+  this->PPInternals->LastPushedProxies.clear();
+  for (unsigned int cc=0; cc < numProxies; ++cc)
+    {
+    this->PPInternals->LastPushedProxies.push_back(this->GetProxy(cc));
     }
 }
 
@@ -470,13 +481,35 @@ int vtkSMProxyProperty::ReadXMLAttributes(vtkSMProxy* parent,
 
 //---------------------------------------------------------------------------
 int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
-                                  vtkSMStateLoader* loader)
+  vtkSMStateLoader* loader, int loadLastPushedValues/*=0*/)
 {
   int prevImUpdate = this->ImmediateUpdate;
 
   // Wait until all values are set before update (if ImmediateUpdate)
   this->ImmediateUpdate = 0;
-  this->Superclass::LoadState(element, loader);
+  this->Superclass::LoadState(element, loader, loadLastPushedValues);
+
+  if (loadLastPushedValues)
+    {
+    unsigned int numElems = element->GetNumberOfNestedElements();
+    vtkPVXMLElement* actual_element = NULL;
+    for (unsigned int i=0; i < numElems; i++)
+      {
+      vtkPVXMLElement* currentElement = element->GetNestedElement(i);
+      if (currentElement->GetName() && 
+        strcmp(currentElement->GetName(), "LastPushedValues") == 0)
+        {
+        actual_element = currentElement;
+        break;
+        }
+      }
+    if (!actual_element)
+      {
+      // No LastPushedValues present, do nothing.
+      return 1;
+      }
+    element = actual_element;
+    }
 
   unsigned int numElems = element->GetNumberOfNestedElements();
   for (unsigned int i=0; i<numElems; i++)
@@ -512,9 +545,10 @@ int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyProperty::ChildSaveState(vtkPVXMLElement* propertyElement)
+void vtkSMProxyProperty::ChildSaveState(vtkPVXMLElement* propertyElement,
+  int saveLastPushedValues)
 {
-  this->Superclass::ChildSaveState(propertyElement);
+  this->Superclass::ChildSaveState(propertyElement, saveLastPushedValues);
 
   unsigned int numProxies = this->GetNumberOfProxies();
   propertyElement->AddAttribute("number_of_elements", numProxies);
@@ -529,6 +563,30 @@ void vtkSMProxyProperty::ChildSaveState(vtkPVXMLElement* propertyElement)
       propertyElement->AddNestedElement(elementElement);
       elementElement->Delete();
       }
+    }
+
+  if (saveLastPushedValues)
+    {
+    unsigned int numLastPushedProxies = 
+      static_cast<unsigned int>(this->PPInternals->LastPushedProxies.size());
+    
+    vtkPVXMLElement* element = vtkPVXMLElement::New();
+    element->SetName("LastPushedValues");
+    element->AddAttribute("number_of_elements", numLastPushedProxies);
+    for (unsigned int cc=0; cc < numLastPushedProxies; cc++)
+      {
+      vtkSMProxy* proxy = this->PPInternals->LastPushedProxies[cc].GetPointer();
+      if (proxy)
+        {
+        vtkPVXMLElement* elementElement = vtkPVXMLElement::New();
+        elementElement->SetName("Proxy");
+        elementElement->AddAttribute("value", proxy->GetSelfIDAsString());
+        element->AddNestedElement(elementElement);
+        elementElement->Delete();
+        }
+      }
+    propertyElement->AddNestedElement(element);
+    element->Delete();
     }
 }
 

@@ -48,6 +48,7 @@
 
 #include <vtkstd/map>
 #include <vtkstd/new>
+
 #include <vtksys/RegularExpression.hxx>
 #include <vtksys/SystemTools.hxx>
 
@@ -97,7 +98,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.44");
+vtkCxxRevisionMacro(vtkProcessModule, "1.45");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -634,6 +635,18 @@ int vtkProcessModule::ConnectToRemote()
       this->GUIHelper->ExitApplication();
       return 0;
       }
+    }
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+int vtkProcessModule::IsRemote(vtkConnectionID id)
+{
+  vtkRemoteConnection* rc = vtkRemoteConnection::SafeDownCast(
+    this->ConnectionManager->GetConnectionFromID(id));
+  if (rc)
+    {
+    return 1;
     }
   return 0;
 }
@@ -1592,6 +1605,25 @@ vtkSocketController* vtkProcessModule::GetActiveRenderServerSocketController()
       }
     }
   return this->GetActiveSocketController();
+}
+
+//-----------------------------------------------------------------------------
+void vtkProcessModule::PushUndo(vtkConnectionID id, const char* label, 
+  vtkPVXMLElement* root)
+{
+  this->ConnectionManager->PushUndo(id, label, root); 
+}
+
+//-----------------------------------------------------------------------------
+vtkPVXMLElement* vtkProcessModule::NewNextUndo(vtkConnectionID id)
+{
+  return this->ConnectionManager->NewNextUndo(id);
+}
+
+//-----------------------------------------------------------------------------
+vtkPVXMLElement* vtkProcessModule::NewNextRedo(vtkConnectionID id)
+{
+  return this->ConnectionManager->NewNextRedo(id);
 }
 
 //-----------------------------------------------------------------------------

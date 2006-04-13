@@ -17,7 +17,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMStateLoader.h"
 
-vtkCxxRevisionMacro(vtkSMVectorProperty, "1.8");
+vtkCxxRevisionMacro(vtkSMVectorProperty, "1.9");
 
 //---------------------------------------------------------------------------
 vtkSMVectorProperty::vtkSMVectorProperty()
@@ -37,9 +37,9 @@ vtkSMVectorProperty::~vtkSMVectorProperty()
 
 //---------------------------------------------------------------------------
 int vtkSMVectorProperty::LoadState(vtkPVXMLElement* element,
-                                   vtkSMStateLoader* loader)
+  vtkSMStateLoader* loader, int loadLastPushedValues/*=0*/)
 {
-  this->Superclass::LoadState(element, loader);
+  this->Superclass::LoadState(element, loader, loadLastPushedValues);
 
   int numEls;
   if (element->GetScalarAttribute("number_of_elements", &numEls))

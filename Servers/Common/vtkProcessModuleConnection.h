@@ -33,6 +33,7 @@ class vtkCommand;
 class vtkMultiProcessController;
 class vtkProcessModuleConnectionObserver;
 class vtkPVInformation;
+class vtkPVXMLElement;
 
 class VTK_EXPORT vtkProcessModuleConnection : public vtkObject
 {
@@ -103,11 +104,33 @@ public:
   // vtkRemoteConnections store their own ClientServerIds.
   virtual void UnRegister(vtkObjectBase* obj);
 
-  //BTX
+//BTX
   // Description:
   // Get the SelfID.
   vtkGetMacro(SelfID, vtkClientServerID);
-  //ETX
+//ETX
+
+  // Description:
+  // Push the vtkUndoSet xml state on the undo stack for this connection.
+  // Subclasses override this method to do the appropriate action.
+  // On SelfConnection, the undo set is stored locally, while on
+  // remote server connection, the undo set is sent to the server.
+  virtual void PushUndo(const char* label, vtkPVXMLElement* root) =0;
+
+  // Description:
+  // Get the next undo  xml from this connection.
+  // This method allocates  a new vtkPVXMLElement. It is the responsibility 
+  // of caller to \c Delete it. 
+  // \returns NULL on failure, otherwise the XML element is returned.
+  virtual vtkPVXMLElement* NewNextUndo()=0;
+ 
+  // Description:
+  // Get the next redo  xml from this connection.
+  // This method allocates  a new vtkPVXMLElement. It is the responsibility 
+  // of caller to \c Delete it. 
+  // \returns NULL on failure, otherwise the XML element is returned.
+  virtual vtkPVXMLElement* NewNextRedo()=0;
+
 protected:
   vtkProcessModuleConnection();
   ~vtkProcessModuleConnection();

@@ -21,12 +21,20 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIdTypeVectorProperty);
-vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.9");
+vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.10");
 
 struct vtkSMIdTypeVectorPropertyInternals
 {
   vtkstd::vector<vtkIdType> Values;
   vtkstd::vector<vtkIdType> UncheckedValues;
+  vtkstd::vector<vtkIdType> LastPushedValues;
+  void UpdateLastPushedValues()
+    {
+    // Save LastPushedValues.
+    this->LastPushedValues.clear();
+    this->LastPushedValues.insert(this->LastPushedValues.end(),
+      this->Values.begin(), this->Values.end());
+    }
 };
 
 //---------------------------------------------------------------------------
@@ -103,6 +111,7 @@ void vtkSMIdTypeVectorProperty::AppendCommandToStream(
       *str << vtkClientServerStream::End;
       }
     }
+  this->Internals->UpdateLastPushedValues();
 }
 
 //---------------------------------------------------------------------------
@@ -267,6 +276,7 @@ int vtkSMIdTypeVectorProperty::ReadXMLAttributes(vtkSMProxy* parent,
         {
         this->SetElement(i, initVal[i]);
         }
+      this->Internals->UpdateLastPushedValues();
       }
     else
       {
@@ -282,13 +292,35 @@ int vtkSMIdTypeVectorProperty::ReadXMLAttributes(vtkSMProxy* parent,
 
 //---------------------------------------------------------------------------
 int vtkSMIdTypeVectorProperty::LoadState(vtkPVXMLElement* element,
-                                         vtkSMStateLoader* loader)
+  vtkSMStateLoader* loader, int loadLastPushedValues/*=0*/)
 {
   int prevImUpdate = this->ImmediateUpdate;
 
   // Wait until all values are set before update (if ImmediateUpdate)
   this->ImmediateUpdate = 0;
-  this->Superclass::LoadState(element, loader);
+  this->Superclass::LoadState(element, loader, loadLastPushedValues);
+
+  if (loadLastPushedValues)
+    {
+    unsigned int numElems = element->GetNumberOfNestedElements();
+    vtkPVXMLElement* actual_element = NULL;
+    for (unsigned int i=0; i < numElems; i++)
+      {
+      vtkPVXMLElement* currentElement = element->GetNestedElement(i);
+      if (currentElement->GetName() && 
+        strcmp(currentElement->GetName(), "LastPushedValues") == 0)
+        {
+        actual_element = currentElement;
+        break;
+        }
+      }
+    if (!actual_element)
+      {
+      // No LastPushedValues present, do nothing.
+      return 1;
+      }
+    element = actual_element;
+    }
 
   unsigned int numElems = element->GetNumberOfNestedElements();
   for (unsigned int i=0; i<numElems; i++)
@@ -317,9 +349,10 @@ int vtkSMIdTypeVectorProperty::LoadState(vtkPVXMLElement* element,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMIdTypeVectorProperty::ChildSaveState(vtkPVXMLElement* propertyElement)
+void vtkSMIdTypeVectorProperty::ChildSaveState(vtkPVXMLElement* propertyElement,
+  int saveLastPushedValues)
 {
-  this->Superclass::ChildSaveState(propertyElement);
+  this->Superclass::ChildSaveState(propertyElement, saveLastPushedValues);
 
   unsigned int size = this->GetNumberOfElements();
   if (size > 0)
@@ -334,6 +367,27 @@ void vtkSMIdTypeVectorProperty::ChildSaveState(vtkPVXMLElement* propertyElement)
     elementElement->AddAttribute("value", this->GetElement(i));
     propertyElement->AddNestedElement(elementElement);
     elementElement->Delete();
+    }
+
+  if (saveLastPushedValues)
+    {
+    size = this->Internals->LastPushedValues.size();
+    
+    vtkPVXMLElement* element = vtkPVXMLElement::New();
+    element->SetName("LastPushedValues");
+    element->AddAttribute("number_of_elements", size);
+    for (unsigned int cc=0; cc < size; ++cc)
+      {
+      vtkPVXMLElement* elementElement = vtkPVXMLElement::New();
+      elementElement->SetName("Element");
+      elementElement->AddAttribute("index", cc);
+      elementElement->AddAttribute("value", 
+        this->Internals->LastPushedValues[cc]);
+      element->AddNestedElement(elementElement);
+      elementElement->Delete();
+      }
+    propertyElement->AddNestedElement(element);
+    element->Delete();
     }
 }
 

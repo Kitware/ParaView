@@ -43,6 +43,7 @@ class vtkPVInformation;
 class vtkPVOptions;
 class vtkPVProgressHandler;
 class vtkPVServerInformation;
+class vtkPVXMLElement;
 class vtkRemoteConnection;
 class vtkSocketController;
 class vtkStringList;
@@ -461,7 +462,10 @@ public:
   // Description:
   // Close the connection. The connection must be a remote connection.
   void Disconnect(vtkConnectionID id);
-  
+ 
+  // Description:
+  // Returns 1 is the connection is a connection with a remote server (or client).
+  int IsRemote(vtkConnectionID id);
   //ETX
 
   // Description:
@@ -484,7 +488,27 @@ public:
   // vtkPVMain sets this flag depending upon whether MPI was initialized or not.
   vtkSetMacro(UseMPI, int);
   vtkGetMacro(UseMPI, int);
+
+//BTX
+  // Description:
+  // Push an undo set xml state on the undo stack for the given connection.
+  void PushUndo(vtkConnectionID id, const char* label, vtkPVXMLElement* root);
+
+  // Description:
+  // Get the next undo  xml from the connection.
+  // This method allocates  a new vtkPVXMLElement. It is the responsibility 
+  // of caller to \c Delete it. 
+  // \returns NULL on failure, otherwise the XML element is returned.
+  vtkPVXMLElement* NewNextUndo(vtkConnectionID id);
+ 
+  // Description:
+  // Get the next redo  xml from the connection.
+  // This method allocates  a new vtkPVXMLElement. It is the responsibility 
+  // of caller to \c Delete it. 
+  // \returns NULL on failure, otherwise the XML element is returned.
+  vtkPVXMLElement* NewNextRedo(vtkConnectionID id);
   
+//ETX
 protected:
   vtkProcessModule();
   ~vtkProcessModule();

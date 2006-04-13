@@ -39,7 +39,7 @@ class vtkSMLink;
 class vtkSMProperty;
 class vtkSMProxy;
 class vtkSMProxyManagerObserver;
-
+class vtkSMUndoStack;
 //BTX
 struct vtkSMProxyManagerInternals;
 struct vtkConnectionID;
@@ -223,8 +223,19 @@ public:
     const char* GroupName;
     const char* ProxyName;
   };
+
+  struct ModifiedPropertyInformation
+    {
+    vtkSMProxy* Proxy;
+    const char* PropertyName;
+    };
 //ETX
 
+  // Description:
+  // Get/Set the Server Manager Undo stack. No undo stack is created by default.
+  // The GUI must set this, if it supports Undo/Redo.
+  void SetUndoStack(vtkSMUndoStack*);
+  vtkGetObjectMacro(UndoStack, vtkSMUndoStack);
 protected:
   vtkSMProxyManager();
   ~vtkSMProxyManager();
@@ -266,6 +277,7 @@ protected:
   // Save/Load registered link states.
   void SaveRegisteredLinks(vtkPVXMLElement* root);
 
+  vtkSMUndoStack* UndoStack;
 private:
   vtkSMProxyManagerInternals* Internals;
   vtkSMProxyManagerObserver* Observer;

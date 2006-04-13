@@ -348,6 +348,7 @@ protected:
   friend class vtkSMIceTDesktopRenderModuleProxy;
   friend class vtkSMCompoundProxy;
   friend class vtkSMStateLoader;
+  friend class vtkSMProxyUnRegisterUndoElement;
 //ETX
 
   // Description:

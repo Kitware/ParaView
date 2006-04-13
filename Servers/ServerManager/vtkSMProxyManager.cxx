@@ -21,12 +21,13 @@
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMCompoundProxyDefinitionLoader.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMStateLoader.h"
-#include "vtkSmartPointer.h"
+#include "vtkSMUndoStack.h"
 
 #include <vtkstd/map>
 #include <vtkstd/set>
@@ -82,15 +83,15 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.35");
-
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.36");
+vtkCxxSetObjectMacro(vtkSMProxyManager, UndoStack, vtkSMUndoStack);
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
   this->Internals = new vtkSMProxyManagerInternals;
   this->Observer = vtkSMProxyManagerObserver::New();
   this->Observer->SetTarget(this);
-
+  this->UndoStack = 0;
 #if 0 // for debugging
   vtkSMProxyRegObserver* obs = new vtkSMProxyRegObserver;
   this->AddObserver(vtkCommand::RegisterEvent, obs);
@@ -106,6 +107,7 @@ vtkSMProxyManager::~vtkSMProxyManager()
 
   this->Observer->SetTarget(0);
   this->Observer->Delete();
+  this->SetUndoStack(0);
 }
 
 //----------------------------------------------------------------------------
@@ -604,7 +606,7 @@ void vtkSMProxyManager::UnRegisterAllLinks()
 
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
-  void* )
+  void* data)
 {
   vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(obj);
   if (!proxy)
@@ -616,8 +618,18 @@ void vtkSMProxyManager::ExecuteEvent(vtkObject* obj, unsigned long event,
   switch (event)
     {
   case vtkCommand::PropertyModifiedEvent:
-    // Some property on the proxy has been modified.
-    this->MarkProxyAsModified(proxy);
+      {
+      // Some property on the proxy has been modified.
+      this->MarkProxyAsModified(proxy);
+      ModifiedPropertyInformation info;
+      info.Proxy = proxy;
+      info.PropertyName = static_cast<const char*>(data);
+      if (info.PropertyName)
+        {
+        this->InvokeEvent(vtkCommand::PropertyModifiedEvent,
+          &info);
+        }
+      }
     break;
     
   case vtkCommand::UpdateEvent:

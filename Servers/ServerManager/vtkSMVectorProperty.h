@@ -106,7 +106,7 @@ protected:
 
   // Description:
   // Updates state from an XML element. Returns 0 on failure.
-  virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoader* loader);
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoader* loader, int loadLastPushedValues=0);
 
   // Description:
   // Set the appropriate ivars from the xml element.
