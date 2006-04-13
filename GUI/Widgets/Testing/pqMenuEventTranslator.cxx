@@ -55,6 +55,7 @@ bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool&
     {
     case QEvent::Enter:
       {
+      this->clearActions();
       QList<QAction*> actions = object->actions();
       for(int i = 0; i != actions.size(); ++i)
         {
@@ -67,9 +68,6 @@ bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool&
           SLOT(onRecordEvent(QObject*, const QString&, const QString&)));
         }
       }
-      break;
-    case QEvent::Leave:
-      this->clearActions();
       break;
     default:
       break;

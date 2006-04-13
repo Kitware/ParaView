@@ -42,5 +42,5 @@ pqMenuEventTranslatorAdaptor::pqMenuEventTranslatorAdaptor(QAction* action) :
 
 void pqMenuEventTranslatorAdaptor::onTriggered(bool)
 {
-  recordEvent(Action, "activate", "");
+  emit recordEvent(Action, "activate", "");
 }
