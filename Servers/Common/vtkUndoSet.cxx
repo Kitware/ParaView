@@ -21,7 +21,7 @@
 #include "vtkUndoElement.h"
 
 vtkStandardNewMacro(vtkUndoSet);
-vtkCxxRevisionMacro(vtkUndoSet, "1.1");
+vtkCxxRevisionMacro(vtkUndoSet, "1.2");
 //-----------------------------------------------------------------------------
 vtkUndoSet::vtkUndoSet()
 {
@@ -66,9 +66,9 @@ int vtkUndoSet::Redo()
       // redo failed, undo the half redone operations.
       for (int rr=cc-1; rr >=0; --rr)
         {
-        vtkUndoElement* elem = vtkUndoElement::SafeDownCast(
+        vtkUndoElement* elemU = vtkUndoElement::SafeDownCast(
           this->Collection->GetItemAsObject(rr));
-        elem->Undo();
+        elemU->Undo();
         }
       return 0;
       }
@@ -90,9 +90,9 @@ int vtkUndoSet::Undo()
       // undo failed, redo the half undone operations.
       for (int rr=0; rr <cc; ++rr)
         {
-        vtkUndoElement* elem = vtkUndoElement::SafeDownCast(
+        vtkUndoElement* elemR = vtkUndoElement::SafeDownCast(
           this->Collection->GetItemAsObject(rr));
-        elem->Redo();
+        elemR->Redo();
         }
       return 0;
       }
