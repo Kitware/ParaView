@@ -39,7 +39,7 @@ AboutDialog::AboutDialog(QWidget* Parent) :
   Ui(new Ui::AboutDialog())
 {
   this->Ui->setupUi(this);
-  this->setObjectName("aboutDialog");
+  this->setObjectName("AboutDialog");
   this->setAttribute(Qt::WA_DeleteOnClose);
 }
 

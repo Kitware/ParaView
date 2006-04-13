@@ -1,20 +1,20 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="mainWindow/menuBar/serverMenu/Connect" command="activate" arguments="" />
-  <pqevent object="mainWindow/serverBrowser/layoutWidget_3/okButton" command="activate" arguments="" />
-  <pqevent object="mainWindow/menuBar/sourcesMenu/Sphere" command="activate" arguments="" />
-  <pqevent object="mainWindow/menuBar/sourcesMenu/Cylinder" command="activate" arguments="" />
-  <pqevent object="mainWindow/objectInspectorDock/Inspector/Object Editor/Object Editor Scroll/qt_scrollarea_viewport/Object Editor Panel/Center:1" command="set_string" arguments="1" />
-  <pqevent object="mainWindow/objectInspectorDock/Inspector/Object Editor/Accept" command="activate" arguments="" />
-  <pqevent object="mainWindow/objectInspectorDock/Inspector/Object Editor/Object Editor Scroll/qt_scrollarea_viewport/Object Editor Panel/Height" command="set_string" arguments="2" />
-  <pqevent object="mainWindow/objectInspectorDock/Inspector/Object Editor/Accept" command="activate" arguments="" />
-  <pqevent object="mainWindow/UndoRedoToolBar/UndoButton" command="activate" arguments="" />
-  <pqevent object="mainWindow/UndoRedoToolBar/RedoButton" command="activate" arguments="" />
-  <pqevent object="mainWindow/UndoRedoToolBar/UndoButton" command="activate" arguments="" />
-  <pqevent object="mainWindow/pipelineInspectorDock/PipelineList/PipelineView" command="currentChanged" arguments="/0/0/0/0|0" />
-  <pqevent object="mainWindow/objectInspectorDock/Inspector/Object Editor/Accept" command="activate" arguments="" />
-  <pqevent object="mainWindow/UndoRedoToolBar/UndoButton" command="activate" arguments="" />
-  <pqevent object="mainWindow/objectInspectorDock/Inspector/Object Editor/Object Editor Scroll/qt_scrollarea_viewport/Object Editor Panel/Center:0" command="set_string" arguments="1" />
-  <pqevent object="mainWindow/objectInspectorDock/Inspector/Object Editor/Accept" command="activate" arguments="" />
-  <pqevent object="mainWindow/UndoRedoToolBar/UndoButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/ServerMenu/Connect" command="activate" arguments="" />
+  <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/SourcesMenu/Sphere" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/SourcesMenu/Cylinder" command="activate" arguments="" />
+  <pqevent object="MainWindow/ObjectInspectorDock/Inspector/Object Editor/Object Editor Scroll/qt_scrollarea_viewport/Object Editor Panel/Center:1" command="set_string" arguments="1" />
+  <pqevent object="MainWindow/ObjectInspectorDock/Inspector/Object Editor/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/ObjectInspectorDock/Inspector/Object Editor/Object Editor Scroll/qt_scrollarea_viewport/Object Editor Panel/Height" command="set_string" arguments="2" />
+  <pqevent object="MainWindow/ObjectInspectorDock/Inspector/Object Editor/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/UndoRedoToolBar/UndoButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/UndoRedoToolBar/RedoButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/UndoRedoToolBar/UndoButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/PipelineInspectorDock/PipelineList/PipelineView" command="currentChanged" arguments="/0/0/0/0|0" />
+  <pqevent object="MainWindow/ObjectInspectorDock/Inspector/Object Editor/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/UndoRedoToolBar/UndoButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/ObjectInspectorDock/Inspector/Object Editor/Object Editor Scroll/qt_scrollarea_viewport/Object Editor Panel/Center:0" command="set_string" arguments="1" />
+  <pqevent object="MainWindow/ObjectInspectorDock/Inspector/Object Editor/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/UndoRedoToolBar/UndoButton" command="activate" arguments="" />
 </pqevents>

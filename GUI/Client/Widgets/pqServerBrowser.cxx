@@ -33,40 +33,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerBrowser.h"
 
+#include "ui_pqServerBrowser.h"
+
 #include <QMessageBox>
 
 pqServerBrowser::pqServerBrowser(QWidget* Parent) :
-  base(Parent)
+  base(Parent),
+  Ui(new Ui::pqServerBrowser())
 {
-  this->Ui.setupUi(this);
-  
-  this->Ui.serverType->addItem(tr("Builtin"));
-  this->Ui.serverType->addItem(tr("Remote"));
-
-  QObject::connect(this->Ui.serverType, SIGNAL(activated(int)), this, SLOT(onServerTypeActivated(int)));
-
-  this->Ui.serverType->setCurrentIndex(0);
-  this->onServerTypeActivated(0);
-
+  this->Ui->setupUi(this);
+  this->setObjectName("ServerBrowser");
   this->setWindowTitle(tr("Pick Server:"));
   
-  this->setObjectName("serverBrowser");
+  this->Ui->ServerType->addItem(tr("Builtin"));
+  this->Ui->ServerType->addItem(tr("Remote"));
+
+  QObject::connect(this->Ui->ServerType, SIGNAL(activated(int)), this, SLOT(onServerTypeActivated(int)));
+
+  this->Ui->ServerType->setCurrentIndex(0);
+  this->onServerTypeActivated(0);
 }
 
 pqServerBrowser::~pqServerBrowser()
 {
+  delete this->Ui;
 }
 
 void pqServerBrowser::accept()
 {
   pqServer* server = 0;
-  switch(this->Ui.serverType->currentIndex())
+  switch(this->Ui->ServerType->currentIndex())
     {
     case 0:
       server = pqServer::CreateStandalone();
       break;
     case 1:
-      server = pqServer::CreateConnection(this->Ui.hostName->text().toAscii().data(), this->Ui.portNumber->value());
+      server = pqServer::CreateConnection(this->Ui->HostName->text().toAscii().data(), this->Ui->PortNumber->value());
     case 2:
       // TODO: Add case where the user connects to render server and data server separately.
       // UI will accept host name and port numbers for both data server and render server.
@@ -89,7 +91,7 @@ void pqServerBrowser::accept()
 
 void pqServerBrowser::onServerTypeActivated(int Index)
 {
-  this->Ui.hostName->setEnabled(1 == Index);
-  this->Ui.portNumber->setEnabled(1 == Index);
+  this->Ui->HostName->setEnabled(1 == Index);
+  this->Ui->PortNumber->setEnabled(1 == Index);
 }
 

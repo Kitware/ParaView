@@ -73,7 +73,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="okButton" >
+      <widget class="QPushButton" name="OK" >
        <property name="text" >
         <string>OK</string>
        </property>
@@ -89,7 +89,7 @@
  </resources>
  <connections>
   <connection>
-   <sender>okButton</sender>
+   <sender>OK</sender>
    <signal>clicked()</signal>
    <receiver>AboutDialog</receiver>
    <slot>accept()</slot>

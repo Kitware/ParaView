@@ -34,8 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqServerBrowser_h
 
 #include "pqWidgetsExport.h"
-#include "ui_pqServerBrowser.h"
 
+#include <QDialog>
+
+namespace Ui { class pqServerBrowser; }
 class pqServer;
 
 /// Provides a user-interface component for creating server connections
@@ -58,7 +60,7 @@ private:
   pqServerBrowser(const pqServerBrowser&);
   pqServerBrowser& operator=(const pqServerBrowser&);
   
-  Ui::pqServerBrowser Ui;
+  Ui::pqServerBrowser* const Ui;
   
 private slots:
   void accept();
@@ -66,4 +68,3 @@ private slots:
 };
 
 #endif // !_pqServerBrowser_h
-

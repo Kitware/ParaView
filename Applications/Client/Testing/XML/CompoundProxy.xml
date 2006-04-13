@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="mainWindow/menuBar/serverMenu/Connect" command="activate" arguments="" />
-  <pqevent object="mainWindow/serverBrowser/layoutWidget_3/okButton" command="activate" arguments="" />
-  <pqevent object="mainWindow/menuBar/toolsMenu/CompoundFilter" command="activate" arguments="" />
-  <pqevent object="mainWindow/pqCompoundProxyWizard/LoadButton" command="activate" arguments="" />
-  <pqevent object="mainWindow/pqCompoundProxyWizard/fileOpenDialog/fileName" command="set_string" arguments="Testing/XML/filters.xml" />
-  <pqevent object="mainWindow/pqCompoundProxyWizard/fileOpenDialog/buttonOk" command="activate" arguments="" />
-  <pqevent object="mainWindow/pqCompoundProxyWizard/DoneButton" command="activate" arguments="" />
-  <pqevent object="mainWindow/menuBar/sourcesMenu/Sphere" command="activate" arguments="" />
-  <pqevent object="mainWindow/CompoundProxyToolBar/MyElevation" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/ServerMenu/Connect" command="activate" arguments="" />
+  <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/ToolsMenu/CompoundFilter" command="activate" arguments="" />
+  <pqevent object="MainWindow/CompoundProxyWizard/LoadButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/CompoundProxyWizard/FileOpenDialog/FileName" command="set_string" arguments="Testing/XML/filters.xml" />
+  <pqevent object="MainWindow/CompoundProxyWizard/FileOpenDialog/OK" command="activate" arguments="" />
+  <pqevent object="MainWindow/CompoundProxyWizard/DoneButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/SourcesMenu/Sphere" command="activate" arguments="" />
+  <pqevent object="MainWindow/CompoundProxyToolBar/MyElevation" command="activate" arguments="" />
 </pqevents>

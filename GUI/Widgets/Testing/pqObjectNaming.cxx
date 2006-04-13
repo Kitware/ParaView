@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractItemModel>
 #include <QAction>
 #include <QApplication>
+#include <QDockWidget>
 #include <QHeaderView>
 #include <QItemSelectionModel>
 #include <QLayout>
@@ -51,11 +52,38 @@ static bool ValidateName(QObject& Object)
 {
   const QString class_name = Object.metaObject()->className();
   
-  // Skip separators ...
   if(QAction* const action = qobject_cast<QAction*>(&Object))
     {
+    // Skip separators ...
     if(action->isSeparator())
       return false;
+
+    // Skip menu implementation details ...
+    if(QMenu* const menu = qobject_cast<QMenu*>(Object.parent()))
+      {
+      if(menu->menuAction() == action)
+        {
+        return false;
+        }
+      }
+
+    // Skip dock widget implementation details ...
+    if(QDockWidget* const dock = qobject_cast<QDockWidget*>(Object.parent()))
+      {
+      if(dock->toggleViewAction() == action)
+        {
+        return false;
+        }
+      }
+
+    // Skip toolbar implementation details ...
+    if(QToolBar* const toolbar = qobject_cast<QToolBar*>(Object.parent()))
+      {
+      if(toolbar->toggleViewAction() == action)
+        {
+        return false;
+        }
+      }
     }
   
   // Skip layouts ...
@@ -94,25 +122,7 @@ static bool ValidateName(QObject& Object)
     return false;
     }
 
-  // Skip menu implementation details ...
-  if(QMenu* const menu = qobject_cast<QMenu*>(Object.parent()))
-    {
-    if(menu->menuAction() == &Object)
-      {
-      return false;
-      }
-    }
-
-  // Skip toolbar implementation details ...
-  if(QToolBar* const toolbar = qobject_cast<QToolBar*>(Object.parent()))
-    {
-    if(toolbar->toggleViewAction() == &Object)
-      {
-      return false;
-      }
-    }
-
-  // Skip some weird dockwindow implementation details ...
+  // Skip some weird dock widget implementation details ...
   if(
     class_name == "QDockSeparator"
     || class_name == "QDockWidgetSeparator"
@@ -166,14 +176,14 @@ bool pqObjectNaming::Validate(QObject& Parent, const QString& Path)
       const QString name = child->objectName();
       if(name.isEmpty())
         {
-        qWarning() << Path << " - unnamed child object: " << child << "\n";
+        qWarning() << Path << " - unnamed child object: " << child;
         result = false;
         }
       else
         {
         if(names.contains(name))
           {
-          qWarning() << Path << " - duplicate child object name [" << name << "]: " << child << "\n";
+          qWarning() << Path << " - duplicate child object name [" << name << "]: " << child;
           result = false;
           }
           
@@ -211,7 +221,7 @@ const QString pqObjectNaming::GetName(QObject& Object)
     
     if(!p->parent() && !QApplication::topLevelWidgets().contains(qobject_cast<QWidget*>(p)))
       {
-      qCritical() << "Object " << p << " is not a top-level widget\n";
+      qCritical() << "Object " << p << " is not a top-level widget";
       return QString();
       }
     }
@@ -238,6 +248,6 @@ QObject* pqObjectNaming::GetObject(const QString& Name)
       return object;
     }
   
-  qCritical() << "Couldn't find object " << Name << "\n";
+  qCritical() << "Couldn't find object " << Name;
   return 0;
 }

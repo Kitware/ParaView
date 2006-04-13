@@ -23,7 +23,7 @@
     <number>6</number>
    </property>
    <item row="1" column="1" >
-    <widget class="QTreeView" name="files" >
+    <widget class="QTreeView" name="Files" >
      <property name="sizePolicy" >
       <sizepolicy>
        <hsizetype>7</hsizetype>
@@ -50,10 +50,10 @@
       </widget>
      </item>
      <item row="1" column="1" >
-      <widget class="QComboBox" name="fileType" />
+      <widget class="QComboBox" name="FileType" />
      </item>
      <item row="0" column="2" >
-      <widget class="QPushButton" name="buttonOk" >
+      <widget class="QPushButton" name="OK" >
        <property name="text" >
         <string>OK</string>
        </property>
@@ -67,10 +67,10 @@
       </widget>
      </item>
      <item row="0" column="1" >
-      <widget class="QLineEdit" name="fileName" />
+      <widget class="QLineEdit" name="FileName" />
      </item>
      <item row="1" column="2" >
-      <widget class="QPushButton" name="buttonCancel" >
+      <widget class="QPushButton" name="Cancel" >
        <property name="text" >
         <string>Cancel</string>
        </property>
@@ -79,7 +79,7 @@
     </layout>
    </item>
    <item rowspan="2" row="1" column="0" >
-    <widget class="QListView" name="favorites" >
+    <widget class="QListView" name="Favorites" >
      <property name="sizePolicy" >
       <sizepolicy>
        <hsizetype>7</hsizetype>
@@ -114,7 +114,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="parents" >
+      <widget class="QComboBox" name="Parents" >
        <property name="sizePolicy" >
         <sizepolicy>
          <hsizetype>7</hsizetype>
@@ -126,7 +126,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="navigateUp" >
+      <widget class="QToolButton" name="NavigateUp" >
        <property name="text" >
         <string/>
        </property>
@@ -143,7 +143,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>buttonOk</sender>
+   <sender>OK</sender>
    <signal>clicked()</signal>
    <receiver>pqFileDialog</receiver>
    <slot>accept()</slot>
@@ -159,7 +159,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>buttonCancel</sender>
+   <sender>Cancel</sender>
    <signal>clicked()</signal>
    <receiver>pqFileDialog</receiver>
    <slot>reject()</slot>

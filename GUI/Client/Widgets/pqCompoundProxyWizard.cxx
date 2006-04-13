@@ -46,6 +46,7 @@ pqCompoundProxyWizard::pqCompoundProxyWizard(pqServer* s, QWidget* p, Qt::WFlags
   : QDialog(p, f), Server(s)
 {
   this->setupUi(this);
+  this->setObjectName("CompoundProxyWizard");
   this->connect(this->LoadButton, SIGNAL(clicked()), SLOT(onLoad()));
   this->connect(this->RemoveButton, SIGNAL(clicked()), SLOT(onRemove()));
   
@@ -66,7 +67,7 @@ void pqCompoundProxyWizard::onLoad()
     new pqLocalFileDialogModel(), 
     tr("Open Compound Proxy File:"),
     this,
-    "fileOpenDialog");
+    "FileOpenDialog");
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
 
   this->connect(fileDialog, SIGNAL(filesSelected(const QStringList&)),

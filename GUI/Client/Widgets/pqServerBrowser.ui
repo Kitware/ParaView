@@ -42,7 +42,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QComboBox" name="serverType" >
+     <widget class="QComboBox" name="ServerType" >
       <property name="sizePolicy" >
        <sizepolicy>
         <hsizetype>7</hsizetype>
@@ -85,14 +85,14 @@
      </spacer>
     </item>
     <item>
-     <widget class="QPushButton" name="okButton" >
+     <widget class="QPushButton" name="OK" >
       <property name="text" >
        <string>OK</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="cancelButton" >
+     <widget class="QPushButton" name="Cancel" >
       <property name="text" >
        <string>Cancel</string>
       </property>
@@ -131,14 +131,14 @@
      </widget>
     </item>
     <item row="0" column="1" >
-     <widget class="QLineEdit" name="hostName" >
+     <widget class="QLineEdit" name="HostName" >
       <property name="text" >
        <string>localhost</string>
       </property>
      </widget>
     </item>
     <item row="1" column="1" >
-     <widget class="QSpinBox" name="portNumber" >
+     <widget class="QSpinBox" name="PortNumber" >
       <property name="maximum" >
        <number>65535</number>
       </property>
@@ -157,7 +157,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>okButton</sender>
+   <sender>OK</sender>
    <signal>clicked()</signal>
    <receiver>pqServerBrowser</receiver>
    <slot>accept()</slot>
@@ -173,7 +173,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>cancelButton</sender>
+   <sender>Cancel</sender>
    <signal>clicked()</signal>
    <receiver>pqServerBrowser</receiver>
    <slot>reject()</slot>

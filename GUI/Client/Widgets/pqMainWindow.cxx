@@ -253,10 +253,10 @@ public:
 pqMainWindow::pqMainWindow() :
   Implementation(new pqImplementation())
 {
-  this->setObjectName("mainWindow");
+  this->setObjectName("MainWindow");
   this->setWindowTitle("ParaQ");
 
-  this->menuBar() << pqSetName("menuBar");
+  this->menuBar() << pqSetName("MenuBar");
 
   // Set up the main ParaQ items along with the central widget.
   this->Implementation->Adaptor = new pqSMAdaptor();
@@ -394,9 +394,7 @@ void pqMainWindow::createStandardToolsMenu()
 void pqMainWindow::createStandardPipelineBrowser(bool visible)
 {
   QDockWidget* const pipeline_dock = new QDockWidget("Pipeline Inspector", this)
-    << pqSetName("pipelineInspectorDock");
-    
-  pipeline_dock->toggleViewAction() << pqSetName("toggleView");
+    << pqSetName("PipelineInspectorDock");
     
   pipeline_dock->setAllowedAreas(
     Qt::LeftDockWidgetArea |
@@ -419,9 +417,7 @@ void pqMainWindow::createStandardPipelineBrowser(bool visible)
 void pqMainWindow::createStandardObjectInspector(bool visible)
 {
   QDockWidget* const object_inspector_dock = new QDockWidget("Object Inspector", this)
-    << pqSetName("objectInspectorDock");
-    
-  object_inspector_dock->toggleViewAction() << pqSetName("toggleView");
+    << pqSetName("ObjectInspectorDock");
     
   object_inspector_dock->setAllowedAreas(
       Qt::LeftDockWidgetArea |
@@ -443,9 +439,7 @@ void pqMainWindow::createStandardObjectInspector(bool visible)
 void pqMainWindow::createStandardElementInspector(bool visible)
 {
   this->Implementation->ElementInspectorDock = new QDockWidget("Element Inspector View", this)
-    << pqSetName("elementInspectorDock");
-    
-  this->Implementation->ElementInspectorDock->toggleViewAction() << pqSetName("toggleView");
+    << pqSetName("ElementInspectorDock");
     
   this->Implementation->ElementInspectorDock->setAllowedAreas(
     Qt::BottomDockWidgetArea |
@@ -542,7 +536,7 @@ QMenu* pqMainWindow::fileMenu()
   if(!this->Implementation->FileMenu)
     {
     this->Implementation->FileMenu = this->menuBar()->addMenu(tr("&File"))
-      << pqSetName("fileMenu");
+      << pqSetName("FileMenu");
     }
     
   return this->Implementation->FileMenu;
@@ -553,7 +547,7 @@ QMenu* pqMainWindow::viewMenu()
   if(!this->Implementation->ViewMenu)
     {
     this->Implementation->ViewMenu = this->menuBar()->addMenu(tr("&View"))
-      << pqSetName("viewMenu");
+      << pqSetName("ViewMenu");
     }
     
   return this->Implementation->ViewMenu;
@@ -564,7 +558,7 @@ QMenu* pqMainWindow::serverMenu()
   if(!this->Implementation->ServerMenu)
     {
     this->Implementation->ServerMenu = this->menuBar()->addMenu(tr("&Server"))
-      << pqSetName("serverMenu");
+      << pqSetName("ServerMenu");
     }
     
   return this->Implementation->ServerMenu;
@@ -575,7 +569,7 @@ QMenu* pqMainWindow::sourcesMenu()
   if(!this->Implementation->SourcesMenu)
     {
     this->Implementation->SourcesMenu = this->menuBar()->addMenu(tr("&Sources"))
-      << pqSetName("sourcesMenu");
+      << pqSetName("SourcesMenu");
     }
     
   return this->Implementation->SourcesMenu;
@@ -586,7 +580,7 @@ QMenu* pqMainWindow::filtersMenu()
   if(!this->Implementation->FiltersMenu)
     {
     this->Implementation->FiltersMenu = this->menuBar()->addMenu(tr("&Filters"))
-      << pqSetName("filtersMenu");
+      << pqSetName("FiltersMenu");
     }
     
   return this->Implementation->FiltersMenu;
@@ -597,7 +591,7 @@ QMenu* pqMainWindow::toolsMenu()
   if(!this->Implementation->ToolsMenu)
     {
     this->Implementation->ToolsMenu = this->menuBar()->addMenu(tr("&Tools"))
-      << pqSetName("toolsMenu");
+      << pqSetName("ToolsMenu");
     }
     
   return this->Implementation->ToolsMenu;
@@ -608,7 +602,7 @@ QMenu* pqMainWindow::helpMenu()
   if(!this->Implementation->HelpMenu)
     {
     this->Implementation->HelpMenu = this->menuBar()->addMenu(tr("&Help"))
-      << pqSetName("helpMenu");
+      << pqSetName("HelpMenu");
     }
     
   return this->Implementation->HelpMenu;
@@ -760,7 +754,7 @@ void pqMainWindow::onFileOpen(pqServer* Server)
     setServer(Server);
 
   pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(NULL, Server), 
-    tr("Open File:"), this, "fileOpenDialog");
+    tr("Open File:"), this, "FileOpenDialog");
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileOpen(const QStringList&)));
   file_dialog->show();
@@ -802,7 +796,7 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
 void pqMainWindow::onFileOpenServerState()
 {
   pqFileDialog *fileDialog = new pqFileDialog(new pqLocalFileDialogModel(),
-      tr("Open Server State File:"), this, "fileOpenDialog");
+      tr("Open Server State File:"), this, "FileOpenDialog");
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(fileDialog, SIGNAL(filesSelected(const QStringList&)),
       this, SLOT(onFileOpenServerState(const QStringList&)));
@@ -877,7 +871,7 @@ void pqMainWindow::onFileOpenServerState(const QStringList& Files)
 
 void pqMainWindow::onFileSaveServerState()
 {
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save Server State:"), this, "fileSaveDialog");
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save Server State:"), this, "FileSaveDialog");
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileSaveServerState(const QStringList&)));
   file_dialog->show();
@@ -946,7 +940,7 @@ void pqMainWindow::onFileSaveScreenshot()
     return;
     }
 
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save Screenshot:"), this, "fileSaveDialog");
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save Screenshot:"), this, "FileSaveDialog");
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileSaveScreenshot(const QStringList&)));
   file_dialog->show();
@@ -1236,7 +1230,7 @@ void pqMainWindow::onValidateWidgetNames()
 
 void pqMainWindow::onRecordTest()
 {
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Record Test:"), this, "fileSaveDialog");
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Record Test:"), this, "FileSaveDialog");
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onRecordTest(const QStringList&)));
   file_dialog->show();
@@ -1253,7 +1247,7 @@ void pqMainWindow::onRecordTest(const QStringList& Files)
 
 void pqMainWindow::onPlayTest()
 {
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Record Test:"), this, "fileSaveDialog");
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Play Test:"), this, "FileOpenDialog");
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onPlayTest(const QStringList&)));
   file_dialog->show();

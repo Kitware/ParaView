@@ -44,25 +44,25 @@ pqFileDialog::pqFileDialog(pqFileDialogModel* model, const QString& title, QWidg
   Ui(new Ui::pqFileDialog())
 {
   this->Ui->setupUi(this);
-  this->Ui->navigateUp->setIcon(style()->standardPixmap(QStyle::SP_FileDialogToParent));
-  this->Ui->files->setModel(this->Model->fileModel());
-  this->Ui->favorites->setModel(this->Model->favoriteModel());
+  this->Ui->NavigateUp->setIcon(style()->standardPixmap(QStyle::SP_FileDialogToParent));
+  this->Ui->Files->setModel(this->Model->fileModel());
+  this->Ui->Favorites->setModel(this->Model->favoriteModel());
 
-  this->Ui->files->setSelectionBehavior(QAbstractItemView::SelectRows);
-  this->Ui->files->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  this->Ui->Files->setSelectionBehavior(QAbstractItemView::SelectRows);
+  this->Ui->Files->setSelectionMode(QAbstractItemView::ExtendedSelection);
   
-  this->Ui->favorites->setSelectionBehavior(QAbstractItemView::SelectRows);
-  this->Ui->favorites->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  this->Ui->Favorites->setSelectionBehavior(QAbstractItemView::SelectRows);
+  this->Ui->Favorites->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   this->setWindowTitle(title);
   this->setObjectName(name);
 
   QObject::connect(this->Model->fileModel(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(onDataChanged(const QModelIndex&, const QModelIndex&)));
-  QObject::connect(this->Ui->navigateUp, SIGNAL(clicked()), this, SLOT(onNavigateUp()));
-  QObject::connect(this->Ui->files, SIGNAL(activated(const QModelIndex&)), this, SLOT(onActivated(const QModelIndex&)));
-  QObject::connect(this->Ui->favorites, SIGNAL(activated(const QModelIndex&)), this, SLOT(onActivated(const QModelIndex&)));
-  QObject::connect(this->Ui->parents, SIGNAL(activated(const QString&)), this, SLOT(onNavigate(const QString&)));
-  QObject::connect(this->Ui->fileName, SIGNAL(textChanged(const QString&)), this, SLOT(onManualEntry(const QString&)));
+  QObject::connect(this->Ui->NavigateUp, SIGNAL(clicked()), this, SLOT(onNavigateUp()));
+  QObject::connect(this->Ui->Files, SIGNAL(activated(const QModelIndex&)), this, SLOT(onActivated(const QModelIndex&)));
+  QObject::connect(this->Ui->Favorites, SIGNAL(activated(const QModelIndex&)), this, SLOT(onActivated(const QModelIndex&)));
+  QObject::connect(this->Ui->Parents, SIGNAL(activated(const QString&)), this, SLOT(onNavigate(const QString&)));
+  QObject::connect(this->Ui->FileName, SIGNAL(textChanged(const QString&)), this, SLOT(onManualEntry(const QString&)));
 
   this->Model->setCurrentPath(this->Model->getStartPath());
 }
@@ -78,7 +78,7 @@ void pqFileDialog::accept()
   QStringList selected_files;
   
   // Collect files that were selected from the list ...
-  QModelIndexList indexes = this->Ui->files->selectionModel()->selectedIndexes();
+  QModelIndexList indexes = this->Ui->Files->selectionModel()->selectedIndexes();
   for(int i = 0; i != indexes.size(); ++i)
     {
     if(indexes[i].column() != 0)
@@ -90,7 +90,7 @@ void pqFileDialog::accept()
     }
 
   // Collect manually entered filenames (if any) ...
-  const QString manual_filename = this->Ui->fileName->text();
+  const QString manual_filename = this->Ui->FileName->text();
   if(!manual_filename.isEmpty())
     selected_files.push_back(this->Model->getFilePath(manual_filename));
   
@@ -106,10 +106,10 @@ void pqFileDialog::accept()
 void pqFileDialog::onDataChanged(const QModelIndex&, const QModelIndex&)
 {
   const QStringList split_path = this->Model->splitPath(this->Model->getCurrentPath());
-  this->Ui->parents->clear();
+  this->Ui->Parents->clear();
   for(int i = 0; i != split_path.size(); ++i)
-    this->Ui->parents->addItem(split_path[i]);
-  this->Ui->parents->setCurrentIndex(split_path.size() - 1);
+    this->Ui->Parents->addItem(split_path[i]);
+  this->Ui->Parents->setCurrentIndex(split_path.size() - 1);
 }
 
 void pqFileDialog::onActivated(const QModelIndex& Index)
@@ -131,7 +131,7 @@ void pqFileDialog::onActivated(const QModelIndex& Index)
 
 void pqFileDialog::onManualEntry(const QString&)
 {
-  this->Ui->files->clearSelection();
+  this->Ui->Files->clearSelection();
 }
 
 void pqFileDialog::onNavigate(const QString& Path)

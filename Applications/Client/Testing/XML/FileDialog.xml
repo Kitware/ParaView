@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="mainWindow/menuBar/fileMenu/Open" command="activate" arguments="" />
-  <pqevent object="mainWindow/serverBrowser/layoutWidget_3/okButton" command="activate" arguments="" />
-  <pqevent object="mainWindow/fileOpenDialog/buttonCancel" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/FileMenu/Open" command="activate" arguments="" />
+  <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
+  <pqevent object="MainWindow/FileOpenDialog/Cancel" command="activate" arguments="" />
 </pqevents>
