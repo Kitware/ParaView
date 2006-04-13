@@ -53,9 +53,11 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object, const QString& Co
     {
     if(QMenu* const menu = qobject_cast<QMenu*>(object->parent()))
       {
-      menu->setActiveAction(object);
-
-      pqTesting::NonBlockingSleep(1000);
+        if(!menu->parent())
+          {
+          while(!menu->isVisible())
+            pqTesting::NonBlockingSleep(100);
+          }
 
       QKeyEvent key_press(QEvent::KeyPress, Qt::Key_Escape, 0);
       QApplication::sendEvent(menu, &key_press);
