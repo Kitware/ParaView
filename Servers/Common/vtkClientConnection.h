@@ -21,6 +21,7 @@
 #define __vtkClientConnection_h
 
 #include "vtkRemoteConnection.h"
+class vtkUndoStack;
 
 class VTK_EXPORT vtkClientConnection : public vtkRemoteConnection
 {
@@ -46,6 +47,21 @@ public:
   // Description:
   // Gather information and send over to the Client.
   void SendInformation(vtkClientServerStream &stream);
+
+  // Description:
+  // Called when the server recieves a PushUndoSet request. Don't call
+  // directly. Public so that the RMI callback can call it.
+  void PushUndoXMLRMI(const char* label, const char* message);
+  void UndoRMI();
+  void RedoRMI();
+
+  
+  // Description:
+  // Client connection does not support these method. Do nothing.
+  virtual void PushUndo(const char*, vtkPVXMLElement*)  { }
+  virtual vtkPVXMLElement* NewNextUndo() { return 0; }
+  virtual vtkPVXMLElement* NewNextRedo() { return 0; }
+//BTX
 protected:
   vtkClientConnection();
   ~vtkClientConnection();
@@ -61,10 +77,15 @@ protected:
   // Description:
   // Set up RMI callbacks.
   void SetupRMIs();
- 
+
+  vtkUndoStack* UndoRedoStack;
+  friend class vtkClientConnectionUndoSet;
+  void SendRedoXML(const char* xml);
+  void SendUndoXML(const char* xml);
 private:
   vtkClientConnection(const vtkClientConnection&); // Not implemented.
   void operator=(const vtkClientConnection&); // Not implemented.
+//ETX
 };
                                        
 

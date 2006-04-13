@@ -44,6 +44,9 @@ SET(Kit_SRCS
   vtkSelfConnection.cxx
   vtkServerConnection.cxx
   vtkStringList.cxx  
+  vtkUndoElement.cxx
+  vtkUndoSet.cxx
+  vtkUndoStack.cxx
   )
 
 # Abstract and Wrap exclude
@@ -53,6 +56,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkProcessModuleConnection
   vtkProcessModuleGUIHelper
   vtkRemoteConnection
+  vtkUndoElement
   ABSTRACT
   )
 SET_SOURCE_FILES_PROPERTIES(

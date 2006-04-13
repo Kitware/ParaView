@@ -61,6 +61,7 @@ MainWindow::MainWindow()
   this->createStandardElementInspector(false);
   
   this->createStandardVCRToolBar();
+  this->createUndoRedoToolBar();
   this->createStandardVariableToolBar();
   this->createStandardCompoundProxyToolBar();
 }

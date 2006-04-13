@@ -45,6 +45,8 @@ class pqPipelineServer;
 class pqPipelineWindow;
 class pqServer;
 
+class vtkCommand;
+class vtkObject;
 class vtkSMProxy;
 class vtkSMSourceProxy;
 class vtkUnstructuredGrid;
@@ -89,6 +91,8 @@ public:
 
   /// Creates the "standard" VCR toolbar
   void createStandardVCRToolBar();
+  /// Create the temporary "undo/redo" toolbar.
+  void createUndoRedoToolBar();
   /// Creates the "standard" global variable toolbar
   void createStandardVariableToolBar();
   /// Creates the "standard" compound-proxy toolbar
@@ -165,6 +169,11 @@ public slots:
   void onNextTimeStep();
   void onLastTimeStep();
 
+  void onUndo();
+  void onRedo();
+  // Called when the Undo/Redo stack changes.
+  void onUndoRedoStackChanged(vtkObject*, unsigned long, void*, void*, 
+    vtkCommand*);
 private slots:
   void onNewQVTKWidget(pqMultiViewFrame* parent);
   void onDeleteQVTKWidget(pqMultiViewFrame* parent);

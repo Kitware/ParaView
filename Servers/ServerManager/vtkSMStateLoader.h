@@ -46,13 +46,13 @@ public:
   // Returns 1 on success, 0 on failure.
   // If keep_proxies is set, then the internal map
   // of proxy ids to proxies is not cleared on loading of the state.
-  virtual int LoadState(vtkPVXMLElement* rootElement, int keep_proxies=0);
+  int LoadState(vtkPVXMLElement* rootElement, int keep_proxies=0);
 
   // Description:
   // Either create a new proxy or returns one from the map
   // of existing properties. Newly created proxies are stored
   // in the map with the id as the key.
-  vtkSMProxy* NewProxy(int id);
+  virtual vtkSMProxy* NewProxy(int id);
   vtkSMProxy* NewProxyFromElement(vtkPVXMLElement* proxyElement, int id);
 //BTX
   // Description:

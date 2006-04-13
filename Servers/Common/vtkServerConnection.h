@@ -83,6 +83,28 @@ public:
   // Description:
   // Get the number of data server processes on the server.
   virtual int GetNumberOfPartitions() { return this->NumberOfServerProcesses; }
+
+  // Description:
+  // Push the vtkUndoSet xml state on the undo stack for this connection.
+  // Subclasses override this method to do the appropriate action.
+  // On SelfConnection, the undo set is stored locally, while on
+  // remote server connection, the undo set is sent to the server.
+  virtual void PushUndo(const char* label, vtkPVXMLElement* root);
+
+  // Description:
+  // Get the next undo  xml from this connection.
+  // This method allocates  a new vtkPVXMLElement. It is the responsibility 
+  // of caller to \c Delete it. 
+  // \returns NULL on failure, otherwise the XML element is returned.
+  virtual vtkPVXMLElement* NewNextUndo();
+ 
+  // Description:
+  // Get the next redo  xml from this connection.
+  // This method allocates  a new vtkPVXMLElement. It is the responsibility 
+  // of caller to \c Delete it. 
+  // \returns NULL on failure, otherwise the XML element is returned.
+  virtual vtkPVXMLElement* NewNextRedo();
+
 protected:
   vtkServerConnection();
   ~vtkServerConnection();

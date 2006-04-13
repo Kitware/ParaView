@@ -91,6 +91,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSMStringVectorProperty.h>
+#include <vtkSMUndoStack.h>
 
 #include <QAction>
 #include <QCoreApplication>
@@ -102,6 +103,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMessageBox>
 #include <QSignalMapper>
 #include <QToolBar>
+#include <QToolButton>
 #include <QVTKWidget.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -133,9 +135,11 @@ public:
     ElementInspectorDock(0),
     CompoundProxyToolBar(0),
     VariableSelectorToolBar(0),
+    UndoRedoToolBar(0),
     ProxyInfo(0),
     VTKConnector(0),
-    Inspector(0)
+    Inspector(0),
+    UndoStack(0)
   {
     // Redirect Qt debug output to VTK ...
     qInstallMsgHandler(QtMessageOutput);
@@ -146,6 +150,9 @@ public:
     this->OutputWindow->connect(this->OutputWindowAdapter, SIGNAL(displayWarningText(const QString&)), this->OutputWindow, SLOT(onDisplayWarningText(const QString&)));
     this->OutputWindow->connect(this->OutputWindowAdapter, SIGNAL(displayGenericWarningText(const QString&)), this->OutputWindow, SLOT(onDisplayGenericWarningText(const QString&)));
     vtkOutputWindow::SetInstance(OutputWindowAdapter);
+
+    this->UndoStack = vtkSMUndoStack::New();
+    vtkSMProxyManager::GetProxyManager()->SetUndoStack(this->UndoStack);
   }
   
   ~pqImplementation()
@@ -176,6 +183,9 @@ public:
     this->Adaptor = 0;
     
     delete this->OutputWindow;
+
+    this->UndoStack->Delete();
+    this->UndoStack = 0;
   }
 
   static void QtMessageOutput(QtMsgType type, const char *msg)
@@ -227,9 +237,11 @@ public:
   QDockWidget *ElementInspectorDock;
   QToolBar* CompoundProxyToolBar;
   QToolBar* VariableSelectorToolBar;
+  QToolBar* UndoRedoToolBar;
   pqSourceProxyInfo* ProxyInfo;
   vtkEventQtSlotConnect* VTKConnector;
   pqObjectInspectorWidget* Inspector;
+  vtkSMUndoStack* UndoStack;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -468,7 +480,36 @@ void pqMainWindow::createStandardVCRToolBar()
 
   this->addToolBar(Qt::TopToolBarArea, toolbar);
 }
+//-----------------------------------------------------------------------------
+void pqMainWindow::createUndoRedoToolBar()
+{
+  QToolBar* const toolbar = new QToolBar(tr("Undo Redo Controls"), this)
+    << pqSetName("UndoRedoToolBar");
+  this->Implementation->UndoRedoToolBar = toolbar;
+  this->addToolBar(Qt::TopToolBarArea, toolbar);
+  QToolButton* const undoButton = new QToolButton(toolbar) << pqSetName("UndoButton");
+  undoButton->setAutoRaise(true);
+  undoButton->setToolTip("Undo");
+  undoButton->setIcon(QIcon(":pqWidgets/pqUndo22.png"));
+  undoButton->setEnabled(false);
+  toolbar->addWidget(undoButton);
 
+  QToolButton* const redoButton = new QToolButton(toolbar) << pqSetName("RedoButton");
+  redoButton->setAutoRaise(true);
+  redoButton->setToolTip("Redo");
+  redoButton->setIcon(QIcon(":pqWidgets/pqRedo22.png"));
+  redoButton->setEnabled(false);
+  toolbar->addWidget(redoButton);
+
+  this->connect(undoButton, SIGNAL(clicked()), SLOT(onUndo()));
+  this->connect(redoButton, SIGNAL(clicked()), SLOT(onRedo()));
+
+  this->Implementation->VTKConnector->Connect(this->Implementation->UndoStack,
+    vtkCommand::ModifiedEvent, this, SLOT(onUndoRedoStackChanged(vtkObject*, 
+        unsigned long, void*, void*, vtkCommand*)), NULL, 1.0);
+}
+
+//-----------------------------------------------------------------------------
 void pqMainWindow::createStandardVariableToolBar()
 {
   this->Implementation->VariableSelectorToolBar = new QToolBar(tr("Variables"), this)
@@ -1129,7 +1170,10 @@ vtkSMProxy* pqMainWindow::createSource(const QString& source_name)
   QVTKWidget* const win = this->Implementation->PipelineList->getCurrentWindow();
   if(!win)
     return 0;
-    
+  
+  this->Implementation->UndoStack->BeginUndoSet(
+    this->Implementation->CurrentServer->GetConnectionID(), "CreateSource");
+  
   vtkSMSourceProxy* source = this->Implementation->Pipeline->createSource(source_name.toAscii().data(), win);
   this->Implementation->Pipeline->setVisibility(this->Implementation->Pipeline->createDisplay(source), true);
   vtkSMRenderModuleProxy* rm = this->Implementation->Pipeline->getRenderModule(win);
@@ -1137,6 +1181,7 @@ vtkSMProxy* pqMainWindow::createSource(const QString& source_name)
   win->update();
   this->Implementation->PipelineList->selectProxy(source);
   
+  this->Implementation->UndoStack->EndUndoSet();
   return source;
 }
 
@@ -1700,5 +1745,62 @@ void pqMainWindow::onLastTimeStep()
     QVTKWidget *win= pipeline->getWindowFor(this->Implementation->CurrentProxy);
     if(win)
       win->update();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::onUndoRedoStackChanged(vtkObject*, unsigned long, void*, 
+  void*,  vtkCommand*)
+{
+  QToolButton* undoButton = 
+    this->Implementation->UndoRedoToolBar->findChild<QToolButton*>("UndoButton");
+
+  QToolButton* redoButton = 
+    this->Implementation->UndoRedoToolBar->findChild<QToolButton*>("RedoButton");
+  if (undoButton)
+    {
+    if (this->Implementation->UndoStack->CanUndo())
+      {
+      undoButton->setEnabled(true); 
+      }
+    else
+      {
+      undoButton->setEnabled(false); 
+      }
+    }
+
+  if (redoButton)
+    {
+    if (this->Implementation->UndoStack->CanRedo())
+      {
+      redoButton->setEnabled(true);
+      }
+    else
+      {
+      redoButton->setEnabled(false);
+      }
+    }
+}
+
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::onUndo()
+{
+  this->Implementation->UndoStack->Undo();
+  QVTKWidget *win = this->Implementation->PipelineList->getCurrentWindow();
+  if (win)
+    {
+    win->update();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::onRedo()
+{
+  this->Implementation->UndoStack->Redo();
+  QVTKWidget *win = this->Implementation->PipelineList->getCurrentWindow();
+  if (win)
+    {
+    win->update();
     }
 }

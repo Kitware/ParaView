@@ -23,15 +23,19 @@
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVConfig.h" // for PARAVIEW_VERSION_MAJOR etc.
 #include "vtkPVOptions.h"
+#include "vtkPVXMLElement.h"
+#include "vtkPVXMLParser.h"
 #include "vtkPVServerInformation.h"
+#include "vtkSmartPointer.h"
 #include "vtkSocketController.h"
 #include "vtkSocketCommunicator.h"
 
+#include <vtksys/ios/sstream>
 #include <vtksys/SystemTools.hxx>
 
 
 vtkStandardNewMacro(vtkServerConnection);
-vtkCxxRevisionMacro(vtkServerConnection, "1.4");
+vtkCxxRevisionMacro(vtkServerConnection, "1.5");
 //-----------------------------------------------------------------------------
 vtkServerConnection::vtkServerConnection()
 {
@@ -650,6 +654,116 @@ int vtkServerConnection::SetupDataServerRenderServerConnection()
   return 1;
 }
 
+
+//-----------------------------------------------------------------------------
+void vtkServerConnection::PushUndo(const char* label, vtkPVXMLElement* uelem)
+{
+  vtkPVXMLElement* root = vtkPVXMLElement::New();
+  root->SetName("ClientServerUndoRedo");
+  root->SetAttribute("label", label);
+  root->AddNestedElement(uelem);
+
+  vtksys_ios::ostringstream xml_stream;
+  root->PrintXML(xml_stream, vtkIndent());
+  root->Delete();
+
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+    << label
+    << xml_stream.str().c_str()
+    << vtkClientServerStream::End;
+
+  // Send the string to server.
+  vtkSocketController* controller = this->GetSocketController();
+  const unsigned char* data;
+  size_t len;
+  stream.GetData(&data, &len);
+  
+  controller->TriggerRMI(1, (void*)(data), len, 
+    vtkRemoteConnection::CLIENT_SERVER_PUSH_UNDO_XML_TAG);
+}
+
+//-----------------------------------------------------------------------------
+vtkPVXMLElement* vtkServerConnection::NewNextUndo()
+{
+  vtkSocketController* controller = this->GetSocketController();
+  controller->TriggerRMI(1, NULL, 0, vtkRemoteConnection::UNDO_XML_TAG);
+  int length;
+  controller->Receive(&length, 1, 1, 
+    vtkRemoteConnection::UNDO_XML_TAG);
+  if (length <= 0)
+    {
+    vtkErrorMacro("Failed to Undo. Server did not return any state.");
+    return 0;
+    }
+
+  char* data = new char[length+1];
+  controller->Receive(data, length, 1, vtkRemoteConnection::UNDO_XML_TAG);
+  data[length] = 0;
+
+  // Now parse the XML.
+  vtkSmartPointer<vtkPVXMLParser> parser = vtkSmartPointer<vtkPVXMLParser>::New();
+  if (!parser->Parse(data))
+    {
+    vtkErrorMacro("Server Undo state response is invalid. Must be valid XML.");
+    return 0;
+    }
+  
+  if (!parser->GetRootElement() || 
+    strcmp(parser->GetRootElement()->GetName(), "ClientServerUndoRedo") != 0)
+    {
+    vtkErrorMacro("Invalid XML, expected ClientServerUndoRedo element.");
+    return 0;
+    }
+  
+  vtkPVXMLElement* undoelem = parser->GetRootElement()->GetNestedElement(0);
+  if (undoelem)
+    {
+    undoelem->Register(this);
+    }
+  return undoelem;
+}
+
+//-----------------------------------------------------------------------------
+vtkPVXMLElement* vtkServerConnection::NewNextRedo()
+{
+  vtkSocketController* controller = this->GetSocketController();
+  controller->TriggerRMI(1, NULL, 0, vtkRemoteConnection::REDO_XML_TAG);
+  int length;
+  controller->Receive(&length, 1, 1, 
+    vtkRemoteConnection::REDO_XML_TAG);
+  if (length <= 0)
+    {
+    vtkErrorMacro("Failed to Redo. Server did not return any state.");
+    return 0;
+    }
+
+  char* data = new char[length+1];
+  controller->Receive(data, length, 1, vtkRemoteConnection::REDO_XML_TAG);
+  data[length] = 0;
+
+  // Now parse the XML.
+  vtkSmartPointer<vtkPVXMLParser> parser = vtkSmartPointer<vtkPVXMLParser>::New();
+  if (!parser->Parse(data))
+    {
+    vtkErrorMacro("Server Undo state response is invalid. Must be valid XML.");
+    return 0;
+    }
+
+  if (!parser->GetRootElement() || 
+    strcmp(parser->GetRootElement()->GetName(), "ClientServerUndoRedo") != 0)
+    {
+    vtkErrorMacro("Invalid XML, expected ClientServerUndoRedo element.");
+    return 0;
+    }
+
+  vtkPVXMLElement* undoelem = parser->GetRootElement()->GetNestedElement(0);
+  if (undoelem)
+    {
+    undoelem->Register(this);
+    }
+  return undoelem;
+}
 
 //-----------------------------------------------------------------------------
 void vtkServerConnection::PrintSelf(ostream& os, vtkIndent indent)

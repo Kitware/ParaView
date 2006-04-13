@@ -25,8 +25,11 @@
 #include "vtkPVOptions.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
+#include "vtkUndoSet.h"
+#include "vtkUndoStack.h"
 
 #include <vtkstd/new>
+#include <vtkstd/string>
 
 //-----------------------------------------------------------------------------
 // RMI Callbacks.
@@ -128,17 +131,110 @@ void vtkClientConnectionGatherInformationRMI(void *localArg,
 }
 
 //-----------------------------------------------------------------------------
+// Called when the client wants to push undo set.
+void vtkClientConnectionPushUndoXML(void* localArg,
+  void* remoteArg, int remoteArgLength, int vtkNotUsed(remoteProcessId))
+{
+  vtkClientServerStream stream;
+  stream.SetData(reinterpret_cast<unsigned char*>(remoteArg), remoteArgLength);
+  const char* data;
+  const char* label;
+  stream.GetArgument(0, 0, &label);
+  stream.GetArgument(0, 1, &data);
+  vtkClientConnection* self = (vtkClientConnection*)localArg;
+  self->PushUndoXMLRMI(label, data);
+}
+
+//-----------------------------------------------------------------------------
+void vtkClientConnectionUndo(void* localArg, void* , int , int )
+{
+  vtkClientConnection* self = (vtkClientConnection*)localArg;
+  self->UndoRMI();
+}
+
+//-----------------------------------------------------------------------------
+void vtkClientConnectionRedo(void* localArg, void* , int , int )
+{
+  vtkClientConnection* self = (vtkClientConnection*)localArg;
+  self->RedoRMI();
+}
+
+//-----------------------------------------------------------------------------
+class vtkClientConnectionUndoSet : public vtkUndoSet
+{
+public:
+  static vtkClientConnectionUndoSet* New();
+  vtkTypeRevisionMacro(vtkClientConnectionUndoSet, vtkUndoSet);
+ 
+  virtual int Undo() 
+    {
+    if (!this->Connection)
+      {
+      return 0;
+      }
+    // Send the undo XML to the client.
+    // We may want to let all clients know that someone is undoing. This will unsure
+    // that while the undo is taking place, no one changes the server state.
+    this->Connection->SendUndoXML(this->XMLData.c_str());
+    return 1;
+    }
+  
+  virtual int Redo() 
+    {
+    if (!this->Connection)
+      {
+      return 0;
+      }
+    // Send the undo XML to the client.
+    // We may want to let all clients know that someone is redoing. This will unsure
+    // that while the redo is taking place, no one changes the server state.
+    this->Connection->SendRedoXML(this->XMLData.c_str());
+    return 1;
+    }
+
+  void SetXMLData(const char* data)
+    {
+    this->XMLData = vtkstd::string(data);
+    }
+  const char* GetXMLData(int &length)
+    {
+    length = this->XMLData.length();
+    return this->XMLData.c_str();
+    }
+  void SetConnection(vtkClientConnection* con)
+    {
+    this->Connection = con;
+    }
+protected:
+  vtkClientConnectionUndoSet() 
+    {
+    this->Connection = 0;
+    };
+  ~vtkClientConnectionUndoSet(){ };
+
+  vtkstd::string XMLData;
+  vtkClientConnection* Connection;
+private:
+  vtkClientConnectionUndoSet(const vtkClientConnectionUndoSet&);
+  void operator=(const vtkClientConnectionUndoSet&);
+};
+
+vtkStandardNewMacro(vtkClientConnectionUndoSet);
+vtkCxxRevisionMacro(vtkClientConnectionUndoSet, "1.7");
+//-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkClientConnection);
-vtkCxxRevisionMacro(vtkClientConnection, "1.6");
+vtkCxxRevisionMacro(vtkClientConnection, "1.7");
 //-----------------------------------------------------------------------------
 vtkClientConnection::vtkClientConnection()
 {
+  this->UndoRedoStack = vtkUndoStack::New();
 }
 
 //-----------------------------------------------------------------------------
 vtkClientConnection::~vtkClientConnection()
 {
+  this->UndoRedoStack->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -294,7 +390,16 @@ void vtkClientConnection::SetupRMIs()
   this->Controller->AddRMI(vtkClientConnectionGatherInformationRMI,
     (void*)(this),
     vtkRemoteConnection::CLIENT_SERVER_GATHER_INFORMATION_RMI_TAG);
-  
+
+  this->Controller->AddRMI(vtkClientConnectionPushUndoXML,
+    (void*)(this),
+    vtkRemoteConnection::CLIENT_SERVER_PUSH_UNDO_XML_TAG);
+ 
+  this->Controller->AddRMI(vtkClientConnectionUndo,
+    (void*)this, vtkRemoteConnection::UNDO_XML_TAG);
+
+  this->Controller->AddRMI(vtkClientConnectionRedo,
+    (void*)this, vtkRemoteConnection::REDO_XML_TAG);
   this->Controller->CreateOutputWindow();
   
   vtkSocketCommunicator* comm = vtkSocketCommunicator::SafeDownCast(
@@ -366,6 +471,73 @@ void vtkClientConnection::SendInformation(vtkClientServerStream& stream)
   if (o) 
     { 
     o->Delete(); 
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkClientConnection::PushUndoXMLRMI(const char* label, const char* data)
+{
+  vtkClientConnectionUndoSet* elem = vtkClientConnectionUndoSet::New();
+  elem->SetXMLData(data);
+  elem->SetConnection(this);
+  this->UndoRedoStack->Push(label, elem);
+  elem->Delete();
+  cout << data << endl;
+}
+
+//-----------------------------------------------------------------------------
+void vtkClientConnection::UndoRMI()
+{
+  if (this->UndoRedoStack->CanUndo())
+    {
+    this->UndoRedoStack->Undo();
+    }
+  else
+    {
+    vtkErrorMacro("Nothing to undo.");
+    this->SendUndoXML(""); // essential the send to the client an empty string 
+      // otherwise the client keeps on waiting.
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkClientConnection::RedoRMI()
+{
+  if (this->UndoRedoStack->CanRedo())
+    {
+    this->UndoRedoStack->Redo();
+    }
+  else
+    {
+    vtkErrorMacro("Nothing to redo.");
+    this->SendRedoXML(""); // essential the send to the client an empty string 
+      // otherwise the client keeps on waiting.
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkClientConnection::SendUndoXML(const char* xml)
+{
+  vtkSocketController* controller = this->GetSocketController();
+  int len = strlen(xml);
+  controller->Send(&len, 1, 1, vtkRemoteConnection::UNDO_XML_TAG);
+  if (len > 0)
+    {
+    controller->Send(const_cast<char*>(xml), 
+      len, 1, vtkRemoteConnection::UNDO_XML_TAG);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkClientConnection::SendRedoXML(const char* xml)
+{
+  vtkSocketController* controller = this->GetSocketController();
+  int len = strlen(xml);
+  controller->Send(&len, 1, 1, vtkRemoteConnection::REDO_XML_TAG);
+  if (len > 0)
+    {
+    controller->Send(const_cast<char*>(xml), 
+      len, 1, vtkRemoteConnection::REDO_XML_TAG);
     }
 }
 

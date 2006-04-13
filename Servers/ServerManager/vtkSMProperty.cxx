@@ -32,7 +32,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.41");
+vtkCxxRevisionMacro(vtkSMProperty, "1.42");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -386,7 +386,7 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
 
 //---------------------------------------------------------------------------
 int vtkSMProperty::LoadState(vtkPVXMLElement* propertyElement, 
-                             vtkSMStateLoader* loader)
+  vtkSMStateLoader* loader, int vtkNotUsed(loadLastPushedValues))
 {
   // Process the domains.
   unsigned int numElems = propertyElement->GetNumberOfNestedElements();
@@ -424,7 +424,8 @@ int vtkSMProperty::LoadState(vtkPVXMLElement* propertyElement,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProperty::ChildSaveState(vtkPVXMLElement* /*propertyElement*/)
+void vtkSMProperty::ChildSaveState(vtkPVXMLElement* /*propertyElement*/,
+  int /*saveLastPushedValues*/)
 {
 }
 
@@ -438,7 +439,7 @@ void vtkSMProperty::SetController(vtkSMProxy* p, const char* pname)
 //---------------------------------------------------------------------------
 void vtkSMProperty::SaveState(vtkPVXMLElement* parent, 
   const char* property_name, const char* uid,
-  int saveDomains/*=1*/)
+  int saveDomains/*=1*/, int saveLastPushedValues/*=0*/)
 {
   vtkPVXMLElement* propertyElement = vtkPVXMLElement::New();
   propertyElement->SetName("Property");
@@ -457,7 +458,7 @@ void vtkSMProperty::SaveState(vtkPVXMLElement* parent,
     controllerProxyElem->Delete();
     }
 
-  this->ChildSaveState(propertyElement);
+  this->ChildSaveState(propertyElement, saveLastPushedValues);
 
   if (saveDomains)
     {

@@ -36,6 +36,7 @@ SET(Kit_SRCS
   vtkSMConsumerDisplayProxy.cxx
   vtkSMDataObjectDisplayProxy.cxx
   vtkSMDataTypeDomain.cxx
+  vtkSMDefaultStateLoader.cxx
   vtkSMDisplayProxy.cxx
   vtkSMDocumentation.cxx
   vtkSMDomain.cxx
@@ -85,6 +86,7 @@ SET(Kit_SRCS
   vtkSMPropertyAdaptor.cxx
   vtkSMPropertyIterator.cxx
   vtkSMPropertyLink.cxx
+  vtkSMPropertyModificationUndoElement.cxx
   vtkSMPropertyStatusManager.cxx
   vtkSMProxy.cxx
   vtkSMProxyGroupDomain.cxx
@@ -92,6 +94,8 @@ SET(Kit_SRCS
   vtkSMProxyLink.cxx
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
+  vtkSMProxyRegisterUndoElement.cxx
+  vtkSMProxyUnRegisterUndoElement.cxx
   vtkSMRampKeyFrameProxy.cxx
   vtkSMRenderModuleProxy.cxx
   vtkSMServerFileListingProxy.cxx
@@ -116,6 +120,9 @@ SET(Kit_SRCS
   vtkSMTesting.cxx
   vtkSMTimeStepsInformationHelper.cxx
   vtkSMTransformProxy.cxx
+  vtkSMUndoElement.cxx
+  vtkSMUndoRedoStateLoader.cxx
+  vtkSMUndoStack.cxx
   vtkSMXDMFInformationHelper.cxx
   vtkSMXDMFPropertyDomain.cxx
   vtkSMVectorProperty.cxx
@@ -154,6 +161,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMInformationHelper.cxx
   vtkSMLink.cxx
   vtkSMRenderModuleProxy.cxx
+  vtkSMUndoElement.cxx
   vtkSMVectorProperty.cxx
   ABSTRACT
   )

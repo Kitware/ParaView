@@ -30,6 +30,8 @@
         <file alias="pqVcrLast22.png">Resources/pqVcrLast22.png</file>
         <file alias="pqVcrPause22.png">Resources/pqVcrPause22.png</file>
         <file alias="pqVcrPlay22.png">Resources/pqVcrPlay22.png</file>
+        <file alias="pqUndo22.png">Resources/pqUndo22.png</file>
+        <file alias="pqRedo22.png">Resources/pqRedo22.png</file>
         <file alias="pqWindow16.png">Resources/pqWindow16.png</file>
         <file alias="pqWindow22.png">Resources/pqWindow22.png</file>
         <file alias="pqWindow32.png">Resources/pqWindow32.png</file>

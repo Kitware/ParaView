@@ -156,11 +156,15 @@ protected:
 
   // Description:
   // Updates state from an XML element. Returns 0 on failure.
-  virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoader* loader);
+  virtual int LoadState(vtkPVXMLElement* element, vtkSMStateLoader* loader,
+    int loadLastPushedValues=0);
 
   // Description:
   // Saves the state of the object in XML format. 
-  virtual void ChildSaveState(vtkPVXMLElement* parent);
+  // if \c saveLastPushedValues is set, then the state includes
+  // the values that were last pushed on to the server. This is used for
+  // undo/redo state.
+  virtual void ChildSaveState(vtkPVXMLElement* parent, int saveLastPushedValues);
 
   // Description:
 

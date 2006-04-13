@@ -52,8 +52,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKWidget.h"
 
 // paraview includes
-#include "vtkSMPropertyIterator.h"
 #include "vtkSMProperty.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMUndoStack.h"
 
 // paraq includes
 #include "pqSMAdaptor.h"
@@ -145,7 +147,10 @@ void pqObjectEditor::accept()
     return;
     }
 
+  vtkSMUndoStack* urMgr = vtkSMProxyManager::GetProxyManager()->GetUndoStack();
+  urMgr->BeginUndoSet(this->Proxy->GetConnectionID(), "Accept");
   this->setServerManagerProperties(this->Proxy, this);
+  urMgr->EndUndoSet();
   
   // cause the screen to update
   QVTKWidget *qwindow = pqPipelineData::instance()->getWindowFor(this->Proxy);
