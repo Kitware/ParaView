@@ -32,26 +32,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "AboutDialog.h"
 
+#include "ui_AboutDialog.h"
+
 AboutDialog::AboutDialog(QWidget* Parent) :
-  QDialog(Parent)
+  QDialog(Parent),
+  Ui(new Ui::AboutDialog())
 {
-  this->Ui.setupUi(this);
+  this->Ui->setupUi(this);
   this->setObjectName("aboutDialog");
+  this->setAttribute(Qt::WA_DeleteOnClose);
 }
 
 AboutDialog::~AboutDialog()
 {
+  delete this->Ui;
 }
-
-void AboutDialog::accept()
-{
-  QDialog::accept();
-  delete this;
-}
-
-void AboutDialog::reject()
-{
-  QDialog::reject();
-  delete this;
-}
-

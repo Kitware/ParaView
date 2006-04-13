@@ -33,7 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _AboutDialog_h
 #define _AboutDialog_h
 
-#include "ui_AboutDialog.h"
+#include <QDialog>
+
+namespace Ui { class AboutDialog; }
 
 /// Provides an about dialog
 class AboutDialog :
@@ -49,11 +51,7 @@ private:
   AboutDialog(const AboutDialog&);
   AboutDialog& operator=(const AboutDialog&);
   
-  Ui::AboutDialog Ui;
-  
-private slots:
-  void accept();
-  void reject();
+  Ui::AboutDialog* const Ui;
 };
 
 #endif // !_AboutDialog_h
