@@ -220,11 +220,11 @@ private:
 };
 
 vtkStandardNewMacro(vtkClientConnectionUndoSet);
-vtkCxxRevisionMacro(vtkClientConnectionUndoSet, "1.7");
+vtkCxxRevisionMacro(vtkClientConnectionUndoSet, "1.8");
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkClientConnection);
-vtkCxxRevisionMacro(vtkClientConnection, "1.7");
+vtkCxxRevisionMacro(vtkClientConnection, "1.8");
 //-----------------------------------------------------------------------------
 vtkClientConnection::vtkClientConnection()
 {
@@ -482,7 +482,6 @@ void vtkClientConnection::PushUndoXMLRMI(const char* label, const char* data)
   elem->SetConnection(this);
   this->UndoRedoStack->Push(label, elem);
   elem->Delete();
-  cout << data << endl;
 }
 
 //-----------------------------------------------------------------------------
