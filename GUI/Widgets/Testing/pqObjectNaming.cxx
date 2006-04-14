@@ -57,7 +57,7 @@ static const QString InternalGetName(QObject& Object)
 {
   if(Object.objectName().isEmpty())
     {
-    if(QStackedWidget* const stacked = qobject_cast<QStackedWidget*>(&Object))
+    if(qobject_cast<QStackedWidget*>(&Object))
       {
       if(qobject_cast<QTabWidget*>(Object.parent()))
         {
@@ -109,7 +109,7 @@ static bool ValidateName(QObject& Object)
     }
   
   // Skip menubar implementation details ...
-  if(QMenuBar* const menubar = qobject_cast<QMenuBar*>(Object.parent()))
+  if(qobject_cast<QMenuBar*>(Object.parent()))
     {
     if(QWidget* const widget = qobject_cast<QWidget*>(&Object))
       {
@@ -121,7 +121,7 @@ static bool ValidateName(QObject& Object)
     }
   
   // Skip tab widget implementation details ...
-  if(QTabWidget* const tab_widget = qobject_cast<QTabWidget*>(Object.parent()))
+  if(qobject_cast<QTabWidget*>(Object.parent()))
     {
       if(qobject_cast<QTabBar*>(&Object) || qobject_cast<QToolButton*>(&Object))
         {
