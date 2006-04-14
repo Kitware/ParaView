@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqWidgetEventTranslator.h"
 
+class QAbstractButton;
+
 /// Translates low-level Qt push button events into high-level ParaQ events that can be recorded as test cases
 class pqAbstractButtonEventTranslator :
   public pqWidgetEventTranslator
@@ -50,11 +52,7 @@ private:
   pqAbstractButtonEventTranslator(const pqAbstractButtonEventTranslator&);
   pqAbstractButtonEventTranslator& operator=(const pqAbstractButtonEventTranslator&);
 
-  QObject* CurrentObject;
-  
-private slots:
-  void onClicked(bool);
-  void onToggled(bool);
+  void onActivate(QAbstractButton*);
 };
 
 #endif // !_pqAbstractButtonEventTranslator_h

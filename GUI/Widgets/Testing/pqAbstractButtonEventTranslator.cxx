@@ -33,12 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAbstractButtonEventTranslator.h"
 
 #include <QAbstractButton>
-#include <QToolButton>
 #include <QAction>
-#include <QEvent>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QToolButton>
 
-pqAbstractButtonEventTranslator::pqAbstractButtonEventTranslator() :
-  CurrentObject(0)
+#include <iostream>
+
+pqAbstractButtonEventTranslator::pqAbstractButtonEventTranslator()
 {
 }
 
@@ -50,16 +52,23 @@ bool pqAbstractButtonEventTranslator::translateEvent(QObject* Object, QEvent* Ev
     
   switch(Event->type())
     {
-    case QEvent::Enter:
-      this->CurrentObject = Object;
-      if(object->isCheckable())
-        connect(object, SIGNAL(clicked(bool)), this, SLOT(onToggled(bool)));
-      else
-        connect(object, SIGNAL(clicked(bool)), this, SLOT(onClicked(bool)));
+    case QEvent::KeyPress:
+      {
+      QKeyEvent* const event = static_cast<QKeyEvent*>(Event);
+      if(event->key() == Qt::Key_Space)
+        {
+        onActivate(object);
+        }
+      }
       break;
-    case QEvent::Leave:
-      disconnect(Object, 0, this, 0);
-      this->CurrentObject = 0;
+    case QEvent::MouseButtonRelease:
+      {
+      QMouseEvent* const event = static_cast<QMouseEvent*>(Event);
+      if(event->button() == Qt::LeftButton && object->rect().contains(event->pos()))
+        {
+        onActivate(object);
+        }
+      }
       break;
     default:
       break;
@@ -68,20 +77,22 @@ bool pqAbstractButtonEventTranslator::translateEvent(QObject* Object, QEvent* Ev
   return true;
 }
 
-void pqAbstractButtonEventTranslator::onClicked(bool)
+void pqAbstractButtonEventTranslator::onActivate(QAbstractButton* object)
 {
-  if(this->CurrentObject->objectName() == QString::null && qobject_cast<QToolButton*>(this->CurrentObject))
+  if(object->isCheckable())
     {
-    emit recordEvent(qobject_cast<QToolButton*>(this->CurrentObject)->defaultAction(), "activate", "");
+    const bool new_value = !object->isChecked();
+    emit recordEvent(object, "set_boolean", new_value ? "true" : "false");
     }
   else
     {
-    emit recordEvent(this->CurrentObject, "activate", "");
+    if(object->objectName() == QString::null && qobject_cast<QToolButton*>(object))
+      {
+      emit recordEvent(qobject_cast<QToolButton*>(object)->defaultAction(), "activate", "");
+      }
+    else
+      {
+      emit recordEvent(object, "activate", "");
+      }
     }
 }
-
-void pqAbstractButtonEventTranslator::onToggled(bool Checked)
-{
-  emit recordEvent(this->CurrentObject, "set_boolean", Checked ? "true" : "false");
-}
-
