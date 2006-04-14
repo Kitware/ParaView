@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QItemSelectionModel>
 #include <QLayout>
 #include <QMenu>
+#include <QMenuBar>
 #include <QScrollBar>
 #include <QSet>
 #include <QSignalMapper>
@@ -101,6 +102,18 @@ static bool ValidateName(QObject& Object)
     if(QToolBar* const toolbar = qobject_cast<QToolBar*>(Object.parent()))
       {
       if(toolbar->toggleViewAction() == action)
+        {
+        return false;
+        }
+      }
+    }
+  
+  // Skip menubar implementation details ...
+  if(QMenuBar* const menubar = qobject_cast<QMenuBar*>(Object.parent()))
+    {
+    if(QWidget* const widget = qobject_cast<QWidget*>(&Object))
+      {
+      if(widget->windowType() == Qt::Popup)
         {
         return false;
         }
