@@ -32,6 +32,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqEventObserverXML.h"
 
+/// Escapes strings so they can be embedded in an XML document
+static const QString textToXML(const QString& string)
+{
+  QString result = string;
+  result.replace("&", "&amp;");
+  result.replace("<", "&lt;");
+  result.replace(">", "&gt;");
+  result.replace("'", "&apos;");
+  result.replace("\"", "&quot;");
+  
+  return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+// pqEventObserverXML
+
 pqEventObserverXML::pqEventObserverXML(ostream& stream) :
   Stream(stream)
 {
@@ -48,9 +64,8 @@ void pqEventObserverXML::onRecordEvent(const QString& Widget, const QString& Com
 {
   this->Stream
     << "  <pqevent "
-    << "object=\"" << Widget.toAscii().data() << "\" "
-    << "command=\"" << Command.toAscii().data() << "\" "
-    << "arguments=\"" << Arguments.toAscii().data() << "\" "
+    << "object=\"" << textToXML(Widget).toAscii().data() << "\" "
+    << "command=\"" << textToXML(Command).toAscii().data() << "\" "
+    << "arguments=\"" << textToXML(Arguments).toAscii().data() << "\" "
     << "/>\n";
 }
-

@@ -37,11 +37,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtXml/QDomDocument>
 #include <QtDebug>
 
+/// Removes XML entities from a string
+static const QString xmlToText(const QString& string)
+{
+  QString result = string;
+  
+  result.replace("&lt;", "<");
+  result.replace("&gt;", ">");
+  result.replace("&apos;", "'");
+  result.replace("&quot;", "\"");
+  result.replace("&amp;", "&");
+  
+  return result;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// pqEventPlayerXML
+
 bool pqEventPlayerXML::playXML(pqEventPlayer& Player, const QString& Path)
 {
   QFile file(Path);
   QDomDocument xml_document;
-  xml_document.setContent(&file, false);
+  if(!xml_document.setContent(&file, false))
+    {
+    qCritical() << "Error parsing " << Path << ": not a valid XML document";
+    return false;
+    }
 
   QDomElement xml_events = xml_document.documentElement();
   if(xml_events.nodeName() != "pqevents")
@@ -55,9 +76,9 @@ bool pqEventPlayerXML::playXML(pqEventPlayer& Player, const QString& Path)
     if(!(xml_event.isElement() && xml_event.nodeName() == "pqevent"))
       continue;
       
-    const QString object = xml_event.toElement().attribute("object");
-    const QString command = xml_event.toElement().attribute("command");
-    const QString arguments = xml_event.toElement().attribute("arguments");
+    const QString object = xmlToText(xml_event.toElement().attribute("object"));
+    const QString command = xmlToText(xml_event.toElement().attribute("command"));
+    const QString arguments = xmlToText(xml_event.toElement().attribute("arguments"));
       
     if(!Player.playEvent(object, command, arguments))
       return false;
@@ -65,4 +86,3 @@ bool pqEventPlayerXML::playXML(pqEventPlayer& Player, const QString& Path)
     
   return true;
 }
-
