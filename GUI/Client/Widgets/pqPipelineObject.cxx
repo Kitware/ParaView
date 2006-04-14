@@ -73,6 +73,16 @@ pqPipelineObject::~pqPipelineObject()
     }
 }
 
+pqPipelineServer *pqPipelineObject::GetServer() const
+{
+  if(this->Window)
+    {
+    return this->Window->GetServer();
+    }
+
+  return 0;
+}
+
 int pqPipelineObject::GetInputCount() const
 {
   if(this->Internal)

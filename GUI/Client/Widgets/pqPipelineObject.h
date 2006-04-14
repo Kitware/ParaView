@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString> // Needed for proxy name.
 
 class pqPipelineObjectInternal;
+class pqPipelineServer;
 class pqPipelineWindow;
 class vtkSMDisplayProxy;
 class vtkSMProxy;
@@ -75,6 +76,8 @@ public:
 
   pqPipelineWindow *GetParent() const {return this->Window;}
   void SetParent(pqPipelineWindow *parent) {this->Window = parent;}
+
+  pqPipelineServer *GetServer() const;
 
   /// \name Connection Methods
   //@{

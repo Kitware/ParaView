@@ -34,6 +34,8 @@ SET(QtWidgets_SRCS
   pqFileDialog.h
   pqFileDialogModel.cxx
   pqFileDialogModel.h
+  pqFlatTreeView.cxx
+  pqFlatTreeView.h
   pqLocalFileDialogModel.cxx
   pqLocalFileDialogModel.h
   pqPlayControlsWidget.cxx
@@ -58,6 +60,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqDelimitedTextParser.h
   pqFileDialog.h
   pqFileDialogModel.h
+  pqFlatTreeView.h
   pqLocalFileDialogModel.h
   pqPlayControlsWidget.h
   pqSignalAdaptors.h

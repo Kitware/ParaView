@@ -48,10 +48,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKWidget.h"
 #include "vtkSMProxy.h"
 
+#include <QApplication>
 #include <QHash>
 #include <QList>
 #include <QPixmap>
 #include <QString>
+#include <QStyle>
 
 
 class pqPipelineListItem
@@ -347,8 +349,15 @@ QVariant pqPipelineListModel::data(const QModelIndex &idx, int role) const
           }
         case Qt::DecorationRole:
           {
+          //if(item->Type == pqPipelineListModel::Server)
+          //  {
+          //  return QVariant(QApplication::style()->standardIcon(
+          //      QStyle::SP_ComputerIcon));
+          //  }
           if(this->PixmapList && item->Type != pqPipelineListModel::Invalid)
+            {
             return QVariant(this->PixmapList[item->Type]);
+            }
           }
         }
       }

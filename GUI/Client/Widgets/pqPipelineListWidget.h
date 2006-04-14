@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 
 class pqPipelineListModel;
+class pqFlatTreeView;
 class QModelIndex;
 class QString;
 class QTreeView;
@@ -66,7 +67,7 @@ public:
   virtual bool eventFilter(QObject *object, QEvent *e);
 
   pqPipelineListModel *getListModel() const {return this->ListModel;}
-  QTreeView *getTreeView() const {return this->TreeView;}
+  pqFlatTreeView *getTreeView() const {return this->TreeView;}
 
   vtkSMProxy *getSelectedProxy() const;
   vtkSMProxy *getNextProxy() const; // TEMP
@@ -88,7 +89,7 @@ private slots:
 
 private:
   pqPipelineListModel *ListModel;
-  QTreeView *TreeView;
+  pqFlatTreeView *TreeView;
 };
 
 #endif

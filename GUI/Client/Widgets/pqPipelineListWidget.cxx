@@ -39,6 +39,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPipelineListWidget.h"
 
+#include "pqFlatTreeView.h"
+
+#include "pqDisplayProxyEditor.h"
+#include "pqPipelineData.h"
+#include "pqPipelineListModel.h"
+#include "pqPipelineObject.h"
+#include "pqRenderViewEditor.h"
+#include "QVTKWidget.h"
+#include "vtkSMProxy.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMDisplayProxy.h"
+
 #include <QEvent>
 #include <QHeaderView>
 #include <QItemSelectionModel>
@@ -47,16 +59,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include <QMenu>
 #include <QDialog>
-
-#include "pqPipelineData.h"
-#include "pqPipelineListModel.h"
-#include "pqPipelineObject.h"
-#include "QVTKWidget.h"
-#include "vtkSMProxy.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkSMDisplayProxy.h"
-#include "pqDisplayProxyEditor.h"
-#include "pqRenderViewEditor.h"
 
 
 pqPipelineListWidget::pqPipelineListWidget(QWidget *p)
@@ -71,7 +73,7 @@ pqPipelineListWidget::pqPipelineListWidget(QWidget *p)
     this->ListModel->setObjectName("PipelineList");
 
   // Create a tree view to display the pipeline.
-  this->TreeView = new QTreeView(this);
+  this->TreeView = new pqFlatTreeView(this);
   if(this->TreeView)
     {
     this->TreeView->setObjectName("PipelineView");
