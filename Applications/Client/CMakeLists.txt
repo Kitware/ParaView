@@ -89,6 +89,7 @@ IF(BUILD_TESTING)
     CreateSource
     CompoundProxy
     UndoRedo
+    SubMenu
     )
 
   SET (TESTS_WITHOUT_BASELINES
