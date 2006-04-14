@@ -52,7 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolButton>
 #include <QtDebug>
 
-/// Returns the name of an object.  In some cases, assigns a name as a convenience
+/// Returns the name of an object.  In some cases, assigns a name as a convenience.  Also strips-out problematic characters (such as '/').
 static const QString InternalGetName(QObject& Object)
 {
   if(Object.objectName().isEmpty())
@@ -66,7 +66,10 @@ static const QString InternalGetName(QObject& Object)
       }
     }
     
-  return Object.objectName();
+  QString result = Object.objectName();
+  result.replace("/", "|");
+  
+  return result;
 }
 
 /// Returns true iff the given object needs to have its name validated
