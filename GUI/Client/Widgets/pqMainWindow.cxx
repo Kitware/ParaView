@@ -950,11 +950,18 @@ void pqMainWindow::onFileSaveScreenshot(const QStringList& Files)
   vtkRenderWindow* const render_window =
     this->Implementation->ActiveView ? qobject_cast<QVTKWidget*>(this->Implementation->ActiveView->mainWidget())->GetRenderWindow() : 0;
 
+  // All tests need a 300x300 render window size
+  QSize cur_size = this->Implementation->ActiveView->mainWidget()->size();
+  this->Implementation->ActiveView->mainWidget()->resize(300,300);
+
   for(int i = 0; i != Files.size(); ++i)
     {
     if(!pqImageComparison::SaveScreenshot(render_window, Files[i]))
       QMessageBox::critical(this, tr("Save Screenshot:"), tr("Error saving file"));
     }
+
+  this->Implementation->ActiveView->mainWidget()->resize(cur_size);
+  render_window->Render();
 }
 
 bool pqMainWindow::compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory)
