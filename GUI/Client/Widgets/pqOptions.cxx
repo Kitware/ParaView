@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkObjectFactory.h>
 
 vtkStandardNewMacro(pqOptions);
-vtkCxxRevisionMacro(pqOptions, "1.6");
+vtkCxxRevisionMacro(pqOptions, "1.7");
 
 //-----------------------------------------------------------------------------
 pqOptions::pqOptions()
@@ -45,7 +45,7 @@ pqOptions::pqOptions()
   this->BaselineImage = 0;
   this->TestDirectory = 0;
   this->TestFileName = 0;
-  this->ImageThreshold = 10;
+  this->ImageThreshold = 12;
   this->ExitBeforeEventLoop = 0;
 }
 
