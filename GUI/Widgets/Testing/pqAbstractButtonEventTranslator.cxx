@@ -54,8 +54,8 @@ bool pqAbstractButtonEventTranslator::translateEvent(QObject* Object, QEvent* Ev
     {
     case QEvent::KeyPress:
       {
-      QKeyEvent* const event = static_cast<QKeyEvent*>(Event);
-      if(event->key() == Qt::Key_Space)
+      QKeyEvent* const e = static_cast<QKeyEvent*>(Event);
+      if(e->key() == Qt::Key_Space)
         {
         onActivate(object);
         }
@@ -63,8 +63,8 @@ bool pqAbstractButtonEventTranslator::translateEvent(QObject* Object, QEvent* Ev
       break;
     case QEvent::MouseButtonRelease:
       {
-      QMouseEvent* const event = static_cast<QMouseEvent*>(Event);
-      if(event->button() == Qt::LeftButton && object->rect().contains(event->pos()))
+      QMouseEvent* const e = static_cast<QMouseEvent*>(Event);
+      if(e->button() == Qt::LeftButton && object->rect().contains(e->pos()))
         {
         onActivate(object);
         }
