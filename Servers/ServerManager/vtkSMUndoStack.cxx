@@ -20,6 +20,7 @@
 #include "vtkUndoSet.h"
 #include "vtkUndoStack.h"
 #include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMPropertyModificationUndoElement.h"
 #include "vtkSMProxyManager.h"
@@ -86,12 +87,12 @@ public:
     return 0;
     }
 
-  void SetConnectionID(vtkConnectionID id)
+  void SetConnectionID(vtkIdType id)
     {
     this->ConnectionID = id;
     }
   
-  vtkConnectionID GetConnectionID() 
+  vtkIdType GetConnectionID() 
     { 
     return this->ConnectionID; 
     }
@@ -104,12 +105,12 @@ public:
 protected:
   vtkSMUndoStackUndoSet() 
     {
-    this->ConnectionID.ID = 0;
+    this->ConnectionID = vtkProcessModuleConnectionManager::GetNullConnectionID();
     this->UndoRedoManager = 0;
     };
   ~vtkSMUndoStackUndoSet(){ };
 
-  vtkConnectionID ConnectionID;
+  vtkIdType ConnectionID;
   vtkSMUndoStack* UndoRedoManager;
 private:
   vtkSMUndoStackUndoSet(const vtkSMUndoStackUndoSet&);
@@ -117,11 +118,11 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMUndoStackUndoSet);
-vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.1");
+vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.2");
 //*****************************************************************************
 
 vtkStandardNewMacro(vtkSMUndoStack);
-vtkCxxRevisionMacro(vtkSMUndoStack, "1.1");
+vtkCxxRevisionMacro(vtkSMUndoStack, "1.2");
 vtkCxxSetObjectMacro(vtkSMUndoStack, StateLoader, vtkSMUndoRedoStateLoader);
 //-----------------------------------------------------------------------------
 vtkSMUndoStack::vtkSMUndoStack()
@@ -129,7 +130,7 @@ vtkSMUndoStack::vtkSMUndoStack()
   this->Observer = vtkSMUndoStackObserver::New();
   this->Observer->SetTarget(this);
   this->ActiveUndoSet = NULL;
-  this->ActiveConnectionID.ID = 0;
+  this->ActiveConnectionID = vtkProcessModuleConnectionManager::GetNullConnectionID();
   this->Label = NULL;
   this->StateLoader = NULL;
 
@@ -167,7 +168,7 @@ vtkSMUndoStack::~vtkSMUndoStack()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMUndoStack::BeginUndoSet(vtkConnectionID cid, const char* label)
+void vtkSMUndoStack::BeginUndoSet(vtkIdType cid, const char* label)
 {
   if (this->ActiveUndoSet)
     {
@@ -194,11 +195,12 @@ void vtkSMUndoStack::EndUndoSet()
   this->ActiveUndoSet->Delete();
   this->ActiveUndoSet = NULL;
   this->SetLabel(NULL);
-  this->ActiveConnectionID.ID = 0;
+  this->ActiveConnectionID = 
+    vtkProcessModuleConnectionManager::GetNullConnectionID();
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMUndoStack::Push(vtkConnectionID cid, const char* label, vtkUndoSet* set)
+void vtkSMUndoStack::Push(vtkIdType cid, const char* label, vtkUndoSet* set)
 {
   if (!set)
     {
@@ -230,7 +232,7 @@ void vtkSMUndoStack::Push(vtkConnectionID cid, const char* label, vtkUndoSet* se
 // until it requests it. Ofcourse, this part is still not implemnted. For now,
 // multiple clients are not supported.
 void vtkSMUndoStack::PushUndoConnection(const char* label, 
-  vtkConnectionID id)
+  vtkIdType id)
 {
   vtkSMUndoStackUndoSet* elem = vtkSMUndoStackUndoSet::New();
   elem->SetConnectionID(id);
@@ -305,7 +307,7 @@ void vtkSMUndoStack::OnPropertyModified(void* data)
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMUndoStack::ProcessUndo(vtkConnectionID id, vtkPVXMLElement* root)
+int vtkSMUndoStack::ProcessUndo(vtkIdType id, vtkPVXMLElement* root)
 {
   if (!this->StateLoader)
     {
@@ -327,7 +329,7 @@ int vtkSMUndoStack::ProcessUndo(vtkConnectionID id, vtkPVXMLElement* root)
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMUndoStack::ProcessRedo(vtkConnectionID id, vtkPVXMLElement* root)
+int vtkSMUndoStack::ProcessRedo(vtkIdType id, vtkPVXMLElement* root)
 {
   if (!this->StateLoader)
     {

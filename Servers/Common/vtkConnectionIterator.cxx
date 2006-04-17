@@ -28,7 +28,7 @@ public:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkConnectionIterator);
-vtkCxxRevisionMacro(vtkConnectionIterator, "1.3");
+vtkCxxRevisionMacro(vtkConnectionIterator, "1.4");
 vtkCxxSetObjectMacro(vtkConnectionIterator, ConnectionManager,
   vtkProcessModuleConnectionManager);
 //-----------------------------------------------------------------------------
@@ -137,14 +137,12 @@ vtkProcessModuleConnection* vtkConnectionIterator::GetCurrentConnection()
 }
 
 //-----------------------------------------------------------------------------
-vtkConnectionID vtkConnectionIterator::GetCurrentConnectionID()
+vtkIdType vtkConnectionIterator::GetCurrentConnectionID()
 {
   if (!this->ConnectionManager)
     {
     vtkErrorMacro("ConnectionManager must be set.");
-    vtkConnectionID id;
-    id.ID = 0;
-    return id;
+    return vtkProcessModuleConnectionManager::GetNullConnectionID();
     }
 
   return this->Internals->Iter->first;

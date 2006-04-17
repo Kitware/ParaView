@@ -29,9 +29,7 @@
 #define __vtkConnectionIterator_h
 
 #include "vtkObject.h"
-//BTX
-#include "vtkConnectionID.h" // Needed for MatchConnectionID.
-//ETX
+
 class vtkProcessModuleConnection;
 class vtkProcessModuleConnectionManager;
 class vtkConnectionIteratorInternals;
@@ -54,11 +52,12 @@ public:
   // Description:
   // Move to the next connection.
   void Next();
-//BTX
+  
   // Description:
   // Get/Set the connection ID to match.
-  vtkSetMacro(MatchConnectionID, vtkConnectionID);
-  vtkGetMacro(MatchConnectionID, vtkConnectionID);
+  vtkSetMacro(MatchConnectionID, vtkIdType);
+  vtkGetMacro(MatchConnectionID, vtkIdType);
+  
   // Description:
   // Get/Set the ConnectionManager.
   vtkGetObjectMacro(ConnectionManager, vtkProcessModuleConnectionManager);
@@ -67,14 +66,13 @@ public:
   // Description:
   // Get the connection at the current position.
   vtkProcessModuleConnection* GetCurrentConnection();
-  vtkConnectionID GetCurrentConnectionID();
-//ETX
+  vtkIdType GetCurrentConnectionID();
 protected:
   vtkConnectionIterator();
   ~vtkConnectionIterator();
 
   vtkConnectionIteratorInternals* Internals;
-  vtkConnectionID MatchConnectionID;
+  vtkIdType MatchConnectionID;
   vtkProcessModuleConnectionManager* ConnectionManager;
   int InBegin;
 private:

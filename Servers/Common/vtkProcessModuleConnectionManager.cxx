@@ -72,7 +72,14 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.9");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.10");
+
+//-----------------------------------------------------------------------------
+vtkIdType vtkProcessModuleConnectionManager::NullConnectionID = 0;
+vtkIdType vtkProcessModuleConnectionManager::SelfConnectionID = 1;
+vtkIdType vtkProcessModuleConnectionManager::AllConnectionsID = 2;
+vtkIdType vtkProcessModuleConnectionManager::AllServerConnectionID = 3;
+vtkIdType vtkProcessModuleConnectionManager::RootServerConnectionID = 4;
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
@@ -82,7 +89,7 @@ vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
   this->Observer->SetTarget(this);
   
   this->SocketCollection = vtkSocketCollection::New();
-  this->UniqueConnectionID.ID = 5;
+  this->UniqueConnectionID = 5;
   this->UniqueServerSocketID = 0;
   this->ClientMode = 0;
 }
@@ -155,7 +162,7 @@ void vtkProcessModuleConnectionManager::Finalize()
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnection* vtkProcessModuleConnectionManager::
-GetConnectionFromID(vtkConnectionID connectionID)
+GetConnectionFromID(vtkIdType connectionID)
 {
   vtkConnectionIterator* iter = this->NewIterator();
   iter->SetMatchConnectionID(connectionID);
@@ -228,11 +235,10 @@ void vtkProcessModuleConnectionManager::StopAcceptingAllConnections()
 }
 
 //-----------------------------------------------------------------------------
-vtkConnectionID vtkProcessModuleConnectionManager::OpenConnection(
+vtkIdType vtkProcessModuleConnectionManager::OpenConnection(
   const char* hostname, int port)
 {
-  vtkConnectionID id;
-  id.ID = 0;
+  vtkIdType id = vtkProcessModuleConnectionManager::NullConnectionID;
 
   if (!hostname || !port)
     {
@@ -256,12 +262,11 @@ vtkConnectionID vtkProcessModuleConnectionManager::OpenConnection(
 }
 
 //-----------------------------------------------------------------------------
-vtkConnectionID vtkProcessModuleConnectionManager::OpenConnection(
+vtkIdType vtkProcessModuleConnectionManager::OpenConnection(
   const char* datahostname, int dataport,
   const char* renderhostname, int renderport)
 {
-  vtkConnectionID id;
-  id.ID = 0;
+  vtkIdType id = vtkProcessModuleConnectionManager::NullConnectionID;
 
   if (!datahostname || !dataport || !renderhostname || !renderport)
     {
@@ -319,7 +324,7 @@ int vtkProcessModuleConnectionManager::MonitorConnections(
       // Determine the nature of the server socket.
       vtkClientSocket* rs = 0;
       vtkClientSocket* ds = 0;
-      vtkConnectionID id = { 0 };
+      vtkIdType id = vtkProcessModuleConnectionManager::NullConnectionID;
       switch (ss->GetType())
         {
       case RENDER_SERVER:
@@ -355,7 +360,7 @@ int vtkProcessModuleConnectionManager::MonitorConnections(
         break;
         }
 
-      if (id.ID)
+      if (id != vtkProcessModuleConnectionManager::NullConnectionID)
         {
         ret = 2; // connection created.
         }
@@ -392,7 +397,7 @@ int vtkProcessModuleConnectionManager::MonitorConnections(
 }
 
 //-----------------------------------------------------------------------------
-void vtkProcessModuleConnectionManager::CloseConnection(vtkConnectionID id)
+void vtkProcessModuleConnectionManager::CloseConnection(vtkIdType id)
 {
   vtkRemoteConnection* rc = vtkRemoteConnection::SafeDownCast(
     this->GetConnectionFromID(id));
@@ -426,7 +431,7 @@ int vtkProcessModuleConnectionManager::DropAbortedConnections()
 
 //-----------------------------------------------------------------------------
 int vtkProcessModuleConnectionManager::IsServerConnection(
-  vtkConnectionID connection)
+  vtkIdType connection)
 {
   if (connection == vtkProcessModuleConnectionManager::GetAllConnectionsID() ||
     connection == vtkProcessModuleConnectionManager::GetAllServerConnectionsID() ||
@@ -453,7 +458,7 @@ int vtkProcessModuleConnectionManager::IsServerConnection(
 
 //-----------------------------------------------------------------------------
 vtkClientServerID vtkProcessModuleConnectionManager::
-GetConnectionClientServerID(vtkConnectionID id)
+GetConnectionClientServerID(vtkIdType id)
 {
   vtkProcessModuleConnection* conn = this->GetConnectionFromID(id);
   if (!conn)
@@ -465,7 +470,7 @@ GetConnectionClientServerID(vtkConnectionID id)
 }
 
 //-----------------------------------------------------------------------------
-int vtkProcessModuleConnectionManager::SendStream(vtkConnectionID connectionID, 
+int vtkProcessModuleConnectionManager::SendStream(vtkIdType connectionID, 
   vtkTypeUInt32 serverFlags, vtkClientServerStream& stream, int reset)
 {
   vtkProcessModuleConnection* conn = this->GetConnectionFromID(connectionID);
@@ -482,7 +487,7 @@ int vtkProcessModuleConnectionManager::SendStream(vtkConnectionID connectionID,
 }
 
 //-----------------------------------------------------------------------------
-int vtkProcessModuleConnectionManager::GetNumberOfPartitions(vtkConnectionID id)
+int vtkProcessModuleConnectionManager::GetNumberOfPartitions(vtkIdType id)
 {
   vtkProcessModuleConnection* conn = this->GetConnectionFromID(id);
   if (conn)
@@ -494,7 +499,7 @@ int vtkProcessModuleConnectionManager::GetNumberOfPartitions(vtkConnectionID id)
 
 //-----------------------------------------------------------------------------
 void vtkProcessModuleConnectionManager::GatherInformation(
-  vtkConnectionID connectionID, vtkTypeUInt32 serverFlags,
+  vtkIdType connectionID, vtkTypeUInt32 serverFlags,
   vtkPVInformation* info, vtkClientServerID id)
 {
   vtkProcessModuleConnection* conn = this->GetConnectionFromID(connectionID);
@@ -506,7 +511,7 @@ void vtkProcessModuleConnectionManager::GatherInformation(
 
 //-----------------------------------------------------------------------------
 const vtkClientServerStream& vtkProcessModuleConnectionManager::GetLastResult(
-    vtkConnectionID connectionID, vtkTypeUInt32 server)
+    vtkIdType connectionID, vtkTypeUInt32 server)
 {
   vtkProcessModuleConnection* conn = this->GetConnectionFromID(connectionID);
   if (conn)
@@ -519,7 +524,7 @@ const vtkClientServerStream& vtkProcessModuleConnectionManager::GetLastResult(
 }
 
 //-----------------------------------------------------------------------------
-int vtkProcessModuleConnectionManager::LoadModule(vtkConnectionID connectionID, 
+int vtkProcessModuleConnectionManager::LoadModule(vtkIdType connectionID, 
   const char* name, const char* dir)
 {
   vtkProcessModuleConnection* conn = this->GetConnectionFromID(connectionID);
@@ -539,7 +544,7 @@ int vtkProcessModuleConnectionManager::LoadModule(vtkConnectionID connectionID,
 
 //-----------------------------------------------------------------------------
 vtkPVServerInformation* vtkProcessModuleConnectionManager::GetServerInformation(
-  vtkConnectionID id)
+  vtkIdType id)
 {
   vtkServerConnection* conn = vtkServerConnection::SafeDownCast(
     this->GetConnectionFromID(id));
@@ -551,7 +556,7 @@ vtkPVServerInformation* vtkProcessModuleConnectionManager::GetServerInformation(
 }
 //-----------------------------------------------------------------------------
 vtkClientServerID vtkProcessModuleConnectionManager::GetMPIMToNSocketConnectionID(
-  vtkConnectionID id)
+  vtkIdType id)
 {
   vtkServerConnection* conn = vtkServerConnection::SafeDownCast(
     this->GetConnectionFromID(id));
@@ -594,20 +599,17 @@ vtkProcessModuleConnection* vtkProcessModuleConnectionManager::GetManagedConnect
 }
 
 //-----------------------------------------------------------------------------
-vtkConnectionID vtkProcessModuleConnectionManager::GetUniqueConnectionID()
+vtkIdType vtkProcessModuleConnectionManager::GetUniqueConnectionID()
 {
-  vtkConnectionID id;
-  id.ID = this->UniqueConnectionID.ID++;
-  return id;
+  return this->UniqueConnectionID++;
 }
 
 //-----------------------------------------------------------------------------
-vtkConnectionID vtkProcessModuleConnectionManager::CreateConnection(
+vtkIdType vtkProcessModuleConnectionManager::CreateConnection(
   vtkClientSocket* cs, vtkClientSocket* renderserver_socket, 
   int connecting_side_handshake)
 {
-  vtkConnectionID id;
-  id.ID = 0;
+  vtkIdType id = vtkProcessModuleConnectionManager::NullConnectionID;
 
   vtkRemoteConnection* rc = this->NewRemoteConnection();
   if (rc)
@@ -645,7 +647,7 @@ vtkConnectionID vtkProcessModuleConnectionManager::CreateConnection(
 }
 
 //-----------------------------------------------------------------------------
-void vtkProcessModuleConnectionManager::SetConnection(vtkConnectionID id,
+void vtkProcessModuleConnectionManager::SetConnection(vtkIdType id,
   vtkProcessModuleConnection* conn)
 {
   this->Internals->IDToConnectionMap[id] = conn; 
@@ -720,7 +722,7 @@ void vtkProcessModuleConnectionManager::ExecuteEvent(vtkObject* vtkNotUsed(calle
 }
 
 //-----------------------------------------------------------------------------
-void vtkProcessModuleConnectionManager::PushUndo(vtkConnectionID id, 
+void vtkProcessModuleConnectionManager::PushUndo(vtkIdType id, 
   const char* label, vtkPVXMLElement* root)
 {
   vtkProcessModuleConnection* conn = this->GetConnectionFromID(id);
@@ -734,7 +736,7 @@ void vtkProcessModuleConnectionManager::PushUndo(vtkConnectionID id,
 
 //-----------------------------------------------------------------------------
 vtkPVXMLElement* vtkProcessModuleConnectionManager::NewNextUndo(
-  vtkConnectionID id)
+  vtkIdType id)
 {
   vtkProcessModuleConnection* conn = this->GetConnectionFromID(id);
   if (!conn)
@@ -747,7 +749,7 @@ vtkPVXMLElement* vtkProcessModuleConnectionManager::NewNextUndo(
 
 //-----------------------------------------------------------------------------
 vtkPVXMLElement* vtkProcessModuleConnectionManager::NewNextRedo(
-  vtkConnectionID id)
+  vtkIdType id)
 {
   vtkProcessModuleConnection* conn = this->GetConnectionFromID(id);
   if (!conn)

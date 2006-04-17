@@ -121,7 +121,6 @@
 
 #include "vtkSMObject.h"
 #include "vtkClientServerID.h" // needed for vtkClientServerID
-#include "vtkConnectionID.h" // needed for vtkConnectionID.
 
 //BTX
 struct vtkSMProxyInternals;
@@ -271,14 +270,16 @@ public:
   // Return the servers.
   vtkTypeUInt32 GetServers();
 
+//ETX
   // Description:
   // Set the server connection ID on self and sub-proxies.
-  virtual void SetConnectionID(vtkConnectionID id);
+  virtual void SetConnectionID(vtkIdType id);
 
   // Description:
   // Returns the server connection ID.
-  vtkConnectionID GetConnectionID();
+  vtkIdType GetConnectionID();
 
+//BTX
   // Description:
   // Flags used for the proxyPropertyCopyFlag argument to the Copy method.
   enum
@@ -401,7 +402,7 @@ protected:
 
   // Description:
   // Set the server connection id on self.
-  void SetConnectionIDSelf(vtkConnectionID id);
+  void SetConnectionIDSelf(vtkIdType id);
 
 //BTX
   // Description:
@@ -574,7 +575,7 @@ protected:
   // Description:
   // This ID is the connection ID to the server on which this
   // proxy exists, if at all. By default, it is the RootServerConnectionID.
-  vtkConnectionID ConnectionID;
+  vtkIdType ConnectionID;
 
   vtkSMDocumentation* Documentation;
 private:

@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCompoundProxy);
-vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.9");
 
 struct vtkSMCompoundProxyInternals
 {
@@ -66,7 +66,7 @@ void vtkSMCompoundProxy::SetMainProxy(vtkSMProxy* p)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMCompoundProxy::SetConnectionID(vtkConnectionID id)
+void vtkSMCompoundProxy::SetConnectionID(vtkIdType id)
 {
   if (this->MainProxy)
     {

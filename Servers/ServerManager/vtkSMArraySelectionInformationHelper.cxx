@@ -21,7 +21,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArraySelectionInformationHelper);
-vtkCxxRevisionMacro(vtkSMArraySelectionInformationHelper, "1.2");
+vtkCxxRevisionMacro(vtkSMArraySelectionInformationHelper, "1.3");
 
 //---------------------------------------------------------------------------
 vtkSMArraySelectionInformationHelper::vtkSMArraySelectionInformationHelper()
@@ -37,7 +37,7 @@ vtkSMArraySelectionInformationHelper::~vtkSMArraySelectionInformationHelper()
 
 //---------------------------------------------------------------------------
 void vtkSMArraySelectionInformationHelper::UpdateProperty(
-  vtkConnectionID connectionId,  int serverIds, vtkClientServerID objectId, 
+  vtkIdType connectionId,  int serverIds, vtkClientServerID objectId, 
   vtkSMProperty* prop)
 {
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(prop);

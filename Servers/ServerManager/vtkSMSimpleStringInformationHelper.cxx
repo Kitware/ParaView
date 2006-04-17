@@ -20,7 +20,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSimpleStringInformationHelper);
-vtkCxxRevisionMacro(vtkSMSimpleStringInformationHelper, "1.5");
+vtkCxxRevisionMacro(vtkSMSimpleStringInformationHelper, "1.6");
 
 //---------------------------------------------------------------------------
 vtkSMSimpleStringInformationHelper::vtkSMSimpleStringInformationHelper()
@@ -34,7 +34,7 @@ vtkSMSimpleStringInformationHelper::~vtkSMSimpleStringInformationHelper()
 
 //---------------------------------------------------------------------------
 void vtkSMSimpleStringInformationHelper::UpdateProperty(
-  vtkConnectionID connectionId, int serverIds, vtkClientServerID objectId, 
+  vtkIdType connectionId, int serverIds, vtkClientServerID objectId, 
   vtkSMProperty* prop)
 {
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(prop);

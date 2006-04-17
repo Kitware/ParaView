@@ -15,7 +15,6 @@
 #include "vtkSMProxyManager.h"
 
 #include "vtkCommand.h"
-#include "vtkConnectionID.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModuleConnectionManager.h"
@@ -83,7 +82,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.36");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.37");
 vtkCxxSetObjectMacro(vtkSMProxyManager, UndoStack, vtkSMUndoStack);
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -657,7 +656,7 @@ void vtkSMProxyManager::UnMarkProxyAsModified(vtkSMProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadState(const char* filename, vtkConnectionID id)
+void vtkSMProxyManager::LoadState(const char* filename, vtkIdType id)
 {
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
   parser->SetFileName(filename);
@@ -668,7 +667,7 @@ void vtkSMProxyManager::LoadState(const char* filename, vtkConnectionID id)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement, vtkConnectionID id)
+void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement, vtkIdType id)
 {
   if (!rootElement)
     {
@@ -974,4 +973,5 @@ void vtkSMProxyManager::SaveRegisteredLinks(vtkPVXMLElement* rootElement)
 void vtkSMProxyManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "UndoStack: " << this->UndoStack << endl;
 }

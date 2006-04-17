@@ -35,7 +35,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.67");
+vtkCxxRevisionMacro(vtkSMProxy, "1.68");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -301,7 +301,7 @@ vtkTypeUInt32 vtkSMProxy::GetServers()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxy::SetConnectionID(vtkConnectionID id)
+void vtkSMProxy::SetConnectionID(vtkIdType id)
 {
   if (this->SelfID.ID)
     {
@@ -321,13 +321,13 @@ void vtkSMProxy::SetConnectionID(vtkConnectionID id)
 }
 
 //---------------------------------------------------------------------------
-vtkConnectionID vtkSMProxy::GetConnectionID()
+vtkIdType vtkSMProxy::GetConnectionID()
 {
   return this->ConnectionID;
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxy::SetConnectionIDSelf(vtkConnectionID id)
+void vtkSMProxy::SetConnectionIDSelf(vtkIdType id)
 {
   if (this->ConnectionID == id)
     {
@@ -1066,28 +1066,51 @@ void vtkSMProxy::RemoveSubProxy(const char* name)
   vtkSMProxyInternals::ProxyMap::iterator it =
     this->Internals->SubProxies.find(name);
 
+  vtkSmartPointer<vtkSMProxy> subProxy;
   if (it != this->Internals->SubProxies.end())
     {
+    subProxy = it->second; // we keep the proxy since we need it to remove links.
     it->second.GetPointer()->RemoveObserver(this->SubProxyObserver);
     // Note, we are assuming here that a proxy cannot be added
     // twice as a subproxy to the same proxy.
     this->Internals->SubProxies.erase(it);
     }
+  
   // Now, remove any exposed properties for this subproxy.
   vtkSMProxyInternals::ExposedPropertyInfoMap::iterator iter =
     this->Internals->ExposedProperties.begin();
-  vtkSMProxyInternals::ExposedPropertyInfoMap::iterator prev_iter =
-    iter++;
-  while (prev_iter != this->Internals->ExposedProperties.end())
+  while ( iter != this->Internals->ExposedProperties.end())
     {
-    if (prev_iter->second.SubProxyName == name)
+    if (iter->second.SubProxyName == name)
       {
-      this->Internals->ExposedProperties.erase(prev_iter);
+      this->Internals->ExposedProperties.erase(iter);
+      // start again.
+      iter = this->Internals->ExposedProperties.begin();
       }
-    prev_iter = iter;
-    if (iter != this->Internals->ExposedProperties.end())
+    else
       {
       iter++;
+      }
+    }
+
+  if (subProxy.GetPointer())
+    {
+    // Now, remove any shared property links for the subproxy.
+    vtkSMProxyInternals::SubProxyLinksType::iterator iter2 = 
+      this->Internals->SubProxyLinks.begin();
+    while (iter2 != this->Internals->SubProxyLinks.end())
+      {
+      iter2->GetPointer()->RemoveLinkedProxy(subProxy.GetPointer());
+      if (iter2->GetPointer()->GetNumberOfLinkedProxies() <= 1)
+        {
+        // link is useless, remove it.
+        this->Internals->SubProxyLinks.erase(iter2);
+        iter2 = this->Internals->SubProxyLinks.begin();
+        }
+      else
+        {
+        iter2++;
+        }
       }
     }
 }
@@ -1521,8 +1544,10 @@ void vtkSMProxy::SetupSharedProperties(vtkSMProxy* subproxy,
           "its properties can be shared with another subproxy.");
         continue;
         }
+      vtkSMProxyLink* sharingLink = vtkSMProxyLink::New();
+      sharingLink->PropagateUpdateVTKObjectsOff();
+
       // Read the exceptions.
-      vtkstd::set<vtkstd::string> exceptions;
       for (unsigned int j=0; j < propElement->GetNumberOfNestedElements(); j++)
         {
         vtkPVXMLElement* exceptionProp = propElement->GetNestedElement(j);
@@ -1536,31 +1561,12 @@ void vtkSMProxy::SetupSharedProperties(vtkSMProxy* subproxy,
           vtkErrorMacro("Exception tag must have the attribute 'name'.");
           continue;
           }
-        exceptions.insert(exceptions.end(), vtkstd::string(exp_name));
+        sharingLink->AddException(exp_name);
         }
-      // Iterate over src_subproxy properties and
-      // replace the subproxy properties except those in exceptions.
-      vtkSMPropertyIterator* piter = vtkSMPropertyIterator::New();
-      piter->SetProxy(src_subproxy);
-      for (piter->Begin(); !piter->IsAtEnd(); piter->Next())
-        {
-        const char* pname = piter->GetKey();
-        if (exceptions.find(vtkstd::string(pname)) !=
-          exceptions.end())
-          {
-          continue;
-          }
-        // Check is subproxy has this property. If not, the property
-        // cannot be shared. For a property to be shared, it must be defined 
-        // on both proxies.
-        if (!subproxy->GetProperty(pname))
-          {
-          continue;
-          }
-        subproxy->RemoveProperty(pname);
-        subproxy->AddProperty(pname, piter->GetProperty());
-        }
-      piter->Delete();
+      sharingLink->AddLinkedProxy(src_subproxy, vtkSMLink::INPUT);
+      sharingLink->AddLinkedProxy(subproxy, vtkSMLink::OUTPUT);
+      this->Internals->SubProxyLinks.push_back(sharingLink);
+      sharingLink->Delete();
       }
     }
 }

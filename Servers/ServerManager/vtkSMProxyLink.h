@@ -42,6 +42,20 @@ public:
   // changes, it's value is pushed to all other output proxies in the link.
   void AddLinkedProxy(vtkSMProxy* proxy, int updateDir);
 
+  // Description:
+  // Remove a linked proxy.
+  void RemoveLinkedProxy(vtkSMProxy* proxy);
+
+  // Description:
+  // Get the number of proxies that are involved in this link.
+  unsigned int GetNumberOfLinkedProxies();
+
+  // Description:
+  // It is possible to exclude certain properties from being synchronized
+  // by this link. This method can be used to add/remove the names for such exception
+  // properties.
+  void AddException(const char* propertyname);
+  void RemoveException(const char* propertyname);
  
 protected:
   vtkSMProxyLink();

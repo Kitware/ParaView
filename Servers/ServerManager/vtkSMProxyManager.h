@@ -42,7 +42,6 @@ class vtkSMProxyManagerObserver;
 class vtkSMUndoStack;
 //BTX
 struct vtkSMProxyManagerInternals;
-struct vtkConnectionID;
 //ETX
 
 class VTK_EXPORT vtkSMProxyManager : public vtkSMObject
@@ -182,12 +181,12 @@ public:
   // Loads the state of the server manager from XML.
   void LoadState(const char* filename);
   void LoadState(vtkPVXMLElement* rootElement);
-//BTX
+  
   // Description:
   // Load the state for a particular connection.
-  void LoadState(vtkPVXMLElement* rootElement, vtkConnectionID id);
-  void LoadState(const char* filename, vtkConnectionID id);
-//ETX
+  void LoadState(vtkPVXMLElement* rootElement, vtkIdType id);
+  void LoadState(const char* filename, vtkIdType id);
+  
   // Description:
   // Save the state of the server manager in XML format in a file.
   // This saves the state of all proxies and properties. NOTE: The XML

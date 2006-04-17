@@ -31,13 +31,13 @@ public:
   static vtkSMTimeStepsInformationHelper* New();
   vtkTypeRevisionMacro(vtkSMTimeStepsInformationHelper, vtkSMInformationHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  //BTX
+  
+//BTX
   // Description:
   // Updates the property using values obtained for server.
-  virtual void UpdateProperty(vtkConnectionID connectionId,
+  virtual void UpdateProperty(vtkIdType connectionId,
     int serverIds, vtkClientServerID objectId, vtkSMProperty* prop);
-  //ETX
+//ETX
 
 protected:
   vtkSMTimeStepsInformationHelper();

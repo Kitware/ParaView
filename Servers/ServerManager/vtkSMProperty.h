@@ -64,7 +64,6 @@
 
 #include "vtkSMObject.h"
 #include "vtkClientServerID.h" // needed for vtkClientServerID
-#include "vtkConnectionID.h" // needed for vtkConnectionID.
 
 class vtkClientServerStream;
 class vtkPVXMLElement;
@@ -225,7 +224,7 @@ protected:
   // If this is an information property (InformationOnly is true),
   // this method fills the vector with the values obtained from
   // the server. This work is forwarded to the information helper.
-  virtual void UpdateInformation(vtkConnectionID connectionId, int serverids, 
+  virtual void UpdateInformation(vtkIdType connectionId, int serverids, 
     vtkClientServerID objectId);
   //ETX
 

@@ -20,7 +20,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSimpleIntInformationHelper);
-vtkCxxRevisionMacro(vtkSMSimpleIntInformationHelper, "1.5");
+vtkCxxRevisionMacro(vtkSMSimpleIntInformationHelper, "1.6");
 
 //---------------------------------------------------------------------------
 vtkSMSimpleIntInformationHelper::vtkSMSimpleIntInformationHelper()
@@ -34,7 +34,7 @@ vtkSMSimpleIntInformationHelper::~vtkSMSimpleIntInformationHelper()
 
 //---------------------------------------------------------------------------
 void vtkSMSimpleIntInformationHelper::UpdateProperty(
-  vtkConnectionID connectionId, int serverIds, vtkClientServerID objectId, 
+  vtkIdType connectionId, int serverIds, vtkClientServerID objectId, 
   vtkSMProperty* prop)
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop);

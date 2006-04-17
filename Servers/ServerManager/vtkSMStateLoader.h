@@ -23,9 +23,7 @@
 #define __vtkSMStateLoader_h
 
 #include "vtkSMObject.h"
-//BTX
-#include "vtkConnectionID.h" // needed for vtkConnectionID.
-//ETX
+
 class vtkPVXMLElement;
 class vtkSMProxy;
 
@@ -54,13 +52,13 @@ public:
   // in the map with the id as the key.
   virtual vtkSMProxy* NewProxy(int id);
   vtkSMProxy* NewProxyFromElement(vtkPVXMLElement* proxyElement, int id);
-//BTX
+  
   // Description:
   // Get/Set the connection ID for the connection on which the state is
   // loaded. By default it is set to RootServerConnectionID.
-  void SetConnectionID(vtkConnectionID id) { this->ConnectionID = id; }
-  vtkConnectionID GetConnectionID() { return this->ConnectionID; } 
-//ETX
+  vtkSetMacro(ConnectionID, vtkIdType);
+  vtkGetMacro(ConnectionID, vtkIdType);
+
 protected:
   vtkSMStateLoader();
   ~vtkSMStateLoader();
@@ -81,7 +79,7 @@ protected:
 
   vtkSMStateLoaderInternals* Internal;
 
-  vtkConnectionID ConnectionID;
+  vtkIdType ConnectionID;
 private:
   vtkSMStateLoader(const vtkSMStateLoader&); // Not implemented
   void operator=(const vtkSMStateLoader&); // Not implemented

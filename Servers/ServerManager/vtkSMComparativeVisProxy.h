@@ -166,7 +166,7 @@ public:
   //BTX
   // Description:
   // Overridden to set the connection Id for the MultiActorHelper.
-  virtual void SetConnectionID(vtkConnectionID id);
+  virtual void SetConnectionID(vtkIdType id);
   //ETX
 protected:
   vtkSMComparativeVisProxy();
