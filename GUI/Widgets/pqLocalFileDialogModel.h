@@ -36,7 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QtWidgetsExport.h"
 #include "pqFileDialogModel.h"
 
-/// Implementation of pqFileDialogModel that provides browsing capabilities for the local filesystem
+/**
+  Implementation of pqFileDialogModel that provides browsing capabilities for the local filesystem.
+  
+  /sa pqFileDialogModel, pqFileDialog, pqServerFileDialogModel
+*/
+
 class QTWIDGETS_EXPORT pqLocalFileDialogModel :
   public pqFileDialogModel
 {

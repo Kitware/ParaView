@@ -37,7 +37,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QObject;
 
-/// Helper class for making Qt connections
+/**
+  Using pqConnect, you can create and initialize Qt objects without having to create a bunch of temporaries:
+  
+  \code
+  menu->addAction("Open") << pqConnect(SIGNAL(triggered()), this, SLOT(onTriggered()));
+  \endcode
+ 
+  \sa pqSetName, pqSetData
+*/
+  
 struct QTWIDGETS_EXPORT pqConnect
 {
   pqConnect(const char* Signal, const QObject* Receiver, const char* Method);

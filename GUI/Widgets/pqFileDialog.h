@@ -40,7 +40,20 @@ class pqFileDialogModel;
 namespace Ui { class pqFileDialog; }
 class QModelIndex;
 
-/// Provides a standard file dialog "front-end" for the pqFileDialogModel "back-end", i.e. it can be used for both local and remote file browsing
+/**
+  Provides a standard file dialog "front-end" for the pqFileDialogModel "back-end", i.e. it can be used for both local and remote file browsing.
+
+  When creating an instance of pqFileDialog, you must provide an instance of the back-end.  To get the file(s) selected by the user, connect
+  to the filesSelected() signal:
+  
+  /code
+  pqFileDialog* dialog = new pqFileDialog(new pqLocalFileDialogModel(), "Open Session File", this, "OpenSessionFile");
+  dialog << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(onOpenSessionFile(const QStringList&)));
+  /endcode
+  
+  /sa pqLocalFileDialogModel, pqServerFileDialogModel
+*/
+
 class QTWIDGETS_EXPORT pqFileDialog :
   public QDialog
 {

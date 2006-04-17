@@ -36,7 +36,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QtWidgetsExport.h"
 #include <QString>
 
-/// Helper class for setting a Qt object name
+/**
+  Using pqSetName, you can create and initialize Qt objects without having to create a bunch of temporaries:
+  
+  \code
+  menu->addAction("Open") << pqSetName("FileOpenMenu");
+  \endcode
+ 
+  \sa pqSetData, pqConnect
+*/
+  
 struct QTWIDGETS_EXPORT pqSetName
 {
   pqSetName(const QString& Name);

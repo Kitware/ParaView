@@ -35,10 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 
-////////////////////////////////////////////////////////////////////////////////////////////
-// pqPythonStream
-
-/// Helper-class that converts Python stream operations into Qt signals
+/// Helper-class that converts Python stream operations into Qt signals.
 class pqPythonStream :
   public QObject
 {

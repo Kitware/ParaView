@@ -38,7 +38,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QIODevice;
 
-/// Parses a delimited text file (e.g. a CSV or tab-delimited file), and emits signals that represent data series from the file.
+/**
+  Parses a delimited text file (e.g. a CSV or tab-delimited file), and emits signals that represent data series from the file.
+
+  To use it, create an instance of pqDelimitedTextParser, passing the delimiter character in the constructor.
+  Then, connect the startParsing(), parseSeries(), and finishParsing() signals to slots.  Call parse() with the
+  filename of the file to be parsed, and the parseSeries() signal will be emitted for each series of values
+  contained within the file.
+*/
+
 class QTWIDGETS_EXPORT pqDelimitedTextParser :
   public QObject
 {

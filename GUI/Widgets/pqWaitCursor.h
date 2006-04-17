@@ -35,7 +35,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QtWidgetsExport.h"
 
-/// RAII component that displays a wait cursor during a long operation
+/**
+  RAII component that displays a wait cursor during a long operation.
+  The normal cursor is restored when the pqWaitCursor object goes out-of-scope:
+  
+  /code
+  {
+  pqWaitCursor cursor;
+  for(i = 0; i != really_big_number; ++i)
+    {
+    DoSomethingTimeConsuming();
+    }
+  }
+  /endcode
+*/
+
 class QTWIDGETS_EXPORT pqWaitCursor
 {
 public:

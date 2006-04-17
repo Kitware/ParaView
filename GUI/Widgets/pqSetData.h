@@ -36,7 +36,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QtWidgetsExport.h"
 #include <QVariant>
 
-/// Helper class for setting custom Qt object data
+/**
+  Using pqSetData, you can create and initialize Qt objects without having to create a bunch of temporaries:
+  
+  \code
+  menu->addAction("Open") << pqSetData("My Private Data");
+  \endcode
+ 
+  \sa pqSetName, pqConnect
+*/
+  
 struct QTWIDGETS_EXPORT pqSetData
 {
   pqSetData(const QVariant& Data);

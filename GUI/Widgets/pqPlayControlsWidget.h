@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QHBoxLayout;
 class QToolButton;
 
+/// Provides a standard set of "VCR" controls for controlling animations
 class QTWIDGETS_EXPORT pqPlayControlsWidget :
   public QWidget
 {
@@ -66,8 +67,6 @@ private:
     BACK,
     FORWARD,
     LAST,
-//    PAUSE,
-//    PLAY,
     NUM_BUTTONS
   };
 
@@ -79,5 +78,3 @@ private:
 };
 
 #endif
-
-

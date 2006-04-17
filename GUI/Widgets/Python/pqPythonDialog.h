@@ -36,7 +36,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QtPythonExport.h"
 #include <QDialog>
 
-/// Provides an about dialog
+/**
+  Qt dialog that embeds an instance of pqPythonShell, providing the user
+  with an interactive Python console where they can enter Python commands
+  manually and see the corresponding output.
+  
+  /sa pqPythonShell, pqConsoleWidget
+*/
+
 class QTPYTHON_EXPORT pqPythonDialog :
   public QDialog
 {

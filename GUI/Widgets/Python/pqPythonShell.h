@@ -36,7 +36,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QtPythonExport.h"
 #include <QWidget>
 
-/// Provides an interactive "shell" interface to an embedded Python interpreter
+/**
+  Qt widget that provides an interactive "shell" interface to an embedded Python interpreter.
+  You can put an instance of pqPythonShell in a dialog or a window, and the user will be able
+  to enter Python commands and see their output, while the UI is still responsive.
+  
+  /sa pqConsoleWidget, pqPythonDialog
+*/  
+  
 class QTPYTHON_EXPORT pqPythonShell :
   public QWidget
 {
