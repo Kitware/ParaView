@@ -97,7 +97,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.46");
+vtkCxxRevisionMacro(vtkProcessModule, "1.47");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -261,6 +261,11 @@ int vtkProcessModule::Start(int argc, char** argv)
   this->ConnectionManager = vtkProcessModuleConnectionManager::New();
   this->ConnectionManager->AddObserver(vtkCommand::AbortCheckEvent,
     this->Observer);
+  this->ConnectionManager->AddObserver(vtkCommand::ConnectionCreatedEvent,
+    this->Observer);
+  this->ConnectionManager->AddObserver(vtkCommand::ConnectionClosedEvent,
+    this->Observer);
+
 
   // This call blocks on the Satellite nodes (never on root node).
   if (this->ConnectionManager->Initialize(argc, argv, 
@@ -1077,6 +1082,11 @@ void vtkProcessModule::ExecuteEvent(
 
   case vtkCommand::AbortCheckEvent:
     this->InvokeEvent(vtkCommand::AbortCheckEvent);
+    break;
+
+  case vtkCommand::ConnectionCreatedEvent:
+  case vtkCommand::ConnectionClosedEvent:
+    this->InvokeEvent(event, calldata);
     break;
 
   case vtkCommand::ErrorEvent:

@@ -15,34 +15,11 @@
 #include "vtkUndoStack.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkSmartPointer.h"
-#include "vtkUndoSet.h"
+#include "vtkUndoStackInternal.h"
 
-#include <vtkstd/string>
-#include <vtkstd/vector>
-
-//****************************************************************************
-class vtkUndoStackInternal
-{
-public:
-  struct Element
-    {
-    vtkstd::string Label;
-    vtkSmartPointer<vtkUndoSet> UndoSet;
-    Element(const char* label, vtkUndoSet* set)
-      {
-      this->Label = label;
-      this->UndoSet = set;
-      }
-    };
-  typedef vtkstd::vector<Element> VectorOfElements;
-  VectorOfElements UndoStack;
-  VectorOfElements RedoStack;
-};
-//****************************************************************************
 
 vtkStandardNewMacro(vtkUndoStack);
-vtkCxxRevisionMacro(vtkUndoStack, "1.1");
+vtkCxxRevisionMacro(vtkUndoStack, "1.2");
 //-----------------------------------------------------------------------------
 vtkUndoStack::vtkUndoStack()
 {
