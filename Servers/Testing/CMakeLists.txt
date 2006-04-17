@@ -9,6 +9,7 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
       vtkSMProxyInternals.h
       vtkSMPropertyInternals.h
       vtkSMProxyManagerInternals.h      
+      vtkUndoStackInternal.h
       )
   ENDFOREACH(part)
 ENDIF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
