@@ -2645,4 +2645,41 @@ The mesh quality filter computes the quality of individual triangles, quadrilate
                         property="Value"
                         help="Choose the scalar value to select with"/>
   </Module>
+
+  <Module name="AreaSelect"
+          class="vtkPVAreaSelect"
+          root_name="RBSelect"
+          menu_name="Rubber Band Select"
+          module_type="Filter"
+          button_help="Do rubber band selection on a dataset."
+          replace_input="0">
+    <Filter class="vtkAreaSelect">
+      <Input name="Input"
+             class="vtkDataSet">
+      </Input>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               id="im"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+
+    <SelectionList property="ExactTest"
+                   label="Test Type"
+                   trace_name="ExactTest"
+                   help="Select whether to pick using cell intersection tests (exact) or point insidedness tests (fast).">
+      <Item name="Cell" value="1"/>
+      <Item name="Point" value="0"/>
+    </SelectionList>
+
+    <SelectionList property="PassThrough"
+                   label="Output"
+                   trace_name="PassThrough"
+                   help="Select whether to simply add a new 'Insidedness' array to the input or to create an entirely new output dataset that contains only the potion that is inside.">
+      <Item name="New Grid" value="0"/>
+      <Item name="PassThrough" value="1"/>
+    </SelectionList>
+
+  </Module>
+
 </ModuleInterfaces>

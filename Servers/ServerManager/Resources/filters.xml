@@ -4197,8 +4197,56 @@ This filter operates on all types of data sets, and it returns unstructured grid
      </Property>
    <!-- End TemporalCache -->
    </SourceProxy>
-
    
-  </ProxyGroup>
+   <SourceProxy name="AreaSelect" class="vtkFrustumExtractor">
+      <Documentation
+        long_help="Draw a rectangle on the screen and obtain the section of data inside it." 
+        short_help="Rubber band selection inside a DataSet">
+Click the Start Selection button to begin. Then use the left mouse button to make a selection rectangle on the render window. The portion of the input data set that lies within the volume in space behind the selection rectangle will be returned.
+      </Documentation>
+
+     <DoubleVectorProperty
+        name="CreateFrustum"
+        command="CreateFrustum"
+        number_of_elements="24"
+        default_values="0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0">
+     </DoubleVectorProperty>
+
+     <InputProperty name="Input" command="SetInput">
+       <ProxyGroupDomain name="groups">
+         <Group name="sources"/>
+         <Group name="filters"/>
+       </ProxyGroupDomain>
+       <DataTypeDomain name="input_type">
+         <DataType value="vtkDataSet"/>
+       </DataTypeDomain>
+     </InputProperty>
+
+     <IntVectorProperty 
+        name="ExactTest" 
+        command="SetExactTest" 
+        number_of_elements="1"
+        default_values="1" >
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Off"/>
+         <Entry value="1" text="On"/>
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="PassThrough" 
+        command="SetPassThrough" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Off"/>
+         <Entry value="1" text="On"/>
+       </EnumerationDomain>
+     </IntVectorProperty>
+     
+   <!-- End AreaSelect -->
+   </SourceProxy>
+
+   </ProxyGroup>
 </ServerManagerConfiguration>
 
