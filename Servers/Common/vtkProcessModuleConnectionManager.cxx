@@ -72,14 +72,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.10");
-
-//-----------------------------------------------------------------------------
-vtkIdType vtkProcessModuleConnectionManager::NullConnectionID = 0;
-vtkIdType vtkProcessModuleConnectionManager::SelfConnectionID = 1;
-vtkIdType vtkProcessModuleConnectionManager::AllConnectionsID = 2;
-vtkIdType vtkProcessModuleConnectionManager::AllServerConnectionID = 3;
-vtkIdType vtkProcessModuleConnectionManager::RootServerConnectionID = 4;
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.11");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()

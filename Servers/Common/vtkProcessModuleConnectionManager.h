@@ -83,16 +83,22 @@ public:
   // Description:
   // Used for invalid/null connections.
   static vtkIdType GetNullConnectionID() 
-    { return vtkProcessModuleConnectionManager::NullConnectionID; }
+    { 
+    return static_cast<vtkIdType>(vtkProcessModuleConnectionManager::NullConnectionID); 
+    }
 
   // Description:
   // The ID used for SelfConnection.
   static vtkIdType GetSelfConnectionID() 
-    { return vtkProcessModuleConnectionManager::SelfConnectionID; }
+    { 
+    return static_cast<vtkIdType>(vtkProcessModuleConnectionManager::SelfConnectionID); 
+    }
 
   // The ID used for All Connections.
   static vtkIdType GetAllConnectionsID() 
-    { return vtkProcessModuleConnectionManager::AllConnectionsID; }
+    { 
+    return static_cast<vtkIdType>(vtkProcessModuleConnectionManager::AllConnectionsID); 
+    }
 
   // The ID used for Connection to all Servers. What connection qualifies a 
   // server depends on the mode of operation. When in ParaView mode (with or 
@@ -102,7 +108,9 @@ public:
   // Only remote connections are ServerConnections in such a case. Providing 
   // this ID makes this decision complete transparent to the ServerManager.
   static vtkIdType GetAllServerConnectionsID() 
-    { return vtkProcessModuleConnectionManager::AllServerConnectionID; }
+    { 
+    return static_cast<vtkIdType>(vtkProcessModuleConnectionManager::AllServerConnectionID); 
+    }
 
   // This ID represents the first server connection. What connection qualifies a 
   // server depends on the mode of operation. When in ParaView mode (with or 
@@ -112,7 +120,9 @@ public:
   // Only remote connections are ServerConnections in such a case. Providing 
   // this ID makes this decision completely transparent to the ServerManager.
   static vtkIdType GetRootServerConnectionID()
-    { return vtkProcessModuleConnectionManager::RootServerConnectionID ; }
+    { 
+    return static_cast<vtkIdType>(vtkProcessModuleConnectionManager::RootServerConnectionID); 
+    }
 
 //ETX  
   // Description:
@@ -375,11 +385,13 @@ protected:
   friend class vtkProcessModuleConnectionManagerObserver;
   vtkProcessModuleConnectionManagerObserver* Observer;
 
-  static vtkIdType NullConnectionID;
-  static vtkIdType SelfConnectionID;
-  static vtkIdType AllConnectionsID;
-  static vtkIdType AllServerConnectionID;
-  static vtkIdType RootServerConnectionID;
+  enum ConnectionID {
+    NullConnectionID = 0,
+    SelfConnectionID,
+    AllConnectionsID, 
+    AllServerConnectionID,
+    RootServerConnectionID
+  };
 //ETX
 private:
   vtkProcessModuleConnectionManager(const vtkProcessModuleConnectionManager&); // Not implemented.
