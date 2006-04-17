@@ -36,7 +36,7 @@ public:
   vtkTypeRevisionMacro(vtkSMXDMFInformationHelper, vtkSMInformationHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  //BTX
+//BTX
   // Description:
   // Updates the property using value obtained for server. It creates
   // an instance of the server helper class vtkPVServerXDMFParameters
@@ -44,9 +44,9 @@ public:
   // and populates the property using the values returned.
   // XDMF parameters are stored as 5 component tuples: name, current value, 
   // first index, stride, count
-  virtual void UpdateProperty(vtkConnectionID connectionId,
+  virtual void UpdateProperty(vtkIdType connectionId,
     int serverIds, vtkClientServerID objectId, vtkSMProperty* prop);
-  //ETX
+//ETX
 
 protected:
   vtkSMXDMFInformationHelper();

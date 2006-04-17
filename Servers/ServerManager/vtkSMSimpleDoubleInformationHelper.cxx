@@ -20,7 +20,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSimpleDoubleInformationHelper);
-vtkCxxRevisionMacro(vtkSMSimpleDoubleInformationHelper, "1.5");
+vtkCxxRevisionMacro(vtkSMSimpleDoubleInformationHelper, "1.6");
 
 //---------------------------------------------------------------------------
 vtkSMSimpleDoubleInformationHelper::vtkSMSimpleDoubleInformationHelper()
@@ -34,7 +34,7 @@ vtkSMSimpleDoubleInformationHelper::~vtkSMSimpleDoubleInformationHelper()
 
 //---------------------------------------------------------------------------
 void vtkSMSimpleDoubleInformationHelper::UpdateProperty(
-  vtkConnectionID connectionId, int serverIds, vtkClientServerID objectId, 
+  vtkIdType connectionId, int serverIds, vtkClientServerID objectId, 
   vtkSMProperty* prop)
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(prop);

@@ -14,7 +14,6 @@
 =========================================================================*/
 
 #include "vtkClientSocket.h"
-#include "vtkConnectionID.h"
 #include "vtkSmartPointer.h"
 #include "vtkProcessModuleConnection.h"
 #include "vtkPVServerSocket.h"
@@ -28,7 +27,7 @@ public:
   typedef vtkstd::map<vtkSocket*, 
           vtkSmartPointer<vtkProcessModuleConnection> > MapOfSocketToConnection;
 
-  typedef vtkstd::map<vtkConnectionID, 
+  typedef vtkstd::map<vtkIdType, 
           vtkSmartPointer<vtkProcessModuleConnection> > MapOfIDToConnection;
 
   typedef vtkstd::map<int, vtkSmartPointer<vtkPVServerSocket> > MapOfIntToPVServerSocket;

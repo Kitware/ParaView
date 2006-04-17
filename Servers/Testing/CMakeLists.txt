@@ -3,7 +3,6 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
     ADD_TEST(HeaderTesting-PVServer-${part} ${PYTHON_EXECUTABLE}
       ${VTK_HEADER_TESTING_PY}
       "${PVServer_SOURCE_DIR}/${part}"
-      vtkConnectionID.h
       vtkProcessModuleConnectionManagerInternals.h
       vtkPVServerOptionsInternals.h
       vtkSMPropertyInternals.h

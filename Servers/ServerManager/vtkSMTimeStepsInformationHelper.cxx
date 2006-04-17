@@ -20,7 +20,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMTimeStepsInformationHelper);
-vtkCxxRevisionMacro(vtkSMTimeStepsInformationHelper, "1.2");
+vtkCxxRevisionMacro(vtkSMTimeStepsInformationHelper, "1.3");
 
 //---------------------------------------------------------------------------
 vtkSMTimeStepsInformationHelper::vtkSMTimeStepsInformationHelper()
@@ -34,7 +34,7 @@ vtkSMTimeStepsInformationHelper::~vtkSMTimeStepsInformationHelper()
 
 //---------------------------------------------------------------------------
 void vtkSMTimeStepsInformationHelper::UpdateProperty(
-  vtkConnectionID connectionId, int serverIds, vtkClientServerID objectId, 
+  vtkIdType connectionId, int serverIds, vtkClientServerID objectId, 
   vtkSMProperty* prop)
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(prop);

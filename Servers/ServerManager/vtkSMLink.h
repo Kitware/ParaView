@@ -44,7 +44,12 @@ public:
     };
 //ETX
 
-
+  // Description:
+  // This flag determins if UpdateVTKObjects calls are to be propagated.
+  // Set to 1 by default.
+  vtkSetMacro(PropagateUpdateVTKObjects, int);
+  vtkGetMacro(PropagateUpdateVTKObjects, int);
+  vtkBooleanMacro(PropagateUpdateVTKObjects, int);
 protected:
   vtkSMLink();
   ~vtkSMLink();
@@ -78,6 +83,10 @@ protected:
   friend class vtkSMProxyManager;
 //ETX
   vtkCommand* Observer;
+  // Set by default. In a link P1->P2, if this flag is set, when ever Proxy with P1
+  // is updated i.e. UpdateVTKObjects() is called, this class calls
+  // UpdateVTKObjects on Proxy with P2.
+  int PropagateUpdateVTKObjects;
 private:
   vtkSMLink(const vtkSMLink&); // Not implemented.
   void operator=(const vtkSMLink&); // Not implemented.

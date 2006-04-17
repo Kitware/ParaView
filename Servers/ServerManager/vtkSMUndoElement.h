@@ -24,25 +24,20 @@
 
 #include "vtkUndoElement.h"
 
-#include "vtkConnectionID.h" // needed for vtkConnectionID.
-
 class VTK_EXPORT vtkSMUndoElement : public vtkUndoElement
 {
 public:
   vtkTypeRevisionMacro(vtkSMUndoElement, vtkUndoElement);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
-  void SetConnectionID(vtkConnectionID id) 
-    { this->ConnectionID = id; }
-  vtkConnectionID GetConnectionID()  { return this->ConnectionID; }
-//ETX
+  vtkGetMacro(ConnectionID, vtkIdType);
+  vtkSetMacro(ConnectionID, vtkIdType);
+
 protected:
   vtkSMUndoElement();
   ~vtkSMUndoElement();
-//BTX
-  vtkConnectionID ConnectionID;
-//ETX
+
+  vtkIdType ConnectionID;
 private:
   vtkSMUndoElement(const vtkSMUndoElement&); // Not implemented.
   void operator=(const vtkSMUndoElement&); // Not implemented.

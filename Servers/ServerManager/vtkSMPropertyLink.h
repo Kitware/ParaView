@@ -39,10 +39,10 @@ public:
   // changes, it's value is pushed to all other output proxies in the link.
   void AddLinkedProperty(vtkSMProxy* proxy, const char* propertyname, int updateDir);
 
- 
 protected:
   vtkSMPropertyLink();
   ~vtkSMPropertyLink();
+
 
 //BTX
   friend struct vtkSMPropertyLinkInternals;

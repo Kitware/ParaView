@@ -23,9 +23,11 @@
 #include "vtkSMStateLoader.h"
 
 #include <vtkstd/list>
+#include <vtkstd/set>
+#include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxyLink);
-vtkCxxRevisionMacro(vtkSMProxyLink, "1.4");
+vtkCxxRevisionMacro(vtkSMProxyLink, "1.5");
 
 //---------------------------------------------------------------------------
 struct vtkSMProxyLinkInternals
@@ -51,6 +53,9 @@ struct vtkSMProxyLinkInternals
 
   typedef vtkstd::list<LinkedProxy> LinkedProxiesType;
   LinkedProxiesType LinkedProxies;
+
+  typedef vtkstd::set<vtkstd::string> ExceptionPropertiesType;
+  ExceptionPropertiesType ExceptionProperties;
 };
 
 //---------------------------------------------------------------------------
@@ -110,8 +115,53 @@ void vtkSMProxyLink::AddLinkedProxy(vtkSMProxy* proxy, int updateDir)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxyLink::RemoveLinkedProxy(vtkSMProxy* proxy)
+{
+  vtkSMProxyLinkInternals::LinkedProxiesType::iterator iter =
+    this->Internals->LinkedProxies.begin();
+  for(; iter != this->Internals->LinkedProxies.end(); iter++)
+    {
+    if (iter->Proxy == proxy)
+      {
+      this->Internals->LinkedProxies.erase(iter);
+      break;
+      }
+    }
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMProxyLink::GetNumberOfLinkedProxies()
+{
+  return static_cast<unsigned int>(this->Internals->LinkedProxies.size());
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyLink::AddException(const char* propertyname)
+{
+  this->Internals->ExceptionProperties.insert(propertyname);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyLink::RemoveException(const char* propertyname)
+{
+  vtkSMProxyLinkInternals::ExceptionPropertiesType::iterator iter
+    = this->Internals->ExceptionProperties.find(propertyname);
+  if (iter != this->Internals->ExceptionProperties.end())
+    {
+    this->Internals->ExceptionProperties.erase(iter);
+    }
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxyLink::UpdateProperties(vtkSMProxy* fromProxy, const char* pname)
 {
+  if (pname && this->Internals->ExceptionProperties.find(pname) !=
+    this->Internals->ExceptionProperties.end())
+    {
+    // Property is in exception list.
+    return;
+    }
+
   if (!fromProxy)
     {
     return;

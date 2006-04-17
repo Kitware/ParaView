@@ -26,7 +26,6 @@
 
 #include "vtkObject.h"
 #include "vtkClientServerID.h" // needed for UniqueID.
-#include "vtkConnectionID.h" // needed for ConnectionID.
 
 class vtkCallbackCommand;
 class vtkClientServerInterpreter;
@@ -104,13 +103,13 @@ public:
     }
 //ETX
 
-//BTX
   // Description:
   // Get a directory listing for the given directory.  Returns 1 for
   // success, and 0 for failure (when the directory does not exist).
-  virtual int GetDirectoryListing(vtkConnectionID connectionID, const char* dir, 
+  virtual int GetDirectoryListing(vtkIdType connectionID, const char* dir, 
     vtkStringList* dirs, vtkStringList* files, int save);
-  
+ 
+//BTX
   // Description:
   // Load a ClientServer wrapper module dynamically in the server
   // processes.  Returns 1 if all server nodes loaded the module and 0
@@ -118,10 +117,10 @@ public:
   // serverFlags can be used to indicate if this is a data server module
   // or a render server module. The directory argument may be used 
   // to specify a directory in which to look for the module. 
-  virtual int LoadModule(vtkConnectionID connectionID,
+  virtual int LoadModule(vtkIdType connectionID,
     vtkTypeUInt32 serverFlags, const char* name, const char* directory);
 //ETX
-  
+
   // Description:
   // Used internally.  Do not call.  Use LoadModule instead.
   virtual int LoadModuleInternal(const char* name, const char* directory);
@@ -139,11 +138,10 @@ public:
   // This is the method to be called to gather information.
   // This method require the ID of the connection from which
   // this information must be collected.
-  virtual void GatherInformation(vtkConnectionID connectionID,
+  virtual void GatherInformation(vtkIdType connectionID,
     vtkTypeUInt32 serverFlags, vtkPVInformation* info, vtkClientServerID id);
-
 //ETX
-
+  
   // Description:
   // Start the process modules. It will create the application
   // and start the event loop. Returns 0 on success.
@@ -176,7 +174,7 @@ public:
   // combination of servers.  For an MPI server the result from the
   // root node is returned.  There is no connection to the individual
   // nodes of a server.
-  virtual const vtkClientServerStream& GetLastResult(vtkConnectionID connectionID,
+  virtual const vtkClientServerStream& GetLastResult(vtkIdType connectionID,
     vtkTypeUInt32 server);
 
   // Description:
@@ -185,7 +183,7 @@ public:
   // use the bitwise or operator to combine servers.  The resetStream
   // flag determines if Reset is called to clear the stream after it
   // is sent.
-  int SendStream(vtkConnectionID connectionID, vtkTypeUInt32 server, 
+  int SendStream(vtkIdType connectionID, vtkTypeUInt32 server, 
     vtkClientServerStream& stream, int resetStream=1);
 
   // Description:
@@ -221,15 +219,17 @@ public:
 
   // Description:
   // This overrload is internal for call thru CS stream alone.
-  // Use GetNumberOfPartitions(vtkConnectionID id) with appropriate connection
+  // Use GetNumberOfPartitions(vtkIdType id) with appropriate connection
   // Id to get the number of server partition. This method simply returns the number
   // of partition on the local process.
+  // TODO: is this needed anymore.
   virtual int GetNumberOfPartitions();
-//BTX 
+  
   // Description:
   // Get the number of processes participating in sharing the data.
-  virtual int GetNumberOfPartitions(vtkConnectionID id);
+  virtual int GetNumberOfPartitions(vtkIdType id);
 
+//BTX
   // Description:
   // Get a unique vtkClientServerID for this process module.
   vtkClientServerID GetUniqueID();
@@ -260,11 +260,10 @@ public:
   // should report to all client why the server is exiting.
   void ExceptionEvent(int type);
 
-//BTX
   // Description:
-  virtual void SendPrepareProgress(vtkConnectionID);
-  virtual void SendCleanupPendingProgress(vtkConnectionID);
-//ETX
+  virtual void SendPrepareProgress(vtkIdType connectionID);
+  virtual void SendCleanupPendingProgress(vtkIdType connectionID);
+
   // Description:
   // This method is called before progress reports start comming.
   void PrepareProgress();
@@ -349,24 +348,24 @@ public:
   // Earlier, the ServerInformation was synchronized with the ClientOptions.
   // This no longer is appropriate. Hence, we provide access to the server information
   // on each connection.
-  vtkPVServerInformation* GetServerInformation(vtkConnectionID id);
+  vtkPVServerInformation* GetServerInformation(vtkIdType id);
 
   // Description:
   // Get the ID used for MPIMToNSocketConnection for the given connection.
-  vtkClientServerID GetMPIMToNSocketConnectionID(vtkConnectionID id);
+  vtkClientServerID GetMPIMToNSocketConnectionID(vtkIdType id);
   
 
   // Description:
   // Synchronizes the Client options with the specified server connection.
   // Not sure this is applicable in anything but legacy ParaView.
-  void SynchronizeServerClientOptions(vtkConnectionID);
+  void SynchronizeServerClientOptions(vtkIdType);
 
   // Description:
-  // Given a vtkConnectionID, this call returns the ClientServer ID
+  // Given a connection ID, this call returns the ClientServer ID
   // assigned to that connection. For now, only vtkRemoteConnections are
   // assigned valid ClientServer IDs. If needed, we can add these IDs 
   // to SelfConnection also.
-  vtkClientServerID GetConnectionClientServerID(vtkConnectionID);
+  vtkClientServerID GetConnectionClientServerID(vtkIdType);
 
 //ETX
   
@@ -435,7 +434,8 @@ public:
   vtkBooleanMacro(SupportMultipleConnections, int);
   
   // Description:
-  // Connect to remote process. Returns 1 on success, 0 on error. 
+  // Connect to remote process. Returns the connection Id for the newly created connection,
+  // on failure, NullConnectionID is returned.
   // This method is intended to be used when 
   // SupportMultipleConnections is true, to connect to a server, in forward connection 
   // mode. When SupportMultipleConnections is 1, the client does not connect to
@@ -446,27 +446,17 @@ public:
   // the server connects to a remote client only in reverse connection mode, in which
   // case the server can connect to 1 and only 1 client, and that connection
   // is established in Start() itselt. Hence this method has not useful.
-  int ConnectToRemote(const char* serverhost, int port);
-  int ConnectToRemote(const char* dataserver_host, int dataserver_port,
+  vtkIdType ConnectToRemote(const char* serverhost, int port);
+  vtkIdType ConnectToRemote(const char* dataserver_host, int dataserver_port,
     const char* renderserver_host, int renderserver_port);
   
-  //BTX
-  
-  // Description:
-  // Same as above except that these method return the connection id of
-  // the newly created connection.
-  int ConnectToRemote(const char* serverhost, int port, vtkConnectionID& id);
-  int ConnectToRemote(const char* dataserver_host, int dataserver_port,
-    const char* renderserver_host, int renderserver_port, vtkConnectionID& id);
-
   // Description:
   // Close the connection. The connection must be a remote connection.
-  void Disconnect(vtkConnectionID id);
+  void Disconnect(vtkIdType id);
  
   // Description:
   // Returns 1 is the connection is a connection with a remote server (or client).
-  int IsRemote(vtkConnectionID id);
-  //ETX
+  int IsRemote(vtkIdType id);
 
   // Description:
   // Checks if any new connections are available, if so, creates vtkConnections
@@ -489,26 +479,25 @@ public:
   vtkSetMacro(UseMPI, int);
   vtkGetMacro(UseMPI, int);
 
-//BTX
   // Description:
   // Push an undo set xml state on the undo stack for the given connection.
-  void PushUndo(vtkConnectionID id, const char* label, vtkPVXMLElement* root);
+  void PushUndo(vtkIdType id, const char* label, vtkPVXMLElement* root);
 
   // Description:
   // Get the next undo  xml from the connection.
   // This method allocates  a new vtkPVXMLElement. It is the responsibility 
   // of caller to \c Delete it. 
   // \returns NULL on failure, otherwise the XML element is returned.
-  vtkPVXMLElement* NewNextUndo(vtkConnectionID id);
+  vtkPVXMLElement* NewNextUndo(vtkIdType id);
  
   // Description:
   // Get the next redo  xml from the connection.
   // This method allocates  a new vtkPVXMLElement. It is the responsibility 
   // of caller to \c Delete it. 
   // \returns NULL on failure, otherwise the XML element is returned.
-  vtkPVXMLElement* NewNextRedo(vtkConnectionID id);
-  
-//ETX
+  vtkPVXMLElement* NewNextRedo(vtkIdType id);
+
+//BTX
 protected:
   vtkProcessModule();
   ~vtkProcessModule();
@@ -581,19 +570,15 @@ protected:
   // to set this pointer appropriately. Note that this is reference counted.
   vtkRemoteConnection* ActiveRemoteConnection;
   void SetActiveRemoteConnection(vtkRemoteConnection*);
-  //BTX
   // so that this class can access SetActiveConnection.
   friend class vtkRemoteConnection;
-  //ETX
   
   vtkClientServerID UniqueID;
   
   vtkClientServerInterpreter* Interpreter;
   vtkCallbackCommand* InterpreterObserver;
   int ReportInterpreterErrors;
-  //BTX
   friend class vtkProcessModuleObserver;
-  //ETX
 
   vtkProcessModuleInternals* Internals;
   vtkProcessModuleObserver* Observer;
@@ -631,6 +616,7 @@ protected:
 private:
   vtkProcessModule(const vtkProcessModule&); // Not implemented.
   void operator=(const vtkProcessModule&); // Not implemented.
+//ETX
 };
 
 

@@ -64,8 +64,8 @@ pqServer* pqServer::CreateStandalone()
 pqServer* pqServer::CreateConnection(const char* const hostName, int portNumber)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkConnectionID id;
-  if (!pm->ConnectToRemote(hostName, portNumber, id))
+  vtkIdType id= pm->ConnectToRemote(hostName, portNumber);
+  if (id == vtkProcessModuleConnectionManager::GetNullConnectionID())
     {
     return NULL;
     }
@@ -88,9 +88,9 @@ pqServer* pqServer::CreateConnection(const char* const ds_hostName, int ds_portN
   const char* const rs_hostName, int rs_portNumber)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkConnectionID id;
-  if (!pm->ConnectToRemote(ds_hostName, ds_portNumber, rs_hostName,
-      rs_portNumber, id))
+  vtkIdType id = !pm->ConnectToRemote(ds_hostName, ds_portNumber, rs_hostName,
+      rs_portNumber);
+  if (id == vtkProcessModuleConnectionManager::GetNullConnectionID())
     {
     return NULL;
     }
@@ -117,7 +117,7 @@ pqServer* pqServer::CreateConnection(const char* const ds_hostName, int ds_portN
 }
 
 //-----------------------------------------------------------------------------
-pqServer::pqServer(vtkConnectionID connectionID, vtkPVOptions* options) :
+pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options) :
   FriendlyName()
 {
   this->ConnectionID = connectionID;
@@ -129,12 +129,13 @@ pqServer::pqServer(vtkConnectionID connectionID, vtkPVOptions* options) :
 pqServer::~pqServer()
 {
   // Close the connection.
-  if (this->ConnectionID.ID && this->ConnectionID 
+  if (this->ConnectionID != vtkProcessModuleConnectionManager::GetNullConnectionID()
+    && this->ConnectionID 
     != vtkProcessModuleConnectionManager::GetSelfConnectionID())
     {
     vtkProcessModule::GetProcessModule()->Disconnect(this->ConnectionID);
     }
-  this->ConnectionID.ID = 0;
+  this->ConnectionID = vtkProcessModuleConnectionManager::GetNullConnectionID();
 }
 
 //-----------------------------------------------------------------------------

@@ -47,7 +47,6 @@
 #define __vtkSMUndoStack_h
 
 #include "vtkUndoStack.h"
-#include "vtkConnectionID.h" // needed for vtkConnectionID.
 
 class vtkPVXMLElement;
 class vtkSMUndoRedoStateLoader;
@@ -61,7 +60,6 @@ public:
   vtkTypeRevisionMacro(vtkSMUndoStack, vtkUndoStack);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-//BTX
   // Description:
   // Begin monitoring the proxy manager for undoable operations.
   // All such operations are noted by creating UndoElements for each.
@@ -69,7 +67,7 @@ public:
   // label. For now, this call cannot be nested i.e. BeginUndoSet call after
   // a BeginUndoSet but before EndUndoSet is an error. The GUI has to ensure
   // that separate undo sets are created for operations on different connections.
-  void BeginUndoSet(vtkConnectionID id, const char* label);
+  void BeginUndoSet(vtkIdType connectionid, const char* label);
 
   // Description:
   // End the undo set currently being generated. This must be called only after
@@ -81,8 +79,7 @@ public:
   // It is possible to push any instance of vtkUndoSet on to the server
   // for a specific connection. Note however that once it is pushed on the server
   // every connected client will be able to undo it (evetually atleast).
-  void Push(vtkConnectionID id, const char* label, vtkUndoSet* set);
-//ETX
+  void Push(vtkIdType connectionid, const char* label, vtkUndoSet* set);
 
   // Description:
   // Performs an Undo using the set on the top of the undo stack. The set is poped from
@@ -125,7 +122,7 @@ protected:
   // only the status is updated, the actual undo state is not sent to the client
   // until it requests it. Ofcourse, this part is still not implemnted. For now,
   // multiple clients are not supported.
-  void PushUndoConnection(const char* label, vtkConnectionID id);
+  void PushUndoConnection(const char* label, vtkIdType id);
 
   void ExecuteEvent(vtkObject* caller, unsigned long eventid, void* data);
   friend class vtkSMUndoStackObserver;
@@ -134,14 +131,14 @@ protected:
   void OnUnRegisterProxy(void* data);
   void OnPropertyModified(void* data);
  
-  vtkConnectionID ActiveConnectionID;
+  vtkIdType ActiveConnectionID;
   vtkUndoSet* ActiveUndoSet;
   char* Label;
   vtkSetStringMacro(Label);
 
   friend class vtkSMUndoStackUndoSet;
-  int ProcessUndo(vtkConnectionID id, vtkPVXMLElement* root);
-  int ProcessRedo(vtkConnectionID id, vtkPVXMLElement* root);
+  int ProcessUndo(vtkIdType id, vtkPVXMLElement* root);
+  int ProcessRedo(vtkIdType id, vtkPVXMLElement* root);
 
   vtkSMUndoRedoStateLoader* StateLoader;
 private:

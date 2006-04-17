@@ -42,7 +42,6 @@ class vtkSMMultiViewRenderModuleProxy;
 #include "pqWidgetsExport.h"
 #include <QObject>
 #include <QString>
-#include "vtkConnectionID.h" // needed for connection Id.
 #include "vtkSmartPointer.h"
 
 /// Abstracts the concept of a "server connection" so that ParaQ clients may: have more than one connect at a time / open and close connections at-will
@@ -68,9 +67,9 @@ public:
   /// Returns the multi view manager proxy for this connection.
   vtkSMMultiViewRenderModuleProxy* GetRenderModule();
 
-  vtkConnectionID GetConnectionID() { return this->ConnectionID; }
+  vtkIdType GetConnectionID() { return this->ConnectionID; }
 protected:
-  pqServer(vtkConnectionID, vtkPVOptions*);
+  pqServer(vtkIdType connectionId, vtkPVOptions*);
 
   /// Creates vtkSMMultiViewRenderModuleProxy for this connection and 
   /// initializes it to create render modules of correct type 
@@ -80,7 +79,7 @@ private:
   pqServer(const pqServer&);  // Not implemented.
   pqServer& operator=(const pqServer&); // Not implemented.
 
-  vtkConnectionID ConnectionID;
+  vtkIdType ConnectionID;
   QString FriendlyName;
   vtkSmartPointer<vtkSMMultiViewRenderModuleProxy> RenderModule;
   // TODO:

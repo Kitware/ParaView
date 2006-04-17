@@ -22,7 +22,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkSMLink, "1.2");
+vtkCxxRevisionMacro(vtkSMLink, "1.3");
 //-----------------------------------------------------------------------------
 class vtkSMLinkObserver : public vtkCommand
 {
@@ -46,7 +46,8 @@ public:
     vtkSMProxy* caller = vtkSMProxy::SafeDownCast(c);
     if (this->Link && caller)
       {
-      if (event == vtkCommand::UpdateEvent)
+      if (event == vtkCommand::UpdateEvent && 
+        this->Link->GetPropagateUpdateVTKObjects())
         {
         this->Link->UpdateVTKObjects(caller);
         }
@@ -66,6 +67,7 @@ vtkSMLink::vtkSMLink()
   vtkSMLinkObserver* obs = vtkSMLinkObserver::New();
   obs->Link = this;
   this->Observer = obs;
+  this->PropagateUpdateVTKObjects = 1;
 }
 
 //-----------------------------------------------------------------------------
