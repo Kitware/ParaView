@@ -127,11 +127,11 @@ protected:
   vtkUndoStack();
   ~vtkUndoStack();
 
+  vtkUndoStackInternal* Internal;
 private:
   vtkUndoStack(const vtkUndoStack&); // Not implemented.
   void operator=(const vtkUndoStack&); // Not implemented.
 
-  vtkUndoStackInternal* Internal;
 };
 
 #endif

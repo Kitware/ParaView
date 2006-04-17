@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkUndoElement.h"
 #include "vtkUndoSet.h"
-#include "vtkUndoStack.h"
+#include "vtkUndoStackInternal.h"
 #include "vtkProcessModule.h"
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVXMLElement.h"
@@ -118,11 +118,11 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMUndoStackUndoSet);
-vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.2");
+vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.3");
 //*****************************************************************************
 
 vtkStandardNewMacro(vtkSMUndoStack);
-vtkCxxRevisionMacro(vtkSMUndoStack, "1.2");
+vtkCxxRevisionMacro(vtkSMUndoStack, "1.3");
 vtkCxxSetObjectMacro(vtkSMUndoStack, StateLoader, vtkSMUndoRedoStateLoader);
 //-----------------------------------------------------------------------------
 vtkSMUndoStack::vtkSMUndoStack()
@@ -145,6 +145,11 @@ vtkSMUndoStack::vtkSMUndoStack()
     pxm->AddObserver(vtkCommand::RegisterEvent, this->Observer);
     pxm->AddObserver(vtkCommand::UnRegisterEvent, this->Observer);
     pxm->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer);
+    }
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (pm)
+    {
+    pm->AddObserver(vtkCommand::ConnectionClosedEvent, this->Observer);
     }
 }
 
@@ -245,23 +250,31 @@ void vtkSMUndoStack::PushUndoConnection(const char* label,
 void vtkSMUndoStack::ExecuteEvent(vtkObject* vtkNotUsed(caller), 
   unsigned long eventid,  void* data)
 {
-  if (!this->ActiveUndoSet)
-    {
-    return;
-    }
-
   switch (eventid)
     {
   case vtkCommand::RegisterEvent:
-    this->OnRegisterProxy(data);
+    if (this->ActiveUndoSet)
+      {
+      this->OnRegisterProxy(data);
+      }
     break;
 
   case vtkCommand::UnRegisterEvent:
-    this->OnUnRegisterProxy(data);
+    if (this->ActiveUndoSet)
+      {
+      this->OnUnRegisterProxy(data);
+      }
     break;
 
   case vtkCommand::PropertyModifiedEvent:
-    this->OnPropertyModified(data);
+    if (this->ActiveUndoSet)
+      {
+      this->OnPropertyModified(data);
+      }
+    break;
+
+  case vtkCommand::ConnectionClosedEvent:
+    this->OnConnectionClosed(*reinterpret_cast<vtkIdType*>(data));
     break;
     }
 }
@@ -304,6 +317,44 @@ void vtkSMUndoStack::OnPropertyModified(void* data)
   elem->ModifiedProperty(info.Proxy, info.PropertyName);
   this->ActiveUndoSet->AddElement(elem);
   elem->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMUndoStack::OnConnectionClosed(vtkIdType cid)
+{
+  // Connection closed, remove undo/redo elements belonging to the connection.
+  vtkUndoStackInternal::VectorOfElements::iterator iter;
+  vtkUndoStackInternal::VectorOfElements tempStack;
+  
+  for (iter = this->Internal->UndoStack.begin();
+    iter != this->Internal->UndoStack.end(); ++iter)
+    {
+    vtkSMUndoStackUndoSet* set = vtkSMUndoStackUndoSet::SafeDownCast(
+      iter->UndoSet);
+    if (!set || set->GetConnectionID() != cid)
+      {
+      tempStack.push_back(*iter);
+      }
+    }
+  this->Internal->UndoStack.clear();
+  this->Internal->UndoStack.insert(this->Internal->UndoStack.begin(),
+    tempStack.begin(), tempStack.end());
+
+  tempStack.clear();
+  for (iter = this->Internal->RedoStack.begin();
+    iter != this->Internal->RedoStack.end(); ++iter)
+    {
+     vtkSMUndoStackUndoSet* set = vtkSMUndoStackUndoSet::SafeDownCast(
+      iter->UndoSet);
+    if (!set || set->GetConnectionID() != cid)
+      {
+      tempStack.push_back(*iter);
+      }
+    }
+  this->Internal->RedoStack.clear();
+  this->Internal->RedoStack.insert(this->Internal->RedoStack.begin(),
+    tempStack.begin(), tempStack.end());
+  this->Modified();
 }
 
 //-----------------------------------------------------------------------------

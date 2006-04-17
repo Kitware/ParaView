@@ -72,7 +72,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModuleConnectionManager);
-vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.11");
+vtkCxxRevisionMacro(vtkProcessModuleConnectionManager, "1.12");
 
 //-----------------------------------------------------------------------------
 vtkProcessModuleConnectionManager::vtkProcessModuleConnectionManager()
@@ -636,6 +636,9 @@ vtkIdType vtkProcessModuleConnectionManager::CreateConnection(
       }
     rc->Delete();
     } 
+
+  // Invoke connection created event.
+  this->InvokeEvent(vtkCommand::ConnectionCreatedEvent, &id);
   return id;
 }
 
@@ -666,12 +669,14 @@ void vtkProcessModuleConnectionManager::DropConnection(
       }
     }
 
+  vtkIdType dropped_id = vtkProcessModuleConnectionManager::GetNullConnectionID();
   vtkProcessModuleConnectionManagerInternals::MapOfIDToConnection::iterator iter2;
   for (iter2 = this->Internals->IDToConnectionMap.begin();
     iter2 != this->Internals->IDToConnectionMap.end(); ++iter2)
     {
     if (iter2->second.GetPointer() == conn)
       {
+      dropped_id = iter2->first;
       this->Internals->IDToConnectionMap.erase(iter2);
       break;
       }
@@ -680,6 +685,9 @@ void vtkProcessModuleConnectionManager::DropConnection(
   // Now conn is an invalid pointer.
   // When conn got destroyed, it close the socket as well 
   // as the controller was finalized, so all cleaned up.
+
+  // Let the world know.
+  this->InvokeEvent(vtkCommand::ConnectionClosedEvent, &dropped_id);
 }
 
 //-----------------------------------------------------------------------------

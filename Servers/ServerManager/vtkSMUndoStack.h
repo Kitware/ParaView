@@ -130,6 +130,7 @@ protected:
   void OnRegisterProxy(void* data);
   void OnUnRegisterProxy(void* data);
   void OnPropertyModified(void* data);
+  void OnConnectionClosed(vtkIdType cid);
  
   vtkIdType ActiveConnectionID;
   vtkUndoSet* ActiveUndoSet;
