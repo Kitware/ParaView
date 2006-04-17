@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    $RCS $
+   Module:    pqFlatTreeView.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -179,9 +179,9 @@ QModelIndex pqFlatTreeView::indexAt(const QPoint &point) const
     }
 
   // Convert the coordinates to contents space.
-  int x = point.x() + this->horizontalOffset();
-  int y = point.y() + this->verticalOffset();
-  if(x > this->ContentsWidth && y > this->ContentsHeight)
+  int px = point.x() + this->horizontalOffset();
+  int py = point.y() + this->verticalOffset();
+  if(px > this->ContentsWidth && py > this->ContentsHeight)
     {
     return QModelIndex();
     }
@@ -190,7 +190,7 @@ QModelIndex pqFlatTreeView::indexAt(const QPoint &point) const
   pqFlatTreeViewItem *item = this->getNextVisibleItem(this->Root);
   while(item)
     {
-    if(y >= item->ContentsY && y < item->ContentsY + this->ItemHeight)
+    if(py >= item->ContentsY && py < item->ContentsY + this->ItemHeight)
       {
       // Check which column the point is in.
       int column = this->HeaderView->logicalIndexAt(point);
@@ -209,36 +209,36 @@ QRect pqFlatTreeView::visualRect(const QModelIndex &index) const
   if(item && this->HeaderView)
     {
     int column = index.column();
-    int x = this->HeaderView->sectionPosition(column);
+    int vx = this->HeaderView->sectionPosition(column);
     
     // If the index is for column 0, account for the indent.
     int columnWidth = this->HeaderView->sectionSize(column);
     if(column == 0)
       {
-      x += item->Indent;
+      vx += item->Indent;
       columnWidth -= item->Indent;
       }
 
-    int width = 0;
+    int visualWidth = 0;
     if(column < item->Cells.size())
       {
-      width = item->Cells[column]->Width;
+      visualWidth = item->Cells[column]->Width;
       }
 
     // The column may be sized less than the text width.
-    if(columnWidth < width)
+    if(columnWidth < visualWidth)
       {
-      width = columnWidth;
+      visualWidth = columnWidth;
       }
 
     // Make sure the vertical connector is not included in the height.
-    int height = this->ItemHeight - pqFlatTreeView::PipeLength;
+    int visualHeight = this->ItemHeight - pqFlatTreeView::PipeLength;
 
     // The rectangle should be returned in viewport coordinates.
-    x -= this->horizontalOffset();
-    int y = item->ContentsY + pqFlatTreeView::PipeLength -
+    vx -= this->horizontalOffset();
+    int vy = item->ContentsY + pqFlatTreeView::PipeLength -
         this->verticalOffset();
-    return QRect(x, y, width, height);
+    return QRect(vx, vy, visualWidth, visualHeight);
     }
 
   return QRect();
@@ -264,18 +264,18 @@ void pqFlatTreeView::scrollTo(const QModelIndex &index,
         }
       }
 
-    int y = 0;
+    int cy = 0;
     if(atTop)
       {
       if(this->ContentsHeight - item->ContentsY > this->viewport()->height())
         {
-        y = item->ContentsY;
+        cy = item->ContentsY;
         if(!this->HeaderView->isHidden())
           {
-          y -= this->HeaderView->size().height();
+          cy -= this->HeaderView->size().height();
           }
 
-        this->verticalScrollBar()->setValue(y);
+        this->verticalScrollBar()->setValue(cy);
         }
       else
         {
@@ -285,20 +285,20 @@ void pqFlatTreeView::scrollTo(const QModelIndex &index,
       }
     else
       {
-      y = item->ContentsY + this->ItemHeight - this->viewport()->height();
-      if(y < 0)
+      cy = item->ContentsY + this->ItemHeight - this->viewport()->height();
+      if(cy < 0)
         {
         this->verticalScrollBar()->setValue(0);
         }
       else
         {
-        this->verticalScrollBar()->setValue(y);
+        this->verticalScrollBar()->setValue(cy);
         }
       }
     }
 }
 
-void pqFlatTreeView::keyboardSearch(const QString &search)
+void pqFlatTreeView::keyboardSearch(const QString &)
 {
   // TODO
 }
@@ -606,8 +606,7 @@ void pqFlatTreeView::collapse(const QModelIndex &index)
     }
 }
 
-void pqFlatTreeView::rowsRemoved(const QModelIndex &parentIndex,
-    int start, int end)
+void pqFlatTreeView::rowsRemoved(const QModelIndex &parentIndex, int, int)
 {
   // Get the view item for the parent index. If the view item
   // doesn't exist, it is not visible and no update is necessary.
@@ -881,21 +880,21 @@ void pqFlatTreeView::mousePressEvent(QMouseEvent *e)
   if(this->HeaderView)
     {
     int column = this->HeaderView->logicalIndexAt(e->pos());
-    int y = e->y() + this->verticalOffset();
-    if(column == 0 && y < this->ContentsHeight)
+    int py = e->y() + this->verticalOffset();
+    if(column == 0 && py < this->ContentsHeight)
       {
       // Find the item at the mouse location.
       pqFlatTreeViewItem *item = this->getNextVisibleItem(this->Root);
       while(item)
         {
-        if(y >= item->ContentsY && y < item->ContentsY + this->ItemHeight)
+        if(py >= item->ContentsY && py < item->ContentsY + this->ItemHeight)
           {
             if(item->Expandable)
             {
-            int x = this->HeaderView->sectionPosition(0) + item->Indent;
+            int px = this->HeaderView->sectionPosition(0) + item->Indent;
             int ex = e->x() + this->horizontalOffset();
-            if(ex < x && ex > x - this->IndentWidth &&
-                y > item->ContentsY + pqFlatTreeView::PipeLength)
+            if(ex < px && ex > px - this->IndentWidth &&
+                py > item->ContentsY + pqFlatTreeView::PipeLength)
               {
               if(item->Expanded)
                 {
@@ -1138,8 +1137,8 @@ bool pqFlatTreeView::isIndexHidden(const QModelIndex &index) const
   return false;
 }
 
-void pqFlatTreeView::setSelection(const QRect &rect,
-    QItemSelectionModel::SelectionFlags command)
+void pqFlatTreeView::setSelection(const QRect &,
+    QItemSelectionModel::SelectionFlags)
 {
   if(!this->Root || !this->HeaderView || !this->selectionModel())
     {
@@ -1173,7 +1172,6 @@ QRegion pqFlatTreeView::visualRegionForSelection(
     // bounding rectangles.
     QRect topLeft;
     QRect bottomRight;
-    pqFlatTreeViewItem *item = 0;
     QItemSelection::ConstIterator iter = selection.begin();
     for( ; iter != selection.end(); ++iter)
       {
@@ -1205,9 +1203,9 @@ void pqFlatTreeView::resizeEvent(QResizeEvent *e)
   // Resize the header to the viewport width.
   if(e && this->HeaderView)
     {
-    QSize size = this->HeaderView->sizeHint();
-    size.setWidth(e->size().width());
-    this->HeaderView->resize(size);
+    QSize hsize = this->HeaderView->sizeHint();
+    hsize.setWidth(e->size().width());
+    this->HeaderView->resize(hsize);
 
     // Set the scrollbar page size based on the new size. Update
     // the scrollbar maximums based on the new size and the contents
@@ -1247,11 +1245,11 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
     }
 
   // Translate the painter and paint area to contents coordinates.
-  int x = this->horizontalOffset();
-  int y = this->verticalOffset();
-  painter.translate(QPoint(-x, -y));
+  int px = this->horizontalOffset();
+  int py = this->verticalOffset();
+  painter.translate(QPoint(-px, -py));
   QRect area = e->rect();
-  area.translate(QPoint(x, y));
+  area.translate(QPoint(px, py));
 
   // Setup the view options.
   int i = 0;
@@ -1266,19 +1264,19 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
   int columnWidth = 0;
   if(this->Internal)
     {
-    int height = this->viewport()->height();
-    if(this->ContentsHeight > height)
+    int totalHeight = this->viewport()->height();
+    if(this->ContentsHeight > totalHeight)
       {
-      height = this->ContentsHeight;
+      totalHeight = this->ContentsHeight;
       }
 
     for(i = 0; i < this->Internal->size(); i++)
       {
       if((*this->Internal)[i]->Selected)
         {
-        x = this->HeaderView->sectionPosition(i);
+        px = this->HeaderView->sectionPosition(i);
         columnWidth = this->HeaderView->sectionSize(i);
-        painter.fillRect(x, 0, columnWidth, height,
+        painter.fillRect(px, 0, columnWidth, totalHeight,
             options.palette.highlight());
         }
       }
@@ -1301,17 +1299,17 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
         {
         // If the row is highlighted, draw the background highlight
         // before the data.
-        x = 0;
-        int width = 0;
+        px = 0;
+        int itemWidth = 0;
         if(item->RowSelected)
           {
-          width = this->viewport()->width();
-          if(this->ContentsWidth > width)
+          itemWidth = this->viewport()->width();
+          if(this->ContentsWidth > itemWidth)
             {
-            width = this->ContentsWidth;
+            itemWidth = this->ContentsWidth;
             }
 
-          painter.fillRect(0, item->ContentsY, width, this->ItemHeight,
+          painter.fillRect(0, item->ContentsY, itemWidth, this->ItemHeight,
               options.palette.highlight());
           }
 
@@ -1319,7 +1317,7 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
           {
           // The columns can be moved by the header. Make sure they are
           // drawn in the correct location.
-          x = this->HeaderView->sectionPosition(i);
+          px = this->HeaderView->sectionPosition(i);
           columnWidth = this->HeaderView->sectionSize(i) -
               pqFlatTreeView::TextMargin;
 
@@ -1333,11 +1331,11 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
             // highlighted, draw a highlight behind the banches.
             if(options.showDecorationSelected && item->Cells[i]->Selected)
               {
-              painter.fillRect(x, item->ContentsY + pqFlatTreeView::PipeLength,
+              painter.fillRect(px, item->ContentsY + pqFlatTreeView::PipeLength,
                   item->Indent, trueHeight, options.palette.highlight());
               }
 
-            x += item->Indent;
+            px += item->Indent;
             columnWidth -= item->Indent;
 
             // Get the icon for this item from the model. QVariant won't
@@ -1359,11 +1357,11 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
               {
               // If the item is selected and the decoration should be
               // highlighted, draw a highlight behind the icon.
-              width = this->IndentWidth + pqFlatTreeView::TextMargin;
-              y = item->ContentsY + pqFlatTreeView::PipeLength;
+              itemWidth = this->IndentWidth + pqFlatTreeView::TextMargin;
+              py = item->ContentsY + pqFlatTreeView::PipeLength;
               if(options.showDecorationSelected && item->Cells[i]->Selected)
                 {
-                painter.fillRect(x, y, width, trueHeight,
+                painter.fillRect(px, py, itemWidth, trueHeight,
                     options.palette.highlight());
                 }
 
@@ -1373,20 +1371,20 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
               // option should be followed for the y placement.
               if(options.decorationAlignment & Qt::AlignVCenter)
                 {
-                y += (trueHeight - this->IndentWidth) / 2;
+                py += (trueHeight - this->IndentWidth) / 2;
                 }
               else if(options.decorationAlignment & Qt::AlignBottom)
                 {
-                y += trueHeight - this->IndentWidth;
+                py += trueHeight - this->IndentWidth;
                 }
 
               QPixmap pixmap = icon.pixmap(options.decorationSize);
-              painter.drawPixmap(x + 1, y + 1, pixmap);
+              painter.drawPixmap(px + 1, py + 1, pixmap);
 
               // Add extra padding to the x coordinate to put space
               // between the icon and the text.
-              x += width;
-              columnWidth -= width;
+              px += itemWidth;
+              columnWidth -= itemWidth;
               }
             }
 
@@ -1404,7 +1402,7 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
           if(!text.isEmpty() && columnWidth > 0)
             {
             // Set the text color based on the highlighted state.
-            y = item->ContentsY + pqFlatTreeView::PipeLength;
+            py = item->ContentsY + pqFlatTreeView::PipeLength;
             if(item->RowSelected || (*this->Internal)[i]->Selected ||
                 item->Cells[i]->Selected)
               {
@@ -1412,13 +1410,13 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
               // before drawing the text.
               if(item->Cells[i]->Selected)
                 {
-                width = item->Cells[i]->Width;
-                if(width > columnWidth)
+                itemWidth = item->Cells[i]->Width;
+                if(itemWidth > columnWidth)
                   {
-                  width = columnWidth;
+                  itemWidth = columnWidth;
                   }
 
-                painter.fillRect(x, y, width, trueHeight,
+                painter.fillRect(px, py, itemWidth, trueHeight,
                     options.palette.highlight());
                 }
 
@@ -1434,11 +1432,11 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
             // Adjust the vertical text alignment according to the style.
             if(options.displayAlignment & Qt::AlignVCenter)
               {
-              y += (trueHeight - fontHeight) / 2;
+              py += (trueHeight - fontHeight) / 2;
               }
             else if(options.displayAlignment & Qt::AlignBottom)
               {
-              y += trueHeight - fontHeight;
+              py += trueHeight - fontHeight;
               }
 
             // If the text is too wide for the column, adjust the text
@@ -1473,7 +1471,7 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
                 }
               }
 
-            painter.drawText(x, y + fontAscent, text);
+            painter.drawText(px, py + fontAscent, text);
             }
 
           if(i == 0)
@@ -1492,10 +1490,10 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
                 QPalette::Highlight);
             opt.state |= QStyle::State_KeyboardFocusChange;
             opt.state |= QStyle::State_HasFocus;
-            width = item->Cells[i]->Width;
-            if(width > columnWidth)
+            itemWidth = item->Cells[i]->Width;
+            if(itemWidth > columnWidth)
               {
-              width = columnWidth;
+              itemWidth = columnWidth;
               }
 
             if(options.showDecorationSelected)
@@ -1503,8 +1501,8 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
               // TODO
               }
 
-            opt.rect.setRect(x, item->ContentsY + pqFlatTreeView::PipeLength,
-                width, trueHeight);
+            opt.rect.setRect(px, item->ContentsY + pqFlatTreeView::PipeLength,
+                itemWidth, trueHeight);
             QApplication::style()->drawPrimitive(QStyle::PE_FrameFocusRect,
                 &opt, &painter);
             }
@@ -1538,7 +1536,7 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
   }
 }
 
-void pqFlatTreeView::handleSectionResized(int index, int oldSize, int newSize)
+void pqFlatTreeView::handleSectionResized(int, int, int)
 {
   if(!this->InUpdateWidth && this->HeaderView)
     {
@@ -1552,8 +1550,8 @@ void pqFlatTreeView::handleSectionResized(int index, int oldSize, int newSize)
     }
 }
 
-void pqFlatTreeView::handleSectionMoved(int index, int oldVisual,
-    int newVisual)
+void pqFlatTreeView::handleSectionMoved(int, int,
+    int)
 {
   // Repaint the viewport to show the changes.
   this->viewport()->update();
@@ -1599,8 +1597,8 @@ void pqFlatTreeView::changeCurrent(const QModelIndex &current,
     }
 }
 
-void pqFlatTreeView::changeCurrentRow(const QModelIndex &current,
-    const QModelIndex &previous)
+void pqFlatTreeView::changeCurrentRow(const QModelIndex &,
+    const QModelIndex &)
 {
   if(this->selectionBehavior() == QAbstractItemView::SelectRows)
     {
@@ -1608,8 +1606,8 @@ void pqFlatTreeView::changeCurrentRow(const QModelIndex &current,
     }
 }
 
-void pqFlatTreeView::changeCurrentColumn(const QModelIndex &current,
-    const QModelIndex &previous)
+void pqFlatTreeView::changeCurrentColumn(const QModelIndex &,
+    const QModelIndex &)
 {
   if(this->selectionBehavior() == QAbstractItemView::SelectColumns)
     {
@@ -1630,12 +1628,12 @@ void pqFlatTreeView::changeSelection(const QItemSelection &selected,
   int end = 0;
   int column = 0;
   int i = 0;
-  int y = 0;
-  int height = 0;
-  int width = this->viewport()->width();
-  if(width < this->ContentsWidth)
+  int cy = 0;
+  int totalHeight = 0;
+  int totalWidth = this->viewport()->width();
+  if(totalWidth < this->ContentsWidth)
     {
-    width = this->ContentsWidth;
+    totalWidth = this->ContentsWidth;
     }
 
   // Start with the deselected items.
@@ -1660,13 +1658,13 @@ void pqFlatTreeView::changeSelection(const QItemSelection &selected,
         {
         start = (*iter).top();
         end = (*iter).bottom();
-        y = -1;
+        cy = -1;
         for( ; start <= end; start++)
           {
           item = parentItem->Items[start];
-          if(y == -1)
+          if(cy == -1)
             {
-            y = item->ContentsY;
+            cy = item->ContentsY;
             }
 
           if(this->selectionBehavior() == QAbstractItemView::SelectRows)
@@ -1685,8 +1683,8 @@ void pqFlatTreeView::changeSelection(const QItemSelection &selected,
           }
 
         // Add the affected area to the repaint list.
-        height = (*iter).height() * this->ItemHeight;
-        region = region.unite(QRegion(0, y, width, height));
+        totalHeight = (*iter).height() * this->ItemHeight;
+        region = region.unite(QRegion(0, cy, totalWidth, totalHeight));
         }
       }
     }
@@ -1709,13 +1707,13 @@ void pqFlatTreeView::changeSelection(const QItemSelection &selected,
         {
         start = (*iter).top();
         end = (*iter).bottom();
-        y = -1;
+        cy = -1;
         for( ; start <= end; start++)
           {
           item = parentItem->Items[start];
-          if(y == -1)
+          if(cy == -1)
             {
-            y = item->ContentsY;
+            cy = item->ContentsY;
             }
 
           if(this->selectionBehavior() == QAbstractItemView::SelectRows)
@@ -1734,8 +1732,8 @@ void pqFlatTreeView::changeSelection(const QItemSelection &selected,
           }
 
         // Add the affected area to the repaint list.
-        height = (*iter).height() * this->ItemHeight;
-        region = region.unite(QRegion(0, y, width, height));
+        totalHeight = (*iter).height() * this->ItemHeight;
+        region = region.unite(QRegion(0, cy, totalWidth, totalHeight));
         }
       }
     }
@@ -1851,7 +1849,7 @@ void pqFlatTreeView::layoutItem(pqFlatTreeViewItem *item, int &point,
       }
 
     // The indent may change causing the desired width to change.
-    int width = 0;
+    int preferredWidth = 0;
     if(item->Cells.size() > 0)
       {
       if(item->Cells[0]->Width == 0 || this->FontChanged)
@@ -1861,11 +1859,11 @@ void pqFlatTreeView::layoutItem(pqFlatTreeViewItem *item, int &point,
 
       // The text width, the indent, the icon width, and the padding
       // between the icon and the item all factor into the desired width.
-      width = item->Cells[0]->Width + item->Indent + this->IndentWidth +
-          pqFlatTreeView::DoubleTextMargin;
-      if(width > (*this->Internal)[0]->Width)
+      preferredWidth = item->Cells[0]->Width + item->Indent +
+          this->IndentWidth + pqFlatTreeView::DoubleTextMargin;
+      if(preferredWidth > (*this->Internal)[0]->Width)
         {
-        (*this->Internal)[0]->Width = width;
+        (*this->Internal)[0]->Width = preferredWidth;
         }
       }
 
@@ -1879,10 +1877,10 @@ void pqFlatTreeView::layoutItem(pqFlatTreeViewItem *item, int &point,
         // the image width(s).
         QModelIndex index = item->Index.sibling(item->Index.row(), i);
         item->Cells[i]->Width = fm.width(index.data().toString());
-        width = item->Cells[i]->Width + pqFlatTreeView::TextMargin;
-        if(width > (*this->Internal)[i]->Width)
+        preferredWidth = item->Cells[i]->Width + pqFlatTreeView::TextMargin;
+        if(preferredWidth > (*this->Internal)[i]->Width)
           {
-          (*this->Internal)[i]->Width = width;
+          (*this->Internal)[i]->Width = preferredWidth;
           }
         }
       }
@@ -1900,20 +1898,20 @@ bool pqFlatTreeView::updateContentsWidth()
     if(this->Internal && (this->ManageSizes || this->HeaderView->isHidden()))
       {
       this->InUpdateWidth = true;
-      int width = 0;
+      int newWidth = 0;
       int oldWidth = 0;
       for(int i = 0; i < this->Internal->size(); i++)
         {
         oldWidth = this->HeaderView->sectionSize(i);
-        width = this->HeaderView->sectionSizeHint(i);
-        if(width < (*this->Internal)[i]->Width)
+        newWidth = this->HeaderView->sectionSizeHint(i);
+        if(newWidth < (*this->Internal)[i]->Width)
           {
-          width = (*this->Internal)[i]->Width;
+          newWidth = (*this->Internal)[i]->Width;
           }
 
-        if(width != oldWidth)
+        if(newWidth != oldWidth)
           {
-          this->HeaderView->resizeSection(i, width);
+          this->HeaderView->resizeSection(i, newWidth);
           sectionSizeChanged = true;
           }
         }
@@ -2127,45 +2125,45 @@ void pqFlatTreeView::drawBranches(QPainter &painter, pqFlatTreeViewItem *item,
   // Draw the tree branches for the row. First draw the tree
   // branch for the current item. Then, step back up the parent
   // chain to draw the branches that pass through this row.
-  int x = 0;
-  int y = 0;
+  int px = 0;
+  int py = 0;
   painter.setPen(branchColor);
   if(item->Parent->Items.size() > 1)
     {
-    x = item->Indent - halfIndent;
-    y = item->ContentsY + pqFlatTreeView::PipeLength + halfIndent;
-    int endY = y;
+    px = item->Indent - halfIndent;
+    py = item->ContentsY + pqFlatTreeView::PipeLength + halfIndent;
+    int endY = py;
     if(item != item->Parent->Items.last())
       {
       endY = item->ContentsY + this->ItemHeight;
       }
 
-    painter.drawLine(x, y, x + halfIndent - 1, y);
-    painter.drawLine(x, item->ContentsY, x, endY);
+    painter.drawLine(px, py, px + halfIndent - 1, py);
+    painter.drawLine(px, item->ContentsY, px, endY);
     if(item->Expandable)
       {
       // If the item is expandable, draw in the little box with
       // the +/- icon.
-      painter.fillRect(x - 4, y - 4, 8, 8, options.palette.base());
-      painter.drawRect(x - 4, y - 4, 8, 8);
+      painter.fillRect(px - 4, py - 4, 8, 8, options.palette.base());
+      painter.drawRect(px - 4, py - 4, 8, 8);
 
       painter.setPen(expandColor);
-      painter.drawLine(x - 2, y, x + 2, y);
+      painter.drawLine(px - 2, py, px + 2, py);
       if(!item->Expanded)
         {
-        painter.drawLine(x, y - 2, x, y + 2);
+        painter.drawLine(px, py - 2, px, py + 2);
         }
       painter.setPen(branchColor);
       }
     }
   else
     {
-    x = item->Indent + halfIndent;
-    painter.drawLine(x, item->ContentsY, x, item->ContentsY +
+    px = item->Indent + halfIndent;
+    painter.drawLine(px, item->ContentsY, px, item->ContentsY +
         pqFlatTreeView::PipeLength);
     }
 
-  y = item->ContentsY + this->ItemHeight;
+  py = item->ContentsY + this->ItemHeight;
   pqFlatTreeViewItem *branchItem = item->Parent;
   while(branchItem->Parent)
     {
@@ -2182,10 +2180,10 @@ void pqFlatTreeView::drawBranches(QPainter &painter, pqFlatTreeViewItem *item,
 
     // If the item is not last in the parent's children, draw a
     // branch passing through the item.
-    x -= this->IndentWidth;
+    px -= this->IndentWidth;
     if(branchItem != branchItem->Parent->Items.last())
       {
-      painter.drawLine(x, item->ContentsY, x, y);
+      painter.drawLine(px, item->ContentsY, px, py);
       }
 
     branchItem = branchItem->Parent;
