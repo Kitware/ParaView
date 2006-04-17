@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAreaSelect);
-vtkCxxRevisionMacro(vtkPVAreaSelect, "1.1");
+vtkCxxRevisionMacro(vtkPVAreaSelect, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVAreaSelect::vtkPVAreaSelect()
@@ -120,7 +120,7 @@ void vtkPVAreaSelect::ProcessEvents(vtkObject* vtkNotUsed(object),
   switch(event)
     {
     case vtkCommand::LeftButtonPressEvent: 
-      self->OnLeftButtonDown(eventpos[0], eventpos[1], renderer);
+      self->OnLeftButtonDown(eventpos[0], eventpos[1]);
       break;
     case vtkCommand::LeftButtonReleaseEvent:      
       self->OnLeftButtonUp(eventpos[0], eventpos[1], renderer);
@@ -129,7 +129,7 @@ void vtkPVAreaSelect::ProcessEvents(vtkObject* vtkNotUsed(object),
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAreaSelect::OnLeftButtonDown(int x, int y, vtkRenderer *renderer)
+void vtkPVAreaSelect::OnLeftButtonDown(int x, int y)
 {
   this->X = x;
   this->Y = y;

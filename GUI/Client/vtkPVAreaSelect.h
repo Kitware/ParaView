@@ -46,7 +46,7 @@ public:
 
   // Description:
   // Mouse event callbacks in the render window to define selection area with.
-  void OnLeftButtonDown(int x, int y, vtkRenderer *renderer);
+  void OnLeftButtonDown(int x, int y);
   void OnLeftButtonUp(int x, int y, vtkRenderer *renderer);
 
 protected:
