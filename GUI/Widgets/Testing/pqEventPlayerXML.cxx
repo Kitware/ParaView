@@ -51,6 +51,50 @@ static const QString xmlToText(const QString& string)
   return result;
 }
 
+/// Disables Qt "effects" that might-or-might-not interfere with testing
+#include <QApplication>
+class pqDisableEffects
+{
+public:
+  pqDisableEffects() :
+    General(QApplication::isEffectEnabled(Qt::UI_General)),
+    AnimateMenu(QApplication::isEffectEnabled(Qt::UI_AnimateMenu)),
+    FadeMenu(QApplication::isEffectEnabled(Qt::UI_FadeMenu)),
+    AnimateCombo(QApplication::isEffectEnabled(Qt::UI_AnimateCombo)),
+    AnimateTooltip(QApplication::isEffectEnabled(Qt::UI_AnimateTooltip)),
+    FadeTooltip(QApplication::isEffectEnabled(Qt::UI_FadeTooltip)),
+    AnimateToolBox(QApplication::isEffectEnabled(Qt::UI_AnimateToolBox))
+  {
+    QApplication::setEffectEnabled(Qt::UI_General, false);
+    QApplication::setEffectEnabled(Qt::UI_AnimateMenu, false);
+    QApplication::setEffectEnabled(Qt::UI_FadeMenu, false);
+    QApplication::setEffectEnabled(Qt::UI_AnimateCombo, false);
+    QApplication::setEffectEnabled(Qt::UI_AnimateTooltip, false);
+    QApplication::setEffectEnabled(Qt::UI_FadeTooltip, false);
+    QApplication::setEffectEnabled(Qt::UI_AnimateToolBox, false);
+  }
+  
+  ~pqDisableEffects()
+  {
+    QApplication::setEffectEnabled(Qt::UI_General, this->General);
+    QApplication::setEffectEnabled(Qt::UI_AnimateMenu, this->AnimateMenu);
+    QApplication::setEffectEnabled(Qt::UI_FadeMenu, this->FadeMenu);
+    QApplication::setEffectEnabled(Qt::UI_AnimateCombo, this->AnimateCombo);
+    QApplication::setEffectEnabled(Qt::UI_AnimateTooltip, this->AnimateTooltip);
+    QApplication::setEffectEnabled(Qt::UI_FadeTooltip, this->FadeTooltip);
+    QApplication::setEffectEnabled(Qt::UI_AnimateToolBox, this->AnimateToolBox);
+  }
+  
+private:
+  const bool General;
+  const bool AnimateMenu;
+  const bool FadeMenu;
+  const bool AnimateCombo;
+  const bool AnimateTooltip;
+  const bool FadeTooltip;
+  const bool AnimateToolBox;
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 // pqEventPlayerXML
 
@@ -70,6 +114,8 @@ bool pqEventPlayerXML::playXML(pqEventPlayer& Player, const QString& Path)
     qCritical() << Path << " is not an XML test case document";
     return false;
     }
+
+  pqDisableEffects disable_effects;
 
   for(QDomNode xml_event = xml_events.firstChild(); !xml_event.isNull(); xml_event = xml_event.nextSibling())
     {
