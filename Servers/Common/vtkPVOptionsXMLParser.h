@@ -30,6 +30,7 @@ class VTK_EXPORT vtkPVOptionsXMLParser : public vtkCommandOptionsXMLParser
 public:
   static vtkPVOptionsXMLParser* New();
   vtkTypeRevisionMacro(vtkPVOptionsXMLParser,vtkCommandOptionsXMLParser);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
 protected:
   vtkPVOptionsXMLParser() {}

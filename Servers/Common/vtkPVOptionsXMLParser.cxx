@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptionsXMLParser);
-vtkCxxRevisionMacro(vtkPVOptionsXMLParser, "1.2");
+vtkCxxRevisionMacro(vtkPVOptionsXMLParser, "1.3");
 
 //----------------------------------------------------------------------------
 void vtkPVOptionsXMLParser::SetProcessType(const char* ptype)
@@ -56,4 +56,10 @@ void vtkPVOptionsXMLParser::SetProcessType(const char* ptype)
     }
 
   this->Superclass::SetProcessType(ptype);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVOptionsXMLParser::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
 }
