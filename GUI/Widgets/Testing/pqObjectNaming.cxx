@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAction>
 #include <QApplication>
 #include <QDockWidget>
+#include <QFocusFrame>
 #include <QHeaderView>
 #include <QItemSelectionModel>
 #include <QLabel>
@@ -145,45 +146,18 @@ static bool ValidateName(QObject& Object)
     {
     return false;
     }
-  
-  // Skip labels ...
-  if(qobject_cast<QLabel*>(&Object))
-    {
-    return false;
-    }
-  
-  // Skip layouts ...
-  if(qobject_cast<QLayout*>(&Object))
-    {
-    return false;
-    }
 
-  // Skip mappers ...
-  if(qobject_cast<QSignalMapper*>(&Object))
-    {
-    return false;
-    }
-
-  // Skip headers ...
-  if(qobject_cast<QHeaderView*>(&Object))
-    {
-    return false;
-    }
-
-  // Skip MVC models ...
-  if(qobject_cast<QAbstractItemModel*>(&Object))
-    {
-    return false;
-    }
-
-  // Skip MVC implementation objects ...
-  if(qobject_cast<QAbstractItemDelegate*>(&Object) || qobject_cast<QItemSelectionModel*>(&Object))
-    {
-    return false;
-    }
-
-  // Skip scrollbars ...
-  if(qobject_cast<QScrollBar*>(&Object))
+  // Skip objects that aren't normally used for user input ...  
+  if(
+    qobject_cast<QAbstractItemDelegate*>(&Object)
+    || qobject_cast<QAbstractItemModel*>(&Object)
+    || qobject_cast<QFocusFrame*>(&Object)
+    || qobject_cast<QHeaderView*>(&Object)
+    || qobject_cast<QItemSelectionModel*>(&Object)
+    || qobject_cast<QLabel*>(&Object)
+    || qobject_cast<QLayout*>(&Object)
+    || qobject_cast<QScrollBar*>(&Object)
+    || qobject_cast<QSignalMapper*>(&Object))
     {
     return false;
     }
