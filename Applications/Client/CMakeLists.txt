@@ -90,6 +90,8 @@ IF(BUILD_TESTING)
     CompoundProxy
     UndoRedo
     SubMenu
+    ObjectInspectorSphere
+    ObjectInspectorGlyph
     )
 
   SET (TESTS_WITHOUT_BASELINES

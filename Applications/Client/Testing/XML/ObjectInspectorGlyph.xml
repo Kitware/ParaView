@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="MainWindow/MenuBar/FileMenu/New" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/ServerMenu/Connect" command="activate" arguments="" />
+  <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/SourcesMenu/Cylinder" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/SourcesMenu/Arrow" command="activate" arguments="" />
+  <pqevent object="MainWindow/PipelineInspectorDock/PipelineList/PipelineView" command="currentChanged" arguments="/0/0/0/0|0" />
+  <pqevent object="MainWindow/MenuBar/FiltersMenu/Vectors|Gradients/Glyph" command="activate" arguments="" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/Object Editor Scroll/qt_scrollarea_viewport/Object Editor Panel/SelectInputVectors" command="set_string" arguments="Normals" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/Object Editor Scroll/qt_scrollarea_viewport/Object Editor Panel/SetScaleMode" command="set_string" arguments="scalar" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/Object Editor Scroll/qt_scrollarea_viewport/Object Editor Panel/Source" command="set_string" arguments="ArrowSource1" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/Accept" command="activate" arguments="" />
+</pqevents>
