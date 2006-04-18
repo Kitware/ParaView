@@ -1284,6 +1284,7 @@ void pqMainWindow::onNewQVTKWidget(pqMultiViewFrame* frame)
 {
   QVTKWidget *widget = ParaQ::AddQVTKWidget(frame, this->Implementation->MultiViewManager,
       this->Implementation->CurrentServer);
+      
   if(widget)
     {
     // Select the new window in the pipeline list.

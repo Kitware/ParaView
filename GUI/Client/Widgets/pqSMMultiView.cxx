@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineData.h"
 #include "pqRenderViewProxy.h"
 #include "pqServer.h"
+#include "pqSetName.h"
 #include "pqSMAdaptor.h"
 
 #include <QObject>
@@ -168,7 +169,7 @@ QVTKWidget *ParaQ::AddQVTKWidget(pqMultiViewFrame *frame, QWidget *topWidget,
   vtkSMIntVectorProperty::SafeDownCast(view->GetProperty("LightSwitch"))->SetElement(0, 0);
 
   
-  QVTKWidget* widget = new QVTKWidget(frame);
+  QVTKWidget* widget = new QVTKWidget(frame) << pqSetName("Viewport");
   frame->setMainWidget(widget);
 
   // gotta tell SM about window positions

@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="MainWindow/MenuBar/ServerMenu/Connect" command="activate" arguments="" />
+  <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/SourcesMenu/Sphere" command="activate" arguments="" />
+</pqevents>

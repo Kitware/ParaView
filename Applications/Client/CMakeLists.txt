@@ -104,6 +104,7 @@ IF(BUILD_TESTING)
 
   # Special-case test to see that Qt widgets are all named properly for test playback
   ADD_TEST(pqClientWidgetNaming  ${TEST_BINARY} --test-ui-names --exit)
+  ADD_TEST(pqClientWidgetNaming2  ${TEST_BINARY} --run-test=${TEST_XML}/WidgetNaming2.xml --test-ui-names --exit)
                
   FOREACH(test ${TESTS_WITHOUT_BASELINES})
     ADD_TEST(pqClient${test}
@@ -117,13 +118,5 @@ IF(BUILD_TESTING)
       --exit)
   ENDFOREACH(test) 
   
-
-# ADD_TEST(pqClientStartup        ${TEST_BINARY} --exit)
-# ADD_TEST(pqClientAboutDialog    ${TEST_BINARY} --run-test ${TEST_XML}/AboutDialog.xml --exit)
-# ADD_TEST(pqClientFileDialog     ${TEST_BINARY} --run-test ${TEST_XML}/FileDialog.xml --exit)
-# ADD_TEST(pqClientCreateSource   ${TEST_BINARY} --run-test ${TEST_XML}/CreateSource.xml --compare-view ${TEST_IMAGE}/CreateSource.png)
-# ADD_TEST(pqClientCompoundProxy  ${TEST_BINARY} --run-test ${TEST_XML}/CompoundProxy.xml 
-#   --compare-view ${TEST_IMAGE}/CompoundProxy.png
-#   --exit)
 ENDIF(BUILD_TESTING)
 

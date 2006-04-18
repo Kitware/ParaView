@@ -39,7 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDockWidget>
 #include <QHeaderView>
 #include <QItemSelectionModel>
+#include <QLabel>
 #include <QLayout>
+#include <QLineEdit>
 #include <QMenu>
 #include <QMenuBar>
 #include <QScrollBar>
@@ -130,6 +132,24 @@ static bool ValidateName(QObject& Object)
         {
         return false;
         }
+    }
+  
+  // Skip QVTKWidget implementation details ...
+  if(QString(Object.parent()->metaObject()->className()) == "QVTKWidget")
+    {
+    return false;
+    }
+  
+  // Skip line edit implementation details ...
+  if(qobject_cast<QLineEdit*>(Object.parent()))
+    {
+    return false;
+    }
+  
+  // Skip labels ...
+  if(qobject_cast<QLabel*>(&Object))
+    {
+    return false;
     }
   
   // Skip layouts ...

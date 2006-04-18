@@ -7,8 +7,8 @@
   <pqevent object="MainWindow/MenuBar/SourcesMenu/Arrow" command="activate" arguments="" />
   <pqevent object="MainWindow/PipelineInspectorDock/PipelineList/PipelineView" command="currentChanged" arguments="/0/0/0/0|0" />
   <pqevent object="MainWindow/MenuBar/FiltersMenu/Vectors|Gradients/Glyph" command="activate" arguments="" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/Object Editor Scroll/qt_scrollarea_viewport/Object Editor Panel/SelectInputVectors" command="set_string" arguments="Normals" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/Object Editor Scroll/qt_scrollarea_viewport/Object Editor Panel/SetScaleMode" command="set_string" arguments="scalar" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/Object Editor Scroll/qt_scrollarea_viewport/Object Editor Panel/Source" command="set_string" arguments="ArrowSource1" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/ScrollArea/qt_scrollarea_viewport/Panel/SelectInputVectors" command="set_string" arguments="Normals" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/ScrollArea/qt_scrollarea_viewport/Panel/SetScaleMode" command="set_string" arguments="scalar" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/ScrollArea/qt_scrollarea_viewport/Panel/Source" command="set_string" arguments="ArrowSource1" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/Accept" command="activate" arguments="" />
 </pqevents>

@@ -76,9 +76,9 @@ pqObjectEditor::pqObjectEditor(QWidget* p)
   mainlayout->addLayout(buttonlayout);
 
   QScrollArea* qscroll = new QScrollArea(this);
-  qscroll->setObjectName("Object Editor Scroll");
+  qscroll->setObjectName("ScrollArea");
   QWidget* w = new QWidget;
-  w->setObjectName("Object Editor Panel");
+  w->setObjectName("Panel");
   w->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred));
   qscroll->setWidgetResizable(true);
   qscroll->setWidget(w);
@@ -275,7 +275,7 @@ void pqObjectEditor::createWidgets()
         QLabel* label = new QLabel(this->PanelLayout->parentWidget());
         label->setText(iter->GetKey());
         QSlider* slider = new QSlider(Qt::Horizontal, this->PanelLayout->parentWidget());
-        slider->setObjectName(iter->GetKey());
+        slider->setObjectName(QString(iter->GetKey()) + "Slider");
         slider->setRange(propertyDomain[0].toInt(), propertyDomain[1].toInt());
 
         QLineEdit* lineEdit = new QLineEdit(this->PanelLayout->parentWidget());
