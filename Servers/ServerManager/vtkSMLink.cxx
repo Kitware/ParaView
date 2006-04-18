@@ -22,7 +22,7 @@
 
 #include <vtkstd/list>
 
-vtkCxxRevisionMacro(vtkSMLink, "1.3");
+vtkCxxRevisionMacro(vtkSMLink, "1.4");
 //-----------------------------------------------------------------------------
 class vtkSMLinkObserver : public vtkCommand
 {
@@ -89,4 +89,6 @@ void vtkSMLink::ObserveProxyUpdates(vtkSMProxy* proxy)
 void vtkSMLink::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "PropagateUpdateVTKObjects: " <<
+    this->PropagateUpdateVTKObjects << endl;
 }

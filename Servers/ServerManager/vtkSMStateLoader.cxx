@@ -27,7 +27,7 @@
 #include <vtkstd/map>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.9");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.10");
 
 struct vtkSMStateLoaderInternals
 {
@@ -327,4 +327,5 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_proxies/*
 void vtkSMStateLoader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "ConnectionID: " << this->ConnectionID << endl;
 }
