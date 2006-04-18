@@ -42,6 +42,7 @@ SET (PY_TESTS
   SMAnimation
   ProxyPropertyLinks
   SMTemporalDataAnalysisCellId
+  SMUndoRedo
   )
 
 IF (PVServerManagerTestData)
