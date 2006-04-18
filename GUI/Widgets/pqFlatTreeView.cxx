@@ -497,9 +497,9 @@ void pqFlatTreeView::setHeader(QHeaderView *headerView)
     // the viewport.
     if(this->viewport()->isVisible())
       {
-      QSize size = this->HeaderView->sizeHint();
-      size.setWidth(this->viewport()->width());
-      this->HeaderView->resize(size);
+      QSize headerSize = this->HeaderView->sizeHint();
+      headerSize.setWidth(this->viewport()->width());
+      this->HeaderView->resize(headerSize);
       this->HeaderView->show();
       }
     }
@@ -922,7 +922,7 @@ void pqFlatTreeView::mousePressEvent(QMouseEvent *e)
 
 QModelIndex pqFlatTreeView::moveCursor(
     QAbstractItemView::CursorAction cursorAction,
-    Qt::KeyboardModifiers modifiers)
+    Qt::KeyboardModifiers)
 {
   QModelIndex current = this->selectionModel()->currentIndex();
   pqFlatTreeViewItem *item = this->getItem(current);
