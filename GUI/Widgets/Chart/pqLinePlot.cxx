@@ -144,6 +144,7 @@ void pqLinePlot::layoutPlot(const pqChartAxis& XAxis, const pqChartAxis& YAxis)
 
 void pqLinePlot::drawPlot(QPainter& painter, const QRect& /*area*/, const pqChartAxis& /*XAxis*/, const pqChartAxis& /*YAxis*/)
 {
+  this->Implementation->Pen->resetMarkers();
   this->Implementation->Pen->drawPolyline(painter, this->Implementation->ScreenCoords);
   if(this->Implementation->ScreenCoords.size())
     this->Implementation->Pen->drawPoint(painter, this->Implementation->ScreenCoords.back());
@@ -174,4 +175,3 @@ void pqLinePlot::showChartTip(QHelpEvent& event) const
   if(tip_distance < VTK_DOUBLE_MAX)    
     QToolTip::showText(event.globalPos(), QString("%1, %2").arg(tip_coordinate.X.getDoubleValue()).arg(tip_coordinate.Y.getDoubleValue()));
 }
-

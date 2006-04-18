@@ -173,6 +173,7 @@ void pqLineErrorPlot::drawPlot(QPainter& painter, const QRect& /*area*/, const p
   painter.drawLines(this->Implementation->WhiskerScreenCoords);
 
   // Draw the plot ...
+  this->Implementation->Pen->resetMarkers();
   this->Implementation->Pen->drawPolyline(painter, this->Implementation->PlotScreenCoords);
   if(this->Implementation->PlotScreenCoords.size())
     this->Implementation->Pen->drawPoint(painter, this->Implementation->PlotScreenCoords.back());

@@ -146,6 +146,7 @@ void pqChartLegend::draw(QPainter& painter, const QRect& area)
     
     const QRect label_bounds = this->Implementation->Labels[i]->getBounds();
 
+    this->Implementation->Pens[i]->resetMarkers();
     this->Implementation->Pens[i]->drawLine(
       painter,
       this->Implementation->Bounds.left() + padding,

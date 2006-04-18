@@ -134,6 +134,7 @@ void pqScatterPlot::layoutPlot(const pqChartAxis& XAxis, const pqChartAxis& YAxi
 
 void pqScatterPlot::drawPlot(QPainter& painter, const QRect& /*area*/, const pqChartAxis& /*XAxis*/, const pqChartAxis& /*YAxis*/)
 {
+  this->Implementation->Pen->resetMarkers();
   this->Implementation->Pen->drawPoints(painter, this->Implementation->ScreenCoords);
 }
 

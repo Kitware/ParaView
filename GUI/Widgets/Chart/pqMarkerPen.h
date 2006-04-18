@@ -51,12 +51,26 @@ class QSize;
 /////////////////////////////////////////////////////////////////////////////////////////////////
 // pqMarkerPen
 
-/// Abstract interface for a pen that can be used to draw line segments with optional "markers", typically for line graphs
+/**
+Abstract interface for a pen that can be used to draw line segments with optional "markers", typically for line graphs.
+
+Markers can be drawn for every Nth point by passing a marker interval != 1 in the constructor.
+*/
+
 class QTCHART_EXPORT pqMarkerPen
 {
 public:
   virtual ~pqMarkerPen();
 
+  /**
+  Call resetMarkers() before drawing a set of connected line segments, to ensure that markers are always
+  drawn on the same vertices when using a marker interval != 1.
+  
+  You can pass a nonzero value to resetMarkers() if you are using a marker interval != 1 and you don't want
+  the first vertex drawn to have a marker.
+  */
+  void resetMarkers(unsigned int offset = 0);
+  
   /// Returns the pen that will be used to draw lines (without the markers)
   QPen getPen();
 
@@ -109,13 +123,13 @@ public:
   //@}
 
 protected:
-  pqMarkerPen(const QPen& pen);
+  pqMarkerPen(const QPen& pen, unsigned int marker_interval);
 
 private:
   /// Internal implementation detail
-  void drawMarker(QPainter& painter, const QPoint& point);
+  void intervalDrawMarker(QPainter& painter, const QPoint& point);
   /// Internal implementation detail
-  void drawMarker(QPainter& painter, const QPointF& point);
+  void intervalDrawMarker(QPainter& painter, const QPointF& point);
   
   /// Called by the implementation to setup a painter - derivatives should implement this and set the painter state as-needed before drawMarker() is called one-to-many times
   virtual void setupPainter(QPainter& painter) = 0;
@@ -124,6 +138,10 @@ private:
   
   /// Stores the internal pen
   const QPen Pen;
+  /// Stores the interval at which markers will be drawn
+  const unsigned int MarkerInterval;
+  /// Index that is used to keep track of which markers should be drawn
+  unsigned int MarkerIndex;
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,7 +167,7 @@ class QTCHART_EXPORT pqCrossMarkerPen :
   public pqMarkerPen
 {
 public:
-  pqCrossMarkerPen(const QPen& pen, const QSize& size, const QPen& outline);
+  pqCrossMarkerPen(const QPen& pen, const QSize& size, const QPen& outline, unsigned int marker_interval = 1);
   
 private:
   void setupPainter(QPainter& painter);
@@ -167,7 +185,7 @@ class QTCHART_EXPORT pqPlusMarkerPen :
   public pqMarkerPen
 {
 public:
-  pqPlusMarkerPen(const QPen& pen, const QSize& size, const QPen& outline);
+  pqPlusMarkerPen(const QPen& pen, const QSize& size, const QPen& outline, unsigned int marker_interval = 1);
   
 private:
   void setupPainter(QPainter& painter);
@@ -185,7 +203,7 @@ class QTCHART_EXPORT pqSquareMarkerPen :
   public pqMarkerPen
 {
 public:
-  pqSquareMarkerPen(const QPen& pen, const QSize& size, const QPen& outline, const QBrush& interior);
+  pqSquareMarkerPen(const QPen& pen, const QSize& size, const QPen& outline, const QBrush& interior, unsigned int marker_interval = 1);
   
 private:
   void setupPainter(QPainter& painter);
@@ -204,7 +222,7 @@ class QTCHART_EXPORT pqCircleMarkerPen :
   public pqMarkerPen
 {
 public:
-  pqCircleMarkerPen(const QPen& pen, const QSize& size, const QPen& outline, const QBrush& interior);
+  pqCircleMarkerPen(const QPen& pen, const QSize& size, const QPen& outline, const QBrush& interior, unsigned int marker_interval = 1);
   
 private:
   void setupPainter(QPainter& painter);
