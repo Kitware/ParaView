@@ -114,7 +114,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.388");
+vtkCxxRevisionMacro(vtkPVApplication, "1.389");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -416,11 +416,12 @@ vtkPVApplication::vtkPVApplication()
   vtkPVOutputWindow *window = vtkPVOutputWindow::New();
   this->OutputWindow = window;
   vtkOutputWindow::SetInstance(this->OutputWindow);
-  this->MajorVersion = PARAVIEW_VERSION_MAJOR;
-  this->MinorVersion = PARAVIEW_VERSION_MINOR;
+  this->SetMajorVersion(PARAVIEW_VERSION_MAJOR);
+  this->SetMinorVersion(PARAVIEW_VERSION_MINOR);
   this->SetName("ParaView");
   char name[128];
-  sprintf(name, "ParaView%d.%d", this->MajorVersion, this->MinorVersion);
+  sprintf(name, "ParaView%d.%d", 
+          this->GetMajorVersion(), this->GetMinorVersion());
   this->SetVersionName(name);
   char patch[128];
   sprintf(patch, "%d", PARAVIEW_VERSION_PATCH);
