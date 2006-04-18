@@ -110,7 +110,7 @@ pqPipelineData::pqPipelineData(QObject* p)
 {
   this->Internal = new pqPipelineDataInternal;
   this->Names = new pqNameCount();
-  this->VTKConnect = vtkEventQtSlotConnect::New();
+  this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
 
   if(!pqPipelineData::Instance)
     pqPipelineData::Instance = this;
@@ -120,12 +120,6 @@ pqPipelineData::~pqPipelineData()
 {
   if(pqPipelineData::Instance == this)
     pqPipelineData::Instance = 0;
-
-  if(this->VTKConnect)
-    {
-    this->VTKConnect->Delete();
-    this->VTKConnect = 0;
-    }
 
   if(this->Names)
     {

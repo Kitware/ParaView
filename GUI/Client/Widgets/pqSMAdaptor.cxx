@@ -107,14 +107,13 @@ class pqSMAdaptorInternal
 public:
   pqSMAdaptorInternal()
     {
-    this->VTKConnections = vtkEventQtSlotConnect::New();
+    this->VTKConnections = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     this->QtConnections = new QSignalMapper;
     this->DoingSMPropertyModified = false;
     this->DoingQtPropertyModified = false;
     }
   ~pqSMAdaptorInternal()
     {
-    this->VTKConnections->Delete();
     delete this->QtConnections;
     }
 
@@ -124,7 +123,7 @@ public:
   LinkMap QtLinks;
 
   // handle changes from the SM side
-  vtkEventQtSlotConnect* VTKConnections;
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnections;
   
   // handle changes from the Qt side
   QSignalMapper* QtConnections;

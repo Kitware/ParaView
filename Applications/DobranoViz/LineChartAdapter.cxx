@@ -99,7 +99,7 @@ struct LineChartAdapter::pqImplementation
 
   pqImplementation(pqLineChartWidget& chart) :
     SourceProxy(0),
-    EventAdaptor(vtkEventQtSlotConnect::New()),
+    EventAdaptor(vtkSmartPointer<vtkEventQtSlotConnect>::New()),
     Chart(chart),
     ExodusVariableType(VARIABLE_TYPE_CELL),
     Samples(50),
@@ -149,7 +149,6 @@ struct LineChartAdapter::pqImplementation
   
   ~pqImplementation()
   {
-    this->EventAdaptor->Delete();
   }
   
   void setExodusProxy(vtkSMProxy* Proxy)
@@ -820,7 +819,7 @@ struct LineChartAdapter::pqImplementation
   }
   
   vtkSMProxy* SourceProxy;
-  vtkEventQtSlotConnect* EventAdaptor;
+  vtkSmartPointer<vtkEventQtSlotConnect> EventAdaptor;
   pqLineChartWidget& Chart;
   
   pqVariableType ExodusVariableType;

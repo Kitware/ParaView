@@ -169,17 +169,13 @@ public:
     delete this->MultiViewManager;
     this->MultiViewManager = 0;
 
-    this->VTKConnector->Delete();
-    this->VTKConnector = 0;
-  
     delete this->ProxyInfo;
     this->ProxyInfo = 0;
 
     delete this->Pipeline;
     this->Pipeline = 0;
 
-/** \todo Workaround for shutdown crash */  
-//    delete this->CurrentServer;
+    delete this->CurrentServer;
     this->CurrentServer = 0;
     
     delete this->Adaptor;
@@ -242,7 +238,7 @@ public:
   QToolBar* VariableSelectorToolBar;
   QToolBar* UndoRedoToolBar;
   pqSourceProxyInfo* ProxyInfo;
-  vtkEventQtSlotConnect* VTKConnector;
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnector;
   pqObjectInspectorWidget* Inspector;
   vtkSMUndoStack* UndoStack;
 };
@@ -262,7 +258,7 @@ pqMainWindow::pqMainWindow() :
   this->Implementation->Adaptor = new pqSMAdaptor();
   this->Implementation->Pipeline = new pqPipelineData();
   this->Implementation->ProxyInfo = new pqSourceProxyInfo();
-  this->Implementation->VTKConnector = vtkEventQtSlotConnect::New();
+  this->Implementation->VTKConnector = vtkSmartPointer<vtkEventQtSlotConnect>::New();
 
   this->Implementation->MultiViewManager = new pqMultiViewManager(this) << pqSetName("MultiViewManager");
   //this->Implementation->MultiViewManager->hide();  // workaround for flickering in Qt 4.0.1 & 4.1.0
@@ -662,7 +658,10 @@ void pqMainWindow::setServer(pqServer* Server)
     delete this->Implementation->CurrentServer;
     }
   */
+  
+  delete this->Implementation->CurrentServer;
   this->Implementation->CurrentServer = Server;
+  
   if(this->Implementation->CurrentServer)
     {
     // preload compound proxies
@@ -716,11 +715,8 @@ void pqMainWindow::onFileNew()
     }
 
   // Clean up the current server.
-  if(this->Implementation->CurrentServer)
-    {
-    delete this->Implementation->CurrentServer;
-    this->Implementation->CurrentServer = 0;
-    }
+  delete this->Implementation->CurrentServer;
+  this->Implementation->CurrentServer = 0;
 
   // Call this method to ensure the menu items get updated.
   emit serverChanged(this->Implementation->CurrentServer);
@@ -1003,15 +999,12 @@ void pqMainWindow::onServerConnect(pqServer* Server)
 
 void pqMainWindow::onServerDisconnect()
 {
-  // Get the active server and close the connection.
-  pqServer* server = this->Implementation->CurrentServer;
-  if (!server)
+  if(this->Implementation->CurrentServer)
     {
-    // nothing to disconnect from.
-    return;
+    this->Implementation->Pipeline->removeServer(this->Implementation->CurrentServer);
+    delete this->Implementation->CurrentServer;
+    this->Implementation->CurrentServer = 0;
     }
-  this->Implementation->Pipeline->removeServer(server);
-  delete server;
 }
 
 void pqMainWindow::onUpdateSourcesFiltersMenu(pqServer*)

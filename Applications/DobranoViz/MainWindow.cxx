@@ -133,6 +133,9 @@ MainWindow::MainWindow() :
 
 MainWindow::~MainWindow()
 {
+  delete this->ChooseDataCombo;
+  delete this->LineChart;
+  delete this->LineChartWidget;
 }
 
 void MainWindow::onHelpAbout()

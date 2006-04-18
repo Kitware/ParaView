@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPipelineData_h
 
 #include "pqWidgetsExport.h"
+#include <vtkSmartPointer.h>
 #include <QObject>
 
 class pqMultiView;
@@ -150,7 +151,7 @@ private slots:
 protected:
   pqPipelineDataInternal *Internal;  ///< Stores the pipeline objects.
   pqNameCount *Names;                ///< Keeps track of the proxy names.
-  vtkEventQtSlotConnect *VTKConnect; ///< Used to listen to proxy events.
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect; ///< Used to listen to proxy events.
   vtkSMProxy* CurrentProxy;
 
   static pqPipelineData *Instance;   ///< Pointer to the pipeline instance.

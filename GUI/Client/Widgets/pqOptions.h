@@ -71,6 +71,9 @@ protected:
   vtkSetStringMacro(TestDirectory);
   vtkSetStringMacro(BaselineImage);
   
+  virtual void Register(vtkObjectBase*);
+  virtual void UnRegister(vtkObjectBase*);
+  
 private:
   pqOptions(const pqOptions &);
   void operator=(const pqOptions &);

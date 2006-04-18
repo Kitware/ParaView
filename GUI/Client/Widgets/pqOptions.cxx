@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkObjectFactory.h>
 
 vtkStandardNewMacro(pqOptions);
-vtkCxxRevisionMacro(pqOptions, "1.7");
+vtkCxxRevisionMacro(pqOptions, "1.8");
 
 //-----------------------------------------------------------------------------
 pqOptions::pqOptions()
@@ -103,4 +103,14 @@ void pqOptions::PrintSelf(ostream& os, vtkIndent indent)
     this->TestDirectory : "(none)") << endl;
   os << indent << "TestFileName: " << (this->TestFileName?
     this->TestFileName : "(none)") << endl;
+}
+
+void pqOptions::Register(vtkObjectBase* o)
+{
+  vtkPVOptions::Register(o);
+}
+
+void pqOptions::UnRegister(vtkObjectBase* o)
+{
+  vtkPVOptions::UnRegister(o);
 }

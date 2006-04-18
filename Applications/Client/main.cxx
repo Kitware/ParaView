@@ -90,8 +90,8 @@ int main(int argc, char* argv[])
     }
 
   helper->Delete();
-  pvmain->Delete();
   options->Delete();
+  pvmain->Delete();
   vtkPVMain::Finalize();
   vtkProcessModule::SetProcessModule(0);
   return ret;
