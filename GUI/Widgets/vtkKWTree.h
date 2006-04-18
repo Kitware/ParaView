@@ -42,6 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWCoreWidget.h"
 
+class vtkKWTreeInternals;
+
 class KWWidgets_EXPORT vtkKWTree : public vtkKWCoreWidget
 {
 public:
@@ -317,6 +319,11 @@ protected:
 
   char *SelectionChangedCommand;
   virtual void InvokeSelectionChangedCommand();
+
+  // PIMPL Encapsulation for STL containers
+  //BTX
+  vtkKWTreeInternals *Internals;
+  //ETX
 
 private:
   vtkKWTree(const vtkKWTree&); // Not implemented

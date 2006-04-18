@@ -70,7 +70,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.284");
+vtkCxxRevisionMacro(vtkKWApplication, "1.285");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -109,6 +109,11 @@ public:
   typedef vtksys_stl::vector<vtkKWWindowBase*>::iterator WindowsContainerIterator;
 
   WindowsContainer Windows;
+
+  // Some temporary storage var that do not need to be exposed in the .h
+
+  vtksys_stl::string VersionNameTemp;
+  vtksys_stl::string LimitedEditionModeNameTemp;
 };
 
 //----------------------------------------------------------------------------
@@ -1552,10 +1557,11 @@ const char* vtkKWApplication::GetVersionName()
     }
   if (this->Name)
     {
-    static char versionname_buffer[1024];
+    char versionname_buffer[1024];
     sprintf(versionname_buffer, "%s%d.%d", 
             this->Name, this->MajorVersion, this->MinorVersion);
-    return versionname_buffer;
+    this->Internals->VersionNameTemp = versionname_buffer;
+    return this->Internals->VersionNameTemp.c_str();
     }
   return NULL;
 }
@@ -1569,9 +1575,10 @@ const char* vtkKWApplication::GetLimitedEditionModeName()
     }
   if (this->Name)
     {
-    static char lemname_buffer[1024];
+    char lemname_buffer[1024];
     sprintf(lemname_buffer, "%s Limited Edition", this->Name);
-    return lemname_buffer;
+    this->Internals->LimitedEditionModeNameTemp = lemname_buffer;
+    return this->Internals->LimitedEditionModeNameTemp.c_str();
     }
   return NULL;
 }

@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.50");
+vtkCxxRevisionMacro(vtkKWExtent, "1.51");
 
 //----------------------------------------------------------------------------
 vtkKWExtent::vtkKWExtent()
@@ -206,9 +206,8 @@ void vtkKWExtent::GetExtentRange(double &x1, double &x2,
 //----------------------------------------------------------------------------
 double* vtkKWExtent::GetExtentRange()
 {
-  static double extent_range[6];
-  this->GetExtentRange(extent_range);
-  return extent_range;
+  this->GetExtentRange(this->ExtentRangeTemp);
+  return this->ExtentRangeTemp;
 }
 
 //----------------------------------------------------------------------------

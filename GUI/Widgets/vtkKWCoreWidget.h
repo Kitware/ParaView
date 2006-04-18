@@ -28,6 +28,8 @@
 #include "vtkKWWidget.h"
 #include "vtkKWTkOptions.h" // For option constants
 
+class vtkKWCoreWidgetInternals;
+
 class KWWidgets_EXPORT vtkKWCoreWidget : public vtkKWWidget
 {
 public:
@@ -85,8 +87,8 @@ public:
     { this->SetConfigurationOptionAsColor(option, rgb[0], rgb[1], rgb[2]); };
 
 protected:
-  vtkKWCoreWidget() {};
-  ~vtkKWCoreWidget() {};
+  vtkKWCoreWidget();
+  ~vtkKWCoreWidget();
 
   // Description:
   // Get the Tk string type of the widget.
@@ -97,8 +99,8 @@ protected:
   // internal format (given the widget's application CharacterEncoding), 
   // and vice-versa.
   // The 'source' string is the source to convert.
-  // It returns a pointer to a static buffer where the converted string
-  // can be found (so be quick about it).
+  // It returns a pointer to where the converted string can be found 
+  // (copy the result to safe storage immediately).
   // The 'options' can be set to perform some replacements/escaping.
   // ConvertStringEscapeInterpretable will attempt to escape all characters
   // that can be interpreted (when found between a pair of quotes for
@@ -125,13 +127,14 @@ protected:
   virtual void SetTextOption(const char *option, const char *value);
   virtual const char* GetTextOption(const char *option);
 
+  // PIMPL Encapsulation for STL containers
+
+  vtkKWCoreWidgetInternals *Internals;
+
 private:
+
   vtkKWCoreWidget(const vtkKWCoreWidget&); // Not implemented
   void operator=(const vtkKWCoreWidget&); // Not implemented
 };
 
-
 #endif
-
-
-

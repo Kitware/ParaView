@@ -46,13 +46,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.18");
+vtkCxxRevisionMacro(vtkKWTree, "1.19");
+
+//----------------------------------------------------------------------------
+class vtkKWTreeInternals
+{
+public:
+  
+  // Some temporary storage var that do not need to be exposed in the .h
+  // This is used so that method that are wrapped can return a pointer
+  // to a safer location than a static buffer.
+
+  double SelectionBackgroundColorTemp[3];
+  double SelectionForegroundColorTemp[3];
+};
 
 //----------------------------------------------------------------------------
 vtkKWTree::vtkKWTree()
 {
   this->SelectionMode = vtkKWTkOptions::SelectionModeSingle;
   this->SelectionChangedCommand = NULL;
+
+  this->Internals = new vtkKWTreeInternals;
 }
 
 //----------------------------------------------------------------------------
@@ -63,6 +78,8 @@ vtkKWTree::~vtkKWTree()
     delete [] this->SelectionChangedCommand;
     this->SelectionChangedCommand = NULL;
     }
+
+   delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
@@ -674,7 +691,7 @@ void vtkKWTree::GetSelectionBackgroundColor(double *r, double *g, double *b)
 //----------------------------------------------------------------------------
 double* vtkKWTree::GetSelectionBackgroundColor()
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->SelectionBackgroundColorTemp[0];
   this->GetSelectionBackgroundColor(rgb, rgb + 1, rgb + 2);
   return rgb;
 }
@@ -694,7 +711,7 @@ void vtkKWTree::GetSelectionForegroundColor(double *r, double *g, double *b)
 //----------------------------------------------------------------------------
 double* vtkKWTree::GetSelectionForegroundColor()
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->SelectionForegroundColorTemp[0];
   this->GetSelectionForegroundColor(rgb, rgb + 1, rgb + 2);
   return rgb;
 }

@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.53");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.54");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -46,6 +46,33 @@ public:
 
   int EditedCellRowIndex;
   int EditedCellColumnIndex;
+
+  // Some temporary storage var that do not need to be exposed in the .h
+  // This is used so that method that are wrapped can return a pointer
+  // to a safer location than a static buffer.
+
+  double ColumnLabelBackgroundColorTemp[3];
+  double ColumnLabelForegroundColorTemp[3];
+  double ColumnBackgroundColorTemp[3];
+  double ColumnForegroundColorTemp[3];
+  double RowBackgroundColorTemp[3];
+  double RowForegroundColorTemp[3];
+  double StripeBackgroundColorTemp[3];
+  double StripeForegroundColorTemp[3];
+  double CellBackgroundColorTemp[3];
+  double CellForegroundColorTemp[3];
+  double CellCurrentBackgroundColorTemp[3];
+  double CellCurrentForegroundColorTemp[3];
+  double SelectionBackgroundColorTemp[3];
+  double SelectionForegroundColorTemp[3];
+  double ColumnSelectionBackgroundColorTemp[3];
+  double ColumnSelectionForegroundColorTemp[3];
+  double RowSelectionBackgroundColorTemp[3];
+  double RowSelectionForegroundColorTemp[3];
+  double CellSelectionBackgroundColorTemp[3];
+  double CellSelectionForegroundColorTemp[3];
+
+  int FindCellTextTemp[2];
 };
 
 //----------------------------------------------------------------------------
@@ -364,7 +391,7 @@ void vtkKWMultiColumnList::GetColumnLabelBackgroundColor(
 //----------------------------------------------------------------------------
 double* vtkKWMultiColumnList::GetColumnLabelBackgroundColor()
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->ColumnLabelBackgroundColorTemp[0];
   this->GetColumnLabelBackgroundColor(rgb, rgb + 1, rgb + 2);
   return rgb;
 }
@@ -384,7 +411,7 @@ void vtkKWMultiColumnList::GetColumnLabelForegroundColor(double *r, double *g, d
 //----------------------------------------------------------------------------
 double* vtkKWMultiColumnList::GetColumnLabelForegroundColor()
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->ColumnLabelForegroundColorTemp[0];
   this->GetColumnLabelForegroundColor(rgb, rgb + 1, rgb + 2);
   return rgb;
 }
@@ -686,7 +713,7 @@ void vtkKWMultiColumnList::GetColumnBackgroundColor(
 //----------------------------------------------------------------------------
 double* vtkKWMultiColumnList::GetColumnBackgroundColor(int col_index)
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->ColumnBackgroundColorTemp[0];
   this->GetColumnBackgroundColor(col_index, rgb, rgb + 1, rgb + 2);
   return rgb;
 }
@@ -717,7 +744,7 @@ void vtkKWMultiColumnList::GetColumnForegroundColor(
 //----------------------------------------------------------------------------
 double* vtkKWMultiColumnList::GetColumnForegroundColor(int col_index)
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->ColumnForegroundColorTemp[0];
   this->GetColumnForegroundColor(col_index, rgb, rgb + 1, rgb + 2);
   return rgb;
 }
@@ -1184,7 +1211,7 @@ void vtkKWMultiColumnList::GetRowBackgroundColor(
 //----------------------------------------------------------------------------
 double* vtkKWMultiColumnList::GetRowBackgroundColor(int row_index)
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->RowBackgroundColorTemp[0];
   this->GetRowBackgroundColor(row_index, rgb, rgb + 1, rgb + 2);
   return rgb;
 }
@@ -1215,7 +1242,7 @@ void vtkKWMultiColumnList::GetRowForegroundColor(
 //----------------------------------------------------------------------------
 double* vtkKWMultiColumnList::GetRowForegroundColor(int row_index)
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->RowForegroundColorTemp[0];
   this->GetRowForegroundColor(row_index, rgb, rgb + 1, rgb + 2);
   return rgb;
 }
@@ -1244,7 +1271,7 @@ void vtkKWMultiColumnList::GetStripeBackgroundColor(
 //----------------------------------------------------------------------------
 double* vtkKWMultiColumnList::GetStripeBackgroundColor()
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->StripeBackgroundColorTemp[0];
   this->GetStripeBackgroundColor(rgb, rgb + 1, rgb + 2);
   return rgb;
 }
@@ -1265,7 +1292,7 @@ void vtkKWMultiColumnList::GetStripeForegroundColor(double *r, double *g, double
 //----------------------------------------------------------------------------
 double* vtkKWMultiColumnList::GetStripeForegroundColor()
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->StripeForegroundColorTemp[0];
   this->GetStripeForegroundColor(rgb, rgb + 1, rgb + 2);
   return rgb;
 }
@@ -1616,7 +1643,7 @@ void vtkKWMultiColumnList::GetCellBackgroundColor(
 double* vtkKWMultiColumnList::GetCellBackgroundColor(
   int row_index, int col_index)
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->CellBackgroundColorTemp[0];
   this->GetCellBackgroundColor(row_index, col_index, rgb, rgb + 1, rgb + 2);
   return rgb;
 }
@@ -1647,7 +1674,7 @@ void vtkKWMultiColumnList::GetCellForegroundColor(
 //----------------------------------------------------------------------------
 double* vtkKWMultiColumnList::GetCellForegroundColor(int row_index, int col_index)
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->CellForegroundColorTemp[0];
   this->GetCellForegroundColor(row_index, col_index, rgb, rgb + 1, rgb + 2);
   return rgb;
 }
@@ -1762,7 +1789,7 @@ void vtkKWMultiColumnList::GetCellCurrentBackgroundColor(
 double* vtkKWMultiColumnList::GetCellCurrentBackgroundColor(
   int row_index, int col_index)
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->CellCurrentBackgroundColorTemp[0];
   this->GetCellCurrentBackgroundColor(
     row_index, col_index, rgb, rgb + 1, rgb + 2);
   return rgb;
@@ -1864,7 +1891,7 @@ void vtkKWMultiColumnList::GetCellCurrentForegroundColor(
 double* vtkKWMultiColumnList::GetCellCurrentForegroundColor(
   int row_index, int col_index)
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->CellCurrentForegroundColorTemp[0];
   this->GetCellCurrentForegroundColor(
     row_index, col_index, rgb, rgb + 1, rgb + 2);
   return rgb;
@@ -2584,7 +2611,7 @@ int vtkKWMultiColumnList::FindCellText(
 //----------------------------------------------------------------------------
 int* vtkKWMultiColumnList::FindCellText(const char *text)
 {
-  static int pos[2];
+  int *pos = &this->Internals->FindCellTextTemp[0];
   if (this->FindCellText(text, pos, pos + 1))
     {
     return pos;
@@ -3035,7 +3062,7 @@ void vtkKWMultiColumnList::GetSelectionBackgroundColor(
 //----------------------------------------------------------------------------
 double* vtkKWMultiColumnList::GetSelectionBackgroundColor()
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->SelectionBackgroundColorTemp[0];
   this->GetSelectionBackgroundColor(rgb, rgb + 1, rgb + 2);
   return rgb;
 }
@@ -3056,7 +3083,7 @@ void vtkKWMultiColumnList::GetSelectionForegroundColor(double *r, double *g, dou
 //----------------------------------------------------------------------------
 double* vtkKWMultiColumnList::GetSelectionForegroundColor()
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->SelectionForegroundColorTemp[0];
   this->GetSelectionForegroundColor(rgb, rgb + 1, rgb + 2);
   return rgb;
 }
@@ -3080,7 +3107,7 @@ void vtkKWMultiColumnList::GetColumnSelectionBackgroundColor(
 //----------------------------------------------------------------------------
 double* vtkKWMultiColumnList::GetColumnSelectionBackgroundColor(int col_index)
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->ColumnSelectionBackgroundColorTemp[0];
   this->GetColumnSelectionBackgroundColor(col_index, rgb, rgb + 1, rgb + 2);
   return rgb;
 }
@@ -3111,7 +3138,7 @@ void vtkKWMultiColumnList::GetColumnSelectionForegroundColor(
 //----------------------------------------------------------------------------
 double* vtkKWMultiColumnList::GetColumnSelectionForegroundColor(int col_index)
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->ColumnSelectionForegroundColorTemp[0];
   this->GetColumnSelectionForegroundColor(col_index, rgb, rgb + 1, rgb + 2);
   return rgb;
 }
@@ -3142,7 +3169,7 @@ void vtkKWMultiColumnList::GetRowSelectionBackgroundColor(
 //----------------------------------------------------------------------------
 double* vtkKWMultiColumnList::GetRowSelectionBackgroundColor(int row_index)
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->RowSelectionBackgroundColorTemp[0];
   this->GetRowSelectionBackgroundColor(row_index, rgb, rgb + 1, rgb + 2);
   return rgb;
 }
@@ -3173,7 +3200,7 @@ void vtkKWMultiColumnList::GetRowSelectionForegroundColor(
 //----------------------------------------------------------------------------
 double* vtkKWMultiColumnList::GetRowSelectionForegroundColor(int row_index)
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->RowSelectionForegroundColorTemp[0];
   this->GetRowSelectionForegroundColor(row_index, rgb, rgb + 1, rgb + 2);
   return rgb;
 }
@@ -3206,7 +3233,7 @@ void vtkKWMultiColumnList::GetCellSelectionBackgroundColor(
 double* vtkKWMultiColumnList::GetCellSelectionBackgroundColor(
   int row_index, int col_index)
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->CellSelectionBackgroundColorTemp[0];
   this->GetCellSelectionBackgroundColor(
     row_index, col_index, rgb, rgb + 1, rgb + 2);
   return rgb;
@@ -3241,7 +3268,7 @@ void vtkKWMultiColumnList::GetCellSelectionForegroundColor(
 double* vtkKWMultiColumnList::GetCellSelectionForegroundColor(
   int row_index, int col_index)
 {
-  static double rgb[3];
+  double *rgb = &this->Internals->CellSelectionForegroundColorTemp[0];
   this->GetCellSelectionForegroundColor(row_index, col_index, rgb, rgb + 1, rgb + 2);
   return rgb;
 }

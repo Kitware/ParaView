@@ -211,6 +211,11 @@ protected:
   virtual void Pack();
 
 private:
+
+  // Temporary var for wrapping purposes
+
+  double ExtentRangeTemp[6];
+
   vtkKWExtent(const vtkKWExtent&); // Not implemented
   void operator=(const vtkKWExtent&); // Not implemented
 };

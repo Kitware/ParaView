@@ -21,7 +21,32 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCoreWidget );
-vtkCxxRevisionMacro(vtkKWCoreWidget, "1.17");
+vtkCxxRevisionMacro(vtkKWCoreWidget, "1.18");
+
+//----------------------------------------------------------------------------
+class vtkKWCoreWidgetInternals
+{
+public:
+
+  // Some temporary storage var that do not need to be exposed in the .h
+
+  double ConfigurationOptionAsColorTemp[3];
+  vtksys_stl::string ConvertInternalStringToTclStringTemp;
+  vtksys_stl::string ConvertTclStringToInternalStringTemp;
+};
+
+//----------------------------------------------------------------------------
+vtkKWCoreWidget::vtkKWCoreWidget()
+{
+  this->Internals = new vtkKWCoreWidgetInternals;
+}
+
+//----------------------------------------------------------------------------
+vtkKWCoreWidget::~vtkKWCoreWidget()
+{
+  delete this->Internals;
+  this->Internals = NULL;
+}
 
 //----------------------------------------------------------------------------
 void vtkKWCoreWidget::Create()
@@ -153,9 +178,16 @@ void vtkKWCoreWidget::GetConfigurationOptionAsColor(
 //----------------------------------------------------------------------------
 double* vtkKWCoreWidget::GetConfigurationOptionAsColor(const char *option)
 {
-  static double rgb[3];
-  this->GetConfigurationOptionAsColor(option, rgb, rgb + 1, rgb + 2);
-  return rgb;
+  // Now this is still not super-safe if in a multi-thread context this
+  // method is called with different 'option' argument...
+
+  this->GetConfigurationOptionAsColor(
+    option, 
+    this->Internals->ConfigurationOptionAsColorTemp, 
+    this->Internals->ConfigurationOptionAsColorTemp + 1, 
+    this->Internals->ConfigurationOptionAsColorTemp + 2);
+
+  return this->Internals->ConfigurationOptionAsColorTemp;
 }
 
 //----------------------------------------------------------------------------
@@ -174,7 +206,8 @@ const char* vtkKWCoreWidget::ConvertInternalStringToTclString(
     return NULL;
     }
 
-  static vtksys_stl::string dest;
+  vtksys_stl::string &dest = 
+    this->Internals->ConvertInternalStringToTclStringTemp;
   const char *res = source;
 
   // Handle the encoding
@@ -236,7 +269,8 @@ const char* vtkKWCoreWidget::ConvertTclStringToInternalString(
     return NULL;
     }
 
-  static vtksys_stl::string dest;
+  vtksys_stl::string &dest = 
+    this->Internals->ConvertTclStringToInternalStringTemp;
   const char *res = source;
 
   // Handle the encoding

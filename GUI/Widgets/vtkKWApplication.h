@@ -440,23 +440,12 @@ protected:
   vtkKWApplication();
   ~vtkKWApplication();
 
-  Tk_Window MainWindow;
   Tcl_Interp *MainInterp;
 
   // Description:
   // Do one tcl event and enter the event loop, allowing the application
   // interface to actually run.
   virtual void DoOneTclEvent();
-
-  // Description:
-  // Application name and version
-  char *Name;
-  char *VersionName;
-  char *ReleaseName;
-  int MajorVersion;
-  int MinorVersion;
-  char *PrettyName;
-  vtkSetStringMacro(PrettyName);
 
   // Description:
   // Application installation directory
@@ -496,11 +485,6 @@ protected:
   // Description:
   // Number of dialog that are up. See Un/RegisterDialogUp().
   int DialogUp;
-
-  // Description:
-  // Limited edition mode, name of the application when in limited edition mode
-  int LimitedEditionMode;
-  char *LimitedEditionModeName;
 
   // Description:
   // Registry level. If a call to Set/GetRegistryValue uses a level above
@@ -577,6 +561,21 @@ private:
   vtkKWOptionDataBase *OptionDataBase;
   vtkKWSplashScreen *SplashScreen;
   vtkKWBalloonHelpManager *BalloonHelpManager;
+
+  // Description:
+  // Application name and version
+  char *Name;
+  char *VersionName;
+  char *ReleaseName;
+  int MajorVersion;
+  int MinorVersion;
+  char *PrettyName;
+  vtkSetStringMacro(PrettyName);
+
+  // Description:
+  // Limited edition mode, name of the application when in limited edition mode
+  int LimitedEditionMode;
+  char *LimitedEditionModeName;
 
   vtkKWApplication(const vtkKWApplication&);   // Not implemented.
   void operator=(const vtkKWApplication&);  // Not implemented.
