@@ -19,7 +19,7 @@
 #include "vtkSMProxy.h"
 
 vtkStandardNewMacro(vtkSMDefaultStateLoader);
-vtkCxxRevisionMacro(vtkSMDefaultStateLoader, "1.1");
+vtkCxxRevisionMacro(vtkSMDefaultStateLoader, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMDefaultStateLoader::vtkSMDefaultStateLoader()
 {
@@ -39,6 +39,7 @@ vtkSMProxy* vtkSMDefaultStateLoader::NewProxy(int id)
   vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(pm->GetObjectFromID(csid));
   if (proxy)
     {
+    proxy->Register(this);
     return proxy;
     }
   return this->Superclass::NewProxy(id);
