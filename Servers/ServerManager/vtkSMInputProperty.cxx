@@ -23,7 +23,7 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMInputProperty);
-vtkCxxRevisionMacro(vtkSMInputProperty, "1.12");
+vtkCxxRevisionMacro(vtkSMInputProperty, "1.13");
 
 int vtkSMInputProperty::InputsUpdateImmediately = 1;
 
@@ -82,7 +82,7 @@ void vtkSMInputProperty::AppendCommandToStream(
     }
 
   this->RemoveConsumerFromPreviousProxies(cons);
-  this->RemoveAllPreviousProxies(cons);
+  this->RemoveAllPreviousProxies();
 
   if (this->CleanCommand)
     {
@@ -96,7 +96,7 @@ void vtkSMInputProperty::AppendCommandToStream(
     vtkSMProxy* proxy = this->GetProxy(i) ;
     if (proxy)
       {
-      this->AddPreviousProxy(cons, proxy);
+      this->AddPreviousProxy(proxy);
       proxy->AddConsumer(this, cons);
 
       *str << vtkClientServerStream::Invoke 

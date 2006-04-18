@@ -24,7 +24,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxyUnRegisterUndoElement);
-vtkCxxRevisionMacro(vtkSMProxyUnRegisterUndoElement, "1.1");
+vtkCxxRevisionMacro(vtkSMProxyUnRegisterUndoElement, "1.2");
 vtkCxxSetObjectMacro(vtkSMProxyUnRegisterUndoElement, XMLElement, vtkPVXMLElement);
 //-----------------------------------------------------------------------------
 vtkSMProxyUnRegisterUndoElement::vtkSMProxyUnRegisterUndoElement()
@@ -71,6 +71,7 @@ int vtkSMProxyUnRegisterUndoElement::Undo()
     {
     vtkSMDefaultStateLoader* loader = vtkSMDefaultStateLoader::New();
     proxy = loader->NewProxyFromElement(this->XMLElement, 0);
+    loader->Delete();
     created = 1;
     }
   

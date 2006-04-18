@@ -167,19 +167,23 @@ protected:
   virtual void ChildSaveState(vtkPVXMLElement* parent, int saveLastPushedValues);
 
   // Description:
-
-  // Previous proxies are used by the ProxyProperty internally.  The owner
-  // (consumer arg) of this property will become "consumer" of the proxies
-  // passed to AppendCommandToStream().  Also, the consumer will be removed
-  // from the consumer list of proxies that were added previously
-  // but that are no longer in the list (removed). This requires
-  // keeping track of previous proxies.
-  void AddPreviousProxy(vtkSMProxy* consumer, vtkSMProxy* proxy);
-  void RemoveAllPreviousProxies(vtkSMProxy* consumer);
+  // Previous proxies are used by the ProxyProperty internally. 
+  // This is a collection of proxies to whcih the owner proxy of this property
+  // get added as a consumer. This list helps is breaking this dependence when the
+  // property value changes.
+  void AddPreviousProxy(vtkSMProxy* proxy);
 
   // Description:
-  // Remove the given proxy from the list consumer list of all
-  // previous proxies.
+  // Removes all previous proxies.
+  void RemoveAllPreviousProxies();
+
+  // Description:
+  // When this property is pushed on the stream (AppendCommandToStream),
+  // the proxy to which this property belongs get added as a consumer
+  // to every proxy in this property. This method is called to remove
+  // the depence on all the proxies in the PreviousProxies collection.
+  // Hence when adding the owner proxy as a consumer of any proxy add 
+  // to this property, we push the latter on this PreviousProxies collection.
   void RemoveConsumerFromPreviousProxies(vtkSMProxy* cons);
 
   //BTX
@@ -224,6 +228,7 @@ protected:
 
   void AppendProxyToStream(vtkSMProxy* toAppend,
   vtkSMProxy* cons, vtkClientServerStream* str, vtkClientServerID objectId, int remove=0 );
+
 private:
   vtkSMProxyProperty(const vtkSMProxyProperty&); // Not implemented
   void operator=(const vtkSMProxyProperty&); // Not implemented

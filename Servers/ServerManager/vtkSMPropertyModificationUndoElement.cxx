@@ -21,7 +21,7 @@
 #include "vtkSMProxy.h"
 
 vtkStandardNewMacro(vtkSMPropertyModificationUndoElement);
-vtkCxxRevisionMacro(vtkSMPropertyModificationUndoElement, "1.1");
+vtkCxxRevisionMacro(vtkSMPropertyModificationUndoElement, "1.2");
 vtkCxxSetObjectMacro(vtkSMPropertyModificationUndoElement, XMLElement,
   vtkPVXMLElement);
 //-----------------------------------------------------------------------------
@@ -51,12 +51,15 @@ int vtkSMPropertyModificationUndoElement::Undo()
 
   vtkSMProxy* proxy = stateLoader->NewProxy(proxy_id);
   vtkSMProperty* property = (proxy? proxy->GetProperty(property_name): NULL);
+  int ret = 0;
   if (property)
     {
-    return property->LoadState(this->XMLElement->GetNestedElement(0),  
+    ret = property->LoadState(this->XMLElement->GetNestedElement(0),  
       stateLoader, 1);
     }
-  return 0;
+  proxy->Delete();
+  stateLoader->Delete();
+  return ret;
 }
 
 //-----------------------------------------------------------------------------
@@ -74,12 +77,15 @@ int vtkSMPropertyModificationUndoElement::Redo()
 
   vtkSMProxy* proxy = stateLoader->NewProxy(proxy_id);
   vtkSMProperty* property = (proxy? proxy->GetProperty(property_name): NULL);
+  int ret = 0;
   if (property)
     {
-    return property->LoadState(this->XMLElement->GetNestedElement(0),  
+    ret = property->LoadState(this->XMLElement->GetNestedElement(0),  
       stateLoader, 0);
     }
-  return 0;
+  proxy->Delete();
+  stateLoader->Delete();
+  return ret;
 }
 
 //-----------------------------------------------------------------------------
