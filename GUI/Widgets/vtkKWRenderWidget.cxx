@@ -43,7 +43,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.133");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.134");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -1628,7 +1628,38 @@ void vtkKWRenderWidget::ProcessCallbackCommandEvents(vtkObject *caller,
     return;
     }
 
-  // Handle event for this class
+  /* What is really going on below?
+     The vtkRenderWindow this vtkTkRenderWidget is part of supports a few
+     different mouse cursor shapes that can be set using the SetCurrentCursor
+     method. These cursor shapes are used extensively by VTK's 3D widget, like
+     the distance measurement widget, or the angle widget, to provide the
+     user some visual feedback when the mouse is over an element of the 3D
+     widget that can be interacted with (say, the handle at each end of the
+     measurement widget)
+     This works just fine in a native window, but alas not so well when the
+     renderwindow is part of a vtkTkRenderWidget inside a Tk UI, as it is
+     the case in this class; the problem is that Tk seems to try very hard to 
+     enforce its own cursor policy by refreshing the cursor shape as often as
+     it can; each Tk widget does indeed support a -cursor option that can be
+     used to specify the cursor shape to set when the mouse is hovering over
+     that widget. 
+     Therefore, one can notice an annoying flickering between VTK trying to
+     set a cursor shape, and Tk trying to set it back to its current value
+     for the vtkTkRenderWidget this renderwindow is part of.
+     In order to avoid this, we are listening to the CursorChangedEvent event
+     that is emitted by the renderwindow when its cursor shape is about to
+     change (see vtkWin32OpenGLRenderWindow::SetCurrentCursor for example). 
+     Now what we need to do is to make sure we set the cursor shape of the Tk
+     widget to the same shape VTK is trying to use too.
+     This does not work so well on event "recent" version of Tk (say 8.4.5)
+     because some native cursor shapes (like "hand") are not supported:
+     what we see then is yet another flickering between the native "hand" 
+     cursor and the non-native Tk "hand" cursor. This can be fixed by
+     using a more recent version of Tk (say 8.4.9). This could also be solved
+     by preventing VTK from actually changing any cursor shape, and letting
+     Tk doing it below (i.e. even if the shapes would not all look "native", 
+     they would at least look consistent and would not flicker).
+  */
 
 #if 1
   if (caller == this->RenderWindow)
