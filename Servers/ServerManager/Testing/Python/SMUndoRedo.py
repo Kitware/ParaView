@@ -80,6 +80,10 @@ undoStack.BeginUndoSet(self_cid, "CleanupSources")
 pxm.UnRegisterProxy("filters", "elevationFilter")
 pxm.UnRegisterProxy("mygroup", "sphere")
 pxm.UnRegisterProxy("mygroup", "cube")
+#  Redoing this set should delete the proxies, if not, we have some
+#  extra references to the proxies-->BUG.
+#  Undoing this set will create new proxies, if not, i.e. existing
+#  proxies are used then---> BUG.
 undoStack.EndUndoSet()
 #
 # Release all references to the objects we created, only the Proxy manager
