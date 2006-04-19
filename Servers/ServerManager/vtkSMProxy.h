@@ -190,7 +190,7 @@ public:
   // Overloaded to break the reference loop caused by the fact that
   // proxies store their own ClientServer ids.
   virtual void UnRegister(vtkObjectBase* obj);
-
+//BTX
   // Description:
   // Returns the id of a server object.
   vtkClientServerID GetID(unsigned int idx);
@@ -201,6 +201,7 @@ public:
   // a unique SelfID on the interpretor for the connection on which this 
   // proxy exists i.e. this->ConnectionID.
   vtkClientServerID GetSelfID();
+//ETX
 
   // Description:
   // Returns the number of server ids (same as the number of server objects
@@ -322,6 +323,8 @@ public:
   // Description:
   // Returns the documentation for this proxy.
   vtkGetObjectMacro(Documentation, vtkSMDocumentation);
+
+//BTX
 protected:
   vtkSMProxy();
   ~vtkSMProxy();
@@ -333,7 +336,6 @@ protected:
   void ExposeSubProxyProperty(const char* subproxy_name, 
     const char* property_name, const char* exposed_name);
 
-//BTX
   // Description:
   // These classes have been declared as friends to minimize the
   // public interface exposed by vtkSMProxy. Each of these classes
@@ -349,8 +351,9 @@ protected:
   friend class vtkSMIceTDesktopRenderModuleProxy;
   friend class vtkSMCompoundProxy;
   friend class vtkSMStateLoader;
+  friend class vtkSMDefaultStateLoader;
+  friend class vtkSMProxyRegisterUndoElement;
   friend class vtkSMProxyUnRegisterUndoElement;
-//ETX
 
   // Description:
   // Assigned by the XML parser. The name assigned in the XML
@@ -364,6 +367,14 @@ protected:
   // proxy.
   vtkSetStringMacro(XMLGroup);
 
+  // Description:
+  // It is possible to set the SelfID for a proxy. However then the setter
+  // has the responsiblity to ensure that the ID is going to be unique 
+  // for the lifetime of the proxy. Also the SelfID can be set, only before
+  // an ID was assigned to the proxy. This is used by vtkSMStateLoader
+  // and subclasses.
+  void SetSelfID(vtkClientServerID id);
+  
   // Description:
   // Given the number of objects (numObjects), class name (VTKClassName)
   // and server ids ( this->GetServerIDs()), this methods instantiates
@@ -404,7 +415,6 @@ protected:
   // Set the server connection id on self.
   void SetConnectionIDSelf(vtkIdType id);
 
-//BTX
   // Description:
   // This is a convenience method that pushes the value of one property
   // to one server alone. This is most commonly used by sub-classes
@@ -414,7 +424,6 @@ protected:
   void PushProperty(const char* name, 
                     vtkClientServerID id, 
                     vtkTypeUInt32 servers);
-//ETX
 
   // Description:
   // Cleanup code. Remove all observers from all properties assigned to
@@ -593,16 +602,16 @@ private:
   // IN PVEE ONLY
   // A proxy can be assigned a name. The name is used to
   // indentify the proxy when saving ServerManager state.
-  // By default the name is set to pvTemp{%d} where {%d} 
-  // gets substituted by the SelfID of the proxy.
+  // By default the name is set to the SelfID of the proxy.
   vtkSetStringMacro(Name);
-  //BTX
   // -- PVEE only
   friend class vtkWSMApplication;
-  //ETX
+
+  void RegisterSelfID();
 
   vtkSMProxy(const vtkSMProxy&); // Not implemented
   void operator=(const vtkSMProxy&); // Not implemented
+//ETX
 };
 
 #endif

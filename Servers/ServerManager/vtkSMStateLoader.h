@@ -51,7 +51,7 @@ public:
   // of existing properties. Newly created proxies are stored
   // in the map with the id as the key.
   virtual vtkSMProxy* NewProxy(int id);
-  vtkSMProxy* NewProxyFromElement(vtkPVXMLElement* proxyElement, int id);
+  virtual vtkSMProxy* NewProxyFromElement(vtkPVXMLElement* proxyElement, int id);
   
   // Description:
   // Get/Set the connection ID for the connection on which the state is

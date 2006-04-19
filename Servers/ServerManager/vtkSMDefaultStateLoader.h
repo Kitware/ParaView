@@ -36,6 +36,7 @@ public:
   // Either create a new proxy or returns an existing one.
   // The vtkProcessModule singleton is used to check if the proxy exists.
   virtual vtkSMProxy* NewProxy(int id);
+  virtual vtkSMProxy* NewProxyFromElement(vtkPVXMLElement* proxyElement, int id);
 protected:
   vtkSMDefaultStateLoader();
   ~vtkSMDefaultStateLoader();

@@ -24,7 +24,7 @@
 #include <vtksys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkSMMaterialLoaderProxy);
-vtkCxxRevisionMacro(vtkSMMaterialLoaderProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMMaterialLoaderProxy, "1.2");
 vtkCxxSetObjectMacro(vtkSMMaterialLoaderProxy, PropertyProxy, vtkSMProxy);
 
 //-----------------------------------------------------------------------------
@@ -44,7 +44,10 @@ void vtkSMMaterialLoaderProxy::LoadMaterial(const char* materialname)
 {
   if (!this->PropertyProxy)
     {
-    vtkErrorMacro("PropertyProxy must be set before LoadMaterial().");
+    if (materialname && materialname[0])
+      {
+      vtkErrorMacro("PropertyProxy must be set before LoadMaterial().");
+      }
     return;
     }
 

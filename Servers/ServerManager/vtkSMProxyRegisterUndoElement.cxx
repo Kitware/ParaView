@@ -15,15 +15,14 @@
 #include "vtkSMProxyRegisterUndoElement.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMDefaultStateLoader.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 
-#include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxyRegisterUndoElement);
-vtkCxxRevisionMacro(vtkSMProxyRegisterUndoElement, "1.1");
+vtkCxxRevisionMacro(vtkSMProxyRegisterUndoElement, "1.2");
 vtkCxxSetObjectMacro(vtkSMProxyRegisterUndoElement, XMLElement,
   vtkPVXMLElement);
 //-----------------------------------------------------------------------------
@@ -44,11 +43,18 @@ void vtkSMProxyRegisterUndoElement::ProxyToRegister(const char* groupname,
 {
   vtkPVXMLElement* pcElement = vtkPVXMLElement::New();
   pcElement->SetName("ProxyRegister");
-  pcElement->AddAttribute("xml_group_name", proxy->GetXMLGroup());
-  pcElement->AddAttribute("xml_proxy_name", proxy->GetXMLName());
+ 
+  // This will save the state for the proxy properties as well, which is unncessary.
+  // We only need the proxy state header. In future we may overload 
+  // vtkSMProxy::SaveState (or something) to not save the property states.
+  proxy->SaveState(pcElement);
+
   pcElement->AddAttribute("group_name", groupname);
   pcElement->AddAttribute("proxy_name", proxyname);
   pcElement->AddAttribute("id", proxy->GetSelfIDAsString());
+    //ID is also saved as part of proxy->SaveState(), but we save it here to make
+    //it easily accessible.
+  
   this->SetXMLElement(pcElement);
   pcElement->Delete();
 }
@@ -81,47 +87,38 @@ int vtkSMProxyRegisterUndoElement::Redo()
     vtkErrorMacro("No State present to redo.");
     return 0;
     }
+  
+  if (this->XMLElement->GetNumberOfNestedElements() != 1)
+    {
+    vtkErrorMacro("Invalid child elements. Cannot redo.");
+    return 0;
+    }
+
   vtkPVXMLElement* element = this->XMLElement;
   const char* group_name = element->GetAttribute("group_name");
   const char* proxy_name = element->GetAttribute("proxy_name");
-  const char* xml_group_name = element->GetAttribute("xml_group_name");
-  const char* xml_proxy_name = element->GetAttribute("xml_proxy_name");
- 
-  int int_id = 0;
-  element->GetScalarAttribute("id", &int_id);
-  vtkClientServerID proxyID;
-  proxyID.ID = static_cast<vtkTypeUInt32>(int_id);
-
-  if (!proxyID.ID)
+  int id = 0;
+  element->GetScalarAttribute("id",&id);
+  if (!id)
     {
-    vtkErrorMacro("No valid proxy ID present.");
+    vtkErrorMacro("Failed to locate proxy id.");
     return 0;
     }
-  
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(pm->GetObjectFromID(proxyID));
 
-  int created = 0;
+  vtkSMStateLoader* loader = vtkSMDefaultStateLoader::New();
+  loader->SetConnectionID(this->GetConnectionID());
+  vtkSMProxy* proxy = loader->NewProxyFromElement(
+    this->XMLElement->GetNestedElement(0), id);
+  loader->Delete();
+
   if (!proxy)
     {
-    // Create a new proxy.
-    proxy = pxm->NewProxy(xml_group_name, xml_proxy_name);
-    if (!proxy)
-      {
-      vtkErrorMacro("Failed to create proxy: " 
-        << (xml_group_name? xml_group_name: "(none)") << ", "
-        << (xml_proxy_name? xml_proxy_name: "(none)"));
-      return 0;
-      }
-    created = 1;
+    vtkErrorMacro("Failed to locate the proxy to register.");
+    return 0;
     }
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   pxm->RegisterProxy(group_name, proxy_name, proxy);
-  if (created)
-    {
-    proxy->Delete();
-    }
+  proxy->Delete();
   return 1;
 }
 

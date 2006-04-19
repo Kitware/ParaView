@@ -15,16 +15,14 @@
 #include "vtkSMProxyUnRegisterUndoElement.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMDefaultStateLoader.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 
-#include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkSMProxyUnRegisterUndoElement);
-vtkCxxRevisionMacro(vtkSMProxyUnRegisterUndoElement, "1.2");
+vtkCxxRevisionMacro(vtkSMProxyUnRegisterUndoElement, "1.3");
 vtkCxxSetObjectMacro(vtkSMProxyUnRegisterUndoElement, XMLElement, vtkPVXMLElement);
 //-----------------------------------------------------------------------------
 vtkSMProxyUnRegisterUndoElement::vtkSMProxyUnRegisterUndoElement()
@@ -46,47 +44,43 @@ int vtkSMProxyUnRegisterUndoElement::Undo()
     vtkErrorMacro("No proxy state available to undo deletion.");
     return 0;
     }
- 
+  
+  if (this->XMLElement->GetNumberOfNestedElements() != 1)
+    {
+    vtkErrorMacro("Invalid child elements. Cannot undo.");
+    return 0;
+    }
+
   vtkPVXMLElement* element = this->XMLElement;
   const char* group_name = element->GetAttribute("group_name");
   const char* proxy_name = element->GetAttribute("proxy_name");
- 
-  int int_id = 0;
-  element->GetScalarAttribute("id", &int_id);
-  vtkClientServerID proxyID;
-  proxyID.ID = static_cast<vtkTypeUInt32>(int_id);
-
-  if (!proxyID.ID)
+  int id = 0;
+  element->GetScalarAttribute("id",&id);
+  if (!id)
     {
-    vtkErrorMacro("No valid proxy ID present.");
+    vtkErrorMacro("Failed to locate proxy id.");
     return 0;
     }
-  
+
+  vtkSMStateLoader* loader = vtkSMDefaultStateLoader::New();
+  loader->SetConnectionID(this->GetConnectionID());
+  vtkSMProxy* proxy = loader->NewProxyFromElement(
+    this->XMLElement->GetNestedElement(0), id);
+  loader->Delete();
+
+  if (!proxy)
+    {
+    vtkErrorMacro("Failed to locate the proxy to register.");
+    return 0;
+    }
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(pm->GetObjectFromID(proxyID));
-  int created = 0;
-  if (!proxy)
-    {
-    vtkSMDefaultStateLoader* loader = vtkSMDefaultStateLoader::New();
-    proxy = loader->NewProxyFromElement(this->XMLElement, 0);
-    loader->Delete();
-    created = 1;
-    }
-  
-  if (!proxy)
-    {
-    vtkErrorMacro("Failed to locate proxy to register.");
-    return 0;
-    }
-  
   pxm->RegisterProxy(group_name, proxy_name, proxy);
-  if (created)
-    {
-    proxy->Delete();
-    }
-  return 1;  
+  // HACK: We note that the proxy is registered after its state has been 
+  // loaded as a result when the vtkSMUndoStack updates the modified proxies,
+  // this proxy is not going to be updated. Hence we Update it explicitly. 
+  proxy->UpdateVTKObjects();
+  proxy->Delete();
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -103,6 +97,8 @@ int vtkSMProxyUnRegisterUndoElement::Redo()
 
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   pxm->UnRegisterProxy(group_name, proxy_name);
+  
+  // Unregistering may trigger deletion of the proxy.
   return 1;
 }
 
@@ -118,13 +114,11 @@ void vtkSMProxyUnRegisterUndoElement::ProxyToUnRegister(const char* groupname,
   
   vtkPVXMLElement* pdElement = vtkPVXMLElement::New();
   pdElement->SetName("ProxyUnRegister");
-  pdElement->AddAttribute("group_name", proxyname);
-  pdElement->AddAttribute("proxy_name", groupname);
+  pdElement->AddAttribute("group_name", groupname);
+  pdElement->AddAttribute("proxy_name", proxyname);
   pdElement->AddAttribute("id", proxy->GetSelfIDAsString());
-
-  vtkPVXMLElement* proxyState = proxy->SaveState(NULL);
-  pdElement->AddNestedElement(proxyState);
-  proxyState->Delete();
+  
+  proxy->SaveState(pdElement);
   
   this->SetXMLElement(pdElement);
   pdElement->Delete();

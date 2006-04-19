@@ -14,12 +14,13 @@
 =========================================================================*/
 #include "vtkSMDefaultStateLoader.h"
 
+#include "vtkClientServerInterpreter.h"
 #include "vtkObjectFactory.h"
 #include "vtkProcessModule.h"
 #include "vtkSMProxy.h"
 
 vtkStandardNewMacro(vtkSMDefaultStateLoader);
-vtkCxxRevisionMacro(vtkSMDefaultStateLoader, "1.2");
+vtkCxxRevisionMacro(vtkSMDefaultStateLoader, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMDefaultStateLoader::vtkSMDefaultStateLoader()
 {
@@ -36,13 +37,42 @@ vtkSMProxy* vtkSMDefaultStateLoader::NewProxy(int id)
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerID csid;
   csid.ID = static_cast<vtkTypeUInt32>(id);
-  vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(pm->GetObjectFromID(csid));
+  vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(pm->GetInterpreter()->GetObjectFromID(csid, 1));
   if (proxy)
     {
     proxy->Register(this);
     return proxy;
     }
-  return this->Superclass::NewProxy(id);
+  vtkDebugMacro("Creating new proxy: " << id);
+  proxy = this->Superclass::NewProxy(id);
+  if (proxy)
+    {
+    proxy->SetSelfID(csid);
+    }
+  return proxy;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* vtkSMDefaultStateLoader::NewProxyFromElement(
+  vtkPVXMLElement* proxyElement, int id)
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkClientServerID csid;
+  csid.ID = static_cast<vtkTypeUInt32>(id);
+  vtkSMProxy* proxy = vtkSMProxy::SafeDownCast(
+    pm->GetInterpreter()->GetObjectFromID(csid, 1));
+  if (proxy)
+    {
+    proxy->Register(this);
+    return proxy;
+    }
+  vtkDebugMacro("Creating new proxy: " << id);
+  proxy = this->Superclass::NewProxyFromElement(proxyElement, id);
+  if (proxy)
+    {
+    proxy->SetSelfID(csid);
+    } 
+  return proxy;
 }
 
 //-----------------------------------------------------------------------------
