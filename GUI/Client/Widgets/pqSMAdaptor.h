@@ -132,7 +132,7 @@ private:
   QVariant getProperty(vtkSMProxy* Proxy, vtkSMProperty* Property);
   void setProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index, QVariant QtProperty);
   QVariant getProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index);
-  QVariant pqSMAdaptor::getPropertyDomain(vtkSMProperty* Property);
+  QVariant getPropertyDomain(vtkSMProperty* Property);
 public:
 
   // Property Linking
