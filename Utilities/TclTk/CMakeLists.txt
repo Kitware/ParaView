@@ -48,27 +48,27 @@ IF(UNIX)
     SET(TCL_TCLSH "TCL_TCLSH-NOTFOUND" CACHE FILEPATH "Tcl SH" FORCE)
   ENDIF(SAME_TCL_DIR)
 
-  SET(TCL_LIBRARY ${TclTk_BINARY_DIR_TCLBIN}/libtcl8.4${TCLTK_DEBUG_EXT}.a 
+  SET(TCL_LIBRARY "${TclTk_BINARY_DIR_TCLBIN}/libtcl8.4${TCLTK_DEBUG_EXT}.a "
     CACHE INTERNAL "Path to tcl library" FORCE)
   SET(TCL_STUB_LIBRARY 
-    ${TclTk_BINARY_DIR_TCLBIN}/libtclstub8.4${TCLTK_DEBUG_EXT}.a 
+    "${TclTk_BINARY_DIR_TCLBIN}/libtclstub8.4${TCLTK_DEBUG_EXT}.a"
     CACHE INTERNAL "Path to tcl stub library" FORCE)
-  SET(TCL_INCLUDE_PATH ${TclTk_SOURCE_DIR}/tcl8.4.5/generic 
+  SET(TCL_INCLUDE_PATH "${TclTk_SOURCE_DIR}/tcl8.4.5/generic"
     CACHE INTERNAL "Path to tcl include" FORCE)
-  SET(TK_LIBRARY ${TclTk_BINARY_DIR_TKBIN}/libtk8.4${TCLTK_DEBUG_EXT}.a 
+  SET(TK_LIBRARY "${TclTk_BINARY_DIR_TKBIN}/libtk8.4${TCLTK_DEBUG_EXT}.a"
     CACHE INTERNAL "Path to tk library" FORCE)
-  SET(TK_STUB_LIBRARY 
-    ${TclTk_BINARY_DIR_TKBIN}/libtkstub8.4${TCLTK_DEBUG_EXT}.a 
+  SET(TK_STUB_LIBRARY
+    "${TclTk_BINARY_DIR_TKBIN}/libtkstub8.4${TCLTK_DEBUG_EXT}.a"
     CACHE INTERNAL "Path to tk stub library" FORCE)
-  SET(TK_INCLUDE_PATH ${TclTk_SOURCE_DIR}/tk8.4.5/generic 
+  SET(TK_INCLUDE_PATH "${TclTk_SOURCE_DIR}/tk8.4.5/generic"
     CACHE INTERNAL "Path to tk include" FORCE)
   FIND_PACKAGE(X11)
   GET_FILENAME_COMPONENT(TCL_X11_LIBRARY_PATH "${X11_X11_LIB}" PATH)
 
-  CONFIGURE_FILE(${TclTk_SOURCE_DIR}/configure_tcltk.sh.in
-    ${TclTk_BINARY_DIR}/configure_tcltk.sh IMMEDIATE @ONLY)
-  CONFIGURE_FILE(${TclTk_SOURCE_DIR}/build_tcltk.sh.in
-    ${TclTk_BINARY_DIR}/build_tcltk.sh IMMEDIATE @ONLY)
+  CONFIGURE_FILE("${TclTk_SOURCE_DIR}/configure_tcltk.sh.in"
+    "${TclTk_BINARY_DIR}/configure_tcltk.sh" IMMEDIATE @ONLY)
+  CONFIGURE_FILE("${TclTk_SOURCE_DIR}/build_tcltk.sh.in"
+    "${TclTk_BINARY_DIR}/build_tcltk.sh" IMMEDIATE @ONLY)
 
   IF(RUN_CONFIGURE)
     EXEC_PROGRAM( "/bin/sh \"${TclTk_BINARY_DIR}/configure_tcltk.sh\"")
