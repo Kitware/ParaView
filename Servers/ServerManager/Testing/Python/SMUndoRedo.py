@@ -16,7 +16,7 @@ else:
 
 def RenderAndWait(ren):
   ren.StillRender()
-  time.sleep(.5)
+  #time.sleep(.5)
 
 
 SMPythonTesting.ProcessCommandLineArguments()
@@ -27,6 +27,7 @@ SMPythonTesting.LoadServerManagerState(pvsm_file)
 
 pxm = vtkSMObject.GetProxyManager()
 renModule = pxm.GetProxy("rendermodules", "RenderModule0")
+renModule.UpdateVTKObjects()
 
 undoStack = vtkSMUndoStack()
 pxm.SetUndoStack(undoStack)
@@ -34,66 +35,90 @@ pxm.SetUndoStack(undoStack)
 self_cid = vtkProcessModuleConnectionManager.GetSelfConnectionID()
   
 proxy = pxm.NewProxy("sources","SphereSource")
+proxy.UnRegister(None)
 proxy2 = pxm.NewProxy("sources","CubeSource")
+proxy2.UnRegister(None)
+
 filter = pxm.NewProxy("filters", "ElevationFilter")
-
+filter.UnRegister(None)
 display = renModule.CreateDisplayProxy()
-
-undoStack.BeginUndoSet(self_cid, "Create")
+display.UnRegister(None)
+ 
+undoStack.BeginUndoSet(self_cid, "CreateFilter")
 pxm.RegisterProxy("mygroup", "sphere", proxy)
 pxm.RegisterProxy("mygroup", "cube", proxy2)
-pxm.RegisterProxy("displays", "sphereDisplay", display)
 pxm.RegisterProxy("filters", "elevationFilter", filter)
+undoStack.EndUndoSet()
 
-proxy.UnRegister(None)
-proxy2.UnRegister(None)
-display.UnRegister(None)
-filter.UnRegister(None)
-
+undoStack.BeginUndoSet(self_cid, "FilterInput")
 filter.GetProperty("Input").AddProxy(proxy)
 filter.UpdateVTKObjects()
+undoStack.EndUndoSet()
+  
+undoStack.BeginUndoSet(self_cid, "CreateDisplay")
+pxm.RegisterProxy("displays", "sphereDisplay", display)
+undoStack.EndUndoSet()
+
+undoStack.BeginUndoSet(self_cid, "SetupDisplay")
 display.GetProperty("Input").AddProxy(filter)
 display.GetProperty("Representation").SetElement(0, 2)
 display.UpdateVTKObjects()
+undoStack.EndUndoSet()
 
-renModule.UpdateVTKObjects()
-
+undoStack.BeginUndoSet(self_cid, "AddDisplay")
 renModule.GetProperty("Displays").AddProxy(display)
 renModule.UpdateVTKObjects()
-
 undoStack.EndUndoSet()
-pxm.UpdateRegisteredProxies(0)
-renModule.StillRender()
+
+undoStack.BeginUndoSet(self_cid, "RemoveDisplay")
+renModule.GetProperty("Displays").RemoveProxy(display)
+renModule.UpdateVTKObjects()
+pxm.UnRegisterProxy("displays", "sphereDisplay")
+undoStack.EndUndoSet()
+
+undoStack.BeginUndoSet(self_cid, "CleanupSources")
+pxm.UnRegisterProxy("filters", "elevationFilter")
+pxm.UnRegisterProxy("mygroup", "sphere")
+pxm.UnRegisterProxy("mygroup", "cube")
+undoStack.EndUndoSet()
+#
+# Release all references to the objects we created, only the Proxy manager
+# now keeps a reference to these proxies. This ensures that unregister
+# deletes the proxies...this will check the proxy creation code in the
+# undo/redo elements.
+del proxy
+del display
+del proxy2
+del filter
+
+RenderAndWait(renModule)
+
+while undoStack.GetNumberOfUndoSets() > 0:
+  print "**** Undo: %s" % undoStack.GetUndoSetLabel(0)
+  undoStack.Undo()
+  pxm.UpdateRegisteredProxies(0)
+  RenderAndWait(renModule)
   
-undoStack.BeginUndoSet(self_cid, "Pipeline")
-filter.GetProperty("Input").SetProxy(0, proxy2)
-filter.UpdateVTKObjects()
-undoStack.EndUndoSet()
- 
-# We will uncomment this one vtkSMProxy can be created with fixed IDs.
-#del proxy
-#del display
-#del proxy2
-#del filter
+while undoStack.GetNumberOfRedoSets() > 0:
+  print "**** Redo: %s" % undoStack.GetRedoSetLabel(0)
+  undoStack.Redo()
+  pxm.UpdateRegisteredProxies(0)
+  RenderAndWait(renModule)
 
-RenderAndWait(renModule)
-
-print "Undoing.....(2)"
+# Undo cleanup to test baseline.
+print "**** Undo: %s" % undoStack.GetUndoSetLabel(0)
 undoStack.Undo()
+print "**** Redo: %s" % undoStack.GetRedoSetLabel(0)
+undoStack.Redo()
+print "**** Undo: %s" % undoStack.GetUndoSetLabel(0)
 undoStack.Undo()
-RenderAndWait(renModule)
-
-print "Redoing.....(2)"
-undoStack.Redo()
-undoStack.Redo()
-RenderAndWait(renModule)
-
-print "Undoing.....(1)"
+print "**** Undo: %s" % undoStack.GetUndoSetLabel(0)
 undoStack.Undo()
 RenderAndWait(renModule)
 
 if not SMPythonTesting.DoRegressionTesting():
   # This will lead to VTK object leaks.
   sys.exit(1)
+  pass
 
 

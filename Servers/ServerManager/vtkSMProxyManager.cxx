@@ -21,6 +21,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMCompoundProxy.h"
 #include "vtkSMCompoundProxyDefinitionLoader.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMProperty.h"
@@ -82,7 +83,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.37");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.38");
 vtkCxxSetObjectMacro(vtkSMProxyManager, UndoStack, vtkSMUndoStack);
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -955,7 +956,15 @@ vtkSMCompoundProxy* vtkSMProxyManager::NewCompoundProxy(const char* name)
     }
   vtkSMCompoundProxyDefinitionLoader* loader = 
     vtkSMCompoundProxyDefinitionLoader::New();
-  return loader->LoadDefinition(definition);
+  vtkSMCompoundProxy* cproxy = loader->LoadDefinition(definition);
+  if (cproxy)
+    {
+    // Since this Compound proxy was created using a definition, we set
+    // the XMLName on the CP to denote the name of the definition from
+    // which it was created.
+    cproxy->SetXMLName(name);
+    }
+  return cproxy;
 }
 
 //---------------------------------------------------------------------------

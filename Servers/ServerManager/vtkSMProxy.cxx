@@ -35,7 +35,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.68");
+vtkCxxRevisionMacro(vtkSMProxy, "1.69");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -180,13 +180,21 @@ const char* vtkSMProxy::GetSelfIDAsString()
 }
 
 //---------------------------------------------------------------------------
-vtkClientServerID vtkSMProxy::GetSelfID()
+void vtkSMProxy::SetSelfID(vtkClientServerID id)
 {
   if (this->SelfID.ID != 0)
     {
-    return this->SelfID;
+    vtkErrorMacro("Cannot change the SelfID after the proxy object"
+      " has been assigned an ID.");
+    return;
     }
-  
+  this->SelfID = id;
+  this->RegisterSelfID();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::RegisterSelfID()
+{
   // Assign a unique clientserver id to this object.
   // Note that this ups the reference count to 2.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
@@ -195,10 +203,8 @@ vtkClientServerID vtkSMProxy::GetSelfID()
     vtkErrorMacro("Can not fully initialize without a global "
       "ProcessModule. This object will not be fully "
       "functional.");
-    return this->SelfID;
+    return ;
     }
-
-  this->SelfID = pm->GetUniqueID();
   
   vtkClientServerStream initStream;
   initStream << vtkClientServerStream::Assign 
@@ -209,7 +215,7 @@ vtkClientServerID vtkSMProxy::GetSelfID()
   // This is done to make the last result message release it's reference 
   // count. Otherwise the object has a reference count of 3.
   pm->GetInterpreter()->ClearLastResult();
-  
+
   if (!this->Name) 
     {
     ostrstream str;
@@ -217,6 +223,26 @@ vtkClientServerID vtkSMProxy::GetSelfID()
     this->SetName(str.str());
     delete[] str.str();
     }
+}
+
+//---------------------------------------------------------------------------
+vtkClientServerID vtkSMProxy::GetSelfID()
+{
+  if (this->SelfID.ID != 0)
+    {
+    return this->SelfID;
+    }
+  
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (!pm)
+    {
+    vtkErrorMacro("Can not fully initialize without a global "
+      "ProcessModule. This object will not be fully "
+      "functional.");
+    return this->SelfID;
+    }
+  this->SelfID = pm->GetUniqueID();
+  this->RegisterSelfID();  
   return this->SelfID;
 }
 
