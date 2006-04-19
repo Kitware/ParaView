@@ -222,7 +222,8 @@ public:
   // Use GetNumberOfPartitions(vtkIdType id) with appropriate connection
   // Id to get the number of server partition. This method simply returns the number
   // of partition on the local process.
-  // TODO: is this needed anymore.
+  // NOTE: If this method is called on the client it is equivalent to
+  // GetNumberOfPartitions(vtkProcessModuleConnectionManager::GetRootServerConnectionID()).
   virtual int GetNumberOfPartitions();
   
   // Description:
