@@ -19,7 +19,7 @@
 
 
 vtkStandardNewMacro(vtkUndoStack);
-vtkCxxRevisionMacro(vtkUndoStack, "1.2");
+vtkCxxRevisionMacro(vtkUndoStack, "1.3");
 //-----------------------------------------------------------------------------
 vtkUndoStack::vtkUndoStack()
 {
@@ -60,6 +60,7 @@ const char* vtkUndoStack::GetUndoSetLabel(unsigned int position)
     {
     return NULL;
     }
+  position = (this->Internal->UndoStack.size() - position) -1;
   return this->Internal->UndoStack[position].Label.c_str();
 }
 
@@ -70,6 +71,7 @@ const char* vtkUndoStack::GetRedoSetLabel(unsigned int position)
     {
     return NULL;
     }
+  position = (this->Internal->RedoStack.size() - position) -1;
   return this->Internal->RedoStack[position].Label.c_str();
 }
 
