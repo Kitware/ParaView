@@ -41,7 +41,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QObject;
 class pqWidgetEventPlayer;
 
-/// Manages translation of high-level ParaQ events to low-level Qt events, for playback of test-cases, demos, tutorials, etc.
+/**
+Manages playback of test-cases, demos, tutorials, etc.
+pqEventPlayer converts high-level ParaQ events (button click, row selection, etc) into low-level Qt events that drive the user interface.
+The high-level events created by pqEventTranslator are fed to pqEventPlayer::playEvent() one-by-one, which passes each event through a collection of
+pqWidgetEventPlayer objects.  Once a pqWidgetEventPlayer accepts the event and updates Qt, playEvent() returns, ready for the next high-level event.
+
+pqEventPlayerXML is an example of an object that can retrieve high-level events from a file, feeding them to pqEventPlayer.
+
+For specialized Qt widgets it may be necessary to create "custom" pqWidgetEventPlayer derivatives, which can be added to pqEventPlayer using the
+addWidgetEventPlayer() method.  pqWidgetEventPlayer objects are searched in order for event playback, so you can also use this mechanism to
+"override" the builtin event players.
+
+\sa pqWidgetEventPlayer, pqEventTranslator, pqEventPlayerXML
+*/
+
 class QTTESTING_EXPORT pqEventPlayer
 {
 public:

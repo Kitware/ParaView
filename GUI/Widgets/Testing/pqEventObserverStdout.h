@@ -35,7 +35,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 
-/// Observes high-level ParaQ "events" and writes them to stdout, mainly for debugging purposes
+/**
+Observes high-level ParaQ "events" and writes them to stdout, mainly for debugging purposes.
+To use, connect the onRecordEvent() slot to the pqEventTranslator::recordEvent() signal.
+
+\sa pqEventTranslator, pqEventObserverXML
+*/
+
 class pqEventObserverStdout :
   public QObject
 {

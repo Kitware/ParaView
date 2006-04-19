@@ -35,7 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 
-/// Abstract interface for an object that can translate low-level Qt events into high-level, serializable ParaQ events, for test-cases, demos, tutorials, etc.
+/**
+Abstract interface for an object that can translate low-level Qt events into high-level, serializable ParaQ events, for test-cases, demos, tutorials, etc.
+
+\sa pqEventTranslator
+*/
 class pqWidgetEventTranslator :
   public QObject
 {

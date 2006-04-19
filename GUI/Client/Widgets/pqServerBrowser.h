@@ -40,7 +40,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace Ui { class pqServerBrowser; }
 class pqServer;
 
-/// Provides a user-interface component for creating server connections
+/**
+Provides a user-interface component for creating server connections.
+
+To use, create an instance of pqServerBrowser, and connect its serverConnected()
+method to a slot.  If the user selects a server and a connection is established,
+the slot will be called with the new pqServer object that encapsulates the connection.
+
+\sa pqServer
+*/
+
 class PQWIDGETS_EXPORT pqServerBrowser :
   public QDialog
 {

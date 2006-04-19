@@ -37,7 +37,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqMenuEventTranslatorAdaptor;
 
-/// Translates low-level Qt action events into high-level ParaQ events that can be recorded as test cases
+/**
+Translates low-level Qt events into high-level ParaQ events that can be recorded as test cases.
+
+\sa pqEventTranslator
+*/
+
 class pqMenuEventTranslator :
   public pqWidgetEventTranslator
 {

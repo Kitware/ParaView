@@ -39,7 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkProcessModule;
 class pqServer;
 
-/// Implementation of pqFileDialogModel that allows remote browsing of a connected ParaView server's filesystem
+/**
+Implementation of pqFileDialogModel that allows remote browsing of a connected ParaView server's filesystem.
+
+To use, pass a new instance of pqServerFileDialogModel to pqFileDialog object.
+
+\sa pqFileDialogModel, pqLocalFileDialogModel, pqFileDialog
+*/
 class PQWIDGETS_EXPORT pqServerFileDialogModel :
   public pqFileDialogModel
 {

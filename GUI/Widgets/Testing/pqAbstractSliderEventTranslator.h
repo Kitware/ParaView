@@ -35,7 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqWidgetEventTranslator.h"
 
-/// Translates low-level Qt slider events into high-level ParaQ events that can be recorded as test cases
+/**
+Translates low-level Qt events into high-level ParaQ events that can be recorded as test cases.
+
+\sa pqEventTranslator
+*/
+
 class pqAbstractSliderEventTranslator :
   public pqWidgetEventTranslator
 {

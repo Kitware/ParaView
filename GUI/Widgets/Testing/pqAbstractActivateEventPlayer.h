@@ -35,7 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqWidgetEventPlayer.h"
 
-/// Translates high-level ParaQ events into low-level Qt action events
+/**
+Concrete implementation of pqWidgetEventPlayer that handles playback of "activate" events for buttons and menus.
+
+\sa pqEventPlayer
+*/
 class pqAbstractActivateEventPlayer :
   public pqWidgetEventPlayer
 {

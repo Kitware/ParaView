@@ -36,7 +36,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <vtkIOStream.h>
 
-/// Observes high-level ParaQ events, and serializes them as XML for possible playback (as a test-case, demo, tutorial, etc)
+/**
+Observes high-level ParaQ events, and serializes them to a stream as XML for possible playback (as a test-case, demo, tutorial, etc).
+To use, connect the onRecordEvent() slot to the pqEventTranslator::recordEvent() signal.
+
+\note Output is sent to the stream when this object is initialized, and when it is destroyed, so you must ensure that this object
+goes out of scope before trying to playback the stream.
+
+\sa pqEventObserverStdout, pqEventTranslator, pqEventPlayerXML
+*/
+
 class pqEventObserverXML :
   public QObject
 {

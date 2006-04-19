@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   with an interactive Python console where they can enter Python commands
   manually and see the corresponding output.
   
-  /sa pqPythonShell, pqConsoleWidget
+  \sa pqPythonShell, pqConsoleWidget
 */
 
 class QTPYTHON_EXPORT pqPythonDialog :

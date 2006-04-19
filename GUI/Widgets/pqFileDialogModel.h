@@ -42,7 +42,7 @@ class QString;
 
 /**
   Abstract interface to a file-browsing "back-end" that can be used by the pqFileDialog "front-end".
-  /sa pqFileDialog, pqLocalFileDialogModel, pqServerFileDialogModel
+  \sa pqFileDialog, pqLocalFileDialogModel, pqServerFileDialogModel
 */  
   
 class QTWIDGETS_EXPORT pqFileDialogModel :

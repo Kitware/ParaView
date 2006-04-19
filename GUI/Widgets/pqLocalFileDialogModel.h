@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
   Implementation of pqFileDialogModel that provides browsing capabilities for the local filesystem.
   
-  /sa pqFileDialogModel, pqFileDialog, pqServerFileDialogModel
+  \sa pqFileDialogModel, pqFileDialog, pqServerFileDialogModel
 */
 
 class QTWIDGETS_EXPORT pqLocalFileDialogModel :

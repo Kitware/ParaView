@@ -36,7 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QObject;
 class QString;
 
-/// Abstract interface for an object that can playback high-level ParaQ events by translating them into low-level Qt events, for test-cases, demos, tutorials, etc.
+/**
+Abstract interface for an object that can playback high-level ParaQ events by translating them into low-level Qt events, for test-cases, demos, tutorials, etc.
+
+\sa pqEventPlayer
+*/
+
 class pqWidgetEventPlayer
 {
 public:

@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   You can put an instance of pqPythonShell in a dialog or a window, and the user will be able
   to enter Python commands and see their output, while the UI is still responsive.
   
-  /sa pqConsoleWidget, pqPythonDialog
+  \sa pqConsoleWidget, pqPythonDialog
 */  
   
 class QTPYTHON_EXPORT pqPythonShell :

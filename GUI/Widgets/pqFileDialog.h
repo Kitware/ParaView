@@ -51,7 +51,7 @@ class QModelIndex;
   dialog << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(onOpenSessionFile(const QStringList&)));
   /endcode
   
-  /sa pqLocalFileDialogModel, pqServerFileDialogModel
+  \sa pqLocalFileDialogModel, pqServerFileDialogModel
 */
 
 class QTWIDGETS_EXPORT pqFileDialog :

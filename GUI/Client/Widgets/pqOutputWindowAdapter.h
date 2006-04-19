@@ -38,7 +38,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkOutputWindow.h>
 #include <QObject>
 
-/// vtkOutputWindow implementation that converts VTK output messages into Qt signals
+/**
+vtkOutputWindow implementation that converts VTK output messages into Qt signals.
+
+To use, create an instance of pqOutputWindowAdapter and pass it to the
+vtkOutputWindow::setInstance() static method.
+
+\sa pqOutputWindow
+*/
 class PQWIDGETS_EXPORT pqOutputWindowAdapter :
   public QObject,
   public vtkOutputWindow

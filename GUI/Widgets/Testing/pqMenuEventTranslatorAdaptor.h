@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QAction;
 
+/// Private helper class for pqMenuEventTranslator
 class pqMenuEventTranslatorAdaptor :
   public QObject
 {

@@ -37,7 +37,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqWidgetEventTranslator;
 
-/// Manages translation of low-level Qt events to high-level ParaQ events that can be serialized as test-cases, demos, tutorials, etc.
+/**
+Manages serialization of user interaction for test-cases, demos, tutorials, etc.
+pqEventTranslator installs itself as a global Qt event "filter" that receives notification of every Qt event.  Each event is passed
+through a collection of pqWidgetEventTranslator objects, until one of them "handles" the event.  The pqWidgetEventTranslator objects
+convert low-level Qt events (mouse move, button down, key released, etc) into high-level ParaQ events (button clicked, row selected, etc)
+that can be serialized as text.  Once an event translator is found, the recordEvent() signal is emitted with the name of the widget
+that is receiving the event, plus the serialized event.  Observers such as pqEventObserverXML connect to the recordEvent() signal and
+handle storage of the events.
+
+\sa pqWidgetEventTranslator, pqEventObserverStdout, pqEventObserverXML, pqEventPlayer.
+*/
 class pqEventTranslator :
   public QObject
 {
@@ -47,12 +57,15 @@ public:
   pqEventTranslator();
   ~pqEventTranslator();
 
-  /// Adds the default set of widget translators to the working set.  Translators are executed in order, so you may call addWidgetEventTranslator() before this function to "override" the default translators
+  /**
+  Adds the default set of widget translators to the working set.  Translators are executed in order, so you may call
+  addWidgetEventTranslator() with your own custom translators before calling this method, to "override" the default translators.
+  */
   void addDefaultWidgetEventTranslators();
   /// Adds a new translator to the current working set of widget translators.  pqEventTranslator assumes control of the lifetime of the supplied object.
   void addWidgetEventTranslator(pqWidgetEventTranslator*);
 
-  /// Adds an object to a list of objects that should be ignored when translating events (useful to prevent recording UI events from being captured as part of the recording)
+  /// Adds a Qt object to a list of objects that should be ignored when translating events (useful to prevent recording UI events from being captured as part of the recording)
   void ignoreObject(QObject* Object);
 
 signals:
@@ -73,4 +86,3 @@ private:
 };
 
 #endif // !_pqEventTranslator_h
-

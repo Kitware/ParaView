@@ -35,7 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqWidgetEventPlayer.h"
 
-/// Translates high-level ParaQ events into low-level Qt slider events
+/**
+Concrete implementation of pqWidgetEventPlayer that translates high-level ParaQ events into low-level Qt events.
+
+\sa pqEventPlayer
+*/
+
 class pqAbstractDoubleEventPlayer :
   public pqWidgetEventPlayer
 {
