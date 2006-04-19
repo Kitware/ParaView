@@ -83,7 +83,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.38");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.39");
 vtkCxxSetObjectMacro(vtkSMProxyManager, UndoStack, vtkSMUndoStack);
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -954,9 +954,11 @@ vtkSMCompoundProxy* vtkSMProxyManager::NewCompoundProxy(const char* name)
     {
     return 0;
     }
+  // TODO: ConnectionID....it needs to be set as constituent proxies are created.
   vtkSMCompoundProxyDefinitionLoader* loader = 
     vtkSMCompoundProxyDefinitionLoader::New();
   vtkSMCompoundProxy* cproxy = loader->LoadDefinition(definition);
+  loader->Delete();
   if (cproxy)
     {
     // Since this Compound proxy was created using a definition, we set
