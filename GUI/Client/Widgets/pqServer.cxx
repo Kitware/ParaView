@@ -197,6 +197,7 @@ void pqServer::CreateRenderModule()
   render_module->SetRenderModuleName(renderModuleName);
   render_module->UpdateVTKObjects();
   this->RenderModule = render_module;
+  render_module->Delete();
 }
 
 //-----------------------------------------------------------------------------
