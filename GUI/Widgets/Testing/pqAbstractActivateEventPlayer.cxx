@@ -92,9 +92,12 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object, const QString& Co
               
               if(actions[j]->menu() == submenu)
                 {
-                QMouseEvent event(QEvent::MouseMove, menu->actionGeometry(actions[j]).center(), Qt::NoButton, 0, 0);
-                QApplication::sendEvent(menu, &event);
-                QApplication::sendEvent(menu, &event);
+                QMouseEvent button_press(QEvent::MouseButtonPress, menu->actionGeometry(actions[j]).center(), Qt::LeftButton, Qt::LeftButton, 0);
+                QApplication::sendEvent(menu, &button_press);
+                
+                QMouseEvent button_release(QEvent::MouseButtonRelease, menu->actionGeometry(actions[j]).center(), Qt::LeftButton, 0, 0);
+                QApplication::sendEvent(menu, &button_release);
+
                 while(!submenu->isVisible())
                   pqTesting::NonBlockingSleep(100);
                 break;
