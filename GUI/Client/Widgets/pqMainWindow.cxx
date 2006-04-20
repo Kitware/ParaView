@@ -37,8 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMultiViewManager.h"
 #include "pqNameCount.h"
 #include "pqObjectInspectorWidget.h"
-#include "pqOutputWindow.h"
-#include "pqOutputWindowAdapter.h"
 #include "pqParts.h"
 #include "pqPicking.h"
 #include "pqPipelineData.h"
@@ -114,8 +112,6 @@ class pqMainWindow::pqImplementation
 {
 public:
   pqImplementation() :
-    OutputWindowAdapter(vtkSmartPointer<pqOutputWindowAdapter>::New()),
-    OutputWindow(new pqOutputWindow(0)),
     FileMenu(0),
     ViewMenu(0),
     ServerMenu(0),
@@ -141,16 +137,6 @@ public:
     Inspector(0),
     UndoStack(0)
   {
-    // Redirect Qt debug output to VTK ...
-    qInstallMsgHandler(QtMessageOutput);
-    
-    // Redirect VTK debug output to our window ...
-    this->OutputWindow->connect(this->OutputWindowAdapter, SIGNAL(displayText(const QString&)), this->OutputWindow, SLOT(onDisplayText(const QString&)));
-    this->OutputWindow->connect(this->OutputWindowAdapter, SIGNAL(displayErrorText(const QString&)), this->OutputWindow, SLOT(onDisplayErrorText(const QString&)));
-    this->OutputWindow->connect(this->OutputWindowAdapter, SIGNAL(displayWarningText(const QString&)), this->OutputWindow, SLOT(onDisplayWarningText(const QString&)));
-    this->OutputWindow->connect(this->OutputWindowAdapter, SIGNAL(displayGenericWarningText(const QString&)), this->OutputWindow, SLOT(onDisplayGenericWarningText(const QString&)));
-    vtkOutputWindow::SetInstance(OutputWindowAdapter);
-
     this->UndoStack = vtkSMUndoStack::New();
     vtkSMProxyManager::GetProxyManager()->SetUndoStack(this->UndoStack);
   }
@@ -181,35 +167,9 @@ public:
     delete this->Adaptor;
     this->Adaptor = 0;
     
-    delete this->OutputWindow;
-
     this->UndoStack->Delete();
     this->UndoStack = 0;
   }
-
-  static void QtMessageOutput(QtMsgType type, const char *msg)
-  {
-    switch(type)
-      {
-      case QtDebugMsg:
-        vtkOutputWindow::GetInstance()->DisplayText(msg);
-        break;
-      case QtWarningMsg:
-        vtkOutputWindow::GetInstance()->DisplayWarningText(msg);
-        break;
-      case QtCriticalMsg:
-        vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
-        break;
-      case QtFatalMsg:
-        vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
-        break;
-      }
-  }
-    
-  /// Converts VTK debug output into Qt signals
-  vtkSmartPointer<pqOutputWindowAdapter> OutputWindowAdapter;
-  /// Displays VTK debug output in a console window
-  pqOutputWindow* const OutputWindow;
 
   // Stores standard menus
   QMenu* FileMenu;
@@ -621,12 +581,6 @@ void pqMainWindow::addStandardDockWidget(Qt::DockWidgetArea area, QDockWidget* d
   this->Implementation->DockWidgetVisibleActions[dockwidget] = action;
     
   dockwidget->installEventFilter(this);
-}
-
-void pqMainWindow::disableOutputWindow()
-{
-  this->Implementation->OutputWindowAdapter = vtkSmartPointer<pqOutputWindowAdapter>::New();
-  vtkOutputWindow::SetInstance(this->Implementation->OutputWindowAdapter);
 }
 
 bool pqMainWindow::eventFilter(QObject* watched, QEvent* e)

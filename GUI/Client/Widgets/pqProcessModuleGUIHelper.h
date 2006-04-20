@@ -55,7 +55,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /// Get the main window for the application.
-  pqMainWindow* getWindow(){ return this->Window;}
+  pqMainWindow* getWindow();
 
   /// Start the GUI event loop.
   virtual int RunGUIStart(int argc, char** argv, int numServerProcs, int myId);
@@ -77,6 +77,9 @@ public:
   // Get the application singleton. 
   QApplication* GetApplication();
 
+  /// Dangerous option that disables the debug output window, intended for demo purposes only
+  void disableOutputWindow();
+
 protected:
   pqProcessModuleGUIHelper(); 
   ~pqProcessModuleGUIHelper(); 
@@ -93,10 +96,9 @@ private:
   /// subclass of pqMainWindow as the Main Window.
   virtual pqMainWindow* CreateMainWindow() = 0;
   
-  QApplication* Application;
-  pqMainWindow* Window;
-  vtkSMApplication* SMApplication;
-
+  class pqImplementation;
+  pqImplementation* const Implementation;
+  
   pqProcessModuleGUIHelper(pqProcessModuleGUIHelper&); // Not implemented.
   void operator=(const pqProcessModuleGUIHelper&); // Not implemented.
 };

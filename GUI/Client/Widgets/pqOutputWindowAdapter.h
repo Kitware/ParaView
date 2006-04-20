@@ -56,6 +56,15 @@ public:
   static pqOutputWindowAdapter *New();
   vtkTypeRevisionMacro(pqOutputWindowAdapter, vtkOutputWindow);
 
+  /// Returns the number of text messages received
+  const unsigned int getTextCount();
+  /// Returns the number of error messages received
+  const unsigned int getErrorCount();
+  /// Returns the number of warning messages received
+  const unsigned int getWarningCount();
+  /// Returns the number of generic warning messages received
+  const unsigned int getGenericWarningCount();
+
 signals:
   /// Signal emitted by VTK messages
   void displayText(const QString&);
@@ -67,13 +76,20 @@ signals:
   void displayGenericWarningText(const QString&);
   
 private:
+  pqOutputWindowAdapter();
+  pqOutputWindowAdapter(const pqOutputWindowAdapter&);
+  pqOutputWindowAdapter& operator=(const pqOutputWindowAdapter&);
+  ~pqOutputWindowAdapter();
+
+  unsigned int TextCount;
+  unsigned int ErrorCount;
+  unsigned int WarningCount;
+  unsigned int GenericWarningCount;
+
   virtual void DisplayText(const char*);
   virtual void DisplayErrorText(const char*);
   virtual void DisplayWarningText(const char*);
   virtual void DisplayGenericWarningText(const char*);
-  
-  pqOutputWindowAdapter();
-  ~pqOutputWindowAdapter();
 };
 
 #endif // !_pqOutputWindowAdapter_h

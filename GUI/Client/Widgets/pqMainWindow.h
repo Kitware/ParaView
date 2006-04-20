@@ -124,9 +124,6 @@ public:
   /// Compares the contents of the window with the given reference image, returns true iff they "match" within some tolerance
   bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
 
-  /// Dangerous option that disables the debug output window, intended for demo purposes only
-  void disableOutputWindow();
-  
   virtual bool eventFilter(QObject* watched, QEvent* e);
 
 signals:

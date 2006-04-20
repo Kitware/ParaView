@@ -35,46 +35,104 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqEventPlayerXML.h"
 #include "pqMainWindow.h"
 #include "pqOptions.h"
-#include "vtkObjectFactory.h"
-#include "vtkProcessModule.h"
-#include "vtkSMApplication.h"
-#include "vtkSMProperty.h"
+#include "pqOutputWindow.h"
+#include "pqOutputWindowAdapter.h"
 
 #include <pqObjectNaming.h>
 
+#include <vtkObjectFactory.h>
+#include <vtkProcessModule.h>
+#include <vtkSMApplication.h>
+#include <vtkSMProperty.h>
+#include <vtkSmartPointer.h>
+
 #include <QApplication>
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.4");
-//-----------------------------------------------------------------------------
-pqProcessModuleGUIHelper::pqProcessModuleGUIHelper()
+////////////////////////////////////////////////////////////////////////////
+// pqProcessModuleGUIHelper::pqImplementation
+
+class pqProcessModuleGUIHelper::pqImplementation
 {
-  this->SMApplication = vtkSMApplication::New();
-  this->Application = 0;
-  this->Window = 0;
+public:
+  pqImplementation() :
+    OutputWindowAdapter(vtkSmartPointer<pqOutputWindowAdapter>::New()),
+    OutputWindow(0),
+    SMApplication(vtkSMApplication::New()),
+    Application(0),
+    Window(0)
+  {
+    // Redirect Qt debug output to VTK ...
+    qInstallMsgHandler(QtMessageOutput);
+  }
+  
+  ~pqImplementation()
+  {
+    this->SMApplication->Finalize();
+    this->SMApplication->Delete();
+    delete this->Window;
+    delete this->OutputWindow;
+    delete this->Application;
+  }
+
+  /// Routes Qt debug output through the VTK output window mechanism
+  static void QtMessageOutput(QtMsgType type, const char *msg)
+  {
+    switch(type)
+      {
+      case QtDebugMsg:
+        vtkOutputWindow::GetInstance()->DisplayText(msg);
+        break;
+      case QtWarningMsg:
+        vtkOutputWindow::GetInstance()->DisplayWarningText(msg);
+        break;
+      case QtCriticalMsg:
+        vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
+        break;
+      case QtFatalMsg:
+        vtkOutputWindow::GetInstance()->DisplayErrorText(msg);
+        break;
+      }
+  }
+
+  /// Converts VTK debug output into Qt signals
+  vtkSmartPointer<pqOutputWindowAdapter> OutputWindowAdapter;
+  /// Displays VTK debug output in a console window
+  pqOutputWindow* OutputWindow;
+
+  vtkSMApplication* SMApplication;
+  QApplication* Application;
+  pqMainWindow* Window;
+};
+
+////////////////////////////////////////////////////////////////////////////
+// pqProcessModuleGUIHelper
+
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.5");
+//-----------------------------------------------------------------------------
+pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
+  Implementation(new pqImplementation())
+{
 }
 
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::~pqProcessModuleGUIHelper()
 {
-  this->SMApplication->Finalize();
-  this->SMApplication->Delete();
-  if (this->Window)
-    {
-    delete this->Window;
-    }
-  if (this->Application)
-    {
-    delete this->Application;
-    }
+  delete this->Implementation;
+}
+
+void pqProcessModuleGUIHelper::disableOutputWindow()
+{
+  this->Implementation->OutputWindowAdapter = vtkSmartPointer<pqOutputWindowAdapter>::New();
+  vtkOutputWindow::SetInstance(this->Implementation->OutputWindowAdapter);
 }
 
 //-----------------------------------------------------------------------------
 int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv, 
   int vtkNotUsed(numServerProcs), int vtkNotUsed(myId))
 {
-  this->SMApplication->Initialize();
+  this->Implementation->SMApplication->Initialize();
   vtkSMProperty::SetCheckDomains(0);
-  this->SMApplication->ParseConfigurationFiles();
+  this->Implementation->SMApplication->ParseConfigurationFiles();
   
   if (!this->InitializeApplication(argc, argv))
     {
@@ -82,9 +140,9 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
     }
   
   int status = 1;
-  if (this->Application && this->Window)
+  if (this->Implementation->Application && this->Implementation->Window)
     {
-    this->Window->show();
+    this->Implementation->Window->show();
     
     // Check is options specified to run tests.
     pqOptions* options = pqOptions::SafeDownCast(
@@ -103,14 +161,14 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
 
       if (options->GetBaselineImage())
         {
-        status = !this->Window->compareView(options->GetBaselineImage(),
+        status = !this->Implementation->Window->compareView(options->GetBaselineImage(),
           options->GetImageThreshold(), cout, options->GetTestDirectory());
         dont_start_event_loop = 1;
         }
         
       if(options->GetTestUINames())
         {
-        status = !pqObjectNaming::Validate(*this->Window);
+        status = !pqObjectNaming::Validate(*this->Implementation->Window);
         }
         
       if (options->GetExitBeforeEventLoop())
@@ -122,23 +180,38 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
     if (!dont_start_event_loop )
       {
       // Starts the event loop.
-      status = this->Application->exec();
+      status = this->Implementation->Application->exec();
       }
     }
   this->FinalizeApplication();
+  
+  // If there were any errors from Qt / VTK, ensure that we return an error code
+  if(!status && this->Implementation->OutputWindowAdapter->getErrorCount())
+    {
+    status = 1;
+    }
+  
   return status;
 }
 
 //-----------------------------------------------------------------------------
 int pqProcessModuleGUIHelper::InitializeApplication(int argc, char** argv)
 {
-  this->Application = new QApplication(argc, argv);
+  this->Implementation->Application = new QApplication(argc, argv);
+  
+  // Redirect VTK debug output to a Qt window ...
+  this->Implementation->OutputWindow = new pqOutputWindow(0);
+  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter, SIGNAL(displayText(const QString&)), SLOT(onDisplayText(const QString&)));
+  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter, SIGNAL(displayErrorText(const QString&)), SLOT(onDisplayErrorText(const QString&)));
+  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter, SIGNAL(displayWarningText(const QString&)), SLOT(onDisplayWarningText(const QString&)));
+  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter, SIGNAL(displayGenericWarningText(const QString&)), SLOT(onDisplayGenericWarningText(const QString&)));
+  vtkOutputWindow::SetInstance(Implementation->OutputWindowAdapter);
   
 /** \todo Figure-out how to export Qt's resource symbols from a DLL, so we can use them here */
 #if !(defined(WIN32) && defined(PARAQ_BUILD_SHARED_LIBS))
   Q_INIT_RESOURCE(pqWidgets);
 #endif
-  this->Window = this->CreateMainWindow();
+  this->Implementation->Window = this->CreateMainWindow();
 
   return 1;
 }
@@ -146,8 +219,8 @@ int pqProcessModuleGUIHelper::InitializeApplication(int argc, char** argv)
 //-----------------------------------------------------------------------------
 void pqProcessModuleGUIHelper::FinalizeApplication()
 {
-  delete this->Window;
-  this->Window = NULL;
+  delete this->Implementation->Window;
+  this->Implementation->Window = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -172,9 +245,9 @@ void pqProcessModuleGUIHelper::SetLocalProgress(const char* vtkNotUsed(name),
 //-----------------------------------------------------------------------------
 void pqProcessModuleGUIHelper::ExitApplication()
 {
-  if (this->Application)
+  if (this->Implementation->Application)
     {
-    this->Application->exit();
+    this->Implementation->Application->exit();
     }
 }
 
@@ -182,5 +255,5 @@ void pqProcessModuleGUIHelper::ExitApplication()
 void pqProcessModuleGUIHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Application: " << this->Application << endl;
+  os << indent << "Application: " << this->Implementation->Application << endl;
 }
