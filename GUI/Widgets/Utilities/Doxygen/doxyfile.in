@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------
 # doxyfile for KWWidgets
-# modified by S. Barre (Time-stamp: <2006-01-16 17:24:35 barre>
+# modified by S. Barre (Time-stamp: <2006-04-20 10:14:26 barre>
 # -------------------------------------------------------------------------
 
 PROJECT_NAME         = KWWidgets
@@ -52,7 +52,7 @@ INPUT                = \
 
 TAGFILES             = "@KWWidgets_BINARY_DIR@/Utilities/Doxygen/vtkNightlyDoc.tag=http://www.vtk.org/doc/nightly/html"
 
-ENABLED_SECTIONS = section_public section_private
+# ENABLED_SECTIONS = section_public section_private
 EXTRACT_ALL          = YES
 EXTRACT_PRIVATE      = NO
 EXTRACT_STATIC       = YES
