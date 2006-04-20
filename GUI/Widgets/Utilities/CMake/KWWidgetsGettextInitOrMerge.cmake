@@ -37,7 +37,7 @@ IF(NOT EXISTS "${po_build_file}")
       EXEC_PROGRAM(${GETTEXT_MSGINIT_EXECUTABLE} 
         RETURN_VALUE msginit_return
         OUTPUT_VARIABLE msginit_output
-        ARGS --input="${pot_build_file}" --output-file="${po_build_file}" --locale="${locale}")
+        ARGS --no-translator --input="${pot_build_file}" --output-file="${po_build_file}" --locale="${locale}")
       IF(msginit_output)
         IF(NOT WIN32 OR NOT "${msginit_output}" MATCHES "Bad file desc")
           MESSAGE("${msginit_output}")
