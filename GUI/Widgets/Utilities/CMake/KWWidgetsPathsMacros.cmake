@@ -408,6 +408,11 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ONE_CONFIGURATION_TYPE
     ${LIBRARY_OUTPUT_PATH}
     )
 
+  IF(GETTEXT_INTL_LIBRARY)
+    GET_FILENAME_COMPONENT(path "${GETTEXT_INTL_LIBRARY}" PATH)
+    SET(KWWidgets_PATH_ENV ${KWWidgets_PATH_ENV} "${path}/../bin")
+  ENDIF(GETTEXT_INTL_LIBRARY)
+
   # If we have no TCL_LIBRARY or TCL_TCLSH, then we are probably being invoked
   # from an out-of-source example that is using either an installed VTK or
   # an installed KWWidgets. None of those projects export TCL_* variables
@@ -441,11 +446,6 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ONE_CONFIGURATION_TYPE
     GET_FILENAME_COMPONENT(path "${CMAKE_MAKE_PROGRAM}" PATH)
     SET(KWWidgets_PATH_ENV ${KWWidgets_PATH_ENV} ${path})
   ENDIF(CMAKE_MAKE_PROGRAM)
-
-  IF(GETTEXT_INTL_LIBRARY)
-    GET_FILENAME_COMPONENT(path "${GETTEXT_INTL_LIBRARY}" PATH)
-    SET(KWWidgets_PATH_ENV ${KWWidgets_PATH_ENV} "${path}/../bin")
-  ENDIF(GETTEXT_INTL_LIBRARY)
 
   # For LD_LIBRARY_PATH or equivalent
   
