@@ -13,19 +13,20 @@
 # 'pot_uptodate_file' (string): the dummy file which will be up to date
 # 'options' (string): options
 # 'keywords' (string): keywords
-# 'copyright_holder': optional copyright holder of the template file
+# 'copyright_holder': copyright holder of the template file
+# 'msgid_bugs_address': report address for msgid bugs
 # 'files_from': 
 # GETTEXT_XGETTEXT_EXECUTABLE (string): path to the 'xgettext' executable
 
 SET(SUCCESS 1)
 IF(NOT "${GETTEXT_XGETTEXT_EXECUTABLE}" STREQUAL "")
-  
+
   # Extract the strings, store the result in a variable instead of a POT file
 
   EXEC_PROGRAM(${GETTEXT_XGETTEXT_EXECUTABLE} 
     RETURN_VALUE xgettext_return
     OUTPUT_VARIABLE xgettext_output
-    ARGS --output="-" ${options} ${keywords} --copyright-holder="${copyright_holder}" --files-from="${files_from}")
+    ARGS --output="-" ${options} ${keywords} --msgid-bugs-address="${msgid_bugs_address}" --copyright-holder="${copyright_holder}" --files-from="${files_from}")
   IF(xgettext_return)
     MESSAGE("${xgettext_output}")
     SET(SUCCESS 0)

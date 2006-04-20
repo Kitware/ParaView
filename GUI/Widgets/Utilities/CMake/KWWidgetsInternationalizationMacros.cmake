@@ -58,11 +58,14 @@
 #    where up-to-date translation files (po) should be stored. 
 #    Default to "${CMAKE_CURRENT_BINARY_DIR}/po"  if not found.
 # PO_PREFIX (string): string that will be used to prefix the filename of
-#    each translation file (po).
+#    each translation file.
 #    Default to the value of "${DOMAIN_NAME}_"
 # MO_INSTALL_DIR (path): directory where the binary translation files (mo)
 #    should be installed to.
 # COPYRIGHT_HOLDER (string): copyright holder string that will be stored in
+#    the translation template file (pot). 
+#    Default to the empty string if not found.
+# MSGID_BUGS_ADDRESS (string): report address for msgid bugs that will be stored in
 #    the translation template file (pot). 
 #    Default to the empty string if not found.
 # DEFAULT_PO_ENCODING (string): default encoding to be used when initializing
@@ -128,6 +131,7 @@ MACRO(KWWidgets_CREATE_GETTEXT_TARGETS)
   SET(default_po_encoding      "utf-8")
   SET(mo_install_dir           "")
   SET(copyright_holder         "")
+  SET(msgid_bugs_address       "foo@bar.com")
   SET(sources                  )
   SET(po_prefix                ${notset_value})
   SET(extra_gettext_keywords   "")
@@ -150,7 +154,7 @@ MACRO(KWWidgets_CREATE_GETTEXT_TARGETS)
 
   # Parse the arguments
 
-  SET(valued_parameter_names "^(TARGET_BASENAME|DOMAIN_NAME|POT_BUILD_DIR|PO_DIR|PO_BUILD_DIR|DEFAULT_PO_ENCODING|MO_BUILD_DIR|MO_INSTALL_DIR|COPYRIGHT_HOLDER|PO_PREFIX)$")
+  SET(valued_parameter_names "^(TARGET_BASENAME|DOMAIN_NAME|POT_BUILD_DIR|PO_DIR|PO_BUILD_DIR|DEFAULT_PO_ENCODING|MO_BUILD_DIR|MO_INSTALL_DIR|COPYRIGHT_HOLDER|MSGID_BUGS_ADDRESS|PO_PREFIX)$")
   SET(boolean_parameter_names "^(ADD_MO_TARGET_TO_ALL|CREATE_POT_TARGET|CREATE_PO_TARGET|CREATE_PO_LOCALE_TARGETS|CREATE_MO_TARGET|CREATE_MO_LOCALE_TARGETS)$")
   SET(list_parameter_names "^(SOURCES|LOCALE_LIST|EXTRA_GETTEXT_KEYWORDS|EXTRA_DGETTEXT_KEYWORDS)$")
 
@@ -248,6 +252,7 @@ MACRO(KWWidgets_CREATE_GETTEXT_TARGETS)
       "${pot_build_dir}"
       "${po_dir}"
       "${copyright_holder}"
+      "${msgid_bugs_address}"
       "${sources}"
       "${target_basename}"
       "${create_pot_target}"
@@ -305,7 +310,7 @@ ENDMACRO(KWWidgets_GET_POT_FILENAME)
 # translation file (po) for that locale.
 # 'varname': name of the var the translation filename should be stored into
 # 'po_dir': path to the po directory where the PO file are stored
-# 'po_prefix': string that is used to prefix each translation file (po).
+# 'po_prefix': string that is used to prefix each translation file.
 # 'locale': a locale (say, "fr")
  
 MACRO(KWWidgets_GET_PO_FILENAME varname po_dir po_prefix locale)
@@ -398,6 +403,7 @@ ENDMACRO(KWWidgets_GET_RELATIVE_SOURCES)
 # 'pot_build_dir': path in the build tree where the template should be stored
 # 'po_dir': path to the po directory where the original PO files are found
 # 'copyright_holder': optional copyright holder of the template file
+# 'msgid_bugs_address': report address for msgid bugs in the template file
 # 'sources': list of source files the template file will be generated from
 # 'target_basename': basename of the template file target
 # 'create_pot_target': if true, create pot target (on top of the command)
@@ -409,6 +415,7 @@ MACRO(KWWidgets_CREATE_POT_TARGET
     pot_build_dir
     po_dir
     copyright_holder
+    msgid_bugs_address
     sources
     target_basename 
     create_pot_target
@@ -495,7 +502,7 @@ MACRO(KWWidgets_CREATE_POT_TARGET
       OUTPUT "${pot_uptodate_file}"
       DEPENDS ${abs_sources}
       COMMAND ${CMAKE_COMMAND} 
-      ARGS -E chdir "${po_dir}" ${CMAKE_COMMAND} -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=${CMAKE_BACKWARDS_COMPATIBILITY} -Dpot_build_file:STRING="${pot_build_file}" -Dpot_uptodate_file:STRING="${pot_uptodate_file}" -Dpo_dir:STRING="${po_dir}" -Doptions:STRING="${options}" -Dkeywords:STRING="${keywords}" -Dcopyright_holder:STRING="${copyright_holder}" -Dfiles_from:STRING="${files_from}" -DGETTEXT_XGETTEXT_EXECUTABLE:STRING="${GETTEXT_XGETTEXT_EXECUTABLE}" -P "${KWWidgets_CMAKE_DIR}/KWWidgetsGettextExtract.cmake")
+      ARGS -E chdir "${po_dir}" ${CMAKE_COMMAND} -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=${CMAKE_BACKWARDS_COMPATIBILITY} -Dpot_build_file:STRING=${pot_build_file} -Dpot_uptodate_file:STRING=${pot_uptodate_file} -Dpo_dir:STRING=${po_dir} -Doptions:STRING="${options}" -Dkeywords:STRING="${keywords}" -Dcopyright_holder:STRING="${copyright_holder}" -Dmsgid_bugs_address:STRING="${msgid_bugs_address}" -Dfiles_from:STRING=${files_from} -DGETTEXT_XGETTEXT_EXECUTABLE:STRING=${GETTEXT_XGETTEXT_EXECUTABLE} -P "${KWWidgets_CMAKE_DIR}/KWWidgetsGettextExtract.cmake")
     IF(create_pot_target)
       ADD_CUSTOM_TARGET(${target_basename}_pot DEPENDS ${pot_build_file})
     ENDIF(create_pot_target)
@@ -516,7 +523,7 @@ ENDMACRO(KWWidgets_CREATE_POT_TARGET)
 # 'pot_build_dir': path in the build tree where the template should be stored
 # 'po_dir': path to where the original PO file are found
 # 'po_build_dir': build path where up-to-date PO files should be stored
-# 'po_prefix': string that will be used to prefix each translation file (po).
+# 'po_prefix': string that will be used to prefix each translation file.
 # 'locale_list': semicolon-separated list of locale to generate targets for.
 # 'default_po_encoding': default encoding for new initialized PO files.
 # 'target_basename': basename of the PO targets
@@ -563,11 +570,15 @@ MACRO(KWWidgets_CREATE_PO_TARGETS
       "${safe_build_dir}" "${po_prefix}" "${locale}")
     SET(po_uptodate_file "${po_uptodate_file}.upd")
     SET(po_uptodate_files ${po_uptodate_files} ${po_uptodate_file})
+    SET(depends "${pot_uptodate_file}")
+    IF(EXISTS "${po_file}")
+      SET(depends ${depends} "${po_file}")
+    ENDIF(EXISTS "${po_file}")
     ADD_CUSTOM_COMMAND(
       OUTPUT "${po_uptodate_file}"
-      DEPENDS "${pot_uptodate_file}" "${po_file}"
+      DEPENDS ${depends}
       COMMAND ${CMAKE_COMMAND} 
-      ARGS -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=${CMAKE_BACKWARDS_COMPATIBILITY} -Dpo_file:STRING="${po_file}" -Dpo_build_file:STRING="${po_build_file}" -Dpo_uptodate_file:STRING="${po_uptodate_file}" -Ddefault_po_encoding:STRING="${default_po_encoding}" -Dpot_build_file:STRING="${pot_build_file}" -Dlocale:STRING="${locale}" -DGETTEXT_MSGINIT_EXECUTABLE:STRING="${GETTEXT_MSGINIT_EXECUTABLE}" -DGETTEXT_MSGCONV_EXECUTABLE:STRING="${GETTEXT_MSGCONV_EXECUTABLE}" -DGETTEXT_MSGMERGE_EXECUTABLE:STRING="${GETTEXT_MSGMERGE_EXECUTABLE}" -DGETTEXT_MSGCAT_EXECUTABLE:STRING="${GETTEXT_MSGCAT_EXECUTABLE}" -P "${KWWidgets_CMAKE_DIR}/KWWidgetsGettextInitOrMerge.cmake"
+      ARGS -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=${CMAKE_BACKWARDS_COMPATIBILITY} -Dpo_file:STRING=${po_file} -Dpo_build_file:STRING=${po_build_file} -Dpo_uptodate_file:STRING=${po_uptodate_file} -Ddefault_po_encoding:STRING=${default_po_encoding} -Dpot_build_file:STRING=${pot_build_file} -Dlocale:STRING=${locale} -DGETTEXT_MSGINIT_EXECUTABLE:STRING=${GETTEXT_MSGINIT_EXECUTABLE} -DGETTEXT_MSGCONV_EXECUTABLE:STRING=${GETTEXT_MSGCONV_EXECUTABLE} -DGETTEXT_MSGMERGE_EXECUTABLE:STRING=${GETTEXT_MSGMERGE_EXECUTABLE} -DGETTEXT_MSGCAT_EXECUTABLE:STRING=${GETTEXT_MSGCAT_EXECUTABLE} -P "${KWWidgets_CMAKE_DIR}/KWWidgetsGettextInitOrMerge.cmake"
       )
     IF(create_po_locale_targets)
       ADD_CUSTOM_TARGET(
@@ -593,7 +604,7 @@ ENDMACRO(KWWidgets_CREATE_PO_TARGETS)
 # 'domain_name': translation domain name (i.e. name of application or library)
 # 'po_dir': path to where the original PO file are found
 # 'po_build_dir': build path to where up-to-date PO files are stored
-# 'po_prefix': string that is used to prefix each translation file (po).
+# 'po_prefix': string that is used to prefix each translation file.
 # 'locale_list': semicolon-separated list of locale to generate targets for.
 # 'mo_build_dir': directory where the binary MO files should be saved to
 # 'mo_install_dir': directory where the binary MO files should be installed to
@@ -638,7 +649,7 @@ MACRO(KWWidgets_CREATE_MO_TARGETS
         OUTPUT "${mo_file}"
         DEPENDS "${po_uptodate_file}"
         COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} 
-        ARGS --output-file="${mo_file}" --check-format "${po_build_file}"
+        ARGS --output-file=${mo_file} --check-format "${po_build_file}"
         )
       IF(create_mo_locale_targets)
         ADD_CUSTOM_TARGET(${target_basename}_mo_${locale} DEPENDS ${mo_file})
