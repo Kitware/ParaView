@@ -20,6 +20,7 @@
 # GETTEXT_MSGCONV_EXECUTABLE (string): path to the 'msgconv' executable 
 # GETTEXT_MSGMERGE_EXECUTABLE (string): path to the 'msgmerge' executable 
 
+SET(SUCCESS 1)
 IF(NOT EXISTS "${po_build_file}")
 
   # Initialize PO file or copy from existing PO file
@@ -36,10 +37,11 @@ IF(NOT EXISTS "${po_build_file}")
       EXEC_PROGRAM(${GETTEXT_MSGINIT_EXECUTABLE} 
         RETURN_VALUE msginit_return
         OUTPUT_VARIABLE msginit_output
-        ARGS --input=${pot_build_file} --output-file=${po_build_file} --locale=${locale})
+        ARGS --input="${pot_build_file}" --output-file="${po_build_file}" --locale="${locale}")
       IF(msginit_output)
         IF(NOT WIN32 OR NOT "${msginit_output}" MATCHES "Bad file desc")
-          MESSAGE("OUCH ${msginit_output}")
+          MESSAGE("${msginit_output}")
+          SET(SUCCESS 0)
         ENDIF(NOT WIN32 OR NOT "${msginit_output}" MATCHES "Bad file desc")
       ENDIF(msginit_output)
 
@@ -52,12 +54,15 @@ IF(NOT EXISTS "${po_build_file}")
         EXEC_PROGRAM(${GETTEXT_MSGCONV_EXECUTABLE} 
           RETURN_VALUE msgconv_return
           OUTPUT_VARIABLE msgconv_output
-          ARGS --output-file=${po_build_file} --to-code="${default_po_encoding}" ${po_build_file})
+          ARGS --output-file="${po_build_file}" --to-code="${default_po_encoding}" \"${po_build_file}\")
         IF(msgconv_output)
           MESSAGE("${msgconv_output}")
+          SET(SUCCESS 0)
         ENDIF(msgconv_output)
       ENDIF(NOT "${GETTEXT_MSGCONV_EXECUTABLE}" STREQUAL "")
+
     ENDIF(NOT "${GETTEXT_MSGINIT_EXECUTABLE}" STREQUAL "")
+
   ENDIF(EXISTS "${po_file}")
 
 ELSE(NOT EXISTS "${po_build_file}")
@@ -80,9 +85,10 @@ ELSE(NOT EXISTS "${po_build_file}")
     EXEC_PROGRAM(${GETTEXT_MSGMERGE_EXECUTABLE} 
       RETURN_VALUE msgmerge_return
       OUTPUT_VARIABLE msgmerge_output
-      ARGS --quiet --output-file="-" ${po_build_file} ${pot_build_file})
+      ARGS --quiet --output-file="-" \"${po_build_file}\" \"${pot_build_file}\")
     IF(msgmerge_return)
       MESSAGE("${msgmerge_output}")
+      SET(SUCCESS 0)
     ENDIF(msgmerge_return)
 
     SET(msgmerge_output "${msgmerge_output}\n")
@@ -111,7 +117,7 @@ ELSE(NOT EXISTS "${po_build_file}")
   # msggrep.exe -T -e "#-#-#" would have done the trick but not in 0.13.1
 #   IF(NOT "${GETTEXT_MSGCAT_EXECUTABLE}" STREQUAL "" AND EXISTS "${po_file}")
 #     EXEC_PROGRAM(${GETTEXT_MSGCAT_EXECUTABLE} 
-#       ARGS ${po_build_file} ${po_file}
+#       ARGS "${po_build_file}" "${po_file}"
 #       OUTPUT_VARIABLE msgcat_output)
 #     STRING(REGEX MATCH "^\"#-#.*$" matched "${msgcat_output}")
 #     MESSAGE("match: ${matched}")
@@ -126,6 +132,8 @@ ENDIF(NOT EXISTS "${po_build_file}")
 # targets to be triggered again and again because the POT file is older
 # than the PO, but the PO does not really need to be changed, etc.
 
-FILE(WRITE "${po_uptodate_file}" 
-  "${po_build_file} is *really* up-to-date.")
+IF(SUCCESS)
+  FILE(WRITE "${po_uptodate_file}" 
+    "${po_build_file} is *really* up-to-date.")
+ENDIF(SUCCESS)
 

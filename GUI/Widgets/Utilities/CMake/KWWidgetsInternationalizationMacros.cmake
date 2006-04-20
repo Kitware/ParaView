@@ -492,10 +492,10 @@ MACRO(KWWidgets_CREATE_POT_TARGET
       "--flag=kww_fprintf:2:c-format")
 
     ADD_CUSTOM_COMMAND(
-      OUTPUT ${pot_uptodate_file}
+      OUTPUT "${pot_uptodate_file}"
       DEPENDS ${abs_sources}
       COMMAND ${CMAKE_COMMAND} 
-      ARGS -E chdir ${po_dir} ${CMAKE_COMMAND} -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=${CMAKE_BACKWARDS_COMPATIBILITY} -Dpot_build_file:STRING="${pot_build_file}" -Dpot_uptodate_file:STRING="${pot_uptodate_file}" -Dpo_dir:STRING="${po_dir}" -Doptions:STRING="${options}" -Dkeywords:STRING="${keywords}" -Dcopyright_holder:STRING="${copyright_holder}" -Dfiles_from:STRING="${files_from}" -DGETTEXT_XGETTEXT_EXECUTABLE:STRING="${GETTEXT_XGETTEXT_EXECUTABLE}" -P "${KWWidgets_CMAKE_DIR}/KWWidgetsGettextExtract.cmake")
+      ARGS -E chdir "${po_dir}" ${CMAKE_COMMAND} -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=${CMAKE_BACKWARDS_COMPATIBILITY} -Dpot_build_file:STRING="${pot_build_file}" -Dpot_uptodate_file:STRING="${pot_uptodate_file}" -Dpo_dir:STRING="${po_dir}" -Doptions:STRING="${options}" -Dkeywords:STRING="${keywords}" -Dcopyright_holder:STRING="${copyright_holder}" -Dfiles_from:STRING="${files_from}" -DGETTEXT_XGETTEXT_EXECUTABLE:STRING="${GETTEXT_XGETTEXT_EXECUTABLE}" -P "${KWWidgets_CMAKE_DIR}/KWWidgetsGettextExtract.cmake")
     IF(create_pot_target)
       ADD_CUSTOM_TARGET(${target_basename}_pot DEPENDS ${pot_build_file})
     ENDIF(create_pot_target)
@@ -564,8 +564,8 @@ MACRO(KWWidgets_CREATE_PO_TARGETS
     SET(po_uptodate_file "${po_uptodate_file}.upd")
     SET(po_uptodate_files ${po_uptodate_files} ${po_uptodate_file})
     ADD_CUSTOM_COMMAND(
-      OUTPUT ${po_uptodate_file}
-      DEPENDS ${pot_uptodate_file} ${po_file}
+      OUTPUT "${po_uptodate_file}"
+      DEPENDS "${pot_uptodate_file}" "${po_file}"
       COMMAND ${CMAKE_COMMAND} 
       ARGS -DCMAKE_BACKWARDS_COMPATIBILITY:STRING=${CMAKE_BACKWARDS_COMPATIBILITY} -Dpo_file:STRING="${po_file}" -Dpo_build_file:STRING="${po_build_file}" -Dpo_uptodate_file:STRING="${po_uptodate_file}" -Ddefault_po_encoding:STRING="${default_po_encoding}" -Dpot_build_file:STRING="${pot_build_file}" -Dlocale:STRING="${locale}" -DGETTEXT_MSGINIT_EXECUTABLE:STRING="${GETTEXT_MSGINIT_EXECUTABLE}" -DGETTEXT_MSGCONV_EXECUTABLE:STRING="${GETTEXT_MSGCONV_EXECUTABLE}" -DGETTEXT_MSGMERGE_EXECUTABLE:STRING="${GETTEXT_MSGMERGE_EXECUTABLE}" -DGETTEXT_MSGCAT_EXECUTABLE:STRING="${GETTEXT_MSGCAT_EXECUTABLE}" -P "${KWWidgets_CMAKE_DIR}/KWWidgetsGettextInitOrMerge.cmake"
       )
@@ -635,10 +635,10 @@ MACRO(KWWidgets_CREATE_MO_TARGETS
       SET(mo_files ${mo_files} ${mo_file})
       # --check-accelerators 
       ADD_CUSTOM_COMMAND(
-        OUTPUT ${mo_file}
-        DEPENDS ${po_uptodate_file}
+        OUTPUT "${mo_file}"
+        DEPENDS "${po_uptodate_file}"
         COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} 
-        ARGS --output-file=${mo_file} --check-format ${po_build_file}
+        ARGS --output-file="${mo_file}" --check-format "${po_build_file}"
         )
       IF(create_mo_locale_targets)
         ADD_CUSTOM_TARGET(${target_basename}_mo_${locale} DEPENDS ${mo_file})

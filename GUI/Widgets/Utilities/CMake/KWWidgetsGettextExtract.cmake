@@ -17,6 +17,7 @@
 # 'files_from': 
 # GETTEXT_XGETTEXT_EXECUTABLE (string): path to the 'xgettext' executable
 
+SET(SUCCESS 1)
 IF(NOT "${GETTEXT_XGETTEXT_EXECUTABLE}" STREQUAL "")
   
   # Extract the strings, store the result in a variable instead of a POT file
@@ -24,9 +25,10 @@ IF(NOT "${GETTEXT_XGETTEXT_EXECUTABLE}" STREQUAL "")
   EXEC_PROGRAM(${GETTEXT_XGETTEXT_EXECUTABLE} 
     RETURN_VALUE xgettext_return
     OUTPUT_VARIABLE xgettext_output
-    ARGS --output="-" ${options} ${keywords} --copyright-holder="${copyright_holder}" --files-from=${files_from})
+    ARGS --output="-" ${options} ${keywords} --copyright-holder="${copyright_holder}" --files-from="${files_from}")
   IF(xgettext_return)
     MESSAGE("${xgettext_output}")
+    SET(SUCCESS 0)
   ELSE(xgettext_return)
 
     SET(xgettext_output "${xgettext_output}\n")
@@ -60,8 +62,10 @@ IF(NOT "${GETTEXT_XGETTEXT_EXECUTABLE}" STREQUAL "")
     # target to be triggered again and again because the sources are older
     # than the POT, but the POT does not really need to be changed, etc.
 
-    FILE(WRITE "${pot_uptodate_file}" 
-      "${pot_build_file} is *really* up-to-date.")
+    IF(SUCCESS)
+      FILE(WRITE "${pot_uptodate_file}" 
+        "${pot_build_file} is *really* up-to-date.")
+    ENDIF(SUCCESS)
 
   ENDIF(xgettext_return)
 ENDIF(NOT "${GETTEXT_XGETTEXT_EXECUTABLE}" STREQUAL "")
