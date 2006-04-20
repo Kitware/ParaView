@@ -17,40 +17,54 @@
 #include "vtkKWPushButton.h"
 #include "vtkKWFrameWithScrollbar.h"
 #include "vtkCallbackCommand.h"
+#include "vtkPVApplication.h"
 #include "vtkCommand.h"
 #include "vtkPVWindow.h"
-#include "vtkPVApplication.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkRenderer.h"
-#include "vtkAbstractPicker.h"
-#include "vtkAreaPicker.h"
-#include "vtkInteractorObserver.h"
 #include "vtkInteractorStyleRubberBandPick.h"
-#include "vtkPlanes.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
-#include "vtkPoints.h"
-#include "vtkPVSourceNotebook.h"
+#include "vtkPVTraceHelper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAreaSelect);
-vtkCxxRevisionMacro(vtkPVAreaSelect, "1.2");
+vtkCxxRevisionMacro(vtkPVAreaSelect, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVAreaSelect::vtkPVAreaSelect()
 {
+  this->SelectReady = 0;
   this->InPickState = 0;
+  this->Xs = 0;
+  this->Ys = 0;
+  this->Xe = 0;
+  this->Ye = 0;
 
   this->SelectButton = vtkKWPushButton::New();
   this->EventCallbackCommand = vtkCallbackCommand::New();
   this->EventCallbackCommand->SetClientData(this); 
   this->EventCallbackCommand->SetCallback(vtkPVAreaSelect::ProcessEvents);
   this->RubberBand = vtkInteractorStyleRubberBandPick::New();
+  this->SavedStyle = NULL;
+
+  for (int i = 0; i < 8; i++)
+    {
+    this->Verts[i*4+0] = 0.0;
+    this->Verts[i*4+1] = 0.0;
+    this->Verts[i*4+2] = 0.0;
+    this->Verts[i*4+3] = 0.0;
+    }
 }
 
 //----------------------------------------------------------------------------
 vtkPVAreaSelect::~vtkPVAreaSelect()
 { 
+  if (this->SavedStyle)
+    {
+    this->SavedStyle->Delete();
+    }
   this->RubberBand->Delete();
   this->EventCallbackCommand->Delete();
   this->SelectButton->Delete();
@@ -66,6 +80,8 @@ void vtkPVAreaSelect::CreateProperties()
   this->SelectButton->Create();
   this->SelectButton->SetCommand(this, "SelectCallback");
   this->SelectButton->SetText("Start Selection");
+  this->SelectButton->EnabledOff();
+
   this->Script("pack %s -fill x -expand true",
                this->SelectButton->GetWidgetName());
 
@@ -80,27 +96,36 @@ void vtkPVAreaSelect::SelectCallback()
 
   if (!this->InPickState)
     {    
-    //start watching left mouse actions to get a begin and end pixel
-    rwi->AddObserver(vtkCommand::LeftButtonPressEvent, this->EventCallbackCommand);
-    rwi->AddObserver(vtkCommand::LeftButtonReleaseEvent, this->EventCallbackCommand);
+    this->GetPVInput(0)->SetVisibility(1);
 
+    this->SelectButton->SetReliefToSunken();
+    //start watching left mouse actions to get a begin and end pixel
+    rwi->AddObserver(vtkCommand::LeftButtonPressEvent, 
+                     this->EventCallbackCommand);
+    rwi->AddObserver(vtkCommand::LeftButtonReleaseEvent, 
+                     this->EventCallbackCommand);
     //temporarily use the rubber band interactor style just to draw a rectangle
     this->SavedStyle = rwi->GetInteractorStyle();
+    this->SavedStyle->Register(this);
     rwi->SetInteractorStyle(this->RubberBand);
+
     //don't allow camera motion while selecting
     this->RubberBand->StartSelect();
-    this->SelectButton->SetReliefToSunken();
+    this->SelectReady = 0;
     }
   else
     {
+    this->SelectReady = 1;
     this->RubberBand->HighlightProp(NULL);
     rwi->SetInteractorStyle(this->SavedStyle);
-    this->SelectButton->SetReliefToRaised();
+    this->SavedStyle->UnRegister(this);
+    this->SavedStyle = NULL;
     rwi->RemoveObserver(this->EventCallbackCommand);
+    this->SelectButton->SetReliefToRaised();
+    this->SetAcceptButtonColorToModified();
     }
 
   this->InPickState = !this->InPickState;
-
 }
 
 //----------------------------------------------------------------------------
@@ -113,7 +138,7 @@ void vtkPVAreaSelect::ProcessEvents(vtkObject* vtkNotUsed(object),
     = reinterpret_cast<vtkPVAreaSelect *>( clientdata );
 
   vtkPVWindow* window = self->GetPVApplication()->GetMainWindow();
-  vtkPVGenericRenderWindowInteractor * rwi = window->GetInteractor();
+  vtkPVGenericRenderWindowInteractor *rwi = window->GetInteractor();
   int *eventpos = rwi->GetEventPosition();
   vtkRenderer *renderer = rwi->FindPokedRenderer(eventpos[0], eventpos[1]);
 
@@ -131,83 +156,207 @@ void vtkPVAreaSelect::ProcessEvents(vtkObject* vtkNotUsed(object),
 //----------------------------------------------------------------------------
 void vtkPVAreaSelect::OnLeftButtonDown(int x, int y)
 {
-  this->X = x;
-  this->Y = y;
+  this->Xs = x;
+  this->Ys = y;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVAreaSelect::OnLeftButtonUp(int x, int y, vtkRenderer *renderer)
 {
-  if (this->InPickState)
+  this->Xe = x;
+  this->Ye = y;
+  
+  double x0 = (double)((this->Xs < this->Xe) ? this->Xs : this->Xe);
+  double y0 = (double)((this->Ys < this->Ye) ? this->Ys : this->Ye);
+  double x1 = (double)((this->Xs > this->Xe) ? this->Xs : this->Xe);
+  double y1 = (double)((this->Ys > this->Ye) ? this->Ys : this->Ye);
+  
+  if (x0 == x1)
     {
-    this->InvalidateDataInformation();
+    x0 -= 0.5;
+    x1 += 0.5;
+    }
+  if (y0 == y1)
+    {
+    y0 -= 0.5;
+    y1 += 0.5;
+    }
+  
+  renderer->SetDisplayPoint(x0, y0, 0);
+  renderer->DisplayToWorld();
+  renderer->GetWorldPoint(&this->Verts[0]);
+  
+  renderer->SetDisplayPoint(x0, y0, 1);
+  renderer->DisplayToWorld();
+  renderer->GetWorldPoint(&this->Verts[4]);
+  
+  renderer->SetDisplayPoint(x0, y1, 0);
+  renderer->DisplayToWorld();
+  renderer->GetWorldPoint(&this->Verts[8]);
+  
+  renderer->SetDisplayPoint(x0, y1, 1);
+  renderer->DisplayToWorld();
+  renderer->GetWorldPoint(&this->Verts[12]);
+  
+  renderer->SetDisplayPoint(x1, y0, 0);
+  renderer->DisplayToWorld();
+  renderer->GetWorldPoint(&this->Verts[16]);
+  
+  renderer->SetDisplayPoint(x1, y0, 1);
+  renderer->DisplayToWorld();
+  renderer->GetWorldPoint(&this->Verts[20]);
+  
+  renderer->SetDisplayPoint(x1, y1, 0);
+  renderer->DisplayToWorld();
+  renderer->GetWorldPoint(&this->Verts[24]);
+  
+  renderer->SetDisplayPoint(x1, y1, 1);
+  renderer->DisplayToWorld();
+  renderer->GetWorldPoint(&this->Verts[28]);    
 
-    double x0 = (double)((this->X < x) ? this->X : x);
-    double y0 = (double)((this->Y < y) ? this->Y : y);
-    double x1 = (double)((this->X > x) ? this->X : x);
-    double y1 = (double)((this->Y > y) ? this->Y : y);
+  //reset GUI
+  this->SelectCallback();
 
-    if (x0 == x1)
-      {
-      x0 -= 0.5;
-      x1 += 0.5;
-      }
-    if (y0 == y1)
-      {
-      y0 -= 0.5;
-      y1 += 0.5;
-      }
+  //move the result to the servers to draw wire frame selection area
+  this->SetVerts(1);
+}
+ 
+//----------------------------------------------------------------------------
+void vtkPVAreaSelect::DoSelect()
+{
+  vtkSMSourceProxy *sp = this->GetProxy();
+  if (!sp)
+    {
+    vtkErrorMacro("Failed to find proxy.");
+    return;
+    }
 
-    double verts[24];
+  vtkSMIntVectorProperty* sb = vtkSMIntVectorProperty::SafeDownCast(
+    sp->GetProperty("ShowBounds"));
+  if (!sb)
+    {
+    vtkErrorMacro("Failed to find property.");
+    }
+  else 
+    {
+    sb->SetElement(0, 0);
+    sp->UpdateVTKObjects();
+    }
+}
 
-    renderer->SetDisplayPoint(x0, y0, 0);
-    renderer->DisplayToWorld();
-    renderer->GetWorldPoint(&verts[0]);
-    
-    renderer->SetDisplayPoint(x0, y0, 1);
-    renderer->DisplayToWorld();
-    renderer->GetWorldPoint(&verts[3]);
-    
-    renderer->SetDisplayPoint(x0, y1, 0);
-    renderer->DisplayToWorld();
-    renderer->GetWorldPoint(&verts[6]);
-    
-    renderer->SetDisplayPoint(x0, y1, 1);
-    renderer->DisplayToWorld();
-    renderer->GetWorldPoint(&verts[9]);
-    
-    renderer->SetDisplayPoint(x1, y0, 0);
-    renderer->DisplayToWorld();
-    renderer->GetWorldPoint(&verts[12]);
-    
-    renderer->SetDisplayPoint(x1, y0, 1);
-    renderer->DisplayToWorld();
-    renderer->GetWorldPoint(&verts[15]);
-    
-    renderer->SetDisplayPoint(x1, y1, 0);
-    renderer->DisplayToWorld();
-    renderer->GetWorldPoint(&verts[18]);
-    
-    renderer->SetDisplayPoint(x1, y1, 1);
-    renderer->DisplayToWorld();
-    renderer->GetWorldPoint(&verts[21]);    
+//----------------------------------------------------------------------------
+void vtkPVAreaSelect::AcceptCallbackInternal()
+{
 
-    //move the result to the servers
-    vtkSMSourceProxy *sp = this->GetProxy();
-    vtkSMDoubleVectorProperty* pp = vtkSMDoubleVectorProperty::SafeDownCast(
-      sp->GetProperty("CreateFrustum"));
-    if (!sp)
-      {
-      vtkErrorMacro("Failed to find property.");
-      }
-    else 
-      {
-      pp->SetArgumentIsArray(1);
-      pp->SetElements(verts);
-      sp->UpdateVTKObjects();
-      }
+  this->DataInformationValid = 0; //this won't change the data type though...
 
-    //turn off the selection mode
-    this->SelectCallback();
+  if (this->SelectReady)
+    {
+    this->DoSelect();
+    this->SelectReady = 0;
+    this->GetPVInput(0)->SetVisibility(0);
+    this->SaveVertsInTrace();
+    }
+
+  this->SelectButton->EnabledOn();
+  this->Superclass::AcceptCallbackInternal();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAreaSelect::SaveVertsInTrace()
+{
+    this->GetTraceHelper()->AddEntry("$kw(%s) CreateVert 0 %f %f %f %f",
+                                     this->GetTclName(),
+                                     this->Verts[0], 
+                                     this->Verts[1], 
+                                     this->Verts[2], 
+                                     this->Verts[3]);
+
+    this->GetTraceHelper()->AddEntry("$kw(%s) CreateVert 1 %f %f %f %f",
+                                     this->GetTclName(),
+                                     this->Verts[4], 
+                                     this->Verts[5], 
+                                     this->Verts[6], 
+                                     this->Verts[7]);
+                                     
+    this->GetTraceHelper()->AddEntry("$kw(%s) CreateVert 2 %f %f %f %f",
+                                     this->GetTclName(),
+                                     this->Verts[8], 
+                                     this->Verts[9], 
+                                     this->Verts[10], 
+                                     this->Verts[11]);
+                                     
+    this->GetTraceHelper()->AddEntry("$kw(%s) CreateVert 3 %f %f %f %f",
+                                     this->GetTclName(),
+                                     this->Verts[12], 
+                                     this->Verts[13], 
+                                     this->Verts[14], 
+                                     this->Verts[15]);
+                                     
+    this->GetTraceHelper()->AddEntry("$kw(%s) CreateVert 4 %f %f %f %f",
+                                     this->GetTclName(),
+                                     this->Verts[16], 
+                                     this->Verts[17], 
+                                     this->Verts[18], 
+                                     this->Verts[19]);
+                                     
+    this->GetTraceHelper()->AddEntry("$kw(%s) CreateVert 5 %f %f %f %f",
+                                     this->GetTclName(),
+                                     this->Verts[20], 
+                                     this->Verts[21], 
+                                     this->Verts[22], 
+                                     this->Verts[23]);
+                                     
+    this->GetTraceHelper()->AddEntry("$kw(%s) CreateVert 6 %f %f %f %f",
+                                     this->GetTclName(),
+                                     this->Verts[24], 
+                                     this->Verts[25], 
+                                     this->Verts[26], 
+                                     this->Verts[27]);
+                                     
+    this->GetTraceHelper()->AddEntry("$kw(%s) CreateVert 7 %f %f %f %f",
+                                     this->GetTclName(),
+                                     this->Verts[28], 
+                                     this->Verts[29], 
+                                     this->Verts[30], 
+                                     this->Verts[31] );
+
+    this->GetTraceHelper()->AddEntry("$kw(%s) SetVerts 0", this->GetTclName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAreaSelect::CreateVert(int i,
+                                 double v0 , double v1 , double v2 , double v3)
+{
+  this->Verts[i*4+0] = v0;
+  this->Verts[i*4+1] = v1;
+  this->Verts[i*4+2] = v2;
+  this->Verts[i*4+3] = v3;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAreaSelect::SetVerts(int wireframe)
+{
+  vtkSMSourceProxy *sp = this->GetProxy();
+  if (!sp)
+    {
+    vtkErrorMacro("Failed to find proxy.");
+    return;
+    }
+
+  vtkSMDoubleVectorProperty* cf = vtkSMDoubleVectorProperty::SafeDownCast(
+    sp->GetProperty("CreateFrustum"));
+  vtkSMIntVectorProperty* sb = vtkSMIntVectorProperty::SafeDownCast(
+    sp->GetProperty("ShowBounds"));
+  if (!cf || !sb)
+    {
+    vtkErrorMacro("Failed to find properties.");
+    }
+  else 
+    {
+    sb->SetElement(0, wireframe);
+    cf->SetArgumentIsArray(1);
+    cf->SetElements(&this->Verts[0]);
+    sp->UpdateVTKObjects();   
     }
 }

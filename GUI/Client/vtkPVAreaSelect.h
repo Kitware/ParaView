@@ -49,9 +49,16 @@ public:
   void OnLeftButtonDown(int x, int y);
   void OnLeftButtonUp(int x, int y, vtkRenderer *renderer);
 
+  //These two are for internal use and playback only.
+  void CreateVert(int i, double v0, double v1, double v2, double v3);
+  void SetVerts(int wireframe);
+
 protected:
   vtkPVAreaSelect();
   ~vtkPVAreaSelect();
+
+  virtual void AcceptCallbackInternal();
+  void DoSelect();  
 
   //to watch mouse with
   vtkCallbackCommand* EventCallbackCommand;
@@ -65,16 +72,23 @@ protected:
   vtkInteractorStyleRubberBandPick *RubberBand;
 
   //to restore after picking
-  vtkAbstractPicker *SavedPicker;
   vtkInteractorObserver *SavedStyle;
 
   //to turn on selection
   vtkKWPushButton *SelectButton;
 
+  //have to help out trace and state saving because UI is not completely
+  //XML controlled
+  void SaveVertsInTrace();
+
+  int SelectReady;
   int InPickState;
-  int X;
-  int Y;
-  
+  int Xs;
+  int Ys;
+  int Xe;
+  int Ye;
+  double Verts[32];
+
 private:
   vtkPVAreaSelect(const vtkPVAreaSelect&); // Not implemented
   void operator=(const vtkPVAreaSelect&); // Not implemented
