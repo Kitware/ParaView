@@ -154,9 +154,6 @@ INCLUDE_DIRECTORIES(
   # For possible use of internal/stdio_core.h SGI workaround.
   ${ParaView_BINARY_DIR}/VTK/Utilities
   )
-CONFIGURE_FILE(${ParaView_SOURCE_DIR}/vtkPVConfig.h.in
-  ${ParaView_BINARY_DIR}/vtkPVConfig.h
-  ESCAPE_QUOTES)
 
 INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkSelectStreamsLibrary.cmake)
 VTK_SELECT_STREAMS_LIBRARY(PARAVIEW_USE_ANSI_STDLIB
@@ -571,3 +568,8 @@ SET(PARAVIEW_INCLUDE_DIRS
   ${ParaView_BINARY_DIR}/Servers/Common
   ${XDMF_INCLUDE_DIRS}
   )
+
+CONFIGURE_FILE(${ParaView_SOURCE_DIR}/vtkPVConfig.h.in
+  ${ParaView_BINARY_DIR}/vtkPVConfig.h
+  ESCAPE_QUOTES IMMEDIATE)
+
