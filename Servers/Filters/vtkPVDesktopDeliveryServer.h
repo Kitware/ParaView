@@ -88,6 +88,11 @@ public:
   // DO NOT USE.  FOR INTERNAL USE ONLY.
   virtual void UseRendererSet(int id);
 
+  // Description:
+  // Unused. This is here to provide the same API as the desktop delivery
+  // client. This is required by the render module proxy.
+  void SetSquirtLevel (int) {}
+
 //BTX
 
   enum Tags {
