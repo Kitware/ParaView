@@ -134,7 +134,7 @@
       <ProxyProperty 
         name="ViewProps" 
         command="AddViewProp"
-        clean_command="RemoveAllProps">
+        clean_command="RemoveAllViewProps">
         <ProxyGroupDomain name="groups">
           <Group name="props" />
           <Group name="annotations" />
@@ -161,7 +161,7 @@
         name="Layer"
         command="SetLayer"
         number_of_elements="1"
-        default_values="1">
+        default_values="0">
         <IntRangeDomain name="range" min="1" max="100"/>
       </IntVectorProperty>
       
@@ -178,7 +178,7 @@
         command="SetViewport"
         number_of_elements="4"
         default_values="0 0 1 1"
-        saveable="0">
+        is_internal="1">
         <DoubleRangeDomain name="range" min="0 0 0 0" max="1 1 1 1" />
       </DoubleVectorProperty>
       <ProxyProperty name="Lights" 
@@ -249,7 +249,7 @@
         command="GetPosition"
         number_of_elements="3"
         information_only="1"
-        default_values="1 0 0 ">
+        default_values="0 0 1">
         <SimpleDoubleInformationHelper/>
       </DoubleVectorProperty>
       
@@ -258,7 +258,7 @@
         command="SetPosition"
         number_of_elements="3"
         information_property="CameraPositionInfo"
-        default_values="1 0 0">
+        default_values="0 0 1">
       </DoubleVectorProperty>
       
       <DoubleVectorProperty
@@ -396,14 +396,6 @@
         default_values="1">
         <IntRangeDomain name="range" min="1" max="100"/>
       </IntVectorProperty>
-
-      <DoubleVectorProperty
-        name="DesiredUpdateRate"
-        command="SetDesiredUpdateRate"
-        number_of_elements="1"
-        default_values="0">
-        <DoubleRangeDomain name="range" min="0" />
-      </DoubleVectorProperty>
 
       <IntVectorProperty
         name="OffScreenRendering"
@@ -850,7 +842,7 @@
       </ProxyProperty>
       <ProxyProperty name="RenderModuleHelper"
         command="SetRenderModuleHelper"
-        saveable="0">
+        is_internal="1">
       </ProxyProperty>
       <!-- End of LODActor -->
     </Proxy>
@@ -864,9 +856,68 @@
       </ProxyProperty>
       <ProxyProperty name="RenderModuleHelper"
         command="SetRenderModuleHelper"
-        saveable="0">
+        is_internal="1">
       </ProxyProperty>
       <!-- End of LODVolume -->
+    </Proxy>
+
+    <Proxy name="SliderRepresentation3D" class="vtkSliderRepresentation3D">
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        animateable="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+     <DoubleVectorProperty 
+        name="Value"
+        command="SetValue"
+        number_of_elements="1"
+        information_property="ValueInfo"
+        default_values="0">
+        <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="ValueInfo"
+        command="GetValue"
+        information_only="1">
+        <SimpleDoubleInformationHelper/>
+     </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Point1"
+        command="SetPoint1InWorldCoordinates"
+        number_of_elements="3"
+        default_values="-1.0 0.0 0.0">
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Point2"
+        command="SetPoint2InWorldCoordinates"
+        number_of_elements="3"
+        default_values="1.0 0.0 0.0">
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="MinimumValue"
+        command="SetMinimumValue"
+        number_of_elements="1"
+        default_values="0">
+        <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="MaximumValue"
+        command="SetMaximumValue"
+        number_of_elements="1"
+        default_values="1">
+        <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
     </Proxy>
   </ProxyGroup>
   
@@ -907,7 +958,7 @@
         name="Bold"
         command="SetBold"
         number_of_elements="1"
-        default_values="1"
+        default_values="0"
         animateable="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
@@ -916,7 +967,7 @@
         name="Italic"
         command="SetItalic"
         number_of_elements="1"
-        default_values="1"
+        default_values="0"
         animateable="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
@@ -925,7 +976,7 @@
         name="Shadow"
         command="SetShadow"
         number_of_elements="1"
-        default_values="1"
+        default_values="0"
         animateable="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
@@ -1157,7 +1208,7 @@
         number_of_elements="2"
         update_self="1"
         default_values="0 -1"
-        saveable="0">
+        is_internal="1">
         <IntRangeDomain name="range" min="0 0" />
       </IntVectorProperty>
       <Property
@@ -1385,6 +1436,7 @@
          number_of_elements="2"
          default_values="0 0"
          update_self="1"
+         is_internal="1"
          immediate_update="1">
          <IntRangeDomain name="range" min="0 0" />
       </IntVectorProperty>
@@ -1395,7 +1447,8 @@
          number_of_elements="2"
          default_values="300 300"
          update_self="1"
-         immediate_update="1">
+         immediate_update="1"
+         is_internal="1">
          <IntRangeDomain name="range" min="0 0" />
       </IntVectorProperty>
 
@@ -1839,7 +1892,8 @@
       <Property
         name="Update"
         command="Update"
-        update_self="1">
+        update_self="1"
+        is_internal="1">
       </Property>
       <Property
         name="InvalidateGeometry"
@@ -1953,6 +2007,7 @@
       <Property
         name="Update"
         command="Update"
+        is_internal="1"
         update_self="1">
       </Property>
       <Property
@@ -2118,7 +2173,7 @@
         <InputArrayDomain name="input_array" attribute_type="point">
         </InputArrayDomain>
       </InputProperty>
-      <Property name="Update" command="Update" update_self="1">
+      <Property name="Update" command="Update" update_self="1" is_internal="1">
       </Property>
       <Property name="InvalidateGeometry" command="InvalidateGeometry" update_self="1">
       </Property>
@@ -2153,6 +2208,7 @@
       <Property
         name="Update"
         command="Update"
+        is_internal="1"
         update_self="1">
       </Property>
       <Property
@@ -2166,7 +2222,7 @@
         number_of_elements="2"
         update_self="1"
         default_values="0 -1"
-        saveable="0"
+        is_internal="1"
         animateable="0">
       </IntVectorProperty>
       <IntVectorProperty
@@ -2199,6 +2255,7 @@
       <Property
         name="Update"
         command="Update"
+        is_internal="1"
         update_self="1">
       </Property>
       <Property
@@ -2213,7 +2270,7 @@
         update_self="1"
         default_values="0 -1"
         animateable="0"
-        saveable="0">
+        is_internal="1">
       </IntVectorProperty>
       <IntVectorProperty
         name="Representation"
@@ -2460,7 +2517,7 @@
         update_self="1"
         default_values="0"
         animateable="0"
-        saveable="0">
+        is_internal="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
       <IntVectorProperty
@@ -2470,7 +2527,7 @@
         update_self="1"
         default_values="0"
         animateable="0"
-        saveable="0">
+        is_internal="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
       <IntVectorProperty name="OrderedCompositing"
@@ -2617,7 +2674,7 @@
         update_self="1"
         default_values="0"
         animateable="0"
-        saveable="0">
+        is_internal="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
     </IceTMultiDisplayProxy>
@@ -2634,6 +2691,32 @@
         </ExposedProperties>
       </SubProxy>
     </DisplayProxy>
+
+    <New3DWidgetProxy name="SliderRepresentation">
+      <SubProxy>
+        <Proxy name="Prop"
+          proxygroup="props" proxyname="SliderRepresentation3D">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="ValueInfo" />
+          <Property name="Value" />
+          <Property name="Point1" />
+          <Property name="Point2" />
+          <Property name="MinimumValue" />
+          <Property name="MaximumValue" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Widget"
+          proxygroup="3d_widgets" proxyname="SliderWidget">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Enabled" />
+        </ExposedProperties>
+      </SubProxy>
+    </New3DWidgetProxy>
     <!-- End of displays group -->
   </ProxyGroup>
 
