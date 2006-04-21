@@ -66,7 +66,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.480");
+vtkCxxRevisionMacro(vtkPVSource, "1.481");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -2367,7 +2367,7 @@ void vtkPVSource::SaveStateDisplayInternal(ofstream *file, const char* display_n
   for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
     {
     vtkSMProperty* p = iter->GetProperty();
-    if (!p->GetSaveable())
+    if (p->GetIsInternal())
       {
       continue;
       }

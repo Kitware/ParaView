@@ -59,6 +59,7 @@ SET( ParaViewClient_SRCS
   vtkKWLookmark.cxx
   vtkKWLookmarkFolder.cxx
   vtkKWView.cxx
+  vtkPVNew3DWidget.cxx
   vtkPV3DWidget.cxx
   vtkPVAdvancedReaderModule.cxx
   vtkPVActiveTrackSelector.cxx

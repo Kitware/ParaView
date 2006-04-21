@@ -41,7 +41,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.21");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.22");
 
 // Private implementation
 struct vtkPVComparativeVisManagerInternals
@@ -424,21 +424,24 @@ void vtkPVComparativeVisManager::SaveState(ofstream *file)
           << "ComparativeVis]" << endl;
     *file << "$comparativeVis(" << idx << ") SetVisName {" 
           << iter->GetPointer()->GetVisName() << "}" << endl;
-    *file << "$comparativeVis(" << idx << ") SetNumberOfXFrames " 
+    *file << "[$comparativeVis(" << idx << ") GetProperty NumberOfXFrames] " 
+          << "SetElements1 "
           <<  iter->GetPointer()->GetNumberOfXFrames()
           << endl;
-    *file << "$comparativeVis(" << idx << ") SetNumberOfYFrames " 
-          <<  iter->GetPointer()->GetNumberOfYFrames()
+    *file << "[$comparativeVis(" << idx << ") GetProperty NumberOfYFrames] " 
+          << "SetElements1 "
+          << iter->GetPointer()->GetNumberOfYFrames()
           << endl;
     unsigned int numCues = iter->GetPointer()->GetNumberOfCues();
     for (unsigned int i=0; i<numCues; i++)
       {
-      *file << "$comparativeVis(" << idx << ") SetNumberOfFramesInCue " 
+      *file << "[$comparativeVis(" << idx << ") GetProperty NumberOfFramesInCue] " 
+            << "SetElement "
             << i << " " << iter->GetPointer()->GetNumberOfFramesInCue(i) 
             << endl;
       *file << "$comparativeVis(" << idx << ") SetSourceName " 
             << i << " [$kw(" << iter->GetPointer()->GetSourceTclName(i)
-            << ") GetVisName]" << endl;
+            << ") GetName]" << endl;
       *file << "$comparativeVis(" << idx << ") SetSourceTclName " 
             << i << " $kw(" << iter->GetPointer()->GetSourceTclName(i)
             << ")" << endl;
@@ -467,7 +470,8 @@ void vtkPVComparativeVisManager::SaveState(ofstream *file)
             }
           animCue->SaveInBatchScript(file, proxyName.str(), 0);
           delete[] proxyName.str();
-          *file << "$comparativeVis(" << idx << ") AddCue $pvTemp" 
+          *file << "[$comparativeVis(" << idx << ") "
+                << "GetProperty Cues] AddProxy $pvTemp" 
                 << animCue->GetID() 
                 << endl;
           *file << "$pvTemp" << animCue->GetID() << " UnRegister {}" 
@@ -475,6 +479,7 @@ void vtkPVComparativeVisManager::SaveState(ofstream *file)
           }
         }
       }
+    *file << "$comparativeVis(" << idx << ") UpdateVTKObjects" << endl;
     *file << "$kw(" << this->GetTclName() << ") AddVisualization "
           << "$comparativeVis(" << idx << ")" << endl;
     *file << "$comparativeVis(" << idx << ") UnRegister {}" << endl;

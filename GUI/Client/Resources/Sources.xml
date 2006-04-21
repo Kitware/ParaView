@@ -398,5 +398,11 @@
                property="SubsampleRate" type="int" />
 </Module>
 
+<Module name="Test3DWidget" menu_name="Test 3D Widget" root_name="T3DW" 
+        module_type="Source" >
+  <Source class="vtkConeSource"/>
+  <New3DWidget trace_name="slider" property="Resolution"/>
+</Module>
+
 </ModuleInterfaces>
 
