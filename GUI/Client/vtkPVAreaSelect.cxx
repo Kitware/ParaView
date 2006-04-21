@@ -27,10 +27,12 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkPVTraceHelper.h"
+#include <vtksys/ios/sstream>
+#include <stdio.h>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAreaSelect);
-vtkCxxRevisionMacro(vtkPVAreaSelect, "1.3");
+vtkCxxRevisionMacro(vtkPVAreaSelect, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVAreaSelect::vtkPVAreaSelect()
@@ -248,80 +250,18 @@ void vtkPVAreaSelect::DoSelect()
 void vtkPVAreaSelect::AcceptCallbackInternal()
 {
 
-  this->DataInformationValid = 0; //this won't change the data type though...
+  this->InvalidateDataInformation(); //still doesn't make info page update
 
   if (this->SelectReady)
     {
     this->DoSelect();
     this->SelectReady = 0;
     this->GetPVInput(0)->SetVisibility(0);
-    this->SaveVertsInTrace();
+    this->AdditionalTraceSave();
     }
 
   this->SelectButton->EnabledOn();
   this->Superclass::AcceptCallbackInternal();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVAreaSelect::SaveVertsInTrace()
-{
-    this->GetTraceHelper()->AddEntry("$kw(%s) CreateVert 0 %f %f %f %f",
-                                     this->GetTclName(),
-                                     this->Verts[0], 
-                                     this->Verts[1], 
-                                     this->Verts[2], 
-                                     this->Verts[3]);
-
-    this->GetTraceHelper()->AddEntry("$kw(%s) CreateVert 1 %f %f %f %f",
-                                     this->GetTclName(),
-                                     this->Verts[4], 
-                                     this->Verts[5], 
-                                     this->Verts[6], 
-                                     this->Verts[7]);
-                                     
-    this->GetTraceHelper()->AddEntry("$kw(%s) CreateVert 2 %f %f %f %f",
-                                     this->GetTclName(),
-                                     this->Verts[8], 
-                                     this->Verts[9], 
-                                     this->Verts[10], 
-                                     this->Verts[11]);
-                                     
-    this->GetTraceHelper()->AddEntry("$kw(%s) CreateVert 3 %f %f %f %f",
-                                     this->GetTclName(),
-                                     this->Verts[12], 
-                                     this->Verts[13], 
-                                     this->Verts[14], 
-                                     this->Verts[15]);
-                                     
-    this->GetTraceHelper()->AddEntry("$kw(%s) CreateVert 4 %f %f %f %f",
-                                     this->GetTclName(),
-                                     this->Verts[16], 
-                                     this->Verts[17], 
-                                     this->Verts[18], 
-                                     this->Verts[19]);
-                                     
-    this->GetTraceHelper()->AddEntry("$kw(%s) CreateVert 5 %f %f %f %f",
-                                     this->GetTclName(),
-                                     this->Verts[20], 
-                                     this->Verts[21], 
-                                     this->Verts[22], 
-                                     this->Verts[23]);
-                                     
-    this->GetTraceHelper()->AddEntry("$kw(%s) CreateVert 6 %f %f %f %f",
-                                     this->GetTclName(),
-                                     this->Verts[24], 
-                                     this->Verts[25], 
-                                     this->Verts[26], 
-                                     this->Verts[27]);
-                                     
-    this->GetTraceHelper()->AddEntry("$kw(%s) CreateVert 7 %f %f %f %f",
-                                     this->GetTclName(),
-                                     this->Verts[28], 
-                                     this->Verts[29], 
-                                     this->Verts[30], 
-                                     this->Verts[31] );
-
-    this->GetTraceHelper()->AddEntry("$kw(%s) SetVerts 0", this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -358,5 +298,82 @@ void vtkPVAreaSelect::SetVerts(int wireframe)
     cf->SetArgumentIsArray(1);
     cf->SetElements(&this->Verts[0]);
     sp->UpdateVTKObjects();   
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAreaSelect::AdditionalTraceSave()
+{
+  ofstream *f = this->GetTraceHelper()->GetFile();
+  this->AdditionalStateSave(f);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAreaSelect::AdditionalStateSave(ofstream *file)
+{
+  *file << "$kw(" << this->GetTclName() << ")" << " CreateVert 0 " 
+        << this->Verts[0] << " " 
+        << this->Verts[1] << " " 
+        << this->Verts[2] << " " 
+        << this->Verts[3] << endl;
+
+  *file << "$kw(" << this->GetTclName() << ")" << " CreateVert 1 " 
+        << this->Verts[4] << " " 
+        << this->Verts[5] << " " 
+        << this->Verts[6] << " " 
+        << this->Verts[7] << endl;
+                                     
+  *file << "$kw(" << this->GetTclName() << ")" << " CreateVert 2 " 
+        << this->Verts[8] << " " 
+        << this->Verts[9] << " " 
+        << this->Verts[10] << " "
+        << this->Verts[11] << endl;
+                                     
+  *file << "$kw(" << this->GetTclName() << ")" << " CreateVert 3 " 
+        << this->Verts[12] << " " 
+        << this->Verts[13] << " " 
+        << this->Verts[14] << " " 
+        << this->Verts[15] << endl;
+                                     
+  *file << "$kw(" << this->GetTclName() << ")" << " CreateVert 4 " 
+        << this->Verts[16] << " " 
+        << this->Verts[17] << " " 
+        << this->Verts[18] << " " 
+        << this->Verts[19] << endl;
+                                     
+  *file << "$kw(" << this->GetTclName() << ")" << " CreateVert 5 " 
+        << this->Verts[20] << " " 
+        << this->Verts[21] << " " 
+        << this->Verts[22] << " " 
+        << this->Verts[23] << endl;
+                                     
+  *file << "$kw(" << this->GetTclName() << ")" << " CreateVert 6 " 
+        << this->Verts[24] << " " 
+        << this->Verts[25] << " " 
+        << this->Verts[26] << " " 
+        << this->Verts[27] << endl;
+                                     
+  *file << "$kw(" << this->GetTclName() << ")" << " CreateVert 7 " 
+        << this->Verts[28] << " " 
+        << this->Verts[29] << " " 
+        << this->Verts[30] << " " 
+        << this->Verts[31] << endl;
+                                       
+  *file << "$kw(" << this->GetTclName() << ")" << " SetVerts 0" << endl;
+
+  *file << endl;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAreaSelect::AdditionalBatchSave(ofstream *file)
+{
+  *file << "  [$pvTemp" << this->Proxy->GetSelfIDAsString()
+        << " GetProperty CreateFrustum]" 
+        << " SetArgumentIsArray 1" << endl;
+  for (int i = 0; i < 32; i++)
+    {
+    *file << "  [$pvTemp" << this->Proxy->GetSelfIDAsString()
+          << " GetProperty CreateFrustum]" 
+          << " SetElement " << i << " " << this->Verts[i] << endl;
     }
 }

@@ -66,7 +66,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.479");
+vtkCxxRevisionMacro(vtkPVSource, "1.480");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -2326,6 +2326,8 @@ void vtkPVSource::SaveFilterInBatchScript(ofstream *file)
   this->SetInputsInBatchScript(file);
   this->SaveWidgetsInBatchScript(file);
 
+  // Let the child class save anything it needs to in addition to the above.
+  this->AdditionalBatchSave(file);
 
   *file << "  $pvTemp" << this->Proxy->GetSelfIDAsString()
         << " UpdateVTKObjects" << endl;
@@ -2481,7 +2483,10 @@ void vtkPVSource::SaveState(ofstream *file)
     it->GoToNextItem();
     }
   it->Delete();
-  
+
+  // Let the child class save anything it needs to in addition to the above.
+  this->AdditionalStateSave(file);
+
   // Call accept.
   *file << "$kw(" << this->GetTclName() << ") AcceptCallback" << endl;
 

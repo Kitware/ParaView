@@ -49,7 +49,8 @@ public:
   void OnLeftButtonDown(int x, int y);
   void OnLeftButtonUp(int x, int y, vtkRenderer *renderer);
 
-  //These two are for internal use and playback only.
+  // Description:
+  // For internal use and playback only but need to be public for scripts.
   void CreateVert(int i, double v0, double v1, double v2, double v3);
   void SetVerts(int wireframe);
 
@@ -57,8 +58,8 @@ protected:
   vtkPVAreaSelect();
   ~vtkPVAreaSelect();
 
-  virtual void AcceptCallbackInternal();
   void DoSelect();  
+  virtual void AcceptCallbackInternal();
 
   //to watch mouse with
   vtkCallbackCommand* EventCallbackCommand;
@@ -67,6 +68,12 @@ protected:
                             void* clientdata, 
                             void* calldata);
   
+  //have to help out trace, state and batch saving because UI is 
+  //for this source is not completely XML controlled, in particular
+  //frustum vertices are not shown on the UI but rather drawn with the mouse
+  void AdditionalTraceSave();
+  virtual void AdditionalStateSave(ofstream *file);
+  virtual void AdditionalBatchSave(ofstream *file);
 
   //to use while picking
   vtkInteractorStyleRubberBandPick *RubberBand;
@@ -77,12 +84,11 @@ protected:
   //to turn on selection
   vtkKWPushButton *SelectButton;
 
-  //have to help out trace and state saving because UI is not completely
-  //XML controlled
-  void SaveVertsInTrace();
-
+  //internal operating state
   int SelectReady;
   int InPickState;
+
+  //frustum parameters (screen and world coordinates)
   int Xs;
   int Ys;
   int Xe;

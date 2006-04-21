@@ -546,6 +546,12 @@ protected:
 
   void SaveFilterInBatchScript(ofstream *file);
 
+  // Description:
+  // These are hooks that child classes can use to save off any state
+  // they have that are not contained within the Client Side Widgets.
+  virtual void AdditionalBatchSave(ofstream *file) {};
+  virtual void AdditionalStateSave(ofstream *file) {};
+
   virtual void InitializeWidgets();  
 
 
