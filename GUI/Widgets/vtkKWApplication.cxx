@@ -70,7 +70,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.286");
+vtkCxxRevisionMacro(vtkKWApplication, "1.287");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -2241,6 +2241,7 @@ int vtkKWApplication::PutEnv(const char* value)
   int ret = putenv(env_var);
   // save the pointer in the static vector so that it can
   // be deleted on exit
+  // http://groups.google.com/group/comp.unix.wizards/msg/f0915a043bf259fa?dmode=source
   local_environment.push_back(env_var);
   return ret == 0;
 }
