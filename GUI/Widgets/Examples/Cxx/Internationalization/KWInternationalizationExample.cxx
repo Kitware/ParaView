@@ -102,7 +102,7 @@ int my_main(int argc, char *argv[])
     // the source code (check the french translation catalog for example).
 
     sprintf(buffer, _("The string '%s' has %d characters."), 
-            app->GetName(), strlen(app->GetName()));
+            app->GetName(), (int)strlen(app->GetName()));
     dlg->SetText(buffer);
 
     // Invoke the dialog, and switch the current language
