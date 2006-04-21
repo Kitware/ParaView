@@ -436,6 +436,10 @@ public:
   // Callbacks. Internal, do not use.
   virtual void TclBgErrorCallback(const char* message);
 
+  // Description:
+  // Put a string into the environment of the form var=value
+  static int PutEnv(const char* value);
+
 protected:
   vtkKWApplication();
   ~vtkKWApplication();

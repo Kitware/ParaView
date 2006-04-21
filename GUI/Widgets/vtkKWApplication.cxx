@@ -70,7 +70,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.285");
+vtkCxxRevisionMacro(vtkKWApplication, "1.286");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -114,6 +114,21 @@ public:
 
   vtksys_stl::string VersionNameTemp;
   vtksys_stl::string LimitedEditionModeNameTemp;
+
+  // For ::PutEnv
+
+  class DeletingCharVector : public vtksys_stl::vector<char*>
+  {
+  public:
+    ~DeletingCharVector()
+      {
+        for(vtksys_stl::vector<char*>::iterator i = this->begin();
+            i != this->end(); ++i)
+          {
+          delete []*i;
+          }
+      }
+  };
 };
 
 //----------------------------------------------------------------------------
@@ -2215,6 +2230,19 @@ int vtkKWApplication::EvaluateBooleanExpression(const char* format, ...)
   va_end(var_args2);
 
   return (result && !strcmp(result, "1")) ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::PutEnv(const char* value)
+{ 
+  static vtkKWApplicationInternals::DeletingCharVector local_environment;
+  char *env_var = new char[strlen(value) + 1];
+  strcpy(env_var, value);
+  int ret = putenv(env_var);
+  // save the pointer in the static vector so that it can
+  // be deleted on exit
+  local_environment.push_back(env_var);
+  return ret == 0;
 }
 
 //----------------------------------------------------------------------------

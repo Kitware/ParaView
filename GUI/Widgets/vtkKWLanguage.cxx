@@ -19,13 +19,14 @@
 #include <locale.h>
 #endif
 #include "vtkKWInternationalization.h"
+#include "vtkKWApplication.h"
 
 #include "vtkObjectFactory.h"
 #include <vtksys/stl/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLanguage);
-vtkCxxRevisionMacro(vtkKWLanguage, "1.6");
+vtkCxxRevisionMacro(vtkKWLanguage, "1.7");
 
 //----------------------------------------------------------------------------
 void vtkKWLanguage::SetCurrentLanguage(int lang)
@@ -46,11 +47,11 @@ void vtkKWLanguage::SetCurrentLanguage(int lang)
 
     env_var = "LC_MESSAGES=";
     env_var += xpg;
-    putenv((char*)env_var.c_str());
+    vtkKWApplication::PutEnv(env_var.c_str());
 
     env_var = "LANG=";
     env_var += xpg;
-    putenv((char*)env_var.c_str());
+    vtkKWApplication::PutEnv(env_var.c_str());
     
     /* According to gettext doc, section 10.5
        The code for gcc-2.7.0 and up provides some optimization. This 

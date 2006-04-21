@@ -320,7 +320,6 @@ protected:
   // to find the language if the territory was missing.
   static int GetLanguageFromXPGStrict(const char *xpg);
 
-
 private:
   vtkKWLanguage(const vtkKWLanguage&); // Not implemented
   void operator=(const vtkKWLanguage&); // Not implemented
