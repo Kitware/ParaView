@@ -18,13 +18,14 @@
 #else
 #include <locale.h>
 #endif
+#include "vtkKWInternationalization.h"
 
 #include "vtkObjectFactory.h"
 #include <vtksys/stl/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLanguage);
-vtkCxxRevisionMacro(vtkKWLanguage, "1.4");
+vtkCxxRevisionMacro(vtkKWLanguage, "1.5");
 
 //----------------------------------------------------------------------------
 void vtkKWLanguage::SetCurrentLanguage(int lang)
@@ -50,6 +51,20 @@ void vtkKWLanguage::SetCurrentLanguage(int lang)
     env_var = "LANG=";
     env_var += xpg;
     putenv((char*)env_var.c_str());
+    
+    /* According to gettext doc, section 10.5
+       The code for gcc-2.7.0 and up provides some optimization. This 
+       optimization normally prevents the calling of the dcgettext function as
+       long as no new catalog is loaded. But if dcgettext is not called the
+       program also cannot find the LANGUAGE variable has changed.
+       Here is the "recommended" solution
+    */
+#if !defined(_WIN32) && defined(KWWidgets_USE_INTERNATIONALIZATION)
+    {
+      extern int  _nl_msg_cat_cntr;
+      ++_nl_msg_cat_cntr;
+    }
+#endif
     }
 
 #ifdef _WIN32

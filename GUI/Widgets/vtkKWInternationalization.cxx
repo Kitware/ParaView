@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWInternationalization);
-vtkCxxRevisionMacro(vtkKWInternationalization, "1.4");
+vtkCxxRevisionMacro(vtkKWInternationalization, "1.5");
 
 //----------------------------------------------------------------------------
 void vtkKWInternationalization::SetCurrentTextDomain(const char *domain_name)
@@ -184,7 +184,7 @@ const char* vtkKWInternationalization::FindTextDomainBinding(
   vtksys_stl::vector<vtksys_stl::string> subdir_candidates;
 
   const char *subdir_levels[] = { ".", "..", "../.." };
-  int l;
+  size_t l;
   for (l = 0; l < sizeof(subdir_levels) / sizeof(subdir_levels[0]); l++)
     {
     vtksys_stl::string subdir_level = subdir_levels[l];
