@@ -55,7 +55,7 @@ static void D3UpdateProgress(vtkObject *_D3, unsigned long,
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkOrderedCompositeDistributor, "1.7");
+vtkCxxRevisionMacro(vtkOrderedCompositeDistributor, "1.8");
 vtkStandardNewMacro(vtkOrderedCompositeDistributor);
 
 vtkCxxSetObjectMacro(vtkOrderedCompositeDistributor, PKdTree, vtkPKdTree);
@@ -145,7 +145,7 @@ int vtkOrderedCompositeDistributor::RequestDataObject(
                                              vtkInformationVector** inputVector,
                                              vtkInformationVector* outputVector)
 {
-  if (!this->OutputType)
+  if (!this->OutputType || this->OutputType[0] == '\0')
     {
     return this->Superclass::RequestDataObject(request,
                                                inputVector, outputVector);
