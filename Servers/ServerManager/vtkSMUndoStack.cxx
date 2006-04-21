@@ -124,11 +124,11 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMUndoStackUndoSet);
-vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.4");
+vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.5");
 //*****************************************************************************
 
 vtkStandardNewMacro(vtkSMUndoStack);
-vtkCxxRevisionMacro(vtkSMUndoStack, "1.4");
+vtkCxxRevisionMacro(vtkSMUndoStack, "1.5");
 vtkCxxSetObjectMacro(vtkSMUndoStack, StateLoader, vtkSMUndoRedoStateLoader);
 //-----------------------------------------------------------------------------
 vtkSMUndoStack::vtkSMUndoStack()
@@ -319,7 +319,7 @@ void vtkSMUndoStack::OnPropertyModified(void* data)
     vtkSMProxyManager::ModifiedPropertyInformation*>(data)); 
  
   vtkSMProperty* prop = info.Proxy->GetProperty(info.PropertyName);
-  if (prop && !prop->GetInformationOnly() && prop->GetSaveable())
+  if (prop && !prop->GetInformationOnly() && !prop->GetIsInternal())
     {
     vtkSMPropertyModificationUndoElement* elem = 
       vtkSMPropertyModificationUndoElement::New();

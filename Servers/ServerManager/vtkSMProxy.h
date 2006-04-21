@@ -156,10 +156,24 @@ public:
     }
 
   // Description:
+  // Given a property pointer, returns the name that was used
+  // to add it to the proxy. Returns NULL if the property is
+  // not in the proxy. If the property belongs to a sub-proxy,
+  // it returns the exposed name or NULL if the property is not
+  // exposed.
+  const char* GetPropertyName(vtkSMProperty* prop);
+
+  // Description:
   // Update the VTK object on the server by pushing the values of
   // all modifed properties (un-modified properties are ignored).
   // If the object has not been created, it will be created first.
   virtual void UpdateVTKObjects();
+
+  // Description:
+  // Update the value of one property (pushed to the server) if it is
+  // modified.  If the object has not been created, it will be created
+  // first.
+  void UpdateProperty(const char* name);
 
   // Description:
   // Calls UpdateVTKObjects() on self and all proxies that depend
@@ -324,7 +338,6 @@ public:
   // Returns the documentation for this proxy.
   vtkGetObjectMacro(Documentation, vtkSMDocumentation);
 
-//BTX
 protected:
   vtkSMProxy();
   ~vtkSMProxy();
@@ -336,6 +349,7 @@ protected:
   void ExposeSubProxyProperty(const char* subproxy_name, 
     const char* property_name, const char* exposed_name);
 
+//BTX
   // Description:
   // These classes have been declared as friends to minimize the
   // public interface exposed by vtkSMProxy. Each of these classes
@@ -348,12 +362,17 @@ protected:
   friend class vtkSMProxyObserver;
   friend class vtkSMProxyProperty;
   friend class vtkSMSourceProxy;
+  friend class vtkSMRenderModuleProxy;
   friend class vtkSMIceTDesktopRenderModuleProxy;
   friend class vtkSMCompoundProxy;
   friend class vtkSMStateLoader;
   friend class vtkSMDefaultStateLoader;
   friend class vtkSMProxyRegisterUndoElement;
   friend class vtkSMProxyUnRegisterUndoElement;
+  friend class vtkSMNew3DWidgetProxy;
+  // -- PVEE only
+  friend class vtkWSMApplication;
+//ETX
 
   // Description:
   // Assigned by the XML parser. The name assigned in the XML
@@ -414,16 +433,6 @@ protected:
   // Description:
   // Set the server connection id on self.
   void SetConnectionIDSelf(vtkIdType id);
-
-  // Description:
-  // This is a convenience method that pushes the value of one property
-  // to one server alone. This is most commonly used by sub-classes
-  // to make calls on the server manager through the stream interface.
-  // This method does not change the modified flag of the property.
-  // If possible, use UpdateVTKObjects() instead of this.
-  void PushProperty(const char* name, 
-                    vtkClientServerID id, 
-                    vtkTypeUInt32 servers);
 
   // Description:
   // Cleanup code. Remove all observers from all properties assigned to
@@ -553,6 +562,7 @@ protected:
   char* XMLName;
   int ObjectsCreated;
   vtkTypeUInt32 Servers;
+  int DoNotUpdateImmediately;
   int DoNotModifyProperty;
 
   // Description:
@@ -604,8 +614,6 @@ private:
   // indentify the proxy when saving ServerManager state.
   // By default the name is set to the SelfID of the proxy.
   vtkSetStringMacro(Name);
-  // -- PVEE only
-  friend class vtkWSMApplication;
 
   void RegisterSelfID();
 

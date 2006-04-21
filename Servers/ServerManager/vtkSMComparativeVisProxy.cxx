@@ -40,7 +40,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMComparativeVisProxy);
-vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.17");
+vtkCxxRevisionMacro(vtkSMComparativeVisProxy, "1.18");
 
 vtkCxxSetObjectMacro(vtkSMComparativeVisProxy, RenderModule, vtkSMRenderModuleProxy);
 
@@ -213,6 +213,12 @@ void vtkSMComparativeVisProxy::Initialize()
   this->RemoveAllCues();
 
   this->RemoveAllCache();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMComparativeVisProxy::ClearCues()
+{
+  this->Internal->Cues.clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -894,16 +900,19 @@ int vtkSMComparativeVisProxy::Show()
     vtkSMDoubleVectorProperty::SafeDownCast(
       this->RenderModule->GetProperty("CameraPosition"));
   position->SetElements3(0, 0, 1);
+  position->Modified();
 
   vtkSMDoubleVectorProperty* focalP = 
     vtkSMDoubleVectorProperty::SafeDownCast(
       this->RenderModule->GetProperty("CameraFocalPoint"));
   focalP->SetElements3(0, 0, 0);
+  focalP->Modified();
 
   vtkSMDoubleVectorProperty* viewUp = 
     vtkSMDoubleVectorProperty::SafeDownCast(
       this->RenderModule->GetProperty("CameraViewUp"));
   viewUp->SetElements3(0, 1, 0);
+  viewUp->Modified();
 
   this->RenderModule->UpdateVTKObjects();
   this->RenderModule->ResetCameraClippingRange();

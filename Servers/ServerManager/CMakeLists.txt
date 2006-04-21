@@ -72,6 +72,7 @@ SET(Kit_SRCS
   vtkSMMultiDisplayProxy.cxx
   vtkSMMultiDisplayRenderModuleProxy.cxx
   vtkSMMultiViewRenderModuleProxy.cxx
+  vtkSMNew3DWidgetProxy.cxx
   vtkSMNumberOfGroupsDomain.cxx
   vtkSMNumberOfPartsDomain.cxx
   vtkSMObject.cxx

@@ -36,7 +36,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.13");
 
 
 //-----------------------------------------------------------------------------
@@ -493,30 +493,33 @@ void vtkSMDataObjectDisplayProxy::SetupDefaults()
   pm->SendStream(this->ConnectionID,
     this->UpdateSuppressorProxy->GetServers(), stream);
 
-  // This is here just for streaming (can be removed if streaming is removed).
-  vtkClientServerStream stream2;
-  for (i=0; i < this->UpdateSuppressorProxy->GetNumberOfIDs(); i++)
+  if (pm->GetStreamBlock())
     {
-    stream2
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetNumberOfPartitions"
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->MapperProxy->GetID(i) << "SetNumberOfPieces"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
-    stream2
-      << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetPartitionId"
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << this->MapperProxy->GetID(i) << "SetPiece"
-      << vtkClientServerStream::LastResult
-      << vtkClientServerStream::End;
+    // This is here just for streaming (can be removed if streaming is removed).
+    vtkClientServerStream stream2;
+    for (i=0; i < this->UpdateSuppressorProxy->GetNumberOfIDs(); i++)
+      {
+      stream2
+        << vtkClientServerStream::Invoke
+        << pm->GetProcessModuleID() << "GetNumberOfPartitions"
+        << vtkClientServerStream::End
+        << vtkClientServerStream::Invoke
+        << this->MapperProxy->GetID(i) << "SetNumberOfPieces"
+        << vtkClientServerStream::LastResult
+        << vtkClientServerStream::End;
+      stream2
+        << vtkClientServerStream::Invoke
+        << pm->GetProcessModuleID() << "GetPartitionId"
+        << vtkClientServerStream::End
+        << vtkClientServerStream::Invoke
+        << this->MapperProxy->GetID(i) << "SetPiece"
+        << vtkClientServerStream::LastResult
+        << vtkClientServerStream::End;
+      }
+    // Do we need to client too?
+    pm->SendStream(this->ConnectionID,
+                   vtkProcessModule::RENDER_SERVER, stream2);  
     }
-  // Do we need to client too?
-  pm->SendStream(this->ConnectionID,
-    vtkProcessModule::RENDER_SERVER, stream2);  
   
   //  this->UpdateVTKObjects();
 }

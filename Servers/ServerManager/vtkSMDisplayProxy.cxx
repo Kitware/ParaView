@@ -23,7 +23,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.10");
 
 //-----------------------------------------------------------------------------
 vtkSMDisplayProxy::vtkSMDisplayProxy()
@@ -187,9 +187,9 @@ void vtkSMDisplayProxy::SaveInBatchScript(ofstream* file)
       continue;
       }
     
-    if (!p->GetSaveable())
+    if (p->GetIsInternal())
       {
-      *file << "  # skipping not-saveable property " << iter->GetKey() << endl;
+      *file << "  # skipping internal property " << iter->GetKey() << endl;
       continue;
       }
     

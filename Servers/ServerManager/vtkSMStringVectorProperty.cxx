@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.24");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.25");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -31,6 +31,7 @@ struct vtkSMStringVectorPropertyInternals
   vtkstd::vector<vtkStdString> UncheckedValues;
   vtkstd::vector<vtkStdString> LastPushedValues;
   vtkstd::vector<int> ElementTypes;
+  vtkstd::vector<char> Initialized;
 
   void UpdateLastPushedValues()
     {
@@ -87,6 +88,21 @@ void vtkSMStringVectorProperty::AppendCommandToStream(
     return;
     }
 
+  int i;
+  int numArgs = this->GetNumberOfElements();
+  int numInitArgs = 0;
+  for(i=0; i<numArgs; i++)
+    {
+    if (this->Internals->Initialized[i])
+      {
+      numInitArgs++;
+      }
+    }
+  if (numInitArgs == 0)
+    {
+    return;
+    }
+
   if (this->CleanCommand)
     {
     *str << vtkClientServerStream::Invoke
@@ -97,8 +113,7 @@ void vtkSMStringVectorProperty::AppendCommandToStream(
   if (!this->RepeatCommand)
     {
     *str << vtkClientServerStream::Invoke << objectId << this->Command;
-    int numArgs = this->GetNumberOfElements();
-    for(int i=0; i<numArgs; i++)
+    for(i=0; i<numArgs; i++)
       {
       // Convert to the appropriate type and add to stream
       switch (this->GetElementType(i))
@@ -120,7 +135,7 @@ void vtkSMStringVectorProperty::AppendCommandToStream(
     {
     int numArgs = this->GetNumberOfElements();
     int numCommands = numArgs / this->NumberOfElementsPerCommand;
-    for(int i=0; i<numCommands; i++)
+    for(i=0; i<numCommands; i++)
       {
       *str << vtkClientServerStream::Invoke << objectId << this->Command;
       if (this->UseIndex)
@@ -158,7 +173,12 @@ void vtkSMStringVectorProperty::SetNumberOfUncheckedElements(unsigned int num)
 //---------------------------------------------------------------------------
 void vtkSMStringVectorProperty::SetNumberOfElements(unsigned int num)
 {
+  if (num == this->Internals->Values.size())
+    {
+    return;
+    }
   this->Internals->Values.resize(num);
+  this->Internals->Initialized.resize(num, 0);
   this->Internals->UncheckedValues.resize(num);
   this->Modified();
 }
@@ -211,6 +231,13 @@ int vtkSMStringVectorProperty::SetElement(unsigned int idx, const char* value)
     value = "";
     }
 
+  unsigned int numElems = this->GetNumberOfElements();
+
+  if (idx < numElems && strcmp(value, this->GetElement(idx)) == 0)
+    {
+    return 1;
+    }
+
   if ( vtkSMProperty::GetCheckDomains() )
     {
     for(unsigned int i=0; i<this->GetNumberOfElements(); i++)
@@ -231,6 +258,7 @@ int vtkSMStringVectorProperty::SetElement(unsigned int idx, const char* value)
     this->SetNumberOfElements(idx+1);
     }
   this->Internals->Values[idx] = value;
+  this->Internals->Initialized[idx] = 1;
   this->Modified();
   return 1;
 }
@@ -284,7 +312,10 @@ int vtkSMStringVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
   if (numEls > 0)
     {
     const char *initVal = element->GetAttribute("default_values");
-    this->SetElement(0, initVal); // what to do with > 1 element?
+    if (initVal)
+      {
+      this->SetElement(0, initVal); // what to do with > 1 element?
+      }
     this->Internals->UpdateLastPushedValues(); 
     }
   return 1;

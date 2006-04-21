@@ -45,14 +45,14 @@
 // vtkSMStringVectorProperty, vtkSMIdTypeVectorProperty) by default have
 // have animateable="2".
 //
-// A property can be marked "saveable". "saveable" attribute can have 
+// A property can be marked "is_internal". "internal" attribute can have 
 // value {0, 1}.
-// 0 :-- property is not saveable. Hence, when saving ServerManager state
-//       or saving batch script, the property's value is not saved.
-// 1 :-- property is saveable. Hence, it gets saved when saving SM state
+// 0 :-- property is not internal.
+//
+// 1 :-- property is internal. Hence, it is not saved when saving SM state
 //       or batch script. 
-// An instance of vtkSMProperty is never savable. All other concrete subclasses
-// are by default savable (i.e. vtkSMProxyProperty and subclasses and
+// An instance of vtkSMProperty is always internal. All other concrete subclasses
+// are by default not internal (i.e. vtkSMProxyProperty and subclasses and
 // vtkSMVectorProperty subclasses).
 // .SECTION See Also
 // vtkSMProxyProperty vtkSMInputProperty vtkSMVectorProperty
@@ -192,10 +192,11 @@ public:
   vtkGetMacro(Animateable, int);
 
   // Description:
-  // Get/Set if the property is saveable. A non-saveable property should not
-  // be saved in state or batch script.
-  vtkSetMacro(Saveable, int);
-  vtkGetMacro(Saveable, int);
+  // Get/Set if the property is internal to server manager.
+  // Internal properties are not saved in state and should not be
+  // displayed in the user interface.
+  vtkSetMacro(IsInternal, int);
+  vtkGetMacro(IsInternal, int);
 
   // Description:
   // Copy all property values.
@@ -303,7 +304,7 @@ protected:
   int ImmediateUpdate;
   int UpdateSelf;
   int Animateable;
-  int Saveable;
+  int IsInternal;
 
   char* XMLName;
 

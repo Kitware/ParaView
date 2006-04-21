@@ -31,7 +31,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.32");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.33");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -49,7 +49,7 @@ vtkSMProxyProperty::vtkSMProxyProperty()
   this->CleanCommand = 0;
   this->RepeatCommand = 0;
   this->RemoveCommand = 0;
-  this->SetSaveable(1);
+  this->IsInternal = 0;
 }
 
 //---------------------------------------------------------------------------
