@@ -7,8 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-03-24 11:40-0500\n"
+"Report-Msgid-Bugs-To: foo@bar.com\n"
+"POT-Creation-Date: 2006-04-21 19:17-0400\n"
 "PO-Revision-Date: 2006-03-24 11:33-0500\n"
 "Last-Translator: <EMAIL@ADDRESS>\n"
 "Language-Team: French\n"
@@ -17,27 +17,27 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: ../KWInternationalizationExample.cxx:81
-#: ../KWInternationalizationExample.cxx:133
-#: ../KWInternationalizationExample.cxx:138
+#: ../KWInternationalizationExample.cxx:85
+#: ../KWInternationalizationExample.cxx:137
+#: ../KWInternationalizationExample.cxx:142
 msgid "Button|English"
 msgstr "Anglais"
 
-#: ../KWInternationalizationExample.cxx:82
+#: ../KWInternationalizationExample.cxx:86
 msgid "Button|French"
 msgstr "Français"
 
-#: ../KWInternationalizationExample.cxx:89
+#: ../KWInternationalizationExample.cxx:93
 msgid "A simple dialog box!"
 msgstr "Une simple boîte de dialogue!"
 
-#: ../KWInternationalizationExample.cxx:104
+#: ../KWInternationalizationExample.cxx:108
 #, c-format
 msgid "The string '%s' has %d characters."
 msgstr "Il y a %2$d caractères dans la chaîne '%1$s'."
 
-#: ../KWInternationalizationExample.cxx:130
-#: ../KWInternationalizationExample.cxx:135
+#: ../KWInternationalizationExample.cxx:134
+#: ../KWInternationalizationExample.cxx:139
 #, c-format
 msgid "Test foo = %s and 3 = %d."
 msgstr "Test 3 = %2$d et foo = %1$s."
