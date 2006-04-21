@@ -179,9 +179,9 @@ foo Delete
 
 set comparativeVis(0) [$proxyManager NewProxy ComparativeVisHelpers ComparativeVis]
 $comparativeVis(0) SetVisName {Comparative Vis 1}
-$comparativeVis(0) SetNumberOfXFrames 6
-$comparativeVis(0) SetNumberOfYFrames 4
-$comparativeVis(0) SetNumberOfFramesInCue 0 6
+[$comparativeVis(0) GetProperty NumberOfXFrames] SetElement 0 6
+[$comparativeVis(0) GetProperty NumberOfYFrames] SetElement 0 4
+[$comparativeVis(0) GetProperty NumberOfFramesInCue] SetElement 0 6 
 $comparativeVis(0) SetSourceName 0 [$kw(vtkTemp847) GetName]
 $comparativeVis(0) SetSourceTclName 0 $kw(vtkTemp847)
 
@@ -219,10 +219,10 @@ $pvTemp618 UnRegister {}
 $pvTemp613 UpdateVTKObjects
 $pvTemp614 UnRegister {}
 
-$comparativeVis(0) AddCue $pvTemp613
+[$comparativeVis(0) GetProperty Cues] AddProxy $pvTemp613
 $pvTemp613 UnRegister {}
 
-$comparativeVis(0) SetNumberOfFramesInCue 1 4
+[$comparativeVis(0) GetProperty NumberOfFramesInCue] SetElement 1 4
 $comparativeVis(0) SetSourceName 1 [$kw(vtkTemp847) GetName]
 $comparativeVis(0) SetSourceTclName 1 $kw(vtkTemp847)
 
@@ -260,8 +260,10 @@ $pvTemp620 UnRegister {}
 $pvTemp615 UpdateVTKObjects
 $pvTemp616 UnRegister {}
 
-$comparativeVis(0) AddCue $pvTemp615
+[$comparativeVis(0) GetProperty Cues] AddProxy $pvTemp615
 $pvTemp615 UnRegister {}
+
+$comparativeVis(0) UpdateVTKObjects
 
 $kw(vtkTemp1013) AddVisualization $comparativeVis(0)
 $comparativeVis(0) UnRegister {}
