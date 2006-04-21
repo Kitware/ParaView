@@ -7,6 +7,7 @@
 
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/CommandLineArguments.hxx>
+#include <vtksys/stl/string>
 
 int my_main(int argc, char *argv[])
 {
@@ -25,22 +26,25 @@ int my_main(int argc, char *argv[])
 
   vtkKWInternationalization::SetCurrentTextDomain(
     "KWInternationalizationExample");
-
+  
   // Try to find where the translation catalogs for the current text
   // domain can be found on disk. Several candidates are considered.
 
   vtkKWInternationalization::FindTextDomainBinding(
     vtkKWInternationalization::GetCurrentTextDomain());
-
+  
   // Process some command-line arguments
   // The --test option here is used to run this example as a non-interactive 
   // test for software quality purposes. You can ignore it.
 
   int option_test = 0;
+  vtksys_stl::string option_lang;
   vtksys::CommandLineArguments args;
   args.Initialize(argc, argv);
   args.AddArgument(
     "--test", vtksys::CommandLineArguments::NO_ARGUMENT, &option_test, "");
+  args.AddArgument(
+    "--lang", vtksys::CommandLineArguments::EQUAL_ARGUMENT, &option_lang, "");
   args.Parse();
   
   // Create the application
@@ -70,7 +74,7 @@ int my_main(int argc, char *argv[])
     vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
     dlg->SetApplication(app);
     dlg->SetStyleToOkOtherCancel();
-
+    
     // Change the 'OK' and 'Other ' button label to the name of the
     // languages we want to switch to. Note how we use a special 
     // separator (|) here to provide more context to the translation
@@ -83,9 +87,9 @@ int my_main(int argc, char *argv[])
 
     dlg->Create();
     dlg->SetTextWidth(400);
-
+    
     // Set the title to a simple translatable string
-
+    
     dlg->SetTitle(_("A simple dialog box!"));
 
     // Set the message to a more complex string with printf() arguments.
