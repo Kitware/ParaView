@@ -26,7 +26,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMPropertyLink);
-vtkCxxRevisionMacro(vtkSMPropertyLink, "1.5");
+vtkCxxRevisionMacro(vtkSMPropertyLink, "1.6");
 //-----------------------------------------------------------------------------
 struct vtkSMPropertyLinkInternals
 {
@@ -159,7 +159,6 @@ void vtkSMPropertyLink::UpdateProperties(vtkSMProxy* fromProxy, const char* pnam
       if (toProp)
         {
         toProp->Copy(fromProp);
-        toProp->Modified();
         }
       }
     }

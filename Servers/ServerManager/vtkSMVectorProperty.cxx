@@ -17,7 +17,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMStateLoader.h"
 
-vtkCxxRevisionMacro(vtkSMVectorProperty, "1.9");
+vtkCxxRevisionMacro(vtkSMVectorProperty, "1.10");
 
 //---------------------------------------------------------------------------
 vtkSMVectorProperty::vtkSMVectorProperty()
@@ -26,7 +26,7 @@ vtkSMVectorProperty::vtkSMVectorProperty()
   this->NumberOfElementsPerCommand = 1;
   this->UseIndex = 0;
   this->CleanCommand = 0;
-  this->SetSaveable(1);
+  this->IsInternal = 0;
 }
 
 //---------------------------------------------------------------------------

@@ -37,7 +37,11 @@ public:
   // Add a property to the link. updateDir determines whether a property of
   // the proxy is read or written. When a property of an input proxy
   // changes, it's value is pushed to all other output proxies in the link.
-  void AddLinkedProperty(vtkSMProxy* proxy, const char* propertyname, int updateDir);
+  // A property can be set to be both input and output by setting updateDir
+  // to INPUT | OUTPUT
+  void AddLinkedProperty(vtkSMProxy* proxy, 
+                         const char* propertyname, 
+                         int updateDir);
 
 protected:
   vtkSMPropertyLink();
@@ -58,6 +62,7 @@ protected:
   
   virtual void UpdateVTKObjects(vtkSMProxy* caller);
   virtual void UpdateProperties(vtkSMProxy* caller, const char* pname);
+
 private:
   vtkSMPropertyLinkInternals* Internals;
 

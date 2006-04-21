@@ -94,6 +94,10 @@ public:
 
   // Description:
   // Removes all cues.
+  void ClearCues();
+
+  // Description:
+  // Removes all cues. Also resets number of frames and source names.
   void RemoveAllCues();
 
   // Description:

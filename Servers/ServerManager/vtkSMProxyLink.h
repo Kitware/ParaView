@@ -40,6 +40,8 @@ public:
   // Add a property to the link. updateDir determines whether a property of
   // the proxy is read or written. When a property of an input proxy
   // changes, it's value is pushed to all other output proxies in the link.
+  // A proxy can be set to be both input and output by setting updateDir
+  // to INPUT | OUTPUT
   void AddLinkedProxy(vtkSMProxy* proxy, int updateDir);
 
   // Description:
@@ -52,8 +54,8 @@ public:
 
   // Description:
   // It is possible to exclude certain properties from being synchronized
-  // by this link. This method can be used to add/remove the names for such exception
-  // properties.
+  // by this link. This method can be used to add/remove the names for such
+  // exception properties.
   void AddException(const char* propertyname);
   void RemoveException(const char* propertyname);
  

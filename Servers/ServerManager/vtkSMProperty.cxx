@@ -32,7 +32,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.43");
+vtkCxxRevisionMacro(vtkSMProperty, "1.44");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -58,7 +58,7 @@ vtkSMProperty::vtkSMProperty()
   this->InformationProperty = 0;
   this->ControllerProxy = 0;
   this->ControllerPropertyName = 0;
-  this->Saveable = 0;
+  this->IsInternal = 1;
 }
 
 //---------------------------------------------------------------------------
@@ -328,10 +328,10 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
     this->SetAnimateable(animateable);
     }
 
-  int saveable;
-  if (element->GetScalarAttribute("saveable", &saveable))
+  int is_internal;
+  if (element->GetScalarAttribute("is_internal", &is_internal))
     {
-    this->SetSaveable(saveable);
+    this->SetIsInternal(is_internal);
     }
 
   // Read and create domains.
@@ -513,7 +513,7 @@ void vtkSMProperty::PrintSelf(ostream& os, vtkIndent indent)
      <<  (this->XMLName ? this->XMLName : "(null)") << endl;
   os << indent << "InformationProperty: " << this->InformationProperty << endl;
   os << indent << "Animateable: " << this->Animateable << endl;
-  os << indent << "Saveable: " << this->Saveable << endl;
+  os << indent << "Internal: " << this->IsInternal << endl;
 
   vtkSMSubPropertyIterator* iter = vtkSMSubPropertyIterator::New();
   iter->SetProperty(this);

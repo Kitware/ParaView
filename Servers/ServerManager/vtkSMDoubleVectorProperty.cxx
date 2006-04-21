@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.30");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.31");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -129,14 +129,18 @@ void vtkSMDoubleVectorProperty::AppendCommandToStream(
 //---------------------------------------------------------------------------
 void vtkSMDoubleVectorProperty::SetNumberOfUncheckedElements(unsigned int num)
 {
-  this->Internals->UncheckedValues.resize(num);
+  this->Internals->UncheckedValues.resize(num, 0);
 }
 
 //---------------------------------------------------------------------------
 void vtkSMDoubleVectorProperty::SetNumberOfElements(unsigned int num)
 {
-  this->Internals->Values.resize(num);
-  this->Internals->UncheckedValues.resize(num);
+  if (num == this->Internals->Values.size())
+    {
+    return;
+    }
+  this->Internals->Values.resize(num, 0);
+  this->Internals->UncheckedValues.resize(num, 0);
   this->Modified();
 }
 
@@ -185,6 +189,13 @@ void vtkSMDoubleVectorProperty::SetUncheckedElement(
 //---------------------------------------------------------------------------
 int vtkSMDoubleVectorProperty::SetElement(unsigned int idx, double value)
 {
+  unsigned int numElems = this->GetNumberOfElements();
+
+  if (idx < numElems && value == this->GetElement(idx))
+    {
+    return 1;
+    }
+
   if ( vtkSMProperty::GetCheckDomains() )
     {
     int numArgs = this->GetNumberOfElements();
@@ -200,7 +211,7 @@ int vtkSMDoubleVectorProperty::SetElement(unsigned int idx, double value)
       }
     }
   
-  if (idx >= this->GetNumberOfElements())
+  if (idx >= numElems)
     {
     this->SetNumberOfElements(idx+1);
     }
@@ -247,7 +258,21 @@ int vtkSMDoubleVectorProperty::SetElements4(
 //---------------------------------------------------------------------------
 int vtkSMDoubleVectorProperty::SetElements(const double* values)
 {
-  int numArgs = this->GetNumberOfElements();
+  unsigned int numArgs = this->GetNumberOfElements();
+
+  int modified = 0;
+  for (unsigned int i=0; i<numArgs; i++)
+    {
+    if (this->Internals->Values[i] != values[i])
+      {
+      modified = 1;
+      break;
+      }
+    }
+  if(!modified)
+    {
+    return 1;
+    }
 
   if ( vtkSMProperty::GetCheckDomains() )
     {
@@ -436,16 +461,12 @@ void vtkSMDoubleVectorProperty::Copy(vtkSMProperty* src)
     this->ImmediateUpdate = 0;
     this->SetNumberOfElements(dsrc->GetNumberOfElements());
     this->SetNumberOfUncheckedElements(dsrc->GetNumberOfUncheckedElements());
-    memcpy(&this->Internals->Values[0], 
-           &dsrc->Internals->Values[0], 
-           this->GetNumberOfElements()*sizeof(double));
+    this->SetElements(&dsrc->Internals->Values[0]);
     memcpy(&this->Internals->UncheckedValues[0], 
            &dsrc->Internals->UncheckedValues[0], 
            this->GetNumberOfUncheckedElements()*sizeof(double));
     this->ImmediateUpdate = imUpdate;
     }
-
-  this->Modified();
 }
 
 //---------------------------------------------------------------------------
