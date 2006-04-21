@@ -81,18 +81,26 @@ MACRO(GETTEXT_FIND_RUNTIME_LIBRARY)
     INCLUDE(CheckFunctionExists)
     CHECK_FUNCTION_EXISTS(gettext HAVE_GETTEXT)
   ENDIF(WIN32)
-  IF(NOT HAVE_GETTEXT)
+
+  IF(HAVE_GETTEXT)
+    # Even if we have a system one, let the user provide another one
+    # eventually (i.e., more recent, or GNU).
+    SET(GETTEXT_INTL_LIBRARY "" CACHE FILEPATH
+      "Path to gettext intl library (leave it empty to use the system one)")
+  ELSE(HAVE_GETTEXT)
     FIND_LIBRARY(GETTEXT_INTL_LIBRARY 
       NAMES intl 
       PATHS ${potential_lib_dirs}
       DOC "Path to gettext intl library")
-    MARK_AS_ADVANCED(GETTEXT_INTL_LIBRARY)
     IF(NOT GETTEXT_INTL_LIBRARY)
       SET(GETTEXT_RUNTIME_FOUND 0)
-    ELSE(NOT GETTEXT_INTL_LIBRARY)
-      SET(GETTEXT_LIBRARIES ${GETTEXT_LIBRARIES} ${GETTEXT_INTL_LIBRARY})
     ENDIF(NOT GETTEXT_INTL_LIBRARY)
-  ENDIF(NOT HAVE_GETTEXT)
+  ENDIF(HAVE_GETTEXT)
+
+  MARK_AS_ADVANCED(GETTEXT_INTL_LIBRARY)
+  IF(GETTEXT_INTL_LIBRARY)
+    SET(GETTEXT_LIBRARIES ${GETTEXT_LIBRARIES} ${GETTEXT_INTL_LIBRARY})
+  ENDIF(GETTEXT_INTL_LIBRARY)
 
   # The gettext asprintf library
   # Actually not useful as it does not seem to exist on Unix
