@@ -3063,13 +3063,13 @@ The Probe filter operates on any type of data and produces polygonal output (a p
     <Property
        name="AnimateInit"
        command="AnimateInit"
-       saveable="0">
+       is_internal="1">
     </Property>
 
     <DoubleVectorProperty
        name="AnimateTick"
        command="AnimateTick"
-       saveable="0"
+       is_internal="1"
        number_of_elements="1"
        default_values="0.0" >
           <DoubleRangeDomain name="range" min="0" max="1" />
@@ -3094,13 +3094,13 @@ The Probe filter operates on any type of data and produces polygonal output (a p
     <Property
        name="AnimateInit"
        command="AnimateInit"
-       saveable="0">
+       is_internal="1">
     </Property>
 
     <DoubleVectorProperty
        name="AnimateTick"
        command="AnimateTick"
-       saveable="0"
+       is_internal="1"
        number_of_elements="1"
        default_values="0.0" >
           <DoubleRangeDomain name="range" min="0" max="1" />
@@ -3932,7 +3932,8 @@ This filter uses colors to show levels of a hiearchical dataset.
       </InputProperty>
       <Property
         name="ForceUpdate"
-        command="ForceUpdate">
+        command="ForceUpdate"
+        is_internal="1">
       </Property>
       <Property
         name="RemoveAllCaches"
@@ -3944,7 +3945,7 @@ This filter uses colors to show levels of a hiearchical dataset.
         command="CacheUpdate"
         number_of_elements="2"
         default_values="0 -1"
-        saveable="0">
+        is_internal="1">
         <IntRangeDomain name="range" min="0 -1" />
       </IntVectorProperty>
       <StringVectorProperty

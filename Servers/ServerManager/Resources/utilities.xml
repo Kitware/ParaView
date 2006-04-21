@@ -109,7 +109,7 @@
          name="Normal"
          command="SetNormal"
          number_of_elements="3"
-         default_values="0.0 0.0 1.0" >
+         default_values="1.0 0.0 0.0" >
          <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
@@ -770,6 +770,21 @@
       </SubProxy>
     </PickBoxWidgetProxy>
 
+    <Proxy name="SliderWidget" class="vtkSliderWidget">
+      <ProxyProperty name="Representation"
+         command="SetRepresentation">
+        <ProxyGroupDomain name="groups">
+          <Group name="props" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty name="Enabled" 
+                         command="SetEnabled"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain/>
+      </IntVectorProperty>
+    </Proxy>
+
   </ProxyGroup>
 
   <ProxyGroup name="animation">
@@ -914,7 +929,7 @@
         number_of_elements="1"
         update_self="1"
         default_values="0"
-        saveable="0">
+        is_internal="1">
       </DoubleVectorProperty>
 
       <ProxyProperty name="Cues"
@@ -1589,7 +1604,7 @@
         name="Cues"
         command="AddCue"
         update_self="1"
-        clean_command="RemoveAllCues">
+        clean_command="ClearCues">
         <ProxyGroupDomain name="groups">
           <Group name="animation" />
         </ProxyGroupDomain>

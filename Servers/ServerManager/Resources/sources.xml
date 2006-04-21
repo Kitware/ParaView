@@ -956,5 +956,16 @@ The output of the Wavelet source is image (uniform rectilinear) data.
       </IntVectorProperty>
    <!-- End Wavelet -->
    </SourceProxy>
+
+   <SourceProxy name="Test3DWidget" class="vtkConeSource">
+      <IntVectorProperty
+         name="Resolution"
+         command="SetResolution"
+         number_of_elements="1"
+         default_values="6" >
+        <IntRangeDomain name="range" min="1" max="128" />
+      </IntVectorProperty>
+   </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>
