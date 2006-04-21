@@ -29,7 +29,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkUpdateSuppressorPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.33");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.34");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -126,7 +126,7 @@ int vtkPVUpdateSuppressor::RequestDataObject(
   vtkInformationVector** inputVector, 
   vtkInformationVector* outputVector)
 {
-  if (!this->OutputType)
+  if (!this->OutputType || this->OutputType[0] == '\0')
     {
     return this->Superclass::RequestDataObject(
       request, inputVector, outputVector);
