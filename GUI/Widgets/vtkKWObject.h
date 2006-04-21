@@ -63,6 +63,9 @@ public:
   // it takes care of initializing CallbackCommand, and eventually keep
   // track of observers that have been added, so that they can be removed
   // properly using RemoveCallbackCommandObserver(s).
+  // Listeners (i.e. classes that add observers) can process the events
+  // sent by the object/observer pairs by re-implementing the protected
+  // ProcessCallbackCommandEvents virtual method.
   virtual void AddCallbackCommandObserver(
     vtkObject *object, unsigned long event);
   virtual void RemoveCallbackCommandObserver(
@@ -110,19 +113,21 @@ protected:
   virtual vtkCallbackCommand* GetCallbackCommand();
 
   // Description:
-  // Static callback function that is invoked by the 
-  // CallbackCommand's Execute() method. It converts its clientdata back to
-  // a vtkKWObject pointer and invoke its virtual 
-  // ProcessCallbackCommandEvents method.
-  static void ProcessCallbackCommandEventsFunction(
-    vtkObject *object, unsigned long event, void *clientdata, void *calldata);
-
-  // Description:
   // Processes the events that are passed through CallbackCommand (or others).
   // Subclasses can override this method to process their own events, but
   // should call the superclass too.
+  // Also check AddCallbackCommandObserver and RemoveCallbackCommandObserver.
   virtual void ProcessCallbackCommandEvents(
     vtkObject *caller, unsigned long event, void *calldata);
+
+  // Description:
+  // Static callback function that is invoked by the 
+  // CallbackCommand's Execute() method. It converts its clientdata back to
+  // a vtkKWObject pointer and invoke its virtual 
+  // ProcessCallbackCommandEvents method. Subclass should *not* reimplement
+  // this method, but the virtual ProcessCallbackCommandEvents instead.
+  static void ProcessCallbackCommandEventsFunction(
+    vtkObject *object, unsigned long event, void *clientdata, void *calldata);
 
 private:
 
