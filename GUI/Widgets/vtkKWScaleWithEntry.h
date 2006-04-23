@@ -240,6 +240,7 @@ public:
   // it. The 'method' argument is the name of the method to be called and any
   // arguments in string form. If the object is NULL, the method is still
   // evaluated as a simple command. 
+  // Note that the same events as vtkKWScale are generated, as a convenience.
   // The following parameters are also passed to the command:
   // - the current value: double
   virtual void SetCommand(vtkObject *object, const char *method);
@@ -275,6 +276,14 @@ public:
   virtual void WithdrawPopupModeCallback();
   virtual void EntryValueCallback(const char *value);
   virtual void ScaleValueCallback(double num);
+
+  // Description:
+  // Add all the default observers needed by that object, or remove
+  // all the observers that were added through AddCallbackCommandObserver.
+  // Subclasses can override these methods to add/remove their own default
+  // observers, but should call the superclass too.
+  virtual void AddCallbackCommandObservers();
+  virtual void RemoveCallbackCommandObservers();
 
 protected:
   vtkKWScaleWithEntry();
@@ -316,6 +325,13 @@ protected:
   virtual void SetEntryValue(double num);
   virtual void UpdateRange();
 
+  // Description:
+  // Processes the events that are passed through CallbackCommand (or others).
+  // Subclasses can oberride this method to process their own events, but
+  // should call the superclass too.
+  virtual void ProcessCallbackCommandEvents(
+    vtkObject *caller, unsigned long event, void *calldata);
+  
 private:
 
   // Description:
