@@ -271,6 +271,26 @@ public:
   vtkBooleanMacro(DisableCommands, int);
 
   // Description:
+  // Events. The RangeValueChangingEvent is triggered when the widget value
+  // is changed (i.e., during user interaction on the widget's slider),
+  // the RangeValueStartChangingEvent is invoked at the beginning of an 
+  // interaction with the widget, the RangeValueChangedEvent is invoked at the
+  // end of an interaction with the widget (or when the value is changed
+  // using the entries widget). They are similar in concept as
+  // the 'Command', 'StartCommand', 'EndCommand' and 'EntriesCommand' callbacks
+  // but can be used by multiple listeners/observers at a time.
+  // The following parameters are also passed as client data:
+  // - the current range: double, double.
+  //BTX
+  enum
+  {
+    RangeValueChangingEvent = 10000,
+    RangeValueChangedEvent,
+    RangeValueStartChangingEvent
+  };
+  //ETX
+
+  // Description:
   // Set the string that enables balloon help for this widget.
   // Override to pass down to children.
   virtual void SetBalloonHelpString(const char *str);

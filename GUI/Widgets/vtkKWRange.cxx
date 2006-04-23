@@ -24,7 +24,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.66");
+vtkCxxRevisionMacro(vtkKWRange, "1.67");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -1280,6 +1280,10 @@ void vtkKWRange::SetCommand(vtkObject *object, const char *method)
 void vtkKWRange::InvokeCommand(double r0, double r1)
 {
   this->InvokeRangeCommand(this->Command, r0, r1);
+  double range[2];
+  range[0] = r0;
+  range[1] = r1;
+  this->InvokeEvent(vtkKWRange::RangeValueChangingEvent, range);
 }
 
 //----------------------------------------------------------------------------
@@ -1292,6 +1296,10 @@ void vtkKWRange::SetStartCommand(vtkObject *object, const char *method)
 void vtkKWRange::InvokeStartCommand(double r0, double r1)
 {
   this->InvokeRangeCommand(this->StartCommand, r0, r1);
+  double range[2];
+  range[0] = r0;
+  range[1] = r1;
+  this->InvokeEvent(vtkKWRange::RangeValueStartChangingEvent, range);
 }
 
 //----------------------------------------------------------------------------
@@ -1304,6 +1312,10 @@ void vtkKWRange::SetEndCommand(vtkObject *object, const char *method)
 void vtkKWRange::InvokeEndCommand(double r0, double r1)
 {
   this->InvokeRangeCommand(this->EndCommand, r0, r1);
+  double range[2];
+  range[0] = r0;
+  range[1] = r1;
+  this->InvokeEvent(vtkKWRange::RangeValueChangedEvent, range);
 }
 
 //----------------------------------------------------------------------------
@@ -1316,6 +1328,10 @@ void vtkKWRange::SetEntriesCommand(vtkObject *object, const char *method)
 void vtkKWRange::InvokeEntriesCommand(double r0, double r1)
 {
   this->InvokeRangeCommand(this->EntriesCommand, r0, r1);
+  double range[2];
+  range[0] = r0;
+  range[1] = r1;
+  this->InvokeEvent(vtkKWRange::RangeValueChangedEvent, range);
 }
 
 //----------------------------------------------------------------------------
