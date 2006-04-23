@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.54");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.55");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -153,7 +153,7 @@ void vtkKWMultiColumnList::Create()
 
   // Call the superclass to set the appropriate flags then create manually
 
-  vtksys_stl::string options("-bg #fafafa -stripebackground #dfe7ef -showseparators 1 -showarrow 0  -highlightthickness 0 -selectmode browse -relief sunken -bd 2 -spacing 2 -exportselection 0 -activestyle none -fg #000000 -selectforeground #ffffff");
+  vtksys_stl::string options("-bg #fafafa -stripebackground #dfe7ef -showseparators 1 -showarrow 0  -highlightthickness 0 -selectmode browse -relief sunken -bd 2 -spacing 2 -exportselection 0 -activestyle none -fg #000000 -selectforeground #ffffff -width 0");
 #ifdef _WIN32
   options += " -selectbackground #092369";
 #else
