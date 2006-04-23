@@ -34,11 +34,6 @@
    </SourceProxy>
 
    <SourceProxy name="SurfaceVectors" class="vtkSurfaceVectors">
-     <Documentation
-          long_help="This filter constrains vectors to lie on a surface."
-          short_help="This filter constrains vectors o lie on a surface.">
-The surface vectors filter is used for 2D data sets.  It constrains vectors to lie in a surface by removing components of the vectors normal to the local surface.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -82,11 +77,6 @@ The surface vectors filter is used for 2D data sets.  It constrains vectors to l
    </SourceProxy>
 
    <SourceProxy name="IntegrateAttributes" class="vtkIntegrateAttributes">
-     <Documentation 
-        long_help="This filter integrates cell and point attributes.  Use selects whether the integration is over 1D lines, 2D surfaces or 3D volumes.  Cells not of the selected dimension are ignored."
-        short_help="Integrates over lines, surfaces or vectors.">
-Integrates point and cell data over lines and surfaces.  It also computes length of lines, area of surface or volume.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -103,11 +93,6 @@ Integrates point and cell data over lines and surfaces.  It also computes length
    </SourceProxy>
 
    <SourceProxy name="IntegrateFlowThroughSurface" class="vtkIntegrateFlowThroughSurface">
-     <Documentation
-        long_help="This filter integrates flow through a surface."
-        short_help="This filter integrates flow through a surface.">
-The flow integration fitler  integrates the dot product of a point flow vector field and surface normal.  It computes the net flow across the 2D surface..
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -138,11 +123,6 @@ The flow integration fitler  integrates the dot product of a point flow vector f
    </SourceProxy>
 
    <SourceProxy name="AllToN" class="vtkAllToNRedistributePolyData">
-      <Documentation
-         long_help="Redistribute data to a subset of available processes."
-         short_help="Repartition data filter.">
-The All to N filter is available when ParaView is run in parallel. It redistributes the data so that it is located on the number of processes specified in the Number of Processes entry box. It also does load-balancing of the data among these processes. This filter operates on polygonal data and produces polygonal output.
-      </Documentation>
       <InputProperty
          name="Input"
          command="SetInput">
@@ -165,11 +145,6 @@ The All to N filter is available when ParaView is run in parallel. It redistribu
    </SourceProxy>
 
    <SourceProxy name="Balance" class="vtkBalancedRedistributePolyData">
-      <Documentation
-         long_help="Balance data among available processes."
-         short_help="Load balance filter.">
-The Balance filter is available when ParaView is run in parallel. It does load-balancing so that all processes have the same number of cells. It operates on polygonal data sets and produces polygonal output.
-      </Documentation>
       <InputProperty
          name="Input"
          command="SetInput">
@@ -185,11 +160,6 @@ The Balance filter is available when ParaView is run in parallel. It does load-b
    </SourceProxy>
 
    <SourceProxy name="AppendAttributes" class="vtkMergeArrays">
-      <Documentation
-         long_help="Copies geometry from first input.  Puts all of the arrays into the output."
-         short_help="Puts all input arrays into the single output.">
-The Append Attributes filter takes multiple input data sets with the same geometry and merges their point and cell attributes to produce a single output containing all the point and cell attributes of the inputs. Any inputs without the same number of points and cells as the first input are ignored. The input data sets must already be collected together, either as a result of a reader that loads multiple parts (e.g., EnSight reader) or because the Group Parts filter has been run to form a collection of data sets.
-      </Documentation>
       <InputProperty
          name="Input"
          command="AddInput"
@@ -208,11 +178,6 @@ The Append Attributes filter takes multiple input data sets with the same geomet
    </SourceProxy>
 
    <SourceProxy name="AppendPolyData" class="vtkAppendPolyData">
-      <Documentation
-         long_help="Takes an input of multiple poly data parts and output has only one part."
-         short_help="Append multiple parts into one.">
-The Append Geometry filter operates on multiple polygonal data sets. The data sets must already be collected together, either as a result of a reader that loads multiple parts (e.g., EnSight reader) or because the Group Parts filter has been run to form a collection of data sets. It merges their geometry into a single data set. Only the point and cell attributes that all of the input data sets have in common will appear in the output.
-      </Documentation>
       <InputProperty
          name="Input"
          command="AddInput"
@@ -230,11 +195,6 @@ The Append Geometry filter operates on multiple polygonal data sets. The data se
    </SourceProxy>
 
    <SourceProxy name="Append" class="vtkAppendFilter">
-      <Documentation
-         long_help="Takes an input of multiple datasets and output has only one unstructured grid."
-         short_help="Append multiple datasets into one.">
-The Append Datasets filter operates on multiple data sets of any type (polygonal, structured, etc.). It merges their geometry into a single data set. Only the point and cell attributes that all of the input data sets have in common will appear in the output. The input data sets must already be collected together, either as a result of a reader that loads multiple parts (e.g., EnSight reader) or because the Group Parts filter has been run to form a collection of data sets.
-      </Documentation>
       <InputProperty
          name="Input"
          command="AddInput"
@@ -252,11 +212,6 @@ The Append Datasets filter operates on multiple data sets of any type (polygonal
    </SourceProxy>
 
    <SourceProxy name="CellCenters" class="vtkCellCenters">
-     <Documentation
-        long_help="Create a point (no geometry) at the center of each input cell."
-        short_help="Convert cells to vertices.">
-The Cell Centers filter places a point at the center of each cell in the input data set. The center computed is the parametric center of the cell, not necessarily the geometric or bounding box center. The cell attributes of the input will be associated with these newly created points of the output. The Input menu allows the user to select the data set to which this filter will be applied. If the Generate vertices option is checked, then vertex cells will also be created for each point in the output. This is useful because vertex cells are rendered, but points are not. The points themselves could be used for placing glyphs (using the Glyph filter). The Cell Centers filter takes any type of data set as input and produces a polygonal data set as output.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -280,11 +235,6 @@ The Cell Centers filter places a point at the center of each cell in the input d
    </SourceProxy>
 
    <SourceProxy name="CellDataToPointData" class="vtkPCellDataToPointData">
-     <Documentation
-        long_help="Create point attributes by averaging cell attributes."
-        short_help="Convert cell data to point data.">
-The Cell Data to Point Data filter averages the values of the cell attributes of the cells surrounding a point to compute point attributes. The Input menu allows the user to select the data set to which this filter will be applied. If the Pass cell data option is checked, then the input cell attributes will also be copied to the cell attributes of the output; otherwise the output will only have point attributes. The Cell Data to Point Data filter operates on any type of data set, and the output data set is of the same type as the input.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -334,13 +284,6 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
    </SourceProxy>
 
    <SourceProxy name="CleanPolyData" class="vtkCleanPolyData">
-     <Documentation
-        long_help="Merge coincident points if they do not meet a feature edge critera."
-        short_help="Merge coincident points.">
-The Clean filter takes polygonal data as input and generates polygonal data as output. This filter can merge duplicate points, remove unused points, and transform degenerate cells into their appropriate forms (e.g., a triangle is converted into a line if two of its points are merged). The Input menu allows the user to select the data set to which this filter will be applied. If the Point merging option is on, then points will be merged if they are within the specified Tolerance or Absolute tolerance, depending on whether the Tolerance is absolute box is checked. (Tolerance is specified as a fraction of the length of the diagonal of the bounding box of the data set; Absolute tolerance is specified in the spatial units of the input data set.)
-The transforming of degenerate cells into their appropriate forms is controlled by three check boxes on the user interface: Convert lines to points, Convert polys to lines, and Convert strips to polys. If any of these is unchecked, then degenerate cells of that type will not be converted to another type of cell.
-If the Piece invariant option is checked, the whole data set will be processed at once so that cleaning this data set always produces the same results. If the box is unchecked, the data set can be processed one piece at a time, so it is not necessary for the entire data set to fit into memory, but the results are not guaranteed to be the same as they would be if the Piece invariant option was on.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -421,11 +364,6 @@ If the Piece invariant option is checked, the whole data set will be processed a
    </SourceProxy>
 
    <SourceProxy name="CleanUnstructuredGrid" class="vtkCleanUnstructuredGrid">
-      <Documentation
-         long_help="This filter merges points and converts the data set to unstructured grid."
-         short_help="Merge points.">
-The Clean to Grid filter merges points that are within a tolerance of 1/100,000 of the length of the diagonal of the bounding box of the data set. It also converts the data set to an unstructured grid. You may wish to do this if you want to apply a filter to your data set that is available for unstructured grids but not for the initial type of your data set (e.g., applying warp vector to volumetric data). The Input menu allows the user to select the data set to which this filter will be applied. The Clean to Grid filter operates on any type of data set.
-      </Documentation>
       <InputProperty
          name="Input"
          command="SetInput">
@@ -441,58 +379,6 @@ The Clean to Grid filter merges points that are within a tolerance of 1/100,000 
    </SourceProxy>
 
    <SourceProxy name="Delaunay2D" class="vtkDelaunay2D">
-      <Documentation
-         long_help="Create 2D Delaunay triangulation of input points. 
-It expects a vtkPointSet as input and produces vtkPolyData as output. 
-The points are expected to be in a mostly planar distribution."
-         short_help="Create 2D Delaunay triangulation of input points.">
-Delaunay2D is a filter that constructs a 2D Delaunay triangulation from 
-a list of input points. These points may be represented by any dataset 
-of type vtkPointSet and subclasses. The output of the filter is a 
-polygonal dataset containing a triangle mesh.
-
-The 2D Delaunay triangulation is defined as the triangulation that 
-satisfies the Delaunay criterion for n-dimensional simplexes (in this 
-case n=2 and the simplexes are triangles). This criterion states that a 
-circumsphere of each simplex in a triangulation contains only the n+1 
-defining points of the simplex. (See "The Visualization Toolkit" text 
-for more information.) In two dimensions, this translates into an 
-optimal triangulation. That is, the maximum interior angle of any 
-triangle is less than or equal to that of any possible triangulation.
-
-Delaunay triangulations are used to build topological structures from 
-unorganized (or unstructured) points. The input to this filter is a list 
-of points specified in 3D, even though the triangulation is 2D. Thus the 
-triangulation is constructed in the x-y plane, and the z coordinate is 
-ignored (although carried through to the output). You can use the option
-ProjectionPlaneMode in order to compute the best-fitting plane to the
-set of points, project the points and that plane and then perform the
-triangulation using their projected positions and then use it as the 
-plane in which the triangulation is performed.
-
-The Delaunay triangulation can be numerically sensitive in some cases. 
-To prevent problems, try to avoid injecting points that will result in 
-triangles with bad aspect ratios (1000:1 or greater). In practice this 
-means inserting points that are "widely dispersed", and enables smooth 
-transition of triangle sizes throughout the mesh. (You may even want to 
-add extra points to create a better point distribution.) If numerical 
-problems are present, you will see a warning message to this effect at 
-the end of the triangulation process.
-
-Warning:
-     Points arranged on a regular lattice (termed degenerate cases) can 
-be triangulated in more than one way (at least according to the Delaunay 
-criterion). The choice of triangulation (as implemented by this 
-algorithm) depends on the order of the input points. The first three 
-points will form a triangle; other degenerate points will not break this 
-triangle.
-
-     Points that are coincident (or nearly so) may be discarded by the 
-algorithm. This is because the Delaunay triangulation requires unique 
-input points. The output of the Delaunay triangulation is supposedly a 
-convex hull. In certain cases this implementation may not generate the 
-convex hull.
-      </Documentation>
       <InputProperty
          name="Input"
          command="SetInput">
@@ -542,11 +428,6 @@ convex hull.
    </SourceProxy>
 
    <SourceProxy name="PVConnectivityFilter" class="vtkPVConnectivityFilter">
-      <Documentation
-          long_help="Mark connected components with integer point attribute array."
-          short_help="Find connected components.">
-The Connectivity filter assigns a region id to connected components of the input data set. (The region id is assigned as a point scalar value.) The Input menu allows the user to select the data set to which this filter will be applied. This filter takes any data set type as input and produces unstructured grid output.
-      </Documentation>
       <InputProperty
          name="Input"
          command="SetInput">
@@ -562,12 +443,6 @@ The Connectivity filter assigns a region id to connected components of the input
    </SourceProxy>
 
    <SourceProxy name="ImageClip" class="vtkImageClip">
-    <Documentation
-       long_help="Efficiently extract an area/volume of interest from a 2-d image or 3-d volume."
-       short_help="Extract a volume of interest.">
-The Crop filter extracts an area/volume of interest from a 2D image or a 3D volume by allowing the user to specify the minimum and maximum extents of each dimension of the data. The Input menu allows the user to select the data set to which this filter will be applied. Both the input and output of this filter are uniform rectilinear data.
-    </Documentation>
-
     <InputProperty
        name="Input"
        command="SetInput">
@@ -595,12 +470,6 @@ The Crop filter extracts an area/volume of interest from a 2D image or a 3D volu
    </SourceProxy>
 
    <SourceProxy name="Curvatures" class="vtkCurvatures">
-    <Documentation
-       long_help="This filter will compute the gaussian or mean curvature of the mesh at each point."
-       short_help="Compute the curvature at each point.">
-The Curvature filter computes the curvature at each point in a polygonal data set. This filter supports both Gaussian and mean curvatures; the type can be selected from the Curvature type menu button. The Input menu allows the user to select the data set to which this filter will be applied. If the Invert mean curvature option is checked, the mean curvature calculation will be inverted. This is useful for meshes with inward-pointing normals.
-    </Documentation>
-
     <InputProperty
        name="Input"
        command="SetInput">
@@ -635,11 +504,6 @@ The Curvature filter computes the curvature at each point in a polygonal data se
    </SourceProxy>
 
    <SourceProxy name="DecimatePro" class="vtkDecimatePro">
-     <Documentation
-        long_help="Simplify a polygonal model using an adaptive edge collapse algorithm.  This filter works with triangles only."
-        short_help="Reduce the number of triangles in a model.">
-The Decimate filter reduces the number of triangles in a polygonal data set. Because this filter only operates on triangles, first run the Triangulate filter on a data set that contains polygons other than triangles. The Input menu allows the user to select the data set to which this filter will be applied. The Reduction target slider specifies the desired reduction in the total number of polygons (e.g., if the Reduction target value is 0.9, the Decimate filter will attempt to produce an output data set that is 10% the size of the input.) If the Preserve topology option is on, decimation will not split the data set or produce holes, but it may keep the filter from reaching the reduction target. The Feature angle slider value is used in determining where the data set may be split. If the angle between two adjacent triangles is >= the Feature angle value, then their boundary is considered a feature edge where the data set can be split. If the Boundary deletable option is on, then vertices on the boundary of the data set can be removed. Turning this option off preserves the boundary of the data set, but it may cause the filter not to reach its reduction target.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -688,11 +552,6 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
    </SourceProxy>
 
    <SourceProxy name="D3" class="vtkDistributedDataFilter">
-    <Documentation
-       long_help="Repartition a data set into load-balanced spatially convex regions.  Create ghost cells if requested."
-       short_help="Repartition a data set.">
-The D3 filter is available when ParaView is run in parallel. It operates on any type of data set to evenly divide it across the processors into spatially contiguous regions. The Boundary Cells menu determines how cells that lie on processor boundaries are handled. The Assign cells uniquely option assigns each boundary cell to exactly one process, which is useful for isosurfacing. Selecting Duplicate cells causes the cells on the boundaries to be copied to each process that shares that boundary. The Divide cells option breaks cells across process boundary lines so that pieces of the cell lie in different processes. This option is useful for volume rendering. The Global Id Array Name entry determines the name of the array containing global point ids. Such an array is necessary for processing ghost cells and is useful for removing duplicate points when merging sub-grids. The output of this filter is of type unstructured grid.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -733,12 +592,6 @@ The D3 filter is available when ParaView is run in parallel. It operates on any 
    </SourceProxy>
 
    <SourceProxy name="ElevationFilter" class="vtkElevationFilter">
-     <Documentation
-        long_help="Create point attribute array by projecting points onto an elevation vector."
-        short_help="Create a point array representing elevation.">
-The Elevation filter generates point scalar values for an input data set along a specified direction vector. The Input menu allows the user to select the data set to which this filter will be applied. Use the Scalar range entry boxes to specify the minimum and maximum scalar value to be generated. The Low Point and High Point define a line onto which each point of the data set is projected. The minimum scalar value is associated with the Low Point, and the maximum scalar value is associated with the High Point. The scalar value for each point in the data set is determined by the location along the line to which that point projects.
-The line can be specified interactively using the 3D line widget. See section 7.4 for more information about this widget.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -779,14 +632,6 @@ The line can be specified interactively using the 3D line widget. See section 7.
 
 #if 1
    <SourceProxy name="CTHPart" class="vtkExtractCTHPart">
-    <Documentation
-       long_help="Create a surface from a CTH volume fraction."
-       short_help="Extract a part from a CTH dataset.">
-Extract CTH Parts is a specialized filter for visualizing the data from a CTH simulation. It first converts the selected cell-centered arrays to point-centered ones. It then contours each array at a value of 0.5. The user has the option of clipping the resulting surface(s) with a plane.
-If the Show All option is on, all the cell-centered scalar (single-component) arrays will be displayed in the array selection box; otherwise only the ones with "Fraction" or "fraction" in the name will be shown. (This behavior is because by default the CTH volume fraction arrays should be listed.) Clicking on the name of a particular array selects it. To choose multiple contiguous array names, click the first one and press the Shift key while clicking the last name you wish to select. If the names are not contiguous, press the Ctrl key while selecting the names from the list. The selected arrays will be contoured.
-If you wish to clip the contour surfaces with a plane, select On from the menu in the Clipping section on this Parameters tab. You can interactively position and orient the plane using the plane widget. (See section 7.4 for the details of using this widget or manually setting the plane's parameters.)
-This filter only operates on unstructured data. It produces polygonal output.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -818,11 +663,6 @@ This filter only operates on unstructured data. It produces polygonal output.
 #endif
 
    <SourceProxy name="ExtractEdges" class="vtkExtractEdges">
-     <Documentation
-        long_help="Extract edges of 2-d and 3-d cells as lines."
-        short_help="Covert data to wireframe.">
-The Extract Edges filter produces a wireframe version of the input data set by extracting all the edges of the data set's cells as lines. The Input menu allows the user to select the data set to which this filter will be applied. This filter operates on any type of data set and produces polygonal output.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -838,11 +678,6 @@ The Extract Edges filter produces a wireframe version of the input data set by e
    </SourceProxy>
 
    <SourceProxy name="ExtractParts" class="vtkSelectInputs">
-    <Documentation
-       long_help="Extract a subset of parts from a group."
-       short_help="Extract a subset of parts from a group.">
-The Extract Parts filter operates on any type of data, but its input reader/source/filter must have created multiple parts. The output type of this filter depends on the output type of the selected part(s). This filter is useful for operating on only a subset of the parts available from a reader, source, or filter.
-    </Documentation>
     <InputProperty
        name="Input"
        command="AddInput"
@@ -868,11 +703,6 @@ The Extract Parts filter operates on any type of data, but its input reader/sour
    </SourceProxy>
 
    <SourceProxy name="DataSetSurfaceFilter" class="vtkDataSetSurfaceFilter">
-     <Documentation
-        long_help="Extract a 2-d boundary surface using neighbor relations to eliminate internal faces."
-        short_help="Extract 2-d boundary surface.">
-The Extract Surface filter extracts the polygons forming the outer surface of the input data set. The Input menu allows the user to select the data set to which this filter will be applied. This filter operates on any type of data and produces polygonal data as output.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -896,43 +726,6 @@ The Extract Surface filter extracts the polygons forming the outer surface of th
    </SourceProxy>
 
    <SourceProxy name="Calculator" class="vtkArrayCalculator">
-    <Documentation
-       long_help="Compute new attribute arrays as function of existing arrays."
-       short_help="Compute new attribute arrays.">
-The Calculator filter computes new data arrays as functions of existing scalar or vector arrays. The Input menu allows the user to select the data set to which this filter will be applied. The Result Array Name entry box allows the user to specify the name of the array containing the results of the computation. The Attribute Mode menu selects whether to operate on and produce results that are point-centered or cell-centered. If point-centered arrays are used, the resulting array will also be point-centered. The same is true for cell-centered arrays. The Calculator interface operates similarly to a scientific calculator. In creating the function to evaluate, the standard order of operations applies.
-Each of the calculator functions is described below. Unless otherwise noted, enclose the operand in parentheses using the ( and ) buttons.
-Clear: Erase the current function (displayed in the read-only text box above the calculator buttons).
-/: Divide one scalar by another. The operands for this function are not required to be enclosed in parentheses.
-*: Multiply two scalars, or multiply a vector by a scalar (scalar multiple). The operands for this function are not required to be enclosed in parentheses.
--: Negate a scalar or vector (unary minus), or subtract one scalar or vector from another. The operands for this function are not required to be enclosed in parentheses.
-+: Add two scalars or two vectors. The operands for this function are not required to be enclosed in parentheses.
-sin: Compute the sine of a scalar.
-cos: Compute the cosine of a scalar.
-tan: Compute the tangent of a scalar.
-asin: Compute the arcsine of a scalar.
-acos: Compute the arccosine of a scalar.
-atan: Compute the arctangent of a scalar.
-sinh: Compute the hyperbolic sine of a scalar.
-cosh: Compute the hyperbolic cosine of a scalar.
-tanh: Compute the hyperbolic tangent of a scalar.
-x^y: Raise one scalar to the power of another scalar. The operands for this function are not required to be enclosed in parentheses.
-sqrt: Compute the square root of a scalar.
-e^x: Raise e to the power of a scalar.
-log: Compute the logarithm of a scalar.
-ceil: Compute the ceiling of a scalar.
-floor: Compute the floor of a scalar.
-abs: Compute the absolute value of a scalar.
-v1.v2: Compute the dot product of two vectors. The operands for this function are not required to be enclosed in parentheses.
-mag: Compute the magnitude of a vector.
-norm: Normalize a vector.
-The operands are described below.
-The digits 0 - 9 and the decimal point are used to enter constant scalar values.
-iHat, jHat, and kHat are vector constants representing unit vectors in the X, Y, and Z directions, respectively.
-The scalars menu lists the names of the scalar arrays and the components of the vector arrays of either the point-centered or cell-centered data. The vectors menu lists the names of the point-centered or cell-centered vector arrays. The function will be computed for each point (or cell) using the scalar or vector value of the array at that point (or cell).
-The filter operates on any type of data set, but the input data set must have at least one scalar or vector array. The arrays can be either point-centered or cell-centered. The Calculator filter's output is of the same data set type as the input.
-The Calculator filter is available on the Toolbar.
-    </Documentation>
-
     <InputProperty
        name="Input"
        command="SetInput">
@@ -1009,17 +802,6 @@ The Calculator filter is available on the Toolbar.
    </SourceProxy>
 
    <SourceProxy name="FeatureEdges" class="vtkFeatureEdges">
-    <Documentation
-       long_help="This filter will extract edges along sharp edges of surfaces or boundaries of surfaces."
-       short_help="Extract edges that meet the feature critera.">
-The Feature Edges filter extracts various subsets of edges from the input data set. Which edges are extracted depends on which check boxes are marked. The four types of edges are as follows.
-Boundary edges: line cells or edges used by only one polygon
-Feature edges: edges used by two polygons whose dihedral angle > the value from the Feature angle slider
-Non-manifold edges: edges used by three or more polygons
-Manifold edges: edges used by exactly two polygons
-If the Coloring option is checked, then the extracted edges are assigned a scalar value based on the type of the edge. The Input menu allows the user to select the data set to which this filter will be applied.
-This filter operates on polygonal data and produces polygonal output.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -1083,9 +865,6 @@ This filter operates on polygonal data and produces polygonal output.
    </SourceProxy>
 
    <SourceProxy name="Gradient" class="vtkImageGradient">
-    <Documentation>
-The Gradient filter computes the gradient vector at each point in an image or volume. The Input menu allows the user to select the data set to which this filter will be applied. The Scalars menu determines from which scalar array the gradient will be computed. The Dimensionality menu selects whether the gradient will be calculated in 2 or 3 dimensions. If only 2 dimensions are used, gradients are only computed in X and Y. This filter uses central differences to compute the gradients. The Gradient filter operates on uniform rectilinear (image) data and produces image data output.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -1125,9 +904,6 @@ The Gradient filter computes the gradient vector at each point in an image or vo
    </SourceProxy>
 
    <SourceProxy name="UnstructuredGradient" class="vtkGradientFilter">
-     <Documentation>
-The Gradient filter estimates the gradient vector at each point or cell.  The Input menu allows the user to select the data set to which this filter will be applied.  The Field and Scalars menus allow the user to select the scalar array from which to compute gradients.  The Scalars menu determines from which scalar array the gradient will be computed.  The Result Array Name box allows the user to specify the name of the output array holding the computed gradients.
-     </Documentation>
      <InputProperty name="Input" command="SetInput">
        <ProxyGroupDomain name="groups">
          <Group name="sources"/>
@@ -1166,9 +942,6 @@ The Gradient filter estimates the gradient vector at each point or cell.  The In
    </SourceProxy>
 
    <SourceProxy name="GradientMagnitude" class="vtkImageGradientMagnitude">
-     <Documentation>
-The Gradient Magnitude filter computes the magnitude of the gradient vector at each point in an image or volume. The Input menu allows the user to select the data set to which this filter will be applied. The Scalars menu allows the user to select which scalar array will be used for gradient magnitude calculations. The Dimensionality menu determines whether the gradient magnitude will be computed in 2 or 3 dimensions. If 2 dimensions are used, the gradient magnitude will be computed from the gradients in X and Y. This filter operates on uniform rectilinear (image) data and produces image data output.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -1209,11 +982,6 @@ The Gradient Magnitude filter computes the magnitude of the gradient vector at e
    </SourceProxy>
 
    <SourceProxy name="GroupParts" class="vtkGroup">
-     <Documentation
-        long_help="Group parts."
-        short_help="Group multiple inputs into one collection.">
-The Group Parts filter causes different data sets to be grouped into a collection and treated as a single data set for filtering purposes. All the data objects currently in ParaView will appear in the selection list. Only visible data objects are selected by default. To select a single data set, click on its name. To select several sources whose names are contiguous in the list, select the first name, press and hold the Shift key, and (while still holding the Shift key) click the last name. To select several data sets whose names are non-contiguous, press and hold the Ctrl key while clicking the names. This filter operates on any type of data. The output type depends on the data sets selected for grouping.
-     </Documentation>
      <InputProperty
         name="Input"
         command="AddInput"
@@ -1231,13 +999,6 @@ The Group Parts filter causes different data sets to be grouped into a collectio
    </SourceProxy>
 
    <SourceProxy name="LinearExtrusionFilter" class="vtkPVLinearExtrusionFilter">
-    <Documentation
-       long_help="This filter creates a swept surface defined by translating the input along a vector."
-       short_help="Generate a linear swept surface.">
-The Linear Extrusion filter creates a swept surface by translating the input data set along a specified vector. This filter is intended to operate on 2D polygonal data. The Input menu allows the user to select the data set to which this filter will be applied. The three Vector entry boxes specify the X, Y, and Z components of the vector along which to sweep the input. The value of the Scale factor entry determines the distance along the vector the data set will be translated. (A scale factor of 0.5 will move the data set half the length of the vector, and a scale factor of 2 will move it twice the vector's length.)
-The Capping check box indicates whether to cap the ends of the swept surface. Capping works by placing a copy of the input data set on either end of the swept surface, so it behaves properly if the input is a 2D surface composed of filled polygons. If the input data set is a closed solid (e.g., a sphere), then if capping is on, two copies of the data set will be displayed on output (the second translated from the first one along the specified vector). If instead capping is off, then an input closed solid will produce no output.
-The Piece invariant check box determines whether the output will be the same regardless of the number of processors used to compute the result. The difference is whether there are internal polygonal faces on the processor boundaries. This filter operates on polygonal data and produces polygonal data output.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -1286,11 +1047,6 @@ The Piece invariant check box determines whether the output will be the same reg
    </SourceProxy>
 
    <SourceProxy name="LoopSubdivisionFilter" class="vtkLoopSubdivisionFilter">
-    <Documentation
-       long_help="This filter iteratively divides each triangle into four triangles.  New points are placed so the output surface is smooth."
-       short_help="Create a higher resolution and smoother surface.">
-The Loop Subdivision filter increases the granularity of a polygonal mesh. It works by dividing each triangle in the input into four new triangles. It is named for Charles Loop, the person who devised this subdivision scheme. This filter only operates on triangles, so a data set that contains other types of polygons should be passed through the Triangulate filter before applying this filter to it. The Input menu allows the user to select the data set to which this filter will be applied. The Number of divisions slider specifies the number of subdivision iterations to be performed. (For example, if the number of divisions is 2, the triangles in the initial mesh will each be divided into four new triangles. Then those new triangles will be further subdivided.) This filter only operates on polygonal data (specifically triangle meshes), and it produces polygonal output.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -1315,12 +1071,6 @@ The Loop Subdivision filter increases the granularity of a polygonal mesh. It wo
    </SourceProxy>
 
    <SourceProxy name="MaskPoints" class="vtkMaskPoints">
-    <Documentation
-          long_help="Reduce the number of points.  This filter is often used before glyphing.  Generating vertices is an option."
-          short_help="Reduce the number of points.">
-The Mask Points filter reduces the number of points in the data set. It operates on any type of data set, but produces only points / vertices. This filter is often used before the Glyph filter, but now the basic point-masking functionality is available on the Parameters page for the Glyph filter.
-The Input menu allows the user to select the data set to which this filter will be applied. The value in the On ratio thumb wheel specifies the ratio of points to retain in the output. (For example, if the on ratio is 3, then the output will contain 1/3 as many points -- up to the Max. points value -- as the input.) The Max. points thumb wheel determines the maximum number of points that will appear in the output. The Offset thumb wheel specifies the point in the data set from which to start masking. If the Random check box is marked, then the output points will be selected randomly from the input; otherwise every nth point (specified by the on ratio) will be selected. Selecting points at random is helpful to avoid striping when masking the points of a structured data set. If the Generate vertices option is checked, then a vertex cell will be created for each point in the output.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -1377,9 +1127,6 @@ The Input menu allows the user to select the data set to which this filter will 
    </SourceProxy>
 
    <SourceProxy name="Median" class="vtkImageMedian3D">
-    <Documentation>
-The Median filter operates on uniform rectilinear (image or volume) data and produces uniform rectilinear output. It replaces the scalar value at each pixel / voxel with the median scalar value in the specified surrounding neighborhood (Kernel Size). From the Input menu, the user can select the data set on which to perform this calculation. The Scalar menu determines which scalar array will be used to determine the median. The Kernel Size entry boxes specify the number of pixels / voxels in each dimension to use in computing the median to assign to each pixel / voxel. If the kernel size in a particular dimension is 1, then the median will not be computed in that direction. Since the median operation removes outliers, this filter is useful for removing high-intensity, low-probability noise (shot noise).
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -1417,11 +1164,6 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
    </SourceProxy>
 
    <SourceProxy name="MeshQuality" class="vtkMeshQuality">
-    <Documentation
-       long_help="Compute the quality of triangular, quadrilateral, and tetrahedral cells in a mesh."
-       short_help="Compute the quality of the cells in a mesh.">
-The mesh quality filter computes the quality of individual triangles, quadrilaterals, tetrahedra and hexahedra in a data set. Several quality measures exist for the different cell types. You may choose one for each type of cell. The filter then adds a new scalar array named "Quality" to the per-cell values of the data set containing these measures. Typically, a value of 1 is the optimal quality and the higher the value, the lower the cell quality.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -1437,37 +1179,35 @@ The mesh quality filter computes the quality of individual triangles, quadrilate
         name="TriangleQualityMeasure"
         command="SetTriangleQualityMeasure"
         number_of_elements="1"
-        default_values="0">
-       <IntRangeDomain name="range" min="0" max="3"/>
+        default_values="2">
+       <IntRangeDomain name="range" min="0" max="6"/>
      </IntVectorProperty>
      <IntVectorProperty
         name="QuadQualityMeasure"
         command="SetQuadQualityMeasure"
         number_of_elements="1"
         default_values="0">
-       <IntRangeDomain name="range" min="0" max="3"/>
+       <IntRangeDomain name="range" min="0" max="6"/>
      </IntVectorProperty>
      <IntVectorProperty
         name="TetQualityMeasure"
         command="SetTetQualityMeasure"
         number_of_elements="1"
-        default_values="0">
-       <IntRangeDomain name="range" min="0" max="3"/>
+        default_values="2">
+       <IntRangeDomain name="range" min="0" max="6"/>
+     </IntVectorProperty>
+     <IntVectorProperty
+        name="HexQualityMeasure"
+        command="SetHexQualityMeasure"
+        number_of_elements="1"
+        default_values="5">
+       <IntRangeDomain name="range" min="0" max="6"/>
      </IntVectorProperty>
    <!-- End MeshQuality -->
    </SourceProxy>
 
 
    <SourceProxy name="PolyDataNormals" class="vtkPPolyDataNormals">
-    <Documentation
-       long_help="This filter will produce surface normals used for smooth shading.  Spltting is used to avoid smoothing across feature edges."
-       short_help="Produce surface point normals.">
-The Normals generation filter generates surface normals at the points of the input polygonal data set to provide smooth shading of the data set. The resulting data set is also polygonal. The filter works by calculating a normal vector for each polygon in the data set and then averaging the normals at the shared points.
-In creating surface normals, if the angle between two polygons at a shared edge is larger than the value of the Feature angle slider, then that edge is considered a feature edge. If Splitting is turned on, then the mesh will be split along feature edges, allowing points to be duplicated. Because the duplicated points are no longer shared between the polygons meeting at the feature edge, a normal at these points will be created per polygon rather than averaging the polygon normals to produce one normal at each point. This allows the feature edges to remain "sharp" after shading.
-Generally the normals for a data set should either all point inward or all point outward. If the Consistency check is on, then this filter will reorder the points of cells that whose normal vectors are oriented the opposite direction from the rest of those in the data set. If the Flip normals option is checked, this filter will reverse the normal direction (and reorder the points) for all polygons in the data set. You might want to do this if your viewing position will be inside the data set instead of outside of it. Sometimes you may have more than two polygons sharing an edge (i.e., a non-manifold edge). When this is the case and the Consistency option is checked, then if the Non-manifold check is on, this filter will try to maintain consistent normals across non-manifold edge, but doing this can corrupt the ordering of polygons at these edges.
-This filter computes the normals at the points in the data set. In the process of doing this it computes polygon normals too. If you want these normals to be passed to the output of this filter, turn on the Cell normals option.
-If this filter is run in parallel, the resulting data set will have seams along the processor boundaries unless the Piece invariant check box is marked.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -1539,11 +1279,6 @@ If this filter is run in parallel, the resulting data set will have seams along 
    </SourceProxy>
 
    <SourceProxy name="OutlineFilter" class="vtkPOutlineFilter">
-     <Documentation
-        long_help="This filter generates a bounding box representation of the input."
-        short_help="Generates a bounding box.">
-The Outline filter generates an axis-aligned bounding box for the input data set. The Input menu specifies the data set for which to create a bounding box. This filter operates on any type of data set and produces polygonal output.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -1559,11 +1294,6 @@ The Outline filter generates an axis-aligned bounding box for the input data set
    </SourceProxy>
 
    <SourceProxy name="OutlineCornerFilter" class="vtkPOutlineCornerFilter">
-    <Documentation
-       long_help="This filter generates a bounding box representation of the input.  It only displays the corners of the bounding box."
-       short_help="Generates corners of a bounding box.">
-The Outline Corners filter generates the corners of a bounding box for the input data set (specified by the Input menu). The Corner factor slider specifies the relative length of the corners along the corresponding edges. This filter produces polygonal output.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -1587,11 +1317,6 @@ The Outline Corners filter generates the corners of a bounding box for the input
    </SourceProxy>
 
    <SourceProxy name="PartScalars" class="vtkColorByPart">
-     <Documentation
-        long_help="This filter uses colors to show how data is partitioned across parts."
-        short_help="Generate point scalars from part id.">
-The Part Id Scalars filter assigns a unique scalar value to each part in the input. The input parts must have been collected together either as a result of a reader that loads multiple parts (e.g., EnSight reader) or because the Group Parts filter has been run to form a collection of data sets.
-     </Documentation>
      <InputProperty
         name="Input"
         command="AddInput"
@@ -1610,11 +1335,6 @@ The Part Id Scalars filter assigns a unique scalar value to each part in the inp
    </SourceProxy>
 
    <SourceProxy name="OctreeDepthScalars" class="vtkHyperOctreeDepth">
-     <Documentation
-        long_help="This filter adds a scalar to each leaf of the octree that represents the leaf's depth within the tree."
-        short_help="Computes cell depths within the octree.">
-The vtkHyperOctreeDepth filter adds a scalar to each leaf of the octree that represents the leaf's depth within the tree.
-     </Documentation>
      <InputProperty
         name="Input"
         command="AddInput"
@@ -1631,11 +1351,6 @@ The vtkHyperOctreeDepth filter adds a scalar to each leaf of the octree that rep
    </SourceProxy>
 
    <SourceProxy name="OctreeDepthLimit" class="vtkHyperOctreeLimiter">
-     <Documentation
-        long_help="This filter takes in a octree and produces a new octree which is no deeper than the maximum specified depth level."
-        short_help="Reduce an octree's resolution.">
-The vtkHyperOctreeLimiter takes in a octree and produces a new octree in which is nowhere deeper than the maximum specified depth level. The attribute data of pruned leaf cells is integrated in to their ancestors at the cut level.
-     </Documentation>
      <InputProperty
         name="Input"
         command="AddInput"
@@ -1660,11 +1375,6 @@ The vtkHyperOctreeLimiter takes in a octree and produces a new octree in which i
    </SourceProxy>
 
    <SourceProxy name="ProcessIdScalars" class="vtkProcessIdScalars">
-     <Documentation
-        long_help="This filter uses colors to show how data is partitioned across processes."
-        short_help="Generate point scalars from process id.">
-The Process Id Scalars filter assigns a unique scalar value to each piece of the input according to which processor it resides on. If the Random option is selected, the unique value per piece will be chosen at random; otherwise it will match the process id. This filter operates on any type of data when ParaView is run in parallel. It is useful for determining whether your data is load-balanced across the processors being used. The output data set type is the same as that of the input.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -1688,11 +1398,6 @@ The Process Id Scalars filter assigns a unique scalar value to each piece of the
    </SourceProxy>
 
    <SourceProxy name="PointDataToCellData" class="vtkPointDataToCellData">
-     <Documentation
-        long_help="Create cell attributes by averaging point attributes."
-        short_help="Convert point data to cell data.">
-The Point Data to Cell Data filter averages the values of the point attributes of the points of a cell to compute cell attributes. The Input menu allows the user to select the data set to which this filter will be applied. If the Pass point data option is checked, then the input point attributes will also be copied to the point attributes of the output; otherwise the output will only have cell attributes. The Point Data to Cell Data filter operates on any type of data set, and the output data set is of the same type as the input.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -1718,13 +1423,6 @@ The Point Data to Cell Data filter averages the values of the point attributes o
    </SourceProxy>
 
    <SourceProxy name="QuadricClustering" class="vtkQuadricClustering">
-    <Documentation
-       long_help="This filter is the same filter used to generate level of detail for ParaView.  It uses a structured grid of bins and merges all points contained in each bin."
-       short_help="Simplify polygonal models.">
-The Quadric Clustering filter produces a reduced-resolution polygonal approximation of the input polygonal data set. This filter is the one used by ParaView for computing LODs. It uses spatial binning to reduce the number of points in the data set; points that lie within the same spatial bin are collapsed into one representative point. The Divisions entries specify the number of bins along the X, Y, and Z axes of the data set. If Use input points is on, the representative point for each bin is selected from one of the input points that lies in that bin; the input point that produces the least error is chosen. Without this option selected, the location of the representative point is calculated to produce the least error possible for that bin, but the point will most likely not be one of the input points.
-To better align pieces of the data set assigned to different processors, select Use feature edges and Use feature points. Use feature edges adjusts the representative points that contain boundary edges (along processor divisions), and Use feature points further influences the position of the feature points along the boundaries.
-The Copy cell data toggle controls whether cell-centered data from the input should be copied to the output.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -1788,11 +1486,6 @@ The Copy cell data toggle controls whether cell-centered data from the input sho
    </SourceProxy>
 
    <SourceProxy name="BrownianPoints" class="vtkBrownianPoints">
-    <Documentation
-       long_help="This filter creates a new 3 component point data array and sets it as the default vectors.  It uses a random number generator to create values."
-       short_help="Create a new random vector array.">
-The Random Vectors filter generates a point-centered array of random vectors. It uses a random number generator to determine the components of the vectors. The Min. speed and Max. speed values determine the range of the vector magnitudes. This filter operates on any type of data set, and the output data set will be of the same type as the input.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -1824,11 +1517,6 @@ The Random Vectors filter generates a point-centered array of random vectors. It
    </SourceProxy>
 
    <SourceProxy name="ReflectionFilter" class="vtkReflectionFilter">
-    <Documentation
-       long_help="This filter takes the union of the input and its reflection over an axis-aligned plane."
-       short_help="Reflect input over an axis aligned plane.">
-The Reflection filter reflects the input data set across the specified plane. If the Copy Input check box is marked, the output is the union of the input data set and its reflection. Otherwise the output will contain only the reflection of the input data. If the value chosen from the Plane menu is X, Y, or Z, the value of the Center entry determines where the plane is placed along the specified axis. The other six entries, X Min, X Max, etc., place the reflection plane at the specified face of the bounding box of the input data set. This filter operates on any type of data set and produces an unstructured grid output.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -1879,13 +1567,6 @@ The Reflection filter reflects the input data set across the specified plane. If
    </SourceProxy>
 
    <SourceProxy name="RibbonFilter" class="vtkRibbonFilter">
-    <Documentation
-       long_help="This filter generates ribbon surface from lines.  It is useful for displaying streamlines."
-       short_help="Create ribbon surfaces from lines.">
-The Ribbon filter creates ribbons from the lines in the input data set. This filter is useful for visualizing streamlines. Both the input and output of this filter are polygonal data. The input data set must also have at least one point-centered vector array.
-The vectors and scalars for use in this filter can be selected from the Vectors and Scalars menus respectively. If the Vary width option is on, the width of the ribbons will be scaled according to the selected scalars. If Use default normal is off, the selected vector array will be used as the normals of the ribbons. If Use default normal is on, the normal for the ribbons is specified by the values in the Default normal entry boxes.
-The Width entry box specifies half the width of the ribbons. If Vary width is on, then the Width value specified is half the minimum width of the ribbons. The Angle value determines the orientation of the ribbons; it specifies the offset angle (in degrees) of the ribbon from the normal line.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -1976,12 +1657,6 @@ The Width entry box specifies half the width of the ribbons. If Vary width is on
 
    <SourceProxy name="RotationalExtrusionFilter" 
                 class="vtkRotationalExtrusionFilter">
-    <Documentation
-       long_help="This filter generates a swept surface while translates the input along a circular path."
-       short_help="Generates a swept surface using a rotational path.">
-The Rotational Extrusion filter forms a surface by rotating the input about the Z axis. This filter is intended to operate on 2D polygonal data. The Input menu allows the user to select the data set to which this filter will be applied. The value of the Resolution thumb wheel specifies the number of steps taken in rotating from 0 to the value specified in the Angle entry box. The Translation entry box determines the distance along the Z axis to be covered as the data set is rotated. Specifying a non-zero Translation value allows you to create a corkscrew or spring effect. The Delta radius entry box controls how much the radius of the rotation increases as the new data set is swept out.
-The Capping check box controls whether to close the open ends of the swept surface. Capping works by placing a copy of the input data set on either end of the swept surface, so it behaves properly if the input is a 2D surface composed of filled polygons. If the input data set is a closed solid (e.g., a sphere), then either two copies of the data set will be drawn or no surface will be drawn. No surface is drawn if either capping is on or if the two surfaces would occupy exactly the same 3D space (e.g., Angle is a multiple of 360, and Translation and Delta radius are 0).
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -2039,11 +1714,6 @@ The Capping check box controls whether to close the open ends of the swept surfa
    </SourceProxy>
 
    <SourceProxy name="ShrinkFilter" class="vtkShrinkFilter">
-     <Documentation
-        long_help="This filter shrinks each input cell so they pull away from their neighbors."
-        short_help="Shrink each input cell.">
-The Shrink filter causes the individual cells of a data set to break apart from each other by moving each cell's points toward the centroid of the cell. (The centroid of a cell is the average position of its points.) The Shrink factor scale determines how far the points will move. A value of 0 positions the points at the centroid of the cell; a value of 1 leaves them at their original positions. This filter operates on any type of data set and produces unstructured grid output.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -2068,11 +1738,6 @@ The Shrink filter causes the individual cells of a data set to break apart from 
    </SourceProxy>
 
    <SourceProxy name="SmoothPolyDataFilter" class="vtkSmoothPolyDataFilter">
-    <Documentation
-       long_help="This filter smooths a polygonal surface by iteratively moving points toward their neighbors."
-       short_help="Smooth a polygonal surface without adding more points.">
-The Smooth filter operates on a polygonal data set by iteratively adjusting the position of the points using Laplacian smoothing. (Because this filter only adjusts point positions, the output data set is also polygonal.) This results in better-shaped cells and more evenly distributed points. The Num. iterations thumb wheel specifies the maximum number of smoothing iterations to perform. The Convergence slider limits the maximum motion of any point. It is expressed as a fraction of the length of the diagonal of the bounding box of the data set. If the maximum point motion during a smoothing iteration is less than the Convergence value, the smoothing operation terminates.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -2105,11 +1770,6 @@ The Smooth filter operates on a polygonal data set by iteratively adjusting the 
    </SourceProxy>
 
    <SourceProxy name="Stripper" class="vtkStripper">
-    <Documentation
-       long_help="This filter uses a greedy algorithm to convert triangles into triangle strips"
-       short_help="Convert triangles into triangle strips.">
-The Triangle Strips filter converts triangles into triangle strips and lines into polylines. The Max. length slider determines the maximum number of triangles or lines to merge into a strip. This filter operates on polygonal data sets and produces polygonal output.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -2133,11 +1793,6 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
    </SourceProxy>
 
    <SourceProxy name="Subdivide" class="vtkLinearSubdivisionFilter">
-    <Documentation
-       long_help="This filter iteratively divide triangles into four smaller triangles.  New points are placed linearly so the output surface matches the input surface."
-       short_help="Creates a surface with more triangles than the input.">
-The Subdivide filter iteratively divides each triangle in the data set into 4 new triangles. Three new points are added per triangle -- one at the midpoint of each edge. The image below shows a triangle with the new points inserted and the appropriate edges added to form the four new triangles. The Num. divisions slider determines the number of subdivision passes the filter will take through the data. This filter operates only on polygonal data containing triangles, so run your polygonal data through the Triangulate filter first if it is not composed of triangles. The output of this filter is also polygonal.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -2161,15 +1816,6 @@ The Subdivide filter iteratively divides each triangle in the data set into 4 ne
    </SourceProxy>
 
    <SourceProxy name="TessellatorFilter" class="vtkTessellatorFilter">
-     <Documentation
-        long_help="Tessellate nonlinear curves, surfaces, and volumes with lines, triangles, and tetrahedra."
-        short_help="Polygonize a mesh.">
-The Tessellate filter tessellates cells with nonlinear geometry and/or scalar fields into a simplicial complex with linearly interpolated field values that more closely approximate the original field. This is useful for the quadratic cells supported by VTK. There are several settings that affect the tessellation.
-The Output Dimension specifies whether nonlinear cells should have their volumes, surfaces, or edges tessellated. When the Output Dimension is 3, 3-D cells produce tetrahedra, 2-D cells produce triangles, and 1-D cells produce line segments. When the Output Dimension is 2, 3-D cells will have their boundaries tessellated with triangles. When the Output Dimension is 1, then all cells except points produce line segments.
-The Max Chord Error setting is the maximum allowed distance between the midpoint of any output edge and the original nonlinear geometry.
-The Max Field Error setting is a per-field error, also sampled at midpoints, but comparing the linear and nonlinear field values.
-The Max Num Of Subdivisions setting specifies the maximum number of times an edge may be subdivided. Increasing this number allows further refinement but can drastically increase the computational and storage requirements, especially when the Output Dimension is 3.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -2224,11 +1870,6 @@ The Max Num Of Subdivisions setting specifies the maximum number of times an edg
    </SourceProxy>
 
    <SourceProxy name="DataSetTriangleFilter" class="vtkDataSetTriangleFilter">
-     <Documentation
-        long_help="This filter converts 3-d cells to tetrahedrons and polygons to triangles.  The output is always of type unstructured grid."
-        short_help="Convert to tetrahedrons and triangles.">
-The Tetrahedralize filter converts the 3D cells of any type of data set to tetrahedrons and the 2D ones to triangles. This filter always produces unstructured grid output.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -2244,11 +1885,6 @@ The Tetrahedralize filter converts the 3D cells of any type of data set to tetra
    </SourceProxy>
 
    <SourceProxy name="TransformFilter" class="vtkTransformFilter">
-    <Documentation
-       long_help="This filter applies transformation to the polygons."
-       short_help="Transform polygonal data.">
-The Transform filter allows you to specify the position, size, and orientation of polygonal, unstructured grid, and curvilinear data sets. You can interactively perform these affine transformations on the data by using the box widget, and the parameters can also be controlled manually. See section 7.4 for the details of using the box widget and manually setting its parameters. The output of this filter will have the same data set type as the input.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -2270,11 +1906,6 @@ The Transform filter allows you to specify the position, size, and orientation o
    </SourceProxy>
 
    <SourceProxy name="TriangleFilter" class="vtkTriangleFilter">
-     <Documentation
-        long_help="This filter converts polygons and triangle strips to basic triangles."
-        short_help="Convert polygonal data to triangles.">
-The Triangulate filter decomposes polygonal data into only triangles, points, and lines. It separates triangle strips and polylines into individual triangles and lines, respectively. The output is polygonal data. Some filters that take polygonal data as input require that the data be composed of triangles rather than other polygons, so passing your data through this filter first is useful in such situations. You should use this filter in these cases rather than the Tetrahedralize filter because they produce different output data set types. The filters referenced require polygonal input, and the Tetrahedralize filter produces unstructured grid output.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -2290,11 +1921,6 @@ The Triangulate filter decomposes polygonal data into only triangles, points, an
    </SourceProxy>
 
    <SourceProxy name="TubeFilter" class="vtkTubeFilter">
-    <Documentation
-       long_help="Convert lines into tubes.  Normals are used to avoid cracks between tube segments."
-       short_help="Convert lines into tubes.">
-The Tube filter creates tubes around the lines in the input polygonal data set. The output is also polygonal. The Num. sides value determines the number of faces around the circumference of the tube. The Capping toggle specifies whether to close the end of the tube with a polygon. The Radius entry determines the radius of the tube (or the minimum radius if you are varying the radius). From the Vary radius menu, you can select whether the radius of the tube should vary, and if so, whether it should be by scalar or by vector. If the radius is varied by scalar, the tube radius is based on the point-based scalar values. If it is varied by vector, the vector magnitude is used. If you are varying the radius, the value in the Radius factor entry determines the maximum radius by specifying a multiplier of the Radius value.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -2359,13 +1985,6 @@ The Tube filter creates tubes around the lines in the input polygonal data set. 
    </SourceProxy>
 
    <SourceProxy name="WarpScalar" class="vtkWarpScalar">
-     <Documentation
-        long_help="This filter moves point coordinates along a vector scaled by a point attribute.  It can be used to produce carpet plots."
-        short_help="Warp point scalars into a spatial elevation plot.">
-The Warp (scalar) filter translates the points of the input data set along a vector by a distance determined by the specified scalars (selected from the Scalars menu). The Scale factor entry allows you to rescale the scalar values used in warping the data.
-The Normal entries specify the direction in which to warp the geometry if the Use normal option is checked. If Use normal and X-Y plane are off, the data set will be warped along its normals array. (If no normals array exists, the Normal value will be used.) If X-Y plane is on, the Z-values in the data set are considered to be scalars, and warping is done along the Z axis. This is useful for creating carpet plots. Any scalars in the data set are copied to the output, so the data can be colored by them.
-This filter operates on polygonal, curvilinear, and unstructured grid data sets containing single-component scalar arrays. Because it only changes the positions of the points, the output data set type is the same as that of the input.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -2428,11 +2047,6 @@ This filter operates on polygonal, curvilinear, and unstructured grid data sets 
    </SourceProxy>
 
    <SourceProxy name="WarpVector" class="vtkWarpVector">
-     <Documentation
-        long_help="This filter displaces point coordinates along a vector attribute.  It is useful for showing mechanical deformation."
-        short_help="Warp (displace) the geometry with a given vector field.">
-The Warp (vector) filter translates the points of the input data set using a specified vector array. The vector array chosen specifies a vector per point in the input. Each point is translated along its vector by the value in the Scale factor entry box. This filter operates on polygonal, curvilinear, and unstructured grid data sets. Because this filter only changes the positions of the points, the output data set type is the same as that of the input. This filter is available on the Toolbar.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -2471,13 +2085,6 @@ The Warp (vector) filter translates the points of the input data set using a spe
 
 
    <SourceProxy name="Cut" class="vtkCutter">
-    <Documentation
-       long_help="This filter cuts a data set with a plane or sphere.  Cutting is similar to a contour.  It creates surfaces from volumes and lines from surfaces."
-       short_help="Cut datasets with planes or spheres.">
-The Cut filter extracts the portion of the input data set that lies along the specified plane or sphere. From the Cut Function menu, you can select whether cutting will be performed with a plane or a sphere. The appropriate 3D widget (plane widget or sphere widget) will be displayed. The parameters of the cut function can be specified interactively using the 3D widget or manually using the traditional user interface controls. Instructions for using these 3D widgets and their corresponding user interfaces are found in section 7.4.
-By default, the cut lies on the specified plane or sphere. Using the Cut Offset Values portion of the interface, it is also possible to cut the data set at some offset from the original cut function. The Cut Offset Values are in the spatial units of the data set. To add a single offset, select the value from the New Value slider in the Add value portion of the interface and click the Add button, or press Enter. To instead add several evenly spaced offsets, use the controls in the Generate range of values section. Select the number of offsets to generate using the Number of Values slider. The Range slider controls the interval in which to generate the offsets. Once the number of values and range have been selected, click the Generate button. The new offsets will be added to the Offset Values list. To delete a value from the Cut Offset Values list, select the value and click the Delete button. (If no value is selected, the last value in the list will be removed.) Clicking the Delete All button removes all the values in the list.
-The Cut filter takes any type of data set as input. Use the Input menu to choose a data set to cut. The output of this filter is polygonal data. This filter is available on the Toolbar.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -2523,13 +2130,6 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
    </SourceProxy>
 
    <SourceProxy name="Clip" class="vtkPVClipDataSet">
-    <Documentation
-       long_help="Clip with an implicit plane, sphere or with scalars. Clipping does not reduce the dimensionality of the data set.  This output data type of this filter is always an unstructured grid."
-       short_help="Clip with an implicit plane, sphere or with scalars.">
-The Clip filter cuts away a portion of the input data set using a plane, a sphere, a box, or a scalar value. The menu in the Clip Function portion of the interface allows the user to select which implicit function to use or whether to clip using a scalar value. Making this selection loads the appropriate user interface. For the implicit functions, the appropriate 3D widget (plane, sphere, or box) is also displayed. The use of these 3D widgets, including their user interface components, is discussed in section 7.4.
-If an implicit function is selected, the clip filter returns that portion of the input data set that lies inside the function. If Scalars is selected, then the user must specify a scalar array to clip according to. The clip filter will return the portions of the data set whose value in the selected Scalars array is larger than the Clip value. Regardless of the selection from the Clip Function menu, if the Inside Out option is checked, the opposite portions of the data set will be returned.
-This filter operates on all types of data sets, and it returns unstructured grid data on output. This filter is available on the toolbar.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -2596,11 +2196,6 @@ This filter operates on all types of data sets, and it returns unstructured grid
    </SourceProxy>
 
    <SourceProxy name="Threshold" class="vtkThreshold">
-    <Documentation
-       long_help="This filter extracts cells that have point or cell scalars in the specified range."
-       short_help="Extract cells that satisfy a threshold criterion.">
-The Threshold filter extracts the portions of the input data set whose scalars lie within the specified range. This filter operates on either point-centered or cell-centered data. To select between these two options, select either Point Data or Cell Data from the Attribute Mode menu. Once the Attribute Mode has been selected, choose the scalar array from which to threshold the data from the Scalars menu. The Lower Threshold and Upper Threshold sliders determine the range of the scalars to retain in the output. The All Scalars check box only takes effect when the Attribute Mode is set to Point Data. If the All Scalars option is checked, then a cell will only be passed to the output if the scalar values of all of its points lie within the range indicated by the Lower Threshold and Upper Threshold sliders. If unchecked, then a cell will be added to the output if the specified scalar value for any of its points is within the chosen range. This filter operates on any type of data set and produces unstructured grid output. The Threshold filter is available on the Toolbar.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -2659,14 +2254,6 @@ The Threshold filter extracts the portions of the input data set whose scalars l
    </SourceProxy>
 
    <SourceProxy name="Contour" class="vtkContourFilter">
-    <Documentation
-       long_help="Generate isolines or isosurfaces using point scalars."
-       short_help="Generate isolines or isosurfaces.">
-The Contour filter computes isolines or isosurfaces using a selected point-centered scalar array. The available scalar arrays are listed in the Scalars menu. The scalar range of the selected array will be displayed.
-The interface for adding contour values is very similar to the one for selecting cut offsets (in the Cut filter). To add a single contour value, select the value from the New Value slider in the Add value portion of the interface and click the Add button, or press Enter. To instead add several evenly spaced contours, use the controls in the Generate range of values section. Select the number of contour values to generate using the Number of Values slider. The Range slider controls the interval in which to generate the contour values. Once the number of values and range have been selected, click the Generate button. The new values will be added to the Contour Values list. To delete a value from the Contour Values list, select the value and click the Delete button. (If no value is selected, the last value in the list will be removed.) Clicking the Delete All button removes all the values in the list. If no values are in the Contour Values list when Accept is pressed, the current value of the New Value slider will be used.
-In addition to selecting contour values, you can also select additional computations to perform. If any of Compute Normals, Compute Gradients, or Compute Scalars is selected, the appropriate computation will be performed, and a corresponding point-centered array will be added to the output.
-The Contour filter operates on any type of data set, but the input is required to have at least one point-centered scalar (single-component) array. The output of this filter is polygonal. This filter is available on the Toolbar.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -2742,17 +2329,6 @@ The Contour filter operates on any type of data set, but the input is required t
 
 
    <SourceProxy name="Glyph" class="vtkPVGlyphFilter">
-    <Documentation
-       long_help="This filter generates an arrow, cone, line, sphere, or 2D glyph at each point of the input data set.  The glyphs can be oriented and scaled by the input point attributes."
-       short_help="Generate a glyph symbol at each point of the input data set.">
-The Glyph filter generates a glyph (i.e., an arrow, cone, line, sphere, or 2D glyph) at each point in the input data set. The glyphs can be oriented and scaled by the input point-centered scalars and vectors.
-From the Glyph menu, select which symbol should be drawn at each input point. The available choices are Arrow, Cone, Line, Sphere, and Glyph2D. To change the parameters of any of the glyphs (including which 2D glyph is drawn), choose the appropriate glyph from the Glyphs submenu of the Select menu. Change the desired parameter(s) and click Accept. To return to the Glyph interface, select this filter from the Selection / Navigation Window or from the Select menu.
-The Orient / Scale section of the interface determines how the point-centered scalars and vectors contribute to the orientation and scale of the widgets. The Orient Mode menu determines whether the glyphs are drawn in their original orientation (Off) or in an orientation determined by a vector array (Vector). If the input does not contain point-centered vectors, the Vector option in the Orient Mode menu will not be available.
-The Scale Mode menu determines how the scale of the glyphs will be calculated. The options are to scale by the selected scalar array (Scalar), to scale by the magnitudes of the selected vector array (Vector Magnitude), to scale by each component of the selected vector array (Vector Components), or to draw the all the glyphs at the same scale (Data Scaling Off). If the input contains no point-centered scalar arrays, the Scalar option will be disabled. If it has no point-centered vector arrays, the Vector Magnitude and Vector Components entries will be unavailable. The value of the Scale Factor entry box is a multiplier that contributes to the final size of the glyphs.
-The Scalars and Vectors menus list the point-centered scalar (single-component) and vector (three-component) arrays in the input data set. These menus are enabled and disabled depending on the current Orient and Scale Mode selections.
-The Glyph Parameters tab also contains controls for masking the input points before glyphing. (This is a simplified version of the Mask Points filter interface.) To enable point masking, turn on the Mask Points option. When this is selected, the Max. Number of Glyphs thumbwheel sets an upper limit on the number of glyphs to display. If the Random Masking option is on, the input points to glyph will be randomly selected; otherwise every second point will be glyphed, starting from the first point id.
-The Glyph filter operates on any type of data set. Its output is polygonal. This filter is available on the Toolbar.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -2880,11 +2456,6 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
    </SourceProxy>
 
    <SourceProxy name="ExtractGrid" class="vtkPVExtractVOI">
-    <Documentation
-       long_help="Extract a subgrid from a structured grid with the option of setting subsample strides."
-       short_help="Extract a subgrid or subsample.">
-The Extract Grid filter returns a subgrid of a structured input data set (uniform rectilinear, curvilinear, or nonuniform rectilinear). The VOI section of the interface provides six sliders for specifying the extents of the desired output along each of the I, J, and K axes. The Sample Rate thumb wheels control whether to subsample the input grid in each dimension. Values greater than 1 result in subsampling. For example, if the Sample Rate along the I axis is 2, then every other input point will be passed to the output. If the Sample Rate in any dimension is greater than 1, then selecting the Include boundary option will pass the values on the boundary of the data set to the output even if the boundary extent is not an even multiple of the sample rate. The output data set type of this filter is the same as the input type. This filter is available on the Toolbar.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -2946,81 +2517,7 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
    <!-- End ExtractGrid -->
    </SourceProxy>
 
-   <SourceProxy name="DataAnalysis" class="vtkDataAnalysisFilter">
-    <Documentation
-       long_help="Sample point data at a point or along a line or by point id. Select cell at a point or by cell id. Data can be plotted on an XY plot."
-       short_help="Pick a cell or point.">
-    The Data Analysis filter provides the ability to query either cell or point data in a given data set. The data may be plotted as an plot. If the "Query Method" is "Point", the filter outputs the interpolated point data at the selected point. If the "Query Method" is "Cell", the filter outputs the cell data at the closest cell to the choosen point. If the "Query Method" is "Line", the filter interpolates the point data at the sample points on the line. If the "Query Method" is "Cell Id", the filter outputs the cell data for the cell with the given Id. If the "Query Method" is "Point Id", the filter outpus the point data for the point with the given Id. The data can be plotted on an XY plot. Additionally, if the input supports multiple timesteps, this filter can be used to plot the queried data over time.
-    </Documentation>
-    <InputProperty
-       name="Input"
-       command="SetInput">
-          <ProxyGroupDomain name="groups">
-            <Group name="sources"/>
-            <Group name="filters"/>
-          </ProxyGroupDomain>
-          <DataTypeDomain name="input_type">
-            <DataType value="vtkDataSet"/>
-            <DataType value="vtkMultiGroupDataSet"/>
-          </DataTypeDomain>
-          <NumberOfPartsDomain name="multi_part" multiplicity="single"/>
-          <NumberOfGroupsDomain name="multi_group" multiplicity="single"/>
-          <InputArrayDomain name="input_array" attribute_type="point"/>
-     </InputProperty>
-
-     <InputProperty
-        name="Source"
-        command="SetSource">
-           <ProxyGroupDomain name="groups">
-             <Group name="sources"/>
-           </ProxyGroupDomain>
-     </InputProperty>
-
-     <IntVectorProperty name="Mode"
-        command="SetMode"
-        number_of_elements="1"
-        default_values="1">
-        <EnumerationDomain name="enum">
-          <Entry text="Probe" value="0" />
-          <Entry text="Pick" value="1" />
-        </EnumerationDomain>
-     </IntVectorProperty>
-     <IntVectorProperty name="Id"
-        command="SetId"
-        number_of_elements="1"
-        default_values="0">
-        <IntRangeDomain name="range" min="0" />
-     </IntVectorProperty>
-     <IntVectorProperty name="UseIdToPick"
-        command="SetUseIdToPick"
-        number_of_elements="1"
-        default_values="0">
-        <BooleanDomain name="bool" />
-     </IntVectorProperty>
-     <IntVectorProperty name="PickCell"
-        command="SetPickCell"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-     </IntVectorProperty>
-     <DoubleVectorProperty
-         name="WorldPoint"
-         command="SetWorldPoint"
-         number_of_elements="3"
-         default_values="0 0 0" >
-      </DoubleVectorProperty>
-   <!-- End PickProbe -->
-   </SourceProxy>
-
    <SourceProxy name="Probe" class="vtkPProbeFilter">
-    <Documentation
-       long_help="Sample data attributes at a point or along a line.  Probed lines will be displayed in a graph of the attributes."
-       short_help="Sample data values at a point or along a line.">
-The Probe filter samples the data set attributes of the current data set at a point or along a line. Selecting either Point or Line from the menu button in the Probe object portion of the interface displays the appropriate 3D widget and its associated user interface controls. See section 7.4 for more information about using 3D widgets.
-If you are probing with a point, the values of the point-centered variables at the selected point will be listed on the Parameters tab for this filter. If you are probing with a line, the values of the point-centered variables along that line will be displayed in a 2D graph in the display area if Show XY-Plot is selected.
-Probing with a point is different from using the Pick filter at a point because the Pick filter displays the values for the input point closest to the selected point. Instead the Probe filter uses interpolation to determine the value at the selected point, whether or not it lies at an input point.
-The Probe filter operates on any type of data and produces polygonal output (a point or a line).
-    </Documentation>
     <InputProperty
        name="Source"
        command="SetSource">
@@ -3063,13 +2560,13 @@ The Probe filter operates on any type of data and produces polygonal output (a p
     <Property
        name="AnimateInit"
        command="AnimateInit"
-       is_internal="1">
+       saveable="0">
     </Property>
 
     <DoubleVectorProperty
        name="AnimateTick"
        command="AnimateTick"
-       is_internal="1"
+       saveable="0"
        number_of_elements="1"
        default_values="0.0" >
           <DoubleRangeDomain name="range" min="0" max="1" />
@@ -3094,13 +2591,13 @@ The Probe filter operates on any type of data and produces polygonal output (a p
     <Property
        name="AnimateInit"
        command="AnimateInit"
-       is_internal="1">
+       saveable="0">
     </Property>
 
     <DoubleVectorProperty
        name="AnimateTick"
        command="AnimateTick"
-       is_internal="1"
+       saveable="0"
        number_of_elements="1"
        default_values="0.0" >
           <DoubleRangeDomain name="range" min="0" max="1" />
@@ -3122,17 +2619,6 @@ The Probe filter operates on any type of data and produces polygonal output (a p
 
 
    <SourceProxy name="StreamTracer" class="vtkDistributedStreamTracer">
-    <Documentation
-       long_help="Integrate streamlines in a vector field."
-       short_help="Integrate streamlines in a vector field.">
-The Stream Tracer filter generates streamlines in a vector field from a collection of seed points. The vector field used is selected from the Vectors menu, so the input data set is required to have point-centered vectors. The Seed portion of the interface allows you to select whether the seed points for this integration lie in a point cloud or along a line. Depending on which is selected, the appropriate 3D widget (point or line widget) is displayed along with traditional user interface controls for positioning the point cloud or line within the data set. Instructions for using the 3D widgets and the corresponding manual controls can be found in section 7.4.
-The Max. Propagation entry box allows you to specify the maximum length of the streamlines. From the Max. Propagation menu, you can select the units to be either Time (the time a particle would travel with steady flow) or Length (in the data set's spatial coordinates).
-The Init. Step Len. menu and entry specify the initial step size for integration. (For non-adaptive integrators, Runge-Kutta 2 and 4, the initial step size is used throughout the integration.) The menu allows you to specify the units. Time and Length have the same meaning as for Max. Propagation. Cell Length specifies the step length as a number of cells.
-The Integration Direction menu determines in which direction(s) the stream trace will be generated: FORWARD, BACKWARD, or BOTH.
-The Integrator Type section of the interface determines which calculation to use for integration: Runge-Kutta 2, Runge-Kutta 4, or Runge-Kutta 4-5. If Runge-Kutta 4-5 is selected, controls are displayed for specifying the minimum and maximum step length and the maximum error. The controls for specifying Min. Step Len. and Max. Step Len. are the same as those for Init. Step Len. The Runge-Kutta 4-5 integrator tries to choose the step size so that the estimated error is less than the value of the Maximum Error entry.
-If the integration takes more than Max. Steps to complete, if the speed goes below Term. Speed, if Max. Propagation is reached, or if a boundary of the input data set is crossed, integration terminates.
-This filter operates on any type of data set, provided it has point-centered vectors. The output is polygonal data containing polylines. This filter is available on the Toolbar.
-    </Documentation>
     <InputProperty
        name="Input"
        command="AddInput"
@@ -3326,12 +2812,6 @@ This filter operates on any type of data set, provided it has point-centered vec
    </SourceProxy>
 
    <SourceProxy name="Pick" class="vtkPickFilter">
-     <Documentation
-        long_help="Find the cell or point closest to the input point."
-        short_help="Pick cells or points.">
-The Pick filter displays the underlying data nearest to a user-selected point. A point widget, with its usual controls in the display area and on the Parameters tab, is provided for choosing this point. (See section 7.4 for information about using the point widget.) Pressing the "P" key positions the point widget at the point on the data set under the current cursor position. If you select Point from the Pick Type menu, the output of the filter will be the nearest point to the point widget. If you select Cell, the output of the filter is the cell which is closest to the selected point. All the output point-centered attributes, cell-centered attributes, and original ids are displayed on the Parameters tab. Also, the selected cell will be outlined in red in the display area, and the reference ids of the points within that cell will be labeled.
-The Pick filter operates on any type of data and produces unstructured grid output.
-     </Documentation>
      <InputProperty
         name="Input"
         command="AddInput"
@@ -3385,13 +2865,6 @@ The Pick filter operates on any type of data and produces unstructured grid outp
    </SourceProxy>
 
   <SourceProxy name="GenericClip" class="vtkGenericClip">
-    <Documentation
-       long_help="Clip with an implicit plane, sphere or with scalars. Clipping does not reduce the dimensionality of the data set.  This output data type of this filter is always an unstructured grid."
-       short_help="Clip with an implicit plane, sphere or with scalars.">
-The Clip filter cuts away a portion of the input data set using a plane, a sphere, a box, or a scalar value. The menu in the Clip Function portion of the interface allows the user to select which implicit function to use or whether to clip using a scalar value. Making this selection loads the appropriate user interface. For the implicit functions, the appropriate 3D widget (plane, sphere, or box) is also displayed. The use of these 3D widgets, including their user interface components, is discussed in section 7.4.
-If an implicit function is selected, the clip filter returns that portion of the input data set that lies inside the function. If Scalars is selected, then the user must specify a scalar array to clip according to. The clip filter will return the portions of the data set whose value in the selected Scalars array is larger than the Clip value. Regardless of the selection from the Clip Function menu, if the Inside Out option is checked, the opposite portions of the data set will be returned.
-This filter operates on all types of data sets, and it returns unstructured grid data on output. This filter is available on the toolbar.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -3445,14 +2918,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
    </SourceProxy>
 
    <SourceProxy name="GenericContour" class="vtkGenericContourFilter">
-    <Documentation
-       long_help="Generate isolines or isosurfaces using point scalars."
-       short_help="Generate isolines or isosurfaces.">
-The Contour filter computes isolines or isosurfaces using a selected point-centered scalar array. The available scalar arrays are listed in the Scalars menu. The scalar range of the selected array will be displayed.
-The interface for adding contour values is very similar to the one for selecting cut offsets (in the Cut filter). To add a single contour value, select the value from the New Value slider in the Add value portion of the interface and click the Add button, or press Enter. To instead add several evenly spaced contours, use the controls in the Generate range of values section. Select the number of contour values to generate using the Number of Values slider. The Range slider controls the interval in which to generate the contour values. Once the number of values and range have been selected, click the Generate button. The new values will be added to the Contour Values list. To delete a value from the Contour Values list, select the value and click the Delete button. (If no value is selected, the last value in the list will be removed.) Clicking the Delete All button removes all the values in the list. If no values are in the Contour Values list when Accept is pressed, the current value of the New Value slider will be used.
-In addition to selecting contour values, you can also select additional computations to perform. If any of Compute Normals, Compute Gradients, or Compute Scalars is selected, the appropriate computation will be performed, and a corresponding point-centered array will be added to the output.
-The Contour filter operates on any type of data set, but the input is required to have at least one point-centered scalar (single-component) array. The output of this filter is polygonal. This filter is available on the Toolbar.
-    </Documentation>
+
     <InputProperty
        name="Input"
        command="SetInput">
@@ -3514,13 +2980,6 @@ The Contour filter operates on any type of data set, but the input is required t
    </SourceProxy>
 
  <SourceProxy name="GenericCut" class="vtkGenericCutter">
-    <Documentation
-       long_help="This filter cuts a data set with a plane or sphere.  Cutting is similar to a contour.  It creates surfaces from volumes and lines from surfaces."
-       short_help="Cut datasets with planes or spheres.">
-The Cut filter extracts the portion of the input data set that lies along the specified plane or sphere. From the Cut Function menu, you can select whether cutting will be performed with a plane or a sphere. The appropriate 3D widget (plane widget or sphere widget) will be displayed. The parameters of the cut function can be specified interactively using the 3D widget or manually using the traditional user interface controls. Instructions for using these 3D widgets and their corresponding user interfaces are found in section 7.4.
-By default, the cut lies on the specified plane or sphere. Using the Cut Offset Values portion of the interface, it is also possible to cut the data set at some offset from the original cut function. The Cut Offset Values are in the spatial units of the data set. To add a single offset, select the value from the New Value slider in the Add value portion of the interface and click the Add button, or press Enter. To instead add several evenly spaced offsets, use the controls in the Generate range of values section. Select the number of offsets to generate using the Number of Values slider. The Range slider controls the interval in which to generate the offsets. Once the number of values and range have been selected, click the Generate button. The new offsets will be added to the Offset Values list. To delete a value from the Cut Offset Values list, select the value and click the Delete button. (If no value is selected, the last value in the list will be removed.) Clicking the Delete All button removes all the values in the list.
-The Cut filter takes any type of data set as input. Use the Input menu to choose a data set to cut. The output of this filter is polygonal data. This filter is available on the Toolbar.
-    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -3566,11 +3025,6 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
    </SourceProxy>
 
   <SourceProxy name="GenericGeometryFilter" class="vtkGenericGeometryFilter">
-     <Documentation
-         long_help="Extract geometry from a higher-order dataset"
-         short_help="Extract geometry from a higher-order dataset">
-Extract geometry from a higher-order dataset.
-     </Documentation>
      <InputProperty
          name="Input"
          command="SetInput">
@@ -3587,12 +3041,6 @@ Extract geometry from a higher-order dataset.
    </SourceProxy>
 
  <SourceProxy name="GenericOutlineFilter" class="vtkGenericOutlineFilter">
-     <Documentation
-       long_help="This filter generates a bounding box representation of the input."
-       short_help="Generates a bounding box.">
-The Outline filter generates an axis-aligned bounding box for the input data set. The Input menu specifies the data set for which to create a bounding box. This filter operates on any type of data set and produces polygonal output.
-     </Documentation>
-      
      <InputProperty
         name="Input"
         command="SetInput">
@@ -3608,18 +3056,6 @@ The Outline filter generates an axis-aligned bounding box for the input data set
    </SourceProxy>
 
  <SourceProxy name="GenericStreamTracer" class="vtkGenericStreamTracer">
-    <Documentation
-       long_help="Integrate streamlines in a vector field."
-       short_help="Integrate streamlines in a vector field.">
-The Stream Tracer filter generates streamlines in a vector field from a collection of seed points. The vector field used is selected from the Vectors menu, so the input data set is required to have point-centered vectors. The Seed portion of the interface allows you to select whether the seed points for this integration lie in a point cloud or along a line. Depending on which is selected, the appropriate 3D widget (point or line widget) is displayed along with traditional user interface controls for positioning the point cloud or line within the data set. Instructions for using the 3D widgets and the corresponding manual controls can be found in section 7.4.
-The Max. Propagation entry box allows you to specify the maximum length of the streamlines. From the Max. Propagation menu, you can select the units to be either Time (the time a particle would travel with steady flow) or Length (in the data set's spatial coordinates).
-The Init. Step Len. menu and entry specify the initial step size for integration. (For non-adaptive integrators, Runge-Kutta 2 and 4, the initial step size is used throughout the integration.) The menu allows you to specify the units. Time and Length have the same meaning as for Max. Propagation. Cell Length specifies the step length as a number of cells.
-The Integration Direction menu determines in which direction(s) the stream trace will be generated: FORWARD, BACKWARD, or BOTH.
-The Integrator Type section of the interface determines which calculation to use for integration: Runge-Kutta 2, Runge-Kutta 4, or Runge-Kutta 4-5. If Runge-Kutta 4-5 is selected, controls are displayed for specifying the minimum and maximum step length and the maximum error. The controls for specifying Min. Step Len. and Max. Step Len. are the same as those for Init. Step Len. The Runge-Kutta 4-5 integrator tries to choose the step size so that the estimated error is less than the value of the Maximum Error entry.
-If the integration takes more than Max. Steps to complete, if the speed goes below Term. Speed, if Max. Propagation is reached, or if a boundary of the input data set is crossed, integration terminates.
-This filter operates on any type of data set, provided it has point-centered vectors. The output is polygonal data containing polylines. This filter is available on the Toolbar.
-    </Documentation>
-       
     <InputProperty
        name="Input"
        command="AddInput"
@@ -3803,11 +3239,6 @@ This filter operates on any type of data set, provided it has point-centered vec
    </SourceProxy>
 
   <SourceProxy name="Tessellator" class="vtkGenericDataSetTessellator">
-     <Documentation
-         long_help="Tessellate a higher-order dataset"
-         short_help="Tessellate a higher-order dataset">
-Tessellate a higher-order dataset.
-     </Documentation>
      <InputProperty
          name="Input"
          command="SetInput">
@@ -3824,11 +3255,6 @@ Tessellate a higher-order dataset.
    </SourceProxy>
 
    <SourceProxy name="GroupDataSets" class="vtkMultiGroupDataGroupFilter">
-    <Documentation
-        long_help="Group data sets."
-        short_help="Group multiple inputs into one collection.">
-Groups multiple datasets to create a multigroup dataset
-     </Documentation>
      <InputProperty
         name="Input"
         command="AddInput"
@@ -3846,11 +3272,6 @@ Groups multiple datasets to create a multigroup dataset
    </SourceProxy>
 
    <SourceProxy name="GroupIdScalars" class="vtkMultiGroupDataGroupIdScalars">
-     <Documentation
-        long_help="This filter uses colors to show levels of a hiearchical dataset."
-        short_help="Generate point scalars from level.">
-This filter uses colors to show levels of a hiearchical dataset.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -3932,8 +3353,7 @@ This filter uses colors to show levels of a hiearchical dataset.
       </InputProperty>
       <Property
         name="ForceUpdate"
-        command="ForceUpdate"
-        is_internal="1">
+        command="ForceUpdate">
       </Property>
       <Property
         name="RemoveAllCaches"
@@ -3945,7 +3365,7 @@ This filter uses colors to show levels of a hiearchical dataset.
         command="CacheUpdate"
         number_of_elements="2"
         default_values="0 -1"
-        is_internal="1">
+        saveable="0">
         <IntRangeDomain name="range" min="0 -1" />
       </IntVectorProperty>
       <StringVectorProperty
@@ -3980,11 +3400,6 @@ This filter uses colors to show levels of a hiearchical dataset.
     </SourceProxy>
 
    <SourceProxy name="ExtractLevel" class="vtkMultiGroupDataExtractGroup">
-     <Documentation
-        long_help="This filter extracts a range of groups from a multigroup dataset."
-        short_help="Extract level.">
-This filter extracts a range of groups from a multigroup dataset    
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -4014,11 +3429,6 @@ This filter extracts a range of groups from a multigroup dataset
 
    <SourceProxy name="ExtractDataSets" 
                 class="vtkMultiGroupDataExtractDataSets">
-     <Documentation
-        long_help="This filter extracts a list of datasets from multigroup datasets."
-        short_help="Extract datasets.">
-This filter extracts a list of datasets from multigroup datasets.
-     </Documentation>
      <InputProperty
         name="Input"
         command="SetInput">
@@ -4052,13 +3462,7 @@ This filter extracts a list of datasets from multigroup datasets.
    </ShrunkContoursProxy>
 
    <SourceProxy name="AttributeEditor" class="vtkAttributeEditor">
-     <Documentation
-          long_help="Select with a point or box widget the region to edit.  This output data type of this filter is always an unstructured grid."
-          short_help="Select with a point or box widget the region to edit.">
-The Attribute Editor filter selects a portion of the input data set using a box. The menu in the Clip Function portion of the interface allows the user to select which implicit function to use or whether to clip using a scalar value. Making this selection loads the appropriate user interface. For the implicit functions, the appropriate 3D widget is also displayed. The use of these 3D widgets, including their user interface components, is discussed in section 7.4.
-If an implicit function is selected, the clip filter returns that portion of the input data set that lies inside the function.  The filter will return the portions of the data set whose value in the selected Scalars array is larger than the Clip value. Regardless of the selection from the Clip Function menu, if the Inside Out option is checked, the opposite portions of the data set will be returned.
-This filter operates on all types of data sets, and it returns unstructured grid data on output. This filter is available on the toolbar.
-     </Documentation>
+
      <InputProperty
         name="Input"
         command="AddInput"
@@ -4151,122 +3555,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
    </SourceProxy>
-
-   
-   <SourceProxy name="TemporalCache" class="vtkTemporalCacheFilter">
-     <InputProperty name="Input" command="SetInput">
-       <ProxyGroupDomain name="groups">
-         <Group name="sources"/>
-         <Group name="filters"/>
-       </ProxyGroupDomain>
-       <DataTypeDomain name="input_type">
-         <DataType value="vtkPointSet"/>
-       </DataTypeDomain>
-     </InputProperty>
-
-     <IntVectorProperty 
-        name="UseCache" 
-        command="SetUseCache" 
-        number_of_elements="1"
-        default_values="0" > 
-        <BooleanDomain name="bool" />
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="AttributeToCollect"
-        command="SetAttributeToCollect"
-        number_of_elements="1"
-        default_values="0">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="PointData" />
-          <Entry value="1" text="CellData" />
-          <Entry value="2" text="FieldData" />
-        </EnumerationDomain>
-     </IntVectorProperty>
-
-     <DoubleVectorProperty
-        name="CollectAttributeData"
-        command="CollectAttributeData"
-        number_of_elements="1"
-        default_values="0">
-     </DoubleVectorProperty>
-
-     <Property
-        name="ClearCache"
-        command="ClearCache"
-        immediate_update="1">
-     </Property>
-   <!-- End TemporalCache -->
-   </SourceProxy>
-   
-   <SourceProxy name="AreaSelect" class="vtkFrustumExtractor">
-      <Documentation
-        long_help="Draw a rectangle on the screen and obtain the section of data inside it." 
-        short_help="Rubber band selection inside a DataSet">
-Click the Start Selection button to begin. Then use the left mouse button to make a selection rectangle on the render window. The portion of the input data set that lies within the volume in space behind the selection rectangle will be returned.
-      </Documentation>
-
-     <InputProperty name="Input" command="SetInput">
-       <ProxyGroupDomain name="groups">
-         <Group name="sources"/>
-         <Group name="filters"/>
-       </ProxyGroupDomain>
-       <DataTypeDomain name="input_type">
-         <DataType value="vtkDataSet"/>
-       </DataTypeDomain>
-     </InputProperty>
-
-     <IntVectorProperty 
-        name="ExactTest" 
-        command="SetExactTest" 
-        number_of_elements="1"
-        default_values="1" >
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="Off"/>
-         <Entry value="1" text="On"/>
-       </EnumerationDomain>
-     </IntVectorProperty>
-
-     <IntVectorProperty 
-        name="PassThrough" 
-        command="SetPassThrough" 
-        number_of_elements="1"
-        default_values="0" >
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="Off"/>
-         <Entry value="1" text="On"/>
-       </EnumerationDomain>
-     </IntVectorProperty>
-
-     <DoubleVectorProperty
-        name="CreateFrustum"
-        command="CreateFrustum"
-        number_of_elements="32"
-        default_values=
-        "0.0 0.0 0.0 0.0
-         0.0 0.0 0.0 0.0
-         0.0 0.0 0.0 0.0
-         0.0 0.0 0.0 0.0
-         0.0 0.0 0.0 0.0
-         0.0 0.0 0.0 0.0
-         0.0 0.0 0.0 0.0
-         0.0 0.0 0.0 0.0">
-     </DoubleVectorProperty>
-
-     <IntVectorProperty 
-        name="ShowBounds" 
-        command="SetShowBounds" 
-        number_of_elements="1"
-        default_values="1" >
-       <EnumerationDomain name="enum">
-         <Entry value="0" text="Off"/>
-         <Entry value="1" text="On"/>
-       </EnumerationDomain>
-     </IntVectorProperty>
-     
-   <!-- End AreaSelect -->
-   </SourceProxy>
-
-   </ProxyGroup>
+    
+  </ProxyGroup>
 </ServerManagerConfiguration>
 
