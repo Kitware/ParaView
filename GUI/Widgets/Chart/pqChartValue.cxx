@@ -44,7 +44,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartValue.h"
 #include <vtkstd/vector>
 #include <float.h>
-
+#include <math.h>
+#include <iostream>
+using namespace std;
 
 /// \class pqChartValueIteratorData
 /// \brief
@@ -190,6 +192,7 @@ double pqChartValue::getDoubleValue() const
 QString pqChartValue::getString(int precision) const
 {
   QString result;
+  int exponent = 0;
   if(this->Type == IntValue)
     result.setNum(this->Value.Int);
   else
@@ -199,14 +202,16 @@ QString pqChartValue::getString(int precision) const
       {
       result.setNum(this->Value.Float, 'f', precision);
       result2.setNum(this->Value.Float, 'e', precision);
+      exponent = result2.mid(result2.lastIndexOf("e")+1,result2.length()-1).toInt();
       }
     else
       {
       result.setNum(this->Value.Double, 'f', precision);
       result2.setNum(this->Value.Double, 'e', precision);
+      exponent = result2.mid(result2.lastIndexOf("e")+1,result2.length()-1).toInt();
       }
-
-    if(result2.length() < result.length())
+    // FIX: always use scientific notation for negative exponents less than a certain threshold (for now 3)
+    if(exponent<-3 || result2.length() < result.length())
       result = result2;
     }
 
