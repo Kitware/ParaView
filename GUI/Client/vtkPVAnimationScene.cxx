@@ -73,7 +73,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.66");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.67");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 #define VTK_PV_TOOLBARS_ANIMATION_LABEL "Animation"
@@ -1058,6 +1058,7 @@ void vtkPVAnimationScene::SetAnimationTime(double time)
     time = (int)(time + 0.5);
     }
   DoubleVectPropertySetElement(this->AnimationSceneProxy, "CurrentTime", time);
+  this->AnimationSceneProxy->GetProperty("CurrentTime")->Modified();
   this->AnimationSceneProxy->UpdateVTKObjects();
   this->TimeScale->SetValue(time);
   if (this->Window && this->Window->GetCurrentPVSource())
