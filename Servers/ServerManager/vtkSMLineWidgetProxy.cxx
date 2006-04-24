@@ -24,7 +24,7 @@
 
 
 vtkStandardNewMacro(vtkSMLineWidgetProxy);
-vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.13");
 //----------------------------------------------------------------------------
 vtkSMLineWidgetProxy::vtkSMLineWidgetProxy()
 {
@@ -109,7 +109,19 @@ void vtkSMLineWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long event,void
   if (event != vtkCommand::PlaceWidgetEvent || !this->IgnorePlaceWidgetChanges)
     {
     this->SetPoint1(point1);
+    vtkSMDoubleVectorProperty* pt1 = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->GetProperty("Point1"));
+    if (pt1)
+      {
+      pt1->SetElements(point1);
+      }
     this->SetPoint2(point2);
+    vtkSMDoubleVectorProperty* pt2 = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->GetProperty("Point2"));
+    if (pt2)
+      {
+      pt2->SetElements(point2);
+      }
     }
   this->Superclass::ExecuteEvent(wdg, event, p);
 }

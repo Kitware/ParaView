@@ -22,7 +22,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPointWidgetProxy);
-vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.12");
 
 //----------------------------------------------------------------------------
 vtkSMPointWidgetProxy::vtkSMPointWidgetProxy()
@@ -97,6 +97,12 @@ void vtkSMPointWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long event,voi
     {
     //Update ivars to reflect the VTK object values
     this->SetPosition(val);
+    vtkSMDoubleVectorProperty* pos = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->GetProperty("Position"));
+    if (pos)
+      {
+      pos->SetElements(val);
+      }
     }
   this->Superclass::ExecuteEvent(wdg,event,p);
 }
