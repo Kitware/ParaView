@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAreaSelect);
-vtkCxxRevisionMacro(vtkPVAreaSelect, "1.4");
+vtkCxxRevisionMacro(vtkPVAreaSelect, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVAreaSelect::vtkPVAreaSelect()
@@ -58,6 +58,8 @@ vtkPVAreaSelect::vtkPVAreaSelect()
     this->Verts[i*4+2] = 0.0;
     this->Verts[i*4+3] = 0.0;
     }
+  memcpy((void*)this->SavedVerts, (void*)this->Verts, 32*sizeof(double));  
+
 }
 
 //----------------------------------------------------------------------------
@@ -247,11 +249,21 @@ void vtkPVAreaSelect::DoSelect()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVAreaSelect::Reset()
+{
+  this->Superclass::Reset();
+  if (this->SelectReady)
+    {
+    //restore last saved frustum
+    memcpy((void*)this->Verts, (void*)this->SavedVerts, 32*sizeof(double));  
+    this->SetVerts(0);
+    this->GetPVInput(0)->SetVisibility(0);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVAreaSelect::AcceptCallbackInternal()
 {
-
-  this->InvalidateDataInformation(); //still doesn't make info page update
-
   if (this->SelectReady)
     {
     this->DoSelect();
@@ -259,19 +271,12 @@ void vtkPVAreaSelect::AcceptCallbackInternal()
     this->GetPVInput(0)->SetVisibility(0);
     this->AdditionalTraceSave();
     }
+  
+  //save this frustum for next reset
+  memcpy((void*)this->SavedVerts, (void*)this->Verts, 32*sizeof(double));
 
   this->SelectButton->EnabledOn();
   this->Superclass::AcceptCallbackInternal();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVAreaSelect::CreateVert(int i,
-                                 double v0 , double v1 , double v2 , double v3)
-{
-  this->Verts[i*4+0] = v0;
-  this->Verts[i*4+1] = v1;
-  this->Verts[i*4+2] = v2;
-  this->Verts[i*4+3] = v3;
 }
 
 //----------------------------------------------------------------------------
@@ -285,7 +290,7 @@ void vtkPVAreaSelect::SetVerts(int wireframe)
     }
 
   vtkSMDoubleVectorProperty* cf = vtkSMDoubleVectorProperty::SafeDownCast(
-    sp->GetProperty("CreateFrustum"));
+  sp->GetProperty("CreateFrustum"));
   vtkSMIntVectorProperty* sb = vtkSMIntVectorProperty::SafeDownCast(
     sp->GetProperty("ShowBounds"));
   if (!cf || !sb)
@@ -311,57 +316,29 @@ void vtkPVAreaSelect::AdditionalTraceSave()
 //----------------------------------------------------------------------------
 void vtkPVAreaSelect::AdditionalStateSave(ofstream *file)
 {
-  *file << "$kw(" << this->GetTclName() << ")" << " CreateVert 0 " 
-        << this->Verts[0] << " " 
-        << this->Verts[1] << " " 
-        << this->Verts[2] << " " 
-        << this->Verts[3] << endl;
 
-  *file << "$kw(" << this->GetTclName() << ")" << " CreateVert 1 " 
-        << this->Verts[4] << " " 
-        << this->Verts[5] << " " 
-        << this->Verts[6] << " " 
-        << this->Verts[7] << endl;
-                                     
-  *file << "$kw(" << this->GetTclName() << ")" << " CreateVert 2 " 
-        << this->Verts[8] << " " 
-        << this->Verts[9] << " " 
-        << this->Verts[10] << " "
-        << this->Verts[11] << endl;
-                                     
-  *file << "$kw(" << this->GetTclName() << ")" << " CreateVert 3 " 
-        << this->Verts[12] << " " 
-        << this->Verts[13] << " " 
-        << this->Verts[14] << " " 
-        << this->Verts[15] << endl;
-                                     
-  *file << "$kw(" << this->GetTclName() << ")" << " CreateVert 4 " 
-        << this->Verts[16] << " " 
-        << this->Verts[17] << " " 
-        << this->Verts[18] << " " 
-        << this->Verts[19] << endl;
-                                     
-  *file << "$kw(" << this->GetTclName() << ")" << " CreateVert 5 " 
-        << this->Verts[20] << " " 
-        << this->Verts[21] << " " 
-        << this->Verts[22] << " " 
-        << this->Verts[23] << endl;
-                                     
-  *file << "$kw(" << this->GetTclName() << ")" << " CreateVert 6 " 
-        << this->Verts[24] << " " 
-        << this->Verts[25] << " " 
-        << this->Verts[26] << " " 
-        << this->Verts[27] << endl;
-                                     
-  *file << "$kw(" << this->GetTclName() << ")" << " CreateVert 7 " 
-        << this->Verts[28] << " " 
-        << this->Verts[29] << " " 
-        << this->Verts[30] << " " 
-        << this->Verts[31] << endl;
+  for (int i = 0; i < 8; i++)
+    {
+    *file << "$kw(" << this->GetTclName() << ")" << " CreateVert " << i << " " 
+          << this->Verts[i*4+0] << " " 
+          << this->Verts[i*4+1] << " " 
+          << this->Verts[i*4+2] << " " 
+          << this->Verts[i*4+3] << endl;
+    }
                                        
   *file << "$kw(" << this->GetTclName() << ")" << " SetVerts 0" << endl;
 
   *file << endl;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAreaSelect::CreateVert(int i,
+                                 double v0 , double v1 , double v2 , double v3)
+{
+  this->Verts[i*4+0] = v0;
+  this->Verts[i*4+1] = v1;
+  this->Verts[i*4+2] = v2;
+  this->Verts[i*4+3] = v3;
 }
 
 //----------------------------------------------------------------------------

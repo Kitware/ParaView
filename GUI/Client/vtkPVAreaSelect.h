@@ -70,10 +70,11 @@ protected:
   
   //have to help out trace, state and batch saving because UI is 
   //for this source is not completely XML controlled, in particular
-  //frustum vertices are not shown on the UI but rather drawn with the mouse
+  //frustum vertices are not shown on the UI and set by a widget
   void AdditionalTraceSave();
   virtual void AdditionalStateSave(ofstream *file);
   virtual void AdditionalBatchSave(ofstream *file);
+
 
   //to use while picking
   vtkInteractorStyleRubberBandPick *RubberBand;
@@ -94,6 +95,10 @@ protected:
   int Xe;
   int Ye;
   double Verts[32];
+
+  //needed because frustum params not shown in the UI and set by a widget
+  virtual void Reset();
+  double SavedVerts[32];
 
 private:
   vtkPVAreaSelect(const vtkPVAreaSelect&); // Not implemented
