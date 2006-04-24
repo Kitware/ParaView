@@ -45,6 +45,7 @@ void vtkKWRangeItem::Create(vtkKWWidget *parent, vtkKWWindow *)
   range2->SetParent(parent);
   range2->Create();
   range2->SetLabelText("Another range:");
+  range2->SymmetricalInteractionOn();
   range2->SetWholeRange(range1->GetWholeRange());
   range2->SetRange(range1->GetRange());
   range2->SetLabelPositionToLeft();
@@ -57,8 +58,9 @@ void vtkKWRangeItem::Create(vtkKWWidget *parent, vtkKWWindow *)
   range2->SetBalloonHelpString(
     "Another range widget, the label and entries are in different positions, "
     "the slider and the thickness of the widget has changed, and we set a "
-    "longer minimum length. Also note that changing this range "
-    "sets the value of the first range");
+    "longer minimum length. The range is set to symmetrical mode, where both "
+    "sliders at each end are modified symmetrically. Also note that changing "
+    "this range sets the value of the first range above.");
 
   app->Script(
     "pack %s -side top -anchor nw -expand n -padx 2 -pady 6", 

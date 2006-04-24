@@ -24,7 +24,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.67");
+vtkCxxRevisionMacro(vtkKWRange, "1.68");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -66,13 +66,14 @@ vtkKWRange::vtkKWRange()
   this->RangeAdjusted[1]      = this->Range[1];
   this->Resolution            = (this->WholeRange[1]-this->WholeRange[0])*0.01;
   this->AdjustResolution      = 0;
+  this->SymmetricalInteraction = 0;
   this->Thickness             = 19;
   this->InternalThickness     = 0.5;
   this->RequestedLength       = 0;
   this->Orientation           = vtkKWRange::OrientationHorizontal;
   this->Inverted              = 0;
   this->SliderSize            = 3;
-  this->EntriesVisibility           = 1;
+  this->EntriesVisibility     = 1;
   this->Entry1Position        = vtkKWRange::EntryPositionDefault;
   this->Entry2Position        = vtkKWRange::EntryPositionDefault;
   this->EntriesWidth          = 10;
@@ -1610,7 +1611,7 @@ void vtkKWRange::GetSlidersPositions(int pos[2])
     }
 
   pos[0] = (int)((double)pos_range * r0);
-  pos[1] = (int)((double)pos_range * r1);
+  pos[1] = (int)(((double)pos_range * r1));
 
   if (this->Inverted)
     {
@@ -2199,12 +2200,21 @@ void vtkKWRange::SliderMotionCallback(int slider_idx, int x, int y)
     min = 0;
     max = this->Canvas->GetHeight() - 1;
     }
-
-  // Prevent the sliders to go on top of each other
-
-  if (!this->SliderCanPush)
+  if (pos > max)
     {
-    int delta = (this->SliderSize * 2) + 1;
+    pos = max;
+    }
+  else if (pos < min)
+    {
+    pos = min;
+    }
+
+  // Prevent the moving slider to pass the other non-moving slider
+
+  int delta = (this->SliderSize * 2) + 1;
+
+  if (!this->SliderCanPush && !this->SymmetricalInteraction)
+    {
     if (this->Inverted)
       {
       if (slider_idx == vtkKWRange::SliderIndex0)
@@ -2241,7 +2251,7 @@ void vtkKWRange::SliderMotionCallback(int slider_idx, int x, int y)
       }
     }
 
-  // Are we inverted ?
+  // Are we inverted ? Fix the position
 
   if (this->Inverted)
     {
@@ -2254,21 +2264,52 @@ void vtkKWRange::SliderMotionCallback(int slider_idx, int x, int y)
 
   // New value
 
-  double new_value = (double)
-    ((double)this->WholeRangeAdjusted[0] + 
-     ((double)pos / (double)(max - min)) * whole_range);
+  double new_value = this->WholeRangeAdjusted[0] + 
+    whole_range * ((double)pos / (double)(max - min));
+
+  double middle = 
+    0.5 * (this->StartInteractionRange[0] + this->StartInteractionRange[1]);
 
   double new_range[2];
+
+  // Get the new range. If in symmetrical mode, modify the other
+  // non-moving end too
 
   if (slider_idx == vtkKWRange::SliderIndex0)
     {
     new_range[0] = new_value;
-    new_range[1] = this->RangeAdjusted[1];
+    if (this->SymmetricalInteraction)
+      {
+      new_range[1] = middle + (middle - new_value);
+      }
+    else
+      {
+      new_range[1] = this->RangeAdjusted[1];
+      }
     }
   else
     {
-    new_range[0] = this->RangeAdjusted[0];
+    if (this->SymmetricalInteraction)
+      {
+      new_range[0] = middle - (new_value - middle);
+      }
+    else
+      {
+      new_range[0] = this->RangeAdjusted[0];
+      }
     new_range[1] = new_value;
+    }
+
+  // Check if we are OK in symmetrical mode
+
+  if (this->SymmetricalInteraction)
+    {
+    double delta_range = whole_range * ((double)delta / (double)(max - min));
+    if ((new_range[1] - new_range[0]) < delta_range)
+      {
+      new_range[0] = middle - delta_range * 0.5;
+      new_range[1] = middle + delta_range * 0.5;
+      }
     }
 
   this->ConstrainRangeToWholeRange(
@@ -2382,6 +2423,8 @@ void vtkKWRange::PrintSelf(ostream& os, vtkIndent indent)
      << (this->SliderCanPush ? "On" : "Off") << endl;
   os << indent << "AdjustResolution: "
      << (this->AdjustResolution ? "On" : "Off") << endl;
+  os << indent << "SymmetricalInteraction: "
+     << (this->SymmetricalInteraction ? "On" : "Off") << endl;
 
   os << indent << "Canvas: ";
   if (this->Canvas)

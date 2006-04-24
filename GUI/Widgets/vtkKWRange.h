@@ -291,6 +291,13 @@ public:
   //ETX
 
   // Description:
+  // If set to on, set the interaction to a symmetrical mode, where
+  // adjusting one slider adjust the other one symmetrically.
+  vtkBooleanMacro(SymmetricalInteraction, int);
+  vtkGetMacro(SymmetricalInteraction, int);
+  vtkSetMacro(SymmetricalInteraction, int);
+  
+  // Description:
   // Set the string that enables balloon help for this widget.
   // Override to pass down to children.
   virtual void SetBalloonHelpString(const char *str);
@@ -344,6 +351,7 @@ protected:
   double RangeAdjusted[2];
   double Resolution;
   int   AdjustResolution;
+  int   SymmetricalInteraction;
   int   Inverted;
   int   Thickness;
   double InternalThickness;
@@ -358,10 +366,6 @@ protected:
   int   Entry2Position;
   int   EntriesWidth;
   int   SliderCanPush;
-
-  int   InInteraction;
-  int   StartInteractionPos;
-  double StartInteractionRange[2];
 
   int ClampRange;
 
@@ -436,6 +440,11 @@ protected:
   virtual void GetSlidersPositions(int pos[2]);
 
 private:
+
+  int   InInteraction;
+  int   StartInteractionPos;
+  double StartInteractionRange[2];
+
   vtkKWRange(const vtkKWRange&); // Not implemented
   void operator=(const vtkKWRange&); // Not implemented
 };
