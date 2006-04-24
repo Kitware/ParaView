@@ -724,8 +724,6 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
       QString file = Files[i];
       
       source = this->Implementation->Pipeline->createSource("ExodusReader", win);
-      vtkSMObject::GetProxyManager()->RegisterProxy("paraq", "source1", source);
-      source->Delete();
       pqSMAdaptor::setElementProperty(source, source->GetProperty("FileName"), file);
       pqSMAdaptor::setElementProperty(source, source->GetProperty("FilePrefix"), file);
       pqSMAdaptor::setElementProperty(source, source->GetProperty("FilePattern"), "%s");
