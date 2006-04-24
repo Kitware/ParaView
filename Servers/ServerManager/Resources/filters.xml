@@ -4243,6 +4243,7 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
         name="CreateFrustum"
         command="CreateFrustum"
         number_of_elements="32"
+        argument_is_array="1"
         default_values=
         "0.0 0.0 0.0 0.0
          0.0 0.0 0.0 0.0
