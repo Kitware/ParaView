@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.100");
+vtkCxxRevisionMacro(vtkKWMenu, "1.101");
 
 #define VTK_KW_MENU_CB_VARNAME_PATTERN "CB_group%d"
 #define VTK_KW_MENU_RB_DEFAULT_GROUP "RB_group"
@@ -123,7 +123,7 @@ int vtkKWMenu::AddGeneric(const char* type,
   str << this->GetWidgetName() << " add " << type;
 
   char *clean_label = NULL;
-  int underline_index, cleaned;
+  int underline_index, cleaned = 0;
   if (label)
     {
     cleaned = 
@@ -196,7 +196,7 @@ int vtkKWMenu::InsertGeneric(int index,
   str << this->GetWidgetName() << " insert " << index << " " << type;
 
   char *clean_label = NULL;
-  int underline_index, cleaned;
+  int underline_index, cleaned = 0;
   if (label)
     {
     cleaned = 

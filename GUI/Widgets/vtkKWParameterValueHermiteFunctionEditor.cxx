@@ -22,7 +22,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.19");
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.20");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";
@@ -919,7 +919,7 @@ void vtkKWParameterValueHermiteFunctionEditor::RedrawLine(
   // Is visible ? Is valid (not that there is no midpoint for the last point)
 
   double p, displayed_p;
-  int x, y, r;
+  int x, y, r = 0;
   int is_not_visible = 0, is_not_visible_h = 0;
   int is_not_valid = (id1 < 0 || id1 >= (this->GetFunctionSize() - 1));
 

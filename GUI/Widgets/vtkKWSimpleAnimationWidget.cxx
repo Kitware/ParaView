@@ -72,7 +72,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.27");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.28");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -648,7 +648,7 @@ void vtkKWSimpleAnimationWidget::CreateAnimationCallback()
   frame->Create();
 
   char buffer[1024];
-  int nb_scanned, key_w, key_h;
+  int nb_scanned = 0, key_w, key_h;
 
   vtkKWApplication *app = this->GetApplication();
 

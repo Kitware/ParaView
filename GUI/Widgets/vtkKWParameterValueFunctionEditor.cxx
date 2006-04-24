@@ -38,7 +38,7 @@
 #include <vtksys/stl/algorithm>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.87");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.88");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -4998,7 +4998,7 @@ void vtkKWParameterValueFunctionEditor::RedrawPoint(int id,
 
   const char *canv = this->Canvas->GetWidgetName();
 
-  int x, y, r;
+  int x, y, r = 0;
   int is_not_visible = 0, is_not_visible_h = 0;
   int is_not_valid = (id < 0 || id >= this->GetFunctionSize());
 
