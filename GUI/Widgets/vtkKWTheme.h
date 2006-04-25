@@ -27,6 +27,8 @@
 
 #include "vtkKWObject.h"
 
+class vtkKWOptionDataBase;
+
 class KWWidgets_EXPORT vtkKWTheme : public vtkKWObject
 {
 public:
@@ -35,13 +37,30 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Ask the theme to install/uninstall itself
+  // Ask the theme to install/uninstall itself.
+  // Subclasses should make sure to call the same superclass methods before
+  // setting up their own options so that the application's option
+  // database is backup'ed/restored correctly.
   virtual void Install();
   virtual void Uninstall();
 
+  // Description:
+  // Convenience method to set all the background color options to a 
+  // specific color.
+  virtual void SetBackgroundColorOptions(double r, double g, double b);
+  virtual void SetBackgroundColorOptions(double rgb[3])
+    { this->SetBackgroundColorOptions(rgb[0], rgb[1], rgb[2]); };
+
 protected:
-  vtkKWTheme() {};
-  ~vtkKWTheme() {};
+  vtkKWTheme();
+  ~vtkKWTheme();
+
+  // Description:
+  // Backup the current option-database, and restore it
+  virtual void BackupCurrentOptionDataBase();
+  virtual void RestorePreviousOptionDataBase();
+
+  vtkKWOptionDataBase *BackupOptionDataBase;
 
 private:
 

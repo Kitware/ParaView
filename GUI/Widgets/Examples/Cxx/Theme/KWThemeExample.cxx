@@ -5,7 +5,6 @@
 #include "vtkKWMessageDialog.h"
 #include "vtkKWMyBlueTheme.h"
 #include "vtkKWMyGreenTheme.h"
-#include "vtkKWOptionDataBase.h"
 #include "vtkKWRadioButton.h"
 #include "vtkKWRadioButtonSet.h"
 #include "vtkKWText.h"
@@ -66,7 +65,6 @@ int my_main(int argc, char *argv[])
     if (theme == 0)
       {
       app->SetTheme(NULL);
-      app->GetOptionDataBase()->RemoveAllEntries();
       }
     else if (theme == 1)
       {

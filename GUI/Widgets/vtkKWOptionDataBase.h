@@ -36,6 +36,7 @@ public:
   static vtkKWOptionDataBase* New();
   vtkTypeRevisionMacro(vtkKWOptionDataBase, vtkKWObject);
   void PrintSelf(ostream& os, vtkIndent indent);
+  void DeepCopy(vtkKWOptionDataBase *p);
 
   // Description:
   // Add a new entry in the database.
@@ -58,6 +59,10 @@ public:
   // Description:
   // Remove all entries.
   virtual void RemoveAllEntries();
+
+  // Description:
+  // Get number of entries.
+  virtual int GetNumberOfEntries();
 
   // Description:
   // Configure an object according to the options in the database.

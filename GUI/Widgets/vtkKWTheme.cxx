@@ -22,7 +22,23 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTheme);
-vtkCxxRevisionMacro(vtkKWTheme, "1.3");
+vtkCxxRevisionMacro(vtkKWTheme, "1.4");
+
+//----------------------------------------------------------------------------
+vtkKWTheme::vtkKWTheme()
+{
+  this->BackupOptionDataBase = NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkKWTheme::~vtkKWTheme()
+{
+  if (this->BackupOptionDataBase)
+    {
+    this->BackupOptionDataBase->Delete();
+    this->BackupOptionDataBase = NULL;
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkKWTheme::Install()
@@ -32,25 +48,95 @@ void vtkKWTheme::Install()
     return;
     }
 
-  /* Here is the kind of thing you would probably do here */
-  
-  // we should save the options we are about to replace here and
-  // restore them in Uninstall
+  this->BackupCurrentOptionDataBase();
 
+  /* Here is the kind of thing you could probably do here.
+     Check the Themes example in the Examples/Cxx subdirectory.
+   */
+  
 #if 0
   vtkKWOptionDataBase *odb = this->GetApplication()->GetOptionDataBase();
 
-  odb->AddEntryAsInt("vtkKWLabel", "Relief", vtkKWOptions::ReliefRidge);
-  odb->AddEntryAsInt("vtkKWLabel", "BorderWidth", 2);
-  odb->AddEntryAsDouble3("vtkKWLabel", "BackgroundColor", 0.2, 0.3, 0.6);
-  odb->AddEntryAsDouble3("vtkKWFrame", "BackgroundColor", 0.2, 0.3, 0.6);
+  odb->AddEntryAsInt("vtkKWLabel", "SetReliefToGroove");
+  odb->AddEntryAsInt("vtkKWLabel", "SetBorderWidth", 2);
+  odb->AddEntryAsDouble3("vtkKWLabel", "SetBackgroundColor", 0.2, 0.3, 0.6);
+  odb->AddEntryAsDouble3("vtkKWFrame", "SetBackgroundColor", 0.2, 0.3, 0.6);
 #endif
 }
 
 //----------------------------------------------------------------------------
 void vtkKWTheme::Uninstall()
 {
-  // previous options should be restored
+  this->RestorePreviousOptionDataBase();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTheme::SetBackgroundColorOptions(double r, double g, double b)
+{
+  if (!this->GetApplication())
+    {
+    return;
+    }
+
+  vtkKWOptionDataBase *odb = this->GetApplication()->GetOptionDataBase();
+
+  double bgcolor[3];
+  bgcolor[0] = r;
+  bgcolor[1] = g;
+  bgcolor[2] = b;
+
+  odb->AddEntryAsDouble3("*", "SetBackgroundColor", bgcolor);
+  odb->AddEntryAsDouble3("*", "SetActiveBackgroundColor", bgcolor);
+
+  odb->AddEntryAsDouble3(
+    "vtkKWEntry", "SetDisabledBackgroundColor", bgcolor);
+  odb->AddEntryAsDouble3(
+    "vtkKWEntry", "SetReadOnlyBackgroundColor", bgcolor);
+  odb->AddEntryAsDouble3(
+    "vtkKWSpinBox", "SetDisabledBackgroundColor", bgcolor);
+  odb->AddEntryAsDouble3(
+    "vtkKWSpinBox", "SetReadOnlyBackgroundColor", bgcolor);
+  odb->AddEntryAsDouble3(
+    "vtkKWSpinBox", "SetButtonBackgroundColor", bgcolor);
+  odb->AddEntryAsDouble3(
+    "vtkKWScale", "SetTroughColor", bgcolor);
+  odb->AddEntryAsDouble3(
+    "vtkKWScrollbar", "SetTroughColor", bgcolor);
+  odb->AddEntryAsDouble3(
+    "vtkKWMultiColumnList", "SetColumnLabelBackgroundColor", bgcolor);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTheme::BackupCurrentOptionDataBase()
+{
+  if (!this->GetApplication())
+    {
+    return;
+    }
+
+  if (!this->BackupOptionDataBase)
+    {
+    this->BackupOptionDataBase = vtkKWOptionDataBase::New();
+    }
+  else if (this->BackupOptionDataBase->GetNumberOfEntries())
+    {
+    return;
+    }
+
+  this->BackupOptionDataBase->DeepCopy(
+    this->GetApplication()->GetOptionDataBase());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTheme::RestorePreviousOptionDataBase()
+{
+  if (!this->GetApplication() || !this->BackupOptionDataBase)
+    {
+    return;
+    }
+
+  this->GetApplication()->GetOptionDataBase()->DeepCopy(
+    this->BackupOptionDataBase);
 }
 
 //----------------------------------------------------------------------------

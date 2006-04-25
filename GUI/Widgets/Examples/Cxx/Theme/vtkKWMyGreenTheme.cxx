@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMyGreenTheme);
-vtkCxxRevisionMacro(vtkKWMyGreenTheme, "1.2");
+vtkCxxRevisionMacro(vtkKWMyGreenTheme, "1.3");
 
 //----------------------------------------------------------------------------
 void vtkKWMyGreenTheme::Install()
@@ -30,22 +30,28 @@ void vtkKWMyGreenTheme::Install()
     return;
     }
 
-  vtkKWOptionDataBase *odb = this->GetApplication()->GetOptionDataBase();
+  this->Superclass::Install();
 
-  double bgcolor[3] = {0.2, 0.8, 0.3};
+  // Use the superclass convenience method to set all background color
+  // options to a specific color
 
-  odb->AddEntryAsDouble3("*", "BackgroundColor", bgcolor);
-  odb->AddEntryAsDouble3("*", "ActiveBackgroundColor", bgcolor);
-  odb->AddEntryAsDouble3("vtkKWMultiColumnList", "ColumnLabelBackgroundColor", bgcolor);
+  this->SetBackgroundColorOptions(0.2, 0.8, 0.3);
 
-  odb->AddEntryAsDouble3("vtkKWScale", "TroughColor", bgcolor);
-  odb->AddEntryAsDouble3("vtkKWScrollbar", "TroughColor", bgcolor);
+  // Customize a few more colors
 
   double ltbgcolor[3] = {0.8, 0.1, 0.8};
 
-  odb->AddEntryAsDouble3("*", "ActiveForegroundColor", ltbgcolor);
+  vtkKWOptionDataBase *odb = this->GetApplication()->GetOptionDataBase();
 
-  odb->AddEntryAsDouble3("vtkKWCheckButton", "SelectColor", ltbgcolor);
+  odb->AddEntryAsDouble3("*", "SetActiveForegroundColor", ltbgcolor);
+  odb->AddEntryAsDouble3("*", "SetDisabledForegroundColor", ltbgcolor);
+
+  odb->AddEntryAsDouble3("vtkKWCheckButton", "SetSelectColor", ltbgcolor);
+  odb->AddEntryAsDouble3("vtkKWMenu", "SetSelectColor", ltbgcolor);
+
+  odb->AddEntry("vtkKWPushButton", "SetReliefToSolid", NULL);
+
+  odb->AddEntry("*", "SetFont", "{Times 12}");
 }
 
 //----------------------------------------------------------------------------

@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWOptionDataBase);
-vtkCxxRevisionMacro(vtkKWOptionDataBase, "1.2");
+vtkCxxRevisionMacro(vtkKWOptionDataBase, "1.3");
 
 //----------------------------------------------------------------------------
 class vtkKWOptionDataBaseInternals
@@ -88,8 +88,7 @@ int vtkKWOptionDataBase::AddEntry(const char *pattern,
 {
   if (!this->Internals || 
       !pattern || !*pattern || 
-      !option || !*option || 
-      !value)
+      !option || !*option)
     {
     return -1;
     }
@@ -101,7 +100,10 @@ int vtkKWOptionDataBase::AddEntry(const char *pattern,
   node.Id = id;
   node.Pattern = pattern;
   node.Option = option;
-  node.Value = value;
+  if (value)
+    {
+    node.Value = value;
+    }
 
   this->Internals->EntryPool[node.Pattern].push_back(node);
 
@@ -167,9 +169,54 @@ int vtkKWOptionDataBase::AddEntryAsDouble3(const char *pattern,
 }
 
 //----------------------------------------------------------------------------
+void vtkKWOptionDataBase::DeepCopy(vtkKWOptionDataBase *p)
+{
+  if (!p)
+    {
+    return;
+    }
+
+  this->RemoveAllEntries();
+
+  vtkKWOptionDataBaseInternals::EntryPoolIterator p_it = 
+    p->Internals->EntryPool.begin();
+  vtkKWOptionDataBaseInternals::EntryPoolIterator p_end = 
+    p->Internals->EntryPool.end();
+  for (; p_it != p_end; ++p_it)
+    {
+    vtkKWOptionDataBaseInternals::EntryListIterator l_it = 
+      p_it->second.begin();
+    vtkKWOptionDataBaseInternals::EntryListIterator l_end = 
+      p_it->second.end();
+    for (; l_it != l_end; ++l_it)
+      {
+      this->AddEntry(
+        l_it->Pattern.c_str(), l_it->Option.c_str(), l_it->Value.c_str());
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWOptionDataBase::RemoveAllEntries()
 {
   this->Internals->EntryPool.clear();
+}
+
+//----------------------------------------------------------------------------
+int vtkKWOptionDataBase::GetNumberOfEntries()
+{
+  int total = 0;
+
+  vtkKWOptionDataBaseInternals::EntryPoolIterator p_it = 
+    this->Internals->EntryPool.begin();
+  vtkKWOptionDataBaseInternals::EntryPoolIterator p_end = 
+    this->Internals->EntryPool.end();
+  for (; p_it != p_end; ++p_it)
+    {
+    total += p_it->second.size();
+    }
+
+  return total;
 }
 
 //----------------------------------------------------------------------------
@@ -230,7 +277,7 @@ void vtkKWOptionDataBase::ConfigureObject(vtkKWObject *obj,
     p_it->second.end();
   for (; l_it != l_end; ++l_it)
     {
-    obj->Script("catch {%s Set%s %s}", 
+    obj->Script("catch {%s %s %s}",
                 obj->GetTclName(), l_it->Option.c_str(), l_it->Value.c_str());
     }
 }
