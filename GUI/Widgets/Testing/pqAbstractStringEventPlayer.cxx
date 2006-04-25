@@ -49,7 +49,7 @@ bool pqAbstractStringEventPlayer::playEvent(QObject* Object, const QString& Comm
     
   if(QComboBox* const object = qobject_cast<QComboBox*>(Object))
     {
-    object->setEditText(value);
+    object->setCurrentIndex(object->findText(value));
     return true;
     }
 
