@@ -125,7 +125,7 @@ void pqFileDialog::onActivated(const QModelIndex& Index)
     this->hide();
   
     emit filesSelected(this->Model->getFilePaths(Index));
-    base::accept();
+    this->done(QDialog::Accepted);
     }
 }
 
