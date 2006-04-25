@@ -574,22 +574,19 @@ QVariant pqSMAdaptor::getEnumerationProperty(vtkSMProxy* Proxy, vtkSMProperty* P
 
   vtkSMPropertyAdaptor* adaptor = vtkSMPropertyAdaptor::New();
   adaptor->SetProperty(Property);
+  if(adaptor->GetNumberOfEnumerationElements())
+    {
+    if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::ENUMERATION)
+      {
+      var = adaptor->GetEnumerationValue();
+      var = adaptor->GetEnumerationName(var.toInt());
+      }
 
-  if(!adaptor->GetNumberOfEnumerationElements())
-    {
-    return var;
-    }
-  
-  if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::ENUMERATION)
-    {
-    var = adaptor->GetEnumerationValue();
-    var = adaptor->GetEnumerationName(var.toInt());
-    }
-
-  if(adaptor->GetElementType() == vtkSMPropertyAdaptor::BOOLEAN)
-    {
-    var.convert(QVariant::Int);
-    var.convert(QVariant::Bool);
+    if(adaptor->GetElementType() == vtkSMPropertyAdaptor::BOOLEAN)
+      {
+      var.convert(QVariant::Int);
+      var.convert(QVariant::Bool);
+      }
     }
   
   adaptor->Delete();
@@ -996,7 +993,9 @@ QVariant pqSMAdaptor::getProperty(vtkSMProxy* Proxy, vtkSMProperty* Property)
     numElems = VectorProperty->GetNumberOfElements();
     if(numElems == 1)
       {
-      return this->getProperty(Proxy, Property, 0);
+      QVariant var = this->getProperty(Proxy, Property, 0);
+      adaptor->Delete();
+      return var;
       }
     }
 
