@@ -919,8 +919,63 @@
         <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
     </Proxy>
-  </ProxyGroup>
   
+    <Proxy name="ImplicePlaneRepresentation" 
+           class="vtkImplicitPlaneRepresentation">
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        animateable="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
+     <DoubleVectorProperty 
+        name="Origin"
+        command="SetOrigin"
+        number_of_elements="3"
+        information_property="OriginInfo"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="OriginInfo"
+        command="GetOrigin"
+        information_only="1">
+        <SimpleDoubleInformationHelper/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="Normal"
+        command="SetNormal"
+        number_of_elements="3"
+        information_property="NormalInfo"
+        default_values="1 0 0">
+        <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="NormalInfo"
+        command="GetNormal"
+        information_only="1">
+        <SimpleDoubleInformationHelper/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="PlaceWidget"
+        is_internal="1"
+        command="PlaceWidget"
+        number_of_elements="6"
+        argument_is_array="1"
+        default_values="0 1 0 1 0 1">
+        <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+    </Proxy>
+  </ProxyGroup>
+
   <ProxyGroup name="properties">
     <Proxy name="TextProperty" class="vtkTextProperty">
       <DoubleVectorProperty
@@ -2692,7 +2747,32 @@
       </SubProxy>
     </DisplayProxy>
 
-    <New3DWidgetProxy name="SliderRepresentation">
+    <New3DWidgetProxy name="ImplicitPlaneWidgetDisplay">
+      <SubProxy>
+        <Proxy name="Prop"
+          proxygroup="props" proxyname="ImplicePlaneRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="OriginInfo" />
+          <Property name="Origin" />
+          <Property name="NormalInfo" />
+          <Property name="Normal" />
+          <Property name="PlaceWidget" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Widget"
+          proxygroup="3d_widgets" proxyname="ImplicitPlaneWidget2">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Enabled" />
+        </ExposedProperties>
+      </SubProxy>
+    </New3DWidgetProxy>
+
+    <New3DWidgetProxy name="SliderWidgetDisplay">
       <SubProxy>
         <Proxy name="Prop"
           proxygroup="props" proxyname="SliderRepresentation3D">

@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVNew3DWidget);
-vtkCxxRevisionMacro(vtkPVNew3DWidget, "1.1");
+vtkCxxRevisionMacro(vtkPVNew3DWidget, "1.2");
 
 //----------------------------------------------------------------------------
 class vtkPVNew3DWidgetObserver : public vtkCommand
@@ -115,7 +115,7 @@ void vtkPVNew3DWidget::Create()
   
   this->WidgetProxy = vtkSMNew3DWidgetProxy::SafeDownCast(
     vtkSMObject::GetProxyManager()->NewProxy(
-      "displays", "SliderRepresentation"));
+      "displays", "SliderWidgetDisplay"));
 
   this->WidgetProxy->UpdateVTKObjects();
   vtkSMDoubleVectorProperty* p1 = vtkSMDoubleVectorProperty::SafeDownCast(

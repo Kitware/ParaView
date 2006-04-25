@@ -2692,4 +2692,28 @@ The mesh quality filter computes the quality of individual triangles, quadrilate
 
   </Module>
 
+  <Module name="TestCut"
+          root_name="TestCut"
+          replace_input="0"
+          module_type="Filter"
+          button_help="Cut with an implicit plane or sphere. Cutting typically reduces the dimensionality of the data.">
+    <Filter class="vtkCutter">
+      <Input name="Input"
+             class="vtkDataSet"/>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               id="im1"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <BoundsDisplay show_hide_frame="1"
+                   label="Input Bounds"
+                   property="InputBounds"
+                   trace_name="Input Bounds"
+                   input_menu="im1"/>
+    <NewImplicitPlane trace_name="Plane"
+                      input_menu="im1"
+                      help="Adjusts the parameters of the plane to cut with."/>
+  </Module>
+
 </ModuleInterfaces>

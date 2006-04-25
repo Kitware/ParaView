@@ -4271,6 +4271,37 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
    <!-- End AreaSelect -->
    </SourceProxy>
 
+   <SourceProxy name="TestCut" class="vtkCutter">
+    <InputProperty
+       name="Input"
+       command="SetInput">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+     </InputProperty>
+
+     <ProxyProperty name="CutFunction" command="SetCutFunction">
+           <ProxyGroupDomain name="groups">
+              <Group name="implicit_functions"/>
+           </ProxyGroupDomain>
+     </ProxyProperty>
+
+     <DoubleVectorProperty
+        name="InputBounds" information_only="1">
+       <BoundsDomain name="bounds">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </BoundsDomain>
+     </DoubleVectorProperty>
+
+   <!-- End Cut -->
+   </SourceProxy>
+
    </ProxyGroup>
 </ServerManagerConfiguration>
 
