@@ -210,8 +210,8 @@ QString pqChartValue::getString(int precision) const
       result2.setNum(this->Value.Double, 'e', precision);
       exponent = result2.mid(result2.lastIndexOf("e")+1,result2.length()-1).toInt();
       }
-    // FIX: always use scientific notation for negative exponents less than a certain threshold (for now 3)
-    if(exponent<-3 || result2.length() < result.length())
+    // FIX: always use scientific notation for negative exponents less than a certain threshold (for now 2)
+    if(exponent<-2 || result2.length() < result.length())
       result = result2;
     }
 

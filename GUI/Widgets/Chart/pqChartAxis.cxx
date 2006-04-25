@@ -47,8 +47,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkstd/vector>
 #include <math.h>
-#include <iostream>
-using namespace std;
 
 #define TICK_LENGTH_SMALL 3
 #define TICK_LENGTH 5
