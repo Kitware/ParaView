@@ -70,7 +70,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.287");
+vtkCxxRevisionMacro(vtkKWApplication, "1.288");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -2034,11 +2034,13 @@ int vtkKWApplication::SendEmail(
                      message_text->GetWidgetName());
         }
 
-      int res = dlg->Invoke();
-      if (res == 1 || res == 2)
+      dlg->Invoke();
+      int status = dlg->GetStatus();
+      if (status == vtkKWMessageDialog::StatusOK || 
+          status == vtkKWMessageDialog::StatusOther)
         {
         retry = 1;
-        if (res == 2)
+        if (status == vtkKWMessageDialog::StatusOther)
           {
           this->ExploreLink(attachment_filename);
           }

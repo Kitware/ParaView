@@ -37,8 +37,8 @@ public:
   // Invoke the dialog, display it and enter an event loop until the user
   // confirms or cancels the dialog.
   // Note that a dialog is a modal toplevel by default.
-  // This method returns a zero if the dialog was killed or 
-  // canceled, nonzero otherwise. The status can be further refined
+  // This method returns 0 if the dialog was killed or 
+  // canceled, 1 otherwise. The status can be further refined
   // by querying GetStatus().
   virtual int Invoke();
 
