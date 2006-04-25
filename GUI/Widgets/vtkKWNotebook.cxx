@@ -13,6 +13,7 @@
 =========================================================================*/
 #include "vtkKWNotebook.h"
 
+#include "vtkKWOptions.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
@@ -59,7 +60,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.101");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.102");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -2036,7 +2037,7 @@ void vtkKWNotebook::PageTabContextMenuCallback(int id, int x, int y)
       {
       this->TabPopupMenu->SelectItem(index);
       this->TabPopupMenu->SetItemState(
-        ks_("Notebook|Page|Show"), vtkKWTkOptions::StateDisabled);
+        ks_("Notebook|Page|Show"), vtkKWOptions::StateDisabled);
       }
     }
 

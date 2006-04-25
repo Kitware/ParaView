@@ -12,13 +12,15 @@
 
 =========================================================================*/
 #include "vtkKWLabel.h"
+
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWIcon.h"
+#include "vtkKWOptions.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.49");
+vtkCxxRevisionMacro(vtkKWLabel, "1.50");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -197,26 +199,26 @@ void vtkKWLabel::SetJustification(int justification)
 {
   this->SetConfigurationOption(
     "-justify", 
-    vtkKWTkOptions::GetJustificationAsTkOptionValue(justification));
+    vtkKWOptions::GetJustificationAsTkOptionValue(justification));
 }
 
 void vtkKWLabel::SetJustificationToLeft() 
 { 
-  this->SetJustification(vtkKWTkOptions::JustificationLeft); 
+  this->SetJustification(vtkKWOptions::JustificationLeft); 
 };
 void vtkKWLabel::SetJustificationToCenter() 
 { 
-  this->SetJustification(vtkKWTkOptions::JustificationCenter); 
+  this->SetJustification(vtkKWOptions::JustificationCenter); 
 };
 void vtkKWLabel::SetJustificationToRight() 
 { 
-  this->SetJustification(vtkKWTkOptions::JustificationRight); 
+  this->SetJustification(vtkKWOptions::JustificationRight); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWLabel::GetJustification()
 {
-  return vtkKWTkOptions::GetJustificationFromTkOptionValue(
+  return vtkKWOptions::GetJustificationFromTkOptionValue(
     this->GetConfigurationOption("-justify"));
 }
 
@@ -338,38 +340,38 @@ int vtkKWLabel::GetBorderWidth()
 void vtkKWLabel::SetRelief(int relief)
 {
   this->SetConfigurationOption(
-    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+    "-relief", vtkKWOptions::GetReliefAsTkOptionValue(relief));
 }
 
 void vtkKWLabel::SetReliefToRaised()     
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+  this->SetRelief(vtkKWOptions::ReliefRaised); 
 };
 void vtkKWLabel::SetReliefToSunken() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+  this->SetRelief(vtkKWOptions::ReliefSunken); 
 };
 void vtkKWLabel::SetReliefToFlat() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+  this->SetRelief(vtkKWOptions::ReliefFlat); 
 };
 void vtkKWLabel::SetReliefToRidge() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+  this->SetRelief(vtkKWOptions::ReliefRidge); 
 };
 void vtkKWLabel::SetReliefToSolid() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+  this->SetRelief(vtkKWOptions::ReliefSolid); 
 };
 void vtkKWLabel::SetReliefToGroove() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+  this->SetRelief(vtkKWOptions::ReliefGroove); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWLabel::GetRelief()
 {
-  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+  return vtkKWOptions::GetReliefFromTkOptionValue(
     this->GetConfigurationOption("-relief"));
 }
 
@@ -413,50 +415,50 @@ const char* vtkKWLabel::GetWrapLength()
 void vtkKWLabel::SetAnchor(int anchor)
 {
   this->SetConfigurationOption(
-    "-anchor", vtkKWTkOptions::GetAnchorAsTkOptionValue(anchor));
+    "-anchor", vtkKWOptions::GetAnchorAsTkOptionValue(anchor));
 }
 
 void vtkKWLabel::SetAnchorToNorth() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorNorth); 
+  this->SetAnchor(vtkKWOptions::AnchorNorth); 
 };
 void vtkKWLabel::SetAnchorToNorthEast() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorNorthEast); 
+  this->SetAnchor(vtkKWOptions::AnchorNorthEast); 
 };
 void vtkKWLabel::SetAnchorToEast() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorEast); 
+  this->SetAnchor(vtkKWOptions::AnchorEast); 
 };
 void vtkKWLabel::SetAnchorToSouthEast() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorSouthEast); 
+  this->SetAnchor(vtkKWOptions::AnchorSouthEast); 
 };
 void vtkKWLabel::SetAnchorToSouth() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorSouth); 
+  this->SetAnchor(vtkKWOptions::AnchorSouth); 
 };
 void vtkKWLabel::SetAnchorToSouthWest() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorSouthWest); 
+  this->SetAnchor(vtkKWOptions::AnchorSouthWest); 
 };
 void vtkKWLabel::SetAnchorToWest() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorWest); 
+  this->SetAnchor(vtkKWOptions::AnchorWest); 
 };
 void vtkKWLabel::SetAnchorToNorthWest() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorNorthWest); 
+  this->SetAnchor(vtkKWOptions::AnchorNorthWest); 
 };
 void vtkKWLabel::SetAnchorToCenter() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorCenter); 
+  this->SetAnchor(vtkKWOptions::AnchorCenter); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWLabel::GetAnchor()
 {
-  return vtkKWTkOptions::GetAnchorFromTkOptionValue(
+  return vtkKWOptions::GetAnchorFromTkOptionValue(
     this->GetConfigurationOption("-anchor"));
 }
 

@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWTkOptions.cxx
+  Module:    vtkKWOptions.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,17 +12,17 @@
 
 =========================================================================*/
 
-#include "vtkKWTkOptions.h"
+#include "vtkKWOptions.h"
 
 #include "vtkKWWidget.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWTkOptions );
-vtkCxxRevisionMacro(vtkKWTkOptions, "1.3");
+vtkStandardNewMacro( vtkKWOptions );
+vtkCxxRevisionMacro(vtkKWOptions, "1.1");
 
 //----------------------------------------------------------------------------
-const char* vtkKWTkOptions::GetCharacterEncodingAsTclOptionValue(int encoding)
+const char* vtkKWOptions::GetCharacterEncodingAsTclOptionValue(int encoding)
 {
   switch (encoding)
     {
@@ -89,27 +89,27 @@ const char* vtkKWTkOptions::GetCharacterEncodingAsTclOptionValue(int encoding)
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWTkOptions::GetAnchorAsTkOptionValue(int anchor)
+const char* vtkKWOptions::GetAnchorAsTkOptionValue(int anchor)
 {
   switch (anchor)
     {
-    case vtkKWTkOptions::AnchorNorth:
+    case vtkKWOptions::AnchorNorth:
       return "n";
-    case vtkKWTkOptions::AnchorNorthEast:
+    case vtkKWOptions::AnchorNorthEast:
       return "ne";
-    case vtkKWTkOptions::AnchorEast:
+    case vtkKWOptions::AnchorEast:
       return "e";
-    case vtkKWTkOptions::AnchorSouthEast:
+    case vtkKWOptions::AnchorSouthEast:
       return "se";
-    case vtkKWTkOptions::AnchorSouth:
+    case vtkKWOptions::AnchorSouth:
       return "s";
-    case vtkKWTkOptions::AnchorSouthWest:
+    case vtkKWOptions::AnchorSouthWest:
       return "sw";
-    case vtkKWTkOptions::AnchorWest:
+    case vtkKWOptions::AnchorWest:
       return "w";
-    case vtkKWTkOptions::AnchorNorthWest:
+    case vtkKWOptions::AnchorNorthWest:
       return "nw";
-    case vtkKWTkOptions::AnchorCenter:
+    case vtkKWOptions::AnchorCenter:
       return "center";
     default:
       return "";
@@ -117,67 +117,67 @@ const char* vtkKWTkOptions::GetAnchorAsTkOptionValue(int anchor)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWTkOptions::GetAnchorFromTkOptionValue(const char *anchor)
+int vtkKWOptions::GetAnchorFromTkOptionValue(const char *anchor)
 {
   if (!anchor)
     {
-    return vtkKWTkOptions::AnchorUnknown;
+    return vtkKWOptions::AnchorUnknown;
     }
   if (!strcmp(anchor, "n"))
     {
-    return vtkKWTkOptions::AnchorNorth;
+    return vtkKWOptions::AnchorNorth;
     }
   if (!strcmp(anchor, "ne"))
     {
-    return vtkKWTkOptions::AnchorNorthEast;
+    return vtkKWOptions::AnchorNorthEast;
     }
   if (!strcmp(anchor, "e"))
     {
-    return vtkKWTkOptions::AnchorEast;
+    return vtkKWOptions::AnchorEast;
     }
   if (!strcmp(anchor, "se"))
     {
-    return vtkKWTkOptions::AnchorSouthEast;
+    return vtkKWOptions::AnchorSouthEast;
     }
   if (!strcmp(anchor, "s"))
     {
-    return vtkKWTkOptions::AnchorSouth;
+    return vtkKWOptions::AnchorSouth;
     }
   if (!strcmp(anchor, "sw"))
     {
-    return vtkKWTkOptions::AnchorSouthWest;
+    return vtkKWOptions::AnchorSouthWest;
     }
   if (!strcmp(anchor, "w"))
     {
-    return vtkKWTkOptions::AnchorWest;
+    return vtkKWOptions::AnchorWest;
     }
   if (!strcmp(anchor, "nw"))
     {
-    return vtkKWTkOptions::AnchorNorthWest;
+    return vtkKWOptions::AnchorNorthWest;
     }
   if (!strcmp(anchor, "center"))
     {
-    return vtkKWTkOptions::AnchorCenter;
+    return vtkKWOptions::AnchorCenter;
     }
-  return vtkKWTkOptions::AnchorUnknown;
+  return vtkKWOptions::AnchorUnknown;
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWTkOptions::GetReliefAsTkOptionValue(int relief)
+const char* vtkKWOptions::GetReliefAsTkOptionValue(int relief)
 {
   switch (relief)
     {
-    case vtkKWTkOptions::ReliefRaised:
+    case vtkKWOptions::ReliefRaised:
       return "raised";
-    case vtkKWTkOptions::ReliefSunken:
+    case vtkKWOptions::ReliefSunken:
       return "sunken";
-    case vtkKWTkOptions::ReliefFlat:
+    case vtkKWOptions::ReliefFlat:
       return "flat";
-    case vtkKWTkOptions::ReliefRidge:
+    case vtkKWOptions::ReliefRidge:
       return "ridge";
-    case vtkKWTkOptions::ReliefSolid:
+    case vtkKWOptions::ReliefSolid:
       return "solid";
-    case vtkKWTkOptions::ReliefGroove:
+    case vtkKWOptions::ReliefGroove:
       return "groove";
     default:
       return "";
@@ -185,49 +185,49 @@ const char* vtkKWTkOptions::GetReliefAsTkOptionValue(int relief)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWTkOptions::GetReliefFromTkOptionValue(const char *relief)
+int vtkKWOptions::GetReliefFromTkOptionValue(const char *relief)
 {
   if (!relief)
     {
-    return vtkKWTkOptions::ReliefUnknown;
+    return vtkKWOptions::ReliefUnknown;
     }
   if (!strcmp(relief, "raised"))
     {
-    return vtkKWTkOptions::ReliefRaised;
+    return vtkKWOptions::ReliefRaised;
     }
   if (!strcmp(relief, "sunken"))
     {
-    return vtkKWTkOptions::ReliefSunken;
+    return vtkKWOptions::ReliefSunken;
     }
   if (!strcmp(relief, "flat"))
     {
-    return vtkKWTkOptions::ReliefFlat;
+    return vtkKWOptions::ReliefFlat;
     }
   if (!strcmp(relief, "ridge"))
     {
-    return vtkKWTkOptions::ReliefRidge;
+    return vtkKWOptions::ReliefRidge;
     }
   if (!strcmp(relief, "solid"))
     {
-    return vtkKWTkOptions::ReliefSolid;
+    return vtkKWOptions::ReliefSolid;
     }
   if (!strcmp(relief, "groove"))
     {
-    return vtkKWTkOptions::ReliefGroove;
+    return vtkKWOptions::ReliefGroove;
     }
-  return vtkKWTkOptions::ReliefUnknown;
+  return vtkKWOptions::ReliefUnknown;
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWTkOptions::GetJustificationAsTkOptionValue(int justification)
+const char* vtkKWOptions::GetJustificationAsTkOptionValue(int justification)
 {
   switch (justification)
     {
-    case vtkKWTkOptions::JustificationLeft:
+    case vtkKWOptions::JustificationLeft:
       return "left";
-    case vtkKWTkOptions::JustificationCenter:
+    case vtkKWOptions::JustificationCenter:
       return "center";
-    case vtkKWTkOptions::JustificationRight:
+    case vtkKWOptions::JustificationRight:
       return "right";
     default:
       return "";
@@ -235,39 +235,39 @@ const char* vtkKWTkOptions::GetJustificationAsTkOptionValue(int justification)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWTkOptions::GetJustificationFromTkOptionValue(const char *justification)
+int vtkKWOptions::GetJustificationFromTkOptionValue(const char *justification)
 {
   if (!justification)
     {
-    return vtkKWTkOptions::JustificationUnknown;
+    return vtkKWOptions::JustificationUnknown;
     }
   if (!strcmp(justification, "left"))
     {
-    return vtkKWTkOptions::JustificationLeft;
+    return vtkKWOptions::JustificationLeft;
     }
   if (!strcmp(justification, "center"))
     {
-    return vtkKWTkOptions::JustificationCenter;
+    return vtkKWOptions::JustificationCenter;
     }
   if (!strcmp(justification, "right"))
     {
-    return vtkKWTkOptions::JustificationRight;
+    return vtkKWOptions::JustificationRight;
     }
-  return vtkKWTkOptions::JustificationUnknown;
+  return vtkKWOptions::JustificationUnknown;
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWTkOptions::GetSelectionModeAsTkOptionValue(int mode)
+const char* vtkKWOptions::GetSelectionModeAsTkOptionValue(int mode)
 {
   switch (mode)
     {
-    case vtkKWTkOptions::SelectionModeSingle:
+    case vtkKWOptions::SelectionModeSingle:
       return "single";
-    case vtkKWTkOptions::SelectionModeBrowse:
+    case vtkKWOptions::SelectionModeBrowse:
       return "browse";
-    case vtkKWTkOptions::SelectionModeMultiple:
+    case vtkKWOptions::SelectionModeMultiple:
       return "multiple";
-    case vtkKWTkOptions::SelectionModeExtended:
+    case vtkKWOptions::SelectionModeExtended:
       return "extended";
     default:
       return "";
@@ -275,39 +275,39 @@ const char* vtkKWTkOptions::GetSelectionModeAsTkOptionValue(int mode)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWTkOptions::GetSelectionModeFromTkOptionValue(const char *mode)
+int vtkKWOptions::GetSelectionModeFromTkOptionValue(const char *mode)
 {
   if (!mode)
     {
-    return vtkKWTkOptions::SelectionModeUnknown;
+    return vtkKWOptions::SelectionModeUnknown;
     }
   if (!strcmp(mode, "single"))
     {
-    return vtkKWTkOptions::SelectionModeSingle;
+    return vtkKWOptions::SelectionModeSingle;
     }
   if (!strcmp(mode, "browse"))
     {
-    return vtkKWTkOptions::SelectionModeBrowse;
+    return vtkKWOptions::SelectionModeBrowse;
     }
   if (!strcmp(mode, "multiple"))
     {
-    return vtkKWTkOptions::SelectionModeMultiple;
+    return vtkKWOptions::SelectionModeMultiple;
     }
   if (!strcmp(mode, "extended"))
     {
-    return vtkKWTkOptions::SelectionModeExtended;
+    return vtkKWOptions::SelectionModeExtended;
     }
-  return vtkKWTkOptions::SelectionModeUnknown;
+  return vtkKWOptions::SelectionModeUnknown;
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWTkOptions::GetOrientationAsTkOptionValue(int orientation)
+const char* vtkKWOptions::GetOrientationAsTkOptionValue(int orientation)
 {
   switch (orientation)
     {
-    case vtkKWTkOptions::OrientationHorizontal:
+    case vtkKWOptions::OrientationHorizontal:
       return "horizontal";
-    case vtkKWTkOptions::OrientationVertical:
+    case vtkKWOptions::OrientationVertical:
       return "vertical";
     default:
       return "";
@@ -315,35 +315,35 @@ const char* vtkKWTkOptions::GetOrientationAsTkOptionValue(int orientation)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWTkOptions::GetOrientationFromTkOptionValue(const char *orientation)
+int vtkKWOptions::GetOrientationFromTkOptionValue(const char *orientation)
 {
   if (!orientation)
     {
-    return vtkKWTkOptions::OrientationUnknown;
+    return vtkKWOptions::OrientationUnknown;
     }
   if (!strcmp(orientation, "horizontal"))
     {
-    return vtkKWTkOptions::OrientationHorizontal;
+    return vtkKWOptions::OrientationHorizontal;
     }
   if (!strcmp(orientation, "vertical"))
     {
-    return vtkKWTkOptions::OrientationVertical;
+    return vtkKWOptions::OrientationVertical;
     }
-  return vtkKWTkOptions::OrientationUnknown;
+  return vtkKWOptions::OrientationUnknown;
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWTkOptions::GetStateAsTkOptionValue(int state)
+const char* vtkKWOptions::GetStateAsTkOptionValue(int state)
 {
   switch (state)
     {
-    case vtkKWTkOptions::StateDisabled:
+    case vtkKWOptions::StateDisabled:
       return "disabled";
-    case vtkKWTkOptions::StateNormal:
+    case vtkKWOptions::StateNormal:
       return "normal";
-    case vtkKWTkOptions::StateActive:
+    case vtkKWOptions::StateActive:
       return "active";
-    case vtkKWTkOptions::StateReadOnly:
+    case vtkKWOptions::StateReadOnly:
       return "readonly";
     default:
       return "";
@@ -351,33 +351,33 @@ const char* vtkKWTkOptions::GetStateAsTkOptionValue(int state)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWTkOptions::GetStateFromTkOptionValue(const char *state)
+int vtkKWOptions::GetStateFromTkOptionValue(const char *state)
 {
   if (!state)
     {
-    return vtkKWTkOptions::StateUnknown;
+    return vtkKWOptions::StateUnknown;
     }
   if (!strcmp(state, "disabled"))
     {
-    return vtkKWTkOptions::StateDisabled;
+    return vtkKWOptions::StateDisabled;
     }
   if (!strcmp(state, "normal"))
     {
-    return vtkKWTkOptions::StateNormal;
+    return vtkKWOptions::StateNormal;
     }
   if (!strcmp(state, "active"))
     {
-    return vtkKWTkOptions::StateActive;
+    return vtkKWOptions::StateActive;
     }
   if (!strcmp(state, "readonly"))
     {
-    return vtkKWTkOptions::StateReadOnly;
+    return vtkKWOptions::StateReadOnly;
     }
-  return vtkKWTkOptions::StateUnknown;
+  return vtkKWOptions::StateUnknown;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTkOptions::PrintSelf(ostream& os, vtkIndent indent)
+void vtkKWOptions::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }

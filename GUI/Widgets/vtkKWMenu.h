@@ -270,15 +270,19 @@ public:
   
   // Description:
   // Set/Get state of the menu item with a given index or label.
-  // Valid constants can be found in vtkKWTkOptions::StateType.
+  // Valid constants can be found in vtkKWOptions::StateType.
   virtual void SetItemState(int index, int state);
+  virtual void SetItemStateToDisabled(int index);
+  virtual void SetItemStateToNormal(int index);
   virtual void SetItemState(const char *label, int state);
+  virtual void SetItemStateToDisabled(const char *label);
+  virtual void SetItemStateToNormal(const char *label);
   virtual int GetItemState(int index);
   virtual int GetItemState(const char *label);
 
   // Description:
   // Set the state of all entries.
-  // Valid constants can be found in vtkKWTkOptions::StateType.
+  // Valid constants can be found in vtkKWOptions::StateType.
   // This should not be used directly, this is done by 
   // SetEnabled()/UpdateEnableState(). 
   // Overriden to pass to all menu entries.
@@ -506,7 +510,7 @@ public:
   // Set/Get the 3-D effect desired for the widget. 
   // The value indicates how the interior of the widget should appear
   // relative to its exterior. 
-  // Valid constants can be found in vtkKWTkOptions::ReliefType.
+  // Valid constants can be found in vtkKWOptions::ReliefType.
   virtual void SetRelief(int);
   virtual int GetRelief();
   virtual void SetReliefToRaised();

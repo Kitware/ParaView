@@ -16,12 +16,13 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWIcon.h"
+#include "vtkKWOptions.h"
 
 #include <vtksys/stl/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.52");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.53");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -349,38 +350,38 @@ int vtkKWCheckButton::GetBorderWidth()
 void vtkKWCheckButton::SetRelief(int relief)
 {
   this->SetConfigurationOption(
-    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+    "-relief", vtkKWOptions::GetReliefAsTkOptionValue(relief));
 }
 
 void vtkKWCheckButton::SetReliefToRaised()     
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+  this->SetRelief(vtkKWOptions::ReliefRaised); 
 };
 void vtkKWCheckButton::SetReliefToSunken() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+  this->SetRelief(vtkKWOptions::ReliefSunken); 
 };
 void vtkKWCheckButton::SetReliefToFlat() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+  this->SetRelief(vtkKWOptions::ReliefFlat); 
 };
 void vtkKWCheckButton::SetReliefToRidge() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+  this->SetRelief(vtkKWOptions::ReliefRidge); 
 };
 void vtkKWCheckButton::SetReliefToSolid() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+  this->SetRelief(vtkKWOptions::ReliefSolid); 
 };
 void vtkKWCheckButton::SetReliefToGroove() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+  this->SetRelief(vtkKWOptions::ReliefGroove); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWCheckButton::GetRelief()
 {
-  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+  return vtkKWOptions::GetReliefFromTkOptionValue(
     this->GetConfigurationOption("-relief"));
 }
 
@@ -412,50 +413,50 @@ int vtkKWCheckButton::GetPadY()
 void vtkKWCheckButton::SetAnchor(int anchor)
 {
   this->SetConfigurationOption(
-    "-anchor", vtkKWTkOptions::GetAnchorAsTkOptionValue(anchor));
+    "-anchor", vtkKWOptions::GetAnchorAsTkOptionValue(anchor));
 }
 
 void vtkKWCheckButton::SetAnchorToNorth() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorNorth); 
+  this->SetAnchor(vtkKWOptions::AnchorNorth); 
 };
 void vtkKWCheckButton::SetAnchorToNorthEast() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorNorthEast); 
+  this->SetAnchor(vtkKWOptions::AnchorNorthEast); 
 };
 void vtkKWCheckButton::SetAnchorToEast() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorEast); 
+  this->SetAnchor(vtkKWOptions::AnchorEast); 
 };
 void vtkKWCheckButton::SetAnchorToSouthEast() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorSouthEast); 
+  this->SetAnchor(vtkKWOptions::AnchorSouthEast); 
 };
 void vtkKWCheckButton::SetAnchorToSouth() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorSouth); 
+  this->SetAnchor(vtkKWOptions::AnchorSouth); 
 };
 void vtkKWCheckButton::SetAnchorToSouthWest() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorSouthWest); 
+  this->SetAnchor(vtkKWOptions::AnchorSouthWest); 
 };
 void vtkKWCheckButton::SetAnchorToWest() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorWest); 
+  this->SetAnchor(vtkKWOptions::AnchorWest); 
 };
 void vtkKWCheckButton::SetAnchorToNorthWest() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorNorthWest); 
+  this->SetAnchor(vtkKWOptions::AnchorNorthWest); 
 };
 void vtkKWCheckButton::SetAnchorToCenter() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorCenter); 
+  this->SetAnchor(vtkKWOptions::AnchorCenter); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWCheckButton::GetAnchor()
 {
-  return vtkKWTkOptions::GetAnchorFromTkOptionValue(
+  return vtkKWOptions::GetAnchorFromTkOptionValue(
     this->GetConfigurationOption("-anchor"));
 }
 
@@ -463,38 +464,38 @@ int vtkKWCheckButton::GetAnchor()
 void vtkKWCheckButton::SetOffRelief(int relief)
 {
   this->SetConfigurationOption(
-    "-offrelief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+    "-offrelief", vtkKWOptions::GetReliefAsTkOptionValue(relief));
 }
 
 void vtkKWCheckButton::SetOffReliefToRaised()     
 { 
-  this->SetOffRelief(vtkKWTkOptions::ReliefRaised); 
+  this->SetOffRelief(vtkKWOptions::ReliefRaised); 
 };
 void vtkKWCheckButton::SetOffReliefToSunken() 
 { 
-  this->SetOffRelief(vtkKWTkOptions::ReliefSunken); 
+  this->SetOffRelief(vtkKWOptions::ReliefSunken); 
 };
 void vtkKWCheckButton::SetOffReliefToFlat() 
 { 
-  this->SetOffRelief(vtkKWTkOptions::ReliefFlat); 
+  this->SetOffRelief(vtkKWOptions::ReliefFlat); 
 };
 void vtkKWCheckButton::SetOffReliefToRidge() 
 { 
-  this->SetOffRelief(vtkKWTkOptions::ReliefRidge); 
+  this->SetOffRelief(vtkKWOptions::ReliefRidge); 
 };
 void vtkKWCheckButton::SetOffReliefToSolid() 
 { 
-  this->SetOffRelief(vtkKWTkOptions::ReliefSolid); 
+  this->SetOffRelief(vtkKWOptions::ReliefSolid); 
 };
 void vtkKWCheckButton::SetOffReliefToGroove() 
 { 
-  this->SetOffRelief(vtkKWTkOptions::ReliefGroove); 
+  this->SetOffRelief(vtkKWOptions::ReliefGroove); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWCheckButton::GetOffRelief()
 {
-  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+  return vtkKWOptions::GetReliefFromTkOptionValue(
     this->GetConfigurationOption("-offrelief"));
 }
 
@@ -502,42 +503,42 @@ int vtkKWCheckButton::GetOffRelief()
 void vtkKWCheckButton::SetOverRelief(int relief)
 {
   this->SetConfigurationOption(
-    "-overrelief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+    "-overrelief", vtkKWOptions::GetReliefAsTkOptionValue(relief));
 }
 
 void vtkKWCheckButton::SetOverReliefToRaised()     
 { 
-  this->SetOverRelief(vtkKWTkOptions::ReliefRaised); 
+  this->SetOverRelief(vtkKWOptions::ReliefRaised); 
 };
 void vtkKWCheckButton::SetOverReliefToSunken() 
 { 
-  this->SetOverRelief(vtkKWTkOptions::ReliefSunken); 
+  this->SetOverRelief(vtkKWOptions::ReliefSunken); 
 };
 void vtkKWCheckButton::SetOverReliefToFlat() 
 { 
-  this->SetOverRelief(vtkKWTkOptions::ReliefFlat); 
+  this->SetOverRelief(vtkKWOptions::ReliefFlat); 
 };
 void vtkKWCheckButton::SetOverReliefToRidge() 
 { 
-  this->SetOverRelief(vtkKWTkOptions::ReliefRidge); 
+  this->SetOverRelief(vtkKWOptions::ReliefRidge); 
 };
 void vtkKWCheckButton::SetOverReliefToSolid() 
 { 
-  this->SetOverRelief(vtkKWTkOptions::ReliefSolid); 
+  this->SetOverRelief(vtkKWOptions::ReliefSolid); 
 };
 void vtkKWCheckButton::SetOverReliefToGroove() 
 { 
-  this->SetOverRelief(vtkKWTkOptions::ReliefGroove); 
+  this->SetOverRelief(vtkKWOptions::ReliefGroove); 
 };
 void vtkKWCheckButton::SetOverReliefToNone() 
 { 
-  this->SetOverRelief(vtkKWTkOptions::ReliefUnknown); 
+  this->SetOverRelief(vtkKWOptions::ReliefUnknown); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWCheckButton::GetOverRelief()
 {
-  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+  return vtkKWOptions::GetReliefFromTkOptionValue(
     this->GetConfigurationOption("-overrelief"));
 }
 

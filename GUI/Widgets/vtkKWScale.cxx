@@ -13,14 +13,14 @@
 =========================================================================*/
 #include "vtkKWScale.h"
 
-#include "vtkKWLabel.h"
+#include "vtkKWOptions.h"
 #include "vtkObjectFactory.h"
 
 #include <vtksys/stl/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.116");
+vtkCxxRevisionMacro(vtkKWScale, "1.117");
 
 //----------------------------------------------------------------------------
 vtkKWScale::vtkKWScale()
@@ -30,7 +30,7 @@ vtkKWScale::vtkKWScale()
   this->Range[1]   = 100;  
   this->Resolution = 1;
 
-  this->Orientation = vtkKWTkOptions::OrientationHorizontal;
+  this->Orientation = vtkKWOptions::OrientationHorizontal;
   this->Command      = NULL;
   this->StartCommand = NULL;
   this->EndCommand   = NULL;
@@ -94,7 +94,7 @@ void vtkKWScale::UpdateOrientation()
   if (this->IsCreated())
     {
     this->SetConfigurationOption(
-      "-orient", vtkKWTkOptions::GetOrientationAsTkOptionValue(
+      "-orient", vtkKWOptions::GetOrientationAsTkOptionValue(
         this->Orientation));
     }
 }
@@ -103,8 +103,8 @@ void vtkKWScale::UpdateOrientation()
 void vtkKWScale::SetOrientation(int orientation)
 {
   if (this->Orientation == orientation ||
-      (orientation != vtkKWTkOptions::OrientationHorizontal &&
-       orientation != vtkKWTkOptions::OrientationVertical))
+      (orientation != vtkKWOptions::OrientationHorizontal &&
+       orientation != vtkKWOptions::OrientationVertical))
     {
     return;
     }
@@ -117,11 +117,11 @@ void vtkKWScale::SetOrientation(int orientation)
 
 void vtkKWScale::SetOrientationToHorizontal() 
 { 
-  this->SetOrientation(vtkKWTkOptions::OrientationHorizontal); 
+  this->SetOrientation(vtkKWOptions::OrientationHorizontal); 
 };
 void vtkKWScale::SetOrientationToVertical() 
 { 
-  this->SetOrientation(vtkKWTkOptions::OrientationVertical); 
+  this->SetOrientation(vtkKWOptions::OrientationVertical); 
 };
 
 //----------------------------------------------------------------------------
@@ -206,38 +206,38 @@ int vtkKWScale::GetBorderWidth()
 void vtkKWScale::SetRelief(int relief)
 {
   this->SetConfigurationOption(
-    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+    "-relief", vtkKWOptions::GetReliefAsTkOptionValue(relief));
 }
 
 void vtkKWScale::SetReliefToRaised()     
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+  this->SetRelief(vtkKWOptions::ReliefRaised); 
 };
 void vtkKWScale::SetReliefToSunken() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+  this->SetRelief(vtkKWOptions::ReliefSunken); 
 };
 void vtkKWScale::SetReliefToFlat() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+  this->SetRelief(vtkKWOptions::ReliefFlat); 
 };
 void vtkKWScale::SetReliefToRidge() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+  this->SetRelief(vtkKWOptions::ReliefRidge); 
 };
 void vtkKWScale::SetReliefToSolid() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+  this->SetRelief(vtkKWOptions::ReliefSolid); 
 };
 void vtkKWScale::SetReliefToGroove() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+  this->SetRelief(vtkKWOptions::ReliefGroove); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWScale::GetRelief()
 {
-  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+  return vtkKWOptions::GetReliefFromTkOptionValue(
     this->GetConfigurationOption("-relief"));
 }
 
@@ -359,7 +359,7 @@ void vtkKWScale::UpdateValue()
   int was_disabled = !this->GetEnabled();
   if (was_disabled)
     {
-    this->SetState(vtkKWTkOptions::StateNormal);
+    this->SetState(vtkKWOptions::StateNormal);
     this->SetEnabled(1);
     }
 
@@ -367,7 +367,7 @@ void vtkKWScale::UpdateValue()
 
   if (was_disabled)
     {
-    this->SetState(vtkKWTkOptions::StateDisabled);
+    this->SetState(vtkKWOptions::StateDisabled);
     this->SetEnabled(0);
     }
 }

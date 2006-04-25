@@ -196,13 +196,11 @@ public:
   // For widgets that can lay themselves out with either a horizontal or
   // vertical orientation, such as scales, this option specifies which 
   // orientation should be used. 
-  // Valid constants can be found in vtkKWTkOptions::OrientationType.
+  // Valid constants can be found in vtkKWOptions::OrientationType.
   virtual void SetOrientation(int);
   virtual int GetOrientation();
-  virtual void SetOrientationToHorizontal() 
-    { this->SetOrientation(vtkKWTkOptions::OrientationHorizontal); };
-  virtual void SetOrientationToVertical() 
-    { this->SetOrientation(vtkKWTkOptions::OrientationVertical); };
+  virtual void SetOrientationToHorizontal();
+  virtual void SetOrientationToVertical();
 
   // Description
   // Set/Get the desired long dimension of the scale. 

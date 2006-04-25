@@ -13,6 +13,7 @@
 =========================================================================*/
 #include "vtkKWMostRecentFilesManager.h"
 
+#include "vtkKWOptions.h"
 #include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWMenu.h"
@@ -21,7 +22,7 @@
 #include <vtksys/stl/list>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.14");
+vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.15");
 vtkStandardNewMacro(vtkKWMostRecentFilesManager );
 
 #define VTK_KW_MRF_REGISTRY_FILENAME_KEYNAME_PATTERN "File%02d"
@@ -565,9 +566,9 @@ void vtkKWMostRecentFilesManager::UpdateMenuStateInParent()
         {
         int nb_items = this->Menu->GetNumberOfItems();
         int menu_enabled = 
-          parent->GetEnabled() ? vtkKWTkOptions::StateNormal : vtkKWTkOptions::StateDisabled;
+          parent->GetEnabled() ? vtkKWOptions::StateNormal : vtkKWOptions::StateDisabled;
         parent->SetItemState(
-          index,  nb_items ? menu_enabled : vtkKWTkOptions::StateDisabled);
+          index,  nb_items ? menu_enabled : vtkKWOptions::StateDisabled);
         }
       }
     }

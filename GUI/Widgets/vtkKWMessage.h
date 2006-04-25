@@ -105,7 +105,7 @@ public:
   // Set/Get the 3-D effect desired for the widget. 
   // The value indicates how the interior of the widget should appear
   // relative to its exterior. 
-  // Valid constants can be found in vtkKWTkOptions::ReliefType.
+  // Valid constants can be found in vtkKWOptions::ReliefType.
   virtual void SetRelief(int);
   virtual int GetRelief();
   virtual void SetReliefToRaised();
@@ -146,7 +146,7 @@ public:
   // the window; the entire text block will be centered in the vertical span
   // of the window. Note that the superclass's PadX and PadY setting can be
   // use to provide additional margins.
-  // Valid constants can be found in vtkKWTkOptions::JustificationType.
+  // Valid constants can be found in vtkKWOptions::JustificationType.
   virtual void SetJustification(int);
   virtual int GetJustification();
   virtual void SetJustificationToLeft();
@@ -157,7 +157,7 @@ public:
   // Set/Get the anchoring.
   // Specifies how the information in a widget (e.g. text) is to
   // be displayed in the widget. See example in the Justification method doc.
-  // Valid constants can be found in vtkKWTkOptions::AnchorType.
+  // Valid constants can be found in vtkKWOptions::AnchorType.
   virtual void SetAnchor(int);
   virtual int GetAnchor();
   virtual void SetAnchorToNorth();

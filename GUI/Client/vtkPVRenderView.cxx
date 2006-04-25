@@ -146,7 +146,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.418");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.419");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -938,9 +938,8 @@ void vtkPVRenderView::SwitchBackAndForthToViewProperties()
       // between source and 3D views.
       int state = viewmenu->GetItemState(
         this->MenuLabelSwitchBackAndForthToViewProperties);
-      viewmenu->SetItemState(
-        this->MenuLabelSwitchBackAndForthToViewProperties,
-        vtkKWTkOptions::StateNormal);
+      viewmenu->SetItemStateToNormal(
+        this->MenuLabelSwitchBackAndForthToViewProperties);
       viewmenu->InvokeItem(
         viewmenu->GetIndexOfItem(
           this->MenuLabelSwitchBackAndForthToViewProperties));

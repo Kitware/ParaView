@@ -13,6 +13,7 @@
 =========================================================================*/
 #include "vtkKWWindow.h"
 
+#include "vtkKWOptions.h"
 #include "vtkKWApplication.h"
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWFrame.h"
@@ -33,7 +34,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.278");
+vtkCxxRevisionMacro(vtkKWWindow, "1.279");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -1332,7 +1333,7 @@ void vtkKWWindow::UpdateMenuState()
         idx, 
         ((this->PanelLayout == vtkKWWindow::PanelLayoutSecondaryBelowMain &&
           !this->GetMainPanelVisibility()) ?
-         vtkKWTkOptions::StateDisabled : this->WindowMenu->GetEnabled()));
+         vtkKWOptions::StateDisabled : this->WindowMenu->GetEnabled()));
       }
     }
 }

@@ -77,7 +77,7 @@ public:
   // Set/Get the 3-D effect desired for the widget. 
   // The value indicates how the interior of the widget should appear
   // relative to its exterior. 
-  // Valid constants can be found in vtkKWTkOptions::ReliefType.
+  // Valid constants can be found in vtkKWOptions::ReliefType.
   virtual void SetRelief(int);
   virtual int GetRelief();
   virtual void SetReliefToRaised();
@@ -92,13 +92,11 @@ public:
   // For widgets that can lay themselves out with either a horizontal or
   // vertical orientation, such as scrollbars, this option specifies which 
   // orientation should be used. 
-  // Valid constants can be found in vtkKWTkOptions::OrientationType.
+  // Valid constants can be found in vtkKWOptions::OrientationType.
   virtual void SetOrientation(int);
   virtual int GetOrientation();
-  virtual void SetOrientationToHorizontal() 
-    { this->SetOrientation(vtkKWTkOptions::OrientationHorizontal); };
-  virtual void SetOrientationToVertical() 
-    { this->SetOrientation(vtkKWTkOptions::OrientationVertical); };
+  virtual void SetOrientationToHorizontal();
+  virtual void SetOrientationToVertical();
 
   // Description:
   // Set/Get the trough color, i.e. the color to use for the rectangular

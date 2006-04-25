@@ -14,14 +14,15 @@
 
 #include "vtkKWTheme.h"
 
+#include "vtkKWOptions.h"
 #include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWOptionDataBase.h"
-#include "vtkKWTkOptions.h"
+#include "vtkKWOptions.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTheme);
-vtkCxxRevisionMacro(vtkKWTheme, "1.2");
+vtkCxxRevisionMacro(vtkKWTheme, "1.3");
 
 //----------------------------------------------------------------------------
 void vtkKWTheme::Install()
@@ -39,7 +40,7 @@ void vtkKWTheme::Install()
 #if 0
   vtkKWOptionDataBase *odb = this->GetApplication()->GetOptionDataBase();
 
-  odb->AddEntryAsInt("vtkKWLabel", "Relief", vtkKWTkOptions::ReliefRidge);
+  odb->AddEntryAsInt("vtkKWLabel", "Relief", vtkKWOptions::ReliefRidge);
   odb->AddEntryAsInt("vtkKWLabel", "BorderWidth", 2);
   odb->AddEntryAsDouble3("vtkKWLabel", "BackgroundColor", 0.2, 0.3, 0.6);
   odb->AddEntryAsDouble3("vtkKWFrame", "BackgroundColor", 0.2, 0.3, 0.6);

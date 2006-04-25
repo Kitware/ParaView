@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.34");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.35");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
@@ -242,11 +242,11 @@ void vtkKWLookmark::Create()
   this->CommentsText->SetParent(this->CommentsFrame->GetFrame());
   this->CommentsText->Create();
   this->CommentsText->SetBinding("<KeyPress>", this, "CommentsModifiedCallback");
-  this->CommentsText->SetState(vtkKWTkOptions::StateNormal);
+  this->CommentsText->SetStateToNormal();
 
   this->NameField->SetParent(this->MainFrame->GetLabelFrame());
   this->NameField->Create();
-  this->NameField->SetState(vtkKWTkOptions::StateNormal);
+  this->NameField->SetStateToNormal();
 
   this->Pack();
 

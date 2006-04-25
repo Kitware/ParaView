@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.33");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.34");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -346,11 +346,11 @@ void vtkPVSourcesNavigationWindow::DisplayModulePopupMenu(vtkPVSource* module,
 
   if ( module->IsDeletable())
     {
-    this->PopupMenu->SetItemState("Delete", vtkKWTkOptions::StateNormal);
+    this->PopupMenu->SetItemStateToNormal("Delete");
     }
   else
     {
-    this->PopupMenu->SetItemState("Delete", vtkKWTkOptions::StateDisabled);
+    this->PopupMenu->SetItemStateToDisabled("Delete");
     }
 
   char *rbv = this->PopupMenu->CreateItemVariableName(this, "Visibility");

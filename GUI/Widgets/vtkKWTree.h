@@ -107,13 +107,11 @@ public:
 
   // Description:
   // Set/Get the one of several styles for manipulating the selection. 
-  // Valid constants can be found in vtkKWTkOptions::SelectionModeType.
+  // Valid constants can be found in vtkKWOptions::SelectionModeType.
   virtual void SetSelectionMode(int);
   vtkGetMacro(SelectionMode, int);
-  virtual void SetSelectionModeToSingle() 
-    { this->SetSelectionMode(vtkKWTkOptions::SelectionModeSingle); };
-  virtual void SetSelectionModeToMultiple() 
-    { this->SetSelectionMode(vtkKWTkOptions::SelectionModeMultiple); };
+  virtual void SetSelectionModeToSingle();
+  virtual void SetSelectionModeToMultiple();
 
   // Description:
   // Select a node (this adds the node to the selection), deselect a node.
@@ -212,7 +210,7 @@ public:
   // Set/Get the 3-D effect desired for the widget. 
   // The value indicates how the interior of the widget should appear
   // relative to its exterior. 
-  // Valid constants can be found in vtkKWTkOptions::ReliefType.
+  // Valid constants can be found in vtkKWOptions::ReliefType.
   virtual void SetRelief(int);
   virtual int GetRelief();
   virtual void SetReliefToRaised();

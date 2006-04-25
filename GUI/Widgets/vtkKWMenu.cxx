@@ -18,6 +18,7 @@
 #include "vtkKWWindowBase.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWIcon.h"
+#include "vtkKWOptions.h"
 
 #include <ctype.h>
 
@@ -26,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.101");
+vtkCxxRevisionMacro(vtkKWMenu, "1.102");
 
 #define VTK_KW_MENU_CB_VARNAME_PATTERN "CB_group%d"
 #define VTK_KW_MENU_RB_DEFAULT_GROUP "RB_group"
@@ -1126,7 +1127,7 @@ int vtkKWMenu::GetNumberOfItems()
 //----------------------------------------------------------------------------
 int vtkKWMenu::GetItemState(int index)
 {
-  return vtkKWTkOptions::GetStateFromTkOptionValue(
+  return vtkKWOptions::GetStateFromTkOptionValue(
     this->GetItemOption(index, "-state"));
 }
 
@@ -1138,9 +1139,20 @@ void vtkKWMenu::SetItemState(int index, int state)
     this->Script("catch {%s entryconfigure %d -state %s}", 
                  this->GetWidgetName(), 
                  index, 
-                 vtkKWTkOptions::GetStateAsTkOptionValue(state));
+                 vtkKWOptions::GetStateAsTkOptionValue(state));
     }
 }
+
+void vtkKWMenu::SetItemStateToDisabled(int index) 
+{ 
+  this->SetItemState(index, vtkKWOptions::StateDisabled); 
+};
+
+void vtkKWMenu::SetItemStateToNormal(int index) 
+{ 
+  this->SetItemState(index, vtkKWOptions::StateNormal); 
+};
+
 
 //----------------------------------------------------------------------------
 int vtkKWMenu::GetItemState(const char *label)
@@ -1154,6 +1166,17 @@ void vtkKWMenu::SetItemState(const char *label, int state)
   this->SetItemState(this->GetIndexOfItem(label), state);
 }
 
+void vtkKWMenu::SetItemStateToDisabled(const char *label) 
+{ 
+  this->SetItemState(label, vtkKWOptions::StateDisabled); 
+};
+
+void vtkKWMenu::SetItemStateToNormal(const char *label) 
+{ 
+  this->SetItemState(label, vtkKWOptions::StateNormal); 
+};
+
+
 //----------------------------------------------------------------------------
 void vtkKWMenu::SetState(int state)
 {
@@ -1166,7 +1189,7 @@ void vtkKWMenu::SetState(int state)
   ostrstream tk_cmd;
   const char *wname = this->GetWidgetName();
 
-  const char *statestr = vtkKWTkOptions::GetStateAsTkOptionValue(state);
+  const char *statestr = vtkKWOptions::GetStateAsTkOptionValue(state);
 
   for (int i = 0; i < nb_of_items; i++)
     {
@@ -1599,38 +1622,38 @@ int vtkKWMenu::GetBorderWidth()
 void vtkKWMenu::SetRelief(int relief)
 {
   this->SetConfigurationOption(
-    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+    "-relief", vtkKWOptions::GetReliefAsTkOptionValue(relief));
 }
 
 void vtkKWMenu::SetReliefToRaised()     
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+  this->SetRelief(vtkKWOptions::ReliefRaised); 
 };
 void vtkKWMenu::SetReliefToSunken() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+  this->SetRelief(vtkKWOptions::ReliefSunken); 
 };
 void vtkKWMenu::SetReliefToFlat() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+  this->SetRelief(vtkKWOptions::ReliefFlat); 
 };
 void vtkKWMenu::SetReliefToRidge() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+  this->SetRelief(vtkKWOptions::ReliefRidge); 
 };
 void vtkKWMenu::SetReliefToSolid() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+  this->SetRelief(vtkKWOptions::ReliefSolid); 
 };
 void vtkKWMenu::SetReliefToGroove() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+  this->SetRelief(vtkKWOptions::ReliefGroove); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWMenu::GetRelief()
 {
-  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+  return vtkKWOptions::GetReliefFromTkOptionValue(
     this->GetConfigurationOption("-relief"));
 }
 

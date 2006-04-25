@@ -17,11 +17,10 @@
 #include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWOptionDataBase.h"
-#include "vtkKWTkOptions.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMyGreenTheme);
-vtkCxxRevisionMacro(vtkKWMyGreenTheme, "1.1");
+vtkCxxRevisionMacro(vtkKWMyGreenTheme, "1.2");
 
 //----------------------------------------------------------------------------
 void vtkKWMyGreenTheme::Install()

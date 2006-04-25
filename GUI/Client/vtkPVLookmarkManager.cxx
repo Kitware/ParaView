@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.79");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.80");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -318,8 +318,8 @@ void vtkPVLookmarkManager::Create()
   this->MenuEdit->AddSeparator();
   this->MenuEdit->AddCommand("Select All", this, "SetStateOfAllLookmarkItems 1");
   this->MenuEdit->AddCommand("Clear All", this, "SetStateOfAllLookmarkItems 0");
-  this->MenuEdit->SetItemState("Undo", vtkKWTkOptions::StateDisabled);
-  this->MenuEdit->SetItemState("Redo", vtkKWTkOptions::StateDisabled);
+  this->MenuEdit->SetItemStateToDisabled("Undo");
+  this->MenuEdit->SetItemStateToDisabled("Redo");
 
   // Menu : Help
 
@@ -1011,8 +1011,8 @@ void vtkPVLookmarkManager::Checkpoint()
     this->SaveAll(path);
     }
 
-  this->MenuEdit->SetItemState("Undo", vtkKWTkOptions::StateNormal);
-  this->MenuEdit->SetItemState("Redo", vtkKWTkOptions::StateDisabled);
+  this->MenuEdit->SetItemStateToNormal("Undo");
+  this->MenuEdit->SetItemStateToDisabled("Redo");
 
 }
 
@@ -1021,8 +1021,8 @@ void vtkPVLookmarkManager::RedoCallback()
 {
   this->UndoRedoInternal();
 
-  this->MenuEdit->SetItemState("Redo", vtkKWTkOptions::StateDisabled);
-  this->MenuEdit->SetItemState("Undo", vtkKWTkOptions::StateNormal);
+  this->MenuEdit->SetItemStateToDisabled("Redo");
+  this->MenuEdit->SetItemStateToNormal("Undo");
 }
 
 
@@ -1031,8 +1031,8 @@ void vtkPVLookmarkManager::UndoCallback()
 {
   this->UndoRedoInternal();
 
-  this->MenuEdit->SetItemState("Undo", vtkKWTkOptions::StateDisabled);
-  this->MenuEdit->SetItemState("Redo", vtkKWTkOptions::StateNormal);
+  this->MenuEdit->SetItemStateToDisabled("Undo");
+  this->MenuEdit->SetItemStateToNormal("Redo");
 }
 
 //----------------------------------------------------------------------------

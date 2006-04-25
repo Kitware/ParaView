@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWTkOptions.h
+  Module:    vtkKWOptions.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,31 +11,25 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWTkOptions - set of methods to convert to/from Tk options
+// .NAME vtkKWOptions - set of common options.
 // .SECTION Description
-// This class provides some conversion betweek vtkKWWidget constants
+// This class also provides some conversion betweek vtkKWWidget constants
 // and the corresponding Tk options.
 
-#ifndef __vtkKWTkOptions_h
-#define __vtkKWTkOptions_h
+#ifndef __vtkKWOptions_h
+#define __vtkKWOptions_h
 
 #include "vtkObject.h"
 #include "vtkKWWidgets.h" // Needed for export symbols directives
 
-class KWWidgets_EXPORT vtkKWTkOptions : public vtkObject
+class KWWidgets_EXPORT vtkKWOptions : public vtkObject
 {
 public:
-  static vtkKWTkOptions* New();
-  vtkTypeRevisionMacro(vtkKWTkOptions,vtkObject);
+  static vtkKWOptions* New();
+  vtkTypeRevisionMacro(vtkKWOptions,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Return the Tcl value for a given encoding constant
-  // Check vtkSystemIncludes for a list of valid encodings.
-  static const char* GetCharacterEncodingAsTclOptionValue(int);
-
-  // Description:
-  // Return the Tk value for a given anchor constant, and vice-versa
   // Specifies how the information in a widget (e.g. text or a bitmap) is to
   // be displayed in the widget.
   //BTX
@@ -53,13 +47,10 @@ public:
     AnchorUnknown
   };
   //ETX
-  static const char* GetAnchorAsTkOptionValue(int);
-  static int GetAnchorFromTkOptionValue(const char *);
 
   // Description:
-  // Return the Tk value for a given relief constant, and vice-versa
-  // The value indicates how the interior of the widget should appear
-  // relative to its exterior. 
+  // Specifies the 3-D effect desired for the widget. The value indicates how
+  // the interior of the widget should appear relative to its exterior. 
   //BTX
   enum ReliefType
   {
@@ -72,12 +63,9 @@ public:
     ReliefUnknown
   };
   //ETX
-  static const char* GetReliefAsTkOptionValue(int);
-  static int GetReliefFromTkOptionValue(const char *);
 
   // Description:
-  // Return the Tk value for a given justification constant, and vice-versa.
-  // When there are multiple lines of text displayed in a widget, this option
+  // When there are multiple lines of text displayed in a widget, 
   // determines how the lines line up with each other.   
   //BTX
   enum JustificationType
@@ -88,11 +76,9 @@ public:
     JustificationUnknown
   };
   //ETX
-  static const char* GetJustificationAsTkOptionValue(int);
-  static int GetJustificationFromTkOptionValue(const char *);
 
   // Description:
-  // Set/Get the one of several styles for manipulating the selection. 
+  // Specifies one of several styles for manipulating the selection.
   //BTX
   enum SelectionModeType
   {
@@ -103,13 +89,10 @@ public:
     SelectionModeUnknown
   };
   //ETX
-  static const char* GetSelectionModeAsTkOptionValue(int);
-  static int GetSelectionModeFromTkOptionValue(const char *);
 
   // Description:
-  // Return the Tk value for a given orientation constant, and vice-versa.
   // For widgets that can lay themselves out with either a horizontal or
-  // vertical orientation, such as scrollbars, this option specifies which 
+  // vertical orientation, such as scales or scrollbars, specifies which 
   // orientation should be used. 
   //BTX
   enum OrientationType
@@ -119,11 +102,9 @@ public:
     OrientationUnknown
   };
   //ETX
-  static const char* GetOrientationAsTkOptionValue(int);
-  static int GetOrientationFromTkOptionValue(const char *);
 
   // Description:
-  // State option (make sure disabled/normal map to 0/1). 
+  // Specifies the state of a widget.
   //BTX
   enum StateType
   {
@@ -134,17 +115,50 @@ public:
     StateUnknown
   };
   //ETX
+
+  // Description:
+  // Return the Tcl value for a given encoding constant
+  // Check vtkSystemIncludes for a list of valid encodings.
+  static const char* GetCharacterEncodingAsTclOptionValue(int);
+
+  // Description:
+  // Return the Tk value for a given anchor constant, and vice-versa
+  static const char* GetAnchorAsTkOptionValue(int);
+  static int GetAnchorFromTkOptionValue(const char *);
+
+  // Description:
+  // Return the Tk value for a given relief constant, and vice-versa
+  static const char* GetReliefAsTkOptionValue(int);
+  static int GetReliefFromTkOptionValue(const char *);
+
+  // Description:
+  // Return the Tk value for a given justification constant, and vice-versa.
+  static const char* GetJustificationAsTkOptionValue(int);
+  static int GetJustificationFromTkOptionValue(const char *);
+
+  // Description:
+  // Return the Tk value for a given selection mode constant, and vice-versa.
+  static const char* GetSelectionModeAsTkOptionValue(int);
+  static int GetSelectionModeFromTkOptionValue(const char *);
+
+  // Description:
+  // Return the Tk value for a given orientation constant, and vice-versa.
+  static const char* GetOrientationAsTkOptionValue(int);
+  static int GetOrientationFromTkOptionValue(const char *);
+
+  // Description:
+  // Return the Tk value for a given state constant, and vice-versa.
   static const char* GetStateAsTkOptionValue(int);
   static int GetStateFromTkOptionValue(const char *);
 
 protected:
-  vtkKWTkOptions() {};
-  ~vtkKWTkOptions() {};
+  vtkKWOptions() {};
+  ~vtkKWOptions() {};
 
 private:
   
-  vtkKWTkOptions(const vtkKWTkOptions&); // Not implemented
-  void operator=(const vtkKWTkOptions&); // Not implemented
+  vtkKWOptions(const vtkKWOptions&); // Not implemented
+  void operator=(const vtkKWOptions&); // Not implemented
 };
 
 #endif

@@ -20,6 +20,7 @@
 #include "vtkKWCheckButton.h"
 #include "vtkKWComboBox.h"
 #include "vtkKWRadioButton.h"
+#include "vtkKWOptions.h"
 
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
@@ -31,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.55");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.56");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -225,7 +226,7 @@ int vtkKWMultiColumnList::InsertColumn(int col_index, const char *title)
     {
     int nb_columns = this->GetNumberOfColumns();
     int old_state = this->GetState();
-    if (this->GetState() != vtkKWTkOptions::StateNormal)
+    if (this->GetState() != vtkKWOptions::StateNormal)
       {
       this->SetStateToNormal();
       }
@@ -287,7 +288,7 @@ void vtkKWMultiColumnList::DeleteColumn(int col_index)
     {
     int nb_columns = this->GetNumberOfColumns();
     int old_state = this->GetState();
-    if (this->GetState() != vtkKWTkOptions::StateNormal)
+    if (this->GetState() != vtkKWOptions::StateNormal)
       {
       this->SetStateToNormal();
       }
@@ -308,7 +309,7 @@ void vtkKWMultiColumnList::DeleteAllColumns()
     {
     int nb_columns = this->GetNumberOfColumns();
     int old_state = this->GetState();
-    if (this->GetState() != vtkKWTkOptions::StateNormal)
+    if (this->GetState() != vtkKWOptions::StateNormal)
       {
       this->SetStateToNormal();
       }
@@ -1100,7 +1101,7 @@ void vtkKWMultiColumnList::InsertRow(int row_index)
         }
       int nb_rows = this->GetNumberOfRows();
       int old_state = this->GetState();
-      if (this->GetState() != vtkKWTkOptions::StateNormal)
+      if (this->GetState() != vtkKWOptions::StateNormal)
         {
         this->SetStateToNormal();
         }
@@ -1165,7 +1166,7 @@ void vtkKWMultiColumnList::DeleteRow(int row_index)
     {
     int nb_rows = this->GetNumberOfRows();
     int old_state = this->GetState();
-    if (this->GetState() != vtkKWTkOptions::StateNormal)
+    if (this->GetState() != vtkKWOptions::StateNormal)
       {
       this->SetStateToNormal();
       }
@@ -1186,7 +1187,7 @@ void vtkKWMultiColumnList::DeleteAllRows()
     {
     int nb_rows = this->GetNumberOfRows();
     int old_state = this->GetState();
-    if (this->GetState() != vtkKWTkOptions::StateNormal)
+    if (this->GetState() != vtkKWOptions::StateNormal)
       {
       this->SetStateToNormal();
       }
@@ -1337,7 +1338,7 @@ void vtkKWMultiColumnList::ActivateRow(int row_index)
   if (this->IsCreated())
     {
     int old_state = this->GetState();
-    if (this->GetState() != vtkKWTkOptions::StateNormal)
+    if (this->GetState() != vtkKWOptions::StateNormal)
       {
       this->SetStateToNormal();
       }
@@ -1498,7 +1499,7 @@ void vtkKWMultiColumnList::SetCellText(
   int row_index, int col_index, const char *text)
 {
   int old_state = this->GetState();
-  if (this->GetState() != vtkKWTkOptions::StateNormal)
+  if (this->GetState() != vtkKWOptions::StateNormal)
     {
     this->SetStateToNormal();
     }
@@ -1511,7 +1512,7 @@ void vtkKWMultiColumnList::SetCellTextAsInt(
   int row_index, int col_index, int value)
 {
   int old_state = this->GetState();
-  if (this->GetState() != vtkKWTkOptions::StateNormal)
+  if (this->GetState() != vtkKWOptions::StateNormal)
     {
     this->SetStateToNormal();
     }
@@ -1524,7 +1525,7 @@ void vtkKWMultiColumnList::SetCellTextAsDouble(
   int row_index, int col_index, double value)
 {
   int old_state = this->GetState();
-  if (this->GetState() != vtkKWTkOptions::StateNormal)
+  if (this->GetState() != vtkKWOptions::StateNormal)
     {
     this->SetStateToNormal();
     }
@@ -1538,7 +1539,7 @@ void vtkKWMultiColumnList::SetCellTextAsFormattedDouble(
   int row_index, int col_index, double value, int size)
 {
   int old_state = this->GetState();
-  if (this->GetState() != vtkKWTkOptions::StateNormal)
+  if (this->GetState() != vtkKWOptions::StateNormal)
     {
     this->SetStateToNormal();
     }
@@ -1610,7 +1611,7 @@ void vtkKWMultiColumnList::ActivateCell(int row_index, int col_index)
   if (this->IsCreated())
     {
     int old_state = this->GetState();
-    if (this->GetState() != vtkKWTkOptions::StateNormal)
+    if (this->GetState() != vtkKWOptions::StateNormal)
       {
       this->SetStateToNormal();
       }
@@ -1926,7 +1927,7 @@ void vtkKWMultiColumnList::SetCellImage(
   int row_index, int col_index, const char *image_name)
 {
   int old_state = this->GetState();
-  if (this->GetState() != vtkKWTkOptions::StateNormal)
+  if (this->GetState() != vtkKWOptions::StateNormal)
     {
     this->SetStateToNormal();
     }
@@ -2067,7 +2068,7 @@ void vtkKWMultiColumnList::SetCellWindowCommand(int row_index,
     char *command = NULL;
     this->SetObjectMethodCommand(&command, object, method);
     int old_state = this->GetState();
-    if (this->GetState() != vtkKWTkOptions::StateNormal)
+    if (this->GetState() != vtkKWOptions::StateNormal)
       {
       this->SetStateToNormal();
       }
@@ -2089,7 +2090,7 @@ void vtkKWMultiColumnList::SetCellWindowDestroyCommand(int row_index,
     char *command = NULL;
     this->SetObjectMethodCommand(&command, object, method);
     int old_state = this->GetState();
-    if (this->GetState() != vtkKWTkOptions::StateNormal)
+    if (this->GetState() != vtkKWOptions::StateNormal)
       {
       this->SetStateToNormal();
       }
@@ -2130,7 +2131,7 @@ void vtkKWMultiColumnList::RefreshCellWithWindowCommand(int row_index,
     {
     vtksys_stl::string command_str(command);
     int old_state = this->GetState();
-    if (this->GetState() != vtkKWTkOptions::StateNormal)
+    if (this->GetState() != vtkKWOptions::StateNormal)
       {
       this->SetStateToNormal();
       }
@@ -2150,7 +2151,7 @@ void vtkKWMultiColumnList::RefreshAllCellsWithWindowCommand()
   // from UpdateEnableState())
 
   int old_state = this->GetState();
-  if (this->GetState() != vtkKWTkOptions::StateNormal)
+  if (this->GetState() != vtkKWOptions::StateNormal)
     {
     this->SetStateToNormal();
     }
@@ -2653,7 +2654,7 @@ void vtkKWMultiColumnList::EditCell(int row_index, int col_index)
   if (this->IsCreated())
     {
     int old_state = this->GetState();
-    if (this->GetState() != vtkKWTkOptions::StateNormal)
+    if (this->GetState() != vtkKWOptions::StateNormal)
       {
       this->SetStateToNormal();
       }
@@ -3017,38 +3018,38 @@ int vtkKWMultiColumnList::GetBorderWidth()
 void vtkKWMultiColumnList::SetRelief(int relief)
 {
   this->SetConfigurationOption(
-    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+    "-relief", vtkKWOptions::GetReliefAsTkOptionValue(relief));
 }
 
 void vtkKWMultiColumnList::SetReliefToRaised()     
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+  this->SetRelief(vtkKWOptions::ReliefRaised); 
 };
 void vtkKWMultiColumnList::SetReliefToSunken() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+  this->SetRelief(vtkKWOptions::ReliefSunken); 
 };
 void vtkKWMultiColumnList::SetReliefToFlat() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+  this->SetRelief(vtkKWOptions::ReliefFlat); 
 };
 void vtkKWMultiColumnList::SetReliefToRidge() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+  this->SetRelief(vtkKWOptions::ReliefRidge); 
 };
 void vtkKWMultiColumnList::SetReliefToSolid() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+  this->SetRelief(vtkKWOptions::ReliefSolid); 
 };
 void vtkKWMultiColumnList::SetReliefToGroove() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+  this->SetRelief(vtkKWOptions::ReliefGroove); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWMultiColumnList::GetRelief()
 {
-  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+  return vtkKWOptions::GetReliefFromTkOptionValue(
     this->GetConfigurationOption("-relief"));
 }
 
@@ -3292,14 +3293,31 @@ void vtkKWMultiColumnList::SetCellSelectionForegroundColor(
 void vtkKWMultiColumnList::SetSelectionMode(int relief)
 {
   this->SetConfigurationOption(
-    "-selectmode", vtkKWTkOptions::GetSelectionModeAsTkOptionValue(relief));
+    "-selectmode", vtkKWOptions::GetSelectionModeAsTkOptionValue(relief));
   this->HasSelectionChanged();
 }
+
+void vtkKWMultiColumnList::SetSelectionModeToSingle() 
+{ 
+  this->SetSelectionMode(vtkKWOptions::SelectionModeSingle); 
+};
+void vtkKWMultiColumnList::SetSelectionModeToBrowse() 
+{ 
+  this->SetSelectionMode(vtkKWOptions::SelectionModeBrowse); 
+};
+void vtkKWMultiColumnList::SetSelectionModeToMultiple() 
+{ 
+  this->SetSelectionMode(vtkKWOptions::SelectionModeMultiple); 
+};
+void vtkKWMultiColumnList::SetSelectionModeToExtended() 
+{ 
+  this->SetSelectionMode(vtkKWOptions::SelectionModeExtended); 
+};
 
 //----------------------------------------------------------------------------
 int vtkKWMultiColumnList::GetSelectionMode()
 {
-  return vtkKWTkOptions::GetSelectionModeFromTkOptionValue(
+  return vtkKWOptions::GetSelectionModeFromTkOptionValue(
     this->GetConfigurationOption("-selectmode"));
 }
 
@@ -3363,7 +3381,7 @@ void vtkKWMultiColumnList::SelectRow(int row_index)
   if (this->IsCreated())
     {
     int old_state = this->GetState();
-    if (this->GetState() != vtkKWTkOptions::StateNormal)
+    if (this->GetState() != vtkKWOptions::StateNormal)
       {
       this->SetStateToNormal();
       }
@@ -3380,7 +3398,7 @@ void vtkKWMultiColumnList::DeselectRow(int row_index)
   if (this->IsCreated())
     {
     int old_state = this->GetState();
-    if (this->GetState() != vtkKWTkOptions::StateNormal)
+    if (this->GetState() != vtkKWOptions::StateNormal)
       {
       this->SetStateToNormal();
       }
@@ -3466,7 +3484,7 @@ void vtkKWMultiColumnList::SelectCell(int row_index, int col_index)
   if (this->IsCreated())
     {
     int old_state = this->GetState();
-    if (this->GetState() != vtkKWTkOptions::StateNormal)
+    if (this->GetState() != vtkKWOptions::StateNormal)
       {
       this->SetStateToNormal();
       }
@@ -3484,7 +3502,7 @@ void vtkKWMultiColumnList::DeselectCell(int row_index, int col_index)
   if (this->IsCreated())
     {
     int old_state = this->GetState();
-    if (this->GetState() != vtkKWTkOptions::StateNormal)
+    if (this->GetState() != vtkKWOptions::StateNormal)
       {
       this->SetStateToNormal();
       }
@@ -3554,7 +3572,7 @@ void vtkKWMultiColumnList::ClearSelection()
   if (this->IsCreated())
     {
     int old_state = this->GetState();
-    if (this->GetState() != vtkKWTkOptions::StateNormal)
+    if (this->GetState() != vtkKWOptions::StateNormal)
       {
       this->SetStateToNormal();
       }

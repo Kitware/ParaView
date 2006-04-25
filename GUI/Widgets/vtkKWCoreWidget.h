@@ -26,7 +26,6 @@
 #define __vtkKWCoreWidget_h
 
 #include "vtkKWWidget.h"
-#include "vtkKWTkOptions.h" // For option constants
 
 class vtkKWCoreWidgetInternals;
 
@@ -44,18 +43,15 @@ public:
   // Description:
   // Set/Get the -state option to "normal" (1) or "disabled" (0) or "readonly"
   // (2, if supported).
-  // Valid constants can be found in vtkKWTkOptions::StateType.
+  // Valid constants can be found in vtkKWOptions::StateType.
   // This should not be used directly, this is done by 
   // SetEnabled()/UpdateEnableState(). 
   // TODO: should be in protected:
   virtual void SetState(int);
   virtual int GetState();
-  virtual void SetStateToDisabled() 
-    { this->SetState(vtkKWTkOptions::StateDisabled); };
-  virtual void SetStateToNormal() 
-    { this->SetState(vtkKWTkOptions::StateNormal); };
-  virtual void SetStateToReadOnly() 
-    { this->SetState(vtkKWTkOptions::StateReadOnly); };
+  virtual void SetStateToDisabled();
+  virtual void SetStateToNormal();
+  virtual void SetStateToReadOnly();
 
   // Description:
   // Arranges for window to be displayed above all of its siblings in the

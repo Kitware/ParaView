@@ -17,11 +17,13 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWIcon.h"
+#include "vtkKWOptions.h"
+
 #include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCoreWidget );
-vtkCxxRevisionMacro(vtkKWCoreWidget, "1.18");
+vtkCxxRevisionMacro(vtkKWCoreWidget, "1.19");
 
 //----------------------------------------------------------------------------
 class vtkKWCoreWidgetInternals
@@ -219,7 +221,7 @@ const char* vtkKWCoreWidget::ConvertInternalStringToTclString(
     // Get the Tcl encoding name
 
     const char *tcl_encoding_name = 
-      vtkKWTkOptions::GetCharacterEncodingAsTclOptionValue(app_encoding);
+      vtkKWOptions::GetCharacterEncodingAsTclOptionValue(app_encoding);
 
     // Check if we have that encoding
     
@@ -340,19 +342,34 @@ void vtkKWCoreWidget::SetState(int state)
   if (this->IsAlive())
     {
     this->SetConfigurationOption(
-      "-state", vtkKWTkOptions::GetStateAsTkOptionValue(state));
+      "-state", vtkKWOptions::GetStateAsTkOptionValue(state));
     }
 }
+
+void vtkKWCoreWidget::SetStateToDisabled() 
+{ 
+  this->SetState(vtkKWOptions::StateDisabled); 
+};
+
+void vtkKWCoreWidget::SetStateToNormal() 
+{ 
+  this->SetState(vtkKWOptions::StateNormal); 
+};
+
+void vtkKWCoreWidget::SetStateToReadOnly() 
+{ 
+  this->SetState(vtkKWOptions::StateReadOnly); 
+};
 
 //----------------------------------------------------------------------------
 int vtkKWCoreWidget::GetState()
 {
   if (this->IsAlive())
     {
-    return vtkKWTkOptions::GetStateFromTkOptionValue(
+    return vtkKWOptions::GetStateFromTkOptionValue(
       this->GetConfigurationOption("-state"));
     }
-  return vtkKWTkOptions::StateUnknown;
+  return vtkKWOptions::StateUnknown;
 }
 
 //----------------------------------------------------------------------------

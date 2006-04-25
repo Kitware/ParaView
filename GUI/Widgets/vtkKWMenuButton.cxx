@@ -17,12 +17,13 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWIcon.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkKWOptions.h"
 
 #include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.36");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.37");
 
 //----------------------------------------------------------------------------
 vtkKWMenuButton::vtkKWMenuButton()
@@ -345,38 +346,38 @@ int vtkKWMenuButton::GetBorderWidth()
 void vtkKWMenuButton::SetRelief(int relief)
 {
   this->SetConfigurationOption(
-    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+    "-relief", vtkKWOptions::GetReliefAsTkOptionValue(relief));
 }
 
 void vtkKWMenuButton::SetReliefToRaised()     
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+  this->SetRelief(vtkKWOptions::ReliefRaised); 
 };
 void vtkKWMenuButton::SetReliefToSunken() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+  this->SetRelief(vtkKWOptions::ReliefSunken); 
 };
 void vtkKWMenuButton::SetReliefToFlat() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+  this->SetRelief(vtkKWOptions::ReliefFlat); 
 };
 void vtkKWMenuButton::SetReliefToRidge() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+  this->SetRelief(vtkKWOptions::ReliefRidge); 
 };
 void vtkKWMenuButton::SetReliefToSolid() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+  this->SetRelief(vtkKWOptions::ReliefSolid); 
 };
 void vtkKWMenuButton::SetReliefToGroove() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+  this->SetRelief(vtkKWOptions::ReliefGroove); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWMenuButton::GetRelief()
 {
-  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+  return vtkKWOptions::GetReliefFromTkOptionValue(
     this->GetConfigurationOption("-relief"));
 }
 
@@ -408,50 +409,50 @@ int vtkKWMenuButton::GetPadY()
 void vtkKWMenuButton::SetAnchor(int anchor)
 {
   this->SetConfigurationOption(
-    "-anchor", vtkKWTkOptions::GetAnchorAsTkOptionValue(anchor));
+    "-anchor", vtkKWOptions::GetAnchorAsTkOptionValue(anchor));
 }
 
 void vtkKWMenuButton::SetAnchorToNorth() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorNorth); 
+  this->SetAnchor(vtkKWOptions::AnchorNorth); 
 };
 void vtkKWMenuButton::SetAnchorToNorthEast() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorNorthEast); 
+  this->SetAnchor(vtkKWOptions::AnchorNorthEast); 
 };
 void vtkKWMenuButton::SetAnchorToEast() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorEast); 
+  this->SetAnchor(vtkKWOptions::AnchorEast); 
 };
 void vtkKWMenuButton::SetAnchorToSouthEast() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorSouthEast); 
+  this->SetAnchor(vtkKWOptions::AnchorSouthEast); 
 };
 void vtkKWMenuButton::SetAnchorToSouth() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorSouth); 
+  this->SetAnchor(vtkKWOptions::AnchorSouth); 
 };
 void vtkKWMenuButton::SetAnchorToSouthWest() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorSouthWest); 
+  this->SetAnchor(vtkKWOptions::AnchorSouthWest); 
 };
 void vtkKWMenuButton::SetAnchorToWest() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorWest); 
+  this->SetAnchor(vtkKWOptions::AnchorWest); 
 };
 void vtkKWMenuButton::SetAnchorToNorthWest() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorNorthWest); 
+  this->SetAnchor(vtkKWOptions::AnchorNorthWest); 
 };
 void vtkKWMenuButton::SetAnchorToCenter() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorCenter); 
+  this->SetAnchor(vtkKWOptions::AnchorCenter); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWMenuButton::GetAnchor()
 {
-  return vtkKWTkOptions::GetAnchorFromTkOptionValue(
+  return vtkKWOptions::GetAnchorFromTkOptionValue(
     this->GetConfigurationOption("-anchor"));
 }
 

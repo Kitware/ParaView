@@ -62,7 +62,7 @@ public:
   // Set/Get the justification mode.
   // When there are multiple lines of text displayed in a widget, this option
   // determines how the lines line up with each other.
-  // Valid constants can be found in vtkKWTkOptions::JustificationType.
+  // Valid constants can be found in vtkKWOptions::JustificationType.
   virtual void SetJustification(int);
   virtual int GetJustification();
   virtual void SetJustificationToLeft();
@@ -73,7 +73,7 @@ public:
   // Set/Get the anchoring.
   // Specifies how the information in a widget (e.g. text or a bitmap) is to
   // be displayed in the widget.
-  // Valid constants can be found in vtkKWTkOptions::AnchorType.
+  // Valid constants can be found in vtkKWOptions::AnchorType.
   virtual void SetAnchor(int);
   virtual int GetAnchor();
   virtual void SetAnchorToNorth();
@@ -150,7 +150,7 @@ public:
   // Set/Get the 3-D effect desired for the widget. 
   // The value indicates how the interior of the widget should appear
   // relative to its exterior. 
-  // Valid constants can be found in vtkKWTkOptions::ReliefType.
+  // Valid constants can be found in vtkKWOptions::ReliefType.
   virtual void SetRelief(int);
   virtual int GetRelief();
   virtual void SetReliefToRaised();

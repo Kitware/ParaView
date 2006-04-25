@@ -146,7 +146,7 @@ public:
   // Set/Get the 3-D effect desired for the widget. 
   // The value indicates how the interior of the widget should appear
   // relative to its exterior. 
-  // Valid constants can be found in vtkKWTkOptions::ReliefType.
+  // Valid constants can be found in vtkKWOptions::ReliefType.
   virtual void SetRelief(int);
   virtual int GetRelief();
   virtual void SetReliefToRaised();
@@ -174,7 +174,7 @@ public:
   // Set/Get the anchoring.
   // Specifies how the information in a widget (e.g. text or a bitmap) is to
   // be displayed in the widget.
-  // Valid constants can be found in vtkKWTkOptions::AnchorType.
+  // Valid constants can be found in vtkKWOptions::AnchorType.
   virtual void SetAnchor(int);
   virtual int GetAnchor();
   virtual void SetAnchorToNorth();
@@ -197,7 +197,7 @@ public:
   // is depressed when activated. This is the behavior typically exhibited by
   // the Bold, Italic, and Underline checkbuttons on the toolbar of a 
   // word-processor, for example. 
-  // Valid constants can be found in vtkKWTkOptions::ReliefType.
+  // Valid constants can be found in vtkKWOptions::ReliefType.
   virtual void SetOffRelief(int);
   virtual int GetOffRelief();
   virtual void SetOffReliefToRaised();
@@ -212,7 +212,7 @@ public:
   // Specifies an alternative relief for the button, to be used when the mouse
   // cursor is over the widget. This option can be used to make toolbar 
   // buttons, by configuring SetRelief to Flat and OverRelief to Raised.
-  // Valid constants can be found in vtkKWTkOptions::ReliefType.
+  // Valid constants can be found in vtkKWOptions::ReliefType.
   // If the value of this option is None, then no alternative relief is used
   // when the mouse cursor is over the checkbutton. 
   virtual void SetOverRelief(int);

@@ -225,7 +225,7 @@ SET(KWWidgets_SRCS
   vtkKWTextPropertyEditor.cxx
   vtkKWTheme.cxx
   vtkKWThumbWheel.cxx
-  vtkKWTkOptions.cxx
+  vtkKWOptions.cxx
   vtkKWTkUtilities.cxx
   vtkKWTkcon.cxx
   vtkKWToolbar.cxx

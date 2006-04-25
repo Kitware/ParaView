@@ -12,12 +12,14 @@
 
 =========================================================================*/
 #include "vtkKWMessage.h"
+
+#include "vtkKWOptions.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWIcon.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessage );
-vtkCxxRevisionMacro(vtkKWMessage, "1.4");
+vtkCxxRevisionMacro(vtkKWMessage, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWMessage::vtkKWMessage()
@@ -161,38 +163,38 @@ int vtkKWMessage::GetBorderWidth()
 void vtkKWMessage::SetRelief(int relief)
 {
   this->SetConfigurationOption(
-    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+    "-relief", vtkKWOptions::GetReliefAsTkOptionValue(relief));
 }
 
 void vtkKWMessage::SetReliefToRaised()     
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+  this->SetRelief(vtkKWOptions::ReliefRaised); 
 };
 void vtkKWMessage::SetReliefToSunken() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+  this->SetRelief(vtkKWOptions::ReliefSunken); 
 };
 void vtkKWMessage::SetReliefToFlat() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+  this->SetRelief(vtkKWOptions::ReliefFlat); 
 };
 void vtkKWMessage::SetReliefToRidge() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+  this->SetRelief(vtkKWOptions::ReliefRidge); 
 };
 void vtkKWMessage::SetReliefToSolid() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+  this->SetRelief(vtkKWOptions::ReliefSolid); 
 };
 void vtkKWMessage::SetReliefToGroove() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+  this->SetRelief(vtkKWOptions::ReliefGroove); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWMessage::GetRelief()
 {
-  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+  return vtkKWOptions::GetReliefFromTkOptionValue(
     this->GetConfigurationOption("-relief"));
 }
 
@@ -249,26 +251,26 @@ void vtkKWMessage::SetJustification(int justification)
 {
   this->SetConfigurationOption(
     "-justify", 
-    vtkKWTkOptions::GetJustificationAsTkOptionValue(justification));
+    vtkKWOptions::GetJustificationAsTkOptionValue(justification));
 }
 
 void vtkKWMessage::SetJustificationToLeft() 
 { 
-  this->SetJustification(vtkKWTkOptions::JustificationLeft); 
+  this->SetJustification(vtkKWOptions::JustificationLeft); 
 };
 void vtkKWMessage::SetJustificationToCenter() 
 { 
-  this->SetJustification(vtkKWTkOptions::JustificationCenter); 
+  this->SetJustification(vtkKWOptions::JustificationCenter); 
 };
 void vtkKWMessage::SetJustificationToRight() 
 { 
-  this->SetJustification(vtkKWTkOptions::JustificationRight); 
+  this->SetJustification(vtkKWOptions::JustificationRight); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWMessage::GetJustification()
 {
-  return vtkKWTkOptions::GetJustificationFromTkOptionValue(
+  return vtkKWOptions::GetJustificationFromTkOptionValue(
     this->GetConfigurationOption("-justify"));
 }
 
@@ -276,50 +278,50 @@ int vtkKWMessage::GetJustification()
 void vtkKWMessage::SetAnchor(int anchor)
 {
   this->SetConfigurationOption(
-    "-anchor", vtkKWTkOptions::GetAnchorAsTkOptionValue(anchor));
+    "-anchor", vtkKWOptions::GetAnchorAsTkOptionValue(anchor));
 }
 
 void vtkKWMessage::SetAnchorToNorth() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorNorth); 
+  this->SetAnchor(vtkKWOptions::AnchorNorth); 
 };
 void vtkKWMessage::SetAnchorToNorthEast() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorNorthEast); 
+  this->SetAnchor(vtkKWOptions::AnchorNorthEast); 
 };
 void vtkKWMessage::SetAnchorToEast() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorEast); 
+  this->SetAnchor(vtkKWOptions::AnchorEast); 
 };
 void vtkKWMessage::SetAnchorToSouthEast() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorSouthEast); 
+  this->SetAnchor(vtkKWOptions::AnchorSouthEast); 
 };
 void vtkKWMessage::SetAnchorToSouth() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorSouth); 
+  this->SetAnchor(vtkKWOptions::AnchorSouth); 
 };
 void vtkKWMessage::SetAnchorToSouthWest() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorSouthWest); 
+  this->SetAnchor(vtkKWOptions::AnchorSouthWest); 
 };
 void vtkKWMessage::SetAnchorToWest() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorWest); 
+  this->SetAnchor(vtkKWOptions::AnchorWest); 
 };
 void vtkKWMessage::SetAnchorToNorthWest() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorNorthWest); 
+  this->SetAnchor(vtkKWOptions::AnchorNorthWest); 
 };
 void vtkKWMessage::SetAnchorToCenter() 
 { 
-  this->SetAnchor(vtkKWTkOptions::AnchorCenter); 
+  this->SetAnchor(vtkKWOptions::AnchorCenter); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWMessage::GetAnchor()
 {
-  return vtkKWTkOptions::GetAnchorFromTkOptionValue(
+  return vtkKWOptions::GetAnchorFromTkOptionValue(
     this->GetConfigurationOption("-anchor"));
 }
 

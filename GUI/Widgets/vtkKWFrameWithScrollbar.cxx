@@ -11,15 +11,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWFrameWithScrollbar.h"
+
+#include "vtkKWApplication.h"
+#include "vtkKWOptions.h"
 #include "vtkObjectFactory.h"
 
 #include "Utilities/BWidgets/vtkKWBWidgetsInit.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithScrollbar );
-vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.11");
+vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.12");
 
 //----------------------------------------------------------------------------
 vtkKWFrameWithScrollbar::vtkKWFrameWithScrollbar()
@@ -157,38 +159,38 @@ int vtkKWFrameWithScrollbar::GetBorderWidth()
 void vtkKWFrameWithScrollbar::SetRelief(int relief)
 {
   this->SetConfigurationOption(
-    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+    "-relief", vtkKWOptions::GetReliefAsTkOptionValue(relief));
 }
 
 void vtkKWFrameWithScrollbar::SetReliefToRaised()     
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+  this->SetRelief(vtkKWOptions::ReliefRaised); 
 };
 void vtkKWFrameWithScrollbar::SetReliefToSunken() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+  this->SetRelief(vtkKWOptions::ReliefSunken); 
 };
 void vtkKWFrameWithScrollbar::SetReliefToFlat() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+  this->SetRelief(vtkKWOptions::ReliefFlat); 
 };
 void vtkKWFrameWithScrollbar::SetReliefToRidge() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+  this->SetRelief(vtkKWOptions::ReliefRidge); 
 };
 void vtkKWFrameWithScrollbar::SetReliefToSolid() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+  this->SetRelief(vtkKWOptions::ReliefSolid); 
 };
 void vtkKWFrameWithScrollbar::SetReliefToGroove() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+  this->SetRelief(vtkKWOptions::ReliefGroove); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWFrameWithScrollbar::GetRelief()
 {
-  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+  return vtkKWOptions::GetReliefFromTkOptionValue(
     this->GetConfigurationOption("-relief"));
 }
 

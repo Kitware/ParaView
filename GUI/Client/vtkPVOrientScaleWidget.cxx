@@ -40,7 +40,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.40");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.41");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScalarProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMVectorProperty, vtkSMProperty);
@@ -460,8 +460,7 @@ void vtkPVOrientScaleWidget::UpdateModeMenus()
   if (numScalars == 0)
     {
     // disabled
-    scaleMenu->SetItemState(
-      scaleMenu->GetIndexOfItem("Scalar"), vtkKWTkOptions::StateDisabled);
+    scaleMenu->SetItemStateToDisabled("Scalar");
     if (!strcmp(scaleMode, "Scalar"))
       {
       if (numVectors == 0)
@@ -478,19 +477,15 @@ void vtkPVOrientScaleWidget::UpdateModeMenus()
   else
     {
     // normal
-    scaleMenu->SetItemState(
-      scaleMenu->GetIndexOfItem("Scalar"), vtkKWTkOptions::StateNormal);
+    scaleMenu->SetItemStateToNormal("Scalar");
     }
   
   if (numVectors == 0)
     {
     // disabled
-    orientMenu->SetItemState(scaleMenu->GetIndexOfItem("Vector"), 
-                             vtkKWTkOptions::StateDisabled);
-    scaleMenu->SetItemState(scaleMenu->GetIndexOfItem("Vector Magnitude"), 
-                            vtkKWTkOptions::StateDisabled);
-    scaleMenu->SetItemState(scaleMenu->GetIndexOfItem("Vector Components"), 
-                            vtkKWTkOptions::StateDisabled);
+    orientMenu->SetItemStateToDisabled("Vector");
+    scaleMenu->SetItemStateToDisabled("Vector Magnitude");
+    scaleMenu->SetItemStateToDisabled("Vector Components");
     if (!strcmp(this->OrientModeMenu->GetValue(), "Vector"))
       {
       this->OrientModeMenu->SetValue("Off");
@@ -513,9 +508,9 @@ void vtkPVOrientScaleWidget::UpdateModeMenus()
   else
     {
     // normal
-    orientMenu->SetItemState("Vector", vtkKWTkOptions::StateNormal);
-    scaleMenu->SetItemState("Vector Magnitude", vtkKWTkOptions::StateNormal);
-    scaleMenu->SetItemState("Vector Components", vtkKWTkOptions::StateNormal);
+    orientMenu->SetItemStateToNormal("Vector");
+    scaleMenu->SetItemStateToNormal("Vector Magnitude");
+    scaleMenu->SetItemStateToNormal("Vector Components");
     }
   
   this->UpdateScaleFactor();

@@ -12,11 +12,13 @@
 
 =========================================================================*/
 #include "vtkKWScrollbar.h"
+
+#include "vtkKWOptions.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWScrollbar);
-vtkCxxRevisionMacro(vtkKWScrollbar, "1.5");
+vtkCxxRevisionMacro(vtkKWScrollbar, "1.6");
 
 //----------------------------------------------------------------------------
 void vtkKWScrollbar::Create()
@@ -35,13 +37,22 @@ void vtkKWScrollbar::Create()
 void vtkKWScrollbar::SetOrientation(int orientation)
 {
   this->SetConfigurationOption(
-    "-orient", vtkKWTkOptions::GetOrientationAsTkOptionValue(orientation));
+    "-orient", vtkKWOptions::GetOrientationAsTkOptionValue(orientation));
 }
+
+void vtkKWScrollbar::SetOrientationToHorizontal() 
+{ 
+  this->SetOrientation(vtkKWOptions::OrientationHorizontal); 
+};
+void vtkKWScrollbar::SetOrientationToVertical() 
+{ 
+  this->SetOrientation(vtkKWOptions::OrientationVertical); 
+};
 
 //----------------------------------------------------------------------------
 int vtkKWScrollbar::GetOrientation()
 {
-  return vtkKWTkOptions::GetOrientationFromTkOptionValue(
+  return vtkKWOptions::GetOrientationFromTkOptionValue(
     this->GetConfigurationOption("-orient"));
 }
 
@@ -139,38 +150,38 @@ int vtkKWScrollbar::GetBorderWidth()
 void vtkKWScrollbar::SetRelief(int relief)
 {
   this->SetConfigurationOption(
-    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+    "-relief", vtkKWOptions::GetReliefAsTkOptionValue(relief));
 }
 
 void vtkKWScrollbar::SetReliefToRaised()     
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+  this->SetRelief(vtkKWOptions::ReliefRaised); 
 };
 void vtkKWScrollbar::SetReliefToSunken() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+  this->SetRelief(vtkKWOptions::ReliefSunken); 
 };
 void vtkKWScrollbar::SetReliefToFlat() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+  this->SetRelief(vtkKWOptions::ReliefFlat); 
 };
 void vtkKWScrollbar::SetReliefToRidge() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+  this->SetRelief(vtkKWOptions::ReliefRidge); 
 };
 void vtkKWScrollbar::SetReliefToSolid() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+  this->SetRelief(vtkKWOptions::ReliefSolid); 
 };
 void vtkKWScrollbar::SetReliefToGroove() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+  this->SetRelief(vtkKWOptions::ReliefGroove); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWScrollbar::GetRelief()
 {
-  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+  return vtkKWOptions::GetReliefFromTkOptionValue(
     this->GetConfigurationOption("-relief"));
 }
 

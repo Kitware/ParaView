@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.34");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.35");
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::vtkKWLookmarkFolder()
@@ -139,7 +139,7 @@ void vtkKWLookmarkFolder::Create()
 
   this->NameField->SetParent(this->LabelFrame->GetLabelFrame());
   this->NameField->Create();
-  this->NameField->SetState(vtkKWTkOptions::StateNormal);
+  this->NameField->SetStateToNormal();
 
   this->Pack();
 

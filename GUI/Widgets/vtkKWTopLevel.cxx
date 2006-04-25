@@ -13,6 +13,7 @@
 =========================================================================*/
 #include "vtkKWTopLevel.h"
 
+#include "vtkKWOptions.h"
 #include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
@@ -22,7 +23,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.26");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.27");
 
 //----------------------------------------------------------------------------
 vtkKWTopLevel::vtkKWTopLevel()
@@ -622,38 +623,38 @@ int vtkKWTopLevel::GetBorderWidth()
 void vtkKWTopLevel::SetRelief(int relief)
 {
   this->SetConfigurationOption(
-    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+    "-relief", vtkKWOptions::GetReliefAsTkOptionValue(relief));
 }
 
 void vtkKWTopLevel::SetReliefToRaised()     
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+  this->SetRelief(vtkKWOptions::ReliefRaised); 
 };
 void vtkKWTopLevel::SetReliefToSunken() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+  this->SetRelief(vtkKWOptions::ReliefSunken); 
 };
 void vtkKWTopLevel::SetReliefToFlat() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+  this->SetRelief(vtkKWOptions::ReliefFlat); 
 };
 void vtkKWTopLevel::SetReliefToRidge() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+  this->SetRelief(vtkKWOptions::ReliefRidge); 
 };
 void vtkKWTopLevel::SetReliefToSolid() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+  this->SetRelief(vtkKWOptions::ReliefSolid); 
 };
 void vtkKWTopLevel::SetReliefToGroove() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+  this->SetRelief(vtkKWOptions::ReliefGroove); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWTopLevel::GetRelief()
 {
-  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+  return vtkKWOptions::GetReliefFromTkOptionValue(
     this->GetConfigurationOption("-relief"));
 }
 

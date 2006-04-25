@@ -33,8 +33,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWTree.h"
+
+#include "vtkKWApplication.h"
+#include "vtkKWOptions.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
 
@@ -46,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.19");
+vtkCxxRevisionMacro(vtkKWTree, "1.20");
 
 //----------------------------------------------------------------------------
 class vtkKWTreeInternals
@@ -64,7 +66,7 @@ public:
 //----------------------------------------------------------------------------
 vtkKWTree::vtkKWTree()
 {
-  this->SelectionMode = vtkKWTkOptions::SelectionModeSingle;
+  this->SelectionMode = vtkKWOptions::SelectionModeSingle;
   this->SelectionChangedCommand = NULL;
 
   this->Internals = new vtkKWTreeInternals;
@@ -120,7 +122,7 @@ void vtkKWTree::SelectionCallback()
     }
   in_SelectionCallback = 1;
 
-  if (this->SelectionMode == vtkKWTkOptions::SelectionModeSingle)
+  if (this->SelectionMode == vtkKWOptions::SelectionModeSingle)
     {
     vtksys_stl::vector<vtksys_stl::string> sel_nodes;
     vtksys::SystemTools::Split(this->GetSelection(), sel_nodes, ' ');
@@ -144,8 +146,8 @@ void vtkKWTree::SelectionCallback()
 //----------------------------------------------------------------------------
 void vtkKWTree::SetSelectionMode(int arg)
 {
-  if ((arg != vtkKWTkOptions::SelectionModeSingle &&
-       arg != vtkKWTkOptions::SelectionModeMultiple) ||
+  if ((arg != vtkKWOptions::SelectionModeSingle &&
+       arg != vtkKWOptions::SelectionModeMultiple) ||
       arg == this->SelectionMode)
     {
     return;
@@ -155,7 +157,7 @@ void vtkKWTree::SetSelectionMode(int arg)
 
   // If we are switching to single mode, select the first node only
 
-  if (this->SelectionMode == vtkKWTkOptions::SelectionModeSingle &&
+  if (this->SelectionMode == vtkKWOptions::SelectionModeSingle &&
       this->HasSelection())
     {
     vtksys_stl::vector<vtksys_stl::string> sel_nodes;
@@ -163,6 +165,15 @@ void vtkKWTree::SetSelectionMode(int arg)
     this->SelectSingleNode(sel_nodes[0].c_str());
     }
 }
+
+void vtkKWTree::SetSelectionModeToSingle() 
+{ 
+  this->SetSelectionMode(vtkKWOptions::SelectionModeSingle); 
+};
+void vtkKWTree::SetSelectionModeToMultiple() 
+{ 
+  this->SetSelectionMode(vtkKWOptions::SelectionModeMultiple); 
+};
 
 //----------------------------------------------------------------------------
 void vtkKWTree::SetSelectionChangedCommand(
@@ -635,38 +646,38 @@ int vtkKWTree::GetBorderWidth()
 void vtkKWTree::SetRelief(int relief)
 {
   this->SetConfigurationOption(
-    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+    "-relief", vtkKWOptions::GetReliefAsTkOptionValue(relief));
 }
 
 void vtkKWTree::SetReliefToRaised()     
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+  this->SetRelief(vtkKWOptions::ReliefRaised); 
 };
 void vtkKWTree::SetReliefToSunken() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+  this->SetRelief(vtkKWOptions::ReliefSunken); 
 };
 void vtkKWTree::SetReliefToFlat() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+  this->SetRelief(vtkKWOptions::ReliefFlat); 
 };
 void vtkKWTree::SetReliefToRidge() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+  this->SetRelief(vtkKWOptions::ReliefRidge); 
 };
 void vtkKWTree::SetReliefToSolid() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+  this->SetRelief(vtkKWOptions::ReliefSolid); 
 };
 void vtkKWTree::SetReliefToGroove() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+  this->SetRelief(vtkKWOptions::ReliefGroove); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWTree::GetRelief()
 {
-  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+  return vtkKWOptions::GetReliefFromTkOptionValue(
     this->GetConfigurationOption("-relief"));
 }
 

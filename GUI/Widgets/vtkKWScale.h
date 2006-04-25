@@ -109,7 +109,7 @@ public:
   // Set/Get the 3-D effect desired for the widget. 
   // The value indicates how the interior of the widget should appear
   // relative to its exterior. 
-  // Valid constants can be found in vtkKWTkOptions::ReliefType.
+  // Valid constants can be found in vtkKWOptions::ReliefType.
   virtual void SetRelief(int);
   virtual int GetRelief();
   virtual void SetReliefToRaised();
@@ -124,7 +124,7 @@ public:
   // For widgets that can lay themselves out with either a horizontal or
   // vertical orientation, such as scales, this option specifies which 
   // orientation should be used. 
-  // Valid constants can be found in vtkKWTkOptions::OrientationType.
+  // Valid constants can be found in vtkKWOptions::OrientationType.
   virtual void SetOrientation(int);
   vtkGetMacro(Orientation, int);
   virtual void SetOrientationToHorizontal();

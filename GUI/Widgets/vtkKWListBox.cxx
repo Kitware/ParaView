@@ -14,10 +14,11 @@
 #include "vtkKWListBox.h"
 
 #include "vtkObjectFactory.h"
+#include "vtkKWOptions.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWListBox);
-vtkCxxRevisionMacro(vtkKWListBox, "1.50");
+vtkCxxRevisionMacro(vtkKWListBox, "1.51");
 
 //----------------------------------------------------------------------------
 vtkKWListBox::vtkKWListBox()
@@ -288,30 +289,30 @@ void vtkKWListBox::DeleteAll()
 void vtkKWListBox::SetSelectionMode(int relief)
 {
   this->SetConfigurationOption(
-    "-selectmode", vtkKWTkOptions::GetSelectionModeAsTkOptionValue(relief));
+    "-selectmode", vtkKWOptions::GetSelectionModeAsTkOptionValue(relief));
 }
 
 void vtkKWListBox::SetSelectionModeToSingle() 
 { 
-  this->SetSelectionMode(vtkKWTkOptions::SelectionModeSingle); 
+  this->SetSelectionMode(vtkKWOptions::SelectionModeSingle); 
 };
 void vtkKWListBox::SetSelectionModeToBrowse() 
 { 
-  this->SetSelectionMode(vtkKWTkOptions::SelectionModeBrowse); 
+  this->SetSelectionMode(vtkKWOptions::SelectionModeBrowse); 
 };
 void vtkKWListBox::SetSelectionModeToMultiple() 
 { 
-  this->SetSelectionMode(vtkKWTkOptions::SelectionModeMultiple); 
+  this->SetSelectionMode(vtkKWOptions::SelectionModeMultiple); 
 };
 void vtkKWListBox::SetSelectionModeToExtended() 
 { 
-  this->SetSelectionMode(vtkKWTkOptions::SelectionModeExtended); 
+  this->SetSelectionMode(vtkKWOptions::SelectionModeExtended); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWListBox::GetSelectionMode()
 {
-  return vtkKWTkOptions::GetSelectionModeFromTkOptionValue(
+  return vtkKWOptions::GetSelectionModeFromTkOptionValue(
     this->GetConfigurationOption("-selectmode"));
 }
 
@@ -409,38 +410,38 @@ int vtkKWListBox::GetBorderWidth()
 void vtkKWListBox::SetRelief(int relief)
 {
   this->SetConfigurationOption(
-    "-relief", vtkKWTkOptions::GetReliefAsTkOptionValue(relief));
+    "-relief", vtkKWOptions::GetReliefAsTkOptionValue(relief));
 }
 
 void vtkKWListBox::SetReliefToRaised()     
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRaised); 
+  this->SetRelief(vtkKWOptions::ReliefRaised); 
 };
 void vtkKWListBox::SetReliefToSunken() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSunken); 
+  this->SetRelief(vtkKWOptions::ReliefSunken); 
 };
 void vtkKWListBox::SetReliefToFlat() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefFlat); 
+  this->SetRelief(vtkKWOptions::ReliefFlat); 
 };
 void vtkKWListBox::SetReliefToRidge() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefRidge); 
+  this->SetRelief(vtkKWOptions::ReliefRidge); 
 };
 void vtkKWListBox::SetReliefToSolid() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefSolid); 
+  this->SetRelief(vtkKWOptions::ReliefSolid); 
 };
 void vtkKWListBox::SetReliefToGroove() 
 { 
-  this->SetRelief(vtkKWTkOptions::ReliefGroove); 
+  this->SetRelief(vtkKWOptions::ReliefGroove); 
 };
 
 //----------------------------------------------------------------------------
 int vtkKWListBox::GetRelief()
 {
-  return vtkKWTkOptions::GetReliefFromTkOptionValue(
+  return vtkKWOptions::GetReliefFromTkOptionValue(
     this->GetConfigurationOption("-relief"));
 }
 
