@@ -743,7 +743,7 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
 void pqMainWindow::onFileOpenServerState()
 {
   pqFileDialog *fileDialog = new pqFileDialog(new pqLocalFileDialogModel(),
-      tr("Open Server State File:"), this, "FileOpenDialog");
+      tr("Open Server State File:"), this, "FileOpenServerStateDialog");
   fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(fileDialog, SIGNAL(filesSelected(const QStringList&)),
       this, SLOT(onFileOpenServerState(const QStringList&)));
@@ -818,7 +818,7 @@ void pqMainWindow::onFileOpenServerState(const QStringList& Files)
 
 void pqMainWindow::onFileSaveServerState()
 {
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save Server State:"), this, "FileSaveDialog");
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save Server State:"), this, "FileSaveServerStateDialog");
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileSaveServerState(const QStringList&)));
   file_dialog->show();
@@ -887,7 +887,7 @@ void pqMainWindow::onFileSaveScreenshot()
     return;
     }
 
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save Screenshot:"), this, "FileSaveDialog");
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save Screenshot:"), this, "FileSaveScreenshotDialog");
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileSaveScreenshot(const QStringList&)));
   file_dialog->show();
@@ -1181,7 +1181,7 @@ void pqMainWindow::onValidateWidgetNames()
 
 void pqMainWindow::onRecordTest()
 {
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Record Test:"), this, "FileSaveDialog");
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Record Test:"), this, "ToolsRecordTestDialog");
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onRecordTest(const QStringList&)));
   file_dialog->show();
@@ -1198,7 +1198,7 @@ void pqMainWindow::onRecordTest(const QStringList& Files)
 
 void pqMainWindow::onPlayTest()
 {
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Play Test:"), this, "FileOpenDialog");
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Play Test:"), this, "ToolsPlayTestDialog");
   file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onPlayTest(const QStringList&)));
   file_dialog->show();
