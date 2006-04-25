@@ -549,8 +549,8 @@ protected:
   // Description:
   // These are hooks that child classes can use to save off any state
   // they have that are not contained within the Client Side Widgets.
-  virtual void AdditionalBatchSave(ofstream *file) {};
-  virtual void AdditionalStateSave(ofstream *file) {};
+  virtual void AdditionalBatchSave(ofstream *vtkNotUsed(file)) {};
+  virtual void AdditionalStateSave(ofstream *vtkNotUsed(file)) {};
 
   virtual void InitializeWidgets();  
 
