@@ -93,7 +93,11 @@ void pqSignalAdaptorColor::setColor(const QVariant& var)
       {
       a = qRound(rgba[3].toDouble() * 255.0);
       }
-    this->parent()->setProperty(this->PropertyName, QColor(r,g,b,a));
+    QColor newColor(r,g,b,a);
+    if(this->parent()->property(this->PropertyName) != newColor)
+      {
+      this->parent()->setProperty(this->PropertyName, QColor(r,g,b,a));
+      }
     }
 }
 

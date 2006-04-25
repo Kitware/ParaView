@@ -89,8 +89,12 @@ public:
 
   /// get the pairs of selections for a selection property
   static QList<QList<QVariant> > getSelectionProperty(vtkSMProxy* Proxy, vtkSMProperty* Property);
+  /// get the pairs of selections for a selection property
+  static QList<QVariant> getSelectionProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index);
   /// set the pairs of selections for a selection property
   static void setSelectionProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QList<QList<QVariant> > Value);
+  /// set the pairs of selections for a selection property
+  static void setSelectionProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index, QList<QVariant> Value);
   /// get the possible names for the selection property
   static QList<QVariant> getSelectionPropertyDomain(vtkSMProperty* Property);
   

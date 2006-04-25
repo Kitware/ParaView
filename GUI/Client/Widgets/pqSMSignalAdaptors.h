@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqObjectEditor.h
+   Module:    pqSMSignalAdaptors.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,58 +30,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqObjectEditor_h
-#define _pqObjectEditor_h
+#ifndef pq_SMSignalAdaptors_h
+#define pq_SMSignalAdaptors_h
 
-#include <QWidget>
-#include "pqSMProxy.h"
-#include "pqPropertyManager.h"
-class QGridLayout;
+#include <QObject>
+#include <QVariant>
+#include "pqWidgetsExport.h"
 
-/// Widget which provides an editor for editing properties of a proxy
-class pqObjectEditor : public QWidget
+
+/// signal adaptor to allow getting/setting/observing of a pseudo vtkSMProxy property
+class PQWIDGETS_EXPORT pqSignalAdaptorProxy : public QObject
 {
   Q_OBJECT
+  Q_PROPERTY(QVariant proxy READ proxy WRITE setProxy)
 public:
-  /// constructor
-  pqObjectEditor(QWidget* p);
-  /// destructor
-  ~pqObjectEditor();
-
-  /// set the proxy to display properties for
-  void setProxy(pqSMProxy proxy);
-  /// get the proxy for which properties are displayed
-  pqSMProxy proxy();
-  
-  /// populate widgets with properties from the server manager
-  static void linkServerManagerProperties(pqSMProxy proxy, QWidget* w);
-  /// set the properties in the server manager with properties in the widgets
-  static void unlinkServerManagerProperties(pqSMProxy proxy, QWidget* w);
-
-  /// hint for sizing this widget
-  QSize sizeHint() const;
-
+  /// constructor requires a QObject, the name of the QString proxy name, and a signal for property changes
+  pqSignalAdaptorProxy(QObject* p, const char* Property, const char* signal);
+  /// get the proxy
+  QVariant proxy() const;
+signals:
+  /// signal the proxy changed
+  void proxyChanged(const QVariant&);
 public slots:
-  /// accept the changes made to the properties
-  /// changes will be propogated down to the server manager
-  void accept();
-  /// reset the changes made
-  /// editor will query properties from the server manager
-  void reset();
-  
-  
+  /// set the proxy
+  void setProxy(const QVariant&);
+protected slots:
+  void handleProxyChanged();
 protected:
-
-  /// populate this widget with widgets to represent the properties
-  void createWidgets();
-  /// delete the widgets representing properties
-  void deleteWidgets();
-
-  pqSMProxy Proxy;
-  QGridLayout* PanelLayout;
-
-  static pqPropertyManager PropertyManager;
-
+  QByteArray PropertyName;
 };
 
 #endif

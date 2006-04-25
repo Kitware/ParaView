@@ -45,8 +45,10 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineListModel.h
   pqPipelineListWidget.h
   pqPropertyLinks.h
+  pqPropertyManager.h
   pqRenderViewEditor.h
   pqSMAdaptor.h
+  pqSMSignalAdaptors.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
   pqVariableSelectorWidget.h
@@ -145,12 +147,16 @@ ADD_LIBRARY(pqWidgets
   pqRenderViewEditor.h
   pqPropertyLinks.cxx
   pqPropertyLinks.h
+  pqPropertyManager.cxx
+  pqPropertyManager.h
   pqSMAdaptor.cxx
   pqSMAdaptor.h
   pqSMMultiView.cxx
   pqSMMultiView.h
   pqSMProxy.cxx
   pqSMProxy.h
+  pqSMSignalAdaptors.cxx
+  pqSMSignalAdaptors.h
   pqServer.cxx
   pqServer.h
   pqServerBrowser.cxx

@@ -398,6 +398,69 @@ QList<QList<QVariant> > pqSMAdaptor::getSelectionProperty(vtkSMProxy* Proxy, vtk
   return val;
 }
 
+QList<QVariant> pqSMAdaptor::getSelectionProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index)
+{
+  QList<QVariant> val;
+
+  vtkSMPropertyAdaptor* adaptor = vtkSMPropertyAdaptor::New();
+  adaptor->SetProperty(Property);
+  if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::SELECTION)
+    {
+    int numElems = adaptor->GetNumberOfSelectionElements();
+    if(Index < numElems)
+      {
+      QString name = adaptor->GetSelectionName(Index);
+      QVariant var;
+      vtkSMStringVectorProperty* infoProp = vtkSMStringVectorProperty::SafeDownCast(Property->GetInformationProperty());
+      if(infoProp)
+        {
+        Proxy->UpdatePropertyInformation(infoProp);
+        int exists;
+        int idx = infoProp->GetElementIndex(name.toAscii().data(), exists);
+        var = infoProp->GetElement(idx+1);
+        }
+      else
+        {
+        var = adaptor->GetSelectionValue(Index);
+        }
+      
+      // Convert the variant to the appropriate type.
+      switch(adaptor->GetElementType())
+        {
+        case vtkSMPropertyAdaptor::INT:
+          {
+          if(var.canConvert(QVariant::Int))
+            {
+            var.convert(QVariant::Int);
+            }
+          }
+          break;
+        case vtkSMPropertyAdaptor::DOUBLE:
+          {
+          if(var.canConvert(QVariant::Double))
+            {
+            var.convert(QVariant::Double);
+            }
+          }
+          break;
+        case vtkSMPropertyAdaptor::BOOLEAN:
+          {
+          if(var.canConvert(QVariant::Bool))
+            {
+            var.convert(QVariant::Bool);
+            }
+          }
+          break;
+        }
+      val.push_back(name);
+      val.push_back(var);
+      }
+    }
+  adaptor->Delete();
+
+  return val;
+}
+
 void pqSMAdaptor::setSelectionProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QList<QList<QVariant> > Value)
 {
   vtkSMPropertyAdaptor* adaptor = vtkSMPropertyAdaptor::New();
@@ -416,6 +479,47 @@ void pqSMAdaptor::setSelectionProperty(vtkSMProxy* Proxy, vtkSMProperty* Propert
 
       QString name = l[0].toString();
       QVariant value = l[1];
+      if(value.type() == QVariant::Bool)
+        {
+        value = value.toInt();
+        }
+
+      for(int i=0; i<domain.size(); i++)
+        {
+        if(domain[i] == name)
+          {
+          adaptor->SetSelectionValue(i, value.toString().toAscii().data());
+          }
+        }
+      
+      /*
+      pqSMAdaptorInternal::SettingMultipleProperty = true;
+      adaptor->SetRangeValue(0, name.toAscii().data());
+      adaptor->SetRangeValue(1, value.toString().toAscii().data());
+      */
+      Proxy->UpdateVTKObjects();
+      /*
+      pqSMAdaptorInternal::SettingMultipleProperty = false;
+      Property->Modified();  // let ourselves know it was modified, since we blocked it previously
+      */
+      }
+    }
+  adaptor->Delete();
+}
+
+void pqSMAdaptor::setSelectionProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, int vtkNotUsed(Index), QList<QVariant> Value)
+{
+  vtkSMPropertyAdaptor* adaptor = vtkSMPropertyAdaptor::New();
+  adaptor->SetProperty(Property);
+  if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::SELECTION)
+    {
+
+    QList<QVariant> domain = pqSMAdaptor::getSelectionPropertyDomain(Property);
+
+    if(Value.size() == 2)
+      {
+      QString name = Value[0].toString();
+      QVariant value = Value[1];
       if(value.type() == QVariant::Bool)
         {
         value = value.toInt();

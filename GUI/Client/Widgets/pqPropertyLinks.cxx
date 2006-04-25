@@ -53,6 +53,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqPropertyLinksConnection::pqInternal
 {
 public:
+  pqInternal()
+  {
+    this->SettingValue = false;
+  }
+
   pqSMAdaptor::PropertyType Type;
 
   vtkSMProxy* Proxy;
@@ -61,6 +66,7 @@ public:
 
   QPointer<QObject> QtObject;
   QByteArray QtProperty;
+  bool SettingValue;
 };
 
 class pqPropertyLinks::pqInternal
@@ -171,6 +177,12 @@ bool pqPropertyLinksConnection::operator<(pqPropertyLinksConnection const& other
 
 void pqPropertyLinksConnection::smLinkedPropertyChanged() const
 {
+  if(this->Internal->SettingValue)
+    {
+    return;
+    }
+  this->Internal->SettingValue = true;
+
   if(this->Internal->QtObject)
     {
     // get the property of the object
@@ -178,6 +190,16 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged() const
     QVariant prop;
     switch(this->Internal->Type)
       {
+      case pqSMAdaptor::PROXY:
+        {
+        pqSMProxy p = pqSMAdaptor::getProxyProperty(this->Internal->Proxy, this->Internal->Property);
+        prop.setValue(p);
+        if(prop != old)
+          {
+          this->Internal->QtObject->setProperty(this->Internal->QtProperty, prop);
+          }
+        }
+      break;
       case pqSMAdaptor::ENUMERATION:
         {
         prop = pqSMAdaptor::getEnumerationProperty(this->Internal->Proxy, this->Internal->Property);
@@ -193,6 +215,25 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged() const
         if(prop != old)
           {
           this->Internal->QtObject->setProperty(this->Internal->QtProperty, prop);
+          }
+        }
+      break;
+      case pqSMAdaptor::FILE_LIST:
+        {
+        prop = pqSMAdaptor::getFileListProperty(this->Internal->Proxy, this->Internal->Property);
+        if(prop != old)
+          {
+          this->Internal->QtObject->setProperty(this->Internal->QtProperty, prop);
+          }
+        }
+      break;
+      case pqSMAdaptor::SELECTION:
+        {
+        QList<QVariant> sel = pqSMAdaptor::getSelectionProperty(this->Internal->Proxy, this->Internal->Property, 
+                                                                this->Internal->Index);
+        if(sel.size() == 2 && sel[1] != old)
+          {
+          this->Internal->QtObject->setProperty(this->Internal->QtProperty, sel[1]);
           }
         }
       break;
@@ -216,15 +257,22 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged() const
           }
         }
       break;
-      default:
-        {
-        }
+      case pqSMAdaptor::UNKNOWN:
+      case pqSMAdaptor::PROXYLIST:
+      break;
       }
     }
+  this->Internal->SettingValue = false;
 }
 
 void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
 {
+  if(this->Internal->SettingValue)
+    {
+    return;
+    }
+  this->Internal->SettingValue = true;
+
   if(this->Internal->QtObject)
     {
     // get the property of the object
@@ -232,6 +280,16 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
     QVariant old;
     switch(this->Internal->Type)
       {
+      case pqSMAdaptor::PROXY:
+        {
+        pqSMProxy p = pqSMAdaptor::getProxyProperty(this->Internal->Proxy, this->Internal->Property);
+        old.setValue(p);
+        if(prop != old)
+          {
+          pqSMAdaptor::setProxyProperty(this->Internal->Proxy, this->Internal->Property, prop.value<pqSMProxy>());
+          }
+        }
+      break;
       case pqSMAdaptor::ENUMERATION:
         {
         old = pqSMAdaptor::getEnumerationProperty(this->Internal->Proxy, this->Internal->Property);
@@ -247,6 +305,26 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
         if(prop != old)
           {
           pqSMAdaptor::setElementProperty(this->Internal->Proxy, this->Internal->Property, prop);
+          }
+        }
+      break;
+      case pqSMAdaptor::FILE_LIST:
+        {
+        old = pqSMAdaptor::getFileListProperty(this->Internal->Proxy, this->Internal->Property);
+        if(prop != old)
+          {
+          pqSMAdaptor::setFileListProperty(this->Internal->Proxy, this->Internal->Property, prop.toString());
+          }
+        }
+      break;
+      case pqSMAdaptor::SELECTION:
+        {
+        QList<QVariant> sel = pqSMAdaptor::getSelectionProperty(this->Internal->Proxy, this->Internal->Property, 
+                                                                this->Internal->Index);
+        if(sel.size() == 2 && prop != sel[1])
+          {
+          sel[1] = prop;
+          pqSMAdaptor::setSelectionProperty(this->Internal->Proxy, this->Internal->Property, this->Internal->Index, sel);
           }
         }
       break;
@@ -270,11 +348,12 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
           }
         }
       break;
-      default:
-        {
-        }
+      case pqSMAdaptor::UNKNOWN:
+      case pqSMAdaptor::PROXYLIST:
+      break;
       }
     }
+  this->Internal->SettingValue = false;
 }
 
 class pqPropertyLinksInternal
@@ -337,6 +416,17 @@ void pqPropertyLinks::removePropertyLink(QObject* qObject, const char* qProperty
     {
     this->Internal->VTKConnections->Disconnect(iter->Internal->Property, vtkCommand::ModifiedEvent, qObject);
     QObject::disconnect(iter->Internal->QtObject, signal, &*iter, SLOT(qtLinkedPropertyChanged()));
+    }
+}
+
+void pqPropertyLinks::refreshLinks()
+{
+  pqPropertyLinksInternal::LinkMap::iterator iter;
+  for(iter = this->Internal->Links.begin();
+      iter != this->Internal->Links.end();
+      ++iter)
+    {
+    iter->smLinkedPropertyChanged();
     }
 }
 

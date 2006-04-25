@@ -61,6 +61,10 @@ public:
   void removePropertyLink(QObject* qObject, const char* qProperty, const char* signal,
                           vtkSMProxy* Proxy, vtkSMProperty* Property, int Index=-1);
 
+  /// refresh a link (acts as if the vtkSMProperty's changed)
+  void refreshLinks();
+
+
   /// TODO: domain change events
   /// TODO: do domain changes possibly affect our links?
 
