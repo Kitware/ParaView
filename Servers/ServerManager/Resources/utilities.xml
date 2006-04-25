@@ -785,6 +785,21 @@
       </IntVectorProperty>
     </Proxy>
 
+    <Proxy name="ImplicitPlaneWidget2" class="vtkImplicitPlaneWidget2">
+      <ProxyProperty name="Representation"
+         command="SetRepresentation">
+        <ProxyGroupDomain name="groups">
+          <Group name="props" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty name="Enabled" 
+                         command="SetEnabled"
+                         number_of_elements="1"
+                         default_values="0">
+        <BooleanDomain/>
+      </IntVectorProperty>
+    </Proxy>
+
   </ProxyGroup>
 
   <ProxyGroup name="animation">
