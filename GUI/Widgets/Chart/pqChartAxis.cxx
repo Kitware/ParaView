@@ -47,7 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkstd/vector>
 #include <math.h>
-
+#include <iostream>
+using namespace std;
 
 #define TICK_LENGTH_SMALL 3
 #define TICK_LENGTH 5
@@ -1081,8 +1082,8 @@ void pqChartAxis::calculateInterval()
     {
     minExponent = 0;
     }
-
-  if(exponent < minExponent)
+  // FIX: if the range is very small (exponent<0) we want to use more intervals, not fewer
+  if(exponent < minExponent && exponent>0)
     {
     found = true;
     range = IntervalList[0];
