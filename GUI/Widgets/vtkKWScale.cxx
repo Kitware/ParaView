@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.117");
+vtkCxxRevisionMacro(vtkKWScale, "1.118");
 
 //----------------------------------------------------------------------------
 vtkKWScale::vtkKWScale()
@@ -239,6 +239,18 @@ int vtkKWScale::GetRelief()
 {
   return vtkKWOptions::GetReliefFromTkOptionValue(
     this->GetConfigurationOption("-relief"));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWScale::SetFont(const char *font)
+{
+  this->SetConfigurationOption("-font", font);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWScale::GetFont()
+{
+  return this->GetConfigurationOption("-font");
 }
 
 //----------------------------------------------------------------------------

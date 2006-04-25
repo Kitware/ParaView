@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.53");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.54");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -540,6 +540,18 @@ int vtkKWCheckButton::GetOverRelief()
 {
   return vtkKWOptions::GetReliefFromTkOptionValue(
     this->GetConfigurationOption("-overrelief"));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetFont(const char *font)
+{
+  this->SetConfigurationOption("-font", font);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWCheckButton::GetFont()
+{
+  return this->GetConfigurationOption("-font");
 }
 
 //----------------------------------------------------------------------------

@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessage );
-vtkCxxRevisionMacro(vtkKWMessage, "1.5");
+vtkCxxRevisionMacro(vtkKWMessage, "1.6");
 
 //----------------------------------------------------------------------------
 vtkKWMessage::vtkKWMessage()
@@ -196,6 +196,18 @@ int vtkKWMessage::GetRelief()
 {
   return vtkKWOptions::GetReliefFromTkOptionValue(
     this->GetConfigurationOption("-relief"));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMessage::SetFont(const char *font)
+{
+  this->SetConfigurationOption("-font", font);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWMessage::GetFont()
+{
+  return this->GetConfigurationOption("-font");
 }
 
 //----------------------------------------------------------------------------

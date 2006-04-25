@@ -115,6 +115,21 @@ public:
   virtual void SetReliefToGroove();
 
   // Description:
+  // Specifies the font to use when drawing text inside the widget. 
+  // You can use predefined font names (e.g. 'system'), or you can specify
+  // a set of font attributes with a platform-independent name, for example,
+  // 'times 12 bold'. In this example, the font is specified with a three
+  // element list: the first element is the font family, the second is the
+  // size, the third is a list of style parameters (normal, bold, roman, 
+  // italic, underline, overstrike). Example: 'times 12 {bold italic}'.
+  // The Times, Courier and Helvetica font families are guaranteed to exist
+  // and will be matched to the corresponding (closest) font on your system.
+  // If you are familiar with the X font names specification, you can also
+  // describe the font that way (say, '*times-medium-r-*-*-12*').
+  virtual void SetFont(const char *font);
+  virtual const char* GetFont();
+
+  // Description:
   // Set/Get the padding that will be applied around each widget (in pixels).
   // Specifies a non-negative value indicating how much extra space to request
   // for the widget in the X and Y-direction. When computing how large a

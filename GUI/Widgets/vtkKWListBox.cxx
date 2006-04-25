@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWListBox);
-vtkCxxRevisionMacro(vtkKWListBox, "1.51");
+vtkCxxRevisionMacro(vtkKWListBox, "1.52");
 
 //----------------------------------------------------------------------------
 vtkKWListBox::vtkKWListBox()
@@ -283,6 +283,18 @@ void vtkKWListBox::DeleteAll()
 {
   int n =  this->GetNumberOfItems();
   this->DeleteRange(0, n-1);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBox::SetFont(const char *font)
+{
+  this->SetConfigurationOption("-font", font);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWListBox::GetFont()
+{
+  return this->GetConfigurationOption("-font");
 }
 
 //----------------------------------------------------------------------------

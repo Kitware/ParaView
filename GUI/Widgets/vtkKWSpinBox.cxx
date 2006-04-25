@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSpinBox);
-vtkCxxRevisionMacro(vtkKWSpinBox, "1.14");
+vtkCxxRevisionMacro(vtkKWSpinBox, "1.15");
 
 //----------------------------------------------------------------------------
 vtkKWSpinBox::vtkKWSpinBox() 
@@ -336,6 +336,18 @@ int vtkKWSpinBox::GetRelief()
 {
   return vtkKWOptions::GetReliefFromTkOptionValue(
     this->GetConfigurationOption("-relief"));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSpinBox::SetFont(const char *font)
+{
+  this->SetConfigurationOption("-font", font);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWSpinBox::GetFont()
+{
+  return this->GetConfigurationOption("-font");
 }
 
 //----------------------------------------------------------------------------

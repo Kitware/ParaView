@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.50");
+vtkCxxRevisionMacro(vtkKWLabel, "1.51");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -174,6 +174,18 @@ void vtkKWLabel::AdjustWrapLengthToWidthCallback()
     {
     this->SetConfigurationOptionAsInt("-wraplength", width - 5);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::SetFont(const char *font)
+{
+  this->SetConfigurationOption("-font", font);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWLabel::GetFont()
+{
+  return this->GetConfigurationOption("-font");
 }
 
 //----------------------------------------------------------------------------

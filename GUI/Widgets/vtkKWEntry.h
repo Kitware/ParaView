@@ -136,6 +136,21 @@ public:
   virtual void SetReliefToGroove();
 
   // Description:
+  // Specifies the font to use when drawing text inside the widget. 
+  // You can use predefined font names (e.g. 'system'), or you can specify
+  // a set of font attributes with a platform-independent name, for example,
+  // 'times 12 bold'. In this example, the font is specified with a three
+  // element list: the first element is the font family, the second is the
+  // size, the third is a list of style parameters (normal, bold, roman, 
+  // italic, underline, overstrike). Example: 'times 12 {bold italic}'.
+  // The Times, Courier and Helvetica font families are guaranteed to exist
+  // and will be matched to the corresponding (closest) font on your system.
+  // If you are familiar with the X font names specification, you can also
+  // describe the font that way (say, '*times-medium-r-*-*-12*').
+  virtual void SetFont(const char *font);
+  virtual const char* GetFont();
+
+  // Description:
   // Specifies a command to associate with the widget. This command is 
   // typically invoked when the return key is pressed, or the focus is lost.
   // The 'object' argument is the object that will have the method called on

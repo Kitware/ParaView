@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.37");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.38");
 
 //----------------------------------------------------------------------------
 vtkKWMenuButton::vtkKWMenuButton()
@@ -373,6 +373,18 @@ void vtkKWMenuButton::SetReliefToGroove()
 { 
   this->SetRelief(vtkKWOptions::ReliefGroove); 
 };
+
+//----------------------------------------------------------------------------
+void vtkKWMenuButton::SetFont(const char *font)
+{
+  this->SetConfigurationOption("-font", font);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWMenuButton::GetFont()
+{
+  return this->GetConfigurationOption("-font");
+}
 
 //----------------------------------------------------------------------------
 int vtkKWMenuButton::GetRelief()
