@@ -220,6 +220,7 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
         type = pqSMAdaptor::SINGLE_ELEMENT;
         }
       }
+    adaptor->Delete();
     }
 
   // make sure we can know about all types
