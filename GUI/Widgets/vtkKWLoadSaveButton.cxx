@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLoadSaveButton);
-vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.22");
+vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.23");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveButton::vtkKWLoadSaveButton()
@@ -30,8 +30,6 @@ vtkKWLoadSaveButton::vtkKWLoadSaveButton()
 
   this->MaximumFileNameLength = 30;
   this->TrimPathFromFileName  = 1;
-
-  this->UserCommand = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -42,8 +40,6 @@ vtkKWLoadSaveButton::~vtkKWLoadSaveButton()
     this->LoadSaveDialog->Delete();
     this->LoadSaveDialog = NULL;
     }
-
-  this->SetUserCommand(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -61,12 +57,6 @@ void vtkKWLoadSaveButton::Create()
   // create the pushbutton.
 
   this->Superclass::Create();
-
-  // Do not use SetCommand (we override it to get max compatibility)
-  // Save the old command, if any
-
-  this->SetUserCommand(this->GetConfigurationOption("-command"));
-  this->Superclass::SetCommand(this, "InvokeLoadSaveDialogCallback");
 
   // Cosmetic add-on
 
@@ -93,18 +83,15 @@ void vtkKWLoadSaveButton::Create()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLoadSaveButton::SetCommand(vtkObject *object, 
-                                     const char *method)
+void vtkKWLoadSaveButton::InvokeCommand()
 {
-  if (!this->IsCreated())
+  if (this->LoadSaveDialog->IsCreated() && this->LoadSaveDialog->Invoke())
     {
-    return;
+    this->UpdateFileName();
     }
 
-  char *command = NULL;
-  this->SetObjectMethodCommand(&command, object, method);
-  this->SetUserCommand(command);
-  delete [] command;
+
+  this->Superclass::InvokeCommand();
 }
 
 //----------------------------------------------------------------------------
@@ -175,23 +162,6 @@ void vtkKWLoadSaveButton::UpdateFileName()
     this->SetText(new_fname.c_str());
     }
 } 
-
-// ---------------------------------------------------------------------------
-void vtkKWLoadSaveButton::InvokeLoadSaveDialogCallback()
-{
-  if (!this->LoadSaveDialog->IsCreated() ||
-      !this->LoadSaveDialog->Invoke())
-    {
-    return;
-    }
-
-  this->UpdateFileName();
-
-  if (this->UserCommand && *this->UserCommand)
-    {
-    this->Script(this->UserCommand);
-    }
-}
 
 //----------------------------------------------------------------------------
 void vtkKWLoadSaveButton::UpdateEnableState()

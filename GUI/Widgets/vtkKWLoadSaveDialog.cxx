@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.52");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.53");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
@@ -137,9 +137,9 @@ int vtkKWLoadSaveDialog::Invoke()
 
   int res = 0;
 
-  if (this->MultipleSelection)
+  if (path && strlen(path) && strcmp(path, "{}") != 0)
     {
-    if (path && strlen(path) && strcmp(path, "{}") != 0)
+    if (this->MultipleSelection)
       {
       int n = 0;
       CONST84 char **files = 0;
@@ -170,32 +170,32 @@ int vtkKWLoadSaveDialog::Invoke()
           }
         }
       }
-    }
-  else if (path && strlen(path))
-    {
-    this->SetFileName(this->ConvertTclStringToInternalString(path));
-
-    this->NumberOfFileNames = 1;
-    this->FileNames = new char *[1];
-    this->FileNames[0] = new char[strlen(this->GetFileName()) + 1];
-    strcpy(this->FileNames[0], this->GetFileName());
-
-    if (this->ChooseDirectory && support_choose_dir)
-      {
-      this->SetLastPath(this->GetFileName());
-      }
     else
       {
-      this->GenerateLastPath(this->GetFileName());
+      this->SetFileName(this->ConvertTclStringToInternalString(path));
+      
+      this->NumberOfFileNames = 1;
+      this->FileNames = new char *[1];
+      this->FileNames[0] = new char[strlen(this->GetFileName()) + 1];
+      strcpy(this->FileNames[0], this->GetFileName());
+      
+      if (this->ChooseDirectory && support_choose_dir)
+        {
+        this->SetLastPath(this->GetFileName());
+        }
+      else
+        {
+        this->GenerateLastPath(this->GetFileName());
+        }
+      
+      res = 1;
       }
-
-    res = 1;
     }
 
 
   if (res == 0)
     {
-    this->SetFileName(0);
+    this->SetFileName(NULL);
     }
 
   this->GetApplication()->UnRegisterDialogUp(this);
@@ -203,9 +203,9 @@ int vtkKWLoadSaveDialog::Invoke()
   // Calls to update are evil, document why this one is needed
   //this->Script ("update"); 
 
-  this->Done = res + 1;
+  this->Done = res ? vtkKWDialog::StatusOK : vtkKWDialog::StatusCanceled;
 
-  return res;
+  return (this->Done == vtkKWDialog::StatusCanceled ? 0 : 1);
 }
 
 //----------------------------------------------------------------------------

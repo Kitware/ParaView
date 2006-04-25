@@ -131,7 +131,6 @@ protected:
   int MultipleSelection;
   int NumberOfFileNames;
   char **FileNames;
-  int Done;
 
 private:
   vtkKWLoadSaveDialog(const vtkKWLoadSaveDialog&); // Not implemented
