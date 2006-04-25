@@ -1184,6 +1184,7 @@ void pqChartAxis::calculateInterval()
 
   // Fill in the data based on the interval.
   this->Skip = 1;
+  int numberOfIntervals = 0;
   pqChartValue v = this->ValueMin;
   pqChartValue max = this->ValueMax;
   max += interval/2; // Account for round-off error.
@@ -1200,7 +1201,10 @@ void pqChartAxis::calculateInterval()
       {
       break;
       }
+    numberOfIntervals++;
     }
+
+  this->Intervals = numberOfIntervals;
 }
 
 void pqChartAxis::calculateLogInterval()
