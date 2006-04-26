@@ -24,6 +24,7 @@ class vtkColorTransferFunction;
 class vtkDataArray;
 class vtkImageData;
 class vtkDoubleArray;
+class vtkIntArray;
 
 class KWWidgets_EXPORT vtkKWHistogram : public vtkObject
 {
@@ -131,6 +132,8 @@ protected:
   vtkDoubleArray *Bins;
 
   vtkImageData *Image;
+  vtkIntArray  *ImageCoordinates;
+
   unsigned long LastImageBuildTime;
   unsigned long LastTransferFunctionTime;
   int           LogMode;
@@ -175,6 +178,7 @@ public:
     int  IsEqualTo(const ImageDescriptor *desc);
     void Copy(const ImageDescriptor *desc);
 
+    int          DrawForeground;
     int          DrawBackground;
     int          DrawGrid;
     int          GridSize;
@@ -227,12 +231,15 @@ public:
   // @endcond
   virtual int IsImageUpToDate(const ImageDescriptor *desc = 0);
   virtual vtkImageData* GetImage(ImageDescriptor *desc);
+  virtual vtkIntArray* GetImageCoordinates(ImageDescriptor *desc);
   //ETX
   
 protected:
   //BTX
   vtkKWHistogram::ImageDescriptor *LastImageDescriptor;
   //ETX
+
+  virtual int RefreshImage(ImageDescriptor *desc);
 
 private:
   vtkKWHistogram(const vtkKWHistogram&); // Not implemented

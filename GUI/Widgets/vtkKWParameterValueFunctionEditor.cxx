@@ -30,6 +30,7 @@
 #include "vtkKWMenuButton.h"
 #include "vtkKWMenu.h"
 #include "vtkKWIcon.h"
+#include "vtkIntArray.h"
 
 #include <ctype.h>
 
@@ -38,7 +39,7 @@
 #include <vtksys/stl/algorithm>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.89");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.90");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -5674,6 +5675,7 @@ void vtkKWParameterValueFunctionEditor::UpdateHistogramImageDescriptor(
     this->CanvasHeight - margin_top - margin_bottom);
 
   desc->SetBackgroundColor(this->FrameBackgroundColor);
+  desc->DrawGrid = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -5706,6 +5708,8 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
     this->HistogramColor);
   this->HistogramImageDescriptor->Style = 
     this->HistogramStyle;
+  this->HistogramImageDescriptor->DrawForeground = 
+    hist_is_image ? 1 : 0;
   this->HistogramImageDescriptor->DrawBackground = 1;
   this->UpdateHistogramImageDescriptor(
     this->HistogramImageDescriptor);
@@ -5747,8 +5751,10 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
     this->SecondaryHistogramColor);
   this->SecondaryHistogramImageDescriptor->Style = 
     this->SecondaryHistogramStyle;
+  this->SecondaryHistogramImageDescriptor->DrawForeground = 
+    secondary_hist_is_image ? 1 : 0;
   this->SecondaryHistogramImageDescriptor->DrawBackground = 
-    hist_is_image ? 0 : 1; // if both are images, blend them
+    hist_is_image ? 0 : 1; // if both are images, need alpha to blend them
   this->UpdateHistogramImageDescriptor(
     this->SecondaryHistogramImageDescriptor);
 
@@ -5776,7 +5782,10 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
   double *p_v_range = this->GetVisibleParameterRange();
 
   vtkImageData *hist_image = NULL;
+  vtkIntArray *hist_image_coords = NULL;
+
   vtkImageData *secondary_hist_image = NULL;
+  vtkIntArray *secondary_hist_image_coords = NULL;
 
   vtksys_stl::string blend_hist_img_name;
   if (this->Histogram && hist_is_image &&
@@ -5794,10 +5803,17 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
     // Main histogram
 
     unsigned long hist_image_mtime = 0;
-    if (this->Histogram && hist_is_image)
+    if (this->Histogram)
       {
-      hist_image = this->Histogram->GetImage(this->HistogramImageDescriptor);
-      hist_image_mtime = hist_image->GetMTime();
+      if (hist_is_image)
+        {
+        hist_image = this->Histogram->GetImage(
+          this->HistogramImageDescriptor);
+        }
+      hist_image_coords = 
+        this->Histogram->GetImageCoordinates(
+          this->HistogramImageDescriptor);
+      hist_image_mtime = hist_image_coords->GetMTime();
       }
 
     // Secondary histogram
@@ -5809,11 +5825,17 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
       }
 
     unsigned long secondary_hist_image_mtime = 0;
-    if (this->SecondaryHistogram && secondary_hist_is_image)
+    if (this->SecondaryHistogram)
       {
-      secondary_hist_image = this->SecondaryHistogram->GetImage(
-        this->SecondaryHistogramImageDescriptor);
-      secondary_hist_image_mtime = secondary_hist_image->GetMTime();
+      if (secondary_hist_is_image)
+        {
+        secondary_hist_image = this->SecondaryHistogram->GetImage(
+          this->SecondaryHistogramImageDescriptor);
+        }
+      secondary_hist_image_coords = 
+        this->SecondaryHistogram->GetImageCoordinates(
+          this->SecondaryHistogramImageDescriptor);
+      secondary_hist_image_mtime = secondary_hist_image_coords->GetMTime();
       }
 
     // Update the image in the canvas
@@ -5879,6 +5901,11 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
 
   ostrstream tk_cmd;
 
+  char color[10];
+  double *v_w_range = this->GetWholeValueRange();
+  double *v_v_range = this->GetVisibleValueRange();
+  double factors[2] = {0.0, 0.0};
+
   // Update the histogram position (or delete it if not needed anymore)
 
   if (this->Histogram && 
@@ -5888,11 +5915,15 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
       {
       if (hist_is_image)
         {
-        tk_cmd << canv << " create image 0 0 -anchor nw "
-               << " -tags {" 
-               << vtkKWParameterValueFunctionEditor::HistogramTag
-               << "}" << endl;
+        tk_cmd << canv << " create image 0 0 -anchor nw";
         }
+      else
+        {
+        tk_cmd << canv << " create line 0 0 0 0";
+        }
+      tk_cmd << " -tags {" 
+             << vtkKWParameterValueFunctionEditor::HistogramTag
+             << "}" << endl;
       if (this->CanvasBackgroundVisibility && this->CanvasVisibility)
         {
         tk_cmd << canv << " raise " 
@@ -5902,25 +5933,40 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
         }
       }
     
-    double factors[2] = {0.0, 0.0};
     this->GetCanvasScalingFactors(factors);
-    
-    double *v_w_range = this->GetWholeValueRange();
-    double *v_v_range = this->GetVisibleValueRange();
-    double c_y = factors[1] * (v_w_range[1] - v_v_range[1]);
+    double c_x = 
+      this->HistogramImageDescriptor->Range[0] * factors[0];
 
+    tk_cmd << canv << " coords " 
+           << vtkKWParameterValueFunctionEditor::HistogramTag
+           << " ";
     if (hist_is_image)
       {
-      tk_cmd << canv << " coords " 
-             << vtkKWParameterValueFunctionEditor::HistogramTag
-             << " " 
-             << this->HistogramImageDescriptor->Range[0] * factors[0] 
-             << " " << c_y << endl;
+      double c_y = factors[1] * (v_w_range[1] - v_v_range[1]);
+      tk_cmd << c_x << " " << c_y << endl;
       tk_cmd << canv << " itemconfigure "
              << vtkKWParameterValueFunctionEditor::HistogramTag
              << " -image " 
              << (secondary_hist_image ? blend_hist_img_name.c_str() 
                  : hist_img_name.c_str()) << endl;
+      }
+    else
+      {
+      double c_y = (v_w_range[1] - v_v_range[0]) * factors[1];
+      int *y_ptr = hist_image_coords->GetPointer(0);
+      int *y_end = y_ptr + hist_image_coords->GetNumberOfTuples();
+      for (; y_ptr < y_end; ++c_x, ++y_ptr)
+        {
+        tk_cmd << c_x << " " << (c_y - *y_ptr) << " ";
+        }
+      tk_cmd << endl;
+      sprintf(color, "#%02x%02x%02x", 
+              (int)(this->HistogramColor[0] * 255.0),
+              (int)(this->HistogramColor[1] * 255.0),
+              (int)(this->HistogramColor[2] * 255.0));
+      tk_cmd << canv << " itemconfigure " 
+             << vtkKWParameterValueFunctionEditor::HistogramTag 
+             << " -fill " << color << endl;
       }
     }
   else
@@ -5942,12 +5988,16 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
       {
       if (secondary_hist_is_image)
         {
-        tk_cmd << canv << " create image 0 0 -anchor nw "
-               << " -image " << secondary_hist_img_name.c_str()
-               << " -tags {" 
-               << vtkKWParameterValueFunctionEditor::SecondaryHistogramTag 
-               << "}" << endl;
+        tk_cmd << canv << " create image 0 0 -anchor nw -image " 
+               << secondary_hist_img_name.c_str();
         }
+      else
+        {
+        tk_cmd << canv << " create line 0 0 0 0";
+        }
+      tk_cmd << " -tags {" 
+             << vtkKWParameterValueFunctionEditor::SecondaryHistogramTag 
+             << "}" << endl;
       if (this->CanvasBackgroundVisibility && this->CanvasVisibility)
         {
         tk_cmd << canv << " raise " 
@@ -5957,20 +6007,35 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
         }
       }
     
-    double factors[2] = {0.0, 0.0};
     this->GetCanvasScalingFactors(factors);
-    
-    double *v_w_range = this->GetWholeValueRange();
-    double *v_v_range = this->GetVisibleValueRange();
-    double c_y = factors[1] * (v_w_range[1] - v_v_range[1]);
+    double c_x = 
+      this->SecondaryHistogramImageDescriptor->Range[0] * factors[0];
 
+    tk_cmd << canv << " coords " 
+           << vtkKWParameterValueFunctionEditor::SecondaryHistogramTag
+           << " ";
     if (secondary_hist_is_image)
       {
-      tk_cmd << canv << " coords " 
-             << vtkKWParameterValueFunctionEditor::SecondaryHistogramTag
-             << " " 
-             << this->SecondaryHistogramImageDescriptor->Range[0] * factors[0] 
-             << " " << c_y << endl;
+      double c_y = factors[1] * (v_w_range[1] - v_v_range[1]);
+      tk_cmd << c_x << " " << c_y << endl;
+      }
+    else
+      {
+      double c_y = (v_w_range[1] - v_v_range[0]) * factors[1];
+      int *y_ptr = secondary_hist_image_coords->GetPointer(0);
+      int *y_end = y_ptr + secondary_hist_image_coords->GetNumberOfTuples();
+      for (; y_ptr < y_end; ++c_x, ++y_ptr)
+        {
+        tk_cmd << c_x << " " << (c_y - *y_ptr) << " ";
+        }
+      tk_cmd << endl;
+      sprintf(color, "#%02x%02x%02x", 
+              (int)(this->SecondaryHistogramColor[0] * 255.0),
+              (int)(this->SecondaryHistogramColor[1] * 255.0),
+              (int)(this->SecondaryHistogramColor[2] * 255.0));
+      tk_cmd << canv << " itemconfigure " 
+             << vtkKWParameterValueFunctionEditor::SecondaryHistogramTag 
+             << " -fill " << color << endl;
       }
     }
   else
@@ -5982,7 +6047,6 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
              << endl;
       }
     }
-
 
   tk_cmd << ends;
   this->Script(tk_cmd.str());

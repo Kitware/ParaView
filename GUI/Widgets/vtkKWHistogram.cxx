@@ -21,6 +21,7 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkDoubleArray.h"
+#include "vtkIntArray.h"
 
 #define VTK_KW_HIST_TESTING 0
 
@@ -29,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWHistogram);
-vtkCxxRevisionMacro(vtkKWHistogram, "1.6");
+vtkCxxRevisionMacro(vtkKWHistogram, "1.7");
 
 //----------------------------------------------------------------------------
 vtkKWHistogram::vtkKWHistogram()
@@ -41,6 +42,8 @@ vtkKWHistogram::vtkKWHistogram()
   this->EmptyHistogram();
 
   this->Image                    = NULL;
+  this->ImageCoordinates                = NULL;
+
   this->LastImageDescriptor      = NULL;
   this->LastImageBuildTime       = 0;
   this->LastTransferFunctionTime = 0;
@@ -63,6 +66,12 @@ vtkKWHistogram::~vtkKWHistogram()
     {
     this->Image->Delete();
     this->Image = NULL;
+    }
+
+  if (this->ImageCoordinates)
+    {
+    this->ImageCoordinates->Delete();
+    this->ImageCoordinates = NULL;
     }
 
   if (this->LastImageDescriptor)
@@ -548,6 +557,7 @@ vtkKWHistogram::ImageDescriptor::ImageDescriptor()
   this->Style                   = vtkKWHistogram::ImageDescriptor::StyleBars;
   this->Width                   = 0;
   this->Height                  = 0;
+  this->DrawForeground          = 1;
   this->DrawBackground          = 1;
   this->DrawGrid                = 0;
   this->GridSize                = 15;
@@ -584,19 +594,20 @@ int vtkKWHistogram::ImageDescriptor::IsEqualTo(const ImageDescriptor *desc)
     this->Range[1]              == desc->Range[1] &&
     this->Width                 == desc->Width &&
     this->Height                == desc->Height &&
+    this->Style                 == desc->Style &&
+    this->DrawForeground        == desc->DrawForeground &&
+    this->DrawBackground        == desc->DrawBackground &&
+    this->DrawGrid              == desc->DrawGrid &&
+    this->GridSize              == desc->GridSize &&
     this->Color[0]              == desc->Color[0] &&
     this->Color[1]              == desc->Color[1] &&
     this->Color[2]              == desc->Color[2] &&
-    this->DrawBackground        == desc->DrawBackground &&
     this->BackgroundColor[0]    == desc->BackgroundColor[0] &&
     this->BackgroundColor[1]    == desc->BackgroundColor[1] &&
     this->BackgroundColor[2]    == desc->BackgroundColor[2] &&
     this->OutOfRangeColor[0]    == desc->OutOfRangeColor[0] &&
     this->OutOfRangeColor[1]    == desc->OutOfRangeColor[1] &&
     this->OutOfRangeColor[2]    == desc->OutOfRangeColor[2] &&
-    this->DrawGrid              == desc->DrawGrid &&
-    this->GridSize              == desc->GridSize &&
-    this->Style                 == desc->Style &&
     this->GridColor[0]          == desc->GridColor[0] &&
     this->GridColor[1]          == desc->GridColor[1] &&
     this->GridColor[2]          == desc->GridColor[2] &&
@@ -616,19 +627,20 @@ void vtkKWHistogram::ImageDescriptor::Copy(const ImageDescriptor *desc)
   this->Range[1]              = desc->Range[1];
   this->Width                 = desc->Width;
   this->Height                = desc->Height;
+  this->Style                 = desc->Style;
+  this->DrawForeground        = desc->DrawForeground;
+  this->DrawBackground        = desc->DrawBackground;
+  this->DrawGrid              = desc->DrawGrid;
+  this->GridSize              = desc->GridSize;
   this->Color[0]              = desc->Color[0];
   this->Color[1]              = desc->Color[1];
   this->Color[2]              = desc->Color[2];
-  this->DrawBackground        = desc->DrawBackground;
   this->BackgroundColor[0]    = desc->BackgroundColor[0];
   this->BackgroundColor[1]    = desc->BackgroundColor[1];
   this->BackgroundColor[2]    = desc->BackgroundColor[2];
   this->OutOfRangeColor[0]    = desc->OutOfRangeColor[0];
   this->OutOfRangeColor[1]    = desc->OutOfRangeColor[1];
   this->OutOfRangeColor[2]    = desc->OutOfRangeColor[2];
-  this->DrawGrid              = desc->DrawGrid;
-  this->GridSize              = desc->GridSize;
-  this->Style                 = desc->Style;
   this->GridColor[0]          = desc->GridColor[0];
   this->GridColor[1]          = desc->GridColor[1];
   this->GridColor[2]          = desc->GridColor[2];
@@ -721,6 +733,10 @@ int vtkKWHistogram::IsImageUpToDate(
     {
     this->Image = vtkImageData::New();
     }
+  if (!this->ImageCoordinates)
+    {
+    this->ImageCoordinates = vtkIntArray::New();
+    }
 
   if (!this->LastImageDescriptor)
     {
@@ -736,15 +752,14 @@ int vtkKWHistogram::IsImageUpToDate(
 }
 
 //----------------------------------------------------------------------------
-vtkImageData* vtkKWHistogram::GetImage(
-  ImageDescriptor *desc)
+int vtkKWHistogram::RefreshImage(ImageDescriptor *desc)
 {
   // Check histogram
 
   if (!this->GetNumberOfBins())
     {
     vtkErrorMacro(<< "Can not compute histogram image from empty histogram!");
-    return NULL;
+    return 0;
     }
 
   // Check descriptor
@@ -753,30 +768,36 @@ vtkImageData* vtkKWHistogram::GetImage(
     {
     vtkErrorMacro(
       << "Can not compute histogram image with invalid descriptor!");
-    return NULL;
+    return 0;
     }
 
   // Do we really need to recreate ?
 
   if (this->IsImageUpToDate(desc))
     {
-    return this->Image;
+    return 1;
     }
 
   // We need width x height RGBA (unsigned char)
 
+  int draw_image = desc->DrawForeground || desc->DrawGrid;
+
   int nb_of_components = 3 + (desc->DrawBackground ? 0 : 1);
-  this->Image->SetDimensions(desc->Width, desc->Height, 1);
-  this->Image->SetWholeExtent(this->Image->GetExtent());
-  this->Image->SetUpdateExtent(this->Image->GetExtent());
-  this->Image->SetScalarTypeToUnsignedChar();
-  this->Image->SetNumberOfScalarComponents(nb_of_components);
-  this->Image->AllocateScalars();
+  unsigned char *image_ptr = NULL;
 
-  unsigned char *image_ptr = 
-    static_cast<unsigned char*>(this->Image->GetScalarPointer());
+  if (draw_image)
+    {
+    this->Image->SetDimensions(desc->Width, desc->Height, 1);
+    this->Image->SetWholeExtent(this->Image->GetExtent());
+    this->Image->SetUpdateExtent(this->Image->GetExtent());
+    this->Image->SetScalarTypeToUnsignedChar();
+    this->Image->SetNumberOfScalarComponents(nb_of_components);
+    this->Image->AllocateScalars();
+    image_ptr = 
+      static_cast<unsigned char*>(this->Image->GetScalarPointer());
+    }
 
-  unsigned char *column_ptr;
+  unsigned char *column_ptr = NULL;
 
   // Colors
 
@@ -809,7 +830,7 @@ vtkImageData* vtkKWHistogram::GetImage(
   // Quickly set the whole image to be transparent if no background color
   // is going to be used
 
-  if (!desc->DrawBackground)
+  if (draw_image && !desc->DrawBackground)
     {
     memset(image_ptr, 0, desc->Width * desc->Height * nb_of_components);
     }
@@ -844,7 +865,11 @@ vtkImageData* vtkKWHistogram::GetImage(
   double next_bin_real;
   double max_occurrence = 0.0;
 
-  double * resampled_histogram = new double[desc->Width];
+  this->ImageCoordinates->SetNumberOfComponents(1);
+  this->ImageCoordinates->SetNumberOfTuples(desc->Width);
+  int *image_coords = this->ImageCoordinates->GetPointer(0);
+
+  double *resampled_histogram = new double[desc->Width];
 
   unsigned int x, y, ylimit;
   for (x = 0; x < desc->Width; x++)
@@ -949,6 +974,7 @@ vtkImageData* vtkKWHistogram::GetImage(
     
     if (occurrence < 0.00001 && !desc->DrawBackground)
       {
+      image_coords[x] = 0;
       continue;
       }
     
@@ -976,6 +1002,15 @@ vtkImageData* vtkKWHistogram::GetImage(
     if (ylimit > desc->Height)
       {
       ylimit = desc->Height;
+      }
+
+    image_coords[x] = ylimit;
+
+    // If we are actually only computing the coords, and not drawing, skip
+
+    if (!draw_image)
+      {
+      continue;
       }
 
     column_ptr = image_ptr + x * nb_of_components;
@@ -1134,8 +1169,29 @@ vtkImageData* vtkKWHistogram::GetImage(
     (desc->ColorTransferFunction ? desc->ColorTransferFunction->GetMTime() :0);
 
   this->Image->Modified();
+  this->ImageCoordinates->Modified();
 
-  return this->Image;
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+vtkImageData* vtkKWHistogram::GetImage(ImageDescriptor *desc)
+{
+  if (this->RefreshImage(desc))
+    {
+    return this->Image;
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkIntArray* vtkKWHistogram::GetImageCoordinates(ImageDescriptor *desc)
+{
+  if (this->RefreshImage(desc))
+    {
+    return this->ImageCoordinates;
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
