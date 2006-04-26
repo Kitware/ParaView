@@ -290,7 +290,16 @@
   </ProxyGroup>
   
   <ProxyGroup name="3d_widgets">
-    <PickLineWidgetProxy name="LineWidgetProxy" class="vtkLineWidget">
+    <Proxy name="3DWidgetsBase" class="not_used">
+      <DoubleVectorProperty
+        name="PlaceFactor"
+        command="SetPlaceFactor"
+        number_of_elements="1"
+        default_values="1.0" />
+    </Proxy>
+    <PickLineWidgetProxy name="LineWidgetProxy" class="vtkLineWidget"
+                         base_proxygroup="3d_widgets"
+                         base_proxyname="3DWidgetsBase">
       <IntVectorProperty
         name="IgnorePlaceWidgetChanges"
         command="SetIgnorePlaceWidgetChanges"
@@ -353,7 +362,9 @@
       </IntVectorProperty>
     </PickLineWidgetProxy>
 
-    <PickPointWidgetProxy name="PointWidgetProxy" class="vtkPointWidget">
+    <PickPointWidgetProxy name="PointWidgetProxy" class="vtkPointWidget"
+                          base_proxygroup="3d_widgets"
+                          base_proxyname="3DWidgetsBase">
       <!-- vtkPickPointWidget object is created only on the client -->
       <IntVectorProperty
         name="IgnorePlaceWidgetChanges"
@@ -396,7 +407,9 @@
       </IntVectorProperty>
     </PickPointWidgetProxy>
     
-    <SphereWidgetProxy name="SphereWidgetProxy" class="vtkSphereWidget">
+    <SphereWidgetProxy name="SphereWidgetProxy" class="vtkSphereWidget"
+                       base_proxygroup="3d_widgets"
+                       base_proxyname="3DWidgetsBase">
       <IntVectorProperty
         name="IgnorePlaceWidgetChanges"
         command="SetIgnorePlaceWidgetChanges"
@@ -454,7 +467,10 @@
       </IntVectorProperty>
     </SphereWidgetProxy>
 
-    <PickSphereWidgetProxy name="PickSphereWidgetProxy" class="vtkPickSphereWidget">
+    <PickSphereWidgetProxy name="PickSphereWidgetProxy" 
+                           class="vtkPickSphereWidget"
+                           base_proxygroup="3d_widgets"
+                           base_proxyname="3DWidgetsBase">
       <IntVectorProperty
         name="IgnorePlaceWidgetChanges"
         command="SetIgnorePlaceWidgetChanges"
@@ -520,7 +536,10 @@
       </IntVectorProperty> 
     </PickSphereWidgetProxy>
 
-    <ImplicitPlaneWidgetProxy name="ImplicitPlaneWidgetProxy" class="vtkImplicitPlaneWidget">
+    <ImplicitPlaneWidgetProxy name="ImplicitPlaneWidgetProxy" 
+                              class="vtkImplicitPlaneWidget"
+                              base_proxygroup="3d_widgets"
+                              base_proxyname="3DWidgetsBase">
       <IntVectorProperty
         name="IgnorePlaceWidgetChanges"
         command="SetIgnorePlaceWidgetChanges"
@@ -586,7 +605,9 @@
       </IntVectorProperty>
     </ImplicitPlaneWidgetProxy>
 
-    <BoxWidgetProxy name="BoxWidgetProxy" class="vtkBoxWidget">
+    <BoxWidgetProxy name="BoxWidgetProxy" class="vtkBoxWidget"
+                    base_proxygroup="3d_widgets"
+                    base_proxyname="3DWidgetsBase">
       <IntVectorProperty
         name="IgnorePlaceWidgetChanges"
         command="SetIgnorePlaceWidgetChanges"
@@ -674,7 +695,9 @@
       </SubProxy>
     </BoxWidgetProxy>
 
-    <PickBoxWidgetProxy name="PickBoxWidgetProxy" class="vtkPickBoxWidget">
+    <PickBoxWidgetProxy name="PickBoxWidgetProxy" class="vtkPickBoxWidget"
+                        base_proxygroup="3d_widgets"
+                        base_proxyname="3DWidgetsBase">
       <IntVectorProperty
         name="IgnorePlaceWidgetChanges"
         command="SetIgnorePlaceWidgetChanges"
