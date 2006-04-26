@@ -38,8 +38,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqMultiViewManager.h
   pqNamedObjectPanel.h
   pqObjectPanel.h
-  pqObjectInspector.h
-  pqObjectInspectorItem.h
   pqObjectInspectorWidget.h
   pqOutputWindow.h
   pqOutputWindowAdapter.h
@@ -50,7 +48,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPropertyLinks.h
   pqPropertyManager.h
   pqRenderViewEditor.h
-  pqSMAdaptor.h
   pqSMSignalAdaptors.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
@@ -120,10 +117,6 @@ ADD_LIBRARY(pqWidgets
   pqNamedObjectPanel.h
   pqObjectPanel.cxx
   pqObjectPanel.h
-  pqObjectInspector.cxx
-  pqObjectInspector.h
-  pqObjectInspectorItem.cxx
-  pqObjectInspectorItem.h
   pqObjectInspectorWidget.cxx
   pqObjectInspectorWidget.h
   pqOptions.cxx

@@ -124,7 +124,6 @@ public:
     PropertyToolbar(0),
     MultiViewManager(0),
     ServerDisconnectAction(0),
-    Adaptor(0),
     Pipeline(0),
     PipelineList(0),
     ActiveView(0),
@@ -164,9 +163,6 @@ public:
     delete this->CurrentServer;
     this->CurrentServer = 0;
     
-    delete this->Adaptor;
-    this->Adaptor = 0;
-    
     this->UndoStack->Delete();
     this->UndoStack = 0;
   }
@@ -189,7 +185,6 @@ public:
   QToolBar* PropertyToolbar;
   pqMultiViewManager* MultiViewManager;
   QAction* ServerDisconnectAction;
-  pqSMAdaptor *Adaptor;
   pqPipelineData *Pipeline;
   pqPipelineListWidget *PipelineList;
   pqMultiViewFrame* ActiveView;
@@ -215,7 +210,6 @@ pqMainWindow::pqMainWindow() :
   this->menuBar() << pqSetName("MenuBar");
 
   // Set up the main ParaQ items along with the central widget.
-  this->Implementation->Adaptor = new pqSMAdaptor();
   this->Implementation->Pipeline = new pqPipelineData();
   this->Implementation->ProxyInfo = new pqSourceProxyInfo();
   this->Implementation->VTKConnector = vtkSmartPointer<vtkEventQtSlotConnect>::New();
