@@ -76,5 +76,5 @@
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/ScrollArea/qt_scrollarea_viewport/Panel/StartTheta" command="set_double" arguments="10" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/ScrollArea/qt_scrollarea_viewport/Panel/StartTheta" command="set_double" arguments="11" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/ScrollArea/qt_scrollarea_viewport/Panel/StartTheta" command="set_double" arguments="12" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
 </pqevents>

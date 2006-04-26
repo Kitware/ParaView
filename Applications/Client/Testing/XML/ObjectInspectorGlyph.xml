@@ -10,5 +10,5 @@
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/ScrollArea/qt_scrollarea_viewport/Panel/SelectInputVectors" command="set_string" arguments="Normals" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/ScrollArea/qt_scrollarea_viewport/Panel/SetScaleMode" command="set_string" arguments="scalar" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/ScrollArea/qt_scrollarea_viewport/Panel/Source" command="set_string" arguments="ArrowSource1" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
 </pqevents>

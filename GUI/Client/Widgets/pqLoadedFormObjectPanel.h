@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqObjectInspectorWidget.h
+   Module:    pqLoadedFormObjectPanel.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,49 +30,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqObjectInspectorWidget.h
-/// \brief
-///   The pqObjectInspectorWidget class is used to display the properties
-///   of an object in an editable form.
-///
-/// \date 11/25/2005
+#ifndef _pqLoadedFormObjectPanel_h
+#define _pqLoadedFormObjectPanel_h
 
-#ifndef _pqObjectInspectorWidget_h
-#define _pqObjectInspectorWidget_h
+#include "pqNamedObjectPanel.h"
 
-#include "pqWidgetsExport.h"
-#include <QWidget>
-#include <QListWidgetItem>
-
-class pqObjectPanel;
-class QTabWidget;
-class vtkSMProxy;
-
-
-/// \class pqObjectInspectorWidget
-/// \brief
-///   The pqObjectInspectorWidget class is used to display the properties
-///   of an object in an editable form.
-class PQWIDGETS_EXPORT pqObjectInspectorWidget : public QWidget
+/// Widget which provides an editor for editing properties of a proxy
+class pqLoadedFormObjectPanel : public pqNamedObjectPanel
 {
   Q_OBJECT
 public:
-  pqObjectInspectorWidget(QWidget *parent=0);
-  virtual ~pqObjectInspectorWidget();
+  /// constructor
+  pqLoadedFormObjectPanel(QString filename, QWidget* p);
+  /// destructor
+  ~pqLoadedFormObjectPanel();
 
-public slots:
-  void setProxy(vtkSMProxy *proxy);
+  /// returns whether the form for the filename successfully loaded
+  bool isValid();
 
-  /// accept the changes made to the properties
-  /// changes will be propogated down to the server manager
-  void accept();
-  /// reset the changes made
-  /// editor will query properties from the server manager
-  void reset();
+  /// set the proxy to display properties for
+  void setProxy(pqSMProxy proxy);
 
-private:
-  pqObjectPanel* ObjectPanel;
-  QTabWidget* TabWidget;
+protected:
+
 };
 
 #endif
+

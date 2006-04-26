@@ -130,7 +130,6 @@ public:
   /// set the single element of a property (integer, string, real, etc..)
   static void setFileListProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QString Value);
 
-
 private:
   void setProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QVariant QtProperty);
   QVariant getProperty(vtkSMProxy* Proxy, vtkSMProperty* Property);

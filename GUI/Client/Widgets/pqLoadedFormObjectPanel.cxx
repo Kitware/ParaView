@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqObjectInspectorWidget.h
+   Module:    pqLoadedFormObjectPanel.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,49 +30,61 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqObjectInspectorWidget.h
-/// \brief
-///   The pqObjectInspectorWidget class is used to display the properties
-///   of an object in an editable form.
-///
-/// \date 11/25/2005
+// this include
+#include "pqLoadedFormObjectPanel.h"
 
-#ifndef _pqObjectInspectorWidget_h
-#define _pqObjectInspectorWidget_h
+// Qt includes
+#include <QVBoxLayout>
+#include <QFormBuilder>
 
-#include "pqWidgetsExport.h"
-#include <QWidget>
-#include <QListWidgetItem>
+// VTK includes
 
-class pqObjectPanel;
-class QTabWidget;
-class vtkSMProxy;
+// paraview includes
+
+// paraq includes
 
 
-/// \class pqObjectInspectorWidget
-/// \brief
-///   The pqObjectInspectorWidget class is used to display the properties
-///   of an object in an editable form.
-class PQWIDGETS_EXPORT pqObjectInspectorWidget : public QWidget
+/// constructor
+pqLoadedFormObjectPanel::pqLoadedFormObjectPanel(QString filename, QWidget* p)
+  : pqNamedObjectPanel(p)
 {
-  Q_OBJECT
-public:
-  pqObjectInspectorWidget(QWidget *parent=0);
-  virtual ~pqObjectInspectorWidget();
+  QBoxLayout* mainlayout = new QVBoxLayout(this);
+  mainlayout->setMargin(0);
 
-public slots:
-  void setProxy(vtkSMProxy *proxy);
+  QFile file(filename);
+  
+  if(file.open(QFile::ReadOnly))
+    {
+    QFormBuilder builder;
+    QWidget* customForm = builder.load(&file, NULL);
+    file.close();
+    mainlayout->addWidget(customForm);
+    }
+}
 
-  /// accept the changes made to the properties
-  /// changes will be propogated down to the server manager
-  void accept();
-  /// reset the changes made
-  /// editor will query properties from the server manager
-  void reset();
+/// destructor
+pqLoadedFormObjectPanel::~pqLoadedFormObjectPanel()
+{
+}
 
-private:
-  pqObjectPanel* ObjectPanel;
-  QTabWidget* TabWidget;
-};
+bool pqLoadedFormObjectPanel::isValid()
+{
+  return this->layout()->count() == 1;
+}
 
-#endif
+/// set the proxy to display properties for
+void pqLoadedFormObjectPanel::setProxy(pqSMProxy p)
+{
+  this->setUpdatesEnabled(false);
+  if(this->Proxy)
+    {
+    this->unlinkServerManagerProperties();
+    }
+  this->Proxy = p;
+  if(this->Proxy)
+    {
+    this->linkServerManagerProperties();
+    }
+  this->setUpdatesEnabled(true);
+}
+

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqObjectInspectorWidget.h
+   Module:    pqObjectPanel.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,39 +30,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqObjectInspectorWidget.h
-/// \brief
-///   The pqObjectInspectorWidget class is used to display the properties
-///   of an object in an editable form.
-///
-/// \date 11/25/2005
+#ifndef _pqObjectPanel_h
+#define _pqObjectPanel_h
 
-#ifndef _pqObjectInspectorWidget_h
-#define _pqObjectInspectorWidget_h
-
-#include "pqWidgetsExport.h"
 #include <QWidget>
-#include <QListWidgetItem>
+#include "pqSMProxy.h"
+#include "pqPropertyManager.h"
 
-class pqObjectPanel;
-class QTabWidget;
-class vtkSMProxy;
-
-
-/// \class pqObjectInspectorWidget
-/// \brief
-///   The pqObjectInspectorWidget class is used to display the properties
-///   of an object in an editable form.
-class PQWIDGETS_EXPORT pqObjectInspectorWidget : public QWidget
+/// Base class for Widget which provides an editor for editing properties of a proxy
+class pqObjectPanel : public QWidget
 {
   Q_OBJECT
 public:
-  pqObjectInspectorWidget(QWidget *parent=0);
-  virtual ~pqObjectInspectorWidget();
+  /// constructor
+  pqObjectPanel(QWidget* p);
+  /// destructor
+  ~pqObjectPanel();
+
+  /// set the proxy to display properties for
+  virtual void setProxy(pqSMProxy proxy);
+  /// get the proxy for which properties are displayed
+  virtual pqSMProxy proxy();
+  
+  /// hint for sizing this widget
+  QSize sizeHint() const;
+  
+  /// global instance property manager
+  static pqPropertyManager PropertyManager;
 
 public slots:
-  void setProxy(vtkSMProxy *proxy);
-
   /// accept the changes made to the properties
   /// changes will be propogated down to the server manager
   void accept();
@@ -70,9 +66,11 @@ public slots:
   /// editor will query properties from the server manager
   void reset();
 
-private:
-  pqObjectPanel* ObjectPanel;
-  QTabWidget* TabWidget;
+protected:
+  pqSMProxy Proxy;
+
+
 };
 
 #endif
+

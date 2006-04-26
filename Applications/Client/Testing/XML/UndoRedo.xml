@@ -5,16 +5,16 @@
   <pqevent object="MainWindow/MenuBar/SourcesMenu/Sphere" command="activate" arguments="" />
   <pqevent object="MainWindow/MenuBar/SourcesMenu/Cylinder" command="activate" arguments="" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/ScrollArea/qt_scrollarea_viewport/Panel/Center:1" command="set_string" arguments="1" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/ScrollArea/qt_scrollarea_viewport/Panel/Height" command="set_string" arguments="2" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/UndoRedoToolBar/UndoButton" command="activate" arguments="" />
   <pqevent object="MainWindow/UndoRedoToolBar/RedoButton" command="activate" arguments="" />
   <pqevent object="MainWindow/UndoRedoToolBar/UndoButton" command="activate" arguments="" />
   <pqevent object="MainWindow/PipelineInspectorDock/PipelineList/PipelineView" command="currentChanged" arguments="/0/0/0/0|0" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/UndoRedoToolBar/UndoButton" command="activate" arguments="" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/ScrollArea/qt_scrollarea_viewport/Panel/Center:0" command="set_string" arguments="1" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/UndoRedoToolBar/UndoButton" command="activate" arguments="" />
 </pqevents>

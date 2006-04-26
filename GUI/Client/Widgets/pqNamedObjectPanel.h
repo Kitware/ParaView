@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqObjectInspectorWidget.h
+   Module:    pqNamedObjectPanel.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,49 +30,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqObjectInspectorWidget.h
-/// \brief
-///   The pqObjectInspectorWidget class is used to display the properties
-///   of an object in an editable form.
-///
-/// \date 11/25/2005
+#ifndef _pqNamedObjectPanel_h
+#define _pqNamedObjectPanel_h
 
-#ifndef _pqObjectInspectorWidget_h
-#define _pqObjectInspectorWidget_h
+#include "pqObjectPanel.h"
 
-#include "pqWidgetsExport.h"
-#include <QWidget>
-#include <QListWidgetItem>
-
-class pqObjectPanel;
-class QTabWidget;
-class vtkSMProxy;
-
-
-/// \class pqObjectInspectorWidget
-/// \brief
-///   The pqObjectInspectorWidget class is used to display the properties
-///   of an object in an editable form.
-class PQWIDGETS_EXPORT pqObjectInspectorWidget : public QWidget
+/// Base class for Widget which provides an editor for editing properties of a proxy 
+/// where child widgets are named after the property they represent
+class pqNamedObjectPanel : public pqObjectPanel
 {
   Q_OBJECT
 public:
-  pqObjectInspectorWidget(QWidget *parent=0);
-  virtual ~pqObjectInspectorWidget();
+  /// constructor
+  pqNamedObjectPanel(QWidget* p);
+  /// destructor
+  ~pqNamedObjectPanel();
 
-public slots:
-  void setProxy(vtkSMProxy *proxy);
+protected:
+  
+  /// populate widgets with properties from the server manager
+  void linkServerManagerProperties();
+  /// set the properties in the server manager with properties in the widgets
+  void unlinkServerManagerProperties();
 
-  /// accept the changes made to the properties
-  /// changes will be propogated down to the server manager
-  void accept();
-  /// reset the changes made
-  /// editor will query properties from the server manager
-  void reset();
-
-private:
-  pqObjectPanel* ObjectPanel;
-  QTabWidget* TabWidget;
 };
 
 #endif
+

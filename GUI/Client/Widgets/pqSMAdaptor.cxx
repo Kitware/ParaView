@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSignalMapper>
 
 #include "vtkEventQtSlotConnect.h"
-
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMPropertyAdaptor.h"
