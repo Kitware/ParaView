@@ -50,7 +50,7 @@ pqVariableSelectorWidget::pqVariableSelectorWidget( QWidget *p ) :
   this->Layout->setSpacing( 1 );
   this->Layout->addWidget(this->Variables);
 
-  connect(this->Variables, SIGNAL(currentIndexChanged(int)), SLOT(onVariableActivated(int)));
+  connect(this->Variables, SIGNAL(activated(int)), SLOT(onVariableActivated(int)));
 }
 
 pqVariableSelectorWidget::~pqVariableSelectorWidget()
