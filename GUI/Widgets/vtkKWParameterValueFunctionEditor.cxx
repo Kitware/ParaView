@@ -39,7 +39,7 @@
 #include <vtksys/stl/algorithm>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.90");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.91");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -102,6 +102,7 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->DisableCommands             = 0;
   this->SelectedPoint               = -1;
   this->FunctionLineWidth           = 2;
+  this->HistogramPolyLineWidth      = 1;
   this->PointOutlineWidth           = 1;
   this->FunctionLineStyle           = vtkKWParameterValueFunctionEditor::LineStyleSolid;
   this->PointGuidelineStyle         = vtkKWParameterValueFunctionEditor::LineStyleDash;
@@ -3602,6 +3603,21 @@ void vtkKWParameterValueFunctionEditor::SetComputeHistogramColorFromValue(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetHistogramPolyLineWidth(int arg)
+{
+  if (this->HistogramPolyLineWidth == arg)
+    {
+    return;
+    }
+
+  this->HistogramPolyLineWidth = arg;
+
+  this->Modified();
+
+  this->RedrawHistogram();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetHistogramStyle(
   int arg)
 {
@@ -5953,11 +5969,13 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
     else
       {
       double c_y = (v_w_range[1] - v_v_range[0]) * factors[1];
+      double factor = 
+        c_y / (double)this->HistogramImageDescriptor->Height;
       int *y_ptr = hist_image_coords->GetPointer(0);
       int *y_end = y_ptr + hist_image_coords->GetNumberOfTuples();
       for (; y_ptr < y_end; ++c_x, ++y_ptr)
         {
-        tk_cmd << c_x << " " << (c_y - *y_ptr) << " ";
+        tk_cmd << c_x << " " << (c_y - factor * (*y_ptr)) << " ";
         }
       tk_cmd << endl;
       sprintf(color, "#%02x%02x%02x", 
@@ -5966,7 +5984,8 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
               (int)(this->HistogramColor[2] * 255.0));
       tk_cmd << canv << " itemconfigure " 
              << vtkKWParameterValueFunctionEditor::HistogramTag 
-             << " -fill " << color << endl;
+             << " -fill " << color 
+             << " -width " << this->HistogramPolyLineWidth << endl;
       }
     }
   else
@@ -6022,11 +6041,13 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
     else
       {
       double c_y = (v_w_range[1] - v_v_range[0]) * factors[1];
+      double factor = 
+        c_y / (double)this->SecondaryHistogramImageDescriptor->Height;
       int *y_ptr = secondary_hist_image_coords->GetPointer(0);
       int *y_end = y_ptr + secondary_hist_image_coords->GetNumberOfTuples();
       for (; y_ptr < y_end; ++c_x, ++y_ptr)
         {
-        tk_cmd << c_x << " " << (c_y - *y_ptr) << " ";
+        tk_cmd << c_x << " " << (c_y - factor * (*y_ptr)) << " ";
         }
       tk_cmd << endl;
       sprintf(color, "#%02x%02x%02x", 
@@ -6035,7 +6056,8 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
               (int)(this->SecondaryHistogramColor[2] * 255.0));
       tk_cmd << canv << " itemconfigure " 
              << vtkKWParameterValueFunctionEditor::SecondaryHistogramTag 
-             << " -fill " << color << endl;
+             << " -fill " << color
+             << " -width " << this->HistogramPolyLineWidth << endl;
       }
     }
   else
@@ -7659,6 +7681,7 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
   os << indent << "LastPointStyle: " << this->LastPointStyle << endl;
   os << indent << "FunctionLineStyle: " << this->FunctionLineStyle << endl;
   os << indent << "FunctionLineWidth: " << this->FunctionLineWidth << endl;
+  os << indent << "HistogramPolyLineWidth: " << this->HistogramPolyLineWidth << endl;
   os << indent << "ParameterCursorPosition: " 
      << this->ParameterCursorPosition << endl;
   os << indent << "PointGuidelineStyle: " << this->PointGuidelineStyle << endl;

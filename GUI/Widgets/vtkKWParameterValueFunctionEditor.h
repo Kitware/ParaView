@@ -832,6 +832,11 @@ public:
       vtkKWParameterValueFunctionEditor::HistogramStylePolyLine); };
 
   // Description:
+  // Set/Get the line width of the histograms when drawn in polyline mode.
+  virtual void SetHistogramPolyLineWidth(int);
+  vtkGetMacro(HistogramPolyLineWidth, int);
+  
+  // Description:
   // Set/Get the histogram log mode button visibility.
   // Note: set this parameter to the proper value before calling Create() in
   // order to minimize the footprint of the object.
@@ -1322,6 +1327,7 @@ protected:
   unsigned long LastHistogramBuildTime;
   int           HistogramLogModeOptionMenuVisibility;
   char          *HistogramLogModeChangedCommand;
+  int           HistogramPolyLineWidth;
 
   vtkKWMenuButton  *HistogramLogModeOptionMenu;
   virtual void CreateHistogramLogModeOptionMenu();
