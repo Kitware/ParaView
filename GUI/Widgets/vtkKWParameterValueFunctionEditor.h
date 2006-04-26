@@ -800,11 +800,36 @@ public:
 
   // Description:
   // Set/Get the histogram and secondary histogram style
-  // (see vtkKWHistogram::ImageDescriptor styles).
-  virtual void SetHistogramStyle(int);
+  //BTX
+  enum 
+  {
+    HistogramStyleBars = 0,
+    HistogramStyleDots,
+    HistogramStylePolyLine
+  };
+  //ETX
   vtkGetMacro(HistogramStyle, int);
-  virtual void SetSecondaryHistogramStyle(int);
+  virtual void SetHistogramStyle(int);
+  virtual void SetHistogramStyleToBars()
+    { this->SetHistogramStyle(
+      vtkKWParameterValueFunctionEditor::HistogramStyleBars); };
+  virtual void SetHistogramStyleToDots()
+    { this->SetHistogramStyle(
+      vtkKWParameterValueFunctionEditor::HistogramStyleDots); };
+  virtual void SetHistogramStyleToPolyLine()
+    { this->SetHistogramStyle(
+      vtkKWParameterValueFunctionEditor::HistogramStylePolyLine); };
   vtkGetMacro(SecondaryHistogramStyle, int);
+  virtual void SetSecondaryHistogramStyle(int);
+  virtual void SetSecondaryHistogramStyleToBars()
+    { this->SetSecondaryHistogramStyle(
+      vtkKWParameterValueFunctionEditor::HistogramStyleBars); };
+  virtual void SetSecondaryHistogramStyleToDots()
+    { this->SetSecondaryHistogramStyle(
+      vtkKWParameterValueFunctionEditor::HistogramStyleDots); };
+  virtual void SetSecondaryHistogramStyleToPolyLine()
+    { this->SetSecondaryHistogramStyle(
+      vtkKWParameterValueFunctionEditor::HistogramStylePolyLine); };
 
   // Description:
   // Set/Get the histogram log mode button visibility.
@@ -1069,6 +1094,7 @@ public:
   static const char *PointTextTag;
   static const char *LineTag;
   static const char *HistogramTag;
+  static const char *SecondaryHistogramTag;
   static const char *FrameForegroundTag;
   static const char *FrameBackgroundTag;
   static const char *ParameterCursorTag;
