@@ -43,7 +43,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.135");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.136");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -105,7 +105,7 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->CornerAnnotation = vtkCornerAnnotation::New();
   this->CornerAnnotation->SetMaximumLineHeight(0.07);
   this->CornerAnnotation->VisibilityOff();
-  this->CornerAnnotationSupported = 1;
+  this->SupportCornerAnnotation = 1;
 
   // Header annotation
 
@@ -1115,7 +1115,7 @@ void vtkKWRenderWidget::PopulateAnnotationMenu(vtkKWMenu *menu)
 
   // Corner Annotation
 
-  if (this->CornerAnnotationSupported)
+  if (this->SupportCornerAnnotation)
     {
     index = menu->AddCheckButton(
       ks_("Annotation|Corner Annotation"), 
@@ -1380,16 +1380,18 @@ int vtkKWRenderWidget::GetCornerAnnotationVisibility()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetCornerAnnotationSupported(int s)
+void vtkKWRenderWidget::SetSupportCornerAnnotation(int s)
 {
-  if (this->CornerAnnotationSupported == s)
+  if (this->SupportCornerAnnotation == s)
     {
     return;
     }
 
-  this->CornerAnnotationSupported = s;
-  this->SetCornerAnnotationVisibility( 
-      this->GetCornerAnnotationVisibility() & s );
+  this->SupportCornerAnnotation = s;
+  this->Modified();
+
+  this->SetCornerAnnotationVisibility(
+    this->GetCornerAnnotationVisibility() & s);
 }
 
 //----------------------------------------------------------------------------
@@ -1402,7 +1404,7 @@ void vtkKWRenderWidget::SetCornerAnnotationVisibility(int v)
 
   if (v)
     {
-    if (this->CornerAnnotationSupported)
+    if (this->SupportCornerAnnotation)
       {
       this->CornerAnnotation->VisibilityOn();
       if (!this->HasViewProp(this->CornerAnnotation))
@@ -1775,8 +1777,8 @@ void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "CornerAnnotationSupported: " 
-    << (this->CornerAnnotationSupported ? "On" : "Off") << endl;
+  os << indent << "SupportCornerAnnotation: " 
+    << (this->SupportCornerAnnotation ? "On" : "Off") << endl;
   os << indent << "CornerAnnotation: " << this->CornerAnnotation << endl;
   os << indent << "HeaderAnnotation: " << this->HeaderAnnotation << endl;
   os << indent << "Printing: " << this->Printing << endl;

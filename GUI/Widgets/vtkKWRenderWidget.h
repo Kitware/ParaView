@@ -133,14 +133,10 @@ public:
   vtkBooleanMacro(AnnotationsVisibility, int);
 
   // Description:
-  // Get and control the corner annotation. Turn CornerAnnotationSupported
-  // to off (on by default) if you do not care about corner annotations for 
-  // this render widget. The Visibility flag toggles the visibility of the 
-  // corner annotation. The CornerAnnotationSupported flag overrides the 
-  // visibility flag.
-  virtual void SetCornerAnnotationSupported( int );
-  vtkGetMacro(     CornerAnnotationSupported, int );
-  vtkBooleanMacro( CornerAnnotationSupported, int );
+  // Get and control the corner annotation. Turn SupportCornerAnnotation
+  // to off (on by default) if this widget should not support any corner 
+  // annotation (i.e. never display it, and do not populate the annotation
+  // context menu with the corresponding entry).
   virtual void SetCornerAnnotationVisibility(int v);
   virtual int  GetCornerAnnotationVisibility();
   virtual void ToggleCornerAnnotationVisibility();
@@ -150,6 +146,9 @@ public:
     { this->SetCornerAnnotationColor(rgb[0], rgb[1], rgb[2]); };
   virtual double* GetCornerAnnotationColor();
   vtkGetObjectMacro(CornerAnnotation, vtkCornerAnnotation);
+  vtkGetMacro(SupportCornerAnnotation, int);
+  virtual void SetSupportCornerAnnotation(int);
+  vtkBooleanMacro(SupportCornerAnnotation, int);
 
   // Description:
   // Get and control the header annotation.
@@ -382,7 +381,7 @@ protected:
 
   vtkKWRenderWidgetInternals *Internals;
 
-  int CornerAnnotationSupported;
+  int SupportCornerAnnotation;
 
 private:
   vtkKWRenderWidget(const vtkKWRenderWidget&);  // Not implemented
