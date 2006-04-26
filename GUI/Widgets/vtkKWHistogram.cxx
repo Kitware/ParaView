@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWHistogram);
-vtkCxxRevisionMacro(vtkKWHistogram, "1.5");
+vtkCxxRevisionMacro(vtkKWHistogram, "1.6");
 
 //----------------------------------------------------------------------------
 vtkKWHistogram::vtkKWHistogram()
@@ -596,6 +596,7 @@ int vtkKWHistogram::ImageDescriptor::IsEqualTo(const ImageDescriptor *desc)
     this->OutOfRangeColor[2]    == desc->OutOfRangeColor[2] &&
     this->DrawGrid              == desc->DrawGrid &&
     this->GridSize              == desc->GridSize &&
+    this->Style                 == desc->Style &&
     this->GridColor[0]          == desc->GridColor[0] &&
     this->GridColor[1]          == desc->GridColor[1] &&
     this->GridColor[2]          == desc->GridColor[2] &&
@@ -627,6 +628,7 @@ void vtkKWHistogram::ImageDescriptor::Copy(const ImageDescriptor *desc)
   this->OutOfRangeColor[2]    = desc->OutOfRangeColor[2];
   this->DrawGrid              = desc->DrawGrid;
   this->GridSize              = desc->GridSize;
+  this->Style                 = desc->Style;
   this->GridColor[0]          = desc->GridColor[0];
   this->GridColor[1]          = desc->GridColor[1];
   this->GridColor[2]          = desc->GridColor[2];
