@@ -134,6 +134,7 @@ QSize pqObjectEditor::sizeHint() const
 /// set the proxy to display properties for
 void pqObjectEditor::setProxy(pqSMProxy p)
 {
+  this->setUpdatesEnabled(false);
   if(this->Proxy)
     {
     this->unlinkServerManagerProperties(this->Proxy, this);
@@ -142,11 +143,10 @@ void pqObjectEditor::setProxy(pqSMProxy p)
   this->Proxy = p;
   if(this->Proxy)
     {
-    this->setUpdatesEnabled(false);
     this->createWidgets();
     this->linkServerManagerProperties(this->Proxy, this);
-    this->setUpdatesEnabled(true);
     }
+  this->setUpdatesEnabled(true);
 }
 
 /// get the proxy for which properties are displayed
@@ -493,11 +493,11 @@ void pqObjectEditor::linkServerManagerProperties(pqSMProxy proxy, QWidget* widge
           {
           listWidget->clear();
           QList<QVariant> sel_domain = pqSMAdaptor::getSelectionPropertyDomain(SMProperty);
-          for(int i=0; i<sel_domain.size(); i++)
+          for(int j=0; j<sel_domain.size(); j++)
             {
-            pqListWidgetItemObject* item = new pqListWidgetItemObject(sel_domain[i].toString(), listWidget);
+            pqListWidgetItemObject* item = new pqListWidgetItemObject(sel_domain[j].toString(), listWidget);
             pqObjectEditor::PropertyManager.registerLink(item, "checked", SIGNAL(checkedStateChanged(bool)),
-                                               proxy, SMProperty, i);
+                                               proxy, SMProperty, j);
             }
           }
         }
