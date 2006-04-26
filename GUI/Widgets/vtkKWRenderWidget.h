@@ -133,7 +133,14 @@ public:
   vtkBooleanMacro(AnnotationsVisibility, int);
 
   // Description:
-  // Get and control the corner annotation.
+  // Get and control the corner annotation. Turn CornerAnnotationSupported
+  // to off (on by default) if you do not care about corner annotations for 
+  // this render widget. The Visibility flag toggles the visibility of the 
+  // corner annotation. The CornerAnnotationSupported flag overrides the 
+  // visibility flag.
+  virtual void SetCornerAnnotationSupported( int );
+  vtkGetMacro(     CornerAnnotationSupported, int );
+  vtkBooleanMacro( CornerAnnotationSupported, int );
   virtual void SetCornerAnnotationVisibility(int v);
   virtual int  GetCornerAnnotationVisibility();
   virtual void ToggleCornerAnnotationVisibility();
@@ -374,6 +381,8 @@ protected:
   // PIMPL Encapsulation for STL containers
 
   vtkKWRenderWidgetInternals *Internals;
+
+  int CornerAnnotationSupported;
 
 private:
   vtkKWRenderWidget(const vtkKWRenderWidget&);  // Not implemented

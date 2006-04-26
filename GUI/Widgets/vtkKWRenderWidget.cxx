@@ -43,7 +43,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.134");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.135");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -105,6 +105,7 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->CornerAnnotation = vtkCornerAnnotation::New();
   this->CornerAnnotation->SetMaximumLineHeight(0.07);
   this->CornerAnnotation->VisibilityOff();
+  this->CornerAnnotationSupported = 1;
 
   // Header annotation
 
@@ -1114,15 +1115,18 @@ void vtkKWRenderWidget::PopulateAnnotationMenu(vtkKWMenu *menu)
 
   // Corner Annotation
 
-  index = menu->AddCheckButton(
-    ks_("Annotation|Corner Annotation"), 
-    this, "ToggleCornerAnnotationVisibility");
-  menu->SetItemSelectedState(index, this->GetCornerAnnotationVisibility());
-  if (show_icons)
+  if (this->CornerAnnotationSupported)
     {
-    menu->SetItemImageToPredefinedIcon(
-      index, vtkKWIcon::IconCornerAnnotation);
-    menu->SetItemCompoundMode(index, 1);
+    index = menu->AddCheckButton(
+      ks_("Annotation|Corner Annotation"), 
+      this, "ToggleCornerAnnotationVisibility");
+    menu->SetItemSelectedState(index, this->GetCornerAnnotationVisibility());
+    if (show_icons)
+      {
+      menu->SetItemImageToPredefinedIcon(
+        index, vtkKWIcon::IconCornerAnnotation);
+      menu->SetItemCompoundMode(index, 1);
+      }
     }
 
   // Header Annotation
@@ -1376,6 +1380,19 @@ int vtkKWRenderWidget::GetCornerAnnotationVisibility()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWRenderWidget::SetCornerAnnotationSupported(int s)
+{
+  if (this->CornerAnnotationSupported == s)
+    {
+    return;
+    }
+
+  this->CornerAnnotationSupported = s;
+  this->SetCornerAnnotationVisibility( 
+      this->GetCornerAnnotationVisibility() & s );
+}
+
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetCornerAnnotationVisibility(int v)
 {
   if (this->GetCornerAnnotationVisibility() == v)
@@ -1385,10 +1402,13 @@ void vtkKWRenderWidget::SetCornerAnnotationVisibility(int v)
 
   if (v)
     {
-    this->CornerAnnotation->VisibilityOn();
-    if (!this->HasViewProp(this->CornerAnnotation))
+    if (this->CornerAnnotationSupported)
       {
-      this->AddOverlayViewProp(this->CornerAnnotation);
+      this->CornerAnnotation->VisibilityOn();
+      if (!this->HasViewProp(this->CornerAnnotation))
+        {
+        this->AddOverlayViewProp(this->CornerAnnotation);
+        }
       }
     }
   else
@@ -1755,6 +1775,8 @@ void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
+  os << indent << "CornerAnnotationSupported: " 
+    << (this->CornerAnnotationSupported ? "On" : "Off") << endl;
   os << indent << "CornerAnnotation: " << this->CornerAnnotation << endl;
   os << indent << "HeaderAnnotation: " << this->HeaderAnnotation << endl;
   os << indent << "Printing: " << this->Printing << endl;
