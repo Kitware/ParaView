@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialogModel.h"
 #include "ui_pqFileDialog.h"
 
+#include <QDir>
 #include <QTimer>
 
 #include <vtkstd/set>
@@ -60,9 +61,11 @@ pqFileDialog::pqFileDialog(pqFileDialogModel* model, const QString& title, QWidg
   QObject::connect(this->Model->fileModel(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(onDataChanged(const QModelIndex&, const QModelIndex&)));
   QObject::connect(this->Ui->NavigateUp, SIGNAL(clicked()), this, SLOT(onNavigateUp()));
   QObject::connect(this->Ui->Files, SIGNAL(activated(const QModelIndex&)), this, SLOT(onActivated(const QModelIndex&)));
+  QObject::connect(this->Ui->Files, SIGNAL(clicked(const QModelIndex&)), this, SLOT(onClicked(const QModelIndex&)));
   QObject::connect(this->Ui->Favorites, SIGNAL(activated(const QModelIndex&)), this, SLOT(onActivated(const QModelIndex&)));
+  QObject::connect(this->Ui->Favorites, SIGNAL(clicked(const QModelIndex&)), this, SLOT(onClicked(const QModelIndex&)));
   QObject::connect(this->Ui->Parents, SIGNAL(activated(const QString&)), this, SLOT(onNavigate(const QString&)));
-  QObject::connect(this->Ui->FileName, SIGNAL(textChanged(const QString&)), this, SLOT(onManualEntry(const QString&)));
+  QObject::connect(this->Ui->FileName, SIGNAL(textEdited(const QString&)), this, SLOT(onManualEntry(const QString&)));
 
   this->Model->setCurrentPath(this->Model->getStartPath());
 }
@@ -92,7 +95,13 @@ void pqFileDialog::accept()
   // Collect manually entered filenames (if any) ...
   const QString manual_filename = this->Ui->FileName->text();
   if(!manual_filename.isEmpty())
-    selected_files.push_back(this->Model->getFilePath(manual_filename));
+    {
+    const QString manual_path = this->Model->getFilePath(manual_filename);
+    if(!selected_files.contains(manual_path))
+      {
+      selected_files.push_back(manual_path);
+      }
+    }
   
   // Ensure that we are hidden before broadcasting the selection, so we don't get caught by screen-captures
   this->hide();
@@ -105,10 +114,24 @@ void pqFileDialog::accept()
 
 void pqFileDialog::onDataChanged(const QModelIndex&, const QModelIndex&)
 {
-  const QStringList split_path = this->Model->splitPath(this->Model->getCurrentPath());
   this->Ui->Parents->clear();
+  
+  const QStringList split_path = this->Model->splitPath(this->Model->getCurrentPath());
   for(int i = 0; i != split_path.size(); ++i)
-    this->Ui->Parents->addItem(split_path[i]);
+    {
+    QString path;
+    for(int j = 0; j <= i; ++j)
+      {
+      if(j)
+        {
+        path += QDir::separator();
+        }
+        
+      path += split_path[j];
+      }
+    this->Ui->Parents->addItem(path);
+    }
+    
   this->Ui->Parents->setCurrentIndex(split_path.size() - 1);
 }
 
@@ -127,6 +150,22 @@ void pqFileDialog::onActivated(const QModelIndex& Index)
     emit filesSelected(this->Model->getFilePaths(Index));
     this->done(QDialog::Accepted);
     }
+}
+
+void pqFileDialog::onClicked(const QModelIndex& Index)
+{
+  if(this->Model->isDir(Index))
+    return;
+    
+  const QStringList files = this->Model->getFilePaths(Index);
+  if(files.empty())
+    return;
+  
+  const QStringList components = this->Model->splitPath(files[0]);
+  if(components.empty())
+    return;
+  
+  this->Ui->FileName->setText(components.back());
 }
 
 void pqFileDialog::onManualEntry(const QString&)

@@ -495,14 +495,7 @@ bool pqServerFileDialogModel::isDir(const QModelIndex& Index)
 
 QStringList pqServerFileDialogModel::splitPath(const QString& Path)
 {
-  QStringList results;
-  
-  for(int i = Path.indexOf(QDir::separator()); i != -1; i = Path.indexOf(QDir::separator(), i+1))
-    results.push_back(Path.left(i) + QDir::separator());
-    
-  results.push_back(Path);
-  
-  return results;
+  return Path.split(QDir::separator());
 }
 
 QAbstractItemModel* pqServerFileDialogModel::fileModel()

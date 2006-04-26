@@ -175,13 +175,13 @@ public:
       {
       FileGroup& group = this->FileGroups[Index.internalId()-1];
       FileInfo& file = group.Files[Index.row()];
-      results.push_back(file.filePath());
+      results.push_back(QDir::convertSeparators(file.filePath()));
       }
     else // Selected a file group
       {
       FileGroup& group = this->FileGroups[Index.row()];
       for(int i = 0; i != group.Files.size(); ++i)
-        results.push_back(group.Files[i].filePath());
+        results.push_back(QDir::convertSeparators(group.Files[i].filePath()));
       }
       
     return results;
@@ -540,14 +540,7 @@ bool pqLocalFileDialogModel::isDir(const QModelIndex& Index)
 
 QStringList pqLocalFileDialogModel::splitPath(const QString& Path)
 {
-  QStringList results;
-  
-  for(int i = Path.indexOf(QDir::separator()); i != -1; i = Path.indexOf(QDir::separator(), i+1))
-    results.push_back(Path.left(i) + QDir::separator());
-    
-  results.push_back(Path);
-  
-  return results;
+  return Path.split(QDir::separator());
 }
 
 QAbstractItemModel* pqLocalFileDialogModel::fileModel()
@@ -559,4 +552,3 @@ QAbstractItemModel* pqLocalFileDialogModel::favoriteModel()
 {
   return this->Implementation->FavoriteModel;
 }
-
