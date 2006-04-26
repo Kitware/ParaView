@@ -441,6 +441,7 @@ QString pqServerFileDialogModel::getStartPath()
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
     proxy->GetProperty("CurrentWorkingDirectory"));
   const char* cwd = (svp)? svp->GetElement(0) : "";
+  proxy->Delete();
   
   QString result = cwd;
   return result;

@@ -309,6 +309,7 @@ void pqPart::Color(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype
     name.prepend("LookupTable");
     vtkSMObject::GetProxyManager()->RegisterProxy("lookup_tables",
         name.toAscii().data(), lut);
+    lut->Delete();
 
     pqSMAdaptor::setElementProperty(Part, Part->GetProperty("ScalarVisibility"), 1);
 
