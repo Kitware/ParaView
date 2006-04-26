@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAreaSelect);
-vtkCxxRevisionMacro(vtkPVAreaSelect, "1.5");
+vtkCxxRevisionMacro(vtkPVAreaSelect, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVAreaSelect::vtkPVAreaSelect()
@@ -300,7 +300,6 @@ void vtkPVAreaSelect::SetVerts(int wireframe)
   else 
     {
     sb->SetElement(0, wireframe);
-    cf->SetArgumentIsArray(1);
     cf->SetElements(&this->Verts[0]);
     sp->UpdateVTKObjects();   
     }
