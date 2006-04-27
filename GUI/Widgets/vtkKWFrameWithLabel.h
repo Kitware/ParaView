@@ -164,6 +164,10 @@ public:
   virtual int GetHeight();
 
   // Description:
+  // Get the internal frame responsible for drawing the collapsible border.
+  vtkGetObjectMacro(CollapsibleFrame, vtkKWFrame);
+
+  // Description:
   // Callbacks. Internal, do not use.
   virtual void AdjustMarginCallback();
   virtual void CollapseButtonCallback();
@@ -176,9 +180,9 @@ protected:
   vtkKWFrame          *Frame;
   vtkKWFrame          *LabelFrame;
   vtkKWLabelWithLabel *Label;
-  vtkKWFrame          *Border;
-  vtkKWFrame          *Border2;
-  vtkKWFrame          *Groove;
+  vtkKWFrame          *ExternalMarginFrame;
+  vtkKWFrame          *InternalMarginFrame;
+  vtkKWFrame          *CollapsibleFrame;
   vtkKWLabel          *Icon;
   vtkKWIcon           *IconData;
 

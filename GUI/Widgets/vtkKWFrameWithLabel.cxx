@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithLabel );
-vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.7");
+vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.8");
 
 int vtkKWFrameWithLabel::DefaultLabelCase = vtkKWFrameWithLabel::LabelCaseUppercaseFirst;
 int vtkKWFrameWithLabel::DefaultLabelFontWeight = vtkKWFrameWithLabel::LabelFontWeightBold;
@@ -36,14 +36,14 @@ int vtkKWFrameWithLabel::DefaultAllowFrameToCollapse = 1;
 //----------------------------------------------------------------------------
 vtkKWFrameWithLabel::vtkKWFrameWithLabel()
 {
-  this->Border     = vtkKWFrame::New();
-  this->Groove     = vtkKWFrame::New();
-  this->Border2    = vtkKWFrame::New();
-  this->Frame      = vtkKWFrame::New();
-  this->LabelFrame = vtkKWFrame::New();
-  this->Label      = vtkKWLabelWithLabel::New();
-  this->Icon       = vtkKWLabel::New();
-  this->IconData   = vtkKWIcon::New();
+  this->ExternalMarginFrame  = vtkKWFrame::New();
+  this->CollapsibleFrame     = vtkKWFrame::New();
+  this->InternalMarginFrame  = vtkKWFrame::New();
+  this->Frame                = vtkKWFrame::New();
+  this->LabelFrame           = vtkKWFrame::New();
+  this->Label                = vtkKWLabelWithLabel::New();
+  this->Icon                 = vtkKWLabel::New();
+  this->IconData             = vtkKWIcon::New();
 
   this->AllowFrameToCollapse = 1;
   this->LimitedEditionModeIconVisibility = 0;
@@ -77,20 +77,20 @@ vtkKWFrameWithLabel::~vtkKWFrameWithLabel()
     this->LabelFrame->Delete();
     this->LabelFrame = NULL;
     }
-  if (this->Border)
+  if (this->ExternalMarginFrame)
     {
-    this->Border->Delete();
-    this->Border = NULL;
+    this->ExternalMarginFrame->Delete();
+    this->ExternalMarginFrame = NULL;
     }
-  if (this->Border2)
+  if (this->InternalMarginFrame)
     {
-    this->Border2->Delete();
-    this->Border2 = NULL;
+    this->InternalMarginFrame->Delete();
+    this->InternalMarginFrame = NULL;
     }
-  if (this->Groove)
+  if (this->CollapsibleFrame)
     {
-    this->Groove->Delete();
-    this->Groove = NULL;
+    this->CollapsibleFrame->Delete();
+    this->CollapsibleFrame = NULL;
     }
 }
 
@@ -109,18 +109,18 @@ void vtkKWFrameWithLabel::Create()
 
   this->Superclass::Create();
 
-  this->Border->SetParent(this);
-  this->Border->Create();
+  this->ExternalMarginFrame->SetParent(this);
+  this->ExternalMarginFrame->Create();
 
-  this->Groove->SetParent(this);
-  this->Groove->Create();
-  this->Groove->SetReliefToGroove();
-  this->Groove->SetBorderWidth(2);
+  this->CollapsibleFrame->SetParent(this);
+  this->CollapsibleFrame->Create();
+  this->CollapsibleFrame->SetReliefToGroove();
+  this->CollapsibleFrame->SetBorderWidth(2);
 
-  this->Border2->SetParent(this->Groove);
-  this->Border2->Create();
+  this->InternalMarginFrame->SetParent(this->CollapsibleFrame);
+  this->InternalMarginFrame->Create();
 
-  this->Frame->SetParent(this->Groove);
+  this->Frame->SetParent(this->CollapsibleFrame);
   this->Frame->Create();
 
   this->LabelFrame->SetParent(this);
@@ -172,11 +172,11 @@ void vtkKWFrameWithLabel::Create()
     ks_("Frame With Label|Shrink or expand the frame"));
   
   this->Script(
-    "pack %s -fill x -expand y -side top", this->Border->GetWidgetName());
+    "pack %s -fill x -expand y -side top", this->ExternalMarginFrame->GetWidgetName());
   this->Script(
-    "pack %s -fill both -expand y -side top", this->Groove->GetWidgetName());
+    "pack %s -fill both -expand y -side top", this->CollapsibleFrame->GetWidgetName());
   this->Script(
-    "pack %s -fill x -expand y -side top", this->Border2->GetWidgetName());
+    "pack %s -fill x -expand y -side top", this->InternalMarginFrame->GetWidgetName());
 
   this->Script(
     "pack %s -padx 2 -pady 2 -fill both -expand yes -side top",
@@ -212,13 +212,13 @@ void vtkKWFrameWithLabel::Create()
 void vtkKWFrameWithLabel::SetWidth(int width)
 {
   this->Superclass::SetWidth(width);
-  if (this->Groove)
+  if (this->CollapsibleFrame)
     {
-    this->Groove->SetWidth(width);
-    width -= this->Groove->GetBorderWidth() * 2;
-    if (this->Border2)
+    this->CollapsibleFrame->SetWidth(width);
+    width -= this->CollapsibleFrame->GetBorderWidth() * 2;
+    if (this->InternalMarginFrame)
       {
-      this->Border2->SetWidth(width);
+      this->InternalMarginFrame->SetWidth(width);
       }
     if (this->Frame)
       {
@@ -232,9 +232,9 @@ void vtkKWFrameWithLabel::SetWidth(int width)
 int vtkKWFrameWithLabel::GetWidth()
 {
   int width = this->Superclass::GetWidth();
-  if (this->Groove)
+  if (this->CollapsibleFrame)
     {
-    int internal_width = this->Groove->GetWidth();
+    int internal_width = this->CollapsibleFrame->GetWidth();
     if (internal_width > width)
       {
       width = internal_width;
@@ -243,7 +243,7 @@ int vtkKWFrameWithLabel::GetWidth()
       {
       int padx = 2; // see Create()
       internal_width = this->Frame->GetWidth() + 
-        padx * 2 + this->Groove->GetBorderWidth() * 2;
+        padx * 2 + this->CollapsibleFrame->GetBorderWidth() * 2;
       if (internal_width > width)
         {
         width = internal_width;
@@ -257,17 +257,17 @@ int vtkKWFrameWithLabel::GetWidth()
 void vtkKWFrameWithLabel::SetHeight(int height)
 {
   this->Superclass::SetHeight(height);
-  if (this->Groove)
+  if (this->CollapsibleFrame)
     {
-    if (this->Border)
+    if (this->ExternalMarginFrame)
       {
-      height -= this->Border->GetHeight();
+      height -= this->ExternalMarginFrame->GetHeight();
       }
-    this->Groove->SetHeight(height);
-    height -= this->Groove->GetBorderWidth() * 2;
-    if (this->Border2)
+    this->CollapsibleFrame->SetHeight(height);
+    height -= this->CollapsibleFrame->GetBorderWidth() * 2;
+    if (this->InternalMarginFrame)
       {
-      height -= this->Border2->GetHeight();
+      height -= this->InternalMarginFrame->GetHeight();
       }
     if (this->Frame)
       {
@@ -281,12 +281,12 @@ void vtkKWFrameWithLabel::SetHeight(int height)
 int vtkKWFrameWithLabel::GetHeight()
 {
   int height = this->Superclass::GetHeight();
-  if (this->Groove)
+  if (this->CollapsibleFrame)
     {
-    int internal_height = this->Groove->GetHeight();
-    if (this->Border)
+    int internal_height = this->CollapsibleFrame->GetHeight();
+    if (this->ExternalMarginFrame)
       {
-      internal_height += this->Border->GetHeight();
+      internal_height += this->ExternalMarginFrame->GetHeight();
       }
     if (internal_height > height)
       {
@@ -296,14 +296,14 @@ int vtkKWFrameWithLabel::GetHeight()
       {
       int pady = 2; // see Create()
       internal_height = this->Frame->GetHeight() + 
-        pady * 2 + this->Groove->GetBorderWidth() * 2;
-      if (this->Border)
+        pady * 2 + this->CollapsibleFrame->GetBorderWidth() * 2;
+      if (this->ExternalMarginFrame)
         {
-        internal_height += this->Border->GetHeight();
+        internal_height += this->ExternalMarginFrame->GetHeight();
         }
-      if (this->Border2)
+      if (this->InternalMarginFrame)
         {
-        internal_height += this->Border2->GetHeight();
+        internal_height += this->InternalMarginFrame->GetHeight();
         }
       if (internal_height > height)
         {
@@ -403,8 +403,8 @@ void vtkKWFrameWithLabel::AdjustMarginCallback()
     border2_h++;
 #endif
 
-    this->Border->SetHeight(border_h);
-    this->Border2->SetHeight(border2_h);
+    this->ExternalMarginFrame->SetHeight(border_h);
+    this->InternalMarginFrame->SetHeight(border2_h);
 
     if (vtkKWFrameWithLabel::DefaultAllowFrameToCollapse && 
         this->AllowFrameToCollapse)
@@ -555,9 +555,9 @@ void vtkKWFrameWithLabel::UpdateEnableState()
     }
   this->PropagateEnableState(this->Frame);
   this->PropagateEnableState(this->LabelFrame);
-  this->PropagateEnableState(this->Border);
-  this->PropagateEnableState(this->Border2);
-  this->PropagateEnableState(this->Groove);
+  this->PropagateEnableState(this->ExternalMarginFrame);
+  this->PropagateEnableState(this->InternalMarginFrame);
+  this->PropagateEnableState(this->CollapsibleFrame);
   this->PropagateEnableState(this->Icon);
 }
 
@@ -581,6 +581,7 @@ void vtkKWFrameWithLabel::PrintSelf(ostream& os, vtkIndent indent)
      << (this->AllowFrameToCollapse ? "On" : "Off") << endl;
   os << indent << "Frame: " << this->Frame << endl;
   os << indent << "LabelFrame: " << this->LabelFrame << endl;
+  os << indent << "Groove: " << this->CollapsibleFrame << endl;
   os << indent << "Label: " << this->Label << endl;
   os << indent << "LimitedEditionModeIconVisibility: " 
      << (this->LimitedEditionModeIconVisibility ? "On" : "Off") << endl;
