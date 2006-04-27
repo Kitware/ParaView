@@ -791,21 +791,6 @@ struct LineChartAdapter::pqImplementation
         addDifferencePlot(ExperimentalData[i], *reader, element_id.toInt());
         }
       }
-    
-    int array_id = -1;
-    switch(this->ExodusVariableType)
-      {
-      case VARIABLE_TYPE_CELL:
-        array_id = reader->GetCellArrayID(this->ExodusVariableName.toAscii().data());
-        if(-1 == array_id)
-          return;
-        break;
-      case VARIABLE_TYPE_NODE:
-        array_id = reader->GetPointArrayID(this->ExodusVariableName.toAscii().data());
-        if(-1 == array_id)
-          return;
-        break;
-      }
 
     this->Chart.getYAxis().getLabel().setText(this->ExodusVariableName);
 
