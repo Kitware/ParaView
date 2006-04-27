@@ -33,7 +33,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.48");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.49");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -1070,8 +1070,10 @@ void vtkKWWindowBase::LoadScript()
   load_dialog->SetDefaultExtension(this->ScriptExtension);
 
   char buffer[500];
-  sprintf(buffer, ks_("Load Script Dialog|File Type|%s Scripts"));
-
+  sprintf(buffer, 
+          ks_("Load Script Dialog|File Type|%s Scripts"), 
+          this->ScriptType ? this->ScriptType : "");
+  
   vtksys_stl::string filetypes;
   filetypes += "{{";
   filetypes += buffer;
