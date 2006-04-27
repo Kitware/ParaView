@@ -63,7 +63,7 @@ signals:
   void variableChanged(pqVariableType type, const QString& name);
 
 private slots:
-  /// Slot called when the user makes a choice in the combo box.
+  /// Called to emit the variableChanged() signal in response to user input or the chooseVariable() method.
   void onVariableActivated(int row);
 
 private:
@@ -72,6 +72,7 @@ private:
   
   QHBoxLayout* Layout;
   QComboBox* Variables;
+  bool BlockEmission;
 };
 
 #endif

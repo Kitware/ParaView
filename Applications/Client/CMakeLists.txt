@@ -98,6 +98,7 @@ IF(BUILD_TESTING)
     SubMenu
     ObjectInspectorSphere
     ObjectInspectorGlyph
+    VariableSelector
     )
 
   SET (TESTS_WITHOUT_BASELINES

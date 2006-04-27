@@ -1426,6 +1426,7 @@ void pqMainWindow::onUpdateVariableSelector(vtkSMProxy* p)
     return;
     
   selector->clear();
+  selector->addVariable(VARIABLE_TYPE_NONE, "");
 
   if(!this->Implementation->CurrentProxy)
     return;
@@ -1480,17 +1481,27 @@ void pqMainWindow::onUpdateVariableSelector(vtkSMProxy* p)
       }
     }
 
-  // set to the active display scalar
-  vtkSMStringVectorProperty* d_svp = vtkSMStringVectorProperty::SafeDownCast(display->GetProperty("ColorArray"));
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(display->GetProperty("ScalarMode"));
-  int fieldtype = ivp->GetElement(0);
-  if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
+  // Update the variable selector to display the current proxy color
+  QVariant scalarColor = pqSMAdaptor::getElementProperty(display, display->GetProperty("ScalarVisibility"));
+  
+  vtkSMIntVectorProperty* scalar_visibility = vtkSMIntVectorProperty::SafeDownCast(display->GetProperty("ScalarVisibility"));
+  if(scalar_visibility && scalar_visibility->GetElement(0))
     {
-    selector->chooseVariable(VARIABLE_TYPE_CELL, d_svp->GetElement(0));
+    vtkSMStringVectorProperty* d_svp = vtkSMStringVectorProperty::SafeDownCast(display->GetProperty("ColorArray"));
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(display->GetProperty("ScalarMode"));
+    int fieldtype = ivp->GetElement(0);
+    if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
+      {
+      selector->chooseVariable(VARIABLE_TYPE_CELL, d_svp->GetElement(0));
+      }
+    else if(fieldtype == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)
+      {
+      selector->chooseVariable(VARIABLE_TYPE_NODE, d_svp->GetElement(0));
+      }
     }
   else
     {
-    selector->chooseVariable(VARIABLE_TYPE_NODE, d_svp->GetElement(0));
+    selector->chooseVariable(VARIABLE_TYPE_NONE, "");
     }
 }
 
@@ -1504,6 +1515,9 @@ void pqMainWindow::onVariableChanged(pqVariableType type, const QString& name)
 
     switch(type)
       {
+      case VARIABLE_TYPE_NONE:
+        pqPart::Color(display, NULL, 0);
+        break;
       case VARIABLE_TYPE_CELL:
         pqPart::Color(display, name.toAscii().data(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
         break;

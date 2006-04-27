@@ -735,6 +735,9 @@ struct LineChartAdapter::pqImplementation
         }
       }
     
+    if(this->ExodusVariableType == VARIABLE_TYPE_NONE)
+      return;
+      
     if(this->ExodusVariableName.isEmpty())
       return;
 

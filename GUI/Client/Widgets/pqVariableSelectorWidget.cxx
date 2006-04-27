@@ -36,7 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHBoxLayout>
 
 pqVariableSelectorWidget::pqVariableSelectorWidget( QWidget *p ) :
-  QWidget( p )
+  QWidget( p ),
+  BlockEmission(false)
 {
   this->Layout  = new QHBoxLayout( this );
   this->Layout->setMargin(0);
@@ -50,7 +51,7 @@ pqVariableSelectorWidget::pqVariableSelectorWidget( QWidget *p ) :
   this->Layout->setSpacing( 1 );
   this->Layout->addWidget(this->Variables);
 
-  connect(this->Variables, SIGNAL(activated(int)), SLOT(onVariableActivated(int)));
+  connect(this->Variables, SIGNAL(currentIndexChanged(int)), SLOT(onVariableActivated(int)));
 }
 
 pqVariableSelectorWidget::~pqVariableSelectorWidget()
@@ -64,7 +65,9 @@ pqVariableSelectorWidget::~pqVariableSelectorWidget()
 
 void pqVariableSelectorWidget::clear()
 {
+  this->BlockEmission = true;
   this->Variables->clear();
+  this->BlockEmission = false;
 }
 
 void pqVariableSelectorWidget::addVariable(pqVariableType type, const QString& name)
@@ -73,8 +76,12 @@ void pqVariableSelectorWidget::addVariable(pqVariableType type, const QString& n
   if(-1 != this->Variables->findData(this->variableData(type, name)))
     return;
 
+  this->BlockEmission = true;
   switch(type)
     {
+    case VARIABLE_TYPE_NONE:
+      this->Variables->addItem(name, this->variableData(type, name));
+      break;
     case VARIABLE_TYPE_NODE:
       this->Variables->addItem("Point " + name, this->variableData(type, name));
       break;
@@ -82,6 +89,7 @@ void pqVariableSelectorWidget::addVariable(pqVariableType type, const QString& n
       this->Variables->addItem("Cell " + name, this->variableData(type, name));
       break;
     }
+  this->BlockEmission = false;
 }
 
 void pqVariableSelectorWidget::chooseVariable(pqVariableType type, const QString& name)
@@ -90,26 +98,39 @@ void pqVariableSelectorWidget::chooseVariable(pqVariableType type, const QString
   if(row != -1)
     {
     this->Variables->setCurrentIndex(row);
-    this->onVariableActivated(row);
     }
 }
 
 void pqVariableSelectorWidget::onVariableActivated(int row)
 {
+  if(this->BlockEmission)
+    return;
+
   const QStringList d = this->Variables->itemData(row).toString().split("|");
-  if(d.size() == 2)
-    {
-    const pqVariableType type = d[1] == "cell" ? VARIABLE_TYPE_CELL : VARIABLE_TYPE_NODE;
-    const QString name = d[0];
+  if(d.size() != 2)
+    return;
     
-    emit variableChanged(type, name);
+  pqVariableType type = VARIABLE_TYPE_NONE;
+  if(d[1] == "cell")
+    {
+    type = VARIABLE_TYPE_CELL;
     }
+  else if(d[1] == "point")
+    {
+    type = VARIABLE_TYPE_NODE;
+    }
+    
+  const QString name = d[0];
+  
+  emit variableChanged(type, name);
 }
 
 const QString pqVariableSelectorWidget::variableData(pqVariableType type, const QString& name)
 {
   switch(type)
     {
+    case VARIABLE_TYPE_NONE:
+      return name + "|none";
     case VARIABLE_TYPE_NODE:
       return name + "|point";
     case VARIABLE_TYPE_CELL:
