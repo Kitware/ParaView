@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqWidgetEventPlayer_h
 #define _pqWidgetEventPlayer_h
 
+#include "QtTestingExport.h"
+
 class QObject;
 class QString;
 
@@ -42,7 +44,7 @@ Abstract interface for an object that can playback high-level ParaQ events by tr
 \sa pqEventPlayer
 */
 
-class pqWidgetEventPlayer
+class QTTESTING_EXPORT pqWidgetEventPlayer
 {
 public:
   virtual ~pqWidgetEventPlayer() {}

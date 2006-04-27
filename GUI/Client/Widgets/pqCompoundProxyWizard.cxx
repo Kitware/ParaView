@@ -68,7 +68,6 @@ void pqCompoundProxyWizard::onLoad()
     tr("Open Compound Proxy File:"),
     this,
     "FileOpenDialog");
-  fileDialog->setAttribute(Qt::WA_DeleteOnClose);
 
   this->connect(fileDialog, SIGNAL(filesSelected(const QStringList&)),
                 this, SLOT(onLoad(const QStringList&)));

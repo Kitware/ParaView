@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMultiViewFrame.h"
 #include "pqMultiViewManager.h"
 
+#include "pqEventTranslator.h"
 #include "pqRecordEventsDialog.h"
 #include "pqEventPlayer.h"
 #include "pqEventPlayerXML.h"
@@ -82,7 +83,9 @@ const arguments_t handleTestRecording(const arguments_t& Arguments, QWidget& Roo
     if(*argument == "--record-test")
       {
       QString file = QFileDialog::getSaveFileName();
-      pqRecordEventsDialog* dialog = new pqRecordEventsDialog(file, &RootObject);
+      pqEventTranslator* translator = new pqEventTranslator();
+      translator->addDefaultWidgetEventTranslators();
+      pqRecordEventsDialog* dialog = new pqRecordEventsDialog(translator, file, &RootObject);
       dialog->show();
       continue;
       }

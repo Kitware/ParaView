@@ -63,18 +63,22 @@ class QTWIDGETS_EXPORT pqFileDialog :
   
 public:
   pqFileDialog(pqFileDialogModel* Model, const QString& Title, QWidget* Parent, const char* const Name);
+  ~pqFileDialog();
 
+  /// Forces the dialog to emit the filesSelected() signal and close, as if receiving user input
+  void emitFilesSelected(const QStringList&);
+
+  void accept();
+  void reject();
+  
 signals:
   /// Signal emitted when the user has chosen a set of files and accepted the dialog
   void filesSelected(const QStringList&);
 
 private:
-  ~pqFileDialog();
   pqFileDialog(const pqFileDialog&);
   pqFileDialog& operator=(const pqFileDialog&);
 
-  void accept();
-  
   pqFileDialogModel* const Model;
   Ui::pqFileDialog* const Ui;
   const QModelIndex* Temp;

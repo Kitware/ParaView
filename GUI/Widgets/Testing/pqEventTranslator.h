@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqEventTranslator_h
 #define _pqEventTranslator_h
 
+#include "QtTestingExport.h"
 #include <QObject>
 
 class pqWidgetEventTranslator;
@@ -48,7 +49,7 @@ handle storage of the events.
 
 \sa pqWidgetEventTranslator, pqEventObserverStdout, pqEventObserverXML, pqEventPlayer.
 */
-class pqEventTranslator :
+class QTTESTING_EXPORT pqEventTranslator :
   public QObject
 {
   Q_OBJECT

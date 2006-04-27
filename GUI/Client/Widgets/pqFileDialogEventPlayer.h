@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqRecordEventsDialog.h
+   Module:    pqFileDialogEventPlayer.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,42 +30,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqRecordEventsDialog_h
-#define _pqRecordEventsDialog_h
+#ifndef _pqFileDialogEventPlayer_h
+#define _pqFileDialogEventPlayer_h
 
-#include "QtTestingExport.h"
-#include <QDialog>
+#include <pqWidgetEventPlayer.h>
 
-class pqEventTranslator;
+/**
+Concrete implementation of pqWidgetEventPlayer that handles playback of recorded file dialog user input.
 
-/// Provides a standard dialog that will record user input to an XML file as long as the dialog remains open
-class QTTESTING_EXPORT pqRecordEventsDialog :
-  public QDialog
+\sa pqEventPlayer
+*/
+class pqFileDialogEventPlayer :
+  public pqWidgetEventPlayer
 {
-  Q_OBJECT
-  
 public:
-  /**
-  Creates the dialog and begins translating user input with the supplied translator.
-  pqRecordEventsDialog takes responsibility for the lifetime of the supplied translator object
-  
-  Output will be stored as XML using the supplied filesystem path.
-  */
-  pqRecordEventsDialog(pqEventTranslator* Translator, const QString& Path, QWidget* Parent);
+  pqFileDialogEventPlayer();
 
-private slots:
-  void accept();
-  void reject();
-  void onAutoDelete();
+  bool playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error);
 
 private:
-  pqRecordEventsDialog(const pqRecordEventsDialog&);
-  pqRecordEventsDialog& operator=(const pqRecordEventsDialog&);
-  ~pqRecordEventsDialog();
-
-  struct pqImplementation;
-  pqImplementation* const Implementation;
+  pqFileDialogEventPlayer(const pqFileDialogEventPlayer&);
+  pqFileDialogEventPlayer& operator=(const pqFileDialogEventPlayer&);
 };
 
-#endif // !_pqRecordEventsDialog_h
+#endif // !_pqFileDialogEventPlayer_h
 

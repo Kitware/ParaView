@@ -30,6 +30,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqDataSetModel.h
   pqDisplayProxyEditor.h
   pqElementInspectorWidget.h
+  pqFileDialogEventTranslator.h
   pqImageTip.h
   pqLoadedFormObjectPanel.h
   pqMainWindow.h
@@ -99,6 +100,10 @@ ADD_LIBRARY(pqWidgets
   pqDisplayProxyEditor.h
   pqElementInspectorWidget.cxx
   pqElementInspectorWidget.h
+  pqFileDialogEventPlayer.cxx
+  pqFileDialogEventPlayer.h
+  pqFileDialogEventTranslator.cxx
+  pqFileDialogEventTranslator.h
   pqImageTip.cxx
   pqImageTip.h
   pqLoadedFormObjectPanel.cxx

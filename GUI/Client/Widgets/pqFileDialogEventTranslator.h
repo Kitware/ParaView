@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqRecordEventsDialog.h
+   Module:    pqFileDialogEventTranslator.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,42 +30,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqRecordEventsDialog_h
-#define _pqRecordEventsDialog_h
+#ifndef _pqFileDialogEventTranslator_h
+#define _pqFileDialogEventTranslator_h
 
-#include "QtTestingExport.h"
-#include <QDialog>
+#include <pqWidgetEventTranslator.h>
 
-class pqEventTranslator;
+class pqFileDialog;
 
-/// Provides a standard dialog that will record user input to an XML file as long as the dialog remains open
-class QTTESTING_EXPORT pqRecordEventsDialog :
-  public QDialog
+/**
+Translates low-level Qt events into high-level ParaQ events that can be recorded as test cases.
+
+\sa pqEventTranslator
+*/
+
+class pqFileDialogEventTranslator :
+  public pqWidgetEventTranslator
 {
   Q_OBJECT
   
 public:
-  /**
-  Creates the dialog and begins translating user input with the supplied translator.
-  pqRecordEventsDialog takes responsibility for the lifetime of the supplied translator object
+  pqFileDialogEventTranslator();
   
-  Output will be stored as XML using the supplied filesystem path.
-  */
-  pqRecordEventsDialog(pqEventTranslator* Translator, const QString& Path, QWidget* Parent);
-
-private slots:
-  void accept();
-  void reject();
-  void onAutoDelete();
+  virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
 
 private:
-  pqRecordEventsDialog(const pqRecordEventsDialog&);
-  pqRecordEventsDialog& operator=(const pqRecordEventsDialog&);
-  ~pqRecordEventsDialog();
+  pqFileDialogEventTranslator(const pqFileDialogEventTranslator&);
+  pqFileDialogEventTranslator& operator=(const pqFileDialogEventTranslator&);
 
-  struct pqImplementation;
-  pqImplementation* const Implementation;
+  pqFileDialog* CurrentObject;
+
+private slots:
+  void onFilesSelected(const QStringList&);
+  void onCancelled();
 };
 
-#endif // !_pqRecordEventsDialog_h
+#endif // !_pqFileDialogEventTranslator_h
 

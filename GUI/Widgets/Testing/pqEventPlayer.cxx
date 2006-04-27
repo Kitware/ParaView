@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqAbstractStringEventPlayer.h"
 #include "pqEventPlayer.h"
 #include "pqObjectNaming.h"
+#include "pqTesting.h"
 
 #include <QApplication>
 #include <QObject>
@@ -90,7 +91,7 @@ bool pqEventPlayer::playEvent(const QString& Object, const QString& Command, con
         qCritical() << "Error playing command " << Command << " object " << object;
         return false;
         }
-        
+      
       QApplication::instance()->processEvents();
       return true;
       }

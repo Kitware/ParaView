@@ -52,10 +52,10 @@ void pqTesting::NonBlockingSleep(int Milliseconds)
     QCoreApplication::processEvents(QEventLoop::AllEvents, Milliseconds);
     
 #ifdef Q_OS_WIN32
-    Sleep(Milliseconds);
+    Sleep(Milliseconds / 10);
 #else
     struct timespec ts = { 0, 0 };
-    ts.tv_nsec = Milliseconds * 1000 * 1000;
+    ts.tv_nsec = Milliseconds * 1000 * 1000 / 10;
     nanosleep(&ts, NULL);
 #endif
     }

@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCompoundProxyWizard.h"
 #include "pqElementInspectorWidget.h"
+#include "pqFileDialogEventPlayer.h"
+#include "pqFileDialogEventTranslator.h"
 #include "pqMainWindow.h"
 #include "pqMultiViewFrame.h"
 #include "pqMultiViewManager.h"
@@ -57,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqConnect.h>
 #include <pqEventPlayer.h>
 #include <pqEventPlayerXML.h>
+#include <pqEventTranslator.h>
 #include <pqFileDialog.h>
 #include <pqImageComparison.h>
 #include <pqLocalFileDialogModel.h>
@@ -698,7 +701,6 @@ void pqMainWindow::onFileOpen(pqServer* Server)
 
   pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(NULL, Server), 
     tr("Open File:"), this, "FileOpenDialog");
-  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileOpen(const QStringList&)));
   file_dialog->show();
 }
@@ -738,7 +740,6 @@ void pqMainWindow::onFileOpenServerState()
 {
   pqFileDialog *fileDialog = new pqFileDialog(new pqLocalFileDialogModel(),
       tr("Open Server State File:"), this, "FileOpenServerStateDialog");
-  fileDialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(fileDialog, SIGNAL(filesSelected(const QStringList&)),
       this, SLOT(onFileOpenServerState(const QStringList&)));
   fileDialog->show();
@@ -813,7 +814,6 @@ void pqMainWindow::onFileOpenServerState(const QStringList& Files)
 void pqMainWindow::onFileSaveServerState()
 {
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save Server State:"), this, "FileSaveServerStateDialog");
-  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileSaveServerState(const QStringList&)));
   file_dialog->show();
 }
@@ -882,7 +882,6 @@ void pqMainWindow::onFileSaveScreenshot()
     }
 
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save Screenshot:"), this, "FileSaveScreenshotDialog");
-  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileSaveScreenshot(const QStringList&)));
   file_dialog->show();
 }
@@ -1176,7 +1175,6 @@ void pqMainWindow::onValidateWidgetNames()
 void pqMainWindow::onRecordTest()
 {
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Record Test:"), this, "ToolsRecordTestDialog");
-  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onRecordTest(const QStringList&)));
   file_dialog->show();
 }
@@ -1185,7 +1183,11 @@ void pqMainWindow::onRecordTest(const QStringList& Files)
 {
   for(int i = 0; i != Files.size(); ++i)
     {
-    pqRecordEventsDialog* const dialog = new pqRecordEventsDialog(Files[i], this);
+    pqEventTranslator* const translator = new pqEventTranslator();
+    translator->addWidgetEventTranslator(new pqFileDialogEventTranslator());
+    translator->addDefaultWidgetEventTranslators();
+    
+    pqRecordEventsDialog* const dialog = new pqRecordEventsDialog(translator, Files[i], this);
     dialog->show();
     }
 }
@@ -1193,15 +1195,16 @@ void pqMainWindow::onRecordTest(const QStringList& Files)
 void pqMainWindow::onPlayTest()
 {
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Play Test:"), this, "ToolsPlayTestDialog");
-  file_dialog->setAttribute(Qt::WA_DeleteOnClose);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onPlayTest(const QStringList&)));
   file_dialog->show();
 }
 
 void pqMainWindow::onPlayTest(const QStringList& Files)
 {
+  QApplication::processEvents();
+
   pqEventPlayer player;
-//  player.addWidgetEventPlayer(new pqPipelineListWidgetPlayer());
+  player.addWidgetEventPlayer(new pqFileDialogEventPlayer());
   player.addDefaultWidgetEventPlayers();
 
   for(int i = 0; i != Files.size(); ++i)

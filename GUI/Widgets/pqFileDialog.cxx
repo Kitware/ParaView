@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDir>
 #include <QTimer>
+#include <QtDebug>
 
 #include <vtkstd/set>
 
@@ -44,6 +45,8 @@ pqFileDialog::pqFileDialog(pqFileDialogModel* model, const QString& title, QWidg
   Model(model),
   Ui(new Ui::pqFileDialog())
 {
+  this->setAttribute(Qt::WA_DeleteOnClose);
+
   this->Ui->setupUi(this);
   this->Ui->NavigateUp->setIcon(style()->standardPixmap(QStyle::SP_FileDialogToParent));
   this->Ui->Files->setModel(this->Model->fileModel());
@@ -74,6 +77,14 @@ pqFileDialog::~pqFileDialog()
 {
   delete this->Ui;
   delete this->Model;
+}
+
+void pqFileDialog::emitFilesSelected(const QStringList& files)
+{
+  // Ensure that we are hidden before broadcasting the selection, so we don't get caught by screen-captures
+  this->setVisible(false);
+  emit filesSelected(files);
+  this->done(QDialog::Accepted);
 }
 
 void pqFileDialog::accept()
@@ -112,6 +123,12 @@ void pqFileDialog::accept()
   base::accept();
 }
 
+void pqFileDialog::reject()
+{
+  // this->setObjectName("");
+  base::reject();
+}
+
 void pqFileDialog::onDataChanged(const QModelIndex&, const QModelIndex&)
 {
   this->Ui->Parents->clear();
@@ -144,11 +161,7 @@ void pqFileDialog::onActivated(const QModelIndex& Index)
     }
   else
     {
-    // Ensure that we are hidden before broadcasting the selection, so we don't get caught by screen-captures
-    this->hide();
-  
-    emit filesSelected(this->Model->getFilePaths(Index));
-    this->done(QDialog::Accepted);
+    emitFilesSelected(this->Model->getFilePaths(Index));
     }
 }
 
@@ -194,4 +207,3 @@ void pqFileDialog::onNavigateDown()
     
   this->Model->setCurrentPath(paths[0]);
 }
-

@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqWidgetEventTranslator_h
 #define _pqWidgetEventTranslator_h
 
+#include "QtTestingExport.h"
 #include <QObject>
 
 /**
@@ -40,7 +41,7 @@ Abstract interface for an object that can translate low-level Qt events into hig
 
 \sa pqEventTranslator
 */
-class pqWidgetEventTranslator :
+class QTTESTING_EXPORT pqWidgetEventTranslator :
   public QObject
 {
   Q_OBJECT

@@ -46,34 +46,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 struct pqRecordEventsDialog::pqImplementation
 {
 public:
-  pqImplementation(const QString& Path) :
-    File(Path.toAscii().data()),
+  pqImplementation(pqEventTranslator* translator, const QString& path) :
+    Translator(translator),
+    File(path.toAscii().data()),
     Observer(File)
   {
+  }
+  
+  ~pqImplementation()
+  {
+    delete this->Translator;
   }
 
   Ui::pqRecordEventsDialog Ui;
 
+  pqEventTranslator* const Translator;
   ofstream File;
-  pqEventTranslator Translator;
   pqEventObserverXML Observer;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////
 // pqRecordEventsDialog
 
-pqRecordEventsDialog::pqRecordEventsDialog(const QString& Path, QWidget* Parent) :
+pqRecordEventsDialog::pqRecordEventsDialog(pqEventTranslator* Translator, const QString& Path, QWidget* Parent) :
   QDialog(Parent),
-  Implementation(new pqImplementation(Path))
+  Implementation(new pqImplementation(Translator, Path))
 {
   this->Implementation->Ui.setupUi(this);
   this->Implementation->Ui.label->setText(QString(tr("Recording User Input to %1")).arg(Path));
 
-  this->Implementation->Translator.ignoreObject(this->Implementation->Ui.stopButton);
-  this->Implementation->Translator.addDefaultWidgetEventTranslators();
+  this->Implementation->Translator->ignoreObject(this->Implementation->Ui.stopButton);
   
   QObject::connect(
-    &this->Implementation->Translator,
+    this->Implementation->Translator,
     SIGNAL(recordEvent(const QString&, const QString&, const QString&)),
     &this->Implementation->Observer,
     SLOT(onRecordEvent(const QString&, const QString&, const QString&)));

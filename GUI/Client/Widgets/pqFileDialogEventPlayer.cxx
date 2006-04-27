@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqRecordEventsDialog.h
+   Module:    pqFileDialogEventPlayer.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,42 +30,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqRecordEventsDialog_h
-#define _pqRecordEventsDialog_h
+#include "pqFileDialogEventPlayer.h"
 
-#include "QtTestingExport.h"
-#include <QDialog>
+#include <pqFileDialog.h>
+#include <pqTesting.h>
 
-class pqEventTranslator;
+#include <QApplication>
+#include <QtDebug>
 
-/// Provides a standard dialog that will record user input to an XML file as long as the dialog remains open
-class QTTESTING_EXPORT pqRecordEventsDialog :
-  public QDialog
+pqFileDialogEventPlayer::pqFileDialogEventPlayer()
 {
-  Q_OBJECT
-  
-public:
-  /**
-  Creates the dialog and begins translating user input with the supplied translator.
-  pqRecordEventsDialog takes responsibility for the lifetime of the supplied translator object
-  
-  Output will be stored as XML using the supplied filesystem path.
-  */
-  pqRecordEventsDialog(pqEventTranslator* Translator, const QString& Path, QWidget* Parent);
+}
 
-private slots:
-  void accept();
-  void reject();
-  void onAutoDelete();
+bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error)
+{
+  // Handle playback for pqFileDialog and all its children ...
+  pqFileDialog* object = 0;
+  for(QObject* o = Object; o; o = o->parent())
+    {
+    if(object = qobject_cast<pqFileDialog*>(o))
+      break;
+    }
+  if(!object)
+    return false;
 
-private:
-  pqRecordEventsDialog(const pqRecordEventsDialog&);
-  pqRecordEventsDialog& operator=(const pqRecordEventsDialog&);
-  ~pqRecordEventsDialog();
+  if(Command == "filesSelected")
+    {
+    QStringList files;
+    files.append(Arguments);
+    object->emitFilesSelected(files);
+    QApplication::processEvents();
+        
+    return true;
+    }
+    
+  if(Command == "cancelled")
+    {
+    object->reject();
+    return true;
+    }
 
-  struct pqImplementation;
-  pqImplementation* const Implementation;
-};
-
-#endif // !_pqRecordEventsDialog_h
-
+  qCritical() << "Unknown pqFileDialog command: " << Object << " " << Command << " " << Arguments;
+  Error = true;
+  return true;
+}
