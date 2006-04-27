@@ -11,12 +11,19 @@ IF(VTK_USE_MPI)
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
 ENDIF(VTK_USE_MPI)
 
+# Reduce the number of dirs that get included on moc command line
+# since it causes issues on Windows 2000.
+GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
+SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
+
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   AboutDialog.h
   MainWindow.h
   LineChartAdapter.h
   ${PYTHON_MOC_SOURCES}
 )
+
+SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
   AboutDialog.ui
