@@ -81,6 +81,15 @@ ADD_EXECUTABLE(vtkWrapTcl
 ADD_EXECUTABLE(vtkWrapTclInit 
   ${VTK_SOURCE_DIR}/Wrapping/vtkWrapTclInit.c)
 
+
+# If a project that includes this CMakeLists file via SUBDIRS
+# wants to add to this subset, it can set VTK_TCL_FILES with
+# the extra files prior to the SUBDIRS...
+#
+# Add any abstract classes to VTK_TCL_FILES_ABSTRACT and add
+# any include directories required to VTK_TCL_FILES_INCLUDE_DIRS.
+
+
 SET(VTK_TCL_FILES
   "${VTK_SOURCE_DIR}/Common/vtkCollection.cxx"
   "${VTK_SOURCE_DIR}/Common/vtkCollectionIterator.cxx"
@@ -88,12 +97,18 @@ SET(VTK_TCL_FILES
   "${VTK_SOURCE_DIR}/Common/vtkObjectBase.cxx"
   "${VTK_SOURCE_DIR}/Common/vtkTimerLog.cxx"
   "${VTK_SOURCE_DIR}/IO/vtkXMLParser.cxx"
+  ${VTK_TCL_FILES}
 )
 
 SET_SOURCE_FILES_PROPERTIES(
   "${VTK_SOURCE_DIR}/Common/vtkObjectBase.cxx"
+  ${VTK_TCL_FILES_ABSTRACT}
   ABSTRACT
   )
+
+IF(VTK_TCL_FILES_INCLUDE_DIRS)
+  INCLUDE_DIRECTORIES(${VTK_TCL_FILES_INCLUDE_DIRS})
+ENDIF(VTK_TCL_FILES_INCLUDE_DIRS)
 
 # This requires wrapping a few more files.
 # ie.. when distributing, build without testing to get smaller binaries
