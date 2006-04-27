@@ -57,7 +57,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
 #include "pqPipelineData.h"
-#include "pqPipelineObject.h"
+#include "pqPipelineDisplay.h"
+#include "pqPipelineModel.h"
+#include "pqPipelineSource.h"
 
 
 /// constructor
@@ -163,7 +165,7 @@ void pqNamedObjectPanel::linkServerManagerProperties()
           comboBox->clear();
           foreach(pqSMProxy v, propertyDomain)
             {
-            pqPipelineObject* o = pqPipelineData::instance()->getObjectFor(v);
+            pqPipelineSource* o = pqPipelineData::instance()->getModel()->getSourceFor(v);
             if(o)
               {
               comboBox->addItem(o->GetProxyName());

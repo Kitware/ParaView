@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqMultiViewFrame.h"
 #include "pqPipelineData.h"
+#include "pqPipelineModel.h"
 #include "pqRenderViewProxy.h"
 #include "pqServer.h"
 #include "pqSetName.h"
@@ -204,8 +205,8 @@ QVTKWidget *ParaQ::AddQVTKWidget(pqMultiViewFrame *frame, QWidget *topWidget,
   pqPipelineData *pipeline = pqPipelineData::instance();
   if(pipeline)
     {
+    pipeline->getModel()->addWindow(widget, server);
     pipeline->addViewMapping(widget, view);
-    pipeline->addWindow(widget, server);
     }
 
   return widget;

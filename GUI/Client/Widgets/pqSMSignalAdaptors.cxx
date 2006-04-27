@@ -42,7 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaQ includes
 #include "pqSMProxy.h"
 #include "pqPipelineData.h"
-#include "pqPipelineObject.h"
+#include "pqPipelineModel.h"
+#include "pqPipelineSource.h"
 
 pqSignalAdaptorProxy::pqSignalAdaptorProxy(QObject* p, 
               const char* colorProperty, const char* signal)
@@ -72,7 +73,7 @@ void pqSignalAdaptorProxy::setProxy(const QVariant& var)
     vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
     QString name = pm->GetProxyName(p);
     */
-    pqPipelineObject* o = pqPipelineData::instance()->getObjectFor(p);
+    pqPipelineSource* o = pqPipelineData::instance()->getModel()->getSourceFor(p);
     if(o)
       {
       QString name = o->GetProxyName();

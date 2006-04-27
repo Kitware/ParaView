@@ -40,20 +40,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqMultiView;
 class pqNameCount;
 class pqPipelineDataInternal;
-class pqPipelineObject;
-class pqPipelineServer;
-class pqPipelineWindow;
+class pqPipelineModel;
 class pqServer;
+
+class QString;
 class QVTKWidget;
-class vtkObject;
+
 class vtkCommand;
 class vtkEventQtSlotConnect;
+class vtkObject;
 class vtkPVXMLElement;
+class vtkSMDisplayProxy;
 class vtkSMProxy;
 class vtkSMRenderModuleProxy;
-class vtkSMSourceProxy;
-class vtkSMCompoundProxy;
-class vtkSMDisplayProxy;
 
 
 /// interface for querying pipline state, also provides signals for pipeline changes
@@ -67,69 +66,57 @@ public:
 
   static pqPipelineData *instance();
 
+  pqPipelineModel *getModel() const {return this->Model;}
   pqNameCount *getNameCount() const {return this->Names;}
-
-  void saveState(vtkPVXMLElement *root, pqMultiView *multiView=0);
-  void loadState(vtkPVXMLElement *root, pqMultiView *multiView=0);
-
-  void clearPipeline();
 
   void addServer(pqServer *server);
   void removeServer(pqServer *server);
 
-  int getServerCount() const;
-  pqPipelineServer *getServer(int index) const;
-  pqPipelineServer *getServerFor(pqServer *server);
-
-  void addWindow(QVTKWidget *window, pqServer *server);
-  void removeWindow(QVTKWidget *window);
-
   void addViewMapping(QVTKWidget *widget, vtkSMRenderModuleProxy *module);
   vtkSMRenderModuleProxy *removeViewMapping(QVTKWidget *widget);
   vtkSMRenderModuleProxy *getRenderModule(QVTKWidget *widget) const;
+  QVTKWidget *getRenderWindow(vtkSMRenderModuleProxy *module) const;
   void clearViewMapping();
 
-  // TODO: perhaps not tie source proxies to windows
+  vtkSMProxy *createAndRegisterSource(const char *proxyName, pqServer *server);
+  vtkSMProxy *createAndRegisterFilter(const char *proxyName, pqServer *server);
+  vtkSMProxy *createAndRegisterBundle(const char *proxyName, pqServer *server);
 
-  vtkSMSourceProxy *createSource(const char *proxyName, QVTKWidget *window);
-  vtkSMSourceProxy *createFilter(const char *proxyName, QVTKWidget *window);
-  vtkSMCompoundProxy *createCompoundProxy(const char *proxyName, QVTKWidget *window);
+  void unregisterProxy(vtkSMProxy *proxy, const char *name);
 
-  void deleteProxy(vtkSMProxy *proxy);
+  /// \brief
+  ///   Creates a display proxy for a source proxy.
+  vtkSMDisplayProxy *createAndRegisterDisplay(vtkSMProxy *source,
+      vtkSMRenderModuleProxy *module);
+  void removeAndUnregisterDisplay(vtkSMDisplayProxy *display,
+      const char *name, vtkSMRenderModuleProxy *module);
 
-  // TODO: should take a window to create a display proxy in, but source proxy is already tied to window
-  //! create a display proxy for a source proxy
-  vtkSMDisplayProxy* createDisplay(vtkSMSourceProxy* source, vtkSMProxy* rep = NULL);
-  //! set the visibility on/off for a display
-  void setVisibility(vtkSMDisplayProxy* proxy, bool on);
+  /// \brief
+  ///   Sets whether the display proxy is visible or not.
+  void setVisible(vtkSMDisplayProxy *proxy, bool visible);
 
   void addInput(vtkSMProxy *proxy, vtkSMProxy *input);
   void removeInput(vtkSMProxy *proxy, vtkSMProxy *input);
+  void addConnection(vtkSMProxy *source, vtkSMProxy *sink);
+  void removeConnection(vtkSMProxy *source, vtkSMProxy *sink);
 
-  QVTKWidget *getWindowFor(vtkSMProxy *proxy) const;
-  pqPipelineObject *getObjectFor(vtkSMProxy *proxy) const;
-  pqPipelineWindow *getObjectFor(QVTKWidget *window) const;
+  void loadState(vtkPVXMLElement *root, pqMultiView *multiView=0);
 
 signals:
-  void clearingPipeline();
+  void serverAdded(pqServer *server);
+  void removingServer(pqServer *server);
 
-  void serverAdded(pqPipelineServer *server);
-  void removingServer(pqPipelineServer *server);
+  void sourceCreated(vtkSMProxy *source, const QString &name, pqServer *server);
+  void filterCreated(vtkSMProxy *filter, const QString &name, pqServer *server);
+  void bundleCreated(vtkSMProxy *bundle, const QString &name, pqServer *server);
+  void removingProxy(vtkSMProxy *proxy);
 
-  void windowAdded(pqPipelineWindow *window);
-  void removingWindow(pqPipelineWindow *window);
+  void displayCreated(vtkSMDisplayProxy *display, const QString &name,
+      vtkSMProxy *proxy, vtkSMRenderModuleProxy *module);
+  void removingDisplay(vtkSMDisplayProxy *display, vtkSMProxy *proxy);
 
-  void sourceCreated(pqPipelineObject *source);
-  void filterCreated(pqPipelineObject *filter);
-  void removingObject(pqPipelineObject *object);
-
-  void connectionCreated(pqPipelineObject *source, pqPipelineObject *sink);
-  void removingConnection(pqPipelineObject *source, pqPipelineObject *sink);
-
-  /// signal for new proxy created
-  void newPipelineObject(vtkSMProxy* proxy);
-  /// signal for new input connection to proxy
-  void newPipelineObjectInput(vtkSMProxy* proxy, vtkSMProxy* input);
+  void connectionCreated(vtkSMProxy *source, vtkSMProxy *sink);
+  void removingConnection(vtkSMProxy *source, vtkSMProxy *sink);
 
   /// new current proxy
   void currentProxyChanged(vtkSMProxy* newproxy);
@@ -150,8 +137,12 @@ private slots:
 
 protected:
   pqPipelineDataInternal *Internal;  ///< Stores the pipeline objects.
+  pqPipelineModel *Model;            ///< View interface to the pipeline.
   pqNameCount *Names;                ///< Keeps track of the proxy names.
-  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect; ///< Used to listen to proxy events.
+  bool InCreateOrConnect;            ///< Used to prevent duplicate signals.
+
+  /// Used to listen to proxy events.
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   vtkSMProxy* CurrentProxy;
 
   static pqPipelineData *Instance;   ///< Pointer to the pipeline instance.

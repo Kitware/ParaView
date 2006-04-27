@@ -33,20 +33,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineServer.h"
 
 #include "pqMultiView.h"
-#include "pqPipelineObject.h"
-#include "pqPipelineWindow.h"
+#include "pqPipelineData.h"
+#include "pqPipelineDisplay.h"
+#include "pqPipelineFilter.h"
+#include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqXMLUtil.h"
 
 #include <QHash>
 #include <QList>
 #include <QString>
+#include <QWidget>
 
 #include "vtkPVXMLElement.h"
 #include "vtkSMDisplayProxy.h"
-#include "vtkSMLookupTableProxy.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMProxyProperty.h"
 
 
 class pqPipelineServerInternal
@@ -55,9 +55,9 @@ public:
   pqPipelineServerInternal();
   ~pqPipelineServerInternal() {}
 
-  QList<pqPipelineObject *> Sources;
-  QList<pqPipelineWindow *> Windows;
-  QHash<vtkSMProxy *, pqPipelineObject *> Objects;
+  QList<pqPipelineSource *> Sources;
+  QList<QWidget *> Windows;
+  QHash<vtkSMProxy *, pqPipelineSource *> Objects;
 };
 
 
@@ -71,256 +71,168 @@ pqPipelineServer::pqPipelineServer()
 {
   this->Internal = new pqPipelineServerInternal();
   this->Server = 0;
+
+  // Set the pipeline model item type.
+  this->SetType(pqPipelineModel::Server);
 }
 
 pqPipelineServer::~pqPipelineServer()
 {
-  this->ClearPipelines();
   if(this->Internal)
+    {
+    // Clean up the objects in the map.
+    QHash<vtkSMProxy *, pqPipelineSource *>::Iterator iter =
+        this->Internal->Objects.begin();
+    for( ; iter != this->Internal->Objects.end(); ++iter)
+      {
+      delete *iter;
+      }
+
     delete this->Internal;
+    }
 }
 
 void pqPipelineServer::SaveState(vtkPVXMLElement *root, pqMultiView *multiView)
 {
-  if(!root || !this->Server)
+  if(!root || !multiView || !this->Internal)
     {
     return;
     }
 
+  // Save the window information for the server.
+  QWidget *widget = 0;
   vtkPVXMLElement *element = 0;
-  if(multiView && this->Internal)
+  QList<QWidget *>::Iterator iter = this->Internal->Windows.begin();
+  for( ; iter != this->Internal->Windows.end(); ++iter)
     {
-    // Save the window information for the server.
-    QWidget *widget = 0;
-    QList<pqPipelineWindow *>::Iterator iter = this->Internal->Windows.begin();
-    for( ; iter != this->Internal->Windows.end(); ++iter)
-      {
-      widget = (*iter)->GetWidget();
-      element = vtkPVXMLElement::New();
-      element->SetName("Window");
-      element->AddAttribute("className", widget->metaObject()->className());
-      element->AddAttribute("windowID", ParaQ::GetStringFromIntList(
-          multiView->indexOf(widget->parentWidget())).toAscii().data());
-      element->AddAttribute("name", widget->windowTitle().toAscii().data());
-      root->AddNestedElement(element);
-      element->Delete();
-      }
-
-    // Save display proxy to window relationships. Each object in the
-    // map should have a display proxy.
-    vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
-    QHash<vtkSMProxy *, pqPipelineObject *>::Iterator jter =
-        this->Internal->Objects.begin();
-    for( ; jter != this->Internal->Objects.end(); ++jter)
-      {
-      widget = (*jter)->GetParent()->GetWidget();
-      element = vtkPVXMLElement::New();
-      element->SetName("Display");
-      element->AddAttribute("name", proxyManager->GetProxyName(
-        "displays", (*jter)->GetDisplayProxy()));
-      element->AddAttribute("windowID", ParaQ::GetStringFromIntList(
-          multiView->indexOf(widget->parentWidget())).toAscii().data());
-      element->AddAttribute("proxyName",
-          (*jter)->GetProxyName().toAscii().data());
-      root->AddNestedElement(element);
-      element->Delete();
-      }
+    widget = *iter;
+    element = vtkPVXMLElement::New();
+    element->SetName("Window");
+    element->AddAttribute("className", widget->metaObject()->className());
+    element->AddAttribute("windowID", pqXMLUtil::GetStringFromIntList(
+        multiView->indexOf(widget->parentWidget())).toAscii().data());
+    element->AddAttribute("name", widget->windowTitle().toAscii().data());
+    root->AddNestedElement(element);
+    element->Delete();
     }
 
-  // Save the pipeline information.
-  element = vtkPVXMLElement::New();
-  element->SetName("ServerManagerState");
-  // TODO: Save state and multiple connections....how to they interact?
-  vtkSMObject::GetProxyManager()->SaveState(element);
-  root->AddNestedElement(element);
-  element->Delete();
+  // Save display proxy to window relationships. An object can have
+  // more than one display. An object does not have to have a display.
+  QHash<vtkSMProxy *, pqPipelineSource *>::Iterator jter =
+      this->Internal->Objects.begin();
+  for( ; jter != this->Internal->Objects.end(); ++jter)
+    {
+    (*jter)->GetDisplay()->SaveState(root, multiView);
+    }
 }
 
-pqPipelineObject *pqPipelineServer::AddSource(vtkSMProxy *source)
+void pqPipelineServer::AddSource(pqPipelineSource *source)
 {
-  pqPipelineObject *object = 0;
   if(this->Internal && source)
     {
-    object = new pqPipelineObject(source, pqPipelineObject::Source);
-    if(object)
-      {
-      this->Internal->Objects.insert(source, object);
-      this->Internal->Sources.append(object);
-      }
+    source->SetServer(this);
+    this->Internal->Objects.insert(source->GetProxy(), source);
+    this->Internal->Sources.append(source);
     }
-
-  return object;
 }
 
-pqPipelineObject *pqPipelineServer::AddFilter(vtkSMProxy *filter)
+void pqPipelineServer::AddObject(pqPipelineSource *source)
 {
-  pqPipelineObject *object = 0;
-  if(this->Internal && filter)
+  if(this->Internal && source)
     {
-    object = new pqPipelineObject(filter, pqPipelineObject::Filter);
-    if(object)
-      this->Internal->Objects.insert(filter, object);
+    source->SetServer(this);
+    this->Internal->Objects.insert(source->GetProxy(), source);
     }
-
-  return object;
 }
 
-pqPipelineObject *pqPipelineServer::AddCompoundProxy(vtkSMProxy *proxy)
+void pqPipelineServer::RemoveObject(pqPipelineSource *source)
 {
-  pqPipelineObject *object = 0;
-  if(this->Internal && proxy)
+  if(this->Internal && source)
     {
-    object = new pqPipelineObject(proxy, pqPipelineObject::Bundle);
-    if(object)
-      this->Internal->Objects.insert(proxy, object);
-    }
-
-  return object;
-}
-
-pqPipelineWindow *pqPipelineServer::AddWindow(QWidget *window)
-{
-  pqPipelineWindow *object = 0;
-  if(this->Internal && window)
-    {
-    object = new pqPipelineWindow(window);
-    if(object)
-      this->Internal->Windows.append(object);
-    }
-
-  return object;
-}
-
-pqPipelineObject *pqPipelineServer::GetObject(vtkSMProxy *proxy) const
-{
-  if(this->Internal)
-    {
-    QHash<vtkSMProxy *, pqPipelineObject *>::Iterator iter =
-        this->Internal->Objects.find(proxy);
-    if(iter != this->Internal->Objects.end())
-      return *iter;
-    }
-
-  return 0;
-}
-
-pqPipelineWindow *pqPipelineServer::GetWindow(QWidget *window) const
-{
-  if(this->Internal)
-    {
-    QList<pqPipelineWindow *>::Iterator iter = this->Internal->Windows.begin();
-    for( ; iter != this->Internal->Windows.end(); ++iter)
-      {
-      if(*iter && (*iter)->GetWidget() == window)
-        return *iter;
-      }
-    }
-
-  return 0;
-}
-
-bool pqPipelineServer::RemoveObject(vtkSMProxy *proxy)
-{
-  if(this->Internal && proxy)
-    {
-    QHash<vtkSMProxy *, pqPipelineObject *>::Iterator iter =
-        this->Internal->Objects.find(proxy);
+    QHash<vtkSMProxy *, pqPipelineSource *>::Iterator iter =
+        this->Internal->Objects.find(source->GetProxy());
     if(iter != this->Internal->Objects.end())
       {
-      pqPipelineObject *object = *iter;
       this->Internal->Objects.erase(iter);
-      if(object && object->GetType() == pqPipelineObject::Source)
-        {
-        this->Internal->Sources.removeAll(object);
-        }
-
-      this->UnregisterObject(object);
-      delete object;
-      return true;
       }
-    }
 
-  return false;
+    this->Internal->Sources.removeAll(source);
+    this->UnregisterObject(source);
+    }
 }
 
-bool pqPipelineServer::RemoveWindow(QWidget *window)
+pqPipelineSource *pqPipelineServer::GetObject(vtkSMProxy *proxy) const
 {
-  if(this->Internal && window)
+  if(this->Internal)
     {
-    QList<pqPipelineWindow *>::Iterator iter = this->Internal->Windows.begin();
-    for( ; iter != this->Internal->Windows.end(); ++iter)
+    QHash<vtkSMProxy *, pqPipelineSource *>::Iterator iter =
+        this->Internal->Objects.find(proxy);
+    if(iter != this->Internal->Objects.end())
       {
-      if(*iter && (*iter)->GetWidget() == window)
-        {
-        // Clean up all objects connected with the window.
-        QHash<vtkSMProxy *, pqPipelineObject *>::Iterator jter =
-            this->Internal->Objects.begin();
-        while(jter != this->Internal->Objects.end())
-          {
-          if(*jter && (*jter)->GetParent() &&
-              (*jter)->GetParent()->GetWidget() == window)
-            {
-            pqPipelineObject *object = *jter;
-            jter = this->Internal->Objects.erase(jter);
-            if(object->GetType() == pqPipelineObject::Source)
-              {
-              this->Internal->Sources.removeAll(object);
-              }
-
-            this->UnregisterObject(object);
-            delete object;
-            }
-          else
-            {
-            ++jter;
-            }
-          }
-        
-        delete *iter;
-        this->Internal->Windows.erase(iter);
-
-        return true;
-        }
+      return *iter;
       }
     }
 
-  return false;
+  return 0;
 }
 
 int pqPipelineServer::GetSourceCount() const
 {
   if(this->Internal)
+    {
     return this->Internal->Sources.size();
+    }
+
   return 0;
 }
 
-pqPipelineObject *pqPipelineServer::GetSource(int index) const
+pqPipelineSource *pqPipelineServer::GetSource(int index) const
 {
   if(this->Internal && index >= 0 && index < this->Internal->Sources.size())
+    {
     return this->Internal->Sources[index];
+    }
+
   return 0;
 }
 
-int pqPipelineServer::GetWindowCount() const
+int pqPipelineServer::GetSourceIndexFor(pqPipelineSource *source) const
 {
-  if(this->Internal)
-    return this->Internal->Windows.size();
-  return 0;
+  if(this->Internal && source)
+    {
+    return this->Internal->Sources.indexOf(source);
+    }
+
+  return -1;
 }
 
-pqPipelineWindow *pqPipelineServer::GetWindow(int index) const
+bool pqPipelineServer::HasSource(pqPipelineSource *source) const
 {
-  if(this->Internal && index >= 0 && index < this->Internal->Windows.size())
-    return this->Internal->Windows[index];
-  return 0;
+  return this->GetSourceIndexFor(source) != -1;
+}
+
+void pqPipelineServer::AddToSourceList(pqPipelineSource *source)
+{
+  if(this->Internal && source)
+    {
+    this->Internal->Sources.append(source);
+    }
+}
+
+void pqPipelineServer::RemoveFromSourceList(pqPipelineSource *source)
+{
+  if(this->Internal && source)
+    {
+    this->Internal->Sources.removeAll(source);
+    }
 }
 
 void pqPipelineServer::ClearPipelines()
 {
   if(this->Internal)
     {
-    // Clean up the objects in the map.
-    QHash<vtkSMProxy *, pqPipelineObject *>::Iterator iter =
+    // Unregister and clean up the objects in the map.
+    QHash<vtkSMProxy *, pqPipelineSource *>::Iterator iter =
         this->Internal->Objects.begin();
     for( ; iter != this->Internal->Objects.end(); ++iter)
       {
@@ -332,45 +244,78 @@ void pqPipelineServer::ClearPipelines()
         }
       }
 
-    // Clean up the window objects.
-    QList<pqPipelineWindow *>::Iterator jter = this->Internal->Windows.begin();
-    for( ; jter != this->Internal->Windows.end(); ++jter)
-      {
-      if(*jter)
-        {
-        delete *jter;
-        *jter = 0;
-        }
-      }
-
     this->Internal->Sources.clear();
-    this->Internal->Windows.clear();
     this->Internal->Objects.clear();
+    this->Internal->Windows.clear();
     }
 }
 
-void pqPipelineServer::UnregisterObject(pqPipelineObject *object)
+int pqPipelineServer::GetWindowCount() const
 {
-  if(this->Server)
+  if(this->Internal)
     {
-    vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
-    vtkSMDisplayProxy *display = object->GetDisplayProxy();
-    vtkSMProxyProperty *property = vtkSMProxyProperty::SafeDownCast(
-        display->GetProperty("LookupTable"));
-    if(property && property->GetNumberOfProxies())
+    return this->Internal->Windows.size();
+    }
+
+  return 0;
+}
+
+QWidget *pqPipelineServer::GetWindow(int index) const
+{
+  if(this->Internal && index >= 0 && index < this->Internal->Windows.size())
+    {
+    return this->Internal->Windows[index];
+    }
+
+  return 0;
+}
+
+int pqPipelineServer::GetWindowIndexFor(QWidget *window) const
+{
+  if(this->Internal)
+    {
+    return this->Internal->Windows.indexOf(window);
+    }
+
+  return -1;
+}
+
+bool pqPipelineServer::HasWindow(QWidget *window) const
+{
+  return this->GetWindowIndexFor(window) != -1;
+}
+
+void pqPipelineServer::AddToWindowList(QWidget *window)
+{
+  if(this->Internal && window)
+    {
+    this->Internal->Windows.append(window);
+    }
+}
+
+void pqPipelineServer::RemoveFromWindowList(QWidget *window)
+{
+  if(this->Internal && window)
+    {
+    this->Internal->Windows.removeAll(window);
+    }
+}
+
+void pqPipelineServer::UnregisterObject(pqPipelineSource *source)
+{
+  if(source)
+    {
+    pqPipelineDisplay *display = source->GetDisplay();
+    if(display)
       {
-      vtkSMLookupTableProxy *lookup = vtkSMLookupTableProxy::SafeDownCast(
-          property->GetProxy(0));
-      proxyManager->UnRegisterProxy(proxyManager->GetProxyName("lookup_tables",
-          lookup));
+      display->UnregisterDisplays();
       }
 
-    object->SetDisplayProxy(0);
-    proxyManager->UnRegisterProxy(proxyManager->GetProxyName("displays",
-        display));
-    object->SetProxy(0);
-    proxyManager->UnRegisterProxy(object->GetProxyName().toAscii().data());
-    object->SetProxyName("");
+    if(!source->GetProxyName().isEmpty())
+      {
+      pqPipelineData::instance()->unregisterProxy(source->GetProxy(),
+          source->GetProxyName().toAscii().data());
+      }
     }
 }
 

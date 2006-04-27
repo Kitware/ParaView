@@ -39,10 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "pqWidgetsExport.h"
+#include "pqPipelineModelItem.h"
 
 class pqMultiView;
-class pqPipelineObject;
 class pqPipelineServerInternal;
+class pqPipelineSource;
 class pqPipelineWindow;
 class pqServer;
 class QWidget;
@@ -50,38 +51,76 @@ class vtkPVXMLElement;
 class vtkSMProxy;
 
 
-class PQWIDGETS_EXPORT pqPipelineServer
+class PQWIDGETS_EXPORT pqPipelineServer : public pqPipelineModelItem
 {
 public:
   pqPipelineServer();
   ~pqPipelineServer();
 
-  void SaveState(vtkPVXMLElement *root, pqMultiView *multiView=0);
+  void SaveState(vtkPVXMLElement *root, pqMultiView *multiView);
 
   void SetServer(pqServer *server) {this->Server = server;}
   pqServer *GetServer() const {return this->Server;}
 
-  pqPipelineObject *AddSource(vtkSMProxy *source);
-  pqPipelineObject *AddFilter(vtkSMProxy *filter);
-  pqPipelineObject *AddCompoundProxy(vtkSMProxy *proxy);
-  pqPipelineWindow *AddWindow(QWidget *window);
+  /// \name Pipeline Methods
+  //@{
+  /// \brief
+  ///   Adds a source to the object map and the source list.
+  /// \param source The source object to add.
+  /// \sa
+  ///   pqPipelineServer::AddObject(pqPipelineSource *)
+  void AddSource(pqPipelineSource *source);
 
-  pqPipelineObject *GetObject(vtkSMProxy *proxy) const;
-  pqPipelineWindow *GetWindow(QWidget *window) const;
+  /// \brief
+  ///   Adds a source to the object map.
+  /// \param source The source object to add.
+  /// \sa
+  ///   pqPipelineServer::AddSource(pqPipelineSource *)
+  void AddObject(pqPipelineSource *source);
 
-  bool RemoveObject(vtkSMProxy *proxy);
-  bool RemoveWindow(QWidget *window);
+  /// \brief
+  ///   Removes a source object from the object map.
+  ///
+  /// If the object is on the source list, it is removed from that list
+  /// as well.
+  ///
+  /// \param source The source object to remove.
+  /// \sa
+  ///   pqPipelineServer::RemoveFromSourceList(pqPipelineSource *)
+  void RemoveObject(pqPipelineSource *source);
 
-  int GetSourceCount() const;
-  pqPipelineObject *GetSource(int index) const;
-
-  int GetWindowCount() const;
-  pqPipelineWindow *GetWindow(int index) const;
+  /// \brief
+  ///   Gets a source object from the object map.
+  /// \param proxy The proxy pointer to look up.
+  /// \return
+  ///   A pointer to the object in the map or null if not present.
+  pqPipelineSource *GetObject(vtkSMProxy *proxy) const;
 
   void ClearPipelines();
+  //@}
+
+  /// \name Source List Methods
+  //@{
+  int GetSourceCount() const;
+  pqPipelineSource *GetSource(int index) const;
+  int GetSourceIndexFor(pqPipelineSource *source) const;
+  bool HasSource(pqPipelineSource *source) const;
+  void AddToSourceList(pqPipelineSource *source);
+  void RemoveFromSourceList(pqPipelineSource *source);
+  //@}
+
+  /// \name Window List Methods
+  //@{
+  int GetWindowCount() const;
+  QWidget *GetWindow(int index) const;
+  int GetWindowIndexFor(QWidget *window) const;
+  bool HasWindow(QWidget *window) const;
+  void AddToWindowList(QWidget *window);
+  void RemoveFromWindowList(QWidget *window);
+  //@}
 
 private:
-  void UnregisterObject(pqPipelineObject *object);
+  void UnregisterObject(pqPipelineSource *source);
 
 private:
   pqPipelineServerInternal *Internal;

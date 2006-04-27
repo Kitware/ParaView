@@ -36,9 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMultiViewFrame.h"
 #include "pqNameCount.h"
 #include "pqParts.h"
+#include "pqPipelineModel.h"
 #include "pqPipelineObject.h"
 #include "pqPipelineServer.h"
-#include "pqPipelineWindow.h"
 #include "pqServer.h"
 #include "pqSMMultiView.h"
 #include "pqXMLUtil.h"
@@ -48,30 +48,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMCompoundProxy.h"
+#include "vtkSMDisplayProxy.h"
 #include "vtkSMInputProperty.h"
+#include "vtkSMLookupTableProxy.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkSMDisplayProxy.h"
-#include "vtkSMCompoundProxy.h"
 
 #include <QList>
 #include <QMap>
-
-
-class pqDisplayRestore
-{
-public:
-  pqDisplayRestore(vtkSMDisplayProxy *display, pqPipelineServer *server,
-      QVTKWidget *window);
-  ~pqDisplayRestore() {}
-
-  vtkSMDisplayProxy *Display;
-  pqPipelineServer *Server;
-  QVTKWidget *Window;
-};
 
 
 class pqPipelineDataInternal
@@ -80,25 +68,14 @@ public:
   pqPipelineDataInternal();
   ~pqPipelineDataInternal() {}
 
-  QList<pqPipelineServer *> Servers;
   QMap<QVTKWidget *, vtkSMRenderModuleProxy *> ViewMap;
+  QMap<vtkSMRenderModuleProxy *, QVTKWidget *> RenderMap;
   QMap<QString, QWidget *> RestoreMap;
-  QList<pqDisplayRestore *> Displays;
-  QList<pqPipelineObject *> Connections;
 };
 
 
-pqDisplayRestore::pqDisplayRestore(vtkSMDisplayProxy *display,
-    pqPipelineServer *server, QVTKWidget *window)
-{
-  this->Display = display;
-  this->Server = server;
-  this->Window = window;
-}
-
-
 pqPipelineDataInternal::pqPipelineDataInternal()
-  : Servers(), ViewMap(), RestoreMap(), Displays(), Connections()
+  : ViewMap(), RenderMap(), RestoreMap()
 {
 }
 
@@ -108,18 +85,68 @@ pqPipelineData *pqPipelineData::Instance = 0;
 pqPipelineData::pqPipelineData(QObject* p)
   : QObject(p), CurrentProxy(NULL)
 {
-  this->Internal = new pqPipelineDataInternal;
+  this->Internal = new pqPipelineDataInternal();
+  this->Model = new pqPipelineModel(this);
   this->Names = new pqNameCount();
+  this->InCreateOrConnect = false;
   this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
 
   if(!pqPipelineData::Instance)
+    {
     pqPipelineData::Instance = this;
+    }
+
+  // Connect the pipeline model to the modification signals.
+  if(this->Model)
+    {
+    QObject::connect(this, SIGNAL(serverAdded(pqServer *)), this->Model,
+        SLOT(addServer(pqServer *)));
+    QObject::connect(this, SIGNAL(removingServer(pqServer *)), this->Model,
+        SLOT(removeServer(pqServer *)));
+    QObject::connect(this,
+        SIGNAL(sourceCreated(vtkSMProxy *, const QString &, pqServer *)),
+        this->Model,
+        SLOT(addSource(vtkSMProxy *, const QString &, pqServer *)));
+    QObject::connect(this,
+        SIGNAL(filterCreated(vtkSMProxy *, const QString &, pqServer *)),
+        this->Model,
+        SLOT(addFilter(vtkSMProxy *, const QString &, pqServer *)));
+    QObject::connect(this,
+        SIGNAL(bundleCreated(vtkSMProxy *, const QString &, pqServer *)),
+        this->Model,
+        SLOT(addBundle(vtkSMProxy *, const QString &, pqServer *)));
+    QObject::connect(this, SIGNAL(removingProxy(vtkSMProxy *)), this->Model,
+        SLOT(removeObject(vtkSMProxy *)));
+    QObject::connect(this,
+        SIGNAL(displayCreated(vtkSMDisplayProxy *, const QString &, vtkSMProxy *, vtkSMRenderModuleProxy *)),
+        this->Model,
+        SLOT(addDisplay(vtkSMDisplayProxy *, const QString &, vtkSMProxy *, vtkSMRenderModuleProxy *)));
+    QObject::connect(this,
+        SIGNAL(removingDisplay(vtkSMDisplayProxy *, vtkSMProxy *)),
+        this->Model, SLOT(removeDisplay(vtkSMDisplayProxy *, vtkSMProxy *)));
+    QObject::connect(this,
+        SIGNAL(connectionCreated(vtkSMProxy *, vtkSMProxy *)), this->Model,
+        SLOT(addConnection(vtkSMProxy *, vtkSMProxy *)));
+    QObject::connect(this,
+        SIGNAL(removingConnection(vtkSMProxy *, vtkSMProxy *)), this->Model,
+        SLOT(removeConnection(vtkSMProxy *, vtkSMProxy *)));
+    }
 }
 
 pqPipelineData::~pqPipelineData()
 {
+  // Clean up the pipelines before removing the instance so the objects
+  // can be unregistered.
+  if(this->Model)
+    {
+    QObject::disconnect(this, 0, this->Model, 0);
+    this->Model->clearPipelines();
+    }
+
   if(pqPipelineData::Instance == this)
+    {
     pqPipelineData::Instance = 0;
+    }
 
   if(this->Names)
     {
@@ -127,20 +154,14 @@ pqPipelineData::~pqPipelineData()
     this->Names = 0;
     }
 
+  if(this->Model)
+    {
+    delete this->Model;
+    this->Model = 0;
+    }
+
   if(this->Internal)
     {
-    // Clean up the server objects, which will clean up all the
-    // internal pipeline objects.
-    QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
-    for( ; iter != this->Internal->Servers.end(); ++iter)
-      {
-      if(*iter)
-        {
-        delete *iter;
-        *iter = 0;
-        }
-      }
-
     delete this->Internal;
     this->Internal = 0;
     }
@@ -151,44 +172,385 @@ pqPipelineData *pqPipelineData::instance()
   return pqPipelineData::Instance;
 }
 
-void pqPipelineData::saveState(vtkPVXMLElement *root, pqMultiView *multiView)
+void pqPipelineData::addServer(pqServer *server)
 {
-  if(!root || !this->Internal)
+  // Listen for pipeline events from the server.
+  vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
+  this->VTKConnect->Connect(proxyManager, vtkCommand::RegisterEvent, this,
+      SLOT(proxyRegistered(vtkObject*, unsigned long, void*, void*, vtkCommand*)),
+      NULL, 1.0);
+
+  // Signal that a new server was added to the pipeline data.
+  emit this->serverAdded(server);
+}
+
+void pqPipelineData::removeServer(pqServer *server)
+{
+  if(server)
+    {
+    emit this->removingServer(server);
+    }
+}
+
+void pqPipelineData::addViewMapping(QVTKWidget *widget,
+    vtkSMRenderModuleProxy *module)
+{
+  if(this->Internal && widget && module)
+    {
+    this->Internal->ViewMap.insert(widget, module);
+    this->Internal->RenderMap.insert(module, widget);
+    }
+}
+
+vtkSMRenderModuleProxy *pqPipelineData::removeViewMapping(QVTKWidget *widget)
+{
+  vtkSMRenderModuleProxy *module = 0;
+  if(this->Internal && widget)
+    {
+    QMap<QVTKWidget *, vtkSMRenderModuleProxy *>::Iterator iter =
+        this->Internal->ViewMap.find(widget);
+    if(iter != this->Internal->ViewMap.end())
+      {
+      module = *iter;
+      this->Internal->ViewMap.erase(iter);
+      }
+
+    if(module)
+      {
+      QMap<vtkSMRenderModuleProxy *, QVTKWidget *>::Iterator jter =
+          this->Internal->RenderMap.find(module);
+      if(jter != this->Internal->RenderMap.end())
+        {
+        this->Internal->RenderMap.erase(jter);
+        }
+      }
+    }
+
+  return module;
+}
+
+vtkSMRenderModuleProxy *pqPipelineData::getRenderModule(
+    QVTKWidget *widget) const
+{
+  if(this->Internal && widget)
+    {
+    QMap<QVTKWidget *, vtkSMRenderModuleProxy *>::Iterator iter =
+        this->Internal->ViewMap.find(widget);
+    if(iter != this->Internal->ViewMap.end())
+      {
+      return *iter;
+      }
+    }
+
+  return 0;
+}
+
+QVTKWidget *pqPipelineData::getRenderWindow(
+    vtkSMRenderModuleProxy *module) const
+{
+  if(this->Internal && module)
+    {
+    QMap<vtkSMRenderModuleProxy *, QVTKWidget *>::Iterator iter =
+        this->Internal->RenderMap.find(module);
+    if(iter != this->Internal->RenderMap.end())
+      {
+      return *iter;
+      }
+    }
+
+  return 0;
+}
+
+void pqPipelineData::clearViewMapping()
+{
+  if(this->Internal)
+    {
+    this->Internal->ViewMap.clear();
+    this->Internal->RenderMap.clear();
+    }
+}
+
+vtkSMProxy *pqPipelineData::createAndRegisterSource(const char *proxyName,
+    pqServer *server)
+{
+  if(!this->Names || !proxyName || !server)
+    {
+    return 0;
+    }
+
+  // Create a proxy object on the server.
+  vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
+  vtkSMProxy *proxy = proxyManager->NewProxy("sources", proxyName);
+  proxy->SetConnectionID(server->GetConnectionID());
+
+  // Register the proxy with the server manager. Use a unique name
+  // based on the class name and a count.
+  QString name;
+  name.setNum(this->Names->GetCountAndIncrement(proxyName));
+  name.prepend(proxyName);
+  this->InCreateOrConnect = true;
+  proxyManager->RegisterProxy("sources", name.toAscii().data(), proxy);
+  this->InCreateOrConnect = false;
+  proxy->Delete();
+
+  // Let other objects know a proxy was created.
+  emit this->sourceCreated(proxy, name, server);
+
+  this->setCurrentProxy(proxy);
+  return proxy;
+}
+
+vtkSMProxy *pqPipelineData::createAndRegisterFilter(const char *proxyName,
+    pqServer *server)
+{
+  if(!this->Names || !proxyName || !server)
+    {
+    return 0;
+    }
+
+  // Create a proxy object on the server.
+  vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
+  vtkSMProxy *proxy = proxyManager->NewProxy("filters", proxyName);
+  proxy->SetConnectionID(server->GetConnectionID());
+
+  // Register the proxy with the server manager. Use a unique name
+  // based on the class name and a count.
+  QString name;
+  name.setNum(this->Names->GetCountAndIncrement(proxyName));
+  name.prepend(proxyName);
+  this->InCreateOrConnect = true;
+  proxyManager->RegisterProxy("sources", name.toAscii().data(), proxy);
+  this->InCreateOrConnect = false;
+  proxy->Delete();
+
+  // Let other objects know a proxy was created.
+  emit this->filterCreated(proxy, name, server);
+
+  this->setCurrentProxy(proxy);
+  return proxy;
+}
+
+vtkSMProxy *pqPipelineData::createAndRegisterBundle(const char *proxyName,
+    pqServer *server)
+{
+  if(!this->Names || !proxyName || !server)
+    {
+    return 0;
+    }
+
+  // Create a proxy object on the server.
+  vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
+  vtkSMCompoundProxy *proxy = proxyManager->NewCompoundProxy(proxyName);
+  proxy->SetConnectionID(server->GetConnectionID());
+  proxy->UpdateVTKObjects();
+
+  // Register the proxy with the server manager. Use a unique name
+  // based on the class name and a count.
+  QString name;
+  name.setNum(this->Names->GetCountAndIncrement(proxyName));
+  name.prepend(proxyName);
+  this->InCreateOrConnect = true;
+  proxyManager->RegisterProxy("compound_proxies", name.toAscii().data(), proxy);
+  this->InCreateOrConnect = false;
+  proxy->Delete();
+
+  // Let other objects know a proxy was created.
+  emit this->bundleCreated(proxy, name, server);
+
+  this->setCurrentProxy(proxy);
+  return proxy;
+}
+
+void pqPipelineData::unregisterProxy(vtkSMProxy *proxy, const char *name)
+{
+  emit this->removingProxy(proxy);
+
+  // Unregister the source proxy.
+  if(name)
+    {
+    vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
+    proxyManager->UnRegisterProxy("sources", name);
+    }
+}
+
+vtkSMDisplayProxy *pqPipelineData::createAndRegisterDisplay(vtkSMProxy *proxy,
+    vtkSMRenderModuleProxy *module)
+{
+  if(!module || !proxy)
+    {
+    return 0;
+    }
+
+  // TODO: How to decide which part of the compound proxy to display ????
+  // For now just get the last one, and assuming it is a source proxy.
+  vtkSMProxy *proxyToDisplay = 0;
+  vtkSMCompoundProxy *bundle = vtkSMCompoundProxy::SafeDownCast(proxy);
+  if(bundle)
+    {
+    int i = bundle->GetNumberOfProxies() - 1;
+    for(; proxyToDisplay == 0 && i >= 0; i--)
+      {
+      proxyToDisplay = vtkSMSourceProxy::SafeDownCast(bundle->GetProxy(i));
+      }
+    }
+  else
+    {
+    proxyToDisplay = proxy;
+    }
+  
+  // Create the display proxy and register it.
+  vtkSMDisplayProxy *display = pqPart::Add(module,
+      vtkSMSourceProxy::SafeDownCast(proxyToDisplay));
+  if(display)
+    {
+    QString name;
+    name.setNum(this->Names->GetCountAndIncrement("Display"));
+    name.prepend("Display");
+    vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
+    this->InCreateOrConnect = true;
+    proxyManager->RegisterProxy("displays", name.toAscii().data(), display);
+    this->InCreateOrConnect = false;
+    display->Delete();
+
+    // Notify other objects that a display was created.
+    emit this->displayCreated(display, name, proxy, module);
+    }
+
+  return display;
+}
+
+void pqPipelineData::removeAndUnregisterDisplay(vtkSMDisplayProxy *display,
+    const char *name, vtkSMRenderModuleProxy *module)
+{
+  // Get the proxy from the display input.
+  vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
+  if(display)
+    {
+    vtkSMProxyProperty *property = vtkSMProxyProperty::SafeDownCast(
+        display->GetProperty("Input"));
+    if(property && property->GetNumberOfProxies())
+      {
+      // TODO: How to get the compound proxy from the input proxy.
+      vtkSMProxy *proxy = property->GetProxy(0);
+      emit this->removingDisplay(display, proxy);
+
+      // Remove the input from the display.
+      property->RemoveProxy(proxy);
+      }
+
+    // Remove the display proxy from the render module.
+    if(module)
+      {
+      property = vtkSMProxyProperty::SafeDownCast(module->GetProperty(
+          "Displays"));
+      property->RemoveProxy(display);
+      module->UpdateVTKObjects();
+      }
+
+    // Clean up the lookup table for the display proxy.
+    property = vtkSMProxyProperty::SafeDownCast(display->GetProperty(
+        "LookupTable"));
+    if(property && property->GetNumberOfProxies())
+      {
+      vtkSMLookupTableProxy *lookup = vtkSMLookupTableProxy::SafeDownCast(
+          property->GetProxy(0));
+      proxyManager->UnRegisterProxy("lookup_tables",
+          proxyManager->GetProxyName("lookup_tables", lookup));
+      }
+    }
+
+  if(name)
+    {
+    // Unregister the display proxy.
+    proxyManager->UnRegisterProxy("displays", name);
+    }
+}
+
+void pqPipelineData::setVisible(vtkSMDisplayProxy *display, bool visible)
+{
+  if(display)
+    {
+    display->SetVisibilityCM(visible);
+    }
+}
+
+// TODO: how to handle compound proxies better ????
+void pqPipelineData::addInput(vtkSMProxy *proxy, vtkSMProxy *input)
+{
+  this->addConnection(input, proxy);
+}
+
+void pqPipelineData::removeInput(vtkSMProxy* proxy, vtkSMProxy* input)
+{
+  this->removeConnection(input, proxy);
+}
+
+void pqPipelineData::addConnection(vtkSMProxy *source, vtkSMProxy *sink)
+{
+  vtkSMCompoundProxy *bundle = vtkSMCompoundProxy::SafeDownCast(source);
+  if(bundle)
+    {
+    // TODO: How to find the correct output proxy?
+    source = 0; 
+    for(int i = bundle->GetNumberOfProxies(); source == 0 && i > 0; i--)
+      {
+      source = vtkSMSourceProxy::SafeDownCast(bundle->GetProxy(i-1));
+      }
+    }
+
+  bundle = vtkSMCompoundProxy::SafeDownCast(sink);
+  if(bundle)
+    {
+    // TODO: How to find the correct input proxy?
+    sink = bundle->GetMainProxy();
+    }
+
+  if(!source || !sink)
     {
     return;
     }
 
-  // Create an element to hold the pipeline state.
-  vtkPVXMLElement *pipeline = vtkPVXMLElement::New();
-  pipeline->SetName("Pipeline");
-
-  // Save the state for each of the servers.
-  QString address;
-  pqServer *server = 0;
-  vtkPVXMLElement *element = 0;
-  QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
-  for( ; iter != this->Internal->Servers.end(); ++iter)
+  vtkSMInputProperty *inputProp = vtkSMInputProperty::SafeDownCast(
+      sink->GetProperty("Input"));
+  if(inputProp)
     {
-    element = vtkPVXMLElement::New();
-    element->SetName("Server");
-
-    // Save the connection information.
-    server = (*iter)->GetServer();
-    address = server->getAddress();
-    element->AddAttribute("address", address.toAscii().data());
-    if(address != server->getFriendlyName())
+    // If the sink already has an input, the previous connection
+    // needs to be broken if it doesn't support multiple inputs.
+    if(!inputProp->GetMultipleInput() && inputProp->GetNumberOfProxies() > 0)
       {
-      element->AddAttribute("name", server->getFriendlyName().toAscii().data());
+      vtkSMProxy *other = inputProp->GetProxy(0);
+      emit this->removingConnection(other, sink);
+      this->InCreateOrConnect = true;
+      inputProp->RemoveProxy(other);
+      this->InCreateOrConnect = false;
       }
 
-    (*iter)->SaveState(element, multiView);
-    pipeline->AddNestedElement(element);
-    element->Delete();
+    // Add the input to the proxy in the server manager.
+    inputProp->AddProxy(source);
+    this->InCreateOrConnect = true;
+    emit this->connectionCreated(source, sink);
+    this->InCreateOrConnect = false;
+    }
+}
+
+void pqPipelineData::removeConnection(vtkSMProxy *source, vtkSMProxy *sink)
+{
+  if(!source || !sink)
+    {
+    return;
     }
 
-  // Add the pipeline element to the xml.
-  root->AddNestedElement(pipeline);
-  pipeline->Delete();
+  vtkSMInputProperty *inputProp = vtkSMInputProperty::SafeDownCast(
+      sink->GetProperty("Input"));
+  if(inputProp)
+    {
+    emit this->removingConnection(source, sink);
+
+    // Remove the input from the server manager.
+    this->InCreateOrConnect = true;
+    inputProp->RemoveProxy(source);
+    this->InCreateOrConnect = false;
+    }
 }
 
 void pqPipelineData::loadState(vtkPVXMLElement *root, pqMultiView *multiView)
@@ -199,13 +561,16 @@ void pqPipelineData::loadState(vtkPVXMLElement *root, pqMultiView *multiView)
     }
 
   // Find the pipeline element in the xml.
-  vtkPVXMLElement *pipeline = ParaQ::FindNestedElementByName(root, "Pipeline");
+  vtkPVXMLElement *pipeline = pqXMLUtil::FindNestedElementByName(root,
+      "Pipeline");
   if(pipeline)
     {
+    QString name;
+    vtkPVXMLElement *serverManagerState = 0;
+
     // Create a pqServer for each server element in the xml.
     pqServer *server = 0;
     QStringList address;
-    QString name;
     vtkPVXMLElement *serverElement = 0;
     unsigned int total = pipeline->GetNumberOfNestedElements();
     for(unsigned int i = 0; i < total; i++)
@@ -237,779 +602,71 @@ void pqPipelineData::loadState(vtkPVXMLElement *root, pqMultiView *multiView)
           server = pqServer::CreateConnection(address[0].toAscii().data(), port);
           }
 
-        // Add the server to the pipeline data.
-        if(server)
+        if(!server)
           {
-          this->addServer(server);
-          vtkPVXMLElement *element = 0;
+          continue;
+          }
 
-          // Restore the multi-view windows for the server. Set up the
-          // display and object map.
-          if(multiView)
+        // Add the server to the pipeline data.
+        this->addServer(server);
+
+        // Loop through the elements in the server element.
+        vtkPVXMLElement *element = 0;
+        unsigned int count = serverElement->GetNumberOfNestedElements();
+        for(unsigned int j = 0; j < count; j++)
+          {
+          element = serverElement->GetNestedElement(j);
+          name = element->GetName();
+          if(name == "ServerManagerState")
+            {
+            // The server manager state may be a sub-element of the
+            // server element in demo state files.
+            serverManagerState = element;
+            }
+          else if(multiView)
             {
             QList<int> list;
-            pqMultiViewFrame *frame = 0;
-            unsigned int count = serverElement->GetNumberOfNestedElements();
-            for(unsigned int j = 0; j < count; j++)
+            if(name == "Window")
               {
-              element = serverElement->GetNestedElement(j);
-              name = element->GetName();
-              if(name == "Window")
+              // Restore the window from the server.
+              list = pqXMLUtil::GetIntListFromString(
+                  element->GetAttribute("windowID"));
+              pqMultiViewFrame *frame = qobject_cast<pqMultiViewFrame *>(
+                  multiView->widgetOfIndex(list));
+              if(frame)
                 {
-                // Get the multi-view frame to put the window in.
-                list = ParaQ::GetIntListFromString(
-                    element->GetAttribute("windowID"));
-                frame = qobject_cast<pqMultiViewFrame *>(
-                    multiView->widgetOfIndex(list));
-                if(frame)
-                  {
-                  // Make a new QVTKWidget in the frame.
-                  ParaQ::AddQVTKWidget(frame, multiView, server);
-                  }
-                }
-              else if(name == "Display")
-                {
-                list = ParaQ::GetIntListFromString(
-                    element->GetAttribute("windowID"));
-                frame = qobject_cast<pqMultiViewFrame *>(
-                    multiView->widgetOfIndex(list));
-                if(frame)
-                  {
-                  QWidget *widget = frame->mainWidget();
-                  const char *proxyName = element->GetAttribute("name");
-                  if(widget && proxyName)
-                    {
-                    this->Internal->RestoreMap.insert(QString(proxyName), widget);
-                    }
-
-                  proxyName = element->GetAttribute("proxyName");
-                  if(widget && proxyName)
-                    {
-                    this->Internal->RestoreMap.insert(QString(proxyName), widget);
-                    }
-                  }
+                // Make a new QVTKWidget in the frame.
+                // TODO: Move this to a central location?
+                ParaQ::AddQVTKWidget(frame, multiView, server);
                 }
               }
-            }
-
-          // Restore the server manager state. The server manager
-          // should call back with register events.
-          element = ParaQ::FindNestedElementByName(serverElement,
-              "ServerManagerState");
-          if(element)
-            {
-            vtkSMObject::GetProxyManager()->LoadState(element, 
-              server->GetConnectionID());
-            }
-
-          // TEMP: Update the pipeline connection information.
-          QList<pqPipelineObject *>::Iterator jter =
-              this->Internal->Connections.begin();
-          for( ; jter != this->Internal->Connections.end(); ++jter)
-            {
-            pqPipelineObject *source = 0;
-            vtkSMProxyProperty *prop = vtkSMProxyProperty::SafeDownCast(
-                (*jter)->GetProxy()->GetProperty("Input"));
-            if(!prop)
+            else if(name == "Display")
               {
-              continue;
-              }
-
-            for(unsigned int k = 0; k < prop->GetNumberOfProxies(); k++)
-              {
-              source = this->getObjectFor(prop->GetProxy(k));
-              source->AddOutput(*jter);
-              (*jter)->AddInput(source);
-              emit this->connectionCreated(source, *jter);
+              // Add the display/window pair to the restore map.
+              list = pqXMLUtil::GetIntListFromString(
+                  element->GetAttribute("windowID"));
+              this->Internal->RestoreMap.insert(element->GetAttribute("name"),
+                  multiView->widgetOfIndex(list));
               }
             }
-
-          // Put all the display objects in the correct render module
-          // and pipeline object.
-          QList<pqDisplayRestore *>::Iterator iter =
-              this->Internal->Displays.begin();
-          for( ; iter != this->Internal->Displays.end(); ++iter)
-            {
-            if(*iter)
-              {
-              vtkSMRenderModuleProxy *module = this->getRenderModule(
-                  (*iter)->Window);
-              if(module)
-                {
-                (*iter)->Display->UpdateSelfAndAllInputs();
-                vtkSMProxyProperty *prop = vtkSMProxyProperty::SafeDownCast(
-                    module->GetProperty("Displays"));
-                prop->AddProxy((*iter)->Display);
-                module->UpdateVTKObjects();
-
-                // Add the display proxy to the object. Use the display's
-                // input to find the object.
-                prop = vtkSMProxyProperty::SafeDownCast(
-                    (*iter)->Display->GetProperty("Input"));
-                pqPipelineObject *object = (*iter)->Server->GetObject(
-                    prop->GetProxy(0));
-                if(object)
-                  {
-                  object->SetDisplayProxy((*iter)->Display);
-                  }
-                }
-
-              delete *iter;
-              *iter = 0;
-              }
-            }
-
-          // Clean up the restore variables.
-          this->Internal->RestoreMap.clear();
-          this->Internal->Displays.clear();
           }
         }
-      }
-    }
-}
-
-void pqPipelineData::clearPipeline()
-{
-  if(this->Internal)
-    {
-    // Clean up the server objects, which will clean up all the internal
-    // pipeline objects.
-    emit this->clearingPipeline();
-    QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
-    for( ; iter != this->Internal->Servers.end(); ++iter)
-      {
-      if(*iter)
+      else if(name == "ServerManagerState")
         {
-        delete *iter;
-        *iter = 0;
+        serverManagerState = serverElement;
         }
       }
-    }
-}
 
-void pqPipelineData::addServer(pqServer *server)
-{
-  if(!this->Internal || !server)
-    return;
-
-  // Make sure the server doesn't already exist.
-  QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
-  for( ; iter != this->Internal->Servers.end(); ++iter)
-    {
-    if(*iter && (*iter)->GetServer() == server)
-      return;
-    }
-
-  // Create a new internal representation for the server.
-  pqPipelineServer *object = new pqPipelineServer();
-  if(object)
-    {
-    object->SetServer(server);
-    this->Internal->Servers.append(object);
-
-    // Listen for pipeline events from the server.
-    vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
-    this->VTKConnect->Connect(proxyManager, vtkCommand::RegisterEvent, this,
-        SLOT(proxyRegistered(vtkObject*, unsigned long, void*, void*, vtkCommand*)),
-        NULL, 1.0);
-
-    // Signal that a new server was added to the pipeline data.
-    emit this->serverAdded(object);
-    }
-}
-
-void pqPipelineData::removeServer(pqServer *server)
-{
-  if(!this->Internal || !server)
-    return;
-
-  // Find the server in the list.
-  QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
-  for( ; iter != this->Internal->Servers.end(); ++iter)
-    {
-    if(*iter && (*iter)->GetServer() == server)
+    // Restore the server manager state. The server manager should
+    // signal the pipeline when new proxies are added.
+    if(serverManagerState)
       {
-      emit this->removingServer(*iter);
-      delete *iter;
-      this->Internal->Servers.erase(iter);
-      break;
-      }
-    }
-}
-
-int pqPipelineData::getServerCount() const
-{
-  if(this->Internal)
-    {
-    return this->Internal->Servers.size();
-    }
-
-  return 0;
-}
-
-pqPipelineServer *pqPipelineData::getServer(int index) const
-{
-  if(this->Internal && index >= 0 && index < this->Internal->Servers.size())
-    {
-    return this->Internal->Servers[index];
-    }
-
-  return 0;
-}
-
-pqPipelineServer *pqPipelineData::getServerFor(pqServer *server)
-{
-  if(this->Internal)
-    {
-    QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
-    for( ; iter != this->Internal->Servers.end(); ++iter)
-      {
-      if((*iter)->GetServer() == server)
-        {
-        return *iter;
-        }
-      }
-    }
-
-  return 0;
-}
-
-void pqPipelineData::addWindow(QVTKWidget *window, pqServer *server)
-{
-  if(!this->Internal || !window || !server)
-    return;
-
-  // Find the server in the list.
-  pqPipelineServer *serverObject = 0;
-  QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
-  for( ; iter != this->Internal->Servers.end(); ++iter)
-    {
-    if(*iter && (*iter)->GetServer() == server)
-      {
-      serverObject = *iter;
-      break;
-      }
-    }
-
-  if(!serverObject)
-    return;
-
-  // Create a new window representation.
-  pqPipelineWindow *object = serverObject->AddWindow(window);
-  if(object)
-    {
-    // Give the window a title.
-    QString name;
-    name.setNum(this->Names->GetCountAndIncrement("Window"));
-    name.prepend("Window");
-    window->setWindowTitle(name);
-    pqMultiViewFrame *frame = qobject_cast<pqMultiViewFrame *>(window->parent());
-    if(frame)
-      {
-      frame->setTitle(name);
+      vtkSMObject::GetProxyManager()->LoadState(serverManagerState);
       }
 
-    object->SetServer(serverObject);
-    emit this->windowAdded(object);
+    // Clean up the restore variables.
+    this->Internal->RestoreMap.clear();
     }
-}
-
-void pqPipelineData::removeWindow(QVTKWidget *window)
-{
-  if(!this->Internal || !window)
-    return;
-
-  // Find the server in the list.
-  QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
-  for( ; iter != this->Internal->Servers.end(); ++iter)
-    {
-    if(*iter)
-      {
-      pqPipelineWindow *object = (*iter)->GetWindow(window);
-      if(object)
-        {
-        emit this->removingWindow(object);
-        (*iter)->RemoveWindow(window);
-        break;
-        }
-      }
-    }
-}
-
-void pqPipelineData::addViewMapping(QVTKWidget *widget,
-    vtkSMRenderModuleProxy *module)
-{
-  if(this->Internal && widget && module)
-    this->Internal->ViewMap.insert(widget, module);
-}
-
-vtkSMRenderModuleProxy *pqPipelineData::removeViewMapping(QVTKWidget *widget)
-{
-  vtkSMRenderModuleProxy *module = 0;
-  if(this->Internal && widget)
-    {
-    QMap<QVTKWidget *, vtkSMRenderModuleProxy *>::Iterator iter =
-        this->Internal->ViewMap.find(widget);
-    if(iter != this->Internal->ViewMap.end())
-      {
-      module = *iter;
-      this->Internal->ViewMap.erase(iter);
-      }
-    }
-
-  return module;
-}
-
-vtkSMRenderModuleProxy *pqPipelineData::getRenderModule(
-    QVTKWidget *widget) const
-{
-  if(this->Internal && widget)
-    {
-    QMap<QVTKWidget *, vtkSMRenderModuleProxy *>::Iterator iter =
-        this->Internal->ViewMap.find(widget);
-    if(iter != this->Internal->ViewMap.end())
-      return *iter;
-    }
-
-  return 0;
-}
-
-void pqPipelineData::clearViewMapping()
-{
-  if(this->Internal)
-    this->Internal->ViewMap.clear();
-}
-
-vtkSMSourceProxy *pqPipelineData::createSource(const char *proxyName,
-    QVTKWidget *window)
-{
-  if(!this->Internal || !proxyName || !window)
-    return 0;
-
-  // Get the server from the window.
-  pqPipelineServer *server = 0;
-  QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
-  for( ; iter != this->Internal->Servers.end(); ++iter)
-    {
-    if(*iter && (*iter)->GetWindow(window))
-      {
-      server = *iter;
-      break;
-      }
-    }
-
-  if(!server)
-    return 0;
-
-  // Create a proxy object on the server.
-  vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
-  vtkSMSourceProxy *proxy = 
-    vtkSMSourceProxy::SafeDownCast(proxyManager->NewProxy("sources", proxyName));
-  proxy->SetConnectionID(server->GetServer()->GetConnectionID());
-
-  // Register the proxy with the server manager. Use a unique name
-  // based on the class name and a count.
-  QString name;
-  name.setNum(this->Names->GetCountAndIncrement(proxyName));
-  name.prepend(proxyName);
-  proxyManager->RegisterProxy("sources", name.toAscii().data(), proxy);
-  proxy->Delete();
-
-  // Create an internal representation for the source.
-  pqPipelineObject *source = server->AddSource(proxy);
-  if(source)
-    {
-    source->SetProxyName(name);
-    source->SetParent(server->GetWindow(window));
-    emit this->sourceCreated(source);
-    }
-
-  this->setCurrentProxy(proxy);
-  return proxy;
-}
-
-vtkSMSourceProxy *pqPipelineData::createFilter(const char *proxyName,
-    QVTKWidget *window)
-{
-  if(!this->Internal || !proxyName || !window)
-    return 0;
-
-  // Get the server from the window.
-  pqPipelineServer *server = 0;
-  QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
-  for( ; iter != this->Internal->Servers.end(); ++iter)
-    {
-    if(*iter && (*iter)->GetWindow(window))
-      {
-      server = *iter;
-      break;
-      }
-    }
-
-  if(!server)
-    return 0;
-
-  // Create a proxy object on the server.
-  vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
-  vtkSMSourceProxy *proxy = 
-    vtkSMSourceProxy::SafeDownCast(proxyManager->NewProxy("filters", proxyName));
-  proxy->SetConnectionID(server->GetServer()->GetConnectionID());
-
-  // Register the proxy with the server manager. Use a unique name
-  // based on the class name and a count.
-  QString name;
-  name.setNum(this->Names->GetCountAndIncrement(proxyName));
-  name.prepend(proxyName);
-  proxyManager->RegisterProxy("sources", name.toAscii().data(), proxy);
-  proxy->Delete();
-
-  // Create an internal representation for the filter.
-  pqPipelineObject *filter = server->AddFilter(proxy);
-  if(filter)
-    {
-    filter->SetProxyName(name);
-    filter->SetParent(server->GetWindow(window));
-    emit this->filterCreated(filter);
-    }
-
-  this->setCurrentProxy(proxy);
-  return proxy;
-}
-
-vtkSMCompoundProxy *pqPipelineData::createCompoundProxy(const char *proxyName,
-    QVTKWidget *window)
-{
-  if(!this->Internal || !proxyName || !window)
-    return 0;
-
-  // Get the server from the window.
-  pqPipelineServer *server = 0;
-  QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
-  for( ; iter != this->Internal->Servers.end(); ++iter)
-    {
-    if(*iter && (*iter)->GetWindow(window))
-      {
-      server = *iter;
-      break;
-      }
-    }
-
-  if(!server)
-    return 0;
-
-  // Create a proxy object on the server.
-  vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
-  vtkSMCompoundProxy *proxy = vtkSMCompoundProxy::SafeDownCast(
-    proxyManager->NewCompoundProxy(proxyName));
-  proxy->SetConnectionID(server->GetServer()->GetConnectionID());
-  proxy->UpdateVTKObjects();
-
-  // Register the proxy with the server manager. Use a unique name
-  // based on the class name and a count.
-  QString name;
-  name.setNum(this->Names->GetCountAndIncrement(proxyName));
-  name.prepend(proxyName);
-  proxyManager->RegisterProxy("compound_proxies", name.toAscii().data(), proxy);
-  proxy->Delete();
-
-  // Create an internal representation for the filter.
-  pqPipelineObject *filter = server->AddCompoundProxy(proxy);
-  if(filter)
-    {
-    filter->SetProxyName(name);
-    filter->SetParent(server->GetWindow(window));
-    emit this->filterCreated(filter);
-    }
-
-  this->setCurrentProxy(proxy);
-  return proxy;
-}
-
-void pqPipelineData::deleteProxy(vtkSMProxy *proxy)
-{
-  if(!this->Internal || !proxy)
-    {
-    return;
-    }
-
-  pqPipelineServer *server = 0;
-  pqPipelineObject *object = 0;
-  QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
-  for( ; iter != this->Internal->Servers.end(); ++iter)
-    {
-    if(*iter)
-      {
-      object = (*iter)->GetObject(proxy);
-      if(object)
-        {
-        server = *iter;
-        break;
-        }
-      }
-    }
-
-  if(!server || !object)
-    {
-    return;
-    }
-
-  // Disconnect the object's outputs.
-  pqPipelineObject *sink = 0;
-  vtkSMInputProperty *inputProperty = 0;
-  for(int i = 0; i < object->GetOutputCount(); i++)
-    {
-    sink = object->GetOutput(i);
-    inputProperty = vtkSMInputProperty::SafeDownCast(
-        sink->GetProxy()->GetProperty("Input"));
-    if(inputProperty)
-      {
-      emit this->removingConnection(object, sink);
-      sink->RemoveInput(object);
-      inputProperty->RemoveProxy(proxy);
-      }
-    }
-
-  // Clean up the object.
-  emit this->removingObject(object);
-  server->RemoveObject(proxy);
-}
-
-vtkSMDisplayProxy* pqPipelineData::createDisplay(vtkSMSourceProxy* proxy, vtkSMProxy* rep)
-{
-  if(!this->Internal || !proxy)
-    {
-    return NULL;
-    }
-
-  if(!rep)
-    {
-    rep = proxy;
-    }
-  
-  // Get the object from the list of servers.
-  pqPipelineServer *server = 0;
-  pqPipelineObject *object = 0;
-  QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
-  for( ; iter != this->Internal->Servers.end(); ++iter)
-    {
-    if(*iter)
-      {
-      object = (*iter)->GetObject(rep);
-      if(object)
-        {
-        server = *iter;
-        break;
-        }
-      }
-    }
-
-  if(!object || !object->GetParent())
-    return NULL;
-
-  QVTKWidget *window = qobject_cast<QVTKWidget *>(
-      object->GetParent()->GetWidget());
-  vtkSMRenderModuleProxy *module = this->getRenderModule(window);
-  if(!module)
-    return NULL;
-
-  // Create the display proxy and register it.
-  vtkSMDisplayProxy* display = pqPart::Add(module, proxy);
-  if(display)
-    {
-    QString name;
-    name.setNum(this->Names->GetCountAndIncrement("Display"));
-    name.prepend("Display");
-    vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
-    proxyManager->RegisterProxy("displays", name.toAscii().data(), display);
-    display->Delete();
-    }
-
-  // Save the display proxy in the object as well.
-  object->SetDisplayProxy(display);
-
-  return display;
-}
-
-void pqPipelineData::setVisibility(vtkSMDisplayProxy* display, bool on)
-{
-  if(!this->Internal || !display)
-    {
-    return;
-    }
-
-  display->SetVisibilityCM(on);
-}
-
-// TODO: how to handle compound proxies better ????
-void pqPipelineData::addInput(vtkSMProxy *proxy, vtkSMProxy *input)
-{
-  if(!this->Internal || !proxy || !input)
-    return;
-
-  // Get the object from the list of servers.
-  pqPipelineObject *source = 0;
-  pqPipelineObject *sink = 0;
-  QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
-  for( ; iter != this->Internal->Servers.end(); ++iter)
-    {
-    if(*iter)
-      {
-      sink = (*iter)->GetObject(proxy);
-      if(sink)
-        {
-        // Make sure the source is on the same server.
-        source = (*iter)->GetObject(input);
-        break;
-        }
-      }
-    }
-
-  if(!source || !sink)
-    return;
-
-  // Make sure the two objects are not already connected.
-  if(sink->HasInput(source))
-    return;
-
-  // TODO  hardwired compound proxies
-  vtkSMCompoundProxy* compoundProxy = vtkSMCompoundProxy::SafeDownCast(proxy);
-  if(compoundProxy)
-    {
-    proxy = compoundProxy->GetMainProxy();
-    }
-  
-  // if we are connecting the output of a compound proxy to the input of another filter
-  compoundProxy = vtkSMCompoundProxy::SafeDownCast(input);
-  if(compoundProxy)
-    {
-    input = NULL; 
-    for(int i=compoundProxy->GetNumberOfProxies(); input == NULL && i>0; i--)
-      {
-      input = vtkSMSourceProxy::SafeDownCast(compoundProxy->GetProxy(i-1));
-      }
-    }
-
-  vtkSMInputProperty *inputProp = vtkSMInputProperty::SafeDownCast(
-      proxy->GetProperty("Input"));
-  if(inputProp)
-    {
-    // If the sink already has an input, the previous connection
-    // needs to be broken if it doesn't support multiple inputs.
-    if(!inputProp->GetMultipleInput() && sink->GetInputCount() > 0)
-      {
-      pqPipelineObject *other = sink->GetInput(0);
-      emit this->removingConnection(other, sink);
-
-      other->RemoveOutput(sink);
-      sink->RemoveInput(other);
-      inputProp->RemoveProxy(other->GetProxy());
-      }
-
-    // Connect the internal objects together.
-    source->AddOutput(sink);
-    sink->AddInput(source);
-
-    // Add the input to the proxy in the server manager.
-    inputProp->AddProxy(input);
-    emit this->connectionCreated(source, sink);
-    }
-}
-
-void pqPipelineData::removeInput(vtkSMProxy* proxy, vtkSMProxy* input)
-{
-  if(!this->Internal || !proxy || !input)
-    return;
-
-  // Get the object from the list of servers.
-  pqPipelineObject *source = 0;
-  pqPipelineObject *sink = 0;
-  QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
-  for( ; iter != this->Internal->Servers.end(); ++iter)
-    {
-    if(*iter)
-      {
-      sink = (*iter)->GetObject(proxy);
-      if(sink)
-        {
-        // Make sure the source is on the same server.
-        source = (*iter)->GetObject(input);
-        break;
-        }
-      }
-    }
-
-  if(!source || !sink)
-    return;
-
-  // Make sure the two objects are connected.
-  if(!sink->HasInput(source))
-    return;
-
-  vtkSMInputProperty *inputProp = vtkSMInputProperty::SafeDownCast(
-      proxy->GetProperty("Input"));
-  if(inputProp)
-    {
-    emit this->removingConnection(source, sink);
-
-    // Disconnect the internal objects.
-    sink->RemoveInput(source);
-    source->RemoveOutput(sink);
-
-    // Remove the input from the server manager.
-    inputProp->RemoveProxy(input);
-    }
-}
-
-QVTKWidget *pqPipelineData::getWindowFor(vtkSMProxy *proxy) const
-{
-  // Get the pipeline object for the proxy.
-  pqPipelineObject *object = getObjectFor(proxy);
-  if(object && object->GetParent())
-    return qobject_cast<QVTKWidget *>(object->GetParent()->GetWidget());
-
-  return 0;
-}
-
-pqPipelineObject *pqPipelineData::getObjectFor(vtkSMProxy *proxy) const
-{
-  if(!this->Internal || !proxy)
-    return 0;
-
-  // Get the pipeline object for the proxy.
-  pqPipelineObject *object = 0;
-  QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
-  for( ; iter != this->Internal->Servers.end(); ++iter)
-    {
-    if(*iter)
-      {
-      object = (*iter)->GetObject(proxy);
-      if(object)
-        return object;
-      }
-    }
-
-  return 0;
-}
-
-pqPipelineWindow *pqPipelineData::getObjectFor(QVTKWidget *window) const
-{
-  if(!this->Internal || !window)
-    return 0;
-
-  // Get the pipeline object for the proxy.
-  pqPipelineWindow *object = 0;
-  QList<pqPipelineServer *>::Iterator iter = this->Internal->Servers.begin();
-  for( ; iter != this->Internal->Servers.end(); ++iter)
-    {
-    if(*iter)
-      {
-      object = (*iter)->GetWindow(window);
-      if(object)
-        return object;
-      }
-    }
-
-  return 0;
 }
 
 void pqPipelineData::setCurrentProxy(vtkSMProxy* proxy)
@@ -1029,84 +686,67 @@ void pqPipelineData::proxyRegistered(vtkObject*, unsigned long, void*,
   // Get the proxy information from the call data.
   vtkSMProxyManager::RegisteredProxyInformation *info =
     reinterpret_cast<vtkSMProxyManager::RegisteredProxyInformation *>(callData);
-  if(info && this->Internal)
+  if(!info || !this->Internal || this->InCreateOrConnect)
     {
-    bool isSource = strcmp(info->GroupName, "sources") == 0;
-    bool isDisplay = strcmp(info->GroupName, "displays") == 0;
-    if(isSource || isDisplay)
+    return;
+    }
+
+  if(strcmp(info->GroupName, "sources") == 0)
+    {
+    // TODO: Get the server from the proxy's connection ID.
+    pqServer *server = this->Model->getServer(0)->GetServer();
+
+    // TODO: Why doesn't this work?
+    // Listen for input property change events.
+    vtkSMProperty *prop = info->Proxy->GetProperty("Input");
+    if(prop)
       {
-      QString name = info->ProxyName;
-      QMap<QString, QWidget *>::Iterator iter =
-          this->Internal->RestoreMap.find(name);
-      if(iter != this->Internal->RestoreMap.end())
+      this->VTKConnect->Connect(prop, vtkCommand::ModifiedEvent, this,
+          SLOT(inputChanged(vtkObject*, unsigned long, void*, void*, vtkCommand*)),
+          info->Proxy, 1.0);
+      }
+
+    // Use the xml grouping to determine the type of proxy.
+    if(strcmp(info->Proxy->GetXMLGroup(), "compound_proxies") == 0)
+      {
+      emit this->bundleCreated(info->Proxy, info->ProxyName, server);
+      }
+    else if(strcmp(info->Proxy->GetXMLGroup(), "filters") == 0)
+      {
+      emit this->filterCreated(info->Proxy, info->ProxyName, server);
+      }
+    else if(strcmp(info->Proxy->GetXMLGroup(), "sources") == 0)
+      {
+      emit this->sourceCreated(info->Proxy, info->ProxyName, server);
+      }
+    }
+  else if(strcmp(info->GroupName, "displays") == 0)
+    {
+    QMap<QString, QWidget *>::Iterator iter =
+        this->Internal->RestoreMap.find(info->ProxyName);
+    if(iter != this->Internal->RestoreMap.end())
+      {
+      // The widget in the restore map is the multi-view frame. Use
+      // the frame's widget when getting the render module.
+      QVTKWidget *widget = qobject_cast<QVTKWidget *>(
+          qobject_cast<pqMultiViewFrame *>(*iter)->mainWidget());
+      vtkSMRenderModuleProxy *module = this->getRenderModule(widget);
+      vtkSMDisplayProxy *display = vtkSMDisplayProxy::SafeDownCast(
+          info->Proxy);
+
+      // Get the display proxy's input. If the input doesn't exist
+      // yet, put the information on a list to be added to the
+      // pipeline object later.
+      vtkSMProxyProperty *property = vtkSMProxyProperty::SafeDownCast(
+          display->GetProperty("Input"));
+      if(property && property->GetNumberOfProxies() > 0)
         {
-        // Get the server from the window.
-        QWidget *window = *iter;
-        pqPipelineServer *server = 0;
-        QList<pqPipelineServer *>::Iterator jter = this->Internal->Servers.begin();
-        for( ; jter != this->Internal->Servers.end(); ++jter)
-          {
-          if(*jter && (*jter)->GetWindow(window))
-            {
-            server = *jter;
-            break;
-            }
-          }
-
-        if(server)
-          {
-          if(isSource)
-            {
-            info->Proxy->UpdateVTKObjects();
-
-            // Determine the proxy's type. Use the type to create the
-            // appropriate internal representation for the proxy.
-            pqPipelineObject *object = 0;
-            if(vtkSMCompoundProxy::SafeDownCast(info->Proxy))
-              {
-              object = server->AddCompoundProxy(info->Proxy);
-              }
-            else if(vtkSMSourceProxy::SafeDownCast(info->Proxy))
-              {
-              if(strcmp(info->Proxy->GetXMLGroup(), "filters") == 0)
-                {
-                object = server->AddFilter(info->Proxy);
-                }
-              else
-                {
-                object = server->AddSource(info->Proxy);
-                }
-              }
-
-            if(object)
-              {
-              object->SetProxyName(name);
-              object->SetParent(server->GetWindow(window));
-              if(object->GetType() == pqPipelineObject::Source)
-                {
-                emit this->sourceCreated(object);
-                }
-              else
-                {
-                this->Internal->Connections.append(object); // TEMP
-                // TODO: Why doesn't this work?
-                // Listen for input property change events.
-                //vtkSMProperty *prop = info->Proxy->GetProperty("Input");
-                //this->VTKConnect->Connect(prop, vtkCommand::ModifiedEvent,
-                //    this, SLOT(inputChanged(vtkObject*, unsigned long, void*, void*, vtkCommand*)),
-                //    info->Proxy, 1.0);
-                emit this->filterCreated(object);
-                }
-              }
-            }
-          else if(isDisplay)
-            {
-            // Add the display proxy to the list for later.
-            this->Internal->Displays.append(new pqDisplayRestore(
-                vtkSMDisplayProxy::SafeDownCast(info->Proxy), server,
-                qobject_cast<QVTKWidget *>(window)));
-            }
-          }
+        emit this->displayCreated(display, info->ProxyName,
+            property->GetProxy(0), module);
+        }
+      else
+        {
+        // TODO
         }
       }
     }
@@ -1124,7 +764,7 @@ void pqPipelineData::inputChanged(vtkObject* object, unsigned long e,
   // TODO: The connection may be needed when the pipeline can
   // be modified outside of ParaQ. For now, it is only needed
   // when restoring a session.
-  this->VTKConnect->Disconnect(object, e, this);
+  /*this->VTKConnect->Disconnect(object, e, this);
   if(prop && prop->GetNumberOfProxies() && sink && name &&
       strcmp(name, "Input") == 0)
     {
@@ -1156,7 +796,7 @@ void pqPipelineData::inputChanged(vtkObject* object, unsigned long e,
       sinkItem->AddInput(sourceItem);
       emit this->connectionCreated(sourceItem, sinkItem);
       }
-    }
+    }*/
 }
 
 

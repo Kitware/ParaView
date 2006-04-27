@@ -33,9 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPicking.h"
 
 #include "pqPipelineData.h"
-#include "pqPipelineObject.h"
+#include "pqPipelineDisplay.h"
+#include "pqPipelineSource.h"
 #include "pqPipelineServer.h"
 #include "pqServer.h"
+
+#include <QVTKWidget.h>
 
 #include <vtkSMSourceProxy.h>
 #include <vtkSMPointWidgetProxy.h>
@@ -133,7 +136,8 @@ void pqPicking::computeSelection(vtkRenderWindowInteractor* /*iren*/, int X, int
   if(!inputProxy)
     return;
   
-  vtkSMRenderModuleProxy* rm = pipeline->getRenderModule(pipeline->getWindowFor(inputProxy));
+  pqPipelineSource *source = pipeline->getModel()->getSourceFor(inputProxy);
+  vtkSMRenderModuleProxy* rm = pipeline->getRenderModule(qobject_cast<QVTKWidget *>(source->GetDisplay()->GetDisplayWindow(0)));
 
 
   // make sure the object is in the window we are picking in

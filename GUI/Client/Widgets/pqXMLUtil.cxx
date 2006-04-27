@@ -32,12 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqXMLUtil.h"
 
+#include <QString>
 #include <QStringList>
 #include "vtkPVXMLElement.h"
 
 
-vtkPVXMLElement *ParaQ::FindNestedElementByName(
-    vtkPVXMLElement *element, const char *name)
+vtkPVXMLElement *pqXMLUtil::FindNestedElementByName(vtkPVXMLElement *element,
+    const char *name)
 {
   if(element && name)
     {
@@ -57,7 +58,7 @@ vtkPVXMLElement *ParaQ::FindNestedElementByName(
   return 0;
 }
 
-QString ParaQ::GetStringFromIntList(const QList<int> &list)
+QString pqXMLUtil::GetStringFromIntList(const QList<int> &list)
 {
   QString number;
   QStringList values;
@@ -71,7 +72,7 @@ QString ParaQ::GetStringFromIntList(const QList<int> &list)
   return values.join(".");
 }
 
-QList<int> ParaQ::GetIntListFromString(const char *value)
+QList<int> pqXMLUtil::GetIntListFromString(const char *value)
 {
   QList<int> list;
   if(value)

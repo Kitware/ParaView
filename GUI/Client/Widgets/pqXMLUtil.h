@@ -45,13 +45,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkPVXMLElement;
 
 
-namespace ParaQ
+class PQWIDGETS_EXPORT pqXMLUtil
 {
-  PQWIDGETS_EXPORT vtkPVXMLElement *FindNestedElementByName(
-      vtkPVXMLElement *element, const char *name);
+public:
+  static vtkPVXMLElement *FindNestedElementByName(vtkPVXMLElement *element,
+      const char *name);
 
-  PQWIDGETS_EXPORT QString GetStringFromIntList(const QList<int> &list);
-  PQWIDGETS_EXPORT QList<int> GetIntListFromString(const char *value);
+  static QString GetStringFromIntList(const QList<int> &list);
+  static QList<int> GetIntListFromString(const char *value);
 };
 
 #endif

@@ -47,6 +47,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // paraq includes
 #include "pqPipelineData.h"
+#include "pqPipelineDisplay.h"
+#include "pqPipelineModel.h"
+#include "pqPipelineSource.h"
 
 
 pqPropertyManager pqObjectPanel::PropertyManager;
@@ -104,10 +107,10 @@ void pqObjectPanel::accept()
   urMgr->EndUndoSet();
   
   // cause the screen to update
-  QVTKWidget *qwindow = pqPipelineData::instance()->getWindowFor(this->Proxy);
-  if(qwindow)
+  pqPipelineSource *source = pqPipelineData::instance()->getModel()->getSourceFor(this->Proxy);
+  if(source)
     {
-      qwindow->update();
+    source->GetDisplay()->UpdateWindows();
     }
 }
 

@@ -42,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqMultiViewFrame;
 class pqPipelineServer;
-class pqPipelineWindow;
 class pqServer;
 
 class vtkCommand;
@@ -190,9 +189,9 @@ private slots:
   void onUpdateVariableSelector(vtkSMProxy*);
   void onVariableChanged(pqVariableType, const QString&);
   
-  void onAddServer(pqPipelineServer *server);
-  void onRemoveServer(pqPipelineServer *server);
-  void onAddWindow(pqPipelineWindow *window);
+  void onAddServer(pqServer *server);
+  void onRemoveServer(pqServer *server);
+  void onAddWindow(QWidget *window);
 
 private:
   void setServer(pqServer* Server);

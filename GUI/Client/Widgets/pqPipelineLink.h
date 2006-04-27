@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqPipelineWindow.h
+   Module:    pqPipelineLink.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,35 +30,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqPipelineWindow.h
-///
-/// \date 12/22/2005
+/// \file pqPipelineLink.h
+/// \date 4/17/2006
 
-#ifndef _pqPipelineWindow_h
-#define _pqPipelineWindow_h
+#ifndef _pqPipelineLink_h
+#define _pqPipelineLink_h
 
 
 #include "pqWidgetsExport.h"
+#include "pqPipelineObject.h"
 
-class pqPipelineServer;
-class QWidget;
+class pqPipelineFilter;
+class pqPipelineSource;
 
 
-class PQWIDGETS_EXPORT pqPipelineWindow
+class PQWIDGETS_EXPORT pqPipelineLink : public pqPipelineObject
 {
 public:
-  pqPipelineWindow(QWidget *window);
-  ~pqPipelineWindow() {}
+  pqPipelineLink();
+  virtual ~pqPipelineLink() {}
 
-  QWidget *GetWidget() const {return this->Widget;}
-  void SetWidget(QWidget *widget) {this->Widget = widget;}
+  pqPipelineSource *GetSource() const {return this->Source;}
+  void SetSource(pqPipelineSource *source) {this->Source = source;}
 
-  pqPipelineServer *GetServer() const {return this->Server;}
-  void SetServer(pqPipelineServer *server) {this->Server = server;}
+  pqPipelineFilter *GetLink() const {return this->Link;}
+  void SetLink(pqPipelineFilter *link) {this->Link = link;}
 
 private:
-  QWidget *Widget;          ///< Stores the widget pointer.
-  pqPipelineServer *Server; ///< Stores the parent server.
+  pqPipelineSource *Source;
+  pqPipelineFilter *Link;
 };
 
 #endif

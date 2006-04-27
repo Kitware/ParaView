@@ -105,7 +105,8 @@ void pqMultiViewManager::loadState(vtkPVXMLElement *root)
     }
 
   // Look for the multi-view element in the xml.
-  vtkPVXMLElement *multiView = ParaQ::FindNestedElementByName(root, "MultiView");
+  vtkPVXMLElement *multiView = pqXMLUtil::FindNestedElementByName(root,
+      "MultiView");
   if(multiView)
     {
     QSplitter *splitter = qobject_cast<QSplitter *>(
@@ -113,7 +114,8 @@ void pqMultiViewManager::loadState(vtkPVXMLElement *root)
     if(splitter)
       {
       QWidget *widget = splitter->widget(0);
-      vtkPVXMLElement *element = ParaQ::FindNestedElementByName(multiView, "Splitter");
+      vtkPVXMLElement *element = pqXMLUtil::FindNestedElementByName(multiView,
+          "Splitter");
       if(element && widget)
         {
         // This will be called recursively to restore the multi-view.
@@ -272,7 +274,7 @@ void pqMultiViewManager::saveSplitter(vtkPVXMLElement *element,
   number.setNum(splitter->count());
   splitterElement->AddAttribute("count", number.toAscii().data());
   splitterElement->AddAttribute("sizes",
-      ParaQ::GetStringFromIntList(splitter->sizes()).toAscii().data());
+      pqXMLUtil::GetStringFromIntList(splitter->sizes()).toAscii().data());
 
   // Save each of the child widgets.
   QSplitter *subsplitter = 0;
@@ -317,7 +319,8 @@ void pqMultiViewManager::restoreSplitter(QWidget *widget,
     QSplitter *splitter = qobject_cast<QSplitter *>(widget->parentWidget());
     if(splitter)
       {
-      QList<int> sizes = ParaQ::GetIntListFromString(element->GetAttribute("sizes"));
+      QList<int> sizes = pqXMLUtil::GetIntListFromString(
+          element->GetAttribute("sizes"));
       if(sizes.size() >= splitter->count())
         {
         splitter->setSizes(sizes);

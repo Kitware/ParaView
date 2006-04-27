@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqPipelineWindow.cxx
+   Module:    pqPipelineLink.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,17 +30,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqPipelineWindow.cxx
-///
-/// \date 12/22/2005
+/// \file pqPipelineLink.cxx
+/// \date 4/17/2006
 
-#include "pqPipelineWindow.h"
+#include "pqPipelineLink.h"
+
+#include "pqPipelineFilter.h"
+#include "pqPipelineSource.h"
 
 
-pqPipelineWindow::pqPipelineWindow(QWidget *window)
+pqPipelineLink::pqPipelineLink()
+  : pqPipelineObject()
 {
-  this->Widget = window;
-  this->Server = 0;
+  this->Source = 0;
+  this->Link = 0;
+
+  // Set the model item type.
+  this->SetType(pqPipelineModel::Link);
 }
 
 

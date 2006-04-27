@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqPipelineObject.h
+   Module:    pqPipelineFilter.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,31 +30,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqPipelineObject.h
-///
-/// \date 11/16/2005
+/// \file pqPipelineFilter.h
+/// \date 4/17/2006
 
-#ifndef _pqPipelineObject_h
-#define _pqPipelineObject_h
+#ifndef _pqPipelineFilter_h
+#define _pqPipelineFilter_h
 
 
 #include "pqWidgetsExport.h"
-#include "pqPipelineModelItem.h"
+#include "pqPipelineSource.h"
 
-class pqPipelineServer;
+class pqPipelineFilterInternal;
+class vtkSMProxy;
 
 
-class PQWIDGETS_EXPORT pqPipelineObject : public pqPipelineModelItem
+class PQWIDGETS_EXPORT pqPipelineFilter : public pqPipelineSource
 {
 public:
-  pqPipelineObject();
-  virtual ~pqPipelineObject() {}
+  pqPipelineFilter(vtkSMProxy *proxy,
+      pqPipelineModel::ItemType type=pqPipelineModel::Filter);
+  virtual ~pqPipelineFilter();
 
-  pqPipelineServer *GetServer() const;
-  void SetServer(pqPipelineServer *server);
+  virtual void ClearConnections();
+
+  int GetInputCount() const;
+  pqPipelineSource *GetInput(int index) const;
+  int GetInputIndexFor(pqPipelineSource *input) const;
+  bool HasInput(pqPipelineSource *input) const;
+
+  void AddInput(pqPipelineSource *input);
+  void RemoveInput(pqPipelineSource *input);
 
 private:
-  pqPipelineServer *Server;           ///< Stores the parent server.
+  pqPipelineFilterInternal *Internal; ///< Stores the input connections.
 };
 
 #endif

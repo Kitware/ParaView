@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqPipelineObject.h
+   Module:    pqPipelineBrowserContextMenu.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,31 +30,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqPipelineObject.h
-///
-/// \date 11/16/2005
+/// \file pqPipelineBrowserContextMenu.h
+/// \date 4/20/2006
 
-#ifndef _pqPipelineObject_h
-#define _pqPipelineObject_h
+#ifndef _pqPipelineBrowserContextMenu_h
+#define _pqPipelineBrowserContextMenu_h
 
 
 #include "pqWidgetsExport.h"
-#include "pqPipelineModelItem.h"
+#include <QObject>
 
-class pqPipelineServer;
+class pqPipelineBrowser;
+class QPoint;
 
 
-class PQWIDGETS_EXPORT pqPipelineObject : public pqPipelineModelItem
+class PQWIDGETS_EXPORT pqPipelineBrowserContextMenu : public QObject
 {
-public:
-  pqPipelineObject();
-  virtual ~pqPipelineObject() {}
+  Q_OBJECT
 
-  pqPipelineServer *GetServer() const;
-  void SetServer(pqPipelineServer *server);
+public:
+  pqPipelineBrowserContextMenu(pqPipelineBrowser *browser);
+  virtual ~pqPipelineBrowserContextMenu();
+
+public slots:
+  void showContextMenu(const QPoint &pos);
+  void showDisplayEditor();
+  void showRenderViewEditor();
 
 private:
-  pqPipelineServer *Server;           ///< Stores the parent server.
+  pqPipelineBrowser *Browser;
 };
 
 #endif

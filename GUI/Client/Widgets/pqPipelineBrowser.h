@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqPipelineListWidget.h
+   Module:    pqPipelineBrowser.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,65 +30,57 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqPipelineListWidget.h
-/// \brief
-///   The pqPipelineListWidget class is used to display the pipeline
-///   in the form of a tree.
-///
-/// \date 11/25/2005
+/// \file pqPipelineBrowser.h
+/// \date 4/20/2006
 
-#ifndef _pqPipelineListWidget_h
-#define _pqPipelineListWidget_h
+#ifndef _pqPipelineBrowser_h
+#define _pqPipelineBrowser_h
+
 
 #include "pqWidgetsExport.h"
 #include <QWidget>
 
-class pqPipelineListModel;
 class pqFlatTreeView;
+class pqPipelineModel;
+class pqPipelineObject;
+class pqPipelineServer;
+class pqServer;
+class QItemSelectionModel;
 class QModelIndex;
-class QString;
-class QTreeView;
-class QVTKWidget;
 class vtkSMProxy;
 
 
-/// \class pqPipelineListWidget
-/// \brief
-///   The pqPipelineListWidget class is used to display the pipeline
-///   in the form of a tree.
-class PQWIDGETS_EXPORT pqPipelineListWidget : public QWidget
+class PQWIDGETS_EXPORT pqPipelineBrowser : public QWidget
 {
   Q_OBJECT
 
 public:
-  pqPipelineListWidget(QWidget *parent=0);
-  virtual ~pqPipelineListWidget();
+  pqPipelineBrowser(QWidget *parent=0);
+  virtual ~pqPipelineBrowser();
 
   virtual bool eventFilter(QObject *object, QEvent *e);
 
-  pqPipelineListModel *getListModel() const {return this->ListModel;}
+  pqPipelineModel *getListModel() const {return this->ListModel;}
   pqFlatTreeView *getTreeView() const {return this->TreeView;}
+
+  QItemSelectionModel *getSelectionModel() const;
+  pqPipelineServer *getCurrentServer() const;
 
   vtkSMProxy *getSelectedProxy() const;
   vtkSMProxy *getNextProxy() const; // TEMP
-  QVTKWidget *getCurrentWindow() const;
 
 signals:
   void proxySelected(vtkSMProxy *proxy);
 
 public slots:
   void selectProxy(vtkSMProxy *proxy);
-  void selectWindow(QVTKWidget *window);
-
-  void deleteSelected();
-  void deleteProxy(vtkSMProxy *proxy);
+  void selectServer(pqServer *server);
 
 private slots:
   void changeCurrent(const QModelIndex &current, const QModelIndex &previous);
-  void doViewContextMenu(const QPoint& pos);
 
 private:
-  pqPipelineListModel *ListModel;
+  pqPipelineModel *ListModel;
   pqFlatTreeView *TreeView;
 };
 

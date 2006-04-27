@@ -43,9 +43,10 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqOutputWindow.h
   pqOutputWindowAdapter.h
   pqPicking.h
+  pqPipelineBrowser.h
+  pqPipelineBrowserContextMenu.h
   pqPipelineData.h
-  pqPipelineListModel.h
-  pqPipelineListWidget.h
+  pqPipelineModel.h
   pqPropertyLinks.h
   pqPropertyManager.h
   pqRenderViewEditor.h
@@ -134,18 +135,28 @@ ADD_LIBRARY(pqWidgets
   pqParts.h
   pqPicking.cxx
   pqPicking.h
+  pqPipelineBrowser.cxx
+  pqPipelineBrowser.h
+  pqPipelineBrowserContextMenu.cxx
+  pqPipelineBrowserContextMenu.h
   pqPipelineData.cxx
   pqPipelineData.h
-  pqPipelineListModel.cxx
-  pqPipelineListModel.h
-  pqPipelineListWidget.cxx
-  pqPipelineListWidget.h
+  pqPipelineDisplay.cxx
+  pqPipelineDisplay.h
+  pqPipelineFilter.cxx
+  pqPipelineFilter.h
+  pqPipelineLink.cxx
+  pqPipelineLink.h
+  pqPipelineModel.cxx
+  pqPipelineModel.h
+  pqPipelineModelItem.cxx
+  pqPipelineModelItem.h
   pqPipelineObject.cxx
   pqPipelineObject.h
   pqPipelineServer.cxx
   pqPipelineServer.h
-  pqPipelineWindow.cxx
-  pqPipelineWindow.h
+  pqPipelineSource.cxx
+  pqPipelineSource.h
   pqProcessModuleGUIHelper.cxx
   pqProcessModuleGUIHelper.h
   pqRenderViewProxy.cxx

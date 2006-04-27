@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqPipelineObject.h
+   Module:    pqPipelineDisplay.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,31 +30,44 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqPipelineObject.h
-///
-/// \date 11/16/2005
+/// \file pqPipelineDisplay.h
+/// \date 4/24/2006
 
-#ifndef _pqPipelineObject_h
-#define _pqPipelineObject_h
+#ifndef _pqPipelineDisplay_h
+#define _pqPipelineDisplay_h
 
 
 #include "pqWidgetsExport.h"
-#include "pqPipelineModelItem.h"
 
-class pqPipelineServer;
+class pqMultiView;
+class pqPipelineDisplayInternal;
+class QString;
+class QWidget;
+class vtkPVXMLElement;
+class vtkSMDisplayProxy;
 
 
-class PQWIDGETS_EXPORT pqPipelineObject : public pqPipelineModelItem
+class PQWIDGETS_EXPORT pqPipelineDisplay
 {
 public:
-  pqPipelineObject();
-  virtual ~pqPipelineObject() {}
+  pqPipelineDisplay();
+  ~pqPipelineDisplay();
 
-  pqPipelineServer *GetServer() const;
-  void SetServer(pqPipelineServer *server);
+  void UpdateWindows();
+  void UnregisterDisplays();
+  void SaveState(vtkPVXMLElement *root, pqMultiView *multiView);
+
+  int GetDisplayCount() const;
+  vtkSMDisplayProxy *GetDisplayProxy(int index) const;
+  void GetDisplayName(int index, QString &buffer) const;
+  QWidget *GetDisplayWindow(int index) const;
+  int GetDisplayIndexFor(vtkSMDisplayProxy *display) const;
+  void AddDisplay(vtkSMDisplayProxy *display, const QString &name,
+      QWidget *window);
+  void RemoveDisplay(vtkSMDisplayProxy *display);
 
 private:
-  pqPipelineServer *Server;           ///< Stores the parent server.
+  pqPipelineDisplayInternal *Internal; ///< Stores the display/window objects.
 };
 
 #endif

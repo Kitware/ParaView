@@ -41,12 +41,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqObjectInspectorWidget.h"
 #include "pqParts.h"
 #include "pqPicking.h"
+#include "pqPipelineBrowser.h"
 #include "pqPipelineData.h"
-#include "pqPipelineListModel.h"
-#include "pqPipelineListWidget.h"
-#include "pqPipelineObject.h"
+#include "pqPipelineDisplay.h"
+#include "pqPipelineFilter.h"
+#include "pqPipelineModel.h"
+#include "pqPipelineSource.h"
 #include "pqPipelineServer.h"
-#include "pqPipelineWindow.h"
 #include "pqServer.h"
 #include "pqServerBrowser.h"
 #include "pqServerFileDialogModel.h"
@@ -128,7 +129,7 @@ public:
     MultiViewManager(0),
     ServerDisconnectAction(0),
     Pipeline(0),
-    PipelineList(0),
+    PipelineBrowser(0),
     ActiveView(0),
     ElementInspectorDock(0),
     CompoundProxyToolBar(0),
@@ -149,19 +150,18 @@ public:
     delete this->Inspector;
     this->Inspector = 0;
     
-    // Clean up the pipeline inspector before the views.
-    delete this->PipelineList;
-    this->PipelineList = 0;
-    
-    // clean up multiview before server
-    delete this->MultiViewManager;
-    this->MultiViewManager = 0;
+    delete this->PipelineBrowser;
+    this->PipelineBrowser = 0;
 
     delete this->ProxyInfo;
     this->ProxyInfo = 0;
 
+    // Clean up the pipeline before the view manager.
     delete this->Pipeline;
     this->Pipeline = 0;
+    
+    delete this->MultiViewManager;
+    this->MultiViewManager = 0;
 
     delete this->CurrentServer;
     this->CurrentServer = 0;
@@ -189,7 +189,7 @@ public:
   pqMultiViewManager* MultiViewManager;
   QAction* ServerDisconnectAction;
   pqPipelineData *Pipeline;
-  pqPipelineListWidget *PipelineList;
+  pqPipelineBrowser *PipelineBrowser;
   pqMultiViewFrame* ActiveView;
   QDockWidget *ElementInspectorDock;
   QToolBar* CompoundProxyToolBar;
@@ -227,12 +227,8 @@ pqMainWindow::pqMainWindow() :
   //this->Implementation->MultiViewManager->show();  // workaround for flickering in Qt 4.0.1 & 4.1.0
 
   // Listen for the pipeline's server signals.
-  QObject::connect(this->Implementation->Pipeline, SIGNAL(serverAdded(pqPipelineServer *)),
-      this, SLOT(onAddServer(pqPipelineServer *)));
-  QObject::connect(this->Implementation->Pipeline, SIGNAL(removingServer(pqPipelineServer *)),
-      this, SLOT(onRemoveServer(pqPipelineServer *)));
-  QObject::connect(this->Implementation->Pipeline, SIGNAL(windowAdded(pqPipelineWindow *)),
-      this, SLOT(onAddWindow(pqPipelineWindow *)));
+  QObject::connect(this->Implementation->Pipeline, SIGNAL(serverAdded(pqServer *)),
+      this, SLOT(onAddServer(pqServer *)));
 
   // Set up the dock window corners to give the vertical docks more room.
   this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
@@ -357,14 +353,14 @@ void pqMainWindow::createStandardPipelineBrowser(bool visible)
   // Make sure the pipeline data instance is created before the
   // pipeline list model. This ensures that the connections will
   // work.
-  this->Implementation->PipelineList = new pqPipelineListWidget(pipeline_dock);
-  this->Implementation->PipelineList->setObjectName("PipelineList");
-  pipeline_dock->setWidget(this->Implementation->PipelineList);
+  this->Implementation->PipelineBrowser = new pqPipelineBrowser(pipeline_dock);
+  this->Implementation->PipelineBrowser->setObjectName("PipelineList");
+  pipeline_dock->setWidget(this->Implementation->PipelineBrowser);
 
   this->addStandardDockWidget(Qt::LeftDockWidgetArea, pipeline_dock, QIcon(":pqWidgets/pqPipelineList22.png"), visible);
 
-  this->connect(this->Implementation->PipelineList, SIGNAL(proxySelected(vtkSMProxy*)), this, SIGNAL(proxyChanged(vtkSMProxy*)));
-  this->connect(this->Implementation->PipelineList, SIGNAL(proxySelected(vtkSMProxy*)), this, SLOT(onProxySelected(vtkSMProxy*)));
+  this->connect(this->Implementation->PipelineBrowser, SIGNAL(proxySelected(vtkSMProxy*)), this, SIGNAL(proxyChanged(vtkSMProxy*)));
+  this->connect(this->Implementation->PipelineBrowser, SIGNAL(proxySelected(vtkSMProxy*)), this, SLOT(onProxySelected(vtkSMProxy*)));
 }
 
 void pqMainWindow::createStandardObjectInspector(bool visible)
@@ -379,9 +375,9 @@ void pqMainWindow::createStandardObjectInspector(bool visible)
 
   this->Implementation->Inspector = new pqObjectInspectorWidget(object_inspector_dock);
   object_inspector_dock->setWidget(this->Implementation->Inspector);
-  if(this->Implementation->PipelineList)
+  if(this->Implementation->PipelineBrowser)
     {
-    connect(this->Implementation->PipelineList, SIGNAL(proxySelected(vtkSMProxy *)),
+    connect(this->Implementation->PipelineBrowser, SIGNAL(proxySelected(vtkSMProxy *)),
         this->Implementation->Inspector, SLOT(setProxy(vtkSMProxy *)));
     }
 
@@ -431,22 +427,28 @@ void pqMainWindow::createUndoRedoToolBar()
     << pqSetName("UndoRedoToolBar");
   this->Implementation->UndoRedoToolBar = toolbar;
   this->addToolBar(Qt::TopToolBarArea, toolbar);
-  QToolButton* const undoButton = new QToolButton(toolbar) << pqSetName("UndoButton");
-  undoButton->setAutoRaise(true);
-  undoButton->setToolTip("Undo");
-  undoButton->setIcon(QIcon(":pqWidgets/pqUndo22.png"));
-  undoButton->setEnabled(false);
-  toolbar->addWidget(undoButton);
+  QAction *undoAction = new QAction(toolbar) << pqSetName("UndoButton");
+  //QToolButton* const undoButton = new QToolButton(toolbar) << pqSetName("UndoButton");
+  //undoButton->setAutoRaise(true);
+  undoAction->setToolTip("Undo");
+  undoAction->setIcon(QIcon(":pqWidgets/pqUndo22.png"));
+  undoAction->setEnabled(false);
+  //toolbar->addWidget(undoButton);
+  toolbar->addAction(undoAction);
 
-  QToolButton* const redoButton = new QToolButton(toolbar) << pqSetName("RedoButton");
-  redoButton->setAutoRaise(true);
-  redoButton->setToolTip("Redo");
-  redoButton->setIcon(QIcon(":pqWidgets/pqRedo22.png"));
-  redoButton->setEnabled(false);
-  toolbar->addWidget(redoButton);
+  QAction *redoAction = new QAction(toolbar) << pqSetName("RedoButton");
+  //QToolButton* const redoButton = new QToolButton(toolbar) << pqSetName("RedoButton");
+  //redoButton->setAutoRaise(true);
+  redoAction->setToolTip("Redo");
+  redoAction->setIcon(QIcon(":pqWidgets/pqRedo22.png"));
+  redoAction->setEnabled(false);
+  //toolbar->addWidget(redoButton);
+  toolbar->addAction(redoAction);
 
-  this->connect(undoButton, SIGNAL(clicked()), SLOT(onUndo()));
-  this->connect(redoButton, SIGNAL(clicked()), SLOT(onRedo()));
+  //this->connect(undoButton, SIGNAL(clicked()), SLOT(onUndo()));
+  //this->connect(redoButton, SIGNAL(clicked()), SLOT(onRedo()));
+  this->connect(undoAction, SIGNAL(triggered()), SLOT(onUndo()));
+  this->connect(redoAction, SIGNAL(triggered()), SLOT(onRedo()));
 
   this->Implementation->VTKConnector->Connect(this->Implementation->UndoStack,
     vtkCommand::ModifiedEvent, this, SLOT(onUndoRedoStackChanged(vtkObject*, 
@@ -464,7 +466,7 @@ void pqMainWindow::createStandardVariableToolBar()
     
   this->Implementation->VariableSelectorToolBar->addWidget(varSelector);
 
-  this->connect(this->Implementation->PipelineList, SIGNAL(proxySelected(vtkSMProxy*)), this, SLOT(onUpdateVariableSelector(vtkSMProxy*)));
+  this->connect(this->Implementation->PipelineBrowser, SIGNAL(proxySelected(vtkSMProxy*)), this, SLOT(onUpdateVariableSelector(vtkSMProxy*)));
   this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), this, SIGNAL(variableChanged(pqVariableType, const QString&)));
   this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), this, SLOT(onVariableChanged(pqVariableType, const QString&)));
     
@@ -480,7 +482,7 @@ void pqMainWindow::createStandardCompoundProxyToolBar()
   this->connect(this->Implementation->CompoundProxyToolBar, SIGNAL(actionTriggered(QAction*)), SLOT(onCreateCompoundProxy(QAction*)));
 
   // Workaround for file new crash.
-  this->Implementation->PipelineList->setFocus();
+  this->Implementation->PipelineBrowser->setFocus();
 }
 
 QMenu* pqMainWindow::fileMenu()
@@ -629,6 +631,12 @@ void pqMainWindow::setServer(pqServer* Server)
       }
     
     this->Implementation->Pipeline->addServer(this->Implementation->CurrentServer);
+    if(this->Implementation->PipelineBrowser)
+      {
+      this->Implementation->PipelineBrowser->selectServer(
+          this->Implementation->CurrentServer);
+      }
+
     this->onNewQVTKWidget(qobject_cast<pqMultiViewFrame *>(
         this->Implementation->MultiViewManager->widgetOfIndex(pqMultiView::Index())));
     }
@@ -638,8 +646,16 @@ void pqMainWindow::setServer(pqServer* Server)
 
 void pqMainWindow::onFileNew()
 {
+  // Clean up the pipeline.
+  if(this->Implementation->Pipeline)
+    {
+    this->Implementation->Pipeline->getModel()->clearPipelines();
+    this->Implementation->Pipeline->getNameCount()->Reset();
+    }
+
   // Reset the multi-view. Use the removed widget list to clean
   // up the render modules. Then, delete the widgets.
+  this->Implementation->ActiveView = 0;
   if(this->Implementation->MultiViewManager)
     {
     QList<QWidget *> removed;
@@ -656,13 +672,6 @@ void pqMainWindow::onFileNew()
 
       delete *iter;
       }
-    }
-
-  // Clean up the pipeline.
-  if(this->Implementation->Pipeline)
-    {
-    this->Implementation->Pipeline->clearPipeline();
-    this->Implementation->Pipeline->getNameCount()->Reset();
     }
 
   // Clean up the current server.
@@ -707,24 +716,33 @@ void pqMainWindow::onFileOpen(pqServer* Server)
 
 void pqMainWindow::onFileOpen(const QStringList& Files)
 {
-  if(!this->Implementation->Pipeline || !this->Implementation->PipelineList)
-    return;
-    
-  QVTKWidget *win = this->Implementation->PipelineList->getCurrentWindow();
-  if(win)
+  if(!this->Implementation->Pipeline || !this->Implementation->PipelineBrowser)
     {
-    vtkSMSourceProxy* source = 0;
+    return;
+    }
+
+  QVTKWidget *win = 0;
+  pqServer *server = this->Implementation->PipelineBrowser->getCurrentServer()->GetServer();
+  if(this->Implementation->ActiveView)
+    {
+    win = qobject_cast<QVTKWidget *>(this->Implementation->ActiveView->mainWidget());
+    }
+
+  if(server)
+    {
+    vtkSMProxy* source = 0;
     vtkSMRenderModuleProxy* rm = this->Implementation->Pipeline->getRenderModule(win);
     for(int i = 0; i != Files.size(); ++i)
       {
       QString file = Files[i];
       
-      source = this->Implementation->Pipeline->createSource("ExodusReader", win);
+      source = this->Implementation->Pipeline->createAndRegisterSource("ExodusReader", server);
       pqSMAdaptor::setElementProperty(source, source->GetProperty("FileName"), file);
       pqSMAdaptor::setElementProperty(source, source->GetProperty("FilePrefix"), file);
       pqSMAdaptor::setElementProperty(source, source->GetProperty("FilePattern"), "%s");
       source->UpdateVTKObjects();
-      this->Implementation->Pipeline->setVisibility(this->Implementation->Pipeline->createDisplay(source), true);
+      this->Implementation->Pipeline->setVisible(
+          this->Implementation->Pipeline->createAndRegisterDisplay(source, rm), true);
       }
 
     rm->ResetCamera();
@@ -732,7 +750,7 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
 
     // Select the latest source in the pipeline inspector.
     if(source)
-      this->Implementation->PipelineList->selectProxy(source);
+      this->Implementation->PipelineBrowser->selectProxy(source);
     }
 }
 
@@ -770,7 +788,8 @@ void pqMainWindow::onFileOpenServerState(const QStringList& Files)
   if(name == "ParaQ")
     {
     // Restore the application size and position.
-    vtkPVXMLElement *element = ParaQ::FindNestedElementByName(root, "pqMainWindow");
+    vtkPVXMLElement *element = pqXMLUtil::FindNestedElementByName(root,
+        "MainWindow");
     if(element)
       {
       int xpos = 0;
@@ -806,6 +825,7 @@ void pqMainWindow::onFileOpenServerState(const QStringList& Files)
     {
     // If the xml file is not a ParaQ file, it may be a server manager
     // state file.
+    vtkSMObject::GetProxyManager()->LoadState(root);
     }
 
   xmlParser->Delete();
@@ -830,7 +850,7 @@ void pqMainWindow::onFileSaveServerState(const QStringList& Files)
 
   // Save the size and dock window information.
   vtkPVXMLElement *element = vtkPVXMLElement::New();
-  element->SetName("pqMainWindow");
+  element->SetName("MainWindow");
   QString number;
   number.setNum(this->x());
   element->AddAttribute("x", number.toAscii().data());
@@ -851,7 +871,7 @@ void pqMainWindow::onFileSaveServerState(const QStringList& Files)
 
   if(this->Implementation->Pipeline)
     {
-    this->Implementation->Pipeline->saveState(root, this->Implementation->MultiViewManager);
+    this->Implementation->Pipeline->getModel()->saveState(root, this->Implementation->MultiViewManager);
     }
 
   // Print the xml to the requested file(s).
@@ -1082,23 +1102,30 @@ void pqMainWindow::onUpdateSourcesFiltersMenu(pqServer*)
 
 vtkSMProxy* pqMainWindow::createSource(const QString& source_name)
 {
-  if(!this->Implementation->Pipeline || !this->Implementation->PipelineList)
+  if(!this->Implementation->Pipeline || !this->Implementation->PipelineBrowser)
+    {
     return 0;
+    }
 
-  QVTKWidget* const win = this->Implementation->PipelineList->getCurrentWindow();
-  if(!win)
-    return 0;
-  
+  pqServer *server = this->Implementation->PipelineBrowser->getCurrentServer()->GetServer();
   this->Implementation->UndoStack->BeginUndoSet(
-    this->Implementation->CurrentServer->GetConnectionID(), "CreateSource");
-  
-  vtkSMSourceProxy* source = this->Implementation->Pipeline->createSource(source_name.toAscii().data(), win);
-  this->Implementation->Pipeline->setVisibility(this->Implementation->Pipeline->createDisplay(source), true);
-  vtkSMRenderModuleProxy* rm = this->Implementation->Pipeline->getRenderModule(win);
-  rm->ResetCamera();
-  win->update();
-  this->Implementation->PipelineList->selectProxy(source);
-  
+      server->GetConnectionID(), "CreateSource");
+
+  vtkSMProxy* source = this->Implementation->Pipeline->createAndRegisterSource(
+      source_name.toAscii().data(), server);
+  if(source && this->Implementation->ActiveView)
+    {
+    QVTKWidget *win = qobject_cast<QVTKWidget *>(
+        this->Implementation->ActiveView->mainWidget());
+    vtkSMRenderModuleProxy *rm = this->Implementation->Pipeline->getRenderModule(win);
+    this->Implementation->Pipeline->setVisible(
+        this->Implementation->Pipeline->createAndRegisterDisplay(source, rm), true);
+    rm->ResetCamera();
+    win->update();
+    }
+
+  this->Implementation->PipelineBrowser->selectProxy(source);
+
   this->Implementation->UndoStack->EndUndoSet();
   return source;
 }
@@ -1114,41 +1141,45 @@ void pqMainWindow::onCreateSource(QAction* action)
 
 void pqMainWindow::onCreateFilter(QAction* action)
 {
-  if(!action || !this->Implementation->Pipeline || !this->Implementation->PipelineList)
+  if(!action || !this->Implementation->Pipeline || !this->Implementation->PipelineBrowser)
+    {
     return;
+    }
   
   QByteArray filterName = action->data().toString().toAscii();
-  vtkSMProxy *current = this->Implementation->PipelineList->getSelectedProxy();
-  QVTKWidget *win = this->Implementation->PipelineList->getCurrentWindow();
-  if(current && win)
+  vtkSMProxy *current = this->Implementation->PipelineBrowser->getSelectedProxy();
+  pqServer *server = this->Implementation->PipelineBrowser->getListModel()->getServerFor(current)->GetServer();
+  if(current && server)
     {
-    vtkSMSourceProxy *source = 0;
-    vtkSMProxy *next = this->Implementation->PipelineList->getNextProxy();
+    vtkSMProxy *source = 0;
+    vtkSMProxy *next = this->Implementation->PipelineBrowser->getNextProxy();
     if(next)
       {
-      this->Implementation->PipelineList->getListModel()->beginCreateAndInsert();
-      source = this->Implementation->Pipeline->createFilter(filterName, win);
-      this->Implementation->Pipeline->addInput(source, current);
-      this->Implementation->Pipeline->addInput(next, source);
-      this->Implementation->Pipeline->removeInput(next, current);
-      this->Implementation->PipelineList->getListModel()->finishCreateAndInsert();
-      this->Implementation->Pipeline->setVisibility(this->Implementation->Pipeline->createDisplay(source), false);
+      source = this->Implementation->Pipeline->createAndRegisterFilter(filterName, server);
+      this->Implementation->Pipeline->addConnection(current, source);
+      this->Implementation->Pipeline->removeConnection(current, next);
+      this->Implementation->Pipeline->addConnection(source, next);
       }
     else
       {
-      this->Implementation->PipelineList->getListModel()->beginCreateAndAppend();
-      source = this->Implementation->Pipeline->createFilter(filterName, win);
-      this->Implementation->Pipeline->addInput(source, current);
-      this->Implementation->PipelineList->getListModel()->finishCreateAndAppend();
-
-      // Only turn on visibility for added filters?
-      this->Implementation->Pipeline->setVisibility(this->Implementation->Pipeline->createDisplay(source), true);
+      source = this->Implementation->Pipeline->createAndRegisterFilter(filterName, server);
+      this->Implementation->Pipeline->addConnection(current, source);
       }
 
-    vtkSMRenderModuleProxy *rm = this->Implementation->Pipeline->getRenderModule(win);
-    rm->ResetCamera();
-    win->update();
-    this->Implementation->PipelineList->selectProxy(source);
+    if(source && this->Implementation->ActiveView)
+      {
+      QVTKWidget *win = qobject_cast<QVTKWidget *>(
+          this->Implementation->ActiveView->mainWidget());
+      vtkSMRenderModuleProxy *rm = this->Implementation->Pipeline->getRenderModule(win);
+
+      // Only turn on visibility for added filters?
+      this->Implementation->Pipeline->setVisible(
+          this->Implementation->Pipeline->createAndRegisterDisplay(source, rm), next == 0);
+      rm->ResetCamera();
+      win->update();
+      }
+
+    this->Implementation->PipelineBrowser->selectProxy(source);
     }
 }
 
@@ -1229,12 +1260,6 @@ void pqMainWindow::onNewQVTKWidget(pqMultiViewFrame* frame)
       
   if(widget)
     {
-    // Select the new window in the pipeline list.
-    if(this->Implementation->PipelineList)
-      {
-      this->Implementation->PipelineList->selectWindow(widget);
-      }
-
     QSignalMapper* sm = new QSignalMapper(frame);
     sm->setMapping(frame, frame);
     QObject::connect(frame, SIGNAL(activeChanged(bool)), sm, SLOT(map()));
@@ -1251,14 +1276,6 @@ void pqMainWindow::onDeleteQVTKWidget(pqMultiViewFrame* p)
 {
   QVTKWidget* w = qobject_cast<QVTKWidget*>(p->mainWidget());
   this->cleanUpWindow(w);
-
-  // Remove the window from the pipeline data structure.
-  this->Implementation->Pipeline->removeWindow(w);
-
-  if(this->Implementation->ActiveView == p)
-    {
-    this->Implementation->ActiveView = 0;
-    }
 }
 
 void pqMainWindow::onFrameActive(QWidget* w)
@@ -1284,53 +1301,45 @@ void pqMainWindow::onNewSelections(vtkSMProxy*, vtkUnstructuredGrid* selections)
 
 void pqMainWindow::onCreateCompoundProxy(QAction* action)
 {
-  if(!action || !this->Implementation->Pipeline || !this->Implementation->PipelineList)
-    return;
-  
-  QByteArray filterName = action->data().toString().toAscii();
-  vtkSMProxy *current = this->Implementation->PipelineList->getSelectedProxy();
-  QVTKWidget *win = this->Implementation->PipelineList->getCurrentWindow();
-  if(current && win)
+  if(!action || !this->Implementation->Pipeline || !this->Implementation->PipelineBrowser)
     {
-    vtkSMCompoundProxy *source = 0;
-    vtkSMProxy *next = this->Implementation->PipelineList->getNextProxy();
-    bool vis = false;
+    return;
+    }
+
+  QByteArray filterName = action->data().toString().toAscii();
+  vtkSMProxy *current = this->Implementation->PipelineBrowser->getSelectedProxy();
+  pqServer *server = this->Implementation->PipelineBrowser->getListModel()->getServerFor(current)->GetServer();
+  if(current && server)
+    {
+    vtkSMProxy *source = 0;
+    vtkSMProxy *next = this->Implementation->PipelineBrowser->getNextProxy();
     if(next)
       {
-      this->Implementation->PipelineList->getListModel()->beginCreateAndInsert();
-      source = this->Implementation->Pipeline->createCompoundProxy(filterName, win);
-      this->Implementation->Pipeline->addInput(source->GetMainProxy(), current);
-      this->Implementation->Pipeline->addInput(next, source);
-      this->Implementation->Pipeline->removeInput(next, current);
-      this->Implementation->PipelineList->getListModel()->finishCreateAndInsert();
+      source = this->Implementation->Pipeline->createAndRegisterBundle(filterName, server);
+      this->Implementation->Pipeline->addConnection(current, source);
+      this->Implementation->Pipeline->removeConnection(current, next);
+      this->Implementation->Pipeline->addConnection(source, next);
       }
     else
       {
-      this->Implementation->PipelineList->getListModel()->beginCreateAndAppend();
-      source = this->Implementation->Pipeline->createCompoundProxy(filterName, win);
-      this->Implementation->Pipeline->addInput(source, current);
-      this->Implementation->PipelineList->getListModel()->finishCreateAndAppend();
-      vis = true;
-      // Only turn on visibility for added filters?
+      source = this->Implementation->Pipeline->createAndRegisterBundle(filterName, server);
+      this->Implementation->Pipeline->addConnection(current, source);
       }
 
-    if(source)
+    if(source && this->Implementation->ActiveView)
       {
-      // TODO: how to decide which part of the compound proxy to display ????
-      // for now just get the last one, and assuming it is a source proxy
-      vtkSMProxy* sourceDisplay = NULL;
-      for(int i=source->GetNumberOfProxies(); sourceDisplay == NULL && i>0; i--)
-        {
-        sourceDisplay = vtkSMSourceProxy::SafeDownCast(source->GetProxy(i-1));
-        }
-      this->Implementation->Pipeline->setVisibility(this->Implementation->Pipeline->createDisplay(vtkSMSourceProxy::SafeDownCast(sourceDisplay), source), vis);
-      //this->Implementation->Pipeline->setVisibility(this->Implementation->Pipeline->createDisplay(source), vis);
+      QVTKWidget *win = qobject_cast<QVTKWidget *>(
+          this->Implementation->ActiveView->mainWidget());
+      vtkSMRenderModuleProxy *rm = this->Implementation->Pipeline->getRenderModule(win);
+
+      // Only turn on visibility for added filters?
+      this->Implementation->Pipeline->setVisible(
+          this->Implementation->Pipeline->createAndRegisterDisplay(source, rm), next == 0);
+      rm->ResetCamera();
+      win->update();
       }
 
-    vtkSMRenderModuleProxy *rm = this->Implementation->Pipeline->getRenderModule(win);
-    rm->ResetCamera();
-    win->update();
-    this->Implementation->PipelineList->selectProxy(source);
+    this->Implementation->PipelineBrowser->selectProxy(source);
     }
 }
 
@@ -1340,33 +1349,39 @@ void pqMainWindow::onCompoundProxyAdded(const QString&, const QString& proxy)
     << pqSetName(proxy) << pqSetData(proxy);
 }
 
-void pqMainWindow::onAddServer(pqPipelineServer *server)
+void pqMainWindow::onAddServer(pqServer *server)
 {
   // When restoring a state file, the PipelineData object will
   // create the pqServer. Make sure the CurrentServer gets set.
   if(server && !this->Implementation->CurrentServer)
     {
-    this->Implementation->CurrentServer = server->GetServer();
+    this->Implementation->CurrentServer = server;
     emit serverChanged(this->Implementation->CurrentServer);
     }
 }
 
-void pqMainWindow::onRemoveServer(pqPipelineServer *server)
+void pqMainWindow::onRemoveServer(pqServer *server)
 {
-  if(!server || !this->Implementation->MultiViewManager)
+  if(!this->Implementation->MultiViewManager || !this->Implementation->Pipeline)
+    {
+    return;
+    }
+
+  // Get the server object from the pipeline model.
+  pqPipelineServer *serverObject =
+      this->Implementation->Pipeline->getModel()->getServerFor(server);
+  if(!serverObject)
     {
     return;
     }
 
   // Clean up all the views associated with the server.
   QWidget *widget = 0;
-  pqPipelineWindow *win = 0;
-  int total = server->GetWindowCount();
+  int total = serverObject->GetWindowCount();
   this->Implementation->MultiViewManager->blockSignals(true);
   for(int i = 0; i < total; i++)
     {
-    win = server->GetWindow(i);
-    widget = win->GetWidget();
+    widget = serverObject->GetWindow(i);
 
     // Clean up the render module.
     this->cleanUpWindow(qobject_cast<QVTKWidget *>(widget));
@@ -1378,14 +1393,14 @@ void pqMainWindow::onRemoveServer(pqPipelineServer *server)
   this->Implementation->MultiViewManager->blockSignals(false);
 }
 
-void pqMainWindow::onAddWindow(pqPipelineWindow *win)
+void pqMainWindow::onAddWindow(QWidget *win)
 {
   if(!win)
     {
     return;
     }
 
-  QVTKWidget *widget = qobject_cast<QVTKWidget *>(win->GetWidget());
+  QVTKWidget *widget = qobject_cast<QVTKWidget *>(win);
   if(widget)
     {
     // Get the render module from the view map. Use the render module,
@@ -1408,10 +1423,16 @@ void pqMainWindow::cleanUpWindow(QVTKWidget *win)
   if(win && this->Implementation->Pipeline)
     {
     // Remove the render module from the pipeline's view map and delete it.
+    this->Implementation->Pipeline->getModel()->removeWindow(win);
     vtkSMRenderModuleProxy *rm = this->Implementation->Pipeline->removeViewMapping(win);
     if(rm)
       {
       rm->Delete();
+      }
+
+    if(win->parentWidget() == this->Implementation->ActiveView)
+      {
+      this->Implementation->ActiveView = 0;
       }
     }
 }
@@ -1434,14 +1455,18 @@ void pqMainWindow::onUpdateVariableSelector(vtkSMProxy* p)
   if(!this->Implementation->CurrentProxy)
     return;
     
-  pqPipelineObject* pqObject = pqPipelineData::instance()->getObjectFor(p);
-  vtkSMDisplayProxy* display = pqObject->GetDisplayProxy();
+  pqPipelineSource* pqObject = pqPipelineData::instance()->getModel()->getSourceFor(p);
+  vtkSMDisplayProxy* display = pqObject->GetDisplay()->GetDisplayProxy(0);
   if(!display)
     return;
-  
-  pqPipelineObject* reader = pqObject;
-  while(reader->GetInput(0))
-    reader = reader->GetInput(0);
+
+  pqPipelineSource* reader = pqObject;
+  pqPipelineFilter* filter = dynamic_cast<pqPipelineFilter*>(reader);
+  while(filter && filter->GetInputCount() > 0)
+    {
+    reader = filter->GetInput(0);
+    filter = dynamic_cast<pqPipelineFilter*>(reader);
+    }
 
   vtkPVDataInformation* geomInfo = display->GetGeometryInformation();
   vtkPVDataSetAttributesInformation* cellinfo = geomInfo->GetCellDataInformation();
@@ -1512,9 +1537,9 @@ void pqMainWindow::onVariableChanged(pqVariableType type, const QString& name)
 {
   if(this->Implementation->CurrentProxy)
     {
-    pqPipelineObject* o = pqPipelineData::instance()->getObjectFor(this->Implementation->CurrentProxy);
-    vtkSMDisplayProxy* display = o->GetDisplayProxy();
-    QWidget* widget = o->GetParent()->GetWidget();
+    pqPipelineSource* o = pqPipelineData::instance()->getModel()->getSourceFor(this->Implementation->CurrentProxy);
+    vtkSMDisplayProxy* display = o->GetDisplay()->GetDisplayProxy(0);
+    QWidget* widget = o->GetDisplay()->GetDisplayWindow(0);
 
     switch(type)
       {
@@ -1565,9 +1590,12 @@ void pqMainWindow::onFirstTimeStep()
   this->Implementation->CurrentProxy->UpdateVTKObjects();
   if(pqPipelineData *pipeline = pqPipelineData::instance())
     {
-    QVTKWidget *win = pipeline->getWindowFor(this->Implementation->CurrentProxy);
-    if(win)
-      win->update();
+    pqPipelineSource *source = pipeline->getModel()->getSourceFor(
+        this->Implementation->CurrentProxy);
+    if(source)
+      {
+      source->GetDisplay()->UpdateWindows();
+      }
     }
 }
 
@@ -1603,9 +1631,12 @@ void pqMainWindow::onPreviousTimeStep()
   this->Implementation->CurrentProxy->UpdateVTKObjects();
   if(pqPipelineData *pipeline = pqPipelineData::instance())
     {
-    QVTKWidget *win= pipeline->getWindowFor(this->Implementation->CurrentProxy);
-    if(win)
-      win->update();
+    pqPipelineSource *source = pipeline->getModel()->getSourceFor(
+        this->Implementation->CurrentProxy);
+    if(source)
+      {
+      source->GetDisplay()->UpdateWindows();
+      }
     }
 }
 
@@ -1641,9 +1672,12 @@ void pqMainWindow::onNextTimeStep()
   this->Implementation->CurrentProxy->UpdateVTKObjects();
   if(pqPipelineData *pipeline = pqPipelineData::instance())
     {
-    QVTKWidget *win= pipeline->getWindowFor(this->Implementation->CurrentProxy);
-    if(win)
-      win->update();
+    pqPipelineSource *source = pipeline->getModel()->getSourceFor(
+        this->Implementation->CurrentProxy);
+    if(source)
+      {
+      source->GetDisplay()->UpdateWindows();
+      }
     }
 }
 
@@ -1679,9 +1713,12 @@ void pqMainWindow::onLastTimeStep()
   this->Implementation->CurrentProxy->UpdateVTKObjects();
   if(pqPipelineData *pipeline = pqPipelineData::instance())
     {
-    QVTKWidget *win= pipeline->getWindowFor(this->Implementation->CurrentProxy);
-    if(win)
-      win->update();
+    pqPipelineSource *source = pipeline->getModel()->getSourceFor(
+        this->Implementation->CurrentProxy);
+    if(source)
+      {
+      source->GetDisplay()->UpdateWindows();
+      }
     }
 }
 
@@ -1689,33 +1726,19 @@ void pqMainWindow::onLastTimeStep()
 void pqMainWindow::onUndoRedoStackChanged(vtkObject*, unsigned long, void*, 
   void*,  vtkCommand*)
 {
-  QToolButton* undoButton = 
-    this->Implementation->UndoRedoToolBar->findChild<QToolButton*>("UndoButton");
+  QAction* undoButton = 
+    this->Implementation->UndoRedoToolBar->findChild<QAction*>("UndoButton");
 
-  QToolButton* redoButton = 
-    this->Implementation->UndoRedoToolBar->findChild<QToolButton*>("RedoButton");
+  QAction* redoButton = 
+    this->Implementation->UndoRedoToolBar->findChild<QAction*>("RedoButton");
   if (undoButton)
     {
-    if (this->Implementation->UndoStack->CanUndo())
-      {
-      undoButton->setEnabled(true); 
-      }
-    else
-      {
-      undoButton->setEnabled(false); 
-      }
+    undoButton->setEnabled(this->Implementation->UndoStack->CanUndo()); 
     }
 
   if (redoButton)
     {
-    if (this->Implementation->UndoStack->CanRedo())
-      {
-      redoButton->setEnabled(true);
-      }
-    else
-      {
-      redoButton->setEnabled(false);
-      }
+    redoButton->setEnabled(this->Implementation->UndoStack->CanRedo());
     }
 }
 
@@ -1724,7 +1747,7 @@ void pqMainWindow::onUndoRedoStackChanged(vtkObject*, unsigned long, void*,
 void pqMainWindow::onUndo()
 {
   this->Implementation->UndoStack->Undo();
-  QVTKWidget *win = this->Implementation->PipelineList->getCurrentWindow();
+  QVTKWidget *win = qobject_cast<QVTKWidget *>(this->Implementation->ActiveView->mainWidget());
   if (win)
     {
     win->update();
@@ -1735,7 +1758,7 @@ void pqMainWindow::onUndo()
 void pqMainWindow::onRedo()
 {
   this->Implementation->UndoStack->Redo();
-  QVTKWidget *win = this->Implementation->PipelineList->getCurrentWindow();
+  QVTKWidget *win = qobject_cast<QVTKWidget *>(this->Implementation->ActiveView->mainWidget());
   if (win)
     {
     win->update();

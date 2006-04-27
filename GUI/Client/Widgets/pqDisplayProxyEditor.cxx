@@ -52,6 +52,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 #include "pqSMProxy.h"
 #include "pqPipelineData.h"
+#include "pqPipelineDisplay.h"
+#include "pqPipelineModel.h"
+#include "pqPipelineSource.h"
 #include "pqParts.h"
 
 class pqDisplayProxyEditorInternal : public Ui::pqDisplayProxyEditor
@@ -525,10 +528,10 @@ vtkSMDisplayProxy* pqDisplayProxyEditor::displayProxy()
 
 void pqDisplayProxyEditor::updateView()
 {
-  QVTKWidget* widget = pqPipelineData::instance()->getWindowFor(this->SourceProxy);
-  if(widget)
+  pqPipelineSource *source = pqPipelineData::instance()->getModel()->getSourceFor(this->SourceProxy);
+  if(source)
     {
-    widget->update();
+    source->GetDisplay()->UpdateWindows();
     }
 }
 

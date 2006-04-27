@@ -1724,7 +1724,7 @@ void pqFlatTreeView::changeSelection(const QItemSelection &selected,
             {
             i = (*iter).left();
             column = (*iter).right();
-            for( ; i <= column; i++)
+            for( ; i <= column && i < item->Cells.size(); i++)
               {
               item->Cells[i]->Selected = true;
               }

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqPipelineObject.h
+   Module:    pqPipelineModelItem.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,31 +30,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqPipelineObject.h
-///
-/// \date 11/16/2005
+/// \file pqPipelineModelItem.cxx
+/// \date 4/14/2006
 
-#ifndef _pqPipelineObject_h
-#define _pqPipelineObject_h
-
-
-#include "pqWidgetsExport.h"
 #include "pqPipelineModelItem.h"
 
-class pqPipelineServer;
 
-
-class PQWIDGETS_EXPORT pqPipelineObject : public pqPipelineModelItem
+pqPipelineModelItem::pqPipelineModelItem()
 {
-public:
-  pqPipelineObject();
-  virtual ~pqPipelineObject() {}
+  this->ModelType = pqPipelineModel::Invalid;
+}
 
-  pqPipelineServer *GetServer() const;
-  void SetServer(pqPipelineServer *server);
 
-private:
-  pqPipelineServer *Server;           ///< Stores the parent server.
-};
-
-#endif
