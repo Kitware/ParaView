@@ -54,7 +54,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkSMDisplayProxy.h"
 #include "vtkSMProxy.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMRenderModuleProxy.h"
 
 
@@ -1141,14 +1140,6 @@ void pqPipelineModel::saveState(vtkPVXMLElement *root, pqMultiView *multiView)
     pipeline->AddNestedElement(element);
     element->Delete();
     }
-
-  // Save the server manager state. This should save the proxy
-  // information for every server connection.
-  element = vtkPVXMLElement::New();
-  element->SetName("ServerManagerState");
-  vtkSMObject::GetProxyManager()->SaveState(element);
-  pipeline->AddNestedElement(element);
-  element->Delete();
 
   // Add the pipeline element to the xml.
   root->AddNestedElement(pipeline);

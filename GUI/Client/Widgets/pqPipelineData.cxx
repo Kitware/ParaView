@@ -610,7 +610,7 @@ void pqPipelineData::loadState(vtkPVXMLElement *root, pqMultiView *multiView)
         // Add the server to the pipeline data.
         this->addServer(server);
 
-        // Loop through the elements in the server element.
+        // Loop through the elements in the server state.
         vtkPVXMLElement *element = 0;
         unsigned int count = serverElement->GetNumberOfNestedElements();
         for(unsigned int j = 0; j < count; j++)
@@ -650,18 +650,15 @@ void pqPipelineData::loadState(vtkPVXMLElement *root, pqMultiView *multiView)
               }
             }
           }
-        }
-      else if(name == "ServerManagerState")
-        {
-        serverManagerState = serverElement;
-        }
-      }
 
-    // Restore the server manager state. The server manager should
-    // signal the pipeline when new proxies are added.
-    if(serverManagerState)
-      {
-      vtkSMObject::GetProxyManager()->LoadState(serverManagerState);
+        // Restore the server manager state. The server manager should
+        // signal the pipeline when new proxies are added.
+        if(serverManagerState)
+          {
+          vtkSMObject::GetProxyManager()->LoadState(serverManagerState,
+              server->GetConnectionID());
+          }
+        }
       }
 
     // Clean up the restore variables.
