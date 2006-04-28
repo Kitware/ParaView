@@ -42,7 +42,6 @@ class vtkKWLabel;
 class vtkKWMenu;
 class vtkKWMenuButton;
 class vtkKWNotebook;
-class vtkKWSegmentedProgressGauge;
 class vtkKWText;
 class vtkKWWindow;
 class vtkKWWindow;
@@ -301,15 +300,6 @@ class VTK_EXPORT vtkKWView : public vtkPVTracedWidget
   int ShouldIAbort();
 
   // Description:
-  // Should I display the progress gauge in the title bar?  By default,
-  // it is off.
-  vtkSetMacro(UseProgressGauge, int);
-  vtkGetMacro(UseProgressGauge, int);
-  vtkBooleanMacro(UseProgressGauge, int);
-
-  vtkGetObjectMacro(ProgressGauge, vtkKWSegmentedProgressGauge);
-
-  // Description:
   // Check if the application needs to abort.
   virtual int CheckForOtherAbort() { return 0; }
 
@@ -336,8 +326,6 @@ protected:
   vtkKWFrame *PropertiesParent;
   vtkKWWidget *VTKWidget;
   vtkKWLabel *Label;
-  int UseProgressGauge;
-  vtkKWSegmentedProgressGauge *ProgressGauge;
   vtkKWFrame *Frame;
   vtkKWFrame *Frame2;
   vtkKWFrame *ControlFrame;

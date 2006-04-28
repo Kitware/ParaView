@@ -39,7 +39,6 @@
 #include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWSaveImageDialog.h"
-#include "vtkKWSegmentedProgressGauge.h"
 #include "vtkKWUserInterfaceManager.h"
 #include "vtkObjectFactory.h"
 #include "vtkPNGReader.h"
@@ -104,7 +103,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.35");
+vtkCxxRevisionMacro(vtkKWView, "1.36");
 
 //----------------------------------------------------------------------------
 void KWViewAbortCheckMethod( vtkObject*, unsigned long, void* arg, void* )
@@ -146,10 +145,6 @@ vtkKWView::vtkKWView()
   this->PropertiesParent = NULL;
   this->SharedPropertiesParent = 0;
   this->Notebook = vtkKWNotebook::New();
-
-  this->UseProgressGauge = 0;
-  this->ProgressGauge = vtkKWSegmentedProgressGauge::New();
-  this->ProgressGauge->SetParent(this->Frame2);
 
   this->AnnotationPropertiesFrame = vtkKWFrameWithScrollbar::New();
   this->CornerAnnotation = vtkPVCornerAnnotationEditor::New();
@@ -224,8 +219,6 @@ vtkKWView::~vtkKWView()
   this->ControlFrame->Delete();
   this->SetPropertiesParent(0);
 
-  this->ProgressGauge->Delete();
-  
   delete [] this->StillUpdateRates;
   
   this->SetMenuEntryName(NULL);
@@ -1491,7 +1484,6 @@ void vtkKWView::UpdateEnableState()
   this->PropagateEnableState(this->PropertiesParent);
   this->PropagateEnableState(this->VTKWidget);
   this->PropagateEnableState(this->Label);
-  this->PropagateEnableState(this->ProgressGauge);
   this->PropagateEnableState(this->Frame);
   this->PropagateEnableState(this->Frame2);
   this->PropagateEnableState(this->ControlFrame);
@@ -1649,7 +1641,6 @@ void vtkKWView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "NumberOfStillUpdates: " << this->GetNumberOfStillUpdates()
      << endl;
   os << indent << "Printing: " << this->GetPrinting() << endl;
-  os << indent << "ProgressGauge: " << this->ProgressGauge << endl;
   os << indent << "RenderMode: " << this->GetRenderMode() << endl;
   os << indent << "ParentWindow: " << this->GetParentWindow() << endl;
   os << indent << "RenderState: " << this->GetRenderState() << endl;
@@ -1661,6 +1652,5 @@ void vtkKWView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SupportSaveAsImage: " << this->GetSupportSaveAsImage() 
      << endl;
   os << indent << "SupportCopy: " << this->GetSupportCopy() << endl;
-  os << indent << "UseProgressGauge: " << this->UseProgressGauge << endl;
 }
 
