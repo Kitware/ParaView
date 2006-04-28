@@ -43,10 +43,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Copy the values of the dialog to the given vis. Call after and if Invoke()
   // returns true.
   void CopyToVisualization(vtkSMComparativeVisProxy* cv); 
@@ -67,6 +63,10 @@ protected:
   vtkPVComparativeVisDialog();
   ~vtkPVComparativeVisDialog();
   
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+
   // Called when user selects a property
   void CueSelected(vtkPVComparativeVisPropertyWidget* wid);
 

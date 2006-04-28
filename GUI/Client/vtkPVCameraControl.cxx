@@ -27,7 +27,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVCameraControl);
-vtkCxxRevisionMacro(vtkPVCameraControl, "1.12");
+vtkCxxRevisionMacro(vtkPVCameraControl, "1.13");
 
 vtkCxxSetObjectMacro(vtkPVCameraControl, InteractorStyle,
                      vtkPVInteractorStyleCenterOfRotation);
@@ -199,7 +199,7 @@ void vtkPVCameraControl::Roll(double angle)
   this->GetTraceHelper()->AddEntry("$kw(%s) Roll %f", this->GetTclName(), angle);
 }
 
-void vtkPVCameraControl::Create()
+void vtkPVCameraControl::CreateWidget()
 {
   // Check if already created
 
@@ -211,7 +211,7 @@ void vtkPVCameraControl::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
   
   this->ElevationButton->SetParent(this);
   this->ElevationButton->Create();

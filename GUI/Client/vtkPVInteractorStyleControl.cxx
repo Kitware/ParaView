@@ -43,7 +43,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.55");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.56");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -522,7 +522,7 @@ vtkPVInteractorStyleControl::GetManipulator(const char* name)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVInteractorStyleControl::Create()
+void vtkPVInteractorStyleControl::CreateWidget()
 {
   // Check if already created
 
@@ -534,7 +534,7 @@ void vtkPVInteractorStyleControl::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->LabeledFrame->Create();
   this->LabeledFrame->SetLabelText("Camera Manipulators Control");

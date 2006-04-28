@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.65");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.66");
 
 //----------------------------------------------------------------------------
 vtkPVSelectionList::vtkPVSelectionList()
@@ -86,7 +86,7 @@ void vtkPVSelectionList::Disable()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSelectionList::Create()
+void vtkPVSelectionList::CreateWidget()
 {
   // Check if already created
 
@@ -98,7 +98,7 @@ void vtkPVSelectionList::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->Label->SetParent(this);
   this->Label->Create();

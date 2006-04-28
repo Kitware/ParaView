@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVNew3DWidget);
-vtkCxxRevisionMacro(vtkPVNew3DWidget, "1.2");
+vtkCxxRevisionMacro(vtkPVNew3DWidget, "1.3");
 
 //----------------------------------------------------------------------------
 class vtkPVNew3DWidgetObserver : public vtkCommand
@@ -81,7 +81,7 @@ vtkPVNew3DWidget::~vtkPVNew3DWidget()
 
 
 //----------------------------------------------------------------------------
-void vtkPVNew3DWidget::Create()
+void vtkPVNew3DWidget::CreateWidget()
 {
   // Check if already created
 
@@ -93,7 +93,7 @@ void vtkPVNew3DWidget::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(
     this->GetApplication());

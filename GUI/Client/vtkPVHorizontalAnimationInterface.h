@@ -41,10 +41,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkPVHorizontalAnimationInterface* New();
 
-  // Description:
-  // Create the widget.
-  virtual void Create();
-
   virtual void ResizeCallback();
 
   void AddAnimationCueTree(vtkPVAnimationCueTree* pvCueTree);
@@ -88,6 +84,10 @@ public:
 protected:
   vtkPVHorizontalAnimationInterface();
   ~vtkPVHorizontalAnimationInterface();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkKWSplitFrame* SplitFrame;
   vtkKWFrame* TimeLineFrame;

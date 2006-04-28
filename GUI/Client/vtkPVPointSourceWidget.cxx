@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.53");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.54");
 
 vtkCxxSetObjectMacro(vtkPVPointSourceWidget, InputMenu, vtkPVInputMenu);
 
@@ -184,10 +184,10 @@ void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVPointSourceWidget::Create()
+void vtkPVPointSourceWidget::CreateWidget()
 {
   // Call the superclass to create the widget and set the appropriate flags
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   static int proxyNum = 0;
   vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();

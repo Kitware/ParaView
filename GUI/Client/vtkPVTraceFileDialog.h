@@ -37,10 +37,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Sets the save flag.
   virtual void Save();
   virtual void Retrace();
@@ -48,6 +44,10 @@ public:
 protected:
   vtkPVTraceFileDialog();
   ~vtkPVTraceFileDialog();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkKWPushButton *SaveButton;
   vtkKWFrame  *SaveFrame;

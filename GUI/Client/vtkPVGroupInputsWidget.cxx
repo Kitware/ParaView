@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.38");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.39");
 
 class vtkPVSourceVectorInternals
 {
@@ -62,7 +62,7 @@ vtkPVGroupInputsWidget::~vtkPVGroupInputsWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGroupInputsWidget::Create()
+void vtkPVGroupInputsWidget::CreateWidget()
 {
   // Check if already created
 
@@ -74,7 +74,7 @@ void vtkPVGroupInputsWidget::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->PartSelectionList->SetParent(this);
   this->PartSelectionList->Create();

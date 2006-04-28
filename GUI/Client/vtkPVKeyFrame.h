@@ -37,10 +37,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Get the keyframe proxy.
   vtkGetObjectMacro(KeyFrameProxy, vtkSMKeyFrameProxy);
 
@@ -153,6 +149,10 @@ public:
 protected:
   vtkPVKeyFrame();
   ~vtkPVKeyFrame();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   virtual void ChildCreate();
   

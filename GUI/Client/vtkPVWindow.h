@@ -112,12 +112,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the window and all of the associated widgets. This
-  // essentially creates the whole user interface. ParaView supports
-  // only one window.
-  virtual void Create();
-
-  // Description:
   // Access to the RenderView.
   vtkGetObjectMacro(MainView, vtkPVRenderView);
 
@@ -599,9 +593,16 @@ public:
   // Description:
   // Get the Id for the most recent state saved.
   vtkGetMacro(StateFileId, vtkIdType);
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
+
+  // Description:
+  // Create the window and all of the associated widgets. This
+  // essentially creates the whole user interface. ParaView supports
+  // only one window.
+  virtual void CreateWidget();
 
   static const char* ComparativeVisMenuLabel;
 

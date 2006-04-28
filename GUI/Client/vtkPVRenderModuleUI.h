@@ -44,10 +44,6 @@ public:
   vtkGetObjectMacro(RenderModuleProxy, vtkSMRenderModuleProxy);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Casts to vtkPVApplication.
   vtkPVApplication *GetPVApplication();
 
@@ -71,6 +67,10 @@ public:
 protected:
   vtkPVRenderModuleUI();
   ~vtkPVRenderModuleUI();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkSMRenderModuleProxy* RenderModuleProxy;
 

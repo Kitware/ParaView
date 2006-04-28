@@ -43,10 +43,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Add a child cue.
   // Currently, child can be added only after the parent has been created
   // and the child must not have been created. This method appropriately
@@ -163,6 +159,10 @@ public:
 protected:
   vtkPVAnimationCueTree();
   ~vtkPVAnimationCueTree();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   int Expanded;
   vtkCollection* Children;

@@ -44,10 +44,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
-  // Create the widget.
-  void Create();
-
-  // Description:
   // Tcl callback for the buttons in the calculator
   void UpdateFunction(const char* newSymbol);
 
@@ -107,6 +103,10 @@ public:
 protected:
   vtkPVCalculatorWidget();
   ~vtkPVCalculatorWidget();
+
+  // Description:
+  // Create the widget.
+  void CreateWidget();
 
   vtkKWFrame* AttributeModeFrame;
   vtkKWLabel* AttributeModeLabel;

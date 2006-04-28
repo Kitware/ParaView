@@ -35,7 +35,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVTrackEditor);
-vtkCxxRevisionMacro(vtkPVTrackEditor, "1.19");
+vtkCxxRevisionMacro(vtkPVTrackEditor, "1.20");
 //-----------------------------------------------------------------------------
 class vtkPVTrackEditorObserver : public vtkCommand
 {
@@ -128,7 +128,7 @@ vtkPVTrackEditor::~vtkPVTrackEditor()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVTrackEditor::Create()
+void vtkPVTrackEditor::CreateWidget()
 {
   
   // Check if already created
@@ -141,7 +141,7 @@ void vtkPVTrackEditor::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->KeyFramePropertiesFrame->SetParent(this);
   this->KeyFramePropertiesFrame->Create();

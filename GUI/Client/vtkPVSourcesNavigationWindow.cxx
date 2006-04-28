@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.34");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.35");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -131,7 +131,7 @@ void vtkPVSourcesNavigationWindow::Reconfigure()
 
 
 //-----------------------------------------------------------------------------
-void vtkPVSourcesNavigationWindow::Create()
+void vtkPVSourcesNavigationWindow::CreateWidget()
 {
   // Check if already created
 
@@ -143,7 +143,7 @@ void vtkPVSourcesNavigationWindow::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   const char *wname = this->GetWidgetName();
   

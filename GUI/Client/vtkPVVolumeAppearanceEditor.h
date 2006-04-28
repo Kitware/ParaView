@@ -39,10 +39,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // This method returns the user to the source page.
   // I would eventually like to replace this by 
   // a more general back/forward ParaView navigation.
@@ -103,6 +99,10 @@ public:
 protected:
   vtkPVVolumeAppearanceEditor();
   ~vtkPVVolumeAppearanceEditor();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkKWPushButton        *BackButton;
   

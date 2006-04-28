@@ -93,10 +93,6 @@ public:
   void PrintSelf(ostream& os ,vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // Set the parent frames for the vertical and horizontal animation guis.
   void SetVerticalParent(vtkKWWidget* parent);
   void SetHorizontalParent(vtkKWWidget* parent);
@@ -241,6 +237,10 @@ protected:
   vtkPVAnimationManager();
   ~vtkPVAnimationManager();
 
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+  
   int RecordAll;
   vtkKWWidget* VerticalParent;
   vtkKWWidget* HorizontalParent;

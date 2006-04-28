@@ -57,7 +57,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBasicDSPFilterWidget);
-vtkCxxRevisionMacro(vtkPVBasicDSPFilterWidget, "1.7");
+vtkCxxRevisionMacro(vtkPVBasicDSPFilterWidget, "1.8");
 
 //20 weights, 5 cutoff freqs(.3, .4, .5, .6, .7)
 const double g_butter_lp_numerator_coeffs[5][20]={
@@ -1250,7 +1250,7 @@ bool vtkPVBasicDSPFilterWidget::UpdateTogglesWithFileInformation()
 
 
 //----------------------------------------------------------------------------
-void vtkPVBasicDSPFilterWidget::Create()
+void vtkPVBasicDSPFilterWidget::CreateWidget()
 {
   // Check if already created
 
@@ -1262,7 +1262,7 @@ void vtkPVBasicDSPFilterWidget::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->DSPFilterFrame->SetParent(this);
   this->DSPFilterFrame->Create();

@@ -43,10 +43,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // This input menu supplies the data information.
   // You must set this (XML).
   virtual void SetInputMenu(vtkPVInputMenu*);
@@ -108,6 +104,10 @@ public:
 protected:
   vtkPVFieldMenu();
   ~vtkPVFieldMenu();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);

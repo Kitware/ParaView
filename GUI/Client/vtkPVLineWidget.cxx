@@ -38,7 +38,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.78");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.79");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -465,9 +465,9 @@ void vtkPVLineWidget::ActualPlaceWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::Create()
+void vtkPVLineWidget::CreateWidget()
 {
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Set up controller properties. Controller properties are set so 
   // that in the SM State, we can have a mapping from the widget to the 

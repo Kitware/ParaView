@@ -83,10 +83,6 @@ public:
   virtual void CreateViewProperties();
   
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // Method called by the toolbar reset camera button.
   void ResetCamera();
   
@@ -369,10 +365,15 @@ public:
   // Description:
   // Resets all the settings to default values.
   void ResetSettingsToDefault();
+
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView();
 
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+  
   // Access to the overlay renderer.
   vtkRenderer *GetRenderer2D();
 

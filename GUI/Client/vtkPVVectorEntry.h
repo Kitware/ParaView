@@ -43,10 +43,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // I will eventually remove access to internal widgets once I figure
   // out how to get the vectors value in Tcl with any number of componenets.
   vtkGetObjectMacro(LabelWidget, vtkKWLabel);
@@ -143,6 +139,10 @@ protected:
   vtkPVVectorEntry();
   ~vtkPVVectorEntry();
   
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+
   vtkKWLabel *LabelWidget;
 
   vtkSetStringMacro(EntryLabel);

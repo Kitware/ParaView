@@ -45,7 +45,7 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.72");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.73");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -512,9 +512,9 @@ void vtkPVSphereWidget::ChildCreate()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSphereWidget::Create()
+void vtkPVSphereWidget::CreateWidget()
 {
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
 
   static int proxyNum = 0;

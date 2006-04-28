@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.40");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.41");
 
 class vtkPVVolumeAppearanceEditorObserver : public vtkCommand
 {
@@ -130,7 +130,7 @@ void vtkPVVolumeAppearanceEditor::SetPVRenderView(vtkPVRenderView *rv)
   this->PVRenderView = rv;
 }
 //----------------------------------------------------------------------------
-void vtkPVVolumeAppearanceEditor::Create()
+void vtkPVVolumeAppearanceEditor::CreateWidget()
 {
   // Check if already created
 
@@ -142,7 +142,7 @@ void vtkPVVolumeAppearanceEditor::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Superclass create takes a KWApplication, but we need a PVApplication.
 

@@ -77,7 +77,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.42");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.43");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationCue, PVSource, vtkPVSource);
 
@@ -257,7 +257,7 @@ void vtkPVAnimationCue::ReplaceKeyFrame(vtkPVKeyFrame* oldFrame,
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationCue::Create()
+void vtkPVAnimationCue::CreateWidget()
 {
   if (!this->TimeLineParent)
     {
@@ -275,7 +275,7 @@ void vtkPVAnimationCue::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->TimeLineContainer->SetParent(this->TimeLineParent);
   this->TimeLineContainer->Create();

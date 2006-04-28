@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBoundsDisplay);
-vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.30");
+vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.31");
 
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, Widget, vtkKWBoundsDisplay);
 
@@ -52,7 +52,7 @@ vtkPVBoundsDisplay::~vtkPVBoundsDisplay()
 
 
 //----------------------------------------------------------------------------
-void vtkPVBoundsDisplay::Create()
+void vtkPVBoundsDisplay::CreateWidget()
 {
   // Check if already created
 
@@ -64,7 +64,7 @@ void vtkPVBoundsDisplay::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->Widget->SetParent(this);
   this->Widget->Create();

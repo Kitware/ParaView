@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.33");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.34");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -92,7 +92,7 @@ vtkPVInputProperty* vtkPVFieldMenu::GetInputProperty()
 
 
 //----------------------------------------------------------------------------
-void vtkPVFieldMenu::Create()
+void vtkPVFieldMenu::CreateWidget()
 {
   // Check if already created
 
@@ -104,7 +104,7 @@ void vtkPVFieldMenu::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->Label->SetParent(this);
   this->Label->Create();

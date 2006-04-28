@@ -37,10 +37,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set the width and the height of the underlying canvas
   void SetWidth(int width);
   void SetHeight(int height);
@@ -111,6 +107,10 @@ public:
 protected:
   vtkPVSourcesNavigationWindow();
   ~vtkPVSourcesNavigationWindow();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   // Description:
   // This method calculates the bounding box of object "name". 

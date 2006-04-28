@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisManagerGUI );
-vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.14");
+vtkCxxRevisionMacro(vtkPVComparativeVisManagerGUI, "1.15");
 
 class vtkCVProgressObserver : public vtkCommand
 {
@@ -115,7 +115,7 @@ vtkPVComparativeVisManagerGUI::~vtkPVComparativeVisManagerGUI()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVComparativeVisManagerGUI::Create()
+void vtkPVComparativeVisManagerGUI::CreateWidget()
 {
   // Check if already created
 
@@ -126,7 +126,7 @@ void vtkPVComparativeVisManagerGUI::Create()
     }
 
   // Call the superclass to create the whole widget
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->MainFrame->SetParent(this);
   this->MainFrame->Create();

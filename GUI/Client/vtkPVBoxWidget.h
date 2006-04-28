@@ -120,14 +120,14 @@ public:
   // animation. Called by vtkPVSelectWidget when this widget is deselected.
   virtual void DisableAnimation() { this->UnregisterAnimateableProxies();} ;
 
-  // Description:
-  // Create the widget.
-  // Overloaded to create the ImplicitFunction proxy
-  virtual void Create();
-
 protected:
   vtkPVBoxWidget();
   ~vtkPVBoxWidget();
+
+  // Description:
+  // Create the widget.
+  // Overloaded to create the ImplicitFunction proxy
+  virtual void CreateWidget();
 
   // Description:
   // PlaceWidget is overloaded since, this class has to position the

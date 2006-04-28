@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.79");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.80");
 
 //-----------------------------------------------------------------------------
 vtkPVSelectWidget::vtkPVSelectWidget()
@@ -71,7 +71,7 @@ vtkPVSelectWidget::~vtkPVSelectWidget()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSelectWidget::Create()
+void vtkPVSelectWidget::CreateWidget()
 {
   // Check if already created
 
@@ -83,7 +83,7 @@ void vtkPVSelectWidget::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->LabeledFrame->SetParent(this);
   this->LabeledFrame->Create();

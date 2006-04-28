@@ -53,8 +53,8 @@ public:
   // Create the widget. All sub-classes should re-implement this
   // signature because widgets are created using vtkPVWidget
   // pointers after cloning.
-  virtual void Create()
-    { this->Superclass::Create(); };
+  virtual void CreateWidget()
+    { this->Superclass::CreateWidget(); };
 
   // Description:
   // These methods are called when the Accept and Reset buttons are pressed.

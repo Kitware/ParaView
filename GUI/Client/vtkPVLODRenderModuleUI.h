@@ -49,10 +49,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // Callback for the interrupt render check button
   void RenderInterruptsEnabledCheckCallback(int state);
   void SetRenderInterruptsEnabled(int state);
@@ -120,10 +116,15 @@ public:
   // Description:
   // Resets all the settings to default values.
   virtual void ResetSettingsToDefault();
+
 protected:
   vtkPVLODRenderModuleUI();
   ~vtkPVLODRenderModuleUI();
  
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+  
   int UseReductionFactor;
   
   vtkKWFrameWithLabel *LODFrame;

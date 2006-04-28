@@ -37,7 +37,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.65");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.66");
 
 //-----------------------------------------------------------------------------
 vtkPVSelectTimeSet::vtkPVSelectTimeSet()
@@ -96,7 +96,7 @@ const char* vtkPVSelectTimeSet::GetLabel()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSelectTimeSet::Create()
+void vtkPVSelectTimeSet::CreateWidget()
 {
   // Check if already created
 
@@ -108,7 +108,7 @@ void vtkPVSelectTimeSet::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->SetBorderWidth(2);
 

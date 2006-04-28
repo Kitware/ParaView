@@ -23,7 +23,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVGhostLevelDialog );
-vtkCxxRevisionMacro(vtkPVGhostLevelDialog, "1.14");
+vtkCxxRevisionMacro(vtkPVGhostLevelDialog, "1.15");
 
 //-----------------------------------------------------------------------------
 vtkPVGhostLevelDialog::vtkPVGhostLevelDialog()
@@ -77,7 +77,7 @@ vtkPVGhostLevelDialog::~vtkPVGhostLevelDialog()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVGhostLevelDialog::Create()
+void vtkPVGhostLevelDialog::CreateWidget()
 {
   if (this->IsCreated())
     {
@@ -85,7 +85,7 @@ void vtkPVGhostLevelDialog::Create()
     return;
     }
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->ButtonFrame->Create();
 

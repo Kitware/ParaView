@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.52");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.53");
 
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMFunctionProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMScalarVariableProperty,
@@ -249,7 +249,7 @@ vtkPVCalculatorWidget::~vtkPVCalculatorWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCalculatorWidget::Create()
+void vtkPVCalculatorWidget::CreateWidget()
 {
   // Check if already created
 
@@ -261,7 +261,7 @@ void vtkPVCalculatorWidget::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->AttributeModeFrame->SetParent(this);
   this->AttributeModeFrame->Create();

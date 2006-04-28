@@ -36,10 +36,6 @@ public:
   vtkTypeRevisionMacro(vtkPVSelectTimeSet, vtkPVWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Create the widget.
-  virtual void Create();
-
   //BTX
   // Description:
   // Called when accept button is pushed.
@@ -98,9 +94,14 @@ public:
   // Description:
   // Get the number of timesteps if any.
   int GetNumberOfTimeSteps();
+
 protected:
   vtkPVSelectTimeSet();
   ~vtkPVSelectTimeSet();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkPVSelectTimeSet(const vtkPVSelectTimeSet&); // Not implemented
   void operator=(const vtkPVSelectTimeSet&); // Not implemented

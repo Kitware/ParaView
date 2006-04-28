@@ -22,7 +22,7 @@
 #include "vtkKWFrame.h"
 
 vtkStandardNewMacro(vtkPVVCRControl);
-vtkCxxRevisionMacro(vtkPVVCRControl, "1.16");
+vtkCxxRevisionMacro(vtkPVVCRControl, "1.17");
 //-----------------------------------------------------------------------------
 vtkPVVCRControl::vtkPVVCRControl()
 {
@@ -81,7 +81,7 @@ vtkPVVCRControl::~vtkPVVCRControl()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVVCRControl::Create()
+void vtkPVVCRControl::CreateWidget()
 {
   if (this->IsCreated())
     {
@@ -89,7 +89,7 @@ void vtkPVVCRControl::Create()
     return;
     }
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   vtkKWIcon* icon = vtkKWIcon::New();
   if (this->Mode == vtkPVVCRControl::PLAYBACK ||

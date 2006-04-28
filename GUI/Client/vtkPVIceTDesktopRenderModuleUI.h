@@ -36,10 +36,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  void Create();
-
-  // Description:
   // Callback for the ordered composite check button.
   virtual void SetOrderedCompositingFlag(int state);
 
@@ -52,6 +48,10 @@ public:
 protected:
   vtkPVIceTDesktopRenderModuleUI();
   ~vtkPVIceTDesktopRenderModuleUI();
+
+  // Description:
+  // Create the widget.
+  void CreateWidget();
 
   vtkKWCheckButton *OrderedCompositingCheck;
   int               OrderedCompositingFlag;

@@ -41,10 +41,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
-  // Create the widget.
-  void Create();
-
-  // Description:
   // Save this source to a file.
   void SaveInBatchScript(ofstream *file);
 
@@ -108,6 +104,10 @@ public:
 protected:
   vtkPVSelectArrays();
   ~vtkPVSelectArrays();
+
+  // Description:
+  // Create the widget.
+  void CreateWidget();
 
   vtkKWFrame*      ButtonFrame;
   vtkKWLabel*       ShowAllLabel;

@@ -40,10 +40,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Update the widget from the cv manager.
   void Update();
 
@@ -96,6 +92,10 @@ public:
 protected:
   vtkPVComparativeVisManagerGUI();
   ~vtkPVComparativeVisManagerGUI();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkKWFrame* MainFrame;
 

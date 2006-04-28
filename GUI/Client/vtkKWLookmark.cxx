@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.35");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.36");
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::vtkKWLookmark()
@@ -159,7 +159,7 @@ vtkKWLookmark::~vtkKWLookmark()
 
 
 //----------------------------------------------------------------------------
-void vtkKWLookmark::Create()
+void vtkKWLookmark::CreateWidget()
 {
   // Check if already created
 
@@ -171,7 +171,7 @@ void vtkKWLookmark::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->Frame->SetParent(this);
   this->Frame->Create();

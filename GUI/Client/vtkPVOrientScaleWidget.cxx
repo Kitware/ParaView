@@ -40,7 +40,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.41");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.42");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScalarProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMVectorProperty, vtkSMProperty);
@@ -158,7 +158,7 @@ vtkPVOrientScaleWidget::~vtkPVOrientScaleWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVOrientScaleWidget::Create()
+void vtkPVOrientScaleWidget::CreateWidget()
 {
   // Check if already created
 
@@ -170,7 +170,7 @@ void vtkPVOrientScaleWidget::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
   
   this->LabeledFrame->Create();
   this->LabeledFrame->SetLabelText("Orient / Scale");

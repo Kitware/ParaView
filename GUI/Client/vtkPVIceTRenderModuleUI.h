@@ -32,10 +32,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  void Create();
-
-  // Description:
   // Threshold for collecting geometry to the client (vs. showing the outline
   // on the client).
   void CollectCheckCallback(int state);
@@ -59,9 +55,14 @@ public:
   // Description:
   // Resets all the settings to default values.
   virtual void ResetSettingsToDefault();
+
 protected:
   vtkPVIceTRenderModuleUI();
   ~vtkPVIceTRenderModuleUI();
+
+  // Description:
+  // Create the widget.
+  void CreateWidget();
 
   vtkKWLabel       *CollectLabel;
   vtkKWCheckButton *CollectCheck;

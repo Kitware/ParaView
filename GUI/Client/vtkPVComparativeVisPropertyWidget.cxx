@@ -39,7 +39,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisPropertyWidget );
-vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.13");
+vtkCxxRevisionMacro(vtkPVComparativeVisPropertyWidget, "1.14");
 
 vtkCxxSetObjectMacro(vtkPVComparativeVisPropertyWidget, TrackEditor, vtkPVTrackEditor);
 
@@ -74,7 +74,7 @@ vtkPVComparativeVisPropertyWidget::~vtkPVComparativeVisPropertyWidget()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVComparativeVisPropertyWidget::Create()
+void vtkPVComparativeVisPropertyWidget::CreateWidget()
 {
   // Check if already created
 
@@ -85,7 +85,7 @@ void vtkPVComparativeVisPropertyWidget::Create()
     }
 
   // Call the superclass to create the whole widget
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   vtkPVApplication* pvApp = 
     vtkPVApplication::SafeDownCast(this->GetApplication());

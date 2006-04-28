@@ -42,10 +42,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Add an error to the list.
   virtual void AppendError(const char*);
   
@@ -60,6 +56,10 @@ public:
 protected:
   vtkPVErrorLogDisplay();
   ~vtkPVErrorLogDisplay();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   virtual void Update();
 

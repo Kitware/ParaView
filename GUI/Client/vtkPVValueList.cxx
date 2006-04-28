@@ -34,7 +34,7 @@
 #include "vtkPVTraceHelper.h"
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVValueList, "1.34");
+vtkCxxRevisionMacro(vtkPVValueList, "1.35");
 
 const int vtkPVValueList::MAX_NUMBER_ENTRIES = 200;
 
@@ -138,7 +138,7 @@ void vtkPVValueList::SetLabel(const char* str)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVValueList::Create()
+void vtkPVValueList::CreateWidget()
 {
   // Check if already created
 
@@ -150,7 +150,7 @@ void vtkPVValueList::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->ContourValuesFrame->SetParent(this); 
   this->ContourValuesFrame->Create();

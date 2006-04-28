@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.29");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.30");
 
 //----------------------------------------------------------------------------
 vtkPVSourceNotebook::vtkPVSourceNotebook()
@@ -206,7 +206,7 @@ void vtkPVSourceNotebook::ShowPage(const char* pageName)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSourceNotebook::Create()
+void vtkPVSourceNotebook::CreateWidget()
 {
   // Check if already created
 
@@ -218,7 +218,7 @@ void vtkPVSourceNotebook::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
     
   this->Notebook->SetParent(this);
   this->Notebook->Create();

@@ -22,7 +22,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisProgressDialog );
-vtkCxxRevisionMacro(vtkPVComparativeVisProgressDialog, "1.2");
+vtkCxxRevisionMacro(vtkPVComparativeVisProgressDialog, "1.3");
 
 //-----------------------------------------------------------------------------
 vtkPVComparativeVisProgressDialog::vtkPVComparativeVisProgressDialog()
@@ -49,7 +49,7 @@ vtkPVComparativeVisProgressDialog::~vtkPVComparativeVisProgressDialog()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVComparativeVisProgressDialog::Create()
+void vtkPVComparativeVisProgressDialog::CreateWidget()
 {
   if (this->IsCreated())
     {
@@ -57,7 +57,7 @@ void vtkPVComparativeVisProgressDialog::Create()
     return;
     }
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->Message->SetParent(this);
   this->Message->Create();

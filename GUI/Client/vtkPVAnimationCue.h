@@ -59,10 +59,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // TimeLineParent is the frame that contains the timelines.
   // this->Parent is the frame which contains the labels (or the Navgation
   // widget) for the cue.
@@ -220,6 +216,11 @@ public:
 protected:
   vtkPVAnimationCue();
   ~vtkPVAnimationCue();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+
 //BTX
   // Description:
   // Set/Get the type of the image shown to the left of the label 

@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDesktopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.11");
+vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVIceTDesktopRenderModuleUI::vtkPVIceTDesktopRenderModuleUI()
@@ -52,7 +52,7 @@ vtkPVIceTDesktopRenderModuleUI::~vtkPVIceTDesktopRenderModuleUI()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVIceTDesktopRenderModuleUI::Create()
+void vtkPVIceTDesktopRenderModuleUI::CreateWidget()
 {
   // Skip over LOD res and threshold.
   
@@ -62,7 +62,7 @@ void vtkPVIceTDesktopRenderModuleUI::Create()
     return;
     }
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   vtkPVApplication *pvapp = 
     vtkPVApplication::SafeDownCast(this->GetApplication());

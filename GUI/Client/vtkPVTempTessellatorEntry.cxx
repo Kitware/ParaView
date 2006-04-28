@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.34");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.35");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -112,7 +112,7 @@ void vtkPVTempTessellatorEntry::PrintSelf( ostream& os, vtkIndent indent )
   os << indent << "InputMenu: " << this->InputMenu << endl;
 }
 
-void vtkPVTempTessellatorEntry::Create()
+void vtkPVTempTessellatorEntry::CreateWidget()
 {
   // Check if already created
 
@@ -124,7 +124,7 @@ void vtkPVTempTessellatorEntry::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   vtkTessellatorEntryData* d = this->Data;
 

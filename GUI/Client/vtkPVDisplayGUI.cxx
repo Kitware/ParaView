@@ -102,7 +102,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.64");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.65");
 
 //----------------------------------------------------------------------------
 
@@ -466,7 +466,7 @@ void vtkPVDisplayGUI::SetPVSource(vtkPVSource *source)
 // ============= Use to be in vtkPVActorComposite ===================
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::Create()
+void vtkPVDisplayGUI::CreateWidget()
 {
   // Check if already created
 
@@ -478,7 +478,7 @@ void vtkPVDisplayGUI::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
   int cc;
 
   // We are going to 'grid' most of it, so let's define some const

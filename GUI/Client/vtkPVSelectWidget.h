@@ -46,10 +46,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Add widgets to the possible selection.  The vtkValue
   // is value used to set the vtk object variable.
   void AddItem(const char* labelVal, vtkPVWidget *pvw, const char* vtkVal);
@@ -157,6 +153,10 @@ public:
 protected:
   vtkPVSelectWidget();
   ~vtkPVSelectWidget();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   int FindIndex(const char* str, vtkStringList *list);
   void SetCurrentIndex(int idx);

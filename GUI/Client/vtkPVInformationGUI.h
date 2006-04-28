@@ -39,10 +39,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  void Create();
-  
-  // Description:
   // This updates the user interface.  It checks first to see if the
   // data has changed.  If nothing has changes, it is smart enough
   // to do nothing.
@@ -61,6 +57,10 @@ public:
 protected:
   vtkPVInformationGUI();
   ~vtkPVInformationGUI();
+  
+  // Description:
+  // Create the widget.
+  void CreateWidget();
   
   vtkKWFrameWithLabel *StatsFrame;
 

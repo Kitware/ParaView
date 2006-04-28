@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.16");
+vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.17");
 
 //----------------------------------------------------------------------------
 vtkPVIceTRenderModuleUI::vtkPVIceTRenderModuleUI()
@@ -90,7 +90,7 @@ vtkPVIceTRenderModuleUI::~vtkPVIceTRenderModuleUI()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVIceTRenderModuleUI::Create()
+void vtkPVIceTRenderModuleUI::CreateWidget()
 {
   if (this->IsCreated())
     {
@@ -98,7 +98,7 @@ void vtkPVIceTRenderModuleUI::Create()
     return;
     }
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   vtkPVApplication *pvapp = 
     vtkPVApplication::SafeDownCast(this->GetApplication());

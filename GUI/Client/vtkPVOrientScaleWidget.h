@@ -38,10 +38,6 @@ public:
   vtkTypeRevisionMacro(vtkPVOrientScaleWidget, vtkPVWidget);
   void PrintSelf(ostream &os, vtkIndent indent);
   
-  // Description:
-  // Create the widget.
-  virtual void Create();
-
   //BTX
   // Description:
   // Move widget state to vtk object or back.
@@ -95,6 +91,10 @@ public:
 protected:
   vtkPVOrientScaleWidget();
   ~vtkPVOrientScaleWidget();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkKWFrameWithLabel *LabeledFrame;
   vtkKWFrame *ScalarsFrame;

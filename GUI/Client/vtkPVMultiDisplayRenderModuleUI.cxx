@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModuleUI, "1.11");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModuleUI, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVMultiDisplayRenderModuleUI::vtkPVMultiDisplayRenderModuleUI()
@@ -34,7 +34,7 @@ vtkPVMultiDisplayRenderModuleUI::~vtkPVMultiDisplayRenderModuleUI()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMultiDisplayRenderModuleUI::Create()
+void vtkPVMultiDisplayRenderModuleUI::CreateWidget()
 {
   if (this->IsCreated())
     {
@@ -42,7 +42,7 @@ void vtkPVMultiDisplayRenderModuleUI::Create()
     return;
     }
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // We do not have these options.
   this->CompositeWithFloatCheck->SetSelectedState(0);

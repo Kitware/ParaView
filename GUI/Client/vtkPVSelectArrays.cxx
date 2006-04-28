@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectArrays);
-vtkCxxRevisionMacro(vtkPVSelectArrays, "1.19");
+vtkCxxRevisionMacro(vtkPVSelectArrays, "1.20");
 vtkCxxSetObjectMacro(vtkPVSelectArrays, InputMenu, vtkPVInputMenu);
 
 //----------------------------------------------------------------------------
@@ -85,7 +85,7 @@ vtkPVSelectArrays::~vtkPVSelectArrays()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSelectArrays::Create()
+void vtkPVSelectArrays::CreateWidget()
 {
   // Check if already created
 
@@ -97,7 +97,7 @@ void vtkPVSelectArrays::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->ButtonFrame->SetParent(this);
   this->ButtonFrame->Create();

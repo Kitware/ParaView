@@ -61,7 +61,7 @@
 #define VTK_PV_DEFAULT_OUTLINE_THRESHOLD (5.0 * 1000000.0)
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.37");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.38");
 
 //----------------------------------------------------------------------------
 vtkPVLODRenderModuleUI::vtkPVLODRenderModuleUI()
@@ -144,7 +144,7 @@ vtkPVLODRenderModuleUI::~vtkPVLODRenderModuleUI()
 
 
 //----------------------------------------------------------------------------
-void vtkPVLODRenderModuleUI::Create()
+void vtkPVLODRenderModuleUI::CreateWidget()
 {
   if (this->IsCreated())
     {
@@ -152,7 +152,7 @@ void vtkPVLODRenderModuleUI::Create()
     return;
     }
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   vtkPVApplication *pvapp = 
     vtkPVApplication::SafeDownCast(this->GetApplication());

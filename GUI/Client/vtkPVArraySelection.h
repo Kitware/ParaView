@@ -64,10 +64,6 @@ public:
   vtkGetStringMacro(LabelText);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Callback for the AllOn and AllOff buttons.
   void AllOnCallback();
   void AllOffCallback();
@@ -114,6 +110,10 @@ public:
 protected:
   vtkPVArraySelection();
   ~vtkPVArraySelection();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);

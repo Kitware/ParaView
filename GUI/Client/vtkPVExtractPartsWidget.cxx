@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.36");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.37");
 
 //----------------------------------------------------------------------------
 vtkPVExtractPartsWidget::vtkPVExtractPartsWidget()
@@ -63,7 +63,7 @@ vtkPVExtractPartsWidget::~vtkPVExtractPartsWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVExtractPartsWidget::Create()
+void vtkPVExtractPartsWidget::CreateWidget()
 {
   // Check if already created
 
@@ -75,7 +75,7 @@ void vtkPVExtractPartsWidget::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->ButtonFrame->SetParent(this);
   this->ButtonFrame->Create();

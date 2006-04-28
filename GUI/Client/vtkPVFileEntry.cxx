@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.125");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.126");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -174,7 +174,7 @@ void vtkPVFileEntry::SetBalloonHelpString(const char *str)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVFileEntry::Create()
+void vtkPVFileEntry::CreateWidget()
 {
   // Check if already created
 
@@ -186,7 +186,7 @@ void vtkPVFileEntry::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   vtkKWFrame* frame = vtkKWFrame::New();
   frame->SetParent(this);

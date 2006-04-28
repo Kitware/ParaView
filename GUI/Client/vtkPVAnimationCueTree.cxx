@@ -28,7 +28,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVAnimationCueTree);
-vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.20");
+vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.21");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationCueTree::vtkPVAnimationCueTree()
@@ -78,14 +78,14 @@ vtkPVAnimationCueTree::~vtkPVAnimationCueTree()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationCueTree::Create()
+void vtkPVAnimationCueTree::CreateWidget()
 {
   if (this->IsCreated())
     {
     vtkErrorMacro("Widget already created");
     return;
     }
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   if (!this->IsCreated())
     {

@@ -138,7 +138,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.788");
+vtkCxxRevisionMacro(vtkPVWindow, "1.789");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -1154,7 +1154,7 @@ void vtkPVWindow::SetInteractor(vtkPVGenericRenderWindowInteractor *interactor)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWindow::Create()
+void vtkPVWindow::CreateWidget()
 {
   if (this->IsCreated())
     {
@@ -1181,7 +1181,7 @@ void vtkPVWindow::Create()
 
   // Invoke super method
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Hide the main window until after all user interface is initialized.
 

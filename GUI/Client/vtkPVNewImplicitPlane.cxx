@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVNewImplicitPlane);
-vtkCxxRevisionMacro(vtkPVNewImplicitPlane, "1.1");
+vtkCxxRevisionMacro(vtkPVNewImplicitPlane, "1.2");
 
 //----------------------------------------------------------------------------
 class vtkPVNewImplicitPlaneObserver : public vtkCommand
@@ -80,7 +80,7 @@ vtkPVNewImplicitPlane::~vtkPVNewImplicitPlane()
 
 
 //----------------------------------------------------------------------------
-void vtkPVNewImplicitPlane::Create()
+void vtkPVNewImplicitPlane::CreateWidget()
 {
   // Check if already created
 
@@ -92,7 +92,7 @@ void vtkPVNewImplicitPlane::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(
     this->GetApplication());

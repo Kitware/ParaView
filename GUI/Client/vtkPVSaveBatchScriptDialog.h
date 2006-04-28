@@ -39,10 +39,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // Access to the results of the dialog.
   int GetOffScreen();
   const char* GetImagesFileName();
@@ -68,6 +64,10 @@ protected:
   vtkPVSaveBatchScriptDialog();
   ~vtkPVSaveBatchScriptDialog();
 
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+  
   char* FilePath;
   char* FileRoot;
   

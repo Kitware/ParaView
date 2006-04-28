@@ -138,10 +138,6 @@ public:
   void BrowseMaterial();
   
   // Description:
-  // Create the widget.
-  void Create();
-  
-  // Description:
   // This updates the user interface.  It checks first to see if the
   // data has changed.  If nothing has changes, it is smart enough
   // to do nothing.
@@ -298,6 +294,10 @@ protected:
   vtkPVDisplayGUI();
   ~vtkPVDisplayGUI();
 
+  // Description:
+  // Create the widget.
+  void CreateWidget();
+  
   // Order of these calls makes a difference.  
   // might want to merge some of them.
   // UpdateColorGUI calls them all.

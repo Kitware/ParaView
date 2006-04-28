@@ -53,9 +53,7 @@ public:
   virtual void HideSplashScreen();
 
   // Description:
-  // Retrieve the splash screen object
-  // As a convenience, this will also call vtkKWSplashScreen::Create() to
-  // create the splash screen widget itself.
+  // Retrieve the splash screen object.
   virtual vtkKWSplashScreen* GetSplashScreen();
 
   // Description:

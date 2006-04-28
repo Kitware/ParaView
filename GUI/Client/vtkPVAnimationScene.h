@@ -44,10 +44,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Callbacks
   void SetPlayModeToSequence();
   void SetPlayModeToRealTime();
@@ -209,6 +205,10 @@ public:
 protected:
   vtkPVAnimationScene();
   ~vtkPVAnimationScene();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   void CaptureErrorEvents();
   void ReleaseErrorEvents();

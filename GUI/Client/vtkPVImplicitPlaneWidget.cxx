@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.67");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.68");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -701,9 +701,9 @@ void vtkPVImplicitPlaneWidget::ChildCreate()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::Create()
+void vtkPVImplicitPlaneWidget::CreateWidget()
 {
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   static int proxyNum = 0;
   vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();

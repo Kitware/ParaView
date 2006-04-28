@@ -31,10 +31,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // This method allows scripts to modify the widgets value.
   void SetValue(double val);
   double GetValue();
@@ -143,6 +139,10 @@ public:
 protected:
   vtkPVScale();
   ~vtkPVScale();
+  
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
   
   int RoundValue(double val);
 

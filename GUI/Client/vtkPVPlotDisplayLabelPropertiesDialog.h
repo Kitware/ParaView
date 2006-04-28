@@ -51,7 +51,6 @@ public:
 
   // Description:
   // vtkKWDialog overrides.
-  virtual void Create();
   virtual void OK();
   virtual int Invoke();
   virtual void Cancel();
@@ -91,9 +90,14 @@ public:
   // Description:
   // Get the trace helper object.
   vtkGetObjectMacro(TraceHelper, vtkPVTraceHelper)
+
 protected:
   vtkPVPlotDisplayLabelPropertiesDialog();
   ~vtkPVPlotDisplayLabelPropertiesDialog();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkKWFrame* FrameForGrid;
   vtkKWLabel* TitlePositionLabel;

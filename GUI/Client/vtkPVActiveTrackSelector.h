@@ -39,10 +39,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Add the AnimationCue for a PVSource.
   void AddSource(vtkPVAnimationCueTree*);
   void RemoveSource(vtkPVAnimationCueTree*);
@@ -99,6 +95,11 @@ public:
 protected:
   vtkPVActiveTrackSelector();
   ~vtkPVActiveTrackSelector();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+
   void SelectSourceCallbackInternal(const char*key);
   void SelectPropertyCallbackInternal(int cue_index);
 

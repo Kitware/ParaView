@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSaveBatchScriptDialog );
-vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.23");
+vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.24");
 
 //----------------------------------------------------------------------------
 vtkPVSaveBatchScriptDialog::vtkPVSaveBatchScriptDialog()
@@ -92,7 +92,7 @@ vtkPVSaveBatchScriptDialog::~vtkPVSaveBatchScriptDialog()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSaveBatchScriptDialog::Create()
+void vtkPVSaveBatchScriptDialog::CreateWidget()
 {
   // Check if already created
 
@@ -104,7 +104,7 @@ void vtkPVSaveBatchScriptDialog::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->OffScreenCheck->SetParent(this);
   this->OffScreenCheck->Create();

@@ -29,10 +29,6 @@ public:
   vtkTypeRevisionMacro(vtkPVDummyWidget, vtkPVWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Create the widget.
-  virtual void Create();
-
 //BTX
   // Description:
   // Creates and returns a copy of this widget. It will create
@@ -64,6 +60,9 @@ protected:
   vtkPVDummyWidget();
   ~vtkPVDummyWidget();
 
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,

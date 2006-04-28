@@ -42,10 +42,6 @@ public:
   virtual void Accept();
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set the label.  The label can be used to get this widget
   // from a script.
   void SetLabel (const char* label);
@@ -98,6 +94,10 @@ public:
 protected:
   vtkPVValueList();
   ~vtkPVValueList();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   static const int MAX_NUMBER_ENTRIES;
 

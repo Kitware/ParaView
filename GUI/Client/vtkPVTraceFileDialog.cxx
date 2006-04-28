@@ -21,7 +21,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTraceFileDialog );
-vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.15");
+vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.16");
 
 //-----------------------------------------------------------------------------
 vtkPVTraceFileDialog::vtkPVTraceFileDialog()
@@ -55,7 +55,7 @@ vtkPVTraceFileDialog::~vtkPVTraceFileDialog()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVTraceFileDialog::Create()
+void vtkPVTraceFileDialog::CreateWidget()
 {
   // Check if already created
 
@@ -66,7 +66,7 @@ void vtkPVTraceFileDialog::Create()
     }
 
   // invoke super method
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->SaveFrame->Create();
   this->SaveFrame->SetBorderWidth(3);

@@ -37,10 +37,6 @@ public:
   const char* GetLabel();
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // This method allows scripts to modify the widgets value.
   void SetSelectedState(int val);
   int GetSelectedState();
@@ -86,6 +82,10 @@ public:
 protected:
   vtkPVLabeledToggle();
   ~vtkPVLabeledToggle();
+  
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
   
   // Called when accept button is pushed.  
   // Sets objects variable to the widgets value.

@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.79");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.80");
 
 
 //----------------------------------------------------------------------------
@@ -82,7 +82,7 @@ void vtkPVInputMenu::SetLabel(const char* label)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVInputMenu::Create()
+void vtkPVInputMenu::CreateWidget()
 {
   // Check if already created
 
@@ -94,7 +94,7 @@ void vtkPVInputMenu::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->Label->SetParent(this);
   this->Label->Create();

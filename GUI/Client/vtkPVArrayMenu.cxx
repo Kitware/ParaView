@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.85");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.86");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -95,7 +95,7 @@ void vtkPVArrayMenu::SetLabel(const char* label)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArrayMenu::Create()
+void vtkPVArrayMenu::CreateWidget()
 {
   // Check if already created
 
@@ -107,7 +107,7 @@ void vtkPVArrayMenu::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   vtkKWFrame *extraFrame;
 

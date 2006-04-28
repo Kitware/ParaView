@@ -47,10 +47,6 @@ public:
   void Close();
     
   // Description:
-  // Create the widget
-  virtual void Create();
-
-  // Description:
   // Since thie GUI is shared, the call backs need a source
   // to modify.  The source sets this variable and calls update
   // when it becomes active.
@@ -120,6 +116,10 @@ public:
 protected:
   vtkPVSourceNotebook();
   ~vtkPVSourceNotebook();
+
+  // Description:
+  // Create the widget
+  virtual void CreateWidget();
 
   vtkPVSource* PVSource;
 

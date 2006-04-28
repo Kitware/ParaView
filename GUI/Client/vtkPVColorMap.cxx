@@ -53,7 +53,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.142");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.143");
 
 //===========================================================================
 //***************************************************************************
@@ -227,7 +227,7 @@ vtkPVColorMap::~vtkPVColorMap()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVColorMap::Create()
+void vtkPVColorMap::CreateWidget()
 {
   // Check if already created
 
@@ -239,7 +239,7 @@ void vtkPVColorMap::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
   
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(
     this->GetApplication());

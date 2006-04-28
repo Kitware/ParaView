@@ -37,7 +37,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.83");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.84");
 
 //----------------------------------------------------------------------------
 class vtkPVVectorEntryInternals
@@ -135,7 +135,7 @@ void vtkPVVectorEntry::SetBalloonHelpString(const char *str)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVVectorEntry::Create()
+void vtkPVVectorEntry::CreateWidget()
 {
   // Check if already created
 
@@ -147,7 +147,7 @@ void vtkPVVectorEntry::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   int i;
 

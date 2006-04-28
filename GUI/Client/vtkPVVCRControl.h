@@ -50,7 +50,6 @@ public:
 
   // Description:
   // Create the widget.
-  virtual void Create();
   virtual void UpdateEnableState();
 
   // Description:
@@ -97,6 +96,10 @@ public:
 protected:
   vtkPVVCRControl();
   ~vtkPVVCRControl();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   int InPlay; // used to decide enable state of the buttons.
   vtkKWPushButton *PlayButton;

@@ -39,8 +39,6 @@ public:
   vtkTypeRevisionMacro(vtkPVExtentEntry, vtkPVObjectWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  virtual void Create();
-  
   // Description:
   // Methods to set this widgets value from a script.
   void SetValue(int v1, int v2, int v3, int v4, int v5, int v6);
@@ -119,6 +117,8 @@ protected:
   vtkPVExtentEntry();
   ~vtkPVExtentEntry();
 
+  virtual void CreateWidget();
+  
   vtkKWFrameWithLabel* LabeledFrame;
   char* Label;
 

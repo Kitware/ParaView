@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWBoundsDisplay);
-vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.19");
+vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.20");
 
 //----------------------------------------------------------------------------
 vtkKWBoundsDisplay::vtkKWBoundsDisplay()
@@ -51,7 +51,7 @@ vtkKWBoundsDisplay::~vtkKWBoundsDisplay()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWBoundsDisplay::Create()
+void vtkKWBoundsDisplay::CreateWidget()
 {
   if (this->IsCreated())
     {
@@ -59,7 +59,7 @@ void vtkKWBoundsDisplay::Create()
     return;
     }
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->SetLabelText("Bounds");
 

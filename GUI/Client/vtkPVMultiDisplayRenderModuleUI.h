@@ -35,14 +35,14 @@ public:
   vtkTypeRevisionMacro(vtkPVMultiDisplayRenderModuleUI,vtkPVCompositeRenderModuleUI);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Create the widget.
-  void Create();
-
 protected:
   vtkPVMultiDisplayRenderModuleUI();
   ~vtkPVMultiDisplayRenderModuleUI();
  
+  // Description:
+  // Create the widget.
+  void CreateWidget();
+
   vtkPVMultiDisplayRenderModuleUI(const vtkPVMultiDisplayRenderModuleUI&); // Not implemented
   void operator=(const vtkPVMultiDisplayRenderModuleUI&); // Not implemented
 };

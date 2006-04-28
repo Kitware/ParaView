@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInformationGUI);
-vtkCxxRevisionMacro(vtkPVInformationGUI, "1.16");
+vtkCxxRevisionMacro(vtkPVInformationGUI, "1.17");
 
 //----------------------------------------------------------------------------
 vtkPVInformationGUI::vtkPVInformationGUI()
@@ -75,7 +75,7 @@ vtkPVInformationGUI::~vtkPVInformationGUI()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVInformationGUI::Create()
+void vtkPVInformationGUI::CreateWidget()
 {  
   if (this->IsCreated())
     {
@@ -83,7 +83,7 @@ void vtkPVInformationGUI::Create()
     return;
     }
   
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->StatsFrame = vtkKWFrameWithLabel::New();
   this->TypeLabel = vtkKWLabel::New();

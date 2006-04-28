@@ -35,10 +35,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // The scalar range display gets its array object from the array menu.
   virtual void SetArrayMenu(vtkPVArrayMenu*);
   vtkGetObjectMacro(ArrayMenu, vtkPVArrayMenu);
@@ -80,6 +76,10 @@ public:
 protected:
   vtkPVScalarRangeLabel();
   ~vtkPVScalarRangeLabel();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkPVArrayMenu *ArrayMenu;
   vtkKWLabel *Label;

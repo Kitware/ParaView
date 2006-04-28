@@ -108,11 +108,6 @@ public:
   vtkGetObjectMacro(InputMenu, vtkPVInputMenu);
 
   // Description:
-  // Create the widgets.
-  // Overloaded to create the ImplicitFunction proxy
-  virtual void Create();
-
-  // Description:
   // Register the animatable proxies and make them avaiblable for animation.
   // Called by vtkPVSelectWidget when the widget is selected.
   virtual void EnableAnimation(){ this->RegisterAnimateableProxies();} ;
@@ -125,6 +120,11 @@ public:
 protected:
   vtkPVSphereWidget();
   ~vtkPVSphereWidget();
+
+  // Description:
+  // Create the widgets.
+  // Overloaded to create the ImplicitFunction proxy
+  virtual void CreateWidget();
 
   // Description:
   // These methods assume that the Property has been

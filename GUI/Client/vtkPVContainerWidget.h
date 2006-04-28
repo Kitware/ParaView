@@ -35,10 +35,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
  
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Add widgets to the possible selection.  The vtkValue
   // is value used to set the vtk object variable.
   void AddPVWidget(vtkPVWidget *pvw);
@@ -120,6 +116,10 @@ public:
 protected:
   vtkPVContainerWidget();
   ~vtkPVContainerWidget();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
 //BTX
 

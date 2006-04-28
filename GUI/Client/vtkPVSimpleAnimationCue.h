@@ -43,10 +43,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Virtual indicates if this cue is a actual cue, which has a proxy
   // associated with it or merely a grouping GUI element.
   vtkGetMacro(Virtual, int);
@@ -294,6 +290,10 @@ public:
 protected:
   vtkPVSimpleAnimationCue();
   ~vtkPVSimpleAnimationCue();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   virtual void SelectKeyFrameInternal(int id);
   // Description:

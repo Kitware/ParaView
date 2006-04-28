@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.80");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.81");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -224,7 +224,7 @@ vtkPVWindow* vtkPVLookmarkManager::GetPVWindow()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLookmarkManager::Create()
+void vtkPVLookmarkManager::CreateWidget()
 {
   char methodAndArgs[100];
 
@@ -236,7 +236,7 @@ void vtkPVLookmarkManager::Create()
     }
 
   // Call the superclass to create the whole widget
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->SetGeometry("380x700+0+0");
   this->SetDisplayPositionToScreenCenterFirst();

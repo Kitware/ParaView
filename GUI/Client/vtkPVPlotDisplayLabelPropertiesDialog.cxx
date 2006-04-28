@@ -30,7 +30,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVPlotDisplayLabelPropertiesDialog);
-vtkCxxRevisionMacro(vtkPVPlotDisplayLabelPropertiesDialog, "1.2");
+vtkCxxRevisionMacro(vtkPVPlotDisplayLabelPropertiesDialog, "1.3");
 vtkCxxSetObjectMacro(vtkPVPlotDisplayLabelPropertiesDialog, LabelFormatProperty,
   vtkSMStringVectorProperty);
 vtkCxxSetObjectMacro(vtkPVPlotDisplayLabelPropertiesDialog, NumberOfLabelsProperty,
@@ -125,14 +125,14 @@ void vtkPVPlotDisplayLabelPropertiesDialog::SetPositionLabelText(const char* txt
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVPlotDisplayLabelPropertiesDialog::Create()
+void vtkPVPlotDisplayLabelPropertiesDialog::CreateWidget()
 {
   if (this->IsCreated())
     {
     return;
     }
   
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   if (!this->IsCreated())
     {

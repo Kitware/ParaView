@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThumbWheel);
-vtkCxxRevisionMacro(vtkPVThumbWheel, "1.23");
+vtkCxxRevisionMacro(vtkPVThumbWheel, "1.24");
 
 //-----------------------------------------------------------------------------
 vtkPVThumbWheel::vtkPVThumbWheel()
@@ -53,7 +53,7 @@ vtkPVThumbWheel::~vtkPVThumbWheel()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVThumbWheel::Create()
+void vtkPVThumbWheel::CreateWidget()
 {
   // Check if already created
 
@@ -65,7 +65,7 @@ void vtkPVThumbWheel::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
   
   // Now a label
   this->Label->Create();

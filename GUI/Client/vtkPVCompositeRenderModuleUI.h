@@ -38,10 +38,6 @@ public:
   virtual void Initialize();
   
   // Description:
-  // Create the widget.
-  virtual void Create();
-      
-  // Description:
   // Callback for the use char check button.  
   // The ones without parameters are only public because they are callbacks;
   // they cannot be used from a script because they do not change the state of
@@ -86,10 +82,15 @@ public:
   // Description:
   // Resets all the settings to default values.
   virtual void ResetSettingsToDefault();
+
 protected:
   vtkPVCompositeRenderModuleUI();
   ~vtkPVCompositeRenderModuleUI();
  
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+      
   vtkKWFrameWithLabel *ParallelRenderParametersFrame;
 
   vtkKWCheckButton *CompositeWithFloatCheck;

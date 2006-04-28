@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.67");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.68");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -566,9 +566,9 @@ void vtkPVBoxWidget::ChildCreate()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::Create()
+void vtkPVBoxWidget::CreateWidget()
 {
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   static int instanceCount = 0;
   vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();

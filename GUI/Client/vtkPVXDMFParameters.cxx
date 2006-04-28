@@ -151,7 +151,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.45");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.46");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -203,7 +203,7 @@ void vtkPVXDMFParameters::ScaleModifiedCallback(double)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXDMFParameters::Create()
+void vtkPVXDMFParameters::CreateWidget()
 {
   // Check if already created
 
@@ -215,7 +215,7 @@ void vtkPVXDMFParameters::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->Frame = vtkKWFrameWithLabel::New();
   this->Frame->SetParent(this);

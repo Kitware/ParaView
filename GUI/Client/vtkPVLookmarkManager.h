@@ -63,10 +63,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Display the toplevel.
   virtual void Display();
 
@@ -182,9 +178,12 @@ public:
   virtual void UpdateEnableState();
 
 protected:
-
   vtkPVLookmarkManager();
   ~vtkPVLookmarkManager();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   // convenience methods
   vtkPVApplication* GetPVApplication();

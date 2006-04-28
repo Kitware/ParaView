@@ -36,7 +36,7 @@
 #include "vtkSMProxyProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.77");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.78");
 
 //===========================================================================
 //***************************************************************************
@@ -117,7 +117,7 @@ vtkPV3DWidget::~vtkPV3DWidget()
 
 
 //----------------------------------------------------------------------------
-void vtkPV3DWidget::Create()
+void vtkPV3DWidget::CreateWidget()
 {
   // Check if already created
 
@@ -129,7 +129,7 @@ void vtkPV3DWidget::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(
     this->GetApplication());

@@ -52,10 +52,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
-  // Set up the UI for this source
-  void Create();
-
-  // Description:
   // Save this source to a file.
   void SaveInBatchScript(ofstream *file);
 
@@ -99,6 +95,10 @@ public:
 protected:
   vtkPVExtractDataSetsWidget();
   ~vtkPVExtractDataSetsWidget();
+
+  // Description:
+  // Set up the UI for this source
+  void CreateWidget();
 
   vtkKWFrame* ButtonFrame;
   vtkKWPushButton* AllOnButton;

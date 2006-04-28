@@ -59,10 +59,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   vtkPVApplication *GetPVApplication();
   
   // Description:
@@ -261,6 +257,10 @@ public:
 protected:
   vtkPVColorMap();
   ~vtkPVColorMap();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkPVColorMapObserver* ScalarBarObserver;
 

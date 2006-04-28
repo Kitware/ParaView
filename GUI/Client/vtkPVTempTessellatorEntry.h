@@ -56,10 +56,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Access to the label (for scripting)
   virtual void SetLabel( const char* );
   const char* GetLabel() const;
@@ -146,6 +142,10 @@ public:
 protected:
   vtkPVTempTessellatorEntry();
   ~vtkPVTempTessellatorEntry();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   char* ResetCriteriaCommand;
   char* SetFieldCriterionCommand;

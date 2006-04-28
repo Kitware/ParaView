@@ -35,10 +35,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set and update the progress.
   void SetProgress(double prog);
 
@@ -52,6 +48,10 @@ public:
 protected:
   vtkPVComparativeVisProgressDialog();
   ~vtkPVComparativeVisProgressDialog();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkKWFrame* ProgressFrame;
   vtkKWLabel* ProgressLabel;

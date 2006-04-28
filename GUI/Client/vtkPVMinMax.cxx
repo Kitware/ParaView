@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.58");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.59");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -129,7 +129,7 @@ void vtkPVMinMax::SetMaximumHelp(const char* help)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::Create()
+void vtkPVMinMax::CreateWidget()
 {
   // Check if already created
 
@@ -141,7 +141,7 @@ void vtkPVMinMax::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // For getting the widget in a script.
 

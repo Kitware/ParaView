@@ -43,10 +43,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget
-  void Create();
-
-  // Description:
   // Provide access ot the title and label text property widgets.
   vtkGetObjectMacro(TitleTextPropertyWidget, vtkPVTextPropertyEditor);
   vtkGetObjectMacro(LabelTextPropertyWidget, vtkPVTextPropertyEditor);
@@ -102,6 +98,10 @@ public:
 protected:
   vtkPVColorMapUI();
   ~vtkPVColorMapUI();
+
+  // Description:
+  // Create the widget
+  void CreateWidget();
 
   vtkPVColorMap *CurrentColorMap;
   void SetCurrentColorMap(vtkPVColorMap *colorMap);

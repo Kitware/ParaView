@@ -40,10 +40,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // This is the frame which should be used as parent for the vtkPVKeyFrame
   // (and subclasses) i.e. the GUI for the key frame.
   vtkGetObjectMacro(PropertiesFrame, vtkKWFrame);
@@ -95,9 +91,14 @@ public:
   // By default the first keyframe has fixed time.
   vtkSetMacro(FixedTimeKeyframeFlag, int);
   vtkGetMacro(FixedTimeKeyframeFlag, int);
+
 protected:
   vtkPVTrackEditor();
   ~vtkPVTrackEditor();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkPVSimpleAnimationCue* SimpleAnimationCue;
   vtkPVKeyFrame* ActiveKeyFrame;

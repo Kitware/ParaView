@@ -76,14 +76,14 @@ public:
   // Display hint about picking using the p key.
   void SetVisibility(int v);  
 
-  // Description:
-  // Create the widget.
-  // Overridden to set up control dependencies among properties.
-  virtual void Create();
-
 protected:
   vtkPVPointWidget();
   ~vtkPVPointWidget();
+
+  // Description:
+  // Create the widget.
+  // Overridden to set up control dependencies among properties.
+  virtual void CreateWidget();
 
   void SetPositionInternal(double,double,double);
 

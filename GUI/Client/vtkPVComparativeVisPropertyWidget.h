@@ -42,10 +42,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Copy the values of the widget to the given vis.
   void CopyToVisualization(vtkSMComparativeVisProxy* cv);
 
@@ -67,6 +63,10 @@ public:
 protected:
   vtkPVComparativeVisPropertyWidget();
   ~vtkPVComparativeVisPropertyWidget();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkPVActiveTrackSelector* TrackSelector;
   vtkPVSimpleAnimationCue* CueEditor;

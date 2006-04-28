@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.57");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.58");
 
 // Taken from source selection list  we need ne images.
 /* 
@@ -220,7 +220,7 @@ void vtkPVServerFileDialog::CreateServerSide()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVServerFileDialog::Create()
+void vtkPVServerFileDialog::CreateWidget()
 {
   // Check if already created
 
@@ -232,7 +232,7 @@ void vtkPVServerFileDialog::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   if (this->SaveDialog)
     {

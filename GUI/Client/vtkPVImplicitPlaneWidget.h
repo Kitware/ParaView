@@ -122,11 +122,6 @@ public:
   virtual void UpdateVTKObjects();
 
   // Description:
-  // Create the widget.
-  // Overloaded to create the ImplicitFunctionProxy
-  virtual void Create();
-
-  // Description:
   // Updates the Offset property of the plane proxy 
   // and calls ModifiedCallback.
   void UpdateOffsetRange();
@@ -144,6 +139,11 @@ public:
 protected:
   vtkPVImplicitPlaneWidget();
   ~vtkPVImplicitPlaneWidget();
+
+  // Description:
+  // Create the widget.
+  // Overloaded to create the ImplicitFunctionProxy
+  virtual void CreateWidget();
 
   // Description:
   // Call creation on the child.

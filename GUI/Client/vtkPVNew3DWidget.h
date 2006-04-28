@@ -36,10 +36,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget. 
-  virtual void Create();
-  
-  // Description:
   // This method is called when the source that contains this widget
   // is selected. 
   virtual void Select();
@@ -85,6 +81,10 @@ protected:
   vtkPVNew3DWidget();
   ~vtkPVNew3DWidget();
 
+  // Description:
+  // Create the widget. 
+  virtual void CreateWidget();
+  
   void WidgetModified();
 
 //BTX

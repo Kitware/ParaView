@@ -42,7 +42,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVComparativeVisDialog );
-vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.15");
+vtkCxxRevisionMacro(vtkPVComparativeVisDialog, "1.16");
 
 int vtkPVComparativeVisDialog::NumberOfVisualizationsCreated = 0;
 const int vtkPVComparativeVisDialog::DialogWidth = 700;
@@ -266,7 +266,7 @@ void vtkPVComparativeVisDialog::InitializeToDefault()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVComparativeVisDialog::Create()
+void vtkPVComparativeVisDialog::CreateWidget()
 {
   if (this->IsCreated())
     {
@@ -274,7 +274,7 @@ void vtkPVComparativeVisDialog::Create()
     return;
     }
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->MainFrame->SetParent(this);
   this->MainFrame->Create();

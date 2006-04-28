@@ -38,10 +38,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Controls the radius of the point cloud.
   vtkGetObjectMacro(RadiusWidget, vtkPVScaleFactorEntry);
 
@@ -120,6 +116,10 @@ public:
 protected:
   vtkPVPointSourceWidget();
   ~vtkPVPointSourceWidget();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
 //BTX
   virtual void CopyProperties(vtkPVWidget *clone, vtkPVSource *pvSource,

@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.43");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.44");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -64,7 +64,7 @@ void vtkPVLabeledToggle::SetBalloonHelpString(const char *str)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLabeledToggle::Create()
+void vtkPVLabeledToggle::CreateWidget()
 {
   // Check if already created
 
@@ -76,7 +76,7 @@ void vtkPVLabeledToggle::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
   
   // Now a label
   this->Label->Create();

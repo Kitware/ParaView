@@ -73,7 +73,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.67");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.68");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 #define VTK_PV_TOOLBARS_ANIMATION_LABEL "Animation"
@@ -270,7 +270,7 @@ void vtkPVAnimationScene::SetWindow(vtkPVWindow *window)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationScene::Create()
+void vtkPVAnimationScene::CreateWidget()
 {
   if (!this->AnimationManager)
     {
@@ -298,7 +298,7 @@ void vtkPVAnimationScene::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->CreateProxy();
 

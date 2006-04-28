@@ -34,10 +34,6 @@ public:
   vtkTypeRevisionMacro(vtkPVTimeLine, vtkKWParameterValueFunctionEditor);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Create the widget.
-  virtual void Create();
-  
   virtual int HasFunction();
   virtual int GetFunctionSize();
 
@@ -99,10 +95,15 @@ public:
   // Description:
   // Indicates if the function point can be removed.
   int CanRemoveFunctionPoint(int id);
+
 protected:
   vtkPVTimeLine();
   ~vtkPVTimeLine();
 
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+  
   // To override the manipulation of the start point in certain cases.
   virtual int FunctionPointParameterIsLocked(int id);
   virtual int FunctionPointCanBeMovedToParameter(int id, double parameter);

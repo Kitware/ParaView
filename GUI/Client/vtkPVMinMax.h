@@ -33,10 +33,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Called when the Accept button is pressed.
   virtual void Accept();
 
@@ -158,6 +154,10 @@ protected:
   vtkPVMinMax();
   ~vtkPVMinMax();
   
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+
   vtkPVArrayMenu* ArrayMenu;  
 
   vtkKWLabel *MinLabel;

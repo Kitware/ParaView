@@ -47,10 +47,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // The name of the lookmark. Always the same as the one displayed in the lookmark widget.
   vtkGetStringMacro(Name);
   vtkSetStringMacro(Name);
@@ -126,9 +122,12 @@ public:
   virtual void UpdateEnableState();
 
 protected:
-
   vtkKWLookmark();
   ~vtkKWLookmark();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkKWFrame *LeftFrame;
   vtkKWFrame *RightFrame;

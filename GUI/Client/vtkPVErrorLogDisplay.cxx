@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVErrorLogDisplay );
-vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.15");
+vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.16");
 
 //----------------------------------------------------------------------------
 vtkPVErrorLogDisplay::vtkPVErrorLogDisplay()
@@ -78,7 +78,7 @@ void vtkPVErrorLogDisplay::Clear()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVErrorLogDisplay::Create()
+void vtkPVErrorLogDisplay::CreateWidget()
 {
   if (this->IsCreated())
     {
@@ -86,7 +86,7 @@ void vtkPVErrorLogDisplay::Create()
     return;
     }
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->Script("pack forget  %s %s %s %s",
                this->ThresholdLabel->GetWidgetName(),

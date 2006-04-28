@@ -44,10 +44,6 @@ public:
   // Set the render view to operate in.
   void SetRenderView(vtkPVRenderView *view);
   
-  // Desription:
-  // Create the widget.
-  void Create();
-  
   // Description:
   // Callbacks for the 3 buttons.
   void ElevationButtonCallback();
@@ -63,6 +59,10 @@ public:
 protected:
   vtkPVCameraControl();
   ~vtkPVCameraControl();
+  
+  // Desription:
+  // Create the widget.
+  void CreateWidget();
   
   vtkPVInteractorStyleCenterOfRotation *InteractorStyle;
   vtkPVRenderView *RenderView;

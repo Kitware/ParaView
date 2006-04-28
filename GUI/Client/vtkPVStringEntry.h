@@ -32,10 +32,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widgets.
-  virtual void Create();
-  
-  // Description:
   // This method allows scripts to modify the widgets value.
   void SetValue(const char* fileName);
   const char* GetValue();
@@ -97,6 +93,10 @@ public:
 protected:
   vtkPVStringEntry();
   ~vtkPVStringEntry();
+  
+  // Description:
+  // Create the widgets.
+  virtual void CreateWidget();
   
   vtkKWLabel *LabelWidget;
   vtkKWEntry *Entry;

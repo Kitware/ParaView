@@ -39,7 +39,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.63");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.64");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -138,7 +138,7 @@ void vtkPVExtentEntry::SetBalloonHelpString( const char *str )
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVExtentEntry::Create()
+void vtkPVExtentEntry::CreateWidget()
 {
   // Check if already created
 
@@ -150,7 +150,7 @@ void vtkPVExtentEntry::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // For getting the widget in a script.
 

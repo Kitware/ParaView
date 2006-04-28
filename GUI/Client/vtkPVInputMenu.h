@@ -39,10 +39,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set the label.  The label can be used to get this widget
   // from a script.
   void SetLabel (const char* label);
@@ -143,6 +139,10 @@ public:
 protected:
   vtkPVInputMenu();
   ~vtkPVInputMenu();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   int InitializeWithCurrent;
 

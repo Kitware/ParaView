@@ -46,10 +46,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Get the vtkKWWidget for the internal frame.
   vtkGetObjectMacro(LabeledFrame, vtkKWFrameWithLabel);
 
@@ -141,6 +137,10 @@ public:
 protected:
   vtkPVInteractorStyleControl();
   ~vtkPVInteractorStyleControl();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkKWFrameWithLabel *LabeledFrame;
   vtkKWFrame        *OuterFrame;

@@ -48,10 +48,6 @@ public:
   const char* GetLabel();
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // This method allows scripts to modify the widgets value.
   virtual void SetValue(const char* fileName);
   const char* GetValue();
@@ -144,6 +140,10 @@ protected:
   vtkPVFileEntry();
   ~vtkPVFileEntry();
 
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+  
   vtkKWLabel *LabelWidget;
   vtkKWPushButton *BrowseButton;
   vtkKWEntry *Entry;

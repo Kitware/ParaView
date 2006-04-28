@@ -34,10 +34,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Saves the value of this widget into a VTK Tcl script.
   // This creates the line source (one for all parts).
   virtual void SaveInBatchScript(ofstream *file);
@@ -84,6 +80,10 @@ protected:
   vtkPVLineSourceWidget();
   ~vtkPVLineSourceWidget();
   
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+
   vtkSMSourceProxy *SourceProxy;
 
   vtkPVLineSourceWidget(const vtkPVLineSourceWidget&); // Not implemented

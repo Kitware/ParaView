@@ -33,9 +33,6 @@ public:
   vtkTypeRevisionMacro(vtkPVCameraIcon, vtkKWLabel);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Create the widget.
-  virtual void Create();
-  
   // Description:
   // Set the current render view.
   virtual void SetRenderView(vtkPVRenderView*);
@@ -59,6 +56,9 @@ protected:
   vtkPVCameraIcon();
   ~vtkPVCameraIcon();
 
+  // Create the widget.
+  virtual void CreateWidget();
+  
   vtkPVRenderView* RenderView;
   vtkCamera* Camera;
   int Width;

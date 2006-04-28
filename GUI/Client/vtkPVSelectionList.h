@@ -37,10 +37,6 @@ public:
   vtkTypeRevisionMacro(vtkPVSelectionList, vtkPVObjectWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   
-  // Description:
-  // Create the widget.
-  virtual void Create();
-
   // Add items to the possible selection.
   // The string name is displayed in the list, and the integer value
   // is used to set and get the current selection programmatically.
@@ -135,9 +131,14 @@ public:
   // Description:
   // Get number of items in the selection list.
   int GetNumberOfItems();
+
 protected:
   vtkPVSelectionList();
   ~vtkPVSelectionList();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkKWLabel *Label;
   vtkKWMenuButton *Menu;

@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDummyWidget);
-vtkCxxRevisionMacro(vtkPVDummyWidget, "1.9");
+vtkCxxRevisionMacro(vtkPVDummyWidget, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVDummyWidget::vtkPVDummyWidget()
@@ -31,7 +31,7 @@ vtkPVDummyWidget::~vtkPVDummyWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDummyWidget::Create()
+void vtkPVDummyWidget::CreateWidget()
 {
   // Check if already created
 
@@ -43,7 +43,7 @@ void vtkPVDummyWidget::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 }
 
 //----------------------------------------------------------------------------

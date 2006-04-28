@@ -38,10 +38,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // Display the interactor
   void Invoke();
 
@@ -81,6 +77,10 @@ protected:
   vtkPVRenderGroupDialog();
   ~vtkPVRenderGroupDialog();
 
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+  
   // Returns 1 if first display is OK. 0 if user has modified the display.
   void Update();
   void ComputeDisplayStringRoot(const char* str);

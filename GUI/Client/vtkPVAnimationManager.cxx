@@ -67,7 +67,7 @@
 #define VTK_PV_CAMERA_PROXYNAME "_dont_validate_.ActiveCamera"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.68");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.69");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizontalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -185,7 +185,7 @@ vtkPVAnimationManager::~vtkPVAnimationManager()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationManager::Create()
+void vtkPVAnimationManager::CreateWidget()
 {
   if (!this->VerticalParent || !this->HorizontalParent)
     {
@@ -203,7 +203,7 @@ void vtkPVAnimationManager::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
   vtkPVWindow* pvWin = pvApp->GetMainWindow();

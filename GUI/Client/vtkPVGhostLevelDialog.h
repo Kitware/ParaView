@@ -36,10 +36,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // GhostLevel selected by the user. SetGhostLevel is for
   // internal use only.
   void SetGhostLevel(int level);
@@ -56,6 +52,10 @@ public:
 protected:
   vtkPVGhostLevelDialog();
   ~vtkPVGhostLevelDialog();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   int GhostLevel;
 

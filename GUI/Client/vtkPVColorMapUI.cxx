@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMapUI);
-vtkCxxRevisionMacro(vtkPVColorMapUI, "1.6");
+vtkCxxRevisionMacro(vtkPVColorMapUI, "1.7");
 
 vtkCxxSetObjectMacro(vtkPVColorMapUI, CurrentColorMap, vtkPVColorMap);
 
@@ -152,7 +152,7 @@ vtkPVColorMapUI::~vtkPVColorMapUI()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVColorMapUI::Create()
+void vtkPVColorMapUI::CreateWidget()
 {
   if (this->IsCreated())
     {
@@ -160,7 +160,7 @@ void vtkPVColorMapUI::Create()
     return;
     }
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   const char *grid_settings = "-padx 1 -pady 2";
   int index;

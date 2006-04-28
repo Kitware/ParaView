@@ -146,7 +146,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.419");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.420");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -653,7 +653,7 @@ void vtkPVRenderView::Close()
 
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::Create()
+void vtkPVRenderView::CreateWidget()
 {
   // Check if already created
 
@@ -665,7 +665,7 @@ void vtkPVRenderView::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Need to make sure it destructs right before this view does.
   // It's the whole TKRenderWidget destruction pain.

@@ -42,7 +42,7 @@ class vtkPVItemSelectionArraySet: public vtkPVItemSelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVItemSelection);
-vtkCxxRevisionMacro(vtkPVItemSelection, "1.10");
+vtkCxxRevisionMacro(vtkPVItemSelection, "1.11");
 
 //----------------------------------------------------------------------------
 vtkPVItemSelection::vtkPVItemSelection()
@@ -97,7 +97,7 @@ vtkPVItemSelection::~vtkPVItemSelection()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVItemSelection::Create()
+void vtkPVItemSelection::CreateWidget()
 {
   // Check if already created
 
@@ -109,7 +109,7 @@ void vtkPVItemSelection::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
   
   this->LabeledFrame->SetParent(this);
   this->LabeledFrame->Create();

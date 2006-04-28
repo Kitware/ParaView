@@ -43,10 +43,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget
-  virtual void Create();
-
-  // Description:
   // Callback to menu item in lookmark manager to rename a folder. Pressing 'Return' calls ChangeName
   void EditCallback();
   void ChangeName();
@@ -101,9 +97,12 @@ public:
   virtual void UpdateEnableState();
 
 protected:
-
   vtkKWLookmarkFolder();
   ~vtkKWLookmarkFolder();
+
+  // Description:
+  // Create the widget
+  virtual void CreateWidget();
 
   vtkKWFrame *MainFrame;
   vtkKWFrameWithLabel *LabelFrame;

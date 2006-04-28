@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.76");
+vtkCxxRevisionMacro(vtkPVScale, "1.77");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -166,7 +166,7 @@ void vtkPVScale::EntryCheckModifiedCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVScale::Create()
+void vtkPVScale::CreateWidget()
 {
   // Check if already created
 
@@ -178,7 +178,7 @@ void vtkPVScale::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // For getting the widget in a script.
   if (this->EntryLabel && this->EntryLabel[0] &&

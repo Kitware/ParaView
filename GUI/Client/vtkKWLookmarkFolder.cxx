@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.35");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.36");
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::vtkKWLookmarkFolder()
@@ -95,7 +95,7 @@ void vtkKWLookmarkFolder::RemoveFolder()
 
 
 //----------------------------------------------------------------------------
-void vtkKWLookmarkFolder::Create()
+void vtkKWLookmarkFolder::CreateWidget()
 {
   // Check if already created
   if (this->IsCreated())
@@ -105,7 +105,7 @@ void vtkKWLookmarkFolder::Create()
     }
 
   // Call the superclass to create the whole widget
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->MainFrame->SetParent(this);
   this->MainFrame->Create();

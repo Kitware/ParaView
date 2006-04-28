@@ -42,10 +42,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set active PVAnimationCue.
   // The interface shows the details about the active PVAnimationCue.
   void SetAnimationCue(vtkPVAnimationCue*);
@@ -100,9 +96,14 @@ public:
   // cacheing flag on Animation Scene to 0.
   void EnableCacheCheck();
   void DisableCacheCheck();
+
 protected:
   vtkPVVerticalAnimationInterface();
   ~vtkPVVerticalAnimationInterface();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkPVAnimationManager* AnimationManager;
   vtkPVTrackEditor* TrackEditor;

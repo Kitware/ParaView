@@ -31,7 +31,7 @@
 #include "vtkSMObject.h"
 #include "vtkSMProxyManager.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.29");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.30");
 vtkCxxSetObjectMacro(vtkPVKeyFrame, AnimationScene, vtkPVAnimationScene);
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
@@ -123,7 +123,7 @@ void vtkPVKeyFrame::DetermineKeyFrameProxyName()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVKeyFrame::Create()
+void vtkPVKeyFrame::CreateWidget()
 {
   if (!this->KeyFrameProxyXMLName)
     {
@@ -147,7 +147,7 @@ void vtkPVKeyFrame::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
   this->ChildCreate();
 
   if (!this->KeyFrameProxy)

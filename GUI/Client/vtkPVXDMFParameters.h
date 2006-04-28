@@ -32,10 +32,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   virtual void Accept();
   
   // Description:
@@ -107,6 +103,9 @@ protected:
   vtkPVXDMFParameters();
   ~vtkPVXDMFParameters();
   
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkPVXDMFParametersInternals* Internals;
   vtkKWFrameWithLabel* Frame;

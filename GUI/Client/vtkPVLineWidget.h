@@ -37,11 +37,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  // Overridden to set up control dependencies among properties.
-  virtual void Create();
-
-  // Description:
   // Callbacks to set the points of the 3D widget from the
   // entry values. Bound to <KeyPress-Return>.
   void SetPoint1();
@@ -146,6 +141,10 @@ protected:
   vtkPVLineWidget();
   ~vtkPVLineWidget();
   
+  // Description:
+  // Create the widget.
+  // Overridden to set up control dependencies among properties.
+  virtual void CreateWidget();
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,

@@ -64,11 +64,6 @@ public:
   vtkTypeRevisionMacro(vtkPVBasicDSPFilterWidget, vtkPVWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Set up the UI for this source
-  void Create();
-
-
   void ChangeDSPFilterMode(const char* newMode);
   void ChangeCutoffFreq(const char* newMode);
   void ChangeInputVar(const char* newMode);
@@ -163,7 +158,9 @@ public:
 
 protected:
 
-
+  // Description:
+  // Set up the UI for this source
+  void CreateWidget();
 
   //I would have liked to use vectors, but there was an odd compiler error
   //It turns out that using SAF_EXECUTABLE_SRCS instead of SAF_SRCS in

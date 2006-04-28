@@ -33,10 +33,10 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.28");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.29");
 
 //----------------------------------------------------------------------------
-void vtkPVConnectDialog::Create()
+void vtkPVConnectDialog::CreateWidget()
 {
   if (this->IsCreated())
     {
@@ -49,7 +49,7 @@ void vtkPVConnectDialog::Create()
     vtkKWMessageDialog::WarningIcon );
   this->SetStyleToOkCancel();
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   char buffer[1024];
   sprintf(buffer, 

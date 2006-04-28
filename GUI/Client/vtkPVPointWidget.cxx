@@ -34,7 +34,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.62");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.63");
 
 //----------------------------------------------------------------------------
 vtkPVPointWidget::vtkPVPointWidget()
@@ -201,9 +201,9 @@ void vtkPVPointWidget::Trace(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPointWidget::Create()
+void vtkPVPointWidget::CreateWidget()
 {
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
   // Set up controller properties. Controller properties are set so 
   // that in the SM State, we can have a mapping from the widget to the 
   // controlled implicit function.

@@ -33,10 +33,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // This calculates new bounds to display (using the input menu).
   virtual void Update();
 
@@ -96,6 +92,10 @@ public:
 protected:
   vtkPVBoundsDisplay();
   ~vtkPVBoundsDisplay();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   int ShowHideFrame;
   vtkKWBoundsDisplay *Widget;

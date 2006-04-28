@@ -43,7 +43,7 @@ public:
 };
 
 vtkStandardNewMacro(vtkPVActiveTrackSelector);
-vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.15");
+vtkCxxRevisionMacro(vtkPVActiveTrackSelector, "1.16");
 //-----------------------------------------------------------------------------
 vtkPVActiveTrackSelector::vtkPVActiveTrackSelector()
 {
@@ -69,7 +69,7 @@ vtkPVActiveTrackSelector::~vtkPVActiveTrackSelector()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVActiveTrackSelector::Create()
+void vtkPVActiveTrackSelector::CreateWidget()
 {
   // Check if already created
 
@@ -81,7 +81,7 @@ void vtkPVActiveTrackSelector::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
   
   this->SourceLabel->SetParent(this);
   this->SourceLabel->SetText("Source:");

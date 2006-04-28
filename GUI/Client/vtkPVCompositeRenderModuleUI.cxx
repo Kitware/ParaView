@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.37");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.38");
 
 //----------------------------------------------------------------------------
 vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
@@ -156,14 +156,14 @@ vtkPVCompositeRenderModuleUI::~vtkPVCompositeRenderModuleUI()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCompositeRenderModuleUI::Create()
+void vtkPVCompositeRenderModuleUI::CreateWidget()
 {
   if (this->IsCreated())
     {
     vtkErrorMacro("RenderModuleUI already created");
     return;
     }
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   vtkPVApplication *pvapp = 
     vtkPVApplication::SafeDownCast(this->GetApplication());

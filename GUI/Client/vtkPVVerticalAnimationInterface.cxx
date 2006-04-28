@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.27");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.28");
 
 #define VTK_PV_RAMP_INDEX 1
 #define VTK_PV_RAMP_LABEL "Ramp"
@@ -110,7 +110,7 @@ void vtkPVVerticalAnimationInterface::SetAnimationCue(vtkPVAnimationCue* cue)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVVerticalAnimationInterface::Create()
+void vtkPVVerticalAnimationInterface::CreateWidget()
 {
   if (!this->AnimationManager)
     {
@@ -128,7 +128,7 @@ void vtkPVVerticalAnimationInterface::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->TopFrame->SetParent(this);
   this->TopFrame->Create();

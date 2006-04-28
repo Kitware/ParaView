@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractDataSetsWidget);
-vtkCxxRevisionMacro(vtkPVExtractDataSetsWidget, "1.10");
+vtkCxxRevisionMacro(vtkPVExtractDataSetsWidget, "1.11");
 
 struct vtkPVExtractDataSetsWidgetInternals
 {
@@ -71,7 +71,7 @@ vtkPVExtractDataSetsWidget::~vtkPVExtractDataSetsWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVExtractDataSetsWidget::Create()
+void vtkPVExtractDataSetsWidget::CreateWidget()
 {
   // Check if already created
 
@@ -83,7 +83,7 @@ void vtkPVExtractDataSetsWidget::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->ButtonFrame->SetParent(this);
   this->ButtonFrame->Create();

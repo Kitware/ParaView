@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVRenderGroupDialog );
-vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.12");
+vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVRenderGroupDialog::vtkPVRenderGroupDialog()
@@ -127,11 +127,11 @@ void vtkPVRenderGroupDialog::SetMasterWindow(vtkKWWindow* win)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderGroupDialog::Create()
+void vtkPVRenderGroupDialog::CreateWidget()
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->vtkKWWidget::CreateWidget(app, "toplevel"))
+  if (!this->vtkKWWidget::CreateWidgetWidget(app, "toplevel"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

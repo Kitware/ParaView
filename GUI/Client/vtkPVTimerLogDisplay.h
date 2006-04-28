@@ -41,10 +41,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // Display the toplevel.
   virtual void Display();
 
@@ -98,6 +94,10 @@ protected:
   vtkPVTimerLogDisplay();
   ~vtkPVTimerLogDisplay();
 
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+  
   void DisplayLog();
 
   void Append(const char*);

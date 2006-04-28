@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.42");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.43");
 
 //----------------------------------------------------------------------------
 vtkPVTimerLogDisplay::vtkPVTimerLogDisplay()
@@ -105,7 +105,7 @@ vtkPVTimerLogDisplay::~vtkPVTimerLogDisplay()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVTimerLogDisplay::Create()
+void vtkPVTimerLogDisplay::CreateWidget()
 {
   // Check if already created
 
@@ -117,7 +117,7 @@ void vtkPVTimerLogDisplay::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->ButtonFrame->SetParent(this);
   this->ButtonFrame->Create();

@@ -31,10 +31,6 @@ public:
   void PrintSelf(ostream &os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // Allow scripts to set/get the widget's value.
   void SetValue(float val);
   float GetValue();
@@ -97,6 +93,10 @@ protected:
   vtkPVThumbWheel();
   ~vtkPVThumbWheel();
 
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+  
   vtkKWLabel *Label;
   vtkKWThumbWheel *ThumbWheel;
   

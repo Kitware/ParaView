@@ -46,9 +46,6 @@ public:
   vtkTypeRevisionMacro(vtkPVConnectDialog, vtkKWMessageDialog);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Create the widget.
-  void Create();
-
   void OK();
   void SetHostname(const char* hn);
   const char* GetHostName();
@@ -70,6 +67,9 @@ public:
 protected:
   vtkPVConnectDialog();
   ~vtkPVConnectDialog();
+
+  // Create the widget.
+  void CreateWidget();
 
   vtkKWEntry* Username;
   vtkKWComboBoxWithLabel* Hostname;

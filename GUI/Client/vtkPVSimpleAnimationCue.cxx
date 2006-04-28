@@ -47,7 +47,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVSimpleAnimationCue);
-vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.21");
+vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.22");
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameManipulatorProxy, 
   vtkSMKeyFrameAnimationCueManipulatorProxy);
@@ -192,7 +192,7 @@ void vtkPVSimpleAnimationCue::Observe(vtkObject* toObserve, unsigned long event)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSimpleAnimationCue::Create()
+void vtkPVSimpleAnimationCue::CreateWidget()
 {
   if (!this->KeyFrameParent)
     {
@@ -209,7 +209,7 @@ void vtkPVSimpleAnimationCue::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->CreateProxy();
 }

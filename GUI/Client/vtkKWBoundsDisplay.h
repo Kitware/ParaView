@@ -33,10 +33,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget
-  virtual void Create();
-
-  // Description:
   // Set the bounds to display.
   void SetBounds(double bounds[6]);
   void SetExtent(int ext[6]); 
@@ -62,6 +58,10 @@ public:
 protected:
   vtkKWBoundsDisplay();
   ~vtkKWBoundsDisplay();
+
+  // Description:
+  // Create the widget
+  virtual void CreateWidget();
 
   void UpdateWidgets();
 
