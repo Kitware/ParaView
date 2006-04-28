@@ -51,8 +51,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 
 
-pqPipelineBrowser::pqPipelineBrowser(QWidget *parentWidget)
-  : QWidget(parentWidget)
+pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
+  : QWidget(widgetParent)
 {
   this->ListModel = 0;
   this->TreeView = 0;

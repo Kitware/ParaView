@@ -426,34 +426,34 @@ void pqPipelineData::removeAndUnregisterDisplay(vtkSMDisplayProxy *display,
   vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
   if(display)
     {
-    vtkSMProxyProperty *property = vtkSMProxyProperty::SafeDownCast(
+    vtkSMProxyProperty *prop = vtkSMProxyProperty::SafeDownCast(
         display->GetProperty("Input"));
-    if(property && property->GetNumberOfProxies())
+    if(prop && prop->GetNumberOfProxies())
       {
       // TODO: How to get the compound proxy from the input proxy.
-      vtkSMProxy *proxy = property->GetProxy(0);
+      vtkSMProxy *proxy = prop->GetProxy(0);
       emit this->removingDisplay(display, proxy);
 
       // Remove the input from the display.
-      property->RemoveProxy(proxy);
+      prop->RemoveProxy(proxy);
       }
 
     // Remove the display proxy from the render module.
     if(module)
       {
-      property = vtkSMProxyProperty::SafeDownCast(module->GetProperty(
+      prop = vtkSMProxyProperty::SafeDownCast(module->GetProperty(
           "Displays"));
-      property->RemoveProxy(display);
+      prop->RemoveProxy(display);
       module->UpdateVTKObjects();
       }
 
     // Clean up the lookup table for the display proxy.
-    property = vtkSMProxyProperty::SafeDownCast(display->GetProperty(
+    prop = vtkSMProxyProperty::SafeDownCast(display->GetProperty(
         "LookupTable"));
-    if(property && property->GetNumberOfProxies())
+    if(prop && prop->GetNumberOfProxies())
       {
       vtkSMLookupTableProxy *lookup = vtkSMLookupTableProxy::SafeDownCast(
-          property->GetProxy(0));
+          prop->GetProxy(0));
       proxyManager->UnRegisterProxy("lookup_tables",
           proxyManager->GetProxyName("lookup_tables", lookup));
       }
@@ -737,12 +737,12 @@ void pqPipelineData::proxyRegistered(vtkObject*, unsigned long, void*,
       // Get the display proxy's input. If the input doesn't exist
       // yet, put the information on a list to be added to the
       // pipeline object later.
-      vtkSMProxyProperty *property = vtkSMProxyProperty::SafeDownCast(
+      vtkSMProxyProperty *prop = vtkSMProxyProperty::SafeDownCast(
           display->GetProperty("Input"));
-      if(property && property->GetNumberOfProxies() > 0)
+      if(prop && prop->GetNumberOfProxies() > 0)
         {
         emit this->displayCreated(display, info->ProxyName,
-            property->GetProxy(0), module);
+            prop->GetProxy(0), module);
         }
       else
         {
@@ -752,19 +752,19 @@ void pqPipelineData::proxyRegistered(vtkObject*, unsigned long, void*,
     }
 }
 
-void pqPipelineData::inputChanged(vtkObject* object, unsigned long e,
-    void* clientData, void* callData, vtkCommand*)
+void pqPipelineData::inputChanged(vtkObject* /*object*/, unsigned long /*e*/,
+    void* /*clientData*/, void* /*callData*/, vtkCommand*)
 {
   // Get the property name from the callData and the sink proxy
   // from the clientData.
-  const char *name = reinterpret_cast<const char *>(callData);
+  /*const char *name = reinterpret_cast<const char *>(callData);
   vtkSMProxy *sink = reinterpret_cast<vtkSMProxy *>(clientData);
   vtkSMProxyProperty *prop = vtkSMProxyProperty::SafeDownCast(object);
 
   // TODO: The connection may be needed when the pipeline can
   // be modified outside of ParaQ. For now, it is only needed
   // when restoring a session.
-  /*this->VTKConnect->Disconnect(object, e, this);
+  this->VTKConnect->Disconnect(object, e, this);
   if(prop && prop->GetNumberOfProxies() && sink && name &&
       strcmp(name, "Input") == 0)
     {

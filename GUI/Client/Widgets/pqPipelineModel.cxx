@@ -466,11 +466,11 @@ int pqPipelineModel::getServerCount() const
   return 0;
 }
 
-pqPipelineServer *pqPipelineModel::getServer(int index) const
+pqPipelineServer *pqPipelineModel::getServer(int idx) const
 {
-  if(this->Internal && index >= 0 && index < this->Internal->size())
+  if(this->Internal && idx >= 0 && idx < this->Internal->size())
     {
-    return (*this->Internal)[index];
+    return (*this->Internal)[idx];
     }
 
   return 0;
@@ -816,7 +816,7 @@ void pqPipelineModel::removeObject(pqPipelineSource *source)
     {
     parentIndex = this->createIndex(this->getServerIndexFor(server), 0,
         server);
-    int row = server->GetSourceCount();
+    row = server->GetSourceCount();
     this->beginInsertRows(parentIndex, row, row + orphans.size() - 1);
     QList<pqPipelineFilter *>::Iterator iter = orphans.begin();
     for( ; iter != orphans.end(); ++iter)
