@@ -15,13 +15,14 @@
 
 #include "vtkKWApplication.h"
 #include "vtkKWOptions.h"
+#include "vtkKWFrame.h"
 #include "vtkObjectFactory.h"
 
 #include "Utilities/BWidgets/vtkKWBWidgetsInit.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithScrollbar );
-vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.13");
+vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.14");
 
 //----------------------------------------------------------------------------
 vtkKWFrameWithScrollbar::vtkKWFrameWithScrollbar()
@@ -77,7 +78,7 @@ void vtkKWFrameWithScrollbar::CreateWidget()
 
   // The internal frame is a frame we set the widget name explicitly
 
-  this->Frame = vtkKWCoreWidget::New();
+  this->Frame = vtkKWFrame::New();
   this->Frame->SetParent(this->ScrollableFrame);
   this->Frame->SetWidgetName(
     this->Script("%s getframe", this->ScrollableFrame->GetWidgetName()));

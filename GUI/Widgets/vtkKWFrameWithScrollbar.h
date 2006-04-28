@@ -21,6 +21,8 @@
 
 #include "vtkKWCoreWidget.h"
 
+class vtkKWFrame;
+
 class KWWidgets_EXPORT vtkKWFrameWithScrollbar : public vtkKWCoreWidget
 {
 public:
@@ -29,8 +31,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Get the internal widget (technically a Tk frame).
-  vtkGetObjectMacro(Frame, vtkKWWidget);
+  // Get the internal widget.
+  vtkGetObjectMacro(Frame, vtkKWFrame);
 
   // Description:
   // Set/Get the background color of the widget.
@@ -85,14 +87,13 @@ protected:
   // Create the widget.
   virtual void CreateWidget();
 
-  vtkKWCoreWidget *Frame;
+  vtkKWFrame *Frame;
   vtkKWCoreWidget *ScrollableFrame;
 
 private:
   vtkKWFrameWithScrollbar(const vtkKWFrameWithScrollbar&); // Not implemented
   void operator=(const vtkKWFrameWithScrollbar&); // Not implemented
 };
-
 
 #endif
 
