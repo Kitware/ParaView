@@ -13,14 +13,20 @@
 =========================================================================*/
 // .NAME vtkKWTheme - a theme superclass
 // .SECTION Description
-// This class provides very simple/basic theming capabilities. 
-// It is under development right now.
+// This class provides very simple/basic theming capabilities; it can be
+// used to setup an application-wide "theme" or "brand" by overriding the
+// default look&feel of the KWWidgets objects.
+// It mainly revolves around adding entries to the application's option
+// database (vtkKWOptionDataBase).
+// Check the Examples/Cxx/Theme for more details.
 // .SECTION Thanks
 // This work is part of the National Alliance for Medical Image
 // Computing (NAMIC), funded by the National Institutes of Health
 // through the NIH Roadmap for Medical Research, Grant U54 EB005149.
 // Information on the National Centers for Biomedical Computing
 // can be obtained from http://nihroadmap.nih.gov/bioinformatics.
+// .SECTION See Also
+// vtkKWOptionDataBase
 
 #ifndef __vtkKWTheme_h
 #define __vtkKWTheme_h

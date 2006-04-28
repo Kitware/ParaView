@@ -13,15 +13,57 @@
 =========================================================================*/
 // .NAME vtkKWOptionDataBase - an option database
 // .SECTION Description
-// This class provides a way to specify options that will be applied
-// automatically to widgets when they are created.
-// It is under development right now.
+// This class can be used to store entries specifying how to automatically
+// override the default settings/look&feel of any vtkKWWidget subclass at
+// run-time. 
+//
+// For example, you may want all your vtkKWPushButton objects to use a blue
+// background by default; this can be done by adding the following entry
+// to the application's option database at startup:
+//   myapplication->GetOptionDataBase()->AddEntry(
+//      "vtkKWPushButton", "SetBackgroundColor", "0.2 0.2 0.8");
+// From then on, anytime a vtkKWPushButton is created (using Create()), its 
+// look&feel is configured and overriden automatically given the entries in
+// the database (here, its BackgroundColor is set to a blue-ish color). 
+//
+// Collections of entries can be grouped inside a *theme*, subclass of
+// vtkKWTheme. Check the Examples/Cxx/Theme for more details.
+// Each vtkKWApplication object has a unique instance of a vtkKWOptionDataBase.
+//
+// Note that each entry is added as a pattern, a command, and a value:
+//
+// - the value can be empty if the command does not support any parameter, say:
+//     AddEntry("vtkKWPushButton", "SetReliefToGroove", NULL)
+//
+// - the pattern can specify a constraint on the object context, i.e. require
+//   that the command/value should only be applied if the object is of a 
+//   specific class *and* has specific parents; this provides a way to 
+//   configure widgets only when they are found inside other widgets:
+//     AddEntry("vtkKWMessageDialog*vtkKWPushButton", "SetReliefToGroove",NULL)
+//   => this entry will configure all vtkKWPushButton objects only if
+//   they are found to be a child *or* a sub-child of a vtkKWMessageDialog.
+//     AddEntry("vtkKWFrame.vtkKWPushButton", "SetReliefToGroove",NULL)
+//   => this entry will configure all vtkKWPushButton objects only if
+//   they are found to be an *immediate* child of a vtkKWFrame.
+//   Of course, combinations can be used, say:
+//     AddEntry("vtkKWMessageDialog*vtkKWFrame.vtkKWPushButton", ...
+//
+// - the pattern can specify a unique (terminal) slot suffix, that will be
+//   used to configure a sub-object instead of the object itself. The 
+//   sub-object is retrieved by calling Get'slot name' on the object.
+//     AddEntry("vtkKWFrameWithLabel:CollapsibleFrame", "SetReliefToSolid", 0);
+//   => this entry will configure the sub-object retrieved by calling
+//   GetCollapsibleFrame on any vtkKWFrameWithLabel object, not the object
+//   itself. This can be useful to customize specific part of a mega-widget.
+//
 // .SECTION Thanks
 // This work is part of the National Alliance for Medical Image
 // Computing (NAMIC), funded by the National Institutes of Health
 // through the NIH Roadmap for Medical Research, Grant U54 EB005149.
 // Information on the National Centers for Biomedical Computing
 // can be obtained from http://nihroadmap.nih.gov/bioinformatics.
+// .SECTION See Also
+// vtkKWTheme
 
 #ifndef __vtkKWOptionDataBase_h
 #define __vtkKWOptionDataBase_h
