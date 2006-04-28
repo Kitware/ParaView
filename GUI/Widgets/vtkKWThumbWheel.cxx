@@ -36,7 +36,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.50");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.51");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -159,7 +159,7 @@ vtkKWThumbWheel::~vtkKWThumbWheel()
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWThumbWheel::Create()
+void vtkKWThumbWheel::CreateWidget()
 {
   // Check if already created
 
@@ -171,7 +171,7 @@ void vtkKWThumbWheel::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // If we need the scale to popup, create the top level window accordingly
   // and its push button
@@ -217,10 +217,6 @@ void vtkKWThumbWheel::Create()
   this->UpdateThumbWheelImage();
   this->Bind();
   this->PackWidget();
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 // ---------------------------------------------------------------------------

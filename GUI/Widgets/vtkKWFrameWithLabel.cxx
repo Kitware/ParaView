@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithLabel );
-vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.8");
+vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.9");
 
 int vtkKWFrameWithLabel::DefaultLabelCase = vtkKWFrameWithLabel::LabelCaseUppercaseFirst;
 int vtkKWFrameWithLabel::DefaultLabelFontWeight = vtkKWFrameWithLabel::LabelFontWeightBold;
@@ -95,7 +95,7 @@ vtkKWFrameWithLabel::~vtkKWFrameWithLabel()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWFrameWithLabel::Create()
+void vtkKWFrameWithLabel::CreateWidget()
 {
   // Check if already created
 
@@ -107,7 +107,7 @@ void vtkKWFrameWithLabel::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->ExternalMarginFrame->SetParent(this);
   this->ExternalMarginFrame->Create();
@@ -202,10 +202,6 @@ void vtkKWFrameWithLabel::Create()
   callback += this->GetTclName();
   callback += " AdjustMarginCallback}";
   this->LabelFrame->SetBinding("<Configure>", NULL, callback.c_str());
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

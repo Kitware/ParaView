@@ -53,7 +53,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.41");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.42");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -255,7 +255,7 @@ vtkKWVolumePropertyWidget::~vtkKWVolumePropertyWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWVolumePropertyWidget::Create()
+void vtkKWVolumePropertyWidget::CreateWidget()
 {
   // Check if already created
 
@@ -267,7 +267,7 @@ void vtkKWVolumePropertyWidget::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   ostrstream tk_cmd;
   int label_width = 12;

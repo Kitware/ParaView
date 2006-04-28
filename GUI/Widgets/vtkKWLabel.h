@@ -36,10 +36,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // Set the text on the label.
   virtual void SetText(const char*);
   vtkGetStringMacro(Text);
@@ -247,6 +243,10 @@ protected:
   vtkKWLabel();
   ~vtkKWLabel();
 
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+  
   virtual void UpdateBindings();
   virtual void UpdateText();
 

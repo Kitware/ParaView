@@ -34,10 +34,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Add a string element to the source list if it is not already there or on
   // the final list. The optional argument force will make sure the item is
   // added to the source list and removed from final if it is already there.
@@ -100,6 +96,10 @@ public:
 protected:
   vtkKWListBoxToListBoxSelectionEditor();
   ~vtkKWListBoxToListBoxSelectionEditor();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkKWListBoxWithScrollbars* SourceList;
   vtkKWListBoxWithScrollbars* FinalList;

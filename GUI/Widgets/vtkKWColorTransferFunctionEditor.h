@@ -136,10 +136,6 @@ public:
   vtkGetMacro(ValueEntriesVisibility, int);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Update the whole UI depending on the value of the Ivars
   virtual void Update();
 
@@ -171,6 +167,10 @@ public:
 protected:
   vtkKWColorTransferFunctionEditor();
   ~vtkKWColorTransferFunctionEditor();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   // Description:
   // Proxy to the function. 

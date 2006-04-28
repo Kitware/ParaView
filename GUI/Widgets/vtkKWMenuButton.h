@@ -32,10 +32,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get the current entry of this option menu.
   // This can be an image name if any entry in the menu uses an image
   // instead of a label.
@@ -240,6 +236,10 @@ public:
 protected:
   vtkKWMenuButton();
   ~vtkKWMenuButton();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkGetStringMacro(CurrentValue);
   vtkSetStringMacro(CurrentValue);

@@ -279,8 +279,7 @@ public:
 
   // Description:
   // Retrieve the splash screen object
-  // This will also call vtkKWSplashScreen::Create() to create the splash
-  // screen widget itself.
+  // This will also create the splash screen widget itself.
   virtual vtkKWSplashScreen* GetSplashScreen();
 
   // Description:

@@ -17,10 +17,10 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCompositeWidget );
-vtkCxxRevisionMacro(vtkKWCompositeWidget, "1.4");
+vtkCxxRevisionMacro(vtkKWCompositeWidget, "1.5");
 
 //----------------------------------------------------------------------------
-void vtkKWCompositeWidget::Create()
+void vtkKWCompositeWidget::CreateWidget()
 {
   // Check if already created
 
@@ -32,7 +32,7 @@ void vtkKWCompositeWidget::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 }
 
 //----------------------------------------------------------------------------

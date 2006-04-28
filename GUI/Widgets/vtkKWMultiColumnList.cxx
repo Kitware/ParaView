@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.56");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.57");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -144,7 +144,7 @@ vtkKWMultiColumnList::~vtkKWMultiColumnList()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMultiColumnList::Create()
+void vtkKWMultiColumnList::CreateWidget()
 {
   // Use Tablelist class:
   // http://www.nemethi.de/
@@ -161,7 +161,7 @@ void vtkKWMultiColumnList::Create()
   options += " -selectbackground #fbffb8";
 #endif
 
-  if (!this->Superclass::CreateSpecificTkWidget(
+  if (!vtkKWWidget::CreateSpecificTkWidget(this, 
         "tablelist::tablelist", options.c_str()))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
@@ -189,10 +189,6 @@ void vtkKWMultiColumnList::Create()
 
   this->Script("bind [%s bodytag] <<Button3>> [list %s RightClickCallback %%W %%x %%y %%X %%Y]",
                this->GetWidgetName(), this->GetTclName());
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

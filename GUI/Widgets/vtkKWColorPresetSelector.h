@@ -129,10 +129,6 @@ public:
   virtual void SetPresetNameVisibility(int);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Specifies a command to associate with the widget. This command is 
   // invoked when a preset is selected.
   // The 'object' argument is the object that will have the method called on
@@ -150,6 +146,10 @@ public:
 protected:
   vtkKWColorPresetSelector();
   ~vtkKWColorPresetSelector();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   double ScalarRange[2];
   vtkColorTransferFunction *ColorTransferFunction;

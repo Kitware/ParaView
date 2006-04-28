@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.38");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.39");
 
 //----------------------------------------------------------------------------
 vtkKWMenuButton::vtkKWMenuButton()
@@ -46,11 +46,11 @@ vtkKWMenuButton::~vtkKWMenuButton()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenuButton::Create()
+void vtkKWMenuButton::CreateWidget()
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::CreateSpecificTkWidget(
+  if (!vtkKWWidget::CreateSpecificTkWidget(this, 
         "menubutton", "-indicatoron 1 -relief raised -bd 2 -highlightthickness 0 -anchor center -direction flush"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
@@ -68,10 +68,6 @@ void vtkKWMenuButton::Create()
                this->GetTclName(), this->GetTclName());
 
   this->AddCallbackCommandObservers();
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

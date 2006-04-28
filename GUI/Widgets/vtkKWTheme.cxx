@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTheme);
-vtkCxxRevisionMacro(vtkKWTheme, "1.4");
+vtkCxxRevisionMacro(vtkKWTheme, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWTheme::vtkKWTheme()
@@ -68,42 +68,6 @@ void vtkKWTheme::Install()
 void vtkKWTheme::Uninstall()
 {
   this->RestorePreviousOptionDataBase();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWTheme::SetBackgroundColorOptions(double r, double g, double b)
-{
-  if (!this->GetApplication())
-    {
-    return;
-    }
-
-  vtkKWOptionDataBase *odb = this->GetApplication()->GetOptionDataBase();
-
-  double bgcolor[3];
-  bgcolor[0] = r;
-  bgcolor[1] = g;
-  bgcolor[2] = b;
-
-  odb->AddEntryAsDouble3("*", "SetBackgroundColor", bgcolor);
-  odb->AddEntryAsDouble3("*", "SetActiveBackgroundColor", bgcolor);
-
-  odb->AddEntryAsDouble3(
-    "vtkKWEntry", "SetDisabledBackgroundColor", bgcolor);
-  odb->AddEntryAsDouble3(
-    "vtkKWEntry", "SetReadOnlyBackgroundColor", bgcolor);
-  odb->AddEntryAsDouble3(
-    "vtkKWSpinBox", "SetDisabledBackgroundColor", bgcolor);
-  odb->AddEntryAsDouble3(
-    "vtkKWSpinBox", "SetReadOnlyBackgroundColor", bgcolor);
-  odb->AddEntryAsDouble3(
-    "vtkKWSpinBox", "SetButtonBackgroundColor", bgcolor);
-  odb->AddEntryAsDouble3(
-    "vtkKWScale", "SetTroughColor", bgcolor);
-  odb->AddEntryAsDouble3(
-    "vtkKWScrollbar", "SetTroughColor", bgcolor);
-  odb->AddEntryAsDouble3(
-    "vtkKWMultiColumnList", "SetColumnLabelBackgroundColor", bgcolor);
 }
 
 //----------------------------------------------------------------------------

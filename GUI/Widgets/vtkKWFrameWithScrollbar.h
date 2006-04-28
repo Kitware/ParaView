@@ -29,10 +29,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Get the internal widget (technically a Tk frame).
   vtkGetObjectMacro(Frame, vtkKWWidget);
 
@@ -84,6 +80,10 @@ public:
 protected:
   vtkKWFrameWithScrollbar();
   ~vtkKWFrameWithScrollbar();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkKWCoreWidget *Frame;
   vtkKWCoreWidget *ScrollableFrame;

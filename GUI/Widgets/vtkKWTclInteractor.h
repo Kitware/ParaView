@@ -34,10 +34,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // Append text to the display window. Can be used for sending
   // debugging information to the command prompt when no standard
   // output is available.
@@ -62,6 +58,10 @@ protected:
   vtkKWTclInteractor();
   ~vtkKWTclInteractor();
 
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+  
   vtkKWFrame      *ButtonFrame;
   vtkKWPushButton *DismissButton;
   vtkKWFrame      *CommandFrame;

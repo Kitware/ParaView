@@ -60,10 +60,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Return 1 if there is a function associated to the editor.
   // It is used, among *other* things, to disable the UI automatically if
   // there is nothing to edit at the moment.
@@ -219,6 +215,13 @@ public:
   virtual int FunctionPointCanBeMovedToParameter(int id, double parameter) = 0;
 
 protected:
+  vtkKWParameterValueFunctionInterface() {};
+  ~vtkKWParameterValueFunctionInterface() {};
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+
   // Description:
   // Return 1 if the function line joining point 'id1' and point 'id2'
   // needs to be sampled at regular interval (instead of a straight line). 
@@ -230,9 +233,6 @@ protected:
   // interpolant, some cases may end up requiring just a straight line,
   // which can be drawn much more efficiently.
   virtual int FunctionLineIsSampledBetweenPoints(int id1, int id2);
-
-  vtkKWParameterValueFunctionInterface() {};
-  ~vtkKWParameterValueFunctionInterface() {};
 
 private:
   vtkKWParameterValueFunctionInterface(const vtkKWParameterValueFunctionInterface&); // Not implemented

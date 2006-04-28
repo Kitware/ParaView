@@ -27,7 +27,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.45");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.46");
 
 //----------------------------------------------------------------------------
 vtkKWTclInteractor::vtkKWTclInteractor()
@@ -67,7 +67,7 @@ vtkKWTclInteractor::~vtkKWTclInteractor()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTclInteractor::Create()
+void vtkKWTclInteractor::CreateWidget()
 {
   // Check if already created
 
@@ -79,7 +79,7 @@ void vtkKWTclInteractor::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->ButtonFrame->SetParent(this);
   this->ButtonFrame->Create();

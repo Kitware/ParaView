@@ -31,10 +31,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Get the internal objects
   vtkGetObjectMacro(CheckButton, vtkKWCheckButton);
   vtkGetObjectMacro(ChangeColorButton, vtkKWChangeColorButton);
@@ -67,6 +63,10 @@ public:
 protected:
   vtkKWCheckButtonWithChangeColorButton();
   ~vtkKWCheckButtonWithChangeColorButton();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkKWCheckButton       *CheckButton;
   vtkKWChangeColorButton *ChangeColorButton;

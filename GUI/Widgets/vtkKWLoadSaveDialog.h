@@ -29,10 +29,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Invoke the dialog, display it and enter an event loop until the user
   // confirm (OK) or cancel the dialog.
   // Note that a dialog is a modal toplevel by default.
@@ -116,6 +112,10 @@ public:
 protected:
   vtkKWLoadSaveDialog();
   ~vtkKWLoadSaveDialog();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   // Description:
   // Reset the internal file list

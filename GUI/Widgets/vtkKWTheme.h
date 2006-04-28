@@ -44,13 +44,6 @@ public:
   virtual void Install();
   virtual void Uninstall();
 
-  // Description:
-  // Convenience method to set all the background color options to a 
-  // specific color.
-  virtual void SetBackgroundColorOptions(double r, double g, double b);
-  virtual void SetBackgroundColorOptions(double rgb[3])
-    { this->SetBackgroundColorOptions(rgb[0], rgb[1], rgb[2]); };
-
 protected:
   vtkKWTheme();
   ~vtkKWTheme();

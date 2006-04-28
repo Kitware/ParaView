@@ -33,10 +33,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Automatically disable the popup button when the checkbutton is not 
   // checked.
   virtual void SetDisablePopupButtonWhenNotChecked(int);
@@ -67,6 +63,10 @@ public:
 protected:
   vtkKWCheckButtonWithPopupFrame();
   ~vtkKWCheckButtonWithPopupFrame();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   // GUI
 

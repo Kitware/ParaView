@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.15");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.16");
 
 //----------------------------------------------------------------------------
 vtkKWHeaderAnnotationEditor::vtkKWHeaderAnnotationEditor()
@@ -101,7 +101,7 @@ void vtkKWHeaderAnnotationEditor::SetRenderWidget(vtkKWRenderWidget *_arg)
 } 
 
 //----------------------------------------------------------------------------
-void vtkKWHeaderAnnotationEditor::Create()
+void vtkKWHeaderAnnotationEditor::CreateWidget()
 {
   // Create the superclass widgets
 
@@ -111,7 +111,7 @@ void vtkKWHeaderAnnotationEditor::Create()
     return;
     }
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   int popup_text_property = 
     this->PopupTextProperty && !this->PopupMode;

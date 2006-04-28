@@ -37,10 +37,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get the current color (RGB space)
   virtual void SetColor(double c[3]) {this->SetColor(c[0], c[1], c[2]);};
   virtual void SetColor(double r, double g, double b);
@@ -89,6 +85,10 @@ public:
 protected:
   vtkKWChangeColorButton();
   ~vtkKWChangeColorButton();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkKWLabel  *ColorButton;
   vtkKWFrame  *ButtonFrame;

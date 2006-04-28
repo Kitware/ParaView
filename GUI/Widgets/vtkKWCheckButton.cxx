@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.54");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.55");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -163,11 +163,11 @@ void vtkKWCheckButton::ToggleSelectedState()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButton::Create()
+void vtkKWCheckButton::CreateWidget()
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::CreateSpecificTkWidget(
+  if (!vtkKWWidget::CreateSpecificTkWidget(this, 
         "checkbutton", "-highlightthickness 0"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
@@ -175,10 +175,6 @@ void vtkKWCheckButton::Create()
     }
 
   this->Configure();
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

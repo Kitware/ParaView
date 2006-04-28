@@ -39,10 +39,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // Set/Get title
   virtual void SetTitle(const char *title);
   virtual const char* GetTitle();
@@ -280,6 +276,10 @@ public:
 protected:
   vtkKWSelectionFrame();
   ~vtkKWSelectionFrame();
+  
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
   
   vtkKWFrame      *OuterSelectionFrame;
   vtkKWFrame      *TitleBarFrame;

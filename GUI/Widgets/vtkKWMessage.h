@@ -43,10 +43,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // Set the text on the message.
   virtual void SetText(const char*);
   vtkGetStringMacro(Text);
@@ -189,6 +185,10 @@ protected:
   vtkKWMessage();
   ~vtkKWMessage();
 
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+  
   virtual void UpdateText();
 
 private:

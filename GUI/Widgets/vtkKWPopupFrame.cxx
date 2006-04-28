@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPopupFrame );
-vtkCxxRevisionMacro(vtkKWPopupFrame, "1.13");
+vtkCxxRevisionMacro(vtkKWPopupFrame, "1.14");
 
 //----------------------------------------------------------------------------
 vtkKWPopupFrame::vtkKWPopupFrame()
@@ -52,7 +52,7 @@ vtkKWPopupFrame::~vtkKWPopupFrame()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPopupFrame::Create()
+void vtkKWPopupFrame::CreateWidget()
 {
   // Check if already created
 
@@ -64,7 +64,7 @@ void vtkKWPopupFrame::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // --------------------------------------------------------------
   // If in popup mode, create the popup button

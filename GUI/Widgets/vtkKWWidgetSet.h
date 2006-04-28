@@ -36,10 +36,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Get the number of vtkKWWidget in the set.
   virtual int GetNumberOfWidgets();
 
@@ -121,6 +117,10 @@ public:
 protected:
   vtkKWWidgetSet();
   ~vtkKWWidgetSet();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   int PackHorizontally;
   int MaximumNumberOfWidgetsInPackingDirection;

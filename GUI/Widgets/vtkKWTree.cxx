@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.20");
+vtkCxxRevisionMacro(vtkKWTree, "1.21");
 
 //----------------------------------------------------------------------------
 class vtkKWTreeInternals
@@ -85,7 +85,7 @@ vtkKWTree::~vtkKWTree()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTree::Create()
+void vtkKWTree::CreateWidget()
 {
   // Use BWidget's Tree class:
   // http://aspn.activestate.com/ASPN/docs/ActiveTcl/bwidget/contents.html
@@ -95,7 +95,7 @@ void vtkKWTree::Create()
 
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::CreateSpecificTkWidget(
+  if (!vtkKWWidget::CreateSpecificTkWidget(this, 
         "Tree", "-relief flat -bd 0 -highlightthickness 0 -padx 2"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
@@ -103,10 +103,6 @@ void vtkKWTree::Create()
     }
 
   this->SetBinding("<<TreeSelect>>", this, "SelectionCallback");
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

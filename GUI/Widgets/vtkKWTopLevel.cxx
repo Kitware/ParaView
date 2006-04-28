@@ -23,7 +23,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.27");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.28");
 
 //----------------------------------------------------------------------------
 vtkKWTopLevel::vtkKWTopLevel()
@@ -65,7 +65,7 @@ vtkKWApplication* vtkKWTopLevel::GetApplication()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTopLevel::Create()
+void vtkKWTopLevel::CreateWidget()
 {
   vtksys_stl::string opts;
 
@@ -90,7 +90,7 @@ void vtkKWTopLevel::Create()
 
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget("toplevel", opts.c_str()))
+  if (!vtkKWWidget::CreateSpecificTkWidget(this, "toplevel", opts.c_str()))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

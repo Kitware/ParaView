@@ -19,7 +19,7 @@
 #include <vtksys/stl/string>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWWidgetWithScrollbars, "1.7");
+vtkCxxRevisionMacro(vtkKWWidgetWithScrollbars, "1.8");
 
 //----------------------------------------------------------------------------
 vtkKWWidgetWithScrollbars::vtkKWWidgetWithScrollbars()
@@ -47,7 +47,7 @@ vtkKWWidgetWithScrollbars::~vtkKWWidgetWithScrollbars()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetWithScrollbars::Create()
+void vtkKWWidgetWithScrollbars::CreateWidget()
 {
   // Check if already created
 
@@ -59,7 +59,7 @@ void vtkKWWidgetWithScrollbars::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
 #if 0
   this->SetPadX(2); // or 1
@@ -83,10 +83,6 @@ void vtkKWWidgetWithScrollbars::Create()
   // Pack
   
   this->Pack();
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

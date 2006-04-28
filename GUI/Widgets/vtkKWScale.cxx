@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.118");
+vtkCxxRevisionMacro(vtkKWScale, "1.119");
 
 //----------------------------------------------------------------------------
 vtkKWScale::vtkKWScale()
@@ -69,11 +69,11 @@ vtkKWScale::~vtkKWScale()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWScale::Create()
+void vtkKWScale::CreateWidget()
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget(
+  if (!vtkKWWidget::CreateSpecificTkWidget(this, 
         "scale", "-highlightthickness 0"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());

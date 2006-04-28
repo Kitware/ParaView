@@ -34,10 +34,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Get the frame that can be used as a parent to a toolbar
   vtkGetObjectMacro(ToolbarsFrame, vtkKWFrame);
 
@@ -196,6 +192,10 @@ public:
 protected:
   vtkKWToolbarSet();
   ~vtkKWToolbarSet();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkKWSeparator *TopSeparator;
   vtkKWFrame     *ToolbarsFrame;

@@ -43,10 +43,6 @@ public:
   vtkBooleanMacro(PopupTextProperty, int);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get the vtkKWRenderWidget that owns the header annotation.
   // It is not ref-counted.
   virtual void SetRenderWidget(vtkKWRenderWidget*);
@@ -91,6 +87,10 @@ public:
 protected:
   vtkKWHeaderAnnotationEditor();
   ~vtkKWHeaderAnnotationEditor();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   int AnnotationChangedEvent;
 

@@ -46,10 +46,6 @@ public:
   virtual void SetPiecewiseFunction(vtkPiecewiseFunction*);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Update the whole UI depending on the value of the Ivars
   virtual void Update();
 
@@ -160,6 +156,10 @@ public:
 protected:
   vtkKWPiecewiseFunctionEditor();
   ~vtkKWPiecewiseFunctionEditor();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   // Description:
   // Proxy to the function. 

@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSaveImageDialog );
-vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.31");
+vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.32");
 
 //----------------------------------------------------------------------------
 int vtkKWSaveImageDialog::Invoke()
@@ -73,7 +73,7 @@ int vtkKWSaveImageDialog::Invoke()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSaveImageDialog::Create()
+void vtkKWSaveImageDialog::CreateWidget()
 {
   if (this->IsCreated())
     {
@@ -83,7 +83,7 @@ void vtkKWSaveImageDialog::Create()
 
   // Call the superclass to create the dialog
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->SetTitle(ks_("Save Image Dialog|Title|Save As Image"));
 }

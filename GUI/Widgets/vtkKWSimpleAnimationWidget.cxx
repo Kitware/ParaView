@@ -72,7 +72,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSimpleAnimationWidget);
-vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.28");
+vtkCxxRevisionMacro(vtkKWSimpleAnimationWidget, "1.29");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleAnimationWidget::vtkKWSimpleAnimationWidget()
@@ -140,7 +140,7 @@ vtkKWSimpleAnimationWidget::~vtkKWSimpleAnimationWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSimpleAnimationWidget::Create()
+void vtkKWSimpleAnimationWidget::CreateWidget()
 {
   if (this->IsCreated())
     {
@@ -150,7 +150,7 @@ void vtkKWSimpleAnimationWidget::Create()
   
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
   
   ostrstream tk_cmd;
 

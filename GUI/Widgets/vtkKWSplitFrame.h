@@ -31,10 +31,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // Get Frame1. In horizontal orientation, this is the one on the left of the
   // separator. In vertical orientation, the one at the bottom.
   // Both Frame1 and Frame2 position can be swapped using the SetFrameLayout
@@ -171,6 +167,10 @@ protected:
   vtkKWSplitFrame();
   ~vtkKWSplitFrame();
 
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+  
   virtual int GetTotalSeparatorSize();
 
   vtkKWFrame *Frame1;

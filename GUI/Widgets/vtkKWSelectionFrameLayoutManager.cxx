@@ -71,7 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.61");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.62");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -149,7 +149,7 @@ vtkKWSelectionFrameLayoutManager::~vtkKWSelectionFrameLayoutManager()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrameLayoutManager::Create()
+void vtkKWSelectionFrameLayoutManager::CreateWidget()
 {
   // Check if already created
 
@@ -161,17 +161,13 @@ void vtkKWSelectionFrameLayoutManager::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->SetBackgroundColor(0.2, 0.2, 0.2);
 
   // Pack
 
   this->Pack();
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

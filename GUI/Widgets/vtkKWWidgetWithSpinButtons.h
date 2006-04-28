@@ -33,10 +33,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Retrieve the spin buttons
   vtkGetObjectMacro(SpinButtons, vtkKWSpinButtons);
 
@@ -62,6 +58,10 @@ public:
 protected:
   vtkKWWidgetWithSpinButtons();
   ~vtkKWWidgetWithSpinButtons();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   // Description:
   // Pack or repack the widget. To be implemented by subclasses.

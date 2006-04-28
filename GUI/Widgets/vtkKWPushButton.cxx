@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPushButton );
-vtkCxxRevisionMacro(vtkKWPushButton, "1.33");
+vtkCxxRevisionMacro(vtkKWPushButton, "1.34");
 
 //----------------------------------------------------------------------------
 vtkKWPushButton::vtkKWPushButton()
@@ -42,11 +42,11 @@ vtkKWPushButton::~vtkKWPushButton()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPushButton::Create()
+void vtkKWPushButton::CreateWidget()
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::CreateSpecificTkWidget(
+  if (!vtkKWWidget::CreateSpecificTkWidget(this, 
         "button", "-highlightthickness 0"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
@@ -59,10 +59,6 @@ void vtkKWPushButton::Create()
   this->SetObjectMethodCommand(&command, this, "CommandCallback");
   this->SetConfigurationOption("-command", command);
   delete [] command;
-  
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

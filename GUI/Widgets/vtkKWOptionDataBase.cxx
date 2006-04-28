@@ -15,24 +15,68 @@
 #include "vtkKWOptionDataBase.h"
 
 #include "vtkKWApplication.h"
+#include "vtkKWWidget.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWTkUtilities.h"
 
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/stl/vector>
+#include <vtksys/stl/list>
 #include <vtksys/stl/string>
 #include <vtksys/stl/map>
 #include <vtksys/RegularExpression.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWOptionDataBase);
-vtkCxxRevisionMacro(vtkKWOptionDataBase, "1.3");
+vtkCxxRevisionMacro(vtkKWOptionDataBase, "1.4");
 
 //----------------------------------------------------------------------------
 class vtkKWOptionDataBaseInternals
 {
 public:
 
-  // Option entry
+  // Context list
+  // This is used to put a constraint on the context that should match
+  // the object's parent.
+  // Say, for example that the pattern:
+  //   vtkKWWidget*vtkKWFrameWithLabel.vtkKWFrame
+  // will match a vtkKWFrame that is an immediate child of a 
+  // vtkKWFrameWithLabel, which is a child or sub-child of a vtkKWWidget.
+  // The resulting list (ContextListType), for that example, will look like:
+  //   {{"vtkKWFrameWithLabel", 1} {"vtkKWWidget", 0}}
+
+  class ContextNodeType
+  {
+  public:
+    vtksys_stl::string ClassName;
+    int IsImmediateParent;
+  };
+
+  typedef vtksys_stl::list<ContextNodeType> ContextContainerType;
+  typedef vtksys_stl::list<ContextNodeType>::iterator ContextContainerIterator;
+
+  // Option pool
+  // Data structure used to store each option/
+  // Say, if the following option entry is added:
+  //     AddEntry("vtkKWFoo*vtkKWBar.vtkKWFrameWithLabel:CollapsibleFrame", 
+  //              "SetBackgroundColor", "0.2 0.3 0.4");
+  // The resulting entry in the EntryPoolType map  will be:
+  //  "vtkKWFrameWithLabel" => 
+  //    { 
+  //      0,
+  //      "vtkKWFoo*vtkKWBar.vtkKWFrameWithLabel:CollapsibleFrame",
+  //      "SetBackgroundColor",
+  //      "0.2 0.3 0.4",
+  //      "CollapsibleFrame",
+  //      {{"vtkKWFoo", 0} {"vtkKWBar", 1}}
+  //    }
+  // which means: each time a vtkKWFrameWithLabel is created, that is an
+  // immediate child of a vtkKWBar, which itself is a child or sub-child
+  // of a vtkKWFoo, then retrieve the CollapsibleFrame member of that
+  // vtkKWFrameWithLabel (using GetCollapsibleFrame()) and call
+  // "SetBackgroundColor 0.2 0.3 0.4" on that object.
+  
+  int EntryCounter;
 
   typedef vtksys_stl::string EntryKeyType;
 
@@ -41,28 +85,38 @@ public:
   public:
     int Id;
     vtksys_stl::string Pattern;
-    vtksys_stl::string Option;
+    vtksys_stl::string Command;
     vtksys_stl::string Value;
+    vtksys_stl::string ClassName;
+    vtksys_stl::string SlotName;
+    ContextContainerType Context;
   };
 
-  // Option pool
+  typedef vtksys_stl::vector<EntryNodeType> EntryContainerType;
+  typedef vtksys_stl::vector<EntryNodeType>::iterator EntryContainerIterator;
 
-  typedef vtksys_stl::vector<EntryNodeType> EntryListType;
-  typedef vtksys_stl::vector<EntryNodeType>::iterator EntryListIterator;
-
-  typedef vtksys_stl::map<EntryKeyType, EntryListType> EntryPoolType;
-  typedef vtksys_stl::map<EntryKeyType, EntryListType>::iterator EntryPoolIterator;
+  typedef vtksys_stl::map<EntryKeyType, EntryContainerType> EntryPoolType;
+  typedef vtksys_stl::map<EntryKeyType, EntryContainerType>::iterator EntryPoolIterator;
 
   EntryPoolType EntryPool;
 
   // Superclass cache
+  // say, for vtkKWScale, the ClassHierarchyCacheType map will look like:
+  //   "vtkKWScale" => { "vtkObject", "vtkKWObject", "vtkKWWidget", "vtkKWCoreWidget", "vtkKWScale"}
+  
+  typedef vtksys_stl::vector<vtksys_stl::string> ClassHierarchyContainerType;
+  typedef vtksys_stl::vector<vtksys_stl::string>::iterator ClassHierarchyContainerIterator;
+  typedef vtksys_stl::map<vtksys_stl::string, ClassHierarchyContainerType> ClassHierarchyCacheType;
+  typedef vtksys_stl::map<vtksys_stl::string, ClassHierarchyContainerType>::iterator ClassHierarchyCacheIterator;
 
-  typedef vtksys_stl::vector<vtksys_stl::string> SuperclassListType;
-  typedef vtksys_stl::vector<vtksys_stl::string>::iterator SuperclassListIterator;
-  typedef vtksys_stl::map<vtksys_stl::string, SuperclassListType> SuperclassCacheType;
-  typedef vtksys_stl::map<vtksys_stl::string, SuperclassListType>::iterator SuperclassCacheIterator;
+  ClassHierarchyCacheType ClassHierarchyCache;
 
-  int EntryCounter;
+  // Configure an object. Needs to be in the internals because I want to
+  // pass STL containers around
+
+  void ConfigureWidget(vtkKWWidget *obj, 
+                       ClassHierarchyContainerType *obj_parents, 
+                       const char *as_class_name);
 };
 
 //----------------------------------------------------------------------------
@@ -83,89 +137,132 @@ vtkKWOptionDataBase::~vtkKWOptionDataBase()
 
 //----------------------------------------------------------------------------
 int vtkKWOptionDataBase::AddEntry(const char *pattern, 
-                                  const char *option, 
+                                  const char *command, 
                                   const char *value)
 {
   if (!this->Internals || 
       !pattern || !*pattern || 
-      !option || !*option)
+      !command || !*command)
     {
     return -1;
     }
 
-  int id =  this->Internals->EntryCounter++;
-
   vtkKWOptionDataBaseInternals::EntryNodeType node;
 
-  node.Id = id;
   node.Pattern = pattern;
-  node.Option = option;
+
+  // Get the class name and the context out of the pattern
+
+  vtksys_stl::string::size_type pos = 0;
+  while (1) 
+    {
+    vtksys_stl::string::size_type sep = node.Pattern.find_first_of(".*", pos);
+    if (sep == vtksys_stl::string::npos)
+      {
+      node.ClassName = node.Pattern.substr(pos);
+      break;
+      }
+    else 
+      {
+      vtkKWOptionDataBaseInternals::ContextNodeType context_node;
+      context_node.ClassName = node.Pattern.substr(pos, sep - pos);
+      context_node.IsImmediateParent = (node.Pattern[sep] == '.' ? 1 : 0);
+      node.Context.push_front(context_node);
+      pos = sep + 1;
+      }
+    };
+
+  // Classname not found ? 
+
+  if (!node.ClassName.size())
+    {
+    return -1;
+    }
+
+  // Get the slot name out of the classname 
+  // (say, vtkKWFrameWithLabel:CollapsibleFrame)
+
+  vtksys_stl::string::size_type sep_slot = node.ClassName.find_first_of(':');
+  if (sep_slot != vtksys_stl::string::npos)
+    {
+    node.SlotName = node.ClassName.substr(sep_slot + 1);
+    node.ClassName = node.ClassName.substr(0, sep_slot);
+    if (!node.ClassName.size())
+      {
+      return -1;
+      }
+    }
+
+  // New entry
+
+  node.Id = this->Internals->EntryCounter++;
+  node.Command = command;
   if (value)
     {
     node.Value = value;
     }
 
-  this->Internals->EntryPool[node.Pattern].push_back(node);
+  this->Internals->EntryPool[node.ClassName].push_back(node);
 
-  return id;
+  return node.Id;
 }
 
 //----------------------------------------------------------------------------
 int vtkKWOptionDataBase::AddEntryAsInt(const char *pattern, 
-                                       const char *option, 
+                                       const char *command, 
                                        int value)
 {
   char buffer[20];
   sprintf(buffer, "%d", value);
-  return this->AddEntry(pattern, option, buffer);
+  return this->AddEntry(pattern, command, buffer);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWOptionDataBase::AddEntryAsDouble(const char *pattern, 
-                                          const char *option, 
+                                          const char *command, 
                                           double value)
 {
   char buffer[256];
   sprintf(buffer, "%lf", value);
-  return this->AddEntry(pattern, option, buffer);
+  return this->AddEntry(pattern, command, buffer);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWOptionDataBase::AddEntryAsInt3(const char *pattern, 
-                                        const char *option, 
+                                        const char *command, 
                                         int v0, int v1, int v2)
 {
   char buffer[256];
   sprintf(buffer, "%d %d %d", v0, v1, v2);
-  return this->AddEntry(pattern, option, buffer);
+  return this->AddEntry(pattern, command, buffer);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWOptionDataBase::AddEntryAsInt3(const char *pattern, 
-                                        const char *option, 
+                                        const char *command, 
                                         int value3[3])
 {
   return 
-    this->AddEntryAsDouble3(pattern, option, value3[0], value3[1], value3[2]);
+    this->AddEntryAsDouble3(pattern, command, value3[0], value3[1], value3[2]);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWOptionDataBase::AddEntryAsDouble3(const char *pattern, 
-                                           const char *option, 
+                                           const char *command, 
                                            double v0, double v1, double v2)
 {
   char buffer[256];
   sprintf(buffer, "%lf %lf %lf", v0, v1, v2);
-  return this->AddEntry(pattern, option, buffer);
+  return this->AddEntry(pattern, command, buffer);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWOptionDataBase::AddEntryAsDouble3(const char *pattern, 
-                                           const char *option, 
+                                           const char *command, 
                                            double value3[3])
 {
   return 
-    this->AddEntryAsDouble3(pattern, option, value3[0], value3[1], value3[2]);
+    this->AddEntryAsDouble3(pattern, command, value3[0], value3[1], value3[2]);
 }
 
 //----------------------------------------------------------------------------
@@ -184,14 +281,14 @@ void vtkKWOptionDataBase::DeepCopy(vtkKWOptionDataBase *p)
     p->Internals->EntryPool.end();
   for (; p_it != p_end; ++p_it)
     {
-    vtkKWOptionDataBaseInternals::EntryListIterator l_it = 
+    vtkKWOptionDataBaseInternals::EntryContainerIterator l_it = 
       p_it->second.begin();
-    vtkKWOptionDataBaseInternals::EntryListIterator l_end = 
+    vtkKWOptionDataBaseInternals::EntryContainerIterator l_end = 
       p_it->second.end();
     for (; l_it != l_end; ++l_it)
       {
       this->AddEntry(
-        l_it->Pattern.c_str(), l_it->Option.c_str(), l_it->Value.c_str());
+        l_it->Pattern.c_str(), l_it->Command.c_str(), l_it->Value.c_str());
       }
     }
 }
@@ -220,66 +317,252 @@ int vtkKWOptionDataBase::GetNumberOfEntries()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWOptionDataBase::ConfigureObject(vtkKWObject *obj)
+void vtkKWOptionDataBase::ConfigureWidget(vtkKWWidget *obj)
 {
   if (!obj || !this->Internals->EntryPool.size())
     {
     return;
     }
 
-  this->ConfigureObject(obj, "*");
-
   // Process the class hierarchy
-  // TODO: this should be class in a map of list of class names
-  // i.e.: vtkKWScale: vtkObject, vtkKWObject, vtkkWWidget, vtkKWCoreWidget...
+  // say, for vtkKWScale: 
+  // vtkObject, vtkKWObject, vtkKWWidget, vtkKWCoreWidget, vtkKWScale
 
-  ostrstream revisions;
-  obj->PrintRevisions(revisions);
-  revisions << ends;
+  vtkKWOptionDataBaseInternals::ClassHierarchyCacheIterator p_it = 
+    this->Internals->ClassHierarchyCache.find(obj->GetClassName());
+  vtkKWOptionDataBaseInternals::ClassHierarchyContainerType &list = 
+    this->Internals->ClassHierarchyCache[obj->GetClassName()];
 
-  char buffer[256];
-  const char *c = revisions.str();
-  while (*c)
+  // Cache the class hierarchy
+
+  if (p_it == this->Internals->ClassHierarchyCache.end())
     {
-    const char *begin_class = c;
-    while (*c != ' ') ++c;
-    memcpy(buffer, begin_class, c - begin_class);
-    buffer[c - begin_class] = '\0';
-    this->ConfigureObject(obj, buffer);
-    while (*c != '\n') ++c;
-    ++c;
+    ostrstream revisions;
+    obj->PrintRevisions(revisions);
+    revisions << ends;
+
+    char buffer[512];
+    const char *c = revisions.str();
+    while (*c)
+      {
+      const char *begin_class = c;
+      while (*c != ' ') ++c;
+      memcpy(buffer, begin_class, c - begin_class);
+      buffer[c - begin_class] = '\0';
+      list.push_back(buffer);
+      while (*c != '\n') ++c;
+      ++c;
+      }
+    revisions.rdbuf()->freeze(0);
     }
 
-  revisions.rdbuf()->freeze(0);
+  // Configure the object using the options defined for each class in
+  // its class hierarchy, starting with the top-most classes.
+  // Say, for vtkKWScale, try to find and apply the options defined for
+  // vtkObject, then for vtkKWObject, vtkKWWidget, etc., down to vtkKWScale.
+
+  vtkKWOptionDataBaseInternals::ClassHierarchyContainerType obj_parents;
+
+  vtkKWOptionDataBaseInternals::ClassHierarchyContainerIterator l_it = 
+    list.begin();
+  vtkKWOptionDataBaseInternals::ClassHierarchyContainerIterator l_end = 
+    list.end();
+  for (; l_it != l_end; ++l_it)
+    {
+    this->Internals->ConfigureWidget(obj, &obj_parents, l_it->c_str());
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWOptionDataBase::ConfigureObject(vtkKWObject *obj, 
-                                          const char *pattern)
+void vtkKWOptionDataBaseInternals::ConfigureWidget(
+  vtkKWWidget *obj, 
+  vtkKWOptionDataBaseInternals::ClassHierarchyContainerType *obj_parents,
+  const char *as_class_name)
 {
-  if (!obj || !this->Internals->EntryPool.size())
+  if (!obj || !this->EntryPool.size())
     {
     return;
     }
 
-  // TODO: this should be made much faster
-  // i.e. construct a string for all options to apply, *then* script it
+  // Do we have options for that class ?
+
   vtkKWOptionDataBaseInternals::EntryPoolIterator p_it = 
-    this->Internals->EntryPool.find(pattern);
-  if (p_it == this->Internals->EntryPool.end())
+    this->EntryPool.find(as_class_name);
+  if (p_it == this->EntryPool.end())
     {
     return;
     }
 
-  vtkKWOptionDataBaseInternals::EntryListIterator l_it = 
+  vtksys_stl::string cmd;
+
+  vtkKWOptionDataBaseInternals::EntryContainerIterator l_it = 
     p_it->second.begin();
-  vtkKWOptionDataBaseInternals::EntryListIterator l_end = 
+  vtkKWOptionDataBaseInternals::EntryContainerIterator l_end = 
     p_it->second.end();
   for (; l_it != l_end; ++l_it)
     {
-    obj->Script("catch {%s %s %s}",
-                obj->GetTclName(), l_it->Option.c_str(), l_it->Value.c_str());
+    // Does this option have constraints on the context this object should
+    // be in, i.e. its parents. 
+
+    if (l_it->Context.size())
+      {
+      // Do we have the parents of the object ? Find them.
+      if (!obj_parents->size())
+        {
+        vtkKWWidget *ptr = obj;
+        while (ptr->GetParent())
+          {
+          obj_parents->push_back(ptr->GetParent()->GetClassName());
+          ptr = ptr->GetParent();
+          }
+        }
+
+      // Check if the obj parents match the context. We are not being
+      // very fancy here with the "*" separator (i.e. an element of the
+      // context that can be a parent or grand-parent), we just look
+      // for the closest parent or grand-parent and don't backtrack.
+
+      vtkKWOptionDataBaseInternals::ClassHierarchyContainerIterator obj_p_it = 
+        obj_parents->begin();
+      vtkKWOptionDataBaseInternals::ClassHierarchyContainerIterator obj_p_end =
+        obj_parents->end();
+
+      vtkKWOptionDataBaseInternals::ContextContainerIterator context_it = 
+        l_it->Context.begin();
+      vtkKWOptionDataBaseInternals::ContextContainerIterator context_end = 
+        l_it->Context.end();
+
+      int context_ok = 1;
+      for (; context_it != context_end && obj_p_it != obj_p_end; ++context_it)
+        {
+        // OK, we match right away
+        if (!context_it->ClassName.compare(*obj_p_it))
+          {
+          ++obj_p_it;
+          }
+        else
+          {
+          // We did not match an immediate parent, ouch
+          if (context_it->IsImmediateParent)
+            {
+            context_ok = 0;
+            break;
+            }
+          // We did not match the parent but can match a grand-parent
+          else
+            {
+            do
+              {
+              ++obj_p_it;
+              } while (obj_p_it != obj_p_end &&
+                       context_it->ClassName.compare(*obj_p_it));
+            // Nope, we did not match any grand-parent either, ouch
+            if (obj_p_it == obj_p_end)
+              {
+              context_ok = 0;
+              break;
+              }
+            }
+          }
+        }
+
+      // No context match. Too bad.
+
+      if (context_it != context_end || !context_ok)
+        {
+        continue;
+        }
+      }
+
+    cmd += "catch {";
+    if (l_it->SlotName.size())
+      {
+      cmd += '[';
+      cmd += obj->GetTclName();
+      cmd += " Get";
+      cmd += l_it->SlotName;
+      cmd += ']';
+      }
+    else
+      {
+      cmd += obj->GetTclName();
+      }
+    cmd += ' ';
+    cmd += l_it->Command;
+    cmd += ' ';
+    cmd += l_it->Value;
+    cmd += "}\n";
     }
+
+  if (cmd.size())
+    {
+    vtkKWTkUtilities::EvaluateSimpleString(obj->GetApplication(), cmd.c_str());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWOptionDataBase::AddBackgroundColorOptions(
+  double r, double g, double b)
+{
+  double bgcolor[3];
+  bgcolor[0] = r;
+  bgcolor[1] = g;
+  bgcolor[2] = b;
+
+  this->AddEntryAsDouble3(
+    "vtkKWWidget", "SetBackgroundColor", bgcolor);
+  this->AddEntryAsDouble3(
+    "vtkKWWidget", "SetActiveBackgroundColor", bgcolor);
+
+  this->AddEntryAsDouble3(
+    "vtkKWEntry", "SetDisabledBackgroundColor", bgcolor);
+  this->AddEntryAsDouble3(
+    "vtkKWEntry", "SetReadOnlyBackgroundColor", bgcolor);
+  this->AddEntryAsDouble3(
+    "vtkKWSpinBox", "SetDisabledBackgroundColor", bgcolor);
+  this->AddEntryAsDouble3(
+    "vtkKWSpinBox", "SetReadOnlyBackgroundColor", bgcolor);
+  this->AddEntryAsDouble3(
+    "vtkKWSpinBox", "SetButtonBackgroundColor", bgcolor);
+  this->AddEntryAsDouble3(
+    "vtkKWScale", "SetTroughColor", bgcolor);
+  this->AddEntryAsDouble3(
+    "vtkKWScrollbar", "SetTroughColor", bgcolor);
+  this->AddEntryAsDouble3(
+    "vtkKWMultiColumnList", "SetColumnLabelBackgroundColor", bgcolor);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWOptionDataBase::AddFontOptions(
+  const char *font)
+{
+  if (!font)
+    {
+    return;
+    }
+
+  vtksys_stl::string font_spec(font);
+  if (font_spec[0] != '{')
+    {
+    font_spec.insert(0, "{");
+    font_spec += '}';
+    }
+
+#if 0
+  this->AddEntry("vtkKWWidget", "SetFont", font_spec.c_str());
+#else
+  this->AddEntry("vtkKWCheckButton", "SetFont", font_spec.c_str());
+  this->AddEntry("vtkKWEntry", "SetFont", font_spec.c_str());
+  this->AddEntry("vtkKWLabel", "SetFont", font_spec.c_str());
+  this->AddEntry("vtkKWListBox", "SetFont", font_spec.c_str());
+  this->AddEntry("vtkKWMenu", "SetFont", font_spec.c_str());
+  this->AddEntry("vtkKWMenuButton", "SetFont", font_spec.c_str());
+  this->AddEntry("vtkKWMessage", "SetFont", font_spec.c_str());
+  this->AddEntry("vtkKWPushButton", "SetFont", font_spec.c_str());
+  this->AddEntry("vtkKWScale", "SetFont", font_spec.c_str());
+  this->AddEntry("vtkKWSpinBox", "SetFont", font_spec.c_str());
+  this->AddEntry("vtkKWText", "SetFont", font_spec.c_str());
+#endif
 }
 
 //----------------------------------------------------------------------------

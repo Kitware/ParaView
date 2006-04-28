@@ -46,10 +46,6 @@ public:
   vtkBooleanMacro(PopupTextProperty, int);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get the vtkScalarBarWidget that owns the scalar bar actor.
   virtual void SetScalarBarWidget(vtkScalarBarWidget*);
   vtkGetObjectMacro(ScalarBarWidget, vtkScalarBarWidget);
@@ -123,6 +119,10 @@ public:
 protected:
   vtkKWScalarBarAnnotation();
   ~vtkKWScalarBarAnnotation();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   int PopupTextProperty;
   int AnnotationChangedEvent;

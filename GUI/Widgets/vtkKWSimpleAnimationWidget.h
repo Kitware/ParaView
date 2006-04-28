@@ -52,10 +52,6 @@ public:
   virtual void SetRenderWidget(vtkKWRenderWidget*);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // Set/Get the animation type.
   // If set to 'camera', the widget will display controls to rotate the
   // camera only the 3-axes.
@@ -159,6 +155,10 @@ public:
 protected:
   vtkKWSimpleAnimationWidget();
   ~vtkKWSimpleAnimationWidget();
+  
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
   
   vtkKWRenderWidget *RenderWidget;
 

@@ -48,10 +48,6 @@ public:
   vtkBooleanMacro(PopupTextProperty, int);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get the vtkKWView or the vtkKWRenderWidget that owns this annotation.
   // vtkKWView and vtkKWRenderWidget are two different frameworks, choose one
   // or the other (ParaView uses vtkKWView, VolView uses vtkKWRenderWidget).
@@ -137,6 +133,10 @@ public:
 protected:
   vtkKWCornerAnnotationEditor();
   ~vtkKWCornerAnnotationEditor();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   int AnnotationChangedEvent;
 

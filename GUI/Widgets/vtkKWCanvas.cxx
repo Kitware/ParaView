@@ -39,23 +39,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCanvas );
-vtkCxxRevisionMacro(vtkKWCanvas, "1.11");
+vtkCxxRevisionMacro(vtkKWCanvas, "1.12");
 
 //----------------------------------------------------------------------------
-void vtkKWCanvas::Create()
+void vtkKWCanvas::CreateWidget()
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::CreateSpecificTkWidget(
+  if (!vtkKWWidget::CreateSpecificTkWidget(this, 
         "canvas", "-highlightthickness 0"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

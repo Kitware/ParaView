@@ -42,10 +42,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // Get the buttons
   vtkGetObjectMacro(PreviousButton, vtkKWPushButton);
   vtkGetObjectMacro(NextButton, vtkKWPushButton);
@@ -130,6 +126,10 @@ protected:
   vtkKWSpinButtons();
   ~vtkKWSpinButtons();
 
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+  
   vtkKWPushButton *PreviousButton;
   vtkKWPushButton *NextButton;
 

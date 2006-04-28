@@ -58,7 +58,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.46");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.47");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -298,7 +298,7 @@ vtkKWPresetSelector::~vtkKWPresetSelector()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPresetSelector::Create()
+void vtkKWPresetSelector::CreateWidget()
 {
   // Check if already created
 
@@ -310,7 +310,7 @@ void vtkKWPresetSelector::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // --------------------------------------------------------------
   // Preset : preset list

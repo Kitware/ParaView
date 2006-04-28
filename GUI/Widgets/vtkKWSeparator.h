@@ -31,10 +31,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get the orientation of the separator.
   //BTX
   enum 
@@ -60,6 +56,10 @@ public:
 protected:
   vtkKWSeparator();
   ~vtkKWSeparator() {};
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   int Orientation;
   int Thickness;

@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(@WidgetType@WithSpinButtons);
-vtkCxxRevisionMacro(@WidgetType@WithSpinButtons, "1.4");
+vtkCxxRevisionMacro(@WidgetType@WithSpinButtons, "1.5");
 
 //----------------------------------------------------------------------------
 @WidgetType@WithSpinButtons::@WidgetType@WithSpinButtons()
@@ -45,7 +45,7 @@ vtkCxxRevisionMacro(@WidgetType@WithSpinButtons, "1.4");
 }
 
 //----------------------------------------------------------------------------
-void @WidgetType@WithSpinButtons::Create()
+void @WidgetType@WithSpinButtons::CreateWidget()
 {
   // Check if already created
 
@@ -57,7 +57,7 @@ void @WidgetType@WithSpinButtons::Create()
 
   // Call the superclass
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Create the widget
 

@@ -33,10 +33,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set the Range of the Extent, this is the range of
   // acceptable values for the sliders. Specified as 
   // minx maxx miny maxy minz maxz
@@ -185,6 +181,10 @@ public:
 protected:
   vtkKWExtent();
   ~vtkKWExtent();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   char *Command;
   char *StartCommand;

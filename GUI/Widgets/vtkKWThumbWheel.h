@@ -34,10 +34,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get the value of the thumbwheel.
   virtual void SetValue(double v);
   vtkGetMacro(Value, double);
@@ -274,6 +270,10 @@ public:
 protected:
   vtkKWThumbWheel();
   ~vtkKWThumbWheel();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   double      Value;
   double      MinimumValue;

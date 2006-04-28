@@ -31,7 +31,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.49");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.50");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -670,7 +670,7 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointEntries(int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPiecewiseFunctionEditor::Create()
+void vtkKWPiecewiseFunctionEditor::CreateWidget()
 {
   // Check if already created
 
@@ -682,7 +682,7 @@ void vtkKWPiecewiseFunctionEditor::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Create the value entry
 

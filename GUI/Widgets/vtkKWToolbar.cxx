@@ -54,7 +54,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.66");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.67");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarInternals
@@ -142,7 +142,7 @@ void vtkKWToolbar::UnBind()
   this->RemoveBinding("<Configure>");
 }
 //----------------------------------------------------------------------------
-void vtkKWToolbar::Create()
+void vtkKWToolbar::CreateWidget()
 {
   // Check if already created
 
@@ -154,7 +154,7 @@ void vtkKWToolbar::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
   
   this->Bind();
 

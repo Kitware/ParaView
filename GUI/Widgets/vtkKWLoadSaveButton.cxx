@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLoadSaveButton);
-vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.23");
+vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.24");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveButton::vtkKWLoadSaveButton()
@@ -43,7 +43,7 @@ vtkKWLoadSaveButton::~vtkKWLoadSaveButton()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLoadSaveButton::Create()
+void vtkKWLoadSaveButton::CreateWidget()
 {
   // Check if already created
 
@@ -56,7 +56,7 @@ void vtkKWLoadSaveButton::Create()
   // Call the superclass, this will set the application and 
   // create the pushbutton.
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Cosmetic add-on
 
@@ -76,10 +76,6 @@ void vtkKWLoadSaveButton::Create()
 
   this->LoadSaveDialog->SetParent(this);
   this->LoadSaveDialog->Create();
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

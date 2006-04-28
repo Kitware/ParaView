@@ -18,14 +18,14 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWScrollbar);
-vtkCxxRevisionMacro(vtkKWScrollbar, "1.6");
+vtkCxxRevisionMacro(vtkKWScrollbar, "1.7");
 
 //----------------------------------------------------------------------------
-void vtkKWScrollbar::Create()
+void vtkKWScrollbar::CreateWidget()
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget(
+  if (!vtkKWWidget::CreateSpecificTkWidget(this, 
         "scrollbar", "-highlightthickness 0"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());

@@ -45,10 +45,6 @@ public:
   vtkGetObjectMacro(PopupButton, vtkKWPopupButtonWithLabel);
   
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // Refresh the interface given the value extracted from the current widget.
   virtual void Update();
 
@@ -137,9 +133,12 @@ public:
   virtual void PresetMaterialCallback(int preset_idx);
 
 protected:
-
   vtkKWMaterialPropertyWidget();
   ~vtkKWMaterialPropertyWidget();
+  
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
   
   int   PopupMode;
   int   PreviewSize;

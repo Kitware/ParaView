@@ -164,10 +164,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Main panel. 
   // The whole layout of the window is described at length at the beginning
   // of this document.
@@ -378,6 +374,10 @@ public:
 protected:
   vtkKWWindow();
   ~vtkKWWindow();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   // Description:
   // Save/Restore window geometry

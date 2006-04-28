@@ -7,7 +7,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMyWidget );
-vtkCxxRevisionMacro(vtkKWMyWidget, "1.2");
+vtkCxxRevisionMacro(vtkKWMyWidget, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWMyWidget::vtkKWMyWidget()
@@ -26,7 +26,7 @@ vtkKWMyWidget::~vtkKWMyWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMyWidget::Create()
+void vtkKWMyWidget::CreateWidget()
 {
   // Check if already created
 
@@ -38,7 +38,7 @@ void vtkKWMyWidget::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Create our internal scale widget
 

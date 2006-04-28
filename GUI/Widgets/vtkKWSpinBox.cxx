@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSpinBox);
-vtkCxxRevisionMacro(vtkKWSpinBox, "1.15");
+vtkCxxRevisionMacro(vtkKWSpinBox, "1.16");
 
 //----------------------------------------------------------------------------
 vtkKWSpinBox::vtkKWSpinBox() 
@@ -37,9 +37,9 @@ vtkKWSpinBox::~vtkKWSpinBox()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSpinBox::Create()
+void vtkKWSpinBox::CreateWidget()
 {
-  if (!this->Superclass::CreateSpecificTkWidget(
+  if (!vtkKWWidget::CreateSpecificTkWidget(this, 
         "spinbox", "-highlightthickness 0"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
@@ -50,8 +50,6 @@ void vtkKWSpinBox::Create()
   this->SetObjectMethodCommand(&command, this, "CommandCallback");
   this->SetConfigurationOption("-command", command);
   delete [] command;
-  
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

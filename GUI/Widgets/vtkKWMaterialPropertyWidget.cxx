@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.26");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.27");
 
 //----------------------------------------------------------------------------
 class vtkKWMaterialPropertyWidgetInternals
@@ -262,7 +262,7 @@ void vtkKWMaterialPropertyWidget::AddDefaultPresets()
 } 
 
 //----------------------------------------------------------------------------
-void vtkKWMaterialPropertyWidget::Create()
+void vtkKWMaterialPropertyWidget::CreateWidget()
 {
   // Check if already created
 
@@ -274,7 +274,7 @@ void vtkKWMaterialPropertyWidget::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   vtkKWFrame *frame;
   

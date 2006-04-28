@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCoreWidget );
-vtkCxxRevisionMacro(vtkKWCoreWidget, "1.19");
+vtkCxxRevisionMacro(vtkKWCoreWidget, "1.20");
 
 //----------------------------------------------------------------------------
 class vtkKWCoreWidgetInternals
@@ -51,7 +51,7 @@ vtkKWCoreWidget::~vtkKWCoreWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCoreWidget::Create()
+void vtkKWCoreWidget::CreateWidget()
 {
   // Check if already created
 
@@ -63,7 +63,7 @@ void vtkKWCoreWidget::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 }
 
 //----------------------------------------------------------------------------

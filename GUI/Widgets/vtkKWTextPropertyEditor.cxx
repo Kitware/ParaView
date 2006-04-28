@@ -97,7 +97,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextPropertyEditor);
-vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.21");
+vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.22");
 
 // ----------------------------------------------------------------------------
 vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
@@ -186,7 +186,7 @@ vtkKWTextPropertyEditor::~vtkKWTextPropertyEditor()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextPropertyEditor::Create()
+void vtkKWTextPropertyEditor::CreateWidget()
 {
   // Check if already created
 
@@ -198,7 +198,7 @@ void vtkKWTextPropertyEditor::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Label
 
@@ -1056,7 +1056,6 @@ void vtkKWTextPropertyEditor::SaveInTclScript(ofstream *file,
 void vtkKWTextPropertyEditor::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
-
 
   this->PropagateEnableState(this->Label);
   this->PropagateEnableState(this->ChangeColorButton);

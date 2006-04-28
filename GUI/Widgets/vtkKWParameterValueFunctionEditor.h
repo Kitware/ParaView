@@ -522,10 +522,6 @@ public:
   vtkGetMacro(TicksLength, int);
   
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get if the points of the function are locked in the parameter
   // space (they can not be removed or can only be moved in the value space).
   virtual void SetLockPointsParameter(int);
@@ -1140,6 +1136,10 @@ public:
 protected:
   vtkKWParameterValueFunctionEditor();
   ~vtkKWParameterValueFunctionEditor();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   // Description:
   // Return 1 if the function line joining point 'id1' and point 'id2'

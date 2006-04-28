@@ -29,10 +29,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get the background color of the widget.
   virtual void GetBackgroundColor(double *r, double *g, double *b);
   virtual double* GetBackgroundColor();
@@ -121,6 +117,10 @@ public:
 protected:
   vtkKWScrollbar() {};
   ~vtkKWScrollbar() {};
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
 private:
   vtkKWScrollbar(const vtkKWScrollbar&); // Not implemented

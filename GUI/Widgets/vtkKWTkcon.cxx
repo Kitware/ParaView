@@ -24,7 +24,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTkcon );
-vtkCxxRevisionMacro(vtkKWTkcon, "1.5");
+vtkCxxRevisionMacro(vtkKWTkcon, "1.6");
 
 //----------------------------------------------------------------------------
 class vtkKWTkconInternals
@@ -71,7 +71,7 @@ vtkKWTkcon::~vtkKWTkcon()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTkcon::Create()
+void vtkKWTkcon::CreateWidget()
 {
   if (vtkKWTkconInit::GetInitialized())
     {
@@ -96,7 +96,7 @@ void vtkKWTkcon::Create()
   // We need to bypass the vtkKWTopLevel::Create to allow tkcon to
   // create its own toplevel
 
-  this->vtkKWCoreWidget::Create();
+  this->vtkKWCoreWidget::CreateWidget();
 
   ostrstream tk_cmd;
 

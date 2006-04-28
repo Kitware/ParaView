@@ -56,10 +56,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // Add a new preset.
   // Return the unique Id of the preset
   virtual int AddPreset();
@@ -568,6 +564,10 @@ protected:
   vtkKWPresetSelector();
   ~vtkKWPresetSelector();
 
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+  
   // Description:
   // Create the columns.
   // Subclasses should override this method to add their own columns and

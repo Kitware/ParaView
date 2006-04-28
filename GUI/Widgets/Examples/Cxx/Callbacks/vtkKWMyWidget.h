@@ -13,10 +13,6 @@ public:
   vtkTypeRevisionMacro(vtkKWMyWidget,vtkKWCompositeWidget);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Callbacks
   virtual void ScaleChangeNotifiedByCommandCallback(double value);
 
@@ -25,6 +21,10 @@ protected:
   ~vtkKWMyWidget();
 
   vtkKWScale *Scale;
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   // Description:
   // Processes the events that are passed through CallbackCommand (or others).

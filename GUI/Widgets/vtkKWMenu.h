@@ -28,10 +28,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
  
   // Description: 
-  // Create the widget.
-  virtual void Create();
-  
-  // Description: 
   // Append/Insert a standard command menu item to the menu.
   // The 'object' argument is the object that will have the method called on
   // it. The 'method' argument is the name of the method to be called and any
@@ -559,6 +555,12 @@ public:
   virtual void DisplayHelpCallback(const char *widget_name);
   
 protected:
+  vtkKWMenu();
+  ~vtkKWMenu();
+  
+  // Description: 
+  // Create the widget.
+  virtual void CreateWidget();
   
   // Description: 
   // Add a generic menu item (defined by type)
@@ -588,9 +590,6 @@ protected:
   // selected value.
   virtual int GetIndexOfItemUsingVariableAndSelectedValue(
     const char *varname, const char *selected_value);
-
-  vtkKWMenu();
-  ~vtkKWMenu();
 
   int TearOff;
 

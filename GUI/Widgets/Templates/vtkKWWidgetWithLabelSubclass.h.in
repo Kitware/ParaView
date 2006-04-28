@@ -45,10 +45,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget
-  virtual void Create();
-
-  // Description:
   // Get the @WidgetType@ that is being labeled
   virtual @WidgetType@* GetWidget();
   
@@ -76,6 +72,10 @@ public:
 protected:
   @WidgetType@WithLabel();
   ~@WidgetType@WithLabel();
+
+  // Description:
+  // Create the widget
+  virtual void CreateWidget();
 
   // Description:
   // Expand the widget that is being labeled

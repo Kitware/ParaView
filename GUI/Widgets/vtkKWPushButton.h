@@ -30,10 +30,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set the contents label.
   virtual void SetText(const char *label);
   virtual char *GetText();
@@ -244,6 +240,10 @@ public:
 protected:
   vtkKWPushButton();
   ~vtkKWPushButton();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkSetStringMacro(ButtonText);
   char* ButtonText;

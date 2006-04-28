@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.31");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.32");
 
 //----------------------------------------------------------------------------
 vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
@@ -178,7 +178,7 @@ void vtkKWScalarBarAnnotation::SetVolumeProperty(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWScalarBarAnnotation::Create()
+void vtkKWScalarBarAnnotation::CreateWidget()
 {
   // Create the superclass widgets
 
@@ -188,7 +188,7 @@ void vtkKWScalarBarAnnotation::Create()
     return;
     }
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   int popup_text_property = 
     this->PopupTextProperty && !this->PopupMode;

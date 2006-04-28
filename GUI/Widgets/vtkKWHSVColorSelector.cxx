@@ -22,7 +22,7 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.20");
+vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.21");
 vtkStandardNewMacro(vtkKWHSVColorSelector);
 
 #define VTK_KW_HSV_SEL_POINT_RADIUS_MIN     2
@@ -108,7 +108,7 @@ vtkKWHSVColorSelector::~vtkKWHSVColorSelector()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHSVColorSelector::Create()
+void vtkKWHSVColorSelector::CreateWidget()
 {
   // Check if already created
 
@@ -120,7 +120,7 @@ void vtkKWHSVColorSelector::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Create the Hue/Sat canvas
 

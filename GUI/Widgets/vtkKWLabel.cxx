@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.51");
+vtkCxxRevisionMacro(vtkKWLabel, "1.52");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -91,11 +91,11 @@ void vtkKWLabel::UpdateText()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabel::Create()
+void vtkKWLabel::CreateWidget()
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget(
+  if (!vtkKWWidget::CreateSpecificTkWidget(this, 
         "label", "-justify left -highlightthickness 0"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
@@ -107,10 +107,6 @@ void vtkKWLabel::Create()
   // Set bindings (if any)
   
   this->UpdateBindings();
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

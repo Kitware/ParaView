@@ -36,7 +36,7 @@ const char *vtkKWText::TagFgDarkGreen = "_fg_dark_green_tag_";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.51");
+vtkCxxRevisionMacro(vtkKWText, "1.52");
 
 //----------------------------------------------------------------------------
 class vtkKWTextInternals
@@ -277,11 +277,11 @@ void vtkKWText::AppendTextInternal(const char *s, const char *tag)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWText::Create()
+void vtkKWText::CreateWidget()
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget(
+  if (!vtkKWWidget::CreateSpecificTkWidget(this, 
         "text", "-width 20 -wrap word -height 5 -highlightthickness 0"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
@@ -321,10 +321,6 @@ void vtkKWText::Create()
 
   this->Script("%s tag config %s -foreground #006400", 
                wname, vtkKWText::TagFgDarkGreen);
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

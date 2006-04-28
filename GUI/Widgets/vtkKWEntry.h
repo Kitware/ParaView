@@ -29,10 +29,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get the value of the entry in a few different formats.
   // In the SetValue method with double, values are printed in printf's f or e
   // format, whichever is more compact for the given value and precision. 
@@ -178,6 +174,10 @@ protected:
   vtkKWEntry();
   ~vtkKWEntry();
   
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+
   int Width;
   int ReadOnly;
 

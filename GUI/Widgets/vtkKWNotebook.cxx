@@ -60,7 +60,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.102");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.103");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -290,7 +290,7 @@ vtkKWNotebook::~vtkKWNotebook()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWNotebook::Create()
+void vtkKWNotebook::CreateWidget()
 {
   // Check if already created
 
@@ -302,7 +302,7 @@ void vtkKWNotebook::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   ostrstream cmd;
 
@@ -338,10 +338,6 @@ void vtkKWNotebook::Create()
   cmd << ends;
   this->Script(cmd.str());
   cmd.rdbuf()->freeze(0);
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

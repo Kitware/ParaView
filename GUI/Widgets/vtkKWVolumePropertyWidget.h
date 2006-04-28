@@ -47,10 +47,6 @@ public:
   vtkTypeRevisionMacro(vtkKWVolumePropertyWidget,vtkKWCompositeWidget);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Get/Set the transfer function mapping scalar value to color
   vtkGetObjectMacro(VolumeProperty, vtkVolumeProperty);
   virtual void SetVolumeProperty(vtkVolumeProperty*);
@@ -299,6 +295,10 @@ public:
 protected:
   vtkKWVolumePropertyWidget();
   ~vtkKWVolumePropertyWidget();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkVolumeProperty *VolumeProperty;
   vtkDataSet        *DataSet;

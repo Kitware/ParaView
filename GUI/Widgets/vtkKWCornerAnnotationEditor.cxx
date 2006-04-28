@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.20");
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.21");
 
 //----------------------------------------------------------------------------
 vtkKWCornerAnnotationEditor::vtkKWCornerAnnotationEditor()
@@ -161,7 +161,7 @@ void vtkKWCornerAnnotationEditor::Close()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotationEditor::Create()
+void vtkKWCornerAnnotationEditor::CreateWidget()
 {
   // Create the superclass widgets
 
@@ -171,7 +171,7 @@ void vtkKWCornerAnnotationEditor::Create()
     return;
     }
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   int popup_text_property = 
     this->PopupTextProperty && !this->PopupMode;

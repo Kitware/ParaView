@@ -22,7 +22,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro( vtkKWSimpleEntryDialog );
-vtkCxxRevisionMacro(vtkKWSimpleEntryDialog, "1.13");
+vtkCxxRevisionMacro(vtkKWSimpleEntryDialog, "1.14");
 
 //----------------------------------------------------------------------------
 vtkKWSimpleEntryDialog::vtkKWSimpleEntryDialog()
@@ -41,7 +41,7 @@ vtkKWSimpleEntryDialog::~vtkKWSimpleEntryDialog()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSimpleEntryDialog::Create()
+void vtkKWSimpleEntryDialog::CreateWidget()
 {
   // Check if already created
 
@@ -51,7 +51,7 @@ void vtkKWSimpleEntryDialog::Create()
     return;
     }
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
   
   this->Entry->SetParent(this->MessageDialogFrame);
   this->Entry->Create();

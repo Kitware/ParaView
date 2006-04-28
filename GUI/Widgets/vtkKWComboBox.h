@@ -37,10 +37,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Add and delete values to put in the list.
   virtual void AddValue(const char* value);
   virtual void AddValueAsInt(int value);
@@ -96,6 +92,10 @@ protected:
   vtkKWComboBox();
   ~vtkKWComboBox() {};
   
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+
 private:
   vtkKWComboBox(const vtkKWComboBox&); // Not implemented
   void operator=(const vtkKWComboBox&); // Not Implemented

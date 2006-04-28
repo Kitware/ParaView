@@ -31,10 +31,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get the background color of the widget.
   virtual void GetBackgroundColor(double *r, double *g, double *b);
   virtual double* GetBackgroundColor();
@@ -197,6 +193,10 @@ public:
 protected:
   vtkKWListBox();
   ~vtkKWListBox();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   char* CurrentSelection;       // store last call of CurrentSelection
   char* Item;                   // store last call of GetItem

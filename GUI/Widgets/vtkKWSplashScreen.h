@@ -30,10 +30,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set the text of the progress message
   void SetProgressMessage(const char *);
   
@@ -70,6 +66,10 @@ public:
 protected:
   vtkKWSplashScreen();
   ~vtkKWSplashScreen();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkKWCanvas *Canvas;
   char *ImageName;

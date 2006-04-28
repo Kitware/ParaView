@@ -34,14 +34,9 @@ class vtkKWToolbarSet;
 class KWWidgets_EXPORT vtkKWWindowBase : public vtkKWTopLevel
 {
 public:
-
   static vtkKWWindowBase* New();
   vtkTypeRevisionMacro(vtkKWWindowBase,vtkKWTopLevel);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Create the widget.
-  virtual void Create();
 
   // Description:
   // Close this window, possibly prompting the user.
@@ -310,6 +305,10 @@ public:
 protected:
   vtkKWWindowBase();
   ~vtkKWWindowBase();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   // Description:
   // Insert a "Recent Files" sub-menu to the File menu at position 'pos'

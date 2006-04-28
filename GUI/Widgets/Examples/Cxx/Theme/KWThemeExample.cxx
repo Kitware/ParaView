@@ -82,7 +82,7 @@ int my_main(int argc, char *argv[])
     dlg->SetStyleToCancel();
     dlg->Create();
     dlg->SetTitle(app->GetName());
-    dlg->SetText("This example demonstrates simple themes using the vtkKWTheme class. Select a theme below and a this dialog will be re-created using the corresponding settings.");
+    dlg->SetText("This example demonstrates simple themes using the vtkKWTheme class. Select a theme below and this dialog will be re-created using the corresponding settings.");
 
     // The themes selection
 

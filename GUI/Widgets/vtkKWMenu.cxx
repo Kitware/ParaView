@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.103");
+vtkCxxRevisionMacro(vtkKWMenu, "1.104");
 
 #define VTK_KW_MENU_CB_VARNAME_PATTERN "CB_group%d"
 #define VTK_KW_MENU_RB_DEFAULT_GROUP "RB_group"
@@ -46,11 +46,11 @@ vtkKWMenu::~vtkKWMenu()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::Create()
+void vtkKWMenu::CreateWidget()
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::CreateSpecificTkWidget("menu"))
+  if (!vtkKWWidget::CreateSpecificTkWidget(this, "menu"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -58,10 +58,6 @@ void vtkKWMenu::Create()
 
   this->SetConfigurationOptionAsInt("-tearoff", this->TearOff);
   this->SetBinding("<<MenuSelect>>", this, "DisplayHelpCallback %W");
-
-  // Update enable state
-  
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

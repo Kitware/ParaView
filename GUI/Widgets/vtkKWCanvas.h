@@ -56,10 +56,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set the width and height of the canvas.
   // No effect before Create() is called.
   virtual void SetWidth(int);
@@ -115,6 +111,10 @@ public:
 protected:
   vtkKWCanvas() {};
   ~vtkKWCanvas() {};
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
 private:
   vtkKWCanvas(const vtkKWCanvas&); // Not implemented

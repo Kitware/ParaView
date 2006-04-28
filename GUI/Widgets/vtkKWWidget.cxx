@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.145");
+vtkCxxRevisionMacro(vtkKWWidget, "1.146");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetInternals
@@ -181,95 +181,93 @@ const char *vtkKWWidget::GetWidgetName()
 //----------------------------------------------------------------------------
 void vtkKWWidget::Create()
 {
-  this->CreateSpecificTkWidget(NULL, NULL);
+  // Create the widget itself and its internal sub-widgets, if any
+  // This CreateWidget() method is re-implemented in each widget subclasses.
+
+  this->CreateWidget();
+
+  // Configure the object using the option database
+
+  if (this->IsCreated())
+    {
+    this->GetApplication()->GetOptionDataBase()->ConfigureWidget(this);
+    }
+
+  // Make sure the enable state is up-to-date
+
+  this->UpdateEnableState();
+
+  this->InvokeEvent(vtkKWWidget::WidgetCreatedEvent, NULL);
 }
 
 //----------------------------------------------------------------------------
-int vtkKWWidget::CreateSpecificTkWidget(const char *type, 
+void vtkKWWidget::CreateWidget()
+{
+  vtkKWWidget::CreateSpecificTkWidget(this, NULL, NULL);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWWidget::CreateSpecificTkWidget(vtkKWWidget *obj,
+                                        const char *type, 
                                         const char *args)
 {
-  if (this->IsCreated())
+  if (obj->IsCreated())
     {
     if (type)
       {
-      vtkErrorMacro(
-        << this->GetClassName() << " (" << type << ") already created");
+      vtkErrorWithObjectMacro(obj,
+        << obj->GetClassName() << " (" << type << ") already created");
       }
     else
       {
-      vtkErrorMacro(<< this->GetClassName() << " already created");
+      vtkErrorWithObjectMacro(
+        obj, << obj->GetClassName() << " already created");
       }
     return 0;
     }
 
-  vtkKWApplication *app = this->GetApplication();
+  vtkKWApplication *app = obj->GetApplication();
   if (!app)
     {
-    vtkErrorMacro("Can not create widget if its application attribute was not set. Make sure that you called the SetApplication method on this widget, or that you set its parent to a widget which application attribute is set already.");
+    vtkErrorWithObjectMacro(obj, "Can not create widget if its application attribute was not set. Make sure that you called the SetApplication method on this widget, or that you set its parent to a widget which application attribute is set already.");
     return 0;
     }
 
-  if (this->HasDragAndDropTargetSet())
+  if (obj->HasDragAndDropTargetSet())
     {
-    this->GetDragAndDropTargetSet()->SetApplication(app);
+    obj->GetDragAndDropTargetSet()->SetApplication(app);
     }
 
   const char *ret = NULL;
 
   if (!type)
     {
-    this->WidgetIsCreated = 1;
+    obj->WidgetIsCreated = 1;
     }
   else
     {
     if (args)
       {
-      ret = this->Script("%s %s %s", type, this->GetWidgetName(), args);
+      ret = obj->Script("%s %s %s", type, obj->GetWidgetName(), args);
       }
     else
       {
-      ret = this->Script("%s %s", type, this->GetWidgetName());
+      ret = obj->Script("%s %s", type, obj->GetWidgetName());
       }
-    if (ret && strcmp(ret, this->GetWidgetName()))
+    if (ret && strcmp(ret, obj->GetWidgetName()))
       {
-      vtkErrorMacro("Error creating the widget " << this->GetWidgetName() 
-                    << " of type " << type << ": " << ret);
+      vtkErrorWithObjectMacro(
+        obj, "Error creating the widget " << obj->GetWidgetName() 
+        << " of type " << type << ": " << ret);
       return 0;
       }
 
-    this->WidgetIsCreated = 1;
-
-    app->GetOptionDataBase()->ConfigureObject(this);
-
-    /* Update enable state
-       At this point, the widget is considered created, although for all 
-       all subclasses calling this method, only a part of the widget has
-       really been created (for ex., this method will be used to create the
-       main container for the widget, like a frame, and the subclass will
-       create the subwidgets to put in). 
-       Ideally, we could have a function that explicitly sets when a widget
-       is fully created or not.
-       Anyway, most subclasses override the virtual UpdateEnableState()
-       method to propagate the Enabled state to their subwidgets components.
-       If we call it now, it will immediately go inside the overriden method
-       and try to act on widget that have propably not been created yet: it
-       is therefore important that the overriden UpdateEnableState() is smart
-       enough and test if each subwidget has really been created 
-       (subobj->IsCreated() instead of just this->IsCreated(), which will 
-       return true at the moment). It is the case at the moment.
-       Also, each subclass should call UpdateEnableState() at the end of their
-       own Create() method, so that the code that is supposed to be executed
-       in the overriden UpdateEnableState() for the subwidgets is really 
-       executed now that they have been created.
-       The call here, even if it goes down to the subclass, is still needed.
-    */
-   
-    this->UpdateEnableState();
+    obj->WidgetIsCreated = 1;
 
     // If the balloon help string has been set, make sure the bindings
     // are set too, now that we have been created
 
-    this->AddBalloonHelpBindings();
+    obj->AddBalloonHelpBindings();
     }
 
   return 1;

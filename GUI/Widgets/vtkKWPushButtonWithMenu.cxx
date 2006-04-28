@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWPushButtonWithMenu );
-vtkCxxRevisionMacro(vtkKWPushButtonWithMenu, "1.8");
+vtkCxxRevisionMacro(vtkKWPushButtonWithMenu, "1.9");
 
 //----------------------------------------------------------------------------
 vtkKWPushButtonWithMenu::vtkKWPushButtonWithMenu()
@@ -34,11 +34,11 @@ vtkKWPushButtonWithMenu::~vtkKWPushButtonWithMenu()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPushButtonWithMenu::Create()
+void vtkKWPushButtonWithMenu::CreateWidget()
 { 
   // Call the superclass to create the widget and set the appropriate flags
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
   this->Menu->SetParent(this);
   this->Menu->Create();  
 

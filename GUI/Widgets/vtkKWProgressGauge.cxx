@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.37");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.38");
 
 //----------------------------------------------------------------------------
 vtkKWProgressGauge::vtkKWProgressGauge()
@@ -49,7 +49,7 @@ vtkKWProgressGauge::~vtkKWProgressGauge()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWProgressGauge::Create()
+void vtkKWProgressGauge::CreateWidget()
 {
   // Check if already created
 
@@ -61,7 +61,7 @@ void vtkKWProgressGauge::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->Canvas = vtkKWCanvas::New();
   this->Canvas->SetParent(this);
@@ -83,10 +83,6 @@ void vtkKWProgressGauge::Create()
 
   this->Script("pack %s -fill both -expand yes", 
                this->Canvas->GetWidgetName());
-
-  // Update enable state
-
-  this->UpdateEnableState();
 
   this->Redraw();
 }

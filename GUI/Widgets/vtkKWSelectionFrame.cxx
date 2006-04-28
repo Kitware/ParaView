@@ -27,7 +27,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.57");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.58");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -205,7 +205,7 @@ vtkKWSelectionFrame::~vtkKWSelectionFrame()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrame::Create()
+void vtkKWSelectionFrame::CreateWidget()
 {
   // Check if already created
 
@@ -217,7 +217,7 @@ void vtkKWSelectionFrame::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->SetBorderWidth(1);
   this->SetReliefToRidge();
@@ -272,10 +272,6 @@ void vtkKWSelectionFrame::Create()
   // Update aspect
 
   this->UpdateSelectedAspect();
-  
-  // Update enable state (this will Bind() too)
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

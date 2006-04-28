@@ -16,12 +16,12 @@
 #include "vtkCallbackCommand.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionInterface, "1.6");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionInterface, "1.7");
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionInterface::Create()
+void vtkKWParameterValueFunctionInterface::CreateWidget()
 {
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 }
 
 //----------------------------------------------------------------------------

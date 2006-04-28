@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWVolumeMaterialPropertyWidget);
-vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.22");
+vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.23");
 
 //----------------------------------------------------------------------------
 vtkKWVolumeMaterialPropertyWidget::vtkKWVolumeMaterialPropertyWidget()
@@ -104,7 +104,7 @@ void vtkKWVolumeMaterialPropertyWidget::SetVolumeProperty(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWVolumeMaterialPropertyWidget::Create()
+void vtkKWVolumeMaterialPropertyWidget::CreateWidget()
 {
   if (this->IsCreated())
     {
@@ -114,7 +114,7 @@ void vtkKWVolumeMaterialPropertyWidget::Create()
 
   // Call superclass
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // --------------------------------------------------------------
   // Material frame

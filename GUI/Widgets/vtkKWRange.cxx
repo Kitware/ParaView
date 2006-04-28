@@ -24,7 +24,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.68");
+vtkCxxRevisionMacro(vtkKWRange, "1.69");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -164,7 +164,7 @@ vtkKWRange::~vtkKWRange()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::Create()
+void vtkKWRange::CreateWidget()
 {
   // Check if already created
 
@@ -177,7 +177,7 @@ void vtkKWRange::Create()
   // Call the superclass, this will set the application,
   // create the frame and the Label
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Now we need the canvas
 
@@ -215,10 +215,6 @@ void vtkKWRange::Create()
   // Set the bindings
 
   this->Bind();
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

@@ -22,7 +22,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.20");
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.21");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";
@@ -110,7 +110,7 @@ void vtkKWParameterValueHermiteFunctionEditor::UpdateMidPointEntries(int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueHermiteFunctionEditor::Create()
+void vtkKWParameterValueHermiteFunctionEditor::CreateWidget()
 {
   // Check if already created
 
@@ -122,7 +122,7 @@ void vtkKWParameterValueHermiteFunctionEditor::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Create the midpoint entry
 

@@ -39,10 +39,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get the midpoint entry UI visibility.
   // Not shown if superclass PointEntriesVisibility is set to Off
   // Note: set this parameter to the proper value before calling Create() in
@@ -218,6 +214,10 @@ public:
 protected:
   vtkKWParameterValueHermiteFunctionEditor();
   ~vtkKWParameterValueHermiteFunctionEditor();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   // Description:
   // Retrieve the midpoint between two adjacent points 'id' and 'id + 1'.

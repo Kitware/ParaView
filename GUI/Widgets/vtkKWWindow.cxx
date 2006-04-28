@@ -34,7 +34,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.279");
+vtkCxxRevisionMacro(vtkKWWindow, "1.280");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -231,7 +231,7 @@ void vtkKWWindow::PrepareForDelete()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::Create()
+void vtkKWWindow::CreateWidget()
 {
   // Check if already created
 
@@ -243,7 +243,7 @@ void vtkKWWindow::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   vtksys_stl::string cmd, event;
   vtkKWMenu *menu = NULL;
@@ -322,10 +322,6 @@ void vtkKWWindow::Create()
   this->GetWindowMenu()->SetItemHelpString(
     idx, k_("Display a prompt to interact with the Tcl engine"));
   this->GetWindowMenu()->SetItemAccelerator(idx, "Ctrl+T");
-
-  // Udpate the enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

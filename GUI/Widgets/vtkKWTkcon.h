@@ -36,10 +36,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // Append text to the display window.
   virtual void AppendText(const char* text);
 
@@ -61,6 +57,10 @@ protected:
   vtkKWTkcon();
   ~vtkKWTkcon();
 
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+  
   // PIMPL Encapsulation for STL containers
   //BTX
   vtkKWTkconInternals *Internals;

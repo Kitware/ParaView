@@ -48,10 +48,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set the width (in chars) and height (in lines).
   // If width is set to 0, the widget will be large enough to show
   // all columns. If set to a different value, columns will stretch
@@ -1224,6 +1220,10 @@ public:
 protected:
   vtkKWMultiColumnList();
   ~vtkKWMultiColumnList();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   char *EditStartCommand;
   const char* InvokeEditStartCommand(int row, int col, const char *text);

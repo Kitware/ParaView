@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWColorPresetSelector);
-vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.27");
+vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.28");
 
 vtkCxxSetObjectMacro(vtkKWColorPresetSelector,ColorTransferFunction,vtkColorTransferFunction);
 
@@ -610,7 +610,7 @@ void vtkKWColorPresetSelector::CreateDefaultPresets()
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWColorPresetSelector::Create()
+void vtkKWColorPresetSelector::CreateWidget()
 {
   if (this->IsCreated())
     {
@@ -620,7 +620,7 @@ void vtkKWColorPresetSelector::Create()
 
   // Create the superclass instance (and set the application)
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   if (!this->HasLabel() || !this->GetLabel()->GetText())
     {

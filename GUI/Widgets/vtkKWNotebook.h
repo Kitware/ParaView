@@ -30,15 +30,10 @@ class vtkKWNotebookInternals;
 class KWWidgets_EXPORT vtkKWNotebook : public vtkKWCompositeWidget
 {
 public:
-
   static vtkKWNotebook* New();
   vtkTypeRevisionMacro(vtkKWNotebook,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   
-  // Description:
-  // Create the widget.
-  virtual void Create();
-
   // Description:
   // Add a new page to the notebook. By setting balloon string, the page will
   // display a balloon help. An optional icon can also be specified and will 
@@ -315,6 +310,10 @@ public:
 protected:
   vtkKWNotebook();
   ~vtkKWNotebook();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   int MinimumWidth;
   int MinimumHeight;

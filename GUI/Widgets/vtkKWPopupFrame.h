@@ -37,10 +37,6 @@ public:
   vtkBooleanMacro(PopupMode, int);
   
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Access to sub-widgets
   vtkGetObjectMacro(PopupButton, vtkKWPopupButton);
   vtkGetObjectMacro(Frame, vtkKWFrameWithLabel);
@@ -57,6 +53,10 @@ public:
 protected:
   vtkKWPopupFrame();
   ~vtkKWPopupFrame();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   // GUI
 

@@ -32,7 +32,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.51");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.52");
 
 #define VTK_KW_CTFE_COLOR_RAMP_TAG "color_ramp_tag"
 
@@ -673,7 +673,7 @@ void vtkKWColorTransferFunctionEditor::UpdateColorSpaceOptionMenu()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWColorTransferFunctionEditor::Create()
+void vtkKWColorTransferFunctionEditor::CreateWidget()
 {
   // Check if already created
 
@@ -685,7 +685,7 @@ void vtkKWColorTransferFunctionEditor::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Add the color space option menu
 

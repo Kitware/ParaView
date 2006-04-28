@@ -45,10 +45,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget
-  virtual void Create();
-
-  // Description:
   // Get the @WidgetType@ that is being associated to the spin buttons
   virtual @WidgetType@* GetWidget();
   
@@ -74,6 +70,10 @@ public:
 protected:
   @WidgetType@WithSpinButtons();
   ~@WidgetType@WithSpinButtons();
+
+  // Description:
+  // Create the widget
+  virtual void CreateWidget();
 
   // Description:
   // Pack or repack the widget. To be implemented by subclasses.

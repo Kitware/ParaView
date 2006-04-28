@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(@WidgetType@WithScrollbars);
-vtkCxxRevisionMacro(@WidgetType@WithScrollbars, "1.4");
+vtkCxxRevisionMacro(@WidgetType@WithScrollbars, "1.5");
 
 //----------------------------------------------------------------------------
 @WidgetType@WithScrollbars::@WidgetType@WithScrollbars()
@@ -46,7 +46,7 @@ vtkCxxRevisionMacro(@WidgetType@WithScrollbars, "1.4");
 }
 
 //----------------------------------------------------------------------------
-void @WidgetType@WithScrollbars::Create()
+void @WidgetType@WithScrollbars::CreateWidget()
 {
   // Check if already created
 
@@ -58,7 +58,7 @@ void @WidgetType@WithScrollbars::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Create the widget
 

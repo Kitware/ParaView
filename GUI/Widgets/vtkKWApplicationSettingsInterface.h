@@ -38,14 +38,14 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Create the widget.
+  virtual void Create();
+
+  // Description:
   // Set/Get the window (do not ref count it since the window will ref count
   // this widget).
   vtkGetObjectMacro(Window, vtkKWWindow);
   virtual void SetWindow(vtkKWWindow*);
-
-  // Description:
-  // Create the widget.
-  virtual void Create();
 
   // Description:
   // Refresh the interface given the current value of the Window and its

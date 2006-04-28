@@ -30,10 +30,6 @@ public:
   vtkTypeRevisionMacro(vtkKWScalarComponentSelectionWidget,vtkKWCompositeWidget);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Are the components independent of each other?
   virtual void SetIndependentComponents(int);
   vtkGetMacro(IndependentComponents, int);
@@ -91,6 +87,10 @@ public:
 protected:
   vtkKWScalarComponentSelectionWidget();
   ~vtkKWScalarComponentSelectionWidget();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   int IndependentComponents;
   int NumberOfComponents;

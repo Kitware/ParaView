@@ -31,10 +31,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get the hue/saturation wheel radius in pixels.
   virtual void SetHueSatWheelRadius(int);
   vtkGetMacro(HueSatWheelRadius, int);
@@ -149,6 +145,10 @@ public:
 protected:
   vtkKWHSVColorSelector();
   ~vtkKWHSVColorSelector();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   int    HueSatWheelRadius;
   int    HueSatCursorRadius;

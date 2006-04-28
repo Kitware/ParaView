@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSeparator );
-vtkCxxRevisionMacro(vtkKWSeparator, "1.2");
+vtkCxxRevisionMacro(vtkKWSeparator, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWSeparator::vtkKWSeparator()
@@ -27,7 +27,7 @@ vtkKWSeparator::vtkKWSeparator()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSeparator::Create()
+void vtkKWSeparator::CreateWidget()
 {
   // Check if already created
 
@@ -39,7 +39,7 @@ void vtkKWSeparator::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->SetBorderWidth(2);
 

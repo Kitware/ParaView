@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessage );
-vtkCxxRevisionMacro(vtkKWMessage, "1.6");
+vtkCxxRevisionMacro(vtkKWMessage, "1.7");
 
 //----------------------------------------------------------------------------
 vtkKWMessage::vtkKWMessage()
@@ -81,11 +81,11 @@ void vtkKWMessage::UpdateText()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMessage::Create()
+void vtkKWMessage::CreateWidget()
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget(
+  if (!vtkKWWidget::CreateSpecificTkWidget(this, 
         "message", "-justify left -highlightthickness 0"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
@@ -93,10 +93,6 @@ void vtkKWMessage::Create()
     }
 
   this->UpdateText();
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

@@ -34,10 +34,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Access to sub-widgets.
   vtkGetObjectMacro(LoadSaveDialog, vtkKWLoadSaveDialog);
 
@@ -70,6 +66,10 @@ public:
 protected:
   vtkKWLoadSaveButton();
   ~vtkKWLoadSaveButton();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkKWLoadSaveDialog *LoadSaveDialog;
 

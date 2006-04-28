@@ -37,10 +37,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get the -state option to "normal" (1) or "disabled" (0) or "readonly"
   // (2, if supported).
   // Valid constants can be found in vtkKWOptions::StateType.
@@ -85,6 +81,10 @@ public:
 protected:
   vtkKWCoreWidget();
   ~vtkKWCoreWidget();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   // Description:
   // Get the Tk string type of the widget.

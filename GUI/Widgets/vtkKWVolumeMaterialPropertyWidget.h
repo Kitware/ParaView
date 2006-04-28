@@ -31,10 +31,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // Set/Get the volume property to edit with this widget
   virtual void SetVolumeProperty(vtkVolumeProperty *prop);
   vtkGetObjectMacro(VolumeProperty, vtkVolumeProperty);
@@ -76,10 +72,13 @@ public:
   virtual void SelectedComponentCallback(int);
 
 protected:
-
   vtkKWVolumeMaterialPropertyWidget();
   ~vtkKWVolumeMaterialPropertyWidget();
 
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+  
   vtkVolumeProperty *VolumeProperty;
 
   int SelectedComponent;

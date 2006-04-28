@@ -36,10 +36,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set the range.
   virtual void SetRange(double from, double to);
 
@@ -216,6 +212,10 @@ public:
 protected:
   vtkKWSpinBox();
   ~vtkKWSpinBox();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   char *Command;
   virtual void InvokeCommand(double value);

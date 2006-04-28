@@ -29,6 +29,7 @@
 #include "vtkKWObject.h"
 
 class vtkKWOptionDataBaseInternals;
+class vtkKWWidget;
 
 class KWWidgets_EXPORT vtkKWOptionDataBase : public vtkKWObject
 {
@@ -42,19 +43,19 @@ public:
   // Add a new entry in the database.
   // Return the unique Id of the entry
   virtual int AddEntry(
-    const char *pattern, const char *option, const char *value);
+    const char *pattern, const char *command, const char *value);
   virtual int AddEntryAsInt(
-    const char *pattern, const char *option, int value);
+    const char *pattern, const char *command, int value);
   virtual int AddEntryAsInt3(
-    const char *pattern, const char *option, int v0, int v1, int v2);
+    const char *pattern, const char *command, int v0, int v1, int v2);
   virtual int AddEntryAsInt3(
-    const char *pattern, const char *option, int value3[3]);
+    const char *pattern, const char *command, int value3[3]);
   virtual int AddEntryAsDouble(
-    const char *pattern, const char *option, double value);
+    const char *pattern, const char *command, double value);
   virtual int AddEntryAsDouble3(
-    const char *pattern, const char *option, double v0, double v1, double v2);
+    const char *pattern, const char *command, double v0, double v1, double v2);
   virtual int AddEntryAsDouble3(
-    const char *pattern, const char *option, double value3[3]);
+    const char *pattern, const char *command, double value3[3]);
 
   // Description:
   // Remove all entries.
@@ -65,9 +66,21 @@ public:
   virtual int GetNumberOfEntries();
 
   // Description:
-  // Configure an object according to the options in the database.
+  // Configure a widget according to the options in the database.
   // Return the Id of the entry if found, -1 otherwise
-  virtual void ConfigureObject(vtkKWObject *obj);
+  virtual void ConfigureWidget(vtkKWWidget *obj);
+
+  // Description:
+  // Convenience method to set all the known background color options to a 
+  // specific color.
+  virtual void AddBackgroundColorOptions(double r, double g, double b);
+  virtual void AddBackgroundColorOptions(double rgb[3])
+    { this->AddBackgroundColorOptions(rgb[0], rgb[1], rgb[2]); };
+
+  // Description:
+  // Convenience method to set all the known font options to a 
+  // specific font.
+  virtual void AddFontOptions(const char *font);
 
 protected:
   vtkKWOptionDataBase();
@@ -77,8 +90,6 @@ protected:
   //BTX
   vtkKWOptionDataBaseInternals *Internals;
   //ETX
-
-  virtual void ConfigureObject(vtkKWObject *obj, const char *pattern);
 
 private:
 

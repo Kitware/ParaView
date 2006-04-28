@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.51");
+vtkCxxRevisionMacro(vtkKWExtent, "1.52");
 
 //----------------------------------------------------------------------------
 vtkKWExtent::vtkKWExtent()
@@ -67,7 +67,7 @@ vtkKWExtent::~vtkKWExtent()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::Create()
+void vtkKWExtent::CreateWidget()
 {
   // Check if already created
 
@@ -79,7 +79,7 @@ void vtkKWExtent::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   for (int i = 0; i < 3; i++)
     {
@@ -100,10 +100,6 @@ void vtkKWExtent::Create()
   // Pack the label and the option menu
 
   this->Pack();
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 // ----------------------------------------------------------------------------

@@ -44,10 +44,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Get the @WidgetType@ for which we addded the scrollbars
   virtual @WidgetType@* GetWidget();
   
@@ -63,6 +59,10 @@ public:
 protected:
   @WidgetType@WithScrollbars();
   ~@WidgetType@WithScrollbars();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   // Description:
   // Internal widget

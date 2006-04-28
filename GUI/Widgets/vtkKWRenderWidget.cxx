@@ -43,7 +43,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.136");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.137");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -204,7 +204,7 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::Create()
+void vtkKWRenderWidget::CreateWidget()
 {
   // Check if already created
 
@@ -216,7 +216,7 @@ void vtkKWRenderWidget::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
   
   // Create the default renderers
 
@@ -263,7 +263,8 @@ void vtkKWRenderWidget::Create()
   sprintf(opts, "-rw Addr=%p", this->RenderWindow);
 
   this->VTKWidget->SetParent(this);
-  this->VTKWidget->CreateSpecificTkWidget("vtkTkRenderWidget", opts);
+  vtkKWWidget::CreateSpecificTkWidget(
+    this->VTKWidget, "vtkTkRenderWidget", opts);
 
   this->Script("grid rowconfigure %s 0 -weight 1", this->GetWidgetName());
   this->Script("grid columnconfigure %s 0 -weight 1", this->GetWidgetName());
@@ -281,10 +282,6 @@ void vtkKWRenderWidget::Create()
   // Add the bindings
 
   this->AddBindings();
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

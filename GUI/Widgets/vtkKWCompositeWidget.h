@@ -37,13 +37,13 @@ public:
   vtkTypeRevisionMacro(vtkKWCompositeWidget, vtkKWFrame);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Create the widget.
-  virtual void Create();
-
 protected:
   vtkKWCompositeWidget() {};
   ~vtkKWCompositeWidget() {};
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
 private:
   vtkKWCompositeWidget(const vtkKWCompositeWidget&); // Not implemented

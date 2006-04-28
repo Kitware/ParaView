@@ -209,7 +209,6 @@ SET(KWWidgets_SRCS
   vtkKWScale.cxx
   vtkKWScaleWithEntry.cxx
   vtkKWScrollbar.cxx
-  vtkKWSegmentedProgressGauge.cxx
   vtkKWSelectionFrame.cxx
   vtkKWSelectionFrameLayoutManager.cxx
   vtkKWSeparator.cxx

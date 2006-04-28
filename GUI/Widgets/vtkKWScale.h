@@ -35,10 +35,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set the range for this scale.
   virtual void SetRange(double min, double max);
   virtual void SetRange(const double *range) 
@@ -288,6 +284,10 @@ public:
 protected:
   vtkKWScale();
   ~vtkKWScale();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   // Description:
   // Bind/Unbind all components so that values can be changed, but

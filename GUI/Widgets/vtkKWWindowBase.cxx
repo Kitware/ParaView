@@ -33,7 +33,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.49");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.50");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -299,7 +299,7 @@ void vtkKWWindowBase::PrepareForDelete()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindowBase::Create()
+void vtkKWWindowBase::CreateWidget()
 {
   // Check if already created
 
@@ -311,7 +311,7 @@ void vtkKWWindowBase::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   vtkKWApplication *app = this->GetApplication();
 
@@ -455,10 +455,6 @@ void vtkKWWindowBase::Create()
   // Pack and restore geometry
 
   this->Pack();
-
-  // Update the enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

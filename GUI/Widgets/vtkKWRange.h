@@ -40,10 +40,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get the whole range.
   vtkGetVector2Macro(WholeRange, double);
   virtual void SetWholeRange(double r0, double r1);
@@ -344,6 +340,10 @@ public:
 protected:
   vtkKWRange();
   ~vtkKWRange();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   double WholeRange[2];
   double Range[2];

@@ -44,10 +44,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-  
-  // Description:
   // Control the resolution in widget by widget (columns, rows)
   virtual void SetResolution(int i, int j);
   virtual void SetResolution(int res[2])
@@ -268,6 +264,10 @@ protected:
   vtkKWSelectionFrameLayoutManager();
   ~vtkKWSelectionFrameLayoutManager();
 
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+  
   int Resolution[2];
   vtkKWMenu    *ResolutionEntriesMenu;
   vtkKWToolbar *ResolutionEntriesToolbar;

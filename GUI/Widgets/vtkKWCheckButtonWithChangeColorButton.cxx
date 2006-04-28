@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWCheckButtonWithChangeColorButton);
-vtkCxxRevisionMacro(vtkKWCheckButtonWithChangeColorButton, "1.3");
+vtkCxxRevisionMacro(vtkKWCheckButtonWithChangeColorButton, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButtonWithChangeColorButton::vtkKWCheckButtonWithChangeColorButton()
@@ -50,7 +50,7 @@ vtkKWCheckButtonWithChangeColorButton::~vtkKWCheckButtonWithChangeColorButton()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButtonWithChangeColorButton::Create()
+void vtkKWCheckButtonWithChangeColorButton::CreateWidget()
 {
   // Check if already created
 
@@ -62,7 +62,7 @@ void vtkKWCheckButtonWithChangeColorButton::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Create the checkbutton. 
   

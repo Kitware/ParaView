@@ -39,7 +39,7 @@
 #include <vtksys/stl/algorithm>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.91");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.92");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -1187,7 +1187,7 @@ void vtkKWParameterValueFunctionEditor::UpdatePointEntries(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::Create()
+void vtkKWParameterValueFunctionEditor::CreateWidget()
 {
   if (this->IsCreated())
     {
@@ -1197,7 +1197,7 @@ void vtkKWParameterValueFunctionEditor::Create()
 
   // Call the superclass to create the widget and set the appropriate flags
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Create the canvas
 

@@ -30,10 +30,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get the vertical scrollbar visibility (default to On).
   virtual void SetVerticalScrollbarVisibility(int val);
   vtkGetMacro(VerticalScrollbarVisibility, int);
@@ -62,6 +58,10 @@ public:
 protected:
   vtkKWWidgetWithScrollbars();
   ~vtkKWWidgetWithScrollbars();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   // Description:
   // Scrollbar visibility flags

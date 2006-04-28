@@ -34,10 +34,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get the value of the text. AppendText() can also be used
   // to add text at the end. If a tag is provided, it will be used to 
   // tag the corresponding text.
@@ -197,6 +193,10 @@ public:
 protected:
   vtkKWText();
   ~vtkKWText();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   int ReadOnly;
   int QuickFormatting;

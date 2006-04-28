@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWidgetWithLabel);
-vtkCxxRevisionMacro(vtkKWWidgetWithLabel, "1.4");
+vtkCxxRevisionMacro(vtkKWWidgetWithLabel, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWWidgetWithLabel::vtkKWWidgetWithLabel()
@@ -60,7 +60,7 @@ int vtkKWWidgetWithLabel::HasLabel()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetWithLabel::Create()
+void vtkKWWidgetWithLabel::CreateWidget()
 {
   // Check if already created
 
@@ -72,7 +72,7 @@ void vtkKWWidgetWithLabel::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Create the label subwidget now if it has to be shown now
 
@@ -83,10 +83,6 @@ void vtkKWWidgetWithLabel::Create()
 
   // Subclasses will call this->Pack() here. Not now.
   // this->Pack();
-
-  // Update enable state
-  
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

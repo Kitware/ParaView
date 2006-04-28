@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.38");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.39");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -50,7 +50,7 @@ vtkKWSplashScreen::~vtkKWSplashScreen()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSplashScreen::Create()
+void vtkKWSplashScreen::CreateWidget()
 {
   // Check if already created
 
@@ -62,7 +62,7 @@ void vtkKWSplashScreen::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Create and pack the canvas
 

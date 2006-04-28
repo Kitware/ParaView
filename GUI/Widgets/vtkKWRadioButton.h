@@ -29,10 +29,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get the state of the Radio button 0 = off 1 = on
   vtkBooleanMacro(SelectedState,int);
   virtual int GetSelectedState();
@@ -86,6 +82,10 @@ public:
 protected:
   vtkKWRadioButton() {};
   ~vtkKWRadioButton() {};
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   // Override the superclass (state is ignored)
   virtual void InvokeCommand(int state);

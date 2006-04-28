@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWComboBox);
-vtkCxxRevisionMacro(vtkKWComboBox, "1.14");
+vtkCxxRevisionMacro(vtkKWComboBox, "1.15");
 
 //----------------------------------------------------------------------------
 vtkKWComboBox::vtkKWComboBox()
@@ -29,7 +29,7 @@ vtkKWComboBox::vtkKWComboBox()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWComboBox::Create()
+void vtkKWComboBox::CreateWidget()
 {
   // Use BWidget's ComboBox class:
   // http://aspn.activestate.com/ASPN/docs/ActiveTcl/bwidget/contents.html
@@ -39,7 +39,7 @@ void vtkKWComboBox::Create()
 
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget(
+  if (!vtkKWWidget::CreateSpecificTkWidget(this, 
         "ComboBox", "-highlightthickness 0"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
@@ -47,10 +47,6 @@ void vtkKWComboBox::Create()
     }
 
   this->Configure();
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

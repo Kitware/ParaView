@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWidgetWithSpinButtons);
-vtkCxxRevisionMacro(vtkKWWidgetWithSpinButtons, "1.3");
+vtkCxxRevisionMacro(vtkKWWidgetWithSpinButtons, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWWidgetWithSpinButtons::vtkKWWidgetWithSpinButtons()
@@ -38,7 +38,7 @@ vtkKWWidgetWithSpinButtons::~vtkKWWidgetWithSpinButtons()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetWithSpinButtons::Create()
+void vtkKWWidgetWithSpinButtons::CreateWidget()
 {
   // Check if already created
 
@@ -50,7 +50,7 @@ void vtkKWWidgetWithSpinButtons::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Create the spin buttons subwidget
 
@@ -61,10 +61,6 @@ void vtkKWWidgetWithSpinButtons::Create()
 
   // Subclasses will call this->Pack() here. Not now.
   // this->Pack();
-
-  // Update enable state
-  
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

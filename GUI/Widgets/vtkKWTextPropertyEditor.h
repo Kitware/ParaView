@@ -39,10 +39,6 @@ public:
   vtkTypeRevisionMacro(vtkKWTextPropertyEditor,vtkKWCompositeWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Create the widget.
-  virtual void Create();
-
   // Description
   // Refresh/Update the interface according to the value of the text property
   // and actor2d
@@ -179,6 +175,10 @@ public:
 protected:
   vtkKWTextPropertyEditor();
   ~vtkKWTextPropertyEditor();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   virtual void Pack();
 

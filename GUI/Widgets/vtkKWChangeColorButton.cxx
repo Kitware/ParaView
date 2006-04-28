@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.71");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.72");
 
 //----------------------------------------------------------------------------
 vtkKWChangeColorButton::vtkKWChangeColorButton()
@@ -83,7 +83,7 @@ void vtkKWChangeColorButton::SetColor(double r, double g, double b)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWChangeColorButton::Create()
+void vtkKWChangeColorButton::CreateWidget()
 {
   // Check if already created
 
@@ -96,7 +96,7 @@ void vtkKWChangeColorButton::Create()
   // Call the superclass, this will set the application,
   // create the frame and the Label
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Create the main frame
 
@@ -123,10 +123,6 @@ void vtkKWChangeColorButton::Create()
   // Bind
 
   this->Bind();
-
-  // Update enable state
-  
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

@@ -28,10 +28,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Access to the entry
   vtkGetObjectMacro(Entry, vtkKWEntryWithLabel);
 
@@ -44,6 +40,10 @@ public:
 protected:
   vtkKWSimpleEntryDialog();
   ~vtkKWSimpleEntryDialog();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkKWEntryWithLabel *Entry;
 

@@ -31,10 +31,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get/Toggle the selected state of the check button 0 = off 1 = on
   virtual void SetSelectedState(int );
   virtual int GetSelectedState();
@@ -284,6 +280,10 @@ public:
   virtual void CommandCallback();
 
 protected:
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkSetStringMacro(InternalText);
 

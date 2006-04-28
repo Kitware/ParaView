@@ -33,10 +33,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Access to sub-widgets.
   // The PopupFrame widget is the place to put your own sub-widgets.
   vtkGetObjectMacro(PopupTopLevel, vtkKWTopLevel);
@@ -73,6 +69,10 @@ public:
 protected:
   vtkKWPopupButton();
   ~vtkKWPopupButton();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkKWTopLevel   *PopupTopLevel;
   vtkKWFrame      *PopupFrame;

@@ -21,7 +21,7 @@
 #include <vtksys/stl/vector>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWWidgetSet, "1.15");
+vtkCxxRevisionMacro(vtkKWWidgetSet, "1.16");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetSetInternals
@@ -157,7 +157,7 @@ int vtkKWWidgetSet::GetWidgetPosition(int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetSet::Create()
+void vtkKWWidgetSet::CreateWidget()
 {
   // Check if already created
 
@@ -169,11 +169,7 @@ void vtkKWWidgetSet::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
-
-  // Update enable state
-
-  this->UpdateEnableState();
+  this->Superclass::CreateWidget();
 }
 
 //----------------------------------------------------------------------------

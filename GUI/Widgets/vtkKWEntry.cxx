@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry);
-vtkCxxRevisionMacro(vtkKWEntry, "1.79");
+vtkCxxRevisionMacro(vtkKWEntry, "1.80");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -41,11 +41,11 @@ vtkKWEntry::~vtkKWEntry()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWEntry::Create()
+void vtkKWEntry::CreateWidget()
 {
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget(
+  if (!vtkKWWidget::CreateSpecificTkWidget(this, 
         "entry", "-highlightthickness 0"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
@@ -53,10 +53,6 @@ void vtkKWEntry::Create()
     }
 
   this->Configure();
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

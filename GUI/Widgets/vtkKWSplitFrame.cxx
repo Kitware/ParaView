@@ -17,7 +17,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.41");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.42");
 
 //----------------------------------------------------------------------------
 vtkKWSplitFrame::vtkKWSplitFrame()
@@ -70,7 +70,7 @@ vtkKWSplitFrame::~vtkKWSplitFrame()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSplitFrame::Create()
+void vtkKWSplitFrame::CreateWidget()
 {
   // Check if already created
 
@@ -82,7 +82,7 @@ void vtkKWSplitFrame::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->SetConfigurationOptionAsInt("-width", 200);
   this->SetConfigurationOptionAsInt("-height", 100);
@@ -103,10 +103,6 @@ void vtkKWSplitFrame::Create()
   this->AddBindings();
 
   this->ConfigureSeparatorCursor();
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

@@ -45,10 +45,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Close the widget. 
   // This method brings the widget back to an empty/clean state. 
   // It removes all the actors/props, removes the bindings, resets the
@@ -315,6 +311,10 @@ protected:
   vtkKWRenderWidget();
   ~vtkKWRenderWidget();
   
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+
   vtkKWCoreWidget                    *VTKWidget;
   vtkRenderWindow                    *RenderWindow;
   vtkKWGenericRenderWindowInteractor *Interactor;

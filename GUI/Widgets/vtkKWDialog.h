@@ -30,10 +30,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Invoke the dialog, display it and enter an event loop until the user
   // confirms or cancels the dialog.
   // Note that a dialog is a modal toplevel by default.
@@ -93,9 +89,12 @@ public:
   virtual int IsUserDoneWithDialog();
 
 protected:
-
   vtkKWDialog();
   ~vtkKWDialog() {};
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   int Done;
   int Beep;

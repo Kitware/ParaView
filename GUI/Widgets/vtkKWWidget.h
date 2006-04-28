@@ -51,8 +51,15 @@ public:
 
   // Description:
   // Create the widget.
-  // The parent should be set before calling this method.
-  // Subclasses should implement a Create() method with the same signature.
+  // The parent should be set before calling this method (see SetParent()).
+  // Once the object is fully created:
+  // - the widget is configured according to the settings found in the 
+  //   application's option database.
+  // - the UpdateEnableState() method is called to make sure the state
+  //   of the widget and its internal sub-widgets is up-to-date.
+  // - a WidgetCreatedEvent event is sent.
+  // Subclasses should *not* re-implement this method but re-implement the
+  // protected CreateWidget() method instead.
   virtual void Create();
 
   // Description:
@@ -198,32 +205,15 @@ public:
   virtual void RemoveAllChildren();
 
   // Description:
-  // Create a specific Tk widget of type 'type', with optional arguments 
-  // 'args' and map it to this instance.
-  // Use the Create() method to create this widget instance instead, do *not*
-  // use the CreateSpecificTkWidget() method unless you are calling from
-  // a subclass to implement a specific kind of Tk widget as a vtkKWWidget
-  // subclass, or unless you have to map an external pure Tk widget into a
-  // vtkKWWidget.
-  // This method should be called by all subclasses to ensure that flags are
-  // set correctly (typically from the subclass's Create() method).
-  // If 'type' is NULL, this method will still perform some checkings and
-  // set the proper flags indicating that the widget has been created. It will
-  // then be up to the subclass to create the appropriate Tk widget after
-  // calling the superclass's Create().
-  // Please *do* refrain from using 'args' to pass arbitrary Tk
-  // option settings, let the user call SetConfigurationOption() instead, 
-  // or much better, create C++ methods as front-ends to those settings. 
-  // For example, the SetBackgroundColor() method can/should be used to set
-  // the corresponding -bg Tk option. 
-  // Ideally, the 'args' parameter should only be used to specify options that
-  // can *not* be changed using Tk's 'configure' 
-  // (i.e. SetConfigurationOptions()), and therefore that have to be passed
-  // at widget's creation time. For example the -visual and -class options 
-  // of the 'toplevel' widget.
-  // Return 1 on success, 0 otherwise.
-  virtual int CreateSpecificTkWidget(
-    const char *type, const char *args = NULL);
+  // Events.
+  // The WidgetCreatedEvent is sent after Create() is called.
+  //BTX
+  enum
+  {
+    WidgetCreatedEvent = 30000
+  };
+  //ETX
+
 
 protected:
   vtkKWWidget();
@@ -258,6 +248,30 @@ protected:
   // (preferably a sub-widget).
   // It calls SetEnabled(this->GetEnabled()) on the 'widget' parameter
   virtual void PropagateEnableState(vtkKWWidget* widget);
+
+  // Description:
+  // Create the widget. This is the method that should be implemented to
+  // create the widget itself, as well as its internal widgets if any.
+  // Subclasses should re-implement this method (do *not* re-implement the
+  // public Create() method).
+  virtual void CreateWidget();
+
+  // Description:
+  // Create a specific Tk widget of type 'type', with optional arguments 
+  // 'args' and map it to an object 'obj'.
+  // This method should only be used to from a subclass to implement a
+  // specific kind of pure Tk widget as a vtkKWWidget subclass, or  to map
+  // an external pure Tk widget into a vtkKWWidget.
+  // If 'type' is NULL, this method will still perform some checkings and
+  // set the proper flags indicating that the widget has been created. 
+  // Ideally, the 'args' parameter should only be used to specify options that
+  // can *not* be changed using Tk's 'configure' 
+  // (i.e. SetConfigurationOptions()), and therefore that have to be passed
+  // at widget's creation time. For example the -visual and -class options 
+  // of the 'toplevel' widget.
+  // Return 1 on success, 0 otherwise.
+  static int CreateSpecificTkWidget(
+    vtkKWWidget *obj, const char *type, const char *args = NULL);
 
 private:
   

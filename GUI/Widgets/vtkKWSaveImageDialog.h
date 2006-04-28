@@ -27,10 +27,6 @@ public:
   vtkTypeRevisionMacro(vtkKWSaveImageDialog,vtkKWLoadSaveDialog);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Create the widget.
-  virtual void Create();
-
   // Description::
   // Invoke the dialog 
   virtual int Invoke();
@@ -38,6 +34,10 @@ public:
 protected:
   vtkKWSaveImageDialog() {};
   ~vtkKWSaveImageDialog() {};
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
 private:
   vtkKWSaveImageDialog(const vtkKWSaveImageDialog&); // Not implemented

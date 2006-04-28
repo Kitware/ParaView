@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWSpinButtons );
-vtkCxxRevisionMacro(vtkKWSpinButtons, "1.4");
+vtkCxxRevisionMacro(vtkKWSpinButtons, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWSpinButtons::vtkKWSpinButtons()
@@ -49,7 +49,7 @@ vtkKWSpinButtons::~vtkKWSpinButtons()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSpinButtons::Create()
+void vtkKWSpinButtons::CreateWidget()
 {
   // Check if already created
 
@@ -61,7 +61,7 @@ void vtkKWSpinButtons::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   this->PreviousButton->SetParent(this);
   this->PreviousButton->Create();
@@ -75,10 +75,6 @@ void vtkKWSpinButtons::Create()
   
   this->UpdateArrowOrientation();
   this->Pack();
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.39");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.40");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarSetInternals
@@ -128,7 +128,7 @@ vtkKWToolbarSet::GetToolbarSlot(vtkKWToolbar *toolbar)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWToolbarSet::Create()
+void vtkKWToolbarSet::CreateWidget()
 {
   // Check if already created
 
@@ -140,7 +140,7 @@ void vtkKWToolbarSet::Create()
 
   // Call the superclass to create the whole widget
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // Create the toolbars frame container
 

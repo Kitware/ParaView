@@ -52,10 +52,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Add a new node identified by 'node' at the end of the children list of 
   // 'parent'. If parent is NULL, or an empty string or 'root', insert at the
   // root of the tree automatically. Note that the 'node' parameter is the
@@ -312,6 +308,10 @@ public:
 protected:
   vtkKWTree();
   ~vtkKWTree();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   int SelectionMode;
 

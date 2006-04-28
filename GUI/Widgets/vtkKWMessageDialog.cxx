@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.92");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.93");
 
 //----------------------------------------------------------------------------
 vtkKWMessageDialog::vtkKWMessageDialog()
@@ -85,7 +85,7 @@ vtkKWMessageDialog::~vtkKWMessageDialog()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMessageDialog::Create()
+void vtkKWMessageDialog::CreateWidget()
 {
   // Check if already created
 
@@ -95,7 +95,7 @@ void vtkKWMessageDialog::Create()
     return;
     }
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
   
   this->MessageDialogFrame->SetParent(this);
   this->MessageDialogFrame->Create();

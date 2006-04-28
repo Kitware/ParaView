@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.29");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.30");
 
 //----------------------------------------------------------------------------
 vtkKWPopupButton::vtkKWPopupButton()
@@ -68,7 +68,7 @@ vtkKWPopupButton::~vtkKWPopupButton()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPopupButton::Create()
+void vtkKWPopupButton::CreateWidget()
 {
   // Check if already created
 
@@ -81,7 +81,7 @@ void vtkKWPopupButton::Create()
   // Call the superclass, this will set the application and 
   // create the pushbutton.
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   ostrstream tk_cmd;
 
@@ -127,10 +127,6 @@ void vtkKWPopupButton::Create()
   tk_cmd.rdbuf()->freeze(0);
   
   this->Bind();
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

@@ -30,10 +30,6 @@ public:
   vtkTypeRevisionMacro(vtkKWPushButtonWithMenu, vtkKWPushButton);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Create the widget.
-  virtual void Create();
-    
   // Description: 
   // Access to the menu
   virtual vtkKWMenu* GetMenu();
@@ -55,6 +51,10 @@ protected:
   vtkKWPushButtonWithMenu();
   ~vtkKWPushButtonWithMenu();
   
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
+    
   vtkKWMenu *Menu;
 
 private:

@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButtonWithPopupFrame );
-vtkCxxRevisionMacro(vtkKWCheckButtonWithPopupFrame, "1.4");
+vtkCxxRevisionMacro(vtkKWCheckButtonWithPopupFrame, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButtonWithPopupFrame::vtkKWCheckButtonWithPopupFrame()
@@ -46,7 +46,7 @@ vtkKWCheckButtonWithPopupFrame::~vtkKWCheckButtonWithPopupFrame()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButtonWithPopupFrame::Create()
+void vtkKWCheckButtonWithPopupFrame::CreateWidget()
 {
   // Create the superclass widgets
 
@@ -56,7 +56,7 @@ void vtkKWCheckButtonWithPopupFrame::Create()
     return;
     }
 
-  this->Superclass::Create();
+  this->Superclass::CreateWidget();
 
   // --------------------------------------------------------------
   // Annotation visibility

@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithScrollbar );
-vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.12");
+vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.13");
 
 //----------------------------------------------------------------------------
 vtkKWFrameWithScrollbar::vtkKWFrameWithScrollbar()
@@ -46,7 +46,7 @@ vtkKWFrameWithScrollbar::~vtkKWFrameWithScrollbar()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWFrameWithScrollbar::Create()
+void vtkKWFrameWithScrollbar::CreateWidget()
 {
   // Use BWidget's ScrolledWindow class:
   // http://aspn.activestate.com/ASPN/docs/ActiveTcl/bwidget/contents.html
@@ -56,7 +56,7 @@ void vtkKWFrameWithScrollbar::Create()
 
   // Call the superclass to set the appropriate flags then create manually
 
-  if (!this->Superclass::CreateSpecificTkWidget(
+  if (!vtkKWWidget::CreateSpecificTkWidget(this, 
         "ScrolledWindow", "-relief flat -bd 2 -auto both"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
@@ -68,7 +68,8 @@ void vtkKWFrameWithScrollbar::Create()
 
   this->ScrollableFrame = vtkKWCoreWidget::New();
   this->ScrollableFrame->SetParent(this);
-  this->ScrollableFrame->CreateSpecificTkWidget(
+  vtkKWWidget::CreateSpecificTkWidget(
+    this->ScrollableFrame,
     "ScrollableFrame", "-height 1024 -constrainedwidth 1");
 
   this->Script("%s setwidget %s", 
@@ -81,10 +82,6 @@ void vtkKWFrameWithScrollbar::Create()
   this->Frame->SetWidgetName(
     this->Script("%s getframe", this->ScrollableFrame->GetWidgetName()));
   this->Frame->Create();
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

@@ -35,10 +35,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set the text of the message (and the width of a line, in pixels)
   virtual void SetText(const char *);
   virtual void SetTextWidth(int);
@@ -202,6 +198,10 @@ public:
 protected:
   vtkKWMessageDialog();
   ~vtkKWMessageDialog();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   int             Style;
   int             Default;

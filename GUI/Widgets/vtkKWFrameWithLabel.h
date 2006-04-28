@@ -35,10 +35,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set the label for the frame.
   void SetLabelText(const char *);
   
@@ -173,9 +169,12 @@ public:
   virtual void CollapseButtonCallback();
  
 protected:
-
   vtkKWFrameWithLabel();
   ~vtkKWFrameWithLabel();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   vtkKWFrame          *Frame;
   vtkKWFrame          *LabelFrame;

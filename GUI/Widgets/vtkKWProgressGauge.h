@@ -31,10 +31,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get the percentage displayed. This number is clamped to be betwen
   // 0.0 and 100.0
   virtual void SetValue(double value);
@@ -78,6 +74,10 @@ public:
 protected:
   vtkKWProgressGauge();
   ~vtkKWProgressGauge();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   virtual void Redraw();
 

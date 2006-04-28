@@ -31,10 +31,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create the widget.
-  virtual void Create();
-
-  // Description:
   // Set/Get the internal label visibility (On by default).
   // IMPORTANT: if you know you may not show the label, try to
   // set that flag as early as possible (ideally, before calling Create()) 
@@ -114,6 +110,10 @@ public:
 protected:
   vtkKWWidgetWithLabel();
   ~vtkKWWidgetWithLabel();
+
+  // Description:
+  // Create the widget.
+  virtual void CreateWidget();
 
   // Description:
   // Label visibility
