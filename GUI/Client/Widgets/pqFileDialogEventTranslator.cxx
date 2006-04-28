@@ -47,7 +47,8 @@ bool pqFileDialogEventTranslator::translateEvent(QObject* Object, QEvent* Event,
   pqFileDialog* object = 0;
   for(QObject* o = Object; o; o = o->parent())
     {
-    if(object = qobject_cast<pqFileDialog*>(o))
+    object = qobject_cast<pqFileDialog*>(o);
+    if(object)
       break;
     }
   if(!object)
