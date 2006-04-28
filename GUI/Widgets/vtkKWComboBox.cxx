@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWComboBox);
-vtkCxxRevisionMacro(vtkKWComboBox, "1.15");
+vtkCxxRevisionMacro(vtkKWComboBox, "1.16");
 
 //----------------------------------------------------------------------------
 vtkKWComboBox::vtkKWComboBox()
@@ -201,6 +201,9 @@ void vtkKWComboBox::SetCommand(vtkObject *object, const char *method)
 //----------------------------------------------------------------------------
 void vtkKWComboBox::UpdateEnableState()
 {
+  // We need to bypass the superclass (vtkKWEntry) UpdateEnableState
+  // because it sets up Tk options that are not supported by this Tk widget.
+
   this->vtkKWCoreWidget::UpdateEnableState();
 
   this->SetState(this->GetEnabled());

@@ -24,7 +24,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTkcon );
-vtkCxxRevisionMacro(vtkKWTkcon, "1.6");
+vtkCxxRevisionMacro(vtkKWTkcon, "1.7");
 
 //----------------------------------------------------------------------------
 class vtkKWTkconInternals
@@ -93,7 +93,7 @@ void vtkKWTkcon::CreateWidget()
     }
 
   // Call the superclass to create the whole widget
-  // We need to bypass the vtkKWTopLevel::Create to allow tkcon to
+  // We need to bypass the vtkKWTopLevel::CreateWidget to allow tkcon to
   // create its own toplevel
 
   this->vtkKWCoreWidget::CreateWidget();
@@ -124,20 +124,20 @@ void vtkKWTkcon::CreateWidget()
   this->Internals->Console = vtkKWText::New();
   this->Internals->Console->SetApplication(this->GetApplication());
   this->Internals->Console->SetWidgetName(name.c_str());
-  this->Internals->Console->vtkKWCoreWidget::Create();
+  this->Internals->Console->Create();
 
   name = this->Script("set ::tkcon::PRIV(menubar)");
   this->Internals->MainMenu = vtkKWMenu::New();
   this->Internals->MainMenu->SetApplication(this->GetApplication());
   this->Internals->MainMenu->SetWidgetName(name.c_str());
-  this->Internals->MainMenu->vtkKWCoreWidget::Create();
+  this->Internals->MainMenu->Create();
 
   name = this->Script("set ::tkcon::PRIV(menubar)");
   name += ".pop";
   this->Internals->PopupMenu = vtkKWMenu::New();
   this->Internals->PopupMenu->SetApplication(this->GetApplication());
   this->Internals->PopupMenu->SetWidgetName(name.c_str());
-  this->Internals->PopupMenu->vtkKWCoreWidget::Create();
+  this->Internals->PopupMenu->Create();
 
   vtkKWMenu *menus[] = 
     {
@@ -157,7 +157,7 @@ void vtkKWTkcon::CreateWidget()
     name += ".file";
     filemenu->SetParent(menus[i]);
     filemenu->SetWidgetName(name.c_str());
-    filemenu->vtkKWCoreWidget::Create();
+    filemenu->Create();
     nb_items = filemenu->GetNumberOfItems();
     filemenu->DeleteItem(nb_items - 1); // Quit
     filemenu->DeleteItem(nb_items - 2); // separator
@@ -173,7 +173,7 @@ void vtkKWTkcon::CreateWidget()
     name += ".interp";
     interpmenu->SetParent(menus[i]);
     interpmenu->SetWidgetName(name.c_str());
-    interpmenu->vtkKWCoreWidget::Create();
+    interpmenu->vtkKWWidget::Create();
     nb_items = interpmenu->GetNumberOfItems();
     interpmenu->DeleteItem(nb_items - 1); // Send tkcon commands
     interpmenu->DeleteItem(nb_items - 2); // separator

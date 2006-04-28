@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.146");
+vtkCxxRevisionMacro(vtkKWWidget, "1.147");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetInternals
@@ -184,18 +184,40 @@ void vtkKWWidget::Create()
   // Create the widget itself and its internal sub-widgets, if any
   // This CreateWidget() method is re-implemented in each widget subclasses.
 
-  this->CreateWidget();
+  if (!this->IsCreated())
+    {
+    // If the widget name already exists, and the Tk widget itself exists
+    // too, assume that the user is trying to create a vtkKWWidget wrapper
+    // around a pre-existing Tk widget. If that's the case, only setup
+    // the basic parts of a vtkKWWidget, do not fully create the widget.
+
+    if (this->WidgetName &&
+        atoi(this->Script("winfo exists %s", this->GetWidgetName())))
+      {
+      this->vtkKWWidget::CreateWidget();
+      }
+    else
+      {
+      this->CreateWidget();
+      }
+    }
+
+  // Failed ?
+
+  if (!this->IsCreated())
+    {
+    return;
+    }
 
   // Configure the object using the option database
 
-  if (this->IsCreated())
-    {
-    this->GetApplication()->GetOptionDataBase()->ConfigureWidget(this);
-    }
+  this->GetApplication()->GetOptionDataBase()->ConfigureWidget(this);
 
   // Make sure the enable state is up-to-date
 
   this->UpdateEnableState();
+
+  // Notify that the widget has been created
 
   this->InvokeEvent(vtkKWWidget::WidgetCreatedEvent, NULL);
 }
