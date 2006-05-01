@@ -79,6 +79,14 @@ static const QString InternalGetName(QObject& Object)
 static bool ValidateName(QObject& Object)
 {
   const QString class_name = Object.metaObject()->className();
+
+  // If you add a button to a QToolBar using addAction(), the button is unnamed,
+  // so we have to skip all QToolButtons, which is unsatisfying, since it may
+  // cause false negatives for QToolButtons that were manually added without a name.
+  if(qobject_cast<QToolButton*>(&Object) && qobject_cast<QToolBar*>(Object.parent()))
+    {
+    return false;
+    }
   
   if(QAction* const action = qobject_cast<QAction*>(&Object))
     {
