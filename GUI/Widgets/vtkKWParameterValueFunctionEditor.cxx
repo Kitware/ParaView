@@ -39,7 +39,7 @@
 #include <vtksys/stl/algorithm>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.92");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.93");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -7083,7 +7083,9 @@ void vtkKWParameterValueFunctionEditor::ConfigureCallback()
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::CanvasEnterCallback()
 {
+#ifdef _WIN32
   this->Canvas->Focus();
+#endif
 }
 
 //----------------------------------------------------------------------------

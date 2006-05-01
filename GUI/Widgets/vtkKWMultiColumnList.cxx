@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.57");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.58");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -3921,7 +3921,9 @@ void vtkKWMultiColumnList::SetSortCommand(vtkObject *object,
 //----------------------------------------------------------------------------
 void vtkKWMultiColumnList::EnterCallback()
 {
+#ifdef _WIN32
   this->Focus();
+#endif
 }
 
 //----------------------------------------------------------------------------
