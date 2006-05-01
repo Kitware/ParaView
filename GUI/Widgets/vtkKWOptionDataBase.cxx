@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWOptionDataBase);
-vtkCxxRevisionMacro(vtkKWOptionDataBase, "1.4");
+vtkCxxRevisionMacro(vtkKWOptionDataBase, "1.5");
 
 //----------------------------------------------------------------------------
 class vtkKWOptionDataBaseInternals
@@ -52,8 +52,7 @@ public:
     int IsImmediateParent;
   };
 
-  typedef vtksys_stl::list<ContextNodeType> ContextContainerType;
-  typedef vtksys_stl::list<ContextNodeType>::iterator ContextContainerIterator;
+  struct ContextContainerType: public vtksys_stl::list<ContextNodeType> {};
 
   // Option pool
   // Data structure used to store each option/
@@ -92,11 +91,9 @@ public:
     ContextContainerType Context;
   };
 
-  typedef vtksys_stl::vector<EntryNodeType> EntryContainerType;
-  typedef vtksys_stl::vector<EntryNodeType>::iterator EntryContainerIterator;
+  struct EntryContainerType: public vtksys_stl::vector<EntryNodeType> {};
 
-  typedef vtksys_stl::map<EntryKeyType, EntryContainerType> EntryPoolType;
-  typedef vtksys_stl::map<EntryKeyType, EntryContainerType>::iterator EntryPoolIterator;
+  struct EntryPoolType: public vtksys_stl::map<EntryKeyType, EntryContainerType> {};
 
   EntryPoolType EntryPool;
 
@@ -104,10 +101,8 @@ public:
   // say, for vtkKWScale, the ClassHierarchyCacheType map will look like:
   //   "vtkKWScale" => { "vtkObject", "vtkKWObject", "vtkKWWidget", "vtkKWCoreWidget", "vtkKWScale"}
   
-  typedef vtksys_stl::vector<vtksys_stl::string> ClassHierarchyContainerType;
-  typedef vtksys_stl::vector<vtksys_stl::string>::iterator ClassHierarchyContainerIterator;
-  typedef vtksys_stl::map<vtksys_stl::string, ClassHierarchyContainerType> ClassHierarchyCacheType;
-  typedef vtksys_stl::map<vtksys_stl::string, ClassHierarchyContainerType>::iterator ClassHierarchyCacheIterator;
+  struct ClassHierarchyContainerType: public vtksys_stl::vector<vtksys_stl::string> {};
+  struct ClassHierarchyCacheType: public vtksys_stl::map<vtksys_stl::string, ClassHierarchyContainerType> {};
 
   ClassHierarchyCacheType ClassHierarchyCache;
 
@@ -275,15 +270,15 @@ void vtkKWOptionDataBase::DeepCopy(vtkKWOptionDataBase *p)
 
   this->RemoveAllEntries();
 
-  vtkKWOptionDataBaseInternals::EntryPoolIterator p_it = 
+  vtkKWOptionDataBaseInternals::EntryPoolType::iterator p_it = 
     p->Internals->EntryPool.begin();
-  vtkKWOptionDataBaseInternals::EntryPoolIterator p_end = 
+  vtkKWOptionDataBaseInternals::EntryPoolType::iterator p_end = 
     p->Internals->EntryPool.end();
   for (; p_it != p_end; ++p_it)
     {
-    vtkKWOptionDataBaseInternals::EntryContainerIterator l_it = 
+    vtkKWOptionDataBaseInternals::EntryContainerType::iterator l_it = 
       p_it->second.begin();
-    vtkKWOptionDataBaseInternals::EntryContainerIterator l_end = 
+    vtkKWOptionDataBaseInternals::EntryContainerType::iterator l_end = 
       p_it->second.end();
     for (; l_it != l_end; ++l_it)
       {
@@ -304,9 +299,9 @@ int vtkKWOptionDataBase::GetNumberOfEntries()
 {
   int total = 0;
 
-  vtkKWOptionDataBaseInternals::EntryPoolIterator p_it = 
+  vtkKWOptionDataBaseInternals::EntryPoolType::iterator p_it = 
     this->Internals->EntryPool.begin();
-  vtkKWOptionDataBaseInternals::EntryPoolIterator p_end = 
+  vtkKWOptionDataBaseInternals::EntryPoolType::iterator p_end = 
     this->Internals->EntryPool.end();
   for (; p_it != p_end; ++p_it)
     {
@@ -328,7 +323,7 @@ void vtkKWOptionDataBase::ConfigureWidget(vtkKWWidget *obj)
   // say, for vtkKWScale: 
   // vtkObject, vtkKWObject, vtkKWWidget, vtkKWCoreWidget, vtkKWScale
 
-  vtkKWOptionDataBaseInternals::ClassHierarchyCacheIterator p_it = 
+  vtkKWOptionDataBaseInternals::ClassHierarchyCacheType::iterator p_it = 
     this->Internals->ClassHierarchyCache.find(obj->GetClassName());
   vtkKWOptionDataBaseInternals::ClassHierarchyContainerType &list = 
     this->Internals->ClassHierarchyCache[obj->GetClassName()];
@@ -363,9 +358,9 @@ void vtkKWOptionDataBase::ConfigureWidget(vtkKWWidget *obj)
 
   vtkKWOptionDataBaseInternals::ClassHierarchyContainerType obj_parents;
 
-  vtkKWOptionDataBaseInternals::ClassHierarchyContainerIterator l_it = 
+  vtkKWOptionDataBaseInternals::ClassHierarchyContainerType::iterator l_it = 
     list.begin();
-  vtkKWOptionDataBaseInternals::ClassHierarchyContainerIterator l_end = 
+  vtkKWOptionDataBaseInternals::ClassHierarchyContainerType::iterator l_end = 
     list.end();
   for (; l_it != l_end; ++l_it)
     {
@@ -386,7 +381,7 @@ void vtkKWOptionDataBaseInternals::ConfigureWidget(
 
   // Do we have options for that class ?
 
-  vtkKWOptionDataBaseInternals::EntryPoolIterator p_it = 
+  vtkKWOptionDataBaseInternals::EntryPoolType::iterator p_it = 
     this->EntryPool.find(as_class_name);
   if (p_it == this->EntryPool.end())
     {
@@ -395,9 +390,9 @@ void vtkKWOptionDataBaseInternals::ConfigureWidget(
 
   vtksys_stl::string cmd;
 
-  vtkKWOptionDataBaseInternals::EntryContainerIterator l_it = 
+  vtkKWOptionDataBaseInternals::EntryContainerType::iterator l_it = 
     p_it->second.begin();
-  vtkKWOptionDataBaseInternals::EntryContainerIterator l_end = 
+  vtkKWOptionDataBaseInternals::EntryContainerType::iterator l_end = 
     p_it->second.end();
   for (; l_it != l_end; ++l_it)
     {
@@ -422,15 +417,15 @@ void vtkKWOptionDataBaseInternals::ConfigureWidget(
       // context that can be a parent or grand-parent), we just look
       // for the closest parent or grand-parent and don't backtrack.
 
-      vtkKWOptionDataBaseInternals::ClassHierarchyContainerIterator obj_p_it = 
-        obj_parents->begin();
-      vtkKWOptionDataBaseInternals::ClassHierarchyContainerIterator obj_p_end =
-        obj_parents->end();
+      vtkKWOptionDataBaseInternals::ClassHierarchyContainerType::iterator 
+        obj_p_it = obj_parents->begin();
+      vtkKWOptionDataBaseInternals::ClassHierarchyContainerType::iterator 
+        obj_p_end = obj_parents->end();
 
-      vtkKWOptionDataBaseInternals::ContextContainerIterator context_it = 
-        l_it->Context.begin();
-      vtkKWOptionDataBaseInternals::ContextContainerIterator context_end = 
-        l_it->Context.end();
+      vtkKWOptionDataBaseInternals::ContextContainerType::iterator 
+        context_it = l_it->Context.begin();
+      vtkKWOptionDataBaseInternals::ContextContainerType::iterator 
+        context_end = l_it->Context.end();
 
       int context_ok = 1;
       for (; context_it != context_end && obj_p_it != obj_p_end; ++context_it)
