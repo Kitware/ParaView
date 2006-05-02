@@ -27,7 +27,7 @@
 #include <vtkstd/map>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.10");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.11");
 
 struct vtkSMStateLoaderInternals
 {
@@ -55,6 +55,35 @@ vtkSMStateLoader::~vtkSMStateLoader()
 vtkSMProxy* vtkSMStateLoader::NewProxy(int id)
 {
   return this->NewProxy(this->RootElement, id);
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMStateLoader::GetCreatedProxy(int id)
+{
+  vtkSMStateLoaderInternals::ProxyMapType::iterator iter =
+    this->Internal->CreatedProxies.find(id);
+  if (iter != this->Internal->CreatedProxies.end())
+    {
+    return iter->second;
+    } 
+  return NULL;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMStateLoader::AddCreatedProxy(int id, vtkSMProxy* proxy)
+{
+  this->Internal->CreatedProxies[id] = proxy;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMStateLoader::RemoveCreatedProxy(int id)
+{
+  vtkSMStateLoaderInternals::ProxyMapType::iterator iter =
+    this->Internal->CreatedProxies.find(id);
+  if (iter != this->Internal->CreatedProxies.end())
+    {
+    this->Internal->CreatedProxies.erase(iter);
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -261,6 +290,13 @@ int vtkSMStateLoader::HandleLinks(vtkPVXMLElement* element)
     }
   return 1;
 }
+
+//---------------------------------------------------------------------------
+int vtkSMStateLoader::LoadProxyState(vtkPVXMLElement* elem, vtkSMProxy* proxy)
+{
+  return proxy->LoadState(elem, this);
+}
+  
 
 //---------------------------------------------------------------------------
 void vtkSMStateLoader::ClearCreatedProxies()

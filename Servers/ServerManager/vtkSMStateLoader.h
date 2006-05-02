@@ -77,6 +77,20 @@ protected:
   // element under which the proxy definitions are stored.
   vtkSMProxy* NewProxy(vtkPVXMLElement* root, int id);
 
+  // Description:
+  // Returns the proxy with the given id in the internal proxy store.
+  vtkSMProxy* GetCreatedProxy(int id);
+
+  // Description:
+  // Add a proxy to the internal proxy store.
+  void AddCreatedProxy(int id, vtkSMProxy*);
+
+  // Description:
+  // Remove a proxy from the internal proxy store.
+  void RemoveCreatedProxy(int id);
+
+  int LoadProxyState(vtkPVXMLElement*, vtkSMProxy*);
+
   vtkSMStateLoaderInternals* Internal;
 
   vtkIdType ConnectionID;

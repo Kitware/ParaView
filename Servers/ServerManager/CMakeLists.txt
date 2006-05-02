@@ -97,6 +97,7 @@ SET(Kit_SRCS
   vtkSMProxyProperty.cxx
   vtkSMProxyRegisterUndoElement.cxx
   vtkSMProxyUnRegisterUndoElement.cxx
+  vtkSMPQStateLoader.cxx
   vtkSMRampKeyFrameProxy.cxx
   vtkSMRenderModuleProxy.cxx
   vtkSMServerFileListingProxy.cxx

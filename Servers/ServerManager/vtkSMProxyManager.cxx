@@ -83,7 +83,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.40");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.41");
 vtkCxxSetObjectMacro(vtkSMProxyManager, UndoStack, vtkSMUndoStack);
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -657,41 +657,55 @@ void vtkSMProxyManager::UnMarkProxyAsModified(vtkSMProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadState(const char* filename, vtkIdType id)
+void vtkSMProxyManager::LoadState(const char* filename, vtkIdType id,
+  vtkSMStateLoader* loader/*=NULL*/)
 {
   vtkPVXMLParser* parser = vtkPVXMLParser::New();
   parser->SetFileName(filename);
   parser->Parse();
   
-  this->LoadState(parser->GetRootElement(), id);
+  this->LoadState(parser->GetRootElement(), id, loader);
   parser->Delete();
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement, vtkIdType id)
+void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement, vtkIdType id,
+  vtkSMStateLoader* loader/*=NULL*/)
 {
   if (!rootElement)
     {
     return;
     }
-  vtkSMStateLoader* loader = vtkSMStateLoader::New();
-  loader->SetConnectionID(id);
-  loader->LoadState(rootElement);
-  loader->Delete();
+  vtkSmartPointer<vtkSMStateLoader> spLoader;
+  
+  if (!loader)
+    {
+    spLoader = vtkSmartPointer<vtkSMStateLoader>::New();
+    }
+  else
+    {
+    spLoader = loader;
+    }
+  spLoader->SetConnectionID(id);
+  spLoader->LoadState(rootElement);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadState(const char* filename)
+void vtkSMProxyManager::LoadState(const char* filename, 
+  vtkSMStateLoader* loader/*=NULL*/)
 {
   this->LoadState(filename, 
-    vtkProcessModuleConnectionManager::GetRootServerConnectionID());
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+    loader);
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement)
+void vtkSMProxyManager::LoadState(vtkPVXMLElement* rootElement,
+  vtkSMStateLoader* loader/*=NULL*/)
 {
   this->LoadState(rootElement,
-    vtkProcessModuleConnectionManager::GetRootServerConnectionID());
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+    loader);
 }
 
 //---------------------------------------------------------------------------
