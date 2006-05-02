@@ -39,6 +39,7 @@ class vtkSMLink;
 class vtkSMProperty;
 class vtkSMProxy;
 class vtkSMProxyManagerObserver;
+class vtkSMStateLoader;
 class vtkSMUndoStack;
 //BTX
 struct vtkSMProxyManagerInternals;
@@ -179,13 +180,15 @@ public:
 
   // Description:
   // Loads the state of the server manager from XML.
-  void LoadState(const char* filename);
-  void LoadState(vtkPVXMLElement* rootElement);
+  // If loader is not specified, a vtkSMStateLoader instance is used.
+  void LoadState(const char* filename, vtkSMStateLoader* loader=NULL);
+  void LoadState(vtkPVXMLElement* rootElement, vtkSMStateLoader* loader=NULL);
   
   // Description:
   // Load the state for a particular connection.
-  void LoadState(vtkPVXMLElement* rootElement, vtkIdType id);
-  void LoadState(const char* filename, vtkIdType id);
+  // If loader is not specified, a vtkSMStateLoader instance is used.
+  void LoadState(vtkPVXMLElement* rootElement, vtkIdType id, vtkSMStateLoader* loader=NULL);
+  void LoadState(const char* filename, vtkIdType id, vtkSMStateLoader* loader=NULL);
   
   // Description:
   // Save the state of the server manager in XML format in a file.
