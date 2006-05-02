@@ -1211,7 +1211,6 @@ public:
   virtual void CellWindowCommandToColorButtonCallback(
     const char*, int, int, const char*);
   virtual void ColumnSortedCallback();
-  virtual void EnterCallback();
   virtual void RightClickCallback(
     const char *w, int x, int y, int root_x, int root_y);
   virtual void RefreshColorsOfAllCellsWithWindowCommandCallback();

@@ -39,7 +39,7 @@
 #include <vtksys/stl/algorithm>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.93");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.94");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -1424,6 +1424,7 @@ void vtkKWParameterValueFunctionEditor::CreateRangeLabel()
     this->RangeLabel->SetBorderWidth(0);
     this->RangeLabel->SetAnchorToWest();
     this->UpdateRangeLabel();
+    this->Bind(); // in case we have bindings on the label
     }
 }
 
@@ -1582,6 +1583,7 @@ void vtkKWParameterValueFunctionEditor::CreateValueTicksCanvas()
     this->ValueTicksCanvas->SetReliefToSolid();
     this->ValueTicksCanvas->SetHeight(0);
     this->ValueTicksCanvas->SetBorderWidth(0);
+    this->Bind(); // in case we have bindings on this canvas
     }
 }
 
@@ -1598,6 +1600,7 @@ void vtkKWParameterValueFunctionEditor::CreateParameterTicksCanvas()
     this->ParameterTicksCanvas->SetBorderWidth(0);
     this->ParameterTicksCanvas->SetHeight(
       VTK_KW_PVFE_TICKS_PARAMETER_CANVAS_HEIGHT);
+    this->Bind(); // in case we have bindings on this canvas
     }
 }
 
@@ -1614,6 +1617,7 @@ void vtkKWParameterValueFunctionEditor::CreateGuidelineValueCanvas()
     this->GuidelineValueCanvas->SetBorderWidth(0);
     this->GuidelineValueCanvas->SetHeight(
       VTK_KW_PVFE_GUIDELINE_VALUE_CANVAS_HEIGHT);
+    this->Bind(); // in case we have bindings on this canvas
     }
 }
 
@@ -2089,9 +2093,27 @@ void vtkKWParameterValueFunctionEditor::Bind()
 
     // Key bindings
 
-    tk_cmd << "bind " <<  canv
-           << " <Enter> {" << this->GetTclName() 
-           << " CanvasEnterCallback}" << endl;
+    vtkKWWidget* to_focus[] = { 
+      this, 
+      this->Canvas, 
+      this->RangeLabel, 
+      this->ValueTicksCanvas, 
+      this->ParameterTicksCanvas, 
+      this->GuidelineValueCanvas
+    };
+
+    // Force the focus to the canvas to make sure key navigation works
+
+    size_t i;
+    for (i = 0; i < sizeof(to_focus) / sizeof(to_focus[0]); i++)
+      {
+      if (to_focus[i] && to_focus[i]->IsCreated())
+        {
+        tk_cmd << "bind " <<  to_focus[i]->GetWidgetName()
+               << " <Button> {+" << this->Canvas->GetTclName() 
+               << " Focus}" << endl;
+        }
+      }
 
     tk_cmd << "bind " <<  canv
            << " <KeyPress-n> {" << this->GetTclName() 
@@ -7078,14 +7100,6 @@ void vtkKWParameterValueFunctionEditor::ConfigureCallback()
   this->Redraw();
 
   in_configure_callback = 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::CanvasEnterCallback()
-{
-#ifdef _WIN32
-  this->Canvas->Focus();
-#endif
 }
 
 //----------------------------------------------------------------------------

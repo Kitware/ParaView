@@ -1118,7 +1118,6 @@ public:
   // Description:
   // Callbacks. Internal, do not use.
   virtual void ConfigureCallback();
-  virtual void CanvasEnterCallback();
   virtual void VisibleParameterRangeChangingCallback(double, double);
   virtual void VisibleParameterRangeChangedCallback(double, double);
   virtual void VisibleValueRangeChangingCallback(double, double);
@@ -1162,7 +1161,8 @@ protected:
   virtual int  AddFunctionPointAtParameter(double parameter, int *id);
   virtual int  MoveFunctionPointToCanvasCoordinates(int id,int x,int y);
   virtual int  MoveFunctionPointToParameter(int id,double parameter,int i=0);
-  virtual int  EqualFunctionPointValues(const double *values1, const double *values2);
+  virtual int  EqualFunctionPointValues(
+    const double *values1, const double *values2);
   virtual int  FindFunctionPointAtCanvasCoordinates(
     int x, int y, int *id, int *c_x, int *c_y);
 

@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.58");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.59");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -154,7 +154,7 @@ void vtkKWMultiColumnList::CreateWidget()
 
   // Call the superclass to set the appropriate flags then create manually
 
-  vtksys_stl::string options("-bg #fafafa -stripebackground #dfe7ef -showseparators 1 -showarrow 0  -highlightthickness 0 -selectmode browse -relief sunken -bd 2 -spacing 2 -exportselection 0 -activestyle none -fg #000000 -selectforeground #ffffff -width 0");
+  vtksys_stl::string options("-bg #fafafa -stripebackground #dfe7ef -showseparators 1 -showarrow 0  -highlightthickness 0 -selectmode browse -relief sunken -bd 2 -spacing 2 -exportselection 0 -activestyle none -fg #000000 -selectforeground #ffffff -width 0 -setfocus 1");
 #ifdef _WIN32
   options += " -selectbackground #092369";
 #else
@@ -185,7 +185,6 @@ void vtkKWMultiColumnList::CreateWidget()
   this->AddBinding("<<TablelistCellUpdated>>", this, "CellUpdatedCallback");
   this->AddBinding("<<TablelistUneditableCellSelected>>", this, "UneditableCellDoubleClickCallback");
   this->AddBinding("<<TablelistColumnSorted>>", this, "ColumnSortedCallback");
-  this->AddBinding("<Enter>", this, "EnterCallback");
 
   this->Script("bind [%s bodytag] <<Button3>> [list %s RightClickCallback %%W %%x %%y %%X %%Y]",
                this->GetWidgetName(), this->GetTclName());
@@ -3916,14 +3915,6 @@ void vtkKWMultiColumnList::SetSortCommand(vtkObject *object,
     this->SetConfigurationOption("-sortcommand", command);
     delete [] command;
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMultiColumnList::EnterCallback()
-{
-#ifdef _WIN32
-  this->Focus();
-#endif
 }
 
 //----------------------------------------------------------------------------
