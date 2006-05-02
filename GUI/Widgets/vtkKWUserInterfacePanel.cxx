@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfacePanel);
-vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.16");
+vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.17");
 
 //----------------------------------------------------------------------------
 vtkKWUserInterfacePanel::vtkKWUserInterfacePanel()
@@ -125,6 +125,19 @@ int vtkKWUserInterfacePanel::AddPage(const char *title,
     }
 
   return this->UserInterfaceManager->AddPage(this, title, balloon, icon);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWUserInterfacePanel::RemovePage(const char *title)
+{
+  if (this->UserInterfaceManager == NULL)
+    {
+    vtkErrorMacro("The UserInterfaceManager manager needs to be set before"
+                  "a page can be removed.");
+    return -1;
+    }
+
+  return this->UserInterfaceManager->RemovePage(this, title);
 }
 
 //----------------------------------------------------------------------------

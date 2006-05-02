@@ -96,15 +96,19 @@ public:
   virtual void RemoveAllPanels();
 
   // Description:
-  // Instruct the manager to reserve a page for a given panel.
+  // Instruct the manager to reserve or remove a page for a given panel.
   // Note that you should use the panel's own API to add a page to a panel: 
   // this will automatically call this method with the proper panel parameter 
-  // (see vtkKWUserInterfacePanel::AddPage()).
-  // Return a unique positive ID, or < 0 on error.
+  // (see vtkKWUserInterfacePanel::AddPage() and 
+  // vtkKWUserInterfacePanel::RemovePage()).
+  // Return a unique positive ID for the page that was reserved/removed,
+  // or < 0 on error.
   virtual int AddPage(vtkKWUserInterfacePanel *panel, 
                       const char *title, 
                       const char *balloon = 0, 
                       vtkKWIcon *icon = 0) = 0;
+  virtual int RemovePage(vtkKWUserInterfacePanel *panel, 
+                         const char *title) = 0;
 
   // Description:
   // Retrieve the widget corresponding to a given page reserved by the manager.

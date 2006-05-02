@@ -87,14 +87,16 @@ public:
   vtkGetMacro(Enabled, int);
 
   // Description:
-  // Add a page to the panel (this will, in turn, instructs the manager to 
-  // reserve a page for this given panel).
+  // Add/remove a page to/from the panel (this will, in turn, instructs the
+  // manager to reserve or remove a page for this given panel).
   // balloon specifies the balloon help for that page, icon is an optional
   // icon in case it is supported by the manager later on.
-  // Return a unique positive ID, or < 0 on error.
+  // Return a unique positive ID for the page that was reserved/removed,
+  // or < 0 on error.
   virtual int AddPage(const char *title, 
                       const char *balloon = 0, 
                       vtkKWIcon *icon = 0);
+  virtual int RemovePage(const char *title);
 
   // Description:
   // Retrieve the widget corresponding to a given page added to the panel.

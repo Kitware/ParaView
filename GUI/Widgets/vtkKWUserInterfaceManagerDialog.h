@@ -109,17 +109,21 @@ public:
                             const char *section);
 
   // Description:
-  // Instruct the manager to reserve a page for a given panel. 
-  // In this concrete implementation, this adds a page to the notebook, 
-  // and sets the page tag to be the panel's ID.
+  // Instruct the manager to reserve or remove a page for a given panel.
+  // In this concrete implementation, this adds or removes a page to the 
+  // notebook, and sets the page tag to be the panel's ID.
   // Note that you should use the panel's own API to add a page to a panel: 
   // this will automatically call this method with the proper panel parameter 
-  // (see vtkKWUserInterfacePanel::AddPage()).
-  // Return a unique positive ID, or < 0 on error.
+  // (see vtkKWUserInterfacePanel::AddPage() and 
+  // vtkKWUserInterfacePanel::RemovePage()).
+  // Return a unique positive ID for the page that was reserved/removed,
+  // or < 0 on error.
   virtual int AddPage(vtkKWUserInterfacePanel *panel, 
                       const char *title, 
                       const char *balloon = 0, 
                       vtkKWIcon *icon = 0);
+  virtual int RemovePage(vtkKWUserInterfacePanel *panel, 
+                         const char *title);
 
   // Description:
   // Retrieve the widget corresponding to a given page reserved by the manager.

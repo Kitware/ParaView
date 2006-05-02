@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceManagerDialog);
-vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.15");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManagerDialog, "1.16");
 
 //----------------------------------------------------------------------------
 class vtkKWUserInterfaceManagerDialogInternals
@@ -240,6 +240,50 @@ int vtkKWUserInterfaceManagerDialog::AddPage(
   // to this panel will correspond to notebook pages sharing a same tag.
 
   return this->Notebook->AddPage(title, balloon, icon, tag);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWUserInterfaceManagerDialog::RemovePage(
+  vtkKWUserInterfacePanel *panel, 
+  const char *title)
+{
+  if (!this->IsCreated())
+    {
+    vtkErrorMacro(
+      "Can not remove a page if the manager has not been created.");
+    return -1;
+    }
+ 
+  if (!panel)
+    {
+    vtkErrorMacro("Can not remove a page from a NULL panel.");
+    return -1;
+    }
+  
+  if (!this->HasPanel(panel))
+    {
+    vtkErrorMacro(
+      "Can not remove a page from a panel that is not in the manager.");
+    return -1;
+    }
+
+  int tag = this->GetPanelId(panel);
+  if (tag < 0)
+    {
+    vtkErrorMacro("Can not access the panel to remove a page from.");
+    return -1;
+    }
+
+  // Use the panel id as a tag in the notebook, so that the pages belonging
+  // to this panel will correspond to notebook pages sharing a same tag.
+
+  int id = this->Notebook->GetPageId(title, tag);
+  if (id >= 0)
+    {
+    this->Notebook->RemovePage(id);
+    }
+
+  return id;
 }
 
 //----------------------------------------------------------------------------
