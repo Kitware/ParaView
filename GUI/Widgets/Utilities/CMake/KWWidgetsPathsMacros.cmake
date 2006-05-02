@@ -408,20 +408,39 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ONE_CONFIGURATION_TYPE
     ${LIBRARY_OUTPUT_PATH}
     )
 
-  IF(GETTEXT_INTL_LIBRARY)
-    GET_FILENAME_COMPONENT(path "${GETTEXT_INTL_LIBRARY}" PATH)
-    SET(KWWidgets_PATH_ENV ${KWWidgets_PATH_ENV} "${path}/../bin")
-  ELSE(GETTEXT_INTL_LIBRARY)
-    IF(GETTEXT_INCLUDE_DIR)
-      SET(KWWidgets_PATH_ENV ${KWWidgets_PATH_ENV} 
-        "${GETTEXT_INCLUDE_DIR}/../bin")
-    ELSE(GETTEXT_INCLUDE_DIR)
-      IF(GETTEXT_XGETTEXT_EXECUTABLE)
-        GET_FILENAME_COMPONENT(path "${GETTEXT_XGETTEXT_EXECUTABLE}" PATH)
-        SET(KWWidgets_PATH_ENV ${KWWidgets_PATH_ENV} "${path}/../bin")
-      ENDIF(GETTEXT_XGETTEXT_EXECUTABLE)
-    ENDIF(GETTEXT_INCLUDE_DIR)
-  ENDIF(GETTEXT_INTL_LIBRARY)
+  # Gettext lib
+
+  IF(KWWidgets_USE_INTERNATIONALIZATION)
+    SET(gettext_path)
+    IF(GETTEXT_INTL_LIBRARY)
+      GET_FILENAME_COMPONENT(path "${GETTEXT_INTL_LIBRARY}" PATH)
+      SET(gettext_path "${path}/../bin")
+    ELSE(GETTEXT_INTL_LIBRARY)
+      IF(GETTEXT_INCLUDE_DIR)
+        SET(gettext_path "${GETTEXT_INCLUDE_DIR}/../bin")
+      ELSE(GETTEXT_INCLUDE_DIR)
+        IF(GETTEXT_XGETTEXT_EXECUTABLE)
+          GET_FILENAME_COMPONENT(path "${GETTEXT_XGETTEXT_EXECUTABLE}" PATH)
+          SET(gettext_path "${path}/../bin")
+        ENDIF(GETTEXT_XGETTEXT_EXECUTABLE)
+      ENDIF(GETTEXT_INCLUDE_DIR)
+    ENDIF(GETTEXT_INTL_LIBRARY)
+    # Still nothing found, let's try GETTEXT_SEARCH_PATH, which is defined
+    # when building against a KWWidgets build
+    IF(NOT gettext_path AND GETTEXT_SEARCH_PATH)
+      FOREACH(path "${GETTEXT_SEARCH_PATH}")
+        SET(gettext_path ${gettext_path} "${path}/../bin")
+      ENDFOREACH(path)
+    ENDIF(NOT gettext_path AND GETTEXT_SEARCH_PATH)
+    # Still nothing found, then we are probably building against am
+    # installed KWWidgets, and need to find gettext ourself.
+    IF(NOT gettext_path)
+      FIND_PACKAGE(Gettext REQUIRED)
+    ENDIF(NOT gettext_path)
+    IF(gettext_path)
+      SET(KWWidgets_PATH_ENV ${KWWidgets_PATH_ENV} "${gettext_path}")
+    ENDIF(gettext_path)
+  ENDIF(KWWidgets_USE_INTERNATIONALIZATION)
 
   # If we have no TCL_LIBRARY or TCL_TCLSH, then we are probably being invoked
   # from an out-of-source example that is using either an installed VTK or
