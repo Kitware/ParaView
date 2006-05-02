@@ -23,7 +23,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTablelistInit );
-vtkCxxRevisionMacro(vtkKWTablelistInit, "1.4");
+vtkCxxRevisionMacro(vtkKWTablelistInit, "1.5");
 
 int vtkKWTablelistInit::Initialized = 0;
 
@@ -44,25 +44,6 @@ void vtkKWTablelistInit::Initialize(Tcl_Interp* interp)
 
   vtkKWTablelistInit::Initialized = 1;
 
-  // Create the images required by the lib
-
-  if (!vtkKWTkUtilities::UpdatePhoto(
-        interp, 
-        "tablelistChecked", 
-        image_tablelistChecked, 
-        image_tablelistChecked_width, image_tablelistChecked_height, 
-        image_tablelistChecked_pixel_size, image_tablelistChecked_length) ||
-      !vtkKWTkUtilities::UpdatePhoto(
-        interp, 
-        "tablelistUnchecked", 
-        image_tablelistUnchecked, 
-        image_tablelistUnchecked_width, image_tablelistUnchecked_height, 
-        image_tablelistUnchecked_pixel_size, image_tablelistUnchecked_length))
-    {
-    vtkGenericWarningMacro("Can not initialize Tablelist resources.");
-    return;
-    }
-
   // Evaluate the library
   
   vtkKWTablelistInit::Execute(interp, 
@@ -79,6 +60,11 @@ void vtkKWTablelistInit::Initialize(Tcl_Interp* interp)
                           file_mwutil_tcl, 
                           file_mwutil_tcl_length,
                           file_mwutil_tcl_decoded_length);
+
+  vtkKWTablelistInit::Execute(interp, 
+                          file_tablelistBitmaps_tcl, 
+                          file_tablelistBitmaps_tcl_length,
+                          file_tablelistBitmaps_tcl_decoded_length);
 
   vtkKWTablelistInit::Execute(interp, 
                           file_tablelistBind_tcl, 
@@ -104,6 +90,11 @@ void vtkKWTablelistInit::Initialize(Tcl_Interp* interp)
                           file_tablelistSort_tcl, 
                           file_tablelistSort_tcl_length,
                           file_tablelistSort_tcl_decoded_length);
+
+  vtkKWTablelistInit::Execute(interp, 
+                          file_tablelistThemes_tcl, 
+                          file_tablelistThemes_tcl_length,
+                          file_tablelistThemes_tcl_decoded_length);
 
   vtkKWTablelistInit::Execute(interp, 
                           file_tablelistUtil_tcl, 

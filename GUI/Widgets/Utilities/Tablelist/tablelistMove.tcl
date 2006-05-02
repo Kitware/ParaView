@@ -1,7 +1,7 @@
 #==============================================================================
 # Contains the implementation of the tablelist move and movecolumn subcommands.
 #
-# Copyright (c) 2003-2005  Csaba Nemethi (E-mail: csaba.nemethi@t-online.de)
+# Copyright (c) 2003-2006  Csaba Nemethi (E-mail: csaba.nemethi@t-online.de)
 #==============================================================================
 
 #------------------------------------------------------------------------------
@@ -77,7 +77,20 @@ proc tablelist::moveSubCmd {win source target} {
     $w insert $targetLine.0 "\n"
     set snipStr $data(-snipstring)
     set sourceItem [lindex $data(itemList) $source]
-    set dispItem [strToDispStr $sourceItem]
+    if {[lsearch -exact $data(fmtCmdFlagList) 1] >= 0} {
+	set formattedItem {}
+	set col 0
+	foreach text [lrange $sourceItem 0 $data(lastCol)] \
+		fmtCmdFlag $data(fmtCmdFlagList) {
+	    if {$fmtCmdFlag} {
+		set text [uplevel #0 $data($col-formatcommand) [list $text]]
+	    }
+	    lappend formattedItem $text
+	    incr col
+	}
+    } else {
+	set formattedItem [lrange $sourceItem 0 $data(lastCol)]
+    }
     set key [lindex $sourceItem end]
     array set itemData [array get data $key*-\[bf\]*]		;# for speed
     set rowTags {}
@@ -86,10 +99,9 @@ proc tablelist::moveSubCmd {win source target} {
 	lappend rowTags row-$tail-$itemData($name)
     }
     set col 0
-    foreach text [lrange $dispItem 0 $data(lastCol)] \
+    foreach text [strToDispStr $formattedItem] \
 	    colFont $data(colFontList) \
 	    colTags $data(colTagsList) \
-	    fmtCmdFlag $data(fmtCmdFlagList) \
 	    {pixels alignment} $data(colList) {
 	if {$data($col-hide)} {
 	    incr col
@@ -99,10 +111,11 @@ proc tablelist::moveSubCmd {win source target} {
 	#
 	# Adjust the cell text and the image or window width
 	#
-	if {$fmtCmdFlag} {
-	    set text [uplevel #0 $data($col-formatcommand) \
-		      [list [lindex $sourceItem $col]]]
-	    set text [strToDispStr $text]
+	if {[string match "*\n*" $text]} {
+	    set multiline 1
+	    set list [split $text "\n"]
+	} else {
+	    set multiline 0
 	}
 	set aux [getAuxData $win $key $col auxType auxWidth]
 	if {[info exists data($key-$col-font)]} {
@@ -121,7 +134,14 @@ proc tablelist::moveSubCmd {win source target} {
 	if {$pixels != 0} {
 	    incr pixels $data($col-delta)
 	}
-	adjustElem $win text auxWidth $cellFont $pixels $alignment $snipStr
+	if {$multiline} {
+	    adjustMlElem $win list auxWidth $cellFont \
+			 $pixels $alignment $snipStr
+	    set msgScript [list ::tablelist::displayText $win $key \
+			   $col [join $list "\n"] $cellFont $alignment]
+	} else {
+	    adjustElem $win text auxWidth $cellFont $pixels $alignment $snipStr
+	}
 
 	#
 	# Insert the text and the auxiliary object
@@ -133,11 +153,21 @@ proc tablelist::moveSubCmd {win source target} {
 	}
 	set tagNames [concat $colTags $rowTags $cellTags]
 	if {$auxType == 0} {
-	    $w insert $targetLine.end "\t$text\t" $tagNames
+	    if {$multiline} {
+		$w insert $targetLine.end "\t\t" $tagNames
+		$w window create $targetLine.end-1c -pady 1 -window $msgScript
+	    } else {
+		$w insert $targetLine.end "\t$text\t" $tagNames
+	    }
 	} else {
 	    $w insert $targetLine.end "\t\t" $tagNames
 	    createAuxObject $win $key $source $col $aux $auxType $auxWidth
-	    insertElem $w $targetLine.end-1c $text $aux $auxType $alignment
+	    if {$multiline} {
+		insertMlElem $w $targetLine.end-1c $msgScript \
+			     $aux $auxType $alignment
+	    } else {
+		insertElem $w $targetLine.end-1c $text $aux $auxType $alignment
+	    }
 	}
 
 	incr col
@@ -252,7 +282,7 @@ proc tablelist::movecolumnSubCmd {win source target} {
     #
     array set tmp [array get data $source-*]
     array set tmp [array get data k*-$source-*]
-    foreach specialCol {activeCol anchorCol editCol arrowCol sortCol} {
+    foreach specialCol {activeCol anchorCol editCol} {
 	set tmp($specialCol) $data($specialCol)
     }
     set selCells [curcellselectionSubCmd $win]
@@ -348,6 +378,7 @@ proc tablelist::movecolumnSubCmd {win source target} {
     #
     setupColumns $win $data(-columns) 0
     makeColFontAndTagLists $win
+    makeSortAndArrowColLists $win
     adjustColumns $win {} 0
 
     #

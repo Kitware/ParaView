@@ -1,14 +1,14 @@
 #==============================================================================
 # Main Tablelist and Tablelist_tile package module.
 #
-# Copyright (c) 2000-2005  Csaba Nemethi (E-mail: csaba.nemethi@t-online.de)
+# Copyright (c) 2000-2006  Csaba Nemethi (E-mail: csaba.nemethi@t-online.de)
 #==============================================================================
 
 namespace eval tablelist {
     #
     # Public variables:
     #
-    variable version	4.1
+    variable version	4.3
     if {[string compare $::tcl_platform(platform) "macintosh"] != 0} {
 	#
 	# On the Macintosh, the tablelist::library variable is
@@ -17,7 +17,7 @@ namespace eval tablelist {
 	#
 	variable library	[file dirname [info script]]
     }
-    variable usingTile
+    variable usingTile		;# set in tablelist.tcl or tablelist_tile.tcl
 
     #
     # Creates a new tablelist widget:
@@ -28,6 +28,11 @@ namespace eval tablelist {
     # Sorts the items of a tablelist widget based on one of its columns:
     #
     namespace export	sortByColumn
+
+    #
+    # Extends or updates the list of sort columns:
+    #
+    namespace export	addToSortColumns
 
     #
     # Helper procedures used in binding scripts:

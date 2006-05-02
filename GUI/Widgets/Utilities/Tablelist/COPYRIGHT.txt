@@ -1,5 +1,5 @@
-Multi-column listbox package Tablelist, version 4.0
-Copyright (c) 2000-2005  Csaba Nemethi (E-mail: csaba.nemethi@t-online.de)
+Multi-column listbox package Tablelist, version 4.3
+Copyright (c) 2000-2006  Csaba Nemethi (E-mail: csaba.nemethi@t-online.de)
 
 This library is free software; you can use, modify, and redistribute it
 for any purpose, provided that existing copyright notices are retained

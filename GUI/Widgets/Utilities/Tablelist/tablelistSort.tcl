@@ -2,14 +2,14 @@
 # Contains the implementation of the tablelist::sortByColumn command as well as
 # of the tablelist sort and sortbycolumn subcommands.
 #
-# Copyright (c) 2000-2005  Csaba Nemethi (E-mail: csaba.nemethi@t-online.de)
+# Copyright (c) 2000-2006  Csaba Nemethi (E-mail: csaba.nemethi@t-online.de)
 #==============================================================================
 
 #------------------------------------------------------------------------------
 # tablelist::sortByColumn
 #
 # Sorts the contents of the tablelist widget win by its col'th column.  Returns
-# the sorting order (increasing or decreasing).
+# the sort order (increasing or decreasing).
 #------------------------------------------------------------------------------
 proc tablelist::sortByColumn {win col} {
     #
@@ -29,11 +29,12 @@ proc tablelist::sortByColumn {win col} {
     }
 
     #
-    # Determine the sorting order
+    # Determine the sort order
     #
     set col $result
-    if {$col == [::$win sortcolumn] &&
-	[string compare [::$win sortorder] "increasing"] == 0} {
+    if {[set idx [lsearch -exact [::$win sortcolumnlist] $col]] >= 0 &&
+	[string compare [lindex [::$win sortorderlist] $idx] "increasing"]
+	== 0} {
 	set sortOrder decreasing
     } else {
 	set sortOrder increasing
@@ -51,22 +52,81 @@ proc tablelist::sortByColumn {win col} {
 }
 
 #------------------------------------------------------------------------------
+# tablelist::addToSortColumns
+#
+# Adds the col'th column of the tablelist widget win to the latter's list of
+# sort columns and sorts the contents of the widget by the modified column
+# list.  Returns the specified column's sort order (increasing or decreasing).
+#------------------------------------------------------------------------------
+proc tablelist::addToSortColumns {win col} {
+    #
+    # Check the arguments
+    #
+    if {![winfo exists $win]} {
+	return -code error "bad window path name \"$win\""
+    }
+    if {[string compare [winfo class $win] "Tablelist"] != 0} {
+	return -code error "window \"$win\" is not a tablelist widget"
+    }
+    if {[catch {::$win columnindex $col} result] != 0} {
+	return -code error $result
+    }
+    if {$result < 0 || $result >= [::$win columncount]} {
+	return -code error "column index \"$col\" out of range"
+    }
+
+    #
+    # Update the lists of sort columns and orders
+    #
+    set col $result
+    set sortColList [::$win sortcolumnlist]
+    set sortOrderList [::$win sortorderlist]
+    if {[set idx [lsearch -exact $sortColList $col]] >= 0} {
+	if {[string compare [lindex $sortOrderList $idx] "increasing"] == 0} {
+	    set sortOrder decreasing
+	} else {
+	    set sortOrder increasing
+	}
+	set sortOrderList [lreplace $sortOrderList $idx $idx $sortOrder]
+    } else {
+	lappend sortColList $col
+	lappend sortOrderList increasing
+	set sortOrder increasing
+    }
+
+    #
+    # Sort the widget's contents according to the
+    # modified lists of sort columns and orders
+    #
+    if {[catch {::$win sortbycolumnlist $sortColList $sortOrderList} result]
+	== 0} {
+	event generate $win <<TablelistColumnsSorted>>
+	return $sortOrder
+    } else {
+	return -code error $result
+    }
+}
+
+#------------------------------------------------------------------------------
 # tablelist::sortSubCmd
 #
-# This procedure is invoked to process the tablelist sort and sortbycolumn
-# subcommands.
+# This procedure is invoked to process the tablelist sort, sortbycolumn, and
+# sortbycolumnlist subcommands.
 #------------------------------------------------------------------------------
-proc tablelist::sortSubCmd {win col order} {
+proc tablelist::sortSubCmd {win sortColList sortOrderList} {
     upvar ::tablelist::ns${win}::data data
 
-    set data(sorting) 1
-
     #
-    # Cancel the execution of all delayed redisplay and redisplayCol commands
+    # Make sure sortOrderList has the same length as sortColList
     #
-    foreach name [array names data *redispId] {
-	after cancel $data($name)
-	unset data($name)
+    set sortColCount [llength $sortColList]
+    set sortOrderCount [llength $sortOrderList]
+    if {$sortOrderCount < $sortColCount} {
+	for {set n $sortOrderCount} {$n < $sortColCount} {incr n} {
+	    lappend sortOrderList increasing
+	}
+    } else {
+	set sortOrderList [lrange $sortOrderList 0 [expr {$sortColCount - 1}]]
     }
 
     #
@@ -91,35 +151,63 @@ proc tablelist::sortSubCmd {win col order} {
     }
 
     #
-    # Sort the item list and update the sort info
+    # Update the sort info and sort the item list
     #
-    if {$col < 0} {				;# not sorting by a column
+    if {[llength $sortColList] == 1 && [lindex $sortColList 0] == -1} {
 	if {[string compare $data(-sortcommand) ""] == 0} {
 	    return -code error \
 		   "value of the -sortcommand option is empty"
 	}
 
+	for {set col 0} {$col < $data(colCount)} {incr col} {
+	    set data($col-sortRank) 0
+	    set data($col-sortOrder) ""
+	}
+	set data(sortColList) {}
+	set data(arrowColList) {}
+	set order [lindex $sortOrderList 0]
+	set data(sortOrder) $order
+
 	set data(itemList) \
-	    [lsort $order -command $data(-sortcommand) $data(itemList)]
-    } else {					;# sorting by a column
-	if {[string compare $data($col-sortmode) "command"] == 0} {
-	    if {[info exists data($col-sortcommand)]} {
-		set data(itemList) \
-		    [lsort $order -index $col \
-		     -command $data($col-sortcommand) $data(itemList)]
+	    [lsort -$order -command $data(-sortcommand) $data(itemList)]
+    } else {					;# sorting by a column (list)
+	set sortColCount [llength $sortColList]
+	if {$sortColCount == 0} {
+	    return ""
+	}
+
+	for {set col 0} {$col < $data(colCount)} {incr col} {
+	    set data($col-sortRank) 0
+	    set data($col-sortOrder) ""
+	}
+	set rank 1
+	foreach col $sortColList order $sortOrderList {
+	    set data($col-sortRank) $rank
+	    set data($col-sortOrder) $order
+	    incr rank
+	}
+	makeSortAndArrowColLists $win
+
+	for {set idx [expr {$sortColCount - 1}]} {$idx >= 0} {incr idx -1} {
+	    set col [lindex $sortColList $idx]
+	    set order $data($col-sortOrder)
+	    if {[string compare $data($col-sortmode) "command"] == 0} {
+		if {[info exists data($col-sortcommand)]} {
+		    set data(itemList) \
+			[lsort -$order -index $col \
+			 -command $data($col-sortcommand) $data(itemList)]
+		} else {
+		    return -code error \
+			   "value of the -sortcommand option for\
+			    column $col is missing or empty"
+		}
 	    } else {
-		return -code error \
-		       "value of the -sortcommand option for\
-			column $col is missing or empty"
+		set data(itemList) \
+		    [lsort -$order -index $col \
+		     -$data($col-sortmode) $data(itemList)]
 	    }
-	} else {
-	    set data(itemList) \
-		[lsort $order -index $col \
-		 -$data($col-sortmode) $data(itemList)]
 	}
     }
-    set data(sortCol) $col
-    set data(sortOrder) [string range $order 1 end]
 
     #
     # Replace the contents of the list variable if present
@@ -145,17 +233,21 @@ proc tablelist::sortSubCmd {win col order} {
     }
 
     #
-    # Check whether an up- or down-arrow is to be displayed
+    # Cancel the execution of all delayed redisplay and
+    # redisplayCol commands, and make sure the stretchColumns
+    # procedure won't schedule any invocation of redisplayCol
     #
-    set oldArrowCol $data(arrowCol)
-    if {$col >= 0 && $data(-showarrow) && $data($col-showarrow)} {
-	#
-	# Configure the canvas and draw the arrows
-	#
-	set data(arrowCol) $col
-	configCanvas $win
-	drawArrows $win
+    foreach name [array names data *redispId] {
+	after cancel $data($name)
+	unset data($name)
+    }
+    set data(sorting) 1
 
+    set canvasWidth $data(arrowWidth)
+    if {[llength $data(arrowColList)] > 1} {
+	incr canvasWidth 6
+    }
+    foreach col $data(arrowColList) {
 	#
 	# Make sure the arrow will fit into the column
 	#
@@ -163,61 +255,73 @@ proc tablelist::sortSubCmd {win col order} {
 	set pixels [lindex $data(colList) $idx]
 	if {$pixels == 0 && $data($col-maxPixels) > 0 &&
 	    $data($col-reqPixels) > $data($col-maxPixels) &&
-	    $data($col-maxPixels) < $data(arrowWidth)} {
-	    set data($col-maxPixels) $data(arrowWidth)
-	    set data($col-maxwidth) -$data(arrowWidth)
+	    $data($col-maxPixels) < $canvasWidth} {
+	    set data($col-maxPixels) $canvasWidth
+	    set data($col-maxwidth) -$canvasWidth
 	}
-	if {$pixels != 0 && $pixels < $data(arrowWidth)} {
-	    set data(colList) \
-		[lreplace $data(colList) $idx $idx $data(arrowWidth)]
+	if {$pixels != 0 && $pixels < $canvasWidth} {
+	    set data(colList) [lreplace $data(colList) $idx $idx $canvasWidth]
 	    set idx [expr {3*$col}]
 	    set data(-columns) \
-		[lreplace $data(-columns) $idx $idx -$data(arrowWidth)]
+		[lreplace $data(-columns) $idx $idx -$canvasWidth]
 	}
-
-	#
-	# Adjust the columns; this will also place the canvas into the label
-	#
-	adjustColumns $win [list l$oldArrowCol l$col] 1
-    } else {
-	#
-	# Unmanage the canvas and adjust the columns
-	#
-	place forget $data(hdrTxtFrCanv)
-	set data(arrowCol) -1
-	adjustColumns $win l$oldArrowCol 1
     }
+
+    #
+    # Adjust the columns; this will also place the
+    # canvas widgets into the corresponding labels
+    #
+    adjustColumns $win allLabels 1
 
     #
     # Delete the items from the body text widget and insert the sorted ones.
     # Interestingly, for a large number of items it is much more efficient
     # to empty each line individually than to invoke a global delete command.
     #
+    set w $data(body)
+    for {set line 1} {$line <= $data(itemCount)} {incr line} {
+	$w delete $line.0 $line.end
+    }
     set widgetFont $data(-font)
     set snipStr $data(-snipstring)
     set isSimple [expr {$data(tagRefCount) == 0 && $data(imgCount) == 0 &&
 			$data(winCount) == 0 && !$data(hasColTags)}]
     set isViewable [winfo viewable $win]
-    set w $data(body)
+    set hasFmtCmds [expr {[lsearch -exact $data(fmtCmdFlagList) 1] >= 0}]
     set row 0
     set line 1
     foreach item $data(itemList) {
 	if {$isViewable &&
-	    $row == [expr {[rowIndex $win @0,[winfo height $win] 0] + 1}]} {
+	    $row == [rowIndex $win @0,[winfo height $win] 0] + 1} {
+	    updateColors $win
 	    update idletasks
 	}
 
+	if {$hasFmtCmds} {
+	    set formattedItem {}
+	    set col 0
+	    foreach text [lrange $item 0 $data(lastCol)] \
+		    fmtCmdFlag $data(fmtCmdFlagList) {
+		if {$fmtCmdFlag} {
+		    set text [uplevel #0 $data($col-formatcommand) [list $text]]
+		}
+		lappend formattedItem $text
+		incr col
+	    }
+	} else {
+	    set formattedItem [lrange $item 0 $data(lastCol)]
+	}
+
 	#
-	# Empty the line, clip the elements if necessary,
-	# and insert them with the corresponding tags
+	# Clip the elements if necessary and
+	# insert them with the corresponding tags
 	#
-	$w delete $line.0 $line.end
-	set dispItem [strToDispStr $item]
+	set key [lindex $item end]
 	set col 0
 	if {$isSimple} {
 	    set insertStr ""
-	    foreach text [lrange $dispItem 0 $data(lastCol)] \
-		    fmtCmdFlag $data(fmtCmdFlagList) \
+	    set multilineData {}
+	    foreach text [strToDispStr $formattedItem] \
 		    {pixels alignment} $data(colList) {
 		if {$data($col-hide)} {
 		    incr col
@@ -227,10 +331,11 @@ proc tablelist::sortSubCmd {win col order} {
 		#
 		# Clip the element if necessary
 		#
-		if {$fmtCmdFlag} {
-		    set text [uplevel #0 $data($col-formatcommand) \
-			      [list [lindex $item $col]]]
-		    set text [strToDispStr $text]
+		if {[string match "*\n*" $text]} {
+		    set multiline 1
+		    set list [split $text "\n"]
+		} else {
+		    set multiline 0
 		}
 		if {$pixels == 0} {		;# convention: dynamic width
 		    if {$data($col-maxPixels) > 0 &&
@@ -240,11 +345,21 @@ proc tablelist::sortSubCmd {win col order} {
 		}
 		if {$pixels != 0} {
 		    incr pixels $data($col-delta)
-		    set text [strRangeExt $win $text $widgetFont \
-			      $pixels $alignment $snipStr]
+		    if {$multiline} {
+			set text [joinList $win $list $widgetFont \
+				  $pixels $alignment $snipStr]
+		    } else {
+			set text [strRangeExt $win $text $widgetFont \
+				  $pixels $alignment $snipStr]
+		    }
 		}
 
-		append insertStr "\t$text\t"
+		if {$multiline} {
+		    append insertStr "\t\t"
+		    lappend multilineData $col $text $alignment
+		} else {
+		    append insertStr "\t$text\t"
+		}
 		incr col
 	    }
 
@@ -253,8 +368,17 @@ proc tablelist::sortSubCmd {win col order} {
 	    #
 	    $w insert $line.0 $insertStr
 
+	    #
+	    # Embed the message widgets displaying multiline elements
+	    #
+	    foreach {col text alignment} $multilineData {
+		findTabs $win $line $col $col tabIdx1 tabIdx2
+		set msgScript [list ::tablelist::displayText $win $key \
+			       $col $text $widgetFont $alignment]
+		$w window create $tabIdx2 -pady 1 -create $msgScript
+	    }
+
 	} else {
-	    set key [lindex $item end]
 	    array set itemData [array get data $key*-\[bf\]*]	;# for speed
 
 	    set rowTags {}
@@ -263,10 +387,9 @@ proc tablelist::sortSubCmd {win col order} {
 		lappend rowTags row-$tail-$itemData($name)
 	    }
 
-	    foreach text [lrange $dispItem 0 $data(lastCol)] \
+	    foreach text [strToDispStr $formattedItem] \
 		    colFont $data(colFontList) \
 		    colTags $data(colTagsList) \
-		    fmtCmdFlag $data(fmtCmdFlagList) \
 		    {pixels alignment} $data(colList) {
 		if {$data($col-hide)} {
 		    incr col
@@ -276,10 +399,11 @@ proc tablelist::sortSubCmd {win col order} {
 		#
 		# Adjust the cell text and the image or window width
 		#
-		if {$fmtCmdFlag} {
-		    set text [uplevel #0 $data($col-formatcommand) \
-			      [list [lindex $item $col]]]
-		    set text [strToDispStr $text]
+		if {[string match "*\n*" $text]} {
+		    set multiline 1
+		    set list [split $text "\n"]
+		} else {
+		    set multiline 0
 		}
 		set aux [getAuxData $win $key $col auxType auxWidth]
 		if {[info exists data($key-$col-font)]} {
@@ -298,8 +422,15 @@ proc tablelist::sortSubCmd {win col order} {
 		if {$pixels != 0} {
 		    incr pixels $data($col-delta)
 		}
-		adjustElem $win text auxWidth $cellFont $pixels \
-			   $alignment $snipStr
+		if {$multiline} {
+		    adjustMlElem $win list auxWidth $cellFont \
+				 $pixels $alignment $snipStr
+		    set msgScript [list ::tablelist::displayText $win $key \
+				   $col [join $list "\n"] $cellFont $alignment]
+		} else {
+		    adjustElem $win text auxWidth $cellFont \
+			       $pixels $alignment $snipStr
+		}
 
 		#
 		# Insert the text and the auxiliary object
@@ -311,11 +442,22 @@ proc tablelist::sortSubCmd {win col order} {
 		}
 		set tagNames [concat $colTags $rowTags $cellTags]
 		if {$auxType == 0} {
-		    $w insert $line.end "\t$text\t" $tagNames
+		    if {$multiline} {
+			$w insert $line.end "\t\t" $tagNames
+			$w window create $line.end-1c -pady 1 -create $msgScript
+		    } else {
+			$w insert $line.end "\t$text\t" $tagNames
+		    }
 		} else {
 		    $w insert $line.end "\t\t" $tagNames
 		    createAuxObject $win $key $row $col $aux $auxType $auxWidth
-		    insertElem $w $line.end-1c $text $aux $auxType $alignment
+		    if {$multiline} {
+			insertMlElem $w $line.end-1c $msgScript \
+				     $aux $auxType $alignment
+		    } else {
+			insertElem $w $line.end-1c $text \
+				   $aux $auxType $alignment
+		    }
 		}
 
 		incr col
@@ -381,8 +523,10 @@ proc tablelist::sortSubCmd {win col order} {
     #
     variable winSys
     if {[string compare $winSys "aqua"] == 0} {
-	set canvas [list $data(hdrTxtFrCanv)]
-	after idle "lower $canvas; raise $canvas"
+	foreach col $data(arrowColList) {
+	    set canvas [list $data(hdrTxtFrCanv)$col]
+	    after idle "lower $canvas; raise $canvas"
+	}
     }
 
     set data(sorting) 0
