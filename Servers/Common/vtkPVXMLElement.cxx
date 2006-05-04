@@ -16,7 +16,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.9");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.10");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 #include <vtkstd/string>
@@ -166,6 +166,21 @@ void vtkPVXMLElement::ReadXMLAttributes(const char** atts)
 void vtkPVXMLElement::RemoveAllNestedElements()
 {
   this->Internal->NestedElements.clear();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXMLElement::RemoveNestedElement(vtkPVXMLElement* element)
+{
+  vtkstd::vector<vtkSmartPointer<vtkPVXMLElement> >::iterator iter
+    = this->Internal->NestedElements.begin();
+  for ( ; iter != this->Internal->NestedElements.end(); ++iter)
+    {
+    if (iter->GetPointer() == element)
+      {
+      this->Internal->NestedElements.erase(iter);
+      break;
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
