@@ -11,6 +11,19 @@ SET (KWCommon_INCLUDE_PATH
 
 SET (KWCommon_LIBRARIES KWCommon CACHE INTERNAL "libraries for KWCommon")
 #############################################################################
+# Find an external package VTK if we are not being built as a part of a larger
+# project that includes VTK as a subdir.
+MACRO( INCLUDE_PACKAGE PACKAGE_NAME )
+  IF( NOT ${PACKAGE_NAME}_SOURCE_DIR )
+    FIND_PACKAGE( ${PACKAGE_NAME} REQUIRED )
+    IF( ${PACKAGE_NAME}_FOUND )
+      INCLUDE( ${${PACKAGE_NAME}_USE_FILE} )
+    ENDIF( ${PACKAGE_NAME}_FOUND )
+  ENDIF( NOT ${PACKAGE_NAME}_SOURCE_DIR )
+ENDMACRO( INCLUDE_PACKAGE )
+
+INCLUDE_PACKAGE( VTK )
+########################################################################
 
 # Let parent project set KWCommon_INSTALL_LIB_DIR to control library install
 # location.
@@ -106,3 +119,11 @@ ENDIF(NOT KWCommon_INSTALL_NO_LIBRARIES)
 IF(BUILD_TESTING)
   SUBDIRS(Testing)
 ENDIF(BUILD_TESTING)
+
+# Install include tree
+# IF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
+#  INSTALL_FILES(/include/KWCommon "(\\.h|\\.txx)$")
+# ENDIF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
+
+SUBDIRS( CMake )
+
