@@ -95,6 +95,10 @@ public:
   void RemoveAllNestedElements();
 
   // Description:
+  // Remove a particular element.
+  void RemoveNestedElement(vtkPVXMLElement*);
+
+  // Description:
   // Lookup the element with the given id, starting at this scope.
   vtkPVXMLElement* LookupElement(const char* id);
 
