@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.52");
+vtkCxxRevisionMacro(vtkKWExtent, "1.53");
 
 //----------------------------------------------------------------------------
 vtkKWExtent::vtkKWExtent()
@@ -93,9 +93,9 @@ void vtkKWExtent::CreateWidget()
     this->Range[i]->AdjustResolutionOn();
     }
 
-  this->Range[0]->GetLabel()->SetText(ks_("Extent|Dimension|X (Units)"));
-  this->Range[1]->GetLabel()->SetText(ks_("Extent|Dimension|Y (Units)"));
-  this->Range[2]->GetLabel()->SetText(ks_("Extent|Dimension|Z (Units)"));
+  this->Range[0]->GetLabel()->SetText(ks_("Extent|Dimension|X"));
+  this->Range[1]->GetLabel()->SetText(ks_("Extent|Dimension|Y"));
+  this->Range[2]->GetLabel()->SetText(ks_("Extent|Dimension|Z"));
   
   // Pack the label and the option menu
 
