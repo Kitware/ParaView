@@ -125,5 +125,5 @@ ENDIF(BUILD_TESTING)
 #  INSTALL_FILES(/include/KWCommon "(\\.h|\\.txx)$")
 # ENDIF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
 
-SUBDIRS( CMake )
+SUBDIRS( Utilities/ExportConfiguration )
 
