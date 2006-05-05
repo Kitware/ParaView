@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-  Module:    main.cxx
+   Module:    pqMain.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,10 +30,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "ProcessModuleGUIHelper.h"
-#include <pqMain.h>
+#ifndef _pqMain_h
+#define _pqMain_h
 
-int main(int argc, char* argv[])
+#include "pqWidgetsExport.h"
+
+class pqProcessModuleGUIHelper;
+
+/// Helper class that wraps all of the boilerplate to create a ParaQ client into one function
+class PQWIDGETS_EXPORT pqMain
 {
-  return pqMain::Run(argc, argv, ProcessModuleGUIHelper::New());
-}
+public:
+  /// Call pqMain::Run() in your client's main(), returning the result
+  static int Run(int argc, char* argv[], pqProcessModuleGUIHelper* helper);
+};
+
+#endif // !_pqMain_h

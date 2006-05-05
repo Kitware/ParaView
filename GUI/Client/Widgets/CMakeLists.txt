@@ -109,6 +109,8 @@ ADD_LIBRARY(pqWidgets
   pqImageTip.h
   pqLoadedFormObjectPanel.cxx
   pqLoadedFormObjectPanel.h
+  pqMain.cxx
+  pqMain.h
   pqMainWindow.cxx
   pqMainWindow.h
   pqMultiView.cxx
