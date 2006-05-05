@@ -150,7 +150,7 @@ ENDMACRO(GETTEXT_FIND_TOOLS)
 
 SET(GETTEXT_INFO_MSG "More information about gettext can be found at http://directory.fsf.org/gettext.html.")
 IF(WIN32)
-  SET(GETTEXT_INFO_MSG "${GETTEXT_INFO_MSG} Windows users can download gettext-runtime-0.13.1.bin.woe32.zip (LGPL), gettext-tools-0.13.1.bin.woe32.zip (GPL) as well as libiconv-1.9.1.bin.woe32.zip (LGPL) from any GNU mirror (say, http://mirrors.kernel.org/gnu/gettext/ and http://mirrors.kernel.org/gnu/libiconv/), unpack the archives in the same directory, then set GETTEXT_INTL_LIBRARY to 'lib/intl.lib' in and GETTEXT_INCLUDE_DIR to 'include' in that directory.")
+  SET(GETTEXT_INFO_MSG "${GETTEXT_INFO_MSG} Windows users can download gettext-runtime-0.13.1.bin.woe32.zip (LGPL), gettext-tools-0.13.1.bin.woe32.zip (GPL) as well as libiconv-1.9.1.bin.woe32.zip (LGPL) from any GNU mirror (say, http://mirrors.kernel.org/gnu/gettext/ and http://mirrors.kernel.org/gnu/libiconv/), unpack the archives in the same directory, then set GETTEXT_INTL_LIBRARY to 'lib/intl.lib' in and GETTEXT_INCLUDE_DIR to 'include' in that directory.\n\nWarning: if you are using ActiveTcl, the ActiveState binary distribution for Tcl, make sure you overwrite the iconv.dll file found in both the Tcl bin/ and lib/ directories with the iconv.dll file found in your gettext bin/ directory.")
 ENDIF(WIN32)
 
 # --------------------------------------------------------------------------
