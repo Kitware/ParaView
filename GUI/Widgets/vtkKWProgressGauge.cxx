@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.38");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.39");
 
 //----------------------------------------------------------------------------
 vtkKWProgressGauge::vtkKWProgressGauge()
@@ -155,7 +155,11 @@ void vtkKWProgressGauge::SetMinimumHeight(int height)
 void vtkKWProgressGauge::SetBarColor(double r, double g, double b)
 {
   double *color = this->GetBarColor();
-  if (!color || (color[0] == r && color[1] == g && color[2] == b))
+  if (!color || 
+      (color[0] == r && color[1] == g && color[2] == b) ||
+      r < 0.0 || r > 1.0 || 
+      g < 0.0 || g > 1.0 || 
+      b < 0.0 || b > 1.0)
     {
     return;
     }

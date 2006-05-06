@@ -39,7 +39,7 @@
 #include <vtksys/stl/algorithm>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.94");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.95");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -713,12 +713,32 @@ int vtkKWParameterValueFunctionEditor::GetFunctionPointColorInCanvas(
     for (int i = 0; i < 3; i++)
       {
       rgb[i] = (values[i] - v_w_range[0]) / (v_w_range[1] - v_w_range[0]);
+      // Just in case the point values are outside the whole range, which
+      // is not likely to happen, but who knows.
+      if (rgb[i] < 0.0)
+        {
+        rgb[i] = 0;
+        } 
+      else if (rgb[i] > 1.0) 
+        {
+        rgb[i] = 1;
+        }
       }
     }
   else
     {
-    rgb[0] = rgb[1] = rgb[2] = 
-      (values[0] - v_w_range[0]) / (v_w_range[1] - v_w_range[0]);
+    rgb[0] = (values[0] - v_w_range[0]) / (v_w_range[1] - v_w_range[0]);
+    // Just in case the point values are outside the whole range, which
+    // is not likely to happen, but who knows.
+    if (rgb[0] < 0.0)
+      {
+      rgb[0] = 0;
+      } 
+    else if (rgb[0] > 1.0) 
+      {
+      rgb[0] = 1;
+      }
+    rgb[1] = rgb[2] = rgb[0];
     }
 
   return 1;
