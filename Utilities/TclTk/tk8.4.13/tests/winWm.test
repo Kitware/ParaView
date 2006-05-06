@@ -1,0 +1,353 @@
+# This file tests  is a Tcl script to test the procedures in the file
+# tkWinWm.c.  It is organized in the standard fashion for Tcl tests.
+#
+# This file contains a collection of tests for one or more of the Tcl
+# built-in commands.  Sourcing this file into Tcl runs the tests and
+# generates output for errors.  No output means no errors were found.
+#
+# Copyright (c) 1996 by Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+# All rights reserved.
+#
+# RCS: @(#) Id
+
+package require tcltest 2.1
+namespace import -force tcltest::configure
+namespace import -force tcltest::testsDirectory
+configure -testdir [file join [pwd] [file dirname [info script]]]
+configure -loadfile [file join [testsDirectory] constraints.tcl]
+tcltest::loadTestedCommands
+
+# Measure the height of a single menu line
+
+toplevel .t
+frame .t.f -width 100 -height 50
+pack .t.f
+menu .t.m
+.t.m add command -label "thisisreallylong"
+.t conf -menu .t.m
+wm geom .t -0-0
+update
+set menuheight [winfo y .t]
+.t.m add command -label "thisisreallylong"
+wm geom .t -0-0
+update
+set menuheight [expr $menuheight - [winfo y .t]]
+destroy .t
+
+test winWm-1.1 {TkWmMapWindow} {pcOnly} {
+    toplevel .t
+    wm override .t 1
+    wm geometry .t +0+0
+    update
+    set result [list [winfo rootx .t] [winfo rooty .t]]
+    destroy .t
+    set result
+} {0 0}
+test winWm-1.2 {TkWmMapWindow} {pcOnly} {
+    toplevel .t
+    wm transient .t .
+    update
+    wm iconify .
+    update
+    wm deiconify .
+    update
+    catch {wm iconify .t} msg
+    destroy .t
+    set msg
+} {can't iconify ".t": it is a transient}
+test winWm-1.3 {TkWmMapWindow} {pcOnly} {
+    toplevel .t
+    update
+    toplevel .t2
+    update
+    set result [expr [winfo x .t] != [winfo x .t2]]
+    destroy .t .t2
+    set result
+} 1
+test winWm-1.4 {TkWmMapWindow} {pcOnly} {
+    toplevel .t
+    wm geometry .t +10+10
+    update
+    toplevel .t2
+    wm geometry .t2 +40+10
+    update
+    set result [list [winfo x .t] [winfo x .t2]]
+    destroy .t .t2
+    set result
+} {10 40}
+test winWm-1.5 {TkWmMapWindow} {pcOnly} {
+    toplevel .t
+    wm iconify .t
+    update
+    set result [wm state .t]
+    destroy .t
+    set result
+} iconic
+
+test winWm-2.1 {TkpWmSetState} {pcOnly} {
+    toplevel .t
+    wm geometry .t 150x50+10+10
+    update
+    set result [wm state .t]
+    wm iconify .t
+    update
+    lappend result [wm state .t]
+    wm deiconify .t
+    update
+    lappend result [wm state .t]
+    destroy .t
+    set result
+} {normal iconic normal}
+test winWm-2.2 {TkpWmSetState} {pcOnly} {
+    toplevel .t
+    wm geometry .t 150x50+10+10
+    update
+    set result [wm state .t]
+    wm withdraw .t
+    update
+    lappend result [wm state .t]
+    wm iconify .t
+    update
+    lappend result [wm state .t]
+    wm deiconify .t
+    update 
+    lappend result [wm state .t]
+    destroy .t
+    set result
+} {normal withdrawn iconic normal}
+test winWm-2.2 {TkpWmSetState} {pcOnly} {
+    toplevel .t
+    wm geometry .t 150x50+10+10
+    update
+    set result [wm state .t]
+    wm state .t withdrawn
+    update
+    lappend result [wm state .t]
+    wm state .t iconic
+    update
+    lappend result [wm state .t]
+    wm state .t normal
+    update 
+    lappend result [wm state .t]
+    destroy .t
+    set result
+} {normal withdrawn iconic normal}
+test winWm-2.4 {TkpWmSetState} {pcOnly} {
+    set result {}
+    toplevel .t
+    wm geometry .t 150x50+10+10
+    update
+    lappend result [list [wm state .t] [wm geometry .t]]
+    wm iconify .t
+    update
+    lappend result [list [wm state .t] [wm geometry .t]]
+    wm geometry .t 200x50+10+10
+    update
+    lappend result [list [wm state .t] [wm geometry .t]]
+    wm deiconify .t
+    update
+    lappend result [list [wm state .t] [wm geometry .t]]
+    destroy .t
+    set result
+} {{normal 150x50+10+10} {iconic 150x50+10+10} {iconic 150x50+10+10} {normal 200x50+10+10}}
+
+test winWm-3.1 {ConfigureTopLevel: window geometry propagation} {pcOnly} {
+    toplevel .t
+    wm geometry .t +0+0
+    button .t.b
+    pack .t.b
+    update
+    set x [winfo x .t.b]
+    destroy .t
+    toplevel .t
+    wm geometry .t +0+0
+    button .t.b
+    update
+    pack .t.b
+    update
+    set x [expr $x == [winfo x .t.b]]
+    destroy .t
+    set x
+} 1
+
+test winWm-4.1 {ConfigureTopLevel: menu resizing} {pcOnly} {
+    set result {}
+    toplevel .t
+    frame .t.f -width 150 -height 50 -bg red
+    pack .t.f
+    wm geometry .t -0-0
+    update
+    set y [winfo y .t]
+    menu .t.m
+    .t.m add command -label foo
+    .t conf -menu .t.m
+    update
+    set result [expr $y - [winfo y .t]]
+    destroy .t
+    set result
+} [expr $menuheight + 1]
+
+test winWm-5.1 {UpdateGeometryInfo: menu resizing} {pcOnly} {
+    set result {}
+    toplevel .t
+    frame .t.f -width 150 -height 50 -bg red
+    pack .t.f
+    update
+    set result [winfo height .t]
+    menu .t.m
+    .t.m add command -label foo
+    .t conf -menu .t.m
+    update
+    lappend result [winfo height .t]
+    .t.m add command -label "thisisreallylong"
+    .t.m add command -label "thisisreallylong"
+    update
+    lappend result [winfo height .t]
+    destroy .t
+    set result
+} {50 50 50}
+test winWm-5.2 {UpdateGeometryInfo: menu resizing} {pcOnly} {
+    set result {}
+    toplevel .t
+    frame .t.f -width 150 -height 50 -bg red
+    pack .t.f
+    wm geom .t -0-0
+    update
+    set y [winfo rooty .t]
+    lappend result [winfo height .t]
+    menu .t.m
+    .t conf -menu .t.m
+    .t.m add command -label foo
+    .t.m add command -label "thisisreallylong"
+    .t.m add command -label "thisisreallylong"
+    update
+    lappend result [winfo height .t]
+    lappend result [expr $y - [winfo rooty .t]]
+    destroy .t
+    set result
+} {50 50 0}
+
+test winWm-6.1 {wm attributes} win {
+    destroy .t
+    toplevel .t
+    wm attributes .t
+} {-alpha 1.0 -disabled 0 -toolwindow 0 -topmost 0}
+test winWm-6.2 {wm attributes} win {
+    destroy .t
+    toplevel .t
+    wm attributes .t -disabled
+} {0}
+test winWm-6.3 {wm attributes} win {
+    # This isn't quite the correct error message yet, but it works.
+    destroy .t
+    toplevel .t
+    list [catch {wm attributes .t -foo} msg] $msg
+} {1 {wrong # args: should be "wm attributes window ?-alpha ?double?? ?-disabled ?bool?? ?-toolwindow ?bool?? ?-topmost ?bool??"}}
+
+test winWm-6.4 {wm attributes -alpha} win {
+    # Expect this to return all 1.0 {} on pre-2K/XP
+    destroy .t
+    toplevel .t
+    set res [wm attributes .t -alpha]
+    # we don't return on set yet
+    lappend res [wm attributes .t -alpha 0.5]
+    lappend res [wm attributes .t -alpha]
+    lappend res [wm attributes .t -alpha -100]
+    lappend res [wm attributes .t -alpha]
+    lappend res [wm attributes .t -alpha 100]
+    lappend res [wm attributes .t -alpha]
+    set res
+} {1.0 {} 0.5 {} 0.0 {} 1.0}
+
+test winWm-6.5 {wm attributes -alpha} win {
+    destroy .t
+    toplevel .t
+    list [catch {wm attributes .t -alpha foo} msg] $msg
+} {1 {expected floating-point number but got "foo"}}
+
+test winWm-6.6 {wm attributes -alpha} win {
+    # This test is just to show off -alpha
+    destroy .t
+    toplevel .t
+    wm attributes .t -alpha 0.2
+    pack [label .t.l -text "Alpha Toplevel" -font "Helvetica 18 bold"]
+    tk::PlaceWindow .t center
+    update
+    if {$::tcl_platform(osVersion) >= 5.0} {
+	for {set i 0.2} {$i < 0.99} {set i [expr {$i+0.02}]} {
+	    wm attributes .t -alpha $i
+	    update idle
+	    after 20
+	}
+	for {set i 0.99} {$i > 0.2} {set i [expr {$i-0.02}]} {
+	    wm attributes .t -alpha $i
+	    update idle
+	    after 20
+	}
+    }
+} {}
+
+test winWm-7.1 {deiconify on an unmapped toplevel
+        will raise the window and set the focus} {pcOnly} {
+    destroy .t
+    toplevel .t
+    lower .t
+    focus -force .
+    wm deiconify .t
+    update
+    list [wm stackorder .t isabove .] [focus]
+} {1 .t}
+
+test winWm-7.2 {deiconify on an already mapped toplevel
+        will raise the window and set the focus} {pcOnly} {
+    destroy .t
+    toplevel .t
+    lower .t
+    update
+    focus -force .
+    wm deiconify .t
+    update
+    list [wm stackorder .t isabove .] [focus]
+} {1 .t}
+
+test winWm-7.3 {UpdateWrapper must maintain Z order} win {
+    destroy .t
+    toplevel .t
+    lower .t
+    update
+    set res [wm stackorder .t isbelow .]
+    wm resizable .t 0 0
+    update
+    list $res [wm stackorder .t isbelow .]
+} {1 1}
+
+test winWm-7.4 {UpdateWrapper must maintain focus} win {
+    destroy .t
+    toplevel .t
+    focus -force .t
+    update
+    set res [focus]
+    wm resizable .t 0 0
+    update
+    list $res [focus]
+} {.t .t}
+
+test winWm-8.1 {Tk_WmCmd procedure, "iconphoto" option} win {
+    list [catch {wm iconph .} msg] $msg
+} {1 {wrong # args: should be "wm iconphoto window ?-default? image1 ?image2 ...?"}}
+test winWm-8.2 {Tk_WmCmd procedure, "iconphoto" option} win {
+    destroy .t
+    toplevel .t
+    image create photo blank16 -width 16 -height 16
+    image create photo blank32 -width 32 -height 32
+    # This should just make blank icons for the window
+    wm iconphoto .t blank16 blank32
+    image delete blank16 blank32
+} {}
+
+destroy .t
+
+# cleanup
+::tcltest::cleanupTests
+return

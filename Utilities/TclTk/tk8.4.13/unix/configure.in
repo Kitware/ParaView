@@ -1,0 +1,587 @@
+#! /bin/bash -norc
+dnl	This file is an input file used by the GNU "autoconf" program to
+dnl	generate the file "configure", which is run during Tk installation
+dnl	to configure the system for the local environment.
+#
+# RCS: @(#) Id
+
+AC_INIT(../generic/tk.h)
+AC_PREREQ(2.13)
+
+TK_VERSION=8.4
+TK_MAJOR_VERSION=8
+TK_MINOR_VERSION=4
+TK_PATCH_LEVEL=".13"
+VERSION=${TK_VERSION}
+LOCALES="cs de el en en_gb eo es es_ES fr it nl pl pt ru"
+
+#--------------------------------------------------------------------
+# Find and load the tclConfig.sh file
+#--------------------------------------------------------------------
+
+SC_PATH_TCLCONFIG
+SC_LOAD_TCLCONFIG
+
+SC_PROG_TCLSH
+SC_BUILD_TCLSH
+
+if test "${TCL_VERSION}" != "${TK_VERSION}"; then
+    AC_MSG_ERROR([${TCL_BIN_DIR}/tclConfig.sh is for Tcl ${TCL_VERSION}.
+Tk ${TK_VERSION}${TK_PATCH_LEVEL} needs Tcl ${TK_VERSION}.
+Use --with-tcl= option to indicate location of tclConfig.sh file for Tcl ${TK_VERSION}.])
+fi
+
+#------------------------------------------------------------------------
+# Handle the --prefix=... option
+#------------------------------------------------------------------------
+
+if test "${prefix}" = "NONE"; then
+    prefix="$TCL_PREFIX"
+fi
+if test "${exec_prefix}" = "NONE"; then
+    exec_prefix=$prefix
+fi
+# Make sure srcdir is fully qualified!
+srcdir=`cd $srcdir ; pwd`
+TK_SRC_DIR=`cd $srcdir/..; pwd`
+
+#------------------------------------------------------------------------
+# Compress and/or soft link the manpages?
+#------------------------------------------------------------------------
+
+SC_CONFIG_MANPAGES([tk])
+
+#------------------------------------------------------------------------
+# Standard compiler checks
+#------------------------------------------------------------------------
+
+# If the user did not set CFLAGS, set it now to keep
+# the AC_PROG_CC macro from adding "-g -O2".
+if test "${CFLAGS+set}" != "set" ; then
+    CFLAGS=""
+fi
+
+AC_PROG_CC
+
+# limits header checks must come early to prevent
+# an autoconf bug that throws errors on configure
+AC_CHECK_HEADER(limits.h,
+    [AC_DEFINE(HAVE_LIMITS_H)], [AC_DEFINE(NO_LIMITS_H)])
+AC_HAVE_HEADERS(unistd.h)
+
+#--------------------------------------------------------------------
+# Supply a substitute for stdlib.h if it doesn't define strtol,
+# strtoul, or strtod (which it doesn't in some versions of SunOS).
+#--------------------------------------------------------------------
+
+AC_MSG_CHECKING(stdlib.h)
+AC_EGREP_HEADER(strtol, stdlib.h, tk_ok=yes, tk_ok=no)
+AC_EGREP_HEADER(strtoul, stdlib.h, , tk_ok=no)
+AC_EGREP_HEADER(strtod, stdlib.h, , tk_ok=no)
+if test $tk_ok = no; then
+    AC_DEFINE(NO_STDLIB_H)
+fi
+AC_MSG_RESULT([$tk_ok])
+
+#------------------------------------------------------------------------
+# If we're using GCC, see if the compiler understands -pipe.  If so, use it.
+# It makes compiling go faster.  (This is only a performance feature.)
+#------------------------------------------------------------------------
+
+if test -z "$no_pipe"; then
+if test -n "$GCC"; then
+  AC_MSG_CHECKING([if the compiler understands -pipe])
+  OLDCC="$CC"  
+  CC="$CC -pipe"
+  AC_TRY_COMPILE(,,
+    AC_MSG_RESULT([yes]),
+    CC="$OLDCC"
+    AC_MSG_RESULT([no]))
+fi  
+fi
+
+#------------------------------------------------------------------------
+# Threads support - this auto-enables if Tcl was compiled threaded
+#------------------------------------------------------------------------
+
+SC_ENABLE_THREADS
+
+#--------------------------------------------------------------------
+# On a few very rare systems, all of the libm.a stuff is
+# already in libc.a.  Set compiler flags accordingly.
+# Also, Linux requires the "ieee" library for math to work
+# right (and it must appear before "-lm").
+#--------------------------------------------------------------------
+
+MATH_LIBS=""
+AC_CHECK_FUNC(sin, , MATH_LIBS="-lm")
+AC_CHECK_LIB(ieee, main, [MATH_LIBS="-lieee $MATH_LIBS"])
+
+# Add the threads support libraries
+LIBS="$LIBS$THREADS_LIBS"
+
+SC_ENABLE_SHARED
+
+#--------------------------------------------------------------------
+# The statements below define a collection of compile flags.  This
+# macro depends on the value of SHARED_BUILD, and should be called
+# after SC_ENABLE_SHARED checks the configure switches.
+#--------------------------------------------------------------------
+
+SC_CONFIG_CFLAGS
+
+SC_ENABLE_SYMBOLS
+
+TK_DBGX=${DBGX}
+
+#--------------------------------------------------------------------
+#	Detect what compiler flags to set for 64-bit support.
+#--------------------------------------------------------------------
+
+SC_TCL_EARLY_FLAGS
+
+SC_TCL_64BIT_FLAGS
+
+#--------------------------------------------------------------------
+#	Check endianness because we can optimize some operations
+#--------------------------------------------------------------------
+
+AC_C_BIGENDIAN
+
+#------------------------------------------------------------------------
+# If Tcl and Tk are installed in different places, adjust the library
+# search path to reflect this.
+#------------------------------------------------------------------------
+
+LIB_RUNTIME_DIR='${LIB_RUNTIME_DIR}'
+
+if test "$TCL_EXEC_PREFIX" != "$exec_prefix"; then
+    LIB_RUNTIME_DIR="${LIB_RUNTIME_DIR}:${TCL_EXEC_PREFIX}/lib"
+fi
+
+if test "$TCL_PREFIX" != "$prefix"; then
+    AC_MSG_WARN([
+        Different --prefix selected for Tk and Tcl!
+        [[package require Tk]] may not work correctly in tclsh.])
+fi
+
+#--------------------------------------------------------------------
+#	Include sys/select.h if it exists and if it supplies things
+#	that appear to be useful and aren't already in sys/types.h.
+#	This appears to be true only on the RS/6000 under AIX.  Some
+#	systems like OSF/1 have a sys/select.h that's of no use, and
+#	other systems like SCO UNIX have a sys/select.h that's
+#	pernicious.  If "fd_set" isn't defined anywhere then set a
+#	special flag.
+#--------------------------------------------------------------------
+
+AC_CACHE_CHECK([for fd_set in sys/types], tcl_cv_type_fd_set,
+    AC_TRY_COMPILE([#include <sys/types.h>],[fd_set readMask, writeMask;],
+	tcl_cv_type_fd_set=yes, tcl_cv_type_fd_set=no))
+tk_ok=$tcl_cv_type_fd_set
+if test $tk_ok = no; then
+    AC_CACHE_CHECK([for fd_mask in sys/select], tcl_cv_grep_fd_mask,
+	AC_EGREP_HEADER(fd_mask, sys/select.h,
+	     tcl_cv_grep_fd_mask=present, tcl_cv_grep_fd_mask=missing))
+    if test $tcl_cv_grep_fd_mask = present; then
+	AC_DEFINE(HAVE_SYS_SELECT_H)
+	tk_ok=yes
+    fi
+fi
+if test $tk_ok = no; then
+    AC_DEFINE(NO_FD_SET)
+fi
+
+#------------------------------------------------------------------------------
+#       Find out all about time handling differences.
+#------------------------------------------------------------------------------
+
+AC_CHECK_HEADERS(sys/time.h)
+AC_HEADER_TIME
+
+#--------------------------------------------------------------------
+#	Under Solaris 2.4, strtod returns the wrong value for the
+#	terminating character under some conditions.  Check for this
+#	and if the problem exists use a substitute procedure
+#	"fixstrtod" (provided by Tcl) that corrects the error.
+#--------------------------------------------------------------------
+
+SC_BUGGY_STRTOD
+
+#--------------------------------------------------------------------
+#	Check for various typedefs and provide substitutes if
+#	they don't exist.
+#--------------------------------------------------------------------
+
+AC_TYPE_MODE_T
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+AC_TYPE_UID_T
+
+#-------------------------------------------
+#     In OS/390 struct pwd has no pw_gecos field
+#-------------------------------------------
+
+AC_CACHE_CHECK([pw_gecos in struct pwd], tcl_cv_pwd_pw_gecos,
+    AC_TRY_COMPILE([#include <pwd.h>],
+	    [struct passwd pwd; pwd.pw_gecos;],
+	    tcl_cv_pwd_pw_gecos=yes, tcl_cv_pwd_pw_gecos=no))
+if test $tcl_cv_pwd_pw_gecos = yes; then
+    AC_DEFINE(HAVE_PW_GECOS)
+fi
+
+#--------------------------------------------------------------------
+#	On Mac OS X, we can build either with X11 or with Aqua
+#--------------------------------------------------------------------
+
+if test "`uname -s`" = "Darwin" ; then
+    AC_ARG_ENABLE(aqua, [  --enable-aqua           enable Aqua windowingsystem on Mac OS X [--disable-aqua]],
+                  [tk_aqua=$enableval], [tk_aqua=no])
+    if test $tk_aqua = yes; then
+        if test $tcl_corefoundation = no; then
+            AC_MSG_WARN([Aqua can only be used when CoreFoundation is available])
+            tk_aqua=no
+        elif test ! -d /System/Library/Frameworks/Carbon.framework; then
+            AC_MSG_WARN([Aqua can only be used when Carbon is available])
+            tk_aqua=no
+        fi
+    fi
+    if test $do64bit_ok = no ; then
+	# remove -arch ppc64 from CFLAGS for fat builds as neither Aqua nor X11
+	# can be built for 64bit at present (no 64bit GUI libraries).
+	CFLAGS="`echo "$CFLAGS" | sed -e 's/-arch ppc64/-arch ppc/g'`"
+    fi
+else
+    tk_aqua=no
+fi
+
+if test $tk_aqua = yes; then
+    AC_DEFINE(MAC_OSX_TK)
+    LIBS="$LIBS -framework Carbon"
+    CFLAGS="$CFLAGS -fpascal-strings"
+    TK_WINDOWINGSYSTEM=AQUA
+    if test "${enable_symbols}" = yes; then
+        AC_DEFINE(TK_MAC_DEBUG, 1, [Are TkAqua debug messages enabled?])
+    fi
+else
+    #--------------------------------------------------------------------
+    #	Locate the X11 header files and the X11 library archive.  Try
+    #	the ac_path_x macro first, but if it doesn't find the X stuff
+    #	(e.g. because there's no xmkmf program) then check through
+    #	a list of possible directories.  Under some conditions the
+    #	autoconf macro will return an include directory that contains
+    #	no include files, so double-check its result just to be safe.
+    #--------------------------------------------------------------------
+    
+    SC_PATH_X
+    TK_WINDOWINGSYSTEM=X11
+fi
+
+#--------------------------------------------------------------------
+#	Various manipulations on the search path used at runtime to
+#	find shared libraries:
+#	1. If the X library binaries are in a non-standard directory,
+#	   add the X library location into that search path.
+#	2. On systems such as AIX and Ultrix that use "-L" as the
+#	   search path option, colons cannot be used to separate
+#	   directories from each other. Change colons to " -L".
+#	3. Create two sets of search flags, one for use in cc lines
+#	   and the other for when the linker is invoked directly.  In
+#	   the second case, '-Wl,' must be stripped off and commas must
+#	   be replaced by spaces.
+#--------------------------------------------------------------------
+
+if test "x${x_libraries}" != "x"; then
+    LIB_RUNTIME_DIR="${LIB_RUNTIME_DIR}:${x_libraries}"
+fi
+if test "${TCL_LD_SEARCH_FLAGS}" = '-L${LIB_RUNTIME_DIR}'; then
+    LIB_RUNTIME_DIR=`echo ${LIB_RUNTIME_DIR} |sed -e 's/:/ -L/g'`
+fi
+
+# The statement below is very tricky!  It actually *evaluates* the
+# string in TCL_CC_SEARCH_FLAGS and TCL_LD_SEARCH_FLAGS which
+# causes a substitution of the variable LIB_RUNTIME_DIR.
+
+eval "CC_SEARCH_FLAGS=\"$TCL_CC_SEARCH_FLAGS\""
+eval "LD_SEARCH_FLAGS=\"$TCL_LD_SEARCH_FLAGS\""
+
+#--------------------------------------------------------------------
+#	Check for the existence of various libraries.  The order here
+#	is important, so that then end up in the right order in the
+#	command line generated by make.  The -lsocket and -lnsl libraries
+#	require a couple of special tricks:
+#	1. Use "connect" and "accept" to check for -lsocket, and
+#	   "gethostbyname" to check for -lnsl.
+#	2. Use each function name only once:  can't redo a check because
+#	   autoconf caches the results of the last check and won't redo it.
+#	3. Use -lnsl and -lsocket only if they supply procedures that
+#	   aren't already present in the normal libraries.  This is because
+#	   IRIX 5.2 has libraries, but they aren't needed and they're
+#	   bogus:  they goof up name resolution if used.
+#	4. On some SVR4 systems, can't use -lsocket without -lnsl too.
+#	   To get around this problem, check for both libraries together
+#	   if -lsocket doesn't work by itself.
+#--------------------------------------------------------------------
+
+if test $tk_aqua = no; then
+    AC_CHECK_LIB(Xbsd, main, [LIBS="$LIBS -lXbsd"])
+fi
+
+tk_checkBoth=0
+AC_CHECK_FUNC(connect, tk_checkSocket=0, tk_checkSocket=1)
+if test "$tk_checkSocket" = 1; then
+    AC_CHECK_LIB(socket, main, LIBS="$LIBS -lsocket", tk_checkBoth=1)
+fi
+if test "$tk_checkBoth" = 1; then
+    tk_oldLibs=$LIBS
+    LIBS="$LIBS -lsocket -lnsl"
+    AC_CHECK_FUNC(accept, tk_checkNsl=0, [LIBS=$tk_oldLibs])
+fi
+AC_CHECK_FUNC(gethostbyname, , [AC_CHECK_LIB(nsl, main, [LIBS="$LIBS -lnsl"])])
+
+#--------------------------------------------------------------------
+# One more check related to the X libraries.  The standard releases
+# of Ultrix don't support the "xauth" mechanism, so send won't work
+# unless TK_NO_SECURITY is defined.  However, there are usually copies
+# of the MIT X server available as well, which do support xauth.
+# Check for the MIT stuff and use it if it exists.
+#
+# Note: can't use ac_check_lib macro (at least, not in Autoconf 2.1)
+# because it can't deal with the "-" in the library name.
+#--------------------------------------------------------------------
+
+if test -d /usr/include/mit -a $tk_aqua = no; then
+    AC_MSG_CHECKING([MIT X libraries])
+    tk_oldCFlags=$CFLAGS
+    CFLAGS="$CFLAGS -I/usr/include/mit"
+    tk_oldLibs=$LIBS
+    LIBS="$LIBS -lX11-mit"
+    AC_TRY_LINK([
+	#include <X11/Xlib.h>
+    ], [
+	XOpenDisplay(0);
+    ], [
+	AC_MSG_RESULT([yes])
+	XLIBSW="-lX11-mit"
+	XINCLUDES="-I/usr/include/mit"
+    ], AC_MSG_RESULT([no]))
+    CFLAGS=$tk_oldCFlags
+    LIBS=$tk_oldLibs
+fi
+
+#--------------------------------------------------------------------
+#	Figure out whether "char" is unsigned.  If so, set a
+#	#define for __CHAR_UNSIGNED__.
+#--------------------------------------------------------------------
+
+AC_C_CHAR_UNSIGNED
+
+#--------------------------------------------------------------------
+#	The statements below define a collection of symbols related to
+#	building libtk as a shared library instead of a static library.
+#--------------------------------------------------------------------
+
+eval eval "TK_UNSHARED_LIB_SUFFIX=${UNSHARED_LIB_SUFFIX}"
+eval eval "TK_SHARED_LIB_SUFFIX=${SHARED_LIB_SUFFIX}"
+eval "TK_LIB_FILE=libtk${LIB_SUFFIX}"
+
+# tkConfig.sh needs a version of the _LIB_SUFFIX that has been eval'ed
+# so that the backslashes quoting the DBX braces are dropped.
+
+# Trick to replace DBGX with TK_DBGX
+DBGX='${TK_DBGX}'
+eval "TK_LIB_FILE=${TK_LIB_FILE}"
+
+if test "${SHARED_BUILD}" = "1" -a "${SHLIB_SUFFIX}" != ""; then
+    SHLIB_LD_LIBS="${SHLIB_LD_LIBS} \${TCL_STUB_LIB_SPEC}"
+    TCL_STUB_FLAGS="-DUSE_TCL_STUBS"
+fi
+
+TK_LIBRARY='$(prefix)/lib/tk$(VERSION)'
+PRIVATE_INCLUDE_DIR='$(includedir)'
+HTML_DIR='$(DISTDIR)/html'
+TK_PKG_DIR='tk$(VERSION)$(TK_DBGX)'
+TK_RSRC_FILE='tk$(VERSION).rsrc'
+WISH_RSRC_FILE='wish$(VERSION).rsrc'
+
+# Note:  in the following variable, it's important to use the absolute
+# path name of the Tcl directory rather than "..":  this is because
+# AIX remembers this path and will attempt to use it at run-time to look
+# up the Tcl library.
+
+if test "`uname -s`" = "Darwin" ; then
+    SC_ENABLE_FRAMEWORK
+    TK_SHLIB_LD_EXTRAS="-compatibility_version ${TK_VERSION} -current_version ${TK_VERSION}`echo ${TK_PATCH_LEVEL} | awk ['{match($0, "\\\.[0-9]+"); print substr($0,RSTART,RLENGTH)}']`"
+    TK_SHLIB_LD_EXTRAS="${TK_SHLIB_LD_EXTRAS}"' -install_name ${DYLIB_INSTALL_DIR}/${TK_LIB_FILE} -seg1addr 0xb000000 -unexported_symbols_list $$(f=$(TCL_STUB_LIB_FILE).E && nm -gjp $(TCL_BIN_DIR)/$(TCL_STUB_LIB_FILE) | grep ^_[[^_]] > $$f && echo $$f)'
+fi
+
+if test "$FRAMEWORK_BUILD" = "1" ; then
+    AC_DEFINE(TK_FRAMEWORK)
+    tk_config_files="${tk_config_files} [Tk-Info.plist:../macosx/Tk-Info.plist.in]"
+    # Construct a fake local framework structure to make linking with
+    # '-framework Tk' and running of tktest work
+    AC_OUTPUT_COMMANDS([test "$FRAMEWORK_BUILD" = "1" && n=Tk &&
+	f=$n.framework && v=Versions/$VERSION &&
+	echo "creating $f" && rm -rf $f && mkdir -p $f/$v/Resources &&
+	ln -s $v/$n $v/Resources $f && ln -s ../../../$n $f/$v &&
+	ln -s ../../../../$n-Info.plist $f/$v/Resources/Info.plist &&
+	if test $tk_aqua = yes; then ln -s ../../../../$n.rsrc $f/$v/Resources; fi &&
+	unset n f v
+    ], [VERSION=${TK_VERSION} FRAMEWORK_BUILD=${FRAMEWORK_BUILD}
+	tk_aqua=${tk_aqua}])
+    LD_LIBRARY_PATH_VAR="DYLD_FRAMEWORK_PATH"
+    if test "${libdir}" = '${exec_prefix}/lib'; then
+        # override libdir default
+        libdir="/Library/Frameworks"
+    fi
+    TK_LIB_FILE="Tk"
+    TK_LIB_FLAG="-framework Tk"
+    TK_BUILD_LIB_SPEC="-F`pwd` -framework Tk"
+    TK_LIB_SPEC="-F${libdir} -framework Tk"
+    libdir="${libdir}/Tk.framework/Versions/\${VERSION}"
+    TK_LIBRARY="${libdir}/Resources/Scripts"
+    TK_PKG_DIR="Resources/Scripts"
+    TK_RSRC_FILE="Tk.rsrc"
+    WISH_RSRC_FILE="Wish.rsrc"
+    includedir="${libdir}/Headers"
+    PRIVATE_INCLUDE_DIR="${libdir}/PrivateHeaders"
+    HTML_DIR="${libdir}/Resources/Documentation/Reference/Tk"
+    EXTRA_INSTALL="install-private-headers html-tk"
+    EXTRA_BUILD_HTML='@ln -fs contents.htm $(HTML_INSTALL_DIR)/TkTOC.html' 
+    EXTRA_INSTALL_BINARIES='@echo "Installing Info.plist to $(LIB_INSTALL_DIR)/Resources" && mkdir -p "$(LIB_INSTALL_DIR)/Resources" && $(INSTALL_DATA) Tk-Info.plist "$(LIB_INSTALL_DIR)/Resources/Info.plist"'
+    if test $tk_aqua = yes; then
+        EXTRA_INSTALL_BINARIES="$EXTRA_INSTALL_BINARIES"' && echo "Installing ${TK_RSRC_FILE} to $(LIB_INSTALL_DIR)/Resources" && mkdir -p "$(LIB_INSTALL_DIR)/Resources" && $(INSTALL_DATA) "${TK_RSRC_FILE}" "$(LIB_INSTALL_DIR)/Resources"'
+        EXTRA_INSTALL_BINARIES="$EXTRA_INSTALL_BINARIES"' && echo "Installing wish$(VERSION) script to $(INSTALL_ROOT)/'"${bindir}"'" && mkdir -p "$(INSTALL_ROOT)/'"${bindir}"'" && printf > "$(INSTALL_ROOT)/'"${bindir}"'/wish$(VERSION)" "#!/bin/sh\n\"\$$(dirname \$$0)'"`eval d="${bindir}"; echo "$d" | sed -e 's#/[^/][^/]*#/..#g'`"'$(bindir)/Wish\" \"\$$@\"" && chmod +x "$(INSTALL_ROOT)/'"${bindir}"'/wish$(VERSION)"'
+        bindir="${libdir}/Resources/Wish.app/Contents/MacOS"
+        EXTRA_INSTALL_BINARIES="$EXTRA_INSTALL_BINARIES"' && echo "Installing Info.plist to $(BIN_INSTALL_DIR)/.." && $(INSTALL_DATA) Wish-Info.plist "$(BIN_INSTALL_DIR)/../Info.plist" && mv -f "$(BIN_INSTALL_DIR)/wish$(VERSION)" "$(BIN_INSTALL_DIR)/Wish"'
+        EXTRA_INSTALL_BINARIES="$EXTRA_INSTALL_BINARIES"' && echo "Installing Wish.icns to $(BIN_INSTALL_DIR)/../Resources" && mkdir -p "$(BIN_INSTALL_DIR)/../Resources" && $(INSTALL_DATA) "'\$\(MAC\_OSX_DIR\)'/Wish.icns" "$(BIN_INSTALL_DIR)/../Resources"'
+        EXTRA_INSTALL_BINARIES="$EXTRA_INSTALL_BINARIES"' && echo "Installing ${WISH_RSRC_FILE} to $(BIN_INSTALL_DIR)/../Resources" && $(INSTALL_DATA) "${WISH_RSRC_FILE}" "$(BIN_INSTALL_DIR)/../Resources"'
+    fi
+    EXTRA_INSTALL_BINARIES="$EXTRA_INSTALL_BINARIES"' && echo "Finalizing Tk.framework" && rm -f "$(LIB_INSTALL_DIR)/../Current" && ln -s "$(VERSION)" "$(LIB_INSTALL_DIR)/../Current" && for f in "$(LIB_FILE)" tkConfig.sh Resources Headers PrivateHeaders; do rm -f "$(LIB_INSTALL_DIR)/../../$$f" && ln -s "Versions/Current/$$f" "$(LIB_INSTALL_DIR)/../.."; done && f="$(STUB_LIB_FILE)" && rm -f "$(LIB_INSTALL_DIR)/../../$$f" && ln -s "Versions/$(VERSION)/$$f" "$(LIB_INSTALL_DIR)/../.."'
+    TK_YEAR="`date +%Y`"
+    # Don't use AC_DEFINE for the following as the framework version define 
+    # needs to go into the Makefile even when using autoheader, so that we  
+    # can pick up a potential make override of VERSION. Also, don't put this
+    # into CFLAGS as it should not go into tkConfig.sh
+    EXTRA_CC_SWITCHES='-DTK_FRAMEWORK_VERSION=\"$(VERSION)\"'
+else
+    # libdir must be a fully qualified path and not ${exec_prefix}/lib
+    eval libdir="$libdir"
+    if test "$SHARED_BUILD" = "0" || test "$TCL_NEEDS_EXP_FILE" = "0"; then
+        if test "${TCL_LIB_VERSIONS_OK}" = "ok"; then
+            eval TK_LIB_FLAG="-ltk${VERSION}\${TK_DBGX}"
+        else
+            eval TK_LIB_FLAG="-ltk`echo ${VERSION} | tr -d .`\${TK_DBGX}"
+        fi
+        TK_BUILD_LIB_SPEC="-L`pwd` ${TK_LIB_FLAG}"
+        TK_LIB_SPEC="-L${libdir} ${TK_LIB_FLAG}"
+    else
+        TK_BUILD_EXP_FILE="lib.exp"
+        eval "TK_EXP_FILE=libtk${TCL_EXPORT_FILE_SUFFIX}"
+    
+        if test "$GCC" = "yes" ; then
+            TK_BUILD_LIB_SPEC="-Wl,-bI:`pwd`/${TK_BUILD_EXP_FILE} -L`pwd`"
+            TK_LIB_SPEC="-Wl,-bI:${libdir}/${TK_EXP_FILE} -L`pwd`"
+        else
+            TK_BUILD_LIB_SPEC="-bI:`pwd`/${TK_BUILD_EXP_FILE}"
+            TK_LIB_SPEC="-bI:${libdir}/${TK_EXP_FILE}"
+        fi
+    fi
+fi
+
+# Support for building the Aqua resource files
+if test $tk_aqua = yes; then
+    tk_config_files="${tk_config_files} [Wish-Info.plist:../macosx/Wish-Info.plist.in]"
+    EXTRA_WISH_LIBS='-sectcreate __TEXT __info_plist Wish-Info.plist'
+    LIB_RSRC_FILE='${TK_RSRC_FILE}'
+    APP_RSRC_FILE='${WISH_RSRC_FILE}'
+    REZ=/Developer/Tools/Rez
+    REZ_FLAGS='-d "SystemSevenOrLater=1" -useDF -ro'
+    if test "$SHARED_BUILD" = 0; then
+        EXTRA_INSTALL_BINARIES='@echo "Installing $(TK_RSRC_FILE) to $(LIB_INSTALL_DIR)" && $(INSTALL_DATA) $(TK_RSRC_FILE) $(LIB_INSTALL_DIR)'
+	TK_BUILD_LIB_SPEC="$TK_BUILD_LIB_SPEC -sectcreate __TEXT __tk_rsrc `pwd`/\${TK_RSRC_FILE}"
+	TK_LIB_SPEC="$TK_LIB_SPEC -sectcreate __TEXT __tk_rsrc ${libdir}/\${TK_RSRC_FILE}"        
+    elif test "$FRAMEWORK_BUILD" = "0"; then
+        TK_SHLIB_LD_EXTRAS="$TK_SHLIB_LD_EXTRAS -sectcreate __TEXT __tk_rsrc \${TK_RSRC_FILE}"
+    fi
+fi
+
+#--------------------------------------------------------------------
+#       The statements below define various symbols relating to Tk
+#       stub support.
+#--------------------------------------------------------------------
+
+# Replace ${VERSION} with contents of ${TK_VERSION}
+eval "TK_STUB_LIB_FILE=libtkstub${TK_UNSHARED_LIB_SUFFIX}"
+eval "TK_STUB_LIB_DIR=${libdir}"
+
+if test "${TCL_LIB_VERSIONS_OK}" = "ok"; then
+    eval TK_STUB_LIB_FLAG="-ltkstub${TK_VERSION}\${TK_DBGX}"
+else
+    eval TK_STUB_LIB_FLAG="-ltkstub`echo ${TK_VERSION} | tr -d .`\${TK_DBGX}"
+fi
+
+TK_BUILD_STUB_LIB_SPEC="-L`pwd` ${TK_STUB_LIB_FLAG}"
+TK_STUB_LIB_SPEC="-L${TK_STUB_LIB_DIR} ${TK_STUB_LIB_FLAG}"
+TK_BUILD_STUB_LIB_PATH="`pwd`/${TK_STUB_LIB_FILE}"
+TK_STUB_LIB_PATH="${TK_STUB_LIB_DIR}/${TK_STUB_LIB_FILE}"
+
+#------------------------------------------------------------------------
+# tkConfig.sh refers to this by a different name
+#------------------------------------------------------------------------
+
+TK_SHARED_BUILD=${SHARED_BUILD}
+
+AC_SUBST(TK_VERSION)
+AC_SUBST(TK_MAJOR_VERSION)
+AC_SUBST(TK_MINOR_VERSION)
+AC_SUBST(TK_PATCH_LEVEL)
+AC_SUBST(TK_YEAR)
+
+AC_SUBST(TK_LIB_FILE)
+AC_SUBST(TK_LIB_FLAG)
+AC_SUBST(TK_LIB_SPEC)
+AC_SUBST(TK_STUB_LIB_FILE)
+AC_SUBST(TK_STUB_LIB_FLAG)
+AC_SUBST(TK_STUB_LIB_SPEC)
+AC_SUBST(TK_STUB_LIB_PATH)
+AC_SUBST(TK_BUILD_STUB_LIB_SPEC)
+AC_SUBST(TK_BUILD_STUB_LIB_PATH)
+
+AC_SUBST(TK_SRC_DIR)
+AC_SUBST(TK_DBGX)
+
+AC_SUBST(TK_SHARED_BUILD)
+AC_SUBST(LD_LIBRARY_PATH_VAR)
+
+AC_SUBST(TK_BUILD_LIB_SPEC)
+AC_SUBST(TK_BUILD_EXP_FILE)
+AC_SUBST(TK_EXP_FILE)
+
+AC_SUBST(TCL_STUB_FLAGS)
+AC_SUBST(MATH_LIBS)
+AC_SUBST(XINCLUDES)
+AC_SUBST(XLIBSW)
+AC_SUBST(LOCALES)
+
+AC_SUBST(TK_WINDOWINGSYSTEM)
+AC_SUBST(TK_PKG_DIR)
+AC_SUBST(TK_LIBRARY)
+AC_SUBST(PRIVATE_INCLUDE_DIR)
+AC_SUBST(HTML_DIR)
+
+AC_SUBST(EXTRA_CC_SWITCHES)
+AC_SUBST(EXTRA_INSTALL)
+AC_SUBST(EXTRA_INSTALL_BINARIES)
+AC_SUBST(EXTRA_BUILD_HTML)
+AC_SUBST(EXTRA_WISH_LIBS)
+
+AC_SUBST(TK_RSRC_FILE)
+AC_SUBST(WISH_RSRC_FILE)
+AC_SUBST(LIB_RSRC_FILE)
+AC_SUBST(APP_RSRC_FILE)
+AC_SUBST(REZ)
+AC_SUBST(REZ_FLAGS)
+
+tk_config_files="${tk_config_files} [Makefile tkConfig.sh]"
+AC_OUTPUT([${tk_config_files}])

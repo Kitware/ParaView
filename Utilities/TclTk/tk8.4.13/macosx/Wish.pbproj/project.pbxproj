@@ -1,0 +1,2311 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 39;
+	objects = {
+		4C148E2007ECCFAC0033822E = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkEntry.h;
+			path = ../generic/tkEntry.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		4C148E2407ECCFCF0033822E = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXEntry.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		4C3B4CF6040B18B200C916F0 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.rez;
+			path = tkMacOSXAETE.r;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		4C8A204405E0421900C18A82 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXCarbonEvents.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		4CB2D7CF0619F8EB0081E375 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXScale.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+//4C0
+//4C1
+//4C2
+//4C3
+//4C4
+//950
+//951
+//952
+//953
+//954
+		95911CC7081532D8006F6BCB = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.framework;
+			name = IOKit.framework;
+			path = /System/Library/Frameworks/IOKit.framework;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+//950
+//951
+//952
+//953
+//954
+//F50
+//F51
+//F52
+//F53
+//F54
+		F50D96120196176E01DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.framework;
+			name = ApplicationServices.framework;
+			path = /System/Library/Frameworks/ApplicationServices.framework;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		F537552A016C352C01DC9062 = {
+			buildSettings = {
+			};
+			buildStyles = (
+				F537552C016C352C01DC9062,
+				F537552D016C352C01DC9062,
+			);
+			hasScannedForEncodings = 1;
+			isa = PBXProject;
+			mainGroup = F537552B016C352C01DC9062;
+			productRefGroup = F53755DD016C38D201DC9062;
+			projectDirPath = "";
+			targets = (
+				F9D6747B08E84DC100688CAA,
+			);
+		};
+		F537552B016C352C01DC9062 = {
+			children = (
+				F92ED9910403D0F0006F146B,
+				F5C88659017D625C01DC9062,
+				F5DF07A7016CD03801DC9062,
+				F5375688016C3F1001DC9062,
+				F5375531016C376E01DC9062,
+				F537552E016C376E01DC9062,
+				F537553C016C376E01DC9062,
+				F53755C9016C389901DC9062,
+				F53755CC016C389901DC9062,
+				F537567C016C3ADB01DC9062,
+				F53755DD016C38D201DC9062,
+			);
+			isa = PBXGroup;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F537552C016C352C01DC9062 = {
+			buildSettings = {
+				BUILD_STYLE = Development;
+				MAKE_TARGET = develop;
+			};
+			isa = PBXBuildStyle;
+			name = Development;
+		};
+		F537552D016C352C01DC9062 = {
+			buildSettings = {
+				BUILD_STYLE = Deployment;
+				MAKE_TARGET = deploy;
+			};
+			isa = PBXBuildStyle;
+			name = Deployment;
+		};
+		F537552E016C376E01DC9062 = {
+			children = (
+				F537552F016C376E01DC9062,
+				F5375530016C376E01DC9062,
+			);
+			isa = PBXGroup;
+			name = Generic;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F537552F016C376E01DC9062 = {
+			children = (
+				F5375569016C37A601DC9062,
+				F537556A016C37A601DC9062,
+				F537556B016C37A601DC9062,
+				F537556C016C37A601DC9062,
+				F537556D016C37A601DC9062,
+				F537556E016C37A601DC9062,
+				F537556F016C37A601DC9062,
+				F5375570016C37A601DC9062,
+				4C148E2007ECCFAC0033822E,
+				F5375571016C37A601DC9062,
+				F5375572016C37A601DC9062,
+				F5375573016C37A601DC9062,
+				F5375574016C37A601DC9062,
+				F5375575016C37A601DC9062,
+				F5375576016C37A601DC9062,
+				F5375577016C37A601DC9062,
+				F5375578016C37A601DC9062,
+				F5375579016C37A601DC9062,
+				F537557A016C37A601DC9062,
+				F537557B016C37A601DC9062,
+				F537557C016C37A601DC9062,
+				F537557D016C37A601DC9062,
+				F537557E016C37A601DC9062,
+				F537557F016C37A601DC9062,
+				F5BFE58F02F8C45B01DC9062,
+			);
+			isa = PBXGroup;
+			name = Headers;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375530016C376E01DC9062 = {
+			children = (
+				F5375580016C389901DC9062,
+				F5375581016C389901DC9062,
+				F5375582016C389901DC9062,
+				F5375583016C389901DC9062,
+				F5375584016C389901DC9062,
+				F5375585016C389901DC9062,
+				F5375586016C389901DC9062,
+				F5375587016C389901DC9062,
+				F5375588016C389901DC9062,
+				F5375589016C389901DC9062,
+				F537558A016C389901DC9062,
+				F537558B016C389901DC9062,
+				F537558C016C389901DC9062,
+				F537558D016C389901DC9062,
+				F537558E016C389901DC9062,
+				F537558F016C389901DC9062,
+				F5375590016C389901DC9062,
+				F5375591016C389901DC9062,
+				F5375592016C389901DC9062,
+				F5375593016C389901DC9062,
+				F5375594016C389901DC9062,
+				F5375595016C389901DC9062,
+				F5375596016C389901DC9062,
+				F5375597016C389901DC9062,
+				F5375598016C389901DC9062,
+				F5375599016C389901DC9062,
+				F537559A016C389901DC9062,
+				F537559B016C389901DC9062,
+				F537559C016C389901DC9062,
+				F537559D016C389901DC9062,
+				F537559E016C389901DC9062,
+				F537559F016C389901DC9062,
+				F53755A0016C389901DC9062,
+				F53755A1016C389901DC9062,
+				F53755A2016C389901DC9062,
+				F53755A3016C389901DC9062,
+				F53755A4016C389901DC9062,
+				F53755A5016C389901DC9062,
+				F53755A6016C389901DC9062,
+				F53755A7016C389901DC9062,
+				F53755A8016C389901DC9062,
+				F53755A9016C389901DC9062,
+				F53755AA016C389901DC9062,
+				F53755AB016C389901DC9062,
+				F53755AC016C389901DC9062,
+				F53755AD016C389901DC9062,
+				F53755AE016C389901DC9062,
+				F53755AF016C389901DC9062,
+				F53755B0016C389901DC9062,
+				F53755B1016C389901DC9062,
+				F53755B2016C389901DC9062,
+				F55BC46802B2D38B01DC9062,
+				F53755B3016C389901DC9062,
+				F53755B4016C389901DC9062,
+				F53755B5016C389901DC9062,
+				F53755B6016C389901DC9062,
+				F53755B7016C389901DC9062,
+				F53755B8016C389901DC9062,
+				F53755B9016C389901DC9062,
+				F53755BA016C389901DC9062,
+				F53755BB016C389901DC9062,
+				F5BFE58B02F8C41501DC9062,
+				F53755BC016C389901DC9062,
+				F53755BD016C389901DC9062,
+				F53755BE016C389901DC9062,
+				F53755BF016C389901DC9062,
+				F53755C0016C389901DC9062,
+				F53755C1016C389901DC9062,
+				F53755C2016C389901DC9062,
+				F53755C3016C389901DC9062,
+				F53755C4016C389901DC9062,
+				F53755C5016C389901DC9062,
+				F5BFE58C02F8C41501DC9062,
+				F53755C6016C389901DC9062,
+				F53755C7016C389901DC9062,
+				F53755C8016C389901DC9062,
+			);
+			isa = PBXGroup;
+			name = Source;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375531016C376E01DC9062 = {
+			children = (
+				F5375532016C376E01DC9062,
+				F537553B016C376E01DC9062,
+			);
+			isa = PBXGroup;
+			name = Resources;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375532016C376E01DC9062 = {
+			children = (
+				F5375533016C376E01DC9062,
+				4C3B4CF6040B18B200C916F0,
+				F5375535016C376E01DC9062,
+				F5375538016C376E01DC9062,
+				F537553A016C376E01DC9062,
+			);
+			isa = PBXGroup;
+			name = "Resource Manager Resources";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375533016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.rez;
+			path = tkAboutDlg.r;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375535016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.rez;
+			path = tkMacOSXCursors.r;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375538016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.rez;
+			path = tkMacOSXMenu.r;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F537553A016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.rez;
+			path = tkMacOSXXCursors.r;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F537553B016C376E01DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.icns;
+			path = Wish.icns;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F537553C016C376E01DC9062 = {
+			children = (
+				F537553D016C376E01DC9062,
+				F5375546016C376E01DC9062,
+			);
+			isa = PBXGroup;
+			name = "MacOS X";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F537553D016C376E01DC9062 = {
+			children = (
+				F537553E016C376E01DC9062,
+				F537553F016C376E01DC9062,
+				F5375540016C376E01DC9062,
+				F5375541016C376E01DC9062,
+				F5375542016C376E01DC9062,
+				F5375543016C376E01DC9062,
+				F5375545016C376E01DC9062,
+			);
+			isa = PBXGroup;
+			name = Headers;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F537553E016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = tkMacOSX.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537553F016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = tkMacOSXDebug.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375540016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = tkMacOSXDefault.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375541016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = tkMacOSXEvent.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375542016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = tkMacOSXInt.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375543016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = tkMacOSXPort.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375545016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = tkMacOSXWm.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375546016C376E01DC9062 = {
+			children = (
+				F5375549016C376E01DC9062,
+				F537554A016C376E01DC9062,
+				4C8A204405E0421900C18A82,
+				F537554B016C376E01DC9062,
+				F537554C016C376E01DC9062,
+				F537554D016C376E01DC9062,
+				F537554E016C376E01DC9062,
+				F537554F016C376E01DC9062,
+				F5375550016C376E01DC9062,
+				F5375551016C376E01DC9062,
+				F5375552016C376E01DC9062,
+				4C148E2407ECCFCF0033822E,
+				F5375553016C376E01DC9062,
+				F5375554016C376E01DC9062,
+				F5375555016C376E01DC9062,
+				F5375556016C376E01DC9062,
+				F5375557016C376E01DC9062,
+				F5375558016C376E01DC9062,
+				F5375559016C376E01DC9062,
+				F537555A016C376E01DC9062,
+				F537555B016C376E01DC9062,
+				F537555C016C376E01DC9062,
+				F537555D016C376E01DC9062,
+				F537555E016C376E01DC9062,
+				4CB2D7CF0619F8EB0081E375,
+				F5375560016C376E01DC9062,
+				F5375561016C376E01DC9062,
+				F5375562016C376E01DC9062,
+				F5375563016C376E01DC9062,
+				F5375565016C376E01DC9062,
+				F5375567016C376E01DC9062,
+				F5375568016C376E01DC9062,
+			);
+			isa = PBXGroup;
+			name = Source;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375548016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkAppInit.c;
+			path = ../unix/tkAppInit.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375549016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXBitmap.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F537554A016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXButton.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F537554B016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXClipboard.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F537554C016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXColor.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F537554D016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXConfig.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F537554E016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXCursor.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F537554F016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXDebug.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375550016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXDialog.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375551016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXDraw.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375552016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXEmbed.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375553016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXEvent.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375554016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXFont.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375555016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXHLEvents.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375556016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXInit.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375557016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXKeyboard.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375558016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXKeyEvent.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375559016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXMenu.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F537555A016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXMenubutton.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F537555B016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXMenus.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F537555C016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXMouseEvent.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F537555D016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXNotify.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F537555E016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXRegion.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375560016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXScrlbr.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375561016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXSend.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375562016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXSubwindows.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375563016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXTest.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375565016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXWindowEvent.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375567016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXWm.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375568016C376E01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			path = tkMacOSXXStubs.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375569016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = default.h;
+			path = ../generic/default.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537556A016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ks_names.h;
+			path = ../generic/ks_names.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537556B016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tk.h;
+			path = ../generic/tk.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537556C016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tk3d.h;
+			path = ../generic/tk3d.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537556D016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkButton.h;
+			path = ../generic/tkButton.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537556E016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkCanvas.h;
+			path = ../generic/tkCanvas.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537556F016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkColor.h;
+			path = ../generic/tkColor.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375570016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkDecls.h;
+			path = ../generic/tkDecls.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375571016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkFileFilter.h;
+			path = ../generic/tkFileFilter.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375572016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkFont.h;
+			path = ../generic/tkFont.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375573016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkInitScript.h;
+			path = ../generic/tkInitScript.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375574016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkInt.h;
+			path = ../generic/tkInt.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375575016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkIntDecls.h;
+			path = ../generic/tkIntDecls.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375576016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkIntPlatDecls.h;
+			path = ../generic/tkIntPlatDecls.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375577016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkIntXlibDecls.h;
+			path = ../generic/tkIntXlibDecls.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375578016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkMenu.h;
+			path = ../generic/tkMenu.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375579016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkMenubutton.h;
+			path = ../generic/tkMenubutton.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537557A016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkPlatDecls.h;
+			path = ../generic/tkPlatDecls.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537557B016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkPort.h;
+			path = ../generic/tkPort.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537557C016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkScale.h;
+			path = ../generic/tkScale.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537557D016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkScrollbar.h;
+			path = ../generic/tkScrollbar.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537557E016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkSelect.h;
+			path = ../generic/tkSelect.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537557F016C37A601DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkText.h;
+			path = ../generic/tkText.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375580016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tk3d.c;
+			path = ../generic/tk3d.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375581016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkArgv.c;
+			path = ../generic/tkArgv.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375582016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkAtom.c;
+			path = ../generic/tkAtom.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375583016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkBind.c;
+			path = ../generic/tkBind.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375584016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkBitmap.c;
+			path = ../generic/tkBitmap.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375585016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkButton.c;
+			path = ../generic/tkButton.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375586016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkCanvArc.c;
+			path = ../generic/tkCanvArc.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375587016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkCanvas.c;
+			path = ../generic/tkCanvas.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375588016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkCanvBmap.c;
+			path = ../generic/tkCanvBmap.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375589016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkCanvImg.c;
+			path = ../generic/tkCanvImg.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537558A016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkCanvLine.c;
+			path = ../generic/tkCanvLine.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537558B016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkCanvPoly.c;
+			path = ../generic/tkCanvPoly.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537558C016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkCanvPs.c;
+			path = ../generic/tkCanvPs.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537558D016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkCanvText.c;
+			path = ../generic/tkCanvText.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537558E016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkCanvUtil.c;
+			path = ../generic/tkCanvUtil.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537558F016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkCanvWind.c;
+			path = ../generic/tkCanvWind.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375590016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkClipboard.c;
+			path = ../generic/tkClipboard.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375591016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkCmds.c;
+			path = ../generic/tkCmds.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375592016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkColor.c;
+			path = ../generic/tkColor.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375593016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkConfig.c;
+			path = ../generic/tkConfig.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375594016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkConsole.c;
+			path = ../generic/tkConsole.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375595016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkCursor.c;
+			path = ../generic/tkCursor.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375596016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkEntry.c;
+			path = ../generic/tkEntry.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375597016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkError.c;
+			path = ../generic/tkError.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375598016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkEvent.c;
+			path = ../generic/tkEvent.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375599016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkFileFilter.c;
+			path = ../generic/tkFileFilter.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537559A016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkFocus.c;
+			path = ../generic/tkFocus.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537559B016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkFont.c;
+			path = ../generic/tkFont.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537559C016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkFrame.c;
+			path = ../generic/tkFrame.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537559D016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkGC.c;
+			path = ../generic/tkGC.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537559E016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkGeometry.c;
+			path = ../generic/tkGeometry.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537559F016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkGet.c;
+			path = ../generic/tkGet.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755A0016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkGrab.c;
+			path = ../generic/tkGrab.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755A1016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkGrid.c;
+			path = ../generic/tkGrid.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755A2016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkImage.c;
+			path = ../generic/tkImage.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755A3016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkImgBmap.c;
+			path = ../generic/tkImgBmap.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755A4016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkImgGIF.c;
+			path = ../generic/tkImgGIF.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755A5016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkImgPhoto.c;
+			path = ../generic/tkImgPhoto.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755A6016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkImgPPM.c;
+			path = ../generic/tkImgPPM.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755A7016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkImgUtil.c;
+			path = ../generic/tkImgUtil.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755A8016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkListbox.c;
+			path = ../generic/tkListbox.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755A9016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkMacWinMenu.c;
+			path = ../generic/tkMacWinMenu.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755AA016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkMain.c;
+			path = ../generic/tkMain.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755AB016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkMenu.c;
+			path = ../generic/tkMenu.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755AC016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkMenubutton.c;
+			path = ../generic/tkMenubutton.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755AD016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkMenuDraw.c;
+			path = ../generic/tkMenuDraw.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755AE016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkMessage.c;
+			path = ../generic/tkMessage.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755AF016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkObj.c;
+			path = ../generic/tkObj.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755B0016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkOldConfig.c;
+			path = ../generic/tkOldConfig.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755B1016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkOption.c;
+			path = ../generic/tkOption.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755B2016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkPack.c;
+			path = ../generic/tkPack.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755B3016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkPlace.c;
+			path = ../generic/tkPlace.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755B4016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkPointer.c;
+			path = ../generic/tkPointer.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755B5016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkRectOval.c;
+			path = ../generic/tkRectOval.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755B6016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkScale.c;
+			path = ../generic/tkScale.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755B7016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkScrollbar.c;
+			path = ../generic/tkScrollbar.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755B8016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkSelect.c;
+			path = ../generic/tkSelect.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755B9016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkStubImg.c;
+			path = ../generic/tkStubImg.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755BA016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkStubInit.c;
+			path = ../generic/tkStubInit.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755BB016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkStubLib.c;
+			path = ../generic/tkStubLib.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755BC016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkTest.c;
+			path = ../generic/tkTest.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755BD016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkText.c;
+			path = ../generic/tkText.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755BE016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkTextBTree.c;
+			path = ../generic/tkTextBTree.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755BF016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkTextDisp.c;
+			path = ../generic/tkTextDisp.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755C0016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkTextImage.c;
+			path = ../generic/tkTextImage.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755C1016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkTextIndex.c;
+			path = ../generic/tkTextIndex.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755C2016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkTextMark.c;
+			path = ../generic/tkTextMark.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755C3016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkTextTag.c;
+			path = ../generic/tkTextTag.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755C4016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkTextWind.c;
+			path = ../generic/tkTextWind.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755C5016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkTrig.c;
+			path = ../generic/tkTrig.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755C6016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkUtil.c;
+			path = ../generic/tkUtil.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755C7016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkVisual.c;
+			path = ../generic/tkVisual.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755C8016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkWindow.c;
+			path = ../generic/tkWindow.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755C9016C389901DC9062 = {
+			children = (
+				F5375548016C376E01DC9062,
+				F53755CA016C389901DC9062,
+				F53755CB016C389901DC9062,
+			);
+			isa = PBXGroup;
+			name = Unix;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F53755CA016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkUnix3d.c;
+			path = ../unix/tkUnix3d.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755CB016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkUnixScale.c;
+			path = ../unix/tkUnixScale.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755CC016C389901DC9062 = {
+			children = (
+				F53755CD016C389901DC9062,
+				F53755D7016C389901DC9062,
+			);
+			isa = PBXGroup;
+			name = "X Emulation";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F53755CD016C389901DC9062 = {
+			children = (
+				F53755CE016C389901DC9062,
+				F53755CF016C389901DC9062,
+				F53755D0016C389901DC9062,
+				F53755D1016C389901DC9062,
+				F53755D2016C389901DC9062,
+				F53755D3016C389901DC9062,
+				F53755D4016C389901DC9062,
+				F53755D5016C389901DC9062,
+				F53755D6016C389901DC9062,
+			);
+			isa = PBXGroup;
+			name = Headers;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F53755CE016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = xbytes.h;
+			path = ../xlib/xbytes.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755CF016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = cursorfont.h;
+			path = ../xlib/X11/cursorfont.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755D0016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = keysym.h;
+			path = ../xlib/X11/keysym.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755D1016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = keysymdef.h;
+			path = ../xlib/X11/keysymdef.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755D2016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = X.h;
+			path = ../xlib/X11/X.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755D3016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Xatom.h;
+			path = ../xlib/X11/Xatom.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755D4016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Xfuncproto.h;
+			path = ../xlib/X11/Xfuncproto.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755D5016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Xlib.h;
+			path = ../xlib/X11/Xlib.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755D6016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Xutil.h;
+			path = ../xlib/X11/Xutil.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755D7016C389901DC9062 = {
+			children = (
+				F53755D8016C389901DC9062,
+				F53755D9016C389901DC9062,
+				F53755DA016C389901DC9062,
+				F53755DB016C389901DC9062,
+				F53755DC016C389901DC9062,
+			);
+			isa = PBXGroup;
+			name = Source;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F53755D8016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = xcolors.c;
+			path = ../xlib/xcolors.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755D9016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = xdraw.c;
+			path = ../xlib/xdraw.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755DA016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = xgc.c;
+			path = ../xlib/xgc.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755DB016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = ximage.c;
+			path = ../xlib/ximage.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755DC016C389901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = xutil.c;
+			path = ../xlib/xutil.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F53755DD016C38D201DC9062 = {
+			children = (
+				F9F6B1C008E863C200C9CB24,
+				F9F6B1BF08E863B300C9CB24,
+				F9F6B1BE08E8639A00C9CB24,
+			);
+			isa = PBXGroup;
+			name = Products;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F537567C016C3ADB01DC9062 = {
+			children = (
+				F5875C7B016FEF1D01DC9062,
+				F50D96120196176E01DC9062,
+				F537567D016C3ADB01DC9062,
+				95911CC7081532D8006F6BCB,
+			);
+			isa = PBXGroup;
+			name = "External Frameworks";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F537567D016C3ADB01DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.framework;
+			name = Carbon.framework;
+			path = /System/Library/Frameworks/Carbon.framework;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		F5375688016C3F1001DC9062 = {
+			children = (
+				F5375689016C3F1001DC9062,
+				F537568A016C3F1001DC9062,
+				F537568B016C3F1001DC9062,
+				F537568C016C3F1001DC9062,
+				F537568D016C3F1001DC9062,
+				F537568E016C3F1001DC9062,
+				F537568F016C3F1001DC9062,
+				F5375690016C3F1001DC9062,
+				F5375691016C3F1001DC9062,
+				F5375692016C3F1001DC9062,
+			);
+			isa = PBXGroup;
+			name = Bitmaps;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5375689016C3F1001DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.bmp;
+			name = error.bmp;
+			path = ../bitmaps/error.bmp;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537568A016C3F1001DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.bmp;
+			name = gray12.bmp;
+			path = ../bitmaps/gray12.bmp;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537568B016C3F1001DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.bmp;
+			name = gray25.bmp;
+			path = ../bitmaps/gray25.bmp;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537568C016C3F1001DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.bmp;
+			name = gray50.bmp;
+			path = ../bitmaps/gray50.bmp;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537568D016C3F1001DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.bmp;
+			name = gray75.bmp;
+			path = ../bitmaps/gray75.bmp;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537568E016C3F1001DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.bmp;
+			name = hourglass.bmp;
+			path = ../bitmaps/hourglass.bmp;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F537568F016C3F1001DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.bmp;
+			name = info.bmp;
+			path = ../bitmaps/info.bmp;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375690016C3F1001DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.bmp;
+			name = questhead.bmp;
+			path = ../bitmaps/questhead.bmp;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375691016C3F1001DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.bmp;
+			name = question.bmp;
+			path = ../bitmaps/question.bmp;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5375692016C3F1001DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = image.bmp;
+			name = warning.bmp;
+			path = ../bitmaps/warning.bmp;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F55BC46802B2D38B01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkPanedWindow.c;
+			path = ../generic/tkPanedWindow.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F55BC46A02B2D3F301DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = panedwindow.tcl;
+			path = ../library/panedwindow.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5875C7B016FEF1D01DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.framework;
+			name = Tcl.framework;
+			path = ../tcl/Tcl.framework;
+			refType = 3;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F5BFE58B02F8C41501DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkStyle.c;
+			path = ../generic/tkStyle.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5BFE58C02F8C41501DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = tkUndo.c;
+			path = ../generic/tkUndo.c;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5BFE58F02F8C45B01DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = tkUndo.h;
+			path = ../generic/tkUndo.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5C2EA33034D71B2016F146B = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = mkpsenc.tcl;
+			path = ../library/mkpsenc.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5C88659017D625C01DC9062 = {
+			children = (
+				F5C8865A017D625C01DC9062,
+				F5C8865B017D625C01DC9062,
+			);
+			isa = PBXGroup;
+			name = "Header Tools";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5C8865A017D625C01DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = tk.decls;
+			path = ../generic/tk.decls;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5C8865B017D625C01DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = tkInt.decls;
+			path = ../generic/tkInt.decls;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF07A7016CD03801DC9062 = {
+			children = (
+				F5DF0928016CD3F901DC9062,
+				F5DF0929016CD3F901DC9062,
+				F5DF092A016CD3F901DC9062,
+				F5DF092B016CD3F901DC9062,
+				F5DF092C016CD3F901DC9062,
+				F5DF092D016CD3F901DC9062,
+				F5DF092E016CD3F901DC9062,
+				F5DF092F016CD3F901DC9062,
+				F5DF0930016CD3F901DC9062,
+				F5DF0931016CD3F901DC9062,
+				F5DF0932016CD3F901DC9062,
+				F5DF0933016CD3F901DC9062,
+				F5DF0934016CD3F901DC9062,
+				F5C2EA33034D71B2016F146B,
+				F5DF0935016CD3F901DC9062,
+				F5DF0936016CD3F901DC9062,
+				F5DF0937016CD3F901DC9062,
+				F5DF0938016CD3F901DC9062,
+				F5DF0939016CD3F901DC9062,
+				F55BC46A02B2D3F301DC9062,
+				F5DF093A016CD3F901DC9062,
+				F5DF093B016CD3F901DC9062,
+				F5DF093C016CD3F901DC9062,
+				F5DF093D016CD3F901DC9062,
+				F5DF093E016CD3F901DC9062,
+				F5DF093F016CD3F901DC9062,
+				F5DF0940016CD3F901DC9062,
+				F5DF0941016CD3F901DC9062,
+				F5DF0942016CD3F901DC9062,
+				F5DF0943016CD3F901DC9062,
+				F5DF0944016CD3F901DC9062,
+				F5DF0945016CD3F901DC9062,
+			);
+			isa = PBXGroup;
+			name = Scripts;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F5DF0928016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = bgerror.tcl;
+			path = ../library/bgerror.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF0929016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = button.tcl;
+			path = ../library/button.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF092A016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = choosedir.tcl;
+			path = ../library/choosedir.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF092B016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = clrpick.tcl;
+			path = ../library/clrpick.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF092C016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = comdlg.tcl;
+			path = ../library/comdlg.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF092D016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = console.tcl;
+			path = ../library/console.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF092E016CD3F901DC9062 = {
+			includeInIndex = 0;
+			isa = PBXFileReference;
+			lastKnownFileType = folder;
+			name = demos;
+			path = ../library/demos;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF092F016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = dialog.tcl;
+			path = ../library/dialog.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF0930016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = entry.tcl;
+			path = ../library/entry.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF0931016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = focus.tcl;
+			path = ../library/focus.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF0932016CD3F901DC9062 = {
+			includeInIndex = 0;
+			isa = PBXFileReference;
+			lastKnownFileType = folder;
+			name = images;
+			path = ../library/images;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF0933016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = listbox.tcl;
+			path = ../library/listbox.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF0934016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = menu.tcl;
+			path = ../library/menu.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF0935016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = msgbox.tcl;
+			path = ../library/msgbox.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF0936016CD3F901DC9062 = {
+			includeInIndex = 0;
+			isa = PBXFileReference;
+			lastKnownFileType = folder;
+			name = msgs;
+			path = ../library/msgs;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF0937016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = obsolete.tcl;
+			path = ../library/obsolete.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF0938016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = optMenu.tcl;
+			path = ../library/optMenu.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF0939016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = palette.tcl;
+			path = ../library/palette.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF093A016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = prolog.ps;
+			path = ../generic/prolog.ps;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF093B016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = safetk.tcl;
+			path = ../library/safetk.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF093C016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = scale.tcl;
+			path = ../library/scale.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF093D016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = scrlbar.tcl;
+			path = ../library/scrlbar.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF093E016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = spinbox.tcl;
+			path = ../library/spinbox.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF093F016CD3F901DC9062 = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = tclIndex;
+			path = ../library/tclIndex;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF0940016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = tearoff.tcl;
+			path = ../library/tearoff.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF0941016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = text.tcl;
+			path = ../library/text.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF0942016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = tk.tcl;
+			path = ../library/tk.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF0943016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = tkfbox.tcl;
+			path = ../library/tkfbox.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF0944016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = unsupported.tcl;
+			path = ../library/unsupported.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F5DF0945016CD3F901DC9062 = {
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = xmfbox.tcl;
+			path = ../library/xmfbox.tcl;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+//F50
+//F51
+//F52
+//F53
+//F54
+//F90
+//F91
+//F92
+//F93
+//F94
+		F92ED9910403D0F0006F146B = {
+			fileEncoding = 5;
+			isa = PBXFileReference;
+			lastKnownFileType = text;
+			name = ChangeLog;
+			path = ../ChangeLog;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F9D6747B08E84DC100688CAA = {
+			buildArgumentsString = "-c \"cd \\\"${TK_SRCROOT}/macosx\\\" && ACTION=${ACTION} && gnumake \\${ACTION:+\\${ACTION/clean/distclean}-}${MAKE_TARGET} INSTALL_ROOT=\\\"${DSTROOT}\\\" INSTALL_PATH=\\\"${INSTALL_PATH}\\\" APPLICATION_INSTALL_PATH=\\\"${APPLICATION_INSTALL_PATH}\\\" PREFIX=\\\"${PREFIX}\\\" BINDIR=\\\"${BINDIR}\\\" MANDIR=\\\"${MANDIR}\\\" TCL_BUILD_DIR=\\\"${TCL_BUILD_DIR}\\\" \\${EXTRA_MAKE_FLAGS} ${ALL_SETTINGS}\"";
+			buildPhases = (
+			);
+			buildSettings = {
+				APPLICATION_INSTALL_PATH = /Applications/Utilities;
+				BINDIR = "${PREFIX}/bin";
+				INSTALL_PATH = /Library/Frameworks;
+				MANDIR = "${PREFIX}/man";
+				PREFIX = /usr/local;
+				PRODUCT_NAME = Tk;
+				TCL_BUILD_DIR = "${SYMROOT}/../tcl/${BUILD_STYLE}";
+				TCL_SRCROOT = "${SRCROOT}/../../tcl";
+				TEMP_DIR = "${PROJECT_TEMP_DIR}";
+				TK_SRCROOT = "${SRCROOT}/../../tk";
+			};
+			buildToolPath = /bin/bash;
+			buildWorkingDirectory = "${SRCROOT}";
+			dependencies = (
+			);
+			isa = PBXLegacyTarget;
+			name = Tk;
+			passBuildSettingsInEnvironment = 0;
+			productName = Tk;
+		};
+		F9F6B1BE08E8639A00C9CB24 = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.framework;
+			path = Tk.framework;
+			refType = 3;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F9F6B1BF08E863B300C9CB24 = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.application;
+			path = Wish.app;
+			refType = 3;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F9F6B1C008E863C200C9CB24 = {
+			isa = PBXFileReference;
+			lastKnownFileType = "compiled.mach-o.executable";
+			path = tktest;
+			refType = 3;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+	};
+	rootObject = F537552A016C352C01DC9062;
+}
