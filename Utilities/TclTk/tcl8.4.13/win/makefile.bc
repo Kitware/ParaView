@@ -1,0 +1,566 @@
+#
+# Makefile for Borland C++ 5.5 (or C++ Builder 5), adapted from the makefile
+#   for Visual C++ that came with tcl 8.3.3
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# Copyright (c) 1995-1996 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+#
+# Have a look at the complete description on how to build and test Tcl with
+# the current Borland compilers at www.ratiosoft.com/tcl/borland.
+#
+# Usage:
+#   - Adapt the paths below to match your compiler's location
+#   - Make sure the compiler's bin directory is on your path
+#   - Open a console
+#   - To make a debug version enter
+#       make -fmakefile.bc -DNODEBUG=0 xxx
+#     where 'xxx' is the target you want (e.g. 'all', 'test', ...)
+#     Please note: I omitted the 'd' suffix for debug versions because Tcl
+#     will always call tclpip83.dll and not tclpip83d.dll, causing an error.
+#                                                   ^
+#     Besides, the debug version goes into a separate directory, so there
+#     should be no problem having DLLs and EXEs with the same name.
+#     If you prefer your debug version having the 'd' suffix just uncomment
+#     the line
+#         #DBGX        = d
+#
+#   - To make a 'normal' version enter
+#       make -fmakefile.bc xxx
+#     where 'xxx' is the target you want (e.g. 'all', 'test', ...)
+#
+# DISCLAIMER:
+# This makefile has an experimental status - that is those targets which
+# have been modified do in fact compile and link with Borland's C++
+# Builder 5 and with the free Borland compiler (Borland C++ 5.5).
+# However the author assumes no responsiblity for any effect which the use of
+# this makefile or of the resulting programs might have on your system.
+#
+# Not yet modified:
+#   - The 'plug-in-DLL' and the associated shell.
+#   - The programs to create the windows help files.
+#
+# Suggestions and / or improvements are always welcome.
+#
+# May 2001, H. Giese (hgiese@ratiosoft.com)
+#
+
+# Does not depend on the presence of any environment variables in
+# order to compile tcl; all needed information is derived from
+# location of the compiler directories.
+
+#
+# Project directories
+#
+# ROOT    = top of source tree
+#
+# TOOLS32 = location of Borland development tools.
+#
+# INSTALLDIR = where the install-targets should copy the binaries and
+#     support files
+#
+
+ROOT		= ..
+INSTALLDIR	= c:\program files\tcl
+
+# If you have C++ Builder 5 or the free Borland C++ 5.5 compiler
+# adapt the following paths as appropriate for your system
+TOOLS32		= c:\dev\bcc55
+TOOLS32_rc	= c:\dev\bcc55
+#TOOLS32	= c:\bc55
+#TOOLS32_rc	= c:\bc55
+
+cc32		= "$(TOOLS32)\bin\bcc32.exe"
+link32		= "$(TOOLS32)\bin\ilink32.exe"
+lib32		= "$(TOOLS32)\bin\tlib.exe"
+rc32		= "$(TOOLS32_rc)\bin\brcc32.exe"
+include32	= -I"$(TOOLS32)\include"
+libpath32	= -L"$(TOOLS32)\lib"
+
+# Uncomment the following line to compile with thread support
+#THREADDEFINES	= -DTCL_THREADS=1
+
+# Allow definition of NDEBUG via command line
+# Set NODEBUG to 0 to compile with symbols
+!if !defined(NODEBUG)
+NODEBUG		= 1
+!endif
+
+# The following defines can be used to control the amount of debugging
+# code that is added to the compilation.
+#
+# -DTCL_MEM_DEBUG   Enables the debugging memory allocator.
+# -DTCL_COMPILE_DEBUG Enables byte compilation logging.
+# -DTCL_COMPILE_STATS Enables byte compilation statistics gathering.
+# -DUSE_TCLALLOC=0  Disables the Tcl memory allocator in favor
+#       of the native malloc implementation.  This is
+#       needed when using Purify.
+#
+#DEBUGDEFINES	= -DTCL_MEM_DEBUG -DTCL_COMPILE_DEBUG -DTCL_COMPILE_STATS
+#DEBUGDEFINES	= -DUSE_TCLALLOC=0
+
+######################################################################
+# Do not modify below this line
+######################################################################
+
+NAMEPREFIX	= tcl
+STUBPREFIX	= $(NAMEPREFIX)stub
+DOTVERSION	= 8.4
+VERSION		= 84
+
+DDEVERSION = 12
+DDEDOTVERSION = 1.2
+
+REGVERSION = 11
+REGDOTVERSION = 1.1
+
+BINROOT		= ..
+!IF "$(NODEBUG)" == "1"
+TMPDIRNAME	= Release
+DBGX		=
+!ELSE
+TMPDIRNAME	= Debug
+#DBGX		= d
+DBGX		=
+!ENDIF
+TMPDIR		= $(BINROOT)\$(TMPDIRNAME)
+OUTDIRNAME	= $(TMPDIRNAME)
+OUTDIR		= $(TMPDIR)
+
+TCLLIB		= $(OUTDIR)\$(NAMEPREFIX)$(VERSION)$(DBGX).lib
+TCLDLLNAME	= $(NAMEPREFIX)$(VERSION)$(DBGX).dll
+TCLDLL		= $(OUTDIR)\$(TCLDLLNAME)
+
+TCLSTUBLIBNAME	= $(STUBPREFIX)$(VERSION)$(DBGX).lib
+TCLSTUBLIB	= $(OUTDIR)\$(TCLSTUBLIBNAME)
+
+TCLPLUGINLIB	= $(OUTDIR)\$(NAMEPREFIX)$(VERSION)p$(DBGX).lib
+TCLPLUGINDLLNAME	= $(NAMEPREFIX)$(VERSION)p$(DBGX).dll
+TCLPLUGINDLL	= $(OUTDIR)\$(TCLPLUGINDLLNAME)
+TCLSH		= $(OUTDIR)\$(NAMEPREFIX)sh$(VERSION)$(DBGX).exe
+TCLSHP		= $(OUTDIR)\$(NAMEPREFIX)shp$(VERSION)$(DBGX).exe
+TCLPIPEDLLNAME	= $(NAMEPREFIX)pip$(VERSION)$(DBGX).dll
+TCLPIPEDLL	= $(OUTDIR)\$(TCLPIPEDLLNAME)
+TCLREGDLLNAME	= $(NAMEPREFIX)reg$(REGVERSION)$(DBGX).dll
+TCLREGDLL	= $(OUTDIR)\$(TCLREGDLLNAME)
+TCLDDEDLLNAME	= $(NAMEPREFIX)dde$(DDEVERSION)$(DBGX).dll
+TCLDDEDLL	= $(OUTDIR)\$(TCLDDEDLLNAME)
+TCLTEST		= $(OUTDIR)\$(NAMEPREFIX)test.exe
+CAT32		= $(TMPDIR)\cat32.exe
+RMDIR		= .\rmd.bat
+MKDIR		= .\mkd.bat
+RM		= del
+
+LIB_INSTALL_DIR	= $(INSTALLDIR)\lib
+BIN_INSTALL_DIR	= $(INSTALLDIR)\bin
+SCRIPT_INSTALL_DIR	= $(INSTALLDIR)\lib\tcl$(DOTVERSION)
+INCLUDE_INSTALL_DIR	= $(INSTALLDIR)\include
+
+TCLSHOBJS	= \
+	$(TMPDIR)\tclAppInit.obj
+
+TCLTESTOBJS	= \
+	$(TMPDIR)\tclTest.obj \
+	$(TMPDIR)\tclTestObj.obj \
+	$(TMPDIR)\tclTestProcBodyObj.obj \
+	$(TMPDIR)\tclThreadTest.obj \
+	$(TMPDIR)\tclWinTest.obj \
+	$(TMPDIR)\testMain.obj
+
+TCLOBJS	= \
+	$(TMPDIR)\regcomp.obj \
+	$(TMPDIR)\regexec.obj \
+	$(TMPDIR)\regfree.obj \
+	$(TMPDIR)\regerror.obj \
+	$(TMPDIR)\strftime.obj \
+	$(TMPDIR)\strtoll.obj \
+	$(TMPDIR)\strtoull.obj \
+	$(TMPDIR)\tclAlloc.obj \
+	$(TMPDIR)\tclAsync.obj \
+	$(TMPDIR)\tclBasic.obj \
+	$(TMPDIR)\tclBinary.obj \
+	$(TMPDIR)\tclCkalloc.obj \
+	$(TMPDIR)\tclClock.obj \
+	$(TMPDIR)\tclCmdAH.obj \
+	$(TMPDIR)\tclCmdIL.obj \
+	$(TMPDIR)\tclCmdMZ.obj \
+	$(TMPDIR)\tclCompCmds.obj \
+	$(TMPDIR)\tclCompExpr.obj \
+	$(TMPDIR)\tclCompile.obj \
+	$(TMPDIR)\tclDate.obj \
+	$(TMPDIR)\tclEncoding.obj \
+	$(TMPDIR)\tclEnv.obj \
+	$(TMPDIR)\tclEvent.obj \
+	$(TMPDIR)\tclExecute.obj \
+	$(TMPDIR)\tclFCmd.obj \
+	$(TMPDIR)\tclFileName.obj \
+	$(TMPDIR)\tclGet.obj \
+	$(TMPDIR)\tclHash.obj \
+	$(TMPDIR)\tclHistory.obj \
+	$(TMPDIR)\tclIndexObj.obj \
+	$(TMPDIR)\tclInterp.obj \
+	$(TMPDIR)\tclIO.obj \
+	$(TMPDIR)\tclIOCmd.obj \
+	$(TMPDIR)\tclIOGT.obj \
+	$(TMPDIR)\tclIOSock.obj \
+	$(TMPDIR)\tclIOUtil.obj \
+	$(TMPDIR)\tclLink.obj \
+	$(TMPDIR)\tclLiteral.obj \
+	$(TMPDIR)\tclListObj.obj \
+	$(TMPDIR)\tclLoad.obj \
+	$(TMPDIR)\tclMain.obj \
+	$(TMPDIR)\tclNamesp.obj \
+	$(TMPDIR)\tclNotify.obj \
+	$(TMPDIR)\tclObj.obj \
+	$(TMPDIR)\tclPanic.obj \
+	$(TMPDIR)\tclParse.obj \
+	$(TMPDIR)\tclParseExpr.obj \
+	$(TMPDIR)\tclPipe.obj \
+	$(TMPDIR)\tclPkg.obj \
+	$(TMPDIR)\tclPosixStr.obj \
+	$(TMPDIR)\tclPreserve.obj \
+	$(TMPDIR)\tclProc.obj \
+	$(TMPDIR)\tclRegexp.obj \
+	$(TMPDIR)\tclResolve.obj \
+	$(TMPDIR)\tclResult.obj \
+	$(TMPDIR)\tclScan.obj \
+	$(TMPDIR)\tclStringObj.obj \
+	$(TMPDIR)\tclStubInit.obj \
+	$(TMPDIR)\tclStubLib.obj \
+	$(TMPDIR)\tclThread.obj \
+	$(TMPDIR)\tclThreadJoin.obj \
+	$(TMPDIR)\tclTimer.obj \
+	$(TMPDIR)\tclUtf.obj \
+	$(TMPDIR)\tclUtil.obj \
+	$(TMPDIR)\tclVar.obj \
+	$(TMPDIR)\tclWin32Dll.obj \
+	$(TMPDIR)\tclWinChan.obj \
+	$(TMPDIR)\tclWinConsole.obj \
+	$(TMPDIR)\tclWinSerial.obj \
+	$(TMPDIR)\tclWinError.obj \
+	$(TMPDIR)\tclWinFCmd.obj \
+	$(TMPDIR)\tclWinFile.obj \
+	$(TMPDIR)\tclWinInit.obj \
+	$(TMPDIR)\tclWinLoad.obj \
+	$(TMPDIR)\tclWinMtherr.obj \
+	$(TMPDIR)\tclWinNotify.obj \
+	$(TMPDIR)\tclWinPipe.obj \
+	$(TMPDIR)\tclWinSock.obj \
+	$(TMPDIR)\tclWinThrd.obj \
+	$(TMPDIR)\tclWinTime.obj
+
+TCLSTUBOBJS	= $(TMPDIR)\tclStubLib.obj
+
+WINDIR		= $(ROOT)\win
+GENERICDIR	= $(ROOT)\generic
+
+TCL_INCLUDES	= -I"$(WINDIR)" -I"$(GENERICDIR)"
+TCL_DEFINES	= $(DEBUGDEFINES) $(THREADDEFINES)
+
+######################################################################
+# Compiler flags
+######################################################################
+
+!IF "$(NODEBUG)" == "1"
+# these macros cause maximum optimization and no symbols
+cdebug	= -v- -vi- -O2 -D_DEBUG
+!ELSE
+# these macros enable debugging
+cdebug	= -k -Od -r- -v -vi- -y
+!ENDIF
+
+SYSDEFINES	= _MT;NO_STRICT;_NO_VCL
+
+# declarations common to all compiler options
+cbase	= -c -q -3 -a4 -g0 -tWM -Ve -Vx -X-
+WARNINGS	= -w-rch -w-pch -w-par -w-dup -w-pro -w-dpu
+
+ccons	= -tWC
+
+INCLUDEPATH	= $(include32) $(TCL_INCLUDES)
+
+CFLAGS	= $(cdebug) $(cbase) $(INCLUDEPATH) $(WARNINGS) -D$(SYSDEFINES)
+TCL_CFLAGS	= $(CFLAGS) $(TCL_DEFINES)
+CONS_CFLAGS	= $(CFLAGS) $(TCL_DEFINES) $(ccons)
+
+######################################################################
+# Linker flags
+######################################################################
+
+!IF "$(NODEBUG)" == "1"
+ldebug	=
+!ELSE
+ldebug	= -v
+!ENDIF
+
+# declarations common to all linker options
+LNFLAGS	= -D"" -Gn -I$(TMPDIR) -x $(ldebug) $(libpath32)
+# -Gi: create lib file (is -Gl in doc)
+# -aa: Windows app, -ap: Windows console app
+LNFLAGS_DLL	= -ap -Gi -Tpd
+LNFLAGS_CONS	= -ap -Tpe
+
+LNLIBS	= import32 cw32mt
+
+
+######################################################################
+# Project specific targets
+######################################################################
+
+release:	setup $(TCLSH) dlls
+dlls:		setup $(TCLPIPEDLL) $(TCLREGDLL) $(TCLDDEDLL)
+all:		setup $(TCLSH) dlls $(CAT32)
+tcltest:	setup $(TCLTEST) dlls $(CAT32)
+plugin:		setup $(TCLPLUGINDLL) $(TCLSHP)
+install:	install-binaries install-libraries
+
+test:		setup $(TCLTEST) dlls $(CAT32)
+	set TCL_LIBRARY=$(ROOT)/library
+	$(TCLTEST) $(ROOT)/tests/all.tcl
+
+setup:
+	@if not exist $(OUT_DIR)\nul mkdir $(OUT_DIR) &\
+		echo *** Created directory '$(OUT_DIR)'
+	@if not exist $(TMP_DIR)\nul mkdir $(TMP_DIR) &\
+		echo *** Created directory '$(TMP_DIR)'
+
+
+$(TCLLIB): $(TCLDLL)
+
+$(TCLDLL): $(TCLOBJS) $(TMPDIR)\$(NAMEPREFIX).res
+	$(link32) $(ldebug) $(LNFLAGS) $(LNFLAGS_DLL) $(TOOLS32)\lib\c0d32 @&&!
+		$(TCLOBJS), $@, -x, $(LNLIBS),, $(TMPDIR)\$(NAMEPREFIX).res
+!
+
+$(TCLSTUBLIB): $(TCLSTUBOBJS)
+	$(lib32) /u $@ $(TCLSTUBOBJS)
+
+$(TCLPLUGINLIB): $(TCLPLUGINDLL)
+
+$(TCLPLUGINDLL): $(TCLOBJS) $(TMPDIR)\tcl.res
+	$(link32) $(ldebug) $(dlllflags) \
+		-out:$@ $(TMPDIR)\tcl.res $(guilibsdll) @&&!
+$(TCLOBJS)
+!
+
+$(TCLSH): $(TCLSHOBJS) $(TCLLIB) $(TMPDIR)\$(NAMEPREFIX)sh.res
+	$(link32) $(ldebug) -S:2400000 $(LNFLAGS) $(LNFLAGS_CONS) $(TOOLS32)\lib\c0x32 @&&!
+		$(TCLSHOBJS), $@, -x, $(LNLIBS) $(TCLLIB),, $(TMPDIR)\$(NAMEPREFIX)sh.res
+!
+
+$(TCLSHP): $(TCLSHOBJS) $(TCLPLUGINLIB) $(TMPDIR)\tclsh.res
+	$(link32) $(ldebug) $(conlflags) $(TMPDIR)\tclsh.res -stack:2300000 \
+		-out:$@ $(conlibsdll) $(TCLPLUGINLIB) $(TCLSHOBJS)
+
+$(TCLTEST): $(TCLTESTOBJS) $(TCLLIB) $(TMPDIR)\$(NAMEPREFIX)sh.res
+	$(link32) $(ldebug) -S:2400000 $(LNFLAGS) $(LNFLAGS_CONS) $(TOOLS32)\lib\c0x32 @&&!
+		$(TCLTESTOBJS), $@, -x, $(LNLIBS) $(TCLLIB),, $(TMPDIR)\$(NAMEPREFIX)sh.res
+!
+
+$(TCLPIPEDLL): $(WINDIR)\stub16.c
+	$(cc32) $(CFLAGS) -o$(TMPDIR)\stub16.obj $(WINDIR)\stub16.c
+	$(link32) $(ldebug) $(LNFLAGS) $(LNFLAGS_CONS) $(TOOLS32)\lib\c0x32 \
+		$(TMPDIR)\stub16.obj, $@, -x, $(LNLIBS),, $(TMPDIR)\$(NAMEPREFIX).res
+
+$(TCLDDEDLL): $(TMPDIR)\tclWinDde.obj $(TCLSTUBLIB)
+	$(link32) $(ldebug) $(LNFLAGS) $(LNFLAGS_DLL) $(TOOLS32)\lib\c0d32 \
+		$(TMPDIR)\tclWinDde.obj, $@, -x, $(LNLIBS) $(TCLSTUBLIB),, \
+		$(TMPDIR)\$(NAMEPREFIX).res
+
+$(TCLREGDLL): $(TMPDIR)\tclWinReg.obj $(TCLSTUBLIB)
+	$(link32) $(ldebug) $(LNFLAGS) $(LNFLAGS_DLL) $(TOOLS32)\lib\c0d32 \
+		$(TMPDIR)\tclWinReg.obj, $@, -x, $(LNLIBS) $(TCLSTUBLIB),, \
+		$(TMPDIR)\$(NAMEPREFIX).res
+
+$(CAT32): $(WINDIR)\cat.c
+	$(cc32) $(CONS_CFLAGS) -o$(TMPDIR)\cat.obj $?
+	$(link32) $(ldebug) $(LNFLAGS) $(LNFLAGS_CONS) $(TOOLS32)\lib\c0x32 \
+		$(TMPDIR)\cat.obj, $@, -x, $(LNLIBS),,
+
+install-binaries: $(TCLSH)
+	$(MKDIR) "$(BIN_INSTALL_DIR)"
+	$(MKDIR) "$(LIB_INSTALL_DIR)"
+	@echo installing $(TCLDLLNAME)
+	@copy "$(TCLDLL)" "$(BIN_INSTALL_DIR)"
+	@copy "$(TCLLIB)" "$(LIB_INSTALL_DIR)"
+	@echo installing "$(TCLSH)"
+	@copy "$(TCLSH)" "$(BIN_INSTALL_DIR)"
+	@echo installing $(TCLPIPEDLLNAME)
+	@copy "$(TCLPIPEDLL)" "$(BIN_INSTALL_DIR)"
+	@echo installing $(TCLSTUBLIBNAME)
+	@copy "$(TCLSTUBLIB)" "$(LIB_INSTALL_DIR)"
+
+install-libraries:
+	-@$(MKDIR) "$(LIB_INSTALL_DIR)"
+	-@$(MKDIR) "$(INCLUDE_INSTALL_DIR)"
+	-@$(MKDIR) "$(SCRIPT_INSTALL_DIR)"
+	@echo installing http1.0
+	-@$(MKDIR) "$(SCRIPT_INSTALL_DIR)\http1.0"
+	-@copy "$(ROOT)\library\http1.0\http.tcl"     "$(SCRIPT_INSTALL_DIR)\http1.0"
+	-@copy "$(ROOT)\library\http1.0\pkgIndex.tcl" "$(SCRIPT_INSTALL_DIR)\http1.0"
+	@echo installing http2.5
+	-@$(MKDIR) "$(SCRIPT_INSTALL_DIR)\http2.5"
+	-@copy "$(ROOT)\library\http\http.tcl"     "$(SCRIPT_INSTALL_DIR)\http2.5"
+	-@copy "$(ROOT)\library\http\pkgIndex.tcl" "$(SCRIPT_INSTALL_DIR)\http2.5"
+	@echo installing opt0.4
+	-@$(MKDIR) "$(SCRIPT_INSTALL_DIR)\opt0.4"
+	-@copy "$(ROOT)\library\opt\optparse.tcl" "$(SCRIPT_INSTALL_DIR)\opt0.4"
+	-@copy "$(ROOT)\library\opt\pkgIndex.tcl" "$(SCRIPT_INSTALL_DIR)\opt0.4"
+	@echo installing msgcat1.3
+	-@$(MKDIR) "$(SCRIPT_INSTALL_DIR)\msgcat1.3"
+	-@copy "$(ROOT)\library\msgcat\msgcat.tcl"   "$(SCRIPT_INSTALL_DIR)\msgcat1.3"
+	-@copy "$(ROOT)\library\msgcat\pkgIndex.tcl" "$(SCRIPT_INSTALL_DIR)\msgcat1.3"
+	@echo installing tcltest2.2
+	-@$(MKDIR) "$(SCRIPT_INSTALL_DIR)\tcltest2.2"
+	-@copy "$(ROOT)\library\tcltest\tcltest.tcl"   "$(SCRIPT_INSTALL_DIR)\tcltest2.2"
+	-@copy "$(ROOT)\library\tcltest\pkgIndex.tcl" "$(SCRIPT_INSTALL_DIR)\tcltest2.2"
+	@echo installing $(TCLDDEDLLNAME)
+	-@$(MKDIR) "$(SCRIPT_INSTALL_DIR)\dde1.1"
+	-@copy "$(TCLDDEDLL)" "$(SCRIPT_INSTALL_DIR)\dde1.1"
+	-@copy "$(ROOT)\library\dde\pkgIndex.tcl" "$(SCRIPT_INSTALL_DIR)\dde1.1"
+	@echo installing $(TCLREGDLLNAME)
+	-@$(MKDIR) "$(SCRIPT_INSTALL_DIR)\reg1.1"
+	-@copy "$(TCLREGDLL)" "$(SCRIPT_INSTALL_DIR)\reg1.1"
+	-@copy "$(ROOT)\library\reg\pkgIndex.tcl" "$(SCRIPT_INSTALL_DIR)\reg1.1"
+	@echo installing encoding files
+	-@$(MKDIR) "$(SCRIPT_INSTALL_DIR)\encoding"
+	-@copy "$(ROOT)\library\encoding\*.enc" "$(SCRIPT_INSTALL_DIR)\encoding"
+	@echo installing library files
+	-@copy "$(GENERICDIR)\tcl.h"         "$(INCLUDE_INSTALL_DIR)"
+	-@copy "$(GENERICDIR)\tclDecls.h"    "$(INCLUDE_INSTALL_DIR)"
+	-@copy "$(GENERICDIR)\tclPlatDecls.h" "$(INCLUDE_INSTALL_DIR)"
+	-@copy "$(ROOT)\library\history.tcl" "$(SCRIPT_INSTALL_DIR)"
+	-@copy "$(ROOT)\library\init.tcl"    "$(SCRIPT_INSTALL_DIR)"
+	-@copy "$(ROOT)\library\ldAout.tcl"  "$(SCRIPT_INSTALL_DIR)"
+	-@copy "$(ROOT)\library\parray.tcl"  "$(SCRIPT_INSTALL_DIR)"
+	-@copy "$(ROOT)\library\safe.tcl"    "$(SCRIPT_INSTALL_DIR)"
+	-@copy "$(ROOT)\library\tclIndex"    "$(SCRIPT_INSTALL_DIR)"
+	-@copy "$(ROOT)\library\package.tcl" "$(SCRIPT_INSTALL_DIR)"
+	-@copy "$(ROOT)\library\word.tcl"    "$(SCRIPT_INSTALL_DIR)"
+	-@copy "$(ROOT)\library\auto.tcl"    "$(SCRIPT_INSTALL_DIR)"
+
+#
+# Regenerate the stubs files.
+#
+
+genstubs:
+	tclsh$(VERSION) $(ROOT)\tools\genStubs.tcl $(GENERICDIR) \
+		$(GENERICDIR)\tcl.decls $(GENERICDIR)\tclInt.decls
+
+#
+# Regenerate the windows help files.
+#
+
+TCLTOOLS	= $(ROOT)/tools
+MAN2TCL		= $(TCLTOOLS)/man2tcl
+TCLRTF		= $(TCLTOOLS)/tcl.rtf
+TCLHPJ		= $(TCLTOOLS)/tcl.hpj
+MAN2HELP	= $(TCLTOOLS)/man2help.tcl
+HCRTF		= $(TOOLS32)/bin/hcrtf.exe
+
+winhelp: $(TCLRTF)
+	cd $(TCLTOOLS)
+	start /wait $(HCRTF) -xn $(TCLHPJ)
+
+$(MAN2TCL).exe: $(MAN2TCL).obj
+	cd $(TCLTOOLS)
+	$(cc32) /nologo /G4 /ML /O2 $(MAN2TCL).c
+
+$(TCLRTF): $(MAN2TCL).exe $(TCLSH)
+	cd $(TCLTOOLS)
+	..\win\$(TCLSH) $(MAN2HELP) $(NAMEPREFIX) $(VERSION) $(ROOT)/doc ../../tk$(DOTVERSION)/doc
+
+#
+# Special case object file targets
+#
+$(TMPDIR)\tclWinInit.obj: $(WINDIR)\tclWinInit.c
+	$(cc32) -DBUILD_tcl $(TCL_CFLAGS) -o$(TMPDIR)\$@ $?
+
+$(TMPDIR)\testMain.obj: $(WINDIR)\tclAppInit.c
+	$(cc32) $(TCL_CFLAGS) -DTCL_TEST -o$(TMPDIR)\testMain.obj $?
+
+$(TMPDIR)\tclTest.obj: $(GENERICDIR)\tclTest.c
+	$(cc32) $(TCL_CFLAGS) -o$(TMPDIR)\$@ $?
+
+$(TMPDIR)\tclTestObj.obj: $(GENERICDIR)\tclTestObj.c
+	$(cc32) $(TCL_CFLAGS) -o$(TMPDIR)\$@ $?
+
+$(TMPDIR)\tclWinTest.obj: $(WINDIR)\tclWinTest.c
+	$(cc32) $(TCL_CFLAGS) -o$(TMPDIR)\$@ $?
+
+$(TMPDIR)\tclAppInit.obj : $(WINDIR)\tclAppInit.c
+	$(cc32) $(TCL_CFLAGS) -o$(TMPDIR)\$@ $?
+
+# The following objects should be built using the stub interfaces
+
+# tclWinReg: Produces errors in ANSI mode
+$(TMPDIR)\tclWinReg.obj : $(WINDIR)\tclWinReg.c
+	$(cc32) $(TCL_CFLAGS) -DUSE_TCL_STUBS -o$(TMPDIR)\$@ $?
+
+# tclWinDde: Produces errors in ANSI mode
+$(TMPDIR)\tclWinDde.obj : $(WINDIR)\tclWinDde.c
+	$(cc32) $(TCL_CFLAGS) -DUSE_TCL_STUBS -o$(TMPDIR)\$@ $?
+
+
+# The following objects are part of the stub library and should not
+# be built as DLL objects but none of the symbols should be exported
+
+$(TMPDIR)\tclStubLib.obj : $(GENERICDIR)\tclStubLib.c
+	$(cc32) $(TCL_CFLAGS) -DSTATIC_BUILD -o$(TMPDIR)\$@ $?
+
+
+# Dedependency rules
+
+$(GENERICDIR)\regcomp.c: \
+	$(GENERICDIR)\regguts.h \
+	$(GENERICDIR)\regc_lex.c \
+	$(GENERICDIR)\regc_color.c \
+	$(GENERICDIR)\regc_nfa.c \
+	$(GENERICDIR)\regc_cvec.c \
+	$(GENERICDIR)\regc_locale.c
+
+$(GENERICDIR)\regcustom.h: \
+	$(GENERICDIR)\tclInt.h \
+	$(GENERICDIR)\tclPort.h \
+	$(GENERICDIR)\regex.h
+
+$(GENERICDIR)\regexec.c: \
+	$(GENERICDIR)\rege_dfa.c \
+	$(GENERICDIR)\regguts.h
+
+$(GENERICDIR)\regerror.c: $(GENERICDIR)\regguts.h
+$(GENERICDIR)\regfree.c: $(GENERICDIR)\regguts.h
+$(GENERICDIR)\regfronts.c: $(GENERICDIR)\regguts.h
+$(GENERICDIR)\regguts.h: $(GENERICDIR)\regcustom.h
+
+#
+# Implicit rules
+#
+
+{$(WINDIR)}.c{$(TMPDIR)}.obj:
+	$(cc32) -DBUILD_tcl $(TCL_CFLAGS) -o$@ $<
+
+{$(GENERICDIR)}.c{$(TMPDIR)}.obj:
+	$(cc32) -DBUILD_tcl $(TCL_CFLAGS) -o$@ $<
+
+{$(ROOT)\compat}.c{$(TMPDIR)}.obj:
+	$(cc32) -DBUILD_tcl $(TCL_CFLAGS) -o$@ $<
+
+{$(WINDIR)}.rc{$(TMPDIR)}.res:
+	$(rc32) $(INCLUDEPATH) -D$(USERDEFINES);$(SYSDEFINES) -fo$@ $<
+
+clean:
+	-@$(RM) $(OUTDIR)\*.exp
+	-@$(RM) $(OUTDIR)\*.lib
+	-@$(RM) $(OUTDIR)\*.dll
+	-@$(RM) $(OUTDIR)\*.exe
+	-@$(RM) $(OUTDIR)\*.pdb
+	-@$(RM) $(TMPDIR)\*.pch
+	-@$(RM) $(TMPDIR)\*.obj
+	-@$(RM) $(TMPDIR)\*.res
+	-@$(RM) $(TMPDIR)\*.exe
+	-@$(RMDIR) $(OUTDIR)
+	-@$(RMDIR) $(TMPDIR)
+

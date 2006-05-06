@@ -1,0 +1,52 @@
+'\"
+'\" Copyright (c) 1993 The Regents of the University of California.
+'\" Copyright (c) 1994-1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) Id
+'\" 
+.so man.macros
+.TH concat n 8.3 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+concat \- Join lists together
+.SH SYNOPSIS
+\fBconcat\fI \fR?\fIarg arg ...\fR?
+.BE
+
+.SH DESCRIPTION
+.PP
+This command joins each of its arguments together with spaces after
+trimming leading and trailing white-space from each of them.  If all the
+arguments are lists, this has the same effect as concatenating them
+into a single list.
+It permits any number of arguments;
+if no \fIarg\fRs are supplied, the result is an empty string.
+.SH EXAMPLES
+Although \fBconcat\fR will concatenate lists (so the command:
+.CS
+\fBconcat\fR a b {c d e} {f {g h}}
+.CE
+will return "\fBa b c d e f {g h}\fR" as its result), it will also
+concatenate things that are not lists, and hence the command:
+.CS
+\fBconcat\fR " a b {c   " d "  e} f"
+.CE
+will return "\fBa b {c d e} f\fR" as its result.
+.PP
+Note that the concatenation does not remove spaces from the middle of
+its arguments, so the command:
+.CS
+\fBconcat\fR "a   b   c" { d e f }
+.CE
+will return "\fBa   b   c d e f\fR" (i.e. with three spaces between
+the \fBa\fR, the \fBb\fR and the \fBc\fR).
+
+.SH "SEE ALSO"
+append(n), eval(n)
+
+.SH KEYWORDS
+concatenate, join, lists

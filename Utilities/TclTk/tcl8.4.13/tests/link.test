@@ -1,0 +1,262 @@
+# Commands covered:  none
+#
+# This file contains a collection of tests for Tcl_LinkVar and related
+# library procedures.  Sourcing this file into Tcl runs the tests and
+# generates output for errors.  No output means no errors were found.
+#
+# Copyright (c) 1993 The Regents of the University of California.
+# Copyright (c) 1994 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest 2
+    namespace import -force ::tcltest::*
+}
+
+::tcltest::testConstraint testlink \
+        [expr {[info commands testlink] != {}}]
+
+foreach i {int real bool string} {
+    catch {unset $i}
+}
+test link-1.1 {reading C variables from Tcl} {testlink} {
+    testlink delete
+    testlink set 43 1.23 4 - 12341234
+    testlink create 1 1 1 1 1
+    list $int $real $bool $string $wide
+} {43 1.23 1 NULL 12341234}
+test link-1.2 {reading C variables from Tcl} {testlink} {
+    testlink delete
+    testlink create 1 1 1 1 1
+    testlink set -3 2 0 "A long string with spaces"  43214321
+    list $int $real $bool $string $wide $int $real $bool $string $wide
+} {-3 2.0 0 {A long string with spaces} 43214321 -3 2.0 0 {A long string with spaces} 43214321}
+
+test link-2.1 {writing C variables from Tcl} {testlink} {
+    testlink delete
+    testlink set 43 1.21 4 - 56785678
+    testlink create 1 1 1 1 1
+    set int "00721"
+    set real -10.5
+    set bool true
+    set string abcdef
+    set wide 135135
+    concat [testlink get] $int $real $bool $string $wide
+} {465 -10.5 1 abcdef 135135 00721 -10.5 true abcdef 135135}
+test link-2.2 {writing bad values into variables} {testlink} {
+    testlink delete
+    testlink set 43 1.23 4 - 56785678
+    testlink create 1 1 1 1 1
+    list [catch {set int 09a} msg] $msg $int
+} {1 {can't set "int": variable must have integer value} 43}
+test link-2.3 {writing bad values into variables} {testlink} {
+    testlink delete
+    testlink set 43 1.23 4 - 56785678
+    testlink create 1 1 1 1 1
+    list [catch {set real 1.x3} msg] $msg $real
+} {1 {can't set "real": variable must have real value} 1.23}
+test link-2.4 {writing bad values into variables} {testlink} {
+    testlink delete
+    testlink set 43 1.23 4 - 56785678
+    testlink create 1 1 1 1 1
+    list [catch {set bool gorp} msg] $msg $bool
+} {1 {can't set "bool": variable must have boolean value} 1}
+test link-2.5 {writing bad values into variables} {testlink} {
+    testlink delete
+    testlink set 43 1.23 4 - 56785678
+    testlink create 1 1 1 1 1
+    list [catch {set wide gorp} msg] $msg $bool
+} {1 {can't set "wide": variable must have integer value} 1}
+
+test link-3.1 {read-only variables} {testlink} {
+    testlink delete
+    testlink set 43 1.23 4 - 56785678
+    testlink create 0 1 1 0 0
+    list [catch {set int 4} msg] $msg $int \
+	[catch {set real 10.6} msg] $msg $real \
+	[catch {set bool no} msg] $msg $bool \
+	[catch {set string "new value"} msg] $msg $string \
+	[catch {set wide 12341234} msg] $msg $wide
+} {1 {can't set "int": linked variable is read-only} 43 0 10.6 10.6 0 no no 1 {can't set "string": linked variable is read-only} NULL 1 {can't set "wide": linked variable is read-only} 56785678}
+test link-3.2 {read-only variables} {testlink} {
+    testlink delete
+    testlink set 43 1.23 4 - 56785678
+    testlink create 1 0 0 1 1
+    list [catch {set int 4} msg] $msg $int \
+	[catch {set real 10.6} msg] $msg $real \
+	[catch {set bool no} msg] $msg $bool \
+	[catch {set string "new value"} msg] $msg $string\
+	[catch {set wide 12341234} msg] $msg $wide
+} {0 4 4 1 {can't set "real": linked variable is read-only} 1.23 1 {can't set "bool": linked variable is read-only} 1 0 {new value} {new value} 0 12341234 12341234}
+
+test link-4.1 {unsetting linked variables} {testlink} {
+    testlink delete
+    testlink set -6 -2.5 0 stringValue 13579
+    testlink create 1 1 1 1 1
+    unset int real bool string wide
+    list [catch {set int} msg] $msg [catch {set real} msg] $msg \
+	    [catch {set bool} msg] $msg [catch {set string} msg] $msg \
+	    [catch {set wide} msg] $msg
+} {0 -6 0 -2.5 0 0 0 stringValue 0 13579}
+test link-4.2 {unsetting linked variables} {testlink} {
+    testlink delete
+    testlink set -6 -2.1 0 stringValue 97531
+    testlink create 1 1 1 1 1
+    unset int real bool string wide
+    set int 102
+    set real 16
+    set bool true
+    set string newValue
+    set wide 333555
+    testlink get
+} {102 16.0 1 newValue 333555}
+
+test link-5.1 {unlinking variables} {testlink} {
+    testlink delete
+    testlink set -6 -2.25 0 stringValue 13579
+    testlink delete
+    set int xx1
+    set real qrst
+    set bool bogus
+    set string 12345
+    set wide 875421
+    testlink get
+} {-6 -2.25 0 stringValue 13579}
+test link-5.2 {unlinking variables} {testlink} {
+    testlink delete
+    testlink set -6 -2.25 0 stringValue 97531
+    testlink create 1 1 1 1 1
+    testlink delete
+    testlink set 25 14.7 7 - 999999
+    list $int $real $bool $string $wide
+} {-6 -2.25 0 stringValue 97531}
+
+test link-6.1 {errors in setting up link} {testlink} {
+    testlink delete
+    catch {unset int}
+    set int(44) 1
+    list [catch {testlink create 1 1 1 1 1} msg] $msg
+} {1 {can't set "int": variable is array}}
+catch {unset int}
+
+test link-7.1 {access to linked variables via upvar} {testlink} {
+    proc x {} {
+	upvar int y
+	unset y
+    }
+    testlink delete
+    testlink create 1 0 0 0 0
+    testlink set 14 {} {} {} {}
+    x
+    list [catch {set int} msg] $msg
+} {0 14}
+test link-7.2 {access to linked variables via upvar} {testlink} {
+    proc x {} {
+	upvar int y
+	return [set y]
+    }
+    testlink delete
+    testlink create 1 0 0 0 0
+    testlink set 0 {} {} {} {}
+    set int
+    testlink set 23 {} {} {} {}
+    x
+    list [x] $int
+} {23 23}
+test link-7.3 {access to linked variables via upvar} {testlink} {
+    proc x {} {
+	upvar int y
+	set y 44
+    }
+    testlink delete
+    testlink create 0 0 0 0 0
+    testlink set 11 {} {} {} {}
+    list [catch x msg] $msg $int
+} {1 {can't set "y": linked variable is read-only} 11}
+test link-7.4 {access to linked variables via upvar} {testlink} {
+    proc x {} {
+	upvar int y
+	set y abc
+    }
+    testlink delete
+    testlink create 1 1 1 1 1
+    testlink set -4 {} {} {} {}
+    list [catch x msg] $msg $int
+} {1 {can't set "y": variable must have integer value} -4}
+test link-7.5 {access to linked variables via upvar} {testlink} {
+    proc x {} {
+	upvar real y
+	set y abc
+    }
+    testlink delete
+    testlink create 1 1 1 1 1
+    testlink set -4 16.75 {} {} {}
+    list [catch x msg] $msg $real
+} {1 {can't set "y": variable must have real value} 16.75}
+test link-7.6 {access to linked variables via upvar} {testlink} {
+    proc x {} {
+	upvar bool y
+	set y abc
+    }
+    testlink delete
+    testlink create 1 1 1 1 1
+    testlink set -4 16.3 1 {} {}
+    list [catch x msg] $msg $bool
+} {1 {can't set "y": variable must have boolean value} 1}
+test link-7.7 {access to linked variables via upvar} {testlink} {
+    proc x {} {
+	upvar wide y
+	set y abc
+    }
+    testlink delete
+    testlink create 1 1 1 1 1
+    testlink set -4 16.3 1 {} 778899
+    list [catch x msg] $msg $wide
+} {1 {can't set "y": variable must have integer value} 778899}
+
+test link-8.1 {Tcl_UpdateLinkedVar procedure} {testlink} {
+    proc x args {
+	global x int real bool string wide
+	lappend x $args $int $real $bool $string $wide
+    }
+    set x {}
+    testlink create 1 1 1 1 1
+    testlink set 14 -2.0 0 xyzzy 995511
+    trace var int w x
+    testlink update 32 4.0 3 abcd 113355
+    trace vdelete int w x
+    set x
+} {{int {} w} 32 -2.0 0 xyzzy 995511}
+test link-8.2 {Tcl_UpdateLinkedVar procedure} {testlink} {
+    proc x args {
+	global x int real bool string wide
+	lappend x $args $int $real $bool $string $wide
+    }
+    set x {}
+    testlink create 1 1 1 1 1
+    testlink set 14 -2.0 0 xyzzy 995511
+    testlink delete
+    trace var int w x
+    testlink update 32 4.0 6 abcd 113355
+    trace vdelete int w x
+    set x
+} {}
+test link-8.3 {Tcl_UpdateLinkedVar procedure, read-only variable} {testlink} {
+    testlink create 0 0 0 0 0
+    list [catch {testlink update 47 {} {} {} {}} msg] $msg $int
+} {0 {} 47}
+
+catch {testlink set 0 0 0 - 0}
+catch {testlink delete}
+foreach i {int real bool string wide} {
+    catch {unset $i}
+}
+
+# cleanup
+::tcltest::cleanupTests
+return

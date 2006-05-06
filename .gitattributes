@@ -14,6 +14,7 @@ configure        crlf=input
 configure.in     crlf=input
 hello            crlf=input
 install-sh       crlf=input
+installManPage   crlf=input
 ixset            crlf=input
 ldAix            crlf=input
 mkLinks          crlf=input

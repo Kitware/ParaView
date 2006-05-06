@@ -1,0 +1,65 @@
+'\"
+'\" Copyright (c) 1997 by Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) Id
+'\" 
+.so man.macros
+.TH Tcl_SaveResult 3 8.1 Tcl "Tcl Library Procedures"
+.BS
+.SH NAME
+Tcl_SaveResult, Tcl_RestoreResult, Tcl_DiscardResult \- save and restore an interpreter's result
+.SH SYNOPSIS
+.nf
+\fB#include <tcl.h>\fR
+.sp
+\fBTcl_SaveResult(\fIinterp, statePtr\fB)\fR
+.sp
+\fBTcl_RestoreResult(\fIinterp, statePtr\fB)\fR
+.sp
+\fBTcl_DiscardResult(\fIstatePtr\fB)\fR
+.SH ARGUMENTS
+.AS Tcl_SavedResult statePtr
+.AP Tcl_Interp *interp in
+Interpreter for which state should be saved.
+.AP Tcl_SavedResult *statePtr in
+Pointer to location where interpreter result should be saved or restored.
+.BE
+
+.SH DESCRIPTION
+.PP
+These routines allows a C procedure to take a snapshot of the current
+interpreter result so that it can be restored after a call
+to \fBTcl_Eval\fR or some other routine that modifies the interpreter
+result.  These routines are passed a pointer to a structure that is
+used to store enough information to restore the interpreter result
+state.  This structure can be allocated on the stack of the calling
+procedure.  These routines do not save the state of any error
+information in the interpreter (e.g. the \fBerrorCode\fR or
+\fBerrorInfo\fR variables).
+.PP
+\fBTcl_SaveResult\fR moves the string and object results
+of \fIinterp\fR into the location specified by \fIstatePtr\fR.
+\fBTcl_SaveResult\fR clears the result for \fIinterp\fR and
+leaves the result in its normal empty initialized state.
+.PP
+\fBTcl_RestoreResult\fR moves the string and object results from
+\fIstatePtr\fR back into \fIinterp\fR.  Any result or error that was
+already in the interpreter will be cleared.  The \fIstatePtr\fR is left
+in an uninitialized state and cannot be used until another call to
+\fBTcl_SaveResult\fR.
+.PP
+\fBTcl_DiscardResult\fR releases the saved interpreter state
+stored at \fBstatePtr\fR.  The state structure is left in an
+uninitialized state and cannot be used until another call to
+\fBTcl_SaveResult\fR.
+.PP
+Once \fBTcl_SaveResult\fR is called to save the interpreter
+result, either \fBTcl_RestoreResult\fR or
+\fBTcl_DiscardResult\fR must be called to properly clean up the
+memory associated with the saved state.  
+
+.SH KEYWORDS
+result, state, interp

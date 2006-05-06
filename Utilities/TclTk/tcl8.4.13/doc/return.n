@@ -1,0 +1,144 @@
+'\"
+'\" Copyright (c) 1993 The Regents of the University of California.
+'\" Copyright (c) 1994-1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) Id
+'\" 
+.so man.macros
+.TH return n 7.0 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+return \- Return from a procedure
+.SH SYNOPSIS
+\fBreturn \fR?\fB\-code \fIcode\fR? ?\fB\-errorinfo \fIinfo\fR? ?\fB\-errorcode\fI code\fR? ?\fIstring\fR?
+.BE
+
+.SH DESCRIPTION
+.PP
+Return immediately from the current procedure
+(or top-level command or \fBsource\fR command),
+with \fIstring\fR as the return value.  If \fIstring\fR is not specified then
+an empty string will be returned as result.
+.SH "EXCEPTIONAL RETURN CODES"
+.PP
+In addition to the result of a procedure, the return
+code of a procedure may also be set by \fBreturn\fR
+through use of the \fB-code\fR option.
+In the usual case where the \fB\-code\fR option isn't
+specified the procedure will return normally.
+However, the \fB\-code\fR option may be used to generate an
+exceptional return from the procedure.
+\fICode\fR may have any of the following values:
+.TP 13
+\fBok (or 0)\fR
+Normal return:  same as if the option is omitted.  The return code
+of the procedure is 0 (\fBTCL_OK\fR).
+.TP 13
+\fBerror (1)\fR
+Error return: the return code of the procedure is 1 (\fBTCL_ERROR\fR).
+The procedure command behaves in its calling context as if it
+were the command \fBerror \fIresult\fR.  See below for additional
+options.
+.TP 13
+\fBreturn (2)\fR
+The return code of the procedure is 2 (\fBTCL_RETURN\fR).  The
+procedure command behaves in its calling context as if it
+were the command \fBreturn\fR (with no arguments).
+.TP 13
+\fBbreak (3)\fR
+The return code of the procedure is 3 (\fBTCL_BREAK\fR).  The
+procedure command behaves in its calling context as if it
+were the command \fBbreak\fR.
+.TP 13
+\fBcontinue (4)\fR
+The return code of the procedure is 4 (\fBTCL_CONTINUE\fR).  The
+procedure command behaves in its calling context as if it
+were the command \fBcontinue\fR.
+.TP 13
+\fIvalue\fR
+\fIValue\fR must be an integer;  it will be returned as the
+return code for the current procedure.
+.LP
+The \fB\-code\fR option is rarely used.
+It is provided so that procedures that implement
+new control structures can reflect exceptional conditions back to
+their callers.
+.PP
+Two additional options, \fB\-errorinfo\fR and \fB\-errorcode\fR,
+may be used to provide additional information during error
+returns.
+These options are ignored unless \fIcode\fR is \fBerror\fR.
+.PP
+The \fB\-errorinfo\fR option specifies an initial stack
+trace for the \fBerrorInfo\fR variable;  if it is not specified then
+the stack trace left in \fBerrorInfo\fR will include the call to
+the procedure and higher levels on the stack but it will not include
+any information about the context of the error within the procedure.
+Typically the \fIinfo\fR value is supplied from the value left
+in \fBerrorInfo\fR after a \fBcatch\fR command trapped an error within
+the procedure.
+.PP
+If the \fB\-errorcode\fR option is specified then \fIcode\fR provides
+a value for the \fBerrorCode\fR variable.
+If the option is not specified then \fBerrorCode\fR will
+default to \fBNONE\fR.
+.SH EXAMPLES
+First, a simple example of using \fBreturn\fR to return from a
+procedure, interrupting the procedure body.
+.CS
+proc printOneLine {} {
+   puts "line 1"    ;# This line will be printed.
+   \fBreturn\fR		
+   puts "line 2"    ;# This line will not be printed.
+}
+.CE
+.PP
+Next, an example of using \fBreturn\fR to set the value
+returned by the procedure.
+.CS
+proc returnX {} {\fBreturn\fR X}
+puts [returnX]    ;# prints "X"
+.CE
+.PP
+Next, a more complete example, using \fBreturn -code error\fR
+to report invalid arguments.
+.CS
+proc factorial {n} {
+   if {![string is integer $n] || ($n < 0)} {
+      \fBreturn\fR -code error \\
+            "expected non-negative integer,\\
+             but got \\"$n\\""
+   }
+   if {$n < 2} {
+      \fBreturn\fR 1
+   }
+   set m [expr {$n - 1}]
+   set code [catch {factorial $m} factor]
+   if {$code != 0} {
+      \fBreturn\fR -code $code $factor
+   }
+   set product [expr {$n * $factor}]
+   if {$product < 0} {
+      \fBreturn\fR -code error \\
+            "overflow computing factorial of $n"
+   }
+   \fBreturn\fR $product
+}
+.CE
+.PP
+Next, a procedure replacement for \fBbreak\fR.
+.CS
+proc myBreak {} {
+   \fBreturn\fR -code break
+}
+.CE
+
+.SH "SEE ALSO"
+break(n), catch(n), continue(n), error(n), proc(n), source(n), tclvars(n)
+
+.SH KEYWORDS
+break, catch, continue, error, procedure, return

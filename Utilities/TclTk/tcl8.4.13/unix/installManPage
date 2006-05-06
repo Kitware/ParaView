@@ -1,0 +1,67 @@
+#!/bin/sh
+
+ZIP=:
+while true; do
+    case $1 in
+        -s | --symlinks  )      S="-s ";;
+        -z | --compress  )    ZIP=$2;  shift ;;
+	-e | --extension )      Z=$2;  shift ;;
+	-s | --suffix    ) SUFFIX=$2;  shift ;;
+	*)  break ;;
+    esac
+    shift
+done
+if test "$#" != 2; then
+    echo "Usage: installManPages <options> file dir"
+    exit 1
+fi
+
+MANPAGE=$1
+DIR=$2
+test -z "$S" && S="$DIR/"
+
+# A sed script to parse the alternative names out of a man page.
+#
+#    /^\\.SH NAME/{   ;# Look for a line, that starts with .SH NAME
+#	s/^.*$//      ;# Delete the content of this line from the buffer
+#	n             ;# Read next line
+#	s/,//g        ;# Remove all commas ...
+#	s/\\\ //g     ;# .. and backslash-escaped spaces.
+#	s/ \\\-.*//   ;# Delete from \- to the end of line
+#	p             ;# print the result
+#	q             ;# exit
+#   }
+#
+# Backslashes are trippled in the sed script, because it is in
+# backticks which don't pass backslashes literally.
+#
+# Please keep the commented version above updated if you
+# change anything to the script below.
+NAMES=`sed -n '
+    /^\\.SH NAME/{
+	s/^.*$//
+	n
+	s/,//g
+	s/\\\ //g
+	s/ \\\-.*//
+	p
+	q
+    }' $MANPAGE`
+
+SECTION=`echo $MANPAGE | sed 's/.*\(.\)$/\1/'`
+SRCDIR=`dirname $MANPAGE`
+FIRST=""
+for f in $NAMES; do
+    f=$f.$SECTION$SUFFIX
+    if test -z "$FIRST" ; then
+	FIRST=$f
+	rm -f $DIR/$FIRST $DIR/$FIRST.*
+	sed -e "/man\.macros/r $SRCDIR/man.macros" -e "/man\.macros/d" \
+	    $MANPAGE > $DIR/$FIRST
+	chmod 444 $DIR/$FIRST
+	$ZIP $DIR/$FIRST
+    else
+	rm -f $DIR/$f $DIR/$f.*
+	ln $S$FIRST$Z $DIR/$f$Z
+    fi
+done

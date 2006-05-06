@@ -1,0 +1,149 @@
+'\"
+'\" Copyright (c) 1994 The Regents of the University of California.
+'\" Copyright (c) 1994-1996 Sun Microsystems, Inc.
+'\" Copyright (c) 2000 Ajuba Solutions.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) Id
+'\" 
+.so man.macros
+.TH Tcl_Main 3 8.4 Tcl "Tcl Library Procedures"
+.BS
+.SH NAME
+Tcl_Main, Tcl_SetMainLoop \- main program and event loop definition for Tcl-based applications
+.SH SYNOPSIS
+.nf
+\fB#include <tcl.h>\fR
+.sp
+\fBTcl_Main\fR(\fIargc, argv, appInitProc\fR)
+.sp
+\fBTcl_SetMainLoop\fR(\fImainLoopProc\fR)
+.SH ARGUMENTS
+.AS Tcl_AppInitProc *appInitProc
+.AP int argc in
+Number of elements in \fIargv\fR.
+.AP char *argv[] in
+Array of strings containing command-line arguments.
+.AP Tcl_AppInitProc *appInitProc in
+Address of an application-specific initialization procedure.
+The value for this argument is usually \fBTcl_AppInit\fR.
+.AP Tcl_MainLoopProc *mainLoopProc in
+Address of an application-specific event loop procedure.
+.BE
+
+.SH DESCRIPTION
+.PP
+\fBTcl_Main\fR can serve as the main program for Tcl-based shell
+applications.  A ``shell application'' is a program
+like tclsh or wish that supports both interactive interpretation
+of Tcl and evaluation of a script contained in a file given as
+a command line argument.  \fBTcl_Main\fR is offered as a convenience
+to developers of shell applications, so they do not have to 
+reproduce all of the code for proper initialization of the Tcl
+library and interactive shell operation.  Other styles of embedding
+Tcl in an application are not supported by \fBTcl_Main\fR.  Those
+must be achieved by calling lower level functions in the Tcl library
+directly.
+
+The \fBTcl_Main\fR function has been offered by the Tcl library
+since release Tcl 7.4.  In older releases of Tcl, the Tcl library
+itself defined a function \fBmain\fR, but that lacks flexibility
+of embedding style and having a function \fBmain\fR in a library
+(particularly a shared library) causes problems on many systems.
+Having \fBmain\fR in the Tcl library would also make it hard to use
+Tcl in C++ programs, since C++ programs must have special C++
+\fBmain\fR functions.
+.PP
+Normally each shell application contains a small \fBmain\fR function
+that does nothing but invoke \fBTcl_Main\fR.
+\fBTcl_Main\fR then does all the work of creating and running a
+\fBtclsh\fR-like application.
+.PP
+\fBTcl_Main\fR is not provided by the public interface of Tcl's
+stub library.  Programs that call \fBTcl_Main\fR must be linked
+against the standard Tcl library.  Extensions (stub-enabled or
+not) are not intended to call \fBTcl_Main\fR.
+.PP
+\fBTcl_Main\fR is not thread-safe.  It should only be called by
+a single master thread of a multi-threaded application.  This
+restriction is not a problem with normal use described above.
+.PP
+\fBTcl_Main\fR and therefore all applications based upon it, like
+\fBtclsh\fR, use \fBTcl_GetStdChannel\fR to initialize the standard
+channels to their default values. See \fBTcl_StandardChannels\fR for
+more information.
+.PP
+\fBTcl_Main\fR supports two modes of operation, depending on the
+values of \fIargc\fR and \fIargv\fR.  If \fIargv[1]\fR exists and
+does not begin with the character \fI-\fR, it is taken to be the
+name of a file containing a \fIstartup script\fR, which \fBTcl_Main\fR
+will attempt to evaluate.  Otherwise, \fBTcl_Main\fR will enter an
+interactive mode.
+.PP
+In either mode, \fBTcl_Main\fR will define in its master interpreter
+the Tcl variables \fIargc\fR, \fIargv\fR, \fIargv0\fR, and
+\fItcl_interactive\fR, as described in the documentation for \fBtclsh\fR.
+.PP
+When it has finished its own initialization, but before it processes
+commands, \fBTcl_Main\fR calls the procedure given by the
+\fIappInitProc\fR argument.  This procedure provides a ``hook'' for
+the application to perform its own initialization of the interpreter
+created by \fBTcl_Main\fR, such as defining application-specific
+commands.  The procedure must have an interface that matches the
+type \fBTcl_AppInitProc\fR:
+.CS
+typedef int Tcl_AppInitProc(Tcl_Interp *\fIinterp\fR);
+.CE
+
+\fIAppInitProc\fR is almost always a pointer to \fBTcl_AppInit\fR; for more
+details on this procedure, see the documentation for \fBTcl_AppInit\fR.
+.PP
+When the \fIappInitProc\fR is finished, \fBTcl_Main\fR enters one
+of its two modes.  If a startup script has been provided, \fBTcl_Main\fR
+attempts to evaluate it.  Otherwise, interactive mode begins with
+examination of the variable \fItcl_rcFileName\fR in the master
+interpreter.  If that variable exists and holds the name of a readable
+file, the contents of that file are evaluated in the master interpreter.
+Then interactive operations begin,
+with prompts and command evaluation results written to the standard
+output channel, and commands read from the standard input channel
+and then evaluated.  The prompts written to the standard output
+channel may be customized by defining the Tcl variables \fItcl_prompt1\fR
+and \fItcl_prompt2\fR as described in the documentation for \fBtclsh\fR.
+The prompts and command evaluation results are written to the standard
+output channel only if the Tcl variable \fItcl_interactive\fR in the
+master interpreter holds a non-zero integer value.
+.PP
+.VS 8.4
+\fBTcl_SetMainLoop\fR allows setting an event loop procedure to be run.
+This allows, for example, Tk to be dynamically loaded and set its event
+loop.  The event loop will run following the startup script.  If you
+are in interactive mode, setting the main loop procedure will cause the
+prompt to become fileevent based and then the loop procedure is called.
+When the loop procedure returns in interactive mode, interactive operation
+will continue.
+The main loop procedure must have an interface that matches the type
+\fBTcl_MainLoopProc\fR:
+.CS
+typedef void Tcl_MainLoopProc(void);
+.CE
+.VE 8.4
+.PP
+\fBTcl_Main\fR does not return.  Normally a program based on
+\fBTcl_Main\fR will terminate when the \fBexit\fR command is
+evaluated.  In interactive mode, if an EOF or channel error
+is encountered on the standard input channel, then \fBTcl_Main\fR
+itself will evaluate the \fBexit\fR command after the main loop
+procedure (if any) returns.  In non-interactive mode, after
+\fBTcl_Main\fR evaluates the startup script, and the main loop
+procedure (if any) returns, \fBTcl_Main\fR will also evaluate
+the \fBexit\fR command.
+
+.SH "SEE ALSO"
+tclsh(1), Tcl_GetStdChannel(3), Tcl_StandardChannels(3), Tcl_AppInit(3),
+exit(n)
+
+.SH KEYWORDS
+application-specific initialization, command-line arguments, main program

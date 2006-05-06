@@ -1,0 +1,173 @@
+// !$*UTF8*$!
+{
+	00E2F845016E82EB0ACA28DC = {
+		activeBuildStyle = 00E2F847016E82EB0ACA28DC;
+		activeExecutable = F594E5F1030774B1016F146B;
+		activeTarget = 00E2F84C016E8B780ACA28DC;
+		addToTargets = (
+		);
+		codeSenseManager = F9D167E40610239A0027C147;
+		executables = (
+			F53ACC52031D9AFE016F146B,
+			F594E5F1030774B1016F146B,
+		);
+		sourceControlManager = F9D167E30610239A0027C147;
+		userBuildSettings = {
+			SYMROOT = "${SRCROOT}/../../build/tcl";
+		};
+	};
+	00E2F84C016E8B780ACA28DC = {
+		activeExec = 0;
+	};
+	F53ACC52031D9AFE016F146B = {
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+			NO,
+			NO,
+		);
+		argumentStrings = (
+			"${SRCROOT}/../../tcl/tests/all.tcl",
+			"-verbose \"\"",
+		);
+		configStateDict = {
+			"PBXLSLaunchAction-0" = {
+				PBXLSLaunchAction = 0;
+				PBXLSLaunchStartAction = 1;
+				PBXLSLaunchStdioStyle = 2;
+				PBXLSLaunchStyle = 0;
+				class = PBXLSRunLaunchConfig;
+				displayName = "Executable Runner";
+				identifier = com.apple.Xcode.launch.runConfig;
+				remoteHostInfo = "";
+				startActionInfo = "";
+			};
+			"PBXLSLaunchAction-1" = {
+				PBXLSLaunchAction = 1;
+				PBXLSLaunchStartAction = 1;
+				PBXLSLaunchStdioStyle = 2;
+				PBXLSLaunchStyle = 0;
+				class = PBXGDB_LaunchConfig;
+				displayName = GDB;
+				identifier = com.apple.Xcode.launch.GDBMI_Config;
+				remoteHostInfo = "";
+				startActionInfo = "";
+			};
+		};
+		cppStopOnCatchEnabled = 0;
+		cppStopOnThrowEnabled = 0;
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = _debug;
+		enableDebugStr = 0;
+		environmentEntries = (
+			{
+				active = YES;
+				name = TCL_LIBRARY;
+				value = "${SRCROOT}/../../tcl/library";
+			},
+			{
+				active = NO;
+				name = DYLD_PRINT_LIBRARIES;
+			},
+		);
+		isa = PBXExecutable;
+		launchableReference = F5C37CF303D5BEDF016F146B;
+		libgmallocEnabled = 0;
+		name = tcltest;
+		shlibInfoDictList = (
+		);
+		sourceDirectories = (
+		);
+		startupPath = "<<ProductDirectory>>";
+	};
+	F594E5F1030774B1016F146B = {
+		activeArgIndex = 2147483647;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		configStateDict = {
+			"PBXLSLaunchAction-0" = {
+				PBXLSLaunchAction = 0;
+				PBXLSLaunchStartAction = 1;
+				PBXLSLaunchStdioStyle = 2;
+				PBXLSLaunchStyle = 0;
+				class = PBXLSRunLaunchConfig;
+				displayName = "Executable Runner";
+				identifier = com.apple.Xcode.launch.runConfig;
+				remoteHostInfo = "";
+				startActionInfo = "";
+			};
+			"PBXLSLaunchAction-1" = {
+				PBXLSLaunchAction = 1;
+				PBXLSLaunchStartAction = 1;
+				PBXLSLaunchStdioStyle = 2;
+				PBXLSLaunchStyle = 0;
+				class = PBXGDB_LaunchConfig;
+				displayName = GDB;
+				identifier = com.apple.Xcode.launch.GDBMI_Config;
+				remoteHostInfo = "";
+				startActionInfo = "";
+			};
+		};
+		cppStopOnCatchEnabled = 0;
+		cppStopOnThrowEnabled = 0;
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = _debug;
+		enableDebugStr = 0;
+		environmentEntries = (
+			{
+				active = NO;
+				name = DYLD_PRINT_LIBRARIES;
+			},
+		);
+		isa = PBXExecutable;
+		launchableReference = F98F02E608E7EF9A00D0320A;
+		libgmallocEnabled = 0;
+		name = tclsh;
+		shlibInfoDictList = (
+		);
+		sourceDirectories = (
+		);
+		startupPath = "<<ProductDirectory>>";
+	};
+	F5C37CF303D5BEDF016F146B = {
+		isa = PBXFileReference;
+		lastKnownFileType = "compiled.mach-o.executable";
+		path = tcltest;
+		refType = 3;
+		sourceTree = BUILT_PRODUCTS_DIR;
+	};
+	F98F02E608E7EF9A00D0320A = {
+		isa = PBXFileReference;
+		lastKnownFileType = "compiled.mach-o.executable";
+		path = tclsh8.4;
+		refType = 3;
+		sourceTree = BUILT_PRODUCTS_DIR;
+	};
+	F9D167E30610239A0027C147 = {
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		isa = PBXSourceControlManager;
+		scmConfiguration = {
+		};
+		scmType = scm.cvs;
+	};
+	F9D167E40610239A0027C147 = {
+		indexTemplatePath = "";
+		isa = PBXCodeSenseManager;
+		usesDefaults = 1;
+		wantsCodeCompletion = 1;
+		wantsCodeCompletionAutoSuggestions = 1;
+		wantsCodeCompletionCaseSensitivity = 1;
+		wantsCodeCompletionListAlways = 1;
+		wantsCodeCompletionOnlyMatchingItems = 1;
+		wantsCodeCompletionParametersIncluded = 1;
+		wantsCodeCompletionPlaceholdersInserted = 1;
+		wantsCodeCompletionTabCompletes = 1;
+		wantsIndex = 1;
+	};
+}

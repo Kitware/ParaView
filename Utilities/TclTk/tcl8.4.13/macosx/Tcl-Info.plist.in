@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>@TCL_LIB_FILE@</string>
+	<key>CFBundleGetInfoString</key>
+	<string>Tcl Library @TCL_VERSION@, Copyright © @TCL_YEAR@ Tcl Core Team.
+Initial MacOS X Port by Jim Ingham &lt;jingham@apple.com&gt; &amp; Ian Reid, Copyright © 2001-2002, Apple Computer, Inc.</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.tcltk.tcllibrary</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Tcl Library @TCL_VERSION@</string>
+	<key>CFBundlePackageType</key>
+	<string>FMWK</string>
+	<key>CFBundleShortVersionString</key>
+	<string>@TCL_VERSION@@TCL_PATCH_LEVEL@</string>
+	<key>CFBundleSignature</key>
+	<string>Tcl </string>
+	<key>CFBundleVersion</key>
+	<string>@TCL_VERSION@@TCL_PATCH_LEVEL@</string>
+</dict>
+</plist>

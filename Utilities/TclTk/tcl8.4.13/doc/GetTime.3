@@ -1,0 +1,53 @@
+'\"
+'\" Copyright (c) 2001 by Kevin B. Kenny.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) Id
+'\" 
+.so man.macros
+.TH Tcl_GetTime 3 8.4 Tcl "Tcl Library Procedures"
+.BS
+.SH NAME
+Tcl_GetTime \- get date and time
+.SH SYNOPSIS
+.nf
+\fB#include <tcl.h>\fR
+.sp
+\fBTcl_GetTime\fR(\fI timePtr \fR)
+.SH ARGUMENTS
+.AS "Tcl_Time *" timePtr
+.AP "Tcl_Time *" timePtr out
+Points to memory in which to store the date and time information.
+.BE
+.SH DESCRIPTION
+.PP
+The \fBTcl_GetTime\fR function retrieves the current time as a
+\fITcl_Time\fR structure in memory the caller provides.  This
+structure has the following definition:
+.CS
+typedef struct Tcl_Time {
+    long sec;
+    long usec;
+} Tcl_Time;
+.CE
+.PP
+On return, the \fIsec\fR member of the structure is filled in with the
+number of seconds that have elapsed since the \fIepoch:\fR the epoch
+is the point in time of 00:00 UTC, 1 January 1970.  This number does
+\fInot\fR count leap seconds \- an interval of one day advances it by
+86400 seconds regardless of whether a leap second has been inserted.
+.PP
+The \fIusec\fR member of the structure is filled in with the number of
+microseconds that have elapsed since the start of the second
+designated by \fIsec\fR.  The Tcl library makes every effort to keep
+this number as precise as possible, subject to the limitations of the
+computer system.  On multiprocessor variants of Windows, this number
+may be limited to the 10- or 20-ms granularity of the system clock.
+(On single-processor Windows systems, the \fIusec\fR field is derived
+from a performance counter and is highly precise.)
+.SH "SEE ALSO"
+clock
+.SH KEYWORDS
+date, time

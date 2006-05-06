@@ -1,0 +1,88 @@
+'\"
+'\" Copyright (c) 1993 The Regents of the University of California.
+'\" Copyright (c) 1994-1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) Id
+'\" 
+.so man.macros
+.TH split n "" Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+split \- Split a string into a proper Tcl list
+.SH SYNOPSIS
+\fBsplit \fIstring \fR?\fIsplitChars\fR?
+.BE
+
+.SH DESCRIPTION
+.PP
+Returns a list created by splitting \fIstring\fR at each character
+that is in the \fIsplitChars\fR argument.
+Each element of the result list will consist of the
+characters from \fIstring\fR that lie between instances of the
+characters in \fIsplitChars\fR.
+Empty list elements will be generated if \fIstring\fR contains
+adjacent characters in \fIsplitChars\fR, or if the first or last
+character of \fIstring\fR is in \fIsplitChars\fR.
+If \fIsplitChars\fR is an empty string then each character of
+\fIstring\fR becomes a separate element of the result list.
+\fISplitChars\fR defaults to the standard white-space characters.
+.SH EXAMPLES
+Divide up a USENET group name into its hierarchical components:
+.CS
+\fBsplit\fR "comp.lang.tcl.announce" .
+     \fI=> comp lang tcl announce\fR
+.CE
+.PP
+See how the \fBsplit\fR command splits on \fIevery\fR character in
+\fIsplitChars\fR, which can result in information loss if you are not
+careful:
+.CS
+\fBsplit\fR "alpha beta gamma" "temp"
+     \fI=> al {ha b} {} {a ga} {} a\fR
+.CE
+.PP
+Extract the list words from a string that is not a well-formed list:
+.CS
+\fBsplit\fR "Example with {unbalanced brace character"
+     \fI=> Example with \\{unbalanced brace character\fR
+.CE
+.PP
+Split a string into its constituent characters
+.CS
+\fBsplit\fR "Hello world" {}
+     \fI=> H e l l o { } w o r l d\fR
+.CE
+.SH "PARSING RECORD-ORIENTED FILES"
+Parse a Unix /etc/passwd file, which consists of one entry per line,
+with each line consisting of a colon-separated list of fields:
+.CS
+## Read the file
+set fid [open /etc/passwd]
+set content [read $fid]
+close $fid
+
+## Split into records on newlines
+set records [\fBsplit\fR $content "\\n"]
+
+## Iterate over the records
+foreach rec $records {
+
+   ## Split into fields on colons
+   set fields [\fBsplit\fR $rec ":"]
+
+   ## Assign fields to variables and print some out...
+   lassign $fields \\
+         userName password uid grp longName homeDir shell
+   puts "$longName uses [file tail $shell] for a login shell"
+}
+.CE
+
+.SH "SEE ALSO"
+join(n), list(n), string(n)
+
+.SH KEYWORDS
+list, split, string
