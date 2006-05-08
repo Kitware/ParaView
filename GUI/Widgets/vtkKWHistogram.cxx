@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWHistogram);
-vtkCxxRevisionMacro(vtkKWHistogram, "1.7");
+vtkCxxRevisionMacro(vtkKWHistogram, "1.8");
 
 //----------------------------------------------------------------------------
 vtkKWHistogram::vtkKWHistogram()
@@ -826,7 +826,7 @@ int vtkKWHistogram::RefreshImage(ImageDescriptor *desc)
     desc->ColorTransferFunction->GetTable(
       desc->Range[0], desc->Range[1], desc->Width, tfunccolors);
     }
-    
+
   // Quickly set the whole image to be transparent if no background color
   // is going to be used
 
@@ -834,22 +834,22 @@ int vtkKWHistogram::RefreshImage(ImageDescriptor *desc)
     {
     memset(image_ptr, 0, desc->Width * desc->Height * nb_of_components);
     }
-  
+
   // Fill the image
-  
+
   double *bins_ptr = this->Bins->GetPointer(0);
-  
+
   double value, next_value;
   double occurrence;
 
   // width of bins in the original histogram.
 
-  double bin_width = 
+  double bin_width =
     (this->Range[1] - this->Range[0]) / (double)this->GetNumberOfBins();
-  
+
   // Range of the original histogram that is visible in the interface.
 
-  double hist_subrange = desc->Range[1] - desc->Range[0]; 
+  double hist_subrange = desc->Range[1] - desc->Range[0];
 
   // Scale between pixel units in the image of the histogram on the interface
   // and value units on the scale of the original histogram. Multiplying by
@@ -890,7 +890,7 @@ int vtkKWHistogram::RefreshImage(ImageDescriptor *desc)
       {
       bin_real = (value - this->Range[0]) / bin_width;
       bin      = (vtkIdType)floor(bin_real);
-     
+
       next_value = desc->Range[0] + x_scale * (double)(x+1);
       next_bin_real = (next_value - this->Range[0]) / bin_width;
       next_bin       = (vtkIdType)floor(next_bin_real);
@@ -908,7 +908,7 @@ int vtkKWHistogram::RefreshImage(ImageDescriptor *desc)
       // Compute the partial contribution from the first bin and last bin
       // This is done differently depending on whether bin and next_bin are
       // the same or not.
-      
+
       if( next_bin != bin )
         {
         // Compute the partial contribution from the first bin plus the
@@ -924,9 +924,9 @@ int vtkKWHistogram::RefreshImage(ImageDescriptor *desc)
         // and the resampled histogram.
         occurrence = bins_ptr[bin] * x_scale / bin_width ;
         }
-      
+
       // Height of histogram bars should be such that the area is conserved.
-      // we should divide by the range of values that are now mapped in a 
+      // we should divide by the range of values that are now mapped in a
       // single bin on the histogram visible on the interface.
 
       resampled_histogram[x] = occurrence / x_scale;
