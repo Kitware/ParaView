@@ -30,7 +30,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVPlotDisplayLabelPropertiesDialog);
-vtkCxxRevisionMacro(vtkPVPlotDisplayLabelPropertiesDialog, "1.3");
+vtkCxxRevisionMacro(vtkPVPlotDisplayLabelPropertiesDialog, "1.4");
 vtkCxxSetObjectMacro(vtkPVPlotDisplayLabelPropertiesDialog, LabelFormatProperty,
   vtkSMStringVectorProperty);
 vtkCxxSetObjectMacro(vtkPVPlotDisplayLabelPropertiesDialog, NumberOfLabelsProperty,
@@ -322,6 +322,10 @@ void vtkPVPlotDisplayLabelPropertiesDialog::PushWidgetValues(int from_gui)
         }
       this->DataRangeProperty->SetElements(range);
       }
+    if (this->PlotDisplayProxy)
+      {
+      this->PlotDisplayProxy->UpdateVTKObjects();
+      }
     }
   else
     {
@@ -359,10 +363,6 @@ void vtkPVPlotDisplayLabelPropertiesDialog::PushWidgetValues(int from_gui)
       this->DataRangeMinWidget->GetWidget()->SetValueAsDouble(range[0]);
       this->DataRangeMaxWidget->GetWidget()->SetValueAsDouble(range[1]);
       this->SetDataRangeAuto((range[0]==range[1]));
-      }
-    if (this->PlotDisplayProxy)
-      {
-      this->PlotDisplayProxy->UpdateVTKObjects();
       }
     }
   this->GetTraceHelper()->AddEntry("$kw(%s) PushWidgetValues %d", 
