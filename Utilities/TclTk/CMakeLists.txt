@@ -75,6 +75,9 @@ IF(UNIX)
   ENDIF(RUN_CONFIGURE)
   ADD_CUSTOM_TARGET(maketcltk ALL "/bin/sh" "${TclTk_BINARY_DIR}/build_tcltk.sh")
 
+  SET(VTK_TCL_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tcl8.4.5/library)
+  SET(VTK_TK_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tk8.4.5/library)
+
 ELSE(UNIX)
 
   # copy the tcl/tk dll's to Release Debug MinSizeRel and RelWithDebInfo bin 
@@ -87,14 +90,16 @@ ELSE(UNIX)
     SET (CONFIG_TYPES .)
   ENDIF (CMAKE_CONFIGURATION_TYPES)
 
-  SET(TCL_TK_WIN_DISTRIB_DIR ${TclTk_SOURCE_DIR}/TclTk8.4.5Win)
+  SET(TCL_TK_WIN_VERSION "8.4.13") # or "8.4.5" if you need to revert
+  SET(TCL_TK_WIN_DISTRIB_DIR 
+    "${TclTk_SOURCE_DIR}/TclTk${TCL_TK_WIN_VERSION}Win")
 
   IF(BUILD_SHARED_LIBS)
     SET(SUFFIX "")
     SET(SUFFIX_DEBUG "")
     SET(DLLS
-      TclTk8.4.5Win/bin/tcl84.dll
-      TclTk8.4.5Win/bin/tk84.dll
+      "TclTk${TCL_TK_WIN_VERSION}Win/bin/tcl84.dll"
+      "TclTk${TCL_TK_WIN_VERSION}Win/bin/tk84.dll"
       tkdnd/lib/tkdnd/libtkdnd.dll)
     FOREACH(dll ${DLLS})
       GET_FILENAME_COMPONENT(dllname ${dll} NAME)
@@ -135,15 +140,19 @@ ELSE(UNIX)
   SET(TK_INCLUDE_PATH ${TCL_TK_WIN_DISTRIB_DIR}/include
     CACHE INTERNAL "Path to tk include" FORCE)
 
+  SET(VTK_TCL_SUPPORT_LIBRARY_PATH 
+    "${TclTk_SOURCE_DIR}/tcl${TCL_TK_WIN_VERSION}/library")
+  SET(VTK_TK_SUPPORT_LIBRARY_PATH 
+    "${TclTk_SOURCE_DIR}/tk${TCL_TK_WIN_VERSION}/library")
+
 ENDIF(UNIX)
 
 # Copy the Tcl/Tk support files
 # See vtkTclTkMacros.cmake for full documentation about
 # VTK_COPY_TCL_TK_SUPPORT_FILES_TO_DIR
+# VTK_TCL_SUPPORT_LIBRARY_PATH and VTK_TK_SUPPORT_LIBRARY_PATH are set above
 
 SET(VTK_TCL_TK_COPY_SUPPORT_LIBRARY 1 CACHE INTERNAL "ParaView links against its own version of Tcl/TK" FORCE)
-SET(VTK_TCL_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tcl8.4.5/library)
-SET(VTK_TK_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tk8.4.5/library)
 
 INCLUDE(${VTK_TCL_TK_MACROS_MODULE})
 VTK_COPY_TCL_TK_SUPPORT_FILES_TO_DIR(
