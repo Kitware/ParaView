@@ -211,7 +211,7 @@ namespace eval tablelist {
     defineTablelistEdit 
 
     #
-    # Register the Tk core widgets entry, checkbutton,
+    # Register the Tk core widgets entry, text, checkbutton,
     # and spinbox for interactive cell editing
     #
     proc addTkCoreWidgets {} {
@@ -1256,7 +1256,7 @@ proc tablelist::editcellSubCmd {win row col restore {cmd ""} {charPos -1}} {
     variable editWin
     upvar ::tablelist::ns${win}::data data
 
-    if {$data(isDisabled) || $data($col-hide) ||
+    if {$data(isDisabled) || [doRowCget $row $win -hide] || $data($col-hide) ||
 	![isCellEditable $win $row $col]} {
 	return ""
     }
@@ -1467,8 +1467,10 @@ proc tablelist::editcellSubCmd {win row col restore {cmd ""} {charPos -1}} {
 	set pixels [lindex $data(colList) [expr {2*$col}]]
 	if {$pixels == 0} {			;# convention: dynamic width
 	    set pixels $data($col-reqPixels)
-	    if {$data($col-maxPixels) > 0 && $pixels > $data($col-maxPixels)} {
-		set pixels $data($col-maxPixels)
+	    if {$data($col-maxPixels) > 0} {
+		if {$pixels > $data($col-maxPixels)} {
+		    set pixels $data($col-maxPixels)
+		}
 	    }
 	}
 	incr pixels $data($col-delta)
@@ -1763,8 +1765,7 @@ proc tablelist::adjustEditWindow {win pixels} {
 proc tablelist::setEditWinFont win {
     upvar ::tablelist::ns${win}::data data
 
-    set item [lindex $data(itemList) $data(editRow)]
-    set key [lindex $item end] 
+    set key [lindex [lindex $data(itemList) $data(editRow)] end] 
     set cellFont [getCellFont $win $key $data(editCol)]
 
     switch [winfo class $data(bodyFrEd)] {
@@ -2083,7 +2084,8 @@ proc tablelist::goToNextPrevCell {w amount args} {
 
 	if {$row == $oldRow && $col == $oldCol} {
 	    return -code break ""
-	} elseif {!$data($col-hide) && [isCellEditable $win $row $col]} {
+	} elseif {![doRowCget $row $win -hide] && !$data($col-hide) &&
+		  [isCellEditable $win $row $col]} {
 	    editcellSubCmd $win $row $col 0 $cmd
 	    return -code break ""
 	}
@@ -2152,7 +2154,8 @@ proc tablelist::goToPrevNextLine {w amount row col cmd} {
 	incr row $amount
 	if {$row < 0 || $row > $data(lastRow)} {
 	    return 0
-	} elseif {[isCellEditable $win $row $col]} {
+	} elseif {![doRowCget $row $win -hide] &&
+		  [isCellEditable $win $row $col]} {
 	    editcellSubCmd $win $row $col 0 $cmd
 	    return 1
 	}
@@ -2174,7 +2177,7 @@ proc tablelist::goToPriorNextPage {w amount} {
     upvar ::tablelist::ns${win}::data data
 
     #
-    # Check whether there is any editable cell
+    # Check whether there is any non-hidden editable cell
     # above/below the current one, in the same column
     #
     set row $data(editRow)
@@ -2183,7 +2186,8 @@ proc tablelist::goToPriorNextPage {w amount} {
 	incr row $amount
 	if {$row < 0 || $row > $data(lastRow)} {
 	    return -code break ""
-	} elseif {[isCellEditable $win $row $col]} {
+	} elseif {![doRowCget $row $win -hide] &&
+		  [isCellEditable $win $row $col]} {
 	    break
 	}
     }

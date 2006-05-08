@@ -114,6 +114,7 @@ proc tablelist::addToSortColumns {win col} {
 # sortbycolumnlist subcommands.
 #------------------------------------------------------------------------------
 proc tablelist::sortSubCmd {win sortColList sortOrderList} {
+    variable canElide
     upvar ::tablelist::ns${win}::data data
 
     #
@@ -130,16 +131,12 @@ proc tablelist::sortSubCmd {win sortColList sortOrderList} {
     }
 
     #
-    # Save the keys corresponding to anchorRow and activeRow 
+    # Save the keys corresponding to anchorRow and activeRow,
+    # as well as the indices of the selected cells
     #
     foreach type {anchor active} {
-	set item [lindex $data(itemList) $data(${type}Row)]
-	set ${type}Key [lindex $item end]
+	set ${type}Key [lindex [lindex $data(itemList) $data(${type}Row)] end]
     }
-
-    #
-    # Save the indices of the selected cells
-    #
     set selCells [curcellselectionSubCmd $win 1]
 
     #
@@ -233,15 +230,12 @@ proc tablelist::sortSubCmd {win sortColList sortOrderList} {
     }
 
     #
-    # Cancel the execution of all delayed redisplay and
-    # redisplayCol commands, and make sure the stretchColumns
-    # procedure won't schedule any invocation of redisplayCol
+    # Cancel the execution of all delayed redisplay and redisplayCol commands
     #
     foreach name [array names data *redispId] {
 	after cancel $data($name)
 	unset data($name)
     }
-    set data(sorting) 1
 
     set canvasWidth $data(arrowWidth)
     if {[llength $data(arrowColList)] > 1} {
@@ -279,6 +273,7 @@ proc tablelist::sortSubCmd {win sortColList sortOrderList} {
     # to empty each line individually than to invoke a global delete command.
     #
     set w $data(body)
+    $w tag remove hiddenRow 1.0 end
     for {set line 1} {$line <= $data(itemCount)} {incr line} {
 	$w delete $line.0 $line.end
     }
@@ -286,28 +281,12 @@ proc tablelist::sortSubCmd {win sortColList sortOrderList} {
     set snipStr $data(-snipstring)
     set isSimple [expr {$data(tagRefCount) == 0 && $data(imgCount) == 0 &&
 			$data(winCount) == 0 && !$data(hasColTags)}]
-    set isViewable [winfo viewable $win]
     set hasFmtCmds [expr {[lsearch -exact $data(fmtCmdFlagList) 1] >= 0}]
     set row 0
     set line 1
     foreach item $data(itemList) {
-	if {$isViewable &&
-	    $row == [rowIndex $win @0,[winfo height $win] 0] + 1} {
-	    updateColors $win
-	    update idletasks
-	}
-
 	if {$hasFmtCmds} {
-	    set formattedItem {}
-	    set col 0
-	    foreach text [lrange $item 0 $data(lastCol)] \
-		    fmtCmdFlag $data(fmtCmdFlagList) {
-		if {$fmtCmdFlag} {
-		    set text [uplevel #0 $data($col-formatcommand) [list $text]]
-		}
-		lappend formattedItem $text
-		incr col
-	    }
+	    set formattedItem [formatItem $win [lrange $item 0 $data(lastCol)]]
 	} else {
 	    set formattedItem [lrange $item 0 $data(lastCol)]
 	}
@@ -323,7 +302,7 @@ proc tablelist::sortSubCmd {win sortColList sortOrderList} {
 	    set multilineData {}
 	    foreach text [strToDispStr $formattedItem] \
 		    {pixels alignment} $data(colList) {
-		if {$data($col-hide)} {
+		if {$data($col-hide) && !$canElide} {
 		    incr col
 		    continue
 		}
@@ -338,9 +317,10 @@ proc tablelist::sortSubCmd {win sortColList sortOrderList} {
 		    set multiline 0
 		}
 		if {$pixels == 0} {		;# convention: dynamic width
-		    if {$data($col-maxPixels) > 0 &&
-			$data($col-reqPixels) > $data($col-maxPixels)} {
-			set pixels $data($col-maxPixels)
+		    if {$data($col-maxPixels) > 0} {
+			if {$data($col-reqPixels) > $data($col-maxPixels)} {
+			    set pixels $data($col-maxPixels)
+			}
 		    }
 		}
 		if {$pixels != 0} {
@@ -388,10 +368,9 @@ proc tablelist::sortSubCmd {win sortColList sortOrderList} {
 	    }
 
 	    foreach text [strToDispStr $formattedItem] \
-		    colFont $data(colFontList) \
 		    colTags $data(colTagsList) \
 		    {pixels alignment} $data(colList) {
-		if {$data($col-hide)} {
+		if {$data($col-hide) && !$canElide} {
 		    incr col
 		    continue
 		}
@@ -406,17 +385,12 @@ proc tablelist::sortSubCmd {win sortColList sortOrderList} {
 		    set multiline 0
 		}
 		set aux [getAuxData $win $key $col auxType auxWidth]
-		if {[info exists data($key-$col-font)]} {
-		    set cellFont $data($key-$col-font)
-		} elseif {[info exists data($key-font)]} {
-		    set cellFont $data($key-font)
-		} else {
-		    set cellFont $colFont
-		}
+		set cellFont [getCellFont $win $key $col]
 		if {$pixels == 0} {		;# convention: dynamic width
-		    if {$data($col-maxPixels) > 0 &&
-			$data($col-reqPixels) > $data($col-maxPixels)} {
-			set pixels $data($col-maxPixels)
+		    if {$data($col-maxPixels) > 0} {
+			if {$data($col-reqPixels) > $data($col-maxPixels)} {
+			    set pixels $data($col-maxPixels)
+			}
 		    }
 		}
 		if {$pixels != 0} {
@@ -466,9 +440,18 @@ proc tablelist::sortSubCmd {win sortColList sortOrderList} {
 	    unset itemData
 	}
 
-	incr row
+	if {[info exists data($key-hide)]} {
+	    $w tag add hiddenRow $line.0 $line.end+1c
+	}
+
+	set row $line
 	incr line
     }
+
+    #
+    # Invalidate the list of the row indices indicating the non-hidden rows
+    #
+    set data(nonHiddenRowList) {-1}
 
     #
     # Restore the stripes in the body text widget

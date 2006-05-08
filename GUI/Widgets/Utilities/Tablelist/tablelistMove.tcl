@@ -10,6 +10,7 @@
 # This procedure is invoked to process the tablelist move subcommand.
 #------------------------------------------------------------------------------
 proc tablelist::moveSubCmd {win source target} {
+    variable canElide
     variable elide
     upvar ::tablelist::ns${win}::data data
 
@@ -55,7 +56,7 @@ proc tablelist::moveSubCmd {win source target} {
     set line [expr {$source + 1}]
     set textIdx [expr {double($line)}]
     for {set col 0} {$col < $data(colCount)} {incr col} {
-	if {$data($col-hide)} {
+	if {$data($col-hide) && !$canElide} {
 	    continue
 	}
 
@@ -78,16 +79,8 @@ proc tablelist::moveSubCmd {win source target} {
     set snipStr $data(-snipstring)
     set sourceItem [lindex $data(itemList) $source]
     if {[lsearch -exact $data(fmtCmdFlagList) 1] >= 0} {
-	set formattedItem {}
-	set col 0
-	foreach text [lrange $sourceItem 0 $data(lastCol)] \
-		fmtCmdFlag $data(fmtCmdFlagList) {
-	    if {$fmtCmdFlag} {
-		set text [uplevel #0 $data($col-formatcommand) [list $text]]
-	    }
-	    lappend formattedItem $text
-	    incr col
-	}
+	set formattedItem \
+	    [formatItem $win [lrange $sourceItem 0 $data(lastCol)]]
     } else {
 	set formattedItem [lrange $sourceItem 0 $data(lastCol)]
     }
@@ -100,10 +93,9 @@ proc tablelist::moveSubCmd {win source target} {
     }
     set col 0
     foreach text [strToDispStr $formattedItem] \
-	    colFont $data(colFontList) \
 	    colTags $data(colTagsList) \
 	    {pixels alignment} $data(colList) {
-	if {$data($col-hide)} {
+	if {$data($col-hide) && !$canElide} {
 	    incr col
 	    continue
 	}
@@ -118,17 +110,12 @@ proc tablelist::moveSubCmd {win source target} {
 	    set multiline 0
 	}
 	set aux [getAuxData $win $key $col auxType auxWidth]
-	if {[info exists data($key-$col-font)]} {
-	    set cellFont $data($key-$col-font)
-	} elseif {[info exists data($key-font)]} {
-	    set cellFont $data($key-font)
-	} else {
-	    set cellFont $colFont
-	}
+	set cellFont [getCellFont $win $key $col]
 	if {$pixels == 0} {			;# convention: dynamic width
-	    if {$data($col-maxPixels) > 0 &&
-		$data($col-reqPixels) > $data($col-maxPixels)} {
-		set pixels $data($col-maxPixels)
+	    if {$data($col-maxPixels) > 0} {
+		if {$data($col-reqPixels) > $data($col-maxPixels)} {
+		    set pixels $data($col-maxPixels)
+		}
 	    }
 	}
 	if {$pixels != 0} {
@@ -155,7 +142,7 @@ proc tablelist::moveSubCmd {win source target} {
 	if {$auxType == 0} {
 	    if {$multiline} {
 		$w insert $targetLine.end "\t\t" $tagNames
-		$w window create $targetLine.end-1c -pady 1 -window $msgScript
+		$w window create $targetLine.end-1c -pady 1 -create $msgScript
 	    } else {
 		$w insert $targetLine.end "\t$text\t" $tagNames
 	    }
@@ -208,6 +195,11 @@ proc tablelist::moveSubCmd {win source target} {
     if {$data(activeRow) == $source} {
 	set data(activeRow) $target1
     }
+
+    #
+    # Invalidate the list of the row indices indicating the non-hidden rows
+    #
+    set data(nonHiddenRowList) {-1}
 
     #
     # Restore the stripes in the body text widget

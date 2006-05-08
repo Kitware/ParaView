@@ -25,6 +25,24 @@ static unsigned char triangleDn7x4_bits[] = {
 }
 
 #------------------------------------------------------------------------------
+# tablelist::flat7x5Arrows
+#------------------------------------------------------------------------------
+proc tablelist::flat7x5Arrows w {
+    image create bitmap triangleUp$w -data "
+#define triangleUp7x5_width 7
+#define triangleUp7x5_height 5
+static unsigned char triangleUp7x5_bits[] = {
+   0x08, 0x1c, 0x3e, 0x7f, 0x22};
+"
+    image create bitmap triangleDn$w -data "
+#define triangleDn7x5_width 7
+#define triangleDn7x5_height 5
+static unsigned char triangleDn7x5_bits[] = {
+   0x22, 0x7f, 0x3e, 0x1c, 0x08};
+"
+}
+
+#------------------------------------------------------------------------------
 # tablelist::flat7x7Arrows
 #------------------------------------------------------------------------------
 proc tablelist::flat7x7Arrows w {

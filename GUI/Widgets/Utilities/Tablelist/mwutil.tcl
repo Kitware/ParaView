@@ -11,6 +11,8 @@
 package require Tcl 8
 package require Tk  8
 
+namespace eval tablelist {
+
 #
 # Namespace initialization
 # ========================
@@ -20,7 +22,7 @@ namespace eval mwutil {
     #
     # Public variables:
     #
-    variable version	2.0
+    variable version	2.1
     variable library	[file dirname [info script]]
 
     #
@@ -28,8 +30,8 @@ namespace eval mwutil {
     #
     namespace export	wrongNumArgs getAncestorByClass convEventFields \
 			defineKeyNav processTraversal configure \
-			fullConfigOpt fullOpt enumOpts setConfigVals \
-			configSubCmd attribSubCmd getScrollInfo
+			fullConfigOpt fullOpt enumOpts configSubCmd \
+			attribSubCmd getScrollInfo
 }
 
 #
@@ -134,10 +136,9 @@ proc mwutil::processTraversal {w class event} {
 # in optValPairs and, if the value of initialize is true, also those database
 # options that don't match any command-line arguments.
 #------------------------------------------------------------------------------
-proc mwutil::configure {win configSpecsName configValsName \
-			configCmd optValPairs initialize} {
+proc mwutil::configure {win configSpecsName configCmd cgetCmd \
+			optValPairs initialize} {
     upvar $configSpecsName configSpecs
-    upvar $configValsName configVals
 
     #
     # Process the command-line arguments
@@ -158,7 +159,7 @@ proc mwutil::configure {win configSpecsName configValsName \
 	}
 	set opt $result
 	lappend cmdLineOpts $opt
-	lappend savedVals $configVals($opt)
+	lappend savedVals [eval $cgetCmd $win $opt]
 	if {[catch {eval $configCmd [list $win $opt $val]} result] != 0} {
 	    set failed 1
 	    break
@@ -327,44 +328,12 @@ proc mwutil::enumOpts optList {
 }
 
 #------------------------------------------------------------------------------
-# mwutil::setConfigVals
-#
-# Sets the elements of the array specified by configValsName to the values
-# returned by passing the widget name win and the relevant options to the
-# command given by cgetCmd.
-#------------------------------------------------------------------------------
-proc mwutil::setConfigVals {win configSpecsName configValsName
-			    cgetCmd argList} {
-    upvar $configSpecsName configSpecs
-    upvar $configValsName configVals
-
-    set optList {}
-    if {[llength $argList] == 0} {
-	foreach opt [array names configSpecs] {
-	    if {[llength $configSpecs($opt)] > 1} {
-		lappend optList $opt
-	    }
-	}
-    } else {
-	foreach {opt val} $argList {
-	    lappend optList [fullConfigOpt $opt configSpecs]
-	}
-    }
-
-    foreach opt $optList {
-	set configVals($opt) [eval $cgetCmd [list $win $opt]]
-    }
-}
-
-#------------------------------------------------------------------------------
 # mwutil::configSubCmd
 #
 # This procedure is invoked to process configuration subcommands.
 #------------------------------------------------------------------------------
-proc mwutil::configSubCmd {win configSpecsName configValsName
-			   configCmd argList} {
+proc mwutil::configSubCmd {win configSpecsName configCmd cgetCmd argList} {
     upvar $configSpecsName configSpecs
-    upvar $configValsName configVals
 
     switch [llength $argList] {
 	0 {
@@ -385,7 +354,7 @@ proc mwutil::configSubCmd {win configSpecsName configValsName
 		    set dbClass [lindex $configSpecs($opt) 1]
 		    set default [lindex $configSpecs($opt) 3]
 		    lappend result [list $opt $dbName $dbClass $default \
-				    $configVals($opt)]
+				    [eval $cgetCmd $win $opt]]
 		}
 	    }
 	    return $result
@@ -399,14 +368,15 @@ proc mwutil::configSubCmd {win configSpecsName configValsName
 	    set dbName [lindex $configSpecs($opt) 0]
 	    set dbClass [lindex $configSpecs($opt) 1]
 	    set default [lindex $configSpecs($opt) 3]
-	    return [list $opt $dbName $dbClass $default $configVals($opt)]
+	    return [list $opt $dbName $dbClass $default \
+		    [eval $cgetCmd $win $opt]]
 	}
 
 	default {
 	    #
 	    # Set the specified configuration options to the given values
 	    #
-	    return [configure $win configSpecs configVals $configCmd $argList 0]
+	    return [configure $win configSpecs $configCmd $cgetCmd $argList 0]
 	}
     }
 }
@@ -493,4 +463,6 @@ proc mwutil::getScrollInfo argList {
     } else {
 	return -code error "unknown option \"$opt\": must be moveto or scroll"
     }
+}
+
 }
