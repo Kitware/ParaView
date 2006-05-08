@@ -36,7 +36,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.51");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.52");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -1061,6 +1061,7 @@ void vtkKWThumbWheel::InvokeCommand(double value)
   this->InInvokeCommand = 1;
 
   this->InvokeThumbWheelCommand(this->Command, value);
+  this->InvokeEvent(vtkKWThumbWheel::ThumbWheelValueChangingEvent, &value);
 
   this->InInvokeCommand = 0;
 }
@@ -1075,6 +1076,8 @@ void vtkKWThumbWheel::SetStartCommand(vtkObject *object, const char *method)
 void vtkKWThumbWheel::InvokeStartCommand(double value)
 {
   this->InvokeThumbWheelCommand(this->StartCommand, value);
+  this->InvokeEvent(
+    vtkKWThumbWheel::ThumbWheelValueStartChangingEvent, &value);
 }
 
 // ---------------------------------------------------------------------------
@@ -1087,6 +1090,8 @@ void vtkKWThumbWheel::SetEndCommand(vtkObject *object, const char *method)
 void vtkKWThumbWheel::InvokeEndCommand(double value)
 {
   this->InvokeThumbWheelCommand(this->EndCommand, value);
+  this->InvokeEvent(
+    vtkKWThumbWheel::ThumbWheelValueStartChangingEvent, &value);
 }
 
 // ---------------------------------------------------------------------------
@@ -1099,6 +1104,7 @@ void vtkKWThumbWheel::SetEntryCommand(vtkObject *object, const char *method)
 void vtkKWThumbWheel::InvokeEntryCommand(double value)
 {
   this->InvokeThumbWheelCommand(this->EntryCommand, value);
+  this->InvokeEvent(vtkKWThumbWheel::ThumbWheelValueChangedEvent, &value);
 }
 
 // ---------------------------------------------------------------------------
