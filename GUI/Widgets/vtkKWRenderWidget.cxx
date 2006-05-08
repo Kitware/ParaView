@@ -43,7 +43,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.137");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.138");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -87,7 +87,7 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   // the only way to interact with a VTK Tk render widget
 
   this->Interactor = vtkKWGenericRenderWindowInteractor::New();
-  this->Interactor->SetRenderWidget(this);  
+  this->Interactor->SetRenderWidget(this);
   this->Interactor->SetRenderWindow(this->RenderWindow);
   this->InteractorTimerToken = NULL;
 
@@ -122,7 +122,7 @@ vtkKWRenderWidget::vtkKWRenderWidget()
     ->SetCoordinateSystemToNormalizedViewport();
   this->HeaderAnnotation->GetPosition2Coordinate()->SetValue(0.6, 0.1);
   this->HeaderAnnotation->VisibilityOff();
-  
+
   // Distance units
 
   this->DistanceUnits = NULL;
@@ -181,7 +181,7 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
     this->VTKWidget->Delete();
     this->VTKWidget = NULL;
     }
-  
+
   if (this->CornerAnnotation)
     {
     this->CornerAnnotation->Delete();
@@ -193,7 +193,7 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
     this->HeaderAnnotation->Delete();
     this->HeaderAnnotation = NULL;
     }
-  
+
   this->SetDistanceUnits(NULL);
 
   if (this->ContextMenu)
@@ -217,7 +217,7 @@ void vtkKWRenderWidget::CreateWidget()
   // Call the superclass to create the whole widget
 
   this->Superclass::CreateWidget();
-  
+
   // Create the default renderers
 
   this->CreateDefaultRenderers();
@@ -268,9 +268,9 @@ void vtkKWRenderWidget::CreateWidget()
 
   this->Script("grid rowconfigure %s 0 -weight 1", this->GetWidgetName());
   this->Script("grid columnconfigure %s 0 -weight 1", this->GetWidgetName());
-  this->Script("grid %s -row 0 -column 0 -sticky nsew", 
+  this->Script("grid %s -row 0 -column 0 -sticky nsew",
                this->VTKWidget->GetWidgetName());
-  
+
   // When the render window is created by the Tk render widget, it
   // is Render()'ed, which calls Initialize() on the interactor, which
   // always reset its Enable state.
@@ -295,7 +295,7 @@ void vtkKWRenderWidget::CreateDefaultRenderers()
     this->AddRenderer(renderer);
     renderer->Delete();
     }
- 
+
   if (this->GetNumberOfOverlayRenderers() <= 0)
     {
     vtkRenderer *renderer = vtkRenderer::New();
@@ -420,7 +420,7 @@ void vtkKWRenderWidget::RemoveAllRenderers()
     (*it)->RemoveAllViewProps();
     (*it)->Delete();
     }
-    
+
   this->Internals->RendererPool.clear();
 
   this->InstallRenderers();
@@ -1129,7 +1129,7 @@ void vtkKWRenderWidget::PopulateAnnotationMenu(vtkKWMenu *menu)
   // Header Annotation
 
   const char *header = this->GetHeaderAnnotationText();
-  if (header && header)
+  if (header && *header)
     {
     index = menu->AddCheckButton(
       ks_("Annotation|Header Annotation"), 
@@ -1210,7 +1210,7 @@ void vtkKWRenderWidget::Render()
     this->ResetCameraClippingRange();
     this->RenderWindow->Render();
     }
-  
+
   static_in_render = 0;
 }
 
@@ -1338,7 +1338,7 @@ void vtkKWRenderWidget::SetupMemoryRendering( int x, int y, void *cd)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::ResumeScreenRendering() 
+void vtkKWRenderWidget::ResumeScreenRendering()
 {
 #ifdef _WIN32
   vtkWin32OpenGLRenderWindow::
