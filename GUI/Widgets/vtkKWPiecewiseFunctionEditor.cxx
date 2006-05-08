@@ -31,7 +31,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.50");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.51");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -375,7 +375,9 @@ int vtkKWPiecewiseFunctionEditor::SetFunctionPoint(
 
   if (new_id != id)
     {
-    vtkWarningMacro(<< "Setting a function point (id: " << id << ") parameter/values resulted in a different point (id:" << new_id << "). Inconsistent.");
+    vtkWarningMacro(<< "Setting a function point (id: " << id <<
+      ") parameter/values resulted in a different point (id:" <<
+      new_id << "). Inconsistent.");
     return 0;
     }
 
