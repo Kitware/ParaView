@@ -25,24 +25,41 @@
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/stl/string>
 
-//----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.104");
-
 #define VTK_KW_MENU_CB_VARNAME_PATTERN "CB_group%d"
 #define VTK_KW_MENU_RB_DEFAULT_GROUP "RB_group"
 #define VTK_KW_MENU_VAR_SEPARATOR "_"
 
 //----------------------------------------------------------------------------
+vtkStandardNewMacro( vtkKWMenu );
+vtkCxxRevisionMacro(vtkKWMenu, "1.105");
+
+//----------------------------------------------------------------------------
+class vtkKWMenuInternals
+{
+public:
+  int ItemCounter;
+  int IndexOfLastActiveItem;
+  vtksys_stl::string GetItemCommandTemp;
+};
+
+//----------------------------------------------------------------------------
 vtkKWMenu::vtkKWMenu()
 {
   this->TearOff = 0;
-  this->ItemCounter = 0;
+
+  this->Internals = new vtkKWMenuInternals;
+  this->Internals->ItemCounter = 0;
+  this->Internals->IndexOfLastActiveItem = -1;
 }
 
 //----------------------------------------------------------------------------
 vtkKWMenu::~vtkKWMenu()
 {
+  if (this->Internals)
+    {
+    delete this->Internals;
+    this->Internals = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -107,65 +124,15 @@ int vtkKWMenu::GetLabelWithoutUnderline(
 //----------------------------------------------------------------------------
 int vtkKWMenu::AddGeneric(const char* type, 
                           const char *label,
-                          vtkObject *object,
-                          const char *method,
                           const char* extra)
 {
-  if (!this->IsCreated())
-    {
-    return -1;
-    }
-
-  ostrstream str;
-  str << this->GetWidgetName() << " add " << type;
-
-  char *clean_label = NULL;
-  int underline_index, cleaned = 0;
-  if (label)
-    {
-    cleaned = 
-      this->GetLabelWithoutUnderline(label, &clean_label, &underline_index);
-    str << " -label {" << clean_label << "}";
-    }
-
-  if (object || method)
-    {
-    char *command = NULL;
-    this->SetObjectMethodCommand(&command, object, method);
-    str << " -command {" << command << "}" ;
-    delete [] command;
-    }
-
-  if(extra)
-    {
-    str << " " << extra;
-    }
-
-  str << ends;
-  
-  this->Script(str.str());
-  str.rdbuf()->freeze(0);
-
-  int index = this->GetNumberOfItems() - 1;
-  if (label)
-    {
-    this->SetItemHelpString(index, clean_label);
-    if (cleaned)
-      {
-      this->SetItemUnderline(index, underline_index);
-      delete [] clean_label;
-      }
-    }
-
-  return index;
+  return this->InsertGeneric(this->GetNumberOfItems(), type, label, extra);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWMenu::InsertGeneric(int index, 
                              const char* type, 
                              const char *label, 
-                             vtkObject *object,
-                             const char *method, 
                              const char* extra)
 {
   if (!this->IsCreated())
@@ -201,14 +168,6 @@ int vtkKWMenu::InsertGeneric(int index,
     str << " -label {" << clean_label << "}";
     }
 
-  if (object || method)
-    {
-    char *command = NULL;
-    this->SetObjectMethodCommand(&command, object, method);
-    str << " -command {" << command << "}" ;
-    delete [] command;
-    }
-
   if(extra)
     {
     str << " " << extra;
@@ -228,20 +187,33 @@ int vtkKWMenu::InsertGeneric(int index,
       delete [] clean_label;
       }
     }
-  
+
   return index;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::AddCommand(const char *label)
+{
+  return this->AddCommand(label, NULL, NULL);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWMenu::AddCommand(const char *label, 
                           vtkObject *object, const char *method)
 {
-  int index = this->AddGeneric("command", label, object, method, NULL);
+  int index = this->AddGeneric("command", label, NULL);
   if (index >= 0)
     {
+    this->SetItemCommand(index, object, method);
     this->InvokeEvent(vtkKWMenu::CommandItemAddedEvent, &index);
     }
   return index;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::InsertCommand(int index, const char *label)
+{
+  return this->InsertCommand(index, label, NULL, NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -249,9 +221,10 @@ int vtkKWMenu::InsertCommand(int index,
                              const char *label, 
                              vtkObject *object, const char *method)
 {
-  index = this->InsertGeneric(index, "command", label, object, method, NULL);
+  index = this->InsertGeneric(index, "command", label, NULL);
   if (index >= 0)
     {
+    this->SetItemCommand(index, object, method);
     this->InvokeEvent(vtkKWMenu::CommandItemAddedEvent, &index);
     }
   return index;
@@ -259,8 +232,8 @@ int vtkKWMenu::InsertCommand(int index,
 
 //----------------------------------------------------------------------------
 void vtkKWMenu::SetItemCommand(int index, 
-                                vtkObject *object, 
-                                const char *method)
+                               vtkObject *object, 
+                               const char *method)
 {
   if (!this->IsCreated() || index < 0 || index >= this->GetNumberOfItems())
     {
@@ -269,16 +242,54 @@ void vtkKWMenu::SetItemCommand(int index,
 
   char *command = NULL;
   this->SetObjectMethodCommand(&command, object, method);
-  this->Script("%s entryconfigure %d -command {%s}", 
-               this->GetWidgetName(), index, command);
+
+  // Let's add the CommandInvokedCallback wrapper
+  // The wrapper is used to send an event when the entry is invoked.
+
+  this->Script(
+    "%s entryconfigure %d -command {%s CommandInvokedCallback {%s}}", 
+    this->GetWidgetName(), index, this->GetTclName(), command);
+
   delete [] command;
+
   this->SetItemAcceleratorBindingOnToplevel(index);
 }
 
 //----------------------------------------------------------------------------
 const char* vtkKWMenu::GetItemCommand(int index)
 {
-  return this->GetItemOption(index, "-command");
+  const char *command = this->GetItemOption(index, "-command");
+  if (!command || !*command)
+    {
+    return command;
+    }
+
+  // Let's strip the CommandInvokedCallback wrapper out
+  // The wrapper is used to send an event when the entry is invoked.
+
+  vtksys_stl::string &temp = this->Internals->GetItemCommandTemp;
+  temp = command;
+
+  const char *pattern = "CommandInvokedCallback {";
+  vtksys_stl::string::size_type pos = temp.find(pattern);
+  if(pos != vtksys_stl::string::npos)
+    {
+    temp[temp.size() - 1] = '\0'; // Remove the last enclosing '}'
+    return temp.c_str() + pos + strlen(pattern);
+    }
+
+  return command;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::CommandInvokedCallback(const char *command)
+{
+  this->InvokeObjectMethodCommand(command);
+  int index = this->Internals->IndexOfLastActiveItem;
+  if (index >= 0)
+    {
+    this->InvokeEvent(vtkKWMenu::MenuItemInvokedEvent, &index);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -291,11 +302,13 @@ int vtkKWMenu::AddCheckButton(const char *label)
 int vtkKWMenu::AddCheckButton(const char *label,
                               vtkObject *object, const char *method)
 { 
-  int index = this->AddGeneric("checkbutton", label, object, method, NULL);
+  int index = this->AddGeneric("checkbutton", label, NULL);
   if (index >= 0)
     {
+    this->SetItemCommand(index, object, method);
     char group_name[200];
-    sprintf(group_name, VTK_KW_MENU_CB_VARNAME_PATTERN, this->ItemCounter++);
+    sprintf(group_name, VTK_KW_MENU_CB_VARNAME_PATTERN, 
+            this->Internals->ItemCounter++);
     this->SetItemVariable(index, this, group_name);
     this->SetItemSelectedValueAsInt(index, 1);
     this->SetItemDeselectedValueAsInt(index, 0);
@@ -316,12 +329,13 @@ int vtkKWMenu::InsertCheckButton(int index,
                                  const char *label,
                                  vtkObject *object, const char *method)
 { 
-  index = 
-    this->InsertGeneric(index, "checkbutton", label, object, method, NULL);
+  index = this->InsertGeneric(index, "checkbutton", label, NULL);
   if (index >= 0)
     {
+    this->SetItemCommand(index, object, method);
     char group_name[200];
-    sprintf(group_name, VTK_KW_MENU_CB_VARNAME_PATTERN, this->ItemCounter++);
+    sprintf(group_name, VTK_KW_MENU_CB_VARNAME_PATTERN, 
+            this->Internals->ItemCounter++);
     this->SetItemVariable(index, this, group_name);
     this->SetItemSelectedValueAsInt(index, 1);
     this->SetItemDeselectedValueAsInt(index, 0);
@@ -618,10 +632,10 @@ int vtkKWMenu::AddRadioButton(const char *label)
 int vtkKWMenu::AddRadioButton(const char *label,
                               vtkObject *object, const char *method)
 {
-  int index = 
-    this->AddGeneric("radiobutton", label, object, method, NULL);
+  int index = this->AddGeneric("radiobutton", label, NULL);
   if (index >= 0)
     {
+    this->SetItemCommand(index, object, method);
     this->SetItemVariable(index, this, VTK_KW_MENU_RB_DEFAULT_GROUP);
     this->SetItemSelectedValue(index, label);
     this->InvokeEvent(vtkKWMenu::RadioButtonItemAddedEvent, &index);
@@ -644,10 +658,10 @@ int vtkKWMenu::AddRadioButtonImage(const char *imgname,
   str += " -selectimage ";
   str += imgname;
   // Uses the imgname as label, so that the help string can work.
-  int index = 
-    this->AddGeneric("radiobutton", imgname, object, method, str.c_str());
+  int index = this->AddGeneric("radiobutton", imgname, str.c_str());
   if (index >= 0)
     {
+    this->SetItemCommand(index, object, method);
     this->SetItemVariable(index, this, VTK_KW_MENU_RB_DEFAULT_GROUP);
     this->SetItemSelectedValue(index, imgname);
     this->InvokeEvent(vtkKWMenu::RadioButtonItemAddedEvent, &index);
@@ -667,10 +681,10 @@ int vtkKWMenu::InsertRadioButton(int index,
                                  const char *label,
                                  vtkObject *object, const char *method)
 {
-  index = 
-    this->InsertGeneric(index, "radiobutton", label, object, method, NULL);
+  index = this->InsertGeneric(index, "radiobutton", label, NULL);
   if (index >= 0)
     {
+    this->SetItemCommand(index, object, method);
     this->SetItemVariable(index, this, VTK_KW_MENU_RB_DEFAULT_GROUP);
     this->SetItemSelectedValue(index, label);
     this->InvokeEvent(vtkKWMenu::RadioButtonItemAddedEvent, &index);
@@ -693,10 +707,10 @@ int vtkKWMenu::InsertRadioButtonImage(int index, const char *imgname,
   str += " -selectimage ";
   str += imgname;
   // Uses the imgname as label, so that the help string can work.
-  index = this->InsertGeneric(
-    index, "radiobutton", imgname, object, method, str.c_str());
+  index = this->InsertGeneric(index, "radiobutton", imgname, str.c_str());
   if (index >= 0)
     {
+    this->SetItemCommand(index, object, method);
     this->SetItemVariable(index, this, VTK_KW_MENU_RB_DEFAULT_GROUP);
     this->SetItemSelectedValue(index, imgname);
     this->InvokeEvent(vtkKWMenu::RadioButtonItemAddedEvent, &index);
@@ -800,7 +814,7 @@ int vtkKWMenu::GetIndexOfSelectedItemInGroup(const char *group_name)
 //----------------------------------------------------------------------------
 int vtkKWMenu::AddSeparator()
 {
-  int index = this->AddGeneric("separator", NULL, NULL, NULL, NULL);
+  int index = this->AddGeneric("separator", NULL, NULL);
   this->InvokeEvent(vtkKWMenu::SeparatorItemAddedEvent, &index);
   return index;
 }
@@ -808,7 +822,7 @@ int vtkKWMenu::AddSeparator()
 //----------------------------------------------------------------------------
 int vtkKWMenu::InsertSeparator(int index)
 {
-  index = this->InsertGeneric(index, "separator", NULL, NULL, NULL, NULL);
+  index = this->InsertGeneric(index, "separator", NULL, NULL);
   this->InvokeEvent(vtkKWMenu::SeparatorItemAddedEvent, &index);
   return index;
 }
@@ -817,7 +831,7 @@ int vtkKWMenu::InsertSeparator(int index)
 int vtkKWMenu::AddCascade(const char *label, 
                            vtkKWMenu* menu)
 {
-  int index = this->AddGeneric("cascade", label, NULL, NULL, NULL);
+  int index = this->AddGeneric("cascade", label, NULL);
   if (index >= 0)
     {
     this->SetItemCascade(index, menu);
@@ -831,7 +845,7 @@ int vtkKWMenu::InsertCascade(int index,
                              const char *label, 
                              vtkKWMenu* menu)
 {
-  index = this->InsertGeneric(index, "cascade", label, NULL, NULL, NULL);
+  index = this->InsertGeneric(index, "cascade", label, NULL);
   if (index >= 0)
     {
     this->SetItemCascade(index, menu);
@@ -1012,7 +1026,7 @@ int vtkKWMenu::GetIndexOfCommandItem(
     int nb_of_items = this->GetNumberOfItems();
     for (int i = 0; i < nb_of_items; i++)
       {
-      const char *command_opt = this->GetItemOption(i, "-command");
+      const char *command_opt = this->GetItemCommand(i);
       if (command_opt && !strcmp(command_opt, command))
         {
         delete [] command;
@@ -1516,8 +1530,12 @@ const char* vtkKWMenu::GetItemOption(int index, const char *option)
 //----------------------------------------------------------------------------
 void vtkKWMenu::DisplayHelpCallback(const char* widget_name)
 {
-  const char *help = this->GetItemHelpString(
-    this->GetIndexOfActiveItem(widget_name));
+  int index = this->GetIndexOfActiveItem(widget_name);
+  if (index >= 0)
+    {
+    this->Internals->IndexOfLastActiveItem = index;
+    }
+  const char *help = this->GetItemHelpString(index);
   if(help)
     {
     vtksys_stl::string help_safe(help);

@@ -20,6 +20,8 @@
 
 #include "vtkKWCoreWidget.h"
 
+class vtkKWMenuInternals;
+
 class KWWidgets_EXPORT vtkKWMenu : public vtkKWCoreWidget
 {
 public:
@@ -35,10 +37,12 @@ public:
   // evaluated as a simple command. 
   // A vtkKWMenu::CommandItemAddedEvent event is generated as well.
   // Return index of the menu item that was created/inserted, -1 on error
-  virtual int AddCommand(
-    const char *label, vtkObject *object, const char *method);
-  virtual int InsertCommand(
-    int index, const char *label, vtkObject *object, const char *method);
+  virtual int AddCommand(const char *label);
+  virtual int AddCommand(const char *label, 
+                         vtkObject *object, const char *method);
+  virtual int InsertCommand(int index, const char *label);
+  virtual int InsertCommand(int index, const char *label, 
+                            vtkObject *object, const char *method);
 
   // Description:
   // Set/Get the command for an existing menu item. This can also be used
@@ -426,8 +430,10 @@ public:
   virtual const char* GetItemOption(int index, const char *option);
 
   // Description:
-  // Events. The followign events are generated when the corresponding
-  // menu entries are addded or inserted.
+  // Events. The ItemAddedEvent events are generated when menu entries are
+  // addded or inserted (say, RadioButtonItemAddedEvent).
+  // The MenuItemInvokedEvent is sent when a menu entry is invoked (i.e.,
+  // a mouse button is released over the entry).
   // The following parameters are also passed as client data:
   // - the index of the new menu item: int
   //BTX
@@ -437,7 +443,8 @@ public:
     CheckButtonItemAddedEvent,
     CommandItemAddedEvent,
     SeparatorItemAddedEvent,
-    CascadeItemAddedEvent
+    CascadeItemAddedEvent,
+    MenuItemInvokedEvent
   };
   //ETX
 
@@ -553,6 +560,7 @@ public:
   // Description:
   // Callbacks: for active menu item doc line help
   virtual void DisplayHelpCallback(const char *widget_name);
+  virtual void CommandInvokedCallback(const char *command);
   
 protected:
   vtkKWMenu();
@@ -566,10 +574,8 @@ protected:
   // Add a generic menu item (defined by type)
   // Return index of the menu item that was created/inserted, -1 on error
   virtual int AddGeneric(const char *type, const char *label, 
-                         vtkObject *object, const char *method, 
                          const char* extra);
   virtual int InsertGeneric(int index, const char *type, const char *label, 
-                            vtkObject *object, const char *method, 
                             const char* extra);
 
   // Description: 
@@ -620,10 +626,12 @@ protected:
   // Description:
   // Add accelerator binding to toplevel
   virtual void SetItemAcceleratorBindingOnToplevel(int index);
+
+  // Description:
+  // PIMPL Encapsulation for STL containers
+  vtkKWMenuInternals *Internals;
   
 private:
-
-  int ItemCounter;
 
   vtkKWMenu(const vtkKWMenu&); // Not implemented
   void operator=(const vtkKWMenu&); // Not implemented
