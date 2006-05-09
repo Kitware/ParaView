@@ -43,7 +43,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.138");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.139");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -1670,7 +1670,7 @@ void vtkKWRenderWidget::ProcessCallbackCommandEvents(vtkObject *caller,
      change (see vtkWin32OpenGLRenderWindow::SetCurrentCursor for example). 
      Now what we need to do is to make sure we set the cursor shape of the Tk
      widget to the same shape VTK is trying to use too.
-     This does not work so well on event "recent" version of Tk (say 8.4.5)
+     This does not work so well on even "recent" version of Tk (say 8.4.5)
      because some native cursor shapes (like "hand") are not supported:
      what we see then is yet another flickering between the native "hand" 
      cursor and the non-native Tk "hand" cursor. This can be fixed by
@@ -1739,10 +1739,11 @@ void vtkKWRenderWidget::ProcessCallbackCommandEvents(vtkObject *caller,
             cptr = "hand2";
             break;
           }
-        if (this->GetParentTopLevel() && cptr)
+        vtkKWTopLevel *toplevel = this->GetParentTopLevel();
+        if (toplevel && cptr)
           {
-          this->GetParentTopLevel()->SetConfigurationOption(
-            "-cursor", cptr);
+          //cout << "vtkKWRenderWidget::...: [" << cptr << "]" << endl;
+          toplevel->SetConfigurationOption("-cursor", cptr);
           }
         break;
       }
