@@ -36,7 +36,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.52");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.53");
 
 // ---------------------------------------------------------------------------
 /* 
@@ -1091,7 +1091,7 @@ void vtkKWThumbWheel::InvokeEndCommand(double value)
 {
   this->InvokeThumbWheelCommand(this->EndCommand, value);
   this->InvokeEvent(
-    vtkKWThumbWheel::ThumbWheelValueStartChangingEvent, &value);
+    vtkKWThumbWheel::ThumbWheelValueChangedEvent, &value);
 }
 
 // ---------------------------------------------------------------------------
