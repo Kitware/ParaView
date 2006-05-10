@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// \date 4/20/2006
 
 #include "pqPipelineBrowser.h"
+#include "pqPipelineBrowserContextMenu.h"
 #include "pqFlatTreeView.h"
 #include "pqPipelineData.h"
 #include "pqPipelineModel.h"
@@ -90,6 +91,7 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
     // items. The context menu policy should be set to custom for this
     // behavior.
     this->TreeView->setContextMenuPolicy(Qt::CustomContextMenu);
+    new pqPipelineBrowserContextMenu(this);
     }
 
   // Add the tree view to the layout.
