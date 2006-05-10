@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWHistogram);
-vtkCxxRevisionMacro(vtkKWHistogram, "1.8");
+vtkCxxRevisionMacro(vtkKWHistogram, "1.9");
 
 //----------------------------------------------------------------------------
 vtkKWHistogram::vtkKWHistogram()
@@ -915,7 +915,10 @@ int vtkKWHistogram::RefreshImage(ImageDescriptor *desc)
         // contribution of the last one.  This is a fraction of the counts on
         // each bin.
         occurrence += bins_ptr[bin]       * (1.0 - (bin_real - bin));
-        occurrence += bins_ptr[next_bin]  * (next_bin_real - next_bin);
+        if (next_bin < this->GetNumberOfBins())
+          {
+          occurrence += bins_ptr[next_bin]  * (next_bin_real - next_bin);
+          }
         }
       else
         {
