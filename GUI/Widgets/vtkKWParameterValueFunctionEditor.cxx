@@ -39,7 +39,7 @@
 #include <vtksys/stl/algorithm>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.95");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.96");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -88,8 +88,10 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->ValueRangeVisibility              = 1;
   this->PointPositionInValueRange   = vtkKWParameterValueFunctionEditor::PointPositionValue;
   this->ParameterRangePosition      = vtkKWParameterValueFunctionEditor::ParameterRangePositionBottom;
-  this->CanvasHeight                = 55;
-  this->CanvasWidth                 = 55;
+  this->RequestedCanvasHeight       = 55;
+  this->CurrentCanvasHeight         = this->RequestedCanvasHeight;
+  this->RequestedCanvasWidth        = 150;
+  this->CurrentCanvasWidth          = this->RequestedCanvasWidth;
   this->ExpandCanvasWidth           = 1;
   this->LockPointsParameter         = 0;
   this->LockEndPointsParameter      = 0;
@@ -1226,8 +1228,9 @@ void vtkKWParameterValueFunctionEditor::CreateWidget()
   this->Canvas->SetHighlightThickness(0);
   this->Canvas->SetReliefToSolid();
   this->Canvas->SetBorderWidth(0);
-  this->Canvas->SetHeight(this->CanvasHeight);
-  this->Canvas->SetWidth(this->ExpandCanvasWidth ? 0 : this->CanvasWidth);
+  this->Canvas->SetHeight(this->RequestedCanvasHeight);
+  this->Canvas->SetWidth(
+    this->ExpandCanvasWidth ? 0 : this->RequestedCanvasWidth);
 
   // Both are needed, the first one in case the canvas is not visible, the
   // second because if it is visible, we want it to notify us precisely
@@ -2277,6 +2280,26 @@ double* vtkKWParameterValueFunctionEditor::GetWholeParameterRange()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::GetWholeParameterRange(
+  double &r0, double &r1)
+{ 
+  r0 = this->GetWholeParameterRange()[0]; 
+  r1 = this->GetWholeParameterRange()[1]; 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::GetWholeParameterRange(double range[2])
+{ 
+  this->GetWholeParameterRange(range[0], range[1]); 
+};
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetWholeParameterRange(double range[2])
+{ 
+  this->SetWholeParameterRange(range[0], range[1]); 
+};
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetWholeParameterRange(
   double r0, double r1)
 {
@@ -2338,6 +2361,28 @@ double* vtkKWParameterValueFunctionEditor::GetVisibleParameterRange()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::GetVisibleParameterRange(
+  double &r0, double &r1)
+{ 
+  r0 = this->GetVisibleParameterRange()[0]; 
+  r1 = this->GetVisibleParameterRange()[1]; 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::GetVisibleParameterRange(
+  double range[2])
+{ 
+  this->GetVisibleParameterRange(range[0], range[1]); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetVisibleParameterRange(
+  double range[2]) 
+{ 
+  this->SetVisibleParameterRange(range[0], range[1]); 
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetVisibleParameterRange(
   double r0, double r1)
 {
@@ -2358,6 +2403,20 @@ void vtkKWParameterValueFunctionEditor::GetRelativeVisibleParameterRange(
   double &r0, double &r1)
 {
   this->ParameterRange->GetRelativeRange(r0, r1);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::GetRelativeVisibleParameterRange(
+  double range[2])
+{ 
+  this->GetRelativeVisibleParameterRange(range[0], range[1]); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetRelativeVisibleParameterRange(
+  double range[2]) 
+{ 
+  this->SetRelativeVisibleParameterRange(range[0], range[1]); 
 }
 
 //----------------------------------------------------------------------------
@@ -2420,9 +2479,43 @@ void vtkKWParameterValueFunctionEditor::SetParameterRangePosition(int arg)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetParameterRangePositionToTop()
+{ 
+  this->SetParameterRangePosition(
+    vtkKWParameterValueFunctionEditor::ParameterRangePositionTop); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetParameterRangePositionToBottom()
+{ 
+  this->SetParameterRangePosition(
+    vtkKWParameterValueFunctionEditor::ParameterRangePositionBottom); 
+}
+
+//----------------------------------------------------------------------------
 double* vtkKWParameterValueFunctionEditor::GetWholeValueRange()
 {
   return this->ValueRange->GetWholeRange();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::GetWholeValueRange(
+  double &r0, double &r1)
+{ 
+  r0 = this->GetWholeValueRange()[0]; 
+  r1 = this->GetWholeValueRange()[1]; 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::GetWholeValueRange(double range[2])
+{ 
+  this->GetWholeValueRange(range[0], range[1]); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetWholeValueRange(double range[2]) 
+{ 
+  this->SetWholeValueRange(range[0], range[1]); 
 }
 
 //----------------------------------------------------------------------------
@@ -2472,6 +2565,26 @@ double* vtkKWParameterValueFunctionEditor::GetVisibleValueRange()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::GetVisibleValueRange(
+  double &r0, double &r1)
+{ 
+  r0 = this->GetVisibleValueRange()[0]; 
+  r1 = this->GetVisibleValueRange()[1]; 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::GetVisibleValueRange(double range[2])
+{ 
+  this->GetVisibleValueRange(range[0], range[1]); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetVisibleValueRange(double range[2]) 
+{ 
+  this->SetVisibleValueRange(range[0], range[1]); 
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetVisibleValueRange(
   double r0, double r1)
 {
@@ -2486,6 +2599,20 @@ void vtkKWParameterValueFunctionEditor::GetRelativeVisibleValueRange(
   double &r0, double &r1)
 {
   this->ValueRange->GetRelativeRange(r0, r1);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::GetRelativeVisibleValueRange(
+  double range[2])
+{ 
+  this->GetRelativeVisibleValueRange(range[0], range[1]); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetRelativeVisibleValueRange(
+  double range[2]) 
+{ 
+  this->SetRelativeVisibleValueRange(range[0], range[1]); 
 }
 
 //----------------------------------------------------------------------------
@@ -2544,6 +2671,34 @@ void vtkKWParameterValueFunctionEditor::SetPointPositionInValueRange(int arg)
   this->Modified();
 
   this->RedrawFunction();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointPositionInValueRangeToValue()
+{ 
+  this->SetPointPositionInValueRange(
+    vtkKWParameterValueFunctionEditor::PointPositionValue); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointPositionInValueRangeToTop()
+{ 
+  this->SetPointPositionInValueRange(
+    vtkKWParameterValueFunctionEditor::PointPositionTop); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointPositionInValueRangeToBottom()
+{ 
+  this->SetPointPositionInValueRange(
+    vtkKWParameterValueFunctionEditor::PointPositionBottom); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointPositionInValueRangeToCenter()
+{ 
+  this->SetPointPositionInValueRange(
+    vtkKWParameterValueFunctionEditor::PointPositionCenter); 
 }
 
 //----------------------------------------------------------------------------
@@ -2660,6 +2815,20 @@ void vtkKWParameterValueFunctionEditor::SetRangeLabelPosition(int arg)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetRangeLabelPositionToDefault()
+{ 
+  this->SetRangeLabelPosition(
+    vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetRangeLabelPositionToTop()
+{ 
+  this->SetRangeLabelPosition(
+    vtkKWParameterValueFunctionEditor::RangeLabelPositionTop); 
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetPointEntriesPosition(int arg)
 {
   if (arg < vtkKWParameterValueFunctionEditor::PointEntriesPositionDefault)
@@ -2682,6 +2851,20 @@ void vtkKWParameterValueFunctionEditor::SetPointEntriesPosition(int arg)
   this->Modified();
 
   this->Pack();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointEntriesPositionToDefault()
+{ 
+  this->SetPointEntriesPosition(
+    vtkKWParameterValueFunctionEditor::PointEntriesPositionDefault); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointEntriesPositionToRight()
+{ 
+  this->SetPointEntriesPosition(
+    vtkKWParameterValueFunctionEditor::PointEntriesPositionRight); 
 }
 
 //----------------------------------------------------------------------------
@@ -2787,12 +2970,12 @@ void vtkKWParameterValueFunctionEditor::SetUserFrameVisibility(int arg)
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetCanvasHeight(int arg)
 {
-  if (this->CanvasHeight == arg || arg < VTK_KW_PVFE_CANVAS_HEIGHT_MIN)
+  if (this->RequestedCanvasHeight == arg || arg < VTK_KW_PVFE_CANVAS_HEIGHT_MIN)
     {
     return;
     }
 
-  this->CanvasHeight = arg;
+  this->RequestedCanvasHeight = arg;
 
   this->Modified();
 
@@ -2800,18 +2983,30 @@ void vtkKWParameterValueFunctionEditor::SetCanvasHeight(int arg)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::GetCanvasHeight()
+{
+  return this->RequestedCanvasHeight;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetCanvasWidth(int arg)
 {
-  if (this->CanvasWidth == arg || arg < VTK_KW_PVFE_CANVAS_WIDTH_MIN)
+  if (this->RequestedCanvasWidth == arg || arg < VTK_KW_PVFE_CANVAS_WIDTH_MIN)
     {
     return;
     }
 
-  this->CanvasWidth = arg;
+  this->RequestedCanvasWidth = arg;
 
   this->Modified();
 
   this->Redraw();
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::GetCanvasWidth()
+{
+  return this->RequestedCanvasWidth;
 }
 
 //----------------------------------------------------------------------------
@@ -2915,6 +3110,20 @@ void vtkKWParameterValueFunctionEditor::SetFunctionLineStyle(int arg)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetFunctionLineStyleToSolid()
+{ 
+  this->SetFunctionLineStyle(
+    vtkKWParameterValueFunctionEditor::LineStyleSolid); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetFunctionLineStyleToDash()
+{ 
+  this->SetFunctionLineStyle(
+    vtkKWParameterValueFunctionEditor::LineStyleDash); 
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetPointStyle(int arg)
 {
   if (arg < vtkKWParameterValueFunctionEditor::PointStyleDisc)
@@ -2943,6 +3152,55 @@ void vtkKWParameterValueFunctionEditor::SetPointStyle(int arg)
   this->CanvasRemoveTag(vtkKWParameterValueFunctionEditor::PointTag);
 
   this->RedrawFunction();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointStyleToDisc()
+{ 
+  this->SetPointStyle(
+    vtkKWParameterValueFunctionEditor::PointStyleDisc); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointStyleToCursorDown()
+{ 
+  this->SetPointStyle(
+    vtkKWParameterValueFunctionEditor::PointStyleCursorDown); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointStyleToCursorUp()
+{ 
+  this->SetPointStyle(
+    vtkKWParameterValueFunctionEditor::PointStyleCursorUp); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointStyleToCursorLeft()
+{ 
+  this->SetPointStyle(
+    vtkKWParameterValueFunctionEditor::PointStyleCursorLeft); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointStyleToCursorRight()
+{ 
+  this->SetPointStyle(
+    vtkKWParameterValueFunctionEditor::PointStyleCursorRight); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointStyleToRectangle()
+{ 
+  this->SetPointStyle(
+    vtkKWParameterValueFunctionEditor::PointStyleRectangle); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointStyleToDefault()
+{ 
+  this->SetPointStyle(
+    vtkKWParameterValueFunctionEditor::PointStyleDefault); 
 }
 
 //----------------------------------------------------------------------------
@@ -3417,6 +3675,68 @@ void vtkKWParameterValueFunctionEditor::SetPointMarginToCanvas(int arg)
   this->Modified();
 
   this->Redraw();
+
+  // The previous call does not call RedrawSizeDependentElements because
+  // technically the canvas size did not change, just the margin. Force
+  // a redraw.
+
+  this->RedrawSizeDependentElements();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointMarginToCanvasToNone()
+{ 
+  this->SetPointMarginToCanvas(
+    vtkKWParameterValueFunctionEditor::PointMarginNone); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointMarginToCanvasToLeftSide()
+{ 
+  this->SetPointMarginToCanvas(
+    vtkKWParameterValueFunctionEditor::PointMarginLeftSide); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointMarginToCanvasToRightSide()
+{ 
+  this->SetPointMarginToCanvas(
+    vtkKWParameterValueFunctionEditor::PointMarginRightSide); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointMarginToCanvasToHorizontalSides()
+{ 
+  this->SetPointMarginToCanvas(
+    vtkKWParameterValueFunctionEditor::PointMarginHorizontalSides); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointMarginToCanvasToTopSide()
+{ 
+  this->SetPointMarginToCanvas(
+    vtkKWParameterValueFunctionEditor::PointMarginTopSide); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointMarginToCanvasToBottomSide()
+{ 
+  this->SetPointMarginToCanvas(
+    vtkKWParameterValueFunctionEditor::PointMarginBottomSide); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointMarginToCanvasToVerticalSides()
+{ 
+  this->SetPointMarginToCanvas(
+    vtkKWParameterValueFunctionEditor::PointMarginVerticalSides); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointMarginToCanvasToAllSides()
+{ 
+  this->SetPointMarginToCanvas(
+    vtkKWParameterValueFunctionEditor::PointMarginAllSides); 
 }
 
 //----------------------------------------------------------------------------
@@ -3440,6 +3760,13 @@ void vtkKWParameterValueFunctionEditor::SetFrameBackgroundColor(
   this->Modified();
 
   this->RedrawRangeFrame();
+  this->RedrawHistogram(); // for the background of the histogram
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetFrameBackgroundColor(double rgb[3])
+{ 
+  this->SetFrameBackgroundColor(rgb[0], rgb[1], rgb[2]); 
 }
 
 //----------------------------------------------------------------------------
@@ -3450,6 +3777,12 @@ void vtkKWParameterValueFunctionEditor::SetBackgroundColor(double r, double g, d
     {
     this->Canvas->SetBackgroundColor(r, g, b);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetBackgroundColor(double rgb[3])
+{ 
+  this->Superclass::SetBackgroundColor(rgb); 
 }
 
 //----------------------------------------------------------------------------
@@ -3476,6 +3809,12 @@ void vtkKWParameterValueFunctionEditor::SetHistogramColor(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetHistogramColor(double rgb[3])
+{ 
+  this->SetHistogramColor(rgb[0], rgb[1], rgb[2]); 
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetSecondaryHistogramColor(
   double r, double g, double b)
 {
@@ -3496,6 +3835,13 @@ void vtkKWParameterValueFunctionEditor::SetSecondaryHistogramColor(
   this->Modified();
 
   this->RedrawHistogram();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetSecondaryHistogramColor(
+  double rgb[3])
+{ 
+  this->SetSecondaryHistogramColor(rgb[0], rgb[1], rgb[2]); 
 }
 
 //----------------------------------------------------------------------------
@@ -3522,6 +3868,12 @@ void vtkKWParameterValueFunctionEditor::SetParameterCursorColor(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetParameterCursorColor(double rgb[3])
+{ 
+  this->SetParameterCursorColor(rgb[0], rgb[1], rgb[2]); 
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetPointColor(
   double r, double g, double b)
 {
@@ -3542,6 +3894,12 @@ void vtkKWParameterValueFunctionEditor::SetPointColor(
   this->Modified();
 
   this->RedrawFunction();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointColor(double rgb[3])
+{ 
+  this->SetPointColor(rgb[0], rgb[1], rgb[2]); 
 }
 
 //----------------------------------------------------------------------------
@@ -3568,6 +3926,12 @@ void vtkKWParameterValueFunctionEditor::SetSelectedPointColor(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetSelectedPointColor(double rgb[3])
+{ 
+  this->SetSelectedPointColor(rgb[0], rgb[1], rgb[2]); 
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetPointTextColor(
   double r, double g, double b)
 {
@@ -3591,6 +3955,12 @@ void vtkKWParameterValueFunctionEditor::SetPointTextColor(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetPointTextColor(double rgb[3])
+{ 
+  this->SetPointTextColor(rgb[0], rgb[1], rgb[2]); 
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetSelectedPointTextColor(
   double r, double g, double b)
 {
@@ -3611,6 +3981,13 @@ void vtkKWParameterValueFunctionEditor::SetSelectedPointTextColor(
   this->Modified();
 
   this->RedrawPoint(this->GetSelectedPoint());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetSelectedPointTextColor(
+  double rgb[3])
+{ 
+  this->SetSelectedPointTextColor(rgb[0], rgb[1], rgb[2]); 
 }
 
 //----------------------------------------------------------------------------
@@ -3681,6 +4058,27 @@ void vtkKWParameterValueFunctionEditor::SetHistogramStyle(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetHistogramStyleToBars()
+{ 
+  this->SetHistogramStyle(
+    vtkKWParameterValueFunctionEditor::HistogramStyleBars); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetHistogramStyleToDots()
+{ 
+  this->SetHistogramStyle(
+    vtkKWParameterValueFunctionEditor::HistogramStyleDots); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetHistogramStyleToPolyLine()
+{ 
+  this->SetHistogramStyle(
+    vtkKWParameterValueFunctionEditor::HistogramStylePolyLine); 
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetSecondaryHistogramStyle(
   int arg)
 {
@@ -3699,6 +4097,64 @@ void vtkKWParameterValueFunctionEditor::SetSecondaryHistogramStyle(
     vtkKWParameterValueFunctionEditor::SecondaryHistogramTag);
 
   this->RedrawHistogram();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetSecondaryHistogramStyleToBars()
+{ 
+  this->SetSecondaryHistogramStyle(
+    vtkKWParameterValueFunctionEditor::HistogramStyleBars); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetSecondaryHistogramStyleToDots()
+{ 
+  this->SetSecondaryHistogramStyle(
+    vtkKWParameterValueFunctionEditor::HistogramStyleDots); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetSecondaryHistogramStyleToPolyLine()
+{ 
+  this->SetSecondaryHistogramStyle(
+    vtkKWParameterValueFunctionEditor::HistogramStylePolyLine); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::DisplayHistogramOnly()
+{
+  this->ExpandCanvasWidthOff();
+  this->LabelVisibilityOff();
+  this->ValueRangeVisibilityOff();
+  this->ValueRangeLabelVisibilityOff();
+  this->ParameterRangeVisibilityOff();
+  this->ParameterRangeLabelVisibilityOff();
+  this->SetPointMarginToCanvasToNone();
+  this->FunctionLineVisibilityOff();
+  this->PointVisibilityOff();
+  this->PointGuidelineVisibilityOff();
+  this->PointEntriesVisibilityOff();
+  this->ParameterEntryVisibilityOff();
+
+  double *hist_range = 
+    this->Histogram ? this->Histogram->GetRange() : NULL;
+  double *hist2_range = 
+    this->SecondaryHistogram ? this->SecondaryHistogram->GetRange() : NULL;
+  if (hist_range && hist2_range)
+    {
+    if (hist2_range[0] < hist_range[0])
+      {
+      hist_range[0] = hist2_range[0];
+      }
+    if (hist2_range[1] > hist_range[1])
+      {
+      hist_range[1] = hist2_range[1];
+      }
+    }
+  if (hist_range || hist2_range)
+    {
+    this->SetWholeParameterRange(hist_range ? hist_range : hist2_range);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -4226,7 +4682,8 @@ void vtkKWParameterValueFunctionEditor::GetCanvasScalingFactors(
   double *p_v_range = this->GetVisibleParameterRange();
   if (p_v_range[1] != p_v_range[0])
     {
-    factors[0] = (double)(this->CanvasWidth - 1 - margin_left - margin_right)
+    factors[0] = 
+      (double)(this->CurrentCanvasWidth - 1 - margin_left - margin_right)
       / (p_v_range[1] - p_v_range[0]);
     }
   else
@@ -4237,7 +4694,8 @@ void vtkKWParameterValueFunctionEditor::GetCanvasScalingFactors(
   double *v_v_range = this->GetVisibleValueRange();
   if (v_v_range[1] != v_v_range[0])
     {
-    factors[1] = (double)(this->CanvasHeight - 1 - margin_top - margin_bottom)
+    factors[1] = 
+      (double)(this->CurrentCanvasHeight - 1 - margin_top - margin_bottom)
       / (v_v_range[1] - v_v_range[0]);
     }
   else
@@ -4327,12 +4785,12 @@ void vtkKWParameterValueFunctionEditor::GetCanvasScrollRegion(
 
   if (x2)
     {
-    *x2 = (c_x + (double)(this->CanvasWidth - 0));
+    *x2 = (c_x + (double)(this->CurrentCanvasWidth - 0));
     }
 
   if (y2)
     {
-    *y2 = (c_y + (double)(this->CanvasHeight - 0));
+    *y2 = (c_y + (double)(this->CurrentCanvasHeight - 0));
     }
 }
 
@@ -4418,37 +4876,42 @@ void vtkKWParameterValueFunctionEditor::Redraw()
     if (this->CanvasVisibility)
       {
       vtkKWTkUtilities::GetWidgetSize(
-        this->Canvas, &this->CanvasWidth, NULL);
+        this->Canvas, &this->CurrentCanvasWidth, NULL);
       }
     else
       {
       vtkKWTkUtilities::GetWidgetSize(
-        this, &this->CanvasWidth, NULL);
-
-      this->CanvasWidth -= (this->GetBorderWidth() + this->GetPadX())* 2;
+        this, &this->CurrentCanvasWidth, NULL);
+      this->CurrentCanvasWidth -= 
+        (this->GetBorderWidth() + this->GetPadX())* 2;
       }
-    if (this->CanvasWidth < VTK_KW_PVFE_CANVAS_WIDTH_MIN)
+    if (this->CurrentCanvasWidth < VTK_KW_PVFE_CANVAS_WIDTH_MIN)
       {
-      this->CanvasWidth = VTK_KW_PVFE_CANVAS_WIDTH_MIN;
+      this->CurrentCanvasWidth = VTK_KW_PVFE_CANVAS_WIDTH_MIN;
       }
     }
+  else
+    {
+    this->CurrentCanvasWidth = this->RequestedCanvasWidth;
+    }
+  this->CurrentCanvasHeight = this->RequestedCanvasHeight;
 
-  this->Canvas->SetWidth(this->CanvasWidth);
-  this->Canvas->SetHeight(this->CanvasHeight);
+  this->Canvas->SetWidth(this->CurrentCanvasWidth);
+  this->Canvas->SetHeight(this->CurrentCanvasHeight);
 
   if (this->ValueTicksVisibility)
     {
-    this->ValueTicksCanvas->SetHeight(this->CanvasHeight);
+    this->ValueTicksCanvas->SetHeight(this->CurrentCanvasHeight);
     }
 
   if (this->ParameterTicksVisibility)
     {
-    this->ParameterTicksCanvas->SetWidth(this->CanvasWidth);
+    this->ParameterTicksCanvas->SetWidth(this->CurrentCanvasWidth);
     }
 
   if (this->IsGuidelineValueCanvasUsed())
     {
-    this->GuidelineValueCanvas->SetWidth(this->CanvasWidth);
+    this->GuidelineValueCanvas->SetWidth(this->CurrentCanvasWidth);
     }
 
   // In that visible area, we must fit the visible parameter in the
@@ -4491,8 +4954,8 @@ void vtkKWParameterValueFunctionEditor::Redraw()
   vtkKWParameterValueFunctionEditor::Ranges ranges;
   ranges.GetRangesFrom(this);
 
-  if (old_c_width != this->CanvasWidth || 
-      old_c_height != this->CanvasHeight ||
+  if (old_c_width != this->CurrentCanvasWidth || 
+      old_c_height != this->CurrentCanvasHeight ||
       ranges.NeedResizeComparedTo(&this->LastRanges))
     {
     this->RedrawSizeDependentElements();
@@ -5730,7 +6193,7 @@ void vtkKWParameterValueFunctionEditor::UpdateHistogramImageDescriptor(
   desc->SetRange(p_v_range_ext[0], p_v_range_ext[1]);
   desc->SetDimensions(
     bounds[1] - bounds[0] + 1, 
-    this->CanvasHeight - margin_top - margin_bottom);
+    this->CurrentCanvasHeight - margin_top - margin_bottom);
 
   desc->SetBackgroundColor(this->FrameBackgroundColor);
   desc->DrawGrid = 0;
@@ -6110,6 +6573,21 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
              << vtkKWParameterValueFunctionEditor::SecondaryHistogramTag 
              << endl;
       }
+    }
+
+  // Some re-ordering may be needed to show the polyline on top of the image
+
+  if (!has_hist_tag && hist_is_image)
+    {
+    tk_cmd << canv << " lower " 
+           << vtkKWParameterValueFunctionEditor::HistogramTag << " " 
+           << vtkKWParameterValueFunctionEditor::SecondaryHistogramTag << endl;
+    }
+  if (!has_secondary_hist_tag && secondary_hist_is_image)
+    {
+    tk_cmd << canv << " lower " 
+           << vtkKWParameterValueFunctionEditor::SecondaryHistogramTag 
+           << " " << vtkKWParameterValueFunctionEditor::HistogramTag << endl;
     }
 
   tk_cmd << ends;
@@ -6526,6 +7004,20 @@ void vtkKWParameterValueFunctionEditor::SetDisplayedWholeParameterRange(
   this->UpdatePointEntries(this->GetSelectedPoint());
 
   this->RedrawSizeDependentElements();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetDisplayedWholeParameterRange(
+  double range[2]) 
+{ 
+  this->SetDisplayedWholeParameterRange(range[0], range[1]); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::GetDisplayedVisibleParameterRange(
+  double range[2])
+{ 
+  this->GetDisplayedVisibleParameterRange(range[0], range[1]); 
 }
 
 //----------------------------------------------------------------------------
@@ -7186,18 +7678,18 @@ vtkKWParameterValueFunctionEditor::FindClosestItemWithTagAtCanvasCoordinates(
     {
     x = 0;
     }
-  else if (x > this->CanvasWidth - 1)
+  else if (x > this->CurrentCanvasWidth - 1)
     {
-    x = this->CanvasWidth - 1;
+    x = this->CurrentCanvasWidth - 1;
     }
 
   if (y < 0)
     {
     y = 0;
     }
-  else if (y > this->CanvasHeight - 1)
+  else if (y > this->CurrentCanvasHeight - 1)
     {
-    y = this->CanvasHeight - 1;
+    y = this->CurrentCanvasHeight - 1;
     }
 
   // Get the real canvas coordinates
@@ -7343,9 +7835,9 @@ void vtkKWParameterValueFunctionEditor::MovePointCallback(
   int warn_delete = 
     (this->FunctionPointCanBeRemoved(this->GetSelectedPoint()) &&
      (x < -VTK_KW_PVFE_CANVAS_DELETE_MARGIN ||
-      x > this->CanvasWidth - 1 + VTK_KW_PVFE_CANVAS_DELETE_MARGIN ||
+      x > this->CurrentCanvasWidth - 1 + VTK_KW_PVFE_CANVAS_DELETE_MARGIN ||
       y < -VTK_KW_PVFE_CANVAS_DELETE_MARGIN ||
-      y > this->CanvasHeight - 1 + VTK_KW_PVFE_CANVAS_DELETE_MARGIN));
+      y > this->CurrentCanvasHeight - 1 + VTK_KW_PVFE_CANVAS_DELETE_MARGIN));
 
   // If we are out of the canvas, clamp the coordinates
 
@@ -7353,18 +7845,18 @@ void vtkKWParameterValueFunctionEditor::MovePointCallback(
     {
     x = 0;
     }
-  else if (x > this->CanvasWidth - 1)
+  else if (x > this->CurrentCanvasWidth - 1)
     {
-    x = this->CanvasWidth - 1;
+    x = this->CurrentCanvasWidth - 1;
     }
 
   if (y < 0)
     {
     y = 0;
     }
-  else if (y > this->CanvasHeight - 1)
+  else if (y > this->CurrentCanvasHeight - 1)
     {
-    y = this->CanvasHeight - 1;
+    y = this->CurrentCanvasHeight - 1;
     }
 
   // Get the real canvas coordinates
@@ -7494,9 +7986,9 @@ void vtkKWParameterValueFunctionEditor::EndInteractionCallback(int x, int y)
 
   if (this->FunctionPointCanBeRemoved(this->GetSelectedPoint()) &&
       (x < -VTK_KW_PVFE_CANVAS_DELETE_MARGIN ||
-       x > this->CanvasWidth - 1 + VTK_KW_PVFE_CANVAS_DELETE_MARGIN ||
+       x > this->CurrentCanvasWidth - 1 + VTK_KW_PVFE_CANVAS_DELETE_MARGIN ||
        y < -VTK_KW_PVFE_CANVAS_DELETE_MARGIN ||
-       y > this->CanvasHeight - 1 + VTK_KW_PVFE_CANVAS_DELETE_MARGIN))
+       y > this->CurrentCanvasHeight - 1 + VTK_KW_PVFE_CANVAS_DELETE_MARGIN))
     {
     this->RemovePoint(this->GetSelectedPoint());
     }
@@ -7550,9 +8042,9 @@ void vtkKWParameterValueFunctionEditor::ParameterCursorMoveCallback(int x)
     {
     x = 0;
     }
-  else if (x > this->CanvasWidth - 1)
+  else if (x > this->CurrentCanvasWidth - 1)
     {
-    x = this->CanvasWidth - 1;
+    x = this->CurrentCanvasWidth - 1;
     }
 
   // Get the real canvas coordinates
@@ -7617,8 +8109,10 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
      << (this->PointEntriesVisibility ? "On" : "Off") << endl;
   os << indent << "UserFrameVisibility: "
      << (this->UserFrameVisibility ? "On" : "Off") << endl;
-  os << indent << "CanvasHeight: "<< this->CanvasHeight << endl;
-  os << indent << "CanvasWidth: "<< this->CanvasWidth << endl;
+  os << indent << "CanvasHeight: "<< this->RequestedCanvasHeight << endl;
+  os << indent << "CurrentCanvasHeight: "<< this->CurrentCanvasHeight << endl;
+  os << indent << "CanvasWidth: "<< this->RequestedCanvasWidth << endl;
+  os << indent << "CurrentCanvasWidth: "<< this->CurrentCanvasWidth << endl;
   os << indent << "ExpandCanvasWidth: "
      << (this->ExpandCanvasWidth ? "On" : "Off") << endl;
   os << indent << "PointRadius: "<< this->PointRadius << endl;

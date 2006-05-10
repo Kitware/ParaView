@@ -22,7 +22,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.21");
+vtkCxxRevisionMacro(vtkKWParameterValueHermiteFunctionEditor, "1.22");
 
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointTag = "midpoint_tag";
 const char *vtkKWParameterValueHermiteFunctionEditor::MidPointGuidelineTag = "midpoint_guideline_tag";
@@ -1658,9 +1658,9 @@ void vtkKWParameterValueHermiteFunctionEditor::MoveMidPointCallback(
     {
     x = 0;
     }
-  else if (x > this->CanvasWidth - 1)
+  else if (x > this->CurrentCanvasWidth - 1)
     {
-    x = this->CanvasWidth - 1;
+    x = this->CurrentCanvasWidth - 1;
     }
 
   // Get the real canvas coordinates
@@ -1701,7 +1701,7 @@ void vtkKWParameterValueHermiteFunctionEditor::MoveMidPointCallback(
     cursor = "sb_v_double_arrow";
     double sharpness = this->LastMidPointSelectionSharpness - 
       ((double)(y - this->LastMidPointSelectionCanvasCoordinateY) /
-       (double)this->CanvasHeight) * 2.0;
+       (double)this->CurrentCanvasHeight) * 2.0;
     if (sharpness < 0.0)
       {
       sharpness = 0.0;
@@ -1750,6 +1750,18 @@ void vtkKWParameterValueHermiteFunctionEditor::EndMidPointInteractionCallback(
     {
     this->Canvas->SetConfigurationOption("-cursor", NULL);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueHermiteFunctionEditor::DisplayHistogramOnly()
+{
+  this->Superclass::DisplayHistogramOnly();
+
+  this->MidPointEntryVisibilityOff();
+  this->SharpnessEntryVisibilityOff();
+  this->MidPointVisibilityOff();
+  this->MidPointGuidelineVisibilityOff();
+  this->MidPointGuidelineValueVisibilityOff();
 }
 
 //----------------------------------------------------------------------------

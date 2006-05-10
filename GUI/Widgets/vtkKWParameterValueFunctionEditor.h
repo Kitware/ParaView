@@ -58,13 +58,9 @@ public:
   // the same relative visible range within the whole range.
   virtual double* GetWholeParameterRange();
   virtual void SetWholeParameterRange(double r0, double r1);
-  virtual void GetWholeParameterRange(double &r0, double &r1)
-    { r0 = this->GetWholeParameterRange()[0]; 
-    r1 = this->GetWholeParameterRange()[1]; }
-  virtual void GetWholeParameterRange(double range[2])
-    { this->GetWholeParameterRange(range[0], range[1]); };
-  virtual void SetWholeParameterRange(double range[2]) 
-    { this->SetWholeParameterRange(range[0], range[1]); };
+  virtual void GetWholeParameterRange(double &r0, double &r1);
+  virtual void GetWholeParameterRange(double range[2]);
+  virtual void SetWholeParameterRange(double range[2]);
 
   // Description:
   // Set the whole parameter range to the function parameter range. 
@@ -78,13 +74,9 @@ public:
   // visible (zoomed).
   virtual double* GetVisibleParameterRange();
   virtual void SetVisibleParameterRange(double r0, double r1);
-  virtual void GetVisibleParameterRange(double &r0, double &r1)
-    { r0 = this->GetVisibleParameterRange()[0]; 
-    r1 = this->GetVisibleParameterRange()[1]; }
-  virtual void GetVisibleParameterRange(double range[2])
-    { this->GetVisibleParameterRange(range[0], range[1]); };
-  virtual void SetVisibleParameterRange(double range[2]) 
-    { this->SetVisibleParameterRange(range[0], range[1]); };
+  virtual void GetVisibleParameterRange(double &r0, double &r1);
+  virtual void GetVisibleParameterRange(double range[2]);
+  virtual void SetVisibleParameterRange(double range[2]);
 
   // Description:
   // Set the visible parameter range to the whole parameter range
@@ -95,10 +87,8 @@ public:
   // in the whole parameter range.
   virtual void SetRelativeVisibleParameterRange(double r0, double r1);
   virtual void GetRelativeVisibleParameterRange(double &r0, double &r1);
-  virtual void GetRelativeVisibleParameterRange(double range[2])
-    { this->GetRelativeVisibleParameterRange(range[0], range[1]); };
-  virtual void SetRelativeVisibleParameterRange(double range[2]) 
-    { this->SetRelativeVisibleParameterRange(range[0], range[1]); };
+  virtual void GetRelativeVisibleParameterRange(double range[2]);
+  virtual void SetRelativeVisibleParameterRange(double range[2]);
 
   // Description:
   // Set/Get the whole value range.
@@ -106,13 +96,9 @@ public:
   // the same relative visible range within the whole range.
   virtual double* GetWholeValueRange();
   virtual void SetWholeValueRange(double r0, double r1);
-  virtual void GetWholeValueRange(double &r0, double &r1)
-    { r0 = this->GetWholeValueRange()[0]; 
-    r1 = this->GetWholeValueRange()[1]; }
-  virtual void GetWholeValueRange(double range[2])
-    { this->GetWholeValueRange(range[0], range[1]); };
-  virtual void SetWholeValueRange(double range[2]) 
-    { this->SetWholeValueRange(range[0], range[1]); };
+  virtual void GetWholeValueRange(double &r0, double &r1);
+  virtual void GetWholeValueRange(double range[2]);
+  virtual void SetWholeValueRange(double range[2]);
 
   // Description:
   // Set/Get the visible value range.
@@ -120,23 +106,17 @@ public:
   // visible (zoomed).
   virtual double* GetVisibleValueRange();
   virtual void SetVisibleValueRange(double r0, double r1);
-  virtual void GetVisibleValueRange(double &r0, double &r1)
-    { r0 = this->GetVisibleValueRange()[0]; 
-    r1 = this->GetVisibleValueRange()[1]; }
-  virtual void GetVisibleValueRange(double range[2])
-    { this->GetVisibleValueRange(range[0], range[1]); };
-  virtual void SetVisibleValueRange(double range[2]) 
-    { this->SetVisibleValueRange(range[0], range[1]); };
+  virtual void GetVisibleValueRange(double &r0, double &r1);
+  virtual void GetVisibleValueRange(double range[2]);
+  virtual void SetVisibleValueRange(double range[2]);
 
   // Description:
   // Set/Get the visible value range in the editor as relative positions
   // in the whole value range.
   virtual void SetRelativeVisibleValueRange(double r0, double r1);
   virtual void GetRelativeVisibleValueRange(double &r0, double &r1);
-  virtual void GetRelativeVisibleValueRange(double range[2])
-    { this->GetRelativeVisibleValueRange(range[0], range[1]); };
-  virtual void SetRelativeVisibleValueRange(double range[2]) 
-    { this->SetRelativeVisibleValueRange(range[0], range[1]); };
+  virtual void GetRelativeVisibleValueRange(double range[2]);
+  virtual void SetRelativeVisibleValueRange(double range[2]);
 
   // Description:
   // If supported, set the label position in regards to the rest of
@@ -169,12 +149,8 @@ public:
   //ETX
   virtual void SetParameterRangePosition(int);
   vtkGetMacro(ParameterRangePosition, int);
-  virtual void SetParameterRangePositionToTop()
-    { this->SetParameterRangePosition(
-      vtkKWParameterValueFunctionEditor::ParameterRangePositionTop); };
-  virtual void SetParameterRangePositionToBottom()
-    { this->SetParameterRangePosition(
-      vtkKWParameterValueFunctionEditor::ParameterRangePositionBottom); };
+  virtual void SetParameterRangePositionToTop();
+  virtual void SetParameterRangePositionToBottom();
 
   // Description:
   // Set/Get the value range UI visibility (the slider).
@@ -214,11 +190,9 @@ public:
   // functions return the same parameter.
   vtkGetVector2Macro(DisplayedWholeParameterRange, double);
   virtual void SetDisplayedWholeParameterRange(double r0, double r1);
-  virtual void SetDisplayedWholeParameterRange(double range[2]) 
-    { this->SetDisplayedWholeParameterRange(range[0], range[1]); };
+  virtual void SetDisplayedWholeParameterRange(double range[2]);
   virtual void GetDisplayedVisibleParameterRange(double &r0, double &r1);
-  virtual void GetDisplayedVisibleParameterRange(double range[2])
-    { this->GetDisplayedVisibleParameterRange(range[0], range[1]); };
+  virtual void GetDisplayedVisibleParameterRange(double range[2]);
   virtual void MapParameterToDisplayedParameter(double p, double *displayed_p);
   virtual void MapDisplayedParameterToParameter(double displayed_p, double *p);
   virtual int GetFunctionPointDisplayedParameter(int id, double *displayed_p);
@@ -241,18 +215,10 @@ public:
   //ETX
   virtual void SetPointPositionInValueRange(int);
   vtkGetMacro(PointPositionInValueRange, int);
-  virtual void SetPointPositionInValueRangeToValue()
-    { this->SetPointPositionInValueRange(
-      vtkKWParameterValueFunctionEditor::PointPositionValue); };
-  virtual void SetPointPositionInValueRangeToTop()
-    { this->SetPointPositionInValueRange(
-      vtkKWParameterValueFunctionEditor::PointPositionTop); };
-  virtual void SetPointPositionInValueRangeToBottom()
-    { this->SetPointPositionInValueRange(
-      vtkKWParameterValueFunctionEditor::PointPositionBottom); };
-  virtual void SetPointPositionInValueRangeToCenter()
-    { this->SetPointPositionInValueRange(
-      vtkKWParameterValueFunctionEditor::PointPositionCenter); };
+  virtual void SetPointPositionInValueRangeToValue();
+  virtual void SetPointPositionInValueRangeToTop();
+  virtual void SetPointPositionInValueRangeToBottom();
+  virtual void SetPointPositionInValueRangeToCenter();
 
   // Description:
   // Set/Get the parameter range label UI visibility.
@@ -284,12 +250,8 @@ public:
   //ETX
   virtual void SetRangeLabelPosition(int);
   vtkGetMacro(RangeLabelPosition, int);
-  virtual void SetRangeLabelPositionToDefault()
-    { this->SetRangeLabelPosition(
-      vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault); };
-  virtual void SetRangeLabelPositionToTop()
-    { this->SetRangeLabelPosition(
-      vtkKWParameterValueFunctionEditor::RangeLabelPositionTop); };
+  virtual void SetRangeLabelPositionToDefault();
+  virtual void SetRangeLabelPositionToTop();
 
   // Description:
   // Display the points entries (i.e. the parameter entry, 
@@ -305,12 +267,8 @@ public:
   //ETX
   virtual void SetPointEntriesPosition(int);
   vtkGetMacro(PointEntriesPosition, int);
-  virtual void SetPointEntriesPositionToDefault()
-    { this->SetPointEntriesPosition(
-      vtkKWParameterValueFunctionEditor::PointEntriesPositionDefault); };
-  virtual void SetPointEntriesPositionToRight()
-    { this->SetPointEntriesPosition(
-      vtkKWParameterValueFunctionEditor::PointEntriesPositionRight); };
+  virtual void SetPointEntriesPositionToDefault();
+  virtual void SetPointEntriesPositionToRight();
 
   // Description:
   // Set/Get the point entries UI visibility.
@@ -357,18 +315,21 @@ public:
   vtkGetObjectMacro(UserFrame, vtkKWFrame);
 
   // Description:
-  // Set/Get the canvas width/height in pixels (i.e. the drawable region)
-  // If ExpandCanvasWidth is On, the canvas will expand automatically to
-  // accomodate its parent. This mechanism does not behave as expected 
-  // sometimes, in that case set ExpandCanvasWidth to Off and CanvasWidth to
-  // the proper value
+  // Set/Get the requested canvas width/height in pixels (i.e. the drawable 
+  // region). If ExpandCanvasWidth is On, the canvas will expand automatically
+  // to accomodate its parent: in that case, use GetCurrentCanvasWidth and
+  // GetCurrentCanvasHeight to retrieve the current width/height. 
+  // This mechanism does not behave as expected sometimes, in that case set 
+  // ExpandCanvasWidth to Off and CanvasWidth to the proper value
   virtual void SetCanvasHeight(int);
   virtual void SetCanvasWidth(int);
-  vtkGetMacro(CanvasHeight, int);
-  vtkGetMacro(CanvasWidth, int);
+  virtual int GetCanvasHeight();
+  virtual int GetCanvasWidth();
   vtkBooleanMacro(ExpandCanvasWidth, int);
   virtual void SetExpandCanvasWidth(int);
   vtkGetMacro(ExpandCanvasWidth, int);
+  vtkGetMacro(CurrentCanvasHeight, int);
+  vtkGetMacro(CurrentCanvasWidth, int);
   
   // Description:
   // Set/Get the canvas visibility, i.e. the whole area where the function
@@ -400,12 +361,8 @@ public:
   //ETX
   virtual void SetFunctionLineStyle(int);
   vtkGetMacro(FunctionLineStyle, int);
-  virtual void SetFunctionLineStyleToSolid()
-    { this->SetFunctionLineStyle(
-      vtkKWParameterValueFunctionEditor::LineStyleSolid); };
-  virtual void SetFunctionLineStyleToDash()
-    { this->SetFunctionLineStyle(
-      vtkKWParameterValueFunctionEditor::LineStyleDash); };
+  virtual void SetFunctionLineStyleToSolid();
+  virtual void SetFunctionLineStyleToDash();
 
   // Description:
   // Set/Get the canvas outline visibility
@@ -454,8 +411,7 @@ public:
   // Set/Get the cursor color. 
   vtkGetVector3Macro(ParameterCursorColor, double);
   virtual void SetParameterCursorColor(double r, double g, double b);
-  virtual void SetParameterCursorColor(double rgb[3])
-    { this->SetParameterCursorColor(rgb[0], rgb[1], rgb[2]); };
+  virtual void SetParameterCursorColor(double rgb[3]);
 
   // Description:
   // Set the parameter cursor interaction style.
@@ -596,27 +552,13 @@ public:
   //ETX
   virtual void SetPointStyle(int);
   vtkGetMacro(PointStyle, int);
-  virtual void SetPointStyleToDisc()
-    { this->SetPointStyle(
-      vtkKWParameterValueFunctionEditor::PointStyleDisc); };
-  virtual void SetPointStyleToCursorDown()
-    { this->SetPointStyle(
-      vtkKWParameterValueFunctionEditor::PointStyleCursorDown); };
-  virtual void SetPointStyleToCursorUp()
-    { this->SetPointStyle(
-      vtkKWParameterValueFunctionEditor::PointStyleCursorUp); };
-  virtual void SetPointStyleToCursorLeft()
-    { this->SetPointStyle(
-      vtkKWParameterValueFunctionEditor::PointStyleCursorLeft); };
-  virtual void SetPointStyleToCursorRight()
-    { this->SetPointStyle(
-      vtkKWParameterValueFunctionEditor::PointStyleCursorRight); };
-  virtual void SetPointStyleToRectangle()
-    { this->SetPointStyle(
-      vtkKWParameterValueFunctionEditor::PointStyleRectangle); };
-  virtual void SetPointStyleToDefault()
-    { this->SetPointStyle(
-      vtkKWParameterValueFunctionEditor::PointStyleDefault); };
+  virtual void SetPointStyleToDisc();
+  virtual void SetPointStyleToCursorDown();
+  virtual void SetPointStyleToCursorUp();
+  virtual void SetPointStyleToCursorLeft();
+  virtual void SetPointStyleToCursorRight();
+  virtual void SetPointStyleToRectangle();
+  virtual void SetPointStyleToDefault();
   virtual void SetFirstPointStyle(int);
   vtkGetMacro(FirstPointStyle, int);
   virtual void SetLastPointStyle(int);
@@ -651,6 +593,14 @@ public:
   vtkBooleanMacro(PointMarginToCanvas, int);
   virtual void SetPointMarginToCanvas(int);
   vtkGetMacro(PointMarginToCanvas, int);
+  virtual void SetPointMarginToCanvasToNone();
+  virtual void SetPointMarginToCanvasToLeftSide();
+  virtual void SetPointMarginToCanvasToRightSide();
+  virtual void SetPointMarginToCanvasToHorizontalSides();
+  virtual void SetPointMarginToCanvasToTopSide();
+  virtual void SetPointMarginToCanvasToBottomSide();
+  virtual void SetPointMarginToCanvasToVerticalSides();
+  virtual void SetPointMarginToCanvasToAllSides();
 
   // Description:
   // Select/Deselect a point, get the selected point (-1 if none selected)
@@ -687,43 +637,37 @@ public:
   // canvas color (i.e., the whole area outside the margin)
   vtkGetVector3Macro(FrameBackgroundColor, double);
   virtual void SetFrameBackgroundColor(double r, double g, double b);
-  virtual void SetFrameBackgroundColor(double rgb[3])
-    { this->SetFrameBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+  virtual void SetFrameBackgroundColor(double rgb[3]);
   virtual void SetBackgroundColor(double r, double g, double b);
-  virtual void SetBackgroundColor(double rgb[3])
-    { this->Superclass::SetBackgroundColor(rgb); };
+  virtual void SetBackgroundColor(double rgb[3]);
 
   // Description:
   // Set/Get the point color. 
   // Overriden by ComputePointColorFromValue if supported.
   vtkGetVector3Macro(PointColor, double);
   virtual void SetPointColor(double r, double g, double b);
-  virtual void SetPointColor(double rgb[3])
-    { this->SetPointColor(rgb[0], rgb[1], rgb[2]); };
+  virtual void SetPointColor(double rgb[3]);
   
   // Description:
   // Set/Get the selected point color.
   // Overriden by ComputePointColorFromValue if supported.
   vtkGetVector3Macro(SelectedPointColor, double);
   virtual void SetSelectedPointColor(double r, double g, double b);
-  virtual void SetSelectedPointColor(double rgb[3])
-    { this->SetSelectedPointColor(rgb[0], rgb[1], rgb[2]); };
+  virtual void SetSelectedPointColor(double rgb[3]);
 
   // Description:
   // Set/Get the point text color.
   // Overriden by ComputePointColorFromValue if supported.
   vtkGetVector3Macro(PointTextColor, double);
   virtual void SetPointTextColor(double r, double g, double b);
-  virtual void SetPointTextColor(double rgb[3])
-    { this->SetPointTextColor(rgb[0], rgb[1], rgb[2]); };
+  virtual void SetPointTextColor(double rgb[3]);
 
   // Description:
   // Set/Get the selected point text color.
   // Overriden by ComputePointColorFromValue if supported.
   vtkGetVector3Macro(SelectedPointTextColor, double);
   virtual void SetSelectedPointTextColor(double r, double g, double b);
-  virtual void SetSelectedPointTextColor(double rgb[3])
-    { this->SetSelectedPointTextColor(rgb[0], rgb[1], rgb[2]); };
+  virtual void SetSelectedPointTextColor(double rgb[3]);
 
   // Description:
   // Set a hint: some colors should be function of the value
@@ -776,16 +720,25 @@ public:
   virtual void SetSecondaryHistogram(vtkKWHistogram*);
 
   // Description:
+  // Convenience method that will hide all elements but the histogram.
+  // Various elements (the main label, the range and value sliders, the point
+  // margins, etc.) will not be visible anymore, but can be restored at
+  // any point. Note that ExpandCanvasWidth will be set to Off for 
+  // convenience, and that the whole range will be set to the maximum range
+  // of either the primary or secondary histogram, for convenience again (you
+  // should therefore call SetHistogram and SetSecondaryHistogram before 
+  // calling this method).
+  virtual void DisplayHistogramOnly();
+
+  // Description:
   // Set/Get the histogram and secondary histogram color. 
   // Overriden by ComputeHistogramColorFromValue if supported.
   vtkGetVector3Macro(HistogramColor, double);
   virtual void SetHistogramColor(double r, double g, double b);
-  virtual void SetHistogramColor(double rgb[3])
-    { this->SetHistogramColor(rgb[0], rgb[1], rgb[2]); };
+  virtual void SetHistogramColor(double rgb[3]);
   vtkGetVector3Macro(SecondaryHistogramColor, double);
   virtual void SetSecondaryHistogramColor(double r, double g, double b);
-  virtual void SetSecondaryHistogramColor(double rgb[3])
-    { this->SetSecondaryHistogramColor(rgb[0], rgb[1], rgb[2]); };
+  virtual void SetSecondaryHistogramColor(double rgb[3]);
   
   // Description:
   // Set a hint: histogram and secondary histogram colors should be function
@@ -806,26 +759,14 @@ public:
   //ETX
   vtkGetMacro(HistogramStyle, int);
   virtual void SetHistogramStyle(int);
-  virtual void SetHistogramStyleToBars()
-    { this->SetHistogramStyle(
-      vtkKWParameterValueFunctionEditor::HistogramStyleBars); };
-  virtual void SetHistogramStyleToDots()
-    { this->SetHistogramStyle(
-      vtkKWParameterValueFunctionEditor::HistogramStyleDots); };
-  virtual void SetHistogramStyleToPolyLine()
-    { this->SetHistogramStyle(
-      vtkKWParameterValueFunctionEditor::HistogramStylePolyLine); };
+  virtual void SetHistogramStyleToBars();
+  virtual void SetHistogramStyleToDots();
+  virtual void SetHistogramStyleToPolyLine();
   vtkGetMacro(SecondaryHistogramStyle, int);
   virtual void SetSecondaryHistogramStyle(int);
-  virtual void SetSecondaryHistogramStyleToBars()
-    { this->SetSecondaryHistogramStyle(
-      vtkKWParameterValueFunctionEditor::HistogramStyleBars); };
-  virtual void SetSecondaryHistogramStyleToDots()
-    { this->SetSecondaryHistogramStyle(
-      vtkKWParameterValueFunctionEditor::HistogramStyleDots); };
-  virtual void SetSecondaryHistogramStyleToPolyLine()
-    { this->SetSecondaryHistogramStyle(
-      vtkKWParameterValueFunctionEditor::HistogramStylePolyLine); };
+  virtual void SetSecondaryHistogramStyleToBars();
+  virtual void SetSecondaryHistogramStyleToDots();
+  virtual void SetSecondaryHistogramStyleToPolyLine();
 
   // Description:
   // Set/Get the line width of the histograms when drawn in polyline mode.
@@ -1202,8 +1143,10 @@ protected:
   int   ValueRangeVisibility;
   int   PointPositionInValueRange;
   int   ParameterRangePosition;
-  int   CanvasHeight;
-  int   CanvasWidth;
+  int   CurrentCanvasHeight;
+  int   CurrentCanvasWidth;
+  int   RequestedCanvasHeight;
+  int   RequestedCanvasWidth;
   int   ExpandCanvasWidth;
   int   LockPointsParameter;
   int   LockEndPointsParameter;
@@ -1512,6 +1455,7 @@ protected:
     vtkObject *object, unsigned long event, void *clientdata, void *calldata);
 
 private:
+
   vtkKWParameterValueFunctionEditor(const vtkKWParameterValueFunctionEditor&); // Not implemented
   void operator=(const vtkKWParameterValueFunctionEditor&); // Not implemented
 };
