@@ -4302,6 +4302,52 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
    <!-- End Cut -->
    </SourceProxy>
 
+   <SourceProxy name="ExtractHistogram" class="vtkExtractHistogram">
+     <Documentation
+        long_help="Extract a histogram from field data."
+        short_help="Extract a histogram from field data.">
+     </Documentation>
+    
+     <InputProperty name="Input" command="SetInput">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+          <InputArrayDomain name="input_array"/>
+     </InputProperty>
+
+     <StringVectorProperty name="SelectInput" command="SetInputArrayToProcess" number_of_elements="5" element_types="0 0 0 0 2" animateable="0"> 
+          <ArrayListDomain name="array_list_scalars" attribute_type="Scalars">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+     </StringVectorProperty>
+
+<!--
+     <StringVectorProperty name="SelectInputVectors" command="SetInputArrayToProcess" number_of_elements="5" element_types="0 0 0 0 2"> 
+          <ArrayListDomain name="array_list" attribute_type="Normals">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+               <Property name="AttributeMode" function="FieldDataSelection"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+     </StringVectorProperty>
+-->
+
+     <IntVectorProperty name="BinCount" command="SetBinCount" number_of_elements="1" default_values="10" animateable="0"> 
+        <IntRangeDomain name="range" min="1" max="256"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty name="Component" command="SetComponent" number_of_elements="1" default_values="0" animateable="0"> 
+        <IntRangeDomain name="range" min="0" max="15"/>
+     </IntVectorProperty>
+
+   <!-- End ExtractHistogram -->
+   </SourceProxy>
    </ProxyGroup>
 </ServerManagerConfiguration>
 

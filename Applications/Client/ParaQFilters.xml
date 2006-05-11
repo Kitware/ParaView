@@ -128,6 +128,9 @@
       <Filter name="GradientMagnitude" />
       <Filter name="SurfaceVectors" />
     </Category>
+    <Category name="Test">
+      <Filter name="ExtractHistogram" />
+    </Category>
   </CategoryGroup>
   <CategoryGroup>
     <Category name="Alphabetical" />
