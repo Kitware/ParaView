@@ -27,7 +27,7 @@
 
 #include <iostream>
 
-vtkCxxRevisionMacro(vtkExtractScatterPlot, "1.1");
+vtkCxxRevisionMacro(vtkExtractScatterPlot, "1.2");
 vtkStandardNewMacro(vtkExtractScatterPlot);
 
 vtkExtractScatterPlot::vtkExtractScatterPlot() :
@@ -160,16 +160,17 @@ int vtkExtractScatterPlot::RequestData(vtkInformation* /*request*/, vtkInformati
   y_bin_extents->SetValue(this->YBinCount, y_range[1] + VTK_DBL_EPSILON);
 
   // Insert values into bins ...
-  const unsigned long bin_count = this->XBinCount * this->YBinCount;
-  
   vtkUnsignedLongArray* const bin_values = vtkUnsignedLongArray::New();
-  bin_values->SetNumberOfComponents(1);
-  bin_values->SetNumberOfTuples(bin_count);
+  bin_values->SetNumberOfComponents(this->YBinCount);
+  bin_values->SetNumberOfTuples(this->XBinCount);
   bin_values->SetName("bin_values");
   
-  for(unsigned long i = 0; i != bin_count; ++i)
+  for(unsigned long i = 0; i != this->XBinCount; ++i)
     {
-    bin_values->SetValue(i, 0);
+    for(unsigned long j = 0; j != this->YBinCount; ++j)
+      {
+      bin_values->SetComponent(i, j, 0);
+      }
     }
 
   const unsigned long value_count = x_data_array->GetNumberOfTuples();
@@ -186,7 +187,7 @@ int vtkExtractScatterPlot::RequestData(vtkInformation* /*request*/, vtkInformati
           {
           if(y_bin_extents->GetValue(k) <= y && y < y_bin_extents->GetValue(k+1))
             {
-            bin_values->SetValue(j * this->XBinCount + k, bin_values->GetValue(j * this->XBinCount + k) + 1);
+            bin_values->SetComponent(j, k, bin_values->GetComponent(j, k) + 1);
             break;
             }
           }

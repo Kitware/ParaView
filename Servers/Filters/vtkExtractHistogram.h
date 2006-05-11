@@ -47,8 +47,8 @@ public:
   
 private:
   vtkExtractHistogram();
-  vtkExtractHistogram(const vtkExtractHistogram&);
-  vtkExtractHistogram& operator=(const vtkExtractHistogram&);
+  vtkExtractHistogram(const vtkExtractHistogram&); // Not implemented
+  void operator=(const vtkExtractHistogram&); // Not implemented
   ~vtkExtractHistogram();
 
   virtual int FillInputPortInformation (int port, vtkInformation *info);
