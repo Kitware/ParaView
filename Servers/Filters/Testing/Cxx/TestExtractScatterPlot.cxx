@@ -28,7 +28,7 @@ int main(int, char*[])
   
   vtkSmartPointer<vtkExtractScatterPlot> extraction = vtkSmartPointer<vtkExtractScatterPlot>::New();
   
-  const unsigned long bin_count = 3;
+  const int bin_count = 3;
   
   extraction->SetInputConnection(sphere->GetOutputPort());
   extraction->SetInputArrayToProcess(0, 0, 0, vtkDataSet::FIELD_ASSOCIATION_POINTS_THEN_CELLS, "Normals");
@@ -74,21 +74,21 @@ int main(int, char*[])
     {
     return 1;
     }
-  if(bin_values->GetNumberOfComponents() != 1)
+  if(bin_values->GetNumberOfComponents() != bin_count)
     {
     return 1;
     }
-  if(bin_values->GetNumberOfTuples() != bin_count * bin_count)
+  if(bin_values->GetNumberOfTuples() != bin_count)
     {
     return 1;
     }
 
-  unsigned long count = 0;
+  int count = 0;
   for(int i = 0; i != bin_count; ++i)
     {
     for(int j = 0; j != bin_count; ++j)
       {
-      count += bin_values->GetComponent(i * bin_count + j, 0);
+      count += static_cast<int>(bin_values->GetComponent(i, j));
       }
     }
 

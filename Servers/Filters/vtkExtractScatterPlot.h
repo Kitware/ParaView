@@ -57,8 +57,8 @@ public:
   
 private:
   vtkExtractScatterPlot();
-  vtkExtractScatterPlot(const vtkExtractScatterPlot&);
-  vtkExtractScatterPlot& operator=(const vtkExtractScatterPlot&);
+  vtkExtractScatterPlot(const vtkExtractScatterPlot&); // Not implemented
+  void operator=(const vtkExtractScatterPlot&); // Not implemented
   ~vtkExtractScatterPlot();
 
   virtual int FillInputPortInformation (int port, vtkInformation *info);

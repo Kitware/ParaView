@@ -28,7 +28,7 @@ int main(int, char*[])
   
   vtkSmartPointer<vtkExtractHistogram> extraction = vtkSmartPointer<vtkExtractHistogram>::New();
   
-  const unsigned long bin_count = 3;
+  const int bin_count = 3;
   
   extraction->SetInputConnection(sphere->GetOutputPort());
   extraction->SetInputArrayToProcess(0, 0, 0, vtkDataSet::FIELD_ASSOCIATION_POINTS_THEN_CELLS, "Normals");
