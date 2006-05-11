@@ -42,11 +42,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqMultiViewFrame;
 class pqPipelineServer;
+class pqPipelineData;
 class pqServer;
 
 class vtkCommand;
 class vtkObject;
+class vtkSMDisplayProxy;
 class vtkSMProxy;
+class vtkSMRenderModuleProxy;
 class vtkSMSourceProxy;
 class vtkUnstructuredGrid;
 
@@ -120,10 +123,18 @@ public:
   /// Creates a source proxy by name, adding it to the current render window
   vtkSMProxy* createSource(const QString&);
 
+  /// Creates a display
+  vtkSMDisplayProxy* createDisplay(vtkSMProxy* source);
+
   /// Compares the contents of the window with the given reference image, returns true iff they "match" within some tolerance
   bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
 
   virtual bool eventFilter(QObject* watched, QEvent* e);
+
+protected:
+  virtual vtkSMProxy* createReader(const QString &file, pqServer* server);
+  pqPipelineData* getPipeline();
+  virtual vtkSMRenderModuleProxy* getRenderModule();
 
 signals:
   /// Signal emitted whenever the server changes

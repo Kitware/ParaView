@@ -640,7 +640,6 @@ void pqMainWindow::setServer(pqServer* Server)
     this->onNewQVTKWidget(qobject_cast<pqMultiViewFrame *>(
         this->Implementation->MultiViewManager->widgetOfIndex(pqMultiView::Index())));
     }
-
   emit serverChanged(this->Implementation->CurrentServer);
 }
 
@@ -734,12 +733,7 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
     vtkSMRenderModuleProxy* rm = this->Implementation->Pipeline->getRenderModule(win);
     for(int i = 0; i != Files.size(); ++i)
       {
-      QString file = Files[i];
-      
-      source = this->Implementation->Pipeline->createAndRegisterSource("ExodusReader", server);
-      pqSMAdaptor::setElementProperty(source, source->GetProperty("FileName"), file);
-      pqSMAdaptor::setElementProperty(source, source->GetProperty("FilePrefix"), file);
-      pqSMAdaptor::setElementProperty(source, source->GetProperty("FilePattern"), "%s");
+      source = this->createReader(Files[i], server);
       source->UpdateVTKObjects();
       this->Implementation->Pipeline->setVisible(
           this->Implementation->Pipeline->createAndRegisterDisplay(source, rm), true);
@@ -1763,4 +1757,78 @@ void pqMainWindow::onRedo()
     {
     win->update();
     }
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* pqMainWindow::createReader(const QString &file, pqServer* server)
+{
+  vtkSMProxy* source = this->Implementation->Pipeline->createAndRegisterSource("ExodusReader", server);
+  pqSMAdaptor::setElementProperty(source, source->GetProperty("FileName"), file);
+  pqSMAdaptor::setElementProperty(source, source->GetProperty("FilePrefix"), file);
+  pqSMAdaptor::setElementProperty(source, source->GetProperty("FilePattern"), "%s");
+  return source;
+}
+
+//-----------------------------------------------------------------------------
+pqPipelineData* pqMainWindow::getPipeline()
+{
+  return this->Implementation->Pipeline;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMDisplayProxy* pqMainWindow::createDisplay(vtkSMProxy* source)
+{
+  if(!this->Implementation->Pipeline || !this->Implementation->PipelineBrowser)
+    {
+    return 0;
+    }
+
+  QVTKWidget *win = 0;
+  pqServer *server = this->Implementation->PipelineBrowser->getCurrentServer()->GetServer();
+  if(this->Implementation->ActiveView)
+    {
+    win = qobject_cast<QVTKWidget *>(this->Implementation->ActiveView->mainWidget());
+    }
+
+  vtkSMDisplayProxy* display = 0;
+
+  if(server)
+    {
+    vtkSMRenderModuleProxy* rm = this->Implementation->Pipeline->getRenderModule(win);
+    source->UpdateVTKObjects();
+    display = this->Implementation->Pipeline->createAndRegisterDisplay(source, rm);
+    this->Implementation->Pipeline->setVisible(display, true);
+
+    rm->ResetCamera();
+    win->update();
+
+    // Select the latest source in the pipeline inspector.
+    if(source)
+      {
+      this->Implementation->PipelineBrowser->selectProxy(source);
+      }
+    }
+  return display;
+}
+
+//-----------------------------------------------------------------------------
+vtkSMRenderModuleProxy* pqMainWindow::getRenderModule()
+{
+  if(!this->Implementation->Pipeline || !this->Implementation->PipelineBrowser)
+    {
+    return 0;
+    }
+
+  QVTKWidget *win = 0;
+  pqServer *server = this->Implementation->PipelineBrowser->getCurrentServer()->GetServer();
+  if(this->Implementation->ActiveView)
+    {
+    win = qobject_cast<QVTKWidget *>(this->Implementation->ActiveView->mainWidget());
+    }
+
+  if(!server)
+    {
+    return 0;
+    }
+  return this->Implementation->Pipeline->getRenderModule(win);
 }
