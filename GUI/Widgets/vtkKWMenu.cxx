@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.105");
+vtkCxxRevisionMacro(vtkKWMenu, "1.106");
 
 //----------------------------------------------------------------------------
 class vtkKWMenuInternals
@@ -284,12 +284,12 @@ const char* vtkKWMenu::GetItemCommand(int index)
 //----------------------------------------------------------------------------
 void vtkKWMenu::CommandInvokedCallback(const char *command)
 {
-  this->InvokeObjectMethodCommand(command);
   int index = this->Internals->IndexOfLastActiveItem;
   if (index >= 0)
     {
     this->InvokeEvent(vtkKWMenu::MenuItemInvokedEvent, &index);
     }
+  this->InvokeObjectMethodCommand(command);
 }
 
 //----------------------------------------------------------------------------
