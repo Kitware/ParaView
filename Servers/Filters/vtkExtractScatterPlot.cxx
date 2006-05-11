@@ -27,7 +27,7 @@
 
 #include <iostream>
 
-vtkCxxRevisionMacro(vtkExtractScatterPlot, "1.2");
+vtkCxxRevisionMacro(vtkExtractScatterPlot, "1.3");
 vtkStandardNewMacro(vtkExtractScatterPlot);
 
 vtkExtractScatterPlot::vtkExtractScatterPlot() :
@@ -165,16 +165,16 @@ int vtkExtractScatterPlot::RequestData(vtkInformation* /*request*/, vtkInformati
   bin_values->SetNumberOfTuples(this->XBinCount);
   bin_values->SetName("bin_values");
   
-  for(unsigned long i = 0; i != this->XBinCount; ++i)
+  for(int i = 0; i != this->XBinCount; ++i)
     {
-    for(unsigned long j = 0; j != this->YBinCount; ++j)
+    for(int j = 0; j != this->YBinCount; ++j)
       {
       bin_values->SetComponent(i, j, 0);
       }
     }
 
-  const unsigned long value_count = x_data_array->GetNumberOfTuples();
-  for(unsigned long i = 0; i != value_count; ++i)
+  const int value_count = x_data_array->GetNumberOfTuples();
+  for(int i = 0; i != value_count; ++i)
     {
     const double x = x_data_array->GetComponent(i, this->XComponent);
     const double y = y_data_array->GetComponent(i, this->YComponent);
