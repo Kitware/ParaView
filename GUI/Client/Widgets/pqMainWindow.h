@@ -135,6 +135,8 @@ protected:
   virtual vtkSMProxy* createReader(const QString &file, pqServer* server);
   pqPipelineData* getPipeline();
   virtual vtkSMRenderModuleProxy* getRenderModule();
+  virtual pqServer* getServer();
+  virtual QVTKWidget* getVTKWindow();
 
 signals:
   /// Signal emitted whenever the server changes

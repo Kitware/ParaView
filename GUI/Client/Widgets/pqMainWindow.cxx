@@ -1812,23 +1812,40 @@ vtkSMDisplayProxy* pqMainWindow::createDisplay(vtkSMProxy* source)
 }
 
 //-----------------------------------------------------------------------------
+QVTKWidget* pqMainWindow::getVTKWindow()
+{
+  pqServer* server = this->getServer();
+  if ( !server )
+    {
+    return  0;
+    }
+
+  if(!this->Implementation->ActiveView)
+    {
+    return 0;
+    }
+  return qobject_cast<QVTKWidget *>(this->Implementation->ActiveView->mainWidget());
+}
+
+//-----------------------------------------------------------------------------
 vtkSMRenderModuleProxy* pqMainWindow::getRenderModule()
+{
+  QVTKWidget* win = this->getVTKWindow();
+  if ( !win )
+    {
+    return  0;
+    }
+
+  return this->Implementation->Pipeline->getRenderModule(win);
+}
+
+//-----------------------------------------------------------------------------
+pqServer* pqMainWindow::getServer()
 {
   if(!this->Implementation->Pipeline || !this->Implementation->PipelineBrowser)
     {
     return 0;
     }
 
-  QVTKWidget *win = 0;
-  pqServer *server = this->Implementation->PipelineBrowser->getCurrentServer()->GetServer();
-  if(this->Implementation->ActiveView)
-    {
-    win = qobject_cast<QVTKWidget *>(this->Implementation->ActiveView->mainWidget());
-    }
-
-  if(!server)
-    {
-    return 0;
-    }
-  return this->Implementation->Pipeline->getRenderModule(win);
+  return this->Implementation->PipelineBrowser->getCurrentServer()->GetServer();
 }
