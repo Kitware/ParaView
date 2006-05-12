@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.34");
+vtkCxxRevisionMacro(vtkKWIcon, "1.35");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -101,18 +101,6 @@ void vtkKWIcon::SetData(const unsigned char *data,
                         int pixel_size,
                         int options)
 {
-  if (this->Data)
-    {
-    if (this->Data)
-      {
-      delete [] this->Data;
-      }
-    this->Data         = 0;
-    this->Width        = 0;
-    this->Height       = 0;
-    this->PixelSize    = 0;
-    }
-
   unsigned long stride = width * pixel_size;
   unsigned long buffer_length = stride * height;
   if (data && buffer_length > 0)
@@ -120,12 +108,12 @@ void vtkKWIcon::SetData(const unsigned char *data,
     this->Width  = width;
     this->Height = height;
     this->PixelSize = pixel_size;
-    this->Data = new unsigned char [buffer_length];
+    unsigned char *new_data = new unsigned char [buffer_length];
     if (options & vtkKWIcon::ImageOptionFlipVertical)
       {
       const unsigned char *src = data + buffer_length - stride;
-      unsigned char *dest = this->Data;
-      unsigned char *dest_end = this->Data + buffer_length;
+      unsigned char *dest = new_data;
+      unsigned char *dest_end = dest + buffer_length;
       while (dest < dest_end)
         {
         memcpy(dest, src, stride);
@@ -135,8 +123,18 @@ void vtkKWIcon::SetData(const unsigned char *data,
       }
     else
       {
-      memcpy(this->Data, data, buffer_length);
+      memcpy(new_data, data, buffer_length);
       }
+    delete [] this->Data;
+    this->Data = new_data;
+    }
+  else
+    {
+    delete [] this->Data;
+    this->Data         = NULL;
+    this->Width        = 0;
+    this->Height       = 0;
+    this->PixelSize    = 0;
     }
 }
 
