@@ -34,13 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqFileDialogEventPlayer_h
 
 #include <pqWidgetEventPlayer.h>
+#include "pqWidgetsExport.h"
 
 /**
 Concrete implementation of pqWidgetEventPlayer that handles playback of recorded file dialog user input.
 
 \sa pqEventPlayer
 */
-class pqFileDialogEventPlayer :
+class PQWIDGETS_EXPORT pqFileDialogEventPlayer :
   public pqWidgetEventPlayer
 {
 public:

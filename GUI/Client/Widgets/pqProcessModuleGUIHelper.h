@@ -35,9 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModuleGUIHelper.h"
 #include "pqWidgetsExport.h" // needed for PQWIDGETS_EXPORT macro.
 
-class pqMainWindow;
+class QWidget;
 class vtkSMApplication;
 class QApplication;
+class QString;
 /*! \brief This is the GUI helper for ParaQ.
  * This class provides GUI elements to the process module without forcing
  * the process modules to link with the GUI. This class creates the QApplication
@@ -55,7 +56,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   /// Get the main window for the application.
-  pqMainWindow* getWindow();
+  QWidget* GetMainWindow();
 
   /// Start the GUI event loop.
   virtual int RunGUIStart(int argc, char** argv, int numServerProcs, int myId);
@@ -72,6 +73,10 @@ public:
 
   /// Exit the application
   virtual void ExitApplication();
+
+  /// Compares the contents of the window with the given reference image, returns true iff they "match" within some tolerance
+  virtual  bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
+
  
   // Description:
   // Get the application singleton. 
@@ -94,7 +99,7 @@ private:
 
   /// subclasses can override this method to create their own
   /// subclass of pqMainWindow as the Main Window.
-  virtual pqMainWindow* CreateMainWindow() = 0;
+  virtual QWidget* CreateMainWindow() = 0;
   
   class pqImplementation;
   pqImplementation* const Implementation;

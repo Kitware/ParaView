@@ -45,13 +45,15 @@ public:
   vtkTypeRevisionMacro(ProcessModuleGUIHelper, pqProcessModuleGUIHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  /// Compares the contents of the window with the given reference image, returns true iff they "match" within some tolerance
+  virtual  bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
 protected:
   ProcessModuleGUIHelper();
   ~ProcessModuleGUIHelper();
 
   /// subclasses can override this method to create their own
   /// subclass of pqMainWindow as the Main Window.
-  virtual pqMainWindow* CreateMainWindow();
+  virtual QWidget* CreateMainWindow();
 
 private:
   ProcessModuleGUIHelper(const ProcessModuleGUIHelper&); // Not implemented.

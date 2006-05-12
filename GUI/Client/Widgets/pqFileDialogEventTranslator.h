@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqFileDialogEventTranslator_h
 
 #include <pqWidgetEventTranslator.h>
+#include "pqWidgetsExport.h"
 
 class pqFileDialog;
 
@@ -43,7 +44,7 @@ Translates low-level Qt events into high-level ParaQ events that can be recorded
 \sa pqEventTranslator
 */
 
-class pqFileDialogEventTranslator :
+class PQWIDGETS_EXPORT pqFileDialogEventTranslator :
   public pqWidgetEventTranslator
 {
   Q_OBJECT

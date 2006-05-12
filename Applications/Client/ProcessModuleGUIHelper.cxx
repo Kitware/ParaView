@@ -35,8 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "MainWindow.h"
 
+
 vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.1");
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.2");
 //-----------------------------------------------------------------------------
 ProcessModuleGUIHelper::ProcessModuleGUIHelper()
 {
@@ -48,7 +49,7 @@ ProcessModuleGUIHelper::~ProcessModuleGUIHelper()
 }
 
 //-----------------------------------------------------------------------------
-pqMainWindow* ProcessModuleGUIHelper::CreateMainWindow()
+QWidget* ProcessModuleGUIHelper::CreateMainWindow()
 {
   pqMainWindow* const window = new MainWindow();
   window->resize(800, 600);
@@ -60,4 +61,17 @@ void ProcessModuleGUIHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
+
+//-----------------------------------------------------------------------------
+bool ProcessModuleGUIHelper::compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory)
+{
+  QWidget * widget=this->GetMainWindow();
+  pqMainWindow* mainWindow=qobject_cast<pqMainWindow*>(widget);
+  if(mainWindow)
+  {
+    return mainWindow->compareView(ReferenceImage,Threshold,Output,TempDirectory);
+  }
+  return false;
+}
+
 
