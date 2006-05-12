@@ -31,6 +31,7 @@ SUBDIRS(
   Client
   CustomServer
   DobranoViz
+  Prism
   PGraph
 )
 
