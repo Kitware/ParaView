@@ -58,7 +58,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.48");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.49");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -322,7 +322,7 @@ void vtkKWPresetSelector::CreateWidget()
 
   this->PresetList->SetParent(this);
   this->PresetList->Create();
-  this->PresetList->HorizontalScrollbarVisibilityOff();
+  //this->PresetList->HorizontalScrollbarVisibilityOff();
 
   this->Script(
     "pack %s -side top -anchor nw -fill both -expand t -padx 2 -pady 2",
@@ -2163,6 +2163,17 @@ void vtkKWPresetSelector::ClearSelection()
     this->PresetList->GetWidget()->ClearSelection();
     this->UpdatePresetButtons();
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPresetSelector::GetIdOfSelectedPreset()
+{
+  if (this->PresetList)
+    {
+    return this->GetIdOfPresetAtRow(
+      this->PresetList->GetWidget()->GetIndexOfFirstSelectedRow());
+    }
+  return -1;
 }
 
 //----------------------------------------------------------------------------

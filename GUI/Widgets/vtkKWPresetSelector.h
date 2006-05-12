@@ -345,6 +345,7 @@ public:
   virtual void SelectPreviousPreset();
   virtual void SelectNextPreset();
   virtual void ClearSelection();
+  virtual int GetIdOfSelectedPreset();
 
   // Description:
   // Set/Get the list height (in number of items)
