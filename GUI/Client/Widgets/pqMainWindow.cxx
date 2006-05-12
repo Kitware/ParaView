@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialogEventTranslator.h"
 #include "pqMainWindow.h"
 #include "pqMultiViewFrame.h"
-#include "pqMultiViewManager.h"
+#include "pqMultiView.h"
 #include "pqNameCount.h"
 #include "pqObjectInspectorWidget.h"
 #include "pqParts.h"
@@ -186,7 +186,7 @@ public:
   vtkSMProxy* CurrentProxy;
 
   QToolBar* PropertyToolbar;
-  pqMultiViewManager* MultiViewManager;
+  pqMultiView* MultiViewManager;
   QAction* ServerDisconnectAction;
   pqPipelineData *Pipeline;
   pqPipelineBrowser *PipelineBrowser;
@@ -217,7 +217,7 @@ pqMainWindow::pqMainWindow() :
   this->Implementation->ProxyInfo = new pqSourceProxyInfo();
   this->Implementation->VTKConnector = vtkSmartPointer<vtkEventQtSlotConnect>::New();
 
-  this->Implementation->MultiViewManager = new pqMultiViewManager(this) << pqSetName("MultiViewManager");
+  this->Implementation->MultiViewManager = new pqMultiView(this) << pqSetName("MultiViewManager");
   //this->Implementation->MultiViewManager->hide();  // workaround for flickering in Qt 4.0.1 & 4.1.0
   this->setCentralWidget(this->Implementation->MultiViewManager);
   QObject::connect(this->Implementation->MultiViewManager, SIGNAL(frameAdded(pqMultiViewFrame*)),

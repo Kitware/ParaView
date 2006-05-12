@@ -35,8 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFileDialog>
 #include "pqMultiView.h"
 #include "pqMultiViewFrame.h"
-#include "pqMultiViewManager.h"
-
 #include "pqEventTranslator.h"
 #include "pqRecordEventsDialog.h"
 #include "pqEventPlayer.h"
@@ -131,7 +129,7 @@ int main(int argc, char** argv)
 
   QCoreApplication::processEvents();
 
-  pqMultiViewManager mv2;
+  pqMultiView mv2;
   mv2.resize(600, 400);
   mv2.setObjectName("multiviewtest");
   mv2.show();

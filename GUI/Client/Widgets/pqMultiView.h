@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFrame>
 #include <QList>
 
+class pqMultiViewFrame;
+class vtkPVXMLElement;
 class QSplitter;
 
 /// class to manage locations of multiple view widgets
@@ -52,9 +54,7 @@ public:
   /// \brief
   ///   Resets the multi-view to its original state.
   /// \param removed Used to return all the removed widgets.
-  /// \param newWidget The new main widget for the reset multi-view.
-  ///   If no widget is passed in, the default frame will be used.
-  virtual void reset(QList<QWidget*> &removed, QWidget *newWidget=0);
+  virtual void reset(QList<QWidget*> &removed);
 
   /// replace a widget at index with a new widget, returns the old one
   virtual QWidget* replaceView(Index index, QWidget* widget);
@@ -72,7 +72,34 @@ public:
   /// get the widget from an index
   QWidget* widgetOfIndex(Index index);
 
+  void saveState(vtkPVXMLElement *root);
+  void loadState(vtkPVXMLElement *root);
+signals:
+  /// signal for new frame added
+  void frameAdded(pqMultiViewFrame*);
+  /// signal for frame removed
+  void frameRemoved(pqMultiViewFrame*);
+
+public slots:
+  void removeWidget(QWidget *widget);
+  void splitWidgetHorizontal(QWidget *widget);
+  void splitWidgetVertical(QWidget *widget);
+
+protected slots:
+  void maximizeWidget(QWidget*);
+  void restoreWidget(QWidget*);
+
+protected:
+
+  bool eventFilter(QObject*, QEvent* e);
+  void splitWidget(QWidget*, Qt::Orientation);
+
+  void setup(pqMultiViewFrame*);
+  void cleanup(pqMultiViewFrame*);
+
 private:
+  void saveSplitter(vtkPVXMLElement *element, QSplitter *splitter, int index);
+  void restoreSplitter(QWidget *widget, vtkPVXMLElement *element);
   void cleanSplitter(QSplitter *splitter, QList<QWidget*> &removed);
 };
 

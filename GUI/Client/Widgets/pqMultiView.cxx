@@ -32,8 +32,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqMultiView.h"
 
-#include <QLayout>
+#include <QSignalMapper>
 #include <QSplitter>
+#include <QString>
+#include <QBuffer>
+#include <QDataStream>
+#include <QLayout>
+#include "pqMultiViewFrame.h"
+#include "pqXMLUtil.h"
+
+#include "vtkPVXMLElement.h"
+
 
 namespace {
   
@@ -63,14 +72,28 @@ pqMultiView::pqMultiView(QWidget* p)
   splitter->setObjectName("MultiViewSplitter");
   l->addWidget(splitter);
   splitter->addWidget(makeNewFrame());
+
+  pqMultiViewFrame* frame = new pqMultiViewFrame(this);
+  QWidget* old = this->replaceView(pqMultiView::Index(), frame);
+  delete old;
+  splitter->addWidget(frame);
+  this->installEventFilter(this);
+  this->setup(frame);
 }
 
 pqMultiView::~pqMultiView()
 {
+  // emit signals for removing frames
+  QList<pqMultiViewFrame*> frames = this->findChildren<pqMultiViewFrame*>();
+  foreach(pqMultiViewFrame* v, frames)
+    {
+    this->removeWidget(v);
+    }
 }
 
-void pqMultiView::reset(QList<QWidget*> &removed, QWidget *newWidget)
+void pqMultiView::reset(QList<QWidget*> &removed)
 {
+  pqMultiViewFrame* frame = new pqMultiViewFrame();
   // Remove all the widgets. Put them in the list. Then clean
   // up all the extra splitters.
   QWidget *widget = this->layout()->itemAt(0)->widget();
@@ -90,15 +113,9 @@ void pqMultiView::reset(QList<QWidget*> &removed, QWidget *newWidget)
       }
 
     splitter->refresh();
-    if(newWidget)
-      {
-      splitter->addWidget(newWidget);
-      }
-    else
-      {
-      splitter->addWidget(makeNewFrame());
-      }
+    splitter->addWidget(frame);
     }
+  this->setup(frame);
 }
 
 QWidget* pqMultiView::replaceView(pqMultiView::Index index, QWidget* widget)
@@ -333,6 +350,130 @@ QWidget* pqMultiView::widgetOfIndex(Index index)
   return w;
 }
 
+void pqMultiView::saveState(vtkPVXMLElement *root)
+{
+  if(!root)
+    {
+    return;
+    }
+
+  // Create an element to hold the multi-view state.
+  vtkPVXMLElement *multiView = vtkPVXMLElement::New();
+  multiView->SetName("MultiView");
+
+  QSplitter *splitter = qobject_cast<QSplitter *>(
+      this->layout()->itemAt(0)->widget());
+  if(splitter)
+    {
+    // Save the splitter. This will recursively save the children.
+    this->saveSplitter(multiView, splitter, 0);
+    }
+
+  root->AddNestedElement(multiView);
+  multiView->Delete();
+}
+
+void pqMultiView::loadState(vtkPVXMLElement *root)
+{
+  if(!root)
+    {
+    return;
+    }
+
+  // Look for the multi-view element in the xml.
+  vtkPVXMLElement *multiView = pqXMLUtil::FindNestedElementByName(root,
+      "MultiView");
+  if(multiView)
+    {
+    QSplitter *splitter = qobject_cast<QSplitter *>(
+        this->layout()->itemAt(0)->widget());
+    if(splitter)
+      {
+      QWidget *widget = splitter->widget(0);
+      vtkPVXMLElement *element = pqXMLUtil::FindNestedElementByName(multiView,
+          "Splitter");
+      if(element && widget)
+        {
+        // This will be called recursively to restore the multi-view.
+        this->restoreSplitter(widget, element);
+        }
+      }
+    }
+}
+
+void pqMultiView::removeWidget(QWidget* widget)
+{
+  // If this is the only widget in the multi-view, replace it
+  // with a new one so there is always something in the space.
+  QSplitter *splitter = qobject_cast<QSplitter *>(widget->parentWidget());
+  if(splitter && splitter->parentWidget() == this && splitter->count() < 2)
+    {
+    pqMultiViewFrame* frame = new pqMultiViewFrame();
+    this->replaceView(this->indexOf(widget), frame);
+    this->setup(frame);
+    }
+  else
+    {
+    this->removeView(widget);
+    }
+
+  emit this->frameRemoved(qobject_cast<pqMultiViewFrame*>(widget));
+  delete widget;
+}
+
+void pqMultiView::splitWidget(QWidget* widget, Qt::Orientation o)
+{
+  pqMultiView::Index index = this->indexOf(widget);
+  pqMultiView::Index newindex = this->splitView(index, o);
+  pqMultiViewFrame* frame = new pqMultiViewFrame;
+  QWidget *old = this->replaceView(newindex, frame);
+  delete old;
+  this->setup(frame);
+  emit this->frameAdded(frame);
+}
+
+void pqMultiView::splitWidgetHorizontal(QWidget* widget)
+{
+  this->splitWidget(widget, Qt::Horizontal);
+}
+
+void pqMultiView::splitWidgetVertical(QWidget* widget)
+{
+  this->splitWidget(widget, Qt::Vertical);
+}
+
+void pqMultiView::maximizeWidget(QWidget* /*widget*/)
+{
+  /*
+  pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(widget);
+  Q_ASSERT(frame != NULL);
+  
+  QWidget* holder = new QWidget;
+  holder->setAttribute(Qt::WA_ShowModal);
+  QWidget* w = frame->mainWidget();
+  w->setParent(holder);
+  QHBoxLayout* l = new QHBoxLayout(holder);
+  l->addWidget(w);
+  holder->setWindowState(Qt::WindowMaximized);
+  holder->showFullScreen();
+  */
+}
+
+void pqMultiView::restoreWidget(QWidget* /*widget*/)
+{
+
+}
+bool pqMultiView::eventFilter(QObject*, QEvent* e)
+{
+  if(e->type() == QEvent::Polish)
+    {
+    // delay emit of first signal
+    emit this->frameAdded(qobject_cast<pqMultiViewFrame*>(
+        this->widgetOfIndex(pqMultiView::Index())));
+    this->removeEventFilter(this);
+    }
+  return false;
+}
 void pqMultiView::cleanSplitter(QSplitter *splitter, QList<QWidget*> &removed)
 {
   QWidget *widget = 0;
@@ -352,5 +493,148 @@ void pqMultiView::cleanSplitter(QSplitter *splitter, QList<QWidget*> &removed)
       }
     }
 }
+void pqMultiView::setup(pqMultiViewFrame* frame)
+{
+  Q_ASSERT(frame != NULL);
+  if(!frame)
+    return;
 
+  // Give the frame a name.
+  QString name;
+  pqMultiView::Index index=this->indexOf(frame);
+  name.setNum(index.front());
+  frame->setObjectName(name);
+
+  QSignalMapper* CloseSignalMapper = new QSignalMapper(frame);
+  QSignalMapper* HorizontalSignalMapper = new QSignalMapper(frame);
+  QSignalMapper* VerticalSignalMapper = new QSignalMapper(frame);
+  QSignalMapper* MaximizeSignalMapper = new QSignalMapper(frame);
+
+  CloseSignalMapper->setMapping(frame, frame);
+  HorizontalSignalMapper->setMapping(frame, frame);
+  VerticalSignalMapper->setMapping(frame, frame);
+  MaximizeSignalMapper->setMapping(frame, frame);
+
+  // connect close button
+  QObject::connect(frame, SIGNAL(closePressed()), 
+                   CloseSignalMapper, SLOT(map()));
+  QObject::connect(CloseSignalMapper, SIGNAL(mapped(QWidget*)), 
+                   this, SLOT(removeWidget(QWidget*)), Qt::QueuedConnection);
+
+  // connect split buttons
+  QObject::connect(frame, SIGNAL(splitHorizontalPressed()), 
+                   HorizontalSignalMapper, SLOT(map()));
+  QObject::connect(HorizontalSignalMapper, SIGNAL(mapped(QWidget*)), 
+                   this, SLOT(splitWidgetHorizontal(QWidget*)));
+  
+  QObject::connect(frame, SIGNAL(splitVerticalPressed()), 
+                   VerticalSignalMapper, SLOT(map()));
+  QObject::connect(VerticalSignalMapper, SIGNAL(mapped(QWidget*)), 
+                   this, SLOT(splitWidgetVertical(QWidget*)));
+  
+  QObject::connect(frame, SIGNAL(maximizePressed()), 
+                   MaximizeSignalMapper, SLOT(map()));
+  QObject::connect(MaximizeSignalMapper, SIGNAL(mapped(QWidget*)), 
+                   this, SLOT(maximizeWidget(QWidget*)));
+}
+void pqMultiView::saveSplitter(vtkPVXMLElement *element,
+    QSplitter *splitter, int index)
+{
+  // Make a new element for the splitter.
+  vtkPVXMLElement *splitterElement = vtkPVXMLElement::New();
+  splitterElement->SetName("Splitter");
+
+  // Save the splitter's index in the parent splitter.
+  QString number;
+  if(index >= 0)
+    {
+    number.setNum(index);
+    splitterElement->AddAttribute("index", number.toAscii().data());
+    }
+
+  // Save the splitter orientation and sizes.
+  if(splitter->orientation() == Qt::Horizontal)
+    {
+    splitterElement->AddAttribute("orientation", "Horizontal");
+    }
+  else
+    {
+    splitterElement->AddAttribute("orientation", "Vertical");
+    }
+
+  number.setNum(splitter->count());
+  splitterElement->AddAttribute("count", number.toAscii().data());
+  splitterElement->AddAttribute("sizes",
+      pqXMLUtil::GetStringFromIntList(splitter->sizes()).toAscii().data());
+
+  // Save each of the child widgets.
+  QSplitter *subsplitter = 0;
+  for(int i = 0; i < splitter->count(); ++i)
+    {
+    subsplitter = qobject_cast<QSplitter *>(splitter->widget(i));
+    if(subsplitter)
+      {
+      // Save the splitter. This will recursively save the children.
+      this->saveSplitter(splitterElement, subsplitter, i);
+      }
+    }
+
+  // Add the element to the xml.
+  element->AddNestedElement(splitterElement);
+  splitterElement->Delete();
+}
+
+void pqMultiView::restoreSplitter(QWidget *widget,
+    vtkPVXMLElement *element)
+{
+  // Set the orientation.
+  Qt::Orientation orientation = Qt::Horizontal;
+  QString value = element->GetAttribute("orientation");
+  if(value == "Vertical")
+    {
+    orientation = Qt::Vertical;
+    }
+
+  // Get the number of child widgets. Split the view to hold
+  // enough child widgets.
+  int count = 0;
+  if(element->GetScalarAttribute("count", &count))
+    {
+    for(int i = 1; i < count; i++)
+      {
+      this->splitWidget(widget, orientation);
+      }
+
+    // Get the view sizes. Convert them to a list of ints to
+    // restore the splitter sizes.
+    QSplitter *splitter = qobject_cast<QSplitter *>(widget->parentWidget());
+    if(splitter)
+      {
+      QList<int> sizes = pqXMLUtil::GetIntListFromString(
+          element->GetAttribute("sizes"));
+      if(sizes.size() >= splitter->count())
+        {
+        splitter->setSizes(sizes);
+        }
+
+      // Search the element for sub-splitters.
+      int index = 0;
+      value = "Splitter";
+      vtkPVXMLElement *splitterElement = 0;
+      unsigned int total = element->GetNumberOfNestedElements();
+      for(unsigned int j = 0; j < total; j++)
+        {
+        splitterElement = element->GetNestedElement(j);
+        if(value == splitterElement->GetName())
+          {
+          if(splitterElement->GetScalarAttribute("index", &index) &&
+              index >= 0 && index < splitter->count())
+            {
+            this->restoreSplitter(splitter->widget(index), splitterElement);
+            }
+          }
+        }
+      }
+    }
+}
 
