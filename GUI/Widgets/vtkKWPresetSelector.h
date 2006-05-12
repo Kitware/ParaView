@@ -162,10 +162,16 @@ public:
   // vtkImageData; in that case, the window contents is grabbed and used
   // to build both thumbnail and screenshot.
   // Both thumbnail and screenshot icons can be retrieved.
+  // Return 1 on success, 0 on error
   virtual int BuildPresetThumbnailAndScreenshotFromImage(
     int id, vtkImageData *image);
   virtual int BuildPresetThumbnailAndScreenshotFromRenderWindow(
     int id, vtkRenderWindow *win);
+
+  // Description:
+  // Flip the thumbnail and screenshot vertically for a specific preset
+  // Return 1 on success, 0 on error
+  virtual int FlipPresetThumbnailAndScreenshotVertically(int id);
 
   // Description:
   // Set/Get the thumbnail size.

@@ -58,7 +58,7 @@ const char *vtkKWPresetSelector::CommentColumnName   = "Comment";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPresetSelector);
-vtkCxxRevisionMacro(vtkKWPresetSelector, "1.47");
+vtkCxxRevisionMacro(vtkKWPresetSelector, "1.48");
 
 //----------------------------------------------------------------------------
 class vtkKWPresetSelectorInternals
@@ -1267,21 +1267,16 @@ vtkKWIcon* vtkKWPresetSelector::GetPresetScreenshot(int id)
 int vtkKWPresetSelector::BuildPresetThumbnailAndScreenshotFromImage(
   int id, vtkImageData *image)
 {
-  if (!this->Internals)
-    {
-    return 0;
-    }
-
-  if (!this->HasPreset(id))
+  if (!this->Internals || !this->HasPreset(id))
     {
     return 0;
     }
 
   // Empty image, remove thumbnail/screenshot
 
-  int *image_dims = image ? image->GetDimensions() : NULL;
-  if (!image_dims ||
-      image_dims[0] == 0 || 
+  int image_dims[3];
+  image->GetDimensions(image_dims);
+  if (image_dims[0] == 0 || 
       image_dims[1] == 0 || 
       image_dims[2] == 0)
     {
@@ -1304,7 +1299,8 @@ int vtkKWPresetSelector::BuildPresetThumbnailAndScreenshotFromImage(
 
   // Permute, as a convenience
 
-  int *clip_dims = clip->GetOutput()->GetDimensions();
+  int clip_dims[3];
+  clip->GetOutput()->GetDimensions(clip_dims);
 
   vtkImagePermute *permute = NULL;
   if (clip_dims[2] != 1)
@@ -1327,7 +1323,9 @@ int vtkKWPresetSelector::BuildPresetThumbnailAndScreenshotFromImage(
     }
 
   resample_input->Update();
-  int *resample_input_dims = resample_input->GetDimensions();
+  int resample_input_dims[3], resample_output_dims[3];
+
+  resample_input->GetDimensions(resample_input_dims);
   double *resample_input_spacing = resample_input->GetSpacing();
 
   int large_dim = 0, small_dim = 1;
@@ -1351,12 +1349,13 @@ int vtkKWPresetSelector::BuildPresetThumbnailAndScreenshotFromImage(
                          resample_input_spacing[large_dim]));
   resample->Update();
   resample_output = resample->GetOutput();
+  resample_output->GetDimensions(resample_output_dims);
 
   vtkKWIcon *screenshot = vtkKWIcon::New();
   screenshot->SetImage(
     (const unsigned char*)resample_output->GetScalarPointer(),
-    resample_output->GetDimensions()[0],
-    resample_output->GetDimensions()[1],
+    resample_output_dims[0],
+    resample_output_dims[1],
     3,
     0,
     vtkKWIcon::ImageOptionFlipVertical);
@@ -1373,12 +1372,13 @@ int vtkKWPresetSelector::BuildPresetThumbnailAndScreenshotFromImage(
                          resample_input_spacing[large_dim]));
   resample->Update();
   resample_output = resample->GetOutput();
+  resample_output->GetDimensions(resample_output_dims);
 
   vtkKWIcon *thumbnail = vtkKWIcon::New();
   thumbnail->SetImage(
     (const unsigned char*)resample_output->GetScalarPointer(),
-    resample_output->GetDimensions()[0],
-    resample_output->GetDimensions()[1],
+    resample_output_dims[0],
+    resample_output_dims[1],
     3,
     0,
     vtkKWIcon::ImageOptionFlipVertical);
@@ -1411,11 +1411,57 @@ int vtkKWPresetSelector::BuildPresetThumbnailAndScreenshotFromRenderWindow(
     filter->ShouldRerenderOff();
     filter->SetInput(win);
     filter->Update();
-    int res = this->BuildPresetThumbnailAndScreenshotFromImage(id, filter->GetOutput());
+    int res = this->BuildPresetThumbnailAndScreenshotFromImage(
+      id, filter->GetOutput());
     filter->Delete();
     return res;
     }
   return 0;
+}
+
+//---------------------------------------------------------------------------
+int vtkKWPresetSelector::FlipPresetThumbnailAndScreenshotVertically(
+  int id)
+{
+  if (!this->Internals || !this->HasPreset(id))
+    {
+    return 0;
+    }
+
+  int modified = 0;
+
+  vtkKWIcon *screenshot = this->GetPresetScreenshot(id);
+  if (screenshot)
+    {
+    screenshot->SetImage(screenshot->GetData(),
+                         screenshot->GetWidth(),
+                         screenshot->GetHeight(),
+                         screenshot->GetPixelSize(),
+                         0,
+                         vtkKWIcon::ImageOptionFlipVertical);
+    modified++;
+    }
+
+  vtkKWIcon *thumbnail = this->GetPresetThumbnail(id);
+  if (thumbnail)
+    {
+    thumbnail->SetImage(thumbnail->GetData(),
+                        thumbnail->GetWidth(),
+                        thumbnail->GetHeight(),
+                        thumbnail->GetPixelSize(),
+                        0,
+                        vtkKWIcon::ImageOptionFlipVertical);
+    modified++;
+    }
+
+  // Update the icon cell
+
+  if (modified)
+    {
+    this->ScheduleUpdatePresetRow(id);
+    }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
