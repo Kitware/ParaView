@@ -39,7 +39,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Set/Get the parent widget for this widget
+  // Set/Get the parent widget for this widget.
+  // Important: you can not reparent a widget that has been Create()'ed already.
   virtual void SetParent(vtkKWWidget *p);
   vtkGetObjectMacro(Parent, vtkKWWidget);
 
