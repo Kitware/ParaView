@@ -32,7 +32,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.52");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.53");
 
 #define VTK_KW_CTFE_COLOR_RAMP_TAG "color_ramp_tag"
 
@@ -1643,6 +1643,64 @@ void vtkKWColorTransferFunctionEditor::RedrawColorRamp()
     this->Script(tk_cmd.str());
     tk_cmd.rdbuf()->freeze(0);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWColorTransferFunctionEditor::RedrawHistogram()
+{
+  if (!this->IsCreated() || !this->Canvas || !this->Canvas->IsAlive() ||
+      this->DisableRedraw)
+    {
+    return;
+    }
+
+  const char *canv = this->Canvas->GetWidgetName();
+
+  int has_hist_tag, has_secondary_hist_tag; 
+  if (this->ColorRampPosition == 
+      vtkKWColorTransferFunctionEditor::ColorRampPositionCanvas)
+    {
+    has_hist_tag = 
+      this->CanvasHasTag(vtkKWParameterValueFunctionEditor::HistogramTag);
+    has_secondary_hist_tag = 
+      this->CanvasHasTag(vtkKWParameterValueFunctionEditor::SecondaryHistogramTag);
+    }
+
+  this->Superclass::RedrawHistogram();
+
+  if (this->ColorRampPosition != 
+      vtkKWColorTransferFunctionEditor::ColorRampPositionCanvas)
+    {
+    return;
+    }
+
+  ostrstream tk_cmd;
+
+  // If the primary histogram has just been created, raise or lower it
+
+  if (!has_hist_tag && has_hist_tag != 
+      this->CanvasHasTag(vtkKWParameterValueFunctionEditor::HistogramTag))
+    {
+    cout << "Raising!" << endl;
+    tk_cmd << canv << " raise "
+           << vtkKWParameterValueFunctionEditor::HistogramTag 
+           << " " << VTK_KW_CTFE_COLOR_RAMP_TAG << endl;
+    }
+
+  // If the secondary histogram has just been created, raise or lower it
+
+  if (!has_secondary_hist_tag && has_secondary_hist_tag !=
+      this->CanvasHasTag(vtkKWParameterValueFunctionEditor::SecondaryHistogramTag))
+    {
+    cout << "Raising! 2" << endl;
+    tk_cmd << canv << " raise " 
+           << vtkKWParameterValueFunctionEditor::SecondaryHistogramTag 
+           << " " << VTK_KW_CTFE_COLOR_RAMP_TAG << endl;
+    }
+  
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------

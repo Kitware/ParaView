@@ -256,6 +256,10 @@ protected:
   virtual int IsTopLeftFrameUsed();
   virtual int IsPointEntriesFrameUsed();
 
+  // Description:
+  // Redraw the histogram
+  virtual void RedrawHistogram();
+
 private:
   vtkKWColorTransferFunctionEditor(const vtkKWColorTransferFunctionEditor&); // Not implemented
   void operator=(const vtkKWColorTransferFunctionEditor&); // Not implemented
