@@ -32,7 +32,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.53");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.54");
 
 #define VTK_KW_CTFE_COLOR_RAMP_TAG "color_ramp_tag"
 
@@ -1681,7 +1681,6 @@ void vtkKWColorTransferFunctionEditor::RedrawHistogram()
   if (!has_hist_tag && has_hist_tag != 
       this->CanvasHasTag(vtkKWParameterValueFunctionEditor::HistogramTag))
     {
-    cout << "Raising!" << endl;
     tk_cmd << canv << " raise "
            << vtkKWParameterValueFunctionEditor::HistogramTag 
            << " " << VTK_KW_CTFE_COLOR_RAMP_TAG << endl;
@@ -1692,7 +1691,6 @@ void vtkKWColorTransferFunctionEditor::RedrawHistogram()
   if (!has_secondary_hist_tag && has_secondary_hist_tag !=
       this->CanvasHasTag(vtkKWParameterValueFunctionEditor::SecondaryHistogramTag))
     {
-    cout << "Raising! 2" << endl;
     tk_cmd << canv << " raise " 
            << vtkKWParameterValueFunctionEditor::SecondaryHistogramTag 
            << " " << VTK_KW_CTFE_COLOR_RAMP_TAG << endl;
