@@ -27,7 +27,7 @@
 
 #include <iostream>
 
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.1");
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.2");
 vtkStandardNewMacro(vtkExtractHistogram);
 
 vtkExtractHistogram::vtkExtractHistogram() :
@@ -54,19 +54,23 @@ void vtkExtractHistogram::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "BinCount: " << this->BinCount << "\n";
 }
 
-int vtkExtractHistogram::FillInputPortInformation (int port, vtkInformation *info)
+int vtkExtractHistogram::FillInputPortInformation (int port, 
+                                                   vtkInformation *info)
 {
-  Superclass::FillInputPortInformation(port, info);
+  this->Superclass::FillInputPortInformation(port, info);
   
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
   return 1;
 }
 
-int vtkExtractHistogram::RequestData(vtkInformation* /*request*/, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+int vtkExtractHistogram::RequestData(vtkInformation* /*request*/, 
+                                     vtkInformationVector** inputVector, 
+                                     vtkInformationVector* outputVector)
 {
   vtkDebugMacro(<< "Executing vtkExtractHistogram filter");
 
-  // Build an empty output grid in advance, so we can bail-out if we encounter any problems
+  // Build an empty output grid in advance, so we can bail-out if we
+  // encounter any problems
   vtkInformation* const output_info = outputVector->GetInformationObject(0);
   vtkPolyData* const output_data = vtkPolyData::SafeDownCast(
     output_info->Get(vtkDataObject::DATA_OBJECT()));
@@ -83,22 +87,27 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/, vtkInformation
   output_data->GetCellData()->AddArray(bin_extents);
   bin_extents->Delete();
   
-  // Find the field to process, if we can't find anything, we return an empty dataset
+  // Find the field to process, if we can't find anything, we return an
+  // empty dataset
   vtkDataArray* const data_array = this->GetInputArrayToProcess(0, inputVector);
   if(!data_array)
     {
     return 1;
     }
 
-  // If the requested component is out-of-range for the input, we return an empty dataset
-  if(this->Component < 0 || this->Component >= data_array->GetNumberOfComponents())
+  // If the requested component is out-of-range for the input, we return an
+  // empty dataset
+  if(this->Component < 0 || 
+     this->Component >= data_array->GetNumberOfComponents())
     {
     return 1;
     }
 
-  // Calculate the extents of each bin, based on the range of values in the input ...
-  // we offset the first and last values in the range by epsilon to ensure that
-  // extrema don't fall "outside" the first or last bins due to errors in floating-point precision.
+  // Calculate the extents of each bin, based on the range of values in the
+  // input ...  
+  // we offset the first and last values in the range by epsilon
+  // to ensure that extrema don't fall "outside" the first or last bins due
+  // to errors in floating-point precision.
   double range[2];
   data_array->GetRange(range, this->Component);
   const double bin_delta = (range[1] - range[0]) / this->BinCount;

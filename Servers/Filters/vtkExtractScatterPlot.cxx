@@ -27,7 +27,7 @@
 
 #include <iostream>
 
-vtkCxxRevisionMacro(vtkExtractScatterPlot, "1.3");
+vtkCxxRevisionMacro(vtkExtractScatterPlot, "1.4");
 vtkStandardNewMacro(vtkExtractScatterPlot);
 
 vtkExtractScatterPlot::vtkExtractScatterPlot() :
@@ -65,7 +65,8 @@ void vtkExtractScatterPlot::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "YBinCount: " << this->YBinCount << "\n";
 }
 
-int vtkExtractScatterPlot::FillInputPortInformation (int port, vtkInformation *info)
+int vtkExtractScatterPlot::FillInputPortInformation (int port, 
+                                                     vtkInformation *info)
 {
   Superclass::FillInputPortInformation(port, info);
   
@@ -73,11 +74,14 @@ int vtkExtractScatterPlot::FillInputPortInformation (int port, vtkInformation *i
   return 1;
 }
 
-int vtkExtractScatterPlot::RequestData(vtkInformation* /*request*/, vtkInformationVector** inputVector, vtkInformationVector* outputVector)
+int vtkExtractScatterPlot::RequestData(vtkInformation* /*request*/, 
+                                       vtkInformationVector** inputVector, 
+                                       vtkInformationVector* outputVector)
 {
   vtkDebugMacro(<< "Executing vtkExtractScatterPlot filter");
 
-  // Build an empty output grid in advance, so we can bail-out if we encounter any problems
+  // Build an empty output grid in advance, so we can bail-out if we
+  // encounter any problems
   vtkInformation* const output_info = outputVector->GetInformationObject(0);
   vtkPolyData* const output_data = vtkPolyData::SafeDownCast(
     output_info->Get(vtkDataObject::DATA_OBJECT()));
@@ -104,26 +108,34 @@ int vtkExtractScatterPlot::RequestData(vtkInformation* /*request*/, vtkInformati
   output_data->GetCellData()->AddArray(y_bin_extents);
   y_bin_extents->Delete();
 
-  // Find the field to process, if we can't find anything, we return an empty dataset
-  vtkDataArray* const x_data_array = this->GetInputArrayToProcess(0, inputVector);
+  // Find the field to process, if we can't find anything, we return an
+  // empty dataset
+  vtkDataArray* const x_data_array = 
+    this->GetInputArrayToProcess(0, inputVector);
   if(!x_data_array)
     {
     return 1;
     }
-  // If the requested component is out-of-range for the input, we return an empty dataset
-  if(this->XComponent < 0 || this->XComponent >= x_data_array->GetNumberOfComponents())
+  // If the requested component is out-of-range for the input, we return an
+  // empty dataset
+  if(this->XComponent < 0 || 
+     this->XComponent >= x_data_array->GetNumberOfComponents())
     {
     return 1;
     }
 
-  // Find the field to process, if we can't find anything, we return an empty dataset
-  vtkDataArray* const y_data_array = this->GetInputArrayToProcess(1, inputVector);
+  // Find the field to process, if we can't find anything, we return an
+  // empty dataset
+  vtkDataArray* const y_data_array = 
+    this->GetInputArrayToProcess(1, inputVector);
   if(!y_data_array)
     {
     return 1;
     }
-  // If the requested component is out-of-range for the input, we return an empty dataset
-  if(this->YComponent < 0 || this->YComponent >= y_data_array->GetNumberOfComponents())
+  // If the requested component is out-of-range for the input, we return an
+  // empty dataset
+  if(this->YComponent < 0 || 
+     this->YComponent >= y_data_array->GetNumberOfComponents())
     {
     return 1;
     }
@@ -134,9 +146,10 @@ int vtkExtractScatterPlot::RequestData(vtkInformation* /*request*/, vtkInformati
     return 1;
     }
 
-  // Calculate the extents of each bin, based on the range of values in the input ...
-  // we offset the first and last values in each range by epsilon to ensure that
-  // extrema don't fall "outside" the first or last bins due to errors in floating-point precision.
+  // Calculate the extents of each bin, based on the range of values in the
+  // input ...  we offset the first and last values in each range by
+  // epsilon to ensure that extrema don't fall "outside" the first or last
+  // bins due to errors in floating-point precision.
   double x_range[2];
   x_data_array->GetRange(x_range, this->XComponent);
   const double x_bin_delta = (x_range[1] - x_range[0]) / this->XBinCount;
