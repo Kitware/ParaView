@@ -19,13 +19,15 @@
 #include "vtkPolyDataAlgorithm.h"
 
 // .NAME vtkExtractScatterPlot - Extract a scatter plot (two-dimensional histogram) from any dataset
-
 // .SECTION Description
-// vtkExtractScatterPlot accepts any vtkDataSet as input and produces a vtkPolyData
-// containing two-dimensional histogram data as output.  The output vtkPolyData will
-// contain two vtkDoubleArray instances named "x_bin_extents" and "y_bin_extents", which
-// contain the boundaries between bins along each dimension.  It will also contain a
-// vtkUnsignedLongArray named "bin_values" which contains the value for each bin.
+
+// vtkExtractScatterPlot accepts any vtkDataSet as input and produces a
+// vtkPolyData containing two-dimensional histogram data as output.  The
+// output vtkPolyData will contain two vtkDoubleArray instances named
+// "x_bin_extents" and "y_bin_extents", which contain the boundaries
+// between bins along each dimension.  It will also contain a
+// vtkUnsignedLongArray named "bin_values" which contains the value for
+// each bin.
 
 class VTK_EXPORT vtkExtractScatterPlot :
   public vtkPolyDataAlgorithm
@@ -41,7 +43,8 @@ public:
   vtkGetMacro(XComponent, int);
   
   // Description:
-  // Controls which input data component should be binned, for input arrays with more-than-one component
+  // Controls which input data component should be binned, for input arrays
+  // with more-than-one component
   vtkSetClampMacro(YComponent, int, 0, VTK_LARGE_INTEGER);
   vtkGetMacro(YComponent, int);
   
@@ -62,7 +65,9 @@ private:
   ~vtkExtractScatterPlot();
 
   virtual int FillInputPortInformation (int port, vtkInformation *info);
-  virtual int RequestData(vtkInformation *request, vtkInformationVector **inputVector, vtkInformationVector *outputVector);
+  virtual int RequestData(vtkInformation *request, 
+                          vtkInformationVector **inputVector, 
+                          vtkInformationVector *outputVector);
 
   int XComponent;
   int YComponent;
