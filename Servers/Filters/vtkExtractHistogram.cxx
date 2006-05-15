@@ -27,7 +27,7 @@
 
 #include <iostream>
 
-vtkCxxRevisionMacro(vtkExtractHistogram, "1.2");
+vtkCxxRevisionMacro(vtkExtractHistogram, "1.3");
 vtkStandardNewMacro(vtkExtractHistogram);
 
 vtkExtractHistogram::vtkExtractHistogram() :
@@ -79,7 +79,8 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   bin_extents->SetNumberOfComponents(1);
   bin_extents->SetNumberOfTuples(this->BinCount + 1);
   bin_extents->SetName("bin_extents");
-  for(int i = 0; i != this->BinCount + 1; ++i)
+  int i;
+  for(i = 0; i != this->BinCount + 1; ++i)
     {
     bin_extents->SetValue(i, 0);
     }
@@ -113,7 +114,7 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   const double bin_delta = (range[1] - range[0]) / this->BinCount;
   
   bin_extents->SetValue(0, range[0] - VTK_DBL_EPSILON);
-  for(int i = 1; i < this->BinCount; ++i)
+  for(i = 1; i < this->BinCount; ++i)
     {
     bin_extents->SetValue(i, range[0] + (i * bin_delta));
     }
@@ -125,12 +126,12 @@ int vtkExtractHistogram::RequestData(vtkInformation* /*request*/,
   bin_values->SetNumberOfTuples(this->BinCount);
   bin_values->SetName("bin_values");
   
-  for(int i = 0; i != this->BinCount; ++i)
+  for(i = 0; i != this->BinCount; ++i)
     {
     bin_values->SetValue(i, 0);
     }
   
-  for(int i = 0; i != data_array->GetNumberOfTuples(); ++i)
+  for(i = 0; i != data_array->GetNumberOfTuples(); ++i)
     {
     const double value = data_array->GetComponent(i, this->Component);
     for(int j = 0; j != this->BinCount; ++j)
