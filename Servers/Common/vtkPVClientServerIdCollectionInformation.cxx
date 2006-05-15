@@ -26,7 +26,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkPVClientServerIdCollectionInformation);
-vtkCxxRevisionMacro(vtkPVClientServerIdCollectionInformation, "1.1");
+vtkCxxRevisionMacro(vtkPVClientServerIdCollectionInformation, "1.2");
 
 typedef vtkstd::set<vtkClientServerID> vtkClientServerIdSetBase;
 class vtkClientServerIdSetType : public vtkClientServerIdSetBase {};
@@ -76,7 +76,7 @@ void vtkPVClientServerIdCollectionInformation
     
     props->InitTraversal();
     vtkProp *prop;
-    while (prop = props->GetNextProp())
+    while ( (prop = props->GetNextProp()) )
       {
       vtkClientServerID id = processModule->GetIDFromObject(prop);
       this->ClientServerIdIds->insert(id);
