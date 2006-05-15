@@ -1,3 +1,4 @@
+
 <ServerManagerConfiguration>
 
   <ProxyGroup name="rendering">
@@ -2798,6 +2799,35 @@
       </SubProxy>
     </New3DWidgetProxy>
     <!-- End of displays group -->
+  </ProxyGroup>
+
+  <ProxyGroup name="PropPickers">
+    <Proxy name="AreaPicker"
+           class="vtkRenderedAreaPicker">
+
+      <ProxyProperty 
+        name="SetRenderer" 
+        command="SetRenderer">
+        <ProxyGroupDomain name="groups">
+          <Group name="renderers"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+
+      <DoubleVectorProperty
+        name="SetPickCoords"
+        command="SetPickCoords"
+        number_of_elements="4"
+        default_values="0.0 0.0 0.0 0.0">
+        <DoubleRangeDomain name="range" min="0.0 0.0 0.0 0.0"/>
+      </DoubleVectorProperty>
+       
+      <Property
+        name="Pick"
+        command="Pick"
+        is_internal="1">
+      </Property>
+    </Proxy>
+    
   </ProxyGroup>
 
 </ServerManagerConfiguration>

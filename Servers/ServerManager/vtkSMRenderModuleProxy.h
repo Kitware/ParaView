@@ -30,6 +30,7 @@ class vtkRenderer;
 class vtkPVRenderModuleHelper;
 class vtkSMDisplay;
 class vtkSMDisplayProxy;
+class vtkPVClientServerIdCollectionInformation;
 
 // TODO: have to change the PVCameraManipulators to do ResetCamera on
 // the RenderModule rather than renderer.
@@ -112,6 +113,12 @@ public:
   // Get the value of the z buffer at a position. 
   // This is necessary for picking the center of rotation.
   virtual double GetZBufferValue(int x, int y);
+
+  // Description:
+  // Performs a pick in the selected screen area and returns a list
+  // of ClientServerIds for the DisplayProxies hit.
+  vtkPVClientServerIdCollectionInformation* 
+    Pick(int xs, int ys, int xe, int ye);
 
   // Description:
   // Reset camera to the given bounds.

@@ -47,6 +47,7 @@ SET(Kit_SRCS
   vtkUndoElement.cxx
   vtkUndoSet.cxx
   vtkUndoStack.cxx
+  vtkPVClientServerIdCollectionInformation.cxx
   )
 
 # Abstract and Wrap exclude

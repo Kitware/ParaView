@@ -280,6 +280,7 @@ protected:
   friend class vtkPVComparativeVisManager;
   friend class vtkPVComparativeVis;
   friend class vtkSMComparativeVisProxy;
+  friend class vtkSMRenderModuleProxy;
   vtkGetObjectMacro(MapperProxy, vtkSMProxy);
   vtkGetObjectMacro(ActorProxy, vtkSMProxy);
   vtkGetObjectMacro(GeometryFilterProxy, vtkSMProxy);

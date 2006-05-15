@@ -45,8 +45,12 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkWindowToImageFilter.h"
 
+#include "vtkAreaPicker.h"
+#include "vtkPVClientServerIdCollectionInformation.h"
+#include "vtkProcessModuleConnectionManager.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.27");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.28");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -766,6 +770,110 @@ double vtkSMRenderModuleProxy::GetZBufferValue(int x, int y)
   val = array->GetValue(0);
   array->Delete();
   return val;  
+}
+
+//----------------------------------------------------------------------------
+vtkPVClientServerIdCollectionInformation* vtkSMRenderModuleProxy
+  ::Pick(int xs, int ys, int xe, int ye)
+{
+  vtkPVClientServerIdCollectionInformation *propCollectionInfo = NULL;
+
+  vtkProcessModule* processModule = NULL;
+  vtkSMProxyManager* proxyManager = NULL;
+  vtkSMProxy *areaPickerProxy = NULL;
+  vtkSMProxyProperty *setRendererMethod = NULL;
+  vtkSMDoubleVectorProperty *setCoordsMethod = NULL;
+  vtkSMProperty *pickMethod = NULL;
+  vtkCollectionIterator* iter = NULL;
+
+  //create an areapicker and find its methods
+  processModule = vtkProcessModule::GetProcessModule();
+  if (!processModule)
+    {
+    vtkErrorMacro("Failed to find processmodule.");
+    goto cleanup;
+    }  
+  proxyManager = vtkSMObject::GetProxyManager();  
+  if (!proxyManager)
+    {
+    vtkErrorMacro("Failed to find the proxy manager.");
+    goto cleanup;
+    }
+  areaPickerProxy = proxyManager->NewProxy("PropPickers", "AreaPicker"); 
+  if (!areaPickerProxy)
+    {
+    vtkErrorMacro("Failed to make AreaPicker proxy.");
+    goto cleanup;
+    }
+  setRendererMethod = vtkSMProxyProperty::SafeDownCast(
+    areaPickerProxy->GetProperty("SetRenderer"));
+  if (!setRendererMethod)
+    {
+    vtkErrorMacro("Failed to find the set renderer property.");
+    goto cleanup;
+    }
+  setCoordsMethod = vtkSMDoubleVectorProperty::SafeDownCast(
+    areaPickerProxy->GetProperty("SetPickCoords"));
+  if (!setCoordsMethod)
+    {
+    vtkErrorMacro("Failed to find the set pick coords property.");
+    goto cleanup;
+    }
+  pickMethod = areaPickerProxy->GetProperty("Pick");
+  if (!pickMethod)
+    {
+    vtkErrorMacro("Failed to find the pick property.");
+    goto cleanup;
+    }
+    
+  //execute the areapick
+  setRendererMethod->AddProxy(this->GetRendererProxy());
+  setCoordsMethod->SetElements4(xs, ys, xe, ye);
+  areaPickerProxy->UpdateVTKObjects();   
+  pickMethod->Modified();
+  areaPickerProxy->UpdateVTKObjects();   
+
+  //gather the results from the AreaPicker
+  propCollectionInfo = vtkPVClientServerIdCollectionInformation::New();
+  processModule->GatherInformation(
+    vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+    vtkProcessModule::RENDER_SERVER, 
+    propCollectionInfo, 
+    areaPickerProxy->GetID(0)
+    );
+  
+  //find the SMDisplayProxies that contain the picked props, then we know
+  //what we hit.
+  iter = this->Displays->NewIterator();
+  for (iter->InitTraversal(); 
+       !iter->IsDoneWithTraversal(); 
+       iter->GoToNextItem())
+    {
+    vtkSMDataObjectDisplayProxy* dodp = 
+      vtkSMDataObjectDisplayProxy::SafeDownCast(iter->GetCurrentObject());
+    
+    if (dodp)
+      {
+      //had to expose this protected method in SMDataObjectDisplayProxy
+      vtkSMProxy *actorProxy = dodp->GetActorProxy();
+      vtkClientServerID id = actorProxy->GetID(0);
+      if (propCollectionInfo->Contains(&id))
+        {
+        cerr << "Picked Display Proxy " <<dodp<< " for prop " <<id<< endl;
+        //dodp->SetColorCM(1.0, 1.0, 0.0);
+        }
+      }
+    
+    }
+  iter->Delete();  
+
+cleanup:
+  if (areaPickerProxy)
+    {
+    areaPickerProxy->Delete();
+    }
+  
+  return propCollectionInfo;
 }
 
 //-----------------------------------------------------------------------------

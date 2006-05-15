@@ -167,6 +167,7 @@ public:
   // client.  If the id is for an object on another node then 0 is
   // returned.
   virtual vtkObjectBase* GetObjectFromID(vtkClientServerID);
+  virtual vtkClientServerID GetIDFromObject(vtkObjectBase*);
 
   // Description:
   // Return the last result for the specified server.  In this case,
