@@ -97,7 +97,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.50");
+vtkCxxRevisionMacro(vtkProcessModule, "1.51");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -532,6 +532,12 @@ vtkIdType vtkProcessModule::ConnectToRemote(const char* dataserver_host,
 {
   return this->ConnectionManager->OpenConnection(
     dataserver_host, dataserver_port, renderserver_host, renderserver_port);
+}
+
+//-----------------------------------------------------------------------------
+vtkIdType vtkProcessModule::ConnectToSelf()
+{
+  return this->ConnectionManager->OpenSelfConnection();
 }
 
 //-----------------------------------------------------------------------------
@@ -1636,6 +1642,12 @@ vtkPVXMLElement* vtkProcessModule::NewNextUndo(vtkIdType id)
 vtkPVXMLElement* vtkProcessModule::NewNextRedo(vtkIdType id)
 {
   return this->ConnectionManager->NewNextRedo(id);
+}
+
+//-----------------------------------------------------------------------------
+int vtkProcessModule::GetNumberOfConnections()
+{
+  return this->ConnectionManager->GetNumberOfConnections();
 }
 
 //-----------------------------------------------------------------------------

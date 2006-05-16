@@ -193,6 +193,11 @@ public:
   vtkIdType OpenConnection(const char* datahostname, int dataport,
   const char* renderhostname, int renderport);
 
+  // Description:
+  // This creates a new self connection. This is an experimental
+  // feature.
+  vtkIdType OpenSelfConnection();
+
 //BTX
   // Description:
   // Close the connection with the given connection Id. Must be
@@ -301,6 +306,9 @@ public:
   // \returns NULL on failure, otherwise the XML element is returned.
   vtkPVXMLElement* NewNextRedo(vtkIdType id);
  
+  // Description:
+  // Get the number of connections open.
+  unsigned int GetNumberOfConnections();
 //ETX
 protected:
   vtkProcessModuleConnectionManager();
@@ -320,10 +328,6 @@ protected:
   // active on that socket.
   vtkProcessModuleConnection* GetManagedConnection(vtkSocket* soc);
   
-  // Description:
-  // Get the number of connections open.
-  unsigned int GetNumberOfConnections();
-
   // Description:
   // Instantiates a vtkRemoteConnection() subclass.
   // The actual class instantiated depends on this->ClientMode.
