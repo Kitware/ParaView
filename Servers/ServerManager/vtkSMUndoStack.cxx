@@ -124,11 +124,11 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMUndoStackUndoSet);
-vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.5");
+vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.6");
 //*****************************************************************************
 
 vtkStandardNewMacro(vtkSMUndoStack);
-vtkCxxRevisionMacro(vtkSMUndoStack, "1.5");
+vtkCxxRevisionMacro(vtkSMUndoStack, "1.6");
 vtkCxxSetObjectMacro(vtkSMUndoStack, StateLoader, vtkSMUndoRedoStateLoader);
 //-----------------------------------------------------------------------------
 vtkSMUndoStack::vtkSMUndoStack()
@@ -139,6 +139,7 @@ vtkSMUndoStack::vtkSMUndoStack()
   this->ActiveConnectionID = vtkProcessModuleConnectionManager::GetNullConnectionID();
   this->Label = NULL;
   this->StateLoader = NULL;
+  this->BuildUndoSet = 0;
 
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   if (!pxm)
@@ -179,17 +180,32 @@ vtkSMUndoStack::~vtkSMUndoStack()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMUndoStack::BeginUndoSet(vtkIdType cid, const char* label)
+void vtkSMUndoStack::BeginOrContinueUndoSet(vtkIdType cid, const char* label)
 {
-  if (this->ActiveUndoSet)
+  if (this->ActiveUndoSet && this->ActiveConnectionID != cid)
     {
-    vtkErrorMacro("BeginUndoSet cannot be nested. EndUndoSet must be called "
-      << "before calling BeginUndoSet again.");
-    return;
+    vtkWarningMacro("Connection ID has changed, cannot continue "
+      << "with the active undo set. Starting a new one.");
+    this->EndUndoSet();
     }
-  this->ActiveUndoSet = vtkUndoSet::New();
-  this->SetLabel(label);
-  this->ActiveConnectionID = cid;
+
+  if (!this->ActiveUndoSet)
+    {
+    this->ActiveUndoSet = vtkUndoSet::New();
+    this->SetLabel(label);
+    this->ActiveConnectionID = cid;
+    }
+  this->BuildUndoSet = 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMUndoStack::PauseUndoSet()
+{
+  if (!this->BuildUndoSet)
+    {
+    vtkWarningMacro("No undo set active.");
+    }
+  this->BuildUndoSet = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -197,17 +213,26 @@ void vtkSMUndoStack::EndUndoSet()
 {
   if (!this->ActiveUndoSet)
     {
-    vtkErrorMacro("BeginUndoSet must be called before calling EndUndoSet.");
+    vtkErrorMacro("BeginOrContinueUndoSet must be called before calling EndUndoSet.");
     return;
     }
 
   this->Push(this->ActiveConnectionID, this->Label, this->ActiveUndoSet);
-  
-  this->ActiveUndoSet->Delete();
-  this->ActiveUndoSet = NULL;
-  this->SetLabel(NULL);
-  this->ActiveConnectionID = 
-    vtkProcessModuleConnectionManager::GetNullConnectionID();
+  this->CancelUndoSet();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMUndoStack::CancelUndoSet()
+{
+  if (this->ActiveUndoSet)
+    {
+    this->ActiveUndoSet->Delete();
+    this->ActiveUndoSet = NULL;
+    this->SetLabel(NULL);
+    this->ActiveConnectionID = 
+      vtkProcessModuleConnectionManager::GetNullConnectionID();
+    this->BuildUndoSet = 0;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -227,6 +252,7 @@ void vtkSMUndoStack::Push(vtkIdType cid, const char* label, vtkUndoSet* set)
   
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkPVXMLElement* state = set->SaveState(NULL);
+  // state->PrintXML();
   pm->PushUndo(cid, label, state);
   state->Delete();
 
@@ -259,21 +285,21 @@ void vtkSMUndoStack::ExecuteEvent(vtkObject* vtkNotUsed(caller),
   switch (eventid)
     {
   case vtkCommand::RegisterEvent:
-    if (this->ActiveUndoSet)
+    if (this->BuildUndoSet)
       {
       this->OnRegisterProxy(data);
       }
     break;
 
   case vtkCommand::UnRegisterEvent:
-    if (this->ActiveUndoSet)
+    if (this->BuildUndoSet)
       {
       this->OnUnRegisterProxy(data);
       }
     break;
 
   case vtkCommand::PropertyModifiedEvent:
-    if (this->ActiveUndoSet)
+    if (this->BuildUndoSet)
       {
       this->OnPropertyModified(data);
       }
@@ -384,7 +410,7 @@ int vtkSMUndoStack::ProcessUndo(vtkIdType id, vtkPVXMLElement* root)
     status = undo->Undo();
     undo->Delete();
     // Update modified proxies.
-    vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
+    // vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
     }
   return status;
 }
@@ -406,7 +432,7 @@ int vtkSMUndoStack::ProcessRedo(vtkIdType id, vtkPVXMLElement* root)
     status = redo->Redo();
     redo->Delete();
     // Update modified proxies.
-    vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
+    // vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
     }
   return status;
 }
