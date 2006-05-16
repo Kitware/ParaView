@@ -50,6 +50,10 @@ SET(KWCommon_INCLUDE_DIRS_CONFIG ${KWCommon_INCLUDE_PATH})
 SET(KWCommon_LIBRARY_DEPENDS_FILE 
   ${KWCommon_BINARY_DIR}/KWCommonLibraryDepends.cmake)
 
+# The CMake macros dir.
+SET(KWCommon_CMAKE_DIR_CONFIG 
+  ${KWCommon_CMAKE_DIR})
+
 # The VTK options.
 SET(KWCommon_VTK_DIR_CONFIG ${VTK_DIR})
 
@@ -103,6 +107,23 @@ SET(KWCommon_LIBRARY_DEPENDS_FILE
 # The CMake macros dir.
 SET(KWCommon_CMAKE_DIR_CONFIG 
   ${DOLLAR}{KWCommon_INSTALL_PREFIX}${KWCommon_INSTALL_PACKAGE_DIR}/CMake)
+
+# The VTK options.
+# If VTK_BINARY_DIR is set, then KWCommon is part of a larger parent project
+# that also builds VTK. In that case, KWCommon_VTK_INSTALL_PACKAGE_DIR
+# should be set to the value of VTK_INSTALL_PACKAGE_DIR. Otherwise, if not set,
+# then we are using an outside VTK whose location will not change when we
+# install.
+IF(VTK_BINARY_DIR)
+  IF(NOT KWCommon_VTK_INSTALL_PACKAGE_DIR)
+    MESSAGE(
+      FATAL_ERROR 
+      "KWCommon_VTK_INSTALL_PACKAGE_DIR must be set by the parent project to the value of VTK_INSTALL_PACKAGE_DIR it uses to configure VTK.")
+  ENDIF(NOT KWCommon_VTK_INSTALL_PACKAGE_DIR)
+  SET(KWCommon_VTK_DIR_CONFIG ${KWCommon_VTK_INSTALL_PACKAGE_DIR})
+ELSE(VTK_BINARY_DIR)
+  SET(KWCommon_VTK_DIR_CONFIG ${VTK_DIR})
+ENDIF(VTK_BINARY_DIR)
 
 # The build configuration information.
 # The install tree only has one configuration.

@@ -4,9 +4,16 @@
 #
 # This file is configured by KWCommon and used by the UseKWCommon.cmake
 # module to load KWCommon's settings for an external project.
+@KWCommon_CONFIG_INSTALL_ONLY@
+# The KWCommon version number.
+SET(KWCommon_MAJOR_VERSION "@KWCommon_MAJOR_VERSION@")
+SET(KWCommon_MINOR_VERSION "@KWCommon_MINOR_VERSION@")
 
 # The libraries.
 SET(KWCommon_LIBRARIES "@KWCommon_LIBRARIES@")
+
+# The CMake macros dir.
+SET(KWCommon_CMAKE_DIR "@KWCommon_CMAKE_DIR_CONFIG@")
 
 # The configuration options.
 SET(KWCommon_BUILD_SHARED_LIBS "@KWCommon_BUILD_SHARED_LIBS@")
