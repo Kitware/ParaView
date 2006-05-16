@@ -83,7 +83,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.41");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.42");
 vtkCxxSetObjectMacro(vtkSMProxyManager, UndoStack, vtkSMUndoStack);
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -654,6 +654,11 @@ void vtkSMProxyManager::UnMarkProxyAsModified(vtkSMProxy* proxy)
     {
     this->Internals->ModifiedProxies.erase(it);
     }
+}
+//---------------------------------------------------------------------------
+int vtkSMProxyManager::AreProxiesModified()
+{
+  return (this->Internals->ModifiedProxies.size() > 0)? 1: 0;
 }
 
 //---------------------------------------------------------------------------

@@ -238,6 +238,11 @@ public:
   // The GUI must set this, if it supports Undo/Redo.
   void SetUndoStack(vtkSMUndoStack*);
   vtkGetObjectMacro(UndoStack, vtkSMUndoStack);
+
+  // Description:
+  // Get if there are any registered proxies that have their properties in
+  // a modified state.
+  int AreProxiesModified();
 protected:
   vtkSMProxyManager();
   ~vtkSMProxyManager();
