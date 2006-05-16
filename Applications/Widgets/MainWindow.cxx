@@ -62,7 +62,9 @@ MainWindow::MainWindow() : Observer(pqObserver::New())
     << pqSetName("CreateSliderWidget")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onCreateSliderWidget()));
 
-  
+  this->toolsMenu()->addAction(tr("Create Implicit Plane Widget"))
+    << pqSetName("CreateImplicitPlaneWidget")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(onCreateImplicitPlaneWidget()));
 }
 
 //-----------------------------------------------------------------------------
@@ -75,33 +77,48 @@ MainWindow::~MainWindow()
 //-----------------------------------------------------------------------------
 void MainWindow::onCreateSliderWidget()
 {
-  vtkSMNew3DWidgetProxy* const widget_proxy = vtkSMNew3DWidgetProxy::SafeDownCast(
+  vtkSMNew3DWidgetProxy* const widget = vtkSMNew3DWidgetProxy::SafeDownCast(
     vtkSMObject::GetProxyManager()->NewProxy(
       "displays", "SliderWidgetDisplay"));
 
 /*
   vtkSMDoubleVectorProperty* p1 = vtkSMDoubleVectorProperty::SafeDownCast(
-    widget_proxy->GetProperty("Point1"));
+    widget->GetProperty("Point1"));
   p1->SetElements3(-0.75, -0.5, 0);
 
   vtkSMDoubleVectorProperty* p2 = vtkSMDoubleVectorProperty::SafeDownCast(
-    widget_proxy->GetProperty("Point2"));
+    widget->GetProperty("Point2"));
   p2->SetElements3( 0.75, -0.5, 0);
 
   vtkSMDoubleVectorProperty* min = vtkSMDoubleVectorProperty::SafeDownCast(
-    widget_proxy->GetProperty("MinimumValue"));
+    widget->GetProperty("MinimumValue"));
   min->SetElements1(6);
 
   vtkSMDoubleVectorProperty* max = vtkSMDoubleVectorProperty::SafeDownCast(
-    widget_proxy->GetProperty("MaximumValue"));
+    widget->GetProperty("MaximumValue"));
   max->SetElements1(128);
 */
 
-  widget_proxy->UpdateVTKObjects();
+  this->initializeWidget(widget);
+}
 
-  widget_proxy->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer);
+//-----------------------------------------------------------------------------
+void MainWindow::onCreateImplicitPlaneWidget()
+{
+  vtkSMNew3DWidgetProxy* const widget = vtkSMNew3DWidgetProxy::SafeDownCast(
+    vtkSMObject::GetProxyManager()->NewProxy(
+      "displays", "ImplicitPlaneWidgetDisplay"));
+      
+  this->initializeWidget(widget);
+}
 
-  pqRenderModule *renModule = 
+void MainWindow::initializeWidget(vtkSMNew3DWidgetProxy* widget)
+{
+  widget->UpdateVTKObjects();
+
+  widget->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer);
+
+  pqRenderModule* renModule = 
     pqApplicationCore::instance()->getActiveRenderModule();
 
   vtkSMRenderModuleProxy* rm = renModule->getProxy() ;
@@ -109,7 +126,7 @@ void MainWindow::onCreateSliderWidget()
     rm->GetProperty("Displays"));
   if(pp)
     {
-    pp->AddProxy(widget_proxy);
+    pp->AddProxy(widget);
     rm->UpdateVTKObjects();
     }
 }

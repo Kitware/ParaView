@@ -12,6 +12,8 @@
 
 #include <pqMainWindow.h>
 
+class vtkSMNew3DWidgetProxy;
+
 /// Provides the main window for the Dobran-O-Viz application
 class MainWindow :
   public pqMainWindow
@@ -23,10 +25,14 @@ public:
   ~MainWindow();
 
 private slots:
-  /// Called to create an instance of a widget
+  /// Called to create an instance of a slider widget
   void onCreateSliderWidget();
+  /// Called to create an instance of an implicit plane widget
+  void onCreateImplicitPlaneWidget();
 
 private:
+  void initializeWidget(vtkSMNew3DWidgetProxy* widget);
+
   class pqObserver;
   pqObserver* Observer;
 };
