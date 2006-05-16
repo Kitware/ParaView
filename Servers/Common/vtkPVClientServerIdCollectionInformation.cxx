@@ -26,7 +26,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkPVClientServerIdCollectionInformation);
-vtkCxxRevisionMacro(vtkPVClientServerIdCollectionInformation, "1.3");
+vtkCxxRevisionMacro(vtkPVClientServerIdCollectionInformation, "1.4");
 
 typedef vtkstd::set<vtkClientServerID> vtkClientServerIdSetBase;
 class vtkClientServerIdSetType : public vtkClientServerIdSetBase {};
@@ -139,9 +139,11 @@ void vtkPVClientServerIdCollectionInformation
 
 //----------------------------------------------------------------------------
 int vtkPVClientServerIdCollectionInformation
-  ::Contains(vtkClientServerID *id) 
+  ::Contains(vtkTypeUInt32 ID) 
 {
-  if (this->ClientServerIds->find(*id) != this->ClientServerIds->end())
+  vtkClientServerID id;
+  id.ID = ID;
+  if (this->ClientServerIds->find(id) != this->ClientServerIds->end())
     {
     return 1;
     }
