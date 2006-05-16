@@ -23,9 +23,9 @@
 #define __vtkPVClientServerIdCollectionInformation_h
 
 #include "vtkPVInformation.h"
+#include "vtkSystemIncludes.h" // vtkTypeUInt32
 
 class vtkClientServerIdSetType;
-class vtkClientServerID;
 
 class VTK_EXPORT vtkPVClientServerIdCollectionInformation 
   : public vtkPVInformation
@@ -51,7 +51,7 @@ public:
   // Description:
   // For debugging.
 //BTX
-  int Contains(vtkClientServerID *id);
+  int Contains(vtkTypeUInt32 ID);
 //ETX
 
 protected:

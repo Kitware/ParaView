@@ -50,7 +50,7 @@
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.28");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.29");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -857,7 +857,7 @@ vtkPVClientServerIdCollectionInformation* vtkSMRenderModuleProxy
       //had to expose this protected method in SMDataObjectDisplayProxy
       vtkSMProxy *actorProxy = dodp->GetActorProxy();
       vtkClientServerID id = actorProxy->GetID(0);
-      if (propCollectionInfo->Contains(&id))
+      if (propCollectionInfo->Contains(id.ID))
         {
         cerr << "Picked Display Proxy " <<dodp<< " for prop " <<id<< endl;
         //dodp->SetColorCM(1.0, 1.0, 0.0);
