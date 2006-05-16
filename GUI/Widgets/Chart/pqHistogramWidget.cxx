@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLineChart.h"
 
 #include <pqConnect.h>
+#include <pqSetName.h>
 #include <pqFileDialog.h>
 #include <pqLocalFileDialogModel.h>
 
@@ -1021,7 +1022,9 @@ void pqHistogramWidget::printChart(QPrinter& printer)
 
 void pqHistogramWidget::savePDF()
 {
-  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save .pdf File:"), this, "fileSavePDFDialog")
+  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(),
+    this, tr("Save .pdf File:"), QString(), "PDF files (*.pdf)")
+    << pqSetName("fileSavePDFDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(savePDF(const QStringList&)));
     
   file_dialog->show();
@@ -1041,7 +1044,9 @@ void pqHistogramWidget::savePDF(const QStringList& files)
 
 void pqHistogramWidget::savePNG()
 {
-  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), tr("Save .png File:"), this, "fileSavePNGDialog")
+  pqFileDialog* file_dialog = new pqFileDialog(new pqLocalFileDialogModel(),
+    this, tr("Save .png File:"), QString(), "PNG files (*.png)")
+    << pqSetName("fileSavePNGDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(savePNG(const QStringList&)));
     
   file_dialog->show();

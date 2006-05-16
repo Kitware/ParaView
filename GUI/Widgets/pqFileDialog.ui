@@ -50,7 +50,11 @@
       </widget>
      </item>
      <item row="1" column="1" >
-      <widget class="QComboBox" name="FileType" />
+      <widget class="QComboBox" name="FileType" >
+       <property name="sizeAdjustPolicy" >
+        <enum>QComboBox::AdjustToMinimumContentsLength</enum>
+       </property>
+      </widget>
      </item>
      <item row="0" column="2" >
       <widget class="QPushButton" name="OK" >
@@ -140,6 +144,16 @@
   </layout>
  </widget>
  <pixmapfunction></pixmapfunction>
+ <tabstops>
+  <tabstop>FileName</tabstop>
+  <tabstop>FileType</tabstop>
+  <tabstop>OK</tabstop>
+  <tabstop>Cancel</tabstop>
+  <tabstop>Parents</tabstop>
+  <tabstop>NavigateUp</tabstop>
+  <tabstop>Favorites</tabstop>
+  <tabstop>Files</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

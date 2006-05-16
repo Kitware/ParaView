@@ -44,6 +44,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace
 {
 
+  /// the last path accessed by this file dialog model
+  /// used to remember paths across the session
+QString gLastPath;
+
 //////////////////////////////////////////////////////////////////////
 // Icons
 
@@ -488,11 +492,17 @@ pqLocalFileDialogModel::~pqLocalFileDialogModel()
 
 QString pqLocalFileDialogModel::getStartPath()
 {
-  return QDir::currentPath();
+  if(!gLastPath.isNull())
+    {
+    return gLastPath;
+    }
+  gLastPath = QDir::currentPath();
+  return gLastPath;
 }
 
 void pqLocalFileDialogModel::setCurrentPath(const QString& Path)
 {
+  gLastPath = Path;
   this->Implementation->FileModel->setCurrentPath(Path);
 }
 

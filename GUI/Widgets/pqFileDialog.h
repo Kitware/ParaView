@@ -35,8 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QtWidgetsExport.h"
 #include <QDialog>
+#include <QModelIndex>
 
 class pqFileDialogModel;
+class pqFileDialogFilter;
 namespace Ui { class pqFileDialog; }
 class QModelIndex;
 
@@ -62,11 +64,20 @@ class QTWIDGETS_EXPORT pqFileDialog :
   Q_OBJECT
   
 public:
-  pqFileDialog(pqFileDialogModel* Model, const QString& Title, QWidget* Parent, const char* const Name);
+  /// creates a file dialog using the dialog model
+  /// the title, and start directory may be specified
+  /// the filter is a string of semi-colon separated filters
+  pqFileDialog(pqFileDialogModel* Model, QWidget* Parent, 
+               const QString& Title = QString(), 
+               const QString& Directory = QString(), 
+               const QString& Filter = QString());
   ~pqFileDialog();
 
   /// Forces the dialog to emit the filesSelected() signal and close, as if receiving user input
   void emitFilesSelected(const QStringList&);
+
+  /// returns the current file filter
+  QString currentFilter();
 
   void accept();
   void reject();
@@ -75,15 +86,13 @@ signals:
   /// Signal emitted when the user has chosen a set of files and accepted the dialog
   void filesSelected(const QStringList&);
 
-private:
-  pqFileDialog(const pqFileDialog&);
-  pqFileDialog& operator=(const pqFileDialog&);
-
+protected:
   pqFileDialogModel* const Model;
   Ui::pqFileDialog* const Ui;
-  const QModelIndex* Temp;
+  QModelIndex Temp;
+  pqFileDialogFilter* Filter;
   
-private slots:
+protected slots:
   void onDataChanged(const QModelIndex&, const QModelIndex&);
   void onActivated(const QModelIndex&);
   void onClicked(const QModelIndex&);
@@ -91,6 +100,12 @@ private slots:
   void onNavigate(const QString&);
   void onNavigateUp();
   void onNavigateDown();
+  void onFilterChange(const QString&);
+
+private:
+  pqFileDialog(const pqFileDialog&);
+  pqFileDialog& operator=(const pqFileDialog&);
+
 };
 
 #endif // !_pqFileDialog_h

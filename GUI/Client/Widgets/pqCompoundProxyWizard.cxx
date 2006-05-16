@@ -65,9 +65,11 @@ void pqCompoundProxyWizard::onLoad()
 {
   pqFileDialog* fileDialog = new pqFileDialog(
     new pqLocalFileDialogModel(), 
-    tr("Open Compound Proxy File:"),
     this,
-    "FileOpenDialog");
+    tr("Open Compound Proxy File:"),
+    QString(),
+    "XML files (*.xml);;All files (*)");
+  fileDialog->setObjectName("FileOpenDialog");
 
   this->connect(fileDialog, SIGNAL(filesSelected(const QStringList&)),
                 this, SLOT(onLoad(const QStringList&)));

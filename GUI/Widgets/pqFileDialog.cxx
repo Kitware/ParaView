@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialog.h"
 #include "pqFileDialogModel.h"
 #include "ui_pqFileDialog.h"
+#include "pqFileDialogFilter.h"
 
 #include <QDir>
 #include <QTimer>
@@ -40,7 +41,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkstd/set>
 
-pqFileDialog::pqFileDialog(pqFileDialogModel* model, const QString& title, QWidget* p, const char* const name) :
+namespace {
+
+  QStringList MakeFilterList(const QString &filter)
+  {
+    QString f(filter);
+    
+    if (f.isEmpty())
+      {
+      return QStringList();
+      }
+    
+    QString sep(";;");
+    int i = f.indexOf(sep, 0);
+    if (i == -1) 
+      {
+      if (f.indexOf("\n", 0) != -1) 
+        {
+        sep = "\n";
+        i = f.indexOf(sep, 0);
+        }
+      }
+    return f.split(sep, QString::SkipEmptyParts);
+  }
+
+}
+
+pqFileDialog::pqFileDialog(pqFileDialogModel* model, QWidget* p, 
+                           const QString& title, 
+                           const QString& startDirectory, 
+                           const QString& nameFilter) :
   QDialog(p),
   Model(model),
   Ui(new Ui::pqFileDialog())
@@ -49,7 +79,10 @@ pqFileDialog::pqFileDialog(pqFileDialogModel* model, const QString& title, QWidg
 
   this->Ui->setupUi(this);
   this->Ui->NavigateUp->setIcon(style()->standardPixmap(QStyle::SP_FileDialogToParent));
-  this->Ui->Files->setModel(this->Model->fileModel());
+
+  this->Filter = new pqFileDialogFilter(this->Model, this);
+  this->Ui->Files->setModel(this->Filter);
+
   this->Ui->Favorites->setModel(this->Model->favoriteModel());
 
   this->Ui->Files->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -59,18 +92,69 @@ pqFileDialog::pqFileDialog(pqFileDialogModel* model, const QString& title, QWidg
   this->Ui->Favorites->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   this->setWindowTitle(title);
-  this->setObjectName(name);
 
-  QObject::connect(this->Model->fileModel(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(onDataChanged(const QModelIndex&, const QModelIndex&)));
-  QObject::connect(this->Ui->NavigateUp, SIGNAL(clicked()), this, SLOT(onNavigateUp()));
-  QObject::connect(this->Ui->Files, SIGNAL(activated(const QModelIndex&)), this, SLOT(onActivated(const QModelIndex&)));
-  QObject::connect(this->Ui->Files, SIGNAL(clicked(const QModelIndex&)), this, SLOT(onClicked(const QModelIndex&)));
-  QObject::connect(this->Ui->Favorites, SIGNAL(activated(const QModelIndex&)), this, SLOT(onActivated(const QModelIndex&)));
-  QObject::connect(this->Ui->Favorites, SIGNAL(clicked(const QModelIndex&)), this, SLOT(onClicked(const QModelIndex&)));
-  QObject::connect(this->Ui->Parents, SIGNAL(activated(const QString&)), this, SLOT(onNavigate(const QString&)));
-  QObject::connect(this->Ui->FileName, SIGNAL(textEdited(const QString&)), this, SLOT(onManualEntry(const QString&)));
+  QObject::connect(this->Model->fileModel(), 
+                   SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), 
+                   this, 
+                   SLOT(onDataChanged(const QModelIndex&, const QModelIndex&)));
 
-  this->Model->setCurrentPath(this->Model->getStartPath());
+  QObject::connect(this->Ui->NavigateUp, 
+                   SIGNAL(clicked()), 
+                   this, 
+                   SLOT(onNavigateUp()));
+
+  QObject::connect(this->Ui->Files, 
+                   SIGNAL(activated(const QModelIndex&)), 
+                   this, 
+                   SLOT(onActivated(const QModelIndex&)));
+
+  QObject::connect(this->Ui->Files, 
+                   SIGNAL(clicked(const QModelIndex&)), 
+                   this, 
+                   SLOT(onClicked(const QModelIndex&)));
+
+  QObject::connect(this->Ui->Favorites, 
+                   SIGNAL(activated(const QModelIndex&)), 
+                   this, 
+                   SLOT(onActivated(const QModelIndex&)));
+
+  QObject::connect(this->Ui->Favorites, 
+                   SIGNAL(clicked(const QModelIndex&)), 
+                   this, 
+                   SLOT(onClicked(const QModelIndex&)));
+
+  QObject::connect(this->Ui->Parents, 
+                   SIGNAL(activated(const QString&)), 
+                   this, 
+                   SLOT(onNavigate(const QString&)));
+
+  QObject::connect(this->Ui->FileName, 
+                   SIGNAL(textEdited(const QString&)), 
+                   this, 
+                   SLOT(onManualEntry(const QString&)));
+  
+  QObject::connect(this->Ui->FileType, 
+                   SIGNAL(activated(const QString&)), 
+                   this, 
+                   SLOT(onFilterChange(const QString&)));
+  
+  QStringList filterList = MakeFilterList(nameFilter);
+  if(filterList.empty())
+    {
+    this->Ui->FileType->addItem("All Files (*)");
+    }
+  else
+    {
+    this->Ui->FileType->addItems(filterList);
+    }
+  this->onFilterChange(this->Ui->FileType->currentText());
+  
+  QString startPath = startDirectory;
+  if(startPath.isNull())
+    {
+    startPath = this->Model->getStartPath();
+    }
+  this->Model->setCurrentPath(startPath);
 }
 
 pqFileDialog::~pqFileDialog()
@@ -95,10 +179,17 @@ void pqFileDialog::accept()
   QModelIndexList indexes = this->Ui->Files->selectionModel()->selectedIndexes();
   for(int i = 0; i != indexes.size(); ++i)
     {
-    if(indexes[i].column() != 0)
+    QModelIndex idx = indexes[i];
+
+    if(idx.column() != 0)
       continue;
       
-    QStringList files = this->Model->getFilePaths(indexes[i]);
+    if(idx.model() == this->Filter)
+      {
+      idx = this->Filter->mapToSource(idx);
+      }
+
+    QStringList files = this->Model->getFilePaths(idx);
     for(int j = 0; j != files.size(); ++j)
       selected_files.push_back(files[j]);
     }
@@ -154,23 +245,35 @@ void pqFileDialog::onDataChanged(const QModelIndex&, const QModelIndex&)
 
 void pqFileDialog::onActivated(const QModelIndex& Index)
 {
-  if(this->Model->isDir(Index))
+  QModelIndex i = Index;
+  if(i.model() == this->Filter)
     {
-    this->Temp = &Index;
+    i = this->Filter->mapToSource(i);
+    }
+
+  if(this->Model->isDir(i))
+    {
+    this->Temp = i;
     QTimer::singleShot(0, this, SLOT(onNavigateDown()));
     }
   else
     {
-    emitFilesSelected(this->Model->getFilePaths(Index));
+    emitFilesSelected(this->Model->getFilePaths(i));
     }
 }
 
 void pqFileDialog::onClicked(const QModelIndex& Index)
 {
-  if(this->Model->isDir(Index))
+  QModelIndex i = Index;
+  if(i.model() == this->Filter)
+    {
+    i = this->Filter->mapToSource(i);
+    }
+
+  if(this->Model->isDir(i))
     return;
-    
-  const QStringList files = this->Model->getFilePaths(Index);
+
+  QStringList files = this->Model->getFilePaths(i);
   if(files.empty())
     return;
   
@@ -198,12 +301,52 @@ void pqFileDialog::onNavigateUp()
 
 void pqFileDialog::onNavigateDown()
 {
-  if(!this->Model->isDir(*this->Temp))
+  if(!this->Model->isDir(this->Temp))
     return;
     
-  const QStringList paths = this->Model->getFilePaths(*this->Temp);
+  const QStringList paths =
+    this->Model->getFilePaths(this->Temp);
   if(1 != paths.size())
     return;
     
   this->Model->setCurrentPath(paths[0]);
 }
+
+void pqFileDialog::onFilterChange(const QString& filter)
+{
+  if(!this->Filter)
+    {
+    return;
+    }
+
+  QString f = filter;
+
+  // if we have (...) in our filter, strip everything out but the contents of ()
+  int start, end;
+  start = filter.indexOf('(');
+  end = filter.lastIndexOf(')');
+  if(start != -1 && end != -1)
+    {
+    f = f.mid(start+1, end-start-1);
+    }
+  else if(start != -1 || end != -1)
+    {
+    f = QString();  // hmm...  I'm confused
+    }
+
+  // separated by spaces or semi-colons
+  QStringList fs = f.split(QRegExp("[\\s+;]"));
+
+  // set filter on proxy
+  this->Filter->setFilter(fs);
+  
+  // update view
+  this->Filter->clear();
+}
+
+
+QString pqFileDialog::currentFilter()
+{
+  return this->Ui->FileType->currentText();
+}
+

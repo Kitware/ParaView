@@ -44,6 +44,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace
 {
+  
+  /// the last path accessed by this file dialog model
+  /// used to remember paths across the session
+QString gLastPath;
 
 /////////////////////////////////////////////////////////////////////
 // Icons
@@ -432,6 +436,11 @@ pqServerFileDialogModel::~pqServerFileDialogModel()
 
 QString pqServerFileDialogModel::getStartPath()
 {
+  if(!gLastPath.isNull())
+    {
+    return gLastPath;
+    }
+
   vtkSMProxy* proxy = vtkSMObject::GetProxyManager()->NewProxy("file_listing",
     "ServerFileListing");
   proxy->SetConnectionID(this->Server->GetConnectionID());
@@ -442,13 +451,14 @@ QString pqServerFileDialogModel::getStartPath()
     proxy->GetProperty("CurrentWorkingDirectory"));
   const char* cwd = (svp)? svp->GetElement(0) : "";
   
-  QString result = cwd;
+  gLastPath = cwd;
   proxy->Delete();
-  return result;
+  return gLastPath;
 }
 
 void pqServerFileDialogModel::setCurrentPath(const QString& Path)
 {
+  gLastPath = Path;
   this->Implementation->FileModel->SetCurrentPath(Path);
 }
 
