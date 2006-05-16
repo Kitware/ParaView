@@ -75,7 +75,11 @@ bool pqLoadedFormObjectPanel::isValid()
 /// set the proxy to display properties for
 void pqLoadedFormObjectPanel::setProxy(pqSMProxy p)
 {
-  this->setUpdatesEnabled(false);
+  bool hidden = this->isVisible();
+  if(!hidden)
+    {
+    this->hide();
+    }
   if(this->Proxy)
     {
     this->unlinkServerManagerProperties();
@@ -85,6 +89,9 @@ void pqLoadedFormObjectPanel::setProxy(pqSMProxy p)
     {
     this->linkServerManagerProperties();
     }
-  this->setUpdatesEnabled(true);
+  if(!hidden)
+    {
+    this->show();
+    }
 }
 

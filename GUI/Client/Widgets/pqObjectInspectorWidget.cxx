@@ -110,6 +110,11 @@ pqObjectInspectorWidget::~pqObjectInspectorWidget()
 
 void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
 {
+  pqSMProxy old = this->ObjectPanel->proxy();
+  if(old == proxy)
+    {
+    return;
+    }
 
   // make sure proxy is built
   if(proxy)
