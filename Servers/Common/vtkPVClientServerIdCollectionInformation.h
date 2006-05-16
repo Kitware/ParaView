@@ -58,7 +58,7 @@ protected:
   vtkPVClientServerIdCollectionInformation();
   ~vtkPVClientServerIdCollectionInformation();
 
-  vtkClientServerIdSetType *ClientServerIdIds;
+  vtkClientServerIdSetType *ClientServerIds;
 
 private:
   vtkPVClientServerIdCollectionInformation
