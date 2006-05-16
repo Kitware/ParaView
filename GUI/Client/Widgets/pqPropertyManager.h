@@ -65,6 +65,18 @@ signals:
   /// signal emitted whether there are possible properties to send down to the server manager
   void canAcceptOrReject(bool);
 
+  /// emitted before accept.
+  void preaccept();
+  /// emitted on accept() after preaccept() but before postaccept()/
+  void accepted();
+  ///emitted after accept;
+  void postaccept();
+
+  /// emitted before reject.
+  void prereject();
+  /// emitted after reject.
+  void postreject();
+
 public slots:
   /// accept property changes by pushing them all down to the server manager
   void accept();

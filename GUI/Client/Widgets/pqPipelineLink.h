@@ -38,16 +38,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "pqWidgetsExport.h"
-#include "pqPipelineObject.h"
+#include "pqPipelineSource.h"
 
 class pqPipelineFilter;
 class pqPipelineSource;
 
 
-class PQWIDGETS_EXPORT pqPipelineLink : public pqPipelineObject
+class PQWIDGETS_EXPORT pqPipelineLink : public pqPipelineSource
 {
 public:
-  pqPipelineLink();
+  pqPipelineLink(QString name, vtkSMProxy *proxy, pqServer* server, 
+    QObject* parent=NULL);
   virtual ~pqPipelineLink() {}
 
   pqPipelineSource *GetSource() const {return this->Source;}

@@ -34,92 +34,154 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// \date 4/17/2006
 
 #include "pqPipelineFilter.h"
+
+// ParaView includes.
+#include "vtkEventQtSlotConnect.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMProxy.h"
+
+//Qt includes.
 #include <QList>
+#include <QSet>
+#include <QtDebug>
+
+// ParaQ includes.
+#include "pqServerManagerModel.h"
+
+//-----------------------------------------------------------------------------
+class pqPipelineFilterInternal
+{
+public:
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+  QList<pqPipelineSource*> Inputs;
+  pqPipelineFilterInternal()
+    {
+    this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+    }
+};
 
 
-class pqPipelineFilterInternal : public QList<pqPipelineSource *> {};
-
-
-pqPipelineFilter::pqPipelineFilter(vtkSMProxy *proxy,
-    pqPipelineModel::ItemType type)
-  : pqPipelineSource(proxy, type)
+//-----------------------------------------------------------------------------
+pqPipelineFilter::pqPipelineFilter(QString name, vtkSMProxy* proxy,
+  pqServer* server, QObject* parent/*=NULL*/) : 
+  pqPipelineSource(name, proxy, server, parent)
 {
   this->Internal = new pqPipelineFilterInternal();
+  this->setType(pqPipelineModel::Filter);
+  if (proxy)
+    {
+    // Listen to proxy events to get input changes.
+    this->Internal->VTKConnect->Connect(proxy->GetProperty("Input"),
+      vtkCommand::ModifiedEvent, this, SLOT(inputChanged()));
+    }
 }
 
+//-----------------------------------------------------------------------------
 pqPipelineFilter::~pqPipelineFilter()
 {
-  if(this->Internal)
-    {
-    delete this->Internal;
-    this->Internal = 0;
-    }
+  delete this->Internal;
 }
 
-void pqPipelineFilter::ClearConnections()
+//-----------------------------------------------------------------------------
+int pqPipelineFilter::getInputCount() const
 {
-  pqPipelineSource::ClearConnections();
-  if(this->Internal)
-    {
-    this->Internal->clear();
-    }
+  return this->Internal->Inputs.size();
 }
 
-int pqPipelineFilter::GetInputCount() const
+//-----------------------------------------------------------------------------
+pqPipelineSource *pqPipelineFilter::getInput(int index) const
 {
-  if(this->Internal)
+  if(index >= 0 && index < this->Internal->Inputs.size())
     {
-    return this->Internal->size();
+    return this->Internal->Inputs[index]; 
     }
+  qCritical() << "Index " << index << "out of bound.";
   return 0;
 }
 
-pqPipelineSource *pqPipelineFilter::GetInput(int index) const
+//-----------------------------------------------------------------------------
+int pqPipelineFilter::getInputIndexFor(pqPipelineSource *input) const
 {
-  if(this->Internal && index >= 0 && index < this->Internal->size())
+  return this->Internal->Inputs.indexOf(input);
+}
+
+//-----------------------------------------------------------------------------
+bool pqPipelineFilter::hasInput(pqPipelineSource *input) const
+{
+  return (this->getInputIndexFor(input) != -1);
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineFilter::inputChanged()
+{
+  // We must determine what changed on the input property.
+  // Remember that all proxy that are added to the input property are
+  // must already have pqPipelineFilter associated with them. If not, the input proxy was not
+  // registered with the SM and as far as we are concerned, does not even exist :).
+
+  QSet<pqPipelineSource *> oldInputs;
+  foreach(pqPipelineSource* obj, this->Internal->Inputs)
     {
-    return (*this->Internal)[index];
+    oldInputs.insert(obj);
     }
-  return 0;
-}
+    
+  QSet<pqPipelineSource*> currentInputs;
+  this->buildInputList(currentInputs);
 
-int pqPipelineFilter::GetInputIndexFor(pqPipelineSource *input) const
-{
-  if(this->Internal && input)
+  QSet<pqPipelineSource*> removed = oldInputs - currentInputs;
+  QSet<pqPipelineSource*> added = currentInputs - oldInputs;
+
+  // To preserve the order, we do this funny computation to sync the inputs list.
+  foreach (pqPipelineSource* obj, removed)
     {
-    return this->Internal->indexOf(input);
+    this->Internal->Inputs.removeAt(this->Internal->Inputs.indexOf(obj));
+    }
+  foreach (pqPipelineSource* obj, added)
+    {
+    this->Internal->Inputs.push_back(obj);
     }
 
-  return -1;
-}
-
-bool pqPipelineFilter::HasInput(pqPipelineSource *input) const
-{
-  return this->GetInputIndexFor(input) != -1;
-}
-
-void pqPipelineFilter::AddInput(pqPipelineSource *intput)
-{
-  if(this->Internal && intput)
+  // Now tell pqPipelineSource in removed list that we are no longer their
+  // descendent.
+  foreach(pqPipelineSource* removedInput, removed)
     {
-    this->Internal->append(intput);
+    removedInput->removeOutput(this);
     }
+
+  foreach(pqPipelineSource* addedInput, added)
+    {
+    addedInput->addOutput(this);
+    }
+  // The pqPipelineSource whose output changes raises the events when the output 
+  // is removed added, so we don't need to raise any events here to let the world
+  // know that connections were broken/created.
 }
 
-void pqPipelineFilter::RemoveInput(pqPipelineSource *input)
+//-----------------------------------------------------------------------------
+void pqPipelineFilter::buildInputList(QSet<pqPipelineSource*> &set)
 {
-  if(this->Internal && input)
+  vtkSMInputProperty* ivp = vtkSMInputProperty::SafeDownCast(
+    this->getProxy()->GetProperty("Input"));
+
+  pqServerManagerModel* model = pqServerManagerModel::instance();
+
+  unsigned int max = ivp->GetNumberOfProxies();
+  for (unsigned int cc=0; cc <max; cc++)
     {
-    QList<pqPipelineSource *>::Iterator iter = this->Internal->begin();
-    for( ; iter != this->Internal->end(); ++iter)
+    vtkSMProxy* proxy = ivp->GetProxy(cc);
+    if (!proxy)
       {
-      if(*iter == input)
-        {
-        this->Internal->erase(iter);
-        break;
-        }
+      continue;
       }
+    pqPipelineSource* pqSrc = model->getPQSource(proxy);
+    if (!pqSrc)
+      {
+      qCritical() << "Some proxy is added as input but was not registered with"
+        <<" Proxy Manager. This is not recommended.";
+      continue;
+      }
+    set.insert(pqSrc);
     }
 }
-
 

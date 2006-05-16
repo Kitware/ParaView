@@ -34,14 +34,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// \date 4/20/2006
 
 #include "pqPipelineBrowser.h"
-#include "pqPipelineBrowserContextMenu.h"
+
+#include "pqApplicationCore.h"
 #include "pqFlatTreeView.h"
+#include "pqPipelineBrowserContextMenu.h"
 #include "pqPipelineData.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineObject.h"
 #include "pqPipelineServer.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
+#include "pqServerManagerModel.h"
 
 #include <QEvent>
 #include <QHeaderView>
@@ -59,7 +62,28 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
   this->TreeView = 0;
 
   // Get the pipeline model from the pipeline data.
-  this->ListModel = pqPipelineData::instance()->getModel();
+  this->ListModel = new pqPipelineModel(this);
+
+  // Connect the model to the ServerManager model.
+  pqServerManagerModel* smModel = 
+    pqApplicationCore::instance()->getServerManagerModel();
+  
+  QObject::connect(smModel, SIGNAL(serverAdded(pqServer*)),
+    this->ListModel, SLOT(addServer(pqServer*)));
+  QObject::connect(smModel, SIGNAL(serverRemoved(pqServer*)),
+    this->ListModel, SLOT(removeServer(pqServer*)));
+  QObject::connect(smModel, SIGNAL(sourceAdded(pqPipelineSource*)),
+    this->ListModel, SLOT(addSource(pqPipelineSource*)));
+  QObject::connect(smModel, SIGNAL(sourceRemoved(pqPipelineSource*)),
+    this->ListModel, SLOT(removeSource(pqPipelineSource*)));
+  QObject::connect(smModel, 
+    SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*)),
+    this->ListModel, 
+    SLOT(addConnection(pqPipelineSource*, pqPipelineSource*)));
+  QObject::connect(smModel, 
+    SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*, int)),
+    this->ListModel, 
+    SLOT(removeConnection(pqPipelineSource*, pqPipelineSource*, int)));
 
   // Create a flat tree view to display the pipeline.
   this->TreeView = new pqFlatTreeView(this);
@@ -78,6 +102,7 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
           SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
           this, SLOT(changeCurrent(const QModelIndex &, const QModelIndex &)));
       }
+
 
     // Make sure the tree items get expanded when new descendents
     // are added.
@@ -107,6 +132,7 @@ pqPipelineBrowser::~pqPipelineBrowser()
 {
 }
 
+//-----------------------------------------------------------------------------
 bool pqPipelineBrowser::eventFilter(QObject *object, QEvent *e)
 {
   if(object == this->TreeView && e->type() == QEvent::KeyPress)
@@ -121,6 +147,7 @@ bool pqPipelineBrowser::eventFilter(QObject *object, QEvent *e)
   return QWidget::eventFilter(object, e);
 }
 
+//-----------------------------------------------------------------------------
 QItemSelectionModel *pqPipelineBrowser::getSelectionModel() const
 {
   if(this->TreeView)
@@ -131,28 +158,36 @@ QItemSelectionModel *pqPipelineBrowser::getSelectionModel() const
   return 0;
 }
 
-pqPipelineServer *pqPipelineBrowser::getCurrentServer() const
+//-----------------------------------------------------------------------------
+pqServer *pqPipelineBrowser::getCurrentServer() const
+{
+  pqPipelineModelItem* item = this->getCurrentSelection();
+  pqServer* server = dynamic_cast<pqServer*>(item);
+  if (server)
+    {
+    return server;
+    }
+  pqPipelineSource* src = dynamic_cast<pqPipelineSource*>(item);
+  if (src)
+    {
+    return src->getServer();
+    }
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+pqPipelineModelItem* pqPipelineBrowser::getCurrentSelection() const
 {
   QItemSelectionModel *selectionModel = this->getSelectionModel();
   if(selectionModel && this->ListModel)
     {
-    QModelIndex current = selectionModel->currentIndex();
-    pqPipelineServer *server = this->ListModel->getServerFor(current);
-    if(!server)
-      {
-      pqPipelineObject *object = this->ListModel->getObjectFor(current);
-      if(object)
-        {
-        server = object->GetServer();
-        }
-      }
-
-    return server;
+    QModelIndex index = selectionModel->currentIndex();
+    return this->ListModel->getItem(index);
     }
-
   return 0;
 }
-
+/*
+//-----------------------------------------------------------------------------
 vtkSMProxy *pqPipelineBrowser::getSelectedProxy() const
 {
   QItemSelectionModel *selectionModel = this->getSelectionModel();
@@ -171,50 +206,43 @@ vtkSMProxy *pqPipelineBrowser::getNextProxy() const
     {
     pqPipelineSource *source = this->ListModel->getSourceFor(
         selectionModel->currentIndex());
-    if(source && source->GetOutputCount() == 1)
+    if(source && source->getOutputCount() == 1)
       {
-      source = dynamic_cast<pqPipelineSource *>(source->GetOutput(0));
+      source = dynamic_cast<pqPipelineSource *>(source->getOutput(0));
       if(source)
         {
-        return source->GetProxy();
+        return source->getProxy();
         }
       }
     }
 
   return 0;
 }
-
-void pqPipelineBrowser::selectProxy(vtkSMProxy *proxy)
+*/
+//-----------------------------------------------------------------------------
+void pqPipelineBrowser::select(pqPipelineModelItem* item)
 {
-  if(this->ListModel && this->TreeView)
-    {
-    QModelIndex index = this->ListModel->getIndexFor(proxy);
-    this->TreeView->selectionModel()->setCurrentIndex(index,
-        QItemSelectionModel::Select | QItemSelectionModel::Current |
-        QItemSelectionModel::Clear);
-    }
+  QModelIndex index = this->ListModel->getIndexFor(item);
+  this->TreeView->selectionModel()->setCurrentIndex(index,
+    QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
+  emit this->selectionChanged(item); 
+}
+//-----------------------------------------------------------------------------
+void pqPipelineBrowser::select(pqPipelineSource* src)
+{
+  this->select((pqPipelineModelItem*)src);
 }
 
-void pqPipelineBrowser::selectServer(pqServer *server)
-{
-  if(this->ListModel && this->TreeView)
-    {
-    QModelIndex index = this->ListModel->getIndexFor(
-        this->ListModel->getServerFor(server));
-    this->TreeView->selectionModel()->setCurrentIndex(index,
-        QItemSelectionModel::Select | QItemSelectionModel::Current |
-        QItemSelectionModel::Clear);
-    }
-}
-
+//-----------------------------------------------------------------------------
 void pqPipelineBrowser::changeCurrent(const QModelIndex &current,
     const QModelIndex &)
 {
   if(this->ListModel)
     {
     // Get the current item from the model.
-    vtkSMProxy *proxy = this->ListModel->getProxyFor(current);
-    emit this->proxySelected(proxy);
+    pqPipelineModelItem* item = this->ListModel->getItem(current);
+
+    emit this->selectionChanged(item); 
     }
 }
 

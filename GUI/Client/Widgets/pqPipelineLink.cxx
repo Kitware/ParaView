@@ -38,15 +38,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
 
-
-pqPipelineLink::pqPipelineLink()
-  : pqPipelineObject()
+//-----------------------------------------------------------------------------
+pqPipelineLink::pqPipelineLink(QString name, vtkSMProxy* proxy,
+  pqServer* server, QObject* parent/*=NULL*/) : 
+  pqPipelineSource(name, proxy, server, parent)
 {
+  this->setType(pqPipelineModel::Link);
   this->Source = 0;
   this->Link = 0;
 
-  // Set the model item type.
-  this->SetType(pqPipelineModel::Link);
 }
 
 

@@ -304,8 +304,11 @@ void pqPart::Color(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype
     // Register the lookup table with the server manager so save/restore
     // works correctly.
     QString name;
-    pqPipelineData *pipeline = pqPipelineData::instance();
-    name.setNum(pipeline->getNameCount()->GetCountAndIncrement("LookupTable"));
+    // FIXME Probaly,pqPipelineBuilder must be used to get names.
+    static int __num__ = 0;
+    // pqPipelineData *pipeline = pqPipelineData::instance();
+    // name.setNum(pipeline->getNameCount()->GetCountAndIncrement("LookupTable"));
+    name.setNum(__num__++);
     name.prepend("LookupTable");
     vtkSMObject::GetProxyManager()->RegisterProxy("lookup_tables",
         name.toAscii().data(), lut);

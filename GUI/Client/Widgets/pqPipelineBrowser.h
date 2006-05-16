@@ -42,14 +42,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqFlatTreeView;
 class pqPipelineModel;
-class pqPipelineObject;
-class pqPipelineServer;
+class pqPipelineModelItem;
+class pqPipelineSource;
 class pqServer;
 class QItemSelectionModel;
 class QModelIndex;
-class vtkSMProxy;
 
-
+// This is the pipeline browser widget. It creates the pqPipelineModel
+// and the pqFlatTreeView. pqPipelineModel observes events from the
+// pqServerManagerModel do keep the pipeline view in sync with the 
+// the server manager. It provides slot (select()) to change the currently
+// selected item, it also fires a signal selectionChanged() when the selection
+// changes.
 class PQWIDGETS_EXPORT pqPipelineBrowser : public QWidget
 {
   Q_OBJECT
@@ -64,17 +68,24 @@ public:
   pqFlatTreeView *getTreeView() const {return this->TreeView;}
 
   QItemSelectionModel *getSelectionModel() const;
-  pqPipelineServer *getCurrentServer() const;
 
-  vtkSMProxy *getSelectedProxy() const;
-  vtkSMProxy *getNextProxy() const; // TEMP
+  /// returns the currently select object, may be a 
+  /// server/source/filter.
+  pqPipelineModelItem* getCurrentSelection() const;
 
-signals:
-  void proxySelected(vtkSMProxy *proxy);
+  /// returns the server for the currently selected branch.
+  /// This is a convienience method.
+  pqServer *getCurrentServer() const;
 
 public slots:
-  void selectProxy(vtkSMProxy *proxy);
-  void selectServer(pqServer *server);
+  // Call this to select the particular item.
+  void select(pqPipelineModelItem* item);
+  void select(pqPipelineSource* src);
+
+signals:
+  // Fired when the selection is changed. Argument is the newly selected
+  // item.
+  void selectionChanged(pqPipelineModelItem* selectedItem);
 
 private slots:
   void changeCurrent(const QModelIndex &current, const QModelIndex &previous);

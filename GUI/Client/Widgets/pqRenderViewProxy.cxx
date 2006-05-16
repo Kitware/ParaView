@@ -31,50 +31,63 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqRenderViewProxy.h"
+
 #include "vtkObjectFactory.h"
 #include "vtkSMRenderModuleProxy.h"
 
-vtkCxxRevisionMacro(pqRenderViewProxy, "1.3");
-vtkStandardNewMacro(pqRenderViewProxy);
+#include "pqRenderModule.h"
 
+vtkCxxRevisionMacro(pqRenderViewProxy, "1.4");
+vtkStandardNewMacro(pqRenderViewProxy);
+//-----------------------------------------------------------------------------
 pqRenderViewProxy::pqRenderViewProxy()
 {
   this->RenderModule = 0;
 }
 
+//-----------------------------------------------------------------------------
 pqRenderViewProxy::~pqRenderViewProxy()
 {
   this->RenderModule = 0;
 }
 
+//-----------------------------------------------------------------------------
 void pqRenderViewProxy::EventuallyRender()
 {
   this->Render();
 }
 
+//-----------------------------------------------------------------------------
 void pqRenderViewProxy::Render()
 {
+  if (!this->RenderModule)
+    {
+    return;
+    }
   // render LOD's
   //RenderModule->InteractiveRender();
 
   // do not render LOD's
-  this->RenderModule->StillRender();
+  this->RenderModule->getProxy()->StillRender();
 }
 
+//-----------------------------------------------------------------------------
 vtkRenderWindow* pqRenderViewProxy::GetRenderWindow()
 {
   if (!this->RenderModule)
     {
     return 0;
     }
-  return this->RenderModule->GetRenderWindow();
+  return this->RenderModule->getProxy()->GetRenderWindow();
 }
 
-void pqRenderViewProxy::SetRenderModule(vtkSMRenderModuleProxy* rm)
+//-----------------------------------------------------------------------------
+void pqRenderViewProxy::setRenderModule(pqRenderModule* rm)
 {
   this->RenderModule = rm;
 }
 
+//-----------------------------------------------------------------------------
 void pqRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

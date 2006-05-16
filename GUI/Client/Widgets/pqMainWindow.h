@@ -41,7 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMainWindow>
 
 class pqMultiViewFrame;
+class pqPipelineBuilder;
+class pqPipelineModelItem;
 class pqPipelineServer;
+class pqPipelineSource;
 class pqPipelineData;
 class pqServer;
 
@@ -117,26 +120,18 @@ public:
   /// Returns the help menu, creating it if it doesn't already exist
   QMenu* helpMenu();
 
-  /// Adds a dock widget to the window, automatically adding it to the view menu, and setting the initial visibility  
-  void addStandardDockWidget(Qt::DockWidgetArea area, QDockWidget* dockwidget, const QIcon& icon, bool visible = true);
+  /// Adds a dock widget to the window, automatically adding it to the view 
+  /// menu, and setting the initial visibility  
+  void addStandardDockWidget(Qt::DockWidgetArea area, QDockWidget* dockwidget, 
+    const QIcon& icon, bool visible = true);
 
-  /// Creates a source proxy by name, adding it to the current render window
-  vtkSMProxy* createSource(const QString&);
 
-  /// Creates a display
-  vtkSMDisplayProxy* createDisplay(vtkSMProxy* source);
-
-  /// Compares the contents of the window with the given reference image, returns true iff they "match" within some tolerance
-  bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
+  /// Compares the contents of the window with the given reference image,
+  /// returns true iff they "match" within some tolerance
+  bool compareView(const QString& ReferenceImage, double Threshold, 
+    ostream& Output, const QString& TempDirectory);
 
   virtual bool eventFilter(QObject* watched, QEvent* e);
-
-protected:
-  virtual vtkSMProxy* createReader(const QString &file, pqServer* server);
-  pqPipelineData* getPipeline();
-  virtual vtkSMRenderModuleProxy* getRenderModule();
-  virtual pqServer* getServer();
-  virtual QVTKWidget* getVTKWindow();
 
 signals:
   /// Signal emitted whenever the server changes
@@ -149,7 +144,6 @@ signals:
 
 public slots:
   void onFileNew();
-  void onFileNew(pqServer* Server);
   void onFileOpen();
   void onFileOpen(pqServer* Server);
   void onFileOpen(const QStringList& Files);
@@ -178,17 +172,21 @@ public slots:
   void onNextTimeStep();
   void onLastTimeStep();
 
-  void onUndo();
-  void onRedo();
   // Called when the Undo/Redo stack changes.
-  void onUndoRedoStackChanged(vtkObject*, unsigned long, void*, void*, 
-    vtkCommand*);
-private slots:
-  void onNewQVTKWidget(pqMultiViewFrame* parent);
-  void onDeleteQVTKWidget(pqMultiViewFrame* parent);
-  void onFrameActive(QWidget*);
+  void onUndoRedoStackChanged(bool canUndo, QString,
+    bool canRedo, QString);
 
-  void onUpdateSourcesFiltersMenu(pqServer*);
+private slots:
+  // Called when selection on the pqPipelineBrowser changes.
+  // Use this slot to communicate the pipeline browser selection to the
+  // ApplicationCore. Any work that needs to be done on selection
+  // change should actually be done by monitoring selection events
+  // from the ApplicationCore.
+  void onBrowserSelectionChanged(pqPipelineModelItem*);
+
+  void onActiveSourceChanged(pqPipelineSource*);
+  void onActiveServerChanged(pqServer*);
+private slots:
   void onCreateSource(QAction*);
   void onCreateFilter(QAction*);
   void onOpenLinkEditor();
@@ -198,17 +196,20 @@ private slots:
   void onCompoundProxyAdded(const QString&, const QString&);
   void onCreateCompoundProxy(QAction*);
   
-  void onProxySelected(vtkSMProxy*);
   void onUpdateVariableSelector(vtkSMProxy*);
   void onVariableChanged(pqVariableType, const QString&);
   
-  void onAddServer(pqServer *server);
   void onRemoveServer(pqServer *server);
   void onAddWindow(QWidget *window);
 
+protected:
+  void buildSourcesMenu();
+  void buildFiltersMenu();
+
+  // enable/disable filters as per the source.
+  void updateFiltersMenu(pqPipelineSource* source);
 private:
   void setServer(pqServer* Server);
-  void cleanUpWindow(QVTKWidget *window);
 
   /// Stores private implementation details
   class pqImplementation;

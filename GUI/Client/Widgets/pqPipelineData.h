@@ -34,28 +34,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPipelineData_h
 
 #include "pqWidgetsExport.h"
-#include <vtkSmartPointer.h>
 #include <QObject>
-
+#include "vtkType.h" // needed for vtkIdType
 class pqMultiView;
-class pqNameCount;
 class pqPipelineDataInternal;
 class pqPipelineModel;
-class pqServer;
 
-class QString;
 class QVTKWidget;
 
 class vtkCommand;
-class vtkEventQtSlotConnect;
 class vtkObject;
 class vtkPVXMLElement;
-class vtkSMDisplayProxy;
 class vtkSMProxy;
 class vtkSMRenderModuleProxy;
 
-
-/// interface for querying pipline state, also provides signals for pipeline changes
+// This is a vtkSMProxyManager observer. This class should simply listen to events
+// fired by proxy manager and respond. It does not support any creation method. 
+// We must use pqPipelineBuilder for that purpose. The purpose of this class
+// is mostly to filter vtkSMProxyManager manager events and emit Qt signals.
 class PQWIDGETS_EXPORT pqPipelineData : public QObject
 {
   Q_OBJECT
@@ -64,88 +60,47 @@ public:
   pqPipelineData(QObject* parent=0);
   virtual ~pqPipelineData();
 
-  static pqPipelineData *instance();
-
-  pqPipelineModel *getModel() const {return this->Model;}
-  pqNameCount *getNameCount() const {return this->Names;}
-
-  void addServer(pqServer *server);
-  void removeServer(pqServer *server);
-
-  void addViewMapping(QVTKWidget *widget, vtkSMRenderModuleProxy *module);
-  vtkSMRenderModuleProxy *removeViewMapping(QVTKWidget *widget);
-  vtkSMRenderModuleProxy *getRenderModule(QVTKWidget *widget) const;
-  QVTKWidget *getRenderWindow(vtkSMRenderModuleProxy *module) const;
-  void clearViewMapping();
-
-  vtkSMProxy *createAndRegisterSource(const char *proxyName, pqServer *server);
-  vtkSMProxy *createAndRegisterFilter(const char *proxyName, pqServer *server);
-  vtkSMProxy *createAndRegisterBundle(const char *proxyName, pqServer *server);
-
-  void unregisterProxy(vtkSMProxy *proxy, const char *name);
-
-  /// \brief
-  ///   Creates a display proxy for a source proxy.
-  vtkSMDisplayProxy *createAndRegisterDisplay(vtkSMProxy *source,
-      vtkSMRenderModuleProxy *module);
-  void removeAndUnregisterDisplay(vtkSMDisplayProxy *display,
-      const char *name, vtkSMRenderModuleProxy *module);
-
-  /// \brief
-  ///   Sets whether the display proxy is visible or not.
-  void setVisible(vtkSMDisplayProxy *proxy, bool visible);
-
-  void addInput(vtkSMProxy *proxy, vtkSMProxy *input);
-  void removeInput(vtkSMProxy *proxy, vtkSMProxy *input);
-  void addConnection(vtkSMProxy *source, vtkSMProxy *sink);
-  void removeConnection(vtkSMProxy *source, vtkSMProxy *sink);
-
-  void loadState(vtkPVXMLElement *root, pqMultiView *multiView=0);
-
 signals:
-  void serverAdded(pqServer *server);
-  void removingServer(pqServer *server);
+  /// Fired when a proxy is registered under the "sources" group and 
+  /// belongs to "sources" xml group.. 
+  void sourceRegistered(QString name, vtkSMProxy *source);
 
-  void sourceCreated(vtkSMProxy *source, const QString &name, pqServer *server);
-  void filterCreated(vtkSMProxy *filter, const QString &name, pqServer *server);
-  void bundleCreated(vtkSMProxy *bundle, const QString &name, pqServer *server);
-  void removingProxy(vtkSMProxy *proxy);
+  /// Fired when a proxy is registered under the "sources" group and
+  /// belongs to "filters" xml group.
+  void filterRegistered(QString name, vtkSMProxy *filter);
 
-  void displayCreated(vtkSMDisplayProxy *display, const QString &name,
-      vtkSMProxy *proxy, vtkSMRenderModuleProxy *module);
-  void removingDisplay(vtkSMDisplayProxy *display, vtkSMProxy *proxy);
+  /// Fired when a compound proxy is registered.
+  void bundleRegistered(QString name, vtkSMProxy *bundle);
 
-  void connectionCreated(vtkSMProxy *source, vtkSMProxy *sink);
-  void removingConnection(vtkSMProxy *source, vtkSMProxy *sink);
+  /// Fired when a proxy is registered under the "displays" group.
+  void displayRegistered(QString name, vtkSMProxy* display);
 
-  /// new current proxy
-  void currentProxyChanged(vtkSMProxy* newproxy);
+  /// Fired when a source/filter/compound proxy is unregistered.
+  void proxyUnRegistered(vtkSMProxy *proxy);
 
-public slots:
-  /// set the current proxy
-  void setCurrentProxy(vtkSMProxy* proxy);
+  /// Fired when a server connection is created by the vtkProcessModule.
+  void connectionCreated(vtkIdType connectionId);
 
-public:
-  /// get the current proxy
-  vtkSMProxy* currentProxy() const;
+  /// Fired when a server connection is closed by  the vtkProcessModule.
+  void connectionClosed(vtkIdType connectionId);
+
+  /// Fired when a render module proxy is registered under the "render_modules"
+  /// group.
+  void renderModuleRegistered(QString name, vtkSMRenderModuleProxy* rm);
+
+  /// Fired when a render module proxy is unregistred.
+  void renderModuleUnRegistered(vtkSMRenderModuleProxy* rm);
 
 private slots:
   void proxyRegistered(vtkObject* object, unsigned long e, void* clientData,
       void* callData, vtkCommand* command);
-  void inputChanged(vtkObject* object, unsigned long e, void* clientData,
-      void* callData, vtkCommand* command);
+  void proxyUnRegistered(vtkObject*, unsigned long, void*,
+    void* callData, vtkCommand*);
+  void connectionCreated(vtkObject*, unsigned long, void*, void* callData);
+  void connectionClosed(vtkObject*, unsigned long, void*, void* callData);
 
 protected:
   pqPipelineDataInternal *Internal;  ///< Stores the pipeline objects.
-  pqPipelineModel *Model;            ///< View interface to the pipeline.
-  pqNameCount *Names;                ///< Keeps track of the proxy names.
-  bool InCreateOrConnect;            ///< Used to prevent duplicate signals.
-
-  /// Used to listen to proxy events.
-  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
-  vtkSMProxy* CurrentProxy;
-
-  static pqPipelineData *Instance;   ///< Pointer to the pipeline instance.
 };
 
 #endif // _pqPipelineData_h

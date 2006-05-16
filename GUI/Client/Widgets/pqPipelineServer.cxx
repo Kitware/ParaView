@@ -74,7 +74,7 @@ pqPipelineServer::pqPipelineServer()
   this->Server = 0;
 
   // Set the pipeline model item type.
-  this->SetType(pqPipelineModel::Server);
+  this->setType(pqPipelineModel::Server);
 }
 
 pqPipelineServer::~pqPipelineServer()
@@ -95,6 +95,7 @@ pqPipelineServer::~pqPipelineServer()
 
 void pqPipelineServer::SaveState(vtkPVXMLElement *root, pqMultiView *multiView)
 {
+  /* FIXME
   if(!root || !multiView || !this->Internal)
     {
     return;
@@ -123,7 +124,7 @@ void pqPipelineServer::SaveState(vtkPVXMLElement *root, pqMultiView *multiView)
       this->Internal->Objects.begin();
   for( ; jter != this->Internal->Objects.end(); ++jter)
     {
-    (*jter)->GetDisplay()->SaveState(root, multiView);
+    (*jter)->getDisplay()->SaveState(root, multiView);
     }
 
   // Save the server manager state. This should save the proxy
@@ -134,14 +135,15 @@ void pqPipelineServer::SaveState(vtkPVXMLElement *root, pqMultiView *multiView)
   vtkSMObject::GetProxyManager()->SaveState(element);
   root->AddNestedElement(element);
   element->Delete();
+  */
 }
 
 void pqPipelineServer::AddSource(pqPipelineSource *source)
 {
   if(this->Internal && source)
     {
-    source->SetServer(this);
-    this->Internal->Objects.insert(source->GetProxy(), source);
+    //source->setServer(this->Server); FIXME
+    this->Internal->Objects.insert(source->getProxy(), source);
     this->Internal->Sources.append(source);
     }
 }
@@ -150,8 +152,8 @@ void pqPipelineServer::AddObject(pqPipelineSource *source)
 {
   if(this->Internal && source)
     {
-    source->SetServer(this);
-    this->Internal->Objects.insert(source->GetProxy(), source);
+    //source->setServer(this->Server); FIXME
+    this->Internal->Objects.insert(source->getProxy(), source);
     }
 }
 
@@ -160,14 +162,17 @@ void pqPipelineServer::RemoveObject(pqPipelineSource *source)
   if(this->Internal && source)
     {
     QHash<vtkSMProxy *, pqPipelineSource *>::Iterator iter =
-        this->Internal->Objects.find(source->GetProxy());
+        this->Internal->Objects.find(source->getProxy());
     if(iter != this->Internal->Objects.end())
       {
       this->Internal->Objects.erase(iter);
       }
 
     this->Internal->Sources.removeAll(source);
-    this->UnregisterObject(source);
+    // pqPipelineServer is not the class that should unregister any proxies.
+    // It's not our responsibilty. We were not the one to register the proxy
+    // in the first place, how can we be the one who unregisters it?
+    // this->UnregisterObject(source);
     }
 }
 
@@ -313,20 +318,22 @@ void pqPipelineServer::RemoveFromWindowList(QWidget *window)
 
 void pqPipelineServer::UnregisterObject(pqPipelineSource *source)
 {
+  /* FIXME
   if(source)
     {
-    pqPipelineDisplay *display = source->GetDisplay();
+    pqPipelineDisplay *display = source->getDisplay();
     if(display)
       {
       display->UnregisterDisplays();
       }
 
-    if(!source->GetProxyName().isEmpty())
+    if(!source->getProxyName().isEmpty())
       {
-      pqPipelineData::instance()->unregisterProxy(source->GetProxy(),
-          source->GetProxyName().toAscii().data());
+      pqPipelineData::instance()->unregisterProxy(source->getProxy(),
+          source->getProxyName().toAscii().data());
       }
     }
+    */
 }
 
 

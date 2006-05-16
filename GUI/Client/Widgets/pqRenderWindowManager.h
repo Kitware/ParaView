@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqPipelineModelItem.h
+   Module:    pqRenderWindowManager.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,44 +29,49 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-/// \file pqPipelineModelItem.h
-/// \date 4/14/2006
-
-#ifndef _pqPipelineModelItem_h
-#define _pqPipelineModelItem_h
+#ifndef __pqRenderWindowManager_h
+#define __pqRenderWindowManager_h
 
 
 #include "pqWidgetsExport.h"
 #include <QObject>
 
-#include "pqPipelineModel.h" // Needed for ModelType member
+class pqServer;
+class pqMultiViewFrame;
+class pqRenderModule;
+class pqRenderWindowManagerInternal;
 
-
-class PQWIDGETS_EXPORT pqPipelineModelItem : public QObject
+// This class manages all render windows. This class is an attempt to
+// take away some of the work form pqMainWindow. 
+class PQWIDGETS_EXPORT pqRenderWindowManager : public QObject 
 {
   Q_OBJECT
-
 public:
-  pqPipelineModelItem(QObject* parent=NULL);
-  virtual ~pqPipelineModelItem();
+  pqRenderWindowManager(QObject* parent=NULL);
+  virtual ~pqRenderWindowManager();
 
-  // Get the type for the model item. Type determines the way the 
-  // item is displayed.
-  // TODO: May be type must be only for pqPipelineSource, 
-  // everything is directly subclassed, hence we can use dynamic casts..
-  pqPipelineModel::ItemType getType() const {return this->ModelType;}
+  // returns the active render module.
+  pqRenderModule* getActiveRenderModule();
 
-signals:
-  // This signal is fired when data associated with the item,
-  // such as type/name is changed. 
-  void dataModified();
+public slots:
+  // this must be set, so that the manager knows on which server
+  // to create the view when a new view is added.
+  void setActiveServer(pqServer* server);
 
-protected:
-  void setType(pqPipelineModel::ItemType type); 
+public slots:
+  /// This will create a RenderWindow to fill the frame.
+  /// the render window is created on the active server
+  /// which must be set by the application.
+  void onFrameAdded(pqMultiViewFrame* frame);
+  void onFrameRemoved(pqMultiViewFrame* frame);
 
+  void onRenderModuleAdded(pqRenderModule* rm);
+  void onRenderModuleRemoved(pqRenderModule* rm);
+
+  void onActivate(QWidget* obj);
 private:
-  pqPipelineModel::ItemType ModelType;
+  pqRenderWindowManagerInternal* Internal;
 };
 
 #endif
+

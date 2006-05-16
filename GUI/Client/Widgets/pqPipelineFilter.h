@@ -41,25 +41,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 
 class pqPipelineFilterInternal;
-class vtkSMProxy;
-
 
 class PQWIDGETS_EXPORT pqPipelineFilter : public pqPipelineSource
 {
 public:
-  pqPipelineFilter(vtkSMProxy *proxy,
-      pqPipelineModel::ItemType type=pqPipelineModel::Filter);
+  pqPipelineFilter(QString name, vtkSMProxy *proxy, pqServer* server, 
+    QObject* parent=NULL);
   virtual ~pqPipelineFilter();
 
-  virtual void ClearConnections();
+  // Get number of inputs.
+  int getInputCount() const;
 
-  int GetInputCount() const;
-  pqPipelineSource *GetInput(int index) const;
-  int GetInputIndexFor(pqPipelineSource *input) const;
-  bool HasInput(pqPipelineSource *input) const;
+  // Get input at given index.
+  pqPipelineSource *getInput(int index) const;
 
-  void AddInput(pqPipelineSource *input);
-  void RemoveInput(pqPipelineSource *input);
+  // get index for a given input.
+  int getInputIndexFor(pqPipelineSource *input) const;
+
+  // check if the input exists.
+  bool hasInput(pqPipelineSource *input) const;
+
+protected slots:
+  // process some change in the input property for the proxy.
+  virtual void inputChanged();
+
+protected:  
+
+  // builds a set from the current value of the input property.
+  void buildInputList(QSet<pqPipelineSource*>&);
 
 private:
   pqPipelineFilterInternal *Internal; ///< Stores the input connections.

@@ -51,15 +51,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyIterator.h"
 
 // paraq includes
-#include "pqSignalAdaptors.h"
 #include "pqListWidgetItemObject.h"
-#include "pqSMSignalAdaptors.h"
-#include "pqSMAdaptor.h"
-#include "pqSMProxy.h"
 #include "pqPipelineData.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
+#include "pqServerManagerModel.h"
+#include "pqSignalAdaptors.h"
+#include "pqSMAdaptor.h"
+#include "pqSMProxy.h"
+#include "pqSMSignalAdaptors.h"
 
 
 /// constructor
@@ -165,10 +166,10 @@ void pqNamedObjectPanel::linkServerManagerProperties()
           comboBox->clear();
           foreach(pqSMProxy v, propertyDomain)
             {
-            pqPipelineSource* o = pqPipelineData::instance()->getModel()->getSourceFor(v);
+            pqPipelineSource* o = pqServerManagerModel::instance()->getPQSource(v);
             if(o)
               {
-              comboBox->addItem(o->GetProxyName());
+              comboBox->addItem(o->getProxyName());
               }
             }
           pqSignalAdaptorComboBox* comboAdaptor = new pqSignalAdaptorComboBox(comboBox);

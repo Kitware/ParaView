@@ -29,12 +29,14 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include "pqMainWindow.h"
 
+
+#include "pqApplicationCore.h"
 #include "pqCompoundProxyWizard.h"
 #include "pqElementInspectorWidget.h"
 #include "pqFileDialogEventPlayer.h"
 #include "pqFileDialogEventTranslator.h"
-#include "pqMainWindow.h"
 #include "pqMultiViewFrame.h"
 #include "pqMultiView.h"
 #include "pqNameCount.h"
@@ -42,15 +44,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqParts.h"
 #include "pqPicking.h"
 #include "pqPipelineBrowser.h"
+#include "pqPipelineBuilder.h"
 #include "pqPipelineData.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
-#include "pqPipelineServer.h"
-#include "pqServer.h"
+#include "pqRenderModule.h"
+#include "pqRenderWindowManager.h"
 #include "pqServerBrowser.h"
 #include "pqServerFileDialogModel.h"
+#include "pqServer.h"
 #include "pqSMAdaptor.h"
 #include "pqSMMultiView.h"
 #include "pqSourceProxyInfo.h"
@@ -65,10 +69,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqImageComparison.h>
 #include <pqLocalFileDialogModel.h>
 #include <pqObjectNaming.h>
+#include <pqObjectPanel.h>
 #include <pqPlayControlsWidget.h>
 #include <pqRecordEventsDialog.h>
+#include <pqServerManagerModel.h>
 #include <pqSetData.h>
 #include <pqSetName.h>
+#include <pqUndoStack.h>
 
 #ifdef PARAQ_EMBED_PYTHON
 #include <pqPythonDialog.h>
@@ -88,12 +95,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMIntRangeDomain.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMMultiViewRenderModuleProxy.h>
-#include <vtkSMProxy.h>
 #include <vtkSMProxyManager.h>
+#include <vtkSMProxyProperty.h>
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSMStringVectorProperty.h>
-#include <vtkSMUndoStack.h>
 
 #include <QAction>
 #include <QCoreApplication>
@@ -103,7 +109,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QPointer>
 #include <QSignalMapper>
+#include <QtDebug>
 #include <QToolBar>
 #include <QToolButton>
 #include <QVTKWidget.h>
@@ -116,32 +124,30 @@ class pqMainWindow::pqImplementation
 {
 public:
   pqImplementation() :
-    FileMenu(0),
-    ViewMenu(0),
-    ServerMenu(0),
-    SourcesMenu(0),
-    FiltersMenu(0),
-    ToolsMenu(0),
-    HelpMenu(0),
-    CurrentServer(0),
+    ActiveView(0),
+    CompoundProxyToolBar(0),
     CurrentProxy(0),
-    PropertyToolbar(0),
+    CurrentServer(0),
+    CurrentSource(0),
+    ElementInspectorDock(0),
+    FileMenu(0),
+    FiltersMenu(0),
+    HelpMenu(0),
+    Inspector(0),
     MultiViewManager(0),
-    ServerDisconnectAction(0),
     Pipeline(0),
     PipelineBrowser(0),
-    ActiveView(0),
-    ElementInspectorDock(0),
-    CompoundProxyToolBar(0),
-    VariableSelectorToolBar(0),
+    PropertyToolbar(0),
+    ServerDisconnectAction(0),
+    ServerMenu(0),
+    SourcesMenu(0),
+    ToolsMenu(0),
     UndoRedoToolBar(0),
-    ProxyInfo(0),
-    VTKConnector(0),
-    Inspector(0),
-    UndoStack(0)
+    VariableSelectorToolBar(0),
+    ViewMenu(0),
+    VTKConnector(0)
   {
-    this->UndoStack = vtkSMUndoStack::New();
-    vtkSMProxyManager::GetProxyManager()->SetUndoStack(this->UndoStack);
+
   }
   
   ~pqImplementation()
@@ -153,9 +159,6 @@ public:
     delete this->PipelineBrowser;
     this->PipelineBrowser = 0;
 
-    delete this->ProxyInfo;
-    this->ProxyInfo = 0;
-
     // Clean up the pipeline before the view manager.
     delete this->Pipeline;
     this->Pipeline = 0;
@@ -163,11 +166,6 @@ public:
     delete this->MultiViewManager;
     this->MultiViewManager = 0;
 
-    delete this->CurrentServer;
-    this->CurrentServer = 0;
-    
-    this->UndoStack->Delete();
-    this->UndoStack = 0;
   }
 
   // Stores standard menus
@@ -182,23 +180,22 @@ public:
   /// Stores a mapping from dockable widgets to menu actions
   QMap<QDockWidget*, QAction*> DockWidgetVisibleActions;
   
-  pqServer* CurrentServer;
+  QPointer<pqServer> CurrentServer;
+  pqPipelineSource* CurrentSource;
   vtkSMProxy* CurrentProxy;
 
-  QToolBar* PropertyToolbar;
+  pqMultiViewFrame* ActiveView;
+  pqObjectInspectorWidget* Inspector;
+  pqPipelineBrowser *PipelineBrowser;
+  pqPipelineData *Pipeline;
   pqMultiView* MultiViewManager;
   QAction* ServerDisconnectAction;
-  pqPipelineData *Pipeline;
-  pqPipelineBrowser *PipelineBrowser;
-  pqMultiViewFrame* ActiveView;
   QDockWidget *ElementInspectorDock;
   QToolBar* CompoundProxyToolBar;
-  QToolBar* VariableSelectorToolBar;
+  QToolBar* PropertyToolbar;
   QToolBar* UndoRedoToolBar;
-  pqSourceProxyInfo* ProxyInfo;
+  QToolBar* VariableSelectorToolBar;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnector;
-  pqObjectInspectorWidget* Inspector;
-  vtkSMUndoStack* UndoStack;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -214,27 +211,50 @@ pqMainWindow::pqMainWindow() :
 
   // Set up the main ParaQ items along with the central widget.
   this->Implementation->Pipeline = new pqPipelineData();
-  this->Implementation->ProxyInfo = new pqSourceProxyInfo();
   this->Implementation->VTKConnector = vtkSmartPointer<vtkEventQtSlotConnect>::New();
 
-  this->Implementation->MultiViewManager = new pqMultiView(this) << pqSetName("MultiViewManager");
+  this->Implementation->MultiViewManager = 
+    new pqMultiView(this) << pqSetName("MultiViewManager");
   //this->Implementation->MultiViewManager->hide();  // workaround for flickering in Qt 4.0.1 & 4.1.0
   this->setCentralWidget(this->Implementation->MultiViewManager);
-  QObject::connect(this->Implementation->MultiViewManager, SIGNAL(frameAdded(pqMultiViewFrame*)),
-      this, SLOT(onNewQVTKWidget(pqMultiViewFrame*)));
-  QObject::connect(this->Implementation->MultiViewManager, SIGNAL(frameRemoved(pqMultiViewFrame*)),
-      this, SLOT(onDeleteQVTKWidget(pqMultiViewFrame*)));
-  //this->Implementation->MultiViewManager->show();  // workaround for flickering in Qt 4.0.1 & 4.1.0
 
-  // Listen for the pipeline's server signals.
-  QObject::connect(this->Implementation->Pipeline, SIGNAL(serverAdded(pqServer *)),
-      this, SLOT(onAddServer(pqServer *)));
+  pqApplicationCore* core = pqApplicationCore::instance();
+
+  // Connect the renderModule manager with the view manager so that 
+  // new render modules are created as new frames are added.
+  pqRenderWindowManager* renManager = 
+    core->getRenderWindowManager();
+
+  QObject::connect(this->Implementation->MultiViewManager, 
+    SIGNAL(frameAdded(pqMultiViewFrame*)), 
+    renManager, SLOT(onFrameAdded(pqMultiViewFrame*)));
+  QObject::connect(this->Implementation->MultiViewManager, 
+    SIGNAL(frameRemoved(pqMultiViewFrame*)), 
+    renManager, SLOT(onFrameRemoved(pqMultiViewFrame*)));
+
+  // Connect selection changed events.
+  QObject::connect(core, SIGNAL(activeSourceChanged(pqPipelineSource*)),
+    this, SLOT(onActiveSourceChanged(pqPipelineSource*)));
+  QObject::connect(core, SIGNAL(activeServerChanged(pqServer*)),
+    this, SLOT(onActiveServerChanged(pqServer*)));
+
+  pqUndoStack* undoStack = core->getUndoStack();
+  // Connect Accept/reset signals.
+  QObject::connect(&pqObjectPanel::PropertyManager, SIGNAL(preaccept()),
+    undoStack, SLOT(Accept()));
+  QObject::connect(&pqObjectPanel::PropertyManager, SIGNAL(postaccept()),
+    undoStack, SLOT(EndUndoSet()));
+
+  // Connect undo/redo status.
+  QObject::connect(undoStack, 
+    SIGNAL(StackChanged(bool, QString, bool, QString)), 
+    this, SLOT(onUndoRedoStackChanged(bool, QString, bool, QString))); 
 
   // Set up the dock window corners to give the vertical docks more room.
   this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 }
-
+//-----------------------------------------------------------------------------
 pqMainWindow::~pqMainWindow()
 {
   delete Implementation;
@@ -280,7 +300,7 @@ void pqMainWindow::createStandardServerMenu()
 {
   QMenu* const menu = this->serverMenu();
   
-  menu->addAction(tr("Connect..."))
+  menu->addAction(tr("Connect"))
     << pqSetName("Connect")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onServerConnect()));
 
@@ -291,19 +311,23 @@ void pqMainWindow::createStandardServerMenu()
   this->Implementation->ServerDisconnectAction->setEnabled(false);
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindow::createStandardSourcesMenu()
 {
   QMenu* const menu = this->sourcesMenu();
-  menu << pqConnect(SIGNAL(triggered(QAction*)), this, SLOT(onCreateSource(QAction*)));
+  menu << pqConnect(SIGNAL(triggered(QAction*)), 
+    this, SLOT(onCreateSource(QAction*)));
   
-  /** \todo split this into source and filter-specific slots */
-  QObject::connect(this, SIGNAL(serverChanged(pqServer*)), SLOT(onUpdateSourcesFiltersMenu(pqServer*)));
+  this->buildSourcesMenu();
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindow::createStandardFiltersMenu()
 {
   QMenu* const menu = this->filtersMenu();
-  menu << pqConnect(SIGNAL(triggered(QAction*)), this, SLOT(onCreateFilter(QAction*)));
+  menu << pqConnect(SIGNAL(triggered(QAction*)), 
+    this, SLOT(onCreateFilter(QAction*)));
+  this->buildFiltersMenu();
 }
 
 void pqMainWindow::createStandardToolsMenu()
@@ -342,12 +366,12 @@ void pqMainWindow::createStandardToolsMenu()
 
 void pqMainWindow::createStandardPipelineBrowser(bool visible)
 {
-  QDockWidget* const pipeline_dock = new QDockWidget("Pipeline Inspector", this)
+  QDockWidget* const pipeline_dock = 
+    new QDockWidget("Pipeline Inspector", this) 
     << pqSetName("PipelineInspectorDock");
     
   pipeline_dock->setAllowedAreas(
-    Qt::LeftDockWidgetArea |
-    Qt::RightDockWidgetArea);
+    Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
   pipeline_dock->setFeatures(QDockWidget::AllDockWidgetFeatures);
 
   // Make sure the pipeline data instance is created before the
@@ -357,33 +381,47 @@ void pqMainWindow::createStandardPipelineBrowser(bool visible)
   this->Implementation->PipelineBrowser->setObjectName("PipelineList");
   pipeline_dock->setWidget(this->Implementation->PipelineBrowser);
 
-  this->addStandardDockWidget(Qt::LeftDockWidgetArea, pipeline_dock, QIcon(":pqWidgets/pqPipelineList22.png"), visible);
+  this->addStandardDockWidget(Qt::LeftDockWidgetArea, pipeline_dock, 
+    QIcon(":pqWidgets/pqPipelineList22.png"), visible);
 
-  this->connect(this->Implementation->PipelineBrowser, SIGNAL(proxySelected(vtkSMProxy*)), this, SIGNAL(proxyChanged(vtkSMProxy*)));
-  this->connect(this->Implementation->PipelineBrowser, SIGNAL(proxySelected(vtkSMProxy*)), this, SLOT(onProxySelected(vtkSMProxy*)));
+  this->connect(this->Implementation->PipelineBrowser, 
+    SIGNAL(selectionChanged(pqPipelineModelItem*)), 
+    this, SLOT(onBrowserSelectionChanged(pqPipelineModelItem*)));
+
+  // Connect selection change slots.
+  QObject::connect(pqApplicationCore::instance(), 
+    SIGNAL(activeSourceChanged(pqPipelineSource*)),
+    this->Implementation->PipelineBrowser, 
+    SLOT(select(pqPipelineSource*)));
+
 }
-
+//-----------------------------------------------------------------------------
 void pqMainWindow::createStandardObjectInspector(bool visible)
 {
-  QDockWidget* const object_inspector_dock = new QDockWidget("Object Inspector", this)
+  QDockWidget* const object_inspector_dock = 
+    new QDockWidget("Object Inspector", this)
     << pqSetName("ObjectInspectorDock");
-    
+
   object_inspector_dock->setAllowedAreas(
-      Qt::LeftDockWidgetArea |
-      Qt::RightDockWidgetArea);
+    Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
   object_inspector_dock->setFeatures(QDockWidget::AllDockWidgetFeatures);
 
-  this->Implementation->Inspector = new pqObjectInspectorWidget(object_inspector_dock);
+  this->Implementation->Inspector = 
+    new pqObjectInspectorWidget(object_inspector_dock);
   object_inspector_dock->setWidget(this->Implementation->Inspector);
+  /*
   if(this->Implementation->PipelineBrowser)
     {
-    connect(this->Implementation->PipelineBrowser, SIGNAL(proxySelected(vtkSMProxy *)),
-        this->Implementation->Inspector, SLOT(setProxy(vtkSMProxy *)));
+    connect(this->Implementation->PipelineBrowser, 
+      SIGNAL(proxySelected(vtkSMProxy *)),
+      this->Implementation->Inspector, SLOT(setProxy(vtkSMProxy *)));
     }
-
-  this->addStandardDockWidget(Qt::LeftDockWidgetArea, object_inspector_dock, QIcon(), visible);
+  */
+  this->addStandardDockWidget(Qt::LeftDockWidgetArea, 
+    object_inspector_dock, QIcon(), visible);
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindow::createStandardElementInspector(bool visible)
 {
   this->Implementation->ElementInspectorDock = new QDockWidget("Element Inspector View", this)
@@ -428,63 +466,64 @@ void pqMainWindow::createUndoRedoToolBar()
   this->Implementation->UndoRedoToolBar = toolbar;
   this->addToolBar(Qt::TopToolBarArea, toolbar);
   QAction *undoAction = new QAction(toolbar) << pqSetName("UndoButton");
-  //QToolButton* const undoButton = new QToolButton(toolbar) << pqSetName("UndoButton");
-  //undoButton->setAutoRaise(true);
   undoAction->setToolTip("Undo");
   undoAction->setIcon(QIcon(":pqWidgets/pqUndo22.png"));
   undoAction->setEnabled(false);
-  //toolbar->addWidget(undoButton);
   toolbar->addAction(undoAction);
 
   QAction *redoAction = new QAction(toolbar) << pqSetName("RedoButton");
-  //QToolButton* const redoButton = new QToolButton(toolbar) << pqSetName("RedoButton");
-  //redoButton->setAutoRaise(true);
   redoAction->setToolTip("Redo");
   redoAction->setIcon(QIcon(":pqWidgets/pqRedo22.png"));
   redoAction->setEnabled(false);
-  //toolbar->addWidget(redoButton);
   toolbar->addAction(redoAction);
 
-  //this->connect(undoButton, SIGNAL(clicked()), SLOT(onUndo()));
-  //this->connect(redoButton, SIGNAL(clicked()), SLOT(onRedo()));
-  this->connect(undoAction, SIGNAL(triggered()), SLOT(onUndo()));
-  this->connect(redoAction, SIGNAL(triggered()), SLOT(onRedo()));
-
-  this->Implementation->VTKConnector->Connect(this->Implementation->UndoStack,
-    vtkCommand::ModifiedEvent, this, SLOT(onUndoRedoStackChanged(vtkObject*, 
-        unsigned long, void*, void*, vtkCommand*)), NULL, 1.0);
+  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
+  this->connect(undoAction, SIGNAL(triggered()), stack, SLOT(Undo()));
+  this->connect(redoAction, SIGNAL(triggered()), stack, SLOT(Redo()));
 }
 
 //-----------------------------------------------------------------------------
 void pqMainWindow::createStandardVariableToolBar()
 {
-  this->Implementation->VariableSelectorToolBar = new QToolBar(tr("Variables"), this)
+  this->Implementation->VariableSelectorToolBar = 
+    new QToolBar(tr("Variables"), this)
     << pqSetName("VariableSelectorToolBar");
     
-  pqVariableSelectorWidget* varSelector = new pqVariableSelectorWidget(this->Implementation->VariableSelectorToolBar)
+  pqVariableSelectorWidget* varSelector = new pqVariableSelectorWidget(
+    this->Implementation->VariableSelectorToolBar)
     << pqSetName("VariableSelector");
     
   this->Implementation->VariableSelectorToolBar->addWidget(varSelector);
 
-  this->connect(this->Implementation->PipelineBrowser, SIGNAL(proxySelected(vtkSMProxy*)), this, SLOT(onUpdateVariableSelector(vtkSMProxy*)));
-  this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), this, SIGNAL(variableChanged(pqVariableType, const QString&)));
-  this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), this, SLOT(onVariableChanged(pqVariableType, const QString&)));
+  /*
+  this->connect(this->Implementation->PipelineBrowser, 
+    SIGNAL(proxySelected(vtkSMProxy*)), this, 
+    SLOT(onUpdateVariableSelector(vtkSMProxy*)));
+    */
+  this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), 
+    this, SIGNAL(variableChanged(pqVariableType, const QString&)));
+  this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), 
+    this, SLOT(onVariableChanged(pqVariableType, const QString&)));
     
   this->addToolBar(Qt::TopToolBarArea, this->Implementation->VariableSelectorToolBar);
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindow::createStandardCompoundProxyToolBar()
 {
-  this->Implementation->CompoundProxyToolBar = new QToolBar(tr("Compound Proxies"), this)
+  this->Implementation->CompoundProxyToolBar =
+    new QToolBar(tr("Compound Proxies"), this)
     << pqSetName("CompoundProxyToolBar");
     
   this->addToolBar(Qt::TopToolBarArea, this->Implementation->CompoundProxyToolBar);
-  this->connect(this->Implementation->CompoundProxyToolBar, SIGNAL(actionTriggered(QAction*)), SLOT(onCreateCompoundProxy(QAction*)));
+  this->connect(this->Implementation->CompoundProxyToolBar, 
+    SIGNAL(actionTriggered(QAction*)), SLOT(onCreateCompoundProxy(QAction*)));
 
   // Workaround for file new crash.
   this->Implementation->PipelineBrowser->setFocus();
 }
 
+//-----------------------------------------------------------------------------
 QMenu* pqMainWindow::fileMenu()
 {
   if(!this->Implementation->FileMenu)
@@ -496,6 +535,7 @@ QMenu* pqMainWindow::fileMenu()
   return this->Implementation->FileMenu;
 }
 
+//-----------------------------------------------------------------------------
 QMenu* pqMainWindow::viewMenu()
 {
   if(!this->Implementation->ViewMenu)
@@ -507,6 +547,7 @@ QMenu* pqMainWindow::viewMenu()
   return this->Implementation->ViewMenu;
 }
 
+//-----------------------------------------------------------------------------
 QMenu* pqMainWindow::serverMenu()
 {
   if(!this->Implementation->ServerMenu)
@@ -524,6 +565,7 @@ QMenu* pqMainWindow::sourcesMenu()
     {
     this->Implementation->SourcesMenu = this->menuBar()->addMenu(tr("&Sources"))
       << pqSetName("SourcesMenu");
+    this->Implementation->SourcesMenu->setEnabled(false);
     }
     
   return this->Implementation->SourcesMenu;
@@ -535,6 +577,7 @@ QMenu* pqMainWindow::filtersMenu()
     {
     this->Implementation->FiltersMenu = this->menuBar()->addMenu(tr("&Filters"))
       << pqSetName("FiltersMenu");
+    this->Implementation->FiltersMenu->setEnabled(false);
     }
     
   return this->Implementation->FiltersMenu;
@@ -598,23 +641,147 @@ bool pqMainWindow::eventFilter(QObject* watched, QEvent* e)
   return QMainWindow::eventFilter(watched, e);
 }
 
-void pqMainWindow::setServer(pqServer* Server)
+//-----------------------------------------------------------------------------
+void pqMainWindow::buildFiltersMenu()
 {
-  /*
-  if(this->Implementation->CurrentServer)
+  this->Implementation->FiltersMenu->clear();
+
+  // Update the menu items for the server and compound filters too.
+
+  QMenu *alphabetical = this->Implementation->FiltersMenu;
+  QMap<QString, QMenu *> categories;
+
+  QStringList::Iterator iter;
+  pqSourceProxyInfo proxyInfo;
+
+  // Load in the filter information.
+  QFile filterInfo(":/pqClient/ParaQFilters.xml");
+  if(filterInfo.open(QIODevice::ReadOnly))
     {
-    if(this->Implementation->CompoundProxyToolBar)
+    vtkSmartPointer<vtkPVXMLParser> xmlParser = 
+      vtkSmartPointer<vtkPVXMLParser>::New();
+    xmlParser->InitializeParser();
+    QByteArray filter_data = filterInfo.read(1024);
+    while(!filter_data.isEmpty())
       {
-      this->Implementation->CompoundProxyToolBar->clear();
+      xmlParser->ParseChunk(filter_data.data(), filter_data.length());
+      filter_data = filterInfo.read(1024);
       }
-    this->Implementation->Pipeline->removeServer(this->Implementation->CurrentServer);
-    delete this->Implementation->CurrentServer;
+
+    xmlParser->CleanupParser();
+    filterInfo.close();
+
+    proxyInfo.LoadFilterInfo(xmlParser->GetRootElement());
     }
-  */
-  
-  delete this->Implementation->CurrentServer;
-  this->Implementation->CurrentServer = Server;
-  
+
+  // Set up the filters menu based on the filter information.
+  QStringList menuNames;
+  proxyInfo.GetFilterMenu(menuNames);
+  if(menuNames.size() > 0)
+    {
+    // Only use an alphabetical menu if requested.
+    alphabetical = 0;
+    }
+
+  for(iter = menuNames.begin(); iter != menuNames.end(); ++iter)
+    {
+    if((*iter).isEmpty())
+      {
+      this->Implementation->FiltersMenu->addSeparator();
+      }
+    else
+      {
+      QMenu *menu = this->Implementation->FiltersMenu->addMenu(*iter) << pqSetName(*iter);
+      categories.insert(*iter, menu);
+      if((*iter) == "&Alphabetical" || (*iter) == "Alphabetical")
+        {
+        alphabetical = menu;
+        }
+      }
+    }
+
+  vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
+  manager->InstantiateGroupPrototypes("filters");
+  int numFilters = manager->GetNumberOfProxies("filters_prototypes");
+  for(int i=0; i<numFilters; i++)
+    {
+    QStringList categoryList;
+    QString proxyName = manager->GetProxyName("filters_prototypes",i);
+    proxyInfo.GetFilterMenuCategories(proxyName, categoryList);
+
+    for(iter = categoryList.begin(); iter != categoryList.end(); ++iter)
+      {
+      QMap<QString, QMenu *>::Iterator jter = categories.find(*iter);
+      if(jter != categories.end())
+        {
+        QAction* action = (*jter)->addAction(proxyName) << pqSetName(proxyName)
+          << pqSetData(proxyName);
+        action->setEnabled(false);
+        }
+      }
+
+    if(alphabetical)
+      {
+      QAction* action = alphabetical->addAction(proxyName) << pqSetName(proxyName)
+        << pqSetData(proxyName);
+      action->setEnabled(false);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::buildSourcesMenu()
+{
+  this->Implementation->SourcesMenu->clear();
+#if 1
+  // hard code sources
+  this->Implementation->SourcesMenu->addAction("2D Glyph") 
+    << pqSetName("2D Glyph") << pqSetData("GlyphSource2D");
+  this->Implementation->SourcesMenu->addAction("3D Text") 
+    << pqSetName("3D Text") << pqSetData("VectorText");
+  this->Implementation->SourcesMenu->addAction("Arrow")
+    << pqSetName("Arrow") << pqSetData("ArrowSource");
+  this->Implementation->SourcesMenu->addAction("Axes") 
+    << pqSetName("Axes") << pqSetData("Axes");
+  this->Implementation->SourcesMenu->addAction("Box") 
+    << pqSetName("Box") << pqSetData("CubeSource");
+  this->Implementation->SourcesMenu->addAction("Cone") 
+    << pqSetName("Cone") << pqSetData("ConeSource");
+  this->Implementation->SourcesMenu->addAction("Cylinder")
+    << pqSetName("Cylinder") << pqSetData("CylinderSource");
+  this->Implementation->SourcesMenu->addAction("Hierarchical Fractal") 
+    << pqSetName("Hierarchical Fractal") << pqSetData("HierarchicalFractal");
+  this->Implementation->SourcesMenu->addAction("Line") 
+    << pqSetName("Line") << pqSetData("LineSource");
+  this->Implementation->SourcesMenu->addAction("Mandelbrot") 
+    << pqSetName("Mandelbrot") << pqSetData("ImageMandelbrotSource");
+  this->Implementation->SourcesMenu->addAction("Plane") 
+    << pqSetName("Plane") << pqSetData("PlaneSource");
+  this->Implementation->SourcesMenu->addAction("Sphere") 
+    << pqSetName("Sphere") << pqSetData("SphereSource");
+  this->Implementation->SourcesMenu->addAction("Superquadric") 
+    << pqSetName("Superquadric") << pqSetData("SuperquadricSource");
+  this->Implementation->SourcesMenu->addAction("Wavelet") 
+    << pqSetName("Wavelet") << pqSetData("RTAnalyticSource");
+#else
+  // TODO: Add a sources xml file to organize the sources instead of
+  // hardcoding them.
+  manager->InstantiateGroupPrototypes("sources");
+  int numSources = manager->GetNumberOfProxies("sources_prototypes");
+  for(int i=0; i<numSources; i++)
+    {
+    const char* proxyName = manager->GetProxyName("sources_prototypes",i);
+    this->Implementation->SourcesMenu->addAction(proxyName) 
+      << pqSetName(proxyName) << pqSetData(proxyName);
+    }
+#endif
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::setServer(pqServer* server)
+{
+  pqApplicationCore::instance()->setActiveServer(server);
+  /* 
   if(this->Implementation->CurrentServer)
     {
     // preload compound proxies
@@ -630,26 +797,39 @@ void pqMainWindow::setServer(pqServer* Server)
       delete wizard;
       }
     
-    this->Implementation->Pipeline->addServer(this->Implementation->CurrentServer);
+    //this->Implementation->Pipeline->addServer(this->Implementation->CurrentServer);
     if(this->Implementation->PipelineBrowser)
       {
-      this->Implementation->PipelineBrowser->selectServer(
+      this->Implementation->PipelineBrowser->select(
           this->Implementation->CurrentServer);
       }
 
-    this->onNewQVTKWidget(qobject_cast<pqMultiViewFrame *>(
-        this->Implementation->MultiViewManager->widgetOfIndex(pqMultiView::Index())));
+    pqApplicationCore::instance()->getRenderWindowManager()->onFrameAdded(
+      qobject_cast<pqMultiViewFrame *>(
+      this->Implementation->MultiViewManager->widgetOfIndex(
+        pqMultiView::Index())));
     }
   emit serverChanged(this->Implementation->CurrentServer);
+  */
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindow::onFileNew()
 {
+  pqServer* server = pqApplicationCore::instance()->getActiveServer();
+  if (server)
+    {
+    pqApplicationCore::instance()->getPipelineBuilder()->deleteProxies(server);
+    }
+  pqServer::disconnect(server);
+
+  /*
   // Clean up the pipeline.
   if(this->Implementation->Pipeline)
     {
-    this->Implementation->Pipeline->getModel()->clearPipelines();
-    this->Implementation->Pipeline->getNameCount()->Reset();
+    // FIXME
+    // this->Implementation->Pipeline->getModel()->clearPipelines();
+    // this->Implementation->Pipeline->getNameCount()->Reset();
     }
 
   // Reset the multi-view. Use the removed widget list to clean
@@ -679,15 +859,14 @@ void pqMainWindow::onFileNew()
 
   // Call this method to ensure the menu items get updated.
   emit serverChanged(this->Implementation->CurrentServer);
+  */
 }
 
-void pqMainWindow::onFileNew(pqServer* Server)
-{
-  setServer(Server);
-}
-
+//-----------------------------------------------------------------------------
 void pqMainWindow::onFileOpen()
 {
+  /* FIXME
+  this->onFileNew();
   if(!this->Implementation->CurrentServer)
     {
     pqServerBrowser* const server_browser = new pqServerBrowser(this);
@@ -700,10 +879,13 @@ void pqMainWindow::onFileOpen()
     {
     this->onFileOpen(this->Implementation->CurrentServer);
     }
+    */
 }
 
-void pqMainWindow::onFileOpen(pqServer* Server)
+//-----------------------------------------------------------------------------
+void pqMainWindow::onFileOpen(pqServer* vtkNotUsed(Server))
 {
+  /* FIXME
   if(this->Implementation->CurrentServer != Server)
     setServer(Server);
 
@@ -716,10 +898,12 @@ void pqMainWindow::onFileOpen(pqServer* Server)
   file_dialog->setObjectName("FileOpenDialog");
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileOpen(const QStringList&)));
   file_dialog->show();
+  */
 }
 
-void pqMainWindow::onFileOpen(const QStringList& Files)
+void pqMainWindow::onFileOpen(const QStringList& vtkNotUsed(Files))
 {
+    /* FIXME
   if(!this->Implementation->Pipeline || !this->Implementation->PipelineBrowser)
     {
     return;
@@ -751,6 +935,7 @@ void pqMainWindow::onFileOpen(const QStringList& Files)
     if(source)
       this->Implementation->PipelineBrowser->selectProxy(source);
     }
+      */
 }
 
 void pqMainWindow::onFileOpenServerState()
@@ -822,7 +1007,7 @@ void pqMainWindow::onFileOpenServerState(const QStringList& Files)
     // Restore the pipeline.
     if(this->Implementation->Pipeline)
       {
-      this->Implementation->Pipeline->loadState(root, this->Implementation->MultiViewManager);
+      // this->Implementation->Pipeline->loadState(root, this->Implementation->MultiViewManager);
       }
     }
   else
@@ -881,7 +1066,8 @@ void pqMainWindow::onFileSaveServerState(const QStringList& Files)
 
   if(this->Implementation->Pipeline)
     {
-    this->Implementation->Pipeline->getModel()->saveState(root, this->Implementation->MultiViewManager);
+    // FIXME
+    //this->Implementation->Pipeline->getModel()->saveState(root, this->Implementation->MultiViewManager);
     }
 
   // Print the xml to the requested file(s).
@@ -944,264 +1130,106 @@ void pqMainWindow::onFileSaveScreenshot(const QStringList& Files)
   render_window->Render();
 }
 
-bool pqMainWindow::compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory)
+//-----------------------------------------------------------------------------
+bool pqMainWindow::compareView(const QString& referenceImage, double threshold, 
+  ostream& output, const QString& tempDirectory)
 {
-  vtkRenderWindow* const render_window =
-    this->Implementation->ActiveView ? qobject_cast<QVTKWidget*>(this->Implementation->ActiveView->mainWidget())->GetRenderWindow() : 0;
-    
+  pqRenderModule* renModule = 
+    pqApplicationCore::instance()->getActiveRenderModule();
+
+  if (!renModule)
+    {
+    output << "ERROR: Could not locate the render module." << endl;
+    }
+
+  vtkRenderWindow* const render_window = 
+    renModule->getProxy()->GetRenderWindow();
+
   if(!render_window)
-  {
-    Output << "ERROR: Could not locate the Render Window." << endl;
+    {
+    output << "ERROR: Could not locate the Render Window." << endl;
     return false;
-  }
-    
+    }
+
   // All tests need a 300x300 render window size.
-  QSize cur_size = this->Implementation->ActiveView->mainWidget()->size();
-  this->Implementation->ActiveView->mainWidget()->resize(300,300);
-  bool ret = pqImageComparison::CompareImage(render_window, ReferenceImage, 
-    Threshold, Output, TempDirectory);
-  this->Implementation->ActiveView->mainWidget()->resize(cur_size);
-  render_window->Render();
+  QSize cur_size = renModule->getWidget()->size();
+  renModule->getWidget()->resize(300,300);
+  bool ret = pqImageComparison::CompareImage(render_window, referenceImage, 
+    threshold, output, tempDirectory);
+  renModule->getWidget()->resize(cur_size);
+  renModule->render();
   return ret;
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindow::onServerConnect()
 {
   this->setServer(0);
   
   pqServerBrowser* const server_browser = new pqServerBrowser(this);
   server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
-  QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, SLOT(onServerConnect(pqServer*)));
+  QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, 
+    SLOT(onServerConnect(pqServer*)));
   server_browser->setModal(true);
   server_browser->show();
 }
 
-void pqMainWindow::onServerConnect(pqServer* Server)
+//-----------------------------------------------------------------------------
+void pqMainWindow::onServerConnect(pqServer* server)
 {
-  this->setServer(Server);
+  // bring the server object under the window so that when the
+  // window is destroyed the server will get destroyed too.
+  server->setParent(this);
+
+  // Make the newly created server the active server.
+  pqApplicationCore::instance()->setActiveServer(server);
+
+  // Create a render module.
+  pqApplicationCore::instance()->getRenderWindowManager()->onFrameAdded(
+    qobject_cast<pqMultiViewFrame *>(
+      this->Implementation->MultiViewManager->widgetOfIndex(
+        pqMultiView::Index())));
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindow::onServerDisconnect()
 {
-  if(this->Implementation->CurrentServer)
-    {
-    this->Implementation->Pipeline->removeServer(this->Implementation->CurrentServer);
-    delete this->Implementation->CurrentServer;
-    this->Implementation->CurrentServer = 0;
-    }
+  // for now, they both are same.
+  this->onFileNew();
 }
 
-void pqMainWindow::onUpdateSourcesFiltersMenu(pqServer*)
-{
-  this->Implementation->FiltersMenu->clear();
-  this->Implementation->SourcesMenu->clear();
-
-  // Update the menu items for the server and compound filters too.
-  QAction* compoundFilterAction = this->Implementation->ToolsMenu->findChild<QAction*>(
-      "CompoundFilter");
-  compoundFilterAction->setEnabled(this->Implementation->CurrentServer);
-  this->Implementation->ServerDisconnectAction->setEnabled(this->Implementation->CurrentServer);
-
-  if(this->Implementation->CurrentServer)
-    {
-    QMenu *alphabetical = this->Implementation->FiltersMenu;
-    QMap<QString, QMenu *> categories;
-    QStringList::Iterator iter;
-    if(this->Implementation->ProxyInfo)
-      {
-      // Load in the filter information if it is not present.
-      if(!this->Implementation->ProxyInfo->IsFilterInfoLoaded())
-        {
-        QFile filterInfo(":/pqClient/ParaQFilters.xml");
-        if(filterInfo.open(QIODevice::ReadOnly))
-          {
-          vtkPVXMLParser *xmlParser = vtkPVXMLParser::New();
-          xmlParser->InitializeParser();
-          QByteArray filter_data = filterInfo.read(1024);
-          while(!filter_data.isEmpty())
-            {
-            xmlParser->ParseChunk(filter_data.data(), filter_data.length());
-            filter_data = filterInfo.read(1024);
-            }
-
-          xmlParser->CleanupParser();
-
-          filterInfo.close();
-          vtkPVXMLElement *element = xmlParser->GetRootElement();
-          this->Implementation->ProxyInfo->LoadFilterInfo(element);
-          xmlParser->Delete();
-          }
-        }
-
-      // Set up the filters menu based on the filter information.
-      QStringList menuNames;
-      this->Implementation->ProxyInfo->GetFilterMenu(menuNames);
-      if(menuNames.size() > 0)
-        {
-        // Only use an alphabetical menu if requested.
-        alphabetical = 0;
-        }
-
-      for(iter = menuNames.begin(); iter != menuNames.end(); ++iter)
-        {
-        if((*iter).isEmpty())
-          {
-          this->Implementation->FiltersMenu->addSeparator();
-          }
-        else
-          {
-          QMenu *menu = this->Implementation->FiltersMenu->addMenu(*iter) << pqSetName(*iter);
-          categories.insert(*iter, menu);
-          if((*iter) == "&Alphabetical" || (*iter) == "Alphabetical")
-            {
-            alphabetical = menu;
-            }
-          }
-        }
-      }
-
-    vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
-    manager->InstantiateGroupPrototypes("filters");
-    int numFilters = manager->GetNumberOfProxies("filters_prototypes");
-    for(int i=0; i<numFilters; i++)
-      {
-      QStringList categoryList;
-      QString proxyName = manager->GetProxyName("filters_prototypes",i);
-      if(this->Implementation->ProxyInfo)
-        {
-        this->Implementation->ProxyInfo->GetFilterMenuCategories(proxyName, categoryList);
-        }
-
-      for(iter = categoryList.begin(); iter != categoryList.end(); ++iter)
-        {
-        QMap<QString, QMenu *>::Iterator jter = categories.find(*iter);
-        if(jter != categories.end())
-          {
-          (*jter)->addAction(proxyName) << pqSetName(proxyName)
-              << pqSetData(proxyName);
-          }
-        }
-
-      if(alphabetical)
-        {
-        alphabetical->addAction(proxyName) << pqSetName(proxyName)
-            << pqSetData(proxyName);
-        }
-      }
-
-#if 1
-    // hard code sources
-    this->Implementation->SourcesMenu->addAction("2D Glyph") << pqSetName("2D Glyph") << pqSetData("GlyphSource2D");
-    this->Implementation->SourcesMenu->addAction("3D Text") << pqSetName("3D Text") << pqSetData("VectorText");
-    this->Implementation->SourcesMenu->addAction("Arrow") << pqSetName("Arrow") << pqSetData("ArrowSource");
-    this->Implementation->SourcesMenu->addAction("Axes") << pqSetName("Axes") << pqSetData("Axes");
-    this->Implementation->SourcesMenu->addAction("Box") << pqSetName("Box") << pqSetData("CubeSource");
-    this->Implementation->SourcesMenu->addAction("Cone") << pqSetName("Cone") << pqSetData("ConeSource");
-    this->Implementation->SourcesMenu->addAction("Cylinder") << pqSetName("Cylinder") << pqSetData("CylinderSource");
-    this->Implementation->SourcesMenu->addAction("Hierarchical Fractal") << pqSetName("Hierarchical Fractal") << pqSetData("HierarchicalFractal");
-    this->Implementation->SourcesMenu->addAction("Line") << pqSetName("Line") << pqSetData("LineSource");
-    this->Implementation->SourcesMenu->addAction("Mandelbrot") << pqSetName("Mandelbrot") << pqSetData("ImageMandelbrotSource");
-    this->Implementation->SourcesMenu->addAction("Plane") << pqSetName("Plane") << pqSetData("PlaneSource");
-    this->Implementation->SourcesMenu->addAction("Sphere") << pqSetName("Sphere") << pqSetData("SphereSource");
-    this->Implementation->SourcesMenu->addAction("Superquadric") << pqSetName("Superquadric") << pqSetData("SuperquadricSource");
-    this->Implementation->SourcesMenu->addAction("Wavelet") << pqSetName("Wavelet") << pqSetData("RTAnalyticSource");
-#else
-    // TODO: Add a sources xml file to organize the sources instead of
-    // hardcoding them.
-    manager->InstantiateGroupPrototypes("sources");
-    int numSources = manager->GetNumberOfProxies("sources_prototypes");
-    for(int i=0; i<numSources; i++)
-      {
-      const char* proxyName = manager->GetProxyName("sources_prototypes",i);
-      this->Implementation->SourcesMenu->addAction(proxyName) << pqSetName(proxyName) << pqSetData(proxyName);
-      }
-#endif
-    }
-}
-
-vtkSMProxy* pqMainWindow::createSource(const QString& source_name)
-{
-  if(!this->Implementation->Pipeline || !this->Implementation->PipelineBrowser)
-    {
-    return 0;
-    }
-
-  pqServer *server = this->Implementation->PipelineBrowser->getCurrentServer()->GetServer();
-  this->Implementation->UndoStack->BeginUndoSet(
-      server->GetConnectionID(), "CreateSource");
-
-  vtkSMProxy* source = this->Implementation->Pipeline->createAndRegisterSource(
-      source_name.toAscii().data(), server);
-  if(source && this->Implementation->ActiveView)
-    {
-    QVTKWidget *win = qobject_cast<QVTKWidget *>(
-        this->Implementation->ActiveView->mainWidget());
-    vtkSMRenderModuleProxy *rm = this->Implementation->Pipeline->getRenderModule(win);
-    this->Implementation->Pipeline->setVisible(
-        this->Implementation->Pipeline->createAndRegisterDisplay(source, rm), true);
-    rm->ResetCamera();
-    win->update();
-    }
-
-  this->Implementation->PipelineBrowser->selectProxy(source);
-
-  this->Implementation->UndoStack->EndUndoSet();
-  return source;
-}
-
+//-----------------------------------------------------------------------------
 void pqMainWindow::onCreateSource(QAction* action)
 {
   if(!action)
+    {
     return;
+    }
 
-  QByteArray sourceName = action->data().toString().toAscii();
-  this->createSource(sourceName);  
+  QString sourceName = action->data().toString();
+  if (!pqApplicationCore::instance()->createSourceOnActiveServer(sourceName))
+    {
+    qCritical() << "Source could not be created.";
+    }
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindow::onCreateFilter(QAction* action)
 {
-  if(!action || !this->Implementation->Pipeline || !this->Implementation->PipelineBrowser)
+  if(!action || !this->Implementation->Pipeline 
+    || !this->Implementation->PipelineBrowser)
     {
     return;
     }
-  
-  QByteArray filterName = action->data().toString().toAscii();
-  vtkSMProxy *current = this->Implementation->PipelineBrowser->getSelectedProxy();
-  pqServer *server = this->Implementation->PipelineBrowser->getListModel()->getServerFor(current)->GetServer();
-  if(current && server)
+
+  QString filterName = action->data().toString();
+  if (!pqApplicationCore::instance()->createFilterForActiveSource(filterName))
     {
-    vtkSMProxy *source = 0;
-    vtkSMProxy *next = this->Implementation->PipelineBrowser->getNextProxy();
-    if(next)
-      {
-      source = this->Implementation->Pipeline->createAndRegisterFilter(filterName, server);
-      this->Implementation->Pipeline->addConnection(current, source);
-      this->Implementation->Pipeline->removeConnection(current, next);
-      this->Implementation->Pipeline->addConnection(source, next);
-      }
-    else
-      {
-      source = this->Implementation->Pipeline->createAndRegisterFilter(filterName, server);
-      this->Implementation->Pipeline->addConnection(current, source);
-      }
-
-    if(source && this->Implementation->ActiveView)
-      {
-      QVTKWidget *win = qobject_cast<QVTKWidget *>(
-          this->Implementation->ActiveView->mainWidget());
-      vtkSMRenderModuleProxy *rm = this->Implementation->Pipeline->getRenderModule(win);
-
-      // Only turn on visibility for added filters?
-      this->Implementation->Pipeline->setVisible(
-          this->Implementation->Pipeline->createAndRegisterDisplay(source, rm), next == 0);
-      rm->ResetCamera();
-      win->update();
-      }
-
-    this->Implementation->PipelineBrowser->selectProxy(source);
-    }
+    qCritical() << "Source could not be created.";
+    } 
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindow::onOpenLinkEditor()
 {
 }
@@ -1282,43 +1310,6 @@ void pqMainWindow::onPythonShell()
 #endif // PARAQ_EMBED_PYTHON
 }
 
-void pqMainWindow::onNewQVTKWidget(pqMultiViewFrame* frame)
-{
-  QVTKWidget *widget = ParaQ::AddQVTKWidget(frame, this->Implementation->MultiViewManager,
-      this->Implementation->CurrentServer);
-      
-  if(widget)
-    {
-    QSignalMapper* sm = new QSignalMapper(frame);
-    sm->setMapping(frame, frame);
-    QObject::connect(frame, SIGNAL(activeChanged(bool)), sm, SLOT(map()));
-    QObject::connect(sm, SIGNAL(mapped(QWidget*)), this, SLOT(onFrameActive(QWidget*)));
-
-    if(!this->Implementation->ActiveView)
-      {
-      frame->setActive(1);
-      }
-    }
-}
-
-void pqMainWindow::onDeleteQVTKWidget(pqMultiViewFrame* p)
-{
-  QVTKWidget* w = qobject_cast<QVTKWidget*>(p->mainWidget());
-  this->cleanUpWindow(w);
-}
-
-void pqMainWindow::onFrameActive(QWidget* w)
-{
-  if(this->Implementation->ActiveView && this->Implementation->ActiveView != w)
-    {
-    pqMultiViewFrame* f = qobject_cast<pqMultiViewFrame*>(this->Implementation->ActiveView);
-    if(f->active())
-      f->setActive(0);
-    }
-
-  this->Implementation->ActiveView = qobject_cast<pqMultiViewFrame*>(w);
-}
-
 void pqMainWindow::onNewSelections(vtkSMProxy*, vtkUnstructuredGrid* selections)
 {
   // Update the element inspector ...
@@ -1327,68 +1318,29 @@ void pqMainWindow::onNewSelections(vtkSMProxy*, vtkUnstructuredGrid* selections)
     element_inspector->addElements(selections);
     }
 }
-
+//-----------------------------------------------------------------------------
 void pqMainWindow::onCreateCompoundProxy(QAction* action)
 {
-  if(!action || !this->Implementation->Pipeline || !this->Implementation->PipelineBrowser)
+  if(!action)
     {
     return;
     }
 
-  QByteArray filterName = action->data().toString().toAscii();
-  vtkSMProxy *current = this->Implementation->PipelineBrowser->getSelectedProxy();
-  pqServer *server = this->Implementation->PipelineBrowser->getListModel()->getServerFor(current)->GetServer();
-  if(current && server)
+  QString sourceName = action->data().toString();
+  if (!pqApplicationCore::instance()->createCompoundSource(sourceName))
     {
-    vtkSMProxy *source = 0;
-    vtkSMProxy *next = this->Implementation->PipelineBrowser->getNextProxy();
-    if(next)
-      {
-      source = this->Implementation->Pipeline->createAndRegisterBundle(filterName, server);
-      this->Implementation->Pipeline->addConnection(current, source);
-      this->Implementation->Pipeline->removeConnection(current, next);
-      this->Implementation->Pipeline->addConnection(source, next);
-      }
-    else
-      {
-      source = this->Implementation->Pipeline->createAndRegisterBundle(filterName, server);
-      this->Implementation->Pipeline->addConnection(current, source);
-      }
-
-    if(source && this->Implementation->ActiveView)
-      {
-      QVTKWidget *win = qobject_cast<QVTKWidget *>(
-          this->Implementation->ActiveView->mainWidget());
-      vtkSMRenderModuleProxy *rm = this->Implementation->Pipeline->getRenderModule(win);
-
-      // Only turn on visibility for added filters?
-      this->Implementation->Pipeline->setVisible(
-          this->Implementation->Pipeline->createAndRegisterDisplay(source, rm), next == 0);
-      rm->ResetCamera();
-      win->update();
-      }
-
-    this->Implementation->PipelineBrowser->selectProxy(source);
+    qCritical() << "Source could not be created.";
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindow::onCompoundProxyAdded(const QString&, const QString& proxy)
 {
   this->Implementation->CompoundProxyToolBar->addAction(QIcon(":/pqWidgets/pqBundle32.png"), proxy) 
     << pqSetName(proxy) << pqSetData(proxy);
 }
 
-void pqMainWindow::onAddServer(pqServer *server)
-{
-  // When restoring a state file, the PipelineData object will
-  // create the pqServer. Make sure the CurrentServer gets set.
-  if(server && !this->Implementation->CurrentServer)
-    {
-    this->Implementation->CurrentServer = server;
-    emit serverChanged(this->Implementation->CurrentServer);
-    }
-}
-
+//-----------------------------------------------------------------------------
 void pqMainWindow::onRemoveServer(pqServer *server)
 {
   if(!this->Implementation->MultiViewManager || !this->Implementation->Pipeline)
@@ -1396,6 +1348,7 @@ void pqMainWindow::onRemoveServer(pqServer *server)
     return;
     }
 
+  /* FIXME
   // Get the server object from the pipeline model.
   pqPipelineServer *serverObject =
       this->Implementation->Pipeline->getModel()->getServerFor(server);
@@ -1420,6 +1373,7 @@ void pqMainWindow::onRemoveServer(pqServer *server)
     }
 
   this->Implementation->MultiViewManager->blockSignals(false);
+  */
 }
 
 void pqMainWindow::onAddWindow(QWidget *win)
@@ -1429,6 +1383,7 @@ void pqMainWindow::onAddWindow(QWidget *win)
     return;
     }
 
+  /* FIXME
   QVTKWidget *widget = qobject_cast<QVTKWidget *>(win);
   if(widget)
     {
@@ -1445,36 +1400,123 @@ void pqMainWindow::onAddWindow(QWidget *win)
         SIGNAL(selectionChanged(vtkSMProxy*, vtkUnstructuredGrid*)),
         this, SLOT(onNewSelections(vtkSMProxy*, vtkUnstructuredGrid*)));
     }
+    */
 }
 
-void pqMainWindow::cleanUpWindow(QVTKWidget *win)
+//-----------------------------------------------------------------------------
+void pqMainWindow::onBrowserSelectionChanged(pqPipelineModelItem* item)
 {
-  if(win && this->Implementation->Pipeline)
+  // Update the internal iVars that denote the active selections.
+  pqServer* server = 0;
+  pqPipelineSource* source = dynamic_cast<pqPipelineSource*>(item);
+  if (source)
     {
-    // Remove the render module from the pipeline's view map and delete it.
-    this->Implementation->Pipeline->getModel()->removeWindow(win);
-    vtkSMRenderModuleProxy *rm = this->Implementation->Pipeline->removeViewMapping(win);
-    if(rm)
-      {
-      rm->Delete();
-      }
+    server = source->getServer();
+    }
+  else
+    {
+    server = dynamic_cast<pqServer*>(item);
+    }
 
-    if(win->parentWidget() == this->Implementation->ActiveView)
-      {
-      this->Implementation->ActiveView = 0;
-      }
+  pqApplicationCore::instance()->setActiveSource(source);
+  pqApplicationCore::instance()->setActiveServer(server);
+
+  // It's not clear how the Object inspector etc work with the 
+  // pipeline representation yet. So for now, we will
+  // simply let it be.
+  if (this->Implementation->Inspector)
+    {
+    this->Implementation->Inspector->setProxy(
+      (source)? source->getProxy() : NULL);
     }
 }
 
-
-void pqMainWindow::onProxySelected(vtkSMProxy* p)
+//-----------------------------------------------------------------------------
+void pqMainWindow::onActiveSourceChanged(pqPipelineSource* src)
 {
-  this->Implementation->CurrentProxy = p;
+  this->updateFiltersMenu(src);
 }
 
+//-----------------------------------------------------------------------------
+void pqMainWindow::updateFiltersMenu(pqPipelineSource* source)
+{
+  // update the filter menu.
+  
+  // Iterate over all filters in the menu and see if they are
+  // applicable to the current source.
+  QMenu* menu = this->filtersMenu();
+  QList<QAction*> actions = menu->findChildren<QAction*>();
+
+  vtkSMProxy* input = (source)? source->getProxy() : NULL;
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+
+  foreach(QAction* action, actions)
+    {
+    if (!input)
+      {
+      action->setEnabled(false);
+      continue;
+      }
+    QString filterName = action->data().toString();
+    if (filterName.isEmpty())
+      {
+      continue;
+      }
+    vtkSMProxy* output = pxm->GetProxy("filters_prototypes",
+      filterName.toStdString().c_str());
+    if (!output)
+      {
+      action->setEnabled(false);
+      continue;
+      }
+    vtkSMProxyProperty* property = vtkSMProxyProperty::SafeDownCast(
+      output->GetProperty("Input"));
+    if (property)
+      {
+      property->RemoveAllUncheckedProxies();
+      property->AddUncheckedProxy(input);
+      if (property->IsInDomains())
+        {
+        action->setEnabled(true);
+        continue;
+        }
+      }
+    action->setEnabled(false);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::onActiveServerChanged(pqServer* server)
+{
+  // undate filer/source menu.
+  QAction* connectAction = 
+    this->serverMenu()->findChild<QAction*>("Connect");
+  QAction* compoundFilterAction = 
+    this->Implementation->ToolsMenu->findChild<QAction*>( "CompoundFilter");
+  if (server)
+    {
+    connectAction->setEnabled(false);
+    this->Implementation->ServerDisconnectAction->setEnabled(true);
+    this->Implementation->SourcesMenu->setEnabled(true);
+    this->Implementation->FiltersMenu->setEnabled(true);
+    compoundFilterAction->setEnabled(true);
+    }
+  else
+    {
+    connectAction->setEnabled(true);
+    this->Implementation->ServerDisconnectAction->setEnabled(false);
+    this->Implementation->SourcesMenu->setEnabled(false);
+    this->Implementation->FiltersMenu->setEnabled(false);
+    compoundFilterAction->setEnabled(false);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqMainWindow::onUpdateVariableSelector(vtkSMProxy* p)
 {
-  pqVariableSelectorWidget* selector = this->Implementation->VariableSelectorToolBar->findChild<pqVariableSelectorWidget*>();
+  /* FIXME
+  pqVariableSelectorWidget* selector = 
+  this->Implementation->VariableSelectorToolBar->findChild<pqVariableSelectorWidget*>();
   if(!selector)
     return;
     
@@ -1485,15 +1527,15 @@ void pqMainWindow::onUpdateVariableSelector(vtkSMProxy* p)
     return;
     
   pqPipelineSource* pqObject = pqPipelineData::instance()->getModel()->getSourceFor(p);
-  vtkSMDisplayProxy* display = pqObject->GetDisplay()->GetDisplayProxy(0);
+  vtkSMDisplayProxy* display = pqObject->getDisplay()->GetDisplayProxy(0);
   if(!display)
     return;
 
   pqPipelineSource* reader = pqObject;
   pqPipelineFilter* filter = dynamic_cast<pqPipelineFilter*>(reader);
-  while(filter && filter->GetInputCount() > 0)
+  while(filter && filter->getInputCount() > 0)
     {
-    reader = filter->GetInput(0);
+    reader = filter->getInput(0);
     filter = dynamic_cast<pqPipelineFilter*>(reader);
     }
 
@@ -1507,8 +1549,8 @@ void pqMainWindow::onUpdateVariableSelector(vtkSMProxy* p)
     }
   
   // also include unloaded arrays if any
-  QList<QList<QVariant> > extraCellArrays = pqSMAdaptor::getSelectionProperty(reader->GetProxy(), 
-                    reader->GetProxy()->GetProperty("CellArrayStatus"));
+  QList<QList<QVariant> > extraCellArrays = pqSMAdaptor::getSelectionProperty(reader->getProxy(), 
+                    reader->getProxy()->GetProperty("CellArrayStatus"));
   for(i=0; i<extraCellArrays.size(); i++)
     {
     QList<QVariant> cell = extraCellArrays[i];
@@ -1527,8 +1569,8 @@ void pqMainWindow::onUpdateVariableSelector(vtkSMProxy* p)
     }
   
   // also include unloaded arrays if any
-  QList<QList<QVariant> > extraPointArrays = pqSMAdaptor::getSelectionProperty(reader->GetProxy(), 
-               reader->GetProxy()->GetProperty("PointArrayStatus"));
+  QList<QList<QVariant> > extraPointArrays = pqSMAdaptor::getSelectionProperty(reader->getProxy(), 
+               reader->getProxy()->GetProperty("PointArrayStatus"));
   for(i=0; i<extraPointArrays.size(); i++)
     {
     QList<QVariant> cell = extraPointArrays[i];
@@ -1560,39 +1602,41 @@ void pqMainWindow::onUpdateVariableSelector(vtkSMProxy* p)
     {
     selector->chooseVariable(VARIABLE_TYPE_NONE, "");
     }
+  */
 }
 
 void pqMainWindow::onVariableChanged(pqVariableType type, const QString& name)
 {
-  if(this->Implementation->CurrentProxy)
+  /* FIXME
+  if(!this->Implementation->CurrentSource)
     {
-    pqPipelineSource* o = pqPipelineData::instance()->getModel()->getSourceFor(this->Implementation->CurrentProxy);
-    vtkSMDisplayProxy* display = o->GetDisplay()->GetDisplayProxy(0);
-    QWidget* widget = o->GetDisplay()->GetDisplayWindow(0);
-
-    switch(type)
-      {
-      case VARIABLE_TYPE_NONE:
-        pqPart::Color(display, NULL, 0);
-        break;
-      case VARIABLE_TYPE_CELL:
-        pqPart::Color(display, name.toAscii().data(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
-        break;
-      case VARIABLE_TYPE_NODE:
-        pqPart::Color(display, name.toAscii().data(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
-        break;
-      }
-          
-    widget->update();
+    return;
     }
+  pqPipelineSource* o = this->Implementation->CurrentSource;
+  vtkSMDisplayProxy* display = o->getDisplay()->GetDisplayProxy(0);
+  QWidget* widget = o->getDisplay()->GetDisplayWindow(0);
+
+  switch(type)
+    {
+  case VARIABLE_TYPE_NONE:
+    pqPart::Color(display, NULL, 0);
+    break;
+  case VARIABLE_TYPE_CELL:
+    pqPart::Color(display, name.toAscii().data(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+    break;
+  case VARIABLE_TYPE_NODE:
+    pqPart::Color(display, name.toAscii().data(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+    break;
+    }
+
+  widget->update();
+  */
 }
 
 void pqMainWindow::onFirstTimeStep()
 {
-  if(!this->Implementation->CurrentServer)
-    return;
-    
-  if(!this->Implementation->CurrentProxy)
+  /* FIXME
+  if(!this->Implementation->CurrentSource)
     return;
 
   const QString source_class = this->Implementation->CurrentProxy->GetVTKClassName();
@@ -1619,21 +1663,22 @@ void pqMainWindow::onFirstTimeStep()
   this->Implementation->CurrentProxy->UpdateVTKObjects();
   if(pqPipelineData *pipeline = pqPipelineData::instance())
     {
-    pqPipelineSource *source = pipeline->getModel()->getSourceFor(
-        this->Implementation->CurrentProxy);
+    pqPipelineSource *source = this->Implementation->CurrentSource;
     if(source)
       {
-      source->GetDisplay()->UpdateWindows();
+      source->getDisplay()->UpdateWindows();
       }
     }
+    */
 }
 
 void pqMainWindow::onPreviousTimeStep()
 {
+  /*
   if(!this->Implementation->CurrentServer)
     return;
     
-  if(!this->Implementation->CurrentProxy)
+  if(!this->Implementation->CurrentSource)
     return;
 
   const QString source_class = this->Implementation->CurrentProxy->GetVTKClassName();
@@ -1660,21 +1705,19 @@ void pqMainWindow::onPreviousTimeStep()
   this->Implementation->CurrentProxy->UpdateVTKObjects();
   if(pqPipelineData *pipeline = pqPipelineData::instance())
     {
-    pqPipelineSource *source = pipeline->getModel()->getSourceFor(
-        this->Implementation->CurrentProxy);
+    pqPipelineSource *source = this->Implementation->CurrentSource;
     if(source)
       {
-      source->GetDisplay()->UpdateWindows();
+      source->getDisplay()->UpdateWindows();
       }
     }
+    */
 }
 
 void pqMainWindow::onNextTimeStep()
 {
-  if(!this->Implementation->CurrentServer)
-    return;
-    
-  if(!this->Implementation->CurrentProxy)
+  /*
+  if(!this->Implementation->CurrentSource)
     return;
 
   const QString source_class = this->Implementation->CurrentProxy->GetVTKClassName();
@@ -1701,23 +1744,21 @@ void pqMainWindow::onNextTimeStep()
   this->Implementation->CurrentProxy->UpdateVTKObjects();
   if(pqPipelineData *pipeline = pqPipelineData::instance())
     {
-    pqPipelineSource *source = pipeline->getModel()->getSourceFor(
-        this->Implementation->CurrentProxy);
+    pqPipelineSource *source = this->Implementation->CurrentSource;
     if(source)
       {
-      source->GetDisplay()->UpdateWindows();
+      source->getDisplay()->UpdateWindows();
       }
     }
+    */
 }
 
 void pqMainWindow::onLastTimeStep()
 {
-  if(!this->Implementation->CurrentServer)
+  /*
+  if(!this->Implementation->CurrentSource)
     return;
     
-  if(!this->Implementation->CurrentProxy)
-    return;
-
   const QString source_class = this->Implementation->CurrentProxy->GetVTKClassName();
   if(source_class != "vtkExodusReader" && source_class != "vtkPExodusReader")
     return;
@@ -1742,18 +1783,18 @@ void pqMainWindow::onLastTimeStep()
   this->Implementation->CurrentProxy->UpdateVTKObjects();
   if(pqPipelineData *pipeline = pqPipelineData::instance())
     {
-    pqPipelineSource *source = pipeline->getModel()->getSourceFor(
-        this->Implementation->CurrentProxy);
+    pqPipelineSource *source = this->Implementation->CurrentSource;
     if(source)
       {
-      source->GetDisplay()->UpdateWindows();
+      source->getDisplay()->UpdateWindows();
       }
     }
+    */
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindow::onUndoRedoStackChanged(vtkObject*, unsigned long, void*, 
-  void*,  vtkCommand*)
+void pqMainWindow::onUndoRedoStackChanged(bool canUndo, QString,
+  bool canRedo, QString)
 {
   QAction* undoButton = 
     this->Implementation->UndoRedoToolBar->findChild<QAction*>("UndoButton");
@@ -1762,126 +1803,12 @@ void pqMainWindow::onUndoRedoStackChanged(vtkObject*, unsigned long, void*,
     this->Implementation->UndoRedoToolBar->findChild<QAction*>("RedoButton");
   if (undoButton)
     {
-    undoButton->setEnabled(this->Implementation->UndoStack->CanUndo()); 
+    undoButton->setEnabled(canUndo); 
     }
 
   if (redoButton)
     {
-    redoButton->setEnabled(this->Implementation->UndoStack->CanRedo());
+    redoButton->setEnabled(canRedo);
     }
 }
 
-
-//-----------------------------------------------------------------------------
-void pqMainWindow::onUndo()
-{
-  this->Implementation->UndoStack->Undo();
-  QVTKWidget *win = qobject_cast<QVTKWidget *>(this->Implementation->ActiveView->mainWidget());
-  if (win)
-    {
-    win->update();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindow::onRedo()
-{
-  this->Implementation->UndoStack->Redo();
-  QVTKWidget *win = qobject_cast<QVTKWidget *>(this->Implementation->ActiveView->mainWidget());
-  if (win)
-    {
-    win->update();
-    }
-}
-
-//-----------------------------------------------------------------------------
-vtkSMProxy* pqMainWindow::createReader(const QString &file, pqServer* server)
-{
-  vtkSMProxy* source = this->Implementation->Pipeline->createAndRegisterSource("ExodusReader", server);
-  pqSMAdaptor::setElementProperty(source, source->GetProperty("FileName"), file);
-  pqSMAdaptor::setElementProperty(source, source->GetProperty("FilePrefix"), file);
-  pqSMAdaptor::setElementProperty(source, source->GetProperty("FilePattern"), "%s");
-  return source;
-}
-
-//-----------------------------------------------------------------------------
-pqPipelineData* pqMainWindow::getPipeline()
-{
-  return this->Implementation->Pipeline;
-}
-
-//-----------------------------------------------------------------------------
-vtkSMDisplayProxy* pqMainWindow::createDisplay(vtkSMProxy* source)
-{
-  if(!this->Implementation->Pipeline || !this->Implementation->PipelineBrowser)
-    {
-    return 0;
-    }
-
-  QVTKWidget *win = 0;
-  pqServer *server = this->Implementation->PipelineBrowser->getCurrentServer()->GetServer();
-  if(this->Implementation->ActiveView)
-    {
-    win = qobject_cast<QVTKWidget *>(this->Implementation->ActiveView->mainWidget());
-    }
-
-  vtkSMDisplayProxy* display = 0;
-
-  if(server)
-    {
-    vtkSMRenderModuleProxy* rm = this->Implementation->Pipeline->getRenderModule(win);
-    source->UpdateVTKObjects();
-    display = this->Implementation->Pipeline->createAndRegisterDisplay(source, rm);
-    this->Implementation->Pipeline->setVisible(display, true);
-
-    rm->ResetCamera();
-    win->update();
-
-    // Select the latest source in the pipeline inspector.
-    if(source)
-      {
-      this->Implementation->PipelineBrowser->selectProxy(source);
-      }
-    }
-  return display;
-}
-
-//-----------------------------------------------------------------------------
-QVTKWidget* pqMainWindow::getVTKWindow()
-{
-  pqServer* server = this->getServer();
-  if ( !server )
-    {
-    return  0;
-    }
-
-  if(!this->Implementation->ActiveView)
-    {
-    return 0;
-    }
-  return qobject_cast<QVTKWidget *>(this->Implementation->ActiveView->mainWidget());
-}
-
-//-----------------------------------------------------------------------------
-vtkSMRenderModuleProxy* pqMainWindow::getRenderModule()
-{
-  QVTKWidget* win = this->getVTKWindow();
-  if ( !win )
-    {
-    return  0;
-    }
-
-  return this->Implementation->Pipeline->getRenderModule(win);
-}
-
-//-----------------------------------------------------------------------------
-pqServer* pqMainWindow::getServer()
-{
-  if(!this->Implementation->Pipeline || !this->Implementation->PipelineBrowser ||
-    !this->Implementation->PipelineBrowser->getCurrentServer())
-    {
-    return 0;
-    }
-
-  return this->Implementation->PipelineBrowser->getCurrentServer()->GetServer();
-}

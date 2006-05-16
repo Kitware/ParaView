@@ -40,12 +40,13 @@ class vtkSMProxyManager;
 class vtkSMMultiViewRenderModuleProxy;
 
 #include "pqWidgetsExport.h"
-#include <QObject>
+#include "pqPipelineModelItem.h"
 #include <QString>
 #include "vtkSmartPointer.h"
 
-/// Abstracts the concept of a "server connection" so that ParaQ clients may: have more than one connect at a time / open and close connections at-will
-class PQWIDGETS_EXPORT pqServer : public QObject
+/// Abstracts the concept of a "server connection" so that ParaQ clients may: 
+/// have more than one connect at a time / open and close connections at-will
+class PQWIDGETS_EXPORT pqServer : public pqPipelineModelItem 
 {
 public:
   /// Constructs a standalone or "built-in" server connection, returns NULL on failure
@@ -55,6 +56,12 @@ public:
   static pqServer* CreateConnection(const char* const ds_hostName, const int ds_portNumber,
     const char* const rs_hostName, const int rs_portNumber);
 
+  // Use this method to disconnect a server. On calling this method,
+  // the server instance will be deleted.
+  static void disconnect(pqServer* server);
+
+public:  
+  pqServer(vtkIdType connectionId, vtkPVOptions*, QObject* parent = NULL);
   virtual ~pqServer();
 
   /// getAddress() will start reporting the correct address once, there is a separate 
@@ -67,9 +74,13 @@ public:
   /// Returns the multi view manager proxy for this connection.
   vtkSMMultiViewRenderModuleProxy* GetRenderModule();
 
+  /// create a new render module on the server and returns it.
+  /// A new render module is allocated and it is the responsibility of the caller
+  /// to remove it.
+  vtkSMRenderModuleProxy* newRenderModule();
+
   vtkIdType GetConnectionID() { return this->ConnectionID; }
 protected:
-  pqServer(vtkIdType connectionId, vtkPVOptions*);
 
   /// Creates vtkSMMultiViewRenderModuleProxy for this connection and 
   /// initializes it to create render modules of correct type 

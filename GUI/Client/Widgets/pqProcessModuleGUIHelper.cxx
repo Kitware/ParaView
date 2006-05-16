@@ -31,11 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "pqProcessModuleGUIHelper.h"
 
+#include "pqApplicationCore.h"
 #include "pqEventPlayer.h"
 #include "pqEventPlayerXML.h"
 #include "pqOptions.h"
-#include "pqOutputWindow.h"
 #include "pqOutputWindowAdapter.h"
+#include "pqOutputWindow.h"
 
 #include <pqObjectNaming.h>
 
@@ -58,6 +59,7 @@ public:
     OutputWindow(0),
     SMApplication(vtkSMApplication::New()),
     Application(0),
+    ApplicationCore(0),
     Window(0)
   {
     // Redirect Qt debug output to VTK ...
@@ -70,6 +72,7 @@ public:
     this->SMApplication->Delete();
     delete this->Window;
     delete this->OutputWindow;
+    delete this->ApplicationCore;
     delete this->Application;
   }
 
@@ -100,13 +103,14 @@ public:
 
   vtkSMApplication* SMApplication;
   QApplication* Application;
+  pqApplicationCore* ApplicationCore;
   QWidget* Window;
 };
 
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.6");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.7");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -197,13 +201,18 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
 int pqProcessModuleGUIHelper::InitializeApplication(int argc, char** argv)
 {
   this->Implementation->Application = new QApplication(argc, argv);
+  this->Implementation->ApplicationCore = new pqApplicationCore();
   
   // Redirect VTK debug output to a Qt window ...
   this->Implementation->OutputWindow = new pqOutputWindow(0);
-  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter, SIGNAL(displayText(const QString&)), SLOT(onDisplayText(const QString&)));
-  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter, SIGNAL(displayErrorText(const QString&)), SLOT(onDisplayErrorText(const QString&)));
-  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter, SIGNAL(displayWarningText(const QString&)), SLOT(onDisplayWarningText(const QString&)));
-  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter, SIGNAL(displayGenericWarningText(const QString&)), SLOT(onDisplayGenericWarningText(const QString&)));
+  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter, 
+    SIGNAL(displayText(const QString&)), SLOT(onDisplayText(const QString&)));
+  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter, 
+    SIGNAL(displayErrorText(const QString&)), SLOT(onDisplayErrorText(const QString&)));
+  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter, 
+    SIGNAL(displayWarningText(const QString&)), SLOT(onDisplayWarningText(const QString&)));
+  this->Implementation->OutputWindow->connect(this->Implementation->OutputWindowAdapter, 
+    SIGNAL(displayGenericWarningText(const QString&)), SLOT(onDisplayGenericWarningText(const QString&)));
   vtkOutputWindow::SetInstance(Implementation->OutputWindowAdapter);
   
 /** \todo Figure-out how to export Qt's resource symbols from a DLL, so we can use them here */
@@ -258,7 +267,10 @@ void pqProcessModuleGUIHelper::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //-----------------------------------------------------------------------------
-bool pqProcessModuleGUIHelper::compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory)
+bool pqProcessModuleGUIHelper::compareView(
+  const QString& vtkNotUsed(referenceImage), 
+  double vtkNotUsed(threshold), ostream& vtkNotUsed(output), 
+  const QString& vtkNotUsed(tempDirectory))
 {
   return false;
 }

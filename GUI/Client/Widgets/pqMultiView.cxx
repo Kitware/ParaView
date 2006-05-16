@@ -60,7 +60,7 @@ namespace {
     return splitter;
     }
 }
-
+//-----------------------------------------------------------------------------
 pqMultiView::pqMultiView(QWidget* p)
   : QFrame(p)
 {
@@ -81,6 +81,7 @@ pqMultiView::pqMultiView(QWidget* p)
   this->setup(frame);
 }
 
+//-----------------------------------------------------------------------------
 pqMultiView::~pqMultiView()
 {
   // emit signals for removing frames
@@ -91,6 +92,7 @@ pqMultiView::~pqMultiView()
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqMultiView::reset(QList<QWidget*> &removed)
 {
   pqMultiViewFrame* frame = new pqMultiViewFrame();
@@ -118,6 +120,7 @@ void pqMultiView::reset(QList<QWidget*> &removed)
   this->setup(frame);
 }
 
+//-----------------------------------------------------------------------------
 QWidget* pqMultiView::replaceView(pqMultiView::Index index, QWidget* widget)
 {
   if(!widget)
@@ -156,6 +159,7 @@ QWidget* pqMultiView::replaceView(pqMultiView::Index index, QWidget* widget)
   return NULL;
 }
 
+//-----------------------------------------------------------------------------
 void pqMultiView::removeView(QWidget* widget)
 {
   QSplitter* splitter = qobject_cast<QSplitter*>(widget->parentWidget());
@@ -179,7 +183,8 @@ void pqMultiView::removeView(QWidget* widget)
       int location = parentSplitter->indexOf(splitter);
       // get sizes
       QList<int> sizes = parentSplitter->sizes();
-      // in Qt 4.0.1, setParent has a side effect of calling XFlush, so we see some intermediate stuff
+      // in Qt 4.0.1, setParent has a side effect of calling XFlush, so we 
+      // see some intermediate stuff
       splitter->setParent(NULL);
       parentSplitter->insertWidget(location, otherWidget);
       // restore sizes
@@ -195,7 +200,9 @@ void pqMultiView::removeView(QWidget* widget)
     }
 }
 
-pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index, Qt::Orientation orientation)
+//-----------------------------------------------------------------------------
+pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index, 
+  Qt::Orientation orientation)
 {
 
   QFrame* newFrame = NULL;
@@ -286,6 +293,7 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index, Qt::Orientat
   return indexOf(newFrame);
 }
 
+//-----------------------------------------------------------------------------
 pqMultiView::Index pqMultiView::indexOf(QWidget* widget) const
 {
   Index index;
@@ -313,10 +321,11 @@ pqMultiView::Index pqMultiView::indexOf(QWidget* widget) const
   return index;
 }
 
-
+//-----------------------------------------------------------------------------
 QWidget* pqMultiView::widgetOfIndex(Index index)
 {
-  if(index.empty() && static_cast<QSplitter*>(this->layout()->itemAt(0)->widget())->count() == 1)
+  if(index.empty() && static_cast<QSplitter*>(
+      this->layout()->itemAt(0)->widget())->count() == 1)
     {
     return static_cast<QSplitter*>(this->layout()->itemAt(0)->widget())->widget(0);
     }
@@ -350,6 +359,7 @@ QWidget* pqMultiView::widgetOfIndex(Index index)
   return w;
 }
 
+//-----------------------------------------------------------------------------
 void pqMultiView::saveState(vtkPVXMLElement *root)
 {
   if(!root)
@@ -474,6 +484,7 @@ bool pqMultiView::eventFilter(QObject*, QEvent* e)
     }
   return false;
 }
+
 void pqMultiView::cleanSplitter(QSplitter *splitter, QList<QWidget*> &removed)
 {
   QWidget *widget = 0;

@@ -528,11 +528,13 @@ vtkSMDisplayProxy* pqDisplayProxyEditor::displayProxy()
 
 void pqDisplayProxyEditor::updateView()
 {
+  /* FIXME
   pqPipelineSource *source = pqPipelineData::instance()->getModel()->getSourceFor(this->SourceProxy);
   if(source)
     {
-    source->GetDisplay()->UpdateWindows();
+    source->getDisplay()->UpdateWindows();
     }
+    */
 }
 
 void pqDisplayProxyEditor::colorByChanged(const QString& val)

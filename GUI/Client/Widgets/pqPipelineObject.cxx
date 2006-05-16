@@ -33,20 +33,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineObject.h"
 
 
-pqPipelineObject::pqPipelineObject()
-  : pqPipelineModelItem()
+pqPipelineObject::pqPipelineObject(pqServer* server, QObject* parent/*=NULL*/)
+  : pqPipelineModelItem(parent)
 {
-  this->Server = 0;
+  this->Server = server;
 }
 
-pqPipelineServer *pqPipelineObject::GetServer() const
+pqServer *pqPipelineObject::getServer() const
 {
   return this->Server;
 }
 
-void pqPipelineObject::SetServer(pqPipelineServer *server)
-{
-  this->Server = server;
-}
 
 

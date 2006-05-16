@@ -51,8 +51,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMMultiViewRenderModuleProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
-#include "vtkPVAxesWidget.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMRenderModuleProxy.h"
+#include "vtkPVAxesWidget.h"
 
 
 // delete items automatically when another object is deleted
@@ -146,6 +147,7 @@ protected:
 QVTKWidget *ParaQ::AddQVTKWidget(pqMultiViewFrame *frame, QWidget *topWidget,
     pqServer *server)
 {
+  /*
   if(!frame || !topWidget || !server)
     {
     return 0;
@@ -154,6 +156,8 @@ QVTKWidget *ParaQ::AddQVTKWidget(pqMultiViewFrame *frame, QWidget *topWidget,
   vtkSMMultiViewRenderModuleProxy* rm = server->GetRenderModule();
   vtkSMRenderModuleProxy* view = vtkSMRenderModuleProxy::SafeDownCast(
       rm->NewRenderModule());
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  pxm->RegisterProxy("renderModules","temp", view);
 
   // if this property exists (server/client mode), render remotely
   // this should change to a user controlled setting, but this is here for testing
@@ -210,5 +214,7 @@ QVTKWidget *ParaQ::AddQVTKWidget(pqMultiViewFrame *frame, QWidget *topWidget,
     }
 
   return widget;
+  */
+  return 0;
 }
 

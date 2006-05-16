@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineDisplay.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
+#include "pqServerManagerModel.h"
 
 
 pqPropertyManager pqObjectPanel::PropertyManager;
@@ -102,15 +103,17 @@ void pqObjectPanel::accept()
     }
 
   vtkSMUndoStack* urMgr = vtkSMProxyManager::GetProxyManager()->GetUndoStack();
-  urMgr->BeginUndoSet(this->Proxy->GetConnectionID(), "Accept");
+  urMgr->BeginOrContinueUndoSet(this->Proxy->GetConnectionID(), "Accept");
   this->PropertyManager.accept();
   urMgr->EndUndoSet();
   
   // cause the screen to update
-  pqPipelineSource *source = pqPipelineData::instance()->getModel()->getSourceFor(this->Proxy);
+  pqPipelineSource *source = 
+    pqServerManagerModel::instance()->getPQSource(this->Proxy);
   if(source)
     {
-    source->GetDisplay()->UpdateWindows();
+    // FIXME
+    //source->getDisplay()->UpdateWindows();
     }
 }
 

@@ -36,47 +36,92 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPipelineSource_h
 #define _pqPipelineSource_h
 
-
 #include "pqWidgetsExport.h"
 #include "pqPipelineObject.h"
-#include <QString> // Needed for proxy name.
 
 class pqPipelineDisplay;
 class pqPipelineSourceInternal;
-class vtkSMProxy;
+class vtkObject;
 
 
+/// PQ representation for a vtkSMProxy that can be involved in a pipeline.
+/// i.e that can have input and/or output. The public API is to observe
+/// the object, changes to the pipeline structure are only through
+/// protected function. These changes happen automatically as a reflection
+/// of the SM state. 
 class PQWIDGETS_EXPORT pqPipelineSource : public pqPipelineObject
 {
+  Q_OBJECT
+
 public:
-  pqPipelineSource(vtkSMProxy *proxy,
-      pqPipelineModel::ItemType type=pqPipelineModel::Source);
+  pqPipelineSource(QString name, vtkSMProxy *proxy, pqServer* server,
+    QObject* parent=NULL);
   virtual ~pqPipelineSource();
 
-  virtual void ClearConnections();
+  // Returns the registration name for the proxy.
+  const QString &getProxyName() const; 
 
-  const QString &GetProxyName() const {return this->ProxyName;}
-  void SetProxyName(const QString &name) {this->ProxyName = name;}
+  // Returns the vtkSMProxy.
+  vtkSMProxy *getProxy() const; 
 
-  vtkSMProxy *GetProxy() const {return this->Proxy;}
-  void SetProxy(vtkSMProxy *proxy);
 
-  pqPipelineDisplay *GetDisplay() const {return this->Display;}
+  // Get the number of outputs.
+  int getOutputCount() const;
 
-  int GetOutputCount() const;
-  pqPipelineObject *GetOutput(int index) const;
-  int GetOutputIndexFor(pqPipelineObject *output) const;
-  bool HasOutput(pqPipelineObject *output) const;
+  // Get output at a particular index.
+  pqPipelineSource *getOutput(int index) const;
 
-  void AddOutput(pqPipelineObject *output);
-  void InsertOutput(int index, pqPipelineObject *output);
-  void RemoveOutput(pqPipelineObject *output);
+  // Get index for a output.
+  int getOutputIndexFor(pqPipelineSource *output) const;
 
+  // Check if the object exists in the output set.
+  bool hasOutput(pqPipelineSource *output) const;
+
+  /// Get the display at given index.
+  pqPipelineDisplay *getDisplay(int index) const;
+
+  // Get number of displays.
+  int getDisplayCount() const; 
+
+signals:
+  /// fired when a connection is created between two pqPipelineSources.
+  void connectionAdded(pqPipelineSource* in, pqPipelineSource* out);
+
+  /// fired when a connection is broken between two pqPipelineSources.
+  void connectionRemoved(pqPipelineSource* in, pqPipelineSource* out, int index);
+
+public slots:
+  /// when a pqPipelineSource gets created, it adds itself as a
+  /// signal handler for the pqPropertyManager::postaccept() signal.
+  /// This handler tries to create display proxy/LUT etc etc for the source
+  /// if none are already created. Then it signal-slot connection is broken,
+  /// hence on following accepts, it doens't get invoked--hence the name
+  /// "onFirstAccept".
+  void onFirstAccept();
+
+protected slots:
+  // process some change in the input property for the proxy--needed for subclass
+  // pqPipelineFilter.
+  virtual void inputChanged() { ; }
+
+protected:
+
+  /// This method will setup displays/lookup tables etc etc
+  /// for this source proxy.  
+  virtual void setupDisplays();
+
+  friend class pqPipelineFilter;
+  friend class pqPipelineDisplay;
+
+  // called by pqPipelineFilter when the connections change.
+  void removeOutput(pqPipelineSource *);
+  void addOutput(pqPipelineSource*);
+
+  // called by pqPipelineDisplay when the connections change.
+  void addDisplay(pqPipelineDisplay*);
+  void removeDisplay(pqPipelineDisplay*);
 private:
   pqPipelineSourceInternal *Internal; ///< Stores the output connections.
-  pqPipelineDisplay *Display;         ///< Stores the display proxies;
-  QString ProxyName;                  ///< Stores the proxy name.
-  vtkSMProxy *Proxy;                  ///< Stores the proxy pointer.
 };
 
 #endif

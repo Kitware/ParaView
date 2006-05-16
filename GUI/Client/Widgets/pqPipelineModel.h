@@ -55,8 +55,15 @@ class vtkPVXMLElement;
 class vtkSMDisplayProxy;
 class vtkSMProxy;
 class vtkSMRenderModuleProxy;
+class pqPipelineModelDataItem;
 
-
+/// This class is the model for the PipelineLine browser tree view.
+/// pqServerManagerModel models the vtkSMProxyManager for the GUI. The 
+/// vtkSMProxyManager maintains all proxies and hence it is difficult 
+/// to detect/trasvers pipelines etc etc. The pqServerManagerModel
+/// provides a simplified view of the Server Manager. This class
+/// takes that simplified "model" and transforms it into hierachical
+/// tables which can be represented by the Tree View.
 class PQWIDGETS_EXPORT pqPipelineModel : public QAbstractItemModel
 {
   Q_OBJECT
@@ -137,106 +144,36 @@ public:
 
   /// \name Object Mapping
   //@{
-  ItemType getTypeFor(const QModelIndex &index) const;
 
-  vtkSMProxy *getProxyFor(const QModelIndex &index) const;
-  pqPipelineObject *getObjectFor(const QModelIndex &index) const;
-  pqPipelineSource *getSourceFor(const QModelIndex &index) const;
-  pqPipelineSource *getSourceFor(vtkSMProxy *proxy) const;
-  pqPipelineServer *getServerFor(const QModelIndex &index) const;
-  pqPipelineServer *getServerFor(vtkSMProxy *proxy) const;
-  pqPipelineServer *getServerFor(pqServer *server) const;
+  /// Given the index, get the pqPipelineModelItem it represents.
+  /// NULL is returned for root or invalid index.
+  pqPipelineModelItem* getItem(const QModelIndex& ) const;
 
-  QModelIndex getIndexFor(vtkSMProxy *proxy) const;
-  QModelIndex getIndexFor(pqPipelineObject *object) const;
-  QModelIndex getIndexFor(pqPipelineServer *server) const;
-  //@}
 
-  /// \name Server List Methods
-  //@{
-  int getServerCount() const;
-  pqPipelineServer *getServer(int index) const;
-  int getServerIndexFor(pqPipelineServer *server) const;
+  QModelIndex getIndexFor(pqPipelineModelItem *item) const;
   //@}
 
 public slots:
-  /// \name Pipeline Management
-  //@{
-  void clearPipelines();
-
+  /// Called when a new server connection is detected. Adds the connection to the
+  /// list.
   void addServer(pqServer *server);
+
+  /// Called when a server connection is closed. Removes the server from the list.
   void removeServer(pqServer *server);
-  void removeServer(pqPipelineServer *server);
 
-  void addWindow(QWidget *window, pqServer *server);
-  void removeWindow(QWidget *window);
+  // Called when a new source/filter/bundle is registered.
+  void addSource(pqPipelineSource* source);
 
-  void addSource(vtkSMProxy *source, const QString &name, pqServer *server);
-  void addFilter(vtkSMProxy *filter, const QString &name, pqServer *server);
-  void addBundle(vtkSMProxy *bundle, const QString &name, pqServer *server);
+  // Called when a new source/filter/bundle is unregistred.
+  void removeSource(pqPipelineSource* source);
 
-  /// \brief
-  ///   Removes the proxy from the pipeline model.
-  /// \param proxy The proxy to remove.
-  /// \sa
-  ///   pqPipelineModel::removeObject(pqPipelineSource *)
-  void removeObject(vtkSMProxy *proxy);
+  // Called when new pipeline connection (between two pipeline objects)
+  // is made.
+  void addConnection(pqPipelineSource *source, pqPipelineSource *sink);
 
-  /// \brief
-  ///   Removes the source object from the pipeline model.
-  ///
-  /// This method does not reconnect the surrounding proxies. When
-  /// the object is removed, the broken connections will cause the
-  /// view to be rearranged. If you want to reconnect the input(s)
-  /// to the output(s), use the \c extractObject method instead.
-  ///
-  /// \param source The pipeline source object to remove.
-  /// \sa
-  ///   pqPipelineModel::extractObject(pqPipelineFilter *),
-  ///   pqPipelineModel::removeBranch(pqPipelineSource *)
-  void removeObject(pqPipelineSource *source);
-
-  /// \brief
-  ///   Removes the filter object from the pipeline model.
-  ///
-  /// This method can be used to remove a proxy from the pipeline and
-  /// reconnect the surrounding proxies. Reconnecting the surrounding
-  /// proxies reduces the amount of view changes the user sees. An
-  /// object can't be extracted if it doesn't have any inputs or it
-  /// doesn't have any outputs. The object can't be extracted if it
-  /// has multiple inputs and multiple outputs. In case the object
-  /// can't be extracted, this method automatically calls the
-  /// \c removeObject method.
-  ///
-  /// \param filter The pipeline filter object to remove.
-  /// \sa
-  ///   pqPipelineModel::removeObject(pqPipelineSource *),
-  ///   pqPipelineModel::removeBranch(pqPipelineSource *)
-  void extractObject(pqPipelineFilter *filter);
-
-  /// \brief
-  ///   Removes the source and its output from the pipeline model.
-  ///
-  /// This method removes the specified object as well as the branch
-  /// connected to this output. The output branch removed does not
-  /// include objects with multiple inputs. The link to those objects
-  /// is removed, but not the subtree associated with those objects.
-  ///
-  /// \param source The pipeline source object to remove.
-  /// \sa
-  ///   pqPipelineModel::removeObject(pqPipelineSource *),
-  ///   pqPipelineModel::extractObject(pqPipelineFilter *)
-  void removeBranch(pqPipelineSource *source);
-
-  void addConnection(vtkSMProxy *source, vtkSMProxy *sink);
-  void addConnection(pqPipelineSource *source, pqPipelineFilter *sink);
-  void removeConnection(vtkSMProxy *source, vtkSMProxy *sink);
-  void removeConnection(pqPipelineSource *source, pqPipelineFilter *sink);
-
-  void addDisplay(vtkSMDisplayProxy *display, const QString &name,
-      vtkSMProxy *proxy, vtkSMRenderModuleProxy *module);
-  void removeDisplay(vtkSMDisplayProxy *display, vtkSMProxy *proxy);
-  //@}
+  // Called when new pipeline connection (between two pipeline objects)
+  // is broken.
+  void removeConnection(pqPipelineSource *source, pqPipelineSource *sink, int);
 
 signals:
   void firstChildAdded(const QModelIndex &index);
@@ -244,12 +181,29 @@ signals:
 public:
   void saveState(vtkPVXMLElement *root, pqMultiView *multiView=0);
 
-private:
-  int getItemRow(pqPipelineModelItem *item) const;
-  pqPipelineModelItem *getItemParent(pqPipelineModelItem *item) const;
-  void addItemAsSource(pqPipelineSource *source, pqPipelineServer *server);
-  void removeLink(pqPipelineLink *link);
+private slots:
+  void serverDataChanged();
 
+private:
+
+  // Add an item as a child under the parent at the given index.
+  // Note that this method does not actually change the underlying
+  // pqServerManagerModel, it merely signals that such an addition
+  // has taken place.
+  void addChild(pqPipelineModelDataItem* parent, 
+    pqPipelineModelDataItem* child);
+
+  // Remove a child item from under the parent.
+  // Note that this method does not actually change the underlying
+  // pqServerManagerModel, it merely signals that such an addition
+  // has taken place.
+  void removeChildFromParent(pqPipelineModelDataItem* child);
+
+  // Returns the pqPipelineModelDataItem for the given pqPipelineModelItem.
+  pqPipelineModelDataItem* getDataItem(pqPipelineModelItem* item,
+    pqPipelineModelDataItem* subtreeRoot) const;
+
+  QModelIndex getIndex(pqPipelineModelDataItem* item) const;
 private:
   pqPipelineModelInternal *Internal; ///< Stores the pipeline representation.
   QPixmap *PixmapList;               ///< Stores the item icons.

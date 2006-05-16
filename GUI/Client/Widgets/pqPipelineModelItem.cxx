@@ -35,10 +35,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPipelineModelItem.h"
 
+// ParaView includes.
 
-pqPipelineModelItem::pqPipelineModelItem()
+// Qt includes.
+
+//-----------------------------------------------------------------------------
+pqPipelineModelItem::pqPipelineModelItem(QObject* parent /*=null*/)
+  : QObject(parent)
 {
   this->ModelType = pqPipelineModel::Invalid;
+}
+//-----------------------------------------------------------------------------
+pqPipelineModelItem::~pqPipelineModelItem()
+{
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineModelItem::setType(pqPipelineModel::ItemType type)
+{
+  this->ModelType = type;
+  emit this->dataModified();
 }
 
 

@@ -31,8 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqServer.h"
-#include "pqOptions.h"
-#include <QCoreApplication>
 
 #include <vtkToolkits.h>
 #include <vtkObjectFactory.h>
@@ -45,19 +43,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMMultiViewRenderModuleProxy.h>
 
+// Qt includes.
+#include <QCoreApplication>
+#include <QtDebug>
+
+// ParaQ includes.
+#include "pqApplicationCore.h"
+#include "pqOptions.h"
+#include "pqServerManagerModel.h"
+#include "pqPipelineData.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // pqServer
 
 pqServer* pqServer::CreateStandalone()
 {
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkIdType id= pm->ConnectToSelf();
+  if (id == vtkProcessModuleConnectionManager::GetNullConnectionID())
+    {
+    return NULL;
+    }
+  pqServerManagerModel* model = pqServerManagerModel::instance();
+  pqServer* server = model->getServer(id); //new pqServer(id, pm->GetOptions());
+  server->setFriendlyName("Builtin");
+  return server;
+  /*
   // Connection merely to the Self.
   // Process Module always instantiates a self connection.
   pqServer* server = 
     new pqServer(vtkProcessModuleConnectionManager::GetSelfConnectionID(),
       vtkProcessModule::GetProcessModule()->GetOptions());
   server->setFriendlyName("BuiltIn");
+
+  pqServerManagerModel* model = pqServerManagerModel::instance();
+  // Since currently self connections are not new connections,
+  // we, pretend that a new conneciton is created to that the
+  // rest of the connection cogniscance still works. 
+  model->onAddServer(server);
   return server;
+  */
 }
 
 //-----------------------------------------------------------------------------
@@ -78,7 +103,8 @@ pqServer* pqServer::CreateConnection(const char* const hostName, int portNumber)
   name.prepend(":");
   name.prepend(hostName); 
 
-  pqServer* server = new pqServer(id, pm->GetOptions());
+  pqServerManagerModel* model = pqServerManagerModel::instance();
+  pqServer* server = model->getServer(id); //new pqServer(id, pm->GetOptions());
   server->setFriendlyName(name);
   return server;
 }
@@ -111,30 +137,56 @@ pqServer* pqServer::CreateConnection(const char* const ds_hostName, int ds_portN
   
   QString name = name1 + "--" + name2;
 
-  pqServer* server = new pqServer(id, pm->GetOptions());
+  //pqServer* server = new pqServer(id, pm->GetOptions());
+  //server->setFriendlyName(name);
+  //return server;
+
+  pqServerManagerModel* model = pqServerManagerModel::instance();
+  pqServer* server = model->getServer(id); //new pqServer(id, pm->GetOptions());
   server->setFriendlyName(name);
   return server;
 }
 
 //-----------------------------------------------------------------------------
-pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options) :
-  FriendlyName()
+void pqServer::disconnect(pqServer* server)
+{
+  // disconnect on the process module. The event handling will
+  // clean up the connection.
+  
+  // For now, ensure that the render module is deleted before the connection is broken.
+  // Eventually, the vtkSMProxyManager will support a close connection method
+  // which will do proper connection proxy cleanup.
+  server->RenderModule = NULL;
+  vtkProcessModule::GetProcessModule()->Disconnect(
+    server->GetConnectionID());
+}
+
+//-----------------------------------------------------------------------------
+pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* parent) :
+  pqPipelineModelItem(parent), FriendlyName()
 {
   this->ConnectionID = connectionID;
   this->Options = options;
   this->CreateRenderModule();
+  this->setType(pqPipelineModel::Server);
 }
 
 //-----------------------------------------------------------------------------
 pqServer::~pqServer()
 {
   // Close the connection.
+  /* It's not good to disonnect when the object is destroyed, since
+     the connection was not created when the object was created.
+     Let who ever created the connection, close it.
+     */
+  /*
   if (this->ConnectionID != vtkProcessModuleConnectionManager::GetNullConnectionID()
     && this->ConnectionID 
     != vtkProcessModuleConnectionManager::GetSelfConnectionID())
     {
     vtkProcessModule::GetProcessModule()->Disconnect(this->ConnectionID);
     }
+    */
   this->ConnectionID = vtkProcessModuleConnectionManager::GetNullConnectionID();
 }
 
@@ -150,7 +202,7 @@ void pqServer::CreateRenderModule()
   render_module->SetConnectionID(this->ConnectionID);
 
   const char* renderModuleName = 0;
-  if (this->ConnectionID == vtkProcessModuleConnectionManager::GetSelfConnectionID())
+  if (!pm->IsRemote(this->ConnectionID))
     {
     renderModuleName = "LODRenderModule";
     }
@@ -218,6 +270,7 @@ QString pqServer::getAddress() const
 void pqServer::setFriendlyName(const QString& name)
 {
   this->FriendlyName = name;
+  emit this->dataModified();
 }
 
 //-----------------------------------------------------------------------------
@@ -226,4 +279,15 @@ vtkSMMultiViewRenderModuleProxy* pqServer::GetRenderModule()
   return this->RenderModule.GetPointer();
 }
 
+//-----------------------------------------------------------------------------
+vtkSMRenderModuleProxy* pqServer::newRenderModule()
+{
+  if (!this->RenderModule)
+    {
+    qDebug() << "No MultiDisplayRenderModule to create a new render module.";
+    return NULL;
+    }
+  return vtkSMRenderModuleProxy::SafeDownCast(
+    this->RenderModule->NewRenderModule());
+}
 

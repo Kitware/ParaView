@@ -34,25 +34,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPipelineData.h"
 #include "pqPipelineDisplay.h"
-#include "pqPipelineSource.h"
 #include "pqPipelineServer.h"
+#include "pqPipelineSource.h"
 #include "pqServer.h"
+#include "pqServerManagerModel.h"
 
 #include <QVTKWidget.h>
 
-#include <vtkSMSourceProxy.h>
+#include <vtkCommand.h>
+#include <vtkInteractorStyle.h>
+#include <vtkRenderer.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkSMDataObjectDisplayProxy.h>
+#include <vtkSMDoubleVectorProperty.h>
+#include <vtkSMInputProperty.h>
+#include <vtkSMIntVectorProperty.h>
+#include <vtkSMPointLabelDisplayProxy.h>
 #include <vtkSMPointWidgetProxy.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMRenderModuleProxy.h>
-#include <vtkCommand.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkInteractorStyle.h>
-#include <vtkSMInputProperty.h>
-#include <vtkSMDoubleVectorProperty.h>
-#include <vtkSMIntVectorProperty.h>
-#include <vtkSMPointLabelDisplayProxy.h>
-#include <vtkSMDataObjectDisplayProxy.h>
+#include <vtkSMSourceProxy.h>
 #include <vtkUnstructuredGrid.h>
 
 pqPicking::pqPicking(vtkSMRenderModuleProxy* rm, QObject* p)
@@ -128,16 +129,18 @@ void pqPicking::computeSelection(vtkObject* o, unsigned long, void*, void*, vtkC
 
 void pqPicking::computeSelection(vtkRenderWindowInteractor* /*iren*/, int X, int Y)
 {
+  /* FIXME
   // TODO: find a better way to decide the input of the pick filter.
   pqPipelineData* pipeline = pqPipelineData::instance();
 
-  vtkSMProxy* inputProxy = pipeline->currentProxy();
+  vtkSMProxy* inputProxy = 0;// FIXME: pipeline no longer supports currentPorxy. pipeline->currentProxy();
 
   if(!inputProxy)
     return;
-  
-  pqPipelineSource *source = pipeline->getModel()->getSourceFor(inputProxy);
-  vtkSMRenderModuleProxy* rm = pipeline->getRenderModule(qobject_cast<QVTKWidget *>(source->GetDisplay()->GetDisplayWindow(0)));
+ 
+  pqPipelineSource *source = pqServerManagerModel::instance()->getPQSource(inputProxy);
+  vtkSMRenderModuleProxy* rm = pipeline->getRenderModule(
+    qobject_cast<QVTKWidget *>(source->getDisplay()->GetDisplayWindow(0)));
 
 
   // make sure the object is in the window we are picking in
@@ -194,6 +197,7 @@ void pqPicking::computeSelection(vtkRenderWindowInteractor* /*iren*/, int X, int
   rm->UpdateVTKObjects();
 
   rm->StillRender();  // TODO: replace with correct update policy
+  */
 
 }
 

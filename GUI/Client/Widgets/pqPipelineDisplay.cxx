@@ -35,130 +35,123 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPipelineDisplay.h"
 
-#include "pqMultiView.h"
-#include "pqPipelineData.h"
-#include "pqXMLUtil.h"
 
-#include <QString>
-#include "QVTKWidget.h"
-#include <QWidget>
+// ParaView includes.
+#include "vtkCommand.h"
+#include "vtkEventQtSlotConnect.h"
+#include "vtkSmartPointer.h" 
+#include "vtkSMDataObjectDisplayProxy.h"
+#include "vtkSMInputProperty.h"
 
-#include "vtkPVXMLElement.h"
-#include "vtkSMDisplayProxy.h"
+// Qt includes.
+#include <QPointer>
+#include <QtDebug>
 
+// ParaQ includes.
+#include "pqPipelineSource.h"
+#include "pqServerManagerModel.h"
 
-class pqPipelineDisplayItem
+//-----------------------------------------------------------------------------
+class pqPipelineDisplayInternal
 {
 public:
-  pqPipelineDisplayItem();
-  ~pqPipelineDisplayItem();
-
-  vtkSMDisplayProxy *GetDisplay() const {return this->Display;}
-  void SetDisplay(vtkSMDisplayProxy *display);
-
-  QString DisplayName;
-  QWidget *Window;
-
-private:
-  vtkSMDisplayProxy *Display;
+  vtkSmartPointer<vtkSMDataObjectDisplayProxy> DisplayProxy;
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
+  QPointer<pqPipelineSource> Input;
 };
 
-
-class pqPipelineDisplayInternal : public QList<pqPipelineDisplayItem *> {};
-
-
-pqPipelineDisplayItem::pqPipelineDisplayItem()
-  : DisplayName()
-{
-  this->Window = 0;
-  this->Display = 0;
-}
-
-pqPipelineDisplayItem::~pqPipelineDisplayItem()
-{
-  // Make sure the proxy reference gets released.
-  this->SetDisplay(0);
-}
-
-void pqPipelineDisplayItem::SetDisplay(vtkSMDisplayProxy *display)
-{
-  if(this->Display != display)
-    {
-    // Release the reference to the old proxy.
-    if(this->Display)
-      {
-      this->Display->UnRegister(0);
-      }
-
-    // Save the pointer and add a reference to the new proxy.
-    this->Display = display;
-    if(this->Display)
-      {
-      this->Display->Register(0);
-      }
-    }
-}
-
-
-pqPipelineDisplay::pqPipelineDisplay()
+//-----------------------------------------------------------------------------
+pqPipelineDisplay::pqPipelineDisplay(vtkSMDataObjectDisplayProxy* display,
+  pqServer* server, QObject* parent/*=null*/):
+  pqPipelineObject(server, parent)
 {
   this->Internal = new pqPipelineDisplayInternal();
+  this->Internal->DisplayProxy = display;
+  this->Internal->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+  this->Internal->Input = 0;
+  if (display)
+    {
+    this->Internal->VTKConnect->Connect(display->GetProperty("Input"),
+      vtkCommand::ModifiedEvent, this, SLOT(onInputChanged()));
+    }
 }
 
+//-----------------------------------------------------------------------------
 pqPipelineDisplay::~pqPipelineDisplay()
 {
-  if(this->Internal)
+  if (this->Internal->DisplayProxy)
     {
-    // Clean up the display proxy list.
-    QList<pqPipelineDisplayItem *>::Iterator iter = this->Internal->begin();
-    for( ; iter != this->Internal->end(); ++iter)
-      {
-      delete *iter;
-      }
-
-    delete this->Internal;
+    this->Internal->VTKConnect->Disconnect(
+      this->Internal->DisplayProxy->GetProperty("Input"));
     }
+  delete this->Internal;
 }
 
-void pqPipelineDisplay::UpdateWindows()
+//-----------------------------------------------------------------------------
+vtkSMDataObjectDisplayProxy* pqPipelineDisplay::getProxy() const
 {
-  if(this->Internal)
-    {
-    QList<pqPipelineDisplayItem *>::Iterator iter = this->Internal->begin();
-    for( ; iter != this->Internal->end(); ++iter)
-      {
-      if((*iter)->Window)
-        {
-        (*iter)->Window->update();
-        }
-      }
-    }
+  return this->Internal->DisplayProxy;
 }
 
-void pqPipelineDisplay::UnregisterDisplays()
+//-----------------------------------------------------------------------------
+pqPipelineSource* pqPipelineDisplay::getInput() const
 {
-  if(this->Internal)
-    {
-    pqPipelineData *pipeline = pqPipelineData::instance();
-    QList<pqPipelineDisplayItem *>::Iterator iter = this->Internal->begin();
-    for( ; iter != this->Internal->end(); ++iter)
-      {
-      if(!(*iter)->DisplayName.isEmpty())
-        {
-        pipeline->removeAndUnregisterDisplay((*iter)->GetDisplay(),
-            (*iter)->DisplayName.toAscii().data(),
-            pipeline->getRenderModule(qobject_cast<QVTKWidget *>(
-            (*iter)->Window)));
-        }
-
-      delete *iter;
-      *iter = 0;
-      }
-
-    this->Internal->clear();
-    }
+  return this->Internal->Input;
 }
 
+//-----------------------------------------------------------------------------
+void pqPipelineDisplay::onInputChanged()
+{
+  vtkSMInputProperty* ivp = vtkSMInputProperty::SafeDownCast(
+    this->Internal->DisplayProxy->GetProperty("Input"));
+  if (!ivp)
+    {
+    qDebug() << "Display proxy has no input property!";
+    return;
+    }
+  pqPipelineSource* added = 0;
+  pqPipelineSource* removed = 0;
+
+  int new_proxes_count = ivp->GetNumberOfProxies();
+  if (new_proxes_count == 0)
+    {
+    removed = this->Internal->Input;
+    this->Internal->Input = 0;
+    }
+  else if (new_proxes_count == 1)
+    {
+    pqServerManagerModel* model = pqServerManagerModel::instance();
+    removed = this->Internal->Input;
+    this->Internal->Input = model->getPQSource(ivp->GetProxy(0));
+    if (ivp->GetProxy(0) && !this->Internal->Input)
+      {
+      qDebug() << "Display could not locate the pqPipelineSource object "
+        << "for the input proxy.";
+      }
+    }
+  else if (new_proxes_count > 1)
+    {
+    qDebug() << "Displays with more than 1 input are not handled.";
+    return;
+    }
+
+  // Now tell the pqPipelineSource about the changes in the displays.
+  if (removed)
+    {
+    removed->removeDisplay(this);
+    }
+  if (added)
+    {
+    added->addDisplay(this);
+    }
+
+}
+
+
+//-----------------------------------------------------------------------------
+/*
+// This save state must go away. GUI just needs to save which window
+// contains rendermodule with what ID.  ProxyManager will manage the display.
 void pqPipelineDisplay::SaveState(vtkPVXMLElement *root,
     pqMultiView *multiView)
 {
@@ -182,102 +175,6 @@ void pqPipelineDisplay::SaveState(vtkPVXMLElement *root,
       element->Delete();
       }
     }
-}
-
-int pqPipelineDisplay::GetDisplayCount() const
-{
-  if(this->Internal)
-    {
-    return this->Internal->size();
-    }
-
-  return 0;
-}
-
-vtkSMDisplayProxy *pqPipelineDisplay::GetDisplayProxy(int index) const
-{
-  if(this->Internal && index >= 0 && index < this->Internal->size())
-    {
-    return (*this->Internal)[index]->GetDisplay();
-    }
-
-  return 0;
-}
-
-void pqPipelineDisplay::GetDisplayName(int index, QString &buffer) const
-{
-  buffer.clear();
-  if(this->Internal && index >= 0 && index < this->Internal->size())
-    {
-    buffer = (*this->Internal)[index]->DisplayName;
-    }
-}
-
-QWidget *pqPipelineDisplay::GetDisplayWindow(int index) const
-{
-  if(this->Internal && index >= 0 && index < this->Internal->size())
-    {
-    return (*this->Internal)[index]->Window;
-    }
-
-  return 0;
-}
-
-int pqPipelineDisplay::GetDisplayIndexFor(vtkSMDisplayProxy *display) const
-{
-  if(this->Internal)
-    {
-    QList<pqPipelineDisplayItem *>::Iterator iter = this->Internal->begin();
-    for(int i = 0; iter != this->Internal->end(); ++iter, ++i)
-      {
-      if((*iter)->GetDisplay() == display)
-        {
-        return i;
-        }
-      }
-    }
-
-  return -1;
-}
-
-void pqPipelineDisplay::AddDisplay(vtkSMDisplayProxy *display,
-    const QString &name, QWidget *window)
-{
-  // Make sure the display does not already exist.
-  if(!this->Internal || this->GetDisplayIndexFor(display) != -1)
-    {
-    return;
-    }
-
-  // Create the display and add it to the list.
-  pqPipelineDisplayItem *item = new pqPipelineDisplayItem();
-  if(item)
-    {
-    item->SetDisplay(display);
-    item->DisplayName = name;
-    item->Window = window;
-    this->Internal->append(item);
-    }
-}
-
-void pqPipelineDisplay::RemoveDisplay(vtkSMDisplayProxy *display)
-{
-  if(this->Internal)
-    {
-    QList<pqPipelineDisplayItem *>::Iterator iter = this->Internal->begin();
-    for( ; iter != this->Internal->end(); ++iter)
-      {
-      pqPipelineDisplayItem *item = *iter;
-      if(item->GetDisplay() == display)
-        {
-        // Remove the display item from the list.
-        *iter = 0;
-        delete item;
-        this->Internal->erase(iter);
-        break;
-        }
-      }
-    }
-}
+}*/
 
 

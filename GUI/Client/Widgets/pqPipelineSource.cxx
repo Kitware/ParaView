@@ -35,171 +35,229 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPipelineSource.h"
 
+// ParaView.
+#include "vtkEventQtSlotConnect.h"
+#include "vtkProcessModule.h"
+#include "vtkSmartPointer.h"
+#include "vtkSMSourceProxy.h"
+
+// Qt
+#include <QList>
+#include <QtDebug>
+
+// ParaQ
+#include "pqObjectPanel.h"
+#include "pqPipelineBuilder.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineLink.h"
 #include "pqPipelineFilter.h"
-#include <QList>
-#include "vtkSMProxy.h"
+#include "pqProcessModuleGUIHelper.h"
+#include "pqPropertyManager.h"
+#include "pqMainWindow.h"
 
-
-class pqPipelineSourceInternal : public QList<pqPipelineObject *> {};
-
-
-pqPipelineSource::pqPipelineSource(vtkSMProxy *proxy,
-    pqPipelineModel::ItemType type)
-  : pqPipelineObject(), ProxyName()
+//-----------------------------------------------------------------------------
+class pqPipelineSourceInternal 
 {
-  this->Internal = new pqPipelineSourceInternal();
-  this->Display = new pqPipelineDisplay();
-  this->Proxy = 0;
+public:
+  vtkSmartPointer<vtkSMProxy> Proxy;
+  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 
+  QString Name;
+  QList<pqPipelineSource*> Outputs;
+  QList<pqPipelineDisplay*> Displays;
+
+  pqPipelineSourceInternal(QString name, vtkSMProxy* proxy)
+    {
+    this->Name = name;
+    this->Proxy = proxy;
+    this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
+    }
+};
+
+
+//-----------------------------------------------------------------------------
+pqPipelineSource::pqPipelineSource(QString name, vtkSMProxy* proxy,
+  pqServer* server, QObject* parent/*=NULL*/) : pqPipelineObject(server, parent)
+{
+  this->Internal = new pqPipelineSourceInternal(name, proxy);
+  
   // Set the model item type.
-  this->SetType(type);
-
-  // Set the proxy, which will increment the reference count.
-  this->SetProxy(proxy);
+  this->setType(pqPipelineModel::Source);
+ 
+  if (proxy) // TODO: clean this.
+    {
+    QObject::connect(&pqObjectPanel::PropertyManager, SIGNAL(accepted()),
+      this, SLOT(onFirstAccept()));
+    }
 }
 
+//-----------------------------------------------------------------------------
 pqPipelineSource::~pqPipelineSource()
 {
-  this->ClearConnections();
-  this->SetProxy(0);
-  if(this->Internal)
+  if (this->Internal->Proxy.GetPointer())
     {
-    delete this->Internal;
-    this->Internal = 0;
+    this->Internal->VTKConnect->Disconnect(this->Internal->Proxy.GetPointer());
     }
 
-  if(this->Display)
-    {
-    delete this->Display;
-    this->Display = 0;
-    }
+  delete this->Internal;
 }
 
-void pqPipelineSource::ClearConnections()
+//-----------------------------------------------------------------------------
+const QString& pqPipelineSource::getProxyName() const 
 {
-  if(this->Internal)
-    {
-    // Note: The source object should delete the memory allocated
-    // for the link object since the server object has no reference.
-    QList<pqPipelineObject *>::Iterator iter = this->Internal->begin();
-    for( ; iter != this->Internal->end(); ++iter)
-      {
-      if((*iter)->GetType() == pqPipelineModel::Link)
-        {
-        delete *iter;
-        *iter = 0;
-        }
-      }
-
-    this->Internal->clear();
-    }
+  return this->Internal->Name;
 }
 
-void pqPipelineSource::SetProxy(vtkSMProxy *proxy)
+//-----------------------------------------------------------------------------
+vtkSMProxy* pqPipelineSource::getProxy() const
 {
-  if(this->Proxy != proxy)
-    {
-    // Release the reference to the old proxy.
-    if(this->Proxy)
-      {
-      this->Proxy->UnRegister(0);
-      }
-
-    // Save the pointer and add a reference to the new proxy.
-    this->Proxy = proxy;
-    if(this->Proxy)
-      {
-      this->Proxy->Register(0);
-      }
-    }
+  return this->Internal->Proxy.GetPointer();
 }
 
-int pqPipelineSource::GetOutputCount() const
+//-----------------------------------------------------------------------------
+int pqPipelineSource::getOutputCount() const
 {
-  if(this->Internal)
+  return this->Internal->Outputs.size();
+}
+
+//-----------------------------------------------------------------------------
+pqPipelineSource *pqPipelineSource::getOutput(int index) const
+{
+  if(index >= 0 && index < this->Internal->Outputs.size())
     {
-    return this->Internal->size();
+    return this->Internal->Outputs[index];
     }
 
+  qCritical() << "Index " << index << " out of bounds.";
   return 0;
 }
 
-pqPipelineObject *pqPipelineSource::GetOutput(int index) const
+//-----------------------------------------------------------------------------
+int pqPipelineSource::getOutputIndexFor(pqPipelineSource *output) const
 {
-  if(this->Internal && index >= 0 && index < this->Internal->size())
-    {
-    return (*this->Internal)[index];
-    }
-
-  return 0;
-}
-
-int pqPipelineSource::GetOutputIndexFor(pqPipelineObject *output) const
-{
-  if(this->Internal && output)
+  int index = 0;
+  if(output)
     {
     pqPipelineLink *link = 0;
-    pqPipelineObject *current = 0;
-    QList<pqPipelineObject *>::Iterator iter = this->Internal->begin();
-    for(int index = 0; iter != this->Internal->end(); ++iter, ++index)
+    foreach(pqPipelineSource *current, this->Internal->Outputs)
       {
       // The output may be in a link object.
-      current = *iter;
-      if(current->GetType() == pqPipelineModel::Link)
+      if(current->getType() == pqPipelineModel::Link)
         {
         link = dynamic_cast<pqPipelineLink *>(current);
         current = link->GetLink();
         }
-
       // The requested output object may be a link, so test the
       // list item as well as the link output.
-      if(current == output || *iter == output)
+      if(current == output)
         {
         return index;
         }
+      index++;
       }
     }
-
   return -1;
 }
 
-bool pqPipelineSource::HasOutput(pqPipelineObject *output) const
+//-----------------------------------------------------------------------------
+bool pqPipelineSource::hasOutput(pqPipelineSource *output) const
 {
-  return this->GetOutputIndexFor(output) != -1;
+  return (this->getOutputIndexFor(output) != -1);
 }
 
-void pqPipelineSource::AddOutput(pqPipelineObject *output)
+//-----------------------------------------------------------------------------
+void pqPipelineSource::onFirstAccept()
 {
-  if(this->Internal && output)
+  /* FIXME:: this will have to move out of here...
+  if (this->getDisplay()->GetDisplayCount() ==0)
     {
-    this->Internal->append(output);
+    this->setupDisplays();
+    }
+    */
+  QObject::disconnect(this, SLOT(onFirstAccept()));
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineSource::setupDisplays()
+{
+  /*
+  // TODO: how to get the pqMainWindow instance more gracefully?
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pqProcessModuleGUIHelper* helper = 
+    pqProcessModuleGUIHelper::SafeDownCast(pm->GetGUIHelper());
+  if (!helper)
+    {
+    qCritical() << "Failed to locate GUIHelper.";
+    return;
+    }
+  pqMainWindow* mainWindow = helper->getWindow();
+  pqPipelineBuilder* pBuilder = mainWindow->pipelineBuilder();
+  vtkSMRenderModuleProxy* renModule = mainWindow->activeRenderModule();
+  if (renModule)
+    {
+    vtkSMDisplayProxy* display = pBuilder->createDisplayProxy(
+      vtkSMSourceProxy::SafeDownCast(this->Internal->Proxy.GetPointer()), renModule);
+    // the display will get registered by pBuilder and will get added
+    // to this->Display as a side effect of the registeration. So nothing mucj
+    // to do here.
+    }
+    */
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineSource::addOutput(pqPipelineSource* output)
+{
+  this->Internal->Outputs.push_back(output);
+
+  // raise signals to let the world know which connections were
+  // broken and which ones were made.
+  emit this->connectionAdded(this, output);
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineSource::removeOutput(pqPipelineSource* output)
+{
+  int index = this->Internal->Outputs.indexOf(output);
+  if (index != -1)
+    {
+    this->Internal->Outputs.removeAt(index);
+    }
+
+  // raise signals to let the world know which connections were
+  // broken and which ones were made.
+  emit this->connectionRemoved(this, output, index);
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineSource::addDisplay(pqPipelineDisplay* display)
+{
+  this->Internal->Displays.push_back(display);
+
+//  emit this->displayAdded(this, display);
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineSource::removeDisplay(pqPipelineDisplay* display)
+{
+  int index = this->Internal->Displays.indexOf(display);
+  if (index != -1)
+    {
+    this->Internal->Displays.removeAt(index);
     }
 }
 
-void pqPipelineSource::InsertOutput(int index, pqPipelineObject *output)
+//-----------------------------------------------------------------------------
+int pqPipelineSource::getDisplayCount() const
 {
-  if(this->Internal && output)
-    {
-    this->Internal->insert(index, output);
-    }
+  return this->Internal->Displays.size();
 }
 
-void pqPipelineSource::RemoveOutput(pqPipelineObject *output)
+//-----------------------------------------------------------------------------
+pqPipelineDisplay* pqPipelineSource::getDisplay(int index) const
 {
-  if(this->Internal && output)
+  if (index >= 0 && index < this->Internal->Displays.size())
     {
-    QList<pqPipelineObject *>::Iterator iter = this->Internal->begin();
-    for( ; iter != this->Internal->end(); ++iter)
-      {
-      if(*iter == output)
-        {
-        this->Internal->erase(iter);
-        break;
-        }
-      }
+    return this->Internal->Displays[index];
     }
+  return 0;
 }
-
-

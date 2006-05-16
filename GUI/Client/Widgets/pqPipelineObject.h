@@ -37,24 +37,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPipelineObject_h
 #define _pqPipelineObject_h
 
-
-#include "pqWidgetsExport.h"
 #include "pqPipelineModelItem.h"
 
-class pqPipelineServer;
+class pqServer;
 
 
 class PQWIDGETS_EXPORT pqPipelineObject : public pqPipelineModelItem
 {
 public:
-  pqPipelineObject();
+  pqPipelineObject(pqServer* server, QObject* parent=NULL);
   virtual ~pqPipelineObject() {}
 
-  pqPipelineServer *GetServer() const;
-  void SetServer(pqPipelineServer *server);
+  /// Get the server on which this pipeline object exists.
+  pqServer *getServer() const;
 
 private:
-  pqPipelineServer *Server;           ///< Stores the parent server.
+  pqServer *Server;           ///< Stores the parent server.
 };
 
 #endif

@@ -41,15 +41,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineDisplay.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineObject.h"
-#include "pqPipelineServer.h"
 #include "pqPipelineSource.h"
+#include "pqServer.h"
 
 #include <QDialog>
 #include <QHBoxLayout>
 #include <QMenu>
 
 #include "vtkSMProxy.h"
-#include "vtkSMDisplayProxy.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 
 
 pqPipelineBrowserContextMenu::pqPipelineBrowserContextMenu(
@@ -83,18 +83,19 @@ void pqPipelineBrowserContextMenu::showContextMenu(const QPoint &pos)
   pqFlatTreeView *tree = this->Browser->getTreeView();
   QModelIndex current = tree->selectionModel()->currentIndex();
   pqPipelineModel *model = this->Browser->getListModel();
-  pqPipelineSource *source = model->getSourceFor(current);
-  //pqPipelineServer *server = model->getServerFor(current);
-  if(source && source->GetDisplay())
+  pqPipelineSource *source = dynamic_cast<pqPipelineSource*>(
+    model->getItem(current));
+  pqServer* server = dynamic_cast<pqServer*>(model->getItem(current));
+  if(source && source->getDisplayCount())
     {
     // Add the context menu items for a pipeline object.
     menu.addAction("Display Settings...", this, SLOT(showDisplayEditor()));
     menuHasItems = true;
     }
-  //else if(server)
-  //  {
-  //  // Show the context menu for a server object.
-  //  }
+  else if(server)
+    {
+    // Show the context menu for a server object.
+    }
 
   if(menuHasItems)
     {
@@ -113,7 +114,8 @@ void pqPipelineBrowserContextMenu::showDisplayEditor()
   pqFlatTreeView *tree = this->Browser->getTreeView();
   QModelIndex current = tree->selectionModel()->currentIndex();
   pqPipelineModel *model = this->Browser->getListModel();
-  pqPipelineSource *source = model->getSourceFor(current);
+  pqPipelineSource *source = dynamic_cast<pqPipelineSource*>(
+    model->getItem(current));
   if(!source)
     {
     return;
@@ -132,7 +134,7 @@ void pqPipelineBrowserContextMenu::showDisplayEditor()
   dialog->setWindowTitle("Display Settings");
   QHBoxLayout* l = new QHBoxLayout(dialog);
   pqDisplayProxyEditor* editor = new pqDisplayProxyEditor(dialog);
-  editor->setDisplayProxy(source->GetDisplay()->GetDisplayProxy(0), source->GetProxy());
+  editor->setDisplayProxy(source->getDisplay(0)->getProxy(), source->getProxy());
   l->addWidget(editor);
   dialog->show();
 }

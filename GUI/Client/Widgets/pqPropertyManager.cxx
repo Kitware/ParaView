@@ -211,6 +211,7 @@ void pqPropertyManager::unregisterLink(QObject* qObject, const char* qProperty, 
 
 void pqPropertyManager::accept()
 {
+  emit this->preaccept();
   foreach(pqPropertyManagerProperty* p, this->Internal->Properties.values())
     {
     emit p->flushProperty();
@@ -219,15 +220,19 @@ void pqPropertyManager::accept()
   // so flushing the queue works around that
   QApplication::processEvents();  
   emit this->canAcceptOrReject(false);
+  emit this->accepted();
+  emit this->postaccept();
 }
 
 void pqPropertyManager::reject()
 {
+  emit this->prereject();
   this->Internal->Links.refreshLinks();
   // hack -- apparently our propertyChanged() slot is called after we emit canAcceptOrReject(),
   // so flushing the queue works around that
   QApplication::processEvents();
   emit this->canAcceptOrReject(false);
+  emit postreject();
 }
 
 void pqPropertyManager::propertyChanged()

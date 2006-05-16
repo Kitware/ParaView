@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqPipelineDisplay.h
+   Module:    pqRenderModule.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,44 +29,65 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-/// \file pqPipelineDisplay.h
-/// \date 4/24/2006
-
-#ifndef _pqPipelineDisplay_h
-#define _pqPipelineDisplay_h
+#ifndef __pqRenderModule_h
+#define __pqRenderModule_h
 
 
 #include "pqPipelineObject.h"
 
-class pqPipelineDisplayInternal;
-class pqPipelineSource;
+class pqRenderModuleInternal;
 class pqServer;
-class vtkSMDataObjectDisplayProxy;
+class QVTKWidget;
+class QWidget;
+class vtkSMRenderModuleProxy;
 
-/// This is PQ representation for a single display. A pqDisplay represents
-/// a single vtkSMDataObjectDisplayProxy. The display can be added to
-/// only one render module or more (ofcouse on the same server, this class
-/// doesn't worry about that.
-class PQWIDGETS_EXPORT pqPipelineDisplay : public pqPipelineObject
+
+// This is a PQ abstraction of a render module.
+class PQWIDGETS_EXPORT pqRenderModule : public pqPipelineObject
 {
+  Q_OBJECT
 public:
-  pqPipelineDisplay(vtkSMDataObjectDisplayProxy* display, pqServer* server,
+  pqRenderModule(const QString& name, vtkSMRenderModuleProxy* renModule, pqServer* server, 
     QObject* parent=NULL);
-  virtual ~pqPipelineDisplay();
+  virtual ~pqRenderModule();
 
-  // Get the internal display proxy.
-  vtkSMDataObjectDisplayProxy* getProxy() const;
+  /// Returns the internal render Module proxy associated with this object.
+  vtkSMRenderModuleProxy* getProxy() const;
 
-  // Get the source/filter of which this is a display.
-  pqPipelineSource* getInput() const;
+  /// Returns the QVTKWidget for this render Window.
+  QVTKWidget* getWidget() const;
+
+  /// Call this method to assign a Window in which this render module will render.
+  /// This will set the QVTKWidget's parent.
+  void setWindowParent(QWidget* parent);
+
+  /// Request a StillRender.
+  void render();
+
+  /// Resets the camera to include all visible data.
+  void resetCamera();
+
+  /// Returns the name for this render module.
+  const QString &getProxyName() const; 
+
+
+
 private slots:
-  // called when input property on display changes. We must detect if
-  // (and when) the display is connected to a new proxy.
-  void onInputChanged();
+  /// if renModule is not created when this object is instantianted, we
+  /// must listen to UpdateVTKObjects event to bind the QVTKWidget and
+  /// then render window.
+  void onUpdateVTKObjects();
+
+protected:
+  // Event filter callback.
+  bool eventFilter(QObject* caller, QEvent* e);
 
 private:
-  pqPipelineDisplayInternal *Internal; 
+  /// setups up RM and QVTKWidget binding.
+  void renderModuleInit();
+  
+  pqRenderModuleInternal* Internal;
 };
 
 #endif
+
