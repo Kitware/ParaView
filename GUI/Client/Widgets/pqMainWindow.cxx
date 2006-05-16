@@ -1842,7 +1842,8 @@ vtkSMRenderModuleProxy* pqMainWindow::getRenderModule()
 //-----------------------------------------------------------------------------
 pqServer* pqMainWindow::getServer()
 {
-  if(!this->Implementation->Pipeline || !this->Implementation->PipelineBrowser)
+  if(!this->Implementation->Pipeline || !this->Implementation->PipelineBrowser ||
+    !this->Implementation->PipelineBrowser->getCurrentServer())
     {
     return 0;
     }
