@@ -19,12 +19,12 @@
 // type etc etc.
 // 
 // The class records Server Manager changes that are undo/redo able and
-// collects them. To begin recording such changes one must call BeginUndoSet().
+// collects them. To begin recording such changes one must call BeginOrContinueUndoSet().
 // To end recording use EndUndoSet(). On EndUndoSet, the changes are collected
 // into an XML which is then sent to the data server of the connection
-// set when BeginUndoSet() is called. For this to work properly the GUI
-// must ensure that between BeginUndoSet() and EndUndoSet() changes are
-// only performed to the proxies with the connection id used to BeginUndoSet().
+// set when BeginOrContinueUndoSet() is called. For this to work properly the GUI
+// must ensure that between BeginOrContinueUndoSet() and EndUndoSet() changes are
+// only performed to the proxies with the connection id used to BeginOrContinueUndoSet().
 // In other words, a undo-able unit can only be on the same connection. 
 // 
 // On every undo/redo, it fetches the XML state change from the server.
@@ -62,18 +62,36 @@ public:
 
   // Description:
   // Begin monitoring the proxy manager for undoable operations.
+  // This call resumes the undo set, if one has been suspended,
+  // by calling PauseUndoSet otherwise it starts a new UndoSet 
+  // with the given label. If the undo set was resumed, the label is
+  // ignored, instead the original label is used.
   // All such operations are noted by creating UndoElements for each.
   // All the undo elements will be part of a vtkUndoSet with the given
-  // label. For now, this call cannot be nested i.e. BeginUndoSet call after
-  // a BeginUndoSet but before EndUndoSet is an error. The GUI has to ensure
+  // label. For now, this call cannot be nested i.e. BeginOrContinueUndoSet 
+  // call after a BeginOrContinueUndoSet but before EndUndoSet/PauseUndoSet 
+  // is an error. 
+  // For now, the GUI has to ensure
   // that separate undo sets are created for operations on different connections.
-  void BeginUndoSet(vtkIdType connectionid, const char* label);
+  // Since currently we support only 1 connection at a time. This is
+  // fine, but support needs to be added to hide connection details
+  // from GUI in future.
+  void BeginOrContinueUndoSet(vtkIdType connectionid, const char* label);
+
+  // Description:
+  // Pause the undo set building. Note that EndUndoSet must be called before 
+  // the undo set if packaged and pushed onto the undo stack.
+  void PauseUndoSet();
 
   // Description:
   // End the undo set currently being generated. This must be called only after
-  // BeginUndoSet has been called. If any change was noted, EndUndoSet pushes the
+  // BeginOrContinueUndoSet has been called. If any change was noted, EndUndoSet pushes the
   // vtkUndoSet on to the server's undo stack. 
   void EndUndoSet();
+
+  // Description:
+  // Discard the undo set being built currently.
+  void CancelUndoSet();
 
   // Description:
   // It is possible to push any instance of vtkUndoSet on to the server
@@ -105,11 +123,12 @@ protected:
   ~vtkSMUndoStack();
 
   // Description:
-  // Don;t call Push directly on this class. Instead use BeginUndoSet() and EndUndoSet().
+  // Don;t call Push directly on this class. Instead use 
+  // BeginOrContinueUndoSet() and EndUndoSet().
   virtual void Push(const char* , vtkUndoSet* ) 
     {
     vtkErrorMacro("vtkSMUndoStack does not support calling Push directly."
-      " Please use BeginUndoSet()/EndUndoSet() instead.");
+      " Please use BeginOrContinueUndoSet()/EndUndoSet() instead.");
     return;
     }
 
@@ -131,7 +150,8 @@ protected:
   void OnUnRegisterProxy(void* data);
   void OnPropertyModified(void* data);
   void OnConnectionClosed(vtkIdType cid);
- 
+
+  int BuildUndoSet;
   vtkIdType ActiveConnectionID;
   vtkUndoSet* ActiveUndoSet;
   char* Label;
