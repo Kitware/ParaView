@@ -185,7 +185,7 @@ private slots:
   void onBrowserSelectionChanged(pqPipelineModelItem*);
 
   void onActiveSourceChanged(pqPipelineSource*);
-  void onActiveServerChanged(pqServer*);
+  virtual void onActiveServerChanged(pqServer*);
 private slots:
   void onCreateSource(QAction*);
   void onCreateFilter(QAction*);

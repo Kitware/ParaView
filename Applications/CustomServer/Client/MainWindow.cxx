@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMProxyManager.h>
 #include <vtkSMXMLParser.h>
 
+#include "pqApplicationCore.h"
+
 /// Embeds the ParaView server XML that describes the interface to the custom functionality
 const char* const custom_filters =
 
@@ -78,26 +80,31 @@ const char* const custom_filters =
 "  </ProxyGroup>"
 "</ServerManagerConfiguration>";
 
+//-----------------------------------------------------------------------------
 MainWindow::MainWindow()
 {
   // Create a bare-minimum user interface
   this->setWindowTitle("CustomServer Client");
   this->createStandardPipelineBrowser(false);
-  this->connect(this, SIGNAL(serverChanged(pqServer*)), this, SLOT(onServerChanged(pqServer*)));
+  this->connect(this, SIGNAL(serverChanged(pqServer*)), 
+    this, SLOT(onServerChanged(pqServer*)));
   
   // Force the user to pick a server
   this->onServerConnect();
 }
 
-void MainWindow::onServerChanged(pqServer* server)
+//-----------------------------------------------------------------------------
+void MainWindow::onActiveServerChanged(pqServer* server)
 {
   if(!server)
+    {
     return;
+    }
 
   // User picked a server, so create an instance of our custom object
   vtkSmartPointer<vtkSMXMLParser> parser = vtkSmartPointer<vtkSMXMLParser>::New();
   parser->Parse(custom_filters);
   parser->ProcessConfiguration(vtkSMProxyManager::GetProxyManager());
-  
-  this->createSource("CustomSource");
+
+  pqApplicationCore::instance()->createSourceOnActiveServer("CustomSource");
 }

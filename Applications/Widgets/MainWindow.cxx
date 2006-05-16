@@ -21,6 +21,9 @@
 
 #include <QMenu>
 
+#include "pqApplicationCore.h"
+#include "pqRenderModule.h"
+
 class MainWindow::pqObserver :
   public vtkCommand
 {
@@ -35,8 +38,8 @@ public:
   }
 };
 
-MainWindow::MainWindow() :
-  Observer(pqObserver::New())
+//-----------------------------------------------------------------------------
+MainWindow::MainWindow() : Observer(pqObserver::New())
 {
   this->setWindowTitle("WidgetTester");
 
@@ -62,12 +65,14 @@ MainWindow::MainWindow() :
   
 }
 
+//-----------------------------------------------------------------------------
 MainWindow::~MainWindow()
 {
   this->Observer->Delete();
   this->Observer = 0;
 }
 
+//-----------------------------------------------------------------------------
 void MainWindow::onCreateSliderWidget()
 {
   vtkSMNew3DWidgetProxy* const widget_proxy = vtkSMNew3DWidgetProxy::SafeDownCast(
@@ -96,7 +101,10 @@ void MainWindow::onCreateSliderWidget()
 
   widget_proxy->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer);
 
-  vtkSMRenderModuleProxy* rm = this->getRenderModule();
+  pqRenderModule *renModule = 
+    pqApplicationCore::instance()->getActiveRenderModule();
+
+  vtkSMRenderModuleProxy* rm = renModule->getProxy() ;
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     rm->GetProperty("Displays"));
   if(pp)

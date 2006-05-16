@@ -51,7 +51,7 @@ public:
   
 private slots:
   /// Called when the user has made a connection to a new server
-  void onServerChanged(pqServer*);
+  virtual void onActiveServerChanged(pqServer*);
 };
 
 #endif // !_MainWindow_h

@@ -72,6 +72,9 @@ public:
   // Given a process module ConnectionID, get pqServer for it.
   pqServer* getServer(vtkIdType connectionId);
 
+  // Get the number of server connections available.
+  unsigned int getNumberOfServers();
+
   /// Given the name for a Source, get the pqServer on which the
   //// source exists.
   // pqServer* getServerForSource(QString name);
