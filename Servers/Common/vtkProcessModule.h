@@ -291,6 +291,7 @@ public:
   // Description:
   // Set the gui helper
   void SetGUIHelper(vtkProcessModuleGUIHelper*);
+  vtkGetObjectMacro(GUIHelper, vtkProcessModuleGUIHelper);
 
  // Description:
   // Get a pointer to the log file.
@@ -451,6 +452,14 @@ public:
   vtkIdType ConnectToRemote(const char* serverhost, int port);
   vtkIdType ConnectToRemote(const char* dataserver_host, int dataserver_port,
     const char* renderserver_host, int renderserver_port);
+
+  // Description:
+  // This creates a new SelfConnection. This is experimental feature.
+  vtkIdType ConnectToSelf();
+
+  // Description:
+  // Returns the number of connections (including the SelfConnection).
+  int GetNumberOfConnections();
   
   // Description:
   // Close the connection. The connection must be a remote connection.
