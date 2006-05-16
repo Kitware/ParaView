@@ -1,67 +1,158 @@
 PROJECT(KWCommon)
 
-#############################################################################
-# to use this library in your code you will need to SUBDIR into this
+# --------------------------------------------------------------------------
+# To use this library in a larger project you will need to SUBDIR into this
 # directory so that it gets built and then you will use the following variables
 # in your CMakeLists files to get the proper include paths and libraries
+
 SET (KWCommon_INCLUDE_PATH 
   "${CMAKE_CURRENT_SOURCE_DIR}"
   CACHE INTERNAL "include paths for KWCommon"
   )
 
 SET (KWCommon_LIBRARIES KWCommon CACHE INTERNAL "libraries for KWCommon")
-#############################################################################
-# Find an external package VTK if we are not being built as a part of a larger
-# project that includes VTK as a subdir.
-MACRO( INCLUDE_PACKAGE PACKAGE_NAME )
-  IF( NOT ${PACKAGE_NAME}_SOURCE_DIR )
-    FIND_PACKAGE( ${PACKAGE_NAME} REQUIRED )
-    IF( ${PACKAGE_NAME}_FOUND )
-      INCLUDE( ${${PACKAGE_NAME}_USE_FILE} )
-    ENDIF( ${PACKAGE_NAME}_FOUND )
-  ENDIF( NOT ${PACKAGE_NAME}_SOURCE_DIR )
-ENDMACRO( INCLUDE_PACKAGE )
 
-INCLUDE_PACKAGE( VTK )
-########################################################################
+# You will also need to define a value for the following variables:
+# KWCommon_INSTALL_BIN_DIR          - binary dir (executables)
+# KWCommon_INSTALL_LIB_DIR          - library dir (libs)
+# KWCommon_INSTALL_DATA_DIR         - share dir (say, examples, data, etc)
+# KWCommon_INSTALL_INCLUDE_DIR      - include dir (headers)
+# KWCommon_INSTALL_PACKAGE_DIR      - package/export configuration files
+# KWCommon_VTK_INSTALL_PACKAGE_DIR  - VTK package/export configuration files
+# KWCommon_INSTALL_NO_DEVELOPMENT   - do not install development files
+# KWCommon_INSTALL_NO_RUNTIME       - do not install runtime files
+# KWCommon_INSTALL_NO_DOCUMENTATION - do not install documentation files
+# --------------------------------------------------------------------------
 
-# Let parent project set KWCommon_INSTALL_LIB_DIR to control library install
-# location.
+# --------------------------------------------------------------------------
+# Version
+
+SET(KWCommon_MAJOR_VERSION 1)
+SET(KWCommon_MINOR_VERSION 0)
+
+# --------------------------------------------------------------------------
+# We need VTK
+
+IF(NOT VTK_SOURCE_DIR)
+  FIND_PACKAGE(VTK REQUIRED)
+  INCLUDE(${VTK_USE_FILE})
+  INCLUDE(Dart)
+  MARK_AS_ADVANCED(BUILD_TESTING DART_ROOT TCL_TCLSH)
+  IF(BUILD_TESTING)
+    ENABLE_TESTING()
+  ENDIF(BUILD_TESTING)
+  SET(BUILDNAME "${PROJECT_NAME}-${BUILDNAME}")
+  MARK_AS_ADVANCED(CMAKE_BACKWARDS_COMPATIBILITY)
+ENDIF(NOT VTK_SOURCE_DIR)
+
+# --------------------------------------------------------------------------
+# Output directories
+
+IF(NOT LIBRARY_OUTPUT_PATH)
+  SET(LIBRARY_OUTPUT_PATH ${KWCommon_BINARY_DIR}/bin CACHE INTERNAL
+    "Single output directory for building all libraries.")
+ENDIF(NOT LIBRARY_OUTPUT_PATH)
+
+IF(NOT EXECUTABLE_OUTPUT_PATH)
+  SET(EXECUTABLE_OUTPUT_PATH ${KWCommon_BINARY_DIR}/bin CACHE INTERNAL
+    "Single output directory for building all executables.")
+ENDIF(NOT EXECUTABLE_OUTPUT_PATH)
+
+# --------------------------------------------------------------------------
+# Some flags
+
+INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
+SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
+IF(CMAKE_COMPILER_2005)
+  ADD_DEFINITIONS(-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE)
+ENDIF(CMAKE_COMPILER_2005)
+
+SET(BUILD_SHARED_LIBS ${VTK_BUILD_SHARED_LIBS})
+SET(KWCommon_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+
+SET(KWCommon_CMAKE_DIR "${KWCommon_SOURCE_DIR}/Utilities/CMake")
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${KWCommon_CMAKE_DIR}")
+
+SET(KWCommon_CONFIGURATION_TYPES ${CMAKE_CONFIGURATION_TYPES})
+
+# --------------------------------------------------------------------------
+# Install directories
+
+IF(NOT KWCommon_INSTALL_BIN_DIR)
+  SET(KWCommon_INSTALL_BIN_DIR "/bin")
+ENDIF(NOT KWCommon_INSTALL_BIN_DIR)
+
 IF(NOT KWCommon_INSTALL_LIB_DIR)
   SET(KWCommon_INSTALL_LIB_DIR "/lib/${PROJECT_NAME}")
 ENDIF(NOT KWCommon_INSTALL_LIB_DIR)
-IF(NOT KWCommon_INSTALL_BIN_DIR)
-  SET(KWCommon_INSTALL_BIN_DIR /bin)
-ENDIF(NOT KWCommon_INSTALL_BIN_DIR)
 
-# Let parent project set KWCommon_INSTALL_NO_DEVELOPMENT or 
-# KWCommon_INSTALL_NO_RUNTIME to remove components from the installation.
+IF(NOT KWCommon_INSTALL_DATA_DIR)
+  SET(KWCommon_INSTALL_DATA_DIR "/share/${PROJECT_NAME}")
+ENDIF(NOT KWCommon_INSTALL_DATA_DIR)
+
+IF(NOT KWCommon_INSTALL_INCLUDE_DIR)
+  SET(KWCommon_INSTALL_INCLUDE_DIR "/include/${PROJECT_NAME}")
+ENDIF(NOT KWCommon_INSTALL_INCLUDE_DIR)
+
+IF(NOT KWCommon_INSTALL_PACKAGE_DIR)
+  SET(KWCommon_INSTALL_PACKAGE_DIR ${KWCommon_INSTALL_LIB_DIR})
+ENDIF(NOT KWCommon_INSTALL_PACKAGE_DIR)
+
+IF(NOT KWCommon_VTK_INSTALL_PACKAGE_DIR)
+  SET(KWCommon_VTK_INSTALL_PACKAGE_DIR ${VTK_INSTALL_PACKAGE_DIR})
+ENDIF(NOT KWCommon_VTK_INSTALL_PACKAGE_DIR)
+
+IF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
+  SET(KWCommon_INSTALL_NO_DEVELOPMENT 0)
+ENDIF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
+
+IF(NOT KWCommon_INSTALL_NO_RUNTIME)
+  SET(KWCommon_INSTALL_NO_RUNTIME 0)
+ENDIF(NOT KWCommon_INSTALL_NO_RUNTIME)
+
+IF(NOT KWCommon_INSTALL_NO_DOCUMENTATION)
+  SET(KWCommon_INSTALL_NO_DOCUMENTATION 0)
+ENDIF(NOT KWCommon_INSTALL_NO_DOCUMENTATION)
+
 SET(KWCommon_INSTALL_NO_LIBRARIES)
-IF(BUILD_SHARED_LIBS)
+IF(KWCommon_BUILD_SHARED_LIBS)
   IF(KWCommon_INSTALL_NO_RUNTIME AND KWCommon_INSTALL_NO_DEVELOPMENT)
     SET(KWCommon_INSTALL_NO_LIBRARIES 1)
   ENDIF(KWCommon_INSTALL_NO_RUNTIME AND KWCommon_INSTALL_NO_DEVELOPMENT)
-ELSE(BUILD_SHARED_LIBS)
+ELSE(KWCommon_BUILD_SHARED_LIBS)
   IF(KWCommon_INSTALL_NO_DEVELOPMENT)
     SET(KWCommon_INSTALL_NO_LIBRARIES 1)
   ENDIF(KWCommon_INSTALL_NO_DEVELOPMENT)
-ENDIF(BUILD_SHARED_LIBS)
+ENDIF(KWCommon_BUILD_SHARED_LIBS)
 
-INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
+# --------------------------------------------------------------------------
+# Sources
 
-SET( KWCommon_SRCS
+SET(KWCommon_SRCS
   vtkContainer.cxx
   vtkKWProcessStatistics.cxx
   vtkKWRemoteExecute.cxx
   vtkQueue.cxx
   )
 
+# --------------------------------------------------------------------------
+# Include dirs
+
 IF(VTK_ZLIB_INCLUDE_DIRS)
   INCLUDE_DIRECTORIES(${VTK_ZLIB_INCLUDE_DIRS})
 ENDIF(VTK_ZLIB_INCLUDE_DIRS)
 
+INCLUDE_DIRECTORIES(
+  ${KWCommon_BINARY_DIR}
+  ${KWCommon_SOURCE_DIR}
+  )
+
+# --------------------------------------------------------------------------
+# Build the library
+
 ADD_LIBRARY(KWCommon ${KWCommon_SRCS})
-TARGET_LINK_LIBRARIES (KWCommon
+
+TARGET_LINK_LIBRARIES(KWCommon
   vtkFiltering
   vtkGenericFiltering
   vtkGraphics
@@ -69,13 +160,35 @@ TARGET_LINK_LIBRARIES (KWCommon
   vtkImaging
   vtkRendering
   vtksys
-  ${KWCommon_LINK_LIBS}
   )
 
-INCLUDE_DIRECTORIES(
-  ${KWCommon_BINARY_DIR}
-  ${KWCommon_SOURCE_DIR}
-  )
+IF(NOT KWCommon_INSTALL_NO_LIBRARIES)
+  INSTALL_TARGETS(${KWCommon_INSTALL_LIB_DIR} 
+    RUNTIME_DIRECTORY ${KWCommon_INSTALL_BIN_DIR}
+    ${KWCommon_LIBRARIES})
+ENDIF(NOT KWCommon_INSTALL_NO_LIBRARIES)
+
+# --------------------------------------------------------------------------
+# Install the headers
+
+IF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
+  INSTALL_FILES(${KWCommon_INSTALL_INCLUDE_DIR} .h ${KWCommon_SRCS})
+ENDIF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
+
+# --------------------------------------------------------------------------
+# Testing
+
+IF(BUILD_TESTING)
+  SUBDIRS(Testing)
+ENDIF(BUILD_TESTING)
+
+# --------------------------------------------------------------------------
+# Configure the export configuration
+
+SUBDIRS( Utilities/ExportConfiguration )
+
+# --------------------------------------------------------------------------
+# ProcessXML (is it still being used ?)
 
 SET(KWCommon_EXE_SUFFIX)
 SET(KWCommon_EXE_INSTALL ${KWCommon_INSTALL_BIN_DIR})
@@ -109,21 +222,4 @@ IF(KWCOMMON_BUILD_PROCESSXML)
     ADD_DEPENDENCIES(kwProcessXML kwProcessXML${KWCommon_EXE_SUFFIX})
   ENDIF(KWCommon_EXE_SUFFIX)
 ENDIF(KWCOMMON_BUILD_PROCESSXML)
-
-IF(NOT KWCommon_INSTALL_NO_LIBRARIES)
-  INSTALL_TARGETS(${KWCommon_INSTALL_LIB_DIR} 
-    RUNTIME_DIRECTORY ${KWCommon_INSTALL_BIN_DIR}
-    ${KWCommon_LIBRARIES})
-ENDIF(NOT KWCommon_INSTALL_NO_LIBRARIES)
-
-IF(BUILD_TESTING)
-  SUBDIRS(Testing)
-ENDIF(BUILD_TESTING)
-
-# Install include tree
-# IF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
-#  INSTALL_FILES(/include/KWCommon "(\\.h|\\.txx)$")
-# ENDIF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
-
-SUBDIRS( Utilities/ExportConfiguration )
 

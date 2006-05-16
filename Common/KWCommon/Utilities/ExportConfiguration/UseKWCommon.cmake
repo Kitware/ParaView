@@ -35,4 +35,15 @@ IF(NOT KWCommon_USE_FILE_INCLUDED)
   # Add cmake module path.
   SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${KWCommon_CMAKE_DIR}")
 
+  # Use VTK.
+  IF(NOT KWCommon_NO_USE_VTK)
+    SET(VTK_DIR ${KWCommon_VTK_DIR})
+    FIND_PACKAGE(VTK)
+    IF(VTK_FOUND)
+      INCLUDE(${VTK_USE_FILE})
+    ELSE(VTK_FOUND)
+      MESSAGE("VTK not found in KWCommon_VTK_DIR=\"${KWCommon_VTK_DIR}\".")
+    ENDIF(VTK_FOUND)
+  ENDIF(NOT KWCommon_NO_USE_VTK)
+
 ENDIF(NOT KWCommon_USE_FILE_INCLUDED)
