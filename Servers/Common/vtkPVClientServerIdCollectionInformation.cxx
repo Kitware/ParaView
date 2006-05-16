@@ -26,7 +26,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkPVClientServerIdCollectionInformation);
-vtkCxxRevisionMacro(vtkPVClientServerIdCollectionInformation, "1.2");
+vtkCxxRevisionMacro(vtkPVClientServerIdCollectionInformation, "1.3");
 
 typedef vtkstd::set<vtkClientServerID> vtkClientServerIdSetBase;
 class vtkClientServerIdSetType : public vtkClientServerIdSetBase {};
@@ -35,14 +35,14 @@ class vtkClientServerIdSetType : public vtkClientServerIdSetBase {};
 vtkPVClientServerIdCollectionInformation::
   vtkPVClientServerIdCollectionInformation()
 {
-  this->ClientServerIdIds = new vtkClientServerIdSetType;
+  this->ClientServerIds = new vtkClientServerIdSetType;
 }
 
 //----------------------------------------------------------------------------
 vtkPVClientServerIdCollectionInformation::
   ~vtkPVClientServerIdCollectionInformation()
 {
-  delete this->ClientServerIdIds;
+  delete this->ClientServerIds;
 }
 
 //----------------------------------------------------------------------------
@@ -50,12 +50,11 @@ void vtkPVClientServerIdCollectionInformation::
   PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  cerr << indent << "Ids: ";
 
+  cerr << indent << "Ids: ";
   vtkstd::set<vtkClientServerID>::const_iterator IdIter;
-  vtkClientServerIdSetType *myIds = this->ClientServerIdIds;
-  for (IdIter = myIds->begin();
-       IdIter != myIds->end();
+  for (IdIter = this->ClientServerIds->begin();
+       IdIter != this->ClientServerIds->end();
        IdIter++)
     {
      os << *IdIter << " ";
@@ -79,7 +78,7 @@ void vtkPVClientServerIdCollectionInformation
     while ( (prop = props->GetNextProp()) )
       {
       vtkClientServerID id = processModule->GetIDFromObject(prop);
-      this->ClientServerIdIds->insert(id);
+      this->ClientServerIds->insert(id);
       }    
     return;
     }
@@ -89,21 +88,19 @@ void vtkPVClientServerIdCollectionInformation
 void vtkPVClientServerIdCollectionInformation
   ::AddInformation(vtkPVInformation* pvi)
 {
-  vtkPVClientServerIdCollectionInformation* di = 
+  vtkPVClientServerIdCollectionInformation* other = 
     vtkPVClientServerIdCollectionInformation::SafeDownCast(pvi);
-  if (!di)
+  if (!other)
     {    
     return;
     }
 
   vtkstd::set<vtkClientServerID>::const_iterator IdIter;
-  vtkClientServerIdSetType *addIds = di->ClientServerIdIds;
-  for (IdIter = addIds->begin();
-       IdIter != addIds->end();
+  for (IdIter = other->ClientServerIds->begin();
+       IdIter != other->ClientServerIds->end();
        IdIter++)
     {
-    //cout << "Adding in id " << *IdIter << endl;
-    this->ClientServerIdIds->insert(*IdIter);
+    this->ClientServerIds->insert(*IdIter);
     }
 }
 
@@ -116,17 +113,14 @@ void vtkPVClientServerIdCollectionInformation
   *css << vtkClientServerStream::Reply;
 
   vtkstd::set<vtkClientServerID>::const_iterator IdIter;
-  vtkClientServerIdSetType *myIds = this->ClientServerIdIds;
-  for (IdIter = myIds->begin();
-       IdIter != myIds->end();
+  for (IdIter = this->ClientServerIds->begin();
+       IdIter != this->ClientServerIds->end();
        IdIter++)
     {
     *css << *IdIter;
-    //cout << "copied " << *IdIter << " to stream" << endl;
     }
 
   *css << vtkClientServerStream::End;
-
 }
 
 //----------------------------------------------------------------------------
@@ -139,8 +133,7 @@ void vtkPVClientServerIdCollectionInformation
   for (int i = 0; i < numIds; i++)
     {
     css->GetArgument(0, i, &nextId);
-    //cout << "copied " << nextId << " from stream" << endl;
-    this->ClientServerIdIds->insert(nextId);
+    this->ClientServerIds->insert(nextId);
     }
 }
 
@@ -148,7 +141,7 @@ void vtkPVClientServerIdCollectionInformation
 int vtkPVClientServerIdCollectionInformation
   ::Contains(vtkClientServerID *id) 
 {
-  if (this->ClientServerIdIds->find(*id) != this->ClientServerIdIds->end())
+  if (this->ClientServerIds->find(*id) != this->ClientServerIds->end())
     {
     return 1;
     }
