@@ -5,12 +5,12 @@ PROJECT(KWCommon)
 # directory so that it gets built and then you will use the following variables
 # in your CMakeLists files to get the proper include paths and libraries
 
-SET (KWCommon_INCLUDE_PATH 
+SET(KWCommon_INCLUDE_PATH 
   "${CMAKE_CURRENT_SOURCE_DIR}"
   CACHE INTERNAL "include paths for KWCommon"
   )
 
-SET (KWCommon_LIBRARIES KWCommon CACHE INTERNAL "libraries for KWCommon")
+SET(KWCommon_LIBRARIES KWCommon CACHE INTERNAL "libraries for KWCommon")
 
 # You will also need to define a value for the following variables:
 # KWCommon_INSTALL_BIN_DIR          - binary dir (executables)
