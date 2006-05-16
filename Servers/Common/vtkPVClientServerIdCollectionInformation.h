@@ -50,7 +50,9 @@ public:
 
   // Description:
   // For debugging.
+//BTX
   int Contains(vtkClientServerID *id);
+//ETX
 
 protected:
   vtkPVClientServerIdCollectionInformation();
