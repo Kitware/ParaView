@@ -95,6 +95,10 @@ public:
   // source will be used as the input. 
   pqPipelineSource* createCompoundSource(const QString& name);
 
+  // Utility function to create a reader that reads the file on the 
+  // active server. 
+  pqPipelineSource* createReaderOnActiveServer( const QString& filename, 
+    const QString& readerName);
 
   /// returns the active source.
   pqPipelineSource* getActiveSource();

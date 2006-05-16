@@ -329,5 +329,10 @@ pqPipelineSource* pqServerManagerModel::getPQSource(vtkSMProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
+unsigned int pqServerManagerModel::getNumberOfServers()
+{
+  return static_cast<unsigned int>(this->Internal->Servers.size());
+}
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

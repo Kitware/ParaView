@@ -865,79 +865,64 @@ void pqMainWindow::onFileNew()
 //-----------------------------------------------------------------------------
 void pqMainWindow::onFileOpen()
 {
-  /* FIXME
-  this->onFileNew();
-  if(!this->Implementation->CurrentServer)
+  pqApplicationCore* core = pqApplicationCore::instance();
+  if (core->getServerManagerModel()->getNumberOfServers() == 0)
     {
     pqServerBrowser* const server_browser = new pqServerBrowser(this);
     server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
-    QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, SLOT(onFileOpen(pqServer*)));
+    QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), 
+      this, SLOT(onFileOpen(pqServer*)));
+    // let the regular onServerConnect() operation be performed as well.
+    QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, 
+      SLOT(onServerConnect(pqServer*)));
     server_browser->setModal(true);
     server_browser->show();
     }
+  else if(!core->getActiveServer())
+    {
+    qDebug() << "No active server selected.";
+    }
   else
     {
-    this->onFileOpen(this->Implementation->CurrentServer);
+    this->onFileOpen(core->getActiveServer());
     }
-    */
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindow::onFileOpen(pqServer* vtkNotUsed(Server))
+void pqMainWindow::onFileOpen(pqServer* server)
 {
-  /* FIXME
-  if(this->Implementation->CurrentServer != Server)
-    setServer(Server);
-
   // TODO: handle more than exodus
   QString filters;
-  filters += "Exodus files (*.g *.e *.ex2 *.ex2v2 *.exo *.gen *.exoII *.0 *.00 *.000 *.0000)";
+  filters += "Exodus files (*.g *.e *.ex2 *.ex2v2 *.exo *.gen *.exoII ";
+  filters += "*.0 *.00 *.000 *.0000)";
   filters += ";;All files (*)";
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqServerFileDialogModel(NULL, Server), 
+  pqFileDialog* const file_dialog = new pqFileDialog(
+    new pqServerFileDialogModel(NULL, server), 
     this, tr("Open File:"), QString(), filters);
   file_dialog->setObjectName("FileOpenDialog");
-  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileOpen(const QStringList&)));
+  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
+    this, SLOT(onFileOpen(const QStringList&)));
   file_dialog->show();
-  */
 }
 
-void pqMainWindow::onFileOpen(const QStringList& vtkNotUsed(Files))
+//-----------------------------------------------------------------------------
+void pqMainWindow::onFileOpen(const QStringList& files)
 {
-    /* FIXME
-  if(!this->Implementation->Pipeline || !this->Implementation->PipelineBrowser)
-    {
-    return;
-    }
+  pqApplicationCore* core =pqApplicationCore::instance();
 
-  QVTKWidget *win = 0;
-  pqServer *server = this->Implementation->PipelineBrowser->getCurrentServer()->GetServer();
-  if(this->Implementation->ActiveView)
+  for(int i = 0; i != files.size(); ++i)
     {
-    win = qobject_cast<QVTKWidget *>(this->Implementation->ActiveView->mainWidget());
-    }
-
-  if(server)
-    {
-    vtkSMProxy* source = 0;
-    vtkSMRenderModuleProxy* rm = this->Implementation->Pipeline->getRenderModule(win);
-    for(int i = 0; i != Files.size(); ++i)
+    pqPipelineSource* reader = 
+      core->createReaderOnActiveServer(files[i], "ExodusReader");
+    if (!reader)
       {
-      source = this->createReader(Files[i], server);
-      source->UpdateVTKObjects();
-      this->Implementation->Pipeline->setVisible(
-          this->Implementation->Pipeline->createAndRegisterDisplay(source, rm), true);
+      qDebug() << "Failed to create reader for : " << files[i];
+      continue;
       }
-
-    rm->ResetCamera();
-    win->update();
-
-    // Select the latest source in the pipeline inspector.
-    if(source)
-      this->Implementation->PipelineBrowser->selectProxy(source);
     }
-      */
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindow::onFileOpenServerState()
 {
   QString filters;

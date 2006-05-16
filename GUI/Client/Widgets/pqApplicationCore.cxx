@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderWindowManager.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
@@ -336,4 +337,56 @@ pqPipelineSource* pqApplicationCore::createCompoundSource(
 
   // TODO: do something to try to create display on first accept.
   return filter;
+}
+
+//-----------------------------------------------------------------------------
+pqPipelineSource* pqApplicationCore::createReaderOnActiveServer( 
+  const QString& filename, const QString& readerName)
+{
+  if (!this->Internal->ActiveServer)
+    {
+    qDebug() << "No active server. Cannot create reader.";
+    return 0;
+    }
+
+  pqPipelineSource* reader = this->Internal->PipelineBuilder->createSource(
+    "sources", readerName.toStdString().c_str(), 
+    this->Internal->ActiveServer, NULL);
+
+  if (!reader)
+    {
+    return NULL;
+    }
+  this->Internal->UndoStack->BeginOrContinueUndoSet("Set Filenames");
+
+  vtkSMProxy* proxy = reader->getProxy();
+  pqSMAdaptor::setElementProperty(proxy, proxy->GetProperty("FileName"), 
+    filename);
+  pqSMAdaptor::setElementProperty(proxy, proxy->GetProperty("FilePrefix"),
+    filename);
+  pqSMAdaptor::setElementProperty(proxy, proxy->GetProperty("FilePattern"),
+    filename);
+  proxy->UpdateVTKObjects();
+  this->Internal->UndoStack->PauseUndoSet();
+
+  // HACK: Until source/filter creation can be accepted, explitly end
+  // the current undo set.
+  this->Internal->PipelineBuilder->createDisplayProxy(reader,
+    this->getActiveRenderModule());
+
+  // PipelineBuilder never calls EndUndoSet(). Eventually, the undo set will
+  // be automatically finished on first accept after creation. Since, 
+  // currently we are doing the first accept immediately, 
+  // just close teh undo set.
+  this->Internal->UndoStack->EndUndoSet();
+
+  // reset camera(should we?).
+  this->getActiveRenderModule()->resetCamera();
+  this->getActiveRenderModule()->render();
+
+  if (reader)
+    {
+    this->setActiveSource(reader);
+    }
+  return reader;
 }
