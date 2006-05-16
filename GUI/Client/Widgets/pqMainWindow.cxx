@@ -272,13 +272,19 @@ void pqMainWindow::createStandardFileMenu()
     << pqSetName("Open")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onFileOpen()));
 
-  menu->addAction(tr("&Load Server State..."))
+  QAction* action;
+
+  action = menu->addAction(tr("&Load Server State..."))
     << pqSetName("LoadServerState")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onFileOpenServerState()));
+  // disable save/load state for the time being.
+  action->setEnabled(false);
 
-  menu->addAction(tr("&Save Server State..."))
+  action = menu->addAction(tr("&Save Server State..."))
     << pqSetName("SaveServerState")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onFileSaveServerState()));
+  // disable save/load state for the time being.
+  action->setEnabled(false);
 
   menu->addAction(tr("Save Screenshot..."))
     << pqSetName("SaveScreenshot")
@@ -820,8 +826,8 @@ void pqMainWindow::onFileNew()
   if (server)
     {
     pqApplicationCore::instance()->getPipelineBuilder()->deleteProxies(server);
+    pqServer::disconnect(server);
     }
-  pqServer::disconnect(server);
 
   /*
   // Clean up the pipeline.
