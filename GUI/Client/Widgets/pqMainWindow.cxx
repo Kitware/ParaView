@@ -1430,9 +1430,9 @@ void pqMainWindow::updateFiltersMenu(pqPipelineSource* source)
     return;
     }
 
-  QList<QAction*> actions = menu->findChildren<QAction*>();
+  QList<QAction*> menu_actions = menu->findChildren<QAction*>();
   bool some_enabled = false;
-  foreach(QAction* action, actions)
+  foreach(QAction* action, menu_actions)
     {
     if (!input)
       {
@@ -1451,13 +1451,13 @@ void pqMainWindow::updateFiltersMenu(pqPipelineSource* source)
       action->setEnabled(false);
       continue;
       }
-    vtkSMProxyProperty* property = vtkSMProxyProperty::SafeDownCast(
+    vtkSMProxyProperty* smproperty = vtkSMProxyProperty::SafeDownCast(
       output->GetProperty("Input"));
-    if (property)
+    if (smproperty)
       {
-      property->RemoveAllUncheckedProxies();
-      property->AddUncheckedProxy(input);
-      if (property->IsInDomains())
+      smproperty->RemoveAllUncheckedProxies();
+      smproperty->AddUncheckedProxy(input);
+      if (smproperty->IsInDomains())
         {
         action->setEnabled(true);
         some_enabled = true;
