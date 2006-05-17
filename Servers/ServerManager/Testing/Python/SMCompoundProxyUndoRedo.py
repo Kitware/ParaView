@@ -50,7 +50,7 @@ cp_definition.UnRegister(None)
 
 pxm.RegisterCompoundProxyDefinition("MyMacro", cp_definition)
 
-undoStack.BeginUndoSet(self_cid, "CPRegister")
+undoStack.BeginOrContinueUndoSet(self_cid, "CPRegister")
 pxm.RegisterProxy("mygroup", "Groupping", compound_proxy)
 undoStack.EndUndoSet()
 
@@ -58,7 +58,7 @@ del compound_proxy
 
 compound_proxy = pxm.NewCompoundProxy("MyMacro")
 compound_proxy.UnRegister(None)
-undoStack.BeginUndoSet(self_cid, "CPRegister2")
+undoStack.BeginOrContinueUndoSet(self_cid, "CPRegister2")
 pxm.RegisterProxy("mygroup", "Instantiation", compound_proxy)
 undoStack.EndUndoSet()
 del compound_proxy
