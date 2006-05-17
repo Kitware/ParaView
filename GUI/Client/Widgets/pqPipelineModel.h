@@ -173,7 +173,7 @@ public slots:
 
   // Called when new pipeline connection (between two pipeline objects)
   // is broken.
-  void removeConnection(pqPipelineSource *source, pqPipelineSource *sink, int);
+  void removeConnection(pqPipelineSource *source, pqPipelineSource *sink);
 
 signals:
   void firstChildAdded(const QModelIndex &index);

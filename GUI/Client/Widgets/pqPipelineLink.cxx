@@ -40,8 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 pqPipelineLink::pqPipelineLink(QString name, vtkSMProxy* proxy,
-  pqServer* server, QObject* parent/*=NULL*/) : 
-  pqPipelineSource(name, proxy, server, parent)
+  pqServer* server, QObject* p/*=NULL*/) : 
+  pqPipelineSource(name, proxy, server, p)
 {
   this->setType(pqPipelineModel::Link);
   this->Source = 0;

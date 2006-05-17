@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineData.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineObject.h"
-#include "pqPipelineServer.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -81,9 +80,9 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
     this->ListModel, 
     SLOT(addConnection(pqPipelineSource*, pqPipelineSource*)));
   QObject::connect(smModel, 
-    SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*, int)),
+    SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)),
     this->ListModel, 
-    SLOT(removeConnection(pqPipelineSource*, pqPipelineSource*, int)));
+    SLOT(removeConnection(pqPipelineSource*, pqPipelineSource*)));
 
   // Create a flat tree view to display the pipeline.
   this->TreeView = new pqFlatTreeView(this);

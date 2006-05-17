@@ -146,7 +146,7 @@ signals:
   void connectionAdded(pqPipelineSource* in, pqPipelineSource* out);
 
   /// Fired when a connection between tow pqPipelineSources is broken.
-  void connectionRemoved(pqPipelineSource* in, pqPipelineSource* out, int index);
+  void connectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
 
   /// Fired when a render module becomes available. The handler of this
   /// signal must set the pqRenderModule's parent QWidget at first 

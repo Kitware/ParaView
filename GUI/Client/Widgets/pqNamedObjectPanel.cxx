@@ -301,11 +301,11 @@ void pqNamedObjectPanel::unlinkServerManagerProperties()
         QListWidget* listWidget = qobject_cast<QListWidget*>(foundObject);
         if(listWidget)
           {
-          for(int i=0; i<listWidget->count(); i++)
+          for(int ii=0; ii<listWidget->count(); ii++)
             {
-            pqListWidgetItemObject* item = static_cast<pqListWidgetItemObject*>(listWidget->item(i));
+            pqListWidgetItemObject* item = static_cast<pqListWidgetItemObject*>(listWidget->item(ii));
             pqObjectPanel::PropertyManager.unregisterLink(item, "checked", SIGNAL(checkedStateChanged(bool)),
-                                               this->Proxy, SMProperty, i);
+                                               this->Proxy, SMProperty, ii);
             }
           listWidget->clear();
           }

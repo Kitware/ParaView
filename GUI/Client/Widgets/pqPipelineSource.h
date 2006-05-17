@@ -88,7 +88,7 @@ signals:
   void connectionAdded(pqPipelineSource* in, pqPipelineSource* out);
 
   /// fired when a connection is broken between two pqPipelineSources.
-  void connectionRemoved(pqPipelineSource* in, pqPipelineSource* out, int index);
+  void connectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
 
 protected slots:
   // process some change in the input property for the proxy--needed for subclass

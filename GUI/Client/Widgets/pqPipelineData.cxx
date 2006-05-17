@@ -37,10 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqParts.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineObject.h"
-#include "pqPipelineServer.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
-#include "pqSMMultiView.h"
 #include "pqXMLUtil.h"
 
 #include "QVTKWidget.h"

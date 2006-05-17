@@ -75,8 +75,8 @@ pqApplicationCore* pqApplicationCore::instance()
 }
 
 //-----------------------------------------------------------------------------
-pqApplicationCore::pqApplicationCore(QObject* parent/*=null*/)
-  : QObject(parent)
+pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
+  : QObject(p)
 {
   this->Internal = new pqApplicationCoreInternal();
 

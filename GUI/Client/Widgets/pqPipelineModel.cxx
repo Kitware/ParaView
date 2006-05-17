@@ -42,7 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineLink.h"
 #include "pqPipelineModelItem.h"
 #include "pqPipelineObject.h"
-#include "pqPipelineServer.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -64,7 +63,7 @@ public:
   pqPipelineModelItem* Object;
   pqPipelineModel::ItemType Type;
 
-  pqPipelineModelDataItem(QObject* parent) :QObject(parent)
+  pqPipelineModelDataItem(QObject* p) :QObject(p)
     {
     this->Parent = NULL;
     this->Object = NULL;
@@ -209,8 +208,8 @@ QModelIndex pqPipelineModel::parent(const QModelIndex &idx) const
     pqPipelineModelDataItem *item = reinterpret_cast<pqPipelineModelDataItem*>(
         idx.internalPointer());
     
-    pqPipelineModelDataItem* parent = item->Parent;
-    return this->getIndex(parent);
+    pqPipelineModelDataItem* _parent = item->Parent;
+    return this->getIndex(_parent);
     }
 
   return QModelIndex();
@@ -305,19 +304,19 @@ QModelIndex pqPipelineModel::getIndexFor(pqPipelineModelItem *item) const
 
 //-----------------------------------------------------------------------------
 pqPipelineModelDataItem* pqPipelineModel::getDataItem(pqPipelineModelItem* item,
-  pqPipelineModelDataItem* parent) const
+  pqPipelineModelDataItem* _parent) const
 {
-  if (!parent || !item)
+  if (!_parent || !item)
     {
     return 0;
     }
 
-  if (parent->Object == item)
+  if (_parent->Object == item)
     {
-    return parent;
+    return _parent;
     }
 
-  foreach(pqPipelineModelDataItem* child, parent->Children)
+  foreach(pqPipelineModelDataItem* child, _parent->Children)
     {
     pqPipelineModelDataItem* retVal = this->getDataItem(item, child);
     if (retVal)
@@ -346,20 +345,20 @@ QModelIndex pqPipelineModel::getIndex(pqPipelineModelDataItem* dataItem) const
 
 
 //-----------------------------------------------------------------------------
-void pqPipelineModel::addChild(pqPipelineModelDataItem* parent,
+void pqPipelineModel::addChild(pqPipelineModelDataItem* _parent,
   pqPipelineModelDataItem* child)
 {
-  if (!parent || !child)
+  if (!_parent || !child)
     {
     qDebug() << "addChild cannot have null arguments.";
     return;
     }
 
-  QModelIndex parentIndex = this->getIndex(parent);
-  int row = parent->Children.size();
+  QModelIndex parentIndex = this->getIndex(_parent);
+  int row = _parent->Children.size();
 
   this->beginInsertRows(parentIndex, row, row);
-  parent->addChild(child);
+  _parent->addChild(child);
   this->endInsertRows();
 
   if(row == 0)
@@ -378,18 +377,18 @@ void pqPipelineModel::removeChildFromParent(
     return;
     }
 
-  pqPipelineModelDataItem* parent = child->Parent;
-  if (!parent)
+  pqPipelineModelDataItem* _parent = child->Parent;
+  if (!_parent)
     {
     qDebug() << "cannot remove ROOT.";
     return;
     }
 
-  QModelIndex parentIndex = this->getIndex(parent);
+  QModelIndex parentIndex = this->getIndex(_parent);
   int row = child->getIndexInParent();
 
   this->beginRemoveRows(parentIndex, row, row);
-  parent->removeChild(child);
+  _parent->removeChild(child);
   this->endRemoveRows();
 }
 
@@ -451,10 +450,10 @@ void pqPipelineModel::addSource(pqPipelineSource* source)
 {
   pqServerManagerModel* model = pqServerManagerModel::instance();
   pqServer* server = model->getServerForSource(source);
-  pqPipelineModelDataItem* parent = this->getDataItem(server,
+  pqPipelineModelDataItem* _parent = this->getDataItem(server,
     &this->Internal->Root);
 
-  if (!parent)
+  if (!_parent)
     {
     qDebug() << "Could not locate server on which the source is being added.";
     return;
@@ -465,7 +464,7 @@ void pqPipelineModel::addSource(pqPipelineSource* source)
   item->Type = source->getType(); 
 
   // Add the 'source' to the server.
-  this->addChild(parent, item); 
+  this->addChild(_parent, item); 
 }
 
 //-----------------------------------------------------------------------------
@@ -485,188 +484,6 @@ void pqPipelineModel::removeSource(pqPipelineSource* source)
   // TODO: cleanup server subtree.
   delete item;
 }
-
-/* FIXME
-void pqPipelineModel::removeObject(pqPipelineSource *source)
-{
-  if(!this->Internal->ServerList || !source || this->IgnorePipeline)
-    {
-    return;
-    }
-
-  // Get the server from the source object. Make sure the server
-  // is part of this model.
-  pqPipelineServer *server = source->getServer();
-  if(!server || !this->Internal->ServerList.contains(server))
-    {
-    return;
-    }
-
-  // If the object has links in its outputs, those connections
-  // need to be handled before removing the object. If an output
-  // goes to an object that has only one other input, that object
-  // will need to be moved in the tree. Leave the link object in
-  // the output list to reduce the changes to the view.
-  int i = 0;
-  pqPipelineLink *link = 0;
-  for( ; i < source->getOutputCount(); i++)
-    {
-    link = dynamic_cast<pqPipelineLink *>(source->GetOutput(i));
-    if(link)
-      {
-      this->removeLink(link);
-      }
-    }
-
-  // If the object has more than one input, the link items
-  // referencing it need to be removed. If the object only has
-  // one input, that connection will be broken when the object
-  // is removed from the model.
-  int row = 0;
-  QModelIndex parentIndex;
-  pqPipelineSource *input = 0;
-  pqPipelineFilter *filter = dynamic_cast<pqPipelineFilter *>(source);
-  if(filter && filter->getInputCount() > 1)
-    {
-    for(i = 0; i < filter->getInputCount(); i++)
-      {
-      input = filter->GetInput(i);
-      row = input->getOutputIndexFor(filter);
-      link = dynamic_cast<pqPipelineLink *>(input->GetOutput(row));
-      if(link)
-        {
-        parentIndex = this->createIndex(this->getItemRow(input), 0, input);
-        this->beginRemoveRows(parentIndex, row, row);
-        input->RemoveOutput(link);
-        this->endRemoveRows();
-        delete link;
-        }
-      }
-    }
-
-  // Remove the object from the model. The object could be a child
-  // of a server or another object.
-  pqPipelineModelItem *parentItem = this->getItemParent(source);
-  parentIndex = this->createIndex(this->getItemRow(parentItem), 0, parentItem);
-  row = this->getItemRow(source);
-  this->beginRemoveRows(parentIndex, row, row);
-  if(parentItem->getType() != pqPipelineModel::Server)
-    {
-    input = dynamic_cast<pqPipelineSource *>(parentItem);
-    input->RemoveOutput(source);
-    }
-
-  // This will also unregister the object and its displays.
-  this->IgnorePipeline = true;
-  server->RemoveObject(source);
-  this->IgnorePipeline = false;
-  this->endRemoveRows();
-
-  // Remove the proxy connections in the background. Breaking these
-  // connections shouldn't change the view. Put the orphaned output
-  // chains back in the model hierarchy.
-  QList<pqPipelineFilter *> orphans;
-  for(i = 0; i < source->getOutputCount(); i++)
-    {
-    filter = dynamic_cast<pqPipelineFilter *>(source->GetOutput(i));
-    if(filter)
-      {
-      // Only the filters in the output list need to be added to
-      // the server's source list.
-      filter->RemoveInput(source);
-      orphans.append(filter);
-
-      // Remove the input in the proxy as well.
-      this->IgnorePipeline = true;
-      pqPipelineData::instance()->removeConnection(source->GetProxy(),
-          filter->GetProxy());
-      this->IgnorePipeline = false;
-      }
-    }
-
-  if(orphans.size() > 0)
-    {
-    parentIndex = this->createIndex(this->getServerIndexFor(server), 0,
-        server);
-    row = server->GetSourceCount();
-    this->beginInsertRows(parentIndex, row, row + orphans.size() - 1);
-    QList<pqPipelineFilter *>::Iterator iter = orphans.begin();
-    for( ; iter != orphans.end(); ++iter)
-      {
-      server->AddToSourceList(*iter);
-      }
-
-    this->endInsertRows();
-    }
-
-  // Finally, Clean up the object.
-  delete source;
-}
-*/
-/*
-void pqPipelineModel::extractObject(pqPipelineFilter *filter)
-{
-  if(!filter || this->IgnorePipeline)
-    {
-    return;
-    }
-
-  // Get the server from the source object. Make sure the server
-  // is part of this model.
-  pqPipelineServer *server = this->getServerFor(filter->getServer());
-  if(!server || !this->Internal->ServerList.contains(server))
-    {
-    return;
-    }
-
-  // If the object has no inputs, this method is the same as the
-  // removeObject method. If the object has more than one input and
-  // more than one output, the reconnection is indeterminate. In
-  // that case, use the removeObject method instead.
-  if(filter->getInputCount() == 0 || filter->getOutputCount() == 0 ||
-      (filter->getInputCount() > 1 && filter->getOutputCount() > 1))
-    {
-    this->removeObject(filter);
-    return;
-    }
-
-  if(filter->getOutputCount() > 1)
-    {
-    }
-  else
-    {
-    }
-}
-*/
-/*
-void pqPipelineModel::removeBranch(pqPipelineSource *source)
-{
-  if(!source || this->IgnorePipeline)
-    {
-    return;
-    }
-
-  // Get the server from the source object. Make sure the server
-  // is part of this model.
-  pqPipelineServer *server = this->getServerFor(source->getServer());
-  if(!server || !this->Internal->ServerList.contains(server))
-    {
-    return;
-    }
-
-  // If there are link object in the branch, the connections need
-  // to be broken before removing the branch from the tree. Leave
-  // the empty link items in the tree to reduce view changes.
-
-  // If the object has multiple inputs, the link items referencing
-  // the object need to be removed.
-
-  // Remove the proxy connections for the entire branch in the
-  // background. Breaking these connections shouldn't change the view.
-
-  // Clean up all the model items.
-}
-*/
 
 //-----------------------------------------------------------------------------
 void pqPipelineModel::addConnection(pqPipelineSource *source,
@@ -728,7 +545,7 @@ void pqPipelineModel::addConnection(pqPipelineSource *source,
 
 //-----------------------------------------------------------------------------
 void pqPipelineModel::removeConnection(pqPipelineSource *source,
-    pqPipelineSource *sink, int index)
+    pqPipelineSource *sink)
 {
   if(!source || !sink)
     {
@@ -831,62 +648,9 @@ void pqPipelineModel::removeConnection(pqPipelineSource *source,
   }
    */
 }
-/*
-void pqPipelineModel::addDisplay(vtkSMDisplayProxy *display,
-    const QString &name, vtkSMProxy *proxy, vtkSMRenderModuleProxy *module)
-{
-  if(!proxy || !display)
-    {
-    return;
-    }
 
-  // Find the pipeline object associated with the proxy.
-  // TODO: How to handle compound proxies?
-  pqPipelineSource *source = this->getSourceFor(proxy);
-  if(!source)
-    {
-    return;
-    }
-
-  // Make sure the source does not already have the display.
-  pqPipelineDisplay *displayList = source->getDisplay();
-  if(!displayList || displayList->GetDisplayIndexFor(display) != -1)
-    {
-    return;
-    }
-
-  // Get the widget from the view map. Add the display/window pair
-  // to the list.
-  QWidget *window = pqPipelineData::instance()->getRenderWindow(module);
-  displayList->AddDisplay(display, name, window);
-}
-
-void pqPipelineModel::removeDisplay(vtkSMDisplayProxy *display,
-    vtkSMProxy *proxy)
-{
-  if(!display || !proxy || this->IgnorePipeline)
-    {
-    return;
-    }
-
-  // Find the pipeline object associated with the proxy.
-  // TODO: How to handle compound proxies?
-  pqPipelineSource *source = this->getSourceFor(proxy);
-  if(!source)
-    {
-    return;
-    }
-
-  // Remove the display from the display list.
-  pqPipelineDisplay *displayList = source->getDisplay();
-  if(displayList)
-    {
-    displayList->RemoveDisplay(display);
-    }
-}
-*/
-
-void pqPipelineModel::saveState(vtkPVXMLElement *root, pqMultiView *multiView)
+void pqPipelineModel::saveState(vtkPVXMLElement *vtkNotUsed(root), 
+  pqMultiView *vtkNotUsed(multiView))
 {
   /*
   if(!root)

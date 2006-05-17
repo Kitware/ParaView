@@ -156,7 +156,7 @@ void pqPipelineSource::removeConsumer(pqPipelineSource* cons)
 
   // raise signals to let the world know which connections were
   // broken and which ones were made.
-  emit this->connectionRemoved(this, cons, index);
+  emit this->connectionRemoved(this, cons);
 }
 
 //-----------------------------------------------------------------------------

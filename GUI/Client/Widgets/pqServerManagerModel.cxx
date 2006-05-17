@@ -133,8 +133,8 @@ void pqServerManagerModel::onAddSource(QString name, vtkSMProxy* source)
     SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*)),
     this, SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*)));
   QObject::connect(pqSource, 
-    SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*, int)),
-    this, SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*, int)));
+    SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)),
+    this, SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)));
   emit this->sourceAdded(pqSource);
 }
 
@@ -165,7 +165,8 @@ void pqServerManagerModel::onRemoveSource(vtkSMProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
-void pqServerManagerModel::onAddDisplay(QString name, vtkSMProxy* proxy)
+void pqServerManagerModel::onAddDisplay(QString vtkNotUsed(name), 
+  vtkSMProxy* proxy)
 {
   vtkSMDataObjectDisplayProxy* dProxy =
     vtkSMDataObjectDisplayProxy::SafeDownCast(proxy);

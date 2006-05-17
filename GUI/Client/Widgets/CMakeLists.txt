@@ -164,8 +164,6 @@ ADD_LIBRARY(pqWidgets
   pqPipelineModelItem.h
   pqPipelineObject.cxx
   pqPipelineObject.h
-  pqPipelineServer.cxx
-  pqPipelineServer.h
   pqPipelineSource.cxx
   pqPipelineSource.h
   pqProcessModuleGUIHelper.cxx
@@ -186,8 +184,6 @@ ADD_LIBRARY(pqWidgets
   pqServerManagerModel.h
   pqSMAdaptor.cxx
   pqSMAdaptor.h
-  pqSMMultiView.cxx
-  pqSMMultiView.h
   pqSMProxy.cxx
   pqSMProxy.h
   pqSMSignalAdaptors.cxx

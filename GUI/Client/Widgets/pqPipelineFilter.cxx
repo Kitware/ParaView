@@ -64,8 +64,8 @@ public:
 
 //-----------------------------------------------------------------------------
 pqPipelineFilter::pqPipelineFilter(QString name, vtkSMProxy* proxy,
-  pqServer* server, QObject* parent/*=NULL*/) : 
-  pqPipelineSource(name, proxy, server, parent)
+  pqServer* server, QObject* p/*=NULL*/) : 
+  pqPipelineSource(name, proxy, server, p)
 {
   this->Internal = new pqPipelineFilterInternal();
   this->setType(pqPipelineModel::Filter);

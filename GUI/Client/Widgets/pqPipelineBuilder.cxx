@@ -69,8 +69,8 @@ pqPipelineBuilder* pqPipelineBuilder::instance()
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineBuilder::pqPipelineBuilder(QObject* parent/*=0*/):
-  QObject(parent)
+pqPipelineBuilder::pqPipelineBuilder(QObject* p/*=0*/):
+  QObject(p)
 {
   this->NameGenerator = new pqNameCount(); 
   this->UndoStack = 0;

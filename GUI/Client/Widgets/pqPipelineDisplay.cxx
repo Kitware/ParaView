@@ -63,8 +63,8 @@ public:
 
 //-----------------------------------------------------------------------------
 pqPipelineDisplay::pqPipelineDisplay(vtkSMDataObjectDisplayProxy* display,
-  pqServer* server, QObject* parent/*=null*/):
-  pqPipelineObject(server, parent)
+  pqServer* server, QObject* p/*=null*/):
+  pqPipelineObject(server, p)
 {
   this->Internal = new pqPipelineDisplayInternal();
   this->Internal->DisplayProxy = display;
