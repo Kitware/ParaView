@@ -45,11 +45,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHBoxLayout>
 #include <QList>
 
+#include "pqApplicationCore.h"
 #include "pqPipelineSource.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineDisplay.h"
 #include "pqSMAdaptor.h"
-
+#include "pqUndoStack.h"
 
 //-----------------------------------------------------------------------------
 pqVariableSelectorWidget::pqVariableSelectorWidget( QWidget *p ) :
@@ -181,6 +182,11 @@ void pqVariableSelectorWidget::onVariableChanged(pqVariableType type,
     return;
     }
 
+  // I cannot decide if we should use signals here of directly 
+  // call the appropriate methods on undo stack.
+  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
+
+  stack->BeginOrContinueUndoSet("Color Change");
   pqPipelineDisplay* display = this->SelectedSource->getDisplay(0);
    switch(type)
     {
@@ -197,9 +203,8 @@ void pqVariableSelectorWidget::onVariableChanged(pqVariableType type,
     display->colorByArray(name.toStdString().c_str(), 
       vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
     break;
-
     }
-    
+   stack->EndUndoSet();
 }
 
 //-----------------------------------------------------------------------------
@@ -215,6 +220,10 @@ void pqVariableSelectorWidget::updateVariableSelector(pqPipelineSource* source)
     // nothing more to do.
     return;
     }
+
+  // pqVariableSelectorWidget must actually be listening to color change
+  // on the proxy, so that if during undo/redo the coloring changes,
+  // the toolbar will get updated.
 
   // This code must be reorganized, there is duplication here and in
   // pqParts.
