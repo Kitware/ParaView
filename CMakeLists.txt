@@ -103,3 +103,7 @@ OPTION(PARAQ_BUILD_APPLICATIONS "Build Applications suite." ON)
 IF (PARAQ_BUILD_APPLICATIONS)
   SUBDIRS(Applications)
 ENDIF (PARAQ_BUILD_APPLICATIONS)
+
+# Find hints file for the client/server wrapping
+FIND_FILE(VTK_WRAP_HINTS hints ${ParaView_SOURCE_DIR}/VTK/Wrapping)
+MARK_AS_ADVANCED(VTK_WRAP_HINTS)
