@@ -97,7 +97,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.51");
+vtkCxxRevisionMacro(vtkProcessModule, "1.52");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -1701,5 +1701,14 @@ void vtkProcessModule::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
-    
+
+  os << indent << "GUIHelper: ";
+  if (this->GUIHelper)
+    {
+    this->GUIHelper->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }
