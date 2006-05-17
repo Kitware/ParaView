@@ -122,23 +122,23 @@ class pqMainWindow::pqImplementation
 {
 public:
   pqImplementation() :
-    ActiveView(0),
-    CompoundProxyToolBar(0),
-    ElementInspectorDock(0),
     FileMenu(0),
-    FiltersMenu(0),
-    HelpMenu(0),
-    Inspector(0),
-    MultiViewManager(0),
-    PipelineBrowser(0),
-    PropertyToolbar(0),
-    ServerDisconnectAction(0),
+    ViewMenu(0),
     ServerMenu(0),
     SourcesMenu(0),
+    FiltersMenu(0),
     ToolsMenu(0),
+    HelpMenu(0),
+    ActiveView(0),
+    MultiViewManager(0),
+    Inspector(0),
+    PipelineBrowser(0),
+    ServerDisconnectAction(0),
+    ElementInspectorDock(0),
+    CompoundProxyToolBar(0),
+    PropertyToolbar(0),
     UndoRedoToolBar(0),
-    VariableSelectorToolBar(0),
-    ViewMenu(0)
+    VariableSelectorToolBar(0)
   {
 
   }
@@ -170,9 +170,9 @@ public:
   QMap<QDockWidget*, QAction*> DockWidgetVisibleActions;
 
   pqMultiViewFrame* ActiveView;
+  pqMultiView* MultiViewManager;
   pqObjectInspectorWidget* Inspector;
   pqPipelineBrowser *PipelineBrowser;
-  pqMultiView* MultiViewManager;
   QAction* ServerDisconnectAction;
   QDockWidget *ElementInspectorDock;
   QToolBar* CompoundProxyToolBar;
@@ -1316,7 +1316,7 @@ void pqMainWindow::onCompoundProxyAdded(const QString&, const QString& proxy)
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindow::onRemoveServer(pqServer *server)
+void pqMainWindow::onRemoveServer(pqServer *)
 {
   if(!this->Implementation->MultiViewManager )
     {
