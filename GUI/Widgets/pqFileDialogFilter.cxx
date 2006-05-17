@@ -38,10 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqFileDialogModel.h"
 
-pqFileDialogFilter::pqFileDialogFilter(pqFileDialogModel* sourceModel, QObject* Parent)
-  : QSortFilterProxyModel(Parent), Model(sourceModel)
+pqFileDialogFilter::pqFileDialogFilter(pqFileDialogModel* model, QObject* Parent)
+  : QSortFilterProxyModel(Parent), Model(model)
 {
-  this->setSourceModel(sourceModel->fileModel());
+  this->setSourceModel(model->fileModel());
 }
 
 pqFileDialogFilter::~pqFileDialogFilter()
@@ -65,15 +65,15 @@ bool pqFileDialogFilter::filterAcceptsRow(int row_source, const QModelIndex& sou
     return true;
     }
 
-  QString data = this->sourceModel()->data(idx).toString();
+  QString str = this->sourceModel()->data(idx).toString();
 
-  bool match = false;
+  bool pass = false;
   int i=0, end=this->Wildcards.size();
-  for(; i<end && match == false; i++)
+  for(; i<end && pass == false; i++)
     {
-    match = this->Wildcards[i].exactMatch(data);
+    pass = this->Wildcards[i].exactMatch(str);
     }
-  return match;
+  return pass;
 }
 
 
