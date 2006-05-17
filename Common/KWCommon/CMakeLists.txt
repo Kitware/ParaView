@@ -187,7 +187,7 @@ ENDIF(BUILD_TESTING)
 # --------------------------------------------------------------------------
 # Configure the export configuration
 
-SUBDIRS(${KWCommon_CMAKE_DIR}/ExportConfiguration)
+SUBDIRS(CMake/ExportConfiguration)
 
 # --------------------------------------------------------------------------
 # ProcessXML (is it still being used ?)
@@ -224,4 +224,3 @@ IF(KWCOMMON_BUILD_PROCESSXML)
     ADD_DEPENDENCIES(kwProcessXML kwProcessXML${KWCommon_EXE_SUFFIX})
   ENDIF(KWCommon_EXE_SUFFIX)
 ENDIF(KWCOMMON_BUILD_PROCESSXML)
-
