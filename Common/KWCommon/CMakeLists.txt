@@ -70,7 +70,7 @@ ENDIF(CMAKE_COMPILER_2005)
 SET(BUILD_SHARED_LIBS ${VTK_BUILD_SHARED_LIBS})
 SET(KWCommon_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 
-SET(KWCommon_CMAKE_DIR "${KWCommon_SOURCE_DIR}/Utilities/CMake")
+SET(KWCommon_CMAKE_DIR "${KWCommon_SOURCE_DIR}/CMake")
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${KWCommon_CMAKE_DIR}")
 
 SET(KWCommon_CONFIGURATION_TYPES ${CMAKE_CONFIGURATION_TYPES})
@@ -185,7 +185,7 @@ ENDIF(BUILD_TESTING)
 # --------------------------------------------------------------------------
 # Configure the export configuration
 
-SUBDIRS( Utilities/ExportConfiguration )
+SUBDIRS(${KWCommon_CMAKE_DIR}/ExportConfiguration)
 
 # --------------------------------------------------------------------------
 # ProcessXML (is it still being used ?)
