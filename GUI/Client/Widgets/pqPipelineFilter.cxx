@@ -146,16 +146,16 @@ void pqPipelineFilter::inputChanged()
   // descendent.
   foreach(pqPipelineSource* removedInput, removed)
     {
-    removedInput->removeOutput(this);
+    removedInput->removeConsumer(this);
     }
 
   foreach(pqPipelineSource* addedInput, added)
     {
-    addedInput->addOutput(this);
+    addedInput->addConsumer(this);
     }
-  // The pqPipelineSource whose output changes raises the events when the output 
-  // is removed added, so we don't need to raise any events here to let the world
-  // know that connections were broken/created.
+  // The pqPipelineSource whose consumer changes raises the events when the 
+  // consumer is removed added, so we don't need to raise any events here to 
+  // let the world know that connections were broken/created.
 }
 
 //-----------------------------------------------------------------------------

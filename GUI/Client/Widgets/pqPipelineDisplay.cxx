@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaQ includes.
+#include "pqParts.h"
 #include "pqPipelineSource.h"
 #include "pqServerManagerModel.h"
 
@@ -123,6 +124,7 @@ void pqPipelineDisplay::onInputChanged()
     pqServerManagerModel* model = pqServerManagerModel::instance();
     removed = this->Internal->Input;
     this->Internal->Input = model->getPQSource(ivp->GetProxy(0));
+    added = this->Internal->Input;
     if (ivp->GetProxy(0) && !this->Internal->Input)
       {
       qDebug() << "Display could not locate the pqPipelineSource object "
@@ -146,7 +148,12 @@ void pqPipelineDisplay::onInputChanged()
     }
 
 }
-
+//-----------------------------------------------------------------------------
+void pqPipelineDisplay::setDefaultColorParametes()
+{
+  // eventually the implementation from pqPart must move here.
+  pqPart::Color(this->getProxy());
+}
 
 //-----------------------------------------------------------------------------
 /*

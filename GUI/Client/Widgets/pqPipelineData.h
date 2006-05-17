@@ -75,6 +75,9 @@ signals:
   /// Fired when a proxy is registered under the "displays" group.
   void displayRegistered(QString name, vtkSMProxy* display);
 
+  // Fired when a proxy registered under group "displays" is unregistered.
+  void displayUnRegistered(vtkSMProxy* display);
+
   /// Fired when a source/filter/compound proxy is unregistered.
   void proxyUnRegistered(vtkSMProxy *proxy);
 

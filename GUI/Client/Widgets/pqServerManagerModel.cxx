@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "vtkProcessModule.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMRenderModuleProxy.h"
 
 // Qt includes.
@@ -43,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaQ includes.
+#include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
 #include "pqRenderModule.h"
@@ -65,6 +67,10 @@ struct pqServerManagerModelInternal
 
   typedef QList<pqRenderModule*> ListOfRenderModules;
   ListOfRenderModules RenderModules;
+
+  typedef QMap<vtkSMDataObjectDisplayProxy*, pqPipelineDisplay*>
+    MapOfDisplayProxyToDisplay;
+  MapOfDisplayProxyToDisplay Displays;
 };
 
 
@@ -155,6 +161,67 @@ void pqServerManagerModel::onRemoveSource(vtkSMProxy* proxy)
     {
     this->onRemoveSource(pqSrc->getProxyName());
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerModel::onAddDisplay(QString name, vtkSMProxy* proxy)
+{
+  vtkSMDataObjectDisplayProxy* dProxy =
+    vtkSMDataObjectDisplayProxy::SafeDownCast(proxy);
+
+  if (!proxy || !dProxy)
+    {
+    qDebug() << "onAddDisplay cannot be called with a null proxy.";
+    return;
+    }
+
+  if (this->Internal->Displays.contains(dProxy))
+    {
+    qDebug() << "Display already added. Are you registering the display?";
+    return;
+    }
+
+  // Called when a new display is registered.
+  // 1) determine server on which the display is created.
+  pqServer* server = this->getServerForSource(dProxy);
+  if (!server)
+    {
+    qDebug() << "Could not locate the server on which the new display "
+      << "was added.";
+    return;
+    }
+
+  // 2) create a new pqPipelineDisplay;
+  pqPipelineDisplay* display = new pqPipelineDisplay(
+    dProxy, server, this);
+
+  this->Internal->Displays[dProxy] = display;
+
+  cout << "Display added." << endl;
+  // emit this->displayAdded(display);
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerModel::onRemoveDisplay(vtkSMProxy* proxy)
+{
+  vtkSMDataObjectDisplayProxy* dProxy =
+    vtkSMDataObjectDisplayProxy::SafeDownCast(proxy);
+
+  pqPipelineDisplay* display = NULL;
+  if (!proxy || !dProxy)
+    {
+    qDebug() << "onRemoveDisplay cannot be called with a null proxy.";
+    return;
+    }
+  if (this->Internal->Displays.contains(dProxy))
+    {
+    display = this->Internal->Displays.take(dProxy);
+    }
+  QObject::disconnect(display, 0, this, 0);
+  // emit this->displayRemoved(display);
+
+  delete display;
+  cout << "Display removed." << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -324,6 +391,18 @@ pqPipelineSource* pqServerManagerModel::getPQSource(vtkSMProxy* proxy)
       {
       return pqSrc;
       }
+    }
+  return NULL;
+}
+
+//-----------------------------------------------------------------------------
+pqPipelineDisplay* pqServerManagerModel::getPQDisplay(vtkSMProxy* proxy)
+{
+  vtkSMDataObjectDisplayProxy* disp = 
+    vtkSMDataObjectDisplayProxy::SafeDownCast(proxy);
+  if (disp && this->Internal->Displays.contains(disp))
+    {
+    return this->Internal->Displays[disp];
     }
   return NULL;
 }

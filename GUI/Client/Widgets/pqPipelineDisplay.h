@@ -60,10 +60,18 @@ public:
 
   // Get the source/filter of which this is a display.
   pqPipelineSource* getInput() const;
-private slots:
+
+  // Sets the default color mapping for the display.
+  // The rules are:
+  // If the source created a NEW point scalar array, use it.
+  // Else if the source created a NEW cell scalar array, use it.
+  // Else if the input color by array exists in this source, use it.
+  // Else color by property.
+  void setDefaultColorParametes(); 
+protected slots:
   // called when input property on display changes. We must detect if
   // (and when) the display is connected to a new proxy.
-  void onInputChanged();
+  virtual void onInputChanged();
 
 private:
   pqPipelineDisplayInternal *Internal; 

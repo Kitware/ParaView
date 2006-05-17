@@ -36,41 +36,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 
 // ParaView.
-#include "vtkEventQtSlotConnect.h"
-#include "vtkProcessModule.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMSourceProxy.h"
+#include "vtkSMProxy.h"
 
 // Qt
 #include <QList>
 #include <QtDebug>
 
 // ParaQ
-#include "pqObjectPanel.h"
-#include "pqPipelineBuilder.h"
 #include "pqPipelineDisplay.h"
-#include "pqPipelineLink.h"
 #include "pqPipelineFilter.h"
-#include "pqProcessModuleGUIHelper.h"
-#include "pqPropertyManager.h"
-#include "pqMainWindow.h"
 
 //-----------------------------------------------------------------------------
 class pqPipelineSourceInternal 
 {
 public:
   vtkSmartPointer<vtkSMProxy> Proxy;
-  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
 
   QString Name;
-  QList<pqPipelineSource*> Outputs;
+  QList<pqPipelineSource*> Consumers;
   QList<pqPipelineDisplay*> Displays;
 
   pqPipelineSourceInternal(QString name, vtkSMProxy* proxy)
     {
     this->Name = name;
     this->Proxy = proxy;
-    this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     }
 };
 
@@ -83,22 +73,11 @@ pqPipelineSource::pqPipelineSource(QString name, vtkSMProxy* proxy,
   
   // Set the model item type.
   this->setType(pqPipelineModel::Source);
- 
-  if (proxy) // TODO: clean this.
-    {
-    QObject::connect(&pqObjectPanel::PropertyManager, SIGNAL(accepted()),
-      this, SLOT(onFirstAccept()));
-    }
 }
 
 //-----------------------------------------------------------------------------
 pqPipelineSource::~pqPipelineSource()
 {
-  if (this->Internal->Proxy.GetPointer())
-    {
-    this->Internal->VTKConnect->Disconnect(this->Internal->Proxy.GetPointer());
-    }
-
   delete this->Internal;
 }
 
@@ -115,17 +94,17 @@ vtkSMProxy* pqPipelineSource::getProxy() const
 }
 
 //-----------------------------------------------------------------------------
-int pqPipelineSource::getOutputCount() const
+int pqPipelineSource::getNumberOfConsumers() const
 {
-  return this->Internal->Outputs.size();
+  return this->Internal->Consumers.size();
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource *pqPipelineSource::getOutput(int index) const
+pqPipelineSource *pqPipelineSource::getConsumer(int index) const
 {
-  if(index >= 0 && index < this->Internal->Outputs.size())
+  if(index >= 0 && index < this->Internal->Consumers.size())
     {
-    return this->Internal->Outputs[index];
+    return this->Internal->Consumers[index];
     }
 
   qCritical() << "Index " << index << " out of bounds.";
@@ -133,23 +112,14 @@ pqPipelineSource *pqPipelineSource::getOutput(int index) const
 }
 
 //-----------------------------------------------------------------------------
-int pqPipelineSource::getOutputIndexFor(pqPipelineSource *output) const
+int pqPipelineSource::getConsumerIndexFor(pqPipelineSource *consumer) const
 {
   int index = 0;
-  if(output)
+  if(consumer)
     {
-    pqPipelineLink *link = 0;
-    foreach(pqPipelineSource *current, this->Internal->Outputs)
+    foreach(pqPipelineSource *current, this->Internal->Consumers)
       {
-      // The output may be in a link object.
-      if(current->getType() == pqPipelineModel::Link)
-        {
-        link = dynamic_cast<pqPipelineLink *>(current);
-        current = link->GetLink();
-        }
-      // The requested output object may be a link, so test the
-      // list item as well as the link output.
-      if(current == output)
+      if(current == consumer)
         {
         return index;
         }
@@ -160,72 +130,33 @@ int pqPipelineSource::getOutputIndexFor(pqPipelineSource *output) const
 }
 
 //-----------------------------------------------------------------------------
-bool pqPipelineSource::hasOutput(pqPipelineSource *output) const
+bool pqPipelineSource::hasConsumer(pqPipelineSource *consumer) const
 {
-  return (this->getOutputIndexFor(output) != -1);
+  return (this->getConsumerIndexFor(consumer) != -1);
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineSource::onFirstAccept()
+void pqPipelineSource::addConsumer(pqPipelineSource* cons)
 {
-  /* FIXME:: this will have to move out of here...
-  if (this->getDisplay()->GetDisplayCount() ==0)
-    {
-    this->setupDisplays();
-    }
-    */
-  QObject::disconnect(this, SLOT(onFirstAccept()));
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineSource::setupDisplays()
-{
-  /*
-  // TODO: how to get the pqMainWindow instance more gracefully?
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pqProcessModuleGUIHelper* helper = 
-    pqProcessModuleGUIHelper::SafeDownCast(pm->GetGUIHelper());
-  if (!helper)
-    {
-    qCritical() << "Failed to locate GUIHelper.";
-    return;
-    }
-  pqMainWindow* mainWindow = helper->getWindow();
-  pqPipelineBuilder* pBuilder = mainWindow->pipelineBuilder();
-  vtkSMRenderModuleProxy* renModule = mainWindow->activeRenderModule();
-  if (renModule)
-    {
-    vtkSMDisplayProxy* display = pBuilder->createDisplayProxy(
-      vtkSMSourceProxy::SafeDownCast(this->Internal->Proxy.GetPointer()), renModule);
-    // the display will get registered by pBuilder and will get added
-    // to this->Display as a side effect of the registeration. So nothing mucj
-    // to do here.
-    }
-    */
-}
-
-//-----------------------------------------------------------------------------
-void pqPipelineSource::addOutput(pqPipelineSource* output)
-{
-  this->Internal->Outputs.push_back(output);
+  this->Internal->Consumers.push_back(cons);
 
   // raise signals to let the world know which connections were
   // broken and which ones were made.
-  emit this->connectionAdded(this, output);
+  emit this->connectionAdded(this, cons);
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineSource::removeOutput(pqPipelineSource* output)
+void pqPipelineSource::removeConsumer(pqPipelineSource* cons)
 {
-  int index = this->Internal->Outputs.indexOf(output);
+  int index = this->Internal->Consumers.indexOf(cons);
   if (index != -1)
     {
-    this->Internal->Outputs.removeAt(index);
+    this->Internal->Consumers.removeAt(index);
     }
 
   // raise signals to let the world know which connections were
   // broken and which ones were made.
-  emit this->connectionRemoved(this, output, index);
+  emit this->connectionRemoved(this, cons, index);
 }
 
 //-----------------------------------------------------------------------------

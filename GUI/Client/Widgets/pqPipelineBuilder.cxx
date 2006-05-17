@@ -40,8 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtksys/ios/sstream>
 
 // paraview includes
+#include "vtkProcessModule.h"
 #include "vtkSMCompoundProxy.h"
-#include "vtkSMDisplayProxy.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMMultiViewRenderModuleProxy.h"
 #include "vtkSMProxyIterator.h"
@@ -52,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // paraq includes
 #include "pqNameCount.h"
+#include "pqPipelineDisplay.h"
 #include "pqPipelineSource.h"
 #include "pqRenderModule.h"
 #include "pqServer.h"
@@ -247,6 +249,10 @@ vtkSMDisplayProxy* pqPipelineBuilder::createDisplayProxyInternal(
   renModule->UpdateVTKObjects();
 
   display->UpdateVTKObjects();
+
+  pqPipelineDisplay* dispObject = 
+    pqServerManagerModel::instance()->getPQDisplay(display);
+  dispObject->setDefaultColorParametes();
   return display;
 }
 //-----------------------------------------------------------------------------
@@ -439,6 +445,34 @@ void pqPipelineBuilder::removeWindow(pqRenderModule* rm)
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
   pxm->UnRegisterProxy("render_modules", name.toStdString().c_str());
   // rm is invalid at this point.
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProxy* pqPipelineBuilder::createLookupTable(pqPipelineDisplay* display)
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  
+  vtkSMProxy* lut = pxm->NewProxy("lookup_tables", "LookupTable");
+  lut->SetConnectionID(display->getProxy()->GetConnectionID());
+  lut->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  
+  // register it.
+  vtksys_ios::ostringstream proxy_name_stream;
+  proxy_name_stream << "LookupTable"
+    << this->NameGenerator->GetCountAndIncrement("LookupTable");
+  pxm->RegisterProxy("lookup_tables", proxy_name_stream.str().c_str(), lut);
+  lut->Delete();
+  lut->UpdateVTKObjects();
+
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    display->getProxy()->GetProperty("LookupTable"));
+  if (pp)
+    {
+    pp->RemoveAllProxies();
+    pp->AddProxy(lut);
+    }
+
+  return lut;
 }
 
 //-----------------------------------------------------------------------------

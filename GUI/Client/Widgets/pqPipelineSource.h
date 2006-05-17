@@ -65,17 +65,17 @@ public:
   vtkSMProxy *getProxy() const; 
 
 
-  // Get the number of outputs.
-  int getOutputCount() const;
+  // Get the number of consumers.
+  int getNumberOfConsumers() const;
 
-  // Get output at a particular index.
-  pqPipelineSource *getOutput(int index) const;
+  // Get consumer at a particular index.
+  pqPipelineSource *getConsumer(int index) const;
 
-  // Get index for a output.
-  int getOutputIndexFor(pqPipelineSource *output) const;
+  // Get index for a consumer.
+  int getConsumerIndexFor(pqPipelineSource *) const;
 
-  // Check if the object exists in the output set.
-  bool hasOutput(pqPipelineSource *output) const;
+  // Check if the object exists in the consumer set.
+  bool hasConsumer(pqPipelineSource *) const;
 
   /// Get the display at given index.
   pqPipelineDisplay *getDisplay(int index) const;
@@ -90,32 +90,18 @@ signals:
   /// fired when a connection is broken between two pqPipelineSources.
   void connectionRemoved(pqPipelineSource* in, pqPipelineSource* out, int index);
 
-public slots:
-  /// when a pqPipelineSource gets created, it adds itself as a
-  /// signal handler for the pqPropertyManager::postaccept() signal.
-  /// This handler tries to create display proxy/LUT etc etc for the source
-  /// if none are already created. Then it signal-slot connection is broken,
-  /// hence on following accepts, it doens't get invoked--hence the name
-  /// "onFirstAccept".
-  void onFirstAccept();
-
 protected slots:
   // process some change in the input property for the proxy--needed for subclass
   // pqPipelineFilter.
   virtual void inputChanged() { ; }
 
 protected:
-
-  /// This method will setup displays/lookup tables etc etc
-  /// for this source proxy.  
-  virtual void setupDisplays();
-
   friend class pqPipelineFilter;
   friend class pqPipelineDisplay;
 
   // called by pqPipelineFilter when the connections change.
-  void removeOutput(pqPipelineSource *);
-  void addOutput(pqPipelineSource*);
+  void removeConsumer(pqPipelineSource *);
+  void addConsumer(pqPipelineSource*);
 
   // called by pqPipelineDisplay when the connections change.
   void addDisplay(pqPipelineDisplay*);

@@ -40,6 +40,7 @@ class vtkSMProxy;
 class vtkSMRenderModuleProxy;
 class QVTKWidget;
 
+class pqPipelineDisplay;
 class pqPipelineSource;
 class pqRenderModule;
 class pqServer;
@@ -83,6 +84,10 @@ public:
   /// if one exists.
   pqPipelineSource* getPQSource(vtkSMProxy*);
 
+  /// Given a vtkSMProxy for a display get the pqPipelineDisplay
+  /// object for it, if one exists.
+  pqPipelineDisplay* getPQDisplay(vtkSMProxy*);
+
 
   /// Given a render module proxy get the pqRenderModule representation
   /// for it.
@@ -114,6 +119,10 @@ public slots:
   /// Call when a new render module is registered/unrgistered.
   void onAddRenderModule(QString name, vtkSMRenderModuleProxy* rm);
   void onRemoveRenderModule(vtkSMRenderModuleProxy* rm);
+
+  /// Call when a display proxy is registered/unregistered.
+  void onAddDisplay(QString name, vtkSMProxy* display);
+  void onRemoveDisplay(vtkSMProxy* display);
 
 signals:
   // Fired when a new connection is created on the vtkProcessModule.

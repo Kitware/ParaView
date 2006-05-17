@@ -41,6 +41,7 @@ class vtkSMRenderModuleProxy;
 class vtkSMSourceProxy;
 
 class pqNameCount;
+class pqPipelineDisplay;
 class pqPipelineSource;
 class pqRenderModule;
 class pqServer;
@@ -117,6 +118,12 @@ public:
   // is a non-undoable change. 
   void deleteProxies(pqServer* server);
 
+  // Create and add a LUT to a display. LUT will be registered with 
+  // proxy manager. REMARK: This does not bother about the undo stack for now..
+  // we will have to fix that soon.
+  vtkSMProxy* createLookupTable(pqPipelineDisplay* display);
+
+  // Get name generator.
 protected:
   /// this method does what it says. Note that it does not worry about undo stack
   /// at all. The caller would have managed it.

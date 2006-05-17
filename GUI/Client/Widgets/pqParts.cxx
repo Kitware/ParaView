@@ -32,24 +32,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqParts.h"
 
+#include <vtkPVArrayInformation.h>
+#include <vtkPVDataSetAttributesInformation.h>
+#include <vtkPVGeometryInformation.h>
 #include <vtkSMDataObjectDisplayProxy.h>
-#include <vtkSMDisplayProxy.h>
 #include <vtkSMProxyProperty.h>
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
-#include <vtkPVDataSetAttributesInformation.h>
-#include <vtkPVGeometryInformation.h>
-#include <vtkPVArrayInformation.h>
-#include <vtkSMLookupTableProxy.h>
-#include <vtkSMProxyManager.h>
-#include <vtkProcessModule.h>
 
-#include "pqNameCount.h"
-#include "pqPipelineData.h"
+#include <QtDebug>
+#include <QString>
+
 #include "pqSMAdaptor.h"
 #include "pqPipelineObject.h"
+#include "pqPipelineBuilder.h"
+#include "pqApplicationCore.h"
+#include "pqServerManagerModel.h"
 
-#include <QString>
 
 vtkSMDisplayProxy* pqPart::Add(vtkSMRenderModuleProxy* rm, vtkSMSourceProxy* Part)
 {
@@ -281,98 +280,116 @@ void pqPart::Color(vtkSMDisplayProxy* Part)
   pqPart::Color(Part, NULL, 0);
 }
 
+//-----------------------------------------------------------------------------
 /// color the part by a specific field, if fieldname is NULL, colors by actor color
-void pqPart::Color(vtkSMDisplayProxy* Part, const char* fieldname, int fieldtype)
+void pqPart::Color(vtkSMDisplayProxy* displayProxy, 
+  const char* fieldname, int fieldtype)
 {
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(Part->GetProperty("LookupTable"));
-  pp->RemoveAllProxies();
-  
   if(fieldname == 0)
     {
-    pqSMAdaptor::setElementProperty(Part, Part->GetProperty("ScalarVisibility"), 0);
+    pqSMAdaptor::setElementProperty(displayProxy, 
+      displayProxy->GetProperty("ScalarVisibility"), 0);
+    return;
+    }
+
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqServerManagerModel* smModel = core->getServerManagerModel();
+  pqPipelineBuilder* builder = core->getPipelineBuilder();
+
+  // Eventually this functionality should move to pqPipelineDisplay and all
+  // this awkwardness can be avoided.
+  pqPipelineDisplay* displayObject = 
+    smModel->getPQDisplay(displayProxy);
+  if (!displayObject)
+    {
+    qDebug() << "Cannot color a display proxy which does  not have a "
+      << " pqPipelineDisplay.";
+    return;
+    }
+    
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    displayProxy->GetProperty("LookupTable"));
+  vtkSMProxy* lut = 0;
+  if (pp->GetNumberOfProxies() == 0)
+    {
+    // create lut only if one doesn't already exist.
+    lut = builder->createLookupTable(displayObject);
     }
   else
     {
-    // create lut
-    vtkSMLookupTableProxy* lut = vtkSMLookupTableProxy::SafeDownCast(
-      vtkSMObject::GetProxyManager()->NewProxy("lookup_tables", "LookupTable"));
-    lut->SetConnectionID(Part->GetConnectionID());
-    lut->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-    pp = vtkSMProxyProperty::SafeDownCast(Part->GetProperty("LookupTable"));
-    pp->AddProxy(lut);
+    lut = pp->GetProxy(0);
+    }
 
-    // Register the lookup table with the server manager so save/restore
-    // works correctly.
-    QString name;
-    // FIXME Probaly,pqPipelineBuilder must be used to get names.
-    static int __num__ = 0;
-    // pqPipelineData *pipeline = pqPipelineData::instance();
-    // name.setNum(pipeline->getNameCount()->GetCountAndIncrement("LookupTable"));
-    name.setNum(__num__++);
-    name.prepend("LookupTable");
-    vtkSMObject::GetProxyManager()->RegisterProxy("lookup_tables",
-        name.toAscii().data(), lut);
-    lut->Delete();
+  if (!lut)
+    {
+    qDebug() << "Failed to create/locate Lookup Table.";
+    pqSMAdaptor::setElementProperty(displayProxy, 
+      displayProxy->GetProperty("ScalarVisibility"), 0);
+    return;
+    }
 
-    pqSMAdaptor::setElementProperty(Part, Part->GetProperty("ScalarVisibility"), 1);
+  pqSMAdaptor::setElementProperty(displayProxy, 
+    displayProxy->GetProperty("ScalarVisibility"), 1);
 
-    vtkPVArrayInformation* ai;
+  vtkPVArrayInformation* ai;
+  if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
+    {
+    vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
+    ai = geomInfo->GetCellDataInformation()->GetArrayInformation(fieldname);
+    pqSMAdaptor::setEnumerationProperty(displayProxy, 
+      displayProxy->GetProperty("ScalarMode"), "UseCellFieldData");
+    }
+  else
+    {
+    vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
+    ai = geomInfo->GetPointDataInformation()->GetArrayInformation(fieldname);
+    pqSMAdaptor::setEnumerationProperty(displayProxy, 
+      displayProxy->GetProperty("ScalarMode"), "UsePointFieldData");
+    }
 
+  // array couldn't be found, look for it on the reader
+  // TODO: this support should be moved into the server manager and/or VTK
+  if(!ai)
+    {
+    pp = vtkSMProxyProperty::SafeDownCast(displayProxy->GetProperty("Input"));
+    vtkSMProxy* reader = pp->GetProxy(0);
+    while((pp = vtkSMProxyProperty::SafeDownCast(reader->GetProperty("Input"))))
+      reader = pp->GetProxy(0);
+    QList<QVariant> prop;
+    prop += fieldname;
+    prop += 1;
+    QList<QList<QVariant> > property;
+    property.push_back(prop);
     if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
       {
-      vtkPVDataInformation* geomInfo = Part->GetGeometryInformation();
+      pqSMAdaptor::setSelectionProperty(reader, reader->GetProperty("CellArrayStatus"), property);
+      reader->UpdateVTKObjects();
+      vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
       ai = geomInfo->GetCellDataInformation()->GetArrayInformation(fieldname);
-      pqSMAdaptor::setEnumerationProperty(Part, Part->GetProperty("ScalarMode"), "UseCellFieldData");
       }
     else
       {
-      vtkPVDataInformation* geomInfo = Part->GetGeometryInformation();
+      pqSMAdaptor::setSelectionProperty(reader, reader->GetProperty("PointArrayStatus"), property);
+      reader->UpdateVTKObjects();
+      vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
       ai = geomInfo->GetPointDataInformation()->GetArrayInformation(fieldname);
-      pqSMAdaptor::setEnumerationProperty(Part, Part->GetProperty("ScalarMode"), "UsePointFieldData");
       }
-    
-    // array couldn't be found, look for it on the reader
-    // TODO: this support should be moved into the server manager and/or VTK
-    if(!ai)
-      {
-      pp = vtkSMProxyProperty::SafeDownCast(Part->GetProperty("Input"));
-      vtkSMProxy* reader = pp->GetProxy(0);
-      while((pp = vtkSMProxyProperty::SafeDownCast(reader->GetProperty("Input"))))
-        reader = pp->GetProxy(0);
-      QList<QVariant> prop;
-      prop += fieldname;
-      prop += 1;
-      QList<QList<QVariant> > property;
-      property.push_back(prop);
-      if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
-        {
-        pqSMAdaptor::setSelectionProperty(reader, reader->GetProperty("CellArrayStatus"), property);
-        reader->UpdateVTKObjects();
-        vtkPVDataInformation* geomInfo = Part->GetGeometryInformation();
-        ai = geomInfo->GetCellDataInformation()->GetArrayInformation(fieldname);
-        }
-      else
-        {
-        pqSMAdaptor::setSelectionProperty(reader, reader->GetProperty("PointArrayStatus"), property);
-        reader->UpdateVTKObjects();
-        vtkPVDataInformation* geomInfo = Part->GetGeometryInformation();
-        ai = geomInfo->GetPointDataInformation()->GetArrayInformation(fieldname);
-        }
-      }
-    double range[2] = {0,1};
-    if(ai)
-      {
-      ai->GetComponentRange(0, range);
-      }
-    QList<QVariant> tmp;
-    tmp += range[0];
-    tmp += range[1];
-    pqSMAdaptor::setMultipleElementProperty(lut, lut->GetProperty("ScalarRange"), tmp);
-    pqSMAdaptor::setElementProperty(Part, Part->GetProperty("ColorArray"), fieldname);
-    lut->UpdateVTKObjects();
     }
+  double range[2] = {0,1};
+  if(ai)
+    {
+    ai->GetComponentRange(0, range);
+    }
+  QList<QVariant> tmp;
+  tmp += range[0];
+  tmp += range[1];
+  pqSMAdaptor::setMultipleElementProperty(lut, 
+    lut->GetProperty("ScalarRange"), tmp);
+  pqSMAdaptor::setElementProperty(displayProxy, 
+    displayProxy->GetProperty("ColorArray"), fieldname);
+  lut->UpdateVTKObjects();
 
-  Part->UpdateVTKObjects();
+  displayProxy->UpdateVTKObjects();
 }
 
 QList<QString> pqPart::GetColorFields(vtkSMDisplayProxy* display)

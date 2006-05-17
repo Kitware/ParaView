@@ -65,6 +65,10 @@ signals:
 protected:
   void setType(pqPipelineModel::ItemType type); 
 
+protected slots:
+  // called when input property on display changes. We must detect if
+  // (and when) the display is connected to a new proxy.
+  virtual void onInputChanged() { };
 private:
   pqPipelineModel::ItemType ModelType;
 };

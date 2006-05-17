@@ -525,10 +525,13 @@ void pqPipelineData::proxyUnRegistered(vtkObject*, unsigned long, void*,
     return;
     }
 
-  if(strcmp(info->GroupName, "sources") == 0 
-    || strcmp(info->GroupName, "displays") == 0)
+  if(strcmp(info->GroupName, "sources") == 0 )
     {
     emit this->proxyUnRegistered(info->Proxy);
+    }
+  else if (strcmp(info->GroupName, "displays") == 0)
+    {
+    emit this->displayUnRegistered(info->Proxy);
     }
   else if (strcmp(info->GroupName, "render_modules") == 0)
     {
