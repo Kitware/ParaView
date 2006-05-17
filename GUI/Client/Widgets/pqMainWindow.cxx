@@ -805,6 +805,7 @@ void pqMainWindow::setServer(pqServer* server)
 void pqMainWindow::onFileNew()
 {
   pqServer* server = pqApplicationCore::instance()->getActiveServer();
+  pqApplicationCore::instance()->setActiveServer(NULL);
   if (server)
     {
     pqApplicationCore::instance()->getPipelineBuilder()->deleteProxies(server);
@@ -1419,11 +1420,18 @@ void pqMainWindow::updateFiltersMenu(pqPipelineSource* source)
   // Iterate over all filters in the menu and see if they are
   // applicable to the current source.
   QMenu* menu = this->filtersMenu();
-  QList<QAction*> actions = menu->findChildren<QAction*>();
 
   vtkSMProxy* input = (source)? source->getProxy() : NULL;
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
+  if (!input)
+    {
+    menu->setEnabled(false);
+    return;
+    }
+
+  QList<QAction*> actions = menu->findChildren<QAction*>();
+  bool some_enabled = false;
   foreach(QAction* action, actions)
     {
     if (!input)
@@ -1452,11 +1460,14 @@ void pqMainWindow::updateFiltersMenu(pqPipelineSource* source)
       if (property->IsInDomains())
         {
         action->setEnabled(true);
+        some_enabled = true;
         continue;
         }
       }
     action->setEnabled(false);
     }
+
+  menu->setEnabled(some_enabled);
 }
 
 //-----------------------------------------------------------------------------
@@ -1465,15 +1476,20 @@ void pqMainWindow::onActiveServerChanged(pqServer* server)
   // undate filer/source menu.
   QAction* connectAction = 
     this->serverMenu()->findChild<QAction*>("Connect");
+  QAction* saveScreenshot =
+    this->fileMenu()->findChild<QAction*>("SaveScreenshot");
+
   QAction* compoundFilterAction = 
     this->Implementation->ToolsMenu->findChild<QAction*>( "CompoundFilter");
+
   if (server)
     {
     connectAction->setEnabled(false);
     this->Implementation->ServerDisconnectAction->setEnabled(true);
     this->Implementation->SourcesMenu->setEnabled(true);
-    this->Implementation->FiltersMenu->setEnabled(true);
     compoundFilterAction->setEnabled(true);
+    this->Implementation->ServerDisconnectAction->setEnabled(true);
+    saveScreenshot->setEnabled(true);
     }
   else
     {
@@ -1482,6 +1498,8 @@ void pqMainWindow::onActiveServerChanged(pqServer* server)
     this->Implementation->SourcesMenu->setEnabled(false);
     this->Implementation->FiltersMenu->setEnabled(false);
     compoundFilterAction->setEnabled(false);
+    this->Implementation->ServerDisconnectAction->setEnabled(false);
+    saveScreenshot->setEnabled(false);
     }
 }
 
