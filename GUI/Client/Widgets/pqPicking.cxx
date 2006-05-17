@@ -32,11 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPicking.h"
 
-#include "pqPipelineData.h"
+#include "pqApplicationCore.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
-#include "pqServerManagerModel.h"
 
 #include <QVTKWidget.h>
 
@@ -125,26 +124,21 @@ void pqPicking::computeSelection(vtkObject* o, unsigned long, void*, void*, vtkC
   this->computeSelection(iren, pos[0], pos[1]);
 
 }
-
-void pqPicking::computeSelection(vtkRenderWindowInteractor* /*iren*/, int X, int Y)
+//-----------------------------------------------------------------------------
+void pqPicking::computeSelection(
+  vtkRenderWindowInteractor* /*iren*/, int X, int Y)
 {
-  /* FIXME
-  // TODO: find a better way to decide the input of the pick filter.
-  pqPipelineData* pipeline = pqPipelineData::instance();
 
-  vtkSMProxy* inputProxy = 0;// FIXME: pipeline no longer supports currentPorxy. pipeline->currentProxy();
-
-  if(!inputProxy)
+  pqPipelineSource *source = pqApplicationCore::instance()->getActiveSource();
+  if (!source || source->getDisplayCount() == 0)
+    {
     return;
- 
-  pqPipelineSource *source = pqServerManagerModel::instance()->getPQSource(inputProxy);
-  vtkSMRenderModuleProxy* rm = pipeline->getRenderModule(
-    qobject_cast<QVTKWidget *>(source->getDisplay()->GetDisplayWindow(0)));
+    }
 
+  vtkSMProxy* inputProxy = source->getProxy(); 
+  vtkSMRenderModuleProxy* rm = this->RenderModule; 
 
-  // make sure the object is in the window we are picking in
-  if(rm != this->RenderModule)
-    return;
+  // TODO: make sure the object is in the window we are picking in
   
   // get world point from display point
   double Z = rm->GetZBufferValue(X, Y);
@@ -152,7 +146,8 @@ void pqPicking::computeSelection(vtkRenderWindowInteractor* /*iren*/, int X, int
   if (Z == 1.0)
     {
     // remove from render module
-    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(this->RenderModule->GetProperty("Displays"));
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      this->RenderModule->GetProperty("Displays"));
     pp->RemoveProxy(this->PickDisplay);
     rm->UpdateVTKObjects();
     emit this->selectionChanged(inputProxy, this->EmptySet);
@@ -172,11 +167,14 @@ void pqPicking::computeSelection(vtkRenderWindowInteractor* /*iren*/, int X, int
   pt[2] /= pt[3];
 
   // give the world point to the pick filter
-  vtkSMDoubleVectorProperty *worldPointProperty = vtkSMDoubleVectorProperty::SafeDownCast(this->PickFilter->GetProperty("WorldPoint"));
+  vtkSMDoubleVectorProperty *worldPointProperty = 
+    vtkSMDoubleVectorProperty::SafeDownCast(
+      this->PickFilter->GetProperty("WorldPoint"));
   worldPointProperty->SetElements3(pt[0], pt[1], pt[2]);
   
   // set the input to the pick filter
-  vtkSMInputProperty *inputProp = vtkSMInputProperty::SafeDownCast(this->PickFilter->GetProperty("Input"));
+  vtkSMInputProperty *inputProp = vtkSMInputProperty::SafeDownCast(
+    this->PickFilter->GetProperty("Input"));
   inputProp->AddProxy(inputProxy);
   
   // execute filter
@@ -191,12 +189,11 @@ void pqPicking::computeSelection(vtkRenderWindowInteractor* /*iren*/, int X, int
   emit this->selectionChanged(inputProxy, results);
 
   // add to render module
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(this->RenderModule->GetProperty("Displays"));
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->RenderModule->GetProperty("Displays"));
   pp->AddProxy(this->PickDisplay);
   rm->UpdateVTKObjects();
 
   rm->StillRender();  // TODO: replace with correct update policy
-  */
-
 }
 
