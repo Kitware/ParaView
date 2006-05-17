@@ -48,7 +48,8 @@ class PQWIDGETS_EXPORT pqPropertyLinks : public QObject
   Q_OBJECT
   
 public:
-  /// constructor
+  /// constructor creates a property link object
+  /// using unchecked properties is off by default
   pqPropertyLinks(QObject* p=0);
   /// destructor
   ~pqPropertyLinks();
@@ -61,8 +62,22 @@ public:
   void removePropertyLink(QObject* qObject, const char* qProperty, const char* signal,
                           vtkSMProxy* Proxy, vtkSMProperty* Property, int Index=-1);
 
-  /// refresh a link (acts as if the vtkSMProperty's changed)
-  void refreshLinks();
+public slots:
+  /// accept the changes and push them to the server manager
+  /// regardless of the whether we're using unchecked properties
+  void accept();
+  
+  /// reject any changes and update the QObject's properties to reflect the
+  /// server manager properties
+  void reset();
+
+  /// set whether to use unchecked properties on the server manager
+  /// one may get/set unchecked properties to get domain updates before an
+  /// accept is done
+  void setUseUncheckedProperties(bool);
+public:
+  /// get whether unchecked properties are used
+  bool useUncheckedProperties();
 
 
   /// TODO: domain change events
@@ -88,6 +103,8 @@ public:
   ~pqPropertyLinksConnection();
   pqPropertyLinksConnection& operator=(const pqPropertyLinksConnection& copy);
   bool operator<(pqPropertyLinksConnection const& other) const;
+  void setUseUncheckedProperties(bool) const;
+  bool useUncheckedProperties() const;
 private slots:
   void smLinkedPropertyChanged() const;
   void qtLinkedPropertyChanged() const;

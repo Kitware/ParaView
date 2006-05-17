@@ -94,7 +94,9 @@ void pqNamedObjectPanel::linkServerManagerProperties()
 
       if(pt == pqSMAdaptor::MULTIPLE_ELEMENTS)
         {
-        QLayout* propertyLayout = qobject_cast<QLayout*>(foundObject);
+        //QLayout* propertyLayout = qobject_cast<QLayout*>(foundObject);
+        QWidget* propertyWidget = qobject_cast<QWidget*>(foundObject);
+        /*
         if(propertyLayout)
           {
           QList<QList<QVariant> > domain = pqSMAdaptor::getMultipleElementPropertyDomain(SMProperty);
@@ -108,6 +110,38 @@ void pqNamedObjectPanel::linkServerManagerProperties()
               {
               this->PropertyManager->registerLink(le, "text", SIGNAL(textChanged(const QString&)),
                                                  this->Proxy, SMProperty, j);
+              }
+            }
+          }
+        else */ if(propertyWidget)
+          {
+          int index = -1;
+          // get the index from the name
+          QString name = propertyWidget->objectName();
+          QStringList split = name.split(':');
+          if(split.size() == 2)
+            {
+            bool ok = false;
+            index = split[1].toInt(&ok);
+            if(!ok)
+              {
+              index = -1;
+              }
+            }
+          if(index != -1)
+            {
+            QLineEdit* le = qobject_cast<QLineEdit*>(propertyWidget);
+            QSlider* sl = qobject_cast<QSlider*>(propertyWidget);
+            if(le)
+              {
+              this->PropertyManager->registerLink(le, "text", SIGNAL(textChanged(const QString&)),
+                                                 this->Proxy, SMProperty, index);
+              }
+            else if(sl)
+              {
+              this->PropertyManager->registerLink(sl, "value",
+                                                 SIGNAL(valueChanged(int)),
+                                                 this->Proxy, SMProperty, index);
               }
             }
           }
@@ -254,7 +288,9 @@ void pqNamedObjectPanel::unlinkServerManagerProperties()
 
       if(pt == pqSMAdaptor::MULTIPLE_ELEMENTS)
         {
-        QLayout* propertyLayout = qobject_cast<QLayout*>(foundObject);
+        //QLayout* propertyLayout = qobject_cast<QLayout*>(foundObject);
+        QWidget* propertyWidget = qobject_cast<QWidget*>(foundObject);
+        /*
         if(propertyLayout)
           {
           QList<QList<QVariant> > domain = pqSMAdaptor::getMultipleElementPropertyDomain(SMProperty);
@@ -268,6 +304,38 @@ void pqNamedObjectPanel::unlinkServerManagerProperties()
               {
               this->PropertyManager->unregisterLink(le, "text", SIGNAL(textChanged(const QString&)),
                                                this->Proxy, SMProperty, j);
+              }
+            }
+          }
+        else */ if(propertyWidget)
+          {
+          int index = -1;
+          // get the index from the name
+          QString name = propertyWidget->objectName();
+          QStringList split = name.split(':');
+          if(split.size() == 2)
+            {
+            bool ok = false;
+            int index = split[1].toInt(&ok);
+            if(!ok)
+              {
+              index = -1;
+              }
+            }
+          if(index != -1)
+            {
+            QLineEdit* le = qobject_cast<QLineEdit*>(propertyWidget);
+            QSlider* sl = qobject_cast<QSlider*>(propertyWidget);
+            if(le)
+              {
+              this->PropertyManager->unregisterLink(le, "text", SIGNAL(textChanged(const QString&)),
+                                                 this->Proxy, SMProperty, index);
+              }
+            else if(sl)
+              {
+              this->PropertyManager->unregisterLink(sl, "value",
+                                                 SIGNAL(valueChanged(int)),
+                                                 this->Proxy, SMProperty, index);
               }
             }
           }

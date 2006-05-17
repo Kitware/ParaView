@@ -227,10 +227,7 @@ void pqPropertyManager::accept()
 void pqPropertyManager::reject()
 {
   emit this->prereject();
-  this->Internal->Links.refreshLinks();
-  // hack -- apparently our propertyChanged() slot is called after we emit canAcceptOrReject(),
-  // so flushing the queue works around that
-  QApplication::processEvents();
+  this->Internal->Links.reset();
   emit this->canAcceptOrReject(false);
   emit postreject();
 }

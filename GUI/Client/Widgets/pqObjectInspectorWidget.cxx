@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 #include "pqRenderModule.h"
 #include "pqServerManagerModel.h"
+#include "pqThresholdPanel.h"
 
 pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   : QWidget(p)
@@ -132,13 +133,25 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
 
   if(proxy)
     {
-    // try to find a custom form in our pqWidgets resources
-    QString proxyui = QString(":/pqWidgets/") + QString(proxy->GetXMLName()) + QString(".ui");
-    customForm = new pqLoadedFormObjectPanel(proxyui, NULL);
-    if(!customForm->isValid())
+    if(QString(proxy->GetXMLName()) == "Threshold")  // hack for now
       {
-      delete customForm;
-      customForm = NULL;
+      customForm = new pqThresholdPanel(NULL);
+      if(!customForm->isValid())
+        {
+        delete customForm;
+        customForm = NULL;
+        }
+      }
+    else
+      {
+      // try to find a custom form in our pqWidgets resources
+      QString proxyui = QString(":/pqWidgets/") + QString(proxy->GetXMLName()) + QString(".ui");
+      customForm = new pqLoadedFormObjectPanel(proxyui, NULL);
+      if(!customForm->isValid())
+        {
+        delete customForm;
+        customForm = NULL;
+        }
       }
     }
 
@@ -180,6 +193,7 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
   if(customForm)
     {
     customForm->setProxy(proxy);
+    customForm->show();
     }
 
   this->ObjectPanel->setProxy(proxy);

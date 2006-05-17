@@ -39,5 +39,6 @@
         <file alias="pqWindowd22.png">Resources/pqWindowd22.png</file>
         <file alias="pqWindowd32.png">Resources/pqWindowd32.png</file>
         <file alias="ExodusReader.ui">pqExodusReaderProperties.ui</file>
+        <file alias="CustomThreshold.ui">pqThresholdPanel.ui</file>
     </qresource>
 </RCC>
