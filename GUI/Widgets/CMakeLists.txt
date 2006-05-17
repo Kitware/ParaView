@@ -82,7 +82,8 @@ ENDIF(CMAKE_COMPILER_2005)
 SET(BUILD_SHARED_LIBS ${VTK_BUILD_SHARED_LIBS})
 SET(KWWidgets_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 
-SET(KWWidgets_CMAKE_DIR "${KWWidgets_SOURCE_DIR}/Utilities/CMake")
+SET(KWWidgets_CMAKE_DIR "${KWWidgets_SOURCE_DIR}/CMake")
+SUBDIRS(${KWWidgets_CMAKE_DIR})
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${KWWidgets_CMAKE_DIR}")
 
 SET(KWWidgets_CONFIGURATION_TYPES ${CMAKE_CONFIGURATION_TYPES})
@@ -701,7 +702,7 @@ SUBDIRS(Resources)
 # --------------------------------------------------------------------------
 # Configure the export configuration
 
-SUBDIRS(Utilities/ExportConfiguration)
+SUBDIRS(${KWWidgets_CMAKE_DIR}/ExportConfiguration)
 
 # --------------------------------------------------------------------------
 # Build the examples
