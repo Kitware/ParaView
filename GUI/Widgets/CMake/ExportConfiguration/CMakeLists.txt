@@ -182,7 +182,6 @@ SET(KWWidgets_DOXYGEN_DIR_CONFIG
 IF(VTK_BINARY_DIR)
   IF(NOT KWWidgets_VTK_INSTALL_PACKAGE_DIR)
     MESSAGE(
-      FATAL_ERROR 
       "KWWidgets_VTK_INSTALL_PACKAGE_DIR must be set by the parent project to the value of VTK_INSTALL_PACKAGE_DIR it uses to configure VTK.")
   ENDIF(NOT KWWidgets_VTK_INSTALL_PACKAGE_DIR)
   SET(KWWidgets_VTK_DIR_CONFIG ${KWWidgets_VTK_INSTALL_PACKAGE_DIR})
