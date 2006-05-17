@@ -33,12 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "QVTKWidget.h"
+#include "vtkErrorCode.h"
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMRenderModuleProxy.h"
 
 // Qt includes.
+#include <QFileInfo>
 #include <QPointer>
 #include <QtDebug>
 
@@ -73,8 +75,8 @@ public:
 
 //-----------------------------------------------------------------------------
 pqRenderModule::pqRenderModule(const QString& name, 
-  vtkSMRenderModuleProxy* renModule, pqServer* server, QObject* parent/*=null*/)
-: pqPipelineObject(server, parent)
+  vtkSMRenderModuleProxy* renModule, pqServer* server, QObject* _parent/*=null*/)
+: pqPipelineObject(server, _parent)
 {
   this->Internal = new pqRenderModuleInternal();
   this->Internal->Name = name;
@@ -125,9 +127,9 @@ QVTKWidget* pqRenderModule::getWidget() const
 }
 
 //-----------------------------------------------------------------------------
-void pqRenderModule::setWindowParent(QWidget* parent)
+void pqRenderModule::setWindowParent(QWidget* _parent)
 {
-  this->Internal->Viewport->setParent(parent);
+  this->Internal->Viewport->setParent(_parent);
   this->Internal->Viewport->update();
 }
 
@@ -183,6 +185,56 @@ void pqRenderModule::resetCamera()
     {
     this->Internal->RenderModuleProxy->ResetCamera();
     }
+}
+
+//-----------------------------------------------------------------------------
+bool pqRenderModule::saveImage(int width, int height, const QString& filename)
+{
+  QSize cur_size = this->Internal->Viewport->size();
+  if (width>0 && height>0)
+    {
+    this->Internal->Viewport->resize(width, height);
+    }
+  this->render();
+  const char* writername = 0;
+
+  const QFileInfo file(filename);
+  if(file.completeSuffix() == "bmp")
+    {
+    writername = "vtkBMPWriter";
+    }
+  else if(file.completeSuffix() == "tif" || file.completeSuffix() == "tiff")
+    {
+    writername = "vtkTIFFWriter"; 
+    }
+  else if(file.completeSuffix() == "ppm")
+    {
+    writername = "vtkPNMWriter";
+    }
+  else if(file.completeSuffix() == "png")
+    {
+    writername = "vtkPNGWriter";
+    }
+  else if(file.completeSuffix() == "jpg")
+    {
+    writername = "vtkJPEGWriter";
+    }
+  else
+    {
+    qCritical() << "Failed to determine file type for file:" 
+      << filename.toStdString().c_str();
+    return false;
+    }
+
+  int ret = this->Internal->RenderModuleProxy->WriteImage(
+    filename.toStdString().c_str(), writername);
+  if (width>0 && height>0)
+    {
+    this->Internal->Viewport->resize(width, height);
+    this->Internal->Viewport->resize(cur_size);
+    this->render();
+    }
+  return (ret == vtkErrorCode::NoError);
 }
 
 //-----------------------------------------------------------------------------

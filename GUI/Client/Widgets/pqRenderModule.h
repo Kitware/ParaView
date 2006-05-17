@@ -70,7 +70,9 @@ public:
   /// Returns the name for this render module.
   const QString &getProxyName() const; 
 
-
+  /// Save a screenshot for the render module. If width or height ==0,
+  /// the current window size is used.
+  bool saveImage(int width, int height, const QString& filename);
 
 private slots:
   /// if renModule is not created when this object is instantianted, we

@@ -44,7 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPicking.h"
 #include "pqPipelineBrowser.h"
 #include "pqPipelineBuilder.h"
-#include "pqPipelineData.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"
@@ -124,16 +123,12 @@ public:
   pqImplementation() :
     ActiveView(0),
     CompoundProxyToolBar(0),
-    CurrentProxy(0),
-    CurrentServer(0),
-    CurrentSource(0),
     ElementInspectorDock(0),
     FileMenu(0),
     FiltersMenu(0),
     HelpMenu(0),
     Inspector(0),
     MultiViewManager(0),
-    Pipeline(0),
     PipelineBrowser(0),
     PropertyToolbar(0),
     ServerDisconnectAction(0),
@@ -142,8 +137,7 @@ public:
     ToolsMenu(0),
     UndoRedoToolBar(0),
     VariableSelectorToolBar(0),
-    ViewMenu(0),
-    VTKConnector(0)
+    ViewMenu(0)
   {
 
   }
@@ -157,10 +151,6 @@ public:
     delete this->PipelineBrowser;
     this->PipelineBrowser = 0;
 
-    // Clean up the pipeline before the view manager.
-    delete this->Pipeline;
-    this->Pipeline = 0;
-    
     delete this->MultiViewManager;
     this->MultiViewManager = 0;
 
@@ -177,15 +167,10 @@ public:
   
   /// Stores a mapping from dockable widgets to menu actions
   QMap<QDockWidget*, QAction*> DockWidgetVisibleActions;
-  
-  QPointer<pqServer> CurrentServer;
-  pqPipelineSource* CurrentSource;
-  vtkSMProxy* CurrentProxy;
 
   pqMultiViewFrame* ActiveView;
   pqObjectInspectorWidget* Inspector;
   pqPipelineBrowser *PipelineBrowser;
-  pqPipelineData *Pipeline;
   pqMultiView* MultiViewManager;
   QAction* ServerDisconnectAction;
   QDockWidget *ElementInspectorDock;
@@ -193,7 +178,6 @@ public:
   QToolBar* PropertyToolbar;
   QToolBar* UndoRedoToolBar;
   QToolBar* VariableSelectorToolBar;
-  vtkSmartPointer<vtkEventQtSlotConnect> VTKConnector;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -207,13 +191,10 @@ pqMainWindow::pqMainWindow() :
 
   this->menuBar() << pqSetName("MenuBar");
 
-  // Set up the main ParaQ items along with the central widget.
-  this->Implementation->Pipeline = new pqPipelineData();
-  this->Implementation->VTKConnector = vtkSmartPointer<vtkEventQtSlotConnect>::New();
-
   this->Implementation->MultiViewManager = 
     new pqMultiView(this) << pqSetName("MultiViewManager");
-  //this->Implementation->MultiViewManager->hide();  // workaround for flickering in Qt 4.0.1 & 4.1.0
+  //this->Implementation->MultiViewManager->hide();  
+  // workaround for flickering in Qt 4.0.1 & 4.1.0
   this->setCentralWidget(this->Implementation->MultiViewManager);
 
   pqApplicationCore* core = pqApplicationCore::instance();
@@ -252,6 +233,7 @@ pqMainWindow::pqMainWindow() :
   this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 }
+
 //-----------------------------------------------------------------------------
 pqMainWindow::~pqMainWindow()
 {
@@ -994,10 +976,12 @@ void pqMainWindow::onFileOpenServerState(const QStringList& Files)
       }
 
     // Restore the pipeline.
+    /*
     if(this->Implementation->Pipeline)
       {
       // this->Implementation->Pipeline->loadState(root, this->Implementation->MultiViewManager);
       }
+      */
     }
   else
     {
@@ -1053,11 +1037,13 @@ void pqMainWindow::onFileSaveServerState(const QStringList& Files)
     this->Implementation->MultiViewManager->saveState(root);
     }
 
+  /*
   if(this->Implementation->Pipeline)
     {
     // FIXME
     //this->Implementation->Pipeline->getModel()->saveState(root, this->Implementation->MultiViewManager);
     }
+    */
 
   // Print the xml to the requested file(s).
   for(int i = 0; i != Files.size(); ++i)
@@ -1068,21 +1054,13 @@ void pqMainWindow::onFileSaveServerState(const QStringList& Files)
 
   root->Delete();
 }
-
+//-----------------------------------------------------------------------------
 void pqMainWindow::onFileSaveScreenshot()
 {
-  if(!this->Implementation->CurrentServer)
+  pqRenderModule* rm = pqApplicationCore::instance()->getActiveRenderModule();
+  if(!rm)
     {
-    QMessageBox::critical(this, tr("Save Screenshot:"), tr("No server connections to save"));
-    return;
-    }
-
-  vtkRenderWindow* const render_window =
-    this->Implementation->ActiveView ? qobject_cast<QVTKWidget*>(this->Implementation->ActiveView->mainWidget())->GetRenderWindow() : 0;
-
-  if(!render_window)
-    {
-    QMessageBox::critical(this, tr("Save Screenshot:"), tr("No render window to save"));
+    qDebug() << "Cannnot save image. No active render module.";
     return;
     }
 
@@ -1096,27 +1074,28 @@ void pqMainWindow::onFileSaveScreenshot()
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), 
     this, tr("Save Screenshot:"), QString(), filters);
   file_dialog->setObjectName("FileSaveScreenshotDialog");
-  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileSaveScreenshot(const QStringList&)));
+  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
+    this, SLOT(onFileSaveScreenshot(const QStringList&)));
   file_dialog->show();
 }
 
-void pqMainWindow::onFileSaveScreenshot(const QStringList& Files)
+//-----------------------------------------------------------------------------
+void pqMainWindow::onFileSaveScreenshot(const QStringList& files)
 {
-  vtkRenderWindow* const render_window =
-    this->Implementation->ActiveView ? qobject_cast<QVTKWidget*>(this->Implementation->ActiveView->mainWidget())->GetRenderWindow() : 0;
-
-  // All tests need a 300x300 render window size
-  QSize cur_size = this->Implementation->ActiveView->mainWidget()->size();
-  this->Implementation->ActiveView->mainWidget()->resize(300,300);
-
-  for(int i = 0; i != Files.size(); ++i)
+  pqRenderModule* rm = pqApplicationCore::instance()->getActiveRenderModule();
+  if(!rm)
     {
-    if(!pqImageComparison::SaveScreenshot(render_window, Files[i]))
-      QMessageBox::critical(this, tr("Save Screenshot:"), tr("Error saving file"));
+    qDebug() << "Cannnot save image. No active render module.";
+    return;
     }
 
-  this->Implementation->ActiveView->mainWidget()->resize(cur_size);
-  render_window->Render();
+  for(int i = 0; i != files.size(); ++i)
+    {
+    if (!rm->saveImage(0, 0, files[i]))
+      {
+      qCritical() << "Save Image failed.";
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1205,8 +1184,7 @@ void pqMainWindow::onCreateSource(QAction* action)
 //-----------------------------------------------------------------------------
 void pqMainWindow::onCreateFilter(QAction* action)
 {
-  if(!action || !this->Implementation->Pipeline 
-    || !this->Implementation->PipelineBrowser)
+  if(!action)
     {
     return;
     }
@@ -1223,22 +1201,27 @@ void pqMainWindow::onOpenLinkEditor()
 {
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindow::onOpenCompoundFilterWizard()
 {
-  pqCompoundProxyWizard* wizard = new pqCompoundProxyWizard(this->Implementation->CurrentServer, this);
+  // TODO: pqCompoundProxyWizard should not need a server.
+  pqCompoundProxyWizard* wizard = new pqCompoundProxyWizard(
+    pqApplicationCore::instance()->getActiveServer(), this);
   wizard->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
 
-  this->connect(wizard, SIGNAL(newCompoundProxy(const QString&, const QString&)), 
-                        SLOT(onCompoundProxyAdded(const QString&, const QString&)));
-  
+  this->connect(wizard, 
+    SIGNAL(newCompoundProxy(const QString&, const QString&)), 
+    SLOT(onCompoundProxyAdded(const QString&, const QString&)));
   wizard->show();
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindow::onValidateWidgetNames()
 {
   pqObjectNaming::Validate(*this);
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindow::onRecordTest()
 {
   QString filters;
@@ -1332,7 +1315,7 @@ void pqMainWindow::onCompoundProxyAdded(const QString&, const QString& proxy)
 //-----------------------------------------------------------------------------
 void pqMainWindow::onRemoveServer(pqServer *server)
 {
-  if(!this->Implementation->MultiViewManager || !this->Implementation->Pipeline)
+  if(!this->Implementation->MultiViewManager )
     {
     return;
     }

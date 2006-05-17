@@ -162,8 +162,8 @@ void pqServer::disconnect(pqServer* server)
 }
 
 //-----------------------------------------------------------------------------
-pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* parent) :
-  pqPipelineModelItem(parent), FriendlyName()
+pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* _parent) :
+  pqPipelineModelItem(_parent), FriendlyName()
 {
   this->ConnectionID = connectionID;
   this->Options = options;

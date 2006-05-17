@@ -58,8 +58,8 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqRenderWindowManager::pqRenderWindowManager(QObject* parent/*=null*/)
-  : QObject(parent)
+pqRenderWindowManager::pqRenderWindowManager(QObject* _parent/*=null*/)
+  : QObject(_parent)
 {
   this->Internal = new pqRenderWindowManagerInternal();
   pqServerManagerModel* smModel = pqServerManagerModel::instance();

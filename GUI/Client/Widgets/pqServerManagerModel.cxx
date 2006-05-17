@@ -76,8 +76,8 @@ public:
 
 
 //-----------------------------------------------------------------------------
-pqServerManagerModel::pqServerManagerModel(QObject* parent /*=NULL*/):
-  QObject(parent)
+pqServerManagerModel::pqServerManagerModel(QObject* _parent /*=NULL*/):
+  QObject(_parent)
 {
   this->Internal = new pqServerManagerModelInternal();
   if (!pqServerManagerModel::Instance)

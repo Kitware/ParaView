@@ -40,8 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Qt includes.
 
 //-----------------------------------------------------------------------------
-pqPipelineModelItem::pqPipelineModelItem(QObject* parent /*=null*/)
-  : QObject(parent)
+pqPipelineModelItem::pqPipelineModelItem(QObject* _parent /*=null*/)
+  : QObject(_parent)
 {
   this->ModelType = pqPipelineModel::Invalid;
 }

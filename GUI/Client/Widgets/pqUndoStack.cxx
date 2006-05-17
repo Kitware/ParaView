@@ -52,7 +52,7 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqUndoStack::pqUndoStack(QObject* parent/*=null*/) :QObject(parent)
+pqUndoStack::pqUndoStack(QObject* _parent/*=null*/) :QObject(_parent)
 {
   this->Implementation = new pqUndoStackImplementation;
   this->Implementation->UndoStack = vtkSmartPointer<vtkSMUndoStack>::New();
