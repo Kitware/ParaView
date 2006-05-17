@@ -89,6 +89,7 @@ private:
   QComboBox* Variables;
   bool BlockEmission;
   QPointer<pqPipelineSource> SelectedSource;
+  bool IgnoreWidgetChanges;
 };
 
 #endif

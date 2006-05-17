@@ -85,6 +85,7 @@ pqVariableSelectorWidget::~pqVariableSelectorWidget()
   
   this->Layout = 0;
   this->Variables = 0;
+  this->IgnoreWidgetChanges = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -181,6 +182,10 @@ void pqVariableSelectorWidget::onVariableChanged(pqVariableType type,
     {
     return;
     }
+  if (this->IgnoreWidgetChanges)
+    {
+    return;
+    }
 
   // I cannot decide if we should use signals here of directly 
   // call the appropriate methods on undo stack.
@@ -210,6 +215,7 @@ void pqVariableSelectorWidget::onVariableChanged(pqVariableType type,
 //-----------------------------------------------------------------------------
 void pqVariableSelectorWidget::updateVariableSelector(pqPipelineSource* source)
 {
+  this->IgnoreWidgetChanges = true;
   this->clear();
   this->addVariable(VARIABLE_TYPE_NONE, "");
 
@@ -217,6 +223,7 @@ void pqVariableSelectorWidget::updateVariableSelector(pqPipelineSource* source)
 
   if (!source || source->getDisplayCount() == 0)
     {
+    this->IgnoreWidgetChanges = false;
     // nothing more to do.
     return;
     }
@@ -307,4 +314,5 @@ void pqVariableSelectorWidget::updateVariableSelector(pqPipelineSource* source)
     {
     this->chooseVariable(VARIABLE_TYPE_NONE, "");
     }
+  this->IgnoreWidgetChanges = false;
 }
