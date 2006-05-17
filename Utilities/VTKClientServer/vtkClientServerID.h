@@ -28,15 +28,15 @@
 struct VTK_CLIENT_SERVER_EXPORT vtkClientServerID
 {
   // Convenience operators.
-  int operator<(const vtkClientServerID& i) const
+  bool operator<(const vtkClientServerID& i) const
     {
     return this->ID < i.ID;
     }
-  int operator==(const vtkClientServerID& i) const
+  bool operator==(const vtkClientServerID& i) const
     {
     return this->ID == i.ID;
     }
-  int operator!=(const vtkClientServerID& i) const
+  bool operator!=(const vtkClientServerID& i) const
     {
     return this->ID != i.ID;
     }
