@@ -37,12 +37,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsExport.h"
 
 #include <QWidget>
-#include <QString>
+#include <QPointer>
 
 class QComboBox;
 class QHBoxLayout;
 
-/// Provides a standard user interface for selecting among a collection of dataset variables (both cell and node variables).
+class pqPipelineSource;
+
+/// Provides a standard user interface for selecting among a collection 
+/// of dataset variables (both cell and node variables).
 class PQWIDGETS_EXPORT pqVariableSelectorWidget : public QWidget
 {
   Q_OBJECT
@@ -53,11 +56,23 @@ public:
   
   /// Removes all variables from the collection.
   void clear();
+
   /// Adds a variable to the collection.
   void addVariable(pqVariableType type, const QString& name);
-  /// Makes the given variable the "current" selection.  Emits the variableChanged() signal.
+
+  /// Makes the given variable the "current" selection.  Emits the 
+  /// variableChanged() signal.
   void chooseVariable(pqVariableType type, const QString& name);
-  
+ 
+public slots:
+  /// Call to update the variable selector to show the variables
+  /// provided by the \c source. \c source can be NULL.
+  void updateVariableSelector(pqPipelineSource* source);
+
+  /// Called when the variable selection changes. 
+  /// Affects the \c SelectedSource
+  void onVariableChanged(pqVariableType type, const QString& name);
+
 signals:
   /// Signal emitted whenever the user chooses a variable, or chooseVariable() is called.
   void variableChanged(pqVariableType type, const QString& name);
@@ -73,6 +88,7 @@ private:
   QHBoxLayout* Layout;
   QComboBox* Variables;
   bool BlockEmission;
+  QPointer<pqPipelineSource> SelectedSource;
 };
 
 #endif

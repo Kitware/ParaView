@@ -156,6 +156,12 @@ void pqPipelineDisplay::setDefaultColorParametes()
 }
 
 //-----------------------------------------------------------------------------
+void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
+{
+  pqPart::Color(this->getProxy(), arrayname, fieldtype);
+}
+
+//-----------------------------------------------------------------------------
 /*
 // This save state must go away. GUI just needs to save which window
 // contains rendermodule with what ID.  ProxyManager will manage the display.

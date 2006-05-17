@@ -68,6 +68,11 @@ public:
   // Else if the input color by array exists in this source, use it.
   // Else color by property.
   void setDefaultColorParametes(); 
+
+  // Call to select the coloring array. Internally calls
+  // pqPart::Color(), eventually pqPart code should probably 
+  // move in here.
+  void colorByArray(const char* arrayname, int fieldtype);
 protected slots:
   // called when input property on display changes. We must detect if
   // (and when) the display is connected to a new proxy.

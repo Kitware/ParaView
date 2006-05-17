@@ -186,6 +186,7 @@ private slots:
 
   void onActiveSourceChanged(pqPipelineSource*);
   virtual void onActiveServerChanged(pqServer*);
+
 private slots:
   void onCreateSource(QAction*);
   void onCreateFilter(QAction*);
@@ -195,9 +196,6 @@ private slots:
   void onNewSelections(vtkSMProxy* p, vtkUnstructuredGrid* selections);
   void onCompoundProxyAdded(const QString&, const QString&);
   void onCreateCompoundProxy(QAction*);
-  
-  void onUpdateVariableSelector(vtkSMProxy*);
-  void onVariableChanged(pqVariableType, const QString&);
   
   void onRemoveServer(pqServer *server);
   void onAddWindow(QWidget *window);
