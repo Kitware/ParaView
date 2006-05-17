@@ -717,11 +717,6 @@ The D3 filter is available when ParaView is run in parallel. It operates on any 
        </EnumerationDomain>
      </IntVectorProperty>
 
-     <StringVectorProperty 
-        name="GlobalNodeIdArrayName" 
-        command="SetGlobalNodeIdArrayName" 
-        number_of_elements="1" /> 
-
      <IntVectorProperty 
         name="UseMinimalMemory" 
         command="SetUseMinimalMemory" 
