@@ -1484,8 +1484,6 @@ void pqMainWindow::onActiveServerChanged(pqServer* server)
 
   if (server)
     {
-    connectAction->setEnabled(false);
-    this->Implementation->ServerDisconnectAction->setEnabled(true);
     this->Implementation->SourcesMenu->setEnabled(true);
     compoundFilterAction->setEnabled(true);
     this->Implementation->ServerDisconnectAction->setEnabled(true);
@@ -1493,14 +1491,20 @@ void pqMainWindow::onActiveServerChanged(pqServer* server)
     }
   else
     {
-    connectAction->setEnabled(true);
     this->Implementation->ServerDisconnectAction->setEnabled(false);
     this->Implementation->SourcesMenu->setEnabled(false);
     this->Implementation->FiltersMenu->setEnabled(false);
     compoundFilterAction->setEnabled(false);
-    this->Implementation->ServerDisconnectAction->setEnabled(false);
     saveScreenshot->setEnabled(false);
     }
+  bool can_connect = true;
+  if (pqApplicationCore::instance()->
+    getServerManagerModel()->getNumberOfServers() > 0)
+    {
+    can_connect = false;
+    }
+  connectAction->setEnabled(can_connect);
+  this->Implementation->ServerDisconnectAction->setEnabled(!can_connect);
 }
 
 //-----------------------------------------------------------------------------
