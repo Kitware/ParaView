@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineDisplay.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
+#include "pqPropertyManager.h"
 #include "pqServerManagerModel.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
@@ -105,7 +106,7 @@ void pqNamedObjectPanel::linkServerManagerProperties()
             QLineEdit* le = propertyLayout->parentWidget()->findChild<QLineEdit*>(name);
             if(le)
               {
-              pqObjectPanel::PropertyManager.registerLink(le, "text", SIGNAL(textChanged(const QString&)),
+              this->PropertyManager->registerLink(le, "text", SIGNAL(textChanged(const QString&)),
                                                  this->Proxy, SMProperty, j);
               }
             }
@@ -119,7 +120,7 @@ void pqNamedObjectPanel::linkServerManagerProperties()
         QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundObject);
         if(checkBox)
           {
-          pqObjectPanel::PropertyManager.registerLink(checkBox, "checked", SIGNAL(toggled(bool)),
+          this->PropertyManager->registerLink(checkBox, "checked", SIGNAL(toggled(bool)),
                                              this->Proxy, SMProperty);
           }
         else if(comboBox)
@@ -132,12 +133,12 @@ void pqNamedObjectPanel::linkServerManagerProperties()
             }
           pqSignalAdaptorComboBox* adaptor = new pqSignalAdaptorComboBox(comboBox);
           adaptor->setObjectName("ComboBoxAdaptor");
-          pqObjectPanel::PropertyManager.registerLink(adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
+          this->PropertyManager->registerLink(adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
                                              this->Proxy, SMProperty);
           }
         else if(lineEdit)
           {
-          pqObjectPanel::PropertyManager.registerLink(lineEdit, "text", SIGNAL(textChanged(const QString&)),
+          this->PropertyManager->registerLink(lineEdit, "text", SIGNAL(textChanged(const QString&)),
                                              this->Proxy, SMProperty);
           }
         }
@@ -152,7 +153,7 @@ void pqNamedObjectPanel::linkServerManagerProperties()
           for(int j=0; j<sel_domain.size(); j++)
             {
             pqListWidgetItemObject* item = new pqListWidgetItemObject(sel_domain[j].toString(), listWidget);
-            pqObjectPanel::PropertyManager.registerLink(item, "checked", SIGNAL(checkedStateChanged(bool)),
+            this->PropertyManager->registerLink(item, "checked", SIGNAL(checkedStateChanged(bool)),
                                                this->Proxy, SMProperty, j);
             }
           }
@@ -177,7 +178,7 @@ void pqNamedObjectPanel::linkServerManagerProperties()
           pqSignalAdaptorProxy* proxyAdaptor = new pqSignalAdaptorProxy(comboAdaptor, "currentText", 
                                                  SIGNAL(currentTextChanged(const QString&)));
           proxyAdaptor->setObjectName("ComboBoxProxyAdaptor");
-          pqObjectPanel::PropertyManager.registerLink(proxyAdaptor, "proxy", SIGNAL(proxyChanged(const QVariant&)),
+          this->PropertyManager->registerLink(proxyAdaptor, "proxy", SIGNAL(proxyChanged(const QVariant&)),
                                              this->Proxy, SMProperty);
           }
         }
@@ -198,22 +199,22 @@ void pqNamedObjectPanel::linkServerManagerProperties()
 
           pqSignalAdaptorComboBox* adaptor = new pqSignalAdaptorComboBox(comboBox);
           adaptor->setObjectName("ComboBoxAdaptor");
-          pqObjectPanel::PropertyManager.registerLink(adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
+          this->PropertyManager->registerLink(adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
                                              this->Proxy, SMProperty);
           }
         else if(lineEdit)
           {
-          pqObjectPanel::PropertyManager.registerLink(lineEdit, "text", SIGNAL(textChanged(const QString&)),
+          this->PropertyManager->registerLink(lineEdit, "text", SIGNAL(textChanged(const QString&)),
                                              this->Proxy, SMProperty);
           }
         else if(slider)
           {
-          pqObjectPanel::PropertyManager.registerLink(slider, "value", SIGNAL(valueChanged(int)),
+          this->PropertyManager->registerLink(slider, "value", SIGNAL(valueChanged(int)),
                                              this->Proxy, SMProperty);
           }
         else if(doubleSpinBox)
           {
-          pqObjectPanel::PropertyManager.registerLink(doubleSpinBox, "value", SIGNAL(valueChanged(double)),
+          this->PropertyManager->registerLink(doubleSpinBox, "value", SIGNAL(valueChanged(double)),
                                              this->Proxy, SMProperty);
           }
         }
@@ -222,7 +223,7 @@ void pqNamedObjectPanel::linkServerManagerProperties()
         QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundObject);
         if(lineEdit)
           {
-          pqObjectPanel::PropertyManager.registerLink(lineEdit, "text", SIGNAL(textChanged(const QString&)),
+          this->PropertyManager->registerLink(lineEdit, "text", SIGNAL(textChanged(const QString&)),
                                              this->Proxy, SMProperty);
           }
         }
@@ -265,7 +266,7 @@ void pqNamedObjectPanel::unlinkServerManagerProperties()
             QLineEdit* le = propertyLayout->parentWidget()->findChild<QLineEdit*>(name);
             if(le)
               {
-              pqObjectPanel::PropertyManager.unregisterLink(le, "text", SIGNAL(textChanged(const QString&)),
+              this->PropertyManager->unregisterLink(le, "text", SIGNAL(textChanged(const QString&)),
                                                this->Proxy, SMProperty, j);
               }
             }
@@ -279,19 +280,19 @@ void pqNamedObjectPanel::unlinkServerManagerProperties()
         QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundObject);
         if(checkBox)
           {
-          pqObjectPanel::PropertyManager.unregisterLink(checkBox, "checked", SIGNAL(toggled(bool)),
+          this->PropertyManager->unregisterLink(checkBox, "checked", SIGNAL(toggled(bool)),
                                              this->Proxy, SMProperty);
           }
         else if(comboBox)
           {
           pqSignalAdaptorComboBox* adaptor = comboBox->findChild<pqSignalAdaptorComboBox*>("ComboBoxAdaptor");
-          pqObjectPanel::PropertyManager.unregisterLink(adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
+          this->PropertyManager->unregisterLink(adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
                                              this->Proxy, SMProperty);
           delete adaptor;
           }
         else if(lineEdit)
           {
-          pqObjectPanel::PropertyManager.unregisterLink(lineEdit, "text", SIGNAL(textChanged(const QString&)),
+          this->PropertyManager->unregisterLink(lineEdit, "text", SIGNAL(textChanged(const QString&)),
                                              this->Proxy, SMProperty);
           }
         }
@@ -304,7 +305,7 @@ void pqNamedObjectPanel::unlinkServerManagerProperties()
           for(int ii=0; ii<listWidget->count(); ii++)
             {
             pqListWidgetItemObject* item = static_cast<pqListWidgetItemObject*>(listWidget->item(ii));
-            pqObjectPanel::PropertyManager.unregisterLink(item, "checked", SIGNAL(checkedStateChanged(bool)),
+            this->PropertyManager->unregisterLink(item, "checked", SIGNAL(checkedStateChanged(bool)),
                                                this->Proxy, SMProperty, ii);
             }
           listWidget->clear();
@@ -317,7 +318,7 @@ void pqNamedObjectPanel::unlinkServerManagerProperties()
           {
           QObject* comboAdaptor = comboBox->findChild<pqSignalAdaptorComboBox*>("ComboBoxAdaptor");
           QObject* proxyAdaptor = comboBox->findChild<pqSignalAdaptorComboBox*>("ComboBoxProxyAdaptor");
-          pqObjectPanel::PropertyManager.unregisterLink(proxyAdaptor, "proxy", SIGNAL(proxyChanged(const QVariant&)),
+          this->PropertyManager->unregisterLink(proxyAdaptor, "proxy", SIGNAL(proxyChanged(const QVariant&)),
                                              this->Proxy, SMProperty);
           delete proxyAdaptor;
           delete comboAdaptor;
@@ -332,23 +333,23 @@ void pqNamedObjectPanel::unlinkServerManagerProperties()
         if(comboBox)
           {
           pqSignalAdaptorComboBox* adaptor = comboBox->findChild<pqSignalAdaptorComboBox*>("ComboBoxAdaptor");
-          pqObjectPanel::PropertyManager.unregisterLink(adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
+          this->PropertyManager->unregisterLink(adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
                                              this->Proxy, SMProperty);
           delete adaptor;
           }
         else if(lineEdit)
           {
-          pqObjectPanel::PropertyManager.unregisterLink(lineEdit, "text", SIGNAL(textChanged(const QString&)),
+          this->PropertyManager->unregisterLink(lineEdit, "text", SIGNAL(textChanged(const QString&)),
                                              this->Proxy, SMProperty);
           }
         else if(slider)
           {
-          pqObjectPanel::PropertyManager.unregisterLink(slider, "value", SIGNAL(valueChanged(int)),
+          this->PropertyManager->unregisterLink(slider, "value", SIGNAL(valueChanged(int)),
                                              this->Proxy, SMProperty);
           }
         else if(doubleSpinBox)
           {
-          pqObjectPanel::PropertyManager.unregisterLink(doubleSpinBox, "value", SIGNAL(valueChanged(double)),
+          this->PropertyManager->unregisterLink(doubleSpinBox, "value", SIGNAL(valueChanged(double)),
                                              this->Proxy, SMProperty);
           }
         }
@@ -357,7 +358,7 @@ void pqNamedObjectPanel::unlinkServerManagerProperties()
         QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundObject);
         if(lineEdit)
           {
-          pqObjectPanel::PropertyManager.unregisterLink(lineEdit, "text", SIGNAL(textChanged(const QString&)),
+          this->PropertyManager->unregisterLink(lineEdit, "text", SIGNAL(textChanged(const QString&)),
                                              this->Proxy, SMProperty);
           }
         }

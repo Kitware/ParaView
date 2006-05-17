@@ -60,6 +60,10 @@ public:
   pqObjectInspectorWidget(QWidget *parent=0);
   virtual ~pqObjectInspectorWidget();
 
+  pqObjectPanel* getObjectPanel()
+    {
+    return this->ObjectPanel;
+    }
 public slots:
   void setProxy(vtkSMProxy *proxy);
 

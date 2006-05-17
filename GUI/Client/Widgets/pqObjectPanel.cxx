@@ -42,28 +42,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKWidget.h"
 
 // paraview includes
-#include "vtkSMUndoStack.h"
-#include "vtkSMProxyManager.h"
 
 // paraq includes
 #include "pqPipelineData.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
+#include "pqPropertyManager.h"
 #include "pqServerManagerModel.h"
 
 
-pqPropertyManager pqObjectPanel::PropertyManager;
+//pqPropertyManager pqObjectPanel::PropertyManager;
 
 /// constructor
 pqObjectPanel::pqObjectPanel(QWidget* p)
   : QWidget(p), Proxy(NULL)
 {
+  this->PropertyManager = new pqPropertyManager(this);
 }
 
 /// destructor
 pqObjectPanel::~pqObjectPanel()
 {
+  delete this->PropertyManager;
 }
 
 QSize pqObjectPanel::sizeHint() const
@@ -102,10 +103,7 @@ void pqObjectPanel::accept()
     return;
     }
 
-  vtkSMUndoStack* urMgr = vtkSMProxyManager::GetProxyManager()->GetUndoStack();
-  urMgr->BeginOrContinueUndoSet(this->Proxy->GetConnectionID(), "Accept");
-  this->PropertyManager.accept();
-  urMgr->EndUndoSet();
+  this->PropertyManager->accept();
   
   // cause the screen to update
   pqPipelineSource *source = 
@@ -125,6 +123,6 @@ void pqObjectPanel::reset()
     {
     return;
     }
-  this->PropertyManager.reject();
+  this->PropertyManager->reject();
 }
 

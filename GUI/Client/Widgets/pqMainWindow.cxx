@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
+#include "pqPropertyManager.h"
 #include "pqRenderModule.h"
 #include "pqRenderWindowManager.h"
 #include "pqServerBrowser.h"
@@ -217,13 +218,8 @@ pqMainWindow::pqMainWindow() :
   QObject::connect(core, SIGNAL(activeServerChanged(pqServer*)),
     this, SLOT(onActiveServerChanged(pqServer*)));
 
-  pqUndoStack* undoStack = core->getUndoStack();
-  // Connect Accept/reset signals.
-  QObject::connect(&pqObjectPanel::PropertyManager, SIGNAL(preaccept()),
-    undoStack, SLOT(Accept()));
-  QObject::connect(&pqObjectPanel::PropertyManager, SIGNAL(postaccept()),
-    undoStack, SLOT(EndUndoSet()));
 
+  pqUndoStack* undoStack = core->getUndoStack();
   // Connect undo/redo status.
   QObject::connect(undoStack, 
     SIGNAL(StackChanged(bool, QString, bool, QString)), 
@@ -403,6 +399,15 @@ void pqMainWindow::createStandardObjectInspector(bool visible)
       this->Implementation->Inspector, SLOT(setProxy(vtkSMProxy *)));
     }
   */
+  pqUndoStack* undoStack = pqApplicationCore::instance()->getUndoStack();
+  // Connect Accept/reset signals.
+  QObject::connect(
+    this->Implementation->Inspector->getObjectPanel()->getPropertyManager(), 
+    SIGNAL(preaccept()), undoStack, SLOT(Accept()));
+  QObject::connect(
+    this->Implementation->Inspector->getObjectPanel()->getPropertyManager(), 
+    SIGNAL(postaccept()), undoStack, SLOT(EndUndoSet()));
+
   this->addStandardDockWidget(Qt::LeftDockWidgetArea, 
     object_inspector_dock, QIcon(), visible);
 }

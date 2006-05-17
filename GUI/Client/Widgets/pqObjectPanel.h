@@ -35,7 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 #include "pqSMProxy.h"
-#include "pqPropertyManager.h"
+
+class pqPropertyManager;
 
 /// Base class for Widget which provides an editor for editing properties of a proxy
 class pqObjectPanel : public QWidget
@@ -56,7 +57,10 @@ public:
   QSize sizeHint() const;
   
   /// global instance property manager
-  static pqPropertyManager PropertyManager;
+//  static pqPropertyManager PropertyManager;
+
+  pqPropertyManager* getPropertyManager()
+    { return this->PropertyManager; }
 
 public slots:
   /// accept the changes made to the properties
@@ -68,6 +72,7 @@ public slots:
 
 protected:
   pqSMProxy Proxy;
+  pqPropertyManager* PropertyManager;
 
 
 };
