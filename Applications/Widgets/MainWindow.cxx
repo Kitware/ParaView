@@ -33,7 +33,7 @@ public:
     return new pqObserver;
   }
   
-  virtual void Execute(vtkObject* caller, unsigned long event_id, void*)
+  virtual void Execute(vtkObject* , unsigned long , void*)
   {
   }
 };
