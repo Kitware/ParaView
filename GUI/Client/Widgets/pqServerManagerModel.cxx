@@ -57,8 +57,9 @@ pqServerManagerModel* pqServerManagerModel::instance()
 }
 
 //-----------------------------------------------------------------------------
-struct pqServerManagerModelInternal 
+class pqServerManagerModelInternal 
 {
+public:
   typedef QMap<QString, pqPipelineSource*>  MapOfStringToSource;
   MapOfStringToSource Sources;
 

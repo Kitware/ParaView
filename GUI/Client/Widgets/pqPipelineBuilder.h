@@ -123,7 +123,6 @@ public:
   // we will have to fix that soon.
   vtkSMProxy* createLookupTable(pqPipelineDisplay* display);
 
-  // Get name generator.
 protected:
   /// this method does what it says. Note that it does not worry about undo stack
   /// at all. The caller would have managed it.

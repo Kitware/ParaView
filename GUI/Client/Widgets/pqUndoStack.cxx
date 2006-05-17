@@ -44,8 +44,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqServer.h"
 //-----------------------------------------------------------------------------
-struct pqUndoStackImplementation
+class pqUndoStackImplementation
 {
+public:
   vtkSmartPointer<vtkSMUndoStack> UndoStack;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnector;
 };
