@@ -316,7 +316,7 @@ void pqNamedObjectPanel::unlinkServerManagerProperties()
           if(split.size() == 2)
             {
             bool ok = false;
-            int index = split[1].toInt(&ok);
+            index = split[1].toInt(&ok);
             if(!ok)
               {
               index = -1;
