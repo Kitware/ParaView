@@ -819,12 +819,12 @@ void pqMainWindow::setServer(pqServer* server)
 void pqMainWindow::onFileNew()
 {
   pqServer* server = pqApplicationCore::instance()->getActiveServer();
-  pqApplicationCore::instance()->setActiveServer(NULL);
   if (server)
     {
     pqApplicationCore::instance()->getPipelineBuilder()->deleteProxies(server);
     pqServer::disconnect(server);
     }
+  this->updateEnableState();
 
   /*
   // Clean up the pipeline.
@@ -1414,21 +1414,18 @@ void pqMainWindow::onBrowserSelectionChanged(pqPipelineModelItem* item)
 
   pqApplicationCore::instance()->setActiveSource(source);
   pqApplicationCore::instance()->setActiveServer(server);
-
-  // It's not clear how the Object inspector etc work with the 
-  // pipeline representation yet. So for now, we will
-  // simply let it be.
-  if (this->Implementation->Inspector)
-    {
-    this->Implementation->Inspector->setProxy(
-      (source)? source->getProxy() : NULL);
-    }
 }
 
 //-----------------------------------------------------------------------------
 void pqMainWindow::onActiveSourceChanged(pqPipelineSource* src)
 {
+  if (this->Implementation->Inspector)
+    {
+    this->Implementation->Inspector->setProxy(
+      (src)? src->getProxy() : NULL);
+    }
   this->updateFiltersMenu(src);
+  this->updateEnableState();
 }
 
 //-----------------------------------------------------------------------------
@@ -1490,40 +1487,34 @@ void pqMainWindow::updateFiltersMenu(pqPipelineSource* source)
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindow::onActiveServerChanged(pqServer* server)
+void pqMainWindow::onActiveServerChanged(pqServer* )
 {
-  // undate filer/source menu.
+  this->updateEnableState();
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::updateEnableState()
+{
+  pqServer *server = pqApplicationCore::instance()->getActiveServer();
+  pqPipelineSource *source = pqApplicationCore::instance()->getActiveSource();
+  int num_servers = pqApplicationCore::instance()->
+    getServerManagerModel()->getNumberOfServers();
+
+
   QAction* connectAction = 
     this->serverMenu()->findChild<QAction*>("Connect");
   QAction* saveScreenshot =
     this->fileMenu()->findChild<QAction*>("SaveScreenshot");
-
   QAction* compoundFilterAction = 
     this->Implementation->ToolsMenu->findChild<QAction*>( "CompoundFilter");
+  
+  this->Implementation->SourcesMenu->setEnabled(server != 0);
+  this->Implementation->ServerDisconnectAction->setEnabled(server != 0);
+  compoundFilterAction->setEnabled(server != 0);
+  saveScreenshot->setEnabled(server != 0);
 
-  if (server)
-    {
-    this->Implementation->SourcesMenu->setEnabled(true);
-    compoundFilterAction->setEnabled(true);
-    this->Implementation->ServerDisconnectAction->setEnabled(true);
-    saveScreenshot->setEnabled(true);
-    }
-  else
-    {
-    this->Implementation->ServerDisconnectAction->setEnabled(false);
-    this->Implementation->SourcesMenu->setEnabled(false);
-    this->Implementation->FiltersMenu->setEnabled(false);
-    compoundFilterAction->setEnabled(false);
-    saveScreenshot->setEnabled(false);
-    }
-  bool can_connect = true;
-  if (pqApplicationCore::instance()->
-    getServerManagerModel()->getNumberOfServers() > 0)
-    {
-    can_connect = false;
-    }
-  connectAction->setEnabled(can_connect);
-  this->Implementation->ServerDisconnectAction->setEnabled(!can_connect);
+  this->Implementation->FiltersMenu->setEnabled(source != 0 && server != 0);
+  connectAction->setEnabled(num_servers==0);
 }
 
 //-----------------------------------------------------------------------------

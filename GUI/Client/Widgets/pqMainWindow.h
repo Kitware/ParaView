@@ -133,6 +133,10 @@ public:
 
   virtual bool eventFilter(QObject* watched, QEvent* e);
 
+  // This method determine the enable state for various menus/toobars etc,
+  // and updates it.
+  void updateEnableState();
+
 signals:
   /// Signal emitted whenever the server changes
   /**\todo Revisit this API once we truly support simultaneous connections */

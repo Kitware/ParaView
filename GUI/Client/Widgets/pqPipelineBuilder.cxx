@@ -492,7 +492,7 @@ void pqPipelineBuilder::deleteProxies(pqServer* server)
     QString groupname = iter->GetGroup();
     QString proxyname = iter->GetKey();
     iter->Next();
-    if (proxy->GetConnectionID() != serverCID)
+    if (!proxy || proxy->GetConnectionID() != serverCID)
       {
       continue;
       }
