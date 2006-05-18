@@ -134,8 +134,11 @@ void pqPipelineBrowserContextMenu::showDisplayEditor()
   dialog->setWindowTitle("Display Settings");
   QHBoxLayout* l = new QHBoxLayout(dialog);
   pqDisplayProxyEditor* editor = new pqDisplayProxyEditor(dialog);
-  editor->setDisplayProxy(source->getDisplay(0)->getProxy(), source->getProxy());
+  editor->setDisplay(source->getDisplay(0));
   l->addWidget(editor);
+  QObject::connect(editor, SIGNAL(dismiss()),
+    dialog, SLOT(accept()));
+  dialog->setModal(true);
   dialog->show();
 }
 

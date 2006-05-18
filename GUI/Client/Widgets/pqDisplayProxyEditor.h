@@ -29,18 +29,16 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #ifndef _pqDisplayProxyEditor_h
 #define _pqDisplayProxyEditor_h
 
 #include <QWidget>
 #include "pqWidgetsExport.h"
-#include "pqSMProxy.h"
-class vtkSMDisplayProxy;
 
 class pqDisplayProxyEditorInternal;
+class pqPipelineDisplay;
 
-/// Widget which provides an editor for the properties of a display proxy
+/// Widget which provides an editor for the properties of a display.
 class PQWIDGETS_EXPORT pqDisplayProxyEditor : public QWidget
 {
   Q_OBJECT
@@ -50,24 +48,25 @@ public:
   /// destructor
   ~pqDisplayProxyEditor();
 
-  /// set the proxy to display properties for  TODO: fix pqPipelineData so we don't need the sourceProxy
-  void setDisplayProxy(vtkSMDisplayProxy* displayProxy, pqSMProxy sourceProxy);
+  /// Set the display whose properties we want to edit. 
+  void setDisplay(pqPipelineDisplay* display);
+
   /// get the proxy for which properties are displayed
-  vtkSMDisplayProxy* displayProxy();
+  pqPipelineDisplay* getDisplay();
+
+signals:
+  // fired when user clicks dismiss button.
+  void dismiss();
 
 protected slots:
-
   /// internally used to update the graphics window when a property changes
   void updateView();
   void colorByChanged(const QString& val);
+  void zoomToData();
   
 protected:
-
-  // the display proxy
-  vtkSmartPointer<vtkSMDisplayProxy> DisplayProxy;
-  // the source proxy for the display (TODO remove this when pqPipeLineData can do it for us)
-  pqSMProxy SourceProxy;
   pqDisplayProxyEditorInternal* Internal;
+  void setupGUIConnections();
 
 };
 

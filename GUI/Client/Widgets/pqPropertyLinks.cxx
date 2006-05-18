@@ -693,6 +693,7 @@ void pqPropertyLinks::addPropertyLink(QObject* qObject, const char* qProperty,
   iter->smLinkedPropertyChanged();
 }
 
+//-----------------------------------------------------------------------------
 void pqPropertyLinks::removePropertyLink(QObject* qObject, 
                         const char* qProperty, const char* signal,
                         vtkSMProxy* Proxy, vtkSMProperty* Property, int Index)
@@ -709,6 +710,20 @@ void pqPropertyLinks::removePropertyLink(QObject* qObject,
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqPropertyLinks::removeAllPropertyLinks()
+{
+  pqPropertyLinksInternal::LinkMap::iterator iter;
+  for (iter = this->Internal->Links.begin(); iter != this->Internal->Links.end();
+    ++iter)
+    {
+    this->Internal->VTKConnections->Disconnect(iter->Internal->Property);
+    QObject::disconnect(iter->Internal->QtObject, 0, &*iter, 0);
+    }
+  this->Internal->Links.clear();
+}
+
+//-----------------------------------------------------------------------------
 void pqPropertyLinks::reset()
 {
   pqPropertyLinksInternal::LinkMap::iterator iter;

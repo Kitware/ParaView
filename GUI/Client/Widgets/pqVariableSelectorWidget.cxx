@@ -108,7 +108,7 @@ void pqVariableSelectorWidget::addVariable(pqVariableType type,
   switch(type)
     {
     case VARIABLE_TYPE_NONE:
-      this->Variables->addItem(name, this->variableData(type, name));
+      this->Variables->addItem("Solid Color", this->variableData(type, name));
       break;
     case VARIABLE_TYPE_NODE:
       this->Variables->addItem("Point " + name, 
