@@ -30,15 +30,15 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWVolumeMaterialPropertyWidget);
-vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.23");
+vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.24");
 
 //----------------------------------------------------------------------------
 vtkKWVolumeMaterialPropertyWidget::vtkKWVolumeMaterialPropertyWidget()
 {
-  this->PropertyChangedEvent = 
+  this->PropertyChangedEvent =
     vtkKWEvent::VolumeMaterialPropertyChangedEvent;
 
-  this->PropertyChangingEvent = 
+  this->PropertyChangingEvent =
     vtkKWEvent::VolumeMaterialPropertyChangingEvent;
 
   this->VolumeProperty          = NULL;
@@ -49,7 +49,7 @@ vtkKWVolumeMaterialPropertyWidget::vtkKWVolumeMaterialPropertyWidget()
 
   // UI
 
-  this->ComponentSelectionWidget = 
+  this->ComponentSelectionWidget =
     vtkKWScalarComponentSelectionWidget::New();
 
   this->EnableShadingCheckButton = vtkKWCheckButtonWithLabel::New();
@@ -90,7 +90,7 @@ void vtkKWVolumeMaterialPropertyWidget::SetVolumeProperty(
     {
     this->VolumeProperty->UnRegister(this);
     }
-    
+
   this->VolumeProperty = arg;
 
   if (this->VolumeProperty)
@@ -129,17 +129,17 @@ void vtkKWVolumeMaterialPropertyWidget::CreateWidget()
   this->ComponentSelectionWidget->SetSelectedComponentChangedCommand(
     this, "SelectedComponentCallback");
 
-  vtkKWMenuButtonWithLabel *menubuttonwl = 
+  vtkKWMenuButtonWithLabel *menubuttonwl =
     this->ComponentSelectionWidget->GetSelectedComponentOptionMenu();
   menubuttonwl->SetLabelWidth(label_width);
 
   this->Script("pack %s -side top -padx 2 -pady 2 -anchor w",
                this->ComponentSelectionWidget->GetWidgetName());
-  
+
   // --------------------------------------------------------------
   // Enable Shading
 
-  this->EnableShadingCheckButton->SetParent(this->ControlFrame); 
+  this->EnableShadingCheckButton->SetParent(this->ControlFrame);
   this->EnableShadingCheckButton->Create();
   this->EnableShadingCheckButton->GetLabel()->SetText(
     ks_("Material Property Editor|Enable Shading"));
@@ -167,7 +167,7 @@ void vtkKWVolumeMaterialPropertyWidget::Pack()
     return;
     }
 
-  if (this->EnableShadingCheckButton && 
+  if (this->EnableShadingCheckButton &&
       this->EnableShadingCheckButton->IsCreated())
     {
     if (this->AllowEnableShading)
@@ -177,7 +177,7 @@ void vtkKWVolumeMaterialPropertyWidget::Pack()
       }
     else
       {
-      this->Script("pack forget %s", 
+      this->Script("pack forget %s",
                    this->EnableShadingCheckButton->GetWidgetName());
       }
     }
@@ -211,7 +211,7 @@ void vtkKWVolumeMaterialPropertyWidget::Update()
     this->ComponentSelectionWidget->SetEnabled(
       this->VolumeProperty ? 0 : this->GetEnabled());
     }
-  
+
   // Shading ?
 
   if (this->EnableShadingCheckButton)
@@ -231,13 +231,13 @@ void vtkKWVolumeMaterialPropertyWidget::Update()
 
   if (this->VolumeProperty)
     {
-    double ambient = 
+    double ambient =
       this->VolumeProperty->GetAmbient(this->SelectedComponent) * 100.0;
-    double diffuse = 
+    double diffuse =
       this->VolumeProperty->GetDiffuse(this->SelectedComponent) * 100.0;
-    double specular = 
+    double specular =
       this->VolumeProperty->GetSpecular(this->SelectedComponent) * 100.0;
-    double specular_power = 
+    double specular_power =
       this->VolumeProperty->GetSpecularPower(this->SelectedComponent);
     this->UpdateScales(ambient, diffuse, specular, specular_power);
     }
@@ -250,7 +250,7 @@ void vtkKWVolumeMaterialPropertyWidget::Update()
 //----------------------------------------------------------------------------
 int vtkKWVolumeMaterialPropertyWidget::AreControlsEnabled()
 {
-  return this->VolumeProperty && 
+  return this->VolumeProperty &&
     this->VolumeProperty->GetShade(this->SelectedComponent);
 }
 
@@ -331,7 +331,7 @@ void vtkKWVolumeMaterialPropertyWidget::EnableShadingCallback(int state)
     this->InvokePropertyChangedCommand();
     this->SendStateEvent(this->PropertyChangedEvent);
     }
-  
+
   this->Update(); // some controls are enabled/disabled when shading is not on
 }
 
@@ -393,7 +393,7 @@ void vtkKWVolumeMaterialPropertyWidget::SendStateEvent(int event)
     {
     return;
     }
-  
+
   this->InvokeEvent(event, NULL);
 }
 
@@ -402,9 +402,9 @@ void vtkKWVolumeMaterialPropertyWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "SelectedComponent: " 
+  os << indent << "SelectedComponent: "
      << this->SelectedComponent << endl;
-  os << indent << "NumberOfComponents: " 
+  os << indent << "NumberOfComponents: "
      << this->NumberOfComponents << endl;
   os << indent << "AllowEnableShading: "
      << (this->AllowEnableShading ? "On" : "Off") << endl;

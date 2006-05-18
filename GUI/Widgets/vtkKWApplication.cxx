@@ -70,7 +70,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.288");
+vtkCxxRevisionMacro(vtkKWApplication, "1.289");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -1451,7 +1451,7 @@ int vtkKWApplication::GetBooleanRegistryValue(
   int allset = 0;
   if (this->GetRegistryValue(level, subkey, key, buffer))
     {
-    if (buffer && trueval && !strncmp(buffer+1, trueval+1, strlen(trueval)-1))
+    if (trueval && !strncmp(buffer+1, trueval+1, strlen(trueval)-1))
       {
       allset = 1;
       }
@@ -1481,7 +1481,7 @@ int vtkKWApplication::RetrieveColorRegistryValue(
         level, "Colors", key, buffer) )
     {
     if (*buffer)
-      {      
+      {
       sscanf(buffer, "Color: %lf %lf %lf", rgb, rgb+1, rgb+2);
       ok = 1;
       }
