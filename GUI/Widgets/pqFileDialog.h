@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "QtWidgetsExport.h"
 #include <QDialog>
-#include <QModelIndex>
 
 class pqFileDialogModel;
 class pqFileDialogFilter;
@@ -89,7 +88,6 @@ signals:
 protected:
   pqFileDialogModel* const Model;
   Ui::pqFileDialog* const Ui;
-  QModelIndex Temp;
   pqFileDialogFilter* Filter;
   
 protected slots:
@@ -99,7 +97,7 @@ protected slots:
   void onManualEntry(const QString&);
   void onNavigate(const QString&);
   void onNavigateUp();
-  void onNavigateDown();
+  void onNavigateDown(const QModelIndex&);
   void onFilterChange(const QString&);
 
 private:

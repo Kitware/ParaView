@@ -53,7 +53,7 @@ void pqFileDialogFilter::setFilter(const QStringList& wildcards)
   Wildcards.clear();
   foreach(QString p, wildcards)
     {
-    Wildcards.append(QRegExp(p, Qt::CaseSensitive, QRegExp::Wildcard));
+    Wildcards.append(QRegExp(p, Qt::CaseInsensitive, QRegExp::Wildcard));
     }
 }
 

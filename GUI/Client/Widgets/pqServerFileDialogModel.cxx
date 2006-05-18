@@ -146,8 +146,7 @@ public:
       const char* file_name = files->GetString(cc);
       this->FileList.push_back(FileInfo(file_name, file_name, false, false));
       }
-    emit dataChanged(QModelIndex(), QModelIndex());
-    emit layoutChanged();
+    this->reset();
   }
 
   QStringList getFilePaths(const QModelIndex& Index)

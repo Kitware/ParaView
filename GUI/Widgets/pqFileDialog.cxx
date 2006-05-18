@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialogFilter.h"
 
 #include <QDir>
-#include <QTimer>
 #include <QtDebug>
 
 #include <vtkstd/set>
@@ -253,8 +252,7 @@ void pqFileDialog::onActivated(const QModelIndex& Index)
 
   if(this->Model->isDir(i))
     {
-    this->Temp = i;
-    QTimer::singleShot(0, this, SLOT(onNavigateDown()));
+    this->onNavigateDown(i);
     }
   else
     {
@@ -299,13 +297,13 @@ void pqFileDialog::onNavigateUp()
   this->Model->setCurrentPath(this->Model->getParentPath(this->Model->getCurrentPath()));
 }
 
-void pqFileDialog::onNavigateDown()
+void pqFileDialog::onNavigateDown(const QModelIndex& idx)
 {
-  if(!this->Model->isDir(this->Temp))
+  if(!this->Model->isDir(idx))
     return;
     
-  const QStringList paths =
-    this->Model->getFilePaths(this->Temp);
+  const QStringList paths = this->Model->getFilePaths(idx);
+
   if(1 != paths.size())
     return;
     

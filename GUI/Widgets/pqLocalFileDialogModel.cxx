@@ -167,8 +167,7 @@ public:
     if(numbered_files.Files.size())
       this->FileGroups.push_back(numbered_files);
 
-    emit layoutChanged();
-    emit dataChanged(QModelIndex(), QModelIndex());
+    this->reset();
   }
 
   QStringList GetFilePaths(const QModelIndex& Index)
