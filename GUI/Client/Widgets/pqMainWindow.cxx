@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqSourceProxyInfo.h"
 #include "pqVariableSelectorWidget.h"
+#include "pqVCRController.h"
 #include "pqXMLUtil.h"
 
 #include <pqConnect.h>
@@ -138,7 +139,8 @@ public:
     CompoundProxyToolBar(0),
     PropertyToolbar(0),
     UndoRedoToolBar(0),
-    VariableSelectorToolBar(0)
+    VariableSelectorToolBar(0),
+    VCRController(0)
   {
 
   }
@@ -179,6 +181,7 @@ public:
   QToolBar* PropertyToolbar;
   QToolBar* UndoRedoToolBar;
   QToolBar* VariableSelectorToolBar;
+  pqVCRController* VCRController;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -415,22 +418,26 @@ void pqMainWindow::createStandardObjectInspector(bool visible)
 //-----------------------------------------------------------------------------
 void pqMainWindow::createStandardElementInspector(bool visible)
 {
-  this->Implementation->ElementInspectorDock = new QDockWidget("Element Inspector View", this)
+  this->Implementation->ElementInspectorDock = 
+    new QDockWidget("Element Inspector View", this)
     << pqSetName("ElementInspectorDock");
     
   this->Implementation->ElementInspectorDock->setAllowedAreas(
     Qt::BottomDockWidgetArea |
     Qt::LeftDockWidgetArea |
     Qt::RightDockWidgetArea);
-  this->Implementation->ElementInspectorDock->setFeatures(QDockWidget::AllDockWidgetFeatures);
+  this->Implementation->ElementInspectorDock->setFeatures(
+    QDockWidget::AllDockWidgetFeatures);
 
-  pqElementInspectorWidget* const element_inspector = new pqElementInspectorWidget(this->Implementation->ElementInspectorDock);
+  pqElementInspectorWidget* const element_inspector = 
+    new pqElementInspectorWidget(this->Implementation->ElementInspectorDock);
   this->Implementation->ElementInspectorDock->setWidget(element_inspector);
 
-  this->addStandardDockWidget(Qt::BottomDockWidgetArea, this->Implementation->ElementInspectorDock, QIcon(), visible);
-
+  this->addStandardDockWidget(Qt::BottomDockWidgetArea, 
+    this->Implementation->ElementInspectorDock, QIcon(), visible);
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindow::createStandardVCRToolBar()
 {
   QToolBar* const toolbar = new QToolBar(tr("VCR Controls"), this)
@@ -442,13 +449,20 @@ void pqMainWindow::createStandardVCRToolBar()
   toolbar->addWidget(vcr_controls)
     << pqSetName("VCRControls");
 
-  this->connect(vcr_controls, SIGNAL(first()), SLOT(onFirstTimeStep()));
-  this->connect(vcr_controls, SIGNAL(back()), SLOT(onPreviousTimeStep()));
-  this->connect(vcr_controls, SIGNAL(forward()), SLOT(onNextTimeStep()));
-  this->connect(vcr_controls, SIGNAL(last()), SLOT(onLastTimeStep()));
+  this->Implementation->VCRController = new pqVCRController(this);
+  
+  this->connect(vcr_controls, SIGNAL(first()),  
+    this->Implementation->VCRController, SLOT(onFirst()));
+  this->connect(vcr_controls, SIGNAL(back()),   
+    this->Implementation->VCRController, SLOT(onBack()));
+  this->connect(vcr_controls, SIGNAL(forward()),
+    this->Implementation->VCRController, SLOT(onForward()));
+  this->connect(vcr_controls, SIGNAL(last()),   
+    this->Implementation->VCRController, SLOT(onLast()));
 
   this->addToolBar(Qt::TopToolBarArea, toolbar);
 }
+
 //-----------------------------------------------------------------------------
 void pqMainWindow::createUndoRedoToolBar()
 {
@@ -1233,7 +1247,8 @@ void pqMainWindow::onRecordTest()
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), 
     this, tr("Record Test:"), QString(), filters);
   file_dialog->setObjectName("ToolsRecordTestDialog");
-  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onRecordTest(const QStringList&)));
+  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
+    this, SLOT(onRecordTest(const QStringList&)));
   file_dialog->show();
 }
 
@@ -1258,7 +1273,8 @@ void pqMainWindow::onPlayTest()
   pqFileDialog* const file_dialog = new pqFileDialog(new
     pqLocalFileDialogModel(), this, tr("Play Test:"), QString(), filters);
   file_dialog->setObjectName("ToolsPlayTestDialog");
-  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onPlayTest(const QStringList&)));
+  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
+    this, SLOT(onPlayTest(const QStringList&)));
   file_dialog->show();
 }
 
@@ -1288,7 +1304,9 @@ void pqMainWindow::onPythonShell()
 void pqMainWindow::onNewSelections(vtkSMProxy*, vtkUnstructuredGrid* selections)
 {
   // Update the element inspector ...
-  if(pqElementInspectorWidget* const element_inspector = this->Implementation->ElementInspectorDock->findChild<pqElementInspectorWidget*>())
+  if(pqElementInspectorWidget* const element_inspector = 
+    this->Implementation->ElementInspectorDock->findChild
+    <pqElementInspectorWidget*>())
     {
     element_inspector->addElements(selections);
     }
@@ -1311,7 +1329,8 @@ void pqMainWindow::onCreateCompoundProxy(QAction* action)
 //-----------------------------------------------------------------------------
 void pqMainWindow::onCompoundProxyAdded(const QString&, const QString& proxy)
 {
-  this->Implementation->CompoundProxyToolBar->addAction(QIcon(":/pqWidgets/pqBundle32.png"), proxy) 
+  this->Implementation->CompoundProxyToolBar->addAction(
+    QIcon(":/pqWidgets/pqBundle32.png"), proxy) 
     << pqSetName(proxy) << pqSetData(proxy);
 }
 
@@ -1505,166 +1524,6 @@ void pqMainWindow::onActiveServerChanged(pqServer* server)
     }
   connectAction->setEnabled(can_connect);
   this->Implementation->ServerDisconnectAction->setEnabled(!can_connect);
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindow::onFirstTimeStep()
-{
-  /* FIXME
-  if(!this->Implementation->CurrentSource)
-    return;
-
-  const QString source_class = this->Implementation->CurrentProxy->GetVTKClassName();
-  if(source_class != "vtkExodusReader" && source_class != "vtkPExodusReader")
-    return;
-
-  vtkSMIntVectorProperty* const timestep =
-    vtkSMIntVectorProperty::SafeDownCast(this->Implementation->CurrentProxy->GetProperty("TimeStep"));
-    
-  if(!timestep)
-    return;
-
-  vtkSMIntRangeDomain* const timestep_range =
-    vtkSMIntRangeDomain::SafeDownCast(timestep->GetDomain("range"));
-    
-  if(!timestep_range)
-    return;
-
-  int exists = 0;
-  int first_step = timestep_range->GetMinimum(0, exists);
-
-  timestep->SetElement(0, first_step);
-  
-  this->Implementation->CurrentProxy->UpdateVTKObjects();
-  if(pqPipelineData *pipeline = pqPipelineData::instance())
-    {
-    pqPipelineSource *source = this->Implementation->CurrentSource;
-    if(source)
-      {
-      source->getDisplay()->UpdateWindows();
-      }
-    }
-    */
-}
-
-void pqMainWindow::onPreviousTimeStep()
-{
-  /*
-  if(!this->Implementation->CurrentServer)
-    return;
-    
-  if(!this->Implementation->CurrentSource)
-    return;
-
-  const QString source_class = this->Implementation->CurrentProxy->GetVTKClassName();
-  if(source_class != "vtkExodusReader" && source_class != "vtkPExodusReader")
-    return;
-
-  vtkSMIntVectorProperty* const timestep =
-    vtkSMIntVectorProperty::SafeDownCast(this->Implementation->CurrentProxy->GetProperty("TimeStep"));
-    
-  if(!timestep)
-    return;
-
-  vtkSMIntRangeDomain* const timestep_range =
-    vtkSMIntRangeDomain::SafeDownCast(timestep->GetDomain("range"));
-    
-  if(!timestep_range)
-    return;
-
-  int exists = 0;
-  int first_step = timestep_range->GetMinimum(0, exists);
-
-  timestep->SetElement(0, vtkstd::max(first_step, timestep->GetElement(0) - 1));
-  
-  this->Implementation->CurrentProxy->UpdateVTKObjects();
-  if(pqPipelineData *pipeline = pqPipelineData::instance())
-    {
-    pqPipelineSource *source = this->Implementation->CurrentSource;
-    if(source)
-      {
-      source->getDisplay()->UpdateWindows();
-      }
-    }
-    */
-}
-
-void pqMainWindow::onNextTimeStep()
-{
-  /*
-  if(!this->Implementation->CurrentSource)
-    return;
-
-  const QString source_class = this->Implementation->CurrentProxy->GetVTKClassName();
-  if(source_class != "vtkExodusReader" && source_class != "vtkPExodusReader")
-    return;
-
-  vtkSMIntVectorProperty* const timestep =
-    vtkSMIntVectorProperty::SafeDownCast(this->Implementation->CurrentProxy->GetProperty("TimeStep"));
-    
-  if(!timestep)
-    return;
-
-  vtkSMIntRangeDomain* const timestep_range =
-    vtkSMIntRangeDomain::SafeDownCast(timestep->GetDomain("range"));
-    
-  if(!timestep_range)
-    return;
-
-  int exists = 0;
-  int last_step = timestep_range->GetMaximum(0, exists);
-
-  timestep->SetElement(0, vtkstd::min(last_step, timestep->GetElement(0) + 1));
-  
-  this->Implementation->CurrentProxy->UpdateVTKObjects();
-  if(pqPipelineData *pipeline = pqPipelineData::instance())
-    {
-    pqPipelineSource *source = this->Implementation->CurrentSource;
-    if(source)
-      {
-      source->getDisplay()->UpdateWindows();
-      }
-    }
-    */
-}
-
-void pqMainWindow::onLastTimeStep()
-{
-  /*
-  if(!this->Implementation->CurrentSource)
-    return;
-    
-  const QString source_class = this->Implementation->CurrentProxy->GetVTKClassName();
-  if(source_class != "vtkExodusReader" && source_class != "vtkPExodusReader")
-    return;
-
-  vtkSMIntVectorProperty* const timestep =
-    vtkSMIntVectorProperty::SafeDownCast(this->Implementation->CurrentProxy->GetProperty("TimeStep"));
-    
-  if(!timestep)
-    return;
-
-  vtkSMIntRangeDomain* const timestep_range =
-    vtkSMIntRangeDomain::SafeDownCast(timestep->GetDomain("range"));
-    
-  if(!timestep_range)
-    return;
-
-  int exists = 0;
-  int last_step = timestep_range->GetMaximum(0, exists);
-
-  timestep->SetElement(0, last_step);
-  
-  this->Implementation->CurrentProxy->UpdateVTKObjects();
-  if(pqPipelineData *pipeline = pqPipelineData::instance())
-    {
-    pqPipelineSource *source = this->Implementation->CurrentSource;
-    if(source)
-      {
-      source->getDisplay()->UpdateWindows();
-      }
-    }
-    */
 }
 
 //-----------------------------------------------------------------------------

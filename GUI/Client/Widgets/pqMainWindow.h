@@ -167,11 +167,6 @@ public slots:
   
   void onPythonShell();
 
-  void onFirstTimeStep();
-  void onPreviousTimeStep();
-  void onNextTimeStep();
-  void onLastTimeStep();
-
   // Called when the Undo/Redo stack changes.
   void onUndoRedoStackChanged(bool canUndo, QString,
     bool canRedo, QString);

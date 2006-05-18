@@ -63,6 +63,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqThresholdPanel.h
   pqUndoStack.h
   pqVariableSelectorWidget.h
+  pqVCRController.h
 )
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
@@ -208,6 +209,8 @@ ADD_LIBRARY(pqWidgets
   pqVariableSelectorWidget.cxx
   pqVariableSelectorWidget.h
   pqVariableType.h
+  pqVCRController.cxx
+  pqVCRController.h
   pqWidgetsExport.h
   pqXMLUtil.cxx
   pqXMLUtil.h
