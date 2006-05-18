@@ -14,13 +14,15 @@
 =========================================================================*/
 #include "vtkSMCompoundProxy.h"
 
+#include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSmartPointer.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyInternals.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMStateLoader.h"
-#include "vtkSmartPointer.h"
 
 #include <vtkstd/set>
 #include <vtkstd/list>
@@ -28,11 +30,34 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCompoundProxy);
-vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.10");
 
 struct vtkSMCompoundProxyInternals
 {
   vtkstd::set<vtkStdString> ProxyProperties;
+};
+
+//----------------------------------------------------------------------------
+class vtkSMCompoundProxyObserver : public vtkCommand
+{
+public:
+  static vtkSMCompoundProxyObserver* New()
+    { return new vtkSMCompoundProxyObserver; }
+
+  void SetTarget(vtkSMCompoundProxy* target)
+    {
+    this->Target = target;
+    }
+  virtual void Execute(vtkObject*, unsigned long evenid, void* calldata)
+    {
+    if (this->Target)
+      {
+      this->Target->InvokeEvent(evenid, calldata);
+      }
+    }
+protected:
+  vtkSMCompoundProxyObserver() { this->Target = 0; }
+  vtkSMCompoundProxy* Target;
 };
 
 //----------------------------------------------------------------------------
@@ -41,16 +66,17 @@ vtkSMCompoundProxy::vtkSMCompoundProxy()
   this->MainProxy = 0;
 
   this->Internal = new vtkSMCompoundProxyInternals;
+  this->Observer = vtkSMCompoundProxyObserver::New();
+  this->Observer->SetTarget(this);
 }
 
 //----------------------------------------------------------------------------
 vtkSMCompoundProxy::~vtkSMCompoundProxy()
 {
-  if (this->MainProxy)
-    {
-    this->MainProxy->Delete();
-    }
-  this->MainProxy = 0;
+  this->SetMainProxy(0);
+
+  this->Observer->SetTarget(NULL);
+  this->Observer->Delete();
 
   delete this->Internal;
 }
@@ -58,10 +84,18 @@ vtkSMCompoundProxy::~vtkSMCompoundProxy()
 //----------------------------------------------------------------------------
 void vtkSMCompoundProxy::SetMainProxy(vtkSMProxy* p)
 {
+  if (this->MainProxy)
+    {
+    this->MainProxy->RemoveObserver(this->Observer);
+    }
+
   vtkSetObjectBodyMacro(MainProxy, vtkSMProxy, p);
   if (this->MainProxy && !this->MainProxy->ObjectsCreated)
     {
     this->MainProxy->SetConnectionID(this->ConnectionID);
+    this->MainProxy->AddObserver(vtkCommand::ModifiedEvent, this->Observer);
+    this->MainProxy->AddObserver(vtkCommand::PropertyModifiedEvent, 
+      this->Observer);
     }
 }
 
@@ -102,7 +136,9 @@ void vtkSMCompoundProxy::AddProxy(const char* name, vtkSMProxy* proxy)
 {
   if (!this->MainProxy)
     {
-    this->MainProxy = vtkSMProxy::New();
+    vtkSMProxy* mp = vtkSMProxy::New();
+    this->SetMainProxy(mp);
+    mp->Delete();
     }
   this->MainProxy->AddSubProxy(name, proxy);
 }
@@ -171,6 +207,7 @@ void vtkSMCompoundProxy::UpdateVTKObjects()
     return;
     }
   this->MainProxy->UpdateVTKObjects();
+  this->Superclass::UpdateVTKObjects();
 }
 
 //---------------------------------------------------------------------------
@@ -460,6 +497,20 @@ vtkPVXMLElement* vtkSMCompoundProxy::SaveDefinition(vtkPVXMLElement* root)
     }
 
   return defElement;
+}
+
+//----------------------------------------------------------------------------
+vtkSMSourceProxy* vtkSMCompoundProxy::GetUnconsumedProxy()
+{
+  for (unsigned int i = this->GetNumberOfProxies(); i > 0; i--)
+    {
+    vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(this->GetProxy(i-1));
+    if (src)
+      {
+      return src;
+      }
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------

@@ -37,6 +37,9 @@
 struct vtkSMCompoundProxyInternals;
 //ETX
 
+class vtkSMSourceProxy;
+class vtkSMCompoundProxyObserver;
+
 class VTK_EXPORT vtkSMCompoundProxy : public vtkSMProxy
 {
 public:
@@ -115,6 +118,13 @@ public:
   // Description:
   // Set the connection ID.
   virtual void SetConnectionID(vtkIdType id);
+
+  // Description:
+  // This simply starts traversing the subproxies from the last
+  // and returns the first source proxy encountred. Eventually, 
+  // this will be defined in the definition. 
+  vtkSMSourceProxy* GetUnconsumedProxy();
+
 protected:
   vtkSMCompoundProxy();
   ~vtkSMCompoundProxy();
@@ -130,6 +140,7 @@ protected:
   void HandleExposedProperties(vtkPVXMLElement* element);
 
   vtkSMCompoundProxyInternals* Internal;
+  vtkSMCompoundProxyObserver* Observer;
 
   //BTX
   friend class vtkSMCompoundProxyDefinitionLoader;
