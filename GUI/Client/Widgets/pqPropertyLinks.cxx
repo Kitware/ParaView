@@ -210,18 +210,8 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged() const
       case pqSMAdaptor::PROXY:
         {
         pqSMProxy p;
-        if(this->Internal->UseUncheckedProperties)
-          {
-#if 0
-          p = pqSMAdaptor::getUncheckedProxyProperty(this->Internal->Proxy, 
-                this->Internal->Property);
-#endif
-          }
-        else
-          {
-          p = pqSMAdaptor::getProxyProperty(this->Internal->Proxy, 
-                    this->Internal->Property);
-          }
+        p = pqSMAdaptor::getProxyProperty(this->Internal->Proxy, 
+                  this->Internal->Property);
         prop.setValue(p);
         if(prop != old)
           {
@@ -232,18 +222,8 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged() const
       break;
       case pqSMAdaptor::ENUMERATION:
         {
-        if(this->Internal->UseUncheckedProperties)
-          {
-#if 0
-          prop = pqSMAdaptor::getUncheckedEnumerationProperty(
-                  this->Internal->Proxy, this->Internal->Property);
-#endif
-          }
-        else
-          {
-          prop = pqSMAdaptor::getEnumerationProperty(this->Internal->Proxy, 
-                   this->Internal->Property);
-          }
+        prop = pqSMAdaptor::getEnumerationProperty(this->Internal->Proxy, 
+                 this->Internal->Property);
         if(prop != old)
           {
           this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
@@ -253,18 +233,8 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged() const
       break;
       case pqSMAdaptor::SINGLE_ELEMENT:
         {
-        if(this->Internal->UseUncheckedProperties)
-          {
-#if 0
-          prop = pqSMAdaptor::getUncheckedElementProperty(
-                 this->Internal->Proxy, this->Internal->Property);
-#endif
-          }
-        else
-          {
-          prop = pqSMAdaptor::getElementProperty(this->Internal->Proxy, 
-                                            this->Internal->Property);
-          }
+        prop = pqSMAdaptor::getElementProperty(this->Internal->Proxy, 
+                                          this->Internal->Property);
         if(prop != old)
           {
           this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
@@ -274,19 +244,8 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged() const
       break;
       case pqSMAdaptor::FILE_LIST:
         {
-        if(this->Internal->UseUncheckedProperties)
-          {
-#if 0
-          prop = pqSMAdaptor::getUncheckedFileListProperty(
-                       this->Internal->Proxy, 
-                       this->Internal->Property);
-#endif
-          }
-        else
-          {
-          prop = pqSMAdaptor::getFileListProperty(this->Internal->Proxy, 
-                    this->Internal->Property);
-          }
+        prop = pqSMAdaptor::getFileListProperty(this->Internal->Proxy, 
+                  this->Internal->Property);
         if(prop != old)
           {
           this->Internal->QtObject->setProperty(this->Internal->QtProperty,
@@ -297,21 +256,9 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged() const
       case pqSMAdaptor::SELECTION:
         {
         QList<QVariant> sel;
-        if(this->Internal->UseUncheckedProperties)
-          {
-#if 0
-          sel = pqSMAdaptor::getUncheckedSelectionProperty(
-                                      this->Internal->Proxy,
-                                      this->Internal->Property, 
-                                      this->Internal->Index);
-#endif
-          }
-        else
-          {
-          sel = pqSMAdaptor::getSelectionProperty(this->Internal->Proxy, 
-                                      this->Internal->Property, 
-                                      this->Internal->Index);
-          }
+        sel = pqSMAdaptor::getSelectionProperty(this->Internal->Proxy, 
+                                    this->Internal->Property, 
+                                    this->Internal->Index);
 
         if(sel.size() == 2 && sel[1] != old)
           {
@@ -324,19 +271,8 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged() const
         {
         if(this->Internal->Index == -1)
           {
-          if(this->Internal->UseUncheckedProperties)
-            {
-#if 0
-            prop = pqSMAdaptor::getUncheckedMultipleElementProperty(
-                                   this->Internal->Proxy, 
-                                   this->Internal->Property);
-#endif
-            }
-          else
-            {
-            prop = pqSMAdaptor::getMultipleElementProperty(this->Internal->Proxy, 
-                                   this->Internal->Property);
-            }
+          prop = pqSMAdaptor::getMultipleElementProperty(this->Internal->Proxy, 
+                                 this->Internal->Property);
           if(prop != old)
             {
             this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
@@ -345,21 +281,9 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged() const
           }
         else
           {
-          if(this->Internal->UseUncheckedProperties)
-            {
-#if 0
-            prop = pqSMAdaptor::getUncheckedMultipleElementProperty(
-                                     this->Internal->Proxy, 
-                                     this->Internal->Property, 
-                                     this->Internal->Index);
-#endif
-            }
-          else
-            {
-            prop = pqSMAdaptor::getMultipleElementProperty(this->Internal->Proxy, 
-                                     this->Internal->Property, 
-                                     this->Internal->Index);
-            }
+          prop = pqSMAdaptor::getMultipleElementProperty(this->Internal->Proxy, 
+                                   this->Internal->Property, 
+                                   this->Internal->Index);
           if(prop != old)
             {
             this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
@@ -394,30 +318,18 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
       {
       case pqSMAdaptor::PROXY:
         {
-        pqSMProxy p;
         if(this->Internal->UseUncheckedProperties)
           {
-#if 0
-          p = pqSMAdaptor::getUncheckedProxyProperty(this->Internal->Proxy, 
-                                            this->Internal->Property);
-#endif
+          pqSMAdaptor::setUncheckedProxyProperty(this->Internal->Proxy, 
+                this->Internal->Property, prop.value<pqSMProxy>());
           }
         else
           {
+          pqSMProxy p;
           p = pqSMAdaptor::getProxyProperty(this->Internal->Proxy, 
                                             this->Internal->Property);
-          }
-        old.setValue(p);
-        if(prop != old)
-          {
-          if(this->Internal->UseUncheckedProperties)
-            {
-#if 0
-            pqSMAdaptor::setUncheckedProxyProperty(this->Internal->Proxy, 
-                  this->Internal->Property, prop.value<pqSMProxy>());
-#endif
-            }
-          else
+          old.setValue(p);
+          if(prop != old)
             {
             pqSMAdaptor::setProxyProperty(this->Internal->Proxy, 
                   this->Internal->Property, prop.value<pqSMProxy>());
@@ -429,27 +341,14 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
         {
         if(this->Internal->UseUncheckedProperties)
           {
-#if 0
-          old = pqSMAdaptor::getUncheckedEnumerationProperty(
-                                this->Internal->Proxy,
-                                this->Internal->Property);
-#endif
+          pqSMAdaptor::setUncheckedEnumerationProperty(this->Internal->Proxy, 
+                                  this->Internal->Property, prop);
           }
         else
           {
           old = pqSMAdaptor::getEnumerationProperty(this->Internal->Proxy, 
                                 this->Internal->Property);
-          }
-        if(prop != old)
-          {
-          if(this->Internal->UseUncheckedProperties)
-            {
-#if 0
-            pqSMAdaptor::setUncheckedEnumerationProperty(this->Internal->Proxy, 
-                                    this->Internal->Property, prop);
-#endif
-            }
-          else
+          if(prop != old)
             {
             pqSMAdaptor::setEnumerationProperty(this->Internal->Proxy, 
                                     this->Internal->Property, prop);
@@ -461,26 +360,14 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
         {
         if(this->Internal->UseUncheckedProperties)
           {
-#if 0
-          old = pqSMAdaptor::getUncheckedElementProperty(this->Internal->Proxy, 
-                                        this->Internal->Property);
-#endif
+          pqSMAdaptor::setUncheckedElementProperty(this->Internal->Proxy, 
+                               this->Internal->Property, prop);
           }
         else
           {
           old = pqSMAdaptor::getElementProperty(this->Internal->Proxy, 
                                         this->Internal->Property);
-          }
-        if(prop != old)
-          {
-          if(this->Internal->UseUncheckedProperties)
-            {
-#if 0
-            pqSMAdaptor::setUncheckedElementProperty(this->Internal->Proxy, 
-                                 this->Internal->Property, prop);
-#endif
-            }
-          else
+          if(prop != old)
             {
             pqSMAdaptor::setElementProperty(this->Internal->Proxy, 
                                  this->Internal->Property, prop);
@@ -492,26 +379,14 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
         {
         if(this->Internal->UseUncheckedProperties)
           {
-#if 0
-          old = pqSMAdaptor::getUncheckedFileListProperty(this->Internal->Proxy, 
-                                   this->Internal->Property);
-#endif
+          pqSMAdaptor::setUncheckedFileListProperty(this->Internal->Proxy, 
+                                  this->Internal->Property, prop.toString());
           }
         else
           {
           old = pqSMAdaptor::getFileListProperty(this->Internal->Proxy, 
                                    this->Internal->Property);
-          }
-        if(prop != old)
-          {
-          if(this->Internal->UseUncheckedProperties)
-            {
-#if 0
-            pqSMAdaptor::setUncheckedFileListProperty(this->Internal->Proxy, 
-                                    this->Internal->Property, prop.toString());
-#endif
-            }
-          else
+          if(prop != old)
             {
             pqSMAdaptor::setFileListProperty(this->Internal->Proxy, 
                                     this->Internal->Property, prop.toString());
@@ -521,35 +396,30 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
       break;
       case pqSMAdaptor::SELECTION:
         {
-        QList<QVariant> sel;
         if(this->Internal->UseUncheckedProperties)
           {
-#if 0
-          sel = pqSMAdaptor::getUncheckedSelectionProperty(this->Internal->Proxy, 
-                                               this->Internal->Property, 
-                                               this->Internal->Index);
-#endif
-          }
-        else
-          {
+          QList<QVariant> sel;
           sel = pqSMAdaptor::getSelectionProperty(this->Internal->Proxy, 
                                                this->Internal->Property, 
                                                this->Internal->Index);
-          }
-        if(sel.size() == 2 && prop != sel[1])
-          {
-          sel[1] = prop;
-          if(this->Internal->UseUncheckedProperties)
+          if(sel.size() == 2)
             {
-#if 0
+            sel[1] = prop;
             pqSMAdaptor::setUncheckedSelectionProperty(this->Internal->Proxy, 
-                         this->Internal->Property, this->Internal->Index, sel);
-#endif
+                         this->Internal->Property, sel);
             }
-          else
+          }
+        else
+          {
+          QList<QVariant> sel;
+          sel = pqSMAdaptor::getSelectionProperty(this->Internal->Proxy, 
+                                               this->Internal->Property, 
+                                               this->Internal->Index);
+          if(sel.size() == 2 && prop != sel[1])
             {
+            sel[1] = prop;
             pqSMAdaptor::setSelectionProperty(this->Internal->Proxy, 
-                         this->Internal->Property, this->Internal->Index, sel);
+                         this->Internal->Property, sel);
             }
           }
         }
@@ -560,28 +430,15 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
           {
           if(this->Internal->UseUncheckedProperties)
             {
-#if 0
-            old = pqSMAdaptor::getUncheckedMultipleElementProperty(
-                                   this->Internal->Proxy, 
-                                   this->Internal->Property);
-#endif
+            pqSMAdaptor::setUncheckedMultipleElementProperty(
+                            this->Internal->Proxy, 
+                            this->Internal->Property, prop.toList());
             }
           else
             {
             old = pqSMAdaptor::getMultipleElementProperty(this->Internal->Proxy, 
                                    this->Internal->Property);
-            }
-          if(prop != old)
-            {
-            if(this->Internal->UseUncheckedProperties)
-              {
-#if 0
-              pqSMAdaptor::setUncheckedMultipleElementProperty(
-                              this->Internal->Proxy, 
-                              this->Internal->Property, prop.toList());
-#endif
-              }
-            else
+            if(prop != old)
               {
               pqSMAdaptor::setMultipleElementProperty(this->Internal->Proxy, 
                               this->Internal->Property, prop.toList());
@@ -592,28 +449,15 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
           {
           if(this->Internal->UseUncheckedProperties)
             {
-#if 0
-            old = pqSMAdaptor::getUncheckedMultipleElementProperty(
-                            this->Internal->Proxy, 
-                            this->Internal->Property, this->Internal->Index);
-#endif
+            pqSMAdaptor::setUncheckedMultipleElementProperty(
+                      this->Internal->Proxy, 
+                      this->Internal->Property, this->Internal->Index, prop);
             }
           else
             {
             old = pqSMAdaptor::getMultipleElementProperty(this->Internal->Proxy, 
                             this->Internal->Property, this->Internal->Index);
-            }
-          if(prop != old)
-            {
-            if(this->Internal->UseUncheckedProperties)
-              {
-#if 0
-              pqSMAdaptor::setUncheckedMultipleElementProperty(
-                        this->Internal->Proxy, 
-                        this->Internal->Property, this->Internal->Index, prop);
-#endif
-              }
-            else
+            if(prop != old)
               {
               pqSMAdaptor::setMultipleElementProperty(this->Internal->Proxy, 
                         this->Internal->Property, this->Internal->Index, prop);

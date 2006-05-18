@@ -71,62 +71,128 @@ public:
   /// Get the type of the property
   static PropertyType getPropertyType(vtkSMProperty* Property);
 
-  /// get the proxy for a property, for example, glyph filter accepts a source (proxy) to glyph with
-  static pqSMProxy getProxyProperty(vtkSMProxy* Proxy, vtkSMProperty* Property);
-  /// get the proxy for a property, for example, glyph filter accepts a source (proxy) to glyph with
-  static void setProxyProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, pqSMProxy Value);
+  /// get the proxy for a property
+  /// for example, glyph filter accepts a source (proxy) to glyph with
+  static pqSMProxy getProxyProperty(vtkSMProxy* Proxy, 
+                                    vtkSMProperty* Property);
+  /// get the proxy for a property
+  /// for example, glyph filter accepts a source (proxy) to glyph with
+  static void setProxyProperty(vtkSMProxy* Proxy, 
+                               vtkSMProperty* Property, 
+                               pqSMProxy Value);
+  static void setUncheckedProxyProperty(vtkSMProxy* Proxy, 
+                               vtkSMProperty* Property, 
+                               pqSMProxy Value);
   
-  /// get the list of proxies for a property, for example, append filter accepts a list of proxies
-  static QList<pqSMProxy> getProxyListProperty(vtkSMProxy* Proxy, vtkSMProperty* Property);
-  /// get the list of proxies for a property, for example, append filter accepts a list of proxies
-  static void setProxyListProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QList<pqSMProxy> Value);
+  /// get the list of proxies for a property
+  /// for example, append filter accepts a list of proxies
+  static QList<pqSMProxy> getProxyListProperty(vtkSMProxy* Proxy, 
+                                               vtkSMProperty* Property);
+  /// get the list of proxies for a property
+  /// for example, append filter accepts a list of proxies
+  static void setProxyListProperty(vtkSMProxy* Proxy, 
+                                   vtkSMProperty* Property, 
+                                   QList<pqSMProxy> Value);
 
   /// get the list of possible proxies for a property
-  static QList<pqSMProxy> getProxyPropertyDomain(vtkSMProxy* Proxy, vtkSMProperty* Property);
+  static QList<pqSMProxy> getProxyPropertyDomain(vtkSMProxy* Proxy, 
+                                                 vtkSMProperty* Property);
 
 
   /// get the pairs of selections for a selection property
-  static QList<QList<QVariant> > getSelectionProperty(vtkSMProxy* Proxy, vtkSMProperty* Property);
+  static QList<QList<QVariant> > getSelectionProperty(vtkSMProxy* Proxy, 
+                                                      vtkSMProperty* Property);
   /// get the pairs of selections for a selection property
-  static QList<QVariant> getSelectionProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index);
+  static QList<QVariant> getSelectionProperty(vtkSMProxy* Proxy, 
+                                              vtkSMProperty* Property, 
+                                              unsigned int Index);
   /// set the pairs of selections for a selection property
-  static void setSelectionProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QList<QList<QVariant> > Value);
+  static void setSelectionProperty(vtkSMProxy* Proxy, 
+                                   vtkSMProperty* Property, 
+                                   QList<QList<QVariant> > Value);
+  static void setUncheckedSelectionProperty(vtkSMProxy* Proxy, 
+                                   vtkSMProperty* Property, 
+                                   QList<QList<QVariant> > Value);
   /// set the pairs of selections for a selection property
-  static void setSelectionProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index, QList<QVariant> Value);
+  static void setSelectionProperty(vtkSMProxy* Proxy, 
+                                   vtkSMProperty* Property, 
+                                   QList<QVariant> Value);
+  static void setUncheckedSelectionProperty(vtkSMProxy* Proxy, 
+                                   vtkSMProperty* Property, 
+                                   QList<QVariant> Value);
   /// get the possible names for the selection property
   static QList<QVariant> getSelectionPropertyDomain(vtkSMProperty* Property);
   
   /// get the enumeration for a property
-  static QVariant getEnumerationProperty(vtkSMProxy* Proxy, vtkSMProperty* Property);
+  static QVariant getEnumerationProperty(vtkSMProxy* Proxy, 
+                                         vtkSMProperty* Property);
   /// set the enumeration for a property
-  static void setEnumerationProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QVariant Value);
+  static void setEnumerationProperty(vtkSMProxy* Proxy, 
+                                     vtkSMProperty* Property, 
+                                     QVariant Value);
+  static void setUncheckedEnumerationProperty(vtkSMProxy* Proxy, 
+                                     vtkSMProperty* Property, 
+                                     QVariant Value);
   /// get the possible enumerations (string) for a property
   static QList<QVariant> getEnumerationPropertyDomain(vtkSMProperty* Property);
 
   /// get the single element of a property (integer, string, real, etc..)
-  static QVariant getElementProperty(vtkSMProxy* Proxy, vtkSMProperty* Property);
+  static QVariant getElementProperty(vtkSMProxy* Proxy, 
+                                     vtkSMProperty* Property);
   /// set the single element of a property (integer, string, real, etc..)
-  static void setElementProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QVariant Value);
+  static void setElementProperty(vtkSMProxy* Proxy, 
+                                 vtkSMProperty* Property, 
+                                 QVariant Value);
+  static void setUncheckedElementProperty(vtkSMProxy* Proxy, 
+                                 vtkSMProperty* Property, 
+                                 QVariant Value);
   /// get the range of possible values to set the single element of a property
   static QList<QVariant> getElementPropertyDomain(vtkSMProperty* Property);
   
   /// get the multiple elements of a property (integer, string, real, etc..)
-  static QList<QVariant> getMultipleElementProperty(vtkSMProxy* Proxy, vtkSMProperty* Property);
+  static QList<QVariant> getMultipleElementProperty(vtkSMProxy* Proxy, 
+                                                    vtkSMProperty* Property);
   /// set the multiple elements of a property (integer, string, real, etc..)
-  static void setMultipleElementProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QList<QVariant> Value);
-  /// get the ranges of possible values to set the multiple elements of a property
-  static QList<QList<QVariant> > getMultipleElementPropertyDomain(vtkSMProperty* Property);
-  /// get one of the multiple elements of a property (integer, string, real, etc..)
-  static QVariant getMultipleElementProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index);
-  /// set one of the multiple elements of a property (integer, string, real, etc..)
-  static void setMultipleElementProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, int Index, QVariant Value);
-  /// get one of the ranges of possible values to set the multiple elements of a property
-  static QList<QVariant> getMultipleElementPropertyDomain(vtkSMProperty* Property, int Index);
+  static void setMultipleElementProperty(vtkSMProxy* Proxy, 
+                                         vtkSMProperty* Property, 
+                                         QList<QVariant> Value);
+  static void setUncheckedMultipleElementProperty(vtkSMProxy* Proxy, 
+                                         vtkSMProperty* Property, 
+                                         QList<QVariant> Value);
+  /// get the ranges of possible values to 
+  /// set the multiple elements of a property
+  static QList<QList<QVariant> > getMultipleElementPropertyDomain(
+                                           vtkSMProperty* Property);
+  /// get one of the multiple elements of a 
+  /// property (integer, string, real, etc..)
+  static QVariant getMultipleElementProperty(vtkSMProxy* Proxy, 
+                                             vtkSMProperty* Property, 
+                                             unsigned int Index);
+  /// set one of the multiple elements of a 
+  /// property (integer, string, real, etc..)
+  static void setMultipleElementProperty(vtkSMProxy* Proxy, 
+                                         vtkSMProperty* Property, 
+                                         unsigned int Index, 
+                                         QVariant Value);
+  static void setUncheckedMultipleElementProperty(vtkSMProxy* Proxy, 
+                                         vtkSMProperty* Property, 
+                                         unsigned int Index, 
+                                         QVariant Value);
+  /// get one of the ranges of possible values 
+  /// to set the multiple elements of a property
+  static QList<QVariant> getMultipleElementPropertyDomain(
+                       vtkSMProperty* Property, unsigned int Index);
 
   /// get the single element of a property (integer, string, real, etc..)
-  static QString getFileListProperty(vtkSMProxy* Proxy, vtkSMProperty* Property);
+  static QString getFileListProperty(vtkSMProxy* Proxy, 
+                                     vtkSMProperty* Property);
   /// set the single element of a property (integer, string, real, etc..)
-  static void setFileListProperty(vtkSMProxy* Proxy, vtkSMProperty* Property, QString Value);
+  static void setFileListProperty(vtkSMProxy* Proxy, 
+                                  vtkSMProperty* Property, 
+                                  QString Value);
+  static void setUncheckedFileListProperty(vtkSMProxy* Proxy, 
+                                  vtkSMProperty* Property, 
+                                  QString Value);
 
 };
 
