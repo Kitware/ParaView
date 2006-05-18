@@ -27,7 +27,7 @@
 #include <vtkstd/map>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.11");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.12");
 
 struct vtkSMStateLoaderInternals
 {
@@ -124,6 +124,7 @@ vtkSMProxy* vtkSMStateLoader::NewProxyFromElement(
   else if (strcmp(proxyElement->GetName(), "CompoundProxy") == 0)
     {
     proxy = vtkSMCompoundProxy::New();
+    proxy->SetConnectionID(this->ConnectionID);
     }
   this->Internal->CreatedProxies[id] = proxy;
   if (!proxy->LoadState(proxyElement, this))
