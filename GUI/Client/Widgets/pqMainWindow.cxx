@@ -44,9 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPicking.h"
 #include "pqPipelineBrowser.h"
 #include "pqPipelineBuilder.h"
-#include "pqPipelineDisplay.h"
-#include "pqPipelineFilter.h"
-#include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
 #include "pqPropertyManager.h"
 #include "pqRenderModule.h"
@@ -54,7 +51,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerBrowser.h"
 #include "pqServerFileDialogModel.h"
 #include "pqServer.h"
-#include "pqSMAdaptor.h"
 #include "pqSourceProxyInfo.h"
 #include "pqVariableSelectorWidget.h"
 #include "pqVCRController.h"
@@ -1510,6 +1506,7 @@ void pqMainWindow::updateEnableState()
   
   this->Implementation->SourcesMenu->setEnabled(server != 0);
   this->Implementation->ServerDisconnectAction->setEnabled(server != 0);
+  this->Implementation->VariableSelectorToolBar->setEnabled(source != 0);
   compoundFilterAction->setEnabled(server != 0);
   saveScreenshot->setEnabled(server != 0);
 
