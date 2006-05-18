@@ -173,8 +173,13 @@ ENDIF(NOT KWCommon_INSTALL_NO_LIBRARIES)
 # --------------------------------------------------------------------------
 # Install the headers
 
+FILE(GLOB templated_files "${CMAKE_CURRENT_SOURCE_DIR}/*.txx")
+
 IF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
-  INSTALL_FILES(${KWCommon_INSTALL_INCLUDE_DIR} .h ${KWCommon_SRCS})
+  INSTALL_FILES(${KWCommon_INSTALL_INCLUDE_DIR} .h 
+    ${KWCommon_SRCS} 
+    ${templated_files})
+  INSTALL_FILES(${KWCommon_INSTALL_INCLUDE_DIR} .txx ${templated_files})
 ENDIF(NOT KWCommon_INSTALL_NO_DEVELOPMENT)
 
 # --------------------------------------------------------------------------
