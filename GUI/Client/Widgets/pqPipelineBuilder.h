@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMDisplayProxy;
 class vtkSMProxy;
 class vtkSMRenderModuleProxy;
-class vtkSMSourceProxy;
 
 class pqNameCount;
 class pqPipelineDisplay;
@@ -127,7 +126,7 @@ protected:
   /// this method does what it says. Note that it does not worry about undo stack
   /// at all. The caller would have managed it.
   vtkSMDisplayProxy* createDisplayProxyInternal(
-    vtkSMSourceProxy* proxy, vtkSMRenderModuleProxy*);
+    vtkSMProxy* proxy, vtkSMRenderModuleProxy*);
 
   // Internal create method.
   vtkSMProxy* createPipelineProxy(const char* xmlgroup,

@@ -156,8 +156,7 @@ vtkSMProxy* pqPipelineBuilder::createPipelineProxy(const char* xmlgroup,
     // TODO: the display proxy must not longer have Input property ImmediateUpdate.
     // Since otherwise merely connecting to a display would lead to creation of the
     // VTK objects for the proxy, which is not good.
-    this->createDisplayProxyInternal(vtkSMSourceProxy::SafeDownCast(proxy), 
-      renModule->getProxy());
+    this->createDisplayProxyInternal(proxy, renModule->getProxy());
     }
   if (this->UndoStack)
     {
@@ -177,22 +176,7 @@ vtkSMDisplayProxy* pqPipelineBuilder::createDisplayProxy(pqPipelineSource* src,
     }
 
   vtkSMProxy *proxy = src->getProxy();
-  vtkSMSourceProxy* proxyToDisplay = vtkSMSourceProxy::SafeDownCast(proxy); 
-  if (vtkSMCompoundProxy::SafeDownCast(proxy))
-    {
-    // For compound proxies we need to locate the last proxy to connect the display
-    // to.
-    vtkSMCompoundProxy* cp = vtkSMCompoundProxy::SafeDownCast(proxy);
-    for (unsigned int i = cp->GetNumberOfProxies(); i > 0; i--)
-      {
-      proxyToDisplay = vtkSMSourceProxy::SafeDownCast(cp->GetProxy(i-1)); 
-      if (proxyToDisplay)
-        {
-        break;
-        }
-      }
-    }
-  if (!proxyToDisplay)
+  if (!proxy)
     {
     qDebug() << "Failed to locate proxy to connect display to.";
     return NULL;
@@ -205,7 +189,7 @@ vtkSMDisplayProxy* pqPipelineBuilder::createDisplayProxy(pqPipelineSource* src,
     this->UndoStack->BeginOrContinueUndoSet(QString(label.str().c_str()));
     }
   vtkSMDisplayProxy* display = 
-    this->createDisplayProxyInternal(proxyToDisplay, renModule->getProxy());
+    this->createDisplayProxyInternal(proxy, renModule->getProxy());
   if (this->UndoStack)
     {
     this->UndoStack->PauseUndoSet();
@@ -215,14 +199,14 @@ vtkSMDisplayProxy* pqPipelineBuilder::createDisplayProxy(pqPipelineSource* src,
 
 //-----------------------------------------------------------------------------
 vtkSMDisplayProxy* pqPipelineBuilder::createDisplayProxyInternal(
-  vtkSMSourceProxy* proxy, vtkSMRenderModuleProxy* renModule)
+  vtkSMProxy* proxy, vtkSMRenderModuleProxy* renModule)
 {
   if (!proxy)
     {
     qDebug() << "Cannot connect display to NULL source proxy.";
     return NULL;
     }
-  proxy->CreateParts();
+  //proxy->CreateParts();
   vtkSMDisplayProxy* display = renModule->CreateDisplayProxy();
  
   // Register the proxy -- must be done first before any property changes 
@@ -260,24 +244,6 @@ vtkSMDisplayProxy* pqPipelineBuilder::createDisplayProxyInternal(
 // that the UndoState is recoreded.
 void pqPipelineBuilder::addConnection(vtkSMProxy* source, vtkSMProxy* sink)
 {
-  vtkSMCompoundProxy *bundle = vtkSMCompoundProxy::SafeDownCast(source);
-  if(bundle)
-    {
-    // TODO: How to find the correct output proxy?
-    source = 0; 
-    for(int i = bundle->GetNumberOfProxies(); source == 0 && i > 0; i--)
-      {
-      source = vtkSMSourceProxy::SafeDownCast(bundle->GetProxy(i-1));
-      }
-    }
-
-  bundle = vtkSMCompoundProxy::SafeDownCast(sink);
-  if(bundle)
-    {
-    // TODO: How to find the correct input proxy?
-    sink = bundle->GetMainProxy();
-    }
-
   if(!source || !sink)
     {
     qCritical() << "Cannot addConnection. source or sink missing.";
