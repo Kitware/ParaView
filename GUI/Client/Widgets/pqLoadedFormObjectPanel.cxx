@@ -65,6 +65,11 @@ pqLoadedFormObjectPanel::pqLoadedFormObjectPanel(QString filename, QWidget* p)
 /// destructor
 pqLoadedFormObjectPanel::~pqLoadedFormObjectPanel()
 {
+  if(this->Proxy)
+    {
+    this->unlinkServerManagerProperties();
+    }
+  this->Proxy = NULL;
 }
 
 bool pqLoadedFormObjectPanel::isValid()

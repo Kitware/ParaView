@@ -398,13 +398,14 @@ void pqMainWindow::createStandardObjectInspector(bool visible)
       this->Implementation->Inspector, SLOT(setProxy(vtkSMProxy *)));
     }
   */
+  
   pqUndoStack* undoStack = pqApplicationCore::instance()->getUndoStack();
   // Connect Accept/reset signals.
   QObject::connect(
-    this->Implementation->Inspector->getObjectPanel()->getPropertyManager(), 
+    this->Implementation->Inspector, 
     SIGNAL(preaccept()), undoStack, SLOT(Accept()));
   QObject::connect(
-    this->Implementation->Inspector->getObjectPanel()->getPropertyManager(), 
+    this->Implementation->Inspector, 
     SIGNAL(postaccept()), undoStack, SLOT(EndUndoSet()));
 
   this->addStandardDockWidget(Qt::LeftDockWidgetArea, 

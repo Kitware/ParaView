@@ -53,12 +53,10 @@ public:
   /// get the proxy for which properties are displayed
   virtual pqSMProxy proxy();
   
-  /// hint for sizing this widget
+  /// size hint for this widget
   QSize sizeHint() const;
-  
-  /// global instance property manager
-//  static pqPropertyManager PropertyManager;
 
+  /// property manager
   pqPropertyManager* getPropertyManager()
     { return this->PropertyManager; }
 

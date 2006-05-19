@@ -72,6 +72,11 @@ pqNamedObjectPanel::pqNamedObjectPanel(QWidget* p)
 /// destructor
 pqNamedObjectPanel::~pqNamedObjectPanel()
 {
+  if(this->Proxy)
+    {
+    this->unlinkServerManagerProperties();
+    }
+  this->Proxy = NULL;
 }
 
 void pqNamedObjectPanel::linkServerManagerProperties()
