@@ -251,6 +251,11 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
     "value", SIGNAL(valueChanged(double)),
     displayProxy, displayProxy->GetProperty("Opacity"));
 
+  // setup for InterpolateScalarsBeforeMapping
+  this->Internal->Links->addPropertyLink(this->Internal->ColorInterpolateColors,
+    "checked", SIGNAL(stateChanged(int)), displayProxy, 
+    displayProxy->GetProperty("InterpolateScalarsBeforeMapping"));
+
   this->Internal->Display = display;
 }
 
@@ -277,6 +282,9 @@ void pqDisplayProxyEditor::setupGUIConnections()
   // This ensures that the updateView() slot is called 
   // only after the vtkSMProperty has been changed by the pqPropertyLinks.
   QObject::connect(this->Internal->ViewData, SIGNAL(stateChanged(int)),
+    this, SLOT(updateView()),Qt::QueuedConnection);
+  QObject::connect(this->Internal->ColorInterpolateColors, 
+    SIGNAL(stateChanged(int)),
     this, SLOT(updateView()),Qt::QueuedConnection);
   QObject::connect(this->Internal->ColorBy, 
     SIGNAL(currentIndexChanged(const QString&)),
