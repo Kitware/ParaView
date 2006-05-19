@@ -59,7 +59,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 #include "pqRenderModule.h"
 #include "pqServerManagerModel.h"
-#include "pqThresholdPanel.h"
 
 pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   : QWidget(p)
@@ -197,11 +196,6 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
       this->CurrentCustomPanel = new pqCutPanel(NULL);
       this->CurrentCustomPanel->setProxy(proxy);
       }
-    else if(QString(proxy->GetXMLName()) == "Threshold")
-      {
-      this->CurrentCustomPanel = new pqThresholdPanel(NULL);
-      this->CurrentCustomPanel->setProxy(proxy);
-      }
     else
       {
       // try to find a custom form in our pqWidgets resources
@@ -262,8 +256,8 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
     QLayoutItem* item = this->layout()->takeAt(1);
     if(item && item->widget())
       {
-      item->widget()->setParent(NULL);
       item->widget()->hide();
+      item->widget()->setParent(NULL);
       }
 
     this->TabWidget->addTab(this->CurrentAutoPanel, "Advanced");
@@ -283,8 +277,8 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
     QWidget* lastform = s->takeWidget();
     if(lastform)
       {
-      lastform->setParent(NULL);
       lastform->hide();
+      lastform->setParent(NULL);
       }
     
     // put new auto panel in place
@@ -314,8 +308,8 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
     QLayoutItem* item = this->layout()->takeAt(1);
     if(item && item->widget())
       {
-      item->widget()->setParent(NULL);
       item->widget()->hide();
+      item->widget()->setParent(NULL);
       }
     this->layout()->addWidget(this->CurrentAutoPanel);
     this->CurrentAutoPanel->show();

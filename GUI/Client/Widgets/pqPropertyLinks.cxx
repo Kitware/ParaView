@@ -513,8 +513,6 @@ pqPropertyLinks::~pqPropertyLinks()
   delete this->Internal;
 }
 
-//static int numLinks = 0;
-
 void pqPropertyLinks::addPropertyLink(QObject* qObject, const char* qProperty, 
                                       const char* signal,
                                       vtkSMProxy* Proxy, 
@@ -525,8 +523,6 @@ void pqPropertyLinks::addPropertyLink(QObject* qObject, const char* qProperty,
     return;
     }
   
-  //printf("base link %i  %s,%s\n", ++numLinks, qObject->objectName().toAscii().data(), qProperty);
-
   pqPropertyLinksInternal::LinkMap::iterator iter;
   pqPropertyLinksConnection conn(Proxy, Property, Index, qObject, qProperty);
   iter = this->Internal->Links.insert(conn);
@@ -546,7 +542,6 @@ void pqPropertyLinks::removePropertyLink(QObject* qObject,
                         const char* qProperty, const char* signal,
                         vtkSMProxy* Proxy, vtkSMProperty* Property, int Index)
 {
-  //printf("base link %i  %s,%s\n", --numLinks, qObject->objectName().toAscii().data(), qProperty);
   pqPropertyLinksConnection conn(Proxy, Property, Index, qObject, qProperty);
   pqPropertyLinksInternal::LinkMap::iterator iter;
   iter = this->Internal->Links.find(conn);

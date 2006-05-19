@@ -62,6 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMBooleanDomain.h"
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMIntRangeDomain.h"
+#include "vtkSMArrayListDomain.h"
 
 // paraq includes
 #include "pqSMProxy.h"
@@ -883,6 +884,7 @@ QList<QVariant> pqSMAdaptor::getEnumerationPropertyDomain(
   vtkSMEnumerationDomain* EnumerationDomain = NULL;
   vtkSMStringListDomain* StringListDomain = NULL;
   vtkSMProxyGroupDomain* ProxyGroupDomain = NULL;
+  vtkSMArrayListDomain* ArrayListDomain = NULL;
   
   vtkSMDomainIterator* iter = Property->NewDomainIterator();
   iter->Begin();
@@ -901,6 +903,10 @@ QList<QVariant> pqSMAdaptor::getEnumerationPropertyDomain(
       {
       StringListDomain = vtkSMStringListDomain::SafeDownCast(d);
       }
+    if(!ArrayListDomain)
+      {
+      ArrayListDomain = vtkSMArrayListDomain::SafeDownCast(d);
+      }
     if(!ProxyGroupDomain)
       {
       ProxyGroupDomain = vtkSMProxyGroupDomain::SafeDownCast(d);
@@ -913,6 +919,14 @@ QList<QVariant> pqSMAdaptor::getEnumerationPropertyDomain(
     {
     enumerations.push_back(false);
     enumerations.push_back(true);
+    }
+  else if(ArrayListDomain)
+    {
+    unsigned int numEntries = ArrayListDomain->GetNumberOfStrings();
+    for(unsigned int i=0; i<numEntries; i++)
+      {
+      enumerations.push_back(ArrayListDomain->GetString(i));
+      }
     }
   else if(EnumerationDomain)
     {

@@ -174,12 +174,9 @@ pqPropertyManager::~pqPropertyManager()
   delete this->Internal;
 }
 
-//static int numLinks = 0;
-
 void pqPropertyManager::registerLink(QObject* qObject, const char* qProperty, const char* signal,
                      vtkSMProxy* Proxy, vtkSMProperty* Property, int Index)
 {
-  //printf("link %i  %s,%s\n", ++numLinks, qObject->objectName().toAscii().data(), qProperty);
   pqInternal::PropertyMap::iterator iter;
   iter = this->Internal->Properties.find(pqInternal::PropertyKey(Property, Index));
   if(iter == this->Internal->Properties.end())
@@ -201,7 +198,6 @@ void pqPropertyManager::registerLink(QObject* qObject, const char* qProperty, co
 void pqPropertyManager::unregisterLink(QObject* qObject, const char* qProperty, const char* signal,
                         vtkSMProxy* Proxy, vtkSMProperty* Property, int Index)
 {
-  //printf("link %i  %s,%s\n", --numLinks, qObject->objectName().toAscii().data(), qProperty);
   pqInternal::PropertyMap::iterator iter;
   iter = this->Internal->Properties.find(pqInternal::PropertyKey(Property, Index));
   if(iter != this->Internal->Properties.end())

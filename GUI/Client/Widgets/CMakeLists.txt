@@ -62,7 +62,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerManagerModel.h
   pqSliderDomain.h
   pqSMSignalAdaptors.h
-  pqThresholdPanel.h
   pqUndoStack.h
   pqVariableSelectorWidget.h
   pqVCRController.h
@@ -79,7 +78,6 @@ SET(UI_FORMS
   pqOutputWindow.ui
   pqRenderViewEditor.ui
   pqServerBrowser.ui
-  pqThresholdPanel.ui
 )
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
@@ -211,8 +209,6 @@ ADD_LIBRARY(pqWidgets
   pqSliderDomain.h
   pqSourceProxyInfo.cxx
   pqSourceProxyInfo.h
-  pqThresholdPanel.cxx
-  pqThresholdPanel.h
   pqUndoStack.cxx
   pqUndoStack.h
   pqVariableSelectorWidget.cxx
