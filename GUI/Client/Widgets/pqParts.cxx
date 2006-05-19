@@ -401,7 +401,7 @@ QList<QString> pqPart::GetColorFields(vtkSMDisplayProxy* display)
     }
 
   // Actor color is one way to color this part
-  ret.append("Property");
+  ret.append("Solid Color");
 
   vtkPVDataInformation* geomInfo = display->GetGeometryInformation();
   if(!geomInfo)
@@ -446,7 +446,7 @@ void pqPart::SetColorField(vtkSMDisplayProxy* Part, const QString& value)
 
   QString field = value;
 
-  if(field == "Property")
+  if(field == "Solid Color")
     {
     pqPart::Color(Part);
     }
@@ -484,7 +484,7 @@ QString pqPart::GetColorField(vtkSMDisplayProxy* Part)
     }
   else
     {
-    return "Property";
+    return "Solid Color";
     }
   return QString();
 }

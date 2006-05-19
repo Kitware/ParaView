@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqDisplayProxyEditor.h"
 
 // Qt includes
+#include <QMetaType>
 #include <QPointer>
 #include <QtDebug>
 
@@ -140,7 +141,7 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
   QString currentArray = pqPart::GetColorField(displayProxy);
   this->Internal->ColorBy->setCurrentIndex(
     this->Internal->ColorBy->findText(currentArray));
-  if(currentArray == "Property")
+  if(currentArray == "Solid Color")
     {
     this->Internal->ColorActorColor->setEnabled(true);
     }
@@ -325,12 +326,18 @@ void pqDisplayProxyEditor::setupGUIConnections()
     this, SIGNAL(dismiss()));
   
   // Create an connect signal adaptors.
+  if (!QMetaType::isRegistered(QMetaType::type("QVariant")))
+    {
+    qRegisterMetaType<QVariant>("QVariant");
+    }
+
   this->Internal->ColorAdaptor = new pqSignalAdaptorColor(
     this->Internal->ColorActorColor, "chosenColor",
     SIGNAL(chosenColorChanged(const QColor&)));
   this->Internal->ColorAdaptor->setObjectName("ActorColorAdaptor");
   QObject::connect(this->Internal->ColorAdaptor, 
-    SIGNAL(colorChanged(const QVariant&)), this, SLOT(updateView()));
+    SIGNAL(colorChanged(const QVariant&)), this, SLOT(updateView()),
+    Qt::QueuedConnection);
 
   this->Internal->RepresentationAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->StyleRepresentation);
@@ -357,7 +364,7 @@ void pqDisplayProxyEditor::colorByChanged(const QString& val)
     {
     return;
     }
-  if(val == "Property")
+  if(val == "Solid Color")
     {
     this->Internal->ColorActorColor->setEnabled(true);
     pqPart::Color(this->Internal->Display->getProxy(), NULL, 0);
