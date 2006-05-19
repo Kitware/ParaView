@@ -90,6 +90,10 @@ signals:
   /// emitted after reject.
   void postreject();
 
+protected slots:
+
+  void removeProxy(vtkSMProxy* proxy);
+
   
 private:
   QTabWidget* TabWidget;
