@@ -41,11 +41,15 @@ class pqClipPanel :
   public pqWidgetObjectPanel
 {
   Q_OBJECT
+  
 public:
   /// constructor
   pqClipPanel(QWidget* p);
   /// destructor
   ~pqClipPanel();
+  
+protected:
+  void setProxy(pqSMProxy p);
 };
 
 #endif

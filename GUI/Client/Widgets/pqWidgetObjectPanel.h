@@ -51,7 +51,6 @@ protected:
   /// set the proxy to display properties for
   void setProxy(pqSMProxy proxy);
 
-private:
   vtkSMNew3DWidgetProxy* Widget;
 };
 

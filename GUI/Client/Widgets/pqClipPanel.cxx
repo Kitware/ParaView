@@ -30,19 +30,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-// this include
 #include "pqClipPanel.h"
+#include "pqPropertyManager.h"
 
-// Qt includes
-#include <QSlider>
+#include <vtkSMDoubleVectorProperty.h>
+#include <vtkSMNew3DWidgetProxy.h>
 
-// VTK includes
-
-// paraview includes
-
-// paraq includes
-#include "pqSliderDomain.h"
-
+#include <QLineEdit>
 
 /// constructor
 pqClipPanel::pqClipPanel(QWidget* p)
@@ -54,4 +48,53 @@ pqClipPanel::pqClipPanel(QWidget* p)
 pqClipPanel::~pqClipPanel()
 {
   this->setProxy(NULL);
+}
+
+void pqClipPanel::setProxy(pqSMProxy p)
+{
+  pqWidgetObjectPanel::setProxy(p);
+  
+  if(!this->Proxy)
+    return;
+  
+  if(!this->Widget)
+    return;
+
+  if(vtkSMDoubleVectorProperty* const widget_origin = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->Widget->GetProperty("Origin")))
+    {
+    if(QLineEdit* const originX = this->findChild<QLineEdit*>("originX"))
+      {
+      this->getPropertyManager()->registerLink(originX, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 0);
+      }
+ 
+    if(QLineEdit* const originY = this->findChild<QLineEdit*>("originY"))
+      {
+      this->getPropertyManager()->registerLink(originY, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 1);
+      }
+    
+    if(QLineEdit* const originZ = this->findChild<QLineEdit*>("originZ"))
+      {
+      this->getPropertyManager()->registerLink(originZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 2);
+      }
+    }
+
+  if(vtkSMDoubleVectorProperty* const widget_normal = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->Widget->GetProperty("Normal")))
+    {
+    if(QLineEdit* const normalX = this->findChild<QLineEdit*>("normalX"))
+      {
+      this->getPropertyManager()->registerLink(normalX, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 0);
+      }
+ 
+    if(QLineEdit* const normalY = this->findChild<QLineEdit*>("normalY"))
+      {
+      this->getPropertyManager()->registerLink(normalY, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 1);
+      }
+    
+    if(QLineEdit* const normalZ = this->findChild<QLineEdit*>("normalZ"))
+      {
+      this->getPropertyManager()->registerLink(normalZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 2);
+      }
+    }
 }

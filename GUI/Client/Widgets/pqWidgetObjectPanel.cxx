@@ -127,8 +127,6 @@ void pqWidgetObjectPanel::setProxy(pqSMProxy proxy)
 
     this->Widget->UpdateVTKObjects();
 
-  //  this->Widget->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer);
-
     pqRenderModule* renModule = 
       pqApplicationCore::instance()->getActiveRenderModule();
 
