@@ -154,6 +154,19 @@ The output of the Axes source is polygonal data. This polygonal data has a scala
    <!-- End Axes -->
    </SourceProxy>
 
+   <SourceProxy name="OutlineSource" class="vtkOutlineSource">
+      <Documentation
+         long_help="3D outline of the specified bounds." 
+         short_help="Create an outline from the bounds.">
+      </Documentation>
+      <DoubleVectorProperty
+         name="Bounds"
+         command="SetBounds"
+         number_of_elements="6"
+         default_values="0 1 0 1 0 1" >
+      </DoubleVectorProperty>
+   <!-- End OutlineSource -->
+   </SourceProxy>
    <SourceProxy name="CubeSource" class="vtkCubeSource">
       <Documentation
          long_help="3D box with specified X, Y, and Z lengths." 
