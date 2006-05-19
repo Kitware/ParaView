@@ -174,7 +174,7 @@ void pqRenderModule::render()
 {
   if (this->Internal->RenderModuleProxy)
     {
-    this->Internal->RenderModuleProxy->StillRender();
+    this->Internal->Viewport->update();
     }
 }
 
