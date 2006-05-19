@@ -27,7 +27,7 @@
 
 #include <iostream>
 
-vtkCxxRevisionMacro(vtkExtractScatterPlot, "1.4");
+vtkCxxRevisionMacro(vtkExtractScatterPlot, "1.5");
 vtkStandardNewMacro(vtkExtractScatterPlot);
 
 vtkExtractScatterPlot::vtkExtractScatterPlot() :
@@ -78,6 +78,8 @@ int vtkExtractScatterPlot::RequestData(vtkInformation* /*request*/,
                                        vtkInformationVector** inputVector, 
                                        vtkInformationVector* outputVector)
 {
+  int i, j;
+
   vtkDebugMacro(<< "Executing vtkExtractScatterPlot filter");
 
   // Build an empty output grid in advance, so we can bail-out if we
@@ -90,7 +92,7 @@ int vtkExtractScatterPlot::RequestData(vtkInformation* /*request*/,
   x_bin_extents->SetNumberOfComponents(1);
   x_bin_extents->SetNumberOfTuples(this->XBinCount + 1);
   x_bin_extents->SetName("x_bin_extents");
-  for(int i = 0; i != this->XBinCount + 1; ++i)
+  for(i = 0; i != this->XBinCount + 1; ++i)
     {
     x_bin_extents->SetValue(i, 0);
     }
@@ -101,7 +103,7 @@ int vtkExtractScatterPlot::RequestData(vtkInformation* /*request*/,
   y_bin_extents->SetNumberOfComponents(1);
   y_bin_extents->SetNumberOfTuples(this->XBinCount + 1);
   y_bin_extents->SetName("y_bin_extents");
-  for(int i = 0; i != this->YBinCount + 1; ++i)
+  for(i = 0; i != this->YBinCount + 1; ++i)
     {
     y_bin_extents->SetValue(i, 0);
     }
@@ -155,7 +157,7 @@ int vtkExtractScatterPlot::RequestData(vtkInformation* /*request*/,
   const double x_bin_delta = (x_range[1] - x_range[0]) / this->XBinCount;
   
   x_bin_extents->SetValue(0, x_range[0] - VTK_DBL_EPSILON);
-  for(int i = 1; i < this->XBinCount; ++i)
+  for(i = 1; i < this->XBinCount; ++i)
     {
     x_bin_extents->SetValue(i, x_range[0] + (i * x_bin_delta));
     }
@@ -166,7 +168,7 @@ int vtkExtractScatterPlot::RequestData(vtkInformation* /*request*/,
   const double y_bin_delta = (y_range[1] - y_range[0]) / this->YBinCount;
   
   y_bin_extents->SetValue(0, y_range[0] - VTK_DBL_EPSILON);
-  for(int i = 1; i < this->YBinCount; ++i)
+  for(i = 1; i < this->YBinCount; ++i)
     {
     y_bin_extents->SetValue(i, y_range[0] + (i * y_bin_delta));
     }
@@ -178,21 +180,21 @@ int vtkExtractScatterPlot::RequestData(vtkInformation* /*request*/,
   bin_values->SetNumberOfTuples(this->XBinCount);
   bin_values->SetName("bin_values");
   
-  for(int i = 0; i != this->XBinCount; ++i)
+  for(i = 0; i != this->XBinCount; ++i)
     {
-    for(int j = 0; j != this->YBinCount; ++j)
+    for(j = 0; j != this->YBinCount; ++j)
       {
       bin_values->SetComponent(i, j, 0);
       }
     }
 
   const int value_count = x_data_array->GetNumberOfTuples();
-  for(int i = 0; i != value_count; ++i)
+  for(i = 0; i != value_count; ++i)
     {
     const double x = x_data_array->GetComponent(i, this->XComponent);
     const double y = y_data_array->GetComponent(i, this->YComponent);
 
-    for(int j = 0; j != this->XBinCount; ++j)
+    for(j = 0; j != this->XBinCount; ++j)
       {
       if(x_bin_extents->GetValue(j) <= x && x < x_bin_extents->GetValue(j+1))
         {
