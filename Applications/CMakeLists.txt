@@ -33,6 +33,5 @@ SUBDIRS(
   DobranoViz
 # Prism
   PGraph
-  Widgets
 )
 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-Module:    ProcessModuleGUIHelper.cxx
+   Module:    pqCutPanel.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,34 +30,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "ProcessModuleGUIHelper.h"
+#ifndef _pqCutPanel_h
+#define _pqCutPanel_h
 
-#include "vtkObjectFactory.h"
-#include "MainWindow.h"
+#include "pqWidgetObjectPanel.h"
 
-vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.1");
-//-----------------------------------------------------------------------------
-ProcessModuleGUIHelper::ProcessModuleGUIHelper()
+/// Widget which provides an editor for editing properties of a proxy
+class pqCutPanel :
+  public pqWidgetObjectPanel
 {
-}
+  Q_OBJECT
+public:
+  /// constructor
+  pqCutPanel(QWidget* p);
+  /// destructor
+  ~pqCutPanel();
+};
 
-//-----------------------------------------------------------------------------
-ProcessModuleGUIHelper::~ProcessModuleGUIHelper()
-{
-}
-
-//-----------------------------------------------------------------------------
-QWidget* ProcessModuleGUIHelper::CreateMainWindow()
-{
-  pqMainWindow* const window = new MainWindow();
-  window->resize(800, 600);
-  return window;
-}
-
-//-----------------------------------------------------------------------------
-void ProcessModuleGUIHelper::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os, indent);
-}
+#endif
 

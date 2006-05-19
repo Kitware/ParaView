@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-Module:    ProcessModuleGUIHelper.h
+   Module:    pqClipPanel.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,35 +29,29 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pqClientProcessModudeGUIHelper_h
-#define __pqClientProcessModudeGUIHelper_h
 
-#include "pqProcessModuleGUIHelper.h"
-/*!
- * ProcessModuleGUIHelper extends pqProcessModuleGUIHelper
- * so that we can create the type of MainWindow needed for pqClient.
- *
- */
-class ProcessModuleGUIHelper : public pqProcessModuleGUIHelper
+// this include
+#include "pqClipPanel.h"
+
+// Qt includes
+#include <QSlider>
+
+// VTK includes
+
+// paraview includes
+
+// paraq includes
+#include "pqSliderDomain.h"
+
+
+/// constructor
+pqClipPanel::pqClipPanel(QWidget* p)
+  : pqWidgetObjectPanel(":/pqWidgets/ClipPanel.ui", p)
 {
-public:
-  static ProcessModuleGUIHelper* New();
-  vtkTypeRevisionMacro(ProcessModuleGUIHelper, pqProcessModuleGUIHelper);
-  void PrintSelf(ostream& os, vtkIndent indent);
+}
 
-protected:
-  ProcessModuleGUIHelper();
-  ~ProcessModuleGUIHelper();
-
-  /// subclasses can override this method to create their own
-  /// subclass of pqMainWindow as the Main Window.
-  virtual QWidget* CreateMainWindow();
-
-private:
-  ProcessModuleGUIHelper(const ProcessModuleGUIHelper&); // Not implemented.
-  void operator=(const ProcessModuleGUIHelper&); // Not implemented.
-};
-
-#endif
-
-
+/// destructor
+pqClipPanel::~pqClipPanel()
+{
+  this->setProxy(NULL);
+}

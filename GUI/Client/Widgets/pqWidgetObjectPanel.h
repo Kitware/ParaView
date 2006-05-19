@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-  Module:    main.cxx
+   Module:    pqWidgetObjectPanel.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,10 +30,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "ProcessModuleGUIHelper.h"
-#include <pqMain.h>
+#ifndef _pqWidgetObjectPanel_h
+#define _pqWidgetObjectPanel_h
 
-int main(int argc, char* argv[])
+#include "pqLoadedFormObjectPanel.h"
+
+class vtkSMNew3DWidgetProxy;
+
+class pqWidgetObjectPanel :
+  public pqLoadedFormObjectPanel
 {
-  return pqMain::Run(argc, argv, ProcessModuleGUIHelper::New());
-}
+  Q_OBJECT
+public:
+  /// constructor
+  pqWidgetObjectPanel(QString filename, QWidget* p);
+  /// destructor
+  ~pqWidgetObjectPanel();
+
+protected:
+  /// set the proxy to display properties for
+  void setProxy(pqSMProxy proxy);
+
+private:
+  vtkSMNew3DWidgetProxy* Widget;
+};
+
+#endif
+

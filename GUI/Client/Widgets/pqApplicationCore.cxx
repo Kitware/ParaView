@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "vtkSMProxy.h"
+#include "vtkSMProxyProperty.h"
 
 // Qt includes.
 #include <QPointer>
@@ -297,6 +298,18 @@ pqPipelineSource* pqApplicationCore::createFilterForActiveSource(
     this->Internal->PipelineBuilder->createDisplayProxy(filter,
       this->getActiveRenderModule());
     this->setActiveSource(filter);
+
+    if(xmlname == "Clip")
+      {
+      vtkSMProxy* const plane = this->Internal->PipelineBuilder->createPipelineProxy(
+        "implicit_functions", "Plane", this->Internal->ActiveSource->getServer(), NULL);
+        
+      if(vtkSMProxyProperty* const clip_function = vtkSMProxyProperty::SafeDownCast(
+        filter->getProxy()->GetProperty("ClipFunction")))
+        {
+        clip_function->AddProxy(plane);
+        }
+      }
 
     // HACK: Until source/filter creation can be accepted, explitly end
     // the current undo set.

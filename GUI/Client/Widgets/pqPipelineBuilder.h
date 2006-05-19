@@ -122,15 +122,15 @@ public:
   // we will have to fix that soon.
   vtkSMProxy* createLookupTable(pqPipelineDisplay* display);
 
+  // Internal create method.
+  vtkSMProxy* createPipelineProxy(const char* xmlgroup,
+    const char* xmlname, pqServer* server, pqRenderModule* renModule);   
+
 protected:
   /// this method does what it says. Note that it does not worry about undo stack
   /// at all. The caller would have managed it.
   vtkSMDisplayProxy* createDisplayProxyInternal(
     vtkSMProxy* proxy, vtkSMRenderModuleProxy*);
-
-  // Internal create method.
-  vtkSMProxy* createPipelineProxy(const char* xmlgroup,
-    const char* xmlname, pqServer* server, pqRenderModule* renModule);   
 
   /// internal implementation to addConnection.
   void addConnection(vtkSMProxy* source, vtkSMProxy* sink);
