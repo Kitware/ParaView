@@ -199,7 +199,6 @@ void pqServerManagerModel::onAddDisplay(QString vtkNotUsed(name),
 
   this->Internal->Displays[dProxy] = display;
 
-  cout << "Display added." << endl;
   // emit this->displayAdded(display);
 }
 
@@ -223,7 +222,6 @@ void pqServerManagerModel::onRemoveDisplay(vtkSMProxy* proxy)
   // emit this->displayRemoved(display);
 
   delete display;
-  cout << "Display removed." << endl;
 }
 
 //-----------------------------------------------------------------------------

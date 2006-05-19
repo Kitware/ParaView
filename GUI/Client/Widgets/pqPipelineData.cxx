@@ -500,7 +500,6 @@ void pqPipelineData::proxyRegistered(vtkObject*, unsigned long, void*,
     }
   else if (strcmp(info->GroupName, "render_modules")==0)
     {
-    cout << "Render Module registered!" << endl;
     // A render module is registered. proxies in this group
     // are vtkSMRenderModuleProxies which are "alive" with a window and all,
     // and not the vtkSMMultiViewRenderModuleProxy.

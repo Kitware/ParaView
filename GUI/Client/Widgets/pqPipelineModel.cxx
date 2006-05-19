@@ -248,7 +248,7 @@ QVariant pqPipelineModel::data(const QModelIndex &idx, int role) const
           }
         else
           {
-          cout << "Cannot decide type." << endl;
+          qDebug() << "Cannot decide type.";
           }
         break;
         }

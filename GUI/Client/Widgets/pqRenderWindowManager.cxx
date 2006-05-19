@@ -142,14 +142,12 @@ void pqRenderWindowManager::onFrameRemoved(pqMultiViewFrame* frame)
 //-----------------------------------------------------------------------------
 void pqRenderWindowManager::onRenderModuleAdded(pqRenderModule* rm)
 {
-  cout << "pqRenderModule creation detected." << endl;
   if (!this->Internal->FrameAdded)
     {
     qDebug() << "RM creation not initiated by GUI. This case it not handled yet.";
     return;
     // SHould split the view and create a new window for this render module.
     }
-  cout << "update QVTKWidget." << endl;
   rm->setWindowParent(this->Internal->FrameAdded);
   this->Internal->FrameAdded->setMainWidget(rm->getWidget());
   this->Internal->FrameAdded = 0; // since the frame cannot be reused
