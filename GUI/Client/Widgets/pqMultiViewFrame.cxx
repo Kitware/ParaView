@@ -92,6 +92,9 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
   // TODO: temporary until they can be implemented or wanted
   this->MaximizeButton->hide();
   this->ActiveButton->hide();
+  this->CloseButton->hide();
+  this->SplitVerticalButton->hide();
+  this->SplitHorizontalButton->hide();
 }
 
 pqMultiViewFrame::~pqMultiViewFrame()
