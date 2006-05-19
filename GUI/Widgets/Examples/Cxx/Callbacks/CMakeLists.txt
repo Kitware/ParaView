@@ -19,7 +19,7 @@ SET(TARGET_BASE_NAME "KW${PROJECT_NAME}Example")
 # use its callbacks from our user interface. To do so, we need to create
 # a library and wrap it automatically for the Tcl language.
 
-SET(LIB_NAME "KW${PROJECT_NAME}ExampleLib")
+SET(LIB_NAME "KWCallbacksExampleLib")
 SET(LIB_SRCS 
   vtkKWMyApplication.cxx
   vtkKWMyWidget.cxx
@@ -30,16 +30,16 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsWrappingMacros.cmake")
 KWWidgets_WRAP_TCL(${LIB_NAME} LIB_TCL_SRCS "${LIB_SRCS}" "")
 
-# Create the library (in static mode for convenience).
+# Create the library.
 
 ADD_LIBRARY(${LIB_NAME} ${LIB_TCL_SRCS} ${LIB_SRCS})
 TARGET_LINK_LIBRARIES(${LIB_NAME} ${KWWidgets_LIBRARIES})
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
-SET(KWCallbacksExample_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+SET(KWMyApplication_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 CONFIGURE_FILE(
-  ${CMAKE_CURRENT_SOURCE_DIR}/vtkKWCallbacksExampleConfigure.h.in 
-  ${CMAKE_CURRENT_BINARY_DIR}/vtkKWCallbacksExampleConfigure.h)
+  ${CMAKE_CURRENT_SOURCE_DIR}/vtkKWMyApplicationConfigure.h.in 
+  ${CMAKE_CURRENT_BINARY_DIR}/vtkKWMyApplicationConfigure.h)
 
 # The name of our executable and the corresponding source file.
 

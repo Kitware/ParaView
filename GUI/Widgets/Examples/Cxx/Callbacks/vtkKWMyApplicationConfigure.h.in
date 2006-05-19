@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWCallbacksExampleConfigure.h.in
+  Module:    vtkKWMyApplicationConfigure.h.in
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,9 +11,9 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#ifndef __vtkKWCallbacksExampleConfigure_h
-#define __vtkKWCallbacksExampleConfigure_h
+#ifndef __vtkKWMyApplicationConfigure_h
+#define __vtkKWMyApplicationConfigure_h
 
-#cmakedefine KWCallbacksExample_BUILD_SHARED_LIBS
+#cmakedefine KWMyApplication_BUILD_SHARED_LIBS
 
 #endif

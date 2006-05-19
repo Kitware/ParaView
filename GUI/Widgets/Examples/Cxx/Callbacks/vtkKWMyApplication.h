@@ -2,9 +2,9 @@
 #define __vtkKWMyApplication_h
 
 #include "vtkKWApplication.h"
-#include "vtkKWCallbacksExampleWin32Header.h"
+#include "vtkKWMyApplicationWin32Header.h"
 
-class KWCallbacksExample_EXPORT vtkKWMyApplication : public vtkKWApplication
+class KWMyApplication_EXPORT vtkKWMyApplication : public vtkKWApplication
 {
 public:
   static vtkKWMyApplication* New();

@@ -1,4 +1,4 @@
-#include "vtkKWMedicalImageViewerExample.h"
+#include "vtkKWMyWindow.h"
 
 #include "vtkCornerAnnotation.h"
 #include "vtkImageData.h"
@@ -25,57 +25,70 @@
 #include "vtkToolkits.h"
 
 #include <vtksys/SystemTools.hxx>
-#include <vtksys/CommandLineArguments.hxx>
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWMedicalImageViewerExample );
-vtkCxxRevisionMacro(vtkKWMedicalImageViewerExample, "1.5");
+vtkStandardNewMacro( vtkKWMyWindow );
+vtkCxxRevisionMacro(vtkKWMyWindow, "1.1");
 
 //----------------------------------------------------------------------------
-int vtkKWMedicalImageViewerExample::Run(int argc, char *argv[])
+vtkKWMyWindow::vtkKWMyWindow()
 {
-  // Process some command-line arguments
-  // The --test option here is used to run this example as a non-interactive 
-  // test for software quality purposes. You can ignore it.
+  this->RenderWidget = NULL;
+  this->ImageViewer = NULL;
+  this->SliceScale = NULL;
+  this->WindowLevelPresetSelector = NULL;
+  this->AnimationWidget = NULL;
+}
 
-  int option_test = 0;
-  vtksys::CommandLineArguments args;
-  args.Initialize(argc, argv);
-  args.AddArgument(
-    "--test", vtksys::CommandLineArguments::NO_ARGUMENT, &option_test, "");
-  args.Parse();
-  
-  // Create the application
-  // If --test was provided, ignore all registry settings, and exit silently
-  // Restore the settings that have been saved to the registry, like
-  // the geometry of the user interface so far.
+//----------------------------------------------------------------------------
+vtkKWMyWindow::~vtkKWMyWindow()
+{
+  if (this->SliceScale)
+    {
+    this->SliceScale->Delete();
+    }
+  if (this->ImageViewer)
+    {
+    this->ImageViewer->Delete();
+    }
+  if (this->RenderWidget)
+    {
+    this->RenderWidget->Delete();
+    }
+  if (this->WindowLevelPresetSelector)
+    {
+    this->WindowLevelPresetSelector->Delete();
+    }
+  if (this->AnimationWidget)
+    {
+    this->AnimationWidget->Delete();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMyWindow::CreateWidget()
+{
+  // Check if already created
+
+  if (this->IsCreated())
+    {
+    vtkErrorMacro("class already created");
+    return;
+    }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::CreateWidget();
 
   vtkKWApplication *app = this->GetApplication();
-  app->SetName("KWMedicalImageViewerExample");
-  if (option_test)
-    {
-    app->SetRegistryLevel(0);
-    app->PromptBeforeExitOff();
-    }
-  app->RestoreApplicationSettingsFromRegistry();
-
-  // Set a help link. Can be a remote link (URL), or a local file
-
-  app->SetHelpDialogStartingPage("http://www.kwwidgets.org");
-
-  // Add a window
-  // Set 'SupportHelp' to automatically add a menu entry for the help link
-
-  vtkKWWindow *win = vtkKWWindow::New();
-  win->SupportHelpOn();
-  app->AddWindow(win);
-  win->Create();
-  win->SecondaryPanelVisibilityOff();
 
   // Add a render widget, attach it to the view frame, and pack
   
-  this->RenderWidget = vtkKWRenderWidget::New();
-  this->RenderWidget->SetParent(win->GetViewFrame());
+  if (!this->RenderWidget)
+    {
+    this->RenderWidget = vtkKWRenderWidget::New();
+    }
+  this->RenderWidget->SetParent(this->GetViewFrame());
   this->RenderWidget->Create();
   this->RenderWidget->CornerAnnotationVisibilityOn();
 
@@ -99,7 +112,10 @@ int vtkKWMedicalImageViewerExample::Run(int argc, char *argv[])
   // Create an image viewer
   // Use the render window and renderer of the renderwidget
 
-  this->ImageViewer = vtkImageViewer2::New();
+  if (!this->ImageViewer)
+    {
+    this->ImageViewer = vtkImageViewer2::New();
+    }
   this->ImageViewer->SetRenderWindow(this->RenderWidget->GetRenderWindow());
   this->ImageViewer->SetRenderer(this->RenderWidget->GetRenderer());
   this->ImageViewer->SetInput(reader->GetOutput());
@@ -129,8 +145,11 @@ int vtkKWMedicalImageViewerExample::Run(int argc, char *argv[])
 
   // Create a scale to control the slice
 
-  this->SliceScale = vtkKWScale::New();
-  this->SliceScale->SetParent(win->GetViewPanelFrame());
+  if (!this->SliceScale)
+    {
+    this->SliceScale = vtkKWScale::New();
+    }
+  this->SliceScale->SetParent(this->GetViewPanelFrame());
   this->SliceScale->Create();
   this->SliceScale->SetCommand(this, "SetSliceFromScaleCallback");
 
@@ -142,7 +161,7 @@ int vtkKWMedicalImageViewerExample::Run(int argc, char *argv[])
   vtkKWMenuButtonWithSpinButtonsWithLabel *orientation_menubutton = 
     vtkKWMenuButtonWithSpinButtonsWithLabel::New();
 
-  orientation_menubutton->SetParent(win->GetMainPanelFrame());
+  orientation_menubutton->SetParent(this->GetMainPanelFrame());
   orientation_menubutton->Create();
   orientation_menubutton->SetLabelText("Orientation:");
   orientation_menubutton->SetPadX(2);
@@ -165,15 +184,17 @@ int vtkKWMedicalImageViewerExample::Run(int argc, char *argv[])
   // Create a window/level preset selector
 
   vtkKWFrameWithLabel *wl_frame = vtkKWFrameWithLabel::New();
-  wl_frame->SetParent(win->GetMainPanelFrame());
+  wl_frame->SetParent(this->GetMainPanelFrame());
   wl_frame->Create();
   wl_frame->SetLabelText("Window/Level Presets");
 
   app->Script("pack %s -side top -anchor nw -expand n -fill x -pady 2",
               wl_frame->GetWidgetName());
 
-  this->WindowLevelPresetSelector = vtkKWWindowLevelPresetSelector::New();
-
+  if (!this->WindowLevelPresetSelector)
+    {
+    this->WindowLevelPresetSelector = vtkKWWindowLevelPresetSelector::New();
+    }
   this->WindowLevelPresetSelector->SetParent(wl_frame->GetFrame());
   this->WindowLevelPresetSelector->Create();
   this->WindowLevelPresetSelector->ThumbnailColumnVisibilityOn();
@@ -192,13 +213,17 @@ int vtkKWMedicalImageViewerExample::Run(int argc, char *argv[])
   // Create a simple animation widget
 
   vtkKWFrameWithLabel *animation_frame = vtkKWFrameWithLabel::New();
-  animation_frame->SetParent(win->GetMainPanelFrame());
+  animation_frame->SetParent(this->GetMainPanelFrame());
   animation_frame->Create();
   animation_frame->SetLabelText("Movie Creator");
 
   app->Script("pack %s -side top -anchor nw -expand n -fill x -pady 2",
               animation_frame->GetWidgetName());
-  this->AnimationWidget = vtkKWSimpleAnimationWidget::New();
+
+  if (!this->AnimationWidget)
+    {
+    this->AnimationWidget = vtkKWSimpleAnimationWidget::New();
+    }
   this->AnimationWidget->SetParent(animation_frame->GetFrame());
   this->AnimationWidget->Create();
   this->AnimationWidget->SetRenderWidget(this->RenderWidget);
@@ -211,68 +236,46 @@ int vtkKWMedicalImageViewerExample::Run(int argc, char *argv[])
 
   this->UpdateSliceRanges();
 
-  // Start the application
-  // If --test was provided, do not enter the event loop and run this example
-  // as a non-interactive test for software quality purposes.
-
-  int ret = 0;
-  win->Display();
-  if (!option_test)
-    {
-    app->Start(argc, argv);
-    ret = app->GetExitStatus();
-    }
-  win->Close();
-
-  // Deallocate and exit
+  // Deallocate local objects
 
   reader->Delete();
-  this->SliceScale->Delete();
   orientation_menubutton->Delete();
-  this->ImageViewer->Delete();
-  this->RenderWidget->Delete();
   wl_frame->Delete();
-  this->WindowLevelPresetSelector->Delete();
   animation_frame->Delete();
-  this->AnimationWidget->Delete();
-  win->Delete();
-
-  return ret;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMedicalImageViewerExample::SetSliceFromScaleCallback(
-  double value)
+void vtkKWMyWindow::SetSliceFromScaleCallback(double value)
 {
   this->ImageViewer->SetSlice((int)value);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMedicalImageViewerExample::SetSliceCallback(int slice)
+void vtkKWMyWindow::SetSliceCallback(int slice)
 {
   this->ImageViewer->SetSlice(slice);
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMedicalImageViewerExample::GetSliceCallback()
+int vtkKWMyWindow::GetSliceCallback()
 {
   return this->ImageViewer->GetSlice();
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMedicalImageViewerExample::GetSliceMinCallback()
+int vtkKWMyWindow::GetSliceMinCallback()
 {
   return this->ImageViewer->GetSliceMin();
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMedicalImageViewerExample::GetSliceMaxCallback()
+int vtkKWMyWindow::GetSliceMaxCallback()
 {
   return this->ImageViewer->GetSliceMax();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMedicalImageViewerExample::UpdateSliceRanges()
+void vtkKWMyWindow::UpdateSliceRanges()
 {
   this->SliceScale->SetRange(
     this->ImageViewer->GetSliceMin(), this->ImageViewer->GetSliceMax());
@@ -283,29 +286,28 @@ void vtkKWMedicalImageViewerExample::UpdateSliceRanges()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMedicalImageViewerExample::SetSliceOrientationToXYCallback()
+void vtkKWMyWindow::SetSliceOrientationToXYCallback()
 {
   this->ImageViewer->SetSliceOrientationToXY();
   this->UpdateSliceRanges();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMedicalImageViewerExample::SetSliceOrientationToXZCallback()
+void vtkKWMyWindow::SetSliceOrientationToXZCallback()
 {
   this->ImageViewer->SetSliceOrientationToXZ();
   this->UpdateSliceRanges();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMedicalImageViewerExample::SetSliceOrientationToYZCallback()
+void vtkKWMyWindow::SetSliceOrientationToYZCallback()
 {
   this->ImageViewer->SetSliceOrientationToYZ();
   this->UpdateSliceRanges();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMedicalImageViewerExample::WindowLevelPresetApplyCallback(
-  int id)
+void vtkKWMyWindow::WindowLevelPresetApplyCallback(int id)
 {
   if (this->WindowLevelPresetSelector->HasPreset(id))
     {
@@ -317,15 +319,14 @@ void vtkKWMedicalImageViewerExample::WindowLevelPresetApplyCallback(
     }
 }
 //----------------------------------------------------------------------------
-void vtkKWMedicalImageViewerExample::WindowLevelPresetAddCallback()
+void vtkKWMyWindow::WindowLevelPresetAddCallback()
 {
   this->WindowLevelPresetUpdateCallback(
     this->WindowLevelPresetSelector->AddPreset());
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMedicalImageViewerExample::WindowLevelPresetUpdateCallback(
-  int id)
+void vtkKWMyWindow::WindowLevelPresetUpdateCallback(int id)
 {
   this->WindowLevelPresetSelector->SetPresetWindow(
     id, this->ImageViewer->GetColorWindow());
@@ -335,9 +336,7 @@ void vtkKWMedicalImageViewerExample::WindowLevelPresetUpdateCallback(
 }
 
 //----------------------------------------------------------------------------
-void 
-vtkKWMedicalImageViewerExample::WindowLevelPresetHasChangedCallback(
-  int id)
+void vtkKWMyWindow::WindowLevelPresetHasChangedCallback(int id)
 {
   this->WindowLevelPresetSelector->
     BuildPresetThumbnailAndScreenshotFromRenderWindow(

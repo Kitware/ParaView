@@ -19,8 +19,10 @@ SET(TARGET_BASE_NAME "KW${PROJECT_NAME}Example")
 # use its callbacks from our user interface. To do so, we need to create
 # a library and wrap it automatically for the Tcl language.
 
-SET(LIB_NAME "${TARGET_BASE_NAME}Lib")
-SET(LIB_SRCS "vtk${TARGET_BASE_NAME}.cxx")
+SET(LIB_NAME "KWMedicalImageViewerExampleLib")
+SET(LIB_SRCS 
+  vtkKWMyWindow.cxx
+  )
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 
