@@ -36,49 +36,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkImplicitPlaneRepresentation.h>
 #include <vtkProcessModule.h>
+#include <vtkPVDataInformation.h>
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMNew3DWidgetProxy.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMProxyProperty.h>
 #include <vtkSMRenderModuleProxy.h>
+#include <vtkSMSourceProxy.h>
 
 pqWidgetObjectPanel::pqWidgetObjectPanel(QString filename, QWidget* p) :
   pqLoadedFormObjectPanel(filename, p),
   Widget(0)
 {
-  this->Widget = vtkSMNew3DWidgetProxy::SafeDownCast(
-    vtkSMObject::GetProxyManager()->NewProxy(
-      "displays", "ImplicitPlaneWidgetDisplay"));
-
-  this->Widget->UpdateVTKObjects();
-
-//  this->Widget->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer);
-
-  pqRenderModule* renModule = 
-    pqApplicationCore::instance()->getActiveRenderModule();
-
-  vtkSMRenderModuleProxy* rm = renModule->getProxy() ;
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    rm->GetProperty("Displays"));
-  pp->AddProxy(this->Widget);
-  rm->UpdateVTKObjects();
-
 }
 
 pqWidgetObjectPanel::~pqWidgetObjectPanel()
 {
-  pqRenderModule* renModule = 
-    pqApplicationCore::instance()->getActiveRenderModule();
+  if(this->Widget)
+    {
+    pqRenderModule* renModule = 
+      pqApplicationCore::instance()->getActiveRenderModule();
 
-  vtkSMRenderModuleProxy* rm = renModule->getProxy() ;
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    rm->GetProperty("Displays"));
-  pp->RemoveProxy(this->Widget);
-  rm->UpdateVTKObjects();
+    vtkSMRenderModuleProxy* rm = renModule->getProxy() ;
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      rm->GetProperty("Displays"));
+    pp->RemoveProxy(this->Widget);
+    rm->UpdateVTKObjects();
 
-  this->Widget->Delete();
-  this->Widget = 0;
+    this->Widget->Delete();
+    this->Widget = 0;
+    }
 }
 
 void pqWidgetObjectPanel::setProxy(pqSMProxy proxy)
@@ -88,5 +76,66 @@ void pqWidgetObjectPanel::setProxy(pqSMProxy proxy)
   if(!this->Proxy)
     return;
 
-  // Set widget bounds here
+  // Create the 3D widget ...
+  if(!this->Widget)
+    {
+    this->Widget = vtkSMNew3DWidgetProxy::SafeDownCast(
+      vtkSMObject::GetProxyManager()->NewProxy(
+        "displays", "ImplicitPlaneWidgetDisplay"));
+
+    // Resize the 3D widget based on the bounds of the input data ...
+    if(vtkSMProxyProperty* const input_property = vtkSMProxyProperty::SafeDownCast(
+      this->Proxy->GetProperty("Input")))
+      {
+      if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
+        input_property->GetProxy(0)))
+        {
+        double input_bounds[6];
+        input_proxy->GetDataInformation()->GetBounds(input_bounds);
+        
+        double input_origin[3];
+        input_origin[0] = (input_bounds[0] + input_bounds[1]) / 2.0;
+        input_origin[1] = (input_bounds[2] + input_bounds[3]) / 2.0;
+        input_origin[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
+
+        double input_size[3];
+        input_size[0] = abs(input_bounds[1] - input_bounds[0]) * 1.2;
+        input_size[1] = abs(input_bounds[3] - input_bounds[2]) * 1.2;
+        input_size[2] = abs(input_bounds[5] - input_bounds[4]) * 1.2;
+        
+        if(vtkSMDoubleVectorProperty* const origin = vtkSMDoubleVectorProperty::SafeDownCast(
+          this->Widget->GetProperty("Origin")))
+          {
+          origin->SetElements(input_origin);
+          }
+        
+        if(vtkSMDoubleVectorProperty* const place_widget = vtkSMDoubleVectorProperty::SafeDownCast(
+          this->Widget->GetProperty("PlaceWidget")))
+          {
+          double widget_bounds[6];
+          widget_bounds[0] = input_origin[0] - input_size[0];
+          widget_bounds[1] = input_origin[0] + input_size[0];
+          widget_bounds[2] = input_origin[1] - input_size[1];
+          widget_bounds[3] = input_origin[1] + input_size[1];
+          widget_bounds[4] = input_origin[2] - input_size[2];
+          widget_bounds[5] = input_origin[2] + input_size[2];
+          
+          place_widget->SetElements(widget_bounds);
+          }
+        }
+      }
+
+    this->Widget->UpdateVTKObjects();
+
+  //  this->Widget->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer);
+
+    pqRenderModule* renModule = 
+      pqApplicationCore::instance()->getActiveRenderModule();
+
+    vtkSMRenderModuleProxy* rm = renModule->getProxy() ;
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      rm->GetProperty("Displays"));
+    pp->AddProxy(this->Widget);
+    rm->UpdateVTKObjects();
+    }
 }
