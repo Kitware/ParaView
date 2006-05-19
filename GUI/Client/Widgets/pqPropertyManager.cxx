@@ -62,6 +62,10 @@ public:
       return this->Index < o.Index;
       }
     };
+  pqInternal()
+    {
+    Links.setUseUncheckedProperties(true);
+    }
   typedef QMultiMap<PropertyKey, pqPropertyManagerProperty*> PropertyMap;
   PropertyMap Properties;
   pqPropertyLinks Links;
@@ -181,9 +185,10 @@ void pqPropertyManager::registerLink(QObject* qObject, const char* qProperty, co
     iter = this->Internal->Properties.insert(pqInternal::PropertyKey(Property, Index), p);
     
     this->Internal->Links.addPropertyLink(iter.value(), "value", SIGNAL(flushProperty()),
-      Proxy, Property, Index);
+                                          Proxy, Property, Index);
 
     QObject::connect(p, SIGNAL(propertyChanged()), this, SLOT(propertyChanged()));
+    QObject::connect(qObject, signal, iter.value(), SIGNAL(flushProperty()));
     }
   // link the QObject property with this QObject property
   iter.value()->addLink(qObject, qProperty, signal);
@@ -200,9 +205,10 @@ void pqPropertyManager::unregisterLink(QObject* qObject, const char* qProperty, 
     iter.value()->removeLink(qObject, qProperty, signal);
     if(iter.value()->numberOfLinks() == 0)
       {
+      QObject::disconnect(qObject, signal, iter.value(), SIGNAL(flushProperty()));
       QObject::disconnect(iter.value(), SIGNAL(propertyChanged()), this, SLOT(propertyChanged()));
       this->Internal->Links.removePropertyLink(iter.value(), "value", SIGNAL(flushProperty()),
-        Proxy, Property, Index);
+                                               Proxy, Property, Index);
       this->Internal->Properties.erase(iter);
       }
     }
@@ -212,13 +218,7 @@ void pqPropertyManager::unregisterLink(QObject* qObject, const char* qProperty, 
 void pqPropertyManager::accept()
 {
   emit this->preaccept();
-  foreach(pqPropertyManagerProperty* p, this->Internal->Properties.values())
-    {
-    emit p->flushProperty();
-    }
-  // hack -- apparently our propertyChanged() slot is called after we emit canAcceptOrReject(),
-  // so flushing the queue works around that
-  QApplication::processEvents();  
+  this->Internal->Links.accept();
   emit this->canAcceptOrReject(false);
   emit this->accepted();
   emit this->postaccept();

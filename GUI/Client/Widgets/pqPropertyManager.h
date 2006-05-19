@@ -41,8 +41,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkSMProxy;
 class vtkSMProperty;
 
-/// manages queued links between Qt properties and server manager properties
-/// Provides a mechanims for accepting or rejecting changes
+/// Manages links between Qt properties and unchecked proxy properties
+/// This is useful if more than one QWidget exposes a single proxy property
+/// In which case the server manager will not keep the widgets synchronized
+/// Also provides a mechanims for accepting or rejecting changes for unchecked
+/// properties
 class PQWIDGETS_EXPORT pqPropertyManager : public QObject
 {
   Q_OBJECT
