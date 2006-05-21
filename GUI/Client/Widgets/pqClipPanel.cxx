@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMNew3DWidgetProxy.h>
+#include <vtkSMProxyProperty.h>
 
 #include <QLineEdit>
 
@@ -55,50 +56,104 @@ void pqClipPanel::setProxy(pqSMProxy p)
 {
   pqWidgetObjectPanel::setProxy(p);
   
-  if(!this->Proxy)
-    return;
+  QLineEdit* const originX = this->findChild<QLineEdit*>("originX");
+  QLineEdit* const originY = this->findChild<QLineEdit*>("originY");
+  QLineEdit* const originZ = this->findChild<QLineEdit*>("originZ");
+  QLineEdit* const normalX = this->findChild<QLineEdit*>("normalX");
+  QLineEdit* const normalY = this->findChild<QLineEdit*>("normalY");
+  QLineEdit* const normalZ = this->findChild<QLineEdit*>("normalZ");
   
-  if(!this->Widget)
-    return;
-
-  if(vtkSMDoubleVectorProperty* const widget_origin = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->Widget->GetProperty("Origin")))
+  // Connect Qt widgets to the 3D widget ...
+  if(this->Widget)
     {
-    if(QLineEdit* const originX = this->findChild<QLineEdit*>("originX"))
+    if(vtkSMDoubleVectorProperty* const widget_origin = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->Widget->GetProperty("Origin")))
       {
-      this->getPropertyLinks().addPropertyLink(originX, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 0);
+      if(originX)
+        {
+        this->getPropertyLinks().addPropertyLink(originX, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 0);
+        }
+   
+      if(originY)
+        {
+        this->getPropertyLinks().addPropertyLink(originY, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 1);
+        }
+      
+      if(originZ)
+        {
+        this->getPropertyLinks().addPropertyLink(originZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 2);
+        }
       }
- 
-    if(QLineEdit* const originY = this->findChild<QLineEdit*>("originY"))
+
+    if(vtkSMDoubleVectorProperty* const widget_normal = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->Widget->GetProperty("Normal")))
       {
-      this->getPropertyLinks().addPropertyLink(originY, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 1);
-      }
-    
-    if(QLineEdit* const originZ = this->findChild<QLineEdit*>("originZ"))
-      {
-      this->getPropertyLinks().addPropertyLink(originZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 2);
+      if(normalX)
+        {
+        this->getPropertyLinks().addPropertyLink(normalX, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 0);
+        }
+   
+      if(normalY)
+        {
+        this->getPropertyLinks().addPropertyLink(normalY, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 1);
+        }
+      
+      if(normalZ)
+        {
+        this->getPropertyLinks().addPropertyLink(normalZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 2);
+        }
       }
     }
 
-  if(vtkSMDoubleVectorProperty* const widget_normal = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->Widget->GetProperty("Normal")))
+  // Connect Qt widgets to the implicit plane function ...
+/*
+  if(this->Proxy)
     {
-    if(QLineEdit* const normalX = this->findChild<QLineEdit*>("normalX"))
+    if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
+      this->Proxy->GetProperty("ClipFunction")))
       {
-      this->getPropertyLinks().addPropertyLink(normalX, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 0);
-      }
- 
-    if(QLineEdit* const normalY = this->findChild<QLineEdit*>("normalY"))
-      {
-      this->getPropertyLinks().addPropertyLink(normalY, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 1);
-      }
-    
-    if(QLineEdit* const normalZ = this->findChild<QLineEdit*>("normalZ"))
-      {
-      this->getPropertyLinks().addPropertyLink(normalZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 2);
+      if(vtkSMProxy* const clip_function = clip_function_property->GetProxy(0))
+        {
+        if(vtkSMDoubleVectorProperty* const plane_origin = vtkSMDoubleVectorProperty::SafeDownCast(
+          clip_function->GetProperty("Origin")))
+          {
+          if(originX)
+            {
+            this->getPropertyLinks().addPropertyLink(originX, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_origin, 0);
+            }
+       
+          if(originY)
+            {
+            this->getPropertyLinks().addPropertyLink(originY, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_origin, 1);
+            }
+          
+          if(originZ)
+            {
+            this->getPropertyLinks().addPropertyLink(originZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_origin, 2);
+            }
+          }
+
+        if(vtkSMDoubleVectorProperty* const plane_normal = vtkSMDoubleVectorProperty::SafeDownCast(
+          clip_function->GetProperty("Normal")))
+          {
+          if(normalX)
+            {
+            this->getPropertyLinks().addPropertyLink(normalX, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_normal, 0);
+            }
+       
+          if(normalY)
+            {
+            this->getPropertyLinks().addPropertyLink(normalY, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_normal, 1);
+            }
+          
+          if(normalZ)
+            {
+            this->getPropertyLinks().addPropertyLink(normalZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_normal, 2);
+            }
+          }
+        }
       }
     }
-
-  this->getPropertyLinks().reset();
+*/
 }
 
