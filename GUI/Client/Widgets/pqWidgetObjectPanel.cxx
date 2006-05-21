@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqApplicationCore.h"
+#include "pqPropertyLinks.h"
 #include "pqRenderModule.h"
 #include "pqWidgetObjectPanel.h"
 
@@ -47,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 pqWidgetObjectPanel::pqWidgetObjectPanel(QString filename, QWidget* p) :
   pqLoadedFormObjectPanel(filename, p),
+  PropertyLinks(new pqPropertyLinks()),
   Widget(0)
 {
 }
@@ -67,6 +69,13 @@ pqWidgetObjectPanel::~pqWidgetObjectPanel()
     this->Widget->Delete();
     this->Widget = 0;
     }
+
+  delete this->PropertyLinks;
+}
+
+pqPropertyLinks& pqWidgetObjectPanel::getPropertyLinks()
+{
+  return *this->PropertyLinks;
 }
 
 void pqWidgetObjectPanel::setProxy(pqSMProxy proxy)
@@ -92,16 +101,16 @@ void pqWidgetObjectPanel::setProxy(pqSMProxy proxy)
         {
         double input_bounds[6];
         input_proxy->GetDataInformation()->GetBounds(input_bounds);
-        
+       
         double input_origin[3];
         input_origin[0] = (input_bounds[0] + input_bounds[1]) / 2.0;
         input_origin[1] = (input_bounds[2] + input_bounds[3]) / 2.0;
         input_origin[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
 
         double input_size[3];
-        input_size[0] = abs(input_bounds[1] - input_bounds[0]) * 1.2;
-        input_size[1] = abs(input_bounds[3] - input_bounds[2]) * 1.2;
-        input_size[2] = abs(input_bounds[5] - input_bounds[4]) * 1.2;
+        input_size[0] = fabs(input_bounds[1] - input_bounds[0]) * 1.2;
+        input_size[1] = fabs(input_bounds[3] - input_bounds[2]) * 1.2;
+        input_size[2] = fabs(input_bounds[5] - input_bounds[4]) * 1.2;
         
         if(vtkSMDoubleVectorProperty* const origin = vtkSMDoubleVectorProperty::SafeDownCast(
           this->Widget->GetProperty("Origin")))

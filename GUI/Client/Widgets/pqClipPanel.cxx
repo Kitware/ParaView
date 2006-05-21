@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqClipPanel.h"
+#include "pqPropertyLinks.h"
 #include "pqPropertyManager.h"
 
 #include <vtkSMDoubleVectorProperty.h>
@@ -39,8 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLineEdit>
 
 /// constructor
-pqClipPanel::pqClipPanel(QWidget* p)
-  : pqWidgetObjectPanel(":/pqWidgets/ClipPanel.ui", p)
+pqClipPanel::pqClipPanel(QWidget* p) :
+  pqWidgetObjectPanel(":/pqWidgets/ClipPanel.ui", p)
 {
 }
 
@@ -65,17 +66,17 @@ void pqClipPanel::setProxy(pqSMProxy p)
     {
     if(QLineEdit* const originX = this->findChild<QLineEdit*>("originX"))
       {
-      this->getPropertyManager()->registerLink(originX, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 0);
+      this->getPropertyLinks().addPropertyLink(originX, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 0);
       }
  
     if(QLineEdit* const originY = this->findChild<QLineEdit*>("originY"))
       {
-      this->getPropertyManager()->registerLink(originY, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 1);
+      this->getPropertyLinks().addPropertyLink(originY, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 1);
       }
     
     if(QLineEdit* const originZ = this->findChild<QLineEdit*>("originZ"))
       {
-      this->getPropertyManager()->registerLink(originZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 2);
+      this->getPropertyLinks().addPropertyLink(originZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 2);
       }
     }
 
@@ -84,17 +85,20 @@ void pqClipPanel::setProxy(pqSMProxy p)
     {
     if(QLineEdit* const normalX = this->findChild<QLineEdit*>("normalX"))
       {
-      this->getPropertyManager()->registerLink(normalX, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 0);
+      this->getPropertyLinks().addPropertyLink(normalX, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 0);
       }
  
     if(QLineEdit* const normalY = this->findChild<QLineEdit*>("normalY"))
       {
-      this->getPropertyManager()->registerLink(normalY, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 1);
+      this->getPropertyLinks().addPropertyLink(normalY, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 1);
       }
     
     if(QLineEdit* const normalZ = this->findChild<QLineEdit*>("normalZ"))
       {
-      this->getPropertyManager()->registerLink(normalZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 2);
+      this->getPropertyLinks().addPropertyLink(normalZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 2);
       }
     }
+
+  this->getPropertyLinks().reset();
 }
+

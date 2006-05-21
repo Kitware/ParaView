@@ -35,8 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqWidgetObjectPanel.h"
 
-class vtkSMNew3DWidgetProxy;
-
 class pqClipPanel :
   public pqWidgetObjectPanel
 {
