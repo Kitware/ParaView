@@ -218,12 +218,16 @@ void pqPropertyManager::unregisterLink(QObject* qObject, const char* qProperty, 
 void pqPropertyManager::accept()
 {
   this->Internal->Links.accept();
+  emit this->accepted();
+  
   emit this->canAcceptOrReject(false);
 }
 
 void pqPropertyManager::reject()
 {
   this->Internal->Links.reset();
+  emit this->rejected();
+  
   emit this->canAcceptOrReject(false);
 }
 

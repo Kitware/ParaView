@@ -65,19 +65,22 @@ public:
                           vtkSMProxy* Proxy, vtkSMProperty* Property, int Index=-1);
 
 signals:
-  /// signal emitted whether there are possible properties to send down to the server manager
+  /// Signal emitted whether there are possible properties to send down to the server manager
   void canAcceptOrReject(bool);
+  /// Signal emitted when the user has accepted changes
+  void accepted();
+  /// Signal emitted when the user has rejected changes
+  void rejected();
 
 public slots:
   /// accept property changes by pushing them all down to the server manager
   void accept();
   /// reject property changes and revert all QObject properties
   void reject();
-
-protected slots:
+  /// Called whenever a property changes
   void propertyChanged();
-protected:
   
+protected:
   class pqInternal;
   pqInternal* Internal;
 

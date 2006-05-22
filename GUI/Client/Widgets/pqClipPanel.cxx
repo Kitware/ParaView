@@ -44,8 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// constructor
 pqClipPanel::pqClipPanel(QWidget* p) :
   pqWidgetObjectPanel(":/pqWidgets/ClipPanel.ui", p),
-  IgnoreManual(false),
-  IgnoreWidget(false)
+  IgnoreQtWidgets(false),
+  Ignore3DWidget(false)
 {
   QLineEdit* const originX = this->findChild<QLineEdit*>("originX");
   QLineEdit* const originY = this->findChild<QLineEdit*>("originY");
@@ -54,12 +54,15 @@ pqClipPanel::pqClipPanel(QWidget* p) :
   QLineEdit* const normalY = this->findChild<QLineEdit*>("normalY");
   QLineEdit* const normalZ = this->findChild<QLineEdit*>("normalZ");
   
-  connect(originX, SIGNAL(editingFinished()), this, SLOT(onManualEditingFinished()));
-  connect(originY, SIGNAL(editingFinished()), this, SLOT(onManualEditingFinished()));
-  connect(originZ, SIGNAL(editingFinished()), this, SLOT(onManualEditingFinished()));
-  connect(normalX, SIGNAL(editingFinished()), this, SLOT(onManualEditingFinished()));
-  connect(normalY, SIGNAL(editingFinished()), this, SLOT(onManualEditingFinished()));
-  connect(normalZ, SIGNAL(editingFinished()), this, SLOT(onManualEditingFinished()));
+  connect(originX, SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
+  connect(originY, SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
+  connect(originZ, SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
+  connect(normalX, SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
+  connect(normalY, SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
+  connect(normalZ, SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
+  
+  connect(this->getPropertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
+  connect(this->getPropertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
 }
 
 /// destructor
@@ -181,6 +184,76 @@ void pqClipPanel::setProxyInternal(pqSMProxy p)
   if(!this->Proxy)
     return;
   
+  this->pullImplicitPlane();
+}
+
+void pqClipPanel::onQtWidgetChanged()
+{
+  if(IgnoreQtWidgets)
+    return;
+
+  // Get the new values from the Qt widgets ...
+  double origin[3] = { 0, 0, 0 };
+  double normal[3] = { 0, 0, 1 };
+
+  QLineEdit* const originX = this->findChild<QLineEdit*>("originX");
+  QLineEdit* const originY = this->findChild<QLineEdit*>("originY");
+  QLineEdit* const originZ = this->findChild<QLineEdit*>("originZ");
+  QLineEdit* const normalX = this->findChild<QLineEdit*>("normalX");
+  QLineEdit* const normalY = this->findChild<QLineEdit*>("normalY");
+  QLineEdit* const normalZ = this->findChild<QLineEdit*>("normalZ");
+
+  origin[0] = originX->text().toDouble();
+  origin[1] = originY->text().toDouble();
+  origin[2] = originZ->text().toDouble();
+  normal[0] = normalX->text().toDouble();
+  normal[1] = normalY->text().toDouble();
+  normal[2] = normalZ->text().toDouble();
+  
+  // Push the new values into the 3D widget (ideally, this should happen automatically when the implicit plane is updated)
+  this->update3DWidget(origin, normal);
+  
+  // Signal the UI that there are changes to accept/reject ...
+  this->getPropertyManager()->propertyChanged();
+}
+
+void pqClipPanel::on3DWidgetChanged()
+{
+  if(Ignore3DWidget)
+    return;
+    
+  // Get the new values from the 3D widget ...
+  double origin[3] = { 0, 0, 0 };
+  double normal[3] = { 0, 0, 1 };
+  
+  if(this->Widget)
+    {
+    if(vtkSMDoubleVectorProperty* const widget_origin = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->Widget->GetProperty("Origin")))
+      {
+      origin[0] = widget_origin->GetElement(0);
+      origin[1] = widget_origin->GetElement(1);
+      origin[2] = widget_origin->GetElement(2);
+      }
+
+    if(vtkSMDoubleVectorProperty* const widget_normal = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->Widget->GetProperty("Normal")))
+      {
+      normal[0] = widget_normal->GetElement(0);
+      normal[1] = widget_normal->GetElement(1);
+      normal[2] = widget_normal->GetElement(2);
+      }
+    }
+  
+  // Push the new values into the Qt widgets (ideally, this should happen automatically when the implicit plane is updated)
+  this->updateQtWidgets(origin, normal);
+
+  // Signal the UI that there are changes to accept/reject ...
+  this->getPropertyManager()->propertyChanged();
+}
+
+void pqClipPanel::pullImplicitPlane()
+{
   // Get the current values from the implicit plane ...
   double origin[3] = { 0, 0, 0 };
   double normal[3] = { 0, 0, 1 };
@@ -218,76 +291,9 @@ void pqClipPanel::setProxyInternal(pqSMProxy p)
   this->update3DWidget(origin, normal);
 }
 
-void pqClipPanel::onManualEditingFinished()
-{
-  if(IgnoreManual)
-    return;
-
-  // Get the new values from the Qt widgets ...
-  double origin[3] = { 0, 0, 0 };
-  double normal[3] = { 0, 0, 1 };
-
-  QLineEdit* const originX = this->findChild<QLineEdit*>("originX");
-  QLineEdit* const originY = this->findChild<QLineEdit*>("originY");
-  QLineEdit* const originZ = this->findChild<QLineEdit*>("originZ");
-  QLineEdit* const normalX = this->findChild<QLineEdit*>("normalX");
-  QLineEdit* const normalY = this->findChild<QLineEdit*>("normalY");
-  QLineEdit* const normalZ = this->findChild<QLineEdit*>("normalZ");
-
-  origin[0] = originX->text().toDouble();
-  origin[1] = originY->text().toDouble();
-  origin[2] = originZ->text().toDouble();
-  normal[0] = normalX->text().toDouble();
-  normal[1] = normalY->text().toDouble();
-  normal[2] = normalZ->text().toDouble();
-  
-  // Push the new values into the implicit plane ...
-  this->updateImplicitPlane(origin, normal);
-    
-  // Push the new values into the 3D widget (ideally, this should happen automatically when the implicit plane is updated)
-  this->update3DWidget(origin, normal);
-  
-  pqApplicationCore::instance()->render();
-}
-
-void pqClipPanel::on3DWidgetChanged()
-{
-  if(IgnoreWidget)
-    return;
-    
-  // Get the new values from the 3D widget ...
-  double origin[3] = { 0, 0, 0 };
-  double normal[3] = { 0, 0, 1 };
-  
-  if(this->Widget)
-    {
-    if(vtkSMDoubleVectorProperty* const widget_origin = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->Widget->GetProperty("Origin")))
-      {
-      origin[0] = widget_origin->GetElement(0);
-      origin[1] = widget_origin->GetElement(1);
-      origin[2] = widget_origin->GetElement(2);
-      }
-
-    if(vtkSMDoubleVectorProperty* const widget_normal = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->Widget->GetProperty("Normal")))
-      {
-      normal[0] = widget_normal->GetElement(0);
-      normal[1] = widget_normal->GetElement(1);
-      normal[2] = widget_normal->GetElement(2);
-      }
-    }
-  
-  // Push the new values into the implicit plane ...
-  this->updateImplicitPlane(origin, normal);
-    
-  // Push the new values into the Qt widgets (ideally, this should happen automatically when the implicit plane is updated)
-  this->updateQtWidgets(origin, normal);
-}
-
 void pqClipPanel::updateQtWidgets(const double* origin, const double* normal)
 {
-  this->IgnoreManual = true;
+  this->IgnoreQtWidgets = true;
   
   QLineEdit* const originX = this->findChild<QLineEdit*>("originX");
   QLineEdit* const originY = this->findChild<QLineEdit*>("originY");
@@ -303,12 +309,12 @@ void pqClipPanel::updateQtWidgets(const double* origin, const double* normal)
   normalY->setText(QString::number(normal[1]));  
   normalZ->setText(QString::number(normal[2]));
   
-  this->IgnoreManual = false;
+  this->IgnoreQtWidgets = false;
 }
 
 void pqClipPanel::update3DWidget(const double* origin, const double* normal)
 {
-  this->IgnoreWidget = true;
+  this->Ignore3DWidget = true;
    
   if(this->Widget)
     {
@@ -325,12 +331,14 @@ void pqClipPanel::update3DWidget(const double* origin, const double* normal)
       }
     
     this->Widget->UpdateVTKObjects();
+    
+    pqApplicationCore::instance()->render();
     }
     
-  this->IgnoreWidget = false;
+  this->Ignore3DWidget = false;
 }
 
-void pqClipPanel::updateImplicitPlane(const double* origin, const double* normal)
+void pqClipPanel::pushImplicitPlane(const double* origin, const double* normal)
 {
   if(this->Proxy)
     {
@@ -355,4 +363,37 @@ void pqClipPanel::updateImplicitPlane(const double* origin, const double* normal
         }
       }
     }
+}
+
+void pqClipPanel::onAccepted()
+{
+  // Get the updated values from the 3D widget ...
+  double origin[3] = { 0, 0, 0 };
+  double normal[3] = { 0, 0, 1 };
+  
+  if(this->Widget)
+    {
+    if(vtkSMDoubleVectorProperty* const widget_origin = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->Widget->GetProperty("Origin")))
+      {
+      origin[0] = widget_origin->GetElement(0);
+      origin[1] = widget_origin->GetElement(1);
+      origin[2] = widget_origin->GetElement(2);
+      }
+
+    if(vtkSMDoubleVectorProperty* const widget_normal = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->Widget->GetProperty("Normal")))
+      {
+      normal[0] = widget_normal->GetElement(0);
+      normal[1] = widget_normal->GetElement(1);
+      normal[2] = widget_normal->GetElement(2);
+      }
+    }
+  
+  this->pushImplicitPlane(origin, normal);
+}
+
+void pqClipPanel::onRejected()
+{
+  this->pullImplicitPlane();
 }
