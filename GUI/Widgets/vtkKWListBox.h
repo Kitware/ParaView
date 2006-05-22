@@ -145,10 +145,38 @@ public:
   virtual int Append(const char* name);
   
   // Description:
+  // Specifies a command to be invoked when an element is selected/deselected
+  // in the widget. Re-selecting an element will trigger this command too.
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
+  virtual void SetSelectionCommand(vtkObject *object, const char *method);
+
+  // Description:
+  // Specifies a command to be invoked when the user single-click or
+  // double-click in the listbox. This does *not* imply the selection changed
+  // though (use SetSelectionCommand instead).
+  // The 'object' argument is the object that will have the method called on
+  // it. The 'method' argument is the name of the method to be called and any
+  // arguments in string form. If the object is NULL, the method is still
+  // evaluated as a simple command. 
   // Set callback for single and double click on a list item.
   virtual void SetDoubleClickCommand(vtkObject *obj, const char *method);
   virtual void SetSingleClickCommand(vtkObject *obj, const char *method);
   
+  // Description:
+  // Events. The ListBoxSelectionChangedEvent is triggered when an element 
+  // is selected/deselected in the widget. Re-selecting an element will 
+  // trigger this event too. It is similar in concept as the 'SelectionCommand'
+  /// callback but can be used by multiple listeners/observers at a time.
+  //BTX
+  enum
+  {
+    ListBoxSelectionChangedEvent = 10000
+  };
+  //ETX
+
   // Description:
   // Get number of items in the list.
   virtual int GetNumberOfItems();
@@ -189,6 +217,10 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Callbacks. Internal, do not use.
+  virtual void SelectionCallback();
  
 protected:
   vtkKWListBox();
@@ -200,6 +232,9 @@ protected:
 
   char* CurrentSelection;       // store last call of CurrentSelection
   char* Item;                   // store last call of GetItem
+
+  char *SelectionCommand;
+  virtual void InvokeSelectionCommand();
   
 private:
   vtkKWListBox(const vtkKWListBox&); // Not implemented

@@ -18,13 +18,14 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWListBox);
-vtkCxxRevisionMacro(vtkKWListBox, "1.53");
+vtkCxxRevisionMacro(vtkKWListBox, "1.54");
 
 //----------------------------------------------------------------------------
 vtkKWListBox::vtkKWListBox()
 {   
   this->CurrentSelection = 0;
   this->Item = 0; 
+  this->SelectionCommand = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -32,6 +33,11 @@ vtkKWListBox::~vtkKWListBox()
 {
   delete [] this->Item;
   delete [] this->CurrentSelection;
+  if (this->SelectionCommand)
+    {
+    delete [] this->SelectionCommand;
+    this->SelectionCommand = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -45,6 +51,8 @@ void vtkKWListBox::CreateWidget()
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
+
+  this->SetBinding("<<ListboxSelect>>", this, "SelectionCallback");
 }
 
 //----------------------------------------------------------------------------
@@ -218,6 +226,26 @@ void vtkKWListBox::SetSingleClickCommand(vtkObject *obj,
                                           const char *method)
 {
   this->SetBinding("<ButtonRelease-1>", obj, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBox::SetSelectionCommand(
+  vtkObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->SelectionCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBox::InvokeSelectionCommand()
+{
+  this->InvokeObjectMethodCommand(this->SelectionCommand);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListBox::SelectionCallback()
+{
+  this->InvokeEvent(vtkKWListBox::ListBoxSelectionChangedEvent, NULL);
+  this->InvokeSelectionCommand();
 }
 
 //----------------------------------------------------------------------------
