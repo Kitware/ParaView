@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 
 // ParaView includes.
+#include "vtkSMDataObjectDisplayProxy.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyProperty.h"
 
@@ -44,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pq3DWidgetFactory.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineData.h"
+#include "pqPipelineDisplay.h"
 #include "pqPipelineSource.h"
 #include "pqRenderModule.h"
 #include "pqRenderWindowManager.h"
@@ -297,8 +300,20 @@ pqPipelineSource* pqApplicationCore::createFilterForActiveSource(
     this->Internal->PipelineBuilder->addConnection(
       this->Internal->ActiveSource, filter);
 
+    // As a special-case, set a default implicit function for new Clip filters
     if(xmlname == "Clip")
       {
+      for(int i = 0; i != this->Internal->ActiveSource->getDisplayCount(); ++i)
+        {
+        pqPipelineDisplay* const pipeline_display =
+          this->Internal->ActiveSource->getDisplay(i);
+          
+        vtkSMDataObjectDisplayProxy* const display_proxy =
+          pipeline_display->getProxy();
+
+        display_proxy->SetVisibility(false);
+        }
+        
       vtkSMProxy* const plane = this->Internal->PipelineBuilder->createProxy(
         "implicit_functions", "Plane", "implicit_functions", 
         this->Internal->ActiveSource->getServer());
