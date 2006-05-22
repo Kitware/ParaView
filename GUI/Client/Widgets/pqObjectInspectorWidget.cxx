@@ -191,6 +191,7 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
   if(iter != this->QueuedCustomPanels.end())
     {
     this->CurrentCustomPanel = iter.value();
+    this->QueuedCustomPanels.erase(iter);
     }
 
   if(proxy && !this->CurrentCustomPanel)
@@ -238,6 +239,7 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
   if(jter != this->QueuedAutoPanels.end())
     {
     this->CurrentAutoPanel = jter.value();
+    this->QueuedAutoPanels.erase(jter);
     }
 
   if(this->CurrentAutoPanel == NULL)
@@ -341,21 +343,26 @@ void pqObjectInspectorWidget::accept()
   // accept all queued panels
   foreach(pqObjectPanel* p, this->QueuedCustomPanels)
     {
-    p->getPropertyManager()->accept();
+    p->accept();
     delete p;
     }
   this->QueuedCustomPanels.clear();
   
   foreach(pqObjectPanel* p, this->QueuedAutoPanels)
     {
-    p->getPropertyManager()->accept();
+    p->accept();
     delete p;
     }
   this->QueuedAutoPanels.clear();
   
   if(this->CurrentAutoPanel)
     {
-    this->CurrentAutoPanel->getPropertyManager()->accept();
+    this->CurrentAutoPanel->accept();
+    }
+
+  if (this->CurrentCustomPanel)
+    {
+    this->CurrentCustomPanel->accept();
     }
  
   pqApplicationCore::instance()->getActiveRenderModule()->render();

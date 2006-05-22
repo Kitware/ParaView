@@ -69,6 +69,9 @@ public:
   QByteArray QtProperty;
   bool SettingValue;
   bool UseUncheckedProperties;
+
+  // This flag indicates if the QObject and the vtkSMProperty are out of synch. 
+  bool OutOfSync;
 };
 
 class pqPropertyLinks::pqInternal
@@ -106,6 +109,7 @@ pqPropertyLinksConnection::pqPropertyLinksConnection(vtkSMProxy* smproxy,
   this->Internal->QtObject = qobject;
   this->Internal->QtProperty = qproperty;
   this->Internal->Type = pqSMAdaptor::getPropertyType(this->Internal->Property);
+  this->Internal->OutOfSync = false;
 }
 
 pqPropertyLinksConnection::pqPropertyLinksConnection(
@@ -125,12 +129,20 @@ pqPropertyLinksConnection::pqPropertyLinksConnection(
   
   this->Internal->UseUncheckedProperties = 
       copy.Internal->UseUncheckedProperties;
+
+  this->Internal->OutOfSync = copy.Internal->OutOfSync;
 }
 
 pqPropertyLinksConnection::~pqPropertyLinksConnection()
 {
   delete this->Internal;
 }
+
+bool pqPropertyLinksConnection::getOutOfSync() const
+{
+  return this->Internal->OutOfSync;
+}
+
 
 pqPropertyLinksConnection& pqPropertyLinksConnection::operator=(
      const pqPropertyLinksConnection& copy)
@@ -146,7 +158,8 @@ pqPropertyLinksConnection& pqPropertyLinksConnection::operator=(
   
   this->Internal->UseUncheckedProperties = 
     copy.Internal->UseUncheckedProperties;
-  
+ 
+  this->Internal->OutOfSync = copy.Internal->OutOfSync;
   return *this;
 }
 bool pqPropertyLinksConnection::operator<(
@@ -197,6 +210,7 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged() const
     {
     return;
     }
+  this->Internal->OutOfSync = true;
   this->Internal->SettingValue = true;
 
   if(this->Internal->QtObject)
@@ -306,6 +320,7 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
     {
     return;
     }
+  this->Internal->OutOfSync = true;
   this->Internal->SettingValue = true;
 
   if(this->Internal->QtObject)
@@ -575,7 +590,10 @@ void pqPropertyLinks::reset()
       iter != this->Internal->Links.end();
       ++iter)
     {
-    iter->smLinkedPropertyChanged();
+    if (iter->getOutOfSync())
+      {
+      iter->smLinkedPropertyChanged();
+      }
     }
 }
 
@@ -588,6 +606,10 @@ void pqPropertyLinks::accept()
       iter != this->Internal->Links.end();
       ++iter)
     {
+    if (!iter->getOutOfSync())
+      {
+      continue;
+      }
     iter->setUseUncheckedProperties(false);
     iter->qtLinkedPropertyChanged();
     iter->setUseUncheckedProperties(old);

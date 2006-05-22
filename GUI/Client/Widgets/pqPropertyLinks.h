@@ -108,9 +108,12 @@ public:
   bool operator<(pqPropertyLinksConnection const& other) const;
   void setUseUncheckedProperties(bool) const;
   bool useUncheckedProperties() const;
+
+  bool getOutOfSync() const;
 private slots:
   void smLinkedPropertyChanged() const;
   void qtLinkedPropertyChanged() const;
+
 private:
   class pqInternal;
   pqInternal* Internal;
