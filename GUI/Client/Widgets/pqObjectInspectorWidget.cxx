@@ -134,6 +134,15 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
     return;
     }
 
+  if (this->CurrentAutoPanel)
+    {
+    this->CurrentAutoPanel->unselect();
+    }
+  if (this->CurrentCustomPanel)
+    {
+    this->CurrentCustomPanel->unselect();
+    }
+
   // we have a proxy with pending changes
   if(this->AcceptButton->isEnabled())
     {
@@ -313,6 +322,15 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
       }
     this->layout()->addWidget(this->CurrentAutoPanel);
     this->CurrentAutoPanel->show();
+    }
+
+  if (this->CurrentAutoPanel)
+    {
+    this->CurrentAutoPanel->select();
+    }
+  if (this->CurrentCustomPanel)
+    {
+    this->CurrentCustomPanel->select();
     }
 }
 

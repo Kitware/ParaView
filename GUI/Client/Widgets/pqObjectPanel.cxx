@@ -52,8 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 
 
-//pqPropertyManager pqObjectPanel::PropertyManager;
-
+//-----------------------------------------------------------------------------
 /// constructor
 pqObjectPanel::pqObjectPanel(QWidget* p)
   : QWidget(p), Proxy(NULL)
@@ -61,12 +60,14 @@ pqObjectPanel::pqObjectPanel(QWidget* p)
   this->PropertyManager = new pqPropertyManager(this);
 }
 
+//-----------------------------------------------------------------------------
 /// destructor
 pqObjectPanel::~pqObjectPanel()
 {
   delete this->PropertyManager;
 }
 
+//-----------------------------------------------------------------------------
 QSize pqObjectPanel::sizeHint() const
 {
   // return a size hint that would reasonably fit several properties
@@ -79,21 +80,33 @@ QSize pqObjectPanel::sizeHint() const
   opt.palette = palette();
   opt.state = QStyle::State_None;
   return (style()->sizeFromContents(QStyle::CT_LineEdit, &opt, QSize(w, h).
-                                    expandedTo(QApplication::globalStrut()), this));
+                                    expandedTo(QApplication::globalStrut()), 
+                                    this));
 }
 
+//-----------------------------------------------------------------------------
 /// set the proxy to display properties for
 void pqObjectPanel::setProxy(pqSMProxy p)
+{
+  this->hide();
+  this->setProxyInternal(p);
+  this->show();
+}
+
+//-----------------------------------------------------------------------------
+void pqObjectPanel::setProxyInternal(pqSMProxy p)
 {
   this->Proxy = p;
 }
 
+//-----------------------------------------------------------------------------
 /// get the proxy for which properties are displayed
 pqSMProxy pqObjectPanel::proxy()
 {
   return this->Proxy;
 }
 
+//-----------------------------------------------------------------------------
 /// accept the changes made to the properties
 /// changes will be propogated down to the server manager
 void pqObjectPanel::accept()
@@ -104,17 +117,9 @@ void pqObjectPanel::accept()
     }
 
   this->PropertyManager->accept();
-  
-  // cause the screen to update
-  pqPipelineSource *source = 
-    pqServerManagerModel::instance()->getPQSource(this->Proxy);
-  if(source)
-    {
-    // FIXME
-    //source->getDisplay()->UpdateWindows();
-    }
 }
 
+//-----------------------------------------------------------------------------
 /// reset the changes made
 /// editor will query properties from the server manager
 void pqObjectPanel::reset()

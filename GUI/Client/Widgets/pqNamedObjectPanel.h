@@ -47,7 +47,6 @@ public:
   ~pqNamedObjectPanel();
 
 protected:
-  
   /// populate widgets with properties from the server manager
   void linkServerManagerProperties();
   /// set the properties in the server manager with properties in the widgets

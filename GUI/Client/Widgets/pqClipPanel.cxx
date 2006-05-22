@@ -52,9 +52,9 @@ pqClipPanel::~pqClipPanel()
   this->setProxy(NULL);
 }
 
-void pqClipPanel::setProxy(pqSMProxy p)
+void pqClipPanel::setProxyInternal(pqSMProxy p)
 {
-  pqWidgetObjectPanel::setProxy(p);
+  pqWidgetObjectPanel::setProxyInternal(p);
   
   QLineEdit* const originX = this->findChild<QLineEdit*>("originX");
   QLineEdit* const originY = this->findChild<QLineEdit*>("originY");

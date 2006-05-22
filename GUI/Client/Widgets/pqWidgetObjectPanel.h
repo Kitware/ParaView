@@ -48,11 +48,19 @@ public:
   /// destructor
   ~pqWidgetObjectPanel();
 
+public slots:
+  /// Called when the panel becomes active. 
+  /// Overridden to enable the 3D Widget. 
+  virtual void select();
+
+  /// Called when the panel becomes inactive. 
+  /// Overridden to disable the 3D widget.
+  virtual void unselect();
 protected:
   pqPropertyLinks& getPropertyLinks();
   
   /// set the proxy to display properties for
-  void setProxy(pqSMProxy proxy);
+  virtual void setProxyInternal(pqSMProxy proxy);
 
   pqPropertyLinks* PropertyLinks;
   vtkSMNew3DWidgetProxy* Widget;

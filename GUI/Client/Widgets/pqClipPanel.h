@@ -47,7 +47,7 @@ public:
   ~pqClipPanel();
   
 protected:
-  void setProxy(pqSMProxy p);
+  virtual void setProxyInternal(pqSMProxy p);
 };
 
 #endif

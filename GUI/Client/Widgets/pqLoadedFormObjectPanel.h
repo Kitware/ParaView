@@ -48,10 +48,9 @@ public:
   /// returns whether the form for the filename successfully loaded
   bool isValid();
 
-  /// set the proxy to display properties for
-  void setProxy(pqSMProxy proxy);
-
 protected:
+  /// set the proxy to display properties for
+  virtual void setProxyInternal(pqSMProxy proxy);
 
 };
 

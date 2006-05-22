@@ -59,17 +59,7 @@ pqWidgetObjectPanel::~pqWidgetObjectPanel()
 {
   if(this->Widget)
     {
-    pqRenderModule* renModule = 
-      pqApplicationCore::instance()->getActiveRenderModule();
-    if (renModule)
-      {
-      vtkSMRenderModuleProxy* rm = renModule->getProxy() ;
-      vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-        rm->GetProperty("Displays"));
-      pp->RemoveProxy(this->Widget);
-      rm->UpdateVTKObjects();
-      renModule->render();
-      }
+    this->unselect();
 
     pq3DWidgetFactory* widgetFactory = 
       pqApplicationCore::instance()->get3DWidgetFactory();
@@ -79,15 +69,48 @@ pqWidgetObjectPanel::~pqWidgetObjectPanel()
 
   delete this->PropertyLinks;
 }
-
+//-----------------------------------------------------------------------------
 pqPropertyLinks& pqWidgetObjectPanel::getPropertyLinks()
 {
   return *this->PropertyLinks;
 }
 
-void pqWidgetObjectPanel::setProxy(pqSMProxy p)
+//-----------------------------------------------------------------------------
+void pqWidgetObjectPanel::select()
 {
-  pqLoadedFormObjectPanel::setProxy(p);
+  pqRenderModule* renModule = 
+    pqApplicationCore::instance()->getActiveRenderModule();
+  if (this->Widget && renModule)
+    {
+    vtkSMRenderModuleProxy* rm = renModule->getProxy() ;
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      rm->GetProperty("Displays"));
+    pp->AddProxy(this->Widget);
+    rm->UpdateVTKObjects();
+    renModule->render();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqWidgetObjectPanel::unselect()
+{
+  pqRenderModule* renModule = 
+    pqApplicationCore::instance()->getActiveRenderModule();
+  if (this->Widget && renModule)
+    {
+    vtkSMRenderModuleProxy* rm = renModule->getProxy() ;
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      rm->GetProperty("Displays"));
+    pp->RemoveProxy(this->Widget);
+    rm->UpdateVTKObjects();
+    renModule->render();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqWidgetObjectPanel::setProxyInternal(pqSMProxy p)
+{
+  pqLoadedFormObjectPanel::setProxyInternal(p);
 
   if(!this->Proxy)
     {
@@ -149,15 +172,5 @@ void pqWidgetObjectPanel::setProxy(pqSMProxy p)
       }
 
     this->Widget->UpdateVTKObjects();
-
-    pqRenderModule* renModule = 
-      pqApplicationCore::instance()->getActiveRenderModule();
-
-    vtkSMRenderModuleProxy* rm = renModule->getProxy() ;
-    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-      rm->GetProperty("Displays"));
-    pp->AddProxy(this->Widget);
-    rm->UpdateVTKObjects();
-    renModule->render();
     }
 }

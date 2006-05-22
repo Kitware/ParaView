@@ -48,8 +48,10 @@ public:
   /// destructor
   ~pqObjectPanel();
 
-  /// set the proxy to display properties for
-  virtual void setProxy(pqSMProxy proxy);
+  /// set the proxy to display properties for.
+  /// subclassess should override setProxyInternal().
+  void setProxy(pqSMProxy proxy);
+
   /// get the proxy for which properties are displayed
   virtual pqSMProxy proxy();
   
@@ -64,15 +66,24 @@ public slots:
   /// accept the changes made to the properties
   /// changes will be propogated down to the server manager
   void accept();
+
   /// reset the changes made
   /// editor will query properties from the server manager
   void reset();
 
+  /// Called when the panel becomes active. Default implemnetation does nothing.
+  virtual void select() { };
+
+  /// Called when the panel becomes inactive. Default implemnetation does nothing.
+  virtual void unselect() { };
+
 protected:
+  /// Internal method that actually sets the proxy. Subclasses must override
+  /// this instead of setProxy().
+  virtual void setProxyInternal(pqSMProxy proxy);
+
   pqSMProxy Proxy;
   pqPropertyManager* PropertyManager;
-
-
 };
 
 #endif
