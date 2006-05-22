@@ -43,7 +43,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.139");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.140");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -1584,8 +1584,8 @@ void vtkKWRenderWidget::SetCollapsingRenders(int r)
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget_InteractorTimer(ClientData arg)
 {
-  vtkRenderWindowInteractor *me = (vtkRenderWindowInteractor*)arg;
-  me->InvokeEvent(vtkCommand::TimerEvent);
+  vtkGenericRenderWindowInteractor *me = (vtkGenericRenderWindowInteractor*)arg;
+  me->TimerEvent();
 }
 
 //----------------------------------------------------------------------------
