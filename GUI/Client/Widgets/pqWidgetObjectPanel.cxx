@@ -85,9 +85,9 @@ pqPropertyLinks& pqWidgetObjectPanel::getPropertyLinks()
   return *this->PropertyLinks;
 }
 
-void pqWidgetObjectPanel::setProxy(pqSMProxy proxy)
+void pqWidgetObjectPanel::setProxy(pqSMProxy p)
 {
-  pqLoadedFormObjectPanel::setProxy(proxy);
+  pqLoadedFormObjectPanel::setProxy(p);
 
   if(!this->Proxy)
     {
@@ -102,7 +102,7 @@ void pqWidgetObjectPanel::setProxy(pqSMProxy proxy)
     // We won't have to do this once setProxy() takes
     // pqProxy as an argument.
     pqServer* server = pqApplicationCore::instance()->
-      getServerManagerModel()->getServer(proxy->GetConnectionID());
+      getServerManagerModel()->getServer(this->Proxy->GetConnectionID());
     this->Widget = widgetFactory->get3DWidget("ImplicitPlaneWidgetDisplay",
       server);
 
