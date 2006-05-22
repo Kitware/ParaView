@@ -56,6 +56,7 @@ public slots:
   /// Called when the panel becomes inactive. 
   /// Overridden to disable the 3D widget.
   virtual void unselect();
+  
 protected:
   pqPropertyLinks& getPropertyLinks();
   
@@ -64,6 +65,14 @@ protected:
 
   pqPropertyLinks* PropertyLinks;
   vtkSMNew3DWidgetProxy* Widget;
+  
+private:
+  class WidgetObserver;
+  friend class WidgetObserver;
+  WidgetObserver* const Observer;
+  
+  /// Derivatives should override this to receive a notification that the 3D widget has changed
+  virtual void on3DWidgetChanged();
 };
 
 #endif

@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#include "pqApplicationCore.h"
 #include "pqClipPanel.h"
 #include "pqPropertyManager.h"
 #include "pqPropertyManager.h"
@@ -42,8 +43,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /// constructor
 pqClipPanel::pqClipPanel(QWidget* p) :
-  pqWidgetObjectPanel(":/pqWidgets/ClipPanel.ui", p)
+  pqWidgetObjectPanel(":/pqWidgets/ClipPanel.ui", p),
+  IgnoreManual(false),
+  IgnoreWidget(false)
 {
+  QLineEdit* const originX = this->findChild<QLineEdit*>("originX");
+  QLineEdit* const originY = this->findChild<QLineEdit*>("originY");
+  QLineEdit* const originZ = this->findChild<QLineEdit*>("originZ");
+  QLineEdit* const normalX = this->findChild<QLineEdit*>("normalX");
+  QLineEdit* const normalY = this->findChild<QLineEdit*>("normalY");
+  QLineEdit* const normalZ = this->findChild<QLineEdit*>("normalZ");
+  
+  connect(originX, SIGNAL(editingFinished()), this, SLOT(onManualEditingFinished()));
+  connect(originY, SIGNAL(editingFinished()), this, SLOT(onManualEditingFinished()));
+  connect(originZ, SIGNAL(editingFinished()), this, SLOT(onManualEditingFinished()));
+  connect(normalX, SIGNAL(editingFinished()), this, SLOT(onManualEditingFinished()));
+  connect(normalY, SIGNAL(editingFinished()), this, SLOT(onManualEditingFinished()));
+  connect(normalZ, SIGNAL(editingFinished()), this, SLOT(onManualEditingFinished()));
 }
 
 /// destructor
@@ -52,6 +68,7 @@ pqClipPanel::~pqClipPanel()
   this->setProxy(NULL);
 }
 
+/*
 void pqClipPanel::setProxyInternal(pqSMProxy p)
 {
   pqWidgetObjectPanel::setProxyInternal(p);
@@ -106,7 +123,6 @@ void pqClipPanel::setProxyInternal(pqSMProxy p)
     }
 
   // Connect Qt widgets to the implicit plane function ...
-/*
   if(this->Proxy)
     {
     if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
@@ -119,17 +135,17 @@ void pqClipPanel::setProxyInternal(pqSMProxy p)
           {
           if(originX)
             {
-            this->getPropertyManager()->registerLink(originX, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_origin, 0);
+            this->getPropertyManager()->registerLink(originX, "text", SIGNAL(textChanged(const QString&)), clip_function, plane_origin, 0);
             }
        
           if(originY)
             {
-            this->getPropertyManager()->registerLink(originY, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_origin, 1);
+            this->getPropertyManager()->registerLink(originY, "text", SIGNAL(textChanged(const QString&)), clip_function, plane_origin, 1);
             }
           
           if(originZ)
             {
-            this->getPropertyManager()->registerLink(originZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_origin, 2);
+            this->getPropertyManager()->registerLink(originZ, "text", SIGNAL(textChanged(const QString&)), clip_function, plane_origin, 2);
             }
           }
 
@@ -138,22 +154,205 @@ void pqClipPanel::setProxyInternal(pqSMProxy p)
           {
           if(normalX)
             {
-            this->getPropertyManager()->registerLink(normalX, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_normal, 0);
+            this->getPropertyManager()->registerLink(normalX, "text", SIGNAL(textChanged(const QString&)), clip_function, plane_normal, 0);
             }
        
           if(normalY)
             {
-            this->getPropertyManager()->registerLink(normalY, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_normal, 1);
+            this->getPropertyManager()->registerLink(normalY, "text", SIGNAL(textChanged(const QString&)), clip_function, plane_normal, 1);
             }
           
           if(normalZ)
             {
-            this->getPropertyManager()->registerLink(normalZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_normal, 2);
+            this->getPropertyManager()->registerLink(normalZ, "text", SIGNAL(textChanged(const QString&)), clip_function, plane_normal, 2);
             }
           }
         }
       }
     }
+}
 */
+
+
+void pqClipPanel::setProxyInternal(pqSMProxy p)
+{
+  pqWidgetObjectPanel::setProxyInternal(p);
+  
+  if(!this->Proxy)
+    return;
+  
+  // Get the current values from the implicit plane ...
+  double origin[3] = { 0, 0, 0 };
+  double normal[3] = { 0, 0, 1 };
+  
+  if(this->Proxy)
+    {
+    if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
+      this->Proxy->GetProperty("ClipFunction")))
+      {
+      if(vtkSMProxy* const clip_function = clip_function_property->GetProxy(0))
+        {
+        if(vtkSMDoubleVectorProperty* const plane_origin = vtkSMDoubleVectorProperty::SafeDownCast(
+          clip_function->GetProperty("Origin")))
+          {
+          origin[0] = plane_origin->GetElement(0);
+          origin[1] = plane_origin->GetElement(1);
+          origin[2] = plane_origin->GetElement(2);
+          }
+
+        if(vtkSMDoubleVectorProperty* const plane_normal = vtkSMDoubleVectorProperty::SafeDownCast(
+          clip_function->GetProperty("Normal")))
+          {
+          normal[0] = plane_normal->GetElement(0);
+          normal[1] = plane_normal->GetElement(1);
+          normal[2] = plane_normal->GetElement(2);
+          }
+        }
+      }
+    }
+
+  // Push the current values into the Qt widgets ...
+  this->updateQtWidgets(origin, normal);
+  
+  // Push the current values into the 3D widget ...
+  this->update3DWidget(origin, normal);
 }
 
+void pqClipPanel::onManualEditingFinished()
+{
+  if(IgnoreManual)
+    return;
+
+  // Get the new values from the Qt widgets ...
+  double origin[3] = { 0, 0, 0 };
+  double normal[3] = { 0, 0, 1 };
+
+  QLineEdit* const originX = this->findChild<QLineEdit*>("originX");
+  QLineEdit* const originY = this->findChild<QLineEdit*>("originY");
+  QLineEdit* const originZ = this->findChild<QLineEdit*>("originZ");
+  QLineEdit* const normalX = this->findChild<QLineEdit*>("normalX");
+  QLineEdit* const normalY = this->findChild<QLineEdit*>("normalY");
+  QLineEdit* const normalZ = this->findChild<QLineEdit*>("normalZ");
+
+  origin[0] = originX->text().toDouble();
+  origin[1] = originY->text().toDouble();
+  origin[2] = originZ->text().toDouble();
+  normal[0] = normalX->text().toDouble();
+  normal[1] = normalY->text().toDouble();
+  normal[2] = normalZ->text().toDouble();
+  
+  // Push the new values into the implicit plane ...
+  this->updateImplicitPlane(origin, normal);
+    
+  // Push the new values into the 3D widget (ideally, this should happen automatically when the implicit plane is updated)
+  this->update3DWidget(origin, normal);
+  
+  pqApplicationCore::instance()->render();
+}
+
+void pqClipPanel::on3DWidgetChanged()
+{
+  if(IgnoreWidget)
+    return;
+    
+  // Get the new values from the 3D widget ...
+  double origin[3] = { 0, 0, 0 };
+  double normal[3] = { 0, 0, 1 };
+  
+  if(this->Widget)
+    {
+    if(vtkSMDoubleVectorProperty* const widget_origin = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->Widget->GetProperty("Origin")))
+      {
+      origin[0] = widget_origin->GetElement(0);
+      origin[1] = widget_origin->GetElement(1);
+      origin[2] = widget_origin->GetElement(2);
+      }
+
+    if(vtkSMDoubleVectorProperty* const widget_normal = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->Widget->GetProperty("Normal")))
+      {
+      normal[0] = widget_normal->GetElement(0);
+      normal[1] = widget_normal->GetElement(1);
+      normal[2] = widget_normal->GetElement(2);
+      }
+    }
+  
+  // Push the new values into the implicit plane ...
+  this->updateImplicitPlane(origin, normal);
+    
+  // Push the new values into the Qt widgets (ideally, this should happen automatically when the implicit plane is updated)
+  this->updateQtWidgets(origin, normal);
+}
+
+void pqClipPanel::updateQtWidgets(const double* origin, const double* normal)
+{
+  this->IgnoreManual = true;
+  
+  QLineEdit* const originX = this->findChild<QLineEdit*>("originX");
+  QLineEdit* const originY = this->findChild<QLineEdit*>("originY");
+  QLineEdit* const originZ = this->findChild<QLineEdit*>("originZ");
+  QLineEdit* const normalX = this->findChild<QLineEdit*>("normalX");
+  QLineEdit* const normalY = this->findChild<QLineEdit*>("normalY");
+  QLineEdit* const normalZ = this->findChild<QLineEdit*>("normalZ");
+
+  originX->setText(QString::number(origin[0]));  
+  originY->setText(QString::number(origin[1]));  
+  originZ->setText(QString::number(origin[2]));  
+  normalX->setText(QString::number(normal[0]));  
+  normalY->setText(QString::number(normal[1]));  
+  normalZ->setText(QString::number(normal[2]));
+  
+  this->IgnoreManual = false;
+}
+
+void pqClipPanel::update3DWidget(const double* origin, const double* normal)
+{
+  this->IgnoreWidget = true;
+   
+  if(this->Widget)
+    {
+    if(vtkSMDoubleVectorProperty* const widget_origin = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->Widget->GetProperty("Origin")))
+      {
+      widget_origin->SetElements(origin);
+      }
+
+    if(vtkSMDoubleVectorProperty* const widget_normal = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->Widget->GetProperty("Normal")))
+      {
+      widget_normal->SetElements(normal);
+      }
+    
+    this->Widget->UpdateVTKObjects();
+    }
+    
+  this->IgnoreWidget = false;
+}
+
+void pqClipPanel::updateImplicitPlane(const double* origin, const double* normal)
+{
+  if(this->Proxy)
+    {
+    if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
+      this->Proxy->GetProperty("ClipFunction")))
+      {
+      if(vtkSMProxy* const clip_function = clip_function_property->GetProxy(0))
+        {
+        if(vtkSMDoubleVectorProperty* const plane_origin = vtkSMDoubleVectorProperty::SafeDownCast(
+          clip_function->GetProperty("Origin")))
+          {
+          plane_origin->SetElements(origin);
+          }
+
+        if(vtkSMDoubleVectorProperty* const plane_normal = vtkSMDoubleVectorProperty::SafeDownCast(
+          clip_function->GetProperty("Normal")))
+          {
+          plane_normal->SetElements(normal);
+          }
+
+        clip_function->UpdateVTKObjects();
+        }
+      }
+    }
+}

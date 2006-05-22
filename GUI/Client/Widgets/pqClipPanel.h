@@ -48,6 +48,19 @@ public:
   
 protected:
   virtual void setProxyInternal(pqSMProxy p);
+
+private slots:
+  void onManualEditingFinished();
+
+private:
+  void on3DWidgetChanged();
+  
+  void updateQtWidgets(const double* origin, const double* normal);
+  void update3DWidget(const double* origin, const double* normal);
+  void updateImplicitPlane(const double* origin, const double* normal);
+  
+  bool IgnoreManual;
+  bool IgnoreWidget;
 };
 
 #endif

@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqWidgetObjectPanel.h"
 
+#include <vtkCommand.h>
 #include <vtkImplicitPlaneRepresentation.h>
 #include <vtkProcessModule.h>
 #include <vtkPVDataInformation.h>
@@ -48,15 +49,60 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
 
+/////////////////////////////////////////////////////////////////////////
+// pqWidgetObjectPanel::WidgetObserver
+
+class pqWidgetObjectPanel::WidgetObserver :
+  public vtkCommand
+{
+public:
+  static WidgetObserver* New()
+  {
+    return new WidgetObserver();
+  }
+
+  void SetPanel(pqWidgetObjectPanel& panel)
+  {
+    this->Panel = &panel;
+  }
+
+  virtual void Execute(vtkObject*, unsigned long, void*)
+  {
+    if(this->Panel)
+      {
+      this->Panel->on3DWidgetChanged();
+      }
+  }
+
+private:
+  WidgetObserver() :
+    Panel(0)
+  {
+  }
+  
+  ~WidgetObserver()
+  {
+  }
+  
+  pqWidgetObjectPanel* Panel;
+};
+
+/////////////////////////////////////////////////////////////////////////
+// pqWidgetObjectPanel
+
 pqWidgetObjectPanel::pqWidgetObjectPanel(QString filename, QWidget* p) :
   pqLoadedFormObjectPanel(filename, p),
   PropertyLinks(new pqPropertyLinks()),
-  Widget(0)
+  Widget(0),
+  Observer(WidgetObserver::New())
 {
+  this->Observer->SetPanel(*this);
 }
 
 pqWidgetObjectPanel::~pqWidgetObjectPanel()
 {
+  this->Observer->Delete();
+
   if(this->Widget)
     {
     this->unselect();
@@ -89,11 +135,17 @@ void pqWidgetObjectPanel::select()
     rm->UpdateVTKObjects();
     renModule->render();
     }
+    
+  if(this->Widget)
+    this->Widget->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer);
 }
 
 //-----------------------------------------------------------------------------
 void pqWidgetObjectPanel::unselect()
 {
+  if(this->Widget)
+    this->Widget->RemoveObserver(this->Observer);
+
   pqRenderModule* renModule = 
     pqApplicationCore::instance()->getActiveRenderModule();
   if (this->Widget && renModule)
@@ -173,4 +225,8 @@ void pqWidgetObjectPanel::setProxyInternal(pqSMProxy p)
 
     this->Widget->UpdateVTKObjects();
     }
+}
+
+void pqWidgetObjectPanel::on3DWidgetChanged()
+{
 }
