@@ -65,6 +65,8 @@ public:
 
   QPointer<pqPipelineSource> ActiveSource;
   QPointer<pqServer> ActiveServer;
+
+  QList< QPointer<pqPipelineSource> > SourcesSansDisplays;
 };
 
 
@@ -264,21 +266,15 @@ pqPipelineSource* pqApplicationCore::createSourceOnActiveServer(
 
   pqPipelineSource* source = this->Internal->PipelineBuilder->createSource(
     "sources", xmlname.toStdString().c_str(), 
-    this->Internal->ActiveServer, 
-    this->Internal->RenderWindowManager->getActiveRenderModule());
-  // TODO: do something to try to create display on first accept.
+    this->Internal->ActiveServer, NULL);
+
   if (source)
     {
+    this->Internal->SourcesSansDisplays.push_back(source);
+    emit this->pendingDisplays();
     this->setActiveSource(source);
     }
 
-  // HACK: Until source/filter creation can be accepted, explitly end
-  // the current undo set.
-  this->Internal->UndoStack->EndUndoSet();
-
-  // reset camera(should we?).
-  this->getActiveRenderModule()->resetCamera();
-  this->getActiveRenderModule()->render();
   return source;
 }
 
@@ -318,19 +314,12 @@ pqPipelineSource* pqApplicationCore::createFilterForActiveSource(
       }
     }
 
-  filter->getProxy()->UpdateVTKObjects();
-  this->Internal->PipelineBuilder->createDisplayProxy(filter,
-    this->getActiveRenderModule());
-  this->setActiveSource(filter);
-
-  // HACK: Until source/filter creation can be accepted, explitly end
-  // the current undo set.
-  this->Internal->UndoStack->EndUndoSet();
-
-  // reset camera(should we?).
-  this->getActiveRenderModule()->resetCamera();
-  this->getActiveRenderModule()->render();
-  // TODO: do something to try to create display on first accept.
+  if (filter)
+    {
+    this->Internal->SourcesSansDisplays.push_back(filter);
+    emit this->pendingDisplays();
+    this->setActiveSource(filter);
+    }
   return filter;
 }
 
@@ -353,20 +342,12 @@ pqPipelineSource* pqApplicationCore::createCompoundSource(
     {
     this->Internal->PipelineBuilder->addConnection(
       this->Internal->ActiveSource, filter);
-    filter->getProxy()->UpdateVTKObjects();
-    this->Internal->PipelineBuilder->createDisplayProxy(filter,
-      this->getActiveRenderModule());
+
+    this->Internal->SourcesSansDisplays.push_back(filter);
+    emit this->pendingDisplays();
     this->setActiveSource(filter);
-
-    // HACK: Until source/filter creation can be accepted, explitly end
-    // the current undo set.
-    this->Internal->UndoStack->EndUndoSet();
     }
-  // reset camera(should we?).
-  this->getActiveRenderModule()->resetCamera();
-  this->getActiveRenderModule()->render();
 
-  // TODO: do something to try to create display on first accept.
   return filter;
 }
 
@@ -388,6 +369,7 @@ pqPipelineSource* pqApplicationCore::createReaderOnActiveServer(
     {
     return NULL;
     }
+
   this->Internal->UndoStack->BeginOrContinueUndoSet("Set Filenames");
 
   vtkSMProxy* proxy = reader->getProxy();
@@ -398,26 +380,30 @@ pqPipelineSource* pqApplicationCore::createReaderOnActiveServer(
   pqSMAdaptor::setElementProperty(proxy, proxy->GetProperty("FilePattern"),
     filename);
   proxy->UpdateVTKObjects();
+
   this->Internal->UndoStack->PauseUndoSet();
 
-  // HACK: Until source/filter creation can be accepted, explitly end
-  // the current undo set.
-  this->Internal->PipelineBuilder->createDisplayProxy(reader,
-    this->getActiveRenderModule());
+  this->Internal->SourcesSansDisplays.push_back(reader);
+  emit this->pendingDisplays();
 
-  // PipelineBuilder never calls EndUndoSet(). Eventually, the undo set will
-  // be automatically finished on first accept after creation. Since, 
-  // currently we are doing the first accept immediately, 
-  // just close teh undo set.
-  this->Internal->UndoStack->EndUndoSet();
-
-  // reset camera(should we?).
-  this->getActiveRenderModule()->resetCamera();
-  this->getActiveRenderModule()->render();
-
-  if (reader)
-    {
-    this->setActiveSource(reader);
-    }
+  this->setActiveSource(reader);
   return reader;
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::createPendingDisplays()
+{
+  foreach (pqPipelineSource* source, this->Internal->SourcesSansDisplays)
+    {
+    if (!source)
+      {
+      continue;
+      }
+    this->Internal->PipelineBuilder->createDisplayProxy(source,
+      this->getActiveRenderModule());
+    this->getActiveRenderModule()->resetCamera();
+    this->getActiveRenderModule()->render();
+    }
+
+  this->Internal->SourcesSansDisplays.clear();
 }

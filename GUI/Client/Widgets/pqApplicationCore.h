@@ -122,12 +122,20 @@ signals:
   // Fired when the active server changes.
   void activeServerChanged(pqServer*);
 
+  // Fired when a source/filter/reader/compound proxy is
+  // created without a display.
+  void pendingDisplays();
+
 public slots:
   // Call this slot to set the active source. 
   void setActiveSource(pqPipelineSource*);
 
   // Call this slot to set the active server. 
   void setActiveServer(pqServer*);
+
+  // Call this slot when accept is called. This method will create
+  // displays for any sources/filters that are pending.
+  void createPendingDisplays();
 
 protected:
   /// create signal/slot connections between pdata and smModel.

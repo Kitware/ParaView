@@ -64,18 +64,23 @@ public:
   pqObjectInspectorWidget(QWidget *parent=0);
   virtual ~pqObjectInspectorWidget();
 
+  /// hint for sizing this widget
+  virtual QSize sizeHint() const;
+
 public slots:
   void setProxy(vtkSMProxy *proxy);
 
   /// accept the changes made to the properties
   /// changes will be propogated down to the server manager
   void accept();
+
   /// reset the changes made
   /// editor will query properties from the server manager
   void reset();
 
-  /// hint for sizing this widget
-  QSize sizeHint() const;
+  /// This slot is a temporary slot to force  ObjectInspectorPanel
+  /// to become modified i.e. enable Accept/Reset buttons.
+  void forceModified();
 
 signals:
   /// emitted before accept.
@@ -96,6 +101,11 @@ protected slots:
 
   
 private:
+  // When in forceModified(), reset, should not disable accept button,
+  // hence, we keep this flag. This behaviour may need rethinking, but currently,
+  // since forceModified is only called on source creation with pending,
+  // display proxy, it makes sense. This flag gets cleared on accept().
+  bool ForceModified;
   QTabWidget* TabWidget;
   QPushButton* AcceptButton;
   QPushButton* ResetButton;

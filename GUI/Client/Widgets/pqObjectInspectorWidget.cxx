@@ -53,18 +53,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqCutPanel.h"
 #include "pqLoadedFormObjectPanel.h"
 #include "pqPipelineData.h"
-#include "pqPipelineDisplay.h"
-#include "pqPipelineModel.h"
-#include "pqPipelineSource.h"
 #include "pqPropertyManager.h"
 #include "pqRenderModule.h"
 #include "pqServerManagerModel.h"
 
+//-----------------------------------------------------------------------------
 pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   : QWidget(p)
 {
   this->setObjectName("ObjectInspectorWidget");
 
+  this->ForceModified = false;
   this->TabWidget = 0;
   this->CurrentAutoPanel = 0;
   this->CurrentCustomPanel = 0;
@@ -112,6 +111,7 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
  
 }
 
+//-----------------------------------------------------------------------------
 pqObjectInspectorWidget::~pqObjectInspectorWidget()
 {
   // delete all queued panels
@@ -126,6 +126,15 @@ pqObjectInspectorWidget::~pqObjectInspectorWidget()
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqObjectInspectorWidget::forceModified()
+{
+  this->AcceptButton->setEnabled(true);
+  this->ResetButton->setEnabled(true);
+  this->ForceModified = true;
+}
+
+//-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
 {
   // do nothing if this proxy is already current
@@ -379,6 +388,7 @@ void pqObjectInspectorWidget::accept()
     }
     */
   
+  this->ForceModified = false;
   emit this->accepted();
   emit this->postaccept();
 }
@@ -409,6 +419,10 @@ void pqObjectInspectorWidget::reset()
     this->CurrentCustomPanel->getPropertyManager()->reject();
     }
 
+  if (this->ForceModified)
+    {
+    this->forceModified();
+    }
   emit postreject();
 }
 
