@@ -90,6 +90,12 @@ signals:
   /// fired when a connection is broken between two pqPipelineSources.
   void connectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
 
+  /// fired when a display is added.
+  void displayAdded(pqPipelineSource* source, pqPipelineDisplay* display);
+
+  /// fired when a display is removed.
+  void displayRemoved(pqPipelineSource* source, pqPipelineDisplay* display);
+
 protected slots:
   // process some change in the input property for the proxy--needed for subclass
   // pqPipelineFilter.

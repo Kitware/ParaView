@@ -165,7 +165,7 @@ void pqPipelineSource::addDisplay(pqPipelineDisplay* display)
 {
   this->Internal->Displays.push_back(display);
 
-//  emit this->displayAdded(this, display);
+  emit this->displayAdded(this, display);
 }
 
 //-----------------------------------------------------------------------------
@@ -176,6 +176,7 @@ void pqPipelineSource::removeDisplay(pqPipelineDisplay* display)
     {
     this->Internal->Displays.removeAt(index);
     }
+  emit this->displayRemoved(this, display);
 }
 
 //-----------------------------------------------------------------------------

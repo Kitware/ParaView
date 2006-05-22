@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHBoxLayout>
 #include <QList>
 #include <QRegExp>
+#include <QtDebug>
 
 #include "pqApplicationCore.h"
 #include "pqParts.h"
@@ -179,7 +180,7 @@ const QString pqVariableSelectorWidget::variableData(pqVariableType type,
 }
 
 //-----------------------------------------------------------------------------
-void pqVariableSelectorWidget::onVariableChanged(pqVariableType type, 
+void pqVariableSelectorWidget::onVariableChanged(pqVariableType vtkNotUsed(type), 
   const QString& name)
 {
   if (!this->SelectedSource || !this->SelectedSource->getDisplayCount())
@@ -202,6 +203,18 @@ void pqVariableSelectorWidget::onVariableChanged(pqVariableType type,
 }
 
 //-----------------------------------------------------------------------------
+void pqVariableSelectorWidget::onDisplayAdded(pqPipelineSource* src, 
+  pqPipelineDisplay*)
+{
+  if (src != this->SelectedSource)
+    {
+    qDebug() << "onDisplayAdded called on an obsolete source.";
+    return;
+    }
+  this->updateVariableSelector(src);
+}
+
+//-----------------------------------------------------------------------------
 void pqVariableSelectorWidget::updateVariableSelector(pqPipelineSource* source)
 {
   this->VTKConnect->Disconnect();
@@ -209,12 +222,29 @@ void pqVariableSelectorWidget::updateVariableSelector(pqPipelineSource* source)
   this->clear();
   this->addVariable(VARIABLE_TYPE_NONE, "Solid Color");
 
+  if (this->SelectedSource)
+    {
+    // clean up any signals.
+    QObject::disconnect(this->SelectedSource, 0, this, 0);
+    }
+
   this->SelectedSource = source;
 
-  if (!source || source->getDisplayCount() == 0)
+  if (!source)
     {
     this->IgnoreWidgetChanges = false;
     // nothing more to do.
+    return;
+    }
+
+  if (source->getDisplayCount() == 0)
+    {
+    // Wait till the display gets created.
+    QObject::connect(
+      source, SIGNAL(displayAdded(pqPipelineSource*, pqPipelineDisplay*)),
+      this, SLOT(onDisplayAdded(pqPipelineSource*, pqPipelineDisplay*)),
+      Qt::QueuedConnection);
+    this->IgnoreWidgetChanges = false;
     return;
     }
 

@@ -80,7 +80,7 @@ public slots:
 
   /// This slot is a temporary slot to force  ObjectInspectorPanel
   /// to become modified i.e. enable Accept/Reset buttons.
-  void forceModified();
+  void forceModified(bool status);
 
 signals:
   /// emitted before accept.

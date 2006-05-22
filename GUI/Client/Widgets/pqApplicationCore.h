@@ -124,7 +124,7 @@ signals:
 
   // Fired when a source/filter/reader/compound proxy is
   // created without a display.
-  void pendingDisplays();
+  void pendingDisplays(bool status);
 
 public slots:
   // Call this slot to set the active source. 

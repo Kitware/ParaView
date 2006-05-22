@@ -43,6 +43,7 @@ class QComboBox;
 class QHBoxLayout;
 
 class pqPipelineSource;
+class pqPipelineDisplay;
 class vtkEventQtSlotConnect;
 
 /// Provides a standard user interface for selecting among a collection 
@@ -75,19 +76,26 @@ public slots:
   void onVariableChanged(pqVariableType type, const QString& name);
 
 signals:
-  /// Signal emitted whenever the user chooses a variable, or chooseVariable() is called.
+  /// Signal emitted whenever the user chooses a variable, 
+  /// or chooseVariable() is called.
   void variableChanged(pqVariableType type, const QString& name);
 
 private slots:
-  /// Called to emit the variableChanged() signal in response to user input or the chooseVariable() method.
+  /// Called to emit the variableChanged() signal in response to user input 
+  /// or the chooseVariable() method.
   void onVariableActivated(int row);
 
+  /// When updateVariableSelector is called, the source may not have any 
+  /// display connected to it, hence we must wait till the display gets 
+  /// connected. This slot is called when the display gets connected.
+  void onDisplayAdded(pqPipelineSource* src, pqPipelineDisplay*);
 
   /// Called when any important property on the display changes.
   void updateGUI();
 
 private:
-  /// Converts a variable type and name into a packed string representation that can be used with a combo box.
+  /// Converts a variable type and name into a packed string representation 
+  /// that can be used with a combo box.
   static const QString variableData(pqVariableType, const QString& name);
   
   QHBoxLayout* Layout;

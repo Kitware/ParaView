@@ -127,11 +127,11 @@ pqObjectInspectorWidget::~pqObjectInspectorWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqObjectInspectorWidget::forceModified()
+void pqObjectInspectorWidget::forceModified(bool status)
 {
-  this->AcceptButton->setEnabled(true);
-  this->ResetButton->setEnabled(true);
-  this->ForceModified = true;
+  this->AcceptButton->setEnabled(status);
+  this->ResetButton->setEnabled(status);
+  this->ForceModified = status;
 }
 
 //-----------------------------------------------------------------------------
@@ -421,7 +421,7 @@ void pqObjectInspectorWidget::reset()
 
   if (this->ForceModified)
     {
-    this->forceModified();
+    this->forceModified(true);
     }
   emit postreject();
 }

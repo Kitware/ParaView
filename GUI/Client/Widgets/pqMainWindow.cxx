@@ -411,8 +411,9 @@ void pqMainWindow::createStandardObjectInspector(bool visible)
 
   QObject::connect(this->Implementation->Inspector, SIGNAL(accepted()), 
     pqApplicationCore::instance(), SLOT(createPendingDisplays()));
-  QObject::connect(pqApplicationCore::instance(), SIGNAL(pendingDisplays()),
-    this->Implementation->Inspector, SLOT(forceModified()));
+  QObject::connect(
+    pqApplicationCore::instance(), SIGNAL(pendingDisplays(bool)),
+    this->Implementation->Inspector, SLOT(forceModified(bool)));
 
   this->addStandardDockWidget(Qt::LeftDockWidgetArea, 
     object_inspector_dock, QIcon(), visible);

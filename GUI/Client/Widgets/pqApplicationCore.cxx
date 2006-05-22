@@ -244,6 +244,15 @@ void pqApplicationCore::sourceRemoved(pqPipelineSource* source)
     {
     this->setActiveSource(NULL);
     }
+
+  if (this->Internal->SourcesSansDisplays.contains(source))
+    {
+    this->Internal->SourcesSansDisplays.removeAll(source);
+    if (this->Internal->SourcesSansDisplays.size() == 0)
+      {
+      emit this->pendingDisplays(false);
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -274,7 +283,7 @@ pqPipelineSource* pqApplicationCore::createSourceOnActiveServer(
   if (source)
     {
     this->Internal->SourcesSansDisplays.push_back(source);
-    emit this->pendingDisplays();
+    emit this->pendingDisplays(true);
     this->setActiveSource(source);
     }
 
@@ -332,7 +341,7 @@ pqPipelineSource* pqApplicationCore::createFilterForActiveSource(
   if (filter)
     {
     this->Internal->SourcesSansDisplays.push_back(filter);
-    emit this->pendingDisplays();
+    emit this->pendingDisplays(true);
     this->setActiveSource(filter);
     }
   return filter;
@@ -359,7 +368,7 @@ pqPipelineSource* pqApplicationCore::createCompoundSource(
       this->Internal->ActiveSource, filter);
 
     this->Internal->SourcesSansDisplays.push_back(filter);
-    emit this->pendingDisplays();
+    emit this->pendingDisplays(true);
     this->setActiveSource(filter);
     }
 
@@ -399,7 +408,7 @@ pqPipelineSource* pqApplicationCore::createReaderOnActiveServer(
   this->Internal->UndoStack->PauseUndoSet();
 
   this->Internal->SourcesSansDisplays.push_back(reader);
-  emit this->pendingDisplays();
+  emit this->pendingDisplays(true);
 
   this->setActiveSource(reader);
   return reader;
