@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.2");
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.3");
 //-----------------------------------------------------------------------------
 ProcessModuleGUIHelper::ProcessModuleGUIHelper()
 {
@@ -52,7 +52,7 @@ ProcessModuleGUIHelper::~ProcessModuleGUIHelper()
 QWidget* ProcessModuleGUIHelper::CreateMainWindow()
 {
   pqMainWindow* const window = new MainWindow();
-  window->resize(800, 600);
+  window->resize(900, 675);
   return window;
 }
 
