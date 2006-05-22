@@ -15,9 +15,20 @@ ENDIF(NOT KWWidgets_SOURCE_DIR)
 
 SET(TARGET_BASE_NAME "KW${PROJECT_NAME}Example")
 
-# We actually define a class in this example, and we want to be able to
-# use its callbacks from our user interface. To do so, we need to create
-# a library and wrap it automatically for the Tcl language.
+# We define several classes in this example, and we want to be able to use
+# their C++ methods as callbacks for our user interface. To do so, we need to 
+# create a library and wrap it automatically for the Tcl language, which
+# is used as a bridge between C++ objects at run-time. Note that an
+# initialization function is automatically created in this library to allow
+# classes and C++ methods to be used as commands and callbacks inside the Tcl
+# interpreter; do *not* forget to call this function right after you 
+# initialize the Tcl interpreter in your application. The name of this 
+# function is built from the library name in lower-case (except for the first
+# letter) and suffixed with "_Init" (for example: 
+# KWCallbacksExampleLib => Kwcallbacksexamplelib_Init)
+# This whole process is required to use C++ methods as callbacks; it is not
+# needed if you use VTK's C++ command/observer pattern directly, which is
+# also demonstrated in this example.
 
 SET(LIB_NAME "KWCallbacksExampleLib")
 SET(LIB_SRCS 

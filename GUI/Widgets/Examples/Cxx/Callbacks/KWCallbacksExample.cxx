@@ -5,7 +5,22 @@
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/CommandLineArguments.hxx>
 
+// We define several classes in this example, and we want to be able to use
+// their C++ methods as callbacks for our user interface. To do so, we created
+// a library and wrapped it automatically for the Tcl language, which is used
+// as a bridge between C++ objects at run-time. An initialization function is
+// automatically created in this library to allow classes and C++ methods to
+// be used as commands and callbacks inside the Tcl interpreter; let's *not* 
+// forget to declare *and* call this function right after we initialize the Tcl
+// interpreter in our application. The name of this function is built from the
+// library name in lower-case (except for the first letter) and suffixed with
+// "_Init" (for example: KWCallbacksExampleLib => Kwcallbacksexamplelib_Init).
+// This whole process is required to use C++ methods as callbacks; it is not
+// needed if you use VTK's C++ command/observer pattern directly, which is
+// also demonstrated in this example.
+
 extern "C" int Kwcallbacksexamplelib_Init(Tcl_Interp *interp);
+
 int my_main(int argc, char *argv[])
 {
   // Initialize Tcl
@@ -17,8 +32,9 @@ int my_main(int argc, char *argv[])
     return 1;
     }
 
-  // Initialize our Tcl library (i.e. our classes wrapped in Tcl)
-  // Make sure it matches the name of the library that was created
+  // Initialize our Tcl library (i.e. our classes wrapped in Tcl).
+  // This *is* required for the C++ methods to be used as callbacks.
+  // See comment at the top of this file.
 
   Kwcallbacksexamplelib_Init(interp);
 
