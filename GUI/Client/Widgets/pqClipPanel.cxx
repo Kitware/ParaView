@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqClipPanel.h"
-#include "pqPropertyLinks.h"
+#include "pqPropertyManager.h"
 #include "pqPropertyManager.h"
 
 #include <vtkSMDoubleVectorProperty.h>
@@ -71,17 +71,17 @@ void pqClipPanel::setProxyInternal(pqSMProxy p)
       {
       if(originX)
         {
-        this->getPropertyLinks().addPropertyLink(originX, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 0);
+        this->getPropertyManager()->registerLink(originX, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 0);
         }
    
       if(originY)
         {
-        this->getPropertyLinks().addPropertyLink(originY, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 1);
+        this->getPropertyManager()->registerLink(originY, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 1);
         }
       
       if(originZ)
         {
-        this->getPropertyLinks().addPropertyLink(originZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 2);
+        this->getPropertyManager()->registerLink(originZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 2);
         }
       }
 
@@ -90,17 +90,17 @@ void pqClipPanel::setProxyInternal(pqSMProxy p)
       {
       if(normalX)
         {
-        this->getPropertyLinks().addPropertyLink(normalX, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 0);
+        this->getPropertyManager()->registerLink(normalX, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 0);
         }
    
       if(normalY)
         {
-        this->getPropertyLinks().addPropertyLink(normalY, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 1);
+        this->getPropertyManager()->registerLink(normalY, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 1);
         }
       
       if(normalZ)
         {
-        this->getPropertyLinks().addPropertyLink(normalZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 2);
+        this->getPropertyManager()->registerLink(normalZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 2);
         }
       }
     }
@@ -119,17 +119,17 @@ void pqClipPanel::setProxyInternal(pqSMProxy p)
           {
           if(originX)
             {
-            this->getPropertyLinks().addPropertyLink(originX, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_origin, 0);
+            this->getPropertyManager()->registerLink(originX, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_origin, 0);
             }
        
           if(originY)
             {
-            this->getPropertyLinks().addPropertyLink(originY, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_origin, 1);
+            this->getPropertyManager()->registerLink(originY, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_origin, 1);
             }
           
           if(originZ)
             {
-            this->getPropertyLinks().addPropertyLink(originZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_origin, 2);
+            this->getPropertyManager()->registerLink(originZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_origin, 2);
             }
           }
 
@@ -138,17 +138,17 @@ void pqClipPanel::setProxyInternal(pqSMProxy p)
           {
           if(normalX)
             {
-            this->getPropertyLinks().addPropertyLink(normalX, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_normal, 0);
+            this->getPropertyManager()->registerLink(normalX, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_normal, 0);
             }
        
           if(normalY)
             {
-            this->getPropertyLinks().addPropertyLink(normalY, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_normal, 1);
+            this->getPropertyManager()->registerLink(normalY, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_normal, 1);
             }
           
           if(normalZ)
             {
-            this->getPropertyLinks().addPropertyLink(normalZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_normal, 2);
+            this->getPropertyManager()->registerLink(normalZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, plane_normal, 2);
             }
           }
         }
