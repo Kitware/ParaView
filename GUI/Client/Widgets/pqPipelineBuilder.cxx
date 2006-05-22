@@ -168,50 +168,23 @@ vtkSMProxy* pqPipelineBuilder::createProxy(const char* xmlgroup,
 vtkSMProxy* pqPipelineBuilder::createPipelineProxy(const char* xmlgroup,
     const char* xmlname, pqServer* server, pqRenderModule* renModule)
 {
-  if (this->UndoStack)
-    {
-    vtksys_ios::ostringstream label;
-    label << "Create " << xmlname;
-    this->UndoStack->BeginOrContinueUndoSet(QString(label.str().c_str()));
-    }
+  vtkSMProxy* proxy = this->createProxy(xmlgroup, xmlname, "sources",
+    server, true);
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMProxy* proxy = NULL;
-  if (xmlgroup)
+  if (proxy && renModule)
     {
-    proxy = pxm->NewProxy(xmlgroup, xmlname);
-    }
-  else
-    {
-    proxy = pxm->NewCompoundProxy(xmlname);
-    }
-  if (!proxy)
-    {
-    qCritical() << "Failed to create proxy: " 
-      << (xmlgroup? xmlgroup: "") << "," << xmlname;
-    return NULL;
-    }
-  proxy->SetConnectionID(server->GetConnectionID());
-  
-  vtksys_ios::ostringstream proxy_name_stream;
-  proxy_name_stream << xmlname 
-    << this->NameGenerator->GetCountAndIncrement(xmlname);
-
-  pxm->RegisterProxy("sources", proxy_name_stream.str().c_str(),
-    proxy);
-  proxy->Delete();
-
-
-  if (renModule)
-    {
+    if (this->UndoStack)
+      {
+      this->UndoStack->BeginOrContinueUndoSet("Connect display");
+      }
     // TODO: the display proxy must not longer have Input property ImmediateUpdate.
     // Since otherwise merely connecting to a display would lead to creation of the
     // VTK objects for the proxy, which is not good.
     this->createDisplayProxyInternal(proxy, renModule->getProxy());
-    }
-  if (this->UndoStack)
-    {
-    this->UndoStack->PauseUndoSet();
+    if (this->UndoStack)
+      {
+      this->UndoStack->PauseUndoSet();
+      }
     }
   return proxy;
 }
