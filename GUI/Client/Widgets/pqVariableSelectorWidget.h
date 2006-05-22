@@ -43,6 +43,7 @@ class QComboBox;
 class QHBoxLayout;
 
 class pqPipelineSource;
+class vtkEventQtSlotConnect;
 
 /// Provides a standard user interface for selecting among a collection 
 /// of dataset variables (both cell and node variables).
@@ -81,6 +82,10 @@ private slots:
   /// Called to emit the variableChanged() signal in response to user input or the chooseVariable() method.
   void onVariableActivated(int row);
 
+
+  /// Called when any important property on the display changes.
+  void updateGUI();
+
 private:
   /// Converts a variable type and name into a packed string representation that can be used with a combo box.
   static const QString variableData(pqVariableType, const QString& name);
@@ -90,6 +95,7 @@ private:
   bool BlockEmission;
   QPointer<pqPipelineSource> SelectedSource;
   bool IgnoreWidgetChanges;
+  vtkEventQtSlotConnect* VTKConnect;
 };
 
 #endif

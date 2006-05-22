@@ -447,7 +447,7 @@ void pqPart::SetColorField(vtkSMDisplayProxy* Part, const QString& value)
 
   if(field == "Solid Color")
     {
-    pqPart::Color(Part);
+    pqPart::Color(Part, 0, 0);
     }
   else
     {

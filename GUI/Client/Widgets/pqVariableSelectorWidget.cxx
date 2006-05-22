@@ -38,14 +38,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMStringVectorProperty.h"
-
-
+#include "vtkEventQtSlotConnect.h"
 
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QList>
+#include <QRegExp>
 
 #include "pqApplicationCore.h"
+#include "pqParts.h"
 #include "pqPipelineSource.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineDisplay.h"
@@ -69,12 +70,14 @@ pqVariableSelectorWidget::pqVariableSelectorWidget( QWidget *p ) :
   this->Layout->setSpacing( 1 );
   this->Layout->addWidget(this->Variables);
 
+
   QObject::connect(this->Variables, SIGNAL(currentIndexChanged(int)), 
     SLOT(onVariableActivated(int)));
   QObject::connect(this, 
     SIGNAL(variableChanged(pqVariableType, const QString&)),
     this,
     SLOT(onVariableChanged(pqVariableType, const QString&)));
+  this->VTKConnect = vtkEventQtSlotConnect::New();
 }
 
 //-----------------------------------------------------------------------------
@@ -86,6 +89,7 @@ pqVariableSelectorWidget::~pqVariableSelectorWidget()
   this->Layout = 0;
   this->Variables = 0;
   this->IgnoreWidgetChanges = false;
+  this->VTKConnect->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -111,11 +115,11 @@ void pqVariableSelectorWidget::addVariable(pqVariableType type,
       this->Variables->addItem("Solid Color", this->variableData(type, name));
       break;
     case VARIABLE_TYPE_NODE:
-      this->Variables->addItem("Point " + name, 
+      this->Variables->addItem(name, 
         this->variableData(type, name));
       break;
     case VARIABLE_TYPE_CELL:
-      this->Variables->addItem("Cell " + name, this->variableData(type, name));
+      this->Variables->addItem(name, this->variableData(type, name));
       break;
     }
   this->BlockEmission = false;
@@ -193,31 +197,17 @@ void pqVariableSelectorWidget::onVariableChanged(pqVariableType type,
 
   stack->BeginOrContinueUndoSet("Color Change");
   pqPipelineDisplay* display = this->SelectedSource->getDisplay(0);
-   switch(type)
-    {
-  case VARIABLE_TYPE_NONE:
-    display->colorByArray(0, 0);
-    break;
-
-  case VARIABLE_TYPE_CELL:
-    display->colorByArray(name.toStdString().c_str(), 
-      vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
-    break;
-
-  case VARIABLE_TYPE_NODE:
-    display->colorByArray(name.toStdString().c_str(), 
-      vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
-    break;
-    }
-   stack->EndUndoSet();
+  pqPart::SetColorField(display->getProxy(), name);
+  stack->EndUndoSet();
 }
 
 //-----------------------------------------------------------------------------
 void pqVariableSelectorWidget::updateVariableSelector(pqPipelineSource* source)
 {
+  this->VTKConnect->Disconnect();
   this->IgnoreWidgetChanges = true;
   this->clear();
-  this->addVariable(VARIABLE_TYPE_NONE, "");
+  this->addVariable(VARIABLE_TYPE_NONE, "Solid Color");
 
   this->SelectedSource = source;
 
@@ -237,82 +227,61 @@ void pqVariableSelectorWidget::updateVariableSelector(pqPipelineSource* source)
   pqPipelineDisplay* display = source->getDisplay(0);
   vtkSMDataObjectDisplayProxy* displayProxy = display->getProxy();
 
-  pqPipelineSource* reader = source;
-  pqPipelineFilter* filter = dynamic_cast<pqPipelineFilter*>(reader);
-  while(filter && filter->getInputCount() > 0)
+  QList<QString> arrayList = pqPart::GetColorFields(displayProxy);
+  QRegExp regExpCell("\\(cell\\)\\w*$");
+  QRegExp regExpPoint("\\(point\\)\\w*$");
+  foreach(QString arrayName, arrayList)
     {
-    reader = filter->getInput(0);
-    filter = dynamic_cast<pqPipelineFilter*>(reader);
-    }
-
-  vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
-  // No point arrays?
-  vtkPVDataSetAttributesInformation* cellinfo = 
-    geomInfo->GetCellDataInformation();
-  int i;
-  for(i=0; i<cellinfo->GetNumberOfArrays(); i++)
-    {
-    vtkPVArrayInformation* info = cellinfo->GetArrayInformation(i);
-    this->addVariable(VARIABLE_TYPE_CELL, info->GetName());
-    }
-
-  // also include unloaded arrays if any
-  QList<QList<QVariant> > extraCellArrays = 
-    pqSMAdaptor::getSelectionProperty(reader->getProxy(), 
-      reader->getProxy()->GetProperty("CellArrayStatus"));
-  for(i=0; i<extraCellArrays.size(); i++)
-    {
-    QList<QVariant> cell = extraCellArrays[i];
-    if(cell[1] == false)
+    if (arrayName == "Solid Color")
       {
-      this->addVariable(VARIABLE_TYPE_CELL, cell[0].toString());
+      this->addVariable(VARIABLE_TYPE_NONE, arrayName);
+      }
+    else if (regExpCell.indexIn(arrayName) != -1)
+      {
+      this->addVariable(VARIABLE_TYPE_NODE, arrayName);
+      }
+    else if (regExpPoint.indexIn(arrayName) != -1)
+      {
+      this->addVariable(VARIABLE_TYPE_CELL, arrayName);
       }
     }
 
-  vtkPVDataSetAttributesInformation* pointinfo = 
-    geomInfo->GetPointDataInformation();
-  for(i=0; i<pointinfo->GetNumberOfArrays(); i++)
+  QString currentArray = pqPart::GetColorField(displayProxy);
+  if (currentArray == "Solid Color")
     {
-    vtkPVArrayInformation* info = pointinfo->GetArrayInformation(i);
-    this->addVariable(VARIABLE_TYPE_NODE, info->GetName());
+    this->chooseVariable(VARIABLE_TYPE_NONE, "Solid Color");
+    }
+  else if (regExpCell.indexIn(currentArray) != -1)
+    {
+    this->chooseVariable(VARIABLE_TYPE_NODE, currentArray);
+    }
+  else if (regExpPoint.indexIn(currentArray) != -1)
+    {
+    this->chooseVariable(VARIABLE_TYPE_CELL, currentArray);
     }
 
-  // also include unloaded arrays if any
-  QList<QList<QVariant> > extraPointArrays = 
-    pqSMAdaptor::getSelectionProperty(reader->getProxy(), 
-      reader->getProxy()->GetProperty("PointArrayStatus"));
-  for(i=0; i<extraPointArrays.size(); i++)
-    {
-    QList<QVariant> cell = extraPointArrays[i];
-    if(cell[1] == false)
-      {
-      this->addVariable(VARIABLE_TYPE_NODE, cell[0].toString());
-      }
-    }
+  this->Variables->setCurrentIndex(
+    this->Variables->findText(currentArray));
 
-  // Update the variable selector to display the current proxy color
-  vtkSMIntVectorProperty* scalar_visibility = 
-    vtkSMIntVectorProperty::SafeDownCast(
-      displayProxy->GetProperty("ScalarVisibility"));
-  if(scalar_visibility && scalar_visibility->GetElement(0))
-    {
-    vtkSMStringVectorProperty* d_svp = vtkSMStringVectorProperty::SafeDownCast(
-      displayProxy->GetProperty("ColorArray"));
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-      displayProxy->GetProperty("ScalarMode"));
-    int fieldtype = ivp->GetElement(0);
-    if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
-      {
-      this->chooseVariable(VARIABLE_TYPE_CELL, d_svp->GetElement(0));
-      }
-    else if(fieldtype == vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)
-      {
-      this->chooseVariable(VARIABLE_TYPE_NODE, d_svp->GetElement(0));
-      }
-    }
-  else
-    {
-    this->chooseVariable(VARIABLE_TYPE_NONE, "");
-    }
+  this->VTKConnect->Connect(displayProxy->GetProperty("ScalarVisibility"),
+    vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
+  this->VTKConnect->Connect(displayProxy->GetProperty("ScalarMode"),
+    vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
+  this->VTKConnect->Connect(displayProxy->GetProperty("ColorArray"),
+    vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
+
   this->IgnoreWidgetChanges = false;
+}
+
+//-----------------------------------------------------------------------------
+void pqVariableSelectorWidget::updateGUI()
+{
+  if (this->SelectedSource && this->SelectedSource->getDisplayCount())
+    {
+    this->IgnoreWidgetChanges = true;
+    this->Variables->setCurrentIndex(
+      this->Variables->findText(pqPart::GetColorField(
+          this->SelectedSource->getDisplay(0)->getProxy())));
+    this->IgnoreWidgetChanges = false;
+    }
 }
