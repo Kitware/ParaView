@@ -165,7 +165,7 @@ void pqServerManagerModel::onRemoveSource(vtkSMProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
-void pqServerManagerModel::onAddDisplay(QString vtkNotUsed(name), 
+void pqServerManagerModel::onAddDisplay(QString name, 
   vtkSMProxy* proxy)
 {
   vtkSMDataObjectDisplayProxy* dProxy =
@@ -194,7 +194,7 @@ void pqServerManagerModel::onAddDisplay(QString vtkNotUsed(name),
     }
 
   // 2) create a new pqPipelineDisplay;
-  pqPipelineDisplay* display = new pqPipelineDisplay(
+  pqPipelineDisplay* display = new pqPipelineDisplay(name,
     dProxy, server, this);
 
   this->Internal->Displays[dProxy] = display;

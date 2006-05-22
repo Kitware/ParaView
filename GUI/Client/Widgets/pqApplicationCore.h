@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsExport.h"
 #include <QObject>
 
+class pq3DWidgetFactory;
 class pqApplicationCoreInternal;
 class pqPipelineBuilder;
 class pqPipelineData;
@@ -71,6 +72,7 @@ public:
   pqUndoStack* getUndoStack();
   pqPipelineBuilder* getPipelineBuilder();
   pqRenderWindowManager* getRenderWindowManager();
+  pq3DWidgetFactory* get3DWidgetFactory();
 
   // This will create a source with the given xmlname on the active server. 
   // On success returns

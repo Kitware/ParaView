@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqPipelineObject.h
+   Module:    pqProxy.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqPipelineObject.h
+/// \file pqProxy.h
 ///
 /// \date 11/16/2005
 
@@ -38,21 +38,52 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPipelineObject_h
 
 #include "pqPipelineModelItem.h"
-
+#include "vtkSmartPointer.h"
+#include "vtkSMProxy.h"
 class pqServer;
+class vtkSMProxy;
 
-
-class PQWIDGETS_EXPORT pqPipelineObject : public pqPipelineModelItem
+// This class represents any registered Server Manager proxy.
+// It keeps essential information to locate the proxy as well as
+// additional metadata such as user-specified label.
+class PQWIDGETS_EXPORT pqProxy : public pqPipelineModelItem
 {
 public:
-  pqPipelineObject(pqServer* server, QObject* parent=NULL);
-  virtual ~pqPipelineObject() {}
+  pqProxy(const QString& group, const QString& name,
+    vtkSMProxy* proxy, pqServer* server, QObject* parent=NULL);
+  virtual ~pqProxy() {}
 
-  /// Get the server on which this pipeline object exists.
-  pqServer *getServer() const;
+  /// Get the server on which this proxy exists.
+  pqServer *getServer() const
+    { return this->Server; }
 
+  /// Get/Set the user-sepecified name for this proxy.
+  /// This name need not be unique, it's just the label
+  /// used to identify this proxy for the user. By default,
+  /// it is same as the registeration name.
+  void setProxyName(const QString& name)
+    { this->ProxyName = name; }
+  const QString& getProxyName()
+    { return this->ProxyName; }
+  
+  /// Get the name with which this proxy is registered on the
+  /// server manager. A proxy can be registered with more than
+  /// one name on the Server Manager. This is the name/group which
+  /// this pqProxy stands for. 
+  const QString& getSMName()
+    { return this->SMName; }
+  const QString& getSMGroup()
+    { return this->SMGroup; }
+
+  /// Get the vtkSMProxy this object stands for.
+  vtkSMProxy* getSMProxy() const
+    {return this->Proxy; }
 private:
   pqServer *Server;           ///< Stores the parent server.
+  QString ProxyName;
+  QString SMName;
+  QString SMGroup;
+  vtkSmartPointer<vtkSMProxy> Proxy;
 };
 
 #endif

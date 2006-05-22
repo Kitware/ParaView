@@ -45,7 +45,6 @@ class pqPipelineFilter;
 class pqPipelineLink;
 class pqPipelineModelInternal;
 class pqPipelineModelItem;
-class pqPipelineObject;
 class pqPipelineServer;
 class pqPipelineSource;
 class pqServer;

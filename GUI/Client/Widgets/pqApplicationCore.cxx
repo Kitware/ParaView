@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 // ParaQ includes.
+#include "pq3DWidgetFactory.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineData.h"
 #include "pqPipelineSource.h"
@@ -60,6 +61,7 @@ public:
   pqUndoStack* UndoStack;
   pqPipelineBuilder* PipelineBuilder;
   pqRenderWindowManager* RenderWindowManager;
+  pq3DWidgetFactory* WidgetFactory;
 
   QPointer<pqPipelineSource> ActiveSource;
   QPointer<pqServer> ActiveServer;
@@ -113,6 +115,8 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
     SIGNAL(sourceRemoved(pqPipelineSource*)),
     this, SLOT(sourceRemoved(pqPipelineSource*)));
 
+  // * Create the pq3DWidgetFactory.
+  this->Internal->WidgetFactory = new pq3DWidgetFactory(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -131,11 +135,7 @@ void pqApplicationCore::connect(pqPipelineData* pdata,
 {
   QObject::connect(pdata, SIGNAL(sourceRegistered(QString, vtkSMProxy*)),
     smModel, SLOT(onAddSource(QString, vtkSMProxy*)));
-  QObject::connect(pdata, SIGNAL(filterRegistered(QString, vtkSMProxy*)),
-    smModel, SLOT(onAddSource(QString, vtkSMProxy*)));
-  QObject::connect(pdata, SIGNAL(bundleRegistered(QString, vtkSMProxy*)),
-    smModel, SLOT(onAddSource(QString, vtkSMProxy*)));
-  QObject::connect(pdata, SIGNAL(proxyUnRegistered(vtkSMProxy*)),
+  QObject::connect(pdata, SIGNAL(sourceUnRegistered(vtkSMProxy*)),
     smModel, SLOT(onRemoveSource(vtkSMProxy*)));
   QObject::connect(pdata, SIGNAL(connectionCreated(vtkIdType)),
     smModel, SLOT(onAddServer(vtkIdType)));
@@ -182,6 +182,12 @@ pqPipelineBuilder* pqApplicationCore::getPipelineBuilder()
 pqRenderWindowManager* pqApplicationCore::getRenderWindowManager()
 {
   return this->Internal->RenderWindowManager;
+}
+
+//-----------------------------------------------------------------------------
+pq3DWidgetFactory* pqApplicationCore::get3DWidgetFactory()
+{
+  return this->Internal->WidgetFactory;
 }
 
 //-----------------------------------------------------------------------------
@@ -294,27 +300,32 @@ pqPipelineSource* pqApplicationCore::createFilterForActiveSource(
     {
     this->Internal->PipelineBuilder->addConnection(
       this->Internal->ActiveSource, filter);
-    filter->getProxy()->UpdateVTKObjects();
-    this->Internal->PipelineBuilder->createDisplayProxy(filter,
-      this->getActiveRenderModule());
-    this->setActiveSource(filter);
 
     if(xmlname == "Clip")
       {
-      vtkSMProxy* const plane = this->Internal->PipelineBuilder->createPipelineProxy(
-        "implicit_functions", "Plane", this->Internal->ActiveSource->getServer(), NULL);
-        
-      if(vtkSMProxyProperty* const clip_function = vtkSMProxyProperty::SafeDownCast(
-        filter->getProxy()->GetProperty("ClipFunction")))
+      vtkSMProxy* const plane = this->Internal->PipelineBuilder->createProxy(
+        "implicit_functions", "Plane", "implicit_functions", 
+        this->Internal->ActiveSource->getServer());
+      
+      this->Internal->UndoStack->BeginOrContinueUndoSet("Set ClipConnection");
+      if(vtkSMProxyProperty* const clip_function = 
+        vtkSMProxyProperty::SafeDownCast(
+          filter->getProxy()->GetProperty("ClipFunction")))
         {
         clip_function->AddProxy(plane);
         }
+      this->Internal->UndoStack->PauseUndoSet();
       }
-
-    // HACK: Until source/filter creation can be accepted, explitly end
-    // the current undo set.
-    this->Internal->UndoStack->EndUndoSet();
     }
+
+  filter->getProxy()->UpdateVTKObjects();
+  this->Internal->PipelineBuilder->createDisplayProxy(filter,
+    this->getActiveRenderModule());
+  this->setActiveSource(filter);
+
+  // HACK: Until source/filter creation can be accepted, explitly end
+  // the current undo set.
+  this->Internal->UndoStack->EndUndoSet();
 
   // reset camera(should we?).
   this->getActiveRenderModule()->resetCamera();

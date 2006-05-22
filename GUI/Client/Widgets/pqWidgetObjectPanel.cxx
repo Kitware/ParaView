@@ -30,9 +30,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#include "pq3DWidgetFactory.h"
 #include "pqApplicationCore.h"
 #include "pqPropertyLinks.h"
 #include "pqRenderModule.h"
+#include "pqServerManagerModel.h"
 #include "pqWidgetObjectPanel.h"
 
 #include <vtkImplicitPlaneRepresentation.h>
@@ -59,14 +61,19 @@ pqWidgetObjectPanel::~pqWidgetObjectPanel()
     {
     pqRenderModule* renModule = 
       pqApplicationCore::instance()->getActiveRenderModule();
+    if (renModule)
+      {
+      vtkSMRenderModuleProxy* rm = renModule->getProxy() ;
+      vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+        rm->GetProperty("Displays"));
+      pp->RemoveProxy(this->Widget);
+      rm->UpdateVTKObjects();
+      renModule->render();
+      }
 
-    vtkSMRenderModuleProxy* rm = renModule->getProxy() ;
-    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-      rm->GetProperty("Displays"));
-    pp->RemoveProxy(this->Widget);
-    rm->UpdateVTKObjects();
-
-    this->Widget->Delete();
+    pq3DWidgetFactory* widgetFactory = 
+      pqApplicationCore::instance()->get3DWidgetFactory();
+    widgetFactory->free3DWidget(this->Widget);
     this->Widget = 0;
     }
 
@@ -83,14 +90,21 @@ void pqWidgetObjectPanel::setProxy(pqSMProxy proxy)
   pqLoadedFormObjectPanel::setProxy(proxy);
 
   if(!this->Proxy)
+    {
     return;
+    }
 
   // Create the 3D widget ...
   if(!this->Widget)
     {
-    this->Widget = vtkSMNew3DWidgetProxy::SafeDownCast(
-      vtkSMObject::GetProxyManager()->NewProxy(
-        "displays", "ImplicitPlaneWidgetDisplay"));
+    pq3DWidgetFactory* widgetFactory = 
+      pqApplicationCore::instance()->get3DWidgetFactory();
+    // We won't have to do this once setProxy() takes
+    // pqProxy as an argument.
+    pqServer* server = pqApplicationCore::instance()->
+      getServerManagerModel()->getServer(proxy->GetConnectionID());
+    this->Widget = widgetFactory->get3DWidget("ImplicitPlaneWidgetDisplay",
+      server);
 
     // Resize the 3D widget based on the bounds of the input data ...
     if(vtkSMProxyProperty* const input_property = vtkSMProxyProperty::SafeDownCast(
@@ -144,5 +158,6 @@ void pqWidgetObjectPanel::setProxy(pqSMProxy proxy)
       rm->GetProperty("Displays"));
     pp->AddProxy(this->Widget);
     rm->UpdateVTKObjects();
+    renModule->render();
     }
 }

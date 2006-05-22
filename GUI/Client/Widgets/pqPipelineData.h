@@ -61,16 +61,11 @@ public:
   virtual ~pqPipelineData();
 
 signals:
-  /// Fired when a proxy is registered under the "sources" group and 
-  /// belongs to "sources" xml group.. 
+  /// Fired when a proxy is registered under the "sources" group. 
   void sourceRegistered(QString name, vtkSMProxy *source);
 
-  /// Fired when a proxy is registered under the "sources" group and
-  /// belongs to "filters" xml group.
-  void filterRegistered(QString name, vtkSMProxy *filter);
-
-  /// Fired when a compound proxy is registered.
-  void bundleRegistered(QString name, vtkSMProxy *bundle);
+  /// Fired when a proxy under the "sources" group is unregistered.
+  void sourceUnRegistered(vtkSMProxy *proxy);
 
   /// Fired when a proxy is registered under the "displays" group.
   void displayRegistered(QString name, vtkSMProxy* display);
@@ -78,21 +73,26 @@ signals:
   // Fired when a proxy registered under group "displays" is unregistered.
   void displayUnRegistered(vtkSMProxy* display);
 
-  /// Fired when a source/filter/compound proxy is unregistered.
-  void proxyUnRegistered(vtkSMProxy *proxy);
-
-  /// Fired when a server connection is created by the vtkProcessModule.
-  void connectionCreated(vtkIdType connectionId);
-
-  /// Fired when a server connection is closed by  the vtkProcessModule.
-  void connectionClosed(vtkIdType connectionId);
-
   /// Fired when a render module proxy is registered under the "render_modules"
   /// group.
   void renderModuleRegistered(QString name, vtkSMRenderModuleProxy* rm);
 
   /// Fired when a render module proxy is unregistred.
   void renderModuleUnRegistered(vtkSMRenderModuleProxy* rm);
+  
+  // Fired when a proxy is registered, and not in the "sources" or
+  // "render_modules" groups.
+  void proxyRegistered(QString group, QString name, vtkSMProxy* proxy);
+  
+  // Fired when a proxy is unregistered, and does not belong to
+  // the "sources" or "render_modules" group.
+  void proxyUnRegistered(QString group, QString name, vtkSMProxy* proxy);
+
+  /// Fired when a server connection is created by the vtkProcessModule.
+  void connectionCreated(vtkIdType connectionId);
+
+  /// Fired when a server connection is closed by  the vtkProcessModule.
+  void connectionClosed(vtkIdType connectionId);
 
 private slots:
   void proxyRegistered(vtkObject* object, unsigned long e, void* clientData,

@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPipelineDisplay_h
 
 
-#include "pqPipelineObject.h"
+#include "pqProxy.h"
 
 class pqPipelineDisplayInternal;
 class pqPipelineSource;
@@ -48,10 +48,11 @@ class vtkSMDataObjectDisplayProxy;
 /// a single vtkSMDataObjectDisplayProxy. The display can be added to
 /// only one render module or more (ofcouse on the same server, this class
 /// doesn't worry about that.
-class PQWIDGETS_EXPORT pqPipelineDisplay : public pqPipelineObject
+class PQWIDGETS_EXPORT pqPipelineDisplay : public pqProxy
 {
 public:
-  pqPipelineDisplay(vtkSMDataObjectDisplayProxy* display, pqServer* server,
+  pqPipelineDisplay(const QString& name,
+    vtkSMDataObjectDisplayProxy* display, pqServer* server,
     QObject* parent=NULL);
   virtual ~pqPipelineDisplay();
 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqPipelineObject.cxx
+   Module:    pqProxy.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,19 +30,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqPipelineObject.h"
+#include "pqProxy.h"
 
 
-pqPipelineObject::pqPipelineObject(pqServer* server, 
-  QObject* _parent/*=NULL*/) : pqPipelineModelItem(_parent)
+//-----------------------------------------------------------------------------
+pqProxy::pqProxy(const QString& group, const QString& name,
+    vtkSMProxy* proxy, pqServer* server, QObject* _parent/*=NULL*/) 
+: pqPipelineModelItem(_parent),
+  Server(server),
+  ProxyName(name),
+  SMName(name),
+  SMGroup(group),
+  Proxy(proxy)
 {
-  this->Server = server;
+
 }
 
-pqServer *pqPipelineObject::getServer() const
-{
-  return this->Server;
-}
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 
 

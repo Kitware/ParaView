@@ -107,7 +107,7 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
 
 
   this->connect(pqApplicationCore::instance()->getPipelineData(), 
-                SIGNAL(proxyUnRegistered(vtkSMProxy*)),
+                SIGNAL(sourceUnRegistered(vtkSMProxy*)),
                 SLOT(removeProxy(vtkSMProxy*)));
  
 }

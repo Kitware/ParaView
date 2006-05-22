@@ -44,7 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 
 #include "pqSMAdaptor.h"
-#include "pqPipelineObject.h"
 #include "pqPipelineBuilder.h"
 #include "pqApplicationCore.h"
 #include "pqServerManagerModel.h"

@@ -114,6 +114,57 @@ void pqPipelineBuilder::addConnection(pqPipelineSource* source,
 }
 
 //-----------------------------------------------------------------------------
+vtkSMProxy* pqPipelineBuilder::createProxy(const char* xmlgroup, 
+  const char* xmlname, const char* register_group, pqServer* server,
+  bool is_undoable/*=true*/)
+{
+  if (!register_group)
+    {
+    qDebug() << "register_group cannot be null.";
+    return NULL;
+    }
+
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxy* proxy = NULL;
+  if (xmlgroup)
+    {
+    proxy = pxm->NewProxy(xmlgroup, xmlname);
+    }
+  else
+    {
+    proxy = pxm->NewCompoundProxy(xmlname);
+    }
+  if (!proxy)
+    {
+    qCritical() << "Failed to create proxy: " 
+      << (xmlgroup? xmlgroup: "") << "," << xmlname;
+    return NULL;
+    }
+  proxy->SetConnectionID(server->GetConnectionID());
+
+  vtksys_ios::ostringstream proxy_name_stream;
+  proxy_name_stream << xmlname 
+    << this->NameGenerator->GetCountAndIncrement(xmlname);
+
+  if (this->UndoStack && is_undoable)
+    {
+    vtksys_ios::ostringstream label;
+    label << "Create " << xmlname;
+    this->UndoStack->BeginOrContinueUndoSet(QString(label.str().c_str()));
+    }
+
+  pxm->RegisterProxy(register_group, proxy_name_stream.str().c_str(),
+    proxy);
+  proxy->Delete();
+
+  if (this->UndoStack && is_undoable)
+    {
+    this->UndoStack->PauseUndoSet();
+    }
+  return proxy;
+}
+
+//-----------------------------------------------------------------------------
 vtkSMProxy* pqPipelineBuilder::createPipelineProxy(const char* xmlgroup,
     const char* xmlname, pqServer* server, pqRenderModule* renModule)
 {

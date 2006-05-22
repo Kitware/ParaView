@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMultiViewFrame.h"
 #include "pqParts.h"
 #include "pqPipelineModel.h"
-#include "pqPipelineObject.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqXMLUtil.h"
@@ -480,19 +479,7 @@ void pqPipelineData::proxyRegistered(vtkObject*, unsigned long, void*,
 
   if(strcmp(info->GroupName, "sources") == 0)
     {
-    // Use the xml grouping to determine the type of proxy.
-    if(vtkSMCompoundProxy::SafeDownCast(info->Proxy))
-      {
-      emit this->bundleRegistered(info->ProxyName, info->Proxy);
-      }
-    else if(strcmp(info->Proxy->GetXMLGroup(), "filters") == 0)
-      {
-      emit this->filterRegistered(info->ProxyName, info->Proxy);
-      }
-    else if(strcmp(info->Proxy->GetXMLGroup(), "sources") == 0)
-      {
-      emit this->sourceRegistered(info->ProxyName, info->Proxy);
-      }
+    emit this->sourceRegistered(info->ProxyName, info->Proxy);
     }
   else if(strcmp(info->GroupName, "displays") == 0)
     {
@@ -506,6 +493,11 @@ void pqPipelineData::proxyRegistered(vtkObject*, unsigned long, void*,
     vtkSMRenderModuleProxy* rm = vtkSMRenderModuleProxy::SafeDownCast(
       info->Proxy);
     emit this->renderModuleRegistered(info->ProxyName, rm);
+    }
+  else
+    {
+    emit this->proxyRegistered(info->GroupName, info->ProxyName,
+      info->Proxy);
     }
 }
 
@@ -524,7 +516,7 @@ void pqPipelineData::proxyUnRegistered(vtkObject*, unsigned long, void*,
 
   if(strcmp(info->GroupName, "sources") == 0 )
     {
-    emit this->proxyUnRegistered(info->Proxy);
+    emit this->sourceUnRegistered(info->Proxy);
     }
   else if (strcmp(info->GroupName, "displays") == 0)
     {
@@ -534,6 +526,11 @@ void pqPipelineData::proxyUnRegistered(vtkObject*, unsigned long, void*,
     {
     emit this->renderModuleUnRegistered(
       vtkSMRenderModuleProxy::SafeDownCast(info->Proxy));
+    }
+  else
+    {
+    emit this->proxyUnRegistered(info->GroupName, info->ProxyName,
+      info->Proxy);
     }
 }
 //-----------------------------------------------------------------------------

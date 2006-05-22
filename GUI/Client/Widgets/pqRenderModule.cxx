@@ -76,7 +76,7 @@ public:
 //-----------------------------------------------------------------------------
 pqRenderModule::pqRenderModule(const QString& name, 
   vtkSMRenderModuleProxy* renModule, pqServer* server, QObject* _parent/*=null*/)
-: pqPipelineObject(server, _parent)
+: pqProxy("render_modules", name, renModule, server, _parent)
 {
   this->Internal = new pqRenderModuleInternal();
   this->Internal->Name = name;

@@ -66,9 +66,9 @@ public:
 
 
 //-----------------------------------------------------------------------------
-pqPipelineSource::pqPipelineSource(QString name, vtkSMProxy* proxy,
+pqPipelineSource::pqPipelineSource(const QString& name, vtkSMProxy* proxy,
   pqServer* server, QObject* _parent/*=NULL*/) 
-: pqPipelineObject(server, _parent)
+: pqProxy("sources", name, proxy, server, _parent)
 {
   this->Internal = new pqPipelineSourceInternal(name, proxy);
   

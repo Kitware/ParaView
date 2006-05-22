@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPipelineSource_h
 
 #include "pqWidgetsExport.h"
-#include "pqPipelineObject.h"
+#include "pqProxy.h"
 
 class pqPipelineDisplay;
 class pqPipelineSourceInternal;
@@ -49,12 +49,12 @@ class vtkObject;
 /// the object, changes to the pipeline structure are only through
 /// protected function. These changes happen automatically as a reflection
 /// of the SM state. 
-class PQWIDGETS_EXPORT pqPipelineSource : public pqPipelineObject
+class PQWIDGETS_EXPORT pqPipelineSource : public pqProxy
 {
   Q_OBJECT
 
 public:
-  pqPipelineSource(QString name, vtkSMProxy *proxy, pqServer* server,
+  pqPipelineSource(const QString& name, vtkSMProxy *proxy, pqServer* server,
     QObject* parent=NULL);
   virtual ~pqPipelineSource();
 

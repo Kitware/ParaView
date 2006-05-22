@@ -122,15 +122,22 @@ public:
   // we will have to fix that soon.
   vtkSMProxy* createLookupTable(pqPipelineDisplay* display);
 
-  // Internal create method.
-  vtkSMProxy* createPipelineProxy(const char* xmlgroup,
-    const char* xmlname, pqServer* server, pqRenderModule* renModule);   
+
+  // Create and register a proxy and capture the creation in an undo state.
+  // \c is_undoable can be used to override if the creation/registration
+  // of the proxy should be undoable, true by default. 
+  vtkSMProxy* createProxy(const char* xmlgroup, const char* xmlname,
+    const char* register_group, pqServer* server, bool is_undoable=true);
 
 protected:
   /// this method does what it says. Note that it does not worry about undo stack
   /// at all. The caller would have managed it.
   vtkSMDisplayProxy* createDisplayProxyInternal(
     vtkSMProxy* proxy, vtkSMRenderModuleProxy*);
+
+  // Internal create method.
+  vtkSMProxy* createPipelineProxy(const char* xmlgroup,
+    const char* xmlname, pqServer* server, pqRenderModule* renModule);
 
   /// internal implementation to addConnection.
   void addConnection(vtkSMProxy* source, vtkSMProxy* sink);

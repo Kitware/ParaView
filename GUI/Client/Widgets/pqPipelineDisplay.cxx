@@ -62,9 +62,10 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqPipelineDisplay::pqPipelineDisplay(vtkSMDataObjectDisplayProxy* display,
+pqPipelineDisplay::pqPipelineDisplay(const QString& name,
+  vtkSMDataObjectDisplayProxy* display,
   pqServer* server, QObject* p/*=null*/):
-  pqPipelineObject(server, p)
+  pqProxy("displays", name, display, server, p)
 {
   this->Internal = new pqPipelineDisplayInternal();
   this->Internal->DisplayProxy = display;

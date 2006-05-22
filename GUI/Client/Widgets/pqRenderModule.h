@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqRenderModule_h
 
 
-#include "pqPipelineObject.h"
+#include "pqProxy.h"
 
 class pqRenderModuleInternal;
 class pqServer;
@@ -43,12 +43,12 @@ class vtkSMRenderModuleProxy;
 
 
 // This is a PQ abstraction of a render module.
-class PQWIDGETS_EXPORT pqRenderModule : public pqPipelineObject
+class PQWIDGETS_EXPORT pqRenderModule : public pqProxy
 {
   Q_OBJECT
 public:
-  pqRenderModule(const QString& name, vtkSMRenderModuleProxy* renModule, pqServer* server, 
-    QObject* parent=NULL);
+  pqRenderModule(const QString& name, vtkSMRenderModuleProxy* renModule, 
+    pqServer* server, QObject* parent=NULL);
   virtual ~pqRenderModule();
 
   /// Returns the internal render Module proxy associated with this object.

@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineBrowserContextMenu.h"
 #include "pqPipelineData.h"
 #include "pqPipelineModel.h"
-#include "pqPipelineObject.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"

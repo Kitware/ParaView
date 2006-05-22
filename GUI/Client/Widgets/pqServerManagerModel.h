@@ -132,7 +132,7 @@ signals:
 
   // When a connection is disconneted on the vtkProcessModule,
   // this event is fired before the pqServer object is destroyed.
-  // It is not save to access the actual vtkProcessModule connection 
+  // It is not safe to access the actual vtkProcessModule connection 
   // in this event, since it is already closed and unavailable.
   void serverRemoved(pqServer* server);
 
