@@ -921,7 +921,7 @@
      </DoubleVectorProperty>
     </Proxy>
   
-    <Proxy name="ImplicePlaneRepresentation" 
+    <Proxy name="ImplicitPlaneRepresentation" 
            class="vtkImplicitPlaneRepresentation">
       <IntVectorProperty
         name="Visibility"
@@ -2751,7 +2751,7 @@
     <New3DWidgetProxy name="ImplicitPlaneWidgetDisplay">
       <SubProxy>
         <Proxy name="Prop"
-          proxygroup="props" proxyname="ImplicePlaneRepresentation">
+          proxygroup="props" proxyname="ImplicitPlaneRepresentation">
         </Proxy>
         <ExposedProperties>
           <Property name="Visibility" />
