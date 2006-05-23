@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.106");
+vtkCxxRevisionMacro(vtkKWMenu, "1.107");
 
 //----------------------------------------------------------------------------
 class vtkKWMenuInternals
@@ -140,6 +140,10 @@ int vtkKWMenu::InsertGeneric(int index,
     return -1;
     }
 
+  if (index < 0)
+    {
+    index = 0;
+    }
   if (index == 0)
     {
     if (this->TearOff) // If tearoff, then entry 0 is always taken
