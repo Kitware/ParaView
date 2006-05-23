@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqLoadedFormObjectPanel.h"
 
-class pqPropertyLinks;
 class vtkSMNew3DWidgetProxy;
 
 class pqWidgetObjectPanel :
@@ -58,12 +57,9 @@ public slots:
   virtual void unselect();
   
 protected:
-  pqPropertyLinks& getPropertyLinks();
-  
   /// set the proxy to display properties for
   virtual void setProxyInternal(pqSMProxy proxy);
 
-  pqPropertyLinks* PropertyLinks;
   vtkSMNew3DWidgetProxy* Widget;
   
 private:

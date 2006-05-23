@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pq3DWidgetFactory.h"
 #include "pqApplicationCore.h"
-#include "pqPropertyLinks.h"
 #include "pqRenderModule.h"
 #include "pqServerManagerModel.h"
 #include "pqWidgetObjectPanel.h"
@@ -92,7 +91,6 @@ private:
 
 pqWidgetObjectPanel::pqWidgetObjectPanel(QString filename, QWidget* p) :
   pqLoadedFormObjectPanel(filename, p),
-  PropertyLinks(new pqPropertyLinks()),
   Widget(0),
   Observer(WidgetObserver::New())
 {
@@ -112,13 +110,6 @@ pqWidgetObjectPanel::~pqWidgetObjectPanel()
     widgetFactory->free3DWidget(this->Widget);
     this->Widget = 0;
     }
-
-  delete this->PropertyLinks;
-}
-//-----------------------------------------------------------------------------
-pqPropertyLinks& pqWidgetObjectPanel::getPropertyLinks()
-{
-  return *this->PropertyLinks;
 }
 
 //-----------------------------------------------------------------------------
