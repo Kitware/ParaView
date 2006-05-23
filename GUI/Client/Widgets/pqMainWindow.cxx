@@ -243,13 +243,11 @@ void pqMainWindow::createStandardFileMenu()
 {
   QMenu* const menu = this->fileMenu();
   
-  menu->addAction(tr("&New"))
-    << pqSetName("New")
-    << pqConnect(SIGNAL(triggered()), this, SLOT(onFileNew()));
+  menu->addAction(tr("&New"), this, SLOT(onFileNew()), QKeySequence(Qt::CTRL + Qt::Key_N))
+    << pqSetName("New");
 
-  menu->addAction(tr("&Open..."))
-    << pqSetName("Open")
-    << pqConnect(SIGNAL(triggered()), this, SLOT(onFileOpen()));
+  menu->addAction(tr("&Open..."), this, SLOT(onFileOpen()), QKeySequence(Qt::CTRL + Qt::Key_O))
+    << pqSetName("Open");
 
   QAction* action;
 
@@ -271,9 +269,8 @@ void pqMainWindow::createStandardFileMenu()
 
   menu->addSeparator();
   
-  menu->addAction(tr("E&xit"))
-    << pqSetName("Exit")
-    << pqConnect(SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));
+  menu->addAction(tr("E&xit"), QApplication::instance(), SLOT(quit()), QKeySequence(Qt::CTRL + Qt::Key_Q))
+    << pqSetName("Exit");
 }
 
 void pqMainWindow::createStandardViewMenu()
@@ -285,11 +282,11 @@ void pqMainWindow::createStandardServerMenu()
 {
   QMenu* const menu = this->serverMenu();
   
-  menu->addAction(tr("Connect"))
+  menu->addAction(tr("&Connect"))
     << pqSetName("Connect")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onServerConnect()));
 
-  this->Implementation->ServerDisconnectAction = menu->addAction(tr("Disconnect"))
+  this->Implementation->ServerDisconnectAction = menu->addAction(tr("&Disconnect"))
     << pqSetName("Disconnect")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onServerDisconnect()));
     
@@ -330,7 +327,7 @@ void pqMainWindow::createStandardToolsMenu()
 
   menu->addSeparator();
   
-  menu->addAction(tr("Validate Widget Names"))
+  menu->addAction(tr("&Validate Widget Names"))
     << pqSetName("Validate")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onValidateWidgetNames()));
   
@@ -338,7 +335,7 @@ void pqMainWindow::createStandardToolsMenu()
     << pqSetName("Record")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onRecordTest()));
 
-  menu->addAction(tr("Record Test Screenshot"))
+  menu->addAction(tr("Record &Test Screenshot"))
     << pqSetName("RecordTestScreenshot")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onRecordTestScreenshot()));
 
@@ -578,7 +575,7 @@ QMenu* pqMainWindow::sourcesMenu()
 {
   if(!this->Implementation->SourcesMenu)
     {
-    this->Implementation->SourcesMenu = this->menuBar()->addMenu(tr("&Sources"))
+    this->Implementation->SourcesMenu = this->menuBar()->addMenu(tr("S&ources"))
       << pqSetName("SourcesMenu");
     this->Implementation->SourcesMenu->setEnabled(false);
     }
@@ -590,7 +587,7 @@ QMenu* pqMainWindow::filtersMenu()
 {
   if(!this->Implementation->FiltersMenu)
     {
-    this->Implementation->FiltersMenu = this->menuBar()->addMenu(tr("&Filters"))
+    this->Implementation->FiltersMenu = this->menuBar()->addMenu(tr("F&ilters"))
       << pqSetName("FiltersMenu");
     this->Implementation->FiltersMenu->setEnabled(false);
     }
