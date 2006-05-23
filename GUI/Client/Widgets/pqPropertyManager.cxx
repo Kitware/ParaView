@@ -95,7 +95,6 @@ void pqPropertyManagerProperty::setValue(const QVariant& v)
   if(this->Value != v)
     {
     this->Value = v;
-    emit this->propertyChanged();
     }
 }
 
@@ -135,6 +134,7 @@ void pqPropertyManagerPropertyLink::guiPropertyChanged()
   if(p->value() != v)
     {
     p->setValue(v);
+    emit p->propertyChanged();
     }
 }
 
