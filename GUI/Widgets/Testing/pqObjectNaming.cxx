@@ -186,7 +186,13 @@ static bool ValidateName(QObject& Object)
     || class_name == "QToolBarWidgetAction")
     {
     return false;
-    }  
+    }
+    
+  // Skip ParaView stuff ...
+  if(class_name == "pqPropertyManager")
+    {
+    return false;
+    }
   
   return true;
 }
