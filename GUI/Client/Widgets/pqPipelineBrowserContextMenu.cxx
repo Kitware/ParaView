@@ -131,6 +131,7 @@ void pqPipelineBrowserContextMenu::showDisplayEditor()
   // in order to handle multiple displays.
   QDialog* dialog = new QDialog(topParent);
   dialog->setWindowTitle("Display Settings");
+  dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
   QHBoxLayout* l = new QHBoxLayout(dialog);
   pqDisplayProxyEditor* editor = new pqDisplayProxyEditor(dialog);
   editor->setDisplay(source->getDisplay(0));
