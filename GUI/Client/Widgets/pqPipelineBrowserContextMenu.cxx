@@ -57,6 +57,8 @@ pqPipelineBrowserContextMenu::pqPipelineBrowserContextMenu(
 {
   this->Browser = browser;
 
+  this->setObjectName("ContextMenu");
+
   // Listen for the custom context menu signal.
   if(this->Browser)
     {

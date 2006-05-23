@@ -457,7 +457,8 @@ void pqMainWindow::createStandardVCRToolBar()
   toolbar->addWidget(vcr_controls)
     << pqSetName("VCRControls");
 
-  this->Implementation->VCRController = new pqVCRController(this);
+  this->Implementation->VCRController = new pqVCRController(this)
+    << pqSetName("VCRController");
   
   this->connect(vcr_controls, SIGNAL(first()),  
     this->Implementation->VCRController, SLOT(onFirst()));
