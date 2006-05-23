@@ -162,6 +162,8 @@ public slots:
   void onValidateWidgetNames();
   void onRecordTest();
   void onRecordTest(const QStringList& Files);
+  void onRecordTestScreenshot();
+  void onRecordTestScreenshot(const QStringList& Files);
   void onPlayTest();
   void onPlayTest(const QStringList& Files);
   

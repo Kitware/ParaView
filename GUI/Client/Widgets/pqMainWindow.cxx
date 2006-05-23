@@ -338,6 +338,10 @@ void pqMainWindow::createStandardToolsMenu()
     << pqSetName("Record")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onRecordTest()));
 
+  menu->addAction(tr("Record Test Screenshot"))
+    << pqSetName("RecordTestScreenshot")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(onRecordTestScreenshot()));
+
   menu->addAction(tr("&Play Test"))
     << pqSetName("Play")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onPlayTest()));
@@ -1122,6 +1126,56 @@ void pqMainWindow::onFileSaveScreenshot(const QStringList& files)
       qCritical() << "Save Image failed.";
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::onRecordTestScreenshot()
+{
+  pqRenderModule* const render_module = pqApplicationCore::instance()->getActiveRenderModule();
+  if(!render_module)
+    {
+    qDebug() << "Cannnot save image. No active render module.";
+    return;
+    }
+
+  QString filters;
+  filters += "PNG image (*.png)";
+  filters += ";;BMP image (*.bmp)";
+  filters += ";;TIFF image (*.tif)";
+  filters += ";;PPM image (*.ppm)";
+  filters += ";;JPG image (*.jpg)";
+  filters += ";;All files (*)";
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), 
+    this, tr("Save Test Screenshot:"), QString(), filters);
+  file_dialog->setObjectName("RecordTestScreenshotDialog");
+  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
+    this, SLOT(onRecordTestScreenshot(const QStringList&)));
+  file_dialog->show();
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::onRecordTestScreenshot(const QStringList& files)
+{
+  pqRenderModule* render_module = pqApplicationCore::instance()->getActiveRenderModule();
+  if(!render_module)
+    {
+    qDebug() << "Cannnot save image. No active render module.";
+    return;
+    }
+
+  QSize old_size = render_module->getWidget()->size();
+  render_module->getWidget()->resize(300,300);
+  
+  for(int i = 0; i != files.size(); ++i)
+    {
+    if (!render_module->saveImage(0, 0, files[i]))
+      {
+      qCritical() << "Save Image failed.";
+      }
+    }
+    
+  render_module->getWidget()->resize(old_size);
+  render_module->render();
 }
 
 //-----------------------------------------------------------------------------
