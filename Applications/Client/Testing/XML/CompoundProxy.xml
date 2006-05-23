@@ -8,5 +8,7 @@
   <pqevent object="MainWindow/CompoundProxyWizard/FileOpenDialog/OK" command="activate" arguments="" />
   <pqevent object="MainWindow/CompoundProxyWizard/DoneButton" command="activate" arguments="" />
   <pqevent object="MainWindow/MenuBar/SourcesMenu/Sphere" command="activate" arguments="" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/CompoundProxyToolBar/MyElevation" command="activate" arguments="" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
 </pqevents>

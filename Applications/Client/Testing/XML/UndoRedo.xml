@@ -3,7 +3,9 @@
   <pqevent object="MainWindow/MenuBar/ServerMenu/Connect" command="activate" arguments="" />
   <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
   <pqevent object="MainWindow/MenuBar/SourcesMenu/Sphere" command="activate" arguments="" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/MenuBar/SourcesMenu/Cylinder" command="activate" arguments="" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/ScrollArea/qt_scrollarea_viewport/Panel/Center:1" command="set_string" arguments="1" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Editor/ScrollArea/qt_scrollarea_viewport/Panel/Height" command="set_string" arguments="2" />
