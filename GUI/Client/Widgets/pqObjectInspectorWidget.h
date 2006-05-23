@@ -82,6 +82,9 @@ public slots:
   /// to become modified i.e. enable Accept/Reset buttons.
   void forceModified(bool status);
 
+  /// Updates the accept/reset button state.
+  void canAccept(bool status);
+
 signals:
   /// emitted before accept.
   void preaccept();

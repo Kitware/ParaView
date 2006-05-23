@@ -129,9 +129,25 @@ pqObjectInspectorWidget::~pqObjectInspectorWidget()
 //-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::forceModified(bool status)
 {
+  this->ForceModified = status;
+  this->canAccept(status);
+}
+
+//-----------------------------------------------------------------------------
+void pqObjectInspectorWidget::canAccept(bool status)
+{
   this->AcceptButton->setEnabled(status);
   this->ResetButton->setEnabled(status);
-  this->ForceModified = status;
+  if (status)
+    {
+    QPalette palette = this->AcceptButton->palette();
+    palette.setBrush(QPalette::Button, Qt::darkGreen); 
+    this->AcceptButton->setPalette(palette);
+    }
+  else
+    {
+    this->AcceptButton->setPalette(this->ResetButton->palette());
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -234,11 +250,7 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
       
       QObject::connect(this->CurrentCustomPanel->getPropertyManager(), 
         SIGNAL(canAcceptOrReject(bool)), 
-        this->AcceptButton, SLOT(setEnabled(bool)));
-      QObject::connect(this->CurrentCustomPanel->getPropertyManager(), 
-        SIGNAL(canAcceptOrReject(bool)), 
-        this->ResetButton, SLOT(setEnabled(bool)));
-
+        this, SLOT(canAccept(bool)));
       }
     }
 
@@ -257,11 +269,7 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
     this->CurrentAutoPanel->setProxy(proxy);
       
     QObject::connect(this->CurrentAutoPanel->getPropertyManager(), 
-      SIGNAL(canAcceptOrReject(bool)), 
-      this->AcceptButton, SLOT(setEnabled(bool)));
-    QObject::connect(this->CurrentAutoPanel->getPropertyManager(), 
-      SIGNAL(canAcceptOrReject(bool)), 
-      this->ResetButton, SLOT(setEnabled(bool)));
+      SIGNAL(canAcceptOrReject(bool)), this, SLOT(canAccept(bool)));
     }
 
   // the current auto panel always has the name "Editor"
