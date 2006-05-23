@@ -40,7 +40,7 @@ class pqClipPanel :
   public pqWidgetObjectPanel
 {
   Q_OBJECT
-  
+
 public:
   pqClipPanel(QWidget* p);
   ~pqClipPanel();
@@ -76,3 +76,4 @@ private:
 };
 
 #endif
+

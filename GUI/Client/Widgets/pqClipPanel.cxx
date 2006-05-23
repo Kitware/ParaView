@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqClipPanel.h"
 #include "pqPropertyManager.h"
-#include "pqPropertyManager.h"
 
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMNew3DWidgetProxy.h>
@@ -41,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QLineEdit>
 
-/// constructor
 pqClipPanel::pqClipPanel(QWidget* p) :
   pqWidgetObjectPanel(":/pqWidgets/ClipPanel.ui", p),
   IgnoreQtWidgets(false),
@@ -70,112 +68,6 @@ pqClipPanel::~pqClipPanel()
 {
   this->setProxy(NULL);
 }
-
-/*
-void pqClipPanel::setProxyInternal(pqSMProxy p)
-{
-  pqWidgetObjectPanel::setProxyInternal(p);
-  
-  QLineEdit* const originX = this->findChild<QLineEdit*>("originX");
-  QLineEdit* const originY = this->findChild<QLineEdit*>("originY");
-  QLineEdit* const originZ = this->findChild<QLineEdit*>("originZ");
-  QLineEdit* const normalX = this->findChild<QLineEdit*>("normalX");
-  QLineEdit* const normalY = this->findChild<QLineEdit*>("normalY");
-  QLineEdit* const normalZ = this->findChild<QLineEdit*>("normalZ");
-  
-  // Connect Qt widgets to the 3D widget ...
-  if(this->Widget)
-    {
-    if(vtkSMDoubleVectorProperty* const widget_origin = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->Widget->GetProperty("Origin")))
-      {
-      if(originX)
-        {
-        this->getPropertyManager()->registerLink(originX, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 0);
-        }
-   
-      if(originY)
-        {
-        this->getPropertyManager()->registerLink(originY, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 1);
-        }
-      
-      if(originZ)
-        {
-        this->getPropertyManager()->registerLink(originZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_origin, 2);
-        }
-      }
-
-    if(vtkSMDoubleVectorProperty* const widget_normal = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->Widget->GetProperty("Normal")))
-      {
-      if(normalX)
-        {
-        this->getPropertyManager()->registerLink(normalX, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 0);
-        }
-   
-      if(normalY)
-        {
-        this->getPropertyManager()->registerLink(normalY, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 1);
-        }
-      
-      if(normalZ)
-        {
-        this->getPropertyManager()->registerLink(normalZ, "text", SIGNAL(textChanged(const QString&)), this->Widget, widget_normal, 2);
-        }
-      }
-    }
-
-  // Connect Qt widgets to the implicit plane function ...
-  if(this->Proxy)
-    {
-    if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
-      this->Proxy->GetProperty("ClipFunction")))
-      {
-      if(vtkSMProxy* const clip_function = clip_function_property->GetProxy(0))
-        {
-        if(vtkSMDoubleVectorProperty* const plane_origin = vtkSMDoubleVectorProperty::SafeDownCast(
-          clip_function->GetProperty("Origin")))
-          {
-          if(originX)
-            {
-            this->getPropertyManager()->registerLink(originX, "text", SIGNAL(textChanged(const QString&)), clip_function, plane_origin, 0);
-            }
-       
-          if(originY)
-            {
-            this->getPropertyManager()->registerLink(originY, "text", SIGNAL(textChanged(const QString&)), clip_function, plane_origin, 1);
-            }
-          
-          if(originZ)
-            {
-            this->getPropertyManager()->registerLink(originZ, "text", SIGNAL(textChanged(const QString&)), clip_function, plane_origin, 2);
-            }
-          }
-
-        if(vtkSMDoubleVectorProperty* const plane_normal = vtkSMDoubleVectorProperty::SafeDownCast(
-          clip_function->GetProperty("Normal")))
-          {
-          if(normalX)
-            {
-            this->getPropertyManager()->registerLink(normalX, "text", SIGNAL(textChanged(const QString&)), clip_function, plane_normal, 0);
-            }
-       
-          if(normalY)
-            {
-            this->getPropertyManager()->registerLink(normalY, "text", SIGNAL(textChanged(const QString&)), clip_function, plane_normal, 1);
-            }
-          
-          if(normalZ)
-            {
-            this->getPropertyManager()->registerLink(normalZ, "text", SIGNAL(textChanged(const QString&)), clip_function, plane_normal, 2);
-            }
-          }
-        }
-      }
-    }
-}
-*/
-
 
 void pqClipPanel::setProxyInternal(pqSMProxy p)
 {
@@ -397,3 +289,4 @@ void pqClipPanel::onRejected()
 {
   this->pullImplicitPlane();
 }
+
