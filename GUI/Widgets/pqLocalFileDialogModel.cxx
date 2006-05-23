@@ -170,6 +170,7 @@ public:
       this->FileGroups.push_back(numbered_files);
 
     this->endRemoveRows();
+    this->dataChanged(QModelIndex(), QModelIndex());
   }
 
   QStringList GetFilePaths(const QModelIndex& Index)

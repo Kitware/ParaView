@@ -92,7 +92,10 @@ pqFileDialog::pqFileDialog(pqFileDialogModel* model, QWidget* p,
 
   this->setWindowTitle(title);
 
-  QObject::connect(this->Model->fileModel(), 
+  // TODO:  This connection seems weird.
+  //        What we're really after is whether the view's rootIndex/currentIndex changed.
+  //        The model's dataChanged signal isn't an equivalent of that.
+  QObject::connect(this->Model->fileModel(),
                    SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), 
                    this, 
                    SLOT(onDataChanged(const QModelIndex&, const QModelIndex&)));

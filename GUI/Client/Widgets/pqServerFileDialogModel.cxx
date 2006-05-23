@@ -148,6 +148,7 @@ public:
       this->FileList.push_back(FileInfo(file_name, file_name, false, false));
       }
     this->endRemoveRows();
+    this->dataChanged(QModelIndex(), QModelIndex());
   }
 
   QStringList getFilePaths(const QModelIndex& Index)
