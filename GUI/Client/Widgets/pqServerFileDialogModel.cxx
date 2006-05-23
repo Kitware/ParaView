@@ -118,6 +118,7 @@ public:
 
   void SetCurrentPath(const QString& Path)
   {
+    this->beginRemoveRows(QModelIndex(), 0, this->FileList.size());
     this->CurrentPath.setPath(QDir::cleanPath(Path));
     this->FileList.clear();
 
@@ -146,7 +147,7 @@ public:
       const char* file_name = files->GetString(cc);
       this->FileList.push_back(FileInfo(file_name, file_name, false, false));
       }
-    this->reset();
+    this->endRemoveRows();
   }
 
   QStringList getFilePaths(const QModelIndex& Index)

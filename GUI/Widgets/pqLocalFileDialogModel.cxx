@@ -126,6 +126,8 @@ class pqFileModel :
 public:
   void setCurrentPath(const QString& Path)
   {
+    this->beginRemoveRows(QModelIndex(), 0, this->FileGroups.size());
+
     this->CurrentPath.setPath(QDir::cleanPath(Path));
     
     this->FileGroups.clear();
@@ -167,7 +169,7 @@ public:
     if(numbered_files.Files.size())
       this->FileGroups.push_back(numbered_files);
 
-    this->reset();
+    this->endRemoveRows();
   }
 
   QStringList GetFilePaths(const QModelIndex& Index)
