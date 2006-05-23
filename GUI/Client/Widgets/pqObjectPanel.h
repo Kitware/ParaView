@@ -72,10 +72,10 @@ public slots:
   void reset();
 
   /// Called when the panel becomes active. Default implemnetation does nothing.
-  virtual void select() { };
+  virtual void select() { }
 
   /// Called when the panel becomes inactive. Default implemnetation does nothing.
-  virtual void unselect() { };
+  virtual void unselect() { }
 
 protected:
   /// Internal method that actually sets the proxy. Subclasses must override

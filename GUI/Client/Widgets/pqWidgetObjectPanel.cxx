@@ -129,6 +129,8 @@ void pqWidgetObjectPanel::select()
     
   if(this->Widget)
     this->Widget->AddObserver(vtkCommand::PropertyModifiedEvent, this->Observer);
+
+  this->pqNamedObjectPanel::select();
 }
 
 //-----------------------------------------------------------------------------
@@ -148,6 +150,7 @@ void pqWidgetObjectPanel::unselect()
     rm->UpdateVTKObjects();
     renModule->render();
     }
+  this->pqNamedObjectPanel::unselect();
 }
 
 //-----------------------------------------------------------------------------
