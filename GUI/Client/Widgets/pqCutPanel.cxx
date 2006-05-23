@@ -194,12 +194,12 @@ void pqCutPanel::updateQtWidgets(const double* origin, const double* normal)
   QLineEdit* const normalY = this->findChild<QLineEdit*>("normalY");
   QLineEdit* const normalZ = this->findChild<QLineEdit*>("normalZ");
 
-  originX->setText(QString::number(origin[0]));  
-  originY->setText(QString::number(origin[1]));  
-  originZ->setText(QString::number(origin[2]));  
-  normalX->setText(QString::number(normal[0]));  
-  normalY->setText(QString::number(normal[1]));  
-  normalZ->setText(QString::number(normal[2]));
+  originX->setText(QString::number(origin[0], 'g', 3));  
+  originY->setText(QString::number(origin[1], 'g', 3));  
+  originZ->setText(QString::number(origin[2], 'g', 3));  
+  normalX->setText(QString::number(normal[0], 'g', 3));  
+  normalY->setText(QString::number(normal[1], 'g', 3));  
+  normalZ->setText(QString::number(normal[2], 'g', 3));
   
   this->IgnoreQtWidgets = false;
 }
