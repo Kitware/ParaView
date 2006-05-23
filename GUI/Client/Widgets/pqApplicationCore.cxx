@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "vtkSMDataObjectDisplayProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyProperty.h"
@@ -362,12 +363,22 @@ pqPipelineSource* pqApplicationCore::createFilterForActiveSource(
         this->Internal->ActiveSource->getServer());
       
       this->Internal->UndoStack->BeginOrContinueUndoSet("Set CutConnection");
+      
       if(vtkSMProxyProperty* const cut_function = 
         vtkSMProxyProperty::SafeDownCast(
           filter->getProxy()->GetProperty("CutFunction")))
         {
         cut_function->AddProxy(plane);
         }
+        
+      if(vtkSMDoubleVectorProperty* const contours =
+        vtkSMDoubleVectorProperty::SafeDownCast(
+          filter->getProxy()->GetProperty("ContourValues")))
+        {
+        contours->SetNumberOfElements(1);
+        contours->SetElement(0, 0.0);
+        }
+        
       this->Internal->UndoStack->PauseUndoSet();
       }
     }
