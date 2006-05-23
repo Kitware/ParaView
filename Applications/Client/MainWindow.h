@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _MainWindow_h
 
 #include <pqMainWindow.h>
+class QAssistantClient;
 
 /// Provides the main window for the ParaQ application
 class MainWindow :
@@ -45,7 +46,13 @@ public:
   MainWindow();
   
 private slots:
-  void onHelpAbout();
+  void showHelpAbout();
+  void showHelp();
+  
+  void helpClosed();
+
+private:
+  QAssistantClient* HelpClient;
 };
 
 #endif // !_MainWindow_h

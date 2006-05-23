@@ -37,10 +37,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqSetName.h>
 
 #include <QMenu>
+#include <QFile>
+#include <QDir>
+#include <QCoreApplication>
+#include <QAssistantClient>
+#include <QMessageBox>
 
 #include <vtkPQConfig.h>
 
 MainWindow::MainWindow()
+  : HelpClient(NULL)
 {
   this->setWindowTitle(QByteArray("ParaQ Client") + QByteArray(" ") + QByteArray(PARAQ_VERSION_FULL));
 
@@ -52,9 +58,12 @@ MainWindow::MainWindow()
   this->createStandardToolsMenu();
   
   QMenu* const help_menu = this->helpMenu();
+  help_menu->addAction(tr("&ParaQ Help"))
+    << pqSetName("Help")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(showHelp()));
   help_menu->addAction(tr("&About ParaQ"))
     << pqSetName("About")
-    << pqConnect(SIGNAL(triggered()), this, SLOT(onHelpAbout()));
+    << pqConnect(SIGNAL(triggered()), this, SLOT(showHelpAbout()));
   
   this->createStandardPipelineBrowser();
   this->createStandardObjectInspector();
@@ -66,8 +75,74 @@ MainWindow::MainWindow()
   this->createStandardCompoundProxyToolBar();
 }
 
-void MainWindow::onHelpAbout()
+void MainWindow::showHelpAbout()
 {
   AboutDialog* const dialog = new AboutDialog(this);
   dialog->show();
 }
+
+void MainWindow::showHelp()
+{
+  if(!this->HelpClient)
+  {
+    // find the assistant
+#if defined(Q_WS_WIN)
+    const char* assistantName = "assistant.exe";
+#elif defined(Q_WS_MAC)
+    const char* assistantName = "assistant.app/Contents/MacOS/assistant";
+#else
+    const char* assistantName = "assistant";
+#endif
+    
+    // first look if assistant is bundled with application
+    QString assistant = QCoreApplication::applicationDirPath();
+    assistant += QDir::separator();
+    assistant += assistantName;
+    if(QFile::exists(assistant))
+    {
+      this->HelpClient = new QAssistantClient(assistant, this);
+    }
+    else
+    {
+      // not bundled, see if it can can be found in PATH
+      this->HelpClient = new QAssistantClient(QString(), this);
+    }
+
+    QStringList args;
+    args.append(QString("-profile"));
+
+    // see if help is bundled up with the application
+    QString profile = QCoreApplication::applicationDirPath() + QDir::separator()
+      + QString("pqClient.adp");
+
+    if(QFile::exists(profile))
+    {
+      args.append(profile);
+    }
+    else if(getenv("PARAQ_HELP"))
+    {
+      // not bundled, ask for help
+      args.append(getenv("PARAQ_HELP"));
+    }
+    else
+    {
+      // no help, error out
+      QMessageBox::critical(this, "Help error", "Couldn't find"
+          " pqClient.adp.\nTry setting the PARAQ_HELP environment variable which"
+          " points to that file");
+      return;
+    }
+    
+    this->HelpClient->setArguments(args);
+    this->HelpClient->openAssistant();
+  }
+
+}
+
+void MainWindow::helpClosed()
+{
+  delete this->HelpClient;
+  this->HelpClient = NULL;
+}
+
+

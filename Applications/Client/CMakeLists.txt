@@ -1,5 +1,9 @@
 PROJECT(pqClient)
 
+SET(QT_USE_QTASSISTANT TRUE)
+SET(QT_USE_QTNETWORK TRUE)
+INCLUDE(${QT_USE_FILE})
+
 IF(VTK_USE_MPI)
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
 ENDIF(VTK_USE_MPI)
@@ -78,6 +82,7 @@ TARGET_LINK_LIBRARIES(pqClient
   QtWidgets
   QtChart
   QtTesting
+  ${QT_LIBRARIES}
 )
 
 IF(WIN32)
@@ -85,7 +90,7 @@ IF(WIN32)
     optimized qtmain debug qtmaind
   )
 ENDIF(WIN32)
-
+  
 IF(BUILD_TESTING)
   SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/pqClient --test-directory=${PARAQ_TEST_DIR})
   SET(TEST_XML ${pqClient_SOURCE_DIR}/Testing/XML)
