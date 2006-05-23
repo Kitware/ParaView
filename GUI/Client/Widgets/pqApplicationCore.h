@@ -115,6 +115,11 @@ public:
   /// We may want to expose API to render all views or something--need to think 
   /// about it.
   void render();
+
+  /// Returns the number of sources pending displays. This shouldn't even be 
+  /// exposed, but for the current release, we want to disable all menus,
+  /// if the user has a source waiting a display, hence we expose it.
+  int getNumberOfSourcesPendingDisplays();
 signals:
   // Fired when the active source changes.
   void activeSourceChanged(pqPipelineSource*);

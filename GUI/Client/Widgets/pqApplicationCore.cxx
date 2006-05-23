@@ -238,6 +238,12 @@ pqRenderModule* pqApplicationCore::getActiveRenderModule()
 }
 
 //-----------------------------------------------------------------------------
+int pqApplicationCore::getNumberOfSourcesPendingDisplays()
+{
+  return this->Internal->SourcesSansDisplays.size();
+}
+
+//-----------------------------------------------------------------------------
 void pqApplicationCore::sourceRemoved(pqPipelineSource* source)
 {
   if (source == this->getActiveSource())
@@ -430,4 +436,5 @@ void pqApplicationCore::createPendingDisplays()
     }
 
   this->Internal->SourcesSansDisplays.clear();
+  emit this->pendingDisplays(false);
 }

@@ -133,10 +133,6 @@ public:
 
   virtual bool eventFilter(QObject* watched, QEvent* e);
 
-  // This method determine the enable state for various menus/toobars etc,
-  // and updates it.
-  void updateEnableState();
-
 signals:
   /// Signal emitted whenever the server changes
   /**\todo Revisit this API once we truly support simultaneous connections */
@@ -174,6 +170,10 @@ public slots:
   // Called when the Undo/Redo stack changes.
   void onUndoRedoStackChanged(bool canUndo, QString,
     bool canRedo, QString);
+
+  // This method determine the enable state for various menus/toobars etc,
+  // and updates it.
+  void updateEnableState();
 
 private slots:
   // Called when selection on the pqPipelineBrowser changes.

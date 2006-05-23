@@ -217,6 +217,10 @@ pqMainWindow::pqMainWindow() :
   QObject::connect(core, SIGNAL(activeServerChanged(pqServer*)),
     this, SLOT(onActiveServerChanged(pqServer*)));
 
+  // Update enable state when pending displays state changes.
+  QObject::connect(core, SIGNAL(pendingDisplays(bool)),
+    this, SLOT(updateEnableState()));
+
 
   pqUndoStack* undoStack = core->getUndoStack();
   // Connect undo/redo status.
@@ -1504,6 +1508,8 @@ void pqMainWindow::updateEnableState()
   int num_servers = pqApplicationCore::instance()->
     getServerManagerModel()->getNumberOfServers();
 
+  bool pending_displays = 
+    (pqApplicationCore::instance()->getNumberOfSourcesPendingDisplays() > 0);
 
   QAction* connectAction = 
     this->serverMenu()->findChild<QAction*>("Connect");
@@ -1511,14 +1517,20 @@ void pqMainWindow::updateEnableState()
     this->fileMenu()->findChild<QAction*>("SaveScreenshot");
   QAction* compoundFilterAction = 
     this->Implementation->ToolsMenu->findChild<QAction*>( "CompoundFilter");
+  QAction* openAction = this->fileMenu()->findChild<QAction*>("Open");
   
-  this->Implementation->SourcesMenu->setEnabled(server != 0);
+  this->Implementation->SourcesMenu->setEnabled(server != 0 && !pending_displays);
   this->Implementation->ServerDisconnectAction->setEnabled(server != 0);
-  this->Implementation->VariableSelectorToolBar->setEnabled(source != 0);
-  compoundFilterAction->setEnabled(server != 0);
+  this->Implementation->VariableSelectorToolBar->setEnabled(
+    source != 0 && !pending_displays);
+
+  compoundFilterAction->setEnabled(server != 0 && !pending_displays);
   saveScreenshot->setEnabled(server != 0);
 
-  this->Implementation->FiltersMenu->setEnabled(source != 0 && server != 0);
+  this->Implementation->FiltersMenu->setEnabled(
+    source != 0 && server != 0 && !pending_displays);
+
+  openAction->setEnabled(!pending_displays);
   connectAction->setEnabled(num_servers==0);
 }
 
