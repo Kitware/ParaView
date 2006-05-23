@@ -319,17 +319,6 @@ pqPipelineSource* pqApplicationCore::createFilterForActiveSource(
     // As a special-case, set a default implicit function for new Clip filters
     if(xmlname == "Clip")
       {
-      for(int i = 0; i != this->Internal->ActiveSource->getDisplayCount(); ++i)
-        {
-        pqPipelineDisplay* const pipeline_display =
-          this->Internal->ActiveSource->getDisplay(i);
-          
-        vtkSMDataObjectDisplayProxy* const display_proxy =
-          pipeline_display->getProxy();
-
-        display_proxy->SetVisibility(false);
-        }
-        
       vtkSMProxy* const plane = this->Internal->PipelineBuilder->createProxy(
         "implicit_functions", "Plane", "implicit_functions", 
         this->Internal->ActiveSource->getServer());
@@ -347,17 +336,6 @@ pqPipelineSource* pqApplicationCore::createFilterForActiveSource(
     // As a special-case, set a default implicit function for new Cut filters
     if(xmlname == "Cut")
       {
-      for(int i = 0; i != this->Internal->ActiveSource->getDisplayCount(); ++i)
-        {
-        pqPipelineDisplay* const pipeline_display =
-          this->Internal->ActiveSource->getDisplay(i);
-          
-        vtkSMDataObjectDisplayProxy* const display_proxy =
-          pipeline_display->getProxy();
-
-        display_proxy->SetVisibility(false);
-        }
-        
       vtkSMProxy* const plane = this->Internal->PipelineBuilder->createProxy(
         "implicit_functions", "Plane", "implicit_functions", 
         this->Internal->ActiveSource->getServer());

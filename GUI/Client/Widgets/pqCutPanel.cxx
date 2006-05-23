@@ -32,8 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqCutPanel.h"
+#include "pqPipelineDisplay.h"
+#include "pqPipelineFilter.h"
 #include "pqPropertyManager.h"
+#include "pqServerManagerModel.h"
 
+#include <vtkSMDataObjectDisplayProxy.h>
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMNew3DWidgetProxy.h>
 #include <vtkSMProxyProperty.h>
@@ -283,6 +287,31 @@ void pqCutPanel::onAccepted()
     }
   
   this->pushImplicitPlane(origin, normal);
+  
+  // If this is the first time we've been accepted since our creation, hide the source
+  if(pqPipelineFilter* const pipeline_filter =
+    dynamic_cast<pqPipelineFilter*>(pqServerManagerModel::instance()->getPQSource(this->Proxy)))
+    {
+    if(0 == pipeline_filter->getDisplayCount())
+      {
+      for(int i = 0; i != pipeline_filter->getInputCount(); ++i)
+        {
+        if(pqPipelineSource* const pipeline_source = pipeline_filter->getInput(i))
+          {
+          for(int j = 0; j != pipeline_source->getDisplayCount(); ++j)
+            {
+            pqPipelineDisplay* const pipeline_display =
+              pipeline_source->getDisplay(j);
+              
+            vtkSMDataObjectDisplayProxy* const display_proxy =
+              pipeline_display->getProxy();
+
+            display_proxy->SetVisibility(false);
+            }
+          }
+        }
+      }
+    }
 }
 
 void pqCutPanel::onRejected()
