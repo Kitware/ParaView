@@ -30,26 +30,263 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-// this include
+#include "pqApplicationCore.h"
 #include "pqCutPanel.h"
+#include "pqPropertyManager.h"
 
-// Qt includes
+#include <vtkSMDoubleVectorProperty.h>
+#include <vtkSMNew3DWidgetProxy.h>
+#include <vtkSMProxyProperty.h>
 
-// VTK includes
+#include <QLineEdit>
 
-// paraview includes
-
-// paraq includes
-
-/// constructor
-pqCutPanel::pqCutPanel(QWidget* p)
-  : pqWidgetObjectPanel(":/pqWidgets/CutPanel.ui", p)
+pqCutPanel::pqCutPanel(QWidget* p) :
+  pqWidgetObjectPanel(":/pqWidgets/CutPanel.ui", p),
+  IgnoreQtWidgets(false),
+  Ignore3DWidget(false)
 {
+  QLineEdit* const originX = this->findChild<QLineEdit*>("originX");
+  QLineEdit* const originY = this->findChild<QLineEdit*>("originY");
+  QLineEdit* const originZ = this->findChild<QLineEdit*>("originZ");
+  QLineEdit* const normalX = this->findChild<QLineEdit*>("normalX");
+  QLineEdit* const normalY = this->findChild<QLineEdit*>("normalY");
+  QLineEdit* const normalZ = this->findChild<QLineEdit*>("normalZ");
+  
+  connect(originX, SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
+  connect(originY, SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
+  connect(originZ, SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
+  connect(normalX, SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
+  connect(normalY, SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
+  connect(normalZ, SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
+  
+  connect(this->getPropertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
+  connect(this->getPropertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
 }
 
 /// destructor
 pqCutPanel::~pqCutPanel()
 {
   this->setProxy(NULL);
+}
+
+void pqCutPanel::setProxyInternal(pqSMProxy p)
+{
+  pqWidgetObjectPanel::setProxyInternal(p);
+  
+  if(!this->Proxy)
+    return;
+  
+  this->pullImplicitPlane();
+}
+
+void pqCutPanel::onQtWidgetChanged()
+{
+  if(IgnoreQtWidgets)
+    return;
+
+  // Get the new values from the Qt widgets ...
+  double origin[3] = { 0, 0, 0 };
+  double normal[3] = { 0, 0, 1 };
+
+  QLineEdit* const originX = this->findChild<QLineEdit*>("originX");
+  QLineEdit* const originY = this->findChild<QLineEdit*>("originY");
+  QLineEdit* const originZ = this->findChild<QLineEdit*>("originZ");
+  QLineEdit* const normalX = this->findChild<QLineEdit*>("normalX");
+  QLineEdit* const normalY = this->findChild<QLineEdit*>("normalY");
+  QLineEdit* const normalZ = this->findChild<QLineEdit*>("normalZ");
+
+  origin[0] = originX->text().toDouble();
+  origin[1] = originY->text().toDouble();
+  origin[2] = originZ->text().toDouble();
+  normal[0] = normalX->text().toDouble();
+  normal[1] = normalY->text().toDouble();
+  normal[2] = normalZ->text().toDouble();
+  
+  // Push the new values into the 3D widget (ideally, this should happen automatically when the implicit plane is updated)
+  this->update3DWidget(origin, normal);
+  
+  // Signal the UI that there are changes to accept/reject ...
+  this->getPropertyManager()->propertyChanged();
+}
+
+void pqCutPanel::on3DWidgetChanged()
+{
+  if(Ignore3DWidget)
+    return;
+    
+  // Get the new values from the 3D widget ...
+  double origin[3] = { 0, 0, 0 };
+  double normal[3] = { 0, 0, 1 };
+  
+  if(this->Widget)
+    {
+    if(vtkSMDoubleVectorProperty* const widget_origin = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->Widget->GetProperty("Origin")))
+      {
+      origin[0] = widget_origin->GetElement(0);
+      origin[1] = widget_origin->GetElement(1);
+      origin[2] = widget_origin->GetElement(2);
+      }
+
+    if(vtkSMDoubleVectorProperty* const widget_normal = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->Widget->GetProperty("Normal")))
+      {
+      normal[0] = widget_normal->GetElement(0);
+      normal[1] = widget_normal->GetElement(1);
+      normal[2] = widget_normal->GetElement(2);
+      }
+    }
+  
+  // Push the new values into the Qt widgets (ideally, this should happen automatically when the implicit plane is updated)
+  this->updateQtWidgets(origin, normal);
+
+  // Signal the UI that there are changes to accept/reject ...
+  this->getPropertyManager()->propertyChanged();
+}
+
+void pqCutPanel::pullImplicitPlane()
+{
+  // Get the current values from the implicit plane ...
+  double origin[3] = { 0, 0, 0 };
+  double normal[3] = { 0, 0, 1 };
+  
+  if(this->Proxy)
+    {
+    if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
+      this->Proxy->GetProperty("CutFunction")))
+      {
+      if(vtkSMProxy* const clip_function = clip_function_property->GetProxy(0))
+        {
+        if(vtkSMDoubleVectorProperty* const plane_origin = vtkSMDoubleVectorProperty::SafeDownCast(
+          clip_function->GetProperty("Origin")))
+          {
+          origin[0] = plane_origin->GetElement(0);
+          origin[1] = plane_origin->GetElement(1);
+          origin[2] = plane_origin->GetElement(2);
+          }
+
+        if(vtkSMDoubleVectorProperty* const plane_normal = vtkSMDoubleVectorProperty::SafeDownCast(
+          clip_function->GetProperty("Normal")))
+          {
+          normal[0] = plane_normal->GetElement(0);
+          normal[1] = plane_normal->GetElement(1);
+          normal[2] = plane_normal->GetElement(2);
+          }
+        }
+      }
+    }
+
+  // Push the current values into the Qt widgets ...
+  this->updateQtWidgets(origin, normal);
+  
+  // Push the current values into the 3D widget ...
+  this->update3DWidget(origin, normal);
+}
+
+void pqCutPanel::updateQtWidgets(const double* origin, const double* normal)
+{
+  this->IgnoreQtWidgets = true;
+  
+  QLineEdit* const originX = this->findChild<QLineEdit*>("originX");
+  QLineEdit* const originY = this->findChild<QLineEdit*>("originY");
+  QLineEdit* const originZ = this->findChild<QLineEdit*>("originZ");
+  QLineEdit* const normalX = this->findChild<QLineEdit*>("normalX");
+  QLineEdit* const normalY = this->findChild<QLineEdit*>("normalY");
+  QLineEdit* const normalZ = this->findChild<QLineEdit*>("normalZ");
+
+  originX->setText(QString::number(origin[0]));  
+  originY->setText(QString::number(origin[1]));  
+  originZ->setText(QString::number(origin[2]));  
+  normalX->setText(QString::number(normal[0]));  
+  normalY->setText(QString::number(normal[1]));  
+  normalZ->setText(QString::number(normal[2]));
+  
+  this->IgnoreQtWidgets = false;
+}
+
+void pqCutPanel::update3DWidget(const double* origin, const double* normal)
+{
+  this->Ignore3DWidget = true;
+   
+  if(this->Widget)
+    {
+    if(vtkSMDoubleVectorProperty* const widget_origin = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->Widget->GetProperty("Origin")))
+      {
+      widget_origin->SetElements(origin);
+      }
+
+    if(vtkSMDoubleVectorProperty* const widget_normal = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->Widget->GetProperty("Normal")))
+      {
+      widget_normal->SetElements(normal);
+      }
+    
+    this->Widget->UpdateVTKObjects();
+    
+    pqApplicationCore::instance()->render();
+    }
+    
+  this->Ignore3DWidget = false;
+}
+
+void pqCutPanel::pushImplicitPlane(const double* origin, const double* normal)
+{
+  if(this->Proxy)
+    {
+    if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
+      this->Proxy->GetProperty("CutFunction")))
+      {
+      if(vtkSMProxy* const clip_function = clip_function_property->GetProxy(0))
+        {
+        if(vtkSMDoubleVectorProperty* const plane_origin = vtkSMDoubleVectorProperty::SafeDownCast(
+          clip_function->GetProperty("Origin")))
+          {
+          plane_origin->SetElements(origin);
+          }
+
+        if(vtkSMDoubleVectorProperty* const plane_normal = vtkSMDoubleVectorProperty::SafeDownCast(
+          clip_function->GetProperty("Normal")))
+          {
+          plane_normal->SetElements(normal);
+          }
+
+        clip_function->UpdateVTKObjects();
+        }
+      }
+    }
+}
+
+void pqCutPanel::onAccepted()
+{
+  // Get the updated values from the 3D widget ...
+  double origin[3] = { 0, 0, 0 };
+  double normal[3] = { 0, 0, 1 };
+  
+  if(this->Widget)
+    {
+    if(vtkSMDoubleVectorProperty* const widget_origin = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->Widget->GetProperty("Origin")))
+      {
+      origin[0] = widget_origin->GetElement(0);
+      origin[1] = widget_origin->GetElement(1);
+      origin[2] = widget_origin->GetElement(2);
+      }
+
+    if(vtkSMDoubleVectorProperty* const widget_normal = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->Widget->GetProperty("Normal")))
+      {
+      normal[0] = widget_normal->GetElement(0);
+      normal[1] = widget_normal->GetElement(1);
+      normal[2] = widget_normal->GetElement(2);
+      }
+    }
+  
+  this->pushImplicitPlane(origin, normal);
+}
+
+void pqCutPanel::onRejected()
+{
+  this->pullImplicitPlane();
 }
 

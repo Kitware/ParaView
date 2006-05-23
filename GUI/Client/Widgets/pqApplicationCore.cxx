@@ -342,6 +342,34 @@ pqPipelineSource* pqApplicationCore::createFilterForActiveSource(
         }
       this->Internal->UndoStack->PauseUndoSet();
       }
+
+    // As a special-case, set a default implicit function for new Cut filters
+    if(xmlname == "Cut")
+      {
+      for(int i = 0; i != this->Internal->ActiveSource->getDisplayCount(); ++i)
+        {
+        pqPipelineDisplay* const pipeline_display =
+          this->Internal->ActiveSource->getDisplay(i);
+          
+        vtkSMDataObjectDisplayProxy* const display_proxy =
+          pipeline_display->getProxy();
+
+        display_proxy->SetVisibility(false);
+        }
+        
+      vtkSMProxy* const plane = this->Internal->PipelineBuilder->createProxy(
+        "implicit_functions", "Plane", "implicit_functions", 
+        this->Internal->ActiveSource->getServer());
+      
+      this->Internal->UndoStack->BeginOrContinueUndoSet("Set CutConnection");
+      if(vtkSMProxyProperty* const cut_function = 
+        vtkSMProxyProperty::SafeDownCast(
+          filter->getProxy()->GetProperty("CutFunction")))
+        {
+        cut_function->AddProxy(plane);
+        }
+      this->Internal->UndoStack->PauseUndoSet();
+      }
     }
 
   if (filter)
