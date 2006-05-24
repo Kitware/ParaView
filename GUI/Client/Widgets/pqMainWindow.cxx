@@ -1589,7 +1589,7 @@ void pqMainWindow::updateEnableState()
   this->Implementation->FiltersMenu->setEnabled(
     source != 0 && server != 0 && !pending_displays);
 
-  openAction->setEnabled(!pending_displays);
+  openAction->setEnabled(server != 0 && !pending_displays);
   connectAction->setEnabled(num_servers==0);
 }
 
