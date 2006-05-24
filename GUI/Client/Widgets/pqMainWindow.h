@@ -144,6 +144,7 @@ signals:
 
 public slots:
   void onFileNew();
+  void onRemove();
   void onFileOpen();
   void onFileOpen(pqServer* Server);
   void onFileOpen(const QStringList& Files);

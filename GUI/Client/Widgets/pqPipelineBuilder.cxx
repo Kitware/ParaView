@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMSourceProxy.h"
 
 // paraq includes
+#include "pqApplicationCore.h"
 #include "pqNameCount.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineSource.h"
@@ -111,6 +112,15 @@ void pqPipelineBuilder::addConnection(pqPipelineSource* source,
   vtkSMProxy* srcProxy = source->getProxy();
   vtkSMProxy* sinkProxy = sink->getProxy();
   this->addConnection(srcProxy, sinkProxy);
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineBuilder::removeConnection(pqPipelineSource* source,
+  pqPipelineSource* sink)
+{
+  vtkSMProxy* srcProxy = source->getProxy();
+  vtkSMProxy* sinkProxy = sink->getProxy();
+  this->removeConnection(srcProxy, sinkProxy);
 }
 
 //-----------------------------------------------------------------------------
@@ -263,6 +273,111 @@ vtkSMDisplayProxy* pqPipelineBuilder::createDisplayProxyInternal(
   dispObject->setDefaultColorParametes();
   return display;
 }
+
+//-----------------------------------------------------------------------------
+int pqPipelineBuilder::removeInternal(pqPipelineDisplay* display)
+{
+  if (!display)
+    {
+    qDebug() << "Cannot remove null display.";
+    return 0;
+    }
+
+  // 1) Remove display from the render module.
+  // eventually, the pqPipelineDisplay can tell us which render module
+  // it belongs to. For now, we just use the active render module.
+  pqRenderModule* renModule = 
+    pqApplicationCore::instance()->getActiveRenderModule();
+  if (!renModule)
+    {
+    qDebug() << "Failed to locate render module for the display. remove failed.";
+    return 0;
+    }
+
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    renModule->getProxy()->GetProperty("Displays"));
+  pp->RemoveProxy(display->getProxy());
+  renModule->getProxy()->UpdateVTKObjects();
+
+  /*
+  pp = vtkSMProxyProperty::SafeDownCast(
+    display->getProxy()->GetProperty("Input"));
+  pp->RemoveAllProxies();
+  */
+
+  // Unregister display.
+  vtkSMProxyManager::GetProxyManager()->UnRegisterProxy(
+    display->getSMGroup().toStdString().c_str(), 
+    display->getSMName().toStdString().c_str());
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineBuilder::remove(pqPipelineDisplay* display)
+{
+  if (this->UndoStack)
+    {
+    this->UndoStack->BeginOrContinueUndoSet(QString("Remove Display"));
+    }
+
+  this->remove(display);
+
+  if (this->UndoStack)
+    {
+    this->UndoStack->PauseUndoSet();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineBuilder::remove(pqPipelineSource* source)
+{
+  if (!source)
+    {
+    qDebug() << "Cannot remove null source.";
+    return;
+    }
+
+  if (source->getNumberOfConsumers())
+    {
+    qDebug() << "Cannot remove source with consumers.";
+    return;
+    }
+
+  if (this->UndoStack)
+    {
+    this->UndoStack->BeginOrContinueUndoSet(QString("Remove Source"));
+    }
+
+  // 1) remove all displays.
+  while (source->getDisplayCount())
+    {
+    if (!this->removeInternal(source->getDisplay(0)))
+      {
+      qDebug() << "Failed to remove display!";
+      return;
+      }
+    }
+
+  // 2) remove inputs.
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    source->getProxy()->GetProperty("Input"));
+  if (pp)
+    {
+    pp->RemoveAllProxies();
+    }
+
+
+  // 3) Unregister proxy.
+  vtkSMProxyManager::GetProxyManager()->UnRegisterProxy(
+    source->getSMGroup().toStdString().c_str(), 
+    source->getSMName().toStdString().c_str());
+
+  if (this->UndoStack)
+    {
+    this->UndoStack->PauseUndoSet();
+    }
+}
+
 //-----------------------------------------------------------------------------
 // Create a connection between a source and a sink. This method ensures
 // that the UndoState is recoreded.

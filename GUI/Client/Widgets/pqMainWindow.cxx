@@ -242,7 +242,9 @@ pqMainWindow::~pqMainWindow()
 void pqMainWindow::createStandardFileMenu()
 {
   QMenu* const menu = this->fileMenu();
-  
+ 
+  menu->addAction("Remove", this, SLOT(onRemove()));
+
   menu->addAction(tr("&New"), this, SLOT(onFileNew()), QKeySequence(Qt::CTRL + Qt::Key_N))
     << pqSetName("New");
 
@@ -271,6 +273,11 @@ void pqMainWindow::createStandardFileMenu()
   
   menu->addAction(tr("E&xit"), QApplication::instance(), SLOT(quit()), QKeySequence(Qt::CTRL + Qt::Key_Q))
     << pqSetName("Exit");
+}
+
+void pqMainWindow::onRemove()
+{
+  pqApplicationCore::instance()->removeActiveSource();
 }
 
 void pqMainWindow::createStandardViewMenu()

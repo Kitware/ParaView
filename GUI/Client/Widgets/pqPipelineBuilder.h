@@ -111,7 +111,7 @@ public:
 
   // Removes a connection between a source and a sink. This method ensures that 
   // the UndoState is recorded.
-  void removeConnection(vtkSMProxy* source, vtkSMProxy* sink);
+  void removeConnection(pqPipelineSource* source, pqPipelineSource* sink);
 
   // This method unregisters all proxies on the given server. This for now,
   // is a non-undoable change. 
@@ -122,12 +122,23 @@ public:
   // we will have to fix that soon.
   vtkSMProxy* createLookupTable(pqPipelineDisplay* display);
 
-
   // Create and register a proxy and capture the creation in an undo state.
   // \c is_undoable can be used to override if the creation/registration
   // of the proxy should be undoable, true by default. 
   vtkSMProxy* createProxy(const char* xmlgroup, const char* xmlname,
     const char* register_group, pqServer* server, bool is_undoable=true);
+
+  // Removes a source. Removing a source involves the following:
+  // \li removing all displays belonging to the source,
+  // \li unregistering the source.
+  // Note that the source must have no consumers, otherwise,
+  // one cannot delete the source.
+  void remove(pqPipelineSource* source);
+
+  // Removes a display. Removing a display involves:
+  // \li removing the display from the render module it belongs to.
+  // \li unregistering the display.
+  void remove(pqPipelineDisplay* display);
 
 protected:
   /// this method does what it says. Note that it does not worry about undo stack
@@ -141,10 +152,13 @@ protected:
 
   /// internal implementation to addConnection.
   void addConnection(vtkSMProxy* source, vtkSMProxy* sink);
+  void removeConnection(vtkSMProxy* source, vtkSMProxy* sink);
 
   pqNameCount* NameGenerator;
   pqUndoStack* UndoStack;
 
+  /// internal method to remove display. does not bother about undo/redo.
+  int removeInternal(pqPipelineDisplay* display);
 private:
   static pqPipelineBuilder* Instance;
 };

@@ -76,6 +76,8 @@ pqPipelineDisplay::pqPipelineDisplay(const QString& name,
     this->Internal->VTKConnect->Connect(display->GetProperty("Input"),
       vtkCommand::ModifiedEvent, this, SLOT(onInputChanged()));
     }
+  // This will make sure that if the input is already set.
+  this->onInputChanged();
 }
 
 //-----------------------------------------------------------------------------
@@ -85,6 +87,10 @@ pqPipelineDisplay::~pqPipelineDisplay()
     {
     this->Internal->VTKConnect->Disconnect(
       this->Internal->DisplayProxy->GetProperty("Input"));
+    }
+  if (this->Internal->Input)
+    {
+    this->Internal->Input->removeDisplay(this);
     }
   delete this->Internal;
 }

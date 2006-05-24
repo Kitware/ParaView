@@ -102,6 +102,16 @@ public:
   pqPipelineSource* createReaderOnActiveServer( const QString& filename, 
     const QString& readerName);
 
+  // Use this method to delete the active source. 
+  // This involves following operations
+  // \li remove all displays from the render modules.
+  // \li Break all display connections.
+  // \li unregister all displays.
+  // \li Unregister the proxy for the \c source.
+  // All this is delegated to the pipeline builder.
+  // This method can only be called when the active source has no consumers.
+  void removeActiveSource();
+
   /// returns the active source.
   pqPipelineSource* getActiveSource();
 

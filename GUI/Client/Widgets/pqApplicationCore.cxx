@@ -438,6 +438,30 @@ pqPipelineSource* pqApplicationCore::createReaderOnActiveServer(
 }
 
 //-----------------------------------------------------------------------------
+void pqApplicationCore::removeActiveSource()
+{
+  pqPipelineSource* source = this->getActiveSource();
+  if (!source)
+    {
+    qDebug() << "No active source to remove.";
+    return;
+    }
+  if (source->getNumberOfConsumers())
+    {
+    qDebug() << "Active source has consumers, cannot delete";
+    return;
+    }
+ 
+  this->getPipelineBuilder()->remove(source);
+
+  // Since pqPipelineBuilder is never going to call EndUndoSet(), we must call 
+  // it explicitly here.
+  this->getUndoStack()->EndUndoSet();
+  this->getActiveRenderModule()->render();
+}
+
+
+//-----------------------------------------------------------------------------
 void pqApplicationCore::createPendingDisplays()
 {
   foreach (pqPipelineSource* source, this->Internal->SourcesSansDisplays)
