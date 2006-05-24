@@ -132,6 +132,7 @@ void pqPipelineBrowserContextMenu::showDisplayEditor()
   // TODO: The display dialog should accept a pqPipelineSource object
   // in order to handle multiple displays.
   QDialog* dialog = new QDialog(topParent);
+  dialog->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
   dialog->setWindowTitle("Display Settings");
   dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
   QHBoxLayout* l = new QHBoxLayout(dialog);
