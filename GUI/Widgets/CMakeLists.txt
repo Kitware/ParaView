@@ -683,7 +683,8 @@ ENDIF(NOT KWWidgets_INSTALL_NO_DEVELOPMENT)
 # --------------------------------------------------------------------------
 # Resources
 
-SET(KWWidgets_RESOURCES_DIR ${KWWidgets_SOURCE_DIR}/Resources)
+SET(KWWidgets_RESOURCES_DIR 
+  ${KWWidgets_SOURCE_DIR}/Resources CACHE INTERNAL "")
 SUBDIRS(Resources)
 
 # --------------------------------------------------------------------------
