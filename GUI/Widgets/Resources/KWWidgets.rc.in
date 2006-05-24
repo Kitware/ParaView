@@ -4,10 +4,10 @@
 // as the application's icon.
 // Tk was defining app.
 
-IDI_APPLICATION       ICON    DISCARDABLE     "Resources/KWWidgetsIcon32.ico"
-IDI_KWWidgetsICO      ICON    DISCARDABLE     "Resources/KWWidgetsIcon32.ico"
-IDI_KWWidgetsICOSMALL ICON    DISCARDABLE     "Resources/KWWidgetsIcon16.ico"
-
+IDI_APPLICATION       ICON    DISCARDABLE     "@RC_ICON_BASENAME@Icon32.ico"
+IDI_KWWidgetsICO      ICON    DISCARDABLE     "@RC_ICON_BASENAME@Icon32.ico"
+IDI_KWWidgetsICOSMALL ICON    DISCARDABLE     "@RC_ICON_BASENAME@Icon16.ico"
+    
 #include <windows.h>
 
 #include "vtkConfigure.h"
@@ -16,8 +16,8 @@ IDI_KWWidgetsICOSMALL ICON    DISCARDABLE     "Resources/KWWidgetsIcon16.ico"
 #endif
 
 VS_VERSION_INFO	VERSIONINFO
- FILEVERSION	@KWWidgets_RESOURCE_MAJOR_VERSION@,@KWWidgets_RESOURCE_MINOR_VERSION@
- PRODUCTVERSION	@KWWidgets_RESOURCE_MAJOR_VERSION@,@KWWidgets_RESOURCE_MINOR_VERSION@
+ FILEVERSION	@RC_MAJOR_VERSION@,@RC_MINOR_VERSION@
+ PRODUCTVERSION	@RC_MAJOR_VERSION@,@RC_MINOR_VERSION@
  FILEOS		VOS__WINDOWS32
  FILETYPE	VFT_APP
  FILESUBTYPE	0x0L
@@ -26,13 +26,13 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "FileDescription", "@KWWidgets_RESOURCE_APPLICATION_NAME@\0"
-            VALUE "OriginalFilename", "@KWWidgets_RESOURCE_FILE_NAME@.exe\0"
-            VALUE "CompanyName", "@KWWidgets_RESOURCE_COMPANY_NAME@\0"
-            VALUE "FileVersion", "@KWWidgets_RESOURCE_MAJOR_VERSION@.@KWWidgets_RESOURCE_MINOR_VERSION@\0"
-            VALUE "LegalCopyright", "Copyright \251 2005 by @KWWidgets_RESOURCE_COMPANY_NAME@\0"
-            VALUE "ProductName", "@KWWidgets_RESOURCE_APPLICATION_NAME@ @KWWidgets_RESOURCE_MAJOR_VERSION@.@KWWidgets_RESOURCE_MINOR_VERSION@ for Windows\0"
-            VALUE "ProductVersion", "@KWWidgets_RESOURCE_MAJOR_VERSION@.@KWWidgets_RESOURCE_MINOR_VERSION@\0"
+            VALUE "FileDescription", "@RC_APPLICATION_NAME@\0"
+            VALUE "OriginalFilename", "@RC_APPLICATION_FILENAME@.exe\0"
+            VALUE "CompanyName", "@RC_COMPANY_NAME@\0"
+            VALUE "FileVersion", "@RC_MAJOR_VERSION@.@RC_MINOR_VERSION@\0"
+            VALUE "LegalCopyright", "Copyright \251 @RC_COPYRIGHT_YEAR@ by @RC_COMPANY_NAME@\0"
+            VALUE "ProductName", "@RC_APPLICATION_NAME@ @RC_MAJOR_VERSION@.@RC_MINOR_VERSION@ for Windows\0"
+            VALUE "ProductVersion", "@RC_MAJOR_VERSION@.@RC_MINOR_VERSION@\0"
         END
     END
     BLOCK "VarFileInfo"

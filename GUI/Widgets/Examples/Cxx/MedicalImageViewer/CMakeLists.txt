@@ -53,15 +53,17 @@ TARGET_LINK_LIBRARIES(${LIB_NAME} ${KWWidgets_LIBRARIES})
 SET(EXE_NAME "${TARGET_BASE_NAME}")
 SET(EXE_SRCS "${EXE_NAME}.cxx")
 
-# On Win32 platforms, let's configure the KWWidgets sample resource file
-# to get a nice application icon and some additional information.
+# On Win32 platforms, let's create a .rc resource file to setup a decent
+# application icon as well as some additional information in the "Version"
+# tab of the properties panel.
 
 IF(WIN32 AND NOT BORLAND AND NOT CYGWIN)
-  INCLUDE_DIRECTORIES(${VTK_TK_RESOURCES_DIR})
-  SET(RES_FILE "${CMAKE_CURRENT_BINARY_DIR}/${EXE_NAME}.rc")
-  SET(KWWidgets_RESOURCE_APPLICATION_NAME "${EXE_NAME}")
-  SET(KWWidgets_RESOURCE_FILE_NAME "${EXE_NAME}")
-  CONFIGURE_FILE(${KWWidgets_RESOURCES_DIR}/KWWidgets.rc.in ${RES_FILE})
+  INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsResourceMacros.cmake")
+  SET(RC_FILENAME "${CMAKE_CURRENT_BINARY_DIR}/${EXE_NAME}.rc")
+  KWWidgets_CREATE_RC_FILE(
+    RC_FILENAME "${RC_FILENAME}"
+    RC_APPLICATION_NAME "${EXE_NAME}"
+    RC_COMPANY_NAME "Kitware, Inc.")
 ENDIF(WIN32 AND NOT BORLAND AND NOT CYGWIN)
 
 # This example uses some files from the KWWidgets distribution tree.

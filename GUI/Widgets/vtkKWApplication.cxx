@@ -70,7 +70,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.289");
+vtkCxxRevisionMacro(vtkKWApplication, "1.290");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -801,7 +801,8 @@ void vtkKWApplication::Start(int argc, char **argv)
   // Set the KWWidgets icon by default
   // For this to work, the executable should be linked against the
   // KWWidgets resource file KWWidgets.rc:
-  // CONFIGURE_FILE(${KWWidgets_RESOURCES_DIR}/KWWidgets.rc.in foo.rc)
+  // INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsResourceMacros.cmake")
+  // KWWidgets_CREATE_RC_FILE("foo.rc")
   // ADD_EXECUTABLE(... foo.rc)
 
 #ifdef _WIN32

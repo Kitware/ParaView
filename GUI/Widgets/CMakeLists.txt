@@ -681,22 +681,9 @@ IF(NOT KWWidgets_INSTALL_NO_DEVELOPMENT)
 ENDIF(NOT KWWidgets_INSTALL_NO_DEVELOPMENT)
 
 # --------------------------------------------------------------------------
-# The Resources/KWWidgets.rc.in can be configured to be used
-# from examples, samples, or apps. Here are some defaults values.
-# Typically, you should then use:
-# CONFIGURE_FILE(${KWWidgets_RESOURCES_DIR}/KWWidgets.rc.in foo.rc)
-# ADD_EXECUTABLE(... foo.rc)
+# Resources
 
 SET(KWWidgets_RESOURCES_DIR ${KWWidgets_SOURCE_DIR}/Resources)
-
-IF(WIN32)
-  SET(KWWidgets_RESOURCE_MAJOR_VERSION "${KWWidgets_MAJOR_VERSION}")
-  SET(KWWidgets_RESOURCE_MINOR_VERSION "${KWWidgets_MINOR_VERSION}")
-  SET(KWWidgets_RESOURCE_APPLICATION_NAME "Unknown")
-  SET(KWWidgets_RESOURCE_FILE_NAME "Unknown")
-  SET(KWWidgets_RESOURCE_COMPANY_NAME "Kitware Inc.")
-ENDIF(WIN32)
-
 SUBDIRS(Resources)
 
 # --------------------------------------------------------------------------
