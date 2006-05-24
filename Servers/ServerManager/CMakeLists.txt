@@ -55,6 +55,7 @@ SET(Kit_SRCS
   vtkSMIdTypeVectorProperty.cxx
   vtkSMImplicitPlaneProxy.cxx
   vtkSMImplicitPlaneWidgetProxy.cxx
+  vtkSMImplicitPlaneRepresentationProxy.cxx
   vtkSMInformationHelper.cxx
   vtkSMInputArrayDomain.cxx
   vtkSMInputProperty.cxx
