@@ -119,6 +119,7 @@ public:
   int numberOfLinks() const { return Links.size(); }
 signals:
   void propertyChanged();
+  void guiPropertyChanged();
   void flushProperty();
 private:
   QVariant Value;

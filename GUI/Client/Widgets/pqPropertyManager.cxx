@@ -95,6 +95,7 @@ void pqPropertyManagerProperty::setValue(const QVariant& v)
   if(this->Value != v)
     {
     this->Value = v;
+    emit this->propertyChanged();
     }
 }
 
@@ -134,7 +135,7 @@ void pqPropertyManagerPropertyLink::guiPropertyChanged()
   if(p->value() != v)
     {
     p->setValue(v);
-    emit p->propertyChanged();
+    emit p->guiPropertyChanged();
     }
 }
 
@@ -187,7 +188,7 @@ void pqPropertyManager::registerLink(QObject* qObject, const char* qProperty, co
     this->Internal->Links.addPropertyLink(iter.value(), "value", SIGNAL(flushProperty()),
                                           Proxy, Property, Index);
 
-    QObject::connect(p, SIGNAL(propertyChanged()), this, SLOT(propertyChanged()));
+    QObject::connect(p, SIGNAL(guiPropertyChanged()), this, SLOT(propertyChanged()));
     QObject::connect(qObject, signal, iter.value(), SIGNAL(flushProperty()));
     }
   // link the QObject property with this QObject property
@@ -206,7 +207,7 @@ void pqPropertyManager::unregisterLink(QObject* qObject, const char* qProperty, 
     if(iter.value()->numberOfLinks() == 0)
       {
       QObject::disconnect(qObject, signal, iter.value(), SIGNAL(flushProperty()));
-      QObject::disconnect(iter.value(), SIGNAL(propertyChanged()), this, SLOT(propertyChanged()));
+      QObject::disconnect(iter.value(), SIGNAL(guiPropertyChanged()), this, SLOT(propertyChanged()));
       this->Internal->Links.removePropertyLink(iter.value(), "value", SIGNAL(flushProperty()),
                                                Proxy, Property, Index);
       this->Internal->Properties.erase(iter);
