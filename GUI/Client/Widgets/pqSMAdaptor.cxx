@@ -63,6 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMIntRangeDomain.h"
 #include "vtkSMArrayListDomain.h"
+#include "vtkSMSourceProxy.h"
 
 // paraq includes
 #include "pqSMProxy.h"
@@ -428,18 +429,13 @@ void pqSMAdaptor::setSelectionProperty(vtkSMProxy* Proxy,
           adaptor->SetSelectionValue(i, value.toString().toAscii().data());
           }
         }
-      
-      /*
-      pqSMAdaptorInternal::SettingMultipleProperty = true;
-      adaptor->SetRangeValue(0, name.toAscii().data());
-      adaptor->SetRangeValue(1, value.toString().toAscii().data());
-      */
       Proxy->UpdateVTKObjects();
-      /*
-      pqSMAdaptorInternal::SettingMultipleProperty = false;
-      Property->Modified();  
-      // let ourselves know it was modified, since we blocked it previously
-      */
+      vtkSMSourceProxy* sp;
+      sp = vtkSMSourceProxy::SafeDownCast(Proxy);
+      if(sp)
+        {
+        sp->UpdatePipelineInformation();
+        }
       }
     }
   adaptor->Delete();
@@ -533,17 +529,13 @@ void pqSMAdaptor::setSelectionProperty(vtkSMProxy* Proxy,
           }
         }
       
-      /*
-      pqSMAdaptorInternal::SettingMultipleProperty = true;
-      adaptor->SetRangeValue(0, name.toAscii().data());
-      adaptor->SetRangeValue(1, value.toString().toAscii().data());
-      */
       Proxy->UpdateVTKObjects();
-      /*
-      pqSMAdaptorInternal::SettingMultipleProperty = false;
-      Property->Modified();  
-      // let ourselves know it was modified, since we blocked it previously
-      */
+      vtkSMSourceProxy* sp;
+      sp = vtkSMSourceProxy::SafeDownCast(Proxy);
+      if(sp)
+        {
+        sp->UpdatePipelineInformation();
+        }
       }
     }
   adaptor->Delete();

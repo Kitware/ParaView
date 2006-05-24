@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKWidget.h"
 
 // paraview includes
+#include "vtkSMSourceProxy.h"
 
 // paraq includes
 #include "pqPipelineData.h"
@@ -95,6 +96,12 @@ void pqObjectPanel::setProxy(pqSMProxy p)
 void pqObjectPanel::setProxyInternal(pqSMProxy p)
 {
   this->Proxy = p;
+  vtkSMSourceProxy* sp;
+  sp = vtkSMSourceProxy::SafeDownCast(this->Proxy);
+  if(sp)
+    {
+    sp->UpdatePipelineInformation();
+    }
 }
 
 //-----------------------------------------------------------------------------
