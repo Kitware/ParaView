@@ -189,7 +189,9 @@ static bool ValidateName(QObject& Object)
     }
     
   // Skip ParaView stuff ...
-  if(class_name == "pqPropertyManager")
+  if(
+    class_name == "pqPropertyManager"
+    || class_name == "pqPipelineModelItem")
     {
     return false;
     }
