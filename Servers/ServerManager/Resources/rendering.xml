@@ -921,7 +921,8 @@
      </DoubleVectorProperty>
     </Proxy>
   
-    <Proxy name="ImplicitPlaneRepresentation" 
+    <ImplicitPlaneRepresentationProxy 
+           name="ImplicitPlaneRepresentation" 
            class="vtkImplicitPlaneRepresentation">
       <IntVectorProperty
         name="Visibility"
@@ -974,7 +975,7 @@
         <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
-    </Proxy>
+    </ImplicitPlaneRepresentationProxy>
   </ProxyGroup>
 
   <ProxyGroup name="properties">
