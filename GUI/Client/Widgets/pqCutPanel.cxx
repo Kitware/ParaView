@@ -307,7 +307,7 @@ void pqCutPanel::onAccepted()
             vtkSMDataObjectDisplayProxy* const display_proxy =
               pipeline_display->getProxy();
 
-            display_proxy->SetVisibility(false);
+            display_proxy->SetVisibilityCM(false);
             }
           }
         }
