@@ -130,6 +130,7 @@ public:
 
   // Removes a source. Removing a source involves the following:
   // \li removing all displays belonging to the source,
+  // \li breaking any input connections.
   // \li unregistering the source.
   // Note that the source must have no consumers, otherwise,
   // one cannot delete the source.

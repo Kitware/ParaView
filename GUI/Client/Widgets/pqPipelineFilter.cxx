@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //Qt includes.
 #include <QList>
+#include <QPointer>
 #include <QSet>
 #include <QtDebug>
 
@@ -54,7 +55,7 @@ class pqPipelineFilterInternal
 {
 public:
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
-  QList<pqPipelineSource*> Inputs;
+  QList<QPointer<pqPipelineSource> > Inputs;
   pqPipelineFilterInternal()
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();

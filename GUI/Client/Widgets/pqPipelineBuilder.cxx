@@ -348,6 +348,18 @@ void pqPipelineBuilder::remove(pqPipelineSource* source)
     this->UndoStack->BeginOrContinueUndoSet(QString("Remove Source"));
     }
 
+
+
+  // 2) remove inputs.
+  // TODO: this step should not be necessary, but it currently
+  // is :(. Needs some looking into.
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    source->getProxy()->GetProperty("Input"));
+  if (pp)
+    {
+    pp->RemoveAllProxies();
+    }
+
   // 1) remove all displays.
   while (source->getDisplayCount())
     {
@@ -357,15 +369,6 @@ void pqPipelineBuilder::remove(pqPipelineSource* source)
       return;
       }
     }
-
-  // 2) remove inputs.
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    source->getProxy()->GetProperty("Input"));
-  if (pp)
-    {
-    pp->RemoveAllProxies();
-    }
-
 
   // 3) Unregister proxy.
   vtkSMProxyManager::GetProxyManager()->UnRegisterProxy(
