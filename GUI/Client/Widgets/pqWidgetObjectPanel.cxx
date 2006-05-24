@@ -36,10 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqWidgetObjectPanel.h"
 
+#include <vtkCamera.h>
 #include <vtkCommand.h>
 #include <vtkImplicitPlaneRepresentation.h>
 #include <vtkProcessModule.h>
 #include <vtkPVDataInformation.h>
+#include <vtkRenderer.h>
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMNew3DWidgetProxy.h>
@@ -47,6 +49,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMProxyProperty.h>
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
+
+#include <QPushButton>
 
 /////////////////////////////////////////////////////////////////////////
 // pqWidgetObjectPanel::WidgetObserver
@@ -95,6 +99,13 @@ pqWidgetObjectPanel::pqWidgetObjectPanel(QString filename, QWidget* p) :
   Observer(WidgetObserver::New())
 {
   this->Observer->SetPanel(*this);
+  
+  connect(this->findChild<QPushButton*>("useXNormal"), SIGNAL(clicked()), this, SLOT(onUseXNormal()));
+  connect(this->findChild<QPushButton*>("useYNormal"), SIGNAL(clicked()), this, SLOT(onUseYNormal()));
+  connect(this->findChild<QPushButton*>("useZNormal"), SIGNAL(clicked()), this, SLOT(onUseZNormal()));
+  connect(this->findChild<QPushButton*>("useCameraNormal"), SIGNAL(clicked()), this, SLOT(onUseCameraNormal()));
+  connect(this->findChild<QPushButton*>("resetBounds"), SIGNAL(clicked()), this, SLOT(onResetBounds()));
+  connect(this->findChild<QPushButton*>("useCenterBounds"), SIGNAL(clicked()), this, SLOT(onUseCenterBounds()));
 }
 
 pqWidgetObjectPanel::~pqWidgetObjectPanel()
@@ -174,8 +185,16 @@ void pqWidgetObjectPanel::setProxyInternal(pqSMProxy p)
       getServerManagerModel()->getServer(this->Proxy->GetConnectionID());
     this->Widget = widgetFactory->get3DWidget("ImplicitPlaneWidgetDisplay",
       server);
+    }
+    
+  // Synchronize the 3D widget bounds with the source data ...
+  this->onResetBounds();
+}
 
-    // Resize the 3D widget based on the bounds of the input data ...
+void pqWidgetObjectPanel::onResetBounds()
+{
+  if(this->Widget)
+    {
     if(vtkSMProxyProperty* const input_property = vtkSMProxyProperty::SafeDownCast(
       this->Proxy->GetProperty("Input")))
       {
@@ -213,11 +232,105 @@ void pqWidgetObjectPanel::setProxyInternal(pqSMProxy p)
           widget_bounds[5] = input_origin[2] + input_size[2];
           
           place_widget->SetElements(widget_bounds);
+          
+          this->Widget->UpdateVTKObjects();
+          pqApplicationCore::instance()->render();
           }
         }
       }
+    }
+}
 
-    this->Widget->UpdateVTKObjects();
+void pqWidgetObjectPanel::onUseCenterBounds()
+{
+  if(this->Widget)
+    {
+    if(vtkSMProxyProperty* const input_property = vtkSMProxyProperty::SafeDownCast(
+      this->Proxy->GetProperty("Input")))
+      {
+      if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
+        input_property->GetProxy(0)))
+        {
+        double input_bounds[6];
+        input_proxy->GetDataInformation()->GetBounds(input_bounds);
+       
+        double input_origin[3];
+        input_origin[0] = (input_bounds[0] + input_bounds[1]) / 2.0;
+        input_origin[1] = (input_bounds[2] + input_bounds[3]) / 2.0;
+        input_origin[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
+
+        if(vtkSMDoubleVectorProperty* const origin = vtkSMDoubleVectorProperty::SafeDownCast(
+          this->Widget->GetProperty("Origin")))
+          {
+          origin->SetElements(input_origin);
+          this->Widget->UpdateVTKObjects();
+          pqApplicationCore::instance()->render();
+          }
+        }
+      }
+    }
+}
+
+void pqWidgetObjectPanel::onUseXNormal()
+{
+  if(this->Widget)
+    {
+    if(vtkSMDoubleVectorProperty* const normal = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->Widget->GetProperty("Normal")))
+      {
+      normal->SetElements3(1, 0, 0);
+      this->Widget->UpdateVTKObjects();
+      pqApplicationCore::instance()->render();
+      }
+    }
+}
+
+void pqWidgetObjectPanel::onUseYNormal()
+{
+  if(this->Widget)
+    {
+    if(vtkSMDoubleVectorProperty* const normal = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->Widget->GetProperty("Normal")))
+      {
+      normal->SetElements3(0, 1, 0);
+      this->Widget->UpdateVTKObjects();
+      pqApplicationCore::instance()->render();
+      }
+    }
+}
+
+void pqWidgetObjectPanel::onUseZNormal()
+{
+  if(this->Widget)
+    {
+    if(vtkSMDoubleVectorProperty* const normal = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->Widget->GetProperty("Normal")))
+      {
+      normal->SetElements3(0, 0, 1);
+      this->Widget->UpdateVTKObjects();
+      pqApplicationCore::instance()->render();
+      }
+    }
+}
+
+void pqWidgetObjectPanel::onUseCameraNormal()
+{
+  if(this->Widget)
+    {
+    if(vtkCamera* const camera =
+      pqApplicationCore::instance()->getActiveRenderModule()->getProxy()->GetRenderer()->GetActiveCamera())
+      {
+      if(vtkSMDoubleVectorProperty* const normal = vtkSMDoubleVectorProperty::SafeDownCast(
+        this->Widget->GetProperty("Normal")))
+        {
+        double camera_normal[3];
+        camera->GetViewPlaneNormal(camera_normal);
+        normal->SetElements3(-camera_normal[0], -camera_normal[1], -camera_normal[2]);
+        
+        this->Widget->UpdateVTKObjects();
+        pqApplicationCore::instance()->render();
+        }
+      }
     }
 }
 

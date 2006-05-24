@@ -61,7 +61,21 @@ protected:
   virtual void setProxyInternal(pqSMProxy proxy);
 
   vtkSMNew3DWidgetProxy* Widget;
-  
+
+private slots:
+  /// Called to reset the 3D widget bounds to the source data
+  void onResetBounds();
+  /// Called to set the widget origin to the center of the source data
+  void onUseCenterBounds();
+  /// Called to set the widget normal to the X axis
+  void onUseXNormal();
+  /// Called to set the widget normal to the Y axis
+  void onUseYNormal();
+  /// Called to set the widget normal to the Z axis
+  void onUseZNormal();
+  /// Called to set the widget normal to the camera direction
+  void onUseCameraNormal();
+
 private:
   class WidgetObserver;
   friend class WidgetObserver;

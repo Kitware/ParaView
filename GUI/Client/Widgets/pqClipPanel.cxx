@@ -62,7 +62,7 @@ pqClipPanel::pqClipPanel(QWidget* p) :
   connect(normalX, SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
   connect(normalY, SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
   connect(normalZ, SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
-  
+ 
   connect(this->getPropertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
   connect(this->getPropertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
 }
