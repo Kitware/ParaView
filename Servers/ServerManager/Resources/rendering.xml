@@ -2750,6 +2750,15 @@
     </DisplayProxy>
 
     <New3DWidgetProxy name="ImplicitPlaneWidgetDisplay">
+      <IntVectorProperty
+        name="Enabled"
+        comamnd="SetEnabled"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
       <SubProxy>
         <Proxy name="Prop"
           proxygroup="props" proxyname="ImplicitPlaneRepresentation">
@@ -2768,13 +2777,18 @@
         <Proxy name="Widget"
           proxygroup="3d_widgets" proxyname="ImplicitPlaneWidget2">
         </Proxy>
-        <ExposedProperties>
-          <Property name="Enabled" />
-        </ExposedProperties>
       </SubProxy>
     </New3DWidgetProxy>
 
     <New3DWidgetProxy name="SliderWidgetDisplay">
+      <IntVectorProperty
+        name="Enabled"
+        comamnd="SetEnabled"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
       <SubProxy>
         <Proxy name="Prop"
           proxygroup="props" proxyname="SliderRepresentation3D">
@@ -2794,9 +2808,6 @@
         <Proxy name="Widget"
           proxygroup="3d_widgets" proxyname="SliderWidget">
         </Proxy>
-        <ExposedProperties>
-          <Property name="Enabled" />
-        </ExposedProperties>
       </SubProxy>
     </New3DWidgetProxy>
     <!-- End of displays group -->

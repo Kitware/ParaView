@@ -56,7 +56,10 @@ public:
   // Description:
   // Break reference loop that are due to links.
   virtual void UnRegister(vtkObjectBase* o);
-  
+ 
+  // Description:
+  // Calls set enabled on the WidgetProxy.
+  void SetEnabled(int enable);
 protected:
   vtkSMNew3DWidgetProxy();
   ~vtkSMNew3DWidgetProxy();
