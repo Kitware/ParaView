@@ -102,8 +102,8 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
 
   boxLayout->addStretch();
   
-  this->connect(this->AcceptButton, SIGNAL(pressed()), SLOT(accept()));
-  this->connect(this->ResetButton, SIGNAL(pressed()), SLOT(reset()));
+  this->connect(this->AcceptButton, SIGNAL(clicked()), SLOT(accept()));
+  this->connect(this->ResetButton, SIGNAL(clicked()), SLOT(reset()));
 
   this->AcceptButton->setEnabled(false);
   this->ResetButton->setEnabled(false);
