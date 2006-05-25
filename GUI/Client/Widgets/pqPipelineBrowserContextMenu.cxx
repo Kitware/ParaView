@@ -95,7 +95,10 @@ void pqPipelineBrowserContextMenu::showContextMenu(const QPoint &pos)
       menu.addAction("Display Settings...", this, SLOT(showDisplayEditor()));
       }
 
-    menu.addAction("Delete", this->Browser, SLOT(deleteSelected()));
+    if (source->getNumberOfConsumers() == 0)
+      {
+      menu.addAction("Delete", this->Browser, SLOT(deleteSelected()));
+      }
     menuHasItems = true;
     }
   else if(server)
