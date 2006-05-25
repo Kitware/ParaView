@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqNamedObjectPanel.h
+   Module:    pqTreeWidgetItemObject.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,29 +30,45 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqNamedObjectPanel_h
-#define _pqNamedObjectPanel_h
+#include "pqTreeWidgetItemObject.h"
 
-#include "pqObjectPanel.h"
 
-/// Base class for Widget which provides an editor for editing properties of a proxy 
-/// where child widgets are named after the property they represent
-class pqNamedObjectPanel : public pqObjectPanel
+pqTreeWidgetItemObject::pqTreeWidgetItemObject(QTreeWidget* p, const QStringList& t)
+  : QTreeWidgetItem(p, t) 
 {
-  Q_OBJECT
-public:
-  /// constructor
-  pqNamedObjectPanel(QWidget* p);
-  /// destructor
-  ~pqNamedObjectPanel();
+}
 
-protected:
-  /// populate widgets with properties from the server manager
-  virtual void linkServerManagerProperties();
-  /// set the properties in the server manager with properties in the widgets
-  virtual void unlinkServerManagerProperties();
+void pqTreeWidgetItemObject::setData(int column, int role, const QVariant& v)
+{
+  if(Qt::CheckStateRole == role)
+    {
+    if(v != this->data(column, Qt::CheckStateRole))
+      {
+      QTreeWidgetItem::setData(column, role, v);
+      emit this->checkedStateChanged(Qt::Checked == v ? true : false);
+      }
+    }
+  else
+    {
+    QTreeWidgetItem::setData(column, role, v);
+    }
+}
 
-};
+bool pqTreeWidgetItemObject::isChecked() const
+{
+  return Qt::Checked == this->checkState(0) ? true : false;
+}
 
-#endif
+void pqTreeWidgetItemObject::setChecked(bool v)
+{
+  if(v)
+    {
+    this->setCheckState(0, Qt::Checked);
+    }
+  else
+    {
+    this->setCheckState(0, Qt::Unchecked);
+    }
+}
+
 

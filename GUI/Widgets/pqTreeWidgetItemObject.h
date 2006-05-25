@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqNamedObjectPanel.h
+   Module:    pqTreeWidgetItemObject.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,29 +30,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqNamedObjectPanel_h
-#define _pqNamedObjectPanel_h
+#ifndef _pqTreeWidgetItemObject_h
+#define _pqTreeWidgetItemObject_h
 
-#include "pqObjectPanel.h"
+#include "QtWidgetsExport.h"
+#include <QObject>
+#include <QTreeWidgetItem>
 
-/// Base class for Widget which provides an editor for editing properties of a proxy 
-/// where child widgets are named after the property they represent
-class pqNamedObjectPanel : public pqObjectPanel
+/// QTreeWidgetItem subclass with additional signals, slots, and properties
+class QTWIDGETS_EXPORT pqTreeWidgetItemObject : public QObject, public QTreeWidgetItem
 {
   Q_OBJECT
+  Q_PROPERTY(bool checked READ isChecked WRITE setChecked)
 public:
-  /// constructor
-  pqNamedObjectPanel(QWidget* p);
-  /// destructor
-  ~pqNamedObjectPanel();
+  /// construct list widget item to for QTreeWidget with a string
+  pqTreeWidgetItemObject(QTreeWidget* p, const QStringList& t);
+  /// overload setData() to emit changed signal
+  void setData(int column, int role, const QVariant& v);
 
-protected:
-  /// populate widgets with properties from the server manager
-  virtual void linkServerManagerProperties();
-  /// set the properties in the server manager with properties in the widgets
-  virtual void unlinkServerManagerProperties();
+public slots:
+  /// get the check true/false
+  bool isChecked() const;
+  /// set the check state true/false
+  void setChecked(bool v);
+
+signals:
+  /// signal check state changed
+  void checkedStateChanged(bool);
 
 };
 
 #endif
-

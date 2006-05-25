@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqNamedObjectPanel.h
+   Module:    pqExodusPanel.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,27 +30,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqNamedObjectPanel_h
-#define _pqNamedObjectPanel_h
+#ifndef _pqExodusPanel_h
+#define _pqExodusPanel_h
 
-#include "pqObjectPanel.h"
+#include "pqLoadedFormObjectPanel.h"
+class pqTreeWidgetItemObject;
 
-/// Base class for Widget which provides an editor for editing properties of a proxy 
-/// where child widgets are named after the property they represent
-class pqNamedObjectPanel : public pqObjectPanel
+class pqExodusPanel :
+  public pqLoadedFormObjectPanel
 {
   Q_OBJECT
 public:
   /// constructor
-  pqNamedObjectPanel(QWidget* p);
+  pqExodusPanel(QWidget* p = NULL);
   /// destructor
-  ~pqNamedObjectPanel();
+  ~pqExodusPanel();
+
+  virtual void postAccept();
+
+protected slots:
+  void applyDisplacements(int);
+  void displChanged(bool);
+
+  void updateDataRanges();
 
 protected:
+  /// set the proxy to display properties for
+  virtual void setProxyInternal(pqSMProxy proxy);
+
   /// populate widgets with properties from the server manager
   virtual void linkServerManagerProperties();
   /// set the properties in the server manager with properties in the widgets
   virtual void unlinkServerManagerProperties();
+
+  pqTreeWidgetItemObject* DisplItem;
 
 };
 

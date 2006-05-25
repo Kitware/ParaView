@@ -89,7 +89,10 @@ QSize pqObjectPanel::sizeHint() const
 /// set the proxy to display properties for
 void pqObjectPanel::setProxy(pqSMProxy p)
 {
-  this->setProxyInternal(p);
+  if(p != this->Proxy)
+    {
+    this->setProxyInternal(p);
+    }
 }
 
 //-----------------------------------------------------------------------------

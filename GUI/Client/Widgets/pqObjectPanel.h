@@ -65,11 +65,14 @@ public:
 public slots:
   /// accept the changes made to the properties
   /// changes will be propogated down to the server manager
-  void accept();
+  virtual void accept();
+
+  /// called after accept on all panels is complete
+  virtual void postAccept() { }
 
   /// reset the changes made
   /// editor will query properties from the server manager
-  void reset();
+  virtual void reset();
 
   /// Called when the panel becomes active. Default implemnetation does nothing.
   virtual void select() { }

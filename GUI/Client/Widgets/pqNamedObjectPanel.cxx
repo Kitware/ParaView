@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLineEdit>
 #include <QPushButton>
 #include <QListWidget>
+#include <QTreeWidget>
 #include <QGroupBox>
 #include <QSlider>
 #include <QDoubleSpinBox>
@@ -52,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // paraq includes
 #include "pqListWidgetItemObject.h"
+#include "pqTreeWidgetItemObject.h"
 #include "pqPipelineData.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineModel.h"
@@ -185,6 +187,7 @@ void pqNamedObjectPanel::linkServerManagerProperties()
         {
         // selections can be list widgets
         QListWidget* listWidget = qobject_cast<QListWidget*>(foundObject);
+        QTreeWidget* treeWidget = qobject_cast<QTreeWidget*>(foundObject);
         if(listWidget)
           {
           listWidget->clear();
@@ -194,6 +197,23 @@ void pqNamedObjectPanel::linkServerManagerProperties()
             pqListWidgetItemObject* item = new pqListWidgetItemObject(sel_domain[j].toString(), listWidget);
             this->PropertyManager->registerLink(item, "checked", SIGNAL(checkedStateChanged(bool)),
                                                this->Proxy, SMProperty, j);
+            }
+          }
+        else if(treeWidget)
+          {
+          treeWidget->clear();
+          QList<QVariant> sel_domain;
+          sel_domain = pqSMAdaptor::getSelectionPropertyDomain(SMProperty);
+          for(int j=0; j<sel_domain.size(); j++)
+            {
+            QList<QString> str;
+            str.append(sel_domain[j].toString());
+            pqTreeWidgetItemObject* item;
+            item = new pqTreeWidgetItemObject(treeWidget, str);
+            this->PropertyManager->registerLink(item, 
+                                              "checked", 
+                                              SIGNAL(checkedStateChanged(bool)),
+                                              this->Proxy, SMProperty, j);
             }
           }
         }
@@ -373,6 +393,7 @@ void pqNamedObjectPanel::unlinkServerManagerProperties()
         {
         // selections can be list widgets
         QListWidget* listWidget = qobject_cast<QListWidget*>(foundObject);
+        QTreeWidget* treeWidget = qobject_cast<QTreeWidget*>(foundObject);
         if(listWidget)
           {
           for(int ii=0; ii<listWidget->count(); ii++)
@@ -382,6 +403,19 @@ void pqNamedObjectPanel::unlinkServerManagerProperties()
                                                this->Proxy, SMProperty, ii);
             }
           listWidget->clear();
+          }
+        if(treeWidget)
+          {
+          for(int ii=0; ii<treeWidget->topLevelItemCount(); ii++)
+            {
+            pqTreeWidgetItemObject* item;
+            item = static_cast<pqTreeWidgetItemObject*>(treeWidget->topLevelItem(ii));
+            this->PropertyManager->unregisterLink(item, 
+                                                  "checked", 
+                                                  SIGNAL(checkedStateChanged(bool)),
+                                                  this->Proxy, SMProperty, ii);
+            }
+          treeWidget->clear();
           }
         }
       else if(pt == pqSMAdaptor::PROXY)
