@@ -381,6 +381,10 @@ void pqMainWindow::createStandardPipelineBrowser(bool visible)
     this->Implementation->PipelineBrowser, 
     SLOT(select(pqPipelineSource*)));
 
+  QObject::connect(pqApplicationCore::instance(), 
+    SIGNAL(activeServerChanged(pqServer*)),
+    this->Implementation->PipelineBrowser, SLOT(select(pqServer*)));
+
 }
 //-----------------------------------------------------------------------------
 void pqMainWindow::createStandardObjectInspector(bool visible)
@@ -1505,14 +1509,15 @@ void pqMainWindow::onBrowserSelectionChanged(pqPipelineModelItem* item)
   if (source)
     {
     server = source->getServer();
+    pqApplicationCore::instance()->setActiveServer(server);
+    pqApplicationCore::instance()->setActiveSource(source);
     }
   else
     {
     server = dynamic_cast<pqServer*>(item);
+    pqApplicationCore::instance()->setActiveSource(0);
+    pqApplicationCore::instance()->setActiveServer(server);
     }
-
-  pqApplicationCore::instance()->setActiveSource(source);
-  pqApplicationCore::instance()->setActiveServer(server);
 }
 
 //-----------------------------------------------------------------------------

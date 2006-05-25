@@ -249,7 +249,10 @@ void pqApplicationCore::sourceRemoved(pqPipelineSource* source)
 {
   if (source == this->getActiveSource())
     {
+    pqServer* server =this->getActiveServer();
     this->setActiveSource(NULL);
+    this->Internal->ActiveServer = 0;
+    this->setActiveServer(server);
     }
 
   if (this->Internal->SourcesSansDisplays.contains(source))

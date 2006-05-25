@@ -224,14 +224,22 @@ void pqPipelineBrowser::select(pqPipelineModelItem* item)
   QModelIndex index = this->ListModel->getIndexFor(item);
   this->TreeView->selectionModel()->setCurrentIndex(index,
     QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
-  emit this->selectionChanged(item); 
+//  emit this->selectionChanged(item); 
 }
+
 //-----------------------------------------------------------------------------
 void pqPipelineBrowser::select(pqPipelineSource* src)
 {
   this->select((pqPipelineModelItem*)src);
 }
 
+//-----------------------------------------------------------------------------
+void pqPipelineBrowser::select(pqServer* server)
+{
+  this->select((pqPipelineModelItem*)server);
+}
+
+//-----------------------------------------------------------------------------
 void pqPipelineBrowser::deleteSelected()
 {
   // Get the selected item(s) from the selection model.

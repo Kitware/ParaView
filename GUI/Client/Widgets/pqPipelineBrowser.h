@@ -81,6 +81,7 @@ public slots:
   // Call this to select the particular item.
   void select(pqPipelineModelItem* item);
   void select(pqPipelineSource* src);
+  void select(pqServer* server);
 
   void deleteSelected();
 
