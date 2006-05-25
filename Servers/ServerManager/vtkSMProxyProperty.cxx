@@ -31,7 +31,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.33");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.34");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -467,29 +467,16 @@ int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
   this->ImmediateUpdate = 0;
   this->Superclass::LoadState(element, loader, loadLastPushedValues);
 
-  if (loadLastPushedValues)
-    {
-    unsigned int numElems = element->GetNumberOfNestedElements();
-    vtkPVXMLElement* actual_element = NULL;
-    for (unsigned int i=0; i < numElems; i++)
-      {
-      vtkPVXMLElement* currentElement = element->GetNestedElement(i);
-      if (currentElement->GetName() && 
-        strcmp(currentElement->GetName(), "LastPushedValues") == 0)
-        {
-        actual_element = currentElement;
-        break;
-        }
-      }
-    if (!actual_element)
-      {
-      // No LastPushedValues present, do nothing.
-      return 1;
-      }
-    element = actual_element;
-    }
+  // If clear is present and is 0, it implies that the
+  // proxy elements indicate if the proxy is to be added or removed
+  // rather then simply setting the value of the property.
+  int clear = 1;
+  element->GetScalarAttribute("clear", &clear);
 
-  this->RemoveAllProxies();
+  if (clear)
+    {
+    this->RemoveAllProxies();
+    }
 
   unsigned int numElems = element->GetNumberOfNestedElements();
   for (unsigned int i=0; i<numElems; i++)
@@ -500,6 +487,12 @@ int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
          strcmp(currentElement->GetName(), "Proxy") == 0) )
       {
       int id;
+      int remove_proxy = 0;
+      if (!clear)
+        {
+        currentElement->GetScalarAttribute("remove", &remove_proxy);
+        remove_proxy = (loadLastPushedValues)? !remove_proxy : remove_proxy;
+        }
       if (currentElement->GetScalarAttribute("value", &id))
         {
         if (id)
@@ -507,7 +500,14 @@ int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
           vtkSMProxy* proxy = loader->NewProxy(id);
           if (proxy)
             {
-            this->AddProxy(proxy);
+            if (remove_proxy)
+              {
+              this->RemoveProxy(proxy);
+              }
+            else
+              {
+              this->AddProxy(proxy);
+              }
             proxy->Delete();
             }
           else
@@ -518,7 +518,14 @@ int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
           }
         else
           {
-          this->AddProxy(NULL);
+          if (remove_proxy)
+            {
+            this->RemoveProxy(0);
+            }
+          else
+            {
+            this->AddProxy(0);
+            }
           }
         }
       }
@@ -538,51 +545,85 @@ void vtkSMProxyProperty::ChildSaveState(vtkPVXMLElement* propertyElement,
   this->Superclass::ChildSaveState(propertyElement, saveLastPushedValues);
 
   unsigned int numProxies = this->GetNumberOfProxies();
-  propertyElement->AddAttribute("number_of_elements", numProxies);
-  for (unsigned int idx=0; idx<numProxies; idx++)
+  if (!saveLastPushedValues)
     {
-    vtkSMProxy* proxy = this->GetProxy(idx);
-    if (proxy)
+    propertyElement->AddAttribute("number_of_elements", numProxies);
+    for (unsigned int idx=0; idx<numProxies; idx++)
       {
-      vtkPVXMLElement* elementElement = vtkPVXMLElement::New();
-      elementElement->SetName("Proxy");
-      elementElement->AddAttribute("value", proxy->GetSelfIDAsString());
-      propertyElement->AddNestedElement(elementElement);
-      elementElement->Delete();
-      }
-    }
-
-  if (saveLastPushedValues)
-    {
-    unsigned int numLastPushedProxies = 
-      static_cast<unsigned int>(this->PPInternals->PreviousProxies.size());
-    
-    vtkPVXMLElement* element = vtkPVXMLElement::New();
-    element->SetName("LastPushedValues");
-    element->AddAttribute("number_of_elements", numLastPushedProxies);
-    vtkSMProxyPropertyInternals::VectorOfProxies::iterator iter;
-    
-    for (iter=this->PPInternals->PreviousProxies.begin();
-      iter!=this->PPInternals->PreviousProxies.end(); ++iter)
-      {
-      vtkPVXMLElement* elementElement = vtkPVXMLElement::New();
-      elementElement->SetName("Proxy");
-      vtkSMProxy* proxy = (*iter);
+      vtkSMProxy* proxy = this->GetProxy(idx);
       if (proxy)
         {
-        elementElement->AddAttribute("value", 
-          proxy->GetSelfIDAsString());
+        vtkPVXMLElement* elementElement = vtkPVXMLElement::New();
+        elementElement->SetName("Proxy");
+        elementElement->AddAttribute("value", proxy->GetSelfIDAsString());
+        propertyElement->AddNestedElement(elementElement);
+        elementElement->Delete();
         }
-      else
-        {
-        elementElement->AddAttribute("value", "0");
-        }
-        
-      element->AddNestedElement(elementElement);
-      elementElement->Delete();
       }
-    propertyElement->AddNestedElement(element);
-    element->Delete();
+    return;
+    }
+
+  propertyElement->AddAttribute("clear", "0");
+  vtkSMProxyPropertyInternals::VectorOfProxies proxiesToRemove;
+  vtkSMProxyPropertyInternals::VectorOfProxies proxiesToAdd;
+  vtkSMProxyPropertyInternals::VectorOfProxies& prevProxies =
+    this->PPInternals->PreviousProxies;
+  // Determine the proxies in the PreviousProxies but not in Proxies.
+  // These are the proxies to remove.
+  vtkstd::back_insert_iterator<
+    vtkstd::vector<vtkSmartPointer<vtkSMProxy> > > ii_remove(proxiesToRemove);
+  vtkstd::set_difference(prevProxies.begin(),
+                         prevProxies.end(),
+                         this->PPInternals->Proxies.begin(),
+                         this->PPInternals->Proxies.end(),
+                         ii_remove);
+  
+  // Determine the proxies in the Proxies but not in PreviousProxies.
+  // These are the proxies to add.
+  vtkstd::back_insert_iterator<
+    vtkstd::vector<vtkSmartPointer<vtkSMProxy> > > ii_add(proxiesToAdd);
+  vtkstd::set_difference(this->PPInternals->Proxies.begin(),
+                         this->PPInternals->Proxies.end(),
+                         prevProxies.begin(),
+                         prevProxies.end(),
+                         ii_add   );
+
+  vtkSMProxyPropertyInternals::VectorOfProxies::iterator iter;
+  for (iter=proxiesToAdd.begin(); iter != proxiesToAdd.end(); ++iter)
+    {
+    vtkPVXMLElement* elementElement = vtkPVXMLElement::New();
+    elementElement->SetName("Proxy");
+    vtkSMProxy* proxy = (*iter);
+    if (proxy)
+      {
+      elementElement->AddAttribute("value", 
+        proxy->GetSelfIDAsString());
+      }
+    else
+      {
+      elementElement->AddAttribute("value", "0");
+      }
+    propertyElement->AddNestedElement(elementElement);
+    elementElement->Delete();
+    }
+
+  for (iter=proxiesToRemove.begin(); iter != proxiesToRemove.end(); ++iter)
+    {
+    vtkPVXMLElement* elementElement = vtkPVXMLElement::New();
+    elementElement->SetName("Proxy");
+    vtkSMProxy* proxy = (*iter);
+    if (proxy)
+      {
+      elementElement->AddAttribute("value", 
+        proxy->GetSelfIDAsString());
+      }
+    else
+      {
+      elementElement->AddAttribute("value", "0");
+      }
+    elementElement->AddAttribute("remove", "1");
+    propertyElement->AddNestedElement(elementElement);
+    elementElement->Delete();
     }
 }
 
