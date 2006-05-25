@@ -486,7 +486,6 @@ void pqApplicationCore::createPendingDisplays()
       }
     this->Internal->PipelineBuilder->createDisplayProxy(source,
       this->getActiveRenderModule());
-    this->getActiveRenderModule()->resetCamera();
     this->getActiveRenderModule()->render();
     if (this->getServerManagerModel()->getNumberOfSources() == 1)
       {
