@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>462</width>
-    <height>266</height>
+    <width>428</width>
+    <height>186</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -21,18 +21,31 @@
    </sizepolicy>
   </property>
   <property name="windowTitle" >
-   <string>Dialog</string>
+   <string>About ParaView</string>
   </property>
   <property name="modal" >
    <bool>true</bool>
   </property>
   <layout class="QGridLayout" >
    <property name="margin" >
-    <number>8</number>
+    <number>9</number>
    </property>
    <property name="spacing" >
     <number>6</number>
    </property>
+   <item row="1" column="0" >
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
    <item row="0" column="0" >
     <widget class="QLabel" name="label" >
      <property name="sizePolicy" >
@@ -47,11 +60,11 @@
       <string/>
      </property>
      <property name="pixmap" >
-      <pixmap resource="Resources.qrc" >:/pqClient/ParaQLogo.png</pixmap>
+      <pixmap resource="Resources.qrc" >:/pqClient/ParaViewLogo.png</pixmap>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" >
+   <item row="2" column="0" >
     <layout class="QHBoxLayout" >
      <property name="margin" >
       <number>0</number>
@@ -66,8 +79,8 @@
        </property>
        <property name="sizeHint" >
         <size>
-         <width>131</width>
-         <height>31</height>
+         <width>0</width>
+         <height>20</height>
         </size>
        </property>
       </spacer>
