@@ -658,7 +658,6 @@ bool pqMainWindow::eventFilter(QObject* watched, QEvent* e)
 void pqMainWindow::buildFiltersMenu()
 {
   this->Implementation->FiltersMenu->clear();
-
   // Update the menu items for the server and compound filters too.
 
   QMenu *alphabetical = this->Implementation->FiltersMenu;
@@ -666,6 +665,22 @@ void pqMainWindow::buildFiltersMenu()
 
   QStringList::Iterator iter;
   pqSourceProxyInfo proxyInfo;
+
+      
+  //Released Filters
+  QStringList releasedFilters;
+  releasedFilters<<"Clip";
+  releasedFilters<<"Cut";
+  releasedFilters<<"Threshold";
+
+  QMenu *menu = this->Implementation->FiltersMenu->addMenu("Released") << pqSetName("Released");
+  for(iter = releasedFilters.begin(); iter != releasedFilters.end(); ++iter)
+    {
+        QAction* action = menu->addAction(*iter) << pqSetName(*iter)
+          << pqSetData(*iter);
+        action->setEnabled(false);
+    }
+
 
   // Load in the filter information.
   QFile filterInfo(":/pqClient/ParaQFilters.xml");
@@ -747,6 +762,14 @@ void pqMainWindow::buildSourcesMenu()
 {
   this->Implementation->SourcesMenu->clear();
 #if 1
+  // Released Sources
+  QMenu *menu = this->Implementation->SourcesMenu->addMenu("Released") << pqSetName("Released");
+  menu->addAction("Cone") 
+    << pqSetName("Cone") << pqSetData("ConeSource");
+
+
+
+
   // hard code sources
   this->Implementation->SourcesMenu->addAction("2D Glyph") 
     << pqSetName("2D Glyph") << pqSetData("GlyphSource2D");

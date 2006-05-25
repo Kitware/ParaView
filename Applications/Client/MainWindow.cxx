@@ -44,11 +44,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMessageBox>
 
 #include <vtkPQConfig.h>
+#include <vtkSMProxyManager.h>
+#include <pqSetData.h>
+#include <pqSetName.h>
+
 
 MainWindow::MainWindow()
   : HelpClient(NULL)
 {
   this->setWindowTitle(QByteArray("ParaQ Client") + QByteArray(" ") + QByteArray(PARAQ_VERSION_FULL));
+  this->setWindowIcon(QIcon(":pqWidgets/pqAppIcon64.png"));
 
   this->createStandardFileMenu();
   this->createStandardViewMenu();
@@ -80,6 +85,47 @@ void MainWindow::showHelpAbout()
   AboutDialog* const dialog = new AboutDialog(this);
   dialog->show();
 }
+
+
+/*
+//-----------------------------------------------------------------------------
+void MainWindow::buildFiltersMenu()
+{
+
+  QStringList allowedFilters;
+  allowedFilters<<"Clip";
+  allowedFilters<<"Cut";
+  allowedFilters<<"Threshold";
+
+  this->filtersMenu()->clear();
+  QMenu *alphabetical =this->filtersMenu();
+
+  vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
+  manager->InstantiateGroupPrototypes("filters");
+  int numFilters = manager->GetNumberOfProxies("filters_prototypes");
+  for(int i=0; i<numFilters; i++)
+    {
+    QStringList categoryList;
+    QString proxyName = manager->GetProxyName("filters_prototypes",i);
+
+    if(allowedFilters.contains(proxyName))
+      {
+        QAction* action = alphabetical->addAction(proxyName) << pqSetName(proxyName)
+          << pqSetData(proxyName);
+        action->setEnabled(false);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void MainWindow::buildSourcesMenu()
+{
+  this->sourcesMenu()->clear();
+  this->sourcesMenu()->addAction("Cone") 
+    << pqSetName("Cone") << pqSetData("ConeSource");
+}
+*/
+
 
 void MainWindow::showHelp()
 {

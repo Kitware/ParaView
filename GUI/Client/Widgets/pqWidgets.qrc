@@ -38,6 +38,7 @@
         <file alias="pqWindowd16.png">Resources/pqWindowd16.png</file>
         <file alias="pqWindowd22.png">Resources/pqWindowd22.png</file>
         <file alias="pqWindowd32.png">Resources/pqWindowd32.png</file>
+        <file alias="pqAppIcon64.png">Resources/pqAppIcon64.png</file>
         <file alias="ExodusReader.ui">pqExodusReaderProperties.ui</file>
         <file alias="ClipPanel.ui">pqClipPanel.ui</file>
         <file alias="CutPanel.ui">pqCutPanel.ui</file>
