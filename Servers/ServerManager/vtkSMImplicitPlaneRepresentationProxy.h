@@ -12,21 +12,21 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMImplicitPlaneRepresentationProxy - proxy for a VTK lookup table
+// .NAME vtkSMImplicitPlaneRepresentationProxy - proxy for a implicit plane representation
 // .SECTION Description
-// This proxy class is an example of how vtkSMProxy can be subclassed
-// to add functionality. It adds one simple method : Build().
+// Specialized proxy for implicit planes. Overrides the default appearance
+// of VTK implicit plane representation.
 
 #ifndef __vtkSMImplicitPlaneRepresentationProxy_h
 #define __vtkSMImplicitPlaneRepresentationProxy_h
 
-#include "vtkSMProxy.h"
+#include "vtkSMWidgetRepresentationProxy.h"
 
-class VTK_EXPORT vtkSMImplicitPlaneRepresentationProxy : public vtkSMProxy
+class VTK_EXPORT vtkSMImplicitPlaneRepresentationProxy : public vtkSMWidgetRepresentationProxy
 {
 public:
   static vtkSMImplicitPlaneRepresentationProxy* New();
-  vtkTypeRevisionMacro(vtkSMImplicitPlaneRepresentationProxy, vtkSMProxy);
+  vtkTypeRevisionMacro(vtkSMImplicitPlaneRepresentationProxy, vtkSMWidgetRepresentationProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -39,6 +39,8 @@ public:
 protected:
   vtkSMImplicitPlaneRepresentationProxy();
   ~vtkSMImplicitPlaneRepresentationProxy();
+
+  virtual void SendRepresentation();
 
 private:
   vtkSMImplicitPlaneRepresentationProxy(const vtkSMImplicitPlaneRepresentationProxy&); // Not implemented

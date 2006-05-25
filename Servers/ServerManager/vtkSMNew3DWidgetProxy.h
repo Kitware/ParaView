@@ -25,7 +25,7 @@
 // (if any). The information properties are updated when an 
 // EndInteractionEvent occurs. This is also propagated to the properties
 // through the link. The GUI controlling the vtkSMNew3DWidgetProxy should
-// listed to the PropertyModifiedEvent to update when the 3D widget is
+// listen to the PropertyModifiedEvent to update when the 3D widget is
 // changed.
 
 #ifndef __vtkSMNew3DWidgetProxy_h

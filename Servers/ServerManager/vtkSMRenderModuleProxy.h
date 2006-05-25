@@ -245,6 +245,7 @@ protected:
   
   //BTX
   friend class vtkSMDisplayProxy;
+  friend class vtkSMNew3DWidgetProxy;
   //ETX
 
   // This is the XMLName of the proxy to get created when CreateDisplayProxy
