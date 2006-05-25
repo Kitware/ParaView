@@ -82,6 +82,8 @@ public slots:
   void select(pqPipelineModelItem* item);
   void select(pqPipelineSource* src);
 
+  void deleteSelected();
+
 signals:
   // Fired when the selection is changed. Argument is the newly selected
   // item.

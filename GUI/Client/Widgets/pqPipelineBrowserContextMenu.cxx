@@ -87,10 +87,15 @@ void pqPipelineBrowserContextMenu::showContextMenu(const QPoint &pos)
   pqPipelineSource *source = dynamic_cast<pqPipelineSource*>(
     model->getItem(current));
   pqServer* server = dynamic_cast<pqServer*>(model->getItem(current));
-  if(source && source->getDisplayCount())
+  if(source)
     {
     // Add the context menu items for a pipeline object.
-    menu.addAction("Display Settings...", this, SLOT(showDisplayEditor()));
+    if(source->getDisplayCount())
+      {
+      menu.addAction("Display Settings...", this, SLOT(showDisplayEditor()));
+      }
+
+    menu.addAction("Delete", this->Browser, SLOT(deleteSelected()));
     menuHasItems = true;
     }
   else if(server)

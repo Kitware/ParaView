@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqFlatTreeView.h"
 #include "pqPipelineBrowserContextMenu.h"
+#include "pqPipelineBuilder.h"
 #include "pqPipelineData.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
@@ -138,7 +139,7 @@ bool pqPipelineBrowser::eventFilter(QObject *object, QEvent *e)
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
     if(keyEvent->key() == Qt::Key_Delete)
       {
-      //this->deleteSelected();
+      this->deleteSelected();
       }
     }
 
@@ -229,6 +230,19 @@ void pqPipelineBrowser::select(pqPipelineModelItem* item)
 void pqPipelineBrowser::select(pqPipelineSource* src)
 {
   this->select((pqPipelineModelItem*)src);
+}
+
+void pqPipelineBrowser::deleteSelected()
+{
+  // Get the selected item(s) from the selection model.
+  QModelIndex current = this->TreeView->selectionModel()->currentIndex();
+  pqPipelineModelItem *item = this->ListModel->getItem(current);
+  pqPipelineSource *source = qobject_cast<pqPipelineSource *>(item);
+  if(source)
+    {
+    pqApplicationCore::instance()->getPipelineBuilder()->remove(source);
+    }
+  // TODO: Handle the delete of a server and a link.
 }
 
 //-----------------------------------------------------------------------------
