@@ -449,7 +449,13 @@ ENDIF(WIN32)
 # --------------------------------------------------------------------------
 # Internationalization
 
-OPTION(KWWidgets_USE_INTERNATIONALIZATION "Enable internationalization support in KWWidgets." OFF)
+IF(DEFINED KWWidgets_USE_INTERNATIONALIZATION)
+  SET(default_val ${KWWidgets_USE_INTERNATIONALIZATION})
+ELSE(DEFINED KWWidgets_USE_INTERNATIONALIZATION)
+  SET(default_val 0)
+ENDIF(DEFINED KWWidgets_USE_INTERNATIONALIZATION)
+OPTION(KWWidgets_USE_INTERNATIONALIZATION 
+  "Enable internationalization support in KWWidgets." ${default_val})
 MARK_AS_ADVANCED(KWWidgets_USE_INTERNATIONALIZATION)
 IF(KWWidgets_USE_INTERNATIONALIZATION)
   FIND_PACKAGE(Gettext)
