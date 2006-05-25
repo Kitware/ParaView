@@ -203,18 +203,6 @@ void pqVariableSelectorWidget::onVariableChanged(pqVariableType vtkNotUsed(type)
 }
 
 //-----------------------------------------------------------------------------
-void pqVariableSelectorWidget::onDisplayAdded(pqPipelineSource* src, 
-  pqPipelineDisplay*)
-{
-  if (src != this->SelectedSource)
-    {
-    qDebug() << "onDisplayAdded called on an obsolete source.";
-    return;
-    }
-  this->updateVariableSelector(src);
-}
-
-//-----------------------------------------------------------------------------
 void pqVariableSelectorWidget::updateVariableSelector(pqPipelineSource* source)
 {
   this->VTKConnect->Disconnect();
@@ -222,38 +210,53 @@ void pqVariableSelectorWidget::updateVariableSelector(pqPipelineSource* source)
   this->clear();
   this->addVariable(VARIABLE_TYPE_NONE, "Solid Color");
 
-  if (this->SelectedSource)
-    {
-    // clean up any signals.
-    QObject::disconnect(this->SelectedSource, 0, this, 0);
-    }
-
   this->SelectedSource = source;
 
-  if (!source)
+  if (!source || source->getDisplayCount() == 0)
     {
     this->IgnoreWidgetChanges = false;
     // nothing more to do.
     return;
     }
 
-  if (source->getDisplayCount() == 0)
+  this->reloadGUI();
+
+
+  pqPipelineDisplay* display = source->getDisplay(0);
+  vtkSMDataObjectDisplayProxy* displayProxy = display->getProxy();
+
+  this->VTKConnect->Connect(displayProxy->GetProperty("ScalarVisibility"),
+    vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
+  this->VTKConnect->Connect(displayProxy->GetProperty("ScalarMode"),
+    vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
+  this->VTKConnect->Connect(displayProxy->GetProperty("ColorArray"),
+    vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
+
+  this->IgnoreWidgetChanges = false;
+}
+
+//-----------------------------------------------------------------------------
+void pqVariableSelectorWidget::updateGUI()
+{
+  if (this->SelectedSource && this->SelectedSource->getDisplayCount())
     {
-    // Wait till the display gets created.
-    QObject::connect(
-      source, SIGNAL(displayAdded(pqPipelineSource*, pqPipelineDisplay*)),
-      this, SLOT(onDisplayAdded(pqPipelineSource*, pqPipelineDisplay*)),
-      Qt::QueuedConnection);
+    this->IgnoreWidgetChanges = true;
+    this->Variables->setCurrentIndex(
+      this->Variables->findText(pqPart::GetColorField(
+          this->SelectedSource->getDisplay(0)->getProxy())));
     this->IgnoreWidgetChanges = false;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqVariableSelectorWidget::reloadGUI()
+{
+  pqPipelineSource* source = this->SelectedSource;
+  if (!source || source->getDisplayCount() == 0)
+    {
     return;
     }
 
-  // pqVariableSelectorWidget must actually be listening to color change
-  // on the proxy, so that if during undo/redo the coloring changes,
-  // the toolbar will get updated.
-
-  // This code must be reorganized, there is duplication here and in
-  // pqParts.
   pqPipelineDisplay* display = source->getDisplay(0);
   vtkSMDataObjectDisplayProxy* displayProxy = display->getProxy();
 
@@ -292,26 +295,4 @@ void pqVariableSelectorWidget::updateVariableSelector(pqPipelineSource* source)
 
   this->Variables->setCurrentIndex(
     this->Variables->findText(currentArray));
-
-  this->VTKConnect->Connect(displayProxy->GetProperty("ScalarVisibility"),
-    vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
-  this->VTKConnect->Connect(displayProxy->GetProperty("ScalarMode"),
-    vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
-  this->VTKConnect->Connect(displayProxy->GetProperty("ColorArray"),
-    vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
-
-  this->IgnoreWidgetChanges = false;
-}
-
-//-----------------------------------------------------------------------------
-void pqVariableSelectorWidget::updateGUI()
-{
-  if (this->SelectedSource && this->SelectedSource->getDisplayCount())
-    {
-    this->IgnoreWidgetChanges = true;
-    this->Variables->setCurrentIndex(
-      this->Variables->findText(pqPart::GetColorField(
-          this->SelectedSource->getDisplay(0)->getProxy())));
-    this->IgnoreWidgetChanges = false;
-    }
 }

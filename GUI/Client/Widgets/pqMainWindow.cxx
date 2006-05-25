@@ -396,14 +396,6 @@ void pqMainWindow::createStandardObjectInspector(bool visible)
   this->Implementation->Inspector = 
     new pqObjectInspectorWidget(object_inspector_dock);
   object_inspector_dock->setWidget(this->Implementation->Inspector);
-  /*
-  if(this->Implementation->PipelineBrowser)
-    {
-    connect(this->Implementation->PipelineBrowser, 
-      SIGNAL(proxySelected(vtkSMProxy *)),
-      this->Implementation->Inspector, SLOT(setProxy(vtkSMProxy *)));
-    }
-  */
   
   pqUndoStack* undoStack = pqApplicationCore::instance()->getUndoStack();
   // Connect Accept/reset signals.
@@ -415,11 +407,28 @@ void pqMainWindow::createStandardObjectInspector(bool visible)
     this->Implementation->Inspector, 
     SIGNAL(postaccept()), undoStack, SLOT(EndUndoSet()));
 
+  QObject::connect(
+    this->Implementation->Inspector, SIGNAL(postaccept()), 
+    this, SLOT(postAcceptUpdate()));
+
   QObject::connect(this->Implementation->Inspector, SIGNAL(accepted()), 
     pqApplicationCore::instance(), SLOT(createPendingDisplays()));
   QObject::connect(
     pqApplicationCore::instance(), SIGNAL(pendingDisplays(bool)),
     this->Implementation->Inspector, SLOT(forceModified(bool)));
+
+  if (this->Implementation->VariableSelectorToolBar)
+    {
+    // Connecting to accept/postaccept signals from a panel
+    // is a hassle, can't we have something more centralized?
+    pqVariableSelectorWidget* varSelector = this->Implementation->
+      VariableSelectorToolBar->findChild<pqVariableSelectorWidget*>();
+    if (varSelector)
+      {
+      this->connect(this->Implementation->Inspector, SIGNAL(postaccept()),
+        varSelector, SLOT(reloadGUI()));
+      }
+    }
 
   this->addStandardDockWidget(Qt::LeftDockWidgetArea, 
     object_inspector_dock, QIcon(), visible);
@@ -517,6 +526,12 @@ void pqMainWindow::createStandardVariableToolBar()
   
   this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), 
     this, SIGNAL(variableChanged(pqVariableType, const QString&)));
+
+  if (this->Implementation->Inspector)
+    {
+    this->connect(this->Implementation->Inspector, SIGNAL(postaccept()),
+      varSelector, SLOT(reloadGUI()));
+    }
     
   this->addToolBar(Qt::TopToolBarArea, this->Implementation->VariableSelectorToolBar);
 }
@@ -1510,6 +1525,12 @@ void pqMainWindow::onActiveSourceChanged(pqPipelineSource* src)
     }
   this->updateFiltersMenu(src);
   this->updateEnableState();
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::postAcceptUpdate()
+{
+  this->updateFiltersMenu(pqApplicationCore::instance()->getActiveSource());
 }
 
 //-----------------------------------------------------------------------------

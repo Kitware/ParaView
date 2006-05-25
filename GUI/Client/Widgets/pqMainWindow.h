@@ -201,6 +201,9 @@ private slots:
   void onRemoveServer(pqServer *server);
   void onAddWindow(QWidget *window);
 
+  // performs updates that need to be done after accept.
+  void postAcceptUpdate();
+
 protected:
   void buildSourcesMenu();
   void buildFiltersMenu();

@@ -85,13 +85,12 @@ private slots:
   /// or the chooseVariable() method.
   void onVariableActivated(int row);
 
-  /// When updateVariableSelector is called, the source may not have any 
-  /// display connected to it, hence we must wait till the display gets 
-  /// connected. This slot is called when the display gets connected.
-  void onDisplayAdded(pqPipelineSource* src, pqPipelineDisplay*);
-
   /// Called when any important property on the display changes.
+  /// This updates the selected value.
   void updateGUI();
+
+  /// Called when the GUI must reload the arrays shown in the widget.
+  void reloadGUI();
 
 private:
   /// Converts a variable type and name into a packed string representation 
