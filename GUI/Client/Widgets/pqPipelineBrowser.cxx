@@ -240,7 +240,7 @@ void pqPipelineBrowser::deleteSelected()
   pqPipelineSource *source = qobject_cast<pqPipelineSource *>(item);
   if(source)
     {
-    pqApplicationCore::instance()->getPipelineBuilder()->remove(source);
+    pqApplicationCore::instance()->removeSource(source);
     }
   // TODO: Handle the delete of a server and a link.
 }

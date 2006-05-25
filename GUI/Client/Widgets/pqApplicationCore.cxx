@@ -446,6 +446,17 @@ void pqApplicationCore::removeActiveSource()
     qDebug() << "No active source to remove.";
     return;
     }
+  this->removeSource(source);
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::removeSource(pqPipelineSource* source)
+{
+  if (!source)
+    {
+    qDebug() << "No source to remove.";
+    return;
+    }
   if (source->getNumberOfConsumers())
     {
     qDebug() << "Active source has consumers, cannot delete";

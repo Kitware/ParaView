@@ -111,6 +111,7 @@ public:
   // All this is delegated to the pipeline builder.
   // This method can only be called when the active source has no consumers.
   void removeActiveSource();
+  void removeSource(pqPipelineSource* source);
 
   /// returns the active source.
   pqPipelineSource* getActiveSource();
