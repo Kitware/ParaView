@@ -129,6 +129,7 @@ SET(Kit_SRCS
   vtkSMXDMFInformationHelper.cxx
   vtkSMXDMFPropertyDomain.cxx
   vtkSMVectorProperty.cxx
+  vtkSMWidgetRepresentationProxy.cxx
   vtkSMWriterProxy.cxx
   vtkSMCubeAxesDisplayProxy.cxx
   vtkSMPointLabelDisplayProxy.cxx

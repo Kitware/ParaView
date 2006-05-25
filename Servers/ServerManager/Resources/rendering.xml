@@ -975,6 +975,28 @@
         <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
 
+     <Property
+       name="SizeHandles"
+       command="SizeHandles">
+     </Property>
+
+     <Property
+       name="OnInteraction"
+       command="OnInteraction"
+       update_self="1">
+     </Property>
+
+     <Property
+       name="OnEndInteraction"
+       command="OnEndInteraction"
+       update_self="1">
+     </Property>
+
+     <ProxyProperty name="Renderer" command="SetRenderer">
+       <ProxyGroupDomain name="groups">
+         <Group name="renderers"/>
+       </ProxyGroupDomain>
+     </ProxyProperty>
     </ImplicitPlaneRepresentationProxy>
   </ProxyGroup>
 

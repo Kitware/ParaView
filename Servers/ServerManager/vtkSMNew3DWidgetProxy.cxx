@@ -33,7 +33,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkSMNew3DWidgetProxy);
-vtkCxxRevisionMacro(vtkSMNew3DWidgetProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMNew3DWidgetProxy, "1.4");
 
 class vtkSMNew3DWidgetObserver : public vtkCommand
 {
@@ -108,6 +108,17 @@ void vtkSMNew3DWidgetProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
       }
     }
 
+  if (this->RepresentationProxy)
+    {
+    vtkSMProxyProperty* rendererProp = 
+      vtkSMProxyProperty::SafeDownCast(
+        this->RepresentationProxy->GetProperty("Renderer"));
+    if (rendererProp)
+      {
+      rendererProp->AddProxy(rm->GetRendererProxy());
+      this->RepresentationProxy->UpdateProperty("Renderer");
+      }
+    }
   this->SetEnabled(1);
 }
 
@@ -126,6 +137,18 @@ void vtkSMNew3DWidgetProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
     if (this->Widget)
       {
       widget->SetInteractor(0);
+      }
+    }
+
+  if (this->RepresentationProxy)
+    {
+    vtkSMProxyProperty* rendererProp = 
+      vtkSMProxyProperty::SafeDownCast(
+        this->RepresentationProxy->GetProperty("Renderer"));
+    if (rendererProp)
+      {
+      rendererProp->RemoveAllProxies();
+      this->RepresentationProxy->UpdateProperty("Renderer");
       }
     }
 }
@@ -186,6 +209,8 @@ void vtkSMNew3DWidgetProxy::CreateVTKObjects(int numObjects)
       vtkCommand::StartInteractionEvent, this->Observer);
     this->Widget->AddObserver(
       vtkCommand::EndInteractionEvent, this->Observer);
+    this->Widget->AddObserver(
+      vtkCommand::InteractionEvent, this->Observer);
     }
 
   vtkSMPropertyIterator* piter = this->NewPropertyIterator();
@@ -221,6 +246,26 @@ void vtkSMNew3DWidgetProxy::ExecuteEvent(unsigned long event)
       {
       inter->InteractiveRenderEnabledOn();
       }
+    vtkSMProperty* startInt = 
+      this->RepresentationProxy->GetProperty("OnStartInteraction");
+    if (startInt)
+      {
+      startInt->Modified();
+      this->RepresentationProxy->UpdateProperty("OnStartInteraction");
+      }
+    }
+  else if (event == vtkCommand::InteractionEvent)
+    {
+    this->RepresentationProxy->UpdatePropertyInformation();
+    this->UpdateVTKObjects();
+
+    vtkSMProperty* interaction = 
+      this->RepresentationProxy->GetProperty("OnInteraction");
+    if (interaction)
+      {
+      interaction->Modified();
+      this->RepresentationProxy->UpdateProperty("OnInteraction");
+      }
     }
   else if (event == vtkCommand::EndInteractionEvent)
     {
@@ -231,11 +276,20 @@ void vtkSMNew3DWidgetProxy::ExecuteEvent(unsigned long event)
       {
       inter->InteractiveRenderEnabledOff();
       }
-    this->RepresentationProxy->UpdatePropertyInformation();
-    vtkSMDoubleVectorProperty* value = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->RepresentationProxy->GetProperty("Value"));
-    value = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->RepresentationProxy->GetProperty("ValueInfo"));
+    vtkSMProperty* sizeHandles = 
+      this->RepresentationProxy->GetProperty("SizeHandles");
+    if (sizeHandles)
+      {
+      sizeHandles->Modified();
+      this->RepresentationProxy->UpdateProperty("SizeHandles");
+      }
+    vtkSMProperty* endInt = 
+      this->RepresentationProxy->GetProperty("OnEndInteraction");
+    if (endInt)
+      {
+      endInt->Modified();
+      this->RepresentationProxy->UpdateProperty("OnEndInteraction");
+      }
     }
 }
 
