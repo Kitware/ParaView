@@ -7,6 +7,8 @@
         <file alias="pqBundle32.png">Resources/pqBundle32.png</file>
         <file alias="pqCamera16.png">Resources/pqCamera16.png</file>
         <file alias="pqCamerad16.png">Resources/pqCamerad16.png</file>
+        <file alias="pqCancel16.png">Resources/pqCancel16.png</file>
+        <file alias="pqCancel22.png">Resources/pqCancel22.png</file>
         <file alias="pqFilter16.png">Resources/pqFilter16.png</file>
         <file alias="pqFilter22.png">Resources/pqFilter22.png</file>
         <file alias="pqFilter32.png">Resources/pqFilter32.png</file>
@@ -24,6 +26,8 @@
         <file alias="pqSplit16.png">Resources/pqSplit16.png</file>
         <file alias="pqSplitViewH12.png">Resources/pqSplitViewH12.png</file>
         <file alias="pqSplitViewV12.png">Resources/pqSplitViewV12.png</file>
+        <file alias="pqUpdate16.png">Resources/pqUpdate16.png</file>
+        <file alias="pqUpdate22.png">Resources/pqUpdate22.png</file>
         <file alias="pqVcrBack22.png">Resources/pqVcrBack22.png</file>
         <file alias="pqVcrFirst22.png">Resources/pqVcrFirst22.png</file>
         <file alias="pqVcrForward22.png">Resources/pqVcrForward22.png</file>

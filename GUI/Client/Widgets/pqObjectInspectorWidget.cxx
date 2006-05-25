@@ -90,11 +90,15 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->AcceptButton = new QPushButton(this);
   this->AcceptButton->setObjectName("Accept");
   this->AcceptButton->setText(tr("Accept"));
+  this->AcceptButton->setIcon(QIcon(QPixmap(":/pqWidgets/pqUpdate16.png")));
   this->ResetButton = new QPushButton(this);
   this->ResetButton->setObjectName("Reset");
   this->ResetButton->setText(tr("Reset"));
+  this->ResetButton->setIcon(QIcon(QPixmap(":/pqWidgets/pqCancel16.png")));
+  buttonlayout->addStretch();
   buttonlayout->addWidget(this->AcceptButton);
   buttonlayout->addWidget(this->ResetButton);
+  buttonlayout->addStretch();
 
   boxLayout->addStretch();
   
@@ -138,16 +142,6 @@ void pqObjectInspectorWidget::canAccept(bool status)
 {
   this->AcceptButton->setEnabled(status);
   this->ResetButton->setEnabled(status);
-  if (status)
-    {
-    QPalette palette = this->AcceptButton->palette();
-    palette.setBrush(QPalette::Button, Qt::darkGreen); 
-    this->AcceptButton->setPalette(palette);
-    }
-  else
-    {
-    this->AcceptButton->setPalette(this->ResetButton->palette());
-    }
 }
 
 //-----------------------------------------------------------------------------
