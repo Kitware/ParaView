@@ -76,6 +76,11 @@ public:
   // Get the number of server connections available.
   unsigned int getNumberOfServers();
 
+  // Get the number of sources. Eventually, we may want this 
+  // to take a server argument and returns the number of sources
+  // on the server.
+  unsigned int getNumberOfSources();
+
   /// Given the name for a Source, get the pqServer on which the
   //// source exists.
   // pqServer* getServerForSource(QString name);

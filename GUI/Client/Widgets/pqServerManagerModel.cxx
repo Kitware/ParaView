@@ -414,4 +414,9 @@ unsigned int pqServerManagerModel::getNumberOfServers()
 }
 
 //-----------------------------------------------------------------------------
+unsigned int pqServerManagerModel::getNumberOfSources()
+{
+  return static_cast<unsigned int>(this->Internal->Sources.size());
+}
+
 //-----------------------------------------------------------------------------
