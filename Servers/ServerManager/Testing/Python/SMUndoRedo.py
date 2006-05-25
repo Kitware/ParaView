@@ -95,30 +95,44 @@ del display
 del proxy2
 del filter
 
-RenderAndWait(renModule)
 
+RenderAndWait(renModule)
+def UpdateVTKObjects(pxm):
+  pxm.UpdateRegisteredProxies("mygroup", 1)
+  pxm.UpdateRegisteredProxies("filters", 1)
+  pxm.UpdateRegisteredProxies("displays", 1)
+  pxm.UpdateRegisteredProxies(1)
+  return
+
+print "** UNDO **"
 while undoStack.GetNumberOfUndoSets() > 0:
   print "**** Undo: %s" % undoStack.GetUndoSetLabel(0)
   undoStack.Undo()
-  pxm.UpdateRegisteredProxies(0)
+  UpdateVTKObjects(pxm)
   RenderAndWait(renModule)
   
+print "** REDO **"
 while undoStack.GetNumberOfRedoSets() > 0:
   print "**** Redo: %s" % undoStack.GetRedoSetLabel(0)
   undoStack.Redo()
-  pxm.UpdateRegisteredProxies(0)
+  UpdateVTKObjects(pxm)
   RenderAndWait(renModule)
 
+print "** UNDO REDO **"
 # Undo cleanup to test baseline.
 print "**** Undo: %s" % undoStack.GetUndoSetLabel(0)
 undoStack.Undo()
+UpdateVTKObjects(pxm)
 print "**** Redo: %s" % undoStack.GetRedoSetLabel(0)
 undoStack.Redo()
+UpdateVTKObjects(pxm)
 print "**** Undo: %s" % undoStack.GetUndoSetLabel(0)
 undoStack.Undo()
+UpdateVTKObjects(pxm)
 print "**** Undo: %s" % undoStack.GetUndoSetLabel(0)
 undoStack.Undo()
-pxm.UpdateRegisteredProxies(0)
+UpdateVTKObjects(pxm)
+
 RenderAndWait(renModule)
 
 if not SMPythonTesting.DoRegressionTesting():
