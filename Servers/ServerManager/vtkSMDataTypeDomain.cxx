@@ -27,7 +27,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMDataTypeDomain);
-vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.10");
+vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.11");
 
 struct vtkSMDataTypeDomainInternals
 {
@@ -119,6 +119,11 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy)
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   if (!pm)
+    {
+    return 0;
+    }
+
+  if (info->GetNumberOfPoints() == 0)
     {
     return 0;
     }
