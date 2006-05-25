@@ -9,6 +9,7 @@
         <file alias="pqCamerad16.png">Resources/pqCamerad16.png</file>
         <file alias="pqCancel16.png">Resources/pqCancel16.png</file>
         <file alias="pqCancel22.png">Resources/pqCancel22.png</file>
+        <file alias="pqCellData16.png">Resources/pqCellData16.png</file>
         <file alias="pqFilter16.png">Resources/pqFilter16.png</file>
         <file alias="pqFilter22.png">Resources/pqFilter22.png</file>
         <file alias="pqFilter32.png">Resources/pqFilter32.png</file>
@@ -16,10 +17,13 @@
         <file alias="pqLinkIn16.png">Resources/pqLinkIn16.png</file>
         <file alias="pqLinkOut16.png">Resources/pqLinkOut16.png</file>
         <file alias="pqMerge16.png">Resources/pqMerge16.png</file>
+        <file alias="pqNodeSet16.png">Resources/pqNodeSet16.png</file>
         <file alias="pqPipelineList22.png">Resources/pqPipelineList22.png</file>
+        <file alias="pqPointData16.png">Resources/pqPointData16.png</file>
         <file alias="pqServer16.png">Resources/pqServer16.png</file>
         <file alias="pqServer22.png">Resources/pqServer22.png</file>
         <file alias="pqServer32.png">Resources/pqServer32.png</file>
+        <file alias="pqSideSet16.png">Resources/pqSideSet16.png</file>
         <file alias="pqSource16.png">Resources/pqSource16.png</file>
         <file alias="pqSource22.png">Resources/pqSource22.png</file>
         <file alias="pqSource32.png">Resources/pqSource32.png</file>
