@@ -206,7 +206,6 @@ void pqVariableSelectorWidget::onVariableChanged(pqVariableType vtkNotUsed(type)
 void pqVariableSelectorWidget::updateVariableSelector(pqPipelineSource* source)
 {
   this->VTKConnect->Disconnect();
-  this->IgnoreWidgetChanges = true;
   this->clear();
   this->addVariable(VARIABLE_TYPE_NONE, "Solid Color");
 
@@ -214,7 +213,6 @@ void pqVariableSelectorWidget::updateVariableSelector(pqPipelineSource* source)
 
   if (!source || source->getDisplayCount() == 0)
     {
-    this->IgnoreWidgetChanges = false;
     // nothing more to do.
     return;
     }
@@ -257,6 +255,7 @@ void pqVariableSelectorWidget::reloadGUI()
     return;
     }
 
+  this->IgnoreWidgetChanges = true;
   pqPipelineDisplay* display = source->getDisplay(0);
   vtkSMDataObjectDisplayProxy* displayProxy = display->getProxy();
 
@@ -295,4 +294,5 @@ void pqVariableSelectorWidget::reloadGUI()
 
   this->Variables->setCurrentIndex(
     this->Variables->findText(currentArray));
+  this->IgnoreWidgetChanges = false;
 }
