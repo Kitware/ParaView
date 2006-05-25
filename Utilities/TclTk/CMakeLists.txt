@@ -17,7 +17,7 @@ IF(NOT TclTk_INSTALL_BIN_DIR)
   SET(TclTk_INSTALL_BIN_DIR /bin)
 ENDIF(NOT TclTk_INSTALL_BIN_DIR)
 IF(NOT TclTk_INSTALL_LIB_DIR)
-  SET(TclTk_INSTALL_LIB_DIR /lib)
+  SET(TclTk_INSTALL_LIB_DIR /lib/TclTk)
 ENDIF(NOT TclTk_INSTALL_LIB_DIR)
 
 IF(UNIX)
@@ -186,24 +186,27 @@ ENDIF (NOT UNIX)
 
 # Set TK_INTERNAL_PATH
 
-SET (try_file "")
-IF (CYGWIN OR WIN32)
-  SET (try_file "tkWinPort.h")
-ENDIF (CYGWIN OR WIN32)
-IF (APPLE)
-  SET (try_file "tkMacOSXPort.h")
-ENDIF (APPLE)
-IF (try_file)
-  VTK_GET_TCL_TK_VERSION ("TCL_TK_MAJOR_VERSION" "TCL_TK_MINOR_VERSION")
-  SET (TCL_TK_VERSIOND "${TCL_TK_MAJOR_VERSION}.${TCL_TK_MINOR_VERSION}")
-  FIND_PATH(
-    TK_INTERNAL_PATH 
-    ${try_file} 
-    "${VTK_TCL_TK_INTERNALS_DIR}/tk${TCL_TK_VERSIOND}"
-    DOC "The path to the Tk internal headers (${try_file}).")
-  MARK_AS_ADVANCED(TK_INTERNAL_PATH)
-ENDIF (try_file)
+IF(VTK_TCL_TK_INTERNALS_DIR)
+  SET (try_file "")
+  IF (CYGWIN OR WIN32)
+    SET (try_file "tkWinPort.h")
+  ENDIF (CYGWIN OR WIN32)
+  IF (APPLE)
+    SET (try_file "tkMacOSXPort.h")
+  ENDIF (APPLE)
+  IF (try_file)
+    VTK_GET_TCL_TK_VERSION ("TCL_TK_MAJOR_VERSION" "TCL_TK_MINOR_VERSION")
+    SET (TCL_TK_VERSIOND "${TCL_TK_MAJOR_VERSION}.${TCL_TK_MINOR_VERSION}")
+    FIND_PATH(
+      TK_INTERNAL_PATH 
+      ${try_file} 
+      "${VTK_TCL_TK_INTERNALS_DIR}/tk${TCL_TK_VERSIOND}"
+      DOC "The path to the Tk internal headers (${try_file}).")
+    MARK_AS_ADVANCED(TK_INTERNAL_PATH)
+  ENDIF (try_file)
+ENDIF(VTK_TCL_TK_INTERNALS_DIR)
 
 # Take care of the resources
-
-INCLUDE(${VTK_TCL_TK_WRAPPING_DIR}/vtkDetermineTkResources.cmake)
+IF(VTK_TCL_TK_WRAPPING_DIR)
+  INCLUDE(${VTK_TCL_TK_WRAPPING_DIR}/vtkDetermineTkResources.cmake)
+ENDIF(VTK_TCL_TK_WRAPPING_DIR)
