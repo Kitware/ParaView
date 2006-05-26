@@ -1,14 +1,12 @@
-ADD_EXECUTABLE(TestMemory TestMemory.cxx)
-ADD_EXECUTABLE(TestRemoteProcess TestRemoteProcess.cxx)
-ADD_EXECUTABLE(CommonKWCommonPrintSelf CommonKWCommonPrintSelf.cxx)
+SET(TESTS 
+  Memory
+  Lib
+#  RemoteProcess
+  )
 
-ADD_TEST(TestMemory ${CXX_TEST_PATH}/TestMemory)
-# disable this one for now
-#ADD_TEST(TestRemoteProcess ${CXX_TEST_PATH}/TestRemoteProcess)
-ADD_TEST(CommonKWCommonPrintSelf ${CXX_TEST_PATH}/CommonKWCommonPrintSelf)
-
-
-TARGET_LINK_LIBRARIES(TestMemory KWCommon)
-TARGET_LINK_LIBRARIES(TestRemoteProcess KWCommon)
-TARGET_LINK_LIBRARIES(CommonKWCommonPrintSelf KWCommon)
-
+FOREACH(TEST ${TESTS})
+  SET(EXE_NAME KWCommonTest${TEST})
+  ADD_EXECUTABLE(${EXE_NAME} Test${TEST}.cxx)
+  TARGET_LINK_LIBRARIES(${EXE_NAME} ${KWCommon_LIBRARIES})
+  ADD_TEST(KWCommon-${TEST} ${CXX_TEST_PATH}/${EXE_NAME})
+ENDFOREACH(TEST)

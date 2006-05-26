@@ -1,9 +1,13 @@
 INCLUDE("${KWWidgets_CMAKE_DIR}/KWWidgetsTestingMacros.cmake")
 
-ADD_EXECUTABLE(TestRegistry TestRegistry.cxx)
-TARGET_LINK_LIBRARIES(TestRegistry ${KWWidgets_LIBRARIES})
-KWWidgets_ADD_TEST_WITH_LAUNCHER(TestRegistry TestRegistry)
+SET(TESTS 
+  Random
+  Registry
+  )
 
-ADD_EXECUTABLE(TestRandom TestRandom.cxx)
-TARGET_LINK_LIBRARIES(TestRandom ${KWWidgets_LIBRARIES})
-KWWidgets_ADD_TEST_WITH_LAUNCHER(TestRandom TestRandom)
+FOREACH(TEST ${TESTS})
+  SET(EXE_NAME KWWidgetsTest${TEST})
+  ADD_EXECUTABLE(${EXE_NAME} Test${TEST}.cxx)
+  TARGET_LINK_LIBRARIES(${EXE_NAME} ${KWWidgets_LIBRARIES})
+  KWWidgets_ADD_TEST_WITH_LAUNCHER(KWWidgets-${TEST} ${EXE_NAME})
+ENDFOREACH(TEST)
