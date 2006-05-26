@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    CommonKWCommonPrintSelf.cxx
+  Module:    TestLib.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
