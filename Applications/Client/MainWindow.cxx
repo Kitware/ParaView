@@ -176,6 +176,9 @@ void MainWindow::showHelp()
       QMessageBox::critical(this, "Help error", "Couldn't find"
           " pqClient.adp.\nTry setting the PARAQ_HELP environment variable which"
           " points to that file");
+      
+      delete this->HelpClient;
+      this->HelpClient = NULL;
       return;
     }
     
