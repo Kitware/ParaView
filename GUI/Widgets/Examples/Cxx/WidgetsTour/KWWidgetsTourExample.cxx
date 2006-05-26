@@ -31,13 +31,25 @@ int my_main(int argc, char *argv[])
   example->Delete();
   app->Delete();
 
+  Tcl_DeleteInterp(interp);
+
   return res;
 }
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
 #include <windows.h>
+
+#ifdef _MSC_VER
+#include <crtdbg.h>
+#endif
+
 int __stdcall WinMain(HINSTANCE, HINSTANCE, LPSTR lpCmdLine, int)
 {
+#ifdef _MSC_VER
+  // See if there are any mem leaks at exit time on Windows:
+  _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF|_CRTDBG_LEAK_CHECK_DF);
+#endif  //  _MSC_VER
+
   int argc;
   char **argv;
   vtksys::SystemTools::ConvertWindowsCommandLineToUnixArguments(
