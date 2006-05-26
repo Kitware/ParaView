@@ -65,29 +65,27 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->setObjectName("ObjectInspectorWidget");
 
   this->ForceModified = false;
-  this->TabWidget = 0;
-  this->CurrentAutoPanel = 0;
-  this->CurrentCustomPanel = 0;
-
-  this->TabWidget = new QTabWidget(this);
-  QScrollArea* s = new QScrollArea();
-  s->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-  s->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  s->setWidgetResizable(true);
-  s->setObjectName("ScrollView");
-  QVBoxLayout *boxLayout = new QVBoxLayout(s);
-  boxLayout->setMargin(0);
-
-  this->TabWidget->addTab(s, "");
-  this->TabWidget->setObjectName("TabWidget");
-  this->TabWidget->hide();
+  this->CurrentPanel = 0;
   
   // main layout
-  boxLayout = new QVBoxLayout(this);
-  boxLayout->setMargin(0);
+  QVBoxLayout* mainLayout = new QVBoxLayout(this);
+  mainLayout->setMargin(0);
+
+  QScrollArea*s = new QScrollArea();
+  s->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  s->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  s->setWidgetResizable(true);
+  s->setObjectName("ScrollArea");
+
+  this->PanelArea = new QWidget;
+  this->PanelArea->setSizePolicy(QSizePolicy::MinimumExpanding,
+                                 QSizePolicy::MinimumExpanding);
+  QVBoxLayout *panelLayout = new QVBoxLayout(this->PanelArea);
+  panelLayout->setMargin(0);
+  s->setWidget(this->PanelArea);
+  this->PanelArea->setObjectName("PanelArea");
 
   QBoxLayout* buttonlayout = new QHBoxLayout();
-  boxLayout->addLayout(buttonlayout);
   this->AcceptButton = new QPushButton(this);
   this->AcceptButton->setObjectName("Accept");
   this->AcceptButton->setText(tr("Accept"));
@@ -100,9 +98,10 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   buttonlayout->addWidget(this->AcceptButton);
   buttonlayout->addWidget(this->ResetButton);
   buttonlayout->addStretch();
-
-  boxLayout->addStretch();
   
+  mainLayout->addLayout(buttonlayout);
+  mainLayout->addWidget(s);
+
   this->connect(this->AcceptButton, SIGNAL(clicked()), SLOT(accept()));
   this->connect(this->ResetButton, SIGNAL(clicked()), SLOT(reset()));
 
@@ -120,12 +119,7 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
 pqObjectInspectorWidget::~pqObjectInspectorWidget()
 {
   // delete all queued panels
-  foreach(pqObjectPanel* p, this->QueuedCustomPanels)
-    {
-    delete p;
-    }
-  
-  foreach(pqObjectPanel* p, this->QueuedAutoPanels)
+  foreach(pqObjectPanel* p, this->QueuedPanels)
     {
     delete p;
     }
@@ -149,79 +143,35 @@ void pqObjectInspectorWidget::canAccept(bool status)
 void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
 {
   // do nothing if this proxy is already current
-  if(this->CurrentAutoPanel && this->CurrentAutoPanel->proxy() == proxy)
+  if(this->CurrentPanel && this->CurrentPanel->proxy() == proxy)
     {
     return;
-    }
-
-  QScrollArea* scrollArea = 
-    qobject_cast<QScrollArea*>(this->TabWidget->widget(0));
-  // remove the widget from the scroll area.
-  scrollArea->takeWidget();
-
-  if (this->CurrentAutoPanel)
-    {
-    this->CurrentAutoPanel->unselect();
-    this->CurrentAutoPanel->hide();
-    }
-  if (this->CurrentCustomPanel)
-    {
-    this->CurrentCustomPanel->unselect();
-    this->CurrentCustomPanel->hide();
     }
 
   // we have a proxy with pending changes
   if(this->AcceptButton->isEnabled())
     {
-    // save the panels
-    if(this->CurrentAutoPanel)
+    // save the panel
+    if(this->CurrentPanel)
       {
-      this->CurrentAutoPanel->setObjectName("");
-      this->QueuedAutoPanels.insert(this->CurrentAutoPanel->proxy(),
-        this->CurrentAutoPanel);
-      }
-
-    if(this->CurrentCustomPanel)
-      {
-      this->CurrentCustomPanel->setObjectName("");
-      this->QueuedCustomPanels.insert(this->CurrentCustomPanel->proxy(),
-        this->CurrentCustomPanel);
+      this->PanelArea->layout()->takeAt(0);
+      this->CurrentPanel->unselect();
+      this->CurrentPanel->hide();
+      this->CurrentPanel->setObjectName("");
+      this->QueuedPanels.insert(this->CurrentPanel->proxy(),
+        this->CurrentPanel);
       }
     }
   else
     {
-    // delete the panels
-    if(this->CurrentAutoPanel)
+    // delete the panel
+    if(this->CurrentPanel)
       {
-      delete this->CurrentAutoPanel;
-      }
-
-    if(this->CurrentCustomPanel)
-      {
-      delete this->CurrentCustomPanel;
+      delete this->CurrentPanel;
       }
     }
 
-  this->CurrentCustomPanel = NULL;
-  this->CurrentAutoPanel = NULL;
-
-  bool build_advanced_panel = true; // indicates if the auto generated panel
-        // must be built when custom panel can be built.
-
-  // Remove all tabs.
-  while (this->TabWidget->count() > 1)
-    {
-    this->TabWidget->removeTab(1);
-    }
-
-  this->TabWidget->hide();
-
-  // Remove all widgets in the Object inspector.
-  QLayoutItem* child;
-  while ((child = this->layout()->takeAt(1)) != 0)
-    {
-    delete child; // we are deleting the QLayoutItem not the widget in the item.
-    }
+  this->CurrentPanel = NULL;
 
   // make sure proxy is built
   if(proxy)
@@ -232,32 +182,26 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
   
   // search for a custom form for this proxy with pending changes
   QMap<pqSMProxy, pqObjectPanel*>::iterator iter;
-  iter = this->QueuedCustomPanels.find(proxy);
-  if(iter != this->QueuedCustomPanels.end())
+  iter = this->QueuedPanels.find(proxy);
+  if(iter != this->QueuedPanels.end())
     {
-    this->CurrentCustomPanel = iter.value();
-    this->QueuedCustomPanels.erase(iter);
+    this->CurrentPanel = iter.value();
+    this->QueuedPanels.erase(iter);
     }
 
-  if(proxy && !this->CurrentCustomPanel)
+  if(proxy && !this->CurrentPanel)
     {
     if(QString(proxy->GetXMLName()) == "Clip")
       {
-      this->CurrentCustomPanel = new pqClipPanel(NULL);
-      this->CurrentCustomPanel->setProxy(proxy);
-      build_advanced_panel = false;
+      this->CurrentPanel = new pqClipPanel(NULL);
       }
     else if(QString(proxy->GetXMLName()) == "Cut")
       {
-      this->CurrentCustomPanel = new pqCutPanel(NULL);
-      this->CurrentCustomPanel->setProxy(proxy);
-      build_advanced_panel = false;
+      this->CurrentPanel = new pqCutPanel(NULL);
       }
     else if(QString(proxy->GetXMLName()) == "ExodusReader")
       {
-      this->CurrentCustomPanel = new pqExodusPanel(NULL);
-      this->CurrentCustomPanel->setProxy(proxy);
-      build_advanced_panel = false;
+      this->CurrentPanel = new pqExodusPanel(NULL);
       }
     else
       {
@@ -269,76 +213,25 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
         delete panel;
         panel = NULL;
         }
-        this->CurrentCustomPanel = panel;
-      }
-    
-    if(this->CurrentCustomPanel)
-      {
-      this->CurrentCustomPanel->setProxy(proxy);
-      
-      QObject::connect(this->CurrentCustomPanel->getPropertyManager(), 
-        SIGNAL(canAcceptOrReject(bool)), 
-        this, SLOT(canAccept(bool)));
+        this->CurrentPanel = panel;
       }
     }
 
-  if (!this->CurrentCustomPanel || build_advanced_panel)
+  if(this->CurrentPanel == NULL)
     {
-    // search for an auto generated form for this proxy with pending changes
-    QMap<pqSMProxy, pqAutoGeneratedObjectPanel*>::iterator jter;
-    jter = this->QueuedAutoPanels.find(proxy);
-    if(jter != this->QueuedAutoPanels.end())
-      {
-      this->CurrentAutoPanel = jter.value();
-      this->QueuedAutoPanels.erase(jter);
-      }
-
-    if(this->CurrentAutoPanel == NULL)
-      {
-      this->CurrentAutoPanel = new pqAutoGeneratedObjectPanel;
-      this->CurrentAutoPanel->setProxy(proxy);
-
-      QObject::connect(this->CurrentAutoPanel->getPropertyManager(), 
-        SIGNAL(canAcceptOrReject(bool)), this, SLOT(canAccept(bool)));
-      }
+    this->CurrentPanel = new pqAutoGeneratedObjectPanel;
     }
 
   // the current auto panel always has the name "Editor"
-  if(this->CurrentAutoPanel)
-    {
-    this->CurrentAutoPanel->setObjectName("Editor");
-    }
-
-  if (this->CurrentAutoPanel && this->CurrentCustomPanel)
-    {
-    scrollArea->setWidget(this->CurrentCustomPanel);
-    // note the the scrollArea takes over the ownership of the CurrentCustomPanel,
-    // hence we must takeWidget() before we delete CurrentCustomPanel or anything.
-    this->TabWidget->setTabText(0, proxy->GetXMLName());
-    this->TabWidget->addTab(this->CurrentAutoPanel, "Advanced");
-    this->layout()->addWidget(this->TabWidget);
-    this->TabWidget->show();
-    }
-  else if (this->CurrentCustomPanel)
-    {
-    this->layout()->addWidget(this->CurrentCustomPanel);
-    }
-  else if (this->CurrentAutoPanel)
-    {
-    this->layout()->addWidget(this->CurrentAutoPanel);
-    }
-
-  if (this->CurrentAutoPanel)
-    {
-    this->CurrentAutoPanel->select();
-    this->CurrentAutoPanel->setVisible(!this->CurrentCustomPanel);
-    }
-
-  if (this->CurrentCustomPanel)
-    {
-    this->CurrentCustomPanel->select();
-    this->CurrentCustomPanel->show();
-    }
+  this->CurrentPanel->setObjectName("Editor");
+  this->CurrentPanel->setProxy(proxy);
+  
+  QObject::connect(this->CurrentPanel->getPropertyManager(), 
+    SIGNAL(canAcceptOrReject(bool)), this, SLOT(canAccept(bool)));
+  
+  this->PanelArea->layout()->addWidget(this->CurrentPanel);
+  this->CurrentPanel->select();
+  this->CurrentPanel->show();
 }
 
 void pqObjectInspectorWidget::accept()
@@ -346,24 +239,14 @@ void pqObjectInspectorWidget::accept()
   emit this->preaccept();
 
   // accept all queued panels
-  foreach(pqObjectPanel* p, this->QueuedCustomPanels)
+  foreach(pqObjectPanel* p, this->QueuedPanels)
     {
     p->accept();
     }
   
-  foreach(pqObjectPanel* p, this->QueuedAutoPanels)
+  if (this->CurrentPanel)
     {
-    p->accept();
-    }
-  
-  if(this->CurrentAutoPanel)
-    {
-    this->CurrentAutoPanel->accept();
-    }
-
-  if (this->CurrentCustomPanel)
-    {
-    this->CurrentCustomPanel->accept();
+    this->CurrentPanel->accept();
     }
  
   pqApplicationCore::instance()->getActiveRenderModule()->render();
@@ -380,28 +263,16 @@ void pqObjectInspectorWidget::accept()
     }
     */
   
-  foreach(pqObjectPanel* p, this->QueuedCustomPanels)
+  foreach(pqObjectPanel* p, this->QueuedPanels)
     {
     p->postAccept();
     delete p;
     }
-  this->QueuedCustomPanels.clear();
+  this->QueuedPanels.clear();
   
-  foreach(pqObjectPanel* p, this->QueuedAutoPanels)
+  if (this->CurrentPanel)
     {
-    p->postAccept();
-    delete p;
-    }
-  this->QueuedAutoPanels.clear();
-  
-  if(this->CurrentAutoPanel)
-    {
-    this->CurrentAutoPanel->postAccept();
-    }
-
-  if (this->CurrentCustomPanel)
-    {
-    this->CurrentCustomPanel->postAccept();
+    this->CurrentPanel->postAccept();
     }
   
   this->ForceModified = false;
@@ -414,25 +285,15 @@ void pqObjectInspectorWidget::reset()
   emit this->prereject();
 
   // delete all queued panels
-  foreach(pqObjectPanel* p, this->QueuedCustomPanels)
+  foreach(pqObjectPanel* p, this->QueuedPanels)
     {
     delete p;
     }
-  this->QueuedCustomPanels.clear();
+  this->QueuedPanels.clear();
   
-  foreach(pqObjectPanel* p, this->QueuedAutoPanels)
+  if(this->CurrentPanel)
     {
-    delete p;
-    }
-  this->QueuedAutoPanels.clear();
-
-  if(this->CurrentAutoPanel)
-    {
-    this->CurrentAutoPanel->getPropertyManager()->reject();
-    }
-  if(this->CurrentCustomPanel)
-    {
-    this->CurrentCustomPanel->getPropertyManager()->reject();
+    this->CurrentPanel->getPropertyManager()->reject();
     }
 
   if (this->ForceModified)
@@ -460,30 +321,17 @@ QSize pqObjectInspectorWidget::sizeHint() const
 void pqObjectInspectorWidget::removeProxy(vtkSMProxy* proxy)
 {
   QMap<pqSMProxy, pqObjectPanel*>::iterator iter;
-  iter = this->QueuedCustomPanels.find(proxy);
-  if(iter != this->QueuedCustomPanels.end())
+  iter = this->QueuedPanels.find(proxy);
+  if(iter != this->QueuedPanels.end())
     {
     delete iter.value();
-    this->QueuedCustomPanels.erase(iter);
+    this->QueuedPanels.erase(iter);
     }
   
-  QMap<pqSMProxy, pqAutoGeneratedObjectPanel*>::iterator jter;
-  jter = this->QueuedAutoPanels.find(proxy);
-  if(jter != this->QueuedAutoPanels.end())
+  if(this->CurrentPanel && this->CurrentPanel->proxy() == proxy)
     {
-    delete jter.value();
-    this->QueuedAutoPanels.erase(jter);
-    }
-
-  if(this->CurrentCustomPanel && this->CurrentCustomPanel->proxy() == proxy)
-    {
-    delete this->CurrentCustomPanel;
-    this->CurrentCustomPanel = NULL;
-    }
-  if(this->CurrentAutoPanel && this->CurrentAutoPanel->proxy() == proxy)
-    {
-    delete this->CurrentAutoPanel;
-    this->CurrentAutoPanel = NULL;
+    delete this->CurrentPanel;
+    this->CurrentPanel = NULL;
     }
 }
 

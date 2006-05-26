@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVariant>
 #include <QCheckBox>
 #include <QDoubleSpinBox>
+#include <QAction>
 
 // VTK includes
 
@@ -228,7 +229,34 @@ void pqExodusPanel::linkServerManagerProperties()
     }
 
   this->updateDataRanges();
+
+  QTreeWidget* BlockTree = this->findChild<QTreeWidget*>("BlockArrayStatus");
+
+  QAction* a;
+  a = new QAction("All Blocks On", BlockTree);
+  QObject::connect(a, SIGNAL(triggered(bool)), this, SLOT(blocksOn()));
+  BlockTree->addAction(a);
+  a = new QAction("All Blocks Off", BlockTree);
+  QObject::connect(a, SIGNAL(triggered(bool)), this, SLOT(blocksOff()));
+  BlockTree->addAction(a);
+  BlockTree->setContextMenuPolicy(Qt::ActionsContextMenu);
   
+  a = new QAction("All Sets On", SetsTree);
+  QObject::connect(a, SIGNAL(triggered(bool)), this, SLOT(setsOn()));
+  SetsTree->addAction(a);
+  a = new QAction("All Sets Off", SetsTree);
+  QObject::connect(a, SIGNAL(triggered(bool)), this, SLOT(setsOff()));
+  SetsTree->addAction(a);
+  SetsTree->setContextMenuPolicy(Qt::ActionsContextMenu);
+
+  a = new QAction("All Variables On", VariablesTree);
+  QObject::connect(a, SIGNAL(triggered(bool)), this, SLOT(variablesOn()));
+  VariablesTree->addAction(a);
+  a = new QAction("All Variables Off", VariablesTree);
+  QObject::connect(a, SIGNAL(triggered(bool)), this, SLOT(variablesOff()));
+  VariablesTree->addAction(a);
+  VariablesTree->setContextMenuPolicy(Qt::ActionsContextMenu);
+
 }
 
 void pqExodusPanel::unlinkServerManagerProperties()
@@ -488,4 +516,68 @@ void pqExodusPanel::updateDataRanges()
     }
 }
 
+
+void pqExodusPanel::blocksOn()
+{
+  this->blocksToggle(Qt::Checked);
+}
+
+void pqExodusPanel::blocksOff()
+{
+  this->blocksToggle(Qt::Unchecked);
+}
+
+void pqExodusPanel::blocksToggle(Qt::CheckState c)
+{
+  QTreeWidget* Tree = this->findChild<QTreeWidget*>("BlockArrayStatus");
+  this->toggle(Tree, c);
+}
+
+
+void pqExodusPanel::variablesOn()
+{
+  this->variablesToggle(Qt::Checked);
+}
+
+void pqExodusPanel::variablesOff()
+{
+  this->variablesToggle(Qt::Unchecked);
+}
+
+void pqExodusPanel::variablesToggle(Qt::CheckState c)
+{
+  QTreeWidget* Tree = this->findChild<QTreeWidget*>("Variables");
+  this->toggle(Tree, c);
+}
+
+
+void pqExodusPanel::setsOn()
+{
+  this->setsToggle(Qt::Checked);
+}
+
+void pqExodusPanel::setsOff()
+{
+  this->setsToggle(Qt::Unchecked);
+}
+
+void pqExodusPanel::setsToggle(Qt::CheckState c)
+{
+  QTreeWidget* Tree = this->findChild<QTreeWidget*>("Sets");
+  this->toggle(Tree, c);
+}
+
+void pqExodusPanel::toggle(QTreeWidget* Tree, Qt::CheckState c)
+{
+  if(Tree)
+    {
+    QTreeWidgetItem* item;
+    int i, end = Tree->topLevelItemCount();
+    for(i=0; i<end; i++)
+      {
+      item = Tree->topLevelItem(i);
+      item->setCheckState(0, c);
+      }
+    }
+}
 

@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqLoadedFormObjectPanel.h"
 class pqTreeWidgetItemObject;
+class QTreeWidget;
 
 class pqExodusPanel :
   public pqLoadedFormObjectPanel
@@ -53,6 +54,20 @@ protected slots:
   void displChanged(bool);
 
   void updateDataRanges();
+  
+  void blocksOn();
+  void blocksOff();
+  void blocksToggle(Qt::CheckState);
+  
+  void variablesOn();
+  void variablesOff();
+  void variablesToggle(Qt::CheckState);
+  
+  void setsOn();
+  void setsOff();
+  void setsToggle(Qt::CheckState);
+  
+  void toggle(QTreeWidget*, Qt::CheckState);
 
 protected:
   /// set the proxy to display properties for
