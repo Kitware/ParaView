@@ -421,9 +421,6 @@ void pqExodusPanel::updateDataRanges()
   // update data information about loaded arrays
 
   vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(this->proxy());
-  sp->UpdateVTKObjects();
-  sp->UpdatePipelineInformation();
-  sp->UpdateDataInformation();
   vtkPVDataInformation* di = sp->GetDataInformation();
   vtkPVDataSetAttributesInformation* pdi = di->GetPointDataInformation();
   vtkPVDataSetAttributesInformation* cdi = di->GetCellDataInformation();
