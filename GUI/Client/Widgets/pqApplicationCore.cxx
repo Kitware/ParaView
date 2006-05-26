@@ -465,6 +465,12 @@ void pqApplicationCore::removeSource(pqPipelineSource* source)
     qDebug() << "Active source has consumers, cannot delete";
     return;
     }
+
+  // HACK: This will make sure that the panel for the source being
+  // removed goes away before the source is deleted. Probably the selection
+  // should also go into the undo stack, that way on undo, the GUI selection
+  // can also be restored.
+  this->sourceRemoved(source);
  
   this->getPipelineBuilder()->remove(source);
 
