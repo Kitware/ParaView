@@ -140,6 +140,9 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QSpinBox" name="TimeStepSpin" />
+     </item>
     </layout>
    </item>
    <item row="5" column="0" >

@@ -246,6 +246,7 @@ void pqNamedObjectPanel::linkServerManagerProperties()
         QComboBox* comboBox = qobject_cast<QComboBox*>(foundObject);
         QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundObject);
         QSlider* slider = qobject_cast<QSlider*>(foundObject);
+        QSpinBox* spinBox = qobject_cast<QSpinBox*>(foundObject);
         QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(foundObject);
         if(comboBox)
           {
@@ -274,6 +275,11 @@ void pqNamedObjectPanel::linkServerManagerProperties()
         else if(doubleSpinBox)
           {
           this->PropertyManager->registerLink(doubleSpinBox, "value", SIGNAL(valueChanged(double)),
+                                             this->Proxy, SMProperty);
+          }
+        else if(spinBox)
+          {
+          this->PropertyManager->registerLink(spinBox, "value", SIGNAL(valueChanged(int)),
                                              this->Proxy, SMProperty);
           }
         }
@@ -437,6 +443,7 @@ void pqNamedObjectPanel::unlinkServerManagerProperties()
         QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundObject);
         QSlider* slider = qobject_cast<QSlider*>(foundObject);
         QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(foundObject);
+        QSpinBox* spinBox = qobject_cast<QSpinBox*>(foundObject);
         if(comboBox)
           {
           pqSignalAdaptorComboBox* adaptor = comboBox->findChild<pqSignalAdaptorComboBox*>("ComboBoxAdaptor");
@@ -457,6 +464,11 @@ void pqNamedObjectPanel::unlinkServerManagerProperties()
         else if(doubleSpinBox)
           {
           this->PropertyManager->unregisterLink(doubleSpinBox, "value", SIGNAL(valueChanged(double)),
+                                             this->Proxy, SMProperty);
+          }
+        else if(spinBox)
+          {
+          this->PropertyManager->unregisterLink(spinBox, "value", SIGNAL(valueChanged(int)),
                                              this->Proxy, SMProperty);
           }
         }
