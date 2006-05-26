@@ -648,12 +648,10 @@ ENDIF(NOT KWWidgets_INSTALL_NO_LIBRARIES)
 
 SET(KWWidgets_EXAMPLES_DIR ${KWWidgets_SOURCE_DIR}/Examples)
 
-IF(NOT DEFINED BUILD_EXAMPLES)
-  OPTION(BUILD_EXAMPLES "Build KWWidgets examples." OFF)
-  MARK_AS_ADVANCED(BUILD_EXAMPLES)
-ENDIF(NOT DEFINED BUILD_EXAMPLES)
+OPTION(KWWidgets_BUILD_EXAMPLES "Build KWWidgets examples." ${BUILD_EXAMPLES})
+MARK_AS_ADVANCED(KWWidgets_BUILD_EXAMPLES)
 
-SET(NEED_TO_BUILD_EXAMPLES ${BUILD_EXAMPLES})
+SET(KWWidgets_NEED_TO_BUILD_EXAMPLES ${KWWidgets_BUILD_EXAMPLES})
 
 # --------------------------------------------------------------------------
 # Testing (requires some of the examples)
@@ -663,7 +661,7 @@ MARK_AS_ADVANCED(BUILD_TESTING DART_ROOT TCL_TCLSH)
 IF(BUILD_TESTING AND NOT KWWidgets_DISABLE_TESTING)
   ENABLE_TESTING()
   #SET(BUILDNAME "${PROJECT_NAME}-${BUILDNAME}")
-  SET(NEED_TO_BUILD_EXAMPLES 1)
+  SET(KWWidgets_NEED_TO_BUILD_EXAMPLES 1)
   OPTION(KWWidgets_TEST_OUT_OF_SOURCE "Perform existing tests as out-of-source tests. This checks that external projects can be built against a KWWidgets build tree." OFF)
   MARK_AS_ADVANCED(KWWidgets_TEST_OUT_OF_SOURCE)
   IF(KWWidgets_TEST_OUT_OF_SOURCE)
@@ -705,6 +703,6 @@ SUBDIRS(CMake/ExportConfiguration)
 # examples would stop the install process if they failed to build (say, if a
 # third-party lib like ITK or SOV was broken).
 
-IF(NEED_TO_BUILD_EXAMPLES)
+IF(KWWidgets_NEED_TO_BUILD_EXAMPLES)
   SUBDIRS(Examples)
-ENDIF(NEED_TO_BUILD_EXAMPLES)
+ENDIF(KWWidgets_NEED_TO_BUILD_EXAMPLES)

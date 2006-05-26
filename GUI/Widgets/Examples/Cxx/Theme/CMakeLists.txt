@@ -102,6 +102,6 @@ ENDIF(NOT KWWidgets_SOURCE_DIR AND VTK_TCL_TK_COPY_SUPPORT_LIBRARY)
 # omit this section or change the installation directory, unless you want
 # to install your application right where KWWidgets is already installed.
 
-IF(BUILD_EXAMPLES)
+IF(KWWidgets_BUILD_EXAMPLES)
   INSTALL_TARGETS(${KWWidgets_INSTALL_BIN_DIR} ${EXE_NAME})
-ENDIF(BUILD_EXAMPLES)
+ENDIF(KWWidgets_BUILD_EXAMPLES)

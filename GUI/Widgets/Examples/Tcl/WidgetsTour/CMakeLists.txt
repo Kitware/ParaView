@@ -25,21 +25,21 @@ SET(EXE_SRCS "${EXE_NAME}.tcl")
 # KWWidgets, you can most likely omit this section, unless you want to 
 # install your scripts right where KWWidgets is already installed.
 
-IF(BUILD_EXAMPLES)
+IF(KWWidgets_BUILD_EXAMPLES)
   INSTALL_FILES(
     "${KWWidgets_INSTALL_DATA_DIR}/Examples/Tcl/${PROJECT_NAME}"
     .tcl ${EXE_SRCS})
-ENDIF(BUILD_EXAMPLES)
+ENDIF(KWWidgets_BUILD_EXAMPLES)
 
 # Install all individual widgets examples. They are used by the executable
 # to display the C++ and Tcl source code side-by-side.
 
-IF(BUILD_EXAMPLES)
+IF(KWWidgets_BUILD_EXAMPLES)
   FILE(GLOB WIDGETS_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/Widgets/*.tcl")
   INSTALL_FILES(
     "${KWWidgets_INSTALL_DATA_DIR}/Examples/Tcl/${PROJECT_NAME}/Widgets" 
     .tcl ${WIDGETS_SRCS})
-ENDIF(BUILD_EXAMPLES)
+ENDIF(KWWidgets_BUILD_EXAMPLES)
 
 # Register this example as a test. Our script supports a --test
 # configuration option so that it can be run non-interactively as a test.

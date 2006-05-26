@@ -126,18 +126,18 @@ ENDIF(NOT KWWidgets_SOURCE_DIR AND VTK_TCL_TK_COPY_SUPPORT_LIBRARY)
 # omit this section or change the installation directory, unless you want
 # to install your application right where KWWidgets is already installed.
 
-IF(BUILD_EXAMPLES)
+IF(KWWidgets_BUILD_EXAMPLES)
   INSTALL_TARGETS(${KWWidgets_INSTALL_BIN_DIR} ${EXE_NAME})
-ENDIF(BUILD_EXAMPLES)
+ENDIF(KWWidgets_BUILD_EXAMPLES)
 
 # Install all individual widgets examples. They are used by the executable
 # to display the C++ and Tcl source code side-by-side.
 
-IF(BUILD_EXAMPLES)
+IF(KWWidgets_BUILD_EXAMPLES)
   INSTALL_FILES(
     "${KWWidgets_INSTALL_DATA_DIR}/Examples/Cxx/${PROJECT_NAME}/Widgets"
     .cxx ${WIDGETS_SRCS})
-ENDIF(BUILD_EXAMPLES)
+ENDIF(KWWidgets_BUILD_EXAMPLES)
 
 # Register this example as a test. Our executable supports a --test
 # configuration option so that it can be run non-interactively as a test.
