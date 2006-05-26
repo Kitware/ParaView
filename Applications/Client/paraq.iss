@@ -3,22 +3,22 @@
 
 #define ParaQBuildDir "C:\projects\build\ParaQ2"
 #define ParaQSourceDir"C:\projects\ParaQ2"
-#define QtInstallDir  "C:\Qt\4.1.2"
+#define QtInstallDir  "C:\Qt\4.1.3"
 #define MSDEVHomeDir  "c:\Program Files\Microsoft Visual Studio .NET 2003\SDK\v1.1\Bin"
-#define ParaQVersion "0.9.0"
+#define ParaViewVersion "3.0b"
 
 [Setup]
-AppName=ParaQ
-AppVerName=ParaQ {#ParaQVersion}
+AppName=ParaView
+AppVerName=ParaView {#ParaViewVersion}
 AppPublisher=Kitware Inc
 AppPublisherURL=http://www.paraview.org
 AppSupportURL=http://www.paraview.org
 AppUpdatesURL=http://www.paraview.org
-DefaultDirName={pf}\ParaQ {#ParaQVersion}
-DefaultGroupName=ParaQ {#ParaQVersion}
+DefaultDirName={pf}\ParaView {#ParaViewVersion}
+DefaultGroupName=ParaView {#ParaViewVersion}
 InfoAfterFile={#ParaQSourceDir}\Applications\Client\README
-OutputBaseFilename=ParaQ-{#ParaQVersion}_setup
-OutputDir=C:\projects\release\paraq\{#ParaQVersion}\win32
+OutputBaseFilename=ParaView-{#ParaViewVersion}_setup
+OutputDir=C:\projects\release\paraq\{#ParaViewVersion}\win32
 Compression=lzma
 SolidCompression=yes
 
@@ -92,9 +92,9 @@ Source: {#MSDEVHomeDir}\msvcr71.dll; DestDir: {app}
 Source: README; DestDir: {app}; Flags: ignoreversion
 
 [Icons]
-Name: {group}\ParaQ; Filename: {app}\pqClient.exe; WorkingDir: {app}
-Name: {userdesktop}\ParaQ; Filename: {app}\pqClient.exe; Tasks: desktopicon; WorkingDir: {app}
-Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\ParaQ; Filename: {app}\pqClient.exe; Tasks: quicklaunchicon; WorkingDir: {app}
+Name: {group}\ParaView; Filename: {app}\pqClient.exe; WorkingDir: {app}
+Name: {userdesktop}\ParaView; Filename: {app}\pqClient.exe; Tasks: desktopicon; WorkingDir: {app}
+Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\ParaView; Filename: {app}\pqClient.exe; Tasks: quicklaunchicon; WorkingDir: {app}
 
 [Registry]
 ; remove settings for all versions ...
@@ -103,4 +103,4 @@ Root: HKCU; SubKey: Software\Kitware Inc; Flags: uninsdeletekeyifempty
 
 
 [Run]
-Filename: {app}\pqClient.exe; Description: {cm:LaunchProgram,ParaQ}; Flags: nowait postinstall skipifsilent
+Filename: {app}\pqClient.exe; Description: {cm:LaunchProgram,ParaView}; Flags: nowait postinstall skipifsilent
