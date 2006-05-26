@@ -24,14 +24,15 @@
 #include "vtkSMStateLoader.h"
 #include "vtkSmartPointer.h"
 
-#include <vtkstd/map>
-#include <vtkstd/vector>
 #include <vtkstd/algorithm>
+#include <vtkstd/map>
+#include <vtkstd/set>
+#include <vtkstd/vector>
 
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.34");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.35");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -83,8 +84,12 @@ void vtkSMProxyProperty::AppendCommandToStreamWithRemoveCommand(
     return;
     }
 
-  vtkSMProxyPropertyInternals::VectorOfProxies& prevProxies =
-    this->PPInternals->PreviousProxies;
+  vtkstd::set<vtkSmartPointer<vtkSMProxy> > prevProxies(
+    this->PPInternals->PreviousProxies.begin(),
+    this->PPInternals->PreviousProxies.end());
+  vtkstd::set<vtkSmartPointer<vtkSMProxy> > curProxies(
+    this->PPInternals->Proxies.begin(),
+    this->PPInternals->Proxies.end());
 
   vtkstd::vector<vtkSmartPointer<vtkSMProxy> > proxiesToRemove;
   vtkstd::vector<vtkSmartPointer<vtkSMProxy> > proxiesToAdd;
@@ -95,16 +100,16 @@ void vtkSMProxyProperty::AppendCommandToStreamWithRemoveCommand(
     vtkstd::vector<vtkSmartPointer<vtkSMProxy> > > ii_remove(proxiesToRemove);
   vtkstd::set_difference(prevProxies.begin(),
                          prevProxies.end(),
-                         this->PPInternals->Proxies.begin(),
-                         this->PPInternals->Proxies.end(),
+                         curProxies.begin(),
+                         curProxies.end(),
                          ii_remove);
   
   // Determine the proxies in the Proxies but not in PreviousProxies.
   // These are the proxies to add.
   vtkstd::back_insert_iterator<
     vtkstd::vector<vtkSmartPointer<vtkSMProxy> > > ii_add(proxiesToAdd);
-  vtkstd::set_difference(this->PPInternals->Proxies.begin(),
-                         this->PPInternals->Proxies.end(),
+  vtkstd::set_difference(curProxies.begin(),
+                         curProxies.end(),
                          prevProxies.begin(),
                          prevProxies.end(),
                          ii_add   );
@@ -133,8 +138,9 @@ void vtkSMProxyProperty::AppendCommandToStreamWithRemoveCommand(
  
   // Set PreviousProxies to match the current Proxies.
   // (which is same as PreviousProxies - proxiesToRemove + proxiesToAdd).
-  prevProxies.clear();
-  prevProxies.insert(prevProxies.begin(),
+  this->PPInternals->PreviousProxies.clear();
+  this->PPInternals->PreviousProxies.insert(
+    this->PPInternals->PreviousProxies.begin(),
     this->PPInternals->Proxies.begin(), this->PPInternals->Proxies.end());
 }
 
@@ -566,24 +572,29 @@ void vtkSMProxyProperty::ChildSaveState(vtkPVXMLElement* propertyElement,
   propertyElement->AddAttribute("clear", "0");
   vtkSMProxyPropertyInternals::VectorOfProxies proxiesToRemove;
   vtkSMProxyPropertyInternals::VectorOfProxies proxiesToAdd;
-  vtkSMProxyPropertyInternals::VectorOfProxies& prevProxies =
-    this->PPInternals->PreviousProxies;
+  vtkstd::set<vtkSmartPointer<vtkSMProxy> > prevProxies(
+    this->PPInternals->PreviousProxies.begin(),
+    this->PPInternals->PreviousProxies.end());
+  vtkstd::set<vtkSmartPointer<vtkSMProxy> > curProxies(
+    this->PPInternals->Proxies.begin(),
+    this->PPInternals->Proxies.end());
+
   // Determine the proxies in the PreviousProxies but not in Proxies.
   // These are the proxies to remove.
   vtkstd::back_insert_iterator<
     vtkstd::vector<vtkSmartPointer<vtkSMProxy> > > ii_remove(proxiesToRemove);
   vtkstd::set_difference(prevProxies.begin(),
                          prevProxies.end(),
-                         this->PPInternals->Proxies.begin(),
-                         this->PPInternals->Proxies.end(),
+                         curProxies.begin(),
+                         curProxies.end(),
                          ii_remove);
   
   // Determine the proxies in the Proxies but not in PreviousProxies.
   // These are the proxies to add.
   vtkstd::back_insert_iterator<
     vtkstd::vector<vtkSmartPointer<vtkSMProxy> > > ii_add(proxiesToAdd);
-  vtkstd::set_difference(this->PPInternals->Proxies.begin(),
-                         this->PPInternals->Proxies.end(),
+  vtkstd::set_difference(curProxies.begin(),
+                         curProxies.end(),
                          prevProxies.begin(),
                          prevProxies.end(),
                          ii_add   );
