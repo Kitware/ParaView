@@ -738,11 +738,12 @@ void pqMainWindow::buildFiltersMenu()
       }
     else
       {
-      QMenu *menu = this->Implementation->FiltersMenu->addMenu(*iter) << pqSetName(*iter);
-      categories.insert(*iter, menu);
+      QMenu *_menu = this->Implementation->FiltersMenu->addMenu(*iter) 
+        << pqSetName(*iter);
+      categories.insert(*iter, _menu);
       if((*iter) == "&Alphabetical" || (*iter) == "Alphabetical")
         {
-        alphabetical = menu;
+        alphabetical = _menu;
         }
       }
     }
