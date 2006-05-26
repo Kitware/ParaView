@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.23");
+vtkCxxRevisionMacro(vtkSMPart, "1.24");
 
 
 //----------------------------------------------------------------------------
@@ -85,12 +85,14 @@ void vtkSMPart::GatherDataInformation(int doUpdate)
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  if (doUpdate)
-    {
-    pm->SendPrepareProgress(this->ConnectionID);
-    this->Update();
-    pm->SendCleanupPendingProgress(this->ConnectionID);
-    }
+  // The vtkSMSourceProxy updates the pipeline before gathering
+  // information. The update is no longer necessary here.
+//   if (doUpdate)
+//     {
+//     pm->SendPrepareProgress(this->ConnectionID);
+//     this->Update();
+//     pm->SendCleanupPendingProgress(this->ConnectionID);
+//     }
 
   pm->GatherInformation(this->ConnectionID, vtkProcessModule::DATA_SERVER, 
     this->DataInformation, this->GetID(0));
@@ -402,49 +404,44 @@ void vtkSMPart::CreateTranslatorIfNecessary()
 
 //----------------------------------------------------------------------------
 void vtkSMPart::Update()
-
-
 {
-  //law int fixme;  // I would like to get rid of this method.
-  // Do we every need to update just one part?
-  if (this->UpdateNeeded)
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SendPrepareProgress(this->ConnectionID);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke 
+         << this->GetID(0) << "UpdateInformation"
+         << vtkClientServerStream::End;
+  // When getting rid of streaming, throw away the conditional and 
+  // keep the else.
+  // TODO: disabling for now.
+  if (/*vtkPVProcessModule::GetGlobalStreamBlock()*/ 0)
     {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke 
-           << this->GetID(0) << "UpdateInformation"
-           << vtkClientServerStream::End;
-    // When getting rid of streaming, though away the conditional and keep the else.
-    // TODO: disabling for now.
-    if (/*vtkPVProcessModule::GetGlobalStreamBlock()*/ 0)
-      {
-      stream << vtkClientServerStream::Invoke
-             << pm->GetProcessModuleID() << "GetPartitionId"
-             << vtkClientServerStream::End
-             << vtkClientServerStream::Invoke
-             << this->GetID(0) << "SetUpdateExtent"
-             << vtkClientServerStream::LastResult 
-             << pm->GetNumberOfPartitions(this->ConnectionID) * 200 << 0
-             << vtkClientServerStream::End; 
-      }
-    else
-      {
-      stream << vtkClientServerStream::Invoke
-             << pm->GetProcessModuleID() << "GetPartitionId"
-             << vtkClientServerStream::End
-             << vtkClientServerStream::Invoke
-             << this->GetID(0) << "SetUpdateExtent"
-             << vtkClientServerStream::LastResult 
-             << pm->GetNumberOfPartitions(this->ConnectionID) << 0
-             << vtkClientServerStream::End; 
-       }   
-    stream << vtkClientServerStream::Invoke 
-           << this->GetID(0) << "Update"
-           << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-      vtkProcessModule::DATA_SERVER, stream);
-    this->UpdateNeeded = 0;
+    stream << vtkClientServerStream::Invoke
+           << pm->GetProcessModuleID() << "GetPartitionId"
+           << vtkClientServerStream::End
+           << vtkClientServerStream::Invoke
+           << this->GetID(0) << "SetUpdateExtent"
+           << vtkClientServerStream::LastResult 
+           << pm->GetNumberOfPartitions(this->ConnectionID) * 200 << 0
+           << vtkClientServerStream::End; 
     }
+  else
+    {
+    stream << vtkClientServerStream::Invoke
+           << pm->GetProcessModuleID() << "GetPartitionId"
+           << vtkClientServerStream::End
+           << vtkClientServerStream::Invoke
+           << this->GetID(0) << "SetUpdateExtent"
+           << vtkClientServerStream::LastResult 
+           << pm->GetNumberOfPartitions(this->ConnectionID) << 0
+           << vtkClientServerStream::End; 
+    }   
+  stream << vtkClientServerStream::Invoke 
+         << this->GetID(0) << "Update"
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID,
+                 vtkProcessModule::DATA_SERVER, stream);
+  pm->SendCleanupPendingProgress(this->ConnectionID);
 }
 
 //----------------------------------------------------------------------------
