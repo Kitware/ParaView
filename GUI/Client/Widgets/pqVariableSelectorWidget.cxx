@@ -78,7 +78,10 @@ pqVariableSelectorWidget::pqVariableSelectorWidget( QWidget *p ) :
     SIGNAL(variableChanged(pqVariableType, const QString&)),
     this,
     SLOT(onVariableChanged(pqVariableType, const QString&)));
+
   this->VTKConnect = vtkEventQtSlotConnect::New();
+  this->PendingDisplayPropertyConnections = true;
+  this->BlockEmission = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -89,7 +92,6 @@ pqVariableSelectorWidget::~pqVariableSelectorWidget()
   
   this->Layout = 0;
   this->Variables = 0;
-  this->IgnoreWidgetChanges = false;
   this->VTKConnect->Delete();
 }
 
@@ -107,8 +109,11 @@ void pqVariableSelectorWidget::addVariable(pqVariableType type,
 {
   // Don't allow duplicates to creep in ...
   if(-1 != this->Variables->findData(this->variableData(type, name)))
+    {
     return;
+    }
 
+  bool old_value = this->BlockEmission;
   this->BlockEmission = true;
   switch(type)
     {
@@ -123,7 +128,7 @@ void pqVariableSelectorWidget::addVariable(pqVariableType type,
       this->Variables->addItem(name, this->variableData(type, name));
       break;
     }
-  this->BlockEmission = false;
+  this->BlockEmission = old_value;
 }
 
 //-----------------------------------------------------------------------------
@@ -141,7 +146,9 @@ void pqVariableSelectorWidget::chooseVariable(pqVariableType type,
 void pqVariableSelectorWidget::onVariableActivated(int row)
 {
   if(this->BlockEmission)
+    {
     return;
+    }
 
   const QStringList d = this->Variables->itemData(row).toString().split("|");
   if(d.size() != 2)
@@ -187,10 +194,6 @@ void pqVariableSelectorWidget::onVariableChanged(pqVariableType vtkNotUsed(type)
     {
     return;
     }
-  if (this->IgnoreWidgetChanges)
-    {
-    return;
-    }
 
   // I cannot decide if we should use signals here of directly 
   // call the appropriate methods on undo stack.
@@ -206,10 +209,12 @@ void pqVariableSelectorWidget::onVariableChanged(pqVariableType vtkNotUsed(type)
 void pqVariableSelectorWidget::updateVariableSelector(pqPipelineSource* source)
 {
   this->VTKConnect->Disconnect();
+  this->SelectedSource = source;
+  this->PendingDisplayPropertyConnections = true;
+  this->BlockEmission = true;
   this->clear();
   this->addVariable(VARIABLE_TYPE_NONE, "Solid Color");
-
-  this->SelectedSource = source;
+  this->BlockEmission = false;
 
   if (!source || source->getDisplayCount() == 0)
     {
@@ -219,18 +224,8 @@ void pqVariableSelectorWidget::updateVariableSelector(pqPipelineSource* source)
 
   this->reloadGUI();
 
-
   pqPipelineDisplay* display = source->getDisplay(0);
   vtkSMDataObjectDisplayProxy* displayProxy = display->getProxy();
-
-  this->VTKConnect->Connect(displayProxy->GetProperty("ScalarVisibility"),
-    vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
-  this->VTKConnect->Connect(displayProxy->GetProperty("ScalarMode"),
-    vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
-  this->VTKConnect->Connect(displayProxy->GetProperty("ColorArray"),
-    vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
-
-  this->IgnoreWidgetChanges = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -238,11 +233,11 @@ void pqVariableSelectorWidget::updateGUI()
 {
   if (this->SelectedSource && this->SelectedSource->getDisplayCount())
     {
-    this->IgnoreWidgetChanges = true;
+    this->BlockEmission = true;
     this->Variables->setCurrentIndex(
       this->Variables->findText(pqPart::GetColorField(
           this->SelectedSource->getDisplay(0)->getProxy())));
-    this->IgnoreWidgetChanges = false;
+    this->BlockEmission = false;
     }
 }
 
@@ -255,7 +250,7 @@ void pqVariableSelectorWidget::reloadGUI()
     return;
     }
 
-  this->IgnoreWidgetChanges = true;
+  this->BlockEmission = true;
   this->clear();
   this->addVariable(VARIABLE_TYPE_NONE, "Solid Color");
 
@@ -287,6 +282,18 @@ void pqVariableSelectorWidget::reloadGUI()
     {
     index = 0;
     }
+
   this->Variables->setCurrentIndex(index);
-  this->IgnoreWidgetChanges = false;
+
+  if (this->PendingDisplayPropertyConnections)
+    {
+    this->VTKConnect->Connect(displayProxy->GetProperty("ScalarVisibility"),
+      vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
+    this->VTKConnect->Connect(displayProxy->GetProperty("ScalarMode"),
+      vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
+    this->VTKConnect->Connect(displayProxy->GetProperty("ColorArray"),
+      vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
+    this->PendingDisplayPropertyConnections = false;
+    }
+  this->BlockEmission = false;
 }
