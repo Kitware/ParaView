@@ -187,7 +187,7 @@ pqMainWindow::pqMainWindow() :
   Implementation(new pqImplementation())
 {
   this->setObjectName("MainWindow");
-  this->setWindowTitle("ParaQ");
+  this->setWindowTitle("ParaView");
 
   this->menuBar() << pqSetName("MenuBar");
 
@@ -692,10 +692,10 @@ void pqMainWindow::buildFiltersMenu()
   releasedFilters<<"Cut";
   releasedFilters<<"Threshold";
 
-  QMenu *menu = this->Implementation->FiltersMenu->addMenu("Released") << pqSetName("Released");
+  QMenu *releasedMenu = this->Implementation->FiltersMenu->addMenu("Released") << pqSetName("Released");
   for(iter = releasedFilters.begin(); iter != releasedFilters.end(); ++iter)
     {
-        QAction* action = menu->addAction(*iter) << pqSetName(*iter)
+        QAction* action = releasedMenu->addAction(*iter) << pqSetName(*iter)
           << pqSetData(*iter);
         action->setEnabled(false);
     }

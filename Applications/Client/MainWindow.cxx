@@ -52,7 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 MainWindow::MainWindow()
   : HelpClient(NULL)
 {
-  this->setWindowTitle(QByteArray("ParaQ Client") + QByteArray(" ") + QByteArray(PARAQ_VERSION_FULL));
+  this->setWindowTitle(QByteArray("ParaView") + QByteArray(" ") + QByteArray(PARAQ_VERSION_FULL));
   this->setWindowIcon(QIcon(":pqWidgets/pqAppIcon64.png"));
 
   this->createStandardFileMenu();
@@ -63,10 +63,10 @@ MainWindow::MainWindow()
   this->createStandardToolsMenu();
   
   QMenu* const help_menu = this->helpMenu();
-  help_menu->addAction(tr("&ParaQ Help"))
+  help_menu->addAction(tr("&ParaView Help"))
     << pqSetName("Help")
     << pqConnect(SIGNAL(triggered()), this, SLOT(showHelp()));
-  help_menu->addAction(tr("&About ParaQ"))
+  help_menu->addAction(tr("&About ParaView"))
     << pqSetName("About")
     << pqConnect(SIGNAL(triggered()), this, SLOT(showHelpAbout()));
   
