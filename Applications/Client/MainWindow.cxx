@@ -182,6 +182,10 @@ void MainWindow::showHelp()
     this->HelpClient->setArguments(args);
     this->HelpClient->openAssistant();
   }
+  else if(this->HelpClient && !this->HelpClient->isOpen())
+  {
+    this->HelpClient->openAssistant();
+  }
 
 }
 
