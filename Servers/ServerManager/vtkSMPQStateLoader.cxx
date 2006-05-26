@@ -20,7 +20,7 @@
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.1");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.2");
 vtkCxxSetObjectMacro(vtkSMPQStateLoader, MultiViewRenderModuleProxy, 
   vtkSMMultiViewRenderModuleProxy);
 //-----------------------------------------------------------------------------
@@ -66,8 +66,7 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyFromElement(
       // Create a rendermodule.
       if (this->MultiViewRenderModuleProxy)
         {
-        vtkSMProxy* proxy = 
-          this->MultiViewRenderModuleProxy->NewRenderModule();
+        proxy = this->MultiViewRenderModuleProxy->NewRenderModule();
         if (proxy)
           {
           this->AddCreatedProxy(id, proxy);
