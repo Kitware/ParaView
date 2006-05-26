@@ -256,6 +256,9 @@ void pqVariableSelectorWidget::reloadGUI()
     }
 
   this->IgnoreWidgetChanges = true;
+  this->clear();
+  this->addVariable(VARIABLE_TYPE_NONE, "Solid Color");
+
   pqPipelineDisplay* display = source->getDisplay(0);
   vtkSMDataObjectDisplayProxy* displayProxy = display->getProxy();
 
@@ -279,20 +282,11 @@ void pqVariableSelectorWidget::reloadGUI()
     }
 
   QString currentArray = pqPart::GetColorField(displayProxy);
-  if (currentArray == "Solid Color")
+  int index =  this->Variables->findText(currentArray);
+  if (index == -1)
     {
-    this->chooseVariable(VARIABLE_TYPE_NONE, "Solid Color");
+    index = 0;
     }
-  else if (regExpCell.indexIn(currentArray) != -1)
-    {
-    this->chooseVariable(VARIABLE_TYPE_NODE, currentArray);
-    }
-  else if (regExpPoint.indexIn(currentArray) != -1)
-    {
-    this->chooseVariable(VARIABLE_TYPE_CELL, currentArray);
-    }
-
-  this->Variables->setCurrentIndex(
-    this->Variables->findText(currentArray));
+  this->Variables->setCurrentIndex(index);
   this->IgnoreWidgetChanges = false;
 }
