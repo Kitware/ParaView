@@ -223,9 +223,6 @@ void pqVariableSelectorWidget::updateVariableSelector(pqPipelineSource* source)
     }
 
   this->reloadGUI();
-
-  pqPipelineDisplay* display = source->getDisplay(0);
-  vtkSMDataObjectDisplayProxy* displayProxy = display->getProxy();
 }
 
 //-----------------------------------------------------------------------------

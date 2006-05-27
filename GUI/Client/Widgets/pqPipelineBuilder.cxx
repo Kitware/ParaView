@@ -320,7 +320,7 @@ void pqPipelineBuilder::remove(pqPipelineDisplay* display)
     this->UndoStack->BeginOrContinueUndoSet(QString("Remove Display"));
     }
 
-  this->remove(display);
+  this->removeInternal(display);
 
   if (this->UndoStack)
     {
