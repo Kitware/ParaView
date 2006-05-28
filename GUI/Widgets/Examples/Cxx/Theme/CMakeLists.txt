@@ -65,7 +65,7 @@ CONFIGURE_FILE(
 # Create the executable, and link it against the KWWidgets libraries and our
 # own library.
 
-ADD_EXECUTABLE(${EXE_NAME} WIN32 ${EXE_SRCS} ${RES_FILE})
+ADD_EXECUTABLE(${EXE_NAME} WIN32 ${EXE_SRCS} ${RC_FILENAME})
 TARGET_LINK_LIBRARIES(${EXE_NAME} ${LIB_NAME})
 
 # If we are building this example as a standalone external project:

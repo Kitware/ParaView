@@ -35,7 +35,7 @@ ENDIF(WIN32 AND NOT BORLAND AND NOT CYGWIN)
 
 # Create the executable, and link it against the KWWidgets libraries.
 
-ADD_EXECUTABLE(${EXE_NAME} WIN32 ${EXE_SRCS} ${RES_FILE})
+ADD_EXECUTABLE(${EXE_NAME} WIN32 ${EXE_SRCS} ${RC_FILENAME})
 TARGET_LINK_LIBRARIES(${EXE_NAME} ${KWWidgets_LIBRARIES})
 
 # If we are building this example as a standalone external project:

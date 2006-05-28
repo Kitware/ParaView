@@ -89,7 +89,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 # Create the executable, and link it against the KWWidgets libraries.
 
-ADD_EXECUTABLE(${EXE_NAME} WIN32 ${EXE_SRCS} ${WIDGETS_SRCS} ${RES_FILE})
+ADD_EXECUTABLE(${EXE_NAME} WIN32 ${EXE_SRCS} ${WIDGETS_SRCS} ${RC_FILENAME})
 TARGET_LINK_LIBRARIES(${EXE_NAME} ${LIB_NAME})
 
 # If we are building this example as a standalone external project:
