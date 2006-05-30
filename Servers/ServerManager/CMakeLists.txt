@@ -154,6 +154,7 @@ SET( ServerManager_SRCS
   ${ServerManagerCS_SRCS}
   ${Kit_SRCS}
   ${ServerManagerNonWrapped_SRCS}
+  ${ExtraParaViewServerManagerNonWrapped_SRCS}
   )
 
 # Abstract and Wrap exclude
@@ -294,7 +295,7 @@ ADD_CUSTOM_COMMAND(
 
 SET(PARAVIEW_INCLUDE_MODULES_TO_SMAPPLICATION "")
 FOREACH(rf ${resourceFiles})
-  STRING(REGEX REPLACE "^.*/(.*).xml$" "\\1" moduleName "${rf}")
+  STRING(REGEX REPLACE "^.*/(.*).(xml|pvsm)$" "\\1" moduleName "${rf}")
   SET(oneModule "  init_string =  vtkSMDefaultModules${moduleName}GetInterfaces();\n")
   SET(oneModule "${oneModule}  parser->Parse(init_string);\n")
   SET(oneModule "${oneModule}  parser->ProcessConfiguration(proxyM);\n")
