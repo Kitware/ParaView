@@ -93,7 +93,7 @@ public:
 //-----------------------------------------------------------------------------
 /// constructor
 pqDisplayProxyEditor::pqDisplayProxyEditor(QWidget* p)
-  : QWidget(p)
+  : QWidget(p), DisableSlots(0)
 {
   this->Internal = new pqDisplayProxyEditorInternal;
   this->Internal->setupUi(this);
@@ -124,31 +124,22 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
     this->Internal->Links->removeAllPropertyLinks();
     }
 
-  this->Internal->Display = 0;
+  this->Internal->Display = display;
   if (!display )
     {
     return;
     }
+  
+  // The slots are already connected but we do not want them to execute
+  // while we are initializing the GUI
+  this->DisableSlots = 1;
   
   // setup for visibility
   this->Internal->Links->addPropertyLink(this->Internal->ViewData,
     "checked", SIGNAL(stateChanged(int)),
     displayProxy, displayProxy->GetProperty("Visibility"));
 
-  // set color by array
-  this->Internal->ColorBy->clear();
-  this->Internal->ColorBy->addItems(pqPart::GetColorFields(displayProxy));
-  QString currentArray = pqPart::GetColorField(displayProxy);
-  this->Internal->ColorBy->setCurrentIndex(
-    this->Internal->ColorBy->findText(currentArray));
-  if(currentArray == "Solid Color")
-    {
-    this->Internal->ColorActorColor->setEnabled(true);
-    }
-  else
-    {
-    this->Internal->ColorActorColor->setEnabled(false);
-    }
+  this->updateColorByMenu(true);
 
   // set up actor color
   this->Internal->Links->addPropertyLink(
@@ -257,7 +248,7 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
     "checked", SIGNAL(stateChanged(int)), displayProxy, 
     displayProxy->GetProperty("InterpolateScalarsBeforeMapping"));
 
-  this->Internal->Display = display;
+  this->DisableSlots = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -270,7 +261,7 @@ pqPipelineDisplay* pqDisplayProxyEditor::getDisplay()
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::updateView()
 {
-  if (this->Internal->Display)
+  if (!this->DisableSlots)
     {
     pqApplicationCore::instance()->getActiveRenderModule()->render();
     }
@@ -324,6 +315,10 @@ void pqDisplayProxyEditor::setupGUIConnections()
     this, SLOT(zoomToData()));
   QObject::connect(this->Internal->DismissButton, SIGNAL(pressed()),
     this, SIGNAL(dismiss()));
+  QObject::connect(this->Internal->DismissButton, SIGNAL(pressed()),
+    this, SIGNAL(dismiss()));
+  QObject::connect(this->Internal->StyleRepresentation, SIGNAL(currentIndexChanged(int)),
+    this, SLOT(updateColorByMenu()), Qt::QueuedConnection);
   
   // Create an connect signal adaptors.
   if (!QMetaType::isRegistered(QMetaType::type("QVariant")))
@@ -360,7 +355,7 @@ void pqDisplayProxyEditor::setupGUIConnections()
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::colorByChanged(const QString& val)
 {
-  if (!this->Internal->Display)
+  if (this->DisableSlots)
     {
     return;
     }
@@ -378,9 +373,52 @@ void pqDisplayProxyEditor::colorByChanged(const QString& val)
 }
 
 //-----------------------------------------------------------------------------
+void pqDisplayProxyEditor::updateColorByMenu(bool forceUpdate)
+{
+  if (this->DisableSlots && !forceUpdate)
+    {
+    return;
+    }
+  
+  vtkSMDataObjectDisplayProxy* displayProxy = 
+    this->Internal->Display->getProxy();
+  
+  // changing the colorby combo will cause slots to be executed and change
+  // the array to be colored by to Solid Color. disabling slots to prevent
+  // that
+  this->DisableSlots = 1;
+  this->Internal->ColorBy->clear();
+  this->Internal->ColorBy->addItems(pqPart::GetColorFields(displayProxy));
+  this->DisableSlots = 0;
+  QString currentArray = pqPart::GetColorField(displayProxy);
+  int index = this->Internal->ColorBy->findText(currentArray);
+  if (index == -1)
+    {
+    // Menu changed. The array is no longer available
+    // Color by solid color
+    currentArray = "Solid Color";
+    this->Internal->ColorBy->setCurrentIndex(0);
+    this->colorByChanged(currentArray);
+    }
+  else
+    {
+    this->Internal->ColorBy->setCurrentIndex(index);
+    }
+  
+  if(currentArray == "Solid Color")
+    {
+    this->Internal->ColorActorColor->setEnabled(true);
+    }
+  else
+    {
+    this->Internal->ColorActorColor->setEnabled(false);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::zoomToData()
 {
-  if (!this->Internal->Display)
+  if (this->DisableSlots)
     {
     return;
     }

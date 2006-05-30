@@ -63,11 +63,14 @@ protected slots:
   void updateView();
   void colorByChanged(const QString& val);
   void zoomToData();
+  void updateColorByMenu(bool forceUpdate=false);
   
 protected:
   pqDisplayProxyEditorInternal* Internal;
   void setupGUIConnections();
 
+private:
+  bool DisableSlots;
 };
 
 #endif
