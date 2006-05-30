@@ -105,6 +105,7 @@ IF(BUILD_TESTING)
     ObjectInspectorGlyph
     VariableSelector
     Clip
+    Cut
     )
 
   SET (TESTS_WITHOUT_BASELINES
