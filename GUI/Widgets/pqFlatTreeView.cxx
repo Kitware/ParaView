@@ -1661,6 +1661,10 @@ void pqFlatTreeView::changeSelection(const QItemSelection &selected,
         cy = -1;
         for( ; start <= end; start++)
           {
+          if (start >= parentItem->Items.size())
+            {
+            break;
+            }
           item = parentItem->Items[start];
           if(cy == -1)
             {
