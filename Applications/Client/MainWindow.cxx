@@ -52,7 +52,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 MainWindow::MainWindow()
   : HelpClient(NULL)
 {
-  this->setWindowTitle(QByteArray("ParaView") + QByteArray(" ") + QByteArray(PARAQ_VERSION_FULL));
+  this->setWindowTitle(QByteArray("ParaView") + 
+                       QByteArray(" ") + 
+                       QByteArray(PARAQ_VERSION_FULL) + 
+                       QByteArray(" (alpha)"));
   this->setWindowIcon(QIcon(":pqWidgets/pqAppIcon64.png"));
 
   this->createStandardFileMenu();
