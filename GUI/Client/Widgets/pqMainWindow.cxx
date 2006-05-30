@@ -1529,7 +1529,14 @@ void pqMainWindow::onActiveSourceChanged(pqPipelineSource* src)
     this->Implementation->Inspector->setProxy(
       (src)? src->getProxy() : NULL);
     }
-  this->updateFiltersMenu(src);
+  // Update the filters menu if there are no sources waiting for displays.
+  // Updating the filters menu will cause the execution of a filter because
+  // it's output is needed to check filter matches. We do not want the
+  // filter to execute prematurely.
+  if (pqApplicationCore::instance()->getNumberOfSourcesPendingDisplays() == 0)
+    {
+    this->updateFiltersMenu(src);
+    }
   this->updateEnableState();
 }
 
