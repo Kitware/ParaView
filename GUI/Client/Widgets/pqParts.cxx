@@ -49,7 +49,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 
 
-vtkSMDisplayProxy* pqPart::Add(vtkSMRenderModuleProxy* rm, vtkSMSourceProxy* Part)
+vtkSMDisplayProxy* pqPart::Add(vtkSMRenderModuleProxy* rm, 
+                               vtkSMSourceProxy* Part)
 {
   // without this, you will get runtime errors from the part display
   // (connected below). this should be fixed
@@ -168,7 +169,9 @@ void pqPart::Color(vtkSMDisplayProxy* Part)
   pqGetColorArray(attrInfo, inAttrInfo, arrayInfo);
   if(arrayInfo)
     {
-    pqPart::Color(Part, arrayInfo->GetName(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+    pqPart::Color(Part, 
+                  arrayInfo->GetName(), 
+                  vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
     return;
     }
     
@@ -185,7 +188,9 @@ void pqPart::Color(vtkSMDisplayProxy* Part)
   pqGetColorArray(attrInfo, inAttrInfo, arrayInfo);
   if(arrayInfo)
     {
-    pqPart::Color(Part, arrayInfo->GetName(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+    pqPart::Color(Part, 
+                  arrayInfo->GetName(), 
+                  vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
     return;
     }
     
@@ -214,7 +219,9 @@ void pqPart::Color(vtkSMDisplayProxy* Part)
     pqGetColorArray(attrInfo, inAttrInfo, arrayInfo);
     if(arrayInfo)
       {
-      pqPart::Color(Part, arrayInfo->GetName(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+      pqPart::Color(Part, 
+                    arrayInfo->GetName(), 
+                    vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
       return;
       }
     }
@@ -226,7 +233,9 @@ void pqPart::Color(vtkSMDisplayProxy* Part)
     pqGetColorArray(attrInfo, inAttrInfo, arrayInfo);
     if(arrayInfo)
       {
-      pqPart::Color(Part, arrayInfo->GetName(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+      pqPart::Color(Part, 
+                    arrayInfo->GetName(), 
+                    vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
       return;
       }
     }
@@ -280,7 +289,8 @@ void pqPart::Color(vtkSMDisplayProxy* Part)
 }
 
 //-----------------------------------------------------------------------------
-/// color the part by a specific field, if fieldname is NULL, colors by actor color
+/// color the part by a specific field, if fieldname is NULL, colors by
+//actor color
 void pqPart::Color(vtkSMDisplayProxy* displayProxy, 
   const char* fieldname, int fieldtype)
 {
@@ -361,14 +371,16 @@ void pqPart::Color(vtkSMDisplayProxy* displayProxy,
     property.push_back(prop);
     if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
       {
-      pqSMAdaptor::setSelectionProperty(reader, reader->GetProperty("CellArrayStatus"), property);
+      pqSMAdaptor::setSelectionProperty(
+        reader, reader->GetProperty("CellArrayStatus"), property);
       reader->UpdateVTKObjects();
       vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
       ai = geomInfo->GetCellDataInformation()->GetArrayInformation(fieldname);
       }
     else
       {
-      pqSMAdaptor::setSelectionProperty(reader, reader->GetProperty("PointArrayStatus"), property);
+      pqSMAdaptor::setSelectionProperty(
+        reader, reader->GetProperty("PointArrayStatus"), property);
       reader->UpdateVTKObjects();
       vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
       ai = geomInfo->GetPointDataInformation()->GetArrayInformation(fieldname);
@@ -409,7 +421,8 @@ QList<QString> pqPart::GetColorFields(vtkSMDisplayProxy* display)
     }
 
   // get cell arrays
-  vtkPVDataSetAttributesInformation* cellinfo = geomInfo->GetCellDataInformation();
+  vtkPVDataSetAttributesInformation* cellinfo = 
+    geomInfo->GetCellDataInformation();
   if(cellinfo)
     {
     for(int i=0; i<cellinfo->GetNumberOfArrays(); i++)
@@ -422,7 +435,8 @@ QList<QString> pqPart::GetColorFields(vtkSMDisplayProxy* display)
     }
   
   // get point arrays
-  vtkPVDataSetAttributesInformation* pointinfo = geomInfo->GetPointDataInformation();
+  vtkPVDataSetAttributesInformation* pointinfo = 
+    geomInfo->GetPointDataInformation();
   if(pointinfo)
     {
     for(int i=0; i<pointinfo->GetNumberOfArrays(); i++)
@@ -454,12 +468,16 @@ void pqPart::SetColorField(vtkSMDisplayProxy* Part, const QString& value)
     if(field.right(strlen(" (cell)")) == " (cell)")
       {
       field.chop(strlen(" (cell)"));
-      pqPart::Color(Part, field.toAscii().data(), vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+      pqPart::Color(Part, 
+                    field.toAscii().data(), 
+                    vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
       }
     else if(field.right(strlen(" (point)")) == " (point)")
       {
       field.chop(strlen(" (point)"));
-      pqPart::Color(Part, field.toAscii().data(), vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+      pqPart::Color(Part, 
+                    field.toAscii().data(), 
+                    vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
       }
     }
 }
@@ -467,11 +485,14 @@ void pqPart::SetColorField(vtkSMDisplayProxy* Part, const QString& value)
 
 QString pqPart::GetColorField(vtkSMDisplayProxy* Part)
 {
-  QVariant scalarColor = pqSMAdaptor::getElementProperty(Part, Part->GetProperty("ScalarVisibility"));
+  QVariant scalarColor = pqSMAdaptor::getElementProperty(
+    Part, Part->GetProperty("ScalarVisibility"));
   if(scalarColor.toBool())
     {
-    QVariant scalarMode = pqSMAdaptor::getEnumerationProperty(Part, Part->GetProperty("ScalarMode"));
-    QString scalarArray = pqSMAdaptor::getElementProperty(Part, Part->GetProperty("ColorArray")).toString();
+    QVariant scalarMode = pqSMAdaptor::getEnumerationProperty(
+      Part, Part->GetProperty("ScalarMode"));
+    QString scalarArray = pqSMAdaptor::getElementProperty(
+      Part, Part->GetProperty("ColorArray")).toString();
     if(scalarMode == "UseCellFieldData")
       {
       return scalarArray + " (cell)";
