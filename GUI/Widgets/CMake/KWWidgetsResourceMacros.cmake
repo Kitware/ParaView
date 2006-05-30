@@ -76,13 +76,11 @@ MACRO(KWWidgets_CREATE_RC_FILE)
 
     SET(matches_boolean 0)
     IF("${___arg}" MATCHES ${boolean_parameter_names})
-      MESSAGE("bool: ${arg}")
       SET(matches_boolean 1)
     ENDIF("${___arg}" MATCHES ${boolean_parameter_names})
 
     SET(matches_list 0)
     IF("${___arg}" MATCHES ${list_parameter_names})
-      MESSAGE("list: ${arg}")
       SET(matches_list 1)
     ENDIF("${___arg}" MATCHES ${list_parameter_names})
       
