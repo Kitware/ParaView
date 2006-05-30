@@ -440,12 +440,17 @@ LINK_DIRECTORIES(${PARAVIEW_EXTRA_LINK_DIRECTORIES})
 # once the server changes are merged.
 #
 SET(ExtraParaViewServerNonWrapped_SRCS)
+SET(ExtraParaViewServerManagerNonWrapped_SRCS)
 SET(ExtraParaViewClient_SRCS)
 SET(ExtraParaViewBinary_SRCS)
 SET(ExtraParaViewServer_SRCS)
 SET(ExtraParaViewServerFiltersIncludes)
 SET(ExtraParaViewGUIIncludes)
 
+MACRO(PARAVIEW_INCLUDE_SERVERMANAGER_SOURCES SRCS)
+  SET(ExtraParaViewServerManagerNonWrapped_SRCS
+    ${ExtraParaViewServerManagerNonWrapped_SRCS} ${SRCS})
+ENDMACRO(PARAVIEW_INCLUDE_SERVERMANAGER_SOURCES)
 MACRO(PARAVIEW_INCLUDE_SOURCES SRCS)
   SET(ExtraParaViewServerNonWrapped_SRCS
     ${ExtraParaViewServerNonWrapped_SRCS} ${SRCS})
