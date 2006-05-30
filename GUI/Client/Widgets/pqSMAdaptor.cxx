@@ -225,8 +225,6 @@ void pqSMAdaptor::setProxyListProperty(vtkSMProxy* Proxy,
 QList<pqSMProxy> pqSMAdaptor::getProxyPropertyDomain(vtkSMProxy* Proxy, 
                                                      vtkSMProperty* Property)
 {
-  Property->UpdateDependentDomains();
-
   QList<pqSMProxy> proxydomain;
   vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::SafeDownCast(Property);
   if(proxyProp)
@@ -589,7 +587,6 @@ void pqSMAdaptor::setUncheckedSelectionProperty(vtkSMProxy* Proxy,
 
 QList<QVariant> pqSMAdaptor::getSelectionPropertyDomain(vtkSMProperty* Property)
 {
-  Property->UpdateDependentDomains();
   QList<QVariant> prop;
   vtkSMPropertyAdaptor* adaptor = vtkSMPropertyAdaptor::New();
   adaptor->SetProperty(Property);
@@ -824,6 +821,7 @@ void pqSMAdaptor::setUncheckedEnumerationProperty(vtkSMProxy* vtkNotUsed(Proxy),
     if(ok)
       {
       ivp->SetUncheckedElement(0, v);
+      Property->UpdateDependentDomains();
       }
     }
   else if(EnumerationDomain && ivp && ivp->GetNumberOfElements() > 0)
@@ -835,17 +833,20 @@ void pqSMAdaptor::setUncheckedEnumerationProperty(vtkSMProxy* vtkNotUsed(Proxy),
       if(str == EnumerationDomain->GetEntryText(i))
         {
         ivp->SetUncheckedElement(0, EnumerationDomain->GetEntryValue(i));
+        Property->UpdateDependentDomains();
         }
       }
     }
   else if(StringListDomain && svp)
     {
+    QString str = Value.toString();
     unsigned int nos = svp->GetNumberOfElements();
     for (unsigned int i=0; i < nos ; i++)
       {
       if (svp->GetElementType(i) == vtkSMStringVectorProperty::STRING)
         {
-        svp->SetUncheckedElement(i, Value.toString().toAscii().data());
+        svp->SetUncheckedElement(i, str.toAscii().data());
+        Property->UpdateDependentDomains();
         }
       }
     }
@@ -856,20 +857,20 @@ void pqSMAdaptor::setUncheckedEnumerationProperty(vtkSMProxy* vtkNotUsed(Proxy),
     if (pp->GetNumberOfUncheckedProxies() < 1)
       {
       pp->AddUncheckedProxy(toadd);
+      Property->UpdateDependentDomains();
       }
     else
       {
       pp->SetUncheckedProxy(0, toadd);
+      Property->UpdateDependentDomains();
       }
     }
 
-  Property->UpdateDependentDomains();
 }
 
 QList<QVariant> pqSMAdaptor::getEnumerationPropertyDomain(
                                           vtkSMProperty* Property)
 {
-  Property->UpdateDependentDomains();
   QList<QVariant> enumerations;
 
   vtkSMBooleanDomain* BooleanDomain = NULL;
@@ -1147,7 +1148,6 @@ void pqSMAdaptor::setUncheckedMultipleElementProperty(vtkSMProxy* vtkNotUsed(Pro
 QList<QList<QVariant> > pqSMAdaptor::getMultipleElementPropertyDomain(
                            vtkSMProperty* Property)
 {
-  Property->UpdateDependentDomains();
   QList< QList<QVariant> > domains;
   
   vtkSMDoubleRangeDomain* DoubleDomain = NULL;
@@ -1365,7 +1365,6 @@ void pqSMAdaptor::setUncheckedMultipleElementProperty(vtkSMProxy* vtkNotUsed(Pro
 QList<QVariant> pqSMAdaptor::getMultipleElementPropertyDomain(
                         vtkSMProperty* Property, unsigned int Index)
 {
-  Property->UpdateDependentDomains();
   QList<QVariant> domain;
   
   vtkSMDoubleRangeDomain* DoubleDomain = NULL;

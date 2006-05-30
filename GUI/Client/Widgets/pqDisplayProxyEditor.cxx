@@ -149,8 +149,10 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
 
   // setup for representation
   this->Internal->StyleRepresentation->clear();
+  vtkSMProperty* Property = displayProxy->GetProperty("Representation");
+  Property->UpdateDependentDomains();
   QList<QVariant> items = pqSMAdaptor::getEnumerationPropertyDomain(
-    displayProxy->GetProperty("Representation"));
+    Property);
   foreach(QVariant item, items)
     {
     if (item == "Volume" && !displayProxy->GetHasVolumePipeline())
@@ -166,8 +168,10 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
 
   // setup for interpolation
   this->Internal->StyleInterpolation->clear();
+  Property = displayProxy->GetProperty("Interpolation");
+  Property->UpdateDependentDomains();
   items = pqSMAdaptor::getEnumerationPropertyDomain(
-    displayProxy->GetProperty("Interpolation"));
+    Property);
   foreach(QVariant item, items)
     {
     this->Internal->StyleInterpolation->addItem(item.toString());

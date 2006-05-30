@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqClipPanel.h"
 #include "pqCutPanel.h"
 #include "pqExodusPanel.h"
+#include "pqThresholdPanel.h"
 #include "pqLoadedFormObjectPanel.h"
 #include "pqPipelineData.h"
 #include "pqPropertyManager.h"
@@ -203,6 +204,10 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
       {
       this->CurrentPanel = new pqExodusPanel(NULL);
       }
+    else if(QString(proxy->GetXMLName()) == "Threshold")
+      {
+      this->CurrentPanel = new pqThresholdPanel(NULL);
+      }
     else
       {
       // try to find a custom form in our pqWidgets resources
@@ -228,6 +233,9 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
   
   QObject::connect(this->CurrentPanel->getPropertyManager(), 
     SIGNAL(canAcceptOrReject(bool)), this, SLOT(canAccept(bool)));
+
+  QObject::connect(this->CurrentPanel, SIGNAL(canAcceptOrReject(bool)), 
+                   this, SLOT(canAccept(bool)));
   
   this->PanelArea->layout()->addWidget(this->CurrentPanel);
   this->CurrentPanel->select();

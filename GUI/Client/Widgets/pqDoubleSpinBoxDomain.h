@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqExodusPanel.h
+   Module:    pqDoubleSpinBoxDomain.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,53 +30,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqExodusPanel_h
-#define _pqExodusPanel_h
+#ifndef pq_DoubleSpinBoxDomain_h
+#define pq_DoubleSpinBoxDomain_h
 
-#include "pqLoadedFormObjectPanel.h"
-class pqTreeWidgetItemObject;
-class QTreeWidget;
+#include <QObject>
+#include "pqWidgetsExport.h"
 
-class pqExodusPanel :
-  public pqLoadedFormObjectPanel
+class QDoubleSpinBox;
+class vtkSMProperty;
+
+/// combo box domain 
+/// observers the domain for a combo box and updates accordingly
+class PQWIDGETS_EXPORT pqDoubleSpinBoxDomain : public QObject
 {
   Q_OBJECT
 public:
-  /// constructor
-  pqExodusPanel(QWidget* p = NULL);
-  /// destructor
-  ~pqExodusPanel();
+  /// constructor requires a QDoubleSpinBox, 
+  /// and the property with the domain to observe
+  /// the list of values in the combo box is automatically 
+  /// updated when the domain changes
+  pqDoubleSpinBoxDomain(QDoubleSpinBox* p, vtkSMProperty* prop, int index=-1);
+  ~pqDoubleSpinBoxDomain();
 
-  virtual void postAccept();
-
-protected slots:
-  void applyDisplacements(int);
-  void displChanged(bool);
-
-  void updateDataRanges();
-  
-  void blocksOn();
-  void blocksOff();
-  void blocksToggle(Qt::CheckState);
-  
-  void variablesOn();
-  void variablesOff();
-  void variablesToggle(Qt::CheckState);
-  
-  void setsOn();
-  void setsOff();
-  void setsToggle(Qt::CheckState);
-  
-  void toggle(QTreeWidget*, Qt::CheckState);
+public slots:
+  void domainChanged();
 
 protected:
-  /// populate widgets with properties from the server manager
-  virtual void linkServerManagerProperties();
-  /// set the properties in the server manager with properties in the widgets
-  virtual void unlinkServerManagerProperties();
-
-  pqTreeWidgetItemObject* DisplItem;
-
+  class pqInternal;
+  pqInternal* Internal;
 };
 
 #endif

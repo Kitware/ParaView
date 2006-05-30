@@ -62,12 +62,6 @@ pqExodusPanel::~pqExodusPanel()
 {
 }
 
-//-----------------------------------------------------------------------------
-void pqExodusPanel::setProxyInternal(pqSMProxy p)
-{
-  pqLoadedFormObjectPanel::setProxyInternal(p);
-}
-
 void pqExodusPanel::linkServerManagerProperties()
 {
   // parent class hooks up some of our widgets in the ui

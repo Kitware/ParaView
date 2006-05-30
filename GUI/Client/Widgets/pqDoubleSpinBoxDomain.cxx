@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqComboBoxDomain.cxx
+   Module:    pqDoubleSpinBoxDomain.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -31,10 +31,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 // self include
-#include "pqComboBoxDomain.h"
+#include "pqDoubleSpinBoxDomain.h"
 
 // Qt includes
-#include <QComboBox>
+#include <QDoubleSpinBox>
 
 // VTK includes
 #include <vtkSmartPointer.h>
@@ -44,14 +44,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMProperty.h>
 #include <vtkSMDomain.h>
 #include <vtkSMDomainIterator.h>
-#include <vtkSMEnumerationDomain.h>
+#include <vtkSMDoubleRangeDomain.h>
 
 
 // ParaQ includes
 #include <pqSMAdaptor.h>
 
   
-class pqComboBoxDomain::pqInternal
+class pqDoubleSpinBoxDomain::pqInternal
 {
 public:
   pqInternal()
@@ -63,27 +63,29 @@ public:
     this->Connection->Delete();
     }
   vtkSmartPointer<vtkSMProperty> Property;
+  int Index;
   vtkSmartPointer<vtkSMDomain> Domain;
   vtkEventQtSlotConnect* Connection;
 };
   
 
-pqComboBoxDomain::pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop)
+pqDoubleSpinBoxDomain::pqDoubleSpinBoxDomain(QDoubleSpinBox* p, vtkSMProperty* prop, int index)
   : QObject(p)
 {
   this->Internal = new pqInternal();
   this->Internal->Property = prop;
+  this->Internal->Index = index;
 
   // get domain
   vtkSMDomainIterator* iter = prop->NewDomainIterator();
   iter->Begin();
   while(!iter->IsAtEnd() && !this->Internal->Domain)
     {
-    vtkSMEnumerationDomain* enumeration;
-    enumeration = vtkSMEnumerationDomain::SafeDownCast(iter->GetDomain());
-    if(enumeration)
+    vtkSMDoubleRangeDomain* drange;
+    drange = vtkSMDoubleRangeDomain::SafeDownCast(iter->GetDomain());
+    if(drange)
       {
-      this->Internal->Domain = enumeration;
+      this->Internal->Domain = drange;
       }
     iter->Next();
     }
@@ -99,43 +101,59 @@ pqComboBoxDomain::pqComboBoxDomain(QComboBox* p, vtkSMProperty* prop)
     }
 }
 
-pqComboBoxDomain::~pqComboBoxDomain()
+pqDoubleSpinBoxDomain::~pqDoubleSpinBoxDomain()
 {
   delete this->Internal;
 }
-
-void pqComboBoxDomain::domainChanged()
+  
+void pqDoubleSpinBoxDomain::domainChanged()
 {
-  QComboBox* combo = qobject_cast<QComboBox*>(this->parent());
-  Q_ASSERT(combo != NULL);
-  if(!combo)
+  QDoubleSpinBox* spinbox = qobject_cast<QDoubleSpinBox*>(this->parent());
+  Q_ASSERT(spinbox != NULL);
+  if(!spinbox)
     {
     return;
     }
 
   pqSMAdaptor::PropertyType type;
   type = pqSMAdaptor::getPropertyType(this->Internal->Property);
-  if(type == pqSMAdaptor::ENUMERATION)
+  QList<QVariant> range;
+  if(type == pqSMAdaptor::SINGLE_ELEMENT)
     {
-    QList<QVariant> enums;
-    enums = pqSMAdaptor::getEnumerationPropertyDomain(this->Internal->Property);
-    // save previous value to put back
-    QString old = combo->currentText();
-    combo->blockSignals(true);
-    combo->clear();
-    foreach(QVariant var, enums)
+    range = pqSMAdaptor::getElementPropertyDomain(this->Internal->Property);
+    if(range.size() == 2)
       {
-      combo->addItem(var.toString());
+      double min = range[0].toDouble();
+      double max = range[1].toDouble();
+      if(range[0].type() == QVariant::Double)
+        {
+        spinbox->setSingleStep( (max - min) / 50.0 );  // arbitrary
+        }
+      else
+        {
+        spinbox->setSingleStep(1.0);
+        }
+      spinbox->setRange(min, max);
       }
-    combo->blockSignals(false);
-    int foundOld = combo->findText(old);
-    if(foundOld >= 0)
+    }
+  else if(type == pqSMAdaptor::MULTIPLE_ELEMENTS)
+    {
+    QList<QVariant> range;
+    range = pqSMAdaptor::getMultipleElementPropertyDomain(this->Internal->Property,
+                                                          this->Internal->Index);
+    if(range.size() == 2)
       {
-      combo->setCurrentIndex(foundOld);
-      }
-    else
-      {
-      combo->setCurrentIndex(0);
+      double min = range[0].toDouble();
+      double max = range[1].toDouble();
+      if(range[0].type() == QVariant::Double)
+        {
+        spinbox->setSingleStep( (max - min) / 50.0 );  // arbitrary
+        }
+      else
+        {
+        spinbox->setSingleStep(1.0);
+        }
+      spinbox->setRange(min, max);
       }
     }
 }

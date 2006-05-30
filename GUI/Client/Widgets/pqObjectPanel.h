@@ -80,6 +80,9 @@ public slots:
   /// Called when the panel becomes inactive. Default implemnetation does nothing.
   virtual void unselect() { }
 
+signals:
+  void canAcceptOrReject(bool);
+
 protected:
   /// Internal method that actually sets the proxy. Subclasses must override
   /// this instead of setProxy().
