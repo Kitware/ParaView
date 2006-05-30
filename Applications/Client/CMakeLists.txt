@@ -13,7 +13,7 @@ INCLUDE_DIRECTORIES(
   ${pqClient_BINARY_DIR}
 )
 
-ADD_DEFINITIONS(-DVERSION=${PARAQ_VERSION})
+ADD_DEFINITIONS(-DVERSION="${PARAQ_VERSION}")
 
 # Reduce the number of dirs that get included on moc command line
 # since it causes issues on Windows 2000.
@@ -63,7 +63,7 @@ IF(WIN32)
   LINK_DIRECTORIES(${QT_LIBRARY_DIR})
 ENDIF(WIN32)
 
-ADD_EXECUTABLE(pqClient WIN32 MACOSX_BUNDLE
+ADD_EXECUTABLE(paraview_alpha WIN32 MACOSX_BUNDLE
   AboutDialog.cxx
   AboutDialog.h
   MainWindow.cxx
@@ -77,7 +77,7 @@ ADD_EXECUTABLE(pqClient WIN32 MACOSX_BUNDLE
   ${EXE_ICON}
 )
 
-TARGET_LINK_LIBRARIES(pqClient
+TARGET_LINK_LIBRARIES(paraview_alpha
   pqWidgets
   QtWidgets
   QtChart
@@ -86,13 +86,13 @@ TARGET_LINK_LIBRARIES(pqClient
 )
 
 IF(WIN32)
-  TARGET_LINK_LIBRARIES(pqClient
+  TARGET_LINK_LIBRARIES(paraview_alpha
     optimized qtmain debug qtmaind
   )
 ENDIF(WIN32)
   
 IF(BUILD_TESTING)
-  SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/pqClient --test-directory=${PARAQ_TEST_DIR})
+  SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview_alpha --test-directory=${PARAQ_TEST_DIR})
   SET(TEST_XML ${pqClient_SOURCE_DIR}/Testing/XML)
   SET(TEST_IMAGE ${PARAQ_DATA_ROOT}/Baseline)
 
