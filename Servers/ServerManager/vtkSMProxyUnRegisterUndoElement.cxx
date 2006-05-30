@@ -23,7 +23,7 @@
 
 
 vtkStandardNewMacro(vtkSMProxyUnRegisterUndoElement);
-vtkCxxRevisionMacro(vtkSMProxyUnRegisterUndoElement, "1.4");
+vtkCxxRevisionMacro(vtkSMProxyUnRegisterUndoElement, "1.5");
 vtkCxxSetObjectMacro(vtkSMProxyUnRegisterUndoElement, XMLElement, vtkPVXMLElement);
 //-----------------------------------------------------------------------------
 vtkSMProxyUnRegisterUndoElement::vtkSMProxyUnRegisterUndoElement()
@@ -76,10 +76,10 @@ int vtkSMProxyUnRegisterUndoElement::Undo()
     }
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
   pxm->RegisterProxy(group_name, proxy_name, proxy);
-  // HACK: We note that the proxy is registered after its state has been 
+  // We note that the proxy is registered after its state has been 
   // loaded as a result when the vtkSMUndoStack updates the modified proxies,
-  // this proxy is not going to be updated. Hence we Update it explicitly. 
-  // proxy->UpdateVTKObjects();
+  // this proxy is not going to be updated. Hence we explicitly mark it 
+  // for update. 
   proxy->InvokeEvent(vtkCommand::PropertyModifiedEvent, 0);
   proxy->Delete();
   return 1;
