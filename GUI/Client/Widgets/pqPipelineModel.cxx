@@ -573,7 +573,7 @@ void pqPipelineModel::removeConnection(pqPipelineSource *source,
     &this->Internal->Root);
   if (!sinkItem)
     {
-    qDebug() << "Connection involves a non-added source. Ignoring.";
+    // qDebug() << "Connection involves a non-added source. Ignoring.";
     return;
     }
 
