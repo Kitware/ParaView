@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineDisplay.h"
+#include "pqRenderModule.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 
@@ -203,6 +204,7 @@ void pqVariableSelectorWidget::onVariableChanged(pqVariableType vtkNotUsed(type)
   pqPipelineDisplay* display = this->SelectedSource->getDisplay(0);
   pqPart::SetColorField(display->getProxy(), name);
   stack->EndUndoSet();
+  pqApplicationCore::instance()->getActiveRenderModule()->render();
 }
 
 //-----------------------------------------------------------------------------
@@ -290,6 +292,11 @@ void pqVariableSelectorWidget::reloadGUI()
       vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
     this->VTKConnect->Connect(displayProxy->GetProperty("ColorArray"),
       vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
+    this->VTKConnect->Connect(
+      displayProxy->GetProperty("Representation"), vtkCommand::ModifiedEvent, 
+      this, SLOT(reloadGUI()),
+      NULL, 0.0,
+      Qt::QueuedConnection);
     this->PendingDisplayPropertyConnections = false;
     }
   this->BlockEmission = false;
