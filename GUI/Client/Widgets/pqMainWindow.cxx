@@ -877,6 +877,7 @@ void pqMainWindow::onFileNew()
   pqServer* server = pqApplicationCore::instance()->getActiveServer();
   if (server)
     {
+    pqApplicationCore::instance()->setActiveSource(NULL);
     pqApplicationCore::instance()->getPipelineBuilder()->deleteProxies(server);
     pqServer::disconnect(server);
     }
@@ -1506,6 +1507,11 @@ void pqMainWindow::onAddWindow(QWidget *win)
 //-----------------------------------------------------------------------------
 void pqMainWindow::onCoreActiveChanged()
 {
+  if (this->Implementation->IgnoreBrowserSelectionChanges)
+    {
+    return;
+    }
+
   this->Implementation->IgnoreBrowserSelectionChanges = true;
     
   pqPipelineSource* activeSource = 
@@ -1531,6 +1537,7 @@ void pqMainWindow::onBrowserSelectionChanged(pqPipelineModelItem* item)
     {
     return;
     }
+  this->Implementation->IgnoreBrowserSelectionChanges = true;
   
   // Update the internal iVars that denote the active selections.
   pqServer* server = 0;
@@ -1547,6 +1554,7 @@ void pqMainWindow::onBrowserSelectionChanged(pqPipelineModelItem* item)
     pqApplicationCore::instance()->setActiveSource(0);
     pqApplicationCore::instance()->setActiveServer(server);
     }
+  this->Implementation->IgnoreBrowserSelectionChanges = false;
 }
 
 //-----------------------------------------------------------------------------
