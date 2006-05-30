@@ -89,15 +89,19 @@ void pqPipelineBrowserContextMenu::showContextMenu(const QPoint &pos)
   pqServer* server = dynamic_cast<pqServer*>(model->getItem(current));
   if(source)
     {
+    QAction* action;
+
     // Add the context menu items for a pipeline object.
-    if(source->getDisplayCount())
+    action = menu.addAction("Display Settings...", this, SLOT(showDisplayEditor()));
+    if(source->getDisplayCount() == 0)
       {
-      menu.addAction("Display Settings...", this, SLOT(showDisplayEditor()));
+      action->setEnabled(false);
       }
 
-    if (source->getNumberOfConsumers() == 0)
+    action = menu.addAction("Delete", this->Browser, SLOT(deleteSelected()));
+    if (source->getNumberOfConsumers() > 0)
       {
-      menu.addAction("Delete", this->Browser, SLOT(deleteSelected()));
+      action->setEnabled(false);
       }
     menuHasItems = true;
     }
@@ -142,7 +146,6 @@ void pqPipelineBrowserContextMenu::showDisplayEditor()
   QDialog* dialog = new QDialog(topParent);
   dialog->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
   dialog->setWindowTitle("Display Settings");
-  dialog->setWindowFlags(dialog->windowFlags() | Qt::WindowStaysOnTopHint);
   QHBoxLayout* l = new QHBoxLayout(dialog);
   pqDisplayProxyEditor* editor = new pqDisplayProxyEditor(dialog);
   editor->setDisplay(source->getDisplay(0));
