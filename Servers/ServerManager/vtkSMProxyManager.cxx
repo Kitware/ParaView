@@ -83,7 +83,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.42");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.43");
 vtkCxxSetObjectMacro(vtkSMProxyManager, UndoStack, vtkSMUndoStack);
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -443,6 +443,7 @@ void vtkSMProxyManager::UnRegisterProxies()
   this->Internals->RegisteredProxyMap.erase(
     this->Internals->RegisteredProxyMap.begin(),
     this->Internals->RegisteredProxyMap.end());
+  this->Internals->ModifiedProxies.clear();
 }
 
 //---------------------------------------------------------------------------
@@ -462,7 +463,8 @@ void vtkSMProxyManager::UnRegisterProxy(const char* group, const char* name)
       info.ProxyName = it2->first.c_str();
       
       this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
-
+      
+      this->UnMarkProxyAsModified(it2->second.Proxy);
       it->second.erase(it2);
       }
     }
@@ -486,6 +488,7 @@ void vtkSMProxyManager::UnRegisterProxy(const char* name)
       
       this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
 
+      this->UnMarkProxyAsModified(it2->second.Proxy);
       it->second.erase(it2);
       }
     }
