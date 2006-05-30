@@ -479,6 +479,23 @@ void pqPipelineModel::removeSource(pqPipelineSource* source)
     }
 
   this->removeChildFromParent(item);
+  if (item->Children.size())
+    {
+    // Move the children to the server.
+    pqServerManagerModel* model = pqServerManagerModel::instance();
+    pqServer* server = model->getServerForSource(source);
+    pqPipelineModelDataItem* _parent = this->getDataItem(server,
+      &this->Internal->Root);
+    if (!_parent)
+      {
+      _parent = &this->Internal->Root;
+      }
+    foreach(pqPipelineModelDataItem* child, item->Children)
+      {
+      child->Parent = NULL;
+      this->addChild(_parent, child);
+      }
+    }
 
   // TODO: cleanup server subtree.
   delete item;
