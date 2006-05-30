@@ -160,6 +160,16 @@ void pqThresholdPanel::linkServerManagerProperties()
                             Property,
                             1);
   d2->setObjectName("upperSpinDomain");
+
+
+  // TODO -- pqDoubleSpinBoxDomain::updateDomain should automatically be called
+  //         let's hack and help out a bit.
+  QObject::connect(Scalars, SIGNAL(currentIndexChanged(int)),
+                   d1, SLOT(domainChanged()));
+  QObject::connect(Scalars, SIGNAL(currentIndexChanged(int)),
+                   d2, SLOT(domainChanged()));
+
+
 }
 
 void pqThresholdPanel::unlinkServerManagerProperties()
