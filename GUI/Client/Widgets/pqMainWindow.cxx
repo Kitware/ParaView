@@ -136,7 +136,8 @@ public:
     PropertyToolbar(0),
     UndoRedoToolBar(0),
     VariableSelectorToolBar(0),
-    VCRController(0)
+    VCRController(0),
+    IgnoreBrowserSelectionChanges(false)
   {
 
   }
@@ -178,6 +179,8 @@ public:
   QToolBar* UndoRedoToolBar;
   QToolBar* VariableSelectorToolBar;
   pqVCRController* VCRController;
+
+  bool IgnoreBrowserSelectionChanges;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -216,6 +219,11 @@ pqMainWindow::pqMainWindow() :
     this, SLOT(onActiveSourceChanged(pqPipelineSource*)));
   QObject::connect(core, SIGNAL(activeServerChanged(pqServer*)),
     this, SLOT(onActiveServerChanged(pqServer*)));
+
+  QObject::connect(core, SIGNAL(activeSourceChanged(pqPipelineSource*)),
+    this, SLOT(onCoreActiveChanged()));
+  QObject::connect(core, SIGNAL(activeServerChanged(pqServer*)),
+    this, SLOT(onCoreActiveChanged()));
 
   // Update enable state when pending displays state changes.
   QObject::connect(core, SIGNAL(pendingDisplays(bool)),
@@ -375,15 +383,9 @@ void pqMainWindow::createStandardPipelineBrowser(bool visible)
     SIGNAL(selectionChanged(pqPipelineModelItem*)), 
     this, SLOT(onBrowserSelectionChanged(pqPipelineModelItem*)));
 
-  // Connect selection change slots.
-  QObject::connect(pqApplicationCore::instance(), 
-    SIGNAL(activeSourceChanged(pqPipelineSource*)),
-    this->Implementation->PipelineBrowser, 
-    SLOT(select(pqPipelineSource*)));
-
-  QObject::connect(pqApplicationCore::instance(), 
-    SIGNAL(activeServerChanged(pqServer*)),
-    this->Implementation->PipelineBrowser, SLOT(select(pqServer*)));
+  QObject::connect(this, SIGNAL(select(pqPipelineModelItem*)),
+    this->Implementation->PipelineBrowser,
+    SLOT(select(pqPipelineModelItem*)));
 
 }
 //-----------------------------------------------------------------------------
@@ -1502,8 +1504,34 @@ void pqMainWindow::onAddWindow(QWidget *win)
 }
 
 //-----------------------------------------------------------------------------
+void pqMainWindow::onCoreActiveChanged()
+{
+  this->Implementation->IgnoreBrowserSelectionChanges = true;
+    
+  pqPipelineSource* activeSource = 
+    pqApplicationCore::instance()->getActiveSource();
+  pqServer* activeServer = pqApplicationCore::instance()->getActiveServer();
+ 
+  pqPipelineModelItem* item = activeSource;
+  if (!item)
+    {
+    item = activeServer;
+    }
+
+  emit this->select(item);
+  
+
+  this->Implementation->IgnoreBrowserSelectionChanges = false;
+}
+
+//-----------------------------------------------------------------------------
 void pqMainWindow::onBrowserSelectionChanged(pqPipelineModelItem* item)
 {
+  if (this->Implementation->IgnoreBrowserSelectionChanges)
+    {
+    return;
+    }
+  
   // Update the internal iVars that denote the active selections.
   pqServer* server = 0;
   pqPipelineSource* source = dynamic_cast<pqPipelineSource*>(item);

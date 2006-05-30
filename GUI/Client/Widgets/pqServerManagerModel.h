@@ -64,6 +64,7 @@ public:
   pqServerManagerModel(QObject* parent=NULL);
   virtual ~pqServerManagerModel();
 
+  // Avoid using this, this will be take out soon.
   static pqServerManagerModel* instance();
 
   /// Given a vtkSMProxy get the pqServer on which the proxy exists.

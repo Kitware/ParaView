@@ -134,13 +134,12 @@ public:
   virtual bool eventFilter(QObject* watched, QEvent* e);
 
 signals:
-  /// Signal emitted whenever the server changes
-  /**\todo Revisit this API once we truly support simultaneous connections */
-  void serverChanged(pqServer*);
-  /// Signal emitted whenever a different proxy is selected in the pipeline browser
-  void proxyChanged(vtkSMProxy*);
   /// Signal emitted whenever the current variable changes
   void variableChanged(pqVariableType, const QString&);
+
+  /// Signal emitted when the active server/source changes. The
+  /// handler can be a browser that shows the selected element.
+  void select(pqPipelineModelItem*);
 
 public slots:
   void onFileNew();
@@ -204,6 +203,8 @@ private slots:
   // performs updates that need to be done after accept.
   void postAcceptUpdate();
 
+  // Handler when the core indicates change in the active server/source.
+  void onCoreActiveChanged();
 protected:
   void buildSourcesMenu();
   void buildFiltersMenu();
