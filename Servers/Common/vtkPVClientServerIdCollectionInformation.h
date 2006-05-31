@@ -26,9 +26,9 @@
 
 #include "vtkPVInformation.h"
 #include "vtkSystemIncludes.h" // for vtkTypeUInt32
+#include "vtkClientServerID.h" // for vtkClientServerID
 
 class vtkClientServerIdSetType;
-class vtkClientServerID;
 
 class VTK_EXPORT vtkPVClientServerIdCollectionInformation 
   : public vtkPVInformation

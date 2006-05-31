@@ -25,7 +25,9 @@
 
 #include "vtkMultiBlockDataSetAlgorithm.h"
 
-class vtkSelectDataSetsInternals;
+//BTX
+struct vtkSelectDataSetsInternals;
+//ETX
 
 class VTK_EXPORT vtkSelectDataSets : public vtkMultiBlockDataSetAlgorithm
 {
