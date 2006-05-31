@@ -2656,14 +2656,14 @@ The mesh quality filter computes the quality of individual triangles, quadrilate
                         help="Choose the scalar value to select with"/>
   </Module>
 
-  <Module name="AreaSelect"
-          class="vtkPVAreaSelect"
+  <Module name="CellSelect"
+          class="vtkPVCellSelect"
           root_name="RBSelect"
-          menu_name="Rubber Band Select"
+          menu_name="Cell Select"
           module_type="Filter"
-          button_help="Do rubber band selection on a dataset."
+          button_help="Do rubber band selection inside a dataset."
           replace_input="0">
-    <Filter class="vtkAreaSelect">
+    <Filter class="vtkFrustumExtractor">
       <Input name="Input"
              class="vtkDataSet">
       </Input>

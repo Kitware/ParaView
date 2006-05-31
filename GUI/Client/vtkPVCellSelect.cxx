@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVAreaSelect.cxx
+  Module:    vtkPVCellSelect.cxx
 
   All rights reserved.
   See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
@@ -11,7 +11,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVAreaSelect.h"
+#include "vtkPVCellSelect.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkKWPushButton.h"
@@ -31,11 +31,11 @@
 #include <stdio.h>
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVAreaSelect);
-vtkCxxRevisionMacro(vtkPVAreaSelect, "1.6");
+vtkStandardNewMacro(vtkPVCellSelect);
+vtkCxxRevisionMacro(vtkPVCellSelect, "1.1");
 
 //----------------------------------------------------------------------------
-vtkPVAreaSelect::vtkPVAreaSelect()
+vtkPVCellSelect::vtkPVCellSelect()
 {
   this->SelectReady = 0;
   this->InPickState = 0;
@@ -47,7 +47,7 @@ vtkPVAreaSelect::vtkPVAreaSelect()
   this->SelectButton = vtkKWPushButton::New();
   this->EventCallbackCommand = vtkCallbackCommand::New();
   this->EventCallbackCommand->SetClientData(this); 
-  this->EventCallbackCommand->SetCallback(vtkPVAreaSelect::ProcessEvents);
+  this->EventCallbackCommand->SetCallback(vtkPVCellSelect::ProcessEvents);
   this->RubberBand = vtkInteractorStyleRubberBandPick::New();
   this->SavedStyle = NULL;
 
@@ -63,7 +63,7 @@ vtkPVAreaSelect::vtkPVAreaSelect()
 }
 
 //----------------------------------------------------------------------------
-vtkPVAreaSelect::~vtkPVAreaSelect()
+vtkPVCellSelect::~vtkPVCellSelect()
 { 
   if (this->SavedStyle)
     {
@@ -75,7 +75,7 @@ vtkPVAreaSelect::~vtkPVAreaSelect()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAreaSelect::CreateProperties()
+void vtkPVCellSelect::CreateProperties()
 {
   this->Superclass::CreateProperties();
 
@@ -93,7 +93,7 @@ void vtkPVAreaSelect::CreateProperties()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAreaSelect::SelectCallback()
+void vtkPVCellSelect::SelectCallback()
 {
   vtkPVWindow *window = this->GetPVApplication()->GetMainWindow();
   vtkPVGenericRenderWindowInteractor *rwi = window->GetInteractor();
@@ -133,13 +133,13 @@ void vtkPVAreaSelect::SelectCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAreaSelect::ProcessEvents(vtkObject* vtkNotUsed(object), 
+void vtkPVCellSelect::ProcessEvents(vtkObject* vtkNotUsed(object), 
                                   unsigned long event,
                                   void* clientdata, 
                                   void* vtkNotUsed(calldata))
 {
-  vtkPVAreaSelect* self 
-    = reinterpret_cast<vtkPVAreaSelect *>( clientdata );
+  vtkPVCellSelect* self 
+    = reinterpret_cast<vtkPVCellSelect *>( clientdata );
 
   vtkPVWindow* window = self->GetPVApplication()->GetMainWindow();
   vtkPVGenericRenderWindowInteractor *rwi = window->GetInteractor();
@@ -158,14 +158,14 @@ void vtkPVAreaSelect::ProcessEvents(vtkObject* vtkNotUsed(object),
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAreaSelect::OnLeftButtonDown(int x, int y)
+void vtkPVCellSelect::OnLeftButtonDown(int x, int y)
 {
   this->Xs = x;
   this->Ys = y;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAreaSelect::OnLeftButtonUp(int x, int y, vtkRenderer *renderer)
+void vtkPVCellSelect::OnLeftButtonUp(int x, int y, vtkRenderer *renderer)
 {
   this->Xe = x;
   this->Ye = y;
@@ -186,6 +186,11 @@ void vtkPVAreaSelect::OnLeftButtonUp(int x, int y, vtkRenderer *renderer)
     y1 += 0.5;
     }
   
+  this->Xs = (int)x0;
+  this->Xe = (int)x1;
+  this->Ys = (int)y0;
+  this->Ye = (int)y1;
+
   renderer->SetDisplayPoint(x0, y0, 0);
   renderer->DisplayToWorld();
   renderer->GetWorldPoint(&this->Verts[0]);
@@ -226,7 +231,7 @@ void vtkPVAreaSelect::OnLeftButtonUp(int x, int y, vtkRenderer *renderer)
 }
  
 //----------------------------------------------------------------------------
-void vtkPVAreaSelect::DoSelect()
+void vtkPVCellSelect::DoSelect()
 {
   vtkSMSourceProxy *sp = this->GetProxy();
   if (!sp)
@@ -249,7 +254,7 @@ void vtkPVAreaSelect::DoSelect()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAreaSelect::Reset()
+void vtkPVCellSelect::Reset()
 {
   this->Superclass::Reset();
   if (this->SelectReady)
@@ -262,7 +267,7 @@ void vtkPVAreaSelect::Reset()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAreaSelect::AcceptCallbackInternal()
+void vtkPVCellSelect::AcceptCallbackInternal()
 {
   if (this->SelectReady)
     {
@@ -280,7 +285,7 @@ void vtkPVAreaSelect::AcceptCallbackInternal()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAreaSelect::SetVerts(int wireframe)
+void vtkPVCellSelect::SetVerts(int wireframe)
 {
   vtkSMSourceProxy *sp = this->GetProxy();
   if (!sp)
@@ -306,14 +311,14 @@ void vtkPVAreaSelect::SetVerts(int wireframe)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAreaSelect::AdditionalTraceSave()
+void vtkPVCellSelect::AdditionalTraceSave()
 {
   ofstream *f = this->GetTraceHelper()->GetFile();
   this->AdditionalStateSave(f);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAreaSelect::AdditionalStateSave(ofstream *file)
+void vtkPVCellSelect::AdditionalStateSave(ofstream *file)
 {
 
   for (int i = 0; i < 8; i++)
@@ -331,7 +336,7 @@ void vtkPVAreaSelect::AdditionalStateSave(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAreaSelect::CreateVert(int i,
+void vtkPVCellSelect::CreateVert(int i,
                                  double v0 , double v1 , double v2 , double v3)
 {
   this->Verts[i*4+0] = v0;
@@ -341,7 +346,7 @@ void vtkPVAreaSelect::CreateVert(int i,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAreaSelect::AdditionalBatchSave(ofstream *file)
+void vtkPVCellSelect::AdditionalBatchSave(ofstream *file)
 {
   *file << "  [$pvTemp" << this->Proxy->GetSelfIDAsString()
         << " GetProperty CreateFrustum]" 

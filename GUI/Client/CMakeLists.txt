@@ -209,7 +209,8 @@ SET( ParaViewClient_SRCS
   vtkXDMFReaderModule.cxx
   #  vtkPVRenderGroupDialog.cxx
   ${ExtraParaViewClient_SRCS}
-  vtkPVAreaSelect.cxx
+  vtkPVCellSelect.cxx
+  vtkPVPropAndCellSelect.cxx
   )
 
 

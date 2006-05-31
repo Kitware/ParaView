@@ -45,12 +45,11 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkWindowToImageFilter.h"
 
-#include "vtkAreaPicker.h"
 #include "vtkPVClientServerIdCollectionInformation.h"
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.29");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.30");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -776,74 +775,92 @@ double vtkSMRenderModuleProxy::GetZBufferValue(int x, int y)
 vtkPVClientServerIdCollectionInformation* vtkSMRenderModuleProxy
   ::Pick(int xs, int ys, int xe, int ye)
 {
-  vtkPVClientServerIdCollectionInformation *propCollectionInfo = NULL;
-
   vtkProcessModule* processModule = NULL;
   vtkSMProxyManager* proxyManager = NULL;
   vtkSMProxy *areaPickerProxy = NULL;
   vtkSMProxyProperty *setRendererMethod = NULL;
   vtkSMDoubleVectorProperty *setCoordsMethod = NULL;
   vtkSMProperty *pickMethod = NULL;
-  vtkCollectionIterator* iter = NULL;
+
+  bool OK = true;
 
   //create an areapicker and find its methods
   processModule = vtkProcessModule::GetProcessModule();
   if (!processModule)
     {
     vtkErrorMacro("Failed to find processmodule.");
-    goto cleanup;
+    OK = false;
     }  
   proxyManager = vtkSMObject::GetProxyManager();  
-  if (!proxyManager)
+  if (OK && !proxyManager)
     {
     vtkErrorMacro("Failed to find the proxy manager.");
-    goto cleanup;
+    OK = false;
     }
   areaPickerProxy = proxyManager->NewProxy("PropPickers", "AreaPicker"); 
-  if (!areaPickerProxy)
+  if (OK && !areaPickerProxy)
     {
     vtkErrorMacro("Failed to make AreaPicker proxy.");
-    goto cleanup;
+    OK = false;
     }
   setRendererMethod = vtkSMProxyProperty::SafeDownCast(
     areaPickerProxy->GetProperty("SetRenderer"));
-  if (!setRendererMethod)
+  if (OK && !setRendererMethod)
     {
     vtkErrorMacro("Failed to find the set renderer property.");
-    goto cleanup;
+    OK = false;
     }
   setCoordsMethod = vtkSMDoubleVectorProperty::SafeDownCast(
     areaPickerProxy->GetProperty("SetPickCoords"));
-  if (!setCoordsMethod)
+  if (OK && !setCoordsMethod)
     {
     vtkErrorMacro("Failed to find the set pick coords property.");
-    goto cleanup;
+    OK = false;
     }
   pickMethod = areaPickerProxy->GetProperty("Pick");
-  if (!pickMethod)
+  if (OK && !pickMethod)
     {
     vtkErrorMacro("Failed to find the pick property.");
-    goto cleanup;
+    OK = false;
     }
-    
-  //execute the areapick
-  setRendererMethod->AddProxy(this->GetRendererProxy());
-  setCoordsMethod->SetElements4(xs, ys, xe, ye);
-  areaPickerProxy->UpdateVTKObjects();   
-  pickMethod->Modified();
-  areaPickerProxy->UpdateVTKObjects();   
 
-  //gather the results from the AreaPicker
-  propCollectionInfo = vtkPVClientServerIdCollectionInformation::New();
-  processModule->GatherInformation(
-    vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
-    vtkProcessModule::RENDER_SERVER, 
-    propCollectionInfo, 
-    areaPickerProxy->GetID(0)
-    );
+  vtkPVClientServerIdCollectionInformation *propCollectionInfo = NULL;    
+  if (OK)
+    {
+    //execute the areapick
+    setRendererMethod->AddProxy(this->GetRendererProxy());
+    setCoordsMethod->SetElements4(xs, ys, xe, ye);
+    areaPickerProxy->UpdateVTKObjects();   
+    pickMethod->Modified();
+    areaPickerProxy->UpdateVTKObjects();   
+    
+    //gather the results from the AreaPicker
+    propCollectionInfo = vtkPVClientServerIdCollectionInformation::New();
+    processModule->GatherInformation(
+      vtkProcessModuleConnectionManager::GetRootServerConnectionID(),
+      vtkProcessModule::RENDER_SERVER, 
+      propCollectionInfo, 
+      areaPickerProxy->GetID(0)
+      );
+    }
+
+  if (areaPickerProxy)
+    {
+    areaPickerProxy->Delete();
+    }
   
-  //find the SMDisplayProxies that contain the picked props, then we know
-  //what we hit.
+  return propCollectionInfo;
+}
+
+//----------------------------------------------------------------------------
+vtkSMProxy *vtkSMRenderModuleProxy::GetProxyFromPropID(
+  vtkClientServerID *id,
+  int VolumeOrSurface)
+{
+  vtkCollectionIterator* iter = NULL;
+  vtkSMProxy *ret = NULL;
+
+  //find the SMDisplayProxy that contains the CSID.
   iter = this->Displays->NewIterator();
   for (iter->InitTraversal(); 
        !iter->IsDoneWithTraversal(); 
@@ -854,26 +871,28 @@ vtkPVClientServerIdCollectionInformation* vtkSMRenderModuleProxy
     
     if (dodp)
       {
-      //had to expose this protected method in SMDataObjectDisplayProxy
       vtkSMProxy *actorProxy = dodp->GetActorProxy();
-      vtkClientServerID id = actorProxy->GetID(0);
-      if (propCollectionInfo->Contains(id.ID))
+      vtkClientServerID idA = actorProxy->GetID(0);
+      if (idA == *id)
         {
-        cerr << "Picked Display Proxy " <<dodp<< " for prop " <<id<< endl;
-        //dodp->SetColorCM(1.0, 1.0, 0.0);
+        //we found it, now return the proxy for the algorithm that produced it
+        if (VolumeOrSurface==0)
+          {
+          //volume
+          ret = dodp->GetInput(0);
+          }
+        else
+          {
+          //surface
+          ret = dodp->GetGeometryFilterProxy();
+          }
+        break;
         }
-      }
-    
+      }    
     }
-  iter->Delete();  
 
-cleanup:
-  if (areaPickerProxy)
-    {
-    areaPickerProxy->Delete();
-    }
-  
-  return propCollectionInfo;
+  iter->Delete();  
+  return ret;
 }
 
 //-----------------------------------------------------------------------------

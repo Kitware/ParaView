@@ -978,6 +978,90 @@ The output of the Wavelet source is image (uniform rectilinear) data.
          default_values="6" >
         <IntRangeDomain name="range" min="1" max="128" />
       </IntVectorProperty>
+   <!-- End Test3DWidget -->
+   </SourceProxy>
+
+   <SourceProxy name="PropAndCellSelect" class="vtkPropAndCellSelect">
+      <Documentation
+        long_help="Draw a rectangle on the screen to select data." 
+        short_help="Rubber band selection.">
+Press the "Start Selection" button to begin. Then use the left mouse button to make a selection rectangle on the render window. Every DataSet that was visible under that portion of the screen will be returned. To restrict your selection to only those cells and points that lie within the selected volume, click the "Extract Inside" button.
+      </Documentation>
+
+      <Property 
+        name="Initialize" 
+        command="Initialize" >
+      </Property>
+
+      <ProxyProperty 
+        name="AddDataSet" 
+        command="AddDataSet" >
+      </ProxyProperty>
+
+     <IntVectorProperty 
+        name="ExactTest" 
+        command="SetExactTest" 
+        number_of_elements="1"
+        default_values="1" >
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Off"/>
+         <Entry value="1" text="On"/>
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="PassThrough" 
+        command="SetPassThrough" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Off"/>
+         <Entry value="1" text="On"/>
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="SelectionType" 
+        command="SetSelectionType" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Object"/>
+         <Entry value="1" text="Surface"/>
+         <Entry value="2" text="Volume"/>
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="CreateFrustum"
+        command="CreateFrustum"
+        number_of_elements="32"
+        is_internal="1"
+        argument_is_array="1"
+        default_values=
+        "0.0 0.0 0.0 0.0
+         0.0 0.0 0.0 0.0
+         0.0 0.0 0.0 0.0
+         0.0 0.0 0.0 0.0
+         0.0 0.0 0.0 0.0
+         0.0 0.0 0.0 0.0
+         0.0 0.0 0.0 0.0
+         0.0 0.0 0.0 0.0">
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="ShowBounds" 
+        command="SetShowBounds" 
+        number_of_elements="1"
+        is_internal="1"
+        default_values="0">
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="Off"/>
+         <Entry value="1" text="On"/>
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+   <!-- End SelectedObjects -->
    </SourceProxy>
 
   </ProxyGroup>

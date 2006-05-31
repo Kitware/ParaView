@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVAreaSelect.h
+  Module:    vtkPVCellSelect.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,29 +12,30 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVAreaSelect - Client side UI for a selection rectangle.
+// .NAME vtkPVCellSelect - Client side UI for a selection rectangle for 
+// cells and points.
 // .SECTION Description
 // Creates a client GUI page that makes it possible to draw a rectangle on the
 // render window and select all points and cells of a dataset that lie within.
+// This does cell/point level selection, while vtkPVPickObjects does prop
+// level selection.
 
-#ifndef __vtkPVAreaSelect_h
-#define __vtkPVAreaSelect_h
+#ifndef __vtkPVCellSelect_h
+#define __vtkPVCellSelect_h
 
 #include "vtkPVSource.h"
 
 class vtkKWPushButton;
 class vtkCallbackCommand;
 class vtkRenderer;
-class vtkAbstractPicker;
-class vtkAreaPicker;
 class vtkInteractorObserver;
 class vtkInteractorStyleRubberBandPick;
 
-class VTK_EXPORT vtkPVAreaSelect : public vtkPVSource
+class VTK_EXPORT vtkPVCellSelect : public vtkPVSource
 {
 public:
-  static vtkPVAreaSelect* New();
-  vtkTypeRevisionMacro(vtkPVAreaSelect, vtkPVSource);
+  static vtkPVCellSelect* New();
+  vtkTypeRevisionMacro(vtkPVCellSelect, vtkPVSource);
 
   // Description:
   // Set up the UI.
@@ -55,8 +56,8 @@ public:
   void SetVerts(int wireframe);
 
 protected:
-  vtkPVAreaSelect();
-  ~vtkPVAreaSelect();
+  vtkPVCellSelect();
+  ~vtkPVCellSelect();
 
   void DoSelect();  
   virtual void AcceptCallbackInternal();
@@ -101,8 +102,8 @@ protected:
   double SavedVerts[32];
 
 private:
-  vtkPVAreaSelect(const vtkPVAreaSelect&); // Not implemented
-  void operator=(const vtkPVAreaSelect&); // Not implemented
+  vtkPVCellSelect(const vtkPVCellSelect&); // Not implemented
+  void operator=(const vtkPVCellSelect&); // Not implemented
 };
 
 #endif

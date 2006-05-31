@@ -404,5 +404,41 @@
   <New3DWidget trace_name="slider" property="Resolution"/>
 </Module>
 
+<Module name="PropAndCellSelect" 
+        button_help="Do a rubber band selection of or inside visible objects."
+        menu_name="Prop/Cell Select" 
+        root_name="PropAndCellSelect" 
+        module_type="Source" 
+        class="vtkPVPropAndCellSelect"
+        >
+  <Source class="vtkPropAndCellSelect"/>
+
+  <SelectionList property="SelectionType"
+                 label="Selection Type"
+                 trace_name="SelectionType"
+                 help="Pick entire objects, surfaces of those objects within the selection region, or the entire 3D content of the objects within the selection region.">
+    <Item name="Object" value="0"/>
+    <Item name="Surface" value="1"/>
+    <Item name="Volume" value="2"/>
+  </SelectionList>
+
+  <SelectionList property="ExactTest"
+                 label="Test Type"
+                 trace_name="ExactTest"
+                 help="Select whether to pick using cell intersection tests (exact) or point insidedness tests (fast).">
+    <Item name="Cell" value="1"/>
+    <Item name="Point" value="0"/>
+  </SelectionList>
+
+  <SelectionList property="PassThrough"
+                 label="Output"
+                 trace_name="PassThrough"
+                 help="Select whether to simply add a new 'Insidedness' array to the input or to create an entirely new output dataset that contains only the potion that is inside.">
+    <Item name="New Grid" value="0"/>
+    <Item name="PassThrough" value="1"/>
+  </SelectionList>
+
+</Module>
+
 </ModuleInterfaces>
 

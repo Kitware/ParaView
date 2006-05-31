@@ -31,6 +31,7 @@ class vtkPVRenderModuleHelper;
 class vtkSMDisplay;
 class vtkSMDisplayProxy;
 class vtkPVClientServerIdCollectionInformation;
+class vtkClientServerID;
 
 // TODO: have to change the PVCameraManipulators to do ResetCamera on
 // the RenderModule rather than renderer.
@@ -119,6 +120,15 @@ public:
   // of ClientServerIds for the DisplayProxies hit.
   vtkPVClientServerIdCollectionInformation* 
     Pick(int xs, int ys, int xe, int ye);
+
+  // Description:
+  // This will look in the RenderModule's Displays and find the one
+  // that corresponds to the given id (obtained by Pick()).
+  // If VolumeOrSurface is 0, the Proxy returned will be the one for the 
+  // Display's input algorithm. Otherwise the Proxy will be the one for 
+  // the Display's GeometryFilter. The output of one is a 3D dataset, the other
+  // is the "2D" outer shell of the data.
+  vtkSMProxy *GetProxyFromPropID(vtkClientServerID *id, int VolumeOrSurface);
 
   // Description:
   // Reset camera to the given bounds.
