@@ -111,19 +111,21 @@ void pqThresholdPanel::reset()
 
   // reset widgets controlled by the parent class
   pqLoadedFormObjectPanel::reset();
+  
+  pqDoubleSpinBoxDomain* d1;
+  d1 = this->LowerSpin->findChild<pqDoubleSpinBoxDomain*>("lowerSpinDomain");
+  
+  pqDoubleSpinBoxDomain* d2;
+  d2 = this->UpperSpin->findChild<pqDoubleSpinBoxDomain*>("upperSpinDomain");
+
+  d1->domainChanged();
+  d2->domainChanged();
 
 }
 
 void pqThresholdPanel::linkServerManagerProperties()
 {
   
-  QComboBox* Scalars = this->findChild<QComboBox*>("SelectInputScalars");
-  // TODO -- pqDoubleSpinBoxDomain::updateDomain should automatically be called
-  //         let's hack and help out a bit.
-  QObject::connect(Scalars, SIGNAL(currentIndexChanged(int)),
-                   this, SLOT(updateDomain1()), Qt::QueuedConnection);
-  QObject::connect(Scalars, SIGNAL(currentIndexChanged(int)),
-                   this, SLOT(updateDomain2()), Qt::QueuedConnection);
 
   
   // parent class hooks up some of our widgets in the ui
@@ -154,6 +156,7 @@ void pqThresholdPanel::linkServerManagerProperties()
   this->AttributeMode->setCurrentIndex(AttributeIndex);
 
   
+  QComboBox* Scalars = this->findChild<QComboBox*>("SelectInputScalars");
   // connect domain to scalar combo box
   vtkSMProperty* Property = this->proxy()->GetProperty("SelectInputScalars");
   pqComboBoxDomain* d0 = new pqComboBoxDomain(Scalars, Property);
@@ -172,8 +175,21 @@ void pqThresholdPanel::linkServerManagerProperties()
   d2->setObjectName("upperSpinDomain");
 
 
+  // TODO -- pqDoubleSpinBoxDomain::updateDomain should automatically be called
+  //         let's hack and help out a bit.
+  QObject::connect(Scalars, SIGNAL(currentIndexChanged(int)),
+                   d1, SLOT(domainChanged()), Qt::QueuedConnection);
+  QObject::connect(Scalars, SIGNAL(currentIndexChanged(int)),
+                   d2, SLOT(domainChanged()), Qt::QueuedConnection);
 
-  
+
+  // some hacks to get things working
+  this->reset();
+
+  if(Scalars->currentIndex() == -1 && Scalars->count())
+    {
+    Scalars->setCurrentIndex(0);
+    }
 }
 
 void pqThresholdPanel::unlinkServerManagerProperties()
@@ -296,27 +312,4 @@ void pqThresholdPanel::attributeModeChanged(int idx)
 
   emit this->canAcceptOrReject(true);
 }
-  
-void pqThresholdPanel::updateDomain1()
-{
-  pqDoubleSpinBoxDomain* d1;
-  d1 = this->LowerSpin->findChild<pqDoubleSpinBoxDomain*>("lowerSpinDomain");
-  if(d1)
-    {
-    d1->domainChanged();
-    this->LowerSpin->setValue(this->LowerSpin->minimum());
-    }
-}
-
-void pqThresholdPanel::updateDomain2()
-{
-  pqDoubleSpinBoxDomain* d2;
-  d2 = this->UpperSpin->findChild<pqDoubleSpinBoxDomain*>("upperSpinDomain");
-  if(d2)
-    {
-    d2->domainChanged();
-    this->UpperSpin->setValue(this->UpperSpin->maximum());
-    }
-}
-
 

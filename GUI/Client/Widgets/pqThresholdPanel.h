@@ -57,8 +57,6 @@ protected slots:
   void lowerSliderChanged();
   void upperSliderChanged();
   void attributeModeChanged(int);
-  void updateDomain1();
-  void updateDomain2();
 
 protected:
   /// populate widgets with properties from the server manager
