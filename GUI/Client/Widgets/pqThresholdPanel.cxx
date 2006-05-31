@@ -121,6 +121,9 @@ void pqThresholdPanel::reset()
   d1->domainChanged();
   d2->domainChanged();
 
+  this->upperSpinChanged();
+  this->lowerSpinChanged();
+
 }
 
 void pqThresholdPanel::linkServerManagerProperties()
