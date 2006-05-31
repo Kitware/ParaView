@@ -16,16 +16,19 @@
 // .SECTION Description
 // This class is used to gather a list of vtkClientServerIds. The resulting 
 // list will contain one copy of every id that is contained in any 
-// of the input lists. The class is used by SMRenderModuleProxy to gather a
-// list of ClientServerIds corresponding to 
+// of the input lists. The class was created to merge vtkPropCollections inside
+// vtkAreaPicker's for ParaView. The CopyObject method tries to cast the 
+// given pointer into a vtkAreaPicker and then gets the IDs for each prop in 
+// its collection.
 
 #ifndef __vtkPVClientServerIdCollectionInformation_h
 #define __vtkPVClientServerIdCollectionInformation_h
 
 #include "vtkPVInformation.h"
-#include "vtkSystemIncludes.h" // vtkTypeUInt32
+#include "vtkSystemIncludes.h" // for vtkTypeUInt32
 
 class vtkClientServerIdSetType;
+class vtkClientServerID;
 
 class VTK_EXPORT vtkPVClientServerIdCollectionInformation 
   : public vtkPVInformation
@@ -48,9 +51,17 @@ public:
   virtual void CopyToStream(vtkClientServerStream*) const;
   virtual void CopyFromStream(const vtkClientServerStream*);
 
-  // Description:
-  // For debugging.
 //BTX
+  // Description:
+  // Returns the number of IDs held.
+  int GetLength();
+
+  // Description:
+  // Returns the i'th ID in my set.
+  vtkClientServerID GetID(int i);
+
+  // Description:
+  // Returns true if the given ID is in my set.
   int Contains(vtkTypeUInt32 ID);
 //ETX
 

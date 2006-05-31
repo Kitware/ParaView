@@ -54,6 +54,10 @@ public:
   // Description:
   // Connect the VTK data object to display pipeline.
   void SetInput(vtkSMProxy* input);
+
+  // Description:
+  // Obtain the proxy for the algorithm that this displays the output of.
+  vtkSMProxy *GetInput(int i=0);
   
   // Description:
   // This method calls a ForceUpdate on the UpdateSuppressor
@@ -187,8 +191,7 @@ public:
     double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
     this->SetColorCM(rgb);
     }
-    
-    
+        
   // Description:
   // Convenience method to get/set InterpolateColorsBeforeMapping property.
   void SetInterpolateScalarsBeforeMappingCM(int flag);
@@ -248,6 +251,11 @@ public:
   // Convenience method to get/set ImmediateModeRendering property.
   void SetImmediateModeRenderingCM(int f);
   int GetImmediateModeRenderingCM();
+
+  // Description:
+  // Convenience method to get/set Pickability of the vtkActor.
+  void SetPickableCM(int pickable);
+  int GetPickableCM();
 
 protected:
   vtkSMDataObjectDisplayProxy();

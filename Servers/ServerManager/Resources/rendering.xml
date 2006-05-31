@@ -831,6 +831,14 @@
         animateable="0">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
+      <IntVectorProperty
+        name="Pickable"
+        command="SetPickable"
+        number_of_elements="1"
+        default_values="1"
+        animateable="0">
+        <IntRangeDomain name="bool" />
+      </IntVectorProperty>
       <!-- End of Actor -->
     </Proxy>
 
@@ -2381,7 +2389,6 @@
         immediate_update="1"
         update_self="1">
       </Property>
-        
       <SubProxy>
         <Proxy name="GeometryFilter" 
           proxygroup="filters" proxyname="GeometryFilter" />
@@ -2416,6 +2423,7 @@
           <Property name="Orientation" />
           <Property name="Origin" />
           <Property name="RenderModuleHelper" />
+          <Property name="Pickable" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>

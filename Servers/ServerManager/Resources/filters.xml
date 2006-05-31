@@ -4195,7 +4195,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
    <!-- End TemporalCache -->
    </SourceProxy>
    
-   <SourceProxy name="AreaSelect" class="vtkFrustumExtractor">
+   <SourceProxy name="CellSelect" class="vtkFrustumExtractor">
       <Documentation
         long_help="Draw a rectangle on the screen and obtain the section of data inside it." 
         short_help="Rubber band selection inside a DataSet">

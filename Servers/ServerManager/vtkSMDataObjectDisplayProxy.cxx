@@ -36,7 +36,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.14");
 
 
 //-----------------------------------------------------------------------------
@@ -189,6 +189,20 @@ void vtkSMDataObjectDisplayProxy::SetInput(vtkSMProxy* input)
     }
   //This is where the pipeline is setup.
   this->SetInputInternal(vtkSMSourceProxy::SafeDownCast(input));
+}
+
+
+//-----------------------------------------------------------------------------
+vtkSMProxy * vtkSMDataObjectDisplayProxy::GetInput(int i)
+{
+  vtkSMProxy *ret = NULL;
+  vtkSMInputProperty* ip = 
+    vtkSMInputProperty::SafeDownCast(this->GetProperty("Input"));
+  if (ip)
+    {
+    ret = ip->GetProxy(i);
+    }
+  return ret;
 }
 
 //-----------------------------------------------------------------------------
@@ -1684,6 +1698,34 @@ int vtkSMDataObjectDisplayProxy::GetImmediateModeRenderingCM()
     return 0;
     }
   return ivp->GetElement(0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMDataObjectDisplayProxy::SetPickableCM(int op)
+{
+  vtkSMIntVectorProperty* dvp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("Pickable"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property Pickable on DisplayProxy.");
+    return ;
+    }
+  dvp->SetElement(0, op);
+  this->UpdateVTKObjects(); 
+
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMDataObjectDisplayProxy::GetPickableCM()
+{
+  vtkSMIntVectorProperty* dvp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("Pickable"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property Pickable on DisplayProxy.");
+    return 0;
+    }
+  return dvp->GetElement(0);
 }
 
 //-----------------------------------------------------------------------------
