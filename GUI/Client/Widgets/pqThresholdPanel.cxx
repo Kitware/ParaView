@@ -162,9 +162,9 @@ void pqThresholdPanel::linkServerManagerProperties()
   // TODO -- pqDoubleSpinBoxDomain::updateDomain should automatically be called
   //         let's hack and help out a bit.
   QObject::connect(Scalars, SIGNAL(currentIndexChanged(int)),
-                   d1, SLOT(domainChanged()), Qt::QueuedConnection);
+                   this, SLOT(updateDomain1()), Qt::QueuedConnection);
   QObject::connect(Scalars, SIGNAL(currentIndexChanged(int)),
-                   d2, SLOT(domainChanged()), Qt::QueuedConnection);
+                   this, SLOT(updateDomain2()), Qt::QueuedConnection);
 
 
   // parent class hooks up some of our widgets in the ui
@@ -209,6 +209,12 @@ void pqThresholdPanel::lowerSpinChanged()
     int sliderVal = qRound(fraction * 100.0);  // slider range 0-100
     this->LowerSlider->setValue(sliderVal);
     IsSetting = false;
+    
+    // clamp the lower threshold if we need to
+    if(this->UpperSpin->value() < this->LowerSpin->value())
+      {
+      this->UpperSpin->setValue(this->LowerSpin->value());
+      }
     }
 }
 
@@ -226,6 +232,12 @@ void pqThresholdPanel::upperSpinChanged()
     int sliderVal = qRound(fraction * 100.0);  // slider range 0-100
     this->UpperSlider->setValue(sliderVal);
     IsSetting = false;
+    
+    // clamp the lower threshold if we need to
+    if(this->LowerSpin->value() > this->UpperSpin->value())
+      {
+      this->LowerSpin->setValue(this->UpperSpin->value());
+      }
     }
 }
 
@@ -239,6 +251,12 @@ void pqThresholdPanel::lowerSliderChanged()
     double v = (fraction * range) + this->LowerSpin->minimum();
     this->LowerSpin->setValue(v);
     IsSetting = false;
+
+    // clamp the upper threshold if we need to
+    if(this->UpperSlider->value() < this->LowerSlider->value())
+      {
+      this->UpperSlider->setValue(this->LowerSlider->value());
+      }
     }
 }
 
@@ -252,6 +270,12 @@ void pqThresholdPanel::upperSliderChanged()
     double v = (fraction * range) + this->UpperSpin->minimum();
     this->UpperSpin->setValue(v);
     IsSetting = false;
+    
+    // clamp the lower threshold if we need to
+    if(this->LowerSlider->value() > this->UpperSlider->value())
+      {
+      this->LowerSlider->setValue(this->UpperSlider->value());
+      }
     }
 }
 
@@ -268,4 +292,27 @@ void pqThresholdPanel::attributeModeChanged(int idx)
 
   emit this->canAcceptOrReject(true);
 }
+  
+void pqThresholdPanel::updateDomain1()
+{
+  pqDoubleSpinBoxDomain* d1;
+  d1 = this->LowerSpin->findChild<pqDoubleSpinBoxDomain*>("lowerSpinDomain");
+  if(d1)
+    {
+    d1->domainChanged();
+    this->LowerSpin->setValue(this->LowerSpin->minimum());
+    }
+}
+
+void pqThresholdPanel::updateDomain2()
+{
+  pqDoubleSpinBoxDomain* d2;
+  d2 = this->UpperSpin->findChild<pqDoubleSpinBoxDomain*>("upperSpinDomain");
+  if(d2)
+    {
+    d2->domainChanged();
+    this->UpperSpin->setValue(this->UpperSpin->maximum());
+    }
+}
+
 
