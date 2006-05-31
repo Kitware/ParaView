@@ -55,7 +55,7 @@ pqThresholdPanel::pqThresholdPanel(QWidget* p) :
 {
   this->AttributeMode = this->findChild<QComboBox*>("AttributeMode");
   
-  QObject::connect(this->AttributeMode, SIGNAL(activated(int)),
+  QObject::connect(this->AttributeMode, SIGNAL(currentIndexChanged(int)),
                    this, SLOT(attributeModeChanged(int)));
 
   this->LowerSlider = this->findChild<QSlider*>("LowerThresholdSlider");
@@ -108,13 +108,26 @@ void pqThresholdPanel::reset()
     {
     this->AttributeMode->setCurrentIndex(idx);
     }
-  
+
   // reset widgets controlled by the parent class
   pqLoadedFormObjectPanel::reset();
+
 }
 
 void pqThresholdPanel::linkServerManagerProperties()
 {
+  
+  QComboBox* Scalars = this->findChild<QComboBox*>("SelectInputScalars");
+  // TODO -- pqDoubleSpinBoxDomain::updateDomain should automatically be called
+  //         let's hack and help out a bit.
+  QObject::connect(Scalars, SIGNAL(currentIndexChanged(int)),
+                   this, SLOT(updateDomain1()), Qt::QueuedConnection);
+  QObject::connect(Scalars, SIGNAL(currentIndexChanged(int)),
+                   this, SLOT(updateDomain2()), Qt::QueuedConnection);
+
+  
+  // parent class hooks up some of our widgets in the ui
+  pqLoadedFormObjectPanel::linkServerManagerProperties();
   
   // set up the attribute mode combo box
   vtkSMStringVectorProperty* AttributeProperty;
@@ -137,12 +150,12 @@ void pqThresholdPanel::linkServerManagerProperties()
       AttributeIndex = i;
       }
     }
+  //this->AttributeMode->setCurrentIndex(-1);
   this->AttributeMode->setCurrentIndex(AttributeIndex);
 
   
   // connect domain to scalar combo box
   vtkSMProperty* Property = this->proxy()->GetProperty("SelectInputScalars");
-  QComboBox* Scalars = this->findChild<QComboBox*>("SelectInputScalars");
   pqComboBoxDomain* d0 = new pqComboBoxDomain(Scalars, Property);
   d0->setObjectName("ScalarsDomain");
 
@@ -159,16 +172,7 @@ void pqThresholdPanel::linkServerManagerProperties()
   d2->setObjectName("upperSpinDomain");
 
 
-  // TODO -- pqDoubleSpinBoxDomain::updateDomain should automatically be called
-  //         let's hack and help out a bit.
-  QObject::connect(Scalars, SIGNAL(currentIndexChanged(int)),
-                   this, SLOT(updateDomain1()), Qt::QueuedConnection);
-  QObject::connect(Scalars, SIGNAL(currentIndexChanged(int)),
-                   this, SLOT(updateDomain2()), Qt::QueuedConnection);
 
-
-  // parent class hooks up some of our widgets in the ui
-  pqLoadedFormObjectPanel::linkServerManagerProperties();
   
 }
 

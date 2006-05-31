@@ -130,11 +130,14 @@ void pqComboBoxDomain::domainChanged()
     enums = pqSMAdaptor::getEnumerationPropertyDomain(this->Internal->Property);
     // save previous value to put back
     QString old = combo->currentText();
+    combo->blockSignals(true);
     combo->clear();
     foreach(QVariant var, enums)
       {
       combo->addItem(var.toString());
       }
+    combo->setCurrentIndex(-1);
+    combo->blockSignals(false);
     int foundOld = combo->findText(old);
     if(foundOld >= 0)
       {
