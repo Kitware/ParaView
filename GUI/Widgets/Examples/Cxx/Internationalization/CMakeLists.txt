@@ -61,7 +61,6 @@ IF(KWWidgets_USE_INTERNATIONALIZATION)
     ADD_MO_TARGET_TO_ALL)
 ENDIF(KWWidgets_USE_INTERNATIONALIZATION)
 
-
 # If we are building this example as a standalone external project:
 # - Generate a few small scripts (.bat, .sh, .csh) that can be sourced to set
 # the various environments variables (PATH, TCLLIBPATH, LD_LIBRARY_PATH, etc.) 
