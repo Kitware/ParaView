@@ -24,7 +24,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkPVClientServerIdCollectionInformation);
-vtkCxxRevisionMacro(vtkPVClientServerIdCollectionInformation, "1.5");
+vtkCxxRevisionMacro(vtkPVClientServerIdCollectionInformation, "1.6");
 
 typedef vtkstd::set<vtkClientServerID> vtkClientServerIdSetBase;
 class vtkClientServerIdSetType : public vtkClientServerIdSetBase {};
@@ -172,4 +172,8 @@ vtkClientServerID vtkPVClientServerIdCollectionInformation::GetID(int i)
       }
     j++;
     }
+
+  vtkErrorMacro("No such ID, returning first.");
+  IdIter = this->ClientServerIds->begin();
+  return *IdIter;
 }
