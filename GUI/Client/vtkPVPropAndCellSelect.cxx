@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPropAndCellSelect);
-vtkCxxRevisionMacro(vtkPVPropAndCellSelect, "1.1");
+vtkCxxRevisionMacro(vtkPVPropAndCellSelect, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVPropAndCellSelect::vtkPVPropAndCellSelect()
@@ -263,7 +263,6 @@ void vtkPVPropAndCellSelect::DoSelect()
 {
   vtkPVApplication *application = NULL;
   vtkSMRenderModuleProxy *renderModuleProxy = NULL;
-  vtkSMProxy* rendererProxy = NULL;
   vtkPVClientServerIdCollectionInformation *idInfo = NULL;
   vtkSMSourceProxy *sp = NULL;
   vtkSMProperty *initMethod = NULL;
