@@ -35,8 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqObjectPanel.h"
 
-/// Base class for Widget which provides an editor for editing properties of a proxy 
-/// where child widgets are named after the property they represent
+/// Base class for Widget which provides an editor for editing properties
+/// of a proxy where child widgets are named after the property they
+/// represent
 class pqNamedObjectPanel : public pqObjectPanel
 {
   Q_OBJECT
@@ -49,7 +50,8 @@ public:
 protected:
   /// populate widgets with properties from the server manager
   virtual void linkServerManagerProperties();
-  /// set the properties in the server manager with properties in the widgets
+  /// set the properties in the server manager with properties in the
+  /// widgets
   virtual void unlinkServerManagerProperties();
 
 };

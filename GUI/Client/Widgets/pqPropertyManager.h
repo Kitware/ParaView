@@ -61,11 +61,13 @@ public:
                        vtkSMProxy* Proxy, vtkSMProperty* Property, int Index=-1);
   
   /// unregister a QObject property to link with the server manager
-  void unregisterLink(QObject* qObject, const char* qProperty, const char* signal,
-                          vtkSMProxy* Proxy, vtkSMProperty* Property, int Index=-1);
+  void unregisterLink(
+    QObject* qObject, const char* qProperty, const char* signal,
+    vtkSMProxy* Proxy, vtkSMProperty* Property, int Index=-1);
 
 signals:
-  /// Signal emitted whether there are possible properties to send down to the server manager
+  /// Signal emitted whether there are possible properties to send down to
+  /// the server manager
   void canAcceptOrReject(bool);
   /// Signal emitted when the user has accepted changes
   void accepted();
@@ -92,7 +94,10 @@ class PQWIDGETS_EXPORT pqPropertyManagerPropertyLink : public QObject
 {
   Q_OBJECT
 public:
-  pqPropertyManagerPropertyLink(pqPropertyManagerProperty* p, QObject* o, const char* property, const char* signal);
+  pqPropertyManagerPropertyLink(pqPropertyManagerProperty* p, 
+                                QObject* o, 
+                                const char* property, 
+                                const char* signal);
   QObject* object() const;
   QByteArray property() const;
 private slots:

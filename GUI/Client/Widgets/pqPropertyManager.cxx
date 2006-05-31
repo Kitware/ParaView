@@ -99,14 +99,17 @@ void pqPropertyManagerProperty::setValue(const QVariant& v)
     }
 }
 
-void pqPropertyManagerProperty::addLink(QObject* o, const char* prop, const char* signal)
+void pqPropertyManagerProperty::addLink(
+  QObject* o, const char* prop, const char* signal)
 {
-  pqPropertyManagerPropertyLink* link = new pqPropertyManagerPropertyLink(this, o, prop, signal);
+  pqPropertyManagerPropertyLink* link = 
+    new pqPropertyManagerPropertyLink(this, o, prop, signal);
   this->Links.append(link);
   o->setProperty(prop, this->Value);
 }
 
-void pqPropertyManagerProperty::removeLink(QObject* o, const char* prop, const char* /*signal*/)
+void pqPropertyManagerProperty::removeLink(
+  QObject* o, const char* prop, const char* /*signal*/)
 {
   QList<pqPropertyManagerPropertyLink*>::iterator iter;
   for(iter = this->Links.begin(); iter != this->Links.end(); ++iter)
@@ -120,17 +123,20 @@ void pqPropertyManagerProperty::removeLink(QObject* o, const char* prop, const c
     }
 }
 
-pqPropertyManagerPropertyLink::pqPropertyManagerPropertyLink(pqPropertyManagerProperty* p, 
-                                     QObject* o, const char* prop, const char* signal)
- : QObject(p), QtObject(o), QtProperty(prop)
+pqPropertyManagerPropertyLink::pqPropertyManagerPropertyLink(
+  pqPropertyManagerProperty* p, 
+  QObject* o, const char* prop, const char* signal)
+  : QObject(p), QtObject(o), QtProperty(prop)
 {
-  QObject::connect(p, SIGNAL(propertyChanged()), this, SLOT(managerPropertyChanged()));
+  QObject::connect(p, SIGNAL(propertyChanged()), 
+                   this, SLOT(managerPropertyChanged()));
   QObject::connect(o, signal, this, SLOT(guiPropertyChanged()));
 }
 
 void pqPropertyManagerPropertyLink::guiPropertyChanged()
 {
-  pqPropertyManagerProperty* p = qobject_cast<pqPropertyManagerProperty*>(this->parent());
+  pqPropertyManagerProperty* p = 
+    qobject_cast<pqPropertyManagerProperty*>(this->parent());
   QVariant v = this->QtObject->property(QtProperty);
   if(p->value() != v)
     {
@@ -141,11 +147,12 @@ void pqPropertyManagerPropertyLink::guiPropertyChanged()
 
 void pqPropertyManagerPropertyLink::managerPropertyChanged()
 {
-  pqPropertyManagerProperty* p = qobject_cast<pqPropertyManagerProperty*>(this->parent());
+  pqPropertyManagerProperty* p = 
+    qobject_cast<pqPropertyManagerProperty*>(this->parent());
   QVariant v = p->value();
-  if(this->QtObject && this->QtObject->property(QtProperty) != v)
+  if(this->QtObject && this->QtObject->property(this->QtProperty) != v)
     {
-    this->QtObject->setProperty(QtProperty, v);
+    this->QtObject->setProperty(this->QtProperty, v);
     }
 }
 
@@ -175,18 +182,22 @@ pqPropertyManager::~pqPropertyManager()
   delete this->Internal;
 }
 
-void pqPropertyManager::registerLink(QObject* qObject, const char* qProperty, const char* signal,
-                     vtkSMProxy* Proxy, vtkSMProperty* Property, int Index)
+void pqPropertyManager::registerLink(
+  QObject* qObject, const char* qProperty, const char* signal,
+  vtkSMProxy* Proxy, vtkSMProperty* Property, int Index)
 {
   pqInternal::PropertyMap::iterator iter;
-  iter = this->Internal->Properties.find(pqInternal::PropertyKey(Property, Index));
+  iter = 
+    this->Internal->Properties.find(pqInternal::PropertyKey(Property, Index));
   if(iter == this->Internal->Properties.end())
     {
     pqPropertyManagerProperty* p = new pqPropertyManagerProperty(NULL);
-    iter = this->Internal->Properties.insert(pqInternal::PropertyKey(Property, Index), p);
+    iter = this->Internal->Properties.insert(
+      pqInternal::PropertyKey(Property, Index), p);
     
-    this->Internal->Links.addPropertyLink(iter.value(), "value", SIGNAL(flushProperty()),
-                                          Proxy, Property, Index);
+    this->Internal->Links.addPropertyLink(
+      iter.value(), "value", SIGNAL(flushProperty()),
+      Proxy, Property, Index);
 
     QObject::connect(p, SIGNAL(guiPropertyChanged()), 
                      this, SLOT(propertyChanged()));
@@ -198,11 +209,13 @@ void pqPropertyManager::registerLink(QObject* qObject, const char* qProperty, co
 }
 
 
-void pqPropertyManager::unregisterLink(QObject* qObject, const char* qProperty, const char* signal,
-                        vtkSMProxy* Proxy, vtkSMProperty* Property, int Index)
+void pqPropertyManager::unregisterLink(
+  QObject* qObject, const char* qProperty, const char* signal,
+  vtkSMProxy* Proxy, vtkSMProperty* Property, int Index)
 {
   pqInternal::PropertyMap::iterator iter;
-  iter = this->Internal->Properties.find(pqInternal::PropertyKey(Property, Index));
+  iter = 
+    this->Internal->Properties.find(pqInternal::PropertyKey(Property, Index));
   if(iter != this->Internal->Properties.end())
     {
     iter.value()->removeLink(qObject, qProperty, signal);
@@ -212,8 +225,9 @@ void pqPropertyManager::unregisterLink(QObject* qObject, const char* qProperty, 
                           iter.value(), SIGNAL(flushProperty()));
       QObject::disconnect(iter.value(), SIGNAL(guiPropertyChanged()), 
                           this, SLOT(propertyChanged()));
-      this->Internal->Links.removePropertyLink(iter.value(), "value", SIGNAL(flushProperty()),
-                                               Proxy, Property, Index);
+      this->Internal->Links.removePropertyLink(
+        iter.value(), "value", SIGNAL(flushProperty()),
+        Proxy, Property, Index);
       this->Internal->Properties.erase(iter);
       }
     }

@@ -38,7 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqPropertyManager;
 
-/// Base class for Widget which provides an editor for editing properties of a proxy
+/// Base class for Widget which provides an editor for editing properties
+/// of a proxy
 class pqObjectPanel : public QWidget
 {
   Q_OBJECT
@@ -74,10 +75,12 @@ public slots:
   /// editor will query properties from the server manager
   virtual void reset();
 
-  /// Called when the panel becomes active. Default implemnetation does nothing.
+  /// Called when the panel becomes active. Default implemnetation does
+  /// nothing.
   virtual void select() { }
 
-  /// Called when the panel becomes inactive. Default implemnetation does nothing.
+  /// Called when the panel becomes inactive. Default implemnetation does
+  /// nothing.
   virtual void unselect() { }
 
 signals:
