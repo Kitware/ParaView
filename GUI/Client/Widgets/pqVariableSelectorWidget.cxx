@@ -282,7 +282,9 @@ void pqVariableSelectorWidget::reloadGUI()
     index = 0;
     }
 
+  this->Variables->blockSignals(true);
   this->Variables->setCurrentIndex(index);
+  this->Variables->blockSignals(false);
 
   if (this->PendingDisplayPropertyConnections)
     {
