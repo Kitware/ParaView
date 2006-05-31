@@ -74,7 +74,7 @@ QSize pqObjectPanel::sizeHint() const
   // return a size hint that would reasonably fit several properties
   ensurePolished();
   QFontMetrics fm(font());
-  int h = 20 * (qMax(fm.lineSpacing(), 14));
+  int h = qMax(fm.lineSpacing(), 14);
   int w = fm.width('x') * 25;
   QStyleOptionFrame opt;
   opt.rect = rect();
