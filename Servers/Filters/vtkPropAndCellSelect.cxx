@@ -32,7 +32,7 @@
 
 #include "vtkCompositeDataPipeline.h"
 
-vtkCxxRevisionMacro(vtkPropAndCellSelect, "1.1");
+vtkCxxRevisionMacro(vtkPropAndCellSelect, "1.2");
 vtkStandardNewMacro(vtkPropAndCellSelect);
 
 //----------------------------------------------------------------------------
@@ -61,7 +61,7 @@ vtkPropAndCellSelect::~vtkPropAndCellSelect()
 }
 
 //----------------------------------------------------------------------------
-int vtkPropAndCellSelect::FillOutputPortInformation(int p, vtkInformation *info)
+int vtkPropAndCellSelect::FillOutputPortInformation(int vtkNotUsed(p), vtkInformation *info)
 {
   info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataObject");
   info->Set(vtkCompositeDataPipeline::COMPOSITE_DATA_TYPE_NAME(), 
@@ -71,8 +71,8 @@ int vtkPropAndCellSelect::FillOutputPortInformation(int p, vtkInformation *info)
 
 //----------------------------------------------------------------------------
 int vtkPropAndCellSelect::RequestInformation(
-  vtkInformation *i, 
-  vtkInformationVector **iv, 
+  vtkInformation *vtkNotUsed(i), 
+  vtkInformationVector **vtkNotUsed(iv), 
   vtkInformationVector *ov)
 {
   vtkInformation* info = ov->GetInformationObject(0);
@@ -99,9 +99,9 @@ int vtkPropAndCellSelect::RequestInformation(
   compInfo->SetNumberOfGroups(numBlocks);
 
   //each block contains one data set
-  for (int i=0; i<numBlocks; i++)
+  for (int b=0; b<numBlocks; b++)
     {
-    compInfo->SetNumberOfDataSets(i, 1);
+    compInfo->SetNumberOfDataSets(b, 1);
     }
   
   info->Set(vtkCompositeDataPipeline::COMPOSITE_DATA_INFORMATION(),compInfo);
@@ -113,12 +113,10 @@ int vtkPropAndCellSelect::RequestInformation(
 
 //----------------------------------------------------------------------------
 int vtkPropAndCellSelect::RequestData(
-  vtkInformation *r,
-  vtkInformationVector **iv,
+  vtkInformation *vtkNotUsed(r),
+  vtkInformationVector **vtkNotUsed(iv),
   vtkInformationVector *ov)
 { 
-  int showBounds = this->AtomExtractor->GetShowBounds();
-
   // get a hold of my output dataobject to put the results into
   vtkInformation* outInfo = ov->GetInformationObject(0);
   vtkDataObject* dObjOut = 
