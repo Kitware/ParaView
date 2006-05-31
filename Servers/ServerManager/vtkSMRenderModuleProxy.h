@@ -31,7 +31,6 @@ class vtkPVRenderModuleHelper;
 class vtkSMDisplay;
 class vtkSMDisplayProxy;
 class vtkPVClientServerIdCollectionInformation;
-class vtkClientServerID;
 
 // TODO: have to change the PVCameraManipulators to do ResetCamera on
 // the RenderModule rather than renderer.
