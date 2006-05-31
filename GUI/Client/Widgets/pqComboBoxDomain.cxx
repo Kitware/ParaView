@@ -57,6 +57,7 @@ public:
   pqInternal()
     {
     this->Connection = vtkEventQtSlotConnect::New();
+    IsSetting = false;
     }
   ~pqInternal()
     {
@@ -65,6 +66,7 @@ public:
   vtkSmartPointer<vtkSMProperty> Property;
   vtkSmartPointer<vtkSMDomain> Domain;
   vtkEventQtSlotConnect* Connection;
+  bool IsSetting;
 };
   
 
@@ -113,6 +115,13 @@ void pqComboBoxDomain::domainChanged()
     return;
     }
 
+  if(this->Internal->IsSetting)
+    {
+    return;
+    }
+
+  this->Internal->IsSetting = true;
+
   pqSMAdaptor::PropertyType type;
   type = pqSMAdaptor::getPropertyType(this->Internal->Property);
   if(type == pqSMAdaptor::ENUMERATION)
@@ -121,13 +130,11 @@ void pqComboBoxDomain::domainChanged()
     enums = pqSMAdaptor::getEnumerationPropertyDomain(this->Internal->Property);
     // save previous value to put back
     QString old = combo->currentText();
-    combo->blockSignals(true);
     combo->clear();
     foreach(QVariant var, enums)
       {
       combo->addItem(var.toString());
       }
-    combo->blockSignals(false);
     int foundOld = combo->findText(old);
     if(foundOld >= 0)
       {
@@ -138,6 +145,7 @@ void pqComboBoxDomain::domainChanged()
       combo->setCurrentIndex(0);
       }
     }
+  this->Internal->IsSetting = false;
 }
 
 

@@ -97,9 +97,6 @@ void pqThresholdPanel::accept()
 
 void pqThresholdPanel::reset()
 {
-  // reset widgets controlled by the parent class
-  pqLoadedFormObjectPanel::reset();
-
   vtkSMStringVectorProperty* Property;
   Property = vtkSMStringVectorProperty::SafeDownCast(
        this->proxy()->GetProperty("SelectInputScalars"));
@@ -111,13 +108,13 @@ void pqThresholdPanel::reset()
     {
     this->AttributeMode->setCurrentIndex(idx);
     }
+  
+  // reset widgets controlled by the parent class
+  pqLoadedFormObjectPanel::reset();
 }
 
 void pqThresholdPanel::linkServerManagerProperties()
 {
-  // parent class hooks up some of our widgets in the ui
-  pqLoadedFormObjectPanel::linkServerManagerProperties();
-  
   
   // set up the attribute mode combo box
   vtkSMStringVectorProperty* AttributeProperty;
@@ -158,18 +155,21 @@ void pqThresholdPanel::linkServerManagerProperties()
   d1->setObjectName("lowerSpinDomain");
   pqDoubleSpinBoxDomain* d2 = new pqDoubleSpinBoxDomain(this->UpperSpin,
                             Property,
-                            1);
+                            0);
   d2->setObjectName("upperSpinDomain");
 
 
   // TODO -- pqDoubleSpinBoxDomain::updateDomain should automatically be called
   //         let's hack and help out a bit.
   QObject::connect(Scalars, SIGNAL(currentIndexChanged(int)),
-                   d1, SLOT(domainChanged()));
+                   d1, SLOT(domainChanged()), Qt::QueuedConnection);
   QObject::connect(Scalars, SIGNAL(currentIndexChanged(int)),
-                   d2, SLOT(domainChanged()));
+                   d2, SLOT(domainChanged()), Qt::QueuedConnection);
 
 
+  // parent class hooks up some of our widgets in the ui
+  pqLoadedFormObjectPanel::linkServerManagerProperties();
+  
 }
 
 void pqThresholdPanel::unlinkServerManagerProperties()
@@ -234,7 +234,7 @@ void pqThresholdPanel::lowerSliderChanged()
   if(IsSetting == false)
     {
     IsSetting = true;
-    double fraction = this->LowerSlider->value() * 100.0;
+    double fraction = this->LowerSlider->value() / 100.0;
     double range = this->LowerSpin->maximum() - this->LowerSpin->minimum();
     double v = (fraction * range) + this->LowerSpin->minimum();
     this->LowerSpin->setValue(v);
@@ -247,7 +247,7 @@ void pqThresholdPanel::upperSliderChanged()
   if(IsSetting == false)
     {
     IsSetting = true;
-    double fraction = this->UpperSlider->value() * 100.0;
+    double fraction = this->UpperSlider->value() / 100.0;
     double range = this->UpperSpin->maximum() - this->UpperSpin->minimum();
     double v = (fraction * range) + this->UpperSpin->minimum();
     this->UpperSpin->setValue(v);

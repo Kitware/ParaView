@@ -301,7 +301,7 @@ void pqObjectInspectorWidget::reset()
   
   if(this->CurrentPanel)
     {
-    this->CurrentPanel->getPropertyManager()->reject();
+    this->CurrentPanel->reset();
     }
 
   if (this->ForceModified)

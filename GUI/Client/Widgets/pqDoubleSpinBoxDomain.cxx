@@ -138,7 +138,6 @@ void pqDoubleSpinBoxDomain::domainChanged()
     }
   else if(type == pqSMAdaptor::MULTIPLE_ELEMENTS)
     {
-    QList<QVariant> range;
     range = pqSMAdaptor::getMultipleElementPropertyDomain(this->Internal->Property,
                                                           this->Internal->Index);
     if(range.size() == 2)

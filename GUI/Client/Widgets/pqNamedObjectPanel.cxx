@@ -124,6 +124,7 @@ void pqNamedObjectPanel::linkServerManagerProperties()
             {
             QLineEdit* le = qobject_cast<QLineEdit*>(propertyWidget);
             QSlider* sl = qobject_cast<QSlider*>(propertyWidget);
+            QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(foundObject);
             if(le)
               {
               this->PropertyManager->registerLink(le, "text", SIGNAL(textChanged(const QString&)),
@@ -133,6 +134,11 @@ void pqNamedObjectPanel::linkServerManagerProperties()
               {
               this->PropertyManager->registerLink(sl, "value",
                                                  SIGNAL(valueChanged(int)),
+                                                 this->Proxy, SMProperty, index);
+              }
+            else if(doubleSpinBox)
+              {
+              this->PropertyManager->registerLink(doubleSpinBox, "value", SIGNAL(valueChanged(double)),
                                                  this->Proxy, SMProperty, index);
               }
             }
@@ -342,6 +348,8 @@ void pqNamedObjectPanel::unlinkServerManagerProperties()
             {
             QLineEdit* le = qobject_cast<QLineEdit*>(propertyWidget);
             QSlider* sl = qobject_cast<QSlider*>(propertyWidget);
+            QDoubleSpinBox* doubleSpinBox =
+              qobject_cast<QDoubleSpinBox*>(propertyWidget);
             if(le)
               {
               this->PropertyManager->unregisterLink(le, "text", SIGNAL(textChanged(const QString&)),
@@ -352,6 +360,13 @@ void pqNamedObjectPanel::unlinkServerManagerProperties()
               this->PropertyManager->unregisterLink(sl, "value",
                                                  SIGNAL(valueChanged(int)),
                                                  this->Proxy, SMProperty, index);
+              }
+            else if(doubleSpinBox)
+              {
+              this->PropertyManager->unregisterLink(doubleSpinBox, 
+                                                  "value", 
+                                                  SIGNAL(valueChanged(double)),
+                                                  this->Proxy, SMProperty);
               }
             }
           }
