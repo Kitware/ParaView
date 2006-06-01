@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqReaderFactory_h
 #define __pqReaderFactory_h
 
+#include "pqWidgetsExport.h"
 #include <QObject>
 
 class pqPipelineSource;
@@ -42,7 +43,7 @@ class vtkSMProxy;
 // This class is a reader factory. The factory must be made file-type aware
 // by using addFileType. One initialized one can use createReader()
 // to create a reader that can read a particular file. 
-class pqReaderFactory : public QObject
+class PQWIDGETS_EXPORT pqReaderFactory : public QObject
 {
 public:
   pqReaderFactory(QObject* parent=NULL);
