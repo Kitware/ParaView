@@ -46,6 +46,7 @@ public:
   // Set the text on the message.
   virtual void SetText(const char*);
   vtkGetStringMacro(Text);
+  virtual void AppendText(const char*);
 
   // Description:
   // Set/Get width of the message (in pixels).

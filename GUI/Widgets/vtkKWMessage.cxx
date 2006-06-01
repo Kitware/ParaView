@@ -17,9 +17,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWIcon.h"
 
+#include <vtksys/stl/string>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessage );
-vtkCxxRevisionMacro(vtkKWMessage, "1.7");
+vtkCxxRevisionMacro(vtkKWMessage, "1.8");
 
 //----------------------------------------------------------------------------
 vtkKWMessage::vtkKWMessage()
@@ -69,6 +71,18 @@ void vtkKWMessage::SetText(const char* _arg)
 
   this->UpdateText();
 } 
+
+//----------------------------------------------------------------------------
+void vtkKWMessage::AppendText(const char *arg)
+{
+  if (!this->Text)
+    {
+    this->SetText(arg);
+    }
+  vtksys_stl::string text(this->Text);
+  text += arg;
+  this->SetText(text.c_str());
+}
 
 //----------------------------------------------------------------------------
 void vtkKWMessage::UpdateText()
