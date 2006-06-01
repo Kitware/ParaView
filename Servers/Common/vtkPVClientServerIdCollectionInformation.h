@@ -25,7 +25,6 @@
 #define __vtkPVClientServerIdCollectionInformation_h
 
 #include "vtkPVInformation.h"
-#include "vtkSystemIncludes.h" // for vtkTypeUInt32
 #include "vtkClientServerID.h" // for vtkClientServerID
 
 class vtkClientServerIdSetType;
@@ -62,7 +61,7 @@ public:
 
   // Description:
   // Returns true if the given ID is in my set.
-  int Contains(vtkTypeUInt32 ID);
+  int Contains(vtkClientServerID id);
 //ETX
 
 protected:
