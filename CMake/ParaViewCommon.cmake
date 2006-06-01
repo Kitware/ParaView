@@ -50,6 +50,11 @@ FIND_PATH(VTK_DATA_ROOT VTKData.readme ${ParaView_SOURCE_DIR}/../VTKData $ENV{VT
 MARK_AS_ADVANCED(VTK_DATA_ROOT)
 MARK_AS_ADVANCED(BUILD_EXAMPLES)
 
+# Include the UseX option.
+INCLUDE(${VTK_CMAKE_DIR}/vtkDependentOption.cmake)
+INCLUDE(${VTK_CMAKE_DIR}/vtkUseX.cmake)
+SET(VTK_DONT_INCLUDE_USE_X 1)
+
 # Choose static or shared libraries.  This provides BUILD_SHARED_LIBS
 # and VTK_USE_RPATH.
 INCLUDE(${VTK_CMAKE_DIR}/vtkSelectSharedLibraries.cmake)
