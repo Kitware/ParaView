@@ -70,6 +70,7 @@ void pqCompoundProxyWizard::onLoad()
     QString(),
     "XML files (*.xml);;All files (*)");
   fileDialog->setObjectName("FileOpenDialog");
+  fileDialog->setFileMode(pqFileDialog::ExistingFiles);
 
   this->connect(fileDialog, SIGNAL(filesSelected(const QStringList&)),
                 this, SLOT(onLoad(const QStringList&)));

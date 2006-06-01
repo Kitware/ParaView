@@ -555,6 +555,18 @@ QStringList pqLocalFileDialogModel::splitPath(const QString& Path)
   return Path.split(QDir::separator());
 }
 
+bool pqLocalFileDialogModel::fileExists(const QString& File)
+{
+  QFileInfo info(File);
+  return info.exists();
+}
+
+bool pqLocalFileDialogModel::dirExists(const QString& File)
+{
+  QDir info(File);
+  return info.exists();
+}
+
 QAbstractItemModel* pqLocalFileDialogModel::fileModel()
 {
   return this->Implementation->FileModel;

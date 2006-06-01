@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialogFilter.h"
 
 #include <QDir>
+#include <QMessageBox>
 #include <QtDebug>
 
 #include <vtkstd/set>
@@ -72,7 +73,8 @@ pqFileDialog::pqFileDialog(pqFileDialogModel* model, QWidget* p,
                            const QString& nameFilter) :
   QDialog(p),
   Model(model),
-  Ui(new Ui::pqFileDialog())
+  Ui(new Ui::pqFileDialog()),
+  Mode(ExistingFile)
 {
   this->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -85,10 +87,10 @@ pqFileDialog::pqFileDialog(pqFileDialogModel* model, QWidget* p,
   this->Ui->Favorites->setModel(this->Model->favoriteModel());
 
   this->Ui->Files->setSelectionBehavior(QAbstractItemView::SelectRows);
-  this->Ui->Files->setSelectionMode(QAbstractItemView::ExtendedSelection);
   
   this->Ui->Favorites->setSelectionBehavior(QAbstractItemView::SelectRows);
-  this->Ui->Favorites->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
+  this->setFileMode(ExistingFile);
 
   this->setWindowTitle(title);
 
@@ -172,6 +174,37 @@ void pqFileDialog::emitFilesSelected(const QStringList& files)
   emit filesSelected(files);
   this->done(QDialog::Accepted);
 }
+  
+pqFileDialog::FileMode pqFileDialog::fileMode()
+{
+  return this->Mode;
+}
+
+void pqFileDialog::setFileMode(pqFileDialog::FileMode mode)
+{
+  this->Mode = mode;
+  switch(this->Mode)
+    {
+    case AnyFile:
+    case ExistingFile:
+    case Directory:
+        {
+        this->Ui->Files->setSelectionMode(
+             QAbstractItemView::SingleSelection);
+        this->Ui->Favorites->setSelectionMode(
+             QAbstractItemView::SingleSelection);
+        }
+      break;
+    case ExistingFiles:
+        {
+        this->Ui->Files->setSelectionMode(
+             QAbstractItemView::ExtendedSelection);
+        this->Ui->Favorites->setSelectionMode(
+             QAbstractItemView::ExtendedSelection);
+        }
+    }
+}
+
 
 void pqFileDialog::accept()
 {
@@ -206,14 +239,83 @@ void pqFileDialog::accept()
       selected_files.push_back(manual_path);
       }
     }
+
+  // gotta have something
+  if(selected_files.empty())
+    return;
   
-  // Ensure that we are hidden before broadcasting the selection, so we don't get caught by screen-captures
-  this->hide();
   
-  if(selected_files.size())
-    emit filesSelected(selected_files);
-  
-  base::accept();
+  switch(this->Mode)
+    {
+    case Directory:
+      {
+      QString fn = selected_files.first();
+      if(this->Model->dirExists(fn))
+        {
+        this->hide();
+        emit this->filesSelected(selected_files);
+        base::accept();
+        }
+      // not found, issue error and return
+      QString message = tr("\nDirectory not found.\nPlease verify the "
+                           "correct file name was given");
+      QMessageBox::warning(this, this->windowTitle(), fn + message);
+      return;
+      }
+    break;
+    case ExistingFile:
+    case ExistingFiles:
+      {
+      int numFiles = selected_files.size();
+      for(int j=0; j<numFiles; j++)
+        {
+        QString fn = selected_files.at(j);
+        if(this->Model->dirExists(fn))
+          {
+          onNavigate(fn);
+          this->Ui->FileName->selectAll();
+          return;
+          }
+        else if(!this->Model->fileExists(fn))
+          {
+          QString message = tr("\nFile not found.\nPlease verify the "
+                               "correct file name was given.");
+          QMessageBox::warning(this, this->windowTitle(), fn + message);
+          return;
+          }
+        }
+      this->hide();
+      emit this->filesSelected(selected_files);
+      base::accept();
+      }
+    break;
+    case AnyFile:
+      {
+      QString fn = selected_files.first();
+      if(this->Model->dirExists(fn))
+        {
+        //navigate to that dir
+        this->onNavigate(fn);
+        this->Ui->FileName->selectAll();
+        return;
+        }
+      else if(this->Model->fileExists(fn))
+        {
+        // found, ask to overwrite
+        QString message = tr(" already exists.\nDo you want to replace it?");
+        if(QMessageBox::warning(this, this->windowTitle(), fn + message,
+                                QMessageBox::Yes, QMessageBox::No)
+           == QMessageBox::No)
+          {
+          return;
+          }
+        }
+      this->hide();
+      emit this->filesSelected(selected_files);
+      base::accept();
+      }
+    break;
+    }
 }
 
 void pqFileDialog::reject()

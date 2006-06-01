@@ -63,6 +63,16 @@ class QTWIDGETS_EXPORT pqFileDialog :
   Q_OBJECT
   
 public:
+
+  /// choose mode for selecting file/folder.
+  /// AnyFile: The name of a file, whether it exists or not.  
+  ///   Typically used by "Save As..."
+  /// ExistingFile: The name of a single existing file.
+  ///   Typically used by "Open..."
+  /// ExistingFiles: The names of zero or more existing files.
+  /// Directory: The name of a directory.
+  enum FileMode { AnyFile, ExistingFile, ExistingFiles, Directory };
+    
   /// creates a file dialog using the dialog model
   /// the title, and start directory may be specified
   /// the filter is a string of semi-colon separated filters
@@ -80,6 +90,9 @@ public:
 
   void accept();
   void reject();
+
+  FileMode fileMode();
+  void setFileMode(FileMode);
   
 signals:
   /// Signal emitted when the user has chosen a set of files and accepted the dialog
@@ -89,6 +102,7 @@ protected:
   pqFileDialogModel* const Model;
   Ui::pqFileDialog* const Ui;
   pqFileDialogFilter* Filter;
+  FileMode Mode;
   
 protected slots:
   void onDataChanged(const QModelIndex&, const QModelIndex&);

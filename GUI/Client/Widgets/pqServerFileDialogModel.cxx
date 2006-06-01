@@ -510,6 +510,48 @@ QStringList pqServerFileDialogModel::splitPath(const QString& Path)
   return Path.split(QDir::separator());
 }
 
+bool pqServerFileDialogModel::fileExists(const QString& FilePath)
+{
+  QDir dir(FilePath);
+  dir.cdUp();
+  QString Path = dir.path();
+  QString File = this->splitPath(FilePath).last();
+
+  vtkSmartPointer<vtkStringList> dirs = vtkSmartPointer<vtkStringList>::New();
+  vtkSmartPointer<vtkStringList> files = vtkSmartPointer<vtkStringList>::New();
+  
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (!pm->GetDirectoryListing(this->Server->GetConnectionID(),
+    Path.toAscii().data(), dirs.GetPointer(), files.GetPointer(), 0))
+    {
+    // error failed to obtain directory listing.
+    return false;
+    }
+  for(int i=0; i<files->GetNumberOfStrings(); i++)
+    {
+    if(File == files->GetString(i))
+      {
+      return true;
+      }
+    }
+  return false;
+}
+
+bool pqServerFileDialogModel::dirExists(const QString& Dir)
+{
+  vtkSmartPointer<vtkStringList> dirs = vtkSmartPointer<vtkStringList>::New();
+  vtkSmartPointer<vtkStringList> files = vtkSmartPointer<vtkStringList>::New();
+  
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (!pm->GetDirectoryListing(this->Server->GetConnectionID(),
+    Dir.toAscii().data(), dirs.GetPointer(), files.GetPointer(), 0))
+    {
+    // error failed to obtain directory listing.
+    return false;
+    }
+  return true;
+}
+
 QAbstractItemModel* pqServerFileDialogModel::fileModel()
 {
   return this->Implementation->FileModel;

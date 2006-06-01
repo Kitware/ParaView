@@ -66,6 +66,8 @@ public:
   QString getFilePath(const QString&);
   QString getParentPath(const QString&);
   QStringList splitPath(const QString&);
+  bool fileExists(const QString&);
+  bool dirExists(const QString&);
   QAbstractItemModel* fileModel();
   QAbstractItemModel* favoriteModel();
   

@@ -74,6 +74,10 @@ public:
   /// (this is handled by the back-end so it can deal with 
   /// issues of delimiters, symlinks, multi-root filesystems, etc)
   virtual QStringList splitPath(const QString&) = 0;
+  /// Returns whether the file exists
+  virtual bool fileExists(const QString&) = 0;
+  /// Returns whether a directory exists
+  virtual bool dirExists(const QString&) = 0;
 
   /// Returns a Qt model that will contain the contents of the right-hand pane of the file dialog
   virtual QAbstractItemModel* fileModel() = 0;

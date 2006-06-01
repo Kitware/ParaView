@@ -962,6 +962,7 @@ void pqMainWindow::onFileOpen(pqServer* server)
     new pqServerFileDialogModel(NULL, server), 
     this, tr("Open File:"), QString(), filters);
   file_dialog->setObjectName("FileOpenDialog");
+  file_dialog->setFileMode(pqFileDialog::ExistingFile);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
     this, SLOT(onFileOpen(const QStringList&)));
   file_dialog->show();
@@ -994,6 +995,7 @@ void pqMainWindow::onFileOpenServerState()
   pqFileDialog *fileDialog = new pqFileDialog(new pqLocalFileDialogModel(),
       this, tr("Open Server State File:"), QString(), filters);
   fileDialog->setObjectName("FileOpenServerStateDialog");
+  fileDialog->setFileMode(pqFileDialog::ExistingFile);
   QObject::connect(fileDialog, SIGNAL(filesSelected(const QStringList&)),
       this, SLOT(onFileOpenServerState(const QStringList&)));
   fileDialog->show();
@@ -1078,6 +1080,7 @@ void pqMainWindow::onFileSaveServerState()
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), 
     this, tr("Save Server State:"), QString(), filters);
   file_dialog->setObjectName("FileSaveServerStateDialog");
+  file_dialog->setFileMode(pqFileDialog::ExistingFile);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileSaveServerState(const QStringList&)));
   file_dialog->show();
 }
@@ -1150,6 +1153,7 @@ void pqMainWindow::onFileSaveScreenshot()
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), 
     this, tr("Save Screenshot:"), QString(), filters);
   file_dialog->setObjectName("FileSaveScreenshotDialog");
+  file_dialog->setFileMode(pqFileDialog::AnyFile);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
     this, SLOT(onFileSaveScreenshot(const QStringList&)));
   file_dialog->show();
@@ -1194,6 +1198,7 @@ void pqMainWindow::onRecordTestScreenshot()
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), 
     this, tr("Save Test Screenshot:"), QString(), filters);
   file_dialog->setObjectName("RecordTestScreenshotDialog");
+  file_dialog->setFileMode(pqFileDialog::AnyFile);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
     this, SLOT(onRecordTestScreenshot(const QStringList&)));
   file_dialog->show();
@@ -1356,6 +1361,7 @@ void pqMainWindow::onRecordTest()
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), 
     this, tr("Record Test:"), QString(), filters);
   file_dialog->setObjectName("ToolsRecordTestDialog");
+  file_dialog->setFileMode(pqFileDialog::AnyFile);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
     this, SLOT(onRecordTest(const QStringList&)));
   file_dialog->show();
@@ -1382,6 +1388,7 @@ void pqMainWindow::onPlayTest()
   pqFileDialog* const file_dialog = new pqFileDialog(new
     pqLocalFileDialogModel(), this, tr("Play Test:"), QString(), filters);
   file_dialog->setObjectName("ToolsPlayTestDialog");
+  file_dialog->setFileMode(pqFileDialog::ExistingFile);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
     this, SLOT(onPlayTest(const QStringList&)));
   file_dialog->show();

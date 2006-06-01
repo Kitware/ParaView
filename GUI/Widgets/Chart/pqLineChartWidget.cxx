@@ -569,6 +569,7 @@ void pqLineChartWidget::savePDF()
     this, tr("Save .pdf File:"), QString(), "PDF files (*.pdf)")
     << pqSetName("fileSavePDFDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(savePDF(const QStringList&)));
+  file_dialog->setFileMode(pqFileDialog::AnyFile);
     
   file_dialog->show();
 }
@@ -591,6 +592,7 @@ void pqLineChartWidget::savePNG()
     this, tr("Save .png File:"), QString(), "PNG files (*.png)")
     << pqSetName("fileSavePNGDialog")
     << pqConnect(SIGNAL(filesSelected(const QStringList&)), this, SLOT(savePNG(const QStringList&)));
+  file_dialog->setFileMode(pqFileDialog::AnyFile);
     
   file_dialog->show();
 }
