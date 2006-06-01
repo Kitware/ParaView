@@ -2,5 +2,6 @@
     <qresource prefix="/pqClient" >
         <file>ParaViewLogo.png</file>
         <file>ParaQFilters.xml</file>
+        <file>ParaQReaders.xml</file>
     </qresource>
 </RCC>

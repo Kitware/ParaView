@@ -40,6 +40,7 @@ class pqApplicationCoreInternal;
 class pqPipelineBuilder;
 class pqPipelineData;
 class pqPipelineSource;
+class pqReaderFactory;
 class pqRenderModule;
 class pqRenderWindowManager;
 class pqServer;
@@ -73,6 +74,7 @@ public:
   pqPipelineBuilder* getPipelineBuilder();
   pqRenderWindowManager* getRenderWindowManager();
   pq3DWidgetFactory* get3DWidgetFactory();
+  pqReaderFactory* getReaderFactory();
 
   // This will create a source with the given xmlname on the active server. 
   // On success returns
@@ -99,8 +101,7 @@ public:
 
   // Utility function to create a reader that reads the file on the 
   // active server. 
-  pqPipelineSource* createReaderOnActiveServer( const QString& filename, 
-    const QString& readerName);
+  pqPipelineSource* createReaderOnActiveServer( const QString& filename);
 
   // Use this method to delete the active source. 
   // This involves following operations

@@ -239,6 +239,9 @@ pqMainWindow::pqMainWindow() :
   // Set up the dock window corners to give the vertical docks more room.
   this->setCorner(Qt::BottomLeftCorner, Qt::LeftDockWidgetArea);
   this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
+
+  // Initialize supported file types.
+  core->getReaderFactory()->loadFileTypes(":/pqClient/ParaQReaders.xml");
 }
 
 //-----------------------------------------------------------------------------
@@ -951,11 +954,9 @@ void pqMainWindow::onFileOpen()
 //-----------------------------------------------------------------------------
 void pqMainWindow::onFileOpen(pqServer* server)
 {
-  // TODO: handle more than exodus
-  QString filters;
-  filters += "Exodus files (*.g *.e *.ex2 *.ex2v2 *.exo *.gen *.exoII ";
-  filters += "*.0 *.00 *.000 *.0000)";
-  filters += ";;All files (*)";
+  QString filters = 
+    pqApplicationCore::instance()->getReaderFactory()->getSupportedFileTypes();
+  filters += "All files (*)";
   pqFileDialog* const file_dialog = new pqFileDialog(
     new pqServerFileDialogModel(NULL, server), 
     this, tr("Open File:"), QString(), filters);
@@ -973,7 +974,7 @@ void pqMainWindow::onFileOpen(const QStringList& files)
   for(int i = 0; i != files.size(); ++i)
     {
     pqPipelineSource* reader = 
-      core->createReaderOnActiveServer(files[i], "ExodusReader");
+      core->createReaderOnActiveServer(files[i]);
     if (!reader)
       {
       qDebug() << "Failed to create reader for : " << files[i];

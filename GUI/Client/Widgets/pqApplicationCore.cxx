@@ -49,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineData.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineSource.h"
+#include "pqReaderFactory.h"
 #include "pqRenderModule.h"
 #include "pqRenderWindowManager.h"
 #include "pqServer.h"
@@ -66,6 +67,7 @@ public:
   pqPipelineBuilder* PipelineBuilder;
   pqRenderWindowManager* RenderWindowManager;
   pq3DWidgetFactory* WidgetFactory;
+  pqReaderFactory* ReaderFactory;
 
   QPointer<pqPipelineSource> ActiveSource;
   QPointer<pqServer> ActiveServer;
@@ -121,8 +123,10 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
     SIGNAL(sourceRemoved(pqPipelineSource*)),
     this, SLOT(sourceRemoved(pqPipelineSource*)));
 
-  // * Create the pq3DWidgetFactory.
+  // * Create various factories.
   this->Internal->WidgetFactory = new pq3DWidgetFactory(this);
+  this->Internal->ReaderFactory = new pqReaderFactory(this);
+
 }
 
 //-----------------------------------------------------------------------------
@@ -194,6 +198,12 @@ pqRenderWindowManager* pqApplicationCore::getRenderWindowManager()
 pq3DWidgetFactory* pqApplicationCore::get3DWidgetFactory()
 {
   return this->Internal->WidgetFactory;
+}
+
+//-----------------------------------------------------------------------------
+pqReaderFactory* pqApplicationCore::getReaderFactory()
+{
+  return this->Internal->ReaderFactory;
 }
 
 //-----------------------------------------------------------------------------
@@ -402,6 +412,43 @@ pqPipelineSource* pqApplicationCore::createCompoundSource(
 }
 
 //-----------------------------------------------------------------------------
+pqPipelineSource* pqApplicationCore::createReaderOnActiveServer(
+  const QString& filename)
+{
+  if (!this->Internal->ActiveServer)
+    {
+    qDebug() << "No active server. Cannot create reader.";
+    return 0;
+    }
+
+  pqPipelineSource* reader= this->Internal->ReaderFactory->createReader(
+    filename, this->Internal->ActiveServer);
+  if (!reader)
+    {
+    return NULL;
+    }
+
+  this->Internal->UndoStack->BeginOrContinueUndoSet("Set Filenames");
+
+  vtkSMProxy* proxy = reader->getProxy();
+  pqSMAdaptor::setElementProperty(proxy, proxy->GetProperty("FileName"), 
+    filename);
+  pqSMAdaptor::setElementProperty(proxy, proxy->GetProperty("FilePrefix"),
+    filename);
+  pqSMAdaptor::setElementProperty(proxy, proxy->GetProperty("FilePattern"),
+    filename);
+  proxy->UpdateVTKObjects();
+
+  this->Internal->UndoStack->PauseUndoSet();
+
+  this->Internal->SourcesSansDisplays.push_back(reader);
+  emit this->pendingDisplays(true);
+
+  this->setActiveSource(reader);
+  return reader;
+}
+/*
+//-----------------------------------------------------------------------------
 pqPipelineSource* pqApplicationCore::createReaderOnActiveServer( 
   const QString& filename, const QString& readerName)
 {
@@ -439,7 +486,7 @@ pqPipelineSource* pqApplicationCore::createReaderOnActiveServer(
   this->setActiveSource(reader);
   return reader;
 }
-
+*/
 //-----------------------------------------------------------------------------
 void pqApplicationCore::removeActiveSource()
 {

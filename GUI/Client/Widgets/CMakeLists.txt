@@ -194,6 +194,8 @@ ADD_LIBRARY(pqWidgets
   pqPropertyManager.h
   pqProxy.cxx
   pqProxy.h
+  pqReaderFactory.cxx
+  pqReaderFactory.h
   pqRenderModule.cxx
   pqRenderModule.h
   pqRenderViewEditor.cxx
