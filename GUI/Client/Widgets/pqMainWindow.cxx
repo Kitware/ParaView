@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineBuilder.h"
 #include "pqPipelineSource.h"
 #include "pqPropertyManager.h"
+#include "pqReaderFactory.h"
 #include "pqRenderModule.h"
 #include "pqRenderWindowManager.h"
 #include "pqServerBrowser.h"
