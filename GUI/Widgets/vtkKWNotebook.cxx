@@ -23,6 +23,7 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWFrameWithScrollbar.h"
 
 #include <vtksys/stl/list>
 #include <vtksys/stl/algorithm>
@@ -60,7 +61,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.103");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.104");
 
 //----------------------------------------------------------------------------
 class vtkKWNotebookInternals
@@ -222,6 +223,7 @@ vtkKWNotebook::vtkKWNotebook()
   this->PagesCanBePinned         = 0;
   this->EnablePageTabContextMenu = 0;
   this->ShowIcons                = 0;
+  this->UseFrameWithScrollbars  = 0;
 
   this->IdCounter       = 0;
   this->CurrentId       = -1;
@@ -660,7 +662,17 @@ vtkKWFrame *vtkKWNotebook::GetFrame(int id)
   vtkKWNotebook::Page *page = this->GetPage(id);
   if (page)
     {
-    return page->Frame;
+    vtkKWFrame *frame = vtkKWFrame::SafeDownCast(page->Frame);
+    if (frame)
+      {
+      return frame;
+      }
+    vtkKWFrameWithScrollbar *framews = 
+      vtkKWFrameWithScrollbar::SafeDownCast(page->Frame);
+    if (framews)
+      {
+      return framews->GetFrame();
+      }
     }
   return NULL;
 }
@@ -673,7 +685,17 @@ vtkKWFrame *vtkKWNotebook::GetFrame(const char *title)
   vtkKWNotebook::Page *page = this->GetPage(title);
   if (page)
     {
-    return page->Frame;
+    vtkKWFrame *frame = vtkKWFrame::SafeDownCast(page->Frame);
+    if (frame)
+      {
+      return frame;
+      }
+    vtkKWFrameWithScrollbar *framews = 
+      vtkKWFrameWithScrollbar::SafeDownCast(page->Frame);
+    if (framews)
+      {
+      return framews->GetFrame();
+      }
     }
   return NULL;
 }
@@ -686,7 +708,17 @@ vtkKWFrame *vtkKWNotebook::GetFrame(const char *title, int tag)
   vtkKWNotebook::Page *page = this->GetPage(title, tag);
   if (page)
     {
-    return page->Frame;
+    vtkKWFrame *frame = vtkKWFrame::SafeDownCast(page->Frame);
+    if (frame)
+      {
+      return frame;
+      }
+    vtkKWFrameWithScrollbar *framews = 
+      vtkKWFrameWithScrollbar::SafeDownCast(page->Frame);
+    if (framews)
+      {
+      return framews->GetFrame();
+      }
     }
   return NULL;
 }
@@ -703,10 +735,22 @@ int vtkKWNotebook::GetPageIdFromFrameWidgetName(const char *frame_wname)
     for (; it != end; ++it)
       {
       if (*it && (*it)->Frame && 
-          (*it)->Frame->IsCreated() &&
-          !strcmp((*it)->Frame->GetWidgetName(), frame_wname))
+          (*it)->Frame->IsCreated())
         {
-        return (*it)->Id;
+        vtkKWFrame *frame = vtkKWFrame::SafeDownCast((*it)->Frame);
+        if (!frame)
+          {
+          vtkKWFrameWithScrollbar *framews = 
+            vtkKWFrameWithScrollbar::SafeDownCast((*it)->Frame);
+          if (framews)
+            {
+            frame = framews->GetFrame();
+            }
+          }
+        if (frame && !strcmp(frame->GetWidgetName(), frame_wname))
+          {
+          return (*it)->Id;
+          }
         }
       }
     }
@@ -762,7 +806,14 @@ int vtkKWNotebook::AddPage(const char *title,
 
   // Create the page frame (this is where user-defined widgets will be packed)
 
-  page->Frame = vtkKWFrame::New();
+  if (this->UseFrameWithScrollbars)
+    {
+    page->Frame = vtkKWFrameWithScrollbar::New();
+    }
+  else
+    {
+    page->Frame = vtkKWFrame::New();
+    }
   page->Frame->SetParent(this->Body);
   page->Frame->Create();
 
@@ -2050,7 +2101,6 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
   if (selected)
     {
     double fr, fg, fb;
-    //page->Frame->GetBackgroundColor(&fr, &fg, &fb);
     this->GetBackgroundColor(&fr, &fg, &fb);
 
     page->Label->SetBackgroundColor(fr, fr, fb);
@@ -2082,7 +2132,6 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
     // Compute the shaded color based on the current frame background color
 
     double fr, fg, fb;
-    //page->Frame->GetBackgroundColor(&fr, &fg, &fb);
     this->GetBackgroundColor(&fr, &fg, &fb);
 
     double fh, fs, fv;
@@ -2721,6 +2770,8 @@ void vtkKWNotebook::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "ShowAllPagesWithSameTag: " 
      << (this->ShowAllPagesWithSameTag ? "On" : "Off") << endl;
+  os << indent << "UseFrameWithScrollbars: " 
+     << (this->UseFrameWithScrollbars ? "On" : "Off") << endl;
   os << indent << "ShowOnlyPagesWithSameTag: " 
      << (this->ShowOnlyPagesWithSameTag ? "On" : "Off") << endl;
   os << indent << "ShowOnlyMostRecentPages: " 

@@ -2,6 +2,7 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 #include "vtkKWPushButton.h"
+#include "vtkKWMessage.h"
 
 #include "vtkKWWidgetsTourExample.h"
 
@@ -53,8 +54,31 @@ void vtkKWNotebookItem::Create(vtkKWWidget *parent, vtkKWWindow *)
   notebook2->Create();
   notebook2->EnablePageTabContextMenuOn();
   notebook2->PagesCanBePinnedOn();
+  notebook2->UseFrameWithScrollbarsOn();
 
-  notebook2->AddPage("Page A");
+  // -----------------------------------------------------------------------
+
+  // Create a message inside one of the page (as a test for scrollbars)
+
+  page_id = notebook2->AddPage("Page A");
+
+  const char *lorem_ipsum = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Nunc felis. Nulla gravida. Aliquam erat volutpat. Mauris accumsan quam non sem. Sed commodo, magna quis bibendum lacinia, elit turpis iaculis augue, eget hendrerit elit dui vel elit.\n\nInteger ante eros, auctor eu, dapibus ac, ultricies vitae, lacus. Fusce accumsan mauris. Morbi felis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos. Maecenas convallis imperdiet nunc.";
+
+  vtkKWMessage *message = vtkKWMessage::New();
+  message->SetParent(notebook2->GetFrame(page_id));
+  message->Create();
+  message->SetText(lorem_ipsum);
+  message->AppendText(lorem_ipsum);
+
+  app->Script(
+    "pack %s -side top -anchor nw -expand n -padx 2 -pady 2", 
+    message->GetWidgetName());
+
+  message->Delete();
+
+  // -----------------------------------------------------------------------
+
+  // Create a disabled page
 
   page_id = notebook2->AddPage("Page Disabled");
   notebook2->SetPageEnabled(page_id, 0);

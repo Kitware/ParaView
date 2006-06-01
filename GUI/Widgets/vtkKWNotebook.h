@@ -252,6 +252,15 @@ public:
   int GetPinnedPageId(int idx);
   
   // Description:
+  // By default, pages are vtkKWFrame. If the user needs scrollbars, he can
+  // make the page the parent of a vtkKWFrameWithScrollbar. For convenience,
+  // this option can be turned on so that pages that are added from now on are
+  // automatically put inside a vtkKWFrameWithScrollbar.
+  vtkSetMacro(UseFrameWithScrollbars, int);
+  vtkGetMacro(UseFrameWithScrollbars, int);
+  vtkBooleanMacro(UseFrameWithScrollbars, int);
+  
+  // Description:
   // The notebook will automatically resize itself to fit its
   // contents. This can lead to a lot of resizing. So you can
   // specify a minimum width and height for the notebook. This
@@ -325,6 +334,7 @@ protected:
   int NumberOfMostRecentPages;
   int PagesCanBePinned;
   int EnablePageTabContextMenu;
+  int UseFrameWithScrollbars;
 
   vtkKWFrame *TabsFrame;
   vtkKWFrame *Body;
@@ -349,7 +359,7 @@ protected:
     int             Tag;
     int             Enabled;
     char            *Title;
-    vtkKWFrame      *Frame;
+    vtkKWCoreWidget *Frame;
     vtkKWFrame      *TabFrame;
     vtkKWLabel      *Label;
     vtkKWLabel      *ImageLabel;
