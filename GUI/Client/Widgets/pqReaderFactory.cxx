@@ -63,7 +63,7 @@ struct pqReaderInfo
   QString Description;
   QList<QString> Extensions;
 
-  QString getTypeString()
+  QString getTypeString() const
     {
     QString type ;
     type += this->Description + "(";
@@ -134,6 +134,21 @@ public:
         }
       }
     return NULL;
+    }
+
+  // Get a single type string for all supported types.
+  QString getTypeString()
+    {
+    QString types = "ParaView Files (";
+    foreach (const pqReaderInfo& info, this->ReaderList)
+      {
+      foreach (QString ext, info.Extensions)
+        {
+        types += "*." + ext +" ";
+        }
+      }
+    types += ")";
+    return types;
     }
 };
 
@@ -263,16 +278,10 @@ pqPipelineSource* pqReaderFactory::createReader(const QString& filename,
 //-----------------------------------------------------------------------------
 QString pqReaderFactory::getSupportedFileTypes()
 {
-  QString types = "";
-  bool first =true;
+  QString types = this->Internal->getTypeString();
   foreach(pqReaderInfo info, this->Internal->ReaderList)
     {
-    if (!first)
-      {
-      types += ";;";
-      }
-    types += info.getTypeString();
-    first = false;
+    types += ";;" + info.getTypeString();
     }
   return types;
 }
