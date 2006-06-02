@@ -476,6 +476,18 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ONE_CONFIGURATION_TYPE
     SET(KWWidgets_PATH_ENV ${KWWidgets_PATH_ENV} ${path})
   ENDIF(CMAKE_MAKE_PROGRAM)
 
+  # Extra runtime lib
+  
+  SET(extra_runtime_paths)
+  IF(vtkVolumeRendering_LIB_DEPENDS) # trying to catch Mesa lib path
+    FOREACH(lib ${vtkVolumeRendering_LIB_DEPENDS})
+      GET_FILENAME_COMPONENT(path "${lib}" PATH)
+      IF(path)
+        SET(extra_runtime_paths ${extra_runtime_paths} ${path})
+      ENDIF(path)
+    ENDFOREACH(lib)
+  ENDIF(vtkVolumeRendering_LIB_DEPENDS)
+
   # For LD_LIBRARY_PATH or equivalent
   
   IF (WIN32)
@@ -496,7 +508,8 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ONE_CONFIGURATION_TYPE
         ${vtk_runtime_paths}
         ${itk_runtime_paths}
         ${sov_runtime_paths}
-        ${kwwidgets_runtime_paths})
+        ${kwwidgets_runtime_paths}
+        ${extra_runtime_paths})
   ENDIF (WIN32)
 
   # For TCLLIBPATH (space separated)
