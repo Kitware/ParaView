@@ -71,18 +71,19 @@ bool pqAbstractItemViewEventTranslator::translateEvent(QObject* Object, QEvent* 
     case QEvent::Enter:
       this->CurrentObject = object;
       connect(object->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(onCurrentChanged(const QModelIndex&, const QModelIndex&)));
-      connect(object, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(onCustomContextMenuRequested(const QPoint&)));
+      return true;
       break;
     case QEvent::Leave:
       disconnect(Object, 0, this, 0);
       disconnect(object->selectionModel(), 0, this, 0);
       this->CurrentObject = 0;
+      return true;
       break;
     default:
       break;
     }
 
-  return true;
+  return false;
 }
 
 void pqAbstractItemViewEventTranslator::onCurrentChanged(const QModelIndex& current, const QModelIndex& /*previous*/)
@@ -90,7 +91,3 @@ void pqAbstractItemViewEventTranslator::onCurrentChanged(const QModelIndex& curr
   emit recordEvent(this->CurrentObject, "currentChanged", str(current));
 }
 
-void pqAbstractItemViewEventTranslator::onCustomContextMenuRequested(const QPoint&)
-{
-  emit recordEvent(this->CurrentObject, "contextMenu", str(this->CurrentObject->currentIndex()));
-}

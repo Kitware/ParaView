@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMenuEventTranslatorAdaptor.h"
 
 #include <QEvent>
+#include <QMouseEvent>
+#include <QKeyEvent>
 #include <QMenu>
 
 pqMenuEventTranslator::pqMenuEventTranslator()
@@ -42,7 +44,6 @@ pqMenuEventTranslator::pqMenuEventTranslator()
 
 pqMenuEventTranslator::~pqMenuEventTranslator()
 {
-  clearActions();
 }
 
 bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& /*Error*/)
@@ -50,40 +51,35 @@ bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool&
   QMenu* const object = qobject_cast<QMenu*>(Object);
   if(!object)
     return false;
-    
-  switch(Event->type())
+
+  if(Event->type() == QEvent::KeyPress)
     {
-    case QEvent::Enter:
+    QKeyEvent* e = static_cast<QKeyEvent*>(Event);
+    if(e->key() == Qt::Key_Enter)
       {
-      this->clearActions();
-      QList<QAction*> actions = object->actions();
-      for(int i = 0; i != actions.size(); ++i)
+      QAction* action = object->activeAction();
+      if(action)
         {
-        pqMenuEventTranslatorAdaptor* const adaptor = new pqMenuEventTranslatorAdaptor(actions[i]);
-        this->Actions.push_back(adaptor);
-        QObject::connect(
-          adaptor,
-          SIGNAL(recordEvent(QObject*, const QString&, const QString&)),
-          this,
-          SLOT(onRecordEvent(QObject*, const QString&, const QString&)));
+        emit recordEvent(action, "activate", "");
+        return true;
         }
       }
-      break;
-    default:
-      break;
     }
-      
-  return true;
+  
+  if(Event->type() == QEvent::MouseButtonRelease)
+    {
+    QMouseEvent* e = static_cast<QMouseEvent*>(Event);
+    if(e->button() == Qt::LeftButton)
+      {
+      QAction* action = object->actionAt(e->pos());
+      if(action)
+        {
+        emit recordEvent(action, "activate", "");
+        return true;
+        }
+      }
+    }
+    
+  return false;
 }
 
-void pqMenuEventTranslator::clearActions()
-{
-  for(int i = 0; i != this->Actions.size(); ++i)
-    delete this->Actions[i];
-  this->Actions.clear();
-}
-
-void pqMenuEventTranslator::onRecordEvent(QObject* Object, const QString& Command, const QString& Arguments)
-{
-  emit recordEvent(Object, Command, Arguments);
-}

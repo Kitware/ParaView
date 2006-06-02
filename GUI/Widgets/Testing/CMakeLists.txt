@@ -15,10 +15,13 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqAbstractButtonEventTranslator.h
   pqAbstractItemViewEventTranslator.h
   pqAbstractSliderEventTranslator.h
+  pqBasicWidgetEventTranslator.h
   pqComboBoxEventTranslator.h
   pqDoubleSpinBoxEventTranslator.h
   pqEventObserverStdout.h
   pqEventObserverXML.h
+  pqEventPlayer.h
+  pqEventPlayerXML.h
   pqEventTranslator.h
   pqLineEditEventTranslator.h
   pqMenuEventTranslator.h
@@ -54,6 +57,10 @@ ADD_LIBRARY(QtTesting
   pqAbstractSliderEventTranslator.h
   pqAbstractStringEventPlayer.cxx
   pqAbstractStringEventPlayer.h
+  pqBasicWidgetEventPlayer.cxx
+  pqBasicWidgetEventPlayer.h
+  pqBasicWidgetEventTranslator.cxx
+  pqBasicWidgetEventTranslator.h
   pqComboBoxEventTranslator.cxx
   pqComboBoxEventTranslator.h
   pqDoubleSpinBoxEventTranslator.cxx

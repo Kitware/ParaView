@@ -54,8 +54,9 @@ static const QString xmlToText(const QString& string)
 ///////////////////////////////////////////////////////////////////////////////////////////
 // pqEventPlayerXML
 
-bool pqEventPlayerXML::playXML(pqEventPlayer& Player, const QString& Path)
+bool pqEventPlayerXML::playXML(pqEventPlayer& player, const QString& Path)
 {
+
   QFile file(Path);
   QDomDocument xml_document;
   if(!xml_document.setContent(&file, false))
@@ -63,7 +64,7 @@ bool pqEventPlayerXML::playXML(pqEventPlayer& Player, const QString& Path)
     qCritical() << "Error parsing " << Path << ": not a valid XML document";
     return false;
     }
-
+  
   QDomElement xml_events = xml_document.documentElement();
   if(xml_events.nodeName() != "pqevents")
     {
@@ -71,18 +72,44 @@ bool pqEventPlayerXML::playXML(pqEventPlayer& Player, const QString& Path)
     return false;
     }
 
-  for(QDomNode xml_event = xml_events.firstChild(); !xml_event.isNull(); xml_event = xml_event.nextSibling())
-    {
-    if(!(xml_event.isElement() && xml_event.nodeName() == "pqevent"))
-      continue;
-      
-    const QString object = xmlToText(xml_event.toElement().attribute("object"));
-    const QString command = xmlToText(xml_event.toElement().attribute("command"));
-    const QString arguments = xmlToText(xml_event.toElement().attribute("arguments"));
-      
-    if(!Player.playEvent(object, command, arguments))
-      return false;
-    }
-    
-  return true;
+
+  this->Player = &player;
+  QObject::connect(this->Player, SIGNAL(readyPlayEvent()),
+                   this, SLOT(playNextEvent()));
+
+  // get ready for the first one
+  mDomNode = xml_events.firstChild();
+
+  bool status = this->Player->exec();
+  
+  QObject::disconnect(this->Player, SIGNAL(readyPlayEvent()),
+                   this, SLOT(playNextEvent()));
+  this->Player = NULL;
+
+  return status;
 }
+  
+void pqEventPlayerXML::playNextEvent()
+{
+  while(!this->mDomNode.isNull() &&
+      !(this->mDomNode.isElement() && this->mDomNode.nodeName() == "pqevent"))
+    {
+    this->mDomNode = this->mDomNode.nextSibling();
+    }
+
+  if(this->mDomNode.isNull())
+    {
+    this->Player->exit(true);
+    }
+  else
+    {
+    QString object, command, arguments;
+    object = xmlToText(this->mDomNode.toElement().attribute("object"));
+    command = xmlToText(this->mDomNode.toElement().attribute("command"));
+    arguments = xmlToText(this->mDomNode.toElement().attribute("arguments"));
+    this->Player->playEvent(object, command, arguments);
+    this->mDomNode = this->mDomNode.nextSibling();
+    }
+}
+
+

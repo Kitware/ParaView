@@ -34,15 +34,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqEventPlayerXML_h
 
 #include "QtTestingExport.h"
+#include <QObject>
 #include <QString>
+#include <QDomNode>
 
 class pqEventPlayer;
 
-class QTTESTING_EXPORT pqEventPlayerXML
+class QTTESTING_EXPORT pqEventPlayerXML : public QObject
 {
+  Q_OBJECT
 public:
-  /// Loads an XML test case from a file, and plays it with the given player, returning true iff every command was successfully executed
+  /// Loads an XML test case from a file, and plays it with the given player, 
+  /// returning true iff every command was successfully executed
   bool playXML(pqEventPlayer& Player, const QString& Path);
+
+protected slots:
+  void playNextEvent();
+
+protected:
+  QDomNode mDomNode;
+  pqEventPlayer* Player;
 };
 
 #endif // !_pqEventPlayerXML_h

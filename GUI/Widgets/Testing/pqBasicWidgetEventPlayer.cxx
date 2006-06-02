@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqMenuEventTranslator.h
+   Module:    pqBasicWidgetEventPlayer.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,35 +30,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqMenuEventTranslator_h
-#define _pqMenuEventTranslator_h
+#include "pqBasicWidgetEventPlayer.h"
+#include "pqTesting.h"
 
-#include "pqWidgetEventTranslator.h"
+#include <QApplication>
+#include <QWidget>
+#include <QtDebug>
 
-class QAction;
-
-/**
-Translates low-level Qt events into high-level ParaQ events that can be recorded as test cases.
-
-\sa pqEventTranslator
-*/
-
-class pqMenuEventTranslator :
-  public pqWidgetEventTranslator
+pqBasicWidgetEventPlayer::pqBasicWidgetEventPlayer()
 {
-  Q_OBJECT
-  
-public:
-  pqMenuEventTranslator();
-  ~pqMenuEventTranslator();
-  
-  virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
+}
 
-private:
-  pqMenuEventTranslator(const pqMenuEventTranslator&);
-  pqMenuEventTranslator& operator=(const pqMenuEventTranslator&);
-  
-};
-
-#endif // !_pqMenuEventTranslator_h
+bool pqBasicWidgetEventPlayer::playEvent(QObject* Object, 
+         const QString& Command, const QString& /*Arguments*/, 
+         bool& /*Error*/)
+{
+  QWidget* widget = qobject_cast<QWidget*>(Object);
+  if(widget)
+    {
+    if(Command == "contextMenu")
+      {
+      QEvent* e = new QEvent(QEvent::ContextMenu);
+      QCoreApplication::postEvent(widget, e);
+      return true;
+      }
+    else
+      {
+      return false;
+      }
+    }
+  return false;
+}
 

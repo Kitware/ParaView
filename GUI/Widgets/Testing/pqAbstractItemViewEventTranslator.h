@@ -63,7 +63,6 @@ private:
   
 private slots:
   void onCurrentChanged(const QModelIndex&, const QModelIndex&);
-  void onCustomContextMenuRequested(const QPoint&);
 };
 
 #endif // !_pqAbstractItemViewEventTranslator_h

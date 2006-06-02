@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMenuEventTranslator.h"
 #include "pqObjectNaming.h"
 #include "pqSpinBoxEventTranslator.h"
+#include "pqBasicWidgetEventTranslator.h"
 
 #include <QCoreApplication>
 #include <QtDebug>
@@ -61,6 +62,9 @@ struct pqEventTranslator::pqImplementation
   QVector<pqWidgetEventTranslator*> Translators;
   /// Stores the set of objects that should be ignored when translating events
   QSet<QObject*> IgnoredObjects;
+
+  /// a fallback translator to work for most widgets
+  pqBasicWidgetEventTranslator BasicTranslator;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -70,6 +74,12 @@ pqEventTranslator::pqEventTranslator() :
   Implementation(new pqImplementation())
 {
   QCoreApplication::instance()->installEventFilter(this);
+  
+  QObject::connect(
+    &this->Implementation->BasicTranslator,
+    SIGNAL(recordEvent(QObject*, const QString&, const QString&)),
+    this,
+    SLOT(onRecordEvent(QObject*, const QString&, const QString&)));
 }
 
 pqEventTranslator::~pqEventTranslator()
@@ -112,6 +122,12 @@ void pqEventTranslator::ignoreObject(QObject* Object)
 
 bool pqEventTranslator::eventFilter(QObject* Object, QEvent* Event)
 {
+  if(Event->type() == QEvent::ContextMenu)
+    {
+    int dummy = 1;
+    dummy ++;
+    }
+
   for(int i = 0; i != this->Implementation->Translators.size(); ++i)
     {
     bool error = false;
@@ -121,6 +137,13 @@ bool pqEventTranslator::eventFilter(QObject* Object, QEvent* Event)
         qWarning() << "Error translating an event for object " << Object;
       return false;
       }
+    }
+
+  bool error = false;
+  this->Implementation->BasicTranslator.translateEvent(Object, Event, error);
+  if(error)
+    {
+    qWarning() << "Error translating an event for object " << Object;
     }
     
   return false;

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqMenuEventTranslator.h
+   Module:    pqBasicWidgetEventPlayer.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,35 +30,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqMenuEventTranslator_h
-#define _pqMenuEventTranslator_h
+#ifndef _pqBasicWidgetEventPlayer_h
+#define _pqBasicWidgetEventPlayer_h
 
-#include "pqWidgetEventTranslator.h"
-
-class QAction;
+#include "pqWidgetEventPlayer.h"
 
 /**
-Translates low-level Qt events into high-level ParaQ events that can be recorded as test cases.
+Concrete implementation of pqWidgetEventPlayer that handles playback of "activate" events for buttons and menus.
 
-\sa pqEventTranslator
+\sa pqEventPlayer
 */
-
-class pqMenuEventTranslator :
-  public pqWidgetEventTranslator
+class pqBasicWidgetEventPlayer :
+  public pqWidgetEventPlayer
 {
-  Q_OBJECT
-  
 public:
-  pqMenuEventTranslator();
-  ~pqMenuEventTranslator();
-  
-  virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
+  pqBasicWidgetEventPlayer();
+
+  bool playEvent(QObject* Object, const QString& Command, const QString& Arguments, bool& Error);
 
 private:
-  pqMenuEventTranslator(const pqMenuEventTranslator&);
-  pqMenuEventTranslator& operator=(const pqMenuEventTranslator&);
-  
+  pqBasicWidgetEventPlayer(const pqBasicWidgetEventPlayer&);
+  pqBasicWidgetEventPlayer& operator=(const pqBasicWidgetEventPlayer&);
 };
 
-#endif // !_pqMenuEventTranslator_h
+#endif // !_pqBasicWidgetEventPlayer_h
 

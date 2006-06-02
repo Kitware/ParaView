@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqMenuEventTranslator.h
+   Module:    pqBasicWidgetEventTranslator.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,12 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqMenuEventTranslator_h
-#define _pqMenuEventTranslator_h
+#ifndef _pqBasicWidgetEventTranslator_h
+#define _pqBasicWidgetEventTranslator_h
 
 #include "pqWidgetEventTranslator.h"
-
-class QAction;
 
 /**
 Translates low-level Qt events into high-level ParaQ events that can be recorded as test cases.
@@ -43,22 +41,22 @@ Translates low-level Qt events into high-level ParaQ events that can be recorded
 \sa pqEventTranslator
 */
 
-class pqMenuEventTranslator :
+class pqBasicWidgetEventTranslator :
   public pqWidgetEventTranslator
 {
   Q_OBJECT
   
 public:
-  pqMenuEventTranslator();
-  ~pqMenuEventTranslator();
+  pqBasicWidgetEventTranslator();
+  ~pqBasicWidgetEventTranslator();
   
   virtual bool translateEvent(QObject* Object, QEvent* Event, bool& Error);
 
 private:
-  pqMenuEventTranslator(const pqMenuEventTranslator&);
-  pqMenuEventTranslator& operator=(const pqMenuEventTranslator&);
+  pqBasicWidgetEventTranslator(const pqBasicWidgetEventTranslator&);
+  pqBasicWidgetEventTranslator& operator=(const pqBasicWidgetEventTranslator&);
   
 };
 
-#endif // !_pqMenuEventTranslator_h
+#endif // !_pqBasicWidgetEventTranslator_h
 

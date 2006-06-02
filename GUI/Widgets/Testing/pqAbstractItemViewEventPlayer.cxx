@@ -36,7 +36,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QMouseEvent>
 #include <QTime>
-#include <QTreeView>
 #include <QtDebug>
 
 /// Converts a string representation of a model index into the real thing
@@ -85,40 +84,6 @@ bool pqAbstractItemViewEventPlayer::playEvent(QObject* Object, const QString& Co
     return true;
     }
     
-  if(Command == "contextMenu")
-    {
-    // Get the model index where the context menu was clicked ...
-    const QModelIndex index = GetIndex(*object, Arguments);
-    if(!index.isValid())
-      {
-      Error = true;
-      return true;
-      }
-
-    // Ensure that the item in question is visible ...
-    object->scrollTo(index);
-
-    if(QTreeView* const view = qobject_cast<QTreeView*>(Object))
-      {
-      const QPoint position = view->visualRect(index).center();
-      
-      QContextMenuEvent event(QContextMenuEvent::Keyboard, position);
-      if(!QApplication::sendEvent(object, &event))
-        {
-        Error = true;
-        return true;
-        }
-      }
-    else
-      {
-      qCritical() << "Unknown QAbstractItemView derivative: " << Object << "\n";
-      Error = true;
-      return true;
-      }
- 
-    return true;
-    }
-
   qCritical() << "Unknown abstract item command: " << Command << "\n";
   Error = true;
   return true;
