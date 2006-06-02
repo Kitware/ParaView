@@ -234,6 +234,7 @@ public:
   // Set the sub-menu for an existing sub-menu (cascade) item.
   virtual void SetItemCascade(int index, vtkKWMenu*);
   virtual void SetItemCascade(int index, const char *menu_name);
+  virtual vtkKWMenu* GetItemCascade(int index);
 
   // Description:
   // Returns the integer index of the menu item using a specific label.

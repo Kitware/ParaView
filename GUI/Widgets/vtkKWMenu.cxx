@@ -24,6 +24,7 @@
 
 #include <vtksys/SystemTools.hxx>
 #include <vtksys/stl/string>
+#include <vtksys/stl/map>
 
 #define VTK_KW_MENU_CB_VARNAME_PATTERN "CB_group%d"
 #define VTK_KW_MENU_RB_DEFAULT_GROUP "RB_group"
@@ -31,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.107");
+vtkCxxRevisionMacro(vtkKWMenu, "1.108");
 
 //----------------------------------------------------------------------------
 class vtkKWMenuInternals
@@ -40,6 +41,9 @@ public:
   int ItemCounter;
   int IndexOfLastActiveItem;
   vtksys_stl::string GetItemCommandTemp;
+
+  struct CascadePoolType: public vtksys_stl::map<vtksys_stl::string, vtkKWMenu*> {};
+  CascadePoolType CascadePool;
 };
 
 //----------------------------------------------------------------------------
@@ -924,6 +928,7 @@ void vtkKWMenu::SetItemCascade(int index, const char *menu_name)
     str << " -menu {" << menu_name_safe.c_str() << "}" << ends;
     }
 
+
   this->Script(str.str());
   str.rdbuf()->freeze(0); 
 }
@@ -934,7 +939,28 @@ void vtkKWMenu::SetItemCascade(int index, vtkKWMenu *menu)
   if (menu)
     {
     this->SetItemCascade(index, menu->GetWidgetName());
+    const char *menu_opt = this->GetItemOption(index, "-menu");
+    if (menu_opt && *menu_opt && this->Internals)
+      {
+      this->Internals->CascadePool[menu_opt] = menu;
+      }
     }
+}
+
+//----------------------------------------------------------------------------
+vtkKWMenu* vtkKWMenu::GetItemCascade(int index)
+{
+  const char *menu_opt = this->GetItemOption(index, "-menu");
+  if (menu_opt && *menu_opt && this->Internals)
+    {
+    vtkKWMenuInternals::CascadePoolType::iterator it = 
+      this->Internals->CascadePool.find(menu_opt);
+    if (it != this->Internals->CascadePool.end())
+      {
+      return it->second;
+      }
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
