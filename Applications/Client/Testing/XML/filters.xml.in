@@ -5,7 +5,7 @@
         <Property name="HighPoint" proxy_name="first" exposed_name="HighPoint"/>
         <Property name="Input" proxy_name="first" exposed_name="Input"/>
       </ExposedProperties>
-      <Proxy group="filters" type="ElevationFilter" id="5" compound_name="first">
+      <Proxy group="filters" type="ElevationFilter" id="5" compound_name="first" consumable="1">
         <Property name="HighPoint" id="5.HighPoint" number_of_elements="3">
           <Element index="0" value="0"/>
           <Element index="1" value="0"/>
@@ -39,7 +39,7 @@
         <Property name="HighPoint" proxy_name="first" exposed_name="HighPoint"/>
         <Property name="Input" proxy_name="first" exposed_name="Input"/>
       </ExposedProperties>
-      <Proxy group="filters" type="PolyDataNormals" id="7" compound_name="first">
+      <Proxy group="filters" type="PolyDataNormals" id="7" compound_name="first" consumable="1">
         <Property name="ComputeCellNormals" id="7.ComputeCellNormals" number_of_elements="1">
           <Element index="0" value="0"/>
           <Domain name="bool" id="7.ComputeCellNormals.bool"/>
