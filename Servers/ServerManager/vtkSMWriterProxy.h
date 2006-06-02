@@ -31,12 +31,32 @@ public:
 
   // Description:
   // Updates the pipeline and writes the file(s).
+  // Must call UpdateVTKObjects() before calling UpdatePipeline()
+  // to ensure that the filename etc. are set correctly.
   virtual void UpdatePipeline();
 
+  // Description:
+  // Get the error code for the last UpdatePipeline() call. UpdatePipeline()
+  // call writes the file(s) and updates the error status. Error codes are 
+  // defined in vtkErrorCode.h
+  vtkGetMacro(ErrorCode, int);
+
+  // Description:
+  // Flag indicating if the writer supports writing in parallel.
+  // Not set by default.
+  vtkGetMacro(SupportsParallel, int);
+  vtkSetMacro(SupportsParallel, int);
+
 protected:
-  vtkSMWriterProxy() {}
+  vtkSMWriterProxy();
   ~vtkSMWriterProxy() {}
 
+  // Description:
+  // Read attributes from an XML element.
+  virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+
+  int ErrorCode;
+  int SupportsParallel;
 private:
   vtkSMWriterProxy(const vtkSMWriterProxy&); // Not implemented
   void operator=(const vtkSMWriterProxy&); // Not implemented

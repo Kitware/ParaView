@@ -1,6 +1,94 @@
 <ServerManagerConfiguration>
   <ProxyGroup name="writers">
-    <PVDWriterProxy name="XMLPVDWriter" class="vtkXMLPVDWriter">
+    <Proxy name="ParallelWriterBase" class="not-used">
+      <!-- Base for parallel writers -->
+      <SubProxy>
+        <SourceProxy name="CompleteArrays" class="vtkCompleteArrays">
+          <InputProperty name="Input" command="SetInput">
+          </InputProperty>
+        </SourceProxy>
+      </SubProxy>
+      
+      <StringVectorProperty 
+        name="FileName" 
+        command="SetFileName"
+        number_of_elements="1">
+      </StringVectorProperty>
+
+      <IntVectorProperty 
+        name="GhostLevel" 
+        command="SetGhostLevel"
+        number_of_elements="1"
+        default_values="0">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+    </Proxy>
+
+    <Proxy name="XMLWriterBase" class="not-used">
+      <!-- Base class for XML writers -->
+      <IntVectorProperty 
+        name="DataMode"
+        command="SetDataMode"
+        number_of_elements="1"
+        default_values="0">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="Ascii" />
+          <Entry value="1" text="Binary" />
+          <Entry value="2" text="Appended" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+
+      <StringVectorProperty 
+        name="FileName" 
+        command="SetFileName"
+        number_of_elements="1">
+      </StringVectorProperty>
+    </Proxy>
+
+    <Proxy name="DataWriterBase" class="not-used">
+      <!-- Base for non-xml data writers -->
+      <StringVectorProperty 
+        name="FileName" 
+        command="SetFileName"
+        number_of_elements="1">
+      </StringVectorProperty>
+      
+      <IntVectorProperty 
+        name="FileType"
+        command="SetFileType"
+        number_of_elements="1"
+        default_values="2">
+        <EnumerationDomain name="enum">
+          <Entry value="1" text="Ascii" />
+          <Entry value="2" text="Binary" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+    </Proxy>
+
+    <Proxy name="ParallelXMLWriterBase" class="not-used" 
+      base_proxygroup="writers" base_proxyname="XMLWriterBase">
+      <!-- Base for parallel XML writers -->
+      <SubProxy>
+        <SourceProxy name="CompleteArrays" class="vtkCompleteArrays">
+          <InputProperty name="Input" command="SetInput">
+          </InputProperty>
+        </SourceProxy>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="SummaryHelper" proxygroup="writers"
+               proxyname="SummaryHelper" >
+        </Proxy>
+      </SubProxy>
+
+      <IntVectorProperty name="GhostLevel" command="SetGhostLevel"
+        number_of_elements="1" default_values="0">
+        <IntRangeDomain name="range" min="0"/>
+      </IntVectorProperty>
+    </Proxy>
+
+    <PWriterProxy name="XMLPVDWriter" class="vtkXMLPVDWriter" 
+      base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
+
       <InputProperty name="Input" command="SetInput">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -10,23 +98,139 @@
           <DataType value="vtkDataSet"/>
         </DataTypeDomain>
       </InputProperty>
+    </PWriterProxy>
 
-      <StringVectorProperty name="FileName" command="SetFileName"/>
+    <WriterProxy name="XMLPolyDataWriter" class="vtkXMLPolyDataWriter"
+      base_proxygroup="writers" base_proxyname="XMLWriterBase">
+      <InputProperty name="Input" command="SetInput">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+      </InputProperty>
+    </WriterProxy>
 
-      <IntVectorProperty name="GhostLevel" command="SetGhostLevel">
-        <IntRangeDomain name="range" min="0"/>
-      </IntVectorProperty>
+    <WriterProxy name="XMLUnstructuredGridWriter" 
+      class="vtkXMLUnstructuredGridWriter"
+      base_proxygroup="writers" base_proxyname="XMLWriterBase">
+      <InputProperty name="Input" command="SetInput">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+    </WriterProxy>
 
-      <IntVectorProperty name="DataMode" command="SetDataMode">
-        <EnumerationDomain name="enum">
-          <Entry value="0" text="Ascii" />
-          <Entry value="1" text="Binary" />
-          <Entry value="2" text="Appended" />
-        </EnumerationDomain>
-      </IntVectorProperty>
-    </PVDWriterProxy>
+    <WriterProxy name="XMLStructuredGridWriter" 
+      class="vtkXMLStructuredGridWriter"
+      base_proxygroup="writers" base_proxyname="XMLWriterBase">
+      <InputProperty name="Input" command="SetInput">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkStructuredGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+    </WriterProxy>
 
-    <WriterProxy name="PLYWriter" class="vtkPLYWriter">
+    <WriterProxy name="XMLRectilinearGridWriter" 
+      class="vtkXMLRectilinearGridWriter"
+      base_proxygroup="writers" base_proxyname="XMLWriterBase">
+      <InputProperty name="Input" command="SetInput">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkRectilinearGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+    </WriterProxy>
+
+    <WriterProxy name="XMLImageDataWriter" 
+      class="vtkXMLImageDataWriter"
+      base_proxygroup="writers" base_proxyname="XMLWriterBase">
+      <InputProperty name="Input" command="SetInput">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+      </InputProperty>
+    </WriterProxy>
+
+    <WriterProxy name="XMLMultiGroupDataWriter"
+      class="vtkXMLMultiGroupDataWriter"
+      base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
+      <InputProperty name="Input" command="SetInput">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMultiGroupDataSet" />
+        </DataTypeDomain>
+      </InputProperty>
+    </WriterProxy>
+
+    <PWriterProxy name="XMLPPolyDataWriter"
+      class="vtkXMLPPolyDataWriter"
+      base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
+      <InputProperty name="Input" command="SetInput">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData" />
+        </DataTypeDomain>
+      </InputProperty>
+    </PWriterProxy>
+
+    <PWriterProxy name="XMLPUnstructuredGridWriter"
+      class="vtkXMLPUnstructuredGridWriter"
+      base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
+      <InputProperty name="Input" command="SetInput">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkUnstructuredGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+    </PWriterProxy>
+
+    <PWriterProxy name="XMLPStructuredGridWriter"
+      class="vtkXMLPStructuredGridWriter"
+      base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
+      <InputProperty name="Input" command="SetInput">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkStructuredGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+    </PWriterProxy>
+
+    <PWriterProxy name="XMLPRectilinearGridWriter"
+      class="vtkXMLPRectilinearGridWriter"
+      base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
+      <InputProperty name="Input" command="SetInput">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkRectilinearGrid" />
+        </DataTypeDomain>
+      </InputProperty>
+    </PWriterProxy>
+
+    <PWriterProxy name="XMLPImageDataWriter"
+      class="vtkXMLPImageDataWriter"
+      base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
+      <InputProperty name="Input" command="SetInput">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkImageData" />
+        </DataTypeDomain>
+      </InputProperty>
+    </PWriterProxy>
+
+    <PWriterProxy name="XMLPMultiGroupDataWriter"
+      class="vtkXMLPMultiGroupDataWriter"
+      base_proxygroup="writers" base_proxyname="ParallelXMLWriterBase">
+      <InputProperty name="Input" command="SetInput">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkMultiGroupDataSet" />
+        </DataTypeDomain>
+      </InputProperty>
+    </PWriterProxy>
+
+    <WriterProxy name="DataSetWriter" class="vtkDataSet"
+      base_proxygroup="writers" base_proxyname="DataWriterBase">
+      <InputProperty name="Input" command="SetInput">
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet" />
+        </DataTypeDomain>
+      </InputProperty>
+    </WriterProxy>
+
+
+    <WriterProxy name="PLYWriter" class="vtkPLYWriter"
+      base_proxygroup="writers" base_proxyname="DataWriterBase">
       <InputProperty name="Input" command="SetInput">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -36,11 +240,10 @@
           <DataType value="vtkPolyData"/>
         </DataTypeDomain>
       </InputProperty>
-
-      <StringVectorProperty name="FileName" command="SetFileName"/>
     </WriterProxy>
 
-    <WriterProxy name="MetaImageWriter" class="vtkMetaImageWriter">
+    <WriterProxy name="MetaImageWriter" class="vtkMetaImageWriter"
+      base_proxygroup="writers" base_proxyname="DataWriterBase">
       <InputProperty name="Input" command="SetInput">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -50,11 +253,10 @@
           <DataType value="vtkImageData"/>
         </DataTypeDomain>
       </InputProperty>
-
-      <StringVectorProperty name="FileName" command="SetFileName"/>
     </WriterProxy>
 
-    <WriterProxy name="PNGWriter" class="vtkPNGWriter">
+    <WriterProxy name="PNGWriter" class="vtkPNGWriter"
+      base_proxygroup="writers" base_proxyname="DataWriterBase">
       <InputProperty name="Input" command="SetInput">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -64,11 +266,10 @@
           <DataType value="vtkImageData"/>
         </DataTypeDomain>
       </InputProperty>
-
-      <StringVectorProperty name="FileName" command="SetFileName"/>
     </WriterProxy>
 
-    <WriterProxy name="XdmfWriter" class="vtkXdmfWriter">
+    <WriterProxy name="XdmfWriter" class="vtkXdmfWriter"
+      base_proxygroup="writers" base_proxyname="DataWriterBase">
       <InputProperty name="Input" command="SetInput">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -78,11 +279,10 @@
           <DataType value="vtkDataSet"/>
         </DataTypeDomain>
       </InputProperty>
-
-      <StringVectorProperty name="FileName" command="SetFileName"/>
     </WriterProxy>
 
-    <WriterProxy name="ExodusIIWriter" class="vtkExodusIIWriter">
+    <PWriterProxy name="ExodusIIWriter" class="vtkExodusIIWriter"
+      base_proxygroup="writers" base_proxyname="ParallelWriterBase">
       <InputProperty name="Input" command="SetInput">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -92,15 +292,10 @@
           <DataType value="vtkUnstructuredGrid"/>
         </DataTypeDomain>
       </InputProperty>
+    </PWriterProxy>
 
-      <StringVectorProperty name="FileName" command="SetFileName"/>
-
-      <IntVectorProperty name="GhostLevel" command="SetGhostLevel">
-        <IntRangeDomain name="range" min="0"/>
-      </IntVectorProperty>
-    </WriterProxy>
-
-    <WriterProxy name="EnSightWriter" class="vtkEnSightWriter">
+    <PWriterProxy name="EnSightWriter" class="vtkEnSightWriter"
+      base_proxygroup="writers" base_proxyname="ParallelWriterBase">
       <InputProperty name="Input" command="SetInput">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -110,13 +305,7 @@
           <DataType value="vtkUnstructuredGrid"/>
         </DataTypeDomain>
       </InputProperty>
-
-      <StringVectorProperty name="FileName" command="SetFileName"/>
-
-      <IntVectorProperty name="GhostLevel" command="SetGhostLevel">
-        <IntRangeDomain name="range" min="0"/>
-      </IntVectorProperty>
-    </WriterProxy>
+    </PWriterProxy>
 
     <XMLPVAnimationWriterProxy name="XMLPVAnimationWriter" class ="vtkXMLPVAnimationWriter">
       <InputProperty

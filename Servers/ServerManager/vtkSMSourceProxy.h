@@ -55,7 +55,7 @@ public:
   // Description:
   // Calls Update() on all sources. It also creates parts if
   // they are not already created.
-  void UpdatePipeline();
+  virtual void UpdatePipeline();
 
   // Description:
   // Connects filters/sinks to an input. If the filter(s) is not
@@ -69,7 +69,7 @@ public:
   // whereas the other one is not, SetInput() should be called with
   // the multi-block input first. Otherwise, it will create only
   // one filter and can not apply to the multi-block input.
-  void AddInput(vtkSMSourceProxy* input, 
+  virtual void AddInput(vtkSMSourceProxy* input, 
                 const char* method,
                 int hasMultipleInputs);
 
