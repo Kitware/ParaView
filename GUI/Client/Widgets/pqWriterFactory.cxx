@@ -70,7 +70,7 @@ struct pqWriterInfo
     }
 
   // Checks if the writer can write the output from the given source proxy.
-  bool canWriteOutput(pqPipelineSource* source)
+  bool canWriteOutput(pqPipelineSource* source) const
     {
     if (!this->PrototypeProxy.GetPointer() || !source)
       {
@@ -103,11 +103,11 @@ struct pqWriterInfo
     }
 
   // Returns a string for the file type as needed by file dialogs.
-  QString getTypeString()
+  QString getTypeString() const
     {
     QString type ;
     type += this->Description + "(";
-    foreach (QString ext, this->Extensions)
+    foreach (const QString &ext, this->Extensions)
       {
       type += "*." + ext + " ";
       }
@@ -121,7 +121,7 @@ class pqWriterFactoryInternal
 public:
   QList<pqWriterInfo> WriterList;
 
-  vtkSMProxy* getPrototype(const QString& xmlgroup, const QString& xmlname)
+  vtkSMProxy* getPrototype(const QString& xmlgroup, const QString& xmlname) const
     {
     foreach (const pqWriterInfo& info, this->WriterList)
       {
@@ -212,7 +212,7 @@ vtkSMProxy* pqWriterFactory::newWriter(const QString& filename,
     return NULL;
     }
   
-  foreach (pqWriterInfo info, this->Internal->WriterList)
+  foreach (const pqWriterInfo &info, this->Internal->WriterList)
     {
     if (info.canWriteFile(filename) && info.canWriteOutput(toWrite))
       {
@@ -236,7 +236,7 @@ QString pqWriterFactory::getSupportedFileTypes(pqPipelineSource* toWrite)
 {
   QString types = "";
   bool first = true;
-  foreach(pqWriterInfo info , this->Internal->WriterList)
+  foreach(const pqWriterInfo &info , this->Internal->WriterList)
     {
 
     if (info.canWriteOutput(toWrite))

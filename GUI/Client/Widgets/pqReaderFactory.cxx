@@ -75,7 +75,7 @@ struct pqReaderInfo
     return type;
     }
 
-  bool canReadFile(const QString& filename, pqServer* server)
+  bool canReadFile(const QString& filename, pqServer* server) const
     {
     if (!this->PrototypeProxy.GetPointer())
       {
@@ -261,7 +261,7 @@ pqPipelineSource* pqReaderFactory::createReader(const QString& filename,
     qDebug() << "File \"" << filename << "\"  cannot be read.";
     return NULL; 
     }
-  foreach(pqReaderInfo info, this->Internal->ReaderList)
+  foreach(const pqReaderInfo &info, this->Internal->ReaderList)
     {
     if (info.canReadFile(filename, server))
       {
@@ -280,7 +280,7 @@ pqPipelineSource* pqReaderFactory::createReader(const QString& filename,
 QString pqReaderFactory::getSupportedFileTypes()
 {
   QString types = this->Internal->getTypeString();
-  foreach(pqReaderInfo info, this->Internal->ReaderList)
+  foreach(const pqReaderInfo &info, this->Internal->ReaderList)
     {
     types += ";;" + info.getTypeString();
     }
