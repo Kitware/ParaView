@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWOptions.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkKWIcon.h"
 
 #include <vtksys/stl/string>
 #include <vtksys/stl/vector>
@@ -48,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.21");
+vtkCxxRevisionMacro(vtkKWTree, "1.22");
 
 //----------------------------------------------------------------------------
 class vtkKWTreeInternals
@@ -545,6 +546,91 @@ void vtkKWTree::SetNodeSelectableFlag(const char *node, int flag)
     {
     this->Script("%s itemconfigure %s -selectable %d", 
                  this->GetWidgetName(), node, flag);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetNodeImageToPredefinedIcon(const char *node, int icon_index)
+{
+  vtkKWIcon *icon = vtkKWIcon::New();
+  icon->SetImage(icon_index);
+  this->SetNodeImageToIcon(node, icon);
+  icon->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetNodeImageToIcon(const char *node, vtkKWIcon* icon)
+{
+  if (icon)
+    {
+    this->SetNodeImageToPixels(
+      node,
+      icon->GetData(), 
+      icon->GetWidth(), icon->GetHeight(), icon->GetPixelSize());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetNodeImageToPixels(const char *node,
+                                     const unsigned char* pixels, 
+                                     int width, 
+                                     int height,
+                                     int pixel_size,
+                                     unsigned long buffer_length)
+{
+  if (!this->IsCreated() || !node || !*node || !pixels)
+    {
+    return;
+    }
+
+  // Use the prev pic, or create a new one
+
+  int had_no_image = 0;
+  vtksys_stl::string image_name(
+    this->Script("%s itemcget %s -image", this->GetWidgetName(), node));
+  if (!image_name.size())
+    {
+    image_name = this->GetWidgetName();
+    image_name += "_";
+    image_name += node;
+    had_no_image = 1;
+    }
+
+  if (!vtkKWTkUtilities::UpdatePhoto(this->GetApplication(),
+                                     image_name.c_str(),
+                                     pixels, 
+                                     width, height, pixel_size,
+                                     buffer_length))
+    {
+    vtkWarningMacro(
+      << "Error updating Tk photo " << image_name.c_str());
+    }
+
+  if (had_no_image)
+    {
+    this->Script("%s itemconfigure %s -image {%s}", 
+                 this->GetWidgetName(), node, image_name.c_str());
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTree::GetNodePadX(const char *node)
+{
+  if (this->IsCreated() && node && *node)
+    {
+    return atoi(this->Script("%s itemcget %s -padx", 
+                             this->GetWidgetName(), node));
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetNodePadX(const char *node, int arg)
+{
+  if (this->IsCreated() && node && *node)
+    {
+    this->Script("%s itemconfigure %s -padx %d", 
+                 this->GetWidgetName(), node, arg);
     }
 }
 

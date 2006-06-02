@@ -71,9 +71,23 @@ public:
   virtual void SetNodeSelectableFlag(const char *node, int flag);
 
   // Description:
-  // Set/Get the node font.
+  // Specifies the font to use when drawing a specific node. 
+  // You can use predefined font names (e.g. 'system'), or you can specify
+  // a set of font attributes with a platform-independent name, for example,
+  // 'times 12 bold'. In this example, the font is specified with a three
+  // element list: the first element is the font family, the second is the
+  // size, the third is a list of style parameters (normal, bold, roman, 
+  // italic, underline, overstrike). Example: 'times 12 {bold italic}'.
+  // The Times, Courier and Helvetica font families are guaranteed to exist
+  // and will be matched to the corresponding (closest) font on your system.
+  // If you are familiar with the X font names specification, you can also
+  // describe the font that way (say, '*times-medium-r-*-*-12*').
   virtual const char* GetNodeFont(const char *node);
   virtual void SetNodeFont(const char *node, const char *font);
+
+  // Description:
+  // Convenience methods to set the font weight/slant for a specific node.
+  // For more control, check the SetNodeFont method.
   virtual void SetNodeFontWeightToBold(const char *node);
   virtual void SetNodeFontWeightToNormal(const char *node);
   virtual void SetNodeFontSlantToItalic(const char *node);
@@ -165,6 +179,29 @@ public:
   virtual int GetWidth();
   virtual void SetHeight(int);
   virtual int GetHeight();
+
+  // Description:
+  // Specifies an image to display at the left of the label of a node.
+  // The SetImageToPredefinedIcon method accepts an index to one of the
+  // predefined icon listed in vtkKWIcon.
+  // The SetImageToPixels method sets the image using pixel data. It expects
+  // a pointer to the pixels and the structure of the image, i.e. its width, 
+  // height and the pixel_size (how many bytes per pixel, say 3 for RGB, or
+  // 1 for grayscale). If buffer_length = 0, it is computed automatically
+  // from the previous parameters. If it is not, it will most likely indicate
+  // that the buffer has been encoded using base64 and/or zlib.
+  // If pixel_size > 3 (i.e. RGBA), the image is blend the with background
+  // color of the widget.
+  virtual void SetNodeImageToIcon(const char *node, vtkKWIcon *icon);
+  virtual void SetNodeImageToPredefinedIcon(const char *node, int icon_index);
+  virtual void SetNodeImageToPixels(const char *node,
+    const unsigned char *pixels, int width, int height, int pixel_size,
+    unsigned long buffer_length = 0);
+  
+  // Description:
+  // Set/Get the distance between image or window and text of a node.
+  virtual void SetNodePadX(const char *node, int);
+  virtual int GetNodePadX(const char *node);
 
   // Description:
   // Specifies wether or not the tree should be redrawn when entering idle. 
