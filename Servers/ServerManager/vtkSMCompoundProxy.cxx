@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCompoundProxy);
-vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMCompoundProxy, "1.11");
 
 struct vtkSMCompoundProxyInternals
 {
@@ -68,6 +68,7 @@ vtkSMCompoundProxy::vtkSMCompoundProxy()
   this->Internal = new vtkSMCompoundProxyInternals;
   this->Observer = vtkSMCompoundProxyObserver::New();
   this->Observer->SetTarget(this);
+  this->ConsumableSubProxyName = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -79,6 +80,7 @@ vtkSMCompoundProxy::~vtkSMCompoundProxy()
   this->Observer->Delete();
 
   delete this->Internal;
+  this->SetConsumableSubProxyName(0);
 }
 
 //----------------------------------------------------------------------------
@@ -174,6 +176,33 @@ unsigned int vtkSMCompoundProxy::GetNumberOfProxies()
     }
 
   return this->MainProxy->GetNumberOfSubProxies();
+}
+
+
+//---------------------------------------------------------------------------
+void vtkSMCompoundProxy::SetConsumableProxy(const char* name)
+{
+  if (!this->GetProxy(name))
+    {
+    vtkWarningMacro("No subproxy with name : " << name << " exists.");
+    }
+  this->SetConsumableSubProxyName(name);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMCompoundProxy::SetConsumableProxy(vtkSMProxy* subProxy)
+{
+  unsigned int max = this->GetNumberOfProxies();
+  for (unsigned int cc=0; cc < max; cc++)
+    {
+    if (this->GetProxy(cc) == subProxy)
+      {
+      this->SetConsumableProxy(this->GetProxyName(cc));
+      return;
+      }
+    }
+  vtkErrorMacro(
+    "subProxy must be an existing proxy within the Compound Proxy.");
 }
 
 
@@ -427,6 +456,12 @@ int vtkSMCompoundProxy::LoadState(vtkPVXMLElement* proxyElement,
           subProxy->Delete();
           }
         }
+      int consumable = 0;
+      currentElement->GetScalarAttribute("consumable", &consumable);
+      if (consumable)
+        {
+        this->SetConsumableProxy(compoundName);
+        }
       }
     }
 
@@ -477,7 +512,13 @@ vtkPVXMLElement* vtkSMCompoundProxy::SaveState(vtkPVXMLElement* root)
   for (unsigned int i=0; i<numProxies; i++)
     {
     vtkPVXMLElement* newElem = this->GetProxy(i)->SaveState(proxyElement);
-    newElem->AddAttribute("compound_name", this->GetProxyName(i));
+    const char* compound_name =this->GetProxyName(i);
+    newElem->AddAttribute("compound_name", compound_name);
+    if (this->ConsumableSubProxyName && strcmp(
+        compound_name, this->ConsumableSubProxyName) == 0)
+      {
+      newElem->AddAttribute("consumable", "1");
+      }
     }
 
   return proxyElement;
@@ -500,16 +541,13 @@ vtkPVXMLElement* vtkSMCompoundProxy::SaveDefinition(vtkPVXMLElement* root)
 }
 
 //----------------------------------------------------------------------------
-vtkSMSourceProxy* vtkSMCompoundProxy::GetUnconsumedProxy()
+vtkSMProxy* vtkSMCompoundProxy::GetConsumableProxy()
 {
-  for (unsigned int i = this->GetNumberOfProxies(); i > 0; i--)
+  if (this->ConsumableSubProxyName)
     {
-    vtkSMSourceProxy* src = vtkSMSourceProxy::SafeDownCast(this->GetProxy(i-1));
-    if (src)
-      {
-      return src;
-      }
+    return this->GetProxy(this->ConsumableSubProxyName);
     }
+
   return NULL;
 }
 

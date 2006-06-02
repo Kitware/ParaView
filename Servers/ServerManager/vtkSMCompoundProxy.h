@@ -119,17 +119,35 @@ public:
   // Set the connection ID.
   virtual void SetConnectionID(vtkIdType id);
 
+
   // Description:
-  // This simply starts traversing the subproxies from the last
-  // and returns the first source proxy encountred. Eventually, 
-  // this will be defined in the definition. 
-  vtkSMSourceProxy* GetUnconsumedProxy();
+  // Set a proxy with the given name within this compound proxy 
+  // as the proxy which can be
+  // connected to any filter/display. Currently, only 1 proxy within the 
+  // compound proxy can be marked consumable.
+  void SetConsumableProxy(const char* name);
+
+  // Description:
+  // Set a proxy as the proxy which can be
+  // connected to any filter/display. Currently, only 1 proxy within the 
+  // compound proxy can be marked consumable.
+  // \c proxy must be a proxy already added to the compound proxy,
+  // oterwise an error will be flagged.
+  void SetConsumableProxy(vtkSMProxy* proxy);
+
+  // Description:
+  // Returns the consumable proxy which can be connected to inputs of 
+  // filtes/displays.
+  vtkSMProxy* GetConsumableProxy();
 
 protected:
   vtkSMCompoundProxy();
   ~vtkSMCompoundProxy();
 
   vtkSMProxy* MainProxy;
+
+  const char* ConsumableSubProxyName;
+  vtkSetStringMacro(ConsumableSubProxyName);
 
   virtual vtkSMProperty* GetProperty(const char* name, int selfOnly);
 
