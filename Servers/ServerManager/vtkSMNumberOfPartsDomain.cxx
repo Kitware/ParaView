@@ -16,11 +16,12 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMCompoundProxy.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMNumberOfPartsDomain);
-vtkCxxRevisionMacro(vtkSMNumberOfPartsDomain, "1.5");
+vtkCxxRevisionMacro(vtkSMNumberOfPartsDomain, "1.6");
 
 //---------------------------------------------------------------------------
 vtkSMNumberOfPartsDomain::vtkSMNumberOfPartsDomain()
@@ -47,8 +48,13 @@ int vtkSMNumberOfPartsDomain::IsInDomain(vtkSMProperty* property)
     unsigned int numProxs = pp->GetNumberOfUncheckedProxies();
     for (unsigned int i=0; i<numProxs; i++)
       {
+      vtkSMProxy* proxy = pp->GetUncheckedProxy(i);
+      if (vtkSMCompoundProxy* cp = vtkSMCompoundProxy::SafeDownCast(proxy))
+        {
+        proxy = cp->GetConsumableProxy();
+        }
       if (!this->IsInDomain( 
-            vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i)) ) )
+            vtkSMSourceProxy::SafeDownCast(proxy) ) )
         {
         return 0;
         }

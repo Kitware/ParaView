@@ -16,18 +16,19 @@
 
 #include "vtkDataObject.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVXMLElement.h"
-#include "vtkProcessModule.h"
+#include "vtkSMCompoundProxy.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkStdString.h"
 
 #include <vtkstd/vector>
 
-#include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMDataTypeDomain);
-vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.11");
+vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.12");
 
 struct vtkSMDataTypeDomainInternals
 {
@@ -78,8 +79,13 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMProperty* property)
     unsigned int numProxs = pp->GetNumberOfUncheckedProxies();
     for (unsigned int i=0; i<numProxs; i++)
       {
+      vtkSMProxy* proxy = pp->GetUncheckedProxy(i);
+      if (vtkSMCompoundProxy* cp = vtkSMCompoundProxy::SafeDownCast(proxy))
+        {
+        proxy = cp->GetConsumableProxy();
+        }
       if (!this->IsInDomain( 
-            vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i)) ) )
+            vtkSMSourceProxy::SafeDownCast(proxy) ) )
         {
         return 0;
         }

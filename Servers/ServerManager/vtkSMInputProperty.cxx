@@ -24,7 +24,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMInputProperty);
-vtkCxxRevisionMacro(vtkSMInputProperty, "1.14");
+vtkCxxRevisionMacro(vtkSMInputProperty, "1.15");
 
 int vtkSMInputProperty::InputsUpdateImmediately = 1;
 
@@ -104,7 +104,7 @@ void vtkSMInputProperty::AppendCommandToStream(
       vtkSMCompoundProxy* cp = vtkSMCompoundProxy::SafeDownCast(proxy);
       if (cp)
         {
-        actualProxy = cp->GetUnconsumedProxy();
+        actualProxy = cp->GetConsumableProxy();
         }
 
       *str << vtkClientServerStream::Invoke 
