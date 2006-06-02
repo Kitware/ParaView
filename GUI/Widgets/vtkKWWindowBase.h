@@ -296,6 +296,18 @@ public:
   vtkGetStringMacro(DefaultGeometry);
 
   // Description:
+  // Events. 
+  // WindowClosedEvent is called when the window is closing. It is triggered
+  // right before requesting the application to remove the window instance
+  // from its window pool (vtkKWApplication::RemoveWindow).
+  //BTX
+  enum
+  {
+    WindowClosingEvent = 10000
+  };
+  //ETX
+
+  // Description:
   // Callbacks. Internal, do not use.
   virtual void ErrorIconCallback();
   virtual void PrintSettingsCallback() {};

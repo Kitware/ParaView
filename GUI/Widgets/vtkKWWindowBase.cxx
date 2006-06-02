@@ -33,7 +33,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.50");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.51");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -720,6 +720,10 @@ int vtkKWWindowBase::Close()
     {
     this->MostRecentFilesManager->SaveFilesToRegistry();
     }
+
+  // Notify we are closing
+
+  this->InvokeEvent(vtkKWWindowBase::WindowClosingEvent, NULL);
 
   // Remove this window from the application. 
   // It is likely that the application will exit if there are no more windows.
