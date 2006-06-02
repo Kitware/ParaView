@@ -291,3 +291,11 @@ vtkSMRenderModuleProxy* pqServer::newRenderModule()
     this->RenderModule->NewRenderModule());
 }
 
+//-----------------------------------------------------------------------------
+int pqServer::getNumberOfPartitions()
+{
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  return pm->GetNumberOfPartitions(this->ConnectionID);
+
+}
+

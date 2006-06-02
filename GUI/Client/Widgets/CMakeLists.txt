@@ -234,6 +234,8 @@ ADD_LIBRARY(pqWidgets
   pqWidgetObjectPanel.cxx
   pqWidgetObjectPanel.h
   pqWidgetsExport.h
+  pqWriterFactory.h
+  pqWriterFactory.cxx
   pqXMLUtil.cxx
   pqXMLUtil.h
   ${MOC_BUILT_SOURCES}

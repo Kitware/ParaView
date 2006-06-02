@@ -3,5 +3,6 @@
         <file>ParaViewLogo.png</file>
         <file>ParaQFilters.xml</file>
         <file>ParaQReaders.xml</file>
+        <file>ParaQWriters.xml</file>
     </qresource>
 </RCC>

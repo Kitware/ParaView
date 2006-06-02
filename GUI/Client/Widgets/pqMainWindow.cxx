@@ -72,6 +72,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqSetData.h>
 #include <pqSetName.h>
 #include <pqUndoStack.h>
+#include <pqWriterFactory.h>
 
 #ifdef PARAQ_EMBED_PYTHON
 #include <pqPythonDialog.h>
@@ -243,6 +244,7 @@ pqMainWindow::pqMainWindow() :
 
   // Initialize supported file types.
   core->getReaderFactory()->loadFileTypes(":/pqClient/ParaQReaders.xml");
+  core->getWriterFactory()->loadFileTypes(":/pqClient/ParaQWriters.xml");
 }
 
 //-----------------------------------------------------------------------------
@@ -254,6 +256,7 @@ pqMainWindow::~pqMainWindow()
 void pqMainWindow::createStandardFileMenu()
 {
   QMenu* const menu = this->fileMenu();
+  QAction* action;
  
   menu->addAction(tr("&New"), this, SLOT(onFileNew()), QKeySequence(Qt::CTRL + Qt::Key_N))
     << pqSetName("New");
@@ -261,7 +264,10 @@ void pqMainWindow::createStandardFileMenu()
   menu->addAction(tr("&Open..."), this, SLOT(onFileOpen()), QKeySequence(Qt::CTRL + Qt::Key_O))
     << pqSetName("Open");
 
-  QAction* action;
+  action = menu->addAction(tr("&Save Data..."), this, SLOT(onFileSaveData()), 
+    QKeySequence(Qt::CTRL + Qt::Key_S))
+    << pqSetName("SaveData");
+  action->setEnabled(false);
 
   action = menu->addAction(tr("&Load Server State..."))
     << pqSetName("LoadServerState")
@@ -285,7 +291,7 @@ void pqMainWindow::createStandardFileMenu()
     << pqSetName("Exit");
 }
 
-
+//-----------------------------------------------------------------------------
 void pqMainWindow::createStandardViewMenu()
 {
   this->viewMenu();
@@ -957,6 +963,10 @@ void pqMainWindow::onFileOpen(pqServer* server)
 {
   QString filters = 
     pqApplicationCore::instance()->getReaderFactory()->getSupportedFileTypes();
+  if (filters != "")
+    {
+    filters += ";;";
+    }
   filters += "All files (*)";
   pqFileDialog* const file_dialog = new pqFileDialog(
     new pqServerFileDialogModel(NULL, server), 
@@ -976,13 +986,72 @@ void pqMainWindow::onFileOpen(const QStringList& files)
   for(int i = 0; i != files.size(); ++i)
     {
     pqPipelineSource* reader = 
-      core->createReaderOnActiveServer(files[i]);
+      core->createReaderOnActiveServer(files[i]/*, "ExodusReader"*/);
     if (!reader)
       {
       qDebug() << "Failed to create reader for : " << files[i];
       continue;
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::onFileSaveData()
+{
+  pqPipelineSource* source = pqApplicationCore::instance()->getActiveSource();
+  if (!source)
+    {
+    qDebug() << "No active source, cannot save data.";
+    return;
+    }
+
+  // Get the list of writers that can write the output from the given source.
+  QString filters = 
+    pqApplicationCore::instance()->getWriterFactory()->getSupportedFileTypes(
+      source);
+
+  pqFileDialog file_dialog(
+    new pqServerFileDialogModel(NULL, source->getServer()), 
+    this, tr("Save File:"), QString(), filters);
+  file_dialog.setObjectName("FileSaveDialog");
+  file_dialog.setFileMode(pqFileDialog::AnyFile);
+  file_dialog.setAttribute(Qt::WA_DeleteOnClose, false);
+  QObject::connect(&file_dialog, SIGNAL(filesSelected(const QStringList&)), 
+    this, SLOT(onFileSaveData(const QStringList&)));
+  file_dialog.exec();
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::onFileSaveData(const QStringList& files)
+{
+  pqPipelineSource* source = pqApplicationCore::instance()->getActiveSource();
+  if (!source)
+    {
+    qDebug() << "No active source, cannot save data.";
+    return;
+    }
+
+  vtkSmartPointer<vtkSMProxy> proxy;
+  proxy.TakeReference(pqApplicationCore::instance()->getWriterFactory()->
+    newWriter(files[0], source));
+
+  vtkSMSourceProxy* writer = vtkSMSourceProxy::SafeDownCast(proxy);
+  if (!writer)
+    {
+    qDebug() << "Failed to create writer for: " << files[0];
+    return;
+    }
+
+  vtkSMStringVectorProperty::SafeDownCast(writer->GetProperty("FileName"))
+    ->SetElement(0, files[0].toStdString().c_str());
+
+  // TODO: We can popup a wizard or something for setting the properties
+  // on the writer.
+  vtkSMProxyProperty::SafeDownCast(writer->GetProperty("Input"))->AddProxy(
+    pqApplicationCore::instance()->getActiveSource()->getProxy());
+  writer->UpdateVTKObjects();
+
+  writer->UpdatePipeline();
 }
 
 //-----------------------------------------------------------------------------
@@ -1673,6 +1742,7 @@ void pqMainWindow::updateEnableState()
   QAction* compoundFilterAction = 
     this->Implementation->ToolsMenu->findChild<QAction*>( "CompoundFilter");
   QAction* openAction = this->fileMenu()->findChild<QAction*>("Open");
+  QAction* saveDataAction = this->fileMenu()->findChild<QAction*>("SaveData");
   
   this->Implementation->SourcesMenu->setEnabled(server != 0 && !pending_displays);
   this->Implementation->ServerDisconnectAction->setEnabled(server != 0);
@@ -1686,6 +1756,7 @@ void pqMainWindow::updateEnableState()
     source != 0 && server != 0 && !pending_displays);
 
   openAction->setEnabled(!pending_displays);
+  saveDataAction->setEnabled(!pending_displays && source!=0);
   connectAction->setEnabled(num_servers==0);
 }
 

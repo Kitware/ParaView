@@ -46,6 +46,7 @@ class pqRenderWindowManager;
 class pqServer;
 class pqServerManagerModel;
 class pqUndoStack;
+class pqWriterFactory;
 
 /// This class is the crux of the ParaQ application. It creates
 /// and manages various managers which are necessary for the PQClient
@@ -75,6 +76,7 @@ public:
   pqRenderWindowManager* getRenderWindowManager();
   pq3DWidgetFactory* get3DWidgetFactory();
   pqReaderFactory* getReaderFactory();
+  pqWriterFactory* getWriterFactory();
 
   // This will create a source with the given xmlname on the active server. 
   // On success returns

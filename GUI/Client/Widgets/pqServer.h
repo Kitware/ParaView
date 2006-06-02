@@ -80,6 +80,11 @@ public:
   vtkSMRenderModuleProxy* newRenderModule();
 
   vtkIdType GetConnectionID() { return this->ConnectionID; }
+
+  // Return the number of data server partitions on this 
+  // server connection. A convenience method.
+  int getNumberOfPartitions();
+
 protected:
 
   /// Creates vtkSMMultiViewRenderModuleProxy for this connection and 

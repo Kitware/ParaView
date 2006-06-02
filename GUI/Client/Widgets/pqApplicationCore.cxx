@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
+#include "pqWriterFactory.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCoreInternal
@@ -68,6 +69,7 @@ public:
   pqRenderWindowManager* RenderWindowManager;
   pq3DWidgetFactory* WidgetFactory;
   pqReaderFactory* ReaderFactory;
+  pqWriterFactory* WriterFactory;
 
   QPointer<pqPipelineSource> ActiveSource;
   QPointer<pqServer> ActiveServer;
@@ -126,6 +128,7 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   // * Create various factories.
   this->Internal->WidgetFactory = new pq3DWidgetFactory(this);
   this->Internal->ReaderFactory = new pqReaderFactory(this);
+  this->Internal->WriterFactory = new pqWriterFactory(this);
 
 }
 
@@ -204,6 +207,12 @@ pq3DWidgetFactory* pqApplicationCore::get3DWidgetFactory()
 pqReaderFactory* pqApplicationCore::getReaderFactory()
 {
   return this->Internal->ReaderFactory;
+}
+
+//-----------------------------------------------------------------------------
+pqWriterFactory* pqApplicationCore::getWriterFactory()
+{
+  return this->Internal->WriterFactory;
 }
 
 //-----------------------------------------------------------------------------
