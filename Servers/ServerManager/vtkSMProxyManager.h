@@ -213,6 +213,16 @@ public:
   const char* GetXMLGroupName(unsigned int n);
 
   // Description:
+  // Returns the number of proxies under the group with \c groupName for which
+  // proxies can be created.
+  unsigned int GetNumberOfXMLProxies(const char* groupName);
+
+  // Description:
+  // Returns the name for the nth XML proxy element under the
+  // group with name \c groupName.
+  const char* GetXMLProxyName(const char* groupName, unsigned int n);
+
+  // Description:
   // Returns 1 if a proxy element of given group and exists, 0
   // otherwise. If a proxy element does not exist, a call to
   // NewProxy() will fail.
