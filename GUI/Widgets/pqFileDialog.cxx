@@ -65,6 +65,27 @@ namespace {
     return f.split(sep, QString::SkipEmptyParts);
   }
 
+
+  QStringList GetWildCardsFromFilter(const QString& filter)
+    {
+    QString f = filter;
+    // if we have (...) in our filter, strip everything out but the contents of ()
+    int start, end;
+    start = filter.indexOf('(');
+    end = filter.lastIndexOf(')');
+    if(start != -1 && end != -1)
+      {
+      f = f.mid(start+1, end-start-1);
+      }
+    else if(start != -1 || end != -1)
+      {
+      f = QString();  // hmm...  I'm confused
+      }
+
+    // separated by spaces or semi-colons
+    QStringList fs = f.split(QRegExp("[\\s+;]"));
+    return fs;
+    }
 }
 
 pqFileDialog::pqFileDialog(pqFileDialogModel* model, QWidget* p, 
@@ -299,20 +320,41 @@ void pqFileDialog::accept()
         this->Ui->FileName->selectAll();
         return;
         }
-      else if(this->Model->fileExists(fn))
+      else
         {
-        // found, ask to overwrite
-        QString message = tr(" already exists.\nDo you want to replace it?");
-        if(QMessageBox::warning(this, this->windowTitle(), fn + message,
-                                QMessageBox::Yes, QMessageBox::No)
-           == QMessageBox::No)
+        // add missing extension if necessary
+        QFileInfo fi(fn);
+        QString ext = fi.completeSuffix();
+        QString extensionWildcard = GetWildCardsFromFilter(
+             this->Ui->FileType->currentText()).first();
+        QString wantedExtension =
+          extensionWildcard.mid(extensionWildcard.indexOf('.')+1);
+        if(ext.isEmpty() && !wantedExtension.isEmpty())
           {
-          return;
+          if(fn.at(fn.size() - 1) != '.')
+            {
+            fn += ".";
+            }
+          fn += wantedExtension;
           }
+
+        if(this->Model->fileExists(fn))
+          {
+          // found, ask to overwrite
+          QString message = tr(" already exists.\nDo you want to replace it?");
+          if(QMessageBox::warning(this, this->windowTitle(), fn + message,
+                                  QMessageBox::Yes, QMessageBox::No)
+             == QMessageBox::No)
+            {
+            return;
+            }
+          }
+        this->hide();
+        QStringList files;
+        files.append(fn);
+        emit this->filesSelected(files);
+        base::accept();
         }
-      this->hide();
-      emit this->filesSelected(selected_files);
-      base::accept();
       }
     break;
     }
@@ -347,22 +389,9 @@ void pqFileDialog::onDataChanged(const QModelIndex&, const QModelIndex&)
   this->Ui->Parents->setCurrentIndex(split_path.size() - 1);
 }
 
-void pqFileDialog::onActivated(const QModelIndex& Index)
+void pqFileDialog::onActivated(const QModelIndex&)
 {
-  QModelIndex i = Index;
-  if(i.model() == this->Filter)
-    {
-    i = this->Filter->mapToSource(i);
-    }
-
-  if(this->Model->isDir(i))
-    {
-    this->onNavigateDown(i);
-    }
-  else
-    {
-    emitFilesSelected(this->Model->getFilePaths(i));
-    }
+  this->accept();
 }
 
 void pqFileDialog::onClicked(const QModelIndex& Index)
@@ -422,23 +451,7 @@ void pqFileDialog::onFilterChange(const QString& filter)
     return;
     }
 
-  QString f = filter;
-
-  // if we have (...) in our filter, strip everything out but the contents of ()
-  int start, end;
-  start = filter.indexOf('(');
-  end = filter.lastIndexOf(')');
-  if(start != -1 && end != -1)
-    {
-    f = f.mid(start+1, end-start-1);
-    }
-  else if(start != -1 || end != -1)
-    {
-    f = QString();  // hmm...  I'm confused
-    }
-
-  // separated by spaces or semi-colons
-  QStringList fs = f.split(QRegExp("[\\s+;]"));
+  QStringList fs = GetWildCardsFromFilter(filter);
 
   // set filter on proxy
   this->Filter->setFilter(fs);
