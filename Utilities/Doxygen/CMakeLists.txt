@@ -5,6 +5,7 @@ INCLUDE (Documentation)
 
 IF (BUILD_DOCUMENTATION)
   SET (INCLUDE_QT_DOCUMENTATION OFF CACHE BOOL "Specify if Qt documentation should be linked to.")
+  MARK_AS_ADVANCED(INCLUDE_QT_DOCUMENTATION)
   IF (INCLUDE_QT_DOCUMENTATION)
     SET(QT_DOC_DIR CACHE FILEPATH "Path to the directory containing Qt html documentation.")
     FIND_PROGRAM (DOXYTAG
@@ -13,6 +14,7 @@ IF (BUILD_DOCUMENTATION)
       /Applications/Doxygen.app/Contents/Resources
       /Applications/Doxygen.app/Contents/MacOS
       )
+    MARK_AS_ADVANCED(DOXYTAG QT_DOC_DIR)
     SET (QT_TAG_FILE "${CMAKE_CURRENT_BINARY_DIR}/Qt.tag")
   ENDIF (INCLUDE_QT_DOCUMENTATION)
   SET(BUILD_DOXYGEN ON)
