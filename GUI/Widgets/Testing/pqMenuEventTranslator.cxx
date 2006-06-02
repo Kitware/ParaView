@@ -72,7 +72,7 @@ bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool&
     if(e->button() == Qt::LeftButton)
       {
       QAction* action = object->actionAt(e->pos());
-      if(action)
+      if(action && !action->menu())
         {
         emit recordEvent(action, "activate", "");
         return true;
