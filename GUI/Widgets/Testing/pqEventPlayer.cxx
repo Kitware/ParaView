@@ -30,15 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-// trick to get QT3_SUPPORT that isn't in the Qt3Support library
-#if defined(QT3_SUPPORT)
-#include <QCoreApplication>
-#else
-#define QT3_SUPPORT
-#include <QCoreApplication>
-#undef QT3_SUPPORT
-#endif
-
 #include "pqAbstractActivateEventPlayer.h"
 #include "pqAbstractBooleanEventPlayer.h"
 #include "pqAbstractDoubleEventPlayer.h"
@@ -52,8 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QApplication>
 #include <QObject>
-#include <QTimer>
-#include <QStringList>
+#include <QWidget>
 #include <QtDebug>
 #include <QAbstractEventDispatcher>
 
@@ -154,9 +144,6 @@ void pqEventPlayer::internalPlayEvent(const QString& Object,
 
 bool pqEventPlayer::exec()
 {
-  // back up loop count
-  this->StartLoopCount = QCoreApplication::loopLevel();
-
   // aboutToBlock() from QAbstractEventDispatcher
   // is an indication that *absolutely* every Qt event 
   // has been processed, that's the time when we can say
@@ -164,9 +151,14 @@ bool pqEventPlayer::exec()
   QObject::connect(QAbstractEventDispatcher::instance(),
                    SIGNAL(aboutToBlock()),
                    this, SIGNAL(readyPlayEvent()));
+
+  QApplication::instance()->installEventFilter(this);
+
   // start the loop
   int ret = EventLoop.exec();
   
+  QApplication::instance()->removeEventFilter(this);
+
   QObject::disconnect(QAbstractEventDispatcher::instance(),
                    SIGNAL(aboutToBlock()),
                    this, SIGNAL(readyPlayEvent()));
@@ -176,15 +168,39 @@ bool pqEventPlayer::exec()
 
 void pqEventPlayer::exit(bool ret)
 {
-  // exit any other local event loops
-  int numLoops = QCoreApplication::loopLevel() - this->StartLoopCount - 1;
-  for(int i=0; i<numLoops; i++)
+  while(!this->ModalWidgets.isEmpty())
     {
-    QCoreApplication::exit_loop();
+    QWidget* w = this->ModalWidgets.last();
+    w->hide();
+    w->close();
     }
 
   // exit our event loop
   this->EventLoop.exit(ret ? 0 : 1);
 }
+
+bool pqEventPlayer::eventFilter(QObject* watched, QEvent* e)
+{
+  if(e->type() == QEvent::Show)
+    {
+    QWidget* widget = qobject_cast<QWidget*>(watched);
+    if(widget && widget->isModal())
+      {
+      this->ModalWidgets.append(widget);
+      }
+    }
+  else if(e->type() == QEvent::Hide)
+    {
+    QWidget* widget = qobject_cast<QWidget*>(watched);
+    if(widget && widget->isModal())
+      {
+      Q_ASSERT(widget == this->ModalWidgets.last());
+      this->ModalWidgets.removeLast();
+      }
+    }
+  return false;
+}
+
+
 
 

@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QEventLoop>
 #include <QString>
-#include <QVector>
+#include <QList>
 
 class QObject;
 class pqWidgetEventPlayer;
@@ -102,6 +102,7 @@ public:
   /// an error playing an event
   void exit(bool retVal);
 
+
 signals:
   /// readyPlayEvent emitted when playEvent is ready 
   /// for the next playback event
@@ -109,6 +110,8 @@ signals:
 
 
   // Internals
+protected:
+  bool eventFilter(QObject*, QEvent* e);
 
 signals:
   void signalPlayEvent(const QString& Object, const QString& Command,
@@ -121,12 +124,13 @@ private slots:
 private:
   pqEventPlayer(const pqEventPlayer&);
   pqEventPlayer& operator=(const pqEventPlayer&);
+  
 
   /// Stores the working set of widget players  
-  QVector<pqWidgetEventPlayer*> Players;
+  QList<pqWidgetEventPlayer*> Players;
   pqWidgetEventPlayer* BasicPlayer;
   QEventLoop EventLoop;
-  int StartLoopCount;
+  QList<QWidget*> ModalWidgets;
 };
 
 #endif // !_pqEventPlayer_h
