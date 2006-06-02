@@ -70,7 +70,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.291");
+vtkCxxRevisionMacro(vtkKWApplication, "1.292");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -401,6 +401,21 @@ int vtkKWApplication::GetNumberOfWindows()
     return this->Internals->Windows.size();
     }
   return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::GetNumberOfWindowsMapped()
+{
+  int i, nb_windows = this->GetNumberOfWindows(), count = 0;
+  for (i = 0; i < nb_windows; i++)
+    {
+    vtkKWWindowBase *win = this->GetNthWindow(i);
+    if (win && win->IsMapped())
+      {
+      ++count;
+      }
+    }
+  return count;
 }
 
 //----------------------------------------------------------------------------

@@ -89,18 +89,19 @@ public:
   vtkGetMacro(InExit, int);
 
   // Description:
-  // Add/Close a window to/of this application.
+  // Add, remove (i.e. close), or retrieve a window to/from this application.
   // Note that AddWindow() will increase the reference count of the window
   // that is added, RemoveWindow() will decrease it. Once the last window is
   // closed, Exit() is called.
   // Return 1 if successful, 0 otherwise
   virtual int AddWindow(vtkKWWindowBase *w);
   virtual int RemoveWindow(vtkKWWindowBase *);
+  virtual vtkKWWindowBase* GetNthWindow(int rank);
 
   // Description:
-  // Get the number of windows, retrieve a window
+  // Get the number of windows, the number of windows mapped on screen.
   virtual int GetNumberOfWindows();
-  virtual vtkKWWindowBase* GetNthWindow(int rank);
+  virtual int GetNumberOfWindowsMapped();
 
   // Description:
   // Set/Get the application name.
