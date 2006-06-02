@@ -106,6 +106,7 @@ IF(BUILD_TESTING)
     VariableSelector
     Clip
     Cut
+    Threshold
     )
 
   SET (TESTS_WITHOUT_BASELINES
