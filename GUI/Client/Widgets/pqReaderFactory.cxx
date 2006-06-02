@@ -123,7 +123,7 @@ class pqReaderFactoryInternal
 public:
   QList<pqReaderInfo> ReaderList;
 
-  vtkSMProxy* getPrototype(const QString& xmlgroup, const QString& xmlname)
+  vtkSMProxy* getPrototype(const QString& xmlgroup, const QString& xmlname) const
     {
     foreach (const pqReaderInfo& info, this->ReaderList)
       {
@@ -137,14 +137,15 @@ public:
     }
 
   // Get a single type string for all supported types.
-  QString getTypeString()
+  QString getTypeString() const
     {
     QString types = "ParaView Files (";
     foreach (const pqReaderInfo& info, this->ReaderList)
       {
-      foreach (QString ext, info.Extensions)
+      QList<QString>::const_iterator extIter = info.Extensions.begin();
+      for (;extIter!=info.Extensions.end(); extIter++)
         {
-        types += "*." + ext +" ";
+        types += "*." + *extIter +" ";
         }
       }
     types += ")";
