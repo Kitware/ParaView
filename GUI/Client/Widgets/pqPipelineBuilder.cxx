@@ -610,3 +610,23 @@ void pqPipelineBuilder::deleteProxies(pqServer* server)
 
   iter->Delete();
 }
+
+//-----------------------------------------------------------------------------
+void pqPipelineBuilder::getSupportedProxies(const QString& xmlgroup, 
+  pqServer* vtkNotUsed(server), QList<QString>& names)
+{
+  names.clear();
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  unsigned int numProxies = pxm->GetNumberOfXMLProxies(
+    xmlgroup.toStdString().c_str());
+  for (unsigned int cc=0; cc <numProxies; cc++)
+    {
+    const char* name = pxm->GetXMLProxyName(xmlgroup.toStdString().c_str(),
+      cc);
+    if (name)
+      {
+      names.push_back(name);
+      }
+    }
+}
+

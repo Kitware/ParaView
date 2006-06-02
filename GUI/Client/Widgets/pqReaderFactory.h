@@ -73,7 +73,9 @@ public:
   pqPipelineSource* createReader(const QString& filename, pqServer* server);
 
   // Returns a list of file types suitable for use with file dialog.
-  QString getSupportedFileTypes();
+  // \c server is required to ensure that only those readers that can
+  // be instantiated on the server will be considered.
+  QString getSupportedFileTypes(pqServer* server);
 
   // Loads file type definitions from the xml file.
   // Format of this xml is:

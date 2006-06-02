@@ -141,6 +141,16 @@ public:
   // \li unregistering the display.
   void remove(pqPipelineDisplay* display);
 
+  // Every server can potentially be compiled with different compile time options
+  // while could lead to certain filters/sources/writers being non-instantiable
+  // on that server. For all proxies in the \c xmlgroup that the client 
+  // server manager is aware of, this method populates \c names with only the names
+  // for those proxies that can be instantiated on the given \c server.
+  // \todo Currently, this method does not actually validate if the server
+  // can instantiate the proxies.
+  void getSupportedProxies(const QString& xmlgroup, pqServer* server, 
+    QList<QString>& names);
+
 protected:
   /// this method does what it says. Note that it does not worry about undo stack
   /// at all. The caller would have managed it.

@@ -961,8 +961,8 @@ void pqMainWindow::onFileOpen()
 //-----------------------------------------------------------------------------
 void pqMainWindow::onFileOpen(pqServer* server)
 {
-  QString filters = 
-    pqApplicationCore::instance()->getReaderFactory()->getSupportedFileTypes();
+  QString filters = pqApplicationCore::instance()->getReaderFactory()->
+    getSupportedFileTypes(server);
   if (filters != "")
     {
     filters += ";;";
@@ -1028,6 +1028,11 @@ void pqMainWindow::onFileSaveData(const QStringList& files)
   if (!source)
     {
     qDebug() << "No active source, cannot save data.";
+    return;
+    }
+  if (files.size() == 0)
+    {
+    qDebug() << "No file choose to save.";
     return;
     }
 
@@ -1678,6 +1683,12 @@ void pqMainWindow::updateFiltersMenu(pqPipelineSource* source)
     return;
     }
 
+  QList<QString> supportedFilters;
+
+  pqApplicationCore::instance()->getPipelineBuilder()->
+    getSupportedProxies("filters", source->getServer(), supportedFilters);
+
+
   QList<QAction*> menu_actions = menu->findChildren<QAction*>();
   bool some_enabled = false;
   foreach(QAction* action, menu_actions)
@@ -1690,6 +1701,12 @@ void pqMainWindow::updateFiltersMenu(pqPipelineSource* source)
     QString filterName = action->data().toString();
     if (filterName.isEmpty())
       {
+      continue;
+      }
+    if (!supportedFilters.contains(filterName))
+      {
+      // skip filters not supported by the server.
+      action->setEnabled(false);
       continue;
       }
     vtkSMProxy* output = pxm->GetProxy("filters_prototypes",

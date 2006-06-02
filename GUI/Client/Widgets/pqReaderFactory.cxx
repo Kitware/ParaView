@@ -277,12 +277,23 @@ pqPipelineSource* pqReaderFactory::createReader(const QString& filename,
 }
 
 //-----------------------------------------------------------------------------
-QString pqReaderFactory::getSupportedFileTypes()
+QString pqReaderFactory::getSupportedFileTypes(pqServer* server)
 {
+  QList<QString> supportedSources;
+
+  // TODO: We are only looking into sources group for now.
+  pqApplicationCore::instance()->getPipelineBuilder()->
+    getSupportedProxies("sources", server, supportedSources);
+  
+
   QString types = this->Internal->getTypeString();
   foreach(const pqReaderInfo &info, this->Internal->ReaderList)
     {
-    types += ";;" + info.getTypeString();
+    if (info.PrototypeProxy && 
+      supportedSources.contains(info.PrototypeProxy->GetXMLName()))
+      {
+      types += ";;" + info.getTypeString();
+      }
     }
   return types;
 }

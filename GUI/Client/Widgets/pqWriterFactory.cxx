@@ -47,8 +47,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaQ includes.
-#include "pqServer.h"
+#include "pqApplicationCore.h"
+#include "pqPipelineBuilder.h"
 #include "pqPipelineSource.h"
+#include "pqServer.h"
 
 struct pqWriterInfo
 {
@@ -235,10 +237,26 @@ vtkSMProxy* pqWriterFactory::newWriter(const QString& filename,
 QString pqWriterFactory::getSupportedFileTypes(pqPipelineSource* toWrite)
 {
   QString types = "";
+  if (!toWrite)
+    {
+    return types;
+    }
+
+  QList<QString> supportedWriters;
+
+  // TODO: We are only looking into sources group for now.
+  pqApplicationCore::instance()->getPipelineBuilder()->
+    getSupportedProxies("writers", toWrite->getServer(), supportedWriters);
+
   bool first = true;
   foreach(const pqWriterInfo &info , this->Internal->WriterList)
     {
-
+    if (!info.PrototypeProxy || 
+      !supportedWriters.contains(info.PrototypeProxy->GetXMLName()))
+      {
+      // skip writers not supported by the server.
+      continue;
+      }
     if (info.canWriteOutput(toWrite))
       {
       if (!first)
