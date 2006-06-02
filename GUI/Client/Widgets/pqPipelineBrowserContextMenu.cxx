@@ -80,6 +80,7 @@ void pqPipelineBrowserContextMenu::showContextMenu(const QPoint &pos)
     }
 
   QMenu menu;
+  menu.setObjectName("PipelineObjectMenu");
   bool menuHasItems = false;
   pqFlatTreeView *tree = this->Browser->getTreeView();
   QModelIndex current = tree->selectionModel()->currentIndex();
@@ -93,12 +94,14 @@ void pqPipelineBrowserContextMenu::showContextMenu(const QPoint &pos)
 
     // Add the context menu items for a pipeline object.
     action = menu.addAction("Display Settings...", this, SLOT(showDisplayEditor()));
+    action->setObjectName("Display Settings");
     if(source->getDisplayCount() == 0)
       {
       action->setEnabled(false);
       }
 
     action = menu.addAction("Delete", this->Browser, SLOT(deleteSelected()));
+    action->setObjectName("Delete");
     if (source->getNumberOfConsumers() > 0)
       {
       action->setEnabled(false);
@@ -144,6 +147,7 @@ void pqPipelineBrowserContextMenu::showDisplayEditor()
   // TODO: The display dialog should accept a pqPipelineSource object
   // in order to handle multiple displays.
   QDialog* dialog = new QDialog(topParent);
+  dialog->setObjectName("ObjectDisplayProperties");
   dialog->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
   dialog->setWindowTitle("Display Settings");
   QHBoxLayout* l = new QHBoxLayout(dialog);

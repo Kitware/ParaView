@@ -315,11 +315,9 @@ void pqDisplayProxyEditor::setupGUIConnections()
     this, SLOT(updateView()),Qt::QueuedConnection);
   QObject::connect(this->Internal->Opacity, SIGNAL(valueChanged(double)),
     this, SLOT(updateView()),Qt::QueuedConnection);
-  QObject::connect(this->Internal->ViewZoomToData, SIGNAL(pressed()), 
+  QObject::connect(this->Internal->ViewZoomToData, SIGNAL(clicked(bool)), 
     this, SLOT(zoomToData()));
-  QObject::connect(this->Internal->DismissButton, SIGNAL(pressed()),
-    this, SIGNAL(dismiss()));
-  QObject::connect(this->Internal->DismissButton, SIGNAL(pressed()),
+  QObject::connect(this->Internal->DismissButton, SIGNAL(clicked(bool)),
     this, SIGNAL(dismiss()));
   QObject::connect(this->Internal->StyleRepresentation, SIGNAL(currentIndexChanged(int)),
     this, SLOT(updateColorByMenu()), Qt::QueuedConnection);

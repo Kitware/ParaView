@@ -252,25 +252,31 @@ void pqExodusPanel::linkServerManagerProperties()
 
   QAction* a;
   a = new QAction("All Blocks On", BlockTree);
+  a->setObjectName("BlocksOn");
   QObject::connect(a, SIGNAL(triggered(bool)), this, SLOT(blocksOn()));
   BlockTree->addAction(a);
   a = new QAction("All Blocks Off", BlockTree);
+  a->setObjectName("BlocksOff");
   QObject::connect(a, SIGNAL(triggered(bool)), this, SLOT(blocksOff()));
   BlockTree->addAction(a);
   BlockTree->setContextMenuPolicy(Qt::ActionsContextMenu);
   
   a = new QAction("All Sets On", SetsTree);
+  a->setObjectName("SetsOn");
   QObject::connect(a, SIGNAL(triggered(bool)), this, SLOT(setsOn()));
   SetsTree->addAction(a);
   a = new QAction("All Sets Off", SetsTree);
+  a->setObjectName("SetsOff");
   QObject::connect(a, SIGNAL(triggered(bool)), this, SLOT(setsOff()));
   SetsTree->addAction(a);
   SetsTree->setContextMenuPolicy(Qt::ActionsContextMenu);
 
   a = new QAction("All Variables On", VariablesTree);
+  a->setObjectName("VariablesOn");
   QObject::connect(a, SIGNAL(triggered(bool)), this, SLOT(variablesOn()));
   VariablesTree->addAction(a);
   a = new QAction("All Variables Off", VariablesTree);
+  a->setObjectName("VariablesOff");
   QObject::connect(a, SIGNAL(triggered(bool)), this, SLOT(variablesOff()));
   VariablesTree->addAction(a);
   VariablesTree->setContextMenuPolicy(Qt::ActionsContextMenu);
