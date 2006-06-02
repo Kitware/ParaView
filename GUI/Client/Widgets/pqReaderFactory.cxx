@@ -44,11 +44,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 // Qt includes.
-#include <QList>
-#include <QtDebug>
 #include <QDomDocument>
 #include <QFileInfo>
+#include <QList>
 #include <QStringList>
+#include <QtDebug>
 
 // ParaQ includes.
 #include "pqApplicationCore.h"
@@ -264,9 +264,15 @@ pqPipelineSource* pqReaderFactory::createReader(const QString& filename,
 QString pqReaderFactory::getSupportedFileTypes()
 {
   QString types = "";
+  bool first =true;
   foreach(pqReaderInfo info, this->Internal->ReaderList)
     {
-    types += info.getTypeString() + ";;";
+    if (!first)
+      {
+      types += ";;";
+      }
+    types += info.getTypeString();
+    first = false;
     }
   return types;
 }

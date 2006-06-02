@@ -41,7 +41,7 @@ class pqServer;
 class vtkSMProxy;
 
 // This class is a reader factory. The factory must be made file-type aware
-// by using addFileType. One initialized one can use createReader()
+// by using addFileType. Once initialized, one can use createReader()
 // to create a reader that can read a particular file. 
 class PQWIDGETS_EXPORT pqReaderFactory : public QObject
 {
