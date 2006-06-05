@@ -1761,16 +1761,25 @@ void pqMainWindow::updateEnableState()
   QAction* openAction = this->fileMenu()->findChild<QAction*>("Open");
   QAction* saveDataAction = this->fileMenu()->findChild<QAction*>("SaveData");
   
-  this->Implementation->SourcesMenu->setEnabled(server != 0 && !pending_displays);
+  if ( this->Implementation->SourcesMenu )
+    {
+    this->Implementation->SourcesMenu->setEnabled(server != 0 && !pending_displays);
+    }
   this->Implementation->ServerDisconnectAction->setEnabled(server != 0);
-  this->Implementation->VariableSelectorToolBar->setEnabled(
-    source != 0 && !pending_displays);
+  if ( this->Implementation->VariableSelectorToolBar )
+    {
+    this->Implementation->VariableSelectorToolBar->setEnabled(
+      source != 0 && !pending_displays);
+    }
 
   compoundFilterAction->setEnabled(server != 0 && !pending_displays);
   saveScreenshot->setEnabled(server != 0);
 
-  this->Implementation->FiltersMenu->setEnabled(
-    source != 0 && server != 0 && !pending_displays);
+  if ( this->Implementation->FiltersMenu )
+    {
+    this->Implementation->FiltersMenu->setEnabled(
+      source != 0 && server != 0 && !pending_displays);
+    }
 
   openAction->setEnabled(!pending_displays);
   saveDataAction->setEnabled(!pending_displays && source!=0);
