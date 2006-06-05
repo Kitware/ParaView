@@ -35,7 +35,7 @@
 
 
 vtkStandardNewMacro(vtkServerConnection);
-vtkCxxRevisionMacro(vtkServerConnection, "1.5");
+vtkCxxRevisionMacro(vtkServerConnection, "1.6");
 //-----------------------------------------------------------------------------
 vtkServerConnection::vtkServerConnection()
 {
@@ -190,9 +190,11 @@ int vtkServerConnection::SendStreamToClient(vtkClientServerStream& stream)
   // For now, we simply use the common self connection.
   this->Activate();
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  return pm->SendStream(vtkProcessModuleConnectionManager::GetSelfConnectionID(),
+  int ret = pm->SendStream(
+    vtkProcessModuleConnectionManager::GetSelfConnectionID(),
     vtkProcessModule::DATA_SERVER_ROOT, stream, 0);
   this->Deactivate();
+  return ret;
 }
 
 //-----------------------------------------------------------------------------
