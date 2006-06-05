@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QEventLoop>
 #include <QString>
 #include <QList>
+#include <QPointer>
 
 class QObject;
 class pqWidgetEventPlayer;
@@ -110,8 +111,6 @@ signals:
 
 
   // Internals
-protected:
-  bool eventFilter(QObject*, QEvent* e);
 
 signals:
   void signalPlayEvent(const QString& Object, const QString& Command,
@@ -130,7 +129,7 @@ private:
   QList<pqWidgetEventPlayer*> Players;
   pqWidgetEventPlayer* BasicPlayer;
   QEventLoop EventLoop;
-  QList<QWidget*> ModalWidgets;
+  QList<QPointer<QWidget> > TopLevelWidgets;
 };
 
 #endif // !_pqEventPlayer_h

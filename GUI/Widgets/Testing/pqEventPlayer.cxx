@@ -152,13 +152,16 @@ bool pqEventPlayer::exec()
                    SIGNAL(aboutToBlock()),
                    this, SIGNAL(readyPlayEvent()));
 
-  QApplication::instance()->installEventFilter(this);
+  this->TopLevelWidgets.clear();
+  QWidgetList widgets = QApplication::topLevelWidgets();
+  foreach(QWidget* w, widgets)
+    {
+    this->TopLevelWidgets.append(w);
+    }
 
   // start the loop
   int ret = EventLoop.exec();
   
-  QApplication::instance()->removeEventFilter(this);
-
   QObject::disconnect(QAbstractEventDispatcher::instance(),
                    SIGNAL(aboutToBlock()),
                    this, SIGNAL(readyPlayEvent()));
@@ -168,39 +171,21 @@ bool pqEventPlayer::exec()
 
 void pqEventPlayer::exit(bool ret)
 {
-  while(!this->ModalWidgets.isEmpty())
+  // any top level widgets made while playing tests 
+  // will be closed
+  // some/all may be modal, and to exit properly, we have
+  // to get rid of the modal ones
+  foreach(QWidget* w, QApplication::topLevelWidgets())
     {
-    QWidget* w = this->ModalWidgets.last();
-    w->hide();
-    w->close();
+    if(!this->TopLevelWidgets.contains(w))
+      {
+      w->hide();
+      w->close();
+      }
     }
 
   // exit our event loop
   this->EventLoop.exit(ret ? 0 : 1);
 }
-
-bool pqEventPlayer::eventFilter(QObject* watched, QEvent* e)
-{
-  if(e->type() == QEvent::Show)
-    {
-    QWidget* widget = qobject_cast<QWidget*>(watched);
-    if(widget && widget->isModal())
-      {
-      this->ModalWidgets.append(widget);
-      }
-    }
-  else if(e->type() == QEvent::Hide)
-    {
-    QWidget* widget = qobject_cast<QWidget*>(watched);
-    if(widget && widget->isModal())
-      {
-      Q_ASSERT(widget == this->ModalWidgets.last());
-      this->ModalWidgets.removeLast();
-      }
-    }
-  return false;
-}
-
-
 
 

@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTesting.h"
 
 #include <QApplication>
+#include <QContextMenuEvent>
 #include <QWidget>
 #include <QtDebug>
 
@@ -50,8 +51,10 @@ bool pqBasicWidgetEventPlayer::playEvent(QObject* Object,
     {
     if(Command == "contextMenu")
       {
-      QEvent* e = new QEvent(QEvent::ContextMenu);
-      QCoreApplication::postEvent(widget, e);
+      QPoint pt(widget->x(), widget->y());
+      QPoint globalPt = widget->mapToGlobal(pt);
+      QContextMenuEvent e(QContextMenuEvent::Other, pt, globalPt);
+      QCoreApplication::sendEvent(widget, &e);
       return true;
       }
     else
