@@ -107,6 +107,7 @@ IF(BUILD_TESTING)
     Clip
     Cut
     Threshold
+    OpenFile
     )
 
   SET (TESTS_WITHOUT_BASELINES
