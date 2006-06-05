@@ -2,5 +2,6 @@
 <pqevents>
   <pqevent object="MainWindow/MenuBar/FileMenu/Open" command="activate" arguments="" />
   <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
-  <pqevent object="MainWindow/FileOpenDialog/Cancel" command="activate" arguments="" />
+  <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAQ_DATA_ROOT/Data/box.ex2" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
 </pqevents>
