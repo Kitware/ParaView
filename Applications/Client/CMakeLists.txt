@@ -108,6 +108,7 @@ IF(BUILD_TESTING)
     Cut
     Threshold
     OpenFile
+    ExodusPanel
     )
 
   SET (TESTS_WITHOUT_BASELINES
