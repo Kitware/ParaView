@@ -1245,7 +1245,7 @@ void pqMainWindow::onFileSaveScreenshot(const QStringList& files)
 
   for(int i = 0; i != files.size(); ++i)
     {
-    if (!rm->saveImage(0, 0, files[i]))
+    if(!pqImageComparison::SaveScreenshot(rm->getWidget()->GetRenderWindow(), files[i]))
       {
       qCritical() << "Save Image failed.";
       }
@@ -1293,7 +1293,7 @@ void pqMainWindow::onRecordTestScreenshot(const QStringList& files)
   
   for(int i = 0; i != files.size(); ++i)
     {
-    if (!render_module->saveImage(0, 0, files[i]))
+    if(!pqImageComparison::SaveScreenshot(render_module->getWidget()->GetRenderWindow(), files[i]))
       {
       qCritical() << "Save Image failed.";
       }
