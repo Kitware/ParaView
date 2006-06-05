@@ -109,6 +109,7 @@ IF(BUILD_TESTING)
     Threshold
     OpenFile
     ExodusPanel
+    OpenSaveData
     )
 
   SET (TESTS_WITHOUT_BASELINES
