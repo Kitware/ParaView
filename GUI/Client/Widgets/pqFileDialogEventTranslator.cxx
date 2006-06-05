@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqFileDialog.h>
 
 #include <QEvent>
+#include <QtDebug>
 
 pqFileDialogEventTranslator::pqFileDialogEventTranslator() :
   CurrentObject(0)
@@ -78,8 +79,42 @@ bool pqFileDialogEventTranslator::translateEvent(QObject* Object, QEvent* Event,
 
 void pqFileDialogEventTranslator::onFilesSelected(const QStringList& files)
 {
-  /** \todo Handle multiple file selections */
-  emit recordEvent(this->CurrentObject, "filesSelected", files.front());
+  QString data_directory = getenv("PARAQ_DATA_ROOT");
+  if(data_directory.isEmpty())
+    {
+    qCritical() << "You must set the PARAQ_DATA_ROOT environment variable to record file selections.";
+    return;
+    }
+  data_directory.replace('\\', '/');
+  data_directory = data_directory.trimmed();
+  if(data_directory.size() && data_directory.at(data_directory.size()-1) == '/')
+    {
+    data_directory.chop(1);
+    }
+
+  QString arguments;
+  for(int i = 0; i != files.size(); ++i)
+    {
+    QString file = files[i];
+    file.replace('\\', '/');
+    
+    if(file.indexOf(data_directory, 0, Qt::CaseInsensitive) == 0)
+      {
+      file.replace(data_directory, "$PARAQ_DATA_ROOT", Qt::CaseInsensitive);
+      }
+    else
+      {
+      qCritical() << "You must choose a file under the PARAQ_DATA_ROOT directory to record file selections.";
+      return;
+      }
+    
+    arguments += file;
+
+    /** \todo Handle multiple file selections */
+    break;
+    }
+  
+  emit recordEvent(this->CurrentObject, "filesSelected", arguments);
 }
 
 void pqFileDialogEventTranslator::onCancelled()

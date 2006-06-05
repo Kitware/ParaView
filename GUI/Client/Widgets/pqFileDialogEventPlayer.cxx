@@ -57,8 +57,27 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
 
   if(Command == "filesSelected")
     {
+    QString data_directory = getenv("PARAQ_DATA_ROOT");
+    if(data_directory.isEmpty())
+      {
+      qCritical() << "You must set the PARAQ_DATA_ROOT environment variable to play-back file selections.";
+      Error = true;
+      return true;
+      }
+    data_directory.replace('\\', '/');
+    data_directory = data_directory.trimmed();
+    if(data_directory.size() && data_directory.at(data_directory.size()-1) == '/')
+      {
+      data_directory.chop(1);
+      }
+    
+    /** \todo Handle multiple files */
+    QString file = Arguments;
+    file.replace("$PARAQ_DATA_ROOT", data_directory);
+
     QStringList files;
-    files.append(Arguments);
+    files.append(file);
+
     object->emitFilesSelected(files);
     QApplication::processEvents();
         
