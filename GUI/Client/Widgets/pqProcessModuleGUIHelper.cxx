@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqEventPlayer.h"
 #include "pqEventPlayerXML.h"
+#include "pqFileDialogEventPlayer.h"
 #include "pqOptions.h"
 #include "pqOutputWindowAdapter.h"
 #include "pqOutputWindow.h"
@@ -110,7 +111,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.7");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.8");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -157,6 +158,7 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
       if (options->GetTestFileName())
         {
         pqEventPlayer player;
+        player.addWidgetEventPlayer(new pqFileDialogEventPlayer());
         player.addDefaultWidgetEventPlayers();
         pqEventPlayerXML xml_player;
         status = !xml_player.playXML(player, options->GetTestFileName());
