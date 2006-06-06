@@ -15,18 +15,22 @@
 #include "vtkSMPQStateLoader.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkSMMultiViewRenderModuleProxy.h"
-#include "vtkSMProxy.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMDataObjectDisplayProxy.h"
+#include "vtkSMMultiViewRenderModuleProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMRenderModuleProxy.h"
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.2");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.3");
 vtkCxxSetObjectMacro(vtkSMPQStateLoader, MultiViewRenderModuleProxy, 
   vtkSMMultiViewRenderModuleProxy);
 //-----------------------------------------------------------------------------
 vtkSMPQStateLoader::vtkSMPQStateLoader()
 {
   this->MultiViewRenderModuleProxy = 0;
+  this->UseExistingRenderModules = 0;
+  this->UsedExistingRenderModules = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -36,26 +40,17 @@ vtkSMPQStateLoader::~vtkSMPQStateLoader()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* vtkSMPQStateLoader::NewProxyFromElement(
-  vtkPVXMLElement* proxyElement, int id)
+vtkSMProxy* vtkSMPQStateLoader::NewProxyInternal(
+  const char* xml_group, const char* xml_name)
 {
-  vtkSMProxy* proxy = this->GetCreatedProxy(id);
-  if (proxy)
-    {
-    proxy->Register(this);
-    return proxy;
-    }
-
   // Check if the proxy requested is a render module.
-  const char* xml_name = proxyElement->GetAttribute("type");
-  const char* xml_group = proxyElement->GetAttribute("group");
-  if (xml_group && xml_name && strcmp(proxyElement->GetName(), "Proxy") == 0 
-    && strcmp(xml_group, "rendermodules") == 0)
+  if (xml_group && xml_name && strcmp(xml_group, "rendermodules") == 0)
     {
     if (strcmp(xml_name, "MultiViewRenderModule") == 0)
       {
       if (this->MultiViewRenderModuleProxy)
         {
+        this->MultiViewRenderModuleProxy->Register(this);
         return this->MultiViewRenderModuleProxy;
         }
       vtkWarningMacro("MultiViewRenderModuleProxy is not set. "
@@ -66,28 +61,47 @@ vtkSMProxy* vtkSMPQStateLoader::NewProxyFromElement(
       // Create a rendermodule.
       if (this->MultiViewRenderModuleProxy)
         {
-        proxy = this->MultiViewRenderModuleProxy->NewRenderModule();
-        if (proxy)
+        if (this->UseExistingRenderModules)
           {
-          this->AddCreatedProxy(id, proxy);
-          if (!this->LoadProxyState(proxyElement, proxy))
+          vtkSMProxy* p = this->MultiViewRenderModuleProxy->GetProxy(
+            static_cast<unsigned int>(this->UsedExistingRenderModules));
+          if (p)
             {
-            this->RemoveCreatedProxy(id);
-            vtkErrorMacro("Failed to load proxy state.");
-            proxy->Delete();
-            return 0;
+            this->UsedExistingRenderModules++;
+            p->Register(this);
+            return p;
             }
           }
-        return proxy;
+        // Can't use exiting module (none present, or all present are have
+        // already been used, hence we allocate a new one.
+        return this->MultiViewRenderModuleProxy->NewRenderModule();
         }
-      else
-        {
-        vtkWarningMacro("MultiViewRenderModuleProxy is not set. "
-          "Creating MultiViewRenderModuleProxy from the state.");
-        }
+      vtkWarningMacro("MultiViewRenderModuleProxy is not set. "
+        "Creating MultiViewRenderModuleProxy from the state.");
       }
     }
-  return this->Superclass::NewProxyFromElement(proxyElement, id);
+  else if (xml_group && xml_name && strcmp(xml_group, "displays")==0)
+    {
+    vtkSMProxy *display = this->Superclass::NewProxyInternal(xml_group, xml_name);
+    if (vtkSMDataObjectDisplayProxy::SafeDownCast(display))
+      {
+      if (this->MultiViewRenderModuleProxy)
+        {
+        display->Delete();
+        display = this->MultiViewRenderModuleProxy->CreateDisplayProxy();
+        }
+      }
+    return display;
+    }
+  return this->Superclass::NewProxyInternal(xml_group, xml_name);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMPQStateLoader::RegisterProxyInternal(const char* group, 
+  const char* vtkNotUsed(name), vtkSMProxy* proxy)
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  pxm->RegisterProxy(group, proxy->GetSelfIDAsString(), proxy);
 }
 
 //-----------------------------------------------------------------------------

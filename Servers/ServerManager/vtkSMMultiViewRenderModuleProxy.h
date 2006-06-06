@@ -26,6 +26,7 @@
 
 #include "vtkSMCompoundProxy.h"
 
+class vtkSMDisplayProxy;
 class VTK_EXPORT vtkSMMultiViewRenderModuleProxy : public vtkSMCompoundProxy
 {
 public:
@@ -47,6 +48,10 @@ public:
   // and IceT supports this.
   vtkSMProxy* NewRenderModule();
 
+  // Description
+  // Creates a display proxy for the type of render module indicated by
+  // RenderModuleName.
+  vtkSMDisplayProxy* CreateDisplayProxy();
 protected:
   vtkSMMultiViewRenderModuleProxy();
   ~vtkSMMultiViewRenderModuleProxy();

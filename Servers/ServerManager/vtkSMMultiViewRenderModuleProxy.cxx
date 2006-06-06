@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMMultiViewRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMMultiViewRenderModuleProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMMultiViewRenderModuleProxy, "1.4");
 
 //----------------------------------------------------------------------------
 vtkSMMultiViewRenderModuleProxy::vtkSMMultiViewRenderModuleProxy()
@@ -111,6 +111,38 @@ void vtkSMMultiViewRenderModuleProxy::CreateVTKObjects(int numObjects)
     }
 
   this->Superclass::CreateVTKObjects(numObjects);
+}
+
+//----------------------------------------------------------------------------
+vtkSMDisplayProxy* vtkSMMultiViewRenderModuleProxy::CreateDisplayProxy()
+{
+  if (!this->RenderModuleName)
+    {
+    vtkErrorMacro("A render module name has to be set before "
+                  "vtkSMMultiViewRenderModuleProxyProxy can create "
+                  "display proxies.");
+    }
+  unsigned int numMax = this->GetNumberOfProxies();
+  for (unsigned int cc=0;  cc <numMax; cc++)
+    {
+    vtkSMRenderModuleProxy* renModule = vtkSMRenderModuleProxy::SafeDownCast(
+      this->GetProxy(cc));
+    if (renModule)
+      {
+      return renModule->CreateDisplayProxy();
+      }
+    }
+
+  vtkSMProxy* renderModule = this->GetProxyManager()->NewProxy(
+    "rendermodules", this->RenderModuleName); 
+  
+  vtkSMDisplayProxy* display = 0;
+  if (renderModule && vtkSMRenderModuleProxy::SafeDownCast(renderModule))
+    {
+    display = vtkSMRenderModuleProxy::SafeDownCast(renderModule)->CreateDisplayProxy();
+    renderModule->Delete();
+    }
+  return display;
 }
 
 //----------------------------------------------------------------------------

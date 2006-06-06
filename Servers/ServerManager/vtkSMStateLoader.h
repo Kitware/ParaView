@@ -70,6 +70,17 @@ protected:
   int HandleProxyCollection(vtkPVXMLElement* collectionElement);
   void HandleCompoundProxyDefinitions(vtkPVXMLElement* element);
   int HandleLinks(vtkPVXMLElement* linksElement);
+  int BuildProxyCollectionInformation(vtkPVXMLElement*);
+
+  // Description:
+  // This method scans through the internal data structure built 
+  // during BuildProxyCollectionInformation() and registers the proxy. 
+  // The DS keeps info
+  // about each proxy ID and the groups and names 
+  // the proxy should be registered as (as indicated in the state file).
+  void RegisterProxy(int id, vtkSMProxy* proxy);
+  virtual void RegisterProxyInternal(const char* group, 
+    const char* name, vtkSMProxy* proxy);
 
   // Either create a new proxy or returns one from the map
   // of existing properties. Newly created proxies are stored
@@ -77,17 +88,9 @@ protected:
   // element under which the proxy definitions are stored.
   vtkSMProxy* NewProxy(vtkPVXMLElement* root, int id);
 
-  // Description:
-  // Returns the proxy with the given id in the internal proxy store.
-  vtkSMProxy* GetCreatedProxy(int id);
-
-  // Description:
-  // Add a proxy to the internal proxy store.
-  void AddCreatedProxy(int id, vtkSMProxy*);
-
-  // Description:
-  // Remove a proxy from the internal proxy store.
-  void RemoveCreatedProxy(int id);
+  // Default implementation simply requests the proxy manager
+  // to create a new proxy of the given type.
+  virtual vtkSMProxy* NewProxyInternal(const char* xmlgroup, const char* xmlname);
 
   int LoadProxyState(vtkPVXMLElement*, vtkSMProxy*);
 
