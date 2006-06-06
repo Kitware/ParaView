@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqPipelineModelItem.cxx
+   Module:    pqServerManagerModelItem.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,28 +30,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqPipelineModelItem.cxx
+/// \file pqServerManagerModelItem.cxx
 /// \date 4/14/2006
 
-#include "pqPipelineModelItem.h"
+#include "pqServerManagerModelItem.h"
 
 // ParaView includes.
 
 // Qt includes.
 
 //-----------------------------------------------------------------------------
-pqPipelineModelItem::pqPipelineModelItem(QObject* _parent /*=null*/)
+pqServerManagerModelItem::pqServerManagerModelItem(QObject* _parent /*=null*/)
   : QObject(_parent)
 {
   this->ModelType = pqPipelineModel::Invalid;
 }
 //-----------------------------------------------------------------------------
-pqPipelineModelItem::~pqPipelineModelItem()
+pqServerManagerModelItem::~pqServerManagerModelItem()
 {
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineModelItem::setType(pqPipelineModel::ItemType type)
+void pqServerManagerModelItem::setType(pqPipelineModel::ItemType type)
 {
   this->ModelType = type;
   emit this->dataModified();

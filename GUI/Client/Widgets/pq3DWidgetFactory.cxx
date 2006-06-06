@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaQ includes.
 #include "pqApplicationCore.h"
 #include "pqPipelineBuilder.h"
-#include "pqPipelineData.h"
+#include "pqServerManagerObserver.h"
 #include "pqServer.h"
 
 class pq3DWidgetFactoryInternal

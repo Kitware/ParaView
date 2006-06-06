@@ -42,10 +42,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqMultiViewFrame;
 class pqPipelineBuilder;
-class pqPipelineModelItem;
+class pqServerManagerModelItem;
 class pqPipelineServer;
 class pqPipelineSource;
-class pqPipelineData;
+class pqServerManagerObserver;
 class pqServer;
 
 class vtkCommand;
@@ -141,7 +141,7 @@ signals:
 
   /// Signal emitted when the active server/source changes. The
   /// handler can be a browser that shows the selected element.
-  void select(pqPipelineModelItem*);
+  void select(pqServerManagerModelItem*);
 
 public slots:
   void onFileNew();
@@ -186,7 +186,7 @@ private slots:
   // ApplicationCore. Any work that needs to be done on selection
   // change should actually be done by monitoring selection events
   // from the ApplicationCore.
-  void onBrowserSelectionChanged(pqPipelineModelItem*);
+  void onBrowserSelectionChanged(pqServerManagerModelItem*);
 
   void onActiveSourceChanged(pqPipelineSource*);
   virtual void onActiveServerChanged(pqServer*);

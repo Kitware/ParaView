@@ -164,7 +164,7 @@ void pqPipelineBrowserContextMenu::showRenderViewEditor()
 {
   // TODO: Move this code to the correct location.
   /*QWidget* widget = this->ListModel->getWidgetFor(selection);
-  vtkSMRenderModuleProxy* pw = pqPipelineData::instance()->getRenderModule(qobject_cast<QVTKWidget*>(widget));
+  vtkSMRenderModuleProxy* pw = pqServerManagerObserver::instance()->getRenderModule(qobject_cast<QVTKWidget*>(widget));
   if(pw)
     {
     static const char* ViewSettingString = "View Settings...";

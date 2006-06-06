@@ -51,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqOptions.h"
 #include "pqServerManagerModel.h"
-#include "pqPipelineData.h"
+#include "pqServerManagerObserver.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // pqServer
@@ -163,7 +163,7 @@ void pqServer::disconnect(pqServer* server)
 
 //-----------------------------------------------------------------------------
 pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* _parent) :
-  pqPipelineModelItem(_parent), FriendlyName()
+  pqServerManagerModelItem(_parent), FriendlyName()
 {
   this->ConnectionID = connectionID;
   this->Options = options;

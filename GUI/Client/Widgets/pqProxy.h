@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqPipelineObject_h
 #define _pqPipelineObject_h
 
-#include "pqPipelineModelItem.h"
+#include "pqServerManagerModelItem.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxy.h"
 class pqServer;
@@ -46,7 +46,7 @@ class vtkSMProxy;
 // This class represents any registered Server Manager proxy.
 // It keeps essential information to locate the proxy as well as
 // additional metadata such as user-specified label.
-class PQWIDGETS_EXPORT pqProxy : public pqPipelineModelItem
+class PQWIDGETS_EXPORT pqProxy : public pqServerManagerModelItem
 {
 public:
   pqProxy(const QString& group, const QString& name,

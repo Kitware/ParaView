@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqPipelineData.h
+   Module:    pqServerManagerObserver.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,14 +30,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqPipelineData_h
-#define _pqPipelineData_h
+#ifndef _pqServerManagerObserver_h
+#define _pqServerManagerObserver_h
 
 #include "pqWidgetsExport.h"
 #include <QObject>
 #include "vtkType.h" // needed for vtkIdType
 class pqMultiView;
-class pqPipelineDataInternal;
+class pqServerManagerObserverInternal;
 class pqPipelineModel;
 
 class QVTKWidget;
@@ -52,13 +52,13 @@ class vtkSMRenderModuleProxy;
 // fired by proxy manager and respond. It does not support any creation method. 
 // We must use pqPipelineBuilder for that purpose. The purpose of this class
 // is mostly to filter vtkSMProxyManager manager events and emit Qt signals.
-class PQWIDGETS_EXPORT pqPipelineData : public QObject
+class PQWIDGETS_EXPORT pqServerManagerObserver : public QObject
 {
   Q_OBJECT
 
 public:
-  pqPipelineData(QObject* parent=0);
-  virtual ~pqPipelineData();
+  pqServerManagerObserver(QObject* parent=0);
+  virtual ~pqServerManagerObserver();
 
 signals:
   /// Fired when a proxy is registered under the "sources" group. 
@@ -103,8 +103,8 @@ private slots:
   void connectionClosed(vtkObject*, unsigned long, void*, void* callData);
 
 protected:
-  pqPipelineDataInternal *Internal;  ///< Stores the pipeline objects.
+  pqServerManagerObserverInternal *Internal;  ///< Stores the pipeline objects.
 };
 
-#endif // _pqPipelineData_h
+#endif // _pqServerManagerObserver_h
 

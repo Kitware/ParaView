@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pq3DWidgetFactory;
 class pqApplicationCoreInternal;
 class pqPipelineBuilder;
-class pqPipelineData;
+class pqServerManagerObserver;
 class pqPipelineSource;
 class pqReaderFactory;
 class pqRenderModule;
@@ -69,7 +69,7 @@ public:
   virtual ~pqApplicationCore();
 
 
-  pqPipelineData* getPipelineData();
+  pqServerManagerObserver* getPipelineData();
   pqServerManagerModel* getServerManagerModel();
   pqUndoStack* getUndoStack();
   pqPipelineBuilder* getPipelineBuilder();
@@ -158,7 +158,7 @@ public slots:
 
 protected:
   /// create signal/slot connections between pdata and smModel.
-  void connect(pqPipelineData* pdata, pqServerManagerModel* smModel);
+  void connect(pqServerManagerObserver* pdata, pqServerManagerModel* smModel);
 
 private slots:
   // called when a source is removed by the pqServerManagerModel. If

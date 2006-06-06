@@ -40,13 +40,13 @@ class vtkSMProxyManager;
 class vtkSMMultiViewRenderModuleProxy;
 
 #include "pqWidgetsExport.h"
-#include "pqPipelineModelItem.h"
+#include "pqServerManagerModelItem.h"
 #include <QString>
 #include "vtkSmartPointer.h"
 
 /// Abstracts the concept of a "server connection" so that ParaQ clients may: 
 /// have more than one connect at a time / open and close connections at-will
-class PQWIDGETS_EXPORT pqServer : public pqPipelineModelItem 
+class PQWIDGETS_EXPORT pqServer : public pqServerManagerModelItem 
 {
 public:
   /// Constructs a standalone or "built-in" server connection, returns NULL on failure

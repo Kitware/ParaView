@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqPipelineModelItem.h
+   Module:    pqServerManagerModelItem.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,11 +30,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqPipelineModelItem.h
+/// \file pqServerManagerModelItem.h
 /// \date 4/14/2006
 
-#ifndef _pqPipelineModelItem_h
-#define _pqPipelineModelItem_h
+#ifndef _pqServerManagerModelItem_h
+#define _pqServerManagerModelItem_h
 
 
 #include "pqWidgetsExport.h"
@@ -43,13 +43,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineModel.h" // Needed for ModelType member
 
 
-class PQWIDGETS_EXPORT pqPipelineModelItem : public QObject
+class PQWIDGETS_EXPORT pqServerManagerModelItem : public QObject
 {
   Q_OBJECT
 
 public:
-  pqPipelineModelItem(QObject* parent=NULL);
-  virtual ~pqPipelineModelItem();
+  pqServerManagerModelItem(QObject* parent=NULL);
+  virtual ~pqServerManagerModelItem();
 
   // Get the type for the model item. Type determines the way the 
   // item is displayed.

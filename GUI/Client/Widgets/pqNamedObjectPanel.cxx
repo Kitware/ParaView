@@ -54,7 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // paraq includes
 #include "pqListWidgetItemObject.h"
 #include "pqTreeWidgetItemObject.h"
-#include "pqPipelineData.h"
+#include "pqServerManagerObserver.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"

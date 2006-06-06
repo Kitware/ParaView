@@ -44,7 +44,7 @@ class pqMultiView;
 class pqPipelineFilter;
 class pqPipelineLink;
 class pqPipelineModelInternal;
-class pqPipelineModelItem;
+class pqServerManagerModelItem;
 class pqPipelineServer;
 class pqPipelineSource;
 class pqServer;
@@ -144,12 +144,12 @@ public:
   /// \name Object Mapping
   //@{
 
-  /// Given the index, get the pqPipelineModelItem it represents.
+  /// Given the index, get the pqServerManagerModelItem it represents.
   /// NULL is returned for root or invalid index.
-  pqPipelineModelItem* getItem(const QModelIndex& ) const;
+  pqServerManagerModelItem* getItem(const QModelIndex& ) const;
 
 
-  QModelIndex getIndexFor(pqPipelineModelItem *item) const;
+  QModelIndex getIndexFor(pqServerManagerModelItem *item) const;
   //@}
 
 public slots:
@@ -198,8 +198,8 @@ private:
   // has taken place.
   void removeChildFromParent(pqPipelineModelDataItem* child);
 
-  // Returns the pqPipelineModelDataItem for the given pqPipelineModelItem.
-  pqPipelineModelDataItem* getDataItem(pqPipelineModelItem* item,
+  // Returns the pqPipelineModelDataItem for the given pqServerManagerModelItem.
+  pqPipelineModelDataItem* getDataItem(pqServerManagerModelItem* item,
     pqPipelineModelDataItem* subtreeRoot) const;
 
   QModelIndex getIndex(pqPipelineModelDataItem* item) const;

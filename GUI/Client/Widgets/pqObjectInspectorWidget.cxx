@@ -54,7 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqExodusPanel.h"
 #include "pqThresholdPanel.h"
 #include "pqLoadedFormObjectPanel.h"
-#include "pqPipelineData.h"
+#include "pqServerManagerObserver.h"
 #include "pqPropertyManager.h"
 #include "pqRenderModule.h"
 #include "pqServerManagerModel.h"

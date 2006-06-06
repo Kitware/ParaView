@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFlatTreeView.h"
 #include "pqPipelineBrowserContextMenu.h"
 #include "pqPipelineBuilder.h"
-#include "pqPipelineData.h"
+#include "pqServerManagerObserver.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
@@ -160,7 +160,7 @@ QItemSelectionModel *pqPipelineBrowser::getSelectionModel() const
 //-----------------------------------------------------------------------------
 pqServer *pqPipelineBrowser::getCurrentServer() const
 {
-  pqPipelineModelItem* item = this->getCurrentSelection();
+  pqServerManagerModelItem* item = this->getCurrentSelection();
   pqServer* server = dynamic_cast<pqServer*>(item);
   if (server)
     {
@@ -175,7 +175,7 @@ pqServer *pqPipelineBrowser::getCurrentServer() const
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineModelItem* pqPipelineBrowser::getCurrentSelection() const
+pqServerManagerModelItem* pqPipelineBrowser::getCurrentSelection() const
 {
   QItemSelectionModel *selectionModel = this->getSelectionModel();
   if(selectionModel && this->ListModel)
@@ -219,7 +219,7 @@ vtkSMProxy *pqPipelineBrowser::getNextProxy() const
 }
 */
 //-----------------------------------------------------------------------------
-void pqPipelineBrowser::select(pqPipelineModelItem* item)
+void pqPipelineBrowser::select(pqServerManagerModelItem* item)
 {
   QModelIndex index = this->ListModel->getIndexFor(item);
   this->TreeView->selectionModel()->setCurrentIndex(index,
@@ -230,13 +230,13 @@ void pqPipelineBrowser::select(pqPipelineModelItem* item)
 //-----------------------------------------------------------------------------
 void pqPipelineBrowser::select(pqPipelineSource* src)
 {
-  this->select((pqPipelineModelItem*)src);
+  this->select((pqServerManagerModelItem*)src);
 }
 
 //-----------------------------------------------------------------------------
 void pqPipelineBrowser::select(pqServer* server)
 {
-  this->select((pqPipelineModelItem*)server);
+  this->select((pqServerManagerModelItem*)server);
 }
 
 //-----------------------------------------------------------------------------
@@ -244,7 +244,7 @@ void pqPipelineBrowser::deleteSelected()
 {
   // Get the selected item(s) from the selection model.
   QModelIndex current = this->TreeView->selectionModel()->currentIndex();
-  pqPipelineModelItem *item = this->ListModel->getItem(current);
+  pqServerManagerModelItem *item = this->ListModel->getItem(current);
   pqPipelineSource *source = qobject_cast<pqPipelineSource *>(item);
   if(source)
     {
@@ -260,7 +260,7 @@ void pqPipelineBrowser::changeCurrent(const QModelIndex &current,
   if(this->ListModel)
     {
     // Get the current item from the model.
-    pqPipelineModelItem* item = this->ListModel->getItem(current);
+    pqServerManagerModelItem* item = this->ListModel->getItem(current);
 
     emit this->selectionChanged(item); 
     }

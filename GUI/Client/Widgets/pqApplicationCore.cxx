@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaQ includes.
 #include "pq3DWidgetFactory.h"
 #include "pqPipelineBuilder.h"
-#include "pqPipelineData.h"
+#include "pqServerManagerObserver.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineSource.h"
 #include "pqReaderFactory.h"
@@ -62,7 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqApplicationCoreInternal
 {
 public:
-  pqPipelineData* PipelineData;
+  pqServerManagerObserver* PipelineData;
   pqServerManagerModel* ServerManagerModel;
   pqUndoStack* UndoStack;
   pqPipelineBuilder* PipelineBuilder;
@@ -93,8 +93,8 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
 {
   this->Internal = new pqApplicationCoreInternal();
 
-  // *  Create pqPipelineData first. This is the vtkSMProxyManager observer.
-  this->Internal->PipelineData = new pqPipelineData(this);
+  // *  Create pqServerManagerObserver first. This is the vtkSMProxyManager observer.
+  this->Internal->PipelineData = new pqServerManagerObserver(this);
 
   // *  Create pqServerManagerModel.
   //    This is the representation builder for the ServerManager state.
@@ -143,7 +143,7 @@ pqApplicationCore::~pqApplicationCore()
 }
 
 //-----------------------------------------------------------------------------
-void pqApplicationCore::connect(pqPipelineData* pdata, 
+void pqApplicationCore::connect(pqServerManagerObserver* pdata, 
   pqServerManagerModel* smModel)
 {
   QObject::connect(pdata, SIGNAL(sourceRegistered(QString, vtkSMProxy*)),
@@ -168,7 +168,7 @@ void pqApplicationCore::connect(pqPipelineData* pdata,
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineData* pqApplicationCore::getPipelineData()
+pqServerManagerObserver* pqApplicationCore::getPipelineData()
 {
   return this->Internal->PipelineData;
 }

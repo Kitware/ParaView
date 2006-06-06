@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqPipelineData.cxx
+   Module:    pqServerManagerObserver.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqPipelineData.h"
+#include "pqServerManagerObserver.h"
 
 #include "pqMultiView.h"
 #include "pqMultiViewFrame.h"
@@ -62,10 +62,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 //-----------------------------------------------------------------------------
-class pqPipelineDataInternal
+class pqServerManagerObserverInternal
 {
 public:
-  pqPipelineDataInternal()
+  pqServerManagerObserverInternal()
     {
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     }
@@ -74,9 +74,9 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqPipelineData::pqPipelineData(QObject* p) : QObject(p)
+pqServerManagerObserver::pqServerManagerObserver(QObject* p) : QObject(p)
 {
-  this->Internal = new pqPipelineDataInternal();
+  this->Internal = new pqServerManagerObserverInternal();
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
@@ -97,7 +97,7 @@ pqPipelineData::pqPipelineData(QObject* p) : QObject(p)
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineData::~pqPipelineData()
+pqServerManagerObserver::~pqServerManagerObserver()
 {
   delete this->Internal;
 }
@@ -105,7 +105,7 @@ pqPipelineData::~pqPipelineData()
 
 /*
 //-----------------------------------------------------------------------------
-void pqPipelineData::addViewMapping(QVTKWidget *widget,
+void pqServerManagerObserver::addViewMapping(QVTKWidget *widget,
     vtkSMRenderModuleProxy *module)
 {
   if(this->Internal && widget && module)
@@ -116,7 +116,7 @@ void pqPipelineData::addViewMapping(QVTKWidget *widget,
 }
 
 //-----------------------------------------------------------------------------
-vtkSMRenderModuleProxy *pqPipelineData::removeViewMapping(QVTKWidget *widget)
+vtkSMRenderModuleProxy *pqServerManagerObserver::removeViewMapping(QVTKWidget *widget)
 {
   vtkSMRenderModuleProxy *module = 0;
   if(this->Internal && widget)
@@ -144,7 +144,7 @@ vtkSMRenderModuleProxy *pqPipelineData::removeViewMapping(QVTKWidget *widget)
 }
 
 //-----------------------------------------------------------------------------
-vtkSMRenderModuleProxy *pqPipelineData::getRenderModule(
+vtkSMRenderModuleProxy *pqServerManagerObserver::getRenderModule(
     QVTKWidget *widget) const
 {
   if(this->Internal && widget)
@@ -161,7 +161,7 @@ vtkSMRenderModuleProxy *pqPipelineData::getRenderModule(
 }
 
 //-----------------------------------------------------------------------------
-QVTKWidget *pqPipelineData::getRenderWindow(
+QVTKWidget *pqServerManagerObserver::getRenderWindow(
     vtkSMRenderModuleProxy *module) const
 {
   if(this->Internal && module)
@@ -178,7 +178,7 @@ QVTKWidget *pqPipelineData::getRenderWindow(
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineData::clearViewMapping()
+void pqServerManagerObserver::clearViewMapping()
 {
   if(this->Internal)
     {
@@ -189,7 +189,7 @@ void pqPipelineData::clearViewMapping()
 */
 //-----------------------------------------------------------------------------
 /*
-vtkSMProxy *pqPipelineData::createAndRegisterBundle(const char *proxyName,
+vtkSMProxy *pqServerManagerObserver::createAndRegisterBundle(const char *proxyName,
     pqServer *server)
 {
   if(!this->Names || !proxyName || !server)
@@ -221,7 +221,7 @@ vtkSMProxy *pqPipelineData::createAndRegisterBundle(const char *proxyName,
 */
 
 /*
-void pqPipelineData::removeAndUnregisterDisplay(vtkSMDisplayProxy *display,
+void pqServerManagerObserver::removeAndUnregisterDisplay(vtkSMDisplayProxy *display,
     const char *name, vtkSMRenderModuleProxy *module)
 {
   // Get the proxy from the display input.
@@ -270,19 +270,19 @@ void pqPipelineData::removeAndUnregisterDisplay(vtkSMDisplayProxy *display,
 /*
 //-----------------------------------------------------------------------------
 // TODO: how to handle compound proxies better ????
-void pqPipelineData::addInput(vtkSMProxy *proxy, vtkSMProxy *input)
+void pqServerManagerObserver::addInput(vtkSMProxy *proxy, vtkSMProxy *input)
 {
   this->addConnection(input, proxy);
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineData::removeInput(vtkSMProxy* proxy, vtkSMProxy* input)
+void pqServerManagerObserver::removeInput(vtkSMProxy* proxy, vtkSMProxy* input)
 {
   this->removeConnection(input, proxy);
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineData::addConnection(vtkSMProxy *source, vtkSMProxy *sink)
+void pqServerManagerObserver::addConnection(vtkSMProxy *source, vtkSMProxy *sink)
 {
   vtkSMCompoundProxy *bundle = vtkSMCompoundProxy::SafeDownCast(source);
   if(bundle)
@@ -331,7 +331,7 @@ void pqPipelineData::addConnection(vtkSMProxy *source, vtkSMProxy *sink)
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineData::removeConnection(vtkSMProxy *source, vtkSMProxy *sink)
+void pqServerManagerObserver::removeConnection(vtkSMProxy *source, vtkSMProxy *sink)
 {
   if(!source || !sink)
     {
@@ -352,7 +352,7 @@ void pqPipelineData::removeConnection(vtkSMProxy *source, vtkSMProxy *sink)
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineData::loadState(vtkPVXMLElement *root, pqMultiView *multiView)
+void pqServerManagerObserver::loadState(vtkPVXMLElement *root, pqMultiView *multiView)
 {
   if(!root || !this->Internal)
     {
@@ -466,7 +466,7 @@ void pqPipelineData::loadState(vtkPVXMLElement *root, pqMultiView *multiView)
 }
 */
 //-----------------------------------------------------------------------------
-void pqPipelineData::proxyRegistered(vtkObject*, unsigned long, void*,
+void pqServerManagerObserver::proxyRegistered(vtkObject*, unsigned long, void*,
     void* callData, vtkCommand*)
 {
   // Get the proxy information from the call data.
@@ -502,7 +502,7 @@ void pqPipelineData::proxyRegistered(vtkObject*, unsigned long, void*,
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineData::proxyUnRegistered(vtkObject*, unsigned long, void*,
+void pqServerManagerObserver::proxyUnRegistered(vtkObject*, unsigned long, void*,
     void* callData, vtkCommand*)
 {
   // Get the proxy information from the call data.
@@ -534,14 +534,14 @@ void pqPipelineData::proxyUnRegistered(vtkObject*, unsigned long, void*,
     }
 }
 //-----------------------------------------------------------------------------
-void pqPipelineData::connectionCreated(vtkObject*, unsigned long, void*, 
+void pqServerManagerObserver::connectionCreated(vtkObject*, unsigned long, void*, 
   void* callData)
 {
   emit this->connectionCreated(*reinterpret_cast<vtkIdType*>(callData));
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineData::connectionClosed(vtkObject*, unsigned long, void*, 
+void pqServerManagerObserver::connectionClosed(vtkObject*, unsigned long, void*, 
   void* callData)
 {
   emit this->connectionClosed(*reinterpret_cast<vtkIdType*>(callData));

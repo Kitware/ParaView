@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 pqProxy::pqProxy(const QString& group, const QString& name,
     vtkSMProxy* proxy, pqServer* server, QObject* _parent/*=NULL*/) 
-: pqPipelineModelItem(_parent),
+: pqServerManagerModelItem(_parent),
   Server(server),
   ProxyName(name),
   SMName(name),

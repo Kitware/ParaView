@@ -36,11 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineModel.h"
 
 #include "pqMultiView.h"
-#include "pqPipelineData.h"
+#include "pqServerManagerObserver.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineLink.h"
-#include "pqPipelineModelItem.h"
+#include "pqServerManagerModelItem.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -59,7 +59,7 @@ class pqPipelineModelDataItem : public QObject
 public:
   pqPipelineModelDataItem* Parent;
   QList<pqPipelineModelDataItem*> Children;
-  pqPipelineModelItem* Object;
+  pqServerManagerModelItem* Object;
   pqPipelineModel::ItemType Type;
 
   pqPipelineModelDataItem(QObject* p) :QObject(p)
@@ -282,7 +282,7 @@ Qt::ItemFlags pqPipelineModel::flags(const QModelIndex &) const
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineModelItem* pqPipelineModel::getItem(const QModelIndex& idx) const
+pqServerManagerModelItem* pqPipelineModel::getItem(const QModelIndex& idx) const
 {
   if (idx.isValid() && idx.model() == this)
     {
@@ -294,7 +294,7 @@ pqPipelineModelItem* pqPipelineModel::getItem(const QModelIndex& idx) const
 }
 
 //-----------------------------------------------------------------------------
-QModelIndex pqPipelineModel::getIndexFor(pqPipelineModelItem *item) const
+QModelIndex pqPipelineModel::getIndexFor(pqServerManagerModelItem *item) const
 {
   pqPipelineModelDataItem* dataItem = this->getDataItem(item,
     &this->Internal->Root);
@@ -302,7 +302,7 @@ QModelIndex pqPipelineModel::getIndexFor(pqPipelineModelItem *item) const
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineModelDataItem* pqPipelineModel::getDataItem(pqPipelineModelItem* item,
+pqPipelineModelDataItem* pqPipelineModel::getDataItem(pqServerManagerModelItem* item,
   pqPipelineModelDataItem* _parent) const
 {
   if (!_parent || !item)

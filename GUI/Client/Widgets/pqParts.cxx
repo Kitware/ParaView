@@ -140,7 +140,7 @@ void pqPart::Color(vtkSMDisplayProxy* Part)
     
 #if 0
   pqPipelineObject* input = 0;
-  pqPipelineData* pipeline = pqPipelineData::instance();
+  pqServerManagerObserver* pipeline = pqServerManagerObserver::instance();
   pqPipelineObject* pqpart = pipeline->getObjectFor(Part);  // this doesn't work with compound proxies
   input = pqpart->GetInput(0);
 

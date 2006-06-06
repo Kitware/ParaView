@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 
 // ParaQ includes
-#include "pqPipelineData.h"
+#include "pqServerManagerObserver.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
 #include "pqServerManagerModel.h"

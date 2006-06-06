@@ -421,12 +421,12 @@ void pqMainWindow::createStandardPipelineBrowser(bool visible)
     QIcon(":pqWidgets/pqPipelineList22.png"), visible);
 
   this->connect(this->Implementation->PipelineBrowser, 
-    SIGNAL(selectionChanged(pqPipelineModelItem*)), 
-    this, SLOT(onBrowserSelectionChanged(pqPipelineModelItem*)));
+    SIGNAL(selectionChanged(pqServerManagerModelItem*)), 
+    this, SLOT(onBrowserSelectionChanged(pqServerManagerModelItem*)));
 
-  QObject::connect(this, SIGNAL(select(pqPipelineModelItem*)),
+  QObject::connect(this, SIGNAL(select(pqServerManagerModelItem*)),
     this->Implementation->PipelineBrowser,
-    SLOT(select(pqPipelineModelItem*)));
+    SLOT(select(pqServerManagerModelItem*)));
 
 }
 //-----------------------------------------------------------------------------
@@ -1630,7 +1630,7 @@ void pqMainWindow::onCoreActiveChanged()
     pqApplicationCore::instance()->getActiveSource();
   pqServer* activeServer = pqApplicationCore::instance()->getActiveServer();
  
-  pqPipelineModelItem* item = activeSource;
+  pqServerManagerModelItem* item = activeSource;
   if (!item)
     {
     item = activeServer;
@@ -1643,7 +1643,7 @@ void pqMainWindow::onCoreActiveChanged()
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindow::onBrowserSelectionChanged(pqPipelineModelItem* item)
+void pqMainWindow::onBrowserSelectionChanged(pqServerManagerModelItem* item)
 {
   if (this->Implementation->IgnoreBrowserSelectionChanges)
     {

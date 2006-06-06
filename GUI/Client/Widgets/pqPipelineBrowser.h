@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqFlatTreeView;
 class pqPipelineModel;
-class pqPipelineModelItem;
+class pqServerManagerModelItem;
 class pqPipelineSource;
 class pqServer;
 class QItemSelectionModel;
@@ -71,7 +71,7 @@ public:
 
   /// returns the currently select object, may be a 
   /// server/source/filter.
-  pqPipelineModelItem* getCurrentSelection() const;
+  pqServerManagerModelItem* getCurrentSelection() const;
 
   /// returns the server for the currently selected branch.
   /// This is a convienience method.
@@ -79,7 +79,7 @@ public:
 
 public slots:
   // Call this to select the particular item.
-  void select(pqPipelineModelItem* item);
+  void select(pqServerManagerModelItem* item);
   void select(pqPipelineSource* src);
   void select(pqServer* server);
 
@@ -88,7 +88,7 @@ public slots:
 signals:
   // Fired when the selection is changed. Argument is the newly selected
   // item.
-  void selectionChanged(pqPipelineModelItem* selectedItem);
+  void selectionChanged(pqServerManagerModelItem* selectedItem);
 
 private slots:
   void changeCurrent(const QModelIndex &current, const QModelIndex &previous);
