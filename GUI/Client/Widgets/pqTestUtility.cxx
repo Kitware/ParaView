@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPNGReader.h>
 #include <vtkImageDifference.h>
 #include <vtkImageShiftScale.h>
+#include "vtkPQConfig.h"
 #include <vtkRenderWindow.h>
 #include <vtkTesting.h>
 

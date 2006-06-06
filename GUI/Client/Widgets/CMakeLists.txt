@@ -265,8 +265,6 @@ ADD_LIBRARY(pqWidgets
   vtkPVAxesActor.h
 )
 
-ADD_DEFINITIONS(-DPARAQ_DATA_ROOT="${PARAQ_DATA_ROOT}")
-
 TARGET_LINK_LIBRARIES(pqWidgets
   QtChart
   QtTesting
