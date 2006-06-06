@@ -35,7 +35,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.71");
+vtkCxxRevisionMacro(vtkSMProxy, "1.72");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -866,6 +866,11 @@ void vtkSMProxy::UpdateVTKObjects()
     }
 
   this->CreateVTKObjects(1);
+  if (!this->ObjectsCreated)
+    {
+    this->InUpdateVTKObjects = 0;
+    return;
+    }
 
   if (old_SelfPropertiesModified)
     {
@@ -972,7 +977,6 @@ void vtkSMProxy::CreateVTKObjects(int numObjects)
     {
     it2->second.GetPointer()->CreateVTKObjects(numObjects);
     }
-
 }
 
 //---------------------------------------------------------------------------
