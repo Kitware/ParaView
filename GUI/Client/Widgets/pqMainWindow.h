@@ -84,6 +84,8 @@ public:
   void createStandardSourcesMenu();
   /// Creates the "standard" ParaQ filters menu
   void createStandardFiltersMenu();
+  /// Creates the "standard" ParaQ pipeline menu
+  void createStandardPipelineMenu();
   /// Creates the "standard" ParaQ tools menu
   void createStandardToolsMenu();
 

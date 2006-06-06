@@ -1,7 +1,8 @@
 <RCC>
     <qresource prefix="/pqWidgets" >
-        <file alias="SplitViewHorizontal.png">Resources/SplitViewHorizontal.png</file>
-        <file alias="SplitViewVertical.png">Resources/SplitViewVertical.png</file>
+        <file alias="pqAddFavorites16.png">Resources/pqAddFavorites16.png</file>
+        <file alias="pqAppIcon64.png">Resources/pqAppIcon64.png</file>
+        <file alias="pqBack16.png">Resources/pqBack16.png</file>
         <file alias="pqBundle16.png">Resources/pqBundle16.png</file>
         <file alias="pqBundle22.png">Resources/pqBundle22.png</file>
         <file alias="pqBundle32.png">Resources/pqBundle32.png</file>
@@ -10,9 +11,16 @@
         <file alias="pqCancel16.png">Resources/pqCancel16.png</file>
         <file alias="pqCancel22.png">Resources/pqCancel22.png</file>
         <file alias="pqCellData16.png">Resources/pqCellData16.png</file>
+        <file alias="pqFavorites16.png">Resources/pqFavorites16.png</file>
+        <file alias="pqFavorites32.png">Resources/pqFavorites32.png</file>
         <file alias="pqFilter16.png">Resources/pqFilter16.png</file>
         <file alias="pqFilter22.png">Resources/pqFilter22.png</file>
         <file alias="pqFilter32.png">Resources/pqFilter32.png</file>
+        <file alias="pqFolder16.png">Resources/pqFolder16.png</file>
+        <file alias="pqFolder32.png">Resources/pqFolder32.png</file>
+        <file alias="pqFolderNew16.png">Resources/pqFolderNew16.png</file>
+        <file alias="pqFolderOpen16.png">Resources/pqFolderOpen16.png</file>
+        <file alias="pqFolderUp16.png">Resources/pqFolderUp16.png</file>
         <file alias="pqLinkBack16.png">Resources/pqLinkBack16.png</file>
         <file alias="pqLinkIn16.png">Resources/pqLinkIn16.png</file>
         <file alias="pqLinkOut16.png">Resources/pqLinkOut16.png</file>
@@ -20,6 +28,7 @@
         <file alias="pqNodeSet16.png">Resources/pqNodeSet16.png</file>
         <file alias="pqPipelineList22.png">Resources/pqPipelineList22.png</file>
         <file alias="pqPointData16.png">Resources/pqPointData16.png</file>
+        <file alias="pqRedo22.png">Resources/pqRedo22.png</file>
         <file alias="pqServer16.png">Resources/pqServer16.png</file>
         <file alias="pqServer22.png">Resources/pqServer22.png</file>
         <file alias="pqServer32.png">Resources/pqServer32.png</file>
@@ -30,6 +39,7 @@
         <file alias="pqSplit16.png">Resources/pqSplit16.png</file>
         <file alias="pqSplitViewH12.png">Resources/pqSplitViewH12.png</file>
         <file alias="pqSplitViewV12.png">Resources/pqSplitViewV12.png</file>
+        <file alias="pqUndo22.png">Resources/pqUndo22.png</file>
         <file alias="pqUpdate16.png">Resources/pqUpdate16.png</file>
         <file alias="pqUpdate22.png">Resources/pqUpdate22.png</file>
         <file alias="pqVcrBack22.png">Resources/pqVcrBack22.png</file>
@@ -38,15 +48,14 @@
         <file alias="pqVcrLast22.png">Resources/pqVcrLast22.png</file>
         <file alias="pqVcrPause22.png">Resources/pqVcrPause22.png</file>
         <file alias="pqVcrPlay22.png">Resources/pqVcrPlay22.png</file>
-        <file alias="pqUndo22.png">Resources/pqUndo22.png</file>
-        <file alias="pqRedo22.png">Resources/pqRedo22.png</file>
         <file alias="pqWindow16.png">Resources/pqWindow16.png</file>
         <file alias="pqWindow22.png">Resources/pqWindow22.png</file>
         <file alias="pqWindow32.png">Resources/pqWindow32.png</file>
         <file alias="pqWindowd16.png">Resources/pqWindowd16.png</file>
         <file alias="pqWindowd22.png">Resources/pqWindowd22.png</file>
         <file alias="pqWindowd32.png">Resources/pqWindowd32.png</file>
-        <file alias="pqAppIcon64.png">Resources/pqAppIcon64.png</file>
+        <file alias="SplitViewHorizontal.png">Resources/SplitViewHorizontal.png</file>
+        <file alias="SplitViewVertical.png">Resources/SplitViewVertical.png</file>
         <file alias="ClipPanel.ui">pqClipPanel.ui</file>
         <file alias="CutPanel.ui">pqCutPanel.ui</file>
         <file alias="ExodusPanel.ui">pqExodusPanel.ui</file>

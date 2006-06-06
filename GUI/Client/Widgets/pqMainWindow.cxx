@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPicking.h"
 #include "pqPipelineBrowser.h"
 #include "pqPipelineBuilder.h"
+#include "pqPipelineMenu.h"
 #include "pqPipelineSource.h"
 #include "pqPropertyManager.h"
 #include "pqReaderFactory.h"
@@ -124,6 +125,7 @@ public:
     ServerMenu(0),
     SourcesMenu(0),
     FiltersMenu(0),
+    PipelineMenu(0),
     ToolsMenu(0),
     HelpMenu(0),
     ActiveView(0),
@@ -162,6 +164,7 @@ public:
   QMenu* ServerMenu;
   QMenu* SourcesMenu;
   QMenu* FiltersMenu;
+  pqPipelineMenu *PipelineMenu;
   QMenu* ToolsMenu;
   QMenu* HelpMenu;
   
@@ -327,6 +330,36 @@ void pqMainWindow::createStandardFiltersMenu()
   menu << pqConnect(SIGNAL(triggered(QAction*)), 
     this, SLOT(onCreateFilter(QAction*)));
   this->buildFiltersMenu();
+}
+
+void pqMainWindow::createStandardPipelineMenu()
+{
+  if(!this->Implementation->PipelineMenu)
+    {
+    this->Implementation->PipelineMenu = new pqPipelineMenu(this);
+    this->Implementation->PipelineMenu->setObjectName("PipelineMenu");
+    this->Implementation->PipelineMenu->addActionsToMenuBar(this->menuBar());
+
+    // TEMP: Load in the filter information.
+    QFile filterInfo(":/pqClient/ParaQFilters.xml");
+    if(filterInfo.open(QIODevice::ReadOnly))
+      {
+      vtkSmartPointer<vtkPVXMLParser> xmlParser = 
+        vtkSmartPointer<vtkPVXMLParser>::New();
+      xmlParser->InitializeParser();
+      QByteArray filter_data = filterInfo.read(1024);
+      while(!filter_data.isEmpty())
+        {
+        xmlParser->ParseChunk(filter_data.data(), filter_data.length());
+        filter_data = filterInfo.read(1024);
+        }
+
+      xmlParser->CleanupParser();
+      filterInfo.close();
+
+      this->Implementation->PipelineMenu->loadFilterInfo(xmlParser->GetRootElement());
+      }
+    }
 }
 
 void pqMainWindow::createStandardToolsMenu()
