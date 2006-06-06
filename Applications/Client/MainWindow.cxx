@@ -63,6 +63,7 @@ MainWindow::MainWindow()
   this->createStandardServerMenu();
   this->createStandardSourcesMenu();
   this->createStandardFiltersMenu();
+  this->createStandardPipelineMenu();
   this->createStandardToolsMenu();
   
   QMenu* const help_menu = this->helpMenu();
