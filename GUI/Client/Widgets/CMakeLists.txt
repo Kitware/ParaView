@@ -222,6 +222,8 @@ ADD_LIBRARY(pqWidgets
   pqSliderDomain.h
   pqSourceProxyInfo.cxx
   pqSourceProxyInfo.h
+  pqTestUtility.cxx
+  pqTestUtility.h
   pqThresholdPanel.cxx
   pqThresholdPanel.h
   pqUndoStack.cxx
@@ -247,6 +249,8 @@ ADD_LIBRARY(pqWidgets
   vtkPVAxesActor.cxx
   vtkPVAxesActor.h
 )
+
+ADD_DEFINITIONS(-DPARAQ_DATA_ROOT="${PARAQ_DATA_ROOT}")
 
 TARGET_LINK_LIBRARIES(pqWidgets
   QtChart

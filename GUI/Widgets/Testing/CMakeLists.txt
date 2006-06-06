@@ -75,8 +75,6 @@ ADD_LIBRARY(QtTesting
   pqEventPlayerXML.h
   pqEventTranslator.cxx
   pqEventTranslator.h
-  pqImageComparison.cxx
-  pqImageComparison.h
   pqLineEditEventTranslator.cxx
   pqLineEditEventTranslator.h
   pqMenuEventTranslator.cxx

@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqImageComparison.h
+   Module:    pqTestUtility.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,24 +30,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqImageComparison_h
-#define _pqImageComparison_h
+#ifndef _pqTestUtility_h
+#define _pqTestUtility_h
 
-#include "QtTestingExport.h"
+#include "pqWidgetsExport.h"
 #include <vtkIOStream.h>
 
 class QString;
 class vtkRenderWindow;
 
-/// Provides functionality for generating and comparing reference images for regression testing
-class QTTESTING_EXPORT pqImageComparison
+/// Provides ParaView-specific functionality for regression testing
+class PQWIDGETS_EXPORT pqTestUtility
 {
 public:
+  /// Returns the absolute path to the PARAQ_DATA_ROOT in canonical form (slashes forward), or empty string
+  static QString DataRoot();
   /// Saves the contents of a render window to a file for later use as a reference image
   static bool SaveScreenshot(vtkRenderWindow* RenderWindow, const QString& File);
   /// Compares the contents of a render window to a reference image, returning true iff the two match within a given threshold
   static bool CompareImage(vtkRenderWindow* RenderWindow, const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
 };
 
-#endif // !_pqImageComparison_h
+#endif // !_pqTestUtility_h
 

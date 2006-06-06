@@ -53,6 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerFileDialogModel.h"
 #include "pqServer.h"
 #include "pqSourceProxyInfo.h"
+#include "pqTestUtility.h"
 #include "pqVariableSelectorWidget.h"
 #include "pqVCRController.h"
 #include "pqXMLUtil.h"
@@ -62,7 +63,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqEventPlayerXML.h>
 #include <pqEventTranslator.h>
 #include <pqFileDialog.h>
-#include <pqImageComparison.h>
 #include <pqLocalFileDialogModel.h>
 #include <pqObjectNaming.h>
 #include <pqObjectPanel.h>
@@ -1245,7 +1245,7 @@ void pqMainWindow::onFileSaveScreenshot(const QStringList& files)
 
   for(int i = 0; i != files.size(); ++i)
     {
-    if(!pqImageComparison::SaveScreenshot(rm->getWidget()->GetRenderWindow(), files[i]))
+    if(!pqTestUtility::SaveScreenshot(rm->getWidget()->GetRenderWindow(), files[i]))
       {
       qCritical() << "Save Image failed.";
       }
@@ -1293,7 +1293,7 @@ void pqMainWindow::onRecordTestScreenshot(const QStringList& files)
   
   for(int i = 0; i != files.size(); ++i)
     {
-    if(!pqImageComparison::SaveScreenshot(render_module->getWidget()->GetRenderWindow(), files[i]))
+    if(!pqTestUtility::SaveScreenshot(render_module->getWidget()->GetRenderWindow(), files[i]))
       {
       qCritical() << "Save Image failed.";
       }
@@ -1327,7 +1327,7 @@ bool pqMainWindow::compareView(const QString& referenceImage, double threshold,
   // All tests need a 300x300 render window size.
   QSize cur_size = renModule->getWidget()->size();
   renModule->getWidget()->resize(300,300);
-  bool ret = pqImageComparison::CompareImage(render_window, referenceImage, 
+  bool ret = pqTestUtility::CompareImage(render_window, referenceImage, 
     threshold, output, tempDirectory);
   renModule->getWidget()->resize(cur_size);
   renModule->render();

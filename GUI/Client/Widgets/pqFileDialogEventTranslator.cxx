@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqFileDialogEventTranslator.h"
+#include "pqTestUtility.h"
 
 #include <pqFileDialog.h>
 
@@ -79,17 +80,11 @@ bool pqFileDialogEventTranslator::translateEvent(QObject* Object, QEvent* Event,
 
 void pqFileDialogEventTranslator::onFilesSelected(const QStringList& files)
 {
-  QString data_directory = getenv("PARAQ_DATA_ROOT");
+  const QString data_directory = pqTestUtility::DataRoot();
   if(data_directory.isEmpty())
     {
-    qCritical() << "You must set the PARAQ_DATA_ROOT environment variable to record file selections.";
+    qCritical() << "You must set the PARAQ_DATA_ROOT environment variable to play-back file selections.";
     return;
-    }
-  data_directory.replace('\\', '/');
-  data_directory = data_directory.trimmed();
-  if(data_directory.size() && data_directory.at(data_directory.size()-1) == '/')
-    {
-    data_directory.chop(1);
     }
 
   QString arguments;

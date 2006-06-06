@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqImageComparison.cxx
+   Module:    pqTestUtility.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqImageComparison.h"
+#include "pqTestUtility.h"
 
 #include <vtkWindowToImageFilter.h>
 #include <vtkBMPWriter.h>
@@ -62,7 +62,33 @@ bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
   return result;
 }
 
-bool pqImageComparison::SaveScreenshot(vtkRenderWindow* RenderWindow, const QString& File)
+QString pqTestUtility::DataRoot()
+{
+  // Let the user override the defaults by setting an environment variable ...
+  QString result = getenv("PARAQ_DATA_ROOT");
+  
+  // Otherwise, go with the compiled-in default ...
+  if(result.isEmpty())
+    {
+    result = PARAQ_DATA_ROOT;
+    }
+  
+  // Ensure all slashes face forward ...
+  result.replace('\\', '/');
+  
+  // Remove any trailing slashes ...
+  if(result.size() && result.at(result.size()-1) == '/')
+    {
+    result.chop(1);
+    }
+    
+  // Trim excess whitespace ...
+  result = result.trimmed();
+    
+  return result;
+}
+
+bool pqTestUtility::SaveScreenshot(vtkRenderWindow* RenderWindow, const QString& File)
 {
   vtkWindowToImageFilter* const capture = vtkWindowToImageFilter::New();
   capture->SetInput(RenderWindow);
@@ -87,7 +113,7 @@ bool pqImageComparison::SaveScreenshot(vtkRenderWindow* RenderWindow, const QStr
   return success;
 }
 
-bool pqImageComparison::CompareImage(vtkRenderWindow* RenderWindow, 
+bool pqTestUtility::CompareImage(vtkRenderWindow* RenderWindow, 
   const QString& ReferenceImage, double Threshold, 
   ostream& vtkNotUsed(Output), const QString& TempDirectory)
 {
