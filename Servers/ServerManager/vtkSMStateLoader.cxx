@@ -25,14 +25,26 @@
 #include "vtkSmartPointer.h"
 
 #include <vtkstd/map>
+#include <vtkstd/string>
+#include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMStateLoader);
-vtkCxxRevisionMacro(vtkSMStateLoader, "1.12");
+vtkCxxRevisionMacro(vtkSMStateLoader, "1.13");
+
+struct vtkSMStateLoaderRegistrationInfo
+{
+  vtkstd::string GroupName;
+  vtkstd::string ProxyName;
+};
 
 struct vtkSMStateLoaderInternals
 {
   typedef vtkstd::map<int, vtkSmartPointer<vtkSMProxy> >  ProxyMapType;
   ProxyMapType CreatedProxies;
+
+  typedef vtkstd::vector<vtkSMStateLoaderRegistrationInfo> VectorOfRegInfo;
+  typedef vtkstd::map<int, VectorOfRegInfo> RegInfoMapType;
+  RegInfoMapType RegistrationInformation;
 };
 
 //---------------------------------------------------------------------------
@@ -58,35 +70,6 @@ vtkSMProxy* vtkSMStateLoader::NewProxy(int id)
 }
 
 //---------------------------------------------------------------------------
-vtkSMProxy* vtkSMStateLoader::GetCreatedProxy(int id)
-{
-  vtkSMStateLoaderInternals::ProxyMapType::iterator iter =
-    this->Internal->CreatedProxies.find(id);
-  if (iter != this->Internal->CreatedProxies.end())
-    {
-    return iter->second;
-    } 
-  return NULL;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMStateLoader::AddCreatedProxy(int id, vtkSMProxy* proxy)
-{
-  this->Internal->CreatedProxies[id] = proxy;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMStateLoader::RemoveCreatedProxy(int id)
-{
-  vtkSMStateLoaderInternals::ProxyMapType::iterator iter =
-    this->Internal->CreatedProxies.find(id);
-  if (iter != this->Internal->CreatedProxies.end())
-    {
-    this->Internal->CreatedProxies.erase(iter);
-    }
-}
-
-//---------------------------------------------------------------------------
 vtkSMProxy* vtkSMStateLoader::NewProxyFromElement(
   vtkPVXMLElement* proxyElement, int id)
 {
@@ -98,8 +81,6 @@ vtkSMProxy* vtkSMStateLoader::NewProxyFromElement(
     return iter->second;
     }
 
-  vtkSMProxyManager* pm = this->GetProxyManager();
-
   vtkSMProxy* proxy = 0;
   if (strcmp(proxyElement->GetName(), "Proxy") == 0)
     {
@@ -110,7 +91,7 @@ vtkSMProxy* vtkSMStateLoader::NewProxyFromElement(
       vtkErrorMacro("Could not create proxy from element.");
       return 0;
       }
-    proxy = pm->NewProxy(group, type);
+    proxy = this->NewProxyInternal(group, type);
     if (!proxy)
       {
       vtkErrorMacro("Could not create a proxy of group: "
@@ -136,7 +117,43 @@ vtkSMProxy* vtkSMStateLoader::NewProxyFromElement(
     vtkErrorMacro("Failed to load state.");
     return 0;
     }
+
+  // Register this new proxy before we use it.
+  this->RegisterProxy(id, proxy);
   return proxy;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMStateLoader::RegisterProxy(int id, vtkSMProxy* proxy)
+{
+  vtkSMStateLoaderInternals::RegInfoMapType::iterator iter
+    = this->Internal->RegistrationInformation.find(id);
+  if (iter == this->Internal->RegistrationInformation.end())
+    {
+    return;
+    }
+  vtkSMStateLoaderInternals::VectorOfRegInfo::iterator iter2;
+  for (iter2 =iter->second.begin(); iter2 != iter->second.end(); iter2++)
+    {
+    this->RegisterProxyInternal(iter2->GroupName.c_str(), 
+      iter2->ProxyName.c_str(), proxy);
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMStateLoader::RegisterProxyInternal(const char* group,
+  const char* name, vtkSMProxy* proxy)
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  pxm->RegisterProxy(group, name, proxy);
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMStateLoader::NewProxyInternal(const char* xmlgroup, 
+  const char* xmlname)
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  return pxm->NewProxy(xmlgroup, xmlname);
 }
 
 //---------------------------------------------------------------------------
@@ -194,10 +211,48 @@ vtkSMProxy* vtkSMStateLoader::NewProxy(vtkPVXMLElement* root,
 }
 
 //---------------------------------------------------------------------------
+int vtkSMStateLoader::BuildProxyCollectionInformation(
+  vtkPVXMLElement* collectionElement)
+{
+  const char* groupName = collectionElement->GetAttribute("name");
+  if (!groupName)
+    {
+    vtkErrorMacro("Requied attribute name is missing.");
+    return 0;
+    }
+  unsigned int numElems = collectionElement->GetNumberOfNestedElements();
+  for (unsigned int i=0; i<numElems; i++)
+    {
+    vtkPVXMLElement* currentElement = collectionElement->GetNestedElement(i);
+    if (currentElement->GetName() &&
+      strcmp(currentElement->GetName(), "Item") == 0)
+      {
+      int id;
+      if (!currentElement->GetScalarAttribute("id", &id))
+        {
+        vtkErrorMacro("Could not read id for Item. Skipping.");
+        continue;
+        }
+      const char* name = currentElement->GetAttribute("name");
+      if (!name)
+        {
+        vtkErrorMacro("Attribute: name is missing. Cannot register proxy "
+          "with the proxy manager.");
+        continue;
+        }
+      vtkSMStateLoaderRegistrationInfo info;
+      info.GroupName = groupName;
+      info.ProxyName = name;
+      this->Internal->RegistrationInformation[id].push_back(info);
+      }
+    }
+
+  return 1;
+}
+
+//---------------------------------------------------------------------------
 int vtkSMStateLoader::HandleProxyCollection(vtkPVXMLElement* collectionElement)
 {
-  vtkSMProxyManager* pm = this->GetProxyManager();
-
   const char* groupName = collectionElement->GetAttribute("name");
   if (!groupName)
     {
@@ -230,7 +285,8 @@ int vtkSMStateLoader::HandleProxyCollection(vtkPVXMLElement* collectionElement)
         proxy->Delete();
         continue;
         }
-      pm->RegisterProxy(groupName, name, proxy);
+      // No need to register
+      //pm->RegisterProxy(groupName, name, proxy);
       proxy->Delete();
       }
     }
@@ -324,9 +380,26 @@ int vtkSMStateLoader::LoadState(vtkPVXMLElement* rootElement, int keep_proxies/*
   this->RootElement = rootElement;
 
   this->ClearCreatedProxies();
+  this->Internal->RegistrationInformation.clear();
 
   unsigned int numElems = rootElement->GetNumberOfNestedElements();
-  for (unsigned int i=0; i<numElems; i++)
+  unsigned int i;
+  for (i=0; i<numElems; i++)
+    {
+    vtkPVXMLElement* currentElement = rootElement->GetNestedElement(i);
+    const char* name = currentElement->GetName();
+    if (name)
+      {
+      if (strcmp(name, "ProxyCollection") == 0)
+        {
+        if (!this->BuildProxyCollectionInformation(currentElement))
+          {
+          return 0;
+          }
+        }
+      }
+    }
+  for (i=0; i<numElems; i++)
     {
     vtkPVXMLElement* currentElement = rootElement->GetNestedElement(i);
     const char* name = currentElement->GetName();

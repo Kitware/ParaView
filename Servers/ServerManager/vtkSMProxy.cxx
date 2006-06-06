@@ -35,7 +35,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.72");
+vtkCxxRevisionMacro(vtkSMProxy, "1.73");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -330,6 +330,10 @@ vtkTypeUInt32 vtkSMProxy::GetServers()
 //---------------------------------------------------------------------------
 void vtkSMProxy::SetConnectionID(vtkIdType id)
 {
+  if (this->ConnectionID == id)
+    {
+    return;
+    }
   if (this->SelfID.ID)
     {
     // Implies that the proxy performed some processing.

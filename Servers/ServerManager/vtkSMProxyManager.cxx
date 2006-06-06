@@ -21,18 +21,19 @@
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMCompoundProxy.h"
 #include "vtkSMCompoundProxyDefinitionLoader.h"
+#include "vtkSMCompoundProxy.h"
 #include "vtkSMDocumentation.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMStateLoader.h"
 #include "vtkSMUndoStack.h"
+#include "vtkStdString.h"
 
 #include <vtkstd/map>
 #include <vtkstd/set>
+#include <vtksys/RegularExpression.hxx>
 
-#include "vtkStdString.h"
 
 #include "vtkSMProxyManagerInternals.h"
 
@@ -83,7 +84,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.44");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.45");
 vtkCxxSetObjectMacro(vtkSMProxyManager, UndoStack, vtkSMUndoStack);
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -584,10 +585,18 @@ void vtkSMProxyManager::UpdateRegisteredProxies(const char* groupname,
 //---------------------------------------------------------------------------
 void vtkSMProxyManager::UpdateRegisteredProxies(int modified_only /*=1*/)
 {
+  vtksys::RegularExpression prototypesRe("_prototypes$");
+
   vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
     this->Internals->RegisteredProxyMap.begin();
   for (; it != this->Internals->RegisteredProxyMap.end(); it++)
     {
+    if (prototypesRe.find(it->first))
+      {
+      // skip the prototypes.
+      continue;
+      }
+
     vtkSMProxyManagerProxyMapType::iterator it2 =
       it->second.begin();
     for (; it2 != it->second.end(); it2++)
