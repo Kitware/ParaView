@@ -45,16 +45,25 @@ class vtkRenderWindow;
 class PQWIDGETS_EXPORT pqTestUtility
 {
 public:
-  /// Handles ParaView-specific setup of a QtTesting event translator object (so QtTesting doesn't have any dependencies on ParaView/VTK)
+  /// Handles ParaView-specific setup of a QtTesting event translator
+  /// object (so QtTesting doesn't have any dependencies on ParaView/VTK)
   static void Setup(pqEventTranslator&);
-  /// Handles ParaView-specific setup of a QtTesting event player object (so QtTesting doesn't have any dependencies on ParaView/VTK)
+  /// Handles ParaView-specific setup of a QtTesting event player object
+  /// (so QtTesting doesn't have any dependencies on ParaView/VTK)
   static void Setup(pqEventPlayer&);
-  /// Returns the absolute path to the PARAQ_DATA_ROOT in canonical form (slashes forward), or empty string
+  /// Returns the absolute path to the PARAQ_DATA_ROOT in canonical form
+  /// (slashes forward), or empty string
   static QString DataRoot();
-  /// Saves the contents of a render window to a file for later use as a reference image
+  /// Saves the contents of a render window to a file for later use as a
+  /// reference image
   static bool SaveScreenshot(vtkRenderWindow* RenderWindow, const QString& File);
-  /// Compares the contents of a render window to a reference image, returning true iff the two match within a given threshold
-  static bool CompareImage(vtkRenderWindow* RenderWindow, const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
+  /// Compares the contents of a render window to a reference image,
+  /// returning true iff the two match within a given threshold
+  static bool CompareImage(vtkRenderWindow* RenderWindow, 
+                           const QString& ReferenceImage, 
+                           double Threshold, 
+                           ostream& Output, 
+                           const QString& TempDirectory);
 };
 
 #endif // !_pqTestUtility_h
