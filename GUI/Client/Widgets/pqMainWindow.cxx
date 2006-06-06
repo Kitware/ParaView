@@ -1698,6 +1698,10 @@ void pqMainWindow::postAcceptUpdate()
 void pqMainWindow::updateFiltersMenu(pqPipelineSource* source)
 {
   // update the filter menu.
+  if ( !this->Implementation->FiltersMenu )
+    {
+    return;
+    }
   
   // Iterate over all filters in the menu and see if they are
   // applicable to the current source.
@@ -1794,7 +1798,10 @@ void pqMainWindow::updateEnableState()
     {
     this->Implementation->SourcesMenu->setEnabled(server != 0 && !pending_displays);
     }
-  this->Implementation->ServerDisconnectAction->setEnabled(server != 0);
+  if ( this->Implementation->ServerDisconnectAction )
+    {
+    this->Implementation->ServerDisconnectAction->setEnabled(server != 0);
+    }
   if ( this->Implementation->VariableSelectorToolBar )
     {
     this->Implementation->VariableSelectorToolBar->setEnabled(
@@ -1812,7 +1819,10 @@ void pqMainWindow::updateEnableState()
 
   openAction->setEnabled(!pending_displays);
   saveDataAction->setEnabled(!pending_displays && source!=0);
-  connectAction->setEnabled(num_servers==0);
+  if ( connectAction )
+    {
+    connectAction->setEnabled(num_servers==0);
+    }
 }
 
 //-----------------------------------------------------------------------------
