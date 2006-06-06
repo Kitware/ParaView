@@ -35,8 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqCompoundProxyWizard.h"
 #include "pqElementInspectorWidget.h"
-#include "pqFileDialogEventPlayer.h"
-#include "pqFileDialogEventTranslator.h"
 #include "pqMultiViewFrame.h"
 #include "pqMultiView.h"
 #include "pqNameCount.h"
@@ -1446,8 +1444,7 @@ void pqMainWindow::onRecordTest(const QStringList& Files)
   for(int i = 0; i != Files.size(); ++i)
     {
     pqEventTranslator* const translator = new pqEventTranslator();
-    translator->addWidgetEventTranslator(new pqFileDialogEventTranslator());
-    translator->addDefaultWidgetEventTranslators();
+    pqTestUtility::Setup(*translator);
     
     pqRecordEventsDialog* const dialog = new pqRecordEventsDialog(translator, Files[i], this);
     dialog->show();
@@ -1473,8 +1470,7 @@ void pqMainWindow::onPlayTest(const QStringList& Files)
   QApplication::processEvents();
 
   pqEventPlayer player;
-  player.addWidgetEventPlayer(new pqFileDialogEventPlayer());
-  player.addDefaultWidgetEventPlayers();
+  pqTestUtility::Setup(player);
 
   for(int i = 0; i != Files.size(); ++i)
     {

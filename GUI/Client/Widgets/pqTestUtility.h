@@ -37,12 +37,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkIOStream.h>
 
 class QString;
+class pqEventPlayer;
+class pqEventTranslator;
 class vtkRenderWindow;
 
 /// Provides ParaView-specific functionality for regression testing
 class PQWIDGETS_EXPORT pqTestUtility
 {
 public:
+  /// Handles ParaView-specific setup of a QtTesting event translator object (so QtTesting doesn't have any dependencies on ParaView/VTK)
+  static void Setup(pqEventTranslator&);
+  /// Handles ParaView-specific setup of a QtTesting event player object (so QtTesting doesn't have any dependencies on ParaView/VTK)
+  static void Setup(pqEventPlayer&);
   /// Returns the absolute path to the PARAQ_DATA_ROOT in canonical form (slashes forward), or empty string
   static QString DataRoot();
   /// Saves the contents of a render window to a file for later use as a reference image

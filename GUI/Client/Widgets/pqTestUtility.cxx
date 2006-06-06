@@ -30,7 +30,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
+#include "pqFileDialogEventPlayer.h"
+#include "pqFileDialogEventTranslator.h"
 #include "pqTestUtility.h"
+
+#include <pqEventPlayer.h>
+#include <pqEventTranslator.h>
 
 #include <vtkWindowToImageFilter.h>
 #include <vtkBMPWriter.h>
@@ -60,6 +65,18 @@ bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
   writer->Delete();
   
   return result;
+}
+
+void pqTestUtility::Setup(pqEventTranslator& translator)
+{
+  translator.addWidgetEventTranslator(new pqFileDialogEventTranslator());
+  translator.addDefaultWidgetEventTranslators();
+}
+
+void pqTestUtility::Setup(pqEventPlayer& player)
+{
+  player.addWidgetEventPlayer(new pqFileDialogEventPlayer());
+  player.addDefaultWidgetEventPlayers();
 }
 
 QString pqTestUtility::DataRoot()
