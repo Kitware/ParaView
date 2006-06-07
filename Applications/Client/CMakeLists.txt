@@ -110,6 +110,7 @@ IF(BUILD_TESTING)
     OpenFile
     ExodusPanel
     OpenSaveData
+    LoadState
     )
 
   SET (TESTS_WITHOUT_BASELINES
