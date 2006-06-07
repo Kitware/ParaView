@@ -25,7 +25,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqEventTranslator.h
   pqLineEditEventTranslator.h
   pqMenuEventTranslator.h
-  pqMenuEventTranslatorAdaptor.h
   pqRecordEventsDialog.h
   pqSpinBoxEventTranslator.h
   pqWidgetEventTranslator.h
@@ -79,8 +78,6 @@ ADD_LIBRARY(QtTesting
   pqLineEditEventTranslator.h
   pqMenuEventTranslator.cxx
   pqMenuEventTranslator.h
-  pqMenuEventTranslatorAdaptor.cxx
-  pqMenuEventTranslatorAdaptor.h
   pqObjectNaming.cxx
   pqObjectNaming.h
   pqRecordEventsDialog.cxx

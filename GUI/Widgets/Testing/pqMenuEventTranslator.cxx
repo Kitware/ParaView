@@ -31,7 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqMenuEventTranslator.h"
-#include "pqMenuEventTranslatorAdaptor.h"
 
 #include <QEvent>
 #include <QMouseEvent>
