@@ -123,6 +123,10 @@ public:
   // pushed on the undo stack. This is same as Redo() except that vtkUndoElement::Redo()
   // is not invoked.
   void PopRedoStack();
+
+  // Description:
+  // Clears all the undo/redo elements from the stack.
+  void Clear();
 protected:
   vtkUndoStack();
   ~vtkUndoStack();
