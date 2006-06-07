@@ -19,7 +19,7 @@
 
 
 vtkStandardNewMacro(vtkUndoStack);
-vtkCxxRevisionMacro(vtkUndoStack, "1.3");
+vtkCxxRevisionMacro(vtkUndoStack, "1.4");
 //-----------------------------------------------------------------------------
 vtkUndoStack::vtkUndoStack()
 {
@@ -30,6 +30,14 @@ vtkUndoStack::vtkUndoStack()
 vtkUndoStack::~vtkUndoStack()
 {
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+void vtkUndoStack::Clear()
+{
+  this->Internal->UndoStack.clear();
+  this->Internal->RedoStack.clear();
+  this->Modified();
 }
 
 //-----------------------------------------------------------------------------
