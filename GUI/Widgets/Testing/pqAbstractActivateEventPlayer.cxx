@@ -94,11 +94,13 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
         {
         menu_bar->setActiveAction(next->menuAction());
         next->show();
+        QCoreApplication::sendPostedEvents();
         }
       else if(QMenu* menu = qobject_cast<QMenu*>(p))
         {
         menu->setActiveAction(next->menuAction());
         next->show();
+        QCoreApplication::sendPostedEvents();
         }
       }
     
