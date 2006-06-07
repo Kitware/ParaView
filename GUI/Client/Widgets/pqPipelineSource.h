@@ -58,13 +58,6 @@ public:
     QObject* parent=NULL);
   virtual ~pqPipelineSource();
 
-  // Returns the registration name for the proxy.
-  const QString &getProxyName() const; 
-
-  // Returns the vtkSMProxy.
-  vtkSMProxy *getProxy() const; 
-
-
   // Get the number of consumers.
   int getNumberOfConsumers() const;
 
@@ -83,6 +76,10 @@ public:
   // Get number of displays.
   int getDisplayCount() const; 
 
+  // Use this method to initialize the pqObject state using the
+  // underlying vtkSMProxy. This needs to be done only once,
+  // after the object has been created. 
+  virtual void initialize() { };
 signals:
   /// fired when a connection is created between two pqPipelineSources.
   void connectionAdded(pqPipelineSource* in, pqPipelineSource* out);

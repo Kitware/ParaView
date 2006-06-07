@@ -66,6 +66,7 @@ public slots:
   void Reset();
   void Undo();
   void Redo();
+  void Clear();
 
 signals:
   /// Fired to notify interested parites that the stack has changed.

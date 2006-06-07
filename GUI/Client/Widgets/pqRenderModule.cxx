@@ -109,13 +109,7 @@ pqRenderModule::~pqRenderModule()
 }
 
 //-----------------------------------------------------------------------------
-const QString& pqRenderModule::getProxyName() const 
-{
-  return this->Internal->Name;
-}
-
-//-----------------------------------------------------------------------------
-vtkSMRenderModuleProxy* pqRenderModule::getProxy() const
+vtkSMRenderModuleProxy* pqRenderModule::getRenderModuleProxy() const
 {
   return this->Internal->RenderModuleProxy;
 }

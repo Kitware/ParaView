@@ -57,7 +57,7 @@ public:
   virtual ~pqPipelineDisplay();
 
   // Get the internal display proxy.
-  vtkSMDataObjectDisplayProxy* getProxy() const;
+  vtkSMDataObjectDisplayProxy* getDisplayProxy() const;
 
   // Get the source/filter of which this is a display.
   pqPipelineSource* getInput() const;

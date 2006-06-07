@@ -32,15 +32,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 
 // ParaView includes.
+#include "vtkPVXMLElement.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMPQStateLoader.h"
+#include "QVTKWidget.h"
 
 // Qt includes.
 #include <QPointer>
 #include <QtDebug>
+#include <QSize>
 
 
 // ParaQ includes.
@@ -57,6 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 #include "pqWriterFactory.h"
+#include "pqXMLUtil.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCoreInternal
@@ -456,46 +462,7 @@ pqPipelineSource* pqApplicationCore::createReaderOnActiveServer(
   this->setActiveSource(reader);
   return reader;
 }
-/*
-//-----------------------------------------------------------------------------
-pqPipelineSource* pqApplicationCore::createReaderOnActiveServer( 
-  const QString& filename, const QString& readerName)
-{
-  if (!this->Internal->ActiveServer)
-    {
-    qDebug() << "No active server. Cannot create reader.";
-    return 0;
-    }
 
-  pqPipelineSource* reader = this->Internal->PipelineBuilder->createSource(
-    "sources", readerName.toStdString().c_str(), 
-    this->Internal->ActiveServer, NULL);
-
-  if (!reader)
-    {
-    return NULL;
-    }
-
-  this->Internal->UndoStack->BeginOrContinueUndoSet("Set Filenames");
-
-  vtkSMProxy* proxy = reader->getProxy();
-  pqSMAdaptor::setElementProperty(proxy, proxy->GetProperty("FileName"), 
-    filename);
-  pqSMAdaptor::setElementProperty(proxy, proxy->GetProperty("FilePrefix"),
-    filename);
-  pqSMAdaptor::setElementProperty(proxy, proxy->GetProperty("FilePattern"),
-    filename);
-  proxy->UpdateVTKObjects();
-
-  this->Internal->UndoStack->PauseUndoSet();
-
-  this->Internal->SourcesSansDisplays.push_back(reader);
-  emit this->pendingDisplays(true);
-
-  this->setActiveSource(reader);
-  return reader;
-}
-*/
 //-----------------------------------------------------------------------------
 void pqApplicationCore::removeActiveSource()
 {
@@ -557,4 +524,63 @@ void pqApplicationCore::createPendingDisplays()
 
   this->Internal->SourcesSansDisplays.clear();
   emit this->pendingDisplays(false);
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::saveState(vtkPVXMLElement* rootElement)
+{
+  // * Save the Proxy Manager state.
+
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  // Eventually proxy manager will save state for each connection separately.
+  // For now, we only have one connection, so simply save it.
+  vtkPVXMLElement* smState = vtkPVXMLElement::New();
+  smState->SetName("ServerManagerState");
+  rootElement->AddNestedElement(smState);
+  smState->Delete();
+
+  pxm->SaveState(smState);
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::loadState(vtkPVXMLElement* rootElement)
+{
+  if (!this->getActiveServer())
+    {
+    return ;
+    }
+
+  QSize old_size;
+  pqRenderModule* activeRenderModule = this->getActiveRenderModule();
+  if (activeRenderModule)
+    {
+    old_size = activeRenderModule->getWidget()->size();
+    }
+  vtkPVXMLElement* smState = pqXMLUtil::FindNestedElementByName(rootElement,
+    "ServerManagerState");
+  if (smState)
+    {
+    vtkSMPQStateLoader* loader = vtkSMPQStateLoader::New();
+    loader->SetUseExistingRenderModules(1);
+    loader->SetMultiViewRenderModuleProxy(this->getActiveServer()->GetRenderModule());
+
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    pxm->LoadState(smState, this->getActiveServer()->GetConnectionID(),
+      loader);
+    pxm->UpdateRegisteredProxies("sources", 0);
+    pxm->UpdateRegisteredProxies("displays", 0);
+    pxm->UpdateRegisteredProxies(0);
+    loader->Delete();
+    }
+
+  if (activeRenderModule)
+    {
+    // We force a size change so that the render window size indicated in the state
+    // can be overridden.
+    activeRenderModule->getWidget()->resize(old_size.width()-1, old_size.height());
+    activeRenderModule->getWidget()->resize(old_size);
+    activeRenderModule->render();
+    }
+  // Clear undo stack.
+  this->Internal->UndoStack->Clear();
 }

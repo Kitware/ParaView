@@ -304,7 +304,7 @@ void pqClipPanel::onAccepted()
               pipeline_source->getDisplay(j);
               
             vtkSMDataObjectDisplayProxy* const display_proxy =
-              pipeline_display->getProxy();
+              pipeline_display->getDisplayProxy();
 
             display_proxy->SetVisibilityCM(false);
             }

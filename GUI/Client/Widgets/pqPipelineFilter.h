@@ -61,6 +61,10 @@ public:
   // check if the input exists.
   bool hasInput(pqPipelineSource *input) const;
 
+  // Use this method to initialize the pqObject state using the
+  // underlying vtkSMProxy. This needs to be done only once,
+  // after the object has been created. 
+  virtual void initialize() {this->inputChanged();};
 protected slots:
   // process some change in the input property for the proxy.
   virtual void inputChanged();

@@ -76,7 +76,7 @@ public:
     { return this->SMGroup; }
 
   /// Get the vtkSMProxy this object stands for.
-  vtkSMProxy* getSMProxy() const
+  vtkSMProxy* getProxy() const
     {return this->Proxy; }
 private:
   pqServer *Server;           ///< Stores the parent server.

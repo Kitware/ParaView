@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMRenderModuleProxy.h"
 
+#include <vtksys/ios/sstream>
+
 // Qt includes.
 #include <QList>
 #include <QMap>
@@ -44,6 +46,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaQ includes.
+#include "pqApplicationCore.h"
+#include "pqNameCount.h"
+#include "pqPipelineBuilder.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineSource.h"
@@ -72,6 +77,11 @@ public:
   typedef QMap<vtkSMDataObjectDisplayProxy*, pqPipelineDisplay*>
     MapOfDisplayProxyToDisplay;
   MapOfDisplayProxyToDisplay Displays;
+
+  // The pqServerManagerModel has taken on the responsibility
+  // of assigning initial "cute" names for source and filters.
+  // We use the NameGenerator to sort-of-uniquify such names.
+  pqNameCount NameGenerator;
 };
 
 
@@ -127,6 +137,14 @@ void pqServerManagerModel::onAddSource(QString name, vtkSMProxy* source)
     {
     pqSource = new pqPipelineSource(name, source, server, this);
     }
+
+  // Set a nice label for the source, since registration names
+  // in ParaQ are nothing but IDs which are merely numbers.
+  vtksys_ios::ostringstream name_stream;
+  name_stream << source->GetXMLName() << 
+    this->Internal->NameGenerator.GetCountAndIncrement(source->GetXMLName());
+  pqSource->setProxyName(name_stream.str().c_str());
+
   this->Internal->Sources.insert(name, pqSource);
 
   QObject::connect(pqSource, 
@@ -136,6 +154,12 @@ void pqServerManagerModel::onAddSource(QString name, vtkSMProxy* source)
     SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)),
     this, SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)));
   emit this->sourceAdded(pqSource);
+ 
+  // It is essential to let the world know of the addition of pqSource
+  // before we start emitting signals as we update the initial state 
+  // of the pqSource from its underlying proxy. Hence we emit this->sourceAdded()
+  // before we do a pqSource->initialize();
+  pqSource->initialize();
 }
 
 //-----------------------------------------------------------------------------
@@ -145,13 +169,13 @@ void pqServerManagerModel::onRemoveSource(QString name)
   if (this->Internal->Sources.contains(name))
     {
     source = this->Internal->Sources.take(name);
+
+    // disconnect everything.
+    QObject::disconnect(source, 0, this, 0);
+    emit this->sourceRemoved(source);
+
+    delete source;
     }
-
-  // disconnect everything.
-  QObject::disconnect(source, 0, this, 0);
-  emit this->sourceRemoved(source);
-
-  delete source;
 }
 
 //-----------------------------------------------------------------------------
@@ -160,7 +184,7 @@ void pqServerManagerModel::onRemoveSource(vtkSMProxy* proxy)
   pqPipelineSource* pqSrc = getPQSource(proxy);
   if (pqSrc)
     {
-    this->onRemoveSource(pqSrc->getProxyName());
+    this->onRemoveSource(pqSrc->getSMName());
     }
 }
 
@@ -303,6 +327,12 @@ void pqServerManagerModel::onAddRenderModule(QString name,
     return;
     }
 
+  if (this->getRenderModule(rm))
+    {
+    // don't create a new pqRenderModule, one already exists.
+    return;
+    }
+
   pqRenderModule* pqRM = new pqRenderModule(name, rm, server);
   this->Internal->RenderModules.push_back(pqRM);
 
@@ -419,4 +449,3 @@ unsigned int pqServerManagerModel::getNumberOfSources()
   return static_cast<unsigned int>(this->Internal->Sources.size());
 }
 
-//-----------------------------------------------------------------------------

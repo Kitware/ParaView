@@ -152,10 +152,6 @@ vtkSMProxy* pqPipelineBuilder::createProxy(const char* xmlgroup,
     }
   proxy->SetConnectionID(server->GetConnectionID());
 
-  vtksys_ios::ostringstream proxy_name_stream;
-  proxy_name_stream << xmlname 
-    << this->NameGenerator->GetCountAndIncrement(xmlname);
-
   if (this->UndoStack && is_undoable)
     {
     vtksys_ios::ostringstream label;
@@ -163,7 +159,7 @@ vtkSMProxy* pqPipelineBuilder::createProxy(const char* xmlgroup,
     this->UndoStack->BeginOrContinueUndoSet(QString(label.str().c_str()));
     }
 
-  pxm->RegisterProxy(register_group, proxy_name_stream.str().c_str(),
+  pxm->RegisterProxy(register_group, proxy->GetSelfIDAsString(),
     proxy);
   proxy->Delete();
 
@@ -190,7 +186,7 @@ vtkSMProxy* pqPipelineBuilder::createPipelineProxy(const char* xmlgroup,
     // TODO: the display proxy must not longer have Input property ImmediateUpdate.
     // Since otherwise merely connecting to a display would lead to creation of the
     // VTK objects for the proxy, which is not good.
-    this->createDisplayProxyInternal(proxy, renModule->getProxy());
+    this->createDisplayProxyInternal(proxy, renModule->getRenderModuleProxy());
     if (this->UndoStack)
       {
       this->UndoStack->PauseUndoSet();
@@ -223,7 +219,7 @@ vtkSMDisplayProxy* pqPipelineBuilder::createDisplayProxy(pqPipelineSource* src,
     this->UndoStack->BeginOrContinueUndoSet(QString(label.str().c_str()));
     }
   vtkSMDisplayProxy* display = 
-    this->createDisplayProxyInternal(proxy, renModule->getProxy());
+    this->createDisplayProxyInternal(proxy, renModule->getRenderModuleProxy());
   if (this->UndoStack)
     {
     this->UndoStack->PauseUndoSet();
@@ -247,10 +243,7 @@ vtkSMDisplayProxy* pqPipelineBuilder::createDisplayProxyInternal(
   // (of undo/redo to work).
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
 
-  vtksys_ios::ostringstream proxy_name_stream;
-  proxy_name_stream << "display" 
-    << this->NameGenerator->GetCountAndIncrement("display");
-  pxm->RegisterProxy("displays", proxy_name_stream.str().c_str(), display);
+  pxm->RegisterProxy("displays", display->GetSelfIDAsString(), display);
   display->Delete();
   
   vtkSMProxyProperty* pp;
@@ -313,23 +306,25 @@ int pqPipelineBuilder::removeInternal(pqPipelineDisplay* display)
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineBuilder::remove(pqPipelineDisplay* display)
+void pqPipelineBuilder::remove(pqPipelineDisplay* display, 
+  bool is_undoable/*=true*/)
 {
-  if (this->UndoStack)
+  if (is_undoable && this->UndoStack)
     {
     this->UndoStack->BeginOrContinueUndoSet(QString("Remove Display"));
     }
 
   this->removeInternal(display);
 
-  if (this->UndoStack)
+  if (is_undoable && this->UndoStack)
     {
     this->UndoStack->PauseUndoSet();
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineBuilder::remove(pqPipelineSource* source)
+void pqPipelineBuilder::remove(pqPipelineSource* source,
+  bool is_undoable/*=false*/)
 {
   if (!source)
     {
@@ -343,7 +338,7 @@ void pqPipelineBuilder::remove(pqPipelineSource* source)
     return;
     }
 
-  if (this->UndoStack)
+  if (this->UndoStack && is_undoable)
     {
     this->UndoStack->BeginOrContinueUndoSet(QString("Remove Source"));
     }
@@ -375,7 +370,7 @@ void pqPipelineBuilder::remove(pqPipelineSource* source)
     source->getSMGroup().toStdString().c_str(), 
     source->getSMName().toStdString().c_str());
 
-  if (this->UndoStack)
+  if (this->UndoStack && is_undoable)
     {
     this->UndoStack->PauseUndoSet();
     }
@@ -483,13 +478,8 @@ pqRenderModule* pqPipelineBuilder::createWindow(pqServer* server)
   // This is not an undo-able operation (atleast for now).
   vtkSMRenderModuleProxy* renModule = server->newRenderModule();
 
-  // register it.
-  vtksys_ios::ostringstream proxy_name_stream;
-  proxy_name_stream << "renderModule"
-    << this->NameGenerator->GetCountAndIncrement("renderModule");
-
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  pxm->RegisterProxy("render_modules", proxy_name_stream.str().c_str(),
+  pxm->RegisterProxy("render_modules", renModule->GetSelfIDAsString(),
     renModule);
   renModule->Delete();
 
@@ -534,7 +524,7 @@ void pqPipelineBuilder::removeWindow(pqRenderModule* rm)
   // Unregister the proxy....the rest of the GUI will(rather should) manage itself!
   QString name = rm->getProxyName();
   vtkSMMultiViewRenderModuleProxy* multiRM = rm->getServer()->GetRenderModule();
-  vtkSMRenderModuleProxy* rmProxy = rm->getProxy();
+  vtkSMRenderModuleProxy* rmProxy = rm->getRenderModuleProxy();
 
   // This need to be done since multiRM adds all created rendermodules to itself.
   // This may need revisiting once we fully support multi-view.
@@ -565,10 +555,7 @@ vtkSMProxy* pqPipelineBuilder::createLookupTable(pqPipelineDisplay* display)
   lut->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   
   // register it.
-  vtksys_ios::ostringstream proxy_name_stream;
-  proxy_name_stream << "LookupTable"
-    << this->NameGenerator->GetCountAndIncrement("LookupTable");
-  pxm->RegisterProxy("lookup_tables", proxy_name_stream.str().c_str(), lut);
+  pxm->RegisterProxy("lookup_tables", lut->GetSelfIDAsString(), lut);
   lut->Delete();
   lut->UpdateVTKObjects();
 
@@ -604,6 +591,7 @@ void pqPipelineBuilder::deleteProxies(pqServer* server)
       {
       continue;
       }
+
     pxm->UnRegisterProxy(groupname.toStdString().c_str(),
       proxyname.toStdString().c_str());
     }

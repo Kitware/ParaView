@@ -130,7 +130,7 @@ void pqWidgetObjectPanel::select()
     pqApplicationCore::instance()->getActiveRenderModule();
   if (this->Widget && renModule)
     {
-    vtkSMRenderModuleProxy* rm = renModule->getProxy() ;
+    vtkSMRenderModuleProxy* rm = renModule->getRenderModuleProxy() ;
     vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
       rm->GetProperty("Displays"));
     pp->AddProxy(this->Widget);
@@ -154,7 +154,7 @@ void pqWidgetObjectPanel::unselect()
     pqApplicationCore::instance()->getActiveRenderModule();
   if (this->Widget && renModule)
     {
-    vtkSMRenderModuleProxy* rm = renModule->getProxy() ;
+    vtkSMRenderModuleProxy* rm = renModule->getRenderModuleProxy() ;
     vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
       rm->GetProperty("Displays"));
     pp->RemoveProxy(this->Widget);
@@ -318,7 +318,8 @@ void pqWidgetObjectPanel::onUseCameraNormal()
   if(this->Widget)
     {
     if(vtkCamera* const camera =
-      pqApplicationCore::instance()->getActiveRenderModule()->getProxy()->GetRenderer()->GetActiveCamera())
+      pqApplicationCore::instance()->getActiveRenderModule()->
+      getRenderModuleProxy()->GetRenderer()->GetActiveCamera())
       {
       if(vtkSMDoubleVectorProperty* const normal = vtkSMDoubleVectorProperty::SafeDownCast(
         this->Widget->GetProperty("Normal")))

@@ -91,9 +91,11 @@ vtkSMNew3DWidgetProxy* pq3DWidgetFactory::get3DWidget(const QString& name,
   pqPipelineBuilder* builder = 
     pqApplicationCore::instance()->getPipelineBuilder();
 
+  // We register  the 3DWidget proxy under prototypes so that it
+  // is never saved in state
   vtkSMNew3DWidgetProxy* proxy = vtkSMNew3DWidgetProxy::SafeDownCast(
     builder->createProxy("displays", name.toStdString().c_str(), 
-      "3d_widgets", server, false));
+      "3d_widgets_prototypes", server, false));
   if (!proxy)
     {
     qDebug() << "Could not create the 3D widget with name: " << name;

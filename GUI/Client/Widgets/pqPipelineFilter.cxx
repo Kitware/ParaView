@@ -76,7 +76,6 @@ pqPipelineFilter::pqPipelineFilter(QString name, vtkSMProxy* proxy,
     this->Internal->VTKConnect->Connect(proxy->GetProperty("Input"),
       vtkCommand::ModifiedEvent, this, SLOT(inputChanged()));
     }
-  this->inputChanged();
 }
 
 //-----------------------------------------------------------------------------

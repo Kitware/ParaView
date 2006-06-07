@@ -202,7 +202,7 @@ void pqVariableSelectorWidget::onVariableChanged(pqVariableType vtkNotUsed(type)
 
   stack->BeginOrContinueUndoSet("Color Change");
   pqPipelineDisplay* display = this->SelectedSource->getDisplay(0);
-  pqPart::SetColorField(display->getProxy(), name);
+  pqPart::SetColorField(display->getDisplayProxy(), name);
   stack->EndUndoSet();
   pqApplicationCore::instance()->getActiveRenderModule()->render();
 }
@@ -235,7 +235,7 @@ void pqVariableSelectorWidget::updateGUI()
     this->BlockEmission = true;
     this->Variables->setCurrentIndex(
       this->Variables->findText(pqPart::GetColorField(
-          this->SelectedSource->getDisplay(0)->getProxy())));
+          this->SelectedSource->getDisplay(0)->getDisplayProxy())));
     this->BlockEmission = false;
     }
 }
@@ -254,7 +254,7 @@ void pqVariableSelectorWidget::reloadGUI()
   this->addVariable(VARIABLE_TYPE_NONE, "Solid Color");
 
   pqPipelineDisplay* display = source->getDisplay(0);
-  vtkSMDataObjectDisplayProxy* displayProxy = display->getProxy();
+  vtkSMDataObjectDisplayProxy* displayProxy = display->getDisplayProxy();
 
   QList<QString> arrayList = pqPart::GetColorFields(displayProxy);
   QRegExp regExpCell("\\(cell\\)\\w*$");

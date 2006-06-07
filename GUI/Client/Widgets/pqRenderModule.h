@@ -52,7 +52,7 @@ public:
   virtual ~pqRenderModule();
 
   /// Returns the internal render Module proxy associated with this object.
-  vtkSMRenderModuleProxy* getProxy() const;
+  vtkSMRenderModuleProxy* getRenderModuleProxy() const;
 
   /// Returns the QVTKWidget for this render Window.
   QVTKWidget* getWidget() const;
@@ -66,9 +66,6 @@ public:
 
   /// Resets the camera to include all visible data.
   void resetCamera();
-
-  /// Returns the name for this render module.
-  const QString &getProxyName() const; 
 
   /// Save a screenshot for the render module. If width or height ==0,
   /// the current window size is used.

@@ -132,7 +132,6 @@ public:
     MultiViewManager(0),
     Inspector(0),
     PipelineBrowser(0),
-    ServerDisconnectAction(0),
     ElementInspectorDock(0),
     CompoundProxyToolBar(0),
     PropertyToolbar(0),
@@ -175,7 +174,6 @@ public:
   pqMultiView* MultiViewManager;
   pqObjectInspectorWidget* Inspector;
   pqPipelineBrowser *PipelineBrowser;
-  QAction* ServerDisconnectAction;
   QDockWidget *ElementInspectorDock;
   QToolBar* CompoundProxyToolBar;
   QToolBar* PropertyToolbar;
@@ -274,7 +272,7 @@ void pqMainWindow::createStandardFileMenu()
     << pqSetName("LoadServerState")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onFileOpenServerState()));
   // disable save/load state for the time being.
-  action->setEnabled(false);
+  action->setEnabled(true);
 
   action = menu->addAction(tr("&Save Server State..."))
     << pqSetName("SaveServerState")
@@ -306,11 +304,11 @@ void pqMainWindow::createStandardServerMenu()
     << pqSetName("Connect")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onServerConnect()));
 
-  this->Implementation->ServerDisconnectAction = menu->addAction(tr("&Disconnect"))
+  QAction* action= menu->addAction(tr("&Disconnect"))
     << pqSetName("Disconnect")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onServerDisconnect()));
     
-  this->Implementation->ServerDisconnectAction->setEnabled(false);
+  action->setEnabled(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -1093,6 +1091,36 @@ void pqMainWindow::onFileSaveData(const QStringList& files)
 //-----------------------------------------------------------------------------
 void pqMainWindow::onFileOpenServerState()
 {
+  pqApplicationCore* core = pqApplicationCore::instance();
+ int num_servers = core->getServerManagerModel()->getNumberOfServers();
+  if (num_servers > 0)
+    {
+    if (!core->getActiveServer())
+      {
+      qDebug() << "No active server. Cannot load state.";
+      return;
+      }
+    pqServer* server = core->getActiveServer();
+    core->setActiveSource(NULL);
+    this->onFileOpenServerState(server);
+    }
+  else
+    {
+    pqServerBrowser* const server_browser = new pqServerBrowser(this);
+    server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
+    // let the regular onServerConnect() operation be performed as well.
+    QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, 
+      SLOT(onServerConnect(pqServer*)));
+    QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), 
+      this, SLOT(onFileOpenServerState(pqServer*)));
+    server_browser->setModal(true);
+    server_browser->show();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::onFileOpenServerState(pqServer*)
+{
   QString filters;
   filters += "ParaView state file (*.pvs)";
   filters += ";;All files (*)";
@@ -1106,19 +1134,13 @@ void pqMainWindow::onFileOpenServerState()
   fileDialog->show();
 }
 
-void pqMainWindow::onFileOpenServerState(pqServer*)
-{
-}
-
+//-----------------------------------------------------------------------------
 void pqMainWindow::onFileOpenServerState(const QStringList& Files)
 {
   if(Files.size() == 0)
     {
     return;
     }
-
-  // Clean up the current state.
-  this->onFileNew();
 
   // Read in the xml file to restore.
   vtkPVXMLParser *xmlParser = vtkPVXMLParser::New();
@@ -1127,51 +1149,8 @@ void pqMainWindow::onFileOpenServerState(const QStringList& Files)
 
   // Get the root element from the parser.
   vtkPVXMLElement *root = xmlParser->GetRootElement();
+  pqApplicationCore::instance()->loadState(root);
   QString name = root->GetName();
-  if(name == "ParaQ")
-    {
-    // Restore the application size and position.
-    vtkPVXMLElement *element = pqXMLUtil::FindNestedElementByName(root,
-        "MainWindow");
-    if(element)
-      {
-      int xpos = 0;
-      int ypos = 0;
-      if(element->GetScalarAttribute("x", &xpos) &&
-          element->GetScalarAttribute("y", &ypos))
-        {
-        this->move(xpos, ypos);
-        }
-
-      int w = 0;
-      int h = 0;
-      if(element->GetScalarAttribute("width", &w) &&
-          element->GetScalarAttribute("height", &h))
-        {
-        this->resize(w, h);
-        }
-      }
-
-    // Restore the multi-view windows.
-    if(this->Implementation->MultiViewManager)
-      {
-      this->Implementation->MultiViewManager->loadState(root);
-      }
-
-    // Restore the pipeline.
-    /*
-    if(this->Implementation->Pipeline)
-      {
-      // this->Implementation->Pipeline->loadState(root, this->Implementation->MultiViewManager);
-      }
-      */
-    }
-  else
-    {
-    // If the xml file is not a ParaQ file, it may be a server manager
-    // state file.
-    vtkSMObject::GetProxyManager()->LoadState(root);
-    }
 
   xmlParser->Delete();
 }
@@ -1185,7 +1164,7 @@ void pqMainWindow::onFileSaveServerState()
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), 
     this, tr("Save Server State:"), QString(), filters);
   file_dialog->setObjectName("FileSaveServerStateDialog");
-  file_dialog->setFileMode(pqFileDialog::ExistingFile);
+  file_dialog->setFileMode(pqFileDialog::AnyFile);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), this, SLOT(onFileSaveServerState(const QStringList&)));
   file_dialog->show();
 }
@@ -1199,7 +1178,9 @@ void pqMainWindow::onFileSaveServerState(const QStringList& Files)
 
   vtkPVXMLElement *root = vtkPVXMLElement::New();
   root->SetName("ParaQ");
+  pqApplicationCore::instance()->saveState(root);
 
+  /*
   // Save the size and dock window information.
   vtkPVXMLElement *element = vtkPVXMLElement::New();
   element->SetName("MainWindow");
@@ -1221,13 +1202,7 @@ void pqMainWindow::onFileSaveServerState(const QStringList& Files)
     this->Implementation->MultiViewManager->saveState(root);
     }
 
-  /*
-  if(this->Implementation->Pipeline)
-    {
-    // FIXME
-    //this->Implementation->Pipeline->getModel()->saveState(root, this->Implementation->MultiViewManager);
-    }
-    */
+  */
 
   // Print the xml to the requested file(s).
   for(int i = 0; i != Files.size(); ++i)
@@ -1347,7 +1322,7 @@ bool pqMainWindow::compareView(const QString& referenceImage, double threshold,
     }
 
   vtkRenderWindow* const render_window = 
-    renModule->getProxy()->GetRenderWindow();
+    renModule->getRenderModuleProxy()->GetRenderWindow();
 
   if(!render_window)
     {
@@ -1697,6 +1672,10 @@ void pqMainWindow::postAcceptUpdate()
 //-----------------------------------------------------------------------------
 void pqMainWindow::updateFiltersMenu(pqPipelineSource* source)
 {
+  if (!this->Implementation->FiltersMenu)
+    {
+    return;
+    }
   // update the filter menu.
   if ( !this->Implementation->FiltersMenu )
     {
@@ -1785,31 +1764,42 @@ void pqMainWindow::updateEnableState()
   bool pending_displays = 
     (pqApplicationCore::instance()->getNumberOfSourcesPendingDisplays() > 0);
 
-  QAction* connectAction = 
-    this->serverMenu()->findChild<QAction*>("Connect");
-  QAction* saveScreenshot =
-    this->fileMenu()->findChild<QAction*>("SaveScreenshot");
-  QAction* compoundFilterAction = 
-    this->Implementation->ToolsMenu->findChild<QAction*>( "CompoundFilter");
-  QAction* openAction = this->fileMenu()->findChild<QAction*>("Open");
-  QAction* saveDataAction = this->fileMenu()->findChild<QAction*>("SaveData");
-  
+  if (this->Implementation->FileMenu)
+    {
+    QAction* openAction = this->fileMenu()->findChild<QAction*>("Open");
+    QAction* saveDataAction = this->fileMenu()->findChild<QAction*>("SaveData");
+    QAction* loadStateAction = 
+      this->fileMenu()->findChild<QAction*>("LoadServerState");
+    QAction* saveStateAction = 
+      this->fileMenu()->findChild<QAction*>("SaveServerState");
+    QAction* saveScreenshot =
+      this->fileMenu()->findChild<QAction*>("SaveScreenshot");
+    openAction->setEnabled(!pending_displays);
+    saveDataAction->setEnabled(!pending_displays && source!=0);
+    loadStateAction->setEnabled(!pending_displays && (!num_servers || server !=0));
+    saveStateAction->setEnabled(!pending_displays && server !=0);
+    saveScreenshot->setEnabled(server != 0);
+    }
+
+  if (this->Implementation->ServerMenu)
+    {
+    QAction* connectAction = this->serverMenu()->findChild<QAction*>("Connect");
+    QAction* disconnectAction = 
+      this->serverMenu()->findChild<QAction*>("Disconnect");
+    connectAction->setEnabled(num_servers==0);
+    disconnectAction->setEnabled(server != 0);
+    }
+
   if ( this->Implementation->SourcesMenu )
     {
     this->Implementation->SourcesMenu->setEnabled(server != 0 && !pending_displays);
     }
-  if ( this->Implementation->ServerDisconnectAction )
-    {
-    this->Implementation->ServerDisconnectAction->setEnabled(server != 0);
-    }
+
   if ( this->Implementation->VariableSelectorToolBar )
     {
     this->Implementation->VariableSelectorToolBar->setEnabled(
       source != 0 && !pending_displays);
     }
-
-  compoundFilterAction->setEnabled(server != 0 && !pending_displays);
-  saveScreenshot->setEnabled(server != 0);
 
   if ( this->Implementation->FiltersMenu )
     {
@@ -1817,11 +1807,12 @@ void pqMainWindow::updateEnableState()
       source != 0 && server != 0 && !pending_displays);
     }
 
-  openAction->setEnabled(!pending_displays);
-  saveDataAction->setEnabled(!pending_displays && source!=0);
-  if ( connectAction )
+  if (this->Implementation->ToolsMenu)
     {
-    connectAction->setEnabled(num_servers==0);
+    QAction* compoundFilterAction = 
+      this->Implementation->ToolsMenu->findChild<QAction*>( "CompoundFilter");
+
+    compoundFilterAction->setEnabled(server != 0 && !pending_displays);
     }
 }
 

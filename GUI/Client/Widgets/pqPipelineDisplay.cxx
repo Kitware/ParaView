@@ -96,7 +96,7 @@ pqPipelineDisplay::~pqPipelineDisplay()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMDataObjectDisplayProxy* pqPipelineDisplay::getProxy() const
+vtkSMDataObjectDisplayProxy* pqPipelineDisplay::getDisplayProxy() const
 {
   return this->Internal->DisplayProxy;
 }
@@ -159,13 +159,13 @@ void pqPipelineDisplay::onInputChanged()
 void pqPipelineDisplay::setDefaultColorParametes()
 {
   // eventually the implementation from pqPart must move here.
-  pqPart::Color(this->getProxy());
+  pqPart::Color(this->getDisplayProxy());
 }
 
 //-----------------------------------------------------------------------------
 void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
 {
-  pqPart::Color(this->getProxy(), arrayname, fieldtype);
+  pqPart::Color(this->getDisplayProxy(), arrayname, fieldtype);
 }
 
 //-----------------------------------------------------------------------------

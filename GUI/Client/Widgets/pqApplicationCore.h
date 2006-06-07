@@ -47,6 +47,7 @@ class pqServer;
 class pqServerManagerModel;
 class pqUndoStack;
 class pqWriterFactory;
+class vtkPVXMLElement;
 
 /// This class is the crux of the ParaQ application. It creates
 /// and manages various managers which are necessary for the PQClient
@@ -134,6 +135,11 @@ public:
   /// exposed, but for the current release, we want to disable all menus,
   /// if the user has a source waiting a display, hence we expose it.
   int getNumberOfSourcesPendingDisplays();
+
+
+  /// Save the ServerManager state.
+  void saveState(vtkPVXMLElement* root);
+  void loadState(vtkPVXMLElement* root);
 signals:
   // Fired when the active source changes.
   void activeSourceChanged(pqPipelineSource*);

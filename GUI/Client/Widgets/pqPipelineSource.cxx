@@ -83,18 +83,6 @@ pqPipelineSource::~pqPipelineSource()
 }
 
 //-----------------------------------------------------------------------------
-const QString& pqPipelineSource::getProxyName() const 
-{
-  return this->Internal->Name;
-}
-
-//-----------------------------------------------------------------------------
-vtkSMProxy* pqPipelineSource::getProxy() const
-{
-  return this->Internal->Proxy.GetPointer();
-}
-
-//-----------------------------------------------------------------------------
 int pqPipelineSource::getNumberOfConsumers() const
 {
   return this->Internal->Consumers.size();

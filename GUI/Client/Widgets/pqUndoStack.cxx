@@ -149,3 +149,9 @@ void pqUndoStack::Redo()
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
   pqApplicationCore::instance()->render();
 }
+
+//-----------------------------------------------------------------------------
+void pqUndoStack::Clear()
+{
+  this->Implementation->UndoStack->Clear();
+}

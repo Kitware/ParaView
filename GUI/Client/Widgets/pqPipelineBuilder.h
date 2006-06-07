@@ -57,6 +57,8 @@ class pqUndoStack;
 /// call EndUndoSet() on the pqUndoStack, instead always pauses the
 /// recording of the undo set. That way it can collapse mutiple 
 /// operations into on undoable set.
+/// NOTE: For all proxies registered by this class, the registration
+/// name is same as the SelfID for the proxy.
 
 class PQWIDGETS_EXPORT pqPipelineBuilder : public QObject
 {
@@ -134,12 +136,14 @@ public:
   // \li unregistering the source.
   // Note that the source must have no consumers, otherwise,
   // one cannot delete the source.
-  void remove(pqPipelineSource* source);
+  // \c is_undoable flag can be used to indicate if the operation is undoable.
+  void remove(pqPipelineSource* source, bool is_undoable=true);
 
   // Removes a display. Removing a display involves:
   // \li removing the display from the render module it belongs to.
   // \li unregistering the display.
-  void remove(pqPipelineDisplay* display);
+  // \c is_undoable flag can be used to indicate if the operation is undoable.
+  void remove(pqPipelineDisplay* display, bool is_undoable=true);
 
   // Every server can potentially be compiled with different compile time options
   // while could lead to certain filters/sources/writers being non-instantiable

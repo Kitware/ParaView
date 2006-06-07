@@ -117,7 +117,7 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
     }
 
   vtkSMDataObjectDisplayProxy* displayProxy = 
-    (display)? display->getProxy() : NULL;
+    (display)? display->getDisplayProxy() : NULL;
   if(this->Internal->Display)
     {
     // break all old links.
@@ -364,12 +364,12 @@ void pqDisplayProxyEditor::colorByChanged(const QString& val)
   if(val == "Solid Color")
     {
     this->Internal->ColorActorColor->setEnabled(true);
-    pqPart::Color(this->Internal->Display->getProxy(), NULL, 0);
+    pqPart::Color(this->Internal->Display->getDisplayProxy(), NULL, 0);
     }
   else
     {
     this->Internal->ColorActorColor->setEnabled(false);
-    pqPart::SetColorField(this->Internal->Display->getProxy(), val);
+    pqPart::SetColorField(this->Internal->Display->getDisplayProxy(), val);
     }
   this->updateView();
 }
@@ -383,7 +383,7 @@ void pqDisplayProxyEditor::updateColorByMenu(bool forceUpdate)
     }
   
   vtkSMDataObjectDisplayProxy* displayProxy = 
-    this->Internal->Display->getProxy();
+    this->Internal->Display->getDisplayProxy();
   
   // changing the colorby combo will cause slots to be executed and change
   // the array to be colored by to Solid Color. disabling slots to prevent
@@ -440,7 +440,7 @@ void pqDisplayProxyEditor::zoomToData()
     {
     pqRenderModule* renModule = 
       pqApplicationCore::instance()->getActiveRenderModule();
-    vtkSMRenderModuleProxy* rm = renModule->getProxy();
+    vtkSMRenderModuleProxy* rm = renModule->getRenderModuleProxy();
     rm->ResetCamera(bounds);
     rm->ResetCameraClippingRange();
     renModule->render();
