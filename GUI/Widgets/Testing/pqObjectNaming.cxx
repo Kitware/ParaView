@@ -58,20 +58,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /// Returns the name of an object.  In some cases, assigns a name as a convenience.  Also strips-out problematic characters (such as '/').
 static const QString InternalGetName(QObject& Object)
 {
-  if(Object.objectName().isEmpty())
+  QString result = Object.objectName();
+
+  if(result.isEmpty())
     {
-    if(qobject_cast<QStackedWidget*>(&Object))
+    QWidget* widget = qobject_cast<QWidget*>(&Object);
+    if(widget)
       {
-      if(qobject_cast<QTabWidget*>(Object.parent()))
+      QList<QWidget*> widgets;
+      QWidget* parentWidget = widget->parentWidget();
+      if(parentWidget)
         {
-        Object.setObjectName("qt_stacked_widget");
+        widgets = parentWidget->findChildren<QWidget*>();
+        }
+      else if(!widget->parent())
+        {
+        widgets = QApplication::topLevelWidgets();
+        }
+
+      QString type = widget->metaObject()->className();
+      int index = 0;
+      bool found = false;
+      for(int i=0; i<widgets.size() && !found; i++)
+        {
+        QWidget* test = widgets[i];
+        if(test == widget)
+          {
+          found = true;
+          }
+        else if(test->isVisible() == widget->isVisible() 
+                && QString(test->metaObject()->className()) == type)
+          {
+          index++;
+          }
+        }
+      if(found)
+        {
+        result = QString("%1").arg(widget->isVisible()) + type + QString("%1").arg(index);
         }
       }
     }
-    
-  QString result = Object.objectName();
+
   result.replace("/", "|");
-  
   return result;
 }
 

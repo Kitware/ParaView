@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/MenuBar/ServerMenu/Connect" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/ServerMenu" command="activate" arguments="Connect" />
   <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
-  <pqevent object="MainWindow/MenuBar/SourcesMenu/Sphere" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/SourcesMenu" command="activate" arguments="Sphere" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/MenuBar/SourcesMenu/Arrow" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/SourcesMenu" command="activate" arguments="Arrow" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/PipelineInspectorDock/PipelineList/PipelineView" command="currentChanged" arguments="/0/0|0" />
   <pqevent object="MainWindow/VariableSelectorToolBar/VariableSelector/Variables" command="set_string" arguments="Normals (point)" />

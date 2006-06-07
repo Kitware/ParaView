@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QObject;
 class QString;
-class vtkRenderWindow;
 
 /// Provides functionality to ensuring that Qt objects can be uniquely identified for recording and playback of regression tests
 class QTTESTING_EXPORT pqObjectNaming

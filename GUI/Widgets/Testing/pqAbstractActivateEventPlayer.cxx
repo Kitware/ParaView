@@ -45,106 +45,78 @@ pqAbstractActivateEventPlayer::pqAbstractActivateEventPlayer()
 {
 }
 
-bool pqAbstractActivateEventPlayer::playEvent(QObject* Object, const QString& Command, const QString& /*Arguments*/, bool& Error)
+bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
+                                              const QString& Command,
+                                              const QString& Arguments,
+                                              bool& Error)
 {
   if(Command != "activate")
     return false;
 
-  if(QAction* const object = qobject_cast<QAction*>(Object))
+  if(QMenu* const object = qobject_cast<QMenu*>(Object))
     {
-    QObjectList parents;
-    for(QObject* p = object->parent(); p; p = p->parent())
+    
+    QAction* action = NULL;
+    QList<QAction*> actions = object->actions();
+    for(int j = 0; j != actions.size() && !action; ++j)
       {
-      parents.push_front(p);
-      }
-      
-    for(int i = 0; i != parents.size(); ++i)
-      {
-      if(QMenuBar* const menu_bar = qobject_cast<QMenuBar*>(parents[i]))
+      if(actions[j]->objectName() == Arguments)
         {
-        if(QMenu* const menu = (i+1) < parents.size() ? qobject_cast<QMenu*>(parents[i+1]) : 0)
-          {
-          QList<QAction*> actions = menu_bar->actions();
-          for(int j = 0; j != actions.size(); ++j)
-            {
-            if(actions[j]->menu() == menu)
-              {
-              menu_bar->setActiveAction(actions[j]);
-              while(!menu->isVisible())
-                pqTesting::NonBlockingSleep(100);
-              break;
-              }
-            }
-          }
+        action = actions[j];
         }
-      else if(QMenu* const menu = qobject_cast<QMenu*>(parents[i]))
-        {
-        if((i+1) < parents.size())
-          {
-          if(QMenu* const submenu = (i+1) < parents.size() ? qobject_cast<QMenu*>(parents[i+1]) : 0)
-            {
-            const QString temp = submenu->objectName();
-            
-            QList<QAction*> actions = menu->actions();
-            for(int j = 0; j != actions.size(); ++j)
-              {
-              const QString temp2 = actions[j]->menu() ? actions[j]->menu()->objectName() : "";
-              
-              if(actions[j]->menu() == submenu)
-                {
-                QMouseEvent button_press(QEvent::MouseButtonPress, menu->actionGeometry(actions[j]).center(), Qt::LeftButton, Qt::LeftButton, 0);
-                QApplication::sendEvent(menu, &button_press);
-                
-                QMouseEvent button_release(QEvent::MouseButtonRelease, menu->actionGeometry(actions[j]).center(), Qt::LeftButton, 0, 0);
-                QApplication::sendEvent(menu, &button_release);
-
-                while(!submenu->isVisible())
-                  pqTesting::NonBlockingSleep(100);
-                break;
-                }
-              }
-            }
-          }
-        else
-          {
-            QList<QAction*> actions = menu->actions();
-            for(int j = 0; j != actions.size(); ++j)
-              {
-              if(actions[j] == object)
-                {
-                menu->setActiveAction(actions[j]);
-                
-                QMouseEvent button_press(QEvent::MouseButtonPress, menu->actionGeometry(actions[j]).center(), Qt::LeftButton, Qt::LeftButton, 0);
-                QApplication::sendEvent(menu, &button_press);
-                
-                QMouseEvent button_release(QEvent::MouseButtonRelease, menu->actionGeometry(actions[j]).center(), Qt::LeftButton, 0, 0);
-                QApplication::sendEvent(menu, &button_release);
-                return true;
-                }
-              }
-            }
-          }
-        }
-/*
-    if(QMenu* const menu = qobject_cast<QMenu*>(object->parent()))
-      {
-        if(!menu->parent())
-          {
-          while(!menu->isVisible())
-            pqTesting::NonBlockingSleep(100);
-          }
-
-      QKeyEvent key_press(QEvent::KeyPress, Qt::Key_Escape, 0);
-      QApplication::sendEvent(menu, &key_press);
-
-      QKeyEvent key_release(QEvent::KeyRelease, Qt::Key_Escape, 0);
-      QApplication::sendEvent(menu, &key_release);
-      
-      menu->setActiveAction(object);
       }
-*/
-      
-    object->activate(QAction::Trigger);
+
+    if(!action)
+      {
+      qCritical() << "couldn't find action " << Arguments;
+      Error = true;
+      return true;
+      }
+
+    // get a list of menus that must be navigated to 
+    // click on the action
+    QObjectList menus;
+    for(QObject* p = object; 
+        qobject_cast<QMenu*>(p) || qobject_cast<QMenuBar*>(p); 
+        p = p->parent())
+      {
+      menus.push_front(p);
+      }
+
+    // unfold menus to make action visible
+    int i;
+    int numMenus = menus.size() - 1;
+    for(i=0; i < numMenus; ++i)
+      {
+      QObject* p = menus[i];
+      QMenu* next = qobject_cast<QMenu*>(menus[i+1]);
+      if(QMenuBar* menu_bar = qobject_cast<QMenuBar*>(p))
+        {
+        menu_bar->setActiveAction(next->menuAction());
+        next->show();
+        }
+      else if(QMenu* menu = qobject_cast<QMenu*>(p))
+        {
+        menu->setActiveAction(next->menuAction());
+        next->show();
+        }
+      }
+    
+    // simulate mouse click on menu item
+    QRect geom = object->actionGeometry(action);
+    QMouseEvent button_press(QEvent::MouseButtonPress, 
+                             geom.center(), 
+                             Qt::LeftButton, Qt::LeftButton, 0);
+    QApplication::sendEvent(object, &button_press);
+    
+    QMouseEvent button_release(QEvent::MouseButtonRelease, 
+                               geom.center(), 
+                               Qt::LeftButton, 0, 0);
+    QApplication::sendEvent(object, &button_release);
+
+    // TODO:  If mouse happens to be over where a menu shows up
+    //        the mouse messes up the activation of the menu item
+    
     return true;
     }
 
@@ -153,7 +125,7 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object, const QString& Co
     object->click();
     return true;
     }
-
+  
   qCritical() << "calling activate on unhandled type " << Object;
   Error = true;
   return true;

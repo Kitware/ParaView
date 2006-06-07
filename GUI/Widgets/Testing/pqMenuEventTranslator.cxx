@@ -45,10 +45,11 @@ pqMenuEventTranslator::~pqMenuEventTranslator()
 {
 }
 
-bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool& /*Error*/)
+bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event,
+                                           bool& /*Error*/)
 {
-  QMenu* const object = qobject_cast<QMenu*>(Object);
-  if(!object)
+  QMenu* const menu = qobject_cast<QMenu*>(Object);
+  if(!menu)
     return false;
 
   if(Event->type() == QEvent::KeyPress)
@@ -56,10 +57,10 @@ bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool&
     QKeyEvent* e = static_cast<QKeyEvent*>(Event);
     if(e->key() == Qt::Key_Enter)
       {
-      QAction* action = object->activeAction();
+      QAction* action = menu->activeAction();
       if(action)
         {
-        emit recordEvent(action, "activate", "");
+        emit recordEvent(menu, "activate", action->objectName());
         return true;
         }
       }
@@ -70,10 +71,10 @@ bool pqMenuEventTranslator::translateEvent(QObject* Object, QEvent* Event, bool&
     QMouseEvent* e = static_cast<QMouseEvent*>(Event);
     if(e->button() == Qt::LeftButton)
       {
-      QAction* action = object->actionAt(e->pos());
+      QAction* action = menu->actionAt(e->pos());
       if(action && !action->menu())
         {
-        emit recordEvent(action, "activate", "");
+        emit recordEvent(menu, "activate", action->objectName());
         return true;
         }
       }

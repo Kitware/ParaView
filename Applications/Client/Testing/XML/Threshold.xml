@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/MenuBar/ServerMenu/Connect" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/ServerMenu" command="activate" arguments="Connect" />
   <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
-  <pqevent object="MainWindow/MenuBar/SourcesMenu/Sphere" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/SourcesMenu" command="activate" arguments="Sphere" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/MenuBar/FiltersMenu/Alphabetical/ElevationFilter" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/FiltersMenu/Alphabetical" command="activate" arguments="ElevationFilter" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/MenuBar/FiltersMenu/Released/Threshold" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/FiltersMenu/Released" command="activate" arguments="Threshold" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Form/LowerThresholdSlider" command="set_int" arguments="1" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Form/LowerThresholdSlider" command="set_int" arguments="3" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/Form/LowerThresholdSlider" command="set_int" arguments="4" />
@@ -140,12 +140,12 @@
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/PipelineInspectorDock/PipelineList/PipelineView" command="currentChanged" arguments="/0/0/0|0" />
   <pqevent object="MainWindow/PipelineInspectorDock/PipelineList/PipelineView/qt_scrollarea_viewport" command="contextMenu" arguments="" />
-  <pqevent object="PipelineObjectMenu/Display Settings" command="activate" arguments="" />
+  <pqevent object="PipelineObjectMenu" command="activate" arguments="Display Settings" />
   <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/ViewGroup/ViewData" command="set_boolean" arguments="false" />
   <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/DismissButton" command="activate" arguments="" />
   <pqevent object="MainWindow/PipelineInspectorDock/PipelineList/PipelineView" command="currentChanged" arguments="/0/0|0" />
   <pqevent object="MainWindow/PipelineInspectorDock/PipelineList/PipelineView/qt_scrollarea_viewport" command="contextMenu" arguments="" />
-  <pqevent object="PipelineObjectMenu/Display Settings" command="activate" arguments="" />
+  <pqevent object="PipelineObjectMenu" command="activate" arguments="Display Settings" />
   <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/ViewGroup/ViewData" command="set_boolean" arguments="false" />
   <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/DismissButton" command="activate" arguments="" />
   <pqevent object="MainWindow/PipelineInspectorDock/PipelineList/PipelineView" command="currentChanged" arguments="/0/0/0/0|0" />

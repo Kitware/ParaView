@@ -86,13 +86,6 @@ void pqAbstractButtonEventTranslator::onActivate(QAbstractButton* object)
     }
   else
     {
-    if(object->objectName() == QString::null && qobject_cast<QToolButton*>(object))
-      {
-      emit recordEvent(qobject_cast<QToolButton*>(object)->defaultAction(), "activate", "");
-      }
-    else
-      {
-      emit recordEvent(object, "activate", "");
-      }
+    emit recordEvent(object, "activate", "");
     }
 }

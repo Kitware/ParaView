@@ -1,9 +1,9 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/MenuBar/ServerMenu/Connect" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/ServerMenu" command="activate" arguments="Connect" />
   <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
-  <pqevent object="MainWindow/MenuBar/SourcesMenu/Sphere" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/SourcesMenu" command="activate" arguments="Sphere" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/MenuBar/FiltersMenu/Vectors|Gradients/Glyph" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/FiltersMenu/Vectors|Gradients" command="activate" arguments="Glyph" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
 </pqevents>

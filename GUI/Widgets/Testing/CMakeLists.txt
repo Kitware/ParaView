@@ -1,7 +1,6 @@
 PROJECT(QtTesting)
 
 INCLUDE_DIRECTORIES(
-  ${ParaQ_SOURCE_DIR}/VTK/Imaging
   ${QtTesting_BINARY_DIR}
   ${QtTesting_SOURCE_DIR}
 )
@@ -98,8 +97,6 @@ SOURCE_GROUP("Generated" FILES
 )
 
 TARGET_LINK_LIBRARIES(QtTesting
-  vtkIO
-  vtkRendering
   ${QT_LIBRARIES}
   ${QT_XML_LIBRARIES}
 )
