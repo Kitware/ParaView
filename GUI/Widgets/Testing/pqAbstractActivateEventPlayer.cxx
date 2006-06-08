@@ -92,11 +92,19 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
       QMenu* next = qobject_cast<QMenu*>(menus[i+1]);
       if(QMenuBar* menu_bar = qobject_cast<QMenuBar*>(p))
         {
+        const bool effect_enabled = QApplication::isEffectEnabled(Qt::UI_FadeMenu);
+        QApplication::setEffectEnabled(Qt::UI_FadeMenu, false);
+
         menu_bar->setActiveAction(next->menuAction());
         QCoreApplication::processEvents();
+
+        QApplication::setEffectEnabled(Qt::UI_FadeMenu, effect_enabled);
         }
       else if(QMenu* menu = qobject_cast<QMenu*>(p))
         {
+        const bool effect_enabled = QApplication::isEffectEnabled(Qt::UI_FadeMenu);
+        QApplication::setEffectEnabled(Qt::UI_FadeMenu, false);
+
         QRect geom = menu->actionGeometry(next->menuAction());
         QMouseEvent button_press(QEvent::MouseButtonPress, 
                                  geom.center(), 
@@ -110,6 +118,8 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
                                    Qt::LeftButton, 0, 0);
         QApplication::sendEvent(menu, &button_release);
         QCoreApplication::processEvents();
+
+        QApplication::setEffectEnabled(Qt::UI_FadeMenu, effect_enabled);
         }
       }
     
