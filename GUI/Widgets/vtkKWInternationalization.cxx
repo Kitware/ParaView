@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWInternationalization);
-vtkCxxRevisionMacro(vtkKWInternationalization, "1.5");
+vtkCxxRevisionMacro(vtkKWInternationalization, "1.6");
 
 //----------------------------------------------------------------------------
 void vtkKWInternationalization::SetCurrentTextDomain(const char *domain_name)
@@ -137,6 +137,17 @@ const char* vtkKWInternationalization::FindTextDomainBinding(
 
   module_path_length = 
     ::GetModuleFileName(GetModuleHandle(domain_name), module_path, _MAX_PATH);
+  if (module_path_length)
+    {
+    search_dir_candidates.insert(
+      vtksys::SystemTools::GetFilenamePath(module_path));
+    }
+
+  // Try to find path to exec using ::GetModuleFileName on the module that has
+  // the same name as the i18n library intl.dll
+
+  module_path_length = 
+    ::GetModuleFileName(GetModuleHandle("intl.dll"), module_path, _MAX_PATH);
   if (module_path_length)
     {
     search_dir_candidates.insert(
