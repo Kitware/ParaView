@@ -93,14 +93,23 @@ bool pqAbstractActivateEventPlayer::playEvent(QObject* Object,
       if(QMenuBar* menu_bar = qobject_cast<QMenuBar*>(p))
         {
         menu_bar->setActiveAction(next->menuAction());
-        next->show();
-        QCoreApplication::sendPostedEvents();
+        QCoreApplication::processEvents();
         }
       else if(QMenu* menu = qobject_cast<QMenu*>(p))
         {
-        menu->setActiveAction(next->menuAction());
-        next->show();
-        QCoreApplication::sendPostedEvents();
+        QRect geom = menu->actionGeometry(next->menuAction());
+        QMouseEvent button_press(QEvent::MouseButtonPress, 
+                                 geom.center(), 
+                                 Qt::LeftButton, Qt::LeftButton, 0);
+        QApplication::sendEvent(menu, &button_press);
+        // process events before mouse up to help our sub menu show up
+        QCoreApplication::processEvents();  
+        
+        QMouseEvent button_release(QEvent::MouseButtonRelease, 
+                                   geom.center(), 
+                                   Qt::LeftButton, 0, 0);
+        QApplication::sendEvent(menu, &button_release);
+        QCoreApplication::processEvents();
         }
       }
     
