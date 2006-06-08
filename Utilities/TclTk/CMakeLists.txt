@@ -98,7 +98,7 @@ ELSE(UNIX)
     SET (CONFIG_TYPES .)
   ENDIF (CMAKE_CONFIGURATION_TYPES)
 
-  SET(TCL_TK_WIN_VERSION "8.4.13") # or "8.4.5" if you need to revert
+  SET(TCL_TK_WIN_VERSION "8.4.13")
   SET(TCL_TK_WIN_DISTRIB_DIR 
     "${TclTk_SOURCE_DIR}/TclTk${TCL_TK_WIN_VERSION}Win")
 
@@ -144,12 +144,12 @@ ELSE(UNIX)
   ENDIF(NOT DEFINED TK_INCLUDE_PATH)
 
   IF(NOT DEFINED TCL_TCLSH)
-    SET(TCL_TCLSH ${TCL_TK_WIN_DISTRIB_DIR}/bin/tclsh84${SUFFIX_DEBUG}.exe
+    SET(TCL_TCLSH ${TCL_TK_WIN_DISTRIB_DIR}/bin/tclsh84.exe
       CACHE INTERNAL "Path to Tcl shell" FORCE)
   ENDIF(NOT DEFINED TCL_TCLSH)
 
   IF(NOT DEFINED TK_WISH)
-    SET(TK_WISH ${TCL_TK_WIN_DISTRIB_DIR}/bin/wish84${SUFFIX_DEBUG}.exe
+    SET(TK_WISH ${TCL_TK_WIN_DISTRIB_DIR}/bin/wish84.exe
       CACHE INTERNAL "Path to Tcl shell" FORCE)
   ENDIF(NOT DEFINED TK_WISH)
 
@@ -159,17 +159,21 @@ ELSE(UNIX)
     "${TclTk_SOURCE_DIR}/tk${TCL_TK_WIN_VERSION}/library")
 
   IF(BUILD_SHARED_LIBS)
-    SET(SUFFIX "")
-    SET(MSVCRT_SUFFIX "")
-    IF(TCL_LIBRARY MATCHES "(g|gx)\\.lib$")
-      SET(SUFFIX "g")
-      SET(MSVCRT_SUFFIX "d")
-    ENDIF(TCL_LIBRARY MATCHES "(g|gx)\\.lib$")
     SET(DLLS
-      "TclTk${TCL_TK_WIN_VERSION}Win/bin/tcl84${SUFFIX}.dll"
-      "TclTk${TCL_TK_WIN_VERSION}Win/bin/tk84${SUFFIX}.dll"
-      "TclTk${TCL_TK_WIN_VERSION}Win/bin/msvcrt${MSVCRT_SUFFIX}.dll"
+      "TclTk${TCL_TK_WIN_VERSION}Win/bin/tcl84.dll"
+      "TclTk${TCL_TK_WIN_VERSION}Win/bin/tk84.dll"
+      "TclTk${TCL_TK_WIN_VERSION}Win/bin/msvcrt.dll"
       tkdnd/lib/tkdnd/libtkdnd.dll)
+    # If VTK uses Tcl, there is *no* choice but installing the debug libs
+    # as well. VTK makes its choice regarding what to link against at
+    # link time, picking from either TCL_LIBRARY or (TCL_LIBRARY_DEBUG for
+    # example.
+    IF(VTK_WRAP_TCL)
+      SET(DLLS ${DLLS}
+        "TclTk${TCL_TK_WIN_VERSION}Win/bin/tcl84g.dll"
+        "TclTk${TCL_TK_WIN_VERSION}Win/bin/tk84g.dll"
+        "TclTk${TCL_TK_WIN_VERSION}Win/bin/msvcrtd.dll")
+    ENDIF(VTK_WRAP_TCL)
     FOREACH(dll ${DLLS})
       GET_FILENAME_COMPONENT(dllname ${dll} NAME)
       IF(TclTk_BIN_DIR)
