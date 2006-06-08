@@ -82,8 +82,8 @@ signals:
 
 public slots:
   void removeWidget(QWidget *widget);
-  void splitWidgetHorizontal(QWidget *widget);
-  void splitWidgetVertical(QWidget *widget);
+  pqMultiViewFrame* splitWidgetHorizontal(QWidget *widget);
+  pqMultiViewFrame* splitWidgetVertical(QWidget *widget);
 
 protected slots:
   void maximizeWidget(QWidget*);
@@ -92,7 +92,7 @@ protected slots:
 protected:
 
   bool eventFilter(QObject*, QEvent* e);
-  void splitWidget(QWidget*, Qt::Orientation);
+  pqMultiViewFrame* splitWidget(QWidget*, Qt::Orientation);
 
   void setup(pqMultiViewFrame*);
   void cleanup(pqMultiViewFrame*);

@@ -44,22 +44,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 
-namespace {
-  
-  QFrame* makeNewFrame()
-    {
-    QFrame* frame = new QFrame();
-    frame->setFrameShadow(QFrame::Sunken);
-    frame->setFrameShape(QFrame::Panel);
-    frame->setLineWidth(2);
-    return frame;
-    }
-  QSplitter* makeNewSplitter(Qt::Orientation orientation)
-    {
-    QSplitter* splitter = new QSplitter(orientation);
-    return splitter;
-    }
-}
 //-----------------------------------------------------------------------------
 pqMultiView::pqMultiView(QWidget* p)
   : QFrame(p)
@@ -71,12 +55,9 @@ pqMultiView::pqMultiView(QWidget* p)
   QSplitter* splitter = new QSplitter(this);
   splitter->setObjectName("MultiViewSplitter");
   l->addWidget(splitter);
-  splitter->addWidget(makeNewFrame());
-
-  pqMultiViewFrame* frame = new pqMultiViewFrame(this);
-  QWidget* old = this->replaceView(pqMultiView::Index(), frame);
-  delete old;
+  pqMultiViewFrame* frame = new pqMultiViewFrame;
   splitter->addWidget(frame);
+
   this->installEventFilter(this);
   this->setup(frame);
 }
@@ -172,7 +153,8 @@ void pqMultiView::removeView(QWidget* widget)
     // if splitter is empty, add place holder
     if(splitter->count() == 0 && splitter->parentWidget() == this)
       {
-      splitter->addWidget(makeNewFrame());
+      pqMultiViewFrame* frame = new pqMultiViewFrame;
+      splitter->addWidget(frame);
       }
     // if splitter can be merged with parent splitter
     else if(splitter->count() < 2 && splitter->parentWidget() != this)
@@ -205,7 +187,7 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index,
   Qt::Orientation orientation)
 {
 
-  QFrame* newFrame = NULL;
+  pqMultiViewFrame* newFrame = NULL;
 
   QWidget* w = this->widgetOfIndex(index);
   Q_ASSERT(w != NULL);
@@ -219,7 +201,7 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index,
     // change orientation
     splitter->setOrientation(orientation);
     // add new place holder
-    newFrame = makeNewFrame();
+    newFrame = new pqMultiViewFrame;
     splitter->addWidget(newFrame);
     // make equal spacing
     QList<int> sizes = splitter->sizes();
@@ -239,14 +221,15 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index,
     splitter->hide();
     
     int location = splitter->indexOf(w);
-    QSplitter* newSplitter = makeNewSplitter(orientation);
+    QSplitter* newSplitter = new QSplitter(orientation);
     // add splitter to splitter
     splitter->insertWidget(location, newSplitter);
     // remove from old splitter, and add to new splitter
     w->setParent(newSplitter);
     newSplitter->addWidget(w);
     // add new place holder
-    newFrame = makeNewFrame();
+    newFrame = new pqMultiViewFrame;
+
     newSplitter->addWidget(newFrame);
     
     splitter->show();
@@ -277,7 +260,8 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index,
   else
     {
     // insert new below or on right of existing one
-    newFrame = makeNewFrame();
+    newFrame = new pqMultiViewFrame;
+
     splitter->insertWidget(splitter->indexOf(w)+1, newFrame);
     
     // make equal spacing
@@ -431,25 +415,26 @@ void pqMultiView::removeWidget(QWidget* widget)
   delete widget;
 }
 
-void pqMultiView::splitWidget(QWidget* widget, Qt::Orientation o)
+pqMultiViewFrame* pqMultiView::splitWidget(QWidget* widget, Qt::Orientation o)
 {
   pqMultiView::Index index = this->indexOf(widget);
   pqMultiView::Index newindex = this->splitView(index, o);
-  pqMultiViewFrame* frame = new pqMultiViewFrame;
-  QWidget *old = this->replaceView(newindex, frame);
-  delete old;
+  QWidget *newWidget=this->widgetOfIndex(newindex);
+  pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(newWidget); 
   this->setup(frame);
   emit this->frameAdded(frame);
+  return frame;
 }
 
-void pqMultiView::splitWidgetHorizontal(QWidget* widget)
+pqMultiViewFrame* pqMultiView::splitWidgetHorizontal(QWidget* widget)
 {
-  this->splitWidget(widget, Qt::Horizontal);
+  return this->splitWidget(widget, Qt::Horizontal);
+
 }
 
-void pqMultiView::splitWidgetVertical(QWidget* widget)
+pqMultiViewFrame* pqMultiView::splitWidgetVertical(QWidget* widget)
 {
-  this->splitWidget(widget, Qt::Vertical);
+  return this->splitWidget(widget, Qt::Vertical);
 }
 
 void pqMultiView::maximizeWidget(QWidget* /*widget*/)
