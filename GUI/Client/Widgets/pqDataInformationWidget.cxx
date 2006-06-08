@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTableView>
 #include <QVBoxLayout>
 #include <QMenu>
+#include <QSortFilterProxyModel>
 
 // ParaQ includes.
 #include "pqApplicationCore.h"
@@ -50,7 +51,12 @@ pqDataInformationWidget::pqDataInformationWidget(QWidget* _parent /*=0*/)
 {
   this->Model = new pqDataInformationModel(this);
   this->View = new QTableView(this);
-  this->View->setModel(this->Model);
+
+  // We provide the sorting proxy model
+  QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
+  proxyModel->setSourceModel(this->Model);
+  
+  this->View->setModel(proxyModel);
   this->View->verticalHeader()->hide();
   this->View->installEventFilter(this);
   this->View->horizontalHeader()->setMovable(true);
@@ -113,6 +119,7 @@ void pqDataInformationWidget::showHeaderContextMenu(const QPoint& pos)
   menu.setHeaderView(header);
   menu.exec(this->View->mapToGlobal(pos));
 }
+
 //-----------------------------------------------------------------------------
 void pqDataInformationWidget::showBodyContextMenu(const QPoint& pos)
 {
@@ -126,4 +133,10 @@ void pqDataInformationWidget::showBodyContextMenu(const QPoint& pos)
     {
     this->View->horizontalHeader()->setVisible(action->isChecked());
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqDataInformationWidget::refreshData()
+{
+  this->Model->refreshModifiedData();
 }

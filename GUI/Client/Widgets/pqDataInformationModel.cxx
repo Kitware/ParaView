@@ -44,11 +44,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaQ includes.
 #include "pqPipelineSource.h"
 
+struct pqSourceInfo
+{
+  QPointer<pqPipelineSource> Source;
+  unsigned long MTime;
+  pqSourceInfo()
+    {
+    this->MTime = 0;
+    }
+  pqSourceInfo(pqPipelineSource* src)
+    {
+    this->Source = src;
+    this->MTime = 0;
+    }
+  pqSourceInfo(const pqSourceInfo& info)
+    {
+    this->Source = info.Source;
+    this->MTime = info.MTime;
+    }
+  operator pqPipelineSource*() const
+    {
+    return this->Source;
+    }
+  pqSourceInfo& operator=(pqPipelineSource* src)
+    {
+    this->Source = src;
+    this->MTime = 0;
+    return *this;
+    }
+};
+
 //-----------------------------------------------------------------------------
 class pqDataInformationModelInternal 
 {
 public:
-  QList<QPointer<pqPipelineSource> > Sources;
+  QList<pqSourceInfo > Sources;
+  vtkTimeStamp UpdateTime;
 
   // Given a data type ID, returns the string.
   QString getDataTypeAsString(int type)
@@ -117,14 +148,14 @@ pqDataInformationModel::~pqDataInformationModel()
 
 //-----------------------------------------------------------------------------
 int pqDataInformationModel::rowCount(
-  const QModelIndex& parent /*=QModelIndex()*/) const
+  const QModelIndex& vtkNotUsed(parent) /*=QModelIndex()*/) const
 {
   return (this->Internal->Sources.size());
 }
 
 //-----------------------------------------------------------------------------
 int pqDataInformationModel::columnCount(
-  const QModelIndex &parent /*= QModelIndex()*/) const
+  const QModelIndex &vtkNotUsed(parent) /*= QModelIndex()*/) const
 {
   return 5;
 }
@@ -150,10 +181,13 @@ QVariant pqDataInformationModel::data(const QModelIndex&index,
     return this->headerData(index.column(), Qt::Horizontal, Qt::DisplayRole);
     }
 
-  pqPipelineSource* source = this->Internal->Sources[index.row()];
+  pqSourceInfo &info = this->Internal->Sources[index.row()];
+  pqPipelineSource* source = info.Source;
   source->getProxy()->UpdateVTKObjects();
   vtkPVDataInformation* dataInfo = vtkSMSourceProxy::SafeDownCast(
     source->getProxy())->GetDataInformation();
+  info.MTime = dataInfo->GetMTime();
+
   int dataType = dataInfo->GetDataSetType();
   if (dataInfo->GetCompositeDataSetType() >= 0)
     {
@@ -209,12 +243,6 @@ QVariant pqDataInformationModel::data(const QModelIndex&index,
 
     }
   return QVariant();
-}
-
-//-----------------------------------------------------------------------------
-int pqDataInformationModel::row(pqPipelineSource* source)
-{
-  return this->Internal->Sources.indexOf(source);
 }
 
 //-----------------------------------------------------------------------------
@@ -278,53 +306,25 @@ void pqDataInformationModel::removeSource(pqPipelineSource* source)
 }
 
 //-----------------------------------------------------------------------------
-class pqDataInformationModelSorter 
+void pqDataInformationModel::refreshModifiedData()
 {
-public:
-  pqDataInformationModel* Model;
-  Qt::SortOrder Order;
-  int Column;
-  bool NumericCompare;
-
-  bool operator()(pqPipelineSource* a, pqPipelineSource* b)
+  QList<pqSourceInfo>::iterator iter;
+  int row = 0;
+  for (iter = this->Internal->Sources.begin(); 
+    iter != this->Internal->Sources.end(); ++iter, row++)
     {
-    QModelIndex indexA = this->Model->index(
-      this->Model->row(a), this->Column);
-
-    QModelIndex indexB = this->Model->index(
-      this->Model->row(b), this->Column);
-
-    if (this->NumericCompare)
+    vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(
+      iter->Source->getProxy());
+    if (!proxy)
       {
-      return (this->Order == Qt::AscendingOrder)?
-        (this->Model->data(indexA).toDouble() <
-         this->Model->data(indexB).toDouble()) :
-        (this->Model->data(indexA).toDouble() >
-         this->Model->data(indexB).toDouble());
+      continue;
       }
-
-    return (this->Order == Qt::AscendingOrder)?
-      (this->Model->data(indexA).toString() <
-       this->Model->data(indexB).toString()) :
-      (this->Model->data(indexA).toString() >
-       this->Model->data(indexB).toString());
+    if (proxy->GetDataInformation()->GetMTime() > iter->MTime)
+      {
+      emit this->dataChanged(this->index(row, 0),
+        this->index(row, 4));
+      }
     }
-};
-
-
-//-----------------------------------------------------------------------------
-void pqDataInformationModel::sort(int column, 
-  Qt::SortOrder order /*=Qt::AscendingOrder*/)
-{
-  pqDataInformationModelSorter sorter;
-  sorter.Model = this;
-  sorter.Column = column;
-  sorter.NumericCompare = (column >= pqDataInformationModel::CellCount);
-  sorter.Order = order;
-  qSort(this->Internal->Sources.begin(), this->Internal->Sources.end(),
-     sorter); 
-  emit this->layoutChanged();
 }
 
-//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

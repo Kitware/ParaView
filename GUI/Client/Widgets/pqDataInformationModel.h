@@ -66,16 +66,16 @@ public:
   virtual QVariant headerData(int section, Qt::Orientation orientation, 
     int role = Qt::DisplayRole) const;
 
-
-  void sort(int column, Qt::SortOrder order =Qt::AscendingOrder);
-
-  int row(pqPipelineSource* source);
 public slots:
   // Called when a new source/filter is registered.
   void addSource(pqPipelineSource* source);
 
   // Called when a new source/filter is unregistred.
   void removeSource(pqPipelineSource* source);
+
+  // Called to make the model scan through the data information for
+  // all know sources and update data if information for any source changed.
+  void refreshModifiedData();
 
 private:
   pqDataInformationModelInternal* Internal;

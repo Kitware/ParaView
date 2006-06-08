@@ -447,7 +447,6 @@ void pqMainWindow::createStandardDataInformationWidget(bool visible)
     "DataInformationWidget");
   dock->setWidget(this->Implementation->DataInformationWidget);
   
-
   this->addStandardDockWidget(Qt::BottomDockWidgetArea, dock, 
     QIcon(), visible);
 }
@@ -1692,6 +1691,10 @@ void pqMainWindow::onActiveSourceChanged(pqPipelineSource* src)
 void pqMainWindow::postAcceptUpdate()
 {
   this->updateFiltersMenu(pqApplicationCore::instance()->getActiveSource());
+  if (this->Implementation->DataInformationWidget)
+    {
+    this->Implementation->DataInformationWidget->refreshData();
+    }
 }
 
 //-----------------------------------------------------------------------------

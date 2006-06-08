@@ -51,6 +51,11 @@ protected:
   // Filters events received by the View.
   virtual bool eventFilter(QObject* object, QEvent *event);
 
+public slots:
+  // Invoke this slot to force the information widget to update
+  // data information. Typically called after Accept().
+  void refreshData();
+
 private slots:
   void showHeaderContextMenu(const QPoint&);
   void showBodyContextMenu(const QPoint&);
