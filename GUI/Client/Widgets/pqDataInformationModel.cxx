@@ -219,7 +219,8 @@ QVariant pqDataInformationModel::data(const QModelIndex&index,
     switch(role)
       {
     case Qt::DisplayRole:
-      return QVariant(dataInfo->GetNumberOfCells());
+      return QVariant(static_cast<unsigned int>(
+          dataInfo->GetNumberOfCells()));
       }
     break;
 
@@ -228,7 +229,8 @@ QVariant pqDataInformationModel::data(const QModelIndex&index,
     switch (role)
       {
     case Qt::DisplayRole:
-      return QVariant(dataInfo->GetNumberOfPoints());
+      return QVariant(static_cast<unsigned int>(
+          dataInfo->GetNumberOfPoints()));
       }
     break;
 
