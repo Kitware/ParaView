@@ -33,6 +33,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqComboBoxDomain.h
   pqCompoundProxyWizard.h
   pqCutPanel.h
+  pqDataInformationModel.h
+  pqDataInformationWidget.h
   pqDataSetModel.h
   pqDisplayProxyEditor.h
   pqDoubleSpinBoxDomain.h
@@ -131,6 +133,10 @@ ADD_LIBRARY(pqWidgets
   pqCompoundProxyWizard.h
   pqCutPanel.cxx
   pqCutPanel.h
+  pqDataInformationModel.cxx
+  pqDataInformationModel.h
+  pqDataInformationWidget.cxx
+  pqDataInformationWidget.h
   pqDataSetModel.cxx
   pqDataSetModel.h
   pqDisplayProxyEditor.cxx

@@ -44,6 +44,8 @@ SET(QtWidgets_SRCS
   pqLocalFileDialogModel.h
   pqPlayControlsWidget.cxx
   pqPlayControlsWidget.h
+  pqSectionVisibilityContextMenu.cxx
+  pqSectionVisibilityContextMenu.h
   pqSetData.cxx
   pqSetData.h
   pqSetName.cxx
@@ -71,6 +73,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqListWidgetItemObject.h
   pqLocalFileDialogModel.h
   pqPlayControlsWidget.h
+  pqSectionVisibilityContextMenu.h
   pqSignalAdaptors.h
   pqTreeWidgetItemObject.h
 )

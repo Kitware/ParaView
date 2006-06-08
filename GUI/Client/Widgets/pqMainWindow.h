@@ -95,6 +95,8 @@ public:
   void createStandardObjectInspector(bool visible = true);
   /// Creates a "standard" ParaQ element inspector
   void createStandardElementInspector(bool visible = true);
+  /// Create a "standard" ParaQ Data Information Widget.
+  void createStandardDataInformationWidget(bool visible=true);
 
   /// Creates the "standard" VCR toolbar
   void createStandardVCRToolBar();

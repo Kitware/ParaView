@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqCompoundProxyWizard.h"
+#include "pqDataInformationWidget.h"
 #include "pqElementInspectorWidget.h"
 #include "pqMultiViewFrame.h"
 #include "pqMultiView.h"
@@ -138,6 +139,7 @@ public:
     UndoRedoToolBar(0),
     VariableSelectorToolBar(0),
     VCRController(0),
+    DataInformationWidget(0),
     IgnoreBrowserSelectionChanges(false)
   {
 
@@ -155,6 +157,8 @@ public:
     delete this->MultiViewManager;
     this->MultiViewManager = 0;
 
+    delete this->DataInformationWidget;
+    this->DataInformationWidget = 0;
   }
 
   // Stores standard menus
@@ -180,6 +184,7 @@ public:
   QToolBar* UndoRedoToolBar;
   QToolBar* VariableSelectorToolBar;
   pqVCRController* VCRController;
+  pqDataInformationWidget* DataInformationWidget;
 
   bool IgnoreBrowserSelectionChanges;
 };
@@ -408,9 +413,6 @@ void pqMainWindow::createStandardPipelineBrowser(bool visible)
     Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
   pipeline_dock->setFeatures(QDockWidget::AllDockWidgetFeatures);
 
-  // Make sure the pipeline data instance is created before the
-  // pipeline list model. This ensures that the connections will
-  // work.
   this->Implementation->PipelineBrowser = new pqPipelineBrowser(pipeline_dock);
   this->Implementation->PipelineBrowser->setObjectName("PipelineList");
   pipeline_dock->setWidget(this->Implementation->PipelineBrowser);
@@ -427,6 +429,29 @@ void pqMainWindow::createStandardPipelineBrowser(bool visible)
     SLOT(select(pqServerManagerModelItem*)));
 
 }
+//-----------------------------------------------------------------------------
+void pqMainWindow::createStandardDataInformationWidget(bool visible)
+{
+  QDockWidget* const dock = 
+    new QDockWidget("Statistics View", this) 
+    << pqSetName("StatisticsViewDock");
+    
+  dock->setAllowedAreas(
+    Qt::BottomDockWidgetArea |
+    Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+  dock->setFeatures(QDockWidget::AllDockWidgetFeatures);
+
+  this->Implementation->DataInformationWidget = 
+    new pqDataInformationWidget(dock);
+  this->Implementation->DataInformationWidget->setObjectName(
+    "DataInformationWidget");
+  dock->setWidget(this->Implementation->DataInformationWidget);
+  
+
+  this->addStandardDockWidget(Qt::BottomDockWidgetArea, dock, 
+    QIcon(), visible);
+}
+
 //-----------------------------------------------------------------------------
 void pqMainWindow::createStandardObjectInspector(bool visible)
 {
