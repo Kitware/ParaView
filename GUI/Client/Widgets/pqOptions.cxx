@@ -36,12 +36,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkObjectFactory.h>
 
 vtkStandardNewMacro(pqOptions);
-vtkCxxRevisionMacro(pqOptions, "1.10");
+vtkCxxRevisionMacro(pqOptions, "1.11");
 
 //-----------------------------------------------------------------------------
 pqOptions::pqOptions()
 {
-  this->TestUINames = 0;
   this->BaselineImage = 0;
   this->TestDirectory = 0;
   this->TestFileName = 0;
@@ -71,9 +70,6 @@ void pqOptions::Initialize()
     &this->TestDirectory,
     "Set the temporary directory where test-case output will be stored.");
   
-  this->AddBooleanArgument("--test-ui-names", NULL, &this->TestUINames,
-    "Test all UI widgets to see that they are named properly for regression-test playback.");
-  
   this->AddArgument("--run-test", NULL,
     &this->TestFileName,  "Run a recorded test case.");
   
@@ -95,7 +91,6 @@ void pqOptions::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "TestUINames: " << this->TestUINames << endl;
   os << indent << "ImageThreshold: " << this->ImageThreshold
     << endl;
   os << indent << "BaselineImage: " << (this->BaselineImage?

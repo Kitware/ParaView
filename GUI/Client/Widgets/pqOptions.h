@@ -47,7 +47,6 @@ public:
   vtkTypeRevisionMacro(pqOptions, vtkPVOptions);
   void PrintSelf(ostream &os, vtkIndent indent);
 
-  vtkGetMacro(TestUINames, int);
   vtkGetStringMacro(TestFileName);
   vtkGetStringMacro(TestDirectory);
   vtkGetStringMacro(BaselineImage);
@@ -60,7 +59,6 @@ protected:
   virtual void Initialize();
   virtual int PostProcess(int argc, const char * const *argv);
 
-  int TestUINames;
   char* TestFileName;
   char* TestDirectory;
   char* BaselineImage;

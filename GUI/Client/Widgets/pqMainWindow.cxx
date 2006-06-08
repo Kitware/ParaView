@@ -380,9 +380,9 @@ void pqMainWindow::createStandardToolsMenu()
 
   menu->addSeparator();
   
-  menu->addAction(tr("&Validate Widget Names"))
-    << pqSetName("Validate")
-    << pqConnect(SIGNAL(triggered()), this, SLOT(onValidateWidgetNames()));
+  menu->addAction(tr("&Dump Widget Names"))
+    << pqSetName("DumpWidgets")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(onDumpWidgetNames()));
   
   menu->addAction(tr("&Record Test"))
     << pqSetName("Record")
@@ -1449,9 +1449,10 @@ void pqMainWindow::onOpenCompoundFilterWizard()
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindow::onValidateWidgetNames()
+void pqMainWindow::onDumpWidgetNames()
 {
-  pqObjectNaming::Validate(*this);
+  const QString output = pqObjectNaming::DumpHierarchy();
+  qDebug() << output;
 }
 
 //-----------------------------------------------------------------------------

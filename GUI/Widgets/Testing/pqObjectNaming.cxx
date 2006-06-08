@@ -55,232 +55,55 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolButton>
 #include <QtDebug>
 
-/// Returns the name of an object.  In some cases, assigns a name as a convenience.  Also strips-out problematic characters (such as '/').
+/** Returns the name of an object.  If the object doesn't have an explicit name,
+assigns a name as a convenience.  Also replaces problematic characters such as '/'.
+*/
 static const QString InternalGetName(QObject& Object)
 {
   QString result = Object.objectName();
 
   if(result.isEmpty())
     {
-    QWidget* widget = qobject_cast<QWidget*>(&Object);
-    if(widget)
+    QObjectList siblings;
+    if(Object.parent())
       {
-      QList<QWidget*> widgets;
-      QWidget* parentWidget = widget->parentWidget();
-      if(parentWidget)
+      siblings = Object.parent()->children();
+      }
+    else
+      {
+      QWidgetList widgets = QApplication::topLevelWidgets();
+      for(int i = 0; i != widgets.size(); ++i)
         {
-        widgets = parentWidget->findChildren<QWidget*>();
-        }
-      else if(!widget->parent())
-        {
-        widgets = QApplication::topLevelWidgets();
-        }
-
-      QString type = widget->metaObject()->className();
-      int index = 0;
-      bool found = false;
-      for(int i=0; i<widgets.size() && !found; i++)
-        {
-        QWidget* test = widgets[i];
-        if(test == widget)
-          {
-          found = true;
-          }
-        else if(test->isVisible() == widget->isVisible() 
-                && QString(test->metaObject()->className()) == type)
-          {
-          index++;
-          }
-        }
-      if(found)
-        {
-        result = QString("%1").arg(widget->isVisible()) + type + QString("%1").arg(index);
+        siblings.push_back(widgets[i]);
         }
       }
+      
+    const QString type = Object.metaObject()->className();
+    
+    int index = 0;
+    for(int i = 0; i != siblings.size(); ++i)
+      {
+      QObject* test = siblings[i];
+      if(test == &Object)
+        {
+        break;
+        }
+      else if(
+        type == test->metaObject()->className()
+        && test->objectName().isEmpty())
+        {
+        ++index;
+        }
+      }
+      
+    if(QWidget* const widget = qobject_cast<QWidget*>(&Object))
+      {
+      result += QString::number(widget->isVisible());
+      }
+    result += type + QString::number(index);
     }
 
   result.replace("/", "|");
-  return result;
-}
-
-/// Returns true iff the given object needs to have its name validated
-static bool ValidateName(QObject& Object)
-{
-  const QString class_name = Object.metaObject()->className();
-
-  // If you add a button to a QToolBar using addAction(), the button is unnamed,
-  // so we have to skip all QToolButtons, which is unsatisfying, since it may
-  // cause false negatives for QToolButtons that were manually added without a name.
-  if(qobject_cast<QToolButton*>(&Object) && qobject_cast<QToolBar*>(Object.parent()))
-    {
-    return false;
-    }
-  
-  if(QAction* const action = qobject_cast<QAction*>(&Object))
-    {
-    // Skip separators ...
-    if(action->isSeparator())
-      return false;
-
-    // Skip menu implementation details ...
-    if(QMenu* const menu = qobject_cast<QMenu*>(Object.parent()))
-      {
-      if(menu->menuAction() == action)
-        {
-        return false;
-        }
-      }
-
-    // Skip dock widget implementation details ...
-    if(QDockWidget* const dock = qobject_cast<QDockWidget*>(Object.parent()))
-      {
-      if(dock->toggleViewAction() == action)
-        {
-        return false;
-        }
-      }
-
-    // Skip toolbar implementation details ...
-    if(QToolBar* const toolbar = qobject_cast<QToolBar*>(Object.parent()))
-      {
-      if(toolbar->toggleViewAction() == action)
-        {
-        return false;
-        }
-      }
-    }
-  
-  // Skip menubar implementation details ...
-  if(qobject_cast<QMenuBar*>(Object.parent()))
-    {
-    if(QWidget* const widget = qobject_cast<QWidget*>(&Object))
-      {
-      if(widget->windowType() == Qt::Popup)
-        {
-        return false;
-        }
-      }
-    }
-  
-  // Skip tab widget implementation details ...
-  if(qobject_cast<QTabWidget*>(Object.parent()))
-    {
-      if(qobject_cast<QTabBar*>(&Object) || qobject_cast<QToolButton*>(&Object))
-        {
-        return false;
-        }
-    }
-  
-  // Skip QVTKWidget implementation details ...
-  if(QString(Object.parent()->metaObject()->className()) == "QVTKWidget")
-    {
-    return false;
-    }
-  
-  // Skip line edit implementation details ...
-  if(qobject_cast<QLineEdit*>(Object.parent()))
-    {
-    return false;
-    }
-
-  // Skip objects that aren't normally used for user input ...  
-  if(
-    qobject_cast<QAbstractItemDelegate*>(&Object)
-    || qobject_cast<QAbstractItemModel*>(&Object)
-    || qobject_cast<QFocusFrame*>(&Object)
-    || qobject_cast<QHeaderView*>(&Object)
-    || qobject_cast<QItemSelectionModel*>(&Object)
-    || qobject_cast<QLabel*>(&Object)
-    || qobject_cast<QLayout*>(&Object)
-    || qobject_cast<QScrollBar*>(&Object)
-    || qobject_cast<QSignalMapper*>(&Object))
-    {
-    return false;
-    }
-
-  // Skip some weird dock widget implementation details ...
-  if(
-    class_name == "QDockSeparator"
-    || class_name == "QDockWidgetSeparator"
-    || class_name == "QDockWidgetTitleButton"
-    || class_name == "QWidgetResizeHandler")
-    {
-    return false;
-    }
-
-  // Skip some weird toolbar implementation details ...
-  if(
-    class_name == "QToolBarHandle"
-    || class_name == "QToolBarWidgetAction")
-    {
-    return false;
-    }
-    
-  // Skip ParaView stuff ...
-  if(
-    class_name == "pqPropertyManager"
-    || class_name == "pqPipelineModelItem")
-    {
-    return false;
-    }
-  
-  return true;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-// pqObjectNaming
-
-bool pqObjectNaming::Validate(QObject& Parent)
-{
-  const QString name = InternalGetName(Parent);
-  if(name.isEmpty())
-    {
-    qWarning() << "Unnamed root widget\n";
-    return false;
-    }
-    
-  return pqObjectNaming::Validate(Parent, "/" + name);
-}
-
-bool pqObjectNaming::Validate(QObject& Parent, const QString& Path)
-{
-//  qDebug() << Path << ": " << &Parent;
-
-  bool result = true;
-  
-  QSet<QString> names;
-  const QObjectList children = Parent.children();
-  for(int i = 0; i != children.size(); ++i)
-    {
-    QObject* child = children[i];
-
-    // Only validate names for objects that require them ...
-    if(ValidateName(*child))
-      {
-      const QString name = InternalGetName(*child);
-      if(name.isEmpty())
-        {
-        qWarning() << Path << " - unnamed child object: " << child;
-        result = false;
-        }
-      else
-        {
-        if(names.contains(name))
-          {
-          qWarning() << Path << " - duplicate child object name [" << name << "]: " << child;
-          result = false;
-          }
-          
-        names.insert(name);
-        }
-      
-      if(!pqObjectNaming::Validate(*child, Path + "/" + name))
-        {
-        result = false;
-        }
-      }
-    }
-  
   return result;
 }
 
@@ -358,4 +181,32 @@ QObject* pqObjectNaming::GetObject(const QString& Name)
   
   qCritical() << "Couldn't find object " << Name;
   return 0;
+}
+
+const QString pqObjectNaming::DumpHierarchy()
+{
+  QString result;
+  
+  const QWidgetList widgets = QApplication::topLevelWidgets();
+  for(int i = 0; i != widgets.size(); ++i)
+    {
+    result += DumpHierarchy(*widgets[i]);
+    }
+  
+  return result;
+}
+
+const QString pqObjectNaming::DumpHierarchy(QObject& Object)
+{
+  QString result;
+
+  result += GetName(Object) + "\n";
+  
+  const QObjectList children = Object.children();
+  for(int i = 0; i != children.size(); ++i)
+    {
+    result += DumpHierarchy(*children[i]);
+    }
+  
+  return result;
 }

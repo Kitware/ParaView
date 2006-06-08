@@ -102,7 +102,6 @@ IF(BUILD_TESTING)
     UndoRedo
     SubMenu
     ObjectInspectorSphere
-    ObjectInspectorGlyph
     VariableSelector
     Clip
     Cut
@@ -117,10 +116,6 @@ IF(BUILD_TESTING)
     AboutDialog
     )
 
-  # Special-case test to see that Qt widgets are all named properly for test playback
-  ADD_TEST(pqClientWidgetNaming  ${TEST_BINARY} --test-ui-names --exit)
-  ADD_TEST(pqClientWidgetNaming2  ${TEST_BINARY} --run-test=${TEST_XML}/WidgetNaming2.xml --test-ui-names --exit)
-               
   FOREACH(test ${TESTS_WITHOUT_BASELINES})
     ADD_TEST(pqClient${test}
       ${TEST_BINARY} --run-test=${TEST_XML}/${test}.xml --exit)

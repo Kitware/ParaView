@@ -164,7 +164,7 @@ public slots:
   void onServerConnect(pqServer* Server);
   void onServerDisconnect();
 
-  void onValidateWidgetNames();
+  void onDumpWidgetNames();
   void onRecordTest();
   void onRecordTest(const QStringList& Files);
   void onRecordTestScreenshot();

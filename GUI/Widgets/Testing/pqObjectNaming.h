@@ -42,16 +42,15 @@ class QString;
 class QTTESTING_EXPORT pqObjectNaming
 {
 public:
-  /// Recursively validates that every child of the given QObject is named correctly for testing
-  static bool Validate(QObject& Parent);
-
   /// Returns a unique identifier for the given object that can be serialized for later regression test playback
   static const QString GetName(QObject& Object);
   /// Given a unique identifier returned by GetName(), returns the corresponding object, or NULL
   static QObject* GetObject(const QString& Name);
   
-private:
-  static bool Validate(QObject& Parent, const QString& Path);
+  /** Dumps the widget hierarchy to a string */
+  static const QString DumpHierarchy();
+  /** Dumps a subtree of the widget hierarchy to a string */
+  static const QString DumpHierarchy(QObject& Object);
 };
 
 #endif // !_pqObjectNaming_h

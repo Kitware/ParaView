@@ -111,7 +111,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.9");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.10");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -169,11 +169,6 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
         status = !this->compareView(options->GetBaselineImage(),
           options->GetImageThreshold(), cout, options->GetTestDirectory());
         dont_start_event_loop = 1;
-        }
-        
-      if(options->GetTestUINames())
-        {
-        status = !pqObjectNaming::Validate(*this->Implementation->Window);
         }
         
       if (options->GetExitBeforeEventLoop())
