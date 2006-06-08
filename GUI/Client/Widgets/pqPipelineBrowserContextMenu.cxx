@@ -86,8 +86,8 @@ void pqPipelineBrowserContextMenu::showContextMenu(const QPoint &pos)
   QModelIndex current = tree->selectionModel()->currentIndex();
   pqPipelineModel *model = this->Browser->getListModel();
   pqPipelineSource *source = dynamic_cast<pqPipelineSource*>(
-    model->getItem(current));
-  pqServer* server = dynamic_cast<pqServer*>(model->getItem(current));
+    model->getItemFor(current));
+  pqServer* server = dynamic_cast<pqServer*>(model->getItemFor(current));
   if(source)
     {
     QAction* action;
@@ -131,7 +131,7 @@ void pqPipelineBrowserContextMenu::showDisplayEditor()
   QModelIndex current = tree->selectionModel()->currentIndex();
   pqPipelineModel *model = this->Browser->getListModel();
   pqPipelineSource *source = dynamic_cast<pqPipelineSource*>(
-    model->getItem(current));
+      model->getItemFor(current));
   if(!source)
     {
     return;

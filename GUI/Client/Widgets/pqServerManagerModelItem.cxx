@@ -54,7 +54,6 @@ pqServerManagerModelItem::~pqServerManagerModelItem()
 void pqServerManagerModelItem::setType(pqPipelineModel::ItemType type)
 {
   this->ModelType = type;
-  emit this->dataModified();
 }
 
 

@@ -63,6 +63,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqRenderModule.h
   pqRenderViewEditor.h
   pqRenderWindowManager.h
+  pqServer.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
   pqServerManagerModel.h

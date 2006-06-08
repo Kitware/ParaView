@@ -503,6 +503,32 @@ void pqApplicationCore::removeSource(pqPipelineSource* source)
   this->getActiveRenderModule()->render();
 }
 
+void pqApplicationCore::removeActiveServer()
+{
+  pqServer* server = this->getActiveServer();
+  if (!server)
+    {
+    qDebug() << "No active server to remove.";
+    return;
+    }
+  this->removeServer(server);
+}
+
+void pqApplicationCore::removeServer(pqServer* server)
+{
+  if (!server)
+    {
+    qDebug() << "No server to remove.";
+    return;
+    }
+
+  this->getServerManagerModel()->beginRemoveServer(server);
+  this->setActiveSource(NULL);
+  this->getPipelineBuilder()->deleteProxies(server);
+  pqServer::disconnect(server);
+  this->getServerManagerModel()->endRemoveServer();
+}
+
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::createPendingDisplays()

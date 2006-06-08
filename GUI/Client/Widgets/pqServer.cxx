@@ -270,7 +270,7 @@ QString pqServer::getAddress() const
 void pqServer::setFriendlyName(const QString& name)
 {
   this->FriendlyName = name;
-  emit this->dataModified();
+  emit this->friendlyNameChanged();
 }
 
 //-----------------------------------------------------------------------------

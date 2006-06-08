@@ -117,6 +117,9 @@ public:
   void removeActiveSource();
   void removeSource(pqPipelineSource* source);
 
+  void removeActiveServer();
+  void removeServer(pqServer *server);
+
   /// returns the active source.
   pqPipelineSource* getActiveSource();
 

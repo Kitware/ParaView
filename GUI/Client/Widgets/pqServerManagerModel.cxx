@@ -278,6 +278,11 @@ void pqServerManagerModel::onAddServer(pqServer* server)
 
   this->Internal->Servers.push_back(server);
 
+  // Listen for server name changes. The signal will be mapped to the
+  // name change signal.
+  QObject::connect(server, SIGNAL(friendlyNameChanged()),
+      this, SLOT(updateServerName()));
+
   emit this->serverAdded(server);
 }
 
@@ -353,6 +358,18 @@ void pqServerManagerModel::onRemoveRenderModule(vtkSMRenderModuleProxy* rm)
   emit this->renderModuleRemoved(toRemove);
 
   delete toRemove;
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerModel::beginRemoveServer(pqServer *server)
+{
+  emit this->aboutToRemoveServer(server);
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerModel::endRemoveServer()
+{
+  emit this->finishedRemovingServer();
 }
 
 //-----------------------------------------------------------------------------
@@ -447,5 +464,16 @@ unsigned int pqServerManagerModel::getNumberOfServers()
 unsigned int pqServerManagerModel::getNumberOfSources()
 {
   return static_cast<unsigned int>(this->Internal->Sources.size());
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerModel::updateServerName()
+{
+  // Get the server object from the sender.
+  pqServer *server = qobject_cast<pqServer *>(this->sender());
+  if(server)
+    {
+    emit this->nameChanged(server);
+    }
 }
 

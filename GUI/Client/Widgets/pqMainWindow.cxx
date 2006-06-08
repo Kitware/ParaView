@@ -940,9 +940,7 @@ void pqMainWindow::onFileNew()
   pqServer* server = pqApplicationCore::instance()->getActiveServer();
   if (server)
     {
-    pqApplicationCore::instance()->setActiveSource(NULL);
-    pqApplicationCore::instance()->getPipelineBuilder()->deleteProxies(server);
-    pqServer::disconnect(server);
+    pqApplicationCore::instance()->removeServer(server);
     }
   this->updateEnableState();
 

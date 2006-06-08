@@ -38,6 +38,7 @@ class vtkPVOptions;
 class vtkSMApplication;
 class vtkSMProxyManager;
 class vtkSMMultiViewRenderModuleProxy;
+class vtkSMRenderModuleProxy;
 
 #include "pqWidgetsExport.h"
 #include "pqServerManagerModelItem.h"
@@ -48,6 +49,8 @@ class vtkSMMultiViewRenderModuleProxy;
 /// have more than one connect at a time / open and close connections at-will
 class PQWIDGETS_EXPORT pqServer : public pqServerManagerModelItem 
 {
+  Q_OBJECT
+
 public:
   /// Constructs a standalone or "built-in" server connection, returns NULL on failure
   static pqServer* CreateStandalone();
@@ -84,6 +87,9 @@ public:
   // Return the number of data server partitions on this 
   // server connection. A convenience method.
   int getNumberOfPartitions();
+
+signals:
+  void friendlyNameChanged();
 
 protected:
 

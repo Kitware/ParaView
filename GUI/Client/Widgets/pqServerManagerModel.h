@@ -45,6 +45,7 @@ class pqPipelineSource;
 class pqRenderModule;
 class pqServer;
 class pqServerManagerModelInternal;
+class pqServerManagerModelItem;
 
 // pqServerManagerModel is the model for the Server Manager.
 // All the pipelines in the Server Manager need a GUI representation
@@ -100,6 +101,10 @@ public:
   pqRenderModule* getRenderModule(vtkSMRenderModuleProxy*);
   pqRenderModule* getRenderModule(QVTKWidget*);
 
+  /// Book end events for removing a server.
+  void beginRemoveServer(pqServer *server);
+  void endRemoveServer();
+
 public slots:
   /// Call when a  new vtkSMProxy is registered with the proxy manager
   /// under the "sources" group.
@@ -136,6 +141,12 @@ signals:
   // onAddSource) and then this signal is emitted.
   void serverAdded(pqServer* server);
 
+  /// Fired when beginRemoveServer is called.
+  void aboutToRemoveServer(pqServer* server);
+
+  /// Fired when endRemoveServer is called.
+  void finishedRemovingServer();
+
   // When a connection is disconneted on the vtkProcessModule,
   // this event is fired before the pqServer object is destroyed.
   // It is not safe to access the actual vtkProcessModule connection 
@@ -161,6 +172,14 @@ signals:
 
   /// Fired when a render module is gone for ever.
   void renderModuleRemoved(pqRenderModule* rm);
+
+  /// Fired when the name of an item changes.
+  void nameChanged(pqServerManagerModelItem *item);
+
+private slots:
+  /// Used to map a server name change to the name changed signal.
+  void updateServerName();
+
 private:
   pqServerManagerModelInternal* Internal;
   static pqServerManagerModel* Instance;

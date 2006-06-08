@@ -83,6 +83,10 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
     SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)),
     this->ListModel, 
     SLOT(removeConnection(pqPipelineSource*, pqPipelineSource*)));
+  QObject::connect(smModel, SIGNAL(nameChanged(pqServerManagerModelItem *)),
+    this->ListModel, SLOT(updateItemName(pqServerManagerModelItem *)));
+  QObject::connect(smModel, SIGNAL(aboutToRemoveServer(pqServer *)),
+    this->ListModel, SLOT(startRemovingServer(pqServer *)));
 
   // Create a flat tree view to display the pipeline.
   this->TreeView = new pqFlatTreeView(this);
@@ -181,7 +185,7 @@ pqServerManagerModelItem* pqPipelineBrowser::getCurrentSelection() const
   if(selectionModel && this->ListModel)
     {
     QModelIndex index = selectionModel->currentIndex();
-    return this->ListModel->getItem(index);
+    return this->ListModel->getItemFor(index);
     }
   return 0;
 }
@@ -244,13 +248,17 @@ void pqPipelineBrowser::deleteSelected()
 {
   // Get the selected item(s) from the selection model.
   QModelIndex current = this->TreeView->selectionModel()->currentIndex();
-  pqServerManagerModelItem *item = this->ListModel->getItem(current);
+  pqServerManagerModelItem *item = this->ListModel->getItemFor(current);
   pqPipelineSource *source = qobject_cast<pqPipelineSource *>(item);
+  pqServer *server = qobject_cast<pqServer *>(item);
   if(source)
     {
     pqApplicationCore::instance()->removeSource(source);
     }
-  // TODO: Handle the delete of a server and a link.
+  else if(server)
+    {
+    pqApplicationCore::instance()->removeServer(server);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -260,7 +268,7 @@ void pqPipelineBrowser::changeCurrent(const QModelIndex &current,
   if(this->ListModel)
     {
     // Get the current item from the model.
-    pqServerManagerModelItem* item = this->ListModel->getItem(current);
+    pqServerManagerModelItem* item = this->ListModel->getItemFor(current);
 
     emit this->selectionChanged(item); 
     }
