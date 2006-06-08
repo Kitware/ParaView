@@ -46,6 +46,7 @@ pqSourceInfoModelItem::~pqSourceInfoModelItem()
 
 pqSourceInfoModel::pqSourceInfoModel(const QStringList &sources,
     QObject *parentObject)
+ : QAbstractItemModel(parentObject)
 {
   this->Root = new pqSourceInfoModelItem();
 
@@ -90,7 +91,7 @@ int pqSourceInfoModel::rowCount(const QModelIndex &parentIndex) const
   return 0;
 }
 
-int pqSourceInfoModel::columnCount(const QModelIndex &parentIndex) const
+int pqSourceInfoModel::columnCount(const QModelIndex&) const
 {
   return 1;
 }

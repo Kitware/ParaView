@@ -72,7 +72,7 @@ QVariant pqSourceHistoryModel::data(const QModelIndex &idx, int role) const
   return QVariant();
 }
 
-Qt::ItemFlags pqSourceHistoryModel::flags(const QModelIndex &idx) const
+Qt::ItemFlags pqSourceHistoryModel::flags(const QModelIndex&) const
 {
   return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 }
@@ -87,7 +87,7 @@ QString pqSourceHistoryModel::getFilterName(const QModelIndex &idx) const
   return QString();
 }
 
-QModelIndex pqSourceHistoryModel::getIndexFor(const QString &filter) const
+QModelIndex pqSourceHistoryModel::getIndexFor(const QString&) const
 {
   return QModelIndex();
 }

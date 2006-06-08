@@ -209,7 +209,7 @@ void pqPipelineMenu::getAllowedSources(pqSourceInfoModel *model,
   // Loop through the list of filter prototypes to find the ones that
   // are compatible with the input.
   vtkSMProxy *prototype = 0;
-  vtkSMProxyProperty *property = 0;
+  vtkSMProxyProperty *prop = 0;
   vtkSMProxyManager *manager = vtkSMObject::GetProxyManager();
   QStringList::Iterator iter = available.begin();
   for( ; iter != available.end(); ++iter)
@@ -218,13 +218,13 @@ void pqPipelineMenu::getAllowedSources(pqSourceInfoModel *model,
         (*iter).toAscii().data());
     if(prototype)
       {
-      property = vtkSMProxyProperty::SafeDownCast(
+      prop = vtkSMProxyProperty::SafeDownCast(
           prototype->GetProperty("Input"));
-      if(property)
+      if(prop)
         {
-        property->RemoveAllUncheckedProxies();
-        property->AddUncheckedProxy(input);
-        if(property->IsInDomains())
+        prop->RemoveAllUncheckedProxies();
+        prop->AddUncheckedProxy(input);
+        if(prop->IsInDomains())
           {
           list.append(*iter);
           }
