@@ -59,15 +59,12 @@ pqEventPlayer::pqEventPlayer()
                                           const QString&, 
                                           const QString&)),
                    Qt::QueuedConnection);
-
-  this->BasicPlayer = new pqBasicWidgetEventPlayer();
 }
 
 pqEventPlayer::~pqEventPlayer()
 {
   for(int i = 0; i != this->Players.size(); ++i)
     delete this->Players[i];
-  delete this->BasicPlayer;
 }
 
 void pqEventPlayer::addDefaultWidgetEventPlayers()
@@ -78,6 +75,7 @@ void pqEventPlayer::addDefaultWidgetEventPlayers()
   addWidgetEventPlayer(new pqAbstractIntEventPlayer());
   addWidgetEventPlayer(new pqAbstractItemViewEventPlayer());
   addWidgetEventPlayer(new pqAbstractStringEventPlayer());
+  addWidgetEventPlayer(new pqBasicWidgetEventPlayer());
 }
 
 void pqEventPlayer::addWidgetEventPlayer(pqWidgetEventPlayer* Player)
@@ -123,18 +121,6 @@ void pqEventPlayer::internalPlayEvent(const QString& Object,
         }
       return;
       }
-    }
-
-  bool error = false;
-  if(this->BasicPlayer->playEvent(object, Command, Arguments, error))
-    {
-    if(error)
-      {
-      qCritical() << "Error playing command " << Command << " object " << object;
-      this->exit(false);
-      return;
-      }
-    return;
     }
 
   qCritical() << "No player for command " << Command << " object " << object;

@@ -127,7 +127,6 @@ private:
 
   /// Stores the working set of widget players  
   QList<pqWidgetEventPlayer*> Players;
-  pqWidgetEventPlayer* BasicPlayer;
   QEventLoop EventLoop;
   QList<QPointer<QWidget> > TopLevelWidgets;
 };
