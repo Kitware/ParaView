@@ -47,10 +47,10 @@ public:
 
 //-----------------------------------------------------------------------------
 pqServerManagerSelectionModel::pqServerManagerSelectionModel(
-  pqServerManagerModel* model, QObject* _parent /*=null*/) :QObject(_parent)
+  pqServerManagerModel* _model, QObject* _parent /*=null*/) :QObject(_parent)
 {
   this->Internal = new pqServerManagerSelectionModelInternal;
-  this->Internal->Model = model;
+  this->Internal->Model = _model;
 }
 
 //-----------------------------------------------------------------------------

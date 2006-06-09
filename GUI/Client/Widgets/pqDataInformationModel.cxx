@@ -311,9 +311,9 @@ void pqDataInformationModel::removeSource(pqPipelineSource* source)
 void pqDataInformationModel::refreshModifiedData()
 {
   QList<pqSourceInfo>::iterator iter;
-  int row = 0;
+  int row_no = 0;
   for (iter = this->Internal->Sources.begin(); 
-    iter != this->Internal->Sources.end(); ++iter, row++)
+    iter != this->Internal->Sources.end(); ++iter, row_no++)
     {
     vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(
       iter->Source->getProxy());
@@ -323,8 +323,8 @@ void pqDataInformationModel::refreshModifiedData()
       }
     if (proxy->GetDataInformation()->GetMTime() > iter->MTime)
       {
-      emit this->dataChanged(this->index(row, 0),
-        this->index(row, 4));
+      emit this->dataChanged(this->index(row_no, 0),
+        this->index(row_no, 4));
       }
     }
 }
