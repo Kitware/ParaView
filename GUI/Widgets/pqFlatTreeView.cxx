@@ -205,6 +205,11 @@ QModelIndex pqFlatTreeView::indexAt(const QPoint &point) const
 
 QRect pqFlatTreeView::visualRect(const QModelIndex &index) const
 {
+  if(!index.isValid() || index.model() != this->model())
+    {
+    return QRect();
+    }
+
   pqFlatTreeViewItem *item = this->getItem(index);
   if(item && this->HeaderView)
     {
@@ -1642,6 +1647,10 @@ void pqFlatTreeView::changeSelection(const QItemSelection &selected,
   QItemSelection::ConstIterator iter = deselected.begin();
   for( ; iter != deselected.end(); ++iter)
     {
+    if(!(*iter).isValid())
+      {
+      continue;
+      }
     // Get the parent item for the range.
     parentItem = this->getItem((*iter).parent());
     if(parentItem)
@@ -1696,6 +1705,10 @@ void pqFlatTreeView::changeSelection(const QItemSelection &selected,
   // Mark the newly selected items, so they will get highlighted.
   for(iter = selected.begin(); iter != selected.end(); ++iter)
     {
+    if(!(*iter).isValid())
+      {
+      continue;
+      }
     parentItem = this->getItem((*iter).parent());
     if(parentItem)
       {
