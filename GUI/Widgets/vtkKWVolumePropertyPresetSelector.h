@@ -69,6 +69,11 @@ public:
   static const char *ModalityColumnName;
   //ETX
 
+  // Description:
+  // Deep copy contents of volume property 'source' into 'target'
+  static void DeepCopyVolumeProperty(
+    vtkVolumeProperty *target, vtkVolumeProperty *source);
+
 protected:
   vtkKWVolumePropertyPresetSelector() {};
   ~vtkKWVolumePropertyPresetSelector() {};
@@ -89,11 +94,6 @@ protected:
   // Subclasses should call the parent's UpdatePresetRow, and abort
   // if the result is not 1.
   virtual int UpdatePresetRow(int id);
-
-  // Description:
-  // Deep copy contents of volume property 'source' into 'target'
-  virtual void DeepCopyVolumeProperty(
-    vtkVolumeProperty *target, vtkVolumeProperty *source);
 
   // Description:
   // Get the index of a given column.
