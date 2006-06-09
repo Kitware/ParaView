@@ -45,6 +45,7 @@ class pqRenderModule;
 class pqRenderWindowManager;
 class pqServer;
 class pqServerManagerModel;
+class pqServerManagerSelectionModel;
 class pqUndoStack;
 class pqWriterFactory;
 class vtkPVXMLElement;
@@ -78,6 +79,9 @@ public:
   pq3DWidgetFactory* get3DWidgetFactory();
   pqReaderFactory* getReaderFactory();
   pqWriterFactory* getWriterFactory();
+
+  // Returns the server manager selection model.
+  pqServerManagerSelectionModel* getSelectionModel();
 
   // This will create a source with the given xmlname on the active server. 
   // On success returns

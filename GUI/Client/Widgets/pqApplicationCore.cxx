@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderWindowManager.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqServerManagerSelectionModel.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 #include "pqWriterFactory.h"
@@ -76,6 +77,7 @@ public:
   pq3DWidgetFactory* WidgetFactory;
   pqReaderFactory* ReaderFactory;
   pqWriterFactory* WriterFactory;
+  pqServerManagerSelectionModel* SelectionModel;
 
   QPointer<pqPipelineSource> ActiveSource;
   QPointer<pqServer> ActiveServer;
@@ -136,6 +138,9 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   this->Internal->ReaderFactory = new pqReaderFactory(this);
   this->Internal->WriterFactory = new pqWriterFactory(this);
 
+  // * Setup the selection model.
+  this->Internal->SelectionModel = new pqServerManagerSelectionModel(
+    this->Internal->ServerManagerModel, this);
 }
 
 //-----------------------------------------------------------------------------
@@ -219,6 +224,12 @@ pqReaderFactory* pqApplicationCore::getReaderFactory()
 pqWriterFactory* pqApplicationCore::getWriterFactory()
 {
   return this->Internal->WriterFactory;
+}
+
+//-----------------------------------------------------------------------------
+pqServerManagerSelectionModel* pqApplicationCore::getSelectionModel()
+{
+  return this->Internal->SelectionModel;
 }
 
 //-----------------------------------------------------------------------------

@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineBuilder.h"
 #include "pqServerManagerObserver.h"
 #include "pqPipelineModel.h"
+#include "pqPipelineModelSelectionAdaptor.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
@@ -129,6 +130,10 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
     boxLayout->setMargin(0);
     boxLayout->addWidget(this->TreeView);
     }
+
+  // Create the adaptor.
+  new pqPipelineModelSelectionAdaptor(this->TreeView->selectionModel(),
+    pqApplicationCore::instance()->getSelectionModel(), this);
 }
 
 pqPipelineBrowser::~pqPipelineBrowser()

@@ -34,6 +34,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqCompoundProxyWizard.h
   pqCutPanel.h
   pqDataInformationModel.h
+  pqDataInformationModelSelectionAdaptor.h
   pqDataInformationWidget.h
   pqDataSetModel.h
   pqDisplayProxyEditor.h
@@ -57,18 +58,21 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineBuilder.h
   pqPipelineMenu.h
   pqPipelineModel.h
+  pqPipelineModelSelectionAdaptor.h
   pqPipelineSource.h
   pqPropertyLinks.h
   pqPropertyManager.h
   pqRenderModule.h
   pqRenderViewEditor.h
   pqRenderWindowManager.h
+  pqSelectionAdaptor.h
   pqServer.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
   pqServerManagerModel.h
   pqServerManagerModelItem.h
   pqServerManagerObserver.h
+  pqServerManagerSelectionModel.h
   pqSliderDomain.h
   pqSMSignalAdaptors.h
   pqSourceInfoGroupMap.h
@@ -136,6 +140,8 @@ ADD_LIBRARY(pqWidgets
   pqCutPanel.h
   pqDataInformationModel.cxx
   pqDataInformationModel.h
+  pqDataInformationModelSelectionAdaptor.cxx
+  pqDataInformationModelSelectionAdaptor.h
   pqDataInformationWidget.cxx
   pqDataInformationWidget.h
   pqDataSetModel.cxx
@@ -196,6 +202,8 @@ ADD_LIBRARY(pqWidgets
   pqPipelineMenu.h
   pqPipelineModel.cxx
   pqPipelineModel.h
+  pqPipelineModelSelectionAdaptor.cxx
+  pqPipelineModelSelectionAdaptor.h
   pqPipelineSource.cxx
   pqPipelineSource.h
   pqProcessModuleGUIHelper.cxx
@@ -216,6 +224,8 @@ ADD_LIBRARY(pqWidgets
   pqRenderViewProxy.h
   pqRenderWindowManager.cxx
   pqRenderWindowManager.h
+  pqSelectionAdaptor.cxx
+  pqSelectionAdaptor.h
   pqServerBrowser.cxx
   pqServerBrowser.h
   pqServer.cxx
@@ -228,6 +238,8 @@ ADD_LIBRARY(pqWidgets
   pqServerManagerModelItem.h
   pqServerManagerObserver.cxx
   pqServerManagerObserver.h
+  pqServerManagerSelectionModel.cxx
+  pqServerManagerSelectionModel.h
   pqSMAdaptor.cxx
   pqSMAdaptor.h
   pqSMProxy.cxx

@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaQ includes.
 #include "pqApplicationCore.h"
 #include "pqDataInformationModel.h"
+#include "pqDataInformationModelSelectionAdaptor.h"
 #include "pqSectionVisibilityContextMenu.h"
 #include "pqServerManagerModel.h"
 #include "pqSetName.h"
@@ -52,11 +53,15 @@ pqDataInformationWidget::pqDataInformationWidget(QWidget* _parent /*=0*/)
   this->Model = new pqDataInformationModel(this);
   this->View = new QTableView(this);
 
+  /* For timebeing turn off proxy, we need to update the Selection Adaptor
+   * to work with proxies.
   // We provide the sorting proxy model
   QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
   proxyModel->setSourceModel(this->Model);
-  
   this->View->setModel(proxyModel);
+  */
+
+  this->View->setModel(this->Model);
   this->View->verticalHeader()->hide();
   this->View->installEventFilter(this);
   this->View->horizontalHeader()->setMovable(true);
@@ -94,6 +99,9 @@ pqDataInformationWidget::pqDataInformationWidget(QWidget* _parent /*=0*/)
   QObject::connect(this->View, 
     SIGNAL(customContextMenuRequested(const QPoint&)),
     this, SLOT(showBodyContextMenu(const QPoint&)));
+
+  new pqDataInformationModelSelectionAdaptor(this->View->selectionModel(),
+    pqApplicationCore::instance()->getSelectionModel(), this);
 }
 
 //-----------------------------------------------------------------------------

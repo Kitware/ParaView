@@ -330,7 +330,7 @@ void pqDataInformationModel::refreshModifiedData()
 }
 
 //-----------------------------------------------------------------------------
-QModelIndex pqDataInformationModel::getIndexFor(pqPipelineSource* item)
+QModelIndex pqDataInformationModel::getIndexFor(pqPipelineSource* item) const
 {
   if (!this->Internal->Sources.contains(item))
     {
@@ -340,7 +340,7 @@ QModelIndex pqDataInformationModel::getIndexFor(pqPipelineSource* item)
 }
 
 //-----------------------------------------------------------------------------
-pqPipelineSource* pqDataInformationModel::getItemFor(const QModelIndex& idx)
+pqPipelineSource* pqDataInformationModel::getItemFor(const QModelIndex& idx) const
 {
   if (!idx.isValid() && idx.model() != this)
     {
@@ -352,4 +352,60 @@ pqPipelineSource* pqDataInformationModel::getItemFor(const QModelIndex& idx)
     return NULL;
     }
   return this->Internal->Sources[idx.row()];
+}
+
+//-----------------------------------------------------------------------------
+int pqDataInformationModel::row(pqPipelineSource* source)
+{
+  return this->Internal->Sources.indexOf(source);
+}
+
+
+//-----------------------------------------------------------------------------
+class pqDataInformationModelSorter 
+{
+public:
+  pqDataInformationModel* Model;
+  Qt::SortOrder Order;
+  int Column;
+  bool NumericCompare;
+
+  bool operator()(pqPipelineSource* a, pqPipelineSource* b)
+    {
+    QModelIndex indexA = this->Model->index(
+      this->Model->row(a), this->Column);
+
+    QModelIndex indexB = this->Model->index(
+      this->Model->row(b), this->Column);
+
+    if (this->NumericCompare)
+      {
+      return (this->Order == Qt::AscendingOrder)?
+        (this->Model->data(indexA).toDouble() <
+         this->Model->data(indexB).toDouble()) :
+        (this->Model->data(indexA).toDouble() >
+         this->Model->data(indexB).toDouble());
+      }
+
+    return (this->Order == Qt::AscendingOrder)?
+      (this->Model->data(indexA).toString() <
+       this->Model->data(indexB).toString()) :
+      (this->Model->data(indexA).toString() >
+       this->Model->data(indexB).toString());
+    }
+};
+
+
+//-----------------------------------------------------------------------------
+void pqDataInformationModel::sort(int column, 
+  Qt::SortOrder order /*=Qt::AscendingOrder*/)
+{
+  pqDataInformationModelSorter sorter;
+  sorter.Model = this;
+  sorter.Column = column;
+  sorter.NumericCompare = (column >= pqDataInformationModel::CellCount);
+  sorter.Order = order;
+  qSort(this->Internal->Sources.begin(), this->Internal->Sources.end(),
+     sorter); 
+  emit this->layoutChanged();
 }
