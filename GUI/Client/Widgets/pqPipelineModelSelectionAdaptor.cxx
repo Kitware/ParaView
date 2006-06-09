@@ -45,7 +45,7 @@ pqPipelineModelSelectionAdaptor::pqPipelineModelSelectionAdaptor(
     pqServerManagerSelectionModel* smSelectionModel, QObject* _parent/*=0*/)
 : pqSelectionAdaptor(pipelineSelectionModel, smSelectionModel, _parent)
 {
-  if (!qobject_cast<const pqPipelineModel*>(pipelineSelectionModel->model()))
+  if (!qobject_cast<const pqPipelineModel*>(this->getQModel()))
     {
     qDebug() << "QItemSelectionModel must be a selection model for "
       " pqPipelineModel.";
@@ -63,7 +63,7 @@ QModelIndex pqPipelineModelSelectionAdaptor::mapFromSMModel(
     pqServerManagerModelItem* item) const
 {
   const pqPipelineModel* pM = qobject_cast<const pqPipelineModel*>(
-    this->getQSelectionModel()->model());
+    this->getQModel());
   return pM->getIndexFor(item);
 }
 
@@ -72,7 +72,7 @@ pqServerManagerModelItem* pqPipelineModelSelectionAdaptor::mapToSMModel(
     const QModelIndex& index) const
 {
   const pqPipelineModel* pM = qobject_cast<const pqPipelineModel*>(
-    this->getQSelectionModel()->model());
+    this->getQModel());
   return pM->getItemFor(index); 
 }
 

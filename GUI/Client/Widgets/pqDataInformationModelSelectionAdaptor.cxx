@@ -46,7 +46,9 @@ pqDataInformationModelSelectionAdaptor::pqDataInformationModelSelectionAdaptor(
     pqServerManagerSelectionModel* smSelectionModel, QObject* _parent/*=0*/)
 : pqSelectionAdaptor(qModel, smSelectionModel, _parent)
 {
-  if (!qobject_cast<const pqDataInformationModel*>(qModel->model()))
+  const QAbstractItemModel* model = this->getQModel();
+
+  if (!qobject_cast<const pqDataInformationModel*>(model))
     {
     qDebug() << "QItemSelectionModel must be a selection model for "
       " pqDataInformationModel.";
@@ -64,7 +66,7 @@ QModelIndex pqDataInformationModelSelectionAdaptor::mapFromSMModel(
     pqServerManagerModelItem* item) const
 {
   const pqDataInformationModel* pM = qobject_cast<const pqDataInformationModel*>(
-    this->getQSelectionModel()->model());
+    this->getQModel());
   return pM->getIndexFor(qobject_cast<pqPipelineSource*>(item));
 }
 
@@ -73,7 +75,7 @@ pqServerManagerModelItem* pqDataInformationModelSelectionAdaptor::mapToSMModel(
     const QModelIndex& index) const
 {
   const pqDataInformationModel* pM = qobject_cast<const pqDataInformationModel*>(
-    this->getQSelectionModel()->model());
+    this->getQModel());
   return pM->getItemFor(index);
 }
 

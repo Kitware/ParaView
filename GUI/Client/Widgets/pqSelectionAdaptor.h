@@ -40,6 +40,7 @@ class pqServerManagerModelItem;
 class pqServerManagerModelSelection;
 class pqServerManagerSelectionModel;
 
+class QAbstractItemModel;
 class QItemSelection;
 class QItemSelectionModel;
 class QModelIndex;
@@ -78,6 +79,12 @@ protected:
   virtual pqServerManagerModelItem* mapToSMModel(
     const QModelIndex& index) const =0;
 
+  // Returns the QAbstractItemModel used by the QSelectionModel.
+  // If QSelectionModel uses a QAbstractProxyModel, this method skips
+  // over all such proxy models and returns the first non-proxy model 
+  // encountered.
+  const QAbstractItemModel* getQModel() const;
+
 protected slots:
   virtual void currentChanged(const QModelIndex& current, 
     const QModelIndex& previous);
@@ -87,9 +94,23 @@ protected slots:
   virtual void currentChanged(pqServerManagerModelItem* item);
   virtual void selectionChanged(const pqServerManagerModelSelection& selected,
     const pqServerManagerModelSelection& deselected);
-  
+
+
 private:
   pqSelectionAdaptorInternal* Internal;
+
+
+  // Given a QModelIndex for the QAbstractItemModel under the QItemSelectionModel,
+  // this returns the QModelIndex for the inner most non-proxy 
+  // QAbstractItemModel.
+  QModelIndex mapToSource(const QModelIndex& inIndex) const;
+
+
+  // Given a QModelIndex for the innermost non-proxy QAbstractItemModel,
+  // this returns the QModelIndex for the QAbstractItemModel under the 
+  // QItemSelectionModel.
+  QModelIndex mapFromSource(const QModelIndex& inIndex, 
+    const QAbstractItemModel* model) const;
 };
 
 

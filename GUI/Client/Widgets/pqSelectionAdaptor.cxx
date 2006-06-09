@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSelectionAdaptor.h"
 
 // Qt includes.
+#include <QAbstractProxyModel>
 #include <QItemSelectionModel>
 #include <QPointer>
 #include <QtDebug>
@@ -96,10 +97,64 @@ pqServerManagerSelectionModel* pqSelectionAdaptor::getSMSelectionModel() const
 {
   return this->Internal->SMSelectionModel;
 }
+//-----------------------------------------------------------------------------
+// Returns the QAbstractItemModel used by the QSelectionModel.
+// If QSelectionModel uses a QAbstractProxyModel, this method skips
+// over all such proxy models and returns the first non-proxy model 
+// encountered.
+const QAbstractItemModel* pqSelectionAdaptor::getQModel() const
+{
+  const QAbstractItemModel* model = this->getQSelectionModel()->model();
+
+  // Pass thru proxy models. 
+  const QAbstractProxyModel* proxyModel = 
+    qobject_cast<const QAbstractProxyModel*>(model);
+  while (proxyModel)
+    {
+    model = proxyModel->sourceModel();
+    proxyModel = qobject_cast<const QAbstractProxyModel*>(model);
+    }
+
+  return model;
+}
+
+//-----------------------------------------------------------------------------
+QModelIndex pqSelectionAdaptor::mapToSource(const QModelIndex& inIndex) const
+{
+  QModelIndex outIndex = inIndex;
+  const QAbstractItemModel* model = this->getQSelectionModel()->model();
+
+  // Pass thru proxy models. 
+  const QAbstractProxyModel* proxyModel = 
+    qobject_cast<const QAbstractProxyModel*>(model);
+  while (proxyModel)
+    {
+    outIndex = proxyModel->mapToSource(outIndex);
+    model = proxyModel->sourceModel();
+    proxyModel = qobject_cast<const QAbstractProxyModel*>(model);
+    }
+
+  return outIndex;
+}
+
+//-----------------------------------------------------------------------------
+QModelIndex pqSelectionAdaptor::mapFromSource(
+  const QModelIndex& inIndex, const QAbstractItemModel* model) const
+{
+  const QAbstractProxyModel* proxyModel = 
+    qobject_cast<const QAbstractProxyModel*>(model);
+  if (!proxyModel)
+    {
+    return inIndex;
+    }
+
+  return proxyModel->mapFromSource(
+    this->mapFromSource(inIndex, proxyModel->sourceModel()));
+}
 
 //-----------------------------------------------------------------------------
 void pqSelectionAdaptor::currentChanged(const QModelIndex& current,
-    const QModelIndex& previous)
+    const QModelIndex& /*previous*/)
 {
   if (this->Internal->IgnoreSignals)
     {
@@ -111,7 +166,8 @@ void pqSelectionAdaptor::currentChanged(const QModelIndex& current,
     return;
     }
   this->Internal->IgnoreSignals = true;
-  pqServerManagerModelItem* smCurrent = this->mapToSMModel(current);
+  pqServerManagerModelItem* smCurrent = this->mapToSMModel(
+    this->mapToSource(current));
   
   pqServerManagerSelectionModel::SelectionFlags command = 
     pqServerManagerSelectionModel::NoUpdate;
@@ -152,14 +208,16 @@ void pqSelectionAdaptor::selectionChanged(
 
   foreach (const QModelIndex& index, sIndexes)
     {
-    pqServerManagerModelItem* smItem = this->mapToSMModel(index);
+    pqServerManagerModelItem* smItem = this->mapToSMModel(
+      this->mapToSource(index));
     smSelected.push_back(smItem);
     }
 
   const QModelIndexList &dIndexes = deselected.indexes();
   foreach (const QModelIndex& index, dIndexes)
     {
-    pqServerManagerModelItem* smItem = this->mapToSMModel(index);
+    pqServerManagerModelItem* smItem = this->mapToSMModel(
+      this->mapToSource(index));
     smDeselected.push_back(smItem);
     }
   this->Internal->IgnoreSignals = true;
@@ -184,7 +242,8 @@ void pqSelectionAdaptor::currentChanged(
     return;
     }
 
-  const QModelIndex& index = this->mapFromSMModel(item);
+  const QModelIndex& index = this->mapFromSource(
+    this->mapFromSMModel(item), this->getQSelectionModel()->model());
   this->Internal->IgnoreSignals = true;
   QItemSelectionModel::SelectionFlags command = 
     QItemSelectionModel::NoUpdate;
@@ -215,13 +274,15 @@ void pqSelectionAdaptor::selectionChanged(
 
   foreach (pqServerManagerModelItem* item, selected)
     {
-    const QModelIndex& index = this->mapFromSMModel(item);
+    const QModelIndex& index = this->mapFromSource(
+      this->mapFromSMModel(item), this->getQSelectionModel()->model());
     qSelected.push_back(QItemSelectionRange(index));
     }
 
   foreach(pqServerManagerModelItem* item, deselected )
     {
-    const QModelIndex& index = this->mapFromSMModel(item);
+    const QModelIndex& index = this->mapFromSource(
+      this->mapFromSMModel(item), this->getQSelectionModel()->model());
     qDeselected.push_back(QItemSelectionRange(index));
     }
   this->Internal->IgnoreSignals = true;

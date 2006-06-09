@@ -74,8 +74,6 @@ public:
   // to it.
   pqPipelineSource* getItemFor(const QModelIndex& index) const;
 
-  void sort(int column, Qt::SortOrder order =Qt::AscendingOrder);
-  int row(pqPipelineSource* source);
 public slots:
   // Called when a new source/filter is registered.
   void addSource(pqPipelineSource* source);

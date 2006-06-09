@@ -53,15 +53,12 @@ pqDataInformationWidget::pqDataInformationWidget(QWidget* _parent /*=0*/)
   this->Model = new pqDataInformationModel(this);
   this->View = new QTableView(this);
 
-  /* For timebeing turn off proxy, we need to update the Selection Adaptor
-   * to work with proxies.
   // We provide the sorting proxy model
   QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
   proxyModel->setSourceModel(this->Model);
   this->View->setModel(proxyModel);
-  */
 
-  this->View->setModel(this->Model);
+  //this->View->setModel(this->Model);
   this->View->verticalHeader()->hide();
   this->View->installEventFilter(this);
   this->View->horizontalHeader()->setMovable(true);
