@@ -80,7 +80,11 @@ static const QString InternalGetName(QObject& Object)
       
     const QString type = Object.metaObject()->className();
     
-    int index = 0;
+    // order of top level widgets is not guarenteed
+    // we can someone counter that by checking visibility, 
+    // as we usually only test visible widgets, we would get the right one
+    int invisible_index = 0;
+    int visible_index = 0;
     for(int i = 0; i != siblings.size(); ++i)
       {
       QObject* test = siblings[i];
@@ -92,13 +96,30 @@ static const QString InternalGetName(QObject& Object)
         type == test->metaObject()->className()
         && test->objectName().isEmpty())
         {
-        ++index;
+        QWidget* widget = qobject_cast<QWidget*>(test);
+        if(widget && widget->isVisible())
+          {
+          ++visible_index;
+          }
+        else
+          {
+          ++invisible_index;
+          }
         }
       }
       
+    int index = invisible_index;
     if(QWidget* const widget = qobject_cast<QWidget*>(&Object))
       {
-      result += QString::number(widget->isVisible());
+      if(widget->isVisible())
+        {
+        result += QString::number(1);
+        index = visible_index;
+        }
+      else
+        {
+        result += QString::number(0);
+        }
       }
     result += type + QString::number(index);
     }
