@@ -47,12 +47,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderModule.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqApplicationCore.h"
 
 //-----------------------------------------------------------------------------
 class pqRenderWindowManagerInternal
 {
 public:
-  QPointer<pqServer> ActiveServer;
+  //QPointer<pqServer> ActiveServer;
   QPointer<pqRenderModule> ActiveRenderModule;
   QPointer<pqMultiViewFrame> FrameAdded;
 };
@@ -87,12 +88,12 @@ pqRenderWindowManager::~pqRenderWindowManager()
   delete this->Internal;
 }
 
-//-----------------------------------------------------------------------------
+/*//-----------------------------------------------------------------------------
 void pqRenderWindowManager::setActiveServer(pqServer* server)
 {
   this->Internal->ActiveServer = server;
 }
-
+*/
 //-----------------------------------------------------------------------------
 pqRenderModule* pqRenderWindowManager::getActiveRenderModule()
 {
@@ -102,15 +103,17 @@ pqRenderModule* pqRenderWindowManager::getActiveRenderModule()
 //-----------------------------------------------------------------------------
 void pqRenderWindowManager::onFrameAdded(pqMultiViewFrame* frame)
 {
-  if (!this->Internal->ActiveServer)
+  if (!pqApplicationCore::instance()->getActiveServer())
     {
     return;
     }
 
   this->Internal->FrameAdded = frame;
   pqRenderModule* rm =   
-    pqPipelineBuilder::instance()->createWindow(this->Internal->ActiveServer);
+    pqPipelineBuilder::instance()->createWindow(pqApplicationCore::instance()->getActiveServer());
   this->Internal->ActiveRenderModule =  rm;
+  emit this->activeRenderModuleChanged(this->Internal->ActiveRenderModule);
+
 
   QSignalMapper* sm = new QSignalMapper(frame);
   sm->setMapping(frame, frame);
@@ -175,6 +178,8 @@ void pqRenderWindowManager::onRenderModuleRemoved(pqRenderModule* rm)
   if (this->Internal->ActiveRenderModule == rm)
     {
     this->Internal->ActiveRenderModule = 0;
+    emit this->activeRenderModuleChanged(this->Internal->ActiveRenderModule);
+
     }
 }
 
@@ -186,5 +191,7 @@ void pqRenderWindowManager::onActivate(QWidget* obj)
   pqRenderModule* rm = 
     pqServerManagerModel::instance()->getRenderModule(widget);
   this->Internal->ActiveRenderModule = rm;
+  emit this->activeRenderModuleChanged(this->Internal->ActiveRenderModule);
+
   
 }

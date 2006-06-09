@@ -56,7 +56,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqReaderFactory.h"
 #include "pqRenderModule.h"
-#include "pqRenderWindowManager.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerSelectionModel.h"
@@ -73,7 +72,6 @@ public:
   pqServerManagerModel* ServerManagerModel;
   pqUndoStack* UndoStack;
   pqPipelineBuilder* PipelineBuilder;
-  pqRenderWindowManager* RenderWindowManager;
   pq3DWidgetFactory* WidgetFactory;
   pqReaderFactory* ReaderFactory;
   pqWriterFactory* WriterFactory;
@@ -81,6 +79,7 @@ public:
 
   QPointer<pqPipelineSource> ActiveSource;
   QPointer<pqServer> ActiveServer;
+  QPointer<pqRenderModule> ActiveRenderModule;
 
   QList< QPointer<pqPipelineSource> > SourcesSansDisplays;
 };
@@ -118,9 +117,6 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   // *  Create the pqPipelineBuilder. This is used to create pipeline objects.
   this->Internal->PipelineBuilder = new pqPipelineBuilder(this);
   this->Internal->PipelineBuilder->setUndoStack(this->Internal->UndoStack);
-
-  // *  Create the pqRenderWindowManager. 
-  this->Internal->RenderWindowManager = new pqRenderWindowManager(this);
 
   if (!pqApplicationCore::Instance)
     {
@@ -203,12 +199,6 @@ pqPipelineBuilder* pqApplicationCore::getPipelineBuilder()
 }
 
 //-----------------------------------------------------------------------------
-pqRenderWindowManager* pqApplicationCore::getRenderWindowManager()
-{
-  return this->Internal->RenderWindowManager;
-}
-
-//-----------------------------------------------------------------------------
 pq3DWidgetFactory* pqApplicationCore::get3DWidgetFactory()
 {
   return this->Internal->WidgetFactory;
@@ -252,8 +242,20 @@ void pqApplicationCore::setActiveServer(pqServer* server)
     return;
     }
   this->Internal->ActiveServer = server;
-  this->Internal->RenderWindowManager->setActiveServer(server);
   emit this->activeServerChanged(server);
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::setActiveRenderModule(pqRenderModule* rm)
+{
+ if (this->Internal->ActiveRenderModule == rm)
+    {
+    return;
+    }
+  this->Internal->ActiveRenderModule = rm;
+  emit this->activeRenderModuleChanged(rm);
+
+
 }
 
 //-----------------------------------------------------------------------------
@@ -271,7 +273,7 @@ pqServer* pqApplicationCore::getActiveServer()
 //-----------------------------------------------------------------------------
 pqRenderModule* pqApplicationCore::getActiveRenderModule()
 {
-  return this->Internal->RenderWindowManager->getActiveRenderModule();
+  return this->Internal->ActiveRenderModule;
 }
 
 //-----------------------------------------------------------------------------

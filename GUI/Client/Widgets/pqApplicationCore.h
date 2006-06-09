@@ -42,7 +42,6 @@ class pqServerManagerObserver;
 class pqPipelineSource;
 class pqReaderFactory;
 class pqRenderModule;
-class pqRenderWindowManager;
 class pqServer;
 class pqServerManagerModel;
 class pqServerManagerSelectionModel;
@@ -75,7 +74,6 @@ public:
   pqServerManagerModel* getServerManagerModel();
   pqUndoStack* getUndoStack();
   pqPipelineBuilder* getPipelineBuilder();
-  pqRenderWindowManager* getRenderWindowManager();
   pq3DWidgetFactory* get3DWidgetFactory();
   pqReaderFactory* getReaderFactory();
   pqWriterFactory* getWriterFactory();
@@ -154,6 +152,10 @@ signals:
   // Fired when the active server changes.
   void activeServerChanged(pqServer*);
 
+  // Fired when the active render module changes.
+  void activeRenderModuleChanged(pqRenderModule*);
+
+
   // Fired when a source/filter/reader/compound proxy is
   // created without a display.
   void pendingDisplays(bool status);
@@ -164,6 +166,9 @@ public slots:
 
   // Call this slot to set the active server. 
   void setActiveServer(pqServer*);
+
+  // Call this slot to set the active render module.
+  void setActiveRenderModule(pqRenderModule*);
 
   // Call this slot when accept is called. This method will create
   // displays for any sources/filters that are pending.

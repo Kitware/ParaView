@@ -53,10 +53,9 @@ public:
   // returns the active render module.
   pqRenderModule* getActiveRenderModule();
 
-public slots:
-  // this must be set, so that the manager knows on which server
-  // to create the view when a new view is added.
-  void setActiveServer(pqServer* server);
+signals:
+  // Fired when the active render module changes.
+  void activeRenderModuleChanged(pqRenderModule*);
 
 public slots:
   /// This will create a RenderWindow to fill the frame.

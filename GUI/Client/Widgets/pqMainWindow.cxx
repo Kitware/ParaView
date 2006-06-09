@@ -58,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqVCRController.h"
 #include "pqXMLUtil.h"
 
+
 #include <pqConnect.h>
 #include <pqEventPlayer.h>
 #include <pqEventPlayerXML.h>
@@ -140,6 +141,7 @@ public:
     VariableSelectorToolBar(0),
     VCRController(0),
     DataInformationWidget(0),
+    RenderWindowManager(0),
     IgnoreBrowserSelectionChanges(false)
   {
 
@@ -185,6 +187,7 @@ public:
   QToolBar* VariableSelectorToolBar;
   pqVCRController* VCRController;
   pqDataInformationWidget* DataInformationWidget;
+  pqRenderWindowManager* RenderWindowManager;
 
   bool IgnoreBrowserSelectionChanges;
 };
@@ -207,18 +210,25 @@ pqMainWindow::pqMainWindow() :
   this->setCentralWidget(this->Implementation->MultiViewManager);
 
   pqApplicationCore* core = pqApplicationCore::instance();
+  
+  // *  Create the pqRenderWindowManager. 
+  this->Implementation->RenderWindowManager = new pqRenderWindowManager(this);
+
 
   // Connect the renderModule manager with the view manager so that 
   // new render modules are created as new frames are added.
-  pqRenderWindowManager* renManager = 
-    core->getRenderWindowManager();
+  QObject::connect(this->Implementation->RenderWindowManager, 
+    SIGNAL(activeRenderModuleChanged(pqRenderModule*)),core
+    , SLOT(setActiveRenderModule(pqRenderModule*)));
+
+
 
   QObject::connect(this->Implementation->MultiViewManager, 
     SIGNAL(frameAdded(pqMultiViewFrame*)), 
-    renManager, SLOT(onFrameAdded(pqMultiViewFrame*)));
+    this->Implementation->RenderWindowManager, SLOT(onFrameAdded(pqMultiViewFrame*)));
   QObject::connect(this->Implementation->MultiViewManager, 
     SIGNAL(frameRemoved(pqMultiViewFrame*)), 
-    renManager, SLOT(onFrameRemoved(pqMultiViewFrame*)));
+    this->Implementation->RenderWindowManager, SLOT(onFrameRemoved(pqMultiViewFrame*)));
 
   // Connect selection changed events.
   QObject::connect(core, SIGNAL(activeSourceChanged(pqPipelineSource*)),
@@ -1384,9 +1394,8 @@ void pqMainWindow::onServerConnect(pqServer* server)
 
   // Make the newly created server the active server.
   pqApplicationCore::instance()->setActiveServer(server);
-
   // Create a render module.
-  pqApplicationCore::instance()->getRenderWindowManager()->onFrameAdded(
+  this->Implementation->RenderWindowManager->onFrameAdded(
     qobject_cast<pqMultiViewFrame *>(
       this->Implementation->MultiViewManager->widgetOfIndex(
         pqMultiView::Index())));
@@ -1663,6 +1672,7 @@ void pqMainWindow::onBrowserSelectionChanged(pqServerManagerModelItem* item)
     server = dynamic_cast<pqServer*>(item);
     pqApplicationCore::instance()->setActiveSource(0);
     pqApplicationCore::instance()->setActiveServer(server);
+
     }
   this->Implementation->IgnoreBrowserSelectionChanges = false;
 }
