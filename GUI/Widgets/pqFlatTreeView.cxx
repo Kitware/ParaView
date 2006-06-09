@@ -1991,6 +1991,19 @@ void pqFlatTreeView::addChildItems(pqFlatTreeViewItem *item,
 bool pqFlatTreeView::getIndexRowList(const QModelIndex &index,
     pqFlatTreeViewItemRows &rowList) const
 {
+  // Make sure the index is for the current model. If the index is
+  // invalid, it refers to the root. The model won't be set in that
+  // case. If the index is valid, the model can be checked.
+  if(index.isValid() && index.model() != this->model())
+    {
+    return false;
+    }
+
+  if(!this->Root)
+    {
+    return false;
+    }
+
   // Get the row hierarchy from the index and its ancestors.
   // Make sure the index is for column 0.
   QModelIndex tempIndex = index;
