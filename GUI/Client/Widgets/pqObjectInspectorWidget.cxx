@@ -174,13 +174,6 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
 
   this->CurrentPanel = NULL;
 
-  // make sure proxy is built
-  if(proxy)
-    {
-    proxy->UpdateVTKObjects();
-    proxy->UpdatePropertyInformation();
-    }
-  
   // search for a custom form for this proxy with pending changes
   QMap<pqSMProxy, pqObjectPanel*>::iterator iter;
   iter = this->QueuedPanels.find(proxy);

@@ -99,11 +99,16 @@ void pqObjectPanel::setProxy(pqSMProxy p)
 void pqObjectPanel::setProxyInternal(pqSMProxy p)
 {
   this->Proxy = p;
-  vtkSMSourceProxy* sp;
-  sp = vtkSMSourceProxy::SafeDownCast(this->Proxy);
-  if(sp)
+  if(this->Proxy)
     {
-    sp->UpdatePipelineInformation();
+    this->Proxy->UpdateVTKObjects();
+    this->Proxy->UpdatePropertyInformation();
+    vtkSMSourceProxy* sp;
+    sp = vtkSMSourceProxy::SafeDownCast(this->Proxy);
+    if(sp)
+      {
+      sp->UpdatePipelineInformation();
+      }
     }
 }
 
@@ -136,6 +141,8 @@ void pqObjectPanel::reset()
     {
     return;
     }
+  this->Proxy->UpdateVTKObjects();
+  this->Proxy->UpdatePropertyInformation();
   this->PropertyManager->reject();
 }
 

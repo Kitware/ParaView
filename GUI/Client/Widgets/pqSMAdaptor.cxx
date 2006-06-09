@@ -139,8 +139,6 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
 pqSMProxy pqSMAdaptor::getProxyProperty(vtkSMProxy* Proxy, 
                                         vtkSMProperty* Property)
 {
-  Proxy->UpdatePropertyInformation(Property);
-
   if(pqSMAdaptor::getPropertyType(Property) == pqSMAdaptor::PROXY)
     {
     vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::SafeDownCast(Property);
@@ -189,11 +187,9 @@ void pqSMAdaptor::setUncheckedProxyProperty(vtkSMProxy* vtkNotUsed(Proxy),
     }
 }
 
-QList<pqSMProxy> pqSMAdaptor::getProxyListProperty(vtkSMProxy* Proxy, 
+QList<pqSMProxy> pqSMAdaptor::getProxyListProperty(vtkSMProxy* vtkNotUsed(Proxy), 
                                                    vtkSMProperty* Property)
 {
-  Proxy->UpdatePropertyInformation(Property);
-
   QList<pqSMProxy> value;
   if(pqSMAdaptor::getPropertyType(Property) == pqSMAdaptor::PROXYLIST)
     {
@@ -281,7 +277,6 @@ QList<QList<QVariant> > pqSMAdaptor::getSelectionProperty(vtkSMProxy* Proxy,
                            Property->GetInformationProperty());
       if(infoProp)
         {
-        Proxy->UpdatePropertyInformation(infoProp);
         int exists;
         int idx = infoProp->GetElementIndex(name.toAscii().data(), exists);
         var = infoProp->GetElement(idx+1);
@@ -349,7 +344,6 @@ QList<QVariant> pqSMAdaptor::getSelectionProperty(vtkSMProxy* Proxy,
                           Property->GetInformationProperty());
       if(infoProp)
         {
-        Proxy->UpdatePropertyInformation(infoProp);
         int exists;
         int idx = infoProp->GetElementIndex(name.toAscii().data(), exists);
         var = infoProp->GetElement(idx+1);
@@ -399,55 +393,30 @@ QList<QVariant> pqSMAdaptor::getSelectionProperty(vtkSMProxy* Proxy,
 void pqSMAdaptor::setSelectionProperty(vtkSMProxy* Proxy, 
                vtkSMProperty* Property, QList<QList<QVariant> > Value)
 {
-  vtkSMPropertyAdaptor* adaptor = vtkSMPropertyAdaptor::New();
-  adaptor->SetProperty(Property);
-  if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::SELECTION)
+  foreach(QList<QVariant> l, Value)
     {
-
-    QList<QVariant> domain = pqSMAdaptor::getSelectionPropertyDomain(Property);
-
-    foreach(QList<QVariant> l, Value)
-      {
-      if(l.size() < 2)
-        {
-        continue;
-        }
-
-      QString name = l[0].toString();
-      QVariant value = l[1];
-      if(value.type() == QVariant::Bool)
-        {
-        value = value.toInt();
-        }
-
-      for(int i=0; i<domain.size(); i++)
-        {
-        if(domain[i] == name)
-          {
-          adaptor->SetSelectionValue(i, value.toString().toAscii().data());
-          }
-        }
-      Proxy->UpdateVTKObjects();
-      vtkSMSourceProxy* sp;
-      sp = vtkSMSourceProxy::SafeDownCast(Proxy);
-      if(sp)
-        {
-        sp->UpdatePipelineInformation();
-        }
-      }
+    pqSMAdaptor::setSelectionProperty(Proxy, Property, l);
     }
-  adaptor->Delete();
 }
 
-void pqSMAdaptor::setUncheckedSelectionProperty(vtkSMProxy* vtkNotUsed(Proxy), 
+void pqSMAdaptor::setUncheckedSelectionProperty(vtkSMProxy* Proxy, 
                vtkSMProperty* Property, QList<QList<QVariant> > Value)
 {
-  vtkSMStringVectorProperty* StringProperty;
-  vtkSMStringListRangeDomain* StringDomain = NULL;
-  StringProperty = vtkSMStringVectorProperty::SafeDownCast(Property);
-  if(StringProperty)
+  foreach(QList<QVariant> l, Value)
     {
-    // TODO   do we need to check the domain?
+    pqSMAdaptor::setUncheckedSelectionProperty(Proxy, Property, l);
+    }
+}
+
+void pqSMAdaptor::setSelectionProperty(vtkSMProxy* Proxy, 
+                           vtkSMProperty* Property, 
+                           QList<QVariant> Value)
+{
+  vtkSMStringVectorProperty* StringProperty;
+  StringProperty = vtkSMStringVectorProperty::SafeDownCast(Property);
+  if(StringProperty && Value.size() == 2)
+    {
+    vtkSMStringListRangeDomain* StringDomain = NULL;
     vtkSMDomainIterator* iter = Property->NewDomainIterator();
     iter->Begin();
     while(StringDomain == NULL && !iter->IsAtEnd())
@@ -460,57 +429,70 @@ void pqSMAdaptor::setUncheckedSelectionProperty(vtkSMProxy* vtkNotUsed(Proxy),
 
     if(StringDomain)
       {
-      foreach(QList<QVariant> l, Value)
+      QString name = Value[0].toString();
+      QVariant value = Value[1];
+      if(value.type() == QVariant::Bool)
         {
-        if(l.size() < 2)
+        value = value.toInt();
+        }
+      QString valueStr = value.toString();
+      unsigned int numElems;
+      numElems = StringProperty->GetNumberOfElements();
+      if (numElems % 2 != 0)
+        {
+        return;
+        }
+      unsigned int i;
+      for(i=0; i<numElems; i+=2)
+        {
+        if(name == StringProperty->GetElement(i))
           {
-          continue;
-          }
-
-        QString name = l[0].toString();
-        QVariant value = l[1];
-        if(value.type() == QVariant::Bool)
-          {
-          value = value.toInt();
-          }
-        unsigned int numElems;
-        numElems = StringProperty->GetNumberOfElements();
-        if (numElems % 2 == 0)
-          {
-          unsigned int i;
-          bool wasSet = false;
-          for(i=0; i<numElems; i+=2)
-            {
-            if(name == StringProperty->GetElement(i))
-              {
-              wasSet = true;
-              StringProperty->SetElement(i+1,
-                        value.toString().toAscii().data());
-              }
-            }
-          if(!wasSet)
-            {
-            // TODO ???
-            }
+          StringProperty->SetElement(i+1, valueStr.toAscii().data());
+          Proxy->UpdateVTKObjects();  // TODO: why do we have to call this?
+          return;
           }
         }
+      // not found, just put it in the first empty slot
+      for(i=0; i<numElems; i+=2)
+        {
+        const char* elem = StringProperty->GetElement(i);
+        if(!elem || elem[0] == '\0')
+          {
+          StringProperty->SetElement(i, name.toAscii().data());
+          StringProperty->SetElement(i+1, valueStr.toAscii().data());
+          Proxy->UpdateVTKObjects();  // TODO: why do we have to call this?
+          return;
+          }
+        }
+      // If we didn't find any empty spots, append to the vector
+      StringProperty->SetElement(numElems, name.toAscii().data());
+      StringProperty->SetElement(numElems+1, valueStr.toAscii().data());
+      Proxy->UpdateVTKObjects();  // TODO: why do we have to call this?
+      return;
       }
     }
-  Property->UpdateDependentDomains();
 }
 
-void pqSMAdaptor::setSelectionProperty(vtkSMProxy* Proxy, 
+void pqSMAdaptor::setUncheckedSelectionProperty(vtkSMProxy* vtkNotUsed(Proxy), 
                            vtkSMProperty* Property, 
                            QList<QVariant> Value)
 {
-  vtkSMPropertyAdaptor* adaptor = vtkSMPropertyAdaptor::New();
-  adaptor->SetProperty(Property);
-  if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::SELECTION)
+  vtkSMStringVectorProperty* StringProperty;
+  StringProperty = vtkSMStringVectorProperty::SafeDownCast(Property);
+  if(StringProperty && Value.size() == 2)
     {
+    vtkSMStringListRangeDomain* StringDomain = NULL;
+    vtkSMDomainIterator* iter = Property->NewDomainIterator();
+    iter->Begin();
+    while(StringDomain == NULL && !iter->IsAtEnd())
+      {
+      vtkSMDomain* d = iter->GetDomain();
+      StringDomain = vtkSMStringListRangeDomain::SafeDownCast(d);
+      iter->Next();
+      }
+    iter->Delete();
 
-    QList<QVariant> domain = pqSMAdaptor::getSelectionPropertyDomain(Property);
-
-    if(Value.size() == 2)
+    if(StringDomain)
       {
       QString name = Value[0].toString();
       QVariant value = Value[1];
@@ -518,71 +500,42 @@ void pqSMAdaptor::setSelectionProperty(vtkSMProxy* Proxy,
         {
         value = value.toInt();
         }
-
-      for(int i=0; i<domain.size(); i++)
+      QString valueStr = value.toString();
+      unsigned int numElems;
+      numElems = StringProperty->GetNumberOfUncheckedElements();
+      if (numElems % 2 != 0)
         {
-        if(domain[i] == name)
+        return;
+        }
+      unsigned int i;
+      for(i=0; i<numElems; i+=2)
+        {
+        if(name == StringProperty->GetUncheckedElement(i))
           {
-          adaptor->SetSelectionValue(i, value.toString().toAscii().data());
+          StringProperty->SetUncheckedElement(i+1, valueStr.toAscii().data());
+          Property->UpdateDependentDomains();
+          return;
           }
         }
-      
-      Proxy->UpdateVTKObjects();
-      vtkSMSourceProxy* sp;
-      sp = vtkSMSourceProxy::SafeDownCast(Proxy);
-      if(sp)
+      // not found, just put it in the first empty slot
+      for(i=0; i<numElems; i+=2)
         {
-        sp->UpdatePipelineInformation();
-        }
-      }
-    }
-  adaptor->Delete();
-}
-
-void pqSMAdaptor::setUncheckedSelectionProperty(vtkSMProxy* Proxy, 
-                           vtkSMProperty* Property, 
-                           QList<QVariant> Value)
-{
-  // TODO UNCHECKED
-
-  vtkSMPropertyAdaptor* adaptor = vtkSMPropertyAdaptor::New();
-  adaptor->SetProperty(Property);
-  if(adaptor->GetPropertyType() == vtkSMPropertyAdaptor::SELECTION)
-    {
-
-    QList<QVariant> domain = pqSMAdaptor::getSelectionPropertyDomain(Property);
-
-    if(Value.size() == 2)
-      {
-      QString name = Value[0].toString();
-      QVariant value = Value[1];
-      if(value.type() == QVariant::Bool)
-        {
-        value = value.toInt();
-        }
-
-      for(int i=0; i<domain.size(); i++)
-        {
-        if(domain[i] == name)
+        const char* elem = StringProperty->GetUncheckedElement(i);
+        if(!elem || elem[0] == '\0')
           {
-          adaptor->SetSelectionValue(i, value.toString().toAscii().data());
+          StringProperty->SetUncheckedElement(i, name.toAscii().data());
+          StringProperty->SetUncheckedElement(i+1, valueStr.toAscii().data());
+          Property->UpdateDependentDomains();
+          return;
           }
         }
-      
-      /*
-      pqSMAdaptorInternal::SettingMultipleProperty = true;
-      adaptor->SetRangeValue(0, name.toAscii().data());
-      adaptor->SetRangeValue(1, value.toString().toAscii().data());
-      */
-      Proxy->UpdateVTKObjects();
-      /*
-      pqSMAdaptorInternal::SettingMultipleProperty = false;
-      Property->Modified();  
-      // let ourselves know it was modified, since we blocked it previously
-      */
+      // If we didn't find any empty spots, append to the vector
+      StringProperty->SetUncheckedElement(numElems, name.toAscii().data());
+      StringProperty->SetUncheckedElement(numElems+1, valueStr.toAscii().data());
+      Property->UpdateDependentDomains();
+      return;
       }
     }
-  adaptor->Delete();
 }
 
 QList<QVariant> pqSMAdaptor::getSelectionPropertyDomain(vtkSMProperty* Property)
@@ -605,7 +558,6 @@ QList<QVariant> pqSMAdaptor::getSelectionPropertyDomain(vtkSMProperty* Property)
 QVariant pqSMAdaptor::getEnumerationProperty(vtkSMProxy* Proxy, 
                                              vtkSMProperty* Property)
 {
-  Proxy->UpdatePropertyInformation(Property);
   QVariant var;
 
   vtkSMBooleanDomain* BooleanDomain = NULL;
@@ -975,7 +927,6 @@ QList<QVariant> pqSMAdaptor::getElementPropertyDomain(vtkSMProperty* Property)
 QList<QVariant> pqSMAdaptor::getMultipleElementProperty(vtkSMProxy* Proxy, 
                                        vtkSMProperty* Property)
 {
-  Proxy->UpdatePropertyInformation(Property);
   QList<QVariant> props;
   
   vtkSMVectorProperty* VectorProperty;
@@ -1217,7 +1168,6 @@ QList<QList<QVariant> > pqSMAdaptor::getMultipleElementPropertyDomain(
 QVariant pqSMAdaptor::getMultipleElementProperty(vtkSMProxy* Proxy, 
                                vtkSMProperty* Property, unsigned int Index)
 {
-  Proxy->UpdatePropertyInformation(Property);
   QVariant var;
   
   vtkSMDoubleVectorProperty* dvp;
@@ -1416,7 +1366,6 @@ QList<QVariant> pqSMAdaptor::getMultipleElementPropertyDomain(
 QString pqSMAdaptor::getFileListProperty(vtkSMProxy* Proxy, 
                                vtkSMProperty* Property)
 {
-  Proxy->UpdatePropertyInformation(Property);
   QString file;
   
   vtkSMStringVectorProperty* svp;
