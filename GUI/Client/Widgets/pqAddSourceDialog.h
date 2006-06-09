@@ -57,6 +57,8 @@ public:
   pqAddSourceDialog(QWidget *parent=0);
   virtual ~pqAddSourceDialog();
 
+  void setSourceLabel(const QString &label);
+
   void setSourceList(QAbstractItemModel *sources);
   void setHistoryList(QAbstractListModel *history);
 
@@ -71,6 +73,7 @@ public slots:
   void addFavorite();
 
 private slots:
+  void validateChoice();
   void changeRoot(const QModelIndex &index);
   void changeRoot(int index);
   void updateFromSources(const QModelIndex &current,

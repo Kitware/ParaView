@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqPipelineMenuInternal;
 class pqSourceInfoGroupMap;
+class pqSourceInfoIcons;
 class pqSourceInfoModel;
 class QAction;
 class QMenu;
@@ -68,6 +69,8 @@ public:
 public:
   pqPipelineMenu(QObject *parent=0);
   virtual ~pqPipelineMenu();
+
+  pqSourceInfoIcons *getIcons() const;
 
   void loadSourceInfo(vtkPVXMLElement *root);
   void loadFilterInfo(vtkPVXMLElement *root);

@@ -83,7 +83,7 @@
       </spacer>
      </item>
      <item row="0" column="0" >
-      <widget class="QLabel" name="label_2" >
+      <widget class="QLabel" name="SourceLabel" >
        <property name="text" >
         <string>Source</string>
        </property>
@@ -190,7 +190,7 @@
     </layout>
    </item>
    <item row="0" column="0" >
-    <widget class="QLabel" name="label" >
+    <widget class="QLabel" name="SourceGroupLabel" >
      <property name="text" >
       <string>Source Group</string>
      </property>

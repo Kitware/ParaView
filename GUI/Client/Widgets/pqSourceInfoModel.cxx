@@ -80,6 +80,8 @@ pqSourceInfoModel::pqSourceInfoModel(const QStringList &sources,
  : QAbstractItemModel(parentObject)
 {
   this->Root = new pqSourceInfoModelItem();
+  this->Icons = 0;
+  this->Pixmap = pqSourceInfoIcons::Invalid;
 
   // Add the list of available sources to the root. These sources
   // will be used to filter sources added by the source info map.
@@ -173,7 +175,6 @@ QVariant pqSourceInfoModel::data(const QModelIndex &idx, int role) const
         }
       case Qt::DecorationRole:
         {
-        // TODO: Allow the user to specify a custom pixmap.
         if(item->IsFolder)
           {
           if(item->Parent == this->Root && item->Name == "Favorites")
@@ -183,9 +184,15 @@ QVariant pqSourceInfoModel::data(const QModelIndex &idx, int role) const
 
           return QVariant(QPixmap(":/pqWidgets/pqFolder16.png"));
           }
+        else if(this->Icons)
+          {
+          // Get the user specified icon.
+          return QVariant(this->Icons->getPixmap(item->Name, this->Pixmap));
+          }
         else
           {
-          return QVariant(QPixmap(":/pqWidgets/pqFilter16.png"));
+          // Default to the source pixmap.
+          return QVariant(QPixmap(":/pqWidgets/pqSource16.png"));
           }
         }
       case Qt::WhatsThisRole:
@@ -209,6 +216,29 @@ bool pqSourceInfoModel::isSource(const QModelIndex &idx) const
 {
   pqSourceInfoModelItem *item = this->getItemFor(idx);
   return item != 0 && item != this->Root && !item->IsFolder;
+}
+
+bool pqSourceInfoModel::isSource(const QString &name) const
+{
+  // Look in the root's list of sources for the name.
+  if(!name.isEmpty())
+    {
+    pqSourceInfoModelItem *item = this->getChildItem(this->Root, name);
+    return item != 0 && !item->IsFolder;
+    }
+
+  return false;
+}
+
+void pqSourceInfoModel::setIcons(pqSourceInfoIcons *icons,
+    pqSourceInfoIcons::DefaultPixmap type)
+{
+  this->Icons = icons;
+  this->Pixmap = type;
+
+  // Listen for pixmap updates.
+  QObject::connect(this->Icons, SIGNAL(pixmapChanged(const QString &)),
+      this, SLOT(updatePixmap(const QString &)));
 }
 
 void pqSourceInfoModel::clearGroups()
@@ -376,6 +406,35 @@ void pqSourceInfoModel::removeSource(const QString &name, const QString &group)
     }
 }
 
+void pqSourceInfoModel::updatePixmap(const QString &name)
+{
+  // Signal the view to refresh the icon for the specified source.
+  // The source can be in multiple places.
+  QModelIndex idx;
+  pqSourceInfoModelItem *item = this->getNextItem(this->Root);
+  while(item)
+    {
+    if(!item->IsFolder && item->Name == name)
+      {
+      idx = this->getIndexFor(item);
+      emit this->dataChanged(idx, idx);
+      }
+
+    item = this->getNextItem(item);
+    }
+}
+
+QModelIndex pqSourceInfoModel::getIndexFor(pqSourceInfoModelItem *item) const
+{
+  if(item->Parent)
+    {
+    int row = item->Parent->Children.indexOf(item);
+    return this->createIndex(row, 0, item);
+    }
+
+  return QModelIndex();
+}
+
 pqSourceInfoModelItem *pqSourceInfoModel::getItemFor(
     const QModelIndex &idx) const
 {
@@ -491,6 +550,36 @@ void pqSourceInfoModel::removeChildItem(pqSourceInfoModelItem *item)
   item->Parent->Children.removeAt(row);
   this->endRemoveRows();
   delete item;
+}
+
+pqSourceInfoModelItem *pqSourceInfoModel::getNextItem(
+    pqSourceInfoModelItem *item) const
+{
+  if(item->Children.size() > 0)
+    {
+    return item->Children.first();
+    }
+
+  // Search up the ancestors for an item with multiple children.
+  // The next item will be the next child.
+  int row = 0;
+  int count = 0;
+  while(item->Parent)
+    {
+    count = item->Parent->Children.size();
+    if(count > 1)
+      {
+      row = item->Parent->Children.indexOf(item) + 1;
+      if(row < count)
+        {
+        return item->Parent->Children[row];
+        }
+      }
+
+    item = item->Parent;
+    }
+
+  return 0;
 }
 
 

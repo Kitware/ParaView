@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractItemModel>
 #include <QAbstractListModel>
 #include <QAbstractProxyModel>
+#include <QMessageBox>
 #include <QString>
 #include <QStringList>
 
@@ -65,7 +66,7 @@ pqAddSourceDialog::pqAddSourceDialog(QWidget *widgetParent)
 
   // Listen to the button press events.
   QObject::connect(this->Form->OkButton, SIGNAL(clicked()),
-      this, SLOT(accept()));
+      this, SLOT(validateChoice()));
   QObject::connect(this->Form->CancelButton, SIGNAL(clicked()),
       this, SLOT(reject()));
   QObject::connect(this->Form->BackButton, SIGNAL(clicked()),
@@ -84,6 +85,13 @@ pqAddSourceDialog::~pqAddSourceDialog()
     {
     delete this->Form;
     }
+}
+
+void pqAddSourceDialog::setSourceLabel(const QString &label)
+{
+  this->Form->SourceLabel->setText(label);
+  QString sourceLabel = label + " Group";
+  this->Form->SourceGroupLabel->setText(sourceLabel);
 }
 
 void pqAddSourceDialog::setSourceList(QAbstractItemModel *sources)
@@ -218,6 +226,39 @@ void pqAddSourceDialog::addFolder()
 
 void pqAddSourceDialog::addFavorite()
 {
+}
+
+void pqAddSourceDialog::validateChoice()
+{
+  if(!this->SourceInfo)
+    {
+    this->accept();
+    return;
+    }
+
+  // Make sure the filter entered is valid.
+  QString choice = this->Form->SourceName->text();
+  if(choice.isEmpty())
+    {
+    QString type = this->Form->SourceLabel->text().toLower();
+    QString text = "The " + type;
+    text += " name is empty.\nPlease select or enter a " + type + ".";
+    QMessageBox::warning(this, "No Selection", text,
+        QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
+    }
+  else if(!this->SourceInfo->isSource(choice))
+    {
+    QString type = this->Form->SourceLabel->text().toLower();
+    QString title = "Invalid " + this->Form->SourceLabel->text();
+    QString text = "The selected " + type;
+    text += " does not exist.\nPlease select or enter a valid " + type + ".";
+    QMessageBox::warning(this, title, text,
+        QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
+    }
+  else
+    {
+    this->accept();
+    }
 }
 
 void pqAddSourceDialog::changeRoot(const QModelIndex &index)

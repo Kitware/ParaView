@@ -37,8 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAddSourceDialog.h"
 #include "pqApplicationCore.h"
-#include "pqSourceInfoModel.h"
 #include "pqSourceInfoGroupMap.h"
+#include "pqSourceInfoIcons.h"
+#include "pqSourceInfoModel.h"
 
 #include <QAction>
 #include <QApplication>
@@ -61,14 +62,20 @@ public:
   pqPipelineMenuInternal();
   ~pqPipelineMenuInternal() {}
 
+  pqSourceInfoIcons *Icons;
+
   pqSourceInfoGroupMap *FilterGroups;
 
   // TODO: Add support for multiple connections.
   pqSourceInfoModel *FilterModel;
+
+  QString LastFilterGroup;
 };
 
 pqPipelineMenuInternal::pqPipelineMenuInternal()
+  : LastFilterGroup()
 {
+  this->Icons = 0;
   this->FilterGroups = 0;
   this->FilterModel = 0;
 }
@@ -78,6 +85,7 @@ pqPipelineMenu::pqPipelineMenu(QObject *parentObject)
   : QObject(parentObject)
 {
   this->Internal = new pqPipelineMenuInternal();
+  this->Internal->Icons = new pqSourceInfoIcons(this);
   this->Internal->FilterGroups = new pqSourceInfoGroupMap(this);
 
   // Initialize the pipeline menu actions.
@@ -89,14 +97,21 @@ pqPipelineMenu::pqPipelineMenu(QObject *parentObject)
   QObject::connect(action, SIGNAL(triggered()), this, SLOT(addFilter()));
   this->MenuList[pqPipelineMenu::AddFilterAction] = action;
   this->MenuList[pqPipelineMenu::AddBundleAction] = 0;
+
+  // TEMP: Set the add filter start path to the 'Released' group.
+  this->Internal->LastFilterGroup = "Released";
 }
 
 pqPipelineMenu::~pqPipelineMenu()
 {
-  delete this->Internal->FilterGroups;
-  delete this->Internal->FilterModel;
+  // The icon map, group map, and models will get cleaned up by Qt.
   delete this->Internal;
   delete [] this->MenuList;
+}
+
+pqSourceInfoIcons *pqPipelineMenu::getIcons() const
+{
+  return this->Internal->Icons;
 }
 
 void pqPipelineMenu::loadSourceInfo(vtkPVXMLElement *)
@@ -139,6 +154,8 @@ pqSourceInfoModel *pqPipelineMenu::getFilterModel()
     // Initialize the new model.
     this->setupConnections(this->Internal->FilterModel,
         this->Internal->FilterGroups);
+    this->Internal->FilterModel->setIcons(this->Internal->Icons,
+        pqSourceInfoIcons::Filter);
     }
 
   return this->Internal->FilterModel;
@@ -188,14 +205,16 @@ void pqPipelineMenu::addFilter()
   // Set up the add filter dialog.
   pqAddSourceDialog dialog(QApplication::activeWindow());
   dialog.setSourceList(model);
+  dialog.setSourceLabel("Filter");
+  dialog.setWindowTitle("Add Filter");
 
-  // TEMP: Start the dialog in the 'Released' group.
-  // TODO: Start the user in the previous group path.
-  dialog.setPath("Released");
+  // Start the user in the previous group path.
+  dialog.setPath(this->Internal->LastFilterGroup);
   if(dialog.exec() == QDialog::Accepted)
     {
     // If the user selects a filter, save the starting path and emit
     // a signal.
+    dialog.getPath(this->Internal->LastFilterGroup);
     }
 }
 

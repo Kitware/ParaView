@@ -40,6 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsExport.h"
 #include <QAbstractItemModel>
 
+#include "pqSourceInfoIcons.h" // Needed for enum
+
 class pqSourceInfoModelItem;
 class QString;
 class QStringList;
@@ -115,6 +117,11 @@ public:
 
   bool isSource(const QModelIndex &index) const;
 
+  bool isSource(const QString &name) const;
+
+  void setIcons(pqSourceInfoIcons *icons,
+      pqSourceInfoIcons::DefaultPixmap type);
+
 public slots:
   /// \name Modification Methods
   //@{
@@ -127,7 +134,11 @@ public slots:
   void removeSource(const QString &name, const QString &group);
   //@}
 
+private slots:
+  void updatePixmap(const QString &name);
+
 private:
+  QModelIndex getIndexFor(pqSourceInfoModelItem *item) const;
   pqSourceInfoModelItem *getItemFor(const QModelIndex &index) const;
   pqSourceInfoModelItem *getGroupItemFor(const QString &group) const;
 
@@ -138,8 +149,12 @@ private:
   void addChildItem(pqSourceInfoModelItem *item);
   void removeChildItem(pqSourceInfoModelItem *item);
 
+  pqSourceInfoModelItem *getNextItem(pqSourceInfoModelItem *item) const;
+
 private:
   pqSourceInfoModelItem *Root;
+  pqSourceInfoIcons *Icons;
+  pqSourceInfoIcons::DefaultPixmap Pixmap;
 };
 
 #endif

@@ -76,6 +76,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSliderDomain.h
   pqSMSignalAdaptors.h
   pqSourceInfoGroupMap.h
+  pqSourceInfoIcons.h
   pqSourceInfoModel.h
   pqThresholdPanel.h
   pqUndoStack.h
@@ -252,6 +253,8 @@ ADD_LIBRARY(pqWidgets
   pqSourceHistoryModel.h
   pqSourceInfoGroupMap.cxx
   pqSourceInfoGroupMap.h
+  pqSourceInfoIcons.cxx
+  pqSourceInfoIcons.h
   pqSourceInfoModel.cxx
   pqSourceInfoModel.h
   pqSourceProxyInfo.cxx
