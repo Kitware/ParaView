@@ -162,26 +162,26 @@ int pqDataInformationModel::columnCount(
 
 
 //-----------------------------------------------------------------------------
-QVariant pqDataInformationModel::data(const QModelIndex&index, 
+QVariant pqDataInformationModel::data(const QModelIndex&idx, 
   int role /*= Qt::DisplayRole*/) const
 {
-  if (!index.isValid() || index.model() != this)
+  if (!idx.isValid() || idx.model() != this)
     {
     return QVariant();
     }
 
-  if (index.row() >= this->Internal->Sources.size())
+  if (idx.row() >= this->Internal->Sources.size())
     {
     qDebug() << "pqDataInformationModel::data called with invalid index: " 
-      << index.row();
+      << idx.row();
     return QVariant();
     }
   if (role == Qt::ToolTipRole)
     {
-    return this->headerData(index.column(), Qt::Horizontal, Qt::DisplayRole);
+    return this->headerData(idx.column(), Qt::Horizontal, Qt::DisplayRole);
     }
 
-  pqSourceInfo &info = this->Internal->Sources[index.row()];
+  pqSourceInfo &info = this->Internal->Sources[idx.row()];
   pqPipelineSource* source = info.Source;
   source->getProxy()->UpdateVTKObjects();
   vtkPVDataInformation* dataInfo = vtkSMSourceProxy::SafeDownCast(
@@ -194,7 +194,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&index,
     dataType = dataInfo->GetCompositeDataSetType();
     }
 
-  switch (index.column())
+  switch (idx.column())
     {
   case pqDataInformationModel::Name:
     // Name column.
@@ -298,11 +298,11 @@ void pqDataInformationModel::addSource(pqPipelineSource* source)
 //-----------------------------------------------------------------------------
 void pqDataInformationModel::removeSource(pqPipelineSource* source)
 {
-  int index = this->Internal->Sources.indexOf(source);
-  if (index != -1)
+  int idx = this->Internal->Sources.indexOf(source);
+  if (idx != -1)
     {
-    this->beginRemoveRows(QModelIndex(), index, index);
-    this->Internal->Sources.removeAt(index);
+    this->beginRemoveRows(QModelIndex(), idx, idx);
+    this->Internal->Sources.removeAt(idx);
     this->endRemoveRows();
     }
 }
@@ -330,3 +330,26 @@ void pqDataInformationModel::refreshModifiedData()
 }
 
 //-----------------------------------------------------------------------------
+QModelIndex pqDataInformationModel::getIndexFor(pqPipelineSource* item)
+{
+  if (!this->Internal->Sources.contains(item))
+    {
+    return QModelIndex();
+    }
+  return this->index(this->Internal->Sources.indexOf(item), 0);
+}
+
+//-----------------------------------------------------------------------------
+pqPipelineSource* pqDataInformationModel::getItemFor(const QModelIndex& idx)
+{
+  if (!idx.isValid() && idx.model() != this)
+    {
+    return NULL;
+    }
+  if (idx.row() >= this->Internal->Sources.size())
+    {
+    qDebug() << "Index: " << idx.row() << " beyond range.";
+    return NULL;
+    }
+  return this->Internal->Sources[idx.row()];
+}

@@ -64,11 +64,11 @@ pqDataInformationWidget::pqDataInformationWidget(QWidget* _parent /*=0*/)
   this->View->horizontalHeader()->setStretchLastSection(true);
   this->View->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-  QVBoxLayout * layout = new QVBoxLayout(this);
-  if (layout)
+  QVBoxLayout * _layout = new QVBoxLayout(this);
+  if (_layout)
     {
-    layout->setMargin(0);
-    layout->addWidget(this->View);
+    _layout->setMargin(0);
+    _layout->addWidget(this->View);
     }
 
   pqServerManagerModel* smModel = 
@@ -104,24 +104,24 @@ pqDataInformationWidget::~pqDataInformationWidget()
 }
 
 //-----------------------------------------------------------------------------
-bool pqDataInformationWidget::eventFilter(QObject* object, QEvent *event)
+bool pqDataInformationWidget::eventFilter(QObject* object, QEvent *evt)
 {
-  return QWidget::eventFilter(object, event);
+  return QWidget::eventFilter(object, evt);
 }
 
 //-----------------------------------------------------------------------------
-void pqDataInformationWidget::showHeaderContextMenu(const QPoint& pos)
+void pqDataInformationWidget::showHeaderContextMenu(const QPoint& _pos)
 {
   QHeaderView* header = this->View->horizontalHeader();
 
   pqSectionVisibilityContextMenu menu;
   menu.setObjectName("DataInformationHeaderContextMenu");
   menu.setHeaderView(header);
-  menu.exec(this->View->mapToGlobal(pos));
+  menu.exec(this->View->mapToGlobal(_pos));
 }
 
 //-----------------------------------------------------------------------------
-void pqDataInformationWidget::showBodyContextMenu(const QPoint& pos)
+void pqDataInformationWidget::showBodyContextMenu(const QPoint& _pos)
 {
   QMenu menu;
   menu.setObjectName("DataInformationBodyContextMenu");
@@ -129,7 +129,7 @@ void pqDataInformationWidget::showBodyContextMenu(const QPoint& pos)
     << pqSetName("ColumnTitles");
   action->setCheckable(true);
   action->setChecked(this->View->horizontalHeader()->isVisible());
-  if (menu.exec(this->View->mapToGlobal(pos)) == action)
+  if (menu.exec(this->View->mapToGlobal(_pos)) == action)
     {
     this->View->horizontalHeader()->setVisible(action->isChecked());
     }

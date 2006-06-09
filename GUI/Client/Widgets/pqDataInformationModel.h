@@ -66,6 +66,8 @@ public:
   virtual QVariant headerData(int section, Qt::Orientation orientation, 
     int role = Qt::DisplayRole) const;
 
+  QModelIndex getIndexFor(pqPipelineSource* item);
+  pqPipelineSource* getItemFor(const QModelIndex& index);
 public slots:
   // Called when a new source/filter is registered.
   void addSource(pqPipelineSource* source);
