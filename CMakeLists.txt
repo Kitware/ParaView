@@ -62,7 +62,6 @@ OPTION(PARAQ_EMBED_PYTHON "Embedded Python Interpreter" ON)
 IF(PARAQ_EMBED_PYTHON)
 
   SUBDIRS(Utilities/pqPython)
-  ADD_DEFINITIONS(-DPARAQ_EMBED_PYTHON)
   SET(BUILD_SHARED_LIBS ON CACHE BOOL "Build ParaQ using shared libraries" FORCE)
   SET(PARAVIEW_WRAP_PYTHON ON CACHE BOOL "Wrap ParaView server manager into Python" FORCE)
 

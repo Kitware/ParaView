@@ -29,8 +29,9 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "pqMainWindow.h"
+#include <vtkPQConfig.h>
 
+#include "pqMainWindow.h"
 
 #include "pqApplicationCore.h"
 #include "pqCompoundProxyWizard.h"

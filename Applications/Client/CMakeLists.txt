@@ -13,8 +13,6 @@ INCLUDE_DIRECTORIES(
   ${pqClient_BINARY_DIR}
 )
 
-ADD_DEFINITIONS(-DVERSION="${PARAQ_VERSION}")
-
 # Reduce the number of dirs that get included on moc command line
 # since it causes issues on Windows 2000.
 GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
