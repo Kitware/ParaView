@@ -141,7 +141,6 @@ void pqObjectPanel::reset()
     {
     return;
     }
-  this->Proxy->UpdateVTKObjects();
   this->Proxy->UpdatePropertyInformation();
   this->PropertyManager->reject();
 }
