@@ -103,7 +103,9 @@ IF (PARAQ_BUILD_GUI)
 ENDIF (PARAQ_BUILD_GUI)
 
 #########################################################################
+IF (PARAQ_BUILD_GUI)
 SUBDIRS(Applications)
+ENDIF (PARAQ_BUILD_GUI)
 
 # Find hints file for the client/server wrapping
 FIND_FILE(VTK_WRAP_HINTS hints ${ParaView_SOURCE_DIR}/VTK/Wrapping)
