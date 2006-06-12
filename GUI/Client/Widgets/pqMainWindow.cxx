@@ -431,13 +431,13 @@ void pqMainWindow::createStandardPipelineBrowser(bool visible)
   this->addStandardDockWidget(Qt::LeftDockWidgetArea, pipeline_dock, 
     QIcon(":pqWidgets/pqPipelineList22.png"), visible);
 
-  this->connect(this->Implementation->PipelineBrowser, 
-    SIGNAL(selectionChanged(pqServerManagerModelItem*)), 
-    this, SLOT(onBrowserSelectionChanged(pqServerManagerModelItem*)));
+  //this->connect(this->Implementation->PipelineBrowser, 
+  //  SIGNAL(selectionChanged(pqServerManagerModelItem*)), 
+  //  this, SLOT(onBrowserSelectionChanged(pqServerManagerModelItem*)));
 
-  QObject::connect(this, SIGNAL(select(pqServerManagerModelItem*)),
-    this->Implementation->PipelineBrowser,
-    SLOT(select(pqServerManagerModelItem*)));
+  //QObject::connect(this, SIGNAL(select(pqServerManagerModelItem*)),
+  //  this->Implementation->PipelineBrowser,
+  //  SLOT(select(pqServerManagerModelItem*)));
 
 }
 //-----------------------------------------------------------------------------
@@ -456,6 +456,15 @@ void pqMainWindow::createStandardDataInformationWidget(bool visible)
     new pqDataInformationWidget(dock);
   this->Implementation->DataInformationWidget->setObjectName(
     "DataInformationWidget");
+
+  pqUndoStack* undoStack = pqApplicationCore::instance()->getUndoStack();
+  // Undo/redo operations can potentially change data information,
+  // hence we must refresh the data on undo/redo.
+  QObject::connect(undoStack, SIGNAL(Undone()),
+    this->Implementation->DataInformationWidget, SLOT(refreshData()));
+  QObject::connect(undoStack, SIGNAL(Redone()),
+    this->Implementation->DataInformationWidget, SLOT(refreshData()));
+
   dock->setWidget(this->Implementation->DataInformationWidget);
   
   this->addStandardDockWidget(Qt::BottomDockWidgetArea, dock, 

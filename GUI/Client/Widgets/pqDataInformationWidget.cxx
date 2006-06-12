@@ -63,7 +63,7 @@ pqDataInformationWidget::pqDataInformationWidget(QWidget* _parent /*=0*/)
   this->View->horizontalHeader()->setMovable(true);
   this->View->horizontalHeader()->setHighlightSections(false);
   this->View->horizontalHeader()->setStretchLastSection(true);
-  this->View->horizontalHeader()->setSortIndicatorShown(true);
+  //this->View->horizontalHeader()->setSortIndicatorShown(true);
   this->View->setSelectionBehavior(QAbstractItemView::SelectRows);
   //this->View->sortByColumn(0);
 

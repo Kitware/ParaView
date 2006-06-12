@@ -73,6 +73,10 @@ signals:
   /// Has information to know the status of the top of the stack.
   void StackChanged(bool canUndo, QString undoLabel, 
     bool canRedo, QString redoLabel);
+  // Fired after undo.
+  void Undone();
+  // Fired after redo.
+  void Redone();
 
 private slots:
   void onStackChanged(vtkObject*, unsigned long, void*, 

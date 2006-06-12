@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QtAlgorithms>
 #include <QtDebug>
+#include <QIcon>
 
 // ParaQ includes.
 #include "pqPipelineSource.h"
@@ -130,7 +131,11 @@ public:
       }
     }
 
-
+  // Given a datatype, returns the icon for that data type.
+  QIcon getDataTypeAsIcon(int/* type*/)
+    {
+    return QIcon();
+    }
 };
 
 //-----------------------------------------------------------------------------
@@ -211,6 +216,9 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
       {
     case Qt::DisplayRole:
       return QVariant(this->Internal->getDataTypeAsString(dataType));
+
+    case Qt::DecorationRole:
+      return QVariant(this->Internal->getDataTypeAsIcon(dataType));
       }
     break;
 

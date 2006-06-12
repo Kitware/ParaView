@@ -137,6 +137,7 @@ void pqUndoStack::Undo()
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("displays", 1);
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
   pqApplicationCore::instance()->render();
+  emit this->Undone();
 }
 
 //-----------------------------------------------------------------------------
@@ -148,6 +149,7 @@ void pqUndoStack::Redo()
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies("displays", 1);
   vtkSMProxyManager::GetProxyManager()->UpdateRegisteredProxies(1);
   pqApplicationCore::instance()->render();
+  emit this->Redone();
 }
 
 //-----------------------------------------------------------------------------
