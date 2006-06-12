@@ -70,10 +70,13 @@ void pqServerManagerSelectionModel::setCurrentItem(
   pqServerManagerModelItem* item,
   pqServerManagerSelectionModel::SelectionFlags command)
 {
-  this->Internal->Current = item;
-  this->select(item, command);
+  if (this->Internal->Current != item)
+    {
+    this->Internal->Current = item;
+    this->select(item, command);
 
-  emit this->currentChanged(item);
+    emit this->currentChanged(item);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -104,6 +107,7 @@ void pqServerManagerSelectionModel::select(pqServerManagerModelItem* item,
   sel.push_back(item);
   this->select(sel, command);
 }
+
 //-----------------------------------------------------------------------------
 void pqServerManagerSelectionModel::select(
   const pqServerManagerModelSelection& items,
@@ -114,6 +118,7 @@ void pqServerManagerSelectionModel::select(
     return;
     }
 
+  bool changed = false;
   // store old selection.
   pqServerManagerModelSelection selected;
   pqServerManagerModelSelection deselected;
@@ -123,6 +128,8 @@ void pqServerManagerSelectionModel::select(
     deselected = this->Internal->Selection;
     this->Internal->Selection.clear();
     this->Internal->Current = 0;
+    deselected = this->Internal->Selection;
+    changed = true;
     }
 
   foreach(pqServerManagerModelItem* item, items)
@@ -130,17 +137,28 @@ void pqServerManagerSelectionModel::select(
     if (command & Select && !this->Internal->Selection.contains(item))
       {
       this->Internal->Selection.push_back(item);
-      selected.push_back(item);
+      if (!selected.contains(item))
+        {
+        selected.push_back(item);
+        changed = true;
+        }
       }
 
     if (command & Deselect && this->Internal->Selection.contains(item)) 
       {
       this->Internal->Selection.removeAll(item);
-      deselected.push_back(item);
+      if (!deselected.contains(item))
+        {
+        deselected.push_back(item);
+        changed = true;
+        }
       }
     }
 
-  emit this->selectionChanged(selected, deselected);
+  if (changed)
+    {
+    emit this->selectionChanged(selected, deselected);
+    }
 }
 
 //-----------------------------------------------------------------------------
