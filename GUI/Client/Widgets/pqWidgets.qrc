@@ -56,8 +56,6 @@
         <file alias="pqWindowd32.png">Resources/pqWindowd32.png</file>
         <file alias="SplitViewHorizontal.png">Resources/SplitViewHorizontal.png</file>
         <file alias="SplitViewVertical.png">Resources/SplitViewVertical.png</file>
-        <file alias="ClipPanel.ui">pqClipPanel.ui</file>
-        <file alias="CutPanel.ui">pqCutPanel.ui</file>
         <file alias="ExodusPanel.ui">pqExodusPanel.ui</file>
         <file alias="ThresholdPanel.ui">pqThresholdPanel.ui</file>
     </qresource>

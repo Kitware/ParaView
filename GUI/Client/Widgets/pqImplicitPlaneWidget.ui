@@ -2,14 +2,14 @@
  <author></author>
  <comment></comment>
  <exportmacro></exportmacro>
- <class>Form</class>
- <widget class="QWidget" name="Form" >
+ <class>pqImplicitPlaneWidget</class>
+ <widget class="QWidget" name="pqImplicitPlaneWidget" >
   <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>231</width>
-    <height>302</height>
+    <width>206</width>
+    <height>211</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -124,7 +124,7 @@
      <property name="sizeHint" >
       <size>
        <width>20</width>
-       <height>61</height>
+       <height>40</height>
       </size>
      </property>
     </spacer>
@@ -132,14 +132,6 @@
   </layout>
  </widget>
  <pixmapfunction></pixmapfunction>
- <tabstops>
-  <tabstop>originX</tabstop>
-  <tabstop>originY</tabstop>
-  <tabstop>originZ</tabstop>
-  <tabstop>normalX</tabstop>
-  <tabstop>normalY</tabstop>
-  <tabstop>normalZ</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>

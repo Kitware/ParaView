@@ -43,6 +43,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqExodusPanel.h
   pqFileDialogEventTranslator.h
   pqImageTip.h
+  pqImplicitPlaneWidget.h
   pqLoadedFormObjectPanel.h
   pqMainWindow.h
   pqMultiViewFrame.h
@@ -88,10 +89,9 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
 SET(UI_FORMS
   pqAddSourceDialog.ui
-  pqClipPanel.ui
   pqCompoundProxyWizard.ui
-  pqCutPanel.ui
   pqDisplayProxyEditor.ui
+  pqImplicitPlaneWidget.ui
   pqMultiViewFrameMenu.ui
   pqOutputWindow.ui
   pqRenderViewEditor.ui
@@ -161,6 +161,8 @@ ADD_LIBRARY(pqWidgets
   pqFileDialogEventTranslator.h
   pqImageTip.cxx
   pqImageTip.h
+  pqImplicitPlaneWidget.cxx
+  pqImplicitPlaneWidget.h
   pqLoadedFormObjectPanel.cxx
   pqLoadedFormObjectPanel.h
   pqMain.cxx

@@ -33,46 +33,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqCutPanel_h
 #define _pqCutPanel_h
 
-#include "pqWidgetObjectPanel.h"
+#include "pqObjectPanel.h"
 
-/// Widget which provides an editor for editing properties of a proxy
+/// Custom panel for the Cut filter that manages a 3D widget for interactive cutting
 class pqCutPanel :
-  public pqWidgetObjectPanel
+  public pqObjectPanel
 {
+  typedef pqObjectPanel base;
+
   Q_OBJECT
 
 public:
   pqCutPanel(QWidget* p);
   ~pqCutPanel();
   
-protected:
-  virtual void setProxyInternal(pqSMProxy p);
-
 private slots:
-  /// Called if any of the Qt widget values is modified
-  void onQtWidgetChanged();
+  /// Called when changes are made to the implicit plane widget
+  void onWidgetChanged();
   /// Called if the user accepts pending modifications
   void onAccepted();
   /// Called if the user rejects pending modifications
   void onRejected();
 
 private:
-  /// Called when the 3D widget values are modified
-  void on3DWidgetChanged();
+  virtual void setProxyInternal(pqSMProxy p);
+  virtual void select();
+  virtual void deselect();
 
-  /// Pulls the current values from the implicit plane, pushing them into the Qt and 3D widgets  
-  void pullImplicitPlane();
-  /// Pushes values into the Qt widgets
-  void updateQtWidgets(const double* origin, const double* normal);
-  /// Pushes values into the 3D widget
-  void update3DWidget(const double* origin, const double* normal);
-  /// Pushes values into the implicit plane
-  void pushImplicitPlane(const double* origin, const double* normal);
-
-  /// Used to avoid recursion when updating the Qt widgets  
-  bool IgnoreQtWidgets;
-  /// Used to avoid recursion when updating the 3D widget
-  bool Ignore3DWidget;
+  class pqImplementation;
+  pqImplementation* const Implementation;
 };
 
 #endif
