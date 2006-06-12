@@ -1575,7 +1575,6 @@ void pqFlatTreeView::changeCurrent(const QModelIndex &current,
       item = this->getItem(previous);
       if(item && previous.column() < item->Cells.size())
         {
-        item->Cells[previous.column()]->Selected = false;
         region = QRegion(0, item->ContentsY, this->ContentsWidth,
             this->ItemHeight);
         }
@@ -1587,7 +1586,6 @@ void pqFlatTreeView::changeCurrent(const QModelIndex &current,
       item = this->getItem(current);
       if(item && current.column() < item->Cells.size())
         {
-        item->Cells[current.column()]->Selected = true;
         region = region.unite(QRegion(0, item->ContentsY, this->ContentsWidth,
             this->ItemHeight));
         }
@@ -1651,6 +1649,7 @@ void pqFlatTreeView::changeSelection(const QItemSelection &selected,
       {
       continue;
       }
+
     // Get the parent item for the range.
     parentItem = this->getItem((*iter).parent());
     if(parentItem)
@@ -1665,15 +1664,16 @@ void pqFlatTreeView::changeSelection(const QItemSelection &selected,
         }
       else if(parentItem->Items.size() > 0)
         {
+        cy = -1;
         start = (*iter).top();
         end = (*iter).bottom();
-        cy = -1;
+        if(end >= parentItem->Items.size())
+          {
+          end = parentItem->Items.size() - 1;
+          }
+
         for( ; start <= end; start++)
           {
-          if (start >= parentItem->Items.size())
-            {
-            break;
-            }
           item = parentItem->Items[start];
           if(cy == -1)
             {
@@ -1709,6 +1709,7 @@ void pqFlatTreeView::changeSelection(const QItemSelection &selected,
       {
       continue;
       }
+
     parentItem = this->getItem((*iter).parent());
     if(parentItem)
       {
@@ -1722,9 +1723,14 @@ void pqFlatTreeView::changeSelection(const QItemSelection &selected,
         }
       else if(parentItem->Items.size() > 0)
         {
+        cy = -1;
         start = (*iter).top();
         end = (*iter).bottom();
-        cy = -1;
+        if(end >= parentItem->Items.size())
+          {
+          end = parentItem->Items.size() - 1;
+          }
+
         for( ; start <= end; start++)
           {
           item = parentItem->Items[start];
