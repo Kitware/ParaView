@@ -58,13 +58,14 @@ pqDataInformationWidget::pqDataInformationWidget(QWidget* _parent /*=0*/)
   proxyModel->setSourceModel(this->Model);
   this->View->setModel(proxyModel);
 
-  //this->View->setModel(this->Model);
   this->View->verticalHeader()->hide();
   this->View->installEventFilter(this);
   this->View->horizontalHeader()->setMovable(true);
   this->View->horizontalHeader()->setHighlightSections(false);
   this->View->horizontalHeader()->setStretchLastSection(true);
+  this->View->horizontalHeader()->setSortIndicatorShown(true);
   this->View->setSelectionBehavior(QAbstractItemView::SelectRows);
+  this->View->sortByColumn(0);
 
   QVBoxLayout * _layout = new QVBoxLayout(this);
   if (_layout)
@@ -81,8 +82,7 @@ pqDataInformationWidget::pqDataInformationWidget(QWidget* _parent /*=0*/)
     this->Model, SLOT(removeSource(pqPipelineSource*)));
 
   // Clicking on the header should sort the column.
-  QObject::connect(this->View->horizontalHeader(),
-    SIGNAL(sectionClicked(int)),
+  QObject::connect(this->View->horizontalHeader(), SIGNAL(sectionClicked(int)),
     this->View, SLOT(sortByColumn(int)));
 
   // Set the context menu policy for the header.
