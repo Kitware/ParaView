@@ -431,13 +431,13 @@ void pqMainWindow::createStandardPipelineBrowser(bool visible)
   this->addStandardDockWidget(Qt::LeftDockWidgetArea, pipeline_dock, 
     QIcon(":pqWidgets/pqPipelineList22.png"), visible);
 
-  //this->connect(this->Implementation->PipelineBrowser, 
-  //  SIGNAL(selectionChanged(pqServerManagerModelItem*)), 
-  //  this, SLOT(onBrowserSelectionChanged(pqServerManagerModelItem*)));
+  this->connect(this->Implementation->PipelineBrowser, 
+    SIGNAL(selectionChanged(pqServerManagerModelItem*)), 
+    this, SLOT(onBrowserSelectionChanged(pqServerManagerModelItem*)));
 
-  //QObject::connect(this, SIGNAL(select(pqServerManagerModelItem*)),
-  //  this->Implementation->PipelineBrowser,
-  //  SLOT(select(pqServerManagerModelItem*)));
+  QObject::connect(this, SIGNAL(select(pqServerManagerModelItem*)),
+    this->Implementation->PipelineBrowser,
+    SLOT(select(pqServerManagerModelItem*)));
 
 }
 //-----------------------------------------------------------------------------
