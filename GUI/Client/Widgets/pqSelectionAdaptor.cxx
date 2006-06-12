@@ -202,8 +202,9 @@ void pqSelectionAdaptor::selectionChanged(
     return;
     }
 
+  this->Internal->IgnoreSignals = true;
+
   pqServerManagerModelSelection smSelected;
-  pqServerManagerModelSelection smDeselected;
   const QModelIndexList &sIndexes = selected.indexes();
 
   foreach (const QModelIndex& index, sIndexes)
@@ -213,6 +214,9 @@ void pqSelectionAdaptor::selectionChanged(
     smSelected.push_back(smItem);
     }
 
+  (void)deselected;
+  /*
+  pqServerManagerModelSelection smDeselected;
   const QModelIndexList &dIndexes = deselected.indexes();
   foreach (const QModelIndex& index, dIndexes)
     {
@@ -220,11 +224,11 @@ void pqSelectionAdaptor::selectionChanged(
       this->mapToSource(index));
     smDeselected.push_back(smItem);
     }
-  this->Internal->IgnoreSignals = true;
   this->Internal->SMSelectionModel->select(smDeselected, 
    pqServerManagerSelectionModel::Deselect);
+  */
   this->Internal->SMSelectionModel->select(smSelected,
-   pqServerManagerSelectionModel::Select);
+   pqServerManagerSelectionModel::ClearAndSelect);
   this->Internal->IgnoreSignals = false;
 }
 
@@ -269,6 +273,7 @@ void pqSelectionAdaptor::selectionChanged(
     {
     return;
     }
+  this->Internal->IgnoreSignals = true;
   QItemSelection qSelected;
   QItemSelection qDeselected;
 
@@ -279,18 +284,20 @@ void pqSelectionAdaptor::selectionChanged(
     qSelected.push_back(QItemSelectionRange(index));
     }
 
+  (void)deselected;
+  /*
   foreach(pqServerManagerModelItem* item, deselected )
     {
     const QModelIndex& index = this->mapFromSource(
       this->mapFromSMModel(item), this->getQSelectionModel()->model());
     qDeselected.push_back(QItemSelectionRange(index));
     }
-  this->Internal->IgnoreSignals = true;
   this->Internal->QSelectionModel->select(qDeselected,
     QItemSelectionModel::Deselect);
+    */
 
   this->Internal->QSelectionModel->select(qSelected,
-    QItemSelectionModel::Select);
+    QItemSelectionModel::ClearAndSelect);
   this->Internal->IgnoreSignals = false;
 }
 
