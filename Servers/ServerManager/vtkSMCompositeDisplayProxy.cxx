@@ -30,7 +30,7 @@
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.18");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.19");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -1093,6 +1093,31 @@ void vtkSMCompositeDisplayProxy::CacheUpdate(int idx, int total)
     }
 
   this->DistributedLODGeometryIsValid = 0;
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMCompositeDisplayProxy::UpdateRequired()
+{
+  if (this->VolumeRenderMode)
+    {
+    if (!this->DistributedVolumeGeometryIsValid && this->VolumeGeometryIsValid)
+      {
+      return 1;
+      }
+    }
+  else
+    {
+    if (!this->DistributedGeometryIsValid && this->GeometryIsValid)
+      {
+      return 1;
+      }
+    }
+
+  if (!this->DistributedLODGeometryIsValid && this->LODGeometryIsValid)
+    {
+    return 1;
+    }
+  return this->Superclass::UpdateRequired();
 }
 
 //-----------------------------------------------------------------------------

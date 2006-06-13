@@ -25,7 +25,7 @@
 #include "vtkSMInputProperty.h"
 
 vtkStandardNewMacro(vtkSMLODDisplayProxy);
-vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.11");
+vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.12");
 //-----------------------------------------------------------------------------
 vtkSMLODDisplayProxy::vtkSMLODDisplayProxy()
 {
@@ -315,6 +315,17 @@ int vtkSMLODDisplayProxy::GetLODFlag()
     return 1;
     }
   return helper->GetLODFlag();
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMLODDisplayProxy::UpdateRequired()
+{
+  if (!this->LODGeometryIsValid && this->GetLODFlag() && 
+    this->LODUpdateSuppressorProxy)
+    {
+    return 1;
+    } 
+  return this->Superclass::UpdateRequired();
 }
 
 //-----------------------------------------------------------------------------

@@ -262,9 +262,12 @@ public:
   // should report to all client why the server is exiting.
   void ExceptionEvent(int type);
 
+  //BTX
   // Description:
-  virtual void SendPrepareProgress(vtkIdType connectionID);
+  virtual void SendPrepareProgress(vtkIdType connectionID,
+    vtkTypeUInt32 servers=CLIENT|DATA_SERVER);
   virtual void SendCleanupPendingProgress(vtkIdType connectionID);
+  //ETX
 
   // Description:
   // This method is called before progress reports start comming.

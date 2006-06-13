@@ -40,6 +40,12 @@ public:
   // This method calls a ForceUpdate on the UpdateSuppressor
   // if the Geometry is not valid. 
   virtual void Update();
+
+  // Description:
+  // This method returns if the Update() or UpdateDistributedGeometry()
+  // calls will actually lead to an Update. This is used by the render module
+  // to decide if it can expect any pipeline updates.
+  virtual int UpdateRequired();
   
   // Description:
   // Invalidates Geometry. Results in removal of any cached geometry. Also,

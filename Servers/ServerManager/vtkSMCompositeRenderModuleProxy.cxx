@@ -38,7 +38,7 @@
 #include "vtkWindowToImageFilter.h"
 
 vtkStandardNewMacro(vtkSMCompositeRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.14");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {
@@ -56,6 +56,16 @@ vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 vtkSMCompositeRenderModuleProxy::~vtkSMCompositeRenderModuleProxy()
 {
   this->CompositeManagerProxy = 0;
+}
+
+//-----------------------------------------------------------------------------
+vtkTypeUInt32 vtkSMCompositeRenderModuleProxy::GetRenderingProgressServers()
+{
+  if (this->LocalRender)
+    {
+    return vtkProcessModule::CLIENT;
+    }
+  return this->Superclass::GetRenderingProgressServers();
 }
 
 //-----------------------------------------------------------------------------

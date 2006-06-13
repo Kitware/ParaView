@@ -63,6 +63,11 @@ public:
   
   DataTypesType DataTypes;
   MapStringToString Paths;
+  
+  // Flag indicating on which servers the SendPrepareProgress
+  // was sent. This is used to determine where to send the
+  // CleanupPendingProgress request.
+  vtkTypeUInt32 ProgressServersFlag;
 };
 
 //*****************************************************************************
@@ -97,7 +102,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.52");
+vtkCxxRevisionMacro(vtkProcessModule, "1.53");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -1000,7 +1005,8 @@ void vtkProcessModule::RegisterProgressEvent(vtkObject* po, int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkProcessModule::SendPrepareProgress(vtkIdType connectionId)
+void vtkProcessModule::SendPrepareProgress(vtkIdType connectionId,
+  vtkTypeUInt32 servers/*=CLIENT|DATA_SERVER*/)
 {
   if (!this->GUIHelper)
     {
@@ -1010,16 +1016,26 @@ void vtkProcessModule::SendPrepareProgress(vtkIdType connectionId)
 
   if (this->ProgressRequests == 0)
     {
+    this->Internals->ProgressServersFlag = servers;
     this->GUIHelper->SendPrepareProgress();
-    
+    }
+  else
+    {
+    // we need to send the progress request to those servers to which
+    // we haven't already sent the request.
+    servers = servers & (~this->Internals->ProgressServersFlag);
+    this->Internals->ProgressServersFlag |= servers;
+    }
+
+  if (servers)
+    {
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke 
            << this->GetProcessModuleID() << "PrepareProgress" 
            << vtkClientServerStream::End;
-    this->SendStream(connectionId,
-                     vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, 
-                     stream);
+    this->SendStream(connectionId, servers, stream);
     }
+
   this->ProgressRequests ++;
 }
 
@@ -1041,8 +1057,8 @@ void vtkProcessModule::SendCleanupPendingProgress(vtkIdType connectionId)
   stream << vtkClientServerStream::Invoke 
          << this->GetProcessModuleID() << "CleanupPendingProgress" 
          << vtkClientServerStream::End;
-  this->SendStream(connectionId,
-    vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
+  this->SendStream(connectionId, this->Internals->ProgressServersFlag, stream);
+  this->Internals->ProgressServersFlag = 0;
   
   if (!this->GUIHelper)
     {
@@ -1107,6 +1123,7 @@ void vtkProcessModule::ExecuteEvent(
   switch (event)
     {
   case vtkCommand::ProgressEvent:
+    if (this->ProgressRequests > 0)
       {
       int progress = static_cast<int>(*reinterpret_cast<double*>(calldata) *
         100.0);

@@ -49,7 +49,7 @@
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.30");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.31");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -465,9 +465,12 @@ void vtkSMRenderModuleProxy::InteractiveRender()
   renWin->SetDesiredUpdateRate(5.0);
   this->GetRenderer()->ResetCameraClippingRange();
 
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SendPrepareProgress(this->ConnectionID, this->GetRenderingProgressServers());
   this->BeginInteractiveRender();
   renWin->Render();
   this->EndInteractiveRender();
+  pm->SendCleanupPendingProgress(this->ConnectionID);
 }
 
 //-----------------------------------------------------------------------------
@@ -498,9 +501,14 @@ void vtkSMRenderModuleProxy::StillRender()
     }
   renWindow->SetDesiredUpdateRate(0.002);
 
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SendPrepareProgress(this->ConnectionID, this->GetRenderingProgressServers());
+
   this->BeginStillRender();
   renWindow->Render();
   this->EndStillRender();
+
+  pm->SendCleanupPendingProgress(this->ConnectionID);
 }
 
 //-----------------------------------------------------------------------------
@@ -626,12 +634,42 @@ void vtkSMRenderModuleProxy::InvalidateAllGeometries()
 }
 
 //-----------------------------------------------------------------------------
+vtkTypeUInt32 vtkSMRenderModuleProxy::GetRenderingProgressServers()
+{
+  return vtkProcessModule::RENDER_SERVER|vtkProcessModule::CLIENT;
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::UpdateAllDisplays()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-
-  pm->SendPrepareProgress(this->ConnectionID);
   vtkCollectionIterator* iter = this->Displays->NewIterator();
+
+  // Check if this update is going to result in updating of any pipeline,
+  // if so we must enable progresses, otherwise progresses are not necessary.
+  bool enable_progress = false;
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    vtkSMDataObjectDisplayProxy* disp = 
+      vtkSMDataObjectDisplayProxy::SafeDownCast(iter->GetCurrentObject());
+    if (!disp || !disp->GetVisibilityCM())
+      {
+      // Some displays don't need updating.
+      continue;
+      }
+    if (disp->UpdateRequired())
+      {
+      enable_progress = true;
+      break;
+      }
+    }
+
+
+  if (enable_progress)
+    {
+    pm->SendPrepareProgress(this->ConnectionID,
+      vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER);
+    }
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
     vtkSMDisplayProxy* disp = 
@@ -646,8 +684,11 @@ void vtkSMRenderModuleProxy::UpdateAllDisplays()
     disp->UpdateDistributedGeometry();
     // We don;t use properties here since it tends to slow things down.
     }
-  iter->Delete();  
-  pm->SendCleanupPendingProgress(this->ConnectionID);
+  iter->Delete();
+  if (enable_progress)
+    {
+    pm->SendCleanupPendingProgress(this->ConnectionID);
+    }
 }
 
 //-----------------------------------------------------------------------------
