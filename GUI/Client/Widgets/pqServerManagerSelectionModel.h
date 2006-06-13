@@ -43,6 +43,16 @@ class pqServerManagerModel;
 class pqServerManagerModelItem;
 class pqServerManagerSelectionModelInternal;
 
+inline bool operator==(const QPointer<pqServerManagerModelItem>& lhs, const QPointer<pqServerManagerModelItem>& rhs)
+{
+  return static_cast<pqServerManagerModelItem*>(lhs) == static_cast<pqServerManagerModelItem*>(rhs);
+}
+
+inline uint qHash(const QPointer<pqServerManagerModelItem>& index)
+{
+  return reinterpret_cast<uint>(static_cast<pqServerManagerModelItem*>(index));
+}
+
 // This is a selection set. For now, it's simply a QList.
 class PQWIDGETS_EXPORT pqServerManagerModelSelection : 
   public QList<QPointer<pqServerManagerModelItem> >
