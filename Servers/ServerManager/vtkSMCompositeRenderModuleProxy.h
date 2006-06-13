@@ -128,6 +128,12 @@ protected:
   // Note that this message is sent only to the client.
   void SetUseCompositing(vtkSMProxy* p, int flag);
 
+  // Return the servers  where the PrepareProgress request
+  // must be sent when rendering. By default,
+  // it is RENDER_SERVER|CLIENT, however in CompositeRenderModule,
+  // when rendering locally, the progress messages need not 
+  // be sent to the servers.
+  virtual vtkTypeUInt32 GetRenderingProgressServers();
 private:
   vtkSMCompositeRenderModuleProxy(const vtkSMCompositeRenderModuleProxy&); // Not implemented.
   void operator=(const vtkSMCompositeRenderModuleProxy&); // Not implemented.

@@ -279,8 +279,13 @@ protected:
 
   virtual void BeginInteractiveRender();
   virtual void EndInteractiveRender();
-  
-  
+ 
+  // Return the servers  where the PrepareProgress request
+  // must be sent when rendering. By default,
+  // it is RENDER_SERVER|CLIENT, however in CompositeRenderModule,
+  // when rendering locally, the progress messages need not 
+  // be sent to the servers.
+  virtual vtkTypeUInt32 GetRenderingProgressServers();
 
 private:
   vtkSMRenderModuleProxy(const vtkSMRenderModuleProxy&); // Not implemented.

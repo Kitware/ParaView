@@ -36,7 +36,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.15");
 
 
 //-----------------------------------------------------------------------------
@@ -1144,6 +1144,26 @@ void vtkSMDataObjectDisplayProxy::InvalidateGeometryInternal(int useCache)
       this->UpdateSuppressorProxy->UpdateVTKObjects();
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMDataObjectDisplayProxy::UpdateRequired()
+{
+  if (this->VolumeRenderMode)
+    {
+    if (this->VolumeGeometryIsValid || !this->VolumeUpdateSuppressorProxy)
+      {
+      return 0;
+      }
+    }
+  else
+    {
+    if (this->GeometryIsValid || !this->UpdateSuppressorProxy)
+      {
+      return 0;
+      }
+    }
+  return 1;
 }
 
 //-----------------------------------------------------------------------------

@@ -72,6 +72,12 @@ public:
   virtual void Update();
   virtual void UpdateDistributedGeometry();
 
+  // Description:
+  // This method returns if the Update() or UpdateDistributedGeometry()
+  // calls will actually lead to an Update. This is used by the render module
+  // to decide if it can expect any pipeline updates.
+  virtual int UpdateRequired();
+
   virtual void CacheUpdate(int idx, int total);
 
 protected:
