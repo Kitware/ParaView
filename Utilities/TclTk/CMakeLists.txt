@@ -147,21 +147,18 @@ ELSE(UNIX)
     "${TclTk_SOURCE_DIR}/tk${TCL_TK_WIN_VERSION}/library")
 
   IF(BUILD_SHARED_LIBS)
+    # There is *no* choice but installing the debug libs
+    # as well. VTK makes its choice regarding what to link against at
+    # link time, picking from either TCL_LIBRARY or (TCL_LIBRARY_DEBUG for
+    # example.
     SET(DLLS
       "TclTk${TCL_TK_WIN_VERSION}Win/bin/tcl84.dll"
       "TclTk${TCL_TK_WIN_VERSION}Win/bin/tk84.dll"
       "TclTk${TCL_TK_WIN_VERSION}Win/bin/msvcrt.dll"
+      "TclTk${TCL_TK_WIN_VERSION}Win/bin/tcl84g.dll"
+      "TclTk${TCL_TK_WIN_VERSION}Win/bin/tk84g.dll"
+      "TclTk${TCL_TK_WIN_VERSION}Win/bin/msvcrtd.dll"
       tkdnd/lib/tkdnd/libtkdnd.dll)
-    # If VTK uses Tcl, there is *no* choice but installing the debug libs
-    # as well. VTK makes its choice regarding what to link against at
-    # link time, picking from either TCL_LIBRARY or (TCL_LIBRARY_DEBUG for
-    # example.
-    IF(VTK_WRAP_TCL)
-      SET(DLLS ${DLLS}
-        "TclTk${TCL_TK_WIN_VERSION}Win/bin/tcl84g.dll"
-        "TclTk${TCL_TK_WIN_VERSION}Win/bin/tk84g.dll"
-        "TclTk${TCL_TK_WIN_VERSION}Win/bin/msvcrtd.dll")
-    ENDIF(VTK_WRAP_TCL)
     FOREACH(dll ${DLLS})
       GET_FILENAME_COMPONENT(dllname ${dll} NAME)
       IF(TclTk_BIN_DIR)
