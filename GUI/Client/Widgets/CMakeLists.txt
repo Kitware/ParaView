@@ -66,6 +66,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqRenderModule.h
   pqRenderViewEditor.h
   pqRenderWindowManager.h
+  pqSampleScalarWidget.h
   pqSelectionAdaptor.h
   pqServer.h
   pqServerBrowser.h
@@ -95,6 +96,7 @@ SET(UI_FORMS
   pqMultiViewFrameMenu.ui
   pqOutputWindow.ui
   pqRenderViewEditor.ui
+  pqSampleScalarWidget.ui
   pqServerBrowser.ui
 )
 
@@ -227,6 +229,8 @@ ADD_LIBRARY(pqWidgets
   pqRenderViewProxy.h
   pqRenderWindowManager.cxx
   pqRenderWindowManager.h
+  pqSampleScalarWidget.cxx
+  pqSampleScalarWidget.h
   pqSelectionAdaptor.cxx
   pqSelectionAdaptor.h
   pqServerBrowser.cxx

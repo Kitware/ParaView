@@ -52,8 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
 
-#include <QPushButton>
-
 /////////////////////////////////////////////////////////////////////////
 // pqImplicitPlaneWidget::WidgetObserver
 

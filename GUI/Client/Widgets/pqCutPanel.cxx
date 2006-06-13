@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPropertyManager.h"
+#include "pqSampleScalarWidget.h"
 #include "pqServerManagerModel.h"
 
 #include <vtkSMDataObjectDisplayProxy.h>
@@ -43,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMNew3DWidgetProxy.h>
 #include <vtkSMProxyProperty.h>
 
+#include <QFrame>
 #include <QVBoxLayout>
 
 //////////////////////////////////////////////////////////////////////////////
@@ -52,24 +54,32 @@ class pqCutPanel::pqImplementation
 {
 public:
   pqImplementation(QWidget* parent) :
-    ImplicitPlaneWidget(parent)
+    ImplicitPlaneWidget(parent),
+    SampleScalarWidget(parent)
   {
   }
-    
+  
   /// Manages a 3D implicit plane widget, plus Qt controls  
   pqImplicitPlaneWidget ImplicitPlaneWidget;
-  /// Manages the overall Qt layout
-  QVBoxLayout Layout;
+  /// Controls the number and position of "slices"
+  pqSampleScalarWidget SampleScalarWidget;
 };
 
 pqCutPanel::pqCutPanel(QWidget* p) :
   base(p),
   Implementation(new pqImplementation(this))
 {
-  this->Implementation->Layout.addWidget(&this->Implementation->ImplicitPlaneWidget);
-  this->setLayout(&this->Implementation->Layout);
+  QFrame* const separator = new QFrame();
+  separator->setFrameShape(QFrame::HLine);
 
-  connect(&this->Implementation->ImplicitPlaneWidget, SIGNAL(widgetChanged()), this, SLOT(onWidgetChanged()));
+  QVBoxLayout* const layout = new QVBoxLayout();
+  layout->addWidget(&this->Implementation->ImplicitPlaneWidget);
+  layout->addWidget(separator);
+  layout->addWidget(&this->Implementation->SampleScalarWidget);
+  this->setLayout(layout);
+
+  connect(&this->Implementation->ImplicitPlaneWidget, SIGNAL(widgetChanged()), this, SLOT(onImplicitPlaneWidgetChanged()));
+  connect(&this->Implementation->SampleScalarWidget, SIGNAL(samplesChanged()), this, SLOT(onSampleScalarWidgetChanged()));
   connect(this->getPropertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
   connect(this->getPropertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
 }
@@ -80,7 +90,13 @@ pqCutPanel::~pqCutPanel()
   delete this->Implementation;
 }
 
-void pqCutPanel::onWidgetChanged()
+void pqCutPanel::onImplicitPlaneWidgetChanged()
+{
+  // Signal the UI that there are changes to accept/reject ...
+  this->getPropertyManager()->propertyChanged();
+}
+
+void pqCutPanel::onSampleScalarWidgetChanged()
 {
   // Signal the UI that there are changes to accept/reject ...
   this->getPropertyManager()->propertyChanged();
@@ -88,11 +104,13 @@ void pqCutPanel::onWidgetChanged()
 
 void pqCutPanel::onAccepted()
 {
-  // Get the current values from the 3D widget ...
+  // Get the current values from the 3D implicit plane widget ...
   double origin[3] = { 0, 0, 0 };
   double normal[3] = { 0, 0, 1 };
-  
   this->Implementation->ImplicitPlaneWidget.getWidgetState(origin, normal);
+
+  // Get the current values from the sample scalar widget ...
+  const QList<double> samples = this->Implementation->SampleScalarWidget.getSamples();
   
   // Push the new values into the cut filter ...  
   if(this->Proxy)
@@ -116,6 +134,19 @@ void pqCutPanel::onAccepted()
 
         clip_function->UpdateVTKObjects();
         }
+      }
+      
+    if(vtkSMDoubleVectorProperty* const contours =
+      vtkSMDoubleVectorProperty::SafeDownCast(
+        this->Proxy->GetProperty("ContourValues")))
+      {
+      contours->SetNumberOfElements(samples.size());
+      for(int i = 0; i != samples.size(); ++i)
+        {
+        contours->SetElement(i, samples[i]);
+        }
+        
+      this->Proxy->UpdateVTKObjects();
       }
     }
   
@@ -189,7 +220,7 @@ void pqCutPanel::setProxyInternal(pqSMProxy p)
   if(!this->Proxy)
     return;
   
-  // Get the current values from the implicit plane ...
+  // Setup the implicit plane widget ...
   double origin[3] = { 0, 0, 0 };
   double normal[3] = { 0, 0, 1 };
   
@@ -220,6 +251,25 @@ void pqCutPanel::setProxyInternal(pqSMProxy p)
     }
 
   this->Implementation->ImplicitPlaneWidget.setWidgetState(origin, normal);
+
+  // Setup the sample scalar widget ...
+  QList<double> values;
+  
+  if(this->Proxy)
+    {
+    if(vtkSMDoubleVectorProperty* const contours =
+      vtkSMDoubleVectorProperty::SafeDownCast(
+        this->Proxy->GetProperty("ContourValues")))
+      {
+      const int value_count = contours->GetNumberOfElements();
+      for(int i = 0; i != value_count; ++i)
+        {
+        values.push_back(contours->GetElement(i));
+        }
+      }
+    }
+    
+  this->Implementation->SampleScalarWidget.setSamples(values);
 }
 
 void pqCutPanel::select()

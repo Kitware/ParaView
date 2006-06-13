@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqCutPanel.h
+   Module:    pqSampleScalarWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,41 +30,51 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqCutPanel_h
-#define _pqCutPanel_h
+#ifndef _pqSampleScalarWidget_h
+#define _pqSampleScalarWidget_h
 
-#include "pqObjectPanel.h"
+#include "pqWidgetsExport.h"
 
-/// Custom panel for the Cut filter that manages a 3D widget for interactive cutting
-class pqCutPanel :
-  public pqObjectPanel
+#include <QWidget>
+
+namespace Ui { class pqSampleScalarWidget; }
+
+/** Provides a standard user interface component for manipulating a list of
+scalar samples.  Current uses include: specifying the set of "slices" for
+the Cut filter, and specifying the set of contour values for the Contour filter.
+*/
+
+class PQWIDGETS_EXPORT pqSampleScalarWidget :
+  public QWidget
 {
-  typedef pqObjectPanel base;
+  typedef QWidget base;
 
   Q_OBJECT
 
 public:
-  pqCutPanel(QWidget* p);
-  ~pqCutPanel();
-  
+  pqSampleScalarWidget(QWidget* Parent);
+  ~pqSampleScalarWidget();
+
+  /// Set the set of samples selected by the widget, overriding any previous set.
+  void setSamples(const QList<double>& samples);
+  /// Returns the set of samples selected by the widget.
+  const QList<double> getSamples();
+
+signals:
+  /// Signal emitted whenever the set of select samples changes.
+  void samplesChanged();
+
 private slots:
-  /// Called when changes are made to the implicit plane widget
-  void onImplicitPlaneWidgetChanged();
-  /// Called when changes are made to the sample scalar widget
-  void onSampleScalarWidgetChanged();
-  /// Called if the user accepts pending modifications
-  void onAccepted();
-  /// Called if the user rejects pending modifications
-  void onRejected();
-
+  void onAddRange();
+  void onAddValue();
+  void onDeleteAll();
+  void onDeleteSelected();
+  
 private:
-  virtual void setProxyInternal(pqSMProxy p);
-  virtual void select();
-  virtual void deselect();
-
-  class pqImplementation;
-  pqImplementation* const Implementation;
+  pqSampleScalarWidget(const pqSampleScalarWidget&);
+  pqSampleScalarWidget& operator=(const pqSampleScalarWidget&);
+  
+  Ui::pqSampleScalarWidget* const Implementation;
 };
 
-#endif
-
+#endif // !_pqSampleScalarWidget_h
