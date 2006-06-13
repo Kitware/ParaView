@@ -146,7 +146,7 @@ protected:
 
   vtkSMProxy* MainProxy;
 
-  const char* ConsumableSubProxyName;
+  char* ConsumableSubProxyName;
   vtkSetStringMacro(ConsumableSubProxyName);
 
   virtual vtkSMProperty* GetProperty(const char* name, int selfOnly);
