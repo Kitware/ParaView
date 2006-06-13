@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqWidgetsExport.h"
 #include <QObject>
+#include <QItemSelectionModel> //need for qtSelectionFlags
 
 class pqSelectionAdaptorInternal;
 class pqServerManagerModelItem;
@@ -95,6 +96,11 @@ protected slots:
   virtual void selectionChanged(const pqServerManagerModelSelection& selected,
     const pqServerManagerModelSelection& deselected);
 
+
+  // subclasses can override this method to provide model specific selection 
+  // overrides such as QItemSelection::Rows or QItemSelection::Columns etc.
+  virtual QItemSelectionModel::SelectionFlag qtSelectionFlags() const 
+    { return QItemSelectionModel::NoUpdate; }
 
 private:
   pqSelectionAdaptorInternal* Internal;

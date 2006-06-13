@@ -35,8 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QList>
 #include <QItemSelectionModel>
-
+#include <QPointer>
 #include "pqWidgetsExport.h"
+#include "pqServerManagerModelItem.h"
 
 class pqServerManagerModel;
 class pqServerManagerModelItem;
@@ -44,7 +45,7 @@ class pqServerManagerSelectionModelInternal;
 
 // This is a selection set. For now, it's simply a QList.
 class PQWIDGETS_EXPORT pqServerManagerModelSelection : 
-  public QList<pqServerManagerModelItem*>
+  public QList<QPointer<pqServerManagerModelItem> >
 {
 };
 
@@ -93,8 +94,6 @@ public:
   // Returns the list of selected items.
   const pqServerManagerModelSelection* selectedItems() const;
 
-
-
 public slots:
   void select(pqServerManagerModelItem* item, 
     pqServerManagerSelectionModel::SelectionFlags command);
@@ -108,6 +107,8 @@ signals:
 
 private:
   pqServerManagerSelectionModelInternal* Internal;
+  // Cleans up QPointers pointing to null objects in the selection.
+  void purge();
 };
 
 #endif

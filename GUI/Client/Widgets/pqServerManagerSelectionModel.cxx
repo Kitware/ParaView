@@ -70,6 +70,7 @@ void pqServerManagerSelectionModel::setCurrentItem(
   pqServerManagerModelItem* item,
   pqServerManagerSelectionModel::SelectionFlags command)
 {
+  this->purge();
   if (this->Internal->Current != item)
     {
     this->Internal->Current = item;
@@ -113,13 +114,15 @@ void pqServerManagerSelectionModel::select(
   const pqServerManagerModelSelection& items,
   pqServerManagerSelectionModel::SelectionFlags command)
 {
+  this->purge();
+
   if (command == NoUpdate)
     {
     return;
     }
 
   bool changed = false;
-  // store old selection.
+  
   pqServerManagerModelSelection selected;
   pqServerManagerModelSelection deselected;
 
@@ -162,5 +165,9 @@ void pqServerManagerSelectionModel::select(
 }
 
 //-----------------------------------------------------------------------------
+void pqServerManagerSelectionModel::purge()
+{
+  this->Internal->Selection.removeAll(0);
+}
 
 

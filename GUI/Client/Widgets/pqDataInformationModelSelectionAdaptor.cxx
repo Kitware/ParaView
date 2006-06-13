@@ -80,6 +80,11 @@ pqServerManagerModelItem* pqDataInformationModelSelectionAdaptor::mapToSMModel(
 }
 
 //-----------------------------------------------------------------------------
+QItemSelectionModel::SelectionFlag pqDataInformationModelSelectionAdaptor::qtSelectionFlags() const
+{
+  return QItemSelectionModel::Rows;
+}
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 

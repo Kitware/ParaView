@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes.
 #include <QAbstractProxyModel>
-#include <QItemSelectionModel>
 #include <QPointer>
 #include <QtDebug>
 
@@ -172,7 +171,7 @@ void pqSelectionAdaptor::currentChanged(const QModelIndex& current,
   pqServerManagerSelectionModel::SelectionFlags command = 
     pqServerManagerSelectionModel::NoUpdate;
 
-  /* This doesn't seem to work well for pipeline browser.
+  // This doesn't seem to work well for pipeline browser.
   if (this->Internal->QSelectionModel->isSelected(current))
     {
     command |= pqServerManagerSelectionModel::Select;
@@ -181,12 +180,10 @@ void pqSelectionAdaptor::currentChanged(const QModelIndex& current,
     {
     command |= pqServerManagerSelectionModel::Deselect;
     }
-    */
-  command |= pqServerManagerSelectionModel::ClearAndSelect;
+  //command |= pqServerManagerSelectionModel::ClearAndSelect;
   this->Internal->SMSelectionModel->setCurrentItem(smCurrent, command);
   this->Internal->IgnoreSignals = false;
 }
-
 
 //-----------------------------------------------------------------------------
 void pqSelectionAdaptor::selectionChanged(
@@ -214,8 +211,6 @@ void pqSelectionAdaptor::selectionChanged(
     smSelected.push_back(smItem);
     }
 
-  (void)deselected;
-  /*
   pqServerManagerModelSelection smDeselected;
   const QModelIndexList &dIndexes = deselected.indexes();
   foreach (const QModelIndex& index, dIndexes)
@@ -224,11 +219,11 @@ void pqSelectionAdaptor::selectionChanged(
       this->mapToSource(index));
     smDeselected.push_back(smItem);
     }
+
   this->Internal->SMSelectionModel->select(smDeselected, 
    pqServerManagerSelectionModel::Deselect);
-  */
   this->Internal->SMSelectionModel->select(smSelected,
-   pqServerManagerSelectionModel::ClearAndSelect);
+   pqServerManagerSelectionModel::Select);
   this->Internal->IgnoreSignals = false;
 }
 
@@ -260,7 +255,7 @@ void pqSelectionAdaptor::currentChanged(
     command |= QItemSelectionModel::Deselect;
     }
   this->Internal->QSelectionModel->setCurrentIndex(index, 
-    command | QItemSelectionModel::Rows | QItemSelectionModel::Clear);
+    command | this->qtSelectionFlags());
   this->Internal->IgnoreSignals = false;
 }
 
@@ -284,20 +279,18 @@ void pqSelectionAdaptor::selectionChanged(
     qSelected.push_back(QItemSelectionRange(index));
     }
 
-  (void)deselected;
-  /*
   foreach(pqServerManagerModelItem* item, deselected )
     {
     const QModelIndex& index = this->mapFromSource(
       this->mapFromSMModel(item), this->getQSelectionModel()->model());
     qDeselected.push_back(QItemSelectionRange(index));
     }
+
   this->Internal->QSelectionModel->select(qDeselected,
-    QItemSelectionModel::Deselect);
-    */
+    QItemSelectionModel::Deselect | this->qtSelectionFlags());
 
   this->Internal->QSelectionModel->select(qSelected,
-    QItemSelectionModel::ClearAndSelect);
+    QItemSelectionModel::Select | this->qtSelectionFlags());
   this->Internal->IgnoreSignals = false;
 }
 

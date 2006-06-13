@@ -60,6 +60,10 @@ protected:
   // Subclass must implement this method.
   virtual pqServerManagerModelItem* mapToSMModel(
     const QModelIndex& index) const;
+
+  // subclasses can override this method to provide model specific selection 
+  // overrides such as QItemSelection::Rows or QItemSelection::Columns etc.
+  virtual QItemSelectionModel::SelectionFlag qtSelectionFlags() const; 
 };
 
 #endif
