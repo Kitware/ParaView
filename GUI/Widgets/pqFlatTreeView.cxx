@@ -1142,29 +1142,117 @@ bool pqFlatTreeView::isIndexHidden(const QModelIndex &index) const
   return false;
 }
 
-void pqFlatTreeView::setSelection(const QRect &,
-    QItemSelectionModel::SelectionFlags)
+void pqFlatTreeView::setSelection(const QRect &viewRect,
+    QItemSelectionModel::SelectionFlags command)
 {
   if(!this->Root || !this->HeaderView || !this->selectionModel())
     {
     return;
     }
 
-  if(this->selectionMode() == QAbstractItemView::SingleSelection ||
-      this->selectionMode() == QAbstractItemView::NoSelection)
+  if(this->selectionMode() == QAbstractItemView::NoSelection)
     {
     return;
     }
 
+  // Transform the rectangle to contents coordinates.
+  pqFlatTreeViewItem *item = 0;
+  QItemSelection selection;
+  QModelIndex index;
+  QList<int> columnList;
+  QList<int>::Iterator iter;
+  QRect localRect = viewRect;
+  localRect.translate(this->horizontalOffset(), this->verticalOffset());
+  if(this->selectionBehavior() == QAbstractItemView::SelectColumns ||
+      this->selectionBehavior() == QAbstractItemView::SelectItems)
+    {
+    // Find the columns in the rectangle. Use the header to
+    // determine the column order.
+    int cx = 0;
+    int logical;
+    for(int i = 0; i < this->HeaderView->count(); i++)
+      {
+      if(cx > localRect.right())
+        {
+        break;
+        }
+
+      logical = this->HeaderView->logicalIndex(i);
+      cx += this->HeaderView->sectionSize(logical);
+      if(cx >= localRect.left())
+        {
+        columnList.append(logical);
+        }
+      }
+    }
+
   if(this->selectionBehavior() == QAbstractItemView::SelectColumns)
     {
+    // Select the columns in the rectangle.
+    item = this->getNextVisibleItem(this->Root);
+    for(iter = columnList.begin(); iter != columnList.end(); ++iter)
+      {
+      index = item->Index;
+      if(*iter != 0)
+        {
+        index = index.sibling(index.row(), *iter);
+        }
+
+      if(this->model()->flags(index) &= Qt::ItemIsSelectable)
+        {
+        selection.select(index, index);
+        }
+      }
     }
-  else if(this->selectionBehavior() == QAbstractItemView::SelectRows)
+  else
     {
+    // Search for the visible items in the rectangle.
+    item = this->getNextVisibleItem(this->Root);
+    while(item)
+      {
+      if(item->ContentsY + this->ItemHeight >= localRect.top())
+        {
+        // Break out of the loop when the items' y coordinate is larger
+        // than the bottom of the rectangle.
+        if(item->ContentsY > localRect.bottom())
+          {
+          break;
+          }
+
+        if(this->selectionBehavior() == QAbstractItemView::SelectRows)
+          {
+          // If selecting the row, add the column 0 index to the
+          // selection. Make sure the index is selectable.
+          if(this->model()->flags(item->Index) &= Qt::ItemIsSelectable)
+            {
+            selection.select(item->Index, item->Index);
+            }
+          }
+        else // SelectItems
+          {
+          // Select the columns inside the rectangle. Only add the
+          // index if it is selectable.
+          for(iter = columnList.begin(); iter != columnList.end(); ++iter)
+            {
+            index = item->Index;
+            if(*iter != 0)
+              {
+              index = index.sibling(index.row(), *iter);
+              }
+
+            if(this->model()->flags(index) &= Qt::ItemIsSelectable)
+              {
+              selection.select(index, index);
+              }
+            }
+          }
+        }
+
+      item = this->getNextVisibleItem(item);
+      }
     }
-  else // SelectItems
-    {
-    }
+
+  this->selectionModel()->select(selection, command);
 }
 
 QRegion pqFlatTreeView::visualRegionForSelection(
