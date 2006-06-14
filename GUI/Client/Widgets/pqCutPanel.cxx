@@ -72,11 +72,11 @@ pqCutPanel::pqCutPanel(QWidget* p) :
   QFrame* const separator = new QFrame();
   separator->setFrameShape(QFrame::HLine);
 
-  QVBoxLayout* const layout = new QVBoxLayout();
-  layout->addWidget(&this->Implementation->ImplicitPlaneWidget);
-  layout->addWidget(separator);
-  layout->addWidget(&this->Implementation->SampleScalarWidget);
-  this->setLayout(layout);
+  QVBoxLayout* const panel_layout = new QVBoxLayout();
+  panel_layout->addWidget(&this->Implementation->ImplicitPlaneWidget);
+  panel_layout->addWidget(separator);
+  panel_layout->addWidget(&this->Implementation->SampleScalarWidget);
+  this->setLayout(panel_layout);
 
   connect(&this->Implementation->ImplicitPlaneWidget, SIGNAL(widgetChanged()), this, SLOT(onImplicitPlaneWidgetChanged()));
   connect(&this->Implementation->SampleScalarWidget, SIGNAL(samplesChanged()), this, SLOT(onSampleScalarWidgetChanged()));

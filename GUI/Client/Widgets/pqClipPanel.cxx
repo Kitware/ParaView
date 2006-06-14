@@ -72,12 +72,12 @@ pqClipPanel::pqClipPanel(QWidget* p) :
   QFrame* const separator = new QFrame();
   separator->setFrameShape(QFrame::HLine);
 
-  QVBoxLayout* const layout = new QVBoxLayout(this);
-  layout->addWidget(&this->Implementation->InsideOutWidget);
-  layout->addWidget(separator);
-  layout->addWidget(&this->Implementation->ImplicitPlaneWidget);
+  QVBoxLayout* const panel_layout = new QVBoxLayout(this);
+  panel_layout->addWidget(&this->Implementation->InsideOutWidget);
+  panel_layout->addWidget(separator);
+  panel_layout->addWidget(&this->Implementation->ImplicitPlaneWidget);
   
-  this->setLayout(layout);
+  this->setLayout(panel_layout);
 
   connect(&this->Implementation->ImplicitPlaneWidget, SIGNAL(widgetChanged()), this, SLOT(onWidgetChanged()));
   connect(this->getPropertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
