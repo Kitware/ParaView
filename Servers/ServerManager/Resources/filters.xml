@@ -1412,6 +1412,11 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
    </SourceProxy>
 
    <SourceProxy name="MeshQuality" class="vtkMeshQuality">
+    <Documentation
+       long_help="This filter creates a new cell array containing a geometric measure of each cell's fitness. Different quality measures can be chosen for different cell shapes."
+       short_help="Evaluate geometric mesh quality.">
+This filter creates a new cell array containing a geometric measure of each cell's fitness. Different quality measures can be chosen for different cell shapes. Supported shapes include triangles, quadrilaterals, tetrahedra, and hexahedra. For other shapes, a value of 0 is assigned.
+    </Documentation>
     <InputProperty
        name="Input"
        command="SetInput">
@@ -1442,7 +1447,7 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
         command="SetTetQualityMeasure"
         number_of_elements="1"
         default_values="2">
-       <IntRangeDomain name="range" min="0" max="6"/>
+       <IntRangeDomain name="range" min="0" max="7"/>
      </IntVectorProperty>
      <IntVectorProperty
         name="HexQualityMeasure"

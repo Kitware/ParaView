@@ -845,12 +845,13 @@ This feature is nice for debugging output.)" />
     <SelectionList property="TetQualityMeasure"
                    trace_name="TetQualityMeasure"
                    label="Tet Quality Measure"
-                   help="Select the quality measure used to evaluate tetrahedral quality. The radius ratio is the size of a sphere circumscribed by a tetrahedron's 4 vertices divided by the size of a circle tangent to a tetrahedron's 4 faces. The edge ratio is the ratio of the longest edge length to the shortest edge length.">
+                   help="Select the quality measure used to evaluate tetrahedral quality. The radius ratio is the size of a sphere circumscribed by a tetrahedron's 4 vertices divided by the size of a circle tangent to a tetrahedron's 4 faces. The edge ratio is the ratio of the longest edge length to the shortest edge length. The collapse ratio is the minimum ratio of height of a vertex above the triangle opposite it divided by the longest edge of the opposing triangle across all vertex/triangle pairs.">
       <Item name="Edge Ratio" value="0"/>
       <Item name="Aspect Ratio" value="1"/>
       <Item name="Radius Ratio" value="2"/>
       <Item name="Frobenius Norm" value="3"/>
       <Item name="Minimal Dihedral Angle" value="6"/>
+      <Item name="Collapse Ratio" value="7"/>
     </SelectionList>
     <SelectionList property="HexQualityMeasure"
                    trace_name="HexQualityMeasure"
