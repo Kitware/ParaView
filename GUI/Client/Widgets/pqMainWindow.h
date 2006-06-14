@@ -106,6 +106,8 @@ public:
   void createStandardVariableToolBar();
   /// Creates the "standard" compound-proxy toolbar
   void createStandardCompoundProxyToolBar();
+  /// Creates a status bar.
+  void createStandardStatusBar();
 
   // Lower-level methods that can be used to create a "custom" client
 

@@ -109,7 +109,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QPointer>
+#include <QProgressBar>
+#include "pqProgressBar.h"
 #include <QSignalMapper>
+#include <QStatusBar>
 #include <QtDebug>
 #include <QToolBar>
 #include <QToolButton>
@@ -306,12 +309,28 @@ void pqMainWindow::createStandardFileMenu()
     << pqSetName("Exit");
 }
 
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::createStandardStatusBar()
+{
+  QStatusBar* sbar = this->statusBar();
+  sbar->show();
+  QProgressBar *progressBar = new pqProgressBar(sbar);
+  progressBar->hide();
+  sbar->addPermanentWidget(progressBar);
+  QObject::connect(pqApplicationCore::instance(), SIGNAL(enableProgress(bool)),
+    progressBar, SLOT(setVisible(bool)));
+  QObject::connect(pqApplicationCore::instance(), SIGNAL(progress(const QString&, int)),
+    progressBar, SLOT(setProgress(const QString&, int)));
+}
+
 //-----------------------------------------------------------------------------
 void pqMainWindow::createStandardViewMenu()
 {
   this->viewMenu();
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindow::createStandardServerMenu()
 {
   QMenu* const menu = this->serverMenu();

@@ -231,6 +231,8 @@ vtkSMProxy *pqPipelineBrowser::getNextProxy() const
 void pqPipelineBrowser::select(pqServerManagerModelItem* item)
 {
   QModelIndex index = this->ListModel->getIndexFor(item);
+  // This not only changes the current selection, but also clears
+  // any previous selection.
   this->TreeView->selectionModel()->setCurrentIndex(index,
     QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear);
 //  emit this->selectionChanged(item); 

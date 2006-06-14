@@ -145,6 +145,7 @@ public:
   /// Save the ServerManager state.
   void saveState(vtkPVXMLElement* root);
   void loadState(vtkPVXMLElement* root);
+
 signals:
   // Fired when the active source changes.
   void activeSourceChanged(pqPipelineSource*);
@@ -159,6 +160,12 @@ signals:
   // Fired when a source/filter/reader/compound proxy is
   // created without a display.
   void pendingDisplays(bool status);
+
+  // Fired to enable or disable progress bar.
+  void enableProgress(bool enable);
+
+  // Fired with the actual progress value.
+  void progress(const QString&, int);
 
 public slots:
   // Call this slot to set the active source. 
@@ -178,6 +185,19 @@ protected:
   /// create signal/slot connections between pdata and smModel.
   void connect(pqServerManagerObserver* pdata, pqServerManagerModel* smModel);
 
+protected:
+  friend class pqProcessModuleGUIHelper;
+
+  void prepareProgress()
+    { emit this->enableProgress(true); }
+
+  void cleanupPendingProgress()
+    { emit this->enableProgress(false); }
+
+  void sendProgress(const char* name, int value)
+    {
+    emit this->progress(QString(name), value);
+    }
 private slots:
   // called when a source is removed by the pqServerManagerModel. If
   // the removed source is the active source, we must change it.
