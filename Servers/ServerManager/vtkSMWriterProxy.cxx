@@ -75,5 +75,7 @@ void vtkSMWriterProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "ErrorCode: " 
-    << vtkErrorCode::GetStringFromErrorCode(this->ErrorCode) << endl;
+     << vtkErrorCode::GetStringFromErrorCode(this->ErrorCode) << endl;
+  os << indent << "SupportsParallel: "
+     << this->SupportsParallel << endl;
 }

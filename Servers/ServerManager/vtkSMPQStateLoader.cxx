@@ -22,7 +22,7 @@
 #include "vtkSMRenderModuleProxy.h"
 
 vtkStandardNewMacro(vtkSMPQStateLoader);
-vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.3");
+vtkCxxRevisionMacro(vtkSMPQStateLoader, "1.4");
 vtkCxxSetObjectMacro(vtkSMPQStateLoader, MultiViewRenderModuleProxy, 
   vtkSMMultiViewRenderModuleProxy);
 //-----------------------------------------------------------------------------
@@ -109,5 +109,7 @@ void vtkSMPQStateLoader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "MultiViewRenderModuleProxy: " 
-    << this->MultiViewRenderModuleProxy << endl;
+     << this->MultiViewRenderModuleProxy << endl;
+  os << indent << "UseExistingRenderModules: "
+     << this->UseExistingRenderModules << endl;
 }
