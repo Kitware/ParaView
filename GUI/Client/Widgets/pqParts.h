@@ -66,7 +66,9 @@ public:
   /// set the array to color the part by
   static void SetColorField(vtkSMDisplayProxy* Part, const QString& field);
   /// get the array the part is colored by
-  static QString GetColorField(vtkSMDisplayProxy* Part);
+  /// if raw is true, it will not add (point) or (cell) but simply
+  /// return the array name
+  static QString GetColorField(vtkSMDisplayProxy* Part, bool raw=false);
 
 };
 

@@ -483,7 +483,7 @@ void pqPart::SetColorField(vtkSMDisplayProxy* Part, const QString& value)
 }
 
 
-QString pqPart::GetColorField(vtkSMDisplayProxy* Part)
+QString pqPart::GetColorField(vtkSMDisplayProxy* Part, bool raw)
 {
   QVariant scalarColor = pqSMAdaptor::getElementProperty(
     Part, Part->GetProperty("ScalarVisibility"));
@@ -493,6 +493,10 @@ QString pqPart::GetColorField(vtkSMDisplayProxy* Part)
       Part, Part->GetProperty("ScalarMode"));
     QString scalarArray = pqSMAdaptor::getElementProperty(
       Part, Part->GetProperty("ColorArray")).toString();
+    if (raw)
+      {
+      return scalarArray;
+      }
     if(scalarMode == "UseCellFieldData")
       {
       return scalarArray + " (cell)";
