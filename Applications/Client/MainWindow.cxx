@@ -58,6 +58,7 @@ MainWindow::MainWindow()
                        QByteArray(" (alpha)"));
   this->setWindowIcon(QIcon(":pqWidgets/pqAppIcon64.png"));
 
+  this->createStandardStatusBar();
   this->createStandardFileMenu();
   this->createStandardViewMenu();
   this->createStandardServerMenu();
@@ -65,7 +66,6 @@ MainWindow::MainWindow()
   this->createStandardFiltersMenu();
   this->createStandardPipelineMenu();
   this->createStandardToolsMenu();
-  this->createStandardDataInformationWidget(false);
   
   QMenu* const help_menu = this->helpMenu();
   help_menu->addAction(tr("&ParaView Help"))
@@ -78,6 +78,7 @@ MainWindow::MainWindow()
   this->createStandardPipelineBrowser();
   this->createStandardObjectInspector();
   this->createStandardElementInspector(false);
+  this->createStandardDataInformationWidget(false);
   
   this->createStandardVCRToolBar();
   this->createUndoRedoToolBar();
