@@ -15,23 +15,29 @@
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWWin32RegistryHelper, "1.2");
+vtkCxxRevisionMacro(vtkKWWin32RegistryHelper, "1.3");
 vtkStandardNewMacro( vtkKWWin32RegistryHelper );
 
 #define BUFFER_SIZE 8192
 
+//----------------------------------------------------------------------------
 vtkKWWin32RegistryHelper::vtkKWWin32RegistryHelper()
 {
   this->HKey = 0;  
+  this->Organization = 0;
+  this->SetOrganization("Kitware");
 }
 
+//----------------------------------------------------------------------------
 vtkKWWin32RegistryHelper::~vtkKWWin32RegistryHelper()
 {
+  this->SetOrganization(0);
 }
 
+//----------------------------------------------------------------------------
 int vtkKWWin32RegistryHelper::OpenInternal(const char *toplevel,
-                                               const char *subkey, 
-                                               int readonly)
+                                           const char *subkey, 
+                                           int readonly)
 {
   HKEY scope = HKEY_CURRENT_USER;
   if ( this->GetGlobalScope() )
@@ -41,7 +47,12 @@ int vtkKWWin32RegistryHelper::OpenInternal(const char *toplevel,
   int res = 0;
   ostrstream str;
   DWORD dwDummy;
-  str << "Software\\Kitware\\" << toplevel << "\\" << subkey << ends;
+  str << "Software\\";
+  if (this->Organization)
+    {
+    str << this->Organization << "\\";
+    }
+  str << toplevel << "\\" << subkey << ends;
   if ( readonly == vtkKWRegistryHelper::ReadOnly )
     {
     res = ( RegOpenKeyEx(scope, str.str(), 
@@ -57,6 +68,7 @@ int vtkKWWin32RegistryHelper::OpenInternal(const char *toplevel,
   return res;
 }
 
+//----------------------------------------------------------------------------
 int vtkKWWin32RegistryHelper::CloseInternal()
 {
   int res;
@@ -64,8 +76,9 @@ int vtkKWWin32RegistryHelper::CloseInternal()
   return res;
 }
 
+//----------------------------------------------------------------------------
 int vtkKWWin32RegistryHelper::ReadValueInternal(const char *key,
-                                                    char *value)
+                                                char *value)
 {
   int res = 1;
   DWORD dwType, dwSize;  
@@ -76,6 +89,7 @@ int vtkKWWin32RegistryHelper::ReadValueInternal(const char *key,
   return res;
 }
 
+//----------------------------------------------------------------------------
 int vtkKWWin32RegistryHelper::DeleteKeyInternal(const char *key)
 {
   int res = 1;
@@ -83,6 +97,7 @@ int vtkKWWin32RegistryHelper::DeleteKeyInternal(const char *key)
   return res;
 }
 
+//----------------------------------------------------------------------------
 int vtkKWWin32RegistryHelper::DeleteValueInternal(const char *key)
 {
   int res = 1;
@@ -90,8 +105,9 @@ int vtkKWWin32RegistryHelper::DeleteValueInternal(const char *key)
   return res;
 }
 
+//----------------------------------------------------------------------------
 int vtkKWWin32RegistryHelper::SetValueInternal(const char *key, 
-                                                   const char *value)
+                                               const char *value)
 {
   int res = 1;
   DWORD len = (DWORD)(value ? strlen(value) : 0);

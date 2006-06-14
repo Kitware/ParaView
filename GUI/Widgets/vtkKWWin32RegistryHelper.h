@@ -31,6 +31,15 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Set or get the organization registry key.
+  // This is valid for the Win32 registry only. Keys are placed under
+  // HKEY_CURRENT_USER\Software\Organization\TopLevel\Subkey\Key,
+  // where TopLevel can be set a the superclass level (vtkKWRegistryHelper)
+  // and Subkey and Key are specified through the SetValue API. 
+  vtkSetStringMacro(Organization);
+  vtkGetStringMacro(Organization);
+
+  // Description:
   // Read a value from the registry.
   virtual int ReadValueInternal(const char *key, char *value); 
 
@@ -59,6 +68,7 @@ protected:
   virtual ~vtkKWWin32RegistryHelper();
 
 private:
+  char *Organization;
   HKEY HKey;
   vtkKWWin32RegistryHelper(const vtkKWWin32RegistryHelper&); // Not implemented
   void operator=(const vtkKWWin32RegistryHelper&); // Not implemented
