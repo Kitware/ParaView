@@ -97,29 +97,29 @@ void MainWindow::showHelpAbout()
 void MainWindow::buildFiltersMenu()
 {
 
-  QStringList allowedFilters;
-  allowedFilters<<"Clip";
-  allowedFilters<<"Cut";
-  allowedFilters<<"Threshold";
+QStringList allowedFilters;
+allowedFilters<<"Clip";
+allowedFilters<<"Cut";
+allowedFilters<<"Threshold";
 
-  this->filtersMenu()->clear();
-  QMenu *alphabetical =this->filtersMenu();
+this->filtersMenu()->clear();
+QMenu *alphabetical =this->filtersMenu();
 
-  vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
-  manager->InstantiateGroupPrototypes("filters");
-  int numFilters = manager->GetNumberOfProxies("filters_prototypes");
-  for(int i=0; i<numFilters; i++)
+vtkSMProxyManager* manager = vtkSMObject::GetProxyManager();
+manager->InstantiateGroupPrototypes("filters");
+int numFilters = manager->GetNumberOfProxies("filters_prototypes");
+for(int i=0; i<numFilters; i++)
+{
+  QStringList categoryList;
+  QString proxyName = manager->GetProxyName("filters_prototypes",i);
+
+  if(allowedFilters.contains(proxyName))
     {
-    QStringList categoryList;
-    QString proxyName = manager->GetProxyName("filters_prototypes",i);
-
-    if(allowedFilters.contains(proxyName))
-      {
-        QAction* action = alphabetical->addAction(proxyName) << pqSetName(proxyName)
-          << pqSetData(proxyName);
-        action->setEnabled(false);
-      }
+    QAction* action = alphabetical->addAction(proxyName) << pqSetName(proxyName)
+                                                         << pqSetData(proxyName);
+    action->setEnabled(false);
     }
+}
 }
 
 //-----------------------------------------------------------------------------
@@ -135,7 +135,7 @@ void MainWindow::buildSourcesMenu()
 void MainWindow::showHelp()
 {
   if(!this->HelpClient)
-  {
+    {
     // find the assistant
 #if defined(Q_WS_WIN)
     const char* assistantName = "assistant.exe";
@@ -150,14 +150,14 @@ void MainWindow::showHelp()
     assistant += QDir::separator();
     assistant += assistantName;
     if(QFile::exists(assistant))
-    {
+      {
       this->HelpClient = new QAssistantClient(assistant, this);
-    }
+      }
     else
-    {
+      {
       // not bundled, see if it can can be found in PATH
       this->HelpClient = new QAssistantClient(QString(), this);
-    }
+      }
 
     QStringList args;
     args.append(QString("-profile"));
@@ -167,33 +167,33 @@ void MainWindow::showHelp()
       + QString("pqClient.adp");
 
     if(QFile::exists(profile))
-    {
+      {
       args.append(profile);
-    }
+      }
     else if(getenv("PARAQ_HELP"))
-    {
+      {
       // not bundled, ask for help
       args.append(getenv("PARAQ_HELP"));
-    }
+      }
     else
-    {
+      {
       // no help, error out
       QMessageBox::critical(this, "Help error", "Couldn't find"
-          " pqClient.adp.\nTry setting the PARAQ_HELP environment variable which"
-          " points to that file");
+                            " pqClient.adp.\nTry setting the PARAQ_HELP environment variable which"
+                            " points to that file");
       
       delete this->HelpClient;
       this->HelpClient = NULL;
       return;
-    }
+      }
     
     this->HelpClient->setArguments(args);
     this->HelpClient->openAssistant();
-  }
+    }
   else if(this->HelpClient && !this->HelpClient->isOpen())
-  {
+    {
     this->HelpClient->openAssistant();
-  }
+    }
 
 }
 
