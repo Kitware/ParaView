@@ -160,7 +160,6 @@ void pqSourceInfoGroupMap::loadSourceInfo(vtkPVXMLElement *root)
     {
     // Get the next nested element from the current xml element.
     addToStack = false;
-    pqSourceInfoGroupMapXml *current = stack.top();
     element = current->Element->GetNestedElement(current->Index);
     elementName = element->GetName();
     if(elementName == "Filter" || elementName == "Source")
