@@ -55,16 +55,19 @@ public:
   ~pqPropertyLinks();
 
   /// link a property
-  void addPropertyLink(QObject* qObject, const char* qProperty, const char* signal,
-                       vtkSMProxy* Proxy, vtkSMProperty* Property, int Index=-1);
+  void addPropertyLink(
+    QObject* qObject, const char* qProperty, const char* signal,
+    vtkSMProxy* Proxy, vtkSMProperty* Property, int Index=-1);
   
   /// un-link a property
-  void removePropertyLink(QObject* qObject, const char* qProperty, const char* signal,
-                          vtkSMProxy* Proxy, vtkSMProperty* Property, int Index=-1);
+  void removePropertyLink(
+    QObject* qObject, const char* qProperty, const char* signal,
+    vtkSMProxy* Proxy, vtkSMProperty* Property, int Index=-1);
 
   // Call this method to un-links all property links 
   // maintained by this object.
   void removeAllPropertyLinks();
+
 public slots:
   /// accept the changes and push them to the server manager
   /// regardless of the whether we're using unchecked properties
@@ -78,10 +81,10 @@ public slots:
   /// one may get/set unchecked properties to get domain updates before an
   /// accept is done
   void setUseUncheckedProperties(bool);
+
 public:
   /// get whether unchecked properties are used
   bool useUncheckedProperties();
-
 
   /// TODO: domain change events
   /// TODO: do domain changes possibly affect our links?
