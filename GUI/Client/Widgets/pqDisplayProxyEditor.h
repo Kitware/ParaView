@@ -68,6 +68,7 @@ protected slots:
 protected:
   pqDisplayProxyEditorInternal* Internal;
   void setupGUIConnections();
+  void updateEnableState();
 
 private:
   bool DisableSlots;

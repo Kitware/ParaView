@@ -43,7 +43,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKWidget.h"
 
 // paraview includes
-#include "vtkPVDataInformation.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVGeometryInformation.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMRenderModuleProxy.h"
@@ -247,12 +249,19 @@ void pqDisplayProxyEditor::setDisplay(pqPipelineDisplay* display)
     "value", SIGNAL(valueChanged(double)),
     displayProxy, displayProxy->GetProperty("Opacity"));
 
+  // setup for map scalars
+  this->Internal->Links->addPropertyLink(
+    this->Internal->ColorMapScalars, "checked", SIGNAL(stateChanged(int)),
+    displayProxy, displayProxy->GetProperty("MapScalars"));
+
   // setup for InterpolateScalarsBeforeMapping
-  this->Internal->Links->addPropertyLink(this->Internal->ColorInterpolateColors,
-    "checked", SIGNAL(stateChanged(int)), displayProxy, 
-    displayProxy->GetProperty("InterpolateScalarsBeforeMapping"));
+  this->Internal->Links->addPropertyLink(
+    this->Internal->ColorInterpolateColors, "checked", SIGNAL(stateChanged(int)),
+    displayProxy, displayProxy->GetProperty("InterpolateScalarsBeforeMapping"));
 
   this->DisableSlots = 0;
+
+  this->updateEnableState();
 }
 
 //-----------------------------------------------------------------------------
@@ -277,50 +286,90 @@ void pqDisplayProxyEditor::setupGUIConnections()
   // We are usinging Queues slot execution where ever possible,
   // This ensures that the updateView() slot is called 
   // only after the vtkSMProperty has been changed by the pqPropertyLinks.
-  QObject::connect(this->Internal->ViewData, SIGNAL(stateChanged(int)),
-    this, SLOT(updateView()),Qt::QueuedConnection);
-  QObject::connect(this->Internal->ColorInterpolateColors, 
-    SIGNAL(stateChanged(int)),
-    this, SLOT(updateView()),Qt::QueuedConnection);
-  QObject::connect(this->Internal->ColorBy, 
-    SIGNAL(currentIndexChanged(const QString&)),
+  QObject::connect(
+    this->Internal->ViewData, SIGNAL(stateChanged(int)),
+    this, SLOT(updateView()),
+    Qt::QueuedConnection);
+  QObject::connect(
+    this->Internal->ColorInterpolateColors, SIGNAL(stateChanged(int)),
+    this, SLOT(updateView()),
+    Qt::QueuedConnection);
+  QObject::connect(
+    this->Internal->ColorMapScalars, SIGNAL(stateChanged(int)),
+    this, SLOT(updateView()),
+    Qt::QueuedConnection);
+  QObject::connect(
+    this->Internal->ColorBy, SIGNAL(currentIndexChanged(const QString&)),
     this, SLOT(colorByChanged(const QString&)));
-  QObject::connect(this->Internal->StylePointSize, 
-    SIGNAL(valueChanged(double)), this, SLOT(updateView()));
-  QObject::connect(this->Internal->StyleLineWidth, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),Qt::QueuedConnection);
-  QObject::connect(this->Internal->TranslateX, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),Qt::QueuedConnection);
-  QObject::connect(this->Internal->TranslateY, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),Qt::QueuedConnection);
-  QObject::connect(this->Internal->TranslateZ, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),Qt::QueuedConnection);
-  QObject::connect(this->Internal->ScaleX, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),Qt::QueuedConnection);
-  QObject::connect(this->Internal->ScaleY, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),Qt::QueuedConnection);
-  QObject::connect(this->Internal->ScaleZ, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),Qt::QueuedConnection);
-  QObject::connect(this->Internal->OrientationX, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),Qt::QueuedConnection);
-  QObject::connect(this->Internal->OrientationY, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),Qt::QueuedConnection);
-  QObject::connect(this->Internal->OrientationZ, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),Qt::QueuedConnection);
-  QObject::connect(this->Internal->OriginX, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),Qt::QueuedConnection);
-  QObject::connect(this->Internal->OriginY, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),Qt::QueuedConnection);
-  QObject::connect(this->Internal->OriginZ, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),Qt::QueuedConnection);
-  QObject::connect(this->Internal->Opacity, SIGNAL(valueChanged(double)),
-    this, SLOT(updateView()),Qt::QueuedConnection);
-  QObject::connect(this->Internal->ViewZoomToData, SIGNAL(clicked(bool)), 
+  QObject::connect(
+    this->Internal->StylePointSize,  SIGNAL(valueChanged(double)), 
+    this, SLOT(updateView()));
+  QObject::connect(
+    this->Internal->StyleLineWidth, SIGNAL(valueChanged(double)),
+    this, SLOT(updateView()),
+    Qt::QueuedConnection);
+  QObject::connect(
+    this->Internal->TranslateX, SIGNAL(valueChanged(double)),
+    this, SLOT(updateView()),
+    Qt::QueuedConnection);
+  QObject::connect(
+    this->Internal->TranslateY, SIGNAL(valueChanged(double)),
+    this, SLOT(updateView()),
+    Qt::QueuedConnection);
+  QObject::connect(
+    this->Internal->TranslateZ, SIGNAL(valueChanged(double)),
+    this, SLOT(updateView()),
+    Qt::QueuedConnection);
+  QObject::connect(
+    this->Internal->ScaleX, SIGNAL(valueChanged(double)),
+    this, SLOT(updateView()),
+    Qt::QueuedConnection);
+  QObject::connect(
+    this->Internal->ScaleY, SIGNAL(valueChanged(double)),
+    this, SLOT(updateView()),
+    Qt::QueuedConnection);
+  QObject::connect(
+    this->Internal->ScaleZ, SIGNAL(valueChanged(double)),
+    this, SLOT(updateView()),
+    Qt::QueuedConnection);
+  QObject::connect(
+    this->Internal->OrientationX, SIGNAL(valueChanged(double)),
+    this, SLOT(updateView()),
+    Qt::QueuedConnection);
+  QObject::connect(
+    this->Internal->OrientationY, SIGNAL(valueChanged(double)),
+    this, SLOT(updateView()),
+    Qt::QueuedConnection);
+  QObject::connect(
+    this->Internal->OrientationZ, SIGNAL(valueChanged(double)),
+    this, SLOT(updateView()),
+    Qt::QueuedConnection);
+  QObject::connect(
+    this->Internal->OriginX, SIGNAL(valueChanged(double)),
+    this, SLOT(updateView()),
+    Qt::QueuedConnection);
+  QObject::connect(
+    this->Internal->OriginY, SIGNAL(valueChanged(double)),
+    this, SLOT(updateView()),
+    Qt::QueuedConnection);
+  QObject::connect(
+    this->Internal->OriginZ, SIGNAL(valueChanged(double)),
+    this, SLOT(updateView()),
+    Qt::QueuedConnection);
+  QObject::connect(
+    this->Internal->Opacity, SIGNAL(valueChanged(double)),
+    this, SLOT(updateView()),
+    Qt::QueuedConnection);
+  QObject::connect(
+    this->Internal->ViewZoomToData, SIGNAL(clicked(bool)), 
     this, SLOT(zoomToData()));
-  QObject::connect(this->Internal->DismissButton, SIGNAL(clicked(bool)),
+  QObject::connect(
+    this->Internal->DismissButton, SIGNAL(clicked(bool)),
     this, SIGNAL(dismiss()));
-  QObject::connect(this->Internal->StyleRepresentation, SIGNAL(currentIndexChanged(int)),
-    this, SLOT(updateColorByMenu()), Qt::QueuedConnection);
+  QObject::connect(
+    this->Internal->StyleRepresentation, SIGNAL(currentIndexChanged(int)),
+    this, SLOT(updateColorByMenu()), 
+    Qt::QueuedConnection);
   
   // Create an connect signal adaptors.
   if (!QMetaType::isRegistered(QMetaType::type("QVariant")))
@@ -340,10 +389,11 @@ void pqDisplayProxyEditor::setupGUIConnections()
     this->Internal->StyleRepresentation);
   this->Internal->RepresentationAdaptor->setObjectName(
     "StyleRepresentationAdapator");
-  QObject::connect(this->Internal->RepresentationAdaptor,
-    SIGNAL(currentTextChanged(const QString&)), this, SLOT(updateView()),
+  QObject::connect(
+    this->Internal->RepresentationAdaptor,
+    SIGNAL(currentTextChanged(const QString&)), 
+    this, SLOT(updateView()),
     Qt::QueuedConnection);
-    
     
   this->Internal->InterpolationAdaptor = new pqSignalAdaptorComboBox(
     this->Internal->StyleInterpolation);
@@ -355,6 +405,56 @@ void pqDisplayProxyEditor::setupGUIConnections()
 }
 
 //-----------------------------------------------------------------------------
+void pqDisplayProxyEditor::updateEnableState()
+{
+  QString val = this->Internal->ColorBy->currentText();
+
+  if(val == "Solid Color")
+    {
+    this->Internal->ColorActorColor->setEnabled(true);
+    this->Internal->ColorInterpolateColors->setEnabled(false);
+    }
+  else
+    {
+    this->Internal->ColorActorColor->setEnabled(false);
+    this->Internal->ColorInterpolateColors->setEnabled(true);
+    }
+
+  vtkSMDataObjectDisplayProxy* display = 
+    this->Internal->Display->getDisplayProxy();
+  if (display)
+    {
+    vtkPVGeometryInformation* geomInfo = display->GetGeometryInformation();
+    vtkPVDataSetAttributesInformation* attrInfo;
+    if (display->GetScalarModeCM() == 
+        vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA)
+      {
+      attrInfo = geomInfo->GetPointDataInformation();
+      }
+    else
+      {
+      attrInfo = geomInfo->GetCellDataInformation();
+      }
+    vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(
+      pqPart::GetColorField(display, true).toStdString().c_str());      
+
+    if (arrayInfo && arrayInfo->GetDataType() == VTK_UNSIGNED_CHAR)
+      {
+      // Number of component restriction.
+      if (arrayInfo->GetNumberOfComponents() == 3)
+        {
+        // One component causes more trouble than it is worth.
+        this->Internal->ColorMapScalars->setEnabled(true);
+        return;
+        }
+      }
+    }
+
+  this->Internal->ColorMapScalars->setCheckState(Qt::Checked);
+  this->Internal->ColorMapScalars->setEnabled(false);
+}
+
+//-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::colorByChanged(const QString& val)
 {
   if (this->DisableSlots)
@@ -363,14 +463,13 @@ void pqDisplayProxyEditor::colorByChanged(const QString& val)
     }
   if(val == "Solid Color")
     {
-    this->Internal->ColorActorColor->setEnabled(true);
     pqPart::Color(this->Internal->Display->getDisplayProxy(), NULL, 0);
     }
   else
     {
-    this->Internal->ColorActorColor->setEnabled(false);
     pqPart::SetColorField(this->Internal->Display->getDisplayProxy(), val);
     }
+  this->updateEnableState();
   this->updateView();
 }
 
@@ -425,17 +524,16 @@ void pqDisplayProxyEditor::zoomToData()
     return;
     }
 
-  pqPipelineSource* input = this->Internal->Display->getInput();
-  vtkSMSourceProxy* input_proxy = (input)?
-    vtkSMSourceProxy::SafeDownCast(input->getProxy()) : NULL;
+  vtkSMDataObjectDisplayProxy* display = 
+    this->Internal->Display->getDisplayProxy();
 
-  if(!input_proxy)
+  if(!display)
     {
-    qDebug() << "Cannot zoom to data, failed to locate input proxy.";
+    qDebug() << "Cannot zoom to data, failed to locate display proxy.";
     return;
     }
   double bounds[6];
-  input_proxy->GetDataInformation()->GetBounds(bounds);
+  display->GetGeometryInformation()->GetBounds(bounds);
   if (bounds[0]<=bounds[1] && bounds[2]<=bounds[3] && bounds[4]<=bounds[5])
     {
     pqRenderModule* renModule = 
