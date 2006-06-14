@@ -223,7 +223,7 @@ void pqNamedObjectPanel::linkServerManagerProperties()
         if(comboBox)
           {
           QList<pqSMProxy> propertyDomain = 
-            pqSMAdaptor::getProxyPropertyDomain(this->Proxy, SMProperty);
+            pqSMAdaptor::getProxyPropertyDomain(SMProperty);
           comboBox->clear();
           foreach(pqSMProxy v, propertyDomain)
             {
@@ -333,26 +333,8 @@ void pqNamedObjectPanel::unlinkServerManagerProperties()
 
       if(pt == pqSMAdaptor::MULTIPLE_ELEMENTS)
         {
-        //QLayout* propertyLayout = qobject_cast<QLayout*>(foundObject);
         QWidget* propertyWidget = qobject_cast<QWidget*>(foundObject);
-        /*
-        if(propertyLayout)
-          {
-          QList<QList<QVariant> > domain = pqSMAdaptor::getMultipleElementPropertyDomain(SMProperty);
-          for(int j=0; j<domain.size(); j++)
-            {
-            QString name;
-            name.setNum(j);
-            name = QString(iter->GetKey()) + QString(":") + name;
-            QLineEdit* le = propertyLayout->parentWidget()->findChild<QLineEdit*>(name);
-            if(le)
-              {
-              this->PropertyManager->unregisterLink(le, "text", SIGNAL(textChanged(const QString&)),
-                                               this->Proxy, SMProperty, j);
-              }
-            }
-          }
-        else */ if(propertyWidget)
+        if(propertyWidget)
           {
           int index = -1;
           // get the index from the name

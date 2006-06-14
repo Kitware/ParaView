@@ -459,11 +459,11 @@ pqPipelineSource* pqApplicationCore::createReaderOnActiveServer(
   this->Internal->UndoStack->BeginOrContinueUndoSet("Set Filenames");
 
   vtkSMProxy* proxy = reader->getProxy();
-  pqSMAdaptor::setElementProperty(proxy, proxy->GetProperty("FileName"), 
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("FileName"), 
     filename);
-  pqSMAdaptor::setElementProperty(proxy, proxy->GetProperty("FilePrefix"),
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("FilePrefix"),
     filename);
-  pqSMAdaptor::setElementProperty(proxy, proxy->GetProperty("FilePattern"),
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("FilePattern"),
     filename);
   proxy->UpdateVTKObjects();
 

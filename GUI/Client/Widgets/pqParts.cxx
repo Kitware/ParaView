@@ -296,8 +296,9 @@ void pqPart::Color(vtkSMDisplayProxy* displayProxy,
 {
   if(fieldname == 0)
     {
-    pqSMAdaptor::setElementProperty(displayProxy, 
+    pqSMAdaptor::setElementProperty(
       displayProxy->GetProperty("ScalarVisibility"), 0);
+    displayProxy->UpdateVTKObjects();
     return;
     }
 
@@ -332,12 +333,13 @@ void pqPart::Color(vtkSMDisplayProxy* displayProxy,
   if (!lut)
     {
     qDebug() << "Failed to create/locate Lookup Table.";
-    pqSMAdaptor::setElementProperty(displayProxy, 
+    pqSMAdaptor::setElementProperty(
       displayProxy->GetProperty("ScalarVisibility"), 0);
+    displayProxy->UpdateVTKObjects();
     return;
     }
 
-  pqSMAdaptor::setElementProperty(displayProxy, 
+  pqSMAdaptor::setElementProperty(
     displayProxy->GetProperty("ScalarVisibility"), 1);
 
   vtkPVArrayInformation* ai;
@@ -345,14 +347,14 @@ void pqPart::Color(vtkSMDisplayProxy* displayProxy,
     {
     vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
     ai = geomInfo->GetCellDataInformation()->GetArrayInformation(fieldname);
-    pqSMAdaptor::setEnumerationProperty(displayProxy, 
+    pqSMAdaptor::setEnumerationProperty(
       displayProxy->GetProperty("ScalarMode"), "UseCellFieldData");
     }
   else
     {
     vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
     ai = geomInfo->GetPointDataInformation()->GetArrayInformation(fieldname);
-    pqSMAdaptor::setEnumerationProperty(displayProxy, 
+    pqSMAdaptor::setEnumerationProperty(
       displayProxy->GetProperty("ScalarMode"), "UsePointFieldData");
     }
 
@@ -372,7 +374,7 @@ void pqPart::Color(vtkSMDisplayProxy* displayProxy,
     if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
       {
       pqSMAdaptor::setSelectionProperty(
-        reader, reader->GetProperty("CellArrayStatus"), property);
+        reader->GetProperty("CellArrayStatus"), property);
       reader->UpdateVTKObjects();
       vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
       ai = geomInfo->GetCellDataInformation()->GetArrayInformation(fieldname);
@@ -380,7 +382,7 @@ void pqPart::Color(vtkSMDisplayProxy* displayProxy,
     else
       {
       pqSMAdaptor::setSelectionProperty(
-        reader, reader->GetProperty("PointArrayStatus"), property);
+        reader->GetProperty("PointArrayStatus"), property);
       reader->UpdateVTKObjects();
       vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
       ai = geomInfo->GetPointDataInformation()->GetArrayInformation(fieldname);
@@ -394,12 +396,10 @@ void pqPart::Color(vtkSMDisplayProxy* displayProxy,
   QList<QVariant> tmp;
   tmp += range[0];
   tmp += range[1];
-  pqSMAdaptor::setMultipleElementProperty(lut, 
-    lut->GetProperty("ScalarRange"), tmp);
-  pqSMAdaptor::setElementProperty(displayProxy, 
-    displayProxy->GetProperty("ColorArray"), fieldname);
+  pqSMAdaptor::setMultipleElementProperty(lut->GetProperty("ScalarRange"), tmp);
+  pqSMAdaptor::setElementProperty(displayProxy->GetProperty("ColorArray"), 
+                                  fieldname);
   lut->UpdateVTKObjects();
-
   displayProxy->UpdateVTKObjects();
 }
 
@@ -486,13 +486,13 @@ void pqPart::SetColorField(vtkSMDisplayProxy* Part, const QString& value)
 QString pqPart::GetColorField(vtkSMDisplayProxy* Part, bool raw)
 {
   QVariant scalarColor = pqSMAdaptor::getElementProperty(
-    Part, Part->GetProperty("ScalarVisibility"));
+    Part->GetProperty("ScalarVisibility"));
   if(scalarColor.toBool())
     {
     QVariant scalarMode = pqSMAdaptor::getEnumerationProperty(
-      Part, Part->GetProperty("ScalarMode"));
+      Part->GetProperty("ScalarMode"));
     QString scalarArray = pqSMAdaptor::getElementProperty(
-      Part, Part->GetProperty("ColorArray")).toString();
+      Part->GetProperty("ColorArray")).toString();
     if (raw)
       {
       return scalarArray;

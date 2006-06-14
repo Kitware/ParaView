@@ -81,10 +81,17 @@ public slots:
   /// one may get/set unchecked properties to get domain updates before an
   /// accept is done
   void setUseUncheckedProperties(bool);
+  
+  /// set whether UpdateVTKObjects is called automatically when needed
+  void setAutoUpdateVTKObjects(bool);
 
 public:
+
   /// get whether unchecked properties are used
   bool useUncheckedProperties();
+
+  /// get whether UpdateVTKObjects is called automatically when needed
+  bool autoUpdateVTKObjects();
 
   /// TODO: domain change events
   /// TODO: do domain changes possibly affect our links?
@@ -111,6 +118,8 @@ public:
   bool operator<(pqPropertyLinksConnection const& other) const;
   void setUseUncheckedProperties(bool) const;
   bool useUncheckedProperties() const;
+  void setAutoUpdateVTKObjects(bool) const;
+  bool autoUpdateVTKObjects() const;
 
   bool getOutOfSync() const;
 private slots:

@@ -498,15 +498,14 @@ pqRenderModule* pqPipelineBuilder::createWindow(pqServer* server)
   vtkSMProperty* prop = renModule->GetProperty("CompositeThreshold");
   if(prop)
     {
-    pqSMAdaptor::setElementProperty(renModule, prop, 0.0);  // remote render
+    pqSMAdaptor::setElementProperty(prop, 0.0);  // remote render
     }
   renModule->UpdateVTKObjects();
 
   // turn on vtk light kit
   renModule->SetUseLight(1);
   // turn off main light
-  pqSMAdaptor::setElementProperty(renModule,
-    renModule->GetProperty("LightSwitch"), 0);
+  pqSMAdaptor::setElementProperty(renModule->GetProperty("LightSwitch"), 0);
 
   renModule->UpdateVTKObjects();
   return pqRM;
