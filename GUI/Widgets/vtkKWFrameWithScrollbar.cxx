@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithScrollbar );
-vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.14");
+vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.15");
 
 //----------------------------------------------------------------------------
 vtkKWFrameWithScrollbar::vtkKWFrameWithScrollbar()
@@ -139,6 +139,11 @@ double* vtkKWFrameWithScrollbar::GetBackgroundColor()
 void vtkKWFrameWithScrollbar::SetBackgroundColor(double r, double g, double b)
 {
   this->SetConfigurationOptionAsColor("-background", r, g, b);
+  if (this->ScrollableFrame)
+    {
+    this->ScrollableFrame->SetConfigurationOptionAsColor(
+      "-background", r, g, b);
+    }
 }
 
 //----------------------------------------------------------------------------
