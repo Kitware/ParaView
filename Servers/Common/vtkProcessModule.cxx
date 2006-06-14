@@ -102,7 +102,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.53");
+vtkCxxRevisionMacro(vtkProcessModule, "1.54");
 vtkCxxSetObjectMacro(vtkProcessModule, ActiveRemoteConnection, vtkRemoteConnection);
 vtkCxxSetObjectMacro(vtkProcessModule, GUIHelper, vtkProcessModuleGUIHelper);
 
@@ -1664,6 +1664,10 @@ vtkPVXMLElement* vtkProcessModule::NewNextRedo(vtkIdType id)
 //-----------------------------------------------------------------------------
 int vtkProcessModule::GetNumberOfConnections()
 {
+  if (!this->ConnectionManager)
+    {
+    return 0;
+    }
   return this->ConnectionManager->GetNumberOfConnections();
 }
 
