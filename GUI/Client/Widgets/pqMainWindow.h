@@ -210,6 +210,8 @@ private slots:
 
   // performs updates that need to be done after accept.
   void postAcceptUpdate();
+  // performs updates that need to be done before accept.
+  void preAcceptUpdate();
 
   // Handler when the core indicates change in the active server/source.
   void onCoreActiveChanged();

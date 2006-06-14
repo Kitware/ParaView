@@ -250,7 +250,7 @@ void pqObjectInspectorWidget::accept()
     this->CurrentPanel->accept();
     }
  
-  pqApplicationCore::instance()->getActiveRenderModule()->render();
+  pqApplicationCore::instance()->getActiveRenderModule()->forceRender();
 
   /* For now just render the active window, later we will
      render all the windows to which this source belongs.

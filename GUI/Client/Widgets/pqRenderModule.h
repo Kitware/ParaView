@@ -61,8 +61,11 @@ public:
   /// This will set the QVTKWidget's parent.
   void setWindowParent(QWidget* parent);
 
-  /// Request a StillRender.
+  /// Request a StillRender. 
   void render();
+
+  /// Forces an immediate render.
+  void forceRender();
 
   /// Resets the camera to include all visible data.
   void resetCamera();

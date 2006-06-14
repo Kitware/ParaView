@@ -173,6 +173,15 @@ void pqRenderModule::render()
 }
 
 //-----------------------------------------------------------------------------
+void pqRenderModule::forceRender()
+{
+  if (this->Internal->RenderModuleProxy)
+    {
+    this->Internal->RenderModuleProxy->StillRender();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqRenderModule::resetCamera()
 {
   if (this->Internal->RenderModuleProxy)

@@ -516,6 +516,10 @@ void pqMainWindow::createStandardObjectInspector(bool visible)
     SIGNAL(postaccept()), undoStack, SLOT(EndUndoSet()));
 
   QObject::connect(
+    this->Implementation->Inspector, SIGNAL(preaccept()), 
+    this, SLOT(preAcceptUpdate()));
+
+  QObject::connect(
     this->Implementation->Inspector, SIGNAL(postaccept()), 
     this, SLOT(postAcceptUpdate()));
 
@@ -1726,12 +1730,27 @@ void pqMainWindow::onActiveSourceChanged(pqPipelineSource* src)
 }
 
 //-----------------------------------------------------------------------------
+void pqMainWindow::preAcceptUpdate()
+{
+  this->setEnabled(false);
+  if (this->statusBar()->isVisible())
+    {
+    this->statusBar()->showMessage(tr("Updating..."));
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pqMainWindow::postAcceptUpdate()
 {
   this->updateFiltersMenu(pqApplicationCore::instance()->getActiveSource());
   if (this->Implementation->DataInformationWidget)
     {
     this->Implementation->DataInformationWidget->refreshData();
+    }
+  this->setEnabled(true);
+  if (this->statusBar()->isVisible())
+    {
+    this->statusBar()->showMessage(tr("Ready"), 2000);
     }
 }
 
