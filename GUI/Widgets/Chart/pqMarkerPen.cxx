@@ -31,37 +31,70 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqMarkerPen.h"
+
 #include <QPainter>
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
+#include <vtkstd/algorithm>
+
+//////////////////////////////////////////////////////////////////////////////
+// pqMarkerPen::pqImplementation
+
+class pqMarkerPen::pqImplementation
+{
+public:
+  pqImplementation(const QPen& pen, unsigned int marker_interval) :
+    Pen(pen),
+    MarkerInterval(marker_interval ? marker_interval : 1),
+    MarkerIndex(0)
+  {
+  }
+  
+  /// Internal implementation detail
+  void intervalDrawMarker(QPainter& painter, const QPoint& point)
+  {
+  }
+  
+  /// Internal implementation detail
+  void intervalDrawMarker(QPainter& painter, const QPointF& point)
+  {
+  }
+  
+  /// Stores the internal pen
+  const QPen Pen;
+  /// Stores the interval at which markers will be drawn
+  const unsigned int MarkerInterval;
+  /// Index that is used to keep track of which markers should be drawn
+  unsigned int MarkerIndex;
+};
+
+//////////////////////////////////////////////////////////////////////////////
 // pqMarkerPen
 
 pqMarkerPen::pqMarkerPen(const QPen& pen, unsigned int marker_interval) :
-  Pen(pen),
-  MarkerInterval(marker_interval ? marker_interval : 1),
-  MarkerIndex(0)
+  Implementation(new pqImplementation(pen, marker_interval))
 {
 }
 
 pqMarkerPen::~pqMarkerPen()
 {
+  delete this->Implementation;
 }
 
 void pqMarkerPen::resetMarkers(unsigned int offset)
 {
-  this->MarkerIndex = offset;
+  this->Implementation->MarkerIndex = offset;
 }
 
 QPen pqMarkerPen::getPen()
 {
-  return this->Pen;
+  return this->Implementation->Pen;
 }
 
 void pqMarkerPen::drawLine(QPainter& painter, const QLineF& line)
 {
   painter.save();
 
-  painter.setPen(this->Pen);
+  painter.setPen(this->Implementation->Pen);
   painter.drawLine(line);
 
   this->setupPainter(painter);
@@ -74,7 +107,7 @@ void pqMarkerPen::drawLine(QPainter& painter, const QLine& line)
 {
   painter.save();
 
-  painter.setPen(this->Pen);
+  painter.setPen(this->Implementation->Pen);
   painter.drawLine(line);
 
   this->setupPainter(painter);
@@ -87,7 +120,7 @@ void pqMarkerPen::drawLine(QPainter& painter, const QPoint& p1, const QPoint& p2
 {
   painter.save();
 
-  painter.setPen(this->Pen);
+  painter.setPen(this->Implementation->Pen);
   painter.drawLine(p1, p2);
 
   this->setupPainter(painter);
@@ -100,7 +133,7 @@ void pqMarkerPen::drawLine(QPainter& painter, const QPointF& p1, const QPointF& 
 {
   painter.save();
 
-  painter.setPen(this->Pen);
+  painter.setPen(this->Implementation->Pen);
   painter.drawLine(p1, p2);
 
   this->setupPainter(painter);
@@ -113,7 +146,7 @@ void pqMarkerPen::drawLine(QPainter& painter, int x1, int y1, int x2, int y2)
 {
   painter.save();
 
-  painter.setPen(this->Pen);
+  painter.setPen(this->Implementation->Pen);
   painter.drawLine(x1, y1, x2, y2);
 
   this->setupPainter(painter);
@@ -216,8 +249,8 @@ void pqMarkerPen::drawPolyline(QPainter& painter, const QPointF* points, int poi
 {
   painter.save();
   
-  painter.setPen(this->Pen);
-  painter.drawPolyline(points, pointCount);
+  painter.setPen(this->Implementation->Pen);
+  this->safeDrawPolyline(painter, points, pointCount);
 
   this->setupPainter(painter);
   for(int i = 0; i < pointCount - 1; ++i)
@@ -234,8 +267,8 @@ void pqMarkerPen::drawPolyline(QPainter& painter, const QPoint* points, int poin
 {
   painter.save();
   
-  painter.setPen(this->Pen);
-  painter.drawPolyline(points, pointCount);
+  painter.setPen(this->Implementation->Pen);
+  this->safeDrawPolyline(painter, points, pointCount);
   
   this->setupPainter(painter);
   for(int i = 0; i < pointCount - 1; ++i)
@@ -252,8 +285,8 @@ void pqMarkerPen::drawPolyline(QPainter& painter, const QPolygonF& points)
 {
   painter.save();
 
-  painter.setPen(this->Pen);
-  painter.drawPolyline(points);
+  painter.setPen(this->Implementation->Pen);
+  this->safeDrawPolyline(painter, &points[0], points.size());
 
   this->setupPainter(painter);
   for(int i = 0; i < points.size() - 1; ++i)
@@ -270,8 +303,8 @@ void pqMarkerPen::drawPolyline(QPainter& painter, const QPolygon& points)
 {
   painter.save();
   
-  painter.setPen(this->Pen);
-  painter.drawPolyline(points);
+  painter.setPen(this->Implementation->Pen);
+  this->safeDrawPolyline(painter, &points[0], points.size());
 
   this->setupPainter(painter);
   for(int i = 0; i < points.size() - 1; ++i)
@@ -284,9 +317,29 @@ void pqMarkerPen::drawPolyline(QPainter& painter, const QPolygon& points)
   painter.restore();
 }
 
+void pqMarkerPen::safeDrawPolyline(QPainter& painter, const QPointF* points, int pointCount)
+{
+  // This is a workaround for crashes we've seen on X drawing polylines with large numbers
+  // of points - in theory, both Qt and X should hide these details, in practice, they don't :(
+  for(int i = 0; i < pointCount; i += 100)
+    {
+    painter.drawPolyline(&points[i], vtkstd::min(100, pointCount - i));
+    }
+}
+
+void pqMarkerPen::safeDrawPolyline(QPainter& painter, const QPoint* points, int pointCount)
+{
+  // This is a workaround for crashes we've seen on X drawing polylines with large numbers
+  // of points - in theory, both Qt and X should hide these details, in practice, they don't :(
+  for(int i = 0; i < pointCount; i += 100)
+    {
+    painter.drawPolyline(&points[i], vtkstd::min(100, pointCount - i));
+    }
+}
+
 void pqMarkerPen::intervalDrawMarker(QPainter& painter, const QPoint& point)
 {
-  if(0 != (this->MarkerIndex++ % this->MarkerInterval))
+  if(0 != (this->Implementation->MarkerIndex++ % this->Implementation->MarkerInterval))
     return;
     
   painter.translate(point);
@@ -295,7 +348,7 @@ void pqMarkerPen::intervalDrawMarker(QPainter& painter, const QPoint& point)
 
 void pqMarkerPen::intervalDrawMarker(QPainter& painter, const QPointF& point)
 {
-  if(0 != (this->MarkerIndex++ % this->MarkerInterval))
+  if(0 != (this->Implementation->MarkerIndex++ % this->Implementation->MarkerInterval))
     return;
     
   painter.translate(point);
