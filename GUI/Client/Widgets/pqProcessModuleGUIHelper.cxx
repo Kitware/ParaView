@@ -110,7 +110,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.12");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.13");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -180,7 +180,7 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
       {
       // Starts the event loop.
       QCoreApplication* app = QApplication::instance();
-      app->exec();
+      status = app->exec();
       }
     }
   this->FinalizeApplication();
