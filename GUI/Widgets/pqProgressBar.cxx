@@ -51,9 +51,9 @@ QString pqProgressBar::text() const
 }
 
 //-----------------------------------------------------------------------------
-void pqProgressBar::setProgress(const QString& message, int value)
+void pqProgressBar::setProgress(const QString& message, int _value)
 {
   this->Message = message + ": ";
-  this->setValue(value);
+  this->setValue(_value);
 }
 
