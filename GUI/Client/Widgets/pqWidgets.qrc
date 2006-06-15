@@ -11,6 +11,7 @@
         <file alias="pqCancel16.png">Resources/pqCancel16.png</file>
         <file alias="pqCancel22.png">Resources/pqCancel22.png</file>
         <file alias="pqCellData16.png">Resources/pqCellData16.png</file>
+        <file alias="pqEyeball16.png">Resources/pqEyeball16.png</file>
         <file alias="pqFavorites16.png">Resources/pqFavorites16.png</file>
         <file alias="pqFavorites32.png">Resources/pqFavorites32.png</file>
         <file alias="pqFilter16.png">Resources/pqFilter16.png</file>
@@ -24,7 +25,6 @@
         <file alias="pqLinkBack16.png">Resources/pqLinkBack16.png</file>
         <file alias="pqLinkIn16.png">Resources/pqLinkIn16.png</file>
         <file alias="pqLinkOut16.png">Resources/pqLinkOut16.png</file>
-        <file alias="pqMerge16.png">Resources/pqMerge16.png</file>
         <file alias="pqNodeSet16.png">Resources/pqNodeSet16.png</file>
         <file alias="pqPipelineList22.png">Resources/pqPipelineList22.png</file>
         <file alias="pqPointData16.png">Resources/pqPointData16.png</file>
@@ -36,7 +36,6 @@
         <file alias="pqSource16.png">Resources/pqSource16.png</file>
         <file alias="pqSource22.png">Resources/pqSource22.png</file>
         <file alias="pqSource32.png">Resources/pqSource32.png</file>
-        <file alias="pqSplit16.png">Resources/pqSplit16.png</file>
         <file alias="pqSplitViewH12.png">Resources/pqSplitViewH12.png</file>
         <file alias="pqSplitViewV12.png">Resources/pqSplitViewV12.png</file>
         <file alias="pqUndo22.png">Resources/pqUndo22.png</file>
@@ -54,8 +53,7 @@
         <file alias="pqWindowd16.png">Resources/pqWindowd16.png</file>
         <file alias="pqWindowd22.png">Resources/pqWindowd22.png</file>
         <file alias="pqWindowd32.png">Resources/pqWindowd32.png</file>
-        <file alias="SplitViewHorizontal.png">Resources/SplitViewHorizontal.png</file>
-        <file alias="SplitViewVertical.png">Resources/SplitViewVertical.png</file>
+        <file alias="pqWindowh16.png">Resources/pqWindowh16.png</file>
         <file alias="ExodusPanel.ui">pqExodusPanel.ui</file>
         <file alias="ThresholdPanel.ui">pqThresholdPanel.ui</file>
         <file alias="pqSampleScalarWidget.ui">pqSampleScalarWidget.ui</file>
