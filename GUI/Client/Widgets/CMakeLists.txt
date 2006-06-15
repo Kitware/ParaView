@@ -57,6 +57,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineBrowserContextMenu.h
   pqPipelineBrowser.h
   pqPipelineBuilder.h
+  pqPipelineDisplay.h
   pqPipelineMenu.h
   pqPipelineModel.h
   pqPipelineModelSelectionAdaptor.h

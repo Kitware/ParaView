@@ -51,6 +51,7 @@ class vtkSMDataObjectDisplayProxy;
 /// doesn't worry about that.
 class PQWIDGETS_EXPORT pqPipelineDisplay : public pqProxy
 {
+  Q_OBJECT
 public:
   pqPipelineDisplay(const QString& name,
     vtkSMDataObjectDisplayProxy* display, pqServer* server,
