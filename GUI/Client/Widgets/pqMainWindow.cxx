@@ -127,6 +127,7 @@ class pqMainWindow::pqImplementation
 public:
   pqImplementation() :
     FileMenu(0),
+    EditMenu(0),
     ViewMenu(0),
     ServerMenu(0),
     SourcesMenu(0),
@@ -169,6 +170,7 @@ public:
 
   // Stores standard menus
   QMenu* FileMenu;
+  QMenu* EditMenu;
   QMenu* ViewMenu;
   QMenu* ServerMenu;
   QMenu* SourcesMenu;
@@ -271,15 +273,18 @@ pqMainWindow::~pqMainWindow()
   delete Implementation;
 }
 
+//-----------------------------------------------------------------------------
 void pqMainWindow::createStandardFileMenu()
 {
   QMenu* const menu = this->fileMenu();
   QAction* action;
  
-  menu->addAction(tr("&New"), this, SLOT(onFileNew()), QKeySequence(Qt::CTRL + Qt::Key_N))
+  menu->addAction(tr("&New"), this, SLOT(onFileNew()), 
+    QKeySequence(Qt::CTRL + Qt::Key_N))
     << pqSetName("New");
 
-  menu->addAction(tr("&Open..."), this, SLOT(onFileOpen()), QKeySequence(Qt::CTRL + Qt::Key_O))
+  menu->addAction(tr("&Open..."), this, SLOT(onFileOpen()), 
+    QKeySequence(Qt::CTRL + Qt::Key_O))
     << pqSetName("Open");
 
   action = menu->addAction(tr("&Save Data..."), this, SLOT(onFileSaveData()), 
@@ -305,10 +310,28 @@ void pqMainWindow::createStandardFileMenu()
 
   menu->addSeparator();
   
-  menu->addAction(tr("E&xit"), QApplication::instance(), SLOT(quit()), QKeySequence(Qt::CTRL + Qt::Key_Q))
+  menu->addAction(tr("E&xit"), QApplication::instance(), SLOT(quit()), 
+    QKeySequence(Qt::CTRL + Qt::Key_Q))
     << pqSetName("Exit");
 }
 
+//-----------------------------------------------------------------------------
+void pqMainWindow::createStandardEditMenu()
+{
+  QMenu* const menu = this->editMenu();
+  QAction* action;
+
+  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
+  action = menu->addAction(tr("Can't &Undo"), stack, SLOT(Undo()),
+    QKeySequence(Qt::CTRL + Qt::Key_Z))
+    << pqSetName("Undo");
+  action->setEnabled(false);
+
+  action = menu->addAction(tr("Can't &Redo"), stack, SLOT(Redo()),
+    QKeySequence(Qt::CTRL + Qt::Key_R))
+    << pqSetName("Redo");
+  action->setEnabled(false);
+}
 
 //-----------------------------------------------------------------------------
 void pqMainWindow::createStandardStatusBar()
@@ -673,6 +696,17 @@ QMenu* pqMainWindow::fileMenu()
     }
     
   return this->Implementation->FileMenu;
+}
+
+//-----------------------------------------------------------------------------
+QMenu* pqMainWindow::editMenu()
+{
+  if (!this->Implementation->EditMenu)
+    {
+    this->Implementation->EditMenu = this->menuBar()->addMenu(tr("&Edit"))
+      << pqSetName("EditMenu");
+    }
+  return this->Implementation->EditMenu;
 }
 
 //-----------------------------------------------------------------------------
@@ -1902,22 +1936,47 @@ void pqMainWindow::updateEnableState()
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindow::onUndoRedoStackChanged(bool canUndo, QString,
-  bool canRedo, QString)
+void pqMainWindow::onUndoRedoStackChanged(bool canUndo, QString undoText,
+  bool canRedo, QString redoText)
 {
-  QAction* undoButton = 
-    this->Implementation->UndoRedoToolBar->findChild<QAction*>("UndoButton");
+  QAction* undoButton = 0;
+  QAction* redoButton = 0;
 
-  QAction* redoButton = 
-    this->Implementation->UndoRedoToolBar->findChild<QAction*>("RedoButton");
-  if (undoButton)
+
+  if (this->Implementation->UndoRedoToolBar)
     {
-    undoButton->setEnabled(canUndo); 
+    undoButton = this->Implementation->UndoRedoToolBar->findChild<QAction*>(
+      "UndoButton");
+    redoButton = this->Implementation->UndoRedoToolBar->findChild<QAction*>(
+      "RedoButton");
+    if (undoButton)
+      {
+      undoButton->setEnabled(canUndo); 
+      }
+
+    if (redoButton)
+      {
+      redoButton->setEnabled(canRedo);
+      }
     }
 
-  if (redoButton)
+  if (this->Implementation->EditMenu)
     {
-    redoButton->setEnabled(canRedo);
+    undoButton = this->Implementation->EditMenu->findChild<QAction*>("Undo");
+    if (undoButton)
+      {
+      undoButton->setEnabled(canUndo);
+      QString text = (canUndo? "&Undo " + undoText : "Can't &Undo");
+      undoButton->setText(text);
+      }
+
+    redoButton = this->Implementation->EditMenu->findChild<QAction*>("Redo");
+    if (redoButton)
+      {
+      redoButton->setEnabled(canRedo);
+      QString text = (canRedo? "&Redo " + redoText : "Can't &Redo");
+      redoButton->setText(text);
+      }
     }
 }
 

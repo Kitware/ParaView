@@ -77,6 +77,8 @@ public:
   /// Creates the "standard" ParaQ file menu
   void createStandardFileMenu();
   /// Creates the "standard" ParaQ view menu
+  void createStandardEditMenu();
+  /// Creates the "standard" ParaQ view menu
   void createStandardViewMenu();
   /// Creates the "standard" ParaQ server menu
   void createStandardServerMenu();
@@ -111,8 +113,10 @@ public:
 
   // Lower-level methods that can be used to create a "custom" client
 
-  /// Returns the file menu, creating it if it doesn't already exist
+  /// Returns the file menu, creating it if it doesn't already exist.
   QMenu* fileMenu();
+  /// Returns the edit menu, creating it if it doesn't already exist.
+  QMenu* editMenu();
   /// Returns the view menu, creating it if it doesn't already exist
   QMenu* viewMenu();
   /// Returns the server menu, creating it if it doesn't already exist
