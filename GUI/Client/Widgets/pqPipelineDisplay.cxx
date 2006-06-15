@@ -45,12 +45,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes.
 #include <QPointer>
+#include <QList>
 #include <QtDebug>
 
 // ParaQ includes.
 #include "pqParts.h"
 #include "pqPipelineSource.h"
+#include "pqRenderModule.h"
 #include "pqServerManagerModel.h"
+
 
 //-----------------------------------------------------------------------------
 class pqPipelineDisplayInternal
@@ -59,6 +62,10 @@ public:
   vtkSmartPointer<vtkSMDataObjectDisplayProxy> DisplayProxy;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   QPointer<pqPipelineSource> Input;
+
+  // Set of render modules showing this display. Typically,
+  // it will be 1, but theoretically there can be more.
+  QList<QPointer<pqRenderModule> > RenderModules;
 };
 
 //-----------------------------------------------------------------------------
@@ -75,6 +82,8 @@ pqPipelineDisplay::pqPipelineDisplay(const QString& name,
     {
     this->Internal->VTKConnect->Connect(display->GetProperty("Input"),
       vtkCommand::ModifiedEvent, this, SLOT(onInputChanged()));
+    this->Internal->VTKConnect->Connect(display->GetProperty("Visibility"),
+      vtkCommand::ModifiedEvent, this, SLOT(onVisibilityChanged()));
     }
   // This will make sure that if the input is already set.
   this->onInputChanged();
@@ -166,6 +175,84 @@ void pqPipelineDisplay::setDefaultColorParametes()
 void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
 {
   pqPart::Color(this->getDisplayProxy(), arrayname, fieldtype);
+}
+
+//-----------------------------------------------------------------------------
+bool pqPipelineDisplay::shownIn(pqRenderModule* rm) const
+{
+  return this->Internal->RenderModules.contains(rm);
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineDisplay::addRenderModule(pqRenderModule* rm)
+{
+  if (!this->Internal->RenderModules.contains(rm))
+    {
+    this->Internal->RenderModules.push_back(rm);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineDisplay::removeRenderModule(pqRenderModule* rm)
+{
+  if (this->Internal->RenderModules.contains(rm))
+    {
+    this->Internal->RenderModules.removeAll(rm);
+    }
+}
+
+//-----------------------------------------------------------------------------
+unsigned int pqPipelineDisplay::getNumberOfRenderModules() const
+{
+  return this->Internal->RenderModules.size();
+}
+
+//-----------------------------------------------------------------------------
+pqRenderModule* pqPipelineDisplay::getRenderModule(unsigned int index) const
+{
+  if (index >= this->getNumberOfRenderModules())
+    {
+    qDebug() << "Invalid index : " << index;
+    return NULL;
+    }
+  return this->Internal->RenderModules[index];
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineDisplay::renderAllViews(bool force /*=false*/)
+{
+  foreach(pqRenderModule* rm, this->Internal->RenderModules)
+    {
+    if (rm)
+      {
+      if (force)
+        {
+        rm->forceRender();
+        }
+      else
+        {
+        rm->render();
+        }
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+bool pqPipelineDisplay::isVisible() const
+{
+  return this->getDisplayProxy()->GetVisibilityCM();
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineDisplay::setVisible(bool visible)
+{
+  this->getDisplayProxy()->SetVisibilityCM((visible? 1 : 0));
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineDisplay::onVisibilityChanged()
+{
+  emit this->visibilityChanged(this->getDisplayProxy()->GetVisibilityCM());
 }
 
 //-----------------------------------------------------------------------------

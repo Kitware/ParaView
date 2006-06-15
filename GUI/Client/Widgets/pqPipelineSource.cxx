@@ -182,3 +182,29 @@ pqPipelineDisplay* pqPipelineSource::getDisplay(int index) const
     }
   return 0;
 }
+
+//-----------------------------------------------------------------------------
+pqPipelineDisplay* pqPipelineSource::getDisplay(
+  pqRenderModule* renderModule) const
+{
+  foreach(pqPipelineDisplay* disp, this->Internal->Displays)
+    {
+    if (disp && disp->shownIn(renderModule))
+      {
+      return disp;
+      }
+    }
+  return NULL;
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineSource::renderAllViews(bool force /*=false*/)
+{
+  foreach(pqPipelineDisplay* disp, this->Internal->Displays)
+    {
+    if (disp)
+      {
+      disp->renderAllViews(force);
+      }
+    }
+}

@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqProxy.h"
 
+class pqPipelineDisplay;
 class pqRenderModuleInternal;
 class pqServer;
 class QVTKWidget;
@@ -74,11 +75,18 @@ public:
   /// the current window size is used.
   bool saveImage(int width, int height, const QString& filename);
 
+  /// This method checks if the display is one of the displays
+  /// rendered by this render module.
+  bool hasDisplay(pqPipelineDisplay* display);
+
 private slots:
   /// if renModule is not created when this object is instantianted, we
   /// must listen to UpdateVTKObjects event to bind the QVTKWidget and
   /// then render window.
   void onUpdateVTKObjects();
+
+  /// Called when the "Displays" property changes.
+  void displaysChanged();
 
 protected:
   // Event filter callback.

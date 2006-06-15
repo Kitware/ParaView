@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqPipelineDisplay;
 class pqPipelineSourceInternal;
+class pqRenderModule;
 class vtkObject;
 
 
@@ -76,10 +77,21 @@ public:
   // Get number of displays.
   int getDisplayCount() const; 
 
+  // Get the display(if any) that is present in the \c renderModule. 
+  // NOTE: In case more than one display exists for this source
+  // added to the render module, this returns the first one.
+  pqPipelineDisplay* getDisplay(pqRenderModule* renderModule) const;
+
   // Use this method to initialize the pqObject state using the
   // underlying vtkSMProxy. This needs to be done only once,
   // after the object has been created. 
   virtual void initialize() { };
+
+  // This method updates all render modules to which all  
+  // displays for this source belong, if force is true, it for an immediate 
+  // render otherwise render on idle.
+  void renderAllViews(bool force=false);
+
 signals:
   /// fired when a connection is created between two pqPipelineSources.
   void connectionAdded(pqPipelineSource* in, pqPipelineSource* out);

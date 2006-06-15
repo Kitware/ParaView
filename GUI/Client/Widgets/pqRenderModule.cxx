@@ -37,17 +37,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
 
 // Qt includes.
 #include <QFileInfo>
 #include <QPointer>
+#include <QSet>
 #include <QtDebug>
 
 // ParaQ includes.
+#include "pqApplicationCore.h"
+#include "pqPipelineDisplay.h"
 #include "pqRenderViewProxy.h"
+#include "pqServerManagerModel.h"
 #include "pqSetName.h"
 #include "vtkPVAxesWidget.h"
+
+template<class T>
+inline uint qHash(QPointer<T> p)
+{
+  return qHash(static_cast<T*>(p));
+}
 
 class pqRenderModuleInternal
 {
@@ -58,6 +69,9 @@ public:
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   vtkSmartPointer<vtkSMRenderModuleProxy> RenderModuleProxy;
   vtkSmartPointer<vtkPVAxesWidget> AxesWidget;
+
+  // List of displays shown by this render module.
+  QSet<QPointer<pqPipelineDisplay> > Displays;
 
   pqRenderModuleInternal()
     {
@@ -87,6 +101,10 @@ pqRenderModule::pqRenderModule(const QString& name,
     << pqSetName("Viewport" + this->Internal->Name);
   this->Internal->Viewport->installEventFilter(this);
 
+  // Listen to display add/remove events.
+  this->Internal->VTKConnect->Connect(renModule->GetProperty("Displays"),
+    vtkCommand::ModifiedEvent, this, SLOT(displaysChanged()));
+
   vtkRenderWindow* renWin = renModule->GetRenderWindow();
   if (renWin)
     {
@@ -104,6 +122,14 @@ pqRenderModule::pqRenderModule(const QString& name,
 //-----------------------------------------------------------------------------
 pqRenderModule::~pqRenderModule()
 {
+  foreach(pqPipelineDisplay* disp, this->Internal->Displays)
+    {
+    if (disp)
+      {
+      disp->removeRenderModule(this);
+      }
+    }
+
   delete this->Internal->Viewport;
   delete this->Internal;
 }
@@ -161,6 +187,53 @@ void pqRenderModule::onUpdateVTKObjects()
   // no need to listen to any more events.
   this->Internal->VTKConnect->Disconnect(
     this->Internal->RenderModuleProxy);
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderModule::displaysChanged()
+{
+  // Determine what changed, we form two sets of displays that got added
+  // and displays that got removed.
+  
+  QSet<QPointer<pqPipelineDisplay> > currentDisplays;
+  vtkSMProxyProperty* prop = vtkSMProxyProperty::SafeDownCast(
+    this->getProxy()->GetProperty("Displays"));
+  pqServerManagerModel* smModel = 
+    pqApplicationCore::instance()->getServerManagerModel();
+
+  unsigned int max = prop->GetNumberOfProxies();
+  for (unsigned int cc=0; cc < max; ++cc)
+    {
+    vtkSMProxy* proxy = prop->GetProxy(cc);
+    if (!proxy)
+      {
+      continue;
+      }
+    pqPipelineDisplay* display = smModel->getPQDisplay(proxy);
+    if (!display)
+      {
+      continue;
+      }
+    currentDisplays.insert(QPointer<pqPipelineDisplay>(display));
+    }
+
+  QSet<QPointer<pqPipelineDisplay> > removed = 
+    this->Internal->Displays - currentDisplays;
+  QSet<QPointer<pqPipelineDisplay> > added =
+    currentDisplays - this->Internal->Displays;
+
+  this->Internal->Displays = currentDisplays;
+
+  // Tell the displays whether they are shown by this render module or not.
+  foreach(pqPipelineDisplay* removedDisplay, removed)
+    {
+    removedDisplay->removeRenderModule(this);
+    }
+
+  foreach(pqPipelineDisplay* addedDisplay, added)
+    {
+    addedDisplay->addRenderModule(this);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -238,6 +311,12 @@ bool pqRenderModule::saveImage(int width, int height, const QString& filename)
     this->render();
     }
   return (ret == vtkErrorCode::NoError);
+}
+
+//-----------------------------------------------------------------------------
+bool pqRenderModule::hasDisplay(pqPipelineDisplay* display)
+{
+  return this->Internal->Displays.contains(display);
 }
 
 //-----------------------------------------------------------------------------
