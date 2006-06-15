@@ -31,31 +31,56 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqSampleScalarWidget.h"
+#include "pqScalarSetModel.h"
 
 #include "ui_pqSampleScalarWidget.h"
 
+///////////////////////////////////////////////////////////////////////////
+// pqSampleScalarWidget::pqImplementation
+
+class pqSampleScalarWidget::pqImplementation
+{
+public:
+  pqImplementation() :
+    UI(new Ui::pqSampleScalarWidget())
+  {
+  }
+  
+  ~pqImplementation()
+  {
+    delete this->UI;
+  }
+  
+  Ui::pqSampleScalarWidget* const UI;
+  pqScalarSetModel Model;
+};
+
 pqSampleScalarWidget::pqSampleScalarWidget(QWidget* Parent) :
   base(Parent),
-  Implementation(new Ui::pqSampleScalarWidget())
+  Implementation(new pqImplementation())
 {
-  this->Implementation->setupUi(this);
+  this->Implementation->UI->setupUi(this);
   
-  this->Implementation->RangeMin->setValidator(
-    new QDoubleValidator(this->Implementation->RangeMin));
+  this->Implementation->UI->RangeMin->setValidator(
+    new QDoubleValidator(this->Implementation->UI->RangeMin));
     
-  this->Implementation->RangeMax->setValidator(
-    new QDoubleValidator(this->Implementation->RangeMax));
+  this->Implementation->UI->RangeMax->setValidator(
+    new QDoubleValidator(this->Implementation->UI->RangeMax));
   
-  this->Implementation->RangeCount->setValidator(
-    new QIntValidator(2, 9999, this->Implementation->RangeCount));
+  this->Implementation->UI->RangeCount->setValidator(
+    new QIntValidator(2, 9999, this->Implementation->UI->RangeCount));
   
-  this->Implementation->Value->setValidator(
-    new QDoubleValidator(this->Implementation->Value));
+  this->Implementation->UI->Value->setValidator(
+    new QDoubleValidator(this->Implementation->UI->Value));
   
-  connect(this->Implementation->AddRange, SIGNAL(clicked()), this, SLOT(onAddRange()));
-  connect(this->Implementation->AddValue, SIGNAL(clicked()), this, SLOT(onAddValue()));
-  connect(this->Implementation->DeleteAll, SIGNAL(clicked()), this, SLOT(onDeleteAll()));
-  connect(this->Implementation->DeleteSelected, SIGNAL(clicked()), this, SLOT(onDeleteSelected()));
+  this->Implementation->UI->Values->setModel(&this->Implementation->Model);
+  this->Implementation->UI->Values->setSelectionBehavior(QAbstractItemView::SelectRows);
+  this->Implementation->UI->Values->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  
+  connect(this->Implementation->UI->AddRange, SIGNAL(clicked()), this, SLOT(onAddRange()));
+  connect(this->Implementation->UI->AddValue, SIGNAL(clicked()), this, SLOT(onAddValue()));
+  connect(this->Implementation->UI->DeleteAll, SIGNAL(clicked()), this, SLOT(onDeleteAll()));
+  connect(this->Implementation->UI->DeleteSelected, SIGNAL(clicked()), this, SLOT(onDeleteSelected()));
 }
 
 pqSampleScalarWidget::~pqSampleScalarWidget()
@@ -65,34 +90,26 @@ pqSampleScalarWidget::~pqSampleScalarWidget()
 
 void pqSampleScalarWidget::setSamples(const QList<double>& samples)
 {
-  this->Implementation->Values->clear();
+  this->Implementation->Model.clear();
   
   for(int i = 0; i != samples.size(); ++i)
     {
-    this->Implementation->Values->addItem(QString::number(samples[i]));
+    this->Implementation->Model.insert(samples[i]);
     }
    
-  this->Implementation->Values->sortItems();
   emit samplesChanged();
 }
 
 const QList<double> pqSampleScalarWidget::getSamples()
 {
-  QList<double> samples;
-  
-  for(int i = 0; i != this->Implementation->Values->count(); ++i)
-    {
-    samples.push_back(this->Implementation->Values->item(i)->text().toDouble());
-    }
-    
-  return samples;
+  return this->Implementation->Model.values();
 }
 
 void pqSampleScalarWidget::onAddRange()
 {
-  const double range_min = this->Implementation->RangeMin->text().toDouble();
-  const double range_max = this->Implementation->RangeMax->text().toDouble();
-  const int range_count = this->Implementation->RangeCount->text().toInt();
+  const double range_min = this->Implementation->UI->RangeMin->text().toDouble();
+  const double range_max = this->Implementation->UI->RangeMax->text().toDouble();
+  const int range_count = this->Implementation->UI->RangeCount->text().toInt();
 
   if(range_count < 2)
     return;
@@ -104,39 +121,39 @@ void pqSampleScalarWidget::onAddRange()
     {
     const double mix = static_cast<double>(i) / static_cast<double>(range_count - 1);
     
-    this->Implementation->Values->addItem(QString::number(
-      (1.0 - mix) * range_min + (mix) * range_max));
+    this->Implementation->Model.insert((1.0 - mix) * range_min + (mix) * range_max);
     }
   
-  this->Implementation->Values->sortItems();
   emit samplesChanged();
 }
 
 void pqSampleScalarWidget::onAddValue()
 {
-  this->Implementation->Values->addItem(
-    QString::number(this->Implementation->Value->text().toDouble()));
-
-  this->Implementation->Values->sortItems();
+  this->Implementation->Model.insert(
+    this->Implementation->UI->Value->text().toDouble());
+    
   emit samplesChanged();
 }
 
 void pqSampleScalarWidget::onDeleteAll()
 {
-  this->Implementation->Values->clear();
+  this->Implementation->Model.clear();
   emit samplesChanged();
 }
 
 void pqSampleScalarWidget::onDeleteSelected()
 {
-  for(int i = this->Implementation->Values->count() - 1; i >= 0; --i)
+  QList<int> rows;
+  for(int i = this->Implementation->Model.rowCount() - 1; i >= 0; --i)
     {
-    if(this->Implementation->Values->isItemSelected(this->Implementation->Values->item(i)))
-      {
-      this->Implementation->Values->model()->removeRow(i);
-      }
+    if(this->Implementation->UI->Values->selectionModel()->isRowSelected(i, QModelIndex()))
+      rows.push_back(i);
     }
 
-  this->Implementation->Values->sortItems();
+  for(int i = rows.size() - 1; i >= 0; --i)
+    {
+    this->Implementation->Model.erase(rows[i]);
+    }
+  
   emit samplesChanged();
 }

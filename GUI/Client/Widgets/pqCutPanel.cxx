@@ -178,7 +178,7 @@ void pqCutPanel::onAccepted()
 
 void pqCutPanel::onRejected()
 {
-  // Get the current values from the implicit plane ...
+  // Restore the state of the implicit plane widget ...
   double origin[3] = { 0, 0, 0 };
   double normal[3] = { 0, 0, 1 };
   
@@ -207,8 +207,24 @@ void pqCutPanel::onRejected()
         }
       }
     }
-
   this->Implementation->ImplicitPlaneWidget.setWidgetState(origin, normal);
+
+  // Reset the state of the sample scalar widget ...
+  QList<double> values;
+  if(this->Proxy)
+    {
+    if(vtkSMDoubleVectorProperty* const contours =
+      vtkSMDoubleVectorProperty::SafeDownCast(
+        this->Proxy->GetProperty("ContourValues")))
+      {
+      const int value_count = contours->GetNumberOfElements();
+      for(int i = 0; i != value_count; ++i)
+        {
+        values.push_back(contours->GetElement(i));
+        }
+      }
+    }
+  this->Implementation->SampleScalarWidget.setSamples(values);
 }
 
 void pqCutPanel::setProxyInternal(pqSMProxy p)

@@ -67,6 +67,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqRenderViewEditor.h
   pqRenderWindowManager.h
   pqSampleScalarWidget.h
+  pqScalarSetModel.h
   pqSelectionAdaptor.h
   pqServer.h
   pqServerBrowser.h
@@ -231,6 +232,8 @@ ADD_LIBRARY(pqWidgets
   pqRenderWindowManager.h
   pqSampleScalarWidget.cxx
   pqSampleScalarWidget.h
+  pqScalarSetModel.cxx
+  pqScalarSetModel.h
   pqSelectionAdaptor.cxx
   pqSelectionAdaptor.h
   pqServerBrowser.cxx

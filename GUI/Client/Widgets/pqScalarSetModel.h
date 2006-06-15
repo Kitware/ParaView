@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqSampleScalarWidget.h
+   Module:    pqScalarSetModel.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,52 +30,42 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqSampleScalarWidget_h
-#define _pqSampleScalarWidget_h
+#ifndef _pqScalarSetModel_h
+#define _pqScalarSetModel_h
 
 #include "pqWidgetsExport.h"
 
-#include <QWidget>
+#include <QAbstractListModel>
 
-namespace Ui { class pqSampleScalarWidget; }
-
-/** Provides a standard user interface component for manipulating a list of
-scalar samples.  Current uses include: specifying the set of "slices" for
-the Cut filter, and specifying the set of contour values for the Contour filter.
-*/
-
-class PQWIDGETS_EXPORT pqSampleScalarWidget :
-  public QWidget
+/// Qt model that stores a sorted collection of unique floating-point numbers
+class PQWIDGETS_EXPORT pqScalarSetModel :
+  public QAbstractListModel
 {
-  typedef QWidget base;
+  typedef QAbstractListModel base;
 
   Q_OBJECT
 
 public:
-  pqSampleScalarWidget(QWidget* Parent);
-  ~pqSampleScalarWidget();
+  pqScalarSetModel();
+  ~pqScalarSetModel();
 
-  /// Set the set of samples selected by the widget, overriding any previous set.
-  void setSamples(const QList<double>& samples);
-  /// Returns the set of samples selected by the widget.
-  const QList<double> getSamples();
+  /// Clears the model contents
+  void clear();
+  /// Inserts a floating-point number into the model
+  void insert(double value);
+  /// Erases a floating-point number from the model
+  void erase(double value);
+  /// Erases a zero-based row from the model
+  void erase(int row);
+  /// Returns the sorted collection of numbers stored in the model
+  const QList<double> values();
 
-signals:
-  /// Signal emitted whenever the set of select samples changes.
-  void samplesChanged();
-
-private slots:
-  void onAddRange();
-  void onAddValue();
-  void onDeleteAll();
-  void onDeleteSelected();
-  
+  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+  virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+    
 private:
-  pqSampleScalarWidget(const pqSampleScalarWidget&);
-  pqSampleScalarWidget& operator=(const pqSampleScalarWidget&);
-  
   class pqImplementation;
   pqImplementation* const Implementation;
 };
 
-#endif // !_pqSampleScalarWidget_h
+#endif // !_pqScalarSetModel_h

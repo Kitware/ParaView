@@ -103,6 +103,7 @@ IF(BUILD_TESTING)
     VariableSelector
     Clip
     Cut
+    CutMulti
     Threshold
     OpenFile
     ExodusPanel
