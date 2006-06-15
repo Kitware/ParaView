@@ -32,8 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ProcessModuleGUIHelper.h"
 #include <pqMain.h>
+#include <QApplication>
 
 int main(int argc, char* argv[])
 {
-  return pqMain::Run(argc, argv, ProcessModuleGUIHelper::New());
+  QApplication app(argc, argv);
+  return pqMain::Run(app.argc(), app.argv(), ProcessModuleGUIHelper::New());
 }

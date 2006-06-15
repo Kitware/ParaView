@@ -90,7 +90,11 @@ IF(WIN32)
 ENDIF(WIN32)
   
 IF(BUILD_TESTING)
+IF(APPLE)
+  SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview_alpha.app/Contents/MacOS/paraview_alpha --test-directory=${PARAQ_TEST_DIR})
+ELSE(APPLE)
   SET(TEST_BINARY ${EXECUTABLE_OUTPUT_PATH}/paraview_alpha --test-directory=${PARAQ_TEST_DIR})
+ENDIF(APPLE)
   SET(TEST_XML ${pqClient_SOURCE_DIR}/Testing/XML)
   SET(TEST_IMAGE ${PARAQ_DATA_ROOT}/Baseline)
 

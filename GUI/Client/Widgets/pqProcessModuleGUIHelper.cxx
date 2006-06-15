@@ -59,7 +59,6 @@ public:
     OutputWindowAdapter(vtkSmartPointer<pqOutputWindowAdapter>::New()),
     OutputWindow(0),
     SMApplication(vtkSMApplication::New()),
-    Application(0),
     ApplicationCore(0),
     Window(0),
     EnableProgress(false)
@@ -75,7 +74,6 @@ public:
     delete this->Window;
     delete this->OutputWindow;
     delete this->ApplicationCore;
-    delete this->Application;
   }
 
   /// Routes Qt debug output through the VTK output window mechanism
@@ -104,7 +102,6 @@ public:
   pqOutputWindow* OutputWindow;
 
   vtkSMApplication* SMApplication;
-  QApplication* Application;
   pqApplicationCore* ApplicationCore;
   QWidget* Window;
   bool EnableProgress;
@@ -113,7 +110,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.11");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.12");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -146,7 +143,7 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
     }
   
   int status = 1;
-  if (this->Implementation->Application && this->Implementation->Window)
+  if (this->Implementation->Window)
     {
     this->Implementation->Window->show();
     
@@ -182,7 +179,8 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
     if (!dont_start_event_loop )
       {
       // Starts the event loop.
-      status = this->Implementation->Application->exec();
+      QCoreApplication* app = QApplication::instance();
+      app->exec();
       }
     }
   this->FinalizeApplication();
@@ -199,7 +197,6 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
 //-----------------------------------------------------------------------------
 int pqProcessModuleGUIHelper::InitializeApplication(int argc, char** argv)
 {
-  this->Implementation->Application = new QApplication(argc, argv);
   this->Implementation->ApplicationCore = new pqApplicationCore();
   
   // Redirect VTK debug output to a Qt window ...
@@ -262,9 +259,10 @@ void pqProcessModuleGUIHelper::SetLocalProgress(const char* name,
 //-----------------------------------------------------------------------------
 void pqProcessModuleGUIHelper::ExitApplication()
 {
-  if (this->Implementation->Application)
+  QCoreApplication* app = QApplication::instance();
+  if(app)
     {
-    this->Implementation->Application->exit();
+    app->exit();
     }
 }
 
@@ -272,7 +270,7 @@ void pqProcessModuleGUIHelper::ExitApplication()
 void pqProcessModuleGUIHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Application: " << this->Implementation->Application << endl;
+  //os << indent << "Application: " << this->Implementation->Application << endl;
 }
 
 //-----------------------------------------------------------------------------
