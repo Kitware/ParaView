@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSpinBox);
-vtkCxxRevisionMacro(vtkKWSpinBox, "1.16");
+vtkCxxRevisionMacro(vtkKWSpinBox, "1.17");
 
 //----------------------------------------------------------------------------
 vtkKWSpinBox::vtkKWSpinBox() 
@@ -82,6 +82,7 @@ void vtkKWSpinBox::SetValue(double value)
   if (this->IsCreated())
     {
     this->Script("%s set %lf", this->GetWidgetName(), value);
+    this->InvokeCommand(this->GetValue());
     }
 }
 
@@ -377,6 +378,7 @@ void vtkKWSpinBox::InvokeCommand(double value)
       this->Script("%s %lf", this->Command, value);
       }
     }
+  this->InvokeEvent(vtkKWSpinBox::SpinBoxValueChangedEvent, &value);
 }
 
 //----------------------------------------------------------------------------

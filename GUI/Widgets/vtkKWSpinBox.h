@@ -197,6 +197,19 @@ public:
   virtual void SetCommand(vtkObject *object, const char *method);
 
   // Description:
+  // Events. The SpinBoxValueChangedEvent is triggered when the widget value
+  // is changed. It is similar in concept to the 'Command' callback but can be
+  // used by multiple listeners/observers at a time.
+  // The following parameters are also passed as client data:
+  // - the current value: double
+  //BTX
+  enum
+  {
+    SpinBoxValueChangedEvent = 10000,
+  };
+  //ETX
+
+  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
