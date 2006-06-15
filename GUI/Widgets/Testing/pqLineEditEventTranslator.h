@@ -54,11 +54,6 @@ public:
 private:
   pqLineEditEventTranslator(const pqLineEditEventTranslator&);
   pqLineEditEventTranslator& operator=(const pqLineEditEventTranslator&);
-
-  QObject* CurrentObject;
-  
-private slots:
-  void onStateChanged(const QString&);  
 };
 
 #endif // !_pqLineEditEventTranslator_h
