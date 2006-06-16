@@ -2029,14 +2029,17 @@ void pqMainWindow::updateEnableState()
     compoundFilterAction->setEnabled(server != 0 && !pending_displays);
     }
 
-  pqRenderModule* rm = pqApplicationCore::instance()->getActiveRenderModule();
-  if (rm)
+  if (this->Implementation->SelectionToolBar)
     {
-    this->Implementation->SelectionToolBar->setEnabled(true);
-    }
-  else
-    {
-    this->Implementation->SelectionToolBar->setEnabled(false);
+    pqRenderModule* rm = pqApplicationCore::instance()->getActiveRenderModule();
+    if (rm)
+      {
+      this->Implementation->SelectionToolBar->setEnabled(true);
+      }
+    else
+      {
+      this->Implementation->SelectionToolBar->setEnabled(false);
+      }
     }
 }
 
