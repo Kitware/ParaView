@@ -73,10 +73,10 @@ pqSelectionAdaptor::pqSelectionAdaptor(
     this, SLOT(currentChanged(pqServerManagerModelItem*)));
 
   QObject::connect(this->Internal->SMSelectionModel,
-    SIGNAL(selectionChanged(const pqServerManagerModelSelection&,
-        const pqServerManagerModelSelection&)),
-    this, SLOT(selectionChanged(const pqServerManagerModelSelection&,
-        const pqServerManagerModelSelection&)));
+    SIGNAL(selectionChanged(const pqServerManagerSelection&,
+        const pqServerManagerSelection&)),
+    this, SLOT(selectionChanged(const pqServerManagerSelection&,
+        const pqServerManagerSelection&)));
 }
 
 //-----------------------------------------------------------------------------
@@ -201,7 +201,7 @@ void pqSelectionAdaptor::selectionChanged(
 
   this->Internal->IgnoreSignals = true;
 
-  pqServerManagerModelSelection smSelected;
+  pqServerManagerSelection smSelected;
   const QModelIndexList &sIndexes = selected.indexes();
 
   foreach (const QModelIndex& index, sIndexes)
@@ -211,7 +211,7 @@ void pqSelectionAdaptor::selectionChanged(
     smSelected.push_back(smItem);
     }
 
-  pqServerManagerModelSelection smDeselected;
+  pqServerManagerSelection smDeselected;
   const QModelIndexList &dIndexes = deselected.indexes();
   foreach (const QModelIndex& index, dIndexes)
     {
@@ -261,8 +261,8 @@ void pqSelectionAdaptor::currentChanged(
 
 //-----------------------------------------------------------------------------
 void pqSelectionAdaptor::selectionChanged(
-  const pqServerManagerModelSelection& selected,
-    const pqServerManagerModelSelection& deselected)
+  const pqServerManagerSelection& selected,
+    const pqServerManagerSelection& deselected)
 {
   if (this->Internal->IgnoreSignals)
     {

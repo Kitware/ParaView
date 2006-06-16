@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqSelectionAdaptorInternal;
 class pqServerManagerModelItem;
-class pqServerManagerModelSelection;
+class pqServerManagerSelection;
 class pqServerManagerSelectionModel;
 
 class QAbstractItemModel;
@@ -93,8 +93,8 @@ protected slots:
     const QItemSelection& deselected);
 
   virtual void currentChanged(pqServerManagerModelItem* item);
-  virtual void selectionChanged(const pqServerManagerModelSelection& selected,
-    const pqServerManagerModelSelection& deselected);
+  virtual void selectionChanged(const pqServerManagerSelection& selected,
+    const pqServerManagerSelection& deselected);
 
 
   // subclasses can override this method to provide model specific selection 

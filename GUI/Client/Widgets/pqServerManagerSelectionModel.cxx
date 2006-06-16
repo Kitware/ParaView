@@ -41,7 +41,7 @@ class pqServerManagerSelectionModelInternal
 {
 public:
   QPointer<pqServerManagerModel> Model;
-  pqServerManagerModelSelection Selection;
+  pqServerManagerSelection Selection;
   QPointer<pqServerManagerModelItem> Current;
 };
 
@@ -94,7 +94,7 @@ bool pqServerManagerSelectionModel::isSelected(
 }
 
 //-----------------------------------------------------------------------------
-const pqServerManagerModelSelection* 
+const pqServerManagerSelection* 
 pqServerManagerSelectionModel::selectedItems() const
 {
   return &this->Internal->Selection;
@@ -104,14 +104,14 @@ pqServerManagerSelectionModel::selectedItems() const
 void pqServerManagerSelectionModel::select(pqServerManagerModelItem* item,
   pqServerManagerSelectionModel::SelectionFlags command)
 {
-  pqServerManagerModelSelection sel;
+  pqServerManagerSelection sel;
   sel.push_back(item);
   this->select(sel, command);
 }
 
 //-----------------------------------------------------------------------------
 void pqServerManagerSelectionModel::select(
-  const pqServerManagerModelSelection& items,
+  const pqServerManagerSelection& items,
   pqServerManagerSelectionModel::SelectionFlags command)
 {
   this->purge();
@@ -123,8 +123,8 @@ void pqServerManagerSelectionModel::select(
 
   bool changed = false;
   
-  pqServerManagerModelSelection selected;
-  pqServerManagerModelSelection deselected;
+  pqServerManagerSelection selected;
+  pqServerManagerSelection deselected;
 
   if (command & Clear)
     {

@@ -41,23 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqServerManagerModel;
 class pqServerManagerModelItem;
+class pqServerManagerSelection;
 class pqServerManagerSelectionModelInternal;
-
-inline bool operator==(const QPointer<pqServerManagerModelItem>& lhs, const QPointer<pqServerManagerModelItem>& rhs)
-{
-  return static_cast<pqServerManagerModelItem*>(lhs) == static_cast<pqServerManagerModelItem*>(rhs);
-}
-
-inline uint qHash(const QPointer<pqServerManagerModelItem>& index)
-{
-  return reinterpret_cast<size_t>(static_cast<pqServerManagerModelItem*>(index));
-}
-
-// This is a selection set. For now, it's simply a QList.
-class PQWIDGETS_EXPORT pqServerManagerModelSelection : 
-  public QList<QPointer<pqServerManagerModelItem> >
-{
-};
 
 // This is a QItemSelectionModel-like selection model for the
 // pqServerManagerModel. pqServerManagerSelectionModel is part
@@ -102,24 +87,43 @@ public:
   pqServerManagerModel* model() const;
 
   // Returns the list of selected items.
-  const pqServerManagerModelSelection* selectedItems() const;
+  const pqServerManagerSelection* selectedItems() const;
 
 public slots:
   void select(pqServerManagerModelItem* item, 
     pqServerManagerSelectionModel::SelectionFlags command);
-  void select(const pqServerManagerModelSelection& items,
+  void select(const pqServerManagerSelection& items,
     pqServerManagerSelectionModel::SelectionFlags command);
 
 signals:
   void currentChanged(pqServerManagerModelItem* item);
-  void selectionChanged(const pqServerManagerModelSelection& selected,
-    const pqServerManagerModelSelection& deselected);
+  void selectionChanged(const pqServerManagerSelection& selected,
+    const pqServerManagerSelection& deselected);
 
 private:
   pqServerManagerSelectionModelInternal* Internal;
   // Cleans up QPointers pointing to null objects in the selection.
   void purge();
 };
+
+inline bool operator==(const QPointer<pqServerManagerModelItem>& lhs, 
+                       const QPointer<pqServerManagerModelItem>& rhs)
+{
+  return static_cast<pqServerManagerModelItem*>(lhs) == 
+    static_cast<pqServerManagerModelItem*>(rhs);
+}
+
+inline uint qHash(const QPointer<pqServerManagerModelItem>& index)
+{
+  return reinterpret_cast<size_t>(static_cast<pqServerManagerModelItem*>(index));
+}
+
+// This is a selection set. For now, it's simply a QList.
+class PQWIDGETS_EXPORT pqServerManagerSelection : 
+  public QList<QPointer<pqServerManagerModelItem> >
+{
+};
+
 
 #endif
 

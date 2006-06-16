@@ -31,7 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqSelectionManager.h"
+
+#include "pqApplicationCore.h"
+#include "pqPipelineSource.h"
 #include "pqRenderModule.h"
+#include "pqServerManagerModel.h"
+#include "pqServerManagerSelectionModel.h"
 
 #include "qdebug.h"
 
@@ -278,17 +283,34 @@ void pqSelectionManager::processEvents(unsigned long event)
 //-----------------------------------------------------------------------------
 void pqSelectionManager::updateSelection(vtkSMRenderModuleProxy* rmp)
 {
+  // pick with the given rectange. this will need some work when rendering
+  // in parallel, specially with tiled display
   vtkPVClientServerIdCollectionInformation* idInfo = 
     rmp->Pick(this->Implementation->Xs, this->Implementation->Ys,
               this->Implementation->Xe, this->Implementation->Ye);
 
+  pqServerManagerModel* model = 
+    pqApplicationCore::instance()->getServerManagerModel();
+  pqServerManagerSelectionModel* selectionModel =
+    pqApplicationCore::instance()->getSelectionModel();
+
+  pqServerManagerSelection selection;
   int numProps = idInfo->GetLength();
   for (int i = 0; i < numProps; i++)
     {
     vtkClientServerID id = idInfo->GetID(i);
-    cout << id.ID << endl;
-    //vtkSMProxy *objProxy = 
-    //renderModuleProxy->GetProxyFromPropID(&ID, this->SelectionType);
+    // get the source proxy corresponding to the picked display
+    // proxy
+    vtkSMProxy *objProxy = rmp->GetProxyFromPropID(&id, 0);
+    pqPipelineSource* pqSource = model->getPQSource(objProxy);
+    if (pqSource)
+      {
+      selection.push_back(pqSource);
+      }
+    cout << pqSource << endl;
     }
   idInfo->Delete();
+
+  selectionModel->select(
+    selection, pqServerManagerSelectionModel::ClearAndSelect);
 }
