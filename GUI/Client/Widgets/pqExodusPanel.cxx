@@ -427,7 +427,7 @@ void pqExodusPanel::postAccept()
   pqLoadedFormObjectPanel::postAccept();
 }
 
-static QString formatDataFor(vtkPVArrayInformation* ai)
+QString pqExodusPanel::formatDataFor(vtkPVArrayInformation* ai)
 {
   QString info;
   if(ai)
@@ -473,9 +473,14 @@ void pqExodusPanel::updateDataRanges()
   // update data information about loaded arrays
 
   vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(this->proxy());
-  vtkPVDataInformation* di = sp->GetDataInformation();
-  vtkPVDataSetAttributesInformation* pdi = di->GetPointDataInformation();
-  vtkPVDataSetAttributesInformation* cdi = di->GetCellDataInformation();
+  vtkPVDataSetAttributesInformation* pdi = 0;
+  vtkPVDataSetAttributesInformation* cdi = 0;
+  if (sp->GetNumberOfParts() > 0)
+    {
+    vtkPVDataInformation* di = sp->GetDataInformation();
+    pdi = di->GetPointDataInformation();
+    cdi = di->GetCellDataInformation();
+    }
   vtkPVArrayInformation* ai;
   
   QTreeWidget* VariablesTree = this->findChild<QTreeWidget*>("Variables");
@@ -484,7 +489,11 @@ void pqExodusPanel::updateDataRanges()
   
   // block ids
   item = static_cast<pqTreeWidgetItemObject*>(VariablesTree->topLevelItem(0));
-  ai = cdi->GetArrayInformation("BlockId");
+  ai = 0;
+  if (cdi)
+    {
+    ai = cdi->GetArrayInformation("BlockId");
+    }
   dataString = formatDataFor(ai);
   item->setData(1, Qt::DisplayRole, dataString);
   item->setData(1, Qt::ToolTipRole, dataString);
@@ -492,7 +501,11 @@ void pqExodusPanel::updateDataRanges()
   
   // remove global element id
   item = static_cast<pqTreeWidgetItemObject*>(VariablesTree->topLevelItem(1));
-  ai = cdi->GetArrayInformation("GlobalElementId");
+  ai = 0;
+  if (cdi)
+    {
+    ai = cdi->GetArrayInformation("GlobalElementId");
+    }
   dataString = formatDataFor(ai);
   item->setData(1, Qt::DisplayRole, dataString);
   item->setData(1, Qt::ToolTipRole, dataString);
@@ -508,7 +521,11 @@ void pqExodusPanel::updateDataRanges()
     {
     item = static_cast<pqTreeWidgetItemObject*>(
                   VariablesTree->topLevelItem(j+CellOffset));
-    ai = cdi->GetArrayInformation(CellDomain[j].toString().toAscii().data());
+    ai = 0;
+    if (cdi)
+      {
+      ai = cdi->GetArrayInformation(CellDomain[j].toString().toAscii().data());
+      }
     dataString = formatDataFor(ai);
     item->setData(1, Qt::DisplayRole, dataString);
     item->setData(1, Qt::ToolTipRole, dataString);
@@ -517,7 +534,11 @@ void pqExodusPanel::updateDataRanges()
   // remove global node id
   item = static_cast<pqTreeWidgetItemObject*>(
         VariablesTree->topLevelItem(CellOffset + CellDomain.size()));
-  ai = pdi->GetArrayInformation("GlobalNodeId");
+  ai = 0;
+  if (pdi)
+    {
+    ai = pdi->GetArrayInformation("GlobalNodeId");
+    }
   dataString = formatDataFor(ai);
   item->setData(1, Qt::DisplayRole, dataString);
   item->setData(1, Qt::ToolTipRole, dataString);
@@ -533,7 +554,11 @@ void pqExodusPanel::updateDataRanges()
     item = static_cast<pqTreeWidgetItemObject*>(
         VariablesTree->topLevelItem(j + CellOffset + 
                                     PointOffset + CellDomain.size()));
-    ai = pdi->GetArrayInformation(PointDomain[j].toString().toAscii().data());
+    ai = 0;
+    if (pdi)
+      {
+      ai = pdi->GetArrayInformation(PointDomain[j].toString().toAscii().data());
+      }
     dataString = formatDataFor(ai);
     item->setData(1, Qt::DisplayRole, dataString);
     item->setData(1, Qt::ToolTipRole, dataString);
