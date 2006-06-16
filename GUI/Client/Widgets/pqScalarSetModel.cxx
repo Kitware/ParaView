@@ -97,17 +97,17 @@ const QList<double> pqScalarSetModel::values()
   return results;
 }
 
-int pqScalarSetModel::rowCount(const QModelIndex& parent) const
+int pqScalarSetModel::rowCount(const QModelIndex& /*parent*/) const
 {
   return Implementation->Values.size();
 }
 
-QVariant pqScalarSetModel::data(const QModelIndex& index, int role) const
+QVariant pqScalarSetModel::data(const QModelIndex& i, int role) const
 {
-  if(!index.isValid())
+  if(!i.isValid())
     return QVariant();
   
-  if(index.row() < 0 || index.row() >= static_cast<int>(this->Implementation->Values.size()))
+  if(i.row() < 0 || i.row() >= static_cast<int>(this->Implementation->Values.size()))
     return QVariant();
   
   switch(role)
@@ -115,7 +115,7 @@ QVariant pqScalarSetModel::data(const QModelIndex& index, int role) const
     case Qt::DisplayRole:
       {
       vtkstd::set<double>::iterator value = this->Implementation->Values.begin();
-      vtkstd::advance(value, index.row());
+      vtkstd::advance(value, i.row());
       return QString::number(*value);
       }
     }

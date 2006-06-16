@@ -49,16 +49,6 @@ public:
   {
   }
   
-  /// Internal implementation detail
-  void intervalDrawMarker(QPainter& painter, const QPoint& point)
-  {
-  }
-  
-  /// Internal implementation detail
-  void intervalDrawMarker(QPainter& painter, const QPointF& point)
-  {
-  }
-  
   /// Stores the internal pen
   const QPen Pen;
   /// Stores the interval at which markers will be drawn
