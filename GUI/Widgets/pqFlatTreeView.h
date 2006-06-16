@@ -161,6 +161,7 @@ private:
   void layoutItems();
   void layoutItem(pqFlatTreeViewItem *item, int &point,
       const QFontMetrics &fm);
+  int getDataWidth(const QModelIndex &index, const QFontMetrics &fm) const;
   bool updateContentsWidth();
   void updateScrollBars();
   void addChildItems(pqFlatTreeViewItem *item, int parentChildCount);

@@ -859,7 +859,7 @@ void pqFlatTreeView::dataChanged(const QModelIndex &topLeft,
 void pqFlatTreeView::mouseDoubleClickEvent(QMouseEvent *e)
 {
   QModelIndex index = this->indexAt(e->pos());
-  if(index.isValid() && index.row() == 0)
+  if(index.isValid() && index.column() == 0)
     {
     pqFlatTreeViewItem *item = this->getItem(index);
     if(item && item->Expandable)
@@ -972,31 +972,34 @@ QModelIndex pqFlatTreeView::moveCursor(
           {
           // TODO
           }
-        else if(item->Expandable && item->Expanded)
+        else if(current.column() == 0)
           {
-          this->collapse(current);
-          }
-        else
-          {
-          // Find the next parent that is expandable.
-          newItem = item->Parent;
-          while(newItem)
+          if(item->Expandable && item->Expanded)
             {
-            if(newItem->Expandable)
-              {
-              break;
-              }
-            else if(newItem->Items.size() > 1)
-              {
-              break;
-              }
-
-            newItem = newItem->Parent;
+            this->collapse(current);
             }
-
-          if(newItem && newItem != this->Root)
+          else
             {
-            current = newItem->Index;
+            // Find the next parent that is expandable.
+            newItem = item->Parent;
+            while(newItem)
+              {
+              if(newItem->Expandable)
+                {
+                break;
+                }
+              else if(newItem->Items.size() > 1)
+                {
+                break;
+                }
+
+              newItem = newItem->Parent;
+              }
+
+            if(newItem && newItem != this->Root)
+              {
+              current = newItem->Index;
+              }
             }
           }
 
@@ -1008,14 +1011,17 @@ QModelIndex pqFlatTreeView::moveCursor(
           {
           // TODO
           }
-        else if(item->Expandable && !item->Expanded)
+        else if(current.column() == 0)
           {
-          this->expand(current);
-          }
-        else if(item->Expandable || item->Items.size() > 1)
-          {
-          // Move to the first child.
-          current = item->Items[0]->Index;
+          if(item->Expandable && !item->Expanded)
+            {
+            this->expand(current);
+            }
+          else if(item->Expandable || item->Items.size() > 1)
+            {
+            // Move to the first child.
+            current = item->Items[0]->Index;
+            }
           }
 
         break;
@@ -1418,6 +1424,8 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
 
           // Column 0 has the icon and indent. We may want to support
           // decoration for other columns in the future.
+          QIcon icon;
+          QPixmap pixmap;
           if(i == 0)
             {
             // If the item is selected and the decoration should be
@@ -1434,7 +1442,6 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
             // Get the icon for this item from the model. QVariant won't
             // automatically convert from pixmap to icon, so it has to
             // be done here.
-            QIcon icon;
             QVariant decoration = itemModel->data(item->Index,
                 Qt::DecorationRole);
             if(decoration.canConvert(QVariant::Pixmap))
@@ -1471,7 +1478,7 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
                 py += trueHeight - this->IndentWidth;
                 }
 
-              QPixmap pixmap = icon.pixmap(options.decorationSize);
+              pixmap = icon.pixmap(options.decorationSize);
               painter.drawPixmap(px + 1, py + 1, pixmap);
 
               // Add extra padding to the x coordinate to put space
@@ -1491,80 +1498,119 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
             index = item->Index.sibling(item->Index.row(), i);
             }
 
-          QString text = itemModel->data(index).toString();
-          if(!text.isEmpty() && columnWidth > 0)
+          QVariant indexData = itemModel->data(index);
+          py = item->ContentsY + pqFlatTreeView::PipeLength;
+          if(indexData.type() == QVariant::Pixmap)
             {
-            // Set the text color based on the highlighted state.
-            py = item->ContentsY + pqFlatTreeView::PipeLength;
-            if(item->RowSelected || (*this->Internal)[i]->Selected ||
-                item->Cells[i]->Selected)
+            pixmap = qvariant_cast<QPixmap>(indexData);
+            if(pixmap.height() > trueHeight)
               {
-              // If the item is selected, draw the background highlight
-              // before drawing the text.
-              if(item->Cells[i]->Selected)
-                {
-                itemWidth = item->Cells[i]->Width;
-                if(itemWidth > columnWidth)
-                  {
-                  itemWidth = columnWidth;
-                  }
-
-                painter.fillRect(px, py, itemWidth, trueHeight,
-                    options.palette.highlight());
-                }
-
-              painter.setPen(options.palette.color(QPalette::Normal,
-                  QPalette::HighlightedText));
+              pixmap = pixmap.scaledToHeight(trueHeight);
               }
-            else
+            else if(options.displayAlignment & Qt::AlignVCenter)
               {
-              painter.setPen(options.palette.color(QPalette::Normal,
-                  QPalette::Text));
+              py += (trueHeight - pixmap.height()) / 2;
               }
+            else if(options.displayAlignment & Qt::AlignBottom)
+              {
+              py += trueHeight - pixmap.height();
+              }
+
+            painter.drawPixmap(px, py, pixmap);
+            }
+          else if(indexData.canConvert(QVariant::Icon))
+            {
+            icon = qvariant_cast<QIcon>(indexData);
+            pixmap = icon.pixmap(options.decorationSize);
 
             // Adjust the vertical text alignment according to the style.
             if(options.displayAlignment & Qt::AlignVCenter)
               {
-              py += (trueHeight - fontHeight) / 2;
+              py += (trueHeight - pixmap.height()) / 2;
               }
             else if(options.displayAlignment & Qt::AlignBottom)
               {
-              py += trueHeight - fontHeight;
+              py += trueHeight - pixmap.height();
               }
 
-            // If the text is too wide for the column, adjust the text
-            // so it fits. Use the text elide style from the options.
-            if(item->Cells[i]->Width > columnWidth)
+            painter.drawPixmap(px, py, pixmap);
+            }
+          else
+            {
+            QString text = indexData.toString();
+            if(!text.isEmpty() && columnWidth > 0)
               {
-              int length = (text.length() * (columnWidth - elideLength)) /
-                  item->Cells[i]->Width;
-              if(length < 1)
+              // Set the text color based on the highlighted state.
+              if(item->RowSelected || (*this->Internal)[i]->Selected ||
+                  item->Cells[i]->Selected)
                 {
-                length = 1;
-                }
-
-              if(options.textElideMode == Qt::ElideRight)
-                {
-                text = text.left(length) + "...";
-                }
-              else if(options.textElideMode == Qt::ElideLeft)
-                {
-                text = "..." + text.right(length);
-                }
-              else // ElideMiddle
-                {
-                int leftHalf = length / 2;
-                int rightHalf = leftHalf;
-                if(leftHalf + rightHalf != length)
+                // If the item is selected, draw the background highlight
+                // before drawing the text.
+                if(item->Cells[i]->Selected)
                   {
-                  leftHalf++;
+                  itemWidth = item->Cells[i]->Width;
+                  if(itemWidth > columnWidth)
+                    {
+                    itemWidth = columnWidth;
+                    }
+
+                  painter.fillRect(px, py, itemWidth, trueHeight,
+                      options.palette.highlight());
                   }
 
-                text = text.left(leftHalf) + "..." + text.right(rightHalf);
+                painter.setPen(options.palette.color(QPalette::Normal,
+                    QPalette::HighlightedText));
                 }
-              }
+              else
+                {
+                painter.setPen(options.palette.color(QPalette::Normal,
+                    QPalette::Text));
+                }
 
-            painter.drawText(px, py + fontAscent, text);
+              // Adjust the vertical text alignment according to the style.
+              if(options.displayAlignment & Qt::AlignVCenter)
+                {
+                py += (trueHeight - fontHeight) / 2;
+                }
+              else if(options.displayAlignment & Qt::AlignBottom)
+                {
+                py += trueHeight - fontHeight;
+                }
+
+              // If the text is too wide for the column, adjust the text
+              // so it fits. Use the text elide style from the options.
+              if(item->Cells[i]->Width > columnWidth)
+                {
+                int length = (text.length() * (columnWidth - elideLength)) /
+                    item->Cells[i]->Width;
+                if(length < 1)
+                  {
+                  length = 1;
+                  }
+
+                if(options.textElideMode == Qt::ElideRight)
+                  {
+                  text = text.left(length) + "...";
+                  }
+                else if(options.textElideMode == Qt::ElideLeft)
+                  {
+                  text = "..." + text.right(length);
+                  }
+                else // ElideMiddle
+                  {
+                  int leftHalf = length / 2;
+                  int rightHalf = leftHalf;
+                  if(leftHalf + rightHalf != length)
+                    {
+                    leftHalf++;
+                    }
+
+                  text = text.left(leftHalf) + "..." + text.right(rightHalf);
+                  }
+                }
+
+              painter.drawText(px, py + fontAscent, text);
+              }
             }
 
           if(i == 0)
@@ -1579,8 +1625,17 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
             {
             QStyleOptionFocusRect opt;
             opt.QStyleOption::operator=(options);
-            opt.backgroundColor = options.palette.color(QPalette::Normal,
-                QPalette::Highlight);
+            if(item->Cells[i]->Selected)
+              {
+              opt.backgroundColor = options.palette.color(QPalette::Normal,
+                  QPalette::Highlight);
+              }
+            else
+              {
+              opt.backgroundColor = options.palette.color(QPalette::Normal,
+                  QPalette::Base);
+              }
+
             opt.state |= QStyle::State_KeyboardFocusChange;
             opt.state |= QStyle::State_HasFocus;
             itemWidth = item->Cells[i]->Width;
@@ -1643,8 +1698,7 @@ void pqFlatTreeView::handleSectionResized(int, int, int)
     }
 }
 
-void pqFlatTreeView::handleSectionMoved(int, int,
-    int)
+void pqFlatTreeView::handleSectionMoved(int, int, int)
 {
   // Repaint the viewport to show the changes.
   this->viewport()->update();
@@ -1965,7 +2019,7 @@ void pqFlatTreeView::layoutItem(pqFlatTreeViewItem *item, int &point,
       {
       if(item->Cells[0]->Width == 0 || this->FontChanged)
         {
-        item->Cells[0]->Width = fm.width(item->Index.data().toString());
+        item->Cells[0]->Width = this->getDataWidth(item->Index, fm);
         }
 
       // The text width, the indent, the icon width, and the padding
@@ -1987,7 +2041,7 @@ void pqFlatTreeView::layoutItem(pqFlatTreeViewItem *item, int &point,
         // item is an image or list of images, the desired width is
         // the image width(s).
         QModelIndex index = item->Index.sibling(item->Index.row(), i);
-        item->Cells[i]->Width = fm.width(index.data().toString());
+        item->Cells[i]->Width = this->getDataWidth(index, fm);
         preferredWidth = item->Cells[i]->Width + pqFlatTreeView::TextMargin;
         if(preferredWidth > (*this->Internal)[i]->Width)
           {
@@ -1995,6 +2049,34 @@ void pqFlatTreeView::layoutItem(pqFlatTreeViewItem *item, int &point,
           }
         }
       }
+    }
+}
+
+int pqFlatTreeView::getDataWidth(const QModelIndex &index,
+    const QFontMetrics &fm) const
+{
+  QVariant indexData = index.data();
+  if(indexData.type() == QVariant::Pixmap)
+    {
+    // Make sure the pixmap is scaled to fit the uniform item height.
+    QSize pixmapSize = qvariant_cast<QPixmap>(indexData).size();
+    int allowed = this->ItemHeight - pqFlatTreeView::PipeLength;
+    if(pixmapSize.height() > allowed)
+      {
+      pixmapSize.scale(pixmapSize.width(), allowed, Qt::KeepAspectRatio);
+      }
+
+    return pixmapSize.width();
+    }
+  else if(indexData.canConvert(QVariant::Icon))
+    {
+    // Icons will be scaled to fit the style options.
+    return this->viewOptions().decorationSize.width();
+    }
+  else
+    {
+    // Find the font width for the string.
+    return fm.width(indexData.toString());
     }
 }
 
@@ -2249,12 +2331,12 @@ void pqFlatTreeView::drawBranches(QPainter &painter, pqFlatTreeViewItem *item,
   // Draw the tree branches for the row. First draw the tree
   // branch for the current item. Then, step back up the parent
   // chain to draw the branches that pass through this row.
-  int px = 0;
+  int px = this->HeaderView->sectionPosition(0) + item->Indent;
   int py = 0;
   painter.setPen(branchColor);
   if(item->Parent->Items.size() > 1)
     {
-    px = item->Indent - halfIndent;
+    px -= halfIndent;
     py = item->ContentsY + pqFlatTreeView::PipeLength + halfIndent;
     int endY = py;
     if(item != item->Parent->Items.last())
@@ -2282,7 +2364,7 @@ void pqFlatTreeView::drawBranches(QPainter &painter, pqFlatTreeViewItem *item,
     }
   else
     {
-    px = item->Indent + halfIndent;
+    px += halfIndent;
     painter.drawLine(px, item->ContentsY, px, item->ContentsY +
         pqFlatTreeView::PipeLength);
     }
