@@ -284,6 +284,9 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     case Qt::DisplayRole:
       return (dataInfo? QVariant(static_cast<unsigned int>(
           dataInfo->GetNumberOfCells())) : QVariant("Unavailable"));
+
+    case Qt::DecorationRole:
+      return QVariant(QIcon(":/pqWidgets/pqCellData16.png"));
       }
     break;
 
@@ -294,6 +297,9 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     case Qt::DisplayRole:
       return dataInfo? QVariant(static_cast<unsigned int>(
           dataInfo->GetNumberOfPoints())) : QVariant("Unavailable");
+
+    case Qt::DecorationRole:
+      return QVariant(QIcon(":/pqWidgets/pqPointData16.png"));
       }
     break;
 
