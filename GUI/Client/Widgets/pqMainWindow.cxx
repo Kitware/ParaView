@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqReaderFactory.h"
 #include "pqRenderModule.h"
 #include "pqRenderWindowManager.h"
+#include "pqSelectionManager.h"
 #include "pqServerBrowser.h"
 #include "pqServerFileDialogModel.h"
 #include "pqServer.h"
@@ -58,7 +59,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqVariableSelectorWidget.h"
 #include "pqVCRController.h"
 #include "pqXMLUtil.h"
-
 
 #include <pqConnect.h>
 #include <pqEventPlayer.h>
@@ -101,6 +101,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMStringVectorProperty.h>
 
 #include <QAction>
+#include <QActionGroup>
 #include <QCoreApplication>
 #include <QDir>
 #include <QDockWidget>
@@ -143,13 +144,14 @@ public:
     CompoundProxyToolBar(0),
     PropertyToolbar(0),
     UndoRedoToolBar(0),
+    SelectionToolBar(0),
     VariableSelectorToolBar(0),
     VCRController(0),
     DataInformationWidget(0),
     RenderWindowManager(0),
-    IgnoreBrowserSelectionChanges(false)
+    IgnoreBrowserSelectionChanges(false),
+    SelectionManager(0)
   {
-
   }
   
   ~pqImplementation()
@@ -166,6 +168,9 @@ public:
 
     delete this->DataInformationWidget;
     this->DataInformationWidget = 0;
+
+    delete this->SelectionManager;
+    this->SelectionManager = 0;
   }
 
   // Stores standard menus
@@ -190,12 +195,15 @@ public:
   QToolBar* CompoundProxyToolBar;
   QToolBar* PropertyToolbar;
   QToolBar* UndoRedoToolBar;
+  QToolBar* SelectionToolBar;
   QToolBar* VariableSelectorToolBar;
   pqVCRController* VCRController;
   pqDataInformationWidget* DataInformationWidget;
   pqRenderWindowManager* RenderWindowManager;
 
   bool IgnoreBrowserSelectionChanges;
+
+  pqSelectionManager* SelectionManager;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -224,38 +232,43 @@ pqMainWindow::pqMainWindow() :
   // Connect the renderModule manager with the view manager so that 
   // new render modules are created as new frames are added.
   QObject::connect(this->Implementation->RenderWindowManager, 
-    SIGNAL(activeRenderModuleChanged(pqRenderModule*)),core
-    , SLOT(setActiveRenderModule(pqRenderModule*)));
-
-
+                   SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
+                   core, 
+                   SLOT(setActiveRenderModule(pqRenderModule*)));
 
   QObject::connect(this->Implementation->MultiViewManager, 
-    SIGNAL(frameAdded(pqMultiViewFrame*)), 
-    this->Implementation->RenderWindowManager, SLOT(onFrameAdded(pqMultiViewFrame*)));
+                   SIGNAL(frameAdded(pqMultiViewFrame*)), 
+                   this->Implementation->RenderWindowManager, 
+                   SLOT(onFrameAdded(pqMultiViewFrame*)));
+
   QObject::connect(this->Implementation->MultiViewManager, 
-    SIGNAL(frameRemoved(pqMultiViewFrame*)), 
-    this->Implementation->RenderWindowManager, SLOT(onFrameRemoved(pqMultiViewFrame*)));
+                   SIGNAL(frameRemoved(pqMultiViewFrame*)), 
+                   this->Implementation->RenderWindowManager, 
+                   SLOT(onFrameRemoved(pqMultiViewFrame*)));
 
   // Connect selection changed events.
   QObject::connect(core, SIGNAL(activeSourceChanged(pqPipelineSource*)),
-    this, SLOT(onActiveSourceChanged(pqPipelineSource*)));
+                   this, SLOT(onActiveSourceChanged(pqPipelineSource*)));
   QObject::connect(core, SIGNAL(activeServerChanged(pqServer*)),
-    this, SLOT(onActiveServerChanged(pqServer*)));
+                   this, SLOT(onActiveServerChanged(pqServer*)));
 
   QObject::connect(core, SIGNAL(activeSourceChanged(pqPipelineSource*)),
-    this, SLOT(onCoreActiveChanged()));
+                   this, SLOT(onCoreActiveChanged()));
   QObject::connect(core, SIGNAL(activeServerChanged(pqServer*)),
-    this, SLOT(onCoreActiveChanged()));
+                   this, SLOT(onCoreActiveChanged()));
 
   // Update enable state when pending displays state changes.
   QObject::connect(core, SIGNAL(pendingDisplays(bool)),
-    this, SLOT(updateEnableState()));
+                   this, SLOT(updateEnableState()));
 
+  // Update enable state when the active view changes.
+  QObject::connect(core, SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
+                   this, SLOT(updateEnableState()));
 
   pqUndoStack* undoStack = core->getUndoStack();
   // Connect undo/redo status.
-  QObject::connect(undoStack, 
-    SIGNAL(StackChanged(bool, QString, bool, QString)), 
+  QObject::connect(
+    undoStack, SIGNAL(StackChanged(bool, QString, bool, QString)), 
     this, SLOT(onUndoRedoStackChanged(bool, QString, bool, QString))); 
 
   // Set up the dock window corners to give the vertical docks more room.
@@ -265,6 +278,12 @@ pqMainWindow::pqMainWindow() :
   // Initialize supported file types.
   core->getReaderFactory()->loadFileTypes(":/pqClient/ParaQReaders.xml");
   core->getWriterFactory()->loadFileTypes(":/pqClient/ParaQWriters.xml");
+
+  this->Implementation->SelectionManager = new pqSelectionManager;
+  QObject::connect(core, 
+                   SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
+                   this->Implementation->SelectionManager, 
+                   SLOT(activeRenderModuleChanged(pqRenderModule*)));
 }
 
 //-----------------------------------------------------------------------------
@@ -342,9 +361,11 @@ void pqMainWindow::createStandardStatusBar()
   progressBar->hide();
   sbar->addPermanentWidget(progressBar);
   QObject::connect(pqApplicationCore::instance(), SIGNAL(enableProgress(bool)),
-    progressBar, SLOT(setVisible(bool)));
-  QObject::connect(pqApplicationCore::instance(), SIGNAL(progress(const QString&, int)),
-    progressBar, SLOT(setProgress(const QString&, int)));
+                   progressBar, SLOT(setVisible(bool)));
+  QObject::connect(pqApplicationCore::instance(), 
+                   SIGNAL(progress(const QString&, int)),
+                   progressBar, 
+                   SLOT(setProgress(const QString&, int)));
 }
 
 //-----------------------------------------------------------------------------
@@ -643,11 +664,48 @@ void pqMainWindow::createUndoRedoToolBar()
 }
 
 //-----------------------------------------------------------------------------
+void pqMainWindow::createSelectionToolBar()
+{
+  QToolBar* const toolbar = new QToolBar(tr("Selection Controls"), this)
+    << pqSetName("SelectionToolBar");
+  this->Implementation->SelectionToolBar = toolbar;
+  toolbar->setEnabled(false);
+  this->addToolBar(Qt::TopToolBarArea, toolbar);
+
+  QActionGroup* group = new QActionGroup(toolbar);
+
+  QAction *interactAction = new QAction(toolbar) << pqSetName("InteractButton");
+  interactAction->setToolTip("Switch to interaction mode");
+  interactAction->setIcon(QIcon(":pqWidgets/pqMouseMove15.png"));
+  interactAction->setCheckable(true);
+  interactAction->setChecked(true);
+  toolbar->addAction(interactAction);
+  group->addAction(interactAction);
+
+  QAction *selectAction = new QAction(toolbar) << pqSetName("SelectButton");
+  selectAction->setToolTip("Switch to selection mode");
+  selectAction->setIcon(QIcon(":pqWidgets/pqMouseSelect15.png"));
+  selectAction->setCheckable(true);
+  toolbar->addAction(selectAction);
+  group->addAction(selectAction);
+
+  this->connect(interactAction, 
+                SIGNAL(triggered()), 
+                this->Implementation->SelectionManager, 
+                SLOT(switchToInteraction()));
+  this->connect(selectAction, 
+                SIGNAL(triggered()), 
+                this->Implementation->SelectionManager, 
+                SLOT(switchToSelection()));
+}
+
+//-----------------------------------------------------------------------------
 void pqMainWindow::createStandardVariableToolBar()
 {
   this->Implementation->VariableSelectorToolBar = 
     new QToolBar(tr("Variables"), this)
     << pqSetName("VariableSelectorToolBar");
+  this->Implementation->VariableSelectorToolBar->setEnabled(false);
     
   pqVariableSelectorWidget* varSelector = new pqVariableSelectorWidget(
     this->Implementation->VariableSelectorToolBar)
@@ -659,13 +717,15 @@ void pqMainWindow::createStandardVariableToolBar()
   QObject::connect(core, SIGNAL(activeSourceChanged(pqPipelineSource*)),
     varSelector, SLOT(updateVariableSelector(pqPipelineSource*)));
   
-  this->connect(varSelector, SIGNAL(variableChanged(pqVariableType, const QString&)), 
-    this, SIGNAL(variableChanged(pqVariableType, const QString&)));
+  this->connect(varSelector, 
+                SIGNAL(variableChanged(pqVariableType, const QString&)), 
+                this, 
+                SIGNAL(variableChanged(pqVariableType, const QString&)));
 
   if (this->Implementation->Inspector)
     {
     this->connect(this->Implementation->Inspector, SIGNAL(postaccept()),
-      varSelector, SLOT(reloadGUI()));
+                  varSelector, SLOT(reloadGUI()));
     }
     
   this->addToolBar(Qt::TopToolBarArea, this->Implementation->VariableSelectorToolBar);
@@ -1895,8 +1955,10 @@ void pqMainWindow::updateEnableState()
       this->fileMenu()->findChild<QAction*>("SaveScreenshot");
     openAction->setEnabled(!pending_displays);
     saveDataAction->setEnabled(!pending_displays && source!=0);
-    loadStateAction->setEnabled(!pending_displays && (!num_servers || server !=0));
-    saveStateAction->setEnabled(!pending_displays && server !=0);
+    loadStateAction->setEnabled(
+      !pending_displays && (!num_servers || server !=0));
+    saveStateAction->setEnabled(
+      !pending_displays && server !=0);
     saveScreenshot->setEnabled(server != 0);
     }
 
@@ -1911,7 +1973,8 @@ void pqMainWindow::updateEnableState()
 
   if ( this->Implementation->SourcesMenu )
     {
-    this->Implementation->SourcesMenu->setEnabled(server != 0 && !pending_displays);
+    this->Implementation->SourcesMenu->setEnabled(
+      server != 0 && !pending_displays);
     }
 
   if ( this->Implementation->VariableSelectorToolBar )
@@ -1932,6 +1995,16 @@ void pqMainWindow::updateEnableState()
       this->Implementation->ToolsMenu->findChild<QAction*>( "CompoundFilter");
 
     compoundFilterAction->setEnabled(server != 0 && !pending_displays);
+    }
+
+  pqRenderModule* rm = pqApplicationCore::instance()->getActiveRenderModule();
+  if (rm)
+    {
+    this->Implementation->SelectionToolBar->setEnabled(true);
+    }
+  else
+    {
+    this->Implementation->SelectionToolBar->setEnabled(false);
     }
 }
 

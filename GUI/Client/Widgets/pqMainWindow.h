@@ -102,8 +102,10 @@ public:
 
   /// Creates the "standard" VCR toolbar
   void createStandardVCRToolBar();
-  /// Create the temporary "undo/redo" toolbar.
+  /// Create the "undo/redo" toolbar.
   void createUndoRedoToolBar();
+  /// Create the selection toolbar.
+  void createSelectionToolBar();
   /// Creates the "standard" global variable toolbar
   void createStandardVariableToolBar();
   /// Creates the "standard" compound-proxy toolbar
@@ -198,7 +200,7 @@ private slots:
 
   void onActiveSourceChanged(pqPipelineSource*);
   virtual void onActiveServerChanged(pqServer*);
-
+  
 private slots:
   void onCreateSource(QAction*);
   void onCreateFilter(QAction*);

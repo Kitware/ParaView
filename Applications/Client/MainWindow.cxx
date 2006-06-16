@@ -82,6 +82,7 @@ MainWindow::MainWindow()
   
   this->createStandardVCRToolBar();
   this->createUndoRedoToolBar();
+  this->createSelectionToolBar();
   this->createStandardVariableToolBar();
   this->createStandardCompoundProxyToolBar();
 }

@@ -70,6 +70,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSampleScalarWidget.h
   pqScalarSetModel.h
   pqSelectionAdaptor.h
+  pqSelectionManager.h
   pqServer.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
@@ -255,6 +256,8 @@ ADD_LIBRARY(pqWidgets
   pqSMAdaptor.h
   pqSMProxy.cxx
   pqSMProxy.h
+  pqSelectionManager.cxx
+  pqSelectionManager.h
   pqSMSignalAdaptors.cxx
   pqSMSignalAdaptors.h
   pqSliderDomain.cxx

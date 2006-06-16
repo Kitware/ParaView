@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqRenderModule.h"
 
-vtkCxxRevisionMacro(pqRenderViewProxy, "1.5");
+vtkCxxRevisionMacro(pqRenderViewProxy, "1.6");
 vtkStandardNewMacro(pqRenderViewProxy);
 //-----------------------------------------------------------------------------
 pqRenderViewProxy::pqRenderViewProxy()
@@ -65,7 +65,7 @@ void pqRenderViewProxy::Render()
     return;
     }
   // render LOD's
-  //RenderModule->InteractiveRender();
+  //this->RenderModule->getRenderModuleProxy()->InteractiveRender();
 
   // do not render LOD's
   this->RenderModule->getRenderModuleProxy()->StillRender();
