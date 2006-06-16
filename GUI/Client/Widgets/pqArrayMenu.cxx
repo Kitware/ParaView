@@ -105,12 +105,12 @@ pqArrayMenu::pqArrayMenu(QWidget* p) :
   QWidget(p),
   Implementation(new pqImplementation())
 {
-  QHBoxLayout* const layout = new QHBoxLayout(this);
-  layout->setMargin(0);
-  layout->setSpacing(1);
-  layout->addWidget(&this->Implementation->Arrays);
+  QHBoxLayout* const widget_layout = new QHBoxLayout(this);
+  widget_layout->setMargin(0);
+  widget_layout->setSpacing(1);
+  widget_layout->addWidget(&this->Implementation->Arrays);
   
-  this->setLayout(layout);
+  this->setLayout(widget_layout);
 
   QObject::connect(
     &this->Implementation->Arrays,
@@ -256,7 +256,7 @@ void pqArrayMenu::getCurrent(pqVariableType& type, QString& name)
 }
 
 //-----------------------------------------------------------------------------
-void pqArrayMenu::onArrayActivated(int row)
+void pqArrayMenu::onArrayActivated(int /*row*/)
 {
   emit arrayChanged();
 }

@@ -47,9 +47,9 @@ pqToolTipTrapper::~pqToolTipTrapper()
   QCoreApplication::instance()->removeEventFilter(this);
 }
 
-bool pqToolTipTrapper::eventFilter(QObject* watched, QEvent* event)
+bool pqToolTipTrapper::eventFilter(QObject* /*watched*/, QEvent* input_event)
 {
-  if(event->type() == QEvent::ToolTip)
+  if(input_event->type() == QEvent::ToolTip)
     return true;
     
   return false;
