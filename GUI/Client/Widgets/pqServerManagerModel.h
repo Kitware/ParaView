@@ -176,9 +176,17 @@ signals:
   /// Fired when the name of an item changes.
   void nameChanged(pqServerManagerModelItem *item);
 
+  /// Fired when the displays for an item changes.
+  void sourceDisplayChanged(pqPipelineSource *source,
+      pqPipelineDisplay *display);
+
 private slots:
   /// Used to map a server name change to the name changed signal.
   void updateServerName();
+
+  /// Used to map a display visibility change to the visibility
+  /// changed signal.
+  void updateDisplayVisibility(bool);
 
 private:
   pqServerManagerModelInternal* Internal;

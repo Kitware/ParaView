@@ -43,8 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes.
 #include <QFileInfo>
+#include <QList>
 #include <QPointer>
-#include <QSet>
 #include <QtDebug>
 
 // ParaQ includes.
@@ -72,7 +72,7 @@ public:
   vtkSmartPointer<vtkPVAxesWidget> AxesWidget;
 
   // List of displays shown by this render module.
-  QSet<QPointer<pqPipelineDisplay> > Displays;
+  QList<QPointer<pqPipelineDisplay> > Displays;
 
   pqRenderModuleInternal()
     {
@@ -193,10 +193,10 @@ void pqRenderModule::onUpdateVTKObjects()
 //-----------------------------------------------------------------------------
 void pqRenderModule::displaysChanged()
 {
-  // Determine what changed, we form two sets of displays that got added
-  // and displays that got removed.
-  
-  QSet<QPointer<pqPipelineDisplay> > currentDisplays;
+  // Determine what changed. Add the new displays and remove the old
+  // ones. Make sure new displays have a reference to this render module.
+  // Remove the reference to this render module in the removed displays.
+  QList<QPointer<pqPipelineDisplay> > currentDisplays;
   vtkSMProxyProperty* prop = vtkSMProxyProperty::SafeDownCast(
     this->getProxy()->GetProperty("Displays"));
   pqServerManagerModel* smModel = 
@@ -215,25 +215,29 @@ void pqRenderModule::displaysChanged()
       {
       continue;
       }
-    currentDisplays.insert(QPointer<pqPipelineDisplay>(display));
+    currentDisplays.append(QPointer<pqPipelineDisplay>(display));
+    if(!this->Internal->Displays.contains(display))
+      {
+      // Update the render module pointer in the display.
+      display->addRenderModule(this);
+      this->Internal->Displays.append(QPointer<pqPipelineDisplay>(display));
+      }
     }
 
-  QSet<QPointer<pqPipelineDisplay> > removed = 
-    this->Internal->Displays - currentDisplays;
-  QSet<QPointer<pqPipelineDisplay> > added =
-    currentDisplays - this->Internal->Displays;
-
-  this->Internal->Displays = currentDisplays;
-
-  // Tell the displays whether they are shown by this render module or not.
-  foreach(pqPipelineDisplay* removedDisplay, removed)
+  QList<QPointer<pqPipelineDisplay> >::Iterator iter =
+      this->Internal->Displays.begin();
+  while(iter != this->Internal->Displays.end())
     {
-    removedDisplay->removeRenderModule(this);
-    }
-
-  foreach(pqPipelineDisplay* addedDisplay, added)
-    {
-    addedDisplay->addRenderModule(this);
+    if(!currentDisplays.contains(*iter))
+      {
+      // Remove the render module pointer from the display.
+      (*iter)->removeRenderModule(this);
+      iter = this->Internal->Displays.erase(iter);
+      }
+    else
+      {
+      ++iter;
+      }
     }
 }
 
@@ -322,6 +326,23 @@ bool pqRenderModule::saveImage(int width, int height, const QString& filename)
 bool pqRenderModule::hasDisplay(pqPipelineDisplay* display)
 {
   return this->Internal->Displays.contains(display);
+}
+
+//-----------------------------------------------------------------------------
+int pqRenderModule::getDisplayCount() const
+{
+  return this->Internal->Displays.size();
+}
+
+//-----------------------------------------------------------------------------
+pqPipelineDisplay* pqRenderModule::getDisplay(int index) const
+{
+  if(index >= 0 && index < this->Internal->Displays.size())
+    {
+    return this->Internal->Displays[index];
+    }
+
+  return 0;
 }
 
 //-----------------------------------------------------------------------------

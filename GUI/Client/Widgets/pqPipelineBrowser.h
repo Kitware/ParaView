@@ -92,6 +92,7 @@ signals:
 
 private slots:
   void changeCurrent(const QModelIndex &current, const QModelIndex &previous);
+  void handleIndexClicked(const QModelIndex &index);
 
 private:
   pqPipelineModel *ListModel;

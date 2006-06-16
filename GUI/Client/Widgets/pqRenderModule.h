@@ -79,6 +79,12 @@ public:
   /// rendered by this render module.
   bool hasDisplay(pqPipelineDisplay* display);
 
+  /// Gets the number of displays in the render module.
+  int getDisplayCount() const;
+
+  /// Gets the display for the specified index.
+  pqPipelineDisplay* getDisplay(int index) const;
+
 private slots:
   /// if renModule is not created when this object is instantianted, we
   /// must listen to UpdateVTKObjects event to bind the QVTKWidget and

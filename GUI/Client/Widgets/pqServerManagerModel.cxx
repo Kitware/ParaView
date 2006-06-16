@@ -153,6 +153,12 @@ void pqServerManagerModel::onAddSource(QString name, vtkSMProxy* source)
   QObject::connect(pqSource, 
     SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)),
     this, SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)));
+  QObject::connect(pqSource, 
+    SIGNAL(displayAdded(pqPipelineSource*, pqPipelineDisplay*)),
+    this, SIGNAL(sourceDisplayChanged(pqPipelineSource*, pqPipelineDisplay*)));
+  QObject::connect(pqSource, 
+    SIGNAL(displayRemoved(pqPipelineSource*, pqPipelineDisplay*)),
+    this, SIGNAL(sourceDisplayChanged(pqPipelineSource*, pqPipelineDisplay*)));
   emit this->sourceAdded(pqSource);
  
   // It is essential to let the world know of the addition of pqSource
@@ -222,6 +228,10 @@ void pqServerManagerModel::onAddDisplay(QString name,
     dProxy, server, this);
 
   this->Internal->Displays[dProxy] = display;
+
+  // Listen for visibility changes.
+  QObject::connect(display, SIGNAL(visibilityChanged(bool)),
+      this, SLOT(updateDisplayVisibility(bool)));
 
   // emit this->displayAdded(display);
 }
@@ -474,6 +484,21 @@ void pqServerManagerModel::updateServerName()
   if(server)
     {
     emit this->nameChanged(server);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqServerManagerModel::updateDisplayVisibility(bool)
+{
+  // Get the display object from the sender.
+  pqPipelineDisplay *display = qobject_cast<pqPipelineDisplay *>(this->sender());
+  if(display)
+    {
+    pqPipelineSource *source = display->getInput();
+    if(source)
+      {
+      emit this->sourceDisplayChanged(source, display);
+      }
     }
 }
 

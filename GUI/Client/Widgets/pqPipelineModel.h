@@ -40,11 +40,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsExport.h"
 #include <QAbstractItemModel>
 
+class pqPipelineDisplay;
 class pqPipelineModelInternal;
 class pqPipelineModelItem;
 class pqPipelineModelFilter;
 class pqPipelineModelSource;
 class pqPipelineSource;
+class pqRenderModule;
 class pqServer;
 class pqServerManagerModelItem;
 class QPixmap;
@@ -71,7 +73,8 @@ class PQWIDGETS_EXPORT pqPipelineModel : public QAbstractItemModel
   Q_OBJECT
 
 public:
-  enum ItemType {
+  enum ItemType
+    {
     Invalid = -1,
     Server = 0,
     Source,
@@ -79,7 +82,7 @@ public:
     Bundle,
     Link,
     LastType = Link
-  };
+    };
 
 public:
   pqPipelineModel(QObject *parent=0);
@@ -169,6 +172,8 @@ public:
   //@}
 
 public slots:
+  /// \name Model Modification Methods
+  //@{
   /// \brief
   ///   Adds a server item to the pipeline model.
   ///
@@ -232,7 +237,10 @@ public slots:
   /// \sa pqPipelineModel::removeConnection(pqPipelineModelSource *,
   ///   pqPipelineModelFilter *)
   void removeConnection(pqPipelineSource *source, pqPipelineSource *sink);
+  //@}
 
+  /// \name Model Update Methods
+  //@{
   /// \brief
   ///   Updates the name column for the specified item.
   ///
@@ -241,6 +249,22 @@ public slots:
   ///
   /// \param item The server manager model item that changed.
   void updateItemName(pqServerManagerModelItem *item);
+
+  /// \brief
+  ///   Updates the display columns for the given source.
+  /// \param source The source to update.
+  void updateDisplays(pqPipelineSource *source, pqPipelineDisplay *display);
+
+  /// \brief
+  ///   Updates the icons in the current window column.
+  ///
+  /// The current window column shows whether or not the source is
+  /// displayed in the current window. When the current window changes
+  /// the entire column needs to be updated.
+  ///
+  /// \param module The current render module.
+  void updateCurrentWindow(pqRenderModule *module);
+  //@}
 
 signals:
   /// \brief
@@ -314,6 +338,12 @@ private:
       pqPipelineModelFilter *sink);
 
   /// \brief
+  ///   Updates the display columns for sources displayed in the
+  ///   render module.
+  /// \param module The modified render module.
+  void updateDisplays(pqRenderModule *module);
+
+  /// \brief
   ///   Gets the pipeline model item for the server manager model item.
   /// \param item The server manager model item to look up.
   /// \return
@@ -325,10 +355,18 @@ private:
   /// \param item The item to make an index for.
   /// \return
   ///   A model index for the specified item.
-  QModelIndex makeIndex(pqPipelineModelItem *item) const;
+  QModelIndex makeIndex(pqPipelineModelItem *item, int column=0) const;
 
   /// Used to remove all the null entries in the item map.
   void cleanPipelineMap();
+
+  /// \brief
+  ///   Gets the next model item in the tree.
+  /// \param item The current item.
+  /// \return
+  ///   A pointer to the next item in the tree or null when the end
+  ///   of the tree is reached.
+  pqPipelineModelItem *getNextModelItem(pqPipelineModelItem *item) const;
 
 private:
   pqPipelineModelInternal *Internal; ///< Stores the pipeline representation.

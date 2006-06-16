@@ -37,9 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPipelineDisplay.h"
 #include "pqPipelineSource.h"
+#include "pqRenderModule.h"
 #include "pqServer.h"
 #include "pqServerManagerModelItem.h"
 
+#include <QIcon>
 #include <QList>
 #include <QMap>
 #include <QPixmap>
@@ -61,6 +63,7 @@ public:
   virtual ~pqPipelineModelItem() {}
 
   virtual QString getName() const=0;
+  virtual bool isVisible(pqRenderModule *module) const=0;
   virtual pqPipelineModelItem *getParent() const=0;
   virtual pqServerManagerModelItem *getObject() const=0;
   virtual int getChildCount() const=0;
@@ -86,6 +89,7 @@ public:
   virtual ~pqPipelineModelServer();
 
   virtual QString getName() const;
+  virtual bool isVisible(pqRenderModule *) const {return false;}
   virtual pqPipelineModelItem *getParent() const {return 0;}
   virtual pqServerManagerModelItem *getObject() const {return this->Server;}
   virtual int getChildCount() const {return this->Sources.size();}
@@ -128,6 +132,7 @@ public:
   virtual ~pqPipelineModelSource();
 
   virtual QString getName() const;
+  virtual bool isVisible(pqRenderModule *module) const;
   virtual pqPipelineModelItem *getParent() const {return this->getServer();}
   virtual pqServerManagerModelItem *getObject() const {return this->Source;}
   virtual int getChildCount() const {return this->Outputs.size();}
@@ -173,6 +178,7 @@ public:
   virtual ~pqPipelineModelLink() {}
 
   virtual QString getName() const;
+  virtual bool isVisible(pqRenderModule *module) const;
   virtual pqPipelineModelItem *getParent() const {return this->Source;}
   virtual pqServerManagerModelItem *getObject() const;
   virtual int getChildCount() const {return 0;}
@@ -199,11 +205,19 @@ private:
 class pqPipelineModelInternal
 {
 public:
+  enum PixmapIndex
+    {
+    Eyeball = pqPipelineModel::LastType + 1,
+    Total
+    };
+
+public:
   pqPipelineModelInternal();
   ~pqPipelineModelInternal() {}
 
   QList<pqPipelineModelServer *> Servers;
   QMap<pqServerManagerModelItem *, QPointer<pqPipelineModelItem> > ItemMap;
+  pqRenderModule *CurrentView;
   pqServer *CleanupServer;
 };
 
@@ -315,6 +329,17 @@ QString pqPipelineModelSource::getName() const
   return QString();
 }
 
+bool pqPipelineModelSource::isVisible(pqRenderModule *module) const
+{
+  pqPipelineDisplay *display = this->Source->getDisplay(module);
+  if(display)
+    {
+    return display->isVisible();
+    }
+
+  return false;
+}
+
 int pqPipelineModelSource::getChildIndex(pqPipelineModelItem *item) const
 {
   pqPipelineModelObject *object =
@@ -405,6 +430,16 @@ QString pqPipelineModelLink::getName() const
   return QString();
 }
 
+bool pqPipelineModelLink::isVisible(pqRenderModule *module) const
+{
+  if(this->Sink)
+    {
+    return this->Sink->isVisible(module);
+    }
+
+  return false;
+}
+
 pqServerManagerModelItem *pqPipelineModelLink::getObject() const
 {
   if(this->Sink)
@@ -420,6 +455,7 @@ pqServerManagerModelItem *pqPipelineModelLink::getObject() const
 pqPipelineModelInternal::pqPipelineModelInternal()
   : Servers(), ItemMap()
 {
+  this->CurrentView = 0;
   this->CleanupServer = 0;
 }
 
@@ -432,7 +468,7 @@ pqPipelineModel::pqPipelineModel(QObject *p)
 
   // Initialize the pixmap list.
   Q_INIT_RESOURCE(pqWidgets);
-  this->PixmapList = new QPixmap[pqPipelineModel::LastType + 1];
+  this->PixmapList = new QPixmap[pqPipelineModelInternal::Total];
   if(this->PixmapList)
     {
     this->PixmapList[pqPipelineModel::Server].load(
@@ -445,6 +481,8 @@ pqPipelineModel::pqPipelineModel(QObject *p)
         ":/pqWidgets/pqBundle16.png");
     this->PixmapList[pqPipelineModel::Link].load(
         ":/pqWidgets/pqLinkBack16.png");
+    this->PixmapList[pqPipelineModelInternal::Eyeball].load(
+        ":/pqWidgets/pqEyeball16.png");
     }
 }
 
@@ -489,7 +527,7 @@ int pqPipelineModel::rowCount(const QModelIndex &parentIndex) const
 
 int pqPipelineModel::columnCount(const QModelIndex &) const
 {
-  return 1;
+  return 2;
 }
 
 bool pqPipelineModel::hasChildren(const QModelIndex &parentIndex) const
@@ -552,6 +590,13 @@ QVariant pqPipelineModel::data(const QModelIndex &idx, int role) const
       switch(role)
         {
         case Qt::DisplayRole:
+          {
+          if(idx.column() == 1 && item->isVisible(this->Internal->CurrentView))
+            {
+            return QVariant(QIcon(
+                this->PixmapList[pqPipelineModelInternal::Eyeball]));
+            }
+          }
         case Qt::ToolTipRole:
         case Qt::EditRole:
           {
@@ -564,12 +609,10 @@ QVariant pqPipelineModel::data(const QModelIndex &idx, int role) const
           }
         case Qt::DecorationRole:
           {
-          if(idx.column() == 0 && this->PixmapList)
+          if(idx.column() == 0 && this->PixmapList &&
+              item->getType() != pqPipelineModel::Invalid)
             {
-            if(item->getType() != pqPipelineModel::Invalid)
-              {
-              return QVariant(this->PixmapList[item->getType()]);
-              }
+            return QVariant(this->PixmapList[item->getType()]);
             }
 
           break;
@@ -581,9 +624,19 @@ QVariant pqPipelineModel::data(const QModelIndex &idx, int role) const
   return QVariant();
 }
 
-Qt::ItemFlags pqPipelineModel::flags(const QModelIndex &) const
+Qt::ItemFlags pqPipelineModel::flags(const QModelIndex &idx) const
 {
-  return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+  Qt::ItemFlags indexFlags = Qt::ItemIsEnabled;
+  if(idx.column() == 0)
+    {
+    indexFlags |= Qt::ItemIsSelectable;
+    }
+  else if(idx.column() == 1)
+    {
+    indexFlags |= Qt::ItemIsUserCheckable;
+    }
+
+  return indexFlags;
 }
 
 pqServerManagerModelItem *pqPipelineModel::getItemFor(
@@ -910,11 +963,71 @@ void pqPipelineModel::removeConnection(pqPipelineSource *source,
 
 void pqPipelineModel::updateItemName(pqServerManagerModelItem *item)
 {
+  // TODO: If the item is a fan in point, update the link items.
   // The name is in column 0 so the getIndexFor method will work.
   QModelIndex changed = this->getIndexFor(item);
   if(changed.isValid())
     {
     emit this->dataChanged(changed, changed);
+    }
+}
+
+void pqPipelineModel::updateDisplays(pqPipelineSource *source,
+    pqPipelineDisplay *)
+{
+  pqPipelineModelItem *item = this->getModelItemFor(source);
+  if(item)
+    {
+    // Update the current window column.
+    QModelIndex changed = this->makeIndex(item, 1);
+    emit this->dataChanged(changed, changed);
+
+    // TODO: Update the column with the display list.
+    // TODO: If the item is a fan in point, update the link items.
+    }
+}
+
+void pqPipelineModel::updateCurrentWindow(pqRenderModule *module)
+{
+  if(module == this->Internal->CurrentView)
+    {
+    return;
+    }
+
+  // Update the current view column for the previous render module.
+  // If the render modules are from different servers, the whole
+  // column needs to be updated. Otherwise, use the previous and
+  // current render module to look up the affected sources.
+  QModelIndex changed;
+  pqPipelineModelItem *item = 0;
+  if(this->Internal->CurrentView && module &&
+      this->Internal->CurrentView->getServer() != module->getServer())
+    {
+    this->Internal->CurrentView = module;
+    if(this->Internal->Servers.size() > 0)
+      {
+      item = this->Internal->Servers.first();
+      }
+
+    while(item)
+      {
+      changed = this->makeIndex(item, 1);
+      emit this->dataChanged(changed, changed);
+      item = this->getNextModelItem(item);
+      }
+    }
+  else
+    {
+    if(this->Internal->CurrentView)
+      {
+      this->updateDisplays(this->Internal->CurrentView);
+      }
+
+    this->Internal->CurrentView = module;
+    if(this->Internal->CurrentView)
+      {
+      this->updateDisplays(this->Internal->CurrentView);
+      }
     }
 }
 
@@ -1099,6 +1212,28 @@ void pqPipelineModel::removeConnection(pqPipelineModelSource *source,
     }
 }
 
+void pqPipelineModel::updateDisplays(pqRenderModule *module)
+{
+  QModelIndex changed;
+  pqPipelineModelItem *item = 0;
+  pqPipelineDisplay *display = 0;
+  int total = module->getDisplayCount();
+  for(int i = 0; i < total; i++)
+    {
+    display = module->getDisplay(i);
+    if(display)
+      {
+      item = this->getModelItemFor(display->getInput());
+      if(item)
+        {
+        changed = this->makeIndex(item, 1);
+        emit this->dataChanged(changed, changed);
+        // TODO: If the item is a fan in point, update the link items.
+        }
+      }
+    }
+}
+
 pqPipelineModelItem *pqPipelineModel::getModelItemFor(
     pqServerManagerModelItem *item) const
 {
@@ -1112,19 +1247,20 @@ pqPipelineModelItem *pqPipelineModel::getModelItemFor(
   return 0;
 }
 
-QModelIndex pqPipelineModel::makeIndex(pqPipelineModelItem *item) const
+QModelIndex pqPipelineModel::makeIndex(pqPipelineModelItem *item,
+    int column) const
 {
   int row = 0;
   pqPipelineModelServer *server = dynamic_cast<pqPipelineModelServer *>(item);
   if(server)
     {
     row = this->Internal->Servers.indexOf(server);
-    return this->createIndex(row, 0, item);
+    return this->createIndex(row, column, item);
     }
   else
     {
     row = item->getParent()->getChildIndex(item);
-    return this->createIndex(row, 0, item);
+    return this->createIndex(row, column, item);
     }
 }
 
@@ -1144,6 +1280,61 @@ void pqPipelineModel::cleanPipelineMap()
       ++iter;
       }
     }
+}
+
+pqPipelineModelItem *pqPipelineModel::getNextModelItem(
+    pqPipelineModelItem *item) const
+{
+  if(item->getChildCount() > 0)
+    {
+    return item->getChild(0);
+    }
+
+  // Search up the ancestors for an item with multiple children.
+  // The next item will be the next child.
+  int row = 0;
+  int count = 0;
+  pqPipelineModelItem *itemParent = 0;
+  pqPipelineModelServer *server = 0;
+  while(true)
+    {
+    itemParent = item->getParent();
+    if(itemParent)
+      {
+      count = itemParent->getChildCount();
+      if(count > 1)
+        {
+        row = itemParent->getChildIndex(item) + 1;
+        if(row < count)
+          {
+          return itemParent->getChild(row);
+          }
+        }
+
+      item = itemParent;
+      }
+    else
+      {
+      server = dynamic_cast<pqPipelineModelServer *>(item);
+      if(!server)
+        {
+        break;
+        }
+
+      count = this->Internal->Servers.size();
+      row = this->Internal->Servers.indexOf(server) + 1;
+      if(row < 0 || row >= count)
+        {
+        break;
+        }
+      else
+        {
+        return this->Internal->Servers[row];
+        }
+      }
+    }
+
+  return 0;
 }
 
 /*

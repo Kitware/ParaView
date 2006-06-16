@@ -39,12 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFlatTreeView.h"
 #include "pqPipelineBrowserContextMenu.h"
 #include "pqPipelineBuilder.h"
-#include "pqServerManagerObserver.h"
+#include "pqPipelineDisplay.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineModelSelectionAdaptor.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqServerManagerObserver.h"
 
 #include <QEvent>
 #include <QHeaderView>
@@ -70,6 +71,8 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
   
   QObject::connect(smModel, SIGNAL(serverAdded(pqServer*)),
     this->ListModel, SLOT(addServer(pqServer*)));
+  QObject::connect(smModel, SIGNAL(aboutToRemoveServer(pqServer *)),
+    this->ListModel, SLOT(startRemovingServer(pqServer *)));
   QObject::connect(smModel, SIGNAL(serverRemoved(pqServer*)),
     this->ListModel, SLOT(removeServer(pqServer*)));
   QObject::connect(smModel, SIGNAL(sourceAdded(pqPipelineSource*)),
@@ -84,10 +87,16 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
     SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)),
     this->ListModel, 
     SLOT(removeConnection(pqPipelineSource*, pqPipelineSource*)));
+
   QObject::connect(smModel, SIGNAL(nameChanged(pqServerManagerModelItem *)),
     this->ListModel, SLOT(updateItemName(pqServerManagerModelItem *)));
-  QObject::connect(smModel, SIGNAL(aboutToRemoveServer(pqServer *)),
-    this->ListModel, SLOT(startRemovingServer(pqServer *)));
+  QObject::connect(smModel,
+    SIGNAL(sourceDisplayChanged(pqPipelineSource *, pqPipelineDisplay *)),
+    this->ListModel,
+    SLOT(updateDisplays(pqPipelineSource *, pqPipelineDisplay *)));
+  QObject::connect(pqApplicationCore::instance(),
+    SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
+    this->ListModel, SLOT(updateCurrentWindow(pqRenderModule *)));
 
   // Create a flat tree view to display the pipeline.
   this->TreeView = new pqFlatTreeView(this);
@@ -97,6 +106,9 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
     this->TreeView->header()->hide();
     this->TreeView->setModel(this->ListModel);
     this->TreeView->installEventFilter(this);
+    this->TreeView->header()->moveSection(1, 0);
+    this->TreeView->setSelectionMode(QAbstractItemView::SingleSelection);
+    //this->TreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     // Listen to the selection change signals.
     QItemSelectionModel *selection = this->TreeView->selectionModel();
@@ -107,6 +119,9 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
           this, SLOT(changeCurrent(const QModelIndex &, const QModelIndex &)));
       }
 
+    // Listen for index clicked signals to change visibility.
+    QObject::connect(this->TreeView, SIGNAL(clicked(const QModelIndex &)),
+        this, SLOT(handleIndexClicked(const QModelIndex &)));
 
     // Make sure the tree items get expanded when new descendents
     // are added.
@@ -278,6 +293,41 @@ void pqPipelineBrowser::changeCurrent(const QModelIndex &current,
     pqServerManagerModelItem* item = this->ListModel->getItemFor(current);
 
     emit this->selectionChanged(item); 
+    }
+}
+
+void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
+{
+  // See if the index is associated with a source.
+  pqPipelineSource *source = dynamic_cast<pqPipelineSource *>(
+      this->ListModel->getItemFor(index));
+  if(source)
+    {
+    if(index.column() == 1)
+      {
+      // If the column clicked is 1, the user clicked the visible icon.
+      // Get the display object for the current window.
+      pqRenderModule *module =
+          pqApplicationCore::instance()->getActiveRenderModule();
+      pqPipelineDisplay *display = source->getDisplay(module);
+
+      // If the display exists, toggle the display. Otherwise, create a
+      // display for the source in the current window.
+      if(display)
+        {
+        display->setVisible(!display->isVisible());
+        display->renderAllViews(false);
+        }
+      else
+        {
+        // TODO
+        }
+      }
+    // TODO
+    //else if(index.column() == 2)
+    //  {
+    //  // If the column clicked is 2, the user clicked the input menu.
+    //  }
     }
 }
 
