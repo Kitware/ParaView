@@ -56,7 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqSourceProxyInfo.h"
 #include "pqTestUtility.h"
-#include "pqVariableSelectorWidget.h"
+#include "pqDisplayColorWidget.h"
 #include "pqVCRController.h"
 #include "pqXMLUtil.h"
 
@@ -577,8 +577,8 @@ void pqMainWindow::createStandardObjectInspector(bool visible)
     {
     // Connecting to accept/postaccept signals from a panel
     // is a hassle, can't we have something more centralized?
-    pqVariableSelectorWidget* varSelector = this->Implementation->
-      VariableSelectorToolBar->findChild<pqVariableSelectorWidget*>();
+    pqDisplayColorWidget* varSelector = this->Implementation->
+      VariableSelectorToolBar->findChild<pqDisplayColorWidget*>();
     if (varSelector)
       {
       this->connect(this->Implementation->Inspector, SIGNAL(postaccept()),
@@ -707,7 +707,7 @@ void pqMainWindow::createStandardVariableToolBar()
     << pqSetName("VariableSelectorToolBar");
   this->Implementation->VariableSelectorToolBar->setEnabled(false);
     
-  pqVariableSelectorWidget* varSelector = new pqVariableSelectorWidget(
+  pqDisplayColorWidget* varSelector = new pqDisplayColorWidget(
     this->Implementation->VariableSelectorToolBar)
     << pqSetName("VariableSelector");
     

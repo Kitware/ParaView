@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqVariableSelectorWidget.h
+   Module:    pqDisplayColorWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqVariableSelectorWidget_h
-#define _pqVariableSelectorWidget_h
+#ifndef _pqDisplayColorWidget_h
+#define _pqDisplayColorWidget_h
 
 #include "pqVariableType.h"
 #include "pqWidgetsExport.h"
@@ -48,13 +48,13 @@ class vtkEventQtSlotConnect;
 
 /// Provides a standard user interface for selecting among a collection 
 /// of dataset variables (both cell and node variables).
-class PQWIDGETS_EXPORT pqVariableSelectorWidget : public QWidget
+class PQWIDGETS_EXPORT pqDisplayColorWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  pqVariableSelectorWidget( QWidget *parent=0 );
-  ~pqVariableSelectorWidget();
+  pqDisplayColorWidget( QWidget *parent=0 );
+  ~pqDisplayColorWidget();
   
   /// Removes all variables from the collection.
   void clear();

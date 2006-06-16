@@ -113,6 +113,7 @@ ENDIF(APPLE)
     ExodusPanel
     OpenSaveData
     LoadState
+    Contour
     )
 
   SET (TESTS_WITHOUT_BASELINES

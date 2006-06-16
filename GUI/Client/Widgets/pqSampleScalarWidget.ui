@@ -142,6 +142,9 @@
           <property name="toolTip" >
            <string>Add a single value to the current set</string>
           </property>
+          <property name="statusTip" >
+           <string>Add a single value to the current set.</string>
+          </property>
           <property name="text" >
            <string>Add</string>
           </property>

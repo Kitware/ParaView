@@ -54,7 +54,7 @@ class pqClipPanel::pqImplementation
 {
 public:
   pqImplementation(QWidget* parent) :
-    InsideOutWidget("Inside Out"),
+    InsideOutWidget(tr("Inside Out")),
     ImplicitPlaneWidget(parent)
   {
   }

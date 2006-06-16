@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqVariableSelectorWidget.cxx
+   Module:    pqArrayMenu.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,9 +30,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#include "pqVariableSelectorWidget.h"
+//#include "pqParts.h"
+//#include "pqPipelineDisplay.h"
+//#include "pqPipelineSource.h"
+#include "pqArrayMenu.h"
 
-#include "vtkSMDataObjectDisplayProxy.h"
+#include <vtkPVArrayInformation.h>
+#include <vtkPVDataInformation.h>
+#include <vtkPVDataSetAttributesInformation.h>
+#include <vtkSMSourceProxy.h>
+
+#include <QComboBox>
+#include <QHBoxLayout>
+
+/*
 #include "vtkPVArrayInformation.h"
 #include "vtkPVGeometryInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
@@ -40,23 +51,82 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMStringVectorProperty.h"
 #include "vtkEventQtSlotConnect.h"
 
-#include <QComboBox>
-#include <QHBoxLayout>
 #include <QList>
 #include <QRegExp>
 #include <QtDebug>
 
 #include "pqApplicationCore.h"
-#include "pqParts.h"
-#include "pqPipelineSource.h"
 #include "pqPipelineFilter.h"
-#include "pqPipelineDisplay.h"
 #include "pqRenderModule.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
+*/
 
+///////////////////////////////////////////////////////////////////////////////
+// pqArrayMenu::pqImplementation
+
+class pqArrayMenu::pqImplementation
+{
+public:
+  const QString arrayData(pqVariableType type, 
+    const QString& name)
+  {
+    switch(type)
+      {
+      case VARIABLE_TYPE_NONE:
+        return name + "|none";
+      case VARIABLE_TYPE_NODE:
+        return name + "|point";
+      case VARIABLE_TYPE_CELL:
+        return name + "|cell";
+      }
+      
+    return QString();
+  }
+
+  /// Lists available variables in a drop-down list
+  QComboBox Arrays;
+
+/*
+  /// Converts a variable type and name into a packed string representation 
+  /// that can be used with a combo box.
+  static const QString arrayData(pqVariableType, const QString& name);
+  
+  bool PendingDisplayPropertyConnections;
+  QPointer<pqPipelineSource> SelectedSource;
+  vtkEventQtSlotConnect* VTKConnect;
+*/
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// pqArrayMenu
+
+pqArrayMenu::pqArrayMenu(QWidget* p) :
+  QWidget(p),
+  Implementation(new pqImplementation())
+{
+  QHBoxLayout* const layout = new QHBoxLayout(this);
+  layout->setMargin(0);
+  layout->setSpacing(1);
+  layout->addWidget(&this->Implementation->Arrays);
+  
+  this->setLayout(layout);
+
+  QObject::connect(
+    &this->Implementation->Arrays,
+    SIGNAL(currentIndexChanged(int)),
+    this,
+    SLOT(onArrayActivated(int)));
+}
+
+pqArrayMenu::~pqArrayMenu()
+{
+  delete this->Implementation;
+}
+
+/*
 //-----------------------------------------------------------------------------
-pqVariableSelectorWidget::pqVariableSelectorWidget( QWidget *p ) :
+pqArrayMenu::pqArrayMenu( QWidget *p ) :
   QWidget( p ),
   BlockEmission(false)
 {
@@ -64,17 +134,15 @@ pqVariableSelectorWidget::pqVariableSelectorWidget( QWidget *p ) :
   this->Layout->setMargin(0);
   this->Layout->setSpacing(6);
 
-  this->Variables = new QComboBox( this );
-  this->Variables->setObjectName("Variables");
-  this->Variables->setMinimumSize( QSize( 150, 20 ) );
+  this->Arrays = new QComboBox( this );
+  this->Arrays->setObjectName("Arrays");
+  this->Arrays->setMinimumSize( QSize( 150, 20 ) );
 
   this->Layout->setMargin( 0 );
   this->Layout->setSpacing( 1 );
-  this->Layout->addWidget(this->Variables);
+  this->Layout->addWidget(this->Arrays);
 
 
-  QObject::connect(this->Variables, SIGNAL(currentIndexChanged(int)), 
-    SLOT(onVariableActivated(int)));
   QObject::connect(this, 
     SIGNAL(variableChanged(pqVariableType, const QString&)),
     this,
@@ -86,76 +154,95 @@ pqVariableSelectorWidget::pqVariableSelectorWidget( QWidget *p ) :
 }
 
 //-----------------------------------------------------------------------------
-pqVariableSelectorWidget::~pqVariableSelectorWidget()
+pqArrayMenu::~pqArrayMenu()
 {
   delete this->Layout;
-  delete this->Variables;
+  delete this->Arrays;
   
   this->Layout = 0;
-  this->Variables = 0;
+  this->Arrays = 0;
   this->VTKConnect->Delete();
 }
+*/
 
 //-----------------------------------------------------------------------------
-void pqVariableSelectorWidget::clear()
+void pqArrayMenu::clear()
 {
-  this->BlockEmission = true;
-  this->Variables->clear();
-  this->BlockEmission = false;
+  this->Implementation->Arrays.clear();
 }
 
 //-----------------------------------------------------------------------------
-void pqVariableSelectorWidget::addVariable(pqVariableType type, 
-  const QString& name)
+void pqArrayMenu::add(pqVariableType type, const QString& name)
 {
   // Don't allow duplicates to creep in ...
-  if(-1 != this->Variables->findData(this->variableData(type, name)))
+  if(-1 != this->Implementation->Arrays.findData(
+    this->Implementation->arrayData(type, name)))
     {
     return;
     }
 
-  bool old_value = this->BlockEmission;
-  this->BlockEmission = true;
-  switch(type)
-    {
-    case VARIABLE_TYPE_NONE:
-      this->Variables->addItem("Solid Color", this->variableData(type, name));
-      break;
-    case VARIABLE_TYPE_NODE:
-      this->Variables->addItem(name, 
-        this->variableData(type, name));
-      break;
-    case VARIABLE_TYPE_CELL:
-      this->Variables->addItem(name, this->variableData(type, name));
-      break;
-    }
-  this->BlockEmission = old_value;
+  this->Implementation->Arrays.addItem(
+    name, this->Implementation->arrayData(type, name));
 }
 
-//-----------------------------------------------------------------------------
-void pqVariableSelectorWidget::chooseVariable(pqVariableType type, 
-  const QString& name)
+void pqArrayMenu::add(vtkSMSourceProxy* source)
 {
-  const int row = this->Variables->findData(variableData(type, name));
-  if(row != -1)
-    {
-    this->Variables->setCurrentIndex(row);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqVariableSelectorWidget::onVariableActivated(int row)
-{
-  if(this->BlockEmission)
+  if(!source)
     {
     return;
     }
-
-  const QStringList d = this->Variables->itemData(row).toString().split("|");
-  if(d.size() != 2)
+  
+  source->UpdateDataInformation();
+  vtkPVDataInformation* const information = source->GetDataInformation();
+  if(!information)
+    {
     return;
+    }
     
-  pqVariableType type = VARIABLE_TYPE_NONE;
+  if(vtkPVDataSetAttributesInformation* const point_info =
+    information->GetPointDataInformation())
+    {
+    for(int i = 0; i != point_info->GetNumberOfArrays(); ++i)
+      {
+      if(vtkPVArrayInformation* const array_info =
+        point_info->GetArrayInformation(i))
+        {
+        this->add(VARIABLE_TYPE_NODE, array_info->GetName());
+        }
+      }
+    }
+    
+  if(vtkPVDataSetAttributesInformation* const cell_info =
+    information->GetCellDataInformation())
+    {
+    for(int i = 0; i != cell_info->GetNumberOfArrays(); ++i)
+      {
+      if(vtkPVArrayInformation* const array_info =
+        cell_info->GetArrayInformation(i))
+        {
+        this->add(VARIABLE_TYPE_CELL, array_info->GetName());
+        }
+      }
+    }
+}
+
+void pqArrayMenu::getCurrent(pqVariableType& type, QString& name)
+{
+  const int current_index = this->Implementation->Arrays.currentIndex();
+  if(current_index < 0)
+    {
+    return;
+    }
+    
+  const QStringList d =
+    this->Implementation->Arrays.itemData(current_index).toString().split("|");
+    
+  if(d.size() != 2)
+    {
+    return;
+    }
+    
+  type = VARIABLE_TYPE_NONE;
   if(d[1] == "cell")
     {
     type = VARIABLE_TYPE_CELL;
@@ -165,30 +252,30 @@ void pqVariableSelectorWidget::onVariableActivated(int row)
     type = VARIABLE_TYPE_NODE;
     }
     
-  const QString name = d[0];
-  
-  emit variableChanged(type, name);
+  name = d[0];
 }
 
 //-----------------------------------------------------------------------------
-const QString pqVariableSelectorWidget::variableData(pqVariableType type, 
+void pqArrayMenu::onArrayActivated(int row)
+{
+  emit arrayChanged();
+}
+
+/*
+//-----------------------------------------------------------------------------
+void pqArrayMenu::chooseVariable(pqVariableType type, 
   const QString& name)
 {
-  switch(type)
+  const int row = this->Arrays->findData(arrayData(type, name));
+  if(row != -1)
     {
-    case VARIABLE_TYPE_NONE:
-      return name + "|none";
-    case VARIABLE_TYPE_NODE:
-      return name + "|point";
-    case VARIABLE_TYPE_CELL:
-      return name + "|cell";
+    this->Arrays->setCurrentIndex(row);
     }
-    
-  return QString();
 }
 
 //-----------------------------------------------------------------------------
-void pqVariableSelectorWidget::onVariableChanged(pqVariableType vtkNotUsed(type), 
+//-----------------------------------------------------------------------------
+void pqArrayMenu::onVariableChanged(pqVariableType vtkNotUsed(type), 
   const QString& name)
 {
   if (!this->SelectedSource || !this->SelectedSource->getDisplayCount())
@@ -208,7 +295,7 @@ void pqVariableSelectorWidget::onVariableChanged(pqVariableType vtkNotUsed(type)
 }
 
 //-----------------------------------------------------------------------------
-void pqVariableSelectorWidget::updateVariableSelector(pqPipelineSource* source)
+void pqArrayMenu::updateVariableSelector(pqPipelineSource* source)
 {
   this->VTKConnect->Disconnect();
   this->SelectedSource = source;
@@ -228,20 +315,20 @@ void pqVariableSelectorWidget::updateVariableSelector(pqPipelineSource* source)
 }
 
 //-----------------------------------------------------------------------------
-void pqVariableSelectorWidget::updateGUI()
+void pqArrayMenu::updateGUI()
 {
   if (this->SelectedSource && this->SelectedSource->getDisplayCount())
     {
     this->BlockEmission = true;
-    this->Variables->setCurrentIndex(
-      this->Variables->findText(pqPart::GetColorField(
+    this->Arrays->setCurrentIndex(
+      this->Arrays->findText(pqPart::GetColorField(
           this->SelectedSource->getDisplay(0)->getDisplayProxy())));
     this->BlockEmission = false;
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqVariableSelectorWidget::reloadGUI()
+void pqArrayMenu::reloadGUI()
 {
   pqPipelineSource* source = this->SelectedSource;
   if (!source || source->getDisplayCount() == 0)
@@ -276,15 +363,15 @@ void pqVariableSelectorWidget::reloadGUI()
     }
 
   QString currentArray = pqPart::GetColorField(displayProxy);
-  int index =  this->Variables->findText(currentArray);
+  int index =  this->Arrays->findText(currentArray);
   if (index == -1)
     {
     index = 0;
     }
 
-  this->Variables->blockSignals(true);
-  this->Variables->setCurrentIndex(index);
-  this->Variables->blockSignals(false);
+  this->Arrays->blockSignals(true);
+  this->Arrays->setCurrentIndex(index);
+  this->Arrays->blockSignals(false);
 
   if (this->PendingDisplayPropertyConnections)
     {
@@ -303,3 +390,4 @@ void pqVariableSelectorWidget::reloadGUI()
     }
   this->BlockEmission = false;
 }
+*/
