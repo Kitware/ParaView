@@ -87,6 +87,9 @@ public:
     {
     switch (type)
       {
+    case -1:
+      return "Unavailable";
+
     case VTK_POLY_DATA:
       return "Polygonal";
 
@@ -132,9 +135,53 @@ public:
     }
 
   // Given a datatype, returns the icon for that data type.
-  QIcon getDataTypeAsIcon(int/* type*/)
+  QIcon getDataTypeAsIcon(int type)
     {
-    return QIcon();
+    switch (type)
+      {
+    case VTK_POLY_DATA:
+      return QIcon(":/pqWidgets/pqPolydata16.png");
+
+    case VTK_HYPER_OCTREE:
+      return QIcon(":/pqWidgets/pqOctreeData16.png");
+
+    case VTK_UNSTRUCTURED_GRID:
+      return QIcon(":/pqWidgets/pqUnstructuredGrid16.png");
+
+    case VTK_STRUCTURED_GRID:
+      return QIcon(":/pqWidgets/pqStructuredGrid16.png");
+
+    case VTK_RECTILINEAR_GRID:
+      return QIcon(":/pqWidgets/pqRectilinearGrid16.png");
+
+    case VTK_IMAGE_DATA:
+      /*
+      {
+      int *ext = dataInfo->GetExtent();
+      if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
+      {
+      return "Image (Uniform Rectilinear)";
+      }
+      return "Volume (Uniform Rectilinear)";
+      }
+      */
+      return QIcon(":/pqWidgets/pqImageData16.png");
+
+    case VTK_MULTIGROUP_DATA_SET:
+      return QIcon(":/pqWidgets/pqMultiGroupData16.png");
+
+    case VTK_MULTIBLOCK_DATA_SET:
+      return QIcon(":/pqWidgets/pqMultiBlockData16.png");
+
+    case VTK_HIERARCHICAL_DATA_SET:
+      return QIcon(":/pqWidgets/pqHierarchicalData16.png");
+
+    case VTK_HIERARCHICAL_BOX_DATA_SET:
+      return QIcon(":/pqWidgets/pqUniformData16.png");
+
+    default:
+      return QIcon(":/pqWidgets/pqUnknownData16.png");
+      }
     }
 };
 
@@ -188,15 +235,23 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
 
   pqSourceInfo &info = this->Internal->Sources[idx.row()];
   pqPipelineSource* source = info.Source;
-  source->getProxy()->UpdateVTKObjects();
-  vtkPVDataInformation* dataInfo = vtkSMSourceProxy::SafeDownCast(
-    source->getProxy())->GetDataInformation();
-  info.MTime = dataInfo->GetMTime();
+  vtkPVDataInformation* dataInfo = 0;
+  int dataType = -1;
 
-  int dataType = dataInfo->GetDataSetType();
-  if (dataInfo->GetCompositeDataSetType() >= 0)
+  vtkSMSourceProxy* sourceProxy = vtkSMSourceProxy::SafeDownCast(
+    source->getProxy());
+
+  // Get data information only if the proxy is created.
+  if (sourceProxy && sourceProxy->GetNumberOfParts() && 
+    idx.column() > pqDataInformationModel::Name)
     {
-    dataType = dataInfo->GetCompositeDataSetType();
+    dataInfo = sourceProxy->GetDataInformation();
+    info.MTime = dataInfo->GetMTime();
+    dataType = dataInfo->GetDataSetType();
+    if (dataInfo->GetCompositeDataSetType() >= 0)
+      {
+      dataType = dataInfo->GetCompositeDataSetType();
+      }
     }
 
   switch (idx.column())
@@ -227,8 +282,8 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     switch(role)
       {
     case Qt::DisplayRole:
-      return QVariant(static_cast<unsigned int>(
-          dataInfo->GetNumberOfCells()));
+      return (dataInfo? QVariant(static_cast<unsigned int>(
+          dataInfo->GetNumberOfCells())) : QVariant("Unavailable"));
       }
     break;
 
@@ -237,8 +292,8 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     switch (role)
       {
     case Qt::DisplayRole:
-      return QVariant(static_cast<unsigned int>(
-          dataInfo->GetNumberOfPoints()));
+      return dataInfo? QVariant(static_cast<unsigned int>(
+          dataInfo->GetNumberOfPoints())) : QVariant("Unavailable");
       }
     break;
 
@@ -247,7 +302,8 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     switch(role)
       {
     case Qt::DisplayRole:
-      return QVariant(dataInfo->GetMemorySize()/1000.0);
+      return dataInfo? QVariant(dataInfo->GetMemorySize()/1000.0)
+        : QVariant("Unavailable");
       }
     break;
 
@@ -294,7 +350,6 @@ void pqDataInformationModel::addSource(pqPipelineSource* source)
     {
     return;
     }
-
   this->beginInsertRows(QModelIndex(), this->Internal->Sources.size(),
     this->Internal->Sources.size());
 
