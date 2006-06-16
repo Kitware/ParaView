@@ -156,7 +156,7 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
     if(this->CurrentPanel)
       {
       this->PanelArea->layout()->takeAt(0);
-      this->CurrentPanel->unselect();
+      this->CurrentPanel->deselect();
       this->CurrentPanel->hide();
       this->CurrentPanel->setObjectName("");
       this->QueuedPanels.insert(this->CurrentPanel->proxy(),

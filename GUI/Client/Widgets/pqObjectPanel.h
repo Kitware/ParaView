@@ -81,7 +81,7 @@ public slots:
 
   /// Called when the panel becomes inactive. Default implemnetation does
   /// nothing.
-  virtual void unselect() { }
+  virtual void deselect() { }
 
 signals:
   void canAcceptOrReject(bool);

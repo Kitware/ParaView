@@ -54,7 +54,7 @@ public slots:
 
   /// Called when the panel becomes inactive. 
   /// Overridden to disable the 3D widget.
-  virtual void unselect();
+  virtual void deselect();
   
 protected:
   /// set the proxy to display properties for

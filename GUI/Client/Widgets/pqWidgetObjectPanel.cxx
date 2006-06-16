@@ -114,7 +114,7 @@ pqWidgetObjectPanel::~pqWidgetObjectPanel()
 
   if(this->Widget)
     {
-    this->unselect();
+    this->deselect();
 
     pq3DWidgetFactory* widgetFactory = 
       pqApplicationCore::instance()->get3DWidgetFactory();
@@ -145,7 +145,7 @@ void pqWidgetObjectPanel::select()
 }
 
 //-----------------------------------------------------------------------------
-void pqWidgetObjectPanel::unselect()
+void pqWidgetObjectPanel::deselect()
 {
   if(this->Widget)
     this->Widget->RemoveObserver(this->Observer);
@@ -161,7 +161,7 @@ void pqWidgetObjectPanel::unselect()
     rm->UpdateVTKObjects();
     renModule->render();
     }
-  this->pqNamedObjectPanel::unselect();
+  this->pqNamedObjectPanel::deselect();
 }
 
 //-----------------------------------------------------------------------------
