@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKWidget.h"
 #include "vtkErrorCode.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkProcessModule.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyProperty.h"
@@ -250,7 +251,11 @@ void pqRenderModule::forceRender()
 {
   if (this->Internal->RenderModuleProxy)
     {
+    vtkProcessModule::GetProcessModule()->SendPrepareProgress(
+      this->Internal->RenderModuleProxy->GetConnectionID());
     this->Internal->RenderModuleProxy->StillRender();
+    vtkProcessModule::GetProcessModule()->SendCleanupPendingProgress(
+      this->Internal->RenderModuleProxy->GetConnectionID());
     }
 }
 
