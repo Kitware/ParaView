@@ -55,7 +55,7 @@ public:
   static vtkPQSelectionObserver *New() 
     { return new vtkPQSelectionObserver; }
 
-  virtual void Execute(vtkObject*, unsigned long event, void* data)
+  virtual void Execute(vtkObject*, unsigned long event, void* )
     {
       if (this->SelectionManager)
         {
@@ -242,7 +242,7 @@ void pqSelectionManager::activeRenderModuleChanged(pqRenderModule* rm)
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionManager::processEvents(unsigned long event)
+void pqSelectionManager::processEvents(unsigned long eventId)
 {
   if (!this->Implementation->RenderModule)
     {
@@ -266,7 +266,7 @@ void pqSelectionManager::processEvents(unsigned long event)
     }
   int* eventpos = rwi->GetEventPosition();
 
-  switch(event)
+  switch(eventId)
     {
     case vtkCommand::LeftButtonPressEvent:
       this->Implementation->Xs = eventpos[0];
