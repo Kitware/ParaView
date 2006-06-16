@@ -66,6 +66,7 @@ MainWindow::MainWindow()
   this->createStandardFiltersMenu();
   this->createStandardPipelineMenu();
   this->createStandardToolsMenu();
+  this->createStandardHelpMenu();
   
   QMenu* const help_menu = this->helpMenu();
   help_menu->addAction(tr("&ParaView Help"))

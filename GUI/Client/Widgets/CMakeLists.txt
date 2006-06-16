@@ -87,6 +87,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSourceInfoIcons.h
   pqSourceInfoModel.h
   pqThresholdPanel.h
+  pqToolTipTrapper.h
   pqUndoStack.h
   pqVCRController.h
   pqWidgetObjectPanel.h
@@ -284,6 +285,8 @@ ADD_LIBRARY(pqWidgets
   pqTestUtility.h
   pqThresholdPanel.cxx
   pqThresholdPanel.h
+  pqToolTipTrapper.cxx
+  pqToolTipTrapper.h
   pqUndoStack.cxx
   pqUndoStack.h
   pqVCRController.cxx

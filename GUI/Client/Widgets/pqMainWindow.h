@@ -90,6 +90,8 @@ public:
   void createStandardPipelineMenu();
   /// Creates the "standard" ParaQ tools menu
   void createStandardToolsMenu();
+  /// Creates the "standard" ParaQ help menu
+  void createStandardHelpMenu();
 
   /// Creates a "standard" ParaQ pipeline browser
   void createStandardPipelineBrowser(bool visible = true);
@@ -181,6 +183,8 @@ public slots:
   void onPlayTest(const QStringList& Files);
   
   void onPythonShell();
+
+  void enableTooltips(bool enabled = true);
 
   // Called when the Undo/Redo stack changes.
   void onUndoRedoStackChanged(bool canUndo, QString,

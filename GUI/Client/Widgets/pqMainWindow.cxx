@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqSourceProxyInfo.h"
 #include "pqTestUtility.h"
+#include "pqToolTipTrapper.h"
 #include "pqDisplayColorWidget.h"
 #include "pqVCRController.h"
 #include "pqXMLUtil.h"
@@ -150,7 +151,8 @@ public:
     DataInformationWidget(0),
     RenderWindowManager(0),
     IgnoreBrowserSelectionChanges(false),
-    SelectionManager(0)
+    SelectionManager(0),
+    ToolTipTrapper(0)
   {
   }
   
@@ -171,6 +173,9 @@ public:
 
     delete this->SelectionManager;
     this->SelectionManager = 0;
+    
+    delete this->ToolTipTrapper;
+    this->ToolTipTrapper = 0;
   }
 
   // Stores standard menus
@@ -204,6 +209,8 @@ public:
   bool IgnoreBrowserSelectionChanges;
 
   pqSelectionManager* SelectionManager;
+  
+  pqToolTipTrapper* ToolTipTrapper;
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -475,6 +482,18 @@ void pqMainWindow::createStandardToolsMenu()
     << pqSetName("PythonShell")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onPythonShell()));
 #endif // PARAQ_EMBED_PYTHON
+}
+
+void pqMainWindow::createStandardHelpMenu()
+{
+  QMenu* const menu = this->helpMenu();
+  
+  QAction* tooltipsAction = menu->addAction(tr("Tooltips"))
+    << pqSetName("Tooltips");
+    
+  tooltipsAction->setCheckable(true);
+  tooltipsAction->setChecked(!this->Implementation->ToolTipTrapper);
+  tooltipsAction << pqConnect(SIGNAL(toggled(bool)), this, SLOT(enableTooltips(bool)));
 }
 
 void pqMainWindow::createStandardPipelineBrowser(bool visible)
@@ -1652,6 +1671,19 @@ void pqMainWindow::onPythonShell()
   pqPythonDialog* const dialog = new pqPythonDialog(this);
   dialog->show();
 #endif // PARAQ_EMBED_PYTHON
+}
+
+void pqMainWindow::enableTooltips(bool enabled)
+{
+  if(enabled && !this->Implementation->ToolTipTrapper)
+    {
+    delete this->Implementation->ToolTipTrapper;
+    this->Implementation->ToolTipTrapper = 0;
+    }
+  else if(this->Implementation->ToolTipTrapper)
+    {
+    this->Implementation->ToolTipTrapper = new pqToolTipTrapper();
+    }
 }
 
 void pqMainWindow::onNewSelections(vtkSMProxy*, vtkUnstructuredGrid* selections)
