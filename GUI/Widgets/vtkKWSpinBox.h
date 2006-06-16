@@ -36,11 +36,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Set the range.
+  // Set the range. Default to [0, 10]
   virtual void SetRange(double from, double to);
 
   // Description:
-  // Set the increment value.
+  // Set the increment value. Default to 1.
   virtual void SetIncrement(double increment);
   virtual double GetIncrement();
 
@@ -205,7 +205,7 @@ public:
   //BTX
   enum
   {
-    SpinBoxValueChangedEvent = 10000,
+    SpinBoxValueChangedEvent = 10000
   };
   //ETX
 
