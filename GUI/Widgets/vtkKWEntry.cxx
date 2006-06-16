@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry);
-vtkCxxRevisionMacro(vtkKWEntry, "1.80");
+vtkCxxRevisionMacro(vtkKWEntry, "1.81");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -139,6 +139,8 @@ void vtkKWEntry::SetValue(const char *s)
     }
 
   this->SetState(old_state);
+
+  this->InvokeEvent(vtkKWEntry::EntryValueChangedEvent, (void*)s);
 }
 
 //----------------------------------------------------------------------------
@@ -427,6 +429,7 @@ void vtkKWEntry::InvokeCommand(const char *value)
       value, vtkKWCoreWidget::ConvertStringEscapeInterpretable);
     this->Script("%s \"%s\"", this->Command, val ? val : "");
     }
+  this->InvokeEvent(vtkKWEntry::EntryValueChangedEvent, (void*)value);
 }
 
 //----------------------------------------------------------------------------

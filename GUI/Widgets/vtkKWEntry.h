@@ -158,6 +158,23 @@ public:
   virtual void SetCommand(vtkObject *object, const char *method);
 
   // Description:
+  // Events. The EntryValueChangedEvent is triggered when the widget value
+  // is changed. It is similar in concept to the 'Command' callback but can be
+  // used by multiple listeners/observers at a time.
+  // Important: since there is no way to robustly find out when the user
+  // is done inputing characters in the text entry, the EntryValueChangedEvent
+  // event is also generated when <Return> is pressed, or the entry widget
+  // is losing focus (i.e. the user clicked outside the text field).
+  // The following parameters are also passed as client data:
+  // - current value: const char*
+  //BTX
+  enum
+  {
+    EntryValueChangedEvent = 10000
+  };
+  //ETX
+
+  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
