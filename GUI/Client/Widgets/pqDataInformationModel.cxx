@@ -49,8 +49,8 @@ struct pqSourceInfo
 {
   QPointer<pqPipelineSource> Source;
   int DataType;
-  vtkTypeInt64 NumberOfCells;
-  vtkTypeInt64 NumberOfPoints;
+  quint64 NumberOfCells;
+  quint64 NumberOfPoints;
   double MemorySize;
   bool DataInformationValid;
 
@@ -414,7 +414,6 @@ void pqDataInformationModel::refreshModifiedData()
     vtkPVDataInformation* dataInfo = proxy->GetDataInformation();
     if (!iter->DataInformationValid || dataInfo->GetMTime() > iter->MTime)
       {
-      int dataType = -1;
       iter->MTime = dataInfo->GetMTime();
       iter->DataType = dataInfo->GetDataSetType();
       if (dataInfo->GetCompositeDataSetType() >= 0)
