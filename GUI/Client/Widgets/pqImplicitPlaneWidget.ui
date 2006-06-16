@@ -89,21 +89,21 @@
      <item row="0" column="0" >
       <widget class="QPushButton" name="useXNormal" >
        <property name="text" >
-        <string>X Normal</string>
+        <string>&amp;X Normal</string>
        </property>
       </widget>
      </item>
      <item row="2" column="0" >
       <widget class="QPushButton" name="useZNormal" >
        <property name="text" >
-        <string>Z Normal</string>
+        <string>&amp;Z Normal</string>
        </property>
       </widget>
      </item>
      <item row="1" column="0" >
       <widget class="QPushButton" name="useYNormal" >
        <property name="text" >
-        <string>Y Normal</string>
+        <string>&amp;Y Normal</string>
        </property>
       </widget>
      </item>
