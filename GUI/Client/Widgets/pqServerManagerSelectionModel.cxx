@@ -130,8 +130,6 @@ void pqServerManagerSelectionModel::select(
     {
     deselected = this->Internal->Selection;
     this->Internal->Selection.clear();
-    this->Internal->Current = 0;
-    deselected = this->Internal->Selection;
     changed = true;
     }
 
