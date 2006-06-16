@@ -48,48 +48,76 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 struct pqSourceInfo
 {
   QPointer<pqPipelineSource> Source;
+  int DataType;
+  vtkTypeInt64 NumberOfCells;
+  vtkTypeInt64 NumberOfPoints;
+  double MemorySize;
+  bool DataInformationValid;
+
   unsigned long MTime;
   pqSourceInfo()
     {
-    this->MTime = 0;
+    this->Init();
     }
+
   pqSourceInfo(pqPipelineSource* src)
     {
+    this->Init();
     this->Source = src;
-    this->MTime = 0;
     }
-  pqSourceInfo(const pqSourceInfo& info)
-    {
-    this->Source = info.Source;
-    this->MTime = info.MTime;
-    }
+
   operator pqPipelineSource*() const
     {
     return this->Source;
     }
-  pqSourceInfo& operator=(pqPipelineSource* src)
-    {
-    this->Source = src;
-    this->MTime = 0;
-    return *this;
-    }
-};
 
-//-----------------------------------------------------------------------------
-class pqDataInformationModelInternal 
-{
-public:
-  QList<pqSourceInfo > Sources;
-  vtkTimeStamp UpdateTime;
+  void Init()
+    {
+    this->MTime = 0;
+    this->DataType = 0;
+    this->NumberOfCells = 0;
+    this->NumberOfPoints = 0;
+    this->MemorySize = 0;
+    this->DataInformationValid = false;
+    }
+
+  QVariant getNumberOfCells() const
+    {
+    if (this->DataInformationValid)
+      {
+      return QVariant(this->NumberOfCells);
+      }
+    return QVariant("Unavailable");
+    }
+
+  QVariant getNumberOfPoints() const
+    {
+    if (this->DataInformationValid)
+      {
+      return QVariant(this->NumberOfPoints);
+      }
+    return QVariant("Unavailable");
+    }
+
+  QVariant getMemorySize() const
+    {
+    if (this->DataInformationValid)
+      {
+      return QVariant(this->MemorySize);
+      }
+    return QVariant("Unavailable");
+    }
 
   // Given a data type ID, returns the string.
-  QString getDataTypeAsString(int type)
+  QString getDataTypeAsString() const
     {
-    switch (type)
+    if (!this->DataInformationValid)
       {
-    case -1:
       return "Unavailable";
+      }
 
+    switch (this->DataType)
+      {
     case VTK_POLY_DATA:
       return "Polygonal";
 
@@ -107,15 +135,15 @@ public:
 
     case VTK_IMAGE_DATA:
       /*
-        {
-        int *ext = dataInfo->GetExtent();
-        if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
-          {
-          return "Image (Uniform Rectilinear)";
-          }
-        return "Volume (Uniform Rectilinear)";
-        }
-        */
+      {
+      int *ext = dataInfo->GetExtent();
+      if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
+      {
+      return "Image (Uniform Rectilinear)";
+      }
+      return "Volume (Uniform Rectilinear)";
+      }
+      */
       return "Image (Uniform Rectilinear)";
     case VTK_MULTIGROUP_DATA_SET:
       return "Multi-group";
@@ -135,9 +163,14 @@ public:
     }
 
   // Given a datatype, returns the icon for that data type.
-  QIcon getDataTypeAsIcon(int type)
+  QIcon getDataTypeAsIcon() const
     {
-    switch (type)
+    if (!this->DataInformationValid)
+      {
+      return QIcon(":/pqWidgets/pqUnknownData16.png");
+      }
+
+    switch (this->DataType)
       {
     case VTK_POLY_DATA:
       return QIcon(":/pqWidgets/pqPolydata16.png");
@@ -183,6 +216,14 @@ public:
       return QIcon(":/pqWidgets/pqUnknownData16.png");
       }
     }
+};
+
+//-----------------------------------------------------------------------------
+class pqDataInformationModelInternal 
+{
+public:
+  QList<pqSourceInfo > Sources;
+  vtkTimeStamp UpdateTime;
 };
 
 //-----------------------------------------------------------------------------
@@ -235,24 +276,6 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
 
   pqSourceInfo &info = this->Internal->Sources[idx.row()];
   pqPipelineSource* source = info.Source;
-  vtkPVDataInformation* dataInfo = 0;
-  int dataType = -1;
-
-  vtkSMSourceProxy* sourceProxy = vtkSMSourceProxy::SafeDownCast(
-    source->getProxy());
-
-  // Get data information only if the proxy is created.
-  if (sourceProxy && sourceProxy->GetNumberOfParts() && 
-    idx.column() > pqDataInformationModel::Name)
-    {
-    dataInfo = sourceProxy->GetDataInformation();
-    info.MTime = dataInfo->GetMTime();
-    dataType = dataInfo->GetDataSetType();
-    if (dataInfo->GetCompositeDataSetType() >= 0)
-      {
-      dataType = dataInfo->GetCompositeDataSetType();
-      }
-    }
 
   switch (idx.column())
     {
@@ -270,10 +293,10 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     switch(role)
       {
     case Qt::DisplayRole:
-      return QVariant(this->Internal->getDataTypeAsString(dataType));
+      return QVariant(info.getDataTypeAsString());
 
     case Qt::DecorationRole:
-      return QVariant(this->Internal->getDataTypeAsIcon(dataType));
+      return QVariant(info.getDataTypeAsIcon());
       }
     break;
 
@@ -282,8 +305,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     switch(role)
       {
     case Qt::DisplayRole:
-      return (dataInfo? QVariant(static_cast<unsigned int>(
-          dataInfo->GetNumberOfCells())) : QVariant("Unavailable"));
+      return info.getNumberOfCells(); 
 
     case Qt::DecorationRole:
       return QVariant(QIcon(":/pqWidgets/pqCellData16.png"));
@@ -295,8 +317,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     switch (role)
       {
     case Qt::DisplayRole:
-      return dataInfo? QVariant(static_cast<unsigned int>(
-          dataInfo->GetNumberOfPoints())) : QVariant("Unavailable");
+      return info.getNumberOfPoints(); 
 
     case Qt::DecorationRole:
       return QVariant(QIcon(":/pqWidgets/pqPointData16.png"));
@@ -308,8 +329,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
     switch(role)
       {
     case Qt::DisplayRole:
-      return dataInfo? QVariant(dataInfo->GetMemorySize()/1000.0)
-        : QVariant("Unavailable");
+      return info.getMemorySize();
       }
     break;
 
@@ -386,12 +406,26 @@ void pqDataInformationModel::refreshModifiedData()
     {
     vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(
       iter->Source->getProxy());
-    if (!proxy)
+    // Get data information only if the proxy has parts.
+    if (!proxy || proxy->GetNumberOfParts() == 0)
       {
       continue;
       }
-    if (proxy->GetDataInformation()->GetMTime() > iter->MTime)
+    vtkPVDataInformation* dataInfo = proxy->GetDataInformation();
+    if (!iter->DataInformationValid || dataInfo->GetMTime() > iter->MTime)
       {
+      int dataType = -1;
+      iter->MTime = dataInfo->GetMTime();
+      iter->DataType = dataInfo->GetDataSetType();
+      if (dataInfo->GetCompositeDataSetType() >= 0)
+        {
+        iter->DataType = dataInfo->GetCompositeDataSetType();
+        }
+      iter->NumberOfCells = dataInfo->GetNumberOfCells();
+      iter->NumberOfPoints =dataInfo->GetNumberOfPoints();
+      iter->MemorySize = dataInfo->GetMemorySize()/1000.0;
+      iter->DataInformationValid = true;
+
       emit this->dataChanged(this->index(row_no, 0),
         this->index(row_no, 4));
       }
