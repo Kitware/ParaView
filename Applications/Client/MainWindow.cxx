@@ -60,6 +60,7 @@ MainWindow::MainWindow()
 
   this->createStandardStatusBar();
   this->createStandardFileMenu();
+  this->createStandardEditMenu();
   this->createStandardViewMenu();
   this->createStandardServerMenu();
   this->createStandardSourcesMenu();
