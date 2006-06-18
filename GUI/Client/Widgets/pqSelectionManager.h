@@ -50,6 +50,11 @@ public:
   pqSelectionManager(QObject* parent=NULL);
   virtual ~pqSelectionManager();
 
+  int getMode() 
+    {
+      return this->Mode;
+    }
+
   enum Modes
   {
     SELECT,
@@ -69,7 +74,7 @@ private:
   int setInteractorStyleToSelect(pqRenderModule*);
   int setInteractorStyleToInteract(pqRenderModule*);
   void processEvents(unsigned long event);
-  void updateSelection(vtkSMRenderModuleProxy* rmp);
+  void updateSelection(int* eventpos, vtkSMRenderModuleProxy* rmp);
 };
 
 

@@ -44,8 +44,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkInteractorObserver.h"
 #include "vtkInteractorStyleRubberBandPick.h"
 #include "vtkPVClientServerIdCollectionInformation.h"
+#include "vtkProcessModule.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkRenderer.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkSMRenderModuleProxy.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSmartPointer.h"
+
+#include <vtkstd/map>
 
 //---------------------------------------------------------------------------
 // Observer for the start and end interaction events
@@ -79,6 +87,7 @@ public:
     SavedStyle(0),
     RenderModule(0),
     SelectionObserver(0),
+    SelectionProxy(0),
     Xs(0), Ys(0), Xe(0), Ye(0)
     {
     }
@@ -106,8 +115,15 @@ public:
   vtkInteractorObserver* SavedStyle;
   pqRenderModule* RenderModule;
   vtkPQSelectionObserver* SelectionObserver;
+  vtkSMSourceProxy* SelectionProxy;
 
   int Xs, Ys, Xe, Ye;
+
+  typedef vtkstd::map<vtkIdType, vtkSmartPointer<vtkSMSourceProxy> > 
+       ServerSelectionsType;
+  ServerSelectionsType ServerSelections;
+
+  double Verts[32];
 };
 
 //-----------------------------------------------------------------------------
@@ -139,7 +155,7 @@ void pqSelectionManager::switchToSelection()
 
   if (this->setInteractorStyleToSelect(this->Implementation->RenderModule))
     {
-    this->Mode = SELECT;;
+    this->Mode = SELECT;
     }
 }
 
@@ -239,6 +255,39 @@ void pqSelectionManager::activeRenderModuleChanged(pqRenderModule* rm)
     }
 
   this->Implementation->RenderModule = rm;
+
+  vtkSMRenderModuleProxy* rmp = rm->getRenderModuleProxy();
+  if (!rmp)
+    {
+    qDebug("No render module proxy specified. Cannot create selection object");
+    return;
+    }
+
+  vtkIdType connId = rmp->GetConnectionID();
+  vtkSMSourceProxy* selectionProxy = 0;
+  pqSelectionManagerImplementation::ServerSelectionsType::iterator iter = 
+    this->Implementation->ServerSelections.find(connId);
+  if (iter != this->Implementation->ServerSelections.end())
+    {
+    selectionProxy = iter->second;
+    }
+
+  if (!selectionProxy)
+    {
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    selectionProxy = vtkSMSourceProxy::SafeDownCast(
+      pxm->NewProxy("sources", "PropAndCellSelect"));
+    if (!selectionProxy)
+      {
+      qDebug("An appropriate selection proxy could not be created. "
+             "No selection is possible");
+      return;
+      }
+    selectionProxy->SetConnectionID(connId);
+    selectionProxy->SetServers(vtkProcessModule::DATA_SERVER);
+    this->Implementation->ServerSelections[connId] = selectionProxy;
+    selectionProxy->Delete();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -272,17 +321,75 @@ void pqSelectionManager::processEvents(unsigned long eventId)
       this->Implementation->Xs = eventpos[0];
       this->Implementation->Ys = eventpos[1];
       break;
-    case vtkCommand::LeftButtonReleaseEvent:      
-      this->Implementation->Xe = eventpos[0];
-      this->Implementation->Ye = eventpos[1];
-      this->updateSelection(rmp);
+    case vtkCommand::LeftButtonReleaseEvent:
+      this->updateSelection(eventpos, rmp);
       break;
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionManager::updateSelection(vtkSMRenderModuleProxy* rmp)
+void pqSelectionManager::updateSelection(
+  int* eventpos, vtkSMRenderModuleProxy* rmp)
 {
+  vtkRenderWindowInteractor* rwi = rmp->GetInteractor();
+  vtkRenderer *renderer = rwi->FindPokedRenderer(eventpos[0], eventpos[1]);
+
+  this->Implementation->Xe = eventpos[0];
+  this->Implementation->Ye = eventpos[1];
+
+  double x0 = (double)((this->Implementation->Xs < this->Implementation->Xe) ? this->Implementation->Xs : this->Implementation->Xe);
+  double y0 = (double)((this->Implementation->Ys < this->Implementation->Ye) ? this->Implementation->Ys : this->Implementation->Ye);
+  double x1 = (double)((this->Implementation->Xs > this->Implementation->Xe) ? this->Implementation->Xs : this->Implementation->Xe);
+  double y1 = (double)((this->Implementation->Ys > this->Implementation->Ye) ? this->Implementation->Ys : this->Implementation->Ye);
+
+  this->Implementation->Xs = (int)x0;
+  this->Implementation->Ys = (int)y0;
+  this->Implementation->Xe = (int)x1;
+  this->Implementation->Ye = (int)y1;
+  
+  if (x0 == x1)
+    {
+    x0 -= 0.5;
+    x1 += 0.5;
+    }
+  if (y0 == y1)
+    {
+    y0 -= 0.5;
+    y1 += 0.5;
+    }
+  
+  renderer->SetDisplayPoint(x0, y0, 0);
+  renderer->DisplayToWorld();
+  renderer->GetWorldPoint(&this->Implementation->Verts[0]);
+  
+  renderer->SetDisplayPoint(x0, y0, 1);
+  renderer->DisplayToWorld();
+  renderer->GetWorldPoint(&this->Implementation->Verts[4]);
+  
+  renderer->SetDisplayPoint(x0, y1, 0);
+  renderer->DisplayToWorld();
+  renderer->GetWorldPoint(&this->Implementation->Verts[8]);
+  
+  renderer->SetDisplayPoint(x0, y1, 1);
+  renderer->DisplayToWorld();
+  renderer->GetWorldPoint(&this->Implementation->Verts[12]);
+  
+  renderer->SetDisplayPoint(x1, y0, 0);
+  renderer->DisplayToWorld();
+  renderer->GetWorldPoint(&this->Implementation->Verts[16]);
+  
+  renderer->SetDisplayPoint(x1, y0, 1);
+  renderer->DisplayToWorld();
+  renderer->GetWorldPoint(&this->Implementation->Verts[20]);
+  
+  renderer->SetDisplayPoint(x1, y1, 0);
+  renderer->DisplayToWorld();
+  renderer->GetWorldPoint(&this->Implementation->Verts[24]);
+  
+  renderer->SetDisplayPoint(x1, y1, 1);
+  renderer->DisplayToWorld();
+  renderer->GetWorldPoint(&this->Implementation->Verts[28]);
+
   // pick with the given rectange. this will need some work when rendering
   // in parallel, specially with tiled display
   vtkPVClientServerIdCollectionInformation* idInfo = 
@@ -301,16 +408,24 @@ void pqSelectionManager::updateSelection(vtkSMRenderModuleProxy* rmp)
     vtkClientServerID id = idInfo->GetID(i);
     // get the source proxy corresponding to the picked display
     // proxy
-    vtkSMProxy *objProxy = rmp->GetProxyFromPropID(&id, 0);
+    vtkSMProxy *objProxy = 
+      rmp->GetProxyFromPropID(&id, vtkSMRenderModuleProxy::INPUT);
     pqPipelineSource* pqSource = model->getPQSource(objProxy);
     if (pqSource)
       {
       selection.push_back(pqSource);
       }
-    cout << pqSource << endl;
     }
   idInfo->Delete();
 
   selectionModel->select(
     selection, pqServerManagerSelectionModel::ClearAndSelect);
+
+  vtkSMSourceProxy* selectionProxy = 
+    this->Implementation->ServerSelections[rmp->GetConnectionID()];
+  if (!selectionProxy)
+    {
+    qDebug("No selection proxy was created on the data server. "
+           "Cannot select cells");
+    }
 }
