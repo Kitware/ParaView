@@ -45,6 +45,7 @@ class pqPipelineBuilder;
 class pqServerManagerModelItem;
 class pqPipelineServer;
 class pqPipelineSource;
+class pqRenderModule;
 class pqServerManagerObserver;
 class pqServer;
 
@@ -225,12 +226,17 @@ private slots:
 
   // Handler when the core indicates change in the active server/source.
   void onCoreActiveChanged();
+
+  // Handler when the core indicates change in the active render module.
+  void onActiveRenderModuleChanged(pqRenderModule* rm);
+
 protected:
   void buildSourcesMenu();
   void buildFiltersMenu();
 
   // enable/disable filters as per the source.
   void updateFiltersMenu(pqPipelineSource* source);
+
 private:
   void setServer(pqServer* Server);
 

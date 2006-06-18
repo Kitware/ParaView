@@ -107,6 +107,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDir>
 #include <QDockWidget>
 #include <QEvent>
+#include <QKeyEvent>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -226,6 +227,8 @@ pqMainWindow::pqMainWindow() :
 
   this->Implementation->MultiViewManager = 
     new pqMultiView(this) << pqSetName("MultiViewManager");
+  this->Implementation->MultiViewManager->installEventFilter(this);
+
   //this->Implementation->MultiViewManager->hide();  
   // workaround for flickering in Qt 4.0.1 & 4.1.0
   this->setCentralWidget(this->Implementation->MultiViewManager);
@@ -270,7 +273,7 @@ pqMainWindow::pqMainWindow() :
 
   // Update enable state when the active view changes.
   QObject::connect(core, SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
-                   this, SLOT(updateEnableState()));
+                   this, SLOT(onActiveRenderModuleChanged(pqRenderModule*)));
 
   pqUndoStack* undoStack = core->getUndoStack();
   // Connect undo/redo status.
@@ -858,7 +861,10 @@ QMenu* pqMainWindow::helpMenu()
   return this->Implementation->HelpMenu;
 }
 
-void pqMainWindow::addStandardDockWidget(Qt::DockWidgetArea area, QDockWidget* dockwidget, const QIcon& icon, bool visible)
+void pqMainWindow::addStandardDockWidget(Qt::DockWidgetArea area, 
+                                         QDockWidget* dockwidget, 
+                                         const QIcon& icon, 
+                                         bool visible)
 {
   dockwidget->setVisible(visible);
 
@@ -886,7 +892,37 @@ bool pqMainWindow::eventFilter(QObject* watched, QEvent* e)
       {
       if(this->Implementation->DockWidgetVisibleActions.contains(dockwidget))
         {
-        this->Implementation->DockWidgetVisibleActions[dockwidget]->setChecked(e->type() == QEvent::Show);
+        this->Implementation->DockWidgetVisibleActions[dockwidget]->setChecked(
+          e->type() == QEvent::Show);
+        }
+      }
+    }
+  else if (e->type() == QEvent::KeyPress)
+    {
+    QKeyEvent* kEvent = static_cast<QKeyEvent*>(e);
+    
+    if (kEvent->key() == Qt::Key_S)
+      {
+      if (this->Implementation->SelectionManager->getMode() ==
+          pqSelectionManager::SELECT)
+        {
+        QAction*  interact = 
+          this->Implementation->SelectionToolBar->findChild<QAction*>(
+            "InteractButton");
+        if (this->Implementation->SelectionToolBar->isEnabled())
+          {
+          interact->trigger();
+          }
+        }
+      else
+        {
+        QAction*  select = 
+          this->Implementation->SelectionToolBar->findChild<QAction*>(
+            "SelectButton");
+        if (this->Implementation->SelectionToolBar->isEnabled())
+          {
+          select->trigger();
+          }
         }
       }
     }
@@ -1327,8 +1363,16 @@ void pqMainWindow::onFileOpenServerState(const QStringList& Files)
 
   // Get the root element from the parser.
   vtkPVXMLElement *root = xmlParser->GetRootElement();
-  pqApplicationCore::instance()->loadState(root);
-  QString name = root->GetName();
+  if (root)
+    {
+    pqApplicationCore::instance()->loadState(root);
+    QString name = root->GetName();
+    }
+  else
+    {
+    qCritical("Root does not exist. Either state file could not be opened "
+              "or it does not contain valid xml");
+    }
 
   xmlParser->Delete();
 }
@@ -2088,3 +2132,12 @@ void pqMainWindow::onUndoRedoStackChanged(bool canUndo, QString undoText,
     }
 }
 
+//-----------------------------------------------------------------------------
+void pqMainWindow::onActiveRenderModuleChanged(pqRenderModule* rm)
+{
+  this->updateEnableState();
+  if (rm && rm->getWidget())
+    {
+    rm->getWidget()->installEventFilter(this);
+    }
+}
