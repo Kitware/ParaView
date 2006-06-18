@@ -120,14 +120,23 @@ public:
   vtkPVClientServerIdCollectionInformation* 
     Pick(int xs, int ys, int xe, int ye);
 
+//BTX
+enum ProxyType
+{
+  GEOMETRY,
+  INPUT,
+  DISPLAY
+};
+//ETX
+
   // Description:
   // This will look in the RenderModule's Displays and find the one
   // that corresponds to the given id (obtained by Pick()).
-  // If VolumeOrSurface is 0, the Proxy returned will be the one for the 
-  // Display's input algorithm. Otherwise the Proxy will be the one for 
-  // the Display's GeometryFilter. The output of one is a 3D dataset, the other
-  // is the "2D" outer shell of the data.
-  vtkSMProxy *GetProxyFromPropID(vtkClientServerID *id, int VolumeOrSurface);
+  // Which proxy is returned depends on the second argument (proxyType).
+  // If DISPLAY, the corresponding display proxy is returned.
+  // If INPUT, the input of the display proxy is returned.
+  // If GEOMETRY, the geometry filter proxy is returned
+  vtkSMProxy *GetProxyFromPropID(vtkClientServerID *id, int proxyType);
 
   // Description:
   // Reset camera to the given bounds.
