@@ -32,7 +32,7 @@ class vtkKWFrame;
 class vtkKWLabel;
 class vtkKWFrameWithLabel;
 class vtkKWMenuButton;
-class vtkPVCameraManipulator;
+class vtkCameraManipulator;
 class vtkPVInteractorStyleControlCmd;
 class vtkPVWidget;
 
@@ -51,7 +51,7 @@ public:
 
   // Description:
   // Add manipulator to the list of manipulators.
-  void AddManipulator(const char*, vtkPVCameraManipulator*);
+  void AddManipulator(const char*, vtkCameraManipulator*);
 
   // Description:
   // Update menus after adding manipulators.
@@ -65,8 +65,8 @@ public:
   // Set the specific manipulator for a mouse button and key
   // combination.
   int SetManipulator(int pos, const char*);
-  vtkPVCameraManipulator* GetManipulator(int pos);
-  vtkPVCameraManipulator* GetManipulator(const char* name);
+  vtkCameraManipulator* GetManipulator(int pos);
+  vtkCameraManipulator* GetManipulator(const char* name);
 
   // Description:
   // Set the current manipulator to the specified one for the
@@ -107,7 +107,7 @@ public:
   // Description:
   // Callback for widget to call when user modifies UI.
   void ChangeArgument(const char* name, const char* widget);
-  void ResetWidget(vtkPVCameraManipulator*, const char* name);
+  void ResetWidget(vtkCameraManipulator*, const char* name);
 
   // Description:
   // Get a widget by name
@@ -115,7 +115,7 @@ public:
   
   // Description
   // This is hack to convert the current manipulator to Tcl variable.
-  vtkGetObjectMacro(CurrentManipulator, vtkPVCameraManipulator);
+  vtkGetObjectMacro(CurrentManipulator, vtkCameraManipulator);
 
   // Description:
   // This method is called when one of the manipulator is modified.
@@ -157,7 +157,7 @@ protected:
   char* RegistryName;
 
   // This is hack to get tcl name;
-  vtkPVCameraManipulator *CurrentManipulator;
+  vtkCameraManipulator *CurrentManipulator;
 
   vtkPVInteractorStyleControlInternal* Internals;
 

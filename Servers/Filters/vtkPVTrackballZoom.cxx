@@ -20,7 +20,7 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballZoom, "1.6");
+vtkCxxRevisionMacro(vtkPVTrackballZoom, "1.1");
 vtkStandardNewMacro(vtkPVTrackballZoom);
 
 //-------------------------------------------------------------------------

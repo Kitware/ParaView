@@ -20,7 +20,7 @@
 #include "vtkProcessModule.h"
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVApplication.h"
-#include "vtkPVCameraManipulator.h"
+#include "vtkCameraManipulator.h"
 #include "vtkPVInputProperty.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVRenderView.h"
@@ -40,7 +40,7 @@
 #include <ctype.h>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.57");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.58");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -755,12 +755,12 @@ void vtkPVXMLPackageParser::CreateManipulator(vtkPVXMLElement* ma)
     return;
     }
 
-  vtkPVCameraManipulator* pcm = 0;
+  vtkCameraManipulator* pcm = 0;
   const char* className = ma->GetAttribute("class");
   if(className)
     {
     vtkObject* object = vtkInstantiator::CreateInstance(className);
-    pcm = vtkPVCameraManipulator::SafeDownCast(object);
+    pcm = vtkCameraManipulator::SafeDownCast(object);
     if(!pcm)
       {
       vtkErrorMacro("Cannot create Manipulator class \"" << className << "\"");

@@ -18,13 +18,15 @@
 // manipulate the camera, the viewpoint of the scene.
 // The left button is for rotation; shift + left button is for rolling;
 // the right button is for panning; and shift + right button is for zooming.
+// This class fires vtkCommand::StartInteractionEvent and 
+// vtkCommand::EndInteractionEvent to signal start and end of interaction.
 
 #ifndef __vtkPVInteractorStyle_h
 #define __vtkPVInteractorStyle_h
 
 #include "vtkInteractorStyle.h"
 
-class vtkPVCameraManipulator;
+class vtkCameraManipulator;
 class vtkCollection;
 
 class VTK_EXPORT vtkPVInteractorStyle : public vtkInteractorStyle
@@ -47,7 +49,7 @@ public:
   
   // Description:
   // Access to adding or removing manipulators.
-  void AddManipulator(vtkPVCameraManipulator *m);
+  void AddManipulator(vtkCameraManipulator *m);
 
   //BTX
   // Description:
@@ -67,7 +69,7 @@ protected:
   vtkPVInteractorStyle();
   ~vtkPVInteractorStyle();
 
-  vtkPVCameraManipulator *Current;
+  vtkCameraManipulator *Current;
 
   // The CameraInteractors also store there button and modifier.
   vtkCollection *CameraManipulators;

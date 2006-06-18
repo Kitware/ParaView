@@ -4,12 +4,13 @@ INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 
 SET(Filters_SRCS
   vtkAttributeEditor.cxx
-  vtkCVGeometryCache.cxx
+  vtkCameraManipulator.cxx
   vtkCaveRenderManager.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkClientCompositeManager.cxx
   vtkColorByPart.cxx
   vtkCompleteArrays.cxx
+  vtkCVGeometryCache.cxx
   vtkDataAnalysisFilter.cxx
   vtkDataSetSubdivisionAlgorithm.cxx
   vtkDesktopDeliveryClient.cxx
@@ -46,6 +47,7 @@ SET(Filters_SRCS
   vtkPVGenericRenderWindowInteractor.cxx
   vtkPVGeometryFilter.cxx
   vtkPVGeometryInformation.cxx
+  vtkPVInteractorStyle.cxx
   vtkPVGlyphFilter.cxx
   vtkPVLODActor.cxx
   vtkPVLODVolume.cxx
@@ -61,6 +63,9 @@ SET(Filters_SRCS
   vtkPVServerTimeSteps.cxx
   vtkPVServerXDMFParameters.cxx
   vtkPVSummaryHelper.cxx
+  vtkPVTrackballRoll.cxx
+  vtkPVTrackballRotate.cxx
+  vtkPVTrackballZoom.cxx
   vtkPVTreeComposite.cxx
   vtkPVUpdateSuppressor.cxx
   vtkPhastaReader.cxx
@@ -90,9 +95,9 @@ SET_SOURCE_FILES_PROPERTIES(
   WRAP_EXCLUDE)
 
 SET_SOURCE_FILES_PROPERTIES( 
-  vtkSubdivisionAlgorithm.cxx 
-  vtkPVRenderViewProxy.cxx
   vtkImageCompressor.cxx
+  vtkPVRenderViewProxy.cxx
+  vtkSubdivisionAlgorithm.cxx 
   ABSTRACT)
 
 IF(VTK_USE_MPI)

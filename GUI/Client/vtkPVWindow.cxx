@@ -47,7 +47,7 @@
 #include "vtkLinkedListIterator.txx"
 #include "vtkPVApplication.h"
 #include "vtkPVApplicationSettingsInterface.h"
-#include "vtkPVCameraManipulator.h"
+#include "vtkCameraManipulator.h"
 #include "vtkPVColorMap.h"
 #include "vtkPVComparativeVisManagerGUI.h"
 #include "vtkPVDisplayGUI.h"
@@ -137,14 +137,59 @@
 #define VTK_PV_ENABLE_OLD_ANIMATION_INTERFACE 0
 
 //-----------------------------------------------------------------------------
+class vtkPVWindowObserver : public vtkCommand
+{
+public:
+  static vtkPVWindowObserver* New()
+    {
+    return new vtkPVWindowObserver;
+    }
+  void SetWindow(vtkPVWindow* win)
+    {
+    this->Window = win;
+    }
+  virtual void Execute(vtkObject* caller, unsigned long eventId, void*)
+    {
+    if (!this->Window)
+      {
+      return;
+      }
+    if (caller == this->Window->GetInteractor()->GetInteractorStyle())
+      {
+      switch (eventId)
+        {
+      case vtkCommand::StartInteractionEvent:
+        this->Window->SetInteractiveRenderEnabled(1);
+        break;
+
+      case vtkCommand::EndInteractionEvent:
+        this->Window->SetInteractiveRenderEnabled(0);
+        break;
+        }
+      }
+    }
+protected:
+  vtkPVWindowObserver()
+    {
+    this->Window = 0;
+    }
+
+  vtkPVWindow* Window;
+};
+
+
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.789");
+vtkCxxRevisionMacro(vtkPVWindow, "1.790");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
 //-----------------------------------------------------------------------------
 vtkPVWindow::vtkPVWindow()
 {
+  this->Observer = vtkPVWindowObserver::New();
+  this->Observer->SetWindow(this);
+
   this->StateFileId = 0;
   this->SupportHelp = 1;
   this->SupportPrint = 1;
@@ -214,6 +259,21 @@ vtkPVWindow::vtkPVWindow()
   this->CameraStyle3D = vtkPVInteractorStyle::New();
   this->CameraStyle2D = vtkPVInteractorStyle::New();
   this->CenterOfRotationStyle = vtkPVInteractorStyleCenterOfRotation::New();
+
+  this->CameraStyle3D->AddObserver(vtkCommand::StartInteractionEvent,
+    this->Observer);
+  this->CameraStyle3D->AddObserver(vtkCommand::EndInteractionEvent,
+    this->Observer);
+
+  this->CameraStyle2D->AddObserver(vtkCommand::StartInteractionEvent,
+    this->Observer);
+  this->CameraStyle2D->AddObserver(vtkCommand::EndInteractionEvent,
+    this->Observer);
+
+  this->CenterOfRotationStyle->AddObserver(vtkCommand::StartInteractionEvent,
+    this->Observer);
+  this->CenterOfRotationStyle->AddObserver(vtkCommand::EndInteractionEvent,
+    this->Observer);
 
   this->PickCenterToolbar = vtkKWToolbar::New();
   this->PickCenterToolbar->SetName(VTK_PV_TOOLBARS_CAMERA_LABEL);
@@ -346,6 +406,10 @@ vtkPVWindow::vtkPVWindow()
 //-----------------------------------------------------------------------------
 vtkPVWindow::~vtkPVWindow()
 {
+  this->Observer->SetWindow(0);
+  this->Observer->Delete();
+  this->Observer = 0;
+
   vtkClientServerStream stream;
   if(this->ServerFileListingID.ID)
     {
@@ -4765,7 +4829,7 @@ vtkPVVolumeAppearanceEditor* vtkPVWindow::GetVolumeAppearanceEditor()
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::AddManipulator(const char* rotypes, const char* name, 
-                                 vtkPVCameraManipulator* pcm)
+                                 vtkCameraManipulator* pcm)
 {
   if ( !pcm || !this->MainView )
     {

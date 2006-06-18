@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVTrackballRoll.h
+  Module:    vtkPVTrackballZoom.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,22 +12,22 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVTrackballRoll - Rolls camera arround a point.
+// .NAME vtkPVTrackballZoom - Zooms camera with vertical mouse movement.
 // .SECTION Description
-// vtkPVTrackballRoll allows the user to interactively
+// vtkPVTrackballZoom allows the user to interactively
 // manipulate the camera, the viewpoint of the scene.
-// Roll tracks the mouse around the center of rotation.
+// Moving the mouse down zooms in. Up zooms out.
 
-#ifndef __vtkPVTrackballRoll_h
-#define __vtkPVTrackballRoll_h
+#ifndef __vtkPVTrackballZoom_h
+#define __vtkPVTrackballZoom_h
 
-#include "vtkPVCameraManipulator.h"
+#include "vtkCameraManipulator.h"
 
-class VTK_EXPORT vtkPVTrackballRoll : public vtkPVCameraManipulator
+class VTK_EXPORT vtkPVTrackballZoom : public vtkCameraManipulator
 {
 public:
-  static vtkPVTrackballRoll *New();
-  vtkTypeRevisionMacro(vtkPVTrackballRoll, vtkPVCameraManipulator);
+  static vtkPVTrackballZoom *New();
+  vtkTypeRevisionMacro(vtkPVTrackballZoom, vtkCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
@@ -39,13 +39,15 @@ public:
                             vtkRenderWindowInteractor *rwi);
   virtual void OnButtonUp(int x, int y, vtkRenderer *ren,
                           vtkRenderWindowInteractor *rwi);
-
+  
 protected:
-  vtkPVTrackballRoll();
-  ~vtkPVTrackballRoll();
+  vtkPVTrackballZoom();
+  ~vtkPVTrackballZoom();
 
-  vtkPVTrackballRoll(const vtkPVTrackballRoll&); // Not implemented
-  void operator=(const vtkPVTrackballRoll&); // Not implemented
+  float ZoomScale;
+
+  vtkPVTrackballZoom(const vtkPVTrackballZoom&); // Not implemented
+  void operator=(const vtkPVTrackballZoom&); // Not implemented
 };
 
 #endif

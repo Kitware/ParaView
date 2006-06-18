@@ -54,24 +54,27 @@
 #include "vtkClientServerID.h" // Needed for InteractorID
 
 class vtkCollection;
-class vtkPVGenericRenderWindowInteractor;
 class vtkKWCheckButton;
 class vtkKWEntry;
 class vtkKWFrame;
 class vtkKWLabel;
+class vtkKWMenuButton;
 class vtkKWPushButton;
 class vtkKWPushButtonWithMenu;
-class vtkKWMenuButton;
 class vtkKWRadioButton;
 class vtkKWRotateCameraInteractor;
+class vtkKWSplitFrame;
 class vtkKWToolbar;
+class vtkKWToolbarSet;
 class vtkPVAnimationInterface;
+class vtkPVAnimationManager;
 class vtkPVApplication;
 class vtkPVApplicationSettingsInterface;
-class vtkPVCameraManipulator;
+class vtkCameraManipulator;
 class vtkPVColorMap;
 class vtkPVComparativeVisManagerGUI;
 class vtkPVErrorLogDisplay;
+class vtkPVGenericRenderWindowInteractor;
 class vtkPVInteractorStyle;
 class vtkPVInteractorStyleCenterOfRotation;
 class vtkPVLookmarkManager;
@@ -80,17 +83,14 @@ class vtkPVRenderView;
 class vtkPVSource;
 class vtkPVSourceCollection;
 class vtkPVTimerLogDisplay;
+class vtkPVTraceHelper;
 class vtkPVTrackballRoll;
 class vtkPVVolumeAppearanceEditor;
 class vtkPVWidget;
+class vtkPVWindowObserver;
 class vtkPVWriter;
 class vtkPVXMLPackageParser;
 class vtkSMAxesProxy;
-class vtkKWSplitFrame;
-class vtkPVTraceHelper;
-
-class vtkPVAnimationManager;
-class vtkKWToolbarSet;
 
 //BTX
 template <class key, class data> 
@@ -349,7 +349,7 @@ public:
   // Description:
   // Adds manipulator to the list of available manipulators.
   void AddManipulator(const char* type, const char* name, 
-                      vtkPVCameraManipulator*);
+                      vtkCameraManipulator*);
   
   // Description:
   // Adds manipulators variable and the widget to the list.
@@ -798,6 +798,7 @@ protected:
 
 private:
   vtkPVComparativeVisManagerGUI* ComparativeVisManagerGUI;
+  vtkPVWindowObserver* Observer;
 
   vtkPVWindow(const vtkPVWindow&); // Not implemented
   void operator=(const vtkPVWindow&); // Not implemented

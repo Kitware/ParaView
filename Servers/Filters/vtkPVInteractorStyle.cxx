@@ -17,14 +17,15 @@
 #include "vtkCamera.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
+#include "vtkCommand.h"
 #include "vtkLight.h"
 #include "vtkLightCollection.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVCameraManipulator.h"
+#include "vtkCameraManipulator.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyle, "1.8");
+vtkCxxRevisionMacro(vtkPVInteractorStyle, "1.1");
 vtkStandardNewMacro(vtkPVInteractorStyle);
 
 //-------------------------------------------------------------------------
@@ -43,7 +44,7 @@ vtkPVInteractorStyle::~vtkPVInteractorStyle()
 }
 
 //-------------------------------------------------------------------------
-void vtkPVInteractorStyle::AddManipulator(vtkPVCameraManipulator *m)
+void vtkPVInteractorStyle::AddManipulator(vtkCameraManipulator *m)
 {
   this->CameraManipulators->AddItem(m);
 }
@@ -72,13 +73,13 @@ void vtkPVInteractorStyle::OnRightButtonDown()
 //----------------------------------------------------------------------------
 void vtkPVInteractorStyle::SetCenterOfRotation(float x, float y, float z)
 {
-  vtkPVCameraManipulator *m;
+  vtkCameraManipulator *m;
 
   vtkCollectionIterator *it = this->CameraManipulators->NewIterator();
   it->InitTraversal();
   while ( !it->IsDoneWithTraversal() )
     {
-    m = static_cast<vtkPVCameraManipulator*>(it->GetCurrentObject());
+    m = static_cast<vtkCameraManipulator*>(it->GetCurrentObject());
     m->SetCenter(x, y, z);
     it->GoToNextItem();
     }
@@ -88,7 +89,7 @@ void vtkPVInteractorStyle::SetCenterOfRotation(float x, float y, float z)
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
 {
-  vtkPVCameraManipulator *manipulator;
+  vtkCameraManipulator *manipulator;
 
   // Must not be processing an interaction to start another.
   if (this->Current)
@@ -109,7 +110,7 @@ void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
 
   // Look for a matching camera interactor.
   this->CameraManipulators->InitTraversal();
-  while ((manipulator = (vtkPVCameraManipulator*)
+  while ((manipulator = (vtkCameraManipulator*)
                         this->CameraManipulators->GetNextItemAsObject()))
     {
     if (manipulator->GetButton() == button && 
@@ -118,6 +119,7 @@ void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
       {
       this->Current = manipulator;
       this->Current->Register(this);
+      this->InvokeEvent(vtkCommand::StartInteractionEvent);
       this->Current->StartInteraction();
       this->Current->OnButtonDown(this->Interactor->GetEventPosition()[0],
                                   this->Interactor->GetEventPosition()[1],
@@ -158,6 +160,7 @@ void vtkPVInteractorStyle::OnButtonUp(int button)
                               this->CurrentRenderer,
                               this->Interactor);
     this->Current->EndInteraction();
+    this->InvokeEvent(vtkCommand::EndInteractionEvent);
     this->Interactor->Render();
     this->Current->UnRegister(this);
     this->Current = NULL;

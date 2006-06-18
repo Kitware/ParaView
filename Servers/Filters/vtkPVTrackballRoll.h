@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVTrackballRotate.h
+  Module:    vtkPVTrackballRoll.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,21 +12,22 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVTrackballRotate - Rotates camera with xy mouse movement.
+// .NAME vtkPVTrackballRoll - Rolls camera arround a point.
 // .SECTION Description
-// vtkPVTrackballRotate allows the user to interactively
+// vtkPVTrackballRoll allows the user to interactively
 // manipulate the camera, the viewpoint of the scene.
+// Roll tracks the mouse around the center of rotation.
 
-#ifndef __vtkPVTrackballRotate_h
-#define __vtkPVTrackballRotate_h
+#ifndef __vtkPVTrackballRoll_h
+#define __vtkPVTrackballRoll_h
 
-#include "vtkPVCameraManipulator.h"
+#include "vtkCameraManipulator.h"
 
-class VTK_EXPORT vtkPVTrackballRotate : public vtkPVCameraManipulator
+class VTK_EXPORT vtkPVTrackballRoll : public vtkCameraManipulator
 {
 public:
-  static vtkPVTrackballRotate *New();
-  vtkTypeRevisionMacro(vtkPVTrackballRotate, vtkPVCameraManipulator);
+  static vtkPVTrackballRoll *New();
+  vtkTypeRevisionMacro(vtkPVTrackballRoll, vtkCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
@@ -39,20 +40,12 @@ public:
   virtual void OnButtonUp(int x, int y, vtkRenderer *ren,
                           vtkRenderWindowInteractor *rwi);
 
-  // Description:
-  // For setting the center of rotation.
-  vtkSetVector3Macro(Center, float);
-  vtkGetVector3Macro(Center, float);
-  
 protected:
-  vtkPVTrackballRotate();
-  ~vtkPVTrackballRotate();
+  vtkPVTrackballRoll();
+  ~vtkPVTrackballRoll();
 
-  float Center[3];
-  float DisplayCenter[2];
-
-  vtkPVTrackballRotate(const vtkPVTrackballRotate&); // Not implemented
-  void operator=(const vtkPVTrackballRotate&); // Not implemented
+  vtkPVTrackballRoll(const vtkPVTrackballRoll&); // Not implemented
+  void operator=(const vtkPVTrackballRoll&); // Not implemented
 };
 
 #endif

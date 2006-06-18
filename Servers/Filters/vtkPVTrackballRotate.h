@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVTrackballZoom.h
+  Module:    vtkPVTrackballRotate.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,22 +12,21 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVTrackballZoom - Zooms camera with vertical mouse movement.
+// .NAME vtkPVTrackballRotate - Rotates camera with xy mouse movement.
 // .SECTION Description
-// vtkPVTrackballZoom allows the user to interactively
+// vtkPVTrackballRotate allows the user to interactively
 // manipulate the camera, the viewpoint of the scene.
-// Moving the mouse down zooms in. Up zooms out.
 
-#ifndef __vtkPVTrackballZoom_h
-#define __vtkPVTrackballZoom_h
+#ifndef __vtkPVTrackballRotate_h
+#define __vtkPVTrackballRotate_h
 
-#include "vtkPVCameraManipulator.h"
+#include "vtkCameraManipulator.h"
 
-class VTK_EXPORT vtkPVTrackballZoom : public vtkPVCameraManipulator
+class VTK_EXPORT vtkPVTrackballRotate : public vtkCameraManipulator
 {
 public:
-  static vtkPVTrackballZoom *New();
-  vtkTypeRevisionMacro(vtkPVTrackballZoom, vtkPVCameraManipulator);
+  static vtkPVTrackballRotate *New();
+  vtkTypeRevisionMacro(vtkPVTrackballRotate, vtkCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
@@ -39,15 +38,21 @@ public:
                             vtkRenderWindowInteractor *rwi);
   virtual void OnButtonUp(int x, int y, vtkRenderer *ren,
                           vtkRenderWindowInteractor *rwi);
+
+  // Description:
+  // For setting the center of rotation.
+  vtkSetVector3Macro(Center, float);
+  vtkGetVector3Macro(Center, float);
   
 protected:
-  vtkPVTrackballZoom();
-  ~vtkPVTrackballZoom();
+  vtkPVTrackballRotate();
+  ~vtkPVTrackballRotate();
 
-  float ZoomScale;
+  float Center[3];
+  float DisplayCenter[2];
 
-  vtkPVTrackballZoom(const vtkPVTrackballZoom&); // Not implemented
-  void operator=(const vtkPVTrackballZoom&); // Not implemented
+  vtkPVTrackballRotate(const vtkPVTrackballRotate&); // Not implemented
+  void operator=(const vtkPVTrackballRotate&); // Not implemented
 };
 
 #endif

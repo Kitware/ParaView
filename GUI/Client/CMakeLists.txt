@@ -28,8 +28,14 @@ SET( ParaViewSharedNotWrapped_SRCS
   )
 
 SET(ParaViewSharedNotTclWrapped_SRCS
+  vtkPVCameraManipulator.cxx
   vtkPVProcessModuleGUIHelper.cxx
   vtkPVRenderViewProxyImplementation.cxx
+  vtkPVJoystickFly.cxx
+  vtkPVJoystickFlyIn.cxx
+  vtkPVJoystickFlyOut.cxx
+  vtkPVTrackballMoveActor.cxx
+  vtkPVTrackballPan.cxx
   )
 
 SET( ParaViewExtraWrapper_SRCS
@@ -44,7 +50,6 @@ SET( ParaViewClientNotWrapped_SRCS
   vtkPVAxesActor.cxx
   vtkPVAxesWidget.cxx
   vtkInteractorStyleTrackballMultiActor.cxx
-  vtkPVInteractorStyle.cxx
   vtkPVInteractorStyleCenterOfRotation.cxx
   vtkPVWidgetCollection.cxx
   vtkPVWorldPointPicker.cxx
@@ -81,7 +86,6 @@ SET( ParaViewClient_SRCS
   vtkPVCameraControl.cxx
   vtkPVCameraIcon.cxx
   vtkPVCameraKeyFrame.cxx
-  vtkPVCameraManipulator.cxx
   vtkPVCaveRenderModuleUI.cxx
   vtkPVColorMap.cxx
   vtkPVColorMapUI.cxx
@@ -130,9 +134,6 @@ SET( ParaViewClient_SRCS
   vtkPVInputRequirement.cxx
   vtkPVInteractorStyleControl.cxx
   vtkPVItemSelection.cxx
-  vtkPVJoystickFly.cxx
-  vtkPVJoystickFlyIn.cxx
-  vtkPVJoystickFlyOut.cxx
   vtkPVKeyFrame.cxx
   vtkPVLODRenderModuleUI.cxx
   vtkPVLabeledToggle.cxx
@@ -190,11 +191,6 @@ SET( ParaViewClient_SRCS
   vtkPVTraceFileDialog.cxx
   vtkPVTraceHelper.cxx
   vtkPVTracedWidget.cxx
-  vtkPVTrackballMoveActor.cxx
-  vtkPVTrackballPan.cxx
-  vtkPVTrackballRoll.cxx
-  vtkPVTrackballRotate.cxx
-  vtkPVTrackballZoom.cxx
   vtkPVTrackEditor.cxx
   vtkPVValueList.cxx
   vtkPVVCRControl.cxx

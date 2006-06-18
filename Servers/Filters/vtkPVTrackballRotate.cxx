@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVTrackballRoll.cxx
+  Module:    vtkPVTrackballRotate.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVTrackballRoll.h"
+#include "vtkPVTrackballRotate.h"
 
 #include "vtkMath.h"
 #include "vtkCamera.h"
@@ -22,77 +22,67 @@
 #include "vtkRenderWindow.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballRoll, "1.7");
-vtkStandardNewMacro(vtkPVTrackballRoll);
+vtkCxxRevisionMacro(vtkPVTrackballRotate, "1.1");
+vtkStandardNewMacro(vtkPVTrackballRotate);
 
 //-------------------------------------------------------------------------
-vtkPVTrackballRoll::vtkPVTrackballRoll()
+vtkPVTrackballRotate::vtkPVTrackballRotate()
+{
+  this->Center[0] = 0;
+  this->Center[1] = 0;
+  this->Center[2] = 0;
+  this->DisplayCenter[0] = 0;
+  this->DisplayCenter[1] = 0;
+}
+
+//-------------------------------------------------------------------------
+vtkPVTrackballRotate::~vtkPVTrackballRotate()
 {
 }
 
 //-------------------------------------------------------------------------
-vtkPVTrackballRoll::~vtkPVTrackballRoll()
+void vtkPVTrackballRotate::OnButtonDown(int, int, vtkRenderer *ren,
+                                        vtkRenderWindowInteractor*)
 {
-}
-
-//-------------------------------------------------------------------------
-void vtkPVTrackballRoll::OnButtonDown(int, int, vtkRenderer *,
-                                      vtkRenderWindowInteractor *)
-{
+  this->ComputeDisplayCenter(ren);
 }
 
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballRoll::OnButtonUp(int, int, vtkRenderer *,
+void vtkPVTrackballRotate::OnButtonUp(int, int, vtkRenderer *,
                                     vtkRenderWindowInteractor *)
 {
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballRoll::OnMouseMove(int x, int y, vtkRenderer *ren,
+void vtkPVTrackballRotate::OnMouseMove(int x, int y, vtkRenderer *ren,
                                      vtkRenderWindowInteractor *rwi)
 {
   if (ren == NULL)
     {
     return;
     }
-
-  vtkCamera *camera = ren->GetActiveCamera();
+  
   vtkTransform *transform = vtkTransform::New();
-  double axis[3];
-  
-  // compute view vector (rotation axis)
-  double *pos = camera->GetPosition();
-  double *fp = camera->GetFocalPoint();
-  
-  axis[0] = fp[0] - pos[0];
-  axis[1] = fp[1] - pos[1];
-  axis[2] = fp[2] - pos[2];
-  
-  // compute the angle of rotation
-  // - first compute the two vectors (center to mouse)
-  this->ComputeDisplayCenter(ren);
-
-  int x1, x2, y1, y2;
-  x1 = rwi->GetLastEventPosition()[0] - (int)this->DisplayCenter[0];
-  x2 = x - (int)this->DisplayCenter[0];
-  y1 = rwi->GetLastEventPosition()[1] - (int)this->DisplayCenter[1];
-  y2 = y - (int)this->DisplayCenter[1];
-  
-  // - compute cross product (only need z component)
-  double zCross = x1*y2 - y1*x2;
-  
-  // - divide by madnitudes to get angle
-  double angle = vtkMath::RadiansToDegrees() * zCross /
-    (sqrt(static_cast<float>(x1*x1 + y1*y1)) *
-     sqrt(static_cast<float>(x2*x2 + y2*y2)));
+  vtkCamera *camera = ren->GetActiveCamera();
+  double v2[3];
   
   // translate to center
   transform->Identity();
   transform->Translate(this->Center[0], this->Center[1], this->Center[2]);
   
-  // roll
-  transform->RotateWXYZ(angle, axis[0], axis[1], axis[2]);
+  float dx = rwi->GetLastEventPosition()[0] - x;
+  float dy = rwi->GetLastEventPosition()[1] - y;
+  
+  // azimuth
+  camera->OrthogonalizeViewUp();
+  double *viewUp = camera->GetViewUp();
+  int *size = ren->GetSize();
+  transform->RotateWXYZ(360.0 * dx / size[0], viewUp[0], viewUp[1], viewUp[2]);
+  
+  // elevation
+  vtkMath::Cross(camera->GetDirectionOfProjection(), viewUp, v2);
+  transform->RotateWXYZ(-360.0 * dy / size[1], v2[0], v2[1], v2[2]);
   
   // translate back
   transform->Translate(-this->Center[0], -this->Center[1], -this->Center[2]);
@@ -106,9 +96,11 @@ void vtkPVTrackballRoll::OnMouseMove(int x, int y, vtkRenderer *ren,
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballRoll::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVTrackballRotate::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Center: " << this->Center[0] << ", " 
+     << this->Center[1] << ", " << this->Center[2] << endl;
 }
 
 

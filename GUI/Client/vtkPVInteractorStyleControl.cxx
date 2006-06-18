@@ -43,7 +43,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.56");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.57");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -82,7 +82,7 @@ class vtkPVInteractorStyleControlInternal
 public:
 //BTX
   typedef vtkstd::vector<vtkStdString> ArrayString;
-  typedef vtkstd::map<vtkStdString,vtkSmartPointer<vtkPVCameraManipulator> > ManipulatorMap;
+  typedef vtkstd::map<vtkStdString,vtkSmartPointer<vtkCameraManipulator> > ManipulatorMap;
   typedef vtkstd::map<vtkStdString,vtkSmartPointer<vtkPVWidget> > WidgetsMap;
   typedef vtkstd::map<vtkStdString,ArrayString> MapStringToArrayString;
 
@@ -138,7 +138,7 @@ vtkPVInteractorStyleControl::~vtkPVInteractorStyleControl()
     it->InitTraversal();
     while(!it->IsDoneWithTraversal())
       {
-      vtkPVCameraManipulator* m = static_cast<vtkPVCameraManipulator*>(
+      vtkCameraManipulator* m = static_cast<vtkCameraManipulator*>(
         it->GetCurrentObject());
       m->RemoveObserver(this->Observer);
       it->GoToNextItem();
@@ -180,7 +180,7 @@ vtkPVInteractorStyleControl::~vtkPVInteractorStyleControl()
 
 //-----------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::AddManipulator(const char* name, 
-                                                 vtkPVCameraManipulator* object)
+                                                 vtkCameraManipulator* object)
 {
   this->Internals->Manipulators[name] = object;
 }
@@ -267,7 +267,7 @@ void vtkPVInteractorStyleControl::ExecuteEvent(
     {
     const char* argument = static_cast<char*>(calldata);
 
-    vtkPVCameraManipulator* manipulator = static_cast<vtkPVCameraManipulator*>(wdg);
+    vtkCameraManipulator* manipulator = static_cast<vtkCameraManipulator*>(wdg);
     const char* name = manipulator->GetManipulatorName();
   
     vtkPVInteractorStyleControlInternal::MapStringToArrayString::iterator ait = 
@@ -351,8 +351,8 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
     cit->InitTraversal();
     while ( !cit->IsDoneWithTraversal() )
       {
-      vtkPVCameraManipulator* cman 
-        = static_cast<vtkPVCameraManipulator*>(cit->GetCurrentObject());
+      vtkCameraManipulator* cman 
+        = static_cast<vtkCameraManipulator*>(cit->GetCurrentObject());
       if ( *vit == cman->GetManipulatorName() )
         {
         this->CurrentManipulator = cman;
@@ -405,7 +405,7 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
     {
     return;
     }
-  vtkPVCameraManipulator *manipulator = this->GetManipulator(name);
+  vtkCameraManipulator *manipulator = this->GetManipulator(name);
   if ( !manipulator )
     {
     return;
@@ -420,11 +420,11 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
   vtkCollectionIterator *it = this->ManipulatorCollection->NewIterator();
   it->InitTraversal();
 
-  vtkPVCameraManipulator *clone = 0;
+  vtkCameraManipulator *clone = 0;
   while(!it->IsDoneWithTraversal())
     {
-    vtkPVCameraManipulator* access 
-      = static_cast<vtkPVCameraManipulator*>(it->GetCurrentObject());
+    vtkCameraManipulator* access 
+      = static_cast<vtkCameraManipulator*>(it->GetCurrentObject());
     
     // Find previous one that matches the layout
     if ( access->GetButton() == mouse+1 &&
@@ -439,7 +439,12 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
       else
         {
         // Otherwise remove it
-        access->SetApplication(0);
+        vtkPVCameraManipulator* pvaccess
+          = vtkPVCameraManipulator::SafeDownCast(access);
+        if (pvaccess)
+          {
+          pvaccess->SetApplication(0);
+          }
         access->RemoveObserver(this->Observer);
         this->ManipulatorCollection->RemoveItem(access);
         }
@@ -454,8 +459,13 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
   if ( !clone )
     {
     clone = manipulator->NewInstance();
-    vtkPVApplication* pvApp = static_cast<vtkPVApplication*>(this->GetApplication());
-    clone->SetApplication(pvApp);
+    vtkPVApplication* pvApp = 
+      static_cast<vtkPVApplication*>(this->GetApplication());
+    if (vtkPVCameraManipulator* pvclone = 
+      vtkPVCameraManipulator::SafeDownCast(clone))
+      {
+      pvclone->SetApplication(pvApp);
+      }
     this->ManipulatorCollection->AddItem(clone); 
     clone->Delete();
     clone->AddObserver(vtkKWEvent::ManipulatorModifiedEvent, this->Observer);
@@ -497,7 +507,7 @@ int vtkPVInteractorStyleControl::SetManipulator(int pos, const char* name)
 }
 
 //-----------------------------------------------------------------------------
-vtkPVCameraManipulator* vtkPVInteractorStyleControl::GetManipulator(int pos)
+vtkCameraManipulator* vtkPVInteractorStyleControl::GetManipulator(int pos)
 {
   if ( pos < 0 || pos > 8 )
     {
@@ -509,7 +519,7 @@ vtkPVCameraManipulator* vtkPVInteractorStyleControl::GetManipulator(int pos)
 }
 
 //-----------------------------------------------------------------------------
-vtkPVCameraManipulator* 
+vtkCameraManipulator* 
 vtkPVInteractorStyleControl::GetManipulator(const char* name)
 {
   vtkPVInteractorStyleControlInternal::ManipulatorMap::iterator mit 
@@ -728,7 +738,7 @@ vtkPVWidget* vtkPVInteractorStyleControl::GetWidget(const char* name)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVInteractorStyleControl::ResetWidget(vtkPVCameraManipulator* man, 
+void vtkPVInteractorStyleControl::ResetWidget(vtkCameraManipulator* man, 
                                               const char* name)
 {
   vtkPVWidget *pw = 0;
@@ -772,7 +782,7 @@ void vtkPVInteractorStyleControl::SaveState(ofstream *file)
   it->InitTraversal();
   while (!it->IsDoneWithTraversal())
     {
-    vtkPVCameraManipulator *m = static_cast<vtkPVCameraManipulator*>(
+    vtkCameraManipulator *m = static_cast<vtkCameraManipulator*>(
       it->GetCurrentObject());
     *file << "$kw(" << this->GetTclName() << ") SetCurrentManipulator "
           << m->GetButton() - 1 << " ";
