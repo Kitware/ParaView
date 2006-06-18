@@ -49,7 +49,7 @@
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.32");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.33");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -465,7 +465,7 @@ void vtkSMRenderModuleProxy::InteractiveRender()
   renWin->SetDesiredUpdateRate(5.0);
   this->GetRenderer()->ResetCameraClippingRange();
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  //vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   //pm->SendPrepareProgress(this->ConnectionID, this->GetRenderingProgressServers());
   this->BeginInteractiveRender();
   renWin->Render();
@@ -501,7 +501,7 @@ void vtkSMRenderModuleProxy::StillRender()
     }
   renWindow->SetDesiredUpdateRate(0.002);
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  // vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   //pm->SendPrepareProgress(this->ConnectionID, this->GetRenderingProgressServers());
 
   this->BeginStillRender();
