@@ -219,11 +219,12 @@ public:
   virtual int GetPartitionId();
 
   // Description:
-  // This overrload is internal for call thru CS stream alone.
-  // Use GetNumberOfPartitions(vtkIdType id) with appropriate connection
-  // Id to get the number of server partition. This method simply returns the number
-  // of partition on the local process.
-  // NOTE: If this method is called on the client it is equivalent to
+
+  // This overrload is internal for call thru CS stream alone.  Use
+  // GetNumberOfPartitions(vtkIdType id) with appropriate connection Id to
+  // get the number of server partition. This method simply returns the
+  // number of partition on the local process.  NOTE: If this method is
+  // called on the client it is equivalent to
   // GetNumberOfPartitions(vtkProcessModuleConnectionManager::GetRootServerConnectionID()).
   virtual int GetNumberOfPartitions();
   
@@ -351,9 +352,9 @@ public:
 
 //BTX
   // Description:
-  // Earlier, the ServerInformation was synchronized with the ClientOptions.
-  // This no longer is appropriate. Hence, we provide access to the server information
-  // on each connection.
+  // Earlier, the ServerInformation was synchronized with the
+  // ClientOptions.  This no longer is appropriate. Hence, we provide
+  // access to the server information on each connection.
   vtkPVServerInformation* GetServerInformation(vtkIdType id);
 
   // Description:
@@ -393,9 +394,10 @@ public:
   vtkSocketController* GetActiveRenderServerSocketController();
 
   // Description:
-  // This is the way to get the socket controllers on all partitions/server/client etc.
-  // using the client server stream. This works because each
-  // connection (for now, each Remote connection) is assigned a ClientServerId.
+  // This is the way to get the socket controllers on all
+  // partitions/server/client etc.  using the client server stream. This
+  // works because each connection (for now, each Remote connection) is
+  // assigned a ClientServerId.
   vtkSocketController* GetSocketController(vtkProcessModuleConnection* conn);
   vtkSocketController* GetRenderServerSocketController(vtkProcessModuleConnection* conn);
 
@@ -432,26 +434,27 @@ public:
 //ETX
   
   // Description:
-  // When this flag is set, it implies that the server (or client)
-  // can accept multiple remote connections. This class only affects when running
-  // in client-server mode.
+  // When this flag is set, it implies that the server (or client) can
+  // accept multiple remote connections. This class only affects when
+  // running in client-server mode.
   vtkSetMacro(SupportMultipleConnections, int);
   vtkGetMacro(SupportMultipleConnections, int);
   vtkBooleanMacro(SupportMultipleConnections, int);
   
   // Description:
-  // Connect to remote process. Returns the connection Id for the newly created connection,
-  // on failure, NullConnectionID is returned.
-  // This method is intended to be used when 
-  // SupportMultipleConnections is true, to connect to a server, in forward connection 
-  // mode. When SupportMultipleConnections is 1, the client does not connect to
-  // a server in the call to Start(), the GUI is expected to explicitly call this method
-  // to connect to the server. Also, it is the responsibility of the GUI to call the
-  // appropriate overloaded method when running in render client mode. 
-  // TODO: this method can work even on the server -- however, currently, 
-  // the server connects to a remote client only in reverse connection mode, in which
-  // case the server can connect to 1 and only 1 client, and that connection
-  // is established in Start() itselt. Hence this method has not useful.
+  // Connect to remote process. Returns the connection Id for the newly
+  // created connection, on failure, NullConnectionID is returned.  This
+  // method is intended to be used when SupportMultipleConnections is true,
+  // to connect to a server, in forward connection mode. When
+  // SupportMultipleConnections is 1, the client does not connect to a
+  // server in the call to Start(), the GUI is expected to explicitly call
+  // this method to connect to the server. Also, it is the responsibility
+  // of the GUI to call the appropriate overloaded method when running in
+  // render client mode.  TODO: this method can work even on the server --
+  // however, currently, the server connects to a remote client only in
+  // reverse connection mode, in which case the server can connect to 1 and
+  // only 1 client, and that connection is established in Start()
+  // itselt. Hence this method has not useful.
   vtkIdType ConnectToRemote(const char* serverhost, int port);
   vtkIdType ConnectToRemote(const char* dataserver_host, int dataserver_port,
     const char* renderserver_host, int renderserver_port);
@@ -473,23 +476,25 @@ public:
   int IsRemote(vtkIdType id);
 
   // Description:
-  // Checks if any new connections are available, if so, creates vtkConnections
-  // for them. The call will wait for a timeout of msec milliseconds for a
-  // new connection to arrive. Timeout of 0 will wait until a new connection arrives.
-  // This method is intended to be used on the client when running in reverse connection
-  // mode with SupportMultipleConnections set to 1. When SupportMultipleConnections is 
-  // set to 1 Start() does not wait for server to attempt to connect to the client.
-  // The gui must explicitly call this method to check if any new connections are
-  // pending.
+  // Checks if any new connections are available, if so, creates
+  // vtkConnections for them. The call will wait for a timeout of msec
+  // milliseconds for a new connection to arrive. Timeout of 0 will wait
+  // until a new connection arrives.  This method is intended to be used on
+  // the client when running in reverse connection mode with
+  // SupportMultipleConnections set to 1. When SupportMultipleConnections
+  // is set to 1 Start() does not wait for server to attempt to connect to
+  // the client.  The gui must explicitly call this method to check if any
+  // new connections are pending.
   int MonitorConnections(unsigned long msec);
   
   // Description:
-  // Clear this flag to override using of MPI for self connection.
-  // This flag should be changed, if at all, only before calling 
-  // vtkProcessModule::Initialize() after which it has no effect. By default,
-  // this flag is set, i.e. MPI is used for self connection if available i.e.
-  // VTK is built with MPI. Typically, one does not need to change this flag manually,
-  // vtkPVMain sets this flag depending upon whether MPI was initialized or not.
+  // Clear this flag to override using of MPI for self connection.  This
+  // flag should be changed, if at all, only before calling
+  // vtkProcessModule::Initialize() after which it has no effect. By
+  // default, this flag is set, i.e. MPI is used for self connection if
+  // available i.e.  VTK is built with MPI. Typically, one does not need to
+  // change this flag manually, vtkPVMain sets this flag depending upon
+  // whether MPI was initialized or not.
   vtkSetMacro(UseMPI, int);
   vtkGetMacro(UseMPI, int);
 
