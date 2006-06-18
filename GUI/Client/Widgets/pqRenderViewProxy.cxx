@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqRenderModule.h"
 
-vtkCxxRevisionMacro(pqRenderViewProxy, "1.6");
+vtkCxxRevisionMacro(pqRenderViewProxy, "1.7");
 vtkStandardNewMacro(pqRenderViewProxy);
 //-----------------------------------------------------------------------------
 pqRenderViewProxy::pqRenderViewProxy()
@@ -54,21 +54,25 @@ pqRenderViewProxy::~pqRenderViewProxy()
 //-----------------------------------------------------------------------------
 void pqRenderViewProxy::EventuallyRender()
 {
-  this->Render();
+  if (this->RenderModule)
+    {
+    // EventuallyRender is never called during interactive render,
+    // this should try to collapse render requests and all,
+    // for now simply StillRender.
+    this->RenderModule->getRenderModuleProxy()->StillRender();
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqRenderViewProxy::Render()
 {
-  if (!this->RenderModule)
+  if (this->RenderModule)
     {
-    return;
+    // pqRenderViewProxy::Render() is only called for interactive render.
+    // Hence...
+    // render LOD's
+    this->RenderModule->getRenderModuleProxy()->InteractiveRender();
     }
-  // render LOD's
-  //this->RenderModule->getRenderModuleProxy()->InteractiveRender();
-
-  // do not render LOD's
-  this->RenderModule->getRenderModuleProxy()->StillRender();
 }
 
 //-----------------------------------------------------------------------------
@@ -91,4 +95,5 @@ void pqRenderViewProxy::setRenderModule(pqRenderModule* rm)
 void pqRenderViewProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "RenderModule: " << this->RenderModule << endl;
 }

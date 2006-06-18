@@ -94,6 +94,10 @@ private slots:
   /// Called when the "Displays" property changes.
   void displaysChanged();
 
+  // Called on start/end interaction.
+  void startInteraction();
+  void endInteraction();
+
 protected:
   // Event filter callback.
   bool eventFilter(QObject* caller, QEvent* e);

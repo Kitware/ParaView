@@ -37,6 +37,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkEventQtSlotConnect.h"
 #include "vtkProcessModule.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVInteractorStyle.h"
+#include "vtkPVTrackballRoll.h"
+#include "vtkPVTrackballRotate.h"
+#include "vtkPVTrackballZoom.h"
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
@@ -170,7 +174,6 @@ void pqRenderModule::renderModuleInit()
     vtkPVGenericRenderWindowInteractor::SafeDownCast(
       this->Internal->RenderModuleProxy->GetInteractor());
   iren->SetPVRenderView(this->Internal->RenderViewProxy);
-  iren->Enable();
 
   // Init axes actor.
   this->Internal->AxesWidget->SetParentRenderer(
@@ -179,6 +182,59 @@ void pqRenderModule::renderModuleInit()
   this->Internal->AxesWidget->SetInteractor(iren);
   this->Internal->AxesWidget->SetEnabled(1);
   this->Internal->AxesWidget->SetInteractive(0);
+
+  // Set up interactor styles.
+  vtkPVInteractorStyle* style = vtkPVInteractorStyle::New();
+  vtkCameraManipulator* manip = vtkPVTrackballRotate::New();
+  style->AddManipulator(manip);
+  manip->Delete();
+  manip = vtkPVTrackballRoll::New();
+  manip->SetButton(2);
+  style->AddManipulator(manip);
+  manip->Delete();
+  manip = vtkPVTrackballZoom::New();
+  manip->SetButton(3);
+  style->AddManipulator(manip);
+  manip->Delete();
+   
+  iren->SetInteractorStyle(style);
+  style->Delete();
+
+  this->Internal->VTKConnect->Connect(style,
+    vtkCommand::StartInteractionEvent, 
+    this, SLOT(startInteraction()));
+  this->Internal->VTKConnect->Connect(style,
+    vtkCommand::EndInteractionEvent, 
+    this, SLOT(endInteraction()));
+
+  iren->Enable();
+
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderModule::startInteraction()
+{
+  vtkPVGenericRenderWindowInteractor* iren =
+    vtkPVGenericRenderWindowInteractor::SafeDownCast(
+      this->Internal->RenderModuleProxy->GetInteractor());
+  if (!iren)
+    {
+    return;
+    }
+  iren->SetInteractiveRenderEnabled(true);
+}
+
+//-----------------------------------------------------------------------------
+void pqRenderModule::endInteraction()
+{
+  vtkPVGenericRenderWindowInteractor* iren =
+    vtkPVGenericRenderWindowInteractor::SafeDownCast(
+      this->Internal->RenderModuleProxy->GetInteractor());
+  if (!iren)
+    {
+    return;
+    }
+  iren->SetInteractiveRenderEnabled(false);
 }
 
 //-----------------------------------------------------------------------------
