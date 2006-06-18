@@ -25,12 +25,13 @@
 // manager. This is transparent to the user who sees all properties
 // as if they belong to the root proxy.
 //
-// A proxy keeps an iVar ConnectionID. This is the connection ID for
-// the connection on which this proxy exists. Currently, since a ParaView client
-// is connected to 1 and only 1 server. This ID is insignificant. However,
-// it provides the ground work to enable a client to connect with multiple servers.
-// ConnectionID must be set immediately after instantiating the proxy (if at all).
-// Chanding the ConnectionID after that can be dangerous.
+// A proxy keeps an iVar ConnectionID. This is the connection ID for the
+// connection on which this proxy exists. Currently, since a ParaView
+// client is connected to 1 and only 1 server. This ID is
+// insignificant. However, it provides the ground work to enable a client
+// to connect with multiple servers.  ConnectionID must be set immediately
+// after instantiating the proxy (if at all).  Chanding the ConnectionID
+// after that can be dangerous.
 // 
 // When defining a proxy in the XML configuration file,
 // to derrive the property interface from another proxy definition,
