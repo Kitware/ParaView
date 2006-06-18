@@ -75,6 +75,11 @@ void pqOutputWindow::onDisplayText(const QString& text)
 
 void pqOutputWindow::onDisplayWarningText(const QString& text)
 {
+  if (
+    text.contains("QEventDispatcherUNIX::unregisterTimer", Qt::CaseSensitive))
+    {
+    return;
+    }
   QTextCharFormat format = this->Implementation->Ui.consoleWidget->getFormat();
   format.setForeground(Qt::darkRed);
   format.clearBackground();
