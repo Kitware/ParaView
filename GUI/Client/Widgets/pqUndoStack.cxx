@@ -69,6 +69,18 @@ pqUndoStack::~pqUndoStack()
 }
 
 //-----------------------------------------------------------------------------
+bool pqUndoStack::CanUndo()
+{
+  return this->Implementation->UndoStack->CanUndo();
+}
+
+//-----------------------------------------------------------------------------
+bool pqUndoStack::CanRedo()
+{
+  return this->Implementation->UndoStack->CanRedo();
+}
+
+//-----------------------------------------------------------------------------
 void pqUndoStack::onStackChanged(vtkObject*, unsigned long, void*, 
     void*,  vtkCommand*)
 {

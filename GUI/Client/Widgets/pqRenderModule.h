@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqPipelineDisplay;
 class pqRenderModuleInternal;
 class pqServer;
+class pqUndoStack;
 class QVTKWidget;
 class QWidget;
 class vtkSMRenderModuleProxy;
@@ -84,6 +85,12 @@ public:
 
   /// Gets the display for the specified index.
   pqPipelineDisplay* getDisplay(int index) const;
+  
+  /// Each render module keeps a undo stack for interaction.
+  /// This method returns that undo stack. External world
+  /// typically uses it to Undo/Redo; pushing of elements on this stack
+  /// on interaction is managed by this class.
+  pqUndoStack* getInteractionUndoStack() const;
 
 private slots:
   /// if renModule is not created when this object is instantianted, we
@@ -97,6 +104,7 @@ private slots:
   // Called on start/end interaction.
   void startInteraction();
   void endInteraction();
+
 
 protected:
   // Event filter callback.

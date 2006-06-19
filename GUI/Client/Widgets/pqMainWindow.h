@@ -187,13 +187,23 @@ public slots:
 
   void enableTooltips(bool enabled = true);
 
+  // This method determine the enable state for various menus/toobars etc,
+  // and updates it.
+  void updateEnableState();
+
+protected slots:
   // Called when the Undo/Redo stack changes.
   void onUndoRedoStackChanged(bool canUndo, QString,
     bool canRedo, QString);
 
-  // This method determine the enable state for various menus/toobars etc,
-  // and updates it.
-  void updateEnableState();
+  // Called to undo interaciton on active view.
+  void UndoActiveViewInteraction();
+
+  // Called to redo interaciton on active view.
+  void RedoActiveViewInteraction();
+
+  // Called when the interaction undo/redo stack changes.
+  void updateInteractionUndoRedoState();
 
 private slots:
   // Called when selection on the pqPipelineBrowser changes.
@@ -205,7 +215,7 @@ private slots:
 
   void onActiveSourceChanged(pqPipelineSource*);
   virtual void onActiveServerChanged(pqServer*);
-  
+ 
 private slots:
   void onCreateSource(QAction*);
   void onCreateFilter(QAction*);

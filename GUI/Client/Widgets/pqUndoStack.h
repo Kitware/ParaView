@@ -51,6 +51,8 @@ public:
   pqUndoStack(QObject* parent=NULL);
   virtual ~pqUndoStack();
 
+  bool CanUndo();
+  bool CanRedo();
 public slots:
   /// NOTE: Notice that the BeginOrContinueUndoSet doesn;t take
   /// connection Id. This is for two reasons:

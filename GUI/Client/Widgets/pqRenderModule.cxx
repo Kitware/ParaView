@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderViewProxy.h"
 #include "pqServerManagerModel.h"
 #include "pqSetName.h"
+#include "pqUndoStack.h"
 #include "vtkPVAxesWidget.h"
 
 template<class T>
@@ -74,6 +75,7 @@ public:
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnect;
   vtkSmartPointer<vtkSMRenderModuleProxy> RenderModuleProxy;
   vtkSmartPointer<vtkPVAxesWidget> AxesWidget;
+  pqUndoStack* UndoStack;
 
   // List of displays shown by this render module.
   QList<QPointer<pqPipelineDisplay> > Displays;
@@ -84,11 +86,13 @@ public:
     this->RenderViewProxy = vtkSmartPointer<pqRenderViewProxy>::New();
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     this->AxesWidget = vtkSmartPointer<vtkPVAxesWidget>::New();
+    this->UndoStack = new pqUndoStack;
     }
 
   ~pqRenderModuleInternal()
     {
     this->RenderViewProxy->setRenderModule(0);
+    delete this->UndoStack;
     }
 };
 
@@ -149,6 +153,12 @@ vtkSMRenderModuleProxy* pqRenderModule::getRenderModuleProxy() const
 QVTKWidget* pqRenderModule::getWidget() const
 {
   return this->Internal->Viewport;
+}
+
+//-----------------------------------------------------------------------------
+pqUndoStack* pqRenderModule::getInteractionUndoStack() const
+{
+  return this->Internal->UndoStack;
 }
 
 //-----------------------------------------------------------------------------
@@ -214,6 +224,15 @@ void pqRenderModule::renderModuleInit()
 //-----------------------------------------------------------------------------
 void pqRenderModule::startInteraction()
 {
+  // It is essential to synchronize camera properties prior to starting the 
+  // interaction since the current state of the camera might be different from 
+  // that reflected by the properties.
+  this->Internal->RenderModuleProxy->SynchronizeCameraProperties();
+  
+  // NOTE: bewary of the server used while calling
+  // BeginOrContinueUndoSet on vtkSMUndoStack.
+  this->Internal->UndoStack->BeginOrContinueUndoSet("Interaction");
+
   vtkPVGenericRenderWindowInteractor* iren =
     vtkPVGenericRenderWindowInteractor::SafeDownCast(
       this->Internal->RenderModuleProxy->GetInteractor());
@@ -227,6 +246,9 @@ void pqRenderModule::startInteraction()
 //-----------------------------------------------------------------------------
 void pqRenderModule::endInteraction()
 {
+  this->Internal->RenderModuleProxy->SynchronizeCameraProperties();
+  this->Internal->UndoStack->EndUndoSet();
+
   vtkPVGenericRenderWindowInteractor* iren =
     vtkPVGenericRenderWindowInteractor::SafeDownCast(
       this->Internal->RenderModuleProxy->GetInteractor());

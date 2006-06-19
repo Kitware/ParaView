@@ -360,6 +360,20 @@ void pqMainWindow::createStandardEditMenu()
     QKeySequence(Qt::CTRL + Qt::Key_R))
     << pqSetName("Redo");
   action->setEnabled(false);
+
+  menu->addSeparator();
+
+  action = menu->addAction(tr("Can't U&ndo Interaction"), this,
+    SLOT(UndoActiveViewInteraction()),
+    QKeySequence(Qt::CTRL + Qt::Key_C, Qt::CTRL + Qt::Key_Z))
+    << pqSetName("CameraUndo");
+  action->setEnabled(false);
+
+  action = menu->addAction(tr("Can't R&edo Interaction"), this,
+    SLOT(RedoActiveViewInteraction()),
+    QKeySequence(Qt::CTRL + Qt::Key_C, Qt::CTRL + Qt::Key_R))
+    << pqSetName("CameraRedo");
+  action->setEnabled(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -2073,9 +2087,9 @@ void pqMainWindow::updateEnableState()
     compoundFilterAction->setEnabled(server != 0 && !pending_displays);
     }
 
+  pqRenderModule* rm = pqApplicationCore::instance()->getActiveRenderModule();
   if (this->Implementation->SelectionToolBar)
     {
-    pqRenderModule* rm = pqApplicationCore::instance()->getActiveRenderModule();
     if (rm)
       {
       this->Implementation->SelectionToolBar->setEnabled(true);
@@ -2085,6 +2099,8 @@ void pqMainWindow::updateEnableState()
       this->Implementation->SelectionToolBar->setEnabled(false);
       }
     }
+
+  this->updateInteractionUndoRedoState();
 }
 
 //-----------------------------------------------------------------------------
@@ -2139,5 +2155,77 @@ void pqMainWindow::onActiveRenderModuleChanged(pqRenderModule* rm)
   if (rm && rm->getWidget())
     {
     rm->getWidget()->installEventFilter(this);
+    }
+  if (rm)
+    {
+    QObject::connect(rm->getInteractionUndoStack(), 
+      SIGNAL(StackChanged(bool, QString, bool, QString)),
+        this, SLOT(updateInteractionUndoRedoState()));
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::UndoActiveViewInteraction()
+{
+  pqRenderModule* view = pqApplicationCore::instance()->getActiveRenderModule();
+  if (!view)
+    {
+    qDebug() << "No active render module, cannot UndoActiveViewInteraction.";
+    return;
+    }
+  pqUndoStack* stack = view->getInteractionUndoStack();
+  stack->Undo();
+  view->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::RedoActiveViewInteraction()
+{
+  pqRenderModule* view = pqApplicationCore::instance()->getActiveRenderModule();
+  if (!view)
+    {
+    qDebug() << "No active render module, cannot RedoActiveViewInteraction.";
+    return;
+    }
+  pqUndoStack* stack = view->getInteractionUndoStack();
+  stack->Redo();
+  view->render();
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::updateInteractionUndoRedoState()
+{
+  if (this->Implementation->EditMenu)
+    {
+    QAction* undoAction = 
+      this->Implementation->EditMenu->findChild<QAction*>("CameraUndo");
+    QAction* redoAction = 
+      this->Implementation->EditMenu->findChild<QAction*>("CameraRedo");
+
+    bool canUndo = false;
+    bool canRedo = false;
+    QString undoMsg = "Can't U&ndo Interaction";
+    QString redoMsg = "Can't R&edo Interaction";
+    
+    pqRenderModule* rm = pqApplicationCore::instance()->getActiveRenderModule();
+    if (rm)
+      {
+      pqUndoStack* stack = rm->getInteractionUndoStack();
+      if (stack && stack->CanUndo())
+        {
+        canUndo = true;
+        undoMsg = "U&ndo Interaction";
+        }
+      if (stack && stack->CanRedo())
+        {
+        canRedo = true;
+        redoMsg = "R&edo Interaction";
+        }
+      }
+
+    undoAction->setEnabled(canUndo);
+    undoAction->setText(undoMsg);
+    redoAction->setEnabled(canRedo);
+    redoAction->setText(redoMsg);
     }
 }
