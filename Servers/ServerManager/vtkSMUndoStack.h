@@ -117,6 +117,13 @@ public:
   void SetStateLoader(vtkSMUndoRedoStateLoader*);
   vtkGetObjectMacro(StateLoader, vtkSMUndoRedoStateLoader);
 
+  // Description:
+  // Typically undo stacks have their state saved on the server. This may not 
+  // be necessary always. If this flag is set, the undo stack is kept only on
+  // the client. Off by default.
+  vtkSetMacro(ClientOnly, int);
+  vtkGetMacro(ClientOnly, int);
+  vtkBooleanMacro(ClientOnly, int);
 //BTX
 protected:
   vtkSMUndoStack();
@@ -162,6 +169,8 @@ protected:
   int ProcessRedo(vtkIdType id, vtkPVXMLElement* root);
 
   vtkSMUndoRedoStateLoader* StateLoader;
+
+  int ClientOnly;
 private:
   vtkSMUndoStack(const vtkSMUndoStack&); // Not implemented.
   void operator=(const vtkSMUndoStack&); // Not implemented.
