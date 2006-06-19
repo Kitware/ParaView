@@ -203,6 +203,17 @@ pqImplicitPlaneWidget::~pqImplicitPlaneWidget()
   delete this->Implementation;
 }
 
+void pqImplicitPlaneWidget::showWidget()
+{
+  this->show3DWidget(
+    this->Implementation->Visibility[this->Implementation->BoundingBoxProxy]);
+}
+
+void pqImplicitPlaneWidget::hideWidget()
+{
+  this->show3DWidget(false);
+}
+
 //-----------------------------------------------------------------------------
 void pqImplicitPlaneWidget::setBoundingBoxProxy(pqSMProxy proxy)
 {

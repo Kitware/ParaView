@@ -47,6 +47,11 @@ public:
   pqImplicitPlaneWidget(QWidget* p);
   ~pqImplicitPlaneWidget();
 
+  /// Makes the 3D widget visible (but respects the user's choice if they've turned visibility off)
+  void showWidget();
+  /// Hides the 3D widget
+  void hideWidget();
+
   /// Sets a source proxy that will be used to specify the bounding-box for the 3D widget
   void setBoundingBoxProxy(pqSMProxy proxy);
 
