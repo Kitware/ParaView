@@ -30,9 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-//#include "pqParts.h"
-//#include "pqPipelineDisplay.h"
-//#include "pqPipelineSource.h"
 #include "pqArrayMenu.h"
 
 #include <vtkPVArrayInformation.h>
@@ -42,25 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QComboBox>
 #include <QHBoxLayout>
-
-/*
-#include "vtkPVArrayInformation.h"
-#include "vtkPVGeometryInformation.h"
-#include "vtkPVDataSetAttributesInformation.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkEventQtSlotConnect.h"
-
-#include <QList>
-#include <QRegExp>
-#include <QtDebug>
-
-#include "pqApplicationCore.h"
-#include "pqPipelineFilter.h"
-#include "pqRenderModule.h"
-#include "pqSMAdaptor.h"
-#include "pqUndoStack.h"
-*/
 
 ///////////////////////////////////////////////////////////////////////////////
 // pqArrayMenu::pqImplementation
@@ -86,16 +64,6 @@ public:
 
   /// Lists available variables in a drop-down list
   QComboBox Arrays;
-
-/*
-  /// Converts a variable type and name into a packed string representation 
-  /// that can be used with a combo box.
-  static const QString arrayData(pqVariableType, const QString& name);
-  
-  bool PendingDisplayPropertyConnections;
-  QPointer<pqPipelineSource> SelectedSource;
-  vtkEventQtSlotConnect* VTKConnect;
-*/
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -124,47 +92,6 @@ pqArrayMenu::~pqArrayMenu()
   delete this->Implementation;
 }
 
-/*
-//-----------------------------------------------------------------------------
-pqArrayMenu::pqArrayMenu( QWidget *p ) :
-  QWidget( p ),
-  BlockEmission(false)
-{
-  this->Layout  = new QHBoxLayout( this );
-  this->Layout->setMargin(0);
-  this->Layout->setSpacing(6);
-
-  this->Arrays = new QComboBox( this );
-  this->Arrays->setObjectName("Arrays");
-  this->Arrays->setMinimumSize( QSize( 150, 20 ) );
-
-  this->Layout->setMargin( 0 );
-  this->Layout->setSpacing( 1 );
-  this->Layout->addWidget(this->Arrays);
-
-
-  QObject::connect(this, 
-    SIGNAL(variableChanged(pqVariableType, const QString&)),
-    this,
-    SLOT(onVariableChanged(pqVariableType, const QString&)));
-
-  this->VTKConnect = vtkEventQtSlotConnect::New();
-  this->PendingDisplayPropertyConnections = true;
-  this->BlockEmission = false;
-}
-
-//-----------------------------------------------------------------------------
-pqArrayMenu::~pqArrayMenu()
-{
-  delete this->Layout;
-  delete this->Arrays;
-  
-  this->Layout = 0;
-  this->Arrays = 0;
-  this->VTKConnect->Delete();
-}
-*/
-
 //-----------------------------------------------------------------------------
 void pqArrayMenu::clear()
 {
@@ -183,6 +110,20 @@ void pqArrayMenu::add(pqVariableType type, const QString& name)
 
   this->Implementation->Arrays.addItem(
     name, this->Implementation->arrayData(type, name));
+  
+  switch(type)
+    {
+    case VARIABLE_TYPE_NONE:
+      break;
+    case VARIABLE_TYPE_NODE:
+      this->Implementation->Arrays.setItemIcon(
+        this->Implementation->Arrays.count() - 1, QIcon(":/pqWidgets/pqPointData16.png"));
+      break;
+    case VARIABLE_TYPE_CELL:
+      this->Implementation->Arrays.setItemIcon(
+        this->Implementation->Arrays.count() - 1, QIcon(":/pqWidgets/pqCellData16.png"));
+      break;
+    }
 }
 
 void pqArrayMenu::add(vtkSMSourceProxy* source)
@@ -260,134 +201,3 @@ void pqArrayMenu::onArrayActivated(int /*row*/)
 {
   emit arrayChanged();
 }
-
-/*
-//-----------------------------------------------------------------------------
-void pqArrayMenu::chooseVariable(pqVariableType type, 
-  const QString& name)
-{
-  const int row = this->Arrays->findData(arrayData(type, name));
-  if(row != -1)
-    {
-    this->Arrays->setCurrentIndex(row);
-    }
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-void pqArrayMenu::onVariableChanged(pqVariableType vtkNotUsed(type), 
-  const QString& name)
-{
-  if (!this->SelectedSource || !this->SelectedSource->getDisplayCount())
-    {
-    return;
-    }
-
-  // I cannot decide if we should use signals here of directly 
-  // call the appropriate methods on undo stack.
-  pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
-
-  stack->BeginOrContinueUndoSet("Color Change");
-  pqPipelineDisplay* display = this->SelectedSource->getDisplay(0);
-  pqPart::SetColorField(display->getDisplayProxy(), name);
-  stack->EndUndoSet();
-  pqApplicationCore::instance()->getActiveRenderModule()->render();
-}
-
-//-----------------------------------------------------------------------------
-void pqArrayMenu::updateVariableSelector(pqPipelineSource* source)
-{
-  this->VTKConnect->Disconnect();
-  this->SelectedSource = source;
-  this->PendingDisplayPropertyConnections = true;
-  this->BlockEmission = true;
-  this->clear();
-  this->addVariable(VARIABLE_TYPE_NONE, "Solid Color");
-  this->BlockEmission = false;
-
-  if (!source || source->getDisplayCount() == 0)
-    {
-    // nothing more to do.
-    return;
-    }
-
-  this->reloadGUI();
-}
-
-//-----------------------------------------------------------------------------
-void pqArrayMenu::updateGUI()
-{
-  if (this->SelectedSource && this->SelectedSource->getDisplayCount())
-    {
-    this->BlockEmission = true;
-    this->Arrays->setCurrentIndex(
-      this->Arrays->findText(pqPart::GetColorField(
-          this->SelectedSource->getDisplay(0)->getDisplayProxy())));
-    this->BlockEmission = false;
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqArrayMenu::reloadGUI()
-{
-  pqPipelineSource* source = this->SelectedSource;
-  if (!source || source->getDisplayCount() == 0)
-    {
-    return;
-    }
-
-  this->BlockEmission = true;
-  this->clear();
-  this->addVariable(VARIABLE_TYPE_NONE, "Solid Color");
-
-  pqPipelineDisplay* display = source->getDisplay(0);
-  vtkSMDataObjectDisplayProxy* displayProxy = display->getDisplayProxy();
-
-  QList<QString> arrayList = pqPart::GetColorFields(displayProxy);
-  QRegExp regExpCell("\\(cell\\)\\w*$");
-  QRegExp regExpPoint("\\(point\\)\\w*$");
-  foreach(QString arrayName, arrayList)
-    {
-    if (arrayName == "Solid Color")
-      {
-      this->addVariable(VARIABLE_TYPE_NONE, arrayName);
-      }
-    else if (regExpCell.indexIn(arrayName) != -1)
-      {
-      this->addVariable(VARIABLE_TYPE_NODE, arrayName);
-      }
-    else if (regExpPoint.indexIn(arrayName) != -1)
-      {
-      this->addVariable(VARIABLE_TYPE_CELL, arrayName);
-      }
-    }
-
-  QString currentArray = pqPart::GetColorField(displayProxy);
-  int index =  this->Arrays->findText(currentArray);
-  if (index == -1)
-    {
-    index = 0;
-    }
-
-  this->Arrays->blockSignals(true);
-  this->Arrays->setCurrentIndex(index);
-  this->Arrays->blockSignals(false);
-
-  if (this->PendingDisplayPropertyConnections)
-    {
-    this->VTKConnect->Connect(displayProxy->GetProperty("ScalarVisibility"),
-      vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
-    this->VTKConnect->Connect(displayProxy->GetProperty("ScalarMode"),
-      vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
-    this->VTKConnect->Connect(displayProxy->GetProperty("ColorArray"),
-      vtkCommand::ModifiedEvent, this, SLOT(updateGUI()));
-    this->VTKConnect->Connect(
-      displayProxy->GetProperty("Representation"), vtkCommand::ModifiedEvent, 
-      this, SLOT(reloadGUI()),
-      NULL, 0.0,
-      Qt::QueuedConnection);
-    this->PendingDisplayPropertyConnections = false;
-    }
-  this->BlockEmission = false;
-}
-*/
