@@ -112,7 +112,7 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
 
 
   // *  Create the Undo/Redo stack.
-  this->Internal->UndoStack = new pqUndoStack(this);
+  this->Internal->UndoStack = new pqUndoStack(false, this);
 
   // *  Create the pqPipelineBuilder. This is used to create pipeline objects.
   this->Internal->PipelineBuilder = new pqPipelineBuilder(this);

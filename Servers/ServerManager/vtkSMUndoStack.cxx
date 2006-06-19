@@ -69,9 +69,18 @@ public:
  
   virtual int Undo() 
     {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkPVXMLElement* state = pm->NewNextUndo(this->ConnectionID);
     int status=0;
+    vtkPVXMLElement* state;
+    if (this->State)
+      {
+      state = this->State;
+      state->Register(this);
+      }
+    else
+      {
+      vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+      state = pm->NewNextUndo(this->ConnectionID);
+      }
     if (state)
       {
       status = this->UndoRedoManager->ProcessUndo(this->ConnectionID, state);    
@@ -82,9 +91,18 @@ public:
   
   virtual int Redo() 
     {
-    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkPVXMLElement* state = pm->NewNextRedo(this->ConnectionID);
     int status = 0;
+    vtkPVXMLElement* state;
+    if (this->State)
+      {
+      state = this->State;
+      state->Register(this);
+      }
+    else
+      {
+      vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+      state = pm->NewNextRedo(this->ConnectionID);
+      }
     if (state)
       {
       status = this->UndoRedoManager->ProcessRedo(this->ConnectionID, state);    
@@ -108,6 +126,11 @@ public:
     this->UndoRedoManager = r;
     }
 
+  void SetState(vtkPVXMLElement* elem)
+    {
+    this->State = elem;
+    }
+
 protected:
   vtkSMUndoStackUndoSet() 
     {
@@ -118,21 +141,26 @@ protected:
 
   vtkIdType ConnectionID;
   vtkSMUndoStack* UndoRedoManager;
+
+  // State is set for Client side only elements. If state is NULL, then and then 
+  // alone an attempt is made to obtain the state from the server.
+  vtkSmartPointer<vtkPVXMLElement> State;
 private:
   vtkSMUndoStackUndoSet(const vtkSMUndoStackUndoSet&);
   void operator=(const vtkSMUndoStackUndoSet&);
 };
 
 vtkStandardNewMacro(vtkSMUndoStackUndoSet);
-vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.7");
+vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.8");
 //*****************************************************************************
 
 vtkStandardNewMacro(vtkSMUndoStack);
-vtkCxxRevisionMacro(vtkSMUndoStack, "1.7");
+vtkCxxRevisionMacro(vtkSMUndoStack, "1.8");
 vtkCxxSetObjectMacro(vtkSMUndoStack, StateLoader, vtkSMUndoRedoStateLoader);
 //-----------------------------------------------------------------------------
 vtkSMUndoStack::vtkSMUndoStack()
 {
+  this->ClientOnly = 0;
   this->Observer = vtkSMUndoStackObserver::New();
   this->Observer->SetTarget(this);
   this->ActiveUndoSet = NULL;
@@ -250,15 +278,27 @@ void vtkSMUndoStack::Push(vtkIdType cid, const char* label, vtkUndoSet* set)
     return;
     }
   
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkPVXMLElement* state = set->SaveState(NULL);
   // state->PrintXML();
-  pm->PushUndo(cid, label, state);
-  state->Delete();
+  if (this->ClientOnly)
+    {
+    vtkSMUndoStackUndoSet* elem = vtkSMUndoStackUndoSet::New();
+    elem->SetConnectionID(cid);
+    elem->SetUndoRedoManager(this);
+    elem->SetState(state);
+    this->Superclass::Push(label, elem);
+    elem->Delete();
+    }
+  else
+    {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    pm->PushUndo(cid, label, state);
 
-  // For now, call this method direcly, eventually, PM may fire and event or something
-  // when the undo stack on any connection is updated.
-  this->PushUndoConnection(label, cid); 
+    // For now, call this method direcly, eventually, PM may fire and event or something
+    // when the undo stack on any connection is updated.
+    this->PushUndoConnection(label, cid); 
+    }
+  state->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -446,7 +486,6 @@ int vtkSMUndoStack::Undo()
     vtkErrorMacro("Cannot undo. Nothing on undo stack.");
     return 0;
     }
-
   if (this->ActiveUndoSet)
     {
     this->ActiveUndoSet->Undo();
@@ -479,6 +518,7 @@ int vtkSMUndoStack::Redo()
 void vtkSMUndoStack::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent <<"StateLoader: " << this->StateLoader << endl;
+  os << indent << "StateLoader: " << this->StateLoader << endl;
+  os << indent << "ClientOnly: " << this->ClientOnly << endl;
 }
 

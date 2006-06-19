@@ -48,11 +48,12 @@ class PQWIDGETS_EXPORT pqUndoStack : public QObject
 {
   Q_OBJECT
 public:
-  pqUndoStack(QObject* parent=NULL);
+  pqUndoStack(bool clientOnly, QObject* parent=NULL);
   virtual ~pqUndoStack();
 
   bool CanUndo();
   bool CanRedo();
+
 public slots:
   /// NOTE: Notice that the BeginOrContinueUndoSet doesn;t take
   /// connection Id. This is for two reasons:

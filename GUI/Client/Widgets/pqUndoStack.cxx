@@ -52,10 +52,12 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-pqUndoStack::pqUndoStack(QObject* _parent/*=null*/) :QObject(_parent)
+pqUndoStack::pqUndoStack(bool clientOnly, QObject* _parent/*=null*/) 
+:QObject(_parent)
 {
   this->Implementation = new pqUndoStackImplementation;
   this->Implementation->UndoStack = vtkSmartPointer<vtkSMUndoStack>::New();
+  this->Implementation->UndoStack->SetClientOnly(clientOnly);
   this->Implementation->VTKConnector = vtkSmartPointer<vtkEventQtSlotConnect>::New();
   this->Implementation->VTKConnector->Connect(this->Implementation->UndoStack,
     vtkCommand::ModifiedEvent, this, SLOT(onStackChanged(vtkObject*, 

@@ -365,13 +365,13 @@ void pqMainWindow::createStandardEditMenu()
 
   action = menu->addAction(tr("Can't U&ndo Interaction"), this,
     SLOT(UndoActiveViewInteraction()),
-    QKeySequence(Qt::CTRL + Qt::Key_C, Qt::CTRL + Qt::Key_Z))
+    QKeySequence(Qt::CTRL + Qt::Key_B))
     << pqSetName("CameraUndo");
   action->setEnabled(false);
 
   action = menu->addAction(tr("Can't R&edo Interaction"), this,
     SLOT(RedoActiveViewInteraction()),
-    QKeySequence(Qt::CTRL + Qt::Key_C, Qt::CTRL + Qt::Key_R))
+    QKeySequence(Qt::CTRL + Qt::Key_F))
     << pqSetName("CameraRedo");
   action->setEnabled(false);
 }

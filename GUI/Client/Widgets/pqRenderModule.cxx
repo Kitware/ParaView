@@ -86,7 +86,7 @@ public:
     this->RenderViewProxy = vtkSmartPointer<pqRenderViewProxy>::New();
     this->VTKConnect = vtkSmartPointer<vtkEventQtSlotConnect>::New();
     this->AxesWidget = vtkSmartPointer<vtkPVAxesWidget>::New();
-    this->UndoStack = new pqUndoStack;
+    this->UndoStack = new pqUndoStack(true);
     }
 
   ~pqRenderModuleInternal()
