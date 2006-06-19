@@ -49,7 +49,7 @@
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.34");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.35");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1167,6 +1167,7 @@ void vtkSMRenderModuleProxy::SynchronizeCameraProperties()
     if (dvp && info_dvp)
       {
       dvp->SetElements(info_dvp->GetElements());
+      dvp->UpdateLastPushedValues();
       }
     }
   iter->Delete();

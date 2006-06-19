@@ -132,6 +132,15 @@ protected:
   vtkSMDoubleVectorProperty();
   ~vtkSMDoubleVectorProperty();
 
+  //BTX
+  friend class vtkSMRenderModuleProxy;
+  //ETX
+
+  // Description:
+  // This method sets the internal data structure that saves 
+  // last pushed values to the current values of the property.
+  virtual void UpdateLastPushedValues();
+
   virtual int ReadXMLAttributes(vtkSMProxy* parent, 
                                 vtkPVXMLElement* element);
 
