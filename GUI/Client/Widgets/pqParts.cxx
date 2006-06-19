@@ -292,7 +292,7 @@ void pqPart::Color(vtkSMDisplayProxy* Part)
 /// color the part by a specific field, if fieldname is NULL, colors by
 //actor color
 void pqPart::Color(vtkSMDisplayProxy* displayProxy, 
-  const char* fieldname, int fieldtype)
+  const char* fieldname, int fieldtype, vtkSMProxy* lookupTable)
 {
   if(fieldname == 0)
     {
@@ -314,6 +314,7 @@ void pqPart::Color(vtkSMDisplayProxy* displayProxy,
     {
     qDebug() << "Cannot color a display proxy which does  not have a "
       << " pqPipelineDisplay.";
+    abort();
     return;
     }
     
@@ -323,7 +324,14 @@ void pqPart::Color(vtkSMDisplayProxy* displayProxy,
   if (pp->GetNumberOfProxies() == 0)
     {
     // create lut only if one doesn't already exist.
-    lut = builder->createLookupTable(displayObject);
+    if ( lookupTable )
+      {
+      lut = lookupTable;
+      }
+    else
+      {
+      lut = builder->createLookupTable(displayObject);
+      }
     }
   else
     {
