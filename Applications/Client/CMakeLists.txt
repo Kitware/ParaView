@@ -106,6 +106,7 @@ ENDIF(APPLE)
     ObjectInspectorSphere
     VariableSelector
     Clip
+    ClipHidden
     Cut
     CutMulti
     Threshold

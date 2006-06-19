@@ -9,7 +9,7 @@
     <x>0</x>
     <y>0</y>
     <width>206</width>
-    <height>211</height>
+    <height>285</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -22,6 +22,13 @@
    <property name="spacing" >
     <number>6</number>
    </property>
+   <item>
+    <widget class="QCheckBox" name="show3DWidget" >
+     <property name="text" >
+      <string>Show 3D Manipulators</string>
+     </property>
+    </widget>
+   </item>
    <item>
     <layout class="QGridLayout" >
      <property name="margin" >

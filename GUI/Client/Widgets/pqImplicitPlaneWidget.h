@@ -55,12 +55,13 @@ public:
   /// Sets the current state of the widget
   void setWidgetState(const double origin[3], const double normal[3]);
 
-public slots:
-  /// Enables the 3D Widget. 
-  virtual void enableWidget();
-  /// Disables the 3D widget.
-  virtual void disableWidget();
-  
+signals:
+  /// Provides a notification that the 3D widget has been modified
+  void widgetChanged();
+
+private slots:
+  /// Called to show/hide the 3D widget
+  void onShow3DWidget(bool);
   /// Called to reset the 3D widget bounds to the bounding box proxy's
   void onResetBounds();
   /// Called to set the widget origin to the center of the bounding box proxy's data
@@ -73,29 +74,22 @@ public slots:
   void onUseZNormal();
   /// Called to set the widget normal to the camera direction
   void onUseCameraNormal();
-
-signals:
-  /// Provides a notification that the 3D widget has been modified
-  void widgetChanged();
-
-private slots:
   /// Called if any of the Qt widget values is modified
   void onQtWidgetChanged();
   /// Called if the 3D widget is modified
   void on3DWidgetChanged();
 
 private:
-  /// Pushes values into the Qt widgets
+  void show3DWidget(bool show);
   void updateQtWidgets(const double* origin, const double* normal);
-  /// Pushes values into the 3D widget
   void update3DWidget(const double* origin, const double* normal);
+
+  class pqImplementation;
+  pqImplementation* const Implementation;
   
   class WidgetObserver;
   friend class WidgetObserver;
   WidgetObserver* const Observer;
-
-  class pqImplementation;
-  pqImplementation* const Implementation;
 };
 
 #endif

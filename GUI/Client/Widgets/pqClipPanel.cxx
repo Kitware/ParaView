@@ -237,14 +237,10 @@ void pqClipPanel::select()
   this->PropertyManager->registerLink(
     &this->Implementation->InsideOutWidget, "checked", SIGNAL(toggled(bool)),
     this->Proxy, this->Proxy->GetProperty("InsideOut"));
-
-  this->Implementation->ImplicitPlaneWidget.enableWidget();
 }
 
 void pqClipPanel::deselect()
 {
-  this->Implementation->ImplicitPlaneWidget.disableWidget();
-
   this->PropertyManager->unregisterLink(
     &this->Implementation->InsideOutWidget, "checked", SIGNAL(toggled(bool)),
     this->Proxy, this->Proxy->GetProperty("InsideOut"));

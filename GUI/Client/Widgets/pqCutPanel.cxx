@@ -290,10 +290,8 @@ void pqCutPanel::setProxyInternal(pqSMProxy p)
 
 void pqCutPanel::select()
 {
-  this->Implementation->ImplicitPlaneWidget.enableWidget();
 }
 
 void pqCutPanel::deselect()
 {
-  this->Implementation->ImplicitPlaneWidget.disableWidget();
 }
