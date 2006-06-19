@@ -40,6 +40,7 @@
         <file alias="pqServer22.png">Resources/pqServer22.png</file>
         <file alias="pqServer32.png">Resources/pqServer32.png</file>
         <file alias="pqSideSet16.png">Resources/pqSideSet16.png</file>
+        <file alias="pqSolidColor16.png">Resources/pqSolidColor16.png</file>
         <file alias="pqSource16.png">Resources/pqSource16.png</file>
         <file alias="pqSource22.png">Resources/pqSource22.png</file>
         <file alias="pqSource32.png">Resources/pqSource32.png</file>

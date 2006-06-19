@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QList>
 #include <QRegExp>
 #include <QtDebug>
+#include <QIcon>
 
 #include "pqApplicationCore.h"
 #include "pqParts.h"
@@ -60,6 +61,10 @@ pqDisplayColorWidget::pqDisplayColorWidget( QWidget *p ) :
   QWidget( p ),
   BlockEmission(false)
 {
+  this->CellDataIcon = new QIcon(":/pqWidgets/pqCellData16.png");
+  this->PointDataIcon = new QIcon(":/pqWidgets/pqPointData16.png");
+  this->SolidColorIcon = new QIcon(":/pqWidgets/pqSolidColor16.png");
+
   this->Layout  = new QHBoxLayout( this );
   this->Layout->setMargin(0);
   this->Layout->setSpacing(6);
@@ -90,6 +95,8 @@ pqDisplayColorWidget::~pqDisplayColorWidget()
 {
   delete this->Layout;
   delete this->Variables;
+  delete this->CellDataIcon;
+  delete this->PointDataIcon;
   
   this->Layout = 0;
   this->Variables = 0;
@@ -119,14 +126,16 @@ void pqDisplayColorWidget::addVariable(pqVariableType type,
   switch(type)
     {
     case VARIABLE_TYPE_NONE:
-      this->Variables->addItem("Solid Color", this->variableData(type, name));
+      this->Variables->addItem(*this->SolidColorIcon,
+        "Solid Color", this->variableData(type, name));
       break;
     case VARIABLE_TYPE_NODE:
-      this->Variables->addItem(name, 
+      this->Variables->addItem(*this->PointDataIcon, name, 
         this->variableData(type, name));
       break;
     case VARIABLE_TYPE_CELL:
-      this->Variables->addItem(name, this->variableData(type, name));
+      this->Variables->addItem(*this->CellDataIcon,
+        name, this->variableData(type, name));
       break;
     }
   this->BlockEmission = old_value;
@@ -267,11 +276,11 @@ void pqDisplayColorWidget::reloadGUI()
       }
     else if (regExpCell.indexIn(arrayName) != -1)
       {
-      this->addVariable(VARIABLE_TYPE_NODE, arrayName);
+      this->addVariable(VARIABLE_TYPE_CELL, arrayName);
       }
     else if (regExpPoint.indexIn(arrayName) != -1)
       {
-      this->addVariable(VARIABLE_TYPE_CELL, arrayName);
+      this->addVariable(VARIABLE_TYPE_NODE, arrayName);
       }
     }
 

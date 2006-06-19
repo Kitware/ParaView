@@ -96,7 +96,11 @@ private:
   /// Converts a variable type and name into a packed string representation 
   /// that can be used with a combo box.
   static const QString variableData(pqVariableType, const QString& name);
-  
+ 
+  QIcon* CellDataIcon;
+  QIcon* PointDataIcon;
+  QIcon* SolidColorIcon;
+
   QHBoxLayout* Layout;
   QComboBox* Variables;
   bool BlockEmission;
