@@ -470,16 +470,25 @@ void pqImplicitPlaneWidget::show3DWidget(bool show_widget)
 {
   if(this->Implementation->Widget)
     {
+    this->Implementation->Ignore3DWidget = true;
+    
     if(vtkSMIntVectorProperty* const visibility =
       vtkSMIntVectorProperty::SafeDownCast(
         this->Implementation->Widget->GetProperty("Visibility")))
       {
-      this->Implementation->Ignore3DWidget = true;
       visibility->SetElement(0, show_widget);
-      this->Implementation->Widget->UpdateVTKObjects();
-      pqApplicationCore::instance()->render();
-      this->Implementation->Ignore3DWidget = false;
       }
+
+    if(vtkSMIntVectorProperty* const enabled =
+      vtkSMIntVectorProperty::SafeDownCast(
+        this->Implementation->Widget->GetProperty("Enabled")))
+      {
+      enabled->SetElement(0, show_widget);
+      }
+
+    this->Implementation->Widget->UpdateVTKObjects();
+    pqApplicationCore::instance()->render();
+    this->Implementation->Ignore3DWidget = false;
     }
 }
 
