@@ -81,6 +81,7 @@ SET(Filters_SRCS
   vtkTemporalPickFilter.cxx
   vtkTessellatorFilter.cxx
   vtkTiledDisplaySchedule.cxx
+  vtkTrackballPan.cxx
   vtkUpdateSuppressorPipeline.cxx
   vtkVRMLSource.cxx
   vtkXMLCollectionReader.cxx
