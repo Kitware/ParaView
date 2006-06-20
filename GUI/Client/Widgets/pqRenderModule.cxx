@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSmartPointer.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
+#include "vtkTrackballPan.h"
 
 // Qt includes.
 #include <QFileInfo>
@@ -198,7 +199,7 @@ void pqRenderModule::renderModuleInit()
   vtkCameraManipulator* manip = vtkPVTrackballRotate::New();
   style->AddManipulator(manip);
   manip->Delete();
-  manip = vtkPVTrackballRoll::New();
+  manip = vtkTrackballPan::New();
   manip->SetButton(2);
   style->AddManipulator(manip);
   manip->Delete();
