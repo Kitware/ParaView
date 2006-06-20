@@ -46,6 +46,7 @@ public:
   MainWindow();
   
 private slots:
+  // show about box.
   void showHelpAbout();
   void showHelp();
   
