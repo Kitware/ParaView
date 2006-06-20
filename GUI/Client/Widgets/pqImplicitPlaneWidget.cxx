@@ -457,16 +457,16 @@ void pqImplicitPlaneWidget::onUseCameraNormal()
     }
 }
 
-void pqImplicitPlaneWidget::onShow3DWidget(bool show)
+void pqImplicitPlaneWidget::onShow3DWidget(bool show_widget)
 {
   this->Implementation->Visibility.insert(
-    this->Implementation->BoundingBoxProxy, show);
+    this->Implementation->BoundingBoxProxy, show_widget);
     
   this->show3DWidget(
     this->Implementation->Visibility[this->Implementation->BoundingBoxProxy]);
 }
 
-void pqImplicitPlaneWidget::show3DWidget(bool show)
+void pqImplicitPlaneWidget::show3DWidget(bool show_widget)
 {
   if(this->Implementation->Widget)
     {
@@ -475,7 +475,7 @@ void pqImplicitPlaneWidget::show3DWidget(bool show)
         this->Implementation->Widget->GetProperty("Visibility")))
       {
       this->Implementation->Ignore3DWidget = true;
-      visibility->SetElement(0, show);
+      visibility->SetElement(0, show_widget);
       this->Implementation->Widget->UpdateVTKObjects();
       pqApplicationCore::instance()->render();
       this->Implementation->Ignore3DWidget = false;
