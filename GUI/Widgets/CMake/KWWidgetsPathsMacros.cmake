@@ -5,23 +5,32 @@
 # against the current project and some known third-party dependencies (VTK, 
 # ITK, SOViewer, KWWidgets, etc.)
 # 'output_path': location (dir) where to store the generated scripts
-# This macro can take an optional parameter 'basename':
+# This macro can take optional parameters:
 # 'basename': basename for generated scripts (extension of originals are kept)
+# 'extra_library_dirs': list of extra libraries dirs
 
 MACRO(KWWidgets_GENERATE_SETUP_PATHS_SCRIPTS 
     output_path)
 
-  IF(NOT "${ARGN}" STREQUAL "")
-    SET(basename "${ARGN}")
-  ELSE(NOT "${ARGN}" STREQUAL "")
+  IF(NOT "${ARGV1}" STREQUAL "")
+    SET(basename "${ARGV1}")
+  ELSE(NOT "${ARGV1}" STREQUAL "")
     SET(basename "KWWidgetsSetupPaths")
-  ENDIF(NOT "${ARGN}" STREQUAL "")
+  ENDIF(NOT "${ARGV1}" STREQUAL "")
+
+  IF(NOT "${ARGV2}" STREQUAL "")
+    SET(extra_library_dirs "${ARGV2}")
+  ELSE(NOT "${ARGV2}" STREQUAL "")
+    SET(extra_library_dirs "")
+  ENDIF(NOT "${ARGV2}" STREQUAL "")
 
   KWWidgets_GENERATE_SETUP_PATHS(
     "${output_path}"
     "${basename}"
     1
-    0 "" "")
+    0 "" ""
+    "${extra_library_dirs}"
+    )
   
 ENDMACRO(KWWidgets_GENERATE_SETUP_PATHS_SCRIPTS)
 
@@ -46,17 +55,27 @@ ENDMACRO(KWWidgets_GENERATE_SETUP_PATHS_SCRIPTS)
 # Note that if If 'exe_dir' is empty, the launcher will change its working
 # dir to the launcher directory, and therefore attempt to locate 'exe_name'
 # in that same directory.
+# This macro can take optional parameters:
+# 'extra_library_dirs': list of extra libraries dirs
 
 MACRO(KWWidgets_GENERATE_SETUP_PATHS_LAUNCHER
     output_path
     basename
     exe_dir exe_name)
 
+  IF(NOT "${ARGV4}" STREQUAL "")
+    SET(extra_library_dirs "${ARGV4}")
+  ELSE(NOT "${ARGV4}" STREQUAL "")
+    SET(extra_library_dirs "")
+  ENDIF(NOT "${ARGV4}" STREQUAL "")
+
   KWWidgets_GENERATE_SETUP_PATHS(
     "${output_path}"
     "${basename}"
     0
-    1 "${exe_dir}" "${exe_name}")
+    1 "${exe_dir}" "${exe_name}"
+    "${extra_library_dirs}"
+    )
   
 ENDMACRO(KWWidgets_GENERATE_SETUP_PATHS_LAUNCHER)
 
@@ -72,12 +91,14 @@ ENDMACRO(KWWidgets_GENERATE_SETUP_PATHS_LAUNCHER)
 # 'generate_launcher': if true generate C launcher
 # 'exe_dir': location of the executable to generate a C launcher for
 # 'exe_name': name of the executable to generate a C launcher for
+# 'extra_library_dirs': list of extra libraries dirs
 
 MACRO(KWWidgets_GENERATE_SETUP_PATHS 
     output_path
     basename
     generate_scripts
-    generate_launcher exe_dir exe_name)
+    generate_launcher exe_dir exe_name
+    extra_library_dirs)
 
   # VTK
 
@@ -139,7 +160,9 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS
     "${KWWidgets_LIBRARY_DIRS}"
     "${KWWidgets_RUNTIME_DIRS}"
     "${KWWidgets_TCL_PATHS}"
-    "${KWWidgets_PYTHON_PATHS}")
+    "${KWWidgets_PYTHON_PATHS}"
+    "${extra_library_dirs}"
+    )
   
 ENDMACRO(KWWidgets_GENERATE_SETUP_PATHS)
 
@@ -173,7 +196,8 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ALL_CONFIGURATION_TYPES
     kwwidgets_lib_paths 
     kwwidgets_runtime_paths 
     kwwidgets_tcl_paths 
-    kwwidgets_python_paths)
+    kwwidgets_python_paths
+    extra_library_dirs)
 
   IF(WIN32 AND CMAKE_CONFIGURATION_TYPES)
 
@@ -198,7 +222,9 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ALL_CONFIGURATION_TYPES
         "${kwwidgets_lib_paths}"
         "${kwwidgets_runtime_paths}"
         "${kwwidgets_tcl_paths}"
-        "${kwwidgets_python_paths}")
+        "${kwwidgets_python_paths}"
+        "${extra_library_dirs}"
+        )
       
     ENDFOREACH(config)
 
@@ -225,7 +251,9 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ALL_CONFIGURATION_TYPES
       "${kwwidgets_lib_paths}"
       "${kwwidgets_runtime_paths}"
       "${kwwidgets_tcl_paths}"
-      "${kwwidgets_python_paths}")
+      "${kwwidgets_python_paths}"
+      "${extra_library_dirs}"
+      )
 
   ELSE(WIN32 AND CMAKE_CONFIGURATION_TYPES)
 
@@ -246,7 +274,9 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ALL_CONFIGURATION_TYPES
       "${kwwidgets_lib_paths}"
       "${kwwidgets_runtime_paths}"
       "${kwwidgets_tcl_paths}"
-      "${kwwidgets_python_paths}")
+      "${kwwidgets_python_paths}"
+      "${extra_library_dirs}"
+      )
 
   ENDIF(WIN32 AND CMAKE_CONFIGURATION_TYPES)
 ENDMACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ALL_CONFIGURATION_TYPES)
@@ -281,7 +311,8 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ONE_CONFIGURATION_TYPE
     _kwwidgets_lib_paths 
     _kwwidgets_runtime_paths 
     _kwwidgets_tcl_paths 
-    kwwidgets_python_paths)
+    kwwidgets_python_paths
+    _extra_library_dirs)
 
   SET(vtk_lib_paths ${_vtk_lib_paths})
   SET(vtk_runtime_paths ${_vtk_runtime_paths})
@@ -298,6 +329,8 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ONE_CONFIGURATION_TYPE
   SET(kwwidgets_tcl_paths ${_kwwidgets_tcl_paths})
   
   SET(exe_dir ${_exe_dir})
+
+  SET(extra_library_dirs ${_extra_library_dirs})
     
   # Update some paths with the configuration type if needed
 
@@ -376,6 +409,15 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ONE_CONFIGURATION_TYPE
       SET(kwwidgets_tcl_paths ${kwwidgets_tcl_paths2})
     ENDIF(KWWidgets_CONFIGURATION_TYPES)
 
+    # Extra
+
+    SET(extra_library_dirs2)
+    FOREACH(dir ${_extra_library_dirs})
+      SET(extra_library_dirs2 
+        ${extra_library_dirs2} "${dir}/${config}")
+    ENDFOREACH(dir)
+    SET(extra_library_dirs ${extra_library_dirs2})
+
     SET(exe_dir ${_exe_dir})
     IF(NOT "${exe_dir}" STREQUAL "")
       SET(exe_dir "${exe_dir}/${config}")
@@ -404,6 +446,7 @@ MACRO(KWWidgets_GENERATE_SETUP_PATHS_FOR_ONE_CONFIGURATION_TYPE
     ${sov_lib_paths}
     ${kwwidgets_runtime_paths}
     ${kwwidgets_lib_paths}
+    ${extra_library_dirs}
     ${EXECUTABLE_OUTPUT_PATH}
     ${LIBRARY_OUTPUT_PATH}
     )
