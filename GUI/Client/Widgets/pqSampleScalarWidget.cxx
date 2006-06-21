@@ -77,6 +77,21 @@ pqSampleScalarWidget::pqSampleScalarWidget(QWidget* Parent) :
   this->Implementation->UI->Values->setSelectionBehavior(QAbstractItemView::SelectRows);
   this->Implementation->UI->Values->setSelectionMode(QAbstractItemView::ExtendedSelection);
   
+  this->Implementation->UI->DeleteAll->setEnabled(false);
+  this->Implementation->UI->DeleteSelected->setEnabled(false);
+  
+  connect(
+    &this->Implementation->Model,
+    SIGNAL(layoutChanged()),
+    this,
+    SLOT(onSamplesChanged()));
+  
+  connect(
+    this->Implementation->UI->Values->selectionModel(),
+    SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
+    this,
+    SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
+  
   connect(this->Implementation->UI->AddRange, SIGNAL(clicked()), this, SLOT(onAddRange()));
   connect(this->Implementation->UI->AddValue, SIGNAL(clicked()), this, SLOT(onAddValue()));
   connect(this->Implementation->UI->DeleteAll, SIGNAL(clicked()), this, SLOT(onDeleteAll()));
@@ -96,13 +111,25 @@ void pqSampleScalarWidget::setSamples(const QList<double>& samples)
     {
     this->Implementation->Model.insert(samples[i]);
     }
-   
+  
   emit samplesChanged();
 }
 
 const QList<double> pqSampleScalarWidget::getSamples()
 {
   return this->Implementation->Model.values();
+}
+
+void pqSampleScalarWidget::onSamplesChanged()
+{
+  this->Implementation->UI->DeleteAll->setEnabled(
+    this->Implementation->Model.rowCount());
+}
+
+void pqSampleScalarWidget::onSelectionChanged(const QItemSelection&, const QItemSelection&)
+{
+  this->Implementation->UI->DeleteSelected->setEnabled(
+    this->Implementation->UI->Values->selectionModel()->selectedIndexes().size());
 }
 
 void pqSampleScalarWidget::onAddRange()
@@ -138,13 +165,15 @@ void pqSampleScalarWidget::onAddValue()
 void pqSampleScalarWidget::onDeleteAll()
 {
   this->Implementation->Model.clear();
+  this->Implementation->UI->Values->selectionModel()->clear();
+  
   emit samplesChanged();
 }
 
 void pqSampleScalarWidget::onDeleteSelected()
 {
   QList<int> rows;
-  for(int i = this->Implementation->Model.rowCount() - 1; i >= 0; --i)
+  for(int i = 0; i != this->Implementation->Model.rowCount(); ++i)
     {
     if(this->Implementation->UI->Values->selectionModel()->isRowSelected(i, QModelIndex()))
       rows.push_back(i);
@@ -154,6 +183,8 @@ void pqSampleScalarWidget::onDeleteSelected()
     {
     this->Implementation->Model.erase(rows[i]);
     }
+
+  this->Implementation->UI->Values->selectionModel()->clear();
   
   emit samplesChanged();
 }

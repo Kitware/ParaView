@@ -39,6 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace Ui { class pqSampleScalarWidget; }
 
+class QItemSelection;
+class QModelIndex;
+
 /** Provides a standard user interface component for manipulating a list of
 scalar samples.  Current uses include: specifying the set of "slices" for
 the Cut filter, and specifying the set of contour values for the Contour filter.
@@ -65,6 +68,9 @@ signals:
   void samplesChanged();
 
 private slots:
+  void onSamplesChanged();
+  void onSelectionChanged(const QItemSelection&, const QItemSelection&);
+  
   void onAddRange();
   void onAddValue();
   void onDeleteAll();
