@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMetaType>
 #include <QPointer>
 #include <QtDebug>
+#include <QIcon>
 
 // VTK includes
 #include "QVTKWidget.h"
@@ -489,7 +490,29 @@ void pqDisplayProxyEditor::updateColorByMenu(bool forceUpdate)
   // that
   this->DisableSlots = 1;
   this->Internal->ColorBy->clear();
-  this->Internal->ColorBy->addItems(pqPart::GetColorFields(displayProxy));
+
+  QRegExp regExpCell("\\(cell\\)\\w*$");
+  QRegExp regExpPoint("\\(point\\)\\w*$");
+  QList<QString> arrayNames = pqPart::GetColorFields(displayProxy);
+  foreach (const QString& name, arrayNames)
+    {
+    if (regExpPoint.indexIn(name) != -1)
+      {
+      this->Internal->ColorBy->addItem(QIcon(":/pqWidgets/pqPointData16.png"),
+        name);
+      }
+    else if (regExpCell.indexIn(name)!= -1)
+      {
+      this->Internal->ColorBy->addItem(QIcon(":/pqWidgets/pqCellData16.png"),
+        name);
+      }
+    else
+      {
+      this->Internal->ColorBy->addItem(QIcon(":/pqWidgets/pqSolidColor16.png"),
+        name);
+      }
+    }
+  //this->Internal->ColorBy->addItems();
   this->DisableSlots = 0;
   QString currentArray = pqPart::GetColorField(displayProxy);
   int index = this->Internal->ColorBy->findText(currentArray);
