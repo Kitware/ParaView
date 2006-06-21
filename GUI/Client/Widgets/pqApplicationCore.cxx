@@ -51,15 +51,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaQ includes.
 #include "pq3DWidgetFactory.h"
 #include "pqPipelineBuilder.h"
-#include "pqServerManagerObserver.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineSource.h"
 #include "pqReaderFactory.h"
 #include "pqRenderModule.h"
+#include "pqSMAdaptor.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
+#include "pqServerManagerObserver.h"
 #include "pqServerManagerSelectionModel.h"
-#include "pqSMAdaptor.h"
+#include "pqSettings.h"
 #include "pqUndoStack.h"
 #include "pqWriterFactory.h"
 #include "pqXMLUtil.h"
@@ -82,6 +83,10 @@ public:
   QPointer<pqRenderModule> ActiveRenderModule;
 
   QList< QPointer<pqPipelineSource> > SourcesSansDisplays;
+
+  QString OrganizationName;
+  QString ApplicationName;
+  QPointer<pqSettings> Settings;
 };
 
 
@@ -99,6 +104,9 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   : QObject(p)
 {
   this->Internal = new pqApplicationCoreInternal();
+
+  this->Internal->ApplicationName = "ParaViewBasedApplication";
+  this->Internal->OrganizationName = "Humanity";
 
   // *  Create pqServerManagerObserver first. This is the vtkSMProxyManager observer.
   this->Internal->PipelineData = new pqServerManagerObserver(this);
@@ -623,3 +631,44 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement)
   // Clear undo stack.
   this->Internal->UndoStack->Clear();
 }
+
+//-----------------------------------------------------------------------------
+pqSettings* pqApplicationCore::settings()
+{
+  if ( !this->Internal->Settings )
+    {
+    if ( this->Internal->OrganizationName.isEmpty() ||
+      this->Internal->ApplicationName.isEmpty() )
+      {
+      return 0;
+      }
+    this->Internal->Settings = new pqSettings(this->Internal->OrganizationName,
+      this->Internal->ApplicationName);
+    }
+  return this->Internal->Settings;
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::setApplicationName(const QString& an)
+{
+  this->Internal->ApplicationName = an;
+}
+
+//-----------------------------------------------------------------------------
+QString pqApplicationCore::applicationName()
+{
+  return this->Internal->ApplicationName;
+}
+
+//-----------------------------------------------------------------------------
+void pqApplicationCore::setOrganizationName(const QString& on)
+{
+  this->Internal->OrganizationName = on;
+}
+
+//-----------------------------------------------------------------------------
+QString pqApplicationCore::organizationName()
+{
+  return this->Internal->OrganizationName;
+}
+

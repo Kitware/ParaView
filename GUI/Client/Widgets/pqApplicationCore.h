@@ -38,13 +38,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pq3DWidgetFactory;
 class pqApplicationCoreInternal;
 class pqPipelineBuilder;
-class pqServerManagerObserver;
 class pqPipelineSource;
 class pqReaderFactory;
 class pqRenderModule;
 class pqServer;
 class pqServerManagerModel;
+class pqServerManagerObserver;
 class pqServerManagerSelectionModel;
+class pqSettings;
 class pqUndoStack;
 class pqWriterFactory;
 class vtkPVXMLElement;
@@ -145,6 +146,18 @@ public:
   /// Save the ServerManager state.
   void saveState(vtkPVXMLElement* root);
   void loadState(vtkPVXMLElement* root);
+
+  /// Get the application settings.
+  pqSettings* settings();
+
+  /// Set/get the application name for the application settings.
+  void setApplicationName(const QString&);
+  QString applicationName();
+
+  /// Set/get the organization name for the application settngs.
+  void setOrganizationName(const QString&);
+  QString organizationName();
+
 
 signals:
   // Fired when the active source changes.

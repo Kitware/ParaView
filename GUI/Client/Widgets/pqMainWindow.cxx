@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerBrowser.h"
 #include "pqServerFileDialogModel.h"
 #include "pqServer.h"
+#include "pqSettings.h"
 #include "pqSourceProxyInfo.h"
 #include "pqTestUtility.h"
 #include "pqToolTipTrapper.h"
@@ -130,6 +131,7 @@ class pqMainWindow::pqImplementation
 public:
   pqImplementation() :
     FileMenu(0),
+    RecentFilesMenu(0),
     EditMenu(0),
     ViewMenu(0),
     ServerMenu(0),
@@ -138,6 +140,7 @@ public:
     PipelineMenu(0),
     ToolsMenu(0),
     HelpMenu(0),
+    RecentFilesListMaxmumLength(10),
     ActiveView(0),
     MultiViewManager(0),
     Inspector(0),
@@ -181,6 +184,7 @@ public:
 
   // Stores standard menus
   QMenu* FileMenu;
+  QMenu* RecentFilesMenu;
   QMenu* EditMenu;
   QMenu* ViewMenu;
   QMenu* ServerMenu;
@@ -192,6 +196,8 @@ public:
   
   /// Stores a mapping from dockable widgets to menu actions
   QMap<QDockWidget*, QAction*> DockWidgetVisibleActions;
+  QStringList RecentFilesList;
+  int RecentFilesListMaxmumLength;
 
   pqMultiViewFrame* ActiveView;
   pqMultiView* MultiViewManager;
@@ -222,6 +228,8 @@ pqMainWindow::pqMainWindow() :
 {
   this->setObjectName("MainWindow");
   this->setWindowTitle("ParaView");
+  this->Implementation->RecentFilesList
+    = pqApplicationCore::instance()->settings()->recentFilesList();
 
   this->menuBar() << pqSetName("MenuBar");
 
@@ -315,6 +323,8 @@ void pqMainWindow::createStandardFileMenu()
   menu->addAction(tr("&Open..."), this, SLOT(onFileOpen()), 
     QKeySequence(Qt::CTRL + Qt::Key_O))
     << pqSetName("Open");
+
+  this->updateRecentlyLoadedFilesMenu(false);
 
   action = menu->addAction(tr("&Save Data..."), this, SLOT(onFileSaveData()), 
     QKeySequence(Qt::CTRL + Qt::Key_S))
@@ -795,6 +805,18 @@ QMenu* pqMainWindow::fileMenu()
 }
 
 //-----------------------------------------------------------------------------
+QMenu* pqMainWindow::recentFilesMenu()
+{
+  if(!this->Implementation->RecentFilesMenu)
+    {
+    this->Implementation->RecentFilesMenu = this->fileMenu()->addMenu(tr("&Recent Files"))
+      << pqSetName("RecentFilesMenu");
+    }
+    
+  return this->Implementation->RecentFilesMenu;
+}
+
+//-----------------------------------------------------------------------------
 QMenu* pqMainWindow::editMenu()
 {
   if (!this->Implementation->EditMenu)
@@ -1249,6 +1271,7 @@ void pqMainWindow::onFileOpen(const QStringList& files)
       qDebug() << "Failed to create reader for : " << files[i];
       continue;
       }
+    this->addFileToRecentList(files[i]);
     }
 }
 
@@ -1603,6 +1626,7 @@ void pqMainWindow::onServerConnect(pqServer* server)
     qobject_cast<pqMultiViewFrame *>(
       this->Implementation->MultiViewManager->widgetOfIndex(
         pqMultiView::Index())));
+  this->updateRecentlyLoadedFilesMenu(true);
 }
 
 //-----------------------------------------------------------------------------
@@ -2050,6 +2074,7 @@ void pqMainWindow::updateEnableState()
     saveStateAction->setEnabled(
       !pending_displays && server !=0);
     saveScreenshot->setEnabled(server != 0);
+    this->updateRecentlyLoadedFilesMenu(!pending_displays && (!num_servers || server !=0));
     }
 
   if (this->Implementation->ServerMenu)
@@ -2228,4 +2253,54 @@ void pqMainWindow::updateInteractionUndoRedoState()
     redoAction->setEnabled(canRedo);
     redoAction->setText(redoMsg);
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::addFileToRecentList(const QString& fileName)
+{
+  this->Implementation->RecentFilesList.removeAll(fileName);
+  this->Implementation->RecentFilesList.push_front(fileName);
+  pqApplicationCore::instance()->settings()->setRecentFilesList(
+    this->Implementation->RecentFilesList);
+  while ( this->Implementation->RecentFilesList.size() >
+    this->Implementation->RecentFilesListMaxmumLength )
+    {
+    this->Implementation->RecentFilesList.removeLast();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::updateRecentlyLoadedFilesMenu(bool enabled)
+{
+  QMenu* const rfMenu = this->recentFilesMenu();
+  rfMenu->clear();
+  int cnt = 0;
+  if ( !pqApplicationCore::instance()->getActiveServer() )
+    {
+    enabled = false;
+    }
+  foreach(QString file, this->Implementation->RecentFilesList)
+    {
+    QString str = "&" + QString().setNum(cnt);
+    str += " " + file;
+    QAction *qa = rfMenu->addAction(tr(str.toStdString().c_str()),
+      this, SLOT(onRecentFileOpen()));
+    qa->setData(QVariant(file));
+    qa->setEnabled(enabled);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::onRecentFileOpen()
+{
+  if(!pqApplicationCore::instance()->getActiveServer())
+    {
+    qDebug() << "No active server selected.";
+    return;
+    }
+  QVariant qv = qobject_cast<QAction*>(this->sender())->data();
+  QString str = qv.toString();
+  QStringList strList;
+  strList << str;
+  this->onFileOpen(strList);
 }

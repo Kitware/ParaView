@@ -82,6 +82,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerManagerModelItem.h
   pqServerManagerObserver.h
   pqServerManagerSelectionModel.h
+  pqSettings.h
   pqSliderDomain.h
   pqSourceInfoGroupMap.h
   pqSourceInfoIcons.h
@@ -269,6 +270,8 @@ ADD_LIBRARY(pqWidgets
   pqServerManagerObserver.h
   pqServerManagerSelectionModel.cxx
   pqServerManagerSelectionModel.h
+  pqSettings.cxx
+  pqSettings.h
   pqSliderDomain.cxx
   pqSliderDomain.h
   pqSourceHistoryModel.cxx

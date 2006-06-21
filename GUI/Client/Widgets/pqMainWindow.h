@@ -120,6 +120,7 @@ public:
 
   /// Returns the file menu, creating it if it doesn't already exist.
   QMenu* fileMenu();
+  QMenu* recentFilesMenu();
   /// Returns the edit menu, creating it if it doesn't already exist.
   QMenu* editMenu();
   /// Returns the view menu, creating it if it doesn't already exist
@@ -191,7 +192,13 @@ public slots:
   // and updates it.
   void updateEnableState();
 
+  // Add the file to the recently loaded menu
+  void addFileToRecentList(const QString& fileName);
+
 protected slots:
+  // This will update the recently loaded files menu
+  void updateRecentlyLoadedFilesMenu(bool enabled);
+
   // Called when the Undo/Redo stack changes.
   void onUndoRedoStackChanged(bool canUndo, QString,
     bool canRedo, QString);
@@ -215,6 +222,8 @@ private slots:
 
   void onActiveSourceChanged(pqPipelineSource*);
   virtual void onActiveServerChanged(pqServer*);
+
+  void onRecentFileOpen();
  
 private slots:
   void onCreateSource(QAction*);
