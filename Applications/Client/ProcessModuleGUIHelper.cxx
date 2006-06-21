@@ -35,9 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "MainWindow.h"
 
+#include "pqApplicationCore.h"
+
 
 vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.3");
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.4");
 //-----------------------------------------------------------------------------
 ProcessModuleGUIHelper::ProcessModuleGUIHelper()
 {
@@ -51,6 +53,8 @@ ProcessModuleGUIHelper::~ProcessModuleGUIHelper()
 //-----------------------------------------------------------------------------
 QWidget* ProcessModuleGUIHelper::CreateMainWindow()
 {
+  pqApplicationCore::instance()->setApplicationName("ParaView3.0");
+  pqApplicationCore::instance()->setOrganizationName("Kitware");
   pqMainWindow* const window = new MainWindow();
   window->resize(900, 675);
   return window;
