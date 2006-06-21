@@ -996,7 +996,7 @@ The Loop Subdivision filter increases the granularity of a polygonal mesh. It wo
                 minimum_value="0"/>
     <ThumbWheel label="Offset"
                 trace_name="Offset"
-                proeprty="Offset"
+                property="Offset"
                 resolution="1"
                 minimum_value="0"
                 help="Start with this point."/>
