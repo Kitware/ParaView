@@ -47,22 +47,30 @@ public:
   pqImplicitPlaneWidget(QWidget* p);
   ~pqImplicitPlaneWidget();
 
-  /// Makes the 3D widget visible (but respects the user's choice if they've turned visibility off)
-  void showWidget();
-  /// Hides the 3D widget
-  void hideWidget();
-
   /// Sets a source proxy that will be used to specify the bounding-box for the 3D widget
   void setBoundingBoxProxy(pqSMProxy proxy);
-
   /// Returns the current state of the widget
   void getWidgetState(double origin[3], double normal[3]);
   /// Sets the current state of the widget
   void setWidgetState(const double origin[3], const double normal[3]);
 
+public slots:
+  /// Makes the 3D widget visible (but respects the user's choice if they've turned visibility off)
+  void showWidget();
+  /// Makes the 3D widget plane visible (respects the overall visibility flag)
+  void showPlane();
+  /// Hides the 3D widget plane
+  void hidePlane();
+  /// Hides the 3D widget
+  void hideWidget();
+
 signals:
-  /// Provides a notification that the 3D widget has been modified
+  /// Notifies observers that the user is dragging the 3D widget
+  void widgetStartInteraction();
+  /// Notifies observers that the widget has been modified
   void widgetChanged();
+  /// Notifies observers that the user is done dragging the 3D widget
+  void widgetEndInteraction();
 
 private slots:
   /// Called to show/hide the 3D widget
@@ -81,8 +89,12 @@ private slots:
   void onUseCameraNormal();
   /// Called if any of the Qt widget values is modified
   void onQtWidgetChanged();
-  /// Called if the 3D widget is modified
+  /// Called when the user starts dragging the 3D widget
+  void on3DWidgetStartDrag();
+  /// Called when the 3D widget is modified
   void on3DWidgetChanged();
+  /// Called when the user stops dragging the 3D widget
+  void on3DWidgetEndDrag();
 
 private:
   void show3DWidget(bool show);
@@ -91,10 +103,6 @@ private:
 
   class pqImplementation;
   pqImplementation* const Implementation;
-  
-  class WidgetObserver;
-  friend class WidgetObserver;
-  WidgetObserver* const Observer;
 };
 
 #endif

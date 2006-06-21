@@ -78,10 +78,35 @@ pqCutPanel::pqCutPanel(QWidget* p) :
   panel_layout->addWidget(&this->Implementation->SampleScalarWidget);
   this->setLayout(panel_layout);
 
-  connect(&this->Implementation->ImplicitPlaneWidget, SIGNAL(widgetChanged()), this, SLOT(onImplicitPlaneWidgetChanged()));
-  connect(&this->Implementation->SampleScalarWidget, SIGNAL(samplesChanged()), this, SLOT(onSampleScalarWidgetChanged()));
-  connect(this->getPropertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
-  connect(this->getPropertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
+  connect(
+    &this->Implementation->ImplicitPlaneWidget,
+    SIGNAL(widgetStartInteraction()),
+    &this->Implementation->ImplicitPlaneWidget,
+    SLOT(showPlane()));
+  
+  connect(
+    &this->Implementation->ImplicitPlaneWidget,
+    SIGNAL(widgetEndInteraction()),
+    &this->Implementation->ImplicitPlaneWidget,
+    SLOT(hidePlane()));
+  
+  connect(
+    &this->Implementation->ImplicitPlaneWidget,
+    SIGNAL(widgetChanged()),
+    this,
+    SLOT(onImplicitPlaneWidgetChanged()));
+    
+  connect(
+    &this->Implementation->SampleScalarWidget,
+    SIGNAL(samplesChanged()),
+    this,
+    SLOT(onSampleScalarWidgetChanged()));
+  
+  connect(
+    this->getPropertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
+    
+  connect(
+    this->getPropertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
 }
 
 pqCutPanel::~pqCutPanel()

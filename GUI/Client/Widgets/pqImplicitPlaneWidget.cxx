@@ -53,41 +53,47 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMSourceProxy.h>
 
 /////////////////////////////////////////////////////////////////////////
-// pqImplicitPlaneWidget::WidgetObserver
+// pqCommandCallback
 
-class pqImplicitPlaneWidget::WidgetObserver :
+template<class ClassT>
+class pqCommandCallback :
   public vtkCommand
 {
+  typedef pqCommandCallback<ClassT> ThisT;
+  
 public:
-  static WidgetObserver* New()
+  static ThisT* New()
   {
-    return new WidgetObserver();
+    return new ThisT();
   }
 
-  void SetPanel(pqImplicitPlaneWidget& panel)
+  void SetCallback(ClassT& object, void (ClassT::*method)())
   {
-    this->Panel = &panel;
+    this->Object = &object;
+    this->Method = method;
   }
 
-  virtual void Execute(vtkObject*, unsigned long, void*)
+  virtual void Execute(vtkObject*, unsigned long eventid, void*)
   {
-    if(this->Panel)
+    if(this->Object && this->Method)
       {
-      this->Panel->on3DWidgetChanged();
+      (this->Object->*this->Method)();
       }
   }
 
 private:
-  WidgetObserver() :
-    Panel(0)
+  pqCommandCallback() :
+    Object(0),
+    Method(0)
   {
   }
   
-  ~WidgetObserver()
+  ~pqCommandCallback()
   {
   }
   
-  pqImplicitPlaneWidget* Panel;
+  ClassT* Object;
+  void (ClassT::*Method)();
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -98,6 +104,9 @@ class pqImplicitPlaneWidget::pqImplementation
 public:
   pqImplementation() :
     UI(new Ui::pqImplicitPlaneWidget()),
+    StartDragObserver(pqCommandCallback<pqImplicitPlaneWidget>::New()),
+    ChangeObserver(pqCommandCallback<pqImplicitPlaneWidget>::New()),
+    EndDragObserver(pqCommandCallback<pqImplicitPlaneWidget>::New()),
     Widget(0),
     IgnoreVisibilityWidget(false),
     IgnoreQtWidgets(false),
@@ -107,11 +116,20 @@ public:
   
   ~pqImplementation()
   {
+    this->EndDragObserver->Delete();
+    this->ChangeObserver->Delete();
+    this->StartDragObserver->Delete();
     delete this->UI;
   }
   
   /// Stores the Qt widgets
   Ui::pqImplicitPlaneWidget* const UI;
+  /// Callback object used to connect 3D widget events to member methods
+  pqCommandCallback<pqImplicitPlaneWidget>* const StartDragObserver;
+  /// Callback object used to connect 3D widget events to member methods
+  pqCommandCallback<pqImplicitPlaneWidget>* const ChangeObserver;
+  /// Callback object used to connect 3D widget events to member methods
+  pqCommandCallback<pqImplicitPlaneWidget>* const EndDragObserver;
   /// References the 3D implicit plane widget
   vtkSMNew3DWidgetProxy* Widget;
   /// Source proxy that will supply the bounding box for the 3D widget
@@ -133,10 +151,15 @@ QMap<pqSMProxy, bool> pqImplicitPlaneWidget::pqImplementation::Visibility;
 
 pqImplicitPlaneWidget::pqImplicitPlaneWidget(QWidget* p) :
   QWidget(p),
-  Implementation(new pqImplementation()),
-  Observer(WidgetObserver::New())
+  Implementation(new pqImplementation())
 {
-  this->Observer->SetPanel(*this);
+  this->Implementation->StartDragObserver->SetCallback(
+    *this, &pqImplicitPlaneWidget::on3DWidgetStartDrag);
+  this->Implementation->ChangeObserver->SetCallback(
+    *this, &pqImplicitPlaneWidget::on3DWidgetChanged);
+  this->Implementation->EndDragObserver->SetCallback(
+    *this, &pqImplicitPlaneWidget::on3DWidgetEndDrag);
+    
   this->Implementation->UI->setupUi(this);
 
   connect(this->Implementation->UI->show3DWidget,
@@ -173,9 +196,13 @@ pqImplicitPlaneWidget::~pqImplicitPlaneWidget()
 {
   if(this->Implementation->Widget)
     {
-    this->Implementation->Widget->RemoveObserver(this->Observer);
+    this->Implementation->Widget->RemoveObserver(
+      this->Implementation->EndDragObserver);
+    this->Implementation->Widget->RemoveObserver(
+      this->Implementation->ChangeObserver);
+    this->Implementation->Widget->RemoveObserver(
+      this->Implementation->StartDragObserver);
     }
-  this->Observer->Delete();
 
   if(this->Implementation->Widget)
     {
@@ -207,6 +234,34 @@ void pqImplicitPlaneWidget::showWidget()
 {
   this->show3DWidget(
     this->Implementation->Visibility[this->Implementation->BoundingBoxProxy]);
+}
+
+void pqImplicitPlaneWidget::showPlane()
+{
+  if(this->Implementation->Widget)
+    {
+    if(vtkSMIntVectorProperty* const show_plane =
+      vtkSMIntVectorProperty::SafeDownCast(
+        this->Implementation->Widget->GetProperty("DrawPlane")))
+      {
+      show_plane->SetElement(0, true);
+      this->Implementation->Widget->UpdateVTKObjects();
+      }
+    }
+}
+
+void pqImplicitPlaneWidget::hidePlane()
+{
+  if(this->Implementation->Widget)
+    {
+    if(vtkSMIntVectorProperty* const show_plane =
+      vtkSMIntVectorProperty::SafeDownCast(
+        this->Implementation->Widget->GetProperty("DrawPlane")))
+      {
+      show_plane->SetElement(0, false);
+      this->Implementation->Widget->UpdateVTKObjects();
+      }
+    }
 }
 
 void pqImplicitPlaneWidget::hideWidget()
@@ -254,8 +309,17 @@ void pqImplicitPlaneWidget::setBoundingBoxProxy(pqSMProxy proxy)
       }
       
     if(this->Implementation->Widget)
+      {
       this->Implementation->Widget->AddObserver(
-        vtkCommand::PropertyModifiedEvent, this->Observer);
+        vtkCommand::StartInteractionEvent,
+        this->Implementation->StartDragObserver);
+      this->Implementation->Widget->AddObserver(
+        vtkCommand::PropertyModifiedEvent,
+        this->Implementation->ChangeObserver);
+      this->Implementation->Widget->AddObserver(
+        vtkCommand::EndInteractionEvent,
+        this->Implementation->EndDragObserver);
+      }
     }
 
   this->Implementation->IgnoreVisibilityWidget = true;
@@ -514,6 +578,11 @@ void pqImplicitPlaneWidget::onQtWidgetChanged()
   emit widgetChanged();
 }
 
+void pqImplicitPlaneWidget::on3DWidgetStartDrag()
+{
+  emit widgetStartInteraction();
+}
+
 void pqImplicitPlaneWidget::on3DWidgetChanged()
 {
   if(this->Implementation->Ignore3DWidget)
@@ -548,6 +617,11 @@ void pqImplicitPlaneWidget::on3DWidgetChanged()
   this->updateQtWidgets(origin, normal);
 
   emit widgetChanged();
+}
+
+void pqImplicitPlaneWidget::on3DWidgetEndDrag()
+{
+  emit widgetEndInteraction();
 }
 
 void pqImplicitPlaneWidget::updateQtWidgets(const double* origin, const double* normal)
