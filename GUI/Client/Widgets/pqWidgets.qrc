@@ -2,6 +2,8 @@
     <qresource prefix="/pqWidgets" >
         <file alias="pqAddFavorites16.png">Resources/pqAddFavorites16.png</file>
         <file alias="pqAppIcon64.png">Resources/pqAppIcon64.png</file>
+        <file alias="pqArrowDown16.png">Resources/pqArrowDown16.png</file>
+        <file alias="pqArrowUp16.png">Resources/pqArrowUp16.png</file>
         <file alias="pqBack16.png">Resources/pqBack16.png</file>
         <file alias="pqBundle16.png">Resources/pqBundle16.png</file>
         <file alias="pqBundle22.png">Resources/pqBundle22.png</file>
@@ -27,11 +29,13 @@
         <file alias="pqLinkBack16.png">Resources/pqLinkBack16.png</file>
         <file alias="pqLinkIn16.png">Resources/pqLinkIn16.png</file>
         <file alias="pqLinkOut16.png">Resources/pqLinkOut16.png</file>
+        <file alias="pqMinus16.png">Resources/pqMinus16.png</file>
         <file alias="pqMultiBlockData16.png">Resources/pqMultiBlockData16.png</file>
         <file alias="pqMultiGroupData16.png">Resources/pqMultiGroupData16.png</file>
         <file alias="pqNodeSet16.png">Resources/pqNodeSet16.png</file>
         <file alias="pqOctreeData16.png">Resources/pqOctreeData16.png</file>
         <file alias="pqPipelineList22.png">Resources/pqPipelineList22.png</file>
+        <file alias="pqPlus16.png">Resources/pqPlus16.png</file>
         <file alias="pqPointData16.png">Resources/pqPointData16.png</file>
         <file alias="pqPolydata16.png">Resources/pqPolydata16.png</file>
         <file alias="pqRectilinearGrid16.png">Resources/pqRectilinearGrid16.png</file>

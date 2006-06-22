@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMainWindow.h"
 
 #include "pqApplicationCore.h"
+#include "pqBundleDefinitionModel.h"
+#include "pqBundleDefinitionWizard.h"
 #include "pqCompoundProxyWizard.h"
 #include "pqDataInformationWidget.h"
 #include "pqElementInspectorWidget.h"
@@ -53,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSelectionManager.h"
 #include "pqServerBrowser.h"
 #include "pqServerFileDialogModel.h"
+#include "pqServerManagerSelectionModel.h"
 #include "pqServer.h"
 #include "pqSimpleAnimationManager.h"
 #include "pqSettings.h"
@@ -488,8 +491,12 @@ void pqMainWindow::createStandardPipelineMenu()
 void pqMainWindow::createStandardToolsMenu()
 {
   QMenu* const menu = this->toolsMenu();
+
+  menu->addAction(tr("&Create Bundle..."))
+    << pqSetName("CreateBundle")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(onOpenBundleWizard()));
   
-  QAction* compoundFilterAction = menu->addAction(tr("&Compound Filters..."))
+  QAction* compoundFilterAction = menu->addAction(tr("Compound &Filters..."))
     << pqSetName("CompoundFilter")
     << pqConnect(SIGNAL(triggered(bool)), this, SLOT(onOpenCompoundFilterWizard()));
   compoundFilterAction->setEnabled(false);
@@ -1749,6 +1756,49 @@ void pqMainWindow::onOpenCompoundFilterWizard()
     SIGNAL(newCompoundProxy(const QString&, const QString&)), 
     SLOT(onCompoundProxyAdded(const QString&, const QString&)));
   wizard->show();
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::onOpenBundleWizard()
+{
+  // Get the selected sources from the application core. Notify the user
+  // if the selection is empty.
+  const pqServerManagerSelection *selections =
+      pqApplicationCore::instance()->getSelectionModel()->selectedItems();
+  if(selections->size() == 0)
+    {
+    QMessageBox::warning(this, "Create Bundle Error",
+        "No pipeline objects are selected.\n"
+        "To create a new pipeline bundle, select the sources and "
+        "filters you want.\nThen, launch the creation wizard.",
+        QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
+    return;
+    }
+
+  // Create a bundle definition model with the pipeline selection. The
+  // model only accepts pipeline sources. Notify the user if the model
+  // is empty.
+  pqBundleDefinitionModel bundle(this);
+  bundle.setContents(selections);
+  if(!bundle.hasChildren(QModelIndex()))
+    {
+    QMessageBox::warning(this, "Create Bundle Error",
+        "The selected objects cannot be used to make a bundle.\n"
+        "To create a new pipeline bundle, select the sources and "
+        "filters you want.\nThen, launch the creation wizard.",
+        QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
+    return;
+    }
+
+  pqBundleDefinitionWizard wizard(&bundle, this);
+  if(wizard.exec() == QDialog::Accepted)
+    {
+    // Create a new compound proxy from the bundle definition.
+    wizard.createPipelineBundle();
+
+    // TODO: Launch the bundle manager in case the user wants to save
+    // the compound proxy definition.
+    }
 }
 
 //-----------------------------------------------------------------------------

@@ -79,6 +79,12 @@ signals:
 
   /// Fired when a render module proxy is unregistred.
   void renderModuleUnRegistered(vtkSMRenderModuleProxy* rm);
+
+  /// Fired when a compound proxy definition is registered.
+  void compoundProxyDefinitionRegistered(QString name);
+
+  /// Fired when a compound proxy definition is unregistered.
+  void compoundProxyDefinitionUnRegistered(QString name);
   
   // Fired when a proxy is registered, and not in the "sources" or
   // "render_modules" groups.

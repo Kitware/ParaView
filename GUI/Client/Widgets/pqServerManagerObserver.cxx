@@ -477,7 +477,11 @@ void pqServerManagerObserver::proxyRegistered(vtkObject*, unsigned long, void*,
     return;
     }
 
-  if(strcmp(info->GroupName, "sources") == 0)
+  if(info->IsCompoundProxyDefinition)
+    {
+    emit this->compoundProxyDefinitionRegistered(info->ProxyName);
+    }
+  else if(strcmp(info->GroupName, "sources") == 0)
     {
     emit this->sourceRegistered(info->ProxyName, info->Proxy);
     }
@@ -514,7 +518,11 @@ void pqServerManagerObserver::proxyUnRegistered(vtkObject*, unsigned long, void*
     return;
     }
 
-  if(strcmp(info->GroupName, "sources") == 0 )
+  if(info->IsCompoundProxyDefinition)
+    {
+    emit this->compoundProxyDefinitionUnRegistered(info->ProxyName);
+    }
+  else if(strcmp(info->GroupName, "sources") == 0 )
     {
     emit this->sourceUnRegistered(info->Proxy);
     }

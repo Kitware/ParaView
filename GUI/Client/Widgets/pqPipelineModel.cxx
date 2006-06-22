@@ -631,10 +631,6 @@ Qt::ItemFlags pqPipelineModel::flags(const QModelIndex &idx) const
     {
     indexFlags |= Qt::ItemIsSelectable;
     }
-  else if(idx.column() == 1)
-    {
-    indexFlags |= Qt::ItemIsUserCheckable;
-    }
 
   return indexFlags;
 }

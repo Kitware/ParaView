@@ -232,6 +232,7 @@ private slots:
   void onCreateFilter(QAction*);
   void onOpenLinkEditor();
   void onOpenCompoundFilterWizard();
+  void onOpenBundleWizard();
 
   void onNewSelections(vtkSMProxy* p, vtkUnstructuredGrid* selections);
   void onCompoundProxyAdded(const QString&, const QString&);
