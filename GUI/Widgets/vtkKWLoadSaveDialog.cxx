@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.54");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.55");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
@@ -112,7 +112,7 @@ int vtkKWLoadSaveDialog::Invoke()
     {
     if (support_choose_dir)
       {
-      command << " -mustexist 1";
+      command << " -mustexist 0";
       }
     }
   else
