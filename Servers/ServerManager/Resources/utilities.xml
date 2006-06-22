@@ -1093,6 +1093,10 @@
       base_proxygroup="animation_keyframes" base_proxyname="KeyFrame">
     </RampKeyFrameProxy>
 
+    <TimestepKeyFrameProxy name="TimestepKeyFrame"
+      base_proxygroup="animation_keyframes" base_proxyname="KeyFrame">
+    </TimestepKeyFrameProxy>
+
     <ExponentialKeyFrameProxy name="ExponentialKeyFrame" 
       base_proxygroup="animation_keyframes" base_proxyname="KeyFrame">
       <DoubleVectorProperty
