@@ -22,7 +22,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMTimestepKeyFrameProxy);
-vtkCxxRevisionMacro(vtkSMTimestepKeyFrameProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMTimestepKeyFrameProxy, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMTimestepKeyFrameProxy::vtkSMTimestepKeyFrameProxy()
 {
@@ -100,7 +100,6 @@ void vtkSMTimestepKeyFrameProxy::UpdateValue(double currenttime,
       }
     index = cc;
     }
-  cout << "Time: " << timestepValues->GetElement(index) << endl;;
   domain->SetAnimationValue(property, animated_element, index);
   proxy->UpdateVTKObjects();
 }
