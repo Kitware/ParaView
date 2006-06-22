@@ -17,4 +17,3 @@ SUBDIRS(Widgets)
 
 # Include Qt and VTK dependent code.
 SUBDIRS(Client)
-
