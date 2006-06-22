@@ -500,6 +500,9 @@ pqRenderModule* pqPipelineBuilder::createWindow(pqServer* server)
     {
     pqSMAdaptor::setElementProperty(prop, 0.0);  // remote render
     }
+  // disable LOD.
+  pqSMAdaptor::setElementProperty(renModule->GetProperty("LODThreshold"),
+      VTK_LARGE_FLOAT);
   renModule->UpdateVTKObjects();
 
   // turn on vtk light kit
