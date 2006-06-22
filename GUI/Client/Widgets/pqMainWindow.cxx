@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerBrowser.h"
 #include "pqServerFileDialogModel.h"
 #include "pqServer.h"
+#include "pqSimpleAnimationManager.h"
 #include "pqSettings.h"
 #include "pqSourceProxyInfo.h"
 #include "pqTestUtility.h"
@@ -101,6 +102,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMRenderModuleProxy.h>
 #include <vtkSMSourceProxy.h>
 #include <vtkSMStringVectorProperty.h>
+#include "vtkToolkits.h"
 
 #include <QAction>
 #include <QActionGroup>
@@ -320,32 +322,42 @@ void pqMainWindow::createStandardFileMenu()
     QKeySequence(Qt::CTRL + Qt::Key_N))
     << pqSetName("New");
 
-  menu->addAction(tr("&Open..."), this, SLOT(onFileOpen()), 
+  menu->addAction(tr("&Open"), this, SLOT(onFileOpen()), 
     QKeySequence(Qt::CTRL + Qt::Key_O))
     << pqSetName("Open");
 
+
   this->updateRecentlyLoadedFilesMenu(false);
 
-  action = menu->addAction(tr("&Save Data..."), this, SLOT(onFileSaveData()), 
+  action = menu->addAction(tr("&Save Data"), this, SLOT(onFileSaveData()), 
     QKeySequence(Qt::CTRL + Qt::Key_S))
     << pqSetName("SaveData");
   action->setEnabled(false);
 
-  action = menu->addAction(tr("&Load Server State..."))
+  menu->addSeparator();
+
+  action = menu->addAction(tr("&Load Server State"))
     << pqSetName("LoadServerState")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onFileOpenServerState()));
   // disable save/load state for the time being.
   action->setEnabled(true);
 
-  action = menu->addAction(tr("&Save Server State..."))
+  action = menu->addAction(tr("&Save Server State"))
     << pqSetName("SaveServerState")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onFileSaveServerState()));
   // disable save/load state for the time being.
   action->setEnabled(false);
+  menu->addSeparator();
 
-  menu->addAction(tr("Save Screenshot..."))
+  action = menu->addAction(tr("Save Screenshot"))
     << pqSetName("SaveScreenshot")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onFileSaveScreenshot())); 
+  action->setEnabled(false);
+
+  action = menu->addAction(tr("Save Animation"))
+    << pqSetName("SaveAnimation")
+    << pqConnect(SIGNAL(triggered()), this, SLOT(onFileSaveAnimation()));
+  action->setEnabled(false);
 
   menu->addSeparator();
   
@@ -1516,6 +1528,56 @@ void pqMainWindow::onFileSaveScreenshot(const QStringList& files)
       }
     }
 }
+//-----------------------------------------------------------------------------
+void pqMainWindow::onFileSaveAnimation()
+{
+  // Currently we only support saving animations in which reader's
+  // timestep value changes.
+  pqPipelineSource* source = pqApplicationCore::instance()->getActiveSource();
+  if (!source)
+    {
+    qDebug() << "Cannot save animation, no reader selected.";
+    return;
+    }
+
+  if (!pqSimpleAnimationManager::canAnimate(source))
+    {
+    qDebug() << "Cannot animate the selected source.";
+    return;
+    }
+
+
+  QString filters = "MPEG files (*.mpg)";
+#ifdef _WIN32
+  filters += ";;AVI files (*.avi)";
+#else
+# ifdef VTK_USE_FFMPEG_ENCODER
+  filters += ";;AVI files (*.avi)";
+# endif
+#endif
+  filters +=";;JPEG images (*.jpg);; TIFF images (*.tif);; PNG images (*.png)";
+  filters +=";;All files(*)";
+  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), 
+    this, tr("Save Animation:"), QString(), filters);
+  file_dialog->setObjectName("FileSaveAnimationDialog");
+  file_dialog->setFileMode(pqFileDialog::AnyFile);
+  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
+    this, SLOT(onFileSaveAnimation(const QStringList&)));
+  file_dialog->show();
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::onFileSaveAnimation(const QStringList& files)
+{
+  pqPipelineSource* source = pqApplicationCore::instance()->getActiveSource();
+  if (!source)
+    {
+    qDebug() << "Cannot save animation, no reader selected.";
+    return;
+    }
+  pqSimpleAnimationManager manager(this);
+ cout << "status: " <<  manager.createTimestepAnimation(source, files[0]) << endl;
+}
 
 //-----------------------------------------------------------------------------
 void pqMainWindow::onRecordTestScreenshot()
@@ -2051,6 +2113,7 @@ void pqMainWindow::updateEnableState()
 {
   pqServer *server = pqApplicationCore::instance()->getActiveServer();
   pqPipelineSource *source = pqApplicationCore::instance()->getActiveSource();
+  pqRenderModule* rm = pqApplicationCore::instance()->getActiveRenderModule();
   int num_servers = pqApplicationCore::instance()->
     getServerManagerModel()->getNumberOfServers();
 
@@ -2073,7 +2136,7 @@ void pqMainWindow::updateEnableState()
       !pending_displays && (!num_servers || server !=0));
     saveStateAction->setEnabled(
       !pending_displays && server !=0);
-    saveScreenshot->setEnabled(server != 0);
+    saveScreenshot->setEnabled(server != 0 && rm != 0);
     this->updateRecentlyLoadedFilesMenu(!pending_displays && (!num_servers || server !=0));
     }
 
@@ -2112,7 +2175,6 @@ void pqMainWindow::updateEnableState()
     compoundFilterAction->setEnabled(server != 0 && !pending_displays);
     }
 
-  pqRenderModule* rm = pqApplicationCore::instance()->getActiveRenderModule();
   if (this->Implementation->SelectionToolBar)
     {
     if (rm)
@@ -2122,6 +2184,16 @@ void pqMainWindow::updateEnableState()
     else
       {
       this->Implementation->SelectionToolBar->setEnabled(false);
+      }
+    }
+  if (this->Implementation->FileMenu)
+    {
+    QAction* saveAnimation = 
+      this->Implementation->FileMenu->findChild<QAction*>("SaveAnimation");
+    if (saveAnimation)
+      {
+      saveAnimation->setEnabled(pqSimpleAnimationManager::canAnimate(
+          pqApplicationCore::instance()->getActiveSource()));
       }
     }
 

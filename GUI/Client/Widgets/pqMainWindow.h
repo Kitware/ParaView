@@ -171,6 +171,8 @@ public slots:
   void onFileSaveScreenshot(const QStringList& Files);
   void onFileSaveData();
   void onFileSaveData(const QStringList& files);
+  void onFileSaveAnimation();
+  void onFileSaveAnimation(const QStringList& files);
 
   void onServerConnect();
   void onServerConnect(pqServer* Server);

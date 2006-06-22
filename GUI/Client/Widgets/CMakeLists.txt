@@ -70,20 +70,21 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqRenderModule.h
   pqRenderViewEditor.h
   pqRenderWindowManager.h
-  pqSMSignalAdaptors.h
   pqSampleScalarWidget.h
   pqScalarSetModel.h
   pqSelectionAdaptor.h
   pqSelectionManager.h
-  pqServer.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
+  pqServer.h
   pqServerManagerModel.h
   pqServerManagerModelItem.h
   pqServerManagerObserver.h
   pqServerManagerSelectionModel.h
   pqSettings.h
+  pqSimpleAnimationManager.h
   pqSliderDomain.h
+  pqSMSignalAdaptors.h
   pqSourceInfoGroupMap.h
   pqSourceInfoIcons.h
   pqSourceInfoModel.h
@@ -97,6 +98,7 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
 SET(UI_FORMS
   pqAddSourceDialog.ui
+  pqAnimationSettings.ui
   pqCompoundProxyWizard.ui
   pqDisplayProxyEditor.ui
   pqImplicitPlaneWidget.ui
@@ -270,6 +272,8 @@ ADD_LIBRARY(pqWidgets
   pqServerManagerObserver.h
   pqServerManagerSelectionModel.cxx
   pqServerManagerSelectionModel.h
+  pqSimpleAnimationManager.cxx
+  pqSimpleAnimationManager.h
   pqSettings.cxx
   pqSettings.h
   pqSliderDomain.cxx
