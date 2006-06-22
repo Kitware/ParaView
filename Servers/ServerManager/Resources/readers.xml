@@ -831,7 +831,8 @@
         command="SetTimeStep"
         number_of_elements="1"
         animateable="1"
-        default_values="0">
+        default_values="0"
+        information_property="TimestepValues">
        <IntRangeDomain name="range">
           <RequiredProperties>
              <Property name="TimeStepRangeInfo" function="Range"/>
@@ -1037,7 +1038,8 @@
         name="TimeStep"
         command="SetTimeStepIndex"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        information_property="TimestepValues">
        <IntRangeDomain name="range">
           <RequiredProperties>
              <Property name="TimeStepRangeInfo" function="Range"/>
@@ -1493,7 +1495,8 @@
         command="SetTimeStep"
         number_of_elements="1"
         animateable="1"
-        default_values="0">
+        default_values="0"
+        information_property="TimestepValues">
        <IntRangeDomain name="range">
           <RequiredProperties>
              <Property name="TimeStepRangeInfo" function="Range"/>
