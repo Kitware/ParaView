@@ -38,6 +38,7 @@ public:
   vtkGetMacro(DisableRegistry, int);
   vtkGetMacro(CrashOnErrors, int);
   vtkGetMacro(StartEmpty, int);
+  vtkGetMacro(ClientServerConnectionTimeout, int);
   vtkGetStringMacro(ParaViewScriptName);
   vtkSetStringMacro(ParaViewScriptName);
   vtkGetStringMacro(InternalScriptName);
@@ -75,6 +76,7 @@ private:
   int DisableRegistry;
   int CrashOnErrors;
   int StartEmpty;
+  int ClientServerConnectionTimeout;
   char* ParaViewScriptName;
   char* InternalScriptName;
 };

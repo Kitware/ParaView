@@ -14,8 +14,10 @@
 =========================================================================*/
 #include "vtkPVClientServerModule.h"
 
-#include "vtkPVServerInformation.h"
+#include "vtkCallbackCommand.h"
 #include "vtkCharArray.h"
+#include "vtkClientServerInterpreter.h"
+#include "vtkClientServerStream.h"
 #include "vtkDataSet.h"
 #include "vtkDoubleArray.h"
 #include "vtkDummyController.h"
@@ -24,42 +26,43 @@
 #include "vtkLongArray.h"
 #include "vtkMapper.h"
 #include "vtkMapper.h"
+#include "vtkMPIMToNSocketConnectionPortInformation.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkOutputWindow.h"
 #include "vtkPolyData.h"
+#include "vtkProcessModuleGUIHelper.h"
 #include "vtkPVConfig.h"
 #include "vtkPVInformation.h"
+#include "vtkPVOptions.h"
+#include "vtkPVProgressHandler.h"
+#include "vtkPVServerInformation.h"
 #include "vtkShortArray.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
 #include "vtkSource.h"
 #include "vtkStringList.h"
+#include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
-#include "vtkCallbackCommand.h"
-#include "vtkPVOptions.h"
+
 #ifndef _WIN32
 # include <unistd.h>
 #else
 # include "vtkWindows.h"
 #endif
 #include <vtkstd/string>
-#include "vtkProcessModuleGUIHelper.h"
-#include "vtkPVProgressHandler.h"
-#include "vtkTimerLog.h"
+#include <vtksys/RegularExpression.hxx>
+
+
 
 #ifdef VTK_USE_MPI
 #include "vtkMPIController.h"
 #include "vtkMPICommunicator.h"
 #include "vtkMPIGroup.h"
 #endif
-
-#include "vtkClientServerStream.h"
-#include "vtkClientServerInterpreter.h"
-#include "vtkMPIMToNSocketConnectionPortInformation.h"
-
 
 #define VTK_PV_CLIENTSERVER_RMI_TAG          938531
 #define VTK_PV_CLIENTSERVER_ROOT_RMI_TAG     938532
@@ -89,7 +92,18 @@ void vtkPVClientServerMPIRMI(void *localArg, void *remoteArg,
                                 int vtkNotUsed(remoteProcessId))
 {
   vtkPVClientServerModule *self = (vtkPVClientServerModule *)(localArg);
-  self->ProcessMessage((unsigned char*)remoteArg, remoteArgLength);
+  try
+    {
+    self->ProcessMessage((unsigned char*)remoteArg, remoteArgLength);
+    }
+  catch (vtkstd::bad_alloc)
+    {
+    self->ExceptionEvent(vtkProcessModule::EXCEPTION_BAD_ALLOC);
+    }
+  catch (...)
+    {
+    self->ExceptionEvent(vtkProcessModule::EXCEPTION_UNKNOWN);
+    }
   // do something with result here??
 }
 
@@ -148,7 +162,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.45");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.45.2.1");
 
 
 //----------------------------------------------------------------------------
@@ -253,6 +267,8 @@ void vtkPVClientServerModule::Initialize()
     vtkDebugMacro("Setup observer for progress");
     this->SocketController->GetCommunicator()->AddObserver(
       vtkCommand::WrongTagEvent, this->GetObserver());
+    this->SocketController->GetCommunicator()->AddObserver(
+      vtkCommand::ErrorEvent, this->GetObserver());
 
     // The client sends the connect id to data server
     int cid = this->Options->GetConnectID();
@@ -833,6 +849,10 @@ void vtkPVClientServerModule::Connect()
     {
     return;
     }
+
+  vtkOutputWindow::GetInstance()->AddObserver(
+    vtkCommand::ErrorEvent, this->GetObserver());
+
   // Based on reverse connection information any process can
   // wait to be connected to or it can connect to a waiting process
   if ( this->ShouldWaitForConnection())
@@ -1584,5 +1604,69 @@ const char* vtkPVClientServerModule::DetermineLogFilePrefix()
   else
     {
     return "NodeLog";
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVClientServerModule::ExecuteEvent(
+  vtkObject *o, unsigned long event, void* calldata)
+{
+  if (event == vtkCommand::ErrorEvent)
+    {
+    if(o  == vtkOutputWindow::GetInstance())
+      {
+      vtksys::RegularExpression re("Unable to allocate");
+      const char* data = reinterpret_cast<const char*>(calldata);
+      if (data && re.find(data))
+        {
+        // We throw an exception instead of calling 
+        // this->ExceptionEvent() directly so that the the calls
+        // unwind. This makes it possible for the server to exit gracefully
+        // (although there might be some leaks). Otherwise, the server most
+        // likely will segfault or we will have to force exit (using exit()).
+        throw vtkstd::bad_alloc();
+        }
+      }
+    else
+      {
+      // Error from one of the controllers.
+      this->ExceptionEvent("Server connection terminated.");
+      }
+    }
+  else
+    {
+    this->Superclass::ExecuteEvent(o, event, calldata);
+    }
+}
+
+//-----------------------------------------------------------------------------
+// This method is called only on server side.
+void vtkPVClientServerModule::ExceptionEvent(int type)
+{
+  const char* msg = 0;
+  switch (type)
+    {
+  case vtkProcessModule::EXCEPTION_BAD_ALLOC:
+    msg = "Insufficient memory exception.";
+    break;
+  case vtkProcessModule::EXCEPTION_UNKNOWN:
+    msg = "Exception.";
+    break;
+    }
+  vtkErrorMacro("Exception: " << msg);
+  // Now send every client the message, for now,
+  // we send to only the active client, as only the active client
+  // is listening for messages from the server.
+  if (this->SocketController)
+    {
+    this->SocketController->Send((char*)msg, strlen(msg)+1, 1,
+      vtkProcessModule::EXCEPTION_EVENT_TAG);
+    this->SocketController->SetBreakFlag(1);
+    }
+  if (this->RenderServerSocket)
+    {
+    this->RenderServerSocket->Send((char*)msg, strlen(msg)+1, 1,
+      vtkProcessModule::EXCEPTION_EVENT_TAG);
+    this->RenderServerSocket->SetBreakFlag(1);  
     }
 }

@@ -47,7 +47,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.26");
+vtkCxxRevisionMacro(vtkProcessModule, "1.26.2.1");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -102,6 +102,7 @@ vtkProcessModule::vtkProcessModule()
   this->ProgressHandler = vtkPVProgressHandler::New();
   this->GUIHelper = 0;
   this->LogFile = 0;
+  this->AbortCommunication = 0;
 
   this->MemoryInformation = vtkKWProcessStatistics::New();
 }
@@ -214,6 +215,11 @@ int vtkProcessModule::SendStream(vtkTypeUInt32 servers,
                                  vtkClientServerStream& stream,
                                  int resetStream)
 {
+  if (this->AbortCommunication)
+    {
+    return 0;
+    }
+
   vtkTypeUInt32 sendflag = this->CreateSendFlag(servers);
   if(sendflag & DATA_SERVER)
     {
@@ -636,6 +642,7 @@ void vtkProcessModule::ExecuteEvent(
       this->ProgressEvent(o, progress, 0);
       }
     break;
+
   case vtkCommand::WrongTagEvent:
       {
       int tag = -1;
@@ -644,7 +651,8 @@ void vtkProcessModule::ExecuteEvent(
       const char* data = reinterpret_cast<const char*>(calldata);
       const char* ptr = data;
       memcpy(&tag, ptr, sizeof(tag));
-      if ( tag != vtkProcessModule::PROGRESS_EVENT_TAG )
+      if ( tag != vtkProcessModule::PROGRESS_EVENT_TAG  && 
+        tag != vtkProcessModule::EXCEPTION_EVENT_TAG)
         {
         vtkErrorMacro("Internal ParaView Error: "
                       "Socket Communicator received wrong tag: " 
@@ -652,17 +660,25 @@ void vtkProcessModule::ExecuteEvent(
         abort();
         return;
         }
+
       ptr += sizeof(tag);
       memcpy(&len, ptr, sizeof(len));
       ptr += sizeof(len);
-      val = *ptr;
-      ptr ++;
-      if ( val < 0 || val > 100 )
+      if (tag == vtkProcessModule::EXCEPTION_EVENT_TAG)
         {
-        vtkErrorMacro("Received progres not in the range 0 - 100: " << (int)val);
-        return;
+        this->ExceptionEvent(ptr);
         }
-      this->ProgressEvent(o, val, ptr);
+      else
+        {
+        val = *ptr;
+        ptr ++;
+        if ( val < 0 || val > 100 )
+          {
+          vtkErrorMacro("Received progres not in the range 0 - 100: " << (int)val);
+          return;
+          }
+        this->ProgressEvent(o, val, ptr);
+        }
       }
     break;
     }
@@ -750,3 +766,12 @@ void vtkProcessModule::CreateLogFile()
     this->LogFile = 0;
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::ExceptionEvent(const char* message)
+{
+  this->AbortCommunication = 1;
+  vtkErrorMacro("Received exception from server: " << message);
+  this->InvokeEvent(vtkCommand::AbortCheckEvent);
+}
+

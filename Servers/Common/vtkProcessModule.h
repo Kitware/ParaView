@@ -66,6 +66,13 @@ public:
     PROGRESS_EVENT_TAG = 31415
     };
 
+  enum ExceptionEventEnum
+    {
+    EXCEPTION_EVENT_TAG = 31416,
+    EXCEPTION_BAD_ALLOC = 31417,
+    EXCEPTION_UNKNOWN   = 31418
+    };
+
   static inline int GetRootId(int serverId)
     {
       if (serverId == ( DATA_SERVER | CLIENT) || serverId == ( RENDER_SERVER | CLIENT) || serverId == CLIENT_AND_SERVERS)
@@ -217,7 +224,7 @@ public:
 
   // Description:
   // Execute event on callback
-  void ExecuteEvent(vtkObject *o, unsigned long event, void* calldata);
+  virtual void ExecuteEvent(vtkObject *o, unsigned long event, void* calldata);
 
   //BTX
   // Description:
@@ -280,6 +287,11 @@ public:
   };
 //ETX
 
+  // Description:
+  // Internal method- called when an exception Tag is received 
+  // from the server.
+  void ExceptionEvent(const char* message);
+
 protected:
   vtkProcessModule();
   ~vtkProcessModule();
@@ -333,6 +345,7 @@ protected:
   vtkPVProgressHandler* ProgressHandler;
   int ProgressRequests;
   int ProgressEnabled;
+  int AbortCommunication;
 
   vtkProcessModuleObserver* Observer;
   vtkPVOptions* Options;

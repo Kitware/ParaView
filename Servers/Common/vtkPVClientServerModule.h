@@ -133,6 +133,16 @@ public:
   // Internal use. Made public to allow callbacks access.
   vtkGetMacro(Enabled, int);
 
+  // Description:
+  // Internal method - called on the server only. This method
+  // should report to all client why the server is exiting.
+  void ExceptionEvent(int type);
+  void ExceptionEvent(const char* m) 
+    { this->Superclass::ExceptionEvent(m); }
+
+  // Description:
+  // Execute event on callback
+  virtual void ExecuteEvent(vtkObject *o, unsigned long event, void* calldata);
 protected:
   vtkPVClientServerModule();
   ~vtkPVClientServerModule();

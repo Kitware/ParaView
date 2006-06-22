@@ -307,6 +307,10 @@ public:
   // Test some of the features that cannot be tested from the tcl.
   int SelfTest();
 
+  // Description:
+  // Internal method. Called by timer callback when a server connection drops.
+  void ServerConnectionClosedCallback();
+  void TimeoutWarningCallback();
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
@@ -374,7 +378,10 @@ protected:
   vtkSMRenderModuleProxy* RenderModuleProxy;
   char* RenderModuleProxyName;
   vtkSetStringMacro(RenderModuleProxyName);
-  
+
+  Tcl_TimerToken TimerToken;
+  Tcl_TimerToken TimeoutWarningTimerToken;
+  int TimeoutLeft;
 private:  
   vtkPVApplication(const vtkPVApplication&); // Not implemented
   void operator=(const vtkPVApplication&); // Not implemented

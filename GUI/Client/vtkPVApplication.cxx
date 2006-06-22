@@ -113,7 +113,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.374");
+vtkCxxRevisionMacro(vtkPVApplication, "1.374.2.1");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -405,6 +405,9 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
+  this->TimerToken = 0;
+  this->TimeoutWarningTimerToken = 0;
+
   this->Options = 0;
   this->ApplicationInitialized = 0;
   this->Observer = vtkPVApplicationObserver::New();
@@ -466,6 +469,17 @@ vtkPVApplication::vtkPVApplication()
 //----------------------------------------------------------------------------
 vtkPVApplication::~vtkPVApplication()
 {
+  if (this->TimerToken)
+    {
+    Tcl_DeleteTimerHandler(this->TimerToken);
+    this->TimerToken = 0;
+    }
+  if (this->TimeoutWarningTimerToken)
+    {
+    Tcl_DeleteTimerHandler(this->TimeoutWarningTimerToken);
+    this->TimeoutWarningTimerToken = 0;
+    }
+
   this->SetRenderModuleProxy(0);
 
   // Remove the ParaView output window so errors during exit will
@@ -497,8 +511,6 @@ vtkPVApplication::~vtkPVApplication()
     this->SaveRuntimeInfoButton->Delete();
     this->SaveRuntimeInfoButton = 0;
     }
-  
-
 }
 
 //----------------------------------------------------------------------------
@@ -521,6 +533,7 @@ void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
       }
     pm->GetProgressHandler()->SetClientMode(this->Options->GetClientMode());
     pm->GetProgressHandler()->SetServerMode(this->Options->GetServerMode());
+    pm->AddObserver(vtkCommand::AbortCheckEvent, this->Observer);
     }
 }
 //----------------------------------------------------------------------------
@@ -1014,6 +1027,47 @@ void vtkPVApplication::Initialize()
 }
 
 //----------------------------------------------------------------------------
+extern "C" {void PVApplicationTimeoutWarning(ClientData arg); }
+void PVApplicationTimeoutWarning(ClientData arg)
+{
+  vtkPVApplication* me = (vtkPVApplication*)arg;
+  me->TimeoutWarningCallback();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::TimeoutWarningCallback()
+{
+  this->TimeoutWarningTimerToken = NULL;
+  vtkPVWindow* window = this->GetMainWindow();
+  
+  if (window->GetUseMessageDialog())
+    {
+    vtksys_ios::ostringstream buf;
+    buf << "Server connection will timeout in "<<  this->TimeoutLeft 
+      <<" minutes. Please save your work.";
+    
+    vtkKWMessageDialog::PopupMessage(this, window,
+      "Timeout Warning",
+      buf.str().c_str(), vtkKWMessageDialog::WarningIcon);
+    }
+  else
+    {
+    vtkWarningMacro(
+      "Server connection will timeout in " << this->TimeoutLeft << " minutes."
+      "Please save your work.");
+    }
+
+  int timeout = this->TimeoutLeft;
+  this->TimeoutLeft = (timeout > 1)? 1 : 0;
+  if (this->TimeoutLeft)
+    {
+    this->TimeoutWarningTimerToken = Tcl_CreateTimerHandler(
+      ((timeout-this->TimeoutLeft) * 1000 * 60), 
+      PVApplicationTimeoutWarning, (ClientData) this);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVApplication::Start(int argc, char*argv[])
 {
   this->Initialize();
@@ -1046,6 +1100,16 @@ void vtkPVApplication::Start(int argc, char*argv[])
   this->Script("option add *selectColor #666");
 #endif
 
+  // Setup server connection timeout warnings.
+  int timeout = this->Options->GetClientServerConnectionTimeout();
+  this->TimeoutLeft = (timeout > 5)? 5 :
+    (timeout > 1)? 1 : 0;
+  if (this->TimeoutLeft)
+    {
+    this->TimeoutWarningTimerToken = Tcl_CreateTimerHandler(
+      ((timeout-this->TimeoutLeft) * 1000 * 60), 
+      PVApplicationTimeoutWarning, (ClientData) this);
+    }
 
 // Temporarily removing this (for the release - it has bugs)
 //    // Handle setting up the SGI pipes.
@@ -1762,9 +1826,16 @@ int vtkPVApplication::GetNumberOfPartitions()
 }
 
 //----------------------------------------------------------------------------
+extern "C" { void PVApplicationIdleServerConnectionClosed(ClientData arg); }
+void PVApplicationIdleServerConnectionClosed(ClientData arg)
+{
+  vtkPVApplication* me = (vtkPVApplication*)arg;
+  me->ServerConnectionClosedCallback();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVApplication::ExecuteEvent(vtkObject *o, unsigned long event, void* calldata)
 {
-  (void)event;
   (void)calldata;
   (void)o;
   // Placeholder for future events
@@ -1776,6 +1847,65 @@ void vtkPVApplication::ExecuteEvent(vtkObject *o, unsigned long event, void* cal
     break;
     }
     */
+    switch (event)
+      {
+    case vtkCommand::AbortCheckEvent:
+      // from process module. Invoked when server connection is dropped.
+      if (!this->TimerToken)
+        {
+        this->TimerToken = Tcl_CreateTimerHandler(110,
+          PVApplicationIdleServerConnectionClosed,
+          (ClientData)this);
+        }
+      break;
+      }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::ServerConnectionClosedCallback()
+{
+  int ret = 1;
+  vtkPVWindow* window = this->GetMainWindow();
+  if (window->GetUseMessageDialog())
+    {
+    vtkKWMessageDialog* d = vtkKWMessageDialog::New();
+    d->SetApplication(this);
+    d->SetMasterWindow(window);
+    d->SetStyleToOkOtherCancel();
+    d->SetOptions(vtkKWMessageDialog::ErrorIcon | 
+      vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault);
+    d->SetCancelButtonText("Save State");
+    d->SetOtherButtonText("Save Trace");
+    d->Create(this);
+    d->SetText("Server Connection has been dropped. "
+      "ParaView client will be terminated.");
+    d->SetTitle("Server Connection Dropped.");
+    d->SetIcon();
+    ret = d->Invoke();
+    d->Delete();
+    }
+  else
+    {
+    vtkErrorMacro("Server Connection has been dropped. ParaView will exit. ");
+    }
+
+  switch (ret)
+    {
+  case 0: // Save State.
+    window->SaveState(); 
+    break;
+  case 2: // Save Trace.
+    window->SaveTrace();
+    break;
+    }
+
+  if (this->IsDialogUp())
+    {
+    // Force the application to exit.
+    this->DialogUp =0;
+    }
+  this->TimerToken = NULL;
+  exit(1);
 }
 
 //----------------------------------------------------------------------------
