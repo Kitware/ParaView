@@ -102,7 +102,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.65");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.66");
 
 //----------------------------------------------------------------------------
 
@@ -1047,7 +1047,7 @@ void vtkPVDisplayGUI::CreateWidget()
   this->OpacityLabel->SetText("Opacity:");
   this->OpacityLabel->SetBalloonHelpString(
     "Set the opacity of the dataset's geometry.  "
-    "Artifacts may appear in translucent geomtry "
+    "Artifacts may appear in translucent geometry "
     "because primatives are not sorted.");
 
   this->OpacityScale->SetParent(this->ActorControlFrame->GetFrame());
@@ -1063,7 +1063,7 @@ void vtkPVDisplayGUI::CreateWidget()
   this->OpacityScale->SetEntryCommand(this, "OpacityChangedEndCallback");
   this->OpacityScale->SetBalloonHelpString(
     "Set the opacity of the dataset's geometry.  "
-    "Artifacts may appear in translucent geomtry "
+    "Artifacts may appear in translucent geometry "
     "because primatives are not sorted.");
 
   this->Script("grid %s %s %s %s -sticky news -pady %d",
