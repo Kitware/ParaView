@@ -1266,7 +1266,8 @@ void pqMainWindow::onFileOpen(pqServer* server)
   file_dialog->setFileMode(pqFileDialog::ExistingFiles);
   QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
     this, SLOT(onFileOpen(const QStringList&)));
-  file_dialog->show();
+  file_dialog->show(); 
+  QApplication::processEvents();
 }
 
 //-----------------------------------------------------------------------------
