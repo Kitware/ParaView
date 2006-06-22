@@ -84,7 +84,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.45");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.46");
 vtkCxxSetObjectMacro(vtkSMProxyManager, UndoStack, vtkSMUndoStack);
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -500,6 +500,7 @@ void vtkSMProxyManager::UnRegisterProxy(const char* group, const char* name)
       info.Proxy = it2->second.Proxy;
       info.GroupName = it->first.c_str();
       info.ProxyName = it2->first.c_str();
+      info.IsCompoundProxyDefinition = 0;
       
       this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
       
@@ -524,6 +525,7 @@ void vtkSMProxyManager::UnRegisterProxy(const char* name)
       info.Proxy = it2->second.Proxy;
       info.GroupName = it->first.c_str();
       info.ProxyName = it2->first.c_str();
+      info.IsCompoundProxyDefinition = 0;
       
       this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
 
@@ -555,6 +557,7 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
   info.Proxy = proxy;
   info.GroupName = groupname;
   info.ProxyName = name;
+  info.IsCompoundProxyDefinition = 0;
 
   this->InvokeEvent(vtkCommand::RegisterEvent, &info);
 }
@@ -902,6 +905,13 @@ void vtkSMProxyManager::UnRegisterCompoundProxyDefinition(const char* name)
     this->Internals->CompoundProxyDefinitions.find(name);
   if ( it != this->Internals->CompoundProxyDefinitions.end() )
     {
+    RegisteredProxyInformation info;
+    info.Proxy = 0;
+    info.GroupName = 0;
+    info.ProxyName = name;
+    info.IsCompoundProxyDefinition = 1;
+    this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
+
     this->Internals->CompoundProxyDefinitions.erase(it);
     }
 }
@@ -916,6 +926,12 @@ void vtkSMProxyManager::RegisterCompoundProxyDefinition(
     }
 
   this->Internals->CompoundProxyDefinitions[name] = top;
+  RegisteredProxyInformation info;
+  info.Proxy = 0;
+  info.GroupName = 0;
+  info.ProxyName = name;
+  info.IsCompoundProxyDefinition = 1;
+  this->InvokeEvent(vtkCommand::RegisterEvent, &info);
 }
 
 //---------------------------------------------------------------------------

@@ -234,6 +234,9 @@ public:
     vtkSMProxy* Proxy;
     const char* GroupName;
     const char* ProxyName;
+    // Set when the register/unregister event if fired for registration of 
+    // a compound proxy definition.
+    int IsCompoundProxyDefinition;
   };
 
   struct ModifiedPropertyInformation
