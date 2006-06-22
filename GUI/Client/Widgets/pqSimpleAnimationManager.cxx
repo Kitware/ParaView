@@ -55,6 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqApplicationCore.h"
 #include "pqRenderModule.h"
+#include "ui_pqAbortAnimation.h"
 #include "ui_pqAnimationSettings.h"
 
 //-----------------------------------------------------------------------------
@@ -266,14 +267,25 @@ bool pqSimpleAnimationManager::createTimestepAnimation(
   this->Internal->AnimationScene->SetEndTime(
     dialogUI.spinBoxAnimationDuration->value());
 
-  this->Internal->AnimationScene->SaveImages(filePrefix.toStdString().c_str(), 
+  QDialog abortDialog;
+  Ui::AbortAnimation abortDialogUI;
+  abortDialogUI.setupUi(&abortDialog);
+  abortDialog.show();
+  QApplication::processEvents();
+
+  QObject::connect(&abortDialog, SIGNAL(accepted()), 
+    this, SLOT(abortSavingAnimation()));
+
+
+  int status = this->Internal->AnimationScene->SaveImages(
+    filePrefix.toStdString().c_str(),
     extension.toStdString().c_str(), 
     dialogUI.spinBoxWidth->value(),
     dialogUI.spinBoxHeight->value(),
     dialogUI.spinBoxFrameRate->value(), 0);
  
   activeView->getWidget()->resize(viewSize);   
-  return true;
+  return (status == 0);
 }
 
 

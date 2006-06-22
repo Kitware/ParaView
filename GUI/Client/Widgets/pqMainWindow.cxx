@@ -1555,7 +1555,7 @@ void pqMainWindow::onFileSaveAnimation()
   filters += ";;AVI files (*.avi)";
 # endif
 #endif
-  filters +=";;JPEG images (*.jpg);; TIFF images (*.tif);; PNG images (*.png)";
+  filters +=";;JPEG images (*.jpg);;TIFF images (*.tif);;PNG images (*.png)";
   filters +=";;All files(*)";
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), 
     this, tr("Save Animation:"), QString(), filters);
@@ -1576,7 +1576,10 @@ void pqMainWindow::onFileSaveAnimation(const QStringList& files)
     return;
     }
   pqSimpleAnimationManager manager(this);
- cout << "status: " <<  manager.createTimestepAnimation(source, files[0]) << endl;
+  if (!manager.createTimestepAnimation(source, files[0]))
+    {
+    qDebug()<< "Animation not saved successfully.";
+    }
 }
 
 //-----------------------------------------------------------------------------

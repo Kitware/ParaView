@@ -97,6 +97,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
 SET(UI_FORMS
+  pqAbortAnimation.ui
   pqAddSourceDialog.ui
   pqAnimationSettings.ui
   pqCompoundProxyWizard.ui
