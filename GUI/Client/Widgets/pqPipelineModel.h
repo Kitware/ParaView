@@ -253,6 +253,7 @@ public slots:
   /// \brief
   ///   Updates the display columns for the given source.
   /// \param source The source to update.
+  /// \param display The display that is changing.
   void updateDisplays(pqPipelineSource *source, pqPipelineDisplay *display);
 
   /// \brief
@@ -353,6 +354,7 @@ private:
   /// \brief
   ///   Creates a model index for the pipeline model item.
   /// \param item The item to make an index for.
+  /// \param column The column to set in the new index.
   /// \return
   ///   A model index for the specified item.
   QModelIndex makeIndex(pqPipelineModelItem *item, int column=0) const;

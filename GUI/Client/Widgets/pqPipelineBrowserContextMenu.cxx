@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqPipelineBrowserContextMenu.h
+/// \file pqPipelineBrowserContextMenu.cxx
 /// \date 4/20/2006
 
 #include "pqPipelineBrowserContextMenu.h"

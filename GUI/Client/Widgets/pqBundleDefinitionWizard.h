@@ -46,17 +46,17 @@ class QModelIndex;
 class vtkSMCompoundProxy;
 
 
-/// \class pqBundleDefinitionWizard
-/// \brief
-///   The pqBundleDefinitionWizard class is used to create a compound
-///   proxy definition one step at a time.
-///
-/// The wizard should be created with a pqBundleDefinitionModel. The
-/// model stores the sources that will be placed in the bundle. The
-/// model is also used when selecting the exposed properties.
-///
-/// The following is an example of how to use the wizard:
-/*!
+/*! \class pqBundleDefinitionWizard
+ *  \brief
+ *    The pqBundleDefinitionWizard class is used to create a compound
+ *    proxy definition one step at a time.
+ * 
+ *  The wizard should be created with a pqBundleDefinitionModel. The
+ *  model stores the sources that will be placed in the bundle. The
+ *  model is also used when selecting the exposed properties.
+ * 
+ *  The following is an example of how to use the wizard:
+ * 
  *  \code
  *  pqBundleDefinitionModel bundle(this);
  *  bundle.setContents(
@@ -67,14 +67,14 @@ class vtkSMCompoundProxy;
  *    wizard.createPipelineBundle();
  *    }
  *  \endcode
+ *
+ *  The bundle definition model is filled out using the selected
+ *  pipeline sources. After setting the bundle definition model's
+ *  contents, you can check to see if any sources were added. The
+ *  wizard can make a compound proxy without any sources, but you
+ *  may not want to allow it. After the \c createPipelineBundle call,
+ *  you can get the name of the newly created compound proxy.
  */
-///
-/// The bundle definition model is filled out using the selected
-/// pipeline sources. After setting the bundle definition model's
-/// contents, you can check to see if any sources were added. The
-/// wizard can make a compound proxy without any sources, but you
-/// may not want to allow it. After the \c createPipelineBundle call,
-/// you can get the name of the newly created compound proxy.
 class PQWIDGETS_EXPORT pqBundleDefinitionWizard : public QDialog
 {
   Q_OBJECT
@@ -84,7 +84,7 @@ public:
   ///   Creates a bundle definition wizard.
   /// \param model The bundle definition model to use. The model should
   ///   not be null.
-  /// \parent The parent widget for the wizard.
+  /// \param parent The parent widget for the wizard.
   pqBundleDefinitionWizard(pqBundleDefinitionModel *model, QWidget *parent=0);
   virtual ~pqBundleDefinitionWizard();
 
