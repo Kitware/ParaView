@@ -51,8 +51,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QRect>
 
 // Set zoom/pan factors for key and wheel events.
-#define ZOOM_FACTOR 10.0
-#define PAN_FACTOR 10.0
+#define ZOOM_FACTOR_ALT 20.0
+#define PAN_FACTOR_ALT 10.0
 
 // Zoom cursor xpm.
 #include "zoom.xpm"
@@ -124,7 +124,7 @@ void pqChartZoomPanAlt::panUp()
   pqChartValue yRange,yNumInts,yInc;
   yRange = yAxis.getValueRange();
   yNumInts = yAxis.getNumberOfIntervals();
-  yInc = yRange.getFloatValue()/PAN_FACTOR;
+  yInc = yRange.getFloatValue()/PAN_FACTOR_ALT;
 
   this->setAxesBounds(0,0,yInc,yInc);
 }
@@ -135,7 +135,7 @@ void pqChartZoomPanAlt::panDown()
   pqChartValue yRange,yNumInts,yInc;
   yRange = yAxis.getValueRange();
   yNumInts = yAxis.getNumberOfIntervals();
-  yInc = yRange.getFloatValue()/PAN_FACTOR;
+  yInc = yRange.getFloatValue()/PAN_FACTOR_ALT;
 
   this->setAxesBounds(0,0,-1*yInc,-1*yInc);
 }
@@ -146,7 +146,7 @@ void pqChartZoomPanAlt::panLeft()
   pqChartValue xRange,xNumInts,xInc;
   xRange = xAxis.getValueRange();
   xNumInts = xAxis.getNumberOfIntervals();
-  xInc = xRange.getFloatValue()/PAN_FACTOR;
+  xInc = xRange.getFloatValue()/PAN_FACTOR_ALT;
 
   this->setAxesBounds(-1*xInc,-1*xInc,0,0);
 }
@@ -157,7 +157,7 @@ void pqChartZoomPanAlt::panRight()
   pqChartValue xRange,xNumInts,xInc;
   xRange = xAxis.getValueRange();
   xNumInts = xAxis.getNumberOfIntervals();
-  xInc = xRange.getFloatValue()/PAN_FACTOR;
+  xInc = xRange.getFloatValue()/PAN_FACTOR_ALT;
 
   this->setAxesBounds(xInc,xInc,0,0);
 }
@@ -172,13 +172,13 @@ void pqChartZoomPanAlt::zoomIn(InteractFlags flags)
     {
     pqChartAxis &xAxis = this->Parent->getXAxis();
     xRange = xAxis.getValueRange();
-    xInc = xRange/ZOOM_FACTOR;
+    xInc = xRange/ZOOM_FACTOR_ALT;
     }
   if(flags==pqChartZoomPanAlt::ZoomYOnly || flags==pqChartZoomPanAlt::ZoomBoth)
     {
     pqChartAxis &yAxis = this->Parent->getYAxis();
     yRange = yAxis.getValueRange();
-    yInc = yRange/ZOOM_FACTOR;
+    yInc = yRange/ZOOM_FACTOR_ALT;
     }
 
   this->setAxesBounds(xInc,xInc*factor,yInc,yInc*factor);
@@ -195,13 +195,13 @@ void pqChartZoomPanAlt::zoomOut(InteractFlags flags)
     {
     pqChartAxis &xAxis = this->Parent->getXAxis();
     xRange = xAxis.getValueRange();
-    xInc = xRange/ZOOM_FACTOR;
+    xInc = xRange/ZOOM_FACTOR_ALT;
     }
   if(flags==pqChartZoomPanAlt::ZoomYOnly || flags==pqChartZoomPanAlt::ZoomBoth)
     {
     pqChartAxis &yAxis = this->Parent->getYAxis();
     yRange = yAxis.getValueRange();
-    yInc = yRange/ZOOM_FACTOR;
+    yInc = yRange/ZOOM_FACTOR_ALT;
     }
 
   this->setAxesBounds(xInc*factor,xInc,yInc*factor,yInc);
@@ -275,7 +275,7 @@ bool pqChartZoomPanAlt::handleWheelZoom(int delta, const QPoint &pos,
 
   // If the wheel event delta is positive, zoom in. Otherwise,
   // zoom out.
-  int factorChange = ZOOM_FACTOR;
+  int factorChange = ZOOM_FACTOR_ALT;
   if(delta < 0)
     factorChange *= -1;
 
