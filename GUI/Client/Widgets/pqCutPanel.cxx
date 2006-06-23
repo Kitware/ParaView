@@ -41,7 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkSMDataObjectDisplayProxy.h>
 #include <vtkSMDoubleVectorProperty.h>
-#include <vtkSMNew3DWidgetProxy.h>
 #include <vtkSMProxyProperty.h>
 
 #include <QFrame>
