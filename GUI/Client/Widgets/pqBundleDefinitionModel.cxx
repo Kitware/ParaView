@@ -294,7 +294,7 @@ QVariant pqBundleDefinitionModel::data(const QModelIndex &idx, int role) const
   return QVariant();
 }
 
-Qt::ItemFlags pqBundleDefinitionModel::flags(const QModelIndex &idx) const
+Qt::ItemFlags pqBundleDefinitionModel::flags(const QModelIndex &) const
 {
   return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
