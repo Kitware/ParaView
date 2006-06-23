@@ -333,6 +333,8 @@ bool pqChartZoomPanAlt::handleWheelZoom(int delta, const QPoint &pos,
   this->setContentsPos(x, y);
   return true;
 */
+
+  return false;
 }
 
 void pqChartZoomPanAlt::finishInteraction()
