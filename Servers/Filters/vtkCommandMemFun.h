@@ -60,7 +60,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // .SECTION See Also
 // vtkCallbackCommand
 template<class ClassT>
-class vtkCommandMemFun :
+class VTK_EXPORT vtkCommandMemFun :
   public vtkCommand
 {
   typedef vtkCommandMemFun<ClassT> ThisT;
@@ -69,6 +69,11 @@ public:
   static ThisT* New()
   {
     return new ThisT();
+  }
+
+  void PrintSelf(ostream& os, vtkIndent indent)
+  {
+    vtkCommand::PrintSelf(os, indent);
   }
 
   // Description:
@@ -80,7 +85,7 @@ public:
     this->Method = method;
   }
 
-  virtual void Execute(vtkObject*, unsigned long eventid, void*)
+  virtual void Execute(vtkObject*, unsigned long, void*)
   {
     if(this->Object && this->Method)
       {
@@ -101,6 +106,9 @@ private:
   
   ClassT* Object;
   void (ClassT::*Method)();
+  
+  vtkCommandMemFun(const vtkCommandMemFun&); // Not implemented
+  void operator=(const vtkCommandMemFun&); // Not implemented
 };
 
 // Description:
