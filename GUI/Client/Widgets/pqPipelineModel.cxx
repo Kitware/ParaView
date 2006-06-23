@@ -59,11 +59,19 @@ class pqPipelineModelSource;
 class pqPipelineModelItem : public QObject
 {
 public:
+  enum VisibleState
+    {
+    NotAllowed,
+    Visible,
+    NotVisible
+    };
+
+public:
   pqPipelineModelItem(QObject *parent=0);
   virtual ~pqPipelineModelItem() {}
 
   virtual QString getName() const=0;
-  virtual bool isVisible(pqRenderModule *module) const=0;
+  virtual VisibleState getVisibleState(pqRenderModule *module) const=0;
   virtual pqPipelineModelItem *getParent() const=0;
   virtual pqServerManagerModelItem *getObject() const=0;
   virtual int getChildCount() const=0;
@@ -89,7 +97,8 @@ public:
   virtual ~pqPipelineModelServer();
 
   virtual QString getName() const;
-  virtual bool isVisible(pqRenderModule *) const {return false;}
+  virtual pqPipelineModelItem::VisibleState getVisibleState(
+      pqRenderModule *module) const;
   virtual pqPipelineModelItem *getParent() const {return 0;}
   virtual pqServerManagerModelItem *getObject() const {return this->Server;}
   virtual int getChildCount() const {return this->Sources.size();}
@@ -132,7 +141,8 @@ public:
   virtual ~pqPipelineModelSource();
 
   virtual QString getName() const;
-  virtual bool isVisible(pqRenderModule *module) const;
+  virtual pqPipelineModelItem::VisibleState getVisibleState(
+      pqRenderModule *module) const;
   virtual pqPipelineModelItem *getParent() const {return this->getServer();}
   virtual pqServerManagerModelItem *getObject() const {return this->Source;}
   virtual int getChildCount() const {return this->Outputs.size();}
@@ -178,7 +188,8 @@ public:
   virtual ~pqPipelineModelLink() {}
 
   virtual QString getName() const;
-  virtual bool isVisible(pqRenderModule *module) const;
+  virtual pqPipelineModelItem::VisibleState getVisibleState(
+      pqRenderModule *module) const;
   virtual pqPipelineModelItem *getParent() const {return this->Source;}
   virtual pqServerManagerModelItem *getObject() const;
   virtual int getChildCount() const {return 0;}
@@ -208,6 +219,7 @@ public:
   enum PixmapIndex
     {
     Eyeball = pqPipelineModel::LastType + 1,
+    EyeballGray,
     Total
     };
 
@@ -260,6 +272,12 @@ QString pqPipelineModelServer::getName() const
     }
 
   return QString();
+}
+
+pqPipelineModelItem::VisibleState pqPipelineModelServer::getVisibleState(
+    pqRenderModule *module) const
+{
+  return pqPipelineModelItem::NotAllowed;
 }
 
 int pqPipelineModelServer::getChildIndex(pqPipelineModelItem *item) const
@@ -329,15 +347,24 @@ QString pqPipelineModelSource::getName() const
   return QString();
 }
 
-bool pqPipelineModelSource::isVisible(pqRenderModule *module) const
+pqPipelineModelItem::VisibleState pqPipelineModelSource::getVisibleState(
+    pqRenderModule *module) const
 {
-  pqPipelineDisplay *display = this->Source->getDisplay(module);
-  if(display)
+  pqPipelineModelItem::VisibleState state = pqPipelineModelItem::NotAllowed;
+  if(module && module->getServer() == this->Source->getServer())
     {
-    return display->isVisible();
+    pqPipelineDisplay *display = this->Source->getDisplay(module);
+    if(display && display->isVisible())
+      {
+      state = pqPipelineModelItem::Visible;
+      }
+    else
+      {
+      state = pqPipelineModelItem::NotVisible;
+      }
     }
 
-  return false;
+  return state;
 }
 
 int pqPipelineModelSource::getChildIndex(pqPipelineModelItem *item) const
@@ -430,14 +457,15 @@ QString pqPipelineModelLink::getName() const
   return QString();
 }
 
-bool pqPipelineModelLink::isVisible(pqRenderModule *module) const
+pqPipelineModelItem::VisibleState pqPipelineModelLink::getVisibleState(
+    pqRenderModule *module) const
 {
   if(this->Sink)
     {
-    return this->Sink->isVisible(module);
+    return this->Sink->getVisibleState(module);
     }
 
-  return false;
+  return pqPipelineModelItem::NotAllowed;
 }
 
 pqServerManagerModelItem *pqPipelineModelLink::getObject() const
@@ -483,6 +511,8 @@ pqPipelineModel::pqPipelineModel(QObject *p)
         ":/pqWidgets/pqLinkBack16.png");
     this->PixmapList[pqPipelineModelInternal::Eyeball].load(
         ":/pqWidgets/pqEyeball16.png");
+    this->PixmapList[pqPipelineModelInternal::EyeballGray].load(
+        ":/pqWidgets/pqEyeballd16.png");
     }
 }
 
@@ -591,10 +621,20 @@ QVariant pqPipelineModel::data(const QModelIndex &idx, int role) const
         {
         case Qt::DisplayRole:
           {
-          if(idx.column() == 1 && item->isVisible(this->Internal->CurrentView))
+          if(idx.column() == 1)
             {
-            return QVariant(QIcon(
-                this->PixmapList[pqPipelineModelInternal::Eyeball]));
+            pqPipelineModelItem::VisibleState visible = item->getVisibleState(
+                this->Internal->CurrentView);
+            if(visible == pqPipelineModelItem::Visible)
+              {
+              return QVariant(QIcon(
+                  this->PixmapList[pqPipelineModelInternal::Eyeball]));
+              }
+            else if(visible == pqPipelineModelItem::NotVisible)
+              {
+              return QVariant(QIcon(
+                  this->PixmapList[pqPipelineModelInternal::EyeballGray]));
+              }
             }
           }
         case Qt::ToolTipRole:
