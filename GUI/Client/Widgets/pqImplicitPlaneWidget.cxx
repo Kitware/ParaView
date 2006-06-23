@@ -39,11 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqImplicitPlaneWidget.h"
 
 #include <vtkCamera.h>
-#include <vtkCommand.h>
+#include <vtkCommandMemFun.h>
 #include <vtkImplicitPlaneRepresentation.h>
 #include <vtkProcessModule.h>
 #include <vtkPVDataInformation.h>
 #include <vtkRenderer.h>
+#include <vtkSmartPointer.h>
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMNew3DWidgetProxy.h>
@@ -53,50 +54,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMSourceProxy.h>
 
 /////////////////////////////////////////////////////////////////////////
-// pqCommandCallback
-
-template<class ClassT>
-class pqCommandCallback :
-  public vtkCommand
-{
-  typedef pqCommandCallback<ClassT> ThisT;
-  
-public:
-  static ThisT* New()
-  {
-    return new ThisT();
-  }
-
-  void SetCallback(ClassT& object, void (ClassT::*method)())
-  {
-    this->Object = &object;
-    this->Method = method;
-  }
-
-  virtual void Execute(vtkObject*, unsigned long eventid, void*)
-  {
-    if(this->Object && this->Method)
-      {
-      (this->Object->*this->Method)();
-      }
-  }
-
-private:
-  pqCommandCallback() :
-    Object(0),
-    Method(0)
-  {
-  }
-  
-  ~pqCommandCallback()
-  {
-  }
-  
-  ClassT* Object;
-  void (ClassT::*Method)();
-};
-
-/////////////////////////////////////////////////////////////////////////
 // pqImplicitPlaneWidget::pqImplementation
 
 class pqImplicitPlaneWidget::pqImplementation
@@ -104,9 +61,6 @@ class pqImplicitPlaneWidget::pqImplementation
 public:
   pqImplementation() :
     UI(new Ui::pqImplicitPlaneWidget()),
-    StartDragObserver(pqCommandCallback<pqImplicitPlaneWidget>::New()),
-    ChangeObserver(pqCommandCallback<pqImplicitPlaneWidget>::New()),
-    EndDragObserver(pqCommandCallback<pqImplicitPlaneWidget>::New()),
     Widget(0),
     IgnoreVisibilityWidget(false),
     IgnoreQtWidgets(false),
@@ -116,20 +70,17 @@ public:
   
   ~pqImplementation()
   {
-    this->EndDragObserver->Delete();
-    this->ChangeObserver->Delete();
-    this->StartDragObserver->Delete();
     delete this->UI;
   }
   
   /// Stores the Qt widgets
   Ui::pqImplicitPlaneWidget* const UI;
   /// Callback object used to connect 3D widget events to member methods
-  pqCommandCallback<pqImplicitPlaneWidget>* const StartDragObserver;
+  vtkSmartPointer<vtkCommand> StartDragObserver;
   /// Callback object used to connect 3D widget events to member methods
-  pqCommandCallback<pqImplicitPlaneWidget>* const ChangeObserver;
+  vtkSmartPointer<vtkCommand> ChangeObserver;
   /// Callback object used to connect 3D widget events to member methods
-  pqCommandCallback<pqImplicitPlaneWidget>* const EndDragObserver;
+  vtkSmartPointer<vtkCommand> EndDragObserver;
   /// References the 3D implicit plane widget
   vtkSMNew3DWidgetProxy* Widget;
   /// Source proxy that will supply the bounding box for the 3D widget
@@ -153,12 +104,12 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(QWidget* p) :
   QWidget(p),
   Implementation(new pqImplementation())
 {
-  this->Implementation->StartDragObserver->SetCallback(
-    *this, &pqImplicitPlaneWidget::on3DWidgetStartDrag);
-  this->Implementation->ChangeObserver->SetCallback(
-    *this, &pqImplicitPlaneWidget::on3DWidgetChanged);
-  this->Implementation->EndDragObserver->SetCallback(
-    *this, &pqImplicitPlaneWidget::on3DWidgetEndDrag);
+  this->Implementation->StartDragObserver.TakeReference(
+    vtkMakeCommandMemFun(*this, &pqImplicitPlaneWidget::on3DWidgetStartDrag));
+  this->Implementation->ChangeObserver.TakeReference(
+    vtkMakeCommandMemFun(*this, &pqImplicitPlaneWidget::on3DWidgetChanged));
+  this->Implementation->EndDragObserver.TakeReference(
+    vtkMakeCommandMemFun(*this, &pqImplicitPlaneWidget::on3DWidgetEndDrag));
     
   this->Implementation->UI->setupUi(this);
 
