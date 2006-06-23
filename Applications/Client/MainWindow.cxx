@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program: ParaView
    Module:    $RCS $
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -54,7 +54,7 @@ MainWindow::MainWindow()
 {
   this->setWindowTitle(QByteArray("ParaView") + 
                        QByteArray(" ") + 
-                       QByteArray(PARAQ_VERSION_FULL) + 
+                       QByteArray(PARAVIEW_VERSION_FULL) + 
                        QByteArray(" (alpha)"));
   this->setWindowIcon(QIcon(":pqWidgets/pqAppIcon64.png"));
 
@@ -174,16 +174,16 @@ void MainWindow::showHelp()
       {
       args.append(profile);
       }
-    else if(getenv("PARAQ_HELP"))
+    else if(getenv("PARAVIEW_HELP"))
       {
       // not bundled, ask for help
-      args.append(getenv("PARAQ_HELP"));
+      args.append(getenv("PARAVIEW_HELP"));
       }
     else
       {
       // no help, error out
       QMessageBox::critical(this, "Help error", "Couldn't find"
-                            " pqClient.adp.\nTry setting the PARAQ_HELP environment variable which"
+                            " pqClient.adp.\nTry setting the PARAVIEW_HELP environment variable which"
                             " points to that file");
       
       delete this->HelpClient;

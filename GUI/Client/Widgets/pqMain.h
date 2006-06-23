@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program: ParaView
    Module:    pqMain.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqProcessModuleGUIHelper;
 
-/// Helper class that wraps all of the boilerplate to create a ParaQ client into one function
+/// Helper class that wraps all of the boilerplate to create a ParaView client into one function
 class PQWIDGETS_EXPORT pqMain
 {
 public:

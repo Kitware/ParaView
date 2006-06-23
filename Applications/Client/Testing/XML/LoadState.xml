@@ -2,6 +2,6 @@
 <pqevents>
   <pqevent object="MainWindow/MenuBar/FileMenu" command="activate" arguments="LoadServerState" />
   <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
-  <pqevent object="MainWindow/FileOpenServerStateDialog" command="filesSelected" arguments="$PARAQ_DATA_ROOT/Data/LoadState.pvs" />
+  <pqevent object="MainWindow/FileOpenServerStateDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/LoadState.pvs" />
   <pqevent object="MainWindow/PipelineInspectorDock/PipelineList/PipelineView" command="currentChanged" arguments="/0/0/0|0" />
 </pqevents>

@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program: ParaView
    Module:    pqProcessModuleGUIHelper.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -39,7 +39,7 @@ class QWidget;
 class vtkSMApplication;
 class QApplication;
 class QString;
-/*! \brief This is the GUI helper for ParaQ.
+/*! \brief This is the GUI helper for ParaView.
  * This class provides GUI elements to the process module without forcing
  * the process modules to link with the GUI. This class creates the QApplication
  * and the pqMainWindow when the ProcessModule requests the event loop to begin.

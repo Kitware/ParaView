@@ -1,39 +1,39 @@
-PROJECT(ParaQ)
+PROJECT(ParaView)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.2)
 
 #########################################################################
 # Disallow in-source build
-STRING(COMPARE EQUAL "${ParaQ_SOURCE_DIR}" 
-  "${ParaQ_BINARY_DIR}" INSOURCE)
+STRING(COMPARE EQUAL "${ParaView_SOURCE_DIR}" 
+  "${ParaView_BINARY_DIR}" INSOURCE)
 IF(INSOURCE)
-  MESSAGE(FATAL_ERROR "ParaQ requires an out of source Build. Please create a separate binary directory and run CMake there.")
+  MESSAGE(FATAL_ERROR "ParaView requires an out of source Build. Please create a separate binary directory and run CMake there.")
 ENDIF(INSOURCE)
 
 #########################################################################
-SET(PARAQ_VERSION_MAJOR 2)
-SET(PARAQ_VERSION_MINOR 9)
-SET(PARAQ_VERSION_PATCH 0)
-SET(PARAQ_VERSION "${PARAQ_VERSION_MAJOR}.${PARAQ_VERSION_MINOR}")
-SET(PARAQ_VERSION_FULL "${PARAQ_VERSION}.${PARAQ_VERSION_PATCH}")
+SET(PARAVIEW_VERSION_MAJOR 2)
+SET(PARAVIEW_VERSION_MINOR 9)
+SET(PARAVIEW_VERSION_PATCH 0)
+SET(PARAVIEW_VERSION "${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}")
+SET(PARAVIEW_VERSION_FULL "${PARAVIEW_VERSION}.${PARAVIEW_VERSION_PATCH}")
 
 # See VTK/CMakeLists.txt for an explanation of this default selection.
-IF(PARAQ_VERSION_MINOR MATCHES "[02468]$")
+IF(PARAVIEW_VERSION_MINOR MATCHES "[02468]$")
   # This is a release version.  Default to not use rpath.
   SET(VTK_USE_RPATH_DEFAULT OFF)
-ELSE(PARAQ_VERSION_MINOR MATCHES "[02468]$")
+ELSE(PARAVIEW_VERSION_MINOR MATCHES "[02468]$")
   # This is a development version.  Default to use rpath.
   SET(VTK_USE_RPATH_DEFAULT ON)
-ENDIF(PARAQ_VERSION_MINOR MATCHES "[02468]$")
+ENDIF(PARAVIEW_VERSION_MINOR MATCHES "[02468]$")
 
 #########################################################################
 # build VTK/Qt support
-OPTION(PARAQ_BUILD_GUI "Build ParaQ Client. This requires Qt." ON)
-MARK_AS_ADVANCED(PARAQ_BUILD_GUI)
-IF (PARAQ_BUILD_GUI)
+OPTION(PARAVIEW_BUILD_QT_GUI "Build ParaView Qt Client. This requires Qt." ON)
+MARK_AS_ADVANCED(PARAVIEW_BUILD_QT_GUI)
+IF (PARAVIEW_BUILD_QT_GUI)
   SET(VTK_USE_GUISUPPORT ON CACHE BOOL "Build VTK with GUI Support" FORCE)
   SET(VTK_USE_QVTK ON CACHE BOOL "Build VTK with Qt Support" FORCE)
   SET(DESIRED_QT_VERSION 4 CACHE STRING "Use Qt4" FORCE)
-ENDIF (PARAQ_BUILD_GUI)
+ENDIF (PARAVIEW_BUILD_QT_GUI)
 
 
 # Work around CMake 2.2.x FindPythonLibs bug.
@@ -43,49 +43,53 @@ SET(PYTHON_DEBUG_LIBRARY "" CACHE FILEPATH "Purposely empty: work around CMake F
 
 #########################################################################
 # Configure Testing
-OPTION(BUILD_TESTING "Build ParaQ Testing" ON)
+OPTION(BUILD_TESTING "Build ParaView Testing" ON)
 IF(BUILD_TESTING)
-  SET(PARAQ_TEST_DIR    ${ParaQ_BINARY_DIR}/Testing/Temporary)
-  MAKE_DIRECTORY(${PARAQ_TEST_DIR})
+  SET(PARAVIEW_TEST_DIR    ${ParaView_BINARY_DIR}/Testing/Temporary)
+  MAKE_DIRECTORY(${PARAVIEW_TEST_DIR})
   ENABLE_TESTING()
   INCLUDE (CTest)
 ENDIF(BUILD_TESTING)
 
 #########################################################################
 # Configure data directory
-FIND_PATH(PARAQ_DATA_ROOT ParaQData.readme ${ParaQ_SOURCE_DIR}/../ParaQData $ENV{PARAQ_DATA_ROOT})
+FIND_PATH(PARAVIEW_DATA_ROOT ParaViewData.readme
+  ${ParaView_SOURCE_DIR}/ParaViewData
+  ${ParaView_SOURCE_DIR}/../ParaViewData
+  $ENV{PARAVIEW_DATA_ROOT}
+  )
 
 #########################################################################
 # Configure Python
-OPTION(PARAQ_EMBED_PYTHON "Embedded Python Interpreter" ON)
+OPTION(PARAVIEW_EMBED_PYTHON "Embedded Python Interpreter" ON)
 
-IF(PARAQ_EMBED_PYTHON)
+IF(PARAVIEW_EMBED_PYTHON)
 
   SUBDIRS(Utilities/pqPython)
-  SET(BUILD_SHARED_LIBS ON CACHE BOOL "Build ParaQ using shared libraries" FORCE)
+  SET(BUILD_SHARED_LIBS ON CACHE BOOL "Build ParaView using shared libraries" FORCE)
   SET(PARAVIEW_WRAP_PYTHON ON CACHE BOOL "Wrap ParaView server manager into Python" FORCE)
 
-ELSE(PARAQ_EMBED_PYTHON)
+ELSE(PARAVIEW_EMBED_PYTHON)
 
   SET(PARAVIEW_WRAP_PYTHON OFF CACHE BOOL "Wrap ParaView server manager into Python" FORCE)
 
-ENDIF(PARAQ_EMBED_PYTHON)
+ENDIF(PARAVIEW_EMBED_PYTHON)
 
 #########################################################################
 IF(BUILD_SHARED_LIBS)
-  ADD_DEFINITIONS(-DPARAQ_BUILD_SHARED_LIBS)
+  ADD_DEFINITIONS(-DPARAVIEW_BUILD_SHARED_LIBS)
 ENDIF(BUILD_SHARED_LIBS)
 
 
 #########################################################################
 # Set the ServerManager test data dir,
-SET(PVServerManagerTestData ${PARAQ_DATA_ROOT})
+SET(PVServerManagerTestData ${PARAVIEW_DATA_ROOT})
 
 #########################################################################
 # Include the file that most of the environment setup (except GUI).
-SET(ParaView_SOURCE_DIR ${ParaQ_SOURCE_DIR})
-SET(ParaView_BINARY_DIR ${ParaQ_BINARY_DIR})
-INCLUDE(${ParaQ_SOURCE_DIR}/CMake/ParaViewCommon.cmake)
+SET(ParaView_SOURCE_DIR ${ParaView_SOURCE_DIR})
+SET(ParaView_BINARY_DIR ${ParaView_BINARY_DIR})
+INCLUDE(${ParaView_SOURCE_DIR}/CMake/ParaViewCommon.cmake)
 
 #########################################################################
 IF(BUILD_DOCUMENTATION)
@@ -98,14 +102,14 @@ CONFIGURE_FILE(${ParaView_SOURCE_DIR}/vtkPQConfig.h.in
   ESCAPE_QUOTES)
 
 #########################################################################
-IF (PARAQ_BUILD_GUI)
+IF (PARAVIEW_BUILD_QT_GUI)
   SUBDIRS(GUI)
-ENDIF (PARAQ_BUILD_GUI)
+ENDIF (PARAVIEW_BUILD_QT_GUI)
 
 #########################################################################
-IF (PARAQ_BUILD_GUI)
+IF (PARAVIEW_BUILD_QT_GUI)
 SUBDIRS(Applications)
-ENDIF (PARAQ_BUILD_GUI)
+ENDIF (PARAVIEW_BUILD_QT_GUI)
 
 # Find hints file for the client/server wrapping
 FIND_FILE(VTK_WRAP_HINTS hints ${ParaView_SOURCE_DIR}/VTK/Wrapping)

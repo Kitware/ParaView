@@ -10,7 +10,7 @@
 #ifndef _pqPythonExport_h
 #define _pqPythonExport_h
 
-#if defined(WIN32) && defined(PARAQ_BUILD_SHARED_LIBS)
+#if defined(WIN32) && defined(PARAVIEW_BUILD_SHARED_LIBS)
 # if defined(pqPython_EXPORTS)
 #   define PQPYTHON_EXPORT __declspec(dllexport)
 # else

@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program: ParaView
    Module:    pqServer.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -32,8 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqServer.h"
 
+// VTK includes
 #include <vtkToolkits.h>
 #include <vtkObjectFactory.h>
+
+// ParaView Server Manager includes
 #include <vtkProcessModuleGUIHelper.h>
 #include <vtkPVOptions.h>
 #include <vtkProcessModule.h>
@@ -47,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QCoreApplication>
 #include <QtDebug>
 
-// ParaQ includes.
+// ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqOptions.h"
 #include "pqServerManagerModel.h"

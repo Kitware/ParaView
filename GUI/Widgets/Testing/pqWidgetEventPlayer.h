@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program: ParaView
    Module:    pqWidgetEventPlayer.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -39,7 +39,7 @@ class QObject;
 class QString;
 
 /**
-Abstract interface for an object that can playback high-level ParaQ events by translating them into low-level Qt events, for test-cases, demos, tutorials, etc.
+Abstract interface for an object that can playback high-level ParaView events by translating them into low-level Qt events, for test-cases, demos, tutorials, etc.
 
 \sa pqEventPlayer
 */

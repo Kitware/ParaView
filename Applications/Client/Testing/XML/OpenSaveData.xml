@@ -2,13 +2,13 @@
 <pqevents>
   <pqevent object="MainWindow/MenuBar/FileMenu" command="activate" arguments="Open" />
   <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
-  <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAQ_DATA_ROOT/Data/multicomb_0.vts" />
+  <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/multicomb_0.vts" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/MenuBar/FileMenu" command="activate" arguments="SaveData" />
-  <pqevent object="MainWindow/FileSaveDialog" command="filesSelected" arguments="$PARAQ_DATA_ROOT/junk.pvd" />
+  <pqevent object="MainWindow/FileSaveDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/junk.pvd" />
   <pqevent object="MainWindow/MenuBar/FileMenu" command="activate" arguments="New" />
   <pqevent object="MainWindow/MenuBar/FileMenu" command="activate" arguments="Open" />
   <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
-  <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAQ_DATA_ROOT/junk.pvd" />
+  <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/junk.pvd" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
 </pqevents>

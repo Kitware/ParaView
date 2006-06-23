@@ -20,40 +20,40 @@ IF (BUILD_DOCUMENTATION)
   SET(BUILD_DOXYGEN ON)
   SET(DOCUMENTATION_DOWNLOAD_VTK_TAGFILE ON)
   SET(DOCUMENTATION_HTML_TARZ ON)
-  SET(DOXYGEN_PROJECT_NAME "ParaQ")
-  SET(DOXYGEN_SOURCE_DIR "${ParaQ_SOURCE_DIR}/VTK/Utilities/Doxygen")
-  SET(DOXYGEN_PROJECT_SOURCE_DIR "${ParaQ_SOURCE_DIR}")
-  SET(VTK_DOXYGEN_HOME "${ParaQ_SOURCE_DIR}/VTK/Utilities/Doxygen")
-  SET(DOXYGEN_CVSWEB_CHECKOUT "http://public.kitware.com/cgi-bin/cvsweb.cgi/~checkout~/ParaQ/")
-  SET(DOXYGEN_CVSWEB_CHECKOUT_SUFFIX "?cvsroot=ParaQ")
-  SET(DOXYGEN_SOURCE_LOCATIONS_DIR "${ParaQ_SOURCE_DIR}")
+  SET(DOXYGEN_PROJECT_NAME "ParaView")
+  SET(DOXYGEN_SOURCE_DIR "${ParaView_SOURCE_DIR}/VTK/Utilities/Doxygen")
+  SET(DOXYGEN_PROJECT_SOURCE_DIR "${ParaView_SOURCE_DIR}")
+  SET(VTK_DOXYGEN_HOME "${ParaView_SOURCE_DIR}/VTK/Utilities/Doxygen")
+  SET(DOXYGEN_CVSWEB_CHECKOUT "http://public.kitware.com/cgi-bin/cvsweb.cgi/~checkout~/ParaView3/")
+  SET(DOXYGEN_CVSWEB_CHECKOUT_SUFFIX "?cvsroot=ParaView3")
+  SET(DOXYGEN_SOURCE_LOCATIONS_DIR "${ParaView_SOURCE_DIR}")
   SET(DOXYGEN_SOURCE_LOCATIONS
-       "\"${ParaQ_SOURCE_DIR}/Utilities/Xdmf/vtk\" \\
-        \"${ParaQ_SOURCE_DIR}/Utilities/pqPython\" \\
-        \"${ParaQ_SOURCE_DIR}/GUI/Widgets\" \\
-        \"${ParaQ_SOURCE_DIR}/GUI/Widgets/Chart\" \\
-        \"${ParaQ_SOURCE_DIR}/GUI/Widgets/Python\" \\
-        \"${ParaQ_SOURCE_DIR}/GUI/Widgets/Testing\" \\
-        \"${ParaQ_SOURCE_DIR}/GUI/Client/Widgets\" \\
-        \"${ParaQ_SOURCE_DIR}/Applications/Client\" \\
-        \"${ParaQ_SOURCE_DIR}/Applications/DobranoViz\" \\
-        \"${ParaQ_SOURCE_DIR}/Common/KWCommon\" \\
-        \"${ParaQ_SOURCE_DIR}/Servers/Common\" \\
-        \"${ParaQ_SOURCE_DIR}/Servers/Filters\" \\
-        \"${ParaQ_SOURCE_DIR}/Servers/ServerManager\"")
-  SET(DOXYGEN_BINARY_LOCATIONS_DIR "${ParaQ_BINARY_DIR}")
+       "\"${ParaView_SOURCE_DIR}/Utilities/Xdmf/vtk\" \\
+        \"${ParaView_SOURCE_DIR}/Utilities/pqPython\" \\
+        \"${ParaView_SOURCE_DIR}/GUI/Widgets\" \\
+        \"${ParaView_SOURCE_DIR}/GUI/Widgets/Chart\" \\
+        \"${ParaView_SOURCE_DIR}/GUI/Widgets/Python\" \\
+        \"${ParaView_SOURCE_DIR}/GUI/Widgets/Testing\" \\
+        \"${ParaView_SOURCE_DIR}/GUI/Client/Widgets\" \\
+        \"${ParaView_SOURCE_DIR}/Applications/Client\" \\
+        \"${ParaView_SOURCE_DIR}/Applications/DobranoViz\" \\
+        \"${ParaView_SOURCE_DIR}/Common/KWCommon\" \\
+        \"${ParaView_SOURCE_DIR}/Servers/Common\" \\
+        \"${ParaView_SOURCE_DIR}/Servers/Filters\" \\
+        \"${ParaView_SOURCE_DIR}/Servers/ServerManager\"")
+  SET(DOXYGEN_BINARY_LOCATIONS_DIR "${ParaView_BINARY_DIR}")
   SET(DOXYGEN_BINARY_LOCATIONS
        "")
   SET(DOXYGEN_PARSED_INPUT_DIRS
       " \"${CMAKE_CURRENT_BINARY_DIR}/dox/Utilities/Xdmf/vtk\" \\
-        \"${ParaQ_SOURCE_DIR}/Utilities/pqPython\" \\
-        \"${ParaQ_SOURCE_DIR}/GUI/Widgets\" \\
-        \"${ParaQ_SOURCE_DIR}/GUI/Widgets/Chart\" \\
-        \"${ParaQ_SOURCE_DIR}/GUI/Widgets/Python\" \\
-        \"${ParaQ_SOURCE_DIR}/GUI/Widgets/Testing\" \\
-        \"${ParaQ_SOURCE_DIR}/GUI/Client/Widgets\" \\
-        \"${ParaQ_SOURCE_DIR}/Applications/Client\" \\
-        \"${ParaQ_SOURCE_DIR}/Applications/DobranoViz\" \\
+        \"${ParaView_SOURCE_DIR}/Utilities/pqPython\" \\
+        \"${ParaView_SOURCE_DIR}/GUI/Widgets\" \\
+        \"${ParaView_SOURCE_DIR}/GUI/Widgets/Chart\" \\
+        \"${ParaView_SOURCE_DIR}/GUI/Widgets/Python\" \\
+        \"${ParaView_SOURCE_DIR}/GUI/Widgets/Testing\" \\
+        \"${ParaView_SOURCE_DIR}/GUI/Client/Widgets\" \\
+        \"${ParaView_SOURCE_DIR}/Applications/Client\" \\
+        \"${ParaView_SOURCE_DIR}/Applications/DobranoViz\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/GUI/Client/Widgets\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Common/KWCommon\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Servers/Common\" \\

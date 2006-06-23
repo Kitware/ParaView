@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program: ParaView
    Module:    pqMainWindow.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -82,9 +82,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqUndoStack.h>
 #include <pqWriterFactory.h>
 
-#ifdef PARAQ_EMBED_PYTHON
+#ifdef PARAVIEW_EMBED_PYTHON
 #include <pqPythonDialog.h>
-#endif // PARAQ_EMBED_PYTHON
+#endif // PARAVIEW_EMBED_PYTHON
 
 #include <vtkEventQtSlotConnect.h>
 #include <vtkPVArrayInformation.h>
@@ -523,11 +523,11 @@ void pqMainWindow::createStandardToolsMenu()
     << pqSetName("Play")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onPlayTest()));
 
-#ifdef PARAQ_EMBED_PYTHON
+#ifdef PARAVIEW_EMBED_PYTHON
   menu->addAction(tr("Python &Shell"))
     << pqSetName("PythonShell")
     << pqConnect(SIGNAL(triggered()), this, SLOT(onPythonShell()));
-#endif // PARAQ_EMBED_PYTHON
+#endif // PARAVIEW_EMBED_PYTHON
 }
 
 void pqMainWindow::createStandardHelpMenu()
@@ -1456,7 +1456,7 @@ void pqMainWindow::onFileSaveServerState(const QStringList& Files)
     }
 
   vtkPVXMLElement *root = vtkPVXMLElement::New();
-  root->SetName("ParaQ");
+  root->SetName("ParaView");
   pqApplicationCore::instance()->saveState(root);
 
   /*
@@ -1865,10 +1865,10 @@ void pqMainWindow::onPlayTest(const QStringList& Files)
 
 void pqMainWindow::onPythonShell()
 {
-#ifdef PARAQ_EMBED_PYTHON
+#ifdef PARAVIEW_EMBED_PYTHON
   pqPythonDialog* const dialog = new pqPythonDialog(this);
   dialog->show();
-#endif // PARAQ_EMBED_PYTHON
+#endif // PARAVIEW_EMBED_PYTHON
 }
 
 void pqMainWindow::enableTooltips(bool enabled)

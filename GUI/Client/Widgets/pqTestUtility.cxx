@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program: ParaView
    Module:    pqTestUtility.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -83,12 +83,12 @@ void pqTestUtility::Setup(pqEventPlayer& player)
 QString pqTestUtility::DataRoot()
 {
   // Let the user override the defaults by setting an environment variable ...
-  QString result = getenv("PARAQ_DATA_ROOT");
+  QString result = getenv("PARAVIEW_DATA_ROOT");
   
   // Otherwise, go with the compiled-in default ...
   if(result.isEmpty())
     {
-    result = PARAQ_DATA_ROOT;
+    result = PARAVIEW_DATA_ROOT;
     }
   
   // Ensure all slashes face forward ...

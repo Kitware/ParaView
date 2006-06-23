@@ -2,7 +2,7 @@
 <pqevents>
   <pqevent object="MainWindow/MenuBar/FileMenu" command="activate" arguments="Open" />
   <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
-  <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAQ_DATA_ROOT/Data/multicomb_2.vts" />
+  <pqevent object="MainWindow/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Data/multicomb_2.vts" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/MenuBar/FiltersMenu/Geometric Operations" command="activate" arguments="Contour" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="2" />

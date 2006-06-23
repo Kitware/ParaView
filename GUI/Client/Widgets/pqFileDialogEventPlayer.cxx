@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program: ParaView
    Module:    pqFileDialogEventPlayer.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -61,14 +61,14 @@ bool pqFileDialogEventPlayer::playEvent(QObject* Object, const QString& Command,
     const QString data_directory = pqTestUtility::DataRoot();
     if(data_directory.isEmpty())
       {
-      qCritical() << "You must set the PARAQ_DATA_ROOT environment variable to play-back file selections.";
+      qCritical() << "You must set the PARAVIEW_DATA_ROOT environment variable to play-back file selections.";
       Error = true;
       return true;
       }
     
     /** \todo Handle multiple files */
     QString file = Arguments;
-    file.replace("$PARAQ_DATA_ROOT", data_directory);
+    file.replace("$PARAVIEW_DATA_ROOT", data_directory);
 
     QStringList files;
     files.append(file);

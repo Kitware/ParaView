@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program: ParaView
    Module:    pqPythonShell.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -65,7 +65,7 @@ struct pqPythonShell::pqImplementation
     // For the convenience of developers, add the path to the paraview module in the source tree to Python's path
     if(PyObject* path = PySys_GetObject(const_cast<char*>("path")))
       {
-      PyObject* const module_dir = PyString_FromString(QDir::convertSeparators(PARAQ_DEFAULT_PYTHON_MODULE_DIR).toAscii().data());
+      PyObject* const module_dir = PyString_FromString(QDir::convertSeparators(PARAVIEW_DEFAULT_PYTHON_MODULE_DIR).toAscii().data());
       PyList_Insert(path, 0, module_dir);
       Py_XDECREF(module_dir);
       }
@@ -73,7 +73,7 @@ struct pqPythonShell::pqImplementation
     // For the convenience of developers, add the path to the built server manager wrappers to Python's path
     if(PyObject* path = PySys_GetObject(const_cast<char*>("path")))
       {
-      PyObject* const module_dir = PyString_FromString(QDir::convertSeparators(PARAQ_LIBRARY_OUTPUT_PATH).toAscii().data());
+      PyObject* const module_dir = PyString_FromString(QDir::convertSeparators(PARAVIEW_LIBRARY_OUTPUT_PATH).toAscii().data());
       PyList_Insert(path, 0, module_dir);
       Py_XDECREF(module_dir);
       }

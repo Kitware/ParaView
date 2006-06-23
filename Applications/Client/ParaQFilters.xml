@@ -1,4 +1,4 @@
-<ParaQFilters>
+<ParaViewFilters>
   <CategoryGroup>
     <Category name="Favorites" menuName="&amp;Favorites">
       <Filter name="Clip" />
@@ -135,4 +135,4 @@
   <CategoryGroup>
     <Category name="Alphabetical" />
   </CategoryGroup>
-</ParaQFilters>
+</ParaViewFilters>

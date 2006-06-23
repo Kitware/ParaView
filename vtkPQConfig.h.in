@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program:   ParaView
    Module:    vtkPQConfig.h.in
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -37,13 +37,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Include the configuration from paraview.
 #include "vtkPVConfig.h"
 
-#define PARAQ_VERSION_MAJOR @PARAQ_VERSION_MAJOR@
-#define PARAQ_VERSION_MINOR @PARAQ_VERSION_MINOR@
-#define PARAQ_VERSION_PATCH @PARAQ_VERSION_PATCH@
-#define PARAQ_VERSION "@PARAQ_VERSION@"
-#define PARAQ_VERSION_FULL  "@PARAQ_VERSION_FULL@"
-#define PARAQ_DATA_ROOT "@PARAQ_DATA_ROOT@"
-#cmakedefine PARAQ_EMBED_PYTHON
+#define PARAVIEW_VERSION_MAJOR @PARAVIEW_VERSION_MAJOR@
+#define PARAVIEW_VERSION_MINOR @PARAVIEW_VERSION_MINOR@
+#define PARAVIEW_VERSION_PATCH @PARAVIEW_VERSION_PATCH@
+#define PARAVIEW_VERSION "@PARAVIEW_VERSION@"
+#define PARAVIEW_VERSION_FULL  "@PARAVIEW_VERSION_FULL@"
+#define PARAVIEW_DATA_ROOT "@PARAVIEW_DATA_ROOT@"
+#cmakedefine PARAVIEW_EMBED_PYTHON
 
 #endif
 

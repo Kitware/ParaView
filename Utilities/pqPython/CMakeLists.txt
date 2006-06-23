@@ -3,8 +3,8 @@ PROJECT(pqPython)
 FIND_PACKAGE(PythonLibs)
 
 INCLUDE_DIRECTORIES(
- ${ParaQ_SOURCE_DIR}/VTK/Common
- ${ParaQ_BINARY_DIR}/VTK
+ ${ParaView_SOURCE_DIR}/VTK/Common
+ ${ParaView_BINARY_DIR}/VTK
  ${PYTHON_INCLUDE_PATH}
 )
 

@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program: ParaView
    Module:    pqProcessModuleGUIHelper.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -110,7 +110,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.14");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.15");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -213,7 +213,7 @@ int pqProcessModuleGUIHelper::InitializeApplication(int vtkNotUsed(argc),
   vtkOutputWindow::SetInstance(Implementation->OutputWindowAdapter);
   
 /** \todo Figure-out how to export Qt's resource symbols from a DLL, so we can use them here */
-#if !(defined(WIN32) && defined(PARAQ_BUILD_SHARED_LIBS))
+#if !(defined(WIN32) && defined(PARAVIEW_BUILD_SHARED_LIBS))
   Q_INIT_RESOURCE(pqWidgets);
 #endif
   this->Implementation->Window = this->CreateMainWindow();

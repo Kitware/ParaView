@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program: ParaView
    Module:    pqEventTranslator.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -42,7 +42,7 @@ class pqWidgetEventTranslator;
 Manages serialization of user interaction for test-cases, demos, tutorials, etc.
 pqEventTranslator installs itself as a global Qt event "filter" that receives notification of every Qt event.  Each event is passed
 through a collection of pqWidgetEventTranslator objects, until one of them "handles" the event.  The pqWidgetEventTranslator objects
-convert low-level Qt events (mouse move, button down, key released, etc) into high-level ParaQ events (button clicked, row selected, etc)
+convert low-level Qt events (mouse move, button down, key released, etc) into high-level ParaView events (button clicked, row selected, etc)
 that can be serialized as text.  Once an event translator is found, the recordEvent() signal is emitted with the name of the widget
 that is receiving the event, plus the serialized event.  Observers such as pqEventObserverXML connect to the recordEvent() signal and
 handle storage of the events.
@@ -70,7 +70,7 @@ public:
   void ignoreObject(QObject* Object);
 
 signals:
-  /// This signal will be emitted every time a translator generates a high-level ParaQ event.  Observers should connect to this signal to serialize high-level events.
+  /// This signal will be emitted every time a translator generates a high-level ParaView event.  Observers should connect to this signal to serialize high-level events.
   void recordEvent(const QString& Object, const QString& Command, const QString& Arguments);
 
 private slots:

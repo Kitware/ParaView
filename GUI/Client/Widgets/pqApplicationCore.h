@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program: ParaView
    Module:    pqApplicationCore.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -50,7 +50,7 @@ class pqUndoStack;
 class pqWriterFactory;
 class vtkPVXMLElement;
 
-/// This class is the crux of the ParaQ application. It creates
+/// This class is the crux of the ParaView application. It creates
 /// and manages various managers which are necessary for the PQClient
 /// to work with the ServerManager. The functionality implemented by
 /// this class itself should be kept minimal. It should typically use

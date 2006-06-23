@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program: ParaView
    Module:    pqFileDialogEventTranslator.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -83,7 +83,7 @@ void pqFileDialogEventTranslator::onFilesSelected(const QStringList& files)
   const QString data_directory = pqTestUtility::DataRoot();
   if(data_directory.isEmpty())
     {
-    qCritical() << "You must set the PARAQ_DATA_ROOT environment variable to play-back file selections.";
+    qCritical() << "You must set the PARAVIEW_DATA_ROOT environment variable to play-back file selections.";
     return;
     }
 
@@ -95,11 +95,11 @@ void pqFileDialogEventTranslator::onFilesSelected(const QStringList& files)
     
     if(file.indexOf(data_directory, 0, Qt::CaseInsensitive) == 0)
       {
-      file.replace(data_directory, "$PARAQ_DATA_ROOT", Qt::CaseInsensitive);
+      file.replace(data_directory, "$PARAVIEW_DATA_ROOT", Qt::CaseInsensitive);
       }
     else
       {
-      qCritical() << "You must choose a file under the PARAQ_DATA_ROOT directory to record file selections.";
+      qCritical() << "You must choose a file under the PARAVIEW_DATA_ROOT directory to record file selections.";
       return;
       }
     

@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program: ParaView
    Module:    pqMainWindow.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -60,7 +60,7 @@ class vtkUnstructuredGrid;
 class QIcon;
 class QVTKWidget;
 
-/** \brief Provides a standardized main window for ParaQ applications -
+/** \brief Provides a standardized main window for ParaView applications -
 application authors can derive from pqMainWindow and call its member functions
 to use as-much or as-little of the standardized functionality as desired */
 
@@ -75,32 +75,32 @@ public:
   
   // High-level methods used to create a "standard" client
   
-  /// Creates the "standard" ParaQ file menu
+  /// Creates the "standard" ParaView file menu
   void createStandardFileMenu();
-  /// Creates the "standard" ParaQ view menu
+  /// Creates the "standard" ParaView view menu
   void createStandardEditMenu();
-  /// Creates the "standard" ParaQ view menu
+  /// Creates the "standard" ParaView view menu
   void createStandardViewMenu();
-  /// Creates the "standard" ParaQ server menu
+  /// Creates the "standard" ParaView server menu
   void createStandardServerMenu();
-  /// Creates the "standard" ParaQ sources menu
+  /// Creates the "standard" ParaView sources menu
   void createStandardSourcesMenu();
-  /// Creates the "standard" ParaQ filters menu
+  /// Creates the "standard" ParaView filters menu
   void createStandardFiltersMenu();
-  /// Creates the "standard" ParaQ pipeline menu
+  /// Creates the "standard" ParaView pipeline menu
   void createStandardPipelineMenu();
-  /// Creates the "standard" ParaQ tools menu
+  /// Creates the "standard" ParaView tools menu
   void createStandardToolsMenu();
-  /// Creates the "standard" ParaQ help menu
+  /// Creates the "standard" ParaView help menu
   void createStandardHelpMenu();
 
-  /// Creates a "standard" ParaQ pipeline browser
+  /// Creates a "standard" ParaView pipeline browser
   void createStandardPipelineBrowser(bool visible = true);
-  /// Creates a "standard" ParaQ object inspector
+  /// Creates a "standard" ParaView object inspector
   void createStandardObjectInspector(bool visible = true);
-  /// Creates a "standard" ParaQ element inspector
+  /// Creates a "standard" ParaView element inspector
   void createStandardElementInspector(bool visible = true);
-  /// Create a "standard" ParaQ Data Information Widget.
+  /// Create a "standard" ParaView Data Information Widget.
   void createStandardDataInformationWidget(bool visible=true);
 
   /// Creates the "standard" VCR toolbar

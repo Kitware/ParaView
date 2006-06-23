@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program: ParaView
    Module:    pqMain.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -82,7 +82,7 @@ extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
 
 //----------------------------------------------------------------------------
-void ParaQInitializeInterpreter(vtkProcessModule* pm)
+void ParaViewInitializeInterpreter(vtkProcessModule* pm)
 {
   // Initialize built-in wrapper modules.
   vtkCommonCS_Initialize(pm->GetInterpreter());
@@ -112,7 +112,7 @@ int pqMain::Run(int argc, char* argv[], pqProcessModuleGUIHelper* helper)
   options->SetProcessType(vtkPVOptions::PVCLIENT);
  
   // This creates the Process Module and initializes it.
-  int ret = pvmain->Initialize(options, helper, ParaQInitializeInterpreter, argc, argv);
+  int ret = pvmain->Initialize(options, helper, ParaViewInitializeInterpreter, argc, argv);
   if (!ret)
     {
     // Tell process module that we support Multiple connections.

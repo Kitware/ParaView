@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program: ParaView
    Module:    pqServer.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -45,7 +45,7 @@ class vtkSMRenderModuleProxy;
 #include <QString>
 #include "vtkSmartPointer.h"
 
-/// Abstracts the concept of a "server connection" so that ParaQ clients may: 
+/// Abstracts the concept of a "server connection" so that ParaView clients may: 
 /// have more than one connect at a time / open and close connections at-will
 class PQWIDGETS_EXPORT pqServer : public pqServerManagerModelItem 
 {

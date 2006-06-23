@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program: ParaView
    Module:    pqServerManagerModel.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 
 
-// ParaView includes.
+// ParaView Server Manager includes.
 #include "vtkProcessModule.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMRenderModuleProxy.h"
@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPointer>
 #include <QtDebug>
 
-// ParaQ includes.
+// ParaView includes.
 #include "pqApplicationCore.h"
 #include "pqNameCount.h"
 #include "pqPipelineBuilder.h"
@@ -139,7 +139,7 @@ void pqServerManagerModel::onAddSource(QString name, vtkSMProxy* source)
     }
 
   // Set a nice label for the source, since registration names
-  // in ParaQ are nothing but IDs which are merely numbers.
+  // in ParaView are nothing but IDs which are merely numbers.
   vtksys_ios::ostringstream name_stream;
   name_stream << source->GetXMLName() << 
     this->Internal->NameGenerator.GetCountAndIncrement(source->GetXMLName());

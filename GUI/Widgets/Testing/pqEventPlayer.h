@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program: ParaView
    Module:    pqEventPlayer.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -46,7 +46,7 @@ class pqWidgetEventPlayer;
 
 /**
 Manages playback of test-cases, demos, tutorials, etc.
-pqEventPlayer converts high-level ParaQ events 
+pqEventPlayer converts high-level ParaView events 
 (button click, row selection, etc) into low-level Qt events 
 that drive the user interface.
 The high-level events created by pqEventTranslator are fed to 
@@ -83,7 +83,7 @@ public:
   /// pqEventPlayer assumes control of the lifetime of the supplied object.
   void addWidgetEventPlayer(pqWidgetEventPlayer*);
 
-  /// This method is called with each high-level ParaQ event, which 
+  /// This method is called with each high-level ParaView event, which 
   /// will invoke the corresponding low-level Qt functionality in-turn.  
   /// If there was an error playing the event, the error() signal is emitted
   void playEvent(const QString& Object, const QString& Command, 

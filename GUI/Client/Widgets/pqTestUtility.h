@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program: ParaView
    Module:    pqTestUtility.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -51,7 +51,7 @@ public:
   /// Handles ParaView-specific setup of a QtTesting event player object
   /// (so QtTesting doesn't have any dependencies on ParaView/VTK)
   static void Setup(pqEventPlayer&);
-  /// Returns the absolute path to the PARAQ_DATA_ROOT in canonical form
+  /// Returns the absolute path to the PARAVIEW_DATA_ROOT in canonical form
   /// (slashes forward), or empty string
   static QString DataRoot();
   /// Saves the contents of a render window to a file for later use as a

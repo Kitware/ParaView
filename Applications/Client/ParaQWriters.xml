@@ -1,4 +1,4 @@
-<ParaQWriters>
+<ParaViewWriters>
   <Writer name="XMLPVDWriter"
           extensions="pvd"
           file_description="ParaView Data Files"/>
@@ -56,4 +56,4 @@
    <Writer name="EnSightWriter"
            extensions="case"
            file_description="EnSight File"/>
-</ParaQWriters>
+</ParaViewWriters>

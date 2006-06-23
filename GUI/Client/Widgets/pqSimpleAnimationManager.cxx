@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
+   Program: ParaView
    Module:    pqSimpleAnimationManager.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSimpleAnimationManager.h"
 
-// ParaView includes.
+// ParaView Server Manager includes.
 #include "vtkSMAnimationCueProxy.h"
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFileInfo>
 #include <QtDebug>
 
-// ParaQ includes.
+// ParaView includes.
 #include "pqPipelineSource.h"
 #include "pqSMAdaptor.h"
 #include "pqApplicationCore.h"

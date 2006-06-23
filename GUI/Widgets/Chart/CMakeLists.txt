@@ -98,12 +98,12 @@ TARGET_LINK_LIBRARIES(QtChart
 # plugin
 # -----------------------------------------------------------------------------
 
-SET(BUILD_PARAQ_CHART_PLUGIN ON)
+SET(BUILD_PARAVIEW_CHART_PLUGIN ON)
 
 # don't build plugin on systems that require dependents to be shared (PIC actually)
 IF(NOT BUILD_SHARED_LIBS)
   IF(CMAKE_SYSTEM MATCHES "HP-UX.*")
-    SET(BUILD_PARAQ_CHART_PLUGIN OFF)
+    SET(BUILD_PARAVIEW_CHART_PLUGIN OFF)
   ENDIF(CMAKE_SYSTEM MATCHES "HP-UX.*")
 ENDIF(NOT BUILD_SHARED_LIBS)
 
