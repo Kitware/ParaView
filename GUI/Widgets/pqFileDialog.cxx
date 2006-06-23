@@ -100,7 +100,17 @@ pqFileDialog::pqFileDialog(pqFileDialogModel* model, QWidget* p,
   this->setAttribute(Qt::WA_DeleteOnClose);
 
   this->Ui->setupUi(this);
-  this->Ui->NavigateUp->setIcon(style()->standardPixmap(QStyle::SP_FileDialogToParent));
+  this->Ui->NavigateBack->setIcon(style()->
+      standardPixmap(QStyle::SP_FileDialogBack));
+  this->Ui->NavigateBack->setDisabled( true );
+  this->Ui->NavigateForward->setIcon( 
+      QIcon(":/pqWidgets/pqNavigateForward16.png"));
+  this->Ui->NavigateForward->setDisabled( true );
+  this->Ui->NavigateUp->setIcon(style()->
+      standardPixmap(QStyle::SP_FileDialogToParent));
+  this->Ui->CreateFolder->setIcon(style()->
+      standardPixmap(QStyle::SP_FileDialogNewFolder));
+  this->Ui->CreateFolder->setDisabled( true );
 
   this->Filter = new pqFileDialogFilter(this->Model, this);
   this->Ui->Files->setModel(this->Filter);

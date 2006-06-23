@@ -78,5 +78,6 @@
         <file alias="ExodusPanel.ui">pqExodusPanel.ui</file>
         <file alias="ThresholdPanel.ui">pqThresholdPanel.ui</file>
         <file alias="pqSampleScalarWidget.ui">pqSampleScalarWidget.ui</file>
+        <file alias="pqNavigateForward16.png">Resources/pqNavigateForward16.png</file>
     </qresource>
 </RCC>
