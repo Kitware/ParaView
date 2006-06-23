@@ -23,6 +23,8 @@ SET(QtChart_SRCS
   pqChartZoomHistory.h
   pqChartZoomPan.cxx
   pqChartZoomPan.h
+  pqChartZoomPanAlt.cxx
+  pqChartZoomPanAlt.h
   pqHistogramChart.cxx
   pqHistogramChart.h
   pqHistogramColor.cxx
@@ -56,6 +58,7 @@ QT4_WRAP_CPP(QtChart_MOC_SRCS
   pqChartLabel.h
   pqChartLegend.h
   pqChartZoomPan.h
+  pqChartZoomPanAlt.h
   pqHistogramChart.h
   pqHistogramWidget.h
   pqLineChart.h

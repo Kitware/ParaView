@@ -46,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqChartLegend.h"
 #include "pqChartMouseBox.h"
 #include "pqChartZoomPan.h"
+#include "pqChartZoomPanAlt.h"
 #include "pqLineChart.h"
 #include "pqLineChartWidget.h"
 
@@ -80,6 +81,7 @@ pqLineChartWidget::pqLineChartWidget(QWidget *p) :
   Mode(pqLineChartWidget::NoMode),
   Mouse(new pqChartMouseBox()),
   ZoomPan(new pqChartZoomPan(this)),
+  ZoomPanAlt(new pqChartZoomPanAlt(this)),
   Title(new pqChartLabel()),
   XAxis(new pqChartAxis(pqChartAxis::Bottom)),
   YAxis(new pqChartAxis(pqChartAxis::Left)),
@@ -99,10 +101,15 @@ pqLineChartWidget::pqLineChartWidget(QWidget *p) :
   // Set up the widget for keyboard input.
   this->setAttribute(Qt::WA_InputMethodEnabled);
 
+  this->useAlternateZoomPan = false;
+
   // Connect to the zoom/pan object signal.
   this->ZoomPan->setObjectName("ZoomPan");
   connect(this->ZoomPan, SIGNAL(contentsSizeChanging(int, int)),
       this, SLOT(layoutChart(int, int)));
+
+  // Connect to the zoom/pan alternative object signal.
+  this->ZoomPanAlt->setObjectName("ZoomPanAlt");
 
   // Setup the chart title
   connect(this->Title, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
@@ -139,6 +146,7 @@ pqLineChartWidget::~pqLineChartWidget()
   delete this->XAxis;
   delete this->Title;
   delete this->ZoomPan;
+  delete this->ZoomPanAlt;
   delete this->Mouse;
 }
 
@@ -271,6 +279,10 @@ void pqLineChartWidget::keyPressEvent(QKeyEvent *e)
     else
       this->ZoomPan->panRight();
     }
+  else if(e->key() == Qt::Key_A)
+    {
+    this->useAlternateZoomPan = true;
+    }
   else
     handled = false;
 
@@ -311,6 +323,7 @@ void pqLineChartWidget::mousePressEvent(QMouseEvent *e)
 
   this->Mouse->Last = point;
   this->ZoomPan->Last = e->globalPos();
+  this->ZoomPanAlt->Last = e->globalPos();
 
   e->accept();
 }
@@ -331,6 +344,7 @@ void pqLineChartWidget::mouseReleaseEvent(QMouseEvent *e)
       {
       this->Mouse->adjustBox(point);
       this->ZoomPan->zoomToRectangle(&this->Mouse->Box);
+      this->ZoomPanAlt->zoomToRectangle(&this->Mouse->Box);
       this->Mouse->resetBox();
       }
     }
@@ -338,13 +352,18 @@ void pqLineChartWidget::mouseReleaseEvent(QMouseEvent *e)
       this->Mode == pqLineChartWidget::Pan)
     {
     this->Mode = pqLineChartWidget::NoMode;
-    this->ZoomPan->finishInteraction();
+    if(this->useAlternateZoomPan)
+      this->ZoomPanAlt->finishInteraction();
+    else
+      this->ZoomPan->finishInteraction();
     }
   else if(this->Mode != pqLineChartWidget::NoMode)
     {
     this->Mode = pqLineChartWidget::NoMode;
     this->setCursor(Qt::ArrowCursor);
     }
+
+  this->useAlternateZoomPan = false;
     
   e->accept();
 }
@@ -384,18 +403,25 @@ void pqLineChartWidget::mouseMoveEvent(QMouseEvent *e)
         {
         this->Mode = pqLineChartWidget::ZoomBox;
         this->ZoomPan->setZoomCursor();
+        this->ZoomPanAlt->setZoomCursor();
         }
-      else
+      else 
         {
         this->Mode = pqLineChartWidget::Zoom;
-        this->ZoomPan->startInteraction(pqChartZoomPan::Zoom);
+        if(this->useAlternateZoomPan)
+          this->ZoomPanAlt->startInteraction(pqChartZoomPanAlt::Zoom);
+        else
+          this->ZoomPan->startInteraction(pqChartZoomPan::Zoom);
         }
       }
     else if(e->buttons() == Qt::RightButton)
       {
       this->SkipContextMenu = true;
       this->Mode = pqLineChartWidget::Pan;
-      this->ZoomPan->startInteraction(pqChartZoomPan::Pan);
+      if(this->useAlternateZoomPan)
+        this->ZoomPanAlt->startInteraction(pqChartZoomPanAlt::Pan);
+      else
+        this->ZoomPan->startInteraction(pqChartZoomPan::Pan);
       }
     else
       handled = false;
@@ -421,15 +447,32 @@ void pqLineChartWidget::mouseMoveEvent(QMouseEvent *e)
       }
     else if(this->Mode == pqLineChartWidget::Zoom)
       {
-      pqChartZoomPan::InteractFlags flags = pqChartZoomPan::ZoomBoth;
-      if(e->modifiers() == Qt::ControlModifier)
-        flags = pqChartZoomPan::ZoomXOnly;
-      else if(e->modifiers() == Qt::AltModifier)
-        flags = pqChartZoomPan::ZoomYOnly;
-      this->ZoomPan->interact(e->globalPos(), flags);
+      if(this->useAlternateZoomPan)
+        {
+        pqChartZoomPanAlt::InteractFlags altflags = pqChartZoomPanAlt::ZoomBoth;
+        if(e->modifiers() == Qt::ControlModifier)
+          altflags = pqChartZoomPanAlt::ZoomXOnly;
+        else if(e->modifiers() == Qt::AltModifier)
+          altflags = pqChartZoomPanAlt::ZoomYOnly;
+        this->ZoomPanAlt->interact(e->globalPos(), altflags);
+        }
+      else
+        {
+        pqChartZoomPan::InteractFlags flags = pqChartZoomPan::ZoomBoth;
+        if(e->modifiers() == Qt::ControlModifier)
+          flags = pqChartZoomPan::ZoomXOnly;
+        else if(e->modifiers() == Qt::AltModifier)
+          flags = pqChartZoomPan::ZoomYOnly;
+        this->ZoomPan->interact(e->globalPos(), flags);
+        }
       }
     else if(this->Mode == pqLineChartWidget::Pan)
-      this->ZoomPan->interact(e->globalPos(), pqChartZoomPan::NoFlags);
+      {
+      if(this->useAlternateZoomPan)
+        this->ZoomPanAlt->interact(e->globalPos(), pqChartZoomPanAlt::NoFlags);
+      else
+        this->ZoomPan->interact(e->globalPos(), pqChartZoomPan::NoFlags);
+      }
     else
       handled = false;
     }

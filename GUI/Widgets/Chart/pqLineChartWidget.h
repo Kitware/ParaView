@@ -52,6 +52,7 @@ class pqChartLabel;
 class pqChartLegend;
 class pqChartMouseBox;
 class pqChartZoomPan;
+class pqChartZoomPanAlt;
 class pqLineChart;
 
 class QMenu;
@@ -119,6 +120,7 @@ public:
   /// \return
   ///   The widget zoom/pan handler.
   pqChartZoomPan& getZoomPanHandler() const {return *this->ZoomPan;}
+  pqChartZoomPanAlt& getZoomPanHandlerAlt() const {return *this->ZoomPanAlt;}
   //@}
 
   /// \brief
@@ -251,6 +253,8 @@ private:
   MouseMode Mode;          ///< Stores the current mouse state.
   pqChartMouseBox* const Mouse;  ///< Stores the mouse drag box.
   pqChartZoomPan* const ZoomPan; ///< Handles the zoom/pan interaction.
+  pqChartZoomPanAlt* const ZoomPanAlt; ///< Alternative to handling the zoom/pan interaction.
+  bool useAlternateZoomPan;      ///< Flag that is set when user presses 'a' key in conjunction with mouse button
   pqChartLabel* const Title;     ///< Used to draw the chart title.
   pqChartAxis* const XAxis;      ///< Used to draw the x-axis.
   pqChartAxis* const YAxis;      ///< Used to draw the y-axis.
