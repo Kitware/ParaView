@@ -1408,8 +1408,8 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
             itemWidth = this->ContentsWidth;
             }
 
-          painter.fillRect(0, item->ContentsY, itemWidth, this->ItemHeight,
-              options.palette.highlight());
+          painter.fillRect(0, item->ContentsY + pqFlatTreeView::PipeLength,
+              itemWidth, trueHeight, options.palette.highlight());
           }
 
         for(i = 0; i < columns; i++)
@@ -1656,12 +1656,41 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
             }
           }
 
-        // TODO: If this is the current row, draw the current outline.
+        // If this is the current row, draw the current outline.
         if(this->selectionBehavior() == QAbstractItemView::SelectRows)
           {
           index = this->selectionModel()->currentIndex();
-          if(index.isValid() && index.row() == item->Index.row())
+          int currentRow = index.row();
+          int itemRow = item->Index.row();
+          if(index.isValid() && index.row() == item->Index.row() &&
+              index.parent() == item->Index.parent())
             {
+            QStyleOptionFocusRect opt;
+            opt.QStyleOption::operator=(options);
+            if(item->RowSelected)
+              {
+              opt.backgroundColor = options.palette.color(QPalette::Normal,
+                  QPalette::Highlight);
+              }
+            else
+              {
+              opt.backgroundColor = options.palette.color(QPalette::Normal,
+                  QPalette::Base);
+              }
+
+            opt.state |= QStyle::State_KeyboardFocusChange;
+            opt.state |= QStyle::State_HasFocus;
+
+            itemWidth = this->viewport()->width();
+            if(this->ContentsWidth > itemWidth)
+              {
+              itemWidth = this->ContentsWidth;
+              }
+
+            opt.rect.setRect(0, item->ContentsY + pqFlatTreeView::PipeLength,
+                itemWidth, trueHeight);
+            QApplication::style()->drawPrimitive(QStyle::PE_FrameFocusRect,
+                &opt, &painter);
             }
           }
         }
@@ -1742,12 +1771,41 @@ void pqFlatTreeView::changeCurrent(const QModelIndex &current,
     }
 }
 
-void pqFlatTreeView::changeCurrentRow(const QModelIndex &,
-    const QModelIndex &)
+void pqFlatTreeView::changeCurrentRow(const QModelIndex &current,
+    const QModelIndex &previous)
 {
   if(this->selectionBehavior() == QAbstractItemView::SelectRows)
     {
-    this->viewport()->update();
+    // Deselect the previous item.
+    QRegion region;
+    pqFlatTreeViewItem *item = 0;
+    if(previous.isValid())
+      {
+      item = this->getItem(previous);
+      if(item)
+        {
+        region = QRegion(0, item->ContentsY, this->ContentsWidth,
+            this->ItemHeight);
+        }
+      }
+
+    // Select the new item.
+    if(current.isValid())
+      {
+      item = this->getItem(current);
+      if(item)
+        {
+        region = region.unite(QRegion(0, item->ContentsY, this->ContentsWidth,
+            this->ItemHeight));
+        }
+      }
+
+    // Repaint the affected region.
+    if(!region.isEmpty())
+      {
+      region.translate(-this->horizontalOffset(), -this->verticalOffset());
+      this->viewport()->update(region);
+      }
     }
 }
 
