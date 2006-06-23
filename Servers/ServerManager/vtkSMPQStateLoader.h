@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMPQStateLoader - State loader for ParaQ client.
+// .NAME vtkSMPQStateLoader - State loader for ParaView client.
 // .SECTION Description
 // SMState file has render module states in it. Typically one can simply load 
 // back the SMState and create new rendermodules from that SMState, just like 
@@ -54,7 +54,7 @@ protected:
   ~vtkSMPQStateLoader();
 
   // Description:
-  // In ParaQ, since we register all proxies only by their SelfIDs, this method
+  // In ParaView, since we register all proxies only by their SelfIDs, this method
   // ignores the registration name indicated in the state file and registers
   // the proxies using their self ids.
   virtual void RegisterProxyInternal(const char* group, 
