@@ -366,6 +366,12 @@ public:
   // Resets all the settings to default values.
   void ResetSettingsToDefault();
 
+  // Description:
+  // Prevent actions when exiting
+  vtkSetClampMacro(ExitMode, int, 0, 1);
+  vtkBooleanMacro(ExitMode, int);
+  vtkGetMacro(ExitMode, int);
+
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView();
@@ -475,6 +481,8 @@ protected:
 
   vtkTimerLog *RenderTimer;
   Tcl_TimerToken TimerToken;
+
+  int ExitMode;
   
 private:
   vtkPVRenderView(const vtkPVRenderView&); // Not implemented

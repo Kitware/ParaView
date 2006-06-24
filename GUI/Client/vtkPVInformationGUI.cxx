@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInformationGUI);
-vtkCxxRevisionMacro(vtkPVInformationGUI, "1.17");
+vtkCxxRevisionMacro(vtkPVInformationGUI, "1.18");
 
 //----------------------------------------------------------------------------
 vtkPVInformationGUI::vtkPVInformationGUI()
@@ -44,6 +44,7 @@ vtkPVInformationGUI::vtkPVInformationGUI()
   this->NumCellsLabel = 0;
   this->NumPointsLabel = 0;
   this->MemorySizeLabel = 0;
+  this->PolygonCount = 0;
   this->BoundsDisplay = 0;
   this->ExtentDisplay = 0;
   this->ArrayInformationFrame = 0;
@@ -68,6 +69,7 @@ vtkPVInformationGUI::~vtkPVInformationGUI()
   vtkKWRemoveIfExists(NumCellsLabel);
   vtkKWRemoveIfExists(NumPointsLabel);
   vtkKWRemoveIfExists(MemorySizeLabel);
+  vtkKWRemoveIfExists(PolygonCount);
   vtkKWRemoveIfExists(BoundsDisplay);
   vtkKWRemoveIfExists(ExtentDisplay);
   vtkKWRemoveIfExists(ArrayInformationFrame);
@@ -93,6 +95,7 @@ void vtkPVInformationGUI::CreateWidget()
   this->NumCellsLabel = vtkKWLabel::New();
   this->NumPointsLabel = vtkKWLabel::New();
   this->MemorySizeLabel = vtkKWLabel::New();
+  this->PolygonCount = vtkKWLabel::New();
   this->BoundsDisplay = vtkKWBoundsDisplay::New();
   this->ExtentDisplay = vtkKWBoundsDisplay::New();
   this->ArrayInformationFrame = vtkKWFrameWithLabel::New();
@@ -123,6 +126,9 @@ void vtkPVInformationGUI::CreateWidget()
   this->MemorySizeLabel->SetParent(this->StatsFrame->GetFrame());
   this->MemorySizeLabel->Create();
 
+  this->PolygonCount->SetParent(this->StatsFrame->GetFrame());
+  this->PolygonCount->Create();
+
   this->BoundsDisplay->SetParent(this->GetFrame());
   this->BoundsDisplay->Create();
   
@@ -130,12 +136,13 @@ void vtkPVInformationGUI::CreateWidget()
   this->ExtentDisplay->Create();
   this->ExtentDisplay->SetLabelText("Extents");
   
-  this->Script("pack %s %s % s %s %s -side top -anchor nw",
+  this->Script("pack %s %s % s %s %s %s -side top -anchor nw",
                this->TypeLabel->GetWidgetName(),
                this->CompositeDataFrame->GetWidgetName(),
                this->NumCellsLabel->GetWidgetName(),
                this->NumPointsLabel->GetWidgetName(),
-               this->MemorySizeLabel->GetWidgetName());
+               this->MemorySizeLabel->GetWidgetName(),
+               this->PolygonCount->GetWidgetName());
 
   this->Script("pack %s %s -fill x -expand t -pady 2", 
                this->StatsFrame->GetWidgetName(),
@@ -346,6 +353,11 @@ void vtkPVInformationGUI::Update(vtkPVSource* source)
   this->MemorySizeLabel->SetText(memsize.str());
   delete[] memsize.str();
 
+  ostrstream polycount;
+  polycount << "Polygon count: " << dataInfo->GetPolygonCount() << ends;
+  this->PolygonCount->SetText(polycount.str());
+  delete[] polycount.str();
+
   dataInfo->GetBounds(bounds);
   this->BoundsDisplay->SetBounds(bounds);
 
@@ -397,6 +409,7 @@ void vtkPVInformationGUI::UpdateEnableState()
   this->PropagateEnableState(this->NumCellsLabel);
   this->PropagateEnableState(this->NumPointsLabel);
   this->PropagateEnableState(this->MemorySizeLabel);
+  this->PropagateEnableState(this->PolygonCount);
   this->PropagateEnableState(this->BoundsDisplay);
   this->PropagateEnableState(this->ExtentDisplay);  
 }
