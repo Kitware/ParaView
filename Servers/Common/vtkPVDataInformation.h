@@ -19,6 +19,10 @@
 // information about data object and collections of data objects.  It
 // has a PV in the class name because it should never be moved into
 // VTK.
+// 
+// .SECTION Caveats
+// Get polygons only works for poly data and it does not work propelry for the
+// triangle strips.
 
 #ifndef __vtkPVDataInformation_h
 #define __vtkPVDataInformation_h
@@ -73,6 +77,7 @@ public:
   vtkGetMacro(NumberOfPoints, vtkTypeInt64);
   vtkGetMacro(NumberOfCells, vtkTypeInt64);
   vtkGetMacro(MemorySize, int);
+  vtkGetMacro(PolygonCount, int);
   vtkGetMacro(NumberOfDataSets, int);
   vtkGetVector6Macro(Bounds, double);
 
@@ -130,6 +135,7 @@ protected:
   vtkTypeInt64   NumberOfPoints;
   vtkTypeInt64   NumberOfCells;
   int            MemorySize;
+  vtkIdType      PolygonCount;
   double         Bounds[6];
   int            Extent[6];
 
