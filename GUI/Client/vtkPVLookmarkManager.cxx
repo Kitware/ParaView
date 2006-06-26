@@ -69,7 +69,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.82");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.83");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -1198,7 +1198,6 @@ void vtkPVLookmarkManager::ImportBoundingBoxFile(vtkPVReaderModule *reader, vtkP
   //    create a salient view
   //    create lmk, pack lmk inside folder
 
-  int iter=0;
   int j, numberOfItems;
   //float oldCenter[3];
   ifstream *infile;
