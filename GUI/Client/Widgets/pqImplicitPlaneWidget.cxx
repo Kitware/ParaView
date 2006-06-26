@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqImplicitPlaneWidget.h"
 
 #include <vtkCamera.h>
-#include <vtkCommandMemFun.h>
+#include <vtkMemberFunctionCommand.h>
 #include <vtkImplicitPlaneRepresentation.h>
 #include <vtkProcessModule.h>
 #include <vtkPVDataInformation.h>
@@ -105,11 +105,11 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(QWidget* p) :
   Implementation(new pqImplementation())
 {
   this->Implementation->StartDragObserver.TakeReference(
-    vtkMakeCommandMemFun(*this, &pqImplicitPlaneWidget::on3DWidgetStartDrag));
+    vtkMakeMemberFunctionCommand(*this, &pqImplicitPlaneWidget::on3DWidgetStartDrag));
   this->Implementation->ChangeObserver.TakeReference(
-    vtkMakeCommandMemFun(*this, &pqImplicitPlaneWidget::on3DWidgetChanged));
+    vtkMakeMemberFunctionCommand(*this, &pqImplicitPlaneWidget::on3DWidgetChanged));
   this->Implementation->EndDragObserver.TakeReference(
-    vtkMakeCommandMemFun(*this, &pqImplicitPlaneWidget::on3DWidgetEndDrag));
+    vtkMakeMemberFunctionCommand(*this, &pqImplicitPlaneWidget::on3DWidgetEndDrag));
     
   this->Implementation->UI->setupUi(this);
 
