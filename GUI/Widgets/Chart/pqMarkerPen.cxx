@@ -311,8 +311,16 @@ void pqMarkerPen::safeDrawPolyline(QPainter& painter, const QPointF* points, int
 {
   // This is a workaround for crashes we've seen on X drawing polylines with large numbers
   // of points - in theory, both Qt and X should hide these details, in practice, they don't :(
+  QPointF pointConnect[2];
   for(int i = 0; i < pointCount; i += 100)
     {
+    // If this is not the first line being drawn, we need to connect the former one to the new one:
+    if(i>0)
+      {
+      pointConnect[0] = points[i-1];
+      pointConnect[1] = points[i];
+      painter.drawPolyline(pointConnect, 2);
+      }
     painter.drawPolyline(&points[i], vtkstd::min(100, pointCount - i));
     }
 }
@@ -321,8 +329,16 @@ void pqMarkerPen::safeDrawPolyline(QPainter& painter, const QPoint* points, int 
 {
   // This is a workaround for crashes we've seen on X drawing polylines with large numbers
   // of points - in theory, both Qt and X should hide these details, in practice, they don't :(
+  QPoint pointConnect[2];
   for(int i = 0; i < pointCount; i += 100)
     {
+    // If this is not the first line being drawn, we need to connect the former one to the new one:
+    if(i>0)
+      {
+      pointConnect[0] = points[i-1];
+      pointConnect[1] = points[i];
+      painter.drawPolyline(pointConnect, 2);
+      }
     painter.drawPolyline(&points[i], vtkstd::min(100, pointCount - i));
     }
 }
