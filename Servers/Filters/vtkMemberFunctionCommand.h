@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    vtkCommandMemFun.h
+   Module:    vtkMemberFunctionCommand.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -35,37 +35,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /////////////////////////////////////////////////////////////////////////
 // pqCommandMemFun
 
-// .NAME vtkCommandMemFun - Call a class member method in response to a VTK event
+// .NAME vtkMemberFunctionCommand - Call a class member method in response to a VTK event
 // .SECTION Description
-// vtkCommandMemFun is a vtkCommand-derivative that will listen for VTK events,
+// vtkMemberFunctionCommand is a vtkCommand-derivative that will listen for VTK events,
 // calling a class member function when a VTK event is received.
 //
 // It is generally more useful than vtkCallbackCommand, which can only call
 // non-member functions in response to a VTK event.
 //
-// Usage: create an instance of vtkCommandMemFun, specialized for the class that
+// Usage: create an instance of vtkMemberFunctionCommand, specialized for the class that
 // will receive events.  Use the SetCallback() method to pass the instance and
 // member function that will be called when an event is received.  Use
-// vtkObject::AddObserver() to control which VTK events the vtkCommandMemFun
+// vtkObject::AddObserver() to control which VTK events the vtkMemberFunctionCommand
 // object will receive.
 //
 // Usage:
 //
 // vtkObject* subject = /* ... */
 // foo* observer = /* ... */
-// vtkCommandMemFun<foo>* adapter = vtkCommandMemFun<foo>::New();
+// vtkMemberFunctionCommand<foo>* adapter = vtkMemberFunctionCommand<foo>::New();
 // adapter->SetCallback(observer, &foo::bar);
 // subject->AddObserver(vtkCommand::AnyEvent, adapter);
 //
 // .SECTION See Also
 // vtkCallbackCommand
 template<class ClassT>
-class VTK_EXPORT vtkCommandMemFun :
+class VTK_EXPORT vtkMemberFunctionCommand :
   public vtkCommand
 {
-  typedef vtkCommandMemFun<ClassT> ThisT;
+  typedef vtkMemberFunctionCommand<ClassT> ThisT;
   
 public:
+  typedef vtkCommand Superclass;
+  
+  virtual const char* GetClassNameInternal() const { return "vtkMemberFunctionCommand"; }
+  
+  static ThisT* SafeDownCast(vtkObjectBase* o)
+  {
+    return dynamic_cast<ThisT*>(o);
+  }
+
   static ThisT* New()
   {
     return new ThisT();
@@ -94,42 +103,42 @@ public:
   }
 
 private:
-  vtkCommandMemFun() :
+  vtkMemberFunctionCommand() :
     Object(0),
     Method(0)
   {
   }
   
-  ~vtkCommandMemFun()
+  ~vtkMemberFunctionCommand()
   {
   }
   
   ClassT* Object;
   void (ClassT::*Method)();
   
-  vtkCommandMemFun(const vtkCommandMemFun&); // Not implemented
-  void operator=(const vtkCommandMemFun&); // Not implemented
+  vtkMemberFunctionCommand(const vtkMemberFunctionCommand&); // Not implemented
+  void operator=(const vtkMemberFunctionCommand&); // Not implemented
 };
 
 // Description:
-// Convenience function for creating vtkCommandMemFun instances that
+// Convenience function for creating vtkMemberFunctionCommand instances that
 // automatically deduces its arguments.
 //
 // Usage:
 //
 // vtkObject* subject = /* ... */
 // foo* observer = /* ... */
-// vtkCommand* adapter = vtkMakeCommandMemFun(observer, &foo::bar);
+// vtkCommand* adapter = vtkMakeMemberFunctionCommand(observer, &foo::bar);
 // subject->AddObserver(vtkCommand::AnyEvent, adapter);
 //
 // See Also:
-// vtkCommandMemFun, vtkCallbackCommand
+// vtkMemberFunctionCommand, vtkCallbackCommand
 
 template<class ClassT>
-vtkCommandMemFun<ClassT>* vtkMakeCommandMemFun(
+vtkMemberFunctionCommand<ClassT>* vtkMakeMemberFunctionCommand(
   ClassT& object, void (ClassT::*method)())
 {
-  vtkCommandMemFun<ClassT>* result = vtkCommandMemFun<ClassT>::New();
+  vtkMemberFunctionCommand<ClassT>* result = vtkMemberFunctionCommand<ClassT>::New();
   result->SetCallback(object, method);
   
   return result;
