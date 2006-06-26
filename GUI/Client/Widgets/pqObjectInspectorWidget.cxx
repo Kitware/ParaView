@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 #include "pqRenderModule.h"
 #include "pqServerManagerModel.h"
+#include "pqStreamTracerPanel.h"
 
 //-----------------------------------------------------------------------------
 pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
@@ -186,25 +187,31 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
 
   if(proxy && !this->CurrentPanel)
     {
-    if(QString(proxy->GetXMLName()) == "Clip")
+    const QString xml_name = proxy->GetXMLName();
+    
+    if(xml_name == "Clip")
       {
-      this->CurrentPanel = new pqClipPanel(NULL);
+      this->CurrentPanel = new pqClipPanel(0);
       }
-    else if(QString(proxy->GetXMLName()) == "Contour")
+    else if(xml_name == "Contour")
       {
-      this->CurrentPanel = new pqContourPanel(NULL);
+      this->CurrentPanel = new pqContourPanel(0);
       }
-    else if(QString(proxy->GetXMLName()) == "Cut")
+    else if(xml_name == "Cut")
       {
-      this->CurrentPanel = new pqCutPanel(NULL);
+      this->CurrentPanel = new pqCutPanel(0);
       }
-    else if(QString(proxy->GetXMLName()) == "ExodusReader")
+    else if(xml_name == "ExodusReader")
       {
-      this->CurrentPanel = new pqExodusPanel(NULL);
+      this->CurrentPanel = new pqExodusPanel(0);
       }
-    else if(QString(proxy->GetXMLName()) == "Threshold")
+    else if(xml_name == "StreamTracer")
       {
-      this->CurrentPanel = new pqThresholdPanel(NULL);
+      this->CurrentPanel = new pqStreamTracerPanel(0);
+      }
+    else if(xml_name == "Threshold")
+      {
+      this->CurrentPanel = new pqThresholdPanel(0);
       }
     else
       {

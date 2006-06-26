@@ -48,8 +48,10 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqElementInspectorWidget.h
   pqExodusPanel.h
   pqFileDialogEventTranslator.h
+  pqHandleWidget.h
   pqImageTip.h
   pqImplicitPlaneWidget.h
+  pqLineWidget.h
   pqLoadedFormObjectPanel.h
   pqMainWindow.h
   pqMultiView.h
@@ -91,6 +93,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSourceInfoGroupMap.h
   pqSourceInfoIcons.h
   pqSourceInfoModel.h
+  pqStreamTracerPanel.h
   pqThresholdPanel.h
   pqToolsMenu.h
   pqToolTipTrapper.h
@@ -108,7 +111,9 @@ SET(UI_FORMS
   pqBundleManager.ui
   pqCompoundProxyWizard.ui
   pqDisplayProxyEditor.ui
+  pqHandleWidget.ui
   pqImplicitPlaneWidget.ui
+  pqLineWidget.ui
   pqMultiViewFrameMenu.ui
   pqOutputWindow.ui
   pqRenderViewEditor.ui
@@ -191,10 +196,14 @@ ADD_LIBRARY(pqWidgets
   pqFileDialogEventPlayer.h
   pqFileDialogEventTranslator.cxx
   pqFileDialogEventTranslator.h
+  pqHandleWidget.cxx
+  pqHandleWidget.h
   pqImageTip.cxx
   pqImageTip.h
   pqImplicitPlaneWidget.cxx
   pqImplicitPlaneWidget.h
+  pqLineWidget.cxx
+  pqLineWidget.h
   pqLoadedFormObjectPanel.cxx
   pqLoadedFormObjectPanel.h
   pqMain.cxx
@@ -303,6 +312,8 @@ ADD_LIBRARY(pqWidgets
   pqSourceInfoModel.h
   pqSourceProxyInfo.cxx
   pqSourceProxyInfo.h
+  pqStreamTracerPanel.cxx
+  pqStreamTracerPanel.h
   pqTestUtility.cxx
   pqTestUtility.h
   pqThresholdPanel.cxx

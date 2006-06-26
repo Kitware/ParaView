@@ -1,0 +1,89 @@
+<ui version="4.0" >
+ <author></author>
+ <comment></comment>
+ <exportmacro></exportmacro>
+ <class>pqHandleWidget</class>
+ <widget class="QWidget" name="pqHandleWidget" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>190</width>
+    <height>285</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item>
+    <widget class="QCheckBox" name="show3DWidget" >
+     <property name="text" >
+      <string>Visible</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QGridLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <item row="0" column="0" >
+      <widget class="QLabel" name="label_3" >
+       <property name="text" >
+        <string>Point</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3" >
+      <widget class="QLineEdit" name="worldPositionZ" />
+     </item>
+     <item row="0" column="2" >
+      <widget class="QLineEdit" name="worldPositionY" />
+     </item>
+     <item row="0" column="1" >
+      <widget class="QLineEdit" name="worldPositionX" />
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QPushButton" name="useCenterBounds" >
+     <property name="text" >
+      <string>Center on Bounds</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer>
+     <property name="orientation" >
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" >
+      <size>
+       <width>172</width>
+       <height>91</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <pixmapfunction></pixmapfunction>
+ <tabstops>
+  <tabstop>show3DWidget</tabstop>
+  <tabstop>worldPositionX</tabstop>
+  <tabstop>worldPositionY</tabstop>
+  <tabstop>worldPositionZ</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
