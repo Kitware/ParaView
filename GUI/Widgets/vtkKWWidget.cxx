@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.147");
+vtkCxxRevisionMacro(vtkKWWidget, "1.148");
 
 //----------------------------------------------------------------------------
 class vtkKWWidgetInternals
@@ -42,6 +42,8 @@ public:
   vtkKWWidgetInternals() { this->Children = NULL; };
   ~vtkKWWidgetInternals() { delete this->Children; };
 };
+
+int vtkKWWidget::UseClassNameInWidgetName = 0;
 
 //----------------------------------------------------------------------------
 vtkKWWidget::vtkKWWidget()
@@ -159,21 +161,37 @@ const char *vtkKWWidget::GetWidgetName()
 
   // Create this widgets name
 
-  char local[256];
-
+  vtksys_stl::string widget_name;
   if (this->Parent)
     {
-    const char *tmp = this->Parent->GetWidgetName();
-    sprintf(local, "%s.%lu", tmp, count);
+    widget_name += this->Parent->GetWidgetName();
+    }
+
+  char local[512];
+  const char *ptr;
+  if (vtkKWWidget::UseClassNameInWidgetName)
+    {
+    sprintf(local, ".%s%lu", this->GetClassName(), count);
     }
   else
     {
     sprintf(local, ".%lu", count);
     }
-  count++;
 
-  this->WidgetName = new char [strlen(local) + 1];
-  strcpy(this->WidgetName, local);
+  if (this->Parent)
+    {
+    widget_name += local;
+    ptr = widget_name.c_str();
+    }
+  else
+    {
+    ptr = local;
+    }
+
+  this->WidgetName = new char [strlen(ptr) + 1];
+  strcpy(this->WidgetName, ptr);
+
+  count++;
 
   return this->WidgetName;
 }
@@ -790,6 +808,30 @@ void vtkKWWidget::RemoveBinding(const char *event)
     this->Script("bind %s %s {}", this->GetWidgetName(), event);
     }
 }
+
+//----------------------------------------------------------------------------
+int vtkKWWidget::GetUseClassNameInWidgetName()
+{ 
+  return vtkKWWidget::UseClassNameInWidgetName; 
+};
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::SetUseClassNameInWidgetName(int arg)
+{ 
+  vtkKWWidget::UseClassNameInWidgetName = arg; 
+};
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::UseClassNameInWidgetNameOn()
+{ 
+  vtkKWWidget::SetUseClassNameInWidgetName(1); 
+};
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::UseClassNameInWidgetNameOff()
+{ 
+  vtkKWWidget::SetUseClassNameInWidgetName(0); 
+};
 
 //----------------------------------------------------------------------------
 void vtkKWWidget::PrintSelf(ostream& os, vtkIndent indent)

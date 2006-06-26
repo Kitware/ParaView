@@ -73,6 +73,17 @@ public:
   vtkSetStringMacro(WidgetName);
 
   // Description:
+  // Globally Set/Get if the widget name should include the object class name.
+  // NOTE: this is a *static* method that defines the behaviour for *all*
+  // instances to be created afterwards. This is typically called in your 
+  // application class or your main executable, before creating any UI.
+  // By default it is globally *disabled*.
+  static int GetUseClassNameInWidgetName();
+  static void SetUseClassNameInWidgetName(int);
+  static void UseClassNameInWidgetNameOn();
+  static void UseClassNameInWidgetNameOff();
+
+  // Description:
   // Query if the widget was created successfully.
   virtual int IsCreated();
 
@@ -283,6 +294,8 @@ private:
 
   int WidgetIsCreated;
   int Enabled;
+
+  static int UseClassNameInWidgetName;
 
   vtkKWWidget(const vtkKWWidget&); // Not implemented
   void operator=(const vtkKWWidget&); // Not implemented
