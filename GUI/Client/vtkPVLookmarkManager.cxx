@@ -56,10 +56,20 @@
 #include "vtkStdString.h"
 #include "vtkRenderer.h"
 #include <vtkstd/string>
+#include "vtkSMProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkPVWidget.h"
+#include "vtkPVBoxWidget.h"
+#include "vtkPVInputMenu.h"
+#include "vtkPVSelectWidget.h"
+#include "vtkPVLabeledToggle.h"
+#include "vtkPVDataInformation.h"
+#include "vtkBoxWidget.h"
+
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.81");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.82");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -1172,7 +1182,7 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileCallback()
       }
     }
 
-  this->ImportBoundingBoxFileInternal(reader,macro,filename);
+  this->ImportBoundingBoxFile(reader,macro,filename);
 
   this->SetButtonFrameState(1);
 
@@ -1181,7 +1191,7 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(vtkPVReaderModule *reader, vtkPVLookmark *macro, char *boundingBoxFileName)
+void vtkPVLookmarkManager::ImportBoundingBoxFile(vtkPVReaderModule *reader, vtkPVLookmark *macro, char *boundingBoxFileName)
 {
   // create a new folder in which to pack lmks
   // parse bb file one line at a time
@@ -1189,24 +1199,22 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(vtkPVReaderModule *read
   //    create lmk, pack lmk inside folder
 
   int iter=0;
-  int tstep, j, numberOfItems;
-  float center[3];
-  double bds[6];
+  int j, numberOfItems;
+  //float oldCenter[3];
   ifstream *infile;
-  vtkPVLookmark *lmk;
-  vtkPVSource *pvs;
   vtkstd::string filename;
   vtkstd::string::size_type idx;
   vtkIdType k;
   char name[200];
   vtkKWLookmarkFolder *lmkFolderWidget;
+  ostrstream comments;
+  vtkXMLDataParser *parser;
+  vtkXMLDataElement *root;
+  vtkPVLookmark *lookmarkWidget;
+  int retval;
+  ostrstream msg;
 
-  vtkPVSourceCollection *col = this->GetPVWindow()->GetSourceList("Sources");
-  if (col == NULL)
-    {
-    return;
-    }
-  vtkCollectionIterator *it = col->NewIterator();
+
   
   infile = new ifstream(boundingBoxFileName);
 
@@ -1233,19 +1241,147 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(vtkPVReaderModule *read
     j++;
     }
 
+  //vtkPVSource *inputSource = reader;
+
   vtkKWLookmarkFolder *bboxFolder = this->CreateFolder(name,0);
 
-  while(*infile >> tstep >> bds[0] >> bds[2] >> bds[4] >> bds[1] >> bds[3] >> bds[5])
-    {
-    reader->SetRequestedTimeStep(tstep);
 
-    this->GetPVRenderView()->GetRenderer()->ResetCamera(bds);
-    this->GetPVRenderView()->GetRenderer()->ResetCameraClippingRange();
-    this->GetPVRenderView()->ForceRender();
+  //parse the .lmk xml file and get the root node for traversing
+  parser = vtkXMLDataParser::New();
+  parser->SetStream(infile);
+  retval = parser->Parse();
+  if(retval==0)
+    {
+    msg << "Error parsing lookmark file in " << filename << ends;
+    this->GetPVWindow()->ErrorMessage(msg.str());
+    msg.rdbuf()->freeze(0);
+    parser->Delete();
+    return;
+    }
+  root = parser->GetRootElement();
+
+  this->Script("[winfo toplevel %s] config -cursor watch", 
+                this->GetWidgetName());
+
+  if(!root)
+    {
+    msg << "Error parsing lookmark file in " << filename << ends;
+    this->GetPVWindow()->ErrorMessage(msg.str());
+    msg.rdbuf()->freeze(0);
+    parser->Delete();
+    return;
+    }
+
+  this->ImportBoundingBoxFileInternal(0,root,bboxFolder,macro);
+  
+  this->PackChildrenBasedOnLocation(bboxFolder->GetLabelFrame()->GetFrame());
+  // after all the widgets are generated, go back thru and add d&d targets for each of them
+  this->ResetDragAndDropTargetSetAndCallbacks();
+
+  this->Script("[winfo toplevel %s] config -cursor {}", 
+                this->GetWidgetName());
+
+  this->Script("%s yview moveto 1",
+              this->ScrollFrame->GetFrame()->GetParent()->GetWidgetName());
+
+
+  // this is needed to enable the scrollbar in the lmk mgr
+  this->Lookmarks->GetItem(0,lookmarkWidget);
+  if(lookmarkWidget)
+    {
+    this->Script("update");
+    lookmarkWidget->EnableScrollBar();
+    }
+
+  infile->close();
+  delete infile;
+  parser->Delete();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *lmkElement, vtkKWLookmarkFolder *parent,vtkPVLookmark *macro)
+{
+  vtkPVLookmark *lookmarkWidget;
+  vtkKWLookmarkFolder *lmkFolderWidget;
+  vtkIdType j,numFolders;
+  const char *nameAttribute;
+  int ival = 0;
+  char methodAndArg[200];
+  double newBounds[6];
+  double newCenter[3];
+  ostrstream comments;
+  vtkPVSource *pvs;
+  vtkPVSourceCollection *col = this->GetPVWindow()->GetSourceList("Sources");
+  if (col == NULL)
+    {
+    return;
+    }
+  vtkCollectionIterator *it = col->NewIterator();
+
+  if(strcmp("BoundingBoxFolder",lmkElement->GetName())==0)
+    {
+    nameAttribute = lmkElement->GetAttribute("Name");
+
+    lmkFolderWidget = vtkKWLookmarkFolder::New();
+    lmkFolderWidget->SetParent(parent);
+    lmkFolderWidget->Create();
+    sprintf(methodAndArg,"SelectItemCallback %s",lmkFolderWidget->GetWidgetName());
+    lmkFolderWidget->GetCheckbox()->SetCommand(this,methodAndArg);
+    this->Script("pack %s -fill both -expand yes -padx 8",lmkFolderWidget->GetWidgetName());
+    lmkFolderWidget->SetFolderName(lmkElement->GetAttribute("Name"));
+    lmkElement->GetScalarAttribute("MainFrameCollapsedState",ival);
+    lmkFolderWidget->SetMainFrameCollapsedState(ival);
+    lmkFolderWidget->UpdateWidgetValues();
+    lmkFolderWidget->SetLocation(locationOfLmkItemAmongSiblings);
+
+    numFolders = this->Folders->GetNumberOfItems();
+    this->Folders->InsertItem(numFolders,lmkFolderWidget);
+
+    // use the label frame of this lmk container as the parent frame in which to pack into (constant)
+    // for each xml element (either lookmark or lookmark folder) recursively call import with the appropriate location and vtkXMLDataElement
+    for(j=0; j<lmkElement->GetNumberOfNestedElements(); j++)
+      {
+      this->ImportBoundingBoxFileInternal(j,lmkElement->GetNestedElement(j),lmkFolderWidget,macro);
+      }
+    this->PackChildrenBasedOnLocation(parent->GetLabelFrame()->GetFrame());
+    }
+  else if(strcmp("BoundingBoxFile",lmkElement->GetName())==0)
+    {
+    // in this case locationOfLmkItemAmongSiblings is the number of lookmark element currently in the first level of the lookmark manager which is why we start from that index
+    // the parent is the lookmark manager's label frame
+    for(j=0; j<lmkElement->GetNumberOfNestedElements(); j++)
+      {
+      this->ImportBoundingBoxFileInternal(j+locationOfLmkItemAmongSiblings,lmkElement->GetNestedElement(j),parent,macro);
+      }
+    }
+  else if(strcmp("BoundingBox",lmkElement->GetName())==0)
+    {
+    // note that in the case of a lookmark, no recursion is done
+
+    // this uses a vtkXMLLookmarkElement to create a vtkPVLookmark object
+    // create lookmark widget
+    //lookmarkWidget = this->GetPVLookmark(lmkElement);
+
+    // Use other attributes in file to initialize lookmmark
+    int tstep;
+    if(lmkElement->GetScalarAttribute("Timestep",tstep))
+      {
+      this->GetPVWindow()->GetCurrentPVReaderModule()->SetRequestedTimeStep(tstep);
+      }
+
+    lmkElement->GetScalarAttribute("MinX",newBounds[0]);
+    lmkElement->GetScalarAttribute("MaxX",newBounds[1]);
+    lmkElement->GetScalarAttribute("MinY",newBounds[2]);
+    lmkElement->GetScalarAttribute("MaxY",newBounds[3]);
+    lmkElement->GetScalarAttribute("MinZ",newBounds[4]);
+    lmkElement->GetScalarAttribute("MaxZ",newBounds[5]);
 
     if(macro)
       {
       macro->ViewMacro();
+      // The current source will be the reader unless a macro was selected in which case it would be the last filter in the pipeline
+      //inputSource = this->GetPVWindow()->GetCurrentPVSource();
       }
     else
       {
@@ -1256,24 +1392,73 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(vtkPVReaderModule *read
         pvs->SetVisibility(0);
         it->GoToNextItem();
         }
-      reader->SetVisibility(1);
+      this->GetPVWindow()->GetCurrentPVReaderModule()->SetVisibility(1);
       }
 
-    center[0]= bds[0] + (bds[1] - bds[0])/2;
-    center[1]= bds[2] + (bds[3] - bds[2])/2;
-    center[2]= bds[4] + (bds[5] - bds[4])/2;
-    this->GetPVWindow()->SetCenterOfRotation(center);
+    newCenter[0]= newBounds[0] + (newBounds[1] - newBounds[0])/2;
+    newCenter[1]= newBounds[2] + (newBounds[3] - newBounds[2])/2;
+    newCenter[2]= newBounds[4] + (newBounds[5] - newBounds[4])/2;
 
-    lmk = this->CreateLookmark(this->GetUnusedLookmarkName(),0);
-    this->DragAndDropWidget(lmk,bboxFolder->GetNestedSeparatorFrame());
-    this->PackChildrenBasedOnLocation(lmk->GetParent());
-    this->ResetDragAndDropTargetSetAndCallbacks();
+    this->GetPVRenderView()->GetRenderer()->ResetCamera(newBounds);
+    this->GetPVRenderView()->GetRenderer()->ResetCameraClippingRange();
+    this->GetPVRenderView()->ForceRender();
+   //this->GetPVWindow()->SetCenterOfRotation((float)newCenter);
+
+    if(!lmkElement->GetAttribute("Name"))
+      {
+      return;
+      }
+    lookmarkWidget = this->CreateLookmark((char*)lmkElement->GetAttribute("Name"),0);
+    // Add bounding box values as comments to lookmark
+    
+    if(lmkElement->GetAttribute("Comments"))
+      {
+      char *lookmarkComments = new char[strlen(lmkElement->GetAttribute("Comments"))+1];
+      strcpy(lookmarkComments,lmkElement->GetAttribute("Comments"));
+      this->DecodeNewlines(lookmarkComments);
+      lookmarkWidget->SetComments(lookmarkComments);
+      delete [] lookmarkComments;
+      }
+    else
+      {
+      comments << "Bounds of Lookmark: " << newBounds[0] << " " << newBounds[1] << " " << newBounds[2] << " " << newBounds[3] << " " << newBounds[4] << " " << newBounds[5] << ends;
+      lookmarkWidget->SetComments(comments.str());
+      comments.rdbuf()->freeze(0);
+      }
+
+    //lookmarkWidget->UpdateWidgetValues();
+    lookmarkWidget->SetBoundingBoxFlag(1);
+    lookmarkWidget->SetBounds(newBounds);
+    lookmarkWidget->UpdateWidgetValues();
+    lookmarkWidget->SetLocation(locationOfLmkItemAmongSiblings);
+
+    // Visit lookmark so that box clip will be generated, then update our lookmark so that the thumbnail reflects view
+    //lookmarkWidget->View();
+    //lookmarkWidget->Update();
+
+    this->DragAndDropWidget(lookmarkWidget,parent->GetNestedSeparatorFrame());
+    //this->ResetDragAndDropTargetSetAndCallbacks();
  
-    iter++;
+/*
+    lookmarkWidget->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
+    ostrstream s;
+    if(lookmarkWidget->GetName())
+      {
+      s << "GetPVLookmark \"" << lookmarkWidget->GetName() << "\"" << ends;
+      lookmarkWidget->GetTraceHelper()->SetReferenceCommand(s.str());
+      s.rdbuf()->freeze(0);
+      }
+    lookmarkWidget->SetParent(parent);
+    lookmarkWidget->Create();
+*/
+//    sprintf(methodAndArg,"SelectItemCallback %s",lookmarkWidget->GetWidgetName());
+//    lookmarkWidget->GetCheckbox()->SetCommand(this,methodAndArg);
+//    this->Script("pack %s -fill both -expand yes -padx 8",lookmarkWidget->GetWidgetName());
+
+//    numLmks = this->Lookmarks->GetNumberOfItems();
+//    this->Lookmarks->InsertItem(numLmks,lookmarkWidget);
     }
  
-  it->Delete();
-  delete infile;
 }
 
 
@@ -1979,6 +2164,22 @@ vtkPVLookmark *vtkPVLookmarkManager::GetPVLookmark(vtkXMLDataElement *elem)
   if(elem->GetScalarAttribute("CommentsFrameCollapsedState",ival))
     {
     lmk->SetCommentsFrameCollapsedState(ival);
+    }
+
+  if(elem->GetScalarAttribute("HasBoundingBox",ival))
+    {
+    lmk->SetBoundingBoxFlag(ival);
+    double bds[6];
+    if(ival==1)
+      {
+      elem->GetScalarAttribute("MinX",bds[0]);
+      elem->GetScalarAttribute("MaxX",bds[1]);
+      elem->GetScalarAttribute("MinY",bds[2]);
+      elem->GetScalarAttribute("MaxY",bds[3]);
+      elem->GetScalarAttribute("MinZ",bds[4]);
+      elem->GetScalarAttribute("MaxZ",bds[5]);
+      lmk->SetBounds(bds);
+      }
     }
 
   if(elem->GetAttribute("PixelSize"))
@@ -2802,6 +3003,17 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
       elem->SetAttribute("StateScript", lookmarkWidget->GetStateScript());
       elem->SetAttribute("ImageData", lookmarkWidget->GetImageData());
       elem->SetIntAttribute("PixelSize", lookmarkWidget->GetPixelSize());
+      elem->SetIntAttribute("HasBoundingBox", lookmarkWidget->GetBoundingBoxFlag());
+      double *bds = lookmarkWidget->GetBounds();
+      if(lookmarkWidget->GetBoundingBoxFlag())
+        {
+        elem->SetFloatAttribute("MinX", bds[0]);
+        elem->SetFloatAttribute("MaxX", bds[1]);
+        elem->SetFloatAttribute("MinY", bds[2]);
+        elem->SetFloatAttribute("MaxY", bds[3]);
+        elem->SetFloatAttribute("MinZ", bds[4]);
+        elem->SetFloatAttribute("MaxZ", bds[5]);
+        }
       elem->SetAttribute("Dataset", lookmarkWidget->GetDataset());
       elem->SetIntAttribute("MainFrameCollapsedState", lookmarkWidget->GetMainFrameCollapsedState());
       elem->SetIntAttribute("CommentsFrameCollapsedState", lookmarkWidget->GetCommentsFrameCollapsedState());

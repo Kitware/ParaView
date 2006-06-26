@@ -86,6 +86,7 @@ public:
   void ImportLookmarkFileCallback();
   void ImportBoundingBoxFileCallback();
   void ImportLookmarkFile(const char *path, int appendFlag);
+  void ImportBoundingBoxFile(vtkPVReaderModule *reader, vtkPVLookmark *macro, char *boundingBoxFileName);
 
   // Description:
   // Create either a Lookmark or a Lookmark Macro.
@@ -236,14 +237,12 @@ protected:
   // Description:
   // Recursively visit each xml element of the lookmark file, creating, packing, and storing vtkPVLookmarks and vtkKWLookmarkFolders as appropriate
   void ImportLookmarkFileInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *recursiveXmlElement, vtkKWWidget *parentWidget);
+  void ImportBoundingBoxFileInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *recursiveXmlElement, vtkKWLookmarkFolder *parentWidget,vtkPVLookmark *macro);
 
   // Description:
   // Recursively visit each xml element of the lookmark file, creatings entries in the "Add Macro Examples" menu
   void ImportMacroExamplesInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *recursiveXmlElement, vtkKWMenu *parentMenu);
 
-  // Description:
-  //
-  void ImportBoundingBoxFileInternal(vtkPVReaderModule *reader, vtkPVLookmark *macro, char *boundingBoxFileName);
 
   // Description:
   // Convenience method for creating a Load/Save dialog box and returning the filename chosen by the user

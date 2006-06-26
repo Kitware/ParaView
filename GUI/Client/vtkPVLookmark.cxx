@@ -81,10 +81,14 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkPVXDMFParameters.h"
 #include "vtkPVSourceNotebook.h"
+#include "vtkPVBoxWidget.h"
+#include "vtkPVInputMenu.h"
+#include "vtkPVSelectWidget.h"
+#include "vtkPVLabeledToggle.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.67");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.68");
 
 
 //*****************************************************************************
@@ -132,6 +136,7 @@ vtkPVLookmark::vtkPVLookmark()
   this->ReleaseEventFlag = 0;
   this->Version = NULL;
   this->Location = 0;
+  this->BoundingBoxFlag = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -223,6 +228,34 @@ void vtkPVLookmark::View()
                       this->GetTclName());
 
   this->ParseAndExecuteStateScript(temp_script,0);
+
+  // If this lookmark was generated from a bounding box, create a box widget around the region
+  if(this->BoundingBoxFlag)
+    {
+    vtkPVSource *input = this->GetPVWindow()->GetCurrentPVSource();
+    vtkPVSource *clip = this->GetPVWindow()->CreatePVSource("Clip");
+    clip->SetLabel("BoundingBox");
+    vtkPVInputMenu::SafeDownCast(clip->GetPVWidget("Input"))->SetCurrentValue(input);
+    vtkPVSelectWidget *widgetType = vtkPVSelectWidget::SafeDownCast(clip->GetPVWidget("Clip Function"));
+    widgetType->SetCurrentValue("Box");
+    vtkPVBoxWidget *box = vtkPVBoxWidget::SafeDownCast(widgetType->GetPVWidget("Box"));
+    vtkPVLabeledToggle *insideOut = vtkPVLabeledToggle::SafeDownCast(clip->GetPVWidget("InsideOut"));
+    insideOut->SetSelectedState(1);
+    box->PlaceWidget(this->Bounds);
+    box->SetVisibility(1);
+    //reader->SetVisibility(0);
+    this->AddPVSource(clip);
+    clip->SetLookmark(this);
+    clip->AcceptCallback();
+    input->SetVisibility(1);
+    input->GetPVOutput()->SetOpacity(0.1);
+
+    // We now have the bounds of the initially placed box widget and the bounds that we wish it to have
+    // Must translate, scale, and orient the box to go from one to the other
+    //box->SetTranslate(newCenter[0]-oldCenter[0],newCenter[1]-oldCenter[1],newCenter[2]-oldCenter[2]);
+    //box->SetScale( (newBounds[1]-newBounds[0])/(oldBounds[1]-oldBounds[0]),(newBounds[3]-newBounds[2])/(oldBounds[3]-oldBounds[2]),(newBounds[5]-newBounds[4])/(oldBounds[5]-oldBounds[4]));
+    //clip->AcceptCallback();
+    }
 
   // this is needed to update the eyeballs based on recent changes to visibility of filters
   // handle case where there is no source in the source window
@@ -1215,6 +1248,8 @@ void vtkPVLookmark::Clone(vtkPVLookmark *&clone)
   ostrstream s;
   vtkPVLookmark *lmk = this->NewInstance();
   lmk->SetMacroFlag(this->GetMacroFlag());
+  lmk->SetBoundingBoxFlag(this->GetBoundingBoxFlag());
+  lmk->SetBounds(this->GetBounds());
   lmk->GetTraceHelper()->SetReferenceHelper(this->GetPVLookmarkManager()->GetTraceHelper());
   lmk->SetName(this->GetName());
   lmk->SetVersion(this->GetVersion());
@@ -2311,5 +2346,9 @@ void vtkPVLookmark::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Location: " << this->GetLocation() << endl;
   os << indent << "TraceHelper: " << this->TraceHelper << endl;
   os << indent << "ToolbarButton: " << this->GetToolbarButton() << endl;
+  os << indent << "BoundingBoxFlag: " << this->GetBoundingBoxFlag() << endl;
+  os << indent << "Bounds: ( " << this->Bounds[0] << ", " << this->Bounds[1] << ", " << this->Bounds[2]
+                        << ", " << this->Bounds[3] << ", " << this->Bounds[4] << ", " << this->Bounds[5] << ")" << endl;
+  
 
 }

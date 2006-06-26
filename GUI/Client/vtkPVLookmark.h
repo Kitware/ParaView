@@ -144,6 +144,17 @@ public:
   // Finds which readers or sources should be stored with this lookmark when created and initializes the dataset ivar
   void InitializeDataset();
 
+  // Description:
+//BTX
+  vtkSetVectorMacro(Bounds,double,6);
+  vtkGetVectorMacro(Bounds,double,6);
+//ETX
+
+  // Description:
+  // Was this lookmark generated using a bounding box?
+  vtkGetMacro(BoundingBoxFlag,int);
+  vtkSetMacro(BoundingBoxFlag,int);
+
 protected:
 
   vtkPVLookmark();
@@ -216,6 +227,9 @@ protected:
   vtkPVTraceHelper* TraceHelper;
 
   vtkKWPushButton *ToolbarButton;
+
+  double Bounds[6];
+  int BoundingBoxFlag;
 
 private:
   vtkPVLookmark(const vtkPVLookmark&); // Not implemented

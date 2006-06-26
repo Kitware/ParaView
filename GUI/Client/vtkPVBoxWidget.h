@@ -120,6 +120,10 @@ public:
   // animation. Called by vtkPVSelectWidget when this widget is deselected.
   virtual void DisableAnimation() { this->UnregisterAnimateableProxies();} ;
 
+  // Description:
+  // Be able to place widget based on bounds rather than automatically using input data
+  virtual void PlaceWidget(double bds[6]);
+
 protected:
   vtkPVBoxWidget();
   ~vtkPVBoxWidget();
@@ -132,7 +136,6 @@ protected:
   // Description:
   // PlaceWidget is overloaded since, this class has to position the
   // bounds on the BoxProxy(vtkBox) as well.
-  virtual void PlaceWidget(double bds[6]);
   virtual void PlaceWidget() { this->Superclass::PlaceWidget(); }
   
   // Description:
