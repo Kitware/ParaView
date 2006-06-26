@@ -938,6 +938,159 @@
      </DoubleVectorProperty>
     </Proxy>
 
+    <Proxy
+           name="HandleRepresentation"
+           class="vtkPointHandleRepresentation3D">
+
+     <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        animateable="1">
+        <BooleanDomain name="bool" />
+     </IntVectorProperty>
+
+     <DoubleVectorProperty 
+        name="WorldPosition"
+        command="SetWorldPosition"
+        number_of_elements="3"
+        argument_is_array="1"
+        information_property="WorldPositionInfo"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="WorldPositionInfo"
+        command="GetWorldPosition"
+        information_only="1">
+        <SimpleDoubleInformationHelper/>
+     </DoubleVectorProperty>
+
+<!--
+     <Property
+       name="OnInteraction"
+       command="OnInteraction"
+       update_self="1">
+     </Property>
+
+     <Property
+       name="OnEndInteraction"
+       command="OnEndInteraction"
+       update_self="1">
+     </Property>
+-->
+
+     <ProxyProperty name="Renderer" command="SetRenderer">
+       <ProxyGroupDomain name="groups">
+         <Group name="renderers"/>
+       </ProxyGroupDomain>
+     </ProxyProperty>
+    </Proxy>
+        
+    <Proxy
+           name="LineRepresentation"
+           class="vtkLineRepresentation">
+
+     <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1"
+        animateable="1">
+        <BooleanDomain name="bool" />
+     </IntVectorProperty>
+
+     <DoubleVectorProperty 
+        name="Point1WorldPosition"
+        command="SetPoint1WorldPosition"
+        number_of_elements="3"
+        argument_is_array="1"
+        information_property="Point1WorldPositionInfo"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="Point1WorldPositionInfo"
+        command="GetPoint1WorldPosition"
+        information_only="1">
+        <SimpleDoubleInformationHelper/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="Point2WorldPosition"
+        command="SetPoint2WorldPosition"
+        number_of_elements="3"
+        argument_is_array="1"
+        information_property="Point2WorldPositionInfo"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="Point2WorldPositionInfo"
+        command="GetPoint2WorldPosition"
+        information_only="1">
+        <SimpleDoubleInformationHelper/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="Point1DisplayPosition"
+        command="SetPoint1DisplayPosition"
+        number_of_elements="3"
+        argument_is_array="1"
+        information_property="Point1DisplayPositionInfo"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="Point1DisplayPositionInfo"
+        command="GetPoint1DisplayPosition"
+        information_only="1">
+        <SimpleDoubleInformationHelper/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="Point2DisplayPosition"
+        command="SetPoint2DisplayPosition"
+        number_of_elements="3"
+        argument_is_array="1"
+        information_property="Point2DisplayPositionInfo"
+        default_values="0 0 0">
+        <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="Point2DisplayPositionInfo"
+        command="GetPoint2DisplayPosition"
+        information_only="1">
+        <SimpleDoubleInformationHelper/>
+     </DoubleVectorProperty>
+
+<!--
+     <Property
+       name="OnInteraction"
+       command="OnInteraction"
+       update_self="1">
+     </Property>
+
+     <Property
+       name="OnEndInteraction"
+       command="OnEndInteraction"
+       update_self="1">
+     </Property>
+-->
+
+     <ProxyProperty name="Renderer" command="SetRenderer">
+       <ProxyGroupDomain name="groups">
+         <Group name="renderers"/>
+       </ProxyGroupDomain>
+     </ProxyProperty>
+    </Proxy>
+
     <ImplicitPlaneRepresentationProxy 
            name="ImplicitPlaneRepresentation" 
            class="vtkImplicitPlaneRepresentation">
@@ -2792,6 +2945,56 @@
         </ExposedProperties>
       </SubProxy>
     </DisplayProxy>
+
+    <New3DWidgetProxy name="HandleWidgetDisplay">
+      <SubProxy>
+        <Proxy name="Prop"
+          proxygroup="props" proxyname="HandleRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="WorldPositionInfo" />
+          <Property name="WorldPosition" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Widget"
+          proxygroup="3d_widgets" proxyname="HandleWidget">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Enabled" />
+        </ExposedProperties>
+      </SubProxy>
+    </New3DWidgetProxy>
+
+    <New3DWidgetProxy name="LineWidgetDisplay">
+      <SubProxy>
+        <Proxy name="Prop"
+          proxygroup="props" proxyname="LineRepresentation">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Visibility" />
+          <Property name="Point1WorldPositionInfo" />
+          <Property name="Point1WorldPosition" />
+          <Property name="Point2WorldPositionInfo" />
+          <Property name="Point2WorldPosition" />
+          <Property name="Point1DisplayPositionInfo" />
+          <Property name="Point1DisplayPosition" />
+          <Property name="Point2DisplayPositionInfo" />
+          <Property name="Point2DisplayPosition" />
+        </ExposedProperties>
+      </SubProxy>
+
+      <SubProxy>
+        <Proxy name="Widget"
+          proxygroup="3d_widgets" proxyname="LineWidget2">
+        </Proxy>
+        <ExposedProperties>
+          <Property name="Enabled" />
+        </ExposedProperties>
+      </SubProxy>
+    </New3DWidgetProxy>
 
     <New3DWidgetProxy name="ImplicitPlaneWidgetDisplay">
       <SubProxy>
