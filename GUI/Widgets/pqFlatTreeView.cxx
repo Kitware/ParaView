@@ -1660,8 +1660,6 @@ void pqFlatTreeView::paintEvent(QPaintEvent *e)
         if(this->selectionBehavior() == QAbstractItemView::SelectRows)
           {
           index = this->selectionModel()->currentIndex();
-          int currentRow = index.row();
-          int itemRow = item->Index.row();
           if(index.isValid() && index.row() == item->Index.row() &&
               index.parent() == item->Index.parent())
             {
