@@ -48,6 +48,7 @@ class pqPipelineSource;
 class pqRenderModule;
 class pqServerManagerObserver;
 class pqServer;
+class pqToolsMenu;
 
 class vtkCommand;
 class vtkObject;
@@ -132,7 +133,7 @@ public:
   /// Returns the filters menu, creating it if it doesn't already exist
   QMenu* filtersMenu();
   /// Returns the tools menu, creating it if it doesn't already exist
-  QMenu* toolsMenu();
+  pqToolsMenu* toolsMenu();
   /// Returns the help menu, creating it if it doesn't already exist
   QMenu* helpMenu();
 
@@ -178,16 +179,6 @@ public slots:
   void onServerConnect(pqServer* Server);
   void onServerDisconnect();
 
-  void onDumpWidgetNames();
-  void onRecordTest();
-  void onRecordTest(const QStringList& Files);
-  void onRecordTestScreenshot();
-  void onRecordTestScreenshot(const QStringList& Files);
-  void onPlayTest();
-  void onPlayTest(const QStringList& Files);
-  
-  void onPythonShell();
-
   void enableTooltips(bool enabled = true);
 
   // This method determine the enable state for various menus/toobars etc,
@@ -230,12 +221,10 @@ private slots:
 private slots:
   void onCreateSource(QAction*);
   void onCreateFilter(QAction*);
-  void onOpenLinkEditor();
-  void onOpenCompoundFilterWizard();
-  void onOpenBundleWizard();
 
   void onNewSelections(vtkSMProxy* p, vtkUnstructuredGrid* selections);
-  void onCompoundProxyAdded(const QString&, const QString&);
+  void onCompoundProxyAdded(QString proxy);
+  void onCompoundProxyRemoved(QString proxy);
   void onCreateCompoundProxy(QAction*);
   
   void onRemoveServer(pqServer *server);

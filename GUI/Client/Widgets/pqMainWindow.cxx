@@ -55,12 +55,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSelectionManager.h"
 #include "pqServerBrowser.h"
 #include "pqServerFileDialogModel.h"
+#include "pqServerManagerObserver.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqServer.h"
 #include "pqSimpleAnimationManager.h"
 #include "pqSettings.h"
 #include "pqSourceProxyInfo.h"
 #include "pqTestUtility.h"
+#include "pqToolsMenu.h"
 #include "pqToolTipTrapper.h"
 #include "pqDisplayColorWidget.h"
 #include "pqVCRController.h"
@@ -196,7 +198,7 @@ public:
   QMenu* SourcesMenu;
   QMenu* FiltersMenu;
   pqPipelineMenu *PipelineMenu;
-  QMenu* ToolsMenu;
+  pqToolsMenu *ToolsMenu;
   QMenu* HelpMenu;
   
   /// Stores a mapping from dockable widgets to menu actions
@@ -490,44 +492,8 @@ void pqMainWindow::createStandardPipelineMenu()
 
 void pqMainWindow::createStandardToolsMenu()
 {
-  QMenu* const menu = this->toolsMenu();
-
-  menu->addAction(tr("&Create Bundle..."))
-    << pqSetName("CreateBundle")
-    << pqConnect(SIGNAL(triggered()), this, SLOT(onOpenBundleWizard()));
-  
-  QAction* compoundFilterAction = menu->addAction(tr("Compound &Filters..."))
-    << pqSetName("CompoundFilter")
-    << pqConnect(SIGNAL(triggered(bool)), this, SLOT(onOpenCompoundFilterWizard()));
-  compoundFilterAction->setEnabled(false);
-
-  menu->addAction(tr("&Link Editor..."))
-    << pqSetName("LinkEditor")
-    << pqConnect(SIGNAL(triggered(bool)), this, SLOT(onOpenLinkEditor()));
-
-  menu->addSeparator();
-  
-  menu->addAction(tr("&Dump Widget Names"))
-    << pqSetName("DumpWidgets")
-    << pqConnect(SIGNAL(triggered()), this, SLOT(onDumpWidgetNames()));
-  
-  menu->addAction(tr("&Record Test"))
-    << pqSetName("Record")
-    << pqConnect(SIGNAL(triggered()), this, SLOT(onRecordTest()));
-
-  menu->addAction(tr("Record &Test Screenshot"))
-    << pqSetName("RecordTestScreenshot")
-    << pqConnect(SIGNAL(triggered()), this, SLOT(onRecordTestScreenshot()));
-
-  menu->addAction(tr("&Play Test"))
-    << pqSetName("Play")
-    << pqConnect(SIGNAL(triggered()), this, SLOT(onPlayTest()));
-
-#ifdef PARAVIEW_EMBED_PYTHON
-  menu->addAction(tr("Python &Shell"))
-    << pqSetName("PythonShell")
-    << pqConnect(SIGNAL(triggered()), this, SLOT(onPythonShell()));
-#endif // PARAVIEW_EMBED_PYTHON
+  this->toolsMenu();
+  this->Implementation->ToolsMenu->addActionsToMenuBar(this->menuBar());
 }
 
 void pqMainWindow::createStandardHelpMenu()
@@ -802,6 +768,14 @@ void pqMainWindow::createStandardCompoundProxyToolBar()
   this->Implementation->CompoundProxyToolBar =
     new QToolBar(tr("Compound Proxies"), this)
     << pqSetName("CompoundProxyToolBar");
+
+  // Listen for compound proxy register events.
+  pqServerManagerObserver *observer =
+      pqApplicationCore::instance()->getPipelineData();
+  this->connect(observer, SIGNAL(compoundProxyDefinitionRegistered(QString)),
+      this, SLOT(onCompoundProxyAdded(QString)));
+  this->connect(observer, SIGNAL(compoundProxyDefinitionUnRegistered(QString)),
+      this, SLOT(onCompoundProxyRemoved(QString)));
     
   this->addToolBar(Qt::TopToolBarArea, this->Implementation->CompoundProxyToolBar);
   this->connect(this->Implementation->CompoundProxyToolBar, 
@@ -894,12 +868,12 @@ QMenu* pqMainWindow::filtersMenu()
   return this->Implementation->FiltersMenu;
 }
 
-QMenu* pqMainWindow::toolsMenu()
+pqToolsMenu* pqMainWindow::toolsMenu()
 {
   if(!this->Implementation->ToolsMenu)
     {
-    this->Implementation->ToolsMenu = this->menuBar()->addMenu(tr("&Tools"))
-      << pqSetName("ToolsMenu");
+    this->Implementation->ToolsMenu = new pqToolsMenu(this);
+    this->Implementation->ToolsMenu->setObjectName("ToolsMenu");
     }
     
   return this->Implementation->ToolsMenu;
@@ -1591,57 +1565,6 @@ void pqMainWindow::onFileSaveAnimation(const QStringList& files)
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindow::onRecordTestScreenshot()
-{
-  pqRenderModule* const render_module = pqApplicationCore::instance()->getActiveRenderModule();
-  if(!render_module)
-    {
-    qDebug() << "Cannnot save image. No active render module.";
-    return;
-    }
-
-  QString filters;
-  filters += "PNG image (*.png)";
-  filters += ";;BMP image (*.bmp)";
-  filters += ";;TIFF image (*.tif)";
-  filters += ";;PPM image (*.ppm)";
-  filters += ";;JPG image (*.jpg)";
-  filters += ";;All files (*)";
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), 
-    this, tr("Save Test Screenshot:"), QString(), filters);
-  file_dialog->setObjectName("RecordTestScreenshotDialog");
-  file_dialog->setFileMode(pqFileDialog::AnyFile);
-  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
-    this, SLOT(onRecordTestScreenshot(const QStringList&)));
-  file_dialog->show();
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindow::onRecordTestScreenshot(const QStringList& files)
-{
-  pqRenderModule* render_module = pqApplicationCore::instance()->getActiveRenderModule();
-  if(!render_module)
-    {
-    qDebug() << "Cannnot save image. No active render module.";
-    return;
-    }
-
-  QSize old_size = render_module->getWidget()->size();
-  render_module->getWidget()->resize(300,300);
-  
-  for(int i = 0; i != files.size(); ++i)
-    {
-    if(!pqTestUtility::SaveScreenshot(render_module->getWidget()->GetRenderWindow(), files[i]))
-      {
-      qCritical() << "Save Image failed.";
-      }
-    }
-    
-  render_module->getWidget()->resize(old_size);
-  render_module->render();
-}
-
-//-----------------------------------------------------------------------------
 bool pqMainWindow::compareView(const QString& referenceImage, double threshold, 
   ostream& output, const QString& tempDirectory)
 {
@@ -1739,138 +1662,6 @@ void pqMainWindow::onCreateFilter(QAction* action)
     } 
 }
 
-//-----------------------------------------------------------------------------
-void pqMainWindow::onOpenLinkEditor()
-{
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindow::onOpenCompoundFilterWizard()
-{
-  // TODO: pqCompoundProxyWizard should not need a server.
-  pqCompoundProxyWizard* wizard = new pqCompoundProxyWizard(
-    pqApplicationCore::instance()->getActiveServer(), this);
-  wizard->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
-
-  this->connect(wizard, 
-    SIGNAL(newCompoundProxy(const QString&, const QString&)), 
-    SLOT(onCompoundProxyAdded(const QString&, const QString&)));
-  wizard->show();
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindow::onOpenBundleWizard()
-{
-  // Get the selected sources from the application core. Notify the user
-  // if the selection is empty.
-  const pqServerManagerSelection *selections =
-      pqApplicationCore::instance()->getSelectionModel()->selectedItems();
-  if(selections->size() == 0)
-    {
-    QMessageBox::warning(this, "Create Bundle Error",
-        "No pipeline objects are selected.\n"
-        "To create a new pipeline bundle, select the sources and "
-        "filters you want.\nThen, launch the creation wizard.",
-        QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
-    return;
-    }
-
-  // Create a bundle definition model with the pipeline selection. The
-  // model only accepts pipeline sources. Notify the user if the model
-  // is empty.
-  pqBundleDefinitionModel bundle(this);
-  bundle.setContents(selections);
-  if(!bundle.hasChildren(QModelIndex()))
-    {
-    QMessageBox::warning(this, "Create Bundle Error",
-        "The selected objects cannot be used to make a bundle.\n"
-        "To create a new pipeline bundle, select the sources and "
-        "filters you want.\nThen, launch the creation wizard.",
-        QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
-    return;
-    }
-
-  pqBundleDefinitionWizard wizard(&bundle, this);
-  if(wizard.exec() == QDialog::Accepted)
-    {
-    // Create a new compound proxy from the bundle definition.
-    wizard.createPipelineBundle();
-
-    // TODO: Launch the bundle manager in case the user wants to save
-    // the compound proxy definition.
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindow::onDumpWidgetNames()
-{
-  const QString output = pqObjectNaming::DumpHierarchy();
-  qDebug() << output;
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindow::onRecordTest()
-{
-  QString filters;
-  filters += "XML files (*.xml)";
-  filters += ";;All files (*)";
-  pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), 
-    this, tr("Record Test:"), QString(), filters);
-  file_dialog->setObjectName("ToolsRecordTestDialog");
-  file_dialog->setFileMode(pqFileDialog::AnyFile);
-  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
-    this, SLOT(onRecordTest(const QStringList&)));
-  file_dialog->show();
-}
-
-void pqMainWindow::onRecordTest(const QStringList& Files)
-{
-  for(int i = 0; i != Files.size(); ++i)
-    {
-    pqEventTranslator* const translator = new pqEventTranslator();
-    pqTestUtility::Setup(*translator);
-    
-    pqRecordEventsDialog* const dialog = new pqRecordEventsDialog(translator, Files[i], this);
-    dialog->show();
-    }
-}
-
-void pqMainWindow::onPlayTest()
-{
-  QString filters;
-  filters += "XML files (*.xml)";
-  filters += ";;All files (*)";
-  pqFileDialog* const file_dialog = new pqFileDialog(new
-    pqLocalFileDialogModel(), this, tr("Play Test:"), QString(), filters);
-  file_dialog->setObjectName("ToolsPlayTestDialog");
-  file_dialog->setFileMode(pqFileDialog::ExistingFile);
-  QObject::connect(file_dialog, SIGNAL(filesSelected(const QStringList&)), 
-    this, SLOT(onPlayTest(const QStringList&)));
-  file_dialog->show();
-}
-
-void pqMainWindow::onPlayTest(const QStringList& Files)
-{
-  QApplication::processEvents();
-
-  pqEventPlayer player;
-  pqTestUtility::Setup(player);
-
-  for(int i = 0; i != Files.size(); ++i)
-    {
-      pqEventPlayerXML xml_player;
-      xml_player.playXML(player, Files[i]);
-    }
-}
-
-void pqMainWindow::onPythonShell()
-{
-#ifdef PARAVIEW_EMBED_PYTHON
-  pqPythonDialog* const dialog = new pqPythonDialog(this);
-  dialog->show();
-#endif // PARAVIEW_EMBED_PYTHON
-}
-
 void pqMainWindow::enableTooltips(bool enabled)
 {
   if(enabled && !this->Implementation->ToolTipTrapper)
@@ -1910,11 +1701,24 @@ void pqMainWindow::onCreateCompoundProxy(QAction* action)
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindow::onCompoundProxyAdded(const QString&, const QString& proxy)
+void pqMainWindow::onCompoundProxyAdded(QString proxy)
 {
   this->Implementation->CompoundProxyToolBar->addAction(
     QIcon(":/pqWidgets/pqBundle32.png"), proxy) 
     << pqSetName(proxy) << pqSetData(proxy);
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::onCompoundProxyRemoved(QString proxy)
+{
+  // Remove the action associated with the compound proxy.
+  QAction *action =
+    this->Implementation->CompoundProxyToolBar->findChild<QAction *>(proxy);
+  if(action)
+    {
+    this->Implementation->CompoundProxyToolBar->removeAction(action);
+    delete action;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -2219,14 +2023,6 @@ void pqMainWindow::updateEnableState()
     {
     this->Implementation->FiltersMenu->setEnabled(
       source != 0 && server != 0 && !pending_displays);
-    }
-
-  if (this->Implementation->ToolsMenu)
-    {
-    QAction* compoundFilterAction = 
-      this->Implementation->ToolsMenu->findChild<QAction*>( "CompoundFilter");
-
-    compoundFilterAction->setEnabled(server != 0 && !pending_displays);
     }
 
   if (this->Implementation->SelectionToolBar)

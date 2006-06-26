@@ -107,6 +107,7 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
     this->TreeView->setModel(this->ListModel);
     this->TreeView->installEventFilter(this);
     this->TreeView->header()->moveSection(1, 0);
+    //this->TreeView->setSelectionBehavior(QAbstractItemView::SelectRows);
     this->TreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     // Listen to the selection change signals.

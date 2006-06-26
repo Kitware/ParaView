@@ -166,6 +166,7 @@ void pqPipelineMenu::addActionsToMenuBar(QMenuBar *menubar) const
   if(menubar)
     {
     QMenu *menu = menubar->addMenu(tr("&Pipeline"));
+    menu->setObjectName("PipelineMenu");
     this->addActionsToMenu(menu);
     }
 }

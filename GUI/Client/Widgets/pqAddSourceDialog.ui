@@ -207,6 +207,9 @@
      <property name="isWrapping" stdset="0" >
       <bool>true</bool>
      </property>
+     <property name="resizeMode" >
+      <enum>QListView::Adjust</enum>
+     </property>
     </widget>
    </item>
    <item rowspan="2" row="1" column="0" >
@@ -248,5 +251,5 @@
  <resources>
   <include location="pqWidgets.qrc" />
  </resources>
- <connections />
+ <connections/>
 </ui>
