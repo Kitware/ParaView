@@ -96,7 +96,6 @@ pqPipelineMenu::pqPipelineMenu(QObject *parentObject)
   action->setObjectName("AddFilter");
   QObject::connect(action, SIGNAL(triggered()), this, SLOT(addFilter()));
   this->MenuList[pqPipelineMenu::AddFilterAction] = action;
-  this->MenuList[pqPipelineMenu::AddBundleAction] = 0;
 
   // TEMP: Set the add filter start path to the 'Released' group.
   this->Internal->LastFilterGroup = "Released";
@@ -127,10 +126,6 @@ void pqPipelineMenu::loadFilterInfo(vtkPVXMLElement *root)
   this->Internal->FilterGroups->addSource("Clip", "Released");
   this->Internal->FilterGroups->addSource("Cut", "Released");
   this->Internal->FilterGroups->addSource("Threshold", "Released");
-}
-
-void pqPipelineMenu::loadBundleInfo(vtkPVXMLElement *)
-{
 }
 
 pqSourceInfoModel *pqPipelineMenu::getFilterModel()
@@ -217,10 +212,6 @@ void pqPipelineMenu::addFilter()
     // a signal.
     dialog.getPath(this->Internal->LastFilterGroup);
     }
-}
-
-void pqPipelineMenu::addBundle()
-{
 }
 
 void pqPipelineMenu::setupConnections(pqSourceInfoModel *model,

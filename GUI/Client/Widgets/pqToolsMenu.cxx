@@ -36,10 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqToolsMenu.h"
 
 #include "pqApplicationCore.h"
-#include "pqBundleDefinitionModel.h"
-#include "pqBundleDefinitionWizard.h"
-#include "pqBundleManager.h"
-#include "pqBundleManagerModel.h"
+#include "pqCustomFilterDefinitionModel.h"
+#include "pqCustomFilterDefinitionWizard.h"
+#include "pqCustomFilterManager.h"
+#include "pqCustomFilterManagerModel.h"
 #include "pqEventTranslator.h"
 #include "pqEventPlayer.h"
 #include "pqEventPlayerXML.h"
@@ -74,31 +74,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqToolsMenu::pqToolsMenu(QObject *parentObject)
   : QObject(parentObject)
 {
-  this->BundleManager = 0;
-  this->Bundles = new pqBundleManagerModel(this);
+  this->CustomFilters = new pqCustomFilterManagerModel(this);
+  this->Manager = 0;
   this->MenuList = new QAction *[pqToolsMenu::LastAction + 1];
 
-  // Listen for bundle registration events.
+  // Listen for custom filter registration events.
   pqServerManagerObserver *observer =
       pqApplicationCore::instance()->getPipelineData();
   QObject::connect(observer,
       SIGNAL(compoundProxyDefinitionRegistered(QString)),
-      this->Bundles, SLOT(addBundle(QString)));
+      this->CustomFilters, SLOT(addCustomFilter(QString)));
   QObject::connect(observer,
       SIGNAL(compoundProxyDefinitionUnRegistered(QString)),
-      this->Bundles, SLOT(removeBundle(QString)));
+      this->CustomFilters, SLOT(removeCustomFilter(QString)));
 
   // Initialize the menu actions.
-  QAction *action = new QAction(tr("&Create Bundle..."), this);
-  action->setObjectName("CreateBundle");
+  QAction *action = new QAction(tr("&Create Custom Filter..."), this);
+  action->setObjectName("CreateCustomFilter");
   QObject::connect(action, SIGNAL(triggered()),
-      this, SLOT(openBundleWizard()));
-  this->MenuList[pqToolsMenu::CreateBundle] = action;
-  action = new QAction(tr("&Manage Bundles..."), this);
-  action->setObjectName("ManageBundles");
+      this, SLOT(openCustomFilterWizard()));
+  this->MenuList[pqToolsMenu::CreateCustomFilter] = action;
+  action = new QAction(tr("&Manage Custom Filters..."), this);
+  action->setObjectName("ManageCustomFilters");
   QObject::connect(action, SIGNAL(triggered()),
-      this, SLOT(openBundleManager()));
-  this->MenuList[pqToolsMenu::ManageBundles] = action;
+      this, SLOT(openCustomFilterManager()));
+  this->MenuList[pqToolsMenu::ManageCustomFilters] = action;
   action = new QAction(tr("&Link Editor..."), this);
   action->setObjectName("LinkEditor");
   QObject::connect(action, SIGNAL(triggered()), this, SLOT(openLinkEditor()));
@@ -137,14 +137,14 @@ pqToolsMenu::pqToolsMenu(QObject *parentObject)
 
 pqToolsMenu::~pqToolsMenu()
 {
-  if(this->BundleManager)
+  if(this->Manager)
     {
-    delete this->BundleManager;
+    delete this->Manager;
     }
 
   // The actions on the list will get cleaned up by Qt.
   delete [] this->MenuList;
-  delete this->Bundles;
+  delete this->CustomFilters;
 }
 
 void pqToolsMenu::addActionsToMenuBar(QMenuBar *menubar) const
@@ -164,8 +164,8 @@ void pqToolsMenu::addActionsToMenu(QMenu *menu) const
     return;
     }
 
-  menu->addAction(this->MenuList[pqToolsMenu::CreateBundle]);
-  menu->addAction(this->MenuList[pqToolsMenu::ManageBundles]);
+  menu->addAction(this->MenuList[pqToolsMenu::CreateCustomFilter]);
+  menu->addAction(this->MenuList[pqToolsMenu::ManageCustomFilters]);
   menu->addAction(this->MenuList[pqToolsMenu::LinkEditor]);
 
   menu->addSeparator();
@@ -192,7 +192,7 @@ QAction *pqToolsMenu::getMenuAction(pqToolsMenu::ActionName name) const
   return 0;
 }
 
-void pqToolsMenu::openBundleWizard()
+void pqToolsMenu::openCustomFilterWizard()
 {
   // Get the selected sources from the application core. Notify the user
   // if the selection is empty.
@@ -201,52 +201,53 @@ void pqToolsMenu::openBundleWizard()
       pqApplicationCore::instance()->getSelectionModel()->selectedItems();
   if(selections->size() == 0)
     {
-    QMessageBox::warning(activeWindow, "Create Bundle Error",
+    QMessageBox::warning(activeWindow, "Create Custom Filter Error",
         "No pipeline objects are selected.\n"
-        "To create a new pipeline bundle, select the sources and "
+        "To create a new custom filter, select the sources and "
         "filters you want.\nThen, launch the creation wizard.",
         QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
     return;
     }
 
-  // Create a bundle definition model with the pipeline selection. The
-  // model only accepts pipeline sources. Notify the user if the model
-  // is empty.
-  pqBundleDefinitionModel bundle(this);
-  bundle.setContents(selections);
-  if(!bundle.hasChildren(QModelIndex()))
+  // Create a custom filter definition model with the pipeline
+  // selection. The model only accepts pipeline sources. Notify the
+  // user if the model is empty.
+  pqCustomFilterDefinitionModel custom(this);
+  custom.setContents(selections);
+  if(!custom.hasChildren(QModelIndex()))
     {
-    QMessageBox::warning(activeWindow, "Create Bundle Error",
-        "The selected objects cannot be used to make a bundle.\n"
-        "To create a new pipeline bundle, select the sources and "
+    QMessageBox::warning(activeWindow, "Create Custom Filter Error",
+        "The selected objects cannot be used to make a custom filter.\n"
+        "To create a new custom filter, select the sources and "
         "filters you want.\nThen, launch the creation wizard.",
         QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
     return;
     }
 
-  pqBundleDefinitionWizard wizard(&bundle, activeWindow);
+  pqCustomFilterDefinitionWizard wizard(&custom, activeWindow);
   if(wizard.exec() == QDialog::Accepted)
     {
-    // Create a new compound proxy from the bundle definition.
-    wizard.createPipelineBundle();
-    QString bundleName = wizard.getBundleName();
+    // Create a new compound proxy from the custom filter definition.
+    wizard.createCustomFilter();
+    QString customName = wizard.getCustomFilterName();
 
-    // Launch the bundle manager in case the user wants to save the
-    // compound proxy definition. Select the new bundle for the user.
-    this->openBundleManager();
-    this->BundleManager->selectBundle(bundleName);
+    // Launch the custom filter manager in case the user wants to save
+    // the compound proxy definition. Select the new custom filter for
+    // the user.
+    this->openCustomFilterManager();
+    this->Manager->selectCustomFilter(customName);
     }
 }
 
-void pqToolsMenu::openBundleManager()
+void pqToolsMenu::openCustomFilterManager()
 {
-  if(!this->BundleManager)
+  if(!this->Manager)
     {
-    this->BundleManager = new pqBundleManager(this->Bundles,
+    this->Manager = new pqCustomFilterManager(this->CustomFilters,
         QApplication::activeWindow());
     }
 
-  this->BundleManager->show();
+  this->Manager->show();
 }
 
 void pqToolsMenu::openLinkEditor()

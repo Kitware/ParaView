@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqBundleDefinitionWizard.h
+   Module:    pqCustomFilterDefinitionWizard.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,88 +30,91 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-/// \file pqBundleDefinitionWizard.h
+/// \file pqCustomFilterDefinitionWizard.h
 /// \date 6/19/2006
 
-#ifndef _pqBundleDefinitionWizard_h
-#define _pqBundleDefinitionWizard_h
+#ifndef _pqCustomFilterDefinitionWizard_h
+#define _pqCustomFilterDefinitionWizard_h
 
 
 #include "pqWidgetsExport.h"
 #include <QDialog>
 
-class pqBundleDefinitionModel;
-class pqBundleDefinitionWizardForm;
+class pqCustomFilterDefinitionModel;
+class pqCustomFilterDefinitionWizardForm;
 class QModelIndex;
 class vtkSMCompoundProxy;
 
 
-/*! \class pqBundleDefinitionWizard
+/*! \class pqCustomFilterDefinitionWizard
  *  \brief
- *    The pqBundleDefinitionWizard class is used to create a compound
- *    proxy definition one step at a time.
+ *    The pqCustomFilterDefinitionWizard class is used to create a
+ *    compound proxy definition one step at a time.
  * 
- *  The wizard should be created with a pqBundleDefinitionModel. The
- *  model stores the sources that will be placed in the bundle. The
- *  model is also used when selecting the exposed properties.
+ *  The wizard should be created with a pqCustomFilterDefinitionModel.
+ *  The model stores the sources that will be placed in the custom
+ *  filter. The model is also used when selecting the exposed
+ *  properties.
  * 
  *  The following is an example of how to use the wizard:
  * 
  *  \code
- *  pqBundleDefinitionModel bundle(this);
- *  bundle.setContents(
+ *  pqCustomFilterDefinitionModel filter(this);
+ *  filter.setContents(
  *    pqApplicationCore::instance()->getSelectionModel()->selectedItems());
- *  pqBundleDefinitionWizard wizard(&bundle, this);
+ *  pqCustomFilterDefinitionWizard wizard(&filter, this);
  *  if(wizard.exec() == QDialog::Accepted)
  *    {
- *    wizard.createPipelineBundle();
+ *    wizard.createCustomFilter();
  *    }
  *  \endcode
  *
- *  The bundle definition model is filled out using the selected
- *  pipeline sources. After setting the bundle definition model's
- *  contents, you can check to see if any sources were added. The
- *  wizard can make a compound proxy without any sources, but you
- *  may not want to allow it. After the \c createPipelineBundle call,
- *  you can get the name of the newly created compound proxy.
+ *  The custom filter definition model is filled out using the
+ *  selected pipeline sources. After setting the custom filter
+ *  definition model's contents, you can check to see if any sources
+ *  were added. The wizard can make a compound proxy without any
+ *  sources, but you may not want to allow it. After the
+ *  \c createCustomFilter call, you can get the name of the newly
+ *  created compound proxy.
  */
-class PQWIDGETS_EXPORT pqBundleDefinitionWizard : public QDialog
+class PQWIDGETS_EXPORT pqCustomFilterDefinitionWizard : public QDialog
 {
   Q_OBJECT
 
 public:
   /// \brief
-  ///   Creates a bundle definition wizard.
-  /// \param model The bundle definition model to use. The model should
-  ///   not be null.
+  ///   Creates a custom filter definition wizard.
+  /// \param model The custom filter definition model to use. The
+  ///   model should not be null.
   /// \param parent The parent widget for the wizard.
-  pqBundleDefinitionWizard(pqBundleDefinitionModel *model, QWidget *parent=0);
-  virtual ~pqBundleDefinitionWizard();
+  pqCustomFilterDefinitionWizard(pqCustomFilterDefinitionModel *model,
+      QWidget *parent=0);
+  virtual ~pqCustomFilterDefinitionWizard();
 
   /// \brief
-  ///   Gets the bundle definition model used by the wizard.
+  ///   Gets the custom filter definition model used by the wizard.
   /// \return
-  ///   A pointer to the bundle definition model.
-  pqBundleDefinitionModel *getModel() const {return this->Model;}
+  ///   A pointer to the custom filter definition model.
+  pqCustomFilterDefinitionModel *getModel() const {return this->Model;}
 
   /// \brief
   ///   Gets the name of the compound proxy created by the wizard.
   /// \return
   ///   The name of the new compound proxy definition. The name will
   ///   be empty if the compound proxy has not been created.
-  /// \sa pqBundleDefinitionWizard::createPipelineBundle();
-  QString getBundleName() const;
+  /// \sa pqCustomFilterDefinitionWizard::createCustomFilter();
+  QString getCustomFilterName() const;
 
 public slots:
   /// \brief
   ///   Creates a compound proxy definition.
   ///
-  /// The compound proxy definition is created using the bundle
+  /// The compound proxy definition is created using the custom filter
   /// definition model and the parameters entered by the user. The
   /// new definition is registered with the server manager.
   ///
-  /// \sa pqBundleDefinitionWizard::getBundleName()
-  void createPipelineBundle();
+  /// \sa pqCustomFilterDefinitionWizard::getCustomFilterName()
+  void createCustomFilter();
 
 private slots:
   /// \name Page Navigation
@@ -226,10 +229,10 @@ private slots:
   //@}
 
 private:
-  int CurrentPage;                    ///< Stores the current page.
-  vtkSMCompoundProxy *Bundle;         ///< Stores the bundle definition.
-  pqBundleDefinitionModel *Model;     ///< Stores the source hierarchy.
-  pqBundleDefinitionWizardForm *Form; ///< Defines the gui layout.
+  int CurrentPage;                          ///< Stores the current page.
+  vtkSMCompoundProxy *Filter;               ///< Stores the custom filter.
+  pqCustomFilterDefinitionModel *Model;     ///< Stores the source hierarchy.
+  pqCustomFilterDefinitionWizardForm *Form; ///< Defines the gui layout.
 };
 
 #endif

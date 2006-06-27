@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqBundleDefinitionWizard.cxx
+   Module:    pqCustomFilterDefinitionWizard.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,13 +30,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-/// \file pqBundleDefinitionWizard.cxx
+/// \file pqCustomFilterDefinitionWizard.cxx
 /// \date 6/19/2006
 
-#include "pqBundleDefinitionWizard.h"
-#include "ui_pqBundleDefinitionWizard.h"
+#include "pqCustomFilterDefinitionWizard.h"
+#include "ui_pqCustomFilterDefinitionWizard.h"
 
-#include "pqBundleDefinitionModel.h"
+#include "pqCustomFilterDefinitionModel.h"
 #include "pqPipelineSource.h"
 
 #include <QHeaderView>
@@ -54,21 +54,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 
 
-class pqBundleDefinitionWizardForm : public Ui::pqBundleDefinitionWizard
+class pqCustomFilterDefinitionWizardForm :
+    public Ui::pqCustomFilterDefinitionWizard
 {
 public:
   QStringList ListNames; ///< Used to make sure names are unique.
 };
 
 
-pqBundleDefinitionWizard::pqBundleDefinitionWizard(
-    pqBundleDefinitionModel *model, QWidget *widgetParent)
+pqCustomFilterDefinitionWizard::pqCustomFilterDefinitionWizard(
+    pqCustomFilterDefinitionModel *model, QWidget *widgetParent)
   : QDialog(widgetParent)
 {
   this->CurrentPage = 0;
-  this->Bundle = 0;
+  this->Filter = 0;
   this->Model = model;
-  this->Form = new pqBundleDefinitionWizardForm();
+  this->Form = new pqCustomFilterDefinitionWizardForm();
   this->Form->setupUi(this);
 
   // Initialize the form.
@@ -153,47 +154,47 @@ pqBundleDefinitionWizard::pqBundleDefinitionWizard(
       this, SLOT(movePropertyDown()));
 }
 
-pqBundleDefinitionWizard::~pqBundleDefinitionWizard()
+pqCustomFilterDefinitionWizard::~pqCustomFilterDefinitionWizard()
 {
   if(this->Form)
     {
     delete this->Form;
     }
 
-  if(this->Bundle)
+  if(this->Filter)
     {
     // Release the reference to the compound proxy.
-    this->Bundle->Delete();
+    this->Filter->Delete();
     }
 }
 
-QString pqBundleDefinitionWizard::getBundleName() const
+QString pqCustomFilterDefinitionWizard::getCustomFilterName() const
 {
-  if(this->Bundle)
+  if(this->Filter)
     {
-    return this->Form->BundleName->text();
+    return this->Form->CustomFilterName->text();
     }
 
   return QString();
 }
 
-void pqBundleDefinitionWizard::createPipelineBundle()
+void pqCustomFilterDefinitionWizard::createCustomFilter()
 {
-  if(this->Bundle != 0 || this->Form->BundleName->text().isEmpty())
+  if(this->Filter != 0 || this->Form->CustomFilterName->text().isEmpty())
     {
     return;
     }
 
   // Create the compound proxy. Add all the proxies to it.
   pqPipelineSource *source = 0;
-  this->Bundle = vtkSMCompoundProxy::New();
+  this->Filter = vtkSMCompoundProxy::New();
   QModelIndex index = this->Model->getNextIndex(QModelIndex());
   while(index.isValid())
     {
     source = this->Model->getSourceFor(index);
     if(source)
       {
-      this->Bundle->AddProxy(source->getProxyName().toAscii().data(),
+      this->Filter->AddProxy(source->getProxyName().toAscii().data(),
           source->getProxy());
       }
 
@@ -207,7 +208,7 @@ void pqBundleDefinitionWizard::createPipelineBundle()
   for( ; i < total; i++)
     {
     item = this->Form->InputPorts->topLevelItem(i);
-    this->Bundle->ExposeProperty(item->text(0).toAscii().data(),
+    this->Filter->ExposeProperty(item->text(0).toAscii().data(),
         item->text(1).toAscii().data(), item->text(2).toAscii().data());
     }
 
@@ -216,7 +217,7 @@ void pqBundleDefinitionWizard::createPipelineBundle()
   for(i = 0; i < total; i++)
     {
     item = this->Form->OutputPorts->topLevelItem(i);
-    this->Bundle->SetConsumableProxy(item->text(0).toAscii().data());
+    this->Filter->SetConsumableProxy(item->text(0).toAscii().data());
     break; // TEMP: Change when multiple outputs supported.
     }
 
@@ -225,19 +226,19 @@ void pqBundleDefinitionWizard::createPipelineBundle()
   for(i = 0; i < total; i++)
     {
     item = this->Form->PropertyList->topLevelItem(i);
-    this->Bundle->ExposeProperty(item->text(0).toAscii().data(),
+    this->Filter->ExposeProperty(item->text(0).toAscii().data(),
         item->text(1).toAscii().data(), item->text(2).toAscii().data());
     }
 
   // Register the compound proxy definition with the server manager.
-  vtkPVXMLElement *root = this->Bundle->SaveDefinition(0);
+  vtkPVXMLElement *root = this->Filter->SaveDefinition(0);
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
   proxyManager->RegisterCompoundProxyDefinition(
-      this->Form->BundleName->text().toAscii().data(), root);
+      this->Form->CustomFilterName->text().toAscii().data(), root);
   root->Delete();
 }
 
-void pqBundleDefinitionWizard::navigateBack()
+void pqCustomFilterDefinitionWizard::navigateBack()
 {
   if(this->CurrentPage > 0)
     {
@@ -257,18 +258,18 @@ void pqBundleDefinitionWizard::navigateBack()
     }
 }
 
-void pqBundleDefinitionWizard::navigateNext()
+void pqCustomFilterDefinitionWizard::navigateNext()
 {
   if(this->CurrentPage < 3)
     {
     if(this->CurrentPage == 0)
       {
-      // Make sure the user has entered a name for the bundle.
-      if(this->Form->BundleName->text().isEmpty())
+      // Make sure the user has entered a name for the custom filter.
+      if(this->Form->CustomFilterName->text().isEmpty())
         {
         QMessageBox::warning(this, "No Name",
-            "The bundle name field is empty.\n"
-            "Please enter a unique name for the bundle.",
+            "The custom filter name field is empty.\n"
+            "Please enter a unique name for the custom filter.",
             QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
         return;
         }
@@ -297,7 +298,7 @@ void pqBundleDefinitionWizard::navigateNext()
     }
 }
 
-void pqBundleDefinitionWizard::updateInputForm(const QModelIndex &current,
+void pqCustomFilterDefinitionWizard::updateInputForm(const QModelIndex &current,
     const QModelIndex &)
 {
   // Clear the form fields.
@@ -328,15 +329,15 @@ void pqBundleDefinitionWizard::updateInputForm(const QModelIndex &current,
     }
 }
 
-void pqBundleDefinitionWizard::updateOutputForm(const QModelIndex &,
+void pqCustomFilterDefinitionWizard::updateOutputForm(const QModelIndex &,
     const QModelIndex &)
 {
   // Clear the output name field.
   this->Form->OutputName->setText("");
 }
 
-void pqBundleDefinitionWizard::updatePropertyForm(const QModelIndex &current,
-    const QModelIndex &)
+void pqCustomFilterDefinitionWizard::updatePropertyForm(
+    const QModelIndex &current, const QModelIndex &)
 {
   // Clear the form fields.
   this->Form->PropertyName->setText("");
@@ -367,7 +368,7 @@ void pqBundleDefinitionWizard::updatePropertyForm(const QModelIndex &current,
     }
 }
 
-void pqBundleDefinitionWizard::addInput()
+void pqCustomFilterDefinitionWizard::addInput()
 {
   // Validate the entry. Make sure there is an object and a property
   // selected. Make sure the name is unique.
@@ -424,7 +425,7 @@ void pqBundleDefinitionWizard::addInput()
   this->Form->ListNames.append(name);
 }
 
-void pqBundleDefinitionWizard::removeInput()
+void pqCustomFilterDefinitionWizard::removeInput()
 {
   // Remove the selected row from the list.
   QTreeWidgetItem *item = this->Form->InputPorts->currentItem();
@@ -450,7 +451,7 @@ void pqBundleDefinitionWizard::removeInput()
     }
 }
 
-void pqBundleDefinitionWizard::moveInputUp()
+void pqCustomFilterDefinitionWizard::moveInputUp()
 {
   // Move the selected row up one if possible.
   QTreeWidgetItem *item = this->Form->InputPorts->currentItem();
@@ -466,7 +467,7 @@ void pqBundleDefinitionWizard::moveInputUp()
     }
 }
 
-void pqBundleDefinitionWizard::moveInputDown()
+void pqCustomFilterDefinitionWizard::moveInputDown()
 {
   // Move the selected row down one if possible.
   QTreeWidgetItem *item = this->Form->InputPorts->currentItem();
@@ -482,7 +483,7 @@ void pqBundleDefinitionWizard::moveInputDown()
     }
 }
 
-void pqBundleDefinitionWizard::addOutput()
+void pqCustomFilterDefinitionWizard::addOutput()
 {
   // Validate the entry. Make sure there is an object and a property
   // selected. Make sure the name is unique.
@@ -537,7 +538,7 @@ void pqBundleDefinitionWizard::addOutput()
   this->Form->ListNames.append(name);
 }
 
-void pqBundleDefinitionWizard::removeOutput()
+void pqCustomFilterDefinitionWizard::removeOutput()
 {
   // Remove the selected row from the list.
   QTreeWidgetItem *item = this->Form->OutputPorts->currentItem();
@@ -563,7 +564,7 @@ void pqBundleDefinitionWizard::removeOutput()
     }
 }
 
-void pqBundleDefinitionWizard::moveOutputUp()
+void pqCustomFilterDefinitionWizard::moveOutputUp()
 {
   // Move the selected row up one if possible.
   QTreeWidgetItem *item = this->Form->OutputPorts->currentItem();
@@ -579,7 +580,7 @@ void pqBundleDefinitionWizard::moveOutputUp()
     }
 }
 
-void pqBundleDefinitionWizard::moveOutputDown()
+void pqCustomFilterDefinitionWizard::moveOutputDown()
 {
   // Move the selected row down one if possible.
   QTreeWidgetItem *item = this->Form->OutputPorts->currentItem();
@@ -595,7 +596,7 @@ void pqBundleDefinitionWizard::moveOutputDown()
     }
 }
 
-void pqBundleDefinitionWizard::addProperty()
+void pqCustomFilterDefinitionWizard::addProperty()
 {
   // Validate the entry. Make sure there is an object and a property
   // selected. Make sure the name is unique.
@@ -652,7 +653,7 @@ void pqBundleDefinitionWizard::addProperty()
   this->Form->ListNames.append(name);
 }
 
-void pqBundleDefinitionWizard::removeProperty()
+void pqCustomFilterDefinitionWizard::removeProperty()
 {
   // Remove the selected row from the list.
   QTreeWidgetItem *item = this->Form->PropertyList->currentItem();
@@ -678,7 +679,7 @@ void pqBundleDefinitionWizard::removeProperty()
     }
 }
 
-void pqBundleDefinitionWizard::movePropertyUp()
+void pqCustomFilterDefinitionWizard::movePropertyUp()
 {
   // Move the selected row up one if possible.
   QTreeWidgetItem *item = this->Form->PropertyList->currentItem();
@@ -694,7 +695,7 @@ void pqBundleDefinitionWizard::movePropertyUp()
     }
 }
 
-void pqBundleDefinitionWizard::movePropertyDown()
+void pqCustomFilterDefinitionWizard::movePropertyDown()
 {
   // Move the selected row down one if possible.
   QTreeWidgetItem *item = this->Form->PropertyList->currentItem();
@@ -710,8 +711,8 @@ void pqBundleDefinitionWizard::movePropertyDown()
     }
 }
 
-void pqBundleDefinitionWizard::updateInputButtons(const QModelIndex &current,
-    const QModelIndex &)
+void pqCustomFilterDefinitionWizard::updateInputButtons(
+    const QModelIndex &current, const QModelIndex &)
 {
   bool indexIsValid = current.isValid();
   this->Form->RemoveInputButton->setEnabled(indexIsValid);
@@ -719,8 +720,8 @@ void pqBundleDefinitionWizard::updateInputButtons(const QModelIndex &current,
   this->Form->InputDownButton->setEnabled(indexIsValid);
 }
 
-void pqBundleDefinitionWizard::updateOutputButtons(const QModelIndex &current,
-    const QModelIndex &)
+void pqCustomFilterDefinitionWizard::updateOutputButtons(
+    const QModelIndex &current, const QModelIndex &)
 {
   bool indexIsValid = current.isValid();
   this->Form->RemoveOutputButton->setEnabled(indexIsValid);
@@ -728,7 +729,7 @@ void pqBundleDefinitionWizard::updateOutputButtons(const QModelIndex &current,
   this->Form->OutputDownButton->setEnabled(indexIsValid);
 }
 
-void pqBundleDefinitionWizard::updatePropertyButtons(
+void pqCustomFilterDefinitionWizard::updatePropertyButtons(
     const QModelIndex &current, const QModelIndex &)
 {
   bool indexIsValid = current.isValid();

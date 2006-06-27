@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqBundleManager.h
+   Module:    pqCustomFilterManager.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,71 +30,71 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-/// \file pqBundleManager.h
+/// \file pqCustomFilterManager.h
 /// \date 6/23/2006
 
-#ifndef _pqBundleManager_h
-#define _pqBundleManager_h
+#ifndef _pqCustomFilterManager_h
+#define _pqCustomFilterManager_h
 
 
 #include "pqWidgetsExport.h"
 #include <QDialog>
 
-class pqBundleManagerForm;
-class pqBundleManagerModel;
+class pqCustomFilterManagerForm;
+class pqCustomFilterManagerModel;
 class QItemSelection;
 class QStringList;
 
 
-/// \class pqBundleManager
+/// \class pqCustomFilterManager
 /// \brief
-///   The pqBundleManager class displays the list of registered
-///   pipeline bundle definitions.
+///   The pqCustomFilterManager class displays the list of registered
+///   custom filter definitions.
 ///
-/// The bundle manager uses a pqBundleManagerModel to get the list of
-/// registered bundles. The bundle manager uses the server manager to
-/// import and export bundle definitions. It can also unregister the
-/// selected bundle definitions.
-class PQWIDGETS_EXPORT pqBundleManager : public QDialog
+/// The custom filter manager uses a pqCustomFilterManagerModel to get
+/// the list of registered custom filters. The custom filter manager
+/// uses the server manager to import and export custom filter
+/// definitions. It can also unregister the selected custom filter.
+class PQWIDGETS_EXPORT pqCustomFilterManager : public QDialog
 {
   Q_OBJECT
 
 public:
   /// \brief
-  ///   Creates a bundle manager dialog.
-  /// \param model The list of registered bundles to display.
+  ///   Creates a custom filter manager dialog.
+  /// \param model The list of registered custom filters to display.
   /// \param parent The parent widget for the dialog.
-  pqBundleManager(pqBundleManagerModel *model, QWidget *parent=0);
-  virtual ~pqBundleManager();
+  pqCustomFilterManager(pqCustomFilterManagerModel *model, QWidget *parent=0);
+  virtual ~pqCustomFilterManager();
 
 public slots:
   /// \brief
-  ///   Selects the given bundle in the list.
-  /// \param name The bundle name to select.
-  void selectBundle(const QString &name);
+  ///   Selects the given custom filter in the list.
+  /// \param name The custom filter name to select.
+  void selectCustomFilter(const QString &name);
 
   /// \brief
-  ///   Registers the pipeline bundle definitions in the files.
+  ///   Registers the custom filter definitions in the files.
   /// \param files The list of files to import.
   void importFiles(const QStringList &files);
 
   /// \brief
-  ///   Saves the selected bundle definitions to the given files.
+  ///   Saves the selected custom filter definitions to the given files.
   /// \param files The list of files to export to.
   void exportSelected(const QStringList &files);
 
 private slots:
   /// \brief
   ///   Opens the file dialog to select import files.
-  /// \sa pqBundleManager::importFiles(const QStringList &)
+  /// \sa pqCustomFilterManager::importFiles(const QStringList &)
   void importFiles();
 
   /// \brief
   ///   Opens the file dialog to select export files.
-  /// \sa pqBundleManager::exportSelected(const QStringList &)
+  /// \sa pqCustomFilterManager::exportSelected(const QStringList &)
   void exportSelected();
 
-  /// Unregisters the selected pipeline bundle definitions.
+  /// Unregisters the selected custom filter definitions.
   void removeSelected();
 
   /// \brief
@@ -109,8 +109,8 @@ private slots:
       const QItemSelection &deselected);
 
 private:
-  pqBundleManagerModel *Model; ///< Stores the bundle list.
-  pqBundleManagerForm *Form;   ///< Defines the gui layout.
+  pqCustomFilterManagerModel *Model; ///< Stores the custom filter list.
+  pqCustomFilterManagerForm *Form;   ///< Defines the gui layout.
 };
 
 #endif

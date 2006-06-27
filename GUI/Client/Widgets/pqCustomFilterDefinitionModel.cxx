@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqBundleDefinitionModel.cxx
+   Module:    pqCustomFilterDefinitionModel.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,10 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-/// \file pqBundleDefinitionModel.cxx
+/// \file pqCustomFilterDefinitionModel.cxx
 /// \date 6/19/2006
 
-#include "pqBundleDefinitionModel.h"
+#include "pqCustomFilterDefinitionModel.h"
 
 #include "pqPipelineSource.h"
 #include "pqServerManagerSelectionModel.h"
@@ -47,29 +47,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 
 
-/// \class pqBundleDefinitionModelItem
-class pqBundleDefinitionModelItem
+/// \class pqCustomFilterDefinitionModelItem
+class pqCustomFilterDefinitionModelItem
 {
 public:
-  pqBundleDefinitionModelItem(pqBundleDefinitionModelItem *parent=0);
-  virtual ~pqBundleDefinitionModelItem();
+  pqCustomFilterDefinitionModelItem(
+      pqCustomFilterDefinitionModelItem *parent=0);
+  virtual ~pqCustomFilterDefinitionModelItem();
 
   virtual QString GetName() const;
   virtual pqPipelineSource *GetPipelineSource() const {return 0;}
 
-  pqBundleDefinitionModel::ItemType Type;
-  pqBundleDefinitionModelItem *Parent;
-  QList<pqBundleDefinitionModelItem *> Children;
+  pqCustomFilterDefinitionModel::ItemType Type;
+  pqCustomFilterDefinitionModelItem *Parent;
+  QList<pqCustomFilterDefinitionModelItem *> Children;
 };
 
 
-/// \class pqBundleDefinitionModelSource
-class pqBundleDefinitionModelSource : public pqBundleDefinitionModelItem
+/// \class pqCustomFilterDefinitionModelSource
+class pqCustomFilterDefinitionModelSource :
+    public pqCustomFilterDefinitionModelItem
 {
 public:
-  pqBundleDefinitionModelSource(pqBundleDefinitionModelItem *parent=0,
-      pqPipelineSource *source=0);
-  virtual ~pqBundleDefinitionModelSource() {}
+  pqCustomFilterDefinitionModelSource(
+      pqCustomFilterDefinitionModelItem *parent=0, pqPipelineSource *source=0);
+  virtual ~pqCustomFilterDefinitionModelSource() {}
 
   virtual QString GetName() const;
   virtual pqPipelineSource *GetPipelineSource() const;
@@ -78,34 +80,36 @@ public:
 };
 
 
-/// \class pqBundleDefinitionModelLink
-class pqBundleDefinitionModelLink : public pqBundleDefinitionModelItem
+/// \class pqCustomFilterDefinitionModelLink
+class pqCustomFilterDefinitionModelLink :
+    public pqCustomFilterDefinitionModelItem
 {
 public:
-  pqBundleDefinitionModelLink(pqBundleDefinitionModelItem *parent=0,
-      pqBundleDefinitionModelSource *link=0);
-  virtual ~pqBundleDefinitionModelLink() {}
+  pqCustomFilterDefinitionModelLink(
+      pqCustomFilterDefinitionModelItem *parent=0,
+      pqCustomFilterDefinitionModelSource *link=0);
+  virtual ~pqCustomFilterDefinitionModelLink() {}
 
   virtual QString GetName() const;
   virtual pqPipelineSource *GetPipelineSource() const;
 
-  pqBundleDefinitionModelSource *Link;
+  pqCustomFilterDefinitionModelSource *Link;
 };
 
 
 //-----------------------------------------------------------------------------
-pqBundleDefinitionModelItem::pqBundleDefinitionModelItem(
-    pqBundleDefinitionModelItem *parent)
+pqCustomFilterDefinitionModelItem::pqCustomFilterDefinitionModelItem(
+    pqCustomFilterDefinitionModelItem *parent)
   : Children()
 {
-  this->Type = pqBundleDefinitionModel::Invalid;
+  this->Type = pqCustomFilterDefinitionModel::Invalid;
   this->Parent = parent;
 }
 
-pqBundleDefinitionModelItem::~pqBundleDefinitionModelItem()
+pqCustomFilterDefinitionModelItem::~pqCustomFilterDefinitionModelItem()
 {
-  QList<pqBundleDefinitionModelItem *>::Iterator iter = this->Children.begin();
-  for( ; iter != this->Children.end(); ++iter)
+  QList<pqCustomFilterDefinitionModelItem *>::Iterator iter;
+  for(iter = this->Children.begin(); iter != this->Children.end(); ++iter)
     {
     delete *iter;
     }
@@ -113,16 +117,16 @@ pqBundleDefinitionModelItem::~pqBundleDefinitionModelItem()
   this->Children.clear();
 }
 
-QString pqBundleDefinitionModelItem::GetName() const
+QString pqCustomFilterDefinitionModelItem::GetName() const
 {
   return QString();
 }
 
 
 //-----------------------------------------------------------------------------
-pqBundleDefinitionModelSource::pqBundleDefinitionModelSource(
-    pqBundleDefinitionModelItem *parent, pqPipelineSource *source)
-  : pqBundleDefinitionModelItem(parent)
+pqCustomFilterDefinitionModelSource::pqCustomFilterDefinitionModelSource(
+    pqCustomFilterDefinitionModelItem *parent, pqPipelineSource *source)
+  : pqCustomFilterDefinitionModelItem(parent)
 {
   this->Source = source;
 
@@ -130,19 +134,19 @@ pqBundleDefinitionModelSource::pqBundleDefinitionModelSource(
   vtkSMProxy *proxy = source->getProxy();
   if(vtkSMCompoundProxy::SafeDownCast(proxy) != 0)
     {
-    this->Type = pqBundleDefinitionModel::Bundle;
+    this->Type = pqCustomFilterDefinitionModel::CustomFilter;
     }
   else if(strcmp(proxy->GetXMLGroup(), "filters") == 0)
     {
-    this->Type = pqBundleDefinitionModel::Filter;
+    this->Type = pqCustomFilterDefinitionModel::Filter;
     }
   else if(strcmp(proxy->GetXMLGroup(), "sources") == 0)
     {
-    this->Type = pqBundleDefinitionModel::Source;
+    this->Type = pqCustomFilterDefinitionModel::Source;
     }
 }
 
-QString pqBundleDefinitionModelSource::GetName() const
+QString pqCustomFilterDefinitionModelSource::GetName() const
 {
   if(this->Source)
     {
@@ -152,22 +156,23 @@ QString pqBundleDefinitionModelSource::GetName() const
   return QString();
 }
 
-pqPipelineSource *pqBundleDefinitionModelSource::GetPipelineSource() const
+pqPipelineSource *pqCustomFilterDefinitionModelSource::GetPipelineSource() const
 {
   return this->Source;
 }
 
 
 //-----------------------------------------------------------------------------
-pqBundleDefinitionModelLink::pqBundleDefinitionModelLink(
-    pqBundleDefinitionModelItem *parent, pqBundleDefinitionModelSource *link)
-  : pqBundleDefinitionModelItem(parent)
+pqCustomFilterDefinitionModelLink::pqCustomFilterDefinitionModelLink(
+    pqCustomFilterDefinitionModelItem *parent,
+    pqCustomFilterDefinitionModelSource *link)
+  : pqCustomFilterDefinitionModelItem(parent)
 {
   this->Link = link;
-  this->Type = pqBundleDefinitionModel::Link;
+  this->Type = pqCustomFilterDefinitionModel::Link;
 }
 
-QString pqBundleDefinitionModelLink::GetName() const
+QString pqCustomFilterDefinitionModelLink::GetName() const
 {
   if(this->Link)
     {
@@ -177,7 +182,7 @@ QString pqBundleDefinitionModelLink::GetName() const
   return QString();
 }
 
-pqPipelineSource *pqBundleDefinitionModelLink::GetPipelineSource() const
+pqPipelineSource *pqCustomFilterDefinitionModelLink::GetPipelineSource() const
 {
   if(this->Link)
     {
@@ -189,34 +194,36 @@ pqPipelineSource *pqBundleDefinitionModelLink::GetPipelineSource() const
 
 
 //-----------------------------------------------------------------------------
-pqBundleDefinitionModel::pqBundleDefinitionModel(QObject *parentObject)
+pqCustomFilterDefinitionModel::pqCustomFilterDefinitionModel(
+    QObject *parentObject)
   : QAbstractItemModel(parentObject)
 {
-  this->Root = new pqBundleDefinitionModelItem();
+  this->Root = new pqCustomFilterDefinitionModelItem();
 
   // Initialize the pixmap list.
-  this->PixmapList = new QPixmap[pqBundleDefinitionModel::LastType + 1];
+  this->PixmapList = new QPixmap[pqCustomFilterDefinitionModel::LastType + 1];
   if(this->PixmapList)
     {
-    this->PixmapList[pqBundleDefinitionModel::Source].load(
+    this->PixmapList[pqCustomFilterDefinitionModel::Source].load(
         ":/pqWidgets/pqSource16.png");
-    this->PixmapList[pqBundleDefinitionModel::Filter].load(
+    this->PixmapList[pqCustomFilterDefinitionModel::Filter].load(
         ":/pqWidgets/pqFilter16.png");
-    this->PixmapList[pqBundleDefinitionModel::Bundle].load(
+    this->PixmapList[pqCustomFilterDefinitionModel::CustomFilter].load(
         ":/pqWidgets/pqBundle16.png");
-    this->PixmapList[pqBundleDefinitionModel::Link].load(
+    this->PixmapList[pqCustomFilterDefinitionModel::Link].load(
         ":/pqWidgets/pqLinkBack16.png");
     }
 }
 
-pqBundleDefinitionModel::~pqBundleDefinitionModel()
+pqCustomFilterDefinitionModel::~pqCustomFilterDefinitionModel()
 {
   delete this->Root;
 }
 
-int pqBundleDefinitionModel::rowCount(const QModelIndex &parentIndex) const
+int pqCustomFilterDefinitionModel::rowCount(
+    const QModelIndex &parentIndex) const
 {
-  pqBundleDefinitionModelItem *item = this->getModelItemFor(parentIndex);
+  pqCustomFilterDefinitionModelItem *item = this->getModelItemFor(parentIndex);
   if(item)
     {
     return item->Children.size();
@@ -225,20 +232,21 @@ int pqBundleDefinitionModel::rowCount(const QModelIndex &parentIndex) const
   return 0;
 }
 
-int pqBundleDefinitionModel::columnCount(const QModelIndex &) const
+int pqCustomFilterDefinitionModel::columnCount(const QModelIndex &) const
 {
   return 1;
 }
 
-bool pqBundleDefinitionModel::hasChildren(const QModelIndex &parentIndex) const
+bool pqCustomFilterDefinitionModel::hasChildren(
+    const QModelIndex &parentIndex) const
 {
   return this->rowCount(parentIndex) > 0;
 }
 
-QModelIndex pqBundleDefinitionModel::index(int row, int column,
+QModelIndex pqCustomFilterDefinitionModel::index(int row, int column,
     const QModelIndex &parentIndex) const
 {
-  pqBundleDefinitionModelItem *item = this->getModelItemFor(parentIndex);
+  pqCustomFilterDefinitionModelItem *item = this->getModelItemFor(parentIndex);
   if(item && row >= 0 && row < item->Children.size() && column >= 0 &&
       column < this->columnCount(parentIndex))
     {
@@ -248,9 +256,9 @@ QModelIndex pqBundleDefinitionModel::index(int row, int column,
   return QModelIndex();
 }
 
-QModelIndex pqBundleDefinitionModel::parent(const QModelIndex &idx) const
+QModelIndex pqCustomFilterDefinitionModel::parent(const QModelIndex &idx) const
 {
-  pqBundleDefinitionModelItem *item = this->getModelItemFor(idx);
+  pqCustomFilterDefinitionModelItem *item = this->getModelItemFor(idx);
   if(item && item->Parent && item->Parent != this->Root)
     {
     int row = item->Parent->Parent->Children.indexOf(item->Parent);
@@ -260,9 +268,10 @@ QModelIndex pqBundleDefinitionModel::parent(const QModelIndex &idx) const
   return QModelIndex();
 }
 
-QVariant pqBundleDefinitionModel::data(const QModelIndex &idx, int role) const
+QVariant pqCustomFilterDefinitionModel::data(const QModelIndex &idx,
+    int role) const
 {
-  pqBundleDefinitionModelItem *item = this->getModelItemFor(idx);
+  pqCustomFilterDefinitionModelItem *item = this->getModelItemFor(idx);
   if(item && item != this->Root)
     {
     switch(role)
@@ -281,7 +290,7 @@ QVariant pqBundleDefinitionModel::data(const QModelIndex &idx, int role) const
       case Qt::DecorationRole:
         {
         if(idx.column() == 0 && this->PixmapList &&
-            item->Type != pqBundleDefinitionModel::Invalid)
+            item->Type != pqCustomFilterDefinitionModel::Invalid)
           {
           return QVariant(this->PixmapList[item->Type]);
           }
@@ -294,16 +303,16 @@ QVariant pqBundleDefinitionModel::data(const QModelIndex &idx, int role) const
   return QVariant();
 }
 
-Qt::ItemFlags pqBundleDefinitionModel::flags(const QModelIndex &) const
+Qt::ItemFlags pqCustomFilterDefinitionModel::flags(const QModelIndex &) const
 {
   return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
-void pqBundleDefinitionModel::setContents(
+void pqCustomFilterDefinitionModel::setContents(
     const pqServerManagerSelection *items)
 {
   delete this->Root;
-  this->Root = new pqBundleDefinitionModelItem();
+  this->Root = new pqCustomFilterDefinitionModelItem();
   if(!items)
     {
     this->reset();
@@ -313,15 +322,15 @@ void pqBundleDefinitionModel::setContents(
   // Add all the items to the model.
   // TODO: Make sure the sources are from the same server.
   pqPipelineSource *source = 0;
-  pqBundleDefinitionModelSource *item = 0;
-  QMap<pqPipelineSource *, pqBundleDefinitionModelSource *> itemMap;
+  pqCustomFilterDefinitionModelSource *item = 0;
+  QMap<pqPipelineSource *, pqCustomFilterDefinitionModelSource *> itemMap;
   pqServerManagerSelection::ConstIterator iter = items->begin();
   for( ; iter != items->end(); ++iter)
     {
     source = qobject_cast<pqPipelineSource *>(*iter);
     if(source)
       {
-      item = new pqBundleDefinitionModelSource(this->Root, source);
+      item = new pqCustomFilterDefinitionModelSource(this->Root, source);
       this->Root->Children.append(item);
       itemMap.insert(source, item);
       }
@@ -329,11 +338,11 @@ void pqBundleDefinitionModel::setContents(
 
   // Connect the items based on inputs.
   int i = 0;
-  pqBundleDefinitionModelLink *link = 0;
-  pqBundleDefinitionModelSource *output = 0;
-  pqBundleDefinitionModelItem *otherItem = 0;
-  QList<pqBundleDefinitionModelItem *> fanInList;
-  QMap<pqPipelineSource *, pqBundleDefinitionModelSource *>::Iterator jter;
+  pqCustomFilterDefinitionModelLink *link = 0;
+  pqCustomFilterDefinitionModelSource *output = 0;
+  pqCustomFilterDefinitionModelItem *otherItem = 0;
+  QList<pqCustomFilterDefinitionModelItem *> fanInList;
+  QMap<pqPipelineSource *, pqCustomFilterDefinitionModelSource *>::Iterator jter;
   for(iter = items->begin(); iter != items->end(); ++iter)
     {
     jter = itemMap.find(qobject_cast<pqPipelineSource *>(*iter));
@@ -353,7 +362,7 @@ void pqBundleDefinitionModel::setContents(
             if(fanInList.contains(output))
               {
               // Add a link item for the connection.
-              link = new pqBundleDefinitionModelLink(item, output);
+              link = new pqCustomFilterDefinitionModelLink(item, output);
               item->Children.append(link);
               }
             else
@@ -373,9 +382,9 @@ void pqBundleDefinitionModel::setContents(
             output->Parent = this->Root;
             this->Root->Children.append(output);
             fanInList.append(output);
-            link = new pqBundleDefinitionModelLink(item, output);
+            link = new pqCustomFilterDefinitionModelLink(item, output);
             item->Children.append(link);
-            link = new pqBundleDefinitionModelLink(otherItem, output);
+            link = new pqCustomFilterDefinitionModelLink(otherItem, output);
             otherItem->Children.append(link);
             }
           }
@@ -386,9 +395,10 @@ void pqBundleDefinitionModel::setContents(
   this->reset();
 }
 
-QModelIndex pqBundleDefinitionModel::getNextIndex(const QModelIndex &idx) const
+QModelIndex pqCustomFilterDefinitionModel::getNextIndex(
+    const QModelIndex &idx) const
 {
-  pqBundleDefinitionModelItem *item = this->getModelItemFor(idx);
+  pqCustomFilterDefinitionModelItem *item = this->getModelItemFor(idx);
   item = this->getNextItem(item);
   if(item && item->Parent)
     {
@@ -399,10 +409,10 @@ QModelIndex pqBundleDefinitionModel::getNextIndex(const QModelIndex &idx) const
   return QModelIndex();
 }
 
-pqPipelineSource *pqBundleDefinitionModel::getSourceFor(
+pqPipelineSource *pqCustomFilterDefinitionModel::getSourceFor(
     const QModelIndex &idx) const
 {
-  pqBundleDefinitionModelItem *item = this->getModelItemFor(idx);
+  pqCustomFilterDefinitionModelItem *item = this->getModelItemFor(idx);
   if(item)
     {
     return item->GetPipelineSource();
@@ -411,7 +421,7 @@ pqPipelineSource *pqBundleDefinitionModel::getSourceFor(
   return 0;
 }
 
-pqBundleDefinitionModelItem *pqBundleDefinitionModel::getModelItemFor(
+pqCustomFilterDefinitionModelItem *pqCustomFilterDefinitionModel::getModelItemFor(
     const QModelIndex &idx) const
 {
   if(!idx.isValid())
@@ -421,15 +431,15 @@ pqBundleDefinitionModelItem *pqBundleDefinitionModel::getModelItemFor(
 
   if(idx.model() == this)
     {
-    return reinterpret_cast<pqBundleDefinitionModelItem *>(
+    return reinterpret_cast<pqCustomFilterDefinitionModelItem *>(
         idx.internalPointer());
     }
 
   return 0;
 }
 
-pqBundleDefinitionModelItem *pqBundleDefinitionModel::getNextItem(
-    pqBundleDefinitionModelItem *item) const
+pqCustomFilterDefinitionModelItem *pqCustomFilterDefinitionModel::getNextItem(
+    pqCustomFilterDefinitionModelItem *item) const
 {
   if(!item)
     {

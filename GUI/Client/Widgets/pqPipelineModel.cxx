@@ -415,7 +415,7 @@ pqPipelineModelFilter::pqPipelineModelFilter(pqPipelineModelServer *server,
     QObject *parentObject)
   : pqPipelineModelSource(server, source, parentObject), Inputs()
 {
-  if(type != pqPipelineModel::Bundle)
+  if(type != pqPipelineModel::CustomFilter)
     {
     type = pqPipelineModel::Filter;
     }
@@ -505,7 +505,7 @@ pqPipelineModel::pqPipelineModel(QObject *p)
         ":/pqWidgets/pqSource16.png");
     this->PixmapList[pqPipelineModel::Filter].load(
         ":/pqWidgets/pqFilter16.png");
-    this->PixmapList[pqPipelineModel::Bundle].load(
+    this->PixmapList[pqPipelineModel::CustomFilter].load(
         ":/pqWidgets/pqBundle16.png");
     this->PixmapList[pqPipelineModel::Link].load(
         ":/pqWidgets/pqLinkBack16.png");
@@ -817,7 +817,8 @@ void pqPipelineModel::addSource(pqPipelineSource *source)
   vtkSMProxy *proxy = source->getProxy();
   if(vtkSMCompoundProxy::SafeDownCast(proxy) != 0)
     {
-    item = new pqPipelineModelFilter(server, source, pqPipelineModel::Bundle);
+    item = new pqPipelineModelFilter(server, source,
+        pqPipelineModel::CustomFilter);
     }
   else if(strcmp(proxy->GetXMLGroup(), "filters") == 0)
     {

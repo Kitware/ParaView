@@ -62,8 +62,7 @@ public:
     InvalidAction = -1,
     AddSourceAction = 0,
     AddFilterAction,
-    AddBundleAction,
-    LastAction = AddBundleAction
+    LastAction = AddFilterAction
     };
 
 public:
@@ -74,7 +73,6 @@ public:
 
   void loadSourceInfo(vtkPVXMLElement *root);
   void loadFilterInfo(vtkPVXMLElement *root);
-  void loadBundleInfo(vtkPVXMLElement *root);
 
   pqSourceInfoModel *getFilterModel();
 
@@ -85,7 +83,6 @@ public:
 public slots:
   void addSource();
   void addFilter();
-  void addBundle();
 
 private:
   void setupConnections(pqSourceInfoModel *model, pqSourceInfoGroupMap *map);

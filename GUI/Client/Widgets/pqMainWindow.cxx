@@ -34,9 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqMainWindow.h"
 
 #include "pqApplicationCore.h"
-#include "pqBundleDefinitionModel.h"
-#include "pqBundleDefinitionWizard.h"
-#include "pqCompoundProxyWizard.h"
 #include "pqDataInformationWidget.h"
 #include "pqElementInspectorWidget.h"
 #include "pqMultiViewFrame.h"

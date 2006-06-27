@@ -71,7 +71,7 @@ QPixmap pqSourceInfoIcons::getPixmap(const QString &source,
     {
     return QPixmap(":/pqWidgets/pqFilter16.png");
     }
-  else if(alternate == pqSourceInfoIcons::Bundle)
+  else if(alternate == pqSourceInfoIcons::CustomFilter)
     {
     return QPixmap(":/pqWidgets/pqBundle16.png");
     }

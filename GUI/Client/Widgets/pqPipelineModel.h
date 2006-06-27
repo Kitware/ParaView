@@ -79,7 +79,7 @@ public:
     Server = 0,
     Source,
     Filter,
-    Bundle,
+    CustomFilter,
     Link,
     LastType = Link
     };
@@ -205,7 +205,7 @@ public slots:
   /// The source is added to its server's list of sources. The source
   /// should have no inputs when added. The icon displayed for the
   /// source is determined by the type of source (source, filter or
-  /// bundle).
+  /// custom filter).
   ///
   /// \param source The source object to add.
   /// \sa pqPipelineModel::addConnection(pqPipelineSource *,

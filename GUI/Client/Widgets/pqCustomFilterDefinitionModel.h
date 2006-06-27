@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqBundleDefinitionModel.h
+   Module:    pqCustomFilterDefinitionModel.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,31 +30,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-/// \file pqBundleDefinitionModel.h
+/// \file pqCustomFilterDefinitionModel.h
 /// \date 6/19/2006
 
-#ifndef _pqBundleDefinitionModel_h
-#define _pqBundleDefinitionModel_h
+#ifndef _pqCustomFilterDefinitionModel_h
+#define _pqCustomFilterDefinitionModel_h
 
 
 #include "pqWidgetsExport.h"
 #include <QAbstractItemModel>
 
-class pqBundleDefinitionModelItem;
+class pqCustomFilterDefinitionModelItem;
 class pqPipelineSource;
 class pqServerManagerSelection;
 class QPixmap;
 
 
-/// \class pqBundleDefinitionModel
+/// \class pqCustomFilterDefinitionModel
 /// \brief
-///   The pqBundleDefinitionModel class stores the sources that define
-///   a compound proxy in a hierarchical format.
+///   The pqCustomFilterDefinitionModel class stores the sources that
+///   define a compound proxy in a hierarchical format.
 ///
 /// The hierarchical format is similar to the pqPipelineModel. The
-/// bundle definition model contains only sources. It does not include
-/// any server objects, since the bundle must be defined on one server.
-class PQWIDGETS_EXPORT pqBundleDefinitionModel : public QAbstractItemModel
+/// custom filter definition model contains only sources. It does not
+/// include any server objects, since the custom filter must be
+/// defined on one server.
+class PQWIDGETS_EXPORT pqCustomFilterDefinitionModel : public QAbstractItemModel
 {
 public:
   enum ItemType
@@ -62,14 +63,14 @@ public:
     Invalid = -1,
     Source = 0,
     Filter,
-    Bundle,
+    CustomFilter,
     Link,
     LastType = Link
     };
 
 public:
-  pqBundleDefinitionModel(QObject *parent=0);
-  virtual ~pqBundleDefinitionModel();
+  pqCustomFilterDefinitionModel(QObject *parent=0);
+  virtual ~pqCustomFilterDefinitionModel();
 
   /// \name QAbstractItemModel Methods
   //@{
@@ -132,10 +133,10 @@ public:
   //@}
 
   /// \brief
-  ///   Sets the contents of the bundle definition model.
+  ///   Sets the contents of the custom filter definition model.
   ///
-  /// The \c items are added to the bundle definition model in a
-  /// hierarchy similar to the pipeline model. Only the items in the
+  /// The \c items are added to the custom filter definition model in
+  /// a hierarchy similar to the pipeline model. Only the items in the
   /// list are added to the hierarchy.
   ///
   /// \param items The list of selected model items.
@@ -161,19 +162,20 @@ private:
   /// \param index The model index to convert.
   /// \return
   ///   A pointer to the model object or null if there is none.
-  pqBundleDefinitionModelItem *getModelItemFor(const QModelIndex &index) const;
+  pqCustomFilterDefinitionModelItem *getModelItemFor(
+      const QModelIndex &index) const;
 
   /// \brief
   ///   Gets the next item in the tree.
   /// \param item The current model item.
   /// \return
   ///   A pointer to the next model item or null if the end is reached.
-  pqBundleDefinitionModelItem *getNextItem(
-      pqBundleDefinitionModelItem *item) const;
+  pqCustomFilterDefinitionModelItem *getNextItem(
+      pqCustomFilterDefinitionModelItem *item) const;
 
 private:
-  pqBundleDefinitionModelItem *Root; ///< The root of the model tree.
-  QPixmap *PixmapList;               ///< Stores the item icons.
+  pqCustomFilterDefinitionModelItem *Root; ///< The root of the model tree.
+  QPixmap *PixmapList;                     ///< Stores the item icons.
 };
 
 #endif

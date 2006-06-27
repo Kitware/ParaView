@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqBundleManagerModel.cxx
+   Module:    pqCustomFilterManagerModel.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,10 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-/// \file pqBundleManagerModel.cxx
+/// \file pqCustomFilterManagerModel.cxx
 /// \date 6/23/2006
 
-#include "pqBundleManagerModel.h"
+#include "pqCustomFilterManagerModel.h"
 
 #include <QList>
 #include <QPixmap>
@@ -41,21 +41,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 
-class pqBundleManagerModelInternal : public QList<QString> {};
+class pqCustomFilterManagerModelInternal : public QList<QString> {};
 
 
-pqBundleManagerModel::pqBundleManagerModel(QObject *parentObject)
+pqCustomFilterManagerModel::pqCustomFilterManagerModel(QObject *parentObject)
   : QAbstractListModel(parentObject)
 {
-  this->Internal = new pqBundleManagerModelInternal();
+  this->Internal = new pqCustomFilterManagerModelInternal();
 }
 
-pqBundleManagerModel::~pqBundleManagerModel()
+pqCustomFilterManagerModel::~pqCustomFilterManagerModel()
 {
   delete this->Internal;
 }
 
-int pqBundleManagerModel::rowCount(const QModelIndex &parentIndex) const
+int pqCustomFilterManagerModel::rowCount(const QModelIndex &parentIndex) const
 {
   if(this->Internal && !parentIndex.isValid())
     {
@@ -65,7 +65,7 @@ int pqBundleManagerModel::rowCount(const QModelIndex &parentIndex) const
   return 0;
 }
 
-QModelIndex pqBundleManagerModel::index(int row, int column,
+QModelIndex pqCustomFilterManagerModel::index(int row, int column,
     const QModelIndex &parentIndex) const
 {
   if(this->Internal && !parentIndex.isValid() && column == 0 && row >= 0 &&
@@ -77,7 +77,8 @@ QModelIndex pqBundleManagerModel::index(int row, int column,
   return QModelIndex();
 }
 
-QVariant pqBundleManagerModel::data(const QModelIndex &idx, int role) const
+QVariant pqCustomFilterManagerModel::data(const QModelIndex &idx,
+    int role) const
 {
   if(this->Internal && idx.isValid() && idx.model() == this)
     {
@@ -99,12 +100,13 @@ QVariant pqBundleManagerModel::data(const QModelIndex &idx, int role) const
   return QVariant();
 }
 
-Qt::ItemFlags pqBundleManagerModel::flags(const QModelIndex &) const
+Qt::ItemFlags pqCustomFilterManagerModel::flags(const QModelIndex &) const
 {
   return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 }
 
-QString pqBundleManagerModel::getBundleName(const QModelIndex &idx) const
+QString pqCustomFilterManagerModel::getCustomFilterName(
+    const QModelIndex &idx) const
 {
   if(this->Internal && idx.isValid() && idx.model() == this)
     {
@@ -114,11 +116,12 @@ QString pqBundleManagerModel::getBundleName(const QModelIndex &idx) const
   return QString();
 }
 
-QModelIndex pqBundleManagerModel::getIndexFor(const QString &bundle) const
+QModelIndex pqCustomFilterManagerModel::getIndexFor(
+    const QString &filter) const
 {
-  if(this->Internal && !bundle.isEmpty())
+  if(this->Internal && !filter.isEmpty())
     {
-    int row = this->Internal->indexOf(bundle);
+    int row = this->Internal->indexOf(filter);
     if(row != -1)
       {
       return this->createIndex(row, 0, 0);
@@ -128,7 +131,7 @@ QModelIndex pqBundleManagerModel::getIndexFor(const QString &bundle) const
   return QModelIndex();
 }
 
-void pqBundleManagerModel::addBundle(QString name)
+void pqCustomFilterManagerModel::addCustomFilter(QString name)
 {
   if(!this->Internal || name.isEmpty())
     {
@@ -142,7 +145,7 @@ void pqBundleManagerModel::addBundle(QString name)
     return;
     }
 
-  // Insert the bundle in alphabetical order.
+  // Insert the custom filter in alphabetical order.
   int row = 0;
   for( ; row < this->Internal->size(); row++)
     {
@@ -156,17 +159,17 @@ void pqBundleManagerModel::addBundle(QString name)
   this->Internal->insert(row, name);
   this->endInsertRows();
 
-  emit this->bundleAdded(name);
+  emit this->customFilterAdded(name);
 }
 
-void pqBundleManagerModel::removeBundle(QString name)
+void pqCustomFilterManagerModel::removeCustomFilter(QString name)
 {
   if(!this->Internal || name.isEmpty())
     {
     return;
     }
 
-  // Find the row for the bundle.
+  // Find the row for the custom filter.
   int row = this->Internal->indexOf(name);
   if(row == -1)
     {

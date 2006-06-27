@@ -2,8 +2,8 @@
  <author></author>
  <comment></comment>
  <exportmacro></exportmacro>
- <class>pqBundleManager</class>
- <widget class="QDialog" name="pqBundleManager" >
+ <class>pqCustomFilterManager</class>
+ <widget class="QDialog" name="pqCustomFilterManager" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -13,7 +13,7 @@
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Bundle Manager</string>
+   <string>Custom Filter Manager</string>
   </property>
   <layout class="QGridLayout" >
    <property name="margin" >
@@ -23,9 +23,9 @@
     <number>6</number>
    </property>
    <item rowspan="5" row="0" column="0" >
-    <widget class="QListView" name="BundleList" >
+    <widget class="QListView" name="CustomFilterList" >
      <property name="whatsThis" >
-      <string>Displays the list of registered bundle definitions.</string>
+      <string>Displays the list of registered custom filter definitions.</string>
      </property>
      <property name="selectionMode" >
       <enum>QAbstractItemView::ExtendedSelection</enum>
@@ -64,7 +64,7 @@
    <item row="2" column="1" >
     <widget class="QPushButton" name="RemoveButton" >
      <property name="whatsThis" >
-      <string>Removes the selected bundle definitions.</string>
+      <string>Removes the selected custom filter definitions.</string>
      </property>
      <property name="text" >
       <string>&amp;Remove</string>
@@ -74,7 +74,7 @@
    <item row="1" column="1" >
     <widget class="QPushButton" name="ExportButton" >
      <property name="whatsThis" >
-      <string>Exports the selected bundle definitions to a file.</string>
+      <string>Exports the selected custom filter definitions to a file.</string>
      </property>
      <property name="text" >
       <string>&amp;Export</string>
@@ -84,7 +84,7 @@
    <item row="0" column="1" >
     <widget class="QPushButton" name="ImportButton" >
      <property name="whatsThis" >
-      <string>Imports bundle definitions from a file.</string>
+      <string>Imports custom filter definitions from a file.</string>
      </property>
      <property name="text" >
       <string>&amp;Import</string>
@@ -95,7 +95,7 @@
  </widget>
  <pixmapfunction></pixmapfunction>
  <tabstops>
-  <tabstop>BundleList</tabstop>
+  <tabstop>CustomFilterList</tabstop>
   <tabstop>ImportButton</tabstop>
   <tabstop>ExportButton</tabstop>
   <tabstop>RemoveButton</tabstop>

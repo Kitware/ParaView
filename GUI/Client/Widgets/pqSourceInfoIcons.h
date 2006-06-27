@@ -59,7 +59,7 @@ public:
     Invalid = -1,
     Source = 0,
     Filter,
-    Bundle
+    CustomFilter
     };
 
 public:

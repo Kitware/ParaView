@@ -2,8 +2,8 @@
  <author></author>
  <comment></comment>
  <exportmacro></exportmacro>
- <class>pqBundleDefinitionWizard</class>
- <widget class="QDialog" name="pqBundleDefinitionWizard" >
+ <class>pqCustomFilterDefinitionWizard</class>
+ <widget class="QDialog" name="pqCustomFilterDefinitionWizard" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -13,7 +13,7 @@
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Create Bundle</string>
+   <string>Create Custom Filter</string>
   </property>
   <layout class="QVBoxLayout" >
    <property name="margin" >
@@ -92,7 +92,7 @@
           <item>
            <widget class="QLabel" name="label" >
             <property name="text" >
-             <string>&lt;b>Choose a Name&lt;/b>&lt;br>&amp;nbsp;&amp;nbsp;&amp;nbsp;Enter a name for the pipeline bundle.</string>
+             <string>&lt;b>Choose a Name&lt;/b>&lt;br>&amp;nbsp;&amp;nbsp;&amp;nbsp;Enter a name for the custom filter.</string>
             </property>
            </widget>
           </item>
@@ -208,7 +208,7 @@
           <item row="1" column="0" colspan="2" >
            <widget class="QLabel" name="label_3" >
             <property name="text" >
-             <string>The name will be used to identify the pipeline bundle. It should be unique. The name should also indicate what the bundle will be used for.</string>
+             <string>The name will be used to identify the custom filter. It should be unique. The name should also indicate what the custom filter will be used for.</string>
             </property>
             <property name="wordWrap" >
              <bool>true</bool>
@@ -218,14 +218,14 @@
           <item row="3" column="0" >
            <widget class="QLabel" name="label_2" >
             <property name="text" >
-             <string>Bundle Name</string>
+             <string>Custom Filter Name</string>
             </property>
            </widget>
           </item>
           <item row="3" column="1" >
-           <widget class="QLineEdit" name="BundleName" >
+           <widget class="QLineEdit" name="CustomFilterName" >
             <property name="whatsThis" >
-             <string>Enter the pipeline bundle name here.</string>
+             <string>Enter the custom filter name here.</string>
             </property>
            </widget>
           </item>
@@ -877,7 +877,7 @@
  </widget>
  <pixmapfunction></pixmapfunction>
  <tabstops>
-  <tabstop>BundleName</tabstop>
+  <tabstop>CustomFilterName</tabstop>
   <tabstop>InputPipeline</tabstop>
   <tabstop>InputName</tabstop>
   <tabstop>InputPorts</tabstop>

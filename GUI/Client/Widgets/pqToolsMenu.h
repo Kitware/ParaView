@@ -40,8 +40,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsExport.h"
 #include <QObject>
 
-class pqBundleManager;
-class pqBundleManagerModel;
+class pqCustomFilterManager;
+class pqCustomFilterManagerModel;
 class QAction;
 class QMenu;
 class QMenuBar;
@@ -65,8 +65,8 @@ public:
   enum ActionName
     {
     InvalidAction = -1,
-    CreateBundle = 0,
-    ManageBundles,
+    CreateCustomFilter = 0,
+    ManageCustomFilters,
     LinkEditor,
     DumpNames,
     RecordTest,
@@ -99,11 +99,11 @@ public:
   QAction *getMenuAction(ActionName name) const;
 
 public slots:
-  /// Opens the bundle definition wizard.
-  void openBundleWizard();
+  /// Opens the custom filter definition wizard.
+  void openCustomFilterWizard();
 
-  /// Opens the bundle definition manager.
-  void openBundleManager();
+  /// Opens the custom filter definition manager.
+  void openCustomFilterManager();
 
   /// Opens the link editor.
   void openLinkEditor();
@@ -126,8 +126,9 @@ public slots:
   void openOptionsDialog();
 
 private:
-  pqBundleManager *BundleManager; ///< Bundle manager dialog.
-  pqBundleManagerModel *Bundles;  ///< Keeps track of registered bundles.
+  /// Keeps track of registered custom filters.
+  pqCustomFilterManagerModel *CustomFilters;
+  pqCustomFilterManager *Manager; ///< Custom filter manager dialog.
   QAction **MenuList;             ///< Stores the list of menu actions.
 };
 

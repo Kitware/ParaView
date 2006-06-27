@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqBundleManagerModel.h
+   Module:    pqCustomFilterManagerModel.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,35 +30,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-/// \file pqBundleManagerModel.h
+/// \file pqCustomFilterManagerModel.h
 /// \date 6/23/2006
 
-#ifndef _pqBundleManagerModel_h
-#define _pqBundleManagerModel_h
+#ifndef _pqCustomFilterManagerModel_h
+#define _pqCustomFilterManagerModel_h
 
 
 #include "pqWidgetsExport.h"
 #include <QAbstractListModel>
 
-class pqBundleManagerModelInternal;
+class pqCustomFilterManagerModelInternal;
 class QString;
 
 
-/// \class pqBundleManagerModel
+/// \class pqCustomFilterManagerModel
 /// \brief
-///   The pqBundleManagerModel class stores the list of registered
-///   pipeline bundle definitions.
+///   The pqCustomFilterManagerModel class stores the list of registered
+///   pipeline custom filter definitions.
 ///
-/// The list is modified using the \c addBundle and \c removeBundle
-/// methods. When a new bundle is added to the model a signal is
-/// emitted. This signal can be used to highlight the new bundle.
-class PQWIDGETS_EXPORT pqBundleManagerModel : public QAbstractListModel
+/// The list is modified using the \c addCustomFilter and
+/// \c removeCustomFilter methods. When a new custom filter is added
+/// to the model a signal is emitted. This signal can be used to
+/// highlight the new custom filter.
+class PQWIDGETS_EXPORT pqCustomFilterManagerModel : public QAbstractListModel
 {
   Q_OBJECT
 
 public:
-  pqBundleManagerModel(QObject *parent=0);
-  virtual ~pqBundleManagerModel();
+  pqCustomFilterManagerModel(QObject *parent=0);
+  virtual ~pqCustomFilterManagerModel();
 
   /// \name QAbstractItemModel Methods
   //@{
@@ -102,39 +103,41 @@ public:
   /// \name Index Mapping Methods
   //@{
   /// \brief
-  ///   Gets the bundle name for the given model index.
+  ///   Gets the custom filter name for the given model index.
   /// \param index The model index to look up.
   /// \return
-  ///   The bundle definition name or an empty string.
-  QString getBundleName(const QModelIndex &index) const;
+  ///   The custom filter definition name or an empty string.
+  QString getCustomFilterName(const QModelIndex &index) const;
 
   /// \brief
-  ///   Gets the model index for the given bundle name.
-  /// \param bundle The bundle definition name to look up.
+  ///   Gets the model index for the given custom filter name.
+  /// \param filter The custom filter definition name to look up.
   /// \return
   ///   The model index for the given name.
-  QModelIndex getIndexFor(const QString &bundle) const;
+  QModelIndex getIndexFor(const QString &filter) const;
   //@}
 
 public slots:
   /// \brief
-  ///   Adds a new pipeline bundle definition to the model.
-  /// \param name The name of the new pipeline bundle definition.
-  void addBundle(QString name);
+  ///   Adds a new custom filter definition to the model.
+  /// \param name The name of the new custom filter definition.
+  void addCustomFilter(QString name);
 
   /// \brief
-  ///   Removes a pipeline bundle definition from the model.
-  /// \param name The name of the pipeline bundle definition.
-  void removeBundle(QString name);
+  ///   Removes a custom filter definition from the model.
+  /// \param name The name of the custom filter definition.
+  void removeCustomFilter(QString name);
 
 signals:
   /// \brief
-  ///   Emitted when a new bundle definition is added to the model.
-  /// \param name The name of the new pipeline bundle definition.
-  void bundleAdded(const QString &name);
+  ///   Emitted when a new custom filter definition is added to the
+  ///   model.
+  /// \param name The name of the new custom filter definition.
+  void customFilterAdded(const QString &name);
 
 private:
-  pqBundleManagerModelInternal *Internal; ///< Stores the bundle list.
+  /// Stores the custom filter list.
+  pqCustomFilterManagerModelInternal *Internal;
 };
 
 #endif

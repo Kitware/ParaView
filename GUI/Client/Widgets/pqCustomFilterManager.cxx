@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqBundleManager.cxx
+   Module:    pqCustomFilterManager.cxx
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,13 +30,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ========================================================================*/
 
-/// \file pqBundleManager.cxx
+/// \file pqCustomFilterManager.cxx
 /// \date 6/23/2006
 
-#include "pqBundleManager.h"
-#include "ui_pqBundleManager.h"
+#include "pqCustomFilterManager.h"
+#include "ui_pqCustomFilterManager.h"
 
-#include "pqBundleManagerModel.h"
+#include "pqCustomFilterManagerModel.h"
 #include "pqFileDialog.h"
 #include "pqLocalFileDialogModel.h"
 
@@ -49,21 +49,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyManager.h"
 
 
-class pqBundleManagerForm : public Ui::pqBundleManager {};
+class pqCustomFilterManagerForm : public Ui::pqCustomFilterManager {};
 
 
-pqBundleManager::pqBundleManager(pqBundleManagerModel *model,
+pqCustomFilterManager::pqCustomFilterManager(pqCustomFilterManagerModel *model,
     QWidget *widgetParent)
   : QDialog(widgetParent)
 {
   this->Model = model;
-  this->Form = new pqBundleManagerForm();
+  this->Form = new pqCustomFilterManagerForm();
   this->Form->setupUi(this);
 
   // Initialize the form.
   this->Form->ExportButton->setEnabled(false);
   this->Form->RemoveButton->setEnabled(false);
-  this->Form->BundleList->setModel(this->Model);
+  this->Form->CustomFilterList->setModel(this->Model);
 
   // Listen for button clicks.
   QObject::connect(this->Form->ImportButton, SIGNAL(clicked()),
@@ -76,36 +76,36 @@ pqBundleManager::pqBundleManager(pqBundleManagerModel *model,
       this, SLOT(accept()));
 
   // Listen for selection changes.
-  QObject::connect(this->Form->BundleList->selectionModel(),
+  QObject::connect(this->Form->CustomFilterList->selectionModel(),
       SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
       this,
       SLOT(updateButtons(const QItemSelection &, const QItemSelection &)));
 
-  // Listen for new bundle additions.
-  QObject::connect(this->Model, SIGNAL(bundleAdded(const QString &)),
-      this, SLOT(selectBundle(const QString &)));
+  // Listen for new custom filter additions.
+  QObject::connect(this->Model, SIGNAL(CustomFilterAdded(const QString &)),
+      this, SLOT(selectCustomFilter(const QString &)));
 }
 
-pqBundleManager::~pqBundleManager()
+pqCustomFilterManager::~pqCustomFilterManager()
 {
   delete this->Form;
 }
 
-void pqBundleManager::selectBundle(const QString &name)
+void pqCustomFilterManager::selectCustomFilter(const QString &name)
 {
   QModelIndex index = this->Model->getIndexFor(name);
   if(index.isValid())
     {
-    this->Form->BundleList->selectionModel()->select(index,
+    this->Form->CustomFilterList->selectionModel()->select(index,
         QItemSelectionModel::SelectCurrent);
     }
 }
 
-void pqBundleManager::importFiles(const QStringList &files)
+void pqCustomFilterManager::importFiles(const QStringList &files)
 {
-  // Clear the current selection. The new bundle definitions will be
-  // selected as they're added.
-  this->Form->BundleList->selectionModel()->clear();
+  // Clear the current selection. The new custom filter definitions
+  // will be selected as they're added.
+  this->Form->CustomFilterList->selectionModel()->clear();
 
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
   QStringList::ConstIterator iter = files.begin();
@@ -113,16 +113,16 @@ void pqBundleManager::importFiles(const QStringList &files)
     {
     // Load the compound proxy definitions using the server manager.
     // This should trigger some register events, which will update the
-    // list of bundles.
+    // list of custom filters.
     proxyManager->LoadCompoundProxyDefinitions((*iter).toAscii().data());
     }
 }
 
-void pqBundleManager::exportSelected(const QStringList &files)
+void pqCustomFilterManager::exportSelected(const QStringList &files)
 {
-  // Get the selected bundles from the list.
+  // Get the selected custom filters from the list.
   QModelIndexList selection =
-      this->Form->BundleList->selectionModel()->selectedIndexes();
+      this->Form->CustomFilterList->selectionModel()->selectedIndexes();
   if(selection.size() == 0 || files.size() == 0)
     {
     return;
@@ -130,29 +130,29 @@ void pqBundleManager::exportSelected(const QStringList &files)
 
   // Create the root xml element for the file.
   vtkPVXMLElement *root = vtkPVXMLElement::New();
-  root->SetName("BundleDefinitions");
+  root->SetName("CustomFilterDefinitions");
 
-  QString bundle;
+  QString filter;
   vtkPVXMLElement *element = 0;
   vtkPVXMLElement *definition = 0;
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
   QModelIndexList::Iterator iter = selection.begin();
   for( ; iter != selection.end(); ++iter)
     {
-    // Get the xml for the bundle. The xml from the server manager
-    // needs to be added to a "CompoundProxyDefinition" element. That
-    // element needs a name attribute set.
-    bundle = this->Model->getBundleName(*iter);
+    // Get the xml for the custom filter. The xml from the server
+    // manager needs to be added to a "CompoundProxyDefinition"
+    // element. That element needs a name attribute set.
+    filter = this->Model->getCustomFilterName(*iter);
     definition = vtkPVXMLElement::New();
     definition->SetName("CompoundProxyDefinition");
-    definition->AddAttribute("name", bundle.toAscii().data());
-    element = proxyManager->GetCompoundProxyDefinition(bundle.toAscii().data());
+    definition->AddAttribute("name", filter.toAscii().data());
+    element = proxyManager->GetCompoundProxyDefinition(filter.toAscii().data());
     definition->AddNestedElement(element);
     root->AddNestedElement(definition);
     definition->Delete();
     }
 
-  // Save the bundles in the selected files.
+  // Save the custom filters in the selected files.
   QStringList::ConstIterator jter = files.begin();
   for( ; jter != files.end(); ++jter)
     {
@@ -163,15 +163,15 @@ void pqBundleManager::exportSelected(const QStringList &files)
   root->Delete();
 }
 
-void pqBundleManager::importFiles()
+void pqCustomFilterManager::importFiles()
 {
   // Let the user select a file.
   pqFileDialog* fileDialog = new pqFileDialog(
       new pqLocalFileDialogModel(), 
       this,
-      tr("Open Bundle File"),
+      tr("Open Custom Filter File"),
       QString(),
-      "Pipeline Bundle Files (*.pbd, *.xml);;All Files (*)");
+      "Custom Filter Files (*.cpd, *.xml);;All Files (*)");
   fileDialog->setObjectName("FileOpenDialog");
   fileDialog->setFileMode(pqFileDialog::ExistingFiles);
 
@@ -182,15 +182,15 @@ void pqBundleManager::importFiles()
   fileDialog->show();
 }
 
-void pqBundleManager::exportSelected()
+void pqCustomFilterManager::exportSelected()
 {
   // Let the user select a file to save.
   pqFileDialog* fileDialog = new pqFileDialog(
       new pqLocalFileDialogModel(), 
       this,
-      tr("Save Bundle File"),
+      tr("Save Custom Filter File"),
       QString(),
-      "Pipeline Bundle Files (*.pbd, *.xml);;All Files (*)");
+      "Custom Filter Files (*.cpd, *.xml);;All Files (*)");
   fileDialog->setObjectName("FileSaveDialog");
   fileDialog->setFileMode(pqFileDialog::AnyFile);
 
@@ -201,27 +201,27 @@ void pqBundleManager::exportSelected()
   fileDialog->show();
 }
 
-void pqBundleManager::removeSelected()
+void pqCustomFilterManager::removeSelected()
 {
-  // Get the selected bundles from the list.
-  QString bundle;
+  // Get the selected custom filters from the list.
+  QString filter;
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
   QModelIndexList selection =
-      this->Form->BundleList->selectionModel()->selectedIndexes();
+      this->Form->CustomFilterList->selectionModel()->selectedIndexes();
   QModelIndexList::Iterator iter = selection.begin();
   for( ; iter != selection.end(); ++iter)
     {
-    // Unregister the bundle from the server manager.
-    bundle = this->Model->getBundleName(*iter);
-    proxyManager->UnRegisterCompoundProxyDefinition(bundle.toAscii().data());
+    // Unregister the custom filter from the server manager.
+    filter = this->Model->getCustomFilterName(*iter);
+    proxyManager->UnRegisterCompoundProxyDefinition(filter.toAscii().data());
     }
 }
 
-void pqBundleManager::updateButtons(const QItemSelection &,
+void pqCustomFilterManager::updateButtons(const QItemSelection &,
     const QItemSelection &)
 {
   // Enable or disable the buttons based on the selection.
-  QItemSelectionModel *selection = this->Form->BundleList->selectionModel();
+  QItemSelectionModel *selection = this->Form->CustomFilterList->selectionModel();
   bool hasSelected = selection->selection().size() > 0;
   this->Form->ExportButton->setEnabled(hasSelected);
   this->Form->RemoveButton->setEnabled(hasSelected);
