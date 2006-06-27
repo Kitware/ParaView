@@ -1,6 +1,8 @@
 #include "vtkClientServerInterpreter.h"
 
-#cmakedefine PARAVIEW_BUILD_SHARED_LIBS
+#ifndef PARAVIEW_BUILD_SHARED_LIBS
+#  cmakedefine PARAVIEW_BUILD_SHARED_LIBS
+#endif
 #if defined(PARAVIEW_BUILD_SHARED_LIBS) && defined(_WIN32)
 # define VTK_WRAP_CS_EXPORT __declspec(dllexport)
 #else
