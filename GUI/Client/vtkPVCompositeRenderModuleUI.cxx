@@ -35,7 +35,7 @@
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 
-#define VTK_PV_DEFAULT_COMPOSITE_THRESHOLD 10.0
+#define VTK_PV_DEFAULT_COMPOSITE_THRESHOLD 1.0
 #define VTK_PV_DEFAULT_SQUIRT_LEVEL 3
 #define VTK_PV_DEFAULT_REDUCTION_FACTOR 2
 #define VTK_PV_DEFAULT_COMPOSITE_WITH_FLOAT 0
@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.38");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.39");
 
 //----------------------------------------------------------------------------
 vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
