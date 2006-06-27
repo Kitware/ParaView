@@ -49,7 +49,7 @@
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.36");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.37");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -1399,7 +1399,7 @@ int vtkSMRenderModuleProxy::GetServerRenderWindowSize(int size[2])
 void vtkSMRenderModuleProxy::CalculatePolygonsPerSecond(double time)
 {
   vtkIdType numPolygons = this->GetTotalNumberOfPolygons();
-  if ( numPolygons <= 0 )
+  if ( numPolygons <= 0 || time <= 0 )
     {
     return;
     }
