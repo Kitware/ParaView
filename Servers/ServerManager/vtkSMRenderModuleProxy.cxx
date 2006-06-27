@@ -32,6 +32,7 @@
 #include "vtkPVGeometryInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkPVProcessModule.h"
+#include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMDisplayProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMInputProperty.h"
@@ -46,7 +47,7 @@
 #include "vtkWindowToImageFilter.h"
 
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.14.2.1");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -109,6 +110,10 @@ vtkSMRenderModuleProxy::vtkSMRenderModuleProxy()
   this->RenderWindow = 0;
   this->Interactor = 0;
   this->ActiveCamera = 0;
+
+  this->RenderTimer = vtkTimerLog::New();
+  this->ResetPolygonsPerSecondResults();
+  this->MeasurePolygonsPerSecond = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -146,6 +151,8 @@ vtkSMRenderModuleProxy::~vtkSMRenderModuleProxy()
   this->RenderWindow = 0;
   this->Interactor = 0;
   this->ActiveCamera = 0;
+  this->RenderTimer->Delete();
+  this->RenderTimer = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -429,7 +436,16 @@ void vtkSMRenderModuleProxy::InteractiveRender()
   this->GetRenderer()->ResetCameraClippingRange();
 
   this->BeginInteractiveRender();
+  if ( this->MeasurePolygonsPerSecond )
+    {
+    this->RenderTimer->StartTimer();
+    }
   renWin->Render();
+  if ( this->MeasurePolygonsPerSecond )
+    {
+    this->RenderTimer->StopTimer();
+    this->CalculatePolygonsPerSecond(this->RenderTimer->GetElapsedTime());
+    }
   this->EndInteractiveRender();
 }
 
@@ -459,7 +475,16 @@ void vtkSMRenderModuleProxy::StillRender()
   renWindow->SetDesiredUpdateRate(0.002);
 
   this->BeginStillRender();
+  if ( this->MeasurePolygonsPerSecond )
+    {
+    this->RenderTimer->StartTimer();
+    }
   renWindow->Render();
+  if ( this->MeasurePolygonsPerSecond )
+    {
+    this->RenderTimer->StopTimer();
+    this->CalculatePolygonsPerSecond(this->RenderTimer->GetElapsedTime());
+    }
   this->EndStillRender();
 }
 
@@ -1135,6 +1160,66 @@ int vtkSMRenderModuleProxy::GetServerRenderWindowSize(int size[2])
   size[1] = winSize->GetElement(1);
   
   return 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMRenderModuleProxy::CalculatePolygonsPerSecond(double time)
+{
+  vtkIdType numPolygons = this->GetTotalNumberOfPolygons();
+  if ( numPolygons <= 0 )
+    {
+    return;
+    }
+  this->LastPolygonsPerSecond = (numPolygons / time);
+  if ( this->LastPolygonsPerSecond > this->MaximumPolygonsPerSecond )
+    {
+    this->MaximumPolygonsPerSecond = this->LastPolygonsPerSecond;
+    }
+  this->AveragePolygonsPerSecondAccumulated += this->LastPolygonsPerSecond;
+  this->AveragePolygonsPerSecondCount ++;
+  this->AveragePolygonsPerSecond
+    = this->AveragePolygonsPerSecondAccumulated /
+    this->AveragePolygonsPerSecondCount;
+}
+
+//-----------------------------------------------------------------------------
+vtkIdType vtkSMRenderModuleProxy::GetTotalNumberOfPolygons()
+{
+  vtkIdType totalPolygons = 0;
+  vtkCollectionIterator* iter = this->Displays->NewIterator();
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    vtkSMDataObjectDisplayProxy* pDisp = vtkSMDataObjectDisplayProxy::SafeDownCast(
+      iter->GetCurrentObject());
+    if (pDisp && pDisp->GetVisibilityCM())
+      {
+      vtkPVGeometryInformation* info = pDisp->GetGeometryInformation();
+      if (!info)
+        {
+        continue;
+        }
+      if (pDisp->GetVolumeRenderMode())
+        {
+        totalPolygons += 0;
+        }
+      else
+        {
+        totalPolygons += info->GetPolygonCount();
+        }
+      }
+    }
+  iter->Delete();
+  return totalPolygons;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMRenderModuleProxy::ResetPolygonsPerSecondResults()
+{
+  this->LastPolygonsPerSecond = 0;
+  this->MaximumPolygonsPerSecond = 0;
+  this->AveragePolygonsPerSecond = 0;
+  this->AveragePolygonsPerSecondAccumulated = 0;
+  this->AveragePolygonsPerSecondCount = 0;
 }
 
 //-----------------------------------------------------------------------------

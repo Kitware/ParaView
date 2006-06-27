@@ -24,6 +24,8 @@
 
 class vtkPVApplication;
 class vtkSMRenderModuleProxy;
+class vtkKWCheckButton;
+class vtkKWFrameWithLabel;
 
 class VTK_EXPORT vtkPVRenderModuleUI : public vtkPVTracedWidget
 {
@@ -65,12 +67,30 @@ public:
   // vtk objects.  This should eliminate circular references.
   void PrepareForDelete();
 
+  // Description:
+  // Resets all the settings to default values.
+  virtual void ResetSettingsToDefault();
+
+  // Description:
+  void MeasurePolygonsPerSecondCallback();
+
+  // Description:
+  // Update the "enable" state of the object and its internal parts.
+  // Depending on different Ivars (this->Enabled, the application's 
+  // Limited Edition Mode, etc.), the "enable" state of the object is updated
+  // and propagated to its internal parts/subwidgets. This will, for example,
+  // enable/disable parts of the widget UI, enable/disable the visibility
+  // of 3D widgets, etc.
+  virtual void UpdateEnableState();
+
 protected:
   vtkPVRenderModuleUI();
   ~vtkPVRenderModuleUI();
 
   vtkSMRenderModuleProxy* RenderModuleProxy;
 
+  vtkKWFrameWithLabel *RenderModuleFrame;
+  vtkKWCheckButton* MeasurePolygonsPerSecondFlag;
 
   float OutlineThreshold;
  

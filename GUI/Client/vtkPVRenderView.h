@@ -364,6 +364,12 @@ public:
   void              SetLight(int type, int subtype, double value);
 
 
+  // Description:
+  // Prevent actions when exiting
+  vtkSetClampMacro(ExitMode, int, 0, 1);
+  vtkBooleanMacro(ExitMode, int);
+  vtkGetMacro(ExitMode, int);
+
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView();
@@ -459,6 +465,8 @@ protected:
 
   vtkTimerLog *RenderTimer;
   Tcl_TimerToken TimerToken;
+
+  int ExitMode;
   
 private:
   vtkPVRenderView(const vtkPVRenderView&); // Not implemented

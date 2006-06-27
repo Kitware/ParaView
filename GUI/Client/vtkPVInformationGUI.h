@@ -71,6 +71,7 @@ protected:
   vtkKWLabel *NumCellsLabel;
   vtkKWLabel *NumPointsLabel;
   vtkKWLabel *MemorySizeLabel;
+  vtkKWLabel *PolygonCount;
   
   vtkKWBoundsDisplay *BoundsDisplay;
   vtkKWBoundsDisplay *ExtentDisplay;

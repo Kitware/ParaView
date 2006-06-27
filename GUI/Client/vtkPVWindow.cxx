@@ -135,7 +135,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.770.2.5");
+vtkCxxRevisionMacro(vtkPVWindow, "1.770.2.6");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -372,6 +372,7 @@ void vtkPVWindow::PrepareForDelete()
   if (this->MainView)
     {
     this->MainView->DisableRendering();
+    this->MainView->ExitModeOn();
     }
 
   this->Superclass::PrepareForDelete();

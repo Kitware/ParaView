@@ -29,6 +29,8 @@ class vtkRenderWindowInteractor;
 class vtkRenderer;
 class vtkSMDisplay;
 class vtkSMDisplayProxy;
+class vtkPVClientServerIdCollectionInformation;
+class vtkTimerLog;
 
 // TODO: have to change the PVCameraManipulators to do ResetCamera on
 // the RenderModule rather than renderer.
@@ -170,6 +172,22 @@ public:
   // It is the responsibility of the caller to delete the image data.
   virtual vtkImageData* CaptureWindow(int magnification);
 
+  // Description:
+  // Enable measurement of Polygons Per Second
+  vtkSetClampMacro(MeasurePolygonsPerSecond, int, 0, 1);
+  vtkBooleanMacro(MeasurePolygonsPerSecond, int);
+  vtkGetMacro(MeasurePolygonsPerSecond, int);
+  
+  // Description:
+  // Reset the tracking of polygons per second
+  void ResetPolygonsPerSecondResults();
+
+  // Description:
+  // Get the last/maximum/average number of polygons per second
+  vtkGetMacro(LastPolygonsPerSecond, double);
+  vtkGetMacro(MaximumPolygonsPerSecond, double);
+  vtkGetMacro(AveragePolygonsPerSecond, double);
+
 protected:
   vtkSMRenderModuleProxy();
   ~vtkSMRenderModuleProxy();
@@ -253,6 +271,19 @@ protected:
   virtual void EndInteractiveRender();
   
   
+
+  vtkTimerLog *RenderTimer;
+  double LastPolygonsPerSecond;
+  double MaximumPolygonsPerSecond;
+  double AveragePolygonsPerSecond;
+  double AveragePolygonsPerSecondAccumulated;
+  vtkIdType AveragePolygonsPerSecondCount;
+  void CalculatePolygonsPerSecond(double time);
+  int MeasurePolygonsPerSecond;
+
+  // Description:
+  // Get the number of polygons this render module is rendering
+  vtkIdType GetTotalNumberOfPolygons();
 
 private:
   vtkSMRenderModuleProxy(const vtkSMRenderModuleProxy&); // Not implemented.

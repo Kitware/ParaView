@@ -142,12 +142,13 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.405");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.405.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
 {
   this->RenderModuleProxy = 0;
+  this->ExitMode = 0;
 
   if (getenv("PV_SEPARATE_RENDER_WINDOW") != NULL)
     {
@@ -1987,6 +1988,10 @@ vtkPVApplication* vtkPVRenderView::GetPVApplication()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ForceRender()
 {
+  if ( this->ExitMode )
+    {
+    return;
+    }
   vtkPVApplication *pvApp = this->GetPVApplication();
   if ( pvApp )
     {
@@ -2004,6 +2009,10 @@ void vtkPVRenderView::ForceRender()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Render()
 {
+  if ( this->ExitMode )
+    {
+    return;
+    }
   int abort;
   if (this->BlockRender)
     {
@@ -2093,6 +2102,10 @@ void PVRenderView_IdleRender(ClientData arg)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::EventuallyRender()
 {
+  if ( this->ExitMode )
+    {
+    return;
+    }
   vtkDebugMacro("Enqueue EventuallyRender request");
   this->CornerAnnotation->UpdateCornerText();
 
@@ -2110,6 +2123,11 @@ void vtkPVRenderView::EventuallyRenderCallBack()
 {
   int abortFlag;
   double elapsedTime;
+
+  if ( this->ExitMode )
+    {
+    return;
+    }
   
   this->RenderTimer->StopTimer();
   
