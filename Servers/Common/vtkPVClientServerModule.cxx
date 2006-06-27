@@ -53,6 +53,7 @@
 #else
 # include "vtkWindows.h"
 #endif
+#include <vtkstd/new>
 #include <vtkstd/string>
 #include <vtksys/RegularExpression.hxx>
 
@@ -162,7 +163,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.45.2.1");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.45.2.2");
 
 
 //----------------------------------------------------------------------------
