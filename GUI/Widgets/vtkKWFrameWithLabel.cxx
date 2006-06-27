@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithLabel );
-vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.9");
+vtkCxxRevisionMacro(vtkKWFrameWithLabel, "1.10");
 
 int vtkKWFrameWithLabel::DefaultLabelCase = vtkKWFrameWithLabel::LabelCaseUppercaseFirst;
 int vtkKWFrameWithLabel::DefaultLabelFontWeight = vtkKWFrameWithLabel::LabelFontWeightBold;
@@ -143,6 +143,7 @@ void vtkKWFrameWithLabel::CreateWidget()
   // Force label icon to be created now, so that we can set its image option.
 
   this->Label->LabelVisibilityOn();
+  this->GetLabel()->SetBinding("<Double-1>", this, "LabelDoubleClickCallback");
 
   label = this->GetLabelIcon();
   label->SetImageToPredefinedIcon(vtkKWIcon::IconLock);
@@ -190,11 +191,7 @@ void vtkKWFrameWithLabel::CreateWidget()
                this->LabelFrame->GetWidgetName());
   this->Label->Raise();
 
-  if (vtkKWFrameWithLabel::DefaultAllowFrameToCollapse && 
-      this->AllowFrameToCollapse)
-    {
-    this->Icon->SetBinding("<ButtonRelease-1>",this,"CollapseButtonCallback");
-    }
+  this->Icon->SetBinding("<ButtonRelease-1>",this,"CollapseButtonCallback");
 
   // If the label frame get resize, reset the margins
 
@@ -466,15 +463,25 @@ int vtkKWFrameWithLabel::IsFrameCollapsed()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWFrameWithLabel::LabelDoubleClickCallback()
+{
+  this->CollapseButtonCallback();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWFrameWithLabel::CollapseButtonCallback()
 {
-  if (this->IsFrameCollapsed())
+  if (vtkKWFrameWithLabel::DefaultAllowFrameToCollapse && 
+      this->AllowFrameToCollapse)
     {
-    this->ExpandFrame();
-    }
-  else
-    {
-    this->CollapseFrame();
+    if (this->IsFrameCollapsed())
+      {
+      this->ExpandFrame();
+      }
+    else
+      {
+      this->CollapseFrame();
+      }
     }
 }
 

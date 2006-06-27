@@ -167,7 +167,8 @@ public:
   // Callbacks. Internal, do not use.
   virtual void AdjustMarginCallback();
   virtual void CollapseButtonCallback();
- 
+  virtual void LabelDoubleClickCallback();
+
 protected:
   vtkKWFrameWithLabel();
   ~vtkKWFrameWithLabel();
