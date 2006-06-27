@@ -53,6 +53,9 @@ ENDIF(BUILD_TESTING)
 
 #########################################################################
 # Configure data directory
+IF(NOT PARAVIEW_DATA_ROOT AND PARAQ_DATA_ROOT)
+  SET(PARAVIEW_DATA_ROOT "${PARAQ_DATA_ROOT}")
+ENDIF(NOT PARAVIEW_DATA_ROOT AND PARAQ_DATA_ROOT)
 FIND_PATH(PARAVIEW_DATA_ROOT ParaViewData.readme
   ${ParaView_SOURCE_DIR}/ParaViewData
   ${ParaView_SOURCE_DIR}/../ParaViewData
