@@ -32,7 +32,7 @@
 #include <vtksys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.54");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.55");
 
 #define VTK_KW_CTFE_COLOR_RAMP_TAG "color_ramp_tag"
 
@@ -1608,6 +1608,7 @@ void vtkKWColorTransferFunctionEditor::RedrawColorRamp()
                << " -tags {" << VTK_KW_CTFE_COLOR_RAMP_TAG << "}" << endl;
         tk_cmd << canv << " lower " << VTK_KW_CTFE_COLOR_RAMP_TAG
                << " {" << vtkKWParameterValueFunctionEditor::FunctionTag 
+               << "||" << vtkKWParameterValueFunctionEditor::FrameForegroundTag
                << "||" << vtkKWParameterValueFunctionEditor::HistogramTag 
                << "||" << vtkKWParameterValueFunctionEditor::SecondaryHistogramTag 
                << "}" << endl;
