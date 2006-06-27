@@ -30,484 +30,52 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-// this include
 #include "pqNamedObjectPanel.h"
-
-// Qt includes
-#include <QLayout>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QListWidget>
-#include <QTreeWidget>
-#include <QGroupBox>
-#include <QSlider>
-#include <QDoubleSpinBox>
-
-// VTK includes
-
-// ParaView Server Manager includes
-#include "vtkSMProperty.h"
-#include "vtkSMPropertyIterator.h"
-
-// ParaView includes
-#include "pqListWidgetItemObject.h"
-#include "pqTreeWidgetItemObject.h"
-#include "pqServerManagerObserver.h"
-#include "pqPipelineDisplay.h"
-#include "pqPipelineModel.h"
-#include "pqPipelineSource.h"
+#include "pqNamedWidgets.h"
 #include "pqPropertyManager.h"
-#include "pqServerManagerModel.h"
-#include "pqSignalAdaptors.h"
-#include "pqSMAdaptor.h"
-#include "pqSMProxy.h"
-#include "pqSMSignalAdaptors.h"
 
-
-/// constructor
-pqNamedObjectPanel::pqNamedObjectPanel(QWidget* p)
-  : pqObjectPanel(p)
+pqNamedObjectPanel::pqNamedObjectPanel(QWidget* p) :
+  pqObjectPanel(p),
+  NamedWidgets(new pqNamedWidgets())
 {
+  connect(
+    this->NamedWidgets,
+    SIGNAL(propertyChanged()),
+    this->PropertyManager,
+    SLOT(propertyChanged()));
 }
-/// destructor
+
 pqNamedObjectPanel::~pqNamedObjectPanel()
 {
   if(this->Proxy)
     {
-    this->unlinkServerManagerProperties();
+    this->NamedWidgets->unlink(this, this->Proxy);
+    this->Proxy = NULL;
     }
-  this->Proxy = NULL;
+    
+  delete this->NamedWidgets;
+}
+
+void pqNamedObjectPanel::accept()
+{
+  this->NamedWidgets->accept();
+  
+  Superclass::accept();
+}
+
+void pqNamedObjectPanel::reset()
+{
+  this->NamedWidgets->reset();
+  
+  Superclass::reset();
 }
 
 void pqNamedObjectPanel::linkServerManagerProperties()
 {
-  vtkSMPropertyIterator *iter = this->Proxy->NewPropertyIterator();
-  for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    vtkSMProperty* SMProperty = iter->GetProperty();
-    if(SMProperty->GetInformationOnly())
-      {
-      continue;
-      }
-
-    // update domains that we might ask for
-    SMProperty->UpdateDependentDomains();
-
-    QString regex = QString("^") + QString(iter->GetKey());
-    QList<QObject*> foundObjects = this->findChildren<QObject*>(QRegExp(regex));
-    for(int i=0; i<foundObjects.size(); i++)
-      {
-      QObject* foundObject = foundObjects[i];
-      pqSMAdaptor::PropertyType pt = pqSMAdaptor::getPropertyType(SMProperty);
-
-      if(pt == pqSMAdaptor::MULTIPLE_ELEMENTS)
-        {
-        QWidget* propertyWidget = qobject_cast<QWidget*>(foundObject);
-        if(propertyWidget)
-          {
-          int index = -1;
-          // get the index from the name
-          QString name = propertyWidget->objectName();
-          QStringList split = name.split(':');
-          if(split.size() == 2)
-            {
-            bool ok = false;
-            index = split[1].toInt(&ok);
-            if(!ok)
-              {
-              index = -1;
-              }
-            }
-          if(index != -1)
-            {
-            QLineEdit* le = qobject_cast<QLineEdit*>(propertyWidget);
-            QSlider* sl = qobject_cast<QSlider*>(propertyWidget);
-            QDoubleSpinBox* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(foundObject);
-            if(le)
-              {
-              this->PropertyManager->registerLink(
-                le, "text", SIGNAL(textChanged(const QString&)),
-                this->Proxy, SMProperty, index);
-              }
-            else if(sl)
-              {
-              this->PropertyManager->registerLink(
-                sl, "value", SIGNAL(valueChanged(int)),
-                this->Proxy, SMProperty, index);
-              }
-            else if(doubleSpinBox)
-              {
-              this->PropertyManager->registerLink(doubleSpinBox, "value", SIGNAL(valueChanged(double)),
-                                                 this->Proxy, SMProperty, index);
-              }
-            }
-          }
-        }
-      else if(pt == pqSMAdaptor::ENUMERATION)
-        {
-        // enumerations can be combo boxes or check boxes
-        QCheckBox* checkBox = qobject_cast<QCheckBox*>(foundObject);
-        QComboBox* comboBox = qobject_cast<QComboBox*>(foundObject);
-        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundObject);
-        if(checkBox)
-          {
-          this->PropertyManager->registerLink(
-            checkBox, "checked", SIGNAL(toggled(bool)),
-            this->Proxy, SMProperty);
-          }
-        else if(comboBox)
-          {
-          QList<QVariant> domain = 
-            pqSMAdaptor::getEnumerationPropertyDomain(SMProperty);
-          comboBox->clear();
-          foreach(QVariant v, domain)
-            {
-            comboBox->addItem(v.toString());
-            }
-          pqSignalAdaptorComboBox* adaptor = 
-            new pqSignalAdaptorComboBox(comboBox);
-          adaptor->setObjectName("ComboBoxAdaptor");
-          this->PropertyManager->registerLink(
-            adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
-            this->Proxy, SMProperty);
-          }
-        else if(lineEdit)
-          {
-          this->PropertyManager->registerLink(
-            lineEdit, "text", SIGNAL(textChanged(const QString&)),
-            this->Proxy, SMProperty);
-          }
-        }
-      else if(pt == pqSMAdaptor::SELECTION)
-        {
-        // selections can be list widgets
-        QListWidget* listWidget = qobject_cast<QListWidget*>(foundObject);
-        QTreeWidget* treeWidget = qobject_cast<QTreeWidget*>(foundObject);
-        if(listWidget)
-          {
-          listWidget->clear();
-          QList<QVariant> sel_domain = 
-            pqSMAdaptor::getSelectionPropertyDomain(SMProperty);
-          for(int j=0; j<sel_domain.size(); j++)
-            {
-            pqListWidgetItemObject* item = 
-              new pqListWidgetItemObject(sel_domain[j].toString(), listWidget);
-            this->PropertyManager->registerLink(
-              item, "checked", SIGNAL(checkedStateChanged(bool)),
-              this->Proxy, SMProperty, j);
-            }
-          }
-        else if(treeWidget)
-          {
-          treeWidget->clear();
-          QList<QVariant> sel_domain;
-          sel_domain = pqSMAdaptor::getSelectionPropertyDomain(SMProperty);
-          for(int j=0; j<sel_domain.size(); j++)
-            {
-            QList<QString> str;
-            str.append(sel_domain[j].toString());
-            pqTreeWidgetItemObject* item;
-            item = new pqTreeWidgetItemObject(treeWidget, str);
-            this->PropertyManager->registerLink(item, 
-                                              "checked", 
-                                              SIGNAL(checkedStateChanged(bool)),
-                                              this->Proxy, SMProperty, j);
-            }
-          }
-        }
-      else if(pt == pqSMAdaptor::PROXY)
-        {
-        QComboBox* comboBox = qobject_cast<QComboBox*>(foundObject);
-        if(comboBox)
-          {
-          QList<pqSMProxy> propertyDomain = 
-            pqSMAdaptor::getProxyPropertyDomain(SMProperty);
-          comboBox->clear();
-          foreach(pqSMProxy v, propertyDomain)
-            {
-            pqPipelineSource* o = 
-              pqServerManagerModel::instance()->getPQSource(v);
-            if(o)
-              {
-              comboBox->addItem(o->getProxyName());
-              }
-            }
-          pqSignalAdaptorComboBox* comboAdaptor = 
-            new pqSignalAdaptorComboBox(comboBox);
-          comboAdaptor->setObjectName("ComboBoxAdaptor");
-          pqSignalAdaptorProxy* proxyAdaptor = 
-            new pqSignalAdaptorProxy(comboAdaptor, "currentText", 
-                                     SIGNAL(currentTextChanged(const QString&)));
-          proxyAdaptor->setObjectName("ComboBoxProxyAdaptor");
-          this->PropertyManager->registerLink(
-            proxyAdaptor, "proxy", SIGNAL(proxyChanged(const QVariant&)),
-            this->Proxy, SMProperty);
-          }
-        }
-      else if(pt == pqSMAdaptor::SINGLE_ELEMENT)
-        {
-        QComboBox* comboBox = qobject_cast<QComboBox*>(foundObject);
-        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundObject);
-        QSlider* slider = qobject_cast<QSlider*>(foundObject);
-        QSpinBox* spinBox = qobject_cast<QSpinBox*>(foundObject);
-        QDoubleSpinBox* doubleSpinBox = 
-          qobject_cast<QDoubleSpinBox*>(foundObject);
-        if(comboBox)
-          {
-          QList<QVariant> domain = 
-            pqSMAdaptor::getElementPropertyDomain(SMProperty);
-          comboBox->clear();
-          for(int j=0; j<domain.size(); j++)
-            {
-            comboBox->addItem(domain[j].toString());
-            }
-
-          pqSignalAdaptorComboBox* adaptor = 
-            new pqSignalAdaptorComboBox(comboBox);
-          adaptor->setObjectName("ComboBoxAdaptor");
-          this->PropertyManager->registerLink(
-            adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
-            this->Proxy, SMProperty);
-          }
-        else if(lineEdit)
-          {
-          this->PropertyManager->registerLink(
-            lineEdit, "text", SIGNAL(textChanged(const QString&)),
-            this->Proxy, SMProperty);
-          }
-        else if(slider)
-          {
-          this->PropertyManager->registerLink(
-            slider, "value", SIGNAL(valueChanged(int)),
-            this->Proxy, SMProperty);
-          }
-        else if(doubleSpinBox)
-          {
-          this->PropertyManager->registerLink(
-            doubleSpinBox, "value", SIGNAL(valueChanged(double)),
-            this->Proxy, SMProperty);
-          }
-        else if(spinBox)
-          {
-          this->PropertyManager->registerLink(
-            spinBox, "value", SIGNAL(valueChanged(int)),
-            this->Proxy, SMProperty);
-          }
-        }
-      else if(pt == pqSMAdaptor::FILE_LIST)
-        {
-        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundObject);
-        if(lineEdit)
-          {
-          this->PropertyManager->registerLink(
-            lineEdit, "text", SIGNAL(textChanged(const QString&)),
-            this->Proxy, SMProperty);
-          }
-        }
-      }
-    }
-  iter->Delete();
-
+  this->NamedWidgets->link(this, this->Proxy);
 }
 
 void pqNamedObjectPanel::unlinkServerManagerProperties()
 {
-  vtkSMPropertyIterator *iter = this->Proxy->NewPropertyIterator();
-  for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    vtkSMProperty* SMProperty = iter->GetProperty();
-    if(SMProperty->GetInformationOnly())
-      {
-      continue;
-      }
-
-    QString regex = QString("^") + QString(iter->GetKey());
-    QList<QObject*> foundObjects = this->findChildren<QObject*>(QRegExp(regex));
-    for(int i=0; i<foundObjects.size(); i++)
-      {
-      QObject* foundObject = foundObjects[i];
-      
-      pqSMAdaptor::PropertyType pt = pqSMAdaptor::getPropertyType(SMProperty);
-
-      if(pt == pqSMAdaptor::MULTIPLE_ELEMENTS)
-        {
-        QWidget* propertyWidget = qobject_cast<QWidget*>(foundObject);
-        if(propertyWidget)
-          {
-          int index = -1;
-          // get the index from the name
-          QString name = propertyWidget->objectName();
-          QStringList split = name.split(':');
-          if(split.size() == 2)
-            {
-            bool ok = false;
-            index = split[1].toInt(&ok);
-            if(!ok)
-              {
-              index = -1;
-              }
-            }
-          if(index != -1)
-            {
-            QLineEdit* le = qobject_cast<QLineEdit*>(propertyWidget);
-            QSlider* sl = qobject_cast<QSlider*>(propertyWidget);
-            QDoubleSpinBox* doubleSpinBox =
-              qobject_cast<QDoubleSpinBox*>(propertyWidget);
-            if(le)
-              {
-              this->PropertyManager->unregisterLink(
-                le, "text", SIGNAL(textChanged(const QString&)),
-                this->Proxy, SMProperty, index);
-              }
-            else if(sl)
-              {
-              this->PropertyManager->unregisterLink(
-                sl, "value", SIGNAL(valueChanged(int)),
-                this->Proxy, SMProperty, index);
-              }
-            else if(doubleSpinBox)
-              {
-              this->PropertyManager->unregisterLink(doubleSpinBox, 
-                                                  "value", 
-                                                  SIGNAL(valueChanged(double)),
-                                                  this->Proxy, SMProperty);
-              }
-            }
-          }
-        }
-      else if(pt == pqSMAdaptor::ENUMERATION)
-        {
-        // enumerations can be combo boxes or check boxes
-        QCheckBox* checkBox = qobject_cast<QCheckBox*>(foundObject);
-        QComboBox* comboBox = qobject_cast<QComboBox*>(foundObject);
-        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundObject);
-        if(checkBox)
-          {
-          this->PropertyManager->unregisterLink(
-            checkBox, "checked", SIGNAL(toggled(bool)),
-            this->Proxy, SMProperty);
-          }
-        else if(comboBox)
-          {
-          pqSignalAdaptorComboBox* adaptor = 
-            comboBox->findChild<pqSignalAdaptorComboBox*>("ComboBoxAdaptor");
-          this->PropertyManager->unregisterLink(
-            adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
-            this->Proxy, SMProperty);
-          delete adaptor;
-          }
-        else if(lineEdit)
-          {
-          this->PropertyManager->unregisterLink(
-            lineEdit, "text", SIGNAL(textChanged(const QString&)),
-            this->Proxy, SMProperty);
-          }
-        }
-      else if(pt == pqSMAdaptor::SELECTION)
-        {
-        // selections can be list widgets
-        QListWidget* listWidget = qobject_cast<QListWidget*>(foundObject);
-        QTreeWidget* treeWidget = qobject_cast<QTreeWidget*>(foundObject);
-        if(listWidget)
-          {
-          for(int ii=0; ii<listWidget->count(); ii++)
-            {
-            pqListWidgetItemObject* item = 
-              static_cast<pqListWidgetItemObject*>(listWidget->item(ii));
-            this->PropertyManager->unregisterLink(
-              item, "checked", SIGNAL(checkedStateChanged(bool)),
-              this->Proxy, SMProperty, ii);
-            }
-          listWidget->clear();
-          }
-        if(treeWidget)
-          {
-          for(int ii=0; ii<treeWidget->topLevelItemCount(); ii++)
-            {
-            pqTreeWidgetItemObject* item;
-            item = 
-              static_cast<pqTreeWidgetItemObject*>(treeWidget->topLevelItem(ii));
-            this->PropertyManager->unregisterLink(
-              item, "checked", SIGNAL(checkedStateChanged(bool)),
-              this->Proxy, SMProperty, ii);
-            }
-          treeWidget->clear();
-          }
-        }
-      else if(pt == pqSMAdaptor::PROXY)
-        {
-        QComboBox* comboBox = qobject_cast<QComboBox*>(foundObject);
-        if(comboBox)
-          {
-          QObject* comboAdaptor = 
-            comboBox->findChild<pqSignalAdaptorComboBox*>("ComboBoxAdaptor");
-          QObject* proxyAdaptor = 
-            comboBox->findChild<pqSignalAdaptorComboBox*>("ComboBoxProxyAdaptor");
-          this->PropertyManager->unregisterLink(
-            proxyAdaptor, "proxy", SIGNAL(proxyChanged(const QVariant&)),
-            this->Proxy, SMProperty);
-          delete proxyAdaptor;
-          delete comboAdaptor;
-          }
-        }
-      else if(pt == pqSMAdaptor::SINGLE_ELEMENT)
-        {
-        QComboBox* comboBox = qobject_cast<QComboBox*>(foundObject);
-        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundObject);
-        QSlider* slider = qobject_cast<QSlider*>(foundObject);
-        QDoubleSpinBox* doubleSpinBox = 
-          qobject_cast<QDoubleSpinBox*>(foundObject);
-        QSpinBox* spinBox = qobject_cast<QSpinBox*>(foundObject);
-        if(comboBox)
-          {
-          pqSignalAdaptorComboBox* adaptor = 
-            comboBox->findChild<pqSignalAdaptorComboBox*>("ComboBoxAdaptor");
-          this->PropertyManager->unregisterLink(
-            adaptor, "currentText", SIGNAL(currentTextChanged(const QString&)),
-            this->Proxy, SMProperty);
-          delete adaptor;
-          }
-        else if(lineEdit)
-          {
-          this->PropertyManager->unregisterLink(
-            lineEdit, "text", SIGNAL(textChanged(const QString&)),
-            this->Proxy, SMProperty);
-          }
-        else if(slider)
-          {
-          this->PropertyManager->unregisterLink(
-            slider, "value", SIGNAL(valueChanged(int)),
-            this->Proxy, SMProperty);
-          }
-        else if(doubleSpinBox)
-          {
-          this->PropertyManager->unregisterLink(
-            doubleSpinBox, "value", SIGNAL(valueChanged(double)),
-            this->Proxy, SMProperty);
-          }
-        else if(spinBox)
-          {
-          this->PropertyManager->unregisterLink(
-            spinBox, "value", SIGNAL(valueChanged(int)),
-            this->Proxy, SMProperty);
-          }
-        }
-      else if(pt == pqSMAdaptor::FILE_LIST)
-        {
-        QLineEdit* lineEdit = qobject_cast<QLineEdit*>(foundObject);
-        if(lineEdit)
-          {
-          this->PropertyManager->unregisterLink(
-            lineEdit, "text", SIGNAL(textChanged(const QString&)),
-            this->Proxy, SMProperty);
-          }
-        }
-      }
-    }
-  iter->Delete();
-  this->Proxy->UpdateVTKObjects();
+  this->NamedWidgets->unlink(this, this->Proxy);
 }
-
-

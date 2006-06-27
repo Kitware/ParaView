@@ -56,6 +56,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqMultiView.h
   pqMultiViewFrame.h
   pqNamedObjectPanel.h
+  pqNamedWidgets.h
   pqObjectInspectorWidget.h
   pqObjectPanel.h
   pqOutputWindow.h
@@ -117,6 +118,7 @@ SET(UI_FORMS
   pqRenderViewEditor.ui
   pqSampleScalarWidget.ui
   pqServerBrowser.ui
+  pqStreamTracerControls.ui
 )
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
@@ -214,6 +216,8 @@ ADD_LIBRARY(pqWidgets
   pqNameCount.h
   pqNamedObjectPanel.cxx
   pqNamedObjectPanel.h
+  pqNamedWidgets.cxx
+  pqNamedWidgets.h
   pqObjectInspectorWidget.cxx
   pqObjectInspectorWidget.h
   pqObjectPanel.cxx

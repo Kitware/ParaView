@@ -33,11 +33,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 #include "pqHandleWidget.h"
 #include "pqLineWidget.h"
+#include "pqNamedWidgets.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPropertyManager.h"
 #include "pqServerManagerModel.h"
+#include "pqSignalAdaptors.h"
 #include "pqStreamTracerPanel.h"
+
+#include "ui_pqStreamTracerControls.h"
 
 #include <vtkSMDataObjectDisplayProxy.h>
 #include <vtkSMDoubleVectorProperty.h>
@@ -53,8 +57,8 @@ class pqStreamTracerPanel::pqImplementation
 {
 public:
   pqImplementation(QWidget* parent) :
-    HandleWidget(0 /*new pqHandleWidget(parent)*/),
-    LineWidget(new pqLineWidget(parent))
+    HandleWidget(new pqHandleWidget(parent)),
+    LineWidget(0 /*new pqLineWidget(parent)*/)
   {
   }
 
@@ -68,16 +72,33 @@ public:
   pqHandleWidget* const HandleWidget;
   /// Manages a 3D line widget, plus Qt controls  
   pqLineWidget* const LineWidget;
+  /// Provides a container for Qt controls
+  QWidget ControlsContainer;
+  /// Provides the remaining Qt controls for the panel
+  Ui::pqStreamTracerControls Controls;
+  /// Links Qt widgets to SM properties by name
+  pqNamedWidgets NamedWidgets;
 };
 
 pqStreamTracerPanel::pqStreamTracerPanel(QWidget* p) :
   base(p),
   Implementation(new pqImplementation(this))
 {
-//  QFrame* const separator = new QFrame();
-//  separator->setFrameShape(QFrame::HLine);
-
   QVBoxLayout* const panel_layout = new QVBoxLayout();
+
+  this->Implementation->Controls.setupUi(
+    &this->Implementation->ControlsContainer);
+  panel_layout->addWidget(&this->Implementation->ControlsContainer);
+
+  connect(
+    &this->Implementation->NamedWidgets,
+    SIGNAL(propertyChanged()),
+    this,
+    SLOT(onQtWidgetChanged()));
+
+  QFrame* const separator = new QFrame();
+  separator->setFrameShape(QFrame::HLine);
+  panel_layout->addWidget(separator);
   
   if(this->Implementation->HandleWidget)
     {
@@ -101,8 +122,6 @@ pqStreamTracerPanel::pqStreamTracerPanel(QWidget* p) :
       SLOT(on3DWidgetChanged()));
     }
     
-//  panel_layout->addWidget(separator);
-
   this->setLayout(panel_layout);
   
   connect(
@@ -120,12 +139,18 @@ pqStreamTracerPanel::~pqStreamTracerPanel()
 
 void pqStreamTracerPanel::on3DWidgetChanged()
 {
-  // Signal the UI that there are changes to accept/reject ...
+  this->getPropertyManager()->propertyChanged();
+}
+
+void pqStreamTracerPanel::onQtWidgetChanged()
+{
   this->getPropertyManager()->propertyChanged();
 }
 
 void pqStreamTracerPanel::onAccepted()
 {
+  this->Implementation->NamedWidgets.accept();
+  
 /*
   // Get the current values from the 3D implicit plane widget ...
   double origin[3] = { 0, 0, 0 };
@@ -202,6 +227,8 @@ void pqStreamTracerPanel::onAccepted()
 
 void pqStreamTracerPanel::onRejected()
 {
+  this->Implementation->NamedWidgets.reset();
+  
 /*
   // Restore the state of the implicit plane widget ...
   double origin[3] = { 0, 0, 0 };
@@ -326,6 +353,9 @@ void pqStreamTracerPanel::setProxyInternal(pqSMProxy p)
 
 void pqStreamTracerPanel::select()
 {
+  this->Implementation->NamedWidgets.link(
+    &this->Implementation->ControlsContainer, this->Proxy);
+
   if(this->Implementation->HandleWidget)
     {
     this->Implementation->HandleWidget->showWidget();
@@ -339,6 +369,9 @@ void pqStreamTracerPanel::select()
 
 void pqStreamTracerPanel::deselect()
 {
+  this->Implementation->NamedWidgets.unlink(
+    &this->Implementation->ControlsContainer, this->Proxy);
+
   if(this->Implementation->HandleWidget)
     {
     this->Implementation->HandleWidget->hideWidget();

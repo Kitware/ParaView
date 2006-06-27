@@ -1,15 +1,15 @@
 /*=========================================================================
 
-   Program:   ParaQ
-   Module:    pqStreamTracerPanel.h
+   Program: ParaView
+   Module:    pqNamedWidgets.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
 
-   ParaQ is a free software; you can redistribute it and/or modify it
-   under the terms of the ParaQ license version 1.1. 
+   ParaView is a free software; you can redistribute it and/or modify it
+   under the terms of the ParaView license version 1.1. 
 
-   See License_v1.1.txt for the full ParaQ license.
+   See License_v1.1.txt for the full ParaView license.
    A copy of this license can be obtained by contacting
    Kitware Inc.
    28 Corporate Drive
@@ -30,40 +30,44 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqStreamTracerPanel_h
-#define _pqStreamTracerPanel_h
+#ifndef _pqNamedWidgets_h
+#define _pqNamedWidgets_h
 
-#include "pqObjectPanel.h"
+#include "pqSMProxy.h"
 
-/// Custom panel for the StreamTracer filter that manages a 3D widget for interactive cutting
-class pqStreamTracerPanel :
-  public pqObjectPanel
+class QWidget;
+class pqPropertyManager;
+
+class pqNamedWidgets :
+  public QObject
 {
-  typedef pqObjectPanel base;
-
   Q_OBJECT
-
-public:
-  pqStreamTracerPanel(QWidget* p);
-  ~pqStreamTracerPanel();
   
+public:
+  pqNamedWidgets();
+  ~pqNamedWidgets();
+
+  /// Link Qt widgets with server manager properties by name
+  void link(QWidget* parent, pqSMProxy proxy);
+  /// Remove links between Qt widgets and server manager properties
+  void unlink(QWidget* parent, pqSMProxy proxy);
+
+signals:
+  /// Signal emitted when changes have been made to a property
+  void propertyChanged();
+
+public slots:
+  /// Accept pending changes
+  void accept();
+  /// Reset pending changes
+  void reset();
+
 private slots:
-  /// Called when changes are made to a 3D widget
-  void on3DWidgetChanged();
-  /// Called when changes are made to a Qt widget
-  void onQtWidgetChanged();
-  /// Called if the user accepts pending modifications
-  void onAccepted();
-  /// Called if the user rejects pending modifications
-  void onRejected();
+  void onPropertyChanged(bool);
 
 private:
-  virtual void setProxyInternal(pqSMProxy p);
-  virtual void select();
-  virtual void deselect();
-
-  class pqImplementation;
-  pqImplementation* const Implementation;
+  pqPropertyManager* const PropertyManager;
 };
 
 #endif
+

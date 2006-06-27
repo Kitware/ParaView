@@ -35,25 +35,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqObjectPanel.h"
 
+class pqNamedWidgets;
+
 /// Base class for Widget which provides an editor for editing properties
 /// of a proxy where child widgets are named after the property they
 /// represent
 class pqNamedObjectPanel : public pqObjectPanel
 {
+  typedef pqObjectPanel Superclass;
+  
   Q_OBJECT
+  
 public:
   /// constructor
   pqNamedObjectPanel(QWidget* p);
   /// destructor
   ~pqNamedObjectPanel();
 
+  virtual void accept();
+  virtual void reset();
+
 protected:
   /// populate widgets with properties from the server manager
   virtual void linkServerManagerProperties();
-  /// set the properties in the server manager with properties in the
-  /// widgets
+  /// set the properties in the server manager with properties in the widgets
   virtual void unlinkServerManagerProperties();
 
+private:
+  pqNamedWidgets* const NamedWidgets;
 };
 
 #endif
