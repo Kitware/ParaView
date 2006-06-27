@@ -43,7 +43,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.140");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.141");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -86,18 +86,25 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   // Create a default (generic) interactor, which is pretty much
   // the only way to interact with a VTK Tk render widget
 
-  this->Interactor = vtkKWGenericRenderWindowInteractor::New();
-  this->Interactor->SetRenderWidget(this);
-  this->Interactor->SetRenderWindow(this->RenderWindow);
+  vtkKWGenericRenderWindowInteractor *interactor = 
+    vtkKWGenericRenderWindowInteractor::New();
+  interactor->SetRenderWidget(this);
+  interactor->SetRenderWindow(this->RenderWindow);
+  this->RenderWindow->SetInteractor(interactor);
+  interactor->Delete();
+
   this->InteractorTimerToken = NULL;
 
   // Switch to trackball style, it's nicer
 
-  vtkInteractorStyleSwitch *istyle = vtkInteractorStyleSwitch::SafeDownCast(
-    this->Interactor->GetInteractorStyle());
-  if (istyle)
+  if (this->GetRenderWindowInteractor())
     {
-    istyle->SetCurrentStyleToTrackballCamera();
+    vtkInteractorStyleSwitch *istyle = vtkInteractorStyleSwitch::SafeDownCast(
+      this->GetRenderWindowInteractor()->GetInteractorStyle());
+    if (istyle)
+      {
+      istyle->SetCurrentStyleToTrackballCamera();
+      }
     }
 
   // Corner annotation
@@ -162,6 +169,7 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
     this->RenderWindow = NULL;
     }
 
+  /*
   if (this->Interactor)
     {
     this->Interactor->SetRenderWidget(NULL);
@@ -169,6 +177,7 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
     this->Interactor->Delete();
     this->Interactor = NULL;
     }
+  */
 
   if (this->InteractorTimerToken)
     {
@@ -302,6 +311,16 @@ void vtkKWRenderWidget::CreateDefaultRenderers()
     this->AddOverlayRenderer(renderer);
     renderer->Delete();
     }
+}
+
+//----------------------------------------------------------------------------
+vtkRenderWindowInteractor* vtkKWRenderWidget::GetRenderWindowInteractor()
+{
+  if (this->RenderWindow)
+    {
+    return this->RenderWindow->GetInteractor();
+    }
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -744,6 +763,7 @@ void vtkKWRenderWidget::AddBindings()
     
     this->VTKWidget->SetBinding("<Expose>", this, "ExposeCallback");
     this->VTKWidget->SetBinding("<Enter>", this, "EnterCallback %x %y");
+    this->VTKWidget->SetBinding("<Leave>", this, "LeaveCallback %x %y");
     this->VTKWidget->SetBinding("<FocusIn>", this, "FocusInCallback");
     this->VTKWidget->SetBinding("<FocusOut>", this, "FocusOutCallback");
     }
@@ -778,6 +798,7 @@ void vtkKWRenderWidget::RemoveBindings()
     {
     this->VTKWidget->RemoveBinding("<Expose>");
     this->VTKWidget->RemoveBinding("<Enter>");
+    this->VTKWidget->RemoveBinding("<Leave>");
     this->VTKWidget->RemoveBinding("<FocusIn>");
     this->VTKWidget->RemoveBinding("<FocusOut>");
     }
@@ -923,23 +944,46 @@ void vtkKWRenderWidget::RemoveInteractionBindings()
 void vtkKWRenderWidget::MouseMoveCallback(
   int vtkNotUsed(num), int x, int y, int ctrl, int shift)
 {
-  this->Interactor->SetEventInformationFlipY(x, y, ctrl, shift);
-  this->Interactor->MouseMoveEvent();
+  vtkRenderWindowInteractor *interactor = this->GetRenderWindowInteractor();
+  if (!interactor)
+    {
+    return;
+    }
+
+  interactor->SetEventInformationFlipY(x, y, ctrl, shift);
+
+  vtkGenericRenderWindowInteractor *gen_interactor = 
+    vtkGenericRenderWindowInteractor::SafeDownCast(interactor);
+  if (gen_interactor)
+    {
+    gen_interactor->MouseMoveEvent();
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::MouseWheelCallback(int delta, int ctrl, int shift)
 {
-  this->Interactor->SetControlKey(ctrl);
-  this->Interactor->SetShiftKey(shift);
-
-  if (delta < 0)
+  vtkRenderWindowInteractor *interactor = this->GetRenderWindowInteractor();
+  if (!interactor)
     {
-    this->Interactor->MouseWheelBackwardEvent();
+    return;
     }
-  else
+
+  interactor->SetControlKey(ctrl);
+  interactor->SetShiftKey(shift);
+
+  vtkGenericRenderWindowInteractor *gen_interactor = 
+    vtkGenericRenderWindowInteractor::SafeDownCast(interactor);
+  if (gen_interactor)
     {
-    this->Interactor->MouseWheelForwardEvent();
+    if (delta < 0)
+      {
+      gen_interactor->MouseWheelBackwardEvent();
+      }
+    else
+      {
+      gen_interactor->MouseWheelForwardEvent();
+      }
     }
 }
 
@@ -948,6 +992,12 @@ void vtkKWRenderWidget::MouseButtonPressCallback(
   int num, int x, int y, int ctrl, int shift, int repeat)
 {
   this->VTKWidget->Focus();
+
+  vtkRenderWindowInteractor *interactor = this->GetRenderWindowInteractor();
+  if (!interactor)
+    {
+    return;
+    }
   
   if (this->UseContextMenu && num == 3 && repeat == 0)
     {
@@ -971,19 +1021,24 @@ void vtkKWRenderWidget::MouseButtonPressCallback(
     }
   else
     {
-    this->Interactor->SetEventInformationFlipY(x, y, ctrl, shift, 0, repeat);
-    
-    switch (num)
+    interactor->SetEventInformationFlipY(x, y, ctrl, shift, 0, repeat);
+
+    vtkGenericRenderWindowInteractor *gen_interactor = 
+      vtkGenericRenderWindowInteractor::SafeDownCast(interactor);
+    if (gen_interactor)
       {
-      case 1:
-        this->Interactor->LeftButtonPressEvent();
-        break;
-      case 2:
-        this->Interactor->MiddleButtonPressEvent();
-        break;
-      case 3:
-        this->Interactor->RightButtonPressEvent();
-        break;
+      switch (num)
+        {
+        case 1:
+          gen_interactor->LeftButtonPressEvent();
+          break;
+        case 2:
+          gen_interactor->MiddleButtonPressEvent();
+          break;
+        case 3:
+          gen_interactor->RightButtonPressEvent();
+          break;
+        }
       }
     }
 }
@@ -992,19 +1047,30 @@ void vtkKWRenderWidget::MouseButtonPressCallback(
 void vtkKWRenderWidget::MouseButtonReleaseCallback(
   int num, int x, int y, int ctrl, int shift)
 {
-  this->Interactor->SetEventInformationFlipY(x, y, ctrl, shift);
-  
-  switch (num)
+  vtkRenderWindowInteractor *interactor = this->GetRenderWindowInteractor();
+  if (!interactor)
     {
-    case 1:
-      this->Interactor->LeftButtonReleaseEvent();
-      break;
-    case 2:
-      this->Interactor->MiddleButtonReleaseEvent();
-      break;
-    case 3:
-      this->Interactor->RightButtonReleaseEvent();
-      break;
+    return;
+    }
+
+  interactor->SetEventInformationFlipY(x, y, ctrl, shift);
+  
+  vtkGenericRenderWindowInteractor *gen_interactor = 
+    vtkGenericRenderWindowInteractor::SafeDownCast(interactor);
+  if (gen_interactor)
+    {
+    switch (num)
+      {
+      case 1:
+        gen_interactor->LeftButtonReleaseEvent();
+        break;
+      case 2:
+        gen_interactor->MiddleButtonReleaseEvent();
+        break;
+      case 3:
+        gen_interactor->RightButtonReleaseEvent();
+        break;
+      }
     }
 }
 
@@ -1014,25 +1080,80 @@ void vtkKWRenderWidget::KeyPressCallback(char key,
                                          int ctrl, int shift,
                                          char *keysym)
 {
-  this->Interactor->SetEventInformationFlipY(
-    x, y, ctrl, shift, key, 0, keysym);
-  this->Interactor->CharEvent();
+  vtkRenderWindowInteractor *interactor = this->GetRenderWindowInteractor();
+  if (!interactor)
+    {
+    return;
+    }
+
+  interactor->SetEventInformationFlipY(x, y, ctrl, shift, key, 0, keysym);
+
+  vtkGenericRenderWindowInteractor *gen_interactor = 
+    vtkGenericRenderWindowInteractor::SafeDownCast(interactor);
+  if (gen_interactor)
+    {
+    gen_interactor->CharEvent();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::EnterCallback(int x, int y)
+{
+  vtkRenderWindowInteractor *interactor = this->GetRenderWindowInteractor();
+  if (!interactor)
+    {
+    return;
+    }
+
+  interactor->SetEventInformationFlipY(x, y);
+
+  vtkGenericRenderWindowInteractor *gen_interactor = 
+    vtkGenericRenderWindowInteractor::SafeDownCast(interactor);
+  if (gen_interactor)
+    {
+    gen_interactor->EnterEvent();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::LeaveCallback(int x, int y)
+{
+  vtkRenderWindowInteractor *interactor = this->GetRenderWindowInteractor();
+  if (!interactor)
+    {
+    return;
+    }
+
+  interactor->SetEventInformationFlipY(x, y);
+
+  vtkGenericRenderWindowInteractor *gen_interactor = 
+    vtkGenericRenderWindowInteractor::SafeDownCast(interactor);
+  if (gen_interactor)
+    {
+    gen_interactor->LeaveEvent();
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::ConfigureCallback(int width, int height)
 {
+  vtkRenderWindowInteractor *interactor = this->GetRenderWindowInteractor();
+  if (!interactor)
+    {
+    return;
+    }
+
   // When calling the superclass's SetWidth or SetHeight, the
   // other field will be set to 1 (i.e. a width/height of 0 for a Tk frame
   // translates to a size 1 in that dimension). Fix that.
 
   if (width <= 1)
     {
-    width = this->Interactor->GetSize()[0];
+    width = interactor->GetSize()[0];
     }
   if (height <= 1)
     {
-    height = this->Interactor->GetSize()[1];
+    height = interactor->GetSize()[1];
     }
   //Interactor->GetSize() can return 0. in that case set
   //the size to 1.
@@ -1059,8 +1180,14 @@ void vtkKWRenderWidget::ConfigureCallback(int width, int height)
 
   // Propagate to the interactor too, for safety
 
-  this->Interactor->UpdateSize(width, height);
-  this->Interactor->ConfigureEvent();
+  interactor->UpdateSize(width, height);
+
+  vtkGenericRenderWindowInteractor *gen_interactor = 
+    vtkGenericRenderWindowInteractor::SafeDownCast(interactor);
+  if (gen_interactor)
+    {
+    gen_interactor->ConfigureEvent();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1074,6 +1201,15 @@ void vtkKWRenderWidget::ExposeCallback()
   this->InExpose = 1;
   this->GetApplication()->ProcessPendingEvents();
   this->Render();
+
+  vtkRenderWindowInteractor *interactor = this->GetRenderWindowInteractor();
+  vtkGenericRenderWindowInteractor *gen_interactor = 
+    vtkGenericRenderWindowInteractor::SafeDownCast(interactor);
+  if (gen_interactor)
+    {
+    gen_interactor->ExposeEvent();
+    }
+
   this->InExpose = 0;
 }
 
@@ -1593,10 +1729,14 @@ void vtkKWRenderWidget::AddCallbackCommandObservers()
 {
   this->Superclass::AddCallbackCommandObservers();
 
-  this->AddCallbackCommandObserver(
-    this->Interactor, vtkCommand::CreateTimerEvent);
-  this->AddCallbackCommandObserver(
-    this->Interactor, vtkCommand::DestroyTimerEvent);
+  vtkRenderWindowInteractor *interactor = this->GetRenderWindowInteractor();
+  if (interactor)
+    {
+    this->AddCallbackCommandObserver(
+      interactor, vtkCommand::CreateTimerEvent);
+    this->AddCallbackCommandObserver(
+      interactor, vtkCommand::DestroyTimerEvent);
+    }
 
   this->AddCallbackCommandObserver(
     this->RenderWindow, vtkCommand::CursorChangedEvent);
@@ -1607,10 +1747,14 @@ void vtkKWRenderWidget::RemoveCallbackCommandObservers()
 {
   this->Superclass::RemoveCallbackCommandObservers();
 
-  this->RemoveCallbackCommandObserver(
-    this->Interactor, vtkCommand::CreateTimerEvent);
-  this->RemoveCallbackCommandObserver(
-    this->Interactor, vtkCommand::DestroyTimerEvent);
+  vtkRenderWindowInteractor *interactor = this->GetRenderWindowInteractor();
+  if (interactor)
+    {
+    this->RemoveCallbackCommandObserver(
+      interactor, vtkCommand::CreateTimerEvent);
+    this->RemoveCallbackCommandObserver(
+      interactor, vtkCommand::DestroyTimerEvent);
+    }
 
   this->RemoveCallbackCommandObserver(
     this->RenderWindow, vtkCommand::CursorChangedEvent);
@@ -1623,7 +1767,8 @@ void vtkKWRenderWidget::ProcessCallbackCommandEvents(vtkObject *caller,
 {
   // Handle the timer event for the generic interactor
 
-  if (caller == this->Interactor)
+  vtkRenderWindowInteractor *interactor = this->GetRenderWindowInteractor();
+  if (caller == interactor)
     {
     switch (event)
       {

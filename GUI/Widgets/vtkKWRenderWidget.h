@@ -29,13 +29,13 @@
 
 class vtkCamera;
 class vtkCornerAnnotation;
-class vtkKWGenericRenderWindowInteractor;
 class vtkProp;
 class vtkRenderWindow;
 class vtkRenderer;
 class vtkTextActor;
 class vtkKWMenu;
 class vtkKWRenderWidgetInternals;
+class vtkRenderWindowInteractor;
 
 class KWWidgets_EXPORT vtkKWRenderWidget : public vtkKWCompositeWidget
 {
@@ -166,8 +166,9 @@ public:
   vtkGetStringMacro(DistanceUnits);
   
   // Description:
-  // Get the render window
+  // Get the render window, get the renderwindow interactor
   vtkGetObjectMacro(RenderWindow, vtkRenderWindow);
+  virtual vtkRenderWindowInteractor* GetRenderWindowInteractor();
 
   // Description:
   // Get the VTK widget
@@ -303,7 +304,8 @@ public:
     char key, int x, int y, int ctrl, int shift, char *keysym);
   virtual void ConfigureCallback(int width, int height);
   virtual void ExposeCallback();
-  virtual void EnterCallback(int /*x*/, int /*y*/) {};
+  virtual void EnterCallback(int x, int y);
+  virtual void LeaveCallback(int x, int y);
   virtual void FocusInCallback();
   virtual void FocusOutCallback();
 
@@ -317,7 +319,6 @@ protected:
 
   vtkKWCoreWidget                    *VTKWidget;
   vtkRenderWindow                    *RenderWindow;
-  vtkKWGenericRenderWindowInteractor *Interactor;
   vtkCornerAnnotation                *CornerAnnotation;
   vtkTextActor                       *HeaderAnnotation;
   
