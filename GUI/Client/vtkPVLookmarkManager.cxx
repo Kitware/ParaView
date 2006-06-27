@@ -69,7 +69,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.83");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.84");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -1393,6 +1393,32 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(int locationOfLmkItemAm
         }
       this->GetPVWindow()->GetCurrentPVReaderModule()->SetVisibility(1);
       }
+/*
+    vtkPVSource *cubeSource = this->GetPVWindow()->CreatePVSource("CubeSource");
+    vtkPVVectorEntry *cubeCenter = vtkPVVectorEntry::SafeDownCast(cubeSource->GetPVWidget("Center"));
+    vtkPVThumbWheel *wheel = vtkPVThumbWheel::SafeDownCast(cubeSource->GetPVWidget("XLength"));
+    vtkPVThumbWheel *wheel = vtkPVThumbWheel::SafeDownCast(cubeSource->GetPVWidget("YLength"));
+    vtkPVThumbWheel *wheel = vtkPVThumbWheel::SafeDownCast(cubeSource->GetPVWidget("ZLength"));
+    
+    cubeSource->GetPVWidget("XLength");
+    cubeSource->GetPVWidget("XLength");
+    cubeSource->GetPVWidget("XLength");
+set kw(vtkTemp1940) [$kw(vtkTemp2) CreatePVSource CubeSource]
+$kw(vtkTemp1940) SetLabel {Cube1}
+set kw(vtkTemp1941) [$kw(vtkTemp1940) GetPVWidget {XLength}]
+$kw(vtkTemp1941) SetValue 1
+set kw(vtkTemp1948) [$kw(vtkTemp1940) GetPVWidget {YLength}]
+$kw(vtkTemp1948) SetValue 1
+set kw(vtkTemp1955) [$kw(vtkTemp1940) GetPVWidget {ZLength}]
+$kw(vtkTemp1955) SetValue 1
+set kw(vtkTemp1962) [$kw(vtkTemp1940) GetPVWidget {Center}]
+$kw(vtkTemp1962) SetValue 0 0 0
+$kw(vtkTemp1940) AcceptCallback
+# Saving state of the Display Proxy associated with the source
+set pvDisp(vtkTemp1940) [$kw(vtkTemp1940) GetDisplayProxy] 
+catch {[$pvDisp(vtkTemp1940) GetProperty LODResolution] SetElement 0 110}
+catch {[$pvDisp(vtkTemp1940) GetProperty Representation] SetElement 0 3}
+*/
 
     newCenter[0]= newBounds[0] + (newBounds[1] - newBounds[0])/2;
     newCenter[1]= newBounds[2] + (newBounds[3] - newBounds[2])/2;
@@ -1426,8 +1452,8 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(int locationOfLmkItemAm
       }
 
     //lookmarkWidget->UpdateWidgetValues();
-    lookmarkWidget->SetBoundingBoxFlag(1);
-    lookmarkWidget->SetBounds(newBounds);
+    lookmarkWidget->SetBoundingBoxFlag(0);
+    //lookmarkWidget->SetBounds(newBounds);
     lookmarkWidget->UpdateWidgetValues();
     lookmarkWidget->SetLocation(locationOfLmkItemAmongSiblings);
 
