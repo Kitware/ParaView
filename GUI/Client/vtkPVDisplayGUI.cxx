@@ -102,7 +102,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.66");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.67");
 
 //----------------------------------------------------------------------------
 
@@ -1764,6 +1764,7 @@ void vtkPVDisplayGUI::UpdateMapScalarsCheck()
         { // I would like to have two as an option also ...
         // One component causes more trouble than it is worth.
         this->MapScalarsCheckVisible = 1;
+        this->MapScalarsCheck->SetEnabled(1);
         this->MapScalarsCheck->SetSelectedState(
           this->PVSource->GetDisplayProxy()->GetColorModeCM());
         }
