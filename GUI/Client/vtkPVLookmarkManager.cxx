@@ -69,7 +69,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.85");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.86");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -1214,10 +1214,21 @@ void vtkPVLookmarkManager::ImportBoundingBoxFile(vtkPVReaderModule *reader, vtkP
   ostrstream msg;
 
 
-  
+ 
   infile = new ifstream(boundingBoxFileName);
 
-  filename = reader->RemovePath(boundingBoxFileName);
+  // A workaround to allow boundingBoxFileName to consist of no preceding path (or even "./")
+  const char* tempfilename = reader->RemovePath(boundingBoxFileName);
+  if(tempfilename)
+    {
+    filename = tempfilename;
+    }
+  else
+    {
+    filename = boundingBoxFileName;
+    }
+
+  //filename = reader->RemovePath(boundingBoxFileName);
   idx = filename.find_last_of('.',filename.size());
   filename.erase(idx,filename.size()-idx);
 
