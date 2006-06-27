@@ -41,11 +41,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QAbstractListModel>
 #include <QAbstractProxyModel>
 #include <QMessageBox>
+#include <QModelIndex>
+#include <QList>
+#include <QPersistentModelIndex>
 #include <QString>
 #include <QStringList>
 
 
-class pqAddSourceDialogForm : public Ui::pqAddSourceDialog {};
+class pqAddSourceDialogForm : public Ui::pqAddSourceDialog
+{
+public:
+  QList<QPersistentModelIndex> BackHistory;
+};
 
 
 pqAddSourceDialog::pqAddSourceDialog(QWidget *widgetParent)
@@ -126,6 +133,11 @@ void pqAddSourceDialog::setSourceList(QAbstractItemModel *sources)
     this->Form->SourceGroup->addItem(QIcon(":/pqWidgets/pqFolder16.png"), "Filters");
     this->Form->SourceGroup->setCurrentIndex(0);
 
+    // Reset the back button history.
+    this->Form->BackHistory.clear();
+    this->Form->BackHistory.append(QPersistentModelIndex());
+    this->Form->BackButton->setEnabled(false);
+
     // Listen to the selection events from the view.
     QItemSelectionModel *selection = this->Form->SourceList->selectionModel();
     QObject::connect(selection,
@@ -198,6 +210,14 @@ void pqAddSourceDialog::setPath(const QString &path)
   if(rootIndex != this->Form->SourceList->rootIndex())
     {
     this->changeRoot(rootIndex);
+
+    // This should be the starting root index, so clear the previous
+    // history.
+    if(this->Form->BackHistory.size() == 2)
+      {
+      this->Form->BackHistory.removeFirst();
+      this->Form->BackButton->setEnabled(false);
+      }
     }
 }
 
@@ -208,6 +228,19 @@ void pqAddSourceDialog::setSource(const QString &name)
 
 void pqAddSourceDialog::navigateBack()
 {
+  if(this->Form->BackHistory.size() > 1)
+    {
+    // Take the last index off the list. Then, set the previous index
+    // as the root index.
+    this->Form->BackHistory.removeLast();
+    this->changeRoot(this->Form->BackHistory.last());
+
+    // Remove the duplicate added when setting the root index.
+    this->Form->BackHistory.removeLast();
+
+    // Disable the button if the list has only one item.
+    this->Form->BackButton->setEnabled(this->Form->BackHistory.size() > 1);
+    }
 }
 
 void pqAddSourceDialog::navigateUp()
@@ -222,10 +255,12 @@ void pqAddSourceDialog::navigateUp()
 
 void pqAddSourceDialog::addFolder()
 {
+  // TODO
 }
 
 void pqAddSourceDialog::addFavorite()
 {
+  // TODO
 }
 
 void pqAddSourceDialog::validateChoice()
@@ -274,6 +309,10 @@ void pqAddSourceDialog::changeRoot(const QModelIndex &index)
   // Change the root index for the source list.
   this->Form->SourceList->setRootIndex(index);
 
+  // Update the back button history.
+  this->Form->BackHistory.append(index);
+  this->Form->BackButton->setEnabled(true);
+
   // Get the path for the specified index. Use the path list to set up
   // the group combobox.
   QStringList path;
@@ -312,6 +351,10 @@ void pqAddSourceDialog::changeRoot(int index)
 
   // Change the root index for the source list.
   this->Form->SourceList->setRootIndex(rootIndex);
+
+  // Update the back button history.
+  this->Form->BackHistory.append(rootIndex);
+  this->Form->BackButton->setEnabled(true);
 }
 
 void pqAddSourceDialog::updateFromSources(const QModelIndex &current,
