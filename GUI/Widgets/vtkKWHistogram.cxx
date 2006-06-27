@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWHistogram);
-vtkCxxRevisionMacro(vtkKWHistogram, "1.9");
+vtkCxxRevisionMacro(vtkKWHistogram, "1.10");
 
 //----------------------------------------------------------------------------
 vtkKWHistogram::vtkKWHistogram()
@@ -535,7 +535,8 @@ void vtkKWHistogram::UpdateHistogram(vtkDataArray *scalars,
   this->InvokeEvent(vtkCommand::ProgressEvent, &progress);
 
   this->Bins->Modified();
-
+  this->Modified();
+    
   this->InvokeEvent(vtkCommand::EndEvent, NULL);
 }
 
