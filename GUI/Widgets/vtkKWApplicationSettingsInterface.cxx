@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.57");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.58");
 
 //----------------------------------------------------------------------------
 vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
@@ -65,8 +65,8 @@ vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
   // Toolbar settings
 
   this->ToolbarSettingsFrame = 0;
-  this->FlatFrameCheckButton = 0;
-  this->FlatButtonsCheckButton = 0;
+  this->FlatToolbarsCheckButton = 0;
+  this->FlatToolbarWidgetsCheckButton = 0;
 
   // Print settings
 
@@ -139,16 +139,16 @@ vtkKWApplicationSettingsInterface::~vtkKWApplicationSettingsInterface()
     this->ToolbarSettingsFrame = NULL;
     }
 
-  if (this->FlatFrameCheckButton)
+  if (this->FlatToolbarsCheckButton)
     {
-    this->FlatFrameCheckButton->Delete();
-    this->FlatFrameCheckButton = NULL;
+    this->FlatToolbarsCheckButton->Delete();
+    this->FlatToolbarsCheckButton = NULL;
     }
 
-  if (this->FlatButtonsCheckButton)
+  if (this->FlatToolbarWidgetsCheckButton)
     {
-    this->FlatButtonsCheckButton->Delete();
-    this->FlatButtonsCheckButton = NULL;
+    this->FlatToolbarWidgetsCheckButton->Delete();
+    this->FlatToolbarWidgetsCheckButton = NULL;
     }
 
   // Print settings
@@ -397,39 +397,39 @@ void vtkKWApplicationSettingsInterface::Create()
   // --------------------------------------------------------------
   // Toolbar settings : flat frame
 
-  if (!this->FlatFrameCheckButton)
+  if (!this->FlatToolbarsCheckButton)
     {
-    this->FlatFrameCheckButton = vtkKWCheckButton::New();
+    this->FlatToolbarsCheckButton = vtkKWCheckButton::New();
     }
 
-  this->FlatFrameCheckButton->SetParent(frame);
-  this->FlatFrameCheckButton->Create();
-  this->FlatFrameCheckButton->SetText(
+  this->FlatToolbarsCheckButton->SetParent(frame);
+  this->FlatToolbarsCheckButton->Create();
+  this->FlatToolbarsCheckButton->SetText(
     ks_("Application Settings|Toolbar Settings|Flat frame"));
-  this->FlatFrameCheckButton->SetCommand(this, "FlatFrameCallback");
-  this->FlatFrameCheckButton->SetBalloonHelpString(
+  this->FlatToolbarsCheckButton->SetCommand(this, "FlatToolbarsCallback");
+  this->FlatToolbarsCheckButton->SetBalloonHelpString(
     k_("Display the toolbar frames using a flat aspect."));  
 
-  tk_cmd << "pack " << this->FlatFrameCheckButton->GetWidgetName()
+  tk_cmd << "pack " << this->FlatToolbarsCheckButton->GetWidgetName()
          << "  -side top -anchor w -expand no -fill none" << endl;
 
   // --------------------------------------------------------------
   // Toolbar settings : flat buttons
 
-  if (!this->FlatButtonsCheckButton)
+  if (!this->FlatToolbarWidgetsCheckButton)
     {
-    this->FlatButtonsCheckButton = vtkKWCheckButton::New();
+    this->FlatToolbarWidgetsCheckButton = vtkKWCheckButton::New();
     }
 
-  this->FlatButtonsCheckButton->SetParent(frame);
-  this->FlatButtonsCheckButton->Create();
-  this->FlatButtonsCheckButton->SetText(
+  this->FlatToolbarWidgetsCheckButton->SetParent(frame);
+  this->FlatToolbarWidgetsCheckButton->Create();
+  this->FlatToolbarWidgetsCheckButton->SetText(
     ks_("Application Settings|Toolbar Settings|Flat buttons"));
-  this->FlatButtonsCheckButton->SetCommand(this, "FlatButtonsCallback");
-  this->FlatButtonsCheckButton->SetBalloonHelpString(
+  this->FlatToolbarWidgetsCheckButton->SetCommand(this, "FlatToolbarWidgetsCallback");
+  this->FlatToolbarWidgetsCheckButton->SetBalloonHelpString(
     k_("Display the toolbar buttons using a flat aspect."));  
   
-  tk_cmd << "pack " << this->FlatButtonsCheckButton->GetWidgetName()
+  tk_cmd << "pack " << this->FlatToolbarWidgetsCheckButton->GetWidgetName()
          << "  -side top -anchor w -expand no -fill none" << endl;
 
   // --------------------------------------------------------------
@@ -572,18 +572,38 @@ void vtkKWApplicationSettingsInterface::Update()
 
   // Toolbar settings : flat frame
 
-  if (FlatFrameCheckButton)
+  if (this->FlatToolbarsCheckButton)
     {
-    this->FlatFrameCheckButton->SetSelectedState(
-      vtkKWToolbar::GetGlobalFlatAspect());
+    switch (vtkKWToolbar::GetGlobalToolbarAspect())
+      {
+      case vtkKWToolbar::ToolbarAspectFlat:
+        this->FlatToolbarsCheckButton->SetSelectedState(1);
+        break;
+      case vtkKWToolbar::ToolbarAspectRelief:
+        this->FlatToolbarsCheckButton->SetSelectedState(0);
+        break;
+      }
+    this->FlatToolbarsCheckButton->SetEnabled(
+      (vtkKWToolbar::GetGlobalToolbarAspect() == 
+       vtkKWToolbar::ToolbarAspectUnChanged) ? 0 : this->GetEnabled());
     }
 
   // Toolbar settings : flat buttons
 
-  if (FlatButtonsCheckButton)
+  if (this->FlatToolbarWidgetsCheckButton)
     {
-    this->FlatButtonsCheckButton->SetSelectedState(
-      vtkKWToolbar::GetGlobalWidgetsFlatAspect());
+    switch (vtkKWToolbar::GetGlobalWidgetsAspect())
+      {
+      case vtkKWToolbar::WidgetsAspectFlat:
+        this->FlatToolbarWidgetsCheckButton->SetSelectedState(1);
+        break;
+      case vtkKWToolbar::WidgetsAspectRelief:
+        this->FlatToolbarWidgetsCheckButton->SetSelectedState(0);
+        break;
+      }
+    this->FlatToolbarWidgetsCheckButton->SetEnabled(
+      (vtkKWToolbar::GetGlobalWidgetsAspect() == 
+       vtkKWToolbar::WidgetsAspectUnChanged) ? 0 : this->GetEnabled());
     }
 
   // Print settings
@@ -683,9 +703,11 @@ void vtkKWApplicationSettingsInterface::ResetDragAndDropCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplicationSettingsInterface::FlatFrameCallback(int state)
+void vtkKWApplicationSettingsInterface::FlatToolbarsCallback(int state)
 {
-  vtkKWToolbar::SetGlobalFlatAspect(state ? 1 : 0);
+  vtkKWToolbar::SetGlobalToolbarAspect(
+    state ? vtkKWToolbar::ToolbarAspectFlat : 
+    vtkKWToolbar::ToolbarAspectRelief);
   if (this->Window)
     {
     this->Window->UpdateToolbarState();
@@ -693,9 +715,11 @@ void vtkKWApplicationSettingsInterface::FlatFrameCallback(int state)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplicationSettingsInterface::FlatButtonsCallback(int state)
+void vtkKWApplicationSettingsInterface::FlatToolbarWidgetsCallback(int state)
 {
-  vtkKWToolbar::SetGlobalWidgetsFlatAspect(state ? 1 : 0);
+  vtkKWToolbar::SetGlobalWidgetsAspect(
+    state ? vtkKWToolbar::WidgetsAspectFlat : 
+    vtkKWToolbar::WidgetsAspectRelief);
   if (this->Window)
     {
     this->Window->UpdateToolbarState();
@@ -767,14 +791,14 @@ void vtkKWApplicationSettingsInterface::UpdateEnableState()
     this->ToolbarSettingsFrame->SetEnabled(this->GetEnabled());
     }
 
-  if (this->FlatFrameCheckButton)
+  if (this->FlatToolbarsCheckButton)
     {
-    this->FlatFrameCheckButton->SetEnabled(this->GetEnabled());
+    this->FlatToolbarsCheckButton->SetEnabled(this->GetEnabled());
     }
 
-  if (this->FlatButtonsCheckButton)
+  if (this->FlatToolbarWidgetsCheckButton)
     {
-    this->FlatButtonsCheckButton->SetEnabled(this->GetEnabled());
+    this->FlatToolbarWidgetsCheckButton->SetEnabled(this->GetEnabled());
     }
 
   // Print settings

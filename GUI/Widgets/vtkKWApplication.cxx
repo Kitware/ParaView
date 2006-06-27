@@ -70,7 +70,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.292");
+vtkCxxRevisionMacro(vtkKWApplication, "1.293");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -889,19 +889,23 @@ void vtkKWApplication::RestoreApplicationSettingsFromRegistry()
   // Toolbar settings
 
   if (this->HasRegistryValue(
-        2, "RunTime", vtkKWToolbar::FlatAspectRegKey))
+        2, "RunTime", vtkKWToolbar::ToolbarAspectRegKey) &&
+    vtkKWToolbar::GetGlobalToolbarAspect() != 
+      vtkKWToolbar::ToolbarAspectUnChanged)
     {
-    vtkKWToolbar::SetGlobalFlatAspect(
+    vtkKWToolbar::SetGlobalToolbarAspect(
       this->GetApplication()->GetIntRegistryValue(
-        2, "RunTime", vtkKWToolbar::FlatAspectRegKey));
+        2, "RunTime", vtkKWToolbar::ToolbarAspectRegKey));
     }
 
   if (this->GetApplication()->HasRegistryValue(
-        2, "RunTime", vtkKWToolbar::WidgetsFlatAspectRegKey))
+        2, "RunTime", vtkKWToolbar::WidgetsAspectRegKey) &&
+    vtkKWToolbar::GetGlobalWidgetsAspect() != 
+      vtkKWToolbar::WidgetsAspectUnChanged)
     {
-    vtkKWToolbar::SetGlobalWidgetsFlatAspect(
+    vtkKWToolbar::SetGlobalWidgetsAspect(
       this->GetApplication()->GetIntRegistryValue(
-        2, "RunTime", vtkKWToolbar::WidgetsFlatAspectRegKey));
+        2, "RunTime", vtkKWToolbar::WidgetsAspectRegKey));
     }
 }
 
@@ -938,13 +942,21 @@ void vtkKWApplication::SaveApplicationSettingsToRegistry()
 
   // Toolbar settings
 
-  this->SetRegistryValue(
-    2, "RunTime", vtkKWToolbar::FlatAspectRegKey, "%d", 
-    vtkKWToolbar::GetGlobalFlatAspect());
+  if (vtkKWToolbar::GetGlobalToolbarAspect() != 
+      vtkKWToolbar::ToolbarAspectUnChanged)
+    {
+    this->SetRegistryValue(
+      2, "RunTime", vtkKWToolbar::ToolbarAspectRegKey, "%d", 
+      vtkKWToolbar::GetGlobalToolbarAspect());
+    }
 
-  this->SetRegistryValue(
-    2, "RunTime", vtkKWToolbar::WidgetsFlatAspectRegKey, "%d", 
-    vtkKWToolbar::GetGlobalWidgetsFlatAspect()); 
+  if (vtkKWToolbar::GetGlobalWidgetsAspect() != 
+      vtkKWToolbar::WidgetsAspectUnChanged)
+    {
+    this->SetRegistryValue(
+      2, "RunTime", vtkKWToolbar::WidgetsAspectRegKey, "%d", 
+      vtkKWToolbar::GetGlobalWidgetsAspect()); 
+    }
 }
 
 //----------------------------------------------------------------------------

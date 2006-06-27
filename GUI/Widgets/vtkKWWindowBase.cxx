@@ -33,7 +33,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.51");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.52");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -1314,10 +1314,10 @@ void vtkKWWindowBase::UpdateToolbarState()
 {
   if (this->MainToolbarSet)
     {
-    this->MainToolbarSet->SetToolbarsFlatAspect(
-      vtkKWToolbar::GetGlobalFlatAspect());
-    this->MainToolbarSet->SetToolbarsWidgetsFlatAspect(
-      vtkKWToolbar::GetGlobalWidgetsFlatAspect());
+    this->MainToolbarSet->SetToolbarsAspect(
+      vtkKWToolbar::GetGlobalToolbarAspect());
+    this->MainToolbarSet->SetToolbarsWidgetsAspect(
+      vtkKWToolbar::GetGlobalWidgetsAspect());
     this->PropagateEnableState(this->MainToolbarSet);
     }
 }

@@ -34,7 +34,7 @@
 
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.280");
+vtkCxxRevisionMacro(vtkKWWindow, "1.281");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -1208,10 +1208,10 @@ void vtkKWWindow::UpdateToolbarState()
 
   if (this->SecondaryToolbarSet)
     {
-    this->SecondaryToolbarSet->SetToolbarsFlatAspect(
-      vtkKWToolbar::GetGlobalFlatAspect());
-    this->SecondaryToolbarSet->SetToolbarsWidgetsFlatAspect(
-      vtkKWToolbar::GetGlobalWidgetsFlatAspect());
+    this->SecondaryToolbarSet->SetToolbarsAspect(
+      vtkKWToolbar::GetGlobalToolbarAspect());
+    this->SecondaryToolbarSet->SetToolbarsWidgetsAspect(
+      vtkKWToolbar::GetGlobalWidgetsAspect());
     this->PropagateEnableState(this->SecondaryToolbarSet);
     }
 }

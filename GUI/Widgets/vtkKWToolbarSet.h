@@ -60,12 +60,16 @@ public:
   virtual void RemoveAllToolbars();
 
   // Description:
-  // Set/Get the flat aspect of the toolbars
-  virtual void SetToolbarsFlatAspect(int);
+  // Set/Get the aspect of the toolbar (flat or 3D GUI style, or unchanged)
+  // Important: this will *not* override the toolbar aspect of a toolbar
+  // which aspect was already set to 'UnChanged'.
+  virtual void SetToolbarsAspect(int);
 
   // Description:
-  // Set/Get the flat aspect of the widgets (flat or 3D GUI style)
-  virtual void SetToolbarsWidgetsFlatAspect(int);
+  // Set/Get the aspect of the widgets (flat, 3D GUI style, or unchanged)
+  // Important: this will *not* override the widgets aspect of a toolbar
+  // which widgets aspect was already set to 'UnChanged'.
+  virtual void SetToolbarsWidgetsAspect(int);
 
   // Description:
   // Set the visibility of a toolbar.

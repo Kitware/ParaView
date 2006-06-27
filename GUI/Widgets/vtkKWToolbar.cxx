@@ -24,37 +24,19 @@
 #include <vtksys/stl/algorithm>
 
 #ifdef _WIN32
-static int vtkKWToolbarGlobalFlatAspect        = 1;
-static int vtkKWToolbarGlobalWidgetsFlatAspect = 1;
+static int vtkKWToolbarGlobalToolbarAspect = vtkKWToolbar::ToolbarAspectFlat;
+static int vtkKWToolbarGlobalWidgetsAspect = vtkKWToolbar::WidgetsAspectFlat;
 #else
-static int vtkKWToolbarGlobalFlatAspect        = 0;
-static int vtkKWToolbarGlobalWidgetsFlatAspect = 0;
+static int vtkKWToolbarGlobalToolbarAspect = vtkKWToolbar::ToolbarAspectRelief;
+static int vtkKWToolbarGlobalWidgetsAspect = vtkKWToolbar::WidgetsAspectRelief;
 #endif
 
-const char *vtkKWToolbar::FlatAspectRegKey = "ToolbarFlatFrame";
-const char *vtkKWToolbar::WidgetsFlatAspectRegKey = "ToolbarFlatButtons";
-
-int vtkKWToolbar::GetGlobalFlatAspect() 
-{ 
-  return vtkKWToolbarGlobalFlatAspect; 
-}
-void vtkKWToolbar::SetGlobalFlatAspect(int val) 
-{ 
-  vtkKWToolbarGlobalFlatAspect = val; 
-};
-
-int vtkKWToolbar::GetGlobalWidgetsFlatAspect() 
-{ 
-  return vtkKWToolbarGlobalWidgetsFlatAspect; 
-}
-void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val) 
-{ 
-  vtkKWToolbarGlobalWidgetsFlatAspect = val; 
-};
+const char *vtkKWToolbar::ToolbarAspectRegKey = "ToolbarFlatFrame";
+const char *vtkKWToolbar::WidgetsAspectRegKey = "ToolbarFlatButtons";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.67");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.68");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarInternals
@@ -73,8 +55,8 @@ vtkKWToolbar::vtkKWToolbar()
   this->Frame   = vtkKWFrame::New();
   this->Handle  = vtkKWFrame::New();
 
-  this->FlatAspect                = vtkKWToolbar::GetGlobalFlatAspect();
-  this->WidgetsFlatAspect         = vtkKWToolbar::GetGlobalWidgetsFlatAspect();
+  this->ToolbarAspect             = vtkKWToolbar::GetGlobalToolbarAspect();
+  this->WidgetsAspect             = vtkKWToolbar::GetGlobalWidgetsAspect();
   this->Resizable                 = 0;
   this->Expanding                 = 0;
 
@@ -497,13 +479,13 @@ void vtkKWToolbar::UpdateWidgetsAspect()
     vtkKWRadioButton *rb = vtkKWRadioButton::SafeDownCast(*it);
     if (pb)
       {
-      if (this->WidgetsFlatAspect)
+      if (this->WidgetsAspect == vtkKWToolbar::WidgetsAspectFlat)
         {
         pb->SetReliefToFlat();
         pb->SetOverReliefToSolid();
         pb->SetBorderWidth(1);
         }
-      else
+      else if (this->WidgetsAspect == vtkKWToolbar::WidgetsAspectRelief)
         {
         pb->SetReliefToRaised();
         pb->SetOverReliefToNone();
@@ -512,14 +494,14 @@ void vtkKWToolbar::UpdateWidgetsAspect()
       }
     else if (cb)
       {
-      if (this->WidgetsFlatAspect)
+      if (this->WidgetsAspect == vtkKWToolbar::WidgetsAspectFlat)
         {
         cb->SetReliefToFlat();
         cb->SetOffReliefToFlat();
         cb->SetOverReliefToSolid();
         cb->SetBorderWidth(1);
         }
-      else
+      else if (this->WidgetsAspect == vtkKWToolbar::WidgetsAspectRelief)
         {
         cb->SetReliefToFlat();
         cb->SetOffReliefToRaised();
@@ -529,14 +511,14 @@ void vtkKWToolbar::UpdateWidgetsAspect()
       }
     else if (rb)
       {
-      if (this->WidgetsFlatAspect)
+      if (this->WidgetsAspect == vtkKWToolbar::WidgetsAspectFlat)
         {
         rb->SetReliefToFlat();
         rb->SetOffReliefToFlat();
         rb->SetOverReliefToSolid();
         rb->SetBorderWidth(1);
         }
-      else
+      else if (this->WidgetsAspect == vtkKWToolbar::WidgetsAspectRelief)
         {
         rb->SetReliefToFlat();
         rb->SetOffReliefToRaised();
@@ -569,7 +551,7 @@ void vtkKWToolbar::ConstrainWidgetsLayout()
       int reqw = 0;
       vtkKWTkUtilities::GetWidgetRequestedSize((*it), &reqw, NULL);
       totReqWidth += this->WidgetsPadX + reqw;
-      if (this->WidgetsFlatAspect)
+      if (this->WidgetsAspect == vtkKWToolbar::WidgetsAspectFlat)
         {
         totReqWidth += this->WidgetsFlatAdditionalPadX;
         }
@@ -596,11 +578,13 @@ void vtkKWToolbar::ConstrainWidgetsLayout()
           << row << " -column " << num << " -sticky news "
           << " -in " << this->GetFrame()->GetWidgetName()
           << " -padx " 
-          << (this->WidgetsPadX + (this->WidgetsFlatAspect ? 
-                            this->WidgetsFlatAdditionalPadX : 0))
+          << (this->WidgetsPadX + 
+              (this->WidgetsAspect == vtkKWToolbar::WidgetsAspectFlat ? 
+               this->WidgetsFlatAdditionalPadX : 0))
           << " -pady "
-          << (this->WidgetsPadY + (this->WidgetsFlatAspect ? 
-                            this->WidgetsFlatAdditionalPadY : 0))
+          << (this->WidgetsPadY + 
+              (this->WidgetsAspect == vtkKWToolbar::WidgetsAspectFlat ? 
+               this->WidgetsFlatAdditionalPadY : 0))
           << endl;
         num++;
         if (num == numPerRow) 
@@ -661,11 +645,13 @@ void vtkKWToolbar::UpdateWidgetsLayout()
   s << " -sticky news -row 0 "
     << " -in " << this->GetFrame()->GetWidgetName()
     << " -padx " 
-    << (this->WidgetsPadX + (this->WidgetsFlatAspect ? 
-                      this->WidgetsFlatAdditionalPadX : 0))
+    << (this->WidgetsPadX + 
+        (this->WidgetsAspect == vtkKWToolbar::WidgetsAspectFlat ? 
+         this->WidgetsFlatAdditionalPadX : 0))
     << " -pady "
-    << (this->WidgetsPadY + (this->WidgetsFlatAspect ? 
-                      this->WidgetsFlatAdditionalPadY : 0))
+    << (this->WidgetsPadY + 
+        (this->WidgetsAspect == vtkKWToolbar::WidgetsAspectFlat ? 
+         this->WidgetsFlatAdditionalPadY : 0))
     << endl;
 
   s << "grid rowconfigure " << this->GetFrame()->GetWidgetName() 
@@ -749,18 +735,23 @@ void vtkKWToolbar::UpdateToolbarFrameAspect()
 
   const char *common_opts = " -side left -anchor nw -fill both -expand n";
 
-  if (this->FlatAspect)
+  if (this->ToolbarAspect == vtkKWToolbar::ToolbarAspectFlat)
     {
     this->SetReliefToFlat();
     this->SetBorderWidth(0);
     this->Script("pack %s -ipadx 0 -ipady 0 -padx 0 -pady 0 %s",
                  this->Frame->GetWidgetName(), common_opts);
     }
-  else
+  else if (this->ToolbarAspect == vtkKWToolbar::ToolbarAspectRelief)
     {
     this->SetReliefToRaised();
     this->SetBorderWidth(1);
     this->Script("pack %s -ipadx 1 -ipady 1 -padx 0 -pady 0 %s",
+                 this->Frame->GetWidgetName(), common_opts);
+    }
+  else
+    {
+    this->Script("pack %s -ipadx 0 -ipady 0 -padx 0 -pady 0 %s",
                  this->Frame->GetWidgetName(), common_opts);
     }
 }
@@ -774,32 +765,130 @@ void vtkKWToolbar::Update()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWToolbar::SetFlatAspect(int f)
+void vtkKWToolbar::SetToolbarAspect(int f)
 {
-  if (this->FlatAspect == f)
+  if (f < vtkKWToolbar::ToolbarAspectRelief)
+    {
+    f = vtkKWToolbar::ToolbarAspectRelief;
+    }
+  else if (f > vtkKWToolbar::ToolbarAspectUnChanged)
+    {
+    f = vtkKWToolbar::ToolbarAspectUnChanged;
+    }
+
+  if (this->ToolbarAspect == f)
     {
     return;
     }
 
-  this->FlatAspect = f;
+  this->ToolbarAspect = f;
   this->Modified();
 
   this->UpdateToolbarFrameAspect();
   this->UpdateWidgets();
 }
 
-//----------------------------------------------------------------------------
-void vtkKWToolbar::SetWidgetsFlatAspect(int f)
+void vtkKWToolbar::SetToolbarAspectToFlat()
 {
-  if (this->WidgetsFlatAspect == f)
+  this->SetToolbarAspect(vtkKWToolbar::ToolbarAspectFlat);
+}
+
+void vtkKWToolbar::SetToolbarAspectToRelief()
+{
+  this->SetToolbarAspect(vtkKWToolbar::ToolbarAspectRelief);
+}
+
+void vtkKWToolbar::SetToolbarAspectToUnChanged()
+{
+  this->SetToolbarAspect(vtkKWToolbar::ToolbarAspectUnChanged);
+}
+
+int vtkKWToolbar::GetGlobalToolbarAspect() 
+{ 
+  return vtkKWToolbarGlobalToolbarAspect; 
+}
+
+void vtkKWToolbar::SetGlobalToolbarAspect(int val) 
+{ 
+  vtkKWToolbarGlobalToolbarAspect = val; 
+};
+
+void vtkKWToolbar::SetGlobalToolbarAspectToFlat()
+{
+  vtkKWToolbar::SetGlobalToolbarAspect(vtkKWToolbar::ToolbarAspectFlat);
+}
+
+void vtkKWToolbar::SetGlobalToolbarAspectToRelief()
+{
+  vtkKWToolbar::SetGlobalToolbarAspect(vtkKWToolbar::ToolbarAspectRelief);
+}
+
+void vtkKWToolbar::SetGlobalToolbarAspectToUnChanged()
+{
+  vtkKWToolbar::SetGlobalToolbarAspect(vtkKWToolbar::ToolbarAspectUnChanged);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbar::SetWidgetsAspect(int f)
+{
+  if (f < vtkKWToolbar::WidgetsAspectRelief)
+    {
+    f = vtkKWToolbar::WidgetsAspectRelief;
+    }
+  else if (f > vtkKWToolbar::WidgetsAspectUnChanged)
+    {
+    f = vtkKWToolbar::WidgetsAspectUnChanged;
+    }
+
+  if (this->WidgetsAspect == f)
     {
     return;
     }
 
-  this->WidgetsFlatAspect = f;
+  this->WidgetsAspect = f;
   this->Modified();
 
   this->UpdateWidgets();
+}
+
+void vtkKWToolbar::SetWidgetsAspectToFlat()
+{
+  this->SetWidgetsAspect(vtkKWToolbar::WidgetsAspectFlat);
+}
+
+void vtkKWToolbar::SetWidgetsAspectToRelief()
+{
+  this->SetWidgetsAspect(vtkKWToolbar::WidgetsAspectRelief);
+}
+
+void vtkKWToolbar::SetWidgetsAspectToUnChanged()
+{
+  this->SetWidgetsAspect(vtkKWToolbar::WidgetsAspectUnChanged);
+}
+
+int vtkKWToolbar::GetGlobalWidgetsAspect() 
+{ 
+  return vtkKWToolbarGlobalWidgetsAspect; 
+}
+
+void vtkKWToolbar::SetGlobalWidgetsAspect(int val) 
+{ 
+  vtkKWToolbarGlobalWidgetsAspect = val; 
+};
+
+void vtkKWToolbar::SetGlobalWidgetsAspectToFlat()
+{
+  vtkKWToolbar::SetGlobalWidgetsAspect(vtkKWToolbar::WidgetsAspectFlat);
+}
+
+void vtkKWToolbar::SetGlobalWidgetsAspectToRelief()
+{
+  vtkKWToolbar::SetGlobalWidgetsAspect(vtkKWToolbar::WidgetsAspectRelief);
+}
+
+void vtkKWToolbar::SetGlobalWidgetsAspectToUnChanged()
+{
+  vtkKWToolbar::SetGlobalWidgetsAspect(vtkKWToolbar::WidgetsAspectUnChanged);
 }
 
 //----------------------------------------------------------------------------
@@ -837,8 +926,8 @@ void vtkKWToolbar::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Frame: " << this->Frame << endl;
   os << indent << "Resizable: " << (this->Resizable ? "On" : "Off") << endl;
-  os << indent << "FlatAspect: " << (this->FlatAspect ? "On" : "Off") << endl;
-  os << indent << "WidgetsFlatAspect: " << (this->WidgetsFlatAspect ? "On" : "Off") << endl;
+  os << indent << "ToolbarAspect: " << this->ToolbarAspect << endl;
+  os << indent << "WidgetsAspect: " << this->WidgetsAspect << endl;
   os << indent << "WidgetsPadX: " << this->WidgetsPadX << endl;
   os << indent << "WidgetsPadY: " << this->WidgetsPadY << endl;
   os << indent << "WidgetsFlatAdditionalPadX: " << this->WidgetsFlatAdditionalPadX << endl;

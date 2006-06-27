@@ -68,8 +68,8 @@ public:
   virtual void SplashScreenVisibilityCallback(int state);
   virtual void BalloonHelpVisibilityCallback(int state);
   virtual void ResetDragAndDropCallback();
-  virtual void FlatFrameCallback(int state);
-  virtual void FlatButtonsCallback(int state);
+  virtual void FlatToolbarsCallback(int state);
+  virtual void FlatToolbarWidgetsCallback(int state);
   virtual void DPICallback(double dpi);
   virtual void ViewPanelPositionCallback();
 
@@ -97,8 +97,8 @@ protected:
   // Toolbar settings
 
   vtkKWFrameWithLabel *ToolbarSettingsFrame;
-  vtkKWCheckButton  *FlatFrameCheckButton;
-  vtkKWCheckButton  *FlatButtonsCheckButton;
+  vtkKWCheckButton  *FlatToolbarsCheckButton;
+  vtkKWCheckButton  *FlatToolbarWidgetsCheckButton;
 
   // Print settings
 

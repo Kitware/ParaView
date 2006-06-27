@@ -103,32 +103,50 @@ public:
   virtual void Update();
 
   // Description:
-  // Set/Get the flat aspect of the toolbar (flat or 3D GUI style)
-  // The static GlobalFlatAspect member can be set so that all toolbars
+  // Set/Get the aspect of the toolbar (flat or 3D GUI style, or unchanged)
+  // The static GlobalToolbarAspect member can be set so that all toolbars
   // are rendered using the same aspect.
-  virtual void SetFlatAspect(int);
-  vtkBooleanMacro(FlatAspect, int);
-  vtkGetMacro(FlatAspect, int);
-  static int GetGlobalFlatAspect();
-  static void SetGlobalFlatAspect(int val);
-  static void GlobalFlatAspectOn() 
-    { vtkKWToolbar::SetGlobalFlatAspect(1); };
-  static void GlobalFlatAspectOff() 
-    { vtkKWToolbar::SetGlobalFlatAspect(0); };
+  //BTX
+  enum 
+  {
+    ToolbarAspectRelief = 0,
+    ToolbarAspectFlat = 1,
+    ToolbarAspectUnChanged
+  };
+  //ETX
+  vtkGetMacro(ToolbarAspect, int);
+  virtual void SetToolbarAspect(int);
+  virtual void SetToolbarAspectToFlat();
+  virtual void SetToolbarAspectToRelief();
+  virtual void SetToolbarAspectToUnChanged();
+  static int GetGlobalToolbarAspect();
+  static void SetGlobalToolbarAspect(int val);
+  static void SetGlobalToolbarAspectToFlat();
+  static void SetGlobalToolbarAspectToRelief();
+  static void SetGlobalToolbarAspectToUnChanged();
 
   // Description:
-  // Set/Get the flat aspect of the widgets (flat or 3D GUI style)
-  // The static GlobalWidgetsFlatAspect member can be set so that all widgets
+  // Set/Get the aspect of the widgets (flat, 3D GUI style, or unchanged)
+  // The static GlobalWidgetsAspect member can be set so that all widgets
   // are rendered using the same aspect.
-  virtual void SetWidgetsFlatAspect(int);
-  vtkBooleanMacro(WidgetsFlatAspect, int);
-  vtkGetMacro(WidgetsFlatAspect, int);
-  static int GetGlobalWidgetsFlatAspect();
-  static void SetGlobalWidgetsFlatAspect(int val);
-  static void GlobalWidgetsFlatAspectOn() 
-    { vtkKWToolbar::SetGlobalWidgetsFlatAspect(1); };
-  static void GlobalWidgetsFlatAspectOff() 
-    { vtkKWToolbar::SetGlobalWidgetsFlatAspect(0); };
+  //BTX
+  enum 
+  {
+    WidgetsAspectRelief = 0,
+    WidgetsAspectFlat = 1,
+    WidgetsAspectUnChanged
+  };
+  //ETX
+  vtkGetMacro(WidgetsAspect, int);
+  virtual void SetWidgetsAspect(int);
+  virtual void SetWidgetsAspectToFlat();
+  virtual void SetWidgetsAspectToRelief();
+  virtual void SetWidgetsAspectToUnChanged();
+  static int GetGlobalWidgetsAspect();
+  static void SetGlobalWidgetsAspect(int val);
+  static void SetGlobalWidgetsAspectToFlat();
+  static void SetGlobalWidgetsAspectToRelief();
+  static void SetGlobalWidgetsAspectToUnChanged();
 
   // Description:
   // Set/Get the padding that will be applied around each widget.
@@ -140,7 +158,7 @@ public:
 
   // Description:
   // Set/Get the additional internal padding that will be applied around 
-  // each widget when WidgetsFlatAspect is On (default to 1).
+  // each widget when WidgetsAspect is On (default to 1).
   virtual void SetWidgetsFlatAdditionalPadX(int);
   vtkGetMacro(WidgetsFlatAdditionalPadX, int);
   virtual void SetWidgetsFlatAdditionalPadY(int);
@@ -163,8 +181,8 @@ public:
   // Description:
   // Some constants
   //BTX
-  static const char *FlatAspectRegKey;
-  static const char *WidgetsFlatAspectRegKey;
+  static const char *ToolbarAspectRegKey;
+  static const char *WidgetsAspectRegKey;
   //ETX
 
 protected:
@@ -198,8 +216,8 @@ protected:
   int WidgetsFlatAdditionalPadX;
   int WidgetsFlatAdditionalPadY;
 
-  int FlatAspect;
-  int WidgetsFlatAspect;
+  int ToolbarAspect;
+  int WidgetsAspect;
   int Resizable;
 
   vtkKWRadioButton *DefaultOptionsWidget;

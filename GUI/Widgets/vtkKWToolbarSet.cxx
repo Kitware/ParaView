@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.40");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.41");
 
 //----------------------------------------------------------------------------
 class vtkKWToolbarSetInternals
@@ -649,7 +649,7 @@ int vtkKWToolbarSet::GetToolbarAnchor(vtkKWToolbar* toolbar)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWToolbarSet::SetToolbarsFlatAspect(int f)
+void vtkKWToolbarSet::SetToolbarsAspect(int f)
 {
   if (this->Internals)
     {
@@ -659,16 +659,18 @@ void vtkKWToolbarSet::SetToolbarsFlatAspect(int f)
       this->Internals->Toolbars.end();
     for (; it != end; ++it)
       {
-      if (*it && (*it)->Toolbar)
+      if (*it && (*it)->Toolbar && 
+          (*it)->Toolbar->GetToolbarAspect() != 
+          vtkKWToolbar::ToolbarAspectUnChanged)
         {
-        (*it)->Toolbar->SetFlatAspect(f);
+        (*it)->Toolbar->SetToolbarAspect(f);
         }
       }
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWToolbarSet::SetToolbarsWidgetsFlatAspect(int f)
+void vtkKWToolbarSet::SetToolbarsWidgetsAspect(int f)
 {
   if (this->Internals)
     {
@@ -678,9 +680,11 @@ void vtkKWToolbarSet::SetToolbarsWidgetsFlatAspect(int f)
       this->Internals->Toolbars.end();
     for (; it != end; ++it)
       {
-      if (*it && (*it)->Toolbar)
+      if (*it && (*it)->Toolbar &&
+          (*it)->Toolbar->GetWidgetsAspect() != 
+          vtkKWToolbar::WidgetsAspectUnChanged)
         {
-        (*it)->Toolbar->SetWidgetsFlatAspect(f);
+        (*it)->Toolbar->SetWidgetsAspect(f);
         }
       }
     }
