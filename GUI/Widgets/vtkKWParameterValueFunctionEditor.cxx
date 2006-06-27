@@ -39,7 +39,7 @@
 #include <vtksys/stl/algorithm>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.96");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.97");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -4582,32 +4582,34 @@ void vtkKWParameterValueFunctionEditor::SetBalloonHelpString(
 // ---------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetHistogram(vtkKWHistogram *arg)
 {
-  if (this->Histogram == arg)
+  if (this->Histogram != arg)
     {
-    return;
-    }
-
-  if (this->Histogram)
-    {
-    this->Histogram->UnRegister(this);
-    }
+    if (this->Histogram)
+      {
+      this->Histogram->UnRegister(this);
+      }
     
-  this->Histogram = arg;
+    this->Histogram = arg;
   
-  if (this->Histogram)
-    {
-    this->Histogram->Register(this);
+    if (this->Histogram)
+      {
+      this->Histogram->Register(this);
+      }
+  
+    this->Modified();
+  
+    this->LastHistogramBuildTime = 0;
     }
-  
-  this->Modified();
-  
-  this->LastHistogramBuildTime = 0;
 
-  this->UpdateHistogramLogModeOptionMenu();
-  this->RedrawHistogram();
-  if (this->ComputeValueTicksFromHistogram)
+  if (this->Histogram && 
+      this->Histogram->GetMTime() > this->LastHistogramBuildTime)
     {
-    this->RedrawRangeTicks();
+    this->UpdateHistogramLogModeOptionMenu();
+    this->RedrawHistogram();
+    if (this->ComputeValueTicksFromHistogram)
+      {
+      this->RedrawRangeTicks();
+      }
     }
 }
 
@@ -4615,29 +4617,31 @@ void vtkKWParameterValueFunctionEditor::SetHistogram(vtkKWHistogram *arg)
 void vtkKWParameterValueFunctionEditor::SetSecondaryHistogram(
   vtkKWHistogram *arg)
 {
-  if (this->SecondaryHistogram == arg)
+  if (this->SecondaryHistogram != arg)
     {
-    return;
-    }
-
-  if (this->SecondaryHistogram)
-    {
-    this->SecondaryHistogram->UnRegister(this);
-    }
+    if (this->SecondaryHistogram)
+      {
+      this->SecondaryHistogram->UnRegister(this);
+      }
     
-  this->SecondaryHistogram = arg;
-  
-  if (this->SecondaryHistogram)
-    {
-    this->SecondaryHistogram->Register(this);
+    this->SecondaryHistogram = arg;
+    
+    if (this->SecondaryHistogram)
+      {
+      this->SecondaryHistogram->Register(this);
+      }
+    
+    this->Modified();
+    
+    this->LastHistogramBuildTime = 0;
     }
-  
-  this->Modified();
-  
-  this->LastHistogramBuildTime = 0;
 
-  this->UpdateHistogramLogModeOptionMenu();
-  this->RedrawHistogram();
+  if (this->SecondaryHistogram && 
+      this->SecondaryHistogram->GetMTime() > this->LastHistogramBuildTime)
+    {
+    this->UpdateHistogramLogModeOptionMenu();
+    this->RedrawHistogram();
+    }
 }
 
 //----------------------------------------------------------------------------
