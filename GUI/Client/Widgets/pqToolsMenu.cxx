@@ -168,15 +168,15 @@ void pqToolsMenu::addActionsToMenu(QMenu *menu) const
   menu->addAction(this->MenuList[pqToolsMenu::ManageCustomFilters]);
   menu->addAction(this->MenuList[pqToolsMenu::LinkEditor]);
 
+#ifdef PARAVIEW_EMBED_PYTHON
+  menu->addAction(this->MenuList[pqToolsMenu::PythonShell]);
+#endif // PARAVIEW_EMBED_PYTHON
+
   menu->addSeparator();
   menu->addAction(this->MenuList[pqToolsMenu::DumpNames]);
   menu->addAction(this->MenuList[pqToolsMenu::RecordTest]);
   menu->addAction(this->MenuList[pqToolsMenu::TestScreenshot]);
   menu->addAction(this->MenuList[pqToolsMenu::PlayTest]);
-
-#ifdef PARAVIEW_EMBED_PYTHON
-  menu->addAction(this->MenuList[pqToolsMenu::PythonShell]);
-#endif // PARAVIEW_EMBED_PYTHON
 
   //menu->addSeparator();
   //menu->addAction(this->MenuList[pqToolsMenu::Options]);
@@ -225,6 +225,7 @@ void pqToolsMenu::openCustomFilterWizard()
     }
 
   pqCustomFilterDefinitionWizard wizard(&custom, activeWindow);
+  wizard.setCustomFilterList(this->CustomFilters);
   if(wizard.exec() == QDialog::Accepted)
     {
     // Create a new compound proxy from the custom filter definition.

@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqCustomFilterDefinitionWizard.h"
 
 #include "pqCustomFilterDefinitionModel.h"
+#include "pqCustomFilterManagerModel.h"
 #include "pqPipelineSource.h"
 
 #include <QHeaderView>
@@ -67,7 +68,9 @@ pqCustomFilterDefinitionWizard::pqCustomFilterDefinitionWizard(
   : QDialog(widgetParent)
 {
   this->CurrentPage = 0;
+  this->OverwriteOK = false;
   this->Filter = 0;
+  this->Filters = 0;
   this->Model = model;
   this->Form = new pqCustomFilterDefinitionWizardForm();
   this->Form->setupUi(this);
@@ -100,8 +103,10 @@ pqCustomFilterDefinitionWizard::pqCustomFilterDefinitionWizard(
       this, SLOT(reject()));
   QObject::connect(this->Form->BackButton, SIGNAL(clicked()),
       this, SLOT(navigateBack()));
-  QObject::connect(this->Form->NextFinishButton, SIGNAL(clicked()),
+  QObject::connect(this->Form->NextButton, SIGNAL(clicked()),
       this, SLOT(navigateNext()));
+  QObject::connect(this->Form->FinishButton, SIGNAL(clicked()),
+      this, SLOT(finishWizard()));
 
   // Listen to the selection events.
   QObject::connect(this->Form->InputPipeline->selectionModel(),
@@ -152,6 +157,11 @@ pqCustomFilterDefinitionWizard::pqCustomFilterDefinitionWizard(
       this, SLOT(movePropertyUp()));
   QObject::connect(this->Form->PropertyDownButton, SIGNAL(clicked()),
       this, SLOT(movePropertyDown()));
+
+  // Listen for name changes.
+  QObject::connect(this->Form->CustomFilterName,
+      SIGNAL(textEdited(const QString &)),
+      this, SLOT(clearNameOverwrite(const QString &)));
 }
 
 pqCustomFilterDefinitionWizard::~pqCustomFilterDefinitionWizard()
@@ -166,6 +176,12 @@ pqCustomFilterDefinitionWizard::~pqCustomFilterDefinitionWizard()
     // Release the reference to the compound proxy.
     this->Filter->Delete();
     }
+}
+
+void pqCustomFilterDefinitionWizard::setCustomFilterList(
+    pqCustomFilterManagerModel *model)
+{
+  this->Filters = model;
 }
 
 QString pqCustomFilterDefinitionWizard::getCustomFilterName() const
@@ -238,12 +254,48 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
   root->Delete();
 }
 
+bool pqCustomFilterDefinitionWizard::validateCustomFilterName()
+{
+  // Make sure the user has entered a name for the custom filter.
+  QString filterName = this->Form->CustomFilterName->text();
+  if(filterName.isEmpty())
+    {
+    QMessageBox::warning(this, "No Name",
+        "The custom filter name field is empty.\n"
+        "Please enter a unique name for the custom filter.",
+        QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
+    this->Form->CustomFilterName->setFocus();
+    return false;
+    }
+
+  // Make sure the name is unique.
+  if(this->Filters && !this->OverwriteOK)
+    {
+    QModelIndex index = this->Filters->getIndexFor(filterName);
+    if(index.isValid())
+      {
+      int result = QMessageBox::warning(this, "Duplicate Name",
+          "The custom filter name already exists.\n"
+          "Do you want to overwrite the custom filter?",
+          QMessageBox::Yes | QMessageBox::Default, QMessageBox::No);
+      if(result != QMessageBox::Yes)
+        {
+        return false;
+        }
+
+      this->OverwriteOK = true;
+      }
+    }
+
+  return true;
+}
+
 void pqCustomFilterDefinitionWizard::navigateBack()
 {
   if(this->CurrentPage > 0)
     {
     // Decrement the page number and set the stacks to the appropriate
-    // page. Update the button labels as needed.
+    // page. Update the button state as needed.
     this->CurrentPage--;
     this->Form->TitleStack->setCurrentIndex(this->CurrentPage);
     this->Form->PageStack->setCurrentIndex(this->CurrentPage);
@@ -253,7 +305,7 @@ void pqCustomFilterDefinitionWizard::navigateBack()
       }
     else if(this->CurrentPage == 2)
       {
-      this->Form->NextFinishButton->setText("&Next >");
+      this->Form->NextButton->setEnabled(true);
       }
     }
 }
@@ -262,23 +314,13 @@ void pqCustomFilterDefinitionWizard::navigateNext()
 {
   if(this->CurrentPage < 3)
     {
-    if(this->CurrentPage == 0)
+    if(this->CurrentPage == 0 && !this->validateCustomFilterName())
       {
-      // Make sure the user has entered a name for the custom filter.
-      if(this->Form->CustomFilterName->text().isEmpty())
-        {
-        QMessageBox::warning(this, "No Name",
-            "The custom filter name field is empty.\n"
-            "Please enter a unique name for the custom filter.",
-            QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
-        return;
-        }
-
-      // TODO: Make sure the name is unique.
+      return;
       }
 
     // Increment the page number and set the stacks to the appropriate
-    // page. Update the button labels as needed.
+    // page. Update the button state as needed.
     this->CurrentPage++;
     this->Form->TitleStack->setCurrentIndex(this->CurrentPage);
     this->Form->PageStack->setCurrentIndex(this->CurrentPage);
@@ -288,14 +330,23 @@ void pqCustomFilterDefinitionWizard::navigateNext()
       }
     else if(this->CurrentPage == 3)
       {
-      this->Form->NextFinishButton->setText("&Finish");
+      this->Form->NextButton->setEnabled(false);
       }
     }
-  else if(this->CurrentPage == 3)
+}
+
+void pqCustomFilterDefinitionWizard::finishWizard()
+{
+  // Make sure the name has been entered and is unique.
+  if(this->validateCustomFilterName())
     {
-    // Close the dialog when the finish button is clicked.
     this->accept();
     }
+}
+
+void pqCustomFilterDefinitionWizard::clearNameOverwrite(const QString &)
+{
+  this->OverwriteOK = false;
 }
 
 void pqCustomFilterDefinitionWizard::updateInputForm(const QModelIndex &current,

@@ -182,7 +182,7 @@
       <item row="0" column="1" >
        <widget class="QStackedWidget" name="PageStack" >
         <property name="currentIndex" >
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="NamePage" >
          <layout class="QGridLayout" >
@@ -813,8 +813,8 @@
           </property>
           <property name="sizeHint" >
            <size>
-            <width>171</width>
-            <height>26</height>
+            <width>80</width>
+            <height>20</height>
            </size>
           </property>
          </spacer>
@@ -830,7 +830,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="NextFinishButton" >
+         <widget class="QPushButton" name="NextButton" >
           <property name="text" >
            <string>&amp;Next ></string>
           </property>
@@ -857,6 +857,16 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="FinishButton" >
+          <property name="text" >
+           <string>&amp;Finish</string>
+          </property>
+          <property name="autoDefault" >
+           <bool>false</bool>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="CancelButton" >
@@ -900,8 +910,9 @@
   <tabstop>RemovePropertyButton</tabstop>
   <tabstop>PropertyUpButton</tabstop>
   <tabstop>PropertyDownButton</tabstop>
-  <tabstop>NextFinishButton</tabstop>
+  <tabstop>NextButton</tabstop>
   <tabstop>BackButton</tabstop>
+  <tabstop>FinishButton</tabstop>
   <tabstop>CancelButton</tabstop>
  </tabstops>
  <resources>

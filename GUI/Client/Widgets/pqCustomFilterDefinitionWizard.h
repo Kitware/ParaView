@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class pqCustomFilterDefinitionModel;
 class pqCustomFilterDefinitionWizardForm;
+class pqCustomFilterManagerModel;
 class QModelIndex;
 class vtkSMCompoundProxy;
 
@@ -92,6 +93,11 @@ public:
   virtual ~pqCustomFilterDefinitionWizard();
 
   /// \brief
+  ///   Sets the list of registered custom filter definitions.
+  /// \param model The list of registered custom filter definitions.
+  void setCustomFilterList(pqCustomFilterManagerModel *model);
+
+  /// \brief
   ///   Gets the custom filter definition model used by the wizard.
   /// \return
   ///   A pointer to the custom filter definition model.
@@ -116,14 +122,33 @@ public slots:
   /// \sa pqCustomFilterDefinitionWizard::getCustomFilterName()
   void createCustomFilter();
 
+private:
+  /// \brief
+  ///   Validates the custom filter name field.
+  ///
+  /// This method will pop up message boxes for the user if there is
+  /// something wrong with the name entered.
+  ///
+  /// \return
+  ///   True if the custom filter name is valid.
+  bool validateCustomFilterName();
+
 private slots:
   /// \name Page Navigation
   //@{
   /// Called when the user clicks the back button.
   void navigateBack();
 
-  /// Called when the user clicks the next/finish button.
+  /// Called when the user clicks the next button.
   void navigateNext();
+
+  /// Called when the user clicks the finish button.
+  void finishWizard();
+
+  /// \brief
+  ///   Clears the custom filter overwite flag.
+  /// \param text The changed name text.
+  void clearNameOverwrite(const QString &text);
   //@}
 
   /// \name Model Selection Updates
@@ -230,7 +255,9 @@ private slots:
 
 private:
   int CurrentPage;                          ///< Stores the current page.
+  bool OverwriteOK;                         ///< Used with name validation.
   vtkSMCompoundProxy *Filter;               ///< Stores the custom filter.
+  pqCustomFilterManagerModel *Filters;      ///< Stores the current filters.
   pqCustomFilterDefinitionModel *Model;     ///< Stores the source hierarchy.
   pqCustomFilterDefinitionWizardForm *Form; ///< Defines the gui layout.
 };
