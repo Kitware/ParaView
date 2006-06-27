@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSpinBox);
-vtkCxxRevisionMacro(vtkKWSpinBox, "1.18");
+vtkCxxRevisionMacro(vtkKWSpinBox, "1.19");
 
 //----------------------------------------------------------------------------
 vtkKWSpinBox::vtkKWSpinBox() 
@@ -50,6 +50,9 @@ void vtkKWSpinBox::CreateWidget()
   this->SetObjectMethodCommand(&command, this, "CommandCallback");
   this->SetConfigurationOption("-command", command);
   delete [] command;
+
+  this->SetBinding("<Return>", this, "CommandCallback");
+  this->SetBinding("<FocusOut>", this, "CommandCallback");
 }
 
 //----------------------------------------------------------------------------

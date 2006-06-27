@@ -200,6 +200,11 @@ public:
   // Events. The SpinBoxValueChangedEvent is triggered when the widget value
   // is changed. It is similar in concept to the 'Command' callback but can be
   // used by multiple listeners/observers at a time.
+  // Important: since there is no way to robustly find out when the user
+  // is done inputing characters in the text entry part of the spinbox, the 
+  // SpinBoxValueChangedEvent event is also generated when <Return> is pressed,
+  // or the spinbox widget is losing focus (i.e. the user clicked outside the
+  // text field).
   // The following parameters are also passed as client data:
   // - the current value: double
   //BTX
