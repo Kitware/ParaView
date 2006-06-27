@@ -69,7 +69,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.84");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.85");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -1339,7 +1339,7 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(int locationOfLmkItemAm
 
     // use the label frame of this lmk container as the parent frame in which to pack into (constant)
     // for each xml element (either lookmark or lookmark folder) recursively call import with the appropriate location and vtkXMLDataElement
-    for(j=0; j<lmkElement->GetNumberOfNestedElements(); j++)
+    for(j=lmkElement->GetNumberOfNestedElements()-1; j>=0; j--)
       {
       this->ImportBoundingBoxFileInternal(j,lmkElement->GetNestedElement(j),lmkFolderWidget,macro);
       }
@@ -1349,7 +1349,7 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(int locationOfLmkItemAm
     {
     // in this case locationOfLmkItemAmongSiblings is the number of lookmark element currently in the first level of the lookmark manager which is why we start from that index
     // the parent is the lookmark manager's label frame
-    for(j=0; j<lmkElement->GetNumberOfNestedElements(); j++)
+    for(j=lmkElement->GetNumberOfNestedElements()-1; j>=0; j--)
       {
       this->ImportBoundingBoxFileInternal(j+locationOfLmkItemAmongSiblings,lmkElement->GetNestedElement(j),parent,macro);
       }
