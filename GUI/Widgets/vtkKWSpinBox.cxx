@@ -15,15 +15,17 @@
 
 #include "vtkKWOptions.h"
 #include "vtkObjectFactory.h"
+#include <vtksys/stl/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSpinBox);
-vtkCxxRevisionMacro(vtkKWSpinBox, "1.20");
+vtkCxxRevisionMacro(vtkKWSpinBox, "1.21");
 
 //----------------------------------------------------------------------------
 vtkKWSpinBox::vtkKWSpinBox() 
 {
   this->Command = NULL;
+  this->RestrictValuesToIntegers = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -84,6 +86,9 @@ void vtkKWSpinBox::SetValue(double value)
 {
   if (this->IsCreated())
     {
+    // Save the old -validate option, which seems to be reset to none
+    // whenever the entry was set to something invalid
+    vtksys_stl::string old_validate(this->GetConfigurationOption("-validate"));
     const char *ptr = this->GetValueFormat(), *format;
     char user_format[256];
     if (ptr && *ptr)
@@ -94,8 +99,13 @@ void vtkKWSpinBox::SetValue(double value)
     else
       {
       format = "%s set %g";
+      if (this->RestrictValuesToIntegers)
+        {
+        value = floor(value);
+        }
       }
     this->Script(format, this->GetWidgetName(), value);
+    this->SetConfigurationOption("-validate", old_validate.c_str());
     this->InvokeCommand(this->GetValue());
     }
 }
@@ -131,12 +141,20 @@ int vtkKWSpinBox::GetWrap()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSpinBox::SetRestrictValuesToIntegers(int restrict)
+void vtkKWSpinBox::SetRestrictValuesToIntegers(int arg)
 {
-  if (restrict)
+  if (this->RestrictValuesToIntegers == arg)
     {
-    this->SetConfigurationOption("-validate", "key");
-    this->SetConfigurationOption("-validatecommand", "string is integer %%P");
+    return;
+    }
+
+  this->RestrictValuesToIntegers = arg;
+  this->Modified();
+
+  if (arg)
+    {
+    this->SetConfigurationOption("-validate", "all");
+    this->SetConfigurationOption("-validatecommand", "string is integer %P");
     }
   else
     {
@@ -413,4 +431,6 @@ void vtkKWSpinBox::UpdateEnableState()
 void vtkKWSpinBox::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "RestrictValuesToIntegers: " 
+     << (this->RestrictValuesToIntegers ? "On" : "Off") << endl;
 }

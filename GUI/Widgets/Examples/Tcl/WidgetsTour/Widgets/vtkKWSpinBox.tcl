@@ -11,6 +11,7 @@ proc vtkKWSpinBoxEntryPoint {parent win} {
   $spinbox1 Create
   $spinbox1 SetRange 0 10
   $spinbox1 SetIncrement 1
+  $spinbox1 RestrictValuesToIntegersOn
   $spinbox1 SetBalloonHelpString "A simple spinbox"
 
   pack [$spinbox1 GetWidgetName] -side top -anchor nw -expand n -padx 2 -pady 2

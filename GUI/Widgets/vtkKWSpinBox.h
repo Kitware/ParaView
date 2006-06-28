@@ -66,8 +66,11 @@ public:
 
   // Description:
   // Prevent the user from typing in non-integer values.
+  // This will also prevent SetValue from entering floating point values
+  // by truncating to an integer.
   virtual void SetRestrictValuesToIntegers(int restrict);
   vtkBooleanMacro(RestrictValuesToIntegers, int);
+  vtkGetMacro(RestrictValuesToIntegers, int);
 
   // Description:
   // Set/Get the width of the spinbox in number of characters.
@@ -241,6 +244,7 @@ protected:
 
   char *Command;
   virtual void InvokeCommand(double value);
+  int RestrictValuesToIntegers;
 
 private:
   vtkKWSpinBox(const vtkKWSpinBox&); // Not implemented
