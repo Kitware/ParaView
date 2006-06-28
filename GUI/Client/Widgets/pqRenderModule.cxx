@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pqApplicationCore.h"
+#include "pqMultiViewFrame.h"
 #include "pqPipelineDisplay.h"
 #include "pqRenderViewProxy.h"
 #include "pqServerManagerModel.h"
@@ -453,5 +454,20 @@ bool pqRenderModule::eventFilter(QObject* caller, QEvent* e)
       }
     }
     */
+  
+  if(e->type() == QEvent::MouseButtonPress)
+    {
+    QVTKWidget* view = qobject_cast<QVTKWidget*>(caller);
+    if (view)
+      {
+      pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(
+        view->parentWidget());
+      if (frame)
+        {
+        frame->setActive(true);
+        }
+      }
+    }
+
   return QObject::eventFilter(caller, e);
 }
