@@ -313,15 +313,17 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
 
       // If the display exists, toggle the display. Otherwise, create a
       // display for the source in the current window.
-      if(display)
+      if(!display)
         {
-        display->setVisible(!display->isVisible());
-        display->renderAllViews(false);
+        pqApplicationCore* core = pqApplicationCore::instance();
+        core->getPipelineBuilder()->createDisplayProxy(source, module);
+        display = source->getDisplay(module);
         }
       else
         {
-        // TODO
+        display->setVisible(!display->isVisible());
         }
+      display->renderAllViews(false);
       }
     // TODO
     //else if(index.column() == 2)
