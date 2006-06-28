@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSpinBox);
-vtkCxxRevisionMacro(vtkKWSpinBox, "1.19");
+vtkCxxRevisionMacro(vtkKWSpinBox, "1.20");
 
 //----------------------------------------------------------------------------
 vtkKWSpinBox::vtkKWSpinBox() 
@@ -84,7 +84,18 @@ void vtkKWSpinBox::SetValue(double value)
 {
   if (this->IsCreated())
     {
-    this->Script("%s set %lf", this->GetWidgetName(), value);
+    const char *ptr = this->GetValueFormat(), *format;
+    char user_format[256];
+    if (ptr && *ptr)
+      {
+      sprintf(user_format, "%%s set %s", ptr);
+      format = user_format;
+      }
+    else
+      {
+      format = "%s set %g";
+      }
+    this->Script(format, this->GetWidgetName(), value);
     this->InvokeCommand(this->GetValue());
     }
 }
@@ -99,6 +110,12 @@ double vtkKWSpinBox::GetValue()
 void vtkKWSpinBox::SetValueFormat(const char *arg)
 {
   this->SetConfigurationOption("-format", arg);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWSpinBox::GetValueFormat()
+{
+  return this->GetConfigurationOption("-format");
 }
 
 //----------------------------------------------------------------------------

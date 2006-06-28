@@ -51,7 +51,11 @@ public:
 
   // Description:
   // Set/Get the string used to format the value.
+  // Specifies an alternate format to use when setting the string value when
+  // using the range. This must be a format specifier of the
+  // form %<pad>.<pad>f, as it will format a floating-point number.
   virtual void SetValueFormat(const char *format);
+  virtual const char* GetValueFormat();
 
   // Description:
   // Set/Get the wrap. If on, values at edges of range wrap around to the
