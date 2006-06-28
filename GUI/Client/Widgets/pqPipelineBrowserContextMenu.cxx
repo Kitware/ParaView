@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqPipelineBrowserContextMenu.h"
 
+#include "pqApplicationCore.h"
 #include "pqDisplayProxyEditor.h"
 #include "pqFlatTreeView.h"
 #include "pqPipelineBrowser.h"
@@ -152,7 +153,8 @@ void pqPipelineBrowserContextMenu::showDisplayEditor()
   dialog->setWindowTitle("Display Settings");
   QHBoxLayout* l = new QHBoxLayout(dialog);
   pqDisplayProxyEditor* editor = new pqDisplayProxyEditor(dialog);
-  editor->setDisplay(source->getDisplay(0));
+  editor->setDisplay(source->getDisplay(
+                       pqApplicationCore::instance()->getActiveRenderModule()));
   l->addWidget(editor);
   QObject::connect(editor, SIGNAL(dismiss()),
     dialog, SLOT(accept()));
