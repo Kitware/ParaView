@@ -274,7 +274,7 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index,
     splitter->setSizes(sizes);
     }
     
-  return indexOf(newFrame);
+  return this->indexOf(newFrame);
 }
 
 //-----------------------------------------------------------------------------
