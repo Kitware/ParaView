@@ -35,7 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsExport.h"
 #include <QObject>
 
-class vtkSMRenderModuleProxy;
+class vtkSMDisplayProxy;
+class vtkSMSourceProxy;
+class pqPipelineSource;
 class pqRenderModule;
 class pqSelectionManagerImplementation;
 
@@ -67,6 +69,8 @@ public slots:
   void switchToSelection();
   void switchToInteraction();
   void activeRenderModuleChanged(pqRenderModule*);
+  void clearSelection();
+  void sourceRemoved(pqPipelineSource*);
 
 private:
   pqSelectionManagerImplementation* Implementation;
@@ -74,7 +78,9 @@ private:
   int setInteractorStyleToSelect(pqRenderModule*);
   int setInteractorStyleToInteract(pqRenderModule*);
   void processEvents(unsigned long event);
-  void updateSelection(int* eventpos, vtkSMRenderModuleProxy* rmp);
+  void updateSelection(int* eventpos, pqRenderModule* rm);
+  vtkSMDisplayProxy* getDisplayProxy(pqRenderModule*, vtkSMSourceProxy*);
+  void createDisplayProxies(vtkSMSourceProxy*);
 };
 
 
