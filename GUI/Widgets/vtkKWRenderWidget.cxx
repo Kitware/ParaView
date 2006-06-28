@@ -43,7 +43,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.141");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.142");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -836,53 +836,59 @@ void vtkKWRenderWidget::AddInteractionBindings()
       const char *Modifier;
       int Ctrl;
       int Shift;
+      int Alt;
     } EventTranslator;
     EventTranslator translators[] = {
-      { "",               0, 0 },
-      { "Shift-",         0, 1 },
-      { "Control-",       1, 0 },
-      { "Control-Shift-", 1, 1 }
+      { "",                   0, 0, 0 },
+      { "Control-",           1, 0, 0 },
+      { "Shift-",             0, 1, 0 },
+      { "Alt-",               0, 0, 1 },
+      { "Shift-Control-",     1, 1, 0 },
+      { "Shift-Alt-",         0, 1, 1 },
+      { "Control-Alt-",       1, 0, 1 },
+      { "Control-Shift-Alt-", 1, 1, 1 }
     };
     char event[256];
     char callback[256];
     for (size_t i = 0; i < sizeof(translators) / sizeof(translators[0]); i++)
       {
       sprintf(event, "<%sAny-ButtonPress>", translators[i].Modifier);
-      sprintf(callback, "MouseButtonPressCallback %%b %%x %%y %d %d 0", 
-              translators[i].Ctrl, translators[i].Shift);
+      sprintf(callback, "MouseButtonPressCallback %%b %%x %%y %d %d %d 0", 
+              translators[i].Ctrl, translators[i].Shift, translators[i].Alt);
       this->VTKWidget->SetBinding(event, this, callback);
 
       sprintf(event, "<Double-%sAny-ButtonPress>", translators[i].Modifier);
-      sprintf(callback, "MouseButtonPressCallback %%b %%x %%y %d %d 1", 
-              translators[i].Ctrl, translators[i].Shift);
+      sprintf(callback, "MouseButtonPressCallback %%b %%x %%y %d %d %d 1", 
+              translators[i].Ctrl, translators[i].Shift, translators[i].Alt);
       this->VTKWidget->SetBinding(event, this, callback);
 
       sprintf(event, "<%sAny-ButtonRelease>", translators[i].Modifier);
-      sprintf(callback, "MouseButtonReleaseCallback %%b %%x %%y %d %d", 
-              translators[i].Ctrl, translators[i].Shift);
+      sprintf(callback, "MouseButtonReleaseCallback %%b %%x %%y %d %d %d", 
+              translators[i].Ctrl, translators[i].Shift, translators[i].Alt);
       this->VTKWidget->SetBinding(event, this, callback);
 
       sprintf(event, "<%sMotion>", translators[i].Modifier);
-      sprintf(callback, "MouseMoveCallback 0 %%x %%y %d %d", 
-              translators[i].Ctrl, translators[i].Shift);
+      sprintf(callback, "MouseMoveCallback 0 %%x %%y %d %d %d", 
+              translators[i].Ctrl, translators[i].Shift, translators[i].Alt);
       this->VTKWidget->SetBinding(event, this, callback);
         
       for (int b = 1; b <= 3; b++)
         {
         sprintf(event, "<%sB%d-Motion>", translators[i].Modifier, b);
-        sprintf(callback, "MouseMoveCallback %d %%x %%y %d %d", 
-                b, translators[i].Ctrl, translators[i].Shift);
+        sprintf(callback, "MouseMoveCallback %d %%x %%y %d %d %d", 
+                b, 
+                translators[i].Ctrl, translators[i].Shift, translators[i].Alt);
         this->VTKWidget->SetBinding(event, this, callback);
         }
 
       sprintf(event, "<%sMouseWheel>", translators[i].Modifier);
-      sprintf(callback, "MouseWheelCallback %%D %d %d", 
-              translators[i].Ctrl, translators[i].Shift);
+      sprintf(callback, "MouseWheelCallback %%D %d %d %d", 
+              translators[i].Ctrl, translators[i].Shift, translators[i].Alt);
       this->VTKWidget->SetBinding(event, this, callback);
         
       sprintf(event, "<%sKeyPress>", translators[i].Modifier);
-      sprintf(callback, "KeyPressCallback %%A %%x %%y %d %d %%K", 
-              translators[i].Ctrl, translators[i].Shift);
+      sprintf(callback, "KeyPressCallback %%A %%x %%y %d %d %d %%K", 
+              translators[i].Ctrl, translators[i].Shift, translators[i].Alt);
       this->VTKWidget->SetBinding(event, this, callback);
       }
     }
@@ -903,12 +909,17 @@ void vtkKWRenderWidget::RemoveInteractionBindings()
       const char *Modifier;
       int Ctrl;
       int Shift;
+      int Alt;
     } EventTranslator;
     EventTranslator translators[] = {
-      { "",               0, 0 },
-      { "Shift-",         0, 1 },
-      { "Control-",       1, 0 },
-      { "Control-Shift-", 1, 1 }
+      { "",                   0, 0, 0 },
+      { "Control-",           1, 0, 0 },
+      { "Shift-",             0, 1, 0 },
+      { "Alt-",               0, 0, 1 },
+      { "Shift-Control-",     1, 1, 0 },
+      { "Shift-Alt-",         0, 1, 1 },
+      { "Control-Alt-",       1, 0, 1 },
+      { "Control-Shift-Alt-", 1, 1, 1 }
     };
     char event[256];
     for (size_t i = 0; i < sizeof(translators) / sizeof(translators[0]); i++)
@@ -942,7 +953,7 @@ void vtkKWRenderWidget::RemoveInteractionBindings()
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::MouseMoveCallback(
-  int vtkNotUsed(num), int x, int y, int ctrl, int shift)
+  int vtkNotUsed(num), int x, int y, int ctrl, int shift, int alt)
 {
   vtkRenderWindowInteractor *interactor = this->GetRenderWindowInteractor();
   if (!interactor)
@@ -951,7 +962,10 @@ void vtkKWRenderWidget::MouseMoveCallback(
     }
 
   interactor->SetEventInformationFlipY(x, y, ctrl, shift);
-
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
+  interactor->SetAltKey(alt);
+#endif
+  
   vtkGenericRenderWindowInteractor *gen_interactor = 
     vtkGenericRenderWindowInteractor::SafeDownCast(interactor);
   if (gen_interactor)
@@ -961,7 +975,8 @@ void vtkKWRenderWidget::MouseMoveCallback(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::MouseWheelCallback(int delta, int ctrl, int shift)
+void vtkKWRenderWidget::MouseWheelCallback(
+  int delta, int ctrl, int shift, int alt)
 {
   vtkRenderWindowInteractor *interactor = this->GetRenderWindowInteractor();
   if (!interactor)
@@ -971,6 +986,9 @@ void vtkKWRenderWidget::MouseWheelCallback(int delta, int ctrl, int shift)
 
   interactor->SetControlKey(ctrl);
   interactor->SetShiftKey(shift);
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
+  interactor->SetAltKey(alt);
+#endif
 
   vtkGenericRenderWindowInteractor *gen_interactor = 
     vtkGenericRenderWindowInteractor::SafeDownCast(interactor);
@@ -989,7 +1007,7 @@ void vtkKWRenderWidget::MouseWheelCallback(int delta, int ctrl, int shift)
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::MouseButtonPressCallback(
-  int num, int x, int y, int ctrl, int shift, int repeat)
+  int num, int x, int y, int ctrl, int shift, int alt, int repeat)
 {
   this->VTKWidget->Focus();
 
@@ -1022,6 +1040,9 @@ void vtkKWRenderWidget::MouseButtonPressCallback(
   else
     {
     interactor->SetEventInformationFlipY(x, y, ctrl, shift, 0, repeat);
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
+    interactor->SetAltKey(alt);
+#endif
 
     vtkGenericRenderWindowInteractor *gen_interactor = 
       vtkGenericRenderWindowInteractor::SafeDownCast(interactor);
@@ -1045,7 +1066,7 @@ void vtkKWRenderWidget::MouseButtonPressCallback(
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::MouseButtonReleaseCallback(
-  int num, int x, int y, int ctrl, int shift)
+  int num, int x, int y, int ctrl, int shift, int alt)
 {
   vtkRenderWindowInteractor *interactor = this->GetRenderWindowInteractor();
   if (!interactor)
@@ -1054,6 +1075,9 @@ void vtkKWRenderWidget::MouseButtonReleaseCallback(
     }
 
   interactor->SetEventInformationFlipY(x, y, ctrl, shift);
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
+  interactor->SetAltKey(alt);
+#endif
   
   vtkGenericRenderWindowInteractor *gen_interactor = 
     vtkGenericRenderWindowInteractor::SafeDownCast(interactor);
@@ -1077,7 +1101,9 @@ void vtkKWRenderWidget::MouseButtonReleaseCallback(
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::KeyPressCallback(char key, 
                                          int x, int y,
-                                         int ctrl, int shift,
+                                         int ctrl, 
+                                         int shift, 
+                                         int alt,
                                          char *keysym)
 {
   vtkRenderWindowInteractor *interactor = this->GetRenderWindowInteractor();
@@ -1087,6 +1113,9 @@ void vtkKWRenderWidget::KeyPressCallback(char key,
     }
 
   interactor->SetEventInformationFlipY(x, y, ctrl, shift, key, 0, keysym);
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
+  interactor->SetAltKey(alt);
+#endif
 
   vtkGenericRenderWindowInteractor *gen_interactor = 
     vtkGenericRenderWindowInteractor::SafeDownCast(interactor);

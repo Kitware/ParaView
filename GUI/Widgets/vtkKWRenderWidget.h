@@ -293,15 +293,15 @@ public:
   // Description:
   // Callbacks. Internal, do not use.
   virtual void MouseMoveCallback(
-    int num, int x, int y, int ctrl, int shift);
+    int num, int x, int y, int ctrl, int shift, int alt);
   virtual void MouseWheelCallback(
-    int delta, int ctrl, int shift);
+    int delta, int ctrl, int shift, int alt);
   virtual void MouseButtonPressCallback(
-    int num, int x, int y, int ctrl, int shift, int repeat);
+    int num, int x, int y, int ctrl, int shift, int alt, int repeat);
   virtual void MouseButtonReleaseCallback(
-    int num, int x, int y, int ctrl, int shift);
+    int num, int x, int y, int ctrl, int shift, int alt);
   virtual void KeyPressCallback(
-    char key, int x, int y, int ctrl, int shift, char *keysym);
+    char key, int x, int y, int ctrl, int shift, int alt, char *keysym);
   virtual void ConfigureCallback(int width, int height);
   virtual void ExposeCallback();
   virtual void EnterCallback(int x, int y);
