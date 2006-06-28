@@ -502,3 +502,19 @@ void pqServerManagerModel::updateDisplayVisibility(bool)
     }
 }
 
+
+//-----------------------------------------------------------------------------
+int pqServerManagerModel::getNumberOfRenderModules()
+{
+  return this->Internal->RenderModules.size();
+}
+
+//-----------------------------------------------------------------------------
+pqRenderModule* pqServerManagerModel::getRenderModule(int idx)
+{
+  if (idx >= this->Internal->RenderModules.size())
+    {
+    return 0;
+    }
+  return this->Internal->RenderModules.value(idx);
+}
