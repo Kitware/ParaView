@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.22");
+vtkCxxRevisionMacro(vtkKWTree, "1.23");
 
 //----------------------------------------------------------------------------
 class vtkKWTreeInternals
@@ -97,13 +97,14 @@ void vtkKWTree::CreateWidget()
   // Call the superclass to create the widget and set the appropriate flags
 
   if (!vtkKWWidget::CreateSpecificTkWidget(this, 
-        "Tree", "-relief flat -bd 0 -highlightthickness 0 -padx 2"))
+        "Tree", "-relief flat -bd 0 -highlightthickness 0 -padx 2 -deltay 17"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
 
   this->SetBinding("<<TreeSelect>>", this, "SelectionCallback");
+  this->SetBindText("<ButtonPress-3>", this, "RightClickOnNodeCallback");
 }
 
 //----------------------------------------------------------------------------
@@ -138,6 +139,15 @@ void vtkKWTree::SelectionCallback()
   this->InvokeSelectionChangedCommand();
 
   in_SelectionCallback = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::RightClickOnNodeCallback(const char *node)
+{
+  if (node)
+    {
+    this->InvokeEvent(vtkKWTree::RightClickOnNodeEvent, (void*)node);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -183,6 +193,7 @@ void vtkKWTree::SetSelectionChangedCommand(
 void vtkKWTree::InvokeSelectionChangedCommand()
 {
   this->InvokeObjectMethodCommand(this->SelectionChangedCommand);
+  this->InvokeEvent(vtkKWTree::SelectionChangedEvent, NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -773,6 +784,30 @@ void vtkKWTree::SetPadX(int arg)
 int vtkKWTree::GetPadX()
 {
   return this->GetConfigurationOptionAsInt("-padx");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetDeltaX(int arg)
+{
+  this->SetConfigurationOptionAsInt("-deltax", arg);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTree::GetDeltaX()
+{
+  return this->GetConfigurationOptionAsInt("-deltax");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetDeltaY(int arg)
+{
+  this->SetConfigurationOptionAsInt("-deltay", arg);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTree::GetDeltaY()
+{
+  return this->GetConfigurationOptionAsInt("-deltay");
 }
 
 //----------------------------------------------------------------------------

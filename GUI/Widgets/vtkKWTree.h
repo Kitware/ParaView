@@ -259,6 +259,16 @@ public:
   virtual int GetPadX();
 
   // Description:
+  // Set/Get the horizontal indentation between a node and its children.
+  virtual void SetDeltaX(int);
+  virtual int GetDeltaX();
+
+  // Description:
+  // Set/Get the vertical size of the nodes.
+  virtual void SetDeltaY(int);
+  virtual int GetDeltaY();
+
+  // Description:
   // Set/Get the selection foreground and background color
   virtual void GetSelectionBackgroundColor(double *r, double *g, double *b);
   virtual double* GetSelectionBackgroundColor();
@@ -330,6 +340,24 @@ public:
     vtkObject *object, const char *method);
 
   // Description:
+  // Events. The TreeNodeSelectedEvent is triggered when the selection is
+  // changed (i.e. one or more node(s) are selected/deselected).
+  // It is  similar in concept as the 'SelectionChangedCommand' but can be
+  // used by multiple listeners/observers at a time.
+  // The RightClickOnNodeEvent event is triggered when right-clicking on
+  // a specific node.
+  // The following parameters are also passed as client data for 
+  // RightClickOnNodeEvent:
+  // - the node ID: const char*
+  //BTX
+  enum
+  {
+    SelectionChangedEvent = 10000,
+    RightClickOnNodeEvent
+  };
+  //ETX
+
+  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -341,6 +369,7 @@ public:
   // Description:
   // Callbacks. Internal, do not use.
   virtual void SelectionCallback();
+  virtual void RightClickOnNodeCallback(const char *node);
 
 protected:
   vtkKWTree();
