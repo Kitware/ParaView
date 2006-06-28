@@ -32,7 +32,7 @@
 #include "vtkSmartPointer.h"
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkSelectDataSets, "1.1");
+vtkCxxRevisionMacro(vtkSelectDataSets, "1.2");
 vtkStandardNewMacro(vtkSelectDataSets);
 
 struct vtkSelectDataSetsInternals
@@ -63,7 +63,8 @@ vtkSelectDataSets::~vtkSelectDataSets()
 void vtkSelectDataSets::Initialize()
 {
   //the smart pointers should delete the objects contained 
-  this->Internal->Props.resize(0);
+  this->Internal->Props.clear();
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
