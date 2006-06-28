@@ -8,5 +8,9 @@
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqImplicitPlaneWidget/useZNormal" command="activate" arguments="" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/PipelineInspectorDock/PipelineList/PipelineView/qt_scrollarea_viewport" command="contextMenu" arguments="" />
+  <pqevent object="PipelineObjectMenu" command="activate" arguments="Display Settings" />
+  <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/groupBox_2/StyleRepresentation" command="set_string" arguments="Wireframe" />
+  <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/DismissButton" command="activate" arguments="" />
   <pqevent object="MainWindow/PipelineInspectorDock/PipelineList/PipelineView" command="currentChanged" arguments="/0/0|0" />
 </pqevents>
