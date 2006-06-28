@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWScrollbar);
-vtkCxxRevisionMacro(vtkKWScrollbar, "1.8");
+vtkCxxRevisionMacro(vtkKWScrollbar, "1.9");
 
 //----------------------------------------------------------------------------
 void vtkKWScrollbar::CreateWidget()
@@ -106,6 +106,9 @@ double* vtkKWScrollbar::GetForegroundColor()
 void vtkKWScrollbar::SetForegroundColor(double r, double g, double b)
 {
 #ifdef _WIN32
+  (void)r;
+  (void)g;
+  (void)b;
 #else
   this->SetConfigurationOptionAsColor("-foreground", r, g, b);
 #endif
