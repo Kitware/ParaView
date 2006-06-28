@@ -1,6 +1,15 @@
 $Application ExitAfterLoadScriptOn
 $Application PromptBeforeExitOff
 
+# override the 1MB composite threshold default to avoid
+# compositing during testing, unless requested by the
+# test
+set view [$Application GetMainView]
+if { $view != "" } {
+    set ui [$view GetRenderModuleUI]
+    catch {$ui SetCompositeThreshold 10}
+}
+
 proc ParseCommandLine {view argv argc} {
    global DataDir rmui TempDir
    if {[info exists argc]} { 
