@@ -41,7 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static int gPenWidth = 2;
 
 pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
-  : QWidget(p), MainWidget(0), AutoHide(false), Active(false), Color(QColor("red"))
+  : QWidget(p), MainWidget(0), AutoHide(false), Active(false), 
+    Color(QColor("red"))
 {
   QVBoxLayout* boxLayout = new QVBoxLayout(this);
   boxLayout->setMargin(gPenWidth);
@@ -55,33 +56,51 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
   boxLayout->addLayout(sublayout);
   sublayout->addStretch();
 
-  this->CloseButton->setIcon(QIcon(this->style()->standardPixmap(QStyle::SP_TitleBarCloseButton)));
-  this->MaximizeButton->setIcon(QIcon(this->style()->standardPixmap(QStyle::SP_TitleBarMaxButton)));
+  this->CloseButton->setIcon(
+    QIcon(this->style()->standardPixmap(QStyle::SP_TitleBarCloseButton)));
+  this->MaximizeButton->setIcon(
+    QIcon(this->style()->standardPixmap(QStyle::SP_TitleBarMaxButton)));
 
   // set up actions
   QAction* a = new QAction(this->ActiveButton->icon(), tr("Active"), this->Menu);
   a->setObjectName("ActiveAction");
   a->setCheckable(true);
   this->ActiveButton->setDefaultAction(a);
-  a = new QAction(this->SplitHorizontalButton->icon(), this->SplitHorizontalButton->text(), this->Menu);
+  a = new QAction(this->SplitHorizontalButton->icon(), 
+                  this->SplitHorizontalButton->text(), 
+                  this->Menu);
   a->setObjectName("SplitHorizontalAction");
   this->SplitHorizontalButton->setDefaultAction(a);
-  a = new QAction(this->SplitVerticalButton->icon(), this->SplitVerticalButton->text(), this->Menu);
+  a = new QAction(this->SplitVerticalButton->icon(), 
+                  this->SplitVerticalButton->text(), 
+                  this->Menu);
   a->setObjectName("SplitVerticalAction");
   this->SplitVerticalButton->setDefaultAction(a);
-  a = new QAction(this->MaximizeButton->icon(), this->MaximizeButton->text(), this->Menu);
+  a = new QAction(this->MaximizeButton->icon(), 
+                  this->MaximizeButton->text(), 
+                  this->Menu);
   a->setObjectName("MaximizeAction");
   this->MaximizeButton->setDefaultAction(a);
-  a = new QAction(this->CloseButton->icon(), this->CloseButton->text(), this->Menu);
+  a = new QAction(this->CloseButton->icon(), 
+                  this->CloseButton->text(), 
+                  this->Menu);
   a->setObjectName("CloseAction");
   this->CloseButton->setDefaultAction(a);
 
 
-  this->connect(this->ActiveButton->defaultAction(), SIGNAL(triggered(bool)), SLOT(setActive(bool)));
-  this->connect(this->CloseButton->defaultAction(), SIGNAL(triggered(bool)), SLOT(close()));
-  this->connect(this->MaximizeButton->defaultAction(), SIGNAL(triggered(bool)), SLOT(maximize()));
-  this->connect(this->SplitVerticalButton->defaultAction(), SIGNAL(triggered(bool)), SLOT(splitVertical()));
-  this->connect(this->SplitHorizontalButton->defaultAction(), SIGNAL(triggered(bool)), SLOT(splitHorizontal()));
+  this->connect(this->ActiveButton->defaultAction(), SIGNAL(triggered(bool)), 
+                SLOT(setActive(bool)));
+  this->connect(this->CloseButton->defaultAction(), SIGNAL(triggered(bool)), 
+                SLOT(close()));
+  this->connect(this->MaximizeButton->defaultAction(), 
+                SIGNAL(triggered(bool)), 
+                SLOT(maximize()));
+  this->connect(this->SplitVerticalButton->defaultAction(), 
+                SIGNAL(triggered(bool)), 
+                SLOT(splitVertical()));
+  this->connect(this->SplitHorizontalButton->defaultAction(), 
+                SIGNAL(triggered(bool)), 
+                SLOT(splitHorizontal()));
   
   // setup the context menu
   this->Menu->setContextMenuPolicy(Qt::ActionsContextMenu);
@@ -92,9 +111,9 @@ pqMultiViewFrame::pqMultiViewFrame(QWidget* p)
   // TODO: temporary until they can be implemented or wanted
   this->MaximizeButton->hide();
   this->ActiveButton->hide();
-  this->CloseButton->hide();
-  this->SplitVerticalButton->hide();
-  this->SplitHorizontalButton->hide();
+//   this->CloseButton->hide();
+//   this->SplitVerticalButton->hide();
+//   this->SplitHorizontalButton->hide();
 }
 
 pqMultiViewFrame::~pqMultiViewFrame()
@@ -127,19 +146,19 @@ bool pqMultiViewFrame::active() const
 
 void pqMultiViewFrame::setActive(bool a)
 {
-  if(this->ActiveButton->isChecked() != a)
+  if (this->Active == a)
     {
-    this->ActiveButton->blockSignals(true);
-    this->ActiveButton->setChecked(a);
-    this->ActiveButton->blockSignals(false);
+    return;
+    }
+  this->Active = a;
+
+  if(this->ActiveButton->defaultAction()->isChecked() != a)
+    {
+    this->ActiveButton->defaultAction()->setChecked(a);
     }
 
-  if(this->Active != a)
-    {
-    this->Active = a;
-    emit this->activeChanged(a);
-    this->update();
-    }
+  emit this->activeChanged(a);
+  this->update();
 }
 
 QColor pqMultiViewFrame::borderColor() const
@@ -184,7 +203,10 @@ void pqMultiViewFrame::paintEvent(QPaintEvent* e)
     painter.setPen(pen);
     QLayoutItem* i = this->layout()->itemAt(0);
     QRect r = contentsRect();
-    r.adjust(-gPenWidth/2+2, i->geometry().height()+4-gPenWidth/2, gPenWidth/2-2, gPenWidth/2-2);
+    r.adjust(-gPenWidth/2+2, 
+             i->geometry().height()+4-gPenWidth/2, 
+             gPenWidth/2-2, 
+             gPenWidth/2-2);
     painter.drawRect(r);
     }
 }
