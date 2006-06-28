@@ -95,6 +95,7 @@ public:
   // and their inputs.
   void CreateLookmarkCallback(int macroFlag);
   vtkPVLookmark* CreateLookmark(char *name, int macroFlag);
+  vtkPVLookmark* CreateLookmark(char *name, vtkKWWidget *parent, int location, int macroFlag);
 
   // Description:
   // This saves the current state of the lookmark manager, hierarchy and all to the user specified .lmk file

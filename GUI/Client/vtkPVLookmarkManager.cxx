@@ -65,11 +65,13 @@
 #include "vtkPVLabeledToggle.h"
 #include "vtkPVDataInformation.h"
 #include "vtkBoxWidget.h"
-
+#include "vtkPVDisplayGUI.h"
+#include "vtkPVThumbWheel.h"
+#include "vtkPVVectorEntry.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.86");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.87");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -1213,8 +1215,6 @@ void vtkPVLookmarkManager::ImportBoundingBoxFile(vtkPVReaderModule *reader, vtkP
   int retval;
   ostrstream msg;
 
-
- 
   infile = new ifstream(boundingBoxFileName);
 
   // A workaround to allow boundingBoxFileName to consist of no preceding path (or even "./")
@@ -1254,7 +1254,6 @@ void vtkPVLookmarkManager::ImportBoundingBoxFile(vtkPVReaderModule *reader, vtkP
   //vtkPVSource *inputSource = reader;
 
   vtkKWLookmarkFolder *bboxFolder = this->CreateFolder(name,0);
-
 
   //parse the .lmk xml file and get the root node for traversing
   parser = vtkXMLDataParser::New();
@@ -1302,6 +1301,8 @@ void vtkPVLookmarkManager::ImportBoundingBoxFile(vtkPVReaderModule *reader, vtkP
     this->Script("update");
     lookmarkWidget->EnableScrollBar();
     }
+
+  this->Checkpoint();
 
   infile->close();
   delete infile;
@@ -1360,10 +1361,11 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(int locationOfLmkItemAm
     {
     // in this case locationOfLmkItemAmongSiblings is the number of lookmark element currently in the first level of the lookmark manager which is why we start from that index
     // the parent is the lookmark manager's label frame
-    for(j=lmkElement->GetNumberOfNestedElements()-1; j>=0; j--)
+    for(j=lmkElement->GetNumberOfNestedElements()-1;j>=0; j--)
       {
       this->ImportBoundingBoxFileInternal(j+locationOfLmkItemAmongSiblings,lmkElement->GetNestedElement(j),parent,macro);
       }
+    this->PackChildrenBasedOnLocation(parent->GetLabelFrame()->GetFrame());
     }
   else if(strcmp("BoundingBox",lmkElement->GetName())==0)
     {
@@ -1404,13 +1406,48 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(int locationOfLmkItemAm
         }
       this->GetPVWindow()->GetCurrentPVReaderModule()->SetVisibility(1);
       }
+
+    vtkPVSource *input = this->GetPVWindow()->GetCurrentPVSource();
+    vtkPVSource *clip = this->GetPVWindow()->CreatePVSource("Clip");
+    clip->SetLabel("BoundingBox");
+    vtkPVInputMenu::SafeDownCast(clip->GetPVWidget("Input"))->SetCurrentValue(input);
+    vtkPVSelectWidget *widgetType = vtkPVSelectWidget::SafeDownCast(clip->GetPVWidget("Clip Function"));
+    widgetType->SetCurrentValue("Box");
+    vtkPVBoxWidget *box = vtkPVBoxWidget::SafeDownCast(widgetType->GetPVWidget("Box"));
+    vtkPVLabeledToggle *insideOut = vtkPVLabeledToggle::SafeDownCast(clip->GetPVWidget("InsideOut"));
+    insideOut->SetSelectedState(1);
+    box->PlaceWidget(newBounds);
+    clip->AcceptCallback();
+    vtkSMProxy *transformProxy = box->GetProxyByName("BoxTransform");
+    vtkSMDoubleVectorProperty* scale = vtkSMDoubleVectorProperty::SafeDownCast(
+      transformProxy->GetProperty("Scale"));
+    vtkSMDoubleVectorProperty* pos = vtkSMDoubleVectorProperty::SafeDownCast(
+      transformProxy->GetProperty("Position"));
+    vtkSMDoubleVectorProperty* rot = vtkSMDoubleVectorProperty::SafeDownCast(
+      transformProxy->GetProperty("Rotation"));
+//      dvp->SetElements(sdvp->GetElements());
+
+    box->SetVisibility(1);
+    input->SetVisibility(1);
+    input->GetPVOutput()->SetOpacity(0.1);
+
+    newCenter[0]= newBounds[0] + (newBounds[1] - newBounds[0])/2;
+    newCenter[1]= newBounds[2] + (newBounds[3] - newBounds[2])/2;
+    newCenter[2]= newBounds[4] + (newBounds[5] - newBounds[4])/2;
+
 /*
     vtkPVSource *cubeSource = this->GetPVWindow()->CreatePVSource("CubeSource");
     vtkPVVectorEntry *cubeCenter = vtkPVVectorEntry::SafeDownCast(cubeSource->GetPVWidget("Center"));
+    cubeCenter->SetValue((float*)newCenter,3);
     vtkPVThumbWheel *wheel = vtkPVThumbWheel::SafeDownCast(cubeSource->GetPVWidget("XLength"));
-    vtkPVThumbWheel *wheel = vtkPVThumbWheel::SafeDownCast(cubeSource->GetPVWidget("YLength"));
-    vtkPVThumbWheel *wheel = vtkPVThumbWheel::SafeDownCast(cubeSource->GetPVWidget("ZLength"));
-    
+    wheel->SetValue(newBounds[1]-newBounds[0]);
+    wheel = vtkPVThumbWheel::SafeDownCast(cubeSource->GetPVWidget("YLength"));
+    wheel->SetValue(newBounds[3]-newBounds[2]);
+    wheel = vtkPVThumbWheel::SafeDownCast(cubeSource->GetPVWidget("ZLength"));
+    wheel->SetValue(newBounds[5]-newBounds[4]);
+    cubeSource->AcceptCallback();
+    cubeSource->GetPVOutput()->SetRepresentation("Outline");
+
     cubeSource->GetPVWidget("XLength");
     cubeSource->GetPVWidget("XLength");
     cubeSource->GetPVWidget("XLength");
@@ -1431,9 +1468,6 @@ catch {[$pvDisp(vtkTemp1940) GetProperty LODResolution] SetElement 0 110}
 catch {[$pvDisp(vtkTemp1940) GetProperty Representation] SetElement 0 3}
 */
 
-    newCenter[0]= newBounds[0] + (newBounds[1] - newBounds[0])/2;
-    newCenter[1]= newBounds[2] + (newBounds[3] - newBounds[2])/2;
-    newCenter[2]= newBounds[4] + (newBounds[5] - newBounds[4])/2;
 
     this->GetPVRenderView()->GetRenderer()->ResetCamera(newBounds);
     this->GetPVRenderView()->GetRenderer()->ResetCameraClippingRange();
@@ -1444,7 +1478,7 @@ catch {[$pvDisp(vtkTemp1940) GetProperty Representation] SetElement 0 3}
       {
       return;
       }
-    lookmarkWidget = this->CreateLookmark((char*)lmkElement->GetAttribute("Name"),0);
+    lookmarkWidget = this->CreateLookmark((char*)lmkElement->GetAttribute("Name"),parent->GetLabelFrame()->GetFrame(),locationOfLmkItemAmongSiblings,0);
     // Add bounding box values as comments to lookmark
     
     if(lmkElement->GetAttribute("Comments"))
@@ -1466,15 +1500,17 @@ catch {[$pvDisp(vtkTemp1940) GetProperty Representation] SetElement 0 3}
     lookmarkWidget->SetBoundingBoxFlag(0);
     //lookmarkWidget->SetBounds(newBounds);
     lookmarkWidget->UpdateWidgetValues();
-    lookmarkWidget->SetLocation(locationOfLmkItemAmongSiblings);
 
     // Visit lookmark so that box clip will be generated, then update our lookmark so that the thumbnail reflects view
     //lookmarkWidget->View();
     //lookmarkWidget->Update();
 
+//    lookmarkWidget->SetLocation(locationOfLmkItemAmongSiblings);
+/*
     this->DragAndDropWidget(lookmarkWidget,parent->GetNestedSeparatorFrame());
-    //this->ResetDragAndDropTargetSetAndCallbacks();
- 
+    this->PackChildrenBasedOnLocation(parent->GetLabelFrame()->GetFrame());
+    this->ResetDragAndDropTargetSetAndCallbacks();
+*/
 /*
     lookmarkWidget->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
     ostrstream s;
@@ -2328,7 +2364,6 @@ void vtkPVLookmarkManager::UpdateLookmarkCallback()
 void vtkPVLookmarkManager::CreateLookmarkCallback(int macroFlag)
 {
   vtkPVWindow *win = this->GetPVWindow();
-  vtkPVLookmark *lmk;
 
   // if the pipeline is empty, don't add
   if(win->GetSourceList("Sources")->GetNumberOfItems()==0)
@@ -2342,40 +2377,65 @@ void vtkPVLookmarkManager::CreateLookmarkCallback(int macroFlag)
     return;
     }
 
-  lmk = this->CreateLookmark(this->GetUnusedLookmarkName(), macroFlag);
-
-  return;
+  if(macroFlag)
+    {
+    this->CreateLookmark(this->GetUnusedLookmarkName(), this->GetMacrosFolder()->GetLabelFrame()->GetFrame(), this->GetNumberOfChildLmkItems(this->GetMacrosFolder()->GetLabelFrame()->GetFrame()), 1);
+    }
+  else
+    {
+    this->CreateLookmark(this->GetUnusedLookmarkName(), this->ScrollFrame->GetFrame(), this->GetNumberOfChildLmkItems(this->ScrollFrame->GetFrame()), 0);
+    }
 }
-
 
 //----------------------------------------------------------------------------
 vtkPVLookmark* vtkPVLookmarkManager::CreateLookmark(char *name, int macroFlag)
 {
+  vtkPVWindow *win = this->GetPVWindow();
+
+  // if the pipeline is empty, don't add
+  if(win->GetSourceList("Sources")->GetNumberOfItems()==0)
+    {
+    vtkKWMessageDialog::PopupMessage(
+      this->GetPVApplication(), win, "No Data Loaded", 
+      "To create a lookmark you must first open your data and view some feature of interest. Then press \"Create Lookmark\" in the main window of the Lookmark Manager or in its \"Edit\" menu. Also, if the Lookmark toolbar is enabled, you can press the icon of a book in the main ParaView window.", 
+      vtkKWMessageDialog::ErrorIcon);
+    this->Focus();
+
+    return 0;
+    }
+
+
+  this->GetTraceHelper()->AddEntry("$kw(%s) CreateLookmark \"%s\" %d",
+                      this->GetTclName(),name,macroFlag);
+
+  if(macroFlag)
+    {
+    this->CreateLookmark(name, this->GetMacrosFolder()->GetLabelFrame()->GetFrame(), this->GetNumberOfChildLmkItems(this->GetMacrosFolder()->GetLabelFrame()->GetFrame()), 1);
+    }
+  else
+    {
+    this->CreateLookmark(name, this->ScrollFrame->GetFrame(), this->GetNumberOfChildLmkItems(this->ScrollFrame->GetFrame()), 0);
+    }
+}
+
+
+//----------------------------------------------------------------------------
+vtkPVLookmark* vtkPVLookmarkManager::CreateLookmark(char *name, vtkKWWidget *parent, int location, int macroFlag)
+{
   vtkIdType numLmkWidgets = this->Lookmarks->GetNumberOfItems();
   vtkPVLookmark *newLookmark;
-  int indexOfNewLmkWidget;
   vtkPVWindow *win = this->GetPVWindow();
   char methodAndArg[200];
   ostrstream s;
   ostrstream appversion;
 
-  this->GetTraceHelper()->AddEntry("$kw(%s) CreateLookmark \"%s\" %d",
-                      this->GetTclName(),name,macroFlag);
 
   this->Checkpoint();
 
   // create and initialize pvlookmark:
 
   newLookmark = vtkPVLookmark::New();
-  // set the parent depending on whether it is a macro or normal lookmark
-  if(macroFlag)
-    {
-    newLookmark->SetParent(this->GetMacrosFolder()->GetLabelFrame()->GetFrame());
-    } 
-  else
-    {
-    newLookmark->SetParent(this->ScrollFrame->GetFrame());
-    }
+  newLookmark->SetParent(parent);
   newLookmark->SetMacroFlag(macroFlag);
   newLookmark->Create();
   sprintf(methodAndArg,"SelectItemCallback %s",newLookmark->GetWidgetName());
@@ -2396,17 +2456,7 @@ vtkPVLookmark* vtkPVLookmarkManager::CreateLookmark(char *name, int macroFlag)
   newLookmark->StoreStateScript();
   newLookmark->UpdateWidgetValues();
   this->Script("pack %s -fill both -expand yes -padx 8",newLookmark->GetWidgetName());
-
-  // determing location of widget
-  if(macroFlag)
-    {
-    indexOfNewLmkWidget = this->GetNumberOfChildLmkItems(this->GetMacrosFolder()->GetLabelFrame()->GetFrame());
-    }
-  else
-    {
-    indexOfNewLmkWidget = this->GetNumberOfChildLmkItems(this->ScrollFrame->GetFrame());
-    }
-  newLookmark->SetLocation(indexOfNewLmkWidget);
+  newLookmark->SetLocation(location);
   newLookmark->CreateIconFromMainView();
 
   this->Lookmarks->InsertItem(numLmkWidgets,newLookmark);

@@ -88,7 +88,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.68");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.69");
 
 
 //*****************************************************************************
@@ -659,11 +659,10 @@ void vtkPVLookmark::CreateIconFromMainView()
   vtkPVWindow *win = this->GetPVWindow();
   vtkKWIcon *lmkIcon;
 
+  this->GetPVRenderView()->GetRenderWindow()->OffScreenRenderingOn();
   // withdraw the pane so that the lookmark will be added corrrectly
-  this->GetPVLookmarkManager()->Withdraw();
-  //if(win->GetTclInteractor())
-   // this->Script("wm withdraw %s", win->GetTclInteractor()->GetWidgetName());
-  this->Script("focus %s",win->GetWidgetName());
+//  this->GetPVLookmarkManager()->Withdraw();
+//  this->Script("focus %s",win->GetWidgetName());
   for(int i=0;i<4;i++)
     {
     this->GetPVLookmarkManager()->Script("update");
@@ -673,6 +672,7 @@ void vtkPVLookmark::CreateIconFromMainView()
   lmkIcon = this->GetIconOfRenderWindow(this->GetPVRenderView()->GetRenderWindow());
   if(!lmkIcon)
     {
+    this->GetPVRenderView()->GetRenderWindow()->OffScreenRenderingOff();
     return;
     }
   this->GetPVRenderView()->ForceRender();
@@ -686,6 +686,8 @@ void vtkPVLookmark::CreateIconFromMainView()
     {
     this->AddLookmarkToolbarButton(lmkIcon);
     }
+
+  this->GetPVRenderView()->GetRenderWindow()->OffScreenRenderingOff();
 
   lmkIcon->Delete();
 }
