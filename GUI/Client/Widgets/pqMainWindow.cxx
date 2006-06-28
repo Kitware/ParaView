@@ -239,7 +239,6 @@ pqMainWindow::pqMainWindow() :
 
   this->Implementation->MultiViewManager = 
     new pqMultiView(this) << pqSetName("MultiViewManager");
-  this->Implementation->MultiViewManager->installEventFilter(this);
 
   //this->Implementation->MultiViewManager->hide();  
   // workaround for flickering in Qt 4.0.1 & 4.1.0
@@ -302,10 +301,8 @@ pqMainWindow::pqMainWindow() :
   core->getWriterFactory()->loadFileTypes(":/pqClient/ParaQWriters.xml");
 
   this->Implementation->SelectionManager = new pqSelectionManager;
-  QObject::connect(core, 
-                   SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
-                   this->Implementation->SelectionManager, 
-                   SLOT(activeRenderModuleChanged(pqRenderModule*)));
+
+  this->installEventFilter(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -582,6 +579,9 @@ void pqMainWindow::createStandardObjectInspector(bool visible)
   QObject::connect(
     this->Implementation->Inspector, 
     SIGNAL(preaccept()), undoStack, SLOT(Accept()));
+  QObject::connect(
+    this->Implementation->Inspector, SIGNAL(preaccept()), 
+    this->Implementation->SelectionManager, SLOT(clearSelection()));
 
   QObject::connect(
     this->Implementation->Inspector, 
@@ -703,7 +703,7 @@ void pqMainWindow::createSelectionToolBar()
   QActionGroup* group = new QActionGroup(toolbar);
 
   QAction *interactAction = new QAction(toolbar) << pqSetName("InteractButton");
-  interactAction->setToolTip("Switch to interaction mode");
+  interactAction->setToolTip("Switch to interaction mode (S)");
   interactAction->setIcon(QIcon(":pqWidgets/pqMouseMove15.png"));
   interactAction->setCheckable(true);
   interactAction->setChecked(true);
@@ -711,7 +711,7 @@ void pqMainWindow::createSelectionToolBar()
   group->addAction(interactAction);
 
   QAction *selectAction = new QAction(toolbar) << pqSetName("SelectButton");
-  selectAction->setToolTip("Switch to selection mode");
+  selectAction->setToolTip("Switch to selection mode (S)");
   selectAction->setIcon(QIcon(":pqWidgets/pqMouseSelect15.png"));
   selectAction->setCheckable(true);
   toolbar->addAction(selectAction);
@@ -950,6 +950,7 @@ bool pqMainWindow::eventFilter(QObject* watched, QEvent* e)
           select->trigger();
           }
         }
+      return true;
       }
     }
 
