@@ -122,7 +122,7 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
 pqObjectInspectorWidget::~pqObjectInspectorWidget()
 {
   // delete all queued panels
-  foreach(pqObjectPanel* p, this->QueuedPanels)
+  foreach(pqObjectPanel* p, this->PanelStore)
     {
     delete p;
     }
@@ -151,26 +151,27 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
     return;
     }
 
+  if (this->CurrentPanel)
+    {
+    this->PanelArea->layout()->takeAt(0);
+    this->CurrentPanel->deselect();
+    this->CurrentPanel->hide();
+    this->CurrentPanel->setObjectName("");
+    // We don't delete the panel, it's managed by this->PanelStore.
+    // Any deletion of any panel must ensure that call pointers 
+    // to the panel ie. this->CurrentPanel, this->QueuedPanels, and this->PanelStore
+    // are updated so that we don't have any dangling pointers.
+    }
+
   // we have a proxy with pending changes
   if(this->AcceptButton->isEnabled())
     {
     // save the panel
     if(this->CurrentPanel)
       {
-      this->PanelArea->layout()->takeAt(0);
-      this->CurrentPanel->deselect();
-      this->CurrentPanel->hide();
-      this->CurrentPanel->setObjectName("");
+      // QueuedPanels keeps track of all modified panels.
       this->QueuedPanels.insert(this->CurrentPanel->proxy(),
         this->CurrentPanel);
-      }
-    }
-  else
-    {
-    // delete the panel
-    if(this->CurrentPanel)
-      {
-      delete this->CurrentPanel;
       }
     }
 
@@ -178,11 +179,10 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
 
   // search for a custom form for this proxy with pending changes
   QMap<pqSMProxy, pqObjectPanel*>::iterator iter;
-  iter = this->QueuedPanels.find(proxy);
-  if(iter != this->QueuedPanels.end())
+  iter = this->PanelStore.find(proxy);
+  if(iter != this->PanelStore.end())
     {
     this->CurrentPanel = iter.value();
-    this->QueuedPanels.erase(iter);
     }
 
   if(proxy && !this->CurrentPanel)
@@ -245,6 +245,8 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
   this->PanelArea->layout()->addWidget(this->CurrentPanel);
   this->CurrentPanel->select();
   this->CurrentPanel->show();
+
+  this->PanelStore[proxy] = this->CurrentPanel;
 }
 
 void pqObjectInspectorWidget::accept()
@@ -279,7 +281,6 @@ void pqObjectInspectorWidget::accept()
   foreach(pqObjectPanel* p, this->QueuedPanels)
     {
     p->postAccept();
-    delete p;
     }
   this->QueuedPanels.clear();
   
@@ -297,10 +298,10 @@ void pqObjectInspectorWidget::reset()
 {
   emit this->prereject();
 
-  // delete all queued panels
+  // reset all queued panels
   foreach(pqObjectPanel* p, this->QueuedPanels)
     {
-    delete p;
+    p->reset();
     }
   this->QueuedPanels.clear();
   
@@ -337,14 +338,19 @@ void pqObjectInspectorWidget::removeProxy(vtkSMProxy* proxy)
   iter = this->QueuedPanels.find(proxy);
   if(iter != this->QueuedPanels.end())
     {
-    delete iter.value();
     this->QueuedPanels.erase(iter);
     }
-  
+
   if(this->CurrentPanel && this->CurrentPanel->proxy() == proxy)
     {
-    delete this->CurrentPanel;
     this->CurrentPanel = NULL;
+    }
+
+  iter = this->PanelStore.find(proxy);
+  if (iter != this->PanelStore.end())
+    {
+    delete iter.value();
+    this->PanelStore.erase(iter);
     }
 }
 
