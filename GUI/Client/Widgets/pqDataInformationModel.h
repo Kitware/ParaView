@@ -94,7 +94,8 @@ private:
     DataType,
     CellCount,
     PointCount,
-    MemorySize
+    MemorySize,
+    Bounds
     };
 };
 

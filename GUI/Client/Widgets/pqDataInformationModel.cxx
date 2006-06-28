@@ -34,13 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Server Manager includes.
 #include "vtkSMSourceProxy.h"
 #include "vtkPVDataInformation.h"
+#include <vtksys/ios/sstream>
 
 // Qt includes.
+#include <QIcon>
 #include <QList>
 #include <QPointer>
 #include <QtAlgorithms>
 #include <QtDebug>
-#include <QIcon>
 
 // ParaView includes.
 #include "pqPipelineSource.h"
@@ -53,6 +54,7 @@ struct pqSourceInfo
   quint64 NumberOfPoints;
   double MemorySize;
   bool DataInformationValid;
+  double Bounds[6];
 
   unsigned long MTime;
   pqSourceInfo()
@@ -104,6 +106,35 @@ struct pqSourceInfo
     if (this->DataInformationValid)
       {
       return QVariant(this->MemorySize);
+      }
+    return QVariant("Unavailable");
+    }
+  QVariant getBounds() const
+    {
+    if (this->DataInformationValid)
+      {
+      vtksys_ios::ostringstream stream;
+      for (int i=0; i<6; i++)
+        {
+        if (i %2 == 0)
+          {
+          stream << "[ ";
+          }
+        stream << setprecision(3) << this->Bounds[i];
+        if (i%2 == 0)
+          {
+          stream << ", ";
+          }
+        else
+          {
+          stream << " ]";
+          if (i != 5)
+            {
+            stream << " , ";
+            }
+          }
+        }
+      return QVariant(stream.str().c_str());
       }
     return QVariant("Unavailable");
     }
@@ -250,7 +281,7 @@ int pqDataInformationModel::rowCount(
 int pqDataInformationModel::columnCount(
   const QModelIndex &vtkNotUsed(parent) /*= QModelIndex()*/) const
 {
-  return 5;
+  return 6;
 }
 
 
@@ -324,6 +355,14 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
       }
     break;
 
+  case pqDataInformationModel::Bounds:
+    // Data Bounds.
+    switch (role)
+      {
+    case Qt::DisplayRole:
+      return info.getBounds();
+      }
+
   case pqDataInformationModel::MemorySize:
     // Memory.
     switch(role)
@@ -362,6 +401,9 @@ QVariant pqDataInformationModel::headerData(int section,
 
       case pqDataInformationModel::MemorySize:
         return QVariant("Memory (MB)");
+
+      case pqDataInformationModel::Bounds:
+        return QVariant("Data Bounds");
         }
       break;
       }
@@ -424,6 +466,7 @@ void pqDataInformationModel::refreshModifiedData()
       iter->NumberOfPoints =dataInfo->GetNumberOfPoints();
       iter->MemorySize = dataInfo->GetMemorySize()/1000.0;
       iter->DataInformationValid = true;
+      dataInfo->GetBounds(iter->Bounds);
 
       emit this->dataChanged(this->index(row_no, 0),
         this->index(row_no, 4));
