@@ -505,10 +505,12 @@ pqRenderModule* pqPipelineBuilder::createWindow(pqServer* server)
       VTK_LARGE_FLOAT);
   renModule->UpdateVTKObjects();
 
+#if 0
   // turn on vtk light kit
   renModule->SetUseLight(1);
   // turn off main light
   pqSMAdaptor::setElementProperty(renModule->GetProperty("LightSwitch"), 0);
+#endif
 
   renModule->UpdateVTKObjects();
   return pqRM;
