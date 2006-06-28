@@ -59,6 +59,8 @@ ENDIF(NOT PARAVIEW_DATA_ROOT AND PARAQ_DATA_ROOT)
 FIND_PATH(PARAVIEW_DATA_ROOT ParaViewData.readme
   ${ParaView_SOURCE_DIR}/ParaViewData
   ${ParaView_SOURCE_DIR}/../ParaViewData
+  ${ParaView_SOURCE_DIR}/ParaQData
+  ${ParaView_SOURCE_DIR}/../ParaQData
   $ENV{PARAVIEW_DATA_ROOT}
   )
 
