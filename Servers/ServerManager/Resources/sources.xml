@@ -994,8 +994,10 @@ Press the "Start Selection" button to begin. Then use the left mouse button to m
       </Property>
 
       <ProxyProperty 
-        name="AddDataSet" 
-        command="AddDataSet" >
+        name="DataSets" 
+        command="AddDataSet" 
+        is_internal="1"
+        clean_command="Initialize">
       </ProxyProperty>
 
      <IntVectorProperty 
