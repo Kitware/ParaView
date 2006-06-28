@@ -82,7 +82,7 @@ pqCustomFilterManager::pqCustomFilterManager(pqCustomFilterManagerModel *model,
       SLOT(updateButtons(const QItemSelection &, const QItemSelection &)));
 
   // Listen for new custom filter additions.
-  QObject::connect(this->Model, SIGNAL(CustomFilterAdded(const QString &)),
+  QObject::connect(this->Model, SIGNAL(customFilterAdded(const QString &)),
       this, SLOT(selectCustomFilter(const QString &)));
 }
 
