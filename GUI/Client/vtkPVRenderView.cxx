@@ -142,7 +142,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.405.2.1");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.405.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -3327,6 +3327,7 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
     os << "(none)" << endl;
     }
   os << indent << "RenderModuleProxy: " << this->RenderModuleProxy << endl;
+  os << indent << "ExitMode: " << this->ExitMode << endl;
 }
 
 //----------------------------------------------------------------------------
