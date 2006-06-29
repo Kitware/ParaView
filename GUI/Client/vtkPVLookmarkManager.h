@@ -50,6 +50,7 @@ class vtkKWTextWithScrollbars;
 class vtkPVTraceHelper;
 class vtkPVWindow;
 class vtkPVReaderModule;
+class vtkTransform;
 
 //BTX
 template<class DataType> class vtkVector;
@@ -259,6 +260,8 @@ protected:
   // to/from a lookmark file since they get lost in the call to WriteObject() uses a '~' to encode
   void EncodeNewlines(char *str);
   void DecodeNewlines(char *str);
+
+  void GetTransform(vtkTransform*,double bounds[6]);
 
   // Description:
   // called before and after certain callbacks that launch dialog boxes because when the user presses OK or Cancel 

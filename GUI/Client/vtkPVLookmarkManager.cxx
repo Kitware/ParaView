@@ -68,10 +68,20 @@
 #include "vtkPVDisplayGUI.h"
 #include "vtkPVThumbWheel.h"
 #include "vtkPVVectorEntry.h"
+#include "vtkTransform.h"
+#include "vtkMatrix4x4.h"
+#include "vtkDoubleArray.h"
+#include "vtkPoints.h"
+#include "vtkMath.h"
+
+#define VTK_AVERAGE(a,b,c) \
+  c[0] = (a[0] + b[0])/2.0; \
+  c[1] = (a[1] + b[1])/2.0; \
+  c[2] = (a[2] + b[2])/2.0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.87");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.88");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -1416,58 +1426,17 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(int locationOfLmkItemAm
     vtkPVBoxWidget *box = vtkPVBoxWidget::SafeDownCast(widgetType->GetPVWidget("Box"));
     vtkPVLabeledToggle *insideOut = vtkPVLabeledToggle::SafeDownCast(clip->GetPVWidget("InsideOut"));
     insideOut->SetSelectedState(1);
-    box->PlaceWidget(newBounds);
+    //box->PlaceWidget(newBounds[0],newBounds[1],newBounds[2],newBounds[3],newBounds[4],newBounds[5]);
     clip->AcceptCallback();
-    vtkSMProxy *transformProxy = box->GetProxyByName("BoxTransform");
-    vtkSMDoubleVectorProperty* scale = vtkSMDoubleVectorProperty::SafeDownCast(
-      transformProxy->GetProperty("Scale"));
-    vtkSMDoubleVectorProperty* pos = vtkSMDoubleVectorProperty::SafeDownCast(
-      transformProxy->GetProperty("Position"));
-    vtkSMDoubleVectorProperty* rot = vtkSMDoubleVectorProperty::SafeDownCast(
-      transformProxy->GetProperty("Rotation"));
-//      dvp->SetElements(sdvp->GetElements());
-
-    box->SetVisibility(1);
-    input->SetVisibility(1);
-    input->GetPVOutput()->SetOpacity(0.1);
 
     newCenter[0]= newBounds[0] + (newBounds[1] - newBounds[0])/2;
     newCenter[1]= newBounds[2] + (newBounds[3] - newBounds[2])/2;
     newCenter[2]= newBounds[4] + (newBounds[5] - newBounds[4])/2;
 
-/*
-    vtkPVSource *cubeSource = this->GetPVWindow()->CreatePVSource("CubeSource");
-    vtkPVVectorEntry *cubeCenter = vtkPVVectorEntry::SafeDownCast(cubeSource->GetPVWidget("Center"));
-    cubeCenter->SetValue((float*)newCenter,3);
-    vtkPVThumbWheel *wheel = vtkPVThumbWheel::SafeDownCast(cubeSource->GetPVWidget("XLength"));
-    wheel->SetValue(newBounds[1]-newBounds[0]);
-    wheel = vtkPVThumbWheel::SafeDownCast(cubeSource->GetPVWidget("YLength"));
-    wheel->SetValue(newBounds[3]-newBounds[2]);
-    wheel = vtkPVThumbWheel::SafeDownCast(cubeSource->GetPVWidget("ZLength"));
-    wheel->SetValue(newBounds[5]-newBounds[4]);
-    cubeSource->AcceptCallback();
-    cubeSource->GetPVOutput()->SetRepresentation("Outline");
 
-    cubeSource->GetPVWidget("XLength");
-    cubeSource->GetPVWidget("XLength");
-    cubeSource->GetPVWidget("XLength");
-set kw(vtkTemp1940) [$kw(vtkTemp2) CreatePVSource CubeSource]
-$kw(vtkTemp1940) SetLabel {Cube1}
-set kw(vtkTemp1941) [$kw(vtkTemp1940) GetPVWidget {XLength}]
-$kw(vtkTemp1941) SetValue 1
-set kw(vtkTemp1948) [$kw(vtkTemp1940) GetPVWidget {YLength}]
-$kw(vtkTemp1948) SetValue 1
-set kw(vtkTemp1955) [$kw(vtkTemp1940) GetPVWidget {ZLength}]
-$kw(vtkTemp1955) SetValue 1
-set kw(vtkTemp1962) [$kw(vtkTemp1940) GetPVWidget {Center}]
-$kw(vtkTemp1962) SetValue 0 0 0
-$kw(vtkTemp1940) AcceptCallback
-# Saving state of the Display Proxy associated with the source
-set pvDisp(vtkTemp1940) [$kw(vtkTemp1940) GetDisplayProxy] 
-catch {[$pvDisp(vtkTemp1940) GetProperty LODResolution] SetElement 0 110}
-catch {[$pvDisp(vtkTemp1940) GetProperty Representation] SetElement 0 3}
-*/
-
+    box->SetVisibility(1);
+    input->SetVisibility(1);
+ //   input->GetPVOutput()->SetOpacity(0.1);
 
     this->GetPVRenderView()->GetRenderer()->ResetCamera(newBounds);
     this->GetPVRenderView()->GetRenderer()->ResetCameraClippingRange();
@@ -1532,6 +1501,138 @@ catch {[$pvDisp(vtkTemp1940) GetProperty Representation] SetElement 0 3}
     }
  
 }
+
+void vtkPVLookmarkManager::GetTransform(vtkTransform *t, double InitialBounds[6])
+{
+  // Construct initial points
+  vtkPoints *Points = vtkPoints::New(VTK_DOUBLE);
+  Points->SetNumberOfPoints(15);//8 corners; 6 faces; 1 center
+  Points->SetPoint(0, InitialBounds[0], InitialBounds[2], InitialBounds[4]);
+  Points->SetPoint(1, InitialBounds[1], InitialBounds[2], InitialBounds[4]);
+  Points->SetPoint(2, InitialBounds[1], InitialBounds[3], InitialBounds[4]);
+  Points->SetPoint(3, InitialBounds[0], InitialBounds[3], InitialBounds[4]);
+  Points->SetPoint(4, InitialBounds[0], InitialBounds[2], InitialBounds[5]);
+  Points->SetPoint(5, InitialBounds[1], InitialBounds[2], InitialBounds[5]);
+  Points->SetPoint(6, InitialBounds[1], InitialBounds[3], InitialBounds[5]);
+  Points->SetPoint(7, InitialBounds[0], InitialBounds[3], InitialBounds[5]);
+
+  double *pts = ((vtkDoubleArray *)Points->GetData())->GetPointer(0);
+  double *p0 = pts;
+  double *p1 = pts + 3*1;
+  double *p2 = pts + 3*2;
+  double *p3 = pts + 3*3;
+  //double *p4 = pts + 3*4;
+  double *p5 = pts + 3*5;
+  double *p6 = pts + 3*6;
+  double *p7 = pts + 3*7;
+  double x[3];
+
+  VTK_AVERAGE(p0,p7,x);
+  Points->SetPoint(8, x);
+  VTK_AVERAGE(p1,p6,x);
+  Points->SetPoint(9, x);
+  VTK_AVERAGE(p0,p5,x);
+  Points->SetPoint(10, x);
+  VTK_AVERAGE(p2,p7,x);
+  Points->SetPoint(11, x);
+  VTK_AVERAGE(p1,p3,x);
+  Points->SetPoint(12, x);
+  VTK_AVERAGE(p5,p7,x);
+  Points->SetPoint(13, x);
+  VTK_AVERAGE(p0,p6,x);
+  Points->SetPoint(14, x);
+
+
+  pts = ((vtkDoubleArray *)Points->GetData())->GetPointer(0);
+  p0 = pts;
+  p1 = pts + 3*1;
+  p3 = pts + 3*3;
+  double *p4 = pts + 3*4;
+  double *p14 = pts + 3*14;
+  double center[3], translate[3], scale[3], scaleVec[3][3];
+  double InitialCenter[3];
+  int i;
+
+  // The transformation is relative to the initial bounds.
+  // Initial bounds are set when PlaceWidget() is invoked.
+  t->Identity();
+//  t->SetInput(input);
+  
+  // Translation
+  for (i=0; i<3; i++)
+    {
+    InitialCenter[i] = 
+      (InitialBounds[2*i+1]+InitialBounds[2*i]) / 2.0;
+    center[i] = p14[i] - InitialCenter[i];
+    }
+  translate[0] = center[0] + InitialCenter[0];
+  translate[1] = center[1] + InitialCenter[1];
+  translate[2] = center[2] + InitialCenter[2];
+  t->Translate(translate[0], translate[1], translate[2]);
+  
+  // Orientation
+  vtkMatrix4x4 *matrix = vtkMatrix4x4::New();
+
+  p0 = pts;
+  double *px = pts + 3*1;
+  double *py = pts + 3*3;
+  double *pz = pts + 3*4;
+  double N[6][3]; //the normals of the face
+  
+  for (i=0; i<3; i++)
+    {
+    N[0][i] = p0[i] - px[i];
+    N[2][i] = p0[i] - py[i];
+    N[4][i] = p0[i] - pz[i];
+    }
+  vtkMath::Normalize(N[0]);
+  vtkMath::Normalize(N[2]);
+  vtkMath::Normalize(N[4]);
+  for (i=0; i<3; i++)
+    {
+    N[1][i] = -N[0][i];
+    N[3][i] = -N[2][i];
+    N[5][i] = -N[4][i];
+    }
+
+  for (i=0; i<3; i++)
+    {
+    matrix->SetElement(i,0,N[1][i]);
+    matrix->SetElement(i,1,N[3][i]);
+    matrix->SetElement(i,2,N[5][i]);
+    }
+  t->Concatenate(matrix);
+  matrix->Delete();
+
+  // Scale
+  for (i=0; i<3; i++)
+    {
+    scaleVec[0][i] = (p1[i] - p0[i]);
+    scaleVec[1][i] = (p3[i] - p0[i]);
+    scaleVec[2][i] = (p4[i] - p0[i]);
+    }
+
+  scale[0] = vtkMath::Norm(scaleVec[0]);
+  if (InitialBounds[1] != InitialBounds[0])
+    {
+    scale[0] = scale[0] / (InitialBounds[1]-InitialBounds[0]);
+    }
+  scale[1] = vtkMath::Norm(scaleVec[1]);
+  if (InitialBounds[3] != InitialBounds[2])
+    {
+    scale[1] = scale[1] / (InitialBounds[3]-InitialBounds[2]);
+    }
+  scale[2] = vtkMath::Norm(scaleVec[2]);
+  if (InitialBounds[5] != InitialBounds[4])
+    {
+    scale[2] = scale[2] / (InitialBounds[5]-InitialBounds[4]);
+    }
+  t->Scale(scale[0],scale[1],scale[2]);
+  
+  // Add back in the contribution due to non-origin center
+  t->Translate(-InitialCenter[0], -InitialCenter[1], -InitialCenter[2]);
+}
+
 
 
 //----------------------------------------------------------------------------
@@ -2391,6 +2492,7 @@ void vtkPVLookmarkManager::CreateLookmarkCallback(int macroFlag)
 vtkPVLookmark* vtkPVLookmarkManager::CreateLookmark(char *name, int macroFlag)
 {
   vtkPVWindow *win = this->GetPVWindow();
+  vtkPVLookmark *lmk = NULL;
 
   // if the pipeline is empty, don't add
   if(win->GetSourceList("Sources")->GetNumberOfItems()==0)
@@ -2410,12 +2512,14 @@ vtkPVLookmark* vtkPVLookmarkManager::CreateLookmark(char *name, int macroFlag)
 
   if(macroFlag)
     {
-    this->CreateLookmark(name, this->GetMacrosFolder()->GetLabelFrame()->GetFrame(), this->GetNumberOfChildLmkItems(this->GetMacrosFolder()->GetLabelFrame()->GetFrame()), 1);
+    lmk = this->CreateLookmark(name, this->GetMacrosFolder()->GetLabelFrame()->GetFrame(), this->GetNumberOfChildLmkItems(this->GetMacrosFolder()->GetLabelFrame()->GetFrame()), 1);
     }
   else
     {
-    this->CreateLookmark(name, this->ScrollFrame->GetFrame(), this->GetNumberOfChildLmkItems(this->ScrollFrame->GetFrame()), 0);
+    lmk = this->CreateLookmark(name, this->ScrollFrame->GetFrame(), this->GetNumberOfChildLmkItems(this->ScrollFrame->GetFrame()), 0);
     }
+
+  return lmk;
 }
 
 

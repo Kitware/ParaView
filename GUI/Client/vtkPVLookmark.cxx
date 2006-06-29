@@ -88,7 +88,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.69");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.70");
 
 
 //*****************************************************************************
@@ -232,6 +232,7 @@ void vtkPVLookmark::View()
   // If this lookmark was generated from a bounding box, create a box widget around the region
   if(this->BoundingBoxFlag)
     {
+/*
     vtkPVSource *input = this->GetPVWindow()->GetCurrentPVSource();
     vtkPVSource *clip = this->GetPVWindow()->CreatePVSource("Clip");
     clip->SetLabel("BoundingBox");
@@ -255,6 +256,7 @@ void vtkPVLookmark::View()
     //box->SetTranslate(newCenter[0]-oldCenter[0],newCenter[1]-oldCenter[1],newCenter[2]-oldCenter[2]);
     //box->SetScale( (newBounds[1]-newBounds[0])/(oldBounds[1]-oldBounds[0]),(newBounds[3]-newBounds[2])/(oldBounds[3]-oldBounds[2]),(newBounds[5]-newBounds[4])/(oldBounds[5]-oldBounds[4]));
     //clip->AcceptCallback();
+*/
     }
 
   // this is needed to update the eyeballs based on recent changes to visibility of filters
@@ -656,7 +658,6 @@ vtkPVSource* vtkPVLookmark::GetReaderForLookmark(vtkPVSourceCollection *readers,
 
 void vtkPVLookmark::CreateIconFromMainView()
 {
-  vtkPVWindow *win = this->GetPVWindow();
   vtkKWIcon *lmkIcon;
 
   this->GetPVRenderView()->GetRenderWindow()->OffScreenRenderingOn();
