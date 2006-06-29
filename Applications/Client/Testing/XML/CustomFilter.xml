@@ -2,10 +2,10 @@
 <pqevents>
   <pqevent object="MainWindow/MenuBar/ServerMenu" command="activate" arguments="Connect" />
   <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
-  <pqevent object="MainWindow/MenuBar/ToolsMenu" command="activate" arguments="CompoundFilter" />
-  <pqevent object="MainWindow/CompoundProxyWizard/LoadButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/CompoundProxyWizard/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Baseline/filters.xml" />
-  <pqevent object="MainWindow/CompoundProxyWizard/DoneButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/MenuBar/ToolsMenu" command="activate" arguments="ManageCustomFilters" />
+  <pqevent object="MainWindow/pqCustomFilterManager/ImportButton" command="activate" arguments="" />
+  <pqevent object="MainWindow/pqCustomFilterManager/FileOpenDialog" command="filesSelected" arguments="$PARAVIEW_DATA_ROOT/Baseline/filters.xml" />
+  <pqevent object="MainWindow/pqCustomFilterManager/CloseButton" command="activate" arguments="" />
   <pqevent object="MainWindow/MenuBar/SourcesMenu" command="activate" arguments="Sphere" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/CompoundProxyToolBar/1QToolButton0" command="activate" arguments="" />

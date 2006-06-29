@@ -100,7 +100,7 @@ ENDIF(APPLE)
 
   SET (TESTS_WITH_BASELINES
     CreateSource
-    CompoundProxy
+    CustomFilter
     UndoRedo
     SubMenu
     ObjectInspectorSphere
