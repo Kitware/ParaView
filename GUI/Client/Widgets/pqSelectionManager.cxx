@@ -325,8 +325,8 @@ vtkSMDisplayProxy* pqSelectionManager::getDisplayProxy(pqRenderModule* rm,
     this->Implementation->Displays[id].DisplayProxy =
       displayProxy;
 
-    vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
-    pm->RegisterProxy("displays", "selectionProxy", displayProxy);
+    //vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+    //pm->RegisterProxy("displays", "selectionProxy", displayProxy);
 
     vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
       displayProxy->GetProperty("Input"));
