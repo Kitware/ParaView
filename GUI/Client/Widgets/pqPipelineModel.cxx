@@ -275,7 +275,7 @@ QString pqPipelineModelServer::getName() const
 }
 
 pqPipelineModelItem::VisibleState pqPipelineModelServer::getVisibleState(
-    pqRenderModule *module) const
+    pqRenderModule *) const
 {
   return pqPipelineModelItem::NotAllowed;
 }

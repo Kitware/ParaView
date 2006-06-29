@@ -274,11 +274,11 @@ bool pqCustomFilterDefinitionWizard::validateCustomFilterName()
     QModelIndex index = this->Filters->getIndexFor(filterName);
     if(index.isValid())
       {
-      int result = QMessageBox::warning(this, "Duplicate Name",
+      int button = QMessageBox::warning(this, "Duplicate Name",
           "The custom filter name already exists.\n"
           "Do you want to overwrite the custom filter?",
           QMessageBox::Yes | QMessageBox::Default, QMessageBox::No);
-      if(result != QMessageBox::Yes)
+      if(button != QMessageBox::Yes)
         {
         return false;
         }
