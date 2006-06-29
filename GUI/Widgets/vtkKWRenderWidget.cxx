@@ -43,7 +43,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.142");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.143");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -165,6 +165,15 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
 
   if (this->RenderWindow)
     {
+    vtkKWGenericRenderWindowInteractor *interactor =
+      vtkKWGenericRenderWindowInteractor::SafeDownCast(
+        this->RenderWindow->GetInteractor());
+    if (interactor)
+      {
+      interactor->SetRenderWidget(NULL);
+      interactor->SetInteractorStyle(NULL);
+      }
+
     this->RenderWindow->Delete();
     this->RenderWindow = NULL;
     }
