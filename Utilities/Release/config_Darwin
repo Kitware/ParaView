@@ -10,5 +10,8 @@ write_cache()
   cat >> CMakeCache.txt <<EOF
 VTK_USE_CARBON:BOOL=OFF
 VTK_USE_X:BOOL=ON
+OPENGL_INCLUDE_DIR:PATH=/usr/X11R6/include
+OPENGL_gl_LIBRARY:FILEPATH=/usr/X11R6/lib/libGL.a
+OPENGL_glu_LIBRARY:FILEPATH=/usr/X11R6/lib/libGLU.a
 EOF
 }
