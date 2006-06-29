@@ -122,8 +122,6 @@ void pqPointSourceWidget::accept()
   if(this->Implementation->ControlledProxy)
     {
     double center[3] = { 0, 0, 0 };
-    int points = 0;
-    double radius = 0;
     
     this->Implementation->HandleWidget.getWidgetState(center);
 
@@ -143,8 +141,6 @@ void pqPointSourceWidget::reset()
   if(this->Implementation->ControlledProxy)
     {
     double center[3] = { 0, 0, 0 };
-    int points = 0;
-    double radius = 0;
 
     if(vtkSMDoubleVectorProperty* const center_property = vtkSMDoubleVectorProperty::SafeDownCast(
       this->Implementation->ControlledProxy->GetProperty("Center")))
