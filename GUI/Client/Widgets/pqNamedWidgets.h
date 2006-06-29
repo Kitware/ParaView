@@ -38,35 +38,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QWidget;
 class pqPropertyManager;
 
-class pqNamedWidgets :
-  public QObject
+class pqNamedWidgets
 {
-  Q_OBJECT
-  
 public:
-  pqNamedWidgets();
-  ~pqNamedWidgets();
-
-  /// Link Qt widgets with server manager properties by name
-  void link(QWidget* parent, pqSMProxy proxy);
+  /// Link a collection of Qt child widgets with server manager properties by name
+  static void link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager);
   /// Remove links between Qt widgets and server manager properties
-  void unlink(QWidget* parent, pqSMProxy proxy);
-
-signals:
-  /// Signal emitted when changes have been made to a property
-  void propertyChanged();
-
-public slots:
-  /// Accept pending changes
-  void accept();
-  /// Reset pending changes
-  void reset();
-
-private slots:
-  void onPropertyChanged(bool);
-
-private:
-  pqPropertyManager* const PropertyManager;
+  static void unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager);
 };
 
 #endif

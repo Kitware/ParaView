@@ -35,47 +35,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 
 pqNamedObjectPanel::pqNamedObjectPanel(QWidget* p) :
-  pqObjectPanel(p),
-  NamedWidgets(new pqNamedWidgets())
+  pqObjectPanel(p)
 {
-  connect(
-    this->NamedWidgets,
-    SIGNAL(propertyChanged()),
-    this->PropertyManager,
-    SLOT(propertyChanged()));
 }
 
 pqNamedObjectPanel::~pqNamedObjectPanel()
 {
   if(this->Proxy)
     {
-    this->NamedWidgets->unlink(this, this->Proxy);
+    pqNamedWidgets::unlink(this, this->Proxy, this->PropertyManager);
     this->Proxy = NULL;
     }
-    
-  delete this->NamedWidgets;
-}
-
-void pqNamedObjectPanel::accept()
-{
-  this->NamedWidgets->accept();
-  
-  Superclass::accept();
-}
-
-void pqNamedObjectPanel::reset()
-{
-  this->NamedWidgets->reset();
-  
-  Superclass::reset();
 }
 
 void pqNamedObjectPanel::linkServerManagerProperties()
 {
-  this->NamedWidgets->link(this, this->Proxy);
+  pqNamedWidgets::link(this, this->Proxy, this->PropertyManager);
 }
 
 void pqNamedObjectPanel::unlinkServerManagerProperties()
 {
-  this->NamedWidgets->unlink(this, this->Proxy);
+  pqNamedWidgets::unlink(this, this->Proxy, this->PropertyManager);
 }

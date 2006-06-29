@@ -56,7 +56,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqMultiView.h
   pqMultiViewFrame.h
   pqNamedObjectPanel.h
-  pqNamedWidgets.h
   pqObjectInspectorWidget.h
   pqObjectPanel.h
   pqOutputWindow.h

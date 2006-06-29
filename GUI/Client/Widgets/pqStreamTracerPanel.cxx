@@ -57,8 +57,8 @@ class pqStreamTracerPanel::pqImplementation
 {
 public:
   pqImplementation(QWidget* parent) :
-    HandleWidget(new pqHandleWidget(parent)),
-    LineWidget(0 /*new pqLineWidget(parent)*/)
+    HandleWidget(0 /*new pqHandleWidget(parent)*/),
+    LineWidget(new pqLineWidget(parent))
   {
   }
 
@@ -76,8 +76,6 @@ public:
   QWidget ControlsContainer;
   /// Provides the remaining Qt controls for the panel
   Ui::pqStreamTracerControls Controls;
-  /// Links Qt widgets to SM properties by name
-  pqNamedWidgets NamedWidgets;
 };
 
 pqStreamTracerPanel::pqStreamTracerPanel(QWidget* p) :
@@ -89,12 +87,6 @@ pqStreamTracerPanel::pqStreamTracerPanel(QWidget* p) :
   this->Implementation->Controls.setupUi(
     &this->Implementation->ControlsContainer);
   panel_layout->addWidget(&this->Implementation->ControlsContainer);
-
-  connect(
-    &this->Implementation->NamedWidgets,
-    SIGNAL(propertyChanged()),
-    this,
-    SLOT(onQtWidgetChanged()));
 
   QFrame* const separator = new QFrame();
   separator->setFrameShape(QFrame::HLine);
@@ -142,14 +134,9 @@ void pqStreamTracerPanel::on3DWidgetChanged()
   this->getPropertyManager()->propertyChanged();
 }
 
-void pqStreamTracerPanel::onQtWidgetChanged()
-{
-  this->getPropertyManager()->propertyChanged();
-}
-
 void pqStreamTracerPanel::onAccepted()
 {
-  this->Implementation->NamedWidgets.accept();
+//  this->Implementation->NamedWidgets.accept();
   
 /*
   // Get the current values from the 3D implicit plane widget ...
@@ -227,7 +214,7 @@ void pqStreamTracerPanel::onAccepted()
 
 void pqStreamTracerPanel::onRejected()
 {
-  this->Implementation->NamedWidgets.reset();
+//  this->Implementation->NamedWidgets.reset();
   
 /*
   // Restore the state of the implicit plane widget ...
@@ -353,8 +340,8 @@ void pqStreamTracerPanel::setProxyInternal(pqSMProxy p)
 
 void pqStreamTracerPanel::select()
 {
-  this->Implementation->NamedWidgets.link(
-    &this->Implementation->ControlsContainer, this->Proxy);
+  pqNamedWidgets::link(
+    &this->Implementation->ControlsContainer, this->Proxy, this->PropertyManager);
 
   if(this->Implementation->HandleWidget)
     {
@@ -369,8 +356,8 @@ void pqStreamTracerPanel::select()
 
 void pqStreamTracerPanel::deselect()
 {
-  this->Implementation->NamedWidgets.unlink(
-    &this->Implementation->ControlsContainer, this->Proxy);
+  pqNamedWidgets::unlink(
+    &this->Implementation->ControlsContainer, this->Proxy, this->PropertyManager);
 
   if(this->Implementation->HandleWidget)
     {

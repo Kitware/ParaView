@@ -50,8 +50,6 @@ public:
 private slots:
   /// Called when changes are made to a 3D widget
   void on3DWidgetChanged();
-  /// Called when changes are made to a Qt widget
-  void onQtWidgetChanged();
   /// Called if the user accepts pending modifications
   void onAccepted();
   /// Called if the user rejects pending modifications
