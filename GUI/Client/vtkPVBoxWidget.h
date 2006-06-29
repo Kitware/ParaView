@@ -121,8 +121,10 @@ public:
   virtual void DisableAnimation() { this->UnregisterAnimateableProxies();} ;
 
   // Description:
-  // Be able to place widget based on bounds rather than automatically using input data
-  virtual void PlaceWidget(double bds[6]);
+  // Provides option to place widget based on these bounds rather than automatically using the bounds of the input data
+  // Once this is called for this box widget, the bounds of the input data will no longer be used to initialize it, even
+  // when the input changes.
+  virtual void PlaceWidget(double xMin,double xMax,double yMin,double yMax,double zMin,double zMax);
 
 protected:
   vtkPVBoxWidget();
@@ -137,7 +139,8 @@ protected:
   // PlaceWidget is overloaded since, this class has to position the
   // bounds on the BoxProxy(vtkBox) as well.
   virtual void PlaceWidget() { this->Superclass::PlaceWidget(); }
-  
+  virtual void PlaceWidget(double bds[6]);
+
   // Description:
   // Call creation on the child.
   virtual void ChildCreate();
@@ -203,6 +206,10 @@ protected:
   double PositionGUI[3];
   double RotationGUI[3];
   double ScaleGUI[3];
+
+  // A flag to signify whether we are using the bounds of the input data to initialize the widget
+  // or whether the bounds have been explicitly set.
+  bool UseInputBounds;
 
   void SetupPropertyObservers();
   void UnsetPropertyObservers();

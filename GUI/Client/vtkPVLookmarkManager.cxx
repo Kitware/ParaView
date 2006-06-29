@@ -81,7 +81,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.88");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.89");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -1426,7 +1426,7 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(int locationOfLmkItemAm
     vtkPVBoxWidget *box = vtkPVBoxWidget::SafeDownCast(widgetType->GetPVWidget("Box"));
     vtkPVLabeledToggle *insideOut = vtkPVLabeledToggle::SafeDownCast(clip->GetPVWidget("InsideOut"));
     insideOut->SetSelectedState(1);
-    //box->PlaceWidget(newBounds[0],newBounds[1],newBounds[2],newBounds[3],newBounds[4],newBounds[5]);
+    box->PlaceWidget(newBounds[0],newBounds[1],newBounds[2],newBounds[3],newBounds[4],newBounds[5]);
     clip->AcceptCallback();
 
     newCenter[0]= newBounds[0] + (newBounds[1] - newBounds[0])/2;

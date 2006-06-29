@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.68");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.69");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -66,6 +66,8 @@ vtkPVBoxWidget::vtkPVBoxWidget()
 
   this->BoxProxy = 0; // This is the implicit function proxy
   this->BoxTransformProxy = 0;
+
+  this->UseInputBounds = true;
   
   this->SetWidgetProxyXMLName("BoxWidgetProxy");
 }
@@ -161,6 +163,25 @@ void vtkPVBoxWidget::ResetInternal()
   this->Superclass::ResetInternal();
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::PlaceWidget(double xMin, double xMax, double yMin, double yMax, double zMin, double zMax)
+{
+  double bds[6];
+
+  bds[0] = xMin;
+  bds[1] = xMax;
+  bds[2] = yMin;
+  bds[3] = yMax;
+  bds[4] = zMin;
+  bds[5] = zMax;
+
+  this->PlaceWidget(bds);
+
+  // when this method is called, we no longer want to update when input changes
+  this->UseInputBounds = false;
+}
+
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::PlaceWidget(double bds[6])
 {
@@ -246,25 +267,45 @@ void vtkPVBoxWidget::Trace(ofstream *file)
   // Called to save the state of the widget's visibility
   this->Superclass::Trace(file);
 
-  this->GetRotationFromGUI();
-  this->GetScaleFromGUI();
-  this->GetPositionFromGUI();
+  // If the bounds have not been specified explicitly, widget will be initialized using scale, rotate, position parameters
+  if(this->UseInputBounds)
+    {
+    this->GetRotationFromGUI();
+    this->GetScaleFromGUI();
+    this->GetPositionFromGUI();
 
-  *file << "$kw(" << this->GetTclName() << ") SetScale "
-    << this->ScaleGUI[0] << " "
-    << this->ScaleGUI[1] << " "
-    << this->ScaleGUI[2] << endl;
-  *file << "$kw(" << this->GetTclName() << ") SetTranslate "
-    << this->PositionGUI[0] << " "
-    << this->PositionGUI[1] << " "
-    << this->PositionGUI[2] << endl;
-  if ( this->RotationGUI[0] < 0 ) { this->RotationGUI[0] += 360; }
-  if ( this->RotationGUI[1] < 0 ) { this->RotationGUI[1] += 360; }
-  if ( this->RotationGUI[2] < 0 ) { this->RotationGUI[2] += 360; }
-  *file << "$kw(" << this->GetTclName() << ") SetOrientation "
-    << this->RotationGUI[0] << " "
-    << this->RotationGUI[1] << " "
-    << this->RotationGUI[2] << endl;
+    *file << "$kw(" << this->GetTclName() << ") SetScale "
+      << this->ScaleGUI[0] << " "
+      << this->ScaleGUI[1] << " "
+      << this->ScaleGUI[2] << endl;
+    *file << "$kw(" << this->GetTclName() << ") SetTranslate "
+      << this->PositionGUI[0] << " "
+      << this->PositionGUI[1] << " "
+      << this->PositionGUI[2] << endl;
+    if ( this->RotationGUI[0] < 0 ) { this->RotationGUI[0] += 360; }
+    if ( this->RotationGUI[1] < 0 ) { this->RotationGUI[1] += 360; }
+    if ( this->RotationGUI[2] < 0 ) { this->RotationGUI[2] += 360; }
+    *file << "$kw(" << this->GetTclName() << ") SetOrientation "
+      << this->RotationGUI[0] << " "
+      << this->RotationGUI[1] << " "
+      << this->RotationGUI[2] << endl;
+    }
+  else if(this->BoxProxy)
+    {
+    vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->BoxProxy->GetProperty("Bounds"));
+    if (dvp)
+      {
+      *file << "$kw(" << this->GetTclName() << ") PlaceWidget "
+          << dvp->GetElement(0) << " "
+          << dvp->GetElement(1) << " "
+          << dvp->GetElement(2) << " "
+          << dvp->GetElement(3) << " "
+          << dvp->GetElement(4) << " "
+          << dvp->GetElement(5) << endl;
+      }
+    }
+
   /*
   for ( cc = 0; cc < 3; cc ++ )
   {
@@ -1044,7 +1085,9 @@ void vtkPVBoxWidget::Update()
   this->Superclass::Update();
   //Input bounds may have changed so call place widget
   input = this->InputMenu->GetCurrentValue();
-  if (input)
+  
+  // Do not place widget if we are not using input data bounds to set up widget
+  if (input && this->UseInputBounds)
     {
     input->GetDataInformation()->GetBounds(bds);
     this->PlaceWidget(bds);
