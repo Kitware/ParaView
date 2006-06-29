@@ -9,7 +9,7 @@
     <x>0</x>
     <y>0</y>
     <width>190</width>
-    <height>285</height>
+    <height>258</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -17,50 +17,60 @@
   </property>
   <layout class="QVBoxLayout" >
    <property name="margin" >
-    <number>9</number>
+    <number>0</number>
    </property>
    <property name="spacing" >
-    <number>6</number>
+    <number>5</number>
    </property>
    <item>
-    <widget class="QCheckBox" name="show3DWidget" >
-     <property name="text" >
-      <string>Visible</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QGridLayout" >
+    <layout class="QHBoxLayout" >
      <property name="margin" >
       <number>0</number>
      </property>
      <property name="spacing" >
       <number>6</number>
      </property>
-     <item row="0" column="0" >
+     <item>
+      <widget class="QCheckBox" name="show3DWidget" >
+       <property name="text" >
+        <string>Visible</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="useCenterBounds" >
+       <property name="text" >
+        <string>Center on Bounds</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" >
+     <property name="margin" >
+      <number>0</number>
+     </property>
+     <property name="spacing" >
+      <number>6</number>
+     </property>
+     <item>
       <widget class="QLabel" name="label_3" >
        <property name="text" >
         <string>Point</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="3" >
-      <widget class="QLineEdit" name="worldPositionZ" />
-     </item>
-     <item row="0" column="2" >
-      <widget class="QLineEdit" name="worldPositionY" />
-     </item>
-     <item row="0" column="1" >
+     <item>
       <widget class="QLineEdit" name="worldPositionX" />
      </item>
+     <item>
+      <widget class="QLineEdit" name="worldPositionY" />
+     </item>
+     <item>
+      <widget class="QLineEdit" name="worldPositionZ" />
+     </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QPushButton" name="useCenterBounds" >
-     <property name="text" >
-      <string>Center on Bounds</string>
-     </property>
-    </widget>
    </item>
    <item>
     <spacer>
@@ -80,6 +90,7 @@
  <pixmapfunction></pixmapfunction>
  <tabstops>
   <tabstop>show3DWidget</tabstop>
+  <tabstop>useCenterBounds</tabstop>
   <tabstop>worldPositionX</tabstop>
   <tabstop>worldPositionY</tabstop>
   <tabstop>worldPositionZ</tabstop>

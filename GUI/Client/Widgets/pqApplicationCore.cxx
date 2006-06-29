@@ -408,6 +408,33 @@ pqPipelineSource* pqApplicationCore::createFilterForActiveSource(
         
       this->Internal->UndoStack->PauseUndoSet();
       }
+      
+    // As a special-case, set a default point source for new StreamTracer filters
+    if(xmlname == "StreamTracer")
+      {
+      vtkSMProxy* const point_source = this->Internal->PipelineBuilder->createProxy(
+        "sources", "PointSource", "",
+        this->Internal->ActiveSource->getServer());
+        
+      if(vtkSMIntVectorProperty* const number_of_points =
+        vtkSMIntVectorProperty::SafeDownCast(
+          point_source->GetProperty("NumberOfPoints")))
+        {
+        number_of_points->SetNumberOfElements(1);
+        number_of_points->SetElement(0, 100);
+        }
+        
+      this->Internal->UndoStack->BeginOrContinueUndoSet("Set Point Source");
+      
+      if(vtkSMProxyProperty* const source = 
+        vtkSMProxyProperty::SafeDownCast(
+          filter->getProxy()->GetProperty("Source")))
+        {
+        source->AddProxy(point_source);
+        }
+        
+      this->Internal->UndoStack->PauseUndoSet();
+      }
     }
 
   if (filter)

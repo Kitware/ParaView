@@ -115,6 +115,7 @@ ENDIF(APPLE)
     OpenSaveData
     LoadState
     Contour
+    StreamTracer
     )
 
   SET (TESTS_WITHOUT_BASELINES

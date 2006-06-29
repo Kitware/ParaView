@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program:   ParaQ
-   Module:    pqStreamTracerPanel.h
+   Module:    pqPointSourceWidget.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,34 +30,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef _pqStreamTracerPanel_h
-#define _pqStreamTracerPanel_h
+#ifndef _pqPointSourceWidget_h
+#define _pqPointSourceWidget_h
 
-#include "pqObjectPanel.h"
+#include "pqSMProxy.h"
 
-/// Custom panel for the StreamTracer filter that manages a combined Qt / 3D widget UI
-class pqStreamTracerPanel :
-  public pqObjectPanel
+#include <QWidget>
+
+class pqPropertyManager;
+
+/// Provides a complete Qt UI for working with a vtkPointSource filter
+class pqPointSourceWidget :
+  public QWidget
 {
-  typedef pqObjectPanel base;
-
   Q_OBJECT
-
-public:
-  pqStreamTracerPanel(QWidget* p);
-  ~pqStreamTracerPanel();
   
+public:
+  pqPointSourceWidget(QWidget* p);
+  ~pqPointSourceWidget();
+
+  /** Sets a "reference" proxy that will be used to provide bounds
+  for the 3D point widget */
+  void setReferenceProxy(pqSMProxy proxy);
+  /** Sets the vtkPointSource proxy that will actually be controlled
+  by user interaction */
+  void setControlledProxy(pqSMProxy proxy);
+
+  /// Enables the UI, making the 3D widget visible
+  void showWidget(pqPropertyManager* property_manager);
+  /// Accepts pending changes, pushing them to the server manager
+  void accept();
+  /// Resets pending changes, restoring the original state
+  void reset();
+  /// Disables the UI, hiding the 3D widget
+  void hideWidget(pqPropertyManager* property_manager);
+
+signals:
+  /// Signal emitted whenever any part of the UI is modified
+  void widgetChanged();
+
 private slots:
-  /// Called if the user accepts pending modifications
-  void onAccepted();
-  /// Called if the user rejects pending modifications
-  void onRejected();
+  void widgetChanged(const QString&);
 
 private:
-  virtual void setProxyInternal(pqSMProxy p);
-  virtual void select();
-  virtual void deselect();
-
   class pqImplementation;
   pqImplementation* const Implementation;
 };

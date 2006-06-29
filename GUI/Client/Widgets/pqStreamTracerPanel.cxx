@@ -31,11 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqApplicationCore.h"
-#include "pqHandleWidget.h"
 #include "pqLineWidget.h"
 #include "pqNamedWidgets.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
+#include "pqPointSourceWidget.h"
 #include "pqPropertyManager.h"
 #include "pqServerManagerModel.h"
 #include "pqSignalAdaptors.h"
@@ -57,19 +57,19 @@ class pqStreamTracerPanel::pqImplementation
 {
 public:
   pqImplementation(QWidget* parent) :
-    HandleWidget(0 /*new pqHandleWidget(parent)*/),
-    LineWidget(new pqLineWidget(parent))
+    PointSourceWidget(new pqPointSourceWidget(parent)),
+    LineWidget(0 /*new pqLineWidget(parent)*/)
   {
   }
 
   ~pqImplementation()
   {
     delete this->LineWidget;
-    delete this->HandleWidget;
+    delete this->PointSourceWidget;
   }
   
-  /// Manages a 3D handle widget, plus Qt controls
-  pqHandleWidget* const HandleWidget;
+  /// Provides a UI for managing a vtkPointSource
+  pqPointSourceWidget* const PointSourceWidget;
   /// Manages a 3D line widget, plus Qt controls  
   pqLineWidget* const LineWidget;
   /// Provides a container for Qt controls
@@ -92,15 +92,15 @@ pqStreamTracerPanel::pqStreamTracerPanel(QWidget* p) :
   separator->setFrameShape(QFrame::HLine);
   panel_layout->addWidget(separator);
   
-  if(this->Implementation->HandleWidget)
+  if(this->Implementation->PointSourceWidget)
     {
-    panel_layout->addWidget(this->Implementation->HandleWidget);
+    panel_layout->addWidget(this->Implementation->PointSourceWidget);
 
     connect(
-      this->Implementation->HandleWidget,
+      this->Implementation->PointSourceWidget,
       SIGNAL(widgetChanged()),
-      this,
-      SLOT(on3DWidgetChanged()));
+      this->getPropertyManager(),
+      SLOT(propertyChanged()));
     }
 
   if(this->Implementation->LineWidget)
@@ -110,8 +110,8 @@ pqStreamTracerPanel::pqStreamTracerPanel(QWidget* p) :
     connect(
       this->Implementation->LineWidget,
       SIGNAL(widgetChanged()),
-      this,
-      SLOT(on3DWidgetChanged()));
+      this->getPropertyManager(),
+      SLOT(propertyChanged()));
     }
     
   this->setLayout(panel_layout);
@@ -129,63 +129,13 @@ pqStreamTracerPanel::~pqStreamTracerPanel()
   delete this->Implementation;
 }
 
-void pqStreamTracerPanel::on3DWidgetChanged()
-{
-  this->getPropertyManager()->propertyChanged();
-}
-
 void pqStreamTracerPanel::onAccepted()
 {
-//  this->Implementation->NamedWidgets.accept();
-  
-/*
-  // Get the current values from the 3D implicit plane widget ...
-  double origin[3] = { 0, 0, 0 };
-  double normal[3] = { 0, 0, 1 };
-  this->Implementation->LineWidget.getWidgetState(origin, normal);
-
-  // Get the current values from the sample scalar widget ...
-  const QList<double> samples = this->Implementation->SampleScalarWidget.getSamples();
-  
-  // Push the new values into the cut filter ...  
-  if(this->Proxy)
+  if(this->Implementation->PointSourceWidget)
     {
-    if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
-      this->Proxy->GetProperty("StreamTracerFunction")))
-      {
-      if(vtkSMProxy* const clip_function = clip_function_property->GetProxy(0))
-        {
-        if(vtkSMDoubleVectorProperty* const plane_origin = vtkSMDoubleVectorProperty::SafeDownCast(
-          clip_function->GetProperty("Origin")))
-          {
-          plane_origin->SetElements(origin);
-          }
-
-        if(vtkSMDoubleVectorProperty* const plane_normal = vtkSMDoubleVectorProperty::SafeDownCast(
-          clip_function->GetProperty("Normal")))
-          {
-          plane_normal->SetElements(normal);
-          }
-
-        clip_function->UpdateVTKObjects();
-        }
-      }
-      
-    if(vtkSMDoubleVectorProperty* const contours =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        this->Proxy->GetProperty("ContourValues")))
-      {
-      contours->SetNumberOfElements(samples.size());
-      for(int i = 0; i != samples.size(); ++i)
-        {
-        contours->SetElement(i, samples[i]);
-        }
-        
-      this->Proxy->UpdateVTKObjects();
-      }
+    this->Implementation->PointSourceWidget->accept();
     }
-*/
-  
+    
   // If this is the first time we've been accepted since our creation, hide the source
   if(pqPipelineFilter* const pipeline_filter =
     dynamic_cast<pqPipelineFilter*>(pqServerManagerModel::instance()->getPQSource(this->Proxy)))
@@ -214,66 +164,31 @@ void pqStreamTracerPanel::onAccepted()
 
 void pqStreamTracerPanel::onRejected()
 {
-//  this->Implementation->NamedWidgets.reset();
-  
-/*
-  // Restore the state of the implicit plane widget ...
-  double origin[3] = { 0, 0, 0 };
-  double normal[3] = { 0, 0, 1 };
-  
-  if(this->Proxy)
+  if(this->Implementation->PointSourceWidget)
     {
-    if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
-      this->Proxy->GetProperty("StreamTracerFunction")))
-      {
-      if(vtkSMProxy* const clip_function = clip_function_property->GetProxy(0))
-        {
-        if(vtkSMDoubleVectorProperty* const plane_origin = vtkSMDoubleVectorProperty::SafeDownCast(
-          clip_function->GetProperty("Origin")))
-          {
-          origin[0] = plane_origin->GetElement(0);
-          origin[1] = plane_origin->GetElement(1);
-          origin[2] = plane_origin->GetElement(2);
-          }
-
-        if(vtkSMDoubleVectorProperty* const plane_normal = vtkSMDoubleVectorProperty::SafeDownCast(
-          clip_function->GetProperty("Normal")))
-          {
-          normal[0] = plane_normal->GetElement(0);
-          normal[1] = plane_normal->GetElement(1);
-          normal[2] = plane_normal->GetElement(2);
-          }
-        }
-      }
+    this->Implementation->PointSourceWidget->reset();
     }
-  this->Implementation->LineWidget.setWidgetState(origin, normal);
-
-  // Reset the state of the sample scalar widget ...
-  QList<double> values;
-  if(this->Proxy)
-    {
-    if(vtkSMDoubleVectorProperty* const contours =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        this->Proxy->GetProperty("ContourValues")))
-      {
-      const int value_count = contours->GetNumberOfElements();
-      for(int i = 0; i != value_count; ++i)
-        {
-        values.push_back(contours->GetElement(i));
-        }
-      }
-    }
-  this->Implementation->SampleScalarWidget.setSamples(values);
-*/
 }
 
 void pqStreamTracerPanel::setProxyInternal(pqSMProxy p)
 {
   base::setProxyInternal(p);
  
-  if(this->Implementation->HandleWidget)
+  if(this->Implementation->PointSourceWidget)
     {
-    this->Implementation->HandleWidget->setReferenceProxy(p);
+    this->Implementation->PointSourceWidget->setReferenceProxy(p);
+    
+    if(p)
+      {
+      if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
+        p->GetProperty("Source")))
+        {
+        if(vtkSMProxy* const point_source = source_property->GetProxy(0))
+          {
+          this->Implementation->PointSourceWidget->setControlledProxy(point_source);
+          }
+        }
+      }
     }
     
   if(this->Implementation->LineWidget)
@@ -283,59 +198,6 @@ void pqStreamTracerPanel::setProxyInternal(pqSMProxy p)
   
   if(!this->Proxy)
     return;
-
-/*
-  // Setup the implicit plane widget ...
-  double origin[3] = { 0, 0, 0 };
-  double normal[3] = { 0, 0, 1 };
-  
-  if(this->Proxy)
-    {
-    if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
-      this->Proxy->GetProperty("StreamTracerFunction")))
-      {
-      if(vtkSMProxy* const clip_function = clip_function_property->GetProxy(0))
-        {
-        if(vtkSMDoubleVectorProperty* const plane_origin = vtkSMDoubleVectorProperty::SafeDownCast(
-          clip_function->GetProperty("Origin")))
-          {
-          origin[0] = plane_origin->GetElement(0);
-          origin[1] = plane_origin->GetElement(1);
-          origin[2] = plane_origin->GetElement(2);
-          }
-
-        if(vtkSMDoubleVectorProperty* const plane_normal = vtkSMDoubleVectorProperty::SafeDownCast(
-          clip_function->GetProperty("Normal")))
-          {
-          normal[0] = plane_normal->GetElement(0);
-          normal[1] = plane_normal->GetElement(1);
-          normal[2] = plane_normal->GetElement(2);
-          }
-        }
-      }
-    }
-
-  this->Implementation->LineWidget.setWidgetState(origin, normal);
-
-  // Setup the sample scalar widget ...
-  QList<double> values;
-  
-  if(this->Proxy)
-    {
-    if(vtkSMDoubleVectorProperty* const contours =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        this->Proxy->GetProperty("ContourValues")))
-      {
-      const int value_count = contours->GetNumberOfElements();
-      for(int i = 0; i != value_count; ++i)
-        {
-        values.push_back(contours->GetElement(i));
-        }
-      }
-    }
-    
-  this->Implementation->SampleScalarWidget.setSamples(values);
-*/
 }
 
 void pqStreamTracerPanel::select()
@@ -343,9 +205,9 @@ void pqStreamTracerPanel::select()
   pqNamedWidgets::link(
     &this->Implementation->ControlsContainer, this->Proxy, this->PropertyManager);
 
-  if(this->Implementation->HandleWidget)
+  if(this->Implementation->PointSourceWidget)
     {
-    this->Implementation->HandleWidget->showWidget();
+    this->Implementation->PointSourceWidget->showWidget(this->PropertyManager);
     }
     
   if(this->Implementation->LineWidget)
@@ -359,9 +221,9 @@ void pqStreamTracerPanel::deselect()
   pqNamedWidgets::unlink(
     &this->Implementation->ControlsContainer, this->Proxy, this->PropertyManager);
 
-  if(this->Implementation->HandleWidget)
+  if(this->Implementation->PointSourceWidget)
     {
-    this->Implementation->HandleWidget->hideWidget();
+    this->Implementation->PointSourceWidget->hideWidget(this->PropertyManager);
     }
 
   if(this->Implementation->LineWidget)
