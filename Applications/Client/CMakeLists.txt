@@ -101,6 +101,7 @@ ENDIF(APPLE)
   SET (TESTS_WITH_BASELINES
     Clip
     ClipHidden
+    ClipUndo
     Contour
     CreateSource
     CreateSourceWithoutConnect

@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqCutPanel :
   public pqObjectPanel
 {
-  typedef pqObjectPanel base;
+  typedef pqObjectPanel Superclass;
 
   Q_OBJECT
 

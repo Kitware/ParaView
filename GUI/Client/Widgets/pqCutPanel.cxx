@@ -65,7 +65,7 @@ public:
 };
 
 pqCutPanel::pqCutPanel(QWidget* p) :
-  base(p),
+  Superclass(p),
   Implementation(new pqImplementation(this))
 {
   QFrame* const separator = new QFrame();
@@ -128,38 +128,12 @@ void pqCutPanel::onSampleScalarWidgetChanged()
 
 void pqCutPanel::onAccepted()
 {
-  // Get the current values from the 3D implicit plane widget ...
-  double origin[3] = { 0, 0, 0 };
-  double normal[3] = { 0, 0, 1 };
-  this->Implementation->ImplicitPlaneWidget.getWidgetState(origin, normal);
-
+  this->Implementation->ImplicitPlaneWidget.accept();
+      
   // Get the current values from the sample scalar widget ...
   const QList<double> samples = this->Implementation->SampleScalarWidget.getSamples();
-  
-  // Push the new values into the cut filter ...  
   if(this->Proxy)
     {
-    if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
-      this->Proxy->GetProperty("CutFunction")))
-      {
-      if(vtkSMProxy* const clip_function = clip_function_property->GetProxy(0))
-        {
-        if(vtkSMDoubleVectorProperty* const plane_origin = vtkSMDoubleVectorProperty::SafeDownCast(
-          clip_function->GetProperty("Origin")))
-          {
-          plane_origin->SetElements(origin);
-          }
-
-        if(vtkSMDoubleVectorProperty* const plane_normal = vtkSMDoubleVectorProperty::SafeDownCast(
-          clip_function->GetProperty("Normal")))
-          {
-          plane_normal->SetElements(normal);
-          }
-
-        clip_function->UpdateVTKObjects();
-        }
-      }
-      
     if(vtkSMDoubleVectorProperty* const contours =
       vtkSMDoubleVectorProperty::SafeDownCast(
         this->Proxy->GetProperty("ContourValues")))
@@ -202,36 +176,7 @@ void pqCutPanel::onAccepted()
 
 void pqCutPanel::onRejected()
 {
-  // Restore the state of the implicit plane widget ...
-  double origin[3] = { 0, 0, 0 };
-  double normal[3] = { 0, 0, 1 };
-  
-  if(this->Proxy)
-    {
-    if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
-      this->Proxy->GetProperty("CutFunction")))
-      {
-      if(vtkSMProxy* const clip_function = clip_function_property->GetProxy(0))
-        {
-        if(vtkSMDoubleVectorProperty* const plane_origin = vtkSMDoubleVectorProperty::SafeDownCast(
-          clip_function->GetProperty("Origin")))
-          {
-          origin[0] = plane_origin->GetElement(0);
-          origin[1] = plane_origin->GetElement(1);
-          origin[2] = plane_origin->GetElement(2);
-          }
-
-        if(vtkSMDoubleVectorProperty* const plane_normal = vtkSMDoubleVectorProperty::SafeDownCast(
-          clip_function->GetProperty("Normal")))
-          {
-          normal[0] = plane_normal->GetElement(0);
-          normal[1] = plane_normal->GetElement(1);
-          normal[2] = plane_normal->GetElement(2);
-          }
-        }
-      }
-    }
-  this->Implementation->ImplicitPlaneWidget.setWidgetState(origin, normal);
+  this->Implementation->ImplicitPlaneWidget.reset();
 
   // Reset the state of the sample scalar widget ...
   QList<double> values;
@@ -253,48 +198,32 @@ void pqCutPanel::onRejected()
 
 void pqCutPanel::setProxyInternal(pqSMProxy p)
 {
-  base::setProxyInternal(p);
- 
-  this->Implementation->ImplicitPlaneWidget.setBoundingBoxProxy(p);
-  
-  if(!this->Proxy)
-    return;
-  
-  // Setup the implicit plane widget ...
-  double origin[3] = { 0, 0, 0 };
-  double normal[3] = { 0, 0, 1 };
-  
+  Superclass::setProxyInternal(p);
+
+  pqSMProxy reference_proxy = p;
+  pqSMProxy controlled_proxy;
+  vtkSMDoubleVectorProperty* origin_property = 0;
+  vtkSMDoubleVectorProperty* normal_property = 0;
+   
   if(this->Proxy)
     {
     if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
       this->Proxy->GetProperty("CutFunction")))
       {
-      if(vtkSMProxy* const clip_function = clip_function_property->GetProxy(0))
+      if(controlled_proxy = clip_function_property->GetProxy(0))
         {
-        if(vtkSMDoubleVectorProperty* const plane_origin = vtkSMDoubleVectorProperty::SafeDownCast(
-          clip_function->GetProperty("Origin")))
-          {
-          origin[0] = plane_origin->GetElement(0);
-          origin[1] = plane_origin->GetElement(1);
-          origin[2] = plane_origin->GetElement(2);
-          }
-
-        if(vtkSMDoubleVectorProperty* const plane_normal = vtkSMDoubleVectorProperty::SafeDownCast(
-          clip_function->GetProperty("Normal")))
-          {
-          normal[0] = plane_normal->GetElement(0);
-          normal[1] = plane_normal->GetElement(1);
-          normal[2] = plane_normal->GetElement(2);
-          }
+        origin_property = vtkSMDoubleVectorProperty::SafeDownCast(
+          controlled_proxy->GetProperty("Origin"));
+        normal_property = vtkSMDoubleVectorProperty::SafeDownCast(
+          controlled_proxy->GetProperty("Normal"));
         }
       }
     }
-
-  this->Implementation->ImplicitPlaneWidget.setWidgetState(origin, normal);
+  this->Implementation->ImplicitPlaneWidget.setDataSources(
+    reference_proxy, controlled_proxy, origin_property, normal_property);
 
   // Setup the sample scalar widget ...
   QList<double> values;
-  
   if(this->Proxy)
     {
     if(vtkSMDoubleVectorProperty* const contours =
@@ -308,7 +237,6 @@ void pqCutPanel::setProxyInternal(pqSMProxy p)
         }
       }
     }
-    
   this->Implementation->SampleScalarWidget.setSamples(values);
 }
 

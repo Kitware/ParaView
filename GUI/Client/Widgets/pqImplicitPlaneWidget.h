@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 
+class vtkSMDoubleVectorProperty;
+
 /// Provides a complete Qt UI for working with a 3D plane widget
 class pqImplicitPlaneWidget :
   public QWidget
@@ -47,18 +49,22 @@ public:
   pqImplicitPlaneWidget(QWidget* p);
   ~pqImplicitPlaneWidget();
 
-  /// Sets a source proxy that will be used to specify the bounding-box for the 3D widget
-  void setBoundingBoxProxy(pqSMProxy proxy);
-  /// Returns the current state of the widget
-  void getWidgetState(double origin[3], double normal[3]);
-  /// Sets the current state of the widget
-  void setWidgetState(const double origin[3], const double normal[3]);
+  /// Sets the proxies/properties that will be controlled by the widget
+  void setDataSources(
+    pqSMProxy reference_proxy,
+    pqSMProxy controlled_proxy,
+    vtkSMDoubleVectorProperty* origin_property,
+    vtkSMDoubleVectorProperty* normal_property);
 
 public slots:
   /// Makes the 3D widget visible (but respects the user's choice if they've turned visibility off)
   void showWidget();
   /// Makes the 3D widget plane visible (respects the overall visibility flag)
   void showPlane();
+  /// Accepts pending changes
+  void accept();
+  /// Resets pending changes
+  void reset();
   /// Hides the 3D widget plane
   void hidePlane();
   /// Hides the 3D widget
@@ -95,11 +101,15 @@ private slots:
   void on3DWidgetChanged();
   /// Called when the user stops dragging the 3D widget
   void on3DWidgetEndDrag();
+  /// Called when one of the controlled properties change (e.g: by undo/redo)
+  void onControlledPropertyChanged();
 
 private:
   void show3DWidget(bool show);
-  void updateQtWidgets(const double* origin, const double* normal);
-  void update3DWidget(const double* origin, const double* normal);
+
+  void get3DWidgetState(double* origin, double* normal);
+  void set3DWidgetState(const double* origin, const double* normal);
+  void setQtWidgetState(const double* origin, const double* normal);
 
   class pqImplementation;
   pqImplementation* const Implementation;

@@ -65,7 +65,7 @@ public:
 };
 
 pqClipPanel::pqClipPanel(QWidget* p) :
-  base(p),
+  Superclass(p),
   Implementation(new pqImplementation(this))
 {
   QFrame* const separator = new QFrame();
@@ -97,37 +97,8 @@ void pqClipPanel::onWidgetChanged()
 
 void pqClipPanel::onAccepted()
 {
-  // Get the current values from the 3D widget ...
-  double origin[3] = { 0, 0, 0 };
-  double normal[3] = { 0, 0, 1 };
-  
-  this->Implementation->ImplicitPlaneWidget.getWidgetState(origin, normal);
-  
-  // Push the new values into the cut filter ...  
-  if(this->Proxy)
-    {
-    if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
-      this->Proxy->GetProperty("ClipFunction")))
-      {
-      if(vtkSMProxy* const clip_function = clip_function_property->GetProxy(0))
-        {
-        if(vtkSMDoubleVectorProperty* const plane_origin = vtkSMDoubleVectorProperty::SafeDownCast(
-          clip_function->GetProperty("Origin")))
-          {
-          plane_origin->SetElements(origin);
-          }
+  this->Implementation->ImplicitPlaneWidget.accept();
 
-        if(vtkSMDoubleVectorProperty* const plane_normal = vtkSMDoubleVectorProperty::SafeDownCast(
-          clip_function->GetProperty("Normal")))
-          {
-          plane_normal->SetElements(normal);
-          }
-
-        clip_function->UpdateVTKObjects();
-        }
-      }
-    }
-  
   // If this is the first time we've been accepted since our creation, hide the source
   if(pqPipelineFilter* const pipeline_filter =
     dynamic_cast<pqPipelineFilter*>(pqServerManagerModel::instance()->getPQSource(this->Proxy)))
@@ -156,79 +127,34 @@ void pqClipPanel::onAccepted()
 
 void pqClipPanel::onRejected()
 {
-  // Get the current values from the implicit plane ...
-  double origin[3] = { 0, 0, 0 };
-  double normal[3] = { 0, 0, 1 };
-  
-  if(this->Proxy)
-    {
-    if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
-      this->Proxy->GetProperty("ClipFunction")))
-      {
-      if(vtkSMProxy* const clip_function = clip_function_property->GetProxy(0))
-        {
-        if(vtkSMDoubleVectorProperty* const plane_origin = vtkSMDoubleVectorProperty::SafeDownCast(
-          clip_function->GetProperty("Origin")))
-          {
-          origin[0] = plane_origin->GetElement(0);
-          origin[1] = plane_origin->GetElement(1);
-          origin[2] = plane_origin->GetElement(2);
-          }
-
-        if(vtkSMDoubleVectorProperty* const plane_normal = vtkSMDoubleVectorProperty::SafeDownCast(
-          clip_function->GetProperty("Normal")))
-          {
-          normal[0] = plane_normal->GetElement(0);
-          normal[1] = plane_normal->GetElement(1);
-          normal[2] = plane_normal->GetElement(2);
-          }
-        }
-      }
-    }
-
-  this->Implementation->ImplicitPlaneWidget.setWidgetState(origin, normal);
+  this->Implementation->ImplicitPlaneWidget.reset();
 }
 
 void pqClipPanel::setProxyInternal(pqSMProxy p)
 {
-  base::setProxyInternal(p);
+  Superclass::setProxyInternal(p);
  
-  this->Implementation->ImplicitPlaneWidget.setBoundingBoxProxy(p);
-  
-  if(!this->Proxy)
-    return;
-  
-  // Get the current values from the implicit plane ...
-  double origin[3] = { 0, 0, 0 };
-  double normal[3] = { 0, 0, 1 };
-  
+  pqSMProxy reference_proxy = p;
+  pqSMProxy controlled_proxy;
+  vtkSMDoubleVectorProperty* origin_property = 0;
+  vtkSMDoubleVectorProperty* normal_property = 0;
+   
   if(this->Proxy)
     {
     if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
       this->Proxy->GetProperty("ClipFunction")))
       {
-      if(vtkSMProxy* const clip_function = clip_function_property->GetProxy(0))
+      if(controlled_proxy = clip_function_property->GetProxy(0))
         {
-        if(vtkSMDoubleVectorProperty* const plane_origin = vtkSMDoubleVectorProperty::SafeDownCast(
-          clip_function->GetProperty("Origin")))
-          {
-          origin[0] = plane_origin->GetElement(0);
-          origin[1] = plane_origin->GetElement(1);
-          origin[2] = plane_origin->GetElement(2);
-          }
-
-        if(vtkSMDoubleVectorProperty* const plane_normal = vtkSMDoubleVectorProperty::SafeDownCast(
-          clip_function->GetProperty("Normal")))
-          {
-          normal[0] = plane_normal->GetElement(0);
-          normal[1] = plane_normal->GetElement(1);
-          normal[2] = plane_normal->GetElement(2);
-          }
+        origin_property = vtkSMDoubleVectorProperty::SafeDownCast(
+          controlled_proxy->GetProperty("Origin"));
+        normal_property = vtkSMDoubleVectorProperty::SafeDownCast(
+          controlled_proxy->GetProperty("Normal"));
         }
       }
     }
-
-  this->Implementation->ImplicitPlaneWidget.setWidgetState(origin, normal);
+  this->Implementation->ImplicitPlaneWidget.setDataSources(
+    reference_proxy, controlled_proxy, origin_property, normal_property);
 }
 
 void pqClipPanel::select()

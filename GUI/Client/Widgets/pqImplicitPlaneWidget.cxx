@@ -62,9 +62,12 @@ public:
   pqImplementation() :
     UI(new Ui::pqImplicitPlaneWidget()),
     Widget(0),
+    OriginProperty(0),
+    NormalProperty(0),
     IgnoreVisibilityWidget(false),
     IgnoreQtWidgets(false),
-    Ignore3DWidget(false)
+    Ignore3DWidget(false),
+    IgnorePropertyChange(false)
   {
   }
   
@@ -81,16 +84,23 @@ public:
   vtkSmartPointer<vtkCommand> ChangeObserver;
   /// Callback object used to connect 3D widget events to member methods
   vtkSmartPointer<vtkCommand> EndDragObserver;
+  /// Callback object used to connect property events to member methods
+  vtkSmartPointer<vtkCommand> PropertyObserver;
   /// References the 3D implicit plane widget
   vtkSMNew3DWidgetProxy* Widget;
   /// Source proxy that will supply the bounding box for the 3D widget
-  pqSMProxy BoundingBoxProxy;
+  pqSMProxy ReferenceProxy;
+  pqSMProxy ControlledProxy;
+  vtkSMDoubleVectorProperty* OriginProperty;
+  vtkSMDoubleVectorProperty* NormalProperty;
   /// Used to avoid recursion when updating the visiblity checkbox
   bool IgnoreVisibilityWidget;
   /// Used to avoid recursion when updating the Qt widgets  
   bool IgnoreQtWidgets;
   /// Used to avoid recursion when updating the 3D widget
   bool Ignore3DWidget;
+  /// Used to avoid recursion when updating the controlled properties
+  bool IgnorePropertyChange;
   
   static QMap<pqSMProxy, bool> Visibility;
 };
@@ -110,6 +120,8 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(QWidget* p) :
     vtkMakeMemberFunctionCommand(*this, &pqImplicitPlaneWidget::on3DWidgetChanged));
   this->Implementation->EndDragObserver.TakeReference(
     vtkMakeMemberFunctionCommand(*this, &pqImplicitPlaneWidget::on3DWidgetEndDrag));
+  this->Implementation->PropertyObserver.TakeReference(
+    vtkMakeMemberFunctionCommand(*this, &pqImplicitPlaneWidget::onControlledPropertyChanged));
     
   this->Implementation->UI->setupUi(this);
 
@@ -145,6 +157,17 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(QWidget* p) :
 
 pqImplicitPlaneWidget::~pqImplicitPlaneWidget()
 {
+  if(this->Implementation->OriginProperty)
+    {
+    this->Implementation->OriginProperty->RemoveObserver(
+      this->Implementation->PropertyObserver);
+    }
+  if(this->Implementation->NormalProperty)
+    {
+    this->Implementation->NormalProperty->RemoveObserver(
+      this->Implementation->PropertyObserver);
+    }
+
   if(this->Implementation->Widget)
     {
     this->Implementation->Widget->RemoveObserver(
@@ -181,62 +204,50 @@ pqImplicitPlaneWidget::~pqImplicitPlaneWidget()
   delete this->Implementation;
 }
 
-void pqImplicitPlaneWidget::showWidget()
+void pqImplicitPlaneWidget::setDataSources(
+  pqSMProxy reference_proxy,
+  pqSMProxy controlled_proxy,
+  vtkSMDoubleVectorProperty* origin_property,
+  vtkSMDoubleVectorProperty* normal_property)
 {
-  this->show3DWidget(
-    this->Implementation->Visibility[this->Implementation->BoundingBoxProxy]);
-}
+  if(this->Implementation->OriginProperty)
+    {
+    this->Implementation->OriginProperty->RemoveObserver(
+      this->Implementation->PropertyObserver);
+    }
+  if(this->Implementation->NormalProperty)
+    {
+    this->Implementation->NormalProperty->RemoveObserver(
+      this->Implementation->PropertyObserver);
+    }
 
-void pqImplicitPlaneWidget::showPlane()
-{
   if(this->Implementation->Widget)
     {
-    if(vtkSMIntVectorProperty* const show_plane =
-      vtkSMIntVectorProperty::SafeDownCast(
-        this->Implementation->Widget->GetProperty("DrawPlane")))
-      {
-      show_plane->SetElement(0, true);
-      this->Implementation->Widget->UpdateVTKObjects();
-      }
+    this->Implementation->Widget->RemoveObserver(
+      this->Implementation->EndDragObserver);
+    this->Implementation->Widget->RemoveObserver(
+      this->Implementation->ChangeObserver);
+    this->Implementation->Widget->RemoveObserver(
+      this->Implementation->StartDragObserver);
     }
-}
-
-void pqImplicitPlaneWidget::hidePlane()
-{
-  if(this->Implementation->Widget)
-    {
-    if(vtkSMIntVectorProperty* const show_plane =
-      vtkSMIntVectorProperty::SafeDownCast(
-        this->Implementation->Widget->GetProperty("DrawPlane")))
-      {
-      show_plane->SetElement(0, false);
-      this->Implementation->Widget->UpdateVTKObjects();
-      }
-    }
-}
-
-void pqImplicitPlaneWidget::hideWidget()
-{
-  this->show3DWidget(false);
-}
-
-//-----------------------------------------------------------------------------
-void pqImplicitPlaneWidget::setBoundingBoxProxy(pqSMProxy proxy)
-{
-  this->Implementation->BoundingBoxProxy = proxy;
   
-  if(!this->Implementation->Visibility.contains(proxy))
+  this->Implementation->ReferenceProxy = reference_proxy;
+  this->Implementation->ControlledProxy = controlled_proxy;
+  this->Implementation->OriginProperty = origin_property;
+  this->Implementation->NormalProperty = normal_property;
+  
+  if(!this->Implementation->Visibility.contains(this->Implementation->ReferenceProxy))
     {
     this->Implementation->Visibility.insert(
-      proxy, proxy.GetPointer() ? true : false);
+      this->Implementation->ReferenceProxy, this->Implementation->ReferenceProxy.GetPointer() ? true : false);
     }
-  
+
   if(!this->Implementation->Widget)
     {
     // We won't have to do this once setProxy() takes pqProxy as an argument.
     pqServer* const server = pqApplicationCore::instance()->
       getServerManagerModel()->getServer(
-        this->Implementation->BoundingBoxProxy->GetConnectionID());
+        this->Implementation->ReferenceProxy->GetConnectionID());
           
     this->Implementation->Widget =
       pqApplicationCore::instance()->get3DWidgetFactory()->
@@ -273,49 +284,127 @@ void pqImplicitPlaneWidget::setBoundingBoxProxy(pqSMProxy proxy)
       }
     }
 
+  if(this->Implementation->OriginProperty)
+    {
+    this->Implementation->OriginProperty->AddObserver(
+      vtkCommand::ModifiedEvent,
+      this->Implementation->PropertyObserver);
+    }
+  if(this->Implementation->NormalProperty)
+    {
+    this->Implementation->NormalProperty->AddObserver(
+      vtkCommand::ModifiedEvent,
+      this->Implementation->PropertyObserver);
+    }
+
   this->Implementation->IgnoreVisibilityWidget = true;
   this->Implementation->UI->show3DWidget->setChecked(
-    this->Implementation->Visibility[proxy]);
+    this->Implementation->Visibility[this->Implementation->ReferenceProxy]);
   this->Implementation->IgnoreVisibilityWidget = false;
 
-  this->show3DWidget(this->Implementation->Visibility[proxy]);
+  this->show3DWidget(this->Implementation->Visibility[this->Implementation->ReferenceProxy]);
+  
+  this->reset();
 }
 
-void pqImplicitPlaneWidget::getWidgetState(double origin[3], double normal[3])
+void pqImplicitPlaneWidget::showWidget()
 {
-  origin[0] = origin[1] = origin[2] = 0;
-  normal[0] = normal[1] = normal[2] = 0;
+  this->show3DWidget(
+    this->Implementation->Visibility[this->Implementation->ReferenceProxy]);
+}
 
+void pqImplicitPlaneWidget::showPlane()
+{
   if(this->Implementation->Widget)
     {
-    if(vtkSMDoubleVectorProperty* const widget_origin =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        this->Implementation->Widget->GetProperty("Origin")))
+    if(vtkSMIntVectorProperty* const show_plane =
+      vtkSMIntVectorProperty::SafeDownCast(
+        this->Implementation->Widget->GetProperty("DrawPlane")))
       {
-      origin[0] = widget_origin->GetElement(0);
-      origin[1] = widget_origin->GetElement(1);
-      origin[2] = widget_origin->GetElement(2);
-      }
-
-    if(vtkSMDoubleVectorProperty* const widget_normal =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        this->Implementation->Widget->GetProperty("Normal")))
-      {
-      normal[0] = widget_normal->GetElement(0);
-      normal[1] = widget_normal->GetElement(1);
-      normal[2] = widget_normal->GetElement(2);
+      show_plane->SetElement(0, true);
+      this->Implementation->Widget->UpdateVTKObjects();
       }
     }
 }
 
-void pqImplicitPlaneWidget::setWidgetState(
-  const double origin[3], const double normal[3])
+void pqImplicitPlaneWidget::accept()
 {
-  // Push the current values into the Qt widgets ...
-  this->updateQtWidgets(origin, normal);
+  // Get the current values from the 3D implicit plane widget ...
+  double origin[3] = { 0, 0, 0 };
+  double normal[3] = { 0, 0, 1 };
+  this->get3DWidgetState(origin, normal);
+
+  // Push the new values into the controlled properties ...
+  this->Implementation->IgnorePropertyChange = true;
   
-  // Push the current values into the 3D widget ...
-  this->update3DWidget(origin, normal);
+  if(this->Implementation->OriginProperty)
+    {
+    this->Implementation->OriginProperty->SetElements(origin);
+    }
+
+  if(this->Implementation->NormalProperty)
+    {
+    this->Implementation->NormalProperty->SetElements(normal);
+    }
+
+  if(this->Implementation->ControlledProxy)
+    {
+    this->Implementation->ControlledProxy->UpdateVTKObjects();
+    }
+
+  this->Implementation->IgnorePropertyChange = false;
+}
+
+void pqImplicitPlaneWidget::reset()
+{
+  // Restore the state of the implicit plane widget ...
+  double origin[3] = { 0, 0, 0 };
+  double normal[3] = { 0, 0, 1 };
+
+  if(this->Implementation->OriginProperty)
+    {
+    origin[0] = this->Implementation->OriginProperty->GetElement(0);
+    origin[1] = this->Implementation->OriginProperty->GetElement(1);
+    origin[2] = this->Implementation->OriginProperty->GetElement(2);
+    }
+
+  if(this->Implementation->NormalProperty)
+    {
+    normal[0] = this->Implementation->NormalProperty->GetElement(0);
+    normal[1] = this->Implementation->NormalProperty->GetElement(1);
+    normal[2] = this->Implementation->NormalProperty->GetElement(2);
+    }
+
+  this->set3DWidgetState(origin, normal);
+  this->setQtWidgetState(origin, normal);
+}
+
+void pqImplicitPlaneWidget::hidePlane()
+{
+  if(this->Implementation->Widget)
+    {
+    if(vtkSMIntVectorProperty* const show_plane =
+      vtkSMIntVectorProperty::SafeDownCast(
+        this->Implementation->Widget->GetProperty("DrawPlane")))
+      {
+      show_plane->SetElement(0, false);
+      this->Implementation->Widget->UpdateVTKObjects();
+      }
+    }
+}
+
+void pqImplicitPlaneWidget::hideWidget()
+{
+  this->show3DWidget(false);
+}
+
+void pqImplicitPlaneWidget::onShow3DWidget(bool show_widget)
+{
+  this->Implementation->Visibility.insert(
+    this->Implementation->ReferenceProxy, show_widget);
+    
+  this->show3DWidget(
+    this->Implementation->Visibility[this->Implementation->ReferenceProxy]);
 }
 
 void pqImplicitPlaneWidget::onResetBounds()
@@ -324,7 +413,7 @@ void pqImplicitPlaneWidget::onResetBounds()
     {
     if(vtkSMProxyProperty* const input_property =
       vtkSMProxyProperty::SafeDownCast(
-        this->Implementation->BoundingBoxProxy->GetProperty("Input")))
+        this->Implementation->ReferenceProxy->GetProperty("Input")))
       {
       if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
         input_property->GetProxy(0)))
@@ -377,7 +466,7 @@ void pqImplicitPlaneWidget::onUseCenterBounds()
     {
     if(vtkSMProxyProperty* const input_property =
       vtkSMProxyProperty::SafeDownCast(
-        this->Implementation->BoundingBoxProxy->GetProperty("Input")))
+        this->Implementation->ReferenceProxy->GetProperty("Input")))
       {
       if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
         input_property->GetProxy(0)))
@@ -472,13 +561,63 @@ void pqImplicitPlaneWidget::onUseCameraNormal()
     }
 }
 
-void pqImplicitPlaneWidget::onShow3DWidget(bool show_widget)
+void pqImplicitPlaneWidget::onQtWidgetChanged()
 {
-  this->Implementation->Visibility.insert(
-    this->Implementation->BoundingBoxProxy, show_widget);
+  if(this->Implementation->IgnoreQtWidgets)
+    return;
+
+  // Get the new values from the Qt widgets ...
+  double origin[3] = { 0, 0, 0 };
+  double normal[3] = { 0, 0, 1 };
+
+  origin[0] = this->Implementation->UI->originX->text().toDouble();
+  origin[1] = this->Implementation->UI->originY->text().toDouble();
+  origin[2] = this->Implementation->UI->originZ->text().toDouble();
+  normal[0] = this->Implementation->UI->normalX->text().toDouble();
+  normal[1] = this->Implementation->UI->normalY->text().toDouble();
+  normal[2] = this->Implementation->UI->normalZ->text().toDouble();
+  
+  // Push the new values into the 3D widget ...
+  this->set3DWidgetState(origin, normal);
+
+  emit widgetChanged();
+}
+
+void pqImplicitPlaneWidget::on3DWidgetStartDrag()
+{
+  emit widgetStartInteraction();
+}
+
+void pqImplicitPlaneWidget::on3DWidgetChanged()
+{
+  if(this->Implementation->Ignore3DWidget)
+    return;
     
-  this->show3DWidget(
-    this->Implementation->Visibility[this->Implementation->BoundingBoxProxy]);
+  // Get the new values from the 3D widget ...
+  double origin[3] = { 0, 0, 0 };
+  double normal[3] = { 0, 0, 1 };
+  this->get3DWidgetState(origin, normal);
+  
+  // Push the new values into the Qt widgets (ideally, this should happen automatically when the implicit plane is updated)
+  this->setQtWidgetState(origin, normal);
+
+  emit widgetChanged();
+}
+
+void pqImplicitPlaneWidget::on3DWidgetEndDrag()
+{
+  emit widgetEndInteraction();
+}
+
+void pqImplicitPlaneWidget::onControlledPropertyChanged()
+{
+  if(this->Implementation->IgnorePropertyChange)
+    {
+    return;
+    }
+    
+  // Synchronize the 3D and Qt widgets with the controlled properties
+  this->reset();
 }
 
 void pqImplicitPlaneWidget::show3DWidget(bool show_widget)
@@ -507,42 +646,8 @@ void pqImplicitPlaneWidget::show3DWidget(bool show_widget)
     }
 }
 
-void pqImplicitPlaneWidget::onQtWidgetChanged()
+void pqImplicitPlaneWidget::get3DWidgetState(double* origin, double* normal)
 {
-  if(this->Implementation->IgnoreQtWidgets)
-    return;
-
-  // Get the new values from the Qt widgets ...
-  double origin[3] = { 0, 0, 0 };
-  double normal[3] = { 0, 0, 1 };
-
-  origin[0] = this->Implementation->UI->originX->text().toDouble();
-  origin[1] = this->Implementation->UI->originY->text().toDouble();
-  origin[2] = this->Implementation->UI->originZ->text().toDouble();
-  normal[0] = this->Implementation->UI->normalX->text().toDouble();
-  normal[1] = this->Implementation->UI->normalY->text().toDouble();
-  normal[2] = this->Implementation->UI->normalZ->text().toDouble();
-  
-  // Push the new values into the 3D widget ...
-  this->update3DWidget(origin, normal);
-
-  emit widgetChanged();
-}
-
-void pqImplicitPlaneWidget::on3DWidgetStartDrag()
-{
-  emit widgetStartInteraction();
-}
-
-void pqImplicitPlaneWidget::on3DWidgetChanged()
-{
-  if(this->Implementation->Ignore3DWidget)
-    return;
-    
-  // Get the new values from the 3D widget ...
-  double origin[3] = { 0, 0, 0 };
-  double normal[3] = { 0, 0, 1 };
-  
   if(this->Implementation->Widget)
     {
     if(vtkSMDoubleVectorProperty* const widget_origin =
@@ -563,39 +668,9 @@ void pqImplicitPlaneWidget::on3DWidgetChanged()
       normal[2] = widget_normal->GetElement(2);
       }
     }
-  
-  // Push the new values into the Qt widgets (ideally, this should happen automatically when the implicit plane is updated)
-  this->updateQtWidgets(origin, normal);
-
-  emit widgetChanged();
 }
 
-void pqImplicitPlaneWidget::on3DWidgetEndDrag()
-{
-  emit widgetEndInteraction();
-}
-
-void pqImplicitPlaneWidget::updateQtWidgets(const double* origin, const double* normal)
-{
-  this->Implementation->IgnoreQtWidgets = true;
-  
-  this->Implementation->UI->originX->setText(
-    QString::number(origin[0], 'g', 3));
-  this->Implementation->UI->originY->setText(
-    QString::number(origin[1], 'g', 3));  
-  this->Implementation->UI->originZ->setText(
-    QString::number(origin[2], 'g', 3));  
-  this->Implementation->UI->normalX->setText(
-    QString::number(normal[0], 'g', 3));  
-  this->Implementation->UI->normalY->setText(
-    QString::number(normal[1], 'g', 3));  
-  this->Implementation->UI->normalZ->setText(
-    QString::number(normal[2], 'g', 3));
-  
-  this->Implementation->IgnoreQtWidgets = false;
-}
-
-void pqImplicitPlaneWidget::update3DWidget(const double* origin, const double* normal)
+void pqImplicitPlaneWidget::set3DWidgetState(const double* origin, const double* normal)
 {
   this->Implementation->Ignore3DWidget = true;
    
@@ -621,4 +696,24 @@ void pqImplicitPlaneWidget::update3DWidget(const double* origin, const double* n
     }
     
   this->Implementation->Ignore3DWidget = false;
+}
+
+void pqImplicitPlaneWidget::setQtWidgetState(const double* origin, const double* normal)
+{
+  this->Implementation->IgnoreQtWidgets = true;
+  
+  this->Implementation->UI->originX->setText(
+    QString::number(origin[0], 'g', 3));
+  this->Implementation->UI->originY->setText(
+    QString::number(origin[1], 'g', 3));  
+  this->Implementation->UI->originZ->setText(
+    QString::number(origin[2], 'g', 3));  
+  this->Implementation->UI->normalX->setText(
+    QString::number(normal[0], 'g', 3));  
+  this->Implementation->UI->normalY->setText(
+    QString::number(normal[1], 'g', 3));  
+  this->Implementation->UI->normalZ->setText(
+    QString::number(normal[2], 'g', 3));
+  
+  this->Implementation->IgnoreQtWidgets = false;
 }
