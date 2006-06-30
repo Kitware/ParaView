@@ -51,6 +51,7 @@
 class vtkPVXMLElement;
 class vtkSMUndoRedoStateLoader;
 class vtkSMUndoStackObserver;
+class vtkUndoElement;
 class vtkUndoSet;
 
 class VTK_EXPORT vtkSMUndoStack : public vtkUndoStack
@@ -98,6 +99,12 @@ public:
   // for a specific connection. Note however that once it is pushed on the server
   // every connected client will be able to undo it (evetually atleast).
   void Push(vtkIdType connectionid, const char* label, vtkUndoSet* set);
+
+  // Description:
+  // One can add arbritary elements to the active undo set.
+  // If no ActiveUndoSet is present, an error will be raised. It is essential
+  // that the StateLoader can handle the arbritary undo elements.
+  void AddToActiveUndoSet(vtkUndoElement* element);
 
   // Description:
   // Performs an Undo using the set on the top of the undo stack. The set is poped from
