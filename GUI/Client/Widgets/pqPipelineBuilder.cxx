@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProcessModule.h"
 #include "vtkSMCompoundProxy.h"
 #include "vtkSMDataObjectDisplayProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMMultiViewRenderModuleProxy.h"
 #include "vtkSMProxyIterator.h"
@@ -561,6 +562,12 @@ vtkSMProxy* pqPipelineBuilder::createLookupTable(pqPipelineDisplay* display)
   // register it.
   pxm->RegisterProxy("lookup_tables", lut->GetSelfIDAsString(), lut);
   lut->Delete();
+
+  // LUT must go from blue to red.
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    lut->GetProperty("HueRange"));
+  dvp->SetElement(0, 0.6667);
+  dvp->SetElement(1, 0.0);
   lut->UpdateVTKObjects();
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
