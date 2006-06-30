@@ -41,7 +41,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="ThresholdBetweenSpin:1" />
+      <widget class="QDoubleSpinBox" name="ThresholdBetween:Spin:1" />
      </item>
     </layout>
    </item>
@@ -64,7 +64,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="ThresholdBetweenSpin:0" />
+      <widget class="QDoubleSpinBox" name="ThresholdBetween:Spin:0" />
      </item>
     </layout>
    </item>

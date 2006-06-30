@@ -60,8 +60,8 @@ pqThresholdPanel::pqThresholdPanel(QWidget* p) :
 
   this->LowerSlider = this->findChild<QSlider*>("LowerThresholdSlider");
   this->UpperSlider = this->findChild<QSlider*>("UpperThresholdSlider");
-  this->LowerSpin = this->findChild<QDoubleSpinBox*>("ThresholdBetweenSpin:0");
-  this->UpperSpin = this->findChild<QDoubleSpinBox*>("ThresholdBetweenSpin:1");
+  this->LowerSpin = this->findChild<QDoubleSpinBox*>("ThresholdBetween:Spin:0");
+  this->UpperSpin = this->findChild<QDoubleSpinBox*>("ThresholdBetween:Spin:1");
 
   QObject::connect(this->LowerSlider, SIGNAL(valueChanged(int)),
                    this, SLOT(lowerSliderChanged()));

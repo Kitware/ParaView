@@ -38,6 +38,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QWidget;
 class pqPropertyManager;
 
+/** Links Qt widgets with server manager properties by name.
+
+A Qt widget will be considered a "match" for a property if its name is
+any one of the forms:
+
+PropertyName
+PropertyName:String
+PropertyName:Digit
+PropertyName:String:Digit
+
+... where PropertyName is the name of the server manager property in question.
+
+The first form is the most used, when there is a single Qt widget associated
+with a property.
+
+The second form is used when more than one Qt widget will be associated
+with a single property.  An example would be a property controlled by
+a slider widget plus a spin box.  In this case the two widgets might be named
+"Foo:Slider" and "Foo:Spin".  The choice of identifier for individual widgets
+is not significant, as long as it is unique.
+
+The third and fourth forms are used when Qt widgets will be associated with
+multi-element properties.  The digits are used as indices to control with
+which property element a given widget will be associated.
+*/
 class pqNamedWidgets
 {
 public:

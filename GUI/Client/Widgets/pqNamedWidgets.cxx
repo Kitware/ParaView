@@ -84,7 +84,7 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
     // update domains that we might ask for
     SMProperty->UpdateDependentDomains();
 
-    QString regex = QString("^") + QString(iter->GetKey());
+    const QString regex = QString("^%1$|^%1:.*$").arg(iter->GetKey());
     QList<QObject*> foundObjects = parent->findChildren<QObject*>(QRegExp(regex));
     for(int i=0; i<foundObjects.size(); i++)
       {
@@ -100,10 +100,10 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
           // get the index from the name
           QString name = propertyWidget->objectName();
           QStringList split = name.split(':');
-          if(split.size() == 2)
+          if(split.size() > 1)
             {
             bool ok = false;
-            index = split[1].toInt(&ok);
+            index = split[split.size() - 1].toInt(&ok);
             if(!ok)
               {
               index = -1;
@@ -317,7 +317,7 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
       continue;
       }
 
-    QString regex = QString("^") + QString(iter->GetKey());
+    const QString regex = QString("^%1$|^%1:.*$").arg(iter->GetKey());
     QList<QObject*> foundObjects = parent->findChildren<QObject*>(QRegExp(regex));
     for(int i=0; i<foundObjects.size(); i++)
       {
@@ -334,10 +334,10 @@ void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager*
           // get the index from the name
           QString name = propertyWidget->objectName();
           QStringList split = name.split(':');
-          if(split.size() == 2)
+          if(split.size() > 1)
             {
             bool ok = false;
-            index = split[1].toInt(&ok);
+            index = split[split.size() - 1].toInt(&ok);
             if(!ok)
               {
               index = -1;
