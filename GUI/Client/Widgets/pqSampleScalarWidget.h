@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqSampleScalarWidget_h
 #define _pqSampleScalarWidget_h
 
+#include "pqSMProxy.h"
 #include "pqWidgetsExport.h"
 
 #include <QWidget>
@@ -41,6 +42,8 @@ namespace Ui { class pqSampleScalarWidget; }
 
 class QItemSelection;
 class QModelIndex;
+
+class vtkSMDoubleVectorProperty;
 
 /** Provides a standard user interface component for manipulating a list of
 scalar samples.  Current uses include: specifying the set of "slices" for
@@ -58,13 +61,18 @@ public:
   pqSampleScalarWidget(QWidget* Parent);
   ~pqSampleScalarWidget();
 
-  /// Set the set of samples selected by the widget, overriding any previous set.
-  void setSamples(const QList<double>& samples);
-  /// Returns the set of samples selected by the widget.
-  const QList<double> getSamples();
+  /// Sets the server manager objects that will be controlled by the widget
+  void setDataSources(
+    pqSMProxy controlled_proxy,
+    vtkSMDoubleVectorProperty* sample_property);
+
+  /// Accept pending changes
+  void accept();
+  /// Reset pending changes
+  void reset();
 
 signals:
-  /// Signal emitted whenever the set of select samples changes.
+  /// Signal emitted whenever the set of samples changes.
   void samplesChanged();
 
 private slots:
@@ -75,6 +83,8 @@ private slots:
   void onAddValue();
   void onDeleteAll();
   void onDeleteSelected();
+  
+  void onControlledPropertyChanged();
   
 private:
   pqSampleScalarWidget(const pqSampleScalarWidget&);

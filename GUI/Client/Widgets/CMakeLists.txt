@@ -107,6 +107,7 @@ SET(UI_FORMS
   pqAbortAnimation.ui
   pqAddSourceDialog.ui
   pqAnimationSettings.ui
+  pqContourControls.ui
   pqCustomFilterDefinitionWizard.ui
   pqCustomFilterManager.ui
   pqDisplayProxyEditor.ui

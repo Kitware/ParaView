@@ -32,12 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqContourPanel.h"
+#include "pqNamedWidgets.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
 #include "pqPropertyManager.h"
 #include "pqSampleScalarWidget.h"
 #include "pqServerManagerModel.h"
-#include "pqArrayMenu.h"
+
+#include "ui_pqContourControls.h"
 
 #include <vtkSMDataObjectDisplayProxy.h>
 #include <vtkSMDoubleVectorProperty.h>
@@ -57,22 +59,14 @@ class pqContourPanel::pqImplementation
 {
 public:
   pqImplementation(QWidget* parent) :
-    ArrayWidget(parent),
-    ComputeNormalsWidget(tr("Compute Normals")),
-    ComputeGradientsWidget(tr("Compute Gradients")),
-    ComputeScalarsWidget(tr("Compute Scalars")),
     SampleScalarWidget(parent)
   {
   }
-  
-  /// Provides a Qt control for selecting the array to be used for computing contours
-  pqArrayMenu ArrayWidget;
-  /// Provides a Qt control for the "Compute Normals" property of the Contour filter
-  QCheckBox ComputeNormalsWidget;
-  /// Provides a Qt control for the "Compute Gradients" property of the Contour filter
-  QCheckBox ComputeGradientsWidget;
-  /// Provides a Qt control for the "Compute Scalars" property of the Contour filter
-  QCheckBox ComputeScalarsWidget;
+
+  /// Provides a container for Qt controls
+  QWidget ControlsContainer;
+  /// Provides the Qt controls for the panel
+  Ui::pqContourControls Controls;
   /// Controls the number and values of contours
   pqSampleScalarWidget SampleScalarWidget;
 };
@@ -81,29 +75,24 @@ pqContourPanel::pqContourPanel(QWidget* p) :
   base(p),
   Implementation(new pqImplementation(this))
 {
+  this->Implementation->Controls.setupUi(
+    &this->Implementation->ControlsContainer);
+
   QFrame* const separator = new QFrame();
   separator->setFrameShape(QFrame::HLine);
 
   QVBoxLayout* const panel_layout = new QVBoxLayout();
-  panel_layout->addWidget(&this->Implementation->ArrayWidget);
-  panel_layout->addWidget(&this->Implementation->ComputeNormalsWidget);
-  panel_layout->addWidget(&this->Implementation->ComputeGradientsWidget);
-  panel_layout->addWidget(&this->Implementation->ComputeScalarsWidget);
+  panel_layout->addWidget(&this->Implementation->ControlsContainer);
   panel_layout->addWidget(separator);
   panel_layout->addWidget(&this->Implementation->SampleScalarWidget);
+
   this->setLayout(panel_layout);
 
   connect(
-    &this->Implementation->ArrayWidget,
-    SIGNAL(arrayChanged()),
-    this,
-    SLOT(onArrayWidgetChanged()));
-  
-  connect(
     &this->Implementation->SampleScalarWidget,
     SIGNAL(samplesChanged()),
-    this,
-    SLOT(onSampleScalarWidgetChanged()));
+    this->getPropertyManager(),
+    SLOT(propertyChanged()));
     
   connect(this->getPropertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
   connect(this->getPropertyManager(), SIGNAL(rejected()), this, SLOT(onRejected()));
@@ -115,75 +104,9 @@ pqContourPanel::~pqContourPanel()
   delete this->Implementation;
 }
 
-void pqContourPanel::onArrayWidgetChanged()
-{
-  // Signal the UI that there are changes to accept/reject ...
-  this->getPropertyManager()->propertyChanged();
-}
-
-void pqContourPanel::onSampleScalarWidgetChanged()
-{
-  // Signal the UI that there are changes to accept/reject ...
-  this->getPropertyManager()->propertyChanged();
-}
-
 void pqContourPanel::onAccepted()
 {
-  // Get the current values from the variable selection widget and push them to the filter
-  pqVariableType type;
-  QString name;
-  this->Implementation->ArrayWidget.getCurrent(type, name);
-  
-  if(this->Proxy)
-    {
-    if(vtkSMStringVectorProperty* const array =
-      vtkSMStringVectorProperty::SafeDownCast(this->Proxy->GetProperty("SelectInputScalars")))
-      {
-      array->SetNumberOfElements(5);
-      array->SetElement(0, 0);
-      array->SetElement(1, 0);
-      array->SetElement(2, 0);
-      array->SetElement(3, 0);
-      array->SetElement(4, name.toAscii().data());
-      }
-      
-    this->Proxy->UpdateVTKObjects();
-    }
-
-/*  
-    if (!(this->FieldMenu && svp->GetUncheckedElement(3)))
-      {
-      // Don't reset the unchecked element if it has already been set
-      // by changing the value of the field menu on which this array menu
-      // depends. (This is used by the Threshold filter.)
-      svp->SetUncheckedElement(3, svp->GetElement(3));
-      }
-    svp->SetUncheckedElement(0, this->InputAttributeIndex);
-    svp->SetUncheckedElement(1, svp->GetElement(1));
-    svp->SetUncheckedElement(2, svp->GetElement(2));
-    svp->SetUncheckedElement(4, this->ArrayName);
-    svp->UpdateDependentDomains();
-*/
-
-  // Get the current values from the sample scalar widget and push them to the filter
-  const QList<double> samples = this->Implementation->SampleScalarWidget.getSamples();
-  
-  // Push the new values into the cut filter ...  
-  if(this->Proxy)
-    {
-    if(vtkSMDoubleVectorProperty* const contours =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        this->Proxy->GetProperty("ContourValues")))
-      {
-      contours->SetNumberOfElements(samples.size());
-      for(int i = 0; i != samples.size(); ++i)
-        {
-        contours->SetElement(i, samples[i]);
-        }
-        
-      this->Proxy->UpdateVTKObjects();
-      }
-    }
+  this->Implementation->SampleScalarWidget.accept();
   
   // If this is the first time we've been accepted since our creation, hide the source
   if(pqPipelineFilter* const pipeline_filter =
@@ -213,93 +136,27 @@ void pqContourPanel::onAccepted()
 
 void pqContourPanel::onRejected()
 {
-  // Reset the state of the sample scalar widget ...
-  QList<double> values;
-  if(this->Proxy)
-    {
-    if(vtkSMDoubleVectorProperty* const contours =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        this->Proxy->GetProperty("ContourValues")))
-      {
-      const int value_count = contours->GetNumberOfElements();
-      for(int i = 0; i != value_count; ++i)
-        {
-        values.push_back(contours->GetElement(i));
-        }
-      }
-    }
-  this->Implementation->SampleScalarWidget.setSamples(values);
+  this->Implementation->SampleScalarWidget.reset();
 }
 
 void pqContourPanel::setProxyInternal(pqSMProxy p)
 {
   base::setProxyInternal(p);
  
-  if(!this->Proxy)
-    return;
-  
-  // Setup the variable selection widget ...
-  this->Implementation->ArrayWidget.clear();
-  if(pqPipelineFilter* const pipeline_filter =
-    dynamic_cast<pqPipelineFilter*>(
-    pqServerManagerModel::instance()->getPQSource(this->Proxy)))
-    {
-    for(int i = 0; i != pipeline_filter->getInputCount(); ++i)
-      {
-      if(pqPipelineSource* const pipeline_source = pipeline_filter->getInput(i))
-        {
-        this->Implementation->ArrayWidget.add(
-          vtkSMSourceProxy::SafeDownCast(pipeline_source->getProxy()));
-        }
-      }
-    }
-  
   // Setup the sample scalar widget ...
-  QList<double> values;
-  
-  if(this->Proxy)
-    {
-    if(vtkSMDoubleVectorProperty* const contours =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        this->Proxy->GetProperty("ContourValues")))
-      {
-      const int value_count = contours->GetNumberOfElements();
-      for(int i = 0; i != value_count; ++i)
-        {
-        values.push_back(contours->GetElement(i));
-        }
-      }
-    }
-    
-  this->Implementation->SampleScalarWidget.setSamples(values);
+  this->Implementation->SampleScalarWidget.setDataSources(
+    this->Proxy,
+    this->Proxy ? vtkSMDoubleVectorProperty::SafeDownCast(this->Proxy->GetProperty("ContourValues")) : 0);
 }
 
 void pqContourPanel::select()
 {
-  this->PropertyManager->registerLink(
-    &this->Implementation->ComputeNormalsWidget, "checked", SIGNAL(toggled(bool)),
-    this->Proxy, this->Proxy->GetProperty("ComputeNormals"));
-
-  this->PropertyManager->registerLink(
-    &this->Implementation->ComputeGradientsWidget, "checked", SIGNAL(toggled(bool)),
-    this->Proxy, this->Proxy->GetProperty("ComputeGradients"));
-
-  this->PropertyManager->registerLink(
-    &this->Implementation->ComputeScalarsWidget, "checked", SIGNAL(toggled(bool)),
-    this->Proxy, this->Proxy->GetProperty("ComputeScalars"));
+  pqNamedWidgets::link(
+    &this->Implementation->ControlsContainer, this->Proxy, this->PropertyManager);
 }
 
 void pqContourPanel::deselect()
 {
-  this->PropertyManager->unregisterLink(
-    &this->Implementation->ComputeNormalsWidget, "checked", SIGNAL(toggled(bool)),
-    this->Proxy, this->Proxy->GetProperty("ComputeNormals"));
-
-  this->PropertyManager->unregisterLink(
-    &this->Implementation->ComputeGradientsWidget, "checked", SIGNAL(toggled(bool)),
-    this->Proxy, this->Proxy->GetProperty("ComputeGradients"));
-
-  this->PropertyManager->unregisterLink(
-    &this->Implementation->ComputeScalarsWidget, "checked", SIGNAL(toggled(bool)),
-    this->Proxy, this->Proxy->GetProperty("ComputeScalars"));
+  pqNamedWidgets::unlink(
+    &this->Implementation->ControlsContainer, this->Proxy, this->PropertyManager);
 }

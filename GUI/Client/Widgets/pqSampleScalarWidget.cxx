@@ -35,6 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ui_pqSampleScalarWidget.h"
 
+#include <vtkMemberFunctionCommand.h>
+#include <vtkSMDoubleVectorProperty.h>
+
 ///////////////////////////////////////////////////////////////////////////
 // pqSampleScalarWidget::pqImplementation
 
@@ -42,7 +45,9 @@ class pqSampleScalarWidget::pqImplementation
 {
 public:
   pqImplementation() :
-    UI(new Ui::pqSampleScalarWidget())
+    UI(new Ui::pqSampleScalarWidget()),
+    SampleProperty(0),
+    IgnorePropertyChange(false)
   {
   }
   
@@ -51,14 +56,22 @@ public:
     delete this->UI;
   }
   
+  /// Callback object used to connect property events to member methods
+  vtkSmartPointer<vtkCommand> PropertyObserver;
+  pqSMProxy ControlledProxy;
+  vtkSMDoubleVectorProperty* SampleProperty;
   Ui::pqSampleScalarWidget* const UI;
   pqScalarSetModel Model;
+  bool IgnorePropertyChange;
 };
 
 pqSampleScalarWidget::pqSampleScalarWidget(QWidget* Parent) :
   base(Parent),
   Implementation(new pqImplementation())
 {
+  this->Implementation->PropertyObserver.TakeReference(
+    vtkMakeMemberFunctionCommand(*this, &pqSampleScalarWidget::onControlledPropertyChanged));
+
   this->Implementation->UI->setupUi(this);
   
   this->Implementation->UI->RangeMin->setValidator(
@@ -100,24 +113,78 @@ pqSampleScalarWidget::pqSampleScalarWidget(QWidget* Parent) :
 
 pqSampleScalarWidget::~pqSampleScalarWidget()
 {
+  if(this->Implementation->SampleProperty)
+    {
+    this->Implementation->SampleProperty->RemoveObserver(
+      this->Implementation->PropertyObserver);
+    }
+
   delete this->Implementation;
 }
 
-void pqSampleScalarWidget::setSamples(const QList<double>& samples)
+void pqSampleScalarWidget::setDataSources(
+  pqSMProxy controlled_proxy,
+  vtkSMDoubleVectorProperty* sample_property)
 {
-  this->Implementation->Model.clear();
-  
-  for(int i = 0; i != samples.size(); ++i)
+  if(this->Implementation->SampleProperty)
     {
-    this->Implementation->Model.insert(samples[i]);
+    this->Implementation->SampleProperty->RemoveObserver(
+      this->Implementation->PropertyObserver);
     }
-  
-  emit samplesChanged();
+    
+  this->Implementation->ControlledProxy = controlled_proxy;
+  this->Implementation->SampleProperty = sample_property;
+
+  if(this->Implementation->SampleProperty)
+    {
+    this->Implementation->SampleProperty->AddObserver(
+      vtkCommand::ModifiedEvent,
+      this->Implementation->PropertyObserver);
+    }
+    
+  this->reset();
 }
 
-const QList<double> pqSampleScalarWidget::getSamples()
+void pqSampleScalarWidget::accept()
 {
-  return this->Implementation->Model.values();
+  this->Implementation->IgnorePropertyChange = true;
+  
+  if(this->Implementation->SampleProperty)
+    {
+    const QList<double> samples = this->Implementation->Model.values();
+    
+    this->Implementation->SampleProperty->SetNumberOfElements(samples.size());
+    for(int i = 0; i != samples.size(); ++i)
+      {
+      this->Implementation->SampleProperty->SetElement(i, samples[i]);
+      }
+    }
+
+  if(this->Implementation->ControlledProxy)
+    {
+    this->Implementation->ControlledProxy->UpdateVTKObjects();
+    }
+    
+  this->Implementation->IgnorePropertyChange = false;
+}
+
+void pqSampleScalarWidget::reset()
+{
+  QList<double> values;
+  if(this->Implementation->SampleProperty)
+    {
+    const int value_count = this->Implementation->SampleProperty->GetNumberOfElements();
+    for(int i = 0; i != value_count; ++i)
+      {
+      values.push_back(this->Implementation->SampleProperty->GetElement(i));
+      }
+    }
+
+  this->Implementation->Model.clear();
+  for(int i = 0; i != values.size(); ++i)
+    {
+    this->Implementation->Model.insert(values[i]);
+    }
 }
 
 void pqSampleScalarWidget::onSamplesChanged()
@@ -187,4 +254,15 @@ void pqSampleScalarWidget::onDeleteSelected()
   this->Implementation->UI->Values->selectionModel()->clear();
   
   emit samplesChanged();
+}
+
+void pqSampleScalarWidget::onControlledPropertyChanged()
+{
+  if(this->Implementation->IgnorePropertyChange)
+    {
+    return;
+    }
+    
+  // Synchronize Qt widgets with the controlled properties
+  this->reset();
 }

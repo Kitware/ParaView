@@ -48,10 +48,6 @@ public:
   ~pqCutPanel();
   
 private slots:
-  /// Called when changes are made to the implicit plane widget
-  void onImplicitPlaneWidgetChanged();
-  /// Called when changes are made to the sample scalar widget
-  void onSampleScalarWidgetChanged();
   /// Called if the user accepts pending modifications
   void onAccepted();
   /// Called if the user rejects pending modifications

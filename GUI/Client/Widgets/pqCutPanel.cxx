@@ -92,14 +92,14 @@ pqCutPanel::pqCutPanel(QWidget* p) :
   connect(
     &this->Implementation->ImplicitPlaneWidget,
     SIGNAL(widgetChanged()),
-    this,
-    SLOT(onImplicitPlaneWidgetChanged()));
+    this->getPropertyManager(),
+    SLOT(propertyChanged()));
     
   connect(
     &this->Implementation->SampleScalarWidget,
     SIGNAL(samplesChanged()),
-    this,
-    SLOT(onSampleScalarWidgetChanged()));
+    this->getPropertyManager(),
+    SLOT(propertyChanged()));
   
   connect(
     this->getPropertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));
@@ -114,40 +114,11 @@ pqCutPanel::~pqCutPanel()
   delete this->Implementation;
 }
 
-void pqCutPanel::onImplicitPlaneWidgetChanged()
-{
-  // Signal the UI that there are changes to accept/reject ...
-  this->getPropertyManager()->propertyChanged();
-}
-
-void pqCutPanel::onSampleScalarWidgetChanged()
-{
-  // Signal the UI that there are changes to accept/reject ...
-  this->getPropertyManager()->propertyChanged();
-}
-
 void pqCutPanel::onAccepted()
 {
   this->Implementation->ImplicitPlaneWidget.accept();
+  this->Implementation->SampleScalarWidget.accept();
       
-  // Get the current values from the sample scalar widget ...
-  const QList<double> samples = this->Implementation->SampleScalarWidget.getSamples();
-  if(this->Proxy)
-    {
-    if(vtkSMDoubleVectorProperty* const contours =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        this->Proxy->GetProperty("ContourValues")))
-      {
-      contours->SetNumberOfElements(samples.size());
-      for(int i = 0; i != samples.size(); ++i)
-        {
-        contours->SetElement(i, samples[i]);
-        }
-        
-      this->Proxy->UpdateVTKObjects();
-      }
-    }
-  
   // If this is the first time we've been accepted since our creation, hide the source
   if(pqPipelineFilter* const pipeline_filter =
     dynamic_cast<pqPipelineFilter*>(pqServerManagerModel::instance()->getPQSource(this->Proxy)))
@@ -177,40 +148,25 @@ void pqCutPanel::onAccepted()
 void pqCutPanel::onRejected()
 {
   this->Implementation->ImplicitPlaneWidget.reset();
-
-  // Reset the state of the sample scalar widget ...
-  QList<double> values;
-  if(this->Proxy)
-    {
-    if(vtkSMDoubleVectorProperty* const contours =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        this->Proxy->GetProperty("ContourValues")))
-      {
-      const int value_count = contours->GetNumberOfElements();
-      for(int i = 0; i != value_count; ++i)
-        {
-        values.push_back(contours->GetElement(i));
-        }
-      }
-    }
-  this->Implementation->SampleScalarWidget.setSamples(values);
+  this->Implementation->SampleScalarWidget.reset();
 }
 
 void pqCutPanel::setProxyInternal(pqSMProxy p)
 {
   Superclass::setProxyInternal(p);
 
-  pqSMProxy reference_proxy = p;
+  // Setup the implicit plane widget ...
+  pqSMProxy reference_proxy = this->Proxy;
   pqSMProxy controlled_proxy;
   vtkSMDoubleVectorProperty* origin_property = 0;
   vtkSMDoubleVectorProperty* normal_property = 0;
    
   if(this->Proxy)
     {
-    if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
+    if(vtkSMProxyProperty* const cut_function_property = vtkSMProxyProperty::SafeDownCast(
       this->Proxy->GetProperty("CutFunction")))
       {
-      if(controlled_proxy = clip_function_property->GetProxy(0))
+      if(controlled_proxy = cut_function_property->GetProxy(0))
         {
         origin_property = vtkSMDoubleVectorProperty::SafeDownCast(
           controlled_proxy->GetProperty("Origin"));
@@ -223,21 +179,9 @@ void pqCutPanel::setProxyInternal(pqSMProxy p)
     reference_proxy, controlled_proxy, origin_property, normal_property);
 
   // Setup the sample scalar widget ...
-  QList<double> values;
-  if(this->Proxy)
-    {
-    if(vtkSMDoubleVectorProperty* const contours =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        this->Proxy->GetProperty("ContourValues")))
-      {
-      const int value_count = contours->GetNumberOfElements();
-      for(int i = 0; i != value_count; ++i)
-        {
-        values.push_back(contours->GetElement(i));
-        }
-      }
-    }
-  this->Implementation->SampleScalarWidget.setSamples(values);
+  this->Implementation->SampleScalarWidget.setDataSources(
+    this->Proxy,
+    this->Proxy ? vtkSMDoubleVectorProperty::SafeDownCast(this->Proxy->GetProperty("ContourValues")) : 0);
 }
 
 void pqCutPanel::select()
