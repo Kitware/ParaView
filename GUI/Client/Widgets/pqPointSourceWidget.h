@@ -49,12 +49,9 @@ public:
   pqPointSourceWidget(QWidget* p);
   ~pqPointSourceWidget();
 
-  /** Sets a "reference" proxy that will be used to provide bounds
-  for the 3D point widget */
-  void setReferenceProxy(pqSMProxy proxy);
-  /** Sets the vtkPointSource proxy that will actually be controlled
-  by user interaction */
-  void setControlledProxy(pqSMProxy proxy);
+  /** Sets the "reference" and "controlled" proxies that will be controlled
+  by this widget */
+  void setDataSources(pqSMProxy reference_proxy, pqSMProxy controlled_proxy);
 
   /// Enables the UI, making the 3D widget visible
   void showWidget(pqPropertyManager* property_manager);

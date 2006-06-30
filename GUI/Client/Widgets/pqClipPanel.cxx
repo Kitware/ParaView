@@ -75,6 +75,7 @@ pqClipPanel::pqClipPanel(QWidget* p) :
   panel_layout->addWidget(&this->Implementation->InsideOutWidget);
   panel_layout->addWidget(separator);
   panel_layout->addWidget(&this->Implementation->ImplicitPlaneWidget);
+  panel_layout->addStretch();
   
   this->setLayout(panel_layout);
 

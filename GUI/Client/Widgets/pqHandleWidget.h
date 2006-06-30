@@ -47,8 +47,9 @@ public:
   pqHandleWidget(QWidget* p);
   ~pqHandleWidget();
 
-  /// Sets the source proxy that will be controlled by this widget
-  void setReferenceProxy(pqSMProxy proxy);
+  /** Sets the proxy that will be used as a reference when setting the widget
+  to the center of source data */
+  void setDataSources(pqSMProxy reference_proxy);
   /// Returns the current state of the widget
   void getWidgetState(double world_position[3]);
   /// Sets the current state of the widget

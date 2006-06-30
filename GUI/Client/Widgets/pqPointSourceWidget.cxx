@@ -96,14 +96,11 @@ pqPointSourceWidget::~pqPointSourceWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqPointSourceWidget::setReferenceProxy(pqSMProxy proxy)
+void pqPointSourceWidget::setDataSources(pqSMProxy reference_proxy,
+  pqSMProxy controlled_proxy)
 {
-  this->Implementation->HandleWidget.setReferenceProxy(proxy);
-}
-
-void pqPointSourceWidget::setControlledProxy(pqSMProxy proxy)
-{
-  this->Implementation->ControlledProxy = proxy;
+  this->Implementation->HandleWidget.setDataSources(reference_proxy);
+  this->Implementation->ControlledProxy = controlled_proxy;
 }
 
 void pqPointSourceWidget::showWidget(pqPropertyManager* property_manager)

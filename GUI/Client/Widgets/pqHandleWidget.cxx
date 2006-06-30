@@ -164,26 +164,14 @@ pqHandleWidget::~pqHandleWidget()
   delete this->Implementation;
 }
 
-void pqHandleWidget::showWidget()
+void pqHandleWidget::setDataSources(pqSMProxy reference_proxy)
 {
-  this->show3DWidget(
-    this->Implementation->Visibility[this->Implementation->ReferenceProxy]);
-}
-
-void pqHandleWidget::hideWidget()
-{
-  this->show3DWidget(false);
-}
-
-//-----------------------------------------------------------------------------
-void pqHandleWidget::setReferenceProxy(pqSMProxy proxy)
-{
-  this->Implementation->ReferenceProxy = proxy;
+  this->Implementation->ReferenceProxy = reference_proxy;
   
-  if(!this->Implementation->Visibility.contains(proxy))
+  if(!this->Implementation->Visibility.contains(this->Implementation->ReferenceProxy))
     {
     this->Implementation->Visibility.insert(
-      proxy, proxy.GetPointer() ? true : false);
+      this->Implementation->ReferenceProxy, this->Implementation->ReferenceProxy.GetPointer() ? true : false);
     }
   
   if(!this->Implementation->Widget)
@@ -229,10 +217,10 @@ void pqHandleWidget::setReferenceProxy(pqSMProxy proxy)
 
   this->Implementation->IgnoreVisibilityWidget = true;
   this->Implementation->UI->show3DWidget->setChecked(
-    this->Implementation->Visibility[proxy]);
+    this->Implementation->Visibility[this->Implementation->ReferenceProxy]);
   this->Implementation->IgnoreVisibilityWidget = false;
 
-  this->show3DWidget(this->Implementation->Visibility[proxy]);
+  this->show3DWidget(this->Implementation->Visibility[this->Implementation->ReferenceProxy]);
 }
 
 void pqHandleWidget::getWidgetState(double world_position[3])
@@ -259,6 +247,17 @@ void pqHandleWidget::setWidgetState(const double world_position[3])
   
   // Push the current values into the 3D widget ...
   this->update3DWidget(world_position);
+}
+
+void pqHandleWidget::showWidget()
+{
+  this->show3DWidget(
+    this->Implementation->Visibility[this->Implementation->ReferenceProxy]);
+}
+
+void pqHandleWidget::hideWidget()
+{
+  this->show3DWidget(false);
 }
 
 void pqHandleWidget::onShow3DWidget(bool show_widget)

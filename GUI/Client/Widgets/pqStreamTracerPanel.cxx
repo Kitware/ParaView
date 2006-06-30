@@ -113,7 +113,9 @@ pqStreamTracerPanel::pqStreamTracerPanel(QWidget* p) :
       this->getPropertyManager(),
       SLOT(propertyChanged()));
     }
-    
+  
+  panel_layout->addStretch();
+  
   this->setLayout(panel_layout);
   
   connect(
@@ -173,31 +175,29 @@ void pqStreamTracerPanel::onRejected()
 void pqStreamTracerPanel::setProxyInternal(pqSMProxy p)
 {
   base::setProxyInternal(p);
- 
+
+  pqSMProxy reference_proxy = this->Proxy;
+  pqSMProxy controlled_proxy;
+
+  if(this->Proxy)
+    {
+    if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
+      this->Proxy->GetProperty("Source")))
+      {
+      controlled_proxy = source_property->GetProxy(0);
+      }
+    }
+   
   if(this->Implementation->PointSourceWidget)
     {
-    this->Implementation->PointSourceWidget->setReferenceProxy(p);
-    
-    if(p)
-      {
-      if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
-        p->GetProperty("Source")))
-        {
-        if(vtkSMProxy* const point_source = source_property->GetProxy(0))
-          {
-          this->Implementation->PointSourceWidget->setControlledProxy(point_source);
-          }
-        }
-      }
+    this->Implementation->PointSourceWidget->setDataSources(
+      reference_proxy, controlled_proxy);
     }
     
   if(this->Implementation->LineWidget)
     {
-    this->Implementation->LineWidget->setReferenceProxy(p);
+    this->Implementation->LineWidget->setReferenceProxy(reference_proxy);
     }
-  
-  if(!this->Proxy)
-    return;
 }
 
 void pqStreamTracerPanel::select()

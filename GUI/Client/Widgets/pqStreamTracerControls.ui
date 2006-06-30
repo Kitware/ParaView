@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>265</width>
-    <height>203</height>
+    <width>389</width>
+    <height>238</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -30,12 +30,15 @@
      <property name="spacing" >
       <number>6</number>
      </property>
-     <item row="5" column="0" >
-      <widget class="QLabel" name="label_5" >
+     <item row="2" column="0" >
+      <widget class="QLabel" name="label_2" >
        <property name="text" >
-        <string>Term. Speed</string>
+        <string>Initial Step Length</string>
        </property>
       </widget>
+     </item>
+     <item row="2" column="2" >
+      <widget class="QLineEdit" name="InitialIntegrationStep" />
      </item>
      <item row="3" column="0" >
       <widget class="QLabel" name="label_3" >
@@ -44,8 +47,28 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="2" >
-      <widget class="QLineEdit" name="InitialIntegrationStep" />
+     <item row="2" column="1" >
+      <widget class="QComboBox" name="InitialIntegrationStepUnit" />
+     </item>
+     <item row="4" column="1" >
+      <widget class="QLineEdit" name="MaximumNumberOfSteps" />
+     </item>
+     <item row="0" column="0" >
+      <widget class="QLabel" name="label_7" >
+       <property name="text" >
+        <string>Vectors</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0" >
+      <widget class="QLabel" name="label_9" >
+       <property name="text" >
+        <string>Minimum Step Length</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1" >
+      <widget class="QComboBox" name="MaximumPropagationUnit" />
      </item>
      <item row="4" column="0" >
       <widget class="QLabel" name="label_4" >
@@ -54,8 +77,8 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="1" >
-      <widget class="QComboBox" name="IntegratorType" />
+     <item row="5" column="1" >
+      <widget class="QLineEdit" name="TerminalSpeed" />
      </item>
      <item row="6" column="0" >
       <widget class="QLabel" name="label_6" >
@@ -64,15 +87,8 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="0" >
-      <widget class="QLabel" name="label_2" >
-       <property name="text" >
-        <string>Initial Step Length</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1" >
-      <widget class="QLineEdit" name="TerminalSpeed" />
+     <item row="6" column="1" >
+      <widget class="QComboBox" name="IntegratorType" />
      </item>
      <item row="1" column="2" >
       <widget class="QLineEdit" name="MaximumPropagation" />
@@ -84,51 +100,54 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="1" >
-      <widget class="QComboBox" name="InitialIntegrationStepUnit" />
+     <item row="5" column="0" >
+      <widget class="QLabel" name="label_5" >
+       <property name="text" >
+        <string>Term. Speed</string>
+       </property>
+      </widget>
      </item>
-     <item row="4" column="1" >
-      <widget class="QLineEdit" name="MaximumNumberOfSteps" />
-     </item>
-     <item row="1" column="1" >
-      <widget class="QComboBox" name="MaximumPropagationUnit" />
+     <item row="0" column="1" >
+      <widget class="QComboBox" name="SelectInputVectors" />
      </item>
      <item row="3" column="1" >
       <widget class="QComboBox" name="IntegrationDirection" />
      </item>
-     <item row="0" column="1" >
-      <widget class="QComboBox" name="Source" />
-     </item>
-     <item row="0" column="2" >
-      <widget class="QComboBox" name="SelectInputVectors" />
-     </item>
-     <item row="0" column="0" >
-      <widget class="QLabel" name="label_7" >
+     <item row="9" column="0" >
+      <widget class="QLabel" name="label_8" >
        <property name="text" >
-        <string>Source</string>
+        <string>Maximum Error</string>
        </property>
       </widget>
      </item>
+     <item row="9" column="1" >
+      <widget class="QLineEdit" name="MaximumError" />
+     </item>
+     <item row="8" column="0" >
+      <widget class="QLabel" name="label_10" >
+       <property name="text" >
+        <string>Maximum Step Length</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1" >
+      <widget class="QComboBox" name="MinimumIntegrationStepUnit" />
+     </item>
+     <item row="7" column="2" >
+      <widget class="QLineEdit" name="MinimumIntegrationStep" />
+     </item>
+     <item row="8" column="1" >
+      <widget class="QComboBox" name="MaximumIntegrationStepUnit" />
+     </item>
+     <item row="8" column="2" >
+      <widget class="QLineEdit" name="MaximumIntegrationStep" />
+     </item>
     </layout>
-   </item>
-   <item>
-    <spacer>
-     <property name="orientation" >
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" >
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>
  <pixmapfunction></pixmapfunction>
  <tabstops>
-  <tabstop>Source</tabstop>
   <tabstop>SelectInputVectors</tabstop>
   <tabstop>MaximumPropagationUnit</tabstop>
   <tabstop>MaximumPropagation</tabstop>
