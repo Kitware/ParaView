@@ -88,7 +88,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.70");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.71");
 
 
 //*****************************************************************************
@@ -1084,7 +1084,7 @@ void vtkPVLookmark::InitializeDataset()
     it->GoToNextItem();
     }
   it->Delete();
-  unsigned int ret = ds.find_last_of(';',ds.size());
+  vtkstd::string::size_type ret = ds.find_last_of(';',ds.size());
   if(ret != vtkstd::string::npos)
     {
     ds.erase(ret);
