@@ -211,6 +211,21 @@ protected:
     {
     emit this->progress(QString(name), value);
     }
+
+  friend class pqPendingDisplayUndoElement;
+  
+  // Methods to add a source to the list of sources pending displays.
+  void addSourcePendingDisplay(pqPipelineSource*);
+
+  // Methods to remove a source to the list of sources pending displays.
+  void removeSourcePendingDisplay(pqPipelineSource*);
+
+  // Performs the set of actions need to be performed after a new 
+  // source/reader/filter/customfilter is created. This includes
+  // seting up handler to create a default display proxy for the source
+  // after first accept, set up undo stack so that the undo/redo
+  // works correctly with pending displays etc etc.
+  void onSourceCreated(pqPipelineSource* src);
 private slots:
   // called when a source is removed by the pqServerManagerModel. If
   // the removed source is the active source, we must change it.

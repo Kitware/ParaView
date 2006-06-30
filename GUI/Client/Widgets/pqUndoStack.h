@@ -35,10 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsExport.h"
 #include <QObject>
 
+class pqUndoStackImplementation;
 class vtkCommand;
 class vtkObject;
 class vtkSMUndoStack;
-class pqUndoStackImplementation;
+class vtkUndoElement;
 
 /// This is an adaptor for the vtkSMUndoStack.
 /// This class updates the vtkSMUndoStack status on accept reset etc etc.
@@ -53,6 +54,12 @@ public:
 
   bool CanUndo();
   bool CanRedo();
+
+  // Description:
+  // One can add arbritary elements to the active undo set.
+  // If no ActiveUndoSet is present, an error will be raised. It is essential
+  // that the StateLoader can handle the arbritary undo elements.
+  void AddToActiveUndoSet(vtkUndoElement* element);
 
 public slots:
   /// NOTE: Notice that the BeginOrContinueUndoSet doesn;t take

@@ -231,6 +231,8 @@ ADD_LIBRARY(pqWidgets
   pqOutputWindowAdapter.h
   pqParts.cxx
   pqParts.h
+  pqPendingDisplayUndoElement.cxx
+  pqPendingDisplayUndoElement.h
   pqPicking.cxx
   pqPicking.h
   pqPipelineBrowser.cxx
@@ -325,6 +327,8 @@ ADD_LIBRARY(pqWidgets
   pqToolsMenu.h
   pqToolTipTrapper.cxx
   pqToolTipTrapper.h
+  pqUndoRedoStateLoader.cxx
+  pqUndoRedoStateLoader.h
   pqUndoStack.cxx
   pqUndoStack.h
   pqVCRController.cxx

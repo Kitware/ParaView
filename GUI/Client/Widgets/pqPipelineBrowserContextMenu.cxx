@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
+#include "pqUndoStack.h"
 
 #include <QDialog>
 #include <QHBoxLayout>
@@ -158,8 +159,13 @@ void pqPipelineBrowserContextMenu::showDisplayEditor()
   l->addWidget(editor);
   QObject::connect(editor, SIGNAL(dismiss()),
     dialog, SLOT(accept()));
-  dialog->setModal(true);
-  dialog->show();
+  //dialog->setModal(true);
+  //dialog->show();
+  pqApplicationCore::instance()->getUndoStack()->
+    BeginOrContinueUndoSet("Display Settings");
+  dialog->exec();
+  pqApplicationCore::instance()->getUndoStack()->
+    EndUndoSet();
 }
 
 void pqPipelineBrowserContextMenu::showRenderViewEditor()

@@ -50,17 +50,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pq3DWidgetFactory.h"
+#include "pqPendingDisplayUndoElement.h"
 #include "pqPipelineBuilder.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineSource.h"
 #include "pqReaderFactory.h"
 #include "pqRenderModule.h"
-#include "pqSMAdaptor.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqServerManagerSelectionModel.h"
 #include "pqSettings.h"
+#include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
 #include "pqWriterFactory.h"
 #include "pqXMLUtil.h"
@@ -322,6 +323,23 @@ void pqApplicationCore::render()
 }
 
 //-----------------------------------------------------------------------------
+void pqApplicationCore::onSourceCreated(pqPipelineSource* source)
+{
+  if (!source)
+    {
+    return;
+    }
+
+  this->addSourcePendingDisplay(source);
+  this->setActiveSource(source);
+
+  pqPendingDisplayUndoElement* elem = pqPendingDisplayUndoElement::New();
+  elem->PendingDisplay(source, true);
+  this->Internal->UndoStack->AddToActiveUndoSet(elem);
+  elem->Delete();
+}
+
+//-----------------------------------------------------------------------------
 pqPipelineSource* pqApplicationCore::createSourceOnActiveServer(
   const QString& xmlname)
 {
@@ -336,13 +354,8 @@ pqPipelineSource* pqApplicationCore::createSourceOnActiveServer(
     "sources", xmlname.toStdString().c_str(), 
     this->Internal->ActiveServer, NULL);
 
-  if (source)
-    {
-    this->Internal->SourcesSansDisplays.push_back(source);
-    emit this->pendingDisplays(true);
-    this->setActiveSource(source);
-    }
-
+  this->onSourceCreated(source);
+  this->Internal->UndoStack->EndUndoSet();
   return source;
 }
 
@@ -437,12 +450,8 @@ pqPipelineSource* pqApplicationCore::createFilterForActiveSource(
       }
     }
 
-  if (filter)
-    {
-    this->Internal->SourcesSansDisplays.push_back(filter);
-    emit this->pendingDisplays(true);
-    this->setActiveSource(filter);
-    }
+  this->onSourceCreated(filter);
+  this->Internal->UndoStack->EndUndoSet();
   return filter;
 }
 
@@ -465,12 +474,10 @@ pqPipelineSource* pqApplicationCore::createCompoundSource(
     {
     this->Internal->PipelineBuilder->addConnection(
       this->Internal->ActiveSource, filter);
-
-    this->Internal->SourcesSansDisplays.push_back(filter);
-    emit this->pendingDisplays(true);
-    this->setActiveSource(filter);
     }
 
+  this->onSourceCreated(filter);
+  this->Internal->UndoStack->EndUndoSet();
   return filter;
 }
 
@@ -504,10 +511,8 @@ pqPipelineSource* pqApplicationCore::createReaderOnActiveServer(
 
   this->Internal->UndoStack->PauseUndoSet();
 
-  this->Internal->SourcesSansDisplays.push_back(reader);
-  emit this->pendingDisplays(true);
-
-  this->setActiveSource(reader);
+  this->onSourceCreated(reader);
+  this->Internal->UndoStack->EndUndoSet();
   return reader;
 }
 
@@ -551,6 +556,7 @@ void pqApplicationCore::removeSource(pqPipelineSource* source)
   this->getActiveRenderModule()->render();
 }
 
+//-----------------------------------------------------------------------------
 void pqApplicationCore::removeActiveServer()
 {
   pqServer* server = this->getActiveServer();
@@ -562,6 +568,7 @@ void pqApplicationCore::removeActiveServer()
   this->removeServer(server);
 }
 
+//-----------------------------------------------------------------------------
 void pqApplicationCore::removeServer(pqServer* server)
 {
   if (!server)
@@ -577,6 +584,30 @@ void pqApplicationCore::removeServer(pqServer* server)
   this->getServerManagerModel()->endRemoveServer();
 }
 
+//-----------------------------------------------------------------------------
+// Methods to add a source to the list of sources pending displays.
+void pqApplicationCore::addSourcePendingDisplay(pqPipelineSource* src)
+{
+  if (!this->Internal->SourcesSansDisplays.contains(src))
+    {
+    this->Internal->SourcesSansDisplays.push_back(src);
+    emit this->pendingDisplays(true);
+    }
+}
+
+//-----------------------------------------------------------------------------
+// Methods to remove a source to the list of sources pending displays.
+void pqApplicationCore::removeSourcePendingDisplay(pqPipelineSource* src)
+{
+  if (this->Internal->SourcesSansDisplays.contains(src))
+    {
+    this->Internal->SourcesSansDisplays.removeAll(src);
+    if (this->Internal->SourcesSansDisplays.size() == 0)
+      {
+      emit this->pendingDisplays(false);
+      }
+    }
+}
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::createPendingDisplays()
@@ -594,6 +625,16 @@ void pqApplicationCore::createPendingDisplays()
       {
       this->getActiveRenderModule()->resetCamera();
       }
+    
+    // For every pending display we create, we push an undoelement
+    // nothing the creation of the pending display. 
+    // This ensures that when this step is undone, the source for
+    // which we created the pending display is once again marked as
+    // a source pending a display.
+    pqPendingDisplayUndoElement* elem = pqPendingDisplayUndoElement::New();
+    elem->PendingDisplay(source, false);
+    this->Internal->UndoStack->AddToActiveUndoSet(elem);
+    elem->Delete();
     }
 
   this->Internal->SourcesSansDisplays.clear();

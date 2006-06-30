@@ -43,6 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqApplicationCore.h"
 #include "pqServer.h"
+#include "pqUndoRedoStateLoader.h"
+
 //-----------------------------------------------------------------------------
 class pqUndoStackImplementation
 {
@@ -58,6 +60,10 @@ pqUndoStack::pqUndoStack(bool clientOnly, QObject* _parent/*=null*/)
   this->Implementation = new pqUndoStackImplementation;
   this->Implementation->UndoStack = vtkSmartPointer<vtkSMUndoStack>::New();
   this->Implementation->UndoStack->SetClientOnly(clientOnly);
+  pqUndoRedoStateLoader* loader = pqUndoRedoStateLoader::New();
+  this->Implementation->UndoStack->SetStateLoader(loader);
+  loader->Delete();
+
   this->Implementation->VTKConnector = vtkSmartPointer<vtkEventQtSlotConnect>::New();
   this->Implementation->VTKConnector->Connect(this->Implementation->UndoStack,
     vtkCommand::ModifiedEvent, this, SLOT(onStackChanged(vtkObject*, 
@@ -80,6 +86,12 @@ bool pqUndoStack::CanUndo()
 bool pqUndoStack::CanRedo()
 {
   return this->Implementation->UndoStack->CanRedo();
+}
+
+//-----------------------------------------------------------------------------
+void pqUndoStack::AddToActiveUndoSet(vtkUndoElement* element)
+{
+  this->Implementation->UndoStack->AddToActiveUndoSet(element);
 }
 
 //-----------------------------------------------------------------------------
