@@ -99,23 +99,24 @@ ENDIF(APPLE)
   SET(TEST_IMAGE ${PARAVIEW_DATA_ROOT}/Baseline)
 
   SET (TESTS_WITH_BASELINES
-    CreateSource
-    CustomFilter
-    UndoRedo
-    SubMenu
-    ObjectInspectorSphere
-    VariableSelector
     Clip
     ClipHidden
+    Contour
+    CreateSource
+    CreateSourceWithoutConnect
+    CustomFilter
     Cut
     CutMulti
-    Threshold
-    OpenFile
     ExodusPanel
-    OpenSaveData
     LoadState
-    Contour
+    ObjectInspectorSphere
+    OpenFile
+    OpenSaveData
     StreamTracer
+    SubMenu
+    Threshold
+    UndoRedo
+    VariableSelector
     )
 
   SET (TESTS_WITHOUT_BASELINES

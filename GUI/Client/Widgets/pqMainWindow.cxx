@@ -847,7 +847,6 @@ QMenu* pqMainWindow::sourcesMenu()
     {
     this->Implementation->SourcesMenu = this->menuBar()->addMenu(tr("S&ources"))
       << pqSetName("SourcesMenu");
-    this->Implementation->SourcesMenu->setEnabled(false);
     }
     
   return this->Implementation->SourcesMenu;
@@ -1070,9 +1069,6 @@ void pqMainWindow::buildSourcesMenu()
   QMenu *menu = this->Implementation->SourcesMenu->addMenu("Released") << pqSetName("Released");
   menu->addAction("Cone") 
     << pqSetName("Cone") << pqSetData("ConeSource");
-
-
-
 
   // hard code sources
   this->Implementation->SourcesMenu->addAction("2D Glyph") 
@@ -1638,10 +1634,24 @@ void pqMainWindow::onCreateSource(QAction* action)
     return;
     }
 
-  QString sourceName = action->data().toString();
-  if (!pqApplicationCore::instance()->createSourceOnActiveServer(sourceName))
+  pqApplicationCore* core = pqApplicationCore::instance();
+  if (core->getServerManagerModel()->getNumberOfServers() == 0)
     {
-    qCritical() << "Source could not be created.";
+    // We need to create a new connection.
+    pqServerBrowser* const server_browser = new pqServerBrowser(this);
+    server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
+    // let the regular onServerConnect() operation be performed as well.
+    QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, 
+      SLOT(onServerConnect(pqServer*)));
+    server_browser->exec();
+    }
+  if (core->getActiveServer())
+    {
+    QString sourceName = action->data().toString();
+    if (!core->createSourceOnActiveServer(sourceName))
+      {
+      qCritical() << "Source could not be created.";
+      }
     }
 }
 
@@ -2008,7 +2018,7 @@ void pqMainWindow::updateEnableState()
   if ( this->Implementation->SourcesMenu )
     {
     this->Implementation->SourcesMenu->setEnabled(
-      server != 0 && !pending_displays);
+      (num_servers == 0 || server != 0) && !pending_displays);
     }
 
   if ( this->Implementation->VariableSelectorToolBar )
