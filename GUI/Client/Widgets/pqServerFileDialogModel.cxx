@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkClientServerStream.h>
 #include <vtkProcessModule.h>
 #include <vtkSmartPointer.h>
+#include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxy.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMStringVectorProperty.h>
@@ -418,6 +419,7 @@ public:
 
   pqFileModel* const FileModel;
   pqFavoriteModel* const FavoriteModel;
+  vtkSmartPointer<vtkSMProxy> ServerFileListingProxy;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -428,6 +430,13 @@ pqServerFileDialogModel::pqServerFileDialogModel(QObject* Parent, pqServer* serv
   Implementation(new pqImplementation(server))
 {
   this->Server = server;
+  vtkSMProxy* proxy = vtkSMObject::GetProxyManager()->NewProxy("file_listing",
+    "ServerFileListing");
+  proxy->SetConnectionID(this->Server->GetConnectionID());
+  proxy->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
+  proxy->UpdateVTKObjects();
+  this->Implementation->ServerFileListingProxy = proxy;
+  proxy->Delete();
 }
 
 pqServerFileDialogModel::~pqServerFileDialogModel()
@@ -442,18 +451,13 @@ QString pqServerFileDialogModel::getStartPath()
     return gLastPath;
     }
 
-  vtkSMProxy* proxy = vtkSMObject::GetProxyManager()->NewProxy("file_listing",
-    "ServerFileListing");
-  proxy->SetConnectionID(this->Server->GetConnectionID());
-  proxy->SetServers(vtkProcessModule::DATA_SERVER_ROOT);
-  proxy->UpdateVTKObjects();
+  vtkSMProxy* proxy = this->Implementation->ServerFileListingProxy;
   proxy->UpdatePropertyInformation();
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
     proxy->GetProperty("CurrentWorkingDirectory"));
   const char* cwd = (svp)? svp->GetElement(0) : "";
   
   gLastPath = cwd;
-  proxy->Delete();
   return gLastPath;
 }
 
@@ -539,17 +543,19 @@ bool pqServerFileDialogModel::fileExists(const QString& FilePath)
 
 bool pqServerFileDialogModel::dirExists(const QString& Dir)
 {
-  vtkSmartPointer<vtkStringList> dirs = vtkSmartPointer<vtkStringList>::New();
-  vtkSmartPointer<vtkStringList> files = vtkSmartPointer<vtkStringList>::New();
-  
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  if (!pm->GetDirectoryListing(this->Server->GetConnectionID(),
-    Dir.toAscii().data(), dirs.GetPointer(), files.GetPointer(), 0))
+  vtkSMProxy* proxy = this->Implementation->ServerFileListingProxy;
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    proxy->GetProperty("ActiveFileName"));
+  svp->SetElement(0, Dir.toAscii().data());
+  proxy->UpdateVTKObjects();
+  proxy->UpdatePropertyInformation();
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      proxy->GetProperty("ActiveFileIsDirectory"));
+  if (ivp->GetElement(0))
     {
-    // error failed to obtain directory listing.
-    return false;
+      return true;
     }
-  return true;
+  return false;
 }
 
 QAbstractItemModel* pqServerFileDialogModel::fileModel()
