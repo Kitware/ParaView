@@ -3,13 +3,11 @@
 #########################################################################
 # Common settings
 #
-# ParaView version number.  An even minor number corresponds to releases.
-SET(PARAVIEW_VERSION_MAJOR 2)
-SET(PARAVIEW_VERSION_MINOR 5)
-SET(PARAVIEW_VERSION_PATCH 0)
-SET(PARAVIEW_VERSION "${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}")
-SET(PARAVIEW_VERSION_FULL "${PARAVIEW_VERSION}.${PARAVIEW_VERSION_PATCH}")
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${ParaView_SOURCE_DIR}/VTK/CMake")
+
+IF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.3)
+  SET(PV_INSTALL_HAS_CMAKE_24 1)
+ENDIF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" GREATER 2.3)
 
 # Configure VTK library versions to be paraview-specific.
 SET(VTK_NO_LIBRARY_VERSION 1)
@@ -93,6 +91,16 @@ ENDIF(NOT PV_INSTALL_LIB_DIR)
 IF(NOT PV_INSTALL_DATA_DIR)
   SET(PV_INSTALL_DATA_DIR ${PV_INSTALL_ROOT}/share/paraview-${PARAVIEW_VERSION})
 ENDIF(NOT PV_INSTALL_DATA_DIR)
+# Because INSTALL_* commands require a leading / and because INSTALL (cmake 2.4
+# and newer) requires no leading / to install under INSTALL_PREFIX, we
+# are stripping the leading /. In the future, there should be no leading
+# / in any install directory variables
+IF(PV_INSTALL_HAS_CMAKE_24)
+  STRING(REGEX REPLACE "^/" "" PV_INSTALL_LIB_DIR_CM24 "${PV_INSTALL_LIB_DIR}")
+  STRING(REGEX REPLACE "^/" "" PV_INSTALL_BIN_DIR_CM24 "${PV_INSTALL_BIN_DIR}")
+  STRING(REGEX REPLACE "^/" "" PV_INSTALL_INCLUDE_DIR_CM24 "${PV_INSTALL_INCLUDE_DIR}")
+  STRING(REGEX REPLACE "^/" "" PV_INSTALL_DATA_DIR_CM24 "${PV_INSTALL_DATA_DIR}")
+ENDIF(PV_INSTALL_HAS_CMAKE_24)
 
 # Install no development files by default, but allow the user to get
 # them installed by setting PV_INSTALL_DEVELOPMENT to true.  Disable
@@ -128,6 +136,7 @@ SET(VTK_INSTALL_BIN_DIR ${PV_INSTALL_LIB_DIR})
 SET(VTK_INSTALL_INCLUDE_DIR ${PV_INSTALL_INCLUDE_DIR})
 SET(VTK_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
 SET(VTK_INSTALL_PACKAGE_DIR ${PV_INSTALL_LIB_DIR})
+SET(VTK_INSTALL_HAS_CMAKE_24 ${PV_INSTALL_HAS_CMAKE_24})
 
 # VTK and KWCommon should install only the components paraview does.
 
