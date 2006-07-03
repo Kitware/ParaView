@@ -59,7 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 pqChartZoomPanAlt::pqChartZoomPanAlt(pqLineChartWidget *p)
-  : Parent(p), Last()
+  : Last(), Parent(p)
 {
   this->Current = pqChartZoomPanAlt::NoMode;
 }
@@ -68,7 +68,7 @@ pqChartZoomPanAlt::~pqChartZoomPanAlt()
 {
 }
 
-void pqChartZoomPanAlt::zoomToRectangle(const QRect *area)
+void pqChartZoomPanAlt::zoomToRectangle(const QRect * /*area*/)
 {
 /*
   if(!this->Parent || !area || !area->isValid())
@@ -266,8 +266,8 @@ void pqChartZoomPanAlt::interact(const QPoint &pos, InteractFlags flags)
   this->Last = pos;
 }
 
-bool pqChartZoomPanAlt::handleWheelZoom(int delta, const QPoint &pos,
-    InteractFlags flags)
+bool pqChartZoomPanAlt::handleWheelZoom(int /*delta*/, const QPoint & /*pos*/,
+    InteractFlags /*flags*/)
 {
 /*
   if(!this->Parent)
