@@ -61,7 +61,10 @@ IF(WIN32)
   LINK_DIRECTORIES(${QT_LIBRARY_DIR})
 ENDIF(WIN32)
 
-ADD_EXECUTABLE(paraview_alpha WIN32 MACOSX_BUNDLE
+# Add main server executables.
+SET(PV_EXE_LIST paraview_alpha)
+
+ADD_EXECUTABLE(paraview_alpha${PV_EXE_SUFFIX} WIN32 MACOSX_BUNDLE
   AboutDialog.cxx
   AboutDialog.h
   MainWindow.cxx
@@ -75,7 +78,7 @@ ADD_EXECUTABLE(paraview_alpha WIN32 MACOSX_BUNDLE
   ${EXE_ICON}
 )
 
-TARGET_LINK_LIBRARIES(paraview_alpha
+TARGET_LINK_LIBRARIES(paraview_alpha${PV_EXE_SUFFIX}
   pqWidgets
   QtWidgets
   QtChart
@@ -84,7 +87,7 @@ TARGET_LINK_LIBRARIES(paraview_alpha
 )
 
 IF(WIN32)
-  TARGET_LINK_LIBRARIES(paraview_alpha
+  TARGET_LINK_LIBRARIES(paraview_alpha${PV_EXE_SUFFIX}
     optimized qtmain debug qtmaind
   )
 ENDIF(WIN32)
@@ -137,4 +140,61 @@ ENDIF(APPLE)
   ENDFOREACH(test) 
   
 ENDIF(BUILD_TESTING)
+
+# Add shared link forwarding executables if necessary.
+IF(PV_NEED_SHARED_FORWARD)
+  FOREACH(pvexe ${PV_EXE_LIST})
+    SET(PV_FORWARD_EXE ${pvexe}${PV_EXE_SUFFIX})
+    CONFIGURE_FILE(
+      ${ParaView_SOURCE_DIR}/Servers/Executables/pv-forward.c.in
+      ${CMAKE_CURRENT_BINARY_DIR}/${pvexe}-forward.c
+      @ONLY IMMEDIATE)
+    ADD_EXECUTABLE(${pvexe} ${CMAKE_CURRENT_BINARY_DIR}/${pvexe}-forward.c)
+    ADD_DEPENDENCIES(${pvexe} ${pvexe}${PV_EXE_SUFFIX})
+    IF(NOT PV_INSTALL_NO_RUNTIME)
+      INSTALL_TARGETS(${PV_INSTALL_BIN_DIR} ${pvexe})
+    ENDIF(NOT PV_INSTALL_NO_RUNTIME)
+  ENDFOREACH(pvexe)
+ENDIF(PV_NEED_SHARED_FORWARD)
+
+IF(NOT PARAVIEW_INSTALL_NO_RUNTIME)
+   INSTALL_TARGETS(${PV_EXE_INSTALL} paraview_alpha${PV_EXE_SUFFIX})
+ENDIF(NOT PARAVIEW_INSTALL_NO_RUNTIME)
+
+# Install system libraries on Linux (will not work on any other Unix
+# yet)
+IF (PV_INSTALL_HAS_CMAKE_24)
+  FOREACH(fmpglib avcodec avformat avutil)
+    IF(FFMPEG_${fmpglib}_LIBRARY)
+      GET_FILENAME_COMPONENT(FFMPEG_LIB_DIR_tmp ${FFMPEG_${fmpglib}_LIBRARY} PATH)
+      GET_FILENAME_COMPONENT(FFMPEG_LIB_NAME_tmp ${FFMPEG_${fmpglib}_LIBRARY} NAME)
+      FILE(GLOB FFMPEG_LIB_LIST RELATIVE ${FFMPEG_LIB_DIR_tmp} "${FFMPEG_${fmpglib}_LIBRARY}*")
+      INSTALL(CODE "
+MESSAGE(STATUS \"Installing \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR_CM24}/${FFMPEG_LIB_NAME_tmp}\")
+EXECUTE_PROCESS (WORKING_DIRECTORY ${FFMPEG_LIB_DIR_tmp}
+                 COMMAND tar c ${FFMPEG_LIB_LIST}
+                 COMMAND tar -xC \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR_CM24})
+        ")
+      #INSTALL(FILES ${FFMPEG_${fmpglib}_LIBRARY} DESTINATION ${PV_INSTALL_LIB_DIR_CM24})
+
+    ENDIF(FFMPEG_${fmpglib}_LIBRARY)
+  ENDFOREACH(fmpglib)
+
+  FOREACH(qtlib QTCORE QTGUI QTDESIGNER QTNETWORK QTXML)
+    #INSTALL(FILES ${QT_${qtlib}_LIBRARY_RELEASE} DESTINATION ${PV_INSTALL_LIB_DIR_CM24})
+    GET_FILENAME_COMPONENT(QT_LIB_DIR_tmp ${QT_${qtlib}_LIBRARY_RELEASE} PATH)
+    GET_FILENAME_COMPONENT(QT_LIB_NAME_tmp ${QT_${qtlib}_LIBRARY_RELEASE} NAME)
+    FILE(GLOB QT_LIB_LIST RELATIVE ${QT_LIB_DIR_tmp} "${QT_${qtlib}_LIBRARY_RELEASE}*")
+    INSTALL(CODE "
+MESSAGE(STATUS \"Installing \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR_CM24}/${QT_LIB_NAME_tmp}\")
+EXECUTE_PROCESS (WORKING_DIRECTORY ${QT_LIB_DIR_tmp}
+                 COMMAND tar c ${QT_LIB_LIST}
+                 COMMAND tar -xC \${CMAKE_INSTALL_PREFIX}/${PV_INSTALL_LIB_DIR_CM24})
+        ")
+  ENDFOREACH(qtlib)
+
+  # Never do this at home --- HACK ---
+#  INSTALL(FILES /usr/lib/libstdc++.so.5 /lib/libgcc_s.so.1 /usr/lib/libpng.so.3 /usr/lib/libexpat.so.0 /usr/lib/libfontconfig.so.1 /usr/lib/libfreetype.so.6 /lib/libz.so.1 DESTINATION ${PV_INSTALL_LIB_DIR_CM24})
+  
+ENDIF (PV_INSTALL_HAS_CMAKE_24)
 
