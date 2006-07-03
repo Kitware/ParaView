@@ -43,7 +43,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.143");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.144");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -973,6 +973,8 @@ void vtkKWRenderWidget::MouseMoveCallback(
   interactor->SetEventInformationFlipY(x, y, ctrl, shift);
 #if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   interactor->SetAltKey(alt);
+#else
+  (void)alt;
 #endif
   
   vtkGenericRenderWindowInteractor *gen_interactor = 
@@ -997,6 +999,8 @@ void vtkKWRenderWidget::MouseWheelCallback(
   interactor->SetShiftKey(shift);
 #if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   interactor->SetAltKey(alt);
+#else
+  (void)alt;
 #endif
 
   vtkGenericRenderWindowInteractor *gen_interactor = 
@@ -1051,6 +1055,8 @@ void vtkKWRenderWidget::MouseButtonPressCallback(
     interactor->SetEventInformationFlipY(x, y, ctrl, shift, 0, repeat);
 #if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
     interactor->SetAltKey(alt);
+#else
+    (void)alt;
 #endif
 
     vtkGenericRenderWindowInteractor *gen_interactor = 
@@ -1086,6 +1092,8 @@ void vtkKWRenderWidget::MouseButtonReleaseCallback(
   interactor->SetEventInformationFlipY(x, y, ctrl, shift);
 #if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   interactor->SetAltKey(alt);
+#else
+  (void)alt;
 #endif
   
   vtkGenericRenderWindowInteractor *gen_interactor = 
@@ -1124,6 +1132,8 @@ void vtkKWRenderWidget::KeyPressCallback(char key,
   interactor->SetEventInformationFlipY(x, y, ctrl, shift, key, 0, keysym);
 #if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
   interactor->SetAltKey(alt);
+#else
+  (void)alt;
 #endif
 
   vtkGenericRenderWindowInteractor *gen_interactor = 
