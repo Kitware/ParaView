@@ -1,56 +1,75 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/MenuBar/ServerMenu" command="activate" arguments="Connect" />
-  <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
   <pqevent object="MainWindow/MenuBar/SourcesMenu" command="activate" arguments="Sphere" />
+  <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/MenuBar/FiltersMenu/&amp;Favorites" command="activate" arguments="Cut" />
+  <pqevent object="MainWindow/MenuBar/FiltersMenu/Subset" command="activate" arguments="Cut" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqImplicitPlaneWidget/useZNormal" command="activate" arguments="" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="2" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="4" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="3" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="5" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="6" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="10" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="20" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="30" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="41" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="51" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="61" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="67" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="11" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="14" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="18" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="21" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="24" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="29" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="32" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="37" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="43" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="46" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="53" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="54" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="59" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="64" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="69" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="73" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="81" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="85" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="91" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="93" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="101" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="77" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="83" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="88" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="94" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="97" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="104" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="107" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="110" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="115" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="116" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="124" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="134" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="150" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="160" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="172" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="178" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="184" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="188" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="193" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="195" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="197" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="201" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="203" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="205" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="207" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="209" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqSampleScalarWidget/groupBox/RangeMin" command="set_string" arguments="-" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqSampleScalarWidget/groupBox/RangeMin" command="set_string" arguments="-0" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqSampleScalarWidget/groupBox/RangeMin" command="set_string" arguments="-0." />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqSampleScalarWidget/groupBox/RangeMin" command="set_string" arguments="-0.5" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqSampleScalarWidget/groupBox/RangeMax" command="set_string" arguments="" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqSampleScalarWidget/groupBox/RangeMax" command="set_string" arguments="0" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqSampleScalarWidget/groupBox/RangeMax" command="set_string" arguments="0." />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqSampleScalarWidget/groupBox/RangeMax" command="set_string" arguments="0.5" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqSampleScalarWidget/groupBox/RangeCount" command="set_string" arguments="" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqSampleScalarWidget/groupBox/RangeCount" command="set_string" arguments="20" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqSampleScalarWidget/groupBox/RangeCount" command="set_string" arguments="20" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqSampleScalarWidget/groupBox/AddRange" command="activate" arguments="" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="118" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqSampleScalarWidget/NewRange" command="activate" arguments="" />
+  <pqevent object="pqSampleScalarAddRangeDialog/From" command="set_string" arguments="-" />
+  <pqevent object="pqSampleScalarAddRangeDialog/From" command="set_string" arguments="-." />
+  <pqevent object="pqSampleScalarAddRangeDialog/From" command="set_string" arguments="-.5" />
+  <pqevent object="pqSampleScalarAddRangeDialog/To" command="set_string" arguments="" />
+  <pqevent object="pqSampleScalarAddRangeDialog/To" command="set_string" arguments="." />
+  <pqevent object="pqSampleScalarAddRangeDialog/To" command="set_string" arguments=".5" />
+  <pqevent object="pqSampleScalarAddRangeDialog/Steps" command="set_string" arguments="" />
+  <pqevent object="pqSampleScalarAddRangeDialog/Steps" command="set_string" arguments="20" />
+  <pqevent object="pqSampleScalarAddRangeDialog/Steps" command="set_string" arguments="20" />
+  <pqevent object="pqSampleScalarAddRangeDialog/okButton" command="activate" arguments="" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="116" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="115" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="112" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="105" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="100" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="94" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="88" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="81" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="72" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="67" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="59" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="56" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="46" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="38" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="30" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="26" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="19" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="16" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="11" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="5" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="2" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/1QScrollBar0" command="set_int" arguments="0" />
+  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqImplicitPlaneWidget/show3DWidget" command="set_boolean" arguments="false" />
 </pqevents>
