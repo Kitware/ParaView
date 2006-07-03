@@ -33,13 +33,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Server Manager includes.
 #include "vtkPVXMLElement.h"
+#include "vtkSMArrayListDomain.h"
 #include "vtkSMDataObjectDisplayProxy.h"
+#include "vtkSMDoubleRangeDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMPQStateLoader.h"
+#include "vtkSMStringVectorProperty.h"
 #include "QVTKWidget.h"
 
 // Qt includes.
@@ -393,6 +396,51 @@ pqPipelineSource* pqApplicationCore::createFilterForActiveSource(
         clip_function->AddProxy(plane);
         }
       this->Internal->UndoStack->PauseUndoSet();
+      }
+
+    // As a special-case, set the default contour for new Contour filters
+    if(xmlname == "Contour")
+      {
+      double min_value = 0.0;
+      double max_value = 0.0;
+      
+      if(vtkSMStringVectorProperty* const array =
+        vtkSMStringVectorProperty::SafeDownCast(
+          filter->getProxy()->GetProperty("SelectInputScalars")))
+        {
+        if(vtkSMArrayListDomain* const domain =
+          vtkSMArrayListDomain::SafeDownCast(
+            array->GetDomain("array_list")))
+          {
+          filter->getProxy()->UpdateVTKObjects();
+          
+          if(domain->GetNumberOfStrings())
+            {
+            array->SetElement(0, domain->GetString(0));
+            array->UpdateDependentDomains();
+            }
+          }
+        }
+      
+      if(vtkSMDoubleVectorProperty* const contours =
+        vtkSMDoubleVectorProperty::SafeDownCast(
+          filter->getProxy()->GetProperty("ContourValues")))
+        {
+        if(vtkSMDoubleRangeDomain* const domain =
+          vtkSMDoubleRangeDomain::SafeDownCast(
+            contours->GetDomain("scalar_range")))
+          {
+          int min_exists = 0;
+          min_value = domain->GetMinimum(0, min_exists);
+          
+          int max_exists = 0;
+          max_value = domain->GetMaximum(0, max_exists);
+          }
+
+
+        contours->SetNumberOfElements(1);
+        contours->SetElement(0, (min_value + max_value) * 0.5);
+        }
       }
 
     // As a special-case, set a default implicit function for new Cut filters

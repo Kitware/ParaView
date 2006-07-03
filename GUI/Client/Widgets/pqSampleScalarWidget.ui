@@ -23,6 +23,13 @@
     <number>6</number>
    </property>
    <item>
+    <widget class="QLabel" name="ScalarRange" >
+     <property name="text" >
+      <string>Scalar Range: 0.0 - 1.0</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" >
      <property name="margin" >
       <number>0</number>

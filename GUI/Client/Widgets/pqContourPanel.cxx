@@ -147,7 +147,8 @@ void pqContourPanel::setProxyInternal(pqSMProxy p)
   // Setup the sample scalar widget ...
   this->Implementation->SampleScalarWidget.setDataSources(
     this->Proxy,
-    this->Proxy ? vtkSMDoubleVectorProperty::SafeDownCast(this->Proxy->GetProperty("ContourValues")) : 0);
+    this->Proxy ? vtkSMDoubleVectorProperty::SafeDownCast(this->Proxy->GetProperty("ContourValues")) : 0,
+    this->Proxy ? this->Proxy->GetProperty("SelectInputScalars") : 0);
 }
 
 void pqContourPanel::select()

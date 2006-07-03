@@ -64,7 +64,8 @@ public:
   /// Sets the server manager objects that will be controlled by the widget
   void setDataSources(
     pqSMProxy controlled_proxy,
-    vtkSMDoubleVectorProperty* sample_property);
+    vtkSMDoubleVectorProperty* sample_property,
+    vtkSMProperty* range_property = 0);
 
   /// Accept pending changes
   void accept();
@@ -86,6 +87,7 @@ private slots:
   void onScientificNotation(bool);
   
   void onControlledPropertyChanged();
+  void onControlledPropertyDomainChanged();
   
 private:
   pqSampleScalarWidget(const pqSampleScalarWidget&);

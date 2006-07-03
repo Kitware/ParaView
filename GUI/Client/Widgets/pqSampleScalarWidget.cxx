@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_pqSampleScalarWidget.h"
 
 #include <vtkMemberFunctionCommand.h>
+#include <vtkSMDoubleRangeDomain.h>
 #include <vtkSMDoubleVectorProperty.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -71,6 +72,7 @@ class pqSampleScalarWidget::pqImplementation
 public:
   pqImplementation() :
     SampleProperty(0),
+    RangeProperty(0),
     UI(new Ui::pqSampleScalarWidget()),
     IgnorePropertyChange(false)
   {
@@ -83,8 +85,10 @@ public:
   
   /// Callback object used to connect property events to member methods
   vtkSmartPointer<vtkCommand> PropertyObserver;
+  vtkSmartPointer<vtkCommand> DomainObserver;
   pqSMProxy ControlledProxy;
   vtkSMDoubleVectorProperty* SampleProperty;
+  vtkSMProperty* RangeProperty;
   Ui::pqSampleScalarWidget* const UI;
   pqScalarSetModel Model;
   bool IgnorePropertyChange;
@@ -96,6 +100,9 @@ pqSampleScalarWidget::pqSampleScalarWidget(QWidget* Parent) :
 {
   this->Implementation->PropertyObserver.TakeReference(
     vtkMakeMemberFunctionCommand(*this, &pqSampleScalarWidget::onControlledPropertyChanged));
+
+  this->Implementation->DomainObserver.TakeReference(
+    vtkMakeMemberFunctionCommand(*this, &pqSampleScalarWidget::onControlledPropertyDomainChanged));
 
   this->Implementation->UI->setupUi(this);
 
@@ -168,22 +175,36 @@ pqSampleScalarWidget::~pqSampleScalarWidget()
 
 void pqSampleScalarWidget::setDataSources(
   pqSMProxy controlled_proxy,
-  vtkSMDoubleVectorProperty* sample_property)
+  vtkSMDoubleVectorProperty* sample_property,
+  vtkSMProperty* range_property)
 {
   if(this->Implementation->SampleProperty)
     {
     this->Implementation->SampleProperty->RemoveObserver(
       this->Implementation->PropertyObserver);
     }
+  if(this->Implementation->RangeProperty)
+    {
+    this->Implementation->RangeProperty->RemoveObserver(
+      this->Implementation->DomainObserver);
+    }
     
   this->Implementation->ControlledProxy = controlled_proxy;
   this->Implementation->SampleProperty = sample_property;
+  this->Implementation->RangeProperty = range_property;
 
   if(this->Implementation->SampleProperty)
     {
     this->Implementation->SampleProperty->AddObserver(
       vtkCommand::ModifiedEvent,
       this->Implementation->PropertyObserver);
+    }
+  
+  if(this->Implementation->RangeProperty)
+    {
+    this->Implementation->RangeProperty->AddObserver(
+      vtkCommand::ModifiedEvent,
+      this->Implementation->DomainObserver);
     }
     
   this->reset();
@@ -214,6 +235,33 @@ void pqSampleScalarWidget::accept()
 
 void pqSampleScalarWidget::reset()
 {
+  // Display the range of values in the input (if any)
+  if(this->Implementation->SampleProperty)
+    {
+    if(vtkSMDoubleRangeDomain* const domain =
+      vtkSMDoubleRangeDomain::SafeDownCast(
+        this->Implementation->SampleProperty->GetDomain("scalar_range")))
+      {
+      int min_exists = 0;
+      const double min_value = domain->GetMinimum(0, min_exists);
+      
+      int max_exists = 0;
+      const double max_value = domain->GetMaximum(0, max_exists);
+      
+      if(min_exists && max_exists)
+        {
+        this->Implementation->UI->ScalarRange->setText(
+          tr("Scalar Range: [%1, %2]").arg(min_value).arg(max_value));
+        }
+      else
+        {
+        this->Implementation->UI->ScalarRange->setText(
+          tr("Scalar Range: unlimited"));
+        }
+      }
+    }
+
+  // Set the list of values
   QList<double> values;
   double value_min = 0;
   double value_max = 0;
@@ -338,6 +386,11 @@ void pqSampleScalarWidget::onControlledPropertyChanged()
     return;
     }
     
-  // Synchronize Qt widgets with the controlled properties
   this->reset();
 }
+
+void pqSampleScalarWidget::onControlledPropertyDomainChanged()
+{
+  this->reset();
+}
+
