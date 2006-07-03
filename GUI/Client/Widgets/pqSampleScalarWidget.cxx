@@ -124,11 +124,35 @@ pqSampleScalarWidget::pqSampleScalarWidget(QWidget* Parent) :
     this,
     SLOT(onSelectionChanged(const QItemSelection&, const QItemSelection&)));
 
-  connect(this->Implementation->UI->Delete, SIGNAL(clicked()), this, SLOT(onDelete()));
-  connect(this->Implementation->UI->NewValue, SIGNAL(clicked()), this, SLOT(onNewValue()));
-  connect(this->Implementation->UI->NewRange, SIGNAL(clicked()), this, SLOT(onNewRange()));
-  connect(this->Implementation->UI->SelectAll, SIGNAL(clicked()), this, SLOT(onSelectAll()));
-  connect(this->Implementation->UI->ScientificNotation, SIGNAL(toggled(bool)), this, SLOT(onScientificNotation(bool)));
+  connect(
+    this->Implementation->UI->Delete,
+    SIGNAL(clicked()),
+    this,
+    SLOT(onDelete()));
+    
+  connect(
+    this->Implementation->UI->NewValue,
+    SIGNAL(clicked()),
+    this,
+    SLOT(onNewValue()));
+    
+  connect(
+    this->Implementation->UI->NewRange,
+    SIGNAL(clicked()),
+    this,
+    SLOT(onNewRange()));
+    
+  connect(
+    this->Implementation->UI->SelectAll,
+    SIGNAL(clicked()),
+    this,
+    SLOT(onSelectAll()));
+    
+  connect(
+    this->Implementation->UI->ScientificNotation,
+    SIGNAL(toggled(bool)),
+    this,
+    SLOT(onScientificNotation(bool)));
 }
 
 pqSampleScalarWidget::~pqSampleScalarWidget()
