@@ -941,12 +941,12 @@ bool pqMainWindow::eventFilter(QObject* watched, QEvent* e)
         }
       else
         {
-        QAction*  select = 
+        QAction*  selectAction = 
           this->Implementation->SelectionToolBar->findChild<QAction*>(
             "SelectButton");
         if (this->Implementation->SelectionToolBar->isEnabled())
           {
-          select->trigger();
+          selectAction->trigger();
           }
         }
       return true;

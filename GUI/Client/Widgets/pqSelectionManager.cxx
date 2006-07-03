@@ -676,16 +676,16 @@ void pqSelectionManager::updateSelection(int* eventpos, pqRenderModule* rm)
   int numRenModules = model->getNumberOfRenderModules();
   for (int i=0; i<numRenModules; i++)
     {
-    pqRenderModule* rm = model->getRenderModule(i);
-    vtkSMRenderModuleProxy* rmp = rm->getRenderModuleProxy();
-    if (rmp->GetConnectionID() == selectionProxy->GetConnectionID())
+    pqRenderModule* renModule = model->getRenderModule(i);
+    vtkSMRenderModuleProxy* renModuleProxy = renModule->getRenderModuleProxy();
+    if (renModuleProxy->GetConnectionID() == selectionProxy->GetConnectionID())
       {
-      rm->render();
+      renModule->render();
       }
     }
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionManager::sourceRemoved(pqPipelineSource* source)
+void pqSelectionManager::sourceRemoved(pqPipelineSource* vtkNotUsed(source))
 {
 }
