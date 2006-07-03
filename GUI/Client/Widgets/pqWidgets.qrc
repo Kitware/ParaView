@@ -75,8 +75,8 @@
         <file alias="pqMousePick15.png">Resources/pqMousePick15.png</file>
         <file alias="pqMouseSelect15.png">Resources/pqMouseSelect15.png</file>
         <file alias="pqWindowh16.png">Resources/pqWindowh16.png</file>
-        <file alias="ExodusPanel.ui">pqExodusPanel.ui</file>
         <file alias="ThresholdPanel.ui">pqThresholdPanel.ui</file>
+        <file alias="ExodusPanel.ui">pqExodusPanel.ui</file>
         <file alias="pqSampleScalarWidget.ui">pqSampleScalarWidget.ui</file>
         <file alias="pqNavigateForward16.png">Resources/pqNavigateForward16.png</file>
     </qresource>
