@@ -60,8 +60,14 @@ public:
   /// Returns the sorted collection of numbers stored in the model
   const QList<double> values();
 
-  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+  /** Controls formatting of displayed data, supports the
+  'e', 'E', 'f', 'F', 'g', and 'G' formats provided by printf() */
+  void setFormat(char f, int precision = 3);
+
   virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+  virtual Qt::ItemFlags flags(const QModelIndex& index ) const;
+  virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+  virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
     
 private:
   class pqImplementation;

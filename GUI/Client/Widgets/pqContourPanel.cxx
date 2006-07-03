@@ -85,6 +85,7 @@ pqContourPanel::pqContourPanel(QWidget* p) :
   panel_layout->addWidget(&this->Implementation->ControlsContainer);
   panel_layout->addWidget(separator);
   panel_layout->addWidget(&this->Implementation->SampleScalarWidget);
+  panel_layout->addStretch();
 
   this->setLayout(panel_layout);
 

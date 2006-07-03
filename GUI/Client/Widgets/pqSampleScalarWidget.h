@@ -79,16 +79,19 @@ private slots:
   void onSamplesChanged();
   void onSelectionChanged(const QItemSelection&, const QItemSelection&);
   
-  void onAddRange();
-  void onAddValue();
-  void onDeleteAll();
-  void onDeleteSelected();
+  void onDelete();
+  void onNewValue();
+  void onNewRange();
+  void onSelectAll();
+  void onScientificNotation(bool);
   
   void onControlledPropertyChanged();
   
 private:
   pqSampleScalarWidget(const pqSampleScalarWidget&);
   pqSampleScalarWidget& operator=(const pqSampleScalarWidget&);
+  
+  class pqAddRangeDialog;
   
   class pqImplementation;
   pqImplementation* const Implementation;

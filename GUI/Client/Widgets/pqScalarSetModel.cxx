@@ -40,7 +40,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqScalarSetModel::pqImplementation
 {
 public:
+  pqImplementation() :
+    Format('g'),
+    Precision(3)
+  {
+  }
+  
   vtkstd::set<double> Values;
+  char Format;
+  int Precision;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -97,9 +105,11 @@ const QList<double> pqScalarSetModel::values()
   return results;
 }
 
-int pqScalarSetModel::rowCount(const QModelIndex& /*parent*/) const
+void pqScalarSetModel::setFormat(char f, int precision)
 {
-  return Implementation->Values.size();
+  this->Implementation->Format = f;
+  this->Implementation->Precision = precision;
+  emit dataChanged(this->index(0), this->index(this->Implementation->Values.size() - 1));
 }
 
 QVariant pqScalarSetModel::data(const QModelIndex& i, int role) const
@@ -114,11 +124,46 @@ QVariant pqScalarSetModel::data(const QModelIndex& i, int role) const
     {
     case Qt::DisplayRole:
       {
-      vtkstd::set<double>::iterator value = this->Implementation->Values.begin();
-      vtkstd::advance(value, i.row());
-      return QString::number(*value);
+      vtkstd::set<double>::iterator iterator = this->Implementation->Values.begin();
+      vtkstd::advance(iterator, i.row());
+      return QString::number(
+        *iterator, this->Implementation->Format, this->Implementation->Precision);
       }
     }
     
   return QVariant();
+}
+
+Qt::ItemFlags pqScalarSetModel::flags(const QModelIndex& /*i*/) const
+{
+  return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+}
+
+int pqScalarSetModel::rowCount(const QModelIndex& /*parent*/) const
+{
+  return Implementation->Values.size();
+}
+
+bool pqScalarSetModel::setData(const QModelIndex& i, const QVariant& value, int role)
+{
+  if(!i.isValid())
+    return false;
+    
+  if(i.row() < 0 || i.row() >= static_cast<int>(this->Implementation->Values.size()))
+    return false;
+  
+  switch(role)
+    {
+    case Qt::EditRole:
+      {
+      vtkstd::set<double>::iterator iterator = this->Implementation->Values.begin();
+      vtkstd::advance(iterator, i.row());
+      this->Implementation->Values.erase(iterator);
+      this->Implementation->Values.insert(value.toDouble());
+      emit dataChanged(this->index(0), this->index(this->Implementation->Values.size() - 1));
+      emit layoutChanged();
+      }
+    }
+    
+  return true;
 }

@@ -58,6 +58,9 @@
  <pixmapfunction></pixmapfunction>
  <tabstops>
   <tabstop>SelectInputScalars</tabstop>
+  <tabstop>ComputeNormals</tabstop>
+  <tabstop>ComputeGradients</tabstop>
+  <tabstop>ComputeScalars</tabstop>
  </tabstops>
  <resources/>
  <connections/>
