@@ -45,8 +45,8 @@ class pqSampleScalarWidget::pqImplementation
 {
 public:
   pqImplementation() :
-    UI(new Ui::pqSampleScalarWidget()),
     SampleProperty(0),
+    UI(new Ui::pqSampleScalarWidget()),
     IgnorePropertyChange(false)
   {
   }
