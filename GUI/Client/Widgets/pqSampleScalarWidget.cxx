@@ -263,8 +263,6 @@ void pqSampleScalarWidget::reset()
 
   // Set the list of values
   QList<double> values;
-  double value_min = 0;
-  double value_max = 0;
   
   if(this->Implementation->SampleProperty)
     {
