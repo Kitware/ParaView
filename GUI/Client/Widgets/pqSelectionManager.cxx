@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqRenderModule.h"
 #include "pqServerManagerModel.h"
+#include "pqServerManagerObserver.h"
 #include "pqServerManagerSelectionModel.h"
 
 #include "qdebug.h"
@@ -171,18 +172,43 @@ pqSelectionManager::pqSelectionManager(QObject* _parent/*=null*/) :
                    SIGNAL(sourceRemoved(pqPipelineSource*)),
                    this, 
                    SLOT(sourceRemoved(pqPipelineSource*)));
+
+  pqServerManagerObserver* observer = core->getPipelineData();
+  QObject::connect(observer,
+                   SIGNAL(proxyUnRegistered(QString, QString, vtkSMProxy*)),
+                   this,
+                   SLOT(proxyUnRegistered(QString, QString, vtkSMProxy*)));
 }
 
 //-----------------------------------------------------------------------------
 pqSelectionManager::~pqSelectionManager()
 {
-  delete this->Implementation;
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  if (pxm)
+    {
+    pqApplicationCore* core = pqApplicationCore::instance();
+    pqServerManagerObserver* observer = core->getPipelineData();
+    if (observer)
+      {
+      QObject::disconnect(observer, 0, this,0);
+      }
+    pqSelectionManagerImplementation::ServerSelectionsType::iterator iter =
+      this->Implementation->ServerSelections.begin();
+    for(; iter != this->Implementation->ServerSelections.end(); iter++)
+      {      
+      pxm->UnRegisterProxy(
+        "selection_objects", iter->second.SourceProxy->GetSelfIDAsString());
+      }
 
-//   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-//   if (pxm)
-//     {
-//     pxm->UnRegisterProxy("sources", "Selection");
-//     }
+    pqSelectionManagerImplementation::DisplaysType::iterator iter2 =
+      this->Implementation->Displays.begin();
+    for(; iter2 != this->Implementation->Displays.end(); iter2++)
+      {      
+      pxm->UnRegisterProxy(
+        "selection_objects", iter2->second.DisplayProxy->GetSelfIDAsString());
+      }
+    }
+  delete this->Implementation;
 }
 
 //-----------------------------------------------------------------------------
@@ -325,8 +351,9 @@ vtkSMDisplayProxy* pqSelectionManager::getDisplayProxy(pqRenderModule* rm,
     this->Implementation->Displays[id].DisplayProxy =
       displayProxy;
 
-    //vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
-    //pm->RegisterProxy("displays", "selectionProxy", displayProxy);
+    vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+    pm->RegisterProxy(
+      "selection_objects", displayProxy->GetSelfIDAsString(), displayProxy);
 
     vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
       displayProxy->GetProperty("Input"));
@@ -413,7 +440,8 @@ void pqSelectionManager::activeRenderModuleChanged(pqRenderModule* rm)
       }
     selectionProxy->SetConnectionID(connId);
     selectionProxy->SetServers(vtkProcessModule::DATA_SERVER);
-    //pxm->RegisterProxy("sources", "Selection", selectionProxy);
+    pxm->RegisterProxy(
+      "selection_objects", selectionProxy->GetSelfIDAsString(), selectionProxy);
     this->Implementation->ServerSelections[connId].SourceProxy = 
       selectionProxy;
     selectionProxy->Delete();
@@ -681,6 +709,38 @@ void pqSelectionManager::updateSelection(int* eventpos, pqRenderModule* rm)
     if (renModuleProxy->GetConnectionID() == selectionProxy->GetConnectionID())
       {
       renModule->render();
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqSelectionManager::proxyUnRegistered(
+  QString group, QString name, vtkSMProxy*)
+{
+  if (group == "selection_objects")
+    {
+    pqSelectionManagerImplementation::ServerSelectionsType::iterator iter =
+      this->Implementation->ServerSelections.begin();
+    for(; iter != this->Implementation->ServerSelections.end(); iter++)
+      {
+      vtkSMProxy* proxy = iter->second.SourceProxy;
+      if (name == proxy->GetSelfIDAsString())
+        {
+        this->Implementation->ServerSelections.erase(iter);
+        return;
+        }
+      }
+
+    pqSelectionManagerImplementation::DisplaysType::iterator iter2 =
+      this->Implementation->Displays.begin();
+    for(; iter2 != this->Implementation->Displays.end(); iter2++)
+      {      
+      vtkSMProxy* proxy = iter2->second.DisplayProxy;
+      if (name == proxy->GetSelfIDAsString())
+        {
+        this->Implementation->Displays.erase(iter2);
+        return;
+        }
       }
     }
 }

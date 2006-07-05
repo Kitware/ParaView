@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 class vtkSMDisplayProxy;
+class vtkSMProxy;
 class vtkSMSourceProxy;
 class pqPipelineSource;
 class pqRenderModule;
@@ -68,9 +69,12 @@ public:
 public slots:
   void switchToSelection();
   void switchToInteraction();
-  void activeRenderModuleChanged(pqRenderModule*);
   void clearSelection();
+
+private slots:
+  void activeRenderModuleChanged(pqRenderModule*);
   void sourceRemoved(pqPipelineSource*);
+  void proxyUnRegistered(QString, QString, vtkSMProxy*);
 
 private:
   pqSelectionManagerImplementation* Implementation;
