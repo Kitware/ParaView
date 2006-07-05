@@ -63,6 +63,12 @@ ENDIF(WIN32)
 
 # Add main server executables.
 SET(PV_EXE_LIST paraview_alpha)
+# Add Qt assistant to the list of shared lib. forwarded executables.
+# If this is enabled, the build system will create an executable
+# call assistant. This executable will set the appropriate ld library
+# path and execute assistant-real. It is the installation's requirement
+# to install assistant-real
+#SET(PV_EXE_LIST ${PV_EXE_LIST} assistant)
 
 ADD_EXECUTABLE(paraview_alpha${PV_EXE_SUFFIX} WIN32 MACOSX_BUNDLE
   AboutDialog.cxx
@@ -196,7 +202,9 @@ EXECUTE_PROCESS (WORKING_DIRECTORY ${QT_LIB_DIR_tmp}
   
 ENDFOREACH(qtlib)
 
-# Never do this at home --- HACK ---
+# Hard-coded install rules for anything left to install. These should
+# probably go to a local cmake file. Change to match the build system's
+# libraries
 #  INSTALL(FILES /usr/lib/libstdc++.so.5 /lib/libgcc_s.so.1 /usr/lib/libpng.so.3 /usr/lib/libexpat.so.0 /usr/lib/libfontconfig.so.1 /usr/lib/libfreetype.so.6 /lib/libz.so.1 DESTINATION ${PV_INSTALL_LIB_DIR_CM24})
 
 SET(dir "${ParaView_SOURCE_DIR}/Applications/Client/doc/")
@@ -212,3 +220,19 @@ ENDFOREACH(file)
 INSTALL(FILES ${ParaView_SOURCE_DIR}/Applications/Client/pqClient.adp 
   DESTINATION ${PV_EXE_INSTALL_CM24} COMPONENT Runtime )
 
+# Hard-coded install rules for anything left to install. These should
+# probably go to a local cmake file. Change to match the build system's
+# assistant. Make sure share forwarding for assistant (see up above) is
+# enabled if necessary
+# IF(PV_NEED_SHARED_FORWARD)
+#   INSTALL(FILES /opt/qt-4.1.3/bin/assistant 
+#     DESTINATION ${PV_EXE_INSTALL_CM24} 
+#     PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ 
+#     COMPONENT Runtime
+#     RENAME assistant-real)
+# ELSE(PV_NEED_SHARED_FORWARD)
+#   INSTALL(FILES /opt/qt-4.1.3/bin/assistant 
+#     DESTINATION ${PV_EXE_INSTALL_CM24} 
+#     PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ 
+#     COMPONENT Runtime)
+# ENDIF(PV_NEED_SHARED_FORWARD)
