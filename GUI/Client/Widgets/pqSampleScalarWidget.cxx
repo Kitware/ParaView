@@ -368,6 +368,8 @@ void pqSampleScalarWidget::onControlledPropertyDomainChanged()
   // Display the range of values in the input (if any)
   if(this->Implementation->SampleProperty)
     {
+    this->Implementation->SampleProperty->UpdateDependentDomains();
+    
     if(vtkSMDoubleRangeDomain* const domain =
       vtkSMDoubleRangeDomain::SafeDownCast(
         this->Implementation->SampleProperty->GetDomain("scalar_range")))
