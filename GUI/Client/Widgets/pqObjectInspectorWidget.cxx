@@ -278,6 +278,8 @@ void pqObjectInspectorWidget::accept()
     }
     */
   
+  emit this->accepted();
+  
   foreach(pqObjectPanel* p, this->QueuedPanels)
     {
     p->postAccept();
@@ -290,7 +292,6 @@ void pqObjectInspectorWidget::accept()
     }
   
   this->ForceModified = false;
-  emit this->accepted();
   emit this->postaccept();
 }
 
