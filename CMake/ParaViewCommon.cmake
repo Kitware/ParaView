@@ -91,16 +91,6 @@ ENDIF(NOT PV_INSTALL_LIB_DIR)
 IF(NOT PV_INSTALL_DATA_DIR)
   SET(PV_INSTALL_DATA_DIR ${PV_INSTALL_ROOT}/share/paraview-${PARAVIEW_VERSION})
 ENDIF(NOT PV_INSTALL_DATA_DIR)
-# Because INSTALL_* commands require a leading / and because INSTALL (cmake 2.4
-# and newer) requires no leading / to install under INSTALL_PREFIX, we
-# are stripping the leading /. In the future, there should be no leading
-# / in any install directory variables
-IF(PV_INSTALL_HAS_CMAKE_24)
-  STRING(REGEX REPLACE "^/" "" PV_INSTALL_LIB_DIR_CM24 "${PV_INSTALL_LIB_DIR}")
-  STRING(REGEX REPLACE "^/" "" PV_INSTALL_BIN_DIR_CM24 "${PV_INSTALL_BIN_DIR}")
-  STRING(REGEX REPLACE "^/" "" PV_INSTALL_INCLUDE_DIR_CM24 "${PV_INSTALL_INCLUDE_DIR}")
-  STRING(REGEX REPLACE "^/" "" PV_INSTALL_DATA_DIR_CM24 "${PV_INSTALL_DATA_DIR}")
-ENDIF(PV_INSTALL_HAS_CMAKE_24)
 
 # Install no development files by default, but allow the user to get
 # them installed by setting PV_INSTALL_DEVELOPMENT to true.  Disable
@@ -132,7 +122,7 @@ ENDIF(BUILD_SHARED_LIBS)
 # Send VTK include files to the ParaView include directory
 # Send VTK libraries to the ParaView library directory.
 
-SET(VTK_INSTALL_BIN_DIR ${PV_INSTALL_LIB_DIR})
+SET(VTK_INSTALL_BIN_DIR ${PV_INSTALL_BIN_DIR})
 SET(VTK_INSTALL_INCLUDE_DIR ${PV_INSTALL_INCLUDE_DIR})
 SET(VTK_INSTALL_LIB_DIR ${PV_INSTALL_LIB_DIR})
 SET(VTK_INSTALL_PACKAGE_DIR ${PV_INSTALL_LIB_DIR})
@@ -577,6 +567,23 @@ IF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
     ENDFOREACH(ldir)
   ENDIF(NOT WIN32)
 ENDIF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
+
+#########################################################################
+# Because INSTALL_* commands require a leading / and because INSTALL (cmake 2.4
+# and newer) requires no leading / to install under INSTALL_PREFIX, we
+# are stripping the leading /. In the future, there should be no leading
+# / in any install directory variables
+IF(PV_INSTALL_HAS_CMAKE_24)
+  STRING(REGEX REPLACE "^/" "" PV_INSTALL_LIB_DIR_CM24 "${PV_INSTALL_LIB_DIR}")
+  STRING(REGEX REPLACE "^/" "" PV_INSTALL_BIN_DIR_CM24 "${PV_INSTALL_BIN_DIR}")
+  STRING(REGEX REPLACE "^/" "" PV_INSTALL_INCLUDE_DIR_CM24 "${PV_INSTALL_INCLUDE_DIR}")
+  STRING(REGEX REPLACE "^/" "" PV_INSTALL_DATA_DIR_CM24 "${PV_INSTALL_DATA_DIR}")
+  STRING(REGEX REPLACE "^/" "" PV_EXE_INSTALL_CM24 "${PV_EXE_INSTALL}")
+
+  STRING(REGEX REPLACE "^/" "" KWCommon_INSTALL_LIB_DIR_CM24 "${KWCommon_INSTALL_LIB_DIR}")
+  STRING(REGEX REPLACE "^/" "" KWCommon_INSTALL_BIN_DIR_CM24 "${KWCommon_INSTALL_BIN_DIR}")
+  STRING(REGEX REPLACE "^/" "" KWCommon_INSTALL_INCLUDE_DIR_CM24 "${KWCommon_INSTALL_INCLUDE_DIR}")
+ENDIF(PV_INSTALL_HAS_CMAKE_24)
 
 #########################################################################
 SET(PARAVIEW_INCLUDE_DIRS
