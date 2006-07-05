@@ -199,4 +199,16 @@ ENDFOREACH(qtlib)
 # Never do this at home --- HACK ---
 #  INSTALL(FILES /usr/lib/libstdc++.so.5 /lib/libgcc_s.so.1 /usr/lib/libpng.so.3 /usr/lib/libexpat.so.0 /usr/lib/libfontconfig.so.1 /usr/lib/libfreetype.so.6 /lib/libz.so.1 DESTINATION ${PV_INSTALL_LIB_DIR_CM24})
 
+SET(dir "${ParaView_SOURCE_DIR}/Applications/Client/doc/")
+FILE(GLOB list_of_files "${dir}/*")
+FOREACH(file ${list_of_files})
+  IF (${file} MATCHES CVS)
+  ELSE (${file} MATCHES CVS)
+    INSTALL(FILES ${file}
+      DESTINATION ${PV_EXE_INSTALL_CM24}/doc COMPONENT Runtime )
+  ENDIF (${file} MATCHES CVS)
+ENDFOREACH(file)
+
+INSTALL(FILES ${ParaView_SOURCE_DIR}/Applications/Client/pqClient.adp 
+  DESTINATION ${PV_EXE_INSTALL_CM24} COMPONENT Runtime )
 
