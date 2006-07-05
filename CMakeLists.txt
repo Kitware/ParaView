@@ -1,5 +1,5 @@
 PROJECT(ParaView)
-CMAKE_MINIMUM_REQUIRED(VERSION 2.2)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 
 #########################################################################
 # Disallow in-source build
