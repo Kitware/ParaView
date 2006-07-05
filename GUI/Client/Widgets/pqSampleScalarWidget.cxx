@@ -235,31 +235,7 @@ void pqSampleScalarWidget::accept()
 
 void pqSampleScalarWidget::reset()
 {
-  // Display the range of values in the input (if any)
-  if(this->Implementation->SampleProperty)
-    {
-    if(vtkSMDoubleRangeDomain* const domain =
-      vtkSMDoubleRangeDomain::SafeDownCast(
-        this->Implementation->SampleProperty->GetDomain("scalar_range")))
-      {
-      int min_exists = 0;
-      const double min_value = domain->GetMinimum(0, min_exists);
-      
-      int max_exists = 0;
-      const double max_value = domain->GetMaximum(0, max_exists);
-      
-      if(min_exists && max_exists)
-        {
-        this->Implementation->UI->ScalarRange->setText(
-          tr("Scalar Range: [%1, %2]").arg(min_value).arg(max_value));
-        }
-      else
-        {
-        this->Implementation->UI->ScalarRange->setText(
-          tr("Scalar Range: unlimited"));
-        }
-      }
-    }
+  this->onControlledPropertyDomainChanged();
 
   // Set the list of values
   QList<double> values;
@@ -389,6 +365,30 @@ void pqSampleScalarWidget::onControlledPropertyChanged()
 
 void pqSampleScalarWidget::onControlledPropertyDomainChanged()
 {
-  this->reset();
+  // Display the range of values in the input (if any)
+  if(this->Implementation->SampleProperty)
+    {
+    if(vtkSMDoubleRangeDomain* const domain =
+      vtkSMDoubleRangeDomain::SafeDownCast(
+        this->Implementation->SampleProperty->GetDomain("scalar_range")))
+      {
+      int min_exists = 0;
+      const double min_value = domain->GetMinimum(0, min_exists);
+      
+      int max_exists = 0;
+      const double max_value = domain->GetMaximum(0, max_exists);
+      
+      if(min_exists && max_exists)
+        {
+        this->Implementation->UI->ScalarRange->setText(
+          tr("Scalar Range: [%1, %2]").arg(min_value).arg(max_value));
+        }
+      else
+        {
+        this->Implementation->UI->ScalarRange->setText(
+          tr("Scalar Range: unlimited"));
+        }
+      }
+    }
 }
 
