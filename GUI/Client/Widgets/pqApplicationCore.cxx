@@ -32,6 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 
 // ParaView Server Manager includes.
+#include "vtkPVArrayInformation.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMDataObjectDisplayProxy.h"
@@ -42,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxyProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMPQStateLoader.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "QVTKWidget.h"
 
@@ -362,6 +366,111 @@ pqPipelineSource* pqApplicationCore::createSourceOnActiveServer(
   return source;
 }
 
+static void SetDefaultInputArray(vtkSMProxy* Proxy, const char* PropertyName)
+{
+  if(vtkSMStringVectorProperty* const array =
+    vtkSMStringVectorProperty::SafeDownCast(
+      Proxy->GetProperty(PropertyName)))
+    {
+    Proxy->UpdateVTKObjects();
+  
+    QList<QVariant> domain = 
+      pqSMAdaptor::getEnumerationPropertyDomain(array);
+
+    for(int i = 0; i != domain.size(); ++i)
+      {
+      const QString name = domain[i].toString();
+      array->SetElement(4, name.toAscii().data());
+      array->UpdateDependentDomains();
+      break;
+      }
+    }
+}
+
+/*
+static void SetDefaultInputArray2(vtkSMProxy* Proxy, const char* PropertyName)
+{
+  if(vtkSMStringVectorProperty* const array =
+    vtkSMStringVectorProperty::SafeDownCast(
+      Proxy->GetProperty(PropertyName)))
+    {
+    if(vtkSMArrayListDomain* const domain =
+      vtkSMArrayListDomain::SafeDownCast(
+        Proxy->GetProperty("Input")->GetDomain("input_array")))
+      {
+      Proxy->UpdateVTKObjects();
+      
+      if(domain->GetNumberOfStrings())
+        {
+        array->SetElement(4, domain->GetString(0));
+        array->UpdateDependentDomains();
+        }
+      }
+    }
+}
+
+static void SetDefaultInputArray3(vtkSMProxy* Proxy, const char* PropertyName)
+{
+  if(vtkSMStringVectorProperty* const scalar_array =
+    vtkSMStringVectorProperty::SafeDownCast(
+      Proxy->GetProperty(PropertyName)))
+    {
+    char* default_array = 0;
+    
+    if(vtkSMSourceProxy* const source_proxy = vtkSMSourceProxy::SafeDownCast(
+      Proxy))
+      {
+      source_proxy->UpdateVTKObjects();
+      source_proxy->UpdateDataInformation();
+      
+      if(vtkPVDataInformation* const information =
+        source_proxy->GetDataInformation())
+        {
+        if(vtkPVDataSetAttributesInformation* const arrays =
+          information->GetPointDataInformation())
+          {
+          for(int i = 0; i != arrays->GetNumberOfArrays(); ++i)
+            {
+            vtkPVArrayInformation* const array =
+              arrays->GetArrayInformation(i);
+              
+            if(1 == array->GetNumberOfComponents())
+              {
+              default_array = array->GetName();
+              break;
+              }
+            }
+          }
+        
+        if(!default_array)
+          {
+          if(vtkPVDataSetAttributesInformation* const arrays =
+            information->GetCellDataInformation())
+            {
+            for(int i = 0; i != arrays->GetNumberOfArrays(); ++i)
+              {
+              vtkPVArrayInformation* const array =
+                arrays->GetArrayInformation(i);
+                
+              if(1 == array->GetNumberOfComponents())
+                {
+                default_array = array->GetName();
+                break;
+                }
+              }
+            }
+          }
+        }
+      }
+      
+    if(default_array)
+      {
+      scalar_array->SetElement(4, default_array);
+      }
+    }
+}
+*/
+
 //-----------------------------------------------------------------------------
 pqPipelineSource* pqApplicationCore::createFilterForActiveSource(
   const QString& xmlname)
@@ -376,7 +485,7 @@ pqPipelineSource* pqApplicationCore::createFilterForActiveSource(
     "filters", xmlname.toStdString().c_str(), 
     this->Internal->ActiveSource->getServer(), NULL);
 
-  if (filter)
+  if(filter)
     {
     this->Internal->PipelineBuilder->addConnection(
       this->Internal->ActiveSource, filter);
@@ -396,51 +505,6 @@ pqPipelineSource* pqApplicationCore::createFilterForActiveSource(
         clip_function->AddProxy(plane);
         }
       this->Internal->UndoStack->PauseUndoSet();
-      }
-
-    // As a special-case, set the default contour for new Contour filters
-    if(xmlname == "Contour")
-      {
-      double min_value = 0.0;
-      double max_value = 0.0;
-      
-      if(vtkSMStringVectorProperty* const array =
-        vtkSMStringVectorProperty::SafeDownCast(
-          filter->getProxy()->GetProperty("SelectInputScalars")))
-        {
-        if(vtkSMArrayListDomain* const domain =
-          vtkSMArrayListDomain::SafeDownCast(
-            array->GetDomain("array_list")))
-          {
-          filter->getProxy()->UpdateVTKObjects();
-          
-          if(domain->GetNumberOfStrings())
-            {
-            array->SetElement(0, domain->GetString(0));
-            array->UpdateDependentDomains();
-            }
-          }
-        }
-      
-      if(vtkSMDoubleVectorProperty* const contours =
-        vtkSMDoubleVectorProperty::SafeDownCast(
-          filter->getProxy()->GetProperty("ContourValues")))
-        {
-        if(vtkSMDoubleRangeDomain* const domain =
-          vtkSMDoubleRangeDomain::SafeDownCast(
-            contours->GetDomain("scalar_range")))
-          {
-          int min_exists = 0;
-          min_value = domain->GetMinimum(0, min_exists);
-          
-          int max_exists = 0;
-          max_value = domain->GetMaximum(0, max_exists);
-          }
-
-
-        contours->SetNumberOfElements(1);
-        contours->SetElement(0, (min_value + max_value) * 0.5);
-        }
       }
 
     // As a special-case, set a default implicit function for new Cut filters
@@ -469,7 +533,7 @@ pqPipelineSource* pqApplicationCore::createFilterForActiveSource(
         
       this->Internal->UndoStack->PauseUndoSet();
       }
-      
+
     // As a special-case, set a default point source for new StreamTracer filters
     if(xmlname == "StreamTracer")
       {
@@ -496,10 +560,45 @@ pqPipelineSource* pqApplicationCore::createFilterForActiveSource(
         
       this->Internal->UndoStack->PauseUndoSet();
       }
-    }
+      
+    this->onSourceCreated(filter);
+    this->Internal->UndoStack->EndUndoSet();
 
-  this->onSourceCreated(filter);
-  this->Internal->UndoStack->EndUndoSet();
+    // As a special-case, set the default contour for new Contour filters
+    if(xmlname == "Contour")
+      {
+      double min_value = 0.0;
+      double max_value = 0.0;
+
+      SetDefaultInputArray(filter->getProxy(), "SelectInputScalars");
+
+      if(vtkSMDoubleVectorProperty* const contours =
+        vtkSMDoubleVectorProperty::SafeDownCast(
+          filter->getProxy()->GetProperty("ContourValues")))
+        {
+        if(vtkSMDoubleRangeDomain* const domain =
+          vtkSMDoubleRangeDomain::SafeDownCast(
+            contours->GetDomain("scalar_range")))
+          {
+          int min_exists = 0;
+          min_value = domain->GetMinimum(0, min_exists);
+          
+          int max_exists = 0;
+          max_value = domain->GetMaximum(0, max_exists);
+          }
+
+        contours->SetNumberOfElements(1);
+        contours->SetElement(0, (min_value + max_value) * 0.5);
+        }
+      }
+
+    // As a special-case, set a default point source for new StreamTracer filters
+    if(xmlname == "StreamTracer")
+      {
+      SetDefaultInputArray(filter->getProxy(), "SelectInputVectors");
+      }
+    }
+  
   return filter;
 }
 

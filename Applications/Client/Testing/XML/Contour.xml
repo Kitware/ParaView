@@ -6,20 +6,4 @@
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/MenuBar/FiltersMenu/Thermal" command="activate" arguments="Contour" />
   <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqSampleScalarWidget/NewRange" command="activate" arguments="" />
-  <pqevent object="pqSampleScalarAddRangeDialog/From" command="set_string" arguments="0" />
-  <pqevent object="pqSampleScalarAddRangeDialog/From" command="set_string" arguments="0." />
-  <pqevent object="pqSampleScalarAddRangeDialog/From" command="set_string" arguments="0.3" />
-  <pqevent object="pqSampleScalarAddRangeDialog/To" command="set_string" arguments="" />
-  <pqevent object="pqSampleScalarAddRangeDialog/To" command="set_string" arguments="0" />
-  <pqevent object="pqSampleScalarAddRangeDialog/To" command="set_string" arguments="0." />
-  <pqevent object="pqSampleScalarAddRangeDialog/To" command="set_string" arguments="0.5" />
-  <pqevent object="pqSampleScalarAddRangeDialog/Steps" command="set_string" arguments="" />
-  <pqevent object="pqSampleScalarAddRangeDialog/Steps" command="set_string" arguments="3" />
-  <pqevent object="pqSampleScalarAddRangeDialog/okButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/PipelineInspectorDock/PipelineList/PipelineView/qt_scrollarea_viewport" command="contextMenu" arguments="" />
-  <pqevent object="PipelineObjectMenu" command="activate" arguments="Display Settings" />
-  <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/ColorGroup/ColorBy" command="set_string" arguments="Momentum (point)" />
-  <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/DismissButton" command="activate" arguments="" />
 </pqevents>

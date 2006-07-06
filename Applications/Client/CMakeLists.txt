@@ -112,6 +112,7 @@ ENDIF(APPLE)
     ClipHidden
     ClipUndo
     Contour
+    ContourRange
     CreateSource
     CreateSourceWithoutConnect
     CustomFilter
