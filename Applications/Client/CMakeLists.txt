@@ -207,7 +207,7 @@ ENDFOREACH(qtlib)
 # Hard-coded install rules for anything left to install. These should
 # probably go to a local cmake file. Change to match the build system's
 # libraries
-#  INSTALL(FILES /usr/lib/libstdc++.so.5 /lib/libgcc_s.so.1 /usr/lib/libpng.so.3 /usr/lib/libexpat.so.0 /usr/lib/libfontconfig.so.1 /usr/lib/libfreetype.so.6 /lib/libz.so.1 DESTINATION ${PV_INSTALL_LIB_DIR_CM24})
+# INSTALL(FILES /usr/lib/libstdc++.so.5 /lib/libgcc_s.so.1 /usr/lib/libpng.so.3 /usr/lib/libexpat.so.0 /usr/lib/libfontconfig.so.1 /usr/lib/libfreetype.so.6 /lib/libz.so.1 DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Runtime)
 
 SET(dir "${ParaView_SOURCE_DIR}/Applications/Client/doc/")
 FILE(GLOB list_of_files "${dir}/*")
