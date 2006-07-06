@@ -61,6 +61,16 @@ IF(WIN32)
   LINK_DIRECTORIES(${QT_LIBRARY_DIR})
 ENDIF(WIN32)
 
+IF(APPLE)
+  SET(apple_bundle_sources "MacIcon.icns")
+  SET_SOURCE_FILES_PROPERTIES(
+    "MacIcon.icns"
+    PROPERTIES
+    MACOSX_PACKAGE_LOCATION Resources
+    )
+  SET(MACOSX_BUNDLE_ICON_FILE MacIcon.icns)
+ENDIF(APPLE)
+
 # Add main server executables.
 SET(PV_EXE_LIST paraview_alpha)
 # Add Qt assistant to the list of shared lib. forwarded executables.
@@ -82,6 +92,7 @@ ADD_EXECUTABLE(paraview_alpha${PV_EXE_SUFFIX} WIN32 MACOSX_BUNDLE
   ${RCS_SOURCES}
   ${UI_BUILT_SOURCES}
   ${EXE_ICON}
+  ${apple_bundle_sources}
 )
 
 TARGET_LINK_LIBRARIES(paraview_alpha${PV_EXE_SUFFIX}
