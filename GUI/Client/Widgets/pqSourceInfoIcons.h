@@ -57,14 +57,23 @@ public:
   enum DefaultPixmap
     {
     Invalid = -1,
-    Source = 0,
-    Filter,
-    CustomFilter
+    Server = 0,
+    Source,
+    Reader,
+    Filter
     };
 
 public:
   pqSourceInfoIcons(QObject *parent=0);
   virtual ~pqSourceInfoIcons();
+
+  /// \brief
+  ///   Gets the default pixmap for the given type.
+  /// \param type The default pixmap type.
+  /// \return
+  ///   The default pixmap for the given type.
+  /// \sa pqSourceInfoIcons::getPixmap(const QString &, DefaultPixmap)
+  QPixmap getDefaultPixmap(DefaultPixmap type) const;
 
   /// \brief
   ///   Gets the pixmap associated with the specified source.

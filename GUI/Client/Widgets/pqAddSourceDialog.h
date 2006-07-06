@@ -41,9 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDialog>
 
 class pqAddSourceDialogForm;
+class pqSourceInfoGroupMap;
 class pqSourceInfoModel;
 class QAbstractItemModel;
-class QAbstractListModel;
 class QModelIndex;
 class QString;
 class QStringList;
@@ -57,13 +57,17 @@ public:
   pqAddSourceDialog(QWidget *parent=0);
   virtual ~pqAddSourceDialog();
 
+  virtual bool eventFilter(QObject *object, QEvent *e);
+
   void setSourceLabel(const QString &label);
 
+  void setSourceMap(pqSourceInfoGroupMap *groups);
   void setSourceList(QAbstractItemModel *sources);
-  void setHistoryList(QAbstractListModel *history);
+  void setHistoryList(QAbstractItemModel *history);
 
   void getPath(QString &path);
   void setPath(const QString &path);
+  void getSource(QString &name);
   void setSource(const QString &name);
 
 public slots:
@@ -71,6 +75,7 @@ public slots:
   void navigateUp();
   void addFolder();
   void addFavorite();
+  void deleteSelected();
 
 private slots:
   void validateChoice();
@@ -80,15 +85,18 @@ private slots:
       const QModelIndex &previous);
   void updateFromHistory(const QModelIndex &current,
       const QModelIndex &previous);
+  void activateHistoryIndex(const QModelIndex &index);
 
 private:
   void getPath(const QModelIndex &index, QStringList &path);
+  bool isModelSource(const QModelIndex &index) const;
 
 private:
   pqAddSourceDialogForm *Form;
   QAbstractItemModel *Sources;
-  QAbstractListModel *History;
+  QAbstractItemModel *History;
   pqSourceInfoModel *SourceInfo;
+  pqSourceInfoGroupMap *Groups;
 };
 
 #endif

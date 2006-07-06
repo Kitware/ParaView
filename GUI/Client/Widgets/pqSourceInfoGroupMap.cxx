@@ -284,7 +284,6 @@ void pqSourceInfoGroupMap::addGroup(const QString &group)
   // Make sure the parent group does not already have the sub-group.
   if(this->isNameInItem(groupName, parentItem))
     {
-    qDebug() << "Group already exists in source info map.";
     return;
     }
 
@@ -345,7 +344,6 @@ void pqSourceInfoGroupMap::addSource(const QString &name, const QString &group)
   // Make sure the parent group does not already have the source.
   if(this->isNameInItem(name, parentItem))
     {
-    qDebug() << "Source already exists in the specified group.";
     return;
     }
 

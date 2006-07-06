@@ -89,6 +89,8 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSimpleAnimationManager.h
   pqSliderDomain.h
   pqSMSignalAdaptors.h
+  pqSourceHistoryModel.h
+  pqSourceInfoFilterModel.h
   pqSourceInfoGroupMap.h
   pqSourceInfoIcons.h
   pqSourceInfoModel.h
@@ -98,6 +100,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqToolTipTrapper.h
   pqUndoStack.h
   pqVCRController.h
+  pqViewMenu.h
   pqWidgetObjectPanel.h
 )
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
@@ -308,6 +311,8 @@ ADD_LIBRARY(pqWidgets
   pqSliderDomain.h
   pqSourceHistoryModel.cxx
   pqSourceHistoryModel.h
+  pqSourceInfoFilterModel.cxx
+  pqSourceInfoFilterModel.h
   pqSourceInfoGroupMap.cxx
   pqSourceInfoGroupMap.h
   pqSourceInfoIcons.cxx
@@ -330,9 +335,11 @@ ADD_LIBRARY(pqWidgets
   pqUndoRedoStateLoader.h
   pqUndoStack.cxx
   pqUndoStack.h
+  pqVariableType.h
   pqVCRController.cxx
   pqVCRController.h
-  pqVariableType.h
+  pqViewMenu.cxx
+  pqViewMenu.h
   pqWidgetObjectPanel.cxx
   pqWidgetObjectPanel.h
   pqWidgetsExport.h

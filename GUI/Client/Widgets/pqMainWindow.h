@@ -49,6 +49,7 @@ class pqRenderModule;
 class pqServerManagerObserver;
 class pqServer;
 class pqToolsMenu;
+class pqViewMenu;
 
 class vtkCommand;
 class vtkObject;
@@ -125,7 +126,7 @@ public:
   /// Returns the edit menu, creating it if it doesn't already exist.
   QMenu* editMenu();
   /// Returns the view menu, creating it if it doesn't already exist
-  QMenu* viewMenu();
+  pqViewMenu* viewMenu();
   /// Returns the server menu, creating it if it doesn't already exist
   QMenu* serverMenu();
   /// Returns the sources menu, creating it if it doesn't already exist

@@ -47,11 +47,24 @@ class QString;
 class QStringList;
 
 
+/// \class pqSourceInfoModel
+/// \brief
+///   The pqSourceInfoModel class stores the list of available sources
+///   in groups.
+///
+/// The model can be used in conjunction with a pqSourceInfoGroupMap
+/// object. The model will display the sources available in the
+/// groupings defined by the source group map. The available sources
+/// are always shown in the top level of the hierarchy.
 class PQWIDGETS_EXPORT pqSourceInfoModel : public QAbstractItemModel
 {
   Q_OBJECT
 
 public:
+  /// \brief
+  ///   Creates a source info model instance.
+  /// \param sources The list of available sources.
+  /// \param parent The parent object.
   pqSourceInfoModel(const QStringList &sources, QObject *parent=0);
   virtual ~pqSourceInfoModel();
 
@@ -119,8 +132,23 @@ public:
 
   bool isSource(const QString &name) const;
 
+  void getGroup(const QModelIndex &index, QString &group) const;
+
+  /// \brief
+  ///   Initializes the icon database.
+  /// \param icons The icon database.
+  /// \param type The default icon type to display.
   void setIcons(pqSourceInfoIcons *icons,
       pqSourceInfoIcons::DefaultPixmap type);
+
+  /// \brief
+  ///   Gets the list of available sources from the model.
+  ///
+  /// The available sources are not duplicated in the list. They are
+  /// all the top level sources.
+  ///
+  /// \param list Used to return the list of sources.
+  void getAvailableSources(QStringList &list) const;
 
 public slots:
   /// \name Modification Methods
@@ -135,6 +163,9 @@ public slots:
   //@}
 
 private slots:
+  /// \brief
+  ///   Updates the pixmap for the given source name.
+  /// \param name The name of the source whose icon changed.
   void updatePixmap(const QString &name);
 
 private:
@@ -152,9 +183,9 @@ private:
   pqSourceInfoModelItem *getNextItem(pqSourceInfoModelItem *item) const;
 
 private:
-  pqSourceInfoModelItem *Root;
-  pqSourceInfoIcons *Icons;
-  pqSourceInfoIcons::DefaultPixmap Pixmap;
+  pqSourceInfoModelItem *Root;             ///< The root of the tree.
+  pqSourceInfoIcons *Icons;                ///< A pointer to the icons.
+  pqSourceInfoIcons::DefaultPixmap Pixmap; ///< The default icon type.
 };
 
 #endif

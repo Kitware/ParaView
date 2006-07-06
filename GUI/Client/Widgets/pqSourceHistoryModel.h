@@ -40,12 +40,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsExport.h"
 #include <QAbstractListModel>
 
+#include "pqSourceInfoIcons.h" // Needed for enum
+
 class pqSourceHistoryModelInternal;
 class QStringList;
 
 
+/// \class pqSourceHistoryModel
+/// \brief
+///   The pqSourceHistoryModel class is used to store the list of
+///   recent sources.
+///
+/// The pqSourceHistoryModel can be used for recent sources or
+/// filters. The underlying data is the same for each type. The only
+/// difference is the default icon type used. The default icon type
+/// can be configured using the \c setIcons method.
 class PQWIDGETS_EXPORT pqSourceHistoryModel : public QAbstractListModel
 {
+  Q_OBJECT
+
 public:
   pqSourceHistoryModel(QObject *parent=0);
   virtual ~pqSourceHistoryModel();
@@ -91,22 +104,75 @@ public:
 
   /// \name Index Mapping Methods
   //@{
-  QString getFilterName(const QModelIndex &index) const;
-  QModelIndex getIndexFor(const QString &filter) const;
+  /// \brief
+  ///   Gets the source name for a given index.
+  /// \param index The index to look up.
+  /// \return
+  ///   The source name for the given index or an empty string if the
+  ///   index is not valid.
+  QString getSourceName(const QModelIndex &index) const;
+
+  /// \brief
+  ///   Gets the index for the given source name.
+  /// \param source The source name to look up.
+  /// \return
+  ///   The model index for the given source name.
+  QModelIndex getIndexFor(const QString &source) const;
   //@}
 
   /// \name History Methods
   //@{
+  /// \brief
+  ///   Gets the history limit.
+  /// \return
+  ///   The history limit.
   int getHistoryLimit() const {return this->Limit;}
+
+  /// \brief
+  ///   Sets the history limit.
+  /// \param limit The new history limit.
   void setHistoryLimit(int limit);
+
+  /// \brief
+  ///   Gets the list of sources in the history list.
+  /// \param list Used to return the list of sources.
   void getHistoryList(QStringList &list) const;
+
+  /// \brief
+  ///   Sets the list of sources in the history list.
+  /// \param list The list of sources.
   void setHistoryList(const QStringList &list);
-  void addRecentFilter(const QString &filter);
+
+  /// \brief
+  ///   Adds the source to the history list.
+  ///
+  /// If the history list excedes the limit when adding the source,
+  /// the oldest source in the list will be removed. If the source
+  /// is already in the list, it will be moved to the most recent
+  /// position.
+  ///
+  /// \param source The source name to add to the history list.
+  void addRecentSource(const QString &source);
   //@}
 
+  /// \brief
+  ///   Initializes the icon database.
+  /// \param icons The icon database.
+  /// \param type The default icon type to display.
+  void setIcons(pqSourceInfoIcons *icons,
+      pqSourceInfoIcons::DefaultPixmap type);
+
+private slots:
+  /// \brief
+  ///   Updates the pixmap for the given source name.
+  /// \param name The name of the source whose icon changed.
+  void updatePixmap(const QString &name);
+
 private:
-  pqSourceHistoryModelInternal *Internal;
-  int Limit;
+  pqSourceHistoryModelInternal *Internal;  ///< Stores the history list.
+  pqSourceInfoIcons *Icons;                ///< A pointer to the icons.
+  pqSourceInfoIcons::DefaultPixmap Pixmap; ///< The default icon type.
+  int Limit;                               ///< Stores the history limit.
 };
 
 #endif

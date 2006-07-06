@@ -53,6 +53,29 @@ pqSourceInfoIcons::~pqSourceInfoIcons()
   delete this->Internal;
 }
 
+QPixmap pqSourceInfoIcons::getDefaultPixmap(
+    pqSourceInfoIcons::DefaultPixmap type) const
+{
+  if(type == pqSourceInfoIcons::Server)
+    {
+    return QPixmap(":/pqWidgets/pqServer16.png");
+    }
+  else if(type == pqSourceInfoIcons::Source)
+    {
+    return QPixmap(":/pqWidgets/pqSource16.png");
+    }
+  else if(type == pqSourceInfoIcons::Reader)
+    {
+    return QPixmap(":/pqWidgets/pqSource16.png");
+    }
+  else if(type == pqSourceInfoIcons::Filter)
+    {
+    return QPixmap(":/pqWidgets/pqFilter16.png");
+    }
+
+  return QPixmap();
+}
+
 QPixmap pqSourceInfoIcons::getPixmap(const QString &source,
     pqSourceInfoIcons::DefaultPixmap alternate) const
 {
@@ -63,20 +86,7 @@ QPixmap pqSourceInfoIcons::getPixmap(const QString &source,
     }
 
   // If the source does not have a special icon, use the default.
-  if(alternate == pqSourceInfoIcons::Source)
-    {
-    return QPixmap(":/pqWidgets/pqSource16.png");
-    }
-  else if(alternate == pqSourceInfoIcons::Filter)
-    {
-    return QPixmap(":/pqWidgets/pqFilter16.png");
-    }
-  else if(alternate == pqSourceInfoIcons::CustomFilter)
-    {
-    return QPixmap(":/pqWidgets/pqBundle16.png");
-    }
-
-  return QPixmap();
+  return this->getDefaultPixmap(alternate);
 }
 
 void pqSourceInfoIcons::setPixmap(const QString &source,

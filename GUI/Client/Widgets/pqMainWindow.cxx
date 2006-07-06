@@ -63,6 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqToolTipTrapper.h"
 #include "pqDisplayColorWidget.h"
 #include "pqVCRController.h"
+#include "pqViewMenu.h"
 #include "pqXMLUtil.h"
 
 #include <pqConnect.h>
@@ -190,7 +191,7 @@ public:
   QMenu* FileMenu;
   QMenu* RecentFilesMenu;
   QMenu* EditMenu;
-  QMenu* ViewMenu;
+  pqViewMenu* ViewMenu;
   QMenu* ServerMenu;
   QMenu* SourcesMenu;
   QMenu* FiltersMenu;
@@ -199,7 +200,6 @@ public:
   QMenu* HelpMenu;
   
   /// Stores a mapping from dockable widgets to menu actions
-  QMap<QDockWidget*, QAction*> DockWidgetVisibleActions;
   QStringList RecentFilesList;
   int RecentFilesListMaxmumLength;
 
@@ -417,6 +417,7 @@ void pqMainWindow::createStandardStatusBar()
 void pqMainWindow::createStandardViewMenu()
 {
   this->viewMenu();
+  this->Implementation->ViewMenu->addActionsToMenuBar(this->menuBar());
 }
 
 //-----------------------------------------------------------------------------
@@ -461,6 +462,11 @@ void pqMainWindow::createStandardPipelineMenu()
     this->Implementation->PipelineMenu = new pqPipelineMenu(this);
     this->Implementation->PipelineMenu->setObjectName("PipelineMenu");
     this->Implementation->PipelineMenu->addActionsToMenuBar(this->menuBar());
+
+    // Disable the add filter action to start with.
+    QAction *action = this->Implementation->PipelineMenu->getMenuAction(
+        pqPipelineMenu::AddFilterAction);
+    action->setEnabled(false);
 
     // TEMP: Load in the filter information.
     QFile filterInfo(":/pqClient/ParaQFilters.xml");
@@ -665,6 +671,7 @@ void pqMainWindow::createStandardVCRToolBar()
     this->Implementation->VCRController, SLOT(onLast()));
 
   this->addToolBar(Qt::TopToolBarArea, toolbar);
+  this->viewMenu()->addToolBar(toolbar, toolbar->windowTitle());
 }
 
 //-----------------------------------------------------------------------------
@@ -674,6 +681,7 @@ void pqMainWindow::createUndoRedoToolBar()
     << pqSetName("UndoRedoToolBar");
   this->Implementation->UndoRedoToolBar = toolbar;
   this->addToolBar(Qt::TopToolBarArea, toolbar);
+  this->viewMenu()->addToolBar(toolbar, toolbar->windowTitle());
   QAction *undoAction = new QAction(toolbar) << pqSetName("UndoButton");
   undoAction->setToolTip("Undo");
   undoAction->setIcon(QIcon(":pqWidgets/pqUndo22.png"));
@@ -699,6 +707,7 @@ void pqMainWindow::createSelectionToolBar()
   this->Implementation->SelectionToolBar = toolbar;
   toolbar->setEnabled(false);
   this->addToolBar(Qt::TopToolBarArea, toolbar);
+  this->viewMenu()->addToolBar(toolbar, toolbar->windowTitle());
 
   QActionGroup* group = new QActionGroup(toolbar);
 
@@ -757,13 +766,15 @@ void pqMainWindow::createStandardVariableToolBar()
     }
     
   this->addToolBar(Qt::TopToolBarArea, this->Implementation->VariableSelectorToolBar);
+  this->viewMenu()->addToolBar(this->Implementation->VariableSelectorToolBar,
+      this->Implementation->VariableSelectorToolBar->windowTitle());
 }
 
 //-----------------------------------------------------------------------------
 void pqMainWindow::createStandardCompoundProxyToolBar()
 {
   this->Implementation->CompoundProxyToolBar =
-    new QToolBar(tr("Compound Proxies"), this)
+    new QToolBar(tr("Custom Filters"), this)
     << pqSetName("CompoundProxyToolBar");
 
   // Listen for compound proxy register events.
@@ -777,6 +788,8 @@ void pqMainWindow::createStandardCompoundProxyToolBar()
   this->addToolBar(Qt::TopToolBarArea, this->Implementation->CompoundProxyToolBar);
   this->connect(this->Implementation->CompoundProxyToolBar, 
     SIGNAL(actionTriggered(QAction*)), SLOT(onCreateCompoundProxy(QAction*)));
+  this->viewMenu()->addToolBar(this->Implementation->CompoundProxyToolBar,
+      this->Implementation->CompoundProxyToolBar->windowTitle());
 
   // Workaround for file new crash.
   this->Implementation->PipelineBrowser->setFocus();
@@ -818,12 +831,12 @@ QMenu* pqMainWindow::editMenu()
 }
 
 //-----------------------------------------------------------------------------
-QMenu* pqMainWindow::viewMenu()
+pqViewMenu* pqMainWindow::viewMenu()
 {
   if(!this->Implementation->ViewMenu)
     {
-    this->Implementation->ViewMenu = this->menuBar()->addMenu(tr("&View"))
-      << pqSetName("ViewMenu");
+    this->Implementation->ViewMenu = new pqViewMenu(this);
+    this->Implementation->ViewMenu->setObjectName("ViewMenu");
     }
     
   return this->Implementation->ViewMenu;
@@ -892,37 +905,13 @@ void pqMainWindow::addStandardDockWidget(Qt::DockWidgetArea area,
                                          bool visible)
 {
   dockwidget->setVisible(visible);
-
   this->addDockWidget(area, dockwidget);
-  
-  QAction* const action = icon.isNull() ?
-    this->viewMenu()->addAction(dockwidget->windowTitle()) :
-    this->viewMenu()->addAction(icon, dockwidget->windowTitle());
-    
-  action << pqSetName(dockwidget->windowTitle());
-  action->setCheckable(true);
-  action->setChecked(visible);
-  action << pqConnect(SIGNAL(triggered(bool)), dockwidget, SLOT(setVisible(bool)));
-    
-  this->Implementation->DockWidgetVisibleActions[dockwidget] = action;
-    
-  dockwidget->installEventFilter(this);
+  this->viewMenu()->addDockWindow(dockwidget, icon, dockwidget->windowTitle());
 }
 
 bool pqMainWindow::eventFilter(QObject* watched, QEvent* e)
 {
-  if(e->type() == QEvent::Hide || e->type() == QEvent::Show)
-    {
-    if(QDockWidget* const dockwidget = qobject_cast<QDockWidget*>(watched))
-      {
-      if(this->Implementation->DockWidgetVisibleActions.contains(dockwidget))
-        {
-        this->Implementation->DockWidgetVisibleActions[dockwidget]->setChecked(
-          e->type() == QEvent::Show);
-        }
-      }
-    }
-  else if (e->type() == QEvent::KeyPress)
+  if (e->type() == QEvent::KeyPress)
     {
     QKeyEvent* kEvent = static_cast<QKeyEvent*>(e);
     
@@ -1893,6 +1882,16 @@ void pqMainWindow::postAcceptUpdate()
 //-----------------------------------------------------------------------------
 void pqMainWindow::updateFiltersMenu(pqPipelineSource* source)
 {
+  if(this->Implementation->PipelineMenu)
+    {
+    QAction *addFilter = this->Implementation->PipelineMenu->getMenuAction(
+        pqPipelineMenu::AddFilterAction);
+    if(addFilter)
+      {
+      addFilter->setEnabled(source != 0);
+      }
+    }
+
   if (!this->Implementation->FiltersMenu)
     {
     return;

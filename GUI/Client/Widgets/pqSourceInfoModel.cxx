@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 
+/// \class pqSourceInfoModelItem
 class pqSourceInfoModelItem
 {
 public:
@@ -56,6 +57,7 @@ public:
 };
 
 
+//-----------------------------------------------------------------------------
 pqSourceInfoModelItem::pqSourceInfoModelItem(pqSourceInfoModelItem *parent)
   : Children(), Name()
 {
@@ -75,6 +77,7 @@ pqSourceInfoModelItem::~pqSourceInfoModelItem()
 }
 
 
+//-----------------------------------------------------------------------------
 pqSourceInfoModel::pqSourceInfoModel(const QStringList &sources,
     QObject *parentObject)
  : QAbstractItemModel(parentObject)
@@ -230,6 +233,29 @@ bool pqSourceInfoModel::isSource(const QString &name) const
   return false;
 }
 
+void pqSourceInfoModel::getGroup(const QModelIndex &index,
+    QString &group) const
+{
+  pqSourceInfoModelItem *item = this->getItemFor(index);
+  if(item && item != this->Root)
+    {
+    QStringList path;
+    if(item->IsFolder)
+      {
+      path.append(item->Name);
+      }
+
+    pqSourceInfoModelItem *parent = item->Parent;
+    while(parent && parent != this->Root)
+      {
+      path.prepend(parent->Name);
+      parent = parent->Parent;
+      }
+
+    group = path.join("/");
+    }
+}
+
 void pqSourceInfoModel::setIcons(pqSourceInfoIcons *icons,
     pqSourceInfoIcons::DefaultPixmap type)
 {
@@ -239,6 +265,22 @@ void pqSourceInfoModel::setIcons(pqSourceInfoIcons *icons,
   // Listen for pixmap updates.
   QObject::connect(this->Icons, SIGNAL(pixmapChanged(const QString &)),
       this, SLOT(updatePixmap(const QString &)));
+}
+
+void pqSourceInfoModel::getAvailableSources(QStringList &list) const
+{
+  if(this->Root)
+    {
+    QList<pqSourceInfoModelItem *>::ConstIterator iter =
+        this->Root->Children.begin();
+    for( ; iter != this->Root->Children.end(); ++iter)
+      {
+      if(!(*iter)->IsFolder)
+        {
+        list.append((*iter)->Name);
+        }
+      }
+    }
 }
 
 void pqSourceInfoModel::clearGroups()

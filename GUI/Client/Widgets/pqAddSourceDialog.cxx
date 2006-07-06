@@ -35,14 +35,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAddSourceDialog.h"
 #include "ui_pqAddSourceDialog.h"
+#include "pqSourceInfoGroupMap.h"
 #include "pqSourceInfoModel.h"
 
 #include <QAbstractItemModel>
-#include <QAbstractListModel>
 #include <QAbstractProxyModel>
+#include <QEvent>
+#include <QKeyEvent>
+#include <QList>
 #include <QMessageBox>
 #include <QModelIndex>
-#include <QList>
 #include <QPersistentModelIndex>
 #include <QString>
 #include <QStringList>
@@ -55,14 +57,21 @@ public:
 };
 
 
+//-----------------------------------------------------------------------------
 pqAddSourceDialog::pqAddSourceDialog(QWidget *widgetParent)
   : QDialog(widgetParent)
 {
   this->Sources = 0;
   this->History = 0;
   this->SourceInfo = 0;
+  this->Groups = 0;
   this->Form = new pqAddSourceDialogForm();
   this->Form->setupUi(this);
+
+  // Disable the 'new group' and 'add to favorites' buttons until the
+  // source group map is set.
+  this->Form->AddToFavoritesButton->setEnabled(false);
+  this->Form->NewFolderButton->setEnabled(false);
 
   // Set up the change root functionality.
   QObject::connect(this->Form->SourceList,
@@ -70,6 +79,11 @@ pqAddSourceDialog::pqAddSourceDialog(QWidget *widgetParent)
       this, SLOT(changeRoot(const QModelIndex &)));
   QObject::connect(this->Form->SourceGroup, SIGNAL(activated(int)),
       this, SLOT(changeRoot(int)));
+
+  // Listen for history activation events.
+  QObject::connect(this->Form->SourceHistory,
+      SIGNAL(activated(const QModelIndex &)),
+      this, SLOT(activateHistoryIndex(const QModelIndex &)));
 
   // Listen to the button press events.
   QObject::connect(this->Form->OkButton, SIGNAL(clicked()),
@@ -84,6 +98,9 @@ pqAddSourceDialog::pqAddSourceDialog(QWidget *widgetParent)
       this, SLOT(addFolder()));
   QObject::connect(this->Form->AddToFavoritesButton, SIGNAL(clicked()),
       this, SLOT(addFavorite()));
+
+  // Listen for the delete key.
+  this->Form->SourceList->installEventFilter(this);
 }
 
 pqAddSourceDialog::~pqAddSourceDialog()
@@ -94,11 +111,33 @@ pqAddSourceDialog::~pqAddSourceDialog()
     }
 }
 
+bool pqAddSourceDialog::eventFilter(QObject *object, QEvent *e)
+{
+  if(object == this->Form->SourceList && e->type() == QEvent::KeyPress)
+    {
+    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
+    if(keyEvent->key() == Qt::Key_Delete)
+      {
+      this->deleteSelected();
+      }
+    }
+
+  return QWidget::eventFilter(object, e);
+}
+
 void pqAddSourceDialog::setSourceLabel(const QString &label)
 {
   this->Form->SourceLabel->setText(label);
   QString sourceLabel = label + " Group";
   this->Form->SourceGroupLabel->setText(sourceLabel);
+}
+
+void pqAddSourceDialog::setSourceMap(pqSourceInfoGroupMap *groups)
+{
+  this->Groups = groups;
+
+  // TODO: Enable the 'add group' button.
+  //this->Form->NewFolderButton->setEnabled(true);
 }
 
 void pqAddSourceDialog::setSourceList(QAbstractItemModel *sources)
@@ -147,7 +186,7 @@ void pqAddSourceDialog::setSourceList(QAbstractItemModel *sources)
     }
 }
 
-void pqAddSourceDialog::setHistoryList(QAbstractListModel *history)
+void pqAddSourceDialog::setHistoryList(QAbstractItemModel *history)
 {
   if(history != this->History)
     {
@@ -221,6 +260,11 @@ void pqAddSourceDialog::setPath(const QString &path)
     }
 }
 
+void pqAddSourceDialog::getSource(QString &name)
+{
+  name = this->Form->SourceName->text();
+}
+
 void pqAddSourceDialog::setSource(const QString &name)
 {
   this->Form->SourceName->setText(name);
@@ -260,7 +304,74 @@ void pqAddSourceDialog::addFolder()
 
 void pqAddSourceDialog::addFavorite()
 {
-  // TODO
+  if(!this->Groups)
+    {
+    return;
+    }
+
+  // Get the selected source from the model.
+  QModelIndex index = this->Form->SourceList->currentIndex();
+  if(index.isValid() && this->isModelSource(index))
+    {
+    QString name = this->Sources->data(index, Qt::DisplayRole).toString();
+    this->Groups->addSource(name, "Favorites");
+    }
+}
+
+void pqAddSourceDialog::deleteSelected()
+{
+  if(!this->Groups || !this->SourceInfo)
+    {
+    return;
+    }
+
+  // Get the selected source from the model.
+  QModelIndex index = this->Form->SourceList->currentIndex();
+  if(index.isValid())
+    {
+    bool isSource = this->isModelSource(index);
+    QString name = this->Sources->data(index, Qt::DisplayRole).toString();
+    if(name.isEmpty())
+      {
+      return;
+      }
+
+    // The sources in the root index cannot be deleted. The 'Favorites'
+    // group cannot be deleted either.
+    if(this->Form->SourceList->rootIndex() == QModelIndex())
+      {
+      if(isSource)
+        {
+        QString type = this->Form->SourceLabel->text().toLower();
+        QString text = "The selected " + type;
+        text += " cannot be deleted.\nOnly " + type + "s in groups can "
+                "be deleted.";
+        QMessageBox::warning(this, "Delete Error", text,
+            QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
+        return;
+        }
+      else if(name == "Favorites")
+        {
+        QMessageBox::warning(this, "Delete Error",
+            "The \"Favorites\" group cannot be deleted.",
+            QMessageBox::Ok | QMessageBox::Default, QMessageBox::NoButton);
+        return;
+        }
+      }
+
+    // Remove the source or group from the source map.
+    QStringList path;
+    this->getPath(this->Form->SourceList->rootIndex(), path);
+    if(isSource)
+      {
+      this->Groups->removeSource(name, path.join("/"));
+      }
+    else
+      {
+      path.append(name);
+      this->Groups->removeGroup(path.join("/"));
+      }
+    }
 }
 
 void pqAddSourceDialog::validateChoice()
@@ -300,7 +411,7 @@ void pqAddSourceDialog::changeRoot(const QModelIndex &index)
 {
   // Check the index. If it is a source, activating it should be
   // the same thing as hitting the ok button.
-  if(this->SourceInfo && this->SourceInfo->isSource(index))
+  if(this->isModelSource(index))
     {
     this->accept();
     return;
@@ -366,16 +477,14 @@ void pqAddSourceDialog::updateFromSources(const QModelIndex &current,
     // selected item is a source. Clear the name when the selected
     // item is a folder.
     QString name;
-    if(current.isValid())
+    if(current.isValid() && this->isModelSource(current))
       {
-      if(!this->SourceInfo)
-        {
-        name = this->Sources->data(current, Qt::DisplayRole).toString();
-        }
-      else if(this->SourceInfo->isSource(current))
-        {
-        name = this->Sources->data(current, Qt::DisplayRole).toString();
-        }
+      name = this->Sources->data(current, Qt::DisplayRole).toString();
+      this->Form->AddToFavoritesButton->setEnabled(this->Groups != 0);
+      }
+    else
+      {
+      this->Form->AddToFavoritesButton->setEnabled(false);
       }
 
     // Set the selected name as the text in the line edit.
@@ -393,6 +502,11 @@ void pqAddSourceDialog::updateFromHistory(const QModelIndex &current,
     }
 }
 
+void pqAddSourceDialog::activateHistoryIndex(const QModelIndex &index)
+{
+  this->accept();
+}
+
 void pqAddSourceDialog::getPath(const QModelIndex &index, QStringList &path)
 {
   QModelIndex current = index;
@@ -401,6 +515,34 @@ void pqAddSourceDialog::getPath(const QModelIndex &index, QStringList &path)
     path.prepend(this->Sources->data(current, Qt::DisplayRole).toString());
     current = this->Sources->parent(current);
     }
+}
+
+bool pqAddSourceDialog::isModelSource(const QModelIndex &index) const
+{
+  if(!this->SourceInfo)
+    {
+    return true;
+    }
+
+  // If using proxy models, get the index for the source info model.
+  QModelIndex idx = index;
+  QAbstractItemModel *model = this->Sources;
+  while(model)
+    {
+    QAbstractProxyModel *proxy = qobject_cast<QAbstractProxyModel *>(model);
+    if(proxy)
+      {
+      idx = proxy->mapToSource(idx);
+      model = proxy->sourceModel();
+      }
+    else
+      {
+      break;
+      }
+    }
+
+  // The index should be in source coordinates now.
+  return this->SourceInfo->isSource(idx);
 }
 
 

@@ -37,6 +37,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqAddSourceDialog.h"
 #include "pqApplicationCore.h"
+#include "pqPipelineSource.h"
+#include "pqSourceHistoryModel.h"
+#include "pqSourceInfoFilterModel.h"
 #include "pqSourceInfoGroupMap.h"
 #include "pqSourceInfoIcons.h"
 #include "pqSourceInfoModel.h"
@@ -47,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include <QMenuBar>
 #include <QStringList>
+#include <QtDebug>
 #include <QWidget>
 
 #include "vtkPVXMLElement.h"
@@ -65,8 +69,9 @@ public:
   pqSourceInfoIcons *Icons;
 
   pqSourceInfoGroupMap *FilterGroups;
+  pqSourceHistoryModel *FilterHistory;
 
-  // TODO: Add support for multiple connections.
+  // TODO: Add support for multiple servers.
   pqSourceInfoModel *FilterModel;
 
   QString LastFilterGroup;
@@ -77,6 +82,7 @@ pqPipelineMenuInternal::pqPipelineMenuInternal()
 {
   this->Icons = 0;
   this->FilterGroups = 0;
+  this->FilterHistory = 0;
   this->FilterModel = 0;
 }
 
@@ -87,6 +93,11 @@ pqPipelineMenu::pqPipelineMenu(QObject *parentObject)
   this->Internal = new pqPipelineMenuInternal();
   this->Internal->Icons = new pqSourceInfoIcons(this);
   this->Internal->FilterGroups = new pqSourceInfoGroupMap(this);
+  this->Internal->FilterHistory = new pqSourceHistoryModel(this);
+
+  // Set the icons for the history models.
+  this->Internal->FilterHistory->setIcons(this->Internal->Icons,
+      pqSourceInfoIcons::Filter);
 
   // Initialize the pipeline menu actions.
   QAction *action = 0;
@@ -103,7 +114,7 @@ pqPipelineMenu::pqPipelineMenu(QObject *parentObject)
 
 pqPipelineMenu::~pqPipelineMenu()
 {
-  // The icon map, group map, and models will get cleaned up by Qt.
+  // The icon map, group maps, and models will get cleaned up by Qt.
   delete this->Internal;
   delete [] this->MenuList;
 }
@@ -115,6 +126,7 @@ pqSourceInfoIcons *pqPipelineMenu::getIcons() const
 
 void pqPipelineMenu::loadSourceInfo(vtkPVXMLElement *)
 {
+  // TODO
 }
 
 void pqPipelineMenu::loadFilterInfo(vtkPVXMLElement *root)
@@ -130,7 +142,7 @@ void pqPipelineMenu::loadFilterInfo(vtkPVXMLElement *root)
 
 pqSourceInfoModel *pqPipelineMenu::getFilterModel()
 {
-  // TODO: Add support for multiple connections.
+  // TODO: Add support for multiple servers.
   if(!this->Internal->FilterModel)
     {
     // Get the list of available filters from the server manager.
@@ -189,18 +201,38 @@ QAction *pqPipelineMenu::getMenuAction(pqPipelineMenu::ActionName name) const
 
 void pqPipelineMenu::addSource()
 {
+  // TODO
 }
 
 void pqPipelineMenu::addFilter()
 {
+  // Get the selected input from the application core.
+  // TODO: Support multiple inputs.
+  pqPipelineSource *input = pqApplicationCore::instance()->getActiveSource();
+  if(!input)
+    {
+    return;
+    }
+
   // Get the filter info model for the current server.
   pqSourceInfoModel *model = this->getFilterModel();
 
-  // TODO: Use a proxy model to display only the allowed filters.
+  // Use a proxy model to display only the allowed filters.
+  QStringList allowed;
+  pqSourceInfoFilterModel *filter = new pqSourceInfoFilterModel(this);
+  filter->setSourceModel(model);
+  this->getAllowedSources(model, input->getProxy(), allowed);
+  filter->setAllowedNames(allowed);
+
+  pqSourceInfoFilterModel *history = new pqSourceInfoFilterModel(this);
+  history->setSourceModel(this->Internal->FilterHistory);
+  history->setAllowedNames(allowed);
 
   // Set up the add filter dialog.
   pqAddSourceDialog dialog(QApplication::activeWindow());
-  dialog.setSourceList(model);
+  dialog.setSourceMap(this->Internal->FilterGroups);
+  dialog.setSourceList(filter);
+  dialog.setHistoryList(history);
   dialog.setSourceLabel("Filter");
   dialog.setWindowTitle("Add Filter");
 
@@ -208,10 +240,22 @@ void pqPipelineMenu::addFilter()
   dialog.setPath(this->Internal->LastFilterGroup);
   if(dialog.exec() == QDialog::Accepted)
     {
-    // If the user selects a filter, save the starting path and emit
-    // a signal.
+    // If the user selects a filter, save the starting path and add
+    // the selected filter to the history.
     dialog.getPath(this->Internal->LastFilterGroup);
+    QString filterName;
+    dialog.getSource(filterName);
+    this->Internal->FilterHistory->addRecentSource(filterName);
+
+    // Create the filter.
+    if(!pqApplicationCore::instance()->createFilterForActiveSource(filterName))
+      {
+      qCritical() << "Filter could not be created.";
+      } 
     }
+
+  delete filter;
+  delete history;
 }
 
 void pqPipelineMenu::setupConnections(pqSourceInfoModel *model,
@@ -241,8 +285,9 @@ void pqPipelineMenu::getAllowedSources(pqSourceInfoModel *model,
     return;
     }
 
-  // TODO: Get the list of available sources from the model.
+  // Get the list of available sources from the model.
   QStringList available;
+  model->getAvailableSources(available);
   if(available.isEmpty())
     {
     return;

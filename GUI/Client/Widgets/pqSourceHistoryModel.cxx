@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 
 
-// TODO: Handle custom icons.
 class pqSourceHistoryModelInternal : public QList<QString> {};
 
 
@@ -48,6 +47,8 @@ pqSourceHistoryModel::pqSourceHistoryModel(QObject *parentObject)
   : QAbstractListModel(parentObject)
 {
   this->Internal = new pqSourceHistoryModelInternal();
+  this->Icons = 0;
+  this->Pixmap = pqSourceInfoIcons::Invalid;
   this->Limit = 20;
 }
 
@@ -85,17 +86,27 @@ QVariant pqSourceHistoryModel::data(const QModelIndex &idx, int role) const
 {
   if(this->Internal && idx.isValid() && idx.model() == this)
     {
+    QString itemName = (*this->Internal)[idx.row()];
     switch(role)
       {
       case Qt::DisplayRole:
       case Qt::ToolTipRole:
       case Qt::EditRole:
         {
-        return QVariant((*this->Internal)[idx.row()]);
+        return QVariant(itemName);
         }
       case Qt::DecorationRole:
         {
-        break;
+        if(this->Icons)
+          {
+          // Get the user specified icon.
+          return QVariant(this->Icons->getPixmap(itemName, this->Pixmap));
+          }
+        else
+          {
+          // Default to the source pixmap.
+          return QVariant(QPixmap(":/pqWidgets/pqSource16.png"));
+          }
         }
       }
     }
@@ -108,7 +119,7 @@ Qt::ItemFlags pqSourceHistoryModel::flags(const QModelIndex&) const
   return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 }
 
-QString pqSourceHistoryModel::getFilterName(const QModelIndex &idx) const
+QString pqSourceHistoryModel::getSourceName(const QModelIndex &idx) const
 {
   if(this->Internal && idx.isValid() && idx.model() == this)
     {
@@ -170,23 +181,23 @@ void pqSourceHistoryModel::setHistoryList(const QStringList &list)
     }
 }
 
-void pqSourceHistoryModel::addRecentFilter(const QString &filter)
+void pqSourceHistoryModel::addRecentSource(const QString &source)
 {
-  if(this->Internal && !filter.isEmpty())
+  if(this->Internal && !source.isEmpty())
     {
-    // See if the filter is in the history list.
-    int row = this->Internal->indexOf(filter);
+    // See if the source is in the history list.
+    int row = this->Internal->indexOf(source);
     if(row != -1)
       {
-      // Remove the filter from the list.
+      // Remove the source from the list.
       this->beginRemoveRows(QModelIndex(), row, row);
       this->Internal->removeAt(row);
       this->endRemoveRows();
       }
 
-    // Add the filter to the front of the list.
+    // Add the source to the front of the list.
     this->beginInsertRows(QModelIndex(), 0, 0);
-    this->Internal->prepend(filter);
+    this->Internal->prepend(source);
     this->endInsertRows();
 
     // Make sure the list stays within its limit.
@@ -197,6 +208,26 @@ void pqSourceHistoryModel::addRecentFilter(const QString &filter)
       this->Internal->removeAt(row);
       this->endRemoveRows();
       }
+    }
+}
+
+void pqSourceHistoryModel::setIcons(pqSourceInfoIcons *icons,
+    pqSourceInfoIcons::DefaultPixmap type)
+{
+  this->Icons = icons;
+  this->Pixmap = type;
+
+  // Listen for pixmap updates.
+  QObject::connect(this->Icons, SIGNAL(pixmapChanged(const QString &)),
+      this, SLOT(updatePixmap(const QString &)));
+}
+
+void pqSourceHistoryModel::updatePixmap(const QString &name)
+{
+  QModelIndex idx = this->getIndexFor(name);
+  if(idx.isValid())
+    {
+    emit this->dataChanged(idx, idx);
     }
 }
 
