@@ -149,6 +149,12 @@ void pqStreamTracerPanel::onRejected()
 
 void pqStreamTracerPanel::setProxyInternal(pqSMProxy p)
 {
+  if(this->Proxy)
+    {
+    pqNamedWidgets::unlink(
+      &this->Implementation->ControlsContainer, this->Proxy, this->PropertyManager);
+    }
+
   base::setProxyInternal(p);
 
   pqSMProxy reference_proxy = this->Proxy;
@@ -173,13 +179,16 @@ void pqStreamTracerPanel::setProxyInternal(pqSMProxy p)
     {
     this->Implementation->LineWidget->setReferenceProxy(reference_proxy);
     }
+    
+  if(this->Proxy)
+    {
+    pqNamedWidgets::link(
+      &this->Implementation->ControlsContainer, this->Proxy, this->PropertyManager);
+    }
 }
 
 void pqStreamTracerPanel::select()
 {
-  pqNamedWidgets::link(
-    &this->Implementation->ControlsContainer, this->Proxy, this->PropertyManager);
-
   if(this->Implementation->PointSourceWidget)
     {
     this->Implementation->PointSourceWidget->showWidget(this->PropertyManager);
@@ -193,9 +202,6 @@ void pqStreamTracerPanel::select()
 
 void pqStreamTracerPanel::deselect()
 {
-  pqNamedWidgets::unlink(
-    &this->Implementation->ControlsContainer, this->Proxy, this->PropertyManager);
-
   if(this->Implementation->PointSourceWidget)
     {
     this->Implementation->PointSourceWidget->hideWidget(this->PropertyManager);

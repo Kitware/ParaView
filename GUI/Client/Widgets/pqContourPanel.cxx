@@ -142,6 +142,12 @@ void pqContourPanel::onRejected()
 
 void pqContourPanel::setProxyInternal(pqSMProxy p)
 {
+  if(this->Proxy)
+    {
+    pqNamedWidgets::unlink(
+      &this->Implementation->ControlsContainer, this->Proxy, this->PropertyManager);
+    }
+
   base::setProxyInternal(p);
  
   // Setup the sample scalar widget ...
@@ -149,16 +155,18 @@ void pqContourPanel::setProxyInternal(pqSMProxy p)
     this->Proxy,
     this->Proxy ? vtkSMDoubleVectorProperty::SafeDownCast(this->Proxy->GetProperty("ContourValues")) : 0,
     this->Proxy ? this->Proxy->GetProperty("SelectInputScalars") : 0);
+    
+  if(this->Proxy)
+    {
+    pqNamedWidgets::link(
+      &this->Implementation->ControlsContainer, this->Proxy, this->PropertyManager);
+    }
 }
 
 void pqContourPanel::select()
 {
-  pqNamedWidgets::link(
-    &this->Implementation->ControlsContainer, this->Proxy, this->PropertyManager);
 }
 
 void pqContourPanel::deselect()
 {
-  pqNamedWidgets::unlink(
-    &this->Implementation->ControlsContainer, this->Proxy, this->PropertyManager);
 }

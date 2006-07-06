@@ -124,6 +124,7 @@ ENDIF(APPLE)
     OpenFile
     OpenSaveData
     StreamTracer
+    StreamTracerUpdates
     SubMenu
     Threshold
     UndoRedo
