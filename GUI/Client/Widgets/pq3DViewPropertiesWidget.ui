@@ -1,0 +1,692 @@
+<ui version="4.0" >
+ <author></author>
+ <comment></comment>
+ <exportmacro></exportmacro>
+ <class>pq3DViewProperties</class>
+ <widget class="QWidget" name="pq3DViewProperties" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>463</width>
+    <height>568</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>3D View Properties Dialog</string>
+  </property>
+  <layout class="QGridLayout" >
+   <property name="margin" >
+    <number>9</number>
+   </property>
+   <property name="spacing" >
+    <number>6</number>
+   </property>
+   <item row="0" column="0" >
+    <widget class="QGroupBox" name="groupBox" >
+     <property name="title" >
+      <string>Colors</string>
+     </property>
+     <layout class="QVBoxLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <widget class="pqColorChooserButton" name="backgroundColor" >
+        <property name="toolTip" >
+         <string>Change the background color of the 3D View window</string>
+        </property>
+        <property name="text" >
+         <string>Set Background Color</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0" >
+    <widget class="QGroupBox" name="lodParameters" >
+     <property name="title" >
+      <string>LOD Parameters</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="1" column="0" colspan="2" >
+       <widget class="QCheckBox" name="renderingInterrupts" >
+        <property name="toolTip" >
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle the use of render interrupts (when using MPI, this uses asynchronous messaging). When off, renders can not be interrupted.&lt;/p>&lt;/body>&lt;/html></string>
+        </property>
+        <property name="whatsThis" >
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle the use of render interrupts (when using MPI, this uses asynchronous messaging). When off, renders can not be interrupted.&lt;/p>&lt;/body>&lt;/html></string>
+        </property>
+        <property name="text" >
+         <string>Allow Rendering Interrupts</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" >
+       <layout class="QVBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="lodThresholdLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lodResolutionLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="outlineThresholdLabel" >
+          <property name="enabled" >
+           <bool>true</bool>
+          </property>
+          <property name="text" >
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="1" >
+       <layout class="QVBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QSlider" name="lodThreshold" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="toolTip" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines whether to use decimated models during interaction. Threshold criteria is based on size of geometry in megabytes. &lt;b>Left:&lt;/b> Always use decimated models. &lt;b>Right:&lt;/b> Always use full resolution.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="whatsThis" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines whether to use decimated models during interaction. Threshold criteria is based on size of geometry in megabytes. &lt;b>Left:&lt;/b> Always use decimated models. &lt;b>Right:&lt;/b> Always use full resolution.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="maximum" >
+           <number>1000</number>
+          </property>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSlider" name="lodResolution" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="toolTip" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines the resolution of the decimated level-of-detail models. The value is the dimension for each axis in the quadric clustering algorithm. &lt;b>Left:&lt;/b> Use slow high-resolution models. &lt;b>Right:&lt;/b> Use fast simple models.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="whatsThis" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines the resolution of the decimated level-of-detail models. The value is the dimension for each axis in the quadric clustering algorithm. &lt;b>Left:&lt;/b> Use slow high-resolution models. &lt;b>Right:&lt;/b> Use fast simple models.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="minimum" >
+           <number>10</number>
+          </property>
+          <property name="maximum" >
+           <number>160</number>
+          </property>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSlider" name="outlineThreshold" >
+          <property name="toolTip" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines the default representation to use for unstructured grid datasets. If the dataset has more cells than this threshold, then an outline is used. Otherwise, the surface is extracted. &lt;b>Left:&lt;/b> Use surface representation as default. &lt;b>Right:&lt;/b> Use outline representation as default.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="whatsThis" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines the default representation to use for unstructured grid datasets. If the dataset has more cells than this threshold, then an outline is used. Otherwise, the surface is extracted. &lt;b>Left:&lt;/b> Use surface representation as default. &lt;b>Right:&lt;/b> Use outline representation as default.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="minimum" >
+           <number>0</number>
+          </property>
+          <property name="maximum" >
+           <number>5000</number>
+          </property>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="0" >
+       <layout class="QVBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" >
+          <property name="margin" >
+           <number>0</number>
+          </property>
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label" >
+            <property name="text" >
+             <string>LOD Threshold</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="enableLOD" >
+            <property name="toolTip" >
+             <string>Toggle use of LOD while interacting.</string>
+            </property>
+            <property name="text" >
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_2" >
+          <property name="text" >
+           <string>LOD Resolution</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_3" >
+          <property name="text" >
+           <string>Outline Threshold</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="0" >
+    <widget class="QGroupBox" name="compositingParameters" >
+     <property name="title" >
+      <string>Compositing Parameters</string>
+     </property>
+     <layout class="QGridLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item row="0" column="0" >
+       <layout class="QVBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="label_7" >
+          <property name="text" >
+           <string>Composite Threshold</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_8" >
+          <property name="text" >
+           <string>Subsample Rate</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_9" >
+          <property name="text" >
+           <string>Squirt Compression</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="1" >
+       <layout class="QVBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QCheckBox" name="enableCompositing" >
+          <property name="toolTip" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle compositing. When off all rendering is done locally. Otherwise, rendering is done on server or client depending on the threshold.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="whatsThis" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle compositing. When off all rendering is done locally. Otherwise, rendering is done on server or client depending on the threshold.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="text" >
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="enableSubsampling" >
+          <property name="toolTip" >
+           <string>Toggle use of subsampling while interacting.</string>
+          </property>
+          <property name="whatsThis" >
+           <string>Toggle use of subsampling while interacting.</string>
+          </property>
+          <property name="text" >
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="enableSquirt" >
+          <property name="toolTip" >
+           <string>Toggle use of Squirt compression while interacting.</string>
+          </property>
+          <property name="whatsThis" >
+           <string>Toggle use of Squirt compression while interacting.</string>
+          </property>
+          <property name="text" >
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0" colspan="3" >
+       <widget class="QCheckBox" name="orderedCompositing" >
+        <property name="toolTip" >
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle use of ordered compositing. Ordered compositing makes updates and animations slower, but makes volume rendering correct and may speed up compositing in general.&lt;/p>&lt;/body>&lt;/html></string>
+        </property>
+        <property name="whatsThis" >
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle use of ordered compositing. Ordered compositing makes updates and animations slower, but makes volume rendering correct and may speed up compositing in general.&lt;/p>&lt;/body>&lt;/html></string>
+        </property>
+        <property name="text" >
+         <string>Enable Ordered Compositing</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3" >
+       <layout class="QVBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="compositeThresholdLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="subsamplingRateLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="squirtLevelLabel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="text" >
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="2" >
+       <layout class="QVBoxLayout" >
+        <property name="margin" >
+         <number>0</number>
+        </property>
+        <property name="spacing" >
+         <number>6</number>
+        </property>
+        <item>
+         <widget class="QSlider" name="compositeThreshold" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="toolTip" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines when distributed rendering is used. When compositing is off, geometry is collected at process 0 for local rendering. Threshold criteria is based on size of the model in mega bytes. &lt;b>Left:&lt;/b> Always use compositing. &lt;b>Right:&lt;/b> Move even large models to process 0.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="whatsThis" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">This slider determines when distributed rendering is used. When compositing is off, geometry is collected at process 0 for local rendering. Threshold criteria is based on size of the model in mega bytes. &lt;b>Left:&lt;/b> Always use compositing. &lt;b>Right:&lt;/b> Move even large models to process 0.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="maximum" >
+           <number>1000</number>
+          </property>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSlider" name="subsamplingRate" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="toolTip" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Subsampling is a compositing LOD technique. Subsampling will use larger pixels during interaction.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="whatsThis" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Subsampling is a compositing LOD technique. Subsampling will use larger pixels during interaction.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="minimum" >
+           <number>2</number>
+          </property>
+          <property name="maximum" >
+           <number>20</number>
+          </property>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSlider" name="squirtLevel" >
+          <property name="enabled" >
+           <bool>false</bool>
+          </property>
+          <property name="toolTip" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Squirt compression is a combination of runlength encoding and bit compression.&lt;b>Left:&lt;/b> No compression. &lt;b>Right:&lt;/b> Maximum compression.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="whatsThis" >
+           <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Squirt compression is a combination of runlength encoding and bit compression.&lt;b>Left:&lt;/b> No compression. &lt;b>Right:&lt;/b> Maximum compression.&lt;/p>&lt;/body>&lt;/html></string>
+          </property>
+          <property name="minimum" >
+           <number>1</number>
+          </property>
+          <property name="maximum" >
+           <number>6</number>
+          </property>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0" >
+    <widget class="QGroupBox" name="groupBox_2" >
+     <property name="title" >
+      <string>Advanced Render Parameters</string>
+     </property>
+     <layout class="QVBoxLayout" >
+      <property name="margin" >
+       <number>9</number>
+      </property>
+      <property name="spacing" >
+       <number>6</number>
+      </property>
+      <item>
+       <widget class="QCheckBox" name="parallelProjection" >
+        <property name="toolTip" >
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle the use of parallel projection (if parallel projection is off, perspective projection is used)&lt;/p>&lt;/body>&lt;/html></string>
+        </property>
+        <property name="whatsThis" >
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">Toggle the use of parallel projection (if parallel projection is off, perspective projection is used).&lt;/p>&lt;/body>&lt;/html></string>
+        </property>
+        <property name="text" >
+         <string>Use Parallel Projection</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="triangleStrips" >
+        <property name="toolTip" >
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If this option is choosen, all triangles are converted into triangle strips before rendering. This may improve the rendering performance.&lt;/p>&lt;/body>&lt;/html></string>
+        </property>
+        <property name="statusTip" >
+         <string/>
+        </property>
+        <property name="whatsThis" >
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">If this option is choosen, all triangles are converted into triangle strips before rendering. This may improve the rendering performance.&lt;/p>&lt;/body>&lt;/html></string>
+        </property>
+        <property name="text" >
+         <string>Use Triangle Strips</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="immediateModeRendering" >
+        <property name="toolTip" >
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">When this option is off, OpenGL display lists are used for rendering. Using display lists improves performance for small datasets but is not recommended for large datasets due to the excessive memory usage and long display list creation times.&lt;/p>&lt;/body>&lt;/html></string>
+        </property>
+        <property name="whatsThis" >
+         <string>&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;/head>&lt;body style=" white-space: pre-wrap; font-family:Sans Serif; font-size:9pt; font-weight:400; font-style:normal; text-decoration:none;">&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">When this option is off, OpenGL display lists are used for rendering. Using display lists improves performance for small datasets but is not recommended for large datasets due to the excessive memory usage and long display list creation times.&lt;/p>&lt;/body>&lt;/html></string>
+        </property>
+        <property name="text" >
+         <string>Use Immediate Mode Rendering</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <pixmapfunction></pixmapfunction>
+ <customwidgets>
+  <customwidget>
+   <class>pqColorChooserButton</class>
+   <extends>QPushButton</extends>
+   <header>pqColorChooserButton.h</header>
+   <container>0</container>
+   <pixmap></pixmap>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>enableLOD</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lodThreshold</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>131</x>
+     <y>267</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>264</x>
+     <y>269</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>enableCompositing</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>compositeThreshold</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>174</x>
+     <y>450</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>285</x>
+     <y>447</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>enableSubsampling</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>subsamplingRate</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>174</x>
+     <y>477</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>285</x>
+     <y>477</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>enableSquirt</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>squirtLevel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>174</x>
+     <y>504</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>285</x>
+     <y>507</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>enableLOD</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lodResolution</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>131</x>
+     <y>287</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>264</x>
+     <y>319</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>enableLOD</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lodResolutionLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>131</x>
+     <y>287</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>412</x>
+     <y>319</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>enableLOD</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lodThresholdLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>131</x>
+     <y>287</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>412</x>
+     <y>289</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>enableCompositing</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>compositeThresholdLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>174</x>
+     <y>450</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>412</x>
+     <y>447</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>enableSubsampling</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>subsamplingRateLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>174</x>
+     <y>477</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>412</x>
+     <y>477</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>enableSquirt</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>squirtLevelLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>174</x>
+     <y>504</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>412</x>
+     <y>507</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

@@ -25,6 +25,7 @@ GET_DIRECTORY_PROPERTY(include_dirs_tmp INCLUDE_DIRECTORIES)
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
+  pq3DViewPropertiesWidget.h
   pq3DWidgetFactory.h
   pqAddSourceDialog.h
   pqApplicationCore.h
@@ -86,6 +87,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerManagerObserver.h
   pqServerManagerSelectionModel.h
   pqSettings.h
+  pqSettingsDialog.h
   pqSimpleAnimationManager.h
   pqSliderDomain.h
   pqSMSignalAdaptors.h
@@ -106,6 +108,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
 SET(UI_FORMS
+  pq3DViewPropertiesWidget.ui
   pqAbortAnimation.ui
   pqAddSourceDialog.ui
   pqAnimationSettings.ui
@@ -123,6 +126,7 @@ SET(UI_FORMS
   pqSampleScalarAddRangeDialog.ui
   pqSampleScalarWidget.ui
   pqServerBrowser.ui
+  pqSettingsDialog.ui
   pqStreamTracerControls.ui
 )
 
@@ -151,6 +155,8 @@ SOURCE_GROUP("Generated" FILES
 )
 
 ADD_LIBRARY(pqWidgets
+  pq3DViewPropertiesWidget.cxx
+  pq3DViewPropertiesWidget.h
   pq3DWidgetFactory.cxx
   pq3DWidgetFactory.h
   pqAddSourceDialog.cxx
@@ -307,6 +313,8 @@ ADD_LIBRARY(pqWidgets
   pqSimpleAnimationManager.h
   pqSettings.cxx
   pqSettings.h
+  pqSettingsDialog.cxx
+  pqSettingsDialog.h
   pqSliderDomain.cxx
   pqSliderDomain.h
   pqSourceHistoryModel.cxx

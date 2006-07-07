@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqSimpleAnimationManager.h"
 #include "pqSettings.h"
+#include "pqSettingsDialog.h"
 #include "pqSourceProxyInfo.h"
 #include "pqTestUtility.h"
 #include "pqToolsMenu.h"
@@ -394,6 +395,11 @@ void pqMainWindow::createStandardEditMenu()
     SLOT(RedoActiveViewInteraction()),
     QKeySequence(Qt::CTRL + Qt::Key_F))
     << pqSetName("CameraRedo");
+  action->setEnabled(false);
+
+  menu->addSeparator();
+  action = menu->addAction(tr("&Settings"), this,
+    SLOT(onEditSettings())) << pqSetName("Settings");
   action->setEnabled(false);
 }
 
@@ -2053,6 +2059,15 @@ void pqMainWindow::updateEnableState()
           pqApplicationCore::instance()->getActiveSource()));
       }
     }
+  if (this->Implementation->EditMenu)
+    {
+    QAction* settingsAction =
+      this->Implementation->EditMenu->findChild<QAction*>("Settings");
+    if (settingsAction)
+      {
+      settingsAction->setEnabled(rm != 0);
+      }
+    }
 
   this->updateInteractionUndoRedoState();
 }
@@ -2232,4 +2247,11 @@ void pqMainWindow::onRecentFileOpen()
   QStringList strList;
   strList << str;
   this->onFileOpen(strList);
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindow::onEditSettings()
+{
+  pqSettingsDialog dialog(this);
+  dialog.exec();
 }
