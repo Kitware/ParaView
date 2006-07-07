@@ -110,6 +110,12 @@ public:
   void beginRemoveServer(pqServer *server);
   void endRemoveServer();
 
+  /// Returns a list of servers.
+  QList<pqServer*> getServers();
+
+  /// Returns a list of sources on the particular server.
+  QList<pqPipelineSource*> getSources(pqServer* server);
+
 public slots:
   /// Call when a  new vtkSMProxy is registered with the proxy manager
   /// under the "sources" group.

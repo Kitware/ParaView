@@ -107,6 +107,37 @@ pqServerManagerModel::~pqServerManagerModel()
 }
 
 //-----------------------------------------------------------------------------
+QList<pqServer*> pqServerManagerModel::getServers()
+{
+  QList<pqServer*> list;
+  foreach (pqServer* server, this->Internal->Servers)
+    {
+    if (server)
+      {
+      list.push_back(server);
+      }
+    }
+  return list;
+}
+
+//-----------------------------------------------------------------------------
+QList<pqPipelineSource*> pqServerManagerModel::getSources(pqServer* server)
+{
+  QList<pqPipelineSource*> list;
+  if (server)
+    {
+    foreach (pqPipelineSource* source, this->Internal->Sources)
+      {
+      if (source->getProxy()->GetConnectionID() == server->GetConnectionID())
+        {
+        list.push_back(source);
+        }
+      }
+    }
+  return list;
+}
+
+//-----------------------------------------------------------------------------
 void pqServerManagerModel::onAddSource(QString name, vtkSMProxy* source)
 {
   if (!source)
