@@ -62,7 +62,12 @@ public:
   /// split a location in a direction
   /// a dummy widget is inserted and an index for it is returned
   virtual Index splitView(Index index, Qt::Orientation orientation);
-  
+
+  virtual Index splitView(pqMultiView::Index index, 
+  Qt::Orientation orientation, float percent);
+
+  pqMultiViewFrame* splitWidget(QWidget* widget, Qt::Orientation o,float percent);
+
   /// remove a widget inserted by replaceWidget or splitView
   virtual void removeView(QWidget* widget);
 
@@ -93,7 +98,6 @@ protected:
 
   bool eventFilter(QObject*, QEvent* e);
   pqMultiViewFrame* splitWidget(QWidget*, Qt::Orientation);
-
   void setup(pqMultiViewFrame*);
   void cleanup(pqMultiViewFrame*);
 

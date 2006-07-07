@@ -277,6 +277,121 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index,
   return this->indexOf(newFrame);
 }
 
+
+//-----------------------------------------------------------------------------
+pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index, 
+  Qt::Orientation orientation, float percent)
+{
+  if(percent <0.0)
+    percent=0.0;
+  else if(percent >1.0)
+    percent=1.0;
+
+  pqMultiViewFrame* newFrame = NULL;
+
+  QWidget* w = this->widgetOfIndex(index);
+  Q_ASSERT(w != NULL);
+  QSplitter* splitter = qobject_cast<QSplitter*>(w->parentWidget());
+  if(!splitter)
+    return Index();
+
+  // if there is only one item in splitter
+  if(splitter->count() < 2)
+    {
+    QList<int> old_sizes = splitter->sizes();
+    // change orientation
+    splitter->setOrientation(orientation);
+    // add new place holder
+    newFrame = new pqMultiViewFrame;
+    splitter->addWidget(newFrame);
+
+    QList<int> sizes = splitter->sizes();
+
+    sizes[0]=old_sizes[0]*(1.0-percent);
+    sizes[1]=old_sizes[0]*percent;
+
+    splitter->setSizes(sizes);
+    }
+  // else if the orientation isn't the same, we need to make a new child splitter
+  // with the desired orientation
+  else if(splitter->orientation() != orientation)
+    {
+    // get parent sizes
+    QList<int> parentsizes = splitter->sizes();
+    splitter->hide();
+    
+    int location = splitter->indexOf(w);
+    QSplitter* newSplitter = new QSplitter(orientation);
+    // add splitter to splitter
+    splitter->insertWidget(location, newSplitter);
+    // remove from old splitter, and add to new splitter
+    w->setParent(newSplitter);
+    newSplitter->addWidget(w);
+    // add new place holder
+    newFrame = new pqMultiViewFrame;
+
+    newSplitter->addWidget(newFrame);
+    
+    splitter->show();
+    // ensure same sizes for parent splitter
+    splitter->setSizes(parentsizes);
+
+    // make equal spacing for new splitter
+    QList<int> sizes_old = newSplitter->sizes();
+    QList<int> sizes = newSplitter->sizes();
+
+    sizes[0]=sizes_old[0]*(1.0-percent);
+    sizes[1]=sizes_old[0]*percent;
+
+    newSplitter->setSizes(sizes);
+    
+    QByteArray n = "MultiViewSplitter:";
+    Index idxName = this->indexOf(newSplitter);
+    int i;
+    for(i=0; i<idxName.size(); i++)
+      {
+      QString tmp;
+      tmp.setNum(idxName[i]);
+      if(i != 0)
+        n += ",";
+      n += tmp;
+      }
+    newSplitter->setObjectName(n);
+    }
+  else
+    {
+    // insert new below or on right of existing one
+    newFrame = new pqMultiViewFrame;
+    
+    
+    QList<int> sizes_old = splitter->sizes();
+
+
+    splitter->insertWidget(splitter->indexOf(w)+1, newFrame);
+    
+
+    QList<int> sizes = splitter->sizes();
+
+    sizes[splitter->indexOf(w)]=sizes_old[splitter->indexOf(w)]*(1.0-percent);
+    sizes[splitter->indexOf(w)+1]=sizes_old[splitter->indexOf(w)]*percent;
+
+
+    // make equal spacing
+ /*   QList<int> sizes = splitter->sizes();
+    int sum=0, i;
+    for(i=0; i<sizes.size(); i++)
+      sum += sizes[i];
+    for(i=0; i<sizes.size(); i++)
+      sizes[i] = sum / sizes.size();
+      */
+    splitter->setSizes(sizes);
+    }
+    
+  return this->indexOf(newFrame);
+}
+
+
+
 //-----------------------------------------------------------------------------
 pqMultiView::Index pqMultiView::indexOf(QWidget* widget) const
 {
@@ -425,7 +540,16 @@ pqMultiViewFrame* pqMultiView::splitWidget(QWidget* widget, Qt::Orientation o)
   emit this->frameAdded(frame);
   return frame;
 }
-
+pqMultiViewFrame* pqMultiView::splitWidget(QWidget* widget, Qt::Orientation o,float percent)
+{
+  pqMultiView::Index index = this->indexOf(widget);
+  pqMultiView::Index newindex = this->splitView(index, o,percent);
+  QWidget *newWidget=this->widgetOfIndex(newindex);
+  pqMultiViewFrame* frame = qobject_cast<pqMultiViewFrame*>(newWidget); 
+  this->setup(frame);
+  emit this->frameAdded(frame);
+  return frame;
+}
 pqMultiViewFrame* pqMultiView::splitWidgetHorizontal(QWidget* widget)
 {
   return this->splitWidget(widget, Qt::Horizontal);
