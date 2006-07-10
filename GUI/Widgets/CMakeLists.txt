@@ -22,6 +22,8 @@ INCLUDE_DIRECTORIES(
 
 ## Add the source (*.cxx,*.h) files here.
 SET(QtWidgets_SRCS
+  pqCollapsedGroup.cxx
+  pqCollapsedGroup.h
   pqColorChooserButton.cxx
   pqColorChooserButton.h
   pqConnect.cxx
@@ -65,6 +67,7 @@ SET(QtWidgets_SRCS
 ## Add the header files that need to moc processed.
 
 QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
+  pqCollapsedGroup.h
   pqColorChooserButton.h
   pqConsoleWidget.h
   pqDelimitedTextParser.h
