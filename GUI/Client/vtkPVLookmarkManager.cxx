@@ -73,6 +73,8 @@
 #include "vtkDoubleArray.h"
 #include "vtkPoints.h"
 #include "vtkMath.h"
+#include "vtkPVFileEntry.h"
+#include "vtkKWEntry.h"
 
 #define VTK_AVERAGE(a,b,c) \
   c[0] = (a[0] + b[0])/2.0; \
@@ -81,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.89");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.90");
 
 //----------------------------------------------------------------------------
 vtkPVLookmarkManager::vtkPVLookmarkManager()
@@ -1134,7 +1136,6 @@ void vtkPVLookmarkManager::SetStateOfAllLookmarkItems(int state)
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::ImportBoundingBoxFileCallback()
 {
-  char *filename;
   vtkPVSource *currentSource;
   vtkPVSource *pvs;
   vtkPVWindow *win = this->GetPVWindow();
@@ -1145,8 +1146,7 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileCallback()
   vtkPVLookmark *macro = NULL;
   char ext[] = "bb";
 
-  this->SetButtonFrameState(0);
-
+  char *filename;
   // Ask user for path to bb file
   if( !(filename = this->PromptForFile(ext,0)) )
     {
@@ -1154,6 +1154,9 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileCallback()
     this->SetButtonFrameState(1);
     return;
     }
+
+
+  this->SetButtonFrameState(0);
 
   // Ask user for path to data file
   pvs = win->GetCurrentPVSource();
@@ -1202,6 +1205,36 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileCallback()
 
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVLookmarkManager::ImportBoundingBoxFile(char *bboxfilename, char *datafilename, char *macroname)
+{
+
+  if(this->GetPVWindow()->Open(datafilename) == VTK_ERROR)
+    return;
+
+
+  vtkIdType i,numberOfLookmarkWidgets;
+  vtkPVLookmark *lookmarkWidget;
+  vtkPVLookmark *macro = NULL;
+
+  this->SetButtonFrameState(0);
+
+  numberOfLookmarkWidgets = this->Lookmarks->GetNumberOfItems();
+  for(i=numberOfLookmarkWidgets-1;i>=0;i--)
+    {
+    this->Lookmarks->GetItem(i,lookmarkWidget);
+    if(lookmarkWidget->GetMacroFlag() && strcmp(lookmarkWidget->GetName(),macroname)==0)
+      {
+      macro = lookmarkWidget;
+      }
+    }
+
+  this->ImportBoundingBoxFile(this->GetPVWindow()->GetCurrentPVReaderModule(),macro,bboxfilename);
+
+  this->SetButtonFrameState(1);
+}
+
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::ImportBoundingBoxFile(vtkPVReaderModule *reader, vtkPVLookmark *macro, char *boundingBoxFileName)
 {
@@ -1224,6 +1257,17 @@ void vtkPVLookmarkManager::ImportBoundingBoxFile(vtkPVReaderModule *reader, vtkP
   vtkPVLookmark *lookmarkWidget;
   int retval;
   ostrstream msg;
+  vtkPVSource *pvs;
+  vtkPVSourceCollection *col = this->GetPVWindow()->GetSourceList("Sources");
+  if (col == NULL)
+    {
+    return;
+    }
+
+  this->GetTraceHelper()->AddEntry("$kw(%s) ImportBoundingBoxFile \"%s\" \"%s\" \"%s\"",
+                      this->GetTclName(),boundingBoxFileName,reader->GetFileEntry()->GetValue(),macro->GetName());
+
+  vtkCollectionIterator *it = col->NewIterator();
 
   infile = new ifstream(boundingBoxFileName);
 
@@ -1291,7 +1335,40 @@ void vtkPVLookmarkManager::ImportBoundingBoxFile(vtkPVReaderModule *reader, vtkP
     return;
     }
 
-  this->ImportBoundingBoxFileInternal(0,root,bboxFolder,macro);
+
+  if(macro)
+    {
+    macro->ViewMacro();
+    // The current source will be the reader unless a macro was selected in which case it would be the last filter in the pipeline
+    //inputSource = this->GetPVWindow()->GetCurrentPVSource();
+    }
+  else
+    {
+    it->InitTraversal();
+    while ( !it->IsDoneWithTraversal() )
+      {
+      pvs = static_cast<vtkPVSource*>( it->GetCurrentObject() );
+      pvs->SetVisibility(0);
+      it->GoToNextItem();
+      }
+    this->GetPVWindow()->GetCurrentPVReaderModule()->SetVisibility(1);
+    }
+
+  vtkPVSource *input = this->GetPVWindow()->GetCurrentPVSource();
+  vtkPVSource *clip = this->GetPVWindow()->CreatePVSource("Clip");
+  clip->SetLabel("BoundingBox");
+  vtkPVInputMenu::SafeDownCast(clip->GetPVWidget("Input"))->SetCurrentValue(input);
+  vtkPVSelectWidget *widgetType = vtkPVSelectWidget::SafeDownCast(clip->GetPVWidget("Clip Function"));
+  widgetType->SetCurrentValue("Box");
+  vtkPVBoxWidget *box = vtkPVBoxWidget::SafeDownCast(widgetType->GetPVWidget("Box"));
+  vtkPVLabeledToggle *insideOut = vtkPVLabeledToggle::SafeDownCast(clip->GetPVWidget("InsideOut"));
+  insideOut->SetSelectedState(1);
+  box->PlaceWidget(0,1,0,1,0,1);
+  clip->AcceptCallback();
+  box->SetVisibility(1);
+  input->SetVisibility(1);
+
+  this->ImportBoundingBoxFileInternal(0,root,bboxFolder,box);
   
   this->PackChildrenBasedOnLocation(bboxFolder->GetLabelFrame()->GetFrame());
   // after all the widgets are generated, go back thru and add d&d targets for each of them
@@ -1321,7 +1398,7 @@ void vtkPVLookmarkManager::ImportBoundingBoxFile(vtkPVReaderModule *reader, vtkP
 
 
 //----------------------------------------------------------------------------
-void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *lmkElement, vtkKWLookmarkFolder *parent,vtkPVLookmark *macro)
+void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *lmkElement, vtkKWLookmarkFolder *parent,vtkPVBoxWidget *box)
 {
   vtkPVLookmark *lookmarkWidget;
   vtkKWLookmarkFolder *lmkFolderWidget;
@@ -1332,13 +1409,6 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(int locationOfLmkItemAm
   double newBounds[6];
   double newCenter[3];
   ostrstream comments;
-  vtkPVSource *pvs;
-  vtkPVSourceCollection *col = this->GetPVWindow()->GetSourceList("Sources");
-  if (col == NULL)
-    {
-    return;
-    }
-  vtkCollectionIterator *it = col->NewIterator();
 
   if(strcmp("BoundingBoxFolder",lmkElement->GetName())==0)
     {
@@ -1363,7 +1433,7 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(int locationOfLmkItemAm
     // for each xml element (either lookmark or lookmark folder) recursively call import with the appropriate location and vtkXMLDataElement
     for(j=lmkElement->GetNumberOfNestedElements()-1; j>=0; j--)
       {
-      this->ImportBoundingBoxFileInternal(j,lmkElement->GetNestedElement(j),lmkFolderWidget,macro);
+      this->ImportBoundingBoxFileInternal(j,lmkElement->GetNestedElement(j),lmkFolderWidget,box);
       }
     this->PackChildrenBasedOnLocation(parent->GetLabelFrame()->GetFrame());
     }
@@ -1373,7 +1443,7 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(int locationOfLmkItemAm
     // the parent is the lookmark manager's label frame
     for(j=lmkElement->GetNumberOfNestedElements()-1;j>=0; j--)
       {
-      this->ImportBoundingBoxFileInternal(j+locationOfLmkItemAmongSiblings,lmkElement->GetNestedElement(j),parent,macro);
+      this->ImportBoundingBoxFileInternal(j+locationOfLmkItemAmongSiblings,lmkElement->GetNestedElement(j),parent,box);
       }
     this->PackChildrenBasedOnLocation(parent->GetLabelFrame()->GetFrame());
     }
@@ -1399,43 +1469,16 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(int locationOfLmkItemAm
     lmkElement->GetScalarAttribute("MinZ",newBounds[4]);
     lmkElement->GetScalarAttribute("MaxZ",newBounds[5]);
 
-    if(macro)
-      {
-      macro->ViewMacro();
-      // The current source will be the reader unless a macro was selected in which case it would be the last filter in the pipeline
-      //inputSource = this->GetPVWindow()->GetCurrentPVSource();
-      }
-    else
-      {
-      it->InitTraversal();
-      while ( !it->IsDoneWithTraversal() )
-        {
-        pvs = static_cast<vtkPVSource*>( it->GetCurrentObject() );
-        pvs->SetVisibility(0);
-        it->GoToNextItem();
-        }
-      this->GetPVWindow()->GetCurrentPVReaderModule()->SetVisibility(1);
-      }
-
-    vtkPVSource *input = this->GetPVWindow()->GetCurrentPVSource();
-    vtkPVSource *clip = this->GetPVWindow()->CreatePVSource("Clip");
-    clip->SetLabel("BoundingBox");
-    vtkPVInputMenu::SafeDownCast(clip->GetPVWidget("Input"))->SetCurrentValue(input);
-    vtkPVSelectWidget *widgetType = vtkPVSelectWidget::SafeDownCast(clip->GetPVWidget("Clip Function"));
-    widgetType->SetCurrentValue("Box");
-    vtkPVBoxWidget *box = vtkPVBoxWidget::SafeDownCast(widgetType->GetPVWidget("Box"));
-    vtkPVLabeledToggle *insideOut = vtkPVLabeledToggle::SafeDownCast(clip->GetPVWidget("InsideOut"));
-    insideOut->SetSelectedState(1);
     box->PlaceWidget(newBounds[0],newBounds[1],newBounds[2],newBounds[3],newBounds[4],newBounds[5]);
-    clip->AcceptCallback();
+    box->Accept();
 
     newCenter[0]= newBounds[0] + (newBounds[1] - newBounds[0])/2;
     newCenter[1]= newBounds[2] + (newBounds[3] - newBounds[2])/2;
     newCenter[2]= newBounds[4] + (newBounds[5] - newBounds[4])/2;
 
 
-    box->SetVisibility(1);
-    input->SetVisibility(1);
+ //   box->SetVisibility(1);
+ //   input->SetVisibility(1);
  //   input->GetPVOutput()->SetOpacity(0.1);
 
     this->GetPVRenderView()->GetRenderer()->ResetCamera(newBounds);
@@ -1466,9 +1509,9 @@ void vtkPVLookmarkManager::ImportBoundingBoxFileInternal(int locationOfLmkItemAm
       }
 
     //lookmarkWidget->UpdateWidgetValues();
-    lookmarkWidget->SetBoundingBoxFlag(0);
+    lookmarkWidget->SetBoundingBoxFlag(1);
     //lookmarkWidget->SetBounds(newBounds);
-    lookmarkWidget->UpdateWidgetValues();
+    //lookmarkWidget->UpdateWidgetValues();
 
     // Visit lookmark so that box clip will be generated, then update our lookmark so that the thumbnail reflects view
     //lookmarkWidget->View();
@@ -2507,8 +2550,6 @@ vtkPVLookmark* vtkPVLookmarkManager::CreateLookmark(char *name, int macroFlag)
     }
 
 
-  this->GetTraceHelper()->AddEntry("$kw(%s) CreateLookmark \"%s\" %d",
-                      this->GetTclName(),name,macroFlag);
 
   if(macroFlag)
     {
@@ -2533,6 +2574,8 @@ vtkPVLookmark* vtkPVLookmarkManager::CreateLookmark(char *name, vtkKWWidget *par
   ostrstream s;
   ostrstream appversion;
 
+  this->GetTraceHelper()->AddEntry("$kw(%s) CreateLookmark \"%s\" %d",
+                      this->GetTclName(),name,macroFlag);
 
   this->Checkpoint();
 

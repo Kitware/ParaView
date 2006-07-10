@@ -51,6 +51,7 @@ class vtkPVTraceHelper;
 class vtkPVWindow;
 class vtkPVReaderModule;
 class vtkTransform;
+class vtkPVBoxWidget;
 
 //BTX
 template<class DataType> class vtkVector;
@@ -88,6 +89,8 @@ public:
   void ImportBoundingBoxFileCallback();
   void ImportLookmarkFile(const char *path, int appendFlag);
   void ImportBoundingBoxFile(vtkPVReaderModule *reader, vtkPVLookmark *macro, char *boundingBoxFileName);
+  // For tracing:
+  void ImportBoundingBoxFile(char *dataFilePath, char *macroName, char *boundingBoxFileName);
 
   // Description:
   // Create either a Lookmark or a Lookmark Macro.
@@ -239,7 +242,7 @@ protected:
   // Description:
   // Recursively visit each xml element of the lookmark file, creating, packing, and storing vtkPVLookmarks and vtkKWLookmarkFolders as appropriate
   void ImportLookmarkFileInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *recursiveXmlElement, vtkKWWidget *parentWidget);
-  void ImportBoundingBoxFileInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *recursiveXmlElement, vtkKWLookmarkFolder *parentWidget,vtkPVLookmark *macro);
+  void ImportBoundingBoxFileInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *recursiveXmlElement, vtkKWLookmarkFolder *parentWidget,vtkPVBoxWidget *box);
 
   // Description:
   // Recursively visit each xml element of the lookmark file, creatings entries in the "Add Macro Examples" menu

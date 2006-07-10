@@ -88,7 +88,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.71");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.72");
 
 
 //*****************************************************************************
@@ -1203,6 +1203,9 @@ char *vtkPVLookmark::GetEncodedImageData(vtkKWIcon *icon)
 //----------------------------------------------------------------------------
 void vtkPVLookmark::SetLookmarkIconCommand()
 {
+  this->Icon->RemoveBinding("<Button-1>");
+  this->Icon->RemoveBinding("<ButtonRelease-1>");
+
   if(this->MacroFlag)
     {
     this->Icon->AddBinding("<Button-1>", this, "PreViewMacro");
@@ -1213,7 +1216,6 @@ void vtkPVLookmark::SetLookmarkIconCommand()
     this->Icon->AddBinding("<Button-1>", this, "PreView");
 //    this->Icon->AddBinding("<Double-1>", this, "PreView");
     }
-
   this->Icon->AddBinding("<ButtonRelease-1>", this, "ReleaseEvent");
 }
 
