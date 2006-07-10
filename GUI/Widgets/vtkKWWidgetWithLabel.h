@@ -14,7 +14,11 @@
 // .NAME vtkKWWidgetWithLabel - an abstract class widget with a label
 // .SECTION Description
 // This class implements a superclass for composite widgets that need
-// to associate a label to a widget. 
+// to associate a label (vtkKWLabel) to a widget (say, a 
+// vtkKWEntry for example). This superclass provides a GetLabel() method
+// to retrieve the internal vtkKWLabel. Each subclass provides a GetWidget()
+// method that can be used to retrieve the internal widget associated to
+// to this label in the composite (say, a vtkKWEntry).
 //
 // Be aware that most subclasses of vtkKWWidgetWithLabel are 
 // generated automatically out of the vtkKWWidgetWithLabelSubclass template
