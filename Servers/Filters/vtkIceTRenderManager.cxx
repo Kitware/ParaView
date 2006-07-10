@@ -94,7 +94,7 @@ static void vtkIceTRenderManagerReconstructWindowImage(vtkObject *,
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.33");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.34");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, TileViewportTransform,
@@ -1068,7 +1068,7 @@ void vtkIceTRenderManager::RecordIceTImage(vtkIceTRenderer *icetRen)
       dest += (this->ReducedImageSize[0] - physicalViewport[2]);
       }
     }
-  else if (color_format == vtkgl::BGRA)
+  else if ((GLenum)color_format == vtkgl::BGRA)
     {
     this->ReducedImage->SetNumberOfComponents(4);
     this->ReducedImage->SetNumberOfTuples(  this->ReducedImageSize[0]
