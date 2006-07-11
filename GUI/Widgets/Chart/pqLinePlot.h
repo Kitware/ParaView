@@ -59,6 +59,10 @@ public:
   virtual void showChartTip(QHelpEvent& event) const;
   //@}
 
+  /// \brief
+  // Access to this plot's marker pen. Used by the chart's property window to get/set a plot's marker pen settings
+  pqMarkerPen* getMarkerPen();
+
 private:
   /// Private implementation details
   class pqImplementation;
