@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqViewMenu_h
 
 
-#include "pqWidgetsExport.h"
+#include "QtWidgetsExport.h"
 
 #include <QObject>
 #include <QIcon>
@@ -49,7 +49,7 @@ class QMenu;
 class QString;
 
 /// Manages a menu containing a collection of widgets that can be shown/hidden 
-class PQWIDGETS_EXPORT pqViewMenu : public QObject
+class QTWIDGETS_EXPORT pqViewMenu : public QObject
 {
   Q_OBJECT
 

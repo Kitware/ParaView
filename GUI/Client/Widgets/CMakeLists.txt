@@ -102,7 +102,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqToolTipTrapper.h
   pqUndoStack.h
   pqVCRController.h
-  pqViewMenu.h
   pqWidgetObjectPanel.h
 )
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
@@ -346,8 +345,6 @@ ADD_LIBRARY(pqWidgets
   pqVariableType.h
   pqVCRController.cxx
   pqVCRController.h
-  pqViewMenu.cxx
-  pqViewMenu.h
   pqWidgetObjectPanel.cxx
   pqWidgetObjectPanel.h
   pqWidgetsExport.h

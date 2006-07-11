@@ -58,6 +58,8 @@ SET(QtWidgets_SRCS
   pqSignalAdaptors.h
   pqTreeWidgetItemObject.cxx
   pqTreeWidgetItemObject.h
+  pqViewMenu.cxx
+  pqViewMenu.h
   pqWaitCursor.cxx
   pqWaitCursor.h
   QtWidgetsExport.h
@@ -82,6 +84,7 @@ QT4_WRAP_CPP(QtWidgets_MOC_SOURCES
   pqSectionVisibilityContextMenu.h
   pqSignalAdaptors.h
   pqTreeWidgetItemObject.h
+  pqViewMenu.h
 )
 
 ##########################################################################
