@@ -60,10 +60,12 @@ public:
   /// Sets/Gets the text to be displayed by the label
   void setText(const QString& text);
   QString getText(){return this->Text;};
-  /// Sets the label color
+  /// Sets/Gets the label color
   void setColor(const QColor& color);
-  /// Sets the label font
+  QColor getColor(){return this->Color;};
+  /// Sets/Gets the label font
   void setFont(const QFont& font);
+  QFont getFont(){return this->Font;};
   /// Sets the label orientation (the default is HORIZONTAL)
   void setOrientation(const OrientationT orientation);
 
