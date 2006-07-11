@@ -100,8 +100,16 @@ public:
   /// \brief
   ///   Gets the line chart object.
   /// \return
-  ///   A pointer to the line chart object.
+  ///   A pointer to the default line chart object.
   pqLineChart& getLineChart() {return *this->LineChart;}
+
+  /// \name Interface Methods
+  //@{
+  /// \brief
+  ///   Gets the second line chart object.
+  /// \return
+  ///   A pointer to the line chart used with the (optional) right-hand-side y-axis:
+  pqLineChart& getSecondLineChart() {return *this->SecondLineChart;}
 
   /// \brief
   ///   Returns the chart X-axis.
@@ -110,10 +118,16 @@ public:
   pqChartAxis& getXAxis() {return *this->XAxis;}
 
   /// \brief
-  ///   Returns the chart Y-axis.
+  ///   Returns the Y-axis located on the left side of the chart.
   /// \return
   ///   A pointer to the axis.
   pqChartAxis& getYAxis() {return *this->YAxis;}
+
+  /// \brief
+  ///   Returns the optional Y-axis located on the right side of the chart.
+  /// \return
+  ///   A pointer to the axis.
+  pqChartAxis& getRightYAxis() {return *this->RightYAxis;}
 
   /// \brief
   ///   Gets the zoom/pan handler for the widget.
@@ -262,6 +276,8 @@ private:
   pqLineChart* const LineChart;  ///< Used to draw the line chart.
   bool MouseDown;          ///< Used for mouse interactions.
   bool SkipContextMenu; ///< Used to prevent the context menu from appearing during interactive panning
+  pqChartAxis* const RightYAxis;      ///< Used to draw the y-axis on the right side of the chart (optional).
+  pqLineChart* const SecondLineChart;  ///< Used to draw the line chart associated with the right y-axis (optional).
 };
 
 #endif

@@ -85,8 +85,10 @@ pqLineChartWidget::pqLineChartWidget(QWidget *p) :
   Title(new pqChartLabel()),
   XAxis(new pqChartAxis(pqChartAxis::Bottom)),
   YAxis(new pqChartAxis(pqChartAxis::Left)),
+  RightYAxis(new pqChartAxis(pqChartAxis::Right)),
   Legend(new pqChartLegend()),
   LineChart(new pqLineChart()),
+  SecondLineChart(new pqLineChart()),
   MouseDown(false),
   SkipContextMenu(false)
 {
@@ -121,7 +123,7 @@ pqLineChartWidget::pqLineChartWidget(QWidget *p) :
 
   // Set up the line chart and the axes.
   QFont myFont = font();
-  this->XAxis->setNeigbors(this->YAxis, 0);
+  this->XAxis->setNeigbors(this->YAxis, this->RightYAxis);
   this->XAxis->setTickLabelFont(myFont);
   connect(this->XAxis, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
   connect(this->XAxis, SIGNAL(repaintNeeded()), this, SLOT(repaintChart()));
@@ -136,13 +138,28 @@ pqLineChartWidget::pqLineChartWidget(QWidget *p) :
       SLOT(updateLayout()));
   connect(this->LineChart, SIGNAL(repaintNeeded()), this,
       SLOT(repaintChart()));
+
+  this->RightYAxis->setNeigbors(this->XAxis, 0);
+  this->RightYAxis->setTickLabelFont(myFont);
+  connect(this->RightYAxis, SIGNAL(layoutNeeded()), this, SLOT(updateLayout()));
+  connect(this->RightYAxis, SIGNAL(repaintNeeded()), this, SLOT(repaintChart()));
+  // turn off axis by default
+  this->RightYAxis->setVisible(false);
+
+  this->SecondLineChart->setAxes(this->XAxis, this->RightYAxis);
+  connect(this->SecondLineChart, SIGNAL(layoutNeeded()), this,
+      SLOT(updateLayout()));
+  connect(this->SecondLineChart, SIGNAL(repaintNeeded()), this,
+      SLOT(repaintChart()));
 }
 
 pqLineChartWidget::~pqLineChartWidget()
 {
   delete this->LineChart;
+  delete this->SecondLineChart;
   delete this->Legend;
   delete this->YAxis;
+  delete this->RightYAxis;
   delete this->XAxis;
   delete this->Title;
   delete this->ZoomPan;
@@ -174,6 +191,10 @@ void pqLineChartWidget::setFont(const QFont &f)
   this->YAxis->blockSignals(true);
   this->YAxis->setTickLabelFont(f);
   this->YAxis->blockSignals(false);
+
+  this->RightYAxis->blockSignals(true);
+  this->RightYAxis->setTickLabelFont(f);
+  this->RightYAxis->blockSignals(false);
 
   this->layoutChart(this->ZoomPan->contentsWidth(),
       this->ZoomPan->contentsHeight());
@@ -215,7 +236,9 @@ void pqLineChartWidget::layoutChart(int w, int h)
   
   this->XAxis->layoutAxis(area);
   this->YAxis->layoutAxis(area);
+  this->RightYAxis->layoutAxis(area);
   this->LineChart->layoutChart();
+  this->SecondLineChart->layoutChart();
 }
 
 QSize pqLineChartWidget::sizeHint() const
@@ -555,13 +578,16 @@ void pqLineChartWidget::draw(QPainter& painter, QRect area)
 
   // Draw in the axes and grid.
   this->YAxis->drawAxis(&painter, area);
+  this->RightYAxis->drawAxis(&painter, area);
   this->XAxis->drawAxis(&painter, area);
 
   // Paint the chart.
   this->LineChart->drawChart(painter, area);
+  this->SecondLineChart->drawChart(painter, area);
 
   // Draw in the axis lines again to ensure they are on top.
   this->YAxis->drawAxisLine(&painter);
+  this->RightYAxis->drawAxisLine(&painter);
   this->XAxis->drawAxisLine(&painter);
 
   // Draw the chart title
