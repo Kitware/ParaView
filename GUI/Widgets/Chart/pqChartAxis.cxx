@@ -113,6 +113,7 @@ pqChartAxis::pqChartAxis(AxisLocation location, QObject *p)
   this->GridVisible = true;
   this->ExtraMaxPadding = false;
   this->ExtraMinPadding = false;
+  this->Notation = 0;
 }
 
 pqChartAxis::~pqChartAxis()
@@ -803,7 +804,7 @@ void pqChartAxis::drawAxis(QPainter *p, const QRect &area)
         }
       }
 
-    label = (*iter)->Value.getString(this->Precision);
+    label = (*iter)->Value.getString(this->Precision,this->Notation);
     if(vertical)
       {
       if(this->GridVisible)
@@ -957,15 +958,15 @@ void pqChartAxis::calculateMaxWidth()
     {
     pqChartValue value = this->ValueMax;
     value.convertTo(pqChartValue::FloatValue);
-    length1 = value.getString(this->Precision).length();
+    length1 = value.getString(this->Precision,this->Notation).length();
     value = this->ValueMin;
     value.convertTo(pqChartValue::FloatValue);
-    length2 = value.getString(this->Precision).length();
+    length2 = value.getString(this->Precision,this->Notation).length();
     }
   else
     {
-    length1 = this->ValueMax.getString(this->Precision).length();
-    length2 = this->ValueMin.getString(this->Precision).length();
+    length1 = this->ValueMax.getString(this->Precision,this->Notation).length();
+    length2 = this->ValueMin.getString(this->Precision,this->Notation).length();
     }
 
   if(length2 > length1)

@@ -540,6 +540,12 @@ public:
   ///   The new lighter color.
   static QColor lighter(const QColor color, float factor=0.7);
 
+  /// \brief
+  ///   Sets the axis number type.
+  /// \param scale The new axis scale type.
+  void setNotation(char notation) {this->Notation = notation;}
+  char getNotation() {return this->Notation;}
+
 signals:
   /// \brief
   ///   Called when the axis needs to be layed out again.
@@ -625,6 +631,7 @@ private:
   bool GridVisible;         ///< True if the axis grid should be drawn.
   bool ExtraMaxPadding;     ///< Used for best interval layout.
   bool ExtraMinPadding;     ///< Used for best interval layout.
+  char Notation;            ///< Stores the axis number type.
 
   static double MinLogValue; ///< Stores the log scale minimum.
 };

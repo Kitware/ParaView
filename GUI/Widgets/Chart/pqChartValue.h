@@ -166,9 +166,12 @@ public:
   /// it is shorter.
   ///
   /// \param precision The floating point precision.
+  /// \param notation The notation used to represent the value
+  ///     choices are 'e' for exponential, 'f' for floating point, and 'n' for engineering
   /// \return
   ///   A string representation of the value.
-  QString getString(int precision=2) const;
+  //QString getString(int precision=2) const;
+  QString getString(int precision=2, char notation=0) const;
 
   /// \name Operators
   //@{

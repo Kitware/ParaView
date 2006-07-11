@@ -189,7 +189,7 @@ double pqChartValue::getDoubleValue() const
     return this->Value.Double;
 }
 
-QString pqChartValue::getString(int precision) const
+QString pqChartValue::getString(int precision, char notation) const
 {
   QString result;
   int exponent = 0;
@@ -210,11 +210,61 @@ QString pqChartValue::getString(int precision) const
       result2.setNum(this->Value.Double, 'e', precision);
       exponent = result2.mid(result2.lastIndexOf("e")+1,result2.length()-1).toInt();
       }
-    // FIX: always use scientific notation for negative exponents less than a certain threshold (for now 2)
-    if(exponent<-2 || result2.length() < result.length())
-      result = result2;
-    }
 
+// FIX: always use scientific notation for negative exponents less than a certain threshold (for now 2)
+//    if(exponent<-2 || result2.length() < result.length())
+//      result = result2;
+
+    // extract the exponent from the exponential result
+    int exponent = result2.mid(result2.indexOf('e')+1,result2.length()-1).toInt();
+
+    // check for engineering notation flag
+    if(notation=='n')
+      {
+      int offset = exponent%3;
+      if(offset<0)
+        offset+=3;
+      // if using engineering notation we may be moving decimal to right
+      // get a new string representation with increased precision
+      if(this->Type == FloatValue)
+        result2.setNum(this->Value.Float, 'e', precision+offset);
+      else
+        result2.setNum(this->Value.Double, 'e', precision+offset);
+
+      if(offset!=0)
+        {
+        // string is not already in engineering notation so...
+        // decrease the exponent
+        exponent -= offset;
+        int eIdx = result2.indexOf('e');
+        QString exponentString;
+        exponentString.setNum(exponent);
+        // add a plus sign to exponent if need be
+        if(exponent>0)
+          exponentString.insert(0,'+');
+        result2.replace(eIdx+1,result2.mid(eIdx+1,result2.length()-1).length(),exponentString);
+        // move the decimal point to the right
+        // (there's guaranteed to be one since offset is non-zero even if precison==0)
+        int idx = result2.indexOf('.');
+        result2.remove(idx,1);
+        // only insert if we have a non-zero precision
+        if(precision>0)
+          result2.insert(idx+offset,'.');
+        }
+      result = result2;
+      }
+    else if(notation=='e')
+      {
+      // exponential notation flag is on
+      result = result2;
+      }
+    else if(notation!='f' && (exponent<-2 || result2.length() < result.length()))
+      {
+      // always use exponential notation for negative exponents less than a certain threshold (for now 2)
+      result = result2;
+      }
+    // else use floating point value (i.e. result)
+    }
   return result;
 }
 
