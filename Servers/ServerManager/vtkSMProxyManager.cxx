@@ -84,15 +84,13 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.46");
-vtkCxxSetObjectMacro(vtkSMProxyManager, UndoStack, vtkSMUndoStack);
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.47");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
   this->Internals = new vtkSMProxyManagerInternals;
   this->Observer = vtkSMProxyManagerObserver::New();
   this->Observer->SetTarget(this);
-  this->UndoStack = 0;
 #if 0 // for debugging
   vtkSMProxyRegObserver* obs = new vtkSMProxyRegObserver;
   this->AddObserver(vtkCommand::RegisterEvent, obs);
@@ -108,7 +106,6 @@ vtkSMProxyManager::~vtkSMProxyManager()
 
   this->Observer->SetTarget(0);
   this->Observer->Delete();
-  this->SetUndoStack(0);
 }
 
 //----------------------------------------------------------------------------
@@ -1066,8 +1063,29 @@ void vtkSMProxyManager::SaveRegisteredLinks(vtkPVXMLElement* rootElement)
 }
 
 //---------------------------------------------------------------------------
+vtkPVXMLElement* vtkSMProxyManager::GetHints(const char* xmlgroup, 
+  const char* xmlname)
+{
+  vtkPVXMLElement* element = this->GetProxyElement(xmlgroup, xmlname);
+  if (!element)
+    {
+    return NULL;
+    }
+  unsigned int max = element->GetNumberOfNestedElements();
+  for (unsigned int cc=0; cc < max; cc++)
+    {
+    vtkPVXMLElement* curElement = element->GetNestedElement(cc);
+    if (curElement && curElement->GetName() 
+      && strcmp(curElement->GetName(), "Hints")==0)
+      {
+      return curElement;
+      }
+    }
+  return NULL;
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxyManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "UndoStack: " << this->UndoStack << endl;
 }

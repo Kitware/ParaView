@@ -40,7 +40,6 @@ class vtkSMProperty;
 class vtkSMProxy;
 class vtkSMProxyManagerObserver;
 class vtkSMStateLoader;
-class vtkSMUndoStack;
 //BTX
 struct vtkSMProxyManagerInternals;
 //ETX
@@ -247,15 +246,18 @@ public:
 //ETX
 
   // Description:
-  // Get/Set the Server Manager Undo stack. No undo stack is created by default.
-  // The GUI must set this, if it supports Undo/Redo.
-  void SetUndoStack(vtkSMUndoStack*);
-  vtkGetObjectMacro(UndoStack, vtkSMUndoStack);
-
-  // Description:
   // Get if there are any registered proxies that have their properties in
   // a modified state.
   int AreProxiesModified();
+
+  // Description:
+  // The server manager configuration XML may define <Hints /> element for a 
+  // proxy. Hints are metadata associated with the proxy. The Server Manager
+  // does not (and should not) interpret the hints. Hints provide a mechanism
+  // to add GUI pertinant information to the server manager XML.
+  // Returns the XML element for the hints associated with this proxy,
+  // if any, otherwise returns NULL. 
+  vtkPVXMLElement* GetHints(const char* xmlgroup, const char* xmlname);
 protected:
   vtkSMProxyManager();
   ~vtkSMProxyManager();
@@ -297,7 +299,6 @@ protected:
   // Save/Load registered link states.
   void SaveRegisteredLinks(vtkPVXMLElement* root);
 
-  vtkSMUndoStack* UndoStack;
 private:
   vtkSMProxyManagerInternals* Internals;
   vtkSMProxyManagerObserver* Observer;

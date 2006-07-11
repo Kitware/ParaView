@@ -35,7 +35,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.73");
+vtkCxxRevisionMacro(vtkSMProxy, "1.74");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -1782,6 +1782,13 @@ void vtkSMProxy::ExposeSubProxyProperty(const char* subproxy_name,
   info.SubProxyName = subproxy_name;
   info.PropertyName = property_name;
   this->Internals->ExposedProperties[exposed_name] = info;
+}
+
+//---------------------------------------------------------------------------
+vtkPVXMLElement* vtkSMProxy::GetHints()
+{
+  return vtkSMProxyManager::GetProxyManager()->GetHints(
+    this->XMLGroup, this->XMLName);
 }
 
 //---------------------------------------------------------------------------
