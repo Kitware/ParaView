@@ -1,16 +1,16 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/MenuBar/ServerMenu" command="activate" arguments="Connect" />
+  <pqevent object="MainWindow/menubar/menuServer" command="activate" arguments="actionServerConnect" />
   <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
-  <pqevent object="MainWindow/MenuBar/SourcesMenu" command="activate" arguments="Sphere" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/MenuBar/FiltersMenu/&amp;Favorites" command="activate" arguments="Cut" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqImplicitPlaneWidget/useZNormal" command="activate" arguments="" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/PipelineInspectorDock/PipelineList/PipelineView/qt_scrollarea_viewport" command="contextMenu" arguments="" />
+  <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="Sphere" />
+  <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/menubar/menuFilters/&amp;Favorites" command="activate" arguments="Cut" />
+  <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqImplicitPlaneWidget/useZNormal" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView/qt_scrollarea_viewport" command="contextMenu" arguments="" />
   <pqevent object="PipelineObjectMenu" command="activate" arguments="Display Settings" />
   <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/groupBox_2/StyleRepresentation" command="set_string" arguments="Wireframe" />
   <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/DismissButton" command="activate" arguments="" />
-  <pqevent object="MainWindow/PipelineInspectorDock/PipelineList/PipelineView" command="currentChanged" arguments="/0/0|0" />
+  <pqevent object="MainWindow/pipelineBrowserDock/pipelineBrowser/PipelineView" command="currentChanged" arguments="/0/0|0" />
 </pqevents>

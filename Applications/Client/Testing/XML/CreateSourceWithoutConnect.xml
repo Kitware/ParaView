@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/MenuBar/SourcesMenu" command="activate" arguments="Sphere" />
+  <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="Sphere" />
   <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
 </pqevents>

@@ -112,8 +112,12 @@ void pqUndoStack::onStackChanged(vtkObject*, unsigned long, void*,
     canRedo = true;
     redoLabel = this->Implementation->UndoStack->GetRedoSetLabel(0);
     }
+    
   emit this->StackChanged(canUndo, undoLabel, canRedo, redoLabel);
-
+  emit this->CanUndoChanged(canUndo);
+  emit this->CanRedoChanged(canRedo);
+  emit this->UndoLabelChanged(undoLabel);
+  emit this->RedoLabelChanged(redoLabel);
 }
 
 //-----------------------------------------------------------------------------

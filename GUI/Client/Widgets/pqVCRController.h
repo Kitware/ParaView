@@ -41,15 +41,15 @@ class PQWIDGETS_EXPORT pqVCRController : public QObject
 {
   Q_OBJECT
 public:
-  pqVCRController(QObject* parent);
+  pqVCRController(QObject* parent = 0);
   virtual ~pqVCRController();
 
 public slots:
   // Connect these signals to appropriate VCR buttons.
-  void onForward();
-  void onBack();
-  void onFirst();
-  void onLast();
+  void onFirstFrame();
+  void onPreviousFrame();
+  void onNextFrame();
+  void onLastFrame();
  
 private:
   // internal method.

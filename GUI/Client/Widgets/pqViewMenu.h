@@ -38,108 +38,61 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "pqWidgetsExport.h"
-#include <QObject>
 
-class pqViewMenuInternal;
+#include <QObject>
+#include <QIcon>
+
 class QAction;
-class QDockWidget;
 class QEvent;
 class QIcon;
 class QMenu;
-class QMenuBar;
 class QString;
-class QToolBar;
 
-
-/// \class pqViewMenu
-/// \brief
-///   The pqViewMenu class encapsulates the functionality in the view
-///   menu.
+/// Manages a menu containing a collection of widgets that can be shown/hidden 
 class PQWIDGETS_EXPORT pqViewMenu : public QObject
 {
   Q_OBJECT
 
 public:
-  pqViewMenu(QObject *parent=0);
-  virtual ~pqViewMenu();
+  pqViewMenu(QMenu& menu);
+  ~pqViewMenu();
 
   /// \brief
   ///   Used to watch for show and hide events.
   ///
-  /// The show and hide events for dock window and toolbars are used
+  /// The show and hide events for widgets are used
   /// to update the action associated with them in the view menu.
   ///
-  /// \param watched The dock window or toolbar receiving the event.
+  /// \param watched The widget receiving the event.
   /// \param e The event that is about to be sent.
   /// \return
   ///   True if the event should be filtered out.
   virtual bool eventFilter(QObject* watched, QEvent* e);
 
   /// \brief
-  ///   Creates a new view menu with all the actions.
-  /// \param menubar The menu bar to add the menu to.
-  /// \sa pqViewMenu::addActionsToMenu(QMenu *)
-  void addActionsToMenuBar(QMenuBar *menubar) const;
-
-  /// \brief
-  ///   Adds all the actions to the given menu.
+  ///   Adds a menu item for the widget to the view menu.
   ///
-  /// This method should only be called once by the application. The
-  /// menu pointer is saved in order to add new dock window and toolbar
-  /// visibility actions.
-  ///
-  /// \param menu The menu to add the actions to.
-  void addActionsToMenu(QMenu *menu) const;
-
-  /// \brief
-  ///   Gets the menu action associated with the dock window.
-  /// \param dock The dock window to look up.
-  /// \return
-  ///   A pointer to the action associated with the dock window.
-  QAction *getMenuAction(QDockWidget *dock) const;
-
-  /// \brief
-  ///   Gets the menu action associated with the toolbar.
-  /// \param tool The toolbar to look up.
-  /// \return
-  ///   A pointer to the action associated with the toolbar.
-  QAction *getMenuAction(QToolBar *tool) const;
-
-  /// \brief
-  ///   Adds a menu item for the dock window to the view menu.
-  ///
-  /// Pass in a null icon if there is no icon for the dock window. The
+  /// Pass in a null icon if there is no icon for the widget. The
   /// text can be the window title for the dock window. The text can
   /// also include a menu shortcut key.
   ///
-  /// \param dock The dock window to add.
+  /// \param widget The widget to add.
   /// \param icon An icon to display in the menu.
   /// \param text The text to display in the menu.
-  void addDockWindow(QDockWidget *dock, const QIcon &icon,
-      const QString &text);
+  void addWidget(QWidget* widget, const QString& text,
+    const QIcon &icon = QIcon());
+
+  /// Add a separator to the view menu
+  void addSeparator();
 
   /// \brief
-  ///   Removes the dock window from the view menu.
-  /// \param dock The dock window to remove.
-  void removeDockWindow(QDockWidget *dock);
-
-  /// \brief
-  ///   Adds a menu item for the toolbar to the view menu.
-  ///
-  /// The text can be the window title for the toolbar. The text can
-  /// also include a menu shortcut key.
-  ///
-  /// \param tool The toolbar to add.
-  /// \param text The text to display in the menu.
-  void addToolBar(QToolBar *tool, const QString &text);
-
-  /// \brief
-  ///   Removes the toolbar from the view menu.
-  /// \param tool The toolbar to remove.
-  void removeToolBar(QToolBar *tool);
+  ///   Removes the widget from the view menu.
+  /// \param widget The widget to remove.
+  void removeWidget(QWidget* widget);
 
 private:
-  pqViewMenuInternal *Internal; ///< Stores the dock windows and tool bars.
+  class pqImplementation;
+  pqImplementation* const Implementation;
 };
 
 #endif

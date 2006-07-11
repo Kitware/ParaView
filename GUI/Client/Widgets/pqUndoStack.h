@@ -83,6 +83,12 @@ signals:
   /// Has information to know the status of the top of the stack.
   void StackChanged(bool canUndo, QString undoLabel, 
     bool canRedo, QString redoLabel);
+    
+  void CanUndoChanged(bool);
+  void CanRedoChanged(bool);
+  void UndoLabelChanged(const QString&);
+  void RedoLabelChanged(const QString&);
+  
   // Fired after undo.
   void Undone();
   // Fired after redo.

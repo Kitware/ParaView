@@ -1,9 +1,9 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/MenuBar/ServerMenu" command="activate" arguments="Connect" />
+  <pqevent object="MainWindow/menubar/menuServer" command="activate" arguments="actionServerConnect" />
   <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
-  <pqevent object="MainWindow/MenuBar/SourcesMenu" command="activate" arguments="Sphere" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/MenuBar/FiltersMenu/&amp;Favorites" command="activate" arguments="Clip" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="Sphere" />
+  <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/menubar/menuFilters/&amp;Favorites" command="activate" arguments="Clip" />
+  <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
 </pqevents>

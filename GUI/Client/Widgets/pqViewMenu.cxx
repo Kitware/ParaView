@@ -44,64 +44,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenuBar>
 #include <QString>
 #include <QToolBar>
+#include <QtDebug>
 
 
-class pqViewMenuInternal
+class pqViewMenu::pqImplementation
 {
 public:
-  pqViewMenuInternal();
-  ~pqViewMenuInternal() {}
+  pqImplementation(QMenu& menu) :
+    Menu(menu)
+  {
+  }
+  
+  ~pqImplementation()
+  {
+  }
 
-  QMap<QDockWidget *, QAction *> DockMap;
-  QMap<QToolBar *, QAction *> ToolMap;
-  QMenu *ViewMenu;
-  QMenu *ToolbarMenu;
-  QAction *DockSeparator;
+  QMenu& Menu;
+  typedef QMap<QWidget*, QAction*> ActionMapT;
+  ActionMapT ActionMap;
 };
 
-
 //-----------------------------------------------------------------------------
-pqViewMenuInternal::pqViewMenuInternal()
-  : DockMap(), ToolMap()
+pqViewMenu::pqViewMenu(QMenu& menu) :
+  Implementation(new pqImplementation(menu))
 {
-  this->ViewMenu = 0;
-  this->ToolbarMenu = 0;
-  this->DockSeparator = 0;
-}
-
-
-//-----------------------------------------------------------------------------
-pqViewMenu::pqViewMenu(QObject *parent)
-{
-  this->Internal = new pqViewMenuInternal();
 }
 
 pqViewMenu::~pqViewMenu()
 {
-  // The actions will get cleaned up by Qt.
-  delete this->Internal;
+  delete this->Implementation;
 }
 
 bool pqViewMenu::eventFilter(QObject* watched, QEvent* e)
 {
   if(e->type() == QEvent::Hide || e->type() == QEvent::Show)
     {
-    QDockWidget *dock = qobject_cast<QDockWidget *>(watched);
-    QToolBar *tool = qobject_cast<QToolBar *>(watched);
-    if(dock)
+    if(QWidget* const widget = qobject_cast<QWidget*>(watched))
       {
-      QMap<QDockWidget *, QAction *>::Iterator iter =
-          this->Internal->DockMap.find(dock);
-      if(iter != this->Internal->DockMap.end())
-        {
-        (*iter)->setChecked(e->type() == QEvent::Show);
-        }
-      }
-    else if(tool)
-      {
-      QMap<QToolBar *, QAction *>::Iterator iter =
-          this->Internal->ToolMap.find(tool);
-      if(iter != this->Internal->ToolMap.end())
+      pqImplementation::ActionMapT::Iterator iter =
+          this->Implementation->ActionMap.find(widget);
+      if(iter != this->Implementation->ActionMap.end())
         {
         (*iter)->setChecked(e->type() == QEvent::Show);
         }
@@ -111,256 +93,56 @@ bool pqViewMenu::eventFilter(QObject* watched, QEvent* e)
   return QObject::eventFilter(watched, e);
 }
 
-void pqViewMenu::addActionsToMenuBar(QMenuBar *menubar) const
+void pqViewMenu::addWidget(QWidget* widget, const QString& text,
+  const QIcon& icon)
 {
-  if(menubar)
+  if(this->Implementation->ActionMap.contains(widget))
     {
-    QMenu *menu = menubar->addMenu(tr("&View"));
-    menu->setObjectName("ViewMenu");
-    this->addActionsToMenu(menu);
-    }
-}
-
-void pqViewMenu::addActionsToMenu(QMenu *menu) const
-{
-  if(!menu)
-    {
+    qCritical() << "can't add widget twice";
     return;
     }
 
-  // Save the menu for dock window and toolbar additions.
-  this->Internal->ViewMenu = menu;
-
-  // Set up the view menu.
-  this->Internal->ToolbarMenu = new QMenu("&Toolbars",
-      this->Internal->ViewMenu);
-  this->Internal->ViewMenu->addMenu(this->Internal->ToolbarMenu);
-  this->Internal->ToolbarMenu->setEnabled(this->Internal->ToolMap.size() > 0);
-
-  // Add any dock window and toolbar actions available.
-  if(this->Internal->DockMap.size() > 0)
+  if(!widget)
     {
-    this->Internal->DockSeparator = this->Internal->ViewMenu->addSeparator();
-    }
-
-  QMap<QDockWidget *, QAction *>::Iterator iter =
-      this->Internal->DockMap.begin();
-  for( ; iter != this->Internal->DockMap.end(); ++iter)
-    {
-    this->Internal->ViewMenu->addAction(*iter);
-    }
-
-  // Add the toolbar actions in alphabetical order.
-  QString name;
-  QString listName;
-  QList<QAction *> actions;
-  QMap<QToolBar *, QAction *>::Iterator jter =
-      this->Internal->ToolMap.begin();
-  QList<QAction *>::Iterator kter;
-  for( ; jter != this->Internal->ToolMap.end(); ++jter)
-    {
-    name = (*jter)->text();
-    name.remove("&");
-    for(kter = actions.begin(); kter != actions.end(); ++kter)
-      {
-      listName = (*kter)->text();
-      listName.remove("&");
-      if(QString::compare(name, listName) < 0)
-        {
-        actions.insert(kter, *jter);
-        break;
-        }
-      }
-
-    if(kter == actions.end())
-      {
-      actions.append(*jter);
-      }
-    }
-
-  for(kter = actions.begin(); kter != actions.end(); ++kter)
-    {
-    this->Internal->ToolbarMenu->addAction(*kter);
-    }
-}
-
-QAction *pqViewMenu::getMenuAction(QDockWidget *dock) const
-{
-  QMap<QDockWidget *, QAction *>::Iterator iter =
-      this->Internal->DockMap.find(dock);
-  if(iter != this->Internal->DockMap.end())
-    {
-    return *iter;
-    }
-
-  return 0;
-}
-
-QAction *pqViewMenu::getMenuAction(QToolBar *tool) const
-{
-  QMap<QToolBar *, QAction *>::Iterator iter =
-      this->Internal->ToolMap.find(tool);
-  if(iter != this->Internal->ToolMap.end())
-    {
-    return *iter;
-    }
-
-  return 0;
-}
-
-void pqViewMenu::addDockWindow(QDockWidget *dock, const QIcon &icon,
-    const QString &text)
-{
-  // Make sure the dock window isn't added already.
-  QMap<QDockWidget *, QAction *>::Iterator iter =
-      this->Internal->DockMap.find(dock);
-  if(iter != this->Internal->DockMap.end())
-    {
+    qCritical() << "null widget";
     return;
     }
-
-  // Add the dock window to the map.
-  QAction *action = new QAction(text, this);
+    
+  QAction* const action = new QAction(text, this);
   action->setCheckable(true);
-  action->setChecked(dock->isVisible());
-  this->connect(action, SIGNAL(triggered(bool)), dock, SLOT(setVisible(bool)));
+  action->setChecked(widget->isVisible());
   if(!icon.isNull())
     {
     action->setIcon(icon);
     }
+  this->connect(
+    action, SIGNAL(triggered(bool)), widget, SLOT(setVisible(bool)));
 
-  this->Internal->DockMap.insert(dock, action);
-  dock->installEventFilter(this);
+  this->Implementation->ActionMap.insert(widget, action);
+  widget->installEventFilter(this);
 
-  // Add the dock window action to the menu. Add the separator if
-  // this is the first action.
-  if(this->Internal->ViewMenu)
-    {
-    // TODO: If more items are added to the view menu, the insert
-    // position needs to be determined.
-    if(this->Internal->DockMap.size() == 1)
-      {
-      this->Internal->DockSeparator = this->Internal->ViewMenu->addSeparator();
-      }
-
-    this->Internal->ViewMenu->addAction(action);
-    }
+  this->Implementation->Menu.addAction(action);
 }
 
-void pqViewMenu::removeDockWindow(QDockWidget *dock)
+void pqViewMenu::addSeparator()
 {
-  // Find the dock window and remove it from the map.
-  QMap<QDockWidget *, QAction *>::Iterator iter =
-      this->Internal->DockMap.find(dock);
-  if(iter == this->Internal->DockMap.end())
+  this->Implementation->Menu.addSeparator();
+}
+
+void pqViewMenu::removeWidget(QWidget* widget)
+{
+  if(!this->Implementation->ActionMap.contains(widget))
     {
     return;
     }
 
-  dock->removeEventFilter(this);
-  QAction *action = *iter;
-  this->Internal->DockMap.erase(iter);
-  if(this->Internal->ViewMenu)
-    {
-    // Remove the action from the menu.
-    this->Internal->ViewMenu->removeAction(action);
+  widget->removeEventFilter(this);
 
-    // If this was the last dock window action, remove the separator.
-    if(this->Internal->DockMap.size() == 0)
-      {
-      this->Internal->ViewMenu->removeAction(this->Internal->DockSeparator);
-      delete this->Internal->DockSeparator;
-      this->Internal->DockSeparator = 0;
-      }
-    }
+  QAction *action = this->Implementation->ActionMap[widget];
 
-  // Clean up the action.
+  this->Implementation->ActionMap.erase(
+    this->Implementation->ActionMap.find(widget));
+  this->Implementation->Menu.removeAction(action);
+
   delete action;
 }
-
-void pqViewMenu::addToolBar(QToolBar *tool, const QString &text)
-{
-  // Make sure the toolbar isn't added already.
-  QMap<QToolBar *, QAction *>::Iterator iter =
-      this->Internal->ToolMap.find(tool);
-  if(iter != this->Internal->ToolMap.end())
-    {
-    return;
-    }
-
-  // Add the toolbar to the map.
-  QAction *action = new QAction(text, this);
-  action->setCheckable(true);
-  action->setChecked(tool->isVisible());
-  this->connect(action, SIGNAL(triggered(bool)), tool, SLOT(setVisible(bool)));
-  this->Internal->ToolMap.insert(tool, action);
-  tool->installEventFilter(this);
-
-  // Add the toolbar action to the menu. Enable the toolbar menu if
-  // this is the first toolbar added.
-  if(this->Internal->ToolbarMenu)
-    {
-    // Add the toolbar actions in alphabetical order.
-    QString name;
-    QString actionName = text;
-    actionName.remove("&");
-    QAction *before = 0;
-    QList<QAction *> actions = this->Internal->ToolbarMenu->actions();
-    QList<QAction *>::Iterator jter = actions.begin();
-    for( ; jter != actions.end(); ++jter)
-      {
-      name = (*jter)->text();
-      name.remove("&");
-      if(QString::compare(actionName, name) < 0)
-        {
-        before = *jter;
-        break;
-        }
-      }
-
-    if(before)
-      {
-      this->Internal->ToolbarMenu->insertAction(before, action);
-      }
-    else
-      {
-      this->Internal->ToolbarMenu->addAction(action);
-      }
-
-    if(this->Internal->ToolMap.size() == 1)
-      {
-      this->Internal->ToolbarMenu->setEnabled(true);
-      }
-    }
-}
-
-void pqViewMenu::removeToolBar(QToolBar *tool)
-{
-  // Find the tool bar and remove it from the map.
-  QMap<QToolBar *, QAction *>::Iterator iter =
-      this->Internal->ToolMap.find(tool);
-  if(iter == this->Internal->ToolMap.end())
-    {
-    return;
-    }
-
-  tool->removeEventFilter(this);
-  QAction *action = *iter;
-  this->Internal->ToolMap.erase(iter);
-  if(this->Internal->ToolbarMenu)
-    {
-    // Remove the action from the menu.
-    this->Internal->ToolbarMenu->removeAction(action);
-
-    // If this was the last toolbar, disable the toolbar menu.
-    if(this->Internal->ToolMap.size() == 0)
-      {
-      this->Internal->ToolbarMenu->setEnabled(false);
-      }
-    }
-
-  // Clean up the action.
-  delete action;
-}
-
-

@@ -495,7 +495,6 @@ pqPipelineModel::pqPipelineModel(QObject *p)
   this->Internal = new pqPipelineModelInternal();
 
   // Initialize the pixmap list.
-  Q_INIT_RESOURCE(pqWidgets);
   this->PixmapList = new QPixmap[pqPipelineModelInternal::Total];
   if(this->PixmapList)
     {

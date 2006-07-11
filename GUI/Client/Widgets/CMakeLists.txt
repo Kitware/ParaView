@@ -53,7 +53,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqImplicitPlaneWidget.h
   pqLineWidget.h
   pqLoadedFormObjectPanel.h
-  pqMainWindow.h
+  pqMainWindowCore.h
   pqMultiView.h
   pqMultiViewFrame.h
   pqNamedObjectPanel.h
@@ -99,7 +99,6 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSourceInfoModel.h
   pqStreamTracerPanel.h
   pqThresholdPanel.h
-  pqToolsMenu.h
   pqToolTipTrapper.h
   pqUndoStack.h
   pqVCRController.h
@@ -136,7 +135,7 @@ QT4_WRAP_UI(UI_BUILT_SOURCES
 )
 
 SET(UI_RESOURCES
-  pqWidgets.qrc
+  pqResources.qrc
 )
 
 QT4_ADD_RESOURCES(RCS_SOURCES
@@ -218,8 +217,8 @@ ADD_LIBRARY(pqWidgets
   pqLoadedFormObjectPanel.h
   pqMain.cxx
   pqMain.h
-  pqMainWindow.cxx
-  pqMainWindow.h
+  pqMainWindowCore.cxx
+  pqMainWindowCore.h
   pqMultiView.cxx
   pqMultiView.h
   pqMultiViewFrame.cxx
@@ -338,8 +337,6 @@ ADD_LIBRARY(pqWidgets
   pqTestUtility.h
   pqThresholdPanel.cxx
   pqThresholdPanel.h
-  pqToolsMenu.cxx
-  pqToolsMenu.h
   pqToolTipTrapper.cxx
   pqToolTipTrapper.h
   pqUndoRedoStateLoader.cxx

@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
 <pqevents>
-  <pqevent object="MainWindow/MenuBar/ServerMenu" command="activate" arguments="Connect" />
+  <pqevent object="MainWindow/menubar/menuServer" command="activate" arguments="actionServerConnect" />
   <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
-  <pqevent object="MainWindow/MenuBar/SourcesMenu" command="activate" arguments="Cone" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/MenuBar/FiltersMenu/Subset" command="activate" arguments="Clip" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqImplicitPlaneWidget/useXNormal" command="activate" arguments="" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqImplicitPlaneWidget/useYNormal" command="activate" arguments="" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/ObjectInspectorDock/ObjectInspectorWidget/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqImplicitPlaneWidget/show3DWidget" command="set_boolean" arguments="false" />
+  <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="Cone" />
+  <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/menubar/menuFilters/Subset" command="activate" arguments="Clip" />
+  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqImplicitPlaneWidget/useXNormal" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqImplicitPlaneWidget/useYNormal" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqImplicitPlaneWidget/show3DWidget" command="set_boolean" arguments="false" />
 </pqevents>

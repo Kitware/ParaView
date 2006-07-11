@@ -65,7 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   : QWidget(p)
 {
-  this->setObjectName("ObjectInspectorWidget");
+  this->setObjectName("objectInspector");
 
   this->ForceModified = false;
   this->CurrentPanel = 0;

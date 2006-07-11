@@ -53,26 +53,27 @@ pqVCRController::pqVCRController(QObject* _parent/*=null*/) : QObject(_parent)
 pqVCRController::~pqVCRController()
 {
 }
-//-----------------------------------------------------------------------------
-void pqVCRController::onForward()
-{
-  this->updateSource(false, false, 1);
-}
 
 //-----------------------------------------------------------------------------
-void pqVCRController::onBack()
-{
-  this->updateSource(false, false, -1);
-}
-
-//-----------------------------------------------------------------------------
-void pqVCRController::onFirst()
+void pqVCRController::onFirstFrame()
 {
   this->updateSource(true, false, 0);
 }
 
 //-----------------------------------------------------------------------------
-void pqVCRController::onLast()
+void pqVCRController::onPreviousFrame()
+{
+  this->updateSource(false, false, -1);
+}
+
+//-----------------------------------------------------------------------------
+void pqVCRController::onNextFrame()
+{
+  this->updateSource(false, false, 1);
+}
+
+//-----------------------------------------------------------------------------
+void pqVCRController::onLastFrame()
 {
   this->updateSource(false, true, 0);
 }

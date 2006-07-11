@@ -33,27 +33,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MainWindow_h
 #define _MainWindow_h
 
-#include <pqMainWindow.h>
-class QAssistantClient;
+#include <QMainWindow.h>
+#include <vtkIOStream.h>
 
 /// Provides the main window for the ParaView application
 class MainWindow :
-  public pqMainWindow
+  public QMainWindow
 {
   Q_OBJECT
 
 public:
   MainWindow();
+  ~MainWindow();
+
+  bool compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory);
   
 private slots:
-  // show about box.
-  void showHelpAbout();
-  void showHelp();
-  
-  void helpClosed();
+  void onUndoLabel(const QString&);
+  void onRedoLabel(const QString&);
+
+  void onCameraUndoLabel(const QString&);
+  void onCameraRedoLabel(const QString&);
+
+  void onPreAccept();
+  void onPostAccept();
+
+  void onHelpAbout();
+  void onHelpHelp();
 
 private:
-  QAssistantClient* HelpClient;
+  class pqImplementation;
+  pqImplementation* const Implementation;
 };
 
 #endif // !_MainWindow_h
