@@ -339,6 +339,15 @@ public:
   // Returns the documentation for this proxy.
   vtkGetObjectMacro(Documentation, vtkSMDocumentation);
 
+  // Description:
+  // The server manager configuration XML may define <Hints /> element for a 
+  // proxy. Hints are metadata associated with the proxy. The Server Manager
+  // does not (and should not) interpret the hints. Hints provide a mechanism
+  // to add GUI pertinant information to the server manager XML.
+  // Returns the XML element for the hints associated with this proxy,
+  // if any, otherwise returns NULL. This method is a convenience method,
+  // one can use the vtkSMProxyManager::GetHints() as well. 
+  vtkPVXMLElement* GetHints();
 protected:
   vtkSMProxy();
   ~vtkSMProxy();

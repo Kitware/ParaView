@@ -127,6 +127,19 @@
          </RequiredProperties>
         </BoundsDomain>
       </DoubleVectorProperty>
+
+      <Hints>
+        <!-- Hints are metadata associated with the proxy.
+             As far as the ServerManager is concerned, Hints have no 
+             significance. GUI is free to interpret the hints as
+             it chooses. Hints provide a mechanism to add some GUI
+             pertinant information to the server manager XML.
+        -->
+        <Widget group="displays" name="ImplicitPlaneWidgetDisplay">
+          <Property name="Origin" controls="Origin" />
+          <Property name="Normal" controls="Normal" />
+        </Widget>
+      </Hints>
     </ImplicitPlaneProxy>
 
     <Proxy name="Planes" class="vtkPlanes">
@@ -1831,6 +1844,5 @@
       <Property name="BuildLocator" command="BuildLocator"/>
     </Proxy>
   </ProxyGroup>
-
 
 </ServerManagerConfiguration>
