@@ -35,13 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSMProxy.h"
 
-#include <QWidget>
+#include "pq3DWidget.h"
 
 class vtkSMDoubleVectorProperty;
 
 /// Provides a complete Qt UI for working with a 3D plane widget
-class pqImplicitPlaneWidget :
-  public QWidget
+class pqImplicitPlaneWidget : public pq3DWidget
 {
   Q_OBJECT
   
@@ -49,26 +48,17 @@ public:
   pqImplicitPlaneWidget(QWidget* p);
   ~pqImplicitPlaneWidget();
 
-  /// Sets the proxies/properties that will be controlled by the widget
-  void setDataSources(
-    pqSMProxy reference_proxy,
-    pqSMProxy controlled_proxy,
-    vtkSMDoubleVectorProperty* origin_property,
-    vtkSMDoubleVectorProperty* normal_property);
-
+  /// Controlled proxy is a proxy which is controlled by the 3D widget.
+  /// A controlled proxy must provide "Hints" describing how
+  /// the properties of the controlled proxy are controlled by the
+  /// 3D widget.
+  virtual void setControlledProxy(vtkSMProxy*);
 public slots:
-  /// Makes the 3D widget visible (but respects the user's choice if they've turned visibility off)
-  void showWidget();
   /// Makes the 3D widget plane visible (respects the overall visibility flag)
-  void showPlane();
-  /// Accepts pending changes
-  void accept();
-  /// Resets pending changes
-  void reset();
+  virtual void showPlane();
+
   /// Hides the 3D widget plane
-  void hidePlane();
-  /// Hides the 3D widget
-  void hideWidget();
+  virtual void hidePlane();
 
 signals:
   /// Notifies observers that the user is dragging the 3D widget
@@ -77,6 +67,10 @@ signals:
   void widgetChanged();
   /// Notifies observers that the user is done dragging the 3D widget
   void widgetEndInteraction();
+
+protected:
+  virtual void setControlledProperty(const char* function,
+    vtkSMProperty * controlled_property);
 
 private slots:
   /// Called to show/hide the 3D widget
@@ -105,11 +99,12 @@ private slots:
   void onControlledPropertyChanged();
 
 private:
-  void show3DWidget(bool show);
-
   void get3DWidgetState(double* origin, double* normal);
   void set3DWidgetState(const double* origin, const double* normal);
   void setQtWidgetState(const double* origin, const double* normal);
+
+  void setNormalProperty(vtkSMProperty*);
+  void setOriginProperty(vtkSMProperty*);
 
   class pqImplementation;
   pqImplementation* const Implementation;

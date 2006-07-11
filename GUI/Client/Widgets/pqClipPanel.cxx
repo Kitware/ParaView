@@ -161,9 +161,11 @@ void pqClipPanel::setProxyInternal(pqSMProxy p)
         }
       }
     }
-  this->Implementation->ImplicitPlaneWidget.setDataSources(
-    reference_proxy, controlled_proxy, origin_property, normal_property);
-  
+//  this->Implementation->ImplicitPlaneWidget.setDataSources(
+//    reference_proxy, controlled_proxy, origin_property, normal_property);
+  this->Implementation->ImplicitPlaneWidget.setReferenceProxy(reference_proxy);
+  this->Implementation->ImplicitPlaneWidget.setControlledProxy(controlled_proxy);
+
   if(this->Proxy)
     {
     this->PropertyManager->registerLink(
@@ -174,10 +176,10 @@ void pqClipPanel::setProxyInternal(pqSMProxy p)
 
 void pqClipPanel::select()
 {
-  this->Implementation->ImplicitPlaneWidget.showWidget();
+  this->Implementation->ImplicitPlaneWidget.select();
 }
 
 void pqClipPanel::deselect()
 {
-  this->Implementation->ImplicitPlaneWidget.hideWidget();
+  this->Implementation->ImplicitPlaneWidget.deselect();
 }

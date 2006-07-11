@@ -26,6 +26,7 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${MOC_INCLUDE_DIRS}")
 
 QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pq3DViewPropertiesWidget.h
+  pq3DWidget.h
   pq3DWidgetFactory.h
   pqAddSourceDialog.h
   pqApplicationCore.h
@@ -157,6 +158,8 @@ SOURCE_GROUP("Generated" FILES
 ADD_LIBRARY(pqWidgets
   pq3DViewPropertiesWidget.cxx
   pq3DViewPropertiesWidget.h
+  pq3DWidget.cxx
+  pq3DWidget.h
   pq3DWidgetFactory.cxx
   pq3DWidgetFactory.h
   pqAddSourceDialog.cxx
