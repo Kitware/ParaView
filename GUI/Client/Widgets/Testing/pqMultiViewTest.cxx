@@ -114,7 +114,10 @@ int main(int argc, char** argv)
   bool error = false;
 
   QApplication app(argc, argv);
+  
+#if !(defined(WIN32) && defined(PARAVIEW_BUILD_SHARED_LIBS))
   Q_INIT_RESOURCE(pqMultiViewTest);
+#endif
 
   pqMultiView mv;
   mv.resize(400, 300);
