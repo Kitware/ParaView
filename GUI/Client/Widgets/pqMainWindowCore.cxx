@@ -226,6 +226,11 @@ pqMultiView& pqMainWindowCore::multiViewManager()
   return this->Implementation->MultiViewManager;
 }
 
+pqRenderWindowManager& pqMainWindowCore::renderWindowManager()
+{
+  return *this->Implementation->RenderWindowManager;
+}
+
 pqSelectionManager& pqMainWindowCore::selectionManager()
 {
   return this->Implementation->SelectionManager;
@@ -1659,21 +1664,23 @@ void pqMainWindowCore::addRecentFile(const QString& fileName)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::updateRecentFilesMenu(bool enabled)
 {
-  QMenu* const rfMenu = this->Implementation->RecentFilesMenu;
-  rfMenu->clear();
-  int cnt = 0;
-  if ( !pqApplicationCore::instance()->getActiveServer() )
+  if(QMenu* const rfMenu = this->Implementation->RecentFilesMenu)
     {
-    enabled = false;
-    }
-  foreach(QString file, this->Implementation->RecentFilesList)
-    {
-    QString str = "&" + QString().setNum(cnt);
-    str += " " + file;
-    QAction *qa = rfMenu->addAction(tr(str.toStdString().c_str()),
-      this, SLOT(onRecentFileOpen()));
-    qa->setData(QVariant(file));
-    qa->setEnabled(enabled);
+    rfMenu->clear();
+    int cnt = 0;
+    if ( !pqApplicationCore::instance()->getActiveServer() )
+      {
+      enabled = false;
+      }
+    foreach(QString file, this->Implementation->RecentFilesList)
+      {
+      QString str = "&" + QString().setNum(cnt);
+      str += " " + file;
+      QAction *qa = rfMenu->addAction(tr(str.toStdString().c_str()),
+        this, SLOT(onRecentFileOpen()));
+      qa->setData(QVariant(file));
+      qa->setEnabled(enabled);
+      }
     }
 }
 

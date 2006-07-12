@@ -32,11 +32,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MainWindow.h"
 
+#include "ui_MainWindow.h"
+
+#include <pqApplicationCore.h>
+#include <pqMainWindowCore.h>
+#include <pqMultiView.h>
+#include <pqRenderWindowManager.h>
+
 #include <vtkSmartPointer.h>
 #include <vtkSMProxyManager.h>
 #include <vtkSMXMLParser.h>
-
-#include "pqApplicationCore.h"
 
 /// Embeds the ParaView server XML that describes the interface to the custom functionality
 const char* const custom_filters =
@@ -80,17 +85,58 @@ const char* const custom_filters =
 "  </ProxyGroup>"
 "</ServerManagerConfiguration>";
 
-//-----------------------------------------------------------------------------
-MainWindow::MainWindow()
+class MainWindow::pqImplementation
 {
-  // Create a bare-minimum user interface
-  this->setWindowTitle("CustomServer Client");
-  this->createStandardPipelineBrowser(false);
-  this->connect(this, SIGNAL(serverChanged(pqServer*)), 
-    this, SLOT(onServerChanged(pqServer*)));
+public:
+  pqImplementation(QWidget* parent) :
+    Core(parent)
+  {
+  }
   
+  Ui::MainWindow UI;
+  pqMainWindowCore Core;
+};
+
+//-----------------------------------------------------------------------------
+MainWindow::MainWindow() :
+  Implementation(new pqImplementation(this))
+{
+  this->Implementation->UI.setupUi(this);
+
+  connect(this->Implementation->UI.actionFileExit,
+    SIGNAL(triggered()), QApplication::instance(), SLOT(quit()));  
+
+  this->Implementation->Core.setupPipelineBrowser(
+    this->Implementation->UI.pipelineBrowserDock);
+
+  this->connect(
+    pqApplicationCore::instance(),
+    SIGNAL(activeServerChanged(pqServer*)), 
+    this,
+    SLOT(onActiveServerChanged(pqServer*)));
+    
+  this->connect(
+    &this->Implementation->Core.renderWindowManager(),
+    SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
+    this,
+    SLOT(onActiveRenderModuleChanged(pqRenderModule*)));
+
+  // Setup the multiview render window ...
+  this->setCentralWidget(&this->Implementation->Core.multiViewManager());
+
+  // Setup the statusbar ...
+  this->Implementation->Core.setupProgressBar(this->statusBar());
+  
+  // Now that we're ready, initialize everything ...
+  this->Implementation->Core.initializeStates();
+
   // Force the user to pick a server
-  this->onServerConnect();
+  this->Implementation->Core.onServerConnect();
+}
+
+MainWindow::~MainWindow()
+{
+  delete this->Implementation;
 }
 
 //-----------------------------------------------------------------------------
@@ -107,4 +153,9 @@ void MainWindow::onActiveServerChanged(pqServer* server)
   parser->ProcessConfiguration(vtkSMProxyManager::GetProxyManager());
 
   pqApplicationCore::instance()->createSourceOnActiveServer("CustomSource");
+}
+
+void MainWindow::onActiveRenderModuleChanged(pqRenderModule*)
+{
+  pqApplicationCore::instance()->createPendingDisplays();
 }

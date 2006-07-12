@@ -45,6 +45,7 @@ class pqObjectInspectorWidget;
 class pqPipelineMenu;
 class pqPipelineSource;
 class pqRenderModule;
+class pqRenderWindowManager;
 class pqSelectionManager;
 class pqServer;
 class pqServerManagerModelItem;
@@ -78,6 +79,8 @@ public:
 
   /// Returns a multi-view widget which can be embedded in the UI  
   pqMultiView& multiViewManager();
+  /// Returns a render-window manager
+  pqRenderWindowManager& renderWindowManager();
   /// Returns the selection manager, which handles interactive selection
   pqSelectionManager& selectionManager();
   /// Returns the VCR controller, which can control animation playback

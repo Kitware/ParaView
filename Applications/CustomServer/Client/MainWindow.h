@@ -33,25 +33,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MainWindow_h
 #define _MainWindow_h
 
-#include <pqMainWindow.h>
+#include <QMainWindow.h>
 
-class pqLineChartWidget;
-class LineChartAdapter;
-class QComboBox;
-class QPoint;
+class pqRenderModule;
+class pqServer;
 
 /// Provides the main window for the CustomServer client application
 class MainWindow :
-  public pqMainWindow
+  public QMainWindow
 {
   Q_OBJECT
 
 public:
   MainWindow();
+  ~MainWindow();
   
 private slots:
-  /// Called when the user has made a connection to a new server
   virtual void onActiveServerChanged(pqServer*);
+  virtual void onActiveRenderModuleChanged(pqRenderModule*);
+
+private:
+  class pqImplementation;
+  pqImplementation* const Implementation;
 };
 
 #endif // !_MainWindow_h

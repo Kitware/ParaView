@@ -32,11 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ProcessModuleGUIHelper.h"
 
-#include "vtkObjectFactory.h"
 #include "MainWindow.h"
 
+#include <pqApplicationCore.h>
+#include <vtkObjectFactory.h>
+
 vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.3");
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.4");
+
 //-----------------------------------------------------------------------------
 ProcessModuleGUIHelper::ProcessModuleGUIHelper()
 {
@@ -50,9 +53,9 @@ ProcessModuleGUIHelper::~ProcessModuleGUIHelper()
 //-----------------------------------------------------------------------------
 QWidget* ProcessModuleGUIHelper::CreateMainWindow()
 {
-  pqMainWindow* const window = new MainWindow();
-  window->resize(800, 600);
-  return window;
+  pqApplicationCore::instance()->setApplicationName("CustomServer Client");
+  pqApplicationCore::instance()->setOrganizationName("Kitware");
+  return new MainWindow();
 }
 
 //-----------------------------------------------------------------------------
@@ -61,14 +64,9 @@ void ProcessModuleGUIHelper::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 }
 
-bool ProcessModuleGUIHelper::compareView(const QString& ReferenceImage, double Threshold, ostream& Output, const QString& TempDirectory)
+//-----------------------------------------------------------------------------
+bool ProcessModuleGUIHelper::compareView(const QString& ReferenceImage,
+  double Threshold, ostream& Output, const QString& TempDirectory)
 {
-  QWidget * widget=this->GetMainWindow();
-  pqMainWindow* mainWindow=qobject_cast<pqMainWindow*>(widget);
-  if(mainWindow)
-  {
-    return mainWindow->compareView(ReferenceImage,Threshold,Output,TempDirectory);
-  }
   return false;
 }
-
