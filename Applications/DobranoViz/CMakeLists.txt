@@ -27,6 +27,7 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
   AboutDialog.ui
+  MainWindow.ui
 )
 
 SOURCE_GROUP("Generated" FILES
