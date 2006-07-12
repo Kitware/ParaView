@@ -1,5 +1,8 @@
 <RCC>
     <qresource prefix="/pqWidgets" >
+        <file>ParaViewFilters.xml</file>
+        <file>ParaViewReaders.xml</file>
+        <file>ParaViewWriters.xml</file>
         <file>pqAddFavorites16.png</file>
         <file>pqAppIcon64.png</file>
         <file>pqArrowDown16.png</file>

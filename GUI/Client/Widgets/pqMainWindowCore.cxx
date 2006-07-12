@@ -179,8 +179,8 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent) :
     = pqApplicationCore::instance()->settings()->recentFilesList();
 
   // Initialize supported file types.
-  core->getReaderFactory()->loadFileTypes(":/pqClient/ParaQReaders.xml");
-  core->getWriterFactory()->loadFileTypes(":/pqClient/ParaQWriters.xml");
+  core->getReaderFactory()->loadFileTypes(":/pqWidgets/ParaViewReaders.xml");
+  core->getWriterFactory()->loadFileTypes(":/pqWidgets/ParaViewWriters.xml");
   
   // Connect the renderModule manager with the view manager so that 
   // new render modules are created as new frames are added.
@@ -325,7 +325,7 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
       }
 
     // Load in the filter information.
-    QFile filterInfo(":/pqClient/ParaQFilters.xml");
+    QFile filterInfo(":/pqWidgets/ParaViewFilters.xml");
     if(filterInfo.open(QIODevice::ReadOnly))
       {
       vtkSmartPointer<vtkPVXMLParser> xmlParser = 
@@ -414,7 +414,7 @@ pqPipelineMenu& pqMainWindowCore::pipelineMenu()
     action->setEnabled(false);
 
     // TEMP: Load in the filter information.
-    QFile filterInfo(":/pqClient/ParaQFilters.xml");
+    QFile filterInfo(":/pqWidgets/ParaViewFilters.xml");
     if(filterInfo.open(QIODevice::ReadOnly))
       {
       vtkSmartPointer<vtkPVXMLParser> xmlParser = 

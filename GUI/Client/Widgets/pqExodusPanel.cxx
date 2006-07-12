@@ -86,9 +86,9 @@ void pqExodusPanel::linkServerManagerProperties()
   if((range.size() == 2) && (range[1] != -1))
     {
     timeSlider->setEnabled(true);
-    timeSpin->setEnabled(true);
     timeSlider->setRange(range[0].toInt(), 
                          range[1].toInt());
+    timeSpin->setEnabled(true);
     timeSpin->setRange(range[0].toInt(), 
                        range[1].toInt());
     }
