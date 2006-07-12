@@ -25,7 +25,7 @@
 #include "vtkKWWidgets.h" // Needed for export symbols directives
 #include "vtkObject.h"
 
-#define KWWidgets_SOURCE_VERSION "KWWidgets version " KWWidgets_VERSION ", KWWidgets source $Revision: 1.2 $, $Date: 2006-07-12 14:52:20 $ (GMT)"
+#define KWWidgets_SOURCE_VERSION "KWWidgets version " KWWidgets_VERSION ", KWWidgets source $Revision: 1.3 $, $Date: 2006-07-12 15:02:50 $ (GMT)"
 
 class KWWidgets_EXPORT vtkKWWidgetsVersion : public vtkObject
 {
@@ -34,7 +34,7 @@ public:
   vtkTypeRevisionMacro(vtkKWWidgetsVersion,vtkObject);
 
   // Description: 
-  // Return the major, minor and patch revision of the KWWidgets library.
+  // Return the major, minor and patch version of the KWWidgets library.
   static int GetKWWidgetsMajorVersion() 
     { return KWWidgets_MAJOR_VERSION; }
   static int GetKWWidgetsMinorVersion() 
@@ -44,7 +44,7 @@ public:
 
   // Description: 
   // Return the version of the KWWidgets library (as an aggregation of
-  // the major, minor and patch revision).
+  // the major, minor and patch version).
   static const char *GetKWWidgetsVersion() 
     { return KWWidgets_VERSION; }
 
