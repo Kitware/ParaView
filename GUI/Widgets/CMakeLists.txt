@@ -29,6 +29,9 @@ SET(KWWidgets_LIBRARIES KWWidgets CACHE INTERNAL "libraries for KWWidgets")
 
 SET(KWWidgets_MAJOR_VERSION 1)
 SET(KWWidgets_MINOR_VERSION 0)
+SET(KWWidgets_PATCH_VERSION 0)
+SET(KWWidgets_VERSION
+  "${KWWidgets_MAJOR_VERSION}.${KWWidgets_MINOR_VERSION}.${KWWidgets_PATCH_VERSION}")
 
 # --------------------------------------------------------------------------
 # We need VTK
@@ -237,6 +240,7 @@ SET(KWWidgets_SRCS
   vtkKWVolumePropertyPresetSelector.cxx
   vtkKWVolumePropertyWidget.cxx
   vtkKWWidget.cxx
+  vtkKWWidgetsVersion.cxx
   vtkKWWidgetSet.cxx
   vtkKWWidgetWithLabel.cxx
   vtkKWWidgetWithScrollbars.cxx

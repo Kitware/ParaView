@@ -8,6 +8,7 @@
 # The KWWidgets version number.
 SET(KWWidgets_MAJOR_VERSION "@KWWidgets_MAJOR_VERSION@")
 SET(KWWidgets_MINOR_VERSION "@KWWidgets_MINOR_VERSION@")
+SET(KWWidgets_PATCH_VERSION "@KWWidgets_PATCH_VERSION@")
 
 # The libraries.
 SET(KWWidgets_LIBRARIES "@KWWidgets_LIBRARIES@")
