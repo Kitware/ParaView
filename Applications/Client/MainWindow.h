@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _MainWindow_h
 #define _MainWindow_h
 
-#include <QMainWindow.h>
+#include <QMainWindow>
 #include <vtkIOStream.h>
 
 /// Provides the main window for the ParaView application
