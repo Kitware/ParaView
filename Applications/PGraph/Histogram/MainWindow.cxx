@@ -331,7 +331,7 @@ MainWindow::MainWindow() :
   widget->setLayout(vbox);
   
   chart_dock->setWidget(widget);
-  this->addDockWidget(Qt::LeftDockWidgetArea, chart_dock);
+  this->addDockWidget(Qt::BottomDockWidgetArea, chart_dock);
 
   connect(
     pqApplicationCore::instance(),
@@ -354,6 +354,7 @@ MainWindow::MainWindow() :
 
   // Setup the default dock configuration ...
   this->Implementation->UI.elementInspectorDock->hide();
+  this->Implementation->UI.statisticsViewDock->hide();
 
   // Now that we're ready, initialize everything ...
   this->Implementation->Core.initializeStates();
