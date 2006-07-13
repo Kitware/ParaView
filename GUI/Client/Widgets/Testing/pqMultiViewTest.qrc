@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/pqWidgets" >
-        <file>../SplitViewHorizontal.png</file>
-        <file>../SplitViewVertical.png</file>
+        <file>../Resources/Icons/SplitViewHorizontal.png</file>
+        <file>../Resources/Icons/SplitViewVertical.png</file>
     </qresource>
 </RCC>
