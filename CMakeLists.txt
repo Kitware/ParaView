@@ -14,7 +14,7 @@ IF("${ParaView_SOURCE_DIR}" MATCHES "ParaQ")
   SET(PARAVIEW_WARN_ABOUT_PARAQ 1)
 ENDIF("${ParaView_SOURCE_DIR}" MATCHES "ParaQ")
 IF(PARAVIEW_WARN_ABOUT_PARAQ)
-  MESSAGE("ParaView 3 should be checked out from ParaView3 repository. ParaQ repository is deprecated and will be removed")
+  MESSAGE(SEND_ERROR "ParaView 3 should be checked out from ParaView3 repository. ParaQ repository is deprecated and will be removed")
 ENDIF(PARAVIEW_WARN_ABOUT_PARAQ)
 
 #########################################################################
