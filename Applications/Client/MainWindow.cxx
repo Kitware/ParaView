@@ -265,20 +265,11 @@ MainWindow::MainWindow() :
   connect(this->Implementation->UI.actionVCRLastFrame,
     SIGNAL(triggered()), &this->Implementation->Core.VCRController(), SLOT(onLastFrame()));
 
-  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.VCRToolbar,
-    this->Implementation->UI.VCRToolbar->windowTitle());
-
   connect(this->Implementation->UI.actionMoveMode, 
     SIGNAL(triggered()), &this->Implementation->Core.selectionManager(), SLOT(switchToInteraction()));
     
   connect(this->Implementation->UI.actionSelectionMode, 
     SIGNAL(triggered()), &this->Implementation->Core.selectionManager(), SLOT(switchToSelection()));
-
-  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.selectionToolbar,
-    this->Implementation->UI.selectionToolbar->windowTitle());
-
-  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.undoRedoToolbar,
-    this->Implementation->UI.undoRedoToolbar->windowTitle());
 
   this->Implementation->Core.setupVariableToolbar(
     this->Implementation->UI.variableToolbar);
@@ -287,8 +278,6 @@ MainWindow::MainWindow() :
     SIGNAL(enableVariableToolbar(bool)),
     this->Implementation->UI.variableToolbar,
     SLOT(setEnabled(bool)));
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.variableToolbar,
-    this->Implementation->UI.variableToolbar->windowTitle());
 
   connect(
     &this->Implementation->Core,
@@ -298,14 +287,10 @@ MainWindow::MainWindow() :
 
   this->Implementation->Core.setupCustomFilterToolbar(
     this->Implementation->UI.customFilterToolbar);
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.customFilterToolbar,
-    this->Implementation->UI.customFilterToolbar->windowTitle());
 
   // Setup dockable windows ...
   this->Implementation->Core.setupPipelineBrowser(
     this->Implementation->UI.pipelineBrowserDock);
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.pipelineBrowserDock,
-    this->Implementation->UI.pipelineBrowserDock->windowTitle());
 
   pqObjectInspectorWidget* const object_inspector =
     this->Implementation->Core.setupObjectInspector(
@@ -323,19 +308,44 @@ MainWindow::MainWindow() :
     this,
     SLOT(onPostAccept()));
       
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.objectInspectorDock,
-    this->Implementation->UI.objectInspectorDock->windowTitle());
     
   this->Implementation->Core.setupStatisticsView(
     this->Implementation->UI.statisticsViewDock);
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.statisticsViewDock,
-    this->Implementation->UI.statisticsViewDock->windowTitle());
     
   this->Implementation->Core.setupElementInspector(
     this->Implementation->UI.elementInspectorDock);
+  
+  // Setup the view menu ...
+  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.mainToolBar,
+    this->Implementation->UI.mainToolBar->windowTitle());
+  
+  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.selectionToolbar,
+    this->Implementation->UI.selectionToolbar->windowTitle());
+
+  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.variableToolbar,
+    this->Implementation->UI.variableToolbar->windowTitle());
+
+  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.customFilterToolbar,
+    this->Implementation->UI.customFilterToolbar->windowTitle());
+    
+  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.undoRedoToolbar,
+    this->Implementation->UI.undoRedoToolbar->windowTitle());
+
+  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.VCRToolbar,
+    this->Implementation->UI.VCRToolbar->windowTitle());
+
+  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.pipelineBrowserDock,
+    this->Implementation->UI.pipelineBrowserDock->windowTitle());
+
+  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.objectInspectorDock,
+    this->Implementation->UI.objectInspectorDock->windowTitle());
+
+  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.statisticsViewDock,
+    this->Implementation->UI.statisticsViewDock->windowTitle());
+    
   this->Implementation->ViewMenu->addWidget(this->Implementation->UI.elementInspectorDock,
     this->Implementation->UI.elementInspectorDock->windowTitle());
-      
+  
   // Setup the multiview render window ...
   this->setCentralWidget(&this->Implementation->Core.multiViewManager());
 
