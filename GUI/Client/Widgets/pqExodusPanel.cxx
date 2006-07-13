@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 
 pqExodusPanel::pqExodusPanel(QWidget* p) :
-  pqLoadedFormObjectPanel(":/pqWidgets/ExodusPanel.ui", p)
+  pqLoadedFormObjectPanel(":/pqWidgets/pqExodusPanel.ui", p)
 {
   this->DisplItem = 0;
 }
