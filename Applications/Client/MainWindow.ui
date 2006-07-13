@@ -16,7 +16,7 @@
    <string>MainWindow</string>
   </property>
   <property name="windowIcon" >
-   <iconset/>
+   <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqAppIcon22.png</iconset>
   </property>
   <property name="toolButtonStyle" >
    <enum>Qt::ToolButtonIconOnly</enum>
@@ -28,7 +28,7 @@
      <x>0</x>
      <y>0</y>
      <width>1163</width>
-     <height>21</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuRecentFiles" >
@@ -44,19 +44,6 @@
     <addaction name="actionHelpHelp" />
     <addaction name="separator" />
     <addaction name="actionHelpEnableTooltips" />
-   </widget>
-   <widget class="QMenu" name="menuTools" >
-    <property name="title" >
-     <string>Tools</string>
-    </property>
-    <addaction name="actionToolsCreateCustomFilter" />
-    <addaction name="actionToolsManageCustomFilters" />
-    <addaction name="separator" />
-    <addaction name="actionToolsDumpWidgetNames" />
-    <addaction name="actionToolsRecordTest" />
-    <addaction name="actionToolsRecordTestScreenshot" />
-    <addaction name="separator" />
-    <addaction name="actionToolsPythonShell" />
    </widget>
    <widget class="QMenu" name="menuPipeline" >
     <property name="title" >
@@ -122,6 +109,20 @@
      </property>
     </widget>
     <addaction name="menuToolbars" />
+   </widget>
+   <widget class="QMenu" name="menuTools" >
+    <property name="title" >
+     <string>Tools</string>
+    </property>
+    <addaction name="actionToolsCreateCustomFilter" />
+    <addaction name="actionToolsManageCustomFilters" />
+    <addaction name="separator" />
+    <addaction name="actionToolsDumpWidgetNames" />
+    <addaction name="actionToolsRecordTest" />
+    <addaction name="actionToolsRecordTestScreenshot" />
+    <addaction name="actionToolsPlayTest" />
+    <addaction name="separator" />
+    <addaction name="actionToolsPythonShell" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -432,7 +433,7 @@
   </action>
   <action name="actionSelectionMode" >
    <property name="icon" >
-    <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqPointer22.png</iconset>
+    <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqSelectPointer22.png</iconset>
    </property>
    <property name="text" >
     <string>Selection Mode</string>
@@ -539,7 +540,7 @@
   </action>
   <action name="actionToolsPlayTest" >
    <property name="text" >
-    <string>ToolsPlayTest</string>
+    <string>Play Test</string>
    </property>
   </action>
  </widget>

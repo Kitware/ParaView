@@ -1,30 +1,11 @@
 <RCC>
-    <qresource prefix="pqWidgets" >
-	<file>UI/pq3DViewPropertiesWidget.ui</file>
-	<file>UI/pqAbortAnimation.ui</file>
-	<file>UI/pqAddSourceDialog.ui</file>
-	<file>UI/pqAnimationSettings.ui</file>
-	<file>UI/pqContourControls.ui</file>
-	<file>UI/pqCustomFilterDefinitionWizard.ui</file>
-	<file>UI/pqCustomFilterManager.ui</file>
-	<file>UI/pqDisplayProxyEditor.ui</file>
-	<file>UI/pqExodusPanel.ui</file>
-	<file>UI/pqHandleWidget.ui</file>
-	<file>UI/pqImplicitPlaneWidget.ui</file>
-	<file>UI/pqLineWidget.ui</file>
-	<file>UI/pqMultiViewFrameMenu.ui</file>
-	<file>UI/pqOutputWindow.ui</file>
-	<file>UI/pqPointSourceControls.ui</file>
-	<file>UI/pqRenderViewEditor.ui</file>
-	<file>UI/pqSampleScalarAddRangeDialog.ui</file>
-	<file>UI/pqSampleScalarWidget.ui</file>
-	<file>UI/pqServerBrowser.ui</file>
-	<file>UI/pqSettingsDialog.ui</file>
-	<file>UI/pqStreamTracerControls.ui</file>
-	<file>UI/pqThresholdPanel.ui</file>
+    <qresource prefix="/pqWidgets" >
         <file>Icons/SplitViewHorizontal.png</file>
         <file>Icons/SplitViewVertical.png</file>
         <file>Icons/pqAddFavorites16.png</file>
+        <file>Icons/pqAppIcon16.png</file>
+        <file>Icons/pqAppIcon22.png</file>
+        <file>Icons/pqAppIcon32.png</file>
         <file>Icons/pqAppIcon64.png</file>
         <file>Icons/pqArrowDown16.png</file>
         <file>Icons/pqArrowUp16.png</file>
@@ -84,6 +65,7 @@
         <file>Icons/pqRectilinearGrid16.png</file>
         <file>Icons/pqRedo22.png</file>
         <file>Icons/pqSave22.png</file>
+        <file>Icons/pqSelectPointer22.png</file>
         <file>Icons/pqServer16.png</file>
         <file>Icons/pqServer22.png</file>
         <file>Icons/pqServer32.png</file>
@@ -116,6 +98,28 @@
         <file>Icons/pqWindowd22.png</file>
         <file>Icons/pqWindowd32.png</file>
         <file>Icons/pqWindowh16.png</file>
+        <file>UI/pq3DViewPropertiesWidget.ui</file>
+        <file>UI/pqAbortAnimation.ui</file>
+        <file>UI/pqAddSourceDialog.ui</file>
+        <file>UI/pqAnimationSettings.ui</file>
+        <file>UI/pqContourControls.ui</file>
+        <file>UI/pqCustomFilterDefinitionWizard.ui</file>
+        <file>UI/pqCustomFilterManager.ui</file>
+        <file>UI/pqDisplayProxyEditor.ui</file>
+        <file>UI/pqExodusPanel.ui</file>
+        <file>UI/pqHandleWidget.ui</file>
+        <file>UI/pqImplicitPlaneWidget.ui</file>
+        <file>UI/pqLineWidget.ui</file>
+        <file>UI/pqMultiViewFrameMenu.ui</file>
+        <file>UI/pqOutputWindow.ui</file>
+        <file>UI/pqPointSourceControls.ui</file>
+        <file>UI/pqRenderViewEditor.ui</file>
+        <file>UI/pqSampleScalarAddRangeDialog.ui</file>
+        <file>UI/pqSampleScalarWidget.ui</file>
+        <file>UI/pqServerBrowser.ui</file>
+        <file>UI/pqSettingsDialog.ui</file>
+        <file>UI/pqStreamTracerControls.ui</file>
+        <file>UI/pqThresholdPanel.ui</file>
         <file>XML/ParaViewFilters.xml</file>
         <file>XML/ParaViewReaders.xml</file>
         <file>XML/ParaViewWriters.xml</file>
