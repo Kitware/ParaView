@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class QObject;
 class QString;
+class QStringList;
 
 /// Provides functionality to ensuring that Qt objects can be uniquely identified for recording and playback of regression tests
 class QTTESTING_EXPORT pqObjectNaming
@@ -48,10 +49,9 @@ public:
   static QObject* GetObject(const QString& Name);
   
   /** Dumps the widget hierarchy to a string */
-  static const QString DumpHierarchy();
+  static void DumpHierarchy(QStringList& results);
   /** Dumps a subtree of the widget hierarchy to a string */
-  static const QString DumpHierarchy(QObject& Object);
+  static void DumpHierarchy(QObject& Object, QStringList& results);
 };
 
 #endif // !_pqObjectNaming_h
-

@@ -204,30 +204,22 @@ QObject* pqObjectNaming::GetObject(const QString& Name)
   return 0;
 }
 
-const QString pqObjectNaming::DumpHierarchy()
+void pqObjectNaming::DumpHierarchy(QStringList& results)
 {
-  QString result;
-  
   const QWidgetList widgets = QApplication::topLevelWidgets();
   for(int i = 0; i != widgets.size(); ++i)
     {
-    result += DumpHierarchy(*widgets[i]);
+    DumpHierarchy(*widgets[i], results);
     }
-  
-  return result;
 }
 
-const QString pqObjectNaming::DumpHierarchy(QObject& Object)
+void pqObjectNaming::DumpHierarchy(QObject& object, QStringList& results)
 {
-  QString result;
-
-  result += GetName(Object) + "\n";
+  results << GetName(object);
   
-  const QObjectList children = Object.children();
+  const QObjectList children = object.children();
   for(int i = 0; i != children.size(); ++i)
     {
-    result += DumpHierarchy(*children[i]);
+    DumpHierarchy(*children[i], results);
     }
-  
-  return result;
 }

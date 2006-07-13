@@ -576,6 +576,8 @@ void pqMainWindowCore::setupVariableToolbar(QToolBar* parent)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::setupCustomFilterToolbar(QToolBar* parent)
 {
+  this->Implementation->CustomFilterToolbar = parent;
+
   this->connect(parent, 
     SIGNAL(actionTriggered(QAction*)), SLOT(onCreateCompoundProxy(QAction*)));
   // Listen for compound proxy register events.
@@ -1129,8 +1131,14 @@ void pqMainWindowCore::onToolsManageCustomFilters()
 
 void pqMainWindowCore::onToolsDumpWidgetNames()
 {
-  const QString output = pqObjectNaming::DumpHierarchy();
-  qDebug() << output;
+  QStringList names;
+  pqObjectNaming::DumpHierarchy(names);
+  names.sort();
+  
+  for(int i = 0; i != names.size(); ++i)
+    {
+    qDebug() << names[i];
+    }
 }
 
 void pqMainWindowCore::onToolsRecordTest()
@@ -1325,21 +1333,27 @@ void pqMainWindowCore::onCreateCompoundProxy(QAction* action)
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onCompoundProxyAdded(QString proxy)
 {
-  this->Implementation->CustomFilterToolbar->addAction(
-    QIcon(":/pqWidgets/pqBundle32.png"), proxy) 
-    << pqSetName(proxy) << pqSetData(proxy);
+  if(this->Implementation->CustomFilterToolbar)
+    {
+    this->Implementation->CustomFilterToolbar->addAction(
+      QIcon(":/pqWidgets/pqBundle32.png"), proxy) 
+      << pqSetName(proxy) << pqSetData(proxy);
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onCompoundProxyRemoved(QString proxy)
 {
   // Remove the action associated with the compound proxy.
-  QAction *action =
-    this->Implementation->CustomFilterToolbar->findChild<QAction *>(proxy);
-  if(action)
+  if(this->Implementation->CustomFilterToolbar)
     {
-    this->Implementation->CustomFilterToolbar->removeAction(action);
-    delete action;
+    QAction *action =
+      this->Implementation->CustomFilterToolbar->findChild<QAction *>(proxy);
+    if(action)
+      {
+      this->Implementation->CustomFilterToolbar->removeAction(action);
+      delete action;
+      }
     }
 }
 
