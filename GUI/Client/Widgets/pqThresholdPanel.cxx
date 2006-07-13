@@ -51,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 pqThresholdPanel::pqThresholdPanel(QWidget* p) :
-  pqLoadedFormObjectPanel(":/pqWidgets/ThresholdPanel.ui", p)
+  pqLoadedFormObjectPanel(":/pqWidgets/pqThresholdPanel.ui", p)
 {
   this->AttributeMode = this->findChild<QComboBox*>("AttributeMode");
   
