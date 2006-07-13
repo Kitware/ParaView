@@ -58,19 +58,19 @@ QPixmap pqSourceInfoIcons::getDefaultPixmap(
 {
   if(type == pqSourceInfoIcons::Server)
     {
-    return QPixmap(":/pqWidgets/pqServer16.png");
+    return QPixmap(":/pqWidgets/Icons/pqServer16.png");
     }
   else if(type == pqSourceInfoIcons::Source)
     {
-    return QPixmap(":/pqWidgets/pqSource16.png");
+    return QPixmap(":/pqWidgets/Icons/pqSource16.png");
     }
   else if(type == pqSourceInfoIcons::Reader)
     {
-    return QPixmap(":/pqWidgets/pqSource16.png");
+    return QPixmap(":/pqWidgets/Icons/pqSource16.png");
     }
   else if(type == pqSourceInfoIcons::Filter)
     {
-    return QPixmap(":/pqWidgets/pqFilter16.png");
+    return QPixmap(":/pqWidgets/Icons/pqFilter16.png");
     }
 
   return QPixmap();

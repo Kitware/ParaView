@@ -205,13 +205,13 @@ pqCustomFilterDefinitionModel::pqCustomFilterDefinitionModel(
   if(this->PixmapList)
     {
     this->PixmapList[pqCustomFilterDefinitionModel::Source].load(
-        ":/pqWidgets/pqSource16.png");
+        ":/pqWidgets/Icons/pqSource16.png");
     this->PixmapList[pqCustomFilterDefinitionModel::Filter].load(
-        ":/pqWidgets/pqFilter16.png");
+        ":/pqWidgets/Icons/pqFilter16.png");
     this->PixmapList[pqCustomFilterDefinitionModel::CustomFilter].load(
-        ":/pqWidgets/pqBundle16.png");
+        ":/pqWidgets/Icons/pqBundle16.png");
     this->PixmapList[pqCustomFilterDefinitionModel::Link].load(
-        ":/pqWidgets/pqLinkBack16.png");
+        ":/pqWidgets/Icons/pqLinkBack16.png");
     }
 }
 

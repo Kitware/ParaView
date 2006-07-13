@@ -8,7 +8,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
+    <width>1163</width>
     <height>675</height>
    </rect>
   </property>
@@ -16,7 +16,7 @@
    <string>MainWindow</string>
   </property>
   <property name="windowIcon" >
-   <iconset resource="../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqAppIcon64.png</iconset>
+   <iconset/>
   </property>
   <property name="toolButtonStyle" >
    <enum>Qt::ToolButtonIconOnly</enum>
@@ -27,34 +27,10 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>900</width>
-     <height>21</height>
+     <width>1163</width>
+     <height>29</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuHelp" >
-    <property name="title" >
-     <string>&amp;Help</string>
-    </property>
-    <addaction name="actionHelpAbout" />
-    <addaction name="actionHelpHelp" />
-    <addaction name="separator" />
-    <addaction name="actionHelpEnableTooltips" />
-   </widget>
-   <widget class="QMenu" name="menuEdit" >
-    <property name="title" >
-     <string>&amp;Edit</string>
-    </property>
-    <addaction name="actionEditUndo" />
-    <addaction name="actionEditRedo" />
-    <addaction name="separator" />
-    <addaction name="actionEditCameraUndo" />
-    <addaction name="actionEditCameraRedo" />
-   </widget>
-   <widget class="QMenu" name="menuFilters" >
-    <property name="title" >
-     <string>F&amp;ilters</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuView" >
     <property name="title" >
      <string>View</string>
@@ -65,9 +41,41 @@
      <string>Recent Files</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuRecentFiles" >
+    <property name="title" >
+     <string>Recent Files</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuHelp" >
+    <property name="title" >
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionHelpAbout" />
+    <addaction name="actionHelpHelp" />
+    <addaction name="separator" />
+    <addaction name="actionHelpEnableTooltips" />
+   </widget>
+   <widget class="QMenu" name="menuTools" >
+    <property name="title" >
+     <string>Tools</string>
+    </property>
+    <addaction name="actionToolsCreateCustomFilter" />
+    <addaction name="actionToolsManageCustomFilters" />
+    <addaction name="separator" />
+    <addaction name="actionToolsDumpWidgetNames" />
+    <addaction name="actionToolsRecordTest" />
+    <addaction name="actionToolsRecordTestScreenshot" />
+    <addaction name="separator" />
+    <addaction name="actionToolsPythonShell" />
+   </widget>
    <widget class="QMenu" name="menuPipeline" >
     <property name="title" >
      <string>Pipeline</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuFilters" >
+    <property name="title" >
+     <string>F&amp;ilters</string>
     </property>
    </widget>
    <widget class="QMenu" name="menuSources" >
@@ -82,24 +90,15 @@
     <addaction name="actionServerConnect" />
     <addaction name="actionServerDisconnect" />
    </widget>
-   <widget class="QMenu" name="menuTools" >
+   <widget class="QMenu" name="menuEdit" >
     <property name="title" >
-     <string>Tools</string>
+     <string>&amp;Edit</string>
     </property>
-    <addaction name="actionToolsCreateCustomFilter" />
-    <addaction name="actionToolsManageCustomFilters" />
+    <addaction name="actionEditUndo" />
+    <addaction name="actionEditRedo" />
     <addaction name="separator" />
-    <addaction name="actionToolsDumpWidgetNames" />
-    <addaction name="actionToolsRecordTest" />
-    <addaction name="actionToolsRecordTestScreenshot" />
-    <addaction name="actionToolsPlayTest" />
-    <addaction name="separator" />
-    <addaction name="actionToolsPythonShell" />
-   </widget>
-   <widget class="QMenu" name="menuRecentFiles" >
-    <property name="title" >
-     <string>Recent Files</string>
-    </property>
+    <addaction name="actionEditCameraUndo" />
+    <addaction name="actionEditCameraRedo" />
    </widget>
    <widget class="QMenu" name="menuFile" >
     <property name="title" >
@@ -144,7 +143,14 @@
    <attribute name="dockWidgetArea" >
     <number>1</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_2" />
+   <widget class="QWidget" name="dockWidgetContents_2" >
+    <property name="minimumSize" >
+     <size>
+      <width>100</width>
+      <height>16</height>
+     </size>
+    </property>
+   </widget>
   </widget>
   <widget class="QDockWidget" name="objectInspectorDock" >
    <property name="allowedAreas" >
@@ -182,20 +188,23 @@
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_5" />
   </widget>
-  <widget class="QToolBar" name="VCRToolbar" >
-   <property name="windowTitle" >
-    <string>VCR Controls</string>
-   </property>
+   <widget class="QToolBar" name="mainToolBar" >
    <property name="orientation" >
     <enum>Qt::Horizontal</enum>
    </property>
    <attribute name="toolBarArea" >
     <number>4</number>
    </attribute>
-   <addaction name="actionVCRFirstFrame" />
-   <addaction name="actionVCRPreviousFrame" />
-   <addaction name="actionVCRNextFrame" />
-   <addaction name="actionVCRLastFrame" />
+   <addaction name="actionFileNew" />
+   <addaction name="actionFileOpen" />
+   <addaction name="actionFileSaveData" />
+   <addaction name="separator" />
+   <addaction name="actionServerConnect" />
+   <addaction name="actionServerDisconnect" />
+   <addaction name="separator" />
+   <addaction name="actionHelpHelp" />
+   <addaction name="separator" />
+   <addaction name="actionFileExit" />
   </widget>
   <widget class="QToolBar" name="selectionToolbar" >
    <property name="windowTitle" >
@@ -209,19 +218,6 @@
    </attribute>
    <addaction name="actionMoveMode" />
    <addaction name="actionSelectionMode" />
-  </widget>
-  <widget class="QToolBar" name="undoRedoToolbar" >
-   <property name="windowTitle" >
-    <string>Undo/Redo Controls</string>
-   </property>
-   <property name="orientation" >
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <attribute name="toolBarArea" >
-    <number>4</number>
-   </attribute>
-   <addaction name="actionEditUndo" />
-   <addaction name="actionEditRedo" />
   </widget>
   <widget class="QToolBar" name="variableToolbar" >
    <property name="windowTitle" >
@@ -245,15 +241,62 @@
     <number>4</number>
    </attribute>
   </widget>
+   <widget class="QToolBar" name="undoRedoToolbar" >
+   <property name="windowTitle" >
+    <string>Undo/Redo Controls</string>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <attribute name="toolBarArea" >
+    <number>4</number>
+   </attribute>
+   <addaction name="actionEditUndo" />
+   <addaction name="actionEditRedo" />
+  </widget>
+  <widget class="QToolBar" name="VCRToolbar" >
+   <property name="windowTitle" >
+    <string>VCR Controls</string>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <attribute name="toolBarArea" >
+    <number>4</number>
+   </attribute>
+   <addaction name="actionVCRFirstFrame" />
+   <addaction name="actionVCRPreviousFrame" />
+   <addaction name="actionVCRPlay" />
+   <addaction name="actionVCRPause" />
+   <addaction name="actionVCRNextFrame" />
+   <addaction name="actionVCRLastFrame" />
+  </widget>
   <action name="actionFileNew" >
+   <property name="icon" >
+    <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqNew22.png</iconset>
+   </property>
    <property name="text" >
     <string>&amp;New</string>
+   </property>
+   <property name="font" >
+    <font>
+     <family>MS Shell Dlg</family>
+     <pointsize>8</pointsize>
+     <weight>50</weight>
+     <italic>false</italic>
+     <bold>false</bold>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+    </font>
    </property>
    <property name="shortcut" >
     <string>Ctrl+N</string>
    </property>
   </action>
   <action name="actionFileOpen" >
+   <property name="icon" >
+    <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqOpen22.png</iconset>
+   </property>
    <property name="text" >
     <string>&amp;Open</string>
    </property>
@@ -262,6 +305,9 @@
    </property>
   </action>
   <action name="actionFileExit" >
+   <property name="icon" >
+    <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqQuit22.png</iconset>
+   </property>
    <property name="text" >
     <string>E&amp;xit</string>
    </property>
@@ -270,21 +316,33 @@
    </property>
   </action>
   <action name="actionHelpAbout" >
+   <property name="icon" >
+    <iconset/>
+   </property>
    <property name="text" >
     <string>About</string>
    </property>
   </action>
   <action name="actionHelpHelp" >
+   <property name="icon" >
+    <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqHelp22.png</iconset>
+   </property>
    <property name="text" >
     <string>Help</string>
    </property>
   </action>
   <action name="actionServerConnect" >
+   <property name="icon" >
+    <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqConnect22.png</iconset>
+   </property>
    <property name="text" >
     <string>&amp;Connect</string>
    </property>
   </action>
   <action name="actionServerDisconnect" >
+   <property name="icon" >
+    <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqDisconnect22.png</iconset>
+   </property>
    <property name="text" >
     <string>&amp;Disconnect</string>
    </property>
@@ -301,7 +359,7 @@
   </action>
   <action name="actionVCRPreviousFrame" >
    <property name="icon" >
-    <iconset resource="../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqVcrBack22.png</iconset>
+    <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqVcrBack22.png</iconset>
    </property>
    <property name="text" >
     <string>Previous Frame</string>
@@ -309,7 +367,7 @@
   </action>
   <action name="actionVCRFirstFrame" >
    <property name="icon" >
-    <iconset resource="../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqVcrFirst22.png</iconset>
+    <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqVcrFirst22.png</iconset>
    </property>
    <property name="text" >
     <string>First Frame</string>
@@ -317,7 +375,7 @@
   </action>
   <action name="actionVCRNextFrame" >
    <property name="icon" >
-    <iconset resource="../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqVcrForward22.png</iconset>
+    <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqVcrForward22.png</iconset>
    </property>
    <property name="text" >
     <string>Next Frame</string>
@@ -325,13 +383,16 @@
   </action>
   <action name="actionVCRLastFrame" >
    <property name="icon" >
-    <iconset resource="../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqVcrLast22.png</iconset>
+    <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqVcrLast22.png</iconset>
    </property>
    <property name="text" >
     <string>Last Frame</string>
    </property>
   </action>
   <action name="actionFileSaveData" >
+   <property name="icon" >
+    <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqSave22.png</iconset>
+   </property>
    <property name="text" >
     <string>Save Data</string>
    </property>
@@ -362,7 +423,7 @@
   </action>
   <action name="actionMoveMode" >
    <property name="icon" >
-    <iconset resource="../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqMouseMove15.png</iconset>
+    <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqPointer22.png</iconset>
    </property>
    <property name="text" >
     <string>Move Mode</string>
@@ -370,7 +431,7 @@
   </action>
   <action name="actionSelectionMode" >
    <property name="icon" >
-    <iconset resource="../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqMouseSelect15.png</iconset>
+    <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqPointer22.png</iconset>
    </property>
    <property name="text" >
     <string>Selection Mode</string>
@@ -381,7 +442,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqUndo22.png</iconset>
+    <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqUndo22.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Undo</string>
@@ -392,7 +453,7 @@
   </action>
   <action name="actionEditRedo" >
    <property name="icon" >
-    <iconset resource="../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqRedo22.png</iconset>
+    <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqRedo22.png</iconset>
    </property>
    <property name="text" >
     <string>&amp;Redo</string>
@@ -403,7 +464,7 @@
   </action>
   <action name="actionEditCameraUndo" >
    <property name="icon" >
-    <iconset resource="../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqUndo22.png</iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>Camera Undo</string>
@@ -414,7 +475,7 @@
   </action>
   <action name="actionEditCameraRedo" >
    <property name="icon" >
-    <iconset resource="../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqRedo22.png</iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>Camera Redo</string>
@@ -438,11 +499,6 @@
     <string>Record &amp;Test Screenshot</string>
    </property>
   </action>
-  <action name="actionToolsPlayTest" >
-   <property name="text" >
-    <string>&amp;Play Test</string>
-   </property>
-  </action>
   <action name="actionToolsPythonShell" >
    <property name="text" >
     <string>Python &amp;Shell</string>
@@ -458,15 +514,37 @@
     <string>&amp;Manage Custom Filters ...</string>
    </property>
   </action>
-  <action name="actionFoo" >
+  <action name="actionVCRPlay" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqVcrPlay22.png</iconset>
+   </property>
    <property name="text" >
-    <string>Foo</string>
+    <string>Play</string>
+   </property>
+  </action>
+  <action name="actionVCRPause" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
+   <property name="icon" >
+    <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqVcrPause22.png</iconset>
+   </property>
+   <property name="text" >
+    <string>Pause</string>
+   </property>
+  </action>
+  <action name="actionToolsPlayTest" >
+   <property name="text" >
+    <string>ToolsPlayTest</string>
    </property>
   </action>
  </widget>
  <pixmapfunction></pixmapfunction>
  <resources>
-  <include location="../../GUI/Client/Widgets/pqResources.qrc" />
+  <include location="../../GUI/Client/Widgets/Resources/pqResources.qrc" />
  </resources>
  <connections/>
 </ui>

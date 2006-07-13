@@ -110,7 +110,7 @@
         <string>Split Horizontal</string>
        </property>
        <property name="icon" >
-        <iconset resource="pqWidgets.qrc" >:/pqWidgets/pqSplitViewH12.png</iconset>
+        <iconset resource="../pqResources.qrc" >:/pqWidgets/Icons/pqSplitViewH12.png</iconset>
        </property>
        <property name="autoRaise" >
         <bool>false</bool>
@@ -137,7 +137,7 @@
         <string>Split Vertical</string>
        </property>
        <property name="icon" >
-        <iconset resource="pqWidgets.qrc" >:/pqWidgets/pqSplitViewV12.png</iconset>
+        <iconset resource="../pqResources.qrc" >:/pqWidgets/Icons/pqSplitViewV12.png</iconset>
        </property>
        <property name="autoRaise" >
         <bool>false</bool>
@@ -198,7 +198,7 @@
  </widget>
  <pixmapfunction></pixmapfunction>
  <resources>
-  <include location="pqWidgets.qrc" />
+  <include location="../pqResources.qrc" />
  </resources>
  <connections/>
 </ui>

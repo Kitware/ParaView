@@ -61,9 +61,9 @@ pqDisplayColorWidget::pqDisplayColorWidget( QWidget *p ) :
   QWidget( p ),
   BlockEmission(false)
 {
-  this->CellDataIcon = new QIcon(":/pqWidgets/pqCellData16.png");
-  this->PointDataIcon = new QIcon(":/pqWidgets/pqPointData16.png");
-  this->SolidColorIcon = new QIcon(":/pqWidgets/pqSolidColor16.png");
+  this->CellDataIcon = new QIcon(":/pqWidgets/Icons/pqCellData16.png");
+  this->PointDataIcon = new QIcon(":/pqWidgets/Icons/pqPointData16.png");
+  this->SolidColorIcon = new QIcon(":/pqWidgets/Icons/pqSolidColor16.png");
 
   this->Layout  = new QHBoxLayout( this );
   this->Layout->setMargin(0);

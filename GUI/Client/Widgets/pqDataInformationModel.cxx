@@ -198,25 +198,25 @@ struct pqSourceInfo
     {
     if (!this->DataInformationValid)
       {
-      return QIcon(":/pqWidgets/pqUnknownData16.png");
+      return QIcon(":/pqWidgets/Icons/pqUnknownData16.png");
       }
 
     switch (this->DataType)
       {
     case VTK_POLY_DATA:
-      return QIcon(":/pqWidgets/pqPolydata16.png");
+      return QIcon(":/pqWidgets/Icons/pqPolydata16.png");
 
     case VTK_HYPER_OCTREE:
-      return QIcon(":/pqWidgets/pqOctreeData16.png");
+      return QIcon(":/pqWidgets/Icons/pqOctreeData16.png");
 
     case VTK_UNSTRUCTURED_GRID:
-      return QIcon(":/pqWidgets/pqUnstructuredGrid16.png");
+      return QIcon(":/pqWidgets/Icons/pqUnstructuredGrid16.png");
 
     case VTK_STRUCTURED_GRID:
-      return QIcon(":/pqWidgets/pqStructuredGrid16.png");
+      return QIcon(":/pqWidgets/Icons/pqStructuredGrid16.png");
 
     case VTK_RECTILINEAR_GRID:
-      return QIcon(":/pqWidgets/pqRectilinearGrid16.png");
+      return QIcon(":/pqWidgets/Icons/pqRectilinearGrid16.png");
 
     case VTK_IMAGE_DATA:
       /*
@@ -229,22 +229,22 @@ struct pqSourceInfo
       return "Volume (Uniform Rectilinear)";
       }
       */
-      return QIcon(":/pqWidgets/pqImageData16.png");
+      return QIcon(":/pqWidgets/Icons/pqImageData16.png");
 
     case VTK_MULTIGROUP_DATA_SET:
-      return QIcon(":/pqWidgets/pqMultiGroupData16.png");
+      return QIcon(":/pqWidgets/Icons/pqMultiGroupData16.png");
 
     case VTK_MULTIBLOCK_DATA_SET:
-      return QIcon(":/pqWidgets/pqMultiBlockData16.png");
+      return QIcon(":/pqWidgets/Icons/pqMultiBlockData16.png");
 
     case VTK_HIERARCHICAL_DATA_SET:
-      return QIcon(":/pqWidgets/pqHierarchicalData16.png");
+      return QIcon(":/pqWidgets/Icons/pqHierarchicalData16.png");
 
     case VTK_HIERARCHICAL_BOX_DATA_SET:
-      return QIcon(":/pqWidgets/pqUniformData16.png");
+      return QIcon(":/pqWidgets/Icons/pqUniformData16.png");
 
     default:
-      return QIcon(":/pqWidgets/pqUnknownData16.png");
+      return QIcon(":/pqWidgets/Icons/pqUnknownData16.png");
       }
     }
 };
@@ -339,7 +339,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
       return info.getNumberOfCells(); 
 
     case Qt::DecorationRole:
-      return QVariant(QIcon(":/pqWidgets/pqCellData16.png"));
+      return QVariant(QIcon(":/pqWidgets/Icons/pqCellData16.png"));
       }
     break;
 
@@ -351,7 +351,7 @@ QVariant pqDataInformationModel::data(const QModelIndex&idx,
       return info.getNumberOfPoints(); 
 
     case Qt::DecorationRole:
-      return QVariant(QIcon(":/pqWidgets/pqPointData16.png"));
+      return QVariant(QIcon(":/pqWidgets/Icons/pqPointData16.png"));
       }
     break;
 

@@ -182,10 +182,10 @@ QVariant pqSourceInfoModel::data(const QModelIndex &idx, int role) const
           {
           if(item->Parent == this->Root && item->Name == "Favorites")
             {
-            return QVariant(QPixmap(":/pqWidgets/pqFavorites16.png"));
+            return QVariant(QPixmap(":/pqWidgets/Icons/pqFavorites16.png"));
             }
 
-          return QVariant(QPixmap(":/pqWidgets/pqFolder16.png"));
+          return QVariant(QPixmap(":/pqWidgets/Icons/pqFolder16.png"));
           }
         else if(this->Icons)
           {
@@ -195,7 +195,7 @@ QVariant pqSourceInfoModel::data(const QModelIndex &idx, int role) const
         else
           {
           // Default to the source pixmap.
-          return QVariant(QPixmap(":/pqWidgets/pqSource16.png"));
+          return QVariant(QPixmap(":/pqWidgets/Icons/pqSource16.png"));
           }
         }
       case Qt::WhatsThisRole:

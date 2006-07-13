@@ -105,7 +105,7 @@ QVariant pqSourceHistoryModel::data(const QModelIndex &idx, int role) const
         else
           {
           // Default to the source pixmap.
-          return QVariant(QPixmap(":/pqWidgets/pqSource16.png"));
+          return QVariant(QPixmap(":/pqWidgets/Icons/pqSource16.png"));
           }
         }
       }

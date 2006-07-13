@@ -107,26 +107,26 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")
 
 SET(UI_FORMS
-  pq3DViewPropertiesWidget.ui
-  pqAbortAnimation.ui
-  pqAddSourceDialog.ui
-  pqAnimationSettings.ui
-  pqContourControls.ui
-  pqCustomFilterDefinitionWizard.ui
-  pqCustomFilterManager.ui
-  pqDisplayProxyEditor.ui
-  pqHandleWidget.ui
-  pqImplicitPlaneWidget.ui
-  pqLineWidget.ui
-  pqMultiViewFrameMenu.ui
-  pqOutputWindow.ui
-  pqPointSourceControls.ui
-  pqRenderViewEditor.ui
-  pqSampleScalarAddRangeDialog.ui
-  pqSampleScalarWidget.ui
-  pqServerBrowser.ui
-  pqSettingsDialog.ui
-  pqStreamTracerControls.ui
+  Resources/UI/pq3DViewPropertiesWidget.ui
+  Resources/UI/pqAbortAnimation.ui
+  Resources/UI/pqAddSourceDialog.ui
+  Resources/UI/pqAnimationSettings.ui
+  Resources/UI/pqContourControls.ui
+  Resources/UI/pqCustomFilterDefinitionWizard.ui
+  Resources/UI/pqCustomFilterManager.ui
+  Resources/UI/pqDisplayProxyEditor.ui
+  Resources/UI/pqHandleWidget.ui
+  Resources/UI/pqImplicitPlaneWidget.ui
+  Resources/UI/pqLineWidget.ui
+  Resources/UI/pqMultiViewFrameMenu.ui
+  Resources/UI/pqOutputWindow.ui
+  Resources/UI/pqPointSourceControls.ui
+  Resources/UI/pqRenderViewEditor.ui
+  Resources/UI/pqSampleScalarAddRangeDialog.ui
+  Resources/UI/pqSampleScalarWidget.ui
+  Resources/UI/pqServerBrowser.ui
+  Resources/UI/pqSettingsDialog.ui
+  Resources/UI/pqStreamTracerControls.ui
 )
 
 QT4_WRAP_UI(UI_BUILT_SOURCES
@@ -134,7 +134,7 @@ QT4_WRAP_UI(UI_BUILT_SOURCES
 )
 
 SET(UI_RESOURCES
-  pqResources.qrc
+  Resources/pqResources.qrc
 )
 
 QT4_ADD_RESOURCES(RCS_SOURCES

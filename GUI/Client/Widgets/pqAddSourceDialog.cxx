@@ -169,7 +169,7 @@ void pqAddSourceDialog::setSourceList(QAbstractItemModel *sources)
 
     // Set up the path in the combobox.
     this->Form->SourceGroup->clear();
-    this->Form->SourceGroup->addItem(QIcon(":/pqWidgets/pqFolder16.png"), "Filters");
+    this->Form->SourceGroup->addItem(QIcon(":/pqWidgets/Icons/pqFolder16.png"), "Filters");
     this->Form->SourceGroup->setCurrentIndex(0);
 
     // Reset the back button history.
@@ -430,7 +430,7 @@ void pqAddSourceDialog::changeRoot(const QModelIndex &index)
   this->getPath(index, path);
   path.prepend("Filters");
   this->Form->SourceGroup->clear();
-  QIcon folder = QIcon(":/pqWidgets/pqFolder16.png");
+  QIcon folder = QIcon(":/pqWidgets/Icons/pqFolder16.png");
   QStringList::Iterator iter = path.begin();
   for( ; iter != path.end(); ++iter)
     {

@@ -498,17 +498,17 @@ void pqDisplayProxyEditor::updateColorByMenu(bool forceUpdate)
     {
     if (regExpPoint.indexIn(name) != -1)
       {
-      this->Internal->ColorBy->addItem(QIcon(":/pqWidgets/pqPointData16.png"),
+      this->Internal->ColorBy->addItem(QIcon(":/pqWidgets/Icons/pqPointData16.png"),
         name);
       }
     else if (regExpCell.indexIn(name)!= -1)
       {
-      this->Internal->ColorBy->addItem(QIcon(":/pqWidgets/pqCellData16.png"),
+      this->Internal->ColorBy->addItem(QIcon(":/pqWidgets/Icons/pqCellData16.png"),
         name);
       }
     else
       {
-      this->Internal->ColorBy->addItem(QIcon(":/pqWidgets/pqSolidColor16.png"),
+      this->Internal->ColorBy->addItem(QIcon(":/pqWidgets/Icons/pqSolidColor16.png"),
         name);
       }
     }

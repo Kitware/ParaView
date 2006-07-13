@@ -92,7 +92,7 @@ QVariant pqCustomFilterManagerModel::data(const QModelIndex &idx,
         }
       case Qt::DecorationRole:
         {
-        return QVariant(QPixmap(":/pqWidgets/pqBundle16.png"));
+        return QVariant(QPixmap(":/pqWidgets/Icons/pqBundle16.png"));
         }
       }
     }

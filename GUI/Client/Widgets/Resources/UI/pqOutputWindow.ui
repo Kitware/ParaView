@@ -79,7 +79,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="Resources.qrc" />
+  <include location="../pqResources.qrc" />
  </resources>
  <connections>
   <connection>

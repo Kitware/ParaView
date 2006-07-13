@@ -92,11 +92,11 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->AcceptButton = new QPushButton(this);
   this->AcceptButton->setObjectName("Accept");
   this->AcceptButton->setText(tr("Accept"));
-  this->AcceptButton->setIcon(QIcon(QPixmap(":/pqWidgets/pqUpdate16.png")));
+  this->AcceptButton->setIcon(QIcon(QPixmap(":/pqWidgets/Icons/pqUpdate16.png")));
   this->ResetButton = new QPushButton(this);
   this->ResetButton->setObjectName("Reset");
   this->ResetButton->setText(tr("Reset"));
-  this->ResetButton->setIcon(QIcon(QPixmap(":/pqWidgets/pqCancel16.png")));
+  this->ResetButton->setIcon(QIcon(QPixmap(":/pqWidgets/Icons/pqCancel16.png")));
   buttonlayout->addStretch();
   buttonlayout->addWidget(this->AcceptButton);
   buttonlayout->addWidget(this->ResetButton);
@@ -216,7 +216,7 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
     else
       {
       // try to find a custom form in our pqWidgets resources
-      QString proxyui = QString(":/pqWidgets/") + QString(proxy->GetXMLName()) + QString(".ui");
+      QString proxyui = QString(":/pqWidgets/UI/") + QString(proxy->GetXMLName()) + QString(".ui");
       pqLoadedFormObjectPanel* panel = new pqLoadedFormObjectPanel(proxyui, NULL);
       if(!panel->isValid())
         {

@@ -41,49 +41,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 const char *pqPlayControlsWidget::Name[NUM_BUTTONS] = {
   "First",
   "Back",
+  "Play",
+  "Pause",
   "Forward",
-  "Last",
-//  "Pause",
-//  "Play"
+  "Last"
 };
 const char *pqPlayControlsWidget::Image[NUM_BUTTONS] = {
   ":pqWidgets/pqVcrFirst22.png",
   ":pqWidgets/pqVcrBack22.png",
+  ":pqWidgets/pqVcrPlay22.png",
+  ":pqWidgets/pqVcrPause22.png",
   ":pqWidgets/pqVcrForward22.png",
-  ":pqWidgets/pqVcrLast22.png",
-//  ":pqWidgets/pqVcrPause22.png",
-//  ":pqWidgets/pqVcrPlay22.png"
+  ":pqWidgets/pqVcrLast22.png"  
 };
 
 pqPlayControlsWidget::pqPlayControlsWidget(QWidget *_parent)
   : QWidget( _parent)
 {
-  // this->Frame = new QFrame( this, "pqPlayControlsWidget" );
-  // this->Frame->setEnabled( TRUE );
-  // this->Frame->setFrameStyle( QFrame::Box | QFrame::Plain );
-  // this->Frame->setFrameShape( QFrame::Box );
-  // this->Frame->setFrameShadow( QFrame::Plain );
-  // this->Frame->setLineWidth( 1 );
-  // this->Frame->setFocusPolicy( QWidget::NoFocus );
 
   this->Layout = new QHBoxLayout( this );
   this->Layout->setMargin(0);
   this->Layout->setSpacing(0);
 
-  int max_dim = 22;
   for ( int i=0;i<pqPlayControlsWidget::NUM_BUTTONS;i++ )
     {
     this->Button[i] = new QToolButton( this ); 
     this->Button[i]->setAutoRaise( true );
-    QSizePolicy size_policy = this->Button[i]->sizePolicy();
-    size_policy.setHorizontalPolicy(QSizePolicy::Minimum);
-    size_policy.setVerticalPolicy(QSizePolicy::Minimum);
-    size_policy.setHorizontalStretch(0);
-    size_policy.setVerticalStretch(0);
-    this->Button[i]->setSizePolicy(size_policy);
-    this->Button[i]->setMaximumSize( QSize( max_dim, max_dim ) );
-    // this->Button[i]->setText( tr( "..." ) );
-    // this->Button[i]->setFocusPolicy( QWidget::NoFocus );
+    this->Button[i]->setIconSize( QSize(22,22) );
     this->Button[i]->setIcon( QIcon(pqPlayControlsWidget::Image[i]) );
     this->Button[i]->setToolTip(pqPlayControlsWidget::Name[i]);
     this->Button[i]->setStatusTip(pqPlayControlsWidget::Name[i]);
@@ -94,17 +78,16 @@ pqPlayControlsWidget::pqPlayControlsWidget(QWidget *_parent)
   connect( this->Button[FIRST], SIGNAL( clicked() ), 
       SIGNAL( first() ) ); 
   connect( this->Button[LAST], SIGNAL( clicked() ), 
-      SIGNAL( last() ) ); 
+      SIGNAL( last() ) );
+  connect( this->Button[PLAY], SIGNAL( clicked() ), 
+      SIGNAL( play() ) ); 
+  connect( this->Button[PAUSE], SIGNAL( clicked() ), 
+      SIGNAL( pause() ) );  
   connect( this->Button[FORWARD], SIGNAL( clicked() ), 
       SIGNAL( forward() ) ); 
   connect( this->Button[BACK], SIGNAL( clicked() ), 
       SIGNAL( back() ) ); 
-/*
-  connect( this->Button[PLAY], SIGNAL( clicked() ), 
-      SIGNAL( play() ) ); 
-  connect( this->Button[PAUSE], SIGNAL( clicked() ), 
-      SIGNAL( pause() ) ); 
-*/
+
 }
 
 pqPlayControlsWidget::~pqPlayControlsWidget()

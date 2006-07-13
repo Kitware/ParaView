@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 
 pqExodusPanel::pqExodusPanel(QWidget* p) :
-  pqLoadedFormObjectPanel(":/pqWidgets/pqExodusPanel.ui", p)
+  pqLoadedFormObjectPanel(":/pqWidgets/UI/pqExodusPanel.ui", p)
 {
   this->DisplItem = 0;
 }
@@ -69,10 +69,10 @@ void pqExodusPanel::linkServerManagerProperties()
   
   this->DisplItem = 0;
 
-  QPixmap cellPixmap(":/pqWidgets/pqCellData16.png");
-  QPixmap pointPixmap(":/pqWidgets/pqPointData16.png");
-  QPixmap sideSetPixmap(":/pqWidgets/pqSideSet16.png");
-  QPixmap nodeSetPixmap(":/pqWidgets/pqNodeSet16.png");
+  QPixmap cellPixmap(":/pqWidgets/Icons/pqCellData16.png");
+  QPixmap pointPixmap(":/pqWidgets/Icons/pqPointData16.png");
+  QPixmap sideSetPixmap(":/pqWidgets/Icons/pqSideSet16.png");
+  QPixmap nodeSetPixmap(":/pqWidgets/Icons/pqNodeSet16.png");
 
   // set the range for the slider 
   // (should probably be moved down to pqNamedObjectPanel)

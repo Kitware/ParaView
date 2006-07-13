@@ -65,6 +65,8 @@ private:
   enum {
     FIRST,
     BACK,
+    PLAY,
+    PAUSE,
     FORWARD,
     LAST,
     NUM_BUTTONS
