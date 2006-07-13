@@ -28,19 +28,9 @@
      <x>0</x>
      <y>0</y>
      <width>1163</width>
-     <height>29</height>
+     <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuView" >
-    <property name="title" >
-     <string>View</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuRecent_Files" >
-    <property name="title" >
-     <string>Recent Files</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuRecentFiles" >
     <property name="title" >
      <string>Recent Files</string>
@@ -122,6 +112,17 @@
     <addaction name="separator" />
     <addaction name="actionFileExit" />
    </widget>
+   <widget class="QMenu" name="menuView" >
+    <property name="title" >
+     <string>View</string>
+    </property>
+    <widget class="QMenu" name="menuToolbars" >
+     <property name="title" >
+      <string>Toolbars</string>
+     </property>
+    </widget>
+    <addaction name="menuToolbars" />
+   </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
    <addaction name="menuView" />
@@ -188,7 +189,7 @@
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_5" />
   </widget>
-   <widget class="QToolBar" name="mainToolBar" >
+  <widget class="QToolBar" name="mainToolBar" >
    <property name="orientation" >
     <enum>Qt::Horizontal</enum>
    </property>
@@ -241,7 +242,7 @@
     <number>4</number>
    </attribute>
   </widget>
-   <widget class="QToolBar" name="undoRedoToolbar" >
+  <widget class="QToolBar" name="undoRedoToolbar" >
    <property name="windowTitle" >
     <string>Undo/Redo Controls</string>
    </property>

@@ -62,7 +62,8 @@ public:
   pqImplementation(QWidget* parent) :
     AssistantClient(0),
     Core(parent),
-    ViewMenu(0)
+    ViewMenu(0),
+    ToolbarsMenu(0)
   {
   }
   
@@ -75,6 +76,7 @@ public:
   Ui::MainWindow UI;
   pqMainWindowCore Core;
   pqViewMenu* ViewMenu;
+  pqViewMenu* ToolbarsMenu;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -85,6 +87,7 @@ MainWindow::MainWindow() :
 {
   this->Implementation->UI.setupUi(this);
   this->Implementation->ViewMenu = new pqViewMenu(*this->Implementation->UI.menuView);
+  this->Implementation->ToolbarsMenu = new pqViewMenu(*this->Implementation->UI.menuToolbars);
 
   this->setWindowTitle(
     QString("ParaView %1 (alpha)").arg(PARAVIEW_VERSION_FULL));
@@ -262,7 +265,7 @@ MainWindow::MainWindow() :
   connect(this->Implementation->UI.actionVCRLastFrame,
     SIGNAL(triggered()), &this->Implementation->Core.VCRController(), SLOT(onLastFrame()));
 
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.VCRToolbar,
+  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.VCRToolbar,
     this->Implementation->UI.VCRToolbar->windowTitle());
 
   connect(this->Implementation->UI.actionMoveMode, 
@@ -271,10 +274,10 @@ MainWindow::MainWindow() :
   connect(this->Implementation->UI.actionSelectionMode, 
     SIGNAL(triggered()), &this->Implementation->Core.selectionManager(), SLOT(switchToSelection()));
 
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.selectionToolbar,
+  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.selectionToolbar,
     this->Implementation->UI.selectionToolbar->windowTitle());
 
-  this->Implementation->ViewMenu->addWidget(this->Implementation->UI.undoRedoToolbar,
+  this->Implementation->ToolbarsMenu->addWidget(this->Implementation->UI.undoRedoToolbar,
     this->Implementation->UI.undoRedoToolbar->windowTitle());
 
   this->Implementation->Core.setupVariableToolbar(
@@ -297,8 +300,6 @@ MainWindow::MainWindow() :
     this->Implementation->UI.customFilterToolbar);
   this->Implementation->ViewMenu->addWidget(this->Implementation->UI.customFilterToolbar,
     this->Implementation->UI.customFilterToolbar->windowTitle());
-
-  this->Implementation->ViewMenu->addSeparator();
 
   // Setup dockable windows ...
   this->Implementation->Core.setupPipelineBrowser(
