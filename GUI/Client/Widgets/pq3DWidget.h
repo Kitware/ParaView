@@ -70,8 +70,8 @@ public:
   /// A controlled proxy must provide "Hints" describing how
   /// the properties of the controlled proxy are controlled by the
   /// 3D widget.
-  virtual void setControlledProxy(pqSMProxy);
-  pqSMProxy getControlledProxy() const;
+  virtual void setControlledProxy(vtkSMProxy*);
+  vtkSMProxy* getControlledProxy() const;
 
   /// Set the hints XML to be using to map the 3D widget to the controlled
   /// proxy. This method must be called only after the controlled

@@ -162,7 +162,7 @@ pqProxy* pq3DWidget::getReferenceProxy() const
 }
 
 //-----------------------------------------------------------------------------
-void pq3DWidget::setControlledProxy(pqSMProxy proxy)
+void pq3DWidget::setControlledProxy(vtkSMProxy* proxy)
 {
   foreach(vtkSMProperty* controlledProperty, this->Internal->PropertyMap)
     {
@@ -216,7 +216,7 @@ void pq3DWidget::setHints(vtkPVXMLElement* hints)
 }
 
 //-----------------------------------------------------------------------------
-pqSMProxy pq3DWidget::getControlledProxy() const
+vtkSMProxy* pq3DWidget::getControlledProxy() const
 {
   return this->Internal->ControlledProxy;
 }

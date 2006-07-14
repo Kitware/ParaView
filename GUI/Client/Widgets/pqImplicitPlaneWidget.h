@@ -52,7 +52,7 @@ public:
   /// A controlled proxy must provide "Hints" describing how
   /// the properties of the controlled proxy are controlled by the
   /// 3D widget.
-  virtual void setControlledProxy(pqSMProxy);
+  virtual void setControlledProxy(vtkSMProxy*);
 
 public slots:
   /// Makes the 3D widget plane visible (respects the overall visibility flag)

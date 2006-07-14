@@ -180,7 +180,7 @@ pqImplicitPlaneWidget::~pqImplicitPlaneWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqImplicitPlaneWidget::setControlledProxy(pqSMProxy proxy)
+void pqImplicitPlaneWidget::setControlledProxy(vtkSMProxy* proxy)
 {
   if(!this->getWidgetProxy())
     {
