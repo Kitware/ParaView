@@ -209,8 +209,6 @@
    <addaction name="actionServerDisconnect" />
    <addaction name="separator" />
    <addaction name="actionHelpHelp" />
-   <addaction name="separator" />
-   <addaction name="actionFileExit" />
   </widget>
   <widget class="QToolBar" name="selectionToolbar" >
    <property name="windowTitle" >
