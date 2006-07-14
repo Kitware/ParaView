@@ -27,8 +27,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1163</width>
-     <height>19</height>
+     <width>980</width>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp" >
@@ -129,22 +129,13 @@
    <addaction name="menuTools" />
    <addaction name="menuHelp" />
   </widget>
-  <widget class="QStatusBar" name="statusbar" >
-   <property name="geometry" >
-    <rect>
-     <x>0</x>
-     <y>656</y>
-     <width>1163</width>
-     <height>19</height>
-    </rect>
-   </property>
-  </widget>
+  <widget class="QStatusBar" name="statusbar" />
   <widget class="QDockWidget" name="pipelineBrowserDock" >
-   <property name="windowTitle" >
-    <string>Pipeline Browser</string>
-   </property>
    <property name="allowedAreas" >
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Pipeline Browser</string>
    </property>
    <attribute name="dockWidgetArea" >
     <number>1</number>
@@ -159,11 +150,11 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="objectInspectorDock" >
-   <property name="windowTitle" >
-    <string>Object Inspector</string>
-   </property>
    <property name="allowedAreas" >
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Object Inspector</string>
    </property>
    <attribute name="dockWidgetArea" >
     <number>1</number>
@@ -171,11 +162,11 @@
    <widget class="QWidget" name="dockWidgetContents_3" />
   </widget>
   <widget class="QDockWidget" name="statisticsViewDock" >
-   <property name="windowTitle" >
-    <string>Statistics View</string>
-   </property>
    <property name="allowedAreas" >
     <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Statistics View</string>
    </property>
    <attribute name="dockWidgetArea" >
     <number>8</number>
@@ -183,11 +174,11 @@
    <widget class="QWidget" name="dockWidgetContents_4" />
   </widget>
   <widget class="QDockWidget" name="elementInspectorDock" >
-   <property name="windowTitle" >
-    <string>Element Inspector</string>
-   </property>
    <property name="allowedAreas" >
     <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Element Inspector</string>
    </property>
    <attribute name="dockWidgetArea" >
     <number>8</number>
@@ -200,6 +191,12 @@
    </property>
    <property name="orientation" >
     <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="iconSize" >
+    <size>
+     <width>20</width>
+     <height>22</height>
+    </size>
    </property>
    <attribute name="toolBarArea" >
     <number>4</number>
@@ -222,6 +219,12 @@
    <property name="orientation" >
     <enum>Qt::Horizontal</enum>
    </property>
+   <property name="iconSize" >
+    <size>
+     <width>20</width>
+     <height>22</height>
+    </size>
+   </property>
    <attribute name="toolBarArea" >
     <number>4</number>
    </attribute>
@@ -235,6 +238,12 @@
    <property name="orientation" >
     <enum>Qt::Horizontal</enum>
    </property>
+   <property name="iconSize" >
+    <size>
+     <width>20</width>
+     <height>22</height>
+    </size>
+   </property>
    <attribute name="toolBarArea" >
     <number>4</number>
    </attribute>
@@ -246,6 +255,12 @@
    <property name="orientation" >
     <enum>Qt::Horizontal</enum>
    </property>
+   <property name="iconSize" >
+    <size>
+     <width>20</width>
+     <height>22</height>
+    </size>
+   </property>
    <attribute name="toolBarArea" >
     <number>4</number>
    </attribute>
@@ -256,6 +271,12 @@
    </property>
    <property name="orientation" >
     <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="iconSize" >
+    <size>
+     <width>20</width>
+     <height>22</height>
+    </size>
    </property>
    <attribute name="toolBarArea" >
     <number>4</number>
@@ -269,6 +290,12 @@
    </property>
    <property name="orientation" >
     <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="iconSize" >
+    <size>
+     <width>20</width>
+     <height>22</height>
+    </size>
    </property>
    <attribute name="toolBarArea" >
     <number>4</number>
