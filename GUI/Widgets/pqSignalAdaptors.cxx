@@ -43,6 +43,9 @@ pqSignalAdaptorComboBox::pqSignalAdaptorComboBox(QComboBox* p)
 {
   QObject::connect(p, SIGNAL(currentIndexChanged(const QString&)), 
                    this, SIGNAL(currentTextChanged(const QString&)));
+
+  QObject::connect(p, SIGNAL(currentIndexChanged(int)), 
+                   this, SIGNAL(currentIndexChanged(int)));
 }
 
 QString pqSignalAdaptorComboBox::currentText() const
@@ -54,6 +57,17 @@ void pqSignalAdaptorComboBox::setCurrentText(const QString& text)
 {
   QComboBox* combo = static_cast<QComboBox*>(this->parent());
   combo->setCurrentIndex(combo->findText(text));
+}
+
+int pqSignalAdaptorComboBox::currentIndex() const
+{
+  return static_cast<QComboBox*>(this->parent())->currentIndex();
+}
+
+void pqSignalAdaptorComboBox::setCurrentIndex(int index)
+{
+  QComboBox* combo = static_cast<QComboBox*>(this->parent());
+  combo->setCurrentIndex(index);
 }
 
 pqSignalAdaptorColor::pqSignalAdaptorColor(QObject* p, 

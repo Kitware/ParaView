@@ -47,17 +47,24 @@ class QTWIDGETS_EXPORT pqSignalAdaptorComboBox : public QObject
 {
   Q_OBJECT
   Q_PROPERTY(QString currentText READ currentText WRITE setCurrentText)
+  Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex)
+
 public:
   /// constructor requires a QComboBox
   pqSignalAdaptorComboBox(QComboBox* p);
   /// get the current text of a combo box
   QString currentText() const;
+  /// get the current index of a combo box.
+  int currentIndex() const;
 signals:
   /// signal text changed in a combo box
   void currentTextChanged(const QString&);  
+  void currentIndexChanged(int);
 public slots:
   /// set the current text of a combo box (actually sets the index for the text)
   void setCurrentText(const QString&);
+  /// set the current index of a combox box.
+  void setCurrentIndex(int index);
 protected:
 };
 
