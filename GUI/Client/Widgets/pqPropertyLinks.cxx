@@ -122,11 +122,11 @@ pqPropertyLinksConnection::~pqPropertyLinksConnection()
   delete this->Internal;
 }
 
-bool pqPropertyLinksConnection::isEqual(vtkSMProxy* proxy, vtkSMProperty* property, int idx,
+bool pqPropertyLinksConnection::isEqual(vtkSMProxy* proxy, vtkSMProperty* smproperty, int idx,
     QObject* qObject, const char* qproperty) const
 {
   return (this->Internal->Proxy == proxy &&
-    this->Internal->Property == property &&
+    this->Internal->Property == smproperty &&
     this->Internal->Index == idx &&
     this->Internal->QtObject == qObject &&
     this->Internal->QtProperty == qproperty);

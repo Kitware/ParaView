@@ -93,7 +93,7 @@ pqPointSourceWidget::~pqPointSourceWidget()
 
 //-----------------------------------------------------------------------------
 void pqPointSourceWidget::setControlledProperty(const char* function,
-  vtkSMProperty* property)
+  vtkSMProperty* _property)
 {
   if (strcmp(function, "NumberOfPoints") == 0)
     {
@@ -109,6 +109,6 @@ void pqPointSourceWidget::setControlledProperty(const char* function,
       SIGNAL(valueChanged(double)),
       this->getWidgetProxy(), this->getWidgetProxy()->GetProperty("Radius"));
     }
-  this->pqHandleWidget::setControlledProperty(function, property);
+  this->pqHandleWidget::setControlledProperty(function, _property);
 }
 

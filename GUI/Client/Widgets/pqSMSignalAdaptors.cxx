@@ -146,9 +146,9 @@ void pqSignalAdaptorProxyList::setWidgetFrame(QWidget* frame)
 }
 
 //-----------------------------------------------------------------------------
-void pqSignalAdaptorProxyList::setReferenceProxy(vtkSMProxy* proxy)
+void pqSignalAdaptorProxyList::setReferenceProxy(vtkSMProxy* _proxy)
 {
-  this->Internal->ReferenceProxy = proxy;
+  this->Internal->ReferenceProxy = _proxy;
   this->initialize3DWidget();
 }
 
@@ -316,9 +316,9 @@ void pqSignalAdaptorProxyList::handleProxyChanged()
 
 //*****************************************************************************
 pqSignalAdaptorDouble::pqSignalAdaptorDouble(QObject* _parent,
-  const char* property, const char* signal): QObject(_parent)
+  const char* _property, const char* signal): QObject(_parent)
 {
-  this->PropertyName = property;
+  this->PropertyName = _property;
   QObject::connect(_parent, signal, this, SLOT(objectSignalFired()));
 }
 
