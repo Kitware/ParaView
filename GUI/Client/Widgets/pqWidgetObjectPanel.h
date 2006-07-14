@@ -58,7 +58,7 @@ public slots:
   
 protected:
   /// set the proxy to display properties for
-  virtual void setProxyInternal(pqSMProxy proxy);
+  virtual void setProxyInternal(pqProxy* proxy);
 
   vtkSMNew3DWidgetProxy* Widget;
 

@@ -102,7 +102,7 @@ class pqSignalAdaptorProxyListInternal
 {
 public:
   vtkSmartPointer<vtkSMProxyListDomain> Domain;
-  vtkSmartPointer<vtkSMProxy> ReferenceProxy;
+  QPointer<pqProxy> ReferenceProxy;
   QPointer<QWidget> WidgetFrame;
 
   typedef QMap<vtkSMProxy*, QPointer<pq3DWidget> > MapOf3DWidgets;
@@ -146,7 +146,7 @@ void pqSignalAdaptorProxyList::setWidgetFrame(QWidget* frame)
 }
 
 //-----------------------------------------------------------------------------
-void pqSignalAdaptorProxyList::setReferenceProxy(vtkSMProxy* _proxy)
+void pqSignalAdaptorProxyList::setReferenceProxy(pqProxy* _proxy)
 {
   this->Internal->ReferenceProxy = _proxy;
   this->initialize3DWidget();

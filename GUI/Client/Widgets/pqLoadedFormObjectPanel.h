@@ -50,7 +50,7 @@ public:
 
 protected:
   /// set the proxy to display properties for
-  virtual void setProxyInternal(pqSMProxy proxy);
+  virtual void setProxyInternal(pqProxy* proxy);
 
 };
 

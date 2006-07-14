@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqImplicitPlaneWidget_h
 #define _pqImplicitPlaneWidget_h
 
-#include "pqSMProxy.h"
+#include "pqProxy.h"
 
 #include "pq3DWidget.h"
 
@@ -52,7 +52,7 @@ public:
   /// A controlled proxy must provide "Hints" describing how
   /// the properties of the controlled proxy are controlled by the
   /// 3D widget.
-  virtual void setControlledProxy(vtkSMProxy*);
+  virtual void setControlledProxy(pqSMProxy);
 
 public slots:
   /// Makes the 3D widget plane visible (respects the overall visibility flag)

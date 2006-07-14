@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderModule.h"
 #include "pqServerManagerModel.h"
 #include "pqWidgetObjectPanel.h"
+#include "pqPipelineSource.h"
+#include "pqPipelineDisplay.h"
 
 #include <vtkCamera.h>
 #include <vtkCommand.h>
@@ -126,8 +128,20 @@ pqWidgetObjectPanel::~pqWidgetObjectPanel()
 //-----------------------------------------------------------------------------
 void pqWidgetObjectPanel::select()
 {
-  pqRenderModule* renModule = 
-    pqApplicationCore::instance()->getActiveRenderModule();
+  pqPipelineSource* source;
+  pqPipelineDisplay* display = NULL;
+  pqRenderModule* renModule = NULL;
+  
+  source = qobject_cast<pqPipelineSource*>(this->proxy());
+  if(source)
+    {
+    display = source->getDisplay(0);
+    }
+  if(display)
+    {
+    renModule = display->getRenderModule(0);
+    }
+  
   if (this->Widget && renModule)
     {
     vtkSMRenderModuleProxy* rm = renModule->getRenderModuleProxy() ;
@@ -150,8 +164,20 @@ void pqWidgetObjectPanel::deselect()
   if(this->Widget)
     this->Widget->RemoveObserver(this->Observer);
 
-  pqRenderModule* renModule = 
-    pqApplicationCore::instance()->getActiveRenderModule();
+  pqPipelineSource* source;
+  pqPipelineDisplay* display = NULL;
+  pqRenderModule* renModule = NULL;
+  
+  source = qobject_cast<pqPipelineSource*>(this->proxy());
+  if(source)
+    {
+    display = source->getDisplay(0);
+    }
+  if(display)
+    {
+    renModule = display->getRenderModule(0);
+    }
+
   if (this->Widget && renModule)
     {
     vtkSMRenderModuleProxy* rm = renModule->getRenderModuleProxy() ;
@@ -165,7 +191,7 @@ void pqWidgetObjectPanel::deselect()
 }
 
 //-----------------------------------------------------------------------------
-void pqWidgetObjectPanel::setProxyInternal(pqSMProxy p)
+void pqWidgetObjectPanel::setProxyInternal(pqProxy* p)
 {
   pqLoadedFormObjectPanel::setProxyInternal(p);
 
@@ -181,8 +207,7 @@ void pqWidgetObjectPanel::setProxyInternal(pqSMProxy p)
       pqApplicationCore::instance()->get3DWidgetFactory();
     // We won't have to do this once setProxy() takes
     // pqProxy as an argument.
-    pqServer* server = pqApplicationCore::instance()->
-      getServerManagerModel()->getServer(this->Proxy->GetConnectionID());
+    pqServer* server = p->getServer();
     this->Widget = widgetFactory->get3DWidget("ImplicitPlaneWidgetDisplay",
       server);
     }
@@ -196,7 +221,7 @@ void pqWidgetObjectPanel::onResetBounds()
   if(this->Widget)
     {
     if(vtkSMProxyProperty* const input_property = vtkSMProxyProperty::SafeDownCast(
-      this->Proxy->GetProperty("Input")))
+      this->Proxy->getProxy()->GetProperty("Input")))
       {
       if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
         input_property->GetProxy(0)))
@@ -234,7 +259,7 @@ void pqWidgetObjectPanel::onResetBounds()
           place_widget->SetElements(widget_bounds);
           
           this->Widget->UpdateVTKObjects();
-          pqApplicationCore::instance()->render();
+          qobject_cast<pqPipelineSource*>(this->proxy())->renderAllViews();
           }
         }
       }
@@ -246,7 +271,7 @@ void pqWidgetObjectPanel::onUseCenterBounds()
   if(this->Widget)
     {
     if(vtkSMProxyProperty* const input_property = vtkSMProxyProperty::SafeDownCast(
-      this->Proxy->GetProperty("Input")))
+      this->Proxy->getProxy()->GetProperty("Input")))
       {
       if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
         input_property->GetProxy(0)))
@@ -264,7 +289,7 @@ void pqWidgetObjectPanel::onUseCenterBounds()
           {
           origin->SetElements(input_origin);
           this->Widget->UpdateVTKObjects();
-          pqApplicationCore::instance()->render();
+          qobject_cast<pqPipelineSource*>(this->proxy())->renderAllViews();
           }
         }
       }
@@ -280,7 +305,7 @@ void pqWidgetObjectPanel::onUseXNormal()
       {
       normal->SetElements3(1, 0, 0);
       this->Widget->UpdateVTKObjects();
-      pqApplicationCore::instance()->render();
+      qobject_cast<pqPipelineSource*>(this->proxy())->renderAllViews();
       }
     }
 }
@@ -294,7 +319,7 @@ void pqWidgetObjectPanel::onUseYNormal()
       {
       normal->SetElements3(0, 1, 0);
       this->Widget->UpdateVTKObjects();
-      pqApplicationCore::instance()->render();
+      qobject_cast<pqPipelineSource*>(this->proxy())->renderAllViews();
       }
     }
 }
@@ -308,7 +333,7 @@ void pqWidgetObjectPanel::onUseZNormal()
       {
       normal->SetElements3(0, 0, 1);
       this->Widget->UpdateVTKObjects();
-      pqApplicationCore::instance()->render();
+      qobject_cast<pqPipelineSource*>(this->proxy())->renderAllViews();
       }
     }
 }
@@ -317,9 +342,22 @@ void pqWidgetObjectPanel::onUseCameraNormal()
 {
   if(this->Widget)
     {
-    if(vtkCamera* const camera =
-      pqApplicationCore::instance()->getActiveRenderModule()->
-      getRenderModuleProxy()->GetRenderer()->GetActiveCamera())
+    pqPipelineSource* source;
+    pqPipelineDisplay* display = NULL;
+    pqRenderModule* renModule = NULL;
+    
+    source = qobject_cast<pqPipelineSource*>(this->proxy());
+    if(source)
+      {
+      display = source->getDisplay(0);
+      }
+    if(display)
+      {
+      renModule = display->getRenderModule(0);
+      }
+    
+    if(vtkCamera* const camera = renModule ?
+      renModule->getRenderModuleProxy()->GetRenderer()->GetActiveCamera() : NULL)
       {
       if(vtkSMDoubleVectorProperty* const normal = vtkSMDoubleVectorProperty::SafeDownCast(
         this->Widget->GetProperty("Normal")))
@@ -329,7 +367,7 @@ void pqWidgetObjectPanel::onUseCameraNormal()
         normal->SetElements3(-camera_normal[0], -camera_normal[1], -camera_normal[2]);
         
         this->Widget->UpdateVTKObjects();
-        pqApplicationCore::instance()->render();
+        qobject_cast<pqPipelineSource*>(this->proxy())->renderAllViews();
         }
       }
     }

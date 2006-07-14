@@ -40,6 +40,7 @@ class vtkCommand;
 class vtkObject;
 class vtkSMUndoStack;
 class vtkUndoElement;
+class pqServer;
 
 /// This is an adaptor for the vtkSMUndoStack.
 /// This class updates the vtkSMUndoStack status on accept reset etc etc.
@@ -93,10 +94,14 @@ signals:
   void Undone();
   // Fired after redo.
   void Redone();
+ 
+public slots: 
+  void setActiveServer(pqServer* server);  // TODO remove this
 
 private slots:
   void onStackChanged(vtkObject*, unsigned long, void*, 
     void*,  vtkCommand*);
+
 
 private:
   pqUndoStackImplementation* Implementation;

@@ -87,7 +87,7 @@ QSize pqObjectPanel::sizeHint() const
 
 //-----------------------------------------------------------------------------
 /// set the proxy to display properties for
-void pqObjectPanel::setProxy(pqSMProxy p)
+void pqObjectPanel::setProxy(pqProxy* p)
 {
   if(p != this->Proxy)
     {
@@ -96,15 +96,15 @@ void pqObjectPanel::setProxy(pqSMProxy p)
 }
 
 //-----------------------------------------------------------------------------
-void pqObjectPanel::setProxyInternal(pqSMProxy p)
+void pqObjectPanel::setProxyInternal(pqProxy* p)
 {
   this->Proxy = p;
   if(this->Proxy)
     {
-    this->Proxy->UpdateVTKObjects();
-    this->Proxy->UpdatePropertyInformation();
+    this->Proxy->getProxy()->UpdateVTKObjects();
+    this->Proxy->getProxy()->UpdatePropertyInformation();
     vtkSMSourceProxy* sp;
-    sp = vtkSMSourceProxy::SafeDownCast(this->Proxy);
+    sp = vtkSMSourceProxy::SafeDownCast(this->Proxy->getProxy());
     if(sp)
       {
       sp->UpdatePipelineInformation();
@@ -114,7 +114,7 @@ void pqObjectPanel::setProxyInternal(pqSMProxy p)
 
 //-----------------------------------------------------------------------------
 /// get the proxy for which properties are displayed
-pqSMProxy pqObjectPanel::proxy()
+pqProxy* pqObjectPanel::proxy()
 {
   return this->Proxy;
 }
@@ -142,7 +142,7 @@ void pqObjectPanel::reset()
     {
     return;
     }
-  this->Proxy->UpdatePropertyInformation();
+  this->Proxy->getProxy()->UpdatePropertyInformation();
   this->PropertyManager->reject();
   emit this->onreset();
 }

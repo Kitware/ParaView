@@ -70,9 +70,9 @@ public slots:
   void switchToSelection();
   void switchToInteraction();
   void clearSelection();
+  void setActiveRenderModule(pqRenderModule*);
 
 private slots:
-  void activeRenderModuleChanged(pqRenderModule*);
   void sourceRemoved(pqPipelineSource*);
   void proxyUnRegistered(QString, QString, vtkSMProxy*);
 

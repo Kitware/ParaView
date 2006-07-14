@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "pqMain.h"
+#include <QApplication>
 #include "pqOptions.h"
 #include "pqProcessModuleGUIHelper.h"
 
@@ -101,8 +102,11 @@ void ParaViewInitializeInterpreter(vtkProcessModule* pm)
   vtkXdmfCS_Initialize(pm->GetInterpreter());
 }
 
-int pqMain::Run(int argc, char* argv[], pqProcessModuleGUIHelper* helper)
+int pqMain::Run(QApplication& app, pqProcessModuleGUIHelper* helper)
 {
+  int argc = app.argc();
+  char** argv = app.argv();
+
   vtkPVMain::SetInitializeMPI(0);  // pvClient never runs with MPI.
   vtkPVMain::Initialize(&argc, &argv); // Perform any initializations.
 
@@ -112,7 +116,8 @@ int pqMain::Run(int argc, char* argv[], pqProcessModuleGUIHelper* helper)
   options->SetProcessType(vtkPVOptions::PVCLIENT);
  
   // This creates the Process Module and initializes it.
-  int ret = pvmain->Initialize(options, helper, ParaViewInitializeInterpreter, argc, argv);
+  int ret = pvmain->Initialize(options, helper, ParaViewInitializeInterpreter, 
+                               argc, argv);
   if (!ret)
     {
     // Tell process module that we support Multiple connections.
@@ -129,3 +134,4 @@ int pqMain::Run(int argc, char* argv[], pqProcessModuleGUIHelper* helper)
   
   return ret;
 }
+

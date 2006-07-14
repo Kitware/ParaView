@@ -44,6 +44,7 @@ class pqPipelineMenuInternal;
 class pqSourceInfoGroupMap;
 class pqSourceInfoIcons;
 class pqSourceInfoModel;
+class pqPipelineSource;
 class QAction;
 class QMenu;
 class QMenuBar;
@@ -82,7 +83,10 @@ public:
 
 public slots:
   void addSource();
-  void addFilter();
+  void addFilter(pqPipelineSource*);
+
+signals:
+  void filtersActivated();
 
 private:
   void setupConnections(pqSourceInfoModel *model, pqSourceInfoGroupMap *map);

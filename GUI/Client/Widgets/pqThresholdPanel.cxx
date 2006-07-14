@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMEnumerationDomain.h"
 
 // ParaView includes
+#include "pqProxy.h"
 #include "pqSMAdaptor.h"
 #include "pqPropertyManager.h"
 #include "pqDoubleSpinBoxDomain.h"
@@ -85,21 +86,21 @@ void pqThresholdPanel::accept()
 
   vtkSMStringVectorProperty* Property;
   Property = vtkSMStringVectorProperty::SafeDownCast(
-       this->proxy()->GetProperty("SelectInputScalars"));
+       this->proxy()->getProxy()->GetProperty("SelectInputScalars"));
  
   int idx = this->AttributeMode->currentIndex(); 
   QString mode = this->AttributeMode->itemData(idx).toString();
 
   Property->SetElement(3, mode.toAscii().data());
 
-  this->proxy()->UpdateVTKObjects();
+  this->proxy()->getProxy()->UpdateVTKObjects();
 }
 
 void pqThresholdPanel::reset()
 {
   vtkSMStringVectorProperty* Property;
   Property = vtkSMStringVectorProperty::SafeDownCast(
-       this->proxy()->GetProperty("SelectInputScalars"));
+       this->proxy()->getProxy()->GetProperty("SelectInputScalars"));
  
   QString mode = Property->GetElement(3);
   
@@ -137,7 +138,7 @@ void pqThresholdPanel::linkServerManagerProperties()
   // set up the attribute mode combo box
   vtkSMStringVectorProperty* AttributeProperty;
   AttributeProperty = vtkSMStringVectorProperty::SafeDownCast(
-       this->proxy()->GetProperty("SelectInputScalars"));
+       this->proxy()->getProxy()->GetProperty("SelectInputScalars"));
   AttributeProperty->UpdateDependentDomains();
   
   vtkSMEnumerationDomain* domain;
@@ -161,12 +162,12 @@ void pqThresholdPanel::linkServerManagerProperties()
   
   QComboBox* Scalars = this->findChild<QComboBox*>("SelectInputScalars");
   // connect domain to scalar combo box
-  vtkSMProperty* Property = this->proxy()->GetProperty("SelectInputScalars");
+  vtkSMProperty* Property = this->proxy()->getProxy()->GetProperty("SelectInputScalars");
   pqComboBoxDomain* d0 = new pqComboBoxDomain(Scalars, Property);
   d0->setObjectName("ScalarsDomain");
 
   // connect domain to spin boxes
-  Property = this->proxy()->GetProperty("ThresholdBetween");
+  Property = this->proxy()->getProxy()->GetProperty("ThresholdBetween");
   Property->UpdateDependentDomains();
   pqDoubleSpinBoxDomain* d1 = new pqDoubleSpinBoxDomain(this->LowerSpin,
                             Property,
@@ -306,7 +307,7 @@ void pqThresholdPanel::attributeModeChanged(int idx)
 {
   vtkSMStringVectorProperty* Property;
   Property = vtkSMStringVectorProperty::SafeDownCast(
-       this->proxy()->GetProperty("SelectInputScalars"));
+       this->proxy()->getProxy()->GetProperty("SelectInputScalars"));
 
   QString mode = this->AttributeMode->itemData(idx).toString();
 

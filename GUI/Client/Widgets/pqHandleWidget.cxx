@@ -35,6 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHandleWidget.h"
 #include "pqRenderModule.h"
 #include "pqServerManagerModel.h"
+#include "pqPipelineDisplay.h"
+#include "pqPipelineSource.h"
+#include "pqPipelineFilter.h"
 #include "pqPropertyLinks.h"
 #include "pqSMSignalAdaptors.h"
 
@@ -122,8 +125,26 @@ pqHandleWidget::~pqHandleWidget()
 
   if(widget)
     {
-    if(pqRenderModule* const renModule = 
-      pqApplicationCore::instance()->getActiveRenderModule())
+    pqPipelineFilter* source;
+    pqPipelineSource* source1 = NULL;
+    pqPipelineDisplay* display = NULL;
+    pqRenderModule* renModule = NULL;
+    
+    source = qobject_cast<pqPipelineFilter*>(this->getReferenceProxy());
+    if(source)
+      {
+      source1 = source->getInput(0);
+      }
+    if(source1)
+      {
+      display = source1->getDisplay(0);
+      }
+    if(display)
+      {
+      renModule = display->getRenderModule(0);
+      }
+
+    if(renModule)
       {
       if(vtkSMRenderModuleProxy* rm = renModule->getRenderModuleProxy())
         {
@@ -183,8 +204,23 @@ void pqHandleWidget::setControlledProxy(vtkSMProxy* proxy)
     widget->UpdateVTKObjects();
 
 
-    pqRenderModule* const renModule = 
-      pqApplicationCore::instance()->getActiveRenderModule();
+    pqPipelineFilter* source;
+    pqPipelineSource* source1 = NULL;
+    pqPipelineDisplay* display = NULL;
+    pqRenderModule* renModule = NULL;
+    source = qobject_cast<pqPipelineFilter*>(this->getReferenceProxy());
+    if(source)
+      {
+      source1 = source->getInput(0);
+      }
+    if(source1)
+      {
+      display = source1->getDisplay(0);
+      }
+    if(display)
+      {
+      renModule = display->getRenderModule(0);
+      }
       
     if(widget && renModule)
       {
@@ -250,7 +286,7 @@ void pqHandleWidget::resetBounds()
     {
     if(vtkSMProxyProperty* const input_property =
       vtkSMProxyProperty::SafeDownCast(
-        this->getReferenceProxy()->GetProperty("Input")))
+        this->getReferenceProxy()->getProxy()->GetProperty("Input")))
       {
       if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
           input_property->GetProxy(0)))

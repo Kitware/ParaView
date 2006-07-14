@@ -112,18 +112,93 @@ pqPipelineSource* pqPipelineBuilder::createSource(const char* xmlgroup,
 void pqPipelineBuilder::addConnection(pqPipelineSource* source, 
   pqPipelineSource* sink)
 {
-  vtkSMProxy* srcProxy = source->getProxy();
-  vtkSMProxy* sinkProxy = sink->getProxy();
-  this->addConnection(srcProxy, sinkProxy);
+  if(!source || !sink)
+    {
+    qCritical() << "Cannot addConnection. source or sink missing.";
+    return;
+    }
+
+  if (this->UndoStack)
+    {
+    this->UndoStack->BeginOrContinueUndoSet(QString("Add Connection"));
+    }
+
+  vtkSMInputProperty *inputProp = vtkSMInputProperty::SafeDownCast(
+    sink->getProxy()->GetProperty("Input"));
+  if(inputProp)
+    {
+    // If the sink already has an input, the previous connection
+    // needs to be broken if it doesn't support multiple inputs.
+    if(!inputProp->GetMultipleInput() && inputProp->GetNumberOfProxies() > 0)
+      {
+      inputProp->RemoveAllProxies();
+      }
+
+    // Add the input to the proxy in the server manager.
+    inputProp->AddProxy(source->getProxy());
+    }
+  else
+    {
+    qCritical() << "Failed to locate property Input on proxy:" 
+      << source->getProxy()->GetXMLGroup() << ", " << source->getProxy()->GetXMLName();
+    }
+
+  if (this->UndoStack)
+    {
+    this->UndoStack->PauseUndoSet();
+    }
 }
 
 //-----------------------------------------------------------------------------
-void pqPipelineBuilder::removeConnection(pqPipelineSource* source,
-  pqPipelineSource* sink)
+void pqPipelineBuilder::removeConnection(pqPipelineSource* pqsource,
+  pqPipelineSource* pqsink)
 {
-  vtkSMProxy* srcProxy = source->getProxy();
-  vtkSMProxy* sinkProxy = sink->getProxy();
-  this->removeConnection(srcProxy, sinkProxy);
+  vtkSMCompoundProxy *compoundProxy =
+    vtkSMCompoundProxy::SafeDownCast(pqsource->getProxy());
+
+  vtkSMProxy* source = pqsource->getProxy();
+  vtkSMProxy* sink = pqsink->getProxy();
+
+  if(compoundProxy)
+    {
+    // TODO: How to find the correct output proxy?
+    source = 0;
+    for(int i = compoundProxy->GetNumberOfProxies(); source == 0 && i > 0; i--)
+      {
+      source = vtkSMSourceProxy::SafeDownCast(compoundProxy->GetProxy(i-1));
+      }
+    }
+
+  compoundProxy = vtkSMCompoundProxy::SafeDownCast(sink);
+  if(compoundProxy)
+    {
+    // TODO: How to find the correct input proxy?
+    sink = compoundProxy->GetMainProxy();
+    }
+
+  if(!source || !sink)
+    {
+    qCritical() << "Cannot removeConnection. source or sink missing.";
+    return;
+    }
+
+  if (this->UndoStack)
+    {
+    this->UndoStack->BeginOrContinueUndoSet(QString("Remove Connection"));
+    }
+
+  vtkSMInputProperty *inputProp = vtkSMInputProperty::SafeDownCast(
+    sink->GetProperty("Input"));
+  if(inputProp)
+    {
+    // Remove the input from the server manager.
+    inputProp->RemoveProxy(source);
+    }
+
+  if (this->UndoStack)
+    {
+    this->UndoStack->PauseUndoSet();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -316,18 +391,17 @@ int pqPipelineBuilder::removeInternal(pqPipelineDisplay* display)
   // 1) Remove display from the render module.
   // eventually, the pqPipelineDisplay can tell us which render module
   // it belongs to. For now, we just use the active render module.
-  pqRenderModule* renModule = 
-    pqApplicationCore::instance()->getActiveRenderModule();
-  if (!renModule)
+  unsigned int numRenModules = display->getNumberOfRenderModules();
+  for(unsigned int i=0; i<numRenModules; i++)
     {
-    qDebug() << "Failed to locate render module for the display. remove failed.";
-    return 0;
-    }
+    pqRenderModule* renModule = display->getRenderModule(i);
+    
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      renModule->getProxy()->GetProperty("Displays"));
+    pp->RemoveProxy(display->getProxy());
+    renModule->getProxy()->UpdateVTKObjects();
 
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    renModule->getProxy()->GetProperty("Displays"));
-  pp->RemoveProxy(display->getProxy());
-  renModule->getProxy()->UpdateVTKObjects();
+    }
 
   /*
   pp = vtkSMProxyProperty::SafeDownCast(
@@ -408,96 +482,6 @@ void pqPipelineBuilder::remove(pqPipelineSource* source,
     source->getSMName().toStdString().c_str());
 
   if (this->UndoStack && is_undoable)
-    {
-    this->UndoStack->PauseUndoSet();
-    }
-}
-
-//-----------------------------------------------------------------------------
-// Create a connection between a source and a sink. This method ensures
-// that the UndoState is recoreded.
-void pqPipelineBuilder::addConnection(vtkSMProxy* source, vtkSMProxy* sink)
-{
-  if(!source || !sink)
-    {
-    qCritical() << "Cannot addConnection. source or sink missing.";
-    return;
-    }
-
-  if (this->UndoStack)
-    {
-    this->UndoStack->BeginOrContinueUndoSet(QString("Add Connection"));
-    }
-
-  vtkSMInputProperty *inputProp = vtkSMInputProperty::SafeDownCast(
-    sink->GetProperty("Input"));
-  if(inputProp)
-    {
-    // If the sink already has an input, the previous connection
-    // needs to be broken if it doesn't support multiple inputs.
-    if(!inputProp->GetMultipleInput() && inputProp->GetNumberOfProxies() > 0)
-      {
-      inputProp->RemoveAllProxies();
-      }
-
-    // Add the input to the proxy in the server manager.
-    inputProp->AddProxy(source);
-    }
-  else
-    {
-    qCritical() << "Failed to locate property Input on proxy:" 
-      << source->GetXMLGroup() << ", " << source->GetXMLName();
-    }
-
-  if (this->UndoStack)
-    {
-    this->UndoStack->PauseUndoSet();
-    }
-}
-
-//-----------------------------------------------------------------------------
-// Removes a connection between a source and a sink. This method ensures that 
-// the UndoState is recorded.
-void pqPipelineBuilder::removeConnection(vtkSMProxy* source, vtkSMProxy* sink)
-{
-  vtkSMCompoundProxy *bundle = vtkSMCompoundProxy::SafeDownCast(source);
-  if(bundle)
-    {
-    // TODO: How to find the correct output proxy?
-    source = 0; 
-    for(int i = bundle->GetNumberOfProxies(); source == 0 && i > 0; i--)
-      {
-      source = vtkSMSourceProxy::SafeDownCast(bundle->GetProxy(i-1));
-      }
-    }
-
-  bundle = vtkSMCompoundProxy::SafeDownCast(sink);
-  if(bundle)
-    {
-    // TODO: How to find the correct input proxy?
-    sink = bundle->GetMainProxy();
-    }
-
-  if(!source || !sink)
-    {
-    qCritical() << "Cannot removeConnection. source or sink missing.";
-    return;
-    }
-
-  if (this->UndoStack)
-    {
-    this->UndoStack->BeginOrContinueUndoSet(QString("Remove Connection"));
-    }
-
-  vtkSMInputProperty *inputProp = vtkSMInputProperty::SafeDownCast(
-    sink->GetProperty("Input"));
-  if(inputProp)
-    {
-    // Remove the input from the server manager.
-    inputProp->RemoveProxy(source);
-    }
-
-  if (this->UndoStack)
     {
     this->UndoStack->PauseUndoSet();
     }

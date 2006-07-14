@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QVariant>
 #include "pqWidgetsExport.h"
+class pqProxy;
 
 /// signal adaptor to allow getting/setting/observing of a pseudo vtkSMProxy property
 class PQWIDGETS_EXPORT pqSignalAdaptorProxy : public QObject
@@ -86,7 +87,7 @@ public:
   QVariant proxy() const;
 
   /// Set the reference proxy. This is the proxy for which the panel is being shown.
-  void setReferenceProxy(vtkSMProxy*);
+  void setReferenceProxy(pqProxy*);
 
   /// Set the property which is controlled by the adaptor.
   void setProperty(vtkSMProperty*);

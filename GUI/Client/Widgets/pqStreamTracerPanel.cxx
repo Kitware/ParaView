@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqNamedWidgets.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
+#include "pqServerManagerModel.h"
 #include "pqPointSourceWidget.h"
 #include "pqPropertyManager.h"
 #include "pqServerManagerModel.h"
@@ -148,23 +149,23 @@ void pqStreamTracerPanel::onRejected()
     }
 }
 
-void pqStreamTracerPanel::setProxyInternal(pqSMProxy p)
+void pqStreamTracerPanel::setProxyInternal(pqProxy* p)
 {
   if(this->Proxy)
     {
     pqNamedWidgets::unlink(
-      &this->Implementation->ControlsContainer, this->Proxy, this->PropertyManager);
+      &this->Implementation->ControlsContainer, this->Proxy->getProxy(), this->PropertyManager);
     }
 
   base::setProxyInternal(p);
 
-  pqSMProxy reference_proxy = this->Proxy;
-  pqSMProxy controlled_proxy;
+  pqProxy* reference_proxy = this->Proxy;
+  pqSMProxy controlled_proxy = NULL;
 
   if(this->Proxy)
     {
     if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
-      this->Proxy->GetProperty("Source")))
+      this->Proxy->getProxy()->GetProperty("Source")))
       {
       controlled_proxy = source_property->GetProxy(0);
       }
@@ -200,7 +201,7 @@ void pqStreamTracerPanel::setProxyInternal(pqSMProxy p)
   if(this->Proxy)
     {
     pqNamedWidgets::link(
-      &this->Implementation->ControlsContainer, this->Proxy, this->PropertyManager);
+      &this->Implementation->ControlsContainer, this->Proxy->getProxy(), this->PropertyManager);
     }
 }
 

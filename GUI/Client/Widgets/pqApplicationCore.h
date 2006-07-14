@@ -82,32 +82,6 @@ public:
   // Returns the server manager selection model.
   pqServerManagerSelectionModel* getSelectionModel();
 
-  // This will create a source with the given xmlname on the active server. 
-  // On success returns
-  // pqPipelineSource for the source proxy. The actual creation is delegated 
-  // to pqPipelineBuilder instance. Using this method will optionally,
-  // create a display for the source in the active render window (if both
-  // the active window is indeed on the active server. The created source
-  // becomes the active source.
-  pqPipelineSource* createSourceOnActiveServer(const QString& xmlname);
-
-  // This will create a filter and connect it to the active source.
-  // The actual creation is delegated 
-  // to pqPipelineBuilder instance. Using this method will optionally,
-  // create a display for the source in the active render window (if both
-  // the active window is indeed on the active server. The created source
-  // becomes the active source.
-  pqPipelineSource* createFilterForActiveSource( const QString& xmlname);
-
-  // This will instantiate and register a compound proxy. A compound proxy
-  // definition with the given name must have already been registered with
-  // the proxy manager. If the compound proxy needs an input, the active
-  // source will be used as the input. 
-  pqPipelineSource* createCompoundSource(const QString& name);
-
-  // Utility function to create a reader that reads the file on the 
-  // active server. 
-  pqPipelineSource* createReaderOnActiveServer( const QString& filename);
 
   // Use this method to delete the active source. 
   // This involves following operations
@@ -117,35 +91,15 @@ public:
   // \li Unregister the proxy for the \c source.
   // All this is delegated to the pipeline builder.
   // This method can only be called when the active source has no consumers.
-  void removeActiveSource();
   void removeSource(pqPipelineSource* source);
 
-  void removeActiveServer();
   void removeServer(pqServer *server);
-
-  /// returns the active source.
-  pqPipelineSource* getActiveSource();
-
-  /// returns the active server.
-  pqServer* getActiveServer();
-
-  /// returns the active render module.
-  pqRenderModule* getActiveRenderModule();
-
-  /// This method for now renders the Active Render module.
-  /// We may want to expose API to render all views or something--need to think 
-  /// about it.
-  void render();
-
-  /// Returns the number of sources pending displays. This shouldn't even be 
-  /// exposed, but for the current release, we want to disable all menus,
-  /// if the user has a source waiting a display, hence we expose it.
-  int getNumberOfSourcesPendingDisplays();
-
 
   /// Save the ServerManager state.
   void saveState(vtkPVXMLElement* root);
-  void loadState(vtkPVXMLElement* root);
+  void loadState(vtkPVXMLElement* root,
+                 pqServer* server,
+                 pqRenderModule* renModule);
 
   /// Get the application settings.
   pqSettings* settings();
@@ -158,47 +112,40 @@ public:
   void setOrganizationName(const QString&);
   QString organizationName();
 
+  
+  pqPipelineSource* createFilterForSource(const QString& xmlname,
+                                          pqPipelineSource* input);
+  
+  pqPipelineSource* createSourceOnServer(const QString& xmlname, 
+                                         pqServer* server);
+
+  pqPipelineSource* createCompoundFilterForSource(const QString& xmlname, 
+                                                  pqPipelineSource* source);
+
+  pqPipelineSource* createReaderOnServer(const QString& filename, 
+                                         pqServer* server);
+
+  /// Renders all windows
+  void render();
 
 signals:
-  // Fired when the active source changes.
-  void activeSourceChanged(pqPipelineSource*);
-
-  // Fired when the active server changes.
-  void activeServerChanged(pqServer*);
-
-  // Fired when the active render module changes.
-  void activeRenderModuleChanged(pqRenderModule*);
-
-
-  // Fired when a source/filter/reader/compound proxy is
-  // created without a display.
-  void pendingDisplays(bool status);
-
   // Fired to enable or disable progress bar.
   void enableProgress(bool enable);
 
   // Fired with the actual progress value.
   void progress(const QString&, int);
 
-public slots:
-  // Call this slot to set the active source. 
-  void setActiveSource(pqPipelineSource*);
-
-  // Call this slot to set the active server. 
-  void setActiveServer(pqServer*);
-
-  // Call this slot to set the active render module.
-  void setActiveRenderModule(pqRenderModule*);
-
-  // Call this slot when accept is called. This method will create
-  // displays for any sources/filters that are pending.
-  void createPendingDisplays();
+  // HACK
+  void sourceRemoved(pqPipelineSource*);
+  
+  void sourceCreated(pqPipelineSource*);
 
 protected:
   /// create signal/slot connections between pdata and smModel.
   void connect(pqServerManagerObserver* pdata, pqServerManagerModel* smModel);
 
 protected:
+
   friend class pqProcessModuleGUIHelper;
 
   void prepareProgress()
@@ -212,24 +159,6 @@ protected:
     emit this->progress(QString(name), value);
     }
 
-  friend class pqPendingDisplayUndoElement;
-  
-  // Methods to add a source to the list of sources pending displays.
-  void addSourcePendingDisplay(pqPipelineSource*);
-
-  // Methods to remove a source to the list of sources pending displays.
-  void removeSourcePendingDisplay(pqPipelineSource*);
-
-  // Performs the set of actions need to be performed after a new 
-  // source/reader/filter/customfilter is created. This includes
-  // seting up handler to create a default display proxy for the source
-  // after first accept, set up undo stack so that the undo/redo
-  // works correctly with pending displays etc etc.
-  void onSourceCreated(pqPipelineSource* src);
-private slots:
-  // called when a source is removed by the pqServerManagerModel. If
-  // the removed source is the active source, we must change it.
-  void sourceRemoved(pqPipelineSource*);
 
 private:
   pqApplicationCoreInternal* Internal;

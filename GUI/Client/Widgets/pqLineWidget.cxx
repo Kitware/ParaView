@@ -35,6 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqLineWidget.h"
 #include "pqRenderModule.h"
 #include "pqServerManagerModel.h"
+#include "pqPipelineSource.h"
+#include "pqPipelineFilter.h"
+#include "pqPipelineDisplay.h"
 
 #include "ui_pqLineWidget.h"
 
@@ -83,7 +86,7 @@ public:
   /// References the 3D implicit plane widget
   vtkSMNew3DWidgetProxy* Widget;
   /// Source proxy that will supply the bounding box for the 3D widget
-  pqSMProxy ReferenceProxy;
+  pqProxy* ReferenceProxy;
   /// Used to avoid recursion when updating the visiblity checkbox
   bool IgnoreVisibilityWidget;
   /// Used to avoid recursion when updating the Qt widgets  
@@ -91,10 +94,10 @@ public:
   /// Used to avoid recursion when updating the 3D widget
   bool Ignore3DWidget;
   
-  static QMap<pqSMProxy, bool> Visibility;
+  static QMap<pqProxy*, bool> Visibility;
 };
 
-QMap<pqSMProxy, bool> pqLineWidget::pqImplementation::Visibility;
+QMap<pqProxy*, bool> pqLineWidget::pqImplementation::Visibility;
 
 /////////////////////////////////////////////////////////////////////////
 // pqLineWidget
@@ -151,8 +154,24 @@ pqLineWidget::~pqLineWidget()
 
   if(this->Implementation->Widget)
     {
-    if(pqRenderModule* const renModule = 
-      pqApplicationCore::instance()->getActiveRenderModule())
+    pqPipelineFilter* source;
+    pqPipelineSource* source1 = NULL;
+    pqPipelineDisplay* display = NULL;
+    pqRenderModule* renModule = NULL;
+    source = qobject_cast<pqPipelineFilter*>(this->Implementation->ReferenceProxy);
+    if(source)
+      {
+      source1 = source->getInput(0);
+      }
+    if(source1)
+      {
+      display = source1->getDisplay(0);
+      }
+    if(display)
+      {
+      renModule = display->getRenderModule(0);
+      }
+    if(renModule)
       {
       if(vtkSMRenderModuleProxy* rm = renModule->getRenderModuleProxy())
         {
@@ -187,21 +206,21 @@ void pqLineWidget::hideWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqLineWidget::setReferenceProxy(pqSMProxy proxy)
+void pqLineWidget::setReferenceProxy(pqProxy* proxy)
 {
   this->Implementation->ReferenceProxy = proxy;
   
   if(!this->Implementation->Visibility.contains(proxy))
     {
     this->Implementation->Visibility.insert(
-      proxy, proxy.GetPointer() ? true : false);
+      proxy, proxy ? true : false);
     }
   
   if(!this->Implementation->Widget)
     {
     pqServer* const server = pqApplicationCore::instance()->
       getServerManagerModel()->getServer(
-        this->Implementation->ReferenceProxy->GetConnectionID());
+        this->Implementation->ReferenceProxy->getProxy()->GetConnectionID());
           
     this->Implementation->Widget =
       pqApplicationCore::instance()->get3DWidgetFactory()->
@@ -211,8 +230,23 @@ void pqLineWidget::setReferenceProxy(pqSMProxy proxy)
     // Synchronize the 3D widget bounds with the source data ...
     this->onUseXAxis();
 
-    pqRenderModule* const renModule = 
-      pqApplicationCore::instance()->getActiveRenderModule();
+    pqPipelineFilter* source;
+    pqPipelineSource* source1 = NULL;
+    pqPipelineDisplay* display = NULL;
+    pqRenderModule* renModule = NULL;
+    source = qobject_cast<pqPipelineFilter*>(this->Implementation->ReferenceProxy);
+    if(source)
+      {
+      source1 = source->getInput(0);
+      }
+    if(source1)
+      {
+      display = source1->getDisplay(0);
+      }
+    if(display)
+      {
+      renModule = display->getRenderModule(0);
+      }
       
     if(this->Implementation->Widget && renModule)
       {
@@ -297,7 +331,7 @@ void pqLineWidget::onUseXAxis()
     {
     if(vtkSMProxyProperty* const input_property =
       vtkSMProxyProperty::SafeDownCast(
-        this->Implementation->ReferenceProxy->GetProperty("Input")))
+        this->Implementation->ReferenceProxy->getProxy()->GetProperty("Input")))
       {
       if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
         input_property->GetProxy(0)))
@@ -339,7 +373,7 @@ void pqLineWidget::onUseXAxis()
           
           this->on3DWidgetChanged();
           
-          pqApplicationCore::instance()->render();
+          qobject_cast<pqPipelineSource*>(this->Implementation->ReferenceProxy)->renderAllViews();
           }
         }
       }
@@ -352,7 +386,7 @@ void pqLineWidget::onUseYAxis()
     {
     if(vtkSMProxyProperty* const input_property =
       vtkSMProxyProperty::SafeDownCast(
-        this->Implementation->ReferenceProxy->GetProperty("Input")))
+        this->Implementation->ReferenceProxy->getProxy()->GetProperty("Input")))
       {
       if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
         input_property->GetProxy(0)))
@@ -395,7 +429,7 @@ void pqLineWidget::onUseYAxis()
           /** \todo This shouldn't be necessary, not sure why we don't get an event */
           this->on3DWidgetChanged();
           
-          pqApplicationCore::instance()->render();
+          qobject_cast<pqPipelineSource*>(this->Implementation->ReferenceProxy)->renderAllViews();
           }
         }
       }
@@ -408,7 +442,7 @@ void pqLineWidget::onUseZAxis()
     {
     if(vtkSMProxyProperty* const input_property =
       vtkSMProxyProperty::SafeDownCast(
-        this->Implementation->ReferenceProxy->GetProperty("Input")))
+        this->Implementation->ReferenceProxy->getProxy()->GetProperty("Input")))
       {
       if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
         input_property->GetProxy(0)))
@@ -451,7 +485,7 @@ void pqLineWidget::onUseZAxis()
           /** \todo This shouldn't be necessary, not sure why we don't get an event */
           this->on3DWidgetChanged();
           
-          pqApplicationCore::instance()->render();
+          qobject_cast<pqPipelineSource*>(this->Implementation->ReferenceProxy)->renderAllViews();
           }
         }
       }
@@ -479,7 +513,7 @@ void pqLineWidget::show3DWidget(bool show_widget)
       }
 
     this->Implementation->Widget->UpdateVTKObjects();
-    pqApplicationCore::instance()->render();
+    qobject_cast<pqPipelineSource*>(this->Implementation->ReferenceProxy)->renderAllViews();
     this->Implementation->Ignore3DWidget = false;
     }
 }
@@ -596,7 +630,7 @@ void pqLineWidget::update3DWidget(const double point1[3], const double point2[3]
     
     this->Implementation->Widget->UpdateVTKObjects();
     
-    pqApplicationCore::instance()->render();
+    qobject_cast<pqPipelineSource*>(this->Implementation->ReferenceProxy)->renderAllViews();
     }
     
   this->Implementation->Ignore3DWidget = false;

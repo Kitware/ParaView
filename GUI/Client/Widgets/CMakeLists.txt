@@ -61,7 +61,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqObjectPanel.h
   pqOutputWindow.h
   pqOutputWindowAdapter.h
-  pqPicking.h
+#pqPicking.h
   pqPipelineBrowser.h
   pqPipelineBrowserContextMenu.h
   pqPipelineBuilder.h
@@ -88,7 +88,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerManagerObserver.h
   pqServerManagerSelectionModel.h
   pqSettings.h
-  pqSettingsDialog.h
+  #pqSettingsDialog.h
   pqSimpleAnimationManager.h
   pqSliderDomain.h
   pqSMSignalAdaptors.h
@@ -242,8 +242,8 @@ ADD_LIBRARY(pqWidgets
   pqParts.h
   pqPendingDisplayUndoElement.cxx
   pqPendingDisplayUndoElement.h
-  pqPicking.cxx
-  pqPicking.h
+  #  pqPicking.cxx
+  #  pqPicking.h
   pqPipelineBrowser.cxx
   pqPipelineBrowser.h
   pqPipelineBrowserContextMenu.cxx
@@ -314,8 +314,8 @@ ADD_LIBRARY(pqWidgets
   pqSimpleAnimationManager.h
   pqSettings.cxx
   pqSettings.h
-  pqSettingsDialog.cxx
-  pqSettingsDialog.h
+  #pqSettingsDialog.cxx
+  #pqSettingsDialog.h
   pqSliderDomain.cxx
   pqSliderDomain.h
   pqSourceHistoryModel.cxx

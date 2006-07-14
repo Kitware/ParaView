@@ -60,6 +60,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqRenderModule.h"
 #include "pqServerManagerModel.h"
 #include "pqStreamTracerPanel.h"
+#include "pqPipelineSource.h"
 
 //-----------------------------------------------------------------------------
 pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
@@ -112,9 +113,9 @@ pqObjectInspectorWidget::pqObjectInspectorWidget(QWidget *p)
   this->ResetButton->setEnabled(false);
 
 
-  this->connect(pqApplicationCore::instance()->getPipelineData(), 
-                SIGNAL(sourceUnRegistered(vtkSMProxy*)),
-                SLOT(removeProxy(vtkSMProxy*)));
+  this->connect(pqApplicationCore::instance()->getServerManagerModel(), 
+                SIGNAL(sourceRemoved(pqPipelineSource*)),
+                SLOT(removeProxy(pqPipelineSource*)));
  
 }
 
@@ -143,7 +144,7 @@ void pqObjectInspectorWidget::canAccept(bool status)
 }
 
 //-----------------------------------------------------------------------------
-void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
+void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
 {
   // do nothing if this proxy is already current
   if(this->CurrentPanel && this->CurrentPanel->proxy() == proxy)
@@ -178,7 +179,7 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
   this->CurrentPanel = NULL;
 
   // search for a custom form for this proxy with pending changes
-  QMap<pqSMProxy, pqObjectPanel*>::iterator iter;
+  QMap<pqProxy*, pqObjectPanel*>::iterator iter;
   iter = this->PanelStore.find(proxy);
   if(iter != this->PanelStore.end())
     {
@@ -187,7 +188,7 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
 
   if(proxy && !this->CurrentPanel)
     {
-    const QString xml_name = proxy->GetXMLName();
+    const QString xml_name = proxy->getProxy()->GetXMLName();
     
     if(xml_name == "Clip")
       {
@@ -216,7 +217,7 @@ void pqObjectInspectorWidget::setProxy(vtkSMProxy *proxy)
     else
       {
       // try to find a custom form in our pqWidgets resources
-      QString proxyui = QString(":/pqWidgets/UI/") + QString(proxy->GetXMLName()) + QString(".ui");
+      QString proxyui = QString(":/pqWidgets/UI/") + QString(proxy->getProxy()->GetXMLName()) + QString(".ui");
       pqLoadedFormObjectPanel* panel = new pqLoadedFormObjectPanel(proxyui, NULL);
       if(!panel->isValid())
         {
@@ -264,19 +265,14 @@ void pqObjectInspectorWidget::accept()
     this->CurrentPanel->accept();
     }
  
-  pqApplicationCore::instance()->getActiveRenderModule()->forceRender();
-
-  /* For now just render the active window, later we will
-     render all the windows to which this source belongs.
-  // cause the screen to update
-  pqPipelineSource *source = 
-    pqServerManagerModel::instance()->getPQSource(proxy);
-  if(source)
+  foreach(pqObjectPanel* p, this->QueuedPanels)
     {
-    // FIXME
-    // source->getDisplay()->UpdateWindows();
+    pqPipelineSource *source = qobject_cast<pqPipelineSource*>(p->proxy());
+    if(source)
+      {
+      source->renderAllViews();
+      }
     }
-    */
   
   emit this->accepted();
   
@@ -333,9 +329,9 @@ QSize pqObjectInspectorWidget::sizeHint() const
                                     expandedTo(QApplication::globalStrut()), this));
 }
 
-void pqObjectInspectorWidget::removeProxy(vtkSMProxy* proxy)
+void pqObjectInspectorWidget::removeProxy(pqPipelineSource* proxy)
 {
-  QMap<pqSMProxy, pqObjectPanel*>::iterator iter;
+  QMap<pqProxy*, pqObjectPanel*>::iterator iter;
   iter = this->QueuedPanels.find(proxy);
   if(iter != this->QueuedPanels.end())
     {

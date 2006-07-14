@@ -34,10 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QWidget>
 #include "pqWidgetsExport.h"
+#include "pqSMProxy.h"
 
 class vtkPVXMLElement;
 class vtkSMProperty;
-class vtkSMProxy;
+class pqProxy;
 class vtkSMNew3DWidgetProxy;
 class pq3DWidgetInternal;
 
@@ -62,15 +63,15 @@ public:
 
   /// Reference proxy is a proxy which is used to determine the bounds
   /// for the 3D widget.
-  virtual void setReferenceProxy(vtkSMProxy*);
-  vtkSMProxy* getReferenceProxy() const;
+  virtual void setReferenceProxy(pqProxy*);
+  pqProxy* getReferenceProxy() const;
 
   /// Controlled proxy is a proxy which is controlled by the 3D widget.
   /// A controlled proxy must provide "Hints" describing how
   /// the properties of the controlled proxy are controlled by the
   /// 3D widget.
-  virtual void setControlledProxy(vtkSMProxy*);
-  vtkSMProxy* getControlledProxy() const;
+  virtual void setControlledProxy(pqSMProxy);
+  pqSMProxy getControlledProxy() const;
 
   /// Set the hints XML to be using to map the 3D widget to the controlled
   /// proxy. This method must be called only after the controlled

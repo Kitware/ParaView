@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqTreeWidgetItemObject.h"
 #include "pqSMAdaptor.h"
 #include "pqPropertyManager.h"
+#include "pqProxy.h"
 
 pqExodusPanel::pqExodusPanel(QWidget* p) :
   pqLoadedFormObjectPanel(":/pqWidgets/UI/pqExodusPanel.ui", p)
@@ -78,7 +79,7 @@ void pqExodusPanel::linkServerManagerProperties()
   // (should probably be moved down to pqNamedObjectPanel)
   QList<QVariant> range;
   range = pqSMAdaptor::getElementPropertyDomain(
-       this->proxy()->GetProperty("TimeStep"));
+       this->proxy()->getProxy()->GetProperty("TimeStep"));
 
   QSlider* timeSlider = this->findChild<QSlider*>("TimeStep");
   QSpinBox* timeSpin = this->findChild<QSpinBox*>("TimeStepSpin");
@@ -113,8 +114,8 @@ void pqExodusPanel::linkServerManagerProperties()
   this->PropertyManager->registerLink(item, 
                       "checked", 
                       SIGNAL(checkedStateChanged(bool)),
-                      this->proxy(), 
-                      this->proxy()->GetProperty("GenerateBlockIdCellArray"));
+                      this->proxy()->getProxy(), 
+                      this->proxy()->getProxy()->GetProperty("GenerateBlockIdCellArray"));
   
   varName = "Global Element Ids";
   strs.clear();
@@ -125,11 +126,11 @@ void pqExodusPanel::linkServerManagerProperties()
   this->PropertyManager->registerLink(item, 
                     "checked", 
                     SIGNAL(checkedStateChanged(bool)),
-                    this->proxy(), 
-                    this->proxy()->GetProperty("GenerateGlobalElementIdArray"));
+                    this->proxy()->getProxy(), 
+                    this->proxy()->getProxy()->GetProperty("GenerateGlobalElementIdArray"));
   
   // do the cell variables
-  vtkSMProperty* CellProperty = this->proxy()->GetProperty("CellArrayStatus");
+  vtkSMProperty* CellProperty = this->proxy()->getProxy()->GetProperty("CellArrayStatus");
   QList<QVariant> CellDomain;
   CellDomain = pqSMAdaptor::getSelectionPropertyDomain(CellProperty);
   int j;
@@ -144,7 +145,7 @@ void pqExodusPanel::linkServerManagerProperties()
     this->PropertyManager->registerLink(item, 
                                       "checked", 
                                       SIGNAL(checkedStateChanged(bool)),
-                                      this->proxy(), CellProperty, j);
+                                      this->proxy()->getProxy(), CellProperty, j);
     }
   
   
@@ -158,11 +159,11 @@ void pqExodusPanel::linkServerManagerProperties()
   this->PropertyManager->registerLink(item, 
                     "checked", 
                     SIGNAL(checkedStateChanged(bool)),
-                    this->proxy(), 
-                    this->proxy()->GetProperty("GenerateGlobalNodeIdArray"));
+                    this->proxy()->getProxy(), 
+                    this->proxy()->getProxy()->GetProperty("GenerateGlobalNodeIdArray"));
 
   // do the node variables
-  vtkSMProperty* NodeProperty = this->proxy()->GetProperty("PointArrayStatus");
+  vtkSMProperty* NodeProperty = this->proxy()->getProxy()->GetProperty("PointArrayStatus");
   QList<QVariant> PointDomain;
   PointDomain = pqSMAdaptor::getSelectionPropertyDomain(NodeProperty);
 
@@ -177,7 +178,7 @@ void pqExodusPanel::linkServerManagerProperties()
     this->PropertyManager->registerLink(item, 
                                       "checked", 
                                       SIGNAL(checkedStateChanged(bool)),
-                                      this->proxy(), NodeProperty, j);
+                                      this->proxy()->getProxy(), NodeProperty, j);
 
     if(PointDomain[j].toString() == "DISPL")
       {
@@ -211,7 +212,7 @@ void pqExodusPanel::linkServerManagerProperties()
   QTreeWidget* SetsTree = this->findChild<QTreeWidget*>("Sets");
   
   // do the sidesets
-  vtkSMProperty* SideProperty = this->proxy()->GetProperty("SideSetArrayStatus");
+  vtkSMProperty* SideProperty = this->proxy()->getProxy()->GetProperty("SideSetArrayStatus");
   QList<QVariant> SideDomain;
   SideDomain = pqSMAdaptor::getSelectionPropertyDomain(SideProperty);
   for(j=0; j<SideDomain.size(); j++)
@@ -225,11 +226,11 @@ void pqExodusPanel::linkServerManagerProperties()
     this->PropertyManager->registerLink(item, 
                                       "checked", 
                                       SIGNAL(checkedStateChanged(bool)),
-                                      this->proxy(), SideProperty, j);
+                                      this->proxy()->getProxy(), SideProperty, j);
     }
   
   // do the nodesets
-  vtkSMProperty* NSProperty = this->proxy()->GetProperty("NodeSetArrayStatus");
+  vtkSMProperty* NSProperty = this->proxy()->getProxy()->GetProperty("NodeSetArrayStatus");
   QList<QVariant> NSDomain;
   NSDomain = pqSMAdaptor::getSelectionPropertyDomain(NSProperty);
   for(j=0; j<NSDomain.size(); j++)
@@ -243,7 +244,7 @@ void pqExodusPanel::linkServerManagerProperties()
     this->PropertyManager->registerLink(item, 
                                       "checked", 
                                       SIGNAL(checkedStateChanged(bool)),
-                                      this->proxy(), NSProperty, j);
+                                      this->proxy()->getProxy(), NSProperty, j);
     }
 
   this->updateDataRanges();
@@ -298,21 +299,21 @@ void pqExodusPanel::unlinkServerManagerProperties()
   this->PropertyManager->unregisterLink(item, 
                       "checked", 
                       SIGNAL(checkedStateChanged(bool)),
-                      this->proxy(), 
-                      this->proxy()->GetProperty("GenerateBlockIdCellArray"));
+                      this->proxy()->getProxy(), 
+                      this->proxy()->getProxy()->GetProperty("GenerateBlockIdCellArray"));
   
   // remove global element id
   item = static_cast<pqTreeWidgetItemObject*>(VariablesTree->topLevelItem(1));
   this->PropertyManager->unregisterLink(item, 
                       "checked", 
                       SIGNAL(checkedStateChanged(bool)),
-                      this->proxy(), 
-                      this->proxy()->GetProperty("GenerateGlobalElementIdArray"));
+                      this->proxy()->getProxy(), 
+                      this->proxy()->getProxy()->GetProperty("GenerateGlobalElementIdArray"));
 
   const int CellOffset = 2;
   
   // do the cell variables
-  vtkSMProperty* CellProperty = this->proxy()->GetProperty("CellArrayStatus");
+  vtkSMProperty* CellProperty = this->proxy()->getProxy()->GetProperty("CellArrayStatus");
   QList<QVariant> CellDomain;
   CellDomain = pqSMAdaptor::getSelectionPropertyDomain(CellProperty);
   int j;
@@ -323,7 +324,7 @@ void pqExodusPanel::unlinkServerManagerProperties()
     this->PropertyManager->unregisterLink(item, 
                                           "checked", 
                                           SIGNAL(checkedStateChanged(bool)),
-                                          this->proxy(), CellProperty, j);
+                                          this->proxy()->getProxy(), CellProperty, j);
     }
   
   // remove global node id
@@ -333,12 +334,12 @@ void pqExodusPanel::unlinkServerManagerProperties()
   this->PropertyManager->unregisterLink(item, 
                       "checked", 
                       SIGNAL(checkedStateChanged(bool)),
-                      this->proxy(), 
-                      this->proxy()->GetProperty("GenerateGlobalNodeIdArray"));
+                      this->proxy()->getProxy(), 
+                      this->proxy()->getProxy()->GetProperty("GenerateGlobalNodeIdArray"));
 
   const int PointOffset = 1;
   // do the node variables
-  vtkSMProperty* NodeProperty = this->proxy()->GetProperty("PointArrayStatus");
+  vtkSMProperty* NodeProperty = this->proxy()->getProxy()->GetProperty("PointArrayStatus");
   QList<QVariant> PointDomain;
   PointDomain = pqSMAdaptor::getSelectionPropertyDomain(NodeProperty);
 
@@ -349,7 +350,7 @@ void pqExodusPanel::unlinkServerManagerProperties()
     this->PropertyManager->unregisterLink(item, 
                                           "checked", 
                                           SIGNAL(checkedStateChanged(bool)),
-                                          this->proxy(), NodeProperty, j);
+                                          this->proxy()->getProxy(), NodeProperty, j);
     }
 
   // disconnect the apply displacements check box with the "DISPL" node variable
@@ -371,7 +372,7 @@ void pqExodusPanel::unlinkServerManagerProperties()
   QTreeWidget* SetsTree = this->findChild<QTreeWidget*>("Sets");
 
   // do the sidesets
-  vtkSMProperty* SideProperty = this->proxy()->GetProperty("SideSetArrayStatus");
+  vtkSMProperty* SideProperty = this->proxy()->getProxy()->GetProperty("SideSetArrayStatus");
   QList<QVariant> SideDomain;
   SideDomain = pqSMAdaptor::getSelectionPropertyDomain(SideProperty);
   for(j=0; j<SideDomain.size(); j++)
@@ -381,11 +382,11 @@ void pqExodusPanel::unlinkServerManagerProperties()
     this->PropertyManager->unregisterLink(item, 
                                           "checked", 
                                           SIGNAL(checkedStateChanged(bool)),
-                                          this->proxy(), SideProperty, j);
+                                          this->proxy()->getProxy(), SideProperty, j);
     }
   
   // do the nodesets
-  vtkSMProperty* NSProperty = this->proxy()->GetProperty("NodeSetArrayStatus");
+  vtkSMProperty* NSProperty = this->proxy()->getProxy()->GetProperty("NodeSetArrayStatus");
   QList<QVariant> NSDomain;
   NSDomain = pqSMAdaptor::getSelectionPropertyDomain(NSProperty);
 
@@ -396,7 +397,7 @@ void pqExodusPanel::unlinkServerManagerProperties()
     this->PropertyManager->unregisterLink(item, 
                                           "checked", 
                                           SIGNAL(checkedStateChanged(bool)),
-                                          this->proxy(), NSProperty, j);
+                                          this->proxy()->getProxy(), NSProperty, j);
     }
 
 }
@@ -472,7 +473,8 @@ void pqExodusPanel::updateDataRanges()
 {
   // update data information about loaded arrays
 
-  vtkSMSourceProxy* sp = vtkSMSourceProxy::SafeDownCast(this->proxy());
+  vtkSMSourceProxy* sp =
+    vtkSMSourceProxy::SafeDownCast(this->proxy()->getProxy());
   vtkPVDataSetAttributesInformation* pdi = 0;
   vtkPVDataSetAttributesInformation* cdi = 0;
   if (sp->GetNumberOfParts() > 0)
@@ -513,7 +515,7 @@ void pqExodusPanel::updateDataRanges()
   const int CellOffset = 2;
   
   // do the cell variables
-  vtkSMProperty* CellProperty = this->proxy()->GetProperty("CellArrayStatus");
+  vtkSMProperty* CellProperty = this->proxy()->getProxy()->GetProperty("CellArrayStatus");
   QList<QVariant> CellDomain;
   CellDomain = pqSMAdaptor::getSelectionPropertyDomain(CellProperty);
   int j;
@@ -545,7 +547,7 @@ void pqExodusPanel::updateDataRanges()
 
   const int PointOffset = 1;
   // do the node variables
-  vtkSMProperty* NodeProperty = this->proxy()->GetProperty("PointArrayStatus");
+  vtkSMProperty* NodeProperty = this->proxy()->getProxy()->GetProperty("PointArrayStatus");
   QList<QVariant> PointDomain;
   PointDomain = pqSMAdaptor::getSelectionPropertyDomain(NodeProperty);
 

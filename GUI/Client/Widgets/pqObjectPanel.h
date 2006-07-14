@@ -34,7 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqObjectPanel_h
 
 #include <QWidget>
-#include "pqSMProxy.h"
+#include <QPointer>
+class pqProxy;
 
 class pqPropertyManager;
 
@@ -51,10 +52,10 @@ public:
 
   /// set the proxy to display properties for.
   /// subclassess should override setProxyInternal().
-  void setProxy(pqSMProxy proxy);
+  void setProxy(pqProxy* proxy);
 
   /// get the proxy for which properties are displayed
-  virtual pqSMProxy proxy();
+  virtual pqProxy* proxy();
   
   /// size hint for this widget
   QSize sizeHint() const;
@@ -93,9 +94,9 @@ signals:
 protected:
   /// Internal method that actually sets the proxy. Subclasses must override
   /// this instead of setProxy().
-  virtual void setProxyInternal(pqSMProxy proxy);
+  virtual void setProxyInternal(pqProxy* proxy);
 
-  pqSMProxy Proxy;
+  pqProxy* Proxy;
   pqPropertyManager* PropertyManager;
 };
 

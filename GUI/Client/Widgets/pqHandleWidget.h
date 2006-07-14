@@ -33,8 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqHandleWidget_h
 #define _pqHandleWidget_h
 
-#include "pqSMProxy.h"
-
+#include "pqProxy.h"
 #include "pq3DWidget.h"
 
 /// Provides a complete Qt UI for working with a 3D handle widget

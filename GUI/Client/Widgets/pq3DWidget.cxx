@@ -41,26 +41,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Qt includes.
 #include <QtDebug>
+#include <QPointer>
 
 // ParaView GUI includes.
 #include "pqApplicationCore.h"
 #include "pqRenderModule.h"
+#include "pqPipelineSource.h"
+#include "pqProxy.h"
 #include "pqImplicitPlaneWidget.h"
 #include "pqPointSourceWidget.h"
 
 class pq3DWidgetInternal
 {
 public:
-  vtkSmartPointer<vtkSMProxy> ReferenceProxy;
-  vtkSmartPointer<vtkSMProxy> ControlledProxy;
+  QPointer<pqProxy> ReferenceProxy;
+  pqSMProxy ControlledProxy;
   vtkSmartPointer<vtkSMNew3DWidgetProxy> WidgetProxy;
   vtkSmartPointer<vtkCommand> ControlledPropertiesObserver;
 
   QMap<vtkSmartPointer<vtkSMProperty>, vtkSmartPointer<vtkSMProperty> > PropertyMap;
 
-  static QMap<vtkSMProxy*, bool> Visibility;
+  static QMap<pqProxy*, bool> Visibility;
 };
-QMap<vtkSMProxy*, bool> pq3DWidgetInternal::Visibility;
+QMap<pqProxy*, bool> pq3DWidgetInternal::Visibility;
 
 //-----------------------------------------------------------------------------
 pq3DWidget::pq3DWidget(QWidget* _p): QWidget(_p)
@@ -142,7 +145,7 @@ vtkSMNew3DWidgetProxy* pq3DWidget::getWidgetProxy() const
 }
 
 //-----------------------------------------------------------------------------
-void pq3DWidget::setReferenceProxy(vtkSMProxy* proxy)
+void pq3DWidget::setReferenceProxy(pqProxy* proxy)
 {
   this->Internal->ReferenceProxy = proxy;
   if (proxy && !this->Internal->Visibility.contains(proxy))
@@ -153,13 +156,13 @@ void pq3DWidget::setReferenceProxy(vtkSMProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* pq3DWidget::getReferenceProxy() const
+pqProxy* pq3DWidget::getReferenceProxy() const
 {
   return this->Internal->ReferenceProxy;
 }
 
 //-----------------------------------------------------------------------------
-void pq3DWidget::setControlledProxy(vtkSMProxy* proxy)
+void pq3DWidget::setControlledProxy(pqSMProxy proxy)
 {
   foreach(vtkSMProperty* controlledProperty, this->Internal->PropertyMap)
     {
@@ -213,7 +216,7 @@ void pq3DWidget::setHints(vtkPVXMLElement* hints)
 }
 
 //-----------------------------------------------------------------------------
-vtkSMProxy* pq3DWidget::getControlledProxy() const
+pqSMProxy pq3DWidget::getControlledProxy() const
 {
   return this->Internal->ControlledProxy;
 }

@@ -1023,7 +1023,7 @@ void pqPipelineModel::updateDisplays(pqPipelineSource *source,
     }
 }
 
-void pqPipelineModel::updateCurrentWindow(pqRenderModule *module)
+void pqPipelineModel::setCurrentRenderModule(pqRenderModule *module)
 {
   if(module == this->Internal->CurrentView)
     {

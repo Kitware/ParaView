@@ -37,5 +37,5 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 int main(int argc, char* argv[])
 {
   QApplication app(argc, argv);
-  return pqMain::Run(app.argc(), app.argv(), ProcessModuleGUIHelper::New());
+  return pqMain::Run(app, ProcessModuleGUIHelper::New());
 }

@@ -86,12 +86,6 @@ public:
   pqWriterFactory* WriterFactory;
   pqServerManagerSelectionModel* SelectionModel;
 
-  QPointer<pqPipelineSource> ActiveSource;
-  QPointer<pqServer> ActiveServer;
-  QPointer<pqRenderModule> ActiveRenderModule;
-
-  QList< QPointer<pqPipelineSource> > SourcesSansDisplays;
-
   QString OrganizationName;
   QString ApplicationName;
   QPointer<pqSettings> Settings;
@@ -138,12 +132,6 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
     {
     pqApplicationCore::Instance = this;
     }
-
-  // We catch sourceRemoved signal to detect when the ActiveSource
-  // is deleted, if so we need to change the ActiveSource.
-  QObject::connect(this->Internal->ServerManagerModel,
-    SIGNAL(sourceRemoved(pqPipelineSource*)),
-    this, SLOT(sourceRemoved(pqPipelineSource*)));
 
   // * Create various factories.
   this->Internal->WidgetFactory = new pq3DWidgetFactory(this);
@@ -238,325 +226,7 @@ pqServerManagerSelectionModel* pqApplicationCore::getSelectionModel()
   return this->Internal->SelectionModel;
 }
 
-//-----------------------------------------------------------------------------
-void pqApplicationCore::setActiveSource(pqPipelineSource* src)
-{
-  if (this->Internal->ActiveSource == src)
-    {
-    return;
-    }
 
-  this->Internal->ActiveSource = src;
-  emit this->activeSourceChanged(src);
-}
-
-//-----------------------------------------------------------------------------
-void pqApplicationCore::setActiveServer(pqServer* server)
-{
-  if (this->Internal->ActiveServer == server)
-    {
-    return;
-    }
-  this->Internal->ActiveServer = server;
-  emit this->activeServerChanged(server);
-}
-
-//-----------------------------------------------------------------------------
-void pqApplicationCore::setActiveRenderModule(pqRenderModule* rm)
-{
- if (this->Internal->ActiveRenderModule == rm)
-    {
-    return;
-    }
-  this->Internal->ActiveRenderModule = rm;
-  emit this->activeRenderModuleChanged(rm);
-
-
-}
-
-//-----------------------------------------------------------------------------
-pqPipelineSource* pqApplicationCore::getActiveSource()
-{
-  return this->Internal->ActiveSource;
-}
-
-//-----------------------------------------------------------------------------
-pqServer* pqApplicationCore::getActiveServer()
-{
-  return this->Internal->ActiveServer;
-}
-
-//-----------------------------------------------------------------------------
-pqRenderModule* pqApplicationCore::getActiveRenderModule()
-{
-  return this->Internal->ActiveRenderModule;
-}
-
-//-----------------------------------------------------------------------------
-int pqApplicationCore::getNumberOfSourcesPendingDisplays()
-{
-  return this->Internal->SourcesSansDisplays.size();
-}
-
-//-----------------------------------------------------------------------------
-void pqApplicationCore::sourceRemoved(pqPipelineSource* source)
-{
-  if (source == this->getActiveSource())
-    {
-    pqServer* server =this->getActiveServer();
-    this->setActiveSource(NULL);
-    this->Internal->ActiveServer = 0;
-    this->setActiveServer(server);
-    }
-
-  if (this->Internal->SourcesSansDisplays.contains(source))
-    {
-    this->Internal->SourcesSansDisplays.removeAll(source);
-    if (this->Internal->SourcesSansDisplays.size() == 0)
-      {
-      emit this->pendingDisplays(false);
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqApplicationCore::render()
-{
-  pqRenderModule* renModule = this->getActiveRenderModule();
-  if (renModule)
-    {
-    renModule->render();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqApplicationCore::onSourceCreated(pqPipelineSource* source)
-{
-  if (!source)
-    {
-    return;
-    }
-
-  this->addSourcePendingDisplay(source);
-  this->setActiveSource(source);
-
-  pqPendingDisplayUndoElement* elem = pqPendingDisplayUndoElement::New();
-  elem->PendingDisplay(source, true);
-  this->Internal->UndoStack->AddToActiveUndoSet(elem);
-  elem->Delete();
-}
-
-//-----------------------------------------------------------------------------
-pqPipelineSource* pqApplicationCore::createSourceOnActiveServer(
-  const QString& xmlname)
-{
-  if (!this->Internal->ActiveServer)
-    {
-    qDebug() << "No server currently active. "
-      << "Cannot createSourceOnActiveServer.";
-    return 0;
-    }
-
-  pqPipelineSource* source = this->Internal->PipelineBuilder->createSource(
-    "sources", xmlname.toStdString().c_str(), 
-    this->Internal->ActiveServer, NULL);
-
-  this->onSourceCreated(source);
-  this->Internal->UndoStack->EndUndoSet();
-  return source;
-}
-
-static void SetDefaultInputArray(vtkSMProxy* Proxy, const char* PropertyName)
-{
-  if(vtkSMStringVectorProperty* const array =
-    vtkSMStringVectorProperty::SafeDownCast(
-      Proxy->GetProperty(PropertyName)))
-    {
-    Proxy->UpdateVTKObjects();
-  
-    QList<QVariant> domain = 
-      pqSMAdaptor::getEnumerationPropertyDomain(array);
-
-    for(int i = 0; i != domain.size(); ++i)
-      {
-      const QString name = domain[i].toString();
-      array->SetElement(4, name.toAscii().data());
-      array->UpdateDependentDomains();
-      break;
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-pqPipelineSource* pqApplicationCore::createFilterForActiveSource(
-  const QString& xmlname)
-{
-  if (!this->Internal->ActiveSource)
-    {
-    qDebug() << "No source/filter active. Cannot createFilterForActiveSource.";
-    return 0;
-    }
-
-  pqPipelineSource* filter = this->Internal->PipelineBuilder->createSource(
-    "filters", xmlname.toStdString().c_str(), 
-    this->Internal->ActiveSource->getServer(), NULL);
-
-  if(filter)
-    {
-    this->Internal->PipelineBuilder->addConnection(
-      this->Internal->ActiveSource, filter);
-
-    // As a special-case, set a default implicit function for new Cut filters
-    if(xmlname == "Cut")
-      {
-      this->Internal->UndoStack->BeginOrContinueUndoSet("Set CutConnection");
-      
-      if(vtkSMDoubleVectorProperty* const contours =
-        vtkSMDoubleVectorProperty::SafeDownCast(
-          filter->getProxy()->GetProperty("ContourValues")))
-        {
-        contours->SetNumberOfElements(1);
-        contours->SetElement(0, 0.0);
-        }
-        
-      this->Internal->UndoStack->PauseUndoSet();
-      }
-
-    // As a special-case, set a default point source for new StreamTracer filters
-    if(xmlname == "StreamTracer")
-      {
-      this->Internal->UndoStack->BeginOrContinueUndoSet("Set Point Source");
-      vtkSMProxyProperty* sourceProperty = vtkSMProxyProperty::SafeDownCast(
-        filter->getProxy()->GetProperty("Source"));
-      if(sourceProperty && sourceProperty->GetNumberOfProxies() > 0)
-        {
-        vtkSMProxy* const point_source = sourceProperty->GetProxy(0);
-        if(vtkSMIntVectorProperty* const number_of_points =
-          vtkSMIntVectorProperty::SafeDownCast(
-            point_source->GetProperty("NumberOfPoints")))
-          {
-          number_of_points->SetNumberOfElements(1);
-          number_of_points->SetElement(0, 100);
-          }
-        point_source->UpdateVTKObjects();
-        }
-        
-      this->Internal->UndoStack->PauseUndoSet();
-      }
-      
-    this->onSourceCreated(filter);
-    this->Internal->UndoStack->EndUndoSet();
-
-    // As a special-case, set the default contour for new Contour filters
-    if(xmlname == "Contour")
-      {
-      double min_value = 0.0;
-      double max_value = 0.0;
-
-      SetDefaultInputArray(filter->getProxy(), "SelectInputScalars");
-
-      if(vtkSMDoubleVectorProperty* const contours =
-        vtkSMDoubleVectorProperty::SafeDownCast(
-          filter->getProxy()->GetProperty("ContourValues")))
-        {
-        if(vtkSMDoubleRangeDomain* const domain =
-          vtkSMDoubleRangeDomain::SafeDownCast(
-            contours->GetDomain("scalar_range")))
-          {
-          int min_exists = 0;
-          min_value = domain->GetMinimum(0, min_exists);
-          
-          int max_exists = 0;
-          max_value = domain->GetMaximum(0, max_exists);
-          }
-
-        contours->SetNumberOfElements(1);
-        contours->SetElement(0, (min_value + max_value) * 0.5);
-        }
-      }
-
-    // As a special-case, set a default point source for new StreamTracer filters
-    if(xmlname == "StreamTracer")
-      {
-      SetDefaultInputArray(filter->getProxy(), "SelectInputVectors");
-      }
-    }
-  
-  return filter;
-}
-
-//-----------------------------------------------------------------------------
-pqPipelineSource* pqApplicationCore::createCompoundSource(
-  const QString& name)
-{
-  // For starters all compoind proxies need an input..
-  if (!this->Internal->ActiveSource)
-    {
-    qDebug() << "No source/filter active. Cannot createFilterForActiveSource.";
-    return 0;
-    }
-
-  pqPipelineSource* filter = this->Internal->PipelineBuilder->createSource(
-    NULL, name.toStdString().c_str(), 
-    this->Internal->ActiveSource->getServer(), NULL);
-
-  if (filter)
-    {
-    this->Internal->PipelineBuilder->addConnection(
-      this->Internal->ActiveSource, filter);
-    }
-
-  this->onSourceCreated(filter);
-  this->Internal->UndoStack->EndUndoSet();
-  return filter;
-}
-
-//-----------------------------------------------------------------------------
-pqPipelineSource* pqApplicationCore::createReaderOnActiveServer(
-  const QString& filename)
-{
-  if (!this->Internal->ActiveServer)
-    {
-    qDebug() << "No active server. Cannot create reader.";
-    return 0;
-    }
-
-  pqPipelineSource* reader= this->Internal->ReaderFactory->createReader(
-    filename, this->Internal->ActiveServer);
-  if (!reader)
-    {
-    return NULL;
-    }
-
-  this->Internal->UndoStack->BeginOrContinueUndoSet("Set Filenames");
-
-  vtkSMProxy* proxy = reader->getProxy();
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("FileName"), 
-    filename);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("FilePrefix"),
-    filename);
-  pqSMAdaptor::setElementProperty(proxy->GetProperty("FilePattern"),
-    filename);
-  proxy->UpdateVTKObjects();
-
-  this->Internal->UndoStack->PauseUndoSet();
-
-  this->onSourceCreated(reader);
-  this->Internal->UndoStack->EndUndoSet();
-  return reader;
-}
-
-//-----------------------------------------------------------------------------
-void pqApplicationCore::removeActiveSource()
-{
-  pqPipelineSource* source = this->getActiveSource();
-  if (!source)
-    {
-    qDebug() << "No active source to remove.";
-    return;
-    }
-  this->removeSource(source);
-}
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::removeSource(pqPipelineSource* source)
@@ -576,27 +246,15 @@ void pqApplicationCore::removeSource(pqPipelineSource* source)
   // removed goes away before the source is deleted. Probably the selection
   // should also go into the undo stack, that way on undo, the GUI selection
   // can also be restored.
-  this->sourceRemoved(source);
+  emit this->sourceRemoved(source);
  
   this->getPipelineBuilder()->remove(source);
 
   // Since pqPipelineBuilder is never going to call EndUndoSet(), we must call 
   // it explicitly here.
   this->getUndoStack()->EndUndoSet();
-  this->getActiveRenderModule()->render();
 }
 
-//-----------------------------------------------------------------------------
-void pqApplicationCore::removeActiveServer()
-{
-  pqServer* server = this->getActiveServer();
-  if (!server)
-    {
-    qDebug() << "No active server to remove.";
-    return;
-    }
-  this->removeServer(server);
-}
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::removeServer(pqServer* server)
@@ -608,68 +266,12 @@ void pqApplicationCore::removeServer(pqServer* server)
     }
 
   this->getServerManagerModel()->beginRemoveServer(server);
-  this->setActiveSource(NULL);
   this->getPipelineBuilder()->deleteProxies(server);
   pqServer::disconnect(server);
   this->getServerManagerModel()->endRemoveServer();
 }
 
-//-----------------------------------------------------------------------------
-// Methods to add a source to the list of sources pending displays.
-void pqApplicationCore::addSourcePendingDisplay(pqPipelineSource* src)
-{
-  if (!this->Internal->SourcesSansDisplays.contains(src))
-    {
-    this->Internal->SourcesSansDisplays.push_back(src);
-    emit this->pendingDisplays(true);
-    }
-}
 
-//-----------------------------------------------------------------------------
-// Methods to remove a source to the list of sources pending displays.
-void pqApplicationCore::removeSourcePendingDisplay(pqPipelineSource* src)
-{
-  if (this->Internal->SourcesSansDisplays.contains(src))
-    {
-    this->Internal->SourcesSansDisplays.removeAll(src);
-    if (this->Internal->SourcesSansDisplays.size() == 0)
-      {
-      emit this->pendingDisplays(false);
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqApplicationCore::createPendingDisplays()
-{
-  foreach (pqPipelineSource* source, this->Internal->SourcesSansDisplays)
-    {
-    if (!source)
-      {
-      continue;
-      }
-    this->Internal->PipelineBuilder->createDisplayProxy(source,
-      this->getActiveRenderModule());
-    this->getActiveRenderModule()->render();
-    if (this->getServerManagerModel()->getNumberOfSources() == 1)
-      {
-      this->getActiveRenderModule()->resetCamera();
-      }
-    
-    // For every pending display we create, we push an undoelement
-    // nothing the creation of the pending display. 
-    // This ensures that when this step is undone, the source for
-    // which we created the pending display is once again marked as
-    // a source pending a display.
-    pqPendingDisplayUndoElement* elem = pqPendingDisplayUndoElement::New();
-    elem->PendingDisplay(source, false);
-    this->Internal->UndoStack->AddToActiveUndoSet(elem);
-    elem->Delete();
-    }
-
-  this->Internal->SourcesSansDisplays.clear();
-  emit this->pendingDisplays(false);
-}
 
 //-----------------------------------------------------------------------------
 void pqApplicationCore::saveState(vtkPVXMLElement* rootElement)
@@ -688,18 +290,19 @@ void pqApplicationCore::saveState(vtkPVXMLElement* rootElement)
 }
 
 //-----------------------------------------------------------------------------
-void pqApplicationCore::loadState(vtkPVXMLElement* rootElement)
+void pqApplicationCore::loadState(vtkPVXMLElement* rootElement, 
+                                  pqServer* server,
+                                  pqRenderModule* renModule)
 {
-  if (!this->getActiveServer())
+  if (!server)
     {
     return ;
     }
 
   QSize old_size;
-  pqRenderModule* activeRenderModule = this->getActiveRenderModule();
-  if (activeRenderModule)
+  if (renModule)
     {
-    old_size = activeRenderModule->getWidget()->size();
+    old_size = renModule->getWidget()->size();
     }
   vtkPVXMLElement* smState = pqXMLUtil::FindNestedElementByName(rootElement,
     "ServerManagerState");
@@ -707,10 +310,10 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement)
     {
     vtkSMPQStateLoader* loader = vtkSMPQStateLoader::New();
     loader->SetUseExistingRenderModules(1);
-    loader->SetMultiViewRenderModuleProxy(this->getActiveServer()->GetRenderModule());
+    loader->SetMultiViewRenderModuleProxy(server->GetRenderModule());
 
     vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-    pxm->LoadState(smState, this->getActiveServer()->GetConnectionID(),
+    pxm->LoadState(smState, server->GetConnectionID(),
       loader);
     pxm->UpdateRegisteredProxies("sources", 0);
     pxm->UpdateRegisteredProxies("displays", 0);
@@ -718,13 +321,13 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement)
     loader->Delete();
     }
 
-  if (activeRenderModule)
+  if (renModule)
     {
     // We force a size change so that the render window size indicated in the state
     // can be overridden.
-    activeRenderModule->getWidget()->resize(old_size.width()-1, old_size.height());
-    activeRenderModule->getWidget()->resize(old_size);
-    activeRenderModule->render();
+    renModule->getWidget()->resize(old_size.width()-1, old_size.height());
+    renModule->getWidget()->resize(old_size);
+    renModule->render();
     }
   // Clear undo stack.
   this->Internal->UndoStack->Clear();
@@ -769,4 +372,214 @@ QString pqApplicationCore::organizationName()
 {
   return this->Internal->OrganizationName;
 }
+
+static void SetDefaultInputArray(vtkSMProxy* Proxy, const char* PropertyName)
+{
+  if(vtkSMStringVectorProperty* const array =
+    vtkSMStringVectorProperty::SafeDownCast(
+      Proxy->GetProperty(PropertyName)))
+    {
+    Proxy->UpdateVTKObjects();
+  
+    QList<QVariant> domain = 
+      pqSMAdaptor::getEnumerationPropertyDomain(array);
+
+    for(int i = 0; i != domain.size(); ++i)
+      {
+      const QString name = domain[i].toString();
+      array->SetElement(4, name.toAscii().data());
+      array->UpdateDependentDomains();
+      break;
+      }
+    }
+}
+
+pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlname,
+                                        pqPipelineSource* input)
+{
+  if (!input)
+    {
+    qDebug() << "No source/filter active. Cannot createFilterForSource.";
+    return NULL;
+    }
+
+  pqPipelineSource* filter = this->getPipelineBuilder()->createSource(
+    "filters", xmlname.toStdString().c_str(), 
+    input->getServer(), NULL);
+
+  if(filter)
+    {
+    this->getPipelineBuilder()->addConnection(input, filter);
+
+    // As a special-case, set a default implicit function for new Cut filters
+    if(xmlname == "Cut")
+      {
+      this->Internal->UndoStack->BeginOrContinueUndoSet("Set CutConnection");
+      
+      if(vtkSMDoubleVectorProperty* const contours =
+        vtkSMDoubleVectorProperty::SafeDownCast(
+          filter->getProxy()->GetProperty("ContourValues")))
+        {
+        contours->SetNumberOfElements(1);
+        contours->SetElement(0, 0.0);
+        }
+        
+      this->getUndoStack()->PauseUndoSet();
+      }
+
+    // As a special-case, set a default point source for new StreamTracer filters
+    if(xmlname == "StreamTracer")
+      {
+      this->Internal->UndoStack->BeginOrContinueUndoSet("Set Point Source");
+      vtkSMProxyProperty* sourceProperty = vtkSMProxyProperty::SafeDownCast(
+        filter->getProxy()->GetProperty("Source"));
+      if(sourceProperty && sourceProperty->GetNumberOfProxies() > 0)
+        {
+        vtkSMProxy* const point_source = sourceProperty->GetProxy(0);
+        if(vtkSMIntVectorProperty* const number_of_points =
+          vtkSMIntVectorProperty::SafeDownCast(
+            point_source->GetProperty("NumberOfPoints")))
+          {
+          number_of_points->SetNumberOfElements(1);
+          number_of_points->SetElement(0, 100);
+          }
+        point_source->UpdateVTKObjects();
+        }
+        
+      this->getUndoStack()->PauseUndoSet();
+      }
+      
+    emit this->sourceCreated(filter);
+    this->getUndoStack()->EndUndoSet();
+
+    // As a special-case, set the default contour for new Contour filters
+    if(xmlname == "Contour")
+      {
+      double min_value = 0.0;
+      double max_value = 0.0;
+
+      SetDefaultInputArray(filter->getProxy(), "SelectInputScalars");
+
+      if(vtkSMDoubleVectorProperty* const contours =
+        vtkSMDoubleVectorProperty::SafeDownCast(
+          filter->getProxy()->GetProperty("ContourValues")))
+        {
+        if(vtkSMDoubleRangeDomain* const domain =
+          vtkSMDoubleRangeDomain::SafeDownCast(
+            contours->GetDomain("scalar_range")))
+          {
+          int min_exists = 0;
+          min_value = domain->GetMinimum(0, min_exists);
+          
+          int max_exists = 0;
+          max_value = domain->GetMaximum(0, max_exists);
+          }
+
+        contours->SetNumberOfElements(1);
+        contours->SetElement(0, (min_value + max_value) * 0.5);
+        }
+      }
+
+    // As a special-case, set a default point source for new StreamTracer filters
+    if(xmlname == "StreamTracer")
+      {
+      SetDefaultInputArray(filter->getProxy(), "SelectInputVectors");
+      }
+    }
+  
+  return filter;
+}
+
+pqPipelineSource* pqApplicationCore::createSourceOnServer(const QString& xmlname,
+  pqServer* server)
+{
+  if (!server)
+    {
+    qDebug() << "No server specified. "
+      << "Cannot createSourceOnServer.";
+    return 0;
+    }
+
+  pqPipelineSource* source = this->getPipelineBuilder()->createSource(
+    "sources", xmlname.toStdString().c_str(), 
+    server, NULL);
+
+  emit this->sourceCreated(source);
+  this->getUndoStack()->EndUndoSet();
+  return source;
+}
+
+pqPipelineSource* pqApplicationCore::createCompoundFilterForSource(
+                         const QString& name,
+                         pqPipelineSource* source)
+{
+  // For starters all compoind proxies need an input..
+  if (!source)
+    {
+    qDebug() << "No source/filter specified. Cannot createCompoundFilterForSource.";
+    return 0;
+    }
+
+  pqPipelineSource* filter = this->getPipelineBuilder()->createSource(
+    NULL, name.toStdString().c_str(), 
+    source->getServer(), NULL);
+
+  if (filter)
+    {
+    this->getPipelineBuilder()->addConnection(source, filter);
+    }
+
+  emit this->sourceCreated(filter);
+  this->getUndoStack()->EndUndoSet();
+  return filter;
+}
+
+
+pqPipelineSource* pqApplicationCore::createReaderOnServer(
+               const QString& filename,
+               pqServer* server)
+{
+  if (!server)
+    {
+    qDebug() << "No active server. Cannot create reader.";
+    return 0;
+    }
+
+  pqPipelineSource* reader= this->getReaderFactory()->createReader(filename, 
+                                                                   server);
+  if (!reader)
+    {
+    return NULL;
+    }
+
+  this->getUndoStack()->BeginOrContinueUndoSet("Set Filenames");
+
+  vtkSMProxy* proxy = reader->getProxy();
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("FileName"), 
+    filename);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("FilePrefix"),
+    filename);
+  pqSMAdaptor::setElementProperty(proxy->GetProperty("FilePattern"),
+    filename);
+  proxy->UpdateVTKObjects();
+
+  this->getUndoStack()->PauseUndoSet();
+
+  emit this->sourceCreated(reader);
+  this->getUndoStack()->EndUndoSet();
+  return reader;
+}
+
+void pqApplicationCore::render()
+{
+  unsigned int numRenderModules =
+    this->getServerManagerModel()->getNumberOfRenderModules();
+  for(unsigned int i=0; i<numRenderModules; i++)
+    {
+    pqRenderModule* renModule =
+      this->getServerManagerModel()->getRenderModule(i);
+    renModule->render();
+    }
+}
+
 

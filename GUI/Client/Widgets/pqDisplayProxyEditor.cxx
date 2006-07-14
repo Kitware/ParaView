@@ -275,9 +275,9 @@ pqPipelineDisplay* pqDisplayProxyEditor::getDisplay()
 //-----------------------------------------------------------------------------
 void pqDisplayProxyEditor::updateView()
 {
-  if (!this->DisableSlots)
+  if (!this->DisableSlots && this->getDisplay())
     {
-    pqApplicationCore::instance()->getActiveRenderModule()->render();
+    this->getDisplay()->renderAllViews();
     }
 }
 
@@ -559,12 +559,16 @@ void pqDisplayProxyEditor::zoomToData()
   display->GetGeometryInformation()->GetBounds(bounds);
   if (bounds[0]<=bounds[1] && bounds[2]<=bounds[3] && bounds[4]<=bounds[5])
     {
-    pqRenderModule* renModule = 
-      pqApplicationCore::instance()->getActiveRenderModule();
-    vtkSMRenderModuleProxy* rm = renModule->getRenderModuleProxy();
-    rm->ResetCamera(bounds);
-    rm->ResetCameraClippingRange();
-    renModule->render();
+    unsigned int numRenModules;
+    numRenModules = this->Internal->Display->getNumberOfRenderModules();
+    for(unsigned int i=0; i<numRenModules; i++)
+      {
+      pqRenderModule* renModule = this->Internal->Display->getRenderModule(i);
+      vtkSMRenderModuleProxy* rm = renModule->getRenderModuleProxy();
+      rm->ResetCamera(bounds);
+      rm->ResetCameraClippingRange();
+      renModule->render();
+      }
     }
 }
 

@@ -47,11 +47,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //-----------------------------------------------------------------------------
 pqVCRController::pqVCRController(QObject* _parent/*=null*/) : QObject(_parent)
 {
+  this->Source = NULL;
 }
 
 //-----------------------------------------------------------------------------
 pqVCRController::~pqVCRController()
 {
+}
+
+void pqVCRController::setSource(pqPipelineSource* source)
+{
+  this->Source = source;
 }
 
 //-----------------------------------------------------------------------------
@@ -81,13 +87,11 @@ void pqVCRController::onLastFrame()
 //-----------------------------------------------------------------------------
 void pqVCRController::updateSource(bool first, bool last, int offset)
 {
-  pqApplicationCore* core = pqApplicationCore::instance();
-  pqPipelineSource* activeSource = core->getActiveSource();
-  if (!activeSource)
+  if (!this->Source)
     {
     return;
     }
-  vtkSMProxy* activeProxy = activeSource->getProxy();
+  vtkSMProxy* activeProxy = this->Source->getProxy();
   const QString source_class = activeProxy->GetVTKClassName();
   if (source_class != "vtkExodusReader" && source_class != "vtkPExodusReader")
     {
@@ -134,7 +138,7 @@ void pqVCRController::updateSource(bool first, bool last, int offset)
     }
   
   activeProxy->UpdateVTKObjects();
-  core->getActiveRenderModule()->render();
+  this->Source->renderAllViews();
 }
 
 

@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsExport.h"
 
 #include <QObject>
+class pqPipelineSource;
 
 class PQWIDGETS_EXPORT pqVCRController : public QObject
 {
@@ -50,10 +51,14 @@ public slots:
   void onPreviousFrame();
   void onNextFrame();
   void onLastFrame();
+
+  void setSource(pqPipelineSource* source);
  
 private:
   // internal method.
   void updateSource(bool first, bool last, int offset);
+
+  pqPipelineSource* Source;
 };
 
 #endif

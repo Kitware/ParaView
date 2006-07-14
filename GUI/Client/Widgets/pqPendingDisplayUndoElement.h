@@ -39,13 +39,13 @@ class pqPipelineSource;
 class vtkPVXMLElement;
 
 // pqPendingDisplayUndoElement is an GUI undo element used to ensure that
-// "pending displays" in pqApplicationCore work well with undo/redo.
-// When any source is created using pqApplicationCore, the operation has two
+// "pending displays" in pqMainWindowCore work well with undo/redo.
+// When any source is created using pqMainWindowCore, the operation has two
 // parts (a) embryo-state: the source is in the embryo-state until the first 
 // "Accept" following the creation. In this state, as far as the user is concerned
 // the source is not yet available for use. The user can merely set the 
 // initialization values for parameters. (b) birth:- This happens on the first
-// "Accept" following the creation of the source. Here, the pqApplicationCore
+// "Accept" following the creation of the source. Here, the pqMainWindowCore
 // creates a display for the source in the active view and the source becomes
 // usable. Undo/Redo of the source creation has now been split up into two parts
 // as well. After the birth of a source, the first Undo will take the source into
@@ -81,7 +81,7 @@ public:
 
   // Description:
   // Use this method to setup this element.
-  // pqApplicationCore puts two pqPendingDisplayUndoElements
+  // pqMainWindowCore puts two pqPendingDisplayUndoElements
   // per source. 1 in the undoset containing the creation of the 
   // source (with state==ADD) and 1 in the undoset containig the
   // creation of the pending display for the source (with state==REMOVE).

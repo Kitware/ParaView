@@ -122,7 +122,7 @@ void pqCutPanel::onAccepted()
       
   // If this is the first time we've been accepted since our creation, hide the source
   if(pqPipelineFilter* const pipeline_filter =
-    dynamic_cast<pqPipelineFilter*>(pqServerManagerModel::instance()->getPQSource(this->Proxy)))
+    qobject_cast<pqPipelineFilter*>(this->Proxy))
     {
     if(0 == pipeline_filter->getDisplayCount())
       {
@@ -152,18 +152,18 @@ void pqCutPanel::onRejected()
   this->Implementation->SampleScalarWidget.reset();
 }
 
-void pqCutPanel::setProxyInternal(pqSMProxy p)
+void pqCutPanel::setProxyInternal(pqProxy* p)
 {
   Superclass::setProxyInternal(p);
 
   // Setup the implicit plane widget ...
-  pqSMProxy reference_proxy = this->Proxy;
-  pqSMProxy controlled_proxy;
+  pqProxy* reference_proxy = this->Proxy;
+  pqSMProxy controlled_proxy = NULL;
    
   if(this->Proxy)
     {
     if(vtkSMProxyProperty* const cut_function_property = vtkSMProxyProperty::SafeDownCast(
-      this->Proxy->GetProperty("CutFunction")))
+      this->Proxy->getProxy()->GetProperty("CutFunction")))
       {
       controlled_proxy = cut_function_property->GetProxy(0);
       }
@@ -188,8 +188,9 @@ void pqCutPanel::setProxyInternal(pqSMProxy p)
 
   // Setup the sample scalar widget ...
   this->Implementation->SampleScalarWidget.setDataSources(
-    this->Proxy,
-    this->Proxy ? vtkSMDoubleVectorProperty::SafeDownCast(this->Proxy->GetProperty("ContourValues")) : 0);
+    this->Proxy ? this->Proxy->getProxy() : NULL,
+    this->Proxy ?
+    vtkSMDoubleVectorProperty::SafeDownCast(this->Proxy->getProxy()->GetProperty("ContourValues")) : 0);
 }
 
 void pqCutPanel::select()

@@ -36,13 +36,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWidgetsExport.h"
 
 class pqProcessModuleGUIHelper;
+class QApplication;
 
 /// Helper class that wraps all of the boilerplate to create a ParaView client into one function
 class PQWIDGETS_EXPORT pqMain
 {
 public:
   /// Call pqMain::Run() in your client's main(), returning the result
-  static int Run(int argc, char* argv[], pqProcessModuleGUIHelper* helper);
+  static int Run(QApplication& app, pqProcessModuleGUIHelper* helper);
 };
 
 #endif // !_pqMain_h

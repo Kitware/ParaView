@@ -56,7 +56,7 @@ private slots:
   void onRejected();
 
 private:
-  virtual void setProxyInternal(pqSMProxy p);
+  virtual void setProxyInternal(pqProxy* p);
   virtual void select();
   virtual void deselect();
 

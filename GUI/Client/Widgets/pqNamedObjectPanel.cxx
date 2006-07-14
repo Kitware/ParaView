@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqNamedObjectPanel.h"
 #include "pqNamedWidgets.h"
 #include "pqPropertyManager.h"
+#include "pqProxy.h"
 
 pqNamedObjectPanel::pqNamedObjectPanel(QWidget* p) :
   pqObjectPanel(p)
@@ -43,17 +44,17 @@ pqNamedObjectPanel::~pqNamedObjectPanel()
 {
   if(this->Proxy)
     {
-    pqNamedWidgets::unlink(this, this->Proxy, this->PropertyManager);
+    pqNamedWidgets::unlink(this, this->Proxy->getProxy(), this->PropertyManager);
     this->Proxy = NULL;
     }
 }
 
 void pqNamedObjectPanel::linkServerManagerProperties()
 {
-  pqNamedWidgets::link(this, this->Proxy, this->PropertyManager);
+  pqNamedWidgets::link(this, this->Proxy->getProxy(), this->PropertyManager);
 }
 
 void pqNamedObjectPanel::unlinkServerManagerProperties()
 {
-  pqNamedWidgets::unlink(this, this->Proxy, this->PropertyManager);
+  pqNamedWidgets::unlink(this, this->Proxy->getProxy(), this->PropertyManager);
 }

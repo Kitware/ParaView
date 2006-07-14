@@ -41,11 +41,8 @@ class QApplication;
 class QString;
 /*! \brief This is the GUI helper for ParaView.
  * This class provides GUI elements to the process module without forcing
- * the process modules to link with the GUI. This class creates the QApplication
- * and the pqMainWindow when the ProcessModule requests the event loop to begin.
- * If one wants to create any other kind of main window (pqMainWindow subclass)
- * then one must subclass this class and provide the correct instance of the
- * GUI Helper to the process module when intializing it.
+ * the process modules to link with the GUI. This class creates the main window
+ * when the ProcessModule requests the event loop to begin.
  * \todo When the GUI Helper receives Progress, it must be conveyed over to the
  * MainWindow so that the progress can be shown.
  */

@@ -64,10 +64,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
 #include "pqSMSignalAdaptors.h"
+#include "pqApplicationCore.h"
 
 void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager)
 {
-  if(!parent || !proxy.GetPointer() || !property_manager)
+  if(!parent || !proxy || !property_manager)
     {
     return;
     }
@@ -256,7 +257,9 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
             new pqSignalAdaptorProxyList(comboAdaptor, "currentIndex", 
               SIGNAL(currentTextChanged(const QString&)));
           proxyAdaptor->setWidgetFrame(widgetFrame);
-          proxyAdaptor->setReferenceProxy(proxy);
+          pqProxy* pq_proxy =
+            pqApplicationCore::instance()->getServerManagerModel()->getPQSource(proxy);
+          proxyAdaptor->setReferenceProxy(pq_proxy);
           proxyAdaptor->setProperty(SMProperty);
           QObject::connect(parent, SIGNAL(onaccept()), proxyAdaptor, 
             SLOT(accept()));
@@ -341,7 +344,7 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
 
 void pqNamedWidgets::unlink(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager)
 {
-  if(!parent || !proxy.GetPointer() || !property_manager)
+  if(!parent || !proxy || !property_manager)
     {
     return;
     }

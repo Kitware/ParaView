@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ui_MainWindow.h"
 
-#include <pqApplicationCore.h>
 #include <pqMainWindowCore.h>
 #include <pqMultiView.h>
 #include <pqRenderWindowManager.h>
@@ -110,7 +109,7 @@ MainWindow::MainWindow() :
     this->Implementation->UI.pipelineBrowserDock);
 
   this->connect(
-    pqApplicationCore::instance(),
+    &this->Implementation->Core,
     SIGNAL(activeServerChanged(pqServer*)), 
     this,
     SLOT(onActiveServerChanged(pqServer*)));
@@ -152,10 +151,11 @@ void MainWindow::onActiveServerChanged(pqServer* server)
   parser->Parse(custom_filters);
   parser->ProcessConfiguration(vtkSMProxyManager::GetProxyManager());
 
-  pqApplicationCore::instance()->createSourceOnActiveServer("CustomSource");
+  this->Implementation->Core.createSourceOnActiveServer("CustomSource");
 }
 
 void MainWindow::onActiveRenderModuleChanged(pqRenderModule*)
 {
-  pqApplicationCore::instance()->createPendingDisplays();
+  this->Implementation->Core.createPendingDisplays();
 }
+

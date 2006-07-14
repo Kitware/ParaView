@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqLineWidget_h
 #define _pqLineWidget_h
 
-#include "pqSMProxy.h"
+#include "pqProxy.h"
 
 #include <QWidget>
 
@@ -48,7 +48,7 @@ public:
   ~pqLineWidget();
 
   /// Sets the source proxy that will be controlled by this widget
-  void setReferenceProxy(pqSMProxy proxy);
+  void setReferenceProxy(pqProxy* proxy);
   /// Returns the current state of the widget
   void getWidgetState(double point1[3], double point2[3]);
   /// Sets the current state of the widget

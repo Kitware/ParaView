@@ -102,8 +102,8 @@ void pqClipPanel::onAccepted()
   this->Implementation->ImplicitPlaneWidget.accept();
 
   // If this is the first time we've been accepted since our creation, hide the source
-  if(pqPipelineFilter* const pipeline_filter =
-    dynamic_cast<pqPipelineFilter*>(pqServerManagerModel::instance()->getPQSource(this->Proxy)))
+  if(pqPipelineFilter* const pipeline_filter = 
+           qobject_cast<pqPipelineFilter*>(this->Proxy))
     {
     if(0 == pipeline_filter->getDisplayCount())
       {
@@ -132,24 +132,25 @@ void pqClipPanel::onRejected()
   this->Implementation->ImplicitPlaneWidget.reset();
 }
 
-void pqClipPanel::setProxyInternal(pqSMProxy p)
+void pqClipPanel::setProxyInternal(pqProxy* p)
 {
   if(this->Proxy)
     {
     this->PropertyManager->unregisterLink(
       &this->Implementation->InsideOutWidget, "checked", SIGNAL(toggled(bool)),
-      this->Proxy, this->Proxy->GetProperty("InsideOut"));
+      this->Proxy->getProxy(), 
+      this->Proxy->getProxy()->GetProperty("InsideOut"));
     }
 
   Superclass::setProxyInternal(p);
  
-  pqSMProxy reference_proxy = p;
-  pqSMProxy controlled_proxy;
+  pqProxy* reference_proxy = p;
+  vtkSMProxy* controlled_proxy = NULL;
    
   if(this->Proxy)
     {
     if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
-      this->Proxy->GetProperty("ClipFunction")))
+      this->Proxy->getProxy()->GetProperty("ClipFunction")))
       {
       controlled_proxy = clip_function_property->GetProxy(0);
       }
@@ -175,7 +176,8 @@ void pqClipPanel::setProxyInternal(pqSMProxy p)
     {
     this->PropertyManager->registerLink(
       &this->Implementation->InsideOutWidget, "checked", SIGNAL(toggled(bool)),
-      this->Proxy, this->Proxy->GetProperty("InsideOut"));
+      this->Proxy->getProxy(), 
+      this->Proxy->getProxy()->GetProperty("InsideOut"));
     }
 }
 

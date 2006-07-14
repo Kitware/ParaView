@@ -35,6 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqImplicitPlaneWidget.h"
 #include "pqRenderModule.h"
 #include "pqServerManagerModel.h"
+#include "pqPipelineSource.h"
+#include "pqPipelineFilter.h"
+#include "pqPipelineDisplay.h"
 #include "pqPropertyLinks.h"
 #include "pqSMSignalAdaptors.h"
 
@@ -137,8 +140,24 @@ pqImplicitPlaneWidget::~pqImplicitPlaneWidget()
 
   if(widget)
     {
-    if(pqRenderModule* const renModule = 
-      pqApplicationCore::instance()->getActiveRenderModule())
+    pqPipelineFilter* source;
+    pqPipelineSource* source1 = NULL;
+    pqPipelineDisplay* display = NULL;
+    pqRenderModule* renModule = NULL;
+    source = qobject_cast<pqPipelineFilter*>(this->getReferenceProxy());
+    if(source)
+      {
+      source1 = source->getInput(0);
+      }
+    if(source1)
+      {
+      display = source1->getDisplay(0);
+      }
+    if(display)
+      {
+      renModule = display->getRenderModule(0);
+      }
+    if(renModule)
       {
       if(vtkSMRenderModuleProxy* rm = renModule->getRenderModuleProxy())
         {
@@ -161,7 +180,7 @@ pqImplicitPlaneWidget::~pqImplicitPlaneWidget()
 }
 
 //-----------------------------------------------------------------------------
-void pqImplicitPlaneWidget::setControlledProxy(vtkSMProxy* proxy)
+void pqImplicitPlaneWidget::setControlledProxy(pqSMProxy proxy)
 {
   if(!this->getWidgetProxy())
     {
@@ -224,8 +243,23 @@ void pqImplicitPlaneWidget::setControlledProxy(vtkSMProxy* proxy)
       adaptor, "value", SIGNAL(valueChanged(const QString&)),
       widget, widget->GetProperty("Normal"), 2);
 
-    pqRenderModule* const renModule = 
-      pqApplicationCore::instance()->getActiveRenderModule();
+    pqPipelineFilter* source;
+    pqPipelineSource* source1 = NULL;
+    pqPipelineDisplay* display = NULL;
+    pqRenderModule* renModule = NULL;
+    source = qobject_cast<pqPipelineFilter*>(this->getReferenceProxy());
+    if(source)
+      {
+      source1 = source->getInput(0);
+      }
+    if(source1)
+      {
+      display = source1->getDisplay(0);
+      }
+    if(display)
+      {
+      renModule = display->getRenderModule(0);
+      }
 
     if(widget && renModule)
       {
@@ -344,7 +378,7 @@ void pqImplicitPlaneWidget::resetBounds()
     {
     if(vtkSMProxyProperty* const input_property =
       vtkSMProxyProperty::SafeDownCast(
-        this->getReferenceProxy()->GetProperty("Input")))
+        this->getReferenceProxy()->getProxy()->GetProperty("Input")))
       {
       if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
         input_property->GetProxy(0)))
@@ -384,7 +418,7 @@ void pqImplicitPlaneWidget::resetBounds()
           place_widget->SetElements(widget_bounds);
           
           widget->UpdateVTKObjects();
-          pqApplicationCore::instance()->render();
+          qobject_cast<pqPipelineSource*>(this->getReferenceProxy())->renderAllViews();
           }
         }
       }
@@ -398,7 +432,7 @@ void pqImplicitPlaneWidget::onUseCenterBounds()
     {
     if(vtkSMProxyProperty* const input_property =
       vtkSMProxyProperty::SafeDownCast(
-        this->getReferenceProxy()->GetProperty("Input")))
+        this->getReferenceProxy()->getProxy()->GetProperty("Input")))
       {
       if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
         input_property->GetProxy(0)))
@@ -417,7 +451,7 @@ void pqImplicitPlaneWidget::onUseCenterBounds()
           {
           origin->SetElements(input_origin);
           widget->UpdateVTKObjects();
-          pqApplicationCore::instance()->render();
+          qobject_cast<pqPipelineSource*>(this->getReferenceProxy())->renderAllViews();
           }
         }
       }
@@ -435,7 +469,7 @@ void pqImplicitPlaneWidget::onUseXNormal()
       {
       normal->SetElements3(1, 0, 0);
       widget->UpdateVTKObjects();
-      pqApplicationCore::instance()->render();
+      qobject_cast<pqPipelineSource*>(this->getReferenceProxy())->renderAllViews();
       }
     }
 }
@@ -451,7 +485,7 @@ void pqImplicitPlaneWidget::onUseYNormal()
       {
       normal->SetElements3(0, 1, 0);
       widget->UpdateVTKObjects();
-      pqApplicationCore::instance()->render();
+      qobject_cast<pqPipelineSource*>(this->getReferenceProxy())->renderAllViews();
       }
     }
 }
@@ -467,7 +501,7 @@ void pqImplicitPlaneWidget::onUseZNormal()
       {
       normal->SetElements3(0, 0, 1);
       widget->UpdateVTKObjects();
-      pqApplicationCore::instance()->render();
+      qobject_cast<pqPipelineSource*>(this->getReferenceProxy())->renderAllViews();
       }
     }
 }
@@ -477,9 +511,24 @@ void pqImplicitPlaneWidget::onUseCameraNormal()
   vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
   if(widget)
     {
-    if(vtkCamera* const camera =
-      pqApplicationCore::instance()->getActiveRenderModule()->
-        getRenderModuleProxy()->GetRenderer()->GetActiveCamera())
+    pqPipelineFilter* source;
+    pqPipelineSource* source1 = NULL;
+    pqPipelineDisplay* display = NULL;
+    pqRenderModule* renModule = NULL;
+    source = qobject_cast<pqPipelineFilter*>(this->getReferenceProxy());
+    if(source)
+      {
+      source1 = source->getInput(0);
+      }
+    if(source1)
+      {
+      display = source1->getDisplay(0);
+      }
+    if(display)
+      {
+      renModule = display->getRenderModule(0);
+      }
+    if(vtkCamera* const camera = renModule->getRenderModuleProxy()->GetRenderer()->GetActiveCamera())
       {
       if(vtkSMDoubleVectorProperty* const normal =
         vtkSMDoubleVectorProperty::SafeDownCast(
@@ -491,7 +540,7 @@ void pqImplicitPlaneWidget::onUseCameraNormal()
           -camera_normal[0], -camera_normal[1], -camera_normal[2]);
         
         widget->UpdateVTKObjects();
-        pqApplicationCore::instance()->render();
+        qobject_cast<pqPipelineSource*>(this->getReferenceProxy())->renderAllViews();
         }
       }
     }
@@ -506,4 +555,80 @@ void pqImplicitPlaneWidget::on3DWidgetEndDrag()
 {
   emit widgetEndInteraction();
 }
+
+void pqImplicitPlaneWidget::get3DWidgetState(double* origin, double* normal)
+{
+  vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
+  if(widget)
+    {
+    if(vtkSMDoubleVectorProperty* const widget_origin =
+      vtkSMDoubleVectorProperty::SafeDownCast(
+        widget->GetProperty("Origin")))
+      {
+      origin[0] = widget_origin->GetElement(0);
+      origin[1] = widget_origin->GetElement(1);
+      origin[2] = widget_origin->GetElement(2);
+      }
+
+    if(vtkSMDoubleVectorProperty* const widget_normal =
+      vtkSMDoubleVectorProperty::SafeDownCast(
+        widget->GetProperty("Normal")))
+      {
+      normal[0] = widget_normal->GetElement(0);
+      normal[1] = widget_normal->GetElement(1);
+      normal[2] = widget_normal->GetElement(2);
+      }
+    }
+}
+
+#if 0
+void pqImplicitPlaneWidget::set3DWidgetState(const double* origin, const double* normal)
+{
+  this->Ignore3DWidget = true;
+   
+  vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
+  if(widget)
+    {
+    if(vtkSMDoubleVectorProperty* const widget_origin =
+      vtkSMDoubleVectorProperty::SafeDownCast(
+        widget->GetProperty("Origin")))
+      {
+      widget_origin->SetElements(origin);
+      }
+
+    if(vtkSMDoubleVectorProperty* const widget_normal =
+      vtkSMDoubleVectorProperty::SafeDownCast(
+        widget->GetProperty("Normal")))
+      {
+      widget_normal->SetElements(normal);
+      }
+    
+    widget->UpdateVTKObjects();
+    
+    qobject_cast<pqPipelineSource*>(this->getReferenceProxy())->renderAllViews();
+    }
+    
+  this->Ignore3DWidget = false;
+}
+
+void pqImplicitPlaneWidget::setQtWidgetState(const double* origin, const double* normal)
+{
+  this->Implementation->IgnoreQtWidgets = true;
+  
+  this->Implementation->UI->originX->setText(
+    QString::number(origin[0], 'g', 3));
+  this->Implementation->UI->originY->setText(
+    QString::number(origin[1], 'g', 3));  
+  this->Implementation->UI->originZ->setText(
+    QString::number(origin[2], 'g', 3));  
+  this->Implementation->UI->normalX->setText(
+    QString::number(normal[0], 'g', 3));  
+  this->Implementation->UI->normalY->setText(
+    QString::number(normal[1], 'g', 3));  
+  this->Implementation->UI->normalZ->setText(
+    QString::number(normal[2], 'g', 3));
+  
+  this->Implementation->IgnoreQtWidgets = false;
+}
+#endif
 

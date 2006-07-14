@@ -165,10 +165,6 @@ protected:
   vtkSMProxy* createPipelineProxy(const char* xmlgroup,
     const char* xmlname, pqServer* server, pqRenderModule* renModule);
 
-  /// internal implementation to addConnection.
-  void addConnection(vtkSMProxy* source, vtkSMProxy* sink);
-  void removeConnection(vtkSMProxy* source, vtkSMProxy* sink);
-
   pqNameCount* NameGenerator;
   pqUndoStack* UndoStack;
 

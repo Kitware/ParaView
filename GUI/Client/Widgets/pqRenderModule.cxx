@@ -107,6 +107,7 @@ pqRenderModule::pqRenderModule(const QString& name,
   this->Internal->Name = name;
   this->Internal->RenderViewProxy->setRenderModule(this);
   this->Internal->RenderModuleProxy = renModule;
+  this->Internal->UndoStack->setActiveServer(this->getServer());
 
   this->Internal->Viewport = new QVTKWidget() 
     << pqSetName("Viewport" + this->Internal->Name);

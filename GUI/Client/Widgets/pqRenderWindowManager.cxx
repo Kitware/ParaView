@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqRenderWindowManagerInternal
 {
 public:
-  //QPointer<pqServer> ActiveServer;
+  QPointer<pqServer> ActiveServer;
   QPointer<pqRenderModule> ActiveRenderModule;
   QPointer<pqMultiViewFrame> FrameAdded;
 
@@ -90,12 +90,12 @@ pqRenderWindowManager::~pqRenderWindowManager()
   delete this->Internal;
 }
 
-/*//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void pqRenderWindowManager::setActiveServer(pqServer* server)
 {
   this->Internal->ActiveServer = server;
 }
-*/
+
 //-----------------------------------------------------------------------------
 pqRenderModule* pqRenderWindowManager::getActiveRenderModule()
 {
@@ -105,14 +105,14 @@ pqRenderModule* pqRenderWindowManager::getActiveRenderModule()
 //-----------------------------------------------------------------------------
 void pqRenderWindowManager::onFrameAdded(pqMultiViewFrame* frame)
 {
-  if (!pqApplicationCore::instance()->getActiveServer())
+  if (!this->Internal->ActiveServer)
     {
     return;
     }
 
   this->Internal->FrameAdded = frame;
   pqRenderModule* rm =   
-    pqPipelineBuilder::instance()->createWindow(pqApplicationCore::instance()->getActiveServer());
+    pqPipelineBuilder::instance()->createWindow(this->Internal->ActiveServer);
   this->Internal->ActiveRenderModule =  rm;
   emit this->activeRenderModuleChanged(this->Internal->ActiveRenderModule);
 

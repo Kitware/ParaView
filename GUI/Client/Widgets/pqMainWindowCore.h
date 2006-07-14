@@ -44,6 +44,7 @@ class pqMultiView;
 class pqObjectInspectorWidget;
 class pqPipelineMenu;
 class pqPipelineSource;
+class pqProxy;
 class pqRenderModule;
 class pqRenderWindowManager;
 class pqSelectionManager;
@@ -53,7 +54,6 @@ class pqToolsMenu;
 class pqVCRController;
 class pqViewMenu;
 
-class vtkSMProxy;
 class vtkUnstructuredGrid;
 
 class QAction;
@@ -123,6 +123,50 @@ public:
   /// Call this once all of your slots/signals are connected, to
   /// set the initial state of GUI components
   void initializeStates();
+
+  /// returns the active source.
+  pqPipelineSource* getActiveSource();
+
+  /// returns the active server.
+  pqServer* getActiveServer();
+
+  /// returns the active render module.
+  pqRenderModule* getActiveRenderModule();
+  
+  /// Returns the number of sources pending displays. This shouldn't even be 
+  /// exposed, but for the current release, we want to disable all menus,
+  /// if the user has a source waiting a display, hence we expose it.
+  int getNumberOfSourcesPendingDisplays();
+
+  void removeActiveSource();
+  void removeActiveServer();
+  
+  // This will create a source with the given xmlname on the active server. 
+  // On success returns
+  // pqPipelineSource for the source proxy. The actual creation is delegated 
+  // to pqPipelineBuilder instance. Using this method will optionally,
+  // create a display for the source in the active render window (if both
+  // the active window is indeed on the active server. The created source
+  // becomes the active source.
+  pqPipelineSource* createSourceOnActiveServer(const QString& xmlname);
+
+  // This will create a filter and connect it to the active source.
+  // The actual creation is delegated 
+  // to pqPipelineBuilder instance. Using this method will optionally,
+  // create a display for the source in the active render window (if both
+  // the active window is indeed on the active server. The created source
+  // becomes the active source.
+  pqPipelineSource* createFilterForActiveSource( const QString& xmlname);
+
+  // This will instantiate and register a compound proxy. A compound proxy
+  // definition with the given name must have already been registered with
+  // the proxy manager. If the compound proxy needs an input, the active
+  // source will be used as the input. 
+  pqPipelineSource* createCompoundSource(const QString& name);
+
+  // Utility function to create a reader that reads the file on the 
+  // active server. 
+  pqPipelineSource* createReaderOnActiveServer( const QString& filename);
   
 signals:
   void enableFileOpen(bool);
@@ -142,11 +186,24 @@ signals:
   void enableVariableToolbar(bool);
   void enableSelectionToolbar(bool);
   
-  void activeSourceChanged(vtkSMProxy*);
-  
   /** \todo Hide these private implementation details */
   void postAccept();
   void select(pqServerManagerModelItem*);
+  
+  // Fired when the active source changes.
+  void activeSourceChanged(pqPipelineSource*);
+  void activeSourceChanged(pqProxy*);
+
+  // Fired when the active server changes.
+  void activeServerChanged(pqServer*);
+
+  // Fired when the active render module changes.
+  void activeRenderModuleChanged(pqRenderModule*);
+  
+  // Fired when a source/filter/reader/compound proxy is
+  // created without a display.
+  void pendingDisplays(bool status);
+
 
 public slots:
   void onFileNew();
@@ -195,6 +252,21 @@ public slots:
   void onToolsPythonShell();
   
   void onHelpEnableTooltips(bool enabled = true);
+  
+  // Call this slot to set the active source. 
+  void setActiveSource(pqPipelineSource*);
+
+  // Call this slot to set the active server. 
+  void setActiveServer(pqServer*);
+
+  // Call this slot to set the active render module.
+  void setActiveRenderModule(pqRenderModule*);
+  
+  // Call this slot when accept is called. This method will create
+  // displays for any sources/filters that are pending.
+  void createPendingDisplays();
+
+  void filtersActivated();
 
 private slots:
   void onCreateSource(QAction*);
@@ -228,11 +300,29 @@ private slots:
   // This will update the recently loaded files menu
   void updateRecentFilesMenu(bool enabled);
   void onRecentFileOpen();
-
+  
+  // called when a source is removed by the pqServerManagerModel. If
+  // the removed source is the active source, we must change it.
+  void sourceRemoved(pqPipelineSource*);
+  void serverRemoved(pqServer*);
+  
+  // Performs the set of actions need to be performed after a new 
+  // source/reader/filter/customfilter is created. This includes
+  // seting up handler to create a default display proxy for the source
+  // after first accept, set up undo stack so that the undo/redo
+  // works correctly with pending displays etc etc.
+  void onSourceCreated(pqPipelineSource*);
+  
 /*
   virtual bool eventFilter(QObject* watched, QEvent* e);
 */
 
+  // Methods to add a source to the list of sources pending displays.
+  void addSourcePendingDisplay(pqPipelineSource*);
+
+  // Methods to remove a source to the list of sources pending displays.
+  void removeSourcePendingDisplay(pqPipelineSource*);
+  
 private:
   class pqImplementation;
   pqImplementation* const Implementation;

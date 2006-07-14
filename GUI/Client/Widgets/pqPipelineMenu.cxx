@@ -105,7 +105,7 @@ pqPipelineMenu::pqPipelineMenu(QObject *parentObject)
   this->MenuList[pqPipelineMenu::AddSourceAction] = 0;
   action = new QAction(tr("Add &Filter..."), this);
   action->setObjectName("AddFilter");
-  QObject::connect(action, SIGNAL(triggered()), this, SLOT(addFilter()));
+  QObject::connect(action, SIGNAL(triggered()), this, SIGNAL(filtersActivated()));
   this->MenuList[pqPipelineMenu::AddFilterAction] = action;
 
   // TEMP: Set the add filter start path to the 'Released' group.
@@ -204,11 +204,8 @@ void pqPipelineMenu::addSource()
   // TODO
 }
 
-void pqPipelineMenu::addFilter()
+void pqPipelineMenu::addFilter(pqPipelineSource* input)
 {
-  // Get the selected input from the application core.
-  // TODO: Support multiple inputs.
-  pqPipelineSource *input = pqApplicationCore::instance()->getActiveSource();
   if(!input)
     {
     return;
@@ -248,7 +245,7 @@ void pqPipelineMenu::addFilter()
     this->Internal->FilterHistory->addRecentSource(filterName);
 
     // Create the filter.
-    if(!pqApplicationCore::instance()->createFilterForActiveSource(filterName))
+    if(!pqApplicationCore::instance()->createFilterForSource(filterName, input))
       {
       qCritical() << "Filter could not be created.";
       } 

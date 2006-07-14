@@ -68,6 +68,8 @@ public slots:
   void onRenderModuleRemoved(pqRenderModule* rm);
 
   void onActivate(QWidget* obj);
+  void setActiveServer(pqServer* server);
+
 private:
   pqRenderWindowManagerInternal* Internal;
 };

@@ -49,7 +49,7 @@ public:
 
 protected:
   /// set the proxy to display properties for
-  virtual void setProxyInternal(pqSMProxy proxy);
+  virtual void setProxyInternal(pqProxy* proxy);
 
   /// populate this widget with widgets to represent the properties
   void createWidgets();

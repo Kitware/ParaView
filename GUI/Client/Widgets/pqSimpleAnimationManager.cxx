@@ -52,6 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView includes.
 #include "pqPipelineSource.h"
+#include "pqPipelineDisplay.h"
 #include "pqSMAdaptor.h"
 #include "pqApplicationCore.h"
 #include "pqRenderModule.h"
@@ -170,8 +171,7 @@ bool pqSimpleAnimationManager::createTimestepAnimation(
     vtkSMDoubleVectorProperty::SafeDownCast(
       timestep->GetInformationProperty());
   proxy->UpdatePropertyInformation(timestepValues);
-  pqRenderModule* activeView = 
-    pqApplicationCore::instance()->getActiveRenderModule();
+  pqRenderModule* activeView = source->getDisplay(0)->getRenderModule(0);
 
   QFileInfo fileinfo(filename);
   QString filePrefix = filename;

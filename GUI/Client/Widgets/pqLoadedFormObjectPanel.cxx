@@ -78,7 +78,7 @@ bool pqLoadedFormObjectPanel::isValid()
 }
 
 /// set the proxy to display properties for
-void pqLoadedFormObjectPanel::setProxyInternal(pqSMProxy p)
+void pqLoadedFormObjectPanel::setProxyInternal(pqProxy* p)
 {
   if(this->Proxy)
     {

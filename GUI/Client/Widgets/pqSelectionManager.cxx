@@ -162,10 +162,6 @@ pqSelectionManager::pqSelectionManager(QObject* _parent/*=null*/) :
   this->Mode = INTERACT;
 
   pqApplicationCore* core = pqApplicationCore::instance();
-  QObject::connect(core, 
-                   SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
-                   this, 
-                   SLOT(activeRenderModuleChanged(pqRenderModule*)));
 
   pqServerManagerModel* model = core->getServerManagerModel();
   QObject::connect(model, 
@@ -387,7 +383,7 @@ vtkSMDisplayProxy* pqSelectionManager::getDisplayProxy(pqRenderModule* rm,
 }
 
 //-----------------------------------------------------------------------------
-void pqSelectionManager::activeRenderModuleChanged(pqRenderModule* rm)
+void pqSelectionManager::setActiveRenderModule(pqRenderModule* rm)
 {
   if (!rm)
     {

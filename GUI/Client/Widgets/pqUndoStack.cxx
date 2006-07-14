@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include <QtDebug>
+#include <QPointer>
 
 #include "pqApplicationCore.h"
 #include "pqServer.h"
@@ -51,6 +52,7 @@ class pqUndoStackImplementation
 public:
   vtkSmartPointer<vtkSMUndoStack> UndoStack;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnector;
+  QPointer<pqServer> Server;
 };
 
 //-----------------------------------------------------------------------------
@@ -68,6 +70,7 @@ pqUndoStack::pqUndoStack(bool clientOnly, QObject* _parent/*=null*/)
   this->Implementation->VTKConnector->Connect(this->Implementation->UndoStack,
     vtkCommand::ModifiedEvent, this, SLOT(onStackChanged(vtkObject*, 
         unsigned long, void*, void*, vtkCommand*)), NULL, 1.0);
+  this->Implementation->Server = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -123,13 +126,12 @@ void pqUndoStack::onStackChanged(vtkObject*, unsigned long, void*,
 //-----------------------------------------------------------------------------
 void pqUndoStack::BeginOrContinueUndoSet(QString label)
 {
-  pqServer * server= pqApplicationCore::instance()->getActiveServer();
-  if (!server)
+  if (!this->Implementation->Server)
     {
-    qDebug()<< "no active server. cannot undo/redo.";
+    qDebug()<< "no server specified. cannot undo/redo.";
     return;
     }
-  vtkIdType cid = server->GetConnectionID();
+  vtkIdType cid = this->Implementation->Server->GetConnectionID();
   this->Implementation->UndoStack->BeginOrContinueUndoSet(cid,
     label.toStdString().c_str());
 }
@@ -187,3 +189,9 @@ void pqUndoStack::Clear()
 {
   this->Implementation->UndoStack->Clear();
 }
+  
+void pqUndoStack::setActiveServer(pqServer* server)
+{
+  this->Implementation->Server = server;
+}
+
