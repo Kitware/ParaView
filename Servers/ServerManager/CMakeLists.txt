@@ -94,6 +94,7 @@ SET(Kit_SRCS
   vtkSMProxyGroupDomain.cxx
   vtkSMProxyIterator.cxx
   vtkSMProxyLink.cxx
+  vtkSMProxyListDomain.cxx
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
   vtkSMProxyRegisterUndoElement.cxx

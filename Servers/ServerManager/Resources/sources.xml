@@ -671,6 +671,14 @@ The output of the Plane source is polygonal data.
          default_values="1.0" >
        <DoubleRangeDomain name="range" min="0"/>
       </DoubleVectorProperty>
+
+      <Hints>
+        <PropertyGroup type="PointSource" >
+          <Property function="WorldPosition"  name="Center" />
+          <Property function="Radius"         name="Radius" />
+          <Property function="NumberOfPoints" name="NumberOfPoints" />
+        </PropertyGroup>
+      </Hints>
    <!-- End PointSource -->
    </SourceProxy>
 

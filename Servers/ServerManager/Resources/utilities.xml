@@ -135,10 +135,10 @@
              it chooses. Hints provide a mechanism to add some GUI
              pertinant information to the server manager XML.
         -->
-        <Widget group="displays" name="ImplicitPlaneWidgetDisplay">
-          <Property name="Origin" controls="Origin" />
-          <Property name="Normal" controls="Normal" />
-        </Widget>
+        <PropertyGroup type="Plane">
+          <Property name="Origin" function="Origin" />
+          <Property name="Normal" function="Normal" />
+        </PropertyGroup>
       </Hints>
     </ImplicitPlaneProxy>
 
