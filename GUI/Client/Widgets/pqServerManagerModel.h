@@ -166,23 +166,29 @@ signals:
 
   // Fired when a source/filter/compoundProxy is registered.
   void sourceAdded(pqPipelineSource* source);
+  void preSourceAdded(pqPipelineSource* source);
 
   // Fired when a source/filter/compoundproxy is unregistered.
   void sourceRemoved(pqPipelineSource* source);
+  void preSourceRemoved(pqPipelineSource*);
 
   /// Fired when a connection between two pqPipelineSources is created.
   void connectionAdded(pqPipelineSource* in, pqPipelineSource* out);
+  void preConnectionAdded(pqPipelineSource* in, pqPipelineSource* out);
 
   /// Fired when a connection between tow pqPipelineSources is broken.
   void connectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
+  void preConnectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
 
   /// Fired when a render module becomes available. The handler of this
   /// signal must set the pqRenderModule's parent QWidget at first 
   /// opportunity.
   void renderModuleAdded(pqRenderModule* rm);
+  void preRenderModuleAdded(pqRenderModule*);
 
   /// Fired when a render module is gone for ever.
   void renderModuleRemoved(pqRenderModule* rm);
+  void preRenderModuleRemoved(pqRenderModule* rm);
 
   /// Fired when the name of an item changes.
   void nameChanged(pqServerManagerModelItem *item);

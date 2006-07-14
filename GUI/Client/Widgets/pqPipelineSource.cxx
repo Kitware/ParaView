@@ -127,6 +127,7 @@ bool pqPipelineSource::hasConsumer(pqPipelineSource *consumer) const
 //-----------------------------------------------------------------------------
 void pqPipelineSource::addConsumer(pqPipelineSource* cons)
 {
+  emit this->preConnectionAdded(this, cons);
   this->Internal->Consumers.push_back(cons);
 
   // raise signals to let the world know which connections were
@@ -140,12 +141,12 @@ void pqPipelineSource::removeConsumer(pqPipelineSource* cons)
   int index = this->Internal->Consumers.indexOf(cons);
   if (index != -1)
     {
+    emit this->preConnectionRemoved(this, cons);
     this->Internal->Consumers.removeAt(index);
+    // raise signals to let the world know which connections were
+    // broken and which ones were made.
+    emit this->connectionRemoved(this, cons);
     }
-
-  // raise signals to let the world know which connections were
-  // broken and which ones were made.
-  emit this->connectionRemoved(this, cons);
 }
 
 //-----------------------------------------------------------------------------

@@ -95,9 +95,11 @@ public:
 signals:
   /// fired when a connection is created between two pqPipelineSources.
   void connectionAdded(pqPipelineSource* in, pqPipelineSource* out);
+  void preConnectionAdded(pqPipelineSource*, pqPipelineSource*);
 
   /// fired when a connection is broken between two pqPipelineSources.
   void connectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
+  void preConnectionRemoved(pqPipelineSource* in, pqPipelineSource* out);
 
   /// fired when a display is added.
   void displayAdded(pqPipelineSource* source, pqPipelineDisplay* display);

@@ -176,7 +176,6 @@ void pqServerManagerModel::onAddSource(QString name, vtkSMProxy* source)
     this->Internal->NameGenerator.GetCountAndIncrement(source->GetXMLName());
   pqSource->setProxyName(name_stream.str().c_str());
 
-  this->Internal->Sources.insert(name, pqSource);
 
   QObject::connect(pqSource, 
     SIGNAL(connectionAdded(pqPipelineSource*, pqPipelineSource*)),
@@ -185,13 +184,22 @@ void pqServerManagerModel::onAddSource(QString name, vtkSMProxy* source)
     SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)),
     this, SIGNAL(connectionRemoved(pqPipelineSource*, pqPipelineSource*)));
   QObject::connect(pqSource, 
+    SIGNAL(preConnectionAdded(pqPipelineSource*, pqPipelineSource*)),
+    this, SIGNAL(preConnectionAdded(pqPipelineSource*, pqPipelineSource*)));
+  QObject::connect(pqSource, 
+    SIGNAL(preConnectionRemoved(pqPipelineSource*, pqPipelineSource*)),
+    this, SIGNAL(preConnectionRemoved(pqPipelineSource*, pqPipelineSource*)));
+  QObject::connect(pqSource, 
     SIGNAL(displayAdded(pqPipelineSource*, pqPipelineDisplay*)),
     this, SIGNAL(sourceDisplayChanged(pqPipelineSource*, pqPipelineDisplay*)));
   QObject::connect(pqSource, 
     SIGNAL(displayRemoved(pqPipelineSource*, pqPipelineDisplay*)),
     this, SIGNAL(sourceDisplayChanged(pqPipelineSource*, pqPipelineDisplay*)));
+
+  emit this->preSourceAdded(pqSource);
+  this->Internal->Sources.insert(name, pqSource);
   emit this->sourceAdded(pqSource);
- 
+
   // It is essential to let the world know of the addition of pqSource
   // before we start emitting signals as we update the initial state 
   // of the pqSource from its underlying proxy. Hence we emit this->sourceAdded()
@@ -205,12 +213,13 @@ void pqServerManagerModel::onRemoveSource(QString name)
   pqPipelineSource* source = NULL;
   if (this->Internal->Sources.contains(name))
     {
+    source = this->Internal->Sources.value(name);
+    emit this->preSourceRemoved(source);
     source = this->Internal->Sources.take(name);
 
     // disconnect everything.
     QObject::disconnect(source, 0, this, 0);
     emit this->sourceRemoved(source);
-
     delete source;
     }
 }
@@ -380,10 +389,11 @@ void pqServerManagerModel::onAddRenderModule(QString name,
     }
 
   pqRenderModule* pqRM = new pqRenderModule(name, rm, server);
+
+  emit this->preRenderModuleAdded(pqRM);
   this->Internal->RenderModules.push_back(pqRM);
 
   emit this->renderModuleAdded(pqRM);
-
 }
 
 //-----------------------------------------------------------------------------
@@ -395,6 +405,7 @@ void pqServerManagerModel::onRemoveRenderModule(vtkSMRenderModuleProxy* rm)
     qDebug() << "Failed to locate the pqRenderModule for the proxy";
     return;
     }
+  emit this->preRenderModuleRemoved(toRemove);
   this->Internal->RenderModules.removeAll(toRemove);
   emit this->renderModuleRemoved(toRemove);
 
