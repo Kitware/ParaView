@@ -30,7 +30,6 @@ renModule = pxm.GetProxy("rendermodules", "RenderModule0")
 renModule.UpdateVTKObjects()
 
 undoStack = vtkSMUndoStack()
-pxm.SetUndoStack(undoStack)
 
 self_cid = vtkProcessModuleConnectionManager.GetSelfConnectionID()
 
