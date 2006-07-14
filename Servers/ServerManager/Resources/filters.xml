@@ -800,6 +800,11 @@ This filter only operates on unstructured data. It produces polygonal output.
            <ProxyGroupDomain name="groups">
               <Group name="implicit_functions"/>
            </ProxyGroupDomain>
+           <ProxyListDomain name="proxy_list">
+              <Proxy group="implicit_functions" name="Plane" />
+              <Proxy group="implicit_functions" name="Box" />
+              <Proxy group="implicit_functions" name="Sphere" />
+           </ProxyListDomain>
      </ProxyProperty>
 
      <StringVectorProperty 
@@ -2495,6 +2500,11 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
            <ProxyGroupDomain name="groups">
               <Group name="implicit_functions"/>
            </ProxyGroupDomain>
+           <ProxyListDomain name="proxy_list">
+              <Proxy group="implicit_functions" name="Plane" />
+              <Proxy group="implicit_functions" name="Box" />
+              <Proxy group="implicit_functions" name="Sphere" />
+           </ProxyListDomain>
      </ProxyProperty>
 
      <DoubleVectorProperty
@@ -2549,6 +2559,11 @@ This filter operates on all types of data sets, and it returns unstructured grid
            <ProxyGroupDomain name="groups">
                <Group name="implicit_functions"/>
            </ProxyGroupDomain>
+           <ProxyListDomain name="proxy_list">
+              <Proxy group="implicit_functions" name="Plane" />
+              <Proxy group="implicit_functions" name="Box" />
+              <Proxy group="implicit_functions" name="Sphere" />
+           </ProxyListDomain>
      </ProxyProperty>
 
      <DoubleVectorProperty
@@ -2806,6 +2821,11 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
            <DataTypeDomain name="input_type">
              <DataType value="vtkPolyData"/>
            </DataTypeDomain>
+           <ProxyListDomain name="proxy_list">
+              <Proxy group="sources" name="SphereSource" />
+              <Proxy group="sources" name="ConeSource" />
+              <Proxy group="sources" name="CylinderSource" />
+           </ProxyListDomain>
       </InputProperty>
 
      <IntVectorProperty 
@@ -3156,6 +3176,9 @@ This filter operates on any type of data set, provided it has point-centered vec
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
            </ProxyGroupDomain>
+           <ProxyListDomain name="proxy_list">
+              <Proxy group="sources" name="PointSource" />
+           </ProxyListDomain>
       </InputProperty>
 
      <StringVectorProperty 
@@ -3411,6 +3434,11 @@ This filter operates on all types of data sets, and it returns unstructured grid
            <ProxyGroupDomain name="groups">
                <Group name="implicit_functions"/>
            </ProxyGroupDomain>
+           <ProxyListDomain name="proxy_list">
+              <Proxy group="implicit_functions" name="Plane" />
+              <Proxy group="implicit_functions" name="Box" />
+              <Proxy group="implicit_functions" name="Sphere" />
+           </ProxyListDomain>
      </ProxyProperty>
 
      <DoubleVectorProperty
@@ -3538,6 +3566,11 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
            <ProxyGroupDomain name="groups">
               <Group name="implicit_functions"/>
            </ProxyGroupDomain>
+           <ProxyListDomain name="proxy_list">
+              <Proxy group="implicit_functions" name="Plane" />
+              <Proxy group="implicit_functions" name="Box" />
+              <Proxy group="implicit_functions" name="Sphere" />
+           </ProxyListDomain>
      </ProxyProperty>
 
      <DoubleVectorProperty
@@ -4288,6 +4321,11 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
            <ProxyGroupDomain name="groups">
               <Group name="implicit_functions"/>
            </ProxyGroupDomain>
+           <ProxyListDomain name="proxy_list">
+              <Proxy group="implicit_functions" name="Plane" />
+              <Proxy group="implicit_functions" name="Box" />
+              <Proxy group="implicit_functions" name="Sphere" />
+           </ProxyListDomain>
      </ProxyProperty>
 
      <DoubleVectorProperty

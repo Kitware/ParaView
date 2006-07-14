@@ -2968,6 +2968,28 @@
       </SubProxy>
     </New3DWidgetProxy>
 
+    <New3DWidgetProxy name="PointSourceWidgetDisplay"
+      base_proxygroup="displays" base_proxyname="HandleWidgetDisplay">
+      <!-- 
+        This is same as handle widget except that it provides
+        dummy properties for the radius/number of points in a point 
+        source. 
+      -->
+      <DoubleVectorProperty
+        name="Radius"
+        number_of_elements="1"
+        default_values="1.0">
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="NumberOfPoints"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="1" />
+      </IntVectorProperty>
+    </New3DWidgetProxy>
+
     <New3DWidgetProxy name="LineWidgetDisplay">
       <SubProxy>
         <Proxy name="Prop"
