@@ -41,29 +41,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkConfigure.h"   // for 64-bitness
 
 // server manager includes
-#include "vtkSMProperty.h"
-#include "vtkSMProxy.h"
-#include "vtkSMPropertyAdaptor.h"
-#include "vtkSMDomainIterator.h"
-#include "vtkSMDomain.h"
-#include "vtkSMVectorProperty.h"
-#include "vtkSMStringVectorProperty.h"
-#include "vtkSMProxyProperty.h"
-#include "vtkSMInputProperty.h"
-#include "vtkSMProxyManager.h"
-#include "vtkSMProxyGroupDomain.h"
-#include "vtkSMStringListRangeDomain.h"
-#include "vtkSMDoubleVectorProperty.h"
-#include "vtkSMIntVectorProperty.h"
-#include "vtkSMIdTypeVectorProperty.h"
-#include "vtkSMProxyGroupDomain.h"
-#include "vtkSMStringListDomain.h"
-#include "vtkSMEnumerationDomain.h"
-#include "vtkSMBooleanDomain.h"
-#include "vtkSMDoubleRangeDomain.h"
-#include "vtkSMIntRangeDomain.h"
 #include "vtkSMArrayListDomain.h"
+#include "vtkSMBooleanDomain.h"
+#include "vtkSMDomain.h"
+#include "vtkSMDomainIterator.h"
+#include "vtkSMDoubleRangeDomain.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMEnumerationDomain.h"
+#include "vtkSMIdTypeVectorProperty.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMIntRangeDomain.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMPropertyAdaptor.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxyGroupDomain.h"
+#include "vtkSMProxyGroupDomain.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyListDomain.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMStringListDomain.h"
+#include "vtkSMStringListRangeDomain.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkSMVectorProperty.h"
 
 // ParaView includes
 #include "pqSMProxy.h"
@@ -94,6 +95,10 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
       type = pqSMAdaptor::PROXYLIST;
       }
     type = pqSMAdaptor::PROXY;
+    if (vtkSMProxyListDomain::SafeDownCast(Property->GetDomain("proxy_list")))
+      {
+      type = pqSMAdaptor::PROXYSELECTION;
+      }
     }
   else
     {
@@ -224,8 +229,18 @@ QList<pqSMProxy> pqSMAdaptor::getProxyPropertyDomain(vtkSMProperty* Property)
     // get group domain of this property 
     // and add all proxies in those groups to our list
     vtkSMProxyGroupDomain* gd;
+    vtkSMProxyListDomain* ld;
+    ld = vtkSMProxyListDomain::SafeDownCast(Property->GetDomain("proxy_list"));
     gd = vtkSMProxyGroupDomain::SafeDownCast(Property->GetDomain("groups"));
-    if(gd)
+    if (ld)
+      {
+      unsigned int numProxies = ld->GetNumberOfProxies();
+      for (unsigned int cc=0; cc < numProxies; cc++)
+        {
+        proxydomain.append(ld->GetProxy(cc));
+        }
+      }
+    else if (gd)
       {
       unsigned int numGroups = gd->GetNumberOfGroups();
       for(unsigned int i=0; i<numGroups; i++)

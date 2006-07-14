@@ -126,6 +126,21 @@
   </layout>
  </widget>
  <pixmapfunction></pixmapfunction>
+ <tabstops>
+  <tabstop>show3DWidget</tabstop>
+  <tabstop>originX</tabstop>
+  <tabstop>originY</tabstop>
+  <tabstop>originZ</tabstop>
+  <tabstop>normalX</tabstop>
+  <tabstop>normalY</tabstop>
+  <tabstop>normalZ</tabstop>
+  <tabstop>useXNormal</tabstop>
+  <tabstop>resetBounds</tabstop>
+  <tabstop>useYNormal</tabstop>
+  <tabstop>useZNormal</tabstop>
+  <tabstop>useCameraNormal</tabstop>
+  <tabstop>useCenterBounds</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

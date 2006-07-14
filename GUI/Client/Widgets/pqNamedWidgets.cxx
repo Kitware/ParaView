@@ -235,6 +235,44 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
             proxy, SMProperty);
           }
         }
+      else if (pt == pqSMAdaptor::PROXYSELECTION)
+        {
+        QComboBox* comboBox = qobject_cast<QComboBox*>(foundObject);
+        QWidget* widgetFrame = parent->findChild<QWidget*>(
+          QString("WidgetBox.%1").arg(iter->GetKey()));
+        if (comboBox)
+          {
+          comboBox->clear();
+          QList<pqSMProxy> propertyDomain = 
+            pqSMAdaptor::getProxyPropertyDomain(SMProperty);
+          foreach(pqSMProxy v, propertyDomain)
+            {
+            comboBox->addItem(v->GetXMLName());
+            }
+          pqSignalAdaptorComboBox* comboAdaptor = 
+            new pqSignalAdaptorComboBox(comboBox);
+          comboAdaptor->setObjectName("ComboBoxAdaptor");
+          pqSignalAdaptorProxyList* proxyAdaptor = 
+            new pqSignalAdaptorProxyList(comboAdaptor, "currentIndex", 
+              SIGNAL(currentTextChanged(const QString&)));
+          proxyAdaptor->setWidgetFrame(widgetFrame);
+          proxyAdaptor->setReferenceProxy(proxy);
+          proxyAdaptor->setProperty(SMProperty);
+          QObject::connect(parent, SIGNAL(onaccept()), proxyAdaptor, 
+            SLOT(accept()));
+          QObject::connect(parent, SIGNAL(onreset()), proxyAdaptor,
+            SLOT(reset()));
+          QObject::connect(parent, SIGNAL(onselect()), proxyAdaptor,
+            SLOT(select()));
+          QObject::connect(parent, SIGNAL(ondeselect()), proxyAdaptor,
+            SLOT(deselect()));
+
+          proxyAdaptor->setObjectName("ComboBoxProxyAdaptor");
+          property_manager->registerLink(
+            proxyAdaptor, "proxy", SIGNAL(proxyChanged(const QVariant&)),
+            SIGNAL(modified()), proxy, SMProperty);
+          }
+        }
       else if(pt == pqSMAdaptor::SINGLE_ELEMENT)
         {
         QComboBox* comboBox = qobject_cast<QComboBox*>(foundObject);

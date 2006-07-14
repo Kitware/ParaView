@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqImplicitPlaneWidget.h"
 #include "pqRenderModule.h"
 #include "pqServerManagerModel.h"
+#include "pqPropertyLinks.h"
+#include "pqSMSignalAdaptors.h"
 
 #include "ui_pqImplicitPlaneWidget.h"
 
@@ -62,9 +64,7 @@ public:
   pqImplementation() :
     UI(new Ui::pqImplicitPlaneWidget()),
     OriginProperty(0),
-    NormalProperty(0),
-    IgnoreVisibilityWidget(false),
-    IgnoreQtWidgets(false)
+    NormalProperty(0)
   {
   }
   
@@ -78,18 +78,11 @@ public:
   /// Callback object used to connect 3D widget events to member methods
   vtkSmartPointer<vtkCommand> StartDragObserver;
   /// Callback object used to connect 3D widget events to member methods
-  vtkSmartPointer<vtkCommand> ChangeObserver;
-  /// Callback object used to connect 3D widget events to member methods
   vtkSmartPointer<vtkCommand> EndDragObserver;
-  /// Callback object used to connect property events to member methods
-  vtkSmartPointer<vtkCommand> PropertyObserver;
-
+  
   vtkSMDoubleVectorProperty* OriginProperty;
   vtkSMDoubleVectorProperty* NormalProperty;
-  /// Used to avoid recursion when updating the visiblity checkbox
-  bool IgnoreVisibilityWidget;
-  /// Used to avoid recursion when updating the Qt widgets  
-  bool IgnoreQtWidgets;
+  pqPropertyLinks Links;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -101,31 +94,14 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(QWidget* p) :
 {
   this->Implementation->StartDragObserver.TakeReference(
     vtkMakeMemberFunctionCommand(*this, &pqImplicitPlaneWidget::on3DWidgetStartDrag));
-  this->Implementation->ChangeObserver.TakeReference(
-    vtkMakeMemberFunctionCommand(*this, &pqImplicitPlaneWidget::on3DWidgetChanged));
   this->Implementation->EndDragObserver.TakeReference(
     vtkMakeMemberFunctionCommand(*this, &pqImplicitPlaneWidget::on3DWidgetEndDrag));
-  this->Implementation->PropertyObserver.TakeReference(
-    vtkMakeMemberFunctionCommand(*this, &pqImplicitPlaneWidget::onControlledPropertyChanged));
     
   this->Implementation->UI->setupUi(this);
 
   connect(this->Implementation->UI->show3DWidget,
     SIGNAL(toggled(bool)), this, SLOT(onShow3DWidget(bool)));
 
-  connect(this->Implementation->UI->originX,
-    SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
-  connect(this->Implementation->UI->originY,
-    SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
-  connect(this->Implementation->UI->originZ,
-    SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
-  connect(this->Implementation->UI->normalX,
-    SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
-  connect(this->Implementation->UI->normalY,
-    SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
-  connect(this->Implementation->UI->normalZ,
-    SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
-  
   connect(this->Implementation->UI->useXNormal,
     SIGNAL(clicked()), this, SLOT(onUseXNormal()));
   connect(this->Implementation->UI->useYNormal,
@@ -138,28 +114,23 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(QWidget* p) :
     SIGNAL(clicked()), this, SLOT(onResetBounds()));
   connect(this->Implementation->UI->useCenterBounds,
     SIGNAL(clicked()), this, SLOT(onUseCenterBounds()));
+
+  QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
+    this, SIGNAL(widgetChanged()));
+
+  QObject::connect(&this->Implementation->Links, SIGNAL(smPropertyChanged()),
+    this, SIGNAL(widgetChanged()));
 }
 
 pqImplicitPlaneWidget::~pqImplicitPlaneWidget()
 {
-  if(this->Implementation->OriginProperty)
-    {
-    this->Implementation->OriginProperty->RemoveObserver(
-      this->Implementation->PropertyObserver);
-    }
-  if(this->Implementation->NormalProperty)
-    {
-    this->Implementation->NormalProperty->RemoveObserver(
-      this->Implementation->PropertyObserver);
-    }
+  this->Implementation->Links.removeAllPropertyLinks();
 
   vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
   if(widget)
     {
     widget->RemoveObserver(
       this->Implementation->EndDragObserver);
-    widget->RemoveObserver(
-      this->Implementation->ChangeObserver);
     widget->RemoveObserver(
       this->Implementation->StartDragObserver);
     }
@@ -203,10 +174,55 @@ void pqImplicitPlaneWidget::setControlledProxy(vtkSMProxy* proxy)
       pqApplicationCore::instance()->get3DWidgetFactory()->
       get3DWidget("ImplicitPlaneWidgetDisplay", server);
     this->setWidgetProxy(widget);
+    widget->UpdateVTKObjects();
+  
+    // Now bind the GUI widgets to the 3D widget.
 
+    // The adaptor is used to format the text value.
+    pqSignalAdaptorDouble* adaptor = 
+      new pqSignalAdaptorDouble(this->Implementation->UI->originX,
+        "text", SIGNAL(textChanged(const QString&)));
 
-    // Synchronize the 3D widget bounds with the source data ...
-    this->onResetBounds();
+    this->Implementation->Links.addPropertyLink(
+      adaptor, "value", 
+      SIGNAL(valueChanged(const QString&)),
+      widget, widget->GetProperty("Origin"), 0);
+
+    adaptor = new pqSignalAdaptorDouble(
+      this->Implementation->UI->originY,
+      "text", SIGNAL(textChanged(const QString&)));
+    this->Implementation->Links.addPropertyLink(
+      adaptor, "value", SIGNAL(valueChanged(const QString&)),
+      widget, widget->GetProperty("Origin"), 1);
+    
+    adaptor = new pqSignalAdaptorDouble(
+      this->Implementation->UI->originZ,
+      "text", SIGNAL(textChanged(const QString&)));
+    this->Implementation->Links.addPropertyLink(
+      adaptor, "value", SIGNAL(valueChanged(const QString&)),
+      widget, widget->GetProperty("Origin"), 2);
+
+    adaptor = new pqSignalAdaptorDouble(
+      this->Implementation->UI->normalX,
+      "text", SIGNAL(textChanged(const QString&)));
+    this->Implementation->Links.addPropertyLink(
+      adaptor, "value", 
+      SIGNAL(valueChanged(const QString&)),
+      widget, widget->GetProperty("Normal"), 0);
+
+    adaptor = new pqSignalAdaptorDouble(
+      this->Implementation->UI->normalY,
+      "text", SIGNAL(textChanged(const QString&)));
+    this->Implementation->Links.addPropertyLink(
+      adaptor, "value", SIGNAL(valueChanged(const QString&)),
+      widget, widget->GetProperty("Normal"), 1);
+    
+    adaptor = new pqSignalAdaptorDouble(
+      this->Implementation->UI->normalZ,
+      "text", SIGNAL(textChanged(const QString&)));
+    this->Implementation->Links.addPropertyLink(
+      adaptor, "value", SIGNAL(valueChanged(const QString&)),
+      widget, widget->GetProperty("Normal"), 2);
 
     pqRenderModule* const renModule = 
       pqApplicationCore::instance()->getActiveRenderModule();
@@ -225,38 +241,12 @@ void pqImplicitPlaneWidget::setControlledProxy(vtkSMProxy* proxy)
       {
       widget->AddObserver(vtkCommand::StartInteractionEvent,
         this->Implementation->StartDragObserver);
-      widget->AddObserver(vtkCommand::PropertyModifiedEvent,
-        this->Implementation->ChangeObserver);
       widget->AddObserver(vtkCommand::EndInteractionEvent,
         this->Implementation->EndDragObserver);
       }
     }
 
   this->pq3DWidget::setControlledProxy(proxy);
-
-  this->Implementation->IgnoreVisibilityWidget = true;
-  this->Implementation->UI->show3DWidget->setChecked(this->widgetVisibile());
-  this->Implementation->IgnoreVisibilityWidget = false;
-  this->set3DWidgetVisibility(this->widgetVisibile());
-
-  double origin[3] = { 0, 0, 0 };
-  double normal[3] = { 0, 0, 1 };
-  if(this->Implementation->OriginProperty)
-    {
-    origin[0] = this->Implementation->OriginProperty->GetElement(0);
-    origin[1] = this->Implementation->OriginProperty->GetElement(1);
-    origin[2] = this->Implementation->OriginProperty->GetElement(2);
-    }
-
-  if(this->Implementation->NormalProperty)
-    {
-    normal[0] = this->Implementation->NormalProperty->GetElement(0);
-    normal[1] = this->Implementation->NormalProperty->GetElement(1);
-    normal[2] = this->Implementation->NormalProperty->GetElement(2);
-    }
-
-  this->setQtWidgetState(origin, normal);
-  this->reset();
 }
 
 //-----------------------------------------------------------------------------
@@ -277,42 +267,27 @@ void pqImplicitPlaneWidget::setControlledProperty(const char* function,
 //-----------------------------------------------------------------------------
 void pqImplicitPlaneWidget::setOriginProperty(vtkSMProperty* origin_property)
 {
-  if(this->Implementation->OriginProperty)
-    {
-    this->Implementation->OriginProperty->RemoveObserver(
-      this->Implementation->PropertyObserver);
-    }
   this->Implementation->OriginProperty = 
     vtkSMDoubleVectorProperty::SafeDownCast(origin_property);
-
-  if(this->Implementation->OriginProperty)
-    {
-    this->Implementation->OriginProperty->AddObserver(
-      vtkCommand::ModifiedEvent,
-      this->Implementation->PropertyObserver);
-    }
 }
 
 //-----------------------------------------------------------------------------
 void pqImplicitPlaneWidget::setNormalProperty(vtkSMProperty* normal_property)
 {
-  if(this->Implementation->NormalProperty)
-    {
-    this->Implementation->NormalProperty->RemoveObserver(
-      this->Implementation->PropertyObserver);
-    }
-
   this->Implementation->NormalProperty = 
     vtkSMDoubleVectorProperty::SafeDownCast(normal_property);
-
-  if(this->Implementation->NormalProperty)
-    {
-    this->Implementation->NormalProperty->AddObserver(
-      vtkCommand::ModifiedEvent,
-      this->Implementation->PropertyObserver);
-    }
 }
 
+
+//-----------------------------------------------------------------------------
+void pqImplicitPlaneWidget::set3DWidgetVisibility(bool visible)
+{
+  this->Implementation->UI->show3DWidget->blockSignals(true);
+  this->Implementation->UI->show3DWidget->setChecked(visible);
+  this->Implementation->UI->show3DWidget->blockSignals(false);
+
+  this->pq3DWidget::set3DWidgetVisibility(visible);
+}
 
 //-----------------------------------------------------------------------------
 void pqImplicitPlaneWidget::showPlane()
@@ -355,10 +330,17 @@ void pqImplicitPlaneWidget::onShow3DWidget(bool show_widget)
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqImplicitPlaneWidget::onResetBounds()
 {
+  this->resetBounds();
+}
+
+//-----------------------------------------------------------------------------
+void pqImplicitPlaneWidget::resetBounds()
+{
   vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
-  if(widget)
+  if(widget && this->getReferenceProxy())
     {
     if(vtkSMProxyProperty* const input_property =
       vtkSMProxyProperty::SafeDownCast(
@@ -515,47 +497,9 @@ void pqImplicitPlaneWidget::onUseCameraNormal()
     }
 }
 
-void pqImplicitPlaneWidget::onQtWidgetChanged()
-{
-  if(this->Implementation->IgnoreQtWidgets)
-    return;
-
-  // Get the new values from the Qt widgets ...
-  double origin[3] = { 0, 0, 0 };
-  double normal[3] = { 0, 0, 1 };
-
-  origin[0] = this->Implementation->UI->originX->text().toDouble();
-  origin[1] = this->Implementation->UI->originY->text().toDouble();
-  origin[2] = this->Implementation->UI->originZ->text().toDouble();
-  normal[0] = this->Implementation->UI->normalX->text().toDouble();
-  normal[1] = this->Implementation->UI->normalY->text().toDouble();
-  normal[2] = this->Implementation->UI->normalZ->text().toDouble();
-  
-  // Push the new values into the 3D widget ...
-  this->set3DWidgetState(origin, normal);
-
-  emit widgetChanged();
-}
-
 void pqImplicitPlaneWidget::on3DWidgetStartDrag()
 {
   emit widgetStartInteraction();
-}
-
-void pqImplicitPlaneWidget::on3DWidgetChanged()
-{
-  if(this->Ignore3DWidget)
-    return;
-    
-  // Get the new values from the 3D widget ...
-  double origin[3] = { 0, 0, 0 };
-  double normal[3] = { 0, 0, 1 };
-  this->get3DWidgetState(origin, normal);
-  
-  // Push the new values into the Qt widgets (ideally, this should happen automatically when the implicit plane is updated)
-  this->setQtWidgetState(origin, normal);
-
-  emit widgetChanged();
 }
 
 void pqImplicitPlaneWidget::on3DWidgetEndDrag()
@@ -563,87 +507,3 @@ void pqImplicitPlaneWidget::on3DWidgetEndDrag()
   emit widgetEndInteraction();
 }
 
-void pqImplicitPlaneWidget::onControlledPropertyChanged()
-{
-  if(this->IgnorePropertyChange)
-    {
-    return;
-    }
-    
-  // Synchronize the 3D and Qt widgets with the controlled properties
-  this->reset();
-}
-
-void pqImplicitPlaneWidget::get3DWidgetState(double* origin, double* normal)
-{
-  vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
-  if(widget)
-    {
-    if(vtkSMDoubleVectorProperty* const widget_origin =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        widget->GetProperty("Origin")))
-      {
-      origin[0] = widget_origin->GetElement(0);
-      origin[1] = widget_origin->GetElement(1);
-      origin[2] = widget_origin->GetElement(2);
-      }
-
-    if(vtkSMDoubleVectorProperty* const widget_normal =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        widget->GetProperty("Normal")))
-      {
-      normal[0] = widget_normal->GetElement(0);
-      normal[1] = widget_normal->GetElement(1);
-      normal[2] = widget_normal->GetElement(2);
-      }
-    }
-}
-
-void pqImplicitPlaneWidget::set3DWidgetState(const double* origin, const double* normal)
-{
-  this->Ignore3DWidget = true;
-   
-  vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
-  if(widget)
-    {
-    if(vtkSMDoubleVectorProperty* const widget_origin =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        widget->GetProperty("Origin")))
-      {
-      widget_origin->SetElements(origin);
-      }
-
-    if(vtkSMDoubleVectorProperty* const widget_normal =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        widget->GetProperty("Normal")))
-      {
-      widget_normal->SetElements(normal);
-      }
-    
-    widget->UpdateVTKObjects();
-    
-    pqApplicationCore::instance()->render();
-    }
-    
-  this->Ignore3DWidget = false;
-}
-
-void pqImplicitPlaneWidget::setQtWidgetState(const double* origin, const double* normal)
-{
-  this->Implementation->IgnoreQtWidgets = true;
-  
-  this->Implementation->UI->originX->setText(
-    QString::number(origin[0], 'g', 3));
-  this->Implementation->UI->originY->setText(
-    QString::number(origin[1], 'g', 3));  
-  this->Implementation->UI->originZ->setText(
-    QString::number(origin[2], 'g', 3));  
-  this->Implementation->UI->normalX->setText(
-    QString::number(normal[0], 'g', 3));  
-  this->Implementation->UI->normalY->setText(
-    QString::number(normal[1], 'g', 3));  
-  this->Implementation->UI->normalZ->setText(
-    QString::number(normal[2], 'g', 3));
-  
-  this->Implementation->IgnoreQtWidgets = false;
-}

@@ -94,18 +94,18 @@ public:
   // handle changes from the SM side
   vtkEventQtSlotConnect* VTKConnections;
   
-  typedef vtkstd::multiset<pqPropertyLinksConnection> LinkMap;
-  LinkMap Links;
+  typedef QList<QPointer<pqPropertyLinksConnection> > 
+    ListOfPropertyLinkConnections;
+  ListOfPropertyLinkConnections Links;
   bool UseUncheckedProperties;
   bool AutoUpdate;
 };
 
 
-pqPropertyLinksConnection::pqPropertyLinksConnection(vtkSMProxy* smproxy, 
-                                      vtkSMProperty* smproperty, 
-                                      int idx,
-                                      QObject* qobject, 
-                                      const char* qproperty)
+pqPropertyLinksConnection::pqPropertyLinksConnection(
+  QObject* _parent, vtkSMProxy* smproxy, 
+  vtkSMProperty* smproperty, int idx, QObject* qobject, const char* qproperty)
+: QObject(_parent)
 {
   this->Internal = new pqPropertyLinksConnection::pqInternal;
   this->Internal->Proxy = smproxy;
@@ -117,30 +117,19 @@ pqPropertyLinksConnection::pqPropertyLinksConnection(vtkSMProxy* smproxy,
   this->Internal->OutOfSync = false;
 }
 
-pqPropertyLinksConnection::pqPropertyLinksConnection(
-      const pqPropertyLinksConnection& copy)
-  : QObject()
-{
-  this->Internal = new pqPropertyLinksConnection::pqInternal;
-
-  this->Internal->Type = copy.Internal->Type;
-
-  this->Internal->Proxy = copy.Internal->Proxy;
-  this->Internal->Property = copy.Internal->Property;
-  this->Internal->Index = copy.Internal->Index;
-  
-  this->Internal->QtObject = copy.Internal->QtObject;
-  this->Internal->QtProperty = copy.Internal->QtProperty;
-  
-  this->Internal->UseUncheckedProperties = 
-      copy.Internal->UseUncheckedProperties;
-
-  this->Internal->OutOfSync = copy.Internal->OutOfSync;
-}
-
 pqPropertyLinksConnection::~pqPropertyLinksConnection()
 {
   delete this->Internal;
+}
+
+bool pqPropertyLinksConnection::isEqual(vtkSMProxy* proxy, vtkSMProperty* property, int idx,
+    QObject* qObject, const char* qproperty) const
+{
+  return (this->Internal->Proxy == proxy &&
+    this->Internal->Property == property &&
+    this->Internal->Index == idx &&
+    this->Internal->QtObject == qObject &&
+    this->Internal->QtProperty == qproperty);
 }
 
 bool pqPropertyLinksConnection::getOutOfSync() const
@@ -148,68 +137,12 @@ bool pqPropertyLinksConnection::getOutOfSync() const
   return this->Internal->OutOfSync;
 }
 
-
-pqPropertyLinksConnection& pqPropertyLinksConnection::operator=(
-     const pqPropertyLinksConnection& copy)
+void pqPropertyLinksConnection::clearOutOfSync() const
 {
-  this->Internal->Type = copy.Internal->Type;
-
-  this->Internal->Proxy = copy.Internal->Proxy;
-  this->Internal->Property = copy.Internal->Property;
-  this->Internal->Index = copy.Internal->Index;
-  
-  this->Internal->QtObject = copy.Internal->QtObject;
-  this->Internal->QtProperty = copy.Internal->QtProperty;
-  
-  this->Internal->UseUncheckedProperties = 
-    copy.Internal->UseUncheckedProperties;
- 
-  this->Internal->OutOfSync = copy.Internal->OutOfSync;
-  return *this;
-}
-bool pqPropertyLinksConnection::operator<(
-    pqPropertyLinksConnection const& other) const
-{
-  if(this->Internal->Proxy < other.Internal->Proxy)
-    {
-    return true;
-    }
-  else if(this->Internal->Proxy > other.Internal->Proxy)
-    {
-    return false;
-    }
-
-  if(this->Internal->Property < other.Internal->Property)
-    {
-    return true;
-    }
-  else if(this->Internal->Property > other.Internal->Property)
-    {
-    return false;
-    }
-  
-  if(this->Internal->Index < other.Internal->Index)
-    {
-    return true;
-    }
-  if(this->Internal->Index > other.Internal->Index)
-    {
-    return false;
-    }
-  
-  if(this->Internal->QtObject < other.Internal->QtObject)
-    {
-    return true;
-    }
-  if(this->Internal->QtObject > other.Internal->QtObject)
-    {
-    return false;
-    }
-  
-  return this->Internal->QtProperty < other.Internal->QtProperty;
+  this->Internal->OutOfSync = false;
 }
 
-void pqPropertyLinksConnection::smLinkedPropertyChanged() const
+void pqPropertyLinksConnection::smLinkedPropertyChanged() 
 {
   if(SettingValue)
     {
@@ -226,7 +159,8 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged() const
     QVariant prop;
     switch(this->Internal->Type)
       {
-      case pqSMAdaptor::PROXY:
+    case pqSMAdaptor::PROXY:
+    case pqSMAdaptor::PROXYSELECTION:
         {
         pqSMProxy p;
         p = pqSMAdaptor::getProxyProperty(this->Internal->Property);
@@ -234,87 +168,88 @@ void pqPropertyLinksConnection::smLinkedPropertyChanged() const
         if(prop != old)
           {
           this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
-                                                prop);
+            prop);
           }
         }
       break;
-      case pqSMAdaptor::ENUMERATION:
+    case pqSMAdaptor::ENUMERATION:
         {
         prop = pqSMAdaptor::getEnumerationProperty(this->Internal->Property);
         if(prop != old)
           {
           this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
-                                                prop);
+            prop);
           }
         }
       break;
-      case pqSMAdaptor::SINGLE_ELEMENT:
+    case pqSMAdaptor::SINGLE_ELEMENT:
         {
         prop = pqSMAdaptor::getElementProperty(this->Internal->Property);
         if(prop != old)
           {
           this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
-                                                prop);
+            prop);
           }
         }
       break;
-      case pqSMAdaptor::FILE_LIST:
+    case pqSMAdaptor::FILE_LIST:
         {
         prop = pqSMAdaptor::getFileListProperty(this->Internal->Property);
         if(prop != old)
           {
           this->Internal->QtObject->setProperty(this->Internal->QtProperty,
-                                               prop);
+            prop);
           }
         }
       break;
-      case pqSMAdaptor::SELECTION:
+    case pqSMAdaptor::SELECTION:
         {
         QList<QVariant> sel;
         sel = pqSMAdaptor::getSelectionProperty(this->Internal->Property, 
-                                    this->Internal->Index);
+          this->Internal->Index);
 
         if(sel.size() == 2 && sel[1] != old)
           {
           this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
-                                                sel[1]);
+            sel[1]);
           }
         }
       break;
-      case pqSMAdaptor::MULTIPLE_ELEMENTS:
+    case pqSMAdaptor::MULTIPLE_ELEMENTS:
         {
         if(this->Internal->Index == -1)
           {
           prop = pqSMAdaptor::getMultipleElementProperty(
-              this->Internal->Property);
+            this->Internal->Property);
           if(prop != old)
             {
             this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
-                                prop);
+              prop);
             }
           }
         else
           {
           prop = pqSMAdaptor::getMultipleElementProperty(
-                                   this->Internal->Property, 
-                                   this->Internal->Index);
+            this->Internal->Property, 
+            this->Internal->Index);
           if(prop != old)
             {
             this->Internal->QtObject->setProperty(this->Internal->QtProperty, 
-                                    prop);
+              prop);
             }
           }
         }
       break;
-      case pqSMAdaptor::UNKNOWN:
-      case pqSMAdaptor::PROXYLIST:
+    case pqSMAdaptor::UNKNOWN:
+    case pqSMAdaptor::PROXYLIST:
       break;
       }
     }
   SettingValue = false;
+  emit this->smPropertyChanged();
 }
 
-void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
+void pqPropertyLinksConnection::qtLinkedPropertyChanged() 
 {
   if(SettingValue)
     {
@@ -330,17 +265,18 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
     prop = this->Internal->QtObject->property(this->Internal->QtProperty);
     switch(this->Internal->Type)
       {
-      case pqSMAdaptor::PROXY:
+    case pqSMAdaptor::PROXY:
+    case pqSMAdaptor::PROXYSELECTION:
         {
         if(this->Internal->UseUncheckedProperties)
           {
           pqSMAdaptor::setUncheckedProxyProperty(this->Internal->Property,
-                                         prop.value<pqSMProxy>());
+            prop.value<pqSMProxy>());
           }
         else
           {
           pqSMAdaptor::setProxyProperty(this->Internal->Property,
-                                        prop.value<pqSMProxy>());
+            prop.value<pqSMProxy>());
           if(this->Internal->AutoUpdate)
             {
             this->Internal->Proxy->UpdateVTKObjects();
@@ -348,17 +284,17 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
           }
         }
       break;
-      case pqSMAdaptor::ENUMERATION:
+    case pqSMAdaptor::ENUMERATION:
         {
         if(this->Internal->UseUncheckedProperties)
           {
           pqSMAdaptor::setUncheckedEnumerationProperty(
-                           this->Internal->Property, prop);
+            this->Internal->Property, prop);
           }
         else
           {
           pqSMAdaptor::setEnumerationProperty(
-                                  this->Internal->Property, prop);
+            this->Internal->Property, prop);
           if(this->Internal->AutoUpdate)
             {
             this->Internal->Proxy->UpdateVTKObjects();
@@ -366,17 +302,17 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
           }
         }
       break;
-      case pqSMAdaptor::SINGLE_ELEMENT:
+    case pqSMAdaptor::SINGLE_ELEMENT:
         {
         if(this->Internal->UseUncheckedProperties)
           {
           pqSMAdaptor::setUncheckedElementProperty(
-                               this->Internal->Property, prop);
+            this->Internal->Property, prop);
           }
         else
           {
           pqSMAdaptor::setElementProperty(
-                               this->Internal->Property, prop);
+            this->Internal->Property, prop);
           if(this->Internal->AutoUpdate)
             {
             this->Internal->Proxy->UpdateVTKObjects();
@@ -384,17 +320,17 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
           }
         }
       break;
-      case pqSMAdaptor::FILE_LIST:
+    case pqSMAdaptor::FILE_LIST:
         {
         if(this->Internal->UseUncheckedProperties)
           {
           pqSMAdaptor::setUncheckedFileListProperty(
-                                  this->Internal->Property, prop.toString());
+            this->Internal->Property, prop.toString());
           }
         else
           {
           pqSMAdaptor::setFileListProperty(
-                                  this->Internal->Property, prop.toString());
+            this->Internal->Property, prop.toString());
           if(this->Internal->AutoUpdate)
             {
             this->Internal->Proxy->UpdateVTKObjects();
@@ -402,11 +338,11 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
           }
         }
       break;
-      case pqSMAdaptor::SELECTION:
+    case pqSMAdaptor::SELECTION:
         {
         QList<QVariant> domain;
         domain = pqSMAdaptor::getSelectionPropertyDomain(
-                   this->Internal->Property);
+          this->Internal->Property);
         QList<QVariant> selection;
         selection.append(domain[this->Internal->Index]);
         selection.append(prop);
@@ -414,12 +350,12 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
         if(this->Internal->UseUncheckedProperties)
           {
           pqSMAdaptor::setUncheckedSelectionProperty(
-                       this->Internal->Property, selection);
+            this->Internal->Property, selection);
           }
         else
           {
           pqSMAdaptor::setSelectionProperty(
-                       this->Internal->Property, selection);
+            this->Internal->Property, selection);
           if(this->Internal->AutoUpdate)
             {
             this->Internal->Proxy->UpdateVTKObjects();
@@ -427,19 +363,19 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
           }
         }
       break;
-      case pqSMAdaptor::MULTIPLE_ELEMENTS:
+    case pqSMAdaptor::MULTIPLE_ELEMENTS:
         {
         if(this->Internal->Index == -1)
           {
           if(this->Internal->UseUncheckedProperties)
             {
             pqSMAdaptor::setUncheckedMultipleElementProperty(
-                            this->Internal->Property, prop.toList());
+              this->Internal->Property, prop.toList());
             }
           else
             {
             pqSMAdaptor::setMultipleElementProperty(
-                            this->Internal->Property, prop.toList());
+              this->Internal->Property, prop.toList());
             if(this->Internal->AutoUpdate)
               {
               this->Internal->Proxy->UpdateVTKObjects();
@@ -451,12 +387,12 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
           if(this->Internal->UseUncheckedProperties)
             {
             pqSMAdaptor::setUncheckedMultipleElementProperty(
-                      this->Internal->Property, this->Internal->Index, prop);
+              this->Internal->Property, this->Internal->Index, prop);
             }
           else
             {
             pqSMAdaptor::setMultipleElementProperty(
-                      this->Internal->Property, this->Internal->Index, prop);
+              this->Internal->Property, this->Internal->Index, prop);
             if(this->Internal->AutoUpdate)
               {
               this->Internal->Proxy->UpdateVTKObjects();
@@ -465,12 +401,13 @@ void pqPropertyLinksConnection::qtLinkedPropertyChanged() const
           }
         }
       break;
-      case pqSMAdaptor::UNKNOWN:
-      case pqSMAdaptor::PROXYLIST:
+    case pqSMAdaptor::UNKNOWN:
+    case pqSMAdaptor::PROXYLIST:
       break;
       }
     }
   SettingValue = false;
+  emit this->qtWidgetChanged();
 }
 
 bool pqPropertyLinksConnection::useUncheckedProperties() const
@@ -493,23 +430,6 @@ bool pqPropertyLinksConnection::autoUpdateVTKObjects() const
   return this->Internal->AutoUpdate;
 }
 
-class pqPropertyLinksInternal
-{
-public:
-  pqPropertyLinksInternal()
-    {
-    this->VTKConnections = vtkEventQtSlotConnect::New();
-    }
-  ~pqPropertyLinksInternal()
-    {
-    this->VTKConnections->Delete();
-    }
-
-  // handle changes from the SM side
-  vtkEventQtSlotConnect* VTKConnections;
-  typedef vtkstd::multiset<pqPropertyLinksConnection> LinkMap;
-  LinkMap Links;
-};
 
 pqPropertyLinks::pqPropertyLinks(QObject* p)
   : QObject(p)
@@ -532,19 +452,26 @@ void pqPropertyLinks::addPropertyLink(QObject* qObject, const char* qProperty,
     return;
     }
   
-  pqPropertyLinksInternal::LinkMap::iterator iter;
-  pqPropertyLinksConnection conn(Proxy, Property, Index, qObject, qProperty);
-  iter = this->Internal->Links.insert(conn);
+  pqPropertyLinksConnection *conn = 
+    new pqPropertyLinksConnection(this, Proxy, Property, Index, qObject, qProperty);
+  this->Internal->Links.push_back(conn);
   this->Internal->VTKConnections->Connect(Property, vtkCommand::ModifiedEvent,
-                                          &*iter, 
+                                          conn, 
                                           SLOT(smLinkedPropertyChanged()));
   
-  QObject::connect(qObject, signal, &*iter, SLOT(qtLinkedPropertyChanged()));
+  QObject::connect(qObject, signal,conn, SLOT(qtLinkedPropertyChanged()));
+
+  QObject::connect(conn, SIGNAL(qtWidgetChanged()), 
+    this, SIGNAL(qtWidgetChanged()));
+  QObject::connect(conn, SIGNAL(smPropertyChanged()),
+    this, SIGNAL(smPropertyChanged()));
+    
   
-  iter->setUseUncheckedProperties(this->Internal->UseUncheckedProperties);
-  iter->setAutoUpdateVTKObjects(this->Internal->AutoUpdate);
+  conn->setUseUncheckedProperties(this->Internal->UseUncheckedProperties);
+  conn->setAutoUpdateVTKObjects(this->Internal->AutoUpdate);
   // set the object property to the current server manager property value
-  iter->smLinkedPropertyChanged();
+  conn->smLinkedPropertyChanged();
+  conn->clearOutOfSync();
 }
 
 //-----------------------------------------------------------------------------
@@ -552,27 +479,34 @@ void pqPropertyLinks::removePropertyLink(QObject* qObject,
                         const char* qProperty, const char* signal,
                         vtkSMProxy* Proxy, vtkSMProperty* Property, int Index)
 {
-  pqPropertyLinksConnection conn(Proxy, Property, Index, qObject, qProperty);
-  pqPropertyLinksInternal::LinkMap::iterator iter;
-  iter = this->Internal->Links.find(conn);
-  if(iter != this->Internal->Links.end())
+  foreach (pqPropertyLinksConnection* conn, this->Internal->Links)
     {
-    this->Internal->VTKConnections->Disconnect(iter->Internal->Property, 
-                                  vtkCommand::ModifiedEvent, qObject);
-    QObject::disconnect(iter->Internal->QtObject, signal, &*iter, 
-                        SLOT(qtLinkedPropertyChanged()));
+    if (conn && conn->isEqual(Proxy, Property, Index, qObject, qProperty))
+      {
+      this->Internal->VTKConnections->Disconnect(conn->Internal->Property, 
+        vtkCommand::ModifiedEvent, conn);
+      QObject::disconnect(conn->Internal->QtObject, signal, conn, 
+        SLOT(qtLinkedPropertyChanged()));
+      QObject::disconnect(conn, 0, this, 0);
+      delete conn;
+      break;
+      }
     }
 }
 
 //-----------------------------------------------------------------------------
 void pqPropertyLinks::removeAllPropertyLinks()
 {
-  pqPropertyLinksInternal::LinkMap::iterator iter;
-  for (iter = this->Internal->Links.begin(); iter != this->Internal->Links.end();
-    ++iter)
+  foreach (pqPropertyLinksConnection* conn, this->Internal->Links)
     {
-    this->Internal->VTKConnections->Disconnect(iter->Internal->Property);
-    QObject::disconnect(iter->Internal->QtObject, 0, &*iter, 0);
+    if (conn)
+      {
+      this->Internal->VTKConnections->Disconnect(conn->Internal->Property, 
+        vtkCommand::ModifiedEvent, conn);
+      QObject::disconnect(conn->Internal->QtObject, 0, conn, 0);
+      QObject::disconnect(conn, 0, this, 0);
+      }
+    delete conn;
     }
   this->Internal->Links.clear();
 }
@@ -580,18 +514,17 @@ void pqPropertyLinks::removeAllPropertyLinks()
 //-----------------------------------------------------------------------------
 void pqPropertyLinks::reset()
 {
-  pqPropertyLinksInternal::LinkMap::iterator iter;
-  for(iter = this->Internal->Links.begin();
-      iter != this->Internal->Links.end();
-      ++iter)
+  foreach(pqPropertyLinksConnection* conn, this->Internal->Links)
     {
-    if (iter->getOutOfSync())
+    if (conn && conn->getOutOfSync())
       {
-      iter->smLinkedPropertyChanged();
+      conn->smLinkedPropertyChanged();
+      conn->clearOutOfSync();
       }
     }
 }
 
+//-----------------------------------------------------------------------------
 void pqPropertyLinks::accept()
 {
   bool old = this->useUncheckedProperties();
@@ -599,22 +532,20 @@ void pqPropertyLinks::accept()
 
   QSet<vtkSMProxy*> ChangedProxies;
 
-  pqPropertyLinksInternal::LinkMap::iterator iter;
-  for(iter = this->Internal->Links.begin();
-      iter != this->Internal->Links.end();
-      ++iter)
+  foreach(pqPropertyLinksConnection* conn, this->Internal->Links)
     {
-    if (!iter->getOutOfSync())
+    if (!conn || !conn->getOutOfSync())
       {
       continue;
       }
-    iter->setUseUncheckedProperties(false);
-    iter->setAutoUpdateVTKObjects(false);
-    iter->qtLinkedPropertyChanged();
-    iter->setAutoUpdateVTKObjects(oldauto);
-    iter->setUseUncheckedProperties(old);
+    conn->setUseUncheckedProperties(false);
+    conn->setAutoUpdateVTKObjects(false);
+    conn->qtLinkedPropertyChanged();
+    conn->setAutoUpdateVTKObjects(oldauto);
+    conn->setUseUncheckedProperties(old);
+    conn->clearOutOfSync();
 
-    ChangedProxies.insert(iter->Internal->Proxy);
+    ChangedProxies.insert(conn->Internal->Proxy);
     }
 
   foreach(vtkSMProxy* p, ChangedProxies)
@@ -623,39 +554,37 @@ void pqPropertyLinks::accept()
     }
 }
 
+//-----------------------------------------------------------------------------
 bool pqPropertyLinks::useUncheckedProperties()
 {
   return this->Internal->UseUncheckedProperties;
 }
 
+//-----------------------------------------------------------------------------
 void pqPropertyLinks::setUseUncheckedProperties(bool flag)
 {
   this->Internal->UseUncheckedProperties = flag;
   
-  pqPropertyLinksInternal::LinkMap::iterator iter;
-  for(iter = this->Internal->Links.begin();
-      iter != this->Internal->Links.end();
-      ++iter)
+  foreach(pqPropertyLinksConnection* conn, this->Internal->Links)
     {
-    iter->setUseUncheckedProperties(flag);
+    conn->setUseUncheckedProperties(flag);
     }
 }
 
+//-----------------------------------------------------------------------------
 bool pqPropertyLinks::autoUpdateVTKObjects()
 {
   return this->Internal->AutoUpdate;
 }
 
+//-----------------------------------------------------------------------------
 void pqPropertyLinks::setAutoUpdateVTKObjects(bool flag)
 {
   this->Internal->AutoUpdate = flag;
   
-  pqPropertyLinksInternal::LinkMap::iterator iter;
-  for(iter = this->Internal->Links.begin();
-      iter != this->Internal->Links.end();
-      ++iter)
+  foreach(pqPropertyLinksConnection* conn, this->Internal->Links)
     {
-    iter->setAutoUpdateVTKObjects(flag);
+    conn->setAutoUpdateVTKObjects(flag);
     }
 }
 

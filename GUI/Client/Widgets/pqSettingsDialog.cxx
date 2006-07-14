@@ -89,9 +89,9 @@ void pqSettingsDialog::setupGUI()
 }
 
 //-----------------------------------------------------------------------------
-void pqSettingsDialog::onFinished(int result)
+void pqSettingsDialog::onFinished(int end_result)
 {
-  if (result != QDialog::Accepted)
+  if (end_result != QDialog::Accepted)
     {
     return;
     }

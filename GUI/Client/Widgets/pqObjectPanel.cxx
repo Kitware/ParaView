@@ -130,6 +130,7 @@ void pqObjectPanel::accept()
     }
 
   this->PropertyManager->accept();
+  emit this->onaccept();
 }
 
 //-----------------------------------------------------------------------------
@@ -143,5 +144,6 @@ void pqObjectPanel::reset()
     }
   this->Proxy->UpdatePropertyInformation();
   this->PropertyManager->reject();
+  emit this->onreset();
 }
 

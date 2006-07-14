@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHandleWidget.h"
 #include "pqRenderModule.h"
 #include "pqServerManagerModel.h"
+#include "pqPropertyLinks.h"
+#include "pqSMSignalAdaptors.h"
 
 #include "ui_pqHandleWidget.h"
 
@@ -59,11 +61,7 @@ class pqHandleWidget::pqImplementation
 {
 public:
   pqImplementation() :
-    UI(new Ui::pqHandleWidget()),
-    Widget(0),
-    IgnoreVisibilityWidget(false),
-    IgnoreQtWidgets(false),
-    Ignore3DWidget(false)
+    UI(new Ui::pqHandleWidget())
   {
   }
   
@@ -74,71 +72,55 @@ public:
   
   /// Stores the Qt widgets
   Ui::pqHandleWidget* const UI;
+  // Controlled property for position.
+  vtkSmartPointer<vtkSMDoubleVectorProperty> PositionProperty;
+
   /// Callback object used to connect 3D widget events to member methods
   vtkSmartPointer<vtkCommand> StartDragObserver;
   /// Callback object used to connect 3D widget events to member methods
-  vtkSmartPointer<vtkCommand> ChangeObserver;
-  /// Callback object used to connect 3D widget events to member methods
   vtkSmartPointer<vtkCommand> EndDragObserver;
-  /// References the 3D implicit plane widget
-  vtkSMNew3DWidgetProxy* Widget;
-  /// Source proxy that will supply the bounding box for the 3D widget
-  pqSMProxy ReferenceProxy;
-  /// Used to avoid recursion when updating the visiblity checkbox
-  bool IgnoreVisibilityWidget;
-  /// Used to avoid recursion when updating the Qt widgets  
-  bool IgnoreQtWidgets;
-  /// Used to avoid recursion when updating the 3D widget
-  bool Ignore3DWidget;
-  
-  static QMap<pqSMProxy, bool> Visibility;
+  pqPropertyLinks Links;
 };
-
-QMap<pqSMProxy, bool> pqHandleWidget::pqImplementation::Visibility;
 
 /////////////////////////////////////////////////////////////////////////
 // pqHandleWidget
 
 pqHandleWidget::pqHandleWidget(QWidget* p) :
-  QWidget(p),
+  pq3DWidget(p),
   Implementation(new pqImplementation())
 {
   this->Implementation->StartDragObserver.TakeReference(
     vtkMakeMemberFunctionCommand(*this, &pqHandleWidget::on3DWidgetStartDrag));
-  this->Implementation->ChangeObserver.TakeReference(
-    vtkMakeMemberFunctionCommand(*this, &pqHandleWidget::on3DWidgetChanged));
   this->Implementation->EndDragObserver.TakeReference(
     vtkMakeMemberFunctionCommand(*this, &pqHandleWidget::on3DWidgetEndDrag));
-    
+
   this->Implementation->UI->setupUi(this);
 
   connect(this->Implementation->UI->show3DWidget,
     SIGNAL(toggled(bool)), this, SLOT(onShow3DWidget(bool)));
 
-  connect(this->Implementation->UI->worldPositionX,
-    SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
-  connect(this->Implementation->UI->worldPositionY,
-    SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
-  connect(this->Implementation->UI->worldPositionZ,
-    SIGNAL(editingFinished()), this, SLOT(onQtWidgetChanged()));
-    
   connect(this->Implementation->UI->useCenterBounds,
     SIGNAL(clicked()), this, SLOT(onResetBounds()));
+
+  QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
+    this, SIGNAL(widgetChanged()));
+
+  QObject::connect(&this->Implementation->Links, SIGNAL(smPropertyChanged()),
+    this, SIGNAL(widgetChanged()));
 }
 
 pqHandleWidget::~pqHandleWidget()
 {
-  if(this->Implementation->Widget)
+  vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
+  if(widget)
     {
-    this->Implementation->Widget->RemoveObserver(
+    widget->RemoveObserver(
       this->Implementation->EndDragObserver);
-    this->Implementation->Widget->RemoveObserver(
-      this->Implementation->ChangeObserver);
-    this->Implementation->Widget->RemoveObserver(
+    widget->RemoveObserver(
       this->Implementation->StartDragObserver);
     }
 
-  if(this->Implementation->Widget)
+  if(widget)
     {
     if(pqRenderModule* const renModule = 
       pqApplicationCore::instance()->getActiveRenderModule())
@@ -148,7 +130,7 @@ pqHandleWidget::~pqHandleWidget()
         if(vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
           rm->GetProperty("Displays")))
           {
-          pp->RemoveProxy(this->Implementation->Widget);
+          pp->RemoveProxy(widget);
           rm->UpdateVTKObjects();
           renModule->render();
           }
@@ -156,152 +138,142 @@ pqHandleWidget::~pqHandleWidget()
       }
 
     pqApplicationCore::instance()->get3DWidgetFactory()->
-      free3DWidget(this->Implementation->Widget);
+      free3DWidget(widget);
       
-    this->Implementation->Widget = 0;
+    this->setWidgetProxy(0);
     }
 
   delete this->Implementation;
 }
 
-void pqHandleWidget::setDataSources(pqSMProxy reference_proxy)
+//-----------------------------------------------------------------------------
+void pqHandleWidget::setControlledProxy(vtkSMProxy* proxy)
 {
-  this->Implementation->ReferenceProxy = reference_proxy;
-  
-  if(!this->Implementation->Visibility.contains(this->Implementation->ReferenceProxy))
-    {
-    this->Implementation->Visibility.insert(
-      this->Implementation->ReferenceProxy, this->Implementation->ReferenceProxy.GetPointer() ? true : false);
-    }
-  
-  if(!this->Implementation->Widget)
+  if(!this->getWidgetProxy())
     {
     pqServer* const server = pqApplicationCore::instance()->
-      getServerManagerModel()->getServer(
-        this->Implementation->ReferenceProxy->GetConnectionID());
+      getServerManagerModel()->getServer(proxy->GetConnectionID());
           
-    this->Implementation->Widget =
+    vtkSMNew3DWidgetProxy* widget =
       pqApplicationCore::instance()->get3DWidgetFactory()->
-        get3DWidget("HandleWidgetDisplay", server);
-    this->Implementation->Widget->UpdateVTKObjects();
+        get3DWidget("PointSourceWidgetDisplay", server);
+    this->setWidgetProxy(widget);
 
-    // Synchronize the 3D widget bounds with the source data ...
-    this->onResetBounds();
+    pqSignalAdaptorDouble* adaptor = new pqSignalAdaptorDouble(
+      this->Implementation->UI->worldPositionX, "text",
+      SIGNAL(textChanged(const QString&)));
+    this->Implementation->Links.addPropertyLink(
+      adaptor, "value", SIGNAL(valueChanged(const QString&)),
+      widget, widget->GetProperty("WorldPosition"), 0);
+
+    adaptor = new pqSignalAdaptorDouble(
+      this->Implementation->UI->worldPositionY, "text",
+      SIGNAL(textChanged(const QString&)));
+    this->Implementation->Links.addPropertyLink(
+      adaptor, "value", SIGNAL(valueChanged(const QString&)),
+      widget, widget->GetProperty("WorldPosition"), 1);
+
+    adaptor = new pqSignalAdaptorDouble(
+      this->Implementation->UI->worldPositionZ, "text",
+      SIGNAL(textChanged(const QString&)));
+    this->Implementation->Links.addPropertyLink(
+      adaptor, "value", SIGNAL(valueChanged(const QString&)),
+      widget, widget->GetProperty("WorldPosition"), 2);
+
+    widget->UpdateVTKObjects();
+
 
     pqRenderModule* const renModule = 
       pqApplicationCore::instance()->getActiveRenderModule();
       
-    if(this->Implementation->Widget && renModule)
+    if(widget && renModule)
       {
       vtkSMRenderModuleProxy* rm = renModule->getRenderModuleProxy() ;
       vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
         rm->GetProperty("Displays"));
-      pp->AddProxy(this->Implementation->Widget);
+      pp->AddProxy(widget);
       rm->UpdateVTKObjects();
       renModule->render();
       }
       
-    if(this->Implementation->Widget)
+    if(widget)
       {
-      this->Implementation->Widget->AddObserver(
-        vtkCommand::StartInteractionEvent,
+      widget->AddObserver(vtkCommand::StartInteractionEvent,
         this->Implementation->StartDragObserver);
-      this->Implementation->Widget->AddObserver(
-        vtkCommand::PropertyModifiedEvent,
-        this->Implementation->ChangeObserver);
-      this->Implementation->Widget->AddObserver(
-        vtkCommand::EndInteractionEvent,
+      widget->AddObserver(vtkCommand::EndInteractionEvent,
         this->Implementation->EndDragObserver);
       }
     }
-
-  this->Implementation->IgnoreVisibilityWidget = true;
-  this->Implementation->UI->show3DWidget->setChecked(
-    this->Implementation->Visibility[this->Implementation->ReferenceProxy]);
-  this->Implementation->IgnoreVisibilityWidget = false;
-
-  this->show3DWidget(this->Implementation->Visibility[this->Implementation->ReferenceProxy]);
+  this->pq3DWidget::setControlledProxy(proxy);
 }
 
-void pqHandleWidget::getWidgetState(double world_position[3])
+//-----------------------------------------------------------------------------
+void pqHandleWidget::setControlledProperty(const char* function,
+    vtkSMProperty * controlled_property)
 {
-  world_position[0] = world_position[1] = world_position[2] = 0;
-
-  if(this->Implementation->Widget)
+  if (strcmp(function, "WorldPosition") == 0)
     {
-    if(vtkSMDoubleVectorProperty* const widget_world_position =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        this->Implementation->Widget->GetProperty("WorldPosition")))
-      {
-      world_position[0] = widget_world_position->GetElement(0);
-      world_position[1] = widget_world_position->GetElement(1);
-      world_position[2] = widget_world_position->GetElement(2);
-      }
+    this->Implementation->PositionProperty = 
+      vtkSMDoubleVectorProperty::SafeDownCast(controlled_property);
+    }
+  this->pq3DWidget::setControlledProperty(function, controlled_property);
+}
+
+//-----------------------------------------------------------------------------
+void pqHandleWidget::set3DWidgetVisibility(bool visible)
+{
+  this->Implementation->UI->show3DWidget->blockSignals(true);
+  this->Implementation->UI->show3DWidget->setChecked(visible);
+  this->Implementation->UI->show3DWidget->blockSignals(false);
+
+  this->pq3DWidget::set3DWidgetVisibility(visible);
+}
+
+//-----------------------------------------------------------------------------
+void pqHandleWidget::onShow3DWidget(bool show_widget)
+{
+  if (show_widget)
+    {
+    this->showWidget();
+    }
+  else
+    {
+    this->hideWidget();
     }
 }
 
-void pqHandleWidget::setWidgetState(const double world_position[3])
+//-----------------------------------------------------------------------------
+void pqHandleWidget::resetBounds()
 {
-  // Push the current values into the Qt widgets ...
-  this->updateQtWidgets(world_position);
-  
-  // Push the current values into the 3D widget ...
-  this->update3DWidget(world_position);
-}
-
-void pqHandleWidget::showWidget()
-{
-  this->show3DWidget(
-    this->Implementation->Visibility[this->Implementation->ReferenceProxy]);
-}
-
-void pqHandleWidget::hideWidget()
-{
-  this->show3DWidget(false);
-}
-
-void pqHandleWidget::onShow3DWidget(bool show_widget)
-{
-  this->Implementation->Visibility.insert(
-    this->Implementation->ReferenceProxy, show_widget);
-    
-  this->show3DWidget(
-    this->Implementation->Visibility[this->Implementation->ReferenceProxy]);
-}
-
-void pqHandleWidget::onResetBounds()
-{
-  if(this->Implementation->Widget)
+  vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
+  if(widget && this->getReferenceProxy())
     {
     if(vtkSMProxyProperty* const input_property =
       vtkSMProxyProperty::SafeDownCast(
-        this->Implementation->ReferenceProxy->GetProperty("Input")))
+        this->getReferenceProxy()->GetProperty("Input")))
       {
       if(vtkSMSourceProxy* const input_proxy = vtkSMSourceProxy::SafeDownCast(
-        input_property->GetProxy(0)))
+          input_property->GetProxy(0)))
         {
         double input_bounds[6];
         input_proxy->GetDataInformation()->GetBounds(input_bounds);
-       
+
         double input_origin[3];
         input_origin[0] = (input_bounds[0] + input_bounds[1]) / 2.0;
         input_origin[1] = (input_bounds[2] + input_bounds[3]) / 2.0;
         input_origin[2] = (input_bounds[4] + input_bounds[5]) / 2.0;
 
-        if(this->Implementation->Widget)
+        if(widget)
           {
           if(vtkSMDoubleVectorProperty* const widget_position =
             vtkSMDoubleVectorProperty::SafeDownCast(
-              this->Implementation->Widget->GetProperty("WorldPosition")))
+              widget->GetProperty("WorldPosition")))
             {
             widget_position->SetElements(input_origin);
             }
-          
-          this->Implementation->Widget->UpdateVTKObjects();
-          
-          /** \todo This shouldn't be necessary, not sure why we don't get an event */
-          this->on3DWidgetChanged();
-          
+
+          widget->UpdateVTKObjects();
+
           pqApplicationCore::instance()->render();
           }
         }
@@ -309,117 +281,21 @@ void pqHandleWidget::onResetBounds()
     }
 }
 
-void pqHandleWidget::show3DWidget(bool show_widget)
+//-----------------------------------------------------------------------------
+void pqHandleWidget::onResetBounds()
 {
-  if(this->Implementation->Widget)
-    {
-    this->Implementation->Ignore3DWidget = true;
-    
-    if(vtkSMIntVectorProperty* const visibility =
-      vtkSMIntVectorProperty::SafeDownCast(
-        this->Implementation->Widget->GetProperty("Visibility")))
-      {
-      visibility->SetElement(0, show_widget);
-      }
-
-    if(vtkSMIntVectorProperty* const enabled =
-      vtkSMIntVectorProperty::SafeDownCast(
-        this->Implementation->Widget->GetProperty("Enabled")))
-      {
-      enabled->SetElement(0, show_widget);
-      }
-
-    this->Implementation->Widget->UpdateVTKObjects();
-    pqApplicationCore::instance()->render();
-    this->Implementation->Ignore3DWidget = false;
-    }
+  this->resetBounds();
 }
 
-void pqHandleWidget::onQtWidgetChanged()
-{
-  if(this->Implementation->IgnoreQtWidgets)
-    return;
-
-  // Get the new values from the Qt widgets ...
-  double world_position[3] = { 0, 0, 0 };
-
-  world_position[0] = this->Implementation->UI->worldPositionX->text().toDouble();
-  world_position[1] = this->Implementation->UI->worldPositionY->text().toDouble();
-  world_position[2] = this->Implementation->UI->worldPositionZ->text().toDouble();
-  
-  // Push the new values into the 3D widget ...
-  this->update3DWidget(world_position);
-
-  emit widgetChanged();
-}
-
+//-----------------------------------------------------------------------------
 void pqHandleWidget::on3DWidgetStartDrag()
 {
   emit widgetStartInteraction();
 }
 
-void pqHandleWidget::on3DWidgetChanged()
-{
-  if(this->Implementation->Ignore3DWidget)
-    return;
-    
-  // Get the new values from the 3D widget ...
-  double world_position[3] = { 0, 0, 0 };
-  
-  if(this->Implementation->Widget)
-    {
-    if(vtkSMDoubleVectorProperty* const widget_world_position =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        this->Implementation->Widget->GetProperty("WorldPosition")))
-      {
-      world_position[0] = widget_world_position->GetElement(0);
-      world_position[1] = widget_world_position->GetElement(1);
-      world_position[2] = widget_world_position->GetElement(2);
-      }
-    }
-  
-  // Push the new values into the Qt widgets (ideally, this should happen automatically when the implicit plane is updated)
-  this->updateQtWidgets(world_position);
-
-  emit widgetChanged();
-}
-
+//-----------------------------------------------------------------------------
 void pqHandleWidget::on3DWidgetEndDrag()
 {
   emit widgetEndInteraction();
 }
 
-void pqHandleWidget::updateQtWidgets(const double world_position[3])
-{
-  this->Implementation->IgnoreQtWidgets = true;
-  
-  this->Implementation->UI->worldPositionX->setText(
-    QString::number(world_position[0], 'g', 3));
-  this->Implementation->UI->worldPositionY->setText(
-    QString::number(world_position[1], 'g', 3));  
-  this->Implementation->UI->worldPositionZ->setText(
-    QString::number(world_position[2], 'g', 3));  
-  
-  this->Implementation->IgnoreQtWidgets = false;
-}
-
-void pqHandleWidget::update3DWidget(const double world_position[3])
-{
-  this->Implementation->Ignore3DWidget = true;
-   
-  if(this->Implementation->Widget)
-    {
-    if(vtkSMDoubleVectorProperty* const widget_world_position =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        this->Implementation->Widget->GetProperty("WorldPosition")))
-      {
-      widget_world_position->SetElements(world_position);
-      }
-    
-    this->Implementation->Widget->UpdateVTKObjects();
-    
-    pqApplicationCore::instance()->render();
-    }
-    
-  this->Implementation->Ignore3DWidget = false;
-}

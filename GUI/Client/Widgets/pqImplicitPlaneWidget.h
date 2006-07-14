@@ -53,6 +53,7 @@ public:
   /// the properties of the controlled proxy are controlled by the
   /// 3D widget.
   virtual void setControlledProxy(vtkSMProxy*);
+
 public slots:
   /// Makes the 3D widget plane visible (respects the overall visibility flag)
   virtual void showPlane();
@@ -60,17 +61,21 @@ public slots:
   /// Hides the 3D widget plane
   virtual void hidePlane();
 
-signals:
-  /// Notifies observers that the user is dragging the 3D widget
-  void widgetStartInteraction();
-  /// Notifies observers that the widget has been modified
-  void widgetChanged();
-  /// Notifies observers that the user is done dragging the 3D widget
-  void widgetEndInteraction();
-
 protected:
+  /// Subclasses can override this method to map properties to
+  /// GUI. Default implementation updates the internal datastructures
+  /// so that default implementations can be provided for 
+  /// accept/reset.
   virtual void setControlledProperty(const char* function,
     vtkSMProperty * controlled_property);
+
+  /// Overridden to make sure that the visibility check box is
+  /// updated.
+  virtual void set3DWidgetVisibility(bool visible);
+
+protected:
+  /// Resets the bounds of the 3D widget to the reference proxy bounds.
+  virtual void resetBounds();
 
 private slots:
   /// Called to show/hide the 3D widget
@@ -87,16 +92,10 @@ private slots:
   void onUseZNormal();
   /// Called to set the widget normal to the camera direction
   void onUseCameraNormal();
-  /// Called if any of the Qt widget values is modified
-  void onQtWidgetChanged();
   /// Called when the user starts dragging the 3D widget
   void on3DWidgetStartDrag();
-  /// Called when the 3D widget is modified
-  void on3DWidgetChanged();
   /// Called when the user stops dragging the 3D widget
   void on3DWidgetEndDrag();
-  /// Called when one of the controlled properties change (e.g: by undo/redo)
-  void onControlledPropertyChanged();
 
 private:
   void get3DWidgetState(double* origin, double* normal);

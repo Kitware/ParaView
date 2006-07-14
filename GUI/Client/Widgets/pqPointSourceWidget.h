@@ -35,13 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSMProxy.h"
 
-#include <QWidget>
+#include "pqHandleWidget.h" 
 
 class pqPropertyManager;
 
 /// Provides a complete Qt UI for working with a vtkPointSource filter
-class pqPointSourceWidget :
-  public QWidget
+class pqPointSourceWidget : public pqHandleWidget 
 {
   Q_OBJECT
   
@@ -49,26 +48,13 @@ public:
   pqPointSourceWidget(QWidget* p);
   ~pqPointSourceWidget();
 
-  /** Sets the "reference" and "controlled" proxies that will be controlled
-  by this widget */
-  void setDataSources(pqSMProxy reference_proxy, pqSMProxy controlled_proxy);
-
-  /// Enables the UI, making the 3D widget visible
-  void showWidget(pqPropertyManager* property_manager);
-  /// Accepts pending changes, pushing them to the server manager
-  void accept();
-  /// Resets pending changes, restoring the original state
-  void reset();
-  /// Disables the UI, hiding the 3D widget
-  void hideWidget(pqPropertyManager* property_manager);
-
-signals:
-  /// Signal emitted whenever any part of the UI is modified
-  void widgetChanged();
-
-private slots:
-  void widgetChanged(const QString&);
-
+protected:
+  /// Subclasses can override this method to map properties to
+  /// GUI. Default implementation updates the internal datastructures
+  /// so that default implementations can be provided for 
+  /// accept/reset.
+  virtual void setControlledProperty(const char* function,
+    vtkSMProperty * controlled_property);
 private:
   class pqImplementation;
   pqImplementation* const Implementation;

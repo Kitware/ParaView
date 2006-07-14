@@ -33,12 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHandleWidget.h"
 #include "pqNamedWidgets.h"
 #include "pqPointSourceWidget.h"
+#include "pqPropertyLinks.h"
 
 #include "ui_pqPointSourceControls.h"
 
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxyProperty.h>
+#include <vtkSMNew3DWidgetProxy.h>
 
 #include <QDoubleValidator>
 #include <QHBoxLayout>
@@ -53,115 +55,60 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqPointSourceWidget::pqImplementation
 {
 public:
-  pqImplementation(QWidget* parent) :
-    HandleWidget(parent)
+  pqImplementation()
   {
+  this->Links.setUseUncheckedProperties(false);
+  this->Links.setAutoUpdateVTKObjects(true);
   }
-  
-  pqHandleWidget HandleWidget;
   QWidget ControlsContainer;
   Ui::pqPointSourceControls Controls;
-  pqSMProxy ControlledProxy;
+
+  pqPropertyLinks Links;
 };
 
 /////////////////////////////////////////////////////////////////////////
 // pqPointSourceWidget
 
 pqPointSourceWidget::pqPointSourceWidget(QWidget* p) :
-  QWidget(p),
-  Implementation(new pqImplementation(this))
+  pqHandleWidget(p),
+  Implementation(new pqImplementation())
 {
   this->Implementation->Controls.setupUi(
     &this->Implementation->ControlsContainer);
 
-  QVBoxLayout* const widget_layout = new QVBoxLayout();
-  widget_layout->addWidget(&this->Implementation->HandleWidget);
-  widget_layout->addWidget(&this->Implementation->ControlsContainer);
-  
-  this->setLayout(widget_layout);
+  this->layout()->addWidget(&this->Implementation->ControlsContainer);
 
-  this->Implementation->Controls.NumberOfPoints->setValidator(new QIntValidator(0, 999999, this));
-  this->Implementation->Controls.Radius->setValidator(new QDoubleValidator(0, 99999999, 12, this));
+  QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
+    this, SIGNAL(widgetChanged()));
 
-  connect(
-    &this->Implementation->HandleWidget,
-    SIGNAL(widgetChanged()),
-    this,
-    SIGNAL(widgetChanged()));
+  QObject::connect(&this->Implementation->Links, SIGNAL(smPropertyChanged()),
+    this, SIGNAL(widgetChanged()));
 }
 
+//-----------------------------------------------------------------------------
 pqPointSourceWidget::~pqPointSourceWidget()
 {
   delete this->Implementation;
 }
 
 //-----------------------------------------------------------------------------
-void pqPointSourceWidget::setDataSources(pqSMProxy reference_proxy,
-  pqSMProxy controlled_proxy)
+void pqPointSourceWidget::setControlledProperty(const char* function,
+  vtkSMProperty* property)
 {
-  this->Implementation->HandleWidget.setDataSources(reference_proxy);
-  this->Implementation->ControlledProxy = controlled_proxy;
-}
-
-void pqPointSourceWidget::showWidget(pqPropertyManager* property_manager)
-{
-  this->Implementation->HandleWidget.showWidget();
-  
-  pqNamedWidgets::link(
-    &this->Implementation->ControlsContainer,
-    this->Implementation->ControlledProxy,
-    property_manager);
-}
-
-void pqPointSourceWidget::accept()
-{
-  // Get the current values from the 3D handle widget ...
-  if(this->Implementation->ControlledProxy)
+  if (strcmp(function, "NumberOfPoints") == 0)
     {
-    double center[3] = { 0, 0, 0 };
-    
-    this->Implementation->HandleWidget.getWidgetState(center);
-
-    if(vtkSMDoubleVectorProperty* const center_property = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->Implementation->ControlledProxy->GetProperty("Center")))
-      {
-      center_property->SetElements(center);
-      }
-
-    this->Implementation->ControlledProxy->UpdateVTKObjects();
+    this->Implementation->Links.addPropertyLink(
+      this->Implementation->Controls.NumberOfPoints, "value", 
+      SIGNAL(valueChanged(int)),
+      this->getWidgetProxy(), this->getWidgetProxy()->GetProperty("NumberOfPoints"));
     }
-}
-
-void pqPointSourceWidget::reset()
-{
-  // Restore the state of the 3D handle widget ...
-  if(this->Implementation->ControlledProxy)
+  else if (strcmp(function, "Radius") == 0)
     {
-    double center[3] = { 0, 0, 0 };
-
-    if(vtkSMDoubleVectorProperty* const center_property = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->Implementation->ControlledProxy->GetProperty("Center")))
-      {
-      center[0] = center_property->GetElement(0);
-      center[1] = center_property->GetElement(1);
-      center[2] = center_property->GetElement(2);
-      }
-      
-    this->Implementation->HandleWidget.setWidgetState(center);
+    this->Implementation->Links.addPropertyLink(
+      this->Implementation->Controls.Radius, "value", 
+      SIGNAL(valueChanged(double)),
+      this->getWidgetProxy(), this->getWidgetProxy()->GetProperty("Radius"));
     }
+  this->pqHandleWidget::setControlledProperty(function, property);
 }
 
-void pqPointSourceWidget::hideWidget(pqPropertyManager* property_manager)
-{
-  this->Implementation->HandleWidget.hideWidget();
-
-  pqNamedWidgets::unlink(
-    &this->Implementation->ControlsContainer,
-    this->Implementation->ControlledProxy,
-    property_manager);
-}
-
-void pqPointSourceWidget::widgetChanged(const QString&)
-{
-  emit widgetChanged();
-}

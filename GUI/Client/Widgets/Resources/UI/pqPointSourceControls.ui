@@ -8,8 +8,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>197</width>
-    <height>45</height>
+    <width>209</width>
+    <height>103</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -22,9 +22,6 @@
    <property name="spacing" >
     <number>5</number>
    </property>
-   <item row="1" column="1" >
-    <widget class="QLineEdit" name="Radius" />
-   </item>
    <item row="1" column="0" >
     <widget class="QLabel" name="label_2" >
      <property name="text" >
@@ -40,15 +37,25 @@
     </widget>
    </item>
    <item row="0" column="1" >
-    <widget class="QLineEdit" name="NumberOfPoints" />
+    <widget class="QSpinBox" name="NumberOfPoints" >
+     <property name="maximum" >
+      <number>9999999</number>
+     </property>
+     <property name="minimum" >
+      <number>1</number>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" >
+    <widget class="QDoubleSpinBox" name="Radius" >
+     <property name="maximum" >
+      <double>1e+10</double>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
  <pixmapfunction></pixmapfunction>
- <tabstops>
-  <tabstop>NumberOfPoints</tabstop>
-  <tabstop>Radius</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>

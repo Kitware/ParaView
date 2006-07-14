@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ui_pqStreamTracerControls.h"
 
+#include <vtkPVXMLElement.h>
 #include <vtkSMDataObjectDisplayProxy.h>
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMProxyProperty.h>
@@ -171,8 +172,24 @@ void pqStreamTracerPanel::setProxyInternal(pqSMProxy p)
    
   if(this->Implementation->PointSourceWidget)
     {
-    this->Implementation->PointSourceWidget->setDataSources(
-      reference_proxy, controlled_proxy);
+    this->Implementation->PointSourceWidget->setReferenceProxy(
+      reference_proxy);
+    this->Implementation->PointSourceWidget->setControlledProxy(
+      controlled_proxy);
+    if (controlled_proxy)
+      {
+      vtkPVXMLElement* hints = controlled_proxy->GetHints();
+      for (unsigned int cc=0; cc <hints->GetNumberOfNestedElements(); cc++)
+        {
+        vtkPVXMLElement* elem = hints->GetNestedElement(cc);
+        if (QString("PropertyGroup") == elem->GetName() && 
+          QString("PointSource") == elem->GetAttribute("type"))
+          {
+          this->Implementation->PointSourceWidget->setHints(elem);
+          break;
+          }
+        }
+      }
     }
     
   if(this->Implementation->LineWidget)
@@ -191,7 +208,7 @@ void pqStreamTracerPanel::select()
 {
   if(this->Implementation->PointSourceWidget)
     {
-    this->Implementation->PointSourceWidget->showWidget(this->PropertyManager);
+    this->Implementation->PointSourceWidget->select();
     }
     
   if(this->Implementation->LineWidget)
@@ -204,7 +221,7 @@ void pqStreamTracerPanel::deselect()
 {
   if(this->Implementation->PointSourceWidget)
     {
-    this->Implementation->PointSourceWidget->hideWidget(this->PropertyManager);
+    this->Implementation->PointSourceWidget->deselect();
     }
 
   if(this->Implementation->LineWidget)

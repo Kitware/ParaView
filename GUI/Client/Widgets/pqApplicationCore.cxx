@@ -406,39 +406,11 @@ pqPipelineSource* pqApplicationCore::createFilterForActiveSource(
     this->Internal->PipelineBuilder->addConnection(
       this->Internal->ActiveSource, filter);
 
-    // As a special-case, set a default implicit function for new Clip filters
-    if(xmlname == "Clip")
-      {
-      vtkSMProxy* const plane = this->Internal->PipelineBuilder->createProxy(
-        "implicit_functions", "Plane", "implicit_functions", 
-        this->Internal->ActiveSource->getServer());
-      
-      this->Internal->UndoStack->BeginOrContinueUndoSet("Set ClipConnection");
-      if(vtkSMProxyProperty* const clip_function = 
-        vtkSMProxyProperty::SafeDownCast(
-          filter->getProxy()->GetProperty("ClipFunction")))
-        {
-        clip_function->AddProxy(plane);
-        }
-      this->Internal->UndoStack->PauseUndoSet();
-      }
-
     // As a special-case, set a default implicit function for new Cut filters
     if(xmlname == "Cut")
       {
-      vtkSMProxy* const plane = this->Internal->PipelineBuilder->createProxy(
-        "implicit_functions", "Plane", "implicit_functions", 
-        this->Internal->ActiveSource->getServer());
-      
       this->Internal->UndoStack->BeginOrContinueUndoSet("Set CutConnection");
       
-      if(vtkSMProxyProperty* const cut_function = 
-        vtkSMProxyProperty::SafeDownCast(
-          filter->getProxy()->GetProperty("CutFunction")))
-        {
-        cut_function->AddProxy(plane);
-        }
-        
       if(vtkSMDoubleVectorProperty* const contours =
         vtkSMDoubleVectorProperty::SafeDownCast(
           filter->getProxy()->GetProperty("ContourValues")))
@@ -453,25 +425,20 @@ pqPipelineSource* pqApplicationCore::createFilterForActiveSource(
     // As a special-case, set a default point source for new StreamTracer filters
     if(xmlname == "StreamTracer")
       {
-      vtkSMProxy* const point_source = this->Internal->PipelineBuilder->createProxy(
-        "sources", "PointSource", "",
-        this->Internal->ActiveSource->getServer());
-        
-      if(vtkSMIntVectorProperty* const number_of_points =
-        vtkSMIntVectorProperty::SafeDownCast(
-          point_source->GetProperty("NumberOfPoints")))
-        {
-        number_of_points->SetNumberOfElements(1);
-        number_of_points->SetElement(0, 100);
-        }
-        
       this->Internal->UndoStack->BeginOrContinueUndoSet("Set Point Source");
-      
-      if(vtkSMProxyProperty* const source = 
-        vtkSMProxyProperty::SafeDownCast(
-          filter->getProxy()->GetProperty("Source")))
+      vtkSMProxyProperty* sourceProperty = vtkSMProxyProperty::SafeDownCast(
+        filter->getProxy()->GetProperty("Source"));
+      if(sourceProperty && sourceProperty->GetNumberOfProxies() > 0)
         {
-        source->AddProxy(point_source);
+        vtkSMProxy* const point_source = sourceProperty->GetProxy(0);
+        if(vtkSMIntVectorProperty* const number_of_points =
+          vtkSMIntVectorProperty::SafeDownCast(
+            point_source->GetProperty("NumberOfPoints")))
+          {
+          number_of_points->SetNumberOfElements(1);
+          number_of_points->SetElement(0, 100);
+          }
+        point_source->UpdateVTKObjects();
         }
         
       this->Internal->UndoStack->PauseUndoSet();

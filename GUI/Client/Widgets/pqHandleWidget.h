@@ -35,11 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqSMProxy.h"
 
-#include <QWidget>
+#include "pq3DWidget.h"
 
 /// Provides a complete Qt UI for working with a 3D handle widget
-class pqHandleWidget :
-  public QWidget
+class pqHandleWidget : public pq3DWidget
 {
   Q_OBJECT
   
@@ -47,47 +46,34 @@ public:
   pqHandleWidget(QWidget* p);
   ~pqHandleWidget();
 
-  /** Sets the proxy that will be used as a reference when setting the widget
-  to the center of source data */
-  void setDataSources(pqSMProxy reference_proxy);
-  /// Returns the current state of the widget
-  void getWidgetState(double world_position[3]);
-  /// Sets the current state of the widget
-  void setWidgetState(const double world_position[3]);
+  /// Controlled proxy is a proxy which is controlled by the 3D widget.
+  /// A controlled proxy must provide "Hints" describing how
+  /// the properties of the controlled proxy are controlled by the
+  /// 3D widget.
+  virtual void setControlledProxy(vtkSMProxy*);
 
-public slots:
-  /// Makes the 3D widget visible (but respects the user's choice if they've turned visibility off)
-  void showWidget();
-  /// Hides the 3D widget
-  void hideWidget();
-
-signals:
-  /// Notifies observers that the user is dragging the 3D widget
-  void widgetStartInteraction();
-  /// Notifies observers that the widget has been modified
-  void widgetChanged();
-  /// Notifies observers that the user is done dragging the 3D widget
-  void widgetEndInteraction();
+protected:
+  /// Resets the bounds of the 3D widget to the reference proxy bounds.
+  virtual void resetBounds();
 
 private slots:
   /// Called to show/hide the 3D widget
   void onShow3DWidget(bool);
   /// Called to reset the 3D widget bounds to the reference proxy bounds
   void onResetBounds();
-  /// Called if any of the Qt widget values is modified
-  void onQtWidgetChanged();
   /// Called when the user starts dragging the 3D widget
   void on3DWidgetStartDrag();
-  /// Called when the 3D widget is modified
-  void on3DWidgetChanged();
   /// Called when the user stops dragging the 3D widget
   void on3DWidgetEndDrag();
 
+protected:
+  virtual void setControlledProperty(const char* function,
+    vtkSMProperty * controlled_property);
+  
+  /// Overridden to make sure that the visibility check box is
+  /// updated.
+  virtual void set3DWidgetVisibility(bool visible);
 private:
-  void show3DWidget(bool show);
-  void updateQtWidgets(const double world_position[3]);
-  void update3DWidget(const double world_position[3]);
-
   class pqImplementation;
   pqImplementation* const Implementation;
 };

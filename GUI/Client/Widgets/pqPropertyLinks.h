@@ -68,6 +68,11 @@ public:
   // maintained by this object.
   void removeAllPropertyLinks();
 
+signals:
+  /// signals fired when a link is updated.
+  void qtWidgetChanged();
+  void smPropertyChanged();
+
 public slots:
   /// accept the changes and push them to the server manager
   /// regardless of the whether we're using unchecked properties
@@ -110,21 +115,28 @@ class PQWIDGETS_EXPORT pqPropertyLinksConnection : public QObject
   Q_OBJECT
   friend class pqPropertyLinks;
 public:
-  pqPropertyLinksConnection(vtkSMProxy* proxy, vtkSMProperty* property, int idx,
-                            QObject* qobject, const char* qproperty);
-  pqPropertyLinksConnection(const pqPropertyLinksConnection& copy);
+  pqPropertyLinksConnection(QObject*parent, 
+    vtkSMProxy* proxy, vtkSMProperty* property, int idx,
+    QObject* qobject, const char* qproperty);
   ~pqPropertyLinksConnection();
-  pqPropertyLinksConnection& operator=(const pqPropertyLinksConnection& copy);
-  bool operator<(pqPropertyLinksConnection const& other) const;
+
   void setUseUncheckedProperties(bool) const;
   bool useUncheckedProperties() const;
   void setAutoUpdateVTKObjects(bool) const;
   bool autoUpdateVTKObjects() const;
 
   bool getOutOfSync() const;
+  void clearOutOfSync() const;
+
+  bool isEqual(vtkSMProxy* proxy, vtkSMProperty* property, int idx,
+    QObject* qObject, const char* qproperty) const;
+signals: 
+  void qtWidgetChanged();
+  void smPropertyChanged();
+
 private slots:
-  void smLinkedPropertyChanged() const;
-  void qtLinkedPropertyChanged() const;
+  void smLinkedPropertyChanged();
+  void qtLinkedPropertyChanged();
 
 private:
   class pqInternal;

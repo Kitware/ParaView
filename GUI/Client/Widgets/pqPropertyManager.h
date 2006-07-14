@@ -59,6 +59,15 @@ public:
   /// register a QObject property to link with the server manager
   void registerLink(QObject* qObject, const char* qProperty, const char* signal,
                        vtkSMProxy* Proxy, vtkSMProperty* Property, int Index=-1);
+
+  /// register a QObject property to link with the server manager. This internally
+  /// calls the other overload. The additional argument is \c modified_signal.
+  /// This overload is used to connect with QObjects (usually signal adaptors)
+  /// which raise the modified_signal when the widget is modified; as a result
+  /// of which we can make the accept button enabled etc.
+  void registerLink(QObject* qObject, const char* qProperty, const char* signal,
+    const char* modified_signal, vtkSMProxy* smProxy, vtkSMProperty* smProperty, 
+    int index=-1);
   
   /// unregister a QObject property to link with the server manager
   void unregisterLink(

@@ -77,14 +77,18 @@ public slots:
 
   /// Called when the panel becomes active. Default implemnetation does
   /// nothing.
-  virtual void select() { }
+  virtual void select() { emit this->onselect();}
 
   /// Called when the panel becomes inactive. Default implemnetation does
   /// nothing.
-  virtual void deselect() { }
+  virtual void deselect() { emit this->ondeselect(); }
 
 signals:
   void canAcceptOrReject(bool);
+  void onaccept();
+  void onreset();
+  void onselect();
+  void ondeselect();
 
 protected:
   /// Internal method that actually sets the proxy. Subclasses must override

@@ -32,11 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pq3DWidget.h"
 
 // ParaView Server Manager includes.
+#include "vtkMemberFunctionCommand.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMNew3DWidgetProxy.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMIntVectorProperty.h"
 
 // Qt includes.
 #include <QtDebug>
@@ -44,6 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView GUI includes.
 #include "pqApplicationCore.h"
 #include "pqRenderModule.h"
+#include "pqImplicitPlaneWidget.h"
+#include "pqPointSourceWidget.h"
 
 class pq3DWidgetInternal
 {
@@ -51,6 +54,7 @@ public:
   vtkSmartPointer<vtkSMProxy> ReferenceProxy;
   vtkSmartPointer<vtkSMProxy> ControlledProxy;
   vtkSmartPointer<vtkSMNew3DWidgetProxy> WidgetProxy;
+  vtkSmartPointer<vtkCommand> ControlledPropertiesObserver;
 
   QMap<vtkSmartPointer<vtkSMProperty>, vtkSmartPointer<vtkSMProperty> > PropertyMap;
 
@@ -62,14 +66,67 @@ QMap<vtkSMProxy*, bool> pq3DWidgetInternal::Visibility;
 pq3DWidget::pq3DWidget(QWidget* _p): QWidget(_p)
 {
   this->Internal = new pq3DWidgetInternal;
-  this->Ignore3DWidget = false;
+  this->Internal->ControlledPropertiesObserver.TakeReference(
+    vtkMakeMemberFunctionCommand(*this, 
+      &pq3DWidget::onControlledPropertyChanged));
   this->IgnorePropertyChange = false;
 }
 
 //-----------------------------------------------------------------------------
 pq3DWidget::~pq3DWidget()
 {
+  this->setControlledProxy(0);
   delete this->Internal;
+}
+
+//-----------------------------------------------------------------------------
+QList<pq3DWidget*> pq3DWidget::createWidgets(vtkSMProxy* proxy)
+{
+  QList<pq3DWidget*> widgets;
+
+  vtkPVXMLElement* hints = proxy->GetHints();
+  unsigned int max = hints->GetNumberOfNestedElements();
+  for (unsigned int cc=0; cc < max; cc++)
+    {
+    vtkPVXMLElement* element = hints->GetNestedElement(cc);
+    if (QString("PropertyGroup") == element->GetName())
+      {
+      QString widgetType = element->GetAttribute("type");
+      pq3DWidget *widget = 0;
+      if (widgetType == "Plane")
+        {
+        widget = new pqImplicitPlaneWidget(0);
+        }
+      else if (widgetType == "Handle")
+        {
+        widget = new pqHandleWidget(0);
+        }
+      else if (widgetType == "PointSource")
+        {
+        widget = new pqPointSourceWidget(0);
+        }
+
+      if (widget)
+        {
+        widget->setControlledProxy(proxy);
+        widget->setHints(element);
+        widgets.push_back(widget);
+        }
+      }
+    }
+  return widgets;
+}
+
+//-----------------------------------------------------------------------------
+void pq3DWidget::onControlledPropertyChanged()
+{
+  if (this->IgnorePropertyChange)
+    {
+    return;
+    }
+
+  // Synchronize the 3D and Qt widgets with the controlled properties
+  this->reset();
 }
 
 //-----------------------------------------------------------------------------
@@ -92,6 +149,7 @@ void pq3DWidget::setReferenceProxy(vtkSMProxy* proxy)
     {
     this->Internal->Visibility.insert(proxy, true);
     }
+  this->resetBounds();
 }
 
 //-----------------------------------------------------------------------------
@@ -103,38 +161,55 @@ vtkSMProxy* pq3DWidget::getReferenceProxy() const
 //-----------------------------------------------------------------------------
 void pq3DWidget::setControlledProxy(vtkSMProxy* proxy)
 {
+  foreach(vtkSMProperty* controlledProperty, this->Internal->PropertyMap)
+    {
+    controlledProperty->RemoveObserver(
+      this->Internal->ControlledPropertiesObserver);
+    }
   this->Internal->PropertyMap.clear();
+
   this->Internal->ControlledProxy = proxy;
-  if (!proxy)
+  if (proxy)
+    {
+    this->reset();
+    this->resetBounds();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pq3DWidget::setHints(vtkPVXMLElement* hints)
+{
+  if (!hints)
     {
     return;
     }
 
-  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkPVXMLElement* hints = pxm->GetHints(proxy->GetXMLGroup(), 
-    proxy->GetXMLName());
-  if (!hints)
+  if (!this->getControlledProxy())
     {
-    qDebug() << "pq3DWidget cannot control a proxy that does "
-      << "not provide Hints.";
-    return ;
+    qDebug() << "pq3DWidget::setHints must be called only after the controlled "
+      << "proxy has been set.";
+    return;
     }
+  if (QString("PropertyGroup") != hints->GetName())
+    {
+    qDebug() << "Argument to setHints must be a <PropertyGroup /> element.";
+    return;
+    }
+
+  vtkSMProxy* proxy = this->getControlledProxy();
   unsigned int max = hints->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < max; cc++)
     {
-    vtkPVXMLElement* elem = hints->GetNestedElement(cc);
-    if (elem && elem->GetName() && strcmp(elem->GetName(), "Widget") == 0)
+    unsigned int max_props = hints->GetNumberOfNestedElements();
+    for (unsigned int i=0; i < max_props; i++)
       {
-      unsigned int max_props = elem->GetNumberOfNestedElements();
-      for (unsigned int i=0; i < max_props; i++)
-        {
-        vtkPVXMLElement* propElem = elem->GetNestedElement(i);
-        this->setControlledProperty(propElem->GetAttribute("name"),
-          proxy->GetProperty(propElem->GetAttribute("controls")));
-        }
-      break;
+      vtkPVXMLElement* propElem = hints->GetNestedElement(i);
+      this->setControlledProperty(propElem->GetAttribute("function"),
+        proxy->GetProperty(propElem->GetAttribute("name")));
       }
     }
+  this->reset();
+  this->resetBounds();
 }
 
 //-----------------------------------------------------------------------------
@@ -150,27 +225,22 @@ void pq3DWidget::setControlledProperty(const char* function,
   this->Internal->PropertyMap.insert(
     this->Internal->WidgetProxy->GetProperty(function),
     controlled_property);
+
+  controlled_property->AddObserver(vtkCommand::ModifiedEvent,
+    this->Internal->ControlledPropertiesObserver);
 }
 
 //-----------------------------------------------------------------------------
 void pq3DWidget::accept()
 {
   this->IgnorePropertyChange = true;
-  this->Internal->WidgetProxy->UpdatePropertyInformation();
   QMap<vtkSmartPointer<vtkSMProperty>, vtkSmartPointer<vtkSMProperty> >::const_iterator
     iter;
   for (iter = this->Internal->PropertyMap.constBegin() ;
     iter != this->Internal->PropertyMap.constEnd(); 
     ++iter)
     {
-    vtkSMProperty* info_prop = iter.key()->GetInformationProperty();
-    if (!info_prop)
-      {
-      qDebug() << " Some property has no information property. "
-        "3Dwidgets cannot work.";
-      continue;
-      }
-    iter.value()->Copy(info_prop);
+    iter.value()->Copy(iter.key());
     }
   if (this->Internal->ControlledProxy)
     {
@@ -182,6 +252,10 @@ void pq3DWidget::accept()
 //-----------------------------------------------------------------------------
 void pq3DWidget::reset()
 {
+  // We don't want to fire any widget modified events while resetting the 
+  // 3D widget, hence we block all signals. Otherwise, on reset, we fire a
+  // widget modified event, which makes the accept button enabled again.
+  this->blockSignals(true);
   QMap<vtkSmartPointer<vtkSMProperty>, vtkSmartPointer<vtkSMProperty> >::const_iterator
     iter;
   for (iter = this->Internal->PropertyMap.constBegin() ;
@@ -196,6 +270,7 @@ void pq3DWidget::reset()
     this->Internal->WidgetProxy->UpdateVTKObjects();
     pqApplicationCore::instance()->render();
     }
+  this->blockSignals(false);
 }
 
 //-----------------------------------------------------------------------------
@@ -204,7 +279,7 @@ bool pq3DWidget::widgetVisibile() const
   if (!this->Internal->ReferenceProxy || 
     !this->Internal->Visibility.contains(this->Internal->ReferenceProxy))
     {
-    return false;
+    return true;
     }
   return this->Internal->Visibility[this->Internal->ReferenceProxy];
 }
@@ -246,8 +321,6 @@ void pq3DWidget::set3DWidgetVisibility(bool visible)
 {
   if(this->Internal->WidgetProxy)
     {
-    this->Ignore3DWidget = true;
-    
     if(vtkSMIntVectorProperty* const visibility =
       vtkSMIntVectorProperty::SafeDownCast(
         this->Internal->WidgetProxy->GetProperty("Visibility")))
@@ -264,6 +337,5 @@ void pq3DWidget::set3DWidgetVisibility(bool visible)
 
     this->Internal->WidgetProxy->UpdateVTKObjects();
     pqApplicationCore::instance()->render();
-    this->Ignore3DWidget = false;
     }
 }

@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include "pqWidgetsExport.h"
 
+class vtkPVXMLElement;
 class vtkSMProperty;
 class vtkSMProxy;
 class vtkSMNew3DWidgetProxy;
@@ -51,6 +52,14 @@ public:
   pq3DWidget(QWidget* parent=0);
   virtual ~pq3DWidget();
 
+  // This method creates widgets using the hints provided by 
+  // the proxy. If a proxy needs more that one
+  // 3D widget, this method will create all the 3D widgets and
+  // return them. There is no parent associated with the newly
+  // created 3D widgets, it's the responsibility of the caller
+  // to do the memory management for the 3D widgets.
+  static QList<pq3DWidget*> createWidgets(vtkSMProxy* proxy);
+
   /// Reference proxy is a proxy which is used to determine the bounds
   /// for the 3D widget.
   virtual void setReferenceProxy(vtkSMProxy*);
@@ -63,12 +72,26 @@ public:
   virtual void setControlledProxy(vtkSMProxy*);
   vtkSMProxy* getControlledProxy() const;
 
+  /// Set the hints XML to be using to map the 3D widget to the controlled
+  /// proxy. This method must be called only after the controlled
+  /// proxy has been set. The argument is the element
+  /// <PropertyGroup /> which will be controlled by this widget.
+  void setHints(vtkPVXMLElement* element);
+
   /// Return the 3D Widget proxy.
   vtkSMNew3DWidgetProxy* getWidgetProxy() const;
 
   /// Returns if the 3D widget is visible for the current
   /// reference proxy.
   bool widgetVisibile() const;
+
+signals:
+  /// Notifies observers that the user is dragging the 3D widget
+  void widgetStartInteraction();
+  /// Notifies observers that the widget has been modified
+  void widgetChanged();
+  /// Notifies observers that the user is done dragging the 3D widget
+  void widgetEndInteraction();
 
 public slots:
   /// Makes the 3D widget visible. 
@@ -110,17 +133,20 @@ protected:
   /// internal datastructure, use showWidget()/hideWidget() if you want
   /// the change to be recorded so that it will be respected when
   /// the panel calls select().
-  void set3DWidgetVisibility(bool visible);
+  virtual void set3DWidgetVisibility(bool visible);
 
   // Subclasses must set the widget proxy.
   void setWidgetProxy(vtkSMNew3DWidgetProxy*);
 
-  // Flag used to determine if the 3D widget events must be ignored.
-  bool Ignore3DWidget;
+  /// Called when one of the controlled properties change (e.g: by undo/redo)
+  virtual void onControlledPropertyChanged();
+
+  /// Resets the bounds of the 3D widget to the reference proxy bounds.
+  virtual void resetBounds() =0;
 
   /// Used to avoid recursion when updating the controlled properties
   bool IgnorePropertyChange;
-
+  
 private:
   pq3DWidgetInternal* Internal;
 };

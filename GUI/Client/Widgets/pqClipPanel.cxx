@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 #include "pqServerManagerModel.h"
 
+#include <vtkPVXMLElement.h>
 #include <vtkSMDataObjectDisplayProxy.h>
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMProxyProperty.h>
@@ -144,27 +145,31 @@ void pqClipPanel::setProxyInternal(pqSMProxy p)
  
   pqSMProxy reference_proxy = p;
   pqSMProxy controlled_proxy;
-  vtkSMDoubleVectorProperty* origin_property = 0;
-  vtkSMDoubleVectorProperty* normal_property = 0;
    
   if(this->Proxy)
     {
     if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
       this->Proxy->GetProperty("ClipFunction")))
       {
-      if(controlled_proxy = clip_function_property->GetProxy(0))
+      controlled_proxy = clip_function_property->GetProxy(0);
+      }
+    }
+  this->Implementation->ImplicitPlaneWidget.setReferenceProxy(reference_proxy);
+  this->Implementation->ImplicitPlaneWidget.setControlledProxy(controlled_proxy);
+  if (controlled_proxy)
+    {
+    vtkPVXMLElement* hints = controlled_proxy->GetHints();
+    for (unsigned int cc=0; cc <hints->GetNumberOfNestedElements(); cc++)
+      {
+      vtkPVXMLElement* elem = hints->GetNestedElement(cc);
+      if (QString("PropertyGroup") == elem->GetName() && 
+        QString("Plane") == elem->GetAttribute("type"))
         {
-        origin_property = vtkSMDoubleVectorProperty::SafeDownCast(
-          controlled_proxy->GetProperty("Origin"));
-        normal_property = vtkSMDoubleVectorProperty::SafeDownCast(
-          controlled_proxy->GetProperty("Normal"));
+        this->Implementation->ImplicitPlaneWidget.setHints(elem);
+        break;
         }
       }
     }
-//  this->Implementation->ImplicitPlaneWidget.setDataSources(
-//    reference_proxy, controlled_proxy, origin_property, normal_property);
-  this->Implementation->ImplicitPlaneWidget.setReferenceProxy(reference_proxy);
-  this->Implementation->ImplicitPlaneWidget.setControlledProxy(controlled_proxy);
 
   if(this->Proxy)
     {
