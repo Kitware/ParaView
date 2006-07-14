@@ -45,7 +45,7 @@ public:
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMProxyListDomain);
-vtkCxxRevisionMacro(vtkSMProxyListDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMProxyListDomain, "1.2");
 //-----------------------------------------------------------------------------
 vtkSMProxyListDomain::vtkSMProxyListDomain()
 {
@@ -223,6 +223,10 @@ int vtkSMProxyListDomain::LoadState(vtkPVXMLElement* domainElement,
     vtkSMStateLoader* loader)
 {
   this->Internals->ProxyList.clear();
+  if (!this->Superclass::LoadState(domainElement, loader))
+    {
+    return 0;
+    }
 
   unsigned int max = domainElement->GetNumberOfNestedElements();
   for (unsigned int cc=0; cc < max; cc++)
@@ -237,12 +241,14 @@ int vtkSMProxyListDomain::LoadState(vtkPVXMLElement* domainElement,
         continue;
         }
       vtkSMProxy* proxy = loader->NewProxy(id);
-      this->Internals->ProxyList.push_back(proxy);
-      proxy->Delete();
+      if (proxy)
+        {
+        this->Internals->ProxyList.push_back(proxy);
+        proxy->Delete();
+        }
       }
     }
-
-  return this->Superclass::LoadState(domainElement, loader);
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
