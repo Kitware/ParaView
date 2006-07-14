@@ -153,14 +153,14 @@ static const char* pqCollapsedGroup_HideIcon[] = {
 "ffffffffffffffff"
 };
 
-pqCollapsedGroup::pqCollapsedGroup(QWidget* parent)
-  : QGroupBox(parent)
+pqCollapsedGroup::pqCollapsedGroup(QWidget* parent_widget)
+  : QGroupBox(parent_widget)
 {
   this->initialize();
 }
 
-pqCollapsedGroup::pqCollapsedGroup(const QString& title, QWidget* parent)
-  : QGroupBox(title, parent)
+pqCollapsedGroup::pqCollapsedGroup(const QString& group_title, QWidget* parent_widget)
+  : QGroupBox(group_title, parent_widget)
 {
   this->initialize();
 }

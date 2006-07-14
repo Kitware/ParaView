@@ -275,7 +275,7 @@ void pqImplicitPlaneWidget::setControlledProperty(const char* function,
 }
 
 //-----------------------------------------------------------------------------
-void pqImplicitPlaneWidget::setOriginProperty(vtkSMProperty* property)
+void pqImplicitPlaneWidget::setOriginProperty(vtkSMProperty* origin_property)
 {
   if(this->Implementation->OriginProperty)
     {
@@ -283,7 +283,7 @@ void pqImplicitPlaneWidget::setOriginProperty(vtkSMProperty* property)
       this->Implementation->PropertyObserver);
     }
   this->Implementation->OriginProperty = 
-    vtkSMDoubleVectorProperty::SafeDownCast(property);
+    vtkSMDoubleVectorProperty::SafeDownCast(origin_property);
 
   if(this->Implementation->OriginProperty)
     {
@@ -294,7 +294,7 @@ void pqImplicitPlaneWidget::setOriginProperty(vtkSMProperty* property)
 }
 
 //-----------------------------------------------------------------------------
-void pqImplicitPlaneWidget::setNormalProperty(vtkSMProperty* property)
+void pqImplicitPlaneWidget::setNormalProperty(vtkSMProperty* normal_property)
 {
   if(this->Implementation->NormalProperty)
     {
@@ -303,7 +303,7 @@ void pqImplicitPlaneWidget::setNormalProperty(vtkSMProperty* property)
     }
 
   this->Implementation->NormalProperty = 
-    vtkSMDoubleVectorProperty::SafeDownCast(property);
+    vtkSMDoubleVectorProperty::SafeDownCast(normal_property);
 
   if(this->Implementation->NormalProperty)
     {

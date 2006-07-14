@@ -158,8 +158,8 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 // pqMainWindowCore
 
-pqMainWindowCore::pqMainWindowCore(QWidget* parent) :
-  Implementation(new pqImplementation(parent))
+pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
+  Implementation(new pqImplementation(parent_widget))
 {
   this->setObjectName("MainWindowCore");
 
@@ -437,11 +437,12 @@ pqPipelineMenu& pqMainWindowCore::pipelineMenu()
   return *this->Implementation->PipelineMenu;
 }
 
-void pqMainWindowCore::setupPipelineBrowser(QDockWidget* parent)
+void pqMainWindowCore::setupPipelineBrowser(QDockWidget* dock_widget)
 {
-  pqPipelineBrowser* const pipeline_browser = new pqPipelineBrowser(parent)
+  pqPipelineBrowser* const pipeline_browser = new pqPipelineBrowser(dock_widget)
     << pqSetName("pipelineBrowser");
-  parent->setWidget(pipeline_browser);
+    
+  dock_widget->setWidget(pipeline_browser);
 
   this->connect(
     pipeline_browser,
@@ -456,12 +457,12 @@ void pqMainWindowCore::setupPipelineBrowser(QDockWidget* parent)
     SLOT(select(pqServerManagerModelItem*)));
 }
 
-pqObjectInspectorWidget* pqMainWindowCore::setupObjectInspector(QDockWidget* parent)
+pqObjectInspectorWidget* pqMainWindowCore::setupObjectInspector(QDockWidget* dock_widget)
 {
   pqObjectInspectorWidget* const object_inspector = 
-    new pqObjectInspectorWidget(parent);
+    new pqObjectInspectorWidget(dock_widget);
     
-  parent->setWidget(object_inspector);
+  dock_widget->setWidget(object_inspector);
 
   pqUndoStack* const undoStack = pqApplicationCore::instance()->getUndoStack();
   
@@ -512,13 +513,13 @@ pqObjectInspectorWidget* pqMainWindowCore::setupObjectInspector(QDockWidget* par
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::setupStatisticsView(QDockWidget* parent)
+void pqMainWindowCore::setupStatisticsView(QDockWidget* dock_widget)
 {
   pqDataInformationWidget* const statistics_view =
-    new pqDataInformationWidget(parent)
+    new pqDataInformationWidget(dock_widget)
     << pqSetName("statisticsView");
     
-  parent->setWidget(statistics_view);
+  dock_widget->setWidget(statistics_view);
 
   pqUndoStack* const undo_stack = pqApplicationCore::instance()->getUndoStack();
   // Undo/redo operations can potentially change data information,
@@ -542,23 +543,24 @@ void pqMainWindowCore::setupStatisticsView(QDockWidget* parent)
     SLOT(refreshData()));    
 }
 
-void pqMainWindowCore::setupElementInspector(QDockWidget* parent)
+void pqMainWindowCore::setupElementInspector(QDockWidget* dock_widget)
 {
   pqElementInspectorWidget* const element_inspector = 
-    new pqElementInspectorWidget(parent);
-  parent->setWidget(element_inspector);
+    new pqElementInspectorWidget(dock_widget);
+    
+  dock_widget->setWidget(element_inspector);
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::setupVariableToolbar(QToolBar* parent)
+void pqMainWindowCore::setupVariableToolbar(QToolBar* toolbar)
 {
-  this->Implementation->VariableToolbar = parent;
+  this->Implementation->VariableToolbar = toolbar;
   
   pqDisplayColorWidget* display_color = new pqDisplayColorWidget(
-    parent)
+    toolbar)
     << pqSetName("displayColor");
     
-  parent->addWidget(display_color);
+  toolbar->addWidget(display_color);
 
   QObject::connect(
     pqApplicationCore::instance(),
@@ -574,11 +576,11 @@ void pqMainWindowCore::setupVariableToolbar(QToolBar* parent)
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::setupCustomFilterToolbar(QToolBar* parent)
+void pqMainWindowCore::setupCustomFilterToolbar(QToolBar* toolbar)
 {
-  this->Implementation->CustomFilterToolbar = parent;
+  this->Implementation->CustomFilterToolbar = toolbar;
 
-  this->connect(parent, 
+  this->connect(toolbar, 
     SIGNAL(actionTriggered(QAction*)), SLOT(onCreateCompoundProxy(QAction*)));
   // Listen for compound proxy register events.
   pqServerManagerObserver *observer =
@@ -594,10 +596,10 @@ void pqMainWindowCore::setupCustomFilterToolbar(QToolBar* parent)
 */
 }
 
-void pqMainWindowCore::setupProgressBar(QStatusBar* parent)
+void pqMainWindowCore::setupProgressBar(QStatusBar* toolbar)
 {
-  pqProgressBar* const progress_bar = new pqProgressBar(parent);
-  parent->addPermanentWidget(progress_bar);
+  pqProgressBar* const progress_bar = new pqProgressBar(toolbar);
+  toolbar->addPermanentWidget(progress_bar);
   progress_bar->hide();
 
   QObject::connect(

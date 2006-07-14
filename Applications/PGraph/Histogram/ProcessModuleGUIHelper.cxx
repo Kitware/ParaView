@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkObjectFactory.h>
 
 vtkStandardNewMacro(ProcessModuleGUIHelper);
-vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.4");
+vtkCxxRevisionMacro(ProcessModuleGUIHelper, "1.5");
 
 //-----------------------------------------------------------------------------
 ProcessModuleGUIHelper::ProcessModuleGUIHelper()
@@ -65,8 +65,8 @@ void ProcessModuleGUIHelper::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //-----------------------------------------------------------------------------
-bool ProcessModuleGUIHelper::compareView(const QString& ReferenceImage,
-  double Threshold, ostream& Output, const QString& TempDirectory)
+bool ProcessModuleGUIHelper::compareView(const QString& /*ReferenceImage*/,
+  double /*Threshold*/, ostream& /*Output*/, const QString& /*TempDirectory*/)
 {
   return false;
 }
