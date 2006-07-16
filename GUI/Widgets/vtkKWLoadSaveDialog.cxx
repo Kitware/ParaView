@@ -16,12 +16,13 @@
 #include "vtkKWApplication.h"
 #include "vtkKWWindowBase.h"
 #include "vtkObjectFactory.h"
+#include "vtkStringArray.h"
 
 #include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.55");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.56");
 
 //----------------------------------------------------------------------------
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
@@ -35,8 +36,7 @@ vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
   this->SaveDialog       = 0;
   this->ChooseDirectory  = 0;
   this->MultipleSelection = 0;
-  this->NumberOfFileNames = 0;
-  this->FileNames        = NULL;
+  this->FileNames        = vtkStringArray::New();
 
   this->SetTitle("Open Text Document");
   this->SetFileTypes("{{Text Document} {.txt}}");
@@ -50,7 +50,11 @@ vtkKWLoadSaveDialog::~vtkKWLoadSaveDialog()
   this->SetFileName(NULL);
   this->SetDefaultExtension(NULL);
   this->SetLastPath(NULL);
-  this->ResetFileNames();
+  if (this->FileNames)
+    {
+    this->FileNames->Delete();
+    this->FileNames = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -84,7 +88,7 @@ int vtkKWLoadSaveDialog::Invoke()
   this->GetApplication()->RegisterDialogUp(this);
   ostrstream command;
 
-  this->ResetFileNames();
+  this->FileNames->Reset();
   
   int support_choose_dir = this->GetApplication()->EvaluateBooleanExpression(
     "string equal [info commands tk_chooseDirectory] tk_chooseDirectory");
@@ -149,18 +153,10 @@ int vtkKWLoadSaveDialog::Invoke()
         {
         if (n > 0)
           {
-          this->NumberOfFileNames = n;
-          this->FileNames = new char *[n];
-
           for (int i = 0; i < n; i++)
             {
-            // do conversion twice since ConvertTclStringToInternalString
-            //  creates a temporary char pointer
-            int stringLength =
-              strlen(this->ConvertTclStringToInternalString(files[i]));
-            this->FileNames[i] = new char[stringLength + 1];
-            strcpy(this->FileNames[i], 
-                   this->ConvertTclStringToInternalString(files[i]));
+            this->FileNames->InsertNextValue(
+              this->ConvertTclStringToInternalString(files[i]));
             }
 
           this->GenerateLastPath(this->GetNthFileName(0));
@@ -174,10 +170,7 @@ int vtkKWLoadSaveDialog::Invoke()
       {
       this->SetFileName(this->ConvertTclStringToInternalString(path));
       
-      this->NumberOfFileNames = 1;
-      this->FileNames = new char *[1];
-      this->FileNames[0] = new char[strlen(this->GetFileName()) + 1];
-      strcpy(this->FileNames[0], this->GetFileName());
+      this->FileNames->InsertNextValue(this->GetFileName());
       
       if (this->ChooseDirectory && support_choose_dir)
         {
@@ -231,32 +224,22 @@ const char* vtkKWLoadSaveDialog::GenerateLastPath(const char* path)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLoadSaveDialog::ResetFileNames()
+int vtkKWLoadSaveDialog::GetNumberOfFileNames()
 {
-  // deallocate the list of files
-  if (this->FileNames)
-    {
-    for(int i =0; i < this->NumberOfFileNames; i++)
-      {          
-      delete [] this->FileNames[i];
-      }
-    delete [] this->FileNames;
-    }
-  this->FileNames = 0;
-  this->NumberOfFileNames = 0;
+  return this->FileNames->GetNumberOfValues();
 }
 
 //----------------------------------------------------------------------------
 const char *vtkKWLoadSaveDialog::GetNthFileName(int i)
 {
-  if (i < 0 || i >= this->NumberOfFileNames)
+  if (i < 0 || i >= this->FileNames->GetNumberOfValues())
     {
     vtkErrorMacro(<< this->GetClassName()
                   << " index for GetFileName is out of range");
     return NULL;
     }
 
-  return this->FileNames[i];
+  return this->FileNames->GetValue(i);
 }
 
 //----------------------------------------------------------------------------
@@ -303,11 +286,11 @@ void vtkKWLoadSaveDialog::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ChooseDirectory: " << this->GetChooseDirectory() << endl;
   os << indent << "MultipleSelection: " << this->GetMultipleSelection() << endl;
   os << indent << "NumberOfFileNames: " << this->GetNumberOfFileNames() << endl;
-  os << indent << "FileNames: "
-     << (this->NumberOfFileNames == 0 ? "none" : "") << endl;
-  for (int i = 0; i < this->NumberOfFileNames; i++)
+  os << indent << "FileNames:  (" << this->GetFileNames() << ")\n";
+  indent = indent.GetNextIndent();
+  for(int i = 0; i < this->FileNames->GetNumberOfValues(); i++)
     {
-    os << indent << "  " << this->GetNthFileName(i) << endl;
+    os << indent << this->FileNames->GetValue(i) << "\n";
     }
 }
 

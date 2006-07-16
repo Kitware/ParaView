@@ -21,6 +21,8 @@
 
 #include "vtkKWDialog.h"
 
+class vtkStringArray;
+
 class KWWidgets_EXPORT vtkKWLoadSaveDialog : public vtkKWDialog
 {
 public:
@@ -87,12 +89,16 @@ public:
   // Description:
   // Get the number of filenames that are selected.  This is meant
   // for use with MultipleSelection mode.
-  vtkGetMacro(NumberOfFileNames, int);
+  int GetNumberOfFileNames();
 
   // Description:
   // Get one file path from a multiple selection of file paths.  An
   // error will be generated if the index is out of range.
   const char *GetNthFileName(int i);
+
+  // Description:
+  // Get all of the selected filenames as a vtkStringArray.
+  vtkGetObjectMacro(FileNames, vtkStringArray);  
 
   // Description:
   // Set/Get last path
@@ -117,10 +123,6 @@ protected:
   // Create the widget.
   virtual void CreateWidget();
 
-  // Description:
-  // Reset the internal file list
-  void ResetFileNames();
-
   char *FileTypes;
   char *InitialFileName;
   char *FileName;
@@ -129,8 +131,7 @@ protected:
   int SaveDialog;
   int ChooseDirectory;
   int MultipleSelection;
-  int NumberOfFileNames;
-  char **FileNames;
+  vtkStringArray *FileNames;
 
 private:
   vtkKWLoadSaveDialog(const vtkKWLoadSaveDialog&); // Not implemented
