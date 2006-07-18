@@ -91,6 +91,20 @@ bool pqUndoStack::CanRedo()
   return this->Implementation->UndoStack->CanRedo();
 }
 
+const QString pqUndoStack::UndoLabel()
+{
+  return this->Implementation->UndoStack->CanUndo() ?
+    this->Implementation->UndoStack->GetUndoSetLabel(0) :
+    QString();
+}
+
+const QString pqUndoStack::RedoLabel()
+{
+  return this->Implementation->UndoStack->CanRedo() ?
+    this->Implementation->UndoStack->GetRedoSetLabel(0) :
+    QString();
+}
+
 //-----------------------------------------------------------------------------
 void pqUndoStack::AddToActiveUndoSet(vtkUndoElement* element)
 {

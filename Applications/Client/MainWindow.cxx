@@ -361,6 +361,13 @@ MainWindow::MainWindow() :
 
   // Now that we're ready, initialize everything ...
   this->Implementation->Core.initializeStates();
+  
+  this->Implementation->UI.actionEditUndo->setEnabled(
+    pqApplicationCore::instance()->getUndoStack()->CanUndo());
+  this->Implementation->UI.actionEditRedo->setEnabled(
+    pqApplicationCore::instance()->getUndoStack()->CanRedo());
+  this->onUndoLabel(pqApplicationCore::instance()->getUndoStack()->UndoLabel());
+  this->onRedoLabel(pqApplicationCore::instance()->getUndoStack()->RedoLabel());
 }
 
 MainWindow::~MainWindow()

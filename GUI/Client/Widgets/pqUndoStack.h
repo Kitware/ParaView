@@ -55,6 +55,8 @@ public:
 
   bool CanUndo();
   bool CanRedo();
+  const QString UndoLabel();
+  const QString RedoLabel();
 
   // Description:
   // One can add arbritary elements to the active undo set.
