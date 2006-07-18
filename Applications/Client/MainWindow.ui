@@ -28,7 +28,7 @@
      <x>0</x>
      <y>0</y>
      <width>980</width>
-     <height>29</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuHelp" >
@@ -50,16 +50,6 @@
    <widget class="QMenu" name="menuSources" >
     <property name="title" >
      <string>S&amp;ources</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuFilters" >
-    <property name="title" >
-     <string>F&amp;ilters</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuPipeline" >
-    <property name="title" >
-     <string>&amp;Pipeline</string>
     </property>
    </widget>
    <widget class="QMenu" name="menuTools" >
@@ -119,23 +109,41 @@
     <addaction name="separator" />
     <addaction name="actionFileExit" />
    </widget>
+   <widget class="QMenu" name="menuFilters" >
+    <property name="title" >
+     <string>F&amp;ilters</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuPipeline" >
+    <property name="title" >
+     <string>&amp;Pipeline</string>
+    </property>
+   </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
    <addaction name="menuView" />
    <addaction name="menuServer" />
    <addaction name="menuSources" />
    <addaction name="menuFilters" />
-   <addaction name="menuPipeline" />
    <addaction name="menuTools" />
    <addaction name="menuHelp" />
   </widget>
-  <widget class="QStatusBar" name="statusbar" />
-  <widget class="QDockWidget" name="pipelineBrowserDock" >
-   <property name="allowedAreas" >
-    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+  <widget class="QStatusBar" name="statusbar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>715</y>
+     <width>980</width>
+     <height>20</height>
+    </rect>
    </property>
+  </widget>
+  <widget class="QDockWidget" name="pipelineBrowserDock" >
    <property name="windowTitle" >
     <string>Pipeline Browser</string>
+   </property>
+   <property name="allowedAreas" >
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <attribute name="dockWidgetArea" >
     <number>1</number>
@@ -150,11 +158,11 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="objectInspectorDock" >
-   <property name="allowedAreas" >
-    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
-   </property>
    <property name="windowTitle" >
     <string>Object Inspector</string>
+   </property>
+   <property name="allowedAreas" >
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <attribute name="dockWidgetArea" >
     <number>1</number>
@@ -162,11 +170,11 @@
    <widget class="QWidget" name="dockWidgetContents_3" />
   </widget>
   <widget class="QDockWidget" name="statisticsViewDock" >
-   <property name="allowedAreas" >
-    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
-   </property>
    <property name="windowTitle" >
     <string>Statistics View</string>
+   </property>
+   <property name="allowedAreas" >
+    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <attribute name="dockWidgetArea" >
     <number>8</number>
@@ -174,11 +182,11 @@
    <widget class="QWidget" name="dockWidgetContents_4" />
   </widget>
   <widget class="QDockWidget" name="elementInspectorDock" >
-   <property name="allowedAreas" >
-    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
-   </property>
    <property name="windowTitle" >
     <string>Element Inspector</string>
+   </property>
+   <property name="allowedAreas" >
+    <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <attribute name="dockWidgetArea" >
     <number>8</number>

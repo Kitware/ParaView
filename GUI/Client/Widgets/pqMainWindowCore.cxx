@@ -302,12 +302,6 @@ void pqMainWindowCore::setSourceMenu(QMenu* menu)
 
     menu->clear();
     
-    QMenu* released = menu->addMenu("Released")
-      << pqSetName("Released");
-      
-    released->addAction("Cone") 
-      << pqSetName("Cone") << pqSetData("ConeSource");
-
     menu->addAction("2D Glyph") 
       << pqSetName("2D Glyph") << pqSetData("GlyphSource2D");
     menu->addAction("3D Text") 
@@ -361,6 +355,8 @@ void pqMainWindowCore::setFilterMenu(QMenu* menu)
     releasedFilters<<"Clip";
     releasedFilters<<"Cut";
     releasedFilters<<"Threshold";
+    releasedFilters<<"Contour";
+    releasedFilters<<"StreamTracer";
 
     QMenu *releasedMenu = this->Implementation->FilterMenu->addMenu("Released") << pqSetName("Released");
     for(iter = releasedFilters.begin(); iter != releasedFilters.end(); ++iter)
