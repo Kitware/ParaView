@@ -559,6 +559,14 @@ protected:
 
   vtkKWApplicationInternals *Internals;
 
+  // Description:
+  // Initialize VTK's Tcl packages
+  // Return NULL on error (eventually provides an ostream where detailed
+  // error messages will be stored).
+  //BTX
+  static Tcl_Interp *InitializeVTK(Tcl_Interp *interp, ostream *err = 0);
+  //ETX
+
 private:
 
   vtkKWRegistryHelper *RegistryHelper;

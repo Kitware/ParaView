@@ -70,7 +70,7 @@ const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.293");
+vtkCxxRevisionMacro(vtkKWApplication, "1.294");
 
 extern "C" int Kwwidgets_Init(Tcl_Interp *interp);
 
@@ -564,62 +564,8 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
 }
 
 //----------------------------------------------------------------------------
-Tcl_Interp *vtkKWApplication::InitializeTcl(Tcl_Interp *interp, ostream *err)
+Tcl_Interp *vtkKWApplication::InitializeVTK(Tcl_Interp *interp, ostream *err)
 {
-  // As a convenience, try to find the text domain binding for
-  // KWWidgets right now
-
-  vtkKWInternationalization::FindTextDomainBinding(
-    "KWWidgets", KWWidgets_INSTALL_DATA_DIR);
-
-  if (Et_Interp)
-    {
-    return NULL;
-    }
-
-  // Init Tcl
-
-  Et_Interp = interp;
-
-  int status;
-
-  status = Tcl_Init(interp);
-  if (status != TCL_OK)
-    {
-    if (err)
-      {
-      *err << "Tcl_Init error: " << Tcl_GetStringResult(interp) << endl;
-      }
-    return NULL;
-    }
-
-  // Init Tk
-
-  if (!Tcl_PkgPresent(interp, "Tk", NULL, 0))
-    {
-    status = Tk_Init(interp);
-    if (status != TCL_OK)
-      {
-      if (err)
-        {
-        *err << "Tk_Init error: " << Tcl_GetStringResult(interp) << endl;
-        }
-      return NULL;
-      }
-
-    Tcl_StaticPackage(interp, (char *)"Tk", Tk_Init, 0);
-    }
-    
-  // As a convenience, withdraw the main Tk toplevel
-
-  Tcl_GlobalEval(interp, "wm withdraw .");
-
-  // Create the SetApplicationIcon command
-
-#ifdef _WIN32
-  vtkKWSetApplicationIconTclCommand_DoInit(interp);
-#endif
-
   // Initialize VTK
 
   if (Vtkcommontcl_Init(interp) != TCL_OK) 
@@ -748,6 +694,70 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(Tcl_Interp *interp, ostream *err)
 #endif
 
 #endif
+
+  return interp;
+}
+
+//----------------------------------------------------------------------------
+Tcl_Interp *vtkKWApplication::InitializeTcl(Tcl_Interp *interp, ostream *err)
+{
+  // As a convenience, try to find the text domain binding for
+  // KWWidgets right now
+
+  vtkKWInternationalization::FindTextDomainBinding(
+    "KWWidgets", KWWidgets_INSTALL_DATA_DIR);
+
+  if (Et_Interp)
+    {
+    return NULL;
+    }
+
+  // Init Tcl
+
+  Et_Interp = interp;
+
+  int status;
+
+  status = Tcl_Init(interp);
+  if (status != TCL_OK)
+    {
+    if (err)
+      {
+      *err << "Tcl_Init error: " << Tcl_GetStringResult(interp) << endl;
+      }
+    return NULL;
+    }
+
+  // Init Tk
+
+  if (!Tcl_PkgPresent(interp, "Tk", NULL, 0))
+    {
+    status = Tk_Init(interp);
+    if (status != TCL_OK)
+      {
+      if (err)
+        {
+        *err << "Tk_Init error: " << Tcl_GetStringResult(interp) << endl;
+        }
+      return NULL;
+      }
+
+    Tcl_StaticPackage(interp, (char *)"Tk", Tk_Init, 0);
+    }
+    
+  // As a convenience, withdraw the main Tk toplevel
+
+  Tcl_GlobalEval(interp, "wm withdraw .");
+
+  // Create the SetApplicationIcon command
+
+#ifdef _WIN32
+  vtkKWSetApplicationIconTclCommand_DoInit(interp);
+#endif
+
+  // Initialize VTK
+
+  vtkKWApplication::InitializeVTK(interp, err);
 
   // Initialize Widgets
 
