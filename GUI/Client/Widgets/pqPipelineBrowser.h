@@ -39,12 +39,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqWidgetsExport.h"
 #include <QWidget>
+#include <QPointer>
 
 class pqFlatTreeView;
 class pqPipelineModel;
 class pqServerManagerModelItem;
 class pqPipelineSource;
 class pqServer;
+class pqRenderModule;
 class QItemSelectionModel;
 class QModelIndex;
 
@@ -76,6 +78,9 @@ public:
   /// returns the server for the currently selected branch.
   /// This is a convienience method.
   pqServer *getCurrentServer() const;
+  
+  /// get the render module this pipeline browser works with
+  pqRenderModule *getRenderModule();
 
 public slots:
   // Call this to select the particular item.
@@ -85,10 +90,16 @@ public slots:
 
   void deleteSelected();
 
+  /// set the current render module for the pipeline browser
+  void setRenderModule(pqRenderModule* rm);
+
 signals:
   // Fired when the selection is changed. Argument is the newly selected
   // item.
   void selectionChanged(pqServerManagerModelItem* selectedItem);
+  
+  /// Fired when the render module changes
+  void renderModuleChanged(pqRenderModule*);
 
 private slots:
   void changeCurrent(const QModelIndex &current, const QModelIndex &previous);
@@ -97,6 +108,7 @@ private slots:
 private:
   pqPipelineModel *ListModel;
   pqFlatTreeView *TreeView;
+  QPointer<pqRenderModule> RenderModule;
 };
 
 #endif

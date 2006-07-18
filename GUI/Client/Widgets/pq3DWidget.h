@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkPVXMLElement;
 class vtkSMProperty;
 class pqProxy;
+class pqRenderModule;
 class vtkSMNew3DWidgetProxy;
 class pq3DWidgetInternal;
 
@@ -85,6 +86,9 @@ public:
   /// Returns if the 3D widget is visible for the current
   /// reference proxy.
   bool widgetVisibile() const;
+  
+  /// Get the render module that this widget works with
+  pqRenderModule* getRenderModule();
 
 signals:
   /// Notifies observers that the user is dragging the 3D widget
@@ -120,6 +124,9 @@ public slots:
   /// The correspondence is determined from the <Hints />
   /// associated with the controlled proxy.
   virtual void reset();
+
+  /// Set the render module that this widget works with
+  virtual void setRenderModule(pqRenderModule* rm);
 
 protected:
   /// Subclasses can override this method to map properties to

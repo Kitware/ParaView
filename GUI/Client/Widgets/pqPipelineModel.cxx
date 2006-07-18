@@ -229,7 +229,7 @@ public:
 
   QList<pqPipelineModelServer *> Servers;
   QMap<pqServerManagerModelItem *, QPointer<pqPipelineModelItem> > ItemMap;
-  pqRenderModule *CurrentView;
+  pqRenderModule *RenderModule;
   pqServer *CleanupServer;
 };
 
@@ -483,7 +483,7 @@ pqServerManagerModelItem *pqPipelineModelLink::getObject() const
 pqPipelineModelInternal::pqPipelineModelInternal()
   : Servers(), ItemMap()
 {
-  this->CurrentView = 0;
+  this->RenderModule = 0;
   this->CleanupServer = 0;
 }
 
@@ -623,7 +623,7 @@ QVariant pqPipelineModel::data(const QModelIndex &idx, int role) const
           if(idx.column() == 1)
             {
             pqPipelineModelItem::VisibleState visible = item->getVisibleState(
-                this->Internal->CurrentView);
+                this->Internal->RenderModule);
             if(visible == pqPipelineModelItem::Visible)
               {
               return QVariant(QIcon(
@@ -1023,9 +1023,9 @@ void pqPipelineModel::updateDisplays(pqPipelineSource *source,
     }
 }
 
-void pqPipelineModel::setCurrentRenderModule(pqRenderModule *module)
+void pqPipelineModel::setRenderModule(pqRenderModule *module)
 {
-  if(module == this->Internal->CurrentView)
+  if(module == this->Internal->RenderModule)
     {
     return;
     }
@@ -1036,10 +1036,10 @@ void pqPipelineModel::setCurrentRenderModule(pqRenderModule *module)
   // current render module to look up the affected sources.
   QModelIndex changed;
   pqPipelineModelItem *item = 0;
-  if(this->Internal->CurrentView && module &&
-      this->Internal->CurrentView->getServer() != module->getServer())
+  if(this->Internal->RenderModule && module &&
+      this->Internal->RenderModule->getServer() != module->getServer())
     {
-    this->Internal->CurrentView = module;
+    this->Internal->RenderModule = module;
     if(this->Internal->Servers.size() > 0)
       {
       item = this->Internal->Servers.first();
@@ -1054,15 +1054,15 @@ void pqPipelineModel::setCurrentRenderModule(pqRenderModule *module)
     }
   else
     {
-    if(this->Internal->CurrentView)
+    if(this->Internal->RenderModule)
       {
-      this->updateDisplays(this->Internal->CurrentView);
+      this->updateDisplays(this->Internal->RenderModule);
       }
 
-    this->Internal->CurrentView = module;
-    if(this->Internal->CurrentView)
+    this->Internal->RenderModule = module;
+    if(this->Internal->RenderModule)
       {
-      this->updateDisplays(this->Internal->CurrentView);
+      this->updateDisplays(this->Internal->RenderModule);
       }
     }
 }

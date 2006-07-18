@@ -128,28 +128,14 @@ pqWidgetObjectPanel::~pqWidgetObjectPanel()
 //-----------------------------------------------------------------------------
 void pqWidgetObjectPanel::select()
 {
-  pqPipelineSource* source;
-  pqPipelineDisplay* display = NULL;
-  pqRenderModule* renModule = NULL;
-  
-  source = qobject_cast<pqPipelineSource*>(this->proxy());
-  if(source)
+  if (this->Widget && this->RenderModule)
     {
-    display = source->getDisplay(0);
-    }
-  if(display)
-    {
-    renModule = display->getRenderModule(0);
-    }
-  
-  if (this->Widget && renModule)
-    {
-    vtkSMRenderModuleProxy* rm = renModule->getRenderModuleProxy() ;
+    vtkSMRenderModuleProxy* rm = this->RenderModule->getRenderModuleProxy() ;
     vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
       rm->GetProperty("Displays"));
     pp->AddProxy(this->Widget);
     rm->UpdateVTKObjects();
-    renModule->render();
+    this->RenderModule->render();
     }
     
   if(this->Widget)
@@ -164,28 +150,14 @@ void pqWidgetObjectPanel::deselect()
   if(this->Widget)
     this->Widget->RemoveObserver(this->Observer);
 
-  pqPipelineSource* source;
-  pqPipelineDisplay* display = NULL;
-  pqRenderModule* renModule = NULL;
-  
-  source = qobject_cast<pqPipelineSource*>(this->proxy());
-  if(source)
+  if (this->Widget && this->RenderModule)
     {
-    display = source->getDisplay(0);
-    }
-  if(display)
-    {
-    renModule = display->getRenderModule(0);
-    }
-
-  if (this->Widget && renModule)
-    {
-    vtkSMRenderModuleProxy* rm = renModule->getRenderModuleProxy() ;
+    vtkSMRenderModuleProxy* rm = this->RenderModule->getRenderModuleProxy() ;
     vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
       rm->GetProperty("Displays"));
     pp->RemoveProxy(this->Widget);
     rm->UpdateVTKObjects();
-    renModule->render();
+    this->RenderModule->render();
     }
   this->pqNamedObjectPanel::deselect();
 }
@@ -342,22 +314,8 @@ void pqWidgetObjectPanel::onUseCameraNormal()
 {
   if(this->Widget)
     {
-    pqPipelineSource* source;
-    pqPipelineDisplay* display = NULL;
-    pqRenderModule* renModule = NULL;
-    
-    source = qobject_cast<pqPipelineSource*>(this->proxy());
-    if(source)
-      {
-      display = source->getDisplay(0);
-      }
-    if(display)
-      {
-      renModule = display->getRenderModule(0);
-      }
-    
-    if(vtkCamera* const camera = renModule ?
-      renModule->getRenderModuleProxy()->GetRenderer()->GetActiveCamera() : NULL)
+    if(vtkCamera* const camera = this->RenderModule ?
+      this->RenderModule->getRenderModuleProxy()->GetRenderer()->GetActiveCamera() : NULL)
       {
       if(vtkSMDoubleVectorProperty* const normal = vtkSMDoubleVectorProperty::SafeDownCast(
         this->Widget->GetProperty("Normal")))

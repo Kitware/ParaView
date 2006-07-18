@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Paraview Server Manager includes
 
 // ParaView includes
+#include "pqProxy.h"
 
 
 /// constructor

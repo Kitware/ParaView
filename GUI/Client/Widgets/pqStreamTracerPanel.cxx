@@ -84,6 +84,12 @@ pqStreamTracerPanel::pqStreamTracerPanel(QWidget* p) :
   base(p),
   Implementation(new pqImplementation(this))
 {
+  this->Implementation->PointSourceWidget->setRenderModule(
+    this->getRenderModule());
+  QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderModule*)),
+                   this->Implementation->PointSourceWidget,
+                   SLOT(setRenderModule(pqRenderModule*)));
+
   QVBoxLayout* const panel_layout = new QVBoxLayout();
 
   this->Implementation->Controls.setupUi(

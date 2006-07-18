@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineFilter.h"
 #include "pqPipelineDisplay.h"
 
+#include <QPointer>
+
 #include "ui_pqLineWidget.h"
 
 #include <vtkCamera.h>
@@ -93,6 +95,8 @@ public:
   bool IgnoreQtWidgets;
   /// Used to avoid recursion when updating the 3D widget
   bool Ignore3DWidget;
+  
+  QPointer<pqRenderModule> RenderModule;
   
   static QMap<pqProxy*, bool> Visibility;
 };
@@ -154,33 +158,16 @@ pqLineWidget::~pqLineWidget()
 
   if(this->Implementation->Widget)
     {
-    pqPipelineFilter* source;
-    pqPipelineSource* source1 = NULL;
-    pqPipelineDisplay* display = NULL;
-    pqRenderModule* renModule = NULL;
-    source = qobject_cast<pqPipelineFilter*>(this->Implementation->ReferenceProxy);
-    if(source)
+    if(this->getRenderModule())
       {
-      source1 = source->getInput(0);
-      }
-    if(source1)
-      {
-      display = source1->getDisplay(0);
-      }
-    if(display)
-      {
-      renModule = display->getRenderModule(0);
-      }
-    if(renModule)
-      {
-      if(vtkSMRenderModuleProxy* rm = renModule->getRenderModuleProxy())
+      if(vtkSMRenderModuleProxy* rm = this->getRenderModule()->getRenderModuleProxy())
         {
         if(vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
           rm->GetProperty("Displays")))
           {
           pp->RemoveProxy(this->Implementation->Widget);
           rm->UpdateVTKObjects();
-          renModule->render();
+          this->getRenderModule()->render();
           }
         }
       }
@@ -230,32 +217,14 @@ void pqLineWidget::setReferenceProxy(pqProxy* proxy)
     // Synchronize the 3D widget bounds with the source data ...
     this->onUseXAxis();
 
-    pqPipelineFilter* source;
-    pqPipelineSource* source1 = NULL;
-    pqPipelineDisplay* display = NULL;
-    pqRenderModule* renModule = NULL;
-    source = qobject_cast<pqPipelineFilter*>(this->Implementation->ReferenceProxy);
-    if(source)
+    if(this->Implementation->Widget && this->getRenderModule())
       {
-      source1 = source->getInput(0);
-      }
-    if(source1)
-      {
-      display = source1->getDisplay(0);
-      }
-    if(display)
-      {
-      renModule = display->getRenderModule(0);
-      }
-      
-    if(this->Implementation->Widget && renModule)
-      {
-      vtkSMRenderModuleProxy* rm = renModule->getRenderModuleProxy() ;
+      vtkSMRenderModuleProxy* rm = this->getRenderModule()->getRenderModuleProxy() ;
       vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
         rm->GetProperty("Displays"));
       pp->AddProxy(this->Implementation->Widget);
       rm->UpdateVTKObjects();
-      renModule->render();
+      this->getRenderModule()->render();
       }
       
     if(this->Implementation->Widget)
@@ -634,5 +603,15 @@ void pqLineWidget::update3DWidget(const double point1[3], const double point2[3]
     }
     
   this->Implementation->Ignore3DWidget = false;
+}
+
+void pqLineWidget::setRenderModule(pqRenderModule* rm)
+{
+  this->Implementation->RenderModule = rm;
+}
+
+pqRenderModule* pqLineWidget::getRenderModule()
+{
+  return this->Implementation->RenderModule;
 }
 

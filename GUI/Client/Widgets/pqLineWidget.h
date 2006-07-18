@@ -53,12 +53,18 @@ public:
   void getWidgetState(double point1[3], double point2[3]);
   /// Sets the current state of the widget
   void setWidgetState(const double point1[3], const double point2[3]);
+  
+  /// get the render module this widget works with
+  pqRenderModule* getRenderModule();
 
 public slots:
   /// Makes the 3D widget visible (but respects the user's choice if they've turned visibility off)
   void showWidget();
   /// Hides the 3D widget
   void hideWidget();
+
+  /// Set the render module to work with
+  void setRenderModule(pqRenderModule*);
 
 signals:
   /// Notifies observers that the user is dragging the 3D widget

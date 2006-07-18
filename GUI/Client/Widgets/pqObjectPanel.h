@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QWidget>
 #include <QPointer>
 class pqProxy;
+class pqRenderModule;
 
 class pqPropertyManager;
 
@@ -63,6 +64,9 @@ public:
   /// property manager
   pqPropertyManager* getPropertyManager()
     { return this->PropertyManager; }
+  
+  /// get the render module that this object panel works with
+  pqRenderModule* getRenderModule();
 
 public slots:
   /// accept the changes made to the properties
@@ -84,20 +88,25 @@ public slots:
   /// nothing.
   virtual void deselect() { emit this->ondeselect(); }
 
+  /// Set the render module that this panel works with
+  virtual void setRenderModule(pqRenderModule*);
+
 signals:
   void canAcceptOrReject(bool);
   void onaccept();
   void onreset();
   void onselect();
   void ondeselect();
+  void renderModuleChanged(pqRenderModule*);
 
 protected:
   /// Internal method that actually sets the proxy. Subclasses must override
   /// this instead of setProxy().
   virtual void setProxyInternal(pqProxy* proxy);
 
-  pqProxy* Proxy;
+  QPointer<pqProxy> Proxy;
   pqPropertyManager* PropertyManager;
+  QPointer<pqRenderModule> RenderModule;
 };
 
 #endif

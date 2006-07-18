@@ -51,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqPropertyManager.h"
 #include "pqServerManagerModel.h"
+#include "pqRenderModule.h"
 
 
 //-----------------------------------------------------------------------------
@@ -145,5 +146,16 @@ void pqObjectPanel::reset()
   this->Proxy->getProxy()->UpdatePropertyInformation();
   this->PropertyManager->reject();
   emit this->onreset();
+}
+
+void pqObjectPanel::setRenderModule(pqRenderModule* rm)
+{
+  this->RenderModule = rm;
+  emit this->renderModuleChanged(this->RenderModule);
+}
+
+pqRenderModule* pqObjectPanel::getRenderModule()
+{
+  return this->RenderModule;
 }
 

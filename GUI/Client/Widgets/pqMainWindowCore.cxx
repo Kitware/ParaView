@@ -198,6 +198,7 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
                    &this->selectionManager(),
                    SLOT(setActiveRenderModule(pqRenderModule*)));
   
+  
   pqApplicationCore* const core = pqApplicationCore::instance();
 
   this->Implementation->RecentFilesList
@@ -501,8 +502,8 @@ void pqMainWindowCore::setupPipelineBrowser(QDockWidget* dock_widget)
   QObject::connect(
     this,
     SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
-    pipeline_browser->getListModel(),
-    SLOT(setCurrentRenderModule(pqRenderModule*)));
+    pipeline_browser,
+    SLOT(setRenderModule(pqRenderModule*)));
 }
 
 pqObjectInspectorWidget* pqMainWindowCore::setupObjectInspector(QDockWidget* dock_widget)
@@ -556,6 +557,11 @@ pqObjectInspectorWidget* pqMainWindowCore::setupObjectInspector(QDockWidget* doc
     SIGNAL(activeSourceChanged(pqProxy*)),
     object_inspector,
     SLOT(setProxy(pqProxy*)));
+  
+  QObject::connect(this,
+                   SIGNAL(activeRenderModuleChanged(pqRenderModule*)),
+                   object_inspector,
+                   SLOT(setRenderModule(pqRenderModule*)));
 
   return object_inspector;
 }
@@ -1806,8 +1812,6 @@ void pqMainWindowCore::setActiveRenderModule(pqRenderModule* rm)
     }
   this->Implementation->ActiveRenderModule = rm;
   emit this->activeRenderModuleChanged(rm);
-
-
 }
 
 //-----------------------------------------------------------------------------

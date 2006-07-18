@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineModelSelectionAdaptor.h"
 #include "pqPipelineSource.h"
 #include "pqServer.h"
+#include "pqRenderModule.h"
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 
@@ -64,6 +65,8 @@ pqPipelineBrowser::pqPipelineBrowser(QWidget *widgetParent)
 
   // Get the pipeline model from the pipeline data.
   this->ListModel = new pqPipelineModel(this);
+  QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderModule*)),
+                   this->ListModel, SLOT(setRenderModule(pqRenderModule*)));
 
   // Connect the model to the ServerManager model.
   pqServerManagerModel* smModel = 
@@ -303,17 +306,17 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
     if(index.column() == 1)
       {
       // If the column clicked is 1, the user clicked the visible icon.
-      pqPipelineDisplay *display = source->getDisplay(0);  // TODO fix hardcoded 0 to
-                                                           // get first display
+      // Get the display object for the current window.
+      pqPipelineDisplay *display = source->getDisplay(this->getRenderModule());
 
       // If the display exists, toggle the display. Otherwise, create a
       // display for the source in the current window.
       if(!display)
         {
-        qWarning("can't make display for source");
-        //pqApplicationCore* core = pqApplicationCore::instance();
-        //core->getPipelineBuilder()->createDisplayProxy(source, module);
-        //display = source->getDisplay(module);
+        pqApplicationCore* core = pqApplicationCore::instance();
+        core->getPipelineBuilder()->createDisplayProxy(source,
+          this->getRenderModule());
+        display = source->getDisplay(this->getRenderModule());
         }
       else
         {
@@ -327,6 +330,17 @@ void pqPipelineBrowser::handleIndexClicked(const QModelIndex &index)
     //  // If the column clicked is 2, the user clicked the input menu.
     //  }
     }
+}
+
+void pqPipelineBrowser::setRenderModule(pqRenderModule* rm)
+{
+  this->RenderModule = rm;
+  emit this->renderModuleChanged(rm);
+}
+
+pqRenderModule* pqPipelineBrowser::getRenderModule()
+{
+  return this->RenderModule;
 }
 
 

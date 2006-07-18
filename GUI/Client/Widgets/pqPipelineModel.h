@@ -264,7 +264,7 @@ public slots:
   /// the entire column needs to be updated.
   ///
   /// \param module The current render module.
-  void setCurrentRenderModule(pqRenderModule *module);
+  void setRenderModule(pqRenderModule *module);
   //@}
 
 signals:

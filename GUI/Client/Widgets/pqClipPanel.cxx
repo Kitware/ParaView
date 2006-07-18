@@ -69,6 +69,10 @@ pqClipPanel::pqClipPanel(QWidget* p) :
   Superclass(p),
   Implementation(new pqImplementation(this))
 {
+  QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderModule*)),
+                   &this->Implementation->ImplicitPlaneWidget,
+                   SLOT(setRenderModule(pqRenderModule*)));
+
   QFrame* const separator = new QFrame();
   separator->setFrameShape(QFrame::HLine);
 

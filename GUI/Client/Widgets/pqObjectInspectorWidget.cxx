@@ -143,6 +143,17 @@ void pqObjectInspectorWidget::canAccept(bool status)
   this->ResetButton->setEnabled(status);
 }
 
+void pqObjectInspectorWidget::setRenderModule(pqRenderModule* rm)
+{
+  this->RenderModule = rm;
+  emit this->renderModuleChanged(this->RenderModule);
+}
+
+pqRenderModule* pqObjectInspectorWidget::getRenderModule()
+{
+  return this->RenderModule;
+}
+
 //-----------------------------------------------------------------------------
 void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
 {
@@ -177,6 +188,7 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
     }
 
   this->CurrentPanel = NULL;
+  bool reusedPanel = false;
 
   // search for a custom form for this proxy with pending changes
   QMap<pqProxy*, pqObjectPanel*>::iterator iter;
@@ -184,6 +196,7 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
   if(iter != this->PanelStore.end())
     {
     this->CurrentPanel = iter.value();
+    reusedPanel = true;
     }
 
   if(proxy && !this->CurrentPanel)
@@ -235,14 +248,22 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
 
   // the current auto panel always has the name "Editor"
   this->CurrentPanel->setObjectName("Editor");
-  this->CurrentPanel->setProxy(proxy);
   
-  QObject::connect(this->CurrentPanel->getPropertyManager(), 
-    SIGNAL(canAcceptOrReject(bool)), this, SLOT(canAccept(bool)));
+  if(!reusedPanel)
+    {
+    this->CurrentPanel->setRenderModule(this->getRenderModule());
+    this->CurrentPanel->setProxy(proxy);
 
-  QObject::connect(this->CurrentPanel, SIGNAL(canAcceptOrReject(bool)), 
-                   this, SLOT(canAccept(bool)));
-  
+    QObject::connect(this->CurrentPanel->getPropertyManager(), 
+      SIGNAL(canAcceptOrReject(bool)), this, SLOT(canAccept(bool)));
+
+    QObject::connect(this->CurrentPanel, SIGNAL(canAcceptOrReject(bool)), 
+                     this, SLOT(canAccept(bool)));
+    
+    QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderModule*)), 
+                     this->CurrentPanel, SLOT(setRenderModule(pqRenderModule*)));
+    }
+    
   this->PanelArea->layout()->addWidget(this->CurrentPanel);
   this->CurrentPanel->select();
   this->CurrentPanel->show();

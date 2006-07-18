@@ -55,6 +55,7 @@ class pq3DWidgetInternal
 {
 public:
   QPointer<pqProxy> ReferenceProxy;
+  QPointer<pqRenderModule> RenderModule;
   pqSMProxy ControlledProxy;
   vtkSmartPointer<vtkSMNew3DWidgetProxy> WidgetProxy;
   vtkSmartPointer<vtkCommand> ControlledPropertiesObserver;
@@ -342,3 +343,14 @@ void pq3DWidget::set3DWidgetVisibility(bool visible)
     pqApplicationCore::instance()->render();
     }
 }
+  
+void pq3DWidget::setRenderModule(pqRenderModule* rm)
+{
+  this->Internal->RenderModule = rm;
+}
+
+pqRenderModule* pq3DWidget::getRenderModule()
+{
+  return this->Internal->RenderModule;
+}
+

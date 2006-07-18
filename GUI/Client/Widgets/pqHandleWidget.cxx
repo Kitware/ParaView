@@ -125,35 +125,16 @@ pqHandleWidget::~pqHandleWidget()
 
   if(widget)
     {
-    pqPipelineFilter* source;
-    pqPipelineSource* source1 = NULL;
-    pqPipelineDisplay* display = NULL;
-    pqRenderModule* renModule = NULL;
-    
-    source = qobject_cast<pqPipelineFilter*>(this->getReferenceProxy());
-    if(source)
+    if(this->getRenderModule())
       {
-      source1 = source->getInput(0);
-      }
-    if(source1)
-      {
-      display = source1->getDisplay(0);
-      }
-    if(display)
-      {
-      renModule = display->getRenderModule(0);
-      }
-
-    if(renModule)
-      {
-      if(vtkSMRenderModuleProxy* rm = renModule->getRenderModuleProxy())
+      if(vtkSMRenderModuleProxy* rm = this->getRenderModule()->getRenderModuleProxy())
         {
         if(vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
           rm->GetProperty("Displays")))
           {
           pp->RemoveProxy(widget);
           rm->UpdateVTKObjects();
-          renModule->render();
+          this->getRenderModule()->render();
           }
         }
       }
@@ -203,33 +184,14 @@ void pqHandleWidget::setControlledProxy(vtkSMProxy* proxy)
 
     widget->UpdateVTKObjects();
 
-
-    pqPipelineFilter* source;
-    pqPipelineSource* source1 = NULL;
-    pqPipelineDisplay* display = NULL;
-    pqRenderModule* renModule = NULL;
-    source = qobject_cast<pqPipelineFilter*>(this->getReferenceProxy());
-    if(source)
+    if(widget && this->getRenderModule())
       {
-      source1 = source->getInput(0);
-      }
-    if(source1)
-      {
-      display = source1->getDisplay(0);
-      }
-    if(display)
-      {
-      renModule = display->getRenderModule(0);
-      }
-      
-    if(widget && renModule)
-      {
-      vtkSMRenderModuleProxy* rm = renModule->getRenderModuleProxy() ;
+      vtkSMRenderModuleProxy* rm = this->getRenderModule()->getRenderModuleProxy() ;
       vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
         rm->GetProperty("Displays"));
       pp->AddProxy(widget);
       rm->UpdateVTKObjects();
-      renModule->render();
+      this->getRenderModule()->render();
       }
       
     if(widget)
