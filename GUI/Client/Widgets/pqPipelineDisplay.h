@@ -43,6 +43,11 @@ class pqPipelineDisplayInternal;
 class pqPipelineSource;
 class pqRenderModule;
 class pqServer;
+
+class vtkPVDataSetAttributesInformation;
+class vtkPVDataSetAttributesInformation;
+class vtkPVArrayInformation;
+
 class vtkSMDataObjectDisplayProxy;
 
 /// This is PQ representation for a single display. A pqDisplay represents
@@ -72,9 +77,7 @@ public:
   // Else color by property.
   void setDefaultColorParametes(); 
 
-  // Call to select the coloring array. Internally calls
-  // pqPart::Color(), eventually pqPart code should probably 
-  // move in here.
+  // Call to select the coloring array. 
   void colorByArray(const char* arrayname, int fieldtype);
 
   // Returns if the display is shown in the given render module.
@@ -107,6 +110,17 @@ public:
   // otherwise render on idle.
   void renderAllViews(bool force=false);
 
+  /// get the names of the arrays that a part may be colored by
+  QList<QString> getColorFields();
+
+  /// set the array to color the part by
+  void setColorField(const QString& field);
+
+  /// get the array the part is colored by
+  /// if raw is true, it will not add (point) or (cell) but simply
+  /// return the array name
+  QString getColorField(bool raw=false);
+
 signals:
   // Fired when the visibility property of the underlying display changes.
   // It must be noted that this is fired on the property change, the property
@@ -129,6 +143,10 @@ protected:
 
 private:
   pqPipelineDisplayInternal *Internal; 
+  static void getColorArray(
+    vtkPVDataSetAttributesInformation* attrInfo,
+    vtkPVDataSetAttributesInformation* inAttrInfo,
+    vtkPVArrayInformation*& arrayInfo);
 };
 
 #endif

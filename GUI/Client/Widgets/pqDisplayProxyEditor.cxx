@@ -61,7 +61,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyLinks.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineSource.h"
-#include "pqParts.h"
 #include "pqRenderModule.h"
 
 class pqDisplayProxyEditorInternal : public Ui::pqDisplayProxyEditor
@@ -437,7 +436,7 @@ void pqDisplayProxyEditor::updateEnableState()
       attrInfo = geomInfo->GetCellDataInformation();
       }
     vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(
-      pqPart::GetColorField(display, true).toStdString().c_str());      
+      this->Internal->Display->getColorField(true).toStdString().c_str());
 
     if (arrayInfo && arrayInfo->GetDataType() == VTK_UNSIGNED_CHAR)
       {
@@ -464,11 +463,11 @@ void pqDisplayProxyEditor::colorByChanged(const QString& val)
     }
   if(val == "Solid Color")
     {
-    pqPart::Color(this->Internal->Display->getDisplayProxy(), NULL, 0);
+    this->Internal->Display->colorByArray(NULL, 0);
     }
   else
     {
-    pqPart::SetColorField(this->Internal->Display->getDisplayProxy(), val);
+    this->Internal->Display->setColorField(val);
     }
   this->updateEnableState();
   this->updateView();
@@ -493,7 +492,7 @@ void pqDisplayProxyEditor::updateColorByMenu(bool forceUpdate)
 
   QRegExp regExpCell("\\(cell\\)\\w*$");
   QRegExp regExpPoint("\\(point\\)\\w*$");
-  QList<QString> arrayNames = pqPart::GetColorFields(displayProxy);
+  QList<QString> arrayNames = this->Internal->Display->getColorFields();
   foreach (const QString& name, arrayNames)
     {
     if (regExpPoint.indexIn(name) != -1)
@@ -514,7 +513,7 @@ void pqDisplayProxyEditor::updateColorByMenu(bool forceUpdate)
     }
   //this->Internal->ColorBy->addItems();
   this->DisableSlots = 0;
-  QString currentArray = pqPart::GetColorField(displayProxy);
+  QString currentArray = this->Internal->Display->getColorField();
   int index = this->Internal->ColorBy->findText(currentArray);
   if (index == -1)
     {

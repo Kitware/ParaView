@@ -48,7 +48,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QIcon>
 
 #include "pqApplicationCore.h"
-#include "pqParts.h"
 #include "pqPipelineSource.h"
 #include "pqPipelineFilter.h"
 #include "pqPipelineDisplay.h"
@@ -210,7 +209,7 @@ void pqDisplayColorWidget::onVariableChanged(pqVariableType vtkNotUsed(type),
   pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
   stack->BeginOrContinueUndoSet("Color Change");
   pqPipelineDisplay* display = this->SelectedSource->getDisplay(0);
-  pqPart::SetColorField(display->getDisplayProxy(), name);
+  display->setColorField(name);
   stack->EndUndoSet();
   display->renderAllViews();
 }
@@ -242,8 +241,8 @@ void pqDisplayColorWidget::updateGUI()
     {
     this->BlockEmission = true;
     this->Variables->setCurrentIndex(
-      this->Variables->findText(pqPart::GetColorField(
-          this->SelectedSource->getDisplay(0)->getDisplayProxy())));
+      this->Variables->findText(
+        this->SelectedSource->getDisplay(0)->getColorField()));
     this->BlockEmission = false;
     }
 }
@@ -264,7 +263,7 @@ void pqDisplayColorWidget::reloadGUI()
   pqPipelineDisplay* display = source->getDisplay(0);
   vtkSMDataObjectDisplayProxy* displayProxy = display->getDisplayProxy();
 
-  QList<QString> arrayList = pqPart::GetColorFields(displayProxy);
+  QList<QString> arrayList = display->getColorFields();
   QRegExp regExpCell("\\(cell\\)\\w*$");
   QRegExp regExpPoint("\\(point\\)\\w*$");
   foreach(QString arrayName, arrayList)
@@ -283,7 +282,7 @@ void pqDisplayColorWidget::reloadGUI()
       }
     }
 
-  QString currentArray = pqPart::GetColorField(displayProxy);
+  QString currentArray = display->getColorField();
   int index =  this->Variables->findText(currentArray);
   if (index == -1)
     {

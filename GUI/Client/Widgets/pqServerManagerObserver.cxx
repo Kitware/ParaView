@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqMultiView.h"
 #include "pqMultiViewFrame.h"
-#include "pqParts.h"
 #include "pqPipelineModel.h"
 #include "pqServer.h"
 #include "pqServerManagerModel.h"

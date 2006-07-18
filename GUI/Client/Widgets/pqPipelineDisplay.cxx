@@ -39,6 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Server Manager includes.
 #include "vtkCommand.h"
 #include "vtkEventQtSlotConnect.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVGeometryInformation.h"
 #include "vtkSmartPointer.h" 
 #include "vtkSMDataObjectDisplayProxy.h"
 #include "vtkSMInputProperty.h"
@@ -49,9 +52,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtDebug>
 
 // ParaView includes.
-#include "pqParts.h"
+#include "pqApplicationCore.h"
+#include "pqPipelineBuilder.h"
 #include "pqPipelineSource.h"
 #include "pqRenderModule.h"
+#include "pqSMAdaptor.h"
 #include "pqServerManagerModel.h"
 
 
@@ -164,17 +169,200 @@ void pqPipelineDisplay::onInputChanged()
     }
 
 }
+
 //-----------------------------------------------------------------------------
 void pqPipelineDisplay::setDefaultColorParametes()
 {
-  // eventually the implementation from pqPart must move here.
-  pqPart::Color(this->getDisplayProxy());
+  vtkSMDataObjectDisplayProxy* displayProxy = this->getDisplayProxy();
+  if (!displayProxy)
+    {
+    return;
+    }
+
+  // if the source created a new point scalar, use it
+  // else if the source created a new cell scalar, use it
+  // else if the input color by array exists in this source, use it
+  // else color by property
+  
+  vtkPVDataInformation* inGeomInfo = 0;
+  vtkPVDataInformation* geomInfo = 0;
+  vtkPVDataSetAttributesInformation* inAttrInfo = 0;
+  vtkPVDataSetAttributesInformation* attrInfo;
+  vtkPVArrayInformation* arrayInfo;
+
+  geomInfo = displayProxy->GetGeometryInformation();
+    
+  // Look for a new point array.
+  // I do not think the logic is exactly as describerd in this methods
+  // comment.  I believe this method only looks at "Scalars".
+  attrInfo = geomInfo->GetPointDataInformation();
+  if (inGeomInfo)
+    {
+    inAttrInfo = inGeomInfo->GetPointDataInformation();
+    }
+  else
+    {
+    inAttrInfo = 0;
+    }
+  pqPipelineDisplay::getColorArray(attrInfo, inAttrInfo, arrayInfo);
+  if(arrayInfo)
+    {
+    this->colorByArray(arrayInfo->GetName(), 
+                       vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+    return;
+    }
+    
+  // Check for new cell scalars.
+  attrInfo = geomInfo->GetCellDataInformation();
+  if (inGeomInfo)
+    {
+    inAttrInfo = inGeomInfo->GetCellDataInformation();
+    }
+  else
+    {
+    inAttrInfo = 0;
+    }
+  pqPipelineDisplay::getColorArray(attrInfo, inAttrInfo, arrayInfo);
+  if(arrayInfo)
+    {
+    this->colorByArray(arrayInfo->GetName(), 
+                       vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+    return;
+    }
+    
+  if (geomInfo)
+    {
+    // Check for scalars in geometry
+    attrInfo = geomInfo->GetPointDataInformation();
+    this->getColorArray(attrInfo, inAttrInfo, arrayInfo);
+    if(arrayInfo)
+      {
+      this->colorByArray(arrayInfo->GetName(), 
+                         vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+      return;
+      }
+    }
+
+  if (geomInfo)
+    {
+    // Check for scalars in geometry
+    attrInfo = geomInfo->GetCellDataInformation();
+    this->getColorArray(attrInfo, inAttrInfo, arrayInfo);
+    if(arrayInfo)
+      {
+      this->colorByArray(arrayInfo->GetName(), 
+                         vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+      return;
+      }
+    }
+
+  // Color by property.
+  this->colorByArray(NULL, 0);
 }
 
 //-----------------------------------------------------------------------------
 void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
 {
-  pqPart::Color(this->getDisplayProxy(), arrayname, fieldtype);
+  vtkSMDataObjectDisplayProxy* displayProxy = this->getDisplayProxy();
+  if (!displayProxy)
+    {
+    return;
+    }
+
+  if(arrayname == 0)
+    {
+    pqSMAdaptor::setElementProperty(
+      displayProxy->GetProperty("ScalarVisibility"), 0);
+    displayProxy->UpdateVTKObjects();
+    return;
+    }
+
+  pqApplicationCore* core = pqApplicationCore::instance();
+  pqPipelineBuilder* builder = core->getPipelineBuilder();
+
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    displayProxy->GetProperty("LookupTable"));
+  vtkSMProxy* lut = 0;
+  if (pp->GetNumberOfProxies() == 0)
+    {
+    lut = builder->createLookupTable(this);
+    }
+  else
+    {
+    lut = pp->GetProxy(0);
+    }
+
+  if (!lut)
+    {
+    qDebug() << "Failed to create/locate Lookup Table.";
+    pqSMAdaptor::setElementProperty(
+      displayProxy->GetProperty("ScalarVisibility"), 0);
+    displayProxy->UpdateVTKObjects();
+    return;
+    }
+
+  pqSMAdaptor::setElementProperty(
+    displayProxy->GetProperty("ScalarVisibility"), 1);
+
+  vtkPVArrayInformation* ai;
+  if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
+    {
+    vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
+    ai = geomInfo->GetCellDataInformation()->GetArrayInformation(arrayname);
+    pqSMAdaptor::setEnumerationProperty(
+      displayProxy->GetProperty("ScalarMode"), "UseCellFieldData");
+    }
+  else
+    {
+    vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
+    ai = geomInfo->GetPointDataInformation()->GetArrayInformation(arrayname);
+    pqSMAdaptor::setEnumerationProperty(
+      displayProxy->GetProperty("ScalarMode"), "UsePointFieldData");
+    }
+
+  // array couldn't be found, look for it on the reader
+  // TODO: this support should be moved into the server manager and/or VTK
+  if(!ai)
+    {
+    pp = vtkSMProxyProperty::SafeDownCast(displayProxy->GetProperty("Input"));
+    vtkSMProxy* reader = pp->GetProxy(0);
+    while((pp = vtkSMProxyProperty::SafeDownCast(reader->GetProperty("Input"))))
+      reader = pp->GetProxy(0);
+    QList<QVariant> prop;
+    prop += arrayname;
+    prop += 1;
+    QList<QList<QVariant> > property;
+    property.push_back(prop);
+    if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
+      {
+      pqSMAdaptor::setSelectionProperty(
+        reader->GetProperty("CellArrayStatus"), property);
+      reader->UpdateVTKObjects();
+      vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
+      ai = geomInfo->GetCellDataInformation()->GetArrayInformation(arrayname);
+      }
+    else
+      {
+      pqSMAdaptor::setSelectionProperty(
+        reader->GetProperty("PointArrayStatus"), property);
+      reader->UpdateVTKObjects();
+      vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
+      ai = geomInfo->GetPointDataInformation()->GetArrayInformation(arrayname);
+      }
+    }
+  double range[2] = {0,1};
+  if(ai)
+    {
+    ai->GetComponentRange(0, range);
+    }
+  QList<QVariant> tmp;
+  tmp += range[0];
+  tmp += range[1];
+  pqSMAdaptor::setMultipleElementProperty(lut->GetProperty("ScalarRange"), tmp);
+  pqSMAdaptor::setElementProperty(displayProxy->GetProperty("ColorArray"), 
+                                  arrayname);
+  lut->UpdateVTKObjects();
+  displayProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -284,4 +472,154 @@ void pqPipelineDisplay::SaveState(vtkPVXMLElement *root,
     }
 }*/
 
+
+//-----------------------------------------------------------------------------
+void pqPipelineDisplay::getColorArray(
+  vtkPVDataSetAttributesInformation* attrInfo,
+  vtkPVDataSetAttributesInformation* inAttrInfo,
+  vtkPVArrayInformation*& arrayInfo)
+{  
+  arrayInfo = NULL;
+
+  // Check for new point scalars.
+  vtkPVArrayInformation* tmp =
+    attrInfo->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
+  vtkPVArrayInformation* inArrayInfo = 0;
+  if (tmp)
+    {
+    if (inAttrInfo)
+      {
+      inArrayInfo = inAttrInfo->GetAttributeInformation(
+        vtkDataSetAttributes::SCALARS);
+      }
+    if (inArrayInfo == 0 ||
+      strcmp(tmp->GetName(),inArrayInfo->GetName()) != 0)
+      { 
+      // No input or different scalars: use the new scalars.
+      arrayInfo = tmp;
+      }
+    }
+}
+
+
+//-----------------------------------------------------------------------------
+QList<QString> pqPipelineDisplay::getColorFields()
+{
+  vtkSMDisplayProxy* displayProxy = this->getDisplayProxy();
+
+  QList<QString> ret;
+  if(!displayProxy)
+    {
+    return ret;
+    }
+
+  // Actor color is one way to color this part
+  ret.append("Solid Color");
+
+  vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
+  if(!geomInfo)
+    {
+    return ret;
+    }
+
+  // get cell arrays
+  vtkPVDataSetAttributesInformation* cellinfo = 
+    geomInfo->GetCellDataInformation();
+  if(cellinfo)
+    {
+    for(int i=0; i<cellinfo->GetNumberOfArrays(); i++)
+      {
+      vtkPVArrayInformation* info = cellinfo->GetArrayInformation(i);
+      QString name = info->GetName();
+      name += " (cell)";
+      ret.append(name);
+      }
+    }
+  
+  // get point arrays
+  vtkPVDataSetAttributesInformation* pointinfo = 
+    geomInfo->GetPointDataInformation();
+  if(pointinfo)
+    {
+    for(int i=0; i<pointinfo->GetNumberOfArrays(); i++)
+      {
+      vtkPVArrayInformation* info = pointinfo->GetArrayInformation(i);
+      QString name = info->GetName();
+      name += " (point)";
+      ret.append(name);
+      }
+    }
+  return ret;
+}
+
+//-----------------------------------------------------------------------------
+void pqPipelineDisplay::setColorField(const QString& value)
+{
+  vtkSMDisplayProxy* displayProxy = this->getDisplayProxy();
+
+  if(!displayProxy)
+    {
+    return;
+    }
+
+  QString field = value;
+
+  if(field == "Solid Color")
+    {
+    this->colorByArray(0, 0);
+    }
+  else
+    {
+    if(field.right(strlen(" (cell)")) == " (cell)")
+      {
+      field.chop(strlen(" (cell)"));
+      this->colorByArray(field.toAscii().data(), 
+                         vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA);
+      }
+    else if(field.right(strlen(" (point)")) == " (point)")
+      {
+      field.chop(strlen(" (point)"));
+      this->colorByArray(field.toAscii().data(), 
+                         vtkSMDataObjectDisplayProxy::POINT_FIELD_DATA);
+      }
+    }
+}
+
+
+//-----------------------------------------------------------------------------
+QString pqPipelineDisplay::getColorField(bool raw)
+{
+  vtkSMDisplayProxy* displayProxy = this->getDisplayProxy();
+  if (!displayProxy)
+    {
+    return "";
+    }
+
+  QVariant scalarColor = pqSMAdaptor::getElementProperty(
+    displayProxy->GetProperty("ScalarVisibility"));
+  if(scalarColor.toBool())
+    {
+    QVariant scalarMode = pqSMAdaptor::getEnumerationProperty(
+      displayProxy->GetProperty("ScalarMode"));
+    QString scalarArray = pqSMAdaptor::getElementProperty(
+      displayProxy->GetProperty("ColorArray")).toString();
+    if (raw)
+      {
+      return scalarArray;
+      }
+    if(scalarMode == "UseCellFieldData")
+      {
+      return scalarArray + " (cell)";
+      }
+    else if(scalarMode == "UsePointFieldData")
+      {
+      return scalarArray + " (point)";
+      }
+    }
+  else
+    {
+    return "Solid Color";
+    }
+  return QString();
+}
 

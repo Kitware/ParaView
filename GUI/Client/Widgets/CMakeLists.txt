@@ -238,8 +238,6 @@ ADD_LIBRARY(pqWidgets
   pqOutputWindow.h
   pqOutputWindowAdapter.cxx
   pqOutputWindowAdapter.h
-  pqParts.cxx
-  pqParts.h
   pqPendingDisplayUndoElement.cxx
   pqPendingDisplayUndoElement.h
   #  pqPicking.cxx
