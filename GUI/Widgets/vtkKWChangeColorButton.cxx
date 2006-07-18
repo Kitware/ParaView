@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.72");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.73");
 
 //----------------------------------------------------------------------------
 vtkKWChangeColorButton::vtkKWChangeColorButton()
@@ -80,6 +80,8 @@ void vtkKWChangeColorButton::SetColor(double r, double g, double b)
   this->Color[2] = b;
 
   this->UpdateColorButton();
+
+  this->InvokeEvent(vtkKWChangeColorButton::ColorChangedEvent, this->Color);
 }
 
 //----------------------------------------------------------------------------
@@ -411,6 +413,9 @@ void vtkKWChangeColorButton::InvokeCommand(double r, double g, double b)
     {
     this->Script("%s %lf %lf %lf", this->Command, r, g, b);
     }
+  double rgb[3];
+  rgb[0] = r; rgb[1] = g; rgb[2] = b;
+  this->InvokeEvent(vtkKWChangeColorButton::ColorChangedEvent, rgb);
 }
 
 //----------------------------------------------------------------------------

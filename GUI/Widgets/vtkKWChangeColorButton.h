@@ -58,6 +58,19 @@ public:
   virtual void SetCommand(vtkObject *object, const char *method);
 
   // Description:
+  // Events. The ColorChangedEvent is triggered when the color of the button
+  // is changed. It is similar in concept to the 'Command' callback but can be
+  // used by multiple listeners/observers at a time.
+  // The following parameters are also passed as client data:
+  // - the current RGB color value: double[3]
+  //BTX
+  enum
+  {
+    ColorChangedEvent = 1000
+  };
+  //ETX
+
+  // Description:
   // Set the string that enables balloon help for this widget.
   // Override to pass down to children.
   virtual void SetBalloonHelpString(const char *str);
