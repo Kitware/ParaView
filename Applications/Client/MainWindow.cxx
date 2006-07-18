@@ -271,6 +271,11 @@ MainWindow::MainWindow() :
   connect(this->Implementation->UI.actionSelectionMode, 
     SIGNAL(triggered()), &this->Implementation->Core.selectionManager(), SLOT(switchToSelection()));
 
+  // Setup the 'modes' so that they are exclusively selected
+  QActionGroup *modeGroup = new QActionGroup(this);
+    modeGroup->addAction(this->Implementation->UI.actionMoveMode);
+    modeGroup->addAction(this->Implementation->UI.actionSelectionMode);
+
   this->Implementation->Core.setupVariableToolbar(
     this->Implementation->UI.variableToolbar);
   connect(

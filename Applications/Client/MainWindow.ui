@@ -40,22 +40,52 @@
     <addaction name="separator" />
     <addaction name="actionHelpEnableTooltips" />
    </widget>
-   <widget class="QMenu" name="menuFilters" >
-    <property name="title" >
-     <string>F&amp;ilters</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuSources" >
-    <property name="title" >
-     <string>S&amp;ources</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuServer" >
     <property name="title" >
      <string>&amp;Server</string>
     </property>
     <addaction name="actionServerConnect" />
     <addaction name="actionServerDisconnect" />
+   </widget>
+   <widget class="QMenu" name="menuSources" >
+    <property name="title" >
+     <string>S&amp;ources</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuFilters" >
+    <property name="title" >
+     <string>F&amp;ilters</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuPipeline" >
+    <property name="title" >
+     <string>&amp;Pipeline</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuTools" >
+    <property name="title" >
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="actionToolsCreateCustomFilter" />
+    <addaction name="actionToolsManageCustomFilters" />
+    <addaction name="separator" />
+    <addaction name="actionToolsDumpWidgetNames" />
+    <addaction name="actionToolsRecordTest" />
+    <addaction name="actionToolsRecordTestScreenshot" />
+    <addaction name="actionToolsPlayTest" />
+    <addaction name="separator" />
+    <addaction name="actionToolsPythonShell" />
+   </widget>
+   <widget class="QMenu" name="menuView" >
+    <property name="title" >
+     <string>&amp;View</string>
+    </property>
+    <widget class="QMenu" name="menuToolbars" >
+     <property name="title" >
+      <string>Toolbars</string>
+     </property>
+    </widget>
+    <addaction name="menuToolbars" />
    </widget>
    <widget class="QMenu" name="menuEdit" >
     <property name="title" >
@@ -88,36 +118,6 @@
     <addaction name="actionFileSaveAnimation" />
     <addaction name="separator" />
     <addaction name="actionFileExit" />
-   </widget>
-   <widget class="QMenu" name="menuView" >
-    <property name="title" >
-     <string>&amp;View</string>
-    </property>
-    <widget class="QMenu" name="menuToolbars" >
-     <property name="title" >
-      <string>Toolbars</string>
-     </property>
-    </widget>
-    <addaction name="menuToolbars" />
-   </widget>
-   <widget class="QMenu" name="menuTools" >
-    <property name="title" >
-     <string>&amp;Tools</string>
-    </property>
-    <addaction name="actionToolsCreateCustomFilter" />
-    <addaction name="actionToolsManageCustomFilters" />
-    <addaction name="separator" />
-    <addaction name="actionToolsDumpWidgetNames" />
-    <addaction name="actionToolsRecordTest" />
-    <addaction name="actionToolsRecordTestScreenshot" />
-    <addaction name="actionToolsPlayTest" />
-    <addaction name="separator" />
-    <addaction name="actionToolsPythonShell" />
-   </widget>
-   <widget class="QMenu" name="menuPipeline" >
-    <property name="title" >
-     <string>&amp;Pipeline</string>
-    </property>
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -445,14 +445,29 @@
    </property>
   </action>
   <action name="actionMoveMode" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="checked" >
+    <bool>true</bool>
+   </property>
+   <property name="enabled" >
+    <bool>true</bool>
+   </property>
    <property name="icon" >
     <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqPointer22.png</iconset>
    </property>
    <property name="text" >
     <string>Move Mode</string>
    </property>
+   <property name="shortcut" >
+    <string/>
+   </property>
   </action>
   <action name="actionSelectionMode" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
    <property name="icon" >
     <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqSelectPointer22.png</iconset>
    </property>
@@ -462,6 +477,9 @@
   </action>
   <action name="actionEditUndo" >
    <property name="checkable" >
+    <bool>false</bool>
+   </property>
+   <property name="enabled" >
     <bool>false</bool>
    </property>
    <property name="icon" >
@@ -475,6 +493,9 @@
    </property>
   </action>
   <action name="actionEditRedo" >
+   <property name="enabled" >
+    <bool>false</bool>
+   </property>
    <property name="icon" >
     <iconset resource="../../GUI/Client/Widgets/Resources/pqResources.qrc" >:/pqWidgets/Icons/pqRedo22.png</iconset>
    </property>
