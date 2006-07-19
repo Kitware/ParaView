@@ -1,9 +1,0 @@
-<?xml version="1.0" ?>
-<pqevents>
-  <pqevent object="multiviewtest/MultiViewSplitter/0/MultiViewFrameMenu/SplitVerticalButton" command="activate" arguments="" />
-  <pqevent object="multiviewtest/MultiViewSplitter/1/MultiViewFrameMenu/SplitHorizontalButton" command="activate" arguments="" />
-  <pqevent object="multiviewtest/MultiViewSplitter/0/MultiViewFrameMenu/SplitHorizontalButton" command="activate" arguments="" />
-  <pqevent object="multiviewtest/MultiViewSplitter/MultiViewSplitter:0/0/MultiViewFrameMenu/SplitVerticalButton" command="activate" arguments="" />
-  <pqevent object="multiviewtest/MultiViewSplitter/MultiViewSplitter:1/1/MultiViewFrameMenu/CloseButton" command="activate" arguments="" />
-  <pqevent object="multiviewtest/MultiViewSplitter/1/MultiViewFrameMenu/CloseButton" command="activate" arguments="" />
-</pqevents>

@@ -15,8 +15,10 @@ INCLUDE_DIRECTORIES(
   ${VTK_INCLUDE_DIR}
   ${PARAVIEW_INCLUDE_DIRS}
   ${ParaView_SOURCE_DIR}/VTK/GUISupport/Qt
-  ${pqWidgets_SOURCE_DIR}
-  ${pqWidgets_BINARY_DIR}
+  ${pqComponents_SOURCE_DIR}
+  ${pqComponents_BINARY_DIR}
+  ${pqCore_SOURCE_DIR}
+  ${pqCore_BINARY_DIR}
   ${QtWidgets_SOURCE_DIR}
   ${QtWidgets_BINARY_DIR}
   ${QtChart_SOURCE_DIR}

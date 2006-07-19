@@ -56,7 +56,8 @@ ADD_EXECUTABLE(DobranoViz WIN32 MACOSX_BUNDLE
 )
 
 TARGET_LINK_LIBRARIES(DobranoViz
-  pqWidgets
+  pqComponents
+  pqCore
   QtChart
   QtTesting
   QtWidgets

@@ -97,7 +97,8 @@ ADD_EXECUTABLE(paraview_alpha${PV_EXE_SUFFIX} WIN32 MACOSX_BUNDLE
 )
 
 TARGET_LINK_LIBRARIES(paraview_alpha${PV_EXE_SUFFIX}
-  pqWidgets
+  pqComponents
+  pqCore
   QtWidgets
   QtChart
   QtTesting

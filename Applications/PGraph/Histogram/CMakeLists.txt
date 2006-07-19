@@ -50,7 +50,8 @@ ADD_EXECUTABLE(PGraphHistogram WIN32 MACOSX_BUNDLE
 )
 
 TARGET_LINK_LIBRARIES(PGraphHistogram
-  pqWidgets
+  pqComponents
+  pqCore
   QtChart
   QtTesting
   QtWidgets

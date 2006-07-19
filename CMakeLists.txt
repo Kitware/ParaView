@@ -124,7 +124,7 @@ CONFIGURE_FILE(${ParaView_SOURCE_DIR}/vtkPQConfig.h.in
 
 #########################################################################
 IF (PARAVIEW_BUILD_QT_GUI)
-  SUBDIRS(GUI)
+  SUBDIRS(Qt)
 ENDIF (PARAVIEW_BUILD_QT_GUI)
 
 #########################################################################

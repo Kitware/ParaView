@@ -47,7 +47,8 @@ ADD_EXECUTABLE(csClient WIN32 MACOSX_BUNDLE
 )
 
 TARGET_LINK_LIBRARIES(csClient
-  pqWidgets
+  pqComponents
+  pqCore
   QtChart
   QtTesting
   QtWidgets
