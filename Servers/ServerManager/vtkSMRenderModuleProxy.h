@@ -19,7 +19,7 @@
 #ifndef __vtkSMRenderModuleProxy_h
 #define __vtkSMRenderModuleProxy_h
 
-#include "vtkSMProxy.h"
+#include "vtkSMAbstractViewModuleProxy.h"
 
 class vtkCamera;
 class vtkCollection;
@@ -35,10 +35,10 @@ class vtkTimerLog;
 
 // TODO: have to change the PVCameraManipulators to do ResetCamera on
 // the RenderModule rather than renderer.
-class VTK_EXPORT vtkSMRenderModuleProxy : public vtkSMProxy
+class VTK_EXPORT vtkSMRenderModuleProxy : public vtkSMAbstractViewModuleProxy
 {
 public:
-  vtkTypeRevisionMacro(vtkSMRenderModuleProxy, vtkSMProxy);
+  vtkTypeRevisionMacro(vtkSMRenderModuleProxy, vtkSMAbstractViewModuleProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -48,22 +48,6 @@ public:
   // don't forget to call UpdateVTKObjects() on the RenderModule.
   virtual void AddDisplay(vtkSMDisplayProxy* disp);
   virtual void RemoveDisplay(vtkSMDisplayProxy* disp);
-
-  // Description:
-  // Removes all added displays. 
-  // (Calls RemoveFromRenderModule on all displays).
-  virtual void RemoveAllDisplays();
-
-  // Description:
-  // Renders using Still/FullRes or interactive/LODs
-  virtual void StillRender();
-  virtual void InteractiveRender();
-  
-  // Description
-  // Subclass can create their own vtkSMDisplayProxy object by
-  // implementing this method.
-  // So far, others displays are not.
-  virtual vtkSMDisplayProxy* CreateDisplayProxy();
 
   // Description:
   // Update the cache of all visible part displays. For flip books.
@@ -107,10 +91,6 @@ public:
   void ComputeVisiblePropBounds(double bounds[6]);
 
   // Description:
-  // Returns the display collection.
-  vtkGetObjectMacro(Displays, vtkCollection);
-
-  // Description:
   // Get the value of the z buffer at a position. 
   // This is necessary for picking the center of rotation.
   virtual double GetZBufferValue(int x, int y);
@@ -121,24 +101,6 @@ public:
   vtkPVClientServerIdCollectionInformation* 
     Pick(int xs, int ys, int xe, int ye);
 
-//BTX
-enum ProxyType
-{
-  GEOMETRY,
-  INPUT,
-  DISPLAY
-};
-//ETX
-
-  // Description:
-  // This will look in the RenderModule's Displays and find the one
-  // that corresponds to the given id (obtained by Pick()).
-  // Which proxy is returned depends on the second argument (proxyType).
-  // If DISPLAY, the corresponding display proxy is returned.
-  // If INPUT, the input of the display proxy is returned.
-  // If GEOMETRY, the geometry filter proxy is returned
-  vtkSMProxy *GetProxyFromPropID(vtkClientServerID *id, int proxyType);
-
   // Description:
   // Reset camera to the given bounds.
   void ResetCamera(double bds[6]);
@@ -148,12 +110,6 @@ enum ProxyType
   // to obtain the bounds.
   void ResetCamera();
   
-  // Description:
-  // Save the display in batch script. This will eventually get 
-  // removed as we will generate batch script from ServerManager
-  // state. However, until then.
-  virtual void SaveInBatchScript(ofstream* file);
-
   // Description:
   // This method calls UpdateInformation on the Camera Proxy
   // and sets the Camera properties according to the info
@@ -180,17 +136,15 @@ enum ProxyType
   int GetServerRenderWindowSize(int size[2]);
 
   // Description:
+  // Save the display in batch script. This will eventually get 
+  // removed as we will generate batch script from ServerManager
+  // state. However, until then.
+  virtual void SaveInBatchScript(ofstream* file);
+
+  // Description:
   // Called when saving server manager state.
   // Overridden to SynchronizeCameraProperties before saving the properties.
   virtual vtkPVXMLElement* SaveState(vtkPVXMLElement* root);
-
-  // Description:
-  // Indicates if we should locally render.
-  virtual int IsRenderLocal() { return 1; }
-
-  // Description:
-  // Update all visible displays (therefore sources)
-  virtual void UpdateAllDisplays();  
 
   // Description:
   // Returns an image data that contains a "screenshot" of the window.
@@ -213,6 +167,24 @@ enum ProxyType
   vtkGetMacro(MaximumPolygonsPerSecond, double);
   vtkGetMacro(AveragePolygonsPerSecond, double);
 
+  //BTX
+  enum ProxyType
+    {
+    GEOMETRY,
+    INPUT,
+    DISPLAY
+    };
+  //ETX
+
+  // Description:
+  // This will look in the RenderModule's Displays and find the one
+  // that corresponds to the given id (obtained by Pick()).
+  // Which proxy is returned depends on the second argument (proxyType).
+  // If DISPLAY, the corresponding display proxy is returned.
+  // If INPUT, the input of the display proxy is returned.
+  // If GEOMETRY, the geometry filter proxy is returned
+  vtkSMProxy *GetProxyFromPropID(vtkClientServerID *id, int proxyType);
+
 protected:
   vtkSMRenderModuleProxy();
   ~vtkSMRenderModuleProxy();
@@ -230,10 +202,6 @@ protected:
   // Description:
   // Set the LOD decision.
   void SetLODFlag(int val);
-
-  // This collection keeps a reference to all Display Proxies added
-  // to this module.
-  vtkCollection* Displays;
 
   // Collection of props added to the renderer.
   vtkCollection* RendererProps; 
@@ -279,15 +247,9 @@ protected:
   virtual void RemovePropFromRenderer2D(vtkSMProxy* proxy);
   
   //BTX
-  friend class vtkSMDisplayProxy;
   friend class vtkSMNew3DWidgetProxy;
+  friend class vtkSMDisplayProxy;
   //ETX
-
-  // This is the XMLName of the proxy to get created when CreateDisplayProxy
-  // is called. It must be a proxy belonging to the group "displays"
-  // and must be a subclass of vtkSMDisplayProxy.
-  char* DisplayXMLName;
-  vtkSetStringMacro(DisplayXMLName);
 
   int RenderInterruptsEnabled;
   int ResetCameraClippingRangeTag;
@@ -305,13 +267,8 @@ protected:
 
   virtual void BeginInteractiveRender();
   virtual void EndInteractiveRender();
- 
-  // Return the servers  where the PrepareProgress request
-  // must be sent when rendering. By default,
-  // it is RENDER_SERVER|CLIENT, however in CompositeRenderModule,
-  // when rendering locally, the progress messages need not 
-  // be sent to the servers.
-  virtual vtkTypeUInt32 GetRenderingProgressServers();
+
+  virtual void PerformRender();
 
   vtkTimerLog *RenderTimer;
   double LastPolygonsPerSecond;

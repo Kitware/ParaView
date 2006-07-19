@@ -29,7 +29,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.15");
 
 vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderModuleProxy, 
                      ServerRenderWindowProxy,
@@ -481,9 +481,10 @@ void vtkSMIceTDesktopRenderModuleProxy::SetOrderedCompositing(int flag)
   this->OrderedCompositing = flag;
 
   vtkObject *obj;
-  this->Displays->InitTraversal();
-  for (obj = this->Displays->GetNextItemAsObject(); obj != NULL;
-       obj = this->Displays->GetNextItemAsObject())
+  vtkCollection* displays = this->GetDisplays();
+  displays->InitTraversal();
+  for (obj = displays->GetNextItemAsObject(); obj != NULL;
+       obj = displays->GetNextItemAsObject())
     {
     vtkSMDisplayProxy *disp = vtkSMDisplayProxy::SafeDownCast(obj);
     vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -569,9 +570,10 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
     // Check to see if the geometry of any visible objects has changed.
     vtkObject *obj;
     vtkCollectionSimpleIterator cookie;
-    this->Displays->InitTraversal(cookie);
-    for (obj = this->Displays->GetNextItemAsObject(cookie); obj != NULL;
-         obj = this->Displays->GetNextItemAsObject(cookie))
+    vtkCollection* displays = this->GetDisplays();
+    displays->InitTraversal(cookie);
+    for (obj = displays->GetNextItemAsObject(cookie); obj != NULL;
+         obj = displays->GetNextItemAsObject(cookie))
       {
       vtkSMDisplayProxy *disp = vtkSMDisplayProxy::SafeDownCast(obj);
       if (disp && disp->GetVisibilityCM())
@@ -603,9 +605,10 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
       // For all visibile displays, make sure their geometry is up to date
       // for the k-d tree and make sure the distribution gets updated after
       // the tree is reformed.
-      this->Displays->InitTraversal(cookie);
-      for (obj = this->Displays->GetNextItemAsObject(cookie); obj != NULL;
-           obj = this->Displays->GetNextItemAsObject(cookie))
+      vtkCollection* displays = this->GetDisplays();
+      displays->InitTraversal(cookie);
+      for (obj = displays->GetNextItemAsObject(cookie); obj != NULL;
+           obj = displays->GetNextItemAsObject(cookie))
         {
         vtkSMDisplayProxy *disp = vtkSMDisplayProxy::SafeDownCast(obj);
         if (disp && disp->GetVisibilityCM())

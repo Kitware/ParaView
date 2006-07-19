@@ -10,6 +10,7 @@ ENDIF(NOT WIN32)
 
 SET(Kit_SRCS
   vtkSM3DWidgetProxy.cxx
+  vtkSMAbstractViewModuleProxy.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
   vtkSMAnimationCueProxy.cxx
   vtkSMAnimationSceneProxy.cxx
@@ -163,6 +164,7 @@ SET( ServerManager_SRCS
 # Abstract and Wrap exclude
 SET_SOURCE_FILES_PROPERTIES(
   vtkSM3DWidgetProxy.cxx
+  vtkSMAbstractViewModuleProxy.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
   vtkSMConsumerDisplayProxy.cxx
   vtkSMDomain.cxx

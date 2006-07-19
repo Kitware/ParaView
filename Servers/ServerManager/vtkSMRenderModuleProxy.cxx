@@ -49,7 +49,7 @@
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.37");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.38");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -99,10 +99,8 @@ vtkSMRenderModuleProxy::vtkSMRenderModuleProxy()
   this->InteractorProxy = 0;
   this->LightKitProxy = 0;
   this->HelperProxy = 0;
-  this->Displays = vtkCollection::New();
   this->RendererProps = vtkCollection::New();
   this->Renderer2DProps = vtkCollection::New();
-  this->DisplayXMLName = 0;
   this->ResetCameraClippingRangeTag = 0;
   this->AbortCheckTag = 0;
   this->StartRenderEventTag = 0;
@@ -142,7 +140,6 @@ vtkSMRenderModuleProxy::~vtkSMRenderModuleProxy()
     this->Renderer->RemoveObserver(this->StartRenderEventTag);
     this->StartRenderEventTag = 0;
     }
-  this->Displays->Delete();
   this->RendererProps->Delete();
   this->Renderer2DProps->Delete();
   this->RendererProxy = 0;
@@ -152,7 +149,6 @@ vtkSMRenderModuleProxy::~vtkSMRenderModuleProxy()
   this->InteractorProxy = 0;
   this->LightKitProxy = 0;
   this->HelperProxy = 0;
-  this->SetDisplayXMLName(0);
 
   this->Renderer = 0;
   this->Renderer2D = 0;
@@ -234,8 +230,6 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
   // I don't directly use this->SetServers() to set the servers of the
   // subproxies, as the subclasses may have special subproxies that have
   // specific servers on which they want those to be created.
-  this->SetServersSelf(
-    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->RendererProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->Renderer2DProxy->SetServers(
@@ -463,48 +457,27 @@ void vtkSMRenderModuleProxy::SetLODFlag(int val)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMRenderModuleProxy::InteractiveRender()
+void vtkSMRenderModuleProxy::BeginInteractiveRender()
 {
-  this->UpdateAllDisplays();
-
   vtkRenderWindow *renWin = this->GetRenderWindow(); 
   renWin->SetDesiredUpdateRate(5.0);
   this->GetRenderer()->ResetCameraClippingRange();
 
   //vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   //pm->SendPrepareProgress(this->ConnectionID, this->GetRenderingProgressServers());
-  this->BeginInteractiveRender();
-  if ( this->MeasurePolygonsPerSecond )
-    {
-    this->RenderTimer->StartTimer();
-    }
-  renWin->Render();
-  if ( this->MeasurePolygonsPerSecond )
-    {
-    this->RenderTimer->StopTimer();
-    this->CalculatePolygonsPerSecond(this->RenderTimer->GetElapsedTime());
-    }
-  this->EndInteractiveRender();
-  //pm->SendCleanupPendingProgress(this->ConnectionID);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMRenderModuleProxy::BeginInteractiveRender()
-{
-  vtkTimerLog::MarkStartEvent("Interactive Render");
+  this->Superclass::BeginInteractiveRender();
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::EndInteractiveRender()
 {
-  vtkTimerLog::MarkEndEvent("Interactive Render");
+  this->Superclass::EndInteractiveRender();
+  //pm->SendCleanupPendingProgress(this->ConnectionID);
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMRenderModuleProxy::StillRender()
+void vtkSMRenderModuleProxy::BeginStillRender()
 {
-  this->UpdateAllDisplays();
-
   vtkRenderWindow *renWindow = this->GetRenderWindow(); 
   // Still Render can get called some funky ways.
   // Interactive renders get called through the PVInteractorStyles
@@ -519,33 +492,34 @@ void vtkSMRenderModuleProxy::StillRender()
   // vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   //pm->SendPrepareProgress(this->ConnectionID, this->GetRenderingProgressServers());
 
-  this->BeginStillRender();
-  if ( this->MeasurePolygonsPerSecond )
-    {
-    this->RenderTimer->StartTimer();
-    }
-  renWindow->Render();
-  if ( this->MeasurePolygonsPerSecond )
-    {
-    this->RenderTimer->StopTimer();
-    this->CalculatePolygonsPerSecond(this->RenderTimer->GetElapsedTime());
-    }
-  this->EndStillRender();
-
-  //pm->SendCleanupPendingProgress(this->ConnectionID);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMRenderModuleProxy::BeginStillRender()
-{
   this->SetLODFlag(0);
-  vtkTimerLog::MarkStartEvent("Still Render");
+  this->Superclass::BeginStillRender();
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::EndStillRender()
 {
-  vtkTimerLog::MarkEndEvent("Still Render");
+  this->Superclass::EndStillRender();
+
+  //pm->SendCleanupPendingProgress(this->ConnectionID);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMRenderModuleProxy::PerformRender()
+{
+  if ( this->MeasurePolygonsPerSecond )
+    {
+    this->RenderTimer->StartTimer();
+    }
+
+  vtkRenderWindow *renWindow = this->GetRenderWindow(); 
+  renWindow->Render();
+
+  if ( this->MeasurePolygonsPerSecond )
+    {
+    this->RenderTimer->StopTimer();
+    this->CalculatePolygonsPerSecond(this->RenderTimer->GetElapsedTime());
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -570,9 +544,6 @@ void vtkSMRenderModuleProxy::AddDisplay(vtkSMDisplayProxy* disp)
     ivp->SetElement(0, this->UseImmediateMode);
     }
  
-  this->Displays->AddItem(disp);
-
-  disp->AddToRenderModule(this);
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     disp->GetProperty("RenderModuleHelper"));
   if (pp)
@@ -580,7 +551,10 @@ void vtkSMRenderModuleProxy::AddDisplay(vtkSMDisplayProxy* disp)
     pp->RemoveAllProxies();
     pp->AddProxy(this->HelperProxy);
     }
-  disp->UpdateVTKObjects(); 
+
+  disp->AddToRenderModule(this);
+
+  this->Superclass::AddDisplay(disp);
 }
 
 //-----------------------------------------------------------------------------
@@ -591,27 +565,13 @@ void vtkSMRenderModuleProxy::RemoveDisplay(vtkSMDisplayProxy* disp)
     return;
     }
   disp->RemoveFromRenderModule(this);
-  this->Displays->RemoveItem(disp);
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMRenderModuleProxy::RemoveAllDisplays()
-{
-  vtkCollectionIterator* iter = this->Displays->NewIterator();
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-    {
-    vtkSMDisplayProxy* disp = 
-      vtkSMDisplayProxy::SafeDownCast(iter->GetCurrentObject());
-    disp->RemoveFromRenderModule(this);
-    }
-  iter->Delete();  
-  this->Displays->RemoveAllItems();
+  this->Superclass::RemoveDisplay(disp);
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::CacheUpdate(int idx, int total)
 {
-  vtkCollectionIterator* iter = this->Displays->NewIterator();
+  vtkCollectionIterator* iter = this->GetDisplays()->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
     vtkSMDisplayProxy* disp = 
@@ -638,7 +598,7 @@ void vtkSMRenderModuleProxy::CacheUpdate(int idx, int total)
 //-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::InvalidateAllGeometries()
 {
-  vtkCollectionIterator* iter = this->Displays->NewIterator();
+  vtkCollectionIterator* iter = this->GetDisplays()->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
     vtkSMDisplayProxy* disp = 
@@ -658,68 +618,10 @@ void vtkSMRenderModuleProxy::InvalidateAllGeometries()
 }
 
 //-----------------------------------------------------------------------------
-vtkTypeUInt32 vtkSMRenderModuleProxy::GetRenderingProgressServers()
-{
-  return vtkProcessModule::RENDER_SERVER|vtkProcessModule::CLIENT;
-}
-
-//-----------------------------------------------------------------------------
-void vtkSMRenderModuleProxy::UpdateAllDisplays()
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkCollectionIterator* iter = this->Displays->NewIterator();
-
-  // Check if this update is going to result in updating of any pipeline,
-  // if so we must enable progresses, otherwise progresses are not necessary.
-  bool enable_progress = false;
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-    {
-    vtkSMDataObjectDisplayProxy* disp = 
-      vtkSMDataObjectDisplayProxy::SafeDownCast(iter->GetCurrentObject());
-    if (!disp || !disp->GetVisibilityCM())
-      {
-      // Some displays don't need updating.
-      continue;
-      }
-    if (disp->UpdateRequired())
-      {
-      enable_progress = true;
-      break;
-      }
-    }
-
-
-  if (enable_progress)
-    {
-    pm->SendPrepareProgress(this->ConnectionID,
-      vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER);
-    }
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
-    {
-    vtkSMDisplayProxy* disp = 
-      vtkSMDisplayProxy::SafeDownCast(iter->GetCurrentObject());
-    if (!disp || !disp->GetVisibilityCM())
-      {
-      // Some displays don't need updating.
-      continue;
-      }
-    // In case of ordered compositing, make sure any distributed geometry is up
-    // to date.
-    disp->UpdateDistributedGeometry();
-    // We don;t use properties here since it tends to slow things down.
-    }
-  iter->Delete();
-  if (enable_progress)
-    {
-    pm->SendCleanupPendingProgress(this->ConnectionID);
-    }
-}
-
-//-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::SetUseTriangleStrips(int val)
 {
   this->UseTriangleStrips = val;
-  vtkCollectionIterator* iter = this->Displays->NewIterator();
+  vtkCollectionIterator* iter = this->GetDisplays()->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
     vtkSMDisplayProxy* disp = 
@@ -753,7 +655,7 @@ void vtkSMRenderModuleProxy::SetUseTriangleStrips(int val)
 void vtkSMRenderModuleProxy::SetUseImmediateMode(int val)
 {
   this->UseImmediateMode = val;
-  vtkCollectionIterator* iter = this->Displays->NewIterator();
+  vtkCollectionIterator* iter = this->GetDisplays()->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
     vtkSMDisplayProxy* disp = 
@@ -781,33 +683,6 @@ void vtkSMRenderModuleProxy::SetUseImmediateMode(int val)
     }
 }
     
-//-----------------------------------------------------------------------------
-vtkSMDisplayProxy* vtkSMRenderModuleProxy::CreateDisplayProxy()
-{
-  if (!this->DisplayXMLName)
-    {
-    vtkErrorMacro("DisplayXMLName must be set to create Display proxies.");
-    return NULL;
-    }
-  
-  vtkSMProxy* p = vtkSMObject::GetProxyManager()->NewProxy(
-    "displays", this->DisplayXMLName);
-  if (!p)
-    {
-    return NULL;
-    }
-  p->SetConnectionID(this->ConnectionID);
-  vtkSMDisplayProxy *pDisp = vtkSMDisplayProxy::SafeDownCast(p);
-  if (!pDisp)
-    {
-    vtkErrorMacro(<< "'displays' ," <<  this->DisplayXMLName 
-                  << " must be a subclass of vtkSMDisplayProxy.");
-    p->Delete();
-    return NULL;
-    }
-  return pDisp;
-}
-
 //-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::SetBackgroundColorCM(double rgb[3])
 {
@@ -926,7 +801,7 @@ vtkSMProxy *vtkSMRenderModuleProxy::GetProxyFromPropID(
   vtkSMProxy *ret = NULL;
 
   //find the SMDisplayProxy that contains the CSID.
-  iter = this->Displays->NewIterator();
+  iter = this->GetDisplays()->NewIterator();
   for (iter->InitTraversal(); 
        !iter->IsDoneWithTraversal(); 
        iter->GoToNextItem())
@@ -1017,7 +892,7 @@ void vtkSMRenderModuleProxy::ComputeVisiblePropBounds(double bds[6])
   bds[0] = bds[2] = bds[4] = VTK_DOUBLE_MAX;
   bds[1] = bds[3] = bds[5] = -VTK_DOUBLE_MAX;
 
-  vtkCollectionIterator* iter = this->Displays->NewIterator();
+  vtkCollectionIterator* iter = this->GetDisplays()->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
     vtkSMDisplayProxy* pDisp = vtkSMDisplayProxy::SafeDownCast(
@@ -1213,92 +1088,7 @@ void vtkSMRenderModuleProxy::SaveInBatchScript(ofstream* file)
     return;
     }
   this->SynchronizeCameraProperties();
-
-  *file << "set pvTemp" << this->GetSelfIDAsString() 
-        << " [$proxyManager NewProxy "
-        << this->GetXMLGroup() << " " << this->GetXMLName() << "]" << endl;
-  *file << "  $proxyManager RegisterProxy " << this->GetXMLGroup()
-        << " pvTemp" << this->GetSelfIDAsString() << " $pvTemp" 
-        << this->GetSelfIDAsString() << endl;
-  *file << "  $pvTemp" << this->GetSelfIDAsString() << " UnRegister {}" << endl;
-
-  // Now, we save all the properties that are not Input.
-  // Also note that only exposed properties are getting saved.
-  vtkSMPropertyIterator* iter = this->NewPropertyIterator();
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    vtkSMProperty* p = iter->GetProperty();
-    if (vtkSMInputProperty::SafeDownCast(p))
-      {
-      continue;
-      }
-
-    if (p->GetIsInternal() || p->GetInformationOnly())
-      {
-      *file << "  # skipping proxy property " << iter->GetKey() << endl;
-      continue;
-      }
-
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(p);
-    vtkSMDoubleVectorProperty* dvp = 
-      vtkSMDoubleVectorProperty::SafeDownCast(p);
-    vtkSMStringVectorProperty* svp = 
-      vtkSMStringVectorProperty::SafeDownCast(p);
-    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(p);
-    if (ivp)
-      {
-      for (unsigned int i=0; i < ivp->GetNumberOfElements(); i++)
-        {
-        *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty {"
-          << iter->GetKey() << "}] SetElement "
-          << i << " " << ivp->GetElement(i) 
-          << endl;
-        }
-      }
-    else if (dvp)
-      {
-      for (unsigned int i=0; i < dvp->GetNumberOfElements(); i++)
-        {
-        *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty {"
-          << iter->GetKey() << "}] SetElement "
-          << i << " " << dvp->GetElement(i) 
-          << endl;
-        }
-      }
-    else if (svp)
-      {
-      for (unsigned int i=0; i < svp->GetNumberOfElements(); i++)
-        {
-        *file << "  [$pvTemp" << this->GetSelfIDAsString() << " GetProperty {"
-          << iter->GetKey() << "}] SetElement "
-          << i << " {" << svp->GetElement(i) << "}"
-          << endl;
-        }
-      }
-    else if (pp)
-      {
-      // the only proxy property the RenderModule exposes is
-      // Displays.
-      for (unsigned int i=0; i < pp->GetNumberOfProxies(); i++)
-        {
-        vtkSMProxy* proxy = pp->GetProxy(i);
-        // Some displays get saved in batch other don't,
-        // instead of mirroring that logic to determine if
-        // the display got saved in batch, we just catch the
-        // exception.
-        *file << "  catch { [$pvTemp" << this->GetSelfIDAsString() 
-              << " GetProperty {"
-              << iter->GetKey() << "}] AddProxy $pvTemp"
-              << proxy->GetSelfIDAsString()
-              << " } ;#--- " << proxy->GetXMLName() << endl;
-        }
-      }
-    else
-      {
-      *file << "  # skipping property " << iter->GetKey() << endl;
-      }
-    }
-  iter->Delete();
+  this->Superclass::SaveInBatchScript(file);
 }
 
 //-----------------------------------------------------------------------------
@@ -1419,7 +1209,7 @@ void vtkSMRenderModuleProxy::CalculatePolygonsPerSecond(double time)
 vtkIdType vtkSMRenderModuleProxy::GetTotalNumberOfPolygons()
 {
   vtkIdType totalPolygons = 0;
-  vtkCollectionIterator* iter = this->Displays->NewIterator();
+  vtkCollectionIterator* iter = this->GetDisplays()->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
     vtkSMDataObjectDisplayProxy* pDisp = vtkSMDataObjectDisplayProxy::SafeDownCast(
@@ -1461,12 +1251,9 @@ void vtkSMRenderModuleProxy::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "RenderInterruptsEnabled: " << this->RenderInterruptsEnabled 
     << endl;
-  os << indent << "Displays: " << this->Displays << endl;
   os << indent << "Renderer: " << this->Renderer << endl;
   os << indent << "Renderer2D: " << this->Renderer2D << endl;
   os << indent << "RenderWindow: " << this->RenderWindow << endl;
   os << indent << "Interactor: " << this->Interactor << endl;
   os << indent << "ActiveCamera: " << this->ActiveCamera << endl;
-
-  
 }

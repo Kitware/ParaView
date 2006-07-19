@@ -59,7 +59,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMLODRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMLODRenderModuleProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMLODRenderModuleProxy, "1.6");
 //-----------------------------------------------------------------------------
 vtkSMLODRenderModuleProxy::vtkSMLODRenderModuleProxy()
 {
@@ -136,7 +136,7 @@ void vtkSMLODRenderModuleProxy::SetLODResolution(int resolution)
     {
     return;
     }
-  vtkCollectionIterator* iter = this->Displays->NewIterator();
+  vtkCollectionIterator* iter = this->GetDisplays()->NewIterator();
   this->LODResolution = resolution;
 
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
@@ -185,7 +185,7 @@ void vtkSMLODRenderModuleProxy::ComputeTotalVisibleMemorySize()
 {
   this->TotalVisibleGeometryMemorySize = 0;
   this->TotalVisibleLODGeometryMemorySize = 0;
-  vtkCollectionIterator* iter = this->Displays->NewIterator();
+  vtkCollectionIterator* iter = this->GetDisplays()->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
     vtkSMLODDisplayProxy* pDisp = vtkSMLODDisplayProxy::SafeDownCast(
