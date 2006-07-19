@@ -43,7 +43,7 @@
 #include <vtksys/stl/vector>
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.144");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.145");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetInternals
@@ -899,6 +899,11 @@ void vtkKWRenderWidget::AddInteractionBindings()
       sprintf(callback, "KeyPressCallback %%A %%x %%y %d %d %d %%K", 
               translators[i].Ctrl, translators[i].Shift, translators[i].Alt);
       this->VTKWidget->SetBinding(event, this, callback);
+
+      sprintf(event, "<%sKeyRelease>", translators[i].Modifier);
+      sprintf(callback, "KeyReleaseCallback %%A %%x %%y %d %d %d %%K", 
+              translators[i].Ctrl, translators[i].Shift, translators[i].Alt);
+      this->VTKWidget->SetBinding(event, this, callback);
       }
     }
 }
@@ -955,6 +960,9 @@ void vtkKWRenderWidget::RemoveInteractionBindings()
       this->VTKWidget->RemoveBinding(event);
         
       sprintf(event, "<%sKeyPress>", translators[i].Modifier);
+      this->VTKWidget->RemoveBinding(event);
+
+      sprintf(event, "<%sKeyRelease>", translators[i].Modifier);
       this->VTKWidget->RemoveBinding(event);
       }
     }
@@ -1140,7 +1148,37 @@ void vtkKWRenderWidget::KeyPressCallback(char key,
     vtkGenericRenderWindowInteractor::SafeDownCast(interactor);
   if (gen_interactor)
     {
+    gen_interactor->KeyPressEvent();
     gen_interactor->CharEvent();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::KeyReleaseCallback(char key, 
+                                           int x, int y,
+                                           int ctrl, 
+                                           int shift, 
+                                           int alt,
+                                           char *keysym)
+{
+  vtkRenderWindowInteractor *interactor = this->GetRenderWindowInteractor();
+  if (!interactor)
+    {
+    return;
+    }
+
+  interactor->SetEventInformationFlipY(x, y, ctrl, shift, key, 0, keysym);
+#if VTK_MAJOR_VERSION > 5 || (VTK_MAJOR_VERSION == 5 && VTK_MINOR_VERSION > 0)
+  interactor->SetAltKey(alt);
+#else
+  (void)alt;
+#endif
+
+  vtkGenericRenderWindowInteractor *gen_interactor = 
+    vtkGenericRenderWindowInteractor::SafeDownCast(interactor);
+  if (gen_interactor)
+    {
+    gen_interactor->KeyReleaseEvent();
     }
 }
 
