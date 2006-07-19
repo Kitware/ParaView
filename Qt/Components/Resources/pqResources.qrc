@@ -18,6 +18,9 @@
         <file>Icons/pqConnect22.png</file>
         <file>Icons/pqCopy22.png</file>
         <file>Icons/pqCut22.png</file>
+        <file>Icons/pqDelete16.png</file>
+        <file>Icons/pqDelete22.png</file>
+        <file>Icons/pqDelete32.png</file>
         <file>Icons/pqDisconnect22.png</file>
         <file>Icons/pqFavorites16.png</file>
         <file>Icons/pqFavorites32.png</file>
@@ -50,9 +53,10 @@
         <file>Icons/pqPointer22.png</file>
         <file>Icons/pqPolydata16.png</file>
         <file>Icons/pqPrint22.png</file>
-        <file>Icons/pqQuit22.png</file>
         <file>Icons/pqRectilinearGrid16.png</file>
+        <file>Icons/pqRedo16.png</file>
         <file>Icons/pqRedo22.png</file>
+        <file>Icons/pqRedo32.png</file>
         <file>Icons/pqSave22.png</file>
         <file>Icons/pqSelectPointer22.png</file>
         <file>Icons/pqSideSet16.png</file>
@@ -60,18 +64,32 @@
         <file>Icons/pqSplitViewH12.png</file>
         <file>Icons/pqSplitViewV12.png</file>
         <file>Icons/pqStructuredGrid16.png</file>
+        <file>Icons/pqUndo16.png</file>
         <file>Icons/pqUndo22.png</file>
+        <file>Icons/pqUndo32.png</file>
         <file>Icons/pqUniformData16.png</file>
         <file>Icons/pqUnknownData16.png</file>
         <file>Icons/pqUnstructuredGrid16.png</file>
         <file>Icons/pqUpdate16.png</file>
         <file>Icons/pqUpdate22.png</file>
+        <file>Icons/pqVcrBack16.png</file>
         <file>Icons/pqVcrBack22.png</file>
+        <file>Icons/pqVcrBack32.png</file>
+        <file>Icons/pqVcrFirst16.png</file>
         <file>Icons/pqVcrFirst22.png</file>
+        <file>Icons/pqVcrFirst32.png</file>
+        <file>Icons/pqVcrForward16.png</file>
         <file>Icons/pqVcrForward22.png</file>
+        <file>Icons/pqVcrForward32.png</file>
+        <file>Icons/pqVcrLast16.png</file>
         <file>Icons/pqVcrLast22.png</file>
+        <file>Icons/pqVcrLast32.png</file>
+        <file>Icons/pqVcrPause16.png</file>
         <file>Icons/pqVcrPause22.png</file>
+        <file>Icons/pqVcrPause32.png</file>
+        <file>Icons/pqVcrPlay16.png</file>
         <file>Icons/pqVcrPlay22.png</file>
+        <file>Icons/pqVcrPlay32.png</file>
         <file>Icons/pqView22.png</file>
         <file>Icons/pqVolumeData16.png</file>
         <file>Icons/pqWindow16.png</file>
