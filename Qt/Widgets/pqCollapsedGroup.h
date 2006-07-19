@@ -34,42 +34,43 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqCollapsedGroup_h
 
 #include "QtWidgetsExport.h"
-#include <QGroupBox>
+
+#include <QWidget>
 
 class QPushButton;
 
+/// Provides a container that can be collapsed or expanded to
+/// hide/show a child widget.
 class QTWIDGETS_EXPORT pqCollapsedGroup :
-  public QGroupBox
+  public QWidget
 {
-  typedef QDialog base;
-  
   Q_OBJECT
   
 public:
-  /// the filter is a string of semi-colon separated filters
   pqCollapsedGroup(QWidget* parent = 0);
   pqCollapsedGroup(const QString& title, QWidget* parent = 0);
   ~pqCollapsedGroup();
-  virtual bool eventFilter(QObject* watched, QEvent* e);
 
-signals:
+  /// Sets the child widget that will be controlled by the container
+  void setWidget(QWidget*);
 
-protected:
-  
-protected slots:
-  void buttonPressed();
+  /// Returns true if the container is expanded (child is visible)
+  const bool isExpanded();
+
+public slots:
+  /// Expands the container so the child is visible
+  void expand();
+  /// Collapses the container so the child is hidden
+  void collapse();
+  /// Toggles the expanded / collapsed state of the container
+  void toggle();
 
 private:
   pqCollapsedGroup(const pqCollapsedGroup&);
   pqCollapsedGroup& operator=(const pqCollapsedGroup&);
 
-  void initialize();
-
-  bool Hidden;
-  int OldMargin;
-  QPushButton* HideButton;
-  QIcon* HideIcon;
-  QIcon* ShowIcon;
+  class pqImplementation;
+  pqImplementation* const Implementation;
 };
 
 #endif // !_pqCollapsedGroup_h

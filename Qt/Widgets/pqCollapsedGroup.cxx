@@ -30,214 +30,224 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-// self includes
 #include "pqCollapsedGroup.h"
 
-// Qt includes
-#include "QtDebug"
-#include "QResizeEvent"
-#include "QLayout"
-
-#include "QPushButton"
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QVBoxLayout>
 
 /* XPM */
-static const char* pqCollapsedGroup_ShowIcon[] = {
-/* columns rows colors chars-per-pixel */
-"16 16 25 1",
-"  c black",
-". c #060F50",
-"X c #4556A8",
-"o c #5062B2",
-"O c #5063B3",
-"+ c #5A6FBD",
-"@ c #5B6EBC",
-"# c #5B6EBD",
-"$ c #5B6FBD",
-"% c #657BC6",
-"& c #657BC7",
-"* c #6F87D1",
-"= c #6F88D0",
-"- c #7087D0",
-"; c #7088D1",
-": c #738CD3",
-"> c #7A94DA",
-", c #7A94DB",
-"< c #84A0E5",
-"1 c #85A1E5",
-"2 c #8FADEF",
-"3 c #99B9F8",
-"4 c #9AB9F8",
-"5 c #A0C1FF",
-"6 c None",
-/* pixels */
-"6666666666666666",
-"66666.....666666",
-"66666.555.666666",
-"66666.555.666666",
-"66666.444.666666",
-"66666.222.666666",
-"66666.<<<.666666",
-"666...>>>...6666",
-"66.:=-;*;=;*.666",
-"666.&%%%&&&.6666",
-"6666.$$$$$.66666",
-"66666.OOO.666666",
-"666666.X.6666666",
-"6666666.66666666",
-"6666666666666666",
-"6666666666666666"
-};
+static char * expand_xpm[] = {
+"9 9 33 1",
+"  c None",
+". c #FFFFFF",
+"+ c #8E997D",
+"@ c #FCFCFB",
+"# c #FDFDFB",
+"$ c #000000",
+"% c #FCFCFA",
+"& c #F7F6F3",
+"* c #F7F7F5",
+"= c #F7F7F4",
+"- c #F6F6F4",
+"; c #F1F0EB",
+"> c #E5E1DA",
+", c #F5F5F1",
+"' c #DFDBD2",
+") c #F2F2EE",
+"! c #F0F0EC",
+"~ c #EDEDE7",
+"{ c #EAE9E3",
+"] c #E3E0D9",
+"^ c #DBD6CC",
+"/ c #E4E1D9",
+"( c #DCD8CF",
+"_ c #D8D3C9",
+": c #D6D1C6",
+"< c #D2CCC0",
+"[ c #CFC8BB",
+"} c #D2CCBF",
+"| c #C6BEAE",
+"1 c #C2B8A8",
+"2 c #C1B8A7",
+"3 c #C0B7A6",
+"4 c #C3BAAA",
+".+++++++.",
+"+.......+",
+"+@##$@%&+",
+"+**=$-;>+",
+"+,$$$$$'+",
+"+)!~${]^+",
+"+/(_$:<[+",
+"+}|12234+",
+".+++++++."};
 
 /* XPM */
-static const char* pqCollapsedGroup_HideIcon[] = {
-/* columns rows colors chars-per-pixel */
-"16 16 42 1",
-"  c black",
-". c #060F50",
-"X c #4252A5",
-"o c #4353A6",
-"O c #4453A7",
-"+ c #4E60B0",
-"@ c #4F60B1",
-"# c #4F61B1",
-"$ c #596DBC",
-"% c #5B6EBC",
-"& c #5B6FBC",
-"* c #657BC6",
-"= c #667BC7",
-"- c #667DC7",
-"; c #7189D1",
-": c #7189D2",
-"> c #7289D3",
-", c #7C96DC",
-"< c #7D97DD",
-"1 c #86A2E6",
-"2 c #87A2E6",
-"3 c #87A4E7",
-"4 c #88A4E7",
-"5 c #88A5E8",
-"6 c #89A5E8",
-"7 c #89A5E9",
-"8 c #89A6EA",
-"9 c #8AA7EA",
-"0 c #91B1F1",
-"q c #92B1F2",
-"w c #93B1F2",
-"e c #93B2F3",
-"r c #94B2F3",
-"t c #95B3F4",
-"y c #95B4F4",
-"u c #9DBEFD",
-"i c #9EBFFD",
-"p c #9EC0FE",
-"a c #9FC0FE",
-"s c #A0C0FF",
-"d c #A0C1FF",
-"f c None",
-/* pixels */
-"ffffffffffffffff",
-"fffffff.ffffffff",
-"ffffff.s.fffffff",
-"fffff.sss.ffffff",
-"ffff.siiii.fffff",
-"fff.ytw0000.ffff",
-"ff.999999222.fff",
-"fff...,,,...ffff",
-"fffff.>;;.ffffff",
-"fffff.==*.ffffff",
-"fffff.&&$.ffffff",
-"fffff.#++.ffffff",
-"fffff.OXX.ffffff",
-"fffff.....ffffff",
-"ffffffffffffffff",
-"ffffffffffffffff"
+static char * collapse_xpm[] = {
+"9 9 35 1",
+"  c None",
+". c #FFFFFF",
+"+ c #8E997D",
+"@ c #FCFCFB",
+"# c #FDFDFB",
+"$ c #FCFCFA",
+"% c #F7F6F3",
+"& c #F7F7F5",
+"* c #F7F7F4",
+"= c #F6F6F4",
+"- c #F1F0EB",
+"; c #E5E1DA",
+"> c #F5F5F1",
+", c #000000",
+"' c #DFDBD2",
+") c #F2F2EE",
+"! c #F0F0EC",
+"~ c #EDEDE7",
+"{ c #ECEBE6",
+"] c #EAE9E3",
+"^ c #E3E0D9",
+"/ c #DBD6CC",
+"( c #E4E1D9",
+"_ c #DCD8CF",
+": c #D8D3C9",
+"< c #D7D2C7",
+"[ c #D6D1C6",
+"} c #D2CCC0",
+"| c #CFC8BB",
+"1 c #D2CCBF",
+"2 c #C6BEAE",
+"3 c #C2B8A8",
+"4 c #C1B8A7",
+"5 c #C0B7A6",
+"6 c #C3BAAA",
+".+++++++.",
+"+.......+",
+"+@###@$%+",
+"+&&**=-;+",
+"+>,,,,,'+",
+"+)!~{]^/+",
+"+(_:<[}|+",
+"+1234456+",
+".+++++++."};
+
+///////////////////////////////////////////////////////////////////////////////
+// pqCollapsedGroup::pqImplementation
+
+class pqCollapsedGroup::pqImplementation
+{
+public:
+  pqImplementation(const QString& Name, QWidget* parent_widget) :
+    Expanded(true),
+    Widget(0),
+    Button(Name),
+    HideIcon(QPixmap(collapse_xpm)),
+    ShowIcon(QPixmap(expand_xpm))
+  {
+  this->Button.setObjectName("expandCollapse");
+  
+  this->Button.setIcon(
+    this->Expanded ? this->HideIcon : this->ShowIcon);
+    
+  this->Button.setToolTip(
+    this->Expanded ? tr("Collapse Group") : tr("Expand Group"));
+  
+  this->HLayout.setMargin(0);
+  this->HLayout.setSpacing(0);
+  this->HLayout.addSpacing(15);
+  
+  this->VLayout.setMargin(0);
+  this->VLayout.setSpacing(0);
+  this->VLayout.addWidget(&this->Button);
+  this->VLayout.addLayout(&this->HLayout);
+  parent_widget->setLayout(&this->VLayout);
+  }
+
+  bool Expanded;
+  QVBoxLayout VLayout;
+  QHBoxLayout HLayout;
+  QPushButton Button;
+  QWidget* Widget;
+  QIcon HideIcon;
+  QIcon ShowIcon;
 };
 
-pqCollapsedGroup::pqCollapsedGroup(QWidget* parent_widget)
-  : QGroupBox(parent_widget)
+pqCollapsedGroup::pqCollapsedGroup(QWidget* parent_widget) :
+  QWidget(parent_widget),
+  Implementation(new pqImplementation("", this))
 {
-  this->initialize();
+  this->connect(
+    &this->Implementation->Button,
+    SIGNAL(clicked()),
+    this,
+    SLOT(toggle()));
 }
 
-pqCollapsedGroup::pqCollapsedGroup(const QString& group_title, QWidget* parent_widget)
-  : QGroupBox(group_title, parent_widget)
+pqCollapsedGroup::pqCollapsedGroup(const QString& group_title, QWidget* parent_widget) :
+  QWidget(parent_widget),
+  Implementation(new pqImplementation(group_title, this))
 {
-  this->initialize();
-}
-
-void pqCollapsedGroup::initialize()
-{
-  this->installEventFilter(this);
-  this->Hidden = false;
-  this->OldMargin = 0;
-
-  this->HideButton = new QPushButton(this);
-  this->HideButton->setMaximumHeight(15);
-  this->HideButton->setMaximumWidth(15);
-  this->HideButton->setFocusPolicy(Qt::NoFocus);
-  this->HideButton->setFlat(true);
-
-  this->HideIcon = new QIcon(
-    QPixmap( pqCollapsedGroup_HideIcon ));
-  this->ShowIcon = new QIcon(
-    QPixmap( pqCollapsedGroup_ShowIcon ));
-  this->HideButton->setIcon(*this->HideIcon);
-  this->connect(this->HideButton, SIGNAL(clicked()),
-    this, SLOT(buttonPressed()));
+  this->connect(
+    &this->Implementation->Button,
+    SIGNAL(clicked()),
+    this,
+    SLOT(toggle()));
 }
 
 pqCollapsedGroup::~pqCollapsedGroup()
 {
+  delete this->Implementation;
 }
 
-void pqCollapsedGroup::buttonPressed()
+void pqCollapsedGroup::setWidget(QWidget* child_widget)
 {
-  if ( this->Hidden )
+  if(this->Implementation->Widget)
     {
-    this->HideButton->setIcon(*this->HideIcon);
-    this->Hidden = false;
-    foreach(QObject* tmp, this->children())
-      {
-      QWidget* widget = qobject_cast<QWidget*>(tmp);
-      if ( widget && widget != this->HideButton )
-        {
-        widget->setHidden(false);
-        }
-      }
-    if ( this->layout() )
-      {
-      this->layout()->setMargin(this->OldMargin);
-      }
+    this->Implementation->HLayout.removeWidget(
+      this->Implementation->Widget);
     }
-  else
+  
+  this->Implementation->Widget = child_widget;
+  
+  if(this->Implementation->Widget)
     {
-    this->HideButton->setIcon(*this->ShowIcon);
-    this->Hidden = true;
-    foreach(QObject* tmp, this->children())
-      {
-      QWidget* widget = qobject_cast<QWidget*>(tmp);
-      if ( widget && widget != this->HideButton )
-        {
-        widget->setHidden(true);
-        }
-      }
-    if ( this->layout() )
-      {
-      this->OldMargin = this->layout()->margin();
-      this->layout()->setMargin(0);
-      }
+    this->Implementation->Widget->setParent(this);
+    this->Implementation->HLayout.addWidget(this->Implementation->Widget);
     }
-  this->update();
 }
 
-bool pqCollapsedGroup::eventFilter(QObject* watched, QEvent* e)
+const bool pqCollapsedGroup::isExpanded()
 {
-  if ( e->type() == QEvent::Resize )
-    {
-    QResizeEvent* res = static_cast<QResizeEvent*>(e);
-    this->HideButton->move(res->size().width()-this->HideButton->width()-5,2);
-    }
-
-  return QGroupBox::eventFilter(watched, e);
+  return this->Implementation->Expanded;
 }
 
+void pqCollapsedGroup::expand()
+{
+  if(!this->Implementation->Expanded)
+    this->toggle();
+}
+
+void pqCollapsedGroup::collapse()
+{
+  if(this->Implementation->Expanded)
+    this->toggle();
+}
+
+void pqCollapsedGroup::toggle()
+{
+  this->Implementation->Expanded = 
+    !this->Implementation->Expanded;
+    
+  this->Implementation->Button.setIcon(
+    this->Implementation->Expanded ?
+      this->Implementation->HideIcon :
+      this->Implementation->ShowIcon);
+
+  this->Implementation->Button.setToolTip(
+    this->Implementation->Expanded ? tr("Collapse Group") : tr("Expand Group"));
+    
+  if(this->Implementation->Widget)
+    {
+    this->Implementation->Widget->setVisible(
+      this->Implementation->Expanded);
+    }
+}

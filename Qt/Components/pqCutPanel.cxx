@@ -39,12 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqSampleScalarWidget.h"
 #include "pqServerManagerModel.h"
 
+#include <pqCollapsedGroup.h>
+
 #include <vtkPVXMLElement.h>
 #include <vtkSMDataObjectDisplayProxy.h>
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMProxyProperty.h>
 
-#include <QFrame>
 #include <QVBoxLayout>
 
 //////////////////////////////////////////////////////////////////////////////
@@ -69,18 +70,24 @@ pqCutPanel::pqCutPanel(QWidget* p) :
   Superclass(p),
   Implementation(new pqImplementation(this))
 {
+  pqCollapsedGroup* const group1 = new pqCollapsedGroup(tr("Implicit Plane"));
+  group1->setWidget(&this->Implementation->ImplicitPlaneWidget);
+
+  pqCollapsedGroup* const group2 = new pqCollapsedGroup(tr("Slices"));
+  group2->setWidget(&this->Implementation->SampleScalarWidget);
+  
+  QVBoxLayout* const panel_layout = new QVBoxLayout(this);
+  panel_layout->setMargin(0);
+  panel_layout->setSpacing(0);
+  panel_layout->addWidget(group1);
+  panel_layout->addWidget(group2);
+  panel_layout->addStretch();
+  
+  this->setLayout(panel_layout);
+
   QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderModule*)),
                    &this->Implementation->ImplicitPlaneWidget,
                    SLOT(setRenderModule(pqRenderModule*)));
-
-  QFrame* const separator = new QFrame();
-  separator->setFrameShape(QFrame::HLine);
-
-  QVBoxLayout* const panel_layout = new QVBoxLayout();
-  panel_layout->addWidget(&this->Implementation->ImplicitPlaneWidget);
-  panel_layout->addWidget(separator);
-  panel_layout->addWidget(&this->Implementation->SampleScalarWidget);
-  this->setLayout(panel_layout);
 
   connect(
     &this->Implementation->ImplicitPlaneWidget,

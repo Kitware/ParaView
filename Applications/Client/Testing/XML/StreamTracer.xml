@@ -10,7 +10,7 @@
   <pqevent object="MainWindow/ObjectDisplayProperties/pqDisplayProxyEditor/DismissButton" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuFilters/Thermal" command="activate" arguments="StreamTracer" />
   <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqStreamTracerControls/MaximumPropagation" command="set_string" arguments="10" />
+  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/1pqCollapsedGroup0/pqStreamTracerControls/MaximumPropagation" command="set_string" arguments="10" />
   <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/1QScrollBar0" command="set_int" arguments="2" />
   <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/1QScrollBar0" command="set_int" arguments="3" />

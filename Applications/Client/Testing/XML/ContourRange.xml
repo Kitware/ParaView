@@ -6,7 +6,7 @@
   <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
   <pqevent object="MainWindow/menubar/menuFilters/Thermal" command="activate" arguments="Contour" />
   <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
-  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/pqSampleScalarWidget/NewRange" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/objectInspector/ScrollArea/qt_scrollarea_viewport/PanelArea/Editor/1pqCollapsedGroup1/pqSampleScalarWidget/NewRange" command="activate" arguments="" />
   <pqevent object="pqSampleScalarAddRangeDialog/From" command="set_string" arguments="." />
   <pqevent object="pqSampleScalarAddRangeDialog/From" command="set_string" arguments=".2" />
   <pqevent object="pqSampleScalarAddRangeDialog/To" command="set_string" arguments="" />

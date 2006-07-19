@@ -44,12 +44,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ui_pqStreamTracerControls.h"
 
+#include <pqCollapsedGroup.h>
+
 #include <vtkPVXMLElement.h>
 #include <vtkSMDataObjectDisplayProxy.h>
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMProxyProperty.h>
 
-#include <QFrame>
 #include <QVBoxLayout>
 
 //////////////////////////////////////////////////////////////////////////////
@@ -86,23 +87,28 @@ pqStreamTracerPanel::pqStreamTracerPanel(QWidget* p) :
 {
   this->Implementation->PointSourceWidget->setRenderModule(
     this->getRenderModule());
+
   QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderModule*)),
                    this->Implementation->PointSourceWidget,
                    SLOT(setRenderModule(pqRenderModule*)));
 
-  QVBoxLayout* const panel_layout = new QVBoxLayout();
-
   this->Implementation->Controls.setupUi(
     &this->Implementation->ControlsContainer);
-  panel_layout->addWidget(&this->Implementation->ControlsContainer);
+    
+  pqCollapsedGroup* const group1 = new pqCollapsedGroup(tr("Stream Tracer"));
+  group1->setWidget(&this->Implementation->ControlsContainer);
 
-  QFrame* const separator = new QFrame();
-  separator->setFrameShape(QFrame::HLine);
-  panel_layout->addWidget(separator);
+  QVBoxLayout* const panel_layout = new QVBoxLayout(this);
+  panel_layout->setMargin(0);
+  panel_layout->setSpacing(0);
+  panel_layout->addWidget(group1);
   
   if(this->Implementation->PointSourceWidget)
     {
-    panel_layout->addWidget(this->Implementation->PointSourceWidget);
+    pqCollapsedGroup* const group2 = new pqCollapsedGroup(tr("Point Source"));
+    group2->setWidget(this->Implementation->PointSourceWidget);
+  
+    panel_layout->addWidget(group2);
 
     connect(
       this->Implementation->PointSourceWidget,
@@ -113,7 +119,10 @@ pqStreamTracerPanel::pqStreamTracerPanel(QWidget* p) :
 
   if(this->Implementation->LineWidget)
     {
-    panel_layout->addWidget(this->Implementation->LineWidget);
+    pqCollapsedGroup* const group2 = new pqCollapsedGroup(tr("Line Source"));
+    group2->setWidget(this->Implementation->LineWidget);
+  
+    panel_layout->addWidget(group2);
 
     connect(
       this->Implementation->LineWidget,

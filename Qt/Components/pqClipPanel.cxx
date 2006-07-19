@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPropertyManager.h"
 #include "pqServerManagerModel.h"
 
+#include <pqCollapsedGroup.h>
+
 #include <vtkPVXMLElement.h>
 #include <vtkSMDataObjectDisplayProxy.h>
 #include <vtkSMDoubleVectorProperty.h>
@@ -69,20 +71,24 @@ pqClipPanel::pqClipPanel(QWidget* p) :
   Superclass(p),
   Implementation(new pqImplementation(this))
 {
-  QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderModule*)),
-                   &this->Implementation->ImplicitPlaneWidget,
-                   SLOT(setRenderModule(pqRenderModule*)));
+  pqCollapsedGroup* const group1 = new pqCollapsedGroup(tr("Clip"));
+  group1->setWidget(&this->Implementation->InsideOutWidget);
 
-  QFrame* const separator = new QFrame();
-  separator->setFrameShape(QFrame::HLine);
-
+  pqCollapsedGroup* const group2 = new pqCollapsedGroup(tr("Implicit Plane"));
+  group2->setWidget(&this->Implementation->ImplicitPlaneWidget);
+  
   QVBoxLayout* const panel_layout = new QVBoxLayout(this);
-  panel_layout->addWidget(&this->Implementation->InsideOutWidget);
-  panel_layout->addWidget(separator);
-  panel_layout->addWidget(&this->Implementation->ImplicitPlaneWidget);
+  panel_layout->setMargin(0);
+  panel_layout->setSpacing(0);
+  panel_layout->addWidget(group1);
+  panel_layout->addWidget(group2);
   panel_layout->addStretch();
   
   this->setLayout(panel_layout);
+
+  QObject::connect(this, SIGNAL(renderModuleChanged(pqRenderModule*)),
+                   &this->Implementation->ImplicitPlaneWidget,
+                   SLOT(setRenderModule(pqRenderModule*)));
 
   connect(&this->Implementation->ImplicitPlaneWidget, SIGNAL(widgetChanged()), this, SLOT(onWidgetChanged()));
   connect(this->getPropertyManager(), SIGNAL(accepted()), this, SLOT(onAccepted()));

@@ -41,6 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ui_pqContourControls.h"
 
+#include <pqCollapsedGroup.h>
+
 #include <vtkSMDataObjectDisplayProxy.h>
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMNew3DWidgetProxy.h>
@@ -49,7 +51,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMStringVectorProperty.h>
 
 #include <QCheckBox>
-#include <QFrame>
 #include <QVBoxLayout>
 
 //////////////////////////////////////////////////////////////////////////////
@@ -78,15 +79,19 @@ pqContourPanel::pqContourPanel(QWidget* p) :
   this->Implementation->Controls.setupUi(
     &this->Implementation->ControlsContainer);
 
-  QFrame* const separator = new QFrame();
-  separator->setFrameShape(QFrame::HLine);
+  pqCollapsedGroup* const group1 = new pqCollapsedGroup(tr("Contour"));
+  group1->setWidget(&this->Implementation->ControlsContainer);
 
-  QVBoxLayout* const panel_layout = new QVBoxLayout();
-  panel_layout->addWidget(&this->Implementation->ControlsContainer);
-  panel_layout->addWidget(separator);
-  panel_layout->addWidget(&this->Implementation->SampleScalarWidget);
+  pqCollapsedGroup* const group2 = new pqCollapsedGroup(tr("Isosurfaces"));
+  group2->setWidget(&this->Implementation->SampleScalarWidget);
+  
+  QVBoxLayout* const panel_layout = new QVBoxLayout(this);
+  panel_layout->setMargin(0);
+  panel_layout->setSpacing(0);
+  panel_layout->addWidget(group1);
+  panel_layout->addWidget(group2);
   panel_layout->addStretch();
-
+  
   this->setLayout(panel_layout);
 
   connect(

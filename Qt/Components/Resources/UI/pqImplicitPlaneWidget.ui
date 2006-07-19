@@ -17,10 +17,10 @@
   </property>
   <layout class="QVBoxLayout" >
    <property name="margin" >
-    <number>8</number>
+    <number>0</number>
    </property>
    <property name="spacing" >
-    <number>6</number>
+    <number>2</number>
    </property>
    <item>
     <widget class="QCheckBox" name="show3DWidget" >
@@ -35,7 +35,7 @@
       <number>0</number>
      </property>
      <property name="spacing" >
-      <number>6</number>
+      <number>2</number>
      </property>
      <item row="1" column="0" >
       <widget class="QLabel" name="label" >
@@ -77,7 +77,7 @@
       <number>0</number>
      </property>
      <property name="spacing" >
-      <number>6</number>
+      <number>0</number>
      </property>
      <item row="0" column="1" >
       <widget class="QPushButton" name="resetBounds" >
