@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include <QVariant>
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 
 class pq3DWidget;
 class pqProxy;
@@ -50,7 +50,7 @@ class vtkSMProxy;
 /// pqSignalAdaptorProxyList must be used for any combo-box that selects among
 /// proxies, any of which can have a 3D widget. The 3D widget information is obtained
 /// from the server manager hints for the selected proxy.
-class PQWIDGETS_EXPORT pqSignalAdaptorProxyList : public QObject
+class PQCOMPONENTS_EXPORT pqSignalAdaptorProxyList : public QObject
 {
   Q_OBJECT
   Q_PROPERTY(QVariant proxy READ proxy WRITE setProxy)
