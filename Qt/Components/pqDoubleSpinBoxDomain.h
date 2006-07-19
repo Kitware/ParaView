@@ -34,14 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pq_DoubleSpinBoxDomain_h
 
 #include <QObject>
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 
 class QDoubleSpinBox;
 class vtkSMProperty;
 
 /// combo box domain 
 /// observers the domain for a combo box and updates accordingly
-class PQWIDGETS_EXPORT pqDoubleSpinBoxDomain : public QObject
+class PQCOMPONENTS_EXPORT pqDoubleSpinBoxDomain : public QObject
 {
   Q_OBJECT
 public:

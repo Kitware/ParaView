@@ -37,14 +37,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPipelineBrowserContextMenu_h
 
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include <QObject>
 
 class pqPipelineBrowser;
 class QPoint;
 
 
-class PQWIDGETS_EXPORT pqPipelineBrowserContextMenu : public QObject
+class PQCOMPONENTS_EXPORT pqPipelineBrowserContextMenu : public QObject
 {
   Q_OBJECT
 

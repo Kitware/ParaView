@@ -157,6 +157,7 @@ ADD_LIBRARY(pqComponents
   pqClipPanel.h
   pqComboBoxDomain.cxx
   pqComboBoxDomain.h
+  pqComponentsExport.h
   pqContourPanel.cxx
   pqContourPanel.h
   pqCustomFilterDefinitionModel.cxx
@@ -270,7 +271,6 @@ ADD_LIBRARY(pqComponents
   pqVCRController.h
   pqWidgetObjectPanel.cxx
   pqWidgetObjectPanel.h
-  pqWidgetsExport.h
   ${MOC_BUILT_SOURCES}
   ${RCS_SOURCES}
   ${UI_BUILT_SOURCES}
@@ -286,9 +286,6 @@ TARGET_LINK_LIBRARIES(pqComponents
   ${PYTHON_LINK_LIBRARIES}
 )
 
-IF(BUILD_TESTING)
-  SUBDIRS(Testing)
-ENDIF(BUILD_TESTING)
 
 INSTALL(TARGETS pqComponents
   RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR_CM24} COMPONENT Runtime

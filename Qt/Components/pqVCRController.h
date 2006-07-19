@@ -33,12 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqVCRController_h
 #define _pqVCRController_h
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 
 #include <QObject>
 class pqPipelineSource;
 
-class PQWIDGETS_EXPORT pqVCRController : public QObject
+class PQCOMPONENTS_EXPORT pqVCRController : public QObject
 {
   Q_OBJECT
 public:

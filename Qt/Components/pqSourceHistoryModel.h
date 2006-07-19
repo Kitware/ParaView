@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqSourceHistoryModel_h
 
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include <QAbstractListModel>
 
 #include "pqSourceInfoIcons.h" // Needed for enum
@@ -55,7 +55,7 @@ class QStringList;
 /// filters. The underlying data is the same for each type. The only
 /// difference is the default icon type used. The default icon type
 /// can be configured using the \c setIcons method.
-class PQWIDGETS_EXPORT pqSourceHistoryModel : public QAbstractListModel
+class PQCOMPONENTS_EXPORT pqSourceHistoryModel : public QAbstractListModel
 {
   Q_OBJECT
 

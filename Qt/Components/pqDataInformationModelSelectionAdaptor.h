@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Selection adaptors are part of the "Synchronized selection" mechanism
 // making it possible to different views connected to different models 
 // which are based on pqServerManagerModel to coordinate the selection state.
-class PQWIDGETS_EXPORT pqDataInformationModelSelectionAdaptor :
+class PQCOMPONENTS_EXPORT pqDataInformationModelSelectionAdaptor :
   public pqSelectionAdaptor
 {
   Q_OBJECT

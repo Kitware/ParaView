@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqDataInformationWidget_h
 #define __pqDataInformationWidget_h
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include <QWidget>
 
 class pqDataInformationModel;
@@ -40,7 +40,7 @@ class QTableView;
 
 // Widget for the DataInformation(or Statistics View).
 // It creates the model and the view and connects them.
-class PQWIDGETS_EXPORT pqDataInformationWidget : public QWidget
+class PQCOMPONENTS_EXPORT pqDataInformationWidget : public QWidget
 {
   Q_OBJECT
 public:

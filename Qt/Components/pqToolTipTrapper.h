@@ -33,12 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqToolTipTrapper_h
 #define _pqToolTipTrapper_h
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 
 #include <QObject>
 
 /// To prevent tooltips from appearing, create an instance of this object.
-class PQWIDGETS_EXPORT pqToolTipTrapper :
+class PQCOMPONENTS_EXPORT pqToolTipTrapper :
   public QObject
 {
   Q_OBJECT

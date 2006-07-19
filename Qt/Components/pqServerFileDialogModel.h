@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqServerFileDialogModel_h
 #define _pqServerFileDialogModel_h
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include "pqFileDialogModel.h"
 
 class vtkProcessModule;
@@ -46,7 +46,7 @@ To use, pass a new instance of pqServerFileDialogModel to pqFileDialog object.
 
 \sa pqFileDialogModel, pqLocalFileDialogModel, pqFileDialog
 */
-class PQWIDGETS_EXPORT pqServerFileDialogModel :
+class PQCOMPONENTS_EXPORT pqServerFileDialogModel :
   public pqFileDialogModel
 {
   typedef pqFileDialogModel base;

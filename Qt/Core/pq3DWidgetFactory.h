@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pq3DWidgetFactory_h
 #define __pq3DWidgetFactory_h
 
+#include "pqCoreExport.h"
 #include <QObject>
 
 class pq3DWidgetFactoryInternal;
@@ -45,7 +46,7 @@ class vtkSMProxy;
 /// it will be reused, and marked \c in-use. When the caller is done
 /// using the 3D widget, it must call free3DWidget(), which makes 
 /// the widget available for reuse.
-class pq3DWidgetFactory : public QObject
+class PQCORE_EXPORT pq3DWidgetFactory : public QObject
 {
   Q_OBJECT
 public:

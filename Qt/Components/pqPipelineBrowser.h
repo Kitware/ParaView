@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPipelineBrowser_h
 
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include <QWidget>
 #include <QPointer>
 
@@ -56,7 +56,7 @@ class QModelIndex;
 // the server manager. It provides slot (select()) to change the currently
 // selected item, it also fires a signal selectionChanged() when the selection
 // changes.
-class PQWIDGETS_EXPORT pqPipelineBrowser : public QWidget
+class PQCOMPONENTS_EXPORT pqPipelineBrowser : public QWidget
 {
   Q_OBJECT
 

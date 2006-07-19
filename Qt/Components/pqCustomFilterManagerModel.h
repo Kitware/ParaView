@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqCustomFilterManagerModel_h
 
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include <QAbstractListModel>
 
 class pqCustomFilterManagerModelInternal;
@@ -53,7 +53,7 @@ class QString;
 /// \c removeCustomFilter methods. When a new custom filter is added
 /// to the model a signal is emitted. This signal can be used to
 /// highlight the new custom filter.
-class PQWIDGETS_EXPORT pqCustomFilterManagerModel : public QAbstractListModel
+class PQCOMPONENTS_EXPORT pqCustomFilterManagerModel : public QAbstractListModel
 {
   Q_OBJECT
 

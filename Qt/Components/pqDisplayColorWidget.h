@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqDisplayColorWidget_h
 
 #include "pqVariableType.h"
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 
 #include <QWidget>
 #include <QPointer>
@@ -48,7 +48,7 @@ class vtkEventQtSlotConnect;
 
 /// Provides a standard user interface for selecting among a collection 
 /// of dataset variables (both cell and node variables).
-class PQWIDGETS_EXPORT pqDisplayColorWidget : public QWidget
+class PQCOMPONENTS_EXPORT pqDisplayColorWidget : public QWidget
 {
   Q_OBJECT
 

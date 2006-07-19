@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqSelectionManager_h
 #define __pqSelectionManager_h
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include <QObject>
 
 class vtkSMDisplayProxy;
@@ -45,7 +45,7 @@ class pqSelectionManagerImplementation;
 /// pqSelectionManager is the link between the server manager level
 /// selection and the GUI. It keeps a list of selected proxies and
 /// corresponding point/cell list proxies.
-class PQWIDGETS_EXPORT pqSelectionManager : public QObject
+class PQCOMPONENTS_EXPORT pqSelectionManager : public QObject
 {
   Q_OBJECT
 

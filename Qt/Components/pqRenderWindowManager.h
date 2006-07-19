@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqRenderWindowManager_h
 
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include <QObject>
 
 class pqServer;
@@ -43,7 +43,7 @@ class pqRenderWindowManagerInternal;
 
 // This class manages all render windows. This class is an attempt to
 // take away some of the work form pqMainWindow. 
-class PQWIDGETS_EXPORT pqRenderWindowManager : public QObject 
+class PQCOMPONENTS_EXPORT pqRenderWindowManager : public QObject 
 {
   Q_OBJECT
 public:

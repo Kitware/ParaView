@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqSelectionAdaptor_h
 #define __pqSelectionAdaptor_h
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include <QObject>
 #include <QItemSelectionModel> //need for qtSelectionFlags
 
@@ -54,7 +54,7 @@ class QModelIndex;
 // participate in synchronized selections would typically subclass and implement 
 // an adaptor. Subclass typically only need to implement
 // mapToSMModel() and mapFromSMModel().
-class PQWIDGETS_EXPORT pqSelectionAdaptor : public QObject
+class PQCOMPONENTS_EXPORT pqSelectionAdaptor : public QObject
 {
   Q_OBJECT
 

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqMainWindowCore_h
 #define _pqMainWindowCore_h
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include "pqVariableType.h"
 
 #include <vtkIOStream.h>
@@ -68,7 +68,7 @@ class QWidget;
 application authors can derive from pqMainWindowCore and call its member functions
 to use as-much or as-little of the standardized functionality as desired */
 
-class PQWIDGETS_EXPORT pqMainWindowCore :
+class PQCOMPONENTS_EXPORT pqMainWindowCore :
   public QObject
 {
   Q_OBJECT

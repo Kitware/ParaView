@@ -34,11 +34,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqMultiViewFrame_h
 
 #include <QWidget>
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include "ui_pqMultiViewFrameMenu.h"
 
 /// a holder for a widget in a multiview
-class PQWIDGETS_EXPORT pqMultiViewFrame : public QWidget, public Ui::MultiViewFrameMenu
+class PQCOMPONENTS_EXPORT pqMultiViewFrame : public QWidget, public Ui::MultiViewFrameMenu
 {
   Q_OBJECT
   Q_PROPERTY(bool menuAutoHide READ menuAutoHide WRITE setMenuAutoHide)

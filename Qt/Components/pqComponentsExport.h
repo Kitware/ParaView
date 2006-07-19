@@ -1,7 +1,7 @@
 /*=========================================================================
 
-   Program: ParaView
-   Module:    pq3DViewPropertiesWidget.h
+   Program:   ParaView
+   Module:    pqComponentsExport.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,41 +29,18 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef __pq3DViewPropertiesWidget_h
-#define __pq3DViewPropertiesWidget_h
 
-#include<QWidget>
-#include "pqComponentsExport.h"
+#ifndef _pqComponentsExport_h
+#define _pqComponentsExport_h
 
-class pq3DViewPropertiesWidgetInternal;
-class vtkSMProxy;
-
-class PQCOMPONENTS_EXPORT pq3DViewPropertiesWidget : public QWidget
-{
-  Q_OBJECT
-public:
-  pq3DViewPropertiesWidget(QWidget* parent=0);
-  virtual ~pq3DViewPropertiesWidget();
-
-  // Set the render module whose properties this widget is editing.
-  void setRenderModule(vtkSMProxy*);
-
-public slots:
-  // call to accept the changes in the widget.
-  void accept();
-
-private slots:
-  void lodThresholdSliderChanged(int);
-  void lodResolutionSliderChanged(int);
-  void outlineThresholdSliderChanged(int);
-  void compositeThresholdSliderChanged(int);
-  void subsamplingRateSliderChanged(int);
-  void squirtLevelRateSliderChanged(int);
-
-private:
-  pq3DViewPropertiesWidgetInternal* Internal;
-};
-
-
+#if defined(WIN32) && defined(PARAVIEW_BUILD_SHARED_LIBS)
+# if defined(pqComponents_EXPORTS)
+#   define PQCOMPONENTS_EXPORT __declspec(dllexport)
+# else
+#   define PQCOMPONENTS_EXPORT __declspec(dllimport)
+# endif
+#else
+# define PQCOMPONENTS_EXPORT
 #endif
 
+#endif // !_pqWidgetsExport_h

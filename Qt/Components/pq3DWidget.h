@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pq3DWidget_h
 
 #include <QWidget>
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include "pqSMProxy.h"
 
 class vtkPVXMLElement;
@@ -46,7 +46,7 @@ class pq3DWidgetInternal;
 /// pq3DWidget is the abstract superclass for all 3D widgets.
 /// This class represents a 3D Widget proxy as well as the GUI for the
 /// widget.
-class PQWIDGETS_EXPORT pq3DWidget : public QWidget
+class PQCOMPONENTS_EXPORT pq3DWidget : public QWidget
 {
   Q_OBJECT
 

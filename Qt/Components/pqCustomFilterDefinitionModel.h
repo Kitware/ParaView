@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqCustomFilterDefinitionModel_h
 
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include <QAbstractItemModel>
 
 class pqCustomFilterDefinitionModelItem;
@@ -55,7 +55,7 @@ class QPixmap;
 /// custom filter definition model contains only sources. It does not
 /// include any server objects, since the custom filter must be
 /// defined on one server.
-class PQWIDGETS_EXPORT pqCustomFilterDefinitionModel : public QAbstractItemModel
+class PQCOMPONENTS_EXPORT pqCustomFilterDefinitionModel : public QAbstractItemModel
 {
 public:
   enum ItemType

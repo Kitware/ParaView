@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqSourceInfoIcons_h
 
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include <QObject>
 #include <QPixmap> // Needed for return value
 
@@ -49,7 +49,7 @@ class QString;
 /// \brief
 ///   The pqSourceInfoIcons class makes it possible to associate a
 ///   pixmap with a specific source.
-class PQWIDGETS_EXPORT pqSourceInfoIcons : public QObject
+class PQCOMPONENTS_EXPORT pqSourceInfoIcons : public QObject
 {
   Q_OBJECT
 

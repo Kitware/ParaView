@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqCustomFilterDefinitionWizard_h
 
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include <QDialog>
 
 class pqCustomFilterDefinitionModel;
@@ -78,7 +78,7 @@ class vtkSMCompoundProxy;
  *  \c createCustomFilter call, you can get the name of the newly
  *  created compound proxy.
  */
-class PQWIDGETS_EXPORT pqCustomFilterDefinitionWizard : public QDialog
+class PQCOMPONENTS_EXPORT pqCustomFilterDefinitionWizard : public QDialog
 {
   Q_OBJECT
 

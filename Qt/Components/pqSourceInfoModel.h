@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqSourceInfoModel_h
 
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include <QAbstractItemModel>
 
 #include "pqSourceInfoIcons.h" // Needed for enum
@@ -56,7 +56,7 @@ class QStringList;
 /// object. The model will display the sources available in the
 /// groupings defined by the source group map. The available sources
 /// are always shown in the top level of the hierarchy.
-class PQWIDGETS_EXPORT pqSourceInfoModel : public QAbstractItemModel
+class PQCOMPONENTS_EXPORT pqSourceInfoModel : public QAbstractItemModel
 {
   Q_OBJECT
 

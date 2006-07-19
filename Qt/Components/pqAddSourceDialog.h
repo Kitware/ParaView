@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqAddSourceDialog_h
 
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include <QDialog>
 
 class pqAddSourceDialogForm;
@@ -49,7 +49,7 @@ class QString;
 class QStringList;
 
 
-class PQWIDGETS_EXPORT pqAddSourceDialog : public QDialog
+class PQCOMPONENTS_EXPORT pqAddSourceDialog : public QDialog
 {
   Q_OBJECT
 

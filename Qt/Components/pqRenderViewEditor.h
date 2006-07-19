@@ -34,14 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqRenderViewEditor_h
 
 #include <QWidget>
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include "pqSMProxy.h"
 class vtkSMRenderModuleProxy;
 
 class pqRenderViewEditorInternal;
 
 /// Widget which provides an editor for the properties of a display proxy
-class PQWIDGETS_EXPORT pqRenderViewEditor : public QWidget
+class PQCOMPONENTS_EXPORT pqRenderViewEditor : public QWidget
 {
   Q_OBJECT
 public:

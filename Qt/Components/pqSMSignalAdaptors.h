@@ -35,11 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QObject>
 #include <QVariant>
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 class pqProxy;
 
 /// signal adaptor to allow getting/setting/observing of a pseudo vtkSMProxy property
-class PQWIDGETS_EXPORT pqSignalAdaptorProxy : public QObject
+class PQCOMPONENTS_EXPORT pqSignalAdaptorProxy : public QObject
 {
   Q_OBJECT
   Q_PROPERTY(QVariant proxy READ proxy WRITE setProxy)
@@ -73,7 +73,7 @@ class vtkSMProxy;
 /// pqSignalAdaptorProxyList must be used for any combo-box that selects among
 /// proxies, any of which can have a 3D widget. The 3D widget information is obtained
 /// from the server manager hints for the selected proxy.
-class PQWIDGETS_EXPORT pqSignalAdaptorProxyList : public QObject
+class PQCOMPONENTS_EXPORT pqSignalAdaptorProxyList : public QObject
 {
   Q_OBJECT
   Q_PROPERTY(QVariant proxy READ proxy WRITE setProxy)
@@ -133,7 +133,7 @@ private:
 // to a DoubleVectorProperty using a pqPropertyLink.
 // It formats the text shown in the widget to a more
 // readable form. 
-class PQWIDGETS_EXPORT pqSignalAdaptorDouble : public QObject
+class PQCOMPONENTS_EXPORT pqSignalAdaptorDouble : public QObject
 {
   Q_OBJECT
   Q_PROPERTY(QString value READ value WRITE setValue)

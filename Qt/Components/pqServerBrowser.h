@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqServerBrowser_h
 #define _pqServerBrowser_h
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 
 #include <QDialog>
 
@@ -50,7 +50,7 @@ the slot will be called with the new pqServer object that encapsulates the conne
 \sa pqServer
 */
 
-class PQWIDGETS_EXPORT pqServerBrowser :
+class PQCOMPONENTS_EXPORT pqServerBrowser :
   public QDialog
 {
   typedef QDialog base;

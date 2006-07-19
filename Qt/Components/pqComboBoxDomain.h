@@ -34,14 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pq_ComboBoxDomain_h
 
 #include <QObject>
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 
 class QComboBox;
 class vtkSMProperty;
 
 /// combo box domain 
 /// observers the domain for a combo box and updates accordingly
-class PQWIDGETS_EXPORT pqComboBoxDomain : public QObject
+class PQCOMPONENTS_EXPORT pqComboBoxDomain : public QObject
 {
   Q_OBJECT
 public:

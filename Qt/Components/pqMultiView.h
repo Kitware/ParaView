@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqMultiView_h
 #define _pqMultiView_h
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include <QFrame>
 #include <QList>
 
@@ -42,7 +42,7 @@ class vtkPVXMLElement;
 class QSplitter;
 
 /// class to manage locations of multiple view widgets
-class PQWIDGETS_EXPORT pqMultiView : public QFrame
+class PQCOMPONENTS_EXPORT pqMultiView : public QFrame
 {
   Q_OBJECT
 public:

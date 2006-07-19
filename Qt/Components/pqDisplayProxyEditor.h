@@ -33,13 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqDisplayProxyEditor_h
 
 #include <QWidget>
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 
 class pqDisplayProxyEditorInternal;
 class pqPipelineDisplay;
 
 /// Widget which provides an editor for the properties of a display.
-class PQWIDGETS_EXPORT pqDisplayProxyEditor : public QWidget
+class PQCOMPONENTS_EXPORT pqDisplayProxyEditor : public QWidget
 {
   Q_OBJECT
 public:

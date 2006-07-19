@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqPipelineMenu_h
 
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include <QObject>
 
 class pqPipelineMenuInternal;
@@ -53,7 +53,7 @@ class vtkPVXMLElement;
 class vtkSMProxy;
 
 
-class PQWIDGETS_EXPORT pqPipelineMenu : public QObject
+class PQCOMPONENTS_EXPORT pqPipelineMenu : public QObject
 {
   Q_OBJECT
 

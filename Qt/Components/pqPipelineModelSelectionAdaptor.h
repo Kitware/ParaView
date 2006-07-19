@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Every model implemented on top of pqServerManagerModel that should
 // participate in synchronized selections would typically define such 
 // an adaptor.
-class PQWIDGETS_EXPORT pqPipelineModelSelectionAdaptor : 
+class PQCOMPONENTS_EXPORT pqPipelineModelSelectionAdaptor : 
   public pqSelectionAdaptor
 {
   Q_OBJECT

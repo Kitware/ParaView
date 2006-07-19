@@ -32,13 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __pqDataInformationModel_h
 #define __pqDataInformationModel_h
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include <QAbstractTableModel>
 
 class pqPipelineSource;
 class pqDataInformationModelInternal;
 
-class PQWIDGETS_EXPORT pqDataInformationModel : public QAbstractTableModel
+class PQCOMPONENTS_EXPORT pqDataInformationModel : public QAbstractTableModel
 {
   Q_OBJECT
 

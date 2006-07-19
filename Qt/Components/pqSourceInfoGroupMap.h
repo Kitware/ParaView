@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqSourceInfoGroupMap_h
 
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include <QObject>
 
 class pqSourceInfoGroupMapItem;
@@ -47,7 +47,7 @@ class QStringList;
 class vtkPVXMLElement;
 
 
-class PQWIDGETS_EXPORT pqSourceInfoGroupMap : public QObject
+class PQCOMPONENTS_EXPORT pqSourceInfoGroupMap : public QObject
 {
   Q_OBJECT
 

@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqCustomFilterManager_h
 
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include <QDialog>
 
 class pqCustomFilterManagerForm;
@@ -55,7 +55,7 @@ class QStringList;
 /// the list of registered custom filters. The custom filter manager
 /// uses the server manager to import and export custom filter
 /// definitions. It can also unregister the selected custom filter.
-class PQWIDGETS_EXPORT pqCustomFilterManager : public QDialog
+class PQCOMPONENTS_EXPORT pqCustomFilterManager : public QDialog
 {
   Q_OBJECT
 

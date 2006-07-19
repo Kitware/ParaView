@@ -33,12 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqScalarSetModel_h
 #define _pqScalarSetModel_h
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 
 #include <QAbstractListModel>
 
 /// Qt model that stores a sorted collection of unique floating-point numbers
-class PQWIDGETS_EXPORT pqScalarSetModel :
+class PQCOMPONENTS_EXPORT pqScalarSetModel :
   public QAbstractListModel
 {
   typedef QAbstractListModel base;

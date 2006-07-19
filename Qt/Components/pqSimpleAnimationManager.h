@@ -33,14 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqSimpleAnimationManager_h
 
 #include <QObject>
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 
 class pqPipelineSource;
 class pqSimpleAnimationManagerInternal;
 
 // This class is a temporary animation manager. It simply saves
 // animations in which the timestep of a reader is animated.
-class PQWIDGETS_EXPORT pqSimpleAnimationManager : public QObject
+class PQCOMPONENTS_EXPORT pqSimpleAnimationManager : public QObject
 {
   Q_OBJECT;
 public:

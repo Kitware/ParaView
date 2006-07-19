@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqSourceInfoFilterModel_h
 
 
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 #include <QAbstractProxyModel>
 
 class pqSourceInfoFilterModelInternal;
@@ -55,7 +55,7 @@ class QStringList;
 /// pqSourceInfoModel. The filtering functionality is needed by the
 /// "Add Filter..." dialog to only display filters that can be
 /// connected to the selected input.
-class PQWIDGETS_EXPORT pqSourceInfoFilterModel : public QAbstractProxyModel
+class PQCOMPONENTS_EXPORT pqSourceInfoFilterModel : public QAbstractProxyModel
 {
   Q_OBJECT
 

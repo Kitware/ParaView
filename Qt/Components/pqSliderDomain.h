@@ -34,14 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define pq_SliderDomain_h
 
 #include <QObject>
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 
 class QSlider;
 class vtkSMProperty;
 
 /// combo box domain 
 /// observers the domain for a combo box and updates accordingly
-class PQWIDGETS_EXPORT pqSliderDomain : public QObject
+class PQCOMPONENTS_EXPORT pqSliderDomain : public QObject
 {
   Q_OBJECT
   Q_PROPERTY(double ScaleFactor READ scaleFactor WRITE setScaleFactor)

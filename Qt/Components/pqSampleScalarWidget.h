@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _pqSampleScalarWidget_h
 
 #include "pqSMProxy.h"
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 
 #include <QWidget>
 
@@ -50,7 +50,7 @@ scalar samples.  Current uses include: specifying the set of "slices" for
 the Cut filter, and specifying the set of contour values for the Contour filter.
 */
 
-class PQWIDGETS_EXPORT pqSampleScalarWidget :
+class PQCOMPONENTS_EXPORT pqSampleScalarWidget :
   public QWidget
 {
   typedef QWidget base;
