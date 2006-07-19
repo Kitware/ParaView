@@ -38,7 +38,7 @@
 #include "vtkWindowToImageFilter.h"
 
 vtkStandardNewMacro(vtkSMCompositeRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.15");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {
@@ -242,8 +242,8 @@ void vtkSMCompositeRenderModuleProxy::StillRender()
     this->GetTotalVisibleGeometryMemorySize(), 1);
 
   // Change the collection flags and update.
-  this->Displays->InitTraversal();
-  while ( (object = this->Displays->GetNextItemAsObject()) )
+  this->GetDisplays()->InitTraversal();
+  while ( (object = this->GetDisplays()->GetNextItemAsObject()) )
     {
     pDisp = vtkSMCompositeDisplayProxy::SafeDownCast(object);
     if (pDisp && pDisp->GetVisibilityCM())
@@ -290,8 +290,8 @@ void vtkSMCompositeRenderModuleProxy::InteractiveRender()
   this->LocalRender = this->GetLocalRenderDecision(totalMemory, 0);
 
   // Change the collection flags and update.
-  this->Displays->InitTraversal();
-  while ( (object = this->Displays->GetNextItemAsObject()) )
+  this->GetDisplays()->InitTraversal();
+  while ( (object = this->GetDisplays()->GetNextItemAsObject()) )
     {
     pDisp = vtkSMCompositeDisplayProxy::SafeDownCast(object);
     if (pDisp && pDisp->GetVisibilityCM())
