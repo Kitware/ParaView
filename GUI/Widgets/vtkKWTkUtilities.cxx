@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.79");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.80");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::GetTclNameFromPointer(
@@ -206,15 +206,19 @@ const char* vtkKWTkUtilities::EvaluateSimpleStringInternal(
   const char *str)
 {
   static vtksys_stl::string err;
+  static vtksys_stl::string errInfo;
   
   if (Tcl_GlobalEval(interp, str) != TCL_OK && obj)
     {
     err = Tcl_GetStringResult(interp); // need to save now
+    errInfo = Tcl_GetVar(interp, "errorInfo", 
+        TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG ); // get the error message too
     vtkErrorWithObjectMacro(
       obj, "\n    Script: \n" << str
       << "\n    Returned Error on line "
       << interp->errorLine << ": \n"  
-      << err.c_str() << endl);
+      << err.c_str() << "\nStack trace: \n"
+      << errInfo.c_str() << endl);
     return err.c_str();
     }
   
