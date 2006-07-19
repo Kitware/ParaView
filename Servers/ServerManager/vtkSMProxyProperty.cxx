@@ -32,7 +32,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.36");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.37");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -508,11 +508,11 @@ int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
             {
             if (remove_proxy)
               {
-              this->RemoveProxy(proxy);
+              this->RemoveProxy(proxy, 0);
               }
             else
               {
-              this->AddProxy(proxy);
+              this->AddProxy(proxy, 0);
               }
             proxy->Delete();
             }
@@ -528,11 +528,11 @@ int vtkSMProxyProperty::LoadState(vtkPVXMLElement* element,
           {
           if (remove_proxy)
             {
-            this->RemoveProxy(0);
+            this->RemoveProxy(0, 0);
             }
           else
             {
-            this->AddProxy(0);
+            this->AddProxy(0, 0);
             }
           }
         }
