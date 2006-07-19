@@ -52,19 +52,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMPropertyIterator.h"
 
 // ParaView includes
+#include "pqApplicationCore.h"
 #include "pqListWidgetItemObject.h"
-#include "pqTreeWidgetItemObject.h"
-#include "pqServerManagerObserver.h"
+#include "pqObjectPanel.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineModel.h"
 #include "pqPipelineSource.h"
 #include "pqPropertyManager.h"
 #include "pqServerManagerModel.h"
+#include "pqServerManagerObserver.h"
+#include "pqSignalAdaptorProxyList.h"
 #include "pqSignalAdaptors.h"
 #include "pqSMAdaptor.h"
 #include "pqSMProxy.h"
 #include "pqSMSignalAdaptors.h"
-#include "pqApplicationCore.h"
+#include "pqTreeWidgetItemObject.h"
 
 void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* property_manager)
 {
@@ -244,6 +246,7 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
         if (comboBox)
           {
           comboBox->clear();
+          /*
           QList<pqSMProxy> propertyDomain = 
             pqSMAdaptor::getProxyPropertyDomain(SMProperty);
           foreach(pqSMProxy v, propertyDomain)
@@ -253,14 +256,20 @@ void pqNamedWidgets::link(QWidget* parent, pqSMProxy proxy, pqPropertyManager* p
           pqSignalAdaptorComboBox* comboAdaptor = 
             new pqSignalAdaptorComboBox(comboBox);
           comboAdaptor->setObjectName("ComboBoxAdaptor");
-          pqSignalAdaptorProxyList* proxyAdaptor = 
-            new pqSignalAdaptorProxyList(comboAdaptor, "currentIndex", 
-              SIGNAL(currentTextChanged(const QString&)));
-          proxyAdaptor->setWidgetFrame(widgetFrame);
+          */
           pqProxy* pq_proxy =
             pqApplicationCore::instance()->getServerManagerModel()->getPQSource(proxy);
-          proxyAdaptor->setReferenceProxy(pq_proxy);
-          proxyAdaptor->setProperty(SMProperty);
+          pqSignalAdaptorProxyList* proxyAdaptor = 
+            new pqSignalAdaptorProxyList(comboBox, pq_proxy, iter->GetKey());
+          proxyAdaptor->setWidgetFrame(widgetFrame);
+          pqObjectPanel* object_panel = qobject_cast<pqObjectPanel*>(parent);
+          if (object_panel)
+            {
+            proxyAdaptor->setRenderModule(object_panel->getRenderModule());
+            }
+          QObject::connect(parent, SIGNAL(renderModuleChanged(pqRenderModule*)),
+            proxyAdaptor, SLOT(setRenderModule(pqRenderModule*)));
+
           QObject::connect(parent, SIGNAL(onaccept()), proxyAdaptor, 
             SLOT(accept()));
           QObject::connect(parent, SIGNAL(onreset()), proxyAdaptor,

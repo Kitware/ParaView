@@ -121,6 +121,7 @@ ENDIF(APPLE)
   SET(TEST_IMAGE ${PARAVIEW_DATA_ROOT}/Baseline)
 
   SET (TESTS_WITH_BASELINES
+    3DWidgetInCustomFilter
     Clip
     ClipHidden
     ClipUndo

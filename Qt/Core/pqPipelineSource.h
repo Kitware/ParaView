@@ -115,6 +115,15 @@ protected slots:
 protected:
   friend class pqPipelineFilter;
   friend class pqPipelineDisplay;
+  /// For every source registered if it has any property that defines a proxy_list
+  /// domain, we create and register proxies for every type of proxy indicated 
+  /// in that domain. These are "internal proxies" for this pqProxy. Internal
+  /// proxies are registered under special groups and are unregistered with
+  /// the pqProxy object is destroyed i.e. when the vtkSMProxy represented
+  /// by this pqProxy is unregistered. These internal proxies
+  /// are used by pqSignalAdaptorProxyList to populate the combox box
+  /// widget thru which the user can choose one of the available proxies.
+  void createProxiesForProxyListDomains();
 
   // called by pqPipelineFilter when the connections change.
   void removeConsumer(pqPipelineSource *);

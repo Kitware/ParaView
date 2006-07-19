@@ -112,8 +112,54 @@ pqHandleWidget::pqHandleWidget(QWidget* p) :
     this, SIGNAL(widgetChanged()));
 }
 
+//-----------------------------------------------------------------------------
 pqHandleWidget::~pqHandleWidget()
 {
+  this->cleanupWidget();
+  delete this->Implementation;
+}
+
+//-----------------------------------------------------------------------------
+void pqHandleWidget::createWidget(pqServer* server)
+{
+  vtkSMNew3DWidgetProxy* widget =
+    pqApplicationCore::instance()->get3DWidgetFactory()->
+    get3DWidget("PointSourceWidgetDisplay", server);
+  this->setWidgetProxy(widget);
+
+  pqSignalAdaptorDouble* adaptor = new pqSignalAdaptorDouble(
+    this->Implementation->UI->worldPositionX, "text",
+    SIGNAL(textChanged(const QString&)));
+  this->Implementation->Links.addPropertyLink(
+    adaptor, "value", SIGNAL(valueChanged(const QString&)),
+    widget, widget->GetProperty("WorldPosition"), 0);
+
+  adaptor = new pqSignalAdaptorDouble(
+    this->Implementation->UI->worldPositionY, "text",
+    SIGNAL(textChanged(const QString&)));
+  this->Implementation->Links.addPropertyLink(
+    adaptor, "value", SIGNAL(valueChanged(const QString&)),
+    widget, widget->GetProperty("WorldPosition"), 1);
+
+  adaptor = new pqSignalAdaptorDouble(
+    this->Implementation->UI->worldPositionZ, "text",
+    SIGNAL(textChanged(const QString&)));
+  this->Implementation->Links.addPropertyLink(
+    adaptor, "value", SIGNAL(valueChanged(const QString&)),
+    widget, widget->GetProperty("WorldPosition"), 2);
+
+  widget->UpdateVTKObjects();
+
+  widget->AddObserver(vtkCommand::StartInteractionEvent,
+    this->Implementation->StartDragObserver);
+  widget->AddObserver(vtkCommand::EndInteractionEvent,
+    this->Implementation->EndDragObserver);
+}
+
+//-----------------------------------------------------------------------------
+void pqHandleWidget::cleanupWidget()
+{
+  this->Implementation->Links.removeAllPropertyLinks();
   vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
   if(widget)
     {
@@ -121,87 +167,22 @@ pqHandleWidget::~pqHandleWidget()
       this->Implementation->EndDragObserver);
     widget->RemoveObserver(
       this->Implementation->StartDragObserver);
-    }
-
-  if(widget)
-    {
-    if(this->getRenderModule())
-      {
-      if(vtkSMRenderModuleProxy* rm = this->getRenderModule()->getRenderModuleProxy())
-        {
-        if(vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-          rm->GetProperty("Displays")))
-          {
-          pp->RemoveProxy(widget);
-          rm->UpdateVTKObjects();
-          this->getRenderModule()->render();
-          }
-        }
-      }
-
     pqApplicationCore::instance()->get3DWidgetFactory()->
       free3DWidget(widget);
-      
-    this->setWidgetProxy(0);
     }
-
-  delete this->Implementation;
+  this->setWidgetProxy(0);
 }
 
 //-----------------------------------------------------------------------------
 void pqHandleWidget::setControlledProxy(vtkSMProxy* proxy)
 {
-  if(!this->getWidgetProxy())
+  if (!this->getWidgetProxy())
     {
-    pqServer* const server = pqApplicationCore::instance()->
-      getServerManagerModel()->getServer(proxy->GetConnectionID());
-          
-    vtkSMNew3DWidgetProxy* widget =
-      pqApplicationCore::instance()->get3DWidgetFactory()->
-        get3DWidget("PointSourceWidgetDisplay", server);
-    this->setWidgetProxy(widget);
-
-    pqSignalAdaptorDouble* adaptor = new pqSignalAdaptorDouble(
-      this->Implementation->UI->worldPositionX, "text",
-      SIGNAL(textChanged(const QString&)));
-    this->Implementation->Links.addPropertyLink(
-      adaptor, "value", SIGNAL(valueChanged(const QString&)),
-      widget, widget->GetProperty("WorldPosition"), 0);
-
-    adaptor = new pqSignalAdaptorDouble(
-      this->Implementation->UI->worldPositionY, "text",
-      SIGNAL(textChanged(const QString&)));
-    this->Implementation->Links.addPropertyLink(
-      adaptor, "value", SIGNAL(valueChanged(const QString&)),
-      widget, widget->GetProperty("WorldPosition"), 1);
-
-    adaptor = new pqSignalAdaptorDouble(
-      this->Implementation->UI->worldPositionZ, "text",
-      SIGNAL(textChanged(const QString&)));
-    this->Implementation->Links.addPropertyLink(
-      adaptor, "value", SIGNAL(valueChanged(const QString&)),
-      widget, widget->GetProperty("WorldPosition"), 2);
-
-    widget->UpdateVTKObjects();
-
-    if(widget && this->getRenderModule())
-      {
-      vtkSMRenderModuleProxy* rm = this->getRenderModule()->getRenderModuleProxy() ;
-      vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-        rm->GetProperty("Displays"));
-      pp->AddProxy(widget);
-      rm->UpdateVTKObjects();
-      this->getRenderModule()->render();
-      }
-      
-    if(widget)
-      {
-      widget->AddObserver(vtkCommand::StartInteractionEvent,
-        this->Implementation->StartDragObserver);
-      widget->AddObserver(vtkCommand::EndInteractionEvent,
-        this->Implementation->EndDragObserver);
-      }
+    pqServerManagerModel* smModel = 
+      pqApplicationCore::instance()->getServerManagerModel();
+    this->createWidget(smModel->getServer(proxy->GetConnectionID()));
     }
+
   this->pq3DWidget::setControlledProxy(proxy);
 }
 

@@ -43,6 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPVXMLElement.h>
 #include <vtkSMDataObjectDisplayProxy.h>
 #include <vtkSMDoubleVectorProperty.h>
+#include <vtkSMProxyListDomain.h>
 #include <vtkSMProxyProperty.h>
 
 #include <QCheckBox>
@@ -162,7 +163,18 @@ void pqClipPanel::setProxyInternal(pqProxy* p)
     if(vtkSMProxyProperty* const clip_function_property = vtkSMProxyProperty::SafeDownCast(
       this->Proxy->getProxy()->GetProperty("ClipFunction")))
       {
+      if (clip_function_property->GetNumberOfProxies() == 0)
+        {
+        vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
+          clip_function_property->GetDomain("proxy_list"));
+        if (pld)
+          {
+          clip_function_property->AddProxy(pld->GetProxy(0));
+          this->Proxy->getProxy()->UpdateVTKObjects();
+          }
+        }
       controlled_proxy = clip_function_property->GetProxy(0);
+      controlled_proxy->UpdateVTKObjects();
       }
     }
   this->Implementation->ImplicitPlaneWidget.setReferenceProxy(reference_proxy);

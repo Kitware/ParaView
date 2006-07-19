@@ -237,6 +237,7 @@ vtkSMProxy* pqPipelineBuilder::createProxy(const char* xmlgroup,
     this->UndoStack->BeginOrContinueUndoSet(QString(label.str().c_str()));
     }
 
+  /*
   // If the proxy has any proxy_list domains, we need to
   // create and register proxies which will be used for that property.
   // We must create and register proxies for the proxy list domain
@@ -272,6 +273,7 @@ vtkSMProxy* pqPipelineBuilder::createProxy(const char* xmlgroup,
       }
     }
   iter->Delete();
+  */
 
   pxm->RegisterProxy(register_group, proxy->GetSelfIDAsString(),
     proxy);

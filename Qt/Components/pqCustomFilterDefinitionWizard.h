@@ -132,6 +132,17 @@ private:
   /// \return
   ///   True if the custom filter name is valid.
   bool validateCustomFilterName();
+  /// \brief
+  ///   Adds proxies referred to by the proxies in the custom filter that
+  ///   that the user could not have explicitly selected/deselected.
+  /// 
+  /// A custom filter may includes proxies which refer to other internal 
+  /// proxies such as implicit functions, internal sources which are not shown
+  /// in the pipeline browser. We include these proxies into the custom filter
+  /// so that its definition is complete. This method is called after all proxies
+  /// have been added to the custom filter and before its definition is 
+  /// created.
+  void addAutoIncludedProxies(vtkSMCompoundProxy* customFilter);
 
 private slots:
   /// \name Page Navigation

@@ -88,7 +88,7 @@ public:
   bool widgetVisibile() const;
   
   /// Get the render module that this widget works with
-  pqRenderModule* getRenderModule();
+  pqRenderModule* getRenderModule() const;
 
 signals:
   /// Notifies observers that the user is dragging the 3D widget

@@ -29,18 +29,19 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include "pqStreamTracerPanel.h"
 
 #include "pqApplicationCore.h"
 #include "pqLineWidget.h"
 #include "pqNamedWidgets.h"
 #include "pqPipelineDisplay.h"
 #include "pqPipelineFilter.h"
-#include "pqServerManagerModel.h"
 #include "pqPointSourceWidget.h"
 #include "pqPropertyManager.h"
 #include "pqServerManagerModel.h"
+#include "pqServerManagerModel.h"
 #include "pqSignalAdaptors.h"
-#include "pqStreamTracerPanel.h"
+#include "pqSMAdaptor.h"
 
 #include "ui_pqStreamTracerControls.h"
 
@@ -49,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPVXMLElement.h>
 #include <vtkSMDataObjectDisplayProxy.h>
 #include <vtkSMDoubleVectorProperty.h>
+#include <vtkSMIntVectorProperty.h>
 #include <vtkSMProxyProperty.h>
 
 #include <QVBoxLayout>
@@ -182,7 +184,19 @@ void pqStreamTracerPanel::setProxyInternal(pqProxy* p)
     if(vtkSMProxyProperty* const source_property = vtkSMProxyProperty::SafeDownCast(
       this->Proxy->getProxy()->GetProperty("Source")))
       {
-      controlled_proxy = source_property->GetProxy(0);
+      controlled_proxy = pqSMAdaptor::getProxyProperty(source_property);
+      if (source_property->GetNumberOfProxies() == 0)
+        {
+        source_property->AddProxy(controlled_proxy);
+        if(vtkSMIntVectorProperty* const number_of_points =
+          vtkSMIntVectorProperty::SafeDownCast(
+            controlled_proxy->GetProperty("NumberOfPoints")))
+          {
+          number_of_points->SetNumberOfElements(1);
+          number_of_points->SetElement(0, 100);
+          }
+        controlled_proxy->UpdateVTKObjects();
+        }
       }
     }
    

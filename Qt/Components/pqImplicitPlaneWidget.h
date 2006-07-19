@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pq3DWidget.h"
 
+class pqServer;
 class vtkSMDoubleVectorProperty;
 
 /// Provides a complete Qt UI for working with a 3D plane widget
@@ -77,6 +78,11 @@ protected:
   /// Resets the bounds of the 3D widget to the reference proxy bounds.
   virtual void resetBounds();
 
+  /// Internal method to create the widget.
+  void createWidget(pqServer*);
+
+  /// Internal method to cleanup widget.
+  void cleanupWidget();
 private slots:
   /// Called to show/hide the 3D widget
   void onShow3DWidget(bool);

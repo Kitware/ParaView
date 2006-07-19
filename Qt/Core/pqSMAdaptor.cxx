@@ -143,7 +143,8 @@ pqSMAdaptor::PropertyType pqSMAdaptor::getPropertyType(vtkSMProperty* Property)
 
 pqSMProxy pqSMAdaptor::getProxyProperty(vtkSMProperty* Property)
 {
-  if(pqSMAdaptor::getPropertyType(Property) == pqSMAdaptor::PROXY)
+  pqSMAdaptor::PropertyType type = pqSMAdaptor::getPropertyType(Property);
+  if( type == pqSMAdaptor::PROXY || type == pqSMAdaptor::PROXYSELECTION)
     {
     vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::SafeDownCast(Property);
     if(proxyProp->GetNumberOfProxies())
@@ -158,7 +159,7 @@ pqSMProxy pqSMAdaptor::getProxyProperty(vtkSMProperty* Property)
       domain = pqSMAdaptor::getProxyPropertyDomain(Property);
       if(domain.size())
         {
-        //this->setProxyProperty(Proxy, Property, domain[0]);
+        //pqSMAdaptor::setProxyProperty(Property, domain[0]);
         return domain[0];
         }
       }
@@ -172,8 +173,15 @@ void pqSMAdaptor::setProxyProperty(vtkSMProperty* Property,
   vtkSMProxyProperty* proxyProp = vtkSMProxyProperty::SafeDownCast(Property);
   if(proxyProp)
     {
-    proxyProp->RemoveAllProxies();
-    proxyProp->AddProxy(Value);
+    if (proxyProp->GetNumberOfProxies() == 1)
+      {
+      proxyProp->SetProxy(0, Value);
+      }
+    else
+      {
+      proxyProp->RemoveAllProxies();
+      proxyProp->AddProxy(Value);
+      }
     }
 }
 

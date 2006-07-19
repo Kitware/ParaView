@@ -251,7 +251,6 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
   
   if(!reusedPanel)
     {
-    this->CurrentPanel->setRenderModule(this->getRenderModule());
     this->CurrentPanel->setProxy(proxy);
 
     QObject::connect(this->CurrentPanel->getPropertyManager(), 
@@ -265,6 +264,7 @@ void pqObjectInspectorWidget::setProxy(pqProxy *proxy)
     }
     
   this->PanelArea->layout()->addWidget(this->CurrentPanel);
+  this->CurrentPanel->setRenderModule(this->getRenderModule());
   this->CurrentPanel->select();
   this->CurrentPanel->show();
 

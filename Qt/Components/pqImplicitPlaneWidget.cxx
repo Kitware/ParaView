@@ -127,8 +127,78 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(QWidget* p) :
 
 pqImplicitPlaneWidget::~pqImplicitPlaneWidget()
 {
-  this->Implementation->Links.removeAllPropertyLinks();
+  this->cleanupWidget();
 
+  delete this->Implementation;
+}
+
+//-----------------------------------------------------------------------------
+void pqImplicitPlaneWidget::createWidget(pqServer* server)
+{
+  vtkSMNew3DWidgetProxy* widget = 
+    pqApplicationCore::instance()->get3DWidgetFactory()->
+    get3DWidget("ImplicitPlaneWidgetDisplay", server);
+  this->setWidgetProxy(widget);
+  widget->UpdateVTKObjects();
+  widget->AddObserver(vtkCommand::StartInteractionEvent,
+    this->Implementation->StartDragObserver);
+  widget->AddObserver(vtkCommand::EndInteractionEvent,
+    this->Implementation->EndDragObserver);
+
+  // Now bind the GUI widgets to the 3D widget.
+
+  // The adaptor is used to format the text value.
+  pqSignalAdaptorDouble* adaptor = 
+    new pqSignalAdaptorDouble(this->Implementation->UI->originX,
+      "text", SIGNAL(textChanged(const QString&)));
+
+  this->Implementation->Links.addPropertyLink(
+    adaptor, "value", 
+    SIGNAL(valueChanged(const QString&)),
+    widget, widget->GetProperty("Origin"), 0);
+
+  adaptor = new pqSignalAdaptorDouble(
+    this->Implementation->UI->originY,
+    "text", SIGNAL(textChanged(const QString&)));
+  this->Implementation->Links.addPropertyLink(
+    adaptor, "value", SIGNAL(valueChanged(const QString&)),
+    widget, widget->GetProperty("Origin"), 1);
+
+  adaptor = new pqSignalAdaptorDouble(
+    this->Implementation->UI->originZ,
+    "text", SIGNAL(textChanged(const QString&)));
+  this->Implementation->Links.addPropertyLink(
+    adaptor, "value", SIGNAL(valueChanged(const QString&)),
+    widget, widget->GetProperty("Origin"), 2);
+
+  adaptor = new pqSignalAdaptorDouble(
+    this->Implementation->UI->normalX,
+    "text", SIGNAL(textChanged(const QString&)));
+  this->Implementation->Links.addPropertyLink(
+    adaptor, "value", 
+    SIGNAL(valueChanged(const QString&)),
+    widget, widget->GetProperty("Normal"), 0);
+
+  adaptor = new pqSignalAdaptorDouble(
+    this->Implementation->UI->normalY,
+    "text", SIGNAL(textChanged(const QString&)));
+  this->Implementation->Links.addPropertyLink(
+    adaptor, "value", SIGNAL(valueChanged(const QString&)),
+    widget, widget->GetProperty("Normal"), 1);
+
+  adaptor = new pqSignalAdaptorDouble(
+    this->Implementation->UI->normalZ,
+    "text", SIGNAL(textChanged(const QString&)));
+  this->Implementation->Links.addPropertyLink(
+    adaptor, "value", SIGNAL(valueChanged(const QString&)),
+    widget, widget->GetProperty("Normal"), 2);
+
+}
+
+//-----------------------------------------------------------------------------
+void pqImplicitPlaneWidget::cleanupWidget()
+{
+  this->Implementation->Links.removeAllPropertyLinks();
   vtkSMNew3DWidgetProxy* widget = this->getWidgetProxy();
   if(widget)
     {
@@ -136,113 +206,20 @@ pqImplicitPlaneWidget::~pqImplicitPlaneWidget()
       this->Implementation->EndDragObserver);
     widget->RemoveObserver(
       this->Implementation->StartDragObserver);
-    }
-
-  if(widget)
-    {
-    if(this->getRenderModule())
-      {
-      if(vtkSMRenderModuleProxy* rm = this->getRenderModule()->getRenderModuleProxy())
-        {
-        if(vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-          rm->GetProperty("Displays")))
-          {
-          pp->RemoveProxy(widget);
-          rm->UpdateVTKObjects();
-          this->getRenderModule()->render();
-          }
-        }
-      }
-
     pqApplicationCore::instance()->get3DWidgetFactory()->
       free3DWidget(widget);
-    this->setWidgetProxy(0);
     }
-
-  delete this->Implementation;
+  this->setWidgetProxy(0);
 }
 
 //-----------------------------------------------------------------------------
 void pqImplicitPlaneWidget::setControlledProxy(vtkSMProxy* proxy)
 {
-  if(!this->getWidgetProxy())
+  if (!this->getWidgetProxy())
     {
-    // We won't have to do this once setProxy() takes pqProxy as an argument.
-    pqServer* const server = pqApplicationCore::instance()->
-      getServerManagerModel()->getServer(
-        proxy->GetConnectionID());
-
-    vtkSMNew3DWidgetProxy* widget = 
-      pqApplicationCore::instance()->get3DWidgetFactory()->
-      get3DWidget("ImplicitPlaneWidgetDisplay", server);
-    this->setWidgetProxy(widget);
-    widget->UpdateVTKObjects();
-  
-    // Now bind the GUI widgets to the 3D widget.
-
-    // The adaptor is used to format the text value.
-    pqSignalAdaptorDouble* adaptor = 
-      new pqSignalAdaptorDouble(this->Implementation->UI->originX,
-        "text", SIGNAL(textChanged(const QString&)));
-
-    this->Implementation->Links.addPropertyLink(
-      adaptor, "value", 
-      SIGNAL(valueChanged(const QString&)),
-      widget, widget->GetProperty("Origin"), 0);
-
-    adaptor = new pqSignalAdaptorDouble(
-      this->Implementation->UI->originY,
-      "text", SIGNAL(textChanged(const QString&)));
-    this->Implementation->Links.addPropertyLink(
-      adaptor, "value", SIGNAL(valueChanged(const QString&)),
-      widget, widget->GetProperty("Origin"), 1);
-    
-    adaptor = new pqSignalAdaptorDouble(
-      this->Implementation->UI->originZ,
-      "text", SIGNAL(textChanged(const QString&)));
-    this->Implementation->Links.addPropertyLink(
-      adaptor, "value", SIGNAL(valueChanged(const QString&)),
-      widget, widget->GetProperty("Origin"), 2);
-
-    adaptor = new pqSignalAdaptorDouble(
-      this->Implementation->UI->normalX,
-      "text", SIGNAL(textChanged(const QString&)));
-    this->Implementation->Links.addPropertyLink(
-      adaptor, "value", 
-      SIGNAL(valueChanged(const QString&)),
-      widget, widget->GetProperty("Normal"), 0);
-
-    adaptor = new pqSignalAdaptorDouble(
-      this->Implementation->UI->normalY,
-      "text", SIGNAL(textChanged(const QString&)));
-    this->Implementation->Links.addPropertyLink(
-      adaptor, "value", SIGNAL(valueChanged(const QString&)),
-      widget, widget->GetProperty("Normal"), 1);
-    
-    adaptor = new pqSignalAdaptorDouble(
-      this->Implementation->UI->normalZ,
-      "text", SIGNAL(textChanged(const QString&)));
-    this->Implementation->Links.addPropertyLink(
-      adaptor, "value", SIGNAL(valueChanged(const QString&)),
-      widget, widget->GetProperty("Normal"), 2);
-
-    if(widget && this->getRenderModule())
-      {
-      vtkSMRenderModuleProxy* rm = this->getRenderModule()->getRenderModuleProxy() ;
-      vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-        rm->GetProperty("Displays"));
-      pp->AddProxy(widget);
-      rm->UpdateVTKObjects();
-      this->getRenderModule()->render();
-      }
-
-    if(widget)
-      {
-      widget->AddObserver(vtkCommand::StartInteractionEvent,
-        this->Implementation->StartDragObserver);
-      widget->AddObserver(vtkCommand::EndInteractionEvent,
-        this->Implementation->EndDragObserver);
-      }
+    pqServerManagerModel* smModel = 
+      pqApplicationCore::instance()->getServerManagerModel();
+    this->createWidget(smModel->getServer(proxy->GetConnectionID()));
     }
 
   this->pq3DWidget::setControlledProxy(proxy);

@@ -151,11 +151,11 @@ private:
 };
 
 vtkStandardNewMacro(vtkSMUndoStackUndoSet);
-vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.9");
+vtkCxxRevisionMacro(vtkSMUndoStackUndoSet, "1.10");
 //*****************************************************************************
 
 vtkStandardNewMacro(vtkSMUndoStack);
-vtkCxxRevisionMacro(vtkSMUndoStack, "1.9");
+vtkCxxRevisionMacro(vtkSMUndoStack, "1.10");
 vtkCxxSetObjectMacro(vtkSMUndoStack, StateLoader, vtkSMUndoRedoStateLoader);
 //-----------------------------------------------------------------------------
 vtkSMUndoStack::vtkSMUndoStack()
@@ -283,7 +283,8 @@ void vtkSMUndoStack::Push(vtkIdType cid, const char* label, vtkUndoSet* set)
     }
   
   vtkPVXMLElement* state = set->SaveState(NULL);
-  // state->PrintXML();
+  //if (!this->ClientOnly)
+  //   state->PrintXML();
   if (this->ClientOnly)
     {
     vtkSMUndoStackUndoSet* elem = vtkSMUndoStackUndoSet::New();

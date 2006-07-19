@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMNew3DWidgetProxy.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
 
 // Qt includes.
 #include <QtDebug>
@@ -45,11 +46,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView GUI includes.
 #include "pqApplicationCore.h"
-#include "pqRenderModule.h"
-#include "pqPipelineSource.h"
-#include "pqProxy.h"
 #include "pqImplicitPlaneWidget.h"
+#include "pqPipelineSource.h"
 #include "pqPointSourceWidget.h"
+#include "pqProxy.h"
+#include "pqRenderModule.h"
 
 class pq3DWidgetInternal
 {
@@ -79,6 +80,7 @@ pq3DWidget::pq3DWidget(QWidget* _p): QWidget(_p)
 //-----------------------------------------------------------------------------
 pq3DWidget::~pq3DWidget()
 {
+  this->setRenderModule(0);
   this->setControlledProxy(0);
   delete this->Internal;
 }
@@ -122,6 +124,46 @@ QList<pq3DWidget*> pq3DWidget::createWidgets(vtkSMProxy* proxy)
 }
 
 //-----------------------------------------------------------------------------
+void pq3DWidget::setRenderModule(pqRenderModule* renModule)
+{
+  if (renModule == this->Internal->RenderModule)
+    {
+    return;
+    }
+
+  vtkSMProxy* widget = this->getWidgetProxy();
+  if (this->Internal->RenderModule && widget)
+    {
+    vtkSMProxy* rm = this->Internal->RenderModule->getProxy();
+    if(vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+        rm->GetProperty("Displays")))
+      {
+      pp->RemoveProxy(widget);
+      rm->UpdateVTKObjects();
+      this->Internal->RenderModule->render();
+      }
+    }
+  this->Internal->RenderModule = renModule;
+  if (this->Internal->RenderModule && widget)
+    {
+    vtkSMProxy* rm = this->Internal->RenderModule->getProxy();
+    if(vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+        rm->GetProperty("Displays")))
+      {
+      pp->AddProxy(widget);
+      rm->UpdateVTKObjects();
+      this->Internal->RenderModule->render();
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+pqRenderModule* pq3DWidget::getRenderModule() const
+{
+  return this->Internal->RenderModule;
+}
+
+//-----------------------------------------------------------------------------
 void pq3DWidget::onControlledPropertyChanged()
 {
   if (this->IgnorePropertyChange)
@@ -136,7 +178,32 @@ void pq3DWidget::onControlledPropertyChanged()
 //-----------------------------------------------------------------------------
 void pq3DWidget::setWidgetProxy(vtkSMNew3DWidgetProxy* proxy)
 {
+ vtkSMProxy* widget = this->getWidgetProxy();
+
+ if (this->Internal->RenderModule && widget)
+    {
+    vtkSMProxy* rm = this->Internal->RenderModule->getProxy();
+    if(vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+        rm->GetProperty("Displays")))
+      {
+      pp->RemoveProxy(widget);
+      rm->UpdateVTKObjects();
+      this->Internal->RenderModule->render();
+      }
+    }
   this->Internal->WidgetProxy = proxy;
+
+  if (this->Internal->RenderModule && proxy)
+    {
+    vtkSMProxy* rm = this->Internal->RenderModule->getProxy();
+    if(vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+        rm->GetProperty("Displays")))
+      {
+      pp->AddProxy(proxy);
+      rm->UpdateVTKObjects();
+      this->Internal->RenderModule->render();
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -267,6 +334,7 @@ void pq3DWidget::reset()
     ++iter)
     {
     iter.key()->Copy(iter.value());
+    iter.key()->Modified();
     }
 
   if (this->Internal->WidgetProxy)
@@ -323,6 +391,10 @@ void pq3DWidget::hideWidget()
 //-----------------------------------------------------------------------------
 void pq3DWidget::set3DWidgetVisibility(bool visible)
 {
+  if (visible && !this->Internal->RenderModule)
+    {
+    return;
+    }
   if(this->Internal->WidgetProxy)
     {
     if(vtkSMIntVectorProperty* const visibility =
@@ -343,14 +415,3 @@ void pq3DWidget::set3DWidgetVisibility(bool visible)
     pqApplicationCore::instance()->render();
     }
 }
-  
-void pq3DWidget::setRenderModule(pqRenderModule* rm)
-{
-  this->Internal->RenderModule = rm;
-}
-
-pqRenderModule* pq3DWidget::getRenderModule()
-{
-  return this->Internal->RenderModule;
-}
-

@@ -72,6 +72,11 @@ protected:
   /// Overridden to make sure that the visibility check box is
   /// updated.
   virtual void set3DWidgetVisibility(bool visible);
+  /// Internal method to create the widget.
+  void createWidget(pqServer*);
+
+  /// Internal method to cleanup widget.
+  void cleanupWidget();
 private:
   class pqImplementation;
   pqImplementation* const Implementation;

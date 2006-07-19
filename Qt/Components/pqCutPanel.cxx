@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSMDataObjectDisplayProxy.h>
 #include <vtkSMDoubleVectorProperty.h>
 #include <vtkSMProxyProperty.h>
+#include <vtkSMProxyListDomain.h>
 
 #include <QVBoxLayout>
 
@@ -176,7 +177,18 @@ void pqCutPanel::setProxyInternal(pqProxy* p)
     if(vtkSMProxyProperty* const cut_function_property = vtkSMProxyProperty::SafeDownCast(
       this->Proxy->getProxy()->GetProperty("CutFunction")))
       {
+      if (cut_function_property->GetNumberOfProxies() == 0)
+        {
+        vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
+          cut_function_property->GetDomain("proxy_list"));
+        if (pld)
+          {
+          cut_function_property->AddProxy(pld->GetProxy(0));
+          this->Proxy->getProxy()->UpdateVTKObjects();
+          }
+        }
       controlled_proxy = cut_function_property->GetProxy(0);
+      controlled_proxy->UpdateVTKObjects();
       }
     }
   this->Implementation->ImplicitPlaneWidget.setReferenceProxy(reference_proxy);

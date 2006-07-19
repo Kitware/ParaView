@@ -37,10 +37,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView Server Manager.
 #include "vtkSmartPointer.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyListDomain.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
 
 // Qt
 #include <QList>
+#include <QMap>
 #include <QtDebug>
 
 // ParaView
@@ -74,6 +79,9 @@ pqPipelineSource::pqPipelineSource(const QString& name, vtkSMProxy* proxy,
   
   // Set the model item type.
   this->setType(pqPipelineModel::Source);
+  // Create any internal proxies needed by any property
+  // that has a vtkSMProxyListDomain.
+  this->createProxiesForProxyListDomains();
 }
 
 //-----------------------------------------------------------------------------
@@ -81,6 +89,74 @@ pqPipelineSource::~pqPipelineSource()
 {
   delete this->Internal;
 }
+//-----------------------------------------------------------------------------
+void pqPipelineSource::createProxiesForProxyListDomains()
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxy* proxy = this->getProxy();
+  vtkSMPropertyIterator* iter = proxy->NewPropertyIterator();
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProxyProperty* prop = vtkSMProxyProperty::SafeDownCast(
+      iter->GetProperty());
+    if (!prop)
+      {
+      continue;
+      }
+    vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
+      prop->GetDomain("proxy_list"));
+    if (!pld)
+      {
+      continue;
+      }
+
+    QList<vtkSMProxy*> domainProxies;
+    for (unsigned int cc=0; cc < pld->GetNumberOfProxies(); cc++)
+      {
+      domainProxies.push_back(pld->GetProxy(cc));
+      }
+
+    unsigned int max = pld->GetNumberOfProxyTypes();
+    for (unsigned int cc=0; cc < max; cc++)
+      {
+      QString proxy_group = pld->GetProxyGroup(cc);
+      QString proxy_type = pld->GetProxyName(cc);
+
+      vtkSmartPointer<vtkSMProxy> new_proxy;
+
+      // check if a proxy of the indicated type already exists in the domain,
+      // we use it, if present.
+      foreach(vtkSMProxy* temp_proxy, domainProxies)
+        {
+        if (temp_proxy && proxy_group == temp_proxy->GetXMLGroup() 
+          && proxy_type == temp_proxy->GetXMLName())
+          {
+          new_proxy = temp_proxy;
+          break;
+          }
+        }
+      
+      if (new_proxy.GetPointer() == NULL)
+        {
+        new_proxy.TakeReference(pxm->NewProxy(pld->GetProxyGroup(cc),
+            pld->GetProxyName(cc)));
+        if (!new_proxy.GetPointer())
+          {
+          qDebug() << "Could not create a proxy of type " 
+            << proxy_group << "." << proxy_type <<
+            " indicated the proxy list domain.";
+          continue;
+          }
+        new_proxy->SetConnectionID(proxy->GetConnectionID());
+        pld->AddProxy(new_proxy);
+        domainProxies.push_back(new_proxy);
+        }
+      this->addInternalProxy(iter->GetKey(), new_proxy);
+      }
+    }
+  iter->Delete();
+}
+
 
 //-----------------------------------------------------------------------------
 int pqPipelineSource::getNumberOfConsumers() const

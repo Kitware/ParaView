@@ -246,6 +246,9 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
         item->text(1).toAscii().data(), item->text(2).toAscii().data());
     }
 
+  // Include any internal proxies.
+  this->addAutoIncludedProxies(this->Filter);
+
   // Register the compound proxy definition with the server manager.
   vtkPVXMLElement *root = this->Filter->SaveDefinition(0);
   vtkSMProxyManager *proxyManager = vtkSMProxyManager::GetProxyManager();
@@ -254,6 +257,50 @@ void pqCustomFilterDefinitionWizard::createCustomFilter()
   root->Delete();
 }
 
+//-----------------------------------------------------------------------------
+void pqCustomFilterDefinitionWizard::addAutoIncludedProxies(
+  vtkSMCompoundProxy* customFilter)
+{
+  unsigned int num_of_proxies = customFilter->GetNumberOfProxies();
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+
+  QSet<vtkSMProxy*> autoIncludeSet;
+
+  for (unsigned int cc=0; cc < num_of_proxies; cc++)
+    {
+    vtkSMProxy* subProxy = customFilter->GetProxy(cc);
+    vtkSmartPointer<vtkSMPropertyIterator> iter;
+    iter.TakeReference(subProxy->NewPropertyIterator());
+
+    for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+      {
+      vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+        iter->GetProperty());
+      if (!pp)
+        {
+        continue;
+        }
+      unsigned int proxy_count = pp->GetNumberOfProxies();
+      for (unsigned int i =0; i < proxy_count; i++)
+        {
+        vtkSMProxy* proxy = pp->GetProxy(i);
+        if (!proxy || pxm->GetProxyName("sources", proxy) != NULL)
+          {
+          continue;
+          }
+        autoIncludeSet.insert(proxy);
+        }
+      }
+    }
+  foreach(vtkSMProxy* proxy, autoIncludeSet)
+    {
+    QString name = "auto_";
+    name += proxy->GetSelfIDAsString();
+    customFilter->AddProxy(name.toStdString().c_str(), proxy);
+    }
+}
+
+//-----------------------------------------------------------------------------
 bool pqCustomFilterDefinitionWizard::validateCustomFilterName()
 {
   // Make sure the user has entered a name for the custom filter.

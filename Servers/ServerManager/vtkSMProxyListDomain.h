@@ -39,30 +39,43 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Populates the domain by creating new instances of the proxy
-  // types specified in the configuration. This clears any 
-  // already existing proxies in the domain.
-  void CreateProxyList(vtkIdType connectionId);
-
-  // Description:
   // Returns the number of proxies in the domain.
-  unsigned int GetNumberOfProxies();
+  unsigned int GetNumberOfProxyTypes();
 
   // Description:
-  // Returns the proxy at a given index.
-  vtkSMProxy* GetProxy(unsigned int index);
-
-  int GetIndex(vtkSMProxy* proxy);
+  // Returns the xml group name for the proxy at a given index.
+  const char* GetProxyGroup(unsigned int index);
 
   // Description:
-  // Returns true if the value of the propery is in the domain.
-  // The propery has to be a vtkSMProxyPropery or a sub-class. All 
-  // proxies pointed by the property have to be in the domain.
+  // Returns the xml type name for the proxy at a given index.
+  const char* GetProxyName(unsigned int index);
+
+  // Description:
+  // This always returns true.
   virtual int IsInDomain(vtkSMProperty* property);
 
   // Description:
-  // Returns true if the proxy is in the domain.
-  int IsInDomain(vtkSMProxy* proxy);
+  // Add a proxy to the domain.
+  void AddProxy(vtkSMProxy*);
+
+  // Description:
+  // Get number of proxies in the domain.
+  unsigned int GetNumberOfProxies();
+
+  // Description:
+  // Get proxy at a given index.
+  vtkSMProxy* GetProxy(unsigned int index);
+
+  // Description:
+  // Removes the first occurence of the \c proxy in the domain.
+  // Returns if the proxy was removed.
+  int RemoveProxy(vtkSMProxy* proxy);
+
+  // Description:
+  // Removes the proxy at the given index.
+  // Returns if the proxy was removed.
+  int RemoveProxy(unsigned int index);
+
 protected:
   vtkSMProxyListDomain();
   ~vtkSMProxyListDomain();
@@ -76,11 +89,14 @@ protected:
   // Adds a proxy type, used by ReadXMLAttributes().
   void AddProxy(const char* group, const char* name);
 
-  virtual void ChildSaveState(vtkPVXMLElement* domainElement);
+  // Description:
+  // Save state for this domain.
+  virtual void ChildSaveState(vtkPVXMLElement* propertyElement);
 
-
+  // Load the state of the domain from the XML.
   virtual int LoadState(vtkPVXMLElement* domainElement, 
-    vtkSMStateLoader* loader);
+    vtkSMStateLoader* loader); 
+
 private:
   vtkSMProxyListDomain(const vtkSMProxyListDomain&); // Not implemented.
   void operator=(const vtkSMProxyListDomain&); // Not implemented.

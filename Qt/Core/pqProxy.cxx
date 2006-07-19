@@ -32,6 +32,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqProxy.h"
 
+#include "vtkSmartPointer.h"
+#include "vtkSMProxyManager.h"
+
+
+#include <QMap>
+#include <QList>
+#include <QtDebug>
+
+
+//-----------------------------------------------------------------------------
+class pqProxyInternal
+{
+public:
+  typedef QMap<QString, QList<vtkSmartPointer<vtkSMProxy> > > ProxyListsType;
+  ProxyListsType ProxyLists;
+};
 
 //-----------------------------------------------------------------------------
 pqProxy::pqProxy(const QString& group, const QString& name,
@@ -43,13 +59,96 @@ pqProxy::pqProxy(const QString& group, const QString& name,
   SMGroup(group),
   Proxy(proxy)
 {
+  this->Internal = new pqProxyInternal;
 
 }
 
+pqProxy::~pqProxy()
+{
+  this->clearInternalProxies();
+  delete this->Internal;
+}
+
 //-----------------------------------------------------------------------------
+void pqProxy::addInternalProxy(const QString& key,
+  vtkSMProxy* proxy)
+{
+  QString group_name = QString(this->getProxy()->GetXMLName()) + "_" + key;
+
+  bool already_added = false;
+  if (this->Internal->ProxyLists.contains(key))
+    {
+    already_added = this->Internal->ProxyLists[key].contains(proxy);
+    }
+
+  if (!already_added)
+    {
+    this->Internal->ProxyLists[key].push_back(proxy);
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    pxm->RegisterProxy(group_name.toStdString().c_str(),
+      proxy->GetSelfIDAsString(), proxy);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void pqProxy::removeInternalProxy(const QString& key,
+  vtkSMProxy* proxy)
+{
+  if (!proxy)
+    {
+    qDebug() << "proxy argument to pqProxy::removeInternalProxy cannot be 0.";
+    return;
+    }
+
+  QString group_name = QString(this->getProxy()->GetXMLName()) + "_" + key;
+  if (this->Internal->ProxyLists.contains(key))
+    {
+    this->Internal->ProxyLists[key].removeAll(proxy);
+    vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+    pxm->RegisterProxy(group_name.toStdString().c_str(),
+      proxy->GetSelfIDAsString(), proxy);
+    }
+}
+
+//-----------------------------------------------------------------------------
+QList<vtkSMProxy*> pqProxy::getInternalProxies(const QString& key) const
+{
+  QList<vtkSMProxy*> list;
+
+  if (this->Internal->ProxyLists.contains(key))
+    {
+    foreach( vtkSMProxy* proxy, this->Internal->ProxyLists[key])
+      {
+      list.push_back(proxy);
+      }
+    }
+  return list;
+}
 
 
 //-----------------------------------------------------------------------------
+void pqProxy::clearInternalProxies()
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  if (pxm)
+    {
+    pqProxyInternal::ProxyListsType::iterator iter
+      = this->Internal->ProxyLists.begin();
+    for (;iter != this->Internal->ProxyLists.end(); ++iter)
+      {
+      QString group_name = QString(this->getProxy()->GetXMLName())
+        + "_" + iter.key();
+
+      foreach(vtkSMProxy* proxy, iter.value())
+        {
+        pxm->UnRegisterProxy(group_name.toStdString().c_str(), 
+          proxy->GetSelfIDAsString());
+        }
+      }
+    }
+  this->Internal->ProxyLists.clear();
+}
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

@@ -471,7 +471,8 @@ void pqPropertyLinks::addPropertyLink(QObject* qObject, const char* qProperty,
   conn->setAutoUpdateVTKObjects(this->Internal->AutoUpdate);
   // set the object property to the current server manager property value
   conn->smLinkedPropertyChanged();
-  conn->clearOutOfSync();
+  // We let the connection be marked dirty on creation.
+  // conn->clearOutOfSync();
 }
 
 //-----------------------------------------------------------------------------

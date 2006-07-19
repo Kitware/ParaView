@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 class pqServer;
 class vtkSMProxy;
+class pqProxyInternal;
 
 // This class represents any registered Server Manager proxy.
 // It keeps essential information to locate the proxy as well as
@@ -51,7 +52,7 @@ class PQCORE_EXPORT pqProxy : public pqServerManagerModelItem
 public:
   pqProxy(const QString& group, const QString& name,
     vtkSMProxy* proxy, pqServer* server, QObject* parent=NULL);
-  virtual ~pqProxy() {}
+  virtual ~pqProxy();
 
   /// Get the server on which this proxy exists.
   pqServer *getServer() const
@@ -78,12 +79,31 @@ public:
   /// Get the vtkSMProxy this object stands for.
   vtkSMProxy* getProxy() const
     {return this->Proxy; }
+  /// Returns a list of all the internal proxies added with a given key.
+  QList<vtkSMProxy*> getInternalProxies(const QString& key) const;
+
+protected:
+  /// Concept of internal proxies:
+  // A pqProxy is created for every important vtkSMProxy registered. Many a times, 
+  // there may be other proxies associated with that proxy, eg. lookup table proxies,
+  // implicit function proxies may be associated with a filter/source proxy. 
+  // The GUI can create "associated" proxies and add them as internal proxies.
+  // Internal proxies get registered under special groups, so that they are 
+  // undo/redo-able, and state save-restore-able. The pqProxy makes sure that 
+  // the internal proxies are unregistered when the main proxy is unregistered.
+  void addInternalProxy(const QString& key, vtkSMProxy*);
+  void removeInternalProxy(const QString& key, vtkSMProxy*);
+
+  // Unregisters all internal proxies.
+  void clearInternalProxies();
+
 private:
   pqServer *Server;           ///< Stores the parent server.
   QString ProxyName;
   QString SMName;
   QString SMGroup;
   vtkSmartPointer<vtkSMProxy> Proxy;
+  pqProxyInternal* Internal;
 };
 
 #endif
