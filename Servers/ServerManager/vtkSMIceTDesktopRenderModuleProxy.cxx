@@ -29,7 +29,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.17");
 
 vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderModuleProxy, 
                      ServerRenderWindowProxy,
@@ -605,7 +605,7 @@ void vtkSMIceTDesktopRenderModuleProxy::StillRender()
       // For all visibile displays, make sure their geometry is up to date
       // for the k-d tree and make sure the distribution gets updated after
       // the tree is reformed.
-      vtkCollection* displays = this->GetDisplays();
+      displays = this->GetDisplays();
       displays->InitTraversal(cookie);
       for (obj = displays->GetNextItemAsObject(cookie); obj != NULL;
            obj = displays->GetNextItemAsObject(cookie))
