@@ -49,7 +49,7 @@
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkSMDataObjectDisplayProxy.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.39");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.40");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -523,8 +523,9 @@ void vtkSMRenderModuleProxy::PerformRender()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMRenderModuleProxy::AddDisplay(vtkSMDisplayProxy* disp)
+void vtkSMRenderModuleProxy::AddDisplay(vtkSMAbstractDisplayProxy* adisp)
 {
+  vtkSMDisplayProxy* disp = vtkSMDisplayProxy::SafeDownCast(adisp);
   if (!disp)
     {
     return;
@@ -558,8 +559,9 @@ void vtkSMRenderModuleProxy::AddDisplay(vtkSMDisplayProxy* disp)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMRenderModuleProxy::RemoveDisplay(vtkSMDisplayProxy* disp)
+void vtkSMRenderModuleProxy::RemoveDisplay(vtkSMAbstractDisplayProxy* adisp)
 {
+  vtkSMDisplayProxy* disp = vtkSMDisplayProxy::SafeDownCast(adisp);
   if (!disp)
     {
     return;

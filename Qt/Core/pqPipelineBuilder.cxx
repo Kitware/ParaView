@@ -356,7 +356,14 @@ vtkSMDisplayProxy* pqPipelineBuilder::createDisplayProxyInternal(
     return NULL;
     }
   //proxy->CreateParts();
-  vtkSMDisplayProxy* display = renModule->CreateDisplayProxy();
+  vtkSMAbstractDisplayProxy* adisplay = renModule->CreateDisplayProxy();
+  vtkSMDisplayProxy* display = vtkSMDisplayProxy::SafeDownCast(adisplay);
+  if ( !display )
+    {
+    adisplay->Delete();
+    qDebug() << "Cannot create display.";
+    return NULL;
+    }
  
   // Register the proxy -- must be done first before any property changes 
   // (of undo/redo to work).

@@ -32,7 +32,7 @@
 #include "vtkPVGeometryInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkPVRenderModuleHelper.h"
-#include "vtkSMDisplayProxy.h"
+#include "vtkSMAbstractDisplayProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
@@ -47,9 +47,8 @@
 
 #include "vtkPVClientServerIdCollectionInformation.h"
 #include "vtkProcessModuleConnectionManager.h"
-#include "vtkSMDataObjectDisplayProxy.h"
 
-vtkCxxRevisionMacro(vtkSMAbstractViewModuleProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMAbstractViewModuleProxy, "1.2");
 
 //-----------------------------------------------------------------------------
 vtkSMAbstractViewModuleProxy::vtkSMAbstractViewModuleProxy()
@@ -128,7 +127,8 @@ void vtkSMAbstractViewModuleProxy::EndStillRender()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMAbstractViewModuleProxy::AddDisplay(vtkSMDisplayProxy* disp)
+void vtkSMAbstractViewModuleProxy::AddDisplay(
+  vtkSMAbstractDisplayProxy* disp)
 {
   if (!disp)
     {
@@ -141,7 +141,8 @@ void vtkSMAbstractViewModuleProxy::AddDisplay(vtkSMDisplayProxy* disp)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMAbstractViewModuleProxy::RemoveDisplay(vtkSMDisplayProxy* disp)
+void vtkSMAbstractViewModuleProxy::RemoveDisplay(
+  vtkSMAbstractDisplayProxy* disp)
 {
   if (!disp)
     {
@@ -155,8 +156,9 @@ void vtkSMAbstractViewModuleProxy::RemoveAllDisplays()
 {
   while ( this->Displays->GetNumberOfItems() )
     {
-    vtkSMDisplayProxy* disp = 
-      vtkSMDisplayProxy::SafeDownCast(this->Displays->GetItemAsObject(0));
+    vtkSMAbstractDisplayProxy* disp = 
+      vtkSMAbstractDisplayProxy::SafeDownCast(
+        this->Displays->GetItemAsObject(0));
     this->RemoveDisplay(disp);
     }
 }
@@ -178,8 +180,8 @@ void vtkSMAbstractViewModuleProxy::UpdateAllDisplays()
   bool enable_progress = false;
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    vtkSMDataObjectDisplayProxy* disp = 
-      vtkSMDataObjectDisplayProxy::SafeDownCast(iter->GetCurrentObject());
+    vtkSMAbstractDisplayProxy* disp = 
+      vtkSMAbstractDisplayProxy::SafeDownCast(iter->GetCurrentObject());
     if (!disp || !disp->GetVisibilityCM())
       {
       // Some displays don't need updating.
@@ -200,8 +202,8 @@ void vtkSMAbstractViewModuleProxy::UpdateAllDisplays()
     }
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    vtkSMDisplayProxy* disp = 
-      vtkSMDisplayProxy::SafeDownCast(iter->GetCurrentObject());
+    vtkSMAbstractDisplayProxy* disp = 
+      vtkSMAbstractDisplayProxy::SafeDownCast(iter->GetCurrentObject());
     if (!disp || !disp->GetVisibilityCM())
       {
       // Some displays don't need updating.
@@ -220,7 +222,7 @@ void vtkSMAbstractViewModuleProxy::UpdateAllDisplays()
 }
 
 //-----------------------------------------------------------------------------
-vtkSMDisplayProxy* vtkSMAbstractViewModuleProxy::CreateDisplayProxy()
+vtkSMAbstractDisplayProxy* vtkSMAbstractViewModuleProxy::CreateDisplayProxy()
 {
   if (!this->DisplayXMLName)
     {
@@ -235,11 +237,11 @@ vtkSMDisplayProxy* vtkSMAbstractViewModuleProxy::CreateDisplayProxy()
     return NULL;
     }
   p->SetConnectionID(this->ConnectionID);
-  vtkSMDisplayProxy *pDisp = vtkSMDisplayProxy::SafeDownCast(p);
+  vtkSMAbstractDisplayProxy *pDisp = vtkSMAbstractDisplayProxy::SafeDownCast(p);
   if (!pDisp)
     {
     vtkErrorMacro(<< "'displays' ," <<  this->DisplayXMLName 
-                  << " must be a subclass of vtkSMDisplayProxy.");
+                  << " must be a subclass of vtkSMAbstractDisplayProxy.");
     p->Delete();
     return NULL;
     }

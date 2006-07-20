@@ -29,7 +29,7 @@ class vtkRenderWindowInteractor;
 class vtkRenderer;
 class vtkPVRenderModuleHelper;
 class vtkSMDisplay;
-class vtkSMDisplayProxy;
+class vtkSMAbstractDisplayProxy;
 class vtkPVClientServerIdCollectionInformation;
 class vtkTimerLog;
 
@@ -46,8 +46,8 @@ public:
   // needs to be added to it. 
   // NOTE: If you call this method directly (without using properties)
   // don't forget to call UpdateVTKObjects() on the RenderModule.
-  virtual void AddDisplay(vtkSMDisplayProxy* disp);
-  virtual void RemoveDisplay(vtkSMDisplayProxy* disp);
+  virtual void AddDisplay(vtkSMAbstractDisplayProxy* disp);
+  virtual void RemoveDisplay(vtkSMAbstractDisplayProxy* disp);
 
   // Description:
   // Removes all added displays. 
@@ -60,10 +60,10 @@ public:
   virtual void InteractiveRender();
   
   // Description
-  // Subclass can create their own vtkSMDisplayProxy object by
+  // Subclass can create their own vtkSMAbstractDisplayProxy object by
   // implementing this method.
   // So far, others displays are not.
-  virtual vtkSMDisplayProxy* CreateDisplayProxy();
+  virtual vtkSMAbstractDisplayProxy* CreateDisplayProxy();
 
   // Description:
   // Returns the display collection.
@@ -91,7 +91,7 @@ public:
 protected:
   // This is the XMLName of the proxy to get created when CreateDisplayProxy
   // is called. It must be a proxy belonging to the group "displays"
-  // and must be a subclass of vtkSMDisplayProxy.
+  // and must be a subclass of vtkSMAbstractDisplayProxy.
   vtkGetStringMacro(DisplayXMLName);
   vtkSetStringMacro(DisplayXMLName);
 
@@ -133,7 +133,7 @@ private:
 
   // This is the XMLName of the proxy to get created when CreateDisplayProxy
   // is called. It must be a proxy belonging to the group "displays"
-  // and must be a subclass of vtkSMDisplayProxy.
+  // and must be a subclass of vtkSMAbstractDisplayProxy.
   char* DisplayXMLName;
 
 private:
