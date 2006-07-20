@@ -402,7 +402,9 @@ void pqServerManagerModel::onRemoveRenderModule(vtkSMRenderModuleProxy* rm)
   pqRenderModule* toRemove = this->getRenderModule(rm);
   if (!toRemove)
     {
-    qDebug() << "Failed to locate the pqRenderModule for the proxy";
+    // no need to raise an debug message, the render module being removed
+    // is already not present.
+    // qDebug() << "Failed to locate the pqRenderModule for the proxy";
     return;
     }
   emit this->preRenderModuleRemoved(toRemove);
