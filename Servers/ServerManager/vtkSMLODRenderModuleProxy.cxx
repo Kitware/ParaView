@@ -59,7 +59,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMLODRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMLODRenderModuleProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMLODRenderModuleProxy, "1.7");
 //-----------------------------------------------------------------------------
 vtkSMLODRenderModuleProxy::vtkSMLODRenderModuleProxy()
 {
@@ -82,7 +82,7 @@ vtkSMLODRenderModuleProxy::~vtkSMLODRenderModuleProxy()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMLODRenderModuleProxy::AddDisplay(vtkSMDisplayProxy* disp)
+void vtkSMLODRenderModuleProxy::AddDisplay(vtkSMAbstractDisplayProxy* disp)
 {
   this->Superclass::AddDisplay(disp);
   
@@ -94,7 +94,7 @@ void vtkSMLODRenderModuleProxy::AddDisplay(vtkSMDisplayProxy* disp)
   pDisp->AddObserver(vtkSMLODDisplayProxy::InformationInvalidatedEvent, this->Observer);
 }
 //-----------------------------------------------------------------------------
-void vtkSMLODRenderModuleProxy::RemoveDisplay(vtkSMDisplayProxy* disp)
+void vtkSMLODRenderModuleProxy::RemoveDisplay(vtkSMAbstractDisplayProxy* disp)
 {
   vtkSMLODDisplayProxy* pDisp = vtkSMLODDisplayProxy::SafeDownCast(disp);
   if (pDisp)
@@ -105,9 +105,9 @@ void vtkSMLODRenderModuleProxy::RemoveDisplay(vtkSMDisplayProxy* disp)
   this->Superclass::RemoveDisplay(disp);
 }
 //-----------------------------------------------------------------------------
-vtkSMDisplayProxy* vtkSMLODRenderModuleProxy::CreateDisplayProxy()
+vtkSMAbstractDisplayProxy* vtkSMLODRenderModuleProxy::CreateDisplayProxy()
 {
-  vtkSMDisplayProxy* pDisp = this->Superclass::CreateDisplayProxy();
+  vtkSMAbstractDisplayProxy* pDisp = this->Superclass::CreateDisplayProxy();
   if (!pDisp)
     {
     return NULL;

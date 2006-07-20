@@ -31,22 +31,17 @@
 #ifndef __vtkSMDisplayProxy_h
 #define __vtkSMDisplayProxy_h
 
-#include "vtkSMProxy.h"
+#include "vtkSMAbstractDisplayProxy.h"
 class vtkSMRenderModuleProxy;
 class vtkPVGeometryInformation;
 
-class VTK_EXPORT vtkSMDisplayProxy : public vtkSMProxy
+class VTK_EXPORT vtkSMDisplayProxy : public vtkSMAbstractDisplayProxy
 {
 public:
   static vtkSMDisplayProxy* New();
-  vtkTypeRevisionMacro(vtkSMDisplayProxy, vtkSMProxy);
+  vtkTypeRevisionMacro(vtkSMDisplayProxy, vtkSMAbstractDisplayProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get information about the geometry.
-  // Some displays (like Scalar bar, 3DWidgets), may return NULL.
-  virtual vtkPVGeometryInformation* GetGeometryInformation() { return NULL; }
-  
   // Description:
   // Called when the display is added/removed to/from a RenderModule.
   // Default implementation searches for a subproxies with name
@@ -56,28 +51,6 @@ public:
   virtual void AddToRenderModule(vtkSMRenderModuleProxy*);
   virtual void RemoveFromRenderModule(vtkSMRenderModuleProxy*);
 
-  // Description:
-  // Called to update the Display. Default implementation does nothing.
-  virtual void Update() { }
-
-  // Description:
-  // When doing an ordered composite, some displays will need to run extra
-  // filters that redistribute or clip their data before a render occurs.
-  // This method makes sure that the distributed data is up to date.  The
-  // default implementation just calls Update().
-  virtual void UpdateDistributedGeometry() { this->Update(); }
-  
-  // Description:
-  // Convenience method to get/set Visibility property.
-  void SetVisibilityCM(int v);
-  int GetVisibilityCM(); 
-
-  // Description:
-  // Save the display in batch script. This will eventually get 
-  // removed as we will generate batch script from ServerManager
-  // state. However, until then.
-  virtual void SaveInBatchScript(ofstream* file);
-  
 protected:
   vtkSMDisplayProxy();
   ~vtkSMDisplayProxy();

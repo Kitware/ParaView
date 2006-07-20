@@ -38,14 +38,14 @@ public:
   // Any display that must be rendered by this rendermodule
   // needs to be added to it. Overridden to add even listerns
   // to note when LOD Information of the Display changes.
-  virtual void AddDisplay(vtkSMDisplayProxy* disp);
-  virtual void RemoveDisplay(vtkSMDisplayProxy* disp);
+  virtual void AddDisplay(vtkSMAbstractDisplayProxy* disp);
+  virtual void RemoveDisplay(vtkSMAbstractDisplayProxy* disp);
 
   // Description
   // Subclass can create their own vtkSMDisplayProxy object by
   // implementing this method.
   // So far, others displays are not.
-  virtual vtkSMDisplayProxy* CreateDisplayProxy();
+  virtual vtkSMAbstractDisplayProxy* CreateDisplayProxy();
 
   // Description:
   // Set the LOD Threshold.

@@ -46,8 +46,8 @@ public:
   // needs to be added to it. 
   // NOTE: If you call this method directly (without using properties)
   // don't forget to call UpdateVTKObjects() on the RenderModule.
-  virtual void AddDisplay(vtkSMDisplayProxy* disp);
-  virtual void RemoveDisplay(vtkSMDisplayProxy* disp);
+  virtual void AddDisplay(vtkSMAbstractDisplayProxy* disp);
+  virtual void RemoveDisplay(vtkSMAbstractDisplayProxy* disp);
 
   // Description:
   // Update the cache of all visible part displays. For flip books.

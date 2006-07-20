@@ -29,7 +29,7 @@
 #include <vtkstd/set>
 
 vtkStandardNewMacro(vtkSMIceTDesktopRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMIceTDesktopRenderModuleProxy, "1.16");
 
 vtkCxxSetObjectMacro(vtkSMIceTDesktopRenderModuleProxy, 
                      ServerRenderWindowProxy,
@@ -521,7 +521,7 @@ void vtkSMIceTDesktopRenderModuleProxy::SetOrderedCompositing(int flag)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMIceTDesktopRenderModuleProxy::AddDisplay(vtkSMDisplayProxy *disp)
+void vtkSMIceTDesktopRenderModuleProxy::AddDisplay(vtkSMAbstractDisplayProxy *disp)
 {
   this->Superclass::AddDisplay(disp);
 

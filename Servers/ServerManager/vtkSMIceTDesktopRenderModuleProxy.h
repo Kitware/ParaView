@@ -44,7 +44,7 @@ public:
   virtual void SetOrderedCompositing(int);
   vtkBooleanMacro(OrderedCompositing, int);
 
-  virtual void AddDisplay(vtkSMDisplayProxy* disp);
+  virtual void AddDisplay(vtkSMAbstractDisplayProxy* disp);
 
   virtual void StillRender();
 

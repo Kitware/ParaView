@@ -26,7 +26,7 @@
 
 #include "vtkSMCompoundProxy.h"
 
-class vtkSMDisplayProxy;
+class vtkSMAbstractDisplayProxy;
 class VTK_EXPORT vtkSMMultiViewRenderModuleProxy : public vtkSMCompoundProxy
 {
 public:
@@ -51,7 +51,7 @@ public:
   // Description
   // Creates a display proxy for the type of render module indicated by
   // RenderModuleName.
-  vtkSMDisplayProxy* CreateDisplayProxy();
+  vtkSMAbstractDisplayProxy* CreateDisplayProxy();
 protected:
   vtkSMMultiViewRenderModuleProxy();
   ~vtkSMMultiViewRenderModuleProxy();
