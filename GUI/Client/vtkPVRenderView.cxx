@@ -146,7 +146,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.421");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.422");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -3421,6 +3421,7 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << indent << "RenderModuleProxy: " << this->RenderModuleProxy << endl;
   os << indent << "ColorMapUI: " << this->ColorMapUI << endl;
+  os << indent << "ExitMode: " << this->ExitMode << endl;
 }
 
 //----------------------------------------------------------------------------
