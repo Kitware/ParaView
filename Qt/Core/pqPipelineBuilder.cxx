@@ -310,7 +310,7 @@ vtkSMProxy* pqPipelineBuilder::createPipelineProxy(const char* xmlgroup,
 }
 
 //-----------------------------------------------------------------------------
-vtkSMDisplayProxy* pqPipelineBuilder::createDisplayProxy(pqPipelineSource* src,
+pqPipelineDisplay* pqPipelineBuilder::createDisplayProxy(pqPipelineSource* src,
   pqRenderModule* renModule)
 {
   if (!src || !renModule )
@@ -338,7 +338,12 @@ vtkSMDisplayProxy* pqPipelineBuilder::createDisplayProxy(pqPipelineSource* src,
     {
     this->UndoStack->PauseUndoSet();
     }
-  return display;
+
+  if (display)
+    {
+    return pqServerManagerModel::instance()->getPQDisplay(display);
+    }
+  return NULL;
 }
 
 //-----------------------------------------------------------------------------

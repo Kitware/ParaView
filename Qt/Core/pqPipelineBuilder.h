@@ -95,7 +95,7 @@ public:
 
   // Create a display proxy for the given proxy(source/filter) and add 
   // it to the given render module. 
-  vtkSMDisplayProxy* createDisplayProxy(pqPipelineSource* src,
+  pqPipelineDisplay* createDisplayProxy(pqPipelineSource* src,
     pqRenderModule* renModule);
 
   /// Create new viewing "window" on the server. It uses the 

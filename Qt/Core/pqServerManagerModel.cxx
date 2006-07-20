@@ -308,7 +308,7 @@ void pqServerManagerModel::onAddServer(vtkIdType id)
   // TODO: how to assign friendly name for connections
   // origniation internal to the GUI?
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pqServer* server = new pqServer(id, pm->GetOptions());
+  pqServer* server = new pqServer(id, pm->GetOptions(), this);
   this->onAddServer(server);
 }
 
@@ -388,7 +388,7 @@ void pqServerManagerModel::onAddRenderModule(QString name,
     return;
     }
 
-  pqRenderModule* pqRM = new pqRenderModule(name, rm, server);
+  pqRenderModule* pqRM = new pqRenderModule(name, rm, server, this);
 
   emit this->preRenderModuleAdded(pqRM);
   this->Internal->RenderModules.push_back(pqRM);

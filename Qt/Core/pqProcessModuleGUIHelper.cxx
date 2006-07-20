@@ -110,7 +110,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.1");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.2");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -222,6 +222,8 @@ void pqProcessModuleGUIHelper::FinalizeApplication()
 {
   delete this->Implementation->Window;
   this->Implementation->Window = 0;
+  delete this->Implementation->ApplicationCore;
+  this->Implementation->ApplicationCore = 0;
 }
 
 //-----------------------------------------------------------------------------
