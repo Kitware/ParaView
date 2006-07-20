@@ -135,9 +135,9 @@ void pqSignalAdaptorProxyList::createProxyList()
   QList<vtkSMProxy*> list = this->Internal->ReferenceProxy->getInternalProxies(
     this->Internal->SMPropertyName);
 
-  foreach(vtkSMProxy* proxy, list)
+  foreach(vtkSMProxy* _proxy, list)
     {
-    this->Internal->ComboBox->addItem(proxy->GetXMLName());
+    this->Internal->ComboBox->addItem(_proxy->GetXMLName());
     }
   this->Internal->ComboBox->blockSignals(false);
   this->Internal->ComboBox->setCurrentIndex(-1);

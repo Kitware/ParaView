@@ -481,9 +481,6 @@ void pqDisplayProxyEditor::updateColorByMenu(bool forceUpdate)
     return;
     }
   
-  vtkSMDataObjectDisplayProxy* displayProxy = 
-    this->Internal->Display->getDisplayProxy();
-  
   // changing the colorby combo will cause slots to be executed and change
   // the array to be colored by to Solid Color. disabling slots to prevent
   // that

@@ -331,12 +331,12 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
     QList<QVariant> prop;
     prop += arrayname;
     prop += 1;
-    QList<QList<QVariant> > property;
-    property.push_back(prop);
+    QList<QList<QVariant> > propertyList;
+    propertyList.push_back(prop);
     if(fieldtype == vtkSMDataObjectDisplayProxy::CELL_FIELD_DATA)
       {
       pqSMAdaptor::setSelectionProperty(
-        reader->GetProperty("CellArrayStatus"), property);
+        reader->GetProperty("CellArrayStatus"), propertyList);
       reader->UpdateVTKObjects();
       vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
       ai = geomInfo->GetCellDataInformation()->GetArrayInformation(arrayname);
@@ -344,7 +344,7 @@ void pqPipelineDisplay::colorByArray(const char* arrayname, int fieldtype)
     else
       {
       pqSMAdaptor::setSelectionProperty(
-        reader->GetProperty("PointArrayStatus"), property);
+        reader->GetProperty("PointArrayStatus"), propertyList);
       reader->UpdateVTKObjects();
       vtkPVDataInformation* geomInfo = displayProxy->GetGeometryInformation();
       ai = geomInfo->GetPointDataInformation()->GetArrayInformation(arrayname);

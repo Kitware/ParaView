@@ -233,10 +233,10 @@ bool pqSourceInfoModel::isSource(const QString &name) const
   return false;
 }
 
-void pqSourceInfoModel::getGroup(const QModelIndex &index,
+void pqSourceInfoModel::getGroup(const QModelIndex &_index,
     QString &group) const
 {
-  pqSourceInfoModelItem *item = this->getItemFor(index);
+  pqSourceInfoModelItem *item = this->getItemFor(_index);
   if(item && item != this->Root)
     {
     QStringList path;
@@ -245,11 +245,11 @@ void pqSourceInfoModel::getGroup(const QModelIndex &index,
       path.append(item->Name);
       }
 
-    pqSourceInfoModelItem *parent = item->Parent;
-    while(parent && parent != this->Root)
+    pqSourceInfoModelItem *item_parent = item->Parent;
+    while(item_parent && item_parent != this->Root)
       {
-      path.prepend(parent->Name);
-      parent = parent->Parent;
+      path.prepend(item_parent->Name);
+      item_parent = item_parent->Parent;
       }
 
     group = path.join("/");

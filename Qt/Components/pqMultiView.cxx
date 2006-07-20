@@ -307,8 +307,8 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index,
 
     QList<int> sizes = splitter->sizes();
 
-    sizes[0]=old_sizes[0]*(1.0-percent);
-    sizes[1]=old_sizes[0]*percent;
+    sizes[0]=static_cast<int>(old_sizes[0]*(1.0-percent));
+    sizes[1]=static_cast<int>(old_sizes[0]*percent);
 
     splitter->setSizes(sizes);
     }
@@ -340,8 +340,8 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index,
     QList<int> sizes_old = newSplitter->sizes();
     QList<int> sizes = newSplitter->sizes();
 
-    sizes[0]=sizes_old[0]*(1.0-percent);
-    sizes[1]=sizes_old[0]*percent;
+    sizes[0]=static_cast<int>(sizes_old[0]*(1.0-percent));
+    sizes[1]=static_cast<int>(sizes_old[0]*percent);
 
     newSplitter->setSizes(sizes);
     
@@ -372,8 +372,10 @@ pqMultiView::Index pqMultiView::splitView(pqMultiView::Index index,
 
     QList<int> sizes = splitter->sizes();
 
-    sizes[splitter->indexOf(w)]=sizes_old[splitter->indexOf(w)]*(1.0-percent);
-    sizes[splitter->indexOf(w)+1]=sizes_old[splitter->indexOf(w)]*percent;
+    sizes[splitter->indexOf(w)] = static_cast<int>(
+      sizes_old[splitter->indexOf(w)]*(1.0-percent));
+    sizes[splitter->indexOf(w)+1] = static_cast<int>(
+      sizes_old[splitter->indexOf(w)]*percent);
 
 
     // make equal spacing

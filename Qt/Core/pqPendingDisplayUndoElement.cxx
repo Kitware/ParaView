@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 
 vtkStandardNewMacro(pqPendingDisplayUndoElement);
-vtkCxxRevisionMacro(pqPendingDisplayUndoElement, "1.1");
+vtkCxxRevisionMacro(pqPendingDisplayUndoElement, "1.2");
 vtkCxxSetObjectMacro(pqPendingDisplayUndoElement, XMLElement, vtkPVXMLElement);
 //-----------------------------------------------------------------------------
 pqPendingDisplayUndoElement::pqPendingDisplayUndoElement()
@@ -92,8 +92,6 @@ void pqPendingDisplayUndoElement::LoadStateInternal(vtkPVXMLElement* element)
 //-----------------------------------------------------------------------------
 int pqPendingDisplayUndoElement::InternalUndoRedo(bool undo)
 {
-  pqApplicationCore* core = pqApplicationCore::instance();
-  pqServerManagerModel* smModel = core->getServerManagerModel();
 
   vtkPVXMLElement* element = this->XMLElement;
   int state = 0;
@@ -118,6 +116,8 @@ int pqPendingDisplayUndoElement::InternalUndoRedo(bool undo)
     return 0;
     }
 
+  //pqApplicationCore* core = pqApplicationCore::instance();
+  //pqServerManagerModel* smModel = core->getServerManagerModel();
   if ((state && undo) || (!state && !undo))
     {
     // CJS TODO

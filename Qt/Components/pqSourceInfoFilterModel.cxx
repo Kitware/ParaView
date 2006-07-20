@@ -145,7 +145,7 @@ QModelIndex pqSourceInfoFilterModel::index(int row, int column,
   if(item && column >= 0 && row >= 0 && row < item->Children.size())
     {
     pqSourceInfoFilterModelItem *child = item->Children[row];
-    return this->createIndex(row, column, item->Children[row]);
+    return this->createIndex(row, column, child);
     }
 
   return QModelIndex();
@@ -365,7 +365,7 @@ void pqSourceInfoFilterModel::startRemovingRows(const QModelIndex &sourceIndex,
 }
 
 void pqSourceInfoFilterModel::finishRemovingRows(
-    const QModelIndex &sourceIndex, int start, int end)
+    const QModelIndex &/*sourceIndex*/, int /*start*/, int /*end*/)
 {
   // Signal the view that the removal is complete. Then, delete the
   // proxy items on the list.

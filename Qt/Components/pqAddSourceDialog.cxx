@@ -502,7 +502,7 @@ void pqAddSourceDialog::updateFromHistory(const QModelIndex &current,
     }
 }
 
-void pqAddSourceDialog::activateHistoryIndex(const QModelIndex &index)
+void pqAddSourceDialog::activateHistoryIndex(const QModelIndex &/*index*/)
 {
   this->accept();
 }
