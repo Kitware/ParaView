@@ -51,6 +51,7 @@ SET(Kit_SRCS
   vtkSMFieldDataDomain.cxx
   vtkSMFileListDomain.cxx
   vtkSMFixedTypeDomain.cxx
+  vtkSMGenericViewDisplay.cxx
   vtkSMIceTDesktopRenderModuleProxy.cxx
   vtkSMIceTMultiDisplayProxy.cxx
   vtkSMIceTRenderModuleProxy.cxx
@@ -134,6 +135,7 @@ SET(Kit_SRCS
   vtkSMXDMFInformationHelper.cxx
   vtkSMXDMFPropertyDomain.cxx
   vtkSMVectorProperty.cxx
+  vtkSMViewModuleProxy.cxx
   vtkSMWidgetRepresentationProxy.cxx
   vtkSMWriterProxy.cxx
   vtkSMCubeAxesDisplayProxy.cxx
