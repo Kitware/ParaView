@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 
 /* XPM */
-static char * expand_xpm[] = {
+static char const* expand_xpm[] = {
 "9 9 33 1",
 "  c None",
 ". c #FFFFFF",
@@ -83,7 +83,7 @@ static char * expand_xpm[] = {
 ".+++++++."};
 
 /* XPM */
-static char * collapse_xpm[] = {
+static char const* collapse_xpm[] = {
 "9 9 35 1",
 "  c None",
 ". c #FFFFFF",
@@ -138,8 +138,8 @@ class pqCollapsedGroup::pqImplementation
 public:
   pqImplementation(const QString& Name, QWidget* parent_widget) :
     Expanded(true),
-    Widget(0),
     Button(Name),
+    Widget(0),
     HideIcon(QPixmap(collapse_xpm)),
     ShowIcon(QPixmap(expand_xpm))
   {
