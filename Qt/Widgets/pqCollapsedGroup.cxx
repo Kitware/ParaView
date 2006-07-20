@@ -251,3 +251,13 @@ void pqCollapsedGroup::toggle()
       this->Implementation->Expanded);
     }
 }
+
+void pqCollapsedGroup::setTitle(const QString& title)
+{
+  this->Implementation->Button.setText(title);
+}
+
+QString pqCollapsedGroup::title() const
+{
+  return this->Implementation->Button.text();
+}

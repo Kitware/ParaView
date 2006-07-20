@@ -45,7 +45,7 @@ class QTWIDGETS_EXPORT pqCollapsedGroup :
   public QWidget
 {
   Q_OBJECT
-  
+  Q_PROPERTY(QString title READ title WRITE setTitle)
 public:
   pqCollapsedGroup(QWidget* parent = 0);
   pqCollapsedGroup(const QString& title, QWidget* parent = 0);
@@ -57,6 +57,9 @@ public:
   /// Returns true if the container is expanded (child is visible)
   const bool isExpanded();
 
+  /// Get/Set the title for the group.
+  void setTitle(const QString& title);
+  QString title() const;
 public slots:
   /// Expands the container so the child is visible
   void expand();
