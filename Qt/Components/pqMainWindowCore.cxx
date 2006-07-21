@@ -129,6 +129,9 @@ public:
     ToolTipTrapper(0),
     IgnoreBrowserSelectionChanges(false)
   {
+#ifdef PARAVIEW_EMBED_PYTHON
+  this->PythonDialog = 0;
+#endif // PARAVIEW_EMBED_PYTHON
   }
   
   ~pqImplementation()
@@ -164,6 +167,10 @@ public:
   QPointer<pqRenderModule> ActiveRenderModule;
 
   QList< QPointer<pqPipelineSource> > SourcesSansDisplays;
+
+#ifdef PARAVIEW_EMBED_PYTHON
+  QPointer<pqPythonDialog> PythonDialog;
+#endif // PARAVIEW_EMBED_PYTHON
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1305,8 +1312,15 @@ void pqMainWindowCore::onToolsPlayTest(const QStringList &fileNames)
 void pqMainWindowCore::onToolsPythonShell()
 {
 #ifdef PARAVIEW_EMBED_PYTHON
-  pqPythonDialog* const dialog = new pqPythonDialog(this->Implementation->Parent);
-  dialog->show();
+  if (!this->Implementation->PythonDialog)
+    {
+    this->Implementation->PythonDialog = 
+      new pqPythonDialog(this->Implementation->Parent);
+    }
+  this->Implementation->PythonDialog->show();
+  this->Implementation->PythonDialog->raise();
+  this->Implementation->PythonDialog->activateWindow();
+ 
 #endif // PARAVIEW_EMBED_PYTHON
 }
 
