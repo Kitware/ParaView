@@ -51,6 +51,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QAssistantClient>
 #include <QDir>
+#include <QIcon>
+#include <QLayout>
 #include <QMessageBox>
 
 //////////////////////////////////////////////////////////////////////////////
@@ -363,6 +365,86 @@ MainWindow::MainWindow() :
 
   // Setup the default dock configuration ...
   this->Implementation->UI.elementInspectorDock->hide();
+
+  // Set up the action icons ...
+  QIcon icon;
+  icon.addFile(":/pqWidgets/Icons/pqNewProject16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqNewProject22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqNewProject32.png", QSize(32, 32));
+  this->Implementation->UI.actionFileNew->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqOpen16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqOpen22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqOpen32.png", QSize(32, 32));
+  this->Implementation->UI.actionFileOpen->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqFloppyDisk16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqFloppyDisk22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqFloppyDisk32.png", QSize(32, 32));
+  this->Implementation->UI.actionFileSaveData->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqConnect16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqConnect22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqConnect32.png", QSize(32, 32));
+  this->Implementation->UI.actionServerConnect->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqDisconnect16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqDisconnect22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqDisconnect32.png", QSize(32, 32));
+  this->Implementation->UI.actionServerDisconnect->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqHelp16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqHelp22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqHelp32.png", QSize(32, 32));
+  this->Implementation->UI.actionHelpHelp->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqUndo16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqUndo22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqUndo32.png", QSize(32, 32));
+  this->Implementation->UI.actionEditUndo->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqRedo16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqRedo22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqRedo32.png", QSize(32, 32));
+  this->Implementation->UI.actionEditRedo->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqVcrFirst16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqVcrFirst22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqVcrFirst32.png", QSize(32, 32));
+  this->Implementation->UI.actionVCRFirstFrame->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqVcrBack16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqVcrBack22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqVcrBack32.png", QSize(32, 32));
+  this->Implementation->UI.actionVCRPreviousFrame->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqVcrPlay16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqVcrPlay22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqVcrPlay32.png", QSize(32, 32));
+  this->Implementation->UI.actionVCRPlay->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqVcrPause16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqVcrPause22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqVcrPause32.png", QSize(32, 32));
+  this->Implementation->UI.actionVCRPause->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqVcrForward16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqVcrForward22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqVcrForward32.png", QSize(32, 32));
+  this->Implementation->UI.actionVCRNextFrame->setIcon(icon);
+  icon = QIcon();
+  icon.addFile(":/pqWidgets/Icons/pqVcrLast16.png", QSize(16, 16));
+  icon.addFile(":/pqWidgets/Icons/pqVcrLast22.png", QSize(22, 22));
+  icon.addFile(":/pqWidgets/Icons/pqVcrLast32.png", QSize(32, 32));
+  this->Implementation->UI.actionVCRLastFrame->setIcon(icon);
+
+  // Fix the toolbar layouts from designer.
+  this->Implementation->UI.mainToolBar->layout()->setSpacing(0);
+  this->Implementation->UI.selectionToolbar->layout()->setSpacing(0);
+  this->Implementation->UI.variableToolbar->layout()->setSpacing(0);
+  this->Implementation->UI.customFilterToolbar->layout()->setSpacing(0);
+  this->Implementation->UI.undoRedoToolbar->layout()->setSpacing(0);
+  this->Implementation->UI.VCRToolbar->layout()->setSpacing(0);
 
   // Now that we're ready, initialize everything ...
   this->Implementation->Core.initializeStates();
