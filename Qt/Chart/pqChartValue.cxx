@@ -216,7 +216,7 @@ QString pqChartValue::getString(int precision, char notation) const
 //      result = result2;
 
     // extract the exponent from the exponential result
-    int exponent = result2.mid(result2.indexOf('e')+1,result2.length()-1).toInt();
+    exponent = result2.mid(result2.indexOf('e')+1,result2.length()-1).toInt();
 
     // check for engineering notation flag
     if(notation=='n')

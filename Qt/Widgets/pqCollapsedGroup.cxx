@@ -252,9 +252,9 @@ void pqCollapsedGroup::toggle()
     }
 }
 
-void pqCollapsedGroup::setTitle(const QString& title)
+void pqCollapsedGroup::setTitle(const QString& txt)
 {
-  this->Implementation->Button.setText(title);
+  this->Implementation->Button.setText(txt);
 }
 
 QString pqCollapsedGroup::title() const

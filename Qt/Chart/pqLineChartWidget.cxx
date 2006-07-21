@@ -85,12 +85,12 @@ pqLineChartWidget::pqLineChartWidget(QWidget *p) :
   Title(new pqChartLabel()),
   XAxis(new pqChartAxis(pqChartAxis::Bottom)),
   YAxis(new pqChartAxis(pqChartAxis::Left)),
-  RightYAxis(new pqChartAxis(pqChartAxis::Right)),
   Legend(new pqChartLegend()),
   LineChart(new pqLineChart()),
-  SecondLineChart(new pqLineChart()),
   MouseDown(false),
-  SkipContextMenu(false)
+  SkipContextMenu(false),
+  RightYAxis(new pqChartAxis(pqChartAxis::Right)),
+  SecondLineChart(new pqLineChart())
 {
   // Set up the default Qt properties.
   this->setFocusPolicy(Qt::ClickFocus);
