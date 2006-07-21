@@ -1,6 +1,8 @@
 
-ADD_EXECUTABLE(pqCoreBasicApp BasicApp.cxx)
-TARGET_LINK_LIBRARIES(pqCoreBasicApp 
+ADD_EXECUTABLE(pqCoreBasicApp
+  MACOSX_BUNDLE
+  BasicApp.cxx)
+TARGET_LINK_LIBRARIES(pqCoreBasicApp
   pqCore
   QtTesting
   ${QT_LIBRARIES}
