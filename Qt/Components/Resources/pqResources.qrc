@@ -15,23 +15,31 @@
         <file>Icons/pqCancel16.png</file>
         <file>Icons/pqCancel22.png</file>
         <file>Icons/pqCellData16.png</file>
+        <file>Icons/pqConnect16.png</file>
         <file>Icons/pqConnect22.png</file>
+        <file>Icons/pqConnect32.png</file>
         <file>Icons/pqCopy22.png</file>
         <file>Icons/pqCut22.png</file>
         <file>Icons/pqDelete16.png</file>
         <file>Icons/pqDelete22.png</file>
         <file>Icons/pqDelete32.png</file>
+        <file>Icons/pqDisconnect16.png</file>
         <file>Icons/pqDisconnect22.png</file>
+        <file>Icons/pqDisconnect32.png</file>
         <file>Icons/pqFavorites16.png</file>
         <file>Icons/pqFavorites32.png</file>
         <file>Icons/pqFind22.png</file>
         <file>Icons/pqFloppyDisk16.png</file>
+        <file>Icons/pqFloppyDisk22.png</file>
+        <file>Icons/pqFloppyDisk32.png</file>
         <file>Icons/pqFolder16.png</file>
         <file>Icons/pqFolder32.png</file>
         <file>Icons/pqFolderNew16.png</file>
         <file>Icons/pqFolderOpen16.png</file>
         <file>Icons/pqFolderUp16.png</file>
+        <file>Icons/pqHelp16.png</file>
         <file>Icons/pqHelp22.png</file>
+        <file>Icons/pqHelp32.png</file>
         <file>Icons/pqHierarchicalData16.png</file>
         <file>Icons/pqImageData16.png</file>
         <file>Icons/pqInspect22.png</file>
@@ -42,10 +50,14 @@
         <file>Icons/pqMultiBlockData16.png</file>
         <file>Icons/pqMultiGroupData16.png</file>
         <file>Icons/pqNavigateForward16.png</file>
-        <file>Icons/pqNew22.png</file>
+        <file>Icons/pqNewProject16.png</file>
+        <file>Icons/pqNewProject22.png</file>
+        <file>Icons/pqNewProject32.png</file>
         <file>Icons/pqNodeSet16.png</file>
         <file>Icons/pqOctreeData16.png</file>
+        <file>Icons/pqOpen16.png</file>
         <file>Icons/pqOpen22.png</file>
+        <file>Icons/pqOpen32.png</file>
         <file>Icons/pqPaste22.png</file>
         <file>Icons/pqPipelineList22.png</file>
         <file>Icons/pqPlus16.png</file>
