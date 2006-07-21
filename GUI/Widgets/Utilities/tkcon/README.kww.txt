@@ -13,7 +13,7 @@ The changes are:
   comment exit code:
     #        <<TkCon_Exit>>                <Control-q>
   add:
-        <<TkCon_BracketPair>>          <Control-]>
+        <<TkCon_BracketPair>>          <Control-bracketright>
         <<TkCon_ExpandSubcommand>>        <Shift-Tab>
   add:
     bind TkConsole <<TkCon_BracketPair>> {

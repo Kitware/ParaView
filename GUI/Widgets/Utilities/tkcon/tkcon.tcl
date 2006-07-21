@@ -4876,7 +4876,7 @@ proc ::tkcon::Bindings {} {
         <<TkCon_ClearLine>>        <Control-u>
         <<TkCon_SaveCommand>>        <Control-z>
         <<TkCon_Popup>>                <Button-3>
-        <<TkCon_BracketPair>>          <Control-]>
+        <<TkCon_BracketPair>>          <Control-bracketright>
         <<TkCon_ExpandSubcommand>>        <Shift-Tab>
     }] {
         event add $ev $key
