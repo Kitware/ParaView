@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.61");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.62");
 
 //----------------------------------------------------------------------------
 class vtkKWMultiColumnListInternals
@@ -2088,11 +2088,8 @@ void vtkKWMultiColumnList::SetCellWindowDestroyCommand(int row_index,
       {
       this->SetStateToNormal();
       }
-    vtksys_stl::string command_str("catch {");
-    command_str += command;
-    command_str += "}";
     this->SetCellConfigurationOption(
-      row_index, col_index, "-windowdestroy", command_str.c_str());
+      row_index, col_index, "-windowdestroy", command);
     this->SetState(old_state);
     delete [] command;
     }
