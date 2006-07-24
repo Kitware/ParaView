@@ -1,0 +1,4 @@
+import compileall
+compileall.compile_dir('@PV_PYTHON_MODULE_BINARY_DIR@')
+file = open('@PV_PYTHON_MODULE_BINARY_DIR@/pv_compile_complete', 'w')
+file.write('Done')

@@ -143,4 +143,80 @@ IF (PARAVIEW_WRAP_PYTHON)
 
   # include python wrapping from VTK
   INCLUDE(KitCommonPythonWrapBlock)
+
+  SET(PV_PYTHON_MODULE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/paraview")
+  SET(PV_PYTHON_MODULE_BINARY_DIR "${LIBRARY_OUTPUT_PATH}/paraview")
+  SET(PV_PYTHON_MODULE_DIR "${PV_PYTHON_MODULE_BINARY_DIR}" CACHE INTERNAL "Path to paraview module.")
+
+# Handle out-of-source builds correctly.
+#
+#  1. Create a list of Python files to be installed/copied.
+#  2. Copy them to the binary directory. Since paraview cannot be built
+#     in place, we must always copy the files to the binary directory.
+#  3. Use Python's compileall to compile the copied files.
+#
+# *** Step 1 has to be done carefully to avoid missing out files ***
+
+
+# List all python source files.
+# All files paraview/*.py included in the paraview module.
+  SET(PV_PYTHON_FILES
+    __init__
+  )
+
+# Now copy these files if necessary.
+  SET(PV_PYTHON_SOURCE_FILES)
+  SET(PV_PYTHON_OUTPUT_FILES)
+  FOREACH(file ${VTK_PYTHON_FILES})
+    SET(src "${PV_PYTHON_MODULE_SOURCE_DIR}/${file}.py")
+    SET(PV_PYTHON_SOURCE_FILES ${VTK_PYTHON_SOURCE_FILES} ${src})
+  ENDFOREACH(file)
+
+  IF ("${VTK_BINARY_DIR}" MATCHES "^${VTK_SOURCE_DIR}$")
+    #MESSAGE("In source build -- no need to copy Python files.")
+  ELSE ("${VTK_BINARY_DIR}" MATCHES "^${VTK_SOURCE_DIR}$")
+    FOREACH(file ${PV_PYTHON_FILES})
+      SET(src "${PV_PYTHON_MODULE_SOURCE_DIR}/${file}.py")
+      SET(tgt "${PV_PYTHON_MODULE_BINARY_DIR}/${file}.py")
+      ADD_CUSTOM_COMMAND(DEPENDS ${src}
+        COMMAND ${CMAKE_COMMAND}
+        ARGS -E copy ${src} ${tgt}
+        OUTPUT ${tgt}
+        COMMENT "source copy")
+      SET(PV_PYTHON_OUTPUT_FILES ${PV_PYTHON_OUTPUT_FILES} ${tgt})
+    ENDFOREACH(file)
+  ENDIF ("${VTK_BINARY_DIR}" MATCHES "^${VTK_SOURCE_DIR}$")
+
+# handle the different configuration types (each will have identical files)
+  SET(PV_PYTHON_CONFIGURATION_TYPES ${CMAKE_CONFIGURATION_TYPES})
+  IF(PV_PYTHON_CONFIGURATION_TYPES)
+    FOREACH(config ${PV_PYTHON_CONFIGURATION_TYPES})
+      FOREACH(file ${PV_PYTHON_FILES})
+        SET(src "${PV_PYTHON_MODULE_SOURCE_DIR}/${file}.py")
+        SET(tgt "${PV_PYTHON_MODULE_BINARY_DIR}/${config}/${file}.py")
+        ADD_CUSTOM_COMMAND(DEPENDS ${src}
+          COMMAND ${CMAKE_COMMAND}
+          ARGS -E copy ${src} ${tgt}
+          OUTPUT ${tgt}
+          COMMENT "source copy")
+        SET(PV_PYTHON_OUTPUT_FILES ${PV_PYTHON_OUTPUT_FILES} ${tgt})
+      ENDFOREACH(file)
+    ENDFOREACH(config)
+  ENDIF(PV_PYTHON_CONFIGURATION_TYPES)
+
+# Byte compile the Python files.
+  CONFIGURE_FILE(${PV_PYTHON_MODULE_SOURCE_DIR}/compile_all_pv.py.in
+    ${PV_PYTHON_MODULE_BINARY_DIR}/compile_all_pv.py
+    @ONLY IMMEDIATE)
+
+  ADD_CUSTOM_COMMAND(
+    COMMAND ${PYTHON_EXECUTABLE}
+    ARGS ${PV_PYTHON_MODULE_BINARY_DIR}/compile_all_pv.py
+    DEPENDS ${PV_PYTHON_SOURCE_FILES} ${PV_PYTHON_MODULE_BINARY_DIR}/compile_all_pv.py
+      ${PV_PYTHON_OUTPUT_FILES}
+    OUTPUT "${PV_PYTHON_MODULE_BINARY_DIR}/pv_compile_complete"
+    )
+
+  ADD_CUSTOM_TARGET(paraview_pyc ALL 
+    DEPENDS "${PV_PYTHON_MODULE_BINARY_DIR}/pv_compile_complete")
 ENDIF (PARAVIEW_WRAP_PYTHON)
