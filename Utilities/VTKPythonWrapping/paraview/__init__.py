@@ -170,16 +170,19 @@ class pyConnection:
 
   def __repr__(self):
     if not self.RSHostname:
-      return "Connection(%s:%d)" % (self.Hostname, self.Port)
+      return "Connection (%s:%d)" % (self.Hostname, self.Port)
     return "Connection data(%s:%d), render(%s:%d)" % \
       (self.Hostname, self.Port, self.RSHostname, self.RSPort)
 
+# Users can set the active connection which will be used by API
+# to create proxies etc when no connection argument is passed.
+ActiveConnection = None
 
 ## These are method to create a new connection.
 ## One can connect to a server, (data-server,render-server)
 ## or simply create a built-in connection.
 
-def connect(host, port):
+def connect_server(host, port):
   """Connect to a host:port. Returns the connection object if successfully connected 
   with the server."""
   pm =  vtkProcessModule.GetProcessModule()
@@ -190,7 +193,7 @@ def connect(host, port):
   conn.SetHost(host, port)
   return conn 
 
-def connect(ds_host, ds_port, rs_host, rs_port):
+def connect_ds_rs(ds_host, ds_port, rs_host, rs_port):
   """Connect to a dataserver at (ds_host:ds_port) and to a render server
   at (rs_host:rs_port). 
   Returns the connection object if successfully connected 
@@ -203,7 +206,7 @@ def connect(ds_host, ds_port, rs_host, rs_port):
   conn.SetHost(ds_host, ds_port, rs_host, rs_port)
   return conn 
 
-def connect():
+def connect_self():
   """Creates a new self connection."""
   pm =  vtkProcessModule.GetProcessModule()
   cid = pm.ConnectToSelf()
@@ -212,6 +215,13 @@ def connect():
   conn = pyConnection(cid)
   conn.SetHost("builtin", cid)
   return conn
+
+def connect(ds_host=None, ds_port=None, rs_host=None, rs_port=None):
+  if ds_host == None:
+    return connect_self()
+  if rs_host == None:
+    return connect_server(ds_host, ds_port)
+  return connect_ds_rs(ds_host, ds_port, rs_host, rs_port)
 
 def disconnect(connection):
   """Disconnects the connection."""
