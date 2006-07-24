@@ -217,6 +217,9 @@ def connect_self():
   return conn
 
 def connect(ds_host=None, ds_port=None, rs_host=None, rs_port=None):
+  """
+    Unified API to connect to self, or server or dataserver and render server.
+  """
   if ds_host == None:
     return connect_self()
   if rs_host == None:
@@ -229,3 +232,24 @@ def disconnect(connection):
   pm.Disconnect(connection.ID)
   return
 
+def createProxy(xml_group, xml_name, register_group=None, register_name=None, connection=None):
+  """Creates a proxy. If register_group is non-None, then the created
+     proxy is registered under that group. If connection is set, the proxy's
+     connection ID is set accordingly. If connection is None, ActiveConnection
+     is used, is present. If register_group is non-None, but register_name is None,
+     then the proxy's self id is used to create a new name.
+  """
+  global ActiveConnection
+  pxm = pyProxyManager()
+  proxy = pxm.NewProxy(xml_group, xml_name)
+  if not proxy:
+    return None
+  if not connection:
+    connection = ActiveConnection
+  if connection:
+    proxy.SMProxy.SetConnectionID(connection.ID)
+  if register_group:
+    if not register_name:
+      register_name = proxy.GetSelfIDAsString()
+    pxm.RegisterProxy(register_group, register_name, proxy.SMProxy)
+  return proxy
