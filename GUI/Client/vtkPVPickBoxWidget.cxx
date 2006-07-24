@@ -54,7 +54,7 @@
 #include "vtkPVWindow.h"
 
 vtkStandardNewMacro(vtkPVPickBoxWidget);
-vtkCxxRevisionMacro(vtkPVPickBoxWidget, "1.5");
+vtkCxxRevisionMacro(vtkPVPickBoxWidget, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVPickBoxWidget::vtkPVPickBoxWidget()
@@ -123,7 +123,7 @@ void vtkPVPickBoxWidget::ChildCreate()
   this->MouseControlToggle->SetIndicatorVisibility(1);
   this->MouseControlToggle->Create();
   this->MouseControlToggle->SetText("Turn on/off interactions with widget");
-  this->MouseControlToggle->SetSelectedState(1);
+  this->MouseControlToggle->SetSelectedState(0);
   this->MouseControlToggle->SetBalloonHelpString(
     "Enable interaction with the box widget.");
   this->MouseControlToggle->SetCommand(this, "SetMouseControlToggle");
