@@ -77,7 +77,7 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "qt3/include/q"
   ".include.QtCore"
   "include/features.h"
-  "GUI/Widgets/Python/pqPythonStream"
+  "Qt/Python/pqPythonStream"
   "python.+/pyconfig.h"
   )
 
