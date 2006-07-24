@@ -161,13 +161,9 @@ class pyConnection:
     self.RSPort = None
     return
 
-  def SetHost(self, hostname, port):
-    self.Hostname = hostname
-    self.Port = port
-    return
-
-  def SetHost(self, ds_host, ds_port, rs_host, rs_port):
-    self.SetHost(ds_host, ds_port)
+  def SetHost(self, ds_host, ds_port, rs_host=None, rs_port=None):
+    self.Hostname = ds_host 
+    self.Port = ds_host
     self.RSHostname = rs_host
     self.RSPort = rs_port
     return
@@ -215,4 +211,11 @@ def connect():
     return None
   conn = pyConnection(cid)
   conn.SetHost("builtin", cid)
-  return conn 
+  return conn
+
+def disconnect(connection):
+  """Disconnects the connection."""
+  pm =  vtkProcessModule.GetProcessModule()
+  pm.Disconnect(connection.ID)
+  return
+
