@@ -59,9 +59,6 @@ public:
   // We have to look for key press events too.
   virtual void SetEnabled(int);
 
-  vtkSetMacro(MouseControlToggle,int);
-  vtkGetMacro(MouseControlToggle,int);
-
 protected:
   vtkPickBoxWidget();
   ~vtkPickBoxWidget();
@@ -73,6 +70,7 @@ protected:
   virtual void OnMouseMove();
   virtual void OnLeftButtonDown();
   virtual void OnRightButtonDown();
+  virtual void OnMiddleButtonDown();
 
   void PickInternal(int x, int y);
 
@@ -85,13 +83,9 @@ protected:
 
   double PrevPickedPoint[4];
 
-  int MouseControlToggle;
-
 private:
   vtkPickBoxWidget(const vtkPickBoxWidget&); // Not implemented
   void operator=(const vtkPickBoxWidget&); // Not implemented
-
-  int LastY;
 };
 
 #endif

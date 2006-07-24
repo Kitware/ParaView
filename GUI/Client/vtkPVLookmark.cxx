@@ -88,7 +88,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.72");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.73");
 
 
 //*****************************************************************************
@@ -660,10 +660,10 @@ void vtkPVLookmark::CreateIconFromMainView()
 {
   vtkKWIcon *lmkIcon;
 
+#ifndef __APPLE__
   this->GetPVRenderView()->GetRenderWindow()->OffScreenRenderingOn();
-  // withdraw the pane so that the lookmark will be added corrrectly
-//  this->GetPVLookmarkManager()->Withdraw();
-//  this->Script("focus %s",win->GetWidgetName());
+#endif
+
   for(int i=0;i<4;i++)
     {
     this->GetPVLookmarkManager()->Script("update");
@@ -688,7 +688,9 @@ void vtkPVLookmark::CreateIconFromMainView()
     this->AddLookmarkToolbarButton(lmkIcon);
     }
 
+#ifndef __APPLE__
   this->GetPVRenderView()->GetRenderWindow()->OffScreenRenderingOff();
+#endif
 
   lmkIcon->Delete();
 }

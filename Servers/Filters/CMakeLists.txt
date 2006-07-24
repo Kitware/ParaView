@@ -62,6 +62,7 @@ SET(Filters_SRCS
   vtkPVServerSelectTimeSet.cxx
   vtkPVServerTimeSteps.cxx
   vtkPVServerXDMFParameters.cxx
+  vtkPVSpecializedBoxClip.cxx
   vtkPVSummaryHelper.cxx
   vtkPVTrackballRoll.cxx
   vtkPVTrackballRotate.cxx

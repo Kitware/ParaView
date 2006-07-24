@@ -25,6 +25,7 @@
 #include "vtkPVBoxWidget.h"
 
 class vtkKWLabel;
+class vtkCallbackCommand;
 // ATTRIBUTE EDITOR
 class vtkKWCheckButton;
 
@@ -54,6 +55,16 @@ public:
   int GetMouseControlToggleInternal();
   vtkGetObjectMacro(MouseControlToggle,vtkKWCheckButton);
 
+
+  // Description:
+  // Handles the events
+  static void ProcessEvents(vtkObject* object, 
+                            unsigned long event,
+                            void* clientdata, 
+                            void* calldata);
+
+  void OnChar();
+
 protected:
   vtkPVPickBoxWidget();
   ~vtkPVPickBoxWidget();
@@ -61,6 +72,10 @@ protected:
   // Description:
   // Call creation on the child.
   virtual void ChildCreate();
+
+
+  // Listens for keyboard and mouse events
+  vtkCallbackCommand* EventCallbackCommand; 
 
 // ATTRIBUTE EDITOR
   vtkKWCheckButton* MouseControlToggle;

@@ -47,7 +47,7 @@
 
 
 vtkStandardNewMacro(vtkPickBoxWidget);
-vtkCxxRevisionMacro(vtkPickBoxWidget, "1.2");
+vtkCxxRevisionMacro(vtkPickBoxWidget, "1.3");
 
 
 
@@ -56,7 +56,9 @@ vtkPickBoxWidget::vtkPickBoxWidget()
 {
   this->EventCallbackCommand->SetCallback(vtkPickBoxWidget::ProcessEvents);
   this->RenderModuleProxy = 0;
-  this->MouseControlToggle = 0;
+  this->SetTranslationEnabled(0);
+  this->SetScalingEnabled(0);
+  this->SetRotationEnabled(0);
 // ATTRIBUTE EDITOR
   this->LastPickPosition[0] = this->LastPickPosition[1] = this->LastPickPosition[2] = 0;
 
@@ -84,7 +86,6 @@ void vtkPickBoxWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "RenderModuleProxy: (" << this->RenderModuleProxy << ")\n";
-  os << indent << "SetMouseControlToggle" << this->GetMouseControlToggle() << endl;
 }
 
 
@@ -211,12 +212,15 @@ void vtkPickBoxWidget::OnLeftButtonDown()
 
   // Okay, we can process this. Try to pick handles first;
   // if no handles picked, then pick the bounding box.
-  if (!this->CurrentRenderer || !this->CurrentRenderer->IsInViewport(X, Y) || (this->CurrentRenderer->IsInViewport(X, Y) && !this->MouseControlToggle))
+  if (!this->CurrentRenderer || !this->CurrentRenderer->IsInViewport(X, Y) || (this->CurrentRenderer->IsInViewport(X, Y) && !this->RotationEnabled))
     {
     this->State = vtkBoxWidget::Outside;
     return;
     }
+
+  this->Superclass::OnLeftButtonDown();
   
+/*
   vtkAssemblyPath *path;
   this->HandlePicker->Pick(X,Y,0.0,this->CurrentRenderer);
   path = this->HandlePicker->GetPath();
@@ -251,16 +255,7 @@ void vtkPickBoxWidget::OnLeftButtonDown()
     else
       {
       //this->HighlightFace(this->HighlightHandle(NULL));
-// ATTRIBUTE EDITOR
-      if(this->MouseControlToggle)
-        {
-        this->State = vtkBoxWidget::Moving;
-        }
-      else
-        {
-        this->State = vtkBoxWidget::Outside;
-        return;
-        }
+      this->State = vtkBoxWidget::Moving;
       }
     }
   
@@ -268,6 +263,62 @@ void vtkPickBoxWidget::OnLeftButtonDown()
   this->StartInteraction();
   this->InvokeEvent(vtkCommand::StartInteractionEvent, NULL);
   this->Interactor->Render();
+*/
+}
+
+
+void vtkPickBoxWidget::OnMiddleButtonDown()
+{
+  int X = this->Interactor->GetEventPosition()[0];
+  int Y = this->Interactor->GetEventPosition()[1];
+
+  // Okay, we can process this. Try to pick handles first;
+  // if no handles picked, then pick the bounding box.
+  if (!this->CurrentRenderer || !this->CurrentRenderer->IsInViewport(X, Y) || (this->CurrentRenderer->IsInViewport(X, Y) && !this->TranslationEnabled))
+    {
+    this->State = vtkBoxWidget::Outside;
+    return;
+    }
+
+  this->Superclass::OnMiddleButtonDown();
+/*
+
+  vtkAssemblyPath *path;
+  this->HandlePicker->Pick(X,Y,0.0,this->CurrentRenderer);
+  path = this->HandlePicker->GetPath();
+  if ( path != NULL )
+    {
+    this->State = vtkBoxWidget::Moving;
+    this->CurrentHandle = this->Handle[6];
+    this->HighlightOutline(1);
+    this->HandlePicker->GetPickPosition(this->LastPickPosition);
+    this->ValidPick = 1;
+    }
+  else
+    {
+    this->HexPicker->Pick(X,Y,0.0,this->CurrentRenderer);
+    path = this->HexPicker->GetPath();
+    if ( path != NULL )
+      {
+      this->State = vtkBoxWidget::Moving;
+      this->CurrentHandle = this->Handle[6];
+      this->HighlightOutline(1);
+      this->HexPicker->GetPickPosition(this->LastPickPosition);
+      this->ValidPick = 1;
+      }
+    else
+      {
+      this->HighlightFace(this->HighlightHandle(NULL));
+      this->State = vtkBoxWidget::Outside;
+      return;
+      }
+    }
+  
+  this->EventCallbackCommand->SetAbortFlag(1);
+  this->StartInteraction();
+  this->InvokeEvent(vtkCommand::StartInteractionEvent, NULL);
+  this->Interactor->Render();
+*/
 }
 
 void vtkPickBoxWidget::OnRightButtonDown()
@@ -277,11 +328,14 @@ void vtkPickBoxWidget::OnRightButtonDown()
 
   // Okay, we can process this. Try to pick handles first;
   // if no handles picked, then pick the bounding box.
-  if (!this->CurrentRenderer || !this->CurrentRenderer->IsInViewport(X, Y) || (this->CurrentRenderer->IsInViewport(X, Y) && !this->MouseControlToggle))
+  if (!this->CurrentRenderer || !this->CurrentRenderer->IsInViewport(X, Y) || (this->CurrentRenderer->IsInViewport(X, Y) && !this->ScalingEnabled))
     {
     this->State = vtkBoxWidget::Outside;
     return;
     }
+
+  this->Superclass::OnRightButtonDown();
+/*
   
   vtkAssemblyPath *path;
   this->HandlePicker->Pick(X,Y,0.0,this->CurrentRenderer);
@@ -306,16 +360,7 @@ void vtkPickBoxWidget::OnRightButtonDown()
       }
     else
       {
-      if(this->MouseControlToggle)
-        {
-        this->State = vtkBoxWidget::Scaling;
-        this->CurrentHandle = NULL;
-        }
-      else
-        {
-        this->State = vtkBoxWidget::Outside;
-        return;
-        }
+      this->State = vtkBoxWidget::Scaling;
       }
     }
   
@@ -323,14 +368,14 @@ void vtkPickBoxWidget::OnRightButtonDown()
   this->StartInteraction();
   this->InvokeEvent(vtkCommand::StartInteractionEvent, NULL);
   this->Interactor->Render();
+*/
 }
 
 
 void vtkPickBoxWidget::OnMouseMove()
 {
   // See whether we're active
-  if ( (this->State == vtkBoxWidget::Outside ) || 
-       this->State == vtkBoxWidget::Start )
+  if ( this->State == vtkBoxWidget::Outside || this->State == vtkBoxWidget::Start) 
     {
     return;
     }
@@ -406,7 +451,7 @@ void vtkPickBoxWidget::OnMouseMove()
           }
         }
       }
-    else if( this->RotationEnabled && this->MouseControlToggle)
+    else if( this->RotationEnabled) 
       {
       camera->GetViewPlaneNormal(vpn);
       this->Rotate(X, Y, prevPickPoint, pickPoint, vpn);
@@ -422,3 +467,4 @@ void vtkPickBoxWidget::OnMouseMove()
   this->InvokeEvent(vtkCommand::InteractionEvent, NULL);
   this->Interactor->Render();
 }
+

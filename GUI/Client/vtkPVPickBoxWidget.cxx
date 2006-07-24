@@ -48,9 +48,13 @@
 #include "vtkCommand.h"
 #include "vtkPVWindow.h"
 #include "vtkPVTraceHelper.h"
+#include "vtkCallbackCommand.h"
+#include "vtkCommand.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVWindow.h"
 
 vtkStandardNewMacro(vtkPVPickBoxWidget);
-vtkCxxRevisionMacro(vtkPVPickBoxWidget, "1.4");
+vtkCxxRevisionMacro(vtkPVPickBoxWidget, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVPickBoxWidget::vtkPVPickBoxWidget()
@@ -63,15 +67,23 @@ vtkPVPickBoxWidget::vtkPVPickBoxWidget()
 // ATTRIBUTE EDITOR 
 //  this->SetWidgetProxyXMLName("BoxWidgetProxy");
   this->SetWidgetProxyXMLName("PickBoxWidgetProxy");
+
+  this->EventCallbackCommand = vtkCallbackCommand::New();
+  this->EventCallbackCommand->SetClientData(this); 
+  this->EventCallbackCommand->SetCallback(vtkPVPickBoxWidget::ProcessEvents);
 }
 
 //----------------------------------------------------------------------------
 vtkPVPickBoxWidget::~vtkPVPickBoxWidget()
 {
-
 // ATTRIBUTE EDITOR
   this->MouseControlToggle->Delete();
   this->InstructionsLabel->Delete();
+
+  this->EventCallbackCommand->SetClientData(0);
+  this->EventCallbackCommand->SetCallback(0);
+  this->EventCallbackCommand->Delete();
+  this->EventCallbackCommand = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -102,21 +114,28 @@ void vtkPVPickBoxWidget::ChildCreate()
 // ATTRIBUTE EDITOR
   this->InstructionsLabel->SetParent(this->ControlFrame);
   this->InstructionsLabel->Create();
-  this->InstructionsLabel->SetText("Press 'r' to relocate to mouse position\n Press 'e' to edit current region\nPress 't' to toggle mouse control between the model and widget");
-  this->Script("grid %s - - -sticky e",
+  this->InstructionsLabel->SetText("Press 'r' to relocate\nPress 't' to toggle interactions");
+  this->Script("grid %s -sticky nws",
     this->InstructionsLabel->GetWidgetName());
 
 // ATTRIBUTE EDITOR
   this->MouseControlToggle->SetParent(this->ControlFrame);
   this->MouseControlToggle->SetIndicatorVisibility(1);
   this->MouseControlToggle->Create();
-  this->MouseControlToggle->SetText("Control Widget Only");
-  this->MouseControlToggle->SetSelectedState(0);
+  this->MouseControlToggle->SetText("Turn on/off interactions with widget");
+  this->MouseControlToggle->SetSelectedState(1);
   this->MouseControlToggle->SetBalloonHelpString(
-    "Rotate the model from anywhere in the view.");
+    "Enable interaction with the box widget.");
   this->MouseControlToggle->SetCommand(this, "SetMouseControlToggle");
   this->Script("grid %s -sticky nws",
     this->MouseControlToggle->GetWidgetName());
+
+  // listen for the following events
+  vtkPVGenericRenderWindowInteractor *interactor = this->GetPVApplication()->GetMainWindow()->GetInteractor();
+  if(interactor)
+    {
+    interactor->AddObserver(vtkCommand::CharEvent, this->EventCallbackCommand, 1);
+    }
 
 //  this->Script("pack %s -fill x -expand t -pady 2",
 //    this->ControlFrame->GetWidgetName());
@@ -170,4 +189,34 @@ void vtkPVPickBoxWidget::SetMouseControlToggle(int state)
     ivp->SetElements1(state);
     }
   this->WidgetProxy->UpdateVTKObjects();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVPickBoxWidget::ProcessEvents(vtkObject* vtkNotUsed(object), 
+                                       unsigned long event, 
+                                       void* clientdata, 
+                                       void* vtkNotUsed(calldata))
+{
+  vtkPVPickBoxWidget* self = reinterpret_cast<vtkPVPickBoxWidget *>( clientdata );
+
+  //look for char and delete events
+  switch(event)
+    {
+    case vtkCommand::CharEvent:
+      self->OnChar();
+      break;
+    }
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVPickBoxWidget::OnChar()
+{
+  if (this->GetPVApplication()->GetMainWindow()->GetInteractor()->GetKeyCode() == 't' ||
+      this->GetPVApplication()->GetMainWindow()->GetInteractor()->GetKeyCode() == 'T' )
+    {
+    this->GetMouseControlToggle()->ToggleSelectedState();
+    this->SetMouseControlToggle(this->GetMouseControlToggle()->GetSelectedState());
+    }
 }

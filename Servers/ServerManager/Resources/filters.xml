@@ -4386,6 +4386,51 @@ Click the Start Selection button to begin. Then use the left mouse button to mak
 
    <!-- End ExtractHistogram -->
    </SourceProxy>
+   <SourceProxy name="SpecializedBoxClip" class="vtkPVSpecializedBoxClip">
+    <Documentation
+       long_help="Clip with an box. Clipping does not reduce the dimensionality of the data set.  This output data type of this filter is always an unstructured grid."
+       short_help="Clip with an implicit plane, sphere or with scalars.">
+The Clip filter cuts away a portion of the input data set using a box. The clip filter returns that portion of the input data set that lies inside the box. If the Inside Out option is checked, the opposite portions of the data set will be returned.
+This filter operates on all types of data sets, and it returns unstructured grid data on output.
+    </Documentation>
+    <InputProperty
+       name="Input"
+       command="SetInput">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+          <InputArrayDomain name="input_array" attribute_type="point"
+                            optional="1"/>
+     </InputProperty>
+
+     <ProxyProperty name="ClipFunction" command="SetClipFunction">
+           <ProxyGroupDomain name="groups">
+               <Group name="implicit_functions"/>
+           </ProxyGroupDomain>
+     </ProxyProperty>
+
+     <DoubleVectorProperty
+        name="InputBounds"  information_only="1">
+       <BoundsDomain name="bounds">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </BoundsDomain>
+     </DoubleVectorProperty>
+     <IntVectorProperty
+        name="InsideOut"
+        command="SetInsideOut"
+        number_of_elements="1"
+        default_values="0" >
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+   <!-- End Clip -->
+   </SourceProxy>
+
    </ProxyGroup>
 </ServerManagerConfiguration>
 
