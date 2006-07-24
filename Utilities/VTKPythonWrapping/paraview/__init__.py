@@ -83,6 +83,17 @@ class pyProxy:
         "Overload CompoundProxy's AddProxy()"
         self.SMProxy.AddProxy(name, proxy.SMProxy)
 
+    def ListProperties(self):
+        """Returns a list of all properties on this proxy."""
+        iter = self.NewPropertyIterator()
+        iter.Begin()
+        property_list = []
+        while not iter.IsAtEnd():
+          property_list.append(iter.GetKey())
+          iter.Next()
+        iter.UnRegister(None)
+        return property_list
+
     def __getattr__(self, name):
         """With the exception of a few overloaded methods,
         returns the SMProxy method"""
@@ -121,6 +132,7 @@ class pyProxyManager:
         proxy = self.SMProxyManager.NewProxy(group, name)
         if not proxy:
             return None
+        proxy.UnRegister(None)
         return pyProxy(proxy)
 
     def GetProxy(self, group, name):
@@ -135,3 +147,72 @@ class pyProxyManager:
     def __getattr__(self, name):
         """Returns attribute from the SMProxyManager"""
         return getattr(self.SMProxyManager, name)
+
+class pyConnection:
+  """
+    This is a representation for a connection on in the python client.
+    Eventually,  this may move to the server manager itself.
+  """
+  def __init__(self, connectionId):
+    self.ID = connectionId
+    self.Hostname = ""
+    self.Port = 0
+    self.RSHostname = None
+    self.RSPort = None
+    return
+
+  def SetHost(self, hostname, port):
+    self.Hostname = hostname
+    self.Port = port
+    return
+
+  def SetHost(self, ds_host, ds_port, rs_host, rs_port):
+    self.SetHost(ds_host, ds_port)
+    self.RSHostname = rs_host
+    self.RSPort = rs_port
+    return
+
+  def __repr__(self):
+    if not self.RSHostname:
+      return "Connection(%s:%d)" % (self.Hostname, self.Port)
+    return "Connection data(%s:%d), render(%s:%d)" % \
+      (self.Hostname, self.Port, self.RSHostname, self.RSPort)
+
+
+## These are method to create a new connection.
+## One can connect to a server, (data-server,render-server)
+## or simply create a built-in connection.
+
+def connect(host, port):
+  """Connect to a host:port. Returns the connection object if successfully connected 
+  with the server."""
+  pm =  vtkProcessModule.GetProcessModule()
+  cid = pm.ConnectToRemote(host, port)
+  if not cid:
+    return None
+  conn = pyConnection(cid)
+  conn.SetHost(host, port)
+  return conn 
+
+def connect(ds_host, ds_port, rs_host, rs_port):
+  """Connect to a dataserver at (ds_host:ds_port) and to a render server
+  at (rs_host:rs_port). 
+  Returns the connection object if successfully connected 
+  with the server."""
+  pm =  vtkProcessModule.GetProcessModule()
+  cid = pm.ConnectToRemote(ds_host, ds_port, rs_host, rs_port)
+  if not cid:
+    return None
+  conn = pyConnection(cid)
+  conn.SetHost(ds_host, ds_port, rs_host, rs_port)
+  return conn 
+
+def connect():
+  """Creates a new self connection."""
+  pm =  vtkProcessModule.GetProcessModule()
+  cid = pm.ConnectToSelf()
+  if not cid:
+    return None
+  conn = pyConnection(cid)
+  conn.SetHost("builtin", cid)
+  return conn 
