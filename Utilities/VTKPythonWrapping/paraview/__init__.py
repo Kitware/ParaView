@@ -25,7 +25,7 @@ class pyProxy:
         "Constructor. Assigns proxy to self.SMProxy"
         self.SMProxy = proxy
 
-    def AddToProperty(self, *args):
+    def __AddToProperty__(self, *args):
         """Generic method for adding a proxy to a proxy property.
         Should not be directly called"""
         if not self.__LastAttrName:
@@ -50,7 +50,7 @@ class pyProxy:
             raise "AddTo works only with proxy properties"
         self.__LastAttrName = None
 
-    def SetProperty(self, *args):
+    def __SetProperty__(self, *args):
         """Generic method for setting the value of a property.
         Should not be directly called"""
         if not self.__LastAttrName:
@@ -63,6 +63,7 @@ class pyProxy:
             print "Property %s not found. Cannot set" % self.__LastAttrName
             return
         if property.IsA("vtkSMProxyProperty"):
+            property.SetNumberOfProxies(len(args))
             for i in range(len(args)):
                 try:
                     getattr(args[i], "SMProxy")
@@ -75,6 +76,34 @@ class pyProxy:
                 property.SetElement(i, args[i])
         self.__LastAttrName = None
 
+    def __GetProperty__(self):
+        """Generic method for getting the value of a property.
+           Should not be directly called."""
+        if not self.__LastAttrName:
+            raise "Cannot find property name."
+            return
+        property = self.SMProxy.GetProperty(self.__LastAttrName)
+        if not property:
+            self.__LastAttrName = None
+            print "Property %s not found. Cannot set" % self.__LastAttrName
+            return
+        self.__LastAttrName = None
+        if property.IsA("vtkSMProxyProperty"):
+            list = []
+            for i in range(0, property.GetNumberOfProxies()):
+                proxy = property.GetProxy(i)
+                if proxy:
+                    list.append(pyProxy(proxy))
+                else:
+                    list.append(None)
+            return list
+        else:
+            list = []
+            for i in range(0, property.GetNumberOfElements()):
+                list.append(property.GetElement(i))
+            return list 
+        return []
+      
     def CreateDisplayProxy(self):
         "Overload RenderModule's CreateDisplayProxy() to return a pyProxy"
         return pyProxy(self.SMProxy.CreateDisplayProxy())
@@ -97,12 +126,15 @@ class pyProxy:
     def __getattr__(self, name):
         """With the exception of a few overloaded methods,
         returns the SMProxy method"""
-        if re.compile("^Set").match(name):
+        if re.compile("^Set").match(name) and self.SMProxy.GetProperty(name[3:]):
             self.__LastAttrName = name[3:]
-            return self.SetProperty
+            return self.__SetProperty__
+        if re.compile("^Get").match(name) and self.SMProxy.GetProperty(name[3:]):
+            self.__LastAttrName = name[3:]
+            return self.__GetProperty__
         if re.compile("^AddTo").match(name):
             self.__LastAttrName = name[5:]
-            return self.AddToProperty
+            return self.__AddToProperty__
         return getattr(self.SMProxy, name)
         
 class pyProxyManager:
@@ -144,9 +176,86 @@ class pyProxyManager:
             return None
         return pyProxy(proxy)
 
+    def GetProxiesOnConnection(self, connection):
+        """Returns a map of proxies registered with the proxy manager
+           on the particular connection."""
+        proxy_groups = {}
+        iter = self.connection_iter(connection) 
+        for proxy in iter:
+            if not proxy_groups.has_key(iter.GetGroup()):
+                proxy_groups[iter.GetGroup()] = {}
+            group = proxy_groups[iter.GetGroup()]
+            group[iter.GetKey()] = proxy;
+        return proxy_groups
+
+    def GetProxiesInGroup(self, groupname, connection=None):
+        """Returns a map of proxies in a particular group. 
+         If connection is not None, then only those proxies
+         in the group that are on the particular connection
+         are returned.
+        """
+        proxies = {}
+        iter = self.group_iter(groupname) 
+        for proxy in iter:
+            proxies[iter.GetKey()] = proxy;
+        return proxies
+
     def __getattr__(self, name):
         """Returns attribute from the SMProxyManager"""
         return getattr(self.SMProxyManager, name)
+
+    def __iter__(self):
+        return pyProxyIterator()
+
+    def group_iter(self, group_name, connection=None):
+        iter = self.__iter__()
+        if connection:
+            iter.SetConnectionID(connection.ID)
+        iter.SetModeToOneGroup()
+        iter.Begin(group_name)
+        return iter
+
+    def connection_iter(self, connection):
+        iter = self.__iter__()
+        if connection:
+            iter.SetConnectionID(connection.ID)
+        iter.Begin()
+        return iter
+
+class pyProxyIterator:
+    """Wrapper for a vtkSMProxyIterator class to satisfy the
+     python iterator protocol."""
+    def __init__(self):
+        self.SMIterator = vtkSMProxyIterator()
+        self.SMIterator.Begin()
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        if self.SMIterator.IsAtEnd():
+            raise StopIteration
+            return None
+        self.Proxy = self.SMIterator.GetProxy()
+        if self.Proxy:
+          self.Proxy = pyProxy(self.Proxy)
+        self.Group = self.SMIterator.GetGroup()
+        self.Key = self.SMIterator.GetKey()
+        self.SMIterator.Next()
+        return self.Proxy
+
+    def GetProxy(self):
+        return self.Proxy
+
+    def GetKey(self):
+        return self.Key
+
+    def GetGroup(self):
+        return self.Group
+
+    def __getattr__(self, name):
+        """returns attributes from the vtkSMProxyIterator."""
+        return getattr(self.SMIterator, name)
 
 class pyConnection:
   """
@@ -253,3 +362,5 @@ def createProxy(xml_group, xml_name, register_group=None, register_name=None, co
       register_name = proxy.GetSelfIDAsString()
     pxm.RegisterProxy(register_group, register_name, proxy.SMProxy)
   return proxy
+
+
