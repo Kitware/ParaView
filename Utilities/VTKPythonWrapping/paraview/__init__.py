@@ -163,7 +163,7 @@ class pyConnection:
 
   def SetHost(self, ds_host, ds_port, rs_host=None, rs_port=None):
     self.Hostname = ds_host 
-    self.Port = ds_host
+    self.Port = ds_port
     self.RSHostname = rs_host
     self.RSPort = rs_port
     return
