@@ -19,7 +19,7 @@
 #include "vtkSMProxyManagerInternals.h"
 
 vtkStandardNewMacro(vtkSMProxyIterator);
-vtkCxxRevisionMacro(vtkSMProxyIterator, "1.3");
+vtkCxxRevisionMacro(vtkSMProxyIterator, "1.4");
 
 struct vtkSMProxyIteratorInternals
 {
@@ -34,6 +34,7 @@ vtkSMProxyIterator::vtkSMProxyIterator()
 
   this->Mode = vtkSMProxyIterator::ALL;
   this->Begin();
+  this->ConnectionID = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -58,6 +59,15 @@ void vtkSMProxyIterator::Begin(const char* groupName)
     this->Internals->ProxyIterator = 
       this->Internals->GroupIterator->second.begin();
     }
+
+  if (this->ConnectionID != 0)
+    {
+    while (!this->IsAtEnd() 
+      && this->GetProxy()->GetConnectionID() != this->ConnectionID)
+      {
+      this->Next();
+      }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -74,6 +84,15 @@ void vtkSMProxyIterator::Begin()
     {
     this->Internals->ProxyIterator = 
       this->Internals->GroupIterator->second.begin();
+    }
+
+  if (this->ConnectionID != 0)
+    {
+    while (!this->IsAtEnd() 
+      && this->GetProxy()->GetConnectionID() != this->ConnectionID)
+      {
+      this->NextInternal();
+      }
     }
 }
 
@@ -102,6 +121,20 @@ int vtkSMProxyIterator::IsAtEnd()
 
 //---------------------------------------------------------------------------
 void vtkSMProxyIterator::Next()
+{
+  this->NextInternal();
+  if (this->ConnectionID != 0)
+    {
+    while (!this->IsAtEnd() 
+      && this->GetProxy()->GetConnectionID() != this->ConnectionID)
+      {
+      this->NextInternal();
+      }
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyIterator::NextInternal()
 {
   vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
   if (!pm)
@@ -223,4 +256,5 @@ void vtkSMProxyIterator::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 
   os << indent << "Mode: " << this->Mode << endl;
+  os << indent << "ConnectionID: " << this->ConnectionID << endl;
 }
