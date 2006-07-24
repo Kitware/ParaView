@@ -51,14 +51,11 @@ int main(int argc, char* argv[])
   vtkPVMain::Initialize(&argc, &argv); 
   vtkPVMain* pvmain = vtkPVMain::New();
   vtkPVPythonOptions* options = vtkPVPythonOptions::New();
-  options->SetProcessType(vtkPVOptions::PVCLIENT);
+  options->SetProcessType(vtkPVOptions::PVBATCH);
   vtkPVProcessModulePythonHelper* helper = vtkPVProcessModulePythonHelper::New();
   int ret = pvmain->Initialize(options, helper, ParaViewInitializeInterpreter, argc, argv);
   if (!ret)
     {
-    // Tell process module that we support Multiple connections.
-    // This must be set before starting the event loop.
-    vtkProcessModule::GetProcessModule()->SupportMultipleConnectionsOn();
     ret = helper->Run(options);
     }
   helper->Delete();
