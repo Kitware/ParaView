@@ -145,6 +145,13 @@ class pyProxy:
             self.SMProxy.AddProxy(name, proxy)
         return
 
+    def __SaveDefinition__(self):
+        "Overload for CompoundProxy's SaveDefinition."
+         defn = self.SMProxy.SaveDefinition()
+         if defn:
+              defn.UnRegister(None)
+         return defn
+
     def ListProperties(self):
         """Returns a list of all properties on this proxy."""
         property_list = []
@@ -172,6 +179,8 @@ class pyProxy:
             return self.__RemoveFromProperty__
         if name == "CreateDisplayProxy" and hasattr(self.SMProxy, "CreateDisplayProxy"):
             return self.__CreateDisplayProxy__
+        if name == "SaveDefinition" and hasattr(self.SMProxy, "SaveDefinition"):
+            return self.__SaveDefinition__
         if name == "AddProxy" and hasattr(self.SMProxy, "AddProxy"):
             return self.__AddProxy__
         return getattr(self.SMProxy, name)
@@ -199,6 +208,17 @@ class pyProxyManager:
         if not self.SMProxyManager:
             return None
         proxy = self.SMProxyManager.NewProxy(group, name)
+        if not proxy:
+            return None
+        proxy.UnRegister(None)
+        return pyProxy(proxy)
+
+    def NewCompoundProxy(self, name):
+        """Create a new compound proxy with the given name and returns q pyProxy
+        wrapper"""
+        if not self.SMProxyManager:
+            return None
+        proxy = self.SMProxyManager.NewCompoundProxy(name)
         if not proxy:
             return None
         proxy.UnRegister(None)
