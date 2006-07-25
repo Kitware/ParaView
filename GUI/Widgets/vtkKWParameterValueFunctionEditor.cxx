@@ -39,7 +39,7 @@
 #include <vtksys/stl/algorithm>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.97");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.98");
 
 //----------------------------------------------------------------------------
 #define VTK_KW_PVFE_POINT_RADIUS_MIN         2
@@ -2026,40 +2026,47 @@ void vtkKWParameterValueFunctionEditor::Bind()
     this->Canvas->SetBinding(
       "<Any-ButtonPress>", this, "StartInteractionCallback %x %y");
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTag
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueFunctionEditor::PointTag
            << " <B1-Motion> {" << this->GetTclName() 
            << " MovePointCallback %%x %%y 0}" << endl;
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTextTag
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueFunctionEditor::PointTextTag
            << " <B1-Motion> {" << this->GetTclName() 
            << " MovePointCallback %%x %%y 0}" << endl;
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTag
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueFunctionEditor::PointTag
            << " <Shift-B1-Motion> {" << this->GetTclName() 
            << " MovePointCallback %%x %%y 1}" << endl;
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTextTag
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueFunctionEditor::PointTextTag
            << " <Shift-B1-Motion> {" << this->GetTclName() 
            << " MovePointCallback %%x %%y 1}" << endl;
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTag 
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueFunctionEditor::PointTag 
            << " <ButtonRelease-1> {" << this->GetTclName() 
            << " EndInteractionCallback %%x %%y}" << endl;
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTextTag 
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueFunctionEditor::PointTextTag 
            << " <ButtonRelease-1> {" << this->GetTclName() 
            << " EndInteractionCallback %%x %%y}" << endl;
 
     // Double click on point
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTag
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueFunctionEditor::PointTag
            << " <Double-1> {" << this->GetTclName() 
            << " DoubleClickOnPointCallback %%x %%y}" << endl;
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTextTag
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueFunctionEditor::PointTextTag
            << " <Double-1> {" << this->GetTclName() 
            << " DoubleClickOnPointCallback %%x %%y}" << endl;
-
 
     // Parameter Cursor
 
@@ -2197,31 +2204,51 @@ void vtkKWParameterValueFunctionEditor::UnBind()
 
     this->Canvas->RemoveBinding("<ButtonPress-1>");
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTag 
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueFunctionEditor::PointTag 
            << " <B1-Motion> {}" << endl;
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTextTag 
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueFunctionEditor::PointTextTag 
            << " <B1-Motion> {}" << endl;
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTag 
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueFunctionEditor::PointTag 
            << " <Shift-B1-Motion> {}" << endl;
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTextTag 
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueFunctionEditor::PointTextTag 
            << " <Shift-B1-Motion> {}" << endl;
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTag 
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueFunctionEditor::PointTag 
            << " <ButtonRelease-1> {}" << endl;
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::PointTextTag 
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueFunctionEditor::PointTextTag 
            << " <ButtonRelease-1> {}" << endl;
 
-    // Paameter Cursor
+    // Double click on point
 
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::ParameterCursorTag
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueFunctionEditor::PointTag
+           << " <Double-1> {}" << endl;
+
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueFunctionEditor::PointTextTag
+           << " <Double-1> {}" << endl;
+
+
+    // Parameter Cursor
+
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueFunctionEditor::ParameterCursorTag
            << " <ButtonPress-1> {}"  << endl;
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::ParameterCursorTag
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueFunctionEditor::ParameterCursorTag
            << " <ButtonRelease-1> {}" << endl;
-    tk_cmd << canv << " bind " << vtkKWParameterValueFunctionEditor::ParameterCursorTag
+    tk_cmd << canv << " bind " 
+           << vtkKWParameterValueFunctionEditor::ParameterCursorTag
            << " <B1-Motion> {}" << endl;
 
     tk_cmd << "bind " << canv 
