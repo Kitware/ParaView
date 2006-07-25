@@ -21,27 +21,26 @@ pvsm_file = os.path.join(SMPythonTesting.SMStatesDir, "CompoundProxyUndoRedo.pvs
 print "State file: %s" % pvsm_file
 SMPythonTesting.LoadServerManagerState(pvsm_file)
 
-pxm = paraview.vtkSMObject.GetProxyManager()
+pxm = paraview.pyProxyManager()
 renModule = pxm.GetProxy("rendermodules", "RenderModule0")
 renModule.UpdateVTKObjects()
 
 undoStack = paraview.vtkSMUndoStack()
 
-self_cid = paraview.vtkProcessModuleConnectionManager.GetSelfConnectionID()
+self_cid = paraview.ActiveConnection.ID
 
 # Create a compound proxy for the elevation filter.
 shrink = pxm.GetProxy("filters", "Shrink0")
 reflect = pxm.GetProxy("filters", "Reflect0")
 connect = pxm.GetProxy("filters", "Connect0")
 
-compound_proxy = paraview.vtkSMCompoundProxy()
+compound_proxy = paraview.pyProxy(paraview.vtkSMCompoundProxy())
 compound_proxy.AddProxy("first", shrink)
 compound_proxy.AddProxy("second", reflect)
 compound_proxy.AddProxy("third", connect)
 compound_proxy.ExposeProperty("first", "Input", "Input")
 
 cp_definition = compound_proxy.SaveDefinition(None)
-cp_definition.UnRegister(None)
 
 pxm.RegisterCompoundProxyDefinition("MyMacro", cp_definition)
 
@@ -52,7 +51,8 @@ undoStack.EndUndoSet()
 del compound_proxy
 
 compound_proxy = pxm.NewCompoundProxy("MyMacro")
-compound_proxy.UnRegister(None)
+compound_proxy.SetConnectionID(self_cid)
+
 undoStack.BeginOrContinueUndoSet(self_cid, "CPRegister2")
 pxm.RegisterProxy("mygroup", "Instantiation", compound_proxy)
 undoStack.EndUndoSet()
@@ -73,16 +73,15 @@ while undoStack.GetNumberOfRedoSets() > 0:
   RenderAndWait(renModule)
 
 proxy2 = pxm.NewProxy("sources","CubeSource")
-proxy2.UnRegister(None)
 
-shrink.GetProperty("Input").SetProxy(0, proxy2)
+shrink.SetInput(proxy2)
 shrink.UpdateVTKObjects()
 RenderAndWait(renModule)
 
 # This change should affect Groupping compound proxy.
 # Verify that.
 compound_proxy = pxm.GetProxy("mygroup", "Groupping")
-if proxy2 != compound_proxy.GetProperty("Input").GetProxy(0):
+if proxy2 != compound_proxy.GetInput()[0]:
   print "ERROR: Groupping Compund proxy has not groupped proxies correctly."
   sys.exit(1);
 
