@@ -10,7 +10,7 @@
 #ifndef _QtPythonConfig_h
 #define _QtPythonConfig_h
 
-#define PARAVIEW_DEFAULT_PYTHON_MODULE_DIR "@ParaView_SOURCE_DIR@/ParaView/Servers/Wrapping/Python"
+#define PARAVIEW_DEFAULT_PYTHON_MODULE_DIR "@PV_PYTHON_MODULE_DIR@"
 #define PARAVIEW_LIBRARY_OUTPUT_PATH "@LIBRARY_OUTPUT_PATH@"
 
 #endif // !_QtPythonConfig_h

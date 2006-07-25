@@ -4,36 +4,33 @@ import os
 import os.path
 import sys
 
-if os.name == "posix":
-  from libvtkPVServerCommonPython import *
-  from libvtkPVServerManagerPython import *
-else:
-  from vtkPVServerCommonPython import *
-  from vtkPVServerManagerPython import *
+import paraview
+
 import SMPythonTesting
   
 SMPythonTesting.ProcessCommandLineArguments()
+paraview.ActiveConnection = paraview.connect()
 
 pvsm_file = os.path.join(SMPythonTesting.SMStatesDir, "ProxyPropertyLinks.pvsm")
 print "State file: %s" % pvsm_file
 
 SMPythonTesting.LoadServerManagerState(pvsm_file)
-pxm = vtkSMObject.GetProxyManager()
+pxm = paraview.pyProxyManager() 
 
 sphere1 = pxm.GetProxy("sources", "Sphere1")
 sphere2 = pxm.GetProxy("sources", "Sphere2")
 sphere3 = pxm.GetProxy("sources", "Sphere3")
 
 # Create links.
-proxyLink = vtkSMProxyLink()
-proxyLink.AddLinkedProxy(sphere1, 1) # Input
-proxyLink.AddLinkedProxy(sphere2, 2) # Output
+proxyLink = paraview.vtkSMProxyLink()
+proxyLink.AddLinkedProxy(sphere1.SMProxy, 1) # Input
+proxyLink.AddLinkedProxy(sphere2.SMProxy, 2) # Output
 pxm.RegisterLink("MyProxyLink", proxyLink)
 proxyLink = None
 
-propertyLink = vtkSMPropertyLink()
-propertyLink.AddLinkedProperty(sphere3, "EndTheta", 1) # Input.
-propertyLink.AddLinkedProperty(sphere1, "StartTheta", 2) # Output.
+propertyLink = paraview.vtkSMPropertyLink()
+propertyLink.AddLinkedProperty(sphere3.SMProxy, "EndTheta", 1) # Input.
+propertyLink.AddLinkedProperty(sphere1.SMProxy, "StartTheta", 2) # Output.
 pxm.RegisterLink("MyPropertyLink", propertyLink)
 propertyLink = None
 

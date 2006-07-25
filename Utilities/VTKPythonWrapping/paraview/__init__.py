@@ -54,6 +54,30 @@ class pyProxy:
         self.__LastAttrName = None
         return
 
+    def __RemoveFromProperty__(self, *args):
+        """Generic method for removing a proxy from a proxy property.
+        Should not be directly called."""
+        if not self.__LastAttrName:
+            self.__LastAttrName = None
+            raise "Cannot find property name"
+            return
+        property = self.SMProxy.GetProperty(self.__LastAttrName)
+        if not property:
+            self.__LastAttrName = None
+            print "Property %s not found. Cannot set" % self.__LastAttrName
+            return
+        if property.IsA("vtkSMProxyProperty"):
+            for proxy in args:
+                if isinstance(proxy, pyProxy):
+                    property.RemoveProxy(proxy.SMProxy)
+                else:
+                    property.RemoveProxy(proxy)
+        else:
+            raise "RemoveFrom works only with proxy properties"
+        self.__LastAttrName = None
+        return
+
+
     def __SetProperty__(self, *args):
         """Generic method for setting the value of a property.
         Should not be directly called"""
@@ -143,6 +167,9 @@ class pyProxy:
         if re.compile("^AddTo").match(name) and self.SMProxy.GetProperty(name[5:]):
             self.__LastAttrName = name[5:]
             return self.__AddToProperty__
+        if re.compile("^RemoveFrom").match(name) and self.SMProxy.GetProperty(name[10:]):
+            self.__LastAttrName = name[10:]
+            return self.__RemoveFromProperty__
         if name == "CreateDisplayProxy" and hasattr(self.SMProxy, "CreateDisplayProxy"):
             return self.__CreateDisplayProxy__
         if name == "AddProxy" and hasattr(self.SMProxy, "AddProxy"):

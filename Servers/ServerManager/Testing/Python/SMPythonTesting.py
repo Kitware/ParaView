@@ -3,13 +3,8 @@
 import os
 import re
 import sys
+import paraview
 
-if os.name == "posix":
-  from libvtkPVServerCommonPython import *
-  from libvtkPVServerManagerPython import *
-else:
-  from vtkPVServerCommonPython import *
-  from vtkPVServerManagerPython import *
 
 __ProcessedCommandLineArguments__ = False
 DataDir = ""
@@ -67,7 +62,7 @@ def LoadServerManagerState(filename):
   Returns the status of the load."""
   global DataDir
   ProcessCommandLineArguments()
-  parser = vtkPVXMLParser()
+  parser = paraview.vtkPVXMLParser()
 
   try:
     fp = open(filename, "r")
@@ -80,10 +75,11 @@ def LoadServerManagerState(filename):
   data = regExp.sub(DataDir, data)
   if not parser.Parse(data):
     return Error("Failed to parse")
-  loader = vtkSMStateLoader()
+  loader = paraview.vtkSMStateLoader()
+  loader.SetConnectionID(paraview.ActiveConnection.ID)
   root = parser.GetRootElement()
   if loader.LoadState(root,0):
-    pxm = vtkSMObject.GetProxyManager()
+    pxm = paraview.vtkSMObject.GetProxyManager()
     pxm.UpdateRegisteredProxies("sources", 0)
     pxm.UpdateRegisteredProxies("filters", 0)
     pxm.UpdateRegisteredProxies(0)
@@ -97,13 +93,13 @@ def DoRegressionTesting():
   global Threshold
   ProcessCommandLineArguments()
   
-  testing = vtkSMTesting()
+  testing = paraview.vtkSMTesting()
   testing.AddArgument("-T")
   testing.AddArgument(TempDir)
   testing.AddArgument("-V")
   testing.AddArgument(BaselineImage)
 
-  pxm = vtkSMObject.GetProxyManager()
+  pxm = paraview.vtkSMObject.GetProxyManager()
   rmProxy = pxm.GetProxy("rendermodules","RenderModule0")
   #pyProxy(rmProxy).SetRenderWindowSize(300, 300);
   #rmProxy.GetProperty("RenderWindowSize").SetElement(0, 300)
@@ -120,11 +116,12 @@ if __name__ == "__main__":
   # This script loads the state, saves out a temp state and loads the saved state.
   # This saved state is used for testing -- this will ensure load/save SM state
   # is working fine.
+  paraview.ActiveConnection = paraview.connect()
   ProcessCommandLineArguments()
   ret = 1
   if StateXMLFileName:
     if LoadServerManagerState(StateXMLFileName):
-      pxm = vtkSMObject.GetProxyManager()
+      pxm = paraview.vtkSMObject.GetProxyManager()
       if UseSavedStateForRegressionTests:
         saved_state = os.path.join(TempDir, "temp.pvsm")
         pxm.SaveState(saved_state)

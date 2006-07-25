@@ -1,17 +1,12 @@
 # Tests animation.
 
 import SMPythonTesting
+import paraview
 
 import os.path
 import sys
 
-if os.name == "posix":
-  from libvtkPVServerCommonPython import *
-  from libvtkPVServerManagerPython import *
-else:
-  from vtkPVServerCommonPython import *
-  from vtkPVServerManagerPython import *
-
+paraview.ActiveConnection = paraview.connect()
 
 SMPythonTesting.ProcessCommandLineArguments()
 
@@ -19,7 +14,7 @@ pvsm_file = os.path.join(SMPythonTesting.SMStatesDir, "Animation.pvsm")
 print "State file: %s" % pvsm_file
 
 SMPythonTesting.LoadServerManagerState(pvsm_file)
-pxm = vtkSMObject.GetProxyManager()
+pxm = paraview.pyProxyManager() 
 rmProxy = pxm.GetProxy("rendermodules","RenderModule0")
 rmProxy.StillRender()
 

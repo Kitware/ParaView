@@ -203,7 +203,7 @@
       </Domain>
     </Property>
   </Proxy>
-  <Proxy group="displays" type="CompositeDisplay" id="44">
+  <Proxy group="displays" type="LODDisplay" id="44">
     <Property name="Input" id="44.Input" number_of_elements="1">
       <Proxy value="37"/>
       <Domain name="groups" id="44.Input.groups">
@@ -212,22 +212,10 @@
         <Group value="glyph_sources"/>
       </Domain>
     </Property>
-    <Property name="IsDistributedGeometryValid" id="44.IsDistributedGeometryValid" number_of_elements="1">
-      <Element index="0" value="1"/>
-    </Property>
     <Property name="LODResolution" id="44.LODResolution" number_of_elements="1">
       <Element index="0" value="50"/>
       <Domain name="range" id="44.LODResolution.range">
         <Min index="0" value="0"/>
-      </Domain>
-    </Property>
-    <Property name="OrderedCompositing" id="44.OrderedCompositing" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="44.OrderedCompositing.bool"/>
-    </Property>
-    <Property name="OrderedCompositingTree" id="44.OrderedCompositingTree" number_of_elements="0">
-      <Domain name="groups" id="44.OrderedCompositingTree.groups">
-        <Group value="locators"/>
       </Domain>
     </Property>
     <Property name="Representation" id="44.Representation" number_of_elements="1">
@@ -425,7 +413,7 @@
       </Domain>
     </Property>
   </Proxy>
-  <Proxy group="displays" type="CompositeDisplay" id="122">
+  <Proxy group="displays" type="LODDisplay" id="122">
     <Property name="Input" id="122.Input" number_of_elements="1">
       <Proxy value="117"/>
       <Domain name="groups" id="122.Input.groups">
@@ -434,22 +422,10 @@
         <Group value="glyph_sources"/>
       </Domain>
     </Property>
-    <Property name="IsDistributedGeometryValid" id="122.IsDistributedGeometryValid" number_of_elements="1">
-      <Element index="0" value="1"/>
-    </Property>
     <Property name="LODResolution" id="122.LODResolution" number_of_elements="1">
       <Element index="0" value="50"/>
       <Domain name="range" id="122.LODResolution.range">
         <Min index="0" value="0"/>
-      </Domain>
-    </Property>
-    <Property name="OrderedCompositing" id="122.OrderedCompositing" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="122.OrderedCompositing.bool"/>
-    </Property>
-    <Property name="OrderedCompositingTree" id="122.OrderedCompositingTree" number_of_elements="0">
-      <Domain name="groups" id="122.OrderedCompositingTree.groups">
-        <Group value="locators"/>
       </Domain>
     </Property>
     <Property name="Representation" id="122.Representation" number_of_elements="1">
@@ -643,7 +619,7 @@
       </Domain>
     </Property>
   </Proxy>
-  <Proxy group="displays" type="CompositeDisplay" id="202">
+  <Proxy group="displays" type="LODDisplay" id="202">
     <Property name="Input" id="202.Input" number_of_elements="1">
       <Proxy value="195"/>
       <Domain name="groups" id="202.Input.groups">
@@ -652,22 +628,10 @@
         <Group value="glyph_sources"/>
       </Domain>
     </Property>
-    <Property name="IsDistributedGeometryValid" id="202.IsDistributedGeometryValid" number_of_elements="1">
-      <Element index="0" value="1"/>
-    </Property>
     <Property name="LODResolution" id="202.LODResolution" number_of_elements="1">
       <Element index="0" value="50"/>
       <Domain name="range" id="202.LODResolution.range">
         <Min index="0" value="0"/>
-      </Domain>
-    </Property>
-    <Property name="OrderedCompositing" id="202.OrderedCompositing" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="202.OrderedCompositing.bool"/>
-    </Property>
-    <Property name="OrderedCompositingTree" id="202.OrderedCompositingTree" number_of_elements="0">
-      <Domain name="groups" id="202.OrderedCompositingTree.groups">
-        <Group value="locators"/>
       </Domain>
     </Property>
     <Property name="Representation" id="202.Representation" number_of_elements="1">
@@ -862,7 +826,7 @@
       </Domain>
     </Property>
   </Proxy>
-  <Proxy group="displays" type="CompositeDisplay" id="440">
+  <Proxy group="displays" type="LODDisplay" id="440">
     <Property name="Input" id="440.Input" number_of_elements="1">
       <Proxy value="433"/>
       <Domain name="groups" id="440.Input.groups">
@@ -871,22 +835,10 @@
         <Group value="glyph_sources"/>
       </Domain>
     </Property>
-    <Property name="IsDistributedGeometryValid" id="440.IsDistributedGeometryValid" number_of_elements="1">
-      <Element index="0" value="1"/>
-    </Property>
     <Property name="LODResolution" id="440.LODResolution" number_of_elements="1">
       <Element index="0" value="50"/>
       <Domain name="range" id="440.LODResolution.range">
         <Min index="0" value="0"/>
-      </Domain>
-    </Property>
-    <Property name="OrderedCompositing" id="440.OrderedCompositing" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="440.OrderedCompositing.bool"/>
-    </Property>
-    <Property name="OrderedCompositingTree" id="440.OrderedCompositingTree" number_of_elements="0">
-      <Domain name="groups" id="440.OrderedCompositingTree.groups">
-        <Group value="locators"/>
       </Domain>
     </Property>
     <Property name="Representation" id="440.Representation" number_of_elements="1">
@@ -1076,7 +1028,7 @@
       </Domain>
     </Property>
   </Proxy>
-  <Proxy group="displays" type="CompositeDisplay" id="282">
+  <Proxy group="displays" type="LODDisplay" id="282">
     <Property name="Input" id="282.Input" number_of_elements="1">
       <Proxy value="275"/>
       <Domain name="groups" id="282.Input.groups">
@@ -1085,22 +1037,10 @@
         <Group value="glyph_sources"/>
       </Domain>
     </Property>
-    <Property name="IsDistributedGeometryValid" id="282.IsDistributedGeometryValid" number_of_elements="1">
-      <Element index="0" value="1"/>
-    </Property>
     <Property name="LODResolution" id="282.LODResolution" number_of_elements="1">
       <Element index="0" value="50"/>
       <Domain name="range" id="282.LODResolution.range">
         <Min index="0" value="0"/>
-      </Domain>
-    </Property>
-    <Property name="OrderedCompositing" id="282.OrderedCompositing" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="282.OrderedCompositing.bool"/>
-    </Property>
-    <Property name="OrderedCompositingTree" id="282.OrderedCompositingTree" number_of_elements="0">
-      <Domain name="groups" id="282.OrderedCompositingTree.groups">
-        <Group value="locators"/>
       </Domain>
     </Property>
     <Property name="Representation" id="282.Representation" number_of_elements="1">
@@ -1324,7 +1264,7 @@
       </Domain>
     </Property>
   </Proxy>
-  <Proxy group="displays" type="CompositeDisplay" id="360">
+  <Proxy group="displays" type="LODDisplay" id="360">
     <Property name="Input" id="360.Input" number_of_elements="1">
       <Proxy value="355"/>
       <Domain name="groups" id="360.Input.groups">
@@ -1333,22 +1273,10 @@
         <Group value="glyph_sources"/>
       </Domain>
     </Property>
-    <Property name="IsDistributedGeometryValid" id="360.IsDistributedGeometryValid" number_of_elements="1">
-      <Element index="0" value="1"/>
-    </Property>
     <Property name="LODResolution" id="360.LODResolution" number_of_elements="1">
       <Element index="0" value="50"/>
       <Domain name="range" id="360.LODResolution.range">
         <Min index="0" value="0"/>
-      </Domain>
-    </Property>
-    <Property name="OrderedCompositing" id="360.OrderedCompositing" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="360.OrderedCompositing.bool"/>
-    </Property>
-    <Property name="OrderedCompositingTree" id="360.OrderedCompositingTree" number_of_elements="0">
-      <Domain name="groups" id="360.OrderedCompositingTree.groups">
-        <Group value="locators"/>
       </Domain>
     </Property>
     <Property name="Representation" id="360.Representation" number_of_elements="1">
@@ -1574,7 +1502,7 @@
       </Domain>
     </Property>
   </Proxy>
-  <Proxy group="displays" type="CompositeDisplay" id="1178">
+  <Proxy group="displays" type="LODDisplay" id="1178">
     <Property name="Input" id="1178.Input" number_of_elements="1">
       <Proxy value="1137"/>
       <Domain name="groups" id="1178.Input.groups">
@@ -1583,22 +1511,10 @@
         <Group value="glyph_sources"/>
       </Domain>
     </Property>
-    <Property name="IsDistributedGeometryValid" id="1178.IsDistributedGeometryValid" number_of_elements="1">
-      <Element index="0" value="1"/>
-    </Property>
     <Property name="LODResolution" id="1178.LODResolution" number_of_elements="1">
       <Element index="0" value="50"/>
       <Domain name="range" id="1178.LODResolution.range">
         <Min index="0" value="0"/>
-      </Domain>
-    </Property>
-    <Property name="OrderedCompositing" id="1178.OrderedCompositing" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="1178.OrderedCompositing.bool"/>
-    </Property>
-    <Property name="OrderedCompositingTree" id="1178.OrderedCompositingTree" number_of_elements="0">
-      <Domain name="groups" id="1178.OrderedCompositingTree.groups">
-        <Group value="locators"/>
       </Domain>
     </Property>
     <Property name="Representation" id="1178.Representation" number_of_elements="1">
@@ -1877,7 +1793,7 @@
       </Domain>
     </Property>
   </Proxy>
-  <Proxy group="displays" type="CompositeDisplay" id="914">
+  <Proxy group="displays" type="LODDisplay" id="914">
     <Property name="Input" id="914.Input" number_of_elements="1">
       <Proxy value="909"/>
       <Domain name="groups" id="914.Input.groups">
@@ -1886,22 +1802,10 @@
         <Group value="glyph_sources"/>
       </Domain>
     </Property>
-    <Property name="IsDistributedGeometryValid" id="914.IsDistributedGeometryValid" number_of_elements="1">
-      <Element index="0" value="1"/>
-    </Property>
     <Property name="LODResolution" id="914.LODResolution" number_of_elements="1">
       <Element index="0" value="50"/>
       <Domain name="range" id="914.LODResolution.range">
         <Min index="0" value="0"/>
-      </Domain>
-    </Property>
-    <Property name="OrderedCompositing" id="914.OrderedCompositing" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="914.OrderedCompositing.bool"/>
-    </Property>
-    <Property name="OrderedCompositingTree" id="914.OrderedCompositingTree" number_of_elements="0">
-      <Domain name="groups" id="914.OrderedCompositingTree.groups">
-        <Group value="locators"/>
       </Domain>
     </Property>
     <Property name="Representation" id="914.Representation" number_of_elements="1">
@@ -2125,7 +2029,7 @@
       </Domain>
     </Property>
   </Proxy>
-  <Proxy group="displays" type="CompositeDisplay" id="1028">
+  <Proxy group="displays" type="LODDisplay" id="1028">
     <Property name="Input" id="1028.Input" number_of_elements="1">
       <Proxy value="1023"/>
       <Domain name="groups" id="1028.Input.groups">
@@ -2134,22 +2038,10 @@
         <Group value="glyph_sources"/>
       </Domain>
     </Property>
-    <Property name="IsDistributedGeometryValid" id="1028.IsDistributedGeometryValid" number_of_elements="1">
-      <Element index="0" value="1"/>
-    </Property>
     <Property name="LODResolution" id="1028.LODResolution" number_of_elements="1">
       <Element index="0" value="50"/>
       <Domain name="range" id="1028.LODResolution.range">
         <Min index="0" value="0"/>
-      </Domain>
-    </Property>
-    <Property name="OrderedCompositing" id="1028.OrderedCompositing" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="1028.OrderedCompositing.bool"/>
-    </Property>
-    <Property name="OrderedCompositingTree" id="1028.OrderedCompositingTree" number_of_elements="0">
-      <Domain name="groups" id="1028.OrderedCompositingTree.groups">
-        <Group value="locators"/>
       </Domain>
     </Property>
     <Property name="Representation" id="1028.Representation" number_of_elements="1">
@@ -3318,13 +3210,7 @@
       <Domain name="range" id="1150.Scale.range"/>
     </Property>
   </Proxy>
-  <Proxy group="rendermodules" type="MPIRenderModule" id="4">
-    <Property name="CompositeThreshold" id="4.CompositeThreshold" number_of_elements="1">
-      <Element index="0" value="10"/>
-      <Domain name="range" id="4.CompositeThreshold.range">
-        <Min index="0" value="0"/>
-      </Domain>
-    </Property>
+  <Proxy group="rendermodules" type="LODRenderModule" id="4">
     <Property name="Displays" id="4.Displays" number_of_elements="32">
       <Proxy value="27"/>
       <Proxy value="44"/>
@@ -3372,26 +3258,9 @@
       <Element index="0" value="5"/>
       <Domain name="range" id="4.LODThreshold.range"/>
     </Property>
-    <Property name="ReductionFactor" id="4.ReductionFactor" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="range" id="4.ReductionFactor.range">
-        <Min index="0" value="0"/>
-      </Domain>
-    </Property>
     <Property name="RenderInterruptsEnabled" id="4.RenderInterruptsEnabled" number_of_elements="1">
       <Element index="0" value="1"/>
       <Domain name="bool" id="4.RenderInterruptsEnabled.bool"/>
-    </Property>
-    <Property name="SquirtLevel" id="4.SquirtLevel" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="range" id="4.SquirtLevel.range">
-        <Min index="0" value="0"/>
-        <Max index="0" value="7"/>
-      </Domain>
-    </Property>
-    <Property name="UseCompositeCompression" id="4.UseCompositeCompression" number_of_elements="1">
-      <Element index="0" value="1"/>
-      <Domain name="bool" id="4.UseCompositeCompression.bool"/>
     </Property>
     <Property name="UseImmediateMode" id="4.UseImmediateMode" number_of_elements="1">
       <Element index="0" value="0"/>

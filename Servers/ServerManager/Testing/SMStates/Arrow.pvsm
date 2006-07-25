@@ -77,7 +77,7 @@
       </Domain>
     </Property>
   </Proxy>
-  <Proxy group="displays" type="CompositeDisplay" id="44">
+  <Proxy group="displays" type="LODDisplay" id="44">
     <Property name="Input" id="44.Input" number_of_elements="1">
       <Proxy value="37"/>
       <Domain name="groups" id="44.Input.groups">
@@ -86,22 +86,10 @@
         <Group value="glyph_sources"/>
       </Domain>
     </Property>
-    <Property name="IsDistributedGeometryValid" id="44.IsDistributedGeometryValid" number_of_elements="1">
-      <Element index="0" value="1"/>
-    </Property>
     <Property name="LODResolution" id="44.LODResolution" number_of_elements="1">
       <Element index="0" value="50"/>
       <Domain name="range" id="44.LODResolution.range">
         <Min index="0" value="0"/>
-      </Domain>
-    </Property>
-    <Property name="OrderedCompositing" id="44.OrderedCompositing" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="bool" id="44.OrderedCompositing.bool"/>
-    </Property>
-    <Property name="OrderedCompositingTree" id="44.OrderedCompositingTree" number_of_elements="0">
-      <Domain name="groups" id="44.OrderedCompositingTree.groups">
-        <Group value="locators"/>
       </Domain>
     </Property>
     <Property name="Representation" id="44.Representation" number_of_elements="1">
@@ -3010,13 +2998,7 @@
     <SubProxy name="Property" id="784"/>
     <SubProxy name="UpdateSuppressor" id="786"/>
   </Proxy>
-  <Proxy group="rendermodules" type="MPIRenderModule" id="4">
-    <Property name="CompositeThreshold" id="4.CompositeThreshold" number_of_elements="1">
-      <Element index="0" value="10"/>
-      <Domain name="range" id="4.CompositeThreshold.range">
-        <Min index="0" value="0"/>
-      </Domain>
-    </Property>
+  <Proxy group="rendermodules" type="LODRenderModule" id="4">
     <Property name="Displays" id="4.Displays" number_of_elements="29">
       <Proxy value="27"/>
       <Proxy value="44"/>
@@ -3061,26 +3043,9 @@
       <Element index="0" value="5"/>
       <Domain name="range" id="4.LODThreshold.range"/>
     </Property>
-    <Property name="ReductionFactor" id="4.ReductionFactor" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="range" id="4.ReductionFactor.range">
-        <Min index="0" value="0"/>
-      </Domain>
-    </Property>
     <Property name="RenderInterruptsEnabled" id="4.RenderInterruptsEnabled" number_of_elements="1">
       <Element index="0" value="1"/>
       <Domain name="bool" id="4.RenderInterruptsEnabled.bool"/>
-    </Property>
-    <Property name="SquirtLevel" id="4.SquirtLevel" number_of_elements="1">
-      <Element index="0" value="0"/>
-      <Domain name="range" id="4.SquirtLevel.range">
-        <Min index="0" value="0"/>
-        <Max index="0" value="7"/>
-      </Domain>
-    </Property>
-    <Property name="UseCompositeCompression" id="4.UseCompositeCompression" number_of_elements="1">
-      <Element index="0" value="1"/>
-      <Domain name="bool" id="4.UseCompositeCompression.bool"/>
     </Property>
     <Property name="UseImmediateMode" id="4.UseImmediateMode" number_of_elements="1">
       <Element index="0" value="0"/>
