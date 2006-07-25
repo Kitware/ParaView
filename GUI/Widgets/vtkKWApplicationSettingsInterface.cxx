@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.58");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.59");
 
 //----------------------------------------------------------------------------
 vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
@@ -558,6 +558,8 @@ void vtkKWApplicationSettingsInterface::Update()
     }
 
   // Interface customization : Drag & Drop : Enable
+  // Instead of disabling, we hide the D&D section alltogether if it's not
+  // supported in order not to confuse the user about this 'missing' feature.
 
   vtkKWUserInterfaceManagerNotebook *uim_nb = NULL;
   if (this->Window->HasMainUserInterfaceManager())
@@ -565,9 +567,25 @@ void vtkKWApplicationSettingsInterface::Update()
     uim_nb = vtkKWUserInterfaceManagerNotebook::SafeDownCast(
       this->Window->GetMainUserInterfaceManager());
     }
-  if (this->ResetDragAndDropButton && !uim_nb)
+
+  if (this->InterfaceCustomizationFrame)
     {
-    this->ResetDragAndDropButton->SetEnabled(0);
+    if (!uim_nb || !uim_nb->GetEnableDragAndDrop())
+      {
+      this->Script(
+        "pack forget %s", this->InterfaceCustomizationFrame->GetWidgetName());
+      if (this->ResetDragAndDropButton)
+        {
+        this->ResetDragAndDropButton->SetEnabled(0);
+        }
+      }
+    else
+      {
+      this->Script(
+        "pack %s -side top -anchor nw -fill x -padx 2 -pady 2 -in %s ",
+        this->InterfaceCustomizationFrame->GetWidgetName(),
+        this->GetPageWidget(this->GetName())->GetWidgetName());
+      }
     }
 
   // Toolbar settings : flat frame
