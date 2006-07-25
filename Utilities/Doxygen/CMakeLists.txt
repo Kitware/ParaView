@@ -30,11 +30,12 @@ IF (BUILD_DOCUMENTATION)
   SET(DOXYGEN_SOURCE_LOCATIONS
        "\"${ParaView_SOURCE_DIR}/Utilities/Xdmf/vtk\" \\
         \"${ParaView_SOURCE_DIR}/Utilities/pqPython\" \\
-        \"${ParaView_SOURCE_DIR}/GUI/Widgets\" \\
-        \"${ParaView_SOURCE_DIR}/GUI/Widgets/Chart\" \\
-        \"${ParaView_SOURCE_DIR}/GUI/Widgets/Python\" \\
-        \"${ParaView_SOURCE_DIR}/GUI/Widgets/Testing\" \\
-        \"${ParaView_SOURCE_DIR}/GUI/Client/Widgets\" \\
+        \"${ParaView_SOURCE_DIR}/Qt/Chart\" \\
+        \"${ParaView_SOURCE_DIR}/Qt/Components\" \\
+        \"${ParaView_SOURCE_DIR}/Qt/Core\" \\
+        \"${ParaView_SOURCE_DIR}/Qt/Python\" \\
+        \"${ParaView_SOURCE_DIR}/Qt/Widgets\" \\
+        \"${ParaView_SOURCE_DIR}/Qt/Testing\" \\
         \"${ParaView_SOURCE_DIR}/Applications/Client\" \\
         \"${ParaView_SOURCE_DIR}/Applications/DobranoViz\" \\
         \"${ParaView_SOURCE_DIR}/Common/KWCommon\" \\
@@ -47,14 +48,15 @@ IF (BUILD_DOCUMENTATION)
   SET(DOXYGEN_PARSED_INPUT_DIRS
       " \"${CMAKE_CURRENT_BINARY_DIR}/dox/Utilities/Xdmf/vtk\" \\
         \"${ParaView_SOURCE_DIR}/Utilities/pqPython\" \\
-        \"${ParaView_SOURCE_DIR}/GUI/Widgets\" \\
-        \"${ParaView_SOURCE_DIR}/GUI/Widgets/Chart\" \\
-        \"${ParaView_SOURCE_DIR}/GUI/Widgets/Python\" \\
-        \"${ParaView_SOURCE_DIR}/GUI/Widgets/Testing\" \\
-        \"${ParaView_SOURCE_DIR}/GUI/Client/Widgets\" \\
+        \"${ParaView_SOURCE_DIR}/Qt/Chart\" \\
+        \"${ParaView_SOURCE_DIR}/Qt/Components\" \\
+        \"${ParaView_SOURCE_DIR}/Qt/Core\" \\
+        \"${ParaView_SOURCE_DIR}/Qt/Python\" \\
+        \"${ParaView_SOURCE_DIR}/Qt/Widgets\" \\
+        \"${ParaView_SOURCE_DIR}/Qt/Testing\" \\
         \"${ParaView_SOURCE_DIR}/Applications/Client\" \\
         \"${ParaView_SOURCE_DIR}/Applications/DobranoViz\" \\
-        \"${CMAKE_CURRENT_BINARY_DIR}/dox/GUI/Client/Widgets\" \\
+        \"${CMAKE_CURRENT_BINARY_DIR}/dox/Qt/Core\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Common/KWCommon\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Servers/Common\" \\
         \"${CMAKE_CURRENT_BINARY_DIR}/dox/Servers/Filters\" \\
