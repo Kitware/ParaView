@@ -5,21 +5,17 @@ import os
 import os.path
 import sys
 
-if os.name == "posix":
-  from libvtkPVServerCommonPython import *
-  from libvtkPVServerManagerPython import *
-else:
-  from vtkPVServerCommonPython import *
-  from vtkPVServerManagerPython import *
 import SMPythonTesting
-  
+import paraview
+paraview.ActiveConnection = paraview.connect()
+
 SMPythonTesting.ProcessCommandLineArguments()
 
 pvsm_file = os.path.join(SMPythonTesting.SMStatesDir, "SMTemporalDataAnalysisCellId.pvsm")
 print "State file: %s" % pvsm_file
 
 SMPythonTesting.LoadServerManagerState(pvsm_file)
-pxm = vtkSMObject.GetProxyManager()
+pxm = paraview.pyProxyManager()
 
 proxy = pxm.GetProxy("displays","Sources.DataAnalysis0.TemporalXYPlotDisplay")
 proxy.GenerateTemporalPlot()

@@ -6,13 +6,9 @@ import SMPythonTesting
 import os.path
 import sys
 import time
+import paraview
+paraview.ActiveConnection = paraview.connect()
 
-if os.name == "posix":
-  from libvtkPVServerCommonPython import *
-  from libvtkPVServerManagerPython import *
-else:
-  from vtkPVServerCommonPython import *
-  from vtkPVServerManagerPython import *
 
 def RenderAndWait(ren):
   ren.StillRender()
@@ -25,20 +21,20 @@ pvsm_file = os.path.join(SMPythonTesting.SMStatesDir, "CompoundProxyUndoRedo.pvs
 print "State file: %s" % pvsm_file
 SMPythonTesting.LoadServerManagerState(pvsm_file)
 
-pxm = vtkSMObject.GetProxyManager()
+pxm = paraview.vtkSMObject.GetProxyManager()
 renModule = pxm.GetProxy("rendermodules", "RenderModule0")
 renModule.UpdateVTKObjects()
 
-undoStack = vtkSMUndoStack()
+undoStack = paraview.vtkSMUndoStack()
 
-self_cid = vtkProcessModuleConnectionManager.GetSelfConnectionID()
+self_cid = paraview.vtkProcessModuleConnectionManager.GetSelfConnectionID()
 
 # Create a compound proxy for the elevation filter.
 shrink = pxm.GetProxy("filters", "Shrink0")
 reflect = pxm.GetProxy("filters", "Reflect0")
 connect = pxm.GetProxy("filters", "Connect0")
 
-compound_proxy = vtkSMCompoundProxy()
+compound_proxy = paraview.vtkSMCompoundProxy()
 compound_proxy.AddProxy("first", shrink)
 compound_proxy.AddProxy("second", reflect)
 compound_proxy.AddProxy("third", connect)

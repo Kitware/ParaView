@@ -7,12 +7,9 @@ import os.path
 import sys
 import time
 
-if os.name == "posix":
-  from libvtkPVServerCommonPython import *
-  from libvtkPVServerManagerPython import *
-else:
-  from vtkPVServerCommonPython import *
-  from vtkPVServerManagerPython import *
+import paraview
+paraview.ActiveConnection = paraview.connect()
+
 
 def RenderAndWait(ren):
   ren.StillRender()
@@ -25,23 +22,19 @@ pvsm_file = os.path.join(SMPythonTesting.SMStatesDir, "UndoRedo.pvsm")
 print "State file: %s" % pvsm_file
 SMPythonTesting.LoadServerManagerState(pvsm_file)
 
-pxm = vtkSMObject.GetProxyManager()
+pxm = paraview.pyProxyManager()
 renModule = pxm.GetProxy("rendermodules", "RenderModule0")
 renModule.UpdateVTKObjects()
 
-undoStack = vtkSMUndoStack()
+undoStack = paraview.vtkSMUndoStack()
 
-self_cid = vtkProcessModuleConnectionManager.GetSelfConnectionID()
+self_cid = paraview.ActiveConnection.ID 
   
 proxy = pxm.NewProxy("sources","SphereSource")
-proxy.UnRegister(None)
 proxy2 = pxm.NewProxy("sources","CubeSource")
-proxy2.UnRegister(None)
 
 filter = pxm.NewProxy("filters", "ElevationFilter")
-filter.UnRegister(None)
 display = renModule.CreateDisplayProxy()
-display.UnRegister(None)
  
 undoStack.BeginOrContinueUndoSet(self_cid, "CreateFilter")
 pxm.RegisterProxy("mygroup", "sphere", proxy)
@@ -50,7 +43,7 @@ pxm.RegisterProxy("filters", "elevationFilter", filter)
 undoStack.EndUndoSet()
 
 undoStack.BeginOrContinueUndoSet(self_cid, "FilterInput")
-filter.GetProperty("Input").AddProxy(proxy)
+filter.SetInput(proxy)
 filter.UpdateVTKObjects()
 undoStack.EndUndoSet()
   
@@ -59,18 +52,18 @@ pxm.RegisterProxy("displays", "sphereDisplay", display)
 undoStack.EndUndoSet()
 
 undoStack.BeginOrContinueUndoSet(self_cid, "SetupDisplay")
-display.GetProperty("Input").AddProxy(filter)
-display.GetProperty("Representation").SetElement(0, 2)
+display.SetInput(filter)
+display.SetRepresentation(2)
 display.UpdateVTKObjects()
 undoStack.EndUndoSet()
 
 undoStack.BeginOrContinueUndoSet(self_cid, "AddDisplay")
-renModule.GetProperty("Displays").AddProxy(display)
+renModule.AddToDisplays(display)
 renModule.UpdateVTKObjects()
 undoStack.EndUndoSet()
 
 undoStack.BeginOrContinueUndoSet(self_cid, "RemoveDisplay")
-renModule.GetProperty("Displays").RemoveProxy(display)
+renModule.RemoveFromDisplays(display)
 renModule.UpdateVTKObjects()
 pxm.UnRegisterProxy("displays", "sphereDisplay")
 undoStack.EndUndoSet()
