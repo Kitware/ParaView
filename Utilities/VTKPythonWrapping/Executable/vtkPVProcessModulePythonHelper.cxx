@@ -39,7 +39,7 @@ extern "C" {
 }
 
 
-vtkCxxRevisionMacro(vtkPVProcessModulePythonHelper, "1.6");
+vtkCxxRevisionMacro(vtkPVProcessModulePythonHelper, "1.7");
 vtkStandardNewMacro(vtkPVProcessModulePythonHelper);
 
 //----------------------------------------------------------------------------
@@ -106,6 +106,12 @@ int vtkPVProcessModulePythonHelper::RunGUIStart(int argc, char **argv, int numSe
   if ( vtksys::SystemTools::FileExists(VTK_PYTHON_PACKAGE_DIR) )
     {
     newpath = PyString_FromString(VTK_PYTHON_PACKAGE_DIR);
+    PyList_Insert(path, 0, newpath);
+    Py_DECREF(newpath);
+    }
+  if (vtksys::SystemTools::FileExists(PV_PYTHON_PACKAGE_DIR))
+    {
+    newpath = PyString_FromString(PV_PYTHON_PACKAGE_DIR);
     PyList_Insert(path, 0, newpath);
     Py_DECREF(newpath);
     }

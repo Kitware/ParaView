@@ -145,9 +145,9 @@ IF (PARAVIEW_WRAP_PYTHON)
   INCLUDE(KitCommonPythonWrapBlock)
 
   SET(PV_PYTHON_MODULE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/paraview")
-  SET(PV_PYTHON_MODULE_BINARY_DIR "${LIBRARY_OUTPUT_PATH}/paraview")
-  SET(PV_PYTHON_MODULE_DIR "${PV_PYTHON_MODULE_BINARY_DIR}" CACHE INTERNAL "Path to paraview module.")
-
+  SET(PV_PYTHON_MODULE_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/paraview")
+  SET(PV_PYTHON_MODULE_DIR "${CMAKE_CURRENT_BINARY_DIR}" CACHE INTERNAL "Path to paraview module.")
+  MAKE_DIRECTORY(${PV_PYTHON_MODULE_BINARY_DIR})
 # Handle out-of-source builds correctly.
 #
 #  1. Create a list of Python files to be installed/copied.
