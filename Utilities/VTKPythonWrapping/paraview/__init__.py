@@ -21,6 +21,14 @@ class pyProxy:
      proxy.AddToBar(foo)
     All other methods are passed through to the SMProxy.
     """
+    def __eq__(self, other):
+      if isinstance(other, pyProxy):
+        return self.SMProxy == other.SMProxy
+      return self.SMProxy == other
+
+    def __ne__(self, other):
+      return not self.__eq__(other)
+
     def __init__(self, proxy):
         "Constructor. Assigns proxy to self.SMProxy"
         self.SMProxy = proxy
@@ -145,12 +153,12 @@ class pyProxy:
             self.SMProxy.AddProxy(name, proxy)
         return
 
-    def __SaveDefinition__(self):
+    def __SaveDefinition__(self, root=None):
         "Overload for CompoundProxy's SaveDefinition."
-         defn = self.SMProxy.SaveDefinition()
-         if defn:
-              defn.UnRegister(None)
-         return defn
+        defn = self.SMProxy.SaveDefinition(root)
+        if defn:
+             defn.UnRegister(None)
+        return defn
 
     def ListProperties(self):
         """Returns a list of all properties on this proxy."""
