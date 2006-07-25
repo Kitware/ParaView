@@ -28,6 +28,9 @@ class pyProxy:
         if doc:
           self.__doc__ = doc
 
+    def __iter__(self):
+        return pyPropertyIterator(self)
+
     def __AddToProperty__(self, *args):
         """Generic method for adding a proxy to a proxy property.
         Should not be directly called"""
@@ -120,25 +123,24 @@ class pyProxy:
 
     def ListProperties(self):
         """Returns a list of all properties on this proxy."""
-        iter = self.NewPropertyIterator()
-        iter.UnRegister(None)
-        iter.Begin()
         property_list = []
-        while not iter.IsAtEnd():
+        iter = self.__iter__()
+        for property in iter:
           property_list.append(iter.GetKey())
-          iter.Next()
         return property_list
 
     def __getattr__(self, name):
         """With the exception of a few overloaded methods,
         returns the SMProxy method"""
+        if not self.SMProxy:
+          return getattr(self, name)
         if re.compile("^Set").match(name) and self.SMProxy.GetProperty(name[3:]):
             self.__LastAttrName = name[3:]
             return self.__SetProperty__
         if re.compile("^Get").match(name) and self.SMProxy.GetProperty(name[3:]):
             self.__LastAttrName = name[3:]
             return self.__GetProperty__
-        if re.compile("^AddTo").match(name):
+        if re.compile("^AddTo").match(name) and self.SMProxy.GetProperty(name[5:]):
             self.__LastAttrName = name[5:]
             return self.__AddToProperty__
         if name == "CreateDisplayProxy" and hasattr(self.SMProxy, "CreateDisplayProxy"):
@@ -230,6 +232,48 @@ class pyProxyManager:
         iter.Begin()
         return iter
 
+class pyPropertyIterator:
+    """Wrapper for a vtkSMPropertyIterator class to satisfy
+       the python iterator protocol."""
+    def __init__(self, proxy):
+        self.SMIterator = proxy.NewPropertyIterator()
+        self.SMIterator.UnRegister(None)
+        self.SMIterator.Begin()
+        self.Key = None
+        self.Property = None
+        self.Proxy = None
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        if self.SMIterator.IsAtEnd():
+            self.Key = None
+            self.Property = None
+            self.Proxy = None
+            raise StopIteration
+        self.Proxy = self.SMIterator.GetProxy()
+        self.Key = self.SMIterator.GetKey()
+        self.Property = self.SMIterator.GetProperty()
+        self.SMIterator.Next()
+        return self.Property
+
+    def GetProxy(self):
+        """Returns the proxy for the property last returned by the call to 'next()'"""
+        return self.Proxy
+
+    def GetKey(self):
+        """Returns the key for the property last returned by the call to 'next()' """
+        return self.Key
+
+    def GetProperty(self):
+        """Returns the property last returned by the call to 'next()' """
+        return self.Property
+
+    def __getattr__(self, name):
+        """returns attributes from the vtkSMProxyIterator."""
+        return getattr(self.SMIterator, name)
+
 class pyProxyIterator:
     """Wrapper for a vtkSMProxyIterator class to satisfy the
      python iterator protocol."""
@@ -313,7 +357,6 @@ ActiveConnection = None
 ## These are method to create a new connection.
 ## One can connect to a server, (data-server,render-server)
 ## or simply create a built-in connection.
-
 def connect_server(host, port):
     """Connect to a host:port. Returns the connection object if successfully connected 
     with the server."""
@@ -350,7 +393,17 @@ def connect_self():
 
 def connect(ds_host=None, ds_port=None, rs_host=None, rs_port=None):
     """
-      Unified API to connect to self, or server or dataserver and render server.
+    Use this function call to create a new connection. On success,
+    it returns a pyConnection object that abstracts the connection.
+    There are several ways in which this function can be called:
+    * When called with no arguments, it creates a new connection
+      to the built-in server on the client itself.
+    * When called with ds_host and ds_port arguments, it
+      attempts to connect to a server(data and render server on the same server)
+      on the indicated host:port.
+    * When called with ds_host, ds_port, rs_host, rs_port, it
+      creates a new connection to the data server on ds_host:ds_port and to the
+      render server on rs_host: rs_port.
     """
     if ds_host == None:
         return connect_self()
@@ -433,4 +486,5 @@ def createDisplay(proxy, renModule):
     display.SetInput(proxy)
     display.UpdateVTKObjects()
     renModule.AddToDisplays(display)
+    renModule.UpdateVTKObjects()
     return display
