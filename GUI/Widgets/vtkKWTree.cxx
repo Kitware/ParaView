@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTree );
-vtkCxxRevisionMacro(vtkKWTree, "1.23");
+vtkCxxRevisionMacro(vtkKWTree, "1.24");
 
 //----------------------------------------------------------------------------
 class vtkKWTreeInternals
@@ -679,6 +679,18 @@ void vtkKWTree::SetRedrawOnIdle(int redraw)
 int vtkKWTree::GetRedrawOnIdle()
 {
   return this->GetConfigurationOptionAsInt("-redraw");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTree::SetLinesVisibility(int arg)
+{
+  this->SetConfigurationOptionAsInt("-showlines", arg);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTree::GetLinesVisibility()
+{
+  return this->GetConfigurationOptionAsInt("-showlines");
 }
 
 //----------------------------------------------------------------------------

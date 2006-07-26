@@ -211,6 +211,12 @@ public:
   virtual int GetRedrawOnIdle();
 
   // Description:
+  // Specifies wether or not lines should be drawn between nodes.
+  vtkBooleanMacro(LinesVisibility, int);
+  virtual void SetLinesVisibility(int);
+  virtual int GetLinesVisibility();
+
+  // Description:
   // If true, the selection box will be drawn across the entire tree from
   // left-to-right instead of just around the item text.
   vtkBooleanMacro(SelectionFill, int);
