@@ -33,6 +33,7 @@
 #include <vtkstd/map>
 #include <vtkstd/set>
 #include <vtksys/RegularExpression.hxx>
+#include <vtkstd/vector>
 
 
 #include "vtkSMProxyManagerInternals.h"
@@ -84,7 +85,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.47");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.48");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -531,6 +532,42 @@ void vtkSMProxyManager::UnRegisterProxy(const char* name)
       }
     }
 
+}
+
+//---------------------------------------------------------------------------
+struct vtkSMProxyManagerProxyInformation
+{
+  vtkstd::string GroupName;
+  vtkstd::string ProxyName;
+};
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
+{
+  vtkstd::vector<vtkSMProxyManagerProxyInformation> toUnRegister;
+
+  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+    this->Internals->RegisteredProxyMap.begin();
+  for (; it != this->Internals->RegisteredProxyMap.end(); it++)
+    {
+    vtkSMProxyManagerProxyMapType::iterator it2;
+    for (it->second.begin(); it2 != it->second.end(); ++it2)
+      {
+      if (it2->second.Proxy.GetPointer() == proxy)
+        {
+        vtkSMProxyManagerProxyInformation info;
+        info.GroupName = it->first;
+        info.ProxyName = it2->first;
+        toUnRegister.push_back(info);
+        }
+      }
+    }
+
+  vtkstd::vector<vtkSMProxyManagerProxyInformation>::iterator vIter = 
+    toUnRegister.begin();
+  for (;vIter != toUnRegister.end(); ++vIter)
+    {
+    this->UnRegisterProxy(vIter->GroupName.c_str(), vIter->ProxyName.c_str());
+    }
 }
 
 //---------------------------------------------------------------------------
