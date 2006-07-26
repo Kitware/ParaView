@@ -276,6 +276,7 @@ protected:
 //BTX
   friend class vtkSMXMLParser;
   friend class vtkSMProxyIterator;
+  friend class vtkSMProxyDefinitionIterator;
   friend class vtkSMProxy;
   friend class vtkSMProxyManagerObserver;
 //ETX
