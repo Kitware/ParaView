@@ -1,3 +1,39 @@
+#==============================================================================
+#
+#  Program:   ParaView
+#  Module:    __init__.py
+#
+#  Copyright (c) Kitware, Inc.
+#  All rights reserved.
+#  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+#
+#     This software is distributed WITHOUT ANY WARRANTY; without even
+#     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE.  See the above copyright notice for more information.
+#
+#==============================================================================
+r"""paraview.py is a Python module for using paraview server manager in Python.
+One can always directly use the server manager directly. However, this module
+provides server utilty methods that assist in creating connections, proxies, 
+as well as introspection.
+
+A simple example:
+  import paraview
+  # Creates a new built-in connection and makes it the active connection.
+  paraview.ActiveConnection = paraview.connect()
+
+  # Creates a new render module on the active connection.
+  renModule = paraview.createRenderWindow()
+
+  # Create a new sphere proxy on the active connection.
+  sphere = paraview.createProxy("sources", "SphereSource")
+
+  # Create a display for the sphere proxy and adds it to the render module.
+  display = paraview.createDisplay(sphere, renModule)
+
+  renModule.ResetCamera()
+  renModule.StillRender()
+"""
 import re
 import os
 if os.name == "posix":
@@ -15,11 +51,32 @@ class pyProxy:
      proxy.GetProperty("Foo").SetElement(0, 2)
     you can do:
      proxy.SetFoo(1,2)
-    For proxy properties, you can use AddTo so instead of:
-     proxy.GetProoperty("Bar").AddProxy(foo)
+    Instead of:
+      proxy.GetPropery("Foo").GetElements()
+    you can do:
+      proxy.GetFoo()
+      it returns a list of all values of the property.
+    For proxy properties, you can use AddTo or RemoveFrom so instead of:
+     proxy.GetProperty("Bar").AddProxy(foo)
     you can do:
      proxy.AddToBar(foo)
+    Likewise, instead of 
+     proxy.GetProperty("Bar").RemoveProxy(foo)
+    you can do:
+     proxy.RemoveFromBar(foo)
+
+    This class also adds a few new methods:
+
     All other methods are passed through to the SMProxy.
+    * ListMethods - can be used to obtain a list of property names
+        that are supported by this proxy.
+
+    This class also provides an iterator which can be used to iterate
+    over all properties.
+    eg:
+      proxy = pyProxy(smproxy)
+      for property in proxy:
+          print property
     """
     def __eq__(self, other):
       if isinstance(other, pyProxy):
