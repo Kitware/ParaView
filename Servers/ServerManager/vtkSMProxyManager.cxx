@@ -85,7 +85,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.48");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.49");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -223,6 +223,33 @@ vtkSMDocumentation* vtkSMProxyManager::NewProxyDocumentation(
   vtkErrorMacro("Failed to locate documentation for proxy: " 
     << groupName << ", " <<proxyName);
   return NULL;
+}
+
+//---------------------------------------------------------------------------
+vtkSMDocumentation* vtkSMProxyManager::NewPropertyDocumentation(
+  const char* groupName, const char* proxyName, const char* propertyName)
+{
+  if (!groupName || !proxyName || !propertyName)
+    {
+    return 0;
+    }
+ 
+  vtkSMDocumentation* doc = 0;
+  vtkSMProxy* proxy = this->NewProxy(groupName, proxyName);
+  if (proxy)
+    {
+    vtkSMProperty* prop = proxy->GetProperty(propertyName);
+    if (prop)
+      {
+      doc = prop->GetDocumentation();
+      if (doc)
+        {
+        doc->Register(this);
+        }
+      }
+    proxy->Delete();
+    }
+  return doc;
 }
 
 //---------------------------------------------------------------------------

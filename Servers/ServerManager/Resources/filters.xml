@@ -752,6 +752,9 @@ The line can be specified interactively using the 3D line widget. See section 7.
          number_of_elements="2"
          default_values="0 1" >
         <DoubleRangeDomain name="range"/>
+        <Documentation>
+          Specify range to map scalars into. Default is [0, 1].
+        </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -760,6 +763,9 @@ The line can be specified interactively using the 3D line widget. See section 7.
          number_of_elements="3"
          animateable="1"
          default_values="0 0 0" >
+         <Documentation>
+           Define one end of the line (small scalar values). Default is (0,0,0).
+         </Documentation>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -768,6 +774,9 @@ The line can be specified interactively using the 3D line widget. See section 7.
          number_of_elements="3"
          animateable="1"
          default_values="0 0 1" >
+         <Documentation>
+           Define other end of the line (large scalar values). Default is (0,0,1).
+         </Documentation>
       </DoubleVectorProperty>
    <!-- End ElevationFilter -->
    </SourceProxy>

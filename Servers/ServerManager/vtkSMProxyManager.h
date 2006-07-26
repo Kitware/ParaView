@@ -70,6 +70,16 @@ public:
     const char* proxyName);
 
   // Description:
+  // Creates a returns a new vtkSMDocumentation object with the documentation
+  // for the given property of the proxy with given name and group name. 
+  // Note that the name and group
+  // name are not those with the which the proxy is registered, but those
+  // with which the proxy is created i.e. the arguments used for NewProxy().
+  // Also, the property name is the name of an exposed property.
+  vtkSMDocumentation* NewPropertyDocumentation(const char* groupName, 
+    const char* proxyName, const char* propertyName);
+
+  // Description:
   // Used to pass the control of the proxy to the manager. The user code can
   // then release its reference count and not care about what happens
   // to the proxy. Managed proxies are deleted at destruction. NOTE:
