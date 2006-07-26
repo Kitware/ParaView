@@ -85,7 +85,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.49");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.50");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -135,7 +135,7 @@ void vtkSMProxyManager::InstantiateGroupPrototypes(const char* groupName)
         {
         vtkSMProxy* proxy = this->NewProxy(element, groupName);
         proxy->SetConnectionID(
-          vtkProcessModuleConnectionManager::GetSelfConnectionID());
+          vtkProcessModuleConnectionManager::GetNullConnectionID());
         this->RegisterProxy(newgroupname.str(), it2->first.c_str(), proxy);
         proxy->Delete();
         }
@@ -143,6 +143,17 @@ void vtkSMProxyManager::InstantiateGroupPrototypes(const char* groupName)
 
     }
   delete[] newgroupname.str();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMProxyManager::InstantiatePrototypes()
+{
+  vtkSMProxyManagerInternals::GroupMapType::iterator it = 
+    this->Internals->GroupMap.begin();
+  for (; it != this->Internals->GroupMap.end(); ++it)
+    {
+    this->InstantiateGroupPrototypes(it->first.c_str());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -195,38 +206,20 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(vtkPVXMLElement* pelement,
 
 
 //---------------------------------------------------------------------------
-vtkSMDocumentation* vtkSMProxyManager::NewProxyDocumentation(
+vtkSMDocumentation* vtkSMProxyManager::GetProxyDocumentation(
   const char* groupName, const char* proxyName)
 {
   if (!groupName || !proxyName)
     {
     return 0;
     }
-  // Find the XML element from which the proxy can be instantiated and
-  // initialized
-  vtkPVXMLElement* element = this->GetProxyElement(groupName, 
-    proxyName);
-  if (element)
-    {
-    vtkSMDocumentation* doc = vtkSMDocumentation::New();
-    for (unsigned int cc=0; cc < element->GetNumberOfNestedElements(); cc++)
-      {
-      vtkPVXMLElement* doc_elem = element->GetNestedElement(cc);
-      if (strcmp(doc_elem->GetName(), "Documentation") == 0)
-        {
-        doc->SetDocumentationElement(doc_elem);
-        break;
-        }
-      }
-    return doc;
-    }
-  vtkErrorMacro("Failed to locate documentation for proxy: " 
-    << groupName << ", " <<proxyName);
-  return NULL;
+
+  vtkSMProxy* proxy = this->GetPrototypeProxy(groupName, proxyName);
+  return proxy? proxy->GetDocumentation() : NULL;
 }
 
 //---------------------------------------------------------------------------
-vtkSMDocumentation* vtkSMProxyManager::NewPropertyDocumentation(
+vtkSMDocumentation* vtkSMProxyManager::GetPropertyDocumentation(
   const char* groupName, const char* proxyName, const char* propertyName)
 {
   if (!groupName || !proxyName || !propertyName)
@@ -234,22 +227,16 @@ vtkSMDocumentation* vtkSMProxyManager::NewPropertyDocumentation(
     return 0;
     }
  
-  vtkSMDocumentation* doc = 0;
-  vtkSMProxy* proxy = this->NewProxy(groupName, proxyName);
+  vtkSMProxy* proxy = this->GetPrototypeProxy(groupName, proxyName);
   if (proxy)
     {
     vtkSMProperty* prop = proxy->GetProperty(propertyName);
     if (prop)
       {
-      doc = prop->GetDocumentation();
-      if (doc)
-        {
-        doc->Register(this);
-        }
+      return prop->GetDocumentation();
       }
-    proxy->Delete();
     }
-  return doc;
+  return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -383,6 +370,30 @@ unsigned int vtkSMProxyManager::GetNumberOfProxies(const char* group)
     return it->second.size();
     }
   return 0;
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxyManager::GetPrototypeProxy(const char* groupname, 
+  const char* name)
+{
+  vtkstd::string protype_group = groupname;
+  protype_group += "_prototypes";
+  vtkSMProxy* proxy = this->GetProxy(protype_group.c_str(), name);
+  if (proxy)
+    {
+    return proxy;
+    }
+  proxy = this->NewProxy(groupname, name);
+  if (!proxy)
+    {
+    return 0;
+    }
+  proxy->SetConnectionID(
+    vtkProcessModuleConnectionManager::GetNullConnectionID());
+  // register the proxy as a prototype.
+  this->RegisterProxy(protype_group.c_str(), name, proxy); 
+  proxy->Delete();
+  return proxy;
 }
 
 //---------------------------------------------------------------------------
