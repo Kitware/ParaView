@@ -115,6 +115,11 @@ public:
   void UnRegisterProxy(const char* name);
 
   // Description:
+  // Given a proxy, unregisters it. This method unregisters the proxy
+  // from all the groups it has been registered in.
+  void UnRegisterProxy(vtkSMProxy* proxy);
+
+  // Description:
   // Unregisters all managed proxies.
   void UnRegisterProxies();
 
