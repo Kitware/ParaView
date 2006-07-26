@@ -67,6 +67,7 @@
 
 class vtkClientServerStream;
 class vtkPVXMLElement;
+class vtkSMDocumentation;
 class vtkSMDomain;
 class vtkSMDomainIterator;
 class vtkSMInformationHelper;
@@ -201,6 +202,12 @@ public:
   // Description:
   // Copy all property values.
   virtual void Copy(vtkSMProperty* src);
+
+  // Description:
+  // Returns the documentation for this proxy. The return value
+  // may be NULL if no documentation is defined in the XML
+  // for this property.
+  vtkGetObjectMacro(Documentation, vtkSMDocumentation);
 protected:
   vtkSMProperty();
   ~vtkSMProperty();
@@ -323,6 +330,9 @@ protected:
 
   void SetInformationProperty(vtkSMProperty* ip);
   vtkSMProperty* InformationProperty;
+
+  vtkSMDocumentation* Documentation;
+  void SetDocumentation(vtkSMDocumentation*);
 //BTX
   // For PVEE.
   friend class vtkWSMApplication;

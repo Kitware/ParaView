@@ -19,6 +19,7 @@
 #include "vtkPVServerManagerInstantiator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSmartPointer.h"
+#include "vtkSMDocumentation.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMInformationHelper.h"
@@ -32,13 +33,13 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.44");
+vtkCxxRevisionMacro(vtkSMProperty, "1.45");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkSMProperty, ControllerProxy, vtkSMProxy);
-
+vtkCxxSetObjectMacro(vtkSMProperty, Documentation, vtkSMDocumentation);
 int vtkSMProperty::CheckDomains = 1;
 
 //---------------------------------------------------------------------------
@@ -59,6 +60,7 @@ vtkSMProperty::vtkSMProperty()
   this->ControllerProxy = 0;
   this->ControllerPropertyName = 0;
   this->IsInternal = 1;
+  this->Documentation = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -73,6 +75,7 @@ vtkSMProperty::~vtkSMProperty()
   this->SetInformationProperty(0);
   this->SetControllerPropertyName(0);
   this->SetControllerProxy(0);
+  this->SetDocumentation(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -338,6 +341,14 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
   for(unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)
     {
     vtkPVXMLElement* domainEl = element->GetNestedElement(i);
+    if (strcmp(domainEl->GetName(),"Documentation") == 0)
+      {
+      vtkSMDocumentation* doc = vtkSMDocumentation::New();
+      doc->SetDocumentationElement(domainEl);
+      this->SetDocumentation(doc);
+      doc->Delete();
+      continue;
+      }
     vtkObject* object = 0;
     ostrstream name;
     name << "vtkSM" << domainEl->GetName() << ends;

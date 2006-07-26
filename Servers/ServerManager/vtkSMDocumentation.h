@@ -44,15 +44,15 @@ public:
   // Description:
   // Returns the description text, if any.
   const char* GetDescription();
-  
+ 
+  // Description:
+  // Get/Set the documentation XML element.
+  void SetDocumentationElement(vtkPVXMLElement*);
+  vtkGetObjectMacro(DocumentationElement, vtkPVXMLElement);
 protected:
   vtkSMDocumentation();
   ~vtkSMDocumentation();
-//BTX
-  friend class vtkSMProxy;
-  friend class vtkSMProxyManager;
-//ETX
-  void SetDocumentationElement(vtkPVXMLElement*);
+  
   vtkPVXMLElement* DocumentationElement;
 private:
   vtkSMDocumentation(const vtkSMDocumentation&); // Not implemented.
