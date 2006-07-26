@@ -157,13 +157,13 @@ bool pqEventPlayer::exec()
 
 void pqEventPlayer::exit(bool ret)
 {
-  // any top level widgets made while playing tests 
+  // any visible top level widgets made while playing tests 
   // will be closed
   // some/all may be modal, and to exit properly, we have
   // to get rid of the modal ones
   foreach(QWidget* w, QApplication::topLevelWidgets())
     {
-    if(!this->TopLevelWidgets.contains(w))
+    if(!this->TopLevelWidgets.contains(w) && w->isVisible())
       {
       w->hide();
       w->close();
