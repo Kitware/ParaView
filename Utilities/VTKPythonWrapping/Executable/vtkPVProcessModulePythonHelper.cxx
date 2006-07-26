@@ -34,12 +34,29 @@
 # define VTK_PYTHON_LIBRARY_DIR VTK_PYTHON_LIBRARY_DIR_BUILD
 #endif
 
+/* The maximum length of a file name.  */
+#if defined(PATH_MAX)
+# define VTK_PYTHON_MAXPATH PATH_MAX
+#elif defined(MAXPATHLEN)
+# define VTK_PYTHON_MAXPATH MAXPATHLEN
+#else
+# define VTK_PYTHON_MAXPATH 16384
+#endif
+
+/* Python major.minor version string.  */
+#define VTK_PYTHON_TO_STRING(x) VTK_PYTHON_TO_STRING0(x)
+#define VTK_PYTHON_TO_STRING0(x) VTK_PYTHON_TO_STRING1(x)
+#define VTK_PYTHON_TO_STRING1(x) #x
+#define VTK_PYTHON_VERSION VTK_PYTHON_TO_STRING(PY_MAJOR_VERSION.PY_MINOR_VERSION)
+
+
+
 extern "C" {
   extern DL_IMPORT(int) Py_Main(int, char **);
 }
 
 
-vtkCxxRevisionMacro(vtkPVProcessModulePythonHelper, "1.8");
+vtkCxxRevisionMacro(vtkPVProcessModulePythonHelper, "1.9");
 vtkStandardNewMacro(vtkPVProcessModulePythonHelper);
 
 //----------------------------------------------------------------------------
@@ -116,7 +133,7 @@ static void vtkPythonAppInitPrependPath(const char* self_dir)
     // python's native prefix then he/she will have to get the
     // packages in sys.path himself/herself.
     const char* inst_dirs[] = {
-      "/lib/python"/*TODO: added Python version */"/site-packages/paraview", // UNIX --prefix
+      "/lib/python" VTK_PYTHON_VERSION "/site-packages/paraview", // UNIX --prefix
       "/lib/python/paraview", // UNIX --home
       "/Lib/site-packages/paraview", "/Lib/paraview", // Windows
       "/site-packages/paraview", "/paraview", // Windows
