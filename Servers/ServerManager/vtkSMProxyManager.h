@@ -62,21 +62,21 @@ public:
   vtkSMProxy* NewProxy(const char* groupName, const char* proxyName);
 
   // Description:
-  // Creates a returns a new vtkSMDocumentation object with the documentation
+  // Returns a vtkSMDocumentation object with the documentation
   // for the proxy with given name and group name. Note that the name and group
   // name are not those with the which the proxy is registered, but those
   // with which the proxy is created i.e. the arguments used for NewProxy().
-  vtkSMDocumentation* NewProxyDocumentation(const char* groupName, 
+  vtkSMDocumentation* GetProxyDocumentation(const char* groupName, 
     const char* proxyName);
 
   // Description:
-  // Creates a returns a new vtkSMDocumentation object with the documentation
+  // Returns a vtkSMDocumentation object with the documentation
   // for the given property of the proxy with given name and group name. 
   // Note that the name and group
   // name are not those with the which the proxy is registered, but those
   // with which the proxy is created i.e. the arguments used for NewProxy().
   // Also, the property name is the name of an exposed property.
-  vtkSMDocumentation* NewPropertyDocumentation(const char* groupName, 
+  vtkSMDocumentation* GetPropertyDocumentation(const char* groupName, 
     const char* proxyName, const char* propertyName);
 
   // Description:
@@ -97,6 +97,11 @@ public:
   // returns 0.
   vtkSMProxy* GetProxy(const char* groupname, const char* name);
   vtkSMProxy* GetProxy(const char* name);
+
+  // Description:
+  // Returns the prototype proxy for the given type. This method may create
+  // a new prototype proxy, is one does not already exist.
+  vtkSMProxy* GetPrototypeProxy(const char* groupname, const char* name);
 
   // Description:
   // Returns the number of proxies in a group.
@@ -216,6 +221,10 @@ public:
   // in a instance group called groupName_prototypes.
   // Prototypes have their ConnectionID set to the SelfConnection.
   void InstantiateGroupPrototypes(const char* groupName);
+
+  // Description:
+  // Creates protytpes for all known proxy types.
+  void InstantiatePrototypes();
 
   // Description:
   // Returns the number of XML groups from which proxies can
