@@ -59,13 +59,13 @@ class PQCOMPONENTS_EXPORT pqServerBrowser :
 
 public:
   pqServerBrowser(QWidget* Parent);
+  ~pqServerBrowser();
 
 signals:
   /// This signal will be emitted iff a server connection is successfully created
   void serverConnected(pqServer*);
  
 private:
-  ~pqServerBrowser();
   pqServerBrowser(const pqServerBrowser&);
   pqServerBrowser& operator=(const pqServerBrowser&);
   
