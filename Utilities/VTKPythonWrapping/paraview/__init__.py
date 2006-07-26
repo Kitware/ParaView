@@ -287,6 +287,17 @@ class pyProxyManager:
         iter.Begin()
         return iter
 
+    def definition_iter(self, groupname=None):
+        """Returns an iterator that can be used to iterate over
+           all groups and types of proxies that the proxy manager
+           can create."""
+        iter = pyProxyDefinitionIterator()
+        if groupname != None:
+          iter.SetModeToOneGroup()
+          iter.Begin(groupname)
+        return iter
+        
+
 class pyPropertyIterator:
     """Wrapper for a vtkSMPropertyIterator class to satisfy
        the python iterator protocol."""
@@ -328,6 +339,40 @@ class pyPropertyIterator:
     def __getattr__(self, name):
         """returns attributes from the vtkSMProxyIterator."""
         return getattr(self.SMIterator, name)
+
+class pyProxyDefinitionIterator:
+    """Wrapper for a vtkSMProxyDefinitionIterator class to satisfy
+       the python iterator protocol."""
+    def __init__(self):
+        self.SMIterator = vtkSMProxyDefinitionIterator()
+        self.Group = None
+        self.Key = None
+
+    def __iter__(self):
+        return self
+
+    def next(self):
+        if self.SMIterator.IsAtEnd():
+            self.Group = None
+            self.Key = None
+            raise StopIteration
+        self.Group = self.SMIterator.GetGroup()
+        self.Key = self.SMIterator.GetKey()
+        self.SMIterator.Next()
+        return {"group": self.Group, "key":self.Key }
+
+    def GetKey(self):
+        """Returns the key for the proxy definition last returned by the call to 'next()' """
+        return self.Key
+
+    def GetGroup(self):
+        """Returns the group for the proxy definition last returned by the call to 'next()' """
+        return self.Group
+
+    def __getattr__(self, name):
+        """returns attributes from the vtkSMProxyDefinitionIterator."""
+        return getattr(self.SMIterator, name)
+
 
 class pyProxyIterator:
     """Wrapper for a vtkSMProxyIterator class to satisfy the
