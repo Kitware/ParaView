@@ -241,6 +241,15 @@ class pyProxyManager:
             return None
         return pyProxy(proxy)
 
+    def GetPrototypeProxy(self, group, name):
+        """Returns a pyProxy wrapper for a proxy"""
+        if not self.SMProxyManager:
+            return None
+        proxy = self.SMProxyManager.GetPrototypeProxy(group, name)
+        if not proxy:
+            return None
+        return pyProxy(proxy)
+
     def GetProxiesOnConnection(self, connection):
         """Returns a map of proxies registered with the proxy manager
            on the particular connection."""
@@ -264,7 +273,7 @@ class pyProxyManager:
         for proxy in iter:
             proxies[iter.GetKey()] = proxy;
         return proxies
-
+    
     def __getattr__(self, name):
         """Returns attribute from the SMProxyManager"""
         return getattr(self.SMProxyManager, name)
@@ -296,6 +305,13 @@ class pyProxyManager:
           iter.SetModeToOneGroup()
           iter.Begin(groupname)
         return iter
+
+    def ListProperties(self, groupname, proxyname):
+        """Returns a list of all property names for a
+           proxy of the given type."""
+        proxy = self.GetPrototypeProxy(groupname, proxyname)
+        if proxy:
+            return proxy.ListProperties()
         
 
 class pyPropertyIterator:
