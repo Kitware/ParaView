@@ -40,7 +40,7 @@
 #include <ctype.h>
 #include <vtksys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.58");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.59");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -380,13 +380,12 @@ void vtkPVXMLPackageParser::CreateSourceModule(vtkPVXMLElement* me)
 
   // Set the documentation.
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMDocumentation* documentation = pxm->NewProxyDocumentation(
+  vtkSMDocumentation* documentation = pxm->GetProxyDocumentation(
     "sources", pvm->GetModuleName());
   if (documentation)
     {
     pvm->SetShortHelp(documentation->GetShortHelp());
     pvm->SetLongHelp(documentation->GetLongHelp());
-    documentation->Delete();
     }
   
   // Add the source prototype.
@@ -445,13 +444,12 @@ void vtkPVXMLPackageParser::CreateFilterModule(vtkPVXMLElement* me)
   
   // Set the documentation.
   vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
-  vtkSMDocumentation* documentation = pxm->NewProxyDocumentation(
+  vtkSMDocumentation* documentation = pxm->GetProxyDocumentation(
     "filters", pvm->GetModuleName());
   if (documentation)
     {
     pvm->SetShortHelp(documentation->GetShortHelp());
     pvm->SetLongHelp(documentation->GetLongHelp());
-    documentation->Delete();
     }
 
   // Add the source prototype.
