@@ -208,9 +208,9 @@ signals:
 public slots:
   void onFileNew();
 
-  void onFileOpen();
-  void onFileOpen(pqServer* Server);
-  void onFileOpen(const QStringList& Files);
+  virtual void onFileOpen();
+  virtual void onFileOpen(pqServer* Server);
+  virtual void onFileOpen(const QStringList& Files);
 
   void onFileLoadServerState();
   void onFileLoadServerState(pqServer* Server);
