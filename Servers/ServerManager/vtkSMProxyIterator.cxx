@@ -19,7 +19,7 @@
 #include "vtkSMProxyManagerInternals.h"
 
 vtkStandardNewMacro(vtkSMProxyIterator);
-vtkCxxRevisionMacro(vtkSMProxyIterator, "1.4");
+vtkCxxRevisionMacro(vtkSMProxyIterator, "1.5");
 
 struct vtkSMProxyIteratorInternals
 {
@@ -33,8 +33,8 @@ vtkSMProxyIterator::vtkSMProxyIterator()
   this->Internals = new vtkSMProxyIteratorInternals;
 
   this->Mode = vtkSMProxyIterator::ALL;
-  this->Begin();
   this->ConnectionID = 0;
+  this->Begin();
 }
 
 //---------------------------------------------------------------------------
