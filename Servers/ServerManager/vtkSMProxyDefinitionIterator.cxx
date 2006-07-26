@@ -19,13 +19,15 @@
 #include "vtkSMProxyManagerInternals.h"
 
 vtkStandardNewMacro(vtkSMProxyDefinitionIterator);
-vtkCxxRevisionMacro(vtkSMProxyDefinitionIterator, "1.1");
+vtkCxxRevisionMacro(vtkSMProxyDefinitionIterator, "1.2");
 
 class vtkSMProxyDefinitionIteratorInternals
 {
 public:
   vtkSMProxyManagerElementMapType::iterator ProxyIterator;
   vtkSMProxyManagerInternals::GroupMapType::iterator GroupIterator;
+
+  vtkSMProxyManagerInternals::DefinitionType::iterator CompoundProxyIterator;
 };
 //-----------------------------------------------------------------------------
 vtkSMProxyDefinitionIterator::vtkSMProxyDefinitionIterator()
@@ -58,6 +60,9 @@ void vtkSMProxyDefinitionIterator::Begin()
     this->Internals->ProxyIterator =
       this->Internals->GroupIterator->second.begin();
     }
+
+  this->Internals->CompoundProxyIterator = 
+    pm->Internals->CompoundProxyDefinitions.begin();
 }
 
 //-----------------------------------------------------------------------------
@@ -87,6 +92,18 @@ void vtkSMProxyDefinitionIterator::Next()
     vtkErrorMacro("ProxyManager is not set. Can not perform operation: Next()");
     return;
     }
+
+  if (this->Mode == COMPOUND_PROXY_DEFINITIONS)
+    {
+    if (this->Internals->CompoundProxyIterator ==
+      pm->Internals->CompoundProxyDefinitions.end())
+      {
+      return;
+      }
+    this->Internals->CompoundProxyIterator++;
+    return;
+    }
+
   if (this->Internals->GroupIterator == 
     pm->Internals->GroupMap.end())
     {
@@ -147,6 +164,18 @@ int vtkSMProxyDefinitionIterator::IsAtEnd()
     vtkErrorMacro("ProxyManager is not set. Can not perform operation: IsAtEnd()");
     return 1;
     }
+
+  if (this->Mode == COMPOUND_PROXY_DEFINITIONS)
+    {
+    if (this->Internals->CompoundProxyIterator == 
+      pm->Internals->CompoundProxyDefinitions.end())
+      {
+      return 1;
+      }
+
+    return 0;
+    }
+
   if (this->Internals->GroupIterator == 
     pm->Internals->GroupMap.end())
     {
@@ -173,6 +202,11 @@ const char* vtkSMProxyDefinitionIterator::GetGroup()
     return 0;
     }
 
+  if (this->Mode == COMPOUND_PROXY_DEFINITIONS)
+    {
+    return 0;
+    }
+
   if (this->Internals->GroupIterator != pm->Internals->GroupMap.end())
     {
     return this->Internals->GroupIterator->first.c_str();
@@ -190,6 +224,15 @@ const char* vtkSMProxyDefinitionIterator::GetKey()
     return 0;
     }
 
+  if (this->Mode == COMPOUND_PROXY_DEFINITIONS)
+    {
+    if (this->Internals->CompoundProxyIterator !=
+      pm->Internals->CompoundProxyDefinitions.end())
+      {
+      this->Internals->CompoundProxyIterator->first.c_str();
+      }
+    return 0;
+    }
   if (this->Internals->GroupIterator != pm->Internals->GroupMap.end())
     {
     if (this->Internals->ProxyIterator != 

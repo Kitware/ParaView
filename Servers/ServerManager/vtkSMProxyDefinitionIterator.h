@@ -13,11 +13,13 @@
 
 =========================================================================*/
 // .NAME vtkSMProxyDefinitionIterator - iterates over all proxy definitions
-// that the proxy manager can create new proxies from.
+// that the proxy manager can create new proxies from. It can also iterate
+// over registered compound proxy definitions.
 // .SECTION Description
 // vtkSMProxyDefinitionIterator iterates over all proxy definitions known to
 // the proxy manager. The iterator defines mode in which it can be made to
-// iterate over definitions of a particular group alone.
+// iterate over definitions of a particular group alone. This iterator can 
+// also be used to iterate over compound proxy definitions.
 // .SECTION See Also
 // vtkSMProxyManager
 
@@ -63,8 +65,12 @@ public:
   // Description:
   // The traversal mode for the iterator. If the traversal mode is
   // set to GROUPS, each Next() will move to the next group, in
-  // ONE_GROUP mode, all proxies in one group are visited and finally
-  // in ALL mode, all proxies are visited.
+  // ONE_GROUP mode, all proxies in one group are visited,
+  // in ALL mode, all proxies are visited. 
+  // In COMPOUND_PROXY_DEFINITIONS mode, the iterator
+  // iterates over compound proxy definitions. 
+  // Note, when in COMPOUND_PROXY_DEFINITIONS mode, the
+  // "Group" is not defined i.e. GetGroup() always returns NULL.
   vtkSetMacro(Mode, int);
   vtkGetMacro(Mode, int);
   void SetModeToGroupsOnly() { this->SetMode(GROUPS_ONLY); }
@@ -75,7 +81,8 @@ public:
   {
     GROUPS_ONLY=0,
     ONE_GROUP=1,
-    ALL=2
+    ALL=2,
+    COMPOUND_PROXY_DEFINITIONS=3
   };
 //ETX
 protected:
