@@ -841,33 +841,38 @@ void pqMainWindowCore::onFileLoadServerState(pqServer*)
 }
 
 //-----------------------------------------------------------------------------
-void pqMainWindowCore::onFileLoadServerState(const QStringList& Files)
+void pqMainWindowCore::onFileLoadServerState(const QStringList& files)
 {
-  if(Files.size() == 0)
+  for(int i = 0; i != files.size(); ++i)
     {
-    return;
-    }
+    // Read in the xml file to restore.
+    vtkPVXMLParser *xmlParser = vtkPVXMLParser::New();
+    xmlParser->SetFileName(files[i].toAscii().data());
+    xmlParser->Parse();
 
-  // Read in the xml file to restore.
-  vtkPVXMLParser *xmlParser = vtkPVXMLParser::New();
-  xmlParser->SetFileName(Files[0].toAscii().data());
-  xmlParser->Parse();
+    // Get the root element from the parser.
+    vtkPVXMLElement *root = xmlParser->GetRootElement();
+    if (root)
+      {
+      pqApplicationCore::instance()->loadState(root, this->getActiveServer(),
+                                              this->getActiveRenderModule());
+                                              
+      // Add this to the list of recent server resources ...
+      pqServerResource resource;
+      resource.setScheme("session");
+      resource.setPath(files[i]);
+      resource.setSessionServer(this->getActiveServer()->getResource());
+      pqApplicationCore::instance()->serverResources().add(resource);
+      pqApplicationCore::instance()->serverResources().save();
+      }
+    else
+      {
+      qCritical("Root does not exist. Either state file could not be opened "
+                "or it does not contain valid xml");
+      }
 
-  // Get the root element from the parser.
-  vtkPVXMLElement *root = xmlParser->GetRootElement();
-  if (root)
-    {
-    pqApplicationCore::instance()->loadState(root, this->getActiveServer(),
-                                             this->getActiveRenderModule());
-    QString name = root->GetName();
+    xmlParser->Delete();
     }
-  else
-    {
-    qCritical("Root does not exist. Either state file could not be opened "
-              "or it does not contain valid xml");
-    }
-
-  xmlParser->Delete();
 }
 
 void pqMainWindowCore::onFileSaveServerState()
@@ -884,22 +889,25 @@ void pqMainWindowCore::onFileSaveServerState()
   file_dialog->show();
 }
 
-void pqMainWindowCore::onFileSaveServerState(const QStringList& Files)
+void pqMainWindowCore::onFileSaveServerState(const QStringList& files)
 {
-  if(Files.size() == 0)
-    {
-    return;
-    }
-
   vtkPVXMLElement *root = vtkPVXMLElement::New();
   root->SetName("ParaView");
   pqApplicationCore::instance()->saveState(root);
 
   // Print the xml to the requested file(s).
-  for(int i = 0; i != Files.size(); ++i)
+  for(int i = 0; i != files.size(); ++i)
     {
-    ofstream os(Files[i].toAscii().data(), ios::out);
+    ofstream os(files[i].toAscii().data(), ios::out);
     root->PrintXML(os, vtkIndent());
+    
+    // Add this to the list of recent server resources ...
+    pqServerResource resource;
+    resource.setScheme("session");
+    resource.setPath(files[i]);
+    resource.setSessionServer(this->getActiveServer()->getResource());
+    pqApplicationCore::instance()->serverResources().add(resource);
+    pqApplicationCore::instance()->serverResources().save();
     }
 
   root->Delete();

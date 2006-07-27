@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include <QtDebug>
 
+#include <vtkPVXMLParser.h>
+
 #include <vtkstd/algorithm>
 #include <vtkstd/vector>
 
@@ -138,23 +140,59 @@ void pqServerResources::save()
 
 void pqServerResources::open(const pqServerResource& resource)
 {
-  pqServer* const server = pqServer::Create(resource);
-  if(!server)
+  if(resource.scheme() == "session")
     {
-    qCritical() << "Error creating server " << resource.toString() << "\n";
-    return;
-    }
+    pqServer* const server = pqServer::Create(resource.sessionServer());
+    if(!server)
+      {
+      qCritical() << "Error creating server " << resource.sessionServer().toString() << "\n";
+      return;
+      }
+      
+    emit this->serverConnected(server);
     
-  emit this->serverConnected(server);
-  
-  if(resource.path().isEmpty())
-    {
-    return;
+    if(resource.path().isEmpty())
+      {
+      return;
+      }
+
+    // Read in the xml file to restore.
+    vtkSmartPointer<vtkPVXMLParser> xmlParser = vtkSmartPointer<vtkPVXMLParser>::New();
+    xmlParser->SetFileName(resource.path().toAscii().data());
+    xmlParser->Parse();
+
+    // Get the root element from the parser.
+    if(vtkPVXMLElement* const root = xmlParser->GetRootElement())
+      {
+      pqApplicationCore::instance()->loadState(root, server, 0/*this->getActiveRenderModule()*/);
+      }
+    else
+      {
+      qCritical("Root does not exist. Either state file could not be opened "
+                "or it does not contain valid xml");
+      return;
+      }
     }
-  
-  if(!pqApplicationCore::instance()->createReaderOnServer(resource.path(), server))
+  else
     {
-    qCritical() << "Error opening file " << resource.path() << "\n";
-    return;
+    pqServer* const server = pqServer::Create(resource);
+    if(!server)
+      {
+      qCritical() << "Error creating server " << resource.toString() << "\n";
+      return;
+      }
+      
+    emit this->serverConnected(server);
+    
+    if(resource.path().isEmpty())
+      {
+      return;
+      }
+    
+    if(!pqApplicationCore::instance()->createReaderOnServer(resource.path(), server))
+      {
+      qCritical() << "Error opening file " << resource.path() << "\n";
+      return;
+      }
     }
 }

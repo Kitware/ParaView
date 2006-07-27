@@ -48,6 +48,9 @@ cs://host:port/path/to/resource
 csrc://host:port/path/to/resource
 cdsrs://dshost:dsport//rshost:rsport/path/to/resource
 cdsrsrc://dshost:dsport//rshost:rsport/path/to/resource
+session:/path/to/session#builtin:
+session:/path/to/session#cs://host:port
+session:/path/to/session#cdsrs://dshost:dsport//rshost:rsport
 
 Resource paths may also use Win32 syntax with reverse slashes:
 
@@ -56,6 +59,9 @@ cs://host:port/c:\path\to\resource
 csrc://host:port/c:\path\to\resource
 cdsrs://dshost:dsport//rshost:rsport/c:\path\to\resource
 cdsrsrc://dshost:dsport//rshost:rsport/c:\path\to\resource
+session:/c:\path\to\session#builtin:
+session:/c:\path\to\session#cs://host:port
+session:/c:\path\to\session#cdsrs://dshost:dsport//rshost:rsport
 
 (Note that all paths begin with a forward-slash, regardless of platform)
 
@@ -65,19 +71,21 @@ cs://host/path/to/resource
 csrc://host/path/to/resource
 cdsrs://dshost//rshost/path/to/resource
 cdsrsrc://dshost//rshost/path/to/resource
+session:/path/to/session#cs://host
+session:/path/to/session#cdsrs://dshost//rshost
 
 ... in this case, default port numbers will be used.
 
-All paths are optional, e.g:
+For all schemes except "session", paths are optional, e.g:
 
-builtin:/path/to/resource
+builtin:
 cs://host:port
 csrc://host:port
 cdsrs://dshost:dsport//rshost:rsport
 cdsrsrc://dshost:dsport//rshost:rsport
 
-... in this case, the resource represents a connection to a specific server
-without opening a file.
+... in these cases, the resource represents a connection to a
+specific server without opening any file.
 
 \sa pqServerResources, pqServer
 */
@@ -90,12 +98,19 @@ public:
   pqServerResource& operator=(const pqServerResource&);
   ~pqServerResource();
 
+  /// Returns a compact string representation of the resource in URI format
   const QString toString() const;
   
+  /** Returns the resource scheme -
+  session, cs, csrc, cdsrs, cdsrsrc, or session */
   const QString scheme() const;
+  /// Sets the resource scheme
   void setScheme(const QString&);
   
+  /** Returns the resource host, or empty string for builtin, session,
+  cdsrs, and cdsrsrc schemes */
   const QString host() const;
+  /// Sets the resource host
   void setHost(const QString&);
   
   const int port() const;
@@ -119,6 +134,9 @@ public:
   const QString path() const;
   void setPath(const QString&);
 
+  const pqServerResource sessionServer() const;
+  void setSessionServer(const pqServerResource&);
+  
   const pqServerResource server() const;
 
   const bool operator==(const pqServerResource&) const;

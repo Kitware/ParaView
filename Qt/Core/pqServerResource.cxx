@@ -84,6 +84,11 @@ public:
         this->Path = path.cap(2);
         }
       }
+    else if(this->Scheme == "session")
+      {
+      this->Path = temp.path();
+      this->SessionServer = temp.fragment();
+      }
     else
       {
       this->Host = temp.host();
@@ -112,7 +117,8 @@ public:
       && this->DataServerPort == rhs.DataServerPort
       && this->RenderServerHost == rhs.RenderServerHost
       && this->RenderServerPort == rhs.RenderServerPort
-      && this->Path == rhs.Path;
+      && this->Path == rhs.Path
+      && this->SessionServer == rhs.SessionServer;
   }
   
   const bool operator!=(const pqImplementation& rhs)
@@ -136,8 +142,10 @@ public:
       return this->RenderServerHost < rhs.RenderServerHost;
     if(this->RenderServerPort != rhs.RenderServerPort)
       return this->RenderServerPort < rhs.RenderServerPort;
-
-    return this->Path < rhs.Path;
+    if(this->Path != rhs.Path)
+      return this->Path < rhs.Path;
+      
+    return this->SessionServer < rhs.SessionServer;
   }
 
   QString Scheme;
@@ -148,6 +156,7 @@ public:
   QString RenderServerHost;
   int RenderServerPort;
   QString Path;
+  QString SessionServer;
 };
 
 pqServerResource::pqServerResource() :
@@ -189,6 +198,15 @@ const QString pqServerResource::toString() const
   if(this->Implementation->Scheme == "builtin")
     {
     }
+  else if(this->Implementation->Scheme == "cs" ||
+    this->Implementation->Scheme == "csrc")
+    {
+    result += "//" + this->Implementation->Host;
+    if(-1 != this->Implementation->Port)
+      {
+      result += ":" + QString::number(this->Implementation->Port);
+      }
+    }
   else if(this->Implementation->Scheme == "cdsrs" ||
     this->Implementation->Scheme == "cdsrsrc")
     {
@@ -203,13 +221,8 @@ const QString pqServerResource::toString() const
       result += ":" + QString::number(this->Implementation->RenderServerPort);
       }
     }
-  else
+  else if(this->Implementation->Scheme == "session")
     {
-    result += "//" + this->Implementation->Host;
-    if(-1 != this->Implementation->Port)
-      {
-      result += ":" + QString::number(this->Implementation->Port);
-      }
     }
     
   if(!this->Implementation->Path.isEmpty())
@@ -219,6 +232,11 @@ const QString pqServerResource::toString() const
       result += "/";
       }
       result += this->Implementation->Path;
+    }
+    
+  if(!this->Implementation->SessionServer.isEmpty())
+    {
+    result += "#" + this->Implementation->SessionServer;
     }
     
   return result;
@@ -422,6 +440,26 @@ const QString pqServerResource::path() const
 void pqServerResource::setPath(const QString& rhs)
 {
   this->Implementation->Path = rhs;
+}
+
+const pqServerResource pqServerResource::sessionServer() const
+{
+  if(this->Implementation->Scheme != "session")
+    {
+    return "";
+    }
+    
+  return this->Implementation->SessionServer;
+}
+
+void pqServerResource::setSessionServer(const pqServerResource& rhs)
+{
+  if(this->Implementation->Scheme != "session")
+    {
+    return;
+    }
+    
+  this->Implementation->SessionServer = rhs.toString();
 }
 
 const pqServerResource pqServerResource::server() const

@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqApplicationCore.h>
 #include <pqServerResources.h>
 
+#include <QFileInfo>
 #include <QMenu>
 #include <QTimer>
 #include <QtDebug>
@@ -82,14 +83,18 @@ void pqRecentFilesMenu::onResourcesChanged()
   pqServerResources::ListT servers;
   for(int i = 0; i != resources.size(); ++i)
     {
-    pqServerResource server = resources[i].server();
+    pqServerResource resource = resources[i];
+    pqServerResource server = resource.scheme() == "session" ?
+      resource.sessionServer() :
+      resource.server();
+      
     if(-1 == servers.indexOf(server))
       {
       servers.push_back(server);
       }
     }
 
-  // Display the resources, grouped by server ...
+  // Display the servers ...
   for(int i = 0; i != servers.size(); ++i)
     {
     const pqServerResource& server = servers[i];
@@ -107,20 +112,42 @@ void pqRecentFilesMenu::onResourcesChanged()
     
     this->Implementation->Menu.addAction(action);
     
+    // Display sessions associated with the server first ...
     for(int j = 0; j != resources.size(); ++j)
       {
       const pqServerResource& resource = resources[j];
-      
-      if(resource.path().isEmpty() || resource.server() != server)
+
+      if(
+        resource.scheme() != "session"
+        || resource.path().isEmpty()
+        || resource.sessionServer() != server)
         {
         continue;
         }
         
       QAction* const action = new QAction(resource.path(), &this->Implementation->Menu);
       action->setData(resource.toString());
+      action->setIcon(QIcon(":/pqWidgets/Icons/pqAppIcon16.png"));
       
-//      action->setIcon(QIcon(":/pqWidgets/Icons/pqAppIcon16.png"));
-      
+      this->Implementation->Menu.addAction(action);
+      }
+    
+    // Display files associated with the server next ...
+    for(int j = 0; j != resources.size(); ++j)
+      {
+      const pqServerResource& resource = resources[j];
+
+      if(
+        resource.scheme() == "session"
+        || resource.path().isEmpty()
+        || resource.server() != server)
+        {
+        continue;
+        }
+        
+      QAction* const action = new QAction(resource.path(), &this->Implementation->Menu);
+      action->setData(resource.toString());
+
       this->Implementation->Menu.addAction(action);
       }
     }
