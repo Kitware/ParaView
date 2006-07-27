@@ -189,7 +189,7 @@ pqServerResource::~pqServerResource()
   delete this->Implementation;
 }
 
-const QString pqServerResource::toString() const
+QString pqServerResource::toString() const
 {
   QString result;
   
@@ -242,7 +242,7 @@ const QString pqServerResource::toString() const
   return result;
 }
 
-const QString pqServerResource::scheme() const
+QString pqServerResource::scheme() const
 {
   return this->Implementation->Scheme;
 }
@@ -252,7 +252,7 @@ void pqServerResource::setScheme(const QString& rhs)
   this->Implementation->Scheme = rhs;
 }
 
-const QString pqServerResource::host() const
+QString pqServerResource::host() const
 {
   if(this->Implementation->Scheme == "cdsrs" ||
     this->Implementation->Scheme == "cdsrsrc")
@@ -274,7 +274,7 @@ void pqServerResource::setHost(const QString& rhs)
   this->Implementation->Host = rhs;
 }
 
-const int pqServerResource::port() const
+int pqServerResource::port() const
 {
   if(this->Implementation->Scheme == "cdsrs" ||
     this->Implementation->Scheme == "cdsrsrc")
@@ -285,7 +285,7 @@ const int pqServerResource::port() const
   return this->Implementation->Port;
 }
 
-const int pqServerResource::port(int default_port) const
+int pqServerResource::port(int default_port) const
 {
   if(this->Implementation->Scheme == "cdsrs" ||
     this->Implementation->Scheme == "cdsrsrc")
@@ -312,7 +312,7 @@ void pqServerResource::setPort(int rhs)
   this->Implementation->Port = rhs;
 }
 
-const QString pqServerResource::dataServerHost() const
+QString pqServerResource::dataServerHost() const
 {
   if(this->Implementation->Scheme != "cdsrs" &&
     this->Implementation->Scheme != "cdsrsrc")
@@ -334,7 +334,7 @@ void pqServerResource::setDataServerHost(const QString& rhs)
   this->Implementation->DataServerHost = rhs;
 }
 
-const int pqServerResource::dataServerPort() const
+int pqServerResource::dataServerPort() const
 {
   if(this->Implementation->Scheme != "cdsrs" &&
     this->Implementation->Scheme != "cdsrsrc")
@@ -345,7 +345,7 @@ const int pqServerResource::dataServerPort() const
   return this->Implementation->DataServerPort;
 }
 
-const int pqServerResource::dataServerPort(int default_port) const
+int pqServerResource::dataServerPort(int default_port) const
 {
   if(this->Implementation->Scheme != "cdsrs" &&
     this->Implementation->Scheme != "cdsrsrc")
@@ -372,7 +372,7 @@ void pqServerResource::setDataServerPort(int rhs)
   this->Implementation->DataServerPort = rhs;
 }
 
-const QString pqServerResource::renderServerHost() const
+QString pqServerResource::renderServerHost() const
 {
   if(this->Implementation->Scheme != "cdsrs" &&
     this->Implementation->Scheme != "cdsrsrc")
@@ -394,7 +394,7 @@ void pqServerResource::setRenderServerHost(const QString& rhs)
   this->Implementation->RenderServerHost = rhs;
 }
 
-const int pqServerResource::renderServerPort() const
+int pqServerResource::renderServerPort() const
 {
   if(this->Implementation->Scheme != "cdsrs" &&
     this->Implementation->Scheme != "cdsrsrc")
@@ -405,7 +405,7 @@ const int pqServerResource::renderServerPort() const
   return this->Implementation->RenderServerPort;
 }
 
-const int pqServerResource::renderServerPort(int default_port) const
+int pqServerResource::renderServerPort(int default_port) const
 {
   if(this->Implementation->Scheme != "cdsrs" &&
     this->Implementation->Scheme != "cdsrsrc")
@@ -432,7 +432,7 @@ void pqServerResource::setRenderServerPort(int rhs)
   this->Implementation->RenderServerPort = rhs;
 }
 
-const QString pqServerResource::path() const
+QString pqServerResource::path() const
 {
   return this->Implementation->Path;
 }
@@ -442,11 +442,11 @@ void pqServerResource::setPath(const QString& rhs)
   this->Implementation->Path = rhs;
 }
 
-const pqServerResource pqServerResource::sessionServer() const
+pqServerResource pqServerResource::sessionServer() const
 {
   if(this->Implementation->Scheme != "session")
     {
-    return "";
+    return QString("");
     }
     
   return this->Implementation->SessionServer;
@@ -462,7 +462,7 @@ void pqServerResource::setSessionServer(const pqServerResource& rhs)
   this->Implementation->SessionServer = rhs.toString();
 }
 
-const pqServerResource pqServerResource::server() const
+pqServerResource pqServerResource::server() const
 {
   if(this->Implementation->Scheme == "builtin")
     {
@@ -501,17 +501,17 @@ const pqServerResource pqServerResource::server() const
   return pqServerResource();
 }
 
-const bool pqServerResource::operator==(const pqServerResource& rhs) const
+bool pqServerResource::operator==(const pqServerResource& rhs) const
 {
   return *this->Implementation == *rhs.Implementation;
 }
 
-const bool pqServerResource::operator!=(const pqServerResource& rhs) const
+bool pqServerResource::operator!=(const pqServerResource& rhs) const
 {
   return *this->Implementation != *rhs.Implementation;
 }
 
-const bool pqServerResource::operator<(const pqServerResource& rhs) const
+bool pqServerResource::operator<(const pqServerResource& rhs) const
 {
   return *this->Implementation < *rhs.Implementation;
 }

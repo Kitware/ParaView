@@ -99,49 +99,49 @@ public:
   ~pqServerResource();
 
   /// Returns a compact string representation of the resource in URI format
-  const QString toString() const;
+  QString toString() const;
   
   /** Returns the resource scheme -
   session, cs, csrc, cdsrs, cdsrsrc, or session */
-  const QString scheme() const;
+  QString scheme() const;
   /// Sets the resource scheme
   void setScheme(const QString&);
   
   /** Returns the resource host, or empty string for builtin, session,
   cdsrs, and cdsrsrc schemes */
-  const QString host() const;
+  QString host() const;
   /// Sets the resource host
   void setHost(const QString&);
   
-  const int port() const;
-  const int port(int default_port) const;
+  int port() const;
+  int port(int default_port) const;
   void setPort(int);
 
-  const QString dataServerHost() const;
+  QString dataServerHost() const;
   void setDataServerHost(const QString&);
   
-  const int dataServerPort() const;
-  const int dataServerPort(int default_port) const;
+  int dataServerPort() const;
+  int dataServerPort(int default_port) const;
   void setDataServerPort(int);
   
-  const QString renderServerHost() const;
+  QString renderServerHost() const;
   void setRenderServerHost(const QString&);
     
-  const int renderServerPort() const;
-  const int renderServerPort(int default_port) const;
+  int renderServerPort() const;
+  int renderServerPort(int default_port) const;
   void setRenderServerPort(int);
     
-  const QString path() const;
+  QString path() const;
   void setPath(const QString&);
 
-  const pqServerResource sessionServer() const;
+  pqServerResource sessionServer() const;
   void setSessionServer(const pqServerResource&);
   
-  const pqServerResource server() const;
+  pqServerResource server() const;
 
-  const bool operator==(const pqServerResource&) const;
-  const bool operator!=(const pqServerResource&) const;
-  const bool operator<(const pqServerResource&) const;
+  bool operator==(const pqServerResource&) const;
+  bool operator!=(const pqServerResource&) const;
+  bool operator<(const pqServerResource&) const;
 
 private:
   class pqImplementation;
