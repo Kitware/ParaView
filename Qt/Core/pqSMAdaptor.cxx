@@ -330,23 +330,26 @@ QList<QVariant> pqSMAdaptor::getSelectionProperty(vtkSMProperty* Property,
       QVariant value;
 
       int numElements = StringProperty->GetNumberOfElements();
-      for(int i=0; i<numElements; i+=2)
+      if(numElements % 2 == 0)
         {
-        if(StringName == StringProperty->GetElement(i))
+        for(int i=0; i<numElements; i+=2)
           {
-          value = StringProperty->GetElement(i+1);
-          break;
+          if(StringName == StringProperty->GetElement(i))
+            {
+            value = StringProperty->GetElement(i+1);
+            break;
+            }
           }
-        }
-      // check the information property for a default value
-      if(!value.isValid())
-        {
-        vtkSMStringVectorProperty* infoProp = NULL;
-        infoProp = vtkSMStringVectorProperty::SafeDownCast(
-                               StringProperty->GetInformationProperty());
-        if(infoProp)
+        // check the information property for a default value
+        if(!value.isValid())
           {
-          value = infoProp->GetElement(Index*2 + 1);
+          vtkSMStringVectorProperty* infoProp = NULL;
+          infoProp = vtkSMStringVectorProperty::SafeDownCast(
+                                StringProperty->GetInformationProperty());
+          if(infoProp)
+            {
+            value = infoProp->GetElement(Index*2 + 1);
+            }
           }
         }
       // make up a zero
