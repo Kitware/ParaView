@@ -220,6 +220,14 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
     this, 
     SLOT(setActiveRenderModule(pqRenderModule*)));
 
+  // Listen for compound proxy register events.
+  pqServerManagerObserver *observer =
+      pqApplicationCore::instance()->getPipelineData();
+  this->connect(observer, SIGNAL(compoundProxyDefinitionRegistered(QString)),
+      this->Implementation->CustomFilters, SLOT(addCustomFilter(QString)));
+  this->connect(observer, SIGNAL(compoundProxyDefinitionUnRegistered(QString)),
+      this->Implementation->CustomFilters, SLOT(removeCustomFilter(QString)));
+
   // Connect selection changed events.
   QObject::connect(this, SIGNAL(activeSourceChanged(pqPipelineSource*)),
                    this, SLOT(onActiveSourceChanged(pqPipelineSource*)));
