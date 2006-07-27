@@ -44,6 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqPipelineMenu.h>
 #include <pqUndoStack.h>
 #include <pqPipelineBrowser.h>
+#include <pqRecentFilesMenu.h>
 #include <pqSelectionManager.h>
 #include <pqSetName.h>
 #include <pqVCRController.h>
@@ -77,6 +78,7 @@ public:
   QAssistantClient* AssistantClient;
   Ui::MainWindow UI;
   pqMainWindowCore Core;
+  pqRecentFilesMenu* RecentFilesMenu;
   pqViewMenu* ViewMenu;
   pqViewMenu* ToolbarsMenu;
 };
@@ -88,6 +90,9 @@ MainWindow::MainWindow() :
   Implementation(new pqImplementation(this))
 {
   this->Implementation->UI.setupUi(this);
+  
+  this->Implementation->RecentFilesMenu = new pqRecentFilesMenu(*this->Implementation->UI.menuRecentFiles);
+  
   this->Implementation->ViewMenu = new pqViewMenu(*this->Implementation->UI.menuView);
   this->Implementation->ToolbarsMenu = new pqViewMenu(*this->Implementation->UI.menuToolbars);
 
@@ -105,9 +110,6 @@ MainWindow::MainWindow() :
     SIGNAL(enableFileOpen(bool)),
     this->Implementation->UI.actionFileOpen,
     SLOT(setEnabled(bool)));
-
-  this->Implementation->Core.setRecentFilesMenu(
-    this->Implementation->UI.menuRecentFiles);
 
   connect(this->Implementation->UI.actionFileLoadServerState,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onFileLoadServerState()));

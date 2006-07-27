@@ -45,6 +45,7 @@ class pqServer;
 class pqServerManagerModel;
 class pqServerManagerObserver;
 class pqServerManagerSelectionModel;
+class pqServerResources;
 class pqSettings;
 class pqUndoStack;
 class pqWriterFactory;
@@ -100,6 +101,9 @@ public:
   void loadState(vtkPVXMLElement* root,
                  pqServer* server,
                  pqRenderModule* renModule);
+
+  /// Returns the set of available server resources
+  pqServerResources& serverResources();
 
   /// Get the application settings.
   pqSettings* settings();

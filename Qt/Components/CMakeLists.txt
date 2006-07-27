@@ -73,6 +73,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineMenu.h
   pqPipelineModelSelectionAdaptor.h
   pqPointSourceWidget.h
+  pqRecentFilesMenu.h
   pqRenderViewEditor.h
   pqRenderWindowManager.h
   pqSampleScalarWidget.h
@@ -225,6 +226,8 @@ ADD_LIBRARY(pqComponents
   pqPipelineModelSelectionAdaptor.h
   pqPointSourceWidget.cxx
   pqPointSourceWidget.h
+  pqRecentFilesMenu.cxx
+  pqRecentFilesMenu.h
   pqRenderViewEditor.cxx
   pqRenderViewEditor.h
   pqRenderWindowManager.cxx

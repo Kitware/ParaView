@@ -75,6 +75,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqObjectNaming.h>
 #include <pqProgressBar.h>
 #include <pqRecordEventsDialog.h>
+#include <pqServerResources.h>
 #include <pqSetData.h>
 #include <pqSetName.h>
 #include <pqTestUtility.h>
@@ -151,7 +152,6 @@ public:
   pqCustomFilterManager* CustomFilterManager;
  
   QMenu* RecentFilesMenu; 
-  QStringList RecentFilesList;
   
   QMenu* FilterMenu;
   pqPipelineMenu* PipelineMenu;
@@ -208,9 +208,6 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   
   pqApplicationCore* const core = pqApplicationCore::instance();
 
-  this->Implementation->RecentFilesList
-    = pqApplicationCore::instance()->settings()->recentFilesList();
-
   // Initialize supported file types.
   core->getReaderFactory()->loadFileTypes(":/pqWidgets/XML/ParaViewReaders.xml");
   core->getWriterFactory()->loadFileTypes(":/pqWidgets/XML/ParaViewWriters.xml");
@@ -263,7 +260,10 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   QObject::connect(this, SIGNAL(activeSourceChanged(pqPipelineSource*)),
                    &this->VCRController(), SLOT(setSource(pqPipelineSource*)));
 
-                   
+
+  connect(&core->serverResources(), SIGNAL(serverConnected(pqServer*)),
+    this, SLOT(onServerConnect(pqServer*)));
+
 /*
   this->installEventFilter(this);
 */
@@ -293,12 +293,6 @@ pqSelectionManager& pqMainWindowCore::selectionManager()
 pqVCRController& pqMainWindowCore::VCRController()
 {
   return this->Implementation->VCRController;
-}
-
-void pqMainWindowCore::setRecentFilesMenu(QMenu* menu)
-{
-  this->Implementation->RecentFilesMenu = menu;
-  this->updateRecentFilesMenu(true);
 }
 
 void pqMainWindowCore::setSourceMenu(QMenu* menu)
@@ -783,8 +777,12 @@ void pqMainWindowCore::onFileOpen(const QStringList& files)
       qDebug() << "Failed to create reader for : " << files[i];
       continue;
       }
-
-    this->addRecentFile(files[i]);
+      
+    // Add this to the list of recent server resources ...
+    pqServerResource resource = this->getActiveServer()->getResource();
+    resource.setPath(files[i]);
+    pqApplicationCore::instance()->serverResources().add(resource);
+    pqApplicationCore::instance()->serverResources().save();
     }
 }
 
@@ -1093,8 +1091,6 @@ void pqMainWindowCore::onEditCameraRedo()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onServerConnect()
 {
-  this->setActiveServer(0);
-  
   pqServerBrowser* const server_browser = new pqServerBrowser(
     this->Implementation->Parent);
   server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
@@ -1107,6 +1103,8 @@ void pqMainWindowCore::onServerConnect()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::onServerConnect(pqServer* server)
 {
+  this->onServerDisconnect();
+  
   // bring the server object under the window so that when the
   // window is destroyed the server will get destroyed too.
   server->setParent(this);
@@ -1118,8 +1116,6 @@ void pqMainWindowCore::onServerConnect(pqServer* server)
     qobject_cast<pqMultiViewFrame *>(
       this->Implementation->MultiViewManager.widgetOfIndex(
         pqMultiView::Index())));
-        
-  this->updateRecentFilesMenu(true);
 }
 
 //-----------------------------------------------------------------------------
@@ -1545,8 +1541,6 @@ void pqMainWindowCore::onInitializeStates()
 
   emit this->enableFileOpen(!pending_displays);
 
-  this->updateRecentFilesMenu(!pending_displays && (!num_servers || server !=0));
-  
   emit this->enableFileLoadServerState(
     !pending_displays && (!num_servers || server !=0));
   
@@ -1722,57 +1716,6 @@ void pqMainWindowCore::updateFiltersMenu(pqPipelineSource* source)
     }
 
   menu->setEnabled(some_enabled);
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::addRecentFile(const QString& fileName)
-{
-  this->Implementation->RecentFilesList.removeAll(fileName);
-  this->Implementation->RecentFilesList.push_front(fileName);
-  pqApplicationCore::instance()->settings()->setRecentFilesList(
-    this->Implementation->RecentFilesList);
-  while(this->Implementation->RecentFilesList.size() > 10)
-    {
-    this->Implementation->RecentFilesList.removeLast();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::updateRecentFilesMenu(bool enabled)
-{
-  if(QMenu* const rfMenu = this->Implementation->RecentFilesMenu)
-    {
-    rfMenu->clear();
-    int cnt = 0;
-    if ( !this->getActiveServer() )
-      {
-      enabled = false;
-      }
-    foreach(QString file, this->Implementation->RecentFilesList)
-      {
-      QString str = "&" + QString().setNum(cnt);
-      str += " " + file;
-      QAction *qa = rfMenu->addAction(tr(str.toStdString().c_str()),
-        this, SLOT(onRecentFileOpen()));
-      qa->setData(QVariant(file));
-      qa->setEnabled(enabled);
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::onRecentFileOpen()
-{
-  if(!this->getActiveServer())
-    {
-    qDebug() << "No active server selected.";
-    return;
-    }
-  QVariant qv = qobject_cast<QAction*>(this->sender())->data();
-  QString str = qv.toString();
-  QStringList strList;
-  strList << str;
-  this->onFileOpen(strList);
 }
 
 //-----------------------------------------------------------------------------

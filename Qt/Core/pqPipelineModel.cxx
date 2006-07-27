@@ -268,7 +268,7 @@ QString pqPipelineModelServer::getName() const
 {
   if(this->Server)
     {
-    return this->Server->getFriendlyName();
+    return this->Server->getResource().toString();
     }
 
   return QString();

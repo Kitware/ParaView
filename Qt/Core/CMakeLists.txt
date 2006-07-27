@@ -49,6 +49,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerManagerModelItem.h
   pqServerManagerObserver.h
   pqServerManagerSelectionModel.h
+  pqServerResources.h
   pqSettings.h
   pqUndoStack.h
   )
@@ -142,6 +143,10 @@ ADD_LIBRARY(pqCore
   pqServerManagerObserver.h
   pqServerManagerSelectionModel.cxx
   pqServerManagerSelectionModel.h
+  pqServerResource.cxx
+  pqServerResource.h
+  pqServerResources.cxx
+  pqServerResources.h
   pqSettings.cxx
   pqSettings.h
   pqTestUtility.cxx

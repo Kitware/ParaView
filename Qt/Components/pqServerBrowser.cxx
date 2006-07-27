@@ -65,10 +65,21 @@ void pqServerBrowser::accept()
   switch(this->Ui->ServerType->currentIndex())
     {
     case 0:
-      server = pqServer::CreateStandalone();
+      {
+        pqServerResource resource;
+        resource.setScheme("builtin");
+        server = pqServer::Create(resource);
+      }
       break;
     case 1:
-      server = pqServer::CreateConnection(this->Ui->HostName->text().toAscii().data(), this->Ui->PortNumber->value());
+      {
+      pqServerResource resource;
+      resource.setScheme("cs");
+      resource.setHost(this->Ui->HostName->text());
+      resource.setPort(this->Ui->PortNumber->value());
+      server = pqServer::Create(resource);
+      }
+      break;
     case 2:
       // TODO: Add case where the user connects to render server and data server separately.
       // UI will accept host name and port numbers for both data server and render server.

@@ -86,8 +86,6 @@ public:
   /// Returns the VCR controller, which can control animation playback
   pqVCRController& VCRController();
   
-  /// Assigns a menu to be populated with recent files
-  void setRecentFilesMenu(QMenu* menu);
   /// Assigns a menu to be populated with sources
   void setSourceMenu(QMenu* menu);
   /// Assigns a menu to be populated with filters
@@ -295,12 +293,6 @@ private slots:
   // enable/disable filters as per the source.
   void updateFiltersMenu(pqPipelineSource* source);
 
-  // Add the file to the recently loaded menu
-  void addRecentFile(const QString& fileName);
-  // This will update the recently loaded files menu
-  void updateRecentFilesMenu(bool enabled);
-  void onRecentFileOpen();
-  
   // called when a source is removed by the pqServerManagerModel. If
   // the removed source is the active source, we must change it.
   void sourceRemoved(pqPipelineSource*);
@@ -313,10 +305,6 @@ private slots:
   // works correctly with pending displays etc etc.
   void onSourceCreated(pqPipelineSource*);
   
-/*
-  virtual bool eventFilter(QObject* watched, QEvent* e);
-*/
-
   // Methods to add a source to the list of sources pending displays.
   void addSourcePendingDisplay(pqPipelineSource*);
 

@@ -59,95 +59,84 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /////////////////////////////////////////////////////////////////////////////////////////////
 // pqServer
 
-pqServer* pqServer::CreateStandalone()
+pqServer* pqServer::Create(const pqServerResource& resource)
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkIdType id= pm->ConnectToSelf();
-  if (id == vtkProcessModuleConnectionManager::GetNullConnectionID())
+  // Create a modified version of the resource that only contains server information
+  const pqServerResource server_resource = resource.server();
+
+  // Based on the server resource, create the correct type of server ...
+  if(server_resource.scheme() == "builtin")
     {
-    return NULL;
+    vtkProcessModule* const pm = vtkProcessModule::GetProcessModule();
+    const vtkIdType id = pm->ConnectToSelf();
+    if(id == vtkProcessModuleConnectionManager::GetNullConnectionID())
+      {
+      return 0;
+      }
+    pqServerManagerModel* const model = pqServerManagerModel::instance();
+    pqServer* const server = model->getServer(id); //new pqServer(id, pm->GetOptions());
+    server->Resource = server_resource;
+    
+    return server;
     }
-  pqServerManagerModel* model = pqServerManagerModel::instance();
-  pqServer* server = model->getServer(id); //new pqServer(id, pm->GetOptions());
-  server->setFriendlyName("Builtin");
-  return server;
-  /*
-  // Connection merely to the Self.
-  // Process Module always instantiates a self connection.
-  pqServer* server = 
-    new pqServer(vtkProcessModuleConnectionManager::GetSelfConnectionID(),
-      vtkProcessModule::GetProcessModule()->GetOptions());
-  server->setFriendlyName("BuiltIn");
-
-  pqServerManagerModel* model = pqServerManagerModel::instance();
-  // Since currently self connections are not new connections,
-  // we, pretend that a new conneciton is created to that the
-  // rest of the connection cogniscance still works. 
-  model->onAddServer(server);
-  return server;
-  */
-}
-
-//-----------------------------------------------------------------------------
-pqServer* pqServer::CreateConnection(const char* const hostName, int portNumber)
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkIdType id= pm->ConnectToRemote(hostName, portNumber);
-  if (id == vtkProcessModuleConnectionManager::GetNullConnectionID())
+  else if(server_resource.scheme() == "cs")
     {
-    return NULL;
+    vtkProcessModule* const pm = vtkProcessModule::GetProcessModule();
+    const vtkIdType id = pm->ConnectToRemote(resource.host().toAscii().data(), resource.port(11111));
+    if(id == vtkProcessModuleConnectionManager::GetNullConnectionID())
+      {
+      return 0;
+      }
+    // Synchronize options with the server.
+    // TODO: This again will work more reliably once we have separate PVOptions 
+    // per connection.
+    pm->SynchronizeServerClientOptions(id);
+
+    pqServerManagerModel* const model = pqServerManagerModel::instance();
+    pqServer* const server = model->getServer(id); //new pqServer(id, pm->GetOptions());
+    server->Resource = server_resource;
+
+    return server;
     }
-  // Synchronize options with the server.
-  // TODO: This again will work more reliably once we have separate PVOptions 
-  // per connection.
-  pm->SynchronizeServerClientOptions(id);
-  QString name;
-  name.setNum(portNumber);
-  name.prepend(":");
-  name.prepend(hostName); 
-
-  pqServerManagerModel* model = pqServerManagerModel::instance();
-  pqServer* server = model->getServer(id); //new pqServer(id, pm->GetOptions());
-  server->setFriendlyName(name);
-  return server;
-}
-
-//-----------------------------------------------------------------------------
-pqServer* pqServer::CreateConnection(const char* const ds_hostName, int ds_portNumber,
-  const char* const rs_hostName, int rs_portNumber)
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkIdType id = !pm->ConnectToRemote(ds_hostName, ds_portNumber, rs_hostName,
-      rs_portNumber);
-  if (id == vtkProcessModuleConnectionManager::GetNullConnectionID())
+  else if(server_resource.scheme() == "csrc")
     {
-    return NULL;
+    qWarning() << "Server reverse connections not supported yet\n";
+    return 0;
     }
-  // Synchronize options with the server.
-  // TODO: This again will work more reliably once we have separate PVOptions 
-  // per connection.
-  pm->SynchronizeServerClientOptions(id);
-  
-  QString name1;
-  name1.setNum(ds_portNumber);
-  name1.prepend(":");
-  name1.prepend(ds_hostName);
+  else if(server_resource.scheme() == "cdsrs")
+    {
+    vtkProcessModule* const pm = vtkProcessModule::GetProcessModule();
+    const vtkIdType id = pm->ConnectToRemote(
+      server_resource.dataServerHost().toAscii().data(),
+      server_resource.dataServerPort(11111),
+      server_resource.renderServerHost().toAscii().data(),
+      server_resource.renderServerPort(21111));
+    if(id == vtkProcessModuleConnectionManager::GetNullConnectionID())
+      {
+      return 0;
+      }
+    // Synchronize options with the server.
+    // TODO: This again will work more reliably once we have separate PVOptions 
+    // per connection.
+    pm->SynchronizeServerClientOptions(id);
+    
+    pqServerManagerModel* const model = pqServerManagerModel::instance();
+    pqServer* const server = model->getServer(id); //new pqServer(id, pm->GetOptions());
+    server->Resource = server_resource;
+    
+    return server;
+    }
+  else if(server_resource.scheme() == "cdsrsrc")
+    {
+    qWarning() << "Data server/render server reverse connections not supported yet\n";
+    return 0;
+    }
+  else
+    {
+    qCritical() << "Unknown server type: " << server_resource.scheme() << "\n";
+    }
 
-  QString name2;
-  name2.setNum(rs_portNumber);
-  name2.prepend(":");
-  name2.prepend(rs_hostName);
-  
-  QString name = name1 + "--" + name2;
-
-  //pqServer* server = new pqServer(id, pm->GetOptions());
-  //server->setFriendlyName(name);
-  //return server;
-
-  pqServerManagerModel* model = pqServerManagerModel::instance();
-  pqServer* server = model->getServer(id); //new pqServer(id, pm->GetOptions());
-  server->setFriendlyName(name);
-  return server;
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -166,7 +155,7 @@ void pqServer::disconnect(pqServer* server)
 
 //-----------------------------------------------------------------------------
 pqServer::pqServer(vtkIdType connectionID, vtkPVOptions* options, QObject* _parent) :
-  pqServerManagerModelItem(_parent), FriendlyName()
+  pqServerManagerModelItem(_parent)
 {
   this->ConnectionID = connectionID;
   this->Options = options;
@@ -256,27 +245,6 @@ void pqServer::CreateRenderModule()
 }
 
 //-----------------------------------------------------------------------------
-QString pqServer::getAddress() const
-{
-  QString address;
-  if(this->Options)
-    {
-    address.setNum(this->Options->GetServerPort());
-    address.prepend(":");
-    address.prepend(this->Options->GetServerHostName());
-    }
-
-  return address;
-}
-
-//-----------------------------------------------------------------------------
-void pqServer::setFriendlyName(const QString& name)
-{
-  this->FriendlyName = name;
-  emit this->friendlyNameChanged();
-}
-
-//-----------------------------------------------------------------------------
 vtkSMMultiViewRenderModuleProxy* pqServer::GetRenderModule()
 {
   return this->RenderModule.GetPointer();
@@ -294,6 +262,16 @@ vtkSMRenderModuleProxy* pqServer::newRenderModule()
     this->RenderModule->NewRenderModule());
 }
 
+const pqServerResource& pqServer::getResource()
+{
+  return this->Resource;
+}
+
+vtkIdType pqServer::GetConnectionID()
+{
+  return this->ConnectionID;
+}
+
 //-----------------------------------------------------------------------------
 int pqServer::getNumberOfPartitions()
 {
@@ -301,4 +279,3 @@ int pqServer::getNumberOfPartitions()
   return pm->GetNumberOfPartitions(this->ConnectionID);
 
 }
-

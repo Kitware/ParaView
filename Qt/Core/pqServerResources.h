@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSettings.h
+   Module:    pqServerResources.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,26 +30,59 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqSettings.h
-///
-/// \date 1/19/2006
-
-#ifndef _pqSettings_h
-#define _pqSettings_h
-
+#ifndef _pqServerResources_h
+#define _pqServerResources_h
 
 #include "pqCoreExport.h"
-#include <QSettings>
-#include <QStringList>
+#include "pqServerResource.h"
 
-class PQCORE_EXPORT pqSettings :
-  public QSettings
+#include <QObject>
+#include <QVector>
+
+class pqServer;
+
+/**
+Encapsulates a persistent collection of recently-used resources (files)
+that are located on specific servers.
+
+\sa pqServerResource, pqServer */
+class PQCORE_EXPORT pqServerResources :
+  public QObject
 {
   Q_OBJECT
 
 public:
-  pqSettings(const QString& organization, const QString& application);
+  pqServerResources();
+  ~pqServerResources();
+
+  /// Defines an ordered collection of resources
+  typedef QVector<pqServerResource> ListT;
+
+  /** Add a resource to the collection / 
+  move the resource to the beginning of the list */
+  void add(const pqServerResource& resource);
+  /** Returns the contents of the collection, ordered from
+  most-recently-used to least-recently-used */
+  const ListT list() const;
+
+  /// Save the collection (to local user preferences)
+  void save();
+
+  /// Open (connect to) a resource
+  void open(const pqServerResource& resource);
+
+signals:
+  /// Signal emitted whenever the collection is changed
+  void changed();
+  /// Signal emitted whenever a new server connection is made
+  void serverConnected(pqServer*);
+  
+private:
+  pqServerResources(const pqServerResources&);
+  pqServerResources& operator=(const pqServerResources&);
+  
+  class pqImplementation;
+  pqImplementation* const Implementation;
 };
 
 #endif
-

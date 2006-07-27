@@ -42,23 +42,20 @@ class vtkSMRenderModuleProxy;
 
 #include "pqCoreExport.h"
 #include "pqServerManagerModelItem.h"
-#include <QString>
+#include "pqServerResource.h"
 #include "vtkSmartPointer.h"
 
 /// Abstracts the concept of a "server connection" so that ParaView clients may: 
 /// have more than one connect at a time / open and close connections at-will
-class PQCORE_EXPORT pqServer : public pqServerManagerModelItem 
+class PQCORE_EXPORT pqServer :
+  public pqServerManagerModelItem 
 {
   Q_OBJECT
 
 public:
-  /// Constructs a standalone or "built-in" server connection, returns NULL on failure
-  static pqServer* CreateStandalone();
-  /// Constructs a server connection to a remote host, returns NULL on failure
-  static pqServer* CreateConnection(const char* const hostName, const int portNumber);
-  static pqServer* CreateConnection(const char* const ds_hostName, const int ds_portNumber,
-    const char* const rs_hostName, const int rs_portNumber);
-
+  /// Creates a new connection to the given server.  \sa pqServerResource, pqServerResources
+  static pqServer* Create(const pqServerResource& Resource);
+  
   // Use this method to disconnect a server. On calling this method,
   // the server instance will be deleted.
   static void disconnect(pqServer* server);
@@ -66,13 +63,6 @@ public:
 public:  
   pqServer(vtkIdType connectionId, vtkPVOptions*, QObject* parent = NULL);
   virtual ~pqServer();
-
-  /// getAddress() will start reporting the correct address once, there is a separate 
-  /// vtkPVOptions per connection, until then, avoid using it.
-  QString getAddress() const;
-
-  const QString& getFriendlyName() const {return this->FriendlyName;}
-  void setFriendlyName(const QString& name);
 
   /// Returns the multi view manager proxy for this connection.
   vtkSMMultiViewRenderModuleProxy* GetRenderModule();
@@ -82,27 +72,25 @@ public:
   /// to remove it.
   vtkSMRenderModuleProxy* newRenderModule();
 
-  vtkIdType GetConnectionID() { return this->ConnectionID; }
+  const pqServerResource& getResource();
+  vtkIdType GetConnectionID();
 
   // Return the number of data server partitions on this 
   // server connection. A convenience method.
   int getNumberOfPartitions();
 
-signals:
-  void friendlyNameChanged();
-
 protected:
-
   /// Creates vtkSMMultiViewRenderModuleProxy for this connection and 
   /// initializes it to create render modules of correct type 
   /// depending upon the connection.
   void CreateRenderModule();
+  
 private:
   pqServer(const pqServer&);  // Not implemented.
   pqServer& operator=(const pqServer&); // Not implemented.
 
+  pqServerResource Resource;
   vtkIdType ConnectionID;
-  QString FriendlyName;
   vtkSmartPointer<vtkSMMultiViewRenderModuleProxy> RenderModule;
   // TODO:
   // Each connection will eventually have a PVOptions object. 
@@ -111,4 +99,3 @@ private:
 };
 
 #endif // !_pqServer_h
-

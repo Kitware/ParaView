@@ -24,7 +24,7 @@ public:
   MainWindow()
   {
     // automatically make a server connection
-    pqServer* server = pqServer::CreateStandalone();
+    pqServer* server = pqServer::Create(pqServerResource("builtin:"));
     pqApplicationCore* core = pqApplicationCore::instance();
     pqPipelineBuilder* pb = core->getPipelineBuilder();
     

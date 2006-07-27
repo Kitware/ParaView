@@ -328,11 +328,6 @@ void pqServerManagerModel::onAddServer(pqServer* server)
 
   this->Internal->Servers.push_back(server);
 
-  // Listen for server name changes. The signal will be mapped to the
-  // name change signal.
-  QObject::connect(server, SIGNAL(friendlyNameChanged()),
-      this, SLOT(updateServerName()));
-
   emit this->serverAdded(server);
 }
 

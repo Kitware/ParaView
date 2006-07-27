@@ -32,21 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pqSettings.h>
 
 //-----------------------------------------------------------------------------
-pqSettings::pqSettings(const QString& organization, const QString& application)
-  : QSettings(organization, application)
+pqSettings::pqSettings(const QString& organization, const QString& application) :
+  QSettings(organization, application)
 {
 }
-
-//-----------------------------------------------------------------------------
-QStringList pqSettings::recentFilesList() const
-{
-  return this->value(QLatin1String("recentFilesList")).toStringList();
-}
-
-//-----------------------------------------------------------------------------
-void pqSettings::setRecentFilesList(const QStringList &sl)
-{
-  this->setValue(QLatin1String("recentFilesList"), sl);
-}
-
-

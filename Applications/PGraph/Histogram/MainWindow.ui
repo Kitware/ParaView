@@ -16,7 +16,7 @@
    <string>MainWindow</string>
   </property>
   <property name="windowIcon" >
-   <iconset resource="../../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqAppIcon64.png</iconset>
+   <iconset/>
   </property>
   <property name="toolButtonStyle" >
    <enum>Qt::ToolButtonIconOnly</enum>
@@ -87,6 +87,12 @@
     <addaction name="separator" />
     <addaction name="actionToolsPythonShell" />
    </widget>
+   <widget class="QMenu" name="menuHelp" >
+    <property name="title" >
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionHelpEnableTooltips" />
+   </widget>
    <widget class="QMenu" name="menuFile" >
     <property name="title" >
      <string>&amp;File</string>
@@ -98,7 +104,6 @@
     </widget>
     <addaction name="actionFileNew" />
     <addaction name="actionFileOpen" />
-    <addaction name="menuRecentFiles" />
     <addaction name="separator" />
     <addaction name="actionFileLoadServerState" />
     <addaction name="actionFileSaveServerState" />
@@ -108,12 +113,6 @@
     <addaction name="actionFileSaveAnimation" />
     <addaction name="separator" />
     <addaction name="actionFileExit" />
-   </widget>
-   <widget class="QMenu" name="menuHelp" >
-    <property name="title" >
-     <string>&amp;Help</string>
-    </property>
-    <addaction name="actionHelpEnableTooltips" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -283,7 +282,7 @@
   </action>
   <action name="actionVCRPreviousFrame" >
    <property name="icon" >
-    <iconset resource="../../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqVcrBack22.png</iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>Previous Frame</string>
@@ -291,7 +290,7 @@
   </action>
   <action name="actionVCRFirstFrame" >
    <property name="icon" >
-    <iconset resource="../../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqVcrFirst22.png</iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>First Frame</string>
@@ -299,7 +298,7 @@
   </action>
   <action name="actionVCRNextFrame" >
    <property name="icon" >
-    <iconset resource="../../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqVcrForward22.png</iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>Next Frame</string>
@@ -307,7 +306,7 @@
   </action>
   <action name="actionVCRLastFrame" >
    <property name="icon" >
-    <iconset resource="../../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqVcrLast22.png</iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>Last Frame</string>
@@ -344,7 +343,7 @@
   </action>
   <action name="actionMoveMode" >
    <property name="icon" >
-    <iconset resource="../../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqMouseMove15.png</iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>Move Mode</string>
@@ -352,7 +351,7 @@
   </action>
   <action name="actionSelectionMode" >
    <property name="icon" >
-    <iconset resource="../../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqMouseSelect15.png</iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>Selection Mode</string>
@@ -363,7 +362,7 @@
     <bool>false</bool>
    </property>
    <property name="icon" >
-    <iconset resource="../../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqUndo22.png</iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>&amp;Undo</string>
@@ -374,7 +373,7 @@
   </action>
   <action name="actionEditRedo" >
    <property name="icon" >
-    <iconset resource="../../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqRedo22.png</iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>&amp;Redo</string>
@@ -385,7 +384,7 @@
   </action>
   <action name="actionEditCameraUndo" >
    <property name="icon" >
-    <iconset resource="../../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqUndo22.png</iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>Camera Undo</string>
@@ -396,7 +395,7 @@
   </action>
   <action name="actionEditCameraRedo" >
    <property name="icon" >
-    <iconset resource="../../../GUI/Client/Widgets/pqResources.qrc" >:/pqWidgets/pqRedo22.png</iconset>
+    <iconset/>
    </property>
    <property name="text" >
     <string>Camera Redo</string>

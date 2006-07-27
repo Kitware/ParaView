@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqSettings.h
+   Module:    pqRecentFilesMenu.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -30,26 +30,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqSettings.h
-///
-/// \date 1/19/2006
+#ifndef _pqRecentFilesMenu_h
+#define _pqRecentFilesMenu_h
 
-#ifndef _pqSettings_h
-#define _pqSettings_h
+#include "pqComponentsExport.h"
 
+#include <QObject>
 
-#include "pqCoreExport.h"
-#include <QSettings>
-#include <QStringList>
+class QAction;
+class QMenu;
 
-class PQCORE_EXPORT pqSettings :
-  public QSettings
+/** Displays a collection of recently-used files (server resources)
+as a menu, sorted in most-recently-used order and grouped by server */
+class PQCOMPONENTS_EXPORT pqRecentFilesMenu :
+  public QObject
 {
   Q_OBJECT
 
 public:
-  pqSettings(const QString& organization, const QString& application);
+  /// Assigns the menu that will display the list of files
+  pqRecentFilesMenu(QMenu& menu);
+
+private slots:
+  void onResourcesChanged();
+  void onOpenResource(QAction*);
+  void onUpdateResources();
+
+private:
+  ~pqRecentFilesMenu();
+  pqRecentFilesMenu(const pqRecentFilesMenu&);
+  pqRecentFilesMenu& operator=(const pqRecentFilesMenu&);
+
+  class pqImplementation;
+  pqImplementation* const Implementation;  
 };
 
-#endif
-
+#endif // !_pqRecentFilesMenu_h

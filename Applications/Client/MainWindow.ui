@@ -27,19 +27,10 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>980</width>
-     <height>19</height>
+     <width>920</width>
+     <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuHelp" >
-    <property name="title" >
-     <string>&amp;Help</string>
-    </property>
-    <addaction name="actionHelpAbout" />
-    <addaction name="actionHelpHelp" />
-    <addaction name="separator" />
-    <addaction name="actionHelpEnableTooltips" />
-   </widget>
    <widget class="QMenu" name="menuServer" >
     <property name="title" >
      <string>&amp;Server</string>
@@ -51,20 +42,6 @@
     <property name="title" >
      <string>S&amp;ources</string>
     </property>
-   </widget>
-   <widget class="QMenu" name="menuTools" >
-    <property name="title" >
-     <string>&amp;Tools</string>
-    </property>
-    <addaction name="actionToolsCreateCustomFilter" />
-    <addaction name="actionToolsManageCustomFilters" />
-    <addaction name="separator" />
-    <addaction name="actionToolsDumpWidgetNames" />
-    <addaction name="actionToolsRecordTest" />
-    <addaction name="actionToolsRecordTestScreenshot" />
-    <addaction name="actionToolsPlayTest" />
-    <addaction name="separator" />
-    <addaction name="actionToolsPythonShell" />
    </widget>
    <widget class="QMenu" name="menuView" >
     <property name="title" >
@@ -119,6 +96,29 @@
      <string>&amp;Pipeline</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuHelp" >
+    <property name="title" >
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionHelpAbout" />
+    <addaction name="actionHelpHelp" />
+    <addaction name="separator" />
+    <addaction name="actionHelpEnableTooltips" />
+   </widget>
+   <widget class="QMenu" name="menuTools" >
+    <property name="title" >
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="actionToolsCreateCustomFilter" />
+    <addaction name="actionToolsManageCustomFilters" />
+    <addaction name="separator" />
+    <addaction name="actionToolsDumpWidgetNames" />
+    <addaction name="actionToolsRecordTest" />
+    <addaction name="actionToolsRecordTestScreenshot" />
+    <addaction name="actionToolsPlayTest" />
+    <addaction name="separator" />
+    <addaction name="actionToolsPythonShell" />
+   </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
    <addaction name="menuView" />
@@ -128,22 +128,13 @@
    <addaction name="menuTools" />
    <addaction name="menuHelp" />
   </widget>
-  <widget class="QStatusBar" name="statusbar" >
-   <property name="geometry" >
-    <rect>
-     <x>0</x>
-     <y>716</y>
-     <width>980</width>
-     <height>19</height>
-    </rect>
-   </property>
-  </widget>
+  <widget class="QStatusBar" name="statusbar" />
   <widget class="QDockWidget" name="pipelineBrowserDock" >
-   <property name="windowTitle" >
-    <string>Pipeline Browser</string>
-   </property>
    <property name="allowedAreas" >
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Pipeline Browser</string>
    </property>
    <attribute name="dockWidgetArea" >
     <number>1</number>
@@ -158,11 +149,11 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="objectInspectorDock" >
-   <property name="windowTitle" >
-    <string>Object Inspector</string>
-   </property>
    <property name="allowedAreas" >
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Object Inspector</string>
    </property>
    <attribute name="dockWidgetArea" >
     <number>1</number>
@@ -170,11 +161,11 @@
    <widget class="QWidget" name="dockWidgetContents_3" />
   </widget>
   <widget class="QDockWidget" name="statisticsViewDock" >
-   <property name="windowTitle" >
-    <string>Statistics View</string>
-   </property>
    <property name="allowedAreas" >
     <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Statistics View</string>
    </property>
    <attribute name="dockWidgetArea" >
     <number>8</number>
@@ -182,11 +173,11 @@
    <widget class="QWidget" name="dockWidgetContents_4" />
   </widget>
   <widget class="QDockWidget" name="elementInspectorDock" >
-   <property name="windowTitle" >
-    <string>Element Inspector</string>
-   </property>
    <property name="allowedAreas" >
     <set>Qt::BottomDockWidgetArea|Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle" >
+    <string>Element Inspector</string>
    </property>
    <attribute name="dockWidgetArea" >
     <number>8</number>

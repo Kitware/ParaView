@@ -67,6 +67,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServerManagerModel.h"
 #include "pqServerManagerObserver.h"
 #include "pqServerManagerSelectionModel.h"
+#include "pqServerResources.h"
 #include "pqSettings.h"
 #include "pqSMAdaptor.h"
 #include "pqUndoStack.h"
@@ -88,6 +89,7 @@ public:
 
   QString OrganizationName;
   QString ApplicationName;
+  QPointer<pqServerResources> ServerResources;
   QPointer<pqSettings> Settings;
 };
 
@@ -331,6 +333,16 @@ void pqApplicationCore::loadState(vtkPVXMLElement* rootElement,
     }
   // Clear undo stack.
   this->Internal->UndoStack->Clear();
+}
+
+pqServerResources& pqApplicationCore::serverResources()
+{
+  if(!this->Internal->ServerResources)
+    {
+    this->Internal->ServerResources = new pqServerResources();
+    }
+    
+  return *this->Internal->ServerResources;
 }
 
 //-----------------------------------------------------------------------------

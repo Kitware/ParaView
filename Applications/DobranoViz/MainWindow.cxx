@@ -84,9 +84,6 @@ MainWindow::MainWindow() :
     this->Implementation->UI.actionFileOpen,
     SLOT(setEnabled(bool)));
 
-  this->Implementation->Core.setRecentFilesMenu(
-    this->Implementation->UI.menuRecentFiles);
-
   connect(this->Implementation->UI.actionFileLoadServerState,
     SIGNAL(triggered()), &this->Implementation->Core, SLOT(onFileLoadServerState()));
   connect(
