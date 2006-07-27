@@ -94,7 +94,7 @@ void pqRecentFilesMenu::onResourcesChanged()
     {
     const pqServerResource& server = servers[i];
     
-    QString label = server.scheme() == "builtin" ? "builtin" : server.toString();
+    QString label = server.scheme() == "builtin" ? "builtin" : server.host();
     
     QAction* const action = new QAction(label, &this->Implementation->Menu);
     action->setData(server.toString());
