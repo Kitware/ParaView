@@ -822,6 +822,20 @@ This filter only operates on unstructured data. It produces polygonal output.
         repeat_command="1"
         number_of_elements_per_command="1"
         number_of_elements="1" /> 
+
+     <DoubleVectorProperty
+        name="VolumeFractionSurfaceValue"
+        command="SetVolumeFractionSurfaceValue"
+        number_of_elements="1"
+        default_values="0.49" >
+     </DoubleVectorProperty>
+     <IntVectorProperty 
+        name="OverwriteVolumeFractionSurfaceValue" 
+        command="SetOverwriteVolumeFractionSurfaceValue" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
    <!-- End CTHPart -->
    </SourceProxy>
 #endif

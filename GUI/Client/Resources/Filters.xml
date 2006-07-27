@@ -472,6 +472,15 @@ This feature is nice for debugging output.)" />
                   trace_name="ArraySelection"
                   property="AddVolumeArrayName"
                   help="Select the volume fraction arrays for generating parts."/>
+    <VectorEntry label="Volume Fraction Value"
+           trace_name="VolumeFractionSurfaceValue"
+           property="VolumeFractionSurfaceValue"
+           help="The volume fraction value for the surface."
+           type="float"/>
+    <LabeledToggle label="Use Volume Fraction Value"
+                   trace_name="OverwriteVolumeFractionSurfaceValue"
+                   property="OverwriteVolumeFractionSurfaceValue"
+                   help="If checked, the specified volume fraction surface value will be used." />
     <SelectWidget property="ClipPlane"
                   trace_name="Clipping" label="Clip Plane">
       <Item label="Off" value="Off">
