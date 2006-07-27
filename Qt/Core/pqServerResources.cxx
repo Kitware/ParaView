@@ -44,7 +44,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqServerResources::pqImplementation
 {
 public:
-  vtkstd::vector<pqServerResource> Resources;
+  typedef vtkstd::vector<pqServerResource> ResourcesT;
+  ResourcesT Resources;
+};
+
+class pqServerResources::pqMatchHostPath
+{
+public:
+  pqMatchHostPath(const pqServerResource& resource) :
+    Resource(resource)
+  {
+  }
+
+  bool operator()(const pqServerResource& rhs) const
+  {
+    return
+      this->Resource.host() == rhs.host()
+      && this->Resource.dataServerHost() == rhs.dataServerHost()
+      && this->Resource.renderServerHost() == rhs.renderServerHost()
+      && this->Resource.path() == rhs.path();
+  }
+  
+private:
+  const pqServerResource& Resource;
 };
 
 pqServerResources::pqServerResources() :
@@ -68,8 +90,14 @@ pqServerResources::~pqServerResources()
 
 void pqServerResources::add(const pqServerResource& resource)
 {
+  // Remove any existing resources that match the resource we're about to add ...
+  // Note: we consider a resource a "match" if it has the same host(s) and path;
+  // we ignore scheme and port(s)
   this->Implementation->Resources.erase(
-    vtkstd::remove(this->Implementation->Resources.begin(), this->Implementation->Resources.end(), resource),
+    vtkstd::remove_if(
+      this->Implementation->Resources.begin(),
+      this->Implementation->Resources.end(),
+      pqMatchHostPath(resource)),
     this->Implementation->Resources.end());
     
   this->Implementation->Resources.insert(this->Implementation->Resources.begin(), resource);
@@ -99,7 +127,7 @@ void pqServerResources::save()
 {
   QStringList resources;
   for(
-      vtkstd::vector<pqServerResource>::const_iterator resource = this->Implementation->Resources.begin();
+      pqImplementation::ResourcesT::const_iterator resource = this->Implementation->Resources.begin();
       resource != this->Implementation->Resources.end();
       ++resource)
     {

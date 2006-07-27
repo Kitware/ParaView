@@ -83,6 +83,8 @@ private:
   
   class pqImplementation;
   pqImplementation* const Implementation;
+  
+  class pqMatchHostPath;
 };
 
 #endif
