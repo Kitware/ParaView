@@ -27,6 +27,10 @@ SET(QtChart_SRCS
   pqChartZoomPan.h
   pqChartZoomPanAlt.cxx
   pqChartZoomPanAlt.h
+  pqColorMapColorChanger.cxx
+  pqColorMapColorChanger.h
+  pqColorMapWidget.cxx
+  pqColorMapWidget.h
   pqHistogramChart.cxx
   pqHistogramChart.h
   pqHistogramColor.cxx
@@ -45,6 +49,8 @@ SET(QtChart_SRCS
   pqLinePlot.h
   pqMarkerPen.cxx
   pqMarkerPen.h
+  pqPixelTransferFunction.cxx
+  pqPixelTransferFunction.h
   pqScatterPlot.cxx
   pqScatterPlot.h
   QtChartExport.h
@@ -61,6 +67,8 @@ QT4_WRAP_CPP(QtChart_MOC_SRCS
   pqChartLegend.h
   pqChartZoomPan.h
   pqChartZoomPanAlt.h
+  pqColorMapColorChanger.h
+  pqColorMapWidget.h
   pqHistogramChart.h
   pqHistogramWidget.h
   pqLineChart.h
@@ -93,6 +101,16 @@ ADD_LIBRARY(QtChart
 
 TARGET_LINK_LIBRARIES(QtChart
   QtWidgets
+  ${QT_LIBRARIES}
+)
+
+
+ADD_EXECUTABLE(ChartTest
+  ChartTest.cxx
+)
+
+TARGET_LINK_LIBRARIES(ChartTest
+  QtChart
   ${QT_LIBRARIES}
 )
 

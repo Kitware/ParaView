@@ -462,3 +462,38 @@ void pqCircleMarkerPen::drawMarker(QPainter& painter)
 {
   painter.drawEllipse(this->Rect);
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// pqDiamondMarkerPen
+
+pqDiamondMarkerPen::pqDiamondMarkerPen(const QPen& pen, const QSize& size, const QPen& outline, const QBrush& interior, unsigned int marker_interval) :
+  pqMarkerPen(pen, marker_interval),
+  Diamond(),
+  Outline(outline),
+  Interior(interior)
+{
+  // Set up the diamond polygon to fit in the given rectangle.
+  int halfHeight = size.height() / 2;
+  int halfWidth = size.width() / 2;
+  this->Diamond.append(QPointF(0, -halfHeight));
+  this->Diamond.append(QPointF(halfWidth, 0));
+  this->Diamond.append(QPointF(0, halfHeight));
+  this->Diamond.append(QPointF(-halfWidth, 0));
+  this->Diamond.append(QPointF(0, -halfHeight));
+}
+
+void pqDiamondMarkerPen::setInterior(const QBrush& interior)
+{
+  this->Interior = interior;
+}
+
+void pqDiamondMarkerPen::setupPainter(QPainter& painter)
+{
+  painter.setPen(this->Outline);
+  painter.setBrush(this->Interior);
+}
+
+void pqDiamondMarkerPen::drawMarker(QPainter& painter)
+{
+  painter.drawPolygon(this->Diamond);
+}

@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QBrush>
 #include <QPen>
 #include <QRect>
+#include <QPolygonF>
 
 class QLine;
 class QLineF;
@@ -45,7 +46,6 @@ class QPainter;
 class QPoint;
 class QPointF;
 class QPolygon;
-class QPolygonF;
 class QSize;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -237,6 +237,28 @@ private:
   const QRectF Rect;
   const QPen Outline;
   const QBrush Interior;
+};
+
+//////////////////////////////////////////////////////////////////////////////
+// pqDiamondMarkerPen
+
+/// Concrete implementation of pqMarkerPen that draws diamonds as markers
+class QTCHART_EXPORT pqDiamondMarkerPen :
+  public pqMarkerPen
+{
+public:
+  pqDiamondMarkerPen(const QPen& pen, const QSize& size, const QPen& outline,
+    const QBrush& interior, unsigned int marker_interval = 1);
+
+  void setInterior(const QBrush& interior);
+  
+private:
+  void setupPainter(QPainter& painter);
+  void drawMarker(QPainter& painter);
+  
+  QPolygonF Diamond;
+  const QPen Outline;
+  QBrush Interior;
 };
 
 #endif
