@@ -32,7 +32,7 @@
 #include "vtkSmartPointer.h"
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkVolumeSelector, "1.1");
+vtkCxxRevisionMacro(vtkVolumeSelector, "1.2");
 vtkStandardNewMacro(vtkVolumeSelector);
 
 vtkCxxSetObjectMacro(vtkVolumeSelector, Selection, vtkSelection);
@@ -250,5 +250,14 @@ void vtkVolumeSelector::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "AtomExtractor: " << this->AtomExtractor << endl;
+  os << indent << "Selection: ";
+  if (this->Selection)
+    {
+    this->Selection->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }
 
