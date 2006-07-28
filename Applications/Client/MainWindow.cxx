@@ -160,6 +160,9 @@ MainWindow::MainWindow() :
     SIGNAL(CanUndoChanged(bool)), this->Implementation->UI.actionEditUndo, SLOT(setEnabled(bool)));
   connect(pqApplicationCore::instance()->getUndoStack(),
     SIGNAL(UndoLabelChanged(const QString&)), this, SLOT(onUndoLabel(const QString&)));
+
+  connect(this->Implementation->UI.actionEditSettings,
+    SIGNAL(triggered()), &this->Implementation->Core, SLOT(onEditSettings()));
     
   connect(this->Implementation->UI.actionEditRedo,
     SIGNAL(triggered()), pqApplicationCore::instance()->getUndoStack(), SLOT(Redo()));

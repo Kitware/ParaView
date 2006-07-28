@@ -28,41 +28,13 @@
      <x>0</x>
      <y>0</y>
      <width>920</width>
-     <height>21</height>
+     <height>27</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuServer" >
-    <property name="title" >
-     <string>&amp;Server</string>
-    </property>
-    <addaction name="actionServerConnect" />
-    <addaction name="actionServerDisconnect" />
-   </widget>
    <widget class="QMenu" name="menuSources" >
     <property name="title" >
      <string>S&amp;ources</string>
     </property>
-   </widget>
-   <widget class="QMenu" name="menuView" >
-    <property name="title" >
-     <string>&amp;View</string>
-    </property>
-    <widget class="QMenu" name="menuToolbars" >
-     <property name="title" >
-      <string>Toolbars</string>
-     </property>
-    </widget>
-    <addaction name="menuToolbars" />
-   </widget>
-   <widget class="QMenu" name="menuEdit" >
-    <property name="title" >
-     <string>&amp;Edit</string>
-    </property>
-    <addaction name="actionEditUndo" />
-    <addaction name="actionEditRedo" />
-    <addaction name="separator" />
-    <addaction name="actionEditCameraUndo" />
-    <addaction name="actionEditCameraRedo" />
    </widget>
    <widget class="QMenu" name="menuFile" >
     <property name="title" >
@@ -118,6 +90,36 @@
     <addaction name="actionToolsPlayTest" />
     <addaction name="separator" />
     <addaction name="actionToolsPythonShell" />
+   </widget>
+   <widget class="QMenu" name="menuView" >
+    <property name="title" >
+     <string>&amp;View</string>
+    </property>
+    <widget class="QMenu" name="menuToolbars" >
+     <property name="title" >
+      <string>Toolbars</string>
+     </property>
+    </widget>
+    <addaction name="menuToolbars" />
+   </widget>
+   <widget class="QMenu" name="menuServer" >
+    <property name="title" >
+     <string>&amp;Server</string>
+    </property>
+    <addaction name="actionServerConnect" />
+    <addaction name="actionServerDisconnect" />
+   </widget>
+   <widget class="QMenu" name="menuEdit" >
+    <property name="title" >
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="actionEditUndo" />
+    <addaction name="actionEditRedo" />
+    <addaction name="separator" />
+    <addaction name="actionEditCameraUndo" />
+    <addaction name="actionEditCameraRedo" />
+    <addaction name="separator" />
+    <addaction name="actionEditSettings" />
    </widget>
    <addaction name="menuFile" />
    <addaction name="menuEdit" />
@@ -582,6 +584,11 @@
   <action name="actionToolsPlayTest" >
    <property name="text" >
     <string>Play Test</string>
+   </property>
+  </action>
+  <action name="actionEditSettings" >
+   <property name="text" >
+    <string>&amp;Settings</string>
    </property>
   </action>
  </widget>
