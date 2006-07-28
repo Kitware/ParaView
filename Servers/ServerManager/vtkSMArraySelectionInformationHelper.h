@@ -12,7 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMArraySelectionInformationHelper - populates vtkSMStringVectorProperty using a vtkPVServerArraySelection
+// .NAME vtkSMArraySelectionInformationHelper - populates 
+// vtkSMStringVectorProperty using a vtkPVServerArraySelection
 // .SECTION Description
 // vtkSMArraySelectionInformationHelper only works with 
 // vtkSMStringVectorProperties. It populates the property using the server 
