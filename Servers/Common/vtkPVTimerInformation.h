@@ -47,7 +47,7 @@ public:
   
   // Description: 
   // Serialize objects to/from a stream object.
-  virtual void CopyToStream(vtkClientServerStream*) const;
+  virtual void CopyToStream(vtkClientServerStream*);
   virtual void CopyFromStream(const vtkClientServerStream* css);
 protected:
   vtkPVTimerInformation();

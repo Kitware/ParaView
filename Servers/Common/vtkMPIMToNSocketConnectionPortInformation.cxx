@@ -34,7 +34,7 @@ public:
 
 
 vtkStandardNewMacro(vtkMPIMToNSocketConnectionPortInformation);
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnectionPortInformation, "1.1");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnectionPortInformation, "1.2");
 
 //----------------------------------------------------------------------------
 vtkMPIMToNSocketConnectionPortInformation::vtkMPIMToNSocketConnectionPortInformation()
@@ -128,7 +128,7 @@ void vtkMPIMToNSocketConnectionPortInformation::AddInformation(vtkPVInformation*
 
 //----------------------------------------------------------------------------
 void
-vtkMPIMToNSocketConnectionPortInformation::CopyToStream(vtkClientServerStream* css) const
+vtkMPIMToNSocketConnectionPortInformation::CopyToStream(vtkClientServerStream* css)
 {
   css->Reset();
   *css << vtkClientServerStream::Reply 

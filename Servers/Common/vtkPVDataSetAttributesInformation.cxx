@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetAttributesInformation);
-vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.7");
+vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVDataSetAttributesInformation::vtkPVDataSetAttributesInformation()
@@ -411,7 +411,7 @@ vtkPVDataSetAttributesInformation::GetArrayInformation(const char *name) const
 //----------------------------------------------------------------------------
 void
 vtkPVDataSetAttributesInformation
-::CopyToStream(vtkClientServerStream* css) const
+::CopyToStream(vtkClientServerStream* css)
 {
   css->Reset();
   *css << vtkClientServerStream::Reply;

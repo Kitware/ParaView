@@ -23,7 +23,7 @@
 #include "vtkToolkits.h"
 
 vtkStandardNewMacro(vtkPVServerInformation);
-vtkCxxRevisionMacro(vtkPVServerInformation, "1.8");
+vtkCxxRevisionMacro(vtkPVServerInformation, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVServerInformation::vtkPVServerInformation()
@@ -143,7 +143,7 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css) const
+void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css)
 {
   css->Reset();
   *css << vtkClientServerStream::Reply;

@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVClassNameInformation);
-vtkCxxRevisionMacro(vtkPVClassNameInformation, "1.2");
+vtkCxxRevisionMacro(vtkPVClassNameInformation, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVClassNameInformation::vtkPVClassNameInformation()
@@ -64,7 +64,7 @@ void vtkPVClassNameInformation::AddInformation(vtkPVInformation* info)
 
 //----------------------------------------------------------------------------
 void
-vtkPVClassNameInformation::CopyToStream(vtkClientServerStream* css) const
+vtkPVClassNameInformation::CopyToStream(vtkClientServerStream* css)
 {
   css->Reset();
   *css << vtkClientServerStream::Reply << this->VTKClassName

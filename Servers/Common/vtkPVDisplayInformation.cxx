@@ -25,7 +25,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVDisplayInformation);
-vtkCxxRevisionMacro(vtkPVDisplayInformation, "1.2");
+vtkCxxRevisionMacro(vtkPVDisplayInformation, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVDisplayInformation::vtkPVDisplayInformation()
@@ -92,7 +92,7 @@ void vtkPVDisplayInformation::AddInformation(vtkPVInformation* pvi)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayInformation::CopyToStream(vtkClientServerStream* css) const
+void vtkPVDisplayInformation::CopyToStream(vtkClientServerStream* css)
 {
   css->Reset();
   *css << vtkClientServerStream::Reply << this->CanOpenDisplay

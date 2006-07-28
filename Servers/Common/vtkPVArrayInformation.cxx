@@ -19,7 +19,7 @@ cxx     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkPVArrayInformation);
-vtkCxxRevisionMacro(vtkPVArrayInformation, "1.4");
+vtkCxxRevisionMacro(vtkPVArrayInformation, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::vtkPVArrayInformation()
@@ -366,7 +366,7 @@ void vtkPVArrayInformation::AddInformation(vtkPVInformation* info)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArrayInformation::CopyToStream(vtkClientServerStream* css) const
+void vtkPVArrayInformation::CopyToStream(vtkClientServerStream* css)
 {
   css->Reset();
   *css << vtkClientServerStream::Reply;
