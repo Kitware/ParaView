@@ -146,7 +146,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.422");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.423");
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
@@ -747,6 +747,7 @@ void vtkPVRenderView::CreateWidget()
     {
     this->TopLevelRenderWindow->Create();
     this->TopLevelRenderWindow->SetTitle(app->GetName());
+    this->TopLevelRenderWindow->Display();
     }
 
   // Add the -rw argument
