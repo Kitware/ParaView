@@ -62,6 +62,7 @@ SET(Kit_SRCS
   vtkSMInformationHelper.cxx
   vtkSMInputArrayDomain.cxx
   vtkSMInputProperty.cxx
+  vtkSMIntArrayInformationHelper.cxx
   vtkSMIntRangeDomain.cxx
   vtkSMIntVectorProperty.cxx
   vtkSMKeyFrameProxy.cxx
