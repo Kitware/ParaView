@@ -35,7 +35,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.74");
+vtkCxxRevisionMacro(vtkSMProxy, "1.75");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -589,7 +589,7 @@ void vtkSMProxy::AddPropertyToSelf(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxy::UpdateProperty(const char* name)
+void vtkSMProxy::UpdateProperty(const char* name, int force)
 {
   // This will ensure that the SelfID is assigned properly.
   this->GetSelfID();
@@ -610,11 +610,11 @@ void vtkSMProxy::UpdateProperty(const char* name)
     vtkSMProxy * sp = this->GetSubProxy(subproxy_name);
     if (sp)
       {
-      sp->UpdateProperty(property_name);
+      sp->UpdateProperty(property_name, force);
       }
     return;
     }
-  if (it->second.ModifiedFlag)
+  if (it->second.ModifiedFlag || force)
     {
     // In case this property is a self property and causes
     // another UpdateVTKObjects(), make sure that it does
