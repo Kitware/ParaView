@@ -173,8 +173,16 @@ public:
   // Description:
   // Update the value of one property (pushed to the server) if it is
   // modified.  If the object has not been created, it will be created
-  // first.
-  void UpdateProperty(const char* name);
+  // first. If force is true, the property is pushed even if it not
+  // modified.
+  void UpdateProperty(const char* name, int force=0);
+
+  // Description:
+  // Convenience method equivalent to UpdateProperty(name, 1).
+  void InvokeCommand(const char* name)
+    {
+      this->UpdateProperty(name, 1);
+    }
 
   // Description:
   // Calls UpdateVTKObjects() on self and all proxies that depend
