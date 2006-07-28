@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkSMDisplayProxy;
 class vtkSMProxy;
-class vtkSMSourceProxy;
+class vtkSMProxy;
 class pqPipelineSource;
 class pqRenderModule;
 class pqSelectionManagerImplementation;
@@ -53,6 +53,10 @@ public:
   pqSelectionManager(QObject* parent=NULL);
   virtual ~pqSelectionManager();
 
+  /// Returns the mode the manager is in. In SELECT mode, the
+  /// interaction involves drawing a rubber-band. In INTERACT
+  /// mode, the user can interact with the view by rotating, panning
+  // etc.
   int getMode() 
     {
       return this->Mode;
@@ -67,9 +71,14 @@ public:
   friend class vtkPQSelectionObserver;
 
 public slots:
+  /// Change mode to SELECT
   void switchToSelection();
+  /// Change mode to INTERACT
   void switchToInteraction();
+  /// Clear all selections. Note that this does not clear
+  /// the server manager model selection
   void clearSelection();
+  /// Used to keep track of active render module
   void setActiveRenderModule(pqRenderModule*);
 
 private slots:
@@ -83,8 +92,9 @@ private:
   int setInteractorStyleToInteract(pqRenderModule*);
   void processEvents(unsigned long event);
   void updateSelection(int* eventpos, pqRenderModule* rm);
-  vtkSMDisplayProxy* getDisplayProxy(pqRenderModule*, vtkSMSourceProxy*);
-  void createDisplayProxies(vtkSMSourceProxy*);
+  void selectInFrustrum(int* eventpos, pqRenderModule* rm);
+  //vtkSMDisplayProxy* getDisplayProxy(pqRenderModule*, vtkSMProxy*);
+  //void createDisplayProxies(vtkSMProxy*);
 };
 
 
