@@ -20,12 +20,13 @@
 #include "vtkInformationIntegerKey.h"
 #include "vtkInformationObjectBaseKey.h"
 #include "vtkInformationKey.h"
+#include "vtkInstantiator.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkProcessModule.h"
 #include "vtkSelection.h"
 
-vtkCxxRevisionMacro(vtkSelectionSerializer, "1.1");
+vtkCxxRevisionMacro(vtkSelectionSerializer, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSelectionSerializer::vtkSelectionSerializer()
@@ -55,7 +56,6 @@ void vtkSelectionSerializer::PrintXML(
       iter->GoToNextItem())
     {
     vtkInformationKey* key = iter->GetCurrentKey();
-    const char* keyName = key->GetName();
     os << ni 
        << "<Property key=\"" << key->GetName() 
        << "\" value=\"";
@@ -105,14 +105,15 @@ void vtkSelectionSerializerWriteSelectionList(ostream& os, vtkIndent indent,
 void vtkSelectionSerializer::WriteSelectionList(
   ostream& os, vtkIndent indent, vtkSelectionNode* selection)
 {
-  vtkDataArray* selectionList = selection->GetSelectionList();
+  vtkDataArray* selectionList = vtkDataArray::SafeDownCast(
+    selection->GetSelectionList());
   if (selectionList)
     {
     vtkIdType numTuples = selectionList->GetNumberOfTuples();
     vtkIdType numComps  = selectionList->GetNumberOfComponents();
     os << indent 
-       << "<ValueArray type=\""
-       << selectionList->GetDataTypeAsString()
+       << "<SelectionList classname=\""
+       << selectionList->GetClassName()
        << "\" number_of_tuples=\""
        << numTuples
        << "\" number_of_components=\""
@@ -209,6 +210,43 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
           if (elem->GetScalarAttribute("value", &val))
             {
             node->GetProperties()->Set(vtkSelectionNode::PROCESS_ID(), val);
+            }
+          }
+        }
+      }
+    else if (strcmp("SelectionList", name) == 0)
+      {
+      if (elem->GetAttribute("classname"))
+        {
+        vtkDataArray* dataArray = 
+          vtkDataArray::SafeDownCast(
+            vtkInstantiator::CreateInstance(elem->GetAttribute("classname")));
+        if (dataArray)
+          {
+          vtkIdType numTuples;
+          int numComps;
+          if (elem->GetScalarAttribute("number_of_tuples", &numTuples) &&
+              elem->GetScalarAttribute("number_of_components", &numComps))
+            {
+            dataArray->SetNumberOfComponents(numComps);
+            dataArray->SetNumberOfTuples(numTuples);
+            vtkIdType numValues = numTuples*numComps;
+            double* data = new double[numValues];
+            if (elem->GetCharacterDataAsVector(numValues, data))
+              {
+              for (vtkIdType i=0; i<numTuples; i++)
+                {
+                for (int j=0; j<numComps; j++)
+                  {
+                  dataArray->SetComponent(i, j, data[i*numComps+j]);
+                  }
+                }
+              }
+            //for (vtkIdType ii=0; ii<numTuples; ii++)
+            //{
+            //cout << dataArray->GetTuple(ii) << endl;
+            //}
+            delete[] data;
             }
           }
         }
