@@ -65,6 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqWriterFactory.h"
 #include "pqPendingDisplayUndoElement.h"
 #include "pqSMAdaptor.h"
+#include "pqSettingsDialog.h"
 
 #include <pqConnect.h>
 #include <pqEventPlayer.h>
@@ -1347,6 +1348,14 @@ void pqMainWindowCore::onHelpEnableTooltips(bool enabled)
     {
     this->Implementation->ToolTipTrapper = new pqToolTipTrapper();
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqMainWindowCore::onEditSettings()
+{
+  pqSettingsDialog dialog(this->Implementation->Parent);
+  dialog.setRenderModule(this->getActiveRenderModule());
+  dialog.exec();
 }
 
 //-----------------------------------------------------------------------------

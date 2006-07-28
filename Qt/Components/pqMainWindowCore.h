@@ -266,6 +266,9 @@ public slots:
 
   void filtersActivated();
 
+  // Called to show the settings dialog.
+  void onEditSettings();
+
 private slots:
   void onCreateSource(QAction*);
   void onCreateFilter(QAction*);

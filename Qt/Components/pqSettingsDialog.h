@@ -33,16 +33,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __pqSettingsDialog_h
 
 #include <QDialog>
-#include "pqWidgetsExport.h"
+#include "pqComponentsExport.h"
 
 class pqSettingsDialogInternal;
+class pqRenderModule;
 
-class PQWIDGETS_EXPORT pqSettingsDialog : public QDialog
+class PQCOMPONENTS_EXPORT pqSettingsDialog : public QDialog
 {
   Q_OBJECT
 public:
   pqSettingsDialog(QWidget* parent=NULL, Qt::WFlags f=0);
   virtual ~pqSettingsDialog();
+
+public slots:
+  void setRenderModule(pqRenderModule*);
 
 private slots:
   void onFinished(int);

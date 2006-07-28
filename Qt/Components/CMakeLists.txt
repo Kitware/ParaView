@@ -82,7 +82,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqSelectionManager.h
   pqServerBrowser.h
   pqServerFileDialogModel.h
-  #pqSettingsDialog.h
+  pqSettingsDialog.h
   pqSignalAdaptorProxyList.h
   pqSimpleAnimationManager.h
   pqSliderDomain.h
@@ -250,8 +250,8 @@ ADD_LIBRARY(pqComponents
   pqSignalAdaptorProxyList.h
   pqSimpleAnimationManager.cxx
   pqSimpleAnimationManager.h
-  #pqSettingsDialog.cxx
-  #pqSettingsDialog.h
+  pqSettingsDialog.cxx
+  pqSettingsDialog.h
   pqSliderDomain.cxx
   pqSliderDomain.h
   pqSourceHistoryModel.cxx

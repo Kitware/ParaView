@@ -36,9 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSMProxy.h"
 
 // Qt includes.
+#include <QPointer>
 
 // ParaView Client includes.
-#include "pqApplicationCore.h"
 #include "pqRenderModule.h"
 #include "pq3DViewPropertiesWidget.h"
 
@@ -47,6 +47,7 @@ class pqSettingsDialogInternal : public Ui::pqSettingsDialog
 {
 public:
   pq3DViewPropertiesWidget* ViewProperties;
+  QPointer<pqRenderModule> RenderModule;
   pqSettingsDialogInternal()
     {
     this->ViewProperties = 0;
@@ -66,7 +67,6 @@ pqSettingsDialog::pqSettingsDialog(QWidget* _p/*=null*/,
   this->Internal = new pqSettingsDialogInternal;
   this->Internal->setupUi(this);
   this->Internal->ViewProperties = new pq3DViewPropertiesWidget();
-  this->setupGUI();
   
 
   QObject::connect(this, SIGNAL(finished(int)), this, SLOT(onFinished(int)));
@@ -79,13 +79,23 @@ pqSettingsDialog::~pqSettingsDialog()
 }
 
 //-----------------------------------------------------------------------------
+void pqSettingsDialog::setRenderModule(pqRenderModule* ren)
+{
+  this->Internal->RenderModule = ren;
+  this->setupGUI();
+}
+
+//-----------------------------------------------------------------------------
 void pqSettingsDialog::setupGUI()
 {
-  // Add settings tab.
-  this->Internal->ViewProperties->setRenderModule(
-    pqApplicationCore::instance()->getActiveRenderModule()->getProxy());
-  this->Internal->tabWidget->addTab(
-    this->Internal->ViewProperties, "View Properties");
+  if (this->Internal->RenderModule)
+    {
+    // Add settings tab.
+    this->Internal->ViewProperties->setRenderModule(
+      this->Internal->RenderModule->getProxy());
+    this->Internal->tabWidget->addTab(
+      this->Internal->ViewProperties, "Active View Properties");
+    }
 }
 
 //-----------------------------------------------------------------------------
