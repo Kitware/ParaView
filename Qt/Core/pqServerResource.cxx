@@ -189,7 +189,7 @@ pqServerResource::~pqServerResource()
   delete this->Implementation;
 }
 
-QString pqServerResource::toString() const
+const QString pqServerResource::toString() const
 {
   QString result;
   
@@ -242,7 +242,7 @@ QString pqServerResource::toString() const
   return result;
 }
 
-QString pqServerResource::scheme() const
+const QString pqServerResource::scheme() const
 {
   return this->Implementation->Scheme;
 }
@@ -252,7 +252,7 @@ void pqServerResource::setScheme(const QString& rhs)
   this->Implementation->Scheme = rhs;
 }
 
-QString pqServerResource::host() const
+const QString pqServerResource::host() const
 {
   if(this->Implementation->Scheme == "cdsrs" ||
     this->Implementation->Scheme == "cdsrsrc")
@@ -312,7 +312,7 @@ void pqServerResource::setPort(int rhs)
   this->Implementation->Port = rhs;
 }
 
-QString pqServerResource::dataServerHost() const
+const QString pqServerResource::dataServerHost() const
 {
   if(this->Implementation->Scheme != "cdsrs" &&
     this->Implementation->Scheme != "cdsrsrc")
@@ -372,7 +372,7 @@ void pqServerResource::setDataServerPort(int rhs)
   this->Implementation->DataServerPort = rhs;
 }
 
-QString pqServerResource::renderServerHost() const
+const QString pqServerResource::renderServerHost() const
 {
   if(this->Implementation->Scheme != "cdsrs" &&
     this->Implementation->Scheme != "cdsrsrc")
@@ -432,7 +432,7 @@ void pqServerResource::setRenderServerPort(int rhs)
   this->Implementation->RenderServerPort = rhs;
 }
 
-QString pqServerResource::path() const
+const QString pqServerResource::path() const
 {
   return this->Implementation->Path;
 }
@@ -442,7 +442,7 @@ void pqServerResource::setPath(const QString& rhs)
   this->Implementation->Path = rhs;
 }
 
-pqServerResource pqServerResource::sessionServer() const
+const pqServerResource pqServerResource::sessionServer() const
 {
   if(this->Implementation->Scheme != "session")
     {
@@ -462,7 +462,7 @@ void pqServerResource::setSessionServer(const pqServerResource& rhs)
   this->Implementation->SessionServer = rhs.toString();
 }
 
-pqServerResource pqServerResource::server() const
+const pqServerResource pqServerResource::server() const
 {
   if(this->Implementation->Scheme == "builtin")
     {

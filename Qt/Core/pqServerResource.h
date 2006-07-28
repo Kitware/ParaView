@@ -99,17 +99,17 @@ public:
   ~pqServerResource();
 
   /// Returns a compact string representation of the resource in URI format
-  QString toString() const;
+  const QString toString() const;
   
   /** Returns the resource scheme -
   session, cs, csrc, cdsrs, cdsrsrc, or session */
-  QString scheme() const;
+  const QString scheme() const;
   /// Sets the resource scheme
   void setScheme(const QString&);
   
   /** Returns the resource host, or empty string for builtin, session,
   cdsrs, and cdsrsrc schemes */
-  QString host() const;
+  const QString host() const;
   /// Sets the resource host
   void setHost(const QString&);
   
@@ -117,27 +117,27 @@ public:
   int port(int default_port) const;
   void setPort(int);
 
-  QString dataServerHost() const;
+  const QString dataServerHost() const;
   void setDataServerHost(const QString&);
   
   int dataServerPort() const;
   int dataServerPort(int default_port) const;
   void setDataServerPort(int);
   
-  QString renderServerHost() const;
+  const QString renderServerHost() const;
   void setRenderServerHost(const QString&);
     
   int renderServerPort() const;
   int renderServerPort(int default_port) const;
   void setRenderServerPort(int);
     
-  QString path() const;
+  const QString path() const;
   void setPath(const QString&);
 
-  pqServerResource sessionServer() const;
+  const pqServerResource sessionServer() const;
   void setSessionServer(const pqServerResource&);
   
-  pqServerResource server() const;
+  const pqServerResource server() const;
 
   bool operator==(const pqServerResource&) const;
   bool operator!=(const pqServerResource&) const;
