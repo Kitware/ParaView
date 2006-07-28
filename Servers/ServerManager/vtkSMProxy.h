@@ -175,7 +175,11 @@ public:
   // modified.  If the object has not been created, it will be created
   // first. If force is true, the property is pushed even if it not
   // modified.
-  void UpdateProperty(const char* name, int force=0);
+  void UpdateProperty(const char* name)
+    {
+      this->UpdateProperty(name, 0);
+    }
+  void UpdateProperty(const char* name, int force);
 
   // Description:
   // Convenience method equivalent to UpdateProperty(name, 1).
