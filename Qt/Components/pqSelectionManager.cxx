@@ -62,6 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSelection.h"
 #include "vtkSmartPointer.h"
 
+#include <vtkstd/algorithm>
 #include <vtkstd/list>
 #include <vtkstd/map>
 #include <vtkstd/vector>
@@ -165,7 +166,7 @@ void pqSelectionManagerImplementation::traverseSelection(
   if (properties && properties->Has(vtkSelectionNode::PROP_ID()))
     {
     int id = properties->Get(vtkSelectionNode::PROP_ID());
-    if (find(ids.begin(), ids.end(), id) == ids.end())
+    if (vtkstd::find(ids.begin(), ids.end(), id) == ids.end())
       {
       ids.push_back(id);
       }
