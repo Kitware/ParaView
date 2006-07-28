@@ -205,11 +205,7 @@ SET( ParaViewClient_SRCS
   vtkXDMFReaderModule.cxx
   #  vtkPVRenderGroupDialog.cxx
   ${ExtraParaViewClient_SRCS}
-  vtkPVCellSelect.cxx
-  vtkPVPropAndCellSelect.cxx
   )
-
-
 
 INCLUDE_DIRECTORIES(
   ${PVSERVERCOMMON_INCLUDE_DIR}
@@ -233,8 +229,6 @@ IF(BUILD_TESTING)
     vtkKWTesting.cxx
     )
 ENDIF(BUILD_TESTING)
-
-
 
 SET(ParaViewBinary_SRCS ParaView.cxx)
 
