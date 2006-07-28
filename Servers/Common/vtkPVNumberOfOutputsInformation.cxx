@@ -21,7 +21,7 @@
 #include "vtkSource.h"
 
 vtkStandardNewMacro(vtkPVNumberOfOutputsInformation);
-vtkCxxRevisionMacro(vtkPVNumberOfOutputsInformation, "1.4");
+vtkCxxRevisionMacro(vtkPVNumberOfOutputsInformation, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVNumberOfOutputsInformation::vtkPVNumberOfOutputsInformation()
@@ -82,7 +82,7 @@ void vtkPVNumberOfOutputsInformation::AddInformation(vtkPVInformation* info)
 
 //----------------------------------------------------------------------------
 void
-vtkPVNumberOfOutputsInformation::CopyToStream(vtkClientServerStream* css) const
+vtkPVNumberOfOutputsInformation::CopyToStream(vtkClientServerStream* css)
 {
   css->Reset();
   *css << vtkClientServerStream::Reply << this->NumberOfOutputs

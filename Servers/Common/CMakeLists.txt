@@ -30,6 +30,7 @@ SET(Kit_SRCS
   vtkPVOptions.cxx
   vtkPVOptionsXMLParser.cxx
   vtkPVProgressHandler.cxx
+  vtkPVSelectionInformation.cxx
   vtkPVServerInformation.cxx
   vtkPVServerOptions.cxx
   vtkPVServerSocket.cxx
@@ -41,6 +42,7 @@ SET(Kit_SRCS
   vtkProcessModuleConnectionManager.cxx
   vtkProcessModuleGUIHelper.cxx
   vtkRemoteConnection.cxx
+  vtkSelectionSerializer.cxx
   vtkSelfConnection.cxx
   vtkServerConnection.cxx
   vtkStringList.cxx  
@@ -56,6 +58,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVInformation
   vtkProcessModuleConnection
   vtkProcessModuleGUIHelper
+  vtkSelectionSerializer.cxx
   vtkRemoteConnection
   vtkUndoElement
   ABSTRACT
@@ -71,6 +74,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVServerOptions.cxx
   vtkPVServerSocket.cxx
   vtkPVCreateProcessModule
+  vtkSelectionSerializer.cxx
   WRAP_EXCLUDE
   )
 

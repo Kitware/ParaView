@@ -42,7 +42,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.19");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.20");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -785,7 +785,7 @@ int vtkPVDataInformation::DataSetTypeIsA(const char* type)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css) const
+void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css)
 {
   css->Reset();
   *css << vtkClientServerStream::Reply;

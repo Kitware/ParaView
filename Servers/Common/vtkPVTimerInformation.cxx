@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTimerInformation);
-vtkCxxRevisionMacro(vtkPVTimerInformation, "1.2");
+vtkCxxRevisionMacro(vtkPVTimerInformation, "1.3");
 
 
 
@@ -226,7 +226,7 @@ void vtkPVTimerInformation::AddInformation(vtkPVInformation* info)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVTimerInformation::CopyToStream(vtkClientServerStream* css) const
+void vtkPVTimerInformation::CopyToStream(vtkClientServerStream* css)
 { 
   css->Reset();
   *css << vtkClientServerStream::Reply

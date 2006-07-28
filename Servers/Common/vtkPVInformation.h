@@ -40,7 +40,7 @@ public:
   //BTX
   // Description:
   // Manage a serialized version of the information.
-  virtual void CopyToStream(vtkClientServerStream*) const = 0;
+  virtual void CopyToStream(vtkClientServerStream*) = 0;
   virtual void CopyFromStream(const vtkClientServerStream*);
   //ETX
 

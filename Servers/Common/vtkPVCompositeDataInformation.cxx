@@ -24,7 +24,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVCompositeDataInformation);
-vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.5");
+vtkCxxRevisionMacro(vtkPVCompositeDataInformation, "1.6");
 
 struct vtkPVCompositeDataInformationInternals
 {
@@ -206,7 +206,7 @@ void vtkPVCompositeDataInformation::AddInformation(vtkPVInformation* pvi)
 }
 //----------------------------------------------------------------------------
 void vtkPVCompositeDataInformation::CopyToStream(
-  vtkClientServerStream* css) const
+  vtkClientServerStream* css)
 {
   unsigned int i, j;
 
