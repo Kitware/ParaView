@@ -1845,4 +1845,70 @@
     </Proxy>
   </ProxyGroup>
 
+  <ProxyGroup name="selection_helpers">
+    <Proxy name="VolumeSelector" class="vtkVolumeSelector">
+       <Property 
+         name="Initialize" 
+         command="Initialize" >
+       </Property>
+
+       <ProxyProperty 
+         name="DataSets" 
+         command="AddDataSet" 
+         is_internal="1"
+         clean_command="ClearDataSets">
+       </ProxyProperty>
+
+       <ProxyProperty 
+         name="Props" 
+         command="AddProp" 
+         is_internal="1"
+         clean_command="ClearProps">
+       </ProxyProperty>
+
+       <ProxyProperty 
+         name="Selection" 
+         command="SetSelection">
+       </ProxyProperty>
+
+       <IntVectorProperty 
+          name="ExactTest" 
+          command="SetExactTest" 
+          number_of_elements="1"
+          default_values="1" >
+         <EnumerationDomain name="enum">
+           <Entry value="0" text="Off"/>
+           <Entry value="1" text="On"/>
+         </EnumerationDomain>
+       </IntVectorProperty>
+
+       <DoubleVectorProperty
+          name="CreateFrustum"
+          command="CreateFrustum"
+          number_of_elements="32"
+          is_internal="1"
+          argument_is_array="1"
+          default_values=
+          "0.0 0.0 0.0 0.0
+           0.0 0.0 0.0 0.0
+           0.0 0.0 0.0 0.0
+           0.0 0.0 0.0 0.0
+           0.0 0.0 0.0 0.0
+           0.0 0.0 0.0 0.0
+           0.0 0.0 0.0 0.0
+           0.0 0.0 0.0 0.0">
+       </DoubleVectorProperty>
+
+       <Property 
+         name="Select" 
+         command="Select">
+       </Property>
+   <!-- End VolumeSelection -->
+   </Proxy>
+
+    <Proxy name="Selection" class="vtkSelection">
+    </Proxy>
+  </ProxyGroup>
+
+
 </ServerManagerConfiguration>
