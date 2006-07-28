@@ -143,6 +143,7 @@ ENDIF(APPLE)
     Threshold
     UndoRedo
     VariableSelector
+    ViewSettingsDialog
     )
 
   SET (TESTS_WITHOUT_BASELINES

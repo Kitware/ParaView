@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<pqevents>
+  <pqevent object="MainWindow/menubar/menuSources" command="activate" arguments="Sphere" />
+  <pqevent object="MainWindow/ServerBrowser/layoutWidget_3/OK" command="activate" arguments="" />
+  <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/menubar/menuFilters/Released" command="activate" arguments="Clip" />
+  <pqevent object="MainWindow/objectInspectorDock/objectInspector/Accept" command="activate" arguments="" />
+  <pqevent object="MainWindow/menubar/menuEdit" command="activate" arguments="actionEditSettings" />
+  <pqevent object="MainWindow/pqSettingsDialog/tabWidget/1QStackedWidget0/pq3DViewProperties/groupBox_2/parallelProjection" command="set_boolean" arguments="true" />
+  <pqevent object="MainWindow/pqSettingsDialog/okButton" command="activate" arguments="" />
+</pqevents>
