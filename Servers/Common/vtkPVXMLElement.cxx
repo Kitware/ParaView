@@ -16,7 +16,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.10");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.11");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 #include <vtkstd/string>
@@ -432,5 +432,31 @@ int vtkPVXMLElement::GetVectorAttribute(const char* name, int length,
                                         vtkIdType* data)
 {
   return vtkPVXMLVectorAttributeParse(this->GetAttribute(name), length, data);
+}
+#endif
+
+//----------------------------------------------------------------------------
+int vtkPVXMLElement::GetCharacterDataAsVector(int length, int* data)
+{
+  return vtkPVXMLVectorAttributeParse(this->GetCharacterData(), length, data);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVXMLElement::GetCharacterDataAsVector(int length, float* data)
+{
+  return vtkPVXMLVectorAttributeParse(this->GetCharacterData(), length, data);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVXMLElement::GetCharacterDataAsVector(int length, double* data)
+{
+  return vtkPVXMLVectorAttributeParse(this->GetCharacterData(), length, data);
+}
+
+#if defined(VTK_USE_64BIT_IDS)
+//----------------------------------------------------------------------------
+int vtkPVXMLElement::GetCharacterDataAsVector(int length, vtkIdType* data)
+{
+  return vtkPVXMLVectorAttributeParse(this->GetCharacterData(), length, data);
 }
 #endif

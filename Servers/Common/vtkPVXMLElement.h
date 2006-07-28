@@ -55,7 +55,7 @@ public:
   const char* GetCharacterData();
 
   // Description:
-  // Get the attribute with the given name and converted to a scalar
+  // Get the attribute with the given name converted to a scalar
   // value.  Returns whether value was extracted.
   int GetScalarAttribute(const char* name, int* value);
   int GetScalarAttribute(const char* name, float* value);
@@ -65,13 +65,23 @@ public:
 #endif
 
   // Description:
-  // Get the attribute with the given name and converted to a scalar
+  // Get the attribute with the given name converted to a scalar
   // value.  Returns length of vector read.
   int GetVectorAttribute(const char* name, int length, int* value);
   int GetVectorAttribute(const char* name, int length, float* value);
   int GetVectorAttribute(const char* name, int length, double* value);
 #if defined(VTK_USE_64BIT_IDS)
   int GetVectorAttribute(const char* name, int length, vtkIdType* value);
+#endif
+
+  // Description:
+  // Get the character data converted to a scalar
+  // value.  Returns length of vector read.
+  int GetCharacterDataAsVector(int length, int* value);
+  int GetCharacterDataAsVector(int length, float* value);
+  int GetCharacterDataAsVector(int length, double* value);
+#if defined(VTK_USE_64BIT_IDS)
+  int GetCharacterDataAsVector(int length, vtkIdType* value);
 #endif
 
   // Description:
