@@ -26,7 +26,7 @@
 #include "vtkProcessModule.h"
 #include "vtkSelection.h"
 
-vtkCxxRevisionMacro(vtkSelectionSerializer, "1.2");
+vtkCxxRevisionMacro(vtkSelectionSerializer, "1.3");
 
 //----------------------------------------------------------------------------
 vtkSelectionSerializer::vtkSelectionSerializer()
@@ -234,18 +234,14 @@ void vtkSelectionSerializer::ParseNode(vtkPVXMLElement* nodeXML,
             double* data = new double[numValues];
             if (elem->GetCharacterDataAsVector(numValues, data))
               {
-              for (vtkIdType i=0; i<numTuples; i++)
+              for (vtkIdType i2=0; i2<numTuples; i2++)
                 {
                 for (int j=0; j<numComps; j++)
                   {
-                  dataArray->SetComponent(i, j, data[i*numComps+j]);
+                  dataArray->SetComponent(i2, j, data[i2*numComps+j]);
                   }
                 }
               }
-            //for (vtkIdType ii=0; ii<numTuples; ii++)
-            //{
-            //cout << dataArray->GetTuple(ii) << endl;
-            //}
             delete[] data;
             }
           }
