@@ -39,9 +39,11 @@ import os
 if os.name == "posix":
   from libvtkPVServerCommonPython import *
   from libvtkPVServerManagerPython import *
+  from libvtkCommonPython import *
 else:
   from vtkPVServerCommonPython import *
   from vtkPVServerManagerPython import *
+  from vtkCommonPython import *
 
 class pyProxy:
     """

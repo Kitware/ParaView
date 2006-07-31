@@ -80,6 +80,43 @@
     "${VTK_SOURCE_DIR}/Common/vtkObjectBase.cxx"
     "${VTK_SOURCE_DIR}/Common/vtkTimerLog.cxx"
     "${VTK_SOURCE_DIR}/IO/vtkXMLParser.cxx"
+    "${VTK_SOURCE_DIR}/Common/vtkAbstractArray.cxx"
+    "${VTK_SOURCE_DIR}/Common/vtkDataArray.cxx"
+    "${VTK_SOURCE_DIR}/Common/vtkStringArray.cxx"
+# "${VTK_SOURCE_DIR}/Common/vtk__Int64Array.cxx"
+    "${VTK_SOURCE_DIR}/Common/vtkBitArray.cxx"
+    "${VTK_SOURCE_DIR}/Common/vtkCharArray.cxx"
+    "${VTK_SOURCE_DIR}/Common/vtkDoubleArray.cxx"
+    "${VTK_SOURCE_DIR}/Common/vtkFloatArray.cxx"
+    "${VTK_SOURCE_DIR}/Common/vtkIdTypeArray.cxx"
+    "${VTK_SOURCE_DIR}/Common/vtkIntArray.cxx"
+    "${VTK_SOURCE_DIR}/Common/vtkLongArray.cxx"
+    "${VTK_SOURCE_DIR}/Common/vtkLongLongArray.cxx"
+    "${VTK_SOURCE_DIR}/Common/vtkShortArray.cxx"
+#  "${VTK_SOURCE_DIR}/Common/vtkUnsigned__Int64Array.cxx"
+    "${VTK_SOURCE_DIR}/Common/vtkUnsignedCharArray.cxx"
+    "${VTK_SOURCE_DIR}/Common/vtkUnsignedIntArray.cxx"
+    "${VTK_SOURCE_DIR}/Common/vtkUnsignedLongArray.cxx"
+    "${VTK_SOURCE_DIR}/Common/vtkUnsignedLongLongArray.cxx"
+    "${VTK_SOURCE_DIR}/Common/vtkUnsignedShortArray.cxx"
+
+    "${VTK_SOURCE_DIR}/Filtering/vtkDataObject.cxx"
+    "${VTK_SOURCE_DIR}/Filtering/vtkFieldData.cxx"
+    "${VTK_SOURCE_DIR}/Filtering/vtkDataSetAttributes.cxx"
+    "${VTK_SOURCE_DIR}/Filtering/vtkCellData.cxx"
+    "${VTK_SOURCE_DIR}/Filtering/vtkPointData.cxx"
+
+    "${VTK_SOURCE_DIR}/Filtering/vtkDataSet.cxx"
+    "${VTK_SOURCE_DIR}/Filtering/vtkHyperOctree.cxx"
+    "${VTK_SOURCE_DIR}/Filtering/vtkImageData.cxx"
+    "${VTK_SOURCE_DIR}/Filtering/vtkPointSet.cxx"
+    "${VTK_SOURCE_DIR}/Filtering/vtkRectilinearGrid.cxx"
+    "${VTK_SOURCE_DIR}/Filtering/vtkStructuredPoints.cxx"
+    "${VTK_SOURCE_DIR}/Filtering/vtkUniformGrid.cxx"
+    "${VTK_SOURCE_DIR}/Filtering/vtkPolyData.cxx"
+    "${VTK_SOURCE_DIR}/Filtering/vtkStructuredGrid.cxx"
+    "${VTK_SOURCE_DIR}/Filtering/vtkUnstructuredGrid.cxx"
+
     )
 
   SET_SOURCE_FILES_PROPERTIES(
@@ -162,6 +199,7 @@ IF (PARAVIEW_WRAP_PYTHON)
 # All files paraview/*.py included in the paraview module.
   SET(PV_PYTHON_FILES
     __init__
+    numeric
   )
 
 # Now copy these files if necessary.
