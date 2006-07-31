@@ -79,6 +79,9 @@ public:
   // server connection. A convenience method.
   int getNumberOfPartitions();
 
+signals:
+  void nameChanged();
+
 protected:
   /// Creates vtkSMMultiViewRenderModuleProxy for this connection and 
   /// initializes it to create render modules of correct type 
@@ -88,6 +91,8 @@ protected:
 private:
   pqServer(const pqServer&);  // Not implemented.
   pqServer& operator=(const pqServer&); // Not implemented.
+
+  void setResource(const pqServerResource &server_resource);
 
   pqServerResource Resource;
   vtkIdType ConnectionID;

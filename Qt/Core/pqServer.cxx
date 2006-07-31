@@ -75,7 +75,7 @@ pqServer* pqServer::Create(const pqServerResource& resource)
       }
     pqServerManagerModel* const model = pqServerManagerModel::instance();
     pqServer* const server = model->getServer(id); //new pqServer(id, pm->GetOptions());
-    server->Resource = server_resource;
+    server->setResource(server_resource);
     
     return server;
     }
@@ -94,7 +94,7 @@ pqServer* pqServer::Create(const pqServerResource& resource)
 
     pqServerManagerModel* const model = pqServerManagerModel::instance();
     pqServer* const server = model->getServer(id); //new pqServer(id, pm->GetOptions());
-    server->Resource = server_resource;
+    server->setResource(server_resource);
 
     return server;
     }
@@ -122,7 +122,7 @@ pqServer* pqServer::Create(const pqServerResource& resource)
     
     pqServerManagerModel* const model = pqServerManagerModel::instance();
     pqServer* const server = model->getServer(id); //new pqServer(id, pm->GetOptions());
-    server->Resource = server_resource;
+    server->setResource(server_resource);
     
     return server;
     }
@@ -278,4 +278,10 @@ int pqServer::getNumberOfPartitions()
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   return pm->GetNumberOfPartitions(this->ConnectionID);
 
+}
+
+void pqServer::setResource(const pqServerResource &server_resource)
+{
+  this->Resource = server_resource;
+  emit this->nameChanged();
 }

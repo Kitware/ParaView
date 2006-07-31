@@ -327,6 +327,7 @@ void pqServerManagerModel::onAddServer(pqServer* server)
     }
 
   this->Internal->Servers.push_back(server);
+  this->connect(server, SIGNAL(nameChanged()), this, SLOT(updateServerName()));
 
   emit this->serverAdded(server);
 }
