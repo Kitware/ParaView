@@ -100,6 +100,7 @@
 #include "vtkSMProxyProperty.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVCredits.h"
+#include "vtkPVXMLElement.h"
 
 #include "vtkPVLookmarkManager.h"
 
@@ -180,7 +181,7 @@ protected:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.791");
+vtkCxxRevisionMacro(vtkPVWindow, "1.792");
 
 const char* vtkPVWindow::ComparativeVisMenuLabel = "Comparative Vis Manager";
 
@@ -2937,7 +2938,18 @@ void vtkPVWindow::SaveSMState()
 void vtkPVWindow::SaveSMState(const char *filename)
 {
   vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
-  proxm->SaveState(filename);
+  vtkPVXMLElement* root = vtkPVXMLElement::New();
+  root->SetName("ParaView");
+  vtkPVXMLElement* smroot = vtkPVXMLElement::New();
+  smroot->SetName("ServerManagerState");
+  root->AddNestedElement(smroot);
+  smroot->Delete();
+
+  proxm->SaveState(smroot);
+
+  ofstream os(filename, ios::out);
+  root->PrintXML(os, vtkIndent());
+  root->Delete();
 }
 
 //-----------------------------------------------------------------------------
