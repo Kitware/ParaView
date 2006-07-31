@@ -73,9 +73,6 @@ public slots:
   /// changes will be propogated down to the server manager
   virtual void accept();
 
-  /// called after accept on all panels is complete
-  virtual void postAccept() { }
-
   /// reset the changes made
   /// editor will query properties from the server manager
   virtual void reset();

@@ -297,16 +297,7 @@ void pqObjectInspectorWidget::accept()
   
   emit this->accepted();
   
-  foreach(pqObjectPanel* p, this->QueuedPanels)
-    {
-    p->postAccept();
-    }
   this->QueuedPanels.clear();
-  
-  if (this->CurrentPanel)
-    {
-    this->CurrentPanel->postAccept();
-    }
   
   this->ForceModified = false;
   emit this->postaccept();

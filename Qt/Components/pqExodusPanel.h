@@ -48,13 +48,12 @@ public:
   /// destructor
   ~pqExodusPanel();
 
-  virtual void postAccept();
-
 protected slots:
   void applyDisplacements(int);
   void displChanged(bool);
 
   void updateDataRanges();
+  void propertyChanged();
   
   void blocksOn();
   void blocksOff();
@@ -79,6 +78,8 @@ protected:
   static QString formatDataFor(vtkPVArrayInformation* ai);
 
   pqTreeWidgetItemObject* DisplItem;
+
+  bool DataUpdateInProgress;
 
 };
 

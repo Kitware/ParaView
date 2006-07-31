@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QCheckBox>
 #include <QDoubleSpinBox>
 #include <QAction>
+#include <QTimer>
 
 // VTK includes
 
@@ -57,6 +58,10 @@ pqExodusPanel::pqExodusPanel(QWidget* p) :
   pqLoadedFormObjectPanel(":/pqWidgets/UI/pqExodusPanel.ui", p)
 {
   this->DisplItem = 0;
+  QObject::connect(this->PropertyManager, 
+                   SIGNAL(canAcceptOrReject(bool)),
+                   this, SLOT(propertyChanged()));
+  this->DataUpdateInProgress = false;
 }
 
 pqExodusPanel::~pqExodusPanel()
@@ -247,6 +252,7 @@ void pqExodusPanel::linkServerManagerProperties()
                                       this->proxy()->getProxy(), NSProperty, j);
     }
 
+  // update ranges to begin with
   this->updateDataRanges();
 
   QTreeWidget* BlockTree = this->findChild<QTreeWidget*>("BlockArrayStatus");
@@ -422,12 +428,6 @@ void pqExodusPanel::displChanged(bool state)
     }
 }
 
-void pqExodusPanel::postAccept()
-{
-  this->updateDataRanges();
-  pqLoadedFormObjectPanel::postAccept();
-}
-
 QString pqExodusPanel::formatDataFor(vtkPVArrayInformation* ai)
 {
   QString info;
@@ -471,6 +471,8 @@ QString pqExodusPanel::formatDataFor(vtkPVArrayInformation* ai)
 
 void pqExodusPanel::updateDataRanges()
 {
+  this->DataUpdateInProgress = false;
+
   // update data information about loaded arrays
 
   vtkSMSourceProxy* sp =
@@ -632,3 +634,11 @@ void pqExodusPanel::toggle(QTreeWidget* Tree, Qt::CheckState c)
     }
 }
 
+void pqExodusPanel::propertyChanged()
+{
+  if(this->DataUpdateInProgress == false)
+    {
+    this->DataUpdateInProgress = true;
+    QTimer::singleShot(0, this, SLOT(updateDataRanges()));
+    }
+}
