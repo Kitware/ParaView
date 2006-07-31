@@ -829,7 +829,7 @@ void pqMainWindowCore::onFileLoadServerState()
 void pqMainWindowCore::onFileLoadServerState(pqServer*)
 {
   QString filters;
-  filters += "ParaView state file (*.pvs)";
+  filters += "ParaView state file (*.pvsm)";
   filters += ";;All files (*)";
 
   pqFileDialog *fileDialog = new pqFileDialog(new pqLocalFileDialogModel(),
@@ -879,7 +879,7 @@ void pqMainWindowCore::onFileLoadServerState(const QStringList& files)
 void pqMainWindowCore::onFileSaveServerState()
 {
   QString filters;
-  filters += "ParaView state file (*.pvs)";
+  filters += "ParaView state file (*.pvsm)";
   filters += ";;All files (*)";
 
   pqFileDialog* const file_dialog = new pqFileDialog(new pqLocalFileDialogModel(), 
