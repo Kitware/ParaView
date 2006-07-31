@@ -120,6 +120,8 @@ pqImplicitPlaneWidget::pqImplicitPlaneWidget(QWidget* p) :
 
   QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
     this, SIGNAL(widgetChanged()));
+  QObject::connect(&this->Implementation->Links, SIGNAL(qtWidgetChanged()),
+    this, SLOT(render()));
 
   QObject::connect(&this->Implementation->Links, SIGNAL(smPropertyChanged()),
     this, SIGNAL(widgetChanged()));

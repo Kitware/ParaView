@@ -164,6 +164,15 @@ pqRenderModule* pq3DWidget::getRenderModule() const
 }
 
 //-----------------------------------------------------------------------------
+void pq3DWidget::render()
+{
+  if (this->getRenderModule())
+    {
+    this->getRenderModule()->render();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void pq3DWidget::onControlledPropertyChanged()
 {
   if (this->IgnorePropertyChange)

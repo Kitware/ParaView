@@ -128,6 +128,10 @@ public slots:
   /// Set the render module that this widget works with
   virtual void setRenderModule(pqRenderModule* rm);
 
+protected slots:
+  /// Called to request a render.
+  void render();
+
 protected:
   /// Subclasses can override this method to map properties to
   /// GUI. Default implementation updates the internal datastructures
