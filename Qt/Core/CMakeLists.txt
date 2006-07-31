@@ -51,6 +51,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqServerManagerSelectionModel.h
   pqServerResources.h
   pqSettings.h
+  pqTestUtility.h
   pqUndoStack.h
   )
 SET_DIRECTORY_PROPERTIES(PROPERTIES INCLUDE_DIRECTORIES "${include_dirs_tmp}")

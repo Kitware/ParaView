@@ -32,9 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqProcessModuleGUIHelper.h"
 
 #include "pqApplicationCore.h"
-#include "pqEventPlayer.h"
-#include "pqEventPlayerXML.h"
-#include "pqOptions.h"
 #include "pqOutputWindowAdapter.h"
 #include "pqOutputWindow.h"
 #include "pqTestUtility.h"
@@ -49,6 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QApplication>
 #include <QWidget>
+#include <QTimer>
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper::pqImplementation
 
@@ -110,7 +108,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////
 // pqProcessModuleGUIHelper
 
-vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.2");
+vtkCxxRevisionMacro(pqProcessModuleGUIHelper, "1.3");
 //-----------------------------------------------------------------------------
 pqProcessModuleGUIHelper::pqProcessModuleGUIHelper() :
   Implementation(new pqImplementation())
@@ -147,41 +145,13 @@ int pqProcessModuleGUIHelper::RunGUIStart(int argc, char** argv,
     {
     this->Implementation->Window->show();
     
-    // Check is options specified to run tests.
-    pqOptions* options = pqOptions::SafeDownCast(
-      vtkProcessModule::GetProcessModule()->GetOptions());
+    // get the tester going when the application starts
+    pqTestUtility tester(*this);
+    QTimer::singleShot(0, &tester, SLOT(runTests()));
     
-    int dont_start_event_loop = 0;
-    if (options)
-      {
-      if (options->GetTestFileName())
-        {
-        pqEventPlayer player;
-        pqTestUtility::Setup(player);
-
-        pqEventPlayerXML xml_player;
-        status = !xml_player.playXML(player, options->GetTestFileName());
-        }
-
-      if (options->GetBaselineImage())
-        {
-        status = !this->compareView(options->GetBaselineImage(),
-          options->GetImageThreshold(), cout, options->GetTestDirectory());
-        dont_start_event_loop = 1;
-        }
-        
-      if (options->GetExitBeforeEventLoop())
-        {
-        dont_start_event_loop = 1;
-        }
-      }
-    
-    if (!dont_start_event_loop )
-      {
-      // Starts the event loop.
-      QCoreApplication* app = QApplication::instance();
-      status = app->exec();
-      }
+    // Starts the event loop.
+    QCoreApplication* app = QApplication::instance();
+    status = app->exec();
     }
   this->FinalizeApplication();
   

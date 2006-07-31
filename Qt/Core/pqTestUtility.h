@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _pqTestUtility_h
 #define _pqTestUtility_h
 
+#include <QObject>
 #include "pqCoreExport.h"
 #include <vtkIOStream.h>
 
@@ -40,10 +41,20 @@ class QString;
 class pqEventPlayer;
 class pqEventTranslator;
 class vtkRenderWindow;
+class pqProcessModuleGUIHelper;
 
 /// Provides ParaView-specific functionality for regression testing
-class PQCORE_EXPORT pqTestUtility
+class PQCORE_EXPORT pqTestUtility : public QObject
 {
+  Q_OBJECT
+
+public:
+
+  pqTestUtility(pqProcessModuleGUIHelper&, QObject* p=NULL);
+
+public slots:
+  void runTests();
+
 public:
   /// Handles ParaView-specific setup of a QtTesting event translator
   /// object (so QtTesting doesn't have any dependencies on ParaView/VTK)
@@ -64,6 +75,9 @@ public:
                            double Threshold, 
                            ostream& Output, 
                            const QString& TempDirectory);
+
+protected:
+  pqProcessModuleGUIHelper* GUIHelper;
 };
 
 #endif // !_pqTestUtility_h

@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkObjectFactory.h>
 
 vtkStandardNewMacro(pqOptions);
-vtkCxxRevisionMacro(pqOptions, "1.1");
+vtkCxxRevisionMacro(pqOptions, "1.2");
 
 //-----------------------------------------------------------------------------
 pqOptions::pqOptions()
@@ -45,7 +45,7 @@ pqOptions::pqOptions()
   this->TestDirectory = 0;
   this->TestFileName = 0;
   this->ImageThreshold = 12;
-  this->ExitBeforeEventLoop = 0;
+  this->ExitAppWhenTestsDone = 0;
 
 }
 
@@ -76,8 +76,8 @@ void pqOptions::Initialize()
   this->AddArgument("--image-threshold", NULL, &this->ImageThreshold,
     "Set the threshold beyond which viewport-image comparisons fail.");
 
-  this->AddBooleanArgument("--exit", NULL, &this->ExitBeforeEventLoop,
-    "Exit before starting the event loop. Use for testing.");
+  this->AddBooleanArgument("--exit", NULL, &this->ExitAppWhenTestsDone,
+    "Exit application when testing is done. Use for testing.");
 }
 
 //-----------------------------------------------------------------------------

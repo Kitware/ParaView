@@ -34,9 +34,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqFileDialogEventTranslator.h"
 #include "pqTestUtility.h"
 
-#include <pqEventPlayer.h>
-#include <pqEventTranslator.h>
+#include "pqEventTranslator.h"
+#include "pqEventPlayer.h"
+#include "pqEventPlayerXML.h"
+#include "pqOptions.h"
+#include "pqProcessModuleGUIHelper.h"
 
+#include "vtkProcessModule.h"
 #include <vtkWindowToImageFilter.h>
 #include <vtkBMPWriter.h>
 #include <vtkTIFFWriter.h>
@@ -54,6 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDir>
 #include <QFileInfo>
+#include <QApplication>
 
 template<typename WriterT>
 bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
@@ -66,6 +71,11 @@ bool saveImage(vtkWindowToImageFilter* Capture, const QFileInfo& File)
   writer->Delete();
   
   return result;
+}
+
+pqTestUtility::pqTestUtility(pqProcessModuleGUIHelper& helper, QObject* p)
+ : QObject(p), GUIHelper(&helper)
+{
 }
 
 void pqTestUtility::Setup(pqEventTranslator& translator)
@@ -147,3 +157,46 @@ bool pqTestUtility::CompareImage(vtkRenderWindow* RenderWindow,
     }
   return false;
 }
+  
+void pqTestUtility::runTests()
+{
+  // Check is options specified to run tests.
+  pqOptions* options = pqOptions::SafeDownCast(
+    vtkProcessModule::GetProcessModule()->GetOptions());
+ 
+  int status = 1;
+  int quit_event_loop = 0;
+  if (options)
+    {
+    if (options->GetTestFileName())
+      {
+      pqEventPlayer player;
+      pqTestUtility::Setup(player);
+
+      pqEventPlayerXML xml_player;
+      status = !xml_player.playXML(player, options->GetTestFileName());
+      }
+
+    // TODO: image comparisons probably ought to be done the same
+    //       way widget validation is done (when that gets implemented)
+    //       That is, check that the text of a QLineEdit is a certain value
+    //       Referencing a QVTKWidget can then be done the same way as referencing
+    //       any other widget, instead of relying on the "active" view.
+    if (options->GetBaselineImage())
+      {
+      status = !this->GUIHelper->compareView(options->GetBaselineImage(),
+        options->GetImageThreshold(), cout, options->GetTestDirectory());
+      quit_event_loop = 1;
+      }
+      
+    if (options->GetExitAppWhenTestsDone())
+      {
+      quit_event_loop = 1;
+      }
+    }
+  if(quit_event_loop)
+  {
+  QApplication::instance()->exit(status);
+  }
+}
+
