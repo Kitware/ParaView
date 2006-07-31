@@ -822,7 +822,7 @@ void pqFlatTreeView::dataChanged(const QModelIndex &topLeft,
           startPoint = item->ContentsY;
           }
 
-        for(int j = start; j < end && j < item->Cells.size(); j++)
+        for(int j = start; j <= end && j < item->Cells.size(); j++)
           {
           item->Cells[j]->Width = 0;
           }
