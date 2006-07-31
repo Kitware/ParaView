@@ -125,11 +125,11 @@ void pqRecentFilesMenu::onResourcesChanged()
         continue;
         }
         
-      QAction* const action = new QAction(resource.path(), &this->Implementation->Menu);
-      action->setData(resource.toString());
-      action->setIcon(QIcon(":/pqWidgets/Icons/pqAppIcon16.png"));
+      QAction* const act = new QAction(resource.path(), &this->Implementation->Menu);
+      act->setData(resource.toString());
+      act->setIcon(QIcon(":/pqWidgets/Icons/pqAppIcon16.png"));
       
-      this->Implementation->Menu.addAction(action);
+      this->Implementation->Menu.addAction(act);
       }
     
     // Display files associated with the server next ...
@@ -145,10 +145,10 @@ void pqRecentFilesMenu::onResourcesChanged()
         continue;
         }
         
-      QAction* const action = new QAction(resource.path(), &this->Implementation->Menu);
-      action->setData(resource.toString());
+      QAction* const act = new QAction(resource.path(), &this->Implementation->Menu);
+      act->setData(resource.toString());
 
-      this->Implementation->Menu.addAction(action);
+      this->Implementation->Menu.addAction(act);
       }
     }
 }
