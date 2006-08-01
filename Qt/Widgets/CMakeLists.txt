@@ -85,6 +85,7 @@ QT4_WRAP_UI(QtWidgets_UI_BUILT_SOURCES
 ##########################################################################
 ## Add resources.
 SET(UI_RESOURCES
+  Resources/QtWidgets.qrc
 )
 
 QT4_ADD_RESOURCES(RCS_SOURCES

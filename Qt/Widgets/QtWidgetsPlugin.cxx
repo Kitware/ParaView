@@ -67,7 +67,7 @@ QString pqCollapsedGroupPlugin::group() const
 
 QIcon pqCollapsedGroupPlugin::icon() const
 {
-  return QIcon();
+  return QIcon(":/QtWidgets/Icons/pqCollapsedGroup22.png");
 }
 
 QString pqCollapsedGroupPlugin::includeFile() const
