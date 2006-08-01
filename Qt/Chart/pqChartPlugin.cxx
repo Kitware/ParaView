@@ -85,7 +85,7 @@ QString pqHistogramWidgetPlugin::toolTip() const
 
 QString pqHistogramWidgetPlugin::whatsThis() const
 {
-  return QLatin1String("Qt Line Chart");
+  return QLatin1String("Qt Histogram");
 }
 
 
@@ -131,7 +131,7 @@ QString pqLineChartWidgetPlugin::toolTip() const
 
 QString pqLineChartWidgetPlugin::whatsThis() const
 {
-  return QLatin1String("A Qt Line Chart.");
+  return QLatin1String("Qt Line Chart.");
 }
 
 

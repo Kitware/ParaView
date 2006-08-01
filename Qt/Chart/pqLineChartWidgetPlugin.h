@@ -49,7 +49,7 @@ public:
 
   virtual QWidget *createWidget(QWidget *parent=0);
   virtual QString domXml() const;
-  virtual QString group() const {return QLatin1String("ParaView Charts");}
+  virtual QString group() const {return QLatin1String("ParaView Chart Widgets");}
   virtual QIcon icon() const;
   virtual QString includeFile() const;
   virtual bool isContainer() const {return false;}
