@@ -61,9 +61,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqStreamTracerPanel::pqImplementation
 {
 public:
-  pqImplementation(QWidget* parent) :
-    PointSourceWidget(new pqPointSourceWidget(parent)),
-    LineWidget(0 /*new pqLineWidget(parent)*/)
+  pqImplementation() :
+    PointSourceWidget(new pqPointSourceWidget()),
+    LineWidget(0 /*new pqLineWidget()*/)
   {
   }
 
@@ -85,7 +85,7 @@ public:
 
 pqStreamTracerPanel::pqStreamTracerPanel(QWidget* p) :
   base(p),
-  Implementation(new pqImplementation(this))
+  Implementation(new pqImplementation())
 {
   this->Implementation->PointSourceWidget->setRenderModule(
     this->getRenderModule());

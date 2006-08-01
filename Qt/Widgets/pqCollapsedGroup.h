@@ -40,30 +40,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QPushButton;
 
 /// Provides a container that can be collapsed or expanded to
-/// hide/show a child widget.
+/// hide/show its children.
 class QTWIDGETS_EXPORT pqCollapsedGroup :
   public QWidget
 {
   Q_OBJECT
   Q_PROPERTY(QString title READ title WRITE setTitle)
+  Q_PROPERTY(int indent READ indent WRITE setIndent)
+  
 public:
   pqCollapsedGroup(QWidget* parent = 0);
   pqCollapsedGroup(const QString& title, QWidget* parent = 0);
   ~pqCollapsedGroup();
 
-  /// Sets the child widget that will be controlled by the container
-  void setWidget(QWidget*);
+  /// Convenience function that sets a single child widget
+  void setWidget(QWidget* child);
 
-  /// Returns true if the container is expanded (child is visible)
+  /// Returns true if the container is expanded (children are visible)
   const bool isExpanded();
 
   /// Get/Set the title for the group.
   void setTitle(const QString& title);
   QString title() const;
+
+  void setIndent(int indent);
+  int indent() const;
+  
 public slots:
-  /// Expands the container so the child is visible
+  /// Expands the container so children are visible
   void expand();
-  /// Collapses the container so the child is hidden
+  /// Collapses the container so children are hidden
   void collapse();
   /// Toggles the expanded / collapsed state of the container
   void toggle();
@@ -72,6 +78,12 @@ private:
   pqCollapsedGroup(const pqCollapsedGroup&);
   pqCollapsedGroup& operator=(const pqCollapsedGroup&);
 
+  void resizeEvent(QResizeEvent* event);
+  void paintEvent(QPaintEvent* event);
+  void mousePressEvent(QMouseEvent* event);
+  void mouseMoveEvent(QMouseEvent* event);
+  void mouseReleaseEvent(QMouseEvent* event);
+  
   class pqImplementation;
   pqImplementation* const Implementation;
 };

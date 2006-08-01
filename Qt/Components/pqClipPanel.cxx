@@ -56,9 +56,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqClipPanel::pqImplementation
 {
 public:
-  pqImplementation(QWidget* parent) :
+  pqImplementation() :
     InsideOutWidget(tr("Inside Out")),
-    ImplicitPlaneWidget(parent)
+    ImplicitPlaneWidget()
   {
   }
   
@@ -70,7 +70,7 @@ public:
 
 pqClipPanel::pqClipPanel(QWidget* p) :
   Superclass(p),
-  Implementation(new pqImplementation(this))
+  Implementation(new pqImplementation())
 {
   pqCollapsedGroup* const group1 = new pqCollapsedGroup(tr("Clip"));
   group1->setWidget(&this->Implementation->InsideOutWidget);

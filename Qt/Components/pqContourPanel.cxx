@@ -59,8 +59,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqContourPanel::pqImplementation
 {
 public:
-  pqImplementation(QWidget* parent) :
-    SampleScalarWidget(parent)
+  pqImplementation() :
+    SampleScalarWidget()
   {
   }
 
@@ -74,7 +74,7 @@ public:
 
 pqContourPanel::pqContourPanel(QWidget* p) :
   base(p),
-  Implementation(new pqImplementation(this))
+  Implementation(new pqImplementation())
 {
   this->Implementation->Controls.setupUi(
     &this->Implementation->ControlsContainer);

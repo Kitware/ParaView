@@ -44,7 +44,7 @@ class pqLineWidget :
   Q_OBJECT
   
 public:
-  pqLineWidget(QWidget* p);
+  pqLineWidget(QWidget* p = 0);
   ~pqLineWidget();
 
   /// Sets the source proxy that will be controlled by this widget

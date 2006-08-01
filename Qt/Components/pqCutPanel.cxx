@@ -55,9 +55,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqCutPanel::pqImplementation
 {
 public:
-  pqImplementation(QWidget* parent) :
-    ImplicitPlaneWidget(parent),
-    SampleScalarWidget(parent)
+  pqImplementation() :
+    ImplicitPlaneWidget(),
+    SampleScalarWidget()
   {
   }
   
@@ -69,7 +69,7 @@ public:
 
 pqCutPanel::pqCutPanel(QWidget* p) :
   Superclass(p),
-  Implementation(new pqImplementation(this))
+  Implementation(new pqImplementation())
 {
   pqCollapsedGroup* const group1 = new pqCollapsedGroup(tr("Implicit Plane"));
   group1->setWidget(&this->Implementation->ImplicitPlaneWidget);

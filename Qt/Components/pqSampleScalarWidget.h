@@ -58,7 +58,7 @@ class PQCOMPONENTS_EXPORT pqSampleScalarWidget :
   Q_OBJECT
 
 public:
-  pqSampleScalarWidget(QWidget* Parent);
+  pqSampleScalarWidget(QWidget* Parent = 0);
   ~pqSampleScalarWidget();
 
   /// Sets the server manager objects that will be controlled by the widget

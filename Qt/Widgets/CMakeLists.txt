@@ -122,3 +122,34 @@ INSTALL(TARGETS QtWidgets
   RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR_CM24} COMPONENT Runtime
   LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Runtime
   ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Development)
+
+# -----------------------------------------------------------------------------
+# plugin
+# -----------------------------------------------------------------------------
+
+SET(QtWidgetsPlugin_SRCS
+  QtWidgetsPlugin.cxx
+  QtWidgetsPlugin.h
+)
+
+QT4_WRAP_CPP(QtWidgetsPlugin_MOC_SRCS
+  QtWidgetsPlugin.h
+)
+
+ADD_DEFINITIONS(-DQT_PLUGIN -DQT_NO_DEBUG)
+
+ADD_LIBRARY(QtWidgetsPlugin
+  SHARED
+  ${QtWidgetsPlugin_SRCS}
+  ${QtWidgetsPlugin_MOC_SRCS}
+)
+
+TARGET_LINK_LIBRARIES(QtWidgetsPlugin 
+  QtWidgets
+  ${QT_LIBRARIES}
+)
+
+INSTALL(TARGETS QtWidgetsPlugin
+  RUNTIME DESTINATION ${PV_INSTALL_BIN_DIR_CM24} COMPONENT Runtime
+  LIBRARY DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Runtime
+  ARCHIVE DESTINATION ${PV_INSTALL_LIB_DIR_CM24} COMPONENT Development)

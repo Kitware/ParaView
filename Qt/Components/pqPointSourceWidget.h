@@ -45,7 +45,7 @@ class pqPointSourceWidget : public pqHandleWidget
   Q_OBJECT
   
 public:
-  pqPointSourceWidget(QWidget* p);
+  pqPointSourceWidget(QWidget* p = 0);
   ~pqPointSourceWidget();
 
 protected:

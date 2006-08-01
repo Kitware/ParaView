@@ -32,103 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCollapsedGroup.h"
 
-#include <QHBoxLayout>
-#include <QPushButton>
+#include <QResizeEvent>
+#include <QStyleOptionButton>
+#include <QStylePainter>
 #include <QVBoxLayout>
+#include <QtDebug>
 
-/* XPM */
-static char const* expand_xpm[] = {
-"9 9 33 1",
-"  c None",
-". c #FFFFFF",
-"+ c #8E997D",
-"@ c #FCFCFB",
-"# c #FDFDFB",
-"$ c #000000",
-"% c #FCFCFA",
-"& c #F7F6F3",
-"* c #F7F7F5",
-"= c #F7F7F4",
-"- c #F6F6F4",
-"; c #F1F0EB",
-"> c #E5E1DA",
-", c #F5F5F1",
-"' c #DFDBD2",
-") c #F2F2EE",
-"! c #F0F0EC",
-"~ c #EDEDE7",
-"{ c #EAE9E3",
-"] c #E3E0D9",
-"^ c #DBD6CC",
-"/ c #E4E1D9",
-"( c #DCD8CF",
-"_ c #D8D3C9",
-": c #D6D1C6",
-"< c #D2CCC0",
-"[ c #CFC8BB",
-"} c #D2CCBF",
-"| c #C6BEAE",
-"1 c #C2B8A8",
-"2 c #C1B8A7",
-"3 c #C0B7A6",
-"4 c #C3BAAA",
-".+++++++.",
-"+.......+",
-"+@##$@%&+",
-"+**=$-;>+",
-"+,$$$$$'+",
-"+)!~${]^+",
-"+/(_$:<[+",
-"+}|12234+",
-".+++++++."};
-
-/* XPM */
-static char const* collapse_xpm[] = {
-"9 9 35 1",
-"  c None",
-". c #FFFFFF",
-"+ c #8E997D",
-"@ c #FCFCFB",
-"# c #FDFDFB",
-"$ c #FCFCFA",
-"% c #F7F6F3",
-"& c #F7F7F5",
-"* c #F7F7F4",
-"= c #F6F6F4",
-"- c #F1F0EB",
-"; c #E5E1DA",
-"> c #F5F5F1",
-", c #000000",
-"' c #DFDBD2",
-") c #F2F2EE",
-"! c #F0F0EC",
-"~ c #EDEDE7",
-"{ c #ECEBE6",
-"] c #EAE9E3",
-"^ c #E3E0D9",
-"/ c #DBD6CC",
-"( c #E4E1D9",
-"_ c #DCD8CF",
-": c #D8D3C9",
-"< c #D7D2C7",
-"[ c #D6D1C6",
-"} c #D2CCC0",
-"| c #CFC8BB",
-"1 c #D2CCBF",
-"2 c #C6BEAE",
-"3 c #C2B8A8",
-"4 c #C1B8A7",
-"5 c #C0B7A6",
-"6 c #C3BAAA",
-".+++++++.",
-"+.......+",
-"+@###@$%+",
-"+&&**=-;+",
-"+>,,,,,'+",
-"+)!~{]^/+",
-"+(_:<[}|+",
-"+1234456+",
-".+++++++."};
+#include <iostream>
 
 ///////////////////////////////////////////////////////////////////////////////
 // pqCollapsedGroup::pqImplementation
@@ -136,61 +46,35 @@ static char const* collapse_xpm[] = {
 class pqCollapsedGroup::pqImplementation
 {
 public:
-  pqImplementation(const QString& Name, QWidget* parent_widget) :
+  pqImplementation(const QString& title) :
     Expanded(true),
-    Button(Name),
-    Widget(0),
-    HideIcon(QPixmap(collapse_xpm)),
-    ShowIcon(QPixmap(expand_xpm))
+    Title(title),
+    Indent(30),
+    Inside(false),
+    Pressed(false)
   {
-  this->Button.setObjectName("expandCollapse");
-  
-  this->Button.setIcon(
-    this->Expanded ? this->HideIcon : this->ShowIcon);
-    
-  this->Button.setToolTip(
-    this->Expanded ? tr("Collapse Group") : tr("Expand Group"));
-  
-  this->HLayout.setMargin(0);
-  this->HLayout.setSpacing(0);
-  this->HLayout.addSpacing(15);
-  
-  this->VLayout.setMargin(0);
-  this->VLayout.setSpacing(0);
-  this->VLayout.addWidget(&this->Button);
-  this->VLayout.addLayout(&this->HLayout);
-  parent_widget->setLayout(&this->VLayout);
   }
 
   bool Expanded;
-  QVBoxLayout VLayout;
-  QHBoxLayout HLayout;
-  QPushButton Button;
-  QWidget* Widget;
-  QIcon HideIcon;
-  QIcon ShowIcon;
+  QString Title;
+  int Indent;
+  QRect ButtonRect;
+  bool Inside;
+  bool Pressed;
 };
 
 pqCollapsedGroup::pqCollapsedGroup(QWidget* parent_widget) :
   QWidget(parent_widget),
-  Implementation(new pqImplementation("", this))
+  Implementation(new pqImplementation(""))
 {
-  this->connect(
-    &this->Implementation->Button,
-    SIGNAL(clicked()),
-    this,
-    SLOT(toggle()));
+  this->setMouseTracking(true);
 }
 
-pqCollapsedGroup::pqCollapsedGroup(const QString& group_title, QWidget* parent_widget) :
+pqCollapsedGroup::pqCollapsedGroup(const QString& title, QWidget* parent_widget) :
   QWidget(parent_widget),
-  Implementation(new pqImplementation(group_title, this))
+  Implementation(new pqImplementation(title))
 {
-  this->connect(
-    &this->Implementation->Button,
-    SIGNAL(clicked()),
-    this,
-    SLOT(toggle()));
+  this->setMouseTracking(true);
 }
 
 pqCollapsedGroup::~pqCollapsedGroup()
@@ -198,21 +82,13 @@ pqCollapsedGroup::~pqCollapsedGroup()
   delete this->Implementation;
 }
 
-void pqCollapsedGroup::setWidget(QWidget* child_widget)
+void pqCollapsedGroup::setWidget(QWidget* child)
 {
-  if(this->Implementation->Widget)
-    {
-    this->Implementation->HLayout.removeWidget(
-      this->Implementation->Widget);
-    }
-  
-  this->Implementation->Widget = child_widget;
-  
-  if(this->Implementation->Widget)
-    {
-    this->Implementation->Widget->setParent(this);
-    this->Implementation->HLayout.addWidget(this->Implementation->Widget);
-    }
+  QVBoxLayout* const layout = new QVBoxLayout(this);
+  layout->setMargin(0);
+  layout->setSpacing(0);
+  layout->addWidget(child);
+  this->setLayout(layout);
 }
 
 const bool pqCollapsedGroup::isExpanded()
@@ -236,28 +112,139 @@ void pqCollapsedGroup::toggle()
 {
   this->Implementation->Expanded = 
     !this->Implementation->Expanded;
-    
-  this->Implementation->Button.setIcon(
-    this->Implementation->Expanded ?
-      this->Implementation->HideIcon :
-      this->Implementation->ShowIcon);
-
-  this->Implementation->Button.setToolTip(
-    this->Implementation->Expanded ? tr("Collapse Group") : tr("Expand Group"));
-    
-  if(this->Implementation->Widget)
+   
+  const QObjectList& children = this->children();
+  for(int i = 0; i != children.size(); ++i)
     {
-    this->Implementation->Widget->setVisible(
-      this->Implementation->Expanded);
+    if(QWidget* const widget = qobject_cast<QWidget*>(children[i]))
+      {
+      widget->setVisible(this->Implementation->Expanded);
+      }
     }
+
+  this->update();
 }
 
 void pqCollapsedGroup::setTitle(const QString& txt)
 {
-  this->Implementation->Button.setText(txt);
+  this->Implementation->Title = txt;
+  this->update();
 }
 
 QString pqCollapsedGroup::title() const
 {
-  return this->Implementation->Button.text();
+  return this->Implementation->Title;
+}
+
+void pqCollapsedGroup::setIndent(int indent)
+{
+  this->Implementation->Indent = indent;
+  
+  // This hack forces a layout update so changes in Designer are shown immediately
+  const QSize old_size = this->size();
+  this->resize(old_size + QSize(1, 1));
+  this->resize(old_size);
+}
+
+int pqCollapsedGroup::indent() const
+{
+  return this->Implementation->Indent;
+}
+  
+void pqCollapsedGroup::resizeEvent(QResizeEvent* event)
+{
+  /** \todo Base the height on font size here */
+  const int height = 17;
+
+  this->Implementation->ButtonRect =
+    QRect(0, 0, event->size().width(), height);
+  this->setContentsMargins(this->Implementation->Indent, this->Implementation->ButtonRect.height(), 0, 0);
+  this->update();
+}
+
+void pqCollapsedGroup::paintEvent(QPaintEvent* event)
+{
+  const QRect button_rect = this->Implementation->ButtonRect;
+
+  QStylePainter painter(this);
+
+  QStyleOptionButton button_options;
+  button_options.initFrom(this);
+  button_options.features = QStyleOptionButton::None;
+  button_options.rect = button_rect;
+
+  button_options.state = QStyle::State_Enabled;
+
+/*
+  if(this->Implementation->Inside && !this->Implementation->Pressed)
+    button_options.state |= QStyle::State_Default;
+  else
+    button_options.state &= ~QStyle::State_Default;
+*/
+
+  if(this->Implementation->Pressed && this->Implementation->Inside)
+    button_options.state |= QStyle::State_Sunken;
+  else
+    button_options.state |= QStyle::State_Raised;
+
+  painter.drawControl(QStyle::CE_PushButton, button_options);
+
+  const int icon_size = 9; // hardcoded in qcommonstyle.cpp
+
+  QStyleOption icon_options;
+  icon_options.rect = QRect(
+    button_rect.left() + icon_size / 2,
+    button_rect.top() + (button_rect.height() - icon_size) / 2,
+    icon_size,
+    icon_size);
+  icon_options.palette = button_options.palette;
+  icon_options.state = QStyle::State_Children;
+
+  if(this->Implementation->Expanded)
+    icon_options.state |= QStyle::State_Open;
+
+  painter.drawPrimitive(QStyle::PE_IndicatorBranch, icon_options);
+  
+  const QRect text_rect = QRect(
+    button_rect.left() + icon_size * 2,
+    button_rect.top(),
+    button_rect.width() - icon_size * 2,
+    button_rect.height());
+    
+  const QString text = this->Implementation->Title;
+//  const QString text = elidedText(option.fontMetrics, textrect.width(), Qt::ElideMiddle, model->data(index, Qt::DisplayRole).toString());
+  painter.drawItemText(text_rect, Qt::AlignLeft | Qt::AlignVCenter, button_options.palette, true, text);
+}
+
+void pqCollapsedGroup::mousePressEvent(QMouseEvent* event)
+{
+  if(this->Implementation->ButtonRect.contains(event->pos()))
+    {
+    this->Implementation->Pressed = true;
+    this->update();
+    }
+}
+
+void pqCollapsedGroup::mouseMoveEvent(QMouseEvent* event)
+{
+  const bool inside = this->Implementation->ButtonRect.contains(event->pos());
+  if(inside != this->Implementation->Inside)
+    {
+    this->Implementation->Inside = inside;
+    this->update();
+    }
+}
+
+void pqCollapsedGroup::mouseReleaseEvent(QMouseEvent* event)
+{
+  if(this->Implementation->Pressed)
+    {
+    this->Implementation->Pressed = false;
+    this->update();
+
+    if(this->Implementation->ButtonRect.contains(event->pos()))
+      {
+      this->toggle();
+      }
+    }
 }

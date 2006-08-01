@@ -46,7 +46,7 @@ class pqImplicitPlaneWidget : public pq3DWidget
   Q_OBJECT
   
 public:
-  pqImplicitPlaneWidget(QWidget* p);
+  pqImplicitPlaneWidget(QWidget* p = 0);
   ~pqImplicitPlaneWidget();
 
   /// Controlled proxy is a proxy which is controlled by the 3D widget.
