@@ -166,6 +166,11 @@ public:
   // active server. 
   pqPipelineSource* createReaderOnActiveServer( const QString& filename);
   
+  /** By default, whenever a new source/filter is added to the pipeline,
+  pqMainWindowCore will attach a display.  Clients that wish to manage
+  their own pipeline / displays should call this method once at startup. */
+  void disableAutomaticDisplays();
+  
 signals:
   void enableFileOpen(bool);
   void enableFileLoadServerState(bool);

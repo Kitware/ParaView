@@ -1897,6 +1897,14 @@ pqPipelineSource* pqMainWindowCore::createReaderOnActiveServer(
      this->getActiveServer());
 }
 
+void pqMainWindowCore::disableAutomaticDisplays()
+{
+  QObject::disconnect(pqApplicationCore::instance(),
+    SIGNAL(sourceCreated(pqPipelineSource*)),
+    this, 
+    SLOT(onSourceCreated(pqPipelineSource*)));
+}
+
 //-----------------------------------------------------------------------------
 // Methods to add a source to the list of sources pending displays.
 void pqMainWindowCore::addSourcePendingDisplay(pqPipelineSource* src)
