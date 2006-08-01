@@ -78,11 +78,13 @@ private:
   pqCollapsedGroup(const pqCollapsedGroup&);
   pqCollapsedGroup& operator=(const pqCollapsedGroup&);
 
+
   void resizeEvent(QResizeEvent* event);
   void paintEvent(QPaintEvent* event);
+  bool eventFilter(QObject* target, QEvent* event);
   void mousePressEvent(QMouseEvent* event);
-  void mouseMoveEvent(QMouseEvent* event);
   void mouseReleaseEvent(QMouseEvent* event);
+  void leaveEvent(QEvent* event);
   
   class pqImplementation;
   pqImplementation* const Implementation;

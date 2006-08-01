@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "pqCollapsedGroup.h"
 
+#include <QApplication>
 #include <QResizeEvent>
 #include <QStyleOptionButton>
 #include <QStylePainter>
@@ -67,18 +68,19 @@ pqCollapsedGroup::pqCollapsedGroup(QWidget* parent_widget) :
   QWidget(parent_widget),
   Implementation(new pqImplementation(""))
 {
-  this->setMouseTracking(true);
+  QApplication::instance()->installEventFilter(this);
 }
 
 pqCollapsedGroup::pqCollapsedGroup(const QString& title, QWidget* parent_widget) :
   QWidget(parent_widget),
   Implementation(new pqImplementation(title))
 {
-  this->setMouseTracking(true);
+  QApplication::instance()->installEventFilter(this);
 }
 
 pqCollapsedGroup::~pqCollapsedGroup()
 {
+  QApplication::instance()->removeEventFilter(this);
   delete this->Implementation;
 }
 
@@ -140,7 +142,8 @@ void pqCollapsedGroup::setIndent(int indent)
 {
   this->Implementation->Indent = indent;
   
-  // This hack forces a layout update so changes in Designer are shown immediately
+  // This hack forces a layout update so changes in
+  // Designer are shown immediately
   const QSize old_size = this->size();
   this->resize(old_size + QSize(1, 1));
   this->resize(old_size);
@@ -153,8 +156,10 @@ int pqCollapsedGroup::indent() const
   
 void pqCollapsedGroup::resizeEvent(QResizeEvent* event)
 {
-  /** \todo Base the height on font size here */
-  const int height = 17;
+  // Base the height of the button on the height of the font,
+  // and ensure that the result is an odd number (so the icon centers nicely)
+  const int height =
+    static_cast<int>(this->fontMetrics().height() * 1.3) | 0x01;
 
   this->Implementation->ButtonRect =
     QRect(0, 0, event->size().width(), height);
@@ -175,9 +180,9 @@ void pqCollapsedGroup::paintEvent(QPaintEvent* event)
 
   button_options.state = QStyle::State_Enabled;
 
-/*
   if(this->Implementation->Inside && !this->Implementation->Pressed)
-    button_options.state |= QStyle::State_Default;
+    button_options.state |= QStyle::State_MouseOver;
+/*
   else
     button_options.state &= ~QStyle::State_Default;
 */
@@ -212,8 +217,30 @@ void pqCollapsedGroup::paintEvent(QPaintEvent* event)
     button_rect.height());
     
   const QString text = this->Implementation->Title;
-//  const QString text = elidedText(option.fontMetrics, textrect.width(), Qt::ElideMiddle, model->data(index, Qt::DisplayRole).toString());
   painter.drawItemText(text_rect, Qt::AlignLeft | Qt::AlignVCenter, button_options.palette, true, text);
+}
+
+bool pqCollapsedGroup::eventFilter(QObject* target, QEvent* event)
+{
+  if(event->type() == QEvent::MouseMove)
+    {
+    for(QObject* parent = target; parent; parent = parent->parent())
+      {
+      if(parent == this)
+        {
+        const QPoint mouse = this->mapFromGlobal(qobject_cast<QWidget*>(target)->mapToGlobal(static_cast<QMouseEvent*>(event)->pos()));
+        const bool inside = this->Implementation->ButtonRect.contains(mouse);
+        if(inside != this->Implementation->Inside)
+          {
+          this->Implementation->Inside = inside;
+          this->update();
+          }
+        break;
+        }
+      }
+    }
+    
+  return QWidget::eventFilter(target, event);
 }
 
 void pqCollapsedGroup::mousePressEvent(QMouseEvent* event)
@@ -221,16 +248,6 @@ void pqCollapsedGroup::mousePressEvent(QMouseEvent* event)
   if(this->Implementation->ButtonRect.contains(event->pos()))
     {
     this->Implementation->Pressed = true;
-    this->update();
-    }
-}
-
-void pqCollapsedGroup::mouseMoveEvent(QMouseEvent* event)
-{
-  const bool inside = this->Implementation->ButtonRect.contains(event->pos());
-  if(inside != this->Implementation->Inside)
-    {
-    this->Implementation->Inside = inside;
     this->update();
     }
 }
@@ -246,5 +263,14 @@ void pqCollapsedGroup::mouseReleaseEvent(QMouseEvent* event)
       {
       this->toggle();
       }
+    }
+}
+
+void pqCollapsedGroup::leaveEvent(QEvent*)
+{
+  if(this->Implementation->Inside)
+    {
+    this->Implementation->Inside = false;
+    this->update();
     }
 }
