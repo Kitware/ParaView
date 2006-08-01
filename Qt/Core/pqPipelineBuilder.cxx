@@ -120,7 +120,7 @@ void pqPipelineBuilder::addConnection(pqPipelineSource* source,
 
   if (this->UndoStack)
     {
-    this->UndoStack->BeginOrContinueUndoSet(QString("Add Connection"));
+    this->UndoStack->BeginUndoSet(QString("Add Connection"));
     }
 
   vtkSMInputProperty *inputProp = vtkSMInputProperty::SafeDownCast(
@@ -145,7 +145,7 @@ void pqPipelineBuilder::addConnection(pqPipelineSource* source,
 
   if (this->UndoStack)
     {
-    this->UndoStack->PauseUndoSet();
+    this->UndoStack->EndUndoSet();
     }
 }
 
@@ -184,7 +184,7 @@ void pqPipelineBuilder::removeConnection(pqPipelineSource* pqsource,
 
   if (this->UndoStack)
     {
-    this->UndoStack->BeginOrContinueUndoSet(QString("Remove Connection"));
+    this->UndoStack->BeginUndoSet(QString("Remove Connection"));
     }
 
   vtkSMInputProperty *inputProp = vtkSMInputProperty::SafeDownCast(
@@ -197,7 +197,7 @@ void pqPipelineBuilder::removeConnection(pqPipelineSource* pqsource,
 
   if (this->UndoStack)
     {
-    this->UndoStack->PauseUndoSet();
+    this->UndoStack->EndUndoSet();
     }
 }
 
@@ -234,7 +234,7 @@ vtkSMProxy* pqPipelineBuilder::createProxy(const char* xmlgroup,
     {
     vtksys_ios::ostringstream label;
     label << "Create " << xmlname;
-    this->UndoStack->BeginOrContinueUndoSet(QString(label.str().c_str()));
+    this->UndoStack->BeginUndoSet(QString(label.str().c_str()));
     }
 
   /*
@@ -281,7 +281,7 @@ vtkSMProxy* pqPipelineBuilder::createProxy(const char* xmlgroup,
 
   if (this->UndoStack && is_undoable)
     {
-    this->UndoStack->PauseUndoSet();
+    this->UndoStack->EndUndoSet();
     }
   return proxy;
 }
@@ -297,13 +297,13 @@ vtkSMProxy* pqPipelineBuilder::createPipelineProxy(const char* xmlgroup,
     {
     if (this->UndoStack)
       {
-      this->UndoStack->BeginOrContinueUndoSet("Connect display");
+      this->UndoStack->BeginUndoSet("Connect display");
       }
 
     this->createDisplayProxyInternal(proxy, renModule->getRenderModuleProxy());
     if (this->UndoStack)
       {
-      this->UndoStack->PauseUndoSet();
+      this->UndoStack->EndUndoSet();
       }
     }
   return proxy;
@@ -330,13 +330,13 @@ pqPipelineDisplay* pqPipelineBuilder::createDisplayProxy(pqPipelineSource* src,
     {
     vtksys_ios::ostringstream label;
     label << "Display " << (proxy->GetXMLName()? proxy->GetXMLName() : "" );
-    this->UndoStack->BeginOrContinueUndoSet(QString(label.str().c_str()));
+    this->UndoStack->BeginUndoSet(QString(label.str().c_str()));
     }
   vtkSMDisplayProxy* display = 
     this->createDisplayProxyInternal(proxy, renModule->getRenderModuleProxy());
   if (this->UndoStack)
     {
-    this->UndoStack->PauseUndoSet();
+    this->UndoStack->EndUndoSet();
     }
 
   if (display)
@@ -436,14 +436,14 @@ void pqPipelineBuilder::remove(pqPipelineDisplay* display,
 {
   if (is_undoable && this->UndoStack)
     {
-    this->UndoStack->BeginOrContinueUndoSet(QString("Remove Display"));
+    this->UndoStack->BeginUndoSet(QString("Remove Display"));
     }
 
   this->removeInternal(display);
 
   if (is_undoable && this->UndoStack)
     {
-    this->UndoStack->PauseUndoSet();
+    this->UndoStack->EndUndoSet();
     }
 }
 
@@ -465,7 +465,7 @@ void pqPipelineBuilder::remove(pqPipelineSource* source,
 
   if (this->UndoStack && is_undoable)
     {
-    this->UndoStack->BeginOrContinueUndoSet(QString("Remove Source"));
+    this->UndoStack->BeginUndoSet(QString("Remove Source"));
     }
 
 
@@ -497,7 +497,7 @@ void pqPipelineBuilder::remove(pqPipelineSource* source,
 
   if (this->UndoStack && is_undoable)
     {
-    this->UndoStack->PauseUndoSet();
+    this->UndoStack->EndUndoSet();
     }
 }
 

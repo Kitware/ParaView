@@ -161,7 +161,7 @@ void pqPipelineBrowserContextMenu::showDisplayEditor()
   //dialog->setModal(true);
   //dialog->show();
   pqApplicationCore::instance()->getUndoStack()->
-    BeginOrContinueUndoSet("Display Settings");
+    BeginUndoSet("Display Settings");
   dialog->exec();
   pqApplicationCore::instance()->getUndoStack()->
     EndUndoSet();

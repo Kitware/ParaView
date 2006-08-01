@@ -50,9 +50,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class pqUndoStackImplementation
 {
 public:
+  pqUndoStackImplementation()
+    {
+    this->NestedCount = 0;
+    }
   vtkSmartPointer<vtkSMUndoStack> UndoStack;
   vtkSmartPointer<vtkEventQtSlotConnect> VTKConnector;
   QPointer<pqServer> Server;
+  int NestedCount;
 };
 
 //-----------------------------------------------------------------------------
@@ -138,40 +143,55 @@ void pqUndoStack::onStackChanged(vtkObject*, unsigned long, void*,
 }
 
 //-----------------------------------------------------------------------------
-void pqUndoStack::BeginOrContinueUndoSet(QString label)
+void pqUndoStack::BeginUndoSet(QString label)
 {
   if (!this->Implementation->Server)
     {
     qDebug()<< "no server specified. cannot undo/redo.";
     return;
     }
-  vtkIdType cid = this->Implementation->Server->GetConnectionID();
-  this->Implementation->UndoStack->BeginOrContinueUndoSet(cid,
-    label.toStdString().c_str());
-}
 
-//-----------------------------------------------------------------------------
-void pqUndoStack::PauseUndoSet()
-{
-  this->Implementation->UndoStack->PauseUndoSet();
+  if(this->Implementation->NestedCount == 0)
+    {
+    vtkIdType cid = this->Implementation->Server->GetConnectionID();
+    this->Implementation->UndoStack->BeginOrContinueUndoSet(cid,
+      label.toStdString().c_str());
+    }
+
+  this->Implementation->NestedCount++;
 }
 
 //-----------------------------------------------------------------------------
 void pqUndoStack::EndUndoSet()
 {
-  this->Implementation->UndoStack->EndUndoSet();
+  if(this->Implementation->NestedCount == 0)
+    {
+    qDebug() << "EndUndoSet called without a BeginUndoSet.";
+    return;
+    }
+
+  this->Implementation->NestedCount--;
+  if(this->Implementation->NestedCount == 0)
+    {
+    this->Implementation->UndoStack->EndUndoSet();
+    }
 }
 
 //-----------------------------------------------------------------------------
 void pqUndoStack::Accept()
 {
-  this->BeginOrContinueUndoSet("Accept");
+  this->BeginUndoSet("Accept");
 }
 
 //-----------------------------------------------------------------------------
 void pqUndoStack::Reset()
 {
   this->Implementation->UndoStack->CancelUndoSet();
+  if(this->Implementation->NestedCount != 0)
+    {
+    qDebug() << "Reset called without a closing EndUndoSet.";
+    }
+  this->Implementation->NestedCount = 0;
 }
 
 //-----------------------------------------------------------------------------

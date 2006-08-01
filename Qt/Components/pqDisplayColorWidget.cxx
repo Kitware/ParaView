@@ -207,7 +207,7 @@ void pqDisplayColorWidget::onVariableChanged(pqVariableType vtkNotUsed(type),
   // I cannot decide if we should use signals here of directly 
   // call the appropriate methods on undo stack.
   pqUndoStack* stack = pqApplicationCore::instance()->getUndoStack();
-  stack->BeginOrContinueUndoSet("Color Change");
+  stack->BeginUndoSet("Color Change");
   pqPipelineDisplay* display = this->SelectedSource->getDisplay(0);
   display->setColorField(name);
   stack->EndUndoSet();

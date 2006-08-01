@@ -252,9 +252,6 @@ void pqApplicationCore::removeSource(pqPipelineSource* source)
  
   this->getPipelineBuilder()->remove(source);
 
-  // Since pqPipelineBuilder is never going to call EndUndoSet(), we must call 
-  // it explicitly here.
-  this->getUndoStack()->EndUndoSet();
 }
 
 
@@ -415,6 +412,8 @@ pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlnam
     return NULL;
     }
 
+  this->getUndoStack()->BeginUndoSet(QString("Create ") + xmlname);
+
   pqPipelineSource* filter = this->getPipelineBuilder()->createSource(
     "filters", xmlname.toStdString().c_str(), 
     input->getServer(), NULL);
@@ -426,7 +425,7 @@ pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlnam
     // As a special-case, set a default implicit function for new Cut filters
     if(xmlname == "Cut")
       {
-      this->Internal->UndoStack->BeginOrContinueUndoSet("Set CutConnection");
+      this->Internal->UndoStack->BeginUndoSet("Set CutConnection");
       
       if(vtkSMDoubleVectorProperty* const contours =
         vtkSMDoubleVectorProperty::SafeDownCast(
@@ -436,13 +435,13 @@ pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlnam
         contours->SetElement(0, 0.0);
         }
         
-      this->getUndoStack()->PauseUndoSet();
+      this->getUndoStack()->EndUndoSet();
       }
 
     // As a special-case, set a default point source for new StreamTracer filters
     if(xmlname == "StreamTracer")
       {
-      this->Internal->UndoStack->BeginOrContinueUndoSet("Set Point Source");
+      this->Internal->UndoStack->BeginUndoSet("Set Point Source");
       vtkSMProxyProperty* sourceProperty = vtkSMProxyProperty::SafeDownCast(
         filter->getProxy()->GetProperty("Source"));
       if(sourceProperty && sourceProperty->GetNumberOfProxies() > 0)
@@ -458,11 +457,10 @@ pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlnam
         point_source->UpdateVTKObjects();
         }
         
-      this->getUndoStack()->PauseUndoSet();
+      this->getUndoStack()->EndUndoSet();
       }
       
     emit this->sourceCreated(filter);
-    this->getUndoStack()->EndUndoSet();
 
     // As a special-case, set the default contour for new Contour filters
     if(xmlname == "Contour")
@@ -498,6 +496,8 @@ pqPipelineSource* pqApplicationCore::createFilterForSource(const QString& xmlnam
       SetDefaultInputArray(filter->getProxy(), "SelectInputVectors");
       }
     }
+    
+  this->getUndoStack()->EndUndoSet();
   
   return filter;
 }
@@ -512,12 +512,15 @@ pqPipelineSource* pqApplicationCore::createSourceOnServer(const QString& xmlname
     return 0;
     }
 
+  this->getUndoStack()->BeginUndoSet(QString("Create ") + xmlname);
+
   pqPipelineSource* source = this->getPipelineBuilder()->createSource(
     "sources", xmlname.toStdString().c_str(), 
     server, NULL);
 
   emit this->sourceCreated(source);
   this->getUndoStack()->EndUndoSet();
+  
   return source;
 }
 
@@ -531,6 +534,8 @@ pqPipelineSource* pqApplicationCore::createCompoundFilterForSource(
     qDebug() << "No source/filter specified. Cannot createCompoundFilterForSource.";
     return 0;
     }
+
+  this->getUndoStack()->BeginUndoSet(QString("Create ") + name);
 
   pqPipelineSource* filter = this->getPipelineBuilder()->createSource(
     NULL, name.toStdString().c_str(), 
@@ -556,6 +561,8 @@ pqPipelineSource* pqApplicationCore::createReaderOnServer(
     qDebug() << "No active server. Cannot create reader.";
     return 0;
     }
+  
+  this->getUndoStack()->BeginUndoSet(QString("Create reader for ") + filename);
 
   pqPipelineSource* reader= this->getReaderFactory()->createReader(filename, 
                                                                    server);
@@ -563,8 +570,6 @@ pqPipelineSource* pqApplicationCore::createReaderOnServer(
     {
     return NULL;
     }
-
-  this->getUndoStack()->BeginOrContinueUndoSet("Set Filenames");
 
   vtkSMProxy* proxy = reader->getProxy();
   pqSMAdaptor::setElementProperty(proxy->GetProperty("FileName"), 
@@ -574,8 +579,6 @@ pqPipelineSource* pqApplicationCore::createReaderOnServer(
   pqSMAdaptor::setElementProperty(proxy->GetProperty("FilePattern"),
     filename);
   proxy->UpdateVTKObjects();
-
-  this->getUndoStack()->PauseUndoSet();
 
   emit this->sourceCreated(reader);
   this->getUndoStack()->EndUndoSet();

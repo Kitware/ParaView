@@ -72,8 +72,7 @@ public slots:
   /// 2)  Once we start supporting multiple connections vtkSMUndoStack()
   ///     will support UndoSet with elements on multiple connections
   ///     transparently.
-  void BeginOrContinueUndoSet(QString label);
-  void PauseUndoSet();
+  void BeginUndoSet(QString label);
   void EndUndoSet();
   void Accept();
   void Reset();

@@ -233,7 +233,7 @@ void pqRenderModule::startInteraction()
   
   // NOTE: bewary of the server used while calling
   // BeginOrContinueUndoSet on vtkSMUndoStack.
-  this->Internal->UndoStack->BeginOrContinueUndoSet("Interaction");
+  this->Internal->UndoStack->BeginUndoSet("Interaction");
 
   vtkPVGenericRenderWindowInteractor* iren =
     vtkPVGenericRenderWindowInteractor::SafeDownCast(
