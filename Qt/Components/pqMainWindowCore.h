@@ -131,11 +131,6 @@ public:
   /// returns the active render module.
   pqRenderModule* getActiveRenderModule();
   
-  /// Returns the number of sources pending displays. This shouldn't even be 
-  /// exposed, but for the current release, we want to disable all menus,
-  /// if the user has a source waiting a display, hence we expose it.
-  int getNumberOfSourcesPendingDisplays();
-
   void removeActiveSource();
   void removeActiveServer();
   
@@ -312,12 +307,6 @@ private slots:
   // after first accept, set up undo stack so that the undo/redo
   // works correctly with pending displays etc etc.
   void onSourceCreated(pqPipelineSource*);
-  
-  // Methods to add a source to the list of sources pending displays.
-  void addSourcePendingDisplay(pqPipelineSource*);
-
-  // Methods to remove a source to the list of sources pending displays.
-  void removeSourcePendingDisplay(pqPipelineSource*);
   
 private:
   class pqImplementation;

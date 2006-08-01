@@ -63,7 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqToolTipTrapper.h"
 #include "pqVCRController.h"
 #include "pqWriterFactory.h"
-#include "pqPendingDisplayUndoElement.h"
+#include "pqPendingDisplayManager.h"
 #include "pqSMAdaptor.h"
 #include "pqSettingsDialog.h"
 
@@ -167,8 +167,6 @@ public:
   QPointer<pqServer> ActiveServer;
   QPointer<pqRenderModule> ActiveRenderModule;
 
-  QList< QPointer<pqPipelineSource> > SourcesSansDisplays;
-
 #ifdef PARAVIEW_EMBED_PYTHON
   QPointer<pqPythonDialog> PythonDialog;
 #endif // PARAVIEW_EMBED_PYTHON
@@ -242,7 +240,8 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
                    this, SLOT(onCoreActiveChanged()));
 
   // Update enable state when pending displays state changes.
-  QObject::connect(this, SIGNAL(pendingDisplays(bool)),
+  QObject::connect(core->getPendingDisplayManager(), 
+                   SIGNAL(pendingDisplays(bool)),
                    this, SLOT(onInitializeStates()));
 
   // Update enable state when the active view changes.
@@ -272,7 +271,7 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
 
   connect(&core->serverResources(), SIGNAL(serverConnected(pqServer*)),
     this, SLOT(onServerConnect(pqServer*)));
-
+  
 /*
   this->installEventFilter(this);
 */
@@ -557,7 +556,7 @@ pqObjectInspectorWidget* pqMainWindowCore::setupObjectInspector(QDockWidget* doc
     SLOT(createPendingDisplays()));
     
   QObject::connect(
-    this,
+    pqApplicationCore::instance()->getPendingDisplayManager(),
     SIGNAL(pendingDisplays(bool)),
     object_inspector,
     SLOT(forceModified(bool)));
@@ -1452,7 +1451,8 @@ void pqMainWindowCore::onActiveSourceChanged(pqPipelineSource* src)
   // Updating the filters menu will cause the execution of a filter because
   // it's output is needed to check filter matches. We do not want the
   // filter to execute prematurely.
-  if (this->getNumberOfSourcesPendingDisplays() == 0)
+  if (pqApplicationCore::instance()->getPendingDisplayManager()
+      ->getNumberOfPendingDisplays() == 0)
     {
     this->updateFiltersMenu(src);
     }
@@ -1562,7 +1562,8 @@ void pqMainWindowCore::onInitializeStates()
     getServerManagerModel()->getNumberOfServers();
 
   const bool pending_displays = 
-    (this->getNumberOfSourcesPendingDisplays() > 0);
+    (pqApplicationCore::instance()->getPendingDisplayManager()->
+     getNumberOfPendingDisplays() > 0);
 
   emit this->enableFileOpen(!pending_displays);
 
@@ -1796,12 +1797,6 @@ void pqMainWindowCore::setActiveRenderModule(pqRenderModule* rm)
   emit this->activeRenderModuleChanged(rm);
 }
 
-//-----------------------------------------------------------------------------
-int pqMainWindowCore::getNumberOfSourcesPendingDisplays()
-{
-  return this->Implementation->SourcesSansDisplays.size();
-}
-
 void pqMainWindowCore::removeActiveSource()
 {
   pqPipelineSource* source = this->getActiveSource();
@@ -1836,14 +1831,9 @@ void pqMainWindowCore::sourceRemoved(pqPipelineSource* source)
     this->setActiveServer(server);
     }
 
-  if (this->Implementation->SourcesSansDisplays.contains(source))
-    {
-    this->Implementation->SourcesSansDisplays.removeAll(source);
-    if (this->Implementation->SourcesSansDisplays.size() == 0)
-      {
-      emit this->pendingDisplays(false);
-      }
-    }
+  pqApplicationCore::instance()->getPendingDisplayManager()->
+    removePendingDisplayForSource(source);
+
   this->getActiveRenderModule()->render();
 }
 
@@ -1855,13 +1845,9 @@ void pqMainWindowCore::onSourceCreated(pqPipelineSource* source)
     return;
     }
 
-  this->addSourcePendingDisplay(source);
+  pqApplicationCore::instance()->getPendingDisplayManager()->
+        addPendingDisplayForSource(source);
   this->setActiveSource(source);
-
-  pqPendingDisplayUndoElement* elem = pqPendingDisplayUndoElement::New();
-  elem->PendingDisplay(source, true);
-  pqApplicationCore::instance()->getUndoStack()->AddToActiveUndoSet(elem);
-  elem->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -1906,60 +1892,10 @@ void pqMainWindowCore::disableAutomaticDisplays()
 }
 
 //-----------------------------------------------------------------------------
-// Methods to add a source to the list of sources pending displays.
-void pqMainWindowCore::addSourcePendingDisplay(pqPipelineSource* src)
-{
-  if (!this->Implementation->SourcesSansDisplays.contains(src))
-    {
-    this->Implementation->SourcesSansDisplays.push_back(src);
-    emit this->pendingDisplays(true);
-    }
-}
-
-//-----------------------------------------------------------------------------
-// Methods to remove a source to the list of sources pending displays.
-void pqMainWindowCore::removeSourcePendingDisplay(pqPipelineSource* src)
-{
-  if (this->Implementation->SourcesSansDisplays.contains(src))
-    {
-    this->Implementation->SourcesSansDisplays.removeAll(src);
-    if (this->Implementation->SourcesSansDisplays.size() == 0)
-      {
-      emit this->pendingDisplays(false);
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
 void pqMainWindowCore::createPendingDisplays()
 {
-  foreach (pqPipelineSource* source, this->Implementation->SourcesSansDisplays)
-    {
-    if (!source)
-      {
-      continue;
-      }
-    pqApplicationCore::instance()->getPipelineBuilder()->createDisplayProxy(source,
-      this->getActiveRenderModule());
-    this->getActiveRenderModule()->render();
-    if (pqApplicationCore::instance()->getServerManagerModel()->getNumberOfSources() == 1)
-      {
-      this->getActiveRenderModule()->resetCamera();
-      }
-    
-    // For every pending display we create, we push an undoelement
-    // nothing the creation of the pending display. 
-    // This ensures that when this step is undone, the source for
-    // which we created the pending display is once again marked as
-    // a source pending a display.
-    pqPendingDisplayUndoElement* elem = pqPendingDisplayUndoElement::New();
-    elem->PendingDisplay(source, false);
-    pqApplicationCore::instance()->getUndoStack()->AddToActiveUndoSet(elem);
-    elem->Delete();
-    }
-
-  this->Implementation->SourcesSansDisplays.clear();
-  emit this->pendingDisplays(false);
+  pqApplicationCore::instance()->getPendingDisplayManager()->
+    createPendingDisplays(this->getActiveRenderModule());
 }
 
 void pqMainWindowCore::serverRemoved(pqServer*)

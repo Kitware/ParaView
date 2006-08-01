@@ -37,6 +37,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqFileDialogEventTranslator.h
   pqOutputWindow.h
   pqOutputWindowAdapter.h
+  pqPendingDisplayManager.h
   pqPipelineBuilder.h
   pqPipelineDisplay.h
   pqPipelineModel.h
@@ -104,6 +105,8 @@ ADD_LIBRARY(pqCore
   pqOutputWindow.h
   pqOutputWindowAdapter.cxx
   pqOutputWindowAdapter.h
+  pqPendingDisplayManager.cxx
+  pqPendingDisplayManager.h
   pqPendingDisplayUndoElement.cxx
   pqPendingDisplayUndoElement.h
   pqPipelineBuilder.cxx

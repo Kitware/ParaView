@@ -50,6 +50,7 @@ class pqSettings;
 class pqUndoStack;
 class pqWriterFactory;
 class vtkPVXMLElement;
+class pqPendingDisplayManager;
 
 /// This class is the crux of the ParaView application. It creates
 /// and manages various managers which are necessary for the PQClient
@@ -79,6 +80,7 @@ public:
   pq3DWidgetFactory* get3DWidgetFactory();
   pqReaderFactory* getReaderFactory();
   pqWriterFactory* getWriterFactory();
+  pqPendingDisplayManager* getPendingDisplayManager();
 
   // Returns the server manager selection model.
   pqServerManagerSelectionModel* getSelectionModel();

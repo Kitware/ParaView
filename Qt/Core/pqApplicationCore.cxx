@@ -73,6 +73,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqUndoStack.h"
 #include "pqWriterFactory.h"
 #include "pqXMLUtil.h"
+#include "pqPendingDisplayManager.h"
 
 //-----------------------------------------------------------------------------
 class pqApplicationCoreInternal
@@ -86,6 +87,7 @@ public:
   pqReaderFactory* ReaderFactory;
   pqWriterFactory* WriterFactory;
   pqServerManagerSelectionModel* SelectionModel;
+  pqPendingDisplayManager* PendingDisplayManager;
 
   QString OrganizationName;
   QString ApplicationName;
@@ -143,6 +145,8 @@ pqApplicationCore::pqApplicationCore(QObject* p/*=null*/)
   // * Setup the selection model.
   this->Internal->SelectionModel = new pqServerManagerSelectionModel(
     this->Internal->ServerManagerModel, this);
+  
+  this->Internal->PendingDisplayManager = new pqPendingDisplayManager(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -228,6 +232,10 @@ pqServerManagerSelectionModel* pqApplicationCore::getSelectionModel()
   return this->Internal->SelectionModel;
 }
 
+pqPendingDisplayManager* pqApplicationCore::getPendingDisplayManager()
+{
+  return this->Internal->PendingDisplayManager;
+}
 
 
 //-----------------------------------------------------------------------------
