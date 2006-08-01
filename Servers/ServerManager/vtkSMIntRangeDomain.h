@@ -68,10 +68,31 @@ public:
   int GetMaximum(unsigned int idx, int& exists);
 
   // Description:
+  // Returns if minimum/maximum bound is set for the domain.
+  int GetMinimumExists(unsigned int idx);
+  int GetMaximumExists(unsigned int idx);
+
+  // Description:
+  // Returns the minimum/maximum value, is exists, otherwise
+  // 0 is returned. Use GetMaximumExists() GetMaximumExists() to make sure that
+  // the bound is set.
+  int GetMinimum(unsigned int idx);
+  int GetMaximum(unsigned int idx);
+
+  // Description:
   // Return a resolution. value if it exists. If the resolution. exists
   // exists is set to 1. Otherwise, it is set to 0.
   // An unspecified max. is equivalent to 1
   int GetResolution(unsigned int idx, int& exists);
+
+  // Description:
+  // Returns is the relution value is set for the given index.
+  int GetResolutionExists(unsigned int idx);
+ 
+  // Description:
+  // Return a resolution. value if it exists, otherwise 0. 
+  // Use GetResolutionExists() to make sure that the value exists.
+  int GetResolution(unsigned int idx);
 
   // Description:
   // Set a min. of a given index.

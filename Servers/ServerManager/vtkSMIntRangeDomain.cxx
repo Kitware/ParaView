@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntRangeDomain);
-vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.16");
+vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.17");
 
 struct vtkSMIntRangeDomainInternals
 {
@@ -159,6 +159,46 @@ int vtkSMIntRangeDomain::GetMaximum(unsigned int idx, int& exists)
 }
 
 //---------------------------------------------------------------------------
+int vtkSMIntRangeDomain::GetMinimumExists(unsigned int idx)
+{
+  if (idx >= this->IRInternals->Entries.size())
+    {
+    return 0;
+    }
+  return this->IRInternals->Entries[idx].MinSet;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMIntRangeDomain::GetMaximumExists(unsigned int idx)
+{
+  if (idx >= this->IRInternals->Entries.size())
+    {
+    return 0;
+    }
+  return this->IRInternals->Entries[idx].MaxSet;
+}
+
+
+//---------------------------------------------------------------------------
+int vtkSMIntRangeDomain::GetMaximum(unsigned int idx)
+{
+  if (!this->GetMaximumExists(idx))
+    {
+    return 0;
+    }
+  return this->IRInternals->Entries[idx].Max;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMIntRangeDomain::GetMinimum(unsigned int idx)
+{
+  if (!this->GetMinimumExists(idx))
+    {
+    return 0;
+    }
+  return this->IRInternals->Entries[idx].Min;
+}
+//---------------------------------------------------------------------------
 int vtkSMIntRangeDomain::GetResolution(unsigned int idx, int& exists)
 {
   exists = 0;
@@ -172,6 +212,26 @@ int vtkSMIntRangeDomain::GetResolution(unsigned int idx, int& exists)
     return this->IRInternals->Entries[idx].Resolution;
     }
   return 0;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMIntRangeDomain::GetResolutionExists(unsigned int idx)
+{
+  if (idx >= this->IRInternals->Entries.size())
+    {
+    return 0;
+    }
+  return this->IRInternals->Entries[idx].ResolutionSet;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMIntRangeDomain::GetResolution(unsigned int idx)
+{
+  if (!this->GetResolutionExists(idx))
+    {
+    return 0;
+    }
+  return this->IRInternals->Entries[idx].Resolution;
 }
 
 //---------------------------------------------------------------------------
