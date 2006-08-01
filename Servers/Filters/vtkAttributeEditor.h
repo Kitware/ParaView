@@ -51,14 +51,22 @@ public:
   // Description:
   // Get either input of this filter.
 //BTX
-  vtkDataSet *GetInput(int idx);
-  vtkDataSet *GetInput() 
-    {return this->GetInput( 0 );}
+//  vtkDataSet *GetInput(int idx);
+//  vtkDataSet *GetInput() 
+//    {return this->GetInput( 0 );}
 //ETX
 
   // Description:
+  // Specify the source object used when writing out data.
+  void SetSource(vtkDataSet *source);
+  vtkDataSet *GetSource();
+
+  // Description:
   // Remove a dataset from the list of data to append.
-  void RemoveInput(vtkDataSet *in);
+  //void RemoveInput(vtkDataSet *in);
+
+  //void AddInput(vtkDataObject *);
+  //void AddInput(int, vtkDataObject*);
 
   // Description:
   // Access to the flag that toggles between a source view and a filter view
