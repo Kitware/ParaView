@@ -71,9 +71,9 @@ pqCollapsedGroup::pqCollapsedGroup(QWidget* parent_widget) :
   QApplication::instance()->installEventFilter(this);
 }
 
-pqCollapsedGroup::pqCollapsedGroup(const QString& title, QWidget* parent_widget) :
+pqCollapsedGroup::pqCollapsedGroup(const QString& group_title, QWidget* parent_widget) :
   QWidget(parent_widget),
-  Implementation(new pqImplementation(title))
+  Implementation(new pqImplementation(group_title))
 {
   QApplication::instance()->installEventFilter(this);
 }
@@ -86,11 +86,11 @@ pqCollapsedGroup::~pqCollapsedGroup()
 
 void pqCollapsedGroup::setWidget(QWidget* child)
 {
-  QVBoxLayout* const layout = new QVBoxLayout(this);
-  layout->setMargin(0);
-  layout->setSpacing(0);
-  layout->addWidget(child);
-  this->setLayout(layout);
+  QVBoxLayout* const child_layout = new QVBoxLayout(this);
+  child_layout->setMargin(0);
+  child_layout->setSpacing(0);
+  child_layout->addWidget(child);
+  this->setLayout(child_layout);
 }
 
 const bool pqCollapsedGroup::isExpanded()
@@ -115,10 +115,10 @@ void pqCollapsedGroup::toggle()
   this->Implementation->Expanded = 
     !this->Implementation->Expanded;
    
-  const QObjectList& children = this->children();
-  for(int i = 0; i != children.size(); ++i)
+  const QObjectList& group_children = this->children();
+  for(int i = 0; i != group_children.size(); ++i)
     {
-    if(QWidget* const widget = qobject_cast<QWidget*>(children[i]))
+    if(QWidget* const widget = qobject_cast<QWidget*>(group_children[i]))
       {
       widget->setVisible(this->Implementation->Expanded);
       }
@@ -138,9 +138,9 @@ QString pqCollapsedGroup::title() const
   return this->Implementation->Title;
 }
 
-void pqCollapsedGroup::setIndent(int indent)
+void pqCollapsedGroup::setIndent(int new_indent)
 {
-  this->Implementation->Indent = indent;
+  this->Implementation->Indent = new_indent;
   
   // This hack forces a layout update so changes in
   // Designer are shown immediately
@@ -154,20 +154,20 @@ int pqCollapsedGroup::indent() const
   return this->Implementation->Indent;
 }
   
-void pqCollapsedGroup::resizeEvent(QResizeEvent* event)
+void pqCollapsedGroup::resizeEvent(QResizeEvent* e)
 {
   // Base the height of the button on the height of the font,
   // and ensure that the result is an odd number (so the icon centers nicely)
-  const int height =
+  const int button_height =
     static_cast<int>(this->fontMetrics().height() * 1.3) | 0x01;
 
   this->Implementation->ButtonRect =
-    QRect(0, 0, event->size().width(), height);
+    QRect(0, 0, e->size().width(), button_height);
   this->setContentsMargins(this->Implementation->Indent, this->Implementation->ButtonRect.height(), 0, 0);
   this->update();
 }
 
-void pqCollapsedGroup::paintEvent(QPaintEvent* event)
+void pqCollapsedGroup::paintEvent(QPaintEvent*)
 {
   const QRect button_rect = this->Implementation->ButtonRect;
 
@@ -220,15 +220,15 @@ void pqCollapsedGroup::paintEvent(QPaintEvent* event)
   painter.drawItemText(text_rect, Qt::AlignLeft | Qt::AlignVCenter, button_options.palette, true, text);
 }
 
-bool pqCollapsedGroup::eventFilter(QObject* target, QEvent* event)
+bool pqCollapsedGroup::eventFilter(QObject* target, QEvent* e)
 {
-  if(event->type() == QEvent::MouseMove)
+  if(e->type() == QEvent::MouseMove)
     {
-    for(QObject* parent = target; parent; parent = parent->parent())
+    for(QObject* ancestor = target; ancestor; ancestor = ancestor->parent())
       {
-      if(parent == this)
+      if(ancestor == this)
         {
-        const QPoint mouse = this->mapFromGlobal(qobject_cast<QWidget*>(target)->mapToGlobal(static_cast<QMouseEvent*>(event)->pos()));
+        const QPoint mouse = this->mapFromGlobal(qobject_cast<QWidget*>(target)->mapToGlobal(static_cast<QMouseEvent*>(e)->pos()));
         const bool inside = this->Implementation->ButtonRect.contains(mouse);
         if(inside != this->Implementation->Inside)
           {
@@ -240,26 +240,26 @@ bool pqCollapsedGroup::eventFilter(QObject* target, QEvent* event)
       }
     }
     
-  return QWidget::eventFilter(target, event);
+  return QWidget::eventFilter(target, e);
 }
 
-void pqCollapsedGroup::mousePressEvent(QMouseEvent* event)
+void pqCollapsedGroup::mousePressEvent(QMouseEvent* e)
 {
-  if(this->Implementation->ButtonRect.contains(event->pos()))
+  if(this->Implementation->ButtonRect.contains(e->pos()))
     {
     this->Implementation->Pressed = true;
     this->update();
     }
 }
 
-void pqCollapsedGroup::mouseReleaseEvent(QMouseEvent* event)
+void pqCollapsedGroup::mouseReleaseEvent(QMouseEvent* e)
 {
   if(this->Implementation->Pressed)
     {
     this->Implementation->Pressed = false;
     this->update();
 
-    if(this->Implementation->ButtonRect.contains(event->pos()))
+    if(this->Implementation->ButtonRect.contains(e->pos()))
       {
       this->toggle();
       }

@@ -93,8 +93,8 @@ bool pqCollapsedGroupPlugin::isContainer() const
 /////////////////////////////////////////////////////////////////////////////
 // QtWidgetsPlugin
 
-QtWidgetsPlugin::QtWidgetsPlugin(QObject* parent) :
-  QObject(parent)
+QtWidgetsPlugin::QtWidgetsPlugin(QObject* p) :
+  QObject(p)
 {
   this->List.append(new pqCollapsedGroupPlugin());
 }
