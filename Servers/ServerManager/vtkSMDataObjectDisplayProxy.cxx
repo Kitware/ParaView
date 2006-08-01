@@ -36,7 +36,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDataObjectDisplayProxy);
-vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMDataObjectDisplayProxy, "1.16");
 
 
 //-----------------------------------------------------------------------------
@@ -964,8 +964,11 @@ void vtkSMDataObjectDisplayProxy::SetVolumeMapperToBunykCM()
     vtkErrorMacro("Failed to find property Mapper on VolumeActorProxy.");
     return;
     }
-  pp->RemoveAllProxies();
-  pp->AddProxy(this->VolumeBunykMapperProxy);
+  if (pp->GetNumberOfProxies() != 1)
+    {
+    vtkErrorMacro("Expected one proxy in Mapper's VolumeActorProxy.");
+    }
+  pp->SetProxy(0, this->VolumeBunykMapperProxy);
   this->UpdateVTKObjects();
 }
 
@@ -985,8 +988,11 @@ void vtkSMDataObjectDisplayProxy::SetVolumeMapperToPTCM()
     vtkErrorMacro("Failed to find property Mapper on VolumeActorProxy.");
     return;
     }
-  pp->RemoveAllProxies();
-  pp->AddProxy(this->VolumePTMapperProxy);
+  if (pp->GetNumberOfProxies() != 1)
+    {
+    vtkErrorMacro("Expected one proxy in Mapper's VolumeActorProxy.");
+    }
+  pp->SetProxy(0, this->VolumePTMapperProxy);
   this->UpdateVTKObjects();
 }
 
@@ -1006,8 +1012,11 @@ void vtkSMDataObjectDisplayProxy::SetVolumeMapperToZSweepCM()
     vtkErrorMacro("Failed to find property Mapper on VolumeActorProxy.");
     return;
     }
-  pp->RemoveAllProxies();
-  pp->AddProxy(this->VolumeZSweepMapperProxy);
+  if (pp->GetNumberOfProxies() != 1)
+    {
+    vtkErrorMacro("Expected one proxy in Mapper's VolumeActorProxy.");
+    }
+  pp->SetProxy(0, this->VolumeZSweepMapperProxy);
   this->UpdateVTKObjects();
 }
 
