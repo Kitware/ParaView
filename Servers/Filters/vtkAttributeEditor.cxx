@@ -49,7 +49,7 @@
 #include "vtkPickFilter.h"
 
 
-vtkCxxRevisionMacro(vtkAttributeEditor, "1.7");
+vtkCxxRevisionMacro(vtkAttributeEditor, "1.8");
 vtkStandardNewMacro(vtkAttributeEditor);
 vtkCxxSetObjectMacro(vtkAttributeEditor,ClipFunction,vtkImplicitFunction);
 vtkCxxSetObjectMacro(vtkAttributeEditor,Controller,vtkMultiProcessController);
@@ -77,16 +77,17 @@ vtkAttributeEditor::vtkAttributeEditor(vtkImplicitFunction *cf)
   //                             vtkDataSetAttributes::SCALARS);
   //this->SetInputArrayToProcess(0,1,0,vtkDataObject::FIELD_ASSOCIATION_POINTS_THEN_CELLS,
   //                             vtkDataSetAttributes::SCALARS);
+  this->SetNumberOfOutputPorts(2);
 
-  vtkInformation* info = this->GetInputPortInformation(0);
-  info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(),1);
+  this->SetNumberOfInputPorts(2);
+ // vtkInformation* info = this->GetInputPortInformation(0);
+ // info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(),1);
 
   this->FilterDataArray = 0;
   this->ReaderDataArray = 0;
 
   // Point stuff:
 
-  this->SetNumberOfInputPorts(1);
   this->PickCell = 0;
   this->WorldPoint[0] = this->WorldPoint[1] = this->WorldPoint[2] = 0.0;
   this->Controller = 0;
@@ -123,6 +124,7 @@ vtkAttributeEditor::~vtkAttributeEditor()
     }
 }
 
+/*
 //----------------------------------------------------------------------------
 vtkDataSet *vtkAttributeEditor::GetInput(int idx)
 {
@@ -148,7 +150,7 @@ void vtkAttributeEditor::RemoveInput(vtkDataSet *ds)
 
   this->RemoveInputConnection(0, algOutput);
 }
-
+*/
 
 //----------------------------------------------------------------------------
 //
@@ -174,6 +176,10 @@ int vtkAttributeEditor::RequestData(
 
   // Get the filter input and output data sets:
   filterInputInfo = inputVector[0]->GetInformationObject(0);
+  if (filterInputInfo == NULL)
+    {
+    return 1;
+    }
   filterInput = vtkDataSet::SafeDownCast(
     filterInputInfo->Get(vtkDataObject::DATA_OBJECT()));
   if (filterInput == NULL)
@@ -185,7 +191,8 @@ int vtkAttributeEditor::RequestData(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   // Get the source input and output data sets:
-  readerInputInfo = inputVector[0]->GetInformationObject(1);
+//  readerInputInfo = inputVector[0]->GetInformationObject(1);
+  readerInputInfo = inputVector[1]->GetInformationObject(0);
   if(readerInputInfo == NULL)
     {
     // either the two inputs are the same, or second input is invalid
@@ -991,13 +998,41 @@ int vtkAttributeEditor::CompareProcesses(double bestDist2)
 
 
 //----------------------------------------------------------------------------
-int vtkAttributeEditor::FillInputPortInformation(int, vtkInformation *info)
+int vtkAttributeEditor::FillInputPortInformation(int port, vtkInformation *info)
 {
+/*
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
   info->Set(vtkAlgorithm::INPUT_IS_REPEATABLE(), 1);
+
+  return 1;
+*/
+  if(!this->Superclass::FillInputPortInformation(port, info))
+    {
+    return 0;
+    }
+  if(port==1)
+    {
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+    //info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(),1);
+    }
+  else
+    {
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+    }
   return 1;
 }
+//-----------------------------------------------------------------------------
+void vtkAttributeEditor::SetSource(vtkDataSet *source)
+{
+  this->SetInputConnection(1, source->GetProducerPort());
+}
 
+
+//-----------------------------------------------------------------------------
+vtkDataSet *vtkAttributeEditor::GetSource()
+{
+  return static_cast<vtkDataSet *>(this->GetExecutive()->GetInputData(1, 0));
+}
 
 //----------------------------------------------------------------------------
 void vtkAttributeEditor::PrintSelf(ostream& os, vtkIndent indent)

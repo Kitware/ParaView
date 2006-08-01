@@ -2616,17 +2616,12 @@ The mesh quality filter computes the quality of individual triangles, quadrilate
           button_visibility="0">
     <Filter class="vtkAttributeEditor">
       <Input name="Input"
-             class="vtkDataSet" quantity="Multiple"/>
+             class="vtkDataSet"/>
     </Filter>
     <InputMenu trace_name="Input" property="Input"
                id="im1"
                label="Input"
                help="Set the input to this filter."
-               input_name="Input"/>
-    <InputMenu trace_name="Source" property="Source"
-               id="im2"
-               label="Source"
-               help="Set the source dataset to this filter."
                input_name="Input"/>
     <ArrayMenu id="am" property="SelectInputScalars"
                trace_name="Scalars"

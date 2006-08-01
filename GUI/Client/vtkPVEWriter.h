@@ -28,6 +28,11 @@ public:
   vtkTypeRevisionMacro(vtkPVEWriter,vtkPVWriter);
   void PrintSelf(ostream& os, vtkIndent indent);  
 
+  
+  // Description:
+  // Check whether this writer supports the given VTK data set's type.
+  virtual int CanWriteData(vtkDataObject* data, int parallel, int numParts);
+  
 protected:
   vtkPVEWriter();
   ~vtkPVEWriter();

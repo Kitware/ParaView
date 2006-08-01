@@ -4118,14 +4118,12 @@ This filter operates on all types of data sets, and it returns unstructured grid
      </Documentation>
      <InputProperty
         name="Input"
-        command="AddInput"
-        clean_command="RemoveAllInputs"
-        multiple_input="1">
+        command="SetInput">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
-           <DataTypeDomain name="input_type" composite_data_supported="0">
+           <DataTypeDomain name="input_type">
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
           <InputArrayDomain name="input_array" number_of_components="1">
@@ -4134,9 +4132,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
 
      <InputProperty
         name="Source"
-        command="AddInput"
-        clean_command="RemoveAllInputs"
-        multiple_input="1">
+        command="SetSource">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
            </ProxyGroupDomain>
@@ -4144,7 +4140,6 @@ This filter operates on all types of data sets, and it returns unstructured grid
              <DataType value="vtkDataSet"/>
            </DataTypeDomain>
       </InputProperty>
-
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SetInputArrayToProcess"

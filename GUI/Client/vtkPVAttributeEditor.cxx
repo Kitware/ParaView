@@ -22,9 +22,11 @@ Wylie, Brian
 
 #include "vtkSMPart.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkSMProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDisplayProxy.h"
 #include "vtkSMDataObjectDisplayProxy.h"
+#include "vtkSMInputProperty.h"
 
 #include "vtkPVDisplayGUI.h"
 #include "vtkPVApplication.h"
@@ -57,10 +59,11 @@ Wylie, Brian
 #include "vtkKWMessageDialog.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrameWithScrollbar.h"
+#include <vtksys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAttributeEditor);
-vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.14");
+vtkCxxRevisionMacro(vtkPVAttributeEditor, "1.15");
 
 
 //----------------------------------------------------------------------------
@@ -144,6 +147,7 @@ void vtkPVAttributeEditor::PickMethodObserver()
   else if(!strcmp(select->GetCurrentValue(),"'e'dit at a point") && this->GetInitialized())
     {
     this->GetNotebook()->SetAutoAccept(0);
+    vtkPVPointWidget::SafeDownCast(select->GetPVWidget("'e'dit at a point"))->PositionResetCallback();
     }
   else if(!strcmp(select->GetCurrentValue(),"'e'dit within a draggable sphere") && this->GetInitialized())
     {
@@ -170,8 +174,11 @@ void vtkPVAttributeEditor::ProcessEvents(vtkObject* vtkNotUsed(object),
       self->SetIsScalingFlag(1);
       break;
     case vtkCommand::RightButtonReleaseEvent:
+      {
+      self->SetForceNoEdit(1);
       self->SetIsScalingFlag(0);
       break;
+      }
     case vtkCommand::LeftButtonPressEvent:
       leftdown = 1;
       break;
@@ -202,7 +209,7 @@ void vtkPVAttributeEditor::ProcessEvents(vtkObject* vtkNotUsed(object),
 //----------------------------------------------------------------------------
 void vtkPVAttributeEditor::OnTimestepChange()
 {
-  if(this->GetEditedFlag())
+  if(this->EditedFlag)
     {
     if ( vtkKWMessageDialog::PopupYesNo(
           this->GetPVApplication(), this->GetPVWindow(), "UnsavedChanges",
@@ -215,18 +222,18 @@ void vtkPVAttributeEditor::OnTimestepChange()
       this->GetPVWindow()->SetCurrentPVSource(this);
       this->GetPVWindow()->WriteData();
       }
+
+    this->EditedFlag = 0;
     }
-
-  // This ensures the currently selected region won't be edited in the new timestep:
-
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->GetProxy()->GetProperty("EditMode"));
-  ivp->SetElements1(0);
-
   vtkSMIntVectorProperty* vp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProxy()->GetProperty("ClearEdits"));
   vp->SetElements1(1);
 
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->GetProxy()->GetProperty("EditMode"));
+  ivp->SetElements1(0);
+
+  this->GetProxy()->MarkAllPropertiesAsModified();
   this->GetProxy()->UpdateVTKObjects();
 }
 
@@ -240,6 +247,7 @@ void vtkPVAttributeEditor::OnChar()
     this->Notebook->SetAcceptButtonColorToModified();
     // We want filter to edit no matter what (i.e. even if some pvwidget's state has changed)
     this->ForceEdit = 1;
+    //this->Modified();
     this->AcceptCallback();
     this->ForceEdit = 0;
 
@@ -249,15 +257,20 @@ void vtkPVAttributeEditor::OnChar()
       this->GetPVWindow()->GetInteractor()->GetKeyCode() == 'T' )
     {
     vtkPVSelectWidget *select = vtkPVSelectWidget::SafeDownCast(this->GetPVWidget("PickFunction"));
-    vtkPVPickBoxWidget *box = vtkPVPickBoxWidget::SafeDownCast(select->GetPVWidget("'e'dit within a box"));
     vtkPVPickSphereWidget *sphere = vtkPVPickSphereWidget::SafeDownCast(select->GetPVWidget("'e'dit within a draggable sphere"));
+
+/*
     if(strcmp(select->GetCurrentValue(),"'e'dit within a box") == 0)
       {
       box->GetMouseControlToggle()->ToggleSelectedState();
       box->SetMouseControlToggle(
         box->GetMouseControlToggle()->GetSelectedState());
       }
-    else if(strcmp(select->GetCurrentValue(),"'e'dit within a draggable sphere") == 0)
+    vtkPVPickBoxWidget *box = vtkPVPickBoxWidget::SafeDownCast(select->GetPVWidget("'e'dit within a box"));
+
+    else
+*/
+    if(strcmp(select->GetCurrentValue(),"'e'dit within a draggable sphere") == 0)
       {
       sphere->GetMouseControlToggle()->ToggleSelectedState();
       sphere->SetMouseControlToggle(
@@ -278,6 +291,33 @@ void vtkPVAttributeEditor::AcceptCallbackInternal()
   // If this is the first time accept has been called on this source, make sure not to edit
   if(!this->GetInitialized())
     {
+/*
+  vtkPVInputMenu *filterInput = vtkPVInputMenu::SafeDownCast(this->GetPVWidget("Input"));
+  vtkPVInputMenu *sourceInput = vtkPVInputMenu::SafeDownCast(this->GetPVWidget("Source"));
+  vtkPVSource *filterValue = filterInput->GetCurrentValue();
+  vtkPVSource *sourceValue = sourceInput->GetCurrentValue();
+  filterInput->SetCurrentValue(NULL);
+  sourceInput->SetCurrentValue(NULL);
+  filterInput->MenuEntryCallback(filterValue);
+  sourceInput->MenuEntryCallback(sourceValue);
+*/
+/*
+  filterInput->ModifiedCallback();
+  sourceInput->ModifiedCallback();
+  filterInput->Update();
+  sourceInput->Update();
+*/
+    vtkPVReaderModule *reader = this->GetPVWindow()->GetCurrentPVReaderModule();
+    if(reader)
+      {
+/*
+      const char *fname = reader->GetFileEntry()->GetValue();
+      const char *dname = vtksys::SystemTools::GetParentDirectory(fname).c_str();
+      this->GetApplication()->SetRegistryValue(
+        1, "RunTime", "SaveDataFile", dname);
+*/
+      this->GetProxy()->AddInput(reader->GetProxy(),"SetSource",0);
+      }
     editFlag = 0;
     }
   else
@@ -295,6 +335,15 @@ void vtkPVAttributeEditor::AcceptCallbackInternal()
           {
           if(widget->IsA("vtkPVInputMenu"))
             {
+//            this->GetProxy()->AddInput(this->GetPVWindow()->GetCurrentPVReaderModule()->GetProxy(),"SetSource",0);
+/*
+            vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
+              this->GetProxy()->GetProperty("Source"));
+            ip->SetProxy(0,this->GetPVWindow()->GetCurrentPVReaderModule()->GetProxy());
+*/
+            vtkSMIntVectorProperty* vp = vtkSMIntVectorProperty::SafeDownCast(
+              this->GetProxy()->GetProperty("ClearEdits"));
+            vp->SetElements1(1);
             inputModified = 1;
             editFlag = 0;
             }
@@ -313,7 +362,7 @@ void vtkPVAttributeEditor::AcceptCallbackInternal()
             vtkSMIntVectorProperty* vp = vtkSMIntVectorProperty::SafeDownCast(
               this->GetProxy()->GetProperty("ClearEdits"));
             vp->SetElements1(1);
-            this->GetProxy()->UpdateVTKObjects();
+            //this->GetProxy()->UpdateVTKObjects();
             }
           else
             {
@@ -342,9 +391,19 @@ void vtkPVAttributeEditor::AcceptCallbackInternal()
     ivp->SetElements1(1);
     }
   
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->GetProxy()->GetProperty("EditMode"));
-  ivp->SetElements1(editFlag);
+  if(editFlag)
+    {
+    vtkSMIntVectorProperty* vp = vtkSMIntVectorProperty::SafeDownCast(
+      this->GetProxy()->GetProperty("ClearEdits"));
+    vp->SetElements1(0);
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->GetProxy()->GetProperty("EditMode"));
+    ivp->SetElements1(editFlag);
+    //this->GetProxy()->SetPropertyModifiedFlag("EditMode",1);
+    //this->GetProxy()->UpdateProperty("EditMode",1);
+    }
+
+  this->GetProxy()->MarkAllPropertiesAsModified();
   this->GetProxy()->UpdateVTKObjects();
 
   // Has this source been edited yet?
@@ -376,12 +435,18 @@ void vtkPVAttributeEditor::AcceptCallbackInternal()
 //----------------------------------------------------------------------------
 void vtkPVAttributeEditor::Select()
 {
-  vtkPVSource *input, *source;
+  vtkPVSource *input;
+
+  if(!this->GetInitialized())
+    {
+    this->Superclass::Select();
+    return;
+    }
 
   vtkPVInputMenu *filterInput = vtkPVInputMenu::SafeDownCast(this->GetPVWidget("Input"));
   input = filterInput->GetCurrentValue();
-  vtkPVInputMenu *sourceInput = vtkPVInputMenu::SafeDownCast(this->GetPVWidget("Source"));
-  source = sourceInput->GetCurrentValue();
+//  vtkPVInputMenu *sourceInput = vtkPVInputMenu::SafeDownCast(this->GetPVWidget("Source"));
+//  source = sourceInput->GetCurrentValue();
 
   this->Superclass::Select();
 
@@ -389,7 +454,7 @@ void vtkPVAttributeEditor::Select()
   // This is kindof a hack because the state of the input menus was not being maintained
   // when returning to this source
   filterInput->SetCurrentValue(input);
-  sourceInput->SetCurrentValue(source);
+//  sourceInput->SetCurrentValue(source);
   this->ForceNoEdit = 1;
   this->AcceptCallback();
   this->ForceNoEdit = 0;

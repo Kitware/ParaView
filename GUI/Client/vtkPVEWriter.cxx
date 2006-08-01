@@ -29,12 +29,13 @@
 #include "vtkPVAttributeEditor.h"
 //#include "vtkPVLabeledToggle.h"
 #include "vtkPVArrayMenu.h"
+#include "vtkPVFileEntry.h"
 //#include "vtkVector.txx"
 //#include "vtkVectorIterator.txx"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEWriter);
-vtkCxxRevisionMacro(vtkPVEWriter, "1.3");
+vtkCxxRevisionMacro(vtkPVEWriter, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVEWriter::vtkPVEWriter()
@@ -52,6 +53,20 @@ void vtkPVEWriter::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 }
 
+//----------------------------------------------------------------------------
+int vtkPVEWriter::CanWriteData(vtkDataObject* data, int parallel, int numParts)
+{
+  if (data == NULL)
+    {
+    return 0;
+    }
+  if (parallel && !this->Parallel)
+    {
+    return 0;
+    }
+  // don't check numParts because for attribute editor, it will have mutiple parts due to its multiple inputs
+  return (data->IsA(this->InputClassName));
+}
 
 //----------------------------------------------------------------------------
 int vtkPVEWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
@@ -151,6 +166,12 @@ int vtkPVEWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
     //   2) we are replacing a single attribute array in the data file
     stream << vtkClientServerStream::Invoke
                     << writerID << "SetEditorFlag" << 1
+                    << vtkClientServerStream::End;
+    int originalFileFlag = 0;
+    if(strcmp(fileName,this->GetPVApplication()->GetMainWindow()->GetCurrentPVReaderModule()->GetFileEntry()->GetValue())==0)
+      originalFileFlag = 1;
+    stream << vtkClientServerStream::Invoke
+                    << writerID << "SetWritingToOriginalFile" << originalFileFlag
                     << vtkClientServerStream::End;
     // Pass the variable name that was edited on to the writer:
     stream << vtkClientServerStream::Invoke
