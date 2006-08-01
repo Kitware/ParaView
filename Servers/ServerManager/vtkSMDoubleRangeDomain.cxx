@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleRangeDomain);
-vtkCxxRevisionMacro(vtkSMDoubleRangeDomain, "1.17");
+vtkCxxRevisionMacro(vtkSMDoubleRangeDomain, "1.18");
 
 struct vtkSMDoubleRangeDomainInternals
 {
@@ -160,6 +160,47 @@ double vtkSMDoubleRangeDomain::GetMaximum(unsigned int idx, int& exists)
 }
 
 //---------------------------------------------------------------------------
+int vtkSMDoubleRangeDomain::GetMinimumExists(unsigned int idx)
+{
+  if (idx >= this->DRInternals->Entries.size())
+    {
+    return 0;
+    }
+  return this->DRInternals->Entries[idx].MinSet;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMDoubleRangeDomain::GetMaximumExists(unsigned int idx)
+{
+  if (idx >= this->DRInternals->Entries.size())
+    {
+    return 0;
+    }
+  return this->DRInternals->Entries[idx].MaxSet;
+}
+
+
+//---------------------------------------------------------------------------
+double vtkSMDoubleRangeDomain::GetMaximum(unsigned int idx)
+{
+  if (!this->GetMaximumExists(idx))
+    {
+    return 0;
+    }
+  return this->DRInternals->Entries[idx].Max;
+}
+
+//---------------------------------------------------------------------------
+double vtkSMDoubleRangeDomain::GetMinimum(unsigned int idx)
+{
+  if (!this->GetMinimumExists(idx))
+    {
+    return 0;
+    }
+  return this->DRInternals->Entries[idx].Min;
+}
+
+//---------------------------------------------------------------------------
 double vtkSMDoubleRangeDomain::GetResolution(unsigned int idx, int& exists)
 {
   exists = 0;
@@ -173,6 +214,26 @@ double vtkSMDoubleRangeDomain::GetResolution(unsigned int idx, int& exists)
     return this->DRInternals->Entries[idx].Resolution;
     }
   return 0;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMDoubleRangeDomain::GetResolutionExists(unsigned int idx)
+{
+  if (idx >= this->DRInternals->Entries.size())
+    {
+    return 0;
+    }
+  return this->DRInternals->Entries[idx].ResolutionSet;
+}
+
+//---------------------------------------------------------------------------
+double vtkSMDoubleRangeDomain::GetResolution(unsigned int idx)
+{
+  if (!this->GetResolutionExists(idx))
+    {
+    return 0;
+    }
+  return this->DRInternals->Entries[idx].Resolution;
 }
 
 //---------------------------------------------------------------------------
