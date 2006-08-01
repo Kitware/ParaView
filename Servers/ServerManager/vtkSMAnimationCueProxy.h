@@ -127,6 +127,18 @@ public:
   // are deep copied.
   virtual void CloneCopy(vtkSMAnimationCueProxy* src);
 
+  // Description:
+  // This is valid only in a AnimationCueTickEvent handler. 
+  // Before firing the event the animation cue sets the AnimationTime to
+  // the time of the tick.
+  double GetAnimationTime();
+
+  // Description:
+  // This is valid only in a AnimationCueTickEvent handler.
+  // Before firing the event the animation cue sets the DeltaTime
+  // to the difference in time between the current tick and the last tick.
+  double GetDeltaTime();
+
 protected:
   vtkSMAnimationCueProxy();
   ~vtkSMAnimationCueProxy();

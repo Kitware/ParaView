@@ -25,7 +25,7 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.14");
+vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.15");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);
@@ -317,6 +317,19 @@ void vtkSMAnimationCueProxy::SaveInBatchScript(ofstream* file)
     this->SaveInBatchScript(file, 0, 1);
     }
 }
+
+//----------------------------------------------------------------------------
+double vtkSMAnimationCueProxy::GetAnimationTime()
+{
+  return (this->AnimationCue)? this->AnimationCue->GetAnimationTime() : 0.0;
+}
+
+//----------------------------------------------------------------------------
+double vtkSMAnimationCueProxy::GetDeltaTime()
+{
+  return (this->AnimationCue)? this->AnimationCue->GetDeltaTime() : 0.0;
+}
+
 
 //----------------------------------------------------------------------------
 void vtkSMAnimationCueProxy::SaveInBatchScript(ofstream* file,
