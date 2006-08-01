@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODVolume);
-vtkCxxRevisionMacro(vtkPVLODVolume, "1.6");
+vtkCxxRevisionMacro(vtkPVLODVolume, "1.7");
 vtkCxxSetObjectMacro(vtkPVLODVolume, RenderModuleHelper, vtkPVRenderModuleHelper);
 
 //----------------------------------------------------------------------------
@@ -239,6 +239,7 @@ void vtkPVLODVolume::SetMapper(vtkAbstractVolumeMapper *mapper)
 {
   if (this->HighLODId >= 0)
     {
+    if (mapper == this->LODProp->GetLODMapper(this->HighLODId)) return;
     this->LODProp->RemoveLOD(this->HighLODId);
     this->HighLODId = -1;
     }
@@ -254,6 +255,7 @@ void vtkPVLODVolume::SetLODMapper(vtkAbstractVolumeMapper *mapper)
 {
   if (this->LowLODId >= 0)
     {
+    if (mapper == this->LODProp->GetLODMapper(this->LowLODId)) return;
     this->LODProp->RemoveLOD(this->LowLODId);
     this->LowLODId = -1;
     }
@@ -269,6 +271,7 @@ void vtkPVLODVolume::SetLODMapper(vtkMapper *mapper)
 {
   if (this->LowLODId >= 0)
     {
+    if (mapper == this->LODProp->GetLODMapper(this->LowLODId)) return;
     this->LODProp->RemoveLOD(this->LowLODId);
     this->LowLODId = -1;
     }
