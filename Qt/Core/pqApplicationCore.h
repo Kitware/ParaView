@@ -100,6 +100,9 @@ public:
 
   /// Save the ServerManager state.
   void saveState(vtkPVXMLElement* root);
+
+  /// Loads the ServerManager state. Emits the signal
+  /// stateLoaded() on loading state successfully.
   void loadState(vtkPVXMLElement* root,
                  pqServer* server,
                  pqRenderModule* renModule);
@@ -140,6 +143,9 @@ signals:
 
   // Fired with the actual progress value.
   void progress(const QString&, int);
+
+  // Fired when a state file is loaded successfully.
+  void stateLoaded();
 
   // HACK
   void sourceRemoved(pqPipelineSource*);

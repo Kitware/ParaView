@@ -604,6 +604,13 @@ void pqMainWindowCore::setupStatisticsView(QDockWidget* dock_widget)
     SIGNAL(postAccept()),
     statistics_view,
     SLOT(refreshData()));    
+  
+  QObject::connect(
+    pqApplicationCore::instance(),
+    SIGNAL(stateLoaded()),
+    statistics_view,
+    SLOT(refreshData()));
+     
 }
 
 void pqMainWindowCore::setupElementInspector(QDockWidget* dock_widget)
