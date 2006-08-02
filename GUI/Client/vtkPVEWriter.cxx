@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEWriter);
-vtkCxxRevisionMacro(vtkPVEWriter, "1.4");
+vtkCxxRevisionMacro(vtkPVEWriter, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVEWriter::vtkPVEWriter()
@@ -54,7 +54,7 @@ void vtkPVEWriter::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVEWriter::CanWriteData(vtkDataObject* data, int parallel, int numParts)
+int vtkPVEWriter::CanWriteData(vtkDataObject* data, int parallel, int vtkNotUsed(numParts))
 {
   if (data == NULL)
     {
