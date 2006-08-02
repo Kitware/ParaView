@@ -41,6 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqHistogramWidgetPlugin.h"
 #include "pqLineChartWidget.h"
 #include "pqLineChartWidgetPlugin.h"
+#include "pqColorMapWidget.h"
+#include "pqColorMapWidgetPlugin.h"
 
 
 pqHistogramWidgetPlugin::pqHistogramWidgetPlugin(QObject *p)
@@ -135,26 +137,84 @@ QString pqLineChartWidgetPlugin::whatsThis() const
 }
 
 
+pqColorMapWidgetPlugin::pqColorMapWidgetPlugin(QObject *p)
+  : QObject(p)
+{
+}
+
+QWidget *pqColorMapWidgetPlugin::createWidget(QWidget *p)
+{
+  return new pqColorMapWidget(p);
+}
+
+QString pqColorMapWidgetPlugin::domXml() const
+{
+  return QLatin1String(
+      "<widget class=\"pqColorMapWidget\" name=\"pqColorMap\">\n"
+      " <property name=\"geometry\">\n"
+      "  <rect>\n"
+      "   <x>0</x>\n"
+      "   <y>0</y>\n"
+      "   <width>100</width>\n"
+      "   <height>50</height>\n"
+      "  </rect>\n"
+      " </property>\n"
+      "</widget>\n");
+}
+
+QIcon pqColorMapWidgetPlugin::icon() const
+{
+  return QIcon(QPixmap(":/pqChart/pqColorMap22.png"));
+}
+
+QString pqColorMapWidgetPlugin::includeFile() const
+{
+  return QLatin1String("pqColorMapWidget.h");
+}
+
+QString pqColorMapWidgetPlugin::toolTip() const
+{
+  return QLatin1String("Color Map Widget");
+}
+
+QString pqColorMapWidgetPlugin::whatsThis() const
+{
+  return QLatin1String("A Color Map Widget.");
+}
+
+
 pqChartPlugin::pqChartPlugin(QObject *p)
   : QObject(p), QDesignerCustomWidgetCollectionInterface()
 {
+  this->ColorMap = new pqColorMapWidgetPlugin();
   this->Histogram = new pqHistogramWidgetPlugin();
   this->LineChart = new pqLineChartWidgetPlugin();
 }
 
 pqChartPlugin::~pqChartPlugin()
 {
+  if(this->ColorMap)
+    {
+    delete this->ColorMap;
+    }
+
   if(this->Histogram)
+    {
     delete this->Histogram;
+    }
+
   if(this->LineChart)
+    {
     delete this->LineChart;
+    }
 }
 
 QList<QDesignerCustomWidgetInterface*> pqChartPlugin::customWidgets() const
 {
   QList<QDesignerCustomWidgetInterface*> plugins;
-  plugins.append(Histogram);
-  plugins.append(LineChart);
+  plugins.append(this->ColorMap);
+  plugins.append(this->Histogram);
+  plugins.append(this->LineChart);
   return plugins;
 }
 

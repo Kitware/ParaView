@@ -153,6 +153,8 @@ void pqPipelineBrowserContextMenu::showDisplayEditor()
   dialog->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
   dialog->setWindowTitle("Display Settings");
   QHBoxLayout* l = new QHBoxLayout(dialog);
+  l->setMargin(0);
+  l->setSpacing(6);
   pqDisplayProxyEditor* editor = new pqDisplayProxyEditor(dialog);
   editor->setDisplay(source->getDisplay(0));
   l->addWidget(editor);

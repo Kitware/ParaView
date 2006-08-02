@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqDisplayProxyEditor.h
+   Module:    pqColorMapEditor.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,50 +29,51 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqDisplayProxyEditor_h
-#define _pqDisplayProxyEditor_h
 
-#include <QWidget>
+/// \file pqColorMapEditor.h
+/// \date 7/31/2006
+
+#ifndef _pqColorMapEditor_h
+#define _pqColorMapEditor_h
+
+
 #include "pqComponentsExport.h"
+#include <QDialog>
 
-class pqDisplayProxyEditorInternal;
+class pqColorMapEditorForm;
 class pqPipelineDisplay;
+class QCloseEvent;
+class QColor;
+class QString;
+class QTimer;
+class vtkSMLookupTableProxy;
 
-/// Widget which provides an editor for the properties of a display.
-class PQCOMPONENTS_EXPORT pqDisplayProxyEditor : public QWidget
+
+class PQCOMPONENTS_EXPORT pqColorMapEditor : public QDialog
 {
   Q_OBJECT
+
 public:
-  /// constructor
-  pqDisplayProxyEditor(QWidget* p);
-  /// destructor
-  ~pqDisplayProxyEditor();
+  pqColorMapEditor(QWidget *parent=0);
+  virtual ~pqColorMapEditor();
 
-  /// Set the display whose properties we want to edit. 
-  void setDisplay(pqPipelineDisplay* display);
+  void setDisplay(pqPipelineDisplay *display);
 
-  /// get the proxy for which properties are displayed
-  pqPipelineDisplay* getDisplay();
-
-signals:
-  // fired when user clicks dismiss button.
-  void dismiss();
-
-protected slots:
-  /// internally used to update the graphics window when a property changes
-  void updateView();
-  void colorByChanged(const QString& val);
-  void openColorMapEditor();
-  void zoomToData();
-  void updateColorByMenu(bool forceUpdate=false);
-  
 protected:
-  pqDisplayProxyEditorInternal* Internal;
-  void setupGUIConnections();
-  void updateEnableState();
+  virtual void closeEvent(QCloseEvent *e);
+
+private slots:
+  void handleTextEdit(const QString &text);
+  void setSizeFromText();
+  void setSizeFromSlider(int tableSize);
+  void setTableSize(int tableSize);
+  void changeColor(int index, const QColor &color);
+  void closeForm();
 
 private:
-  bool DisableSlots;
+  pqColorMapEditorForm *Form;
+  vtkSMLookupTableProxy *LookupTable;
+  QTimer *EditDelay;
 };
 
 #endif

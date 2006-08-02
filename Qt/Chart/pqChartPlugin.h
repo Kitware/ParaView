@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtCore/qplugin.h>
 #include <QObject>
 
+class pqColorMapWidgetPlugin;
 class pqHistogramWidgetPlugin;
 class pqLineChartWidgetPlugin;
 
@@ -63,6 +64,7 @@ public:
   virtual QList<QDesignerCustomWidgetInterface*> customWidgets() const;
 
 private:
+  pqColorMapWidgetPlugin *ColorMap;
   pqHistogramWidgetPlugin *Histogram;
   pqLineChartWidgetPlugin *LineChart;
 };

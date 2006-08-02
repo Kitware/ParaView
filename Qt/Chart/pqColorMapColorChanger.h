@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/// \file pqColorMapColorChanger.cxx
+/// \file pqColorMapColorChanger.h
 /// \date 7/27/2006
 
 #ifndef _pqColorMapColorChanger_h

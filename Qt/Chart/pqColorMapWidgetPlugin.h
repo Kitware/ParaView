@@ -1,7 +1,7 @@
 /*=========================================================================
 
    Program: ParaView
-   Module:    pqDisplayProxyEditor.h
+   Module:    pqColorMapWidgetPlugin.h
 
    Copyright (c) 2005,2006 Sandia Corporation, Kitware Inc.
    All rights reserved.
@@ -29,51 +29,34 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#ifndef _pqDisplayProxyEditor_h
-#define _pqDisplayProxyEditor_h
 
-#include <QWidget>
-#include "pqComponentsExport.h"
+#ifndef _pqColorMapWidgetPlugin_h
+#define _pqColorMapWidgetPlugin_h
 
-class pqDisplayProxyEditorInternal;
-class pqPipelineDisplay;
 
-/// Widget which provides an editor for the properties of a display.
-class PQCOMPONENTS_EXPORT pqDisplayProxyEditor : public QWidget
+#include <QObject>
+#include <QtDesigner/QDesignerCustomWidgetInterface>
+
+
+class pqColorMapWidgetPlugin : public QObject,
+    public QDesignerCustomWidgetInterface
 {
   Q_OBJECT
+  Q_INTERFACES(QDesignerCustomWidgetInterface)
+
 public:
-  /// constructor
-  pqDisplayProxyEditor(QWidget* p);
-  /// destructor
-  ~pqDisplayProxyEditor();
+  pqColorMapWidgetPlugin(QObject *parent=0);
+  virtual ~pqColorMapWidgetPlugin() {}
 
-  /// Set the display whose properties we want to edit. 
-  void setDisplay(pqPipelineDisplay* display);
-
-  /// get the proxy for which properties are displayed
-  pqPipelineDisplay* getDisplay();
-
-signals:
-  // fired when user clicks dismiss button.
-  void dismiss();
-
-protected slots:
-  /// internally used to update the graphics window when a property changes
-  void updateView();
-  void colorByChanged(const QString& val);
-  void openColorMapEditor();
-  void zoomToData();
-  void updateColorByMenu(bool forceUpdate=false);
-  
-protected:
-  pqDisplayProxyEditorInternal* Internal;
-  void setupGUIConnections();
-  void updateEnableState();
-
-private:
-  bool DisableSlots;
+  virtual QWidget *createWidget(QWidget *parent=0);
+  virtual QString domXml() const;
+  virtual QString group() const {return QLatin1String("ParaView Charts");}
+  virtual QIcon icon() const;
+  virtual QString includeFile() const;
+  virtual bool isContainer() const {return false;}
+  virtual QString name() const {return QLatin1String("pqColorMapWidget");}
+  virtual QString toolTip() const;
+  virtual QString whatsThis() const;
 };
 
 #endif
-

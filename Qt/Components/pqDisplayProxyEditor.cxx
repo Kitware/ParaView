@@ -48,7 +48,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVGeometryInformation.h"
 #include "vtkSMDataObjectDisplayProxy.h"
+#include "vtkSMLookupTableProxy.h"
 #include "vtkSMProperty.h"
+#include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMSourceProxy.h"
 
@@ -57,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ParaView client includes
 #include "pqApplicationCore.h"
+#include "pqColorMapEditor.h"
 #include "pqSMAdaptor.h"
 #include "pqPropertyLinks.h"
 #include "pqPipelineDisplay.h"
@@ -370,6 +373,9 @@ void pqDisplayProxyEditor::setupGUIConnections()
     this->Internal->StyleRepresentation, SIGNAL(currentIndexChanged(int)),
     this, SLOT(updateColorByMenu()), 
     Qt::QueuedConnection);
+  QObject::connect(
+    this->Internal->EditColorMapButton, SIGNAL(clicked()),
+    this, SLOT(openColorMapEditor()));
   
   // Create an connect signal adaptors.
   if (!QMetaType::isRegistered(QMetaType::type("QVariant")))
@@ -413,11 +419,13 @@ void pqDisplayProxyEditor::updateEnableState()
     {
     this->Internal->ColorActorColor->setEnabled(true);
     this->Internal->ColorInterpolateColors->setEnabled(false);
+    this->Internal->EditColorMapButton->setEnabled(false);
     }
   else
     {
     this->Internal->ColorActorColor->setEnabled(false);
     this->Internal->ColorInterpolateColors->setEnabled(true);
+    this->Internal->EditColorMapButton->setEnabled(true);
     }
 
   vtkSMDataObjectDisplayProxy* display = 
@@ -533,6 +541,20 @@ void pqDisplayProxyEditor::updateColorByMenu(bool forceUpdate)
     {
     this->Internal->ColorActorColor->setEnabled(false);
     }
+}
+
+//-----------------------------------------------------------------------------
+void pqDisplayProxyEditor::openColorMapEditor()
+{
+  if(this->Internal->Display.isNull())
+    {
+    return;
+    }
+
+  // Create a color map editor and set the display.
+  pqColorMapEditor colorMap(this);
+  colorMap.setDisplay(this->Internal->Display);
+  colorMap.exec();
 }
 
 //-----------------------------------------------------------------------------

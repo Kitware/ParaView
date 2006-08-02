@@ -6,6 +6,7 @@
 #include <QApplication>
 #include <QColor>
 
+// TODO: Expand the chart test to test other charts.
 
 int main(int argc, char *argv[])
 {

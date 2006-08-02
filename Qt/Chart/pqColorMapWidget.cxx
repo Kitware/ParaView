@@ -165,7 +165,7 @@ void pqColorMapWidget::addPoint(const pqChartValue &value, const QColor &color)
     }
 
   this->layoutColorMap();
-  this->update();
+  this->viewport()->update();
 }
 
 void pqColorMapWidget::removePoint(int index)
@@ -175,6 +175,18 @@ void pqColorMapWidget::removePoint(int index)
     pqColorMapWidgetItem *item = this->Internal->Items.takeAt(index);
     delete item;
     }
+}
+
+void pqColorMapWidget::clearPoints()
+{
+  QList<pqColorMapWidgetItem *>::Iterator iter = this->Internal->Items.begin();
+  for( ; iter != this->Internal->Items.end(); ++iter)
+    {
+    delete *iter;
+    }
+
+  this->Internal->Items.clear();
+  this->layoutColorMap();
 }
 
 void pqColorMapWidget::getPointValue(int index, pqChartValue &value) const
@@ -200,7 +212,10 @@ void pqColorMapWidget::setPointColor(int index, const QColor &color)
     {
     this->Internal->Items[index]->Color = color;
     this->layoutColorMap();
-    this->update();
+    this->viewport()->update();
+
+    // Notify observers that the color changed.
+    emit this->colorChanged(index, color);
     }
 }
 
@@ -210,7 +225,7 @@ void pqColorMapWidget::setTableSize(int tableSize)
     {
     this->TableSize = tableSize;
     this->layoutColorMap();
-    this->update();
+    this->viewport()->update();
     }
 }
 
@@ -395,7 +410,7 @@ void pqColorMapWidget::mouseDoubleClickEvent(QMouseEvent *e)
 {
   if(e->button() == Qt::LeftButton && this->Internal->PointIndex != -1)
     {
-    // TODO: Make a request for the color change event.
+    // Make a request for the color change event.
     emit this->colorChangeRequested(this->Internal->PointIndex);
     }
 }
@@ -457,7 +472,7 @@ void pqColorMapWidget::paintEvent(QPaintEvent *e)
 void pqColorMapWidget::resizeEvent(QResizeEvent *)
 {
   this->layoutColorMap();
-  this->update();
+  this->viewport()->update();
 }
 
 void pqColorMapWidget::scrollContentsBy(int, int)

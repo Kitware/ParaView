@@ -60,17 +60,25 @@ public:
   int getPointCount() const;
   void addPoint(const pqChartValue &value, const QColor &color);
   void removePoint(int index);
+  void clearPoints();
 
   void getPointValue(int index, pqChartValue &value) const;
   void getPointColor(int index, QColor &color) const;
   void setPointColor(int index, const QColor &color);
 
   void setTableSize(int tableSize);
+  int getTableSize() const {return this->TableSize;}
+
+  void setMovingPointsAllowed(bool allowed) {this->MovingAllowed = allowed;}
+  bool isMovingPointsAllowed() const {return this->MovingAllowed;}
+  void setAddingPointsAllowed(bool allowed) {this->AddingAllowed = allowed;}
+  bool isAddingPointsAllowed() const {return this->AddingAllowed;}
 
   void layoutColorMap();
 
 signals:
   void colorChangeRequested(int index);
+  void colorChanged(int index, const QColor &color);
 
 protected:
   virtual void mousePressEvent(QMouseEvent *e);
@@ -88,6 +96,8 @@ private:
   int Spacing;                        ///< Stores the layout spacing.
   int Margin;                         ///< Stores the layout margin.
   int PointWidth;                     ///< Stores the size of the points.
+  bool AddingAllowed;                 ///< True if points can be added.
+  bool MovingAllowed;                 ///< True if points can be moved.
 };
 
 #endif

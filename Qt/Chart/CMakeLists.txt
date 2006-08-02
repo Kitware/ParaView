@@ -131,12 +131,14 @@ ENDIF(NOT BUILD_SHARED_LIBS)
 SET(QtChartPlugin_SRCS
   pqChartPlugin.cxx
   pqChartPlugin.h
+  pqColorMapWidgetPlugin.h
   pqHistogramWidgetPlugin.h
   pqLineChartWidgetPlugin.h
 )
 
 QT4_WRAP_CPP(QtChartPlugin_MOC_SRCS
   pqChartPlugin.h
+  pqColorMapWidgetPlugin.h
   pqHistogramWidgetPlugin.h
   pqLineChartWidgetPlugin.h
 )
