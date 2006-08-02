@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.39");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.40");
 
 class vtkPVSourceVectorInternals
 {
@@ -80,6 +80,8 @@ void vtkPVGroupInputsWidget::CreateWidget()
   this->PartSelectionList->Create();
   this->PartSelectionList->SetSelectionModeToExtended();
   this->PartSelectionList->SetHeight(0);
+  this->PartSelectionList->SetDoubleClickCommand(this, "ModifiedCallback");
+  this->PartSelectionList->SetSingleClickCommand(this, "ModifiedCallback");
   // I assume we need focus for control and alt modifiers.
   this->Script("bind %s <Enter> {focus %s}",
                this->PartSelectionList->GetWidgetName(),
@@ -211,7 +213,9 @@ void vtkPVGroupInputsWidget::Accept()
   pvWin = this->PVSource->GetPVWindow();
   sources = pvWin->GetSourceList("Sources");
 
-  if (this->ModifiedFlag)
+  if (this->ModifiedFlag && 
+      (strcmp(this->PVSource->GetSourceClassName(),
+                "vtkGroup") == 0))
     {
     this->Inactivate();
     }
@@ -238,14 +242,21 @@ void vtkPVGroupInputsWidget::Accept()
         // I am lazy and do not want to debug this ...
         pvs->SetVisibility(0);
         }
+      else
+        {
+        pvs->SetVisibility(1);
+        }
       ++idx;
       }
     }
 
   this->Superclass::Accept();
-  this->ModifiedFlag = 0;
 
-  this->Inactivate();
+  if ( strcmp(this->PVSource->GetSourceClassName(), "vtkGroup") == 0 )
+    {
+    this->ModifiedFlag = 0;
+    this->Inactivate();
+    }
 }
 
 //---------------------------------------------------------------------------
