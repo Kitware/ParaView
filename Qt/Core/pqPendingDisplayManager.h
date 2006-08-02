@@ -39,6 +39,11 @@ class pqPipelineSource;
 class pqRenderModule;
 class pqPendingDisplayUndoElement;
 
+/// This class helps manage deferred displays for an application.
+/// An application may add sources for which displays will eventually 
+/// be made.  This also works with undo/redo, so if the deletion of
+/// a display is done at undo time, it'll put the display back on
+/// the pending display list, and a redo/accept can re-create it.
 class PQCORE_EXPORT pqPendingDisplayManager  : public QObject
 {
   Q_OBJECT
@@ -49,11 +54,17 @@ public:
 
 public slots:
 
+  /// add a source for which a display will eventually be made
   void addPendingDisplayForSource(pqPipelineSource* s);
+
+  /// remove a source for which a display will eventually be made
   void removePendingDisplayForSource(pqPipelineSource* s);
   
+  /// create deferred displays for the sources on a particular
+  /// render module
   void createPendingDisplays(pqRenderModule* rm);
 
+  /// get the number of deferred displays
   int getNumberOfPendingDisplays();
 
 signals:
