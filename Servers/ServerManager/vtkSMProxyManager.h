@@ -41,6 +41,8 @@ class vtkSMProperty;
 class vtkSMProxy;
 class vtkSMProxyManagerObserver;
 class vtkSMStateLoader;
+class vtkStringList;
+
 //BTX
 struct vtkSMProxyManagerInternals;
 struct vtkClientServerID;
@@ -131,9 +133,19 @@ public:
   const char* GetProxyName(const char* groupname, unsigned int idx);
 
   // Description:
-  // Given a group and a proxy, return it's name.
+  // Given a group and a proxy, return it's name. The proxy may be registered
+  // as two different names under the same group, this only returns the  first hit
+  // name, use GetProxyNames() to obtain the list of names for the proxy.
   // NOTE: This operation is slow.
   const char* GetProxyName(const char* groupname, vtkSMProxy* proxy);
+ 
+  // Description:
+  // Given a group and a proxy, return all its names. This clears the
+  // \c names list before populating it with the names for the proxy under 
+  // the group.
+  // NOTE: This operation is slow. 
+  void GetProxyNames(const char* groupname, vtkSMProxy* proxy, 
+    vtkStringList* names);
   
   // Description:
   // Is the proxy is in the given group, return it's name, otherwise
