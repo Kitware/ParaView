@@ -14,9 +14,11 @@
 =========================================================================*/
 #include "vtkSMProxyManager.h"
 
+#include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
@@ -85,7 +87,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.50");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.51");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -367,7 +369,14 @@ unsigned int vtkSMProxyManager::GetNumberOfProxies(const char* group)
     this->Internals->RegisteredProxyMap.find(group);
   if ( it != this->Internals->RegisteredProxyMap.end() )
     {
-    return it->second.size();
+    int size = 0;
+    vtkSMProxyManagerProxyMapType::iterator it2 =
+      it->second.begin();
+    for (; it2 != it->second.end(); ++it2)
+      {
+      size += it2->second.size();
+      }
+    return size;
     }
   return 0;
 }
@@ -407,7 +416,10 @@ vtkSMProxy* vtkSMProxyManager::GetProxy(const char* group, const char* name)
       it->second.find(name);
     if (it2 != it->second.end())
       {
-      return it2->second.Proxy.GetPointer();
+      if (it2->second.begin() != it2->second.end())
+        {
+        return it2->second.front().Proxy.GetPointer();
+        }
       }
     }
   return 0;
@@ -424,10 +436,50 @@ vtkSMProxy* vtkSMProxyManager::GetProxy(const char* name)
       it->second.find(name);
     if (it2 != it->second.end())
       {
-      return it2->second.Proxy.GetPointer();
+      if (it2->second.begin() != it2->second.end())
+        {
+        return it2->second.front().Proxy.GetPointer();
+        }
       }
     }
   return 0;
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxyManager::GetProxy(vtkIdType vtkNotUsed(connectionID),
+  vtkClientServerID id)
+{
+  return vtkSMProxy::SafeDownCast(
+    vtkProcessModule::GetProcessModule()->GetObjectFromID(id));
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxyManager::GetProxy(vtkIdType connectionID, int id)
+{
+  vtkClientServerID cid;
+  cid.ID = id;
+  return this->GetProxy(connectionID, cid);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::GetProxies(const char* group, 
+  const char* name, vtkCollection* collection)
+{
+  collection->RemoveAllItems();
+  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+    this->Internals->RegisteredProxyMap.find(group);
+  if(it != this->Internals->RegisteredProxyMap.end())
+    {
+    vtkSMProxyManagerProxyMapType::iterator it2 = it->second.find(name);
+    if (it2 != it->second.end())
+      {
+      vtkSMProxyManagerProxyListType::iterator it3 = it2->second.begin();
+      for (; it3 != it2->second.end(); ++it3)
+        {
+        collection->AddItem(it3->Proxy);
+        }
+      }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -447,7 +499,7 @@ const char* vtkSMProxyManager::GetProxyName(const char* groupname,
       it->second.begin();
     for (; it2 != it->second.end(); it2++)
       {
-      if (proxy == it2->second.Proxy.GetPointer())
+      if (it2->second.Contains(proxy))
         {
         return it2->first.c_str();
         }
@@ -503,7 +555,7 @@ const char* vtkSMProxyManager::IsProxyInGroup(vtkSMProxy* proxy,
       it->second.begin();
     for (; it2 != it->second.end(); it2++)
       {
-      if (proxy == it2->second.Proxy.GetPointer())
+      if (it2->second.Contains(proxy))
         {
         return it2->first.c_str();
         }
@@ -522,8 +574,41 @@ void vtkSMProxyManager::UnRegisterProxies()
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxyManager::UnRegisterProxy(const char* group, const char* name,
+  vtkSMProxy* proxy)
+{
+  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+    this->Internals->RegisteredProxyMap.find(group);
+  if ( it != this->Internals->RegisteredProxyMap.end() )
+    {
+    vtkSMProxyManagerProxyMapType::iterator it2 = it->second.find(name);
+    if (it2 != it->second.end())
+      {
+      vtkSMProxyManagerProxyListType::iterator it3 = it2->second.Find(proxy);
+      if (it3 != it2->second.end())
+        {
+        RegisteredProxyInformation info;
+        info.Proxy = it3->Proxy;
+        info.GroupName = it->first.c_str();
+        info.ProxyName = it2->first.c_str();
+        info.IsCompoundProxyDefinition = 0;
+
+        this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
+        this->UnMarkProxyAsModified(info.Proxy);
+        it2->second.erase(it3);
+        }
+      if (it2->second.size() == 0)
+        {
+        it->second.erase(it2);
+        }
+      }
+    }
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxyManager::UnRegisterProxy(const char* group, const char* name)
 {
+  // Legacy API, unregister only the first one in that group.
   vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
     this->Internals->RegisteredProxyMap.find(group);
   if ( it != this->Internals->RegisteredProxyMap.end() )
@@ -532,16 +617,25 @@ void vtkSMProxyManager::UnRegisterProxy(const char* group, const char* name)
       it->second.find(name);
     if (it2 != it->second.end())
       {
-      RegisteredProxyInformation info;
-      info.Proxy = it2->second.Proxy;
-      info.GroupName = it->first.c_str();
-      info.ProxyName = it2->first.c_str();
-      info.IsCompoundProxyDefinition = 0;
+      if (it2->second.size() > 0)
+        {
+        vtkSMProxyManagerProxyListType::iterator it3 = 
+          it2->second.begin();
+
+        RegisteredProxyInformation info;
+        info.Proxy = it3->Proxy;
+        info.GroupName = it->first.c_str();
+        info.ProxyName = it2->first.c_str();
+        info.IsCompoundProxyDefinition = 0;
       
-      this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
-      
-      this->UnMarkProxyAsModified(it2->second.Proxy);
-      it->second.erase(it2);
+        this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
+        this->UnMarkProxyAsModified(info.Proxy);
+        it2->second.erase(it3);
+        }
+      if (it2->second.size() == 0)
+        {
+        it->second.erase(it2);
+        }
       }
     }
 }
@@ -557,16 +651,7 @@ void vtkSMProxyManager::UnRegisterProxy(const char* name)
       it->second.find(name);
     if (it2 != it->second.end())
       {
-      RegisteredProxyInformation info;
-      info.Proxy = it2->second.Proxy;
-      info.GroupName = it->first.c_str();
-      info.ProxyName = it2->first.c_str();
-      info.IsCompoundProxyDefinition = 0;
-      
-      this->InvokeEvent(vtkCommand::UnRegisterEvent, &info);
-
-      this->UnMarkProxyAsModified(it2->second.Proxy);
-      it->second.erase(it2);
+      this->UnRegisterProxy(it->first.c_str(), name);
       }
     }
 
@@ -590,7 +675,7 @@ void vtkSMProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
     vtkSMProxyManagerProxyMapType::iterator it2;
     for (it->second.begin(); it2 != it->second.end(); ++it2)
       {
-      if (it2->second.Proxy.GetPointer() == proxy)
+      if (it2->second.Contains(proxy))
         {
         vtkSMProxyManagerProxyInformation info;
         info.GroupName = it->first;
@@ -604,7 +689,8 @@ void vtkSMProxyManager::UnRegisterProxy(vtkSMProxy* proxy)
     toUnRegister.begin();
   for (;vIter != toUnRegister.end(); ++vIter)
     {
-    this->UnRegisterProxy(vIter->GroupName.c_str(), vIter->ProxyName.c_str());
+    this->UnRegisterProxy(vIter->GroupName.c_str(), vIter->ProxyName.c_str(), 
+      proxy);
     }
 }
 
@@ -613,9 +699,18 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
                                       const char* name, 
                                       vtkSMProxy* proxy)
 {
-  ProxyInfo &obj =
+  vtkSMProxyManagerProxyListType &proxy_list =
     this->Internals->RegisteredProxyMap[groupname][name];
+  if (proxy_list.Contains(proxy))
+    {
+    vtkWarningMacro("Proxy has already been registered as " << groupname
+      << ", " << name);
+    return;
+    }
 
+  ProxyInfo temp;
+  proxy_list.push_back(temp);
+  ProxyInfo& obj = proxy_list.back();
   obj.Proxy = proxy;
   
   // Add observers to note proxy modification.
@@ -642,16 +737,19 @@ void vtkSMProxyManager::UpdateRegisteredProxies(const char* groupname,
     this->Internals->RegisteredProxyMap.find(groupname);
   if ( it != this->Internals->RegisteredProxyMap.end() )
     {
-    vtkSMProxyManagerProxyMapType::iterator it2 =
-      it->second.begin();
+    vtkSMProxyManagerProxyMapType::iterator it2 = it->second.begin();
     for (; it2 != it->second.end(); it2++)
       {
-      // Check is proxy is in the modified set.
-      if (!modified_only || 
-        this->Internals->ModifiedProxies.find(it2->second.Proxy.GetPointer())
-        != this->Internals->ModifiedProxies.end())
+      vtkSMProxyManagerProxyListType::iterator it3 = it2->second.begin();
+      for (; it3 != it2->second.end(); ++it3)
         {
-        it2->second.Proxy.GetPointer()->UpdateVTKObjects();
+        // Check is proxy is in the modified set.
+        if (!modified_only || 
+          this->Internals->ModifiedProxies.find(it3->Proxy.GetPointer())
+          != this->Internals->ModifiedProxies.end())
+          {
+          it3->Proxy.GetPointer()->UpdateVTKObjects();
+          }
         }
       }
     }
@@ -672,16 +770,20 @@ void vtkSMProxyManager::UpdateRegisteredProxies(int modified_only /*=1*/)
       continue;
       }
 
-    vtkSMProxyManagerProxyMapType::iterator it2 =
-      it->second.begin();
+    vtkSMProxyManagerProxyMapType::iterator it2 = it->second.begin();
     for (; it2 != it->second.end(); it2++)
       {
       // Check is proxy is in the modified set.
-      if (!modified_only ||
-        this->Internals->ModifiedProxies.find(it2->second.Proxy.GetPointer())
-        != this->Internals->ModifiedProxies.end())
+      vtkSMProxyManagerProxyListType::iterator it3 = it2->second.begin();
+      for (; it3 != it2->second.end(); ++it3)
         {
-        it2->second.Proxy.GetPointer()->UpdateVTKObjects();
+        // Check is proxy is in the modified set.
+        if (!modified_only || 
+          this->Internals->ModifiedProxies.find(it3->Proxy.GetPointer())
+          != this->Internals->ModifiedProxies.end())
+          {
+          it3->Proxy.GetPointer()->UpdateVTKObjects();
+          }
         }
       }
     }
@@ -898,11 +1000,16 @@ void vtkSMProxyManager::SaveState(vtkPVXMLElement* rootElement)
       // save the states of all proxies in this group.
       for (; it2 != it->second.end(); it2++)
         {
-        if (visited_proxies.find(it2->second.Proxy.GetPointer()) 
-          == visited_proxies.end())
+        vtkSMProxyManagerProxyListType::iterator it3
+          = it2->second.begin();
+        for (; it3 != it2->second.end(); ++it3)
           {
-          it2->second.Proxy.GetPointer()->SaveState(rootElement);
-          visited_proxies.insert(it2->second.Proxy.GetPointer());
+          if (visited_proxies.find(it3->Proxy.GetPointer()) 
+            == visited_proxies.end())
+            {
+            it3->Proxy.GetPointer()->SaveState(rootElement);
+            visited_proxies.insert(it3->Proxy.GetPointer());
+            }
           }
         }
       }
@@ -934,13 +1041,18 @@ void vtkSMProxyManager::SaveState(vtkPVXMLElement* rootElement)
         it->second.begin();
       for (; it2 != it->second.end(); it2++)
         {
-        vtkPVXMLElement* itemElement = vtkPVXMLElement::New();
-        itemElement->SetName("Item");
-        itemElement->AddAttribute("id", 
-                     it2->second.Proxy.GetPointer()->GetSelfIDAsString());
-        itemElement->AddAttribute("name", it2->first.c_str());
-        collectionElement->AddNestedElement(itemElement);
-        itemElement->Delete();
+        vtkSMProxyManagerProxyListType::iterator it3 =
+          it2->second.begin();
+        for (; it3 != it2->second.end(); ++it3)
+          {
+          vtkPVXMLElement* itemElement = vtkPVXMLElement::New();
+          itemElement->SetName("Item");
+          itemElement->AddAttribute("id", 
+            it3->Proxy.GetPointer()->GetSelfIDAsString());
+          itemElement->AddAttribute("name", it2->first.c_str());
+          collectionElement->AddNestedElement(itemElement);
+          itemElement->Delete();
+          }
         }
       rootElement->AddNestedElement(collectionElement);
       collectionElement->Delete();

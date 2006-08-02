@@ -332,7 +332,30 @@ class pyProxyManager:
         for proxy in iter:
             proxies[iter.GetKey()] = proxy;
         return proxies
-    
+
+    def UnRegisterProxy(self, groupname, proxyname, proxy):
+        """Unregisters a proxy."""
+        if not self.SMProxyManager:
+            return 
+        if proxy != None and isinstance(proxy,pyProxy):
+            proxy = proxy.SMProxy
+        if not proxy:
+          self.SMProxyManager.UnRegisterProxy(groupname, proxyname, proxy)
+
+    def GetProxies(self, groupname, proxyname):
+        """Returns all proxies registered under the given group with the given name."""
+        if not self.SMProxyManager:
+            return []
+        collection = vtkCollection()
+        result = []
+        self.SMProxyManager.GetProxies(groupname, proxyname, collection)
+        for i in range(0, collection.GetNumberOfItems()):
+            proxy = collection.GetItemAsObject(i)
+            if proxy:
+                proxy = pyProxy(proxy)
+            result.append(proxy)
+        return result
+        
     def __getattr__(self, name):
         """Returns attribute from the SMProxyManager"""
         return getattr(self.SMProxyManager, name)

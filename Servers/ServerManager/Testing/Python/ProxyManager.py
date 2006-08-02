@@ -1,0 +1,41 @@
+"""This is a test to test the paraview proxy manager API."""
+
+import paraview
+
+def Error(message):
+  raise "ERROR: %s" % message
+  
+paraview.ActiveConnection = paraview.connect()
+pxm = paraview.pyProxyManager()
+
+p1 = paraview.createProxy("sources", "SphereSource");
+p2 = paraview.createProxy("sources", "ConeSource");
+p3 = paraview.createProxy("sources", "ArrowSource");
+
+pxm.RegisterProxy("sources", "source1_2", p1);
+pxm.RegisterProxy("sources", "source1_2", p2);
+pxm.RegisterProxy("sources", "source2", p2);
+pxm.RegisterProxy("filters", "s1", p1);
+pxm.RegisterProxy("filters", "s2", p2);
+pxm.RegisterProxy("filters", "s2", p3);
+pxm.RegisterProxy("filters", "s3", p3);
+
+iter = pxm.__iter__();
+for proxy in iter:
+  print "%s.%s ==> %s" % (iter.GetGroup(), iter.GetKey(), proxy.GetXMLName())
+
+print "Number of sources: %d" % pxm.GetNumberOfProxies("sources")
+print "Number of filters: %d" % pxm.GetNumberOfProxies("filters")
+print "Number of non-existant: %d" % pxm.GetNumberOfProxies("non-existant")
+if pxm.GetNumberOfProxies("sources") != 3:
+  Error("Number of proxies in \"sources\" group reported incorrect.");
+
+if pxm.GetNumberOfProxies("filters") != 4:
+  Error("Number of proxies in \"filters\" group reported incorrect.");
+
+if pxm.GetNumberOfProxies("non-existant") != 0:
+  Error("Number of proxies in \"non-existant\" group reported incorrect.");
+
+print "\nProxies under filters.s2"
+for proxy in pxm.GetProxies("filters","s2"):
+  print proxy.GetXMLName()

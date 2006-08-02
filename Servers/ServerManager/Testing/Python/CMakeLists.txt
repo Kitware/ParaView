@@ -58,4 +58,19 @@ IF (PVServerManagerTestData)
   ENDFOREACH(tfile)
 ENDIF (PVServerManagerTestData)
 
+
+SET(PY_TESTS_NO_BASELINE
+  ProxyManager
+)
+
+IF (PVServerManagerTestData)
+  FOREACH (tfile ${PY_TESTS_NO_BASELINE})
+    ADD_TEST("${tfile}-ServerManagerPython"
+      ${EXECUTABLE_OUTPUT_PATH}/pvpython
+      ${CMAKE_CURRENT_SOURCE_DIR}/${tfile}.py
+      -D ${PVServerManagerTestData}
+      -T ${ParaView_BINARY_DIR}/Testing/Temporary
+      -S ${SMSTATE_FILE_DIR})
+  ENDFOREACH(tfile)
+ENDIF (PVServerManagerTestData)
 ###############################################################################

@@ -32,6 +32,7 @@
 
 #include "vtkSMObject.h"
 
+class vtkCollection;
 class vtkPVXMLElement;
 class vtkSMCompoundProxy;
 class vtkSMDocumentation;
@@ -42,6 +43,7 @@ class vtkSMProxyManagerObserver;
 class vtkSMStateLoader;
 //BTX
 struct vtkSMProxyManagerInternals;
+struct vtkClientServerID;
 //ETX
 
 class VTK_EXPORT vtkSMProxyManager : public vtkSMObject
@@ -99,6 +101,22 @@ public:
   vtkSMProxy* GetProxy(const char* name);
 
   // Description:
+  // Given an proxy self ID, this method returns a proxy, if any.
+  // This is a convenience method, this merely asks the process module
+  // for the object on the given connection with the given ID. The proxy
+  // may not be registered at all with the proxy manager.
+  vtkSMProxy* GetProxy(vtkIdType connectionID, int id);
+  //BTX
+  vtkSMProxy* GetProxy(vtkIdType connectionID, vtkClientServerID id);
+  //ETX
+
+  // Description:
+  // Returns all proxies registered under the given group with the given name.
+  // The collection is cleared before the proxies are added to it.
+  void GetProxies(const char* groupname, const char* name, 
+    vtkCollection* collection);
+
+  // Description:
   // Returns the prototype proxy for the given type. This method may create
   // a new prototype proxy, is one does not already exist.
   vtkSMProxy* GetPrototypeProxy(const char* groupname, const char* name);
@@ -126,6 +144,7 @@ public:
   // Description:
   // Given its name, unregisters a proxy and remove it from the list
   // of managed proxies. 
+  void UnRegisterProxy(const char* groupname, const char* name, vtkSMProxy*);
   void UnRegisterProxy(const char* groupname, const char* name);
   void UnRegisterProxy(const char* name);
 

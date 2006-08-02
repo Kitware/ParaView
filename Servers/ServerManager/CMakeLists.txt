@@ -9,6 +9,7 @@ IF(NOT WIN32)
 ENDIF(NOT WIN32)
 
 SET(Kit_SRCS
+  vtkSMProxyManager.cxx
   vtkSM3DWidgetProxy.cxx
   vtkSMAbstractDisplayProxy.cxx
   vtkSMAbstractViewModuleProxy.cxx
@@ -100,7 +101,6 @@ SET(Kit_SRCS
   vtkSMProxyIterator.cxx
   vtkSMProxyLink.cxx
   vtkSMProxyListDomain.cxx
-  vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
   vtkSMProxyRegisterUndoElement.cxx
   vtkSMProxyUnRegisterUndoElement.cxx
