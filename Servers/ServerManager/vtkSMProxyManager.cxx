@@ -31,6 +31,7 @@
 #include "vtkSMStateLoader.h"
 #include "vtkSMUndoStack.h"
 #include "vtkStdString.h"
+#include "vtkStringList.h"
 
 #include <vtkstd/map>
 #include <vtkstd/set>
@@ -87,7 +88,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.51");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.52");
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
 {
@@ -483,6 +484,38 @@ void vtkSMProxyManager::GetProxies(const char* group,
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxyManager::GetProxyNames(const char* groupname, 
+                                      vtkSMProxy* proxy, vtkStringList* names)
+{
+  if (!names)
+    {
+    return;
+    }
+  names->RemoveAllItems();
+
+  if (!groupname || !proxy)
+    {
+    return;
+    }
+  
+  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+    this->Internals->RegisteredProxyMap.find(groupname);
+  if ( it != this->Internals->RegisteredProxyMap.end() )
+    {
+    vtkSMProxyManagerProxyMapType::iterator it2 =
+      it->second.begin();
+    for (; it2 != it->second.end(); it2++)
+      {
+      if (it2->second.Contains(proxy))
+        {
+        names->AddString(it2->first.c_str());
+        }
+      }
+    }
+}
+
+
+//---------------------------------------------------------------------------
 const char* vtkSMProxyManager::GetProxyName(const char* groupname, 
                                             vtkSMProxy* proxy)
 {
@@ -703,8 +736,6 @@ void vtkSMProxyManager::RegisterProxy(const char* groupname,
     this->Internals->RegisteredProxyMap[groupname][name];
   if (proxy_list.Contains(proxy))
     {
-    vtkWarningMacro("Proxy has already been registered as " << groupname
-      << ", " << name);
     return;
     }
 
