@@ -23,6 +23,7 @@
 
 #include <vtkstd/map>
 #include <vtkstd/set>
+#include <vtkstd/vector>
 #include "vtkStdString.h"
 
 // Sub-classed to avoid symbol length explosion.
@@ -55,8 +56,43 @@ struct ProxyInfo
   unsigned long ModifiedObserverTag;
   unsigned long UpdateObserverTag;
 };
+
+class vtkSMProxyManagerProxyListType :
+  public vtkstd::vector<ProxyInfo> 
+{
+public:
+  // Returns if the proxy exists in  this vector.
+  bool Contains(vtkSMProxy* proxy) 
+    {
+    vtkSMProxyManagerProxyListType::iterator iter =
+      this->begin();
+    for (; iter != this->end(); ++iter)
+      {
+      if (iter->Proxy == proxy)
+        {
+        return true;
+        }
+      }
+    return false;
+    }
+  vtkSMProxyManagerProxyListType::iterator Find(vtkSMProxy* proxy)
+    {
+    vtkSMProxyManagerProxyListType::iterator iter =
+      this->begin();
+    for (; iter != this->end(); ++iter)
+      {
+      if (iter->Proxy.GetPointer() == proxy)
+        {
+        return iter;
+        }
+      }
+    return this->end();
+    }
+};
+
 class vtkSMProxyManagerProxyMapType:
-  public vtkstd::map<vtkStdString, ProxyInfo > {};
+  public vtkstd::map<vtkStdString, vtkSMProxyManagerProxyListType> {};
+
 
 
 struct vtkSMProxyManagerInternals

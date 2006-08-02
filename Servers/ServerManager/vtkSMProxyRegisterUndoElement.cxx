@@ -23,7 +23,7 @@
 
 
 vtkStandardNewMacro(vtkSMProxyRegisterUndoElement);
-vtkCxxRevisionMacro(vtkSMProxyRegisterUndoElement, "1.3");
+vtkCxxRevisionMacro(vtkSMProxyRegisterUndoElement, "1.4");
 vtkCxxSetObjectMacro(vtkSMProxyRegisterUndoElement, XMLElement,
   vtkPVXMLElement);
 //-----------------------------------------------------------------------------
@@ -72,9 +72,28 @@ int vtkSMProxyRegisterUndoElement::Undo()
   vtkPVXMLElement* element = this->XMLElement;
   const char* group_name = element->GetAttribute("group_name");
   const char* proxy_name = element->GetAttribute("proxy_name");
+  int id = 0;
+  element->GetScalarAttribute("id",&id);
+  if (!id)
+    {
+    vtkErrorMacro("Failed to locate proxy id.");
+    return 0;
+    }
+
+  vtkSMStateLoader* loader = vtkSMDefaultStateLoader::New();
+  loader->SetConnectionID(this->GetConnectionID());
+  vtkSMProxy* proxy = loader->NewProxyFromElement(
+    this->XMLElement->GetNestedElement(0), id);
+  loader->Delete();
+
+  if (!proxy)
+    {
+    vtkErrorMacro("Failed to locate the proxy to register.");
+    return 0;
+    }
   
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  pxm->UnRegisterProxy(group_name, proxy_name);
+  pxm->UnRegisterProxy(group_name, proxy_name, proxy);
 
   // Unregistering may trigger deletion of the proxy.
   return 1;

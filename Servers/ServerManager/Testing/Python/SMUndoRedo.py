@@ -65,13 +65,13 @@ undoStack.EndUndoSet()
 undoStack.BeginOrContinueUndoSet(self_cid, "RemoveDisplay")
 renModule.RemoveFromDisplays(display)
 renModule.UpdateVTKObjects()
-pxm.UnRegisterProxy("displays", "sphereDisplay")
+pxm.SMProxyManager.UnRegisterProxy("displays", "sphereDisplay")
 undoStack.EndUndoSet()
 
 undoStack.BeginOrContinueUndoSet(self_cid, "CleanupSources")
-pxm.UnRegisterProxy("filters", "elevationFilter")
-pxm.UnRegisterProxy("mygroup", "sphere")
-pxm.UnRegisterProxy("mygroup", "cube")
+pxm.SMProxyManager.UnRegisterProxy("filters", "elevationFilter")
+pxm.SMProxyManager.UnRegisterProxy("mygroup", "sphere")
+pxm.SMProxyManager.UnRegisterProxy("mygroup", "cube")
 #  Redoing this set should delete the proxies, if not, we have some
 #  extra references to the proxies-->BUG.
 #  Undoing this set will create new proxies, if not, i.e. existing
