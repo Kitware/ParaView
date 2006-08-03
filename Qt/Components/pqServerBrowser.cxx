@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqServer.h"
 #include "pqServerBrowser.h"
 
+#include "pqApplicationCore.h"
 #include "ui_pqServerBrowser.h"
 
 #include <QMessageBox>
@@ -68,7 +69,7 @@ void pqServerBrowser::accept()
       {
         pqServerResource resource;
         resource.setScheme("builtin");
-        server = pqServer::Create(resource);
+        server = pqApplicationCore::instance()->createServer(resource);
       }
       break;
     case 1:
@@ -77,7 +78,7 @@ void pqServerBrowser::accept()
       resource.setScheme("cs");
       resource.setHost(this->Ui->HostName->text());
       resource.setPort(this->Ui->PortNumber->value());
-      server = pqServer::Create(resource);
+      server = pqApplicationCore::instance()->createServer(resource);
       }
       break;
     case 2:

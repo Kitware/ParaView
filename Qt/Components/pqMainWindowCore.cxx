@@ -260,6 +260,9 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
                    this, 
                    SLOT(serverRemoved(pqServer*)));
   
+  QObject::connect(core, SIGNAL(serverCreated(pqServer*)),
+                   this, SLOT(serverAdded(pqServer*)));
+  
   QObject::connect(core,
                    SIGNAL(sourceCreated(pqPipelineSource*)),
                    this, 
@@ -267,10 +270,6 @@ pqMainWindowCore::pqMainWindowCore(QWidget* parent_widget) :
   
   QObject::connect(this, SIGNAL(activeSourceChanged(pqPipelineSource*)),
                    &this->VCRController(), SLOT(setSource(pqPipelineSource*)));
-
-
-  connect(&core->serverResources(), SIGNAL(serverConnected(pqServer*)),
-    this, SLOT(onServerConnect(pqServer*)));
   
 /*
   this->installEventFilter(this);
@@ -744,9 +743,6 @@ void pqMainWindowCore::onFileOpen()
     server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
     QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), 
       this, SLOT(onFileOpen(pqServer*)));
-    // let the regular onServerConnect() operation be performed as well.
-    QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, 
-      SLOT(onServerConnect(pqServer*)));
     server_browser->setModal(true);
     server_browser->show();
     }
@@ -821,9 +817,6 @@ void pqMainWindowCore::onFileLoadServerState()
     {
     pqServerBrowser* const server_browser = new pqServerBrowser(this->Implementation->Parent);
     server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
-    // let the regular onServerConnect() operation be performed as well.
-    QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, 
-      SLOT(onServerConnect(pqServer*)));
     QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), 
       this, SLOT(onFileLoadServerState(pqServer*)));
     server_browser->setModal(true);
@@ -1117,28 +1110,8 @@ void pqMainWindowCore::onServerConnect()
   pqServerBrowser* const server_browser = new pqServerBrowser(
     this->Implementation->Parent);
   server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
-  QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, 
-    SLOT(onServerConnect(pqServer*)));
   server_browser->setModal(true);
   server_browser->show();
-}
-
-//-----------------------------------------------------------------------------
-void pqMainWindowCore::onServerConnect(pqServer* server)
-{
-  this->onServerDisconnect();
-  
-  // bring the server object under the window so that when the
-  // window is destroyed the server will get destroyed too.
-  server->setParent(this);
-
-  // Make the newly created server the active server.
-  this->setActiveServer(server);
-  // Create a render module.
-  this->Implementation->RenderWindowManager->onFrameAdded(
-    qobject_cast<pqMultiViewFrame *>(
-      this->Implementation->MultiViewManager.widgetOfIndex(
-        pqMultiView::Index())));
 }
 
 //-----------------------------------------------------------------------------
@@ -1378,9 +1351,6 @@ void pqMainWindowCore::onCreateSource(QAction* action)
     // We need to create a new connection.
     pqServerBrowser* const server_browser = new pqServerBrowser(this->Implementation->Parent);
     server_browser->setAttribute(Qt::WA_DeleteOnClose);  // auto delete when closed
-    // let the regular onServerConnect() operation be performed as well.
-    QObject::connect(server_browser, SIGNAL(serverConnected(pqServer*)), this, 
-      SLOT(onServerConnect(pqServer*)));
     server_browser->exec();
     }
   
@@ -1905,9 +1875,25 @@ void pqMainWindowCore::createPendingDisplays()
     createPendingDisplays(this->getActiveRenderModule());
 }
 
-void pqMainWindowCore::serverRemoved(pqServer*)
+void pqMainWindowCore::serverRemoved(pqServer* server)
 {
-  this->setActiveSource(NULL);
+  if(server == this->Implementation->ActiveServer)
+    {
+    this->setActiveSource(NULL);
+    }
+}
+
+void pqMainWindowCore::serverAdded(pqServer* server)
+{
+  // Create a render module.
+  this->setActiveServer(server);
+  this->Implementation->RenderWindowManager->onFrameAdded(
+    qobject_cast<pqMultiViewFrame *>(
+      this->Implementation->MultiViewManager.widgetOfIndex(
+        pqMultiView::Index())));
+
+  // Make the newly created server is selected.
+  //emit this->select(server);
 }
 
 void pqMainWindowCore::filtersActivated()

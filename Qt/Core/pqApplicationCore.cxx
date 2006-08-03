@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqApplicationCore.h"
 
 // ParaView Server Manager includes.
+#include "vtkProcessModule.h"
+#include "vtkProcessModuleConnectionManager.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
@@ -390,6 +392,76 @@ void pqApplicationCore::setOrganizationName(const QString& on)
 QString pqApplicationCore::organizationName()
 {
   return this->Internal->OrganizationName;
+}
+
+pqServer* pqApplicationCore::createServer(const pqServerResource& resource)
+{
+  // Create a modified version of the resource that only contains server information
+  const pqServerResource server_resource = resource.server();
+
+  // See if the server is already created.
+  pqServerManagerModel *smModel = this->getServerManagerModel();
+  pqServer *server = smModel->getServer(server_resource);
+  if(!server)
+    {
+    // TEMP: ParaView only allows one server connection. Remove this
+    // code when it supports multiple server connections.
+    if(smModel->getNumberOfServers() > 0)
+      {
+      this->removeServer(smModel->getServerByIndex(0));
+      }
+
+    // Based on the server resource, create the correct type of server ...
+    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+    vtkIdType id = vtkProcessModuleConnectionManager::GetNullConnectionID();
+    if(server_resource.scheme() == "builtin")
+      {
+      id = pm->ConnectToSelf();
+      }
+    else if(server_resource.scheme() == "cs")
+      {
+      id = pm->ConnectToRemote(
+        resource.host().toAscii().data(),
+        resource.port(11111));
+      }
+    else if(server_resource.scheme() == "csrc")
+      {
+      qWarning() << "Server reverse connections not supported yet\n";
+      }
+    else if(server_resource.scheme() == "cdsrs")
+      {
+      id = pm->ConnectToRemote(
+        server_resource.dataServerHost().toAscii().data(),
+        server_resource.dataServerPort(11111),
+        server_resource.renderServerHost().toAscii().data(),
+        server_resource.renderServerPort(21111));
+      }
+    else if(server_resource.scheme() == "cdsrsrc")
+      {
+      qWarning() << "Data server/render server reverse connections not supported yet\n";
+      }
+    else
+      {
+      qCritical() << "Unknown server type: " << server_resource.scheme() << "\n";
+      }
+
+    if(id != vtkProcessModuleConnectionManager::GetNullConnectionID())
+      {
+      if(server_resource.scheme() != "builtin")
+        {
+        // Synchronize options with the server.
+        // TODO: This again will work more reliably once we have separate
+        // PVOptions per connection.
+        pm->SynchronizeServerClientOptions(id);
+        }
+
+      server = smModel->getServer(id);
+      server->setResource(server_resource);
+      emit this->serverCreated(server);
+      }
+    }
+
+  return server;
 }
 
 static void SetDefaultInputArray(vtkSMProxy* Proxy, const char* PropertyName)

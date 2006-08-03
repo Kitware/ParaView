@@ -45,6 +45,7 @@ class pqServer;
 class pqServerManagerModel;
 class pqServerManagerObserver;
 class pqServerManagerSelectionModel;
+class pqServerResource;
 class pqServerResources;
 class pqSettings;
 class pqUndoStack;
@@ -121,6 +122,7 @@ public:
   void setOrganizationName(const QString&);
   QString organizationName();
 
+  pqServer* createServer(const pqServerResource& resource);
   
   pqPipelineSource* createFilterForSource(const QString& xmlname,
                                           pqPipelineSource* input);
@@ -151,6 +153,8 @@ signals:
   void sourceRemoved(pqPipelineSource*);
   
   void sourceCreated(pqPipelineSource*);
+
+  void serverCreated(pqServer*);
 
 protected:
   /// create signal/slot connections between pdata and smModel.

@@ -142,14 +142,13 @@ void pqServerResources::open(const pqServerResource& resource)
 {
   if(resource.scheme() == "session")
     {
-    pqServer* const server = pqServer::Create(resource.sessionServer());
+    pqServer* const server = pqApplicationCore::instance()->createServer(
+      resource.sessionServer());
     if(!server)
       {
       qCritical() << "Error creating server " << resource.sessionServer().toString() << "\n";
       return;
       }
-      
-    emit this->serverConnected(server);
     
     if(resource.path().isEmpty())
       {
@@ -175,14 +174,12 @@ void pqServerResources::open(const pqServerResource& resource)
     }
   else
     {
-    pqServer* const server = pqServer::Create(resource);
+    pqServer* const server = pqApplicationCore::instance()->createServer(resource);
     if(!server)
       {
       qCritical() << "Error creating server " << resource.toString() << "\n";
       return;
       }
-      
-    emit this->serverConnected(server);
     
     if(resource.path().isEmpty())
       {

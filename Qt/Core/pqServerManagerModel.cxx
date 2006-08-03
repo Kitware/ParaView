@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pqPipelineSource.h"
 #include "pqRenderModule.h"
 #include "pqServer.h"
+#include "pqServerResource.h"
 
 pqServerManagerModel* pqServerManagerModel::Instance = 0;
 pqServerManagerModel* pqServerManagerModel::instance()
@@ -476,6 +477,30 @@ pqServer* pqServerManagerModel::getServer(vtkIdType cid)
       return server;
       }
     }
+  return NULL;
+}
+
+//-----------------------------------------------------------------------------
+pqServer* pqServerManagerModel::getServer(const pqServerResource& resource) const
+{
+  foreach(pqServer* server, this->Internal->Servers)
+    {
+    if (server && server->getResource() == resource)  
+      {
+      return server;
+      }
+    }
+  return NULL;
+}
+
+//-----------------------------------------------------------------------------
+pqServer* pqServerManagerModel::getServerByIndex(unsigned int idx) const
+{
+  if((int)idx < this->Internal->Servers.size())
+    {
+    return this->Internal->Servers[idx];
+    }
+
   return NULL;
 }
 

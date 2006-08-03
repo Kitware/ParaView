@@ -46,6 +46,7 @@ class pqRenderModule;
 class pqServer;
 class pqServerManagerModelInternal;
 class pqServerManagerModelItem;
+class pqServerResource;
 
 // pqServerManagerModel is the model for the Server Manager.
 // All the pipelines in the Server Manager need a GUI representation
@@ -74,6 +75,12 @@ public:
 
   // Given a process module ConnectionID, get pqServer for it.
   pqServer* getServer(vtkIdType connectionId);
+
+  // Given the server resource, find the pqServer.
+  pqServer* getServer(const pqServerResource& resource) const;
+
+  // Given the server index, get the pqServer.
+  pqServer* getServerByIndex(unsigned int index) const;
 
   // Get the number of server connections available.
   unsigned int getNumberOfServers();

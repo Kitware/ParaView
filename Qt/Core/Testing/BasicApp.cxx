@@ -24,9 +24,9 @@ public:
   MainWindow()
   {
     // automatically make a server connection
-    pqServer* server = pqServer::Create(pqServerResource("builtin:"));
     pqApplicationCore* core = pqApplicationCore::instance();
     pqPipelineBuilder* pb = core->getPipelineBuilder();
+    pqServer* server = core->createServer(pqServerResource("builtin:"));
     
     // create a graphics window and put it in our main window
     this->RenderModule = pb->createWindow(server);

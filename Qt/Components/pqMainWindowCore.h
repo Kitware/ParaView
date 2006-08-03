@@ -230,7 +230,6 @@ public slots:
   void onEditCameraRedo();
   
   void onServerConnect();
-  void onServerConnect(pqServer* Server);
   void onServerDisconnect();
 
   void onToolsCreateCustomFilter();
@@ -299,7 +298,10 @@ private slots:
   // called when a source is removed by the pqServerManagerModel. If
   // the removed source is the active source, we must change it.
   void sourceRemoved(pqPipelineSource*);
-  void serverRemoved(pqServer*);
+  void serverRemoved(pqServer* server);
+
+  // Called when a new server is added to the pqServerManagerModel.
+  void serverAdded(pqServer* server);
   
   // Performs the set of actions need to be performed after a new 
   // source/reader/filter/customfilter is created. This includes

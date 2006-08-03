@@ -53,9 +53,6 @@ class PQCORE_EXPORT pqServer :
   Q_OBJECT
 
 public:
-  /// Creates a new connection to the given server.  \sa pqServerResource, pqServerResources
-  static pqServer* Create(const pqServerResource& Resource);
-  
   // Use this method to disconnect a server. On calling this method,
   // the server instance will be deleted.
   static void disconnect(pqServer* server);
@@ -73,6 +70,8 @@ public:
   vtkSMRenderModuleProxy* newRenderModule();
 
   const pqServerResource& getResource();
+  void setResource(const pqServerResource &server_resource);
+
   vtkIdType GetConnectionID();
 
   // Return the number of data server partitions on this 
@@ -91,8 +90,6 @@ protected:
 private:
   pqServer(const pqServer&);  // Not implemented.
   pqServer& operator=(const pqServer&); // Not implemented.
-
-  void setResource(const pqServerResource &server_resource);
 
   pqServerResource Resource;
   vtkIdType ConnectionID;
