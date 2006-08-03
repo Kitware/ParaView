@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVAnimationWriter);
-vtkCxxRevisionMacro(vtkXMLPVAnimationWriter, "1.7");
+vtkCxxRevisionMacro(vtkXMLPVAnimationWriter, "1.8");
 
 //----------------------------------------------------------------------------
 class vtkXMLPVAnimationWriterInternals
@@ -98,11 +98,8 @@ void vtkXMLPVAnimationWriter::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLPVAnimationWriter::AddInput(vtkDataSet* pd, const char* group)
+void vtkXMLPVAnimationWriter::AddInputInternal(const char* group)
 {
-  // Add the input to the pipeline structure.
-  this->Superclass::AddInput(pd);
-  
   // Find the part number for this input.
   int partNum = 0;
   vtkXMLPVAnimationWriterInternals::GroupMapType::iterator s =
@@ -126,6 +123,23 @@ void vtkXMLPVAnimationWriter::AddInput(vtkDataSet* pd, const char* group)
   
   // Allocate the change count entry for this input.
   this->Internal->InputChangeCounts.push_back(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLPVAnimationWriter::AddInputConnection(vtkAlgorithmOutput* ao, 
+                                                 const char* group)
+{
+  this->Superclass::AddInputConnection(ao);
+  this->AddInputInternal(group);
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLPVAnimationWriter::AddInput(vtkDataSet* pd, const char* group)
+{
+  // Add the input to the pipeline structure.
+  this->Superclass::AddInput(pd);
+  
+  this->AddInputInternal(group);
 }
 
 //----------------------------------------------------------------------------

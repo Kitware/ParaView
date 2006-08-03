@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.24");
+vtkCxxRevisionMacro(vtkSMPart, "1.25");
 
 
 //----------------------------------------------------------------------------
@@ -37,7 +37,9 @@ vtkSMPart::vtkSMPart()
   this->DataInformation = vtkPVDataInformation::New();
   this->ClassNameInformationValid = 0;
   this->DataInformationValid = 0;
-  this->UpdateNeeded = 1;
+  this->PortIndex = 0;
+
+  this->DataObjectProxy = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -45,6 +47,46 @@ vtkSMPart::~vtkSMPart()
 {
   this->ClassNameInformation->Delete();
   this->DataInformation->Delete();
+  if (this->DataObjectProxy)
+    {
+    this->DataObjectProxy->Delete();
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkSMProxy* vtkSMPart::GetDataObjectProxy(int recheck)
+{
+  if (!this->DataObjectProxy)
+    {
+    recheck = 1;
+    }
+  if (recheck)
+    {
+    if (this->DataObjectProxy)
+      {
+      this->DataObjectProxy->Delete();
+      }
+    this->DataObjectProxy = vtkSMProxy::New();
+    this->DataObjectProxy->SetConnectionID(this->ConnectionID);
+    this->DataObjectProxy->SetServers(this->Servers);
+    this->DataObjectProxy->CreateVTKObjects(0);
+
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->GetProducerID()
+           << "GetOutputDataObject"
+           << this->PortIndex
+           << vtkClientServerStream::End;
+    vtkClientServerID uid = pm->GetUniqueID();
+    stream << vtkClientServerStream::Assign 
+           << uid << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID, this->Servers, stream);
+    this->DataObjectProxy->SetID(0, uid);
+    }
+
+  return this->DataObjectProxy;
 }
 
 //----------------------------------------------------------------------------
@@ -85,17 +127,8 @@ void vtkSMPart::GatherDataInformation(int doUpdate)
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
-  // The vtkSMSourceProxy updates the pipeline before gathering
-  // information. The update is no longer necessary here.
-//   if (doUpdate)
-//     {
-//     pm->SendPrepareProgress(this->ConnectionID);
-//     this->Update();
-//     pm->SendCleanupPendingProgress(this->ConnectionID);
-//     }
-
-  pm->GatherInformation(this->ConnectionID, vtkProcessModule::DATA_SERVER, 
-    this->DataInformation, this->GetID(0));
+  pm->GatherInformation(this->ConnectionID, this->Servers, 
+    this->DataInformation, this->GetAlgorithmOutputID());
 
   if (doUpdate)
     {
@@ -112,9 +145,33 @@ void vtkSMPart::GatherClassNameInformation()
     return;
     }
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->GatherInformation(this->ConnectionID, vtkProcessModule::DATA_SERVER,
-    this->ClassNameInformation, this->GetID(0));
+
+  // Temporarily assign an id to the output object so that we
+  // can obtain it's name.
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << this->GetProducerID()
+         << "GetOutputDataObject"
+         << this->PortIndex
+         << vtkClientServerStream::End;
+  vtkClientServerID uid = pm->GetUniqueID();
+  stream << vtkClientServerStream::Assign 
+         << uid << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
+
+  pm->GatherInformation(this->ConnectionID, 
+                        this->Servers,
+                        this->ClassNameInformation, 
+                        uid);
   this->ClassNameInformationValid = 1;
+
+  // Unassign the id.
+  stream << vtkClientServerStream::Delete 
+         << uid 
+         << vtkClientServerStream::End;
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
 }
 
 //----------------------------------------------------------------------------
@@ -144,23 +201,23 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
       return;
       }  
     stream << vtkClientServerStream::Invoke 
-           << this->GetID(0) << "UpdateInformation"
+           << this->GetProducerID() << "UpdateInformation"
            << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID, 
-      vtkProcessModule::DATA_SERVER, stream);
+    pm->SendStream(this->ConnectionID, this->Servers, stream);
     this->GatherDataInformation(0);
     if (this->DataInformation->GetCompositeDataClassName())
       {
       return;
       }
     stream << vtkClientServerStream::Invoke 
-                    << this->GetID(0) << "GetMaximumNumberOfPieces"
-                    << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-      vtkProcessModule::DATA_SERVER_ROOT, stream);
+           << this->GetExecutiveID() 
+           << "GetMaximumNumberOfPieces"
+           << this->PortIndex
+           << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID, this->Servers, stream);
     int num =0;
-    pm->GetLastResult(this->ConnectionID,
-      vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0,&num);
+    pm->GetLastResult(this->ConnectionID, 
+             vtkProcessModule::GetRootId(this->Servers)).GetArgument(0,0,&num);
     if (num != 1)
       { // The source can already produce pieces.
       return;
@@ -205,23 +262,27 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
       return;
       }
     stream << vtkClientServerStream::Invoke 
-           << this->GetID(0) << "UpdateInformation"
+           << this->GetProducerID() << "UpdateInformation"
            << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID,
-      vtkProcessModule::DATA_SERVER, stream);
+                   this->Servers, 
+                   stream);
     this->GatherDataInformation(0);
     if (this->DataInformation->GetCompositeDataClassName())
       {
       return;
       }
     stream << vtkClientServerStream::Invoke 
-                    << this->GetID(0) << "GetMaximumNumberOfPieces"
-                    << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-      vtkProcessModule::DATA_SERVER_ROOT, stream);
+           << this->GetExecutiveID() 
+           << "GetMaximumNumberOfPieces"
+           << this->PortIndex
+           << vtkClientServerStream::End;
+    pm->SendStream(this->ConnectionID, 
+                   vtkProcessModule::GetRootId(this->Servers),
+                   stream);
     int num =0;
-    pm->GetLastResult(this->ConnectionID,
-      vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0,&num);
+    pm->GetLastResult(this->ConnectionID, 
+           vtkProcessModule::GetRootId(this->Servers)).GetArgument(0,0,&num);
     if (num != 1)
       { // The source can already produce pieces.
       return;
@@ -269,19 +330,23 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
       return;
       }
     stream << vtkClientServerStream::Invoke 
-           << this->GetID(0) << "UpdateInformation"
+           << this->GetProducerID() << "UpdateInformation"
            << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID,
-      vtkProcessModule::DATA_SERVER, stream);
+                   this->Servers, 
+                   stream);
     this->GatherDataInformation(0);
     stream << vtkClientServerStream::Invoke
-           << this->GetID(0) << "GetMaximumNumberOfPieces"
+           << this->GetExecutiveID() 
+           << "GetMaximumNumberOfPieces"
+           << this->PortIndex
            << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID,
-      vtkProcessModule::DATA_SERVER_ROOT, stream);
+                   this->Servers, 
+                   stream);
     int num = 0;
-    pm->GetLastResult(this->ConnectionID,
-      vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0,&num);
+    pm->GetLastResult(this->ConnectionID, 
+         vtkProcessModule::GetRootId(this->Servers)).GetArgument(0,0,&num);
     if (num != 1)
       { // The source can already produce pieces.
       return;
@@ -297,47 +362,47 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
     return;
     }
 
-  // Connect the filter to the pipeline.  
-  if (!this->DataInformation->GetCompositeDataClassName())
-    {
-    stream << vtkClientServerStream::Invoke << tempDataPiece 
-           << "SetInput"
-           << this->GetID(0)
-           << vtkClientServerStream::End;
-    }
-  else
-    {
-    stream << vtkClientServerStream::Invoke
-           << this->GetID(0)
-           << "GetProducerPort"
-           << vtkClientServerStream::End
-           << vtkClientServerStream::Invoke
-           << vtkClientServerStream::LastResult
-           << "GetProducer"
-           << vtkClientServerStream::End
-           << vtkClientServerStream::Invoke
-           << vtkClientServerStream::LastResult
-           << "GetExecutive"
-           << vtkClientServerStream::End
-           << vtkClientServerStream::Invoke
-           << vtkClientServerStream::LastResult
-           << "GetCompositeOutputData" << 0
-           << vtkClientServerStream::End
-           << vtkClientServerStream::Invoke
-           << tempDataPiece
-           << "SetInput" << vtkClientServerStream::LastResult
-           << vtkClientServerStream::End;
-    }
+  // Connect filter
   stream << vtkClientServerStream::Invoke << tempDataPiece 
-                  << "GetOutput"
-                  << vtkClientServerStream::End;
-  this->SetID(0, pm->GetUniqueID());
-  stream << vtkClientServerStream::Assign << this->GetID(0)
-                  << vtkClientServerStream::LastResult
-                  << vtkClientServerStream::End;
+         << "SetInputConnection"
+         << this->GetAlgorithmOutputID()
+         << vtkClientServerStream::End;
+
+  // Release references to old ids
+  stream << vtkClientServerStream::Delete 
+         << this->GetAlgorithmOutputID()
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Delete 
+         << this->GetProducerID()
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Delete 
+         << this->GetExecutiveID()
+         << vtkClientServerStream::End;
+
+  // Reassign ids to the new output filter
+  stream << vtkClientServerStream::Invoke << tempDataPiece 
+         << "GetOutputPort" << 0
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Assign << this->GetAlgorithmOutputID()
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << tempDataPiece 
+         << "GetExecutive" 
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Assign << this->GetExecutiveID()
+         << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Assign << this->GetProducerID()
+         << tempDataPiece
+         << vtkClientServerStream::End;
+
+  // Port index is now 0
+  this->PortIndex = 0;
+
+  // We don't have to keep reference to the filter
   pm->DeleteStreamObject(tempDataPiece, stream);
-  pm->SendStream(this->ConnectionID,
-    vtkProcessModule::DATA_SERVER, stream);
+
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
 }
 
 //----------------------------------------------------------------------------
@@ -345,6 +410,8 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
 // Needs to be before "ExtractPieces" because translator propagates.
 void vtkSMPart::CreateTranslatorIfNecessary()
 {
+  return;
+
   if (this->GetNumberOfIDs() < 1)
     {
     return;
@@ -367,17 +434,18 @@ void vtkSMPart::CreateTranslatorIfNecessary()
     // PVExtent translator should really be the default,
     // Then we would not need to do this.
     stream << vtkClientServerStream::Invoke
-           << this->GetID(0) << "GetExtentTranslator"
+           << this->GetExecutiveID() << "GetExtentTranslator"
            << vtkClientServerStream::End
            << vtkClientServerStream::Invoke
            << vtkClientServerStream::LastResult
            << "GetClassName"
            << vtkClientServerStream::End;
-    pm->SendStream(this->ConnectionID,
-      vtkProcessModule::DATA_SERVER_ROOT, stream);
+    pm->SendStream(this->ConnectionID, 
+                   vtkProcessModule::GetRootId(this->Servers),
+                   stream);
     char* classname = 0;
     if(!pm->GetLastResult(this->ConnectionID,
-        vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0,&classname))
+      vtkProcessModule::GetRootId(this->Servers)).GetArgument(0,0,&classname))
       {
       vtkErrorMacro(<< "Faild to get server result.");
       }
@@ -386,31 +454,38 @@ void vtkSMPart::CreateTranslatorIfNecessary()
       vtkClientServerID translatorID =
         pm->NewStreamObject("vtkPVExtentTranslator", stream);
       stream << vtkClientServerStream::Invoke
-             << this->GetID(0) << "SetExtentTranslator"
+             << this->GetExecutiveID() << "SetExtentTranslator"
              << translatorID
              << vtkClientServerStream::End;
       // Translator has to be set on source because it is propagated.
       stream << vtkClientServerStream::Invoke
+             << this->GetProducerID()
+             << "GetOutputDataObject"
+             << this->PortIndex
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke
              << translatorID << "SetOriginalSource"
-             << this->GetID(0)
+             << vtkClientServerStream::LastResult
              << vtkClientServerStream::End;
       pm->DeleteStreamObject(translatorID, stream);
       pm->SendStream(this->ConnectionID,
-        vtkProcessModule::DATA_SERVER, stream);
+                     this->Servers, 
+                     stream);
       }
    }
 
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPart::Update()
+void vtkSMPart::UpdatePipeline()
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SendPrepareProgress(this->ConnectionID);
   vtkClientServerStream stream;
+
   stream << vtkClientServerStream::Invoke 
-         << this->GetID(0) << "UpdateInformation"
+         << this->GetProducerID() << "UpdateInformation"
          << vtkClientServerStream::End;
+
   // When getting rid of streaming, throw away the conditional and 
   // keep the else.
   // TODO: disabling for now.
@@ -420,7 +495,7 @@ void vtkSMPart::Update()
            << pm->GetProcessModuleID() << "GetPartitionId"
            << vtkClientServerStream::End
            << vtkClientServerStream::Invoke
-           << this->GetID(0) << "SetUpdateExtent"
+           << this->GetExecutiveID() << "SetUpdateExtent" << this->PortIndex
            << vtkClientServerStream::LastResult 
            << pm->GetNumberOfPartitions(this->ConnectionID) * 200 << 0
            << vtkClientServerStream::End; 
@@ -431,29 +506,27 @@ void vtkSMPart::Update()
            << pm->GetProcessModuleID() << "GetPartitionId"
            << vtkClientServerStream::End
            << vtkClientServerStream::Invoke
-           << this->GetID(0) << "SetUpdateExtent"
+           << this->GetExecutiveID() << "SetUpdateExtent" << this->PortIndex
            << vtkClientServerStream::LastResult 
            << pm->GetNumberOfPartitions(this->ConnectionID) << 0
            << vtkClientServerStream::End; 
     }   
-  stream << vtkClientServerStream::Invoke 
-         << this->GetID(0) << "Update"
-         << vtkClientServerStream::End;
-  pm->SendStream(this->ConnectionID,
-                 vtkProcessModule::DATA_SERVER, stream);
-  pm->SendCleanupPendingProgress(this->ConnectionID);
-}
 
-//----------------------------------------------------------------------------
-void vtkSMPart::MarkForUpdate()
-{
-  this->UpdateNeeded = 1;
+  stream << vtkClientServerStream::Invoke 
+         << this->GetProducerID() << "Update"
+         << vtkClientServerStream::End;
+
+  pm->SendPrepareProgress(this->ConnectionID);
+  pm->SendStream(this->ConnectionID, this->Servers, stream);
+  pm->SendCleanupPendingProgress(this->ConnectionID);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMPart::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "PortIndex: " << this->PortIndex << endl;
 }
 
 

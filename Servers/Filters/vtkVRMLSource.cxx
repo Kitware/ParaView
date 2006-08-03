@@ -13,23 +13,27 @@
 
 =========================================================================*/
 #include "vtkVRMLSource.h"
-#include "vtkObjectFactory.h"
-#include "vtkPolyData.h"
-#include "vtkProperty.h"
-#include "vtkActorCollection.h"
+
 #include "vtkActor.h"
-#include "vtkPointData.h"
-#include "vtkCellData.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkRenderer.h"
-#include "vtkVRMLImporter.h"
-#include "vtkTransformPolyDataFilter.h"
+#include "vtkActorCollection.h"
 #include "vtkAppendPolyData.h"
+#include "vtkCellData.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkMultiBlockDataSet.h"
+#include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkPolyData.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkProperty.h"
+#include "vtkRenderer.h"
 #include "vtkTransform.h"
+#include "vtkTransformPolyDataFilter.h"
 #include "vtkUnsignedCharArray.h"
+#include "vtkVRMLImporter.h"
 
 
-vtkCxxRevisionMacro(vtkVRMLSource, "1.8");
+vtkCxxRevisionMacro(vtkVRMLSource, "1.9");
 vtkStandardNewMacro(vtkVRMLSource);
 
 //------------------------------------------------------------------------------
@@ -52,53 +56,31 @@ vtkVRMLSource::~vtkVRMLSource()
     }
 }
 
-//----------------------------------------------------------------------------
-vtkPolyData* vtkVRMLSource::GetOutput(int idx)
-{
-  if (this->Importer == NULL)
-    {
-    this->InitializeImporter();
-    }
-
-  return (vtkPolyData *) this->vtkSource::GetOutput(idx); 
-}
-
-//----------------------------------------------------------------------------
-int vtkVRMLSource::GetNumberOfOutputs()
-{
-  if (this->Append)
-    {
-    return 1;
-    }
-
-  if (this->Importer == NULL)
-    {
-    this->InitializeImporter();
-    }
-
-  return this->NumberOfOutputs;
-}
-
-
 //------------------------------------------------------------------------------
-void vtkVRMLSource::Execute()
+int vtkVRMLSource::RequestData(
+  vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
+  vtkInformation* info = outputVector->GetInformationObject(0);
+
+  vtkDataObject* doOutput = info->Get(vtkDataObject::DATA_OBJECT());
+  vtkMultiBlockDataSet* output = vtkMultiBlockDataSet::SafeDownCast(doOutput);
+  if (!output)
+    {
+    return 0;
+    }
+
   if (this->Importer == NULL)
     {
     this->InitializeImporter();
     }
-  this->CopyImporterToOutputs();
+  this->CopyImporterToOutputs(output);
+
+  return 1;
 }
 
 //------------------------------------------------------------------------------
 void vtkVRMLSource::InitializeImporter()
 {
-  vtkRenderer* ren;
-  vtkActorCollection* actors;
-  vtkActor* actor;
-  vtkPolyDataMapper* mapper;
-  int idx;  
-
   if (this->Importer)
     {
     this->Importer->Delete();
@@ -107,28 +89,10 @@ void vtkVRMLSource::InitializeImporter()
   this->Importer = vtkVRMLImporter::New();
   this->Importer->SetFileName(this->FileName);
   this->Importer->Read();
-  ren = this->Importer->GetRenderer();
-  actors = ren->GetActors();
-  actors->InitTraversal();
-  idx = 0;
-  while ( (actor = actors->GetNextActor()) )
-    {
-    mapper = vtkPolyDataMapper::SafeDownCast(actor->GetMapper());
-    if (mapper)
-      {
-      //mapper->GetInput()->Update();
-      vtkPolyData *newOutput = vtkPolyData::New();
-      newOutput->CopyInformation(mapper->GetInput());
-      this->SetNthOutput(idx, newOutput);
-      ++idx;
-      newOutput->Delete();
-      newOutput = NULL;
-      }
-    }
 }
 
 //------------------------------------------------------------------------------
-void vtkVRMLSource::CopyImporterToOutputs()
+void vtkVRMLSource::CopyImporterToOutputs(vtkMultiBlockDataSet* mbOutput)
 {
   vtkRenderer* ren;
   vtkActorCollection* actors;
@@ -165,14 +129,14 @@ void vtkVRMLSource::CopyImporterToOutputs()
       {
       input = mapper->GetInput();
       input->Update();
-      if (append)
+
+      output = vtkPolyData::New();
+
+      if (!append)
         {
-        output = vtkPolyData::New();
+        mbOutput->SetDataSet(idx, 0, output);
         }
-      else
-        {
-        output = this->GetOutput(idx);
-        }
+
       vtkTransformPolyDataFilter *tf = vtkTransformPolyDataFilter::New();
       vtkTransform *trans = vtkTransform::New();
       tf->SetInput(input);
@@ -180,6 +144,7 @@ void vtkVRMLSource::CopyImporterToOutputs()
       trans->SetMatrix(actor->GetMatrix());
       input = tf->GetOutput();
       input->Update();
+
       output->CopyStructure(input);
       // Only copy well formed arrays.
       numPoints = input->GetNumberOfPoints();
@@ -238,9 +203,9 @@ void vtkVRMLSource::CopyImporterToOutputs()
       if (append)
         {
         append->AddInput(output);
-        output->Delete();
-        output = NULL;
         }
+      output->Delete();
+      output = NULL;
 
       ++idx;
       tf->Delete();
@@ -249,11 +214,14 @@ void vtkVRMLSource::CopyImporterToOutputs()
       trans = NULL;
       }
     }
+
   if (append)
     {
-    output = this->GetOutput();
     append->Update();
-    output->ShallowCopy(append->GetOutput());
+    vtkPolyData* newOutput = vtkPolyData::New();
+    newOutput->ShallowCopy(append->GetOutput());
+    mbOutput->SetDataSet(0, 0, newOutput);
+    newOutput->Delete();
     append->Delete();
     }
 }

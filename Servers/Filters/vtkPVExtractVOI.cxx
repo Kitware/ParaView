@@ -28,7 +28,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVExtractVOI, "1.7");
+vtkCxxRevisionMacro(vtkPVExtractVOI, "1.8");
 vtkStandardNewMacro(vtkPVExtractVOI);
 
 //----------------------------------------------------------------------------
@@ -83,8 +83,7 @@ int vtkPVExtractVOI::RequestUpdateExtent(vtkInformation* request,
                                          vtkInformationVector* outputVector)
 {
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  vtkDataSet* output = 
-    vtkDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkDataObject* output = outInfo->Get(vtkDataObject::DATA_OBJECT());
 
   if (output->GetDataObjectType() == VTK_IMAGE_DATA)
     {
@@ -127,8 +126,7 @@ int vtkPVExtractVOI::RequestInformation(vtkInformation* request,
                                         vtkInformationVector* outputVector)
 {
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
-  vtkDataSet* output = 
-    vtkDataSet::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkDataObject* output = outInfo->Get(vtkDataObject::DATA_OBJECT());
 
   if (output->GetDataObjectType() == VTK_IMAGE_DATA)
     {

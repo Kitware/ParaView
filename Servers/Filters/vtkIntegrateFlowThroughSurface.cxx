@@ -30,7 +30,7 @@
 #include "vtkSurfaceVectors.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkIntegrateFlowThroughSurface, "1.4");
+vtkCxxRevisionMacro(vtkIntegrateFlowThroughSurface, "1.5");
 vtkStandardNewMacro(vtkIntegrateFlowThroughSurface);
 
 //-----------------------------------------------------------------------------
@@ -65,11 +65,11 @@ int vtkIntegrateFlowThroughSurface::RequestUpdateExtent(
 
 //-----------------------------------------------------------------------------
 vtkDataSet* vtkIntegrateFlowThroughSurface::GenerateSurfaceVectors(
-  vtkDataSet* input, vtkInformationVector **inputVector)
+  vtkDataSet* input)
 {
   vtkDataSet* inputCopy = input->NewInstance();
   inputCopy->CopyStructure(input);
-  vtkDataArray *vectors = this->GetInputArrayToProcess(0,inputVector);
+  vtkDataArray *vectors = this->GetInputArrayToProcess(0, input);
   if (vectors == 0)
     {
     vtkErrorMacro("Missing Vectors.");
@@ -112,7 +112,7 @@ int vtkIntegrateFlowThroughSurface::RequestData(vtkInformation *request,
 
   vtkIntegrateAttributes* integrate = vtkIntegrateAttributes::New();
   vtkCompositeDataSet *hdInput = vtkCompositeDataSet::SafeDownCast(
-    inInfo->Get(vtkCompositeDataSet::COMPOSITE_DATA_SET()));
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
   if (hdInput) 
     {
     vtkMultiGroupDataSet* hds = vtkMultiGroupDataSet::New();
@@ -123,19 +123,19 @@ int vtkIntegrateFlowThroughSurface::RequestData(vtkInformation *request,
       vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
       if (ds)
         {
-        vtkDataSet* intermData = this->GenerateSurfaceVectors(input, inputVector);
+        vtkDataSet* intermData = this->GenerateSurfaceVectors(ds);
         hds->SetDataSet(0, hds->GetNumberOfDataSets(0), intermData);
         intermData->Delete();
         }
       iter->GoToNextItem();
       }
     iter->Delete();
-    inInfo->Set(vtkCompositeDataSet::COMPOSITE_DATA_SET(), hds);
+    inInfo->Set(vtkDataObject::DATA_OBJECT(), hds);
     hds->Delete();
     }
   else
     {
-    vtkDataSet* intermData = this->GenerateSurfaceVectors(input, inputVector);
+    vtkDataSet* intermData = this->GenerateSurfaceVectors(input);
     if (!intermData)
       {
       return 0;
@@ -148,7 +148,7 @@ int vtkIntegrateFlowThroughSurface::RequestData(vtkInformation *request,
 
   if (hdInput) 
     {
-    inInfo->Set(vtkCompositeDataSet::COMPOSITE_DATA_SET(), hdInput);
+    inInfo->Set(vtkDataObject::DATA_OBJECT(), hdInput);
     }
   else
     {

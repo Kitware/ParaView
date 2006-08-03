@@ -444,7 +444,7 @@
 
   <ProxyGroup name="mappers">
     <SourceProxy name="LabeledDataMapper" class="vtkLabeledDataMapper">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
@@ -476,7 +476,7 @@
     </SourceProxy>
 
     <SourceProxy name="PolyDataMapper" class="vtkPolyDataMapper">
-      <InputProperty name="Input" command="SetInput">
+      <InputProperty name="Input" command="SetInputConnection">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
@@ -588,7 +588,7 @@
       class="vtkProjectedTetrahedraMapper">
       <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
         <!-- 
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -630,7 +630,7 @@
       class="vtkUnstructuredGridVolumeRayCastMapper">
       <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
         <!-- 
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -677,7 +677,7 @@
       class="vtkUnstructuredGridVolumeZSweepMapper">
       <InputProperty
         name="Input"
-        command="SetInput">
+        command="SetInputConnection">
         <!-- 
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
@@ -2629,7 +2629,7 @@
           <!-- note this property is not exposed -->
           <InputProperty
             name="Input"
-            command="SetInput">
+            command="SetInputConnection">
             <ProxyGroupDomain name="groups">
               <Group name="sources"/>
               <Group name="filters"/>

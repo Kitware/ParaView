@@ -40,6 +40,7 @@ public:
   // Description:
   // Specify the point locations used to probe input. Any geometry
   // can be used.
+  void SetSourceConnection(vtkAlgorithmOutput* port);
   void SetSource(vtkDataObject *source);
   vtkDataObject *GetSource();
 

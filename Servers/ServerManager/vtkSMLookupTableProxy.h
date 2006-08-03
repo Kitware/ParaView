@@ -15,7 +15,7 @@
 // .NAME vtkSMLookupTableProxy - proxy for a VTK lookup table
 // .SECTION Description
 // This proxy class is an example of how vtkSMProxy can be subclassed
-// to add functionality. It adds one simple method : Build().
+// to add functionality.
 
 #ifndef __vtkSMLookupTableProxy_h
 #define __vtkSMLookupTableProxy_h

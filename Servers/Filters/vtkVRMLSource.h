@@ -20,14 +20,15 @@
 #ifndef __vtkVRMLSource_h
 #define __vtkVRMLSource_h
 
-#include "vtkSource.h"
-class vtkVRMLImporter;
-class vtkPolyData;
+#include "vtkMultiBlockDataSetAlgorithm.h"
 
-class VTK_EXPORT vtkVRMLSource : public vtkSource
+class vtkMultiBlockDataSet;
+class vtkVRMLImporter;
+
+class VTK_EXPORT vtkVRMLSource : public vtkMultiBlockDataSetAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkVRMLSource,vtkSource);
+  vtkTypeRevisionMacro(vtkVRMLSource,vtkMultiBlockDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkVRMLSource *New();
 
@@ -35,10 +36,6 @@ public:
   // VRML file name.  Set
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-
-  int GetNumberOfOutputs();
-  vtkPolyData* GetOutput(int idx);
-  vtkPolyData* GetOutput() { return this->GetOutput(0);}
 
   // Description: 
   // Descided whether to generate color arrays or not.
@@ -57,9 +54,12 @@ protected:
   vtkVRMLSource();
   ~vtkVRMLSource();
 
-  void Execute();
+  int RequestData(vtkInformation*, 
+                  vtkInformationVector**, 
+                  vtkInformationVector*);
+
   void InitializeImporter();
-  void CopyImporterToOutputs();
+  void CopyImporterToOutputs(vtkMultiBlockDataSet*);
 
   char* FileName;
   vtkVRMLImporter *Importer;

@@ -31,7 +31,7 @@
 #include "vtkProcessModule.h"
 #include "vtkUniformGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.24");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.25");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -152,7 +152,7 @@ int vtkPVGlyphFilter::RequestData(
 
   vtkCompositeDataSet *hdInput = vtkCompositeDataSet::SafeDownCast(
     inputVector[0]->GetInformationObject(0)->Get(
-      vtkCompositeDataSet::COMPOSITE_DATA_SET()));
+      vtkDataObject::DATA_OBJECT()));
   if (hdInput) 
     {
     return this->RequestCompositeData(request, inputVector, outputVector);
@@ -277,7 +277,7 @@ int vtkPVGlyphFilter::RequestCompositeData(vtkInformation* request,
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
 
   vtkMultiGroupDataSet *hdInput = vtkMultiGroupDataSet::SafeDownCast(
-    inInfo->Get(vtkCompositeDataSet::COMPOSITE_DATA_SET()));
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
   vtkMultiGroupDataInformation* hdInfo = 
     hdInput->GetMultiGroupDataInformation();
 

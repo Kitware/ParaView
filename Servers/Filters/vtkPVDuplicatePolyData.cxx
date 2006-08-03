@@ -16,14 +16,17 @@
 
 #include "vtkAppendPolyData.h"
 #include "vtkCellData.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkSocketController.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTiledDisplaySchedule.h"
 
-vtkCxxRevisionMacro(vtkPVDuplicatePolyData, "1.8");
+vtkCxxRevisionMacro(vtkPVDuplicatePolyData, "1.9");
 vtkStandardNewMacro(vtkPVDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkPVDuplicatePolyData,Controller, vtkMultiProcessController);
@@ -70,39 +73,29 @@ void vtkPVDuplicatePolyData::InitializeSchedule(int numTiles)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVDuplicatePolyData::ExecuteInformation()
+int vtkPVDuplicatePolyData::RequestInformation(
+  vtkInformation*,
+  vtkInformationVector**,
+  vtkInformationVector* outputVector)
 {
-  if (this->GetOutput() == NULL)
-    {
-    vtkErrorMacro("Missing output");
-    return;
-    }
-  this->GetOutput()->SetMaximumNumberOfPieces(-1);
+  vtkInformation *info = outputVector->GetInformationObject(0);
+  info->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(),-1);
+  return 1;
 }
-
-//-----------------------------------------------------------------------------
-void vtkPVDuplicatePolyData::ComputeInputUpdateExtents(vtkDataObject *output)
-{
-  vtkPolyData *input = this->GetInput();
-  int piece = output->GetUpdatePiece();
-  int numPieces = output->GetUpdateNumberOfPieces();
-  int ghostLevel = output->GetUpdateGhostLevel();
-
-  if (input == NULL)
-    {
-    return;
-    }
-  input->SetUpdatePiece(piece);
-  input->SetUpdateNumberOfPieces(numPieces);
-  input->SetUpdateGhostLevel(ghostLevel);
-}
-
   
 //-----------------------------------------------------------------------------
-void vtkPVDuplicatePolyData::Execute()
+int vtkPVDuplicatePolyData::RequestData(vtkInformation*,
+                                        vtkInformationVector** inputVector,
+                                        vtkInformationVector* outputVector)
 {
-  vtkPolyData *input = this->GetInput();
-  vtkPolyData *output = this->GetOutput();
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  vtkPolyData *input = vtkPolyData::SafeDownCast(
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkPolyData *output = vtkPolyData::SafeDownCast(
+    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
   int myId;
   int idx, tileId, otherProcessId;
   int numElements;
@@ -110,26 +103,20 @@ void vtkPVDuplicatePolyData::Execute()
   vtkAppendPolyData** appendFilters;
   vtkPolyData* tmp;
 
-  if (input == NULL)
-    {
-    vtkErrorMacro("Input has not been set.");
-    return;
-    }
-
   // Take this path if memory size is too large.
   if (this->PassThrough)
     {
     output->CopyStructure(input);
     output->GetPointData()->PassData(input->GetPointData());
     output->GetCellData()->PassData(input->GetCellData());
-    return;
+    return 1;
     }
 
   // Remote (socket) process as client.
   if (this->SocketController && this->ClientFlag)
     {
-    this->ClientExecute(this->SocketController);
-    return;
+    this->ClientExecute(this->SocketController, output);
+    return 1;
     }
   // MPIRoot as client.
   // Subset of satellites for zero empty.
@@ -143,8 +130,8 @@ void vtkPVDuplicatePolyData::Execute()
     }
   if (myId < 0)
     {
-    this->ClientExecute(this->Controller);
-    return;
+    this->ClientExecute(this->Controller, output);
+    return 1;
     }
 
   appendFilters = new vtkAppendPolyData* [this->Schedule->GetNumberOfTiles()];
@@ -242,13 +229,15 @@ void vtkPVDuplicatePolyData::Execute()
       this->SocketController->Send(output, 1, 11872);
       }
     }
+
+  return 1;
 }
 
 
 //-----------------------------------------------------------------------------
-void vtkPVDuplicatePolyData::ClientExecute(vtkMultiProcessController* controller)
+void vtkPVDuplicatePolyData::ClientExecute(
+  vtkMultiProcessController* controller, vtkPolyData* output)
 {
-  vtkPolyData *output = this->GetOutput();
   vtkPolyData *tmp = vtkPolyData::New();
 
   // No data is on the client, so we just have to get the data
@@ -284,3 +273,11 @@ void vtkPVDuplicatePolyData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ZeroEmpty: " << this->ZeroEmpty << endl;
 }
 
+//----------------------------------------------------------------------------
+int vtkPVDuplicatePolyData::FillInputPortInformation(int , 
+                                                     vtkInformation* info)
+{
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPolyData");
+  info->Set(vtkAlgorithm::INPUT_IS_OPTIONAL(), 1);
+  return 1;
+}

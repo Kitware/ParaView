@@ -50,7 +50,7 @@
 #include "vtkHyperOctreeSurfaceFilter.h"
 
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.63");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.64");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -234,8 +234,9 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
 {
   vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
 
-  vtkMultiGroupDataSet *mgInput = vtkMultiGroupDataSet::SafeDownCast(
-    inInfo->Get(vtkCompositeDataSet::COMPOSITE_DATA_SET()));
+  vtkDataObject* inputDobj = inInfo->Get(vtkDataObject::DATA_OBJECT());
+  vtkMultiGroupDataSet *mgInput = 
+    vtkMultiGroupDataSet::SafeDownCast(inputDobj);
   if (mgInput) 
     {
     return this->RequestCompositeData(request, inputVector, outputVector);
@@ -246,8 +247,7 @@ int vtkPVGeometryFilter::RequestData(vtkInformation* request,
     info->Get(vtkDataObject::DATA_OBJECT()));
   if (!output) {return 0;}
 
-  vtkDataObject *input = vtkDataSet::SafeDownCast(
-    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkDataObject *input = vtkDataSet::SafeDownCast(inputDobj);
   if (!input)
     {
     input = vtkGenericDataSet::SafeDownCast(
@@ -279,7 +279,7 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
   if (!output) {return 0;}
 
   vtkMultiGroupDataSet *mgInput = vtkMultiGroupDataSet::SafeDownCast(
-    inInfo->Get(vtkCompositeDataSet::COMPOSITE_DATA_SET()));
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   if (this->CheckAttributes(mgInput))
     {
@@ -880,7 +880,7 @@ int vtkPVGeometryFilter::FillInputPortInformation(int port,
     }
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
   info->Set(vtkCompositeDataPipeline::INPUT_REQUIRED_COMPOSITE_DATA_TYPE(), 
-            "vtkCompositeDataSet");
+            "vtkMultiGroupDataSet");
   return 1;
 }
 

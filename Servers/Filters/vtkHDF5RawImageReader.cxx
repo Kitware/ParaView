@@ -15,19 +15,21 @@
 #include "vtkHDF5RawImageReader.h"
 
 #include "vtkCallbackCommand.h"
+#include "vtkCharArray.h"
 #include "vtkDataArray.h"
 #include "vtkDataArraySelection.h"
 #include "vtkDoubleArray.h"
-#include "vtkLongArray.h"
 #include "vtkFloatArray.h"
-#include "vtkCharArray.h"
 #include "vtkImageData.h"
-#include "vtkPointData.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkIntArray.h"
+#include "vtkLongArray.h"
 #include "vtkObjectFactory.h"
-#include "vtkShortArray.h"
 #include "vtkPVFiltersConfig.h"
-
+#include "vtkPointData.h"
+#include "vtkShortArray.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 
 // Include ordering of these four files is very sensitive on HP-UX.
 #include <vtkstd/vector>
@@ -38,7 +40,7 @@
 #define VTK_HDF5_DEBUG 1
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.15");
+vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.16");
 vtkStandardNewMacro(vtkHDF5RawImageReader);
 
 //----------------------------------------------------------------------------
@@ -111,13 +113,6 @@ void vtkHDF5RawImageReaderVTKtoHDF5(int rank, const int* dims, hssize_t* h5dims)
 //----------------------------------------------------------------------------
 vtkHDF5RawImageReader::vtkHDF5RawImageReader()
 {
-  // Copied from vtkImageDataReader constructor:
-  this->SetOutput(vtkImageData::New());
-  // Releasing data for pipeline parallism.
-  // Filters will know it is empty.
-  this->Outputs[0]->ReleaseData();
-  this->Outputs[0]->Delete();
-
   this->FileName = 0;
   
   this->SetToEmptyExtent(this->WholeExtent);
@@ -189,36 +184,19 @@ void vtkHDF5RawImageReader::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkHDF5RawImageReader::SetOutput(vtkImageData *output)
+int vtkHDF5RawImageReader::RequestInformation(
+  vtkInformation*,
+  vtkInformationVector**,
+  vtkInformationVector* outputVector)
 {
-  this->Superclass::SetNthOutput(0, output);
-}
+  // get the info objects
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-//----------------------------------------------------------------------------
-vtkImageData* vtkHDF5RawImageReader::GetOutput()
-{
-  if(this->NumberOfOutputs < 1)
-    {
-    return 0;
-    }
-  return static_cast<vtkImageData*>(this->Outputs[0]);
-}
-
-//----------------------------------------------------------------------------
-vtkImageData* vtkHDF5RawImageReader::GetOutput(int idx)
-{
-  return static_cast<vtkImageData*>(this->Superclass::GetOutput(idx));
-}
-
-//----------------------------------------------------------------------------
-void vtkHDF5RawImageReader::ExecuteInformation()
-{
   this->InformationError = 1;
-  this->GetOutput()->Initialize();
   if(!this->FileName)
     {
     vtkErrorMacro("No FileName set!");
-    return;
+    return 0;
     }
 
   // Make sure the file exists.
@@ -226,7 +204,7 @@ void vtkHDF5RawImageReader::ExecuteInformation()
   if(stat(this->FileName, &fs) != 0)
     {
     vtkErrorMacro("File \"" << this->FileName << "\" does not exist.");
-    return;
+    return 0;
     }
 
   // Open the file and traverse it to get the list of supported data
@@ -237,7 +215,7 @@ void vtkHDF5RawImageReader::ExecuteInformation()
   if(file < 0)
     {
     vtkErrorMacro("Could not open file \"" << this->FileName << "\".");
-    return;
+    return 0;
     }
   vtkHDF5RawImageReaderTraverseGroup(this, file, "/");
   H5Fclose(file);
@@ -246,38 +224,51 @@ void vtkHDF5RawImageReader::ExecuteInformation()
   if(this->AvailableDataSets->empty())
     {
     this->SetToEmptyExtent(this->WholeExtent);
-    this->GetOutput()->SetExtent(this->WholeExtent);
     vtkErrorMacro("File \"" << this->FileName
                   << "\" contains no supported data sets.");
-    return;
+    return 0;
     }
   
   this->SetDataArraySelections(this->PointDataArraySelection);
   
   double spacing[3] = {this->Stride[0], this->Stride[1], this->Stride[2]};
-  this->GetOutput()->SetWholeExtent(this->WholeExtent);
-  this->GetOutput()->SetSpacing(spacing);
+
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(),
+               this->WholeExtent, 
+               6);
+  outInfo->Set(vtkDataObject::SPACING(), spacing,3);
+
   this->InformationError = 0;
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
-void vtkHDF5RawImageReader::Execute()
+int vtkHDF5RawImageReader::RequestData(
+  vtkInformation*,
+  vtkInformationVector**,
+  vtkInformationVector* outputVector)
 {
   // Make sure there were no errors from ExecuteInformation().
-  this->GetOutput()->Initialize();
+  // get the output
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkImageData *output = vtkImageData::SafeDownCast(
+    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
   if(this->InformationError)
     {
-    this->GetOutput()->SetExtent(1, 0, 1, 0, 1, 0);
-    return;
+    output->SetExtent(1, 0, 1, 0, 1, 0);
+    return 1;
     }  
-  this->GetOutput()->GetUpdateExtent(this->UpdateExtent);
+  outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), 
+               this->UpdateExtent);
   
   // Re-open the file.
   hid_t file = H5Fopen (this->FileName, H5F_ACC_RDONLY, H5P_DEFAULT);
   if(file < 0)
     {
     vtkErrorMacro("Could not open file \"" << this->FileName << "\".");
-    return;
+    return 0;
     }
   
   int result = 1;
@@ -292,7 +283,7 @@ void vtkHDF5RawImageReader::Execute()
     };
   
   if(!(this->UpdateExtentIsWholeExtent() && (this->Stride[0] == 1) &&
-      (this->Stride[1] == 1) && (this->Stride[2] == 1)))
+       (this->Stride[1] == 1) && (this->Stride[2] == 1)))
     {
     hssize_t h_start[3]  = {0,0,0};
     hsize_t  h_count[3]  = {0,0,0};
@@ -313,12 +304,12 @@ void vtkHDF5RawImageReader::Execute()
     vtkHDF5RawImageReaderVTKtoHDF5(this->Rank, this->Total, h_total);
     
     hid_t dataspace = H5Screate_simple(this->Rank, h_total, 0);
-
+    
     if(H5Sselect_hyperslab(dataspace, H5S_SELECT_SET,
 #if (H5_VERS_MAJOR>1)||((H5_VERS_MAJOR==1)&&((H5_VERS_MINOR>6)||((H5_VERS_MINOR==6)&&(H5_VERS_RELEASE>=4))))
-                              (hsize_t *)h_start, h_stride, h_count, 0) < 0)
+                           (hsize_t *)h_start, h_stride, h_count, 0) < 0)
 #else
-                              h_start, h_stride, h_count, 0) < 0)
+                            h_start, h_stride, h_count, 0) < 0)
 #endif
       {
       vtkErrorMacro("Cannot select file hyperslab.");
@@ -413,8 +404,8 @@ void vtkHDF5RawImageReader::Execute()
       if(H5Dread(dataset, datatype, read_memspace, read_dataspace,
                     H5P_DEFAULT, data->GetVoidPointer(0)) >= 0)
         {
-        this->GetOutput()->GetPointData()->AddArray(data);
-        this->GetOutput()->GetPointData()->SetActiveScalars(name);
+        output->GetPointData()->AddArray(data);
+        output->GetPointData()->SetActiveScalars(name);
         }
       else
         {
@@ -446,13 +437,15 @@ void vtkHDF5RawImageReader::Execute()
   if(result)
     {
     // We filled the exact update extent in the output.
-    this->GetOutput()->SetExtent(this->UpdateExtent);  
+    output->SetExtent(this->UpdateExtent);  
     }
   else
     {
     vtkErrorMacro("Problems when reading file.");
-    this->GetOutput()->SetExtent(1, 0, 1, 0, 1, 0);
+    output->SetExtent(1, 0, 1, 0, 1, 0);
     }
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------

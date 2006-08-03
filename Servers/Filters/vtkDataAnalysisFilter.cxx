@@ -27,7 +27,7 @@
 #include "vtkUnstructuredGrid.h"
 
 vtkStandardNewMacro(vtkDataAnalysisFilter);
-vtkCxxRevisionMacro(vtkDataAnalysisFilter, "1.1");
+vtkCxxRevisionMacro(vtkDataAnalysisFilter, "1.2");
 vtkCxxSetObjectMacro(vtkDataAnalysisFilter, Controller, vtkMultiProcessController);
 //-----------------------------------------------------------------------------
 vtkDataAnalysisFilter::vtkDataAnalysisFilter()
@@ -75,6 +75,13 @@ vtkDataAnalysisFilter::~vtkDataAnalysisFilter()
   this->SetGlobalCellIdArrayName(0);  
   this->SetGlobalPointIdArrayName(0);  
 }
+
+//----------------------------------------------------------------------------
+void vtkDataAnalysisFilter::SetSourceConnection(vtkAlgorithmOutput* port)
+{
+  this->SetInputConnection(1, port);
+}
+
 //----------------------------------------------------------------------------
 void vtkDataAnalysisFilter::SetSource(vtkDataObject *input)
 {

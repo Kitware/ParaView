@@ -49,7 +49,7 @@
 #include "vtkPickFilter.h"
 
 
-vtkCxxRevisionMacro(vtkAttributeEditor, "1.8");
+vtkCxxRevisionMacro(vtkAttributeEditor, "1.9");
 vtkStandardNewMacro(vtkAttributeEditor);
 vtkCxxSetObjectMacro(vtkAttributeEditor,ClipFunction,vtkImplicitFunction);
 vtkCxxSetObjectMacro(vtkAttributeEditor,Controller,vtkMultiProcessController);
@@ -1021,6 +1021,13 @@ int vtkAttributeEditor::FillInputPortInformation(int port, vtkInformation *info)
     }
   return 1;
 }
+
+//-----------------------------------------------------------------------------
+void vtkAttributeEditor::SetSourceConnection(vtkAlgorithmOutput *port)
+{
+  this->SetInputConnection(1, port);
+}
+
 //-----------------------------------------------------------------------------
 void vtkAttributeEditor::SetSource(vtkDataSet *source)
 {

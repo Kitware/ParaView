@@ -184,6 +184,8 @@ protected:
   // Internal method which creates the parts using the proxy specified.
   void CreatePartsInternal(vtkSMProxy* op);
 
+  int DoInsertExtractPieces;
+
 private:
   vtkSMSourceProxyInternals* PInternals;
 

@@ -37,6 +37,7 @@ public:
   // same group.  If no name is given, the empty string is assumed.
   void AddInput(vtkDataSet*, const char* group);
   void AddInput(vtkDataSet*);
+  void AddInputConnection(vtkAlgorithmOutput* ao, const char* group);
   
   // Description:
   // Start a new animation with the current set of inputs.
@@ -73,6 +74,8 @@ protected:
   void AddFileName(const char *fileName);
   void DeleteFileNames();
   void DeleteFiles();
+
+  void AddInputInternal(const char* group);
   
 private:
   vtkXMLPVAnimationWriter(const vtkXMLPVAnimationWriter&);  // Not implemented.

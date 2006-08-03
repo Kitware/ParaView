@@ -1,15 +1,15 @@
 /*=========================================================================
 
-  Program:   ParaView
-  Module:    vtkSMCompositeDisplayProxy.cxx
+Program:   ParaView
+Module:    vtkSMCompositeDisplayProxy.cxx
 
-  Copyright (c) Kitware, Inc.
-  All rights reserved.
-  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+Copyright (c) Kitware, Inc.
+All rights reserved.
+See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 #include "vtkSMCompositeDisplayProxy.h"
@@ -30,7 +30,7 @@
 //-----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.19");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.20");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -132,9 +132,9 @@ void vtkSMCompositeDisplayProxy::CreateVTKObjects(int numObjects)
     }
 
   this->DistributorSuppressorProxy->SetServers(
-                                          vtkProcessModule::CLIENT_AND_SERVERS);
+    vtkProcessModule::CLIENT_AND_SERVERS);
   this->LODDistributorSuppressorProxy->SetServers(
-                                          vtkProcessModule::CLIENT_AND_SERVERS);
+    vtkProcessModule::CLIENT_AND_SERVERS);
   
   if (this->HasVolumePipeline)
     {
@@ -168,7 +168,7 @@ void vtkSMCompositeDisplayProxy::CreateVTKObjects(int numObjects)
       }
 
     this->VolumeDistributorSuppressorProxy->SetServers(
-                                          vtkProcessModule::CLIENT_AND_SERVERS);
+      vtkProcessModule::CLIENT_AND_SERVERS);
     }
   else
     {
@@ -196,41 +196,41 @@ void vtkSMCompositeDisplayProxy::SetupDefaults()
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
     cmd << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "LogStartEvent" << "Execute Collect"
-      << vtkClientServerStream::End;
+        << pm->GetProcessModuleID() << "LogStartEvent" << "Execute Collect"
+        << vtkClientServerStream::End;
     stream
       << vtkClientServerStream::Invoke
       << this->CollectProxy->GetID(i) << "AddObserver" << "StartEvent" << cmd
       << vtkClientServerStream::End;
     cmd.Reset();
     cmd << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "LogEndEvent" << "Execute Collect"
-      << vtkClientServerStream::End;
+        << pm->GetProcessModuleID() << "LogEndEvent" << "Execute Collect"
+        << vtkClientServerStream::End;
     stream
       << vtkClientServerStream::Invoke
       << this->CollectProxy->GetID(i) << "AddObserver" << "EndEvent" << cmd
       << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID,
-      vtkProcessModule::CLIENT_AND_SERVERS, stream);
+                   vtkProcessModule::CLIENT_AND_SERVERS, stream);
 
     cmd.Reset();
     cmd << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "LogStartEvent" << "Execute LODCollect"
-      << vtkClientServerStream::End;
+        << pm->GetProcessModuleID() << "LogStartEvent" << "Execute LODCollect"
+        << vtkClientServerStream::End;
     stream
       << vtkClientServerStream::Invoke
       << this->LODCollectProxy->GetID(i) << "AddObserver" << "StartEvent" << cmd
       << vtkClientServerStream::End;
     cmd.Reset();
     cmd << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "LogEndEvent" << "Execute LODCollect"
-      << vtkClientServerStream::End;
+        << pm->GetProcessModuleID() << "LogEndEvent" << "Execute LODCollect"
+        << vtkClientServerStream::End;
     stream
       << vtkClientServerStream::Invoke
       << this->LODCollectProxy->GetID(i) << "AddObserver" << "EndEvent" << cmd
       << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID,
-      vtkProcessModule::CLIENT_AND_SERVERS, stream);
+                   vtkProcessModule::CLIENT_AND_SERVERS, stream);
 
     // Handle collection setup with client server.
     stream
@@ -252,7 +252,7 @@ void vtkSMCompositeDisplayProxy::SetupDefaults()
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID,
-      vtkProcessModule::CLIENT_AND_SERVERS, stream);
+                   vtkProcessModule::CLIENT_AND_SERVERS, stream);
 
     // Special condition to signal the client.
     // Because both processes of the Socket controller think they are 0!!!!
@@ -267,7 +267,7 @@ void vtkSMCompositeDisplayProxy::SetupDefaults()
         << this->LODCollectProxy->GetID(i) << "SetController" << 0
         << vtkClientServerStream::End;
       pm->SendStream(this->ConnectionID,
-        vtkProcessModule::CLIENT, stream);
+                     vtkProcessModule::CLIENT, stream);
       }
     }
 
@@ -297,7 +297,7 @@ void vtkSMCompositeDisplayProxy::SetupDefaults()
            << "EndEvent" << cmd
            << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID,
-      vtkProcessModule::RENDER_SERVER, stream);
+                   vtkProcessModule::RENDER_SERVER, stream);
 
     cmd.Reset();
     cmd << vtkClientServerStream::Invoke
@@ -318,7 +318,7 @@ void vtkSMCompositeDisplayProxy::SetupDefaults()
            << "EndEvent" << cmd
            << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, 
-      vtkProcessModule::RENDER_SERVER, stream);
+                   vtkProcessModule::RENDER_SERVER, stream);
 
     stream << vtkClientServerStream::Invoke
            << pm->GetProcessModuleID() << "GetController"
@@ -335,7 +335,7 @@ void vtkSMCompositeDisplayProxy::SetupDefaults()
            << vtkClientServerStream::LastResult
            << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID, vtkProcessModule::RENDER_SERVER, 
-      stream);
+                   stream);
     }
 }
 
@@ -396,13 +396,13 @@ void vtkSMCompositeDisplayProxy::SetupPipeline()
 
   // On the render server, insert a distributor.
   ip = vtkSMInputProperty::SafeDownCast(
-                                  this->DistributorProxy->GetProperty("Input"));
+    this->DistributorProxy->GetProperty("Input"));
   ip->RemoveAllProxies();
   ip->AddProxy(this->UpdateSuppressorProxy);
   this->DistributorProxy->UpdateVTKObjects();
 
   ip = vtkSMInputProperty::SafeDownCast(
-                               this->LODDistributorProxy->GetProperty("Input"));
+    this->LODDistributorProxy->GetProperty("Input"));
   ip->RemoveAllProxies();
   ip->AddProxy(this->LODUpdateSuppressorProxy);
   this->LODDistributorProxy->UpdateVTKObjects();
@@ -431,7 +431,7 @@ void vtkSMCompositeDisplayProxy::SetupPipeline()
   if (stream.GetNumberOfMessages() > 0)
     {
     vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID,
-      vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER, stream);
+                                                     vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER, stream);
     }
 
   for (i = 0; i < this->DistributorProxy->GetNumberOfIDs(); i++)
@@ -455,37 +455,37 @@ void vtkSMCompositeDisplayProxy::SetupPipeline()
   if (stream.GetNumberOfMessages() > 0)
     {
     vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID,
-      vtkProcessModule::RENDER_SERVER, stream);
+                                                     vtkProcessModule::RENDER_SERVER, stream);
     }
 
   ip = vtkSMInputProperty::SafeDownCast(
-                                       this->MapperProxy->GetProperty("Input"));
+    this->MapperProxy->GetProperty("Input"));
   ip->RemoveAllProxies();
   ip->AddProxy(this->DistributorSuppressorProxy);
   this->MapperProxy->UpdateVTKObjects();
 
   ip = vtkSMInputProperty::SafeDownCast(
-                                    this->LODMapperProxy->GetProperty("Input"));
+    this->LODMapperProxy->GetProperty("Input"));
   ip->RemoveAllProxies();
   ip->AddProxy(this->LODDistributorSuppressorProxy);
   this->LODMapperProxy->UpdateVTKObjects();
 
   svp = vtkSMStringVectorProperty::SafeDownCast(
-                             this->DistributorProxy->GetProperty("OutputType"));
+    this->DistributorProxy->GetProperty("OutputType"));
   svp->SetElement(0, "vtkPolyData");
 
   svp = vtkSMStringVectorProperty::SafeDownCast(
-                          this->LODDistributorProxy->GetProperty("OutputType"));
+    this->LODDistributorProxy->GetProperty("OutputType"));
   svp->SetElement(0, "vtkPolyData");
 
   this->DistributorProxy->UpdateVTKObjects();
   this->LODDistributorProxy->UpdateVTKObjects();
 
   svp = vtkSMStringVectorProperty::SafeDownCast(
-                   this->DistributorSuppressorProxy->GetProperty("OutputType"));
+    this->DistributorSuppressorProxy->GetProperty("OutputType"));
   svp->SetElement(0, "vtkPolyData");
   svp = vtkSMStringVectorProperty::SafeDownCast(
-                this->LODDistributorSuppressorProxy->GetProperty("OutputType"));
+    this->LODDistributorSuppressorProxy->GetProperty("OutputType"));
   svp->SetElement(0, "vtkPolyData");
   this->DistributorSuppressorProxy->UpdateVTKObjects();
   this->LODDistributorSuppressorProxy->UpdateVTKObjects();
@@ -506,7 +506,7 @@ void vtkSMCompositeDisplayProxy::SetupVolumePipeline()
   vtkClientServerStream stream;
 
   ip = vtkSMInputProperty::SafeDownCast(
-                                this->VolumeCollectProxy->GetProperty("Input"));
+    this->VolumeCollectProxy->GetProperty("Input"));
   ip->RemoveAllProxies();
   ip->AddProxy(this->VolumeFilterProxy);
 
@@ -528,12 +528,12 @@ void vtkSMCompositeDisplayProxy::SetupVolumePipeline()
   if (stream.GetNumberOfMessages() > 0)
     {
     vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID,
-      vtkProcessModule::CLIENT_AND_SERVERS, stream);
+                                                     vtkProcessModule::CLIENT_AND_SERVERS, stream);
     }
 
   // On the render server, insert a distributor.
   ip = vtkSMInputProperty::SafeDownCast(
-                            this->VolumeDistributorProxy->GetProperty("Input"));
+    this->VolumeDistributorProxy->GetProperty("Input"));
   ip->RemoveAllProxies();
   ip->AddProxy(this->VolumeUpdateSuppressorProxy);
   this->VolumeDistributorProxy->UpdateVTKObjects();
@@ -554,7 +554,7 @@ void vtkSMCompositeDisplayProxy::SetupVolumePipeline()
   if (stream.GetNumberOfMessages() > 0)
     {
     vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID,
-      vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER, stream);
+                                                     vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER, stream);
     }
 
   for (i = 0; i < this->DistributorProxy->GetNumberOfIDs(); i++)
@@ -570,35 +570,35 @@ void vtkSMCompositeDisplayProxy::SetupVolumePipeline()
   if (stream.GetNumberOfMessages() > 0)
     {
     vtkProcessModule::GetProcessModule()->SendStream(this->ConnectionID,
-      vtkProcessModule::RENDER_SERVER, stream);
+                                                     vtkProcessModule::RENDER_SERVER, stream);
     }
 
   ip = vtkSMInputProperty::SafeDownCast(
-                               this->VolumePTMapperProxy->GetProperty("Input"));
+    this->VolumePTMapperProxy->GetProperty("Input"));
   ip->RemoveAllProxies();
   ip->AddProxy(this->VolumeDistributorSuppressorProxy);
   this->VolumePTMapperProxy->UpdateVTKObjects();
 
   ip = vtkSMInputProperty::SafeDownCast(
-                            this->VolumeBunykMapperProxy->GetProperty("Input"));
+    this->VolumeBunykMapperProxy->GetProperty("Input"));
   ip->RemoveAllProxies();
   ip->AddProxy(this->VolumeDistributorSuppressorProxy);
   this->VolumeBunykMapperProxy->UpdateVTKObjects();
 
   ip = vtkSMInputProperty::SafeDownCast(
-                           this->VolumeZSweepMapperProxy->GetProperty("Input"));
+    this->VolumeZSweepMapperProxy->GetProperty("Input"));
   ip->RemoveAllProxies();
   ip->AddProxy(this->VolumeDistributorSuppressorProxy);
   this->VolumeZSweepMapperProxy->UpdateVTKObjects();
 
   svp = vtkSMStringVectorProperty::SafeDownCast(
-                       this->VolumeDistributorProxy->GetProperty("OutputType"));
+    this->VolumeDistributorProxy->GetProperty("OutputType"));
   svp->SetElement(0, "vtkUnstructuredGrid");
 
   this->VolumeDistributorProxy->UpdateVTKObjects();
 
   svp = vtkSMStringVectorProperty::SafeDownCast(
-             this->VolumeDistributorSuppressorProxy->GetProperty("OutputType"));
+    this->VolumeDistributorSuppressorProxy->GetProperty("OutputType"));
   svp->SetElement(0, "vtkUnstructuredGrid");
   this->VolumeDistributorSuppressorProxy->UpdateVTKObjects();
 }
@@ -639,7 +639,7 @@ void vtkSMCompositeDisplayProxy::SetupVolumeDefaults()
       << this->VolumeCollectProxy->GetID(i) << "AddObserver" << "EndEvent"
       << cmd << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID,
-      vtkProcessModule::CLIENT_AND_SERVERS, stream);
+                   vtkProcessModule::CLIENT_AND_SERVERS, stream);
 
     stream
       << vtkClientServerStream::Invoke
@@ -651,8 +651,8 @@ void vtkSMCompositeDisplayProxy::SetupVolumeDefaults()
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID,
-      vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER_ROOT|
-      vtkProcessModule::RENDER_SERVER_ROOT, stream);
+                   vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER_ROOT|
+                   vtkProcessModule::RENDER_SERVER_ROOT, stream);
 
 
     // Special condition to signal the client.
@@ -664,7 +664,7 @@ void vtkSMCompositeDisplayProxy::SetupVolumeDefaults()
         << this->VolumeCollectProxy->GetID(i) << "SetController" << 0
         << vtkClientServerStream::End;
       pm->SendStream(this->ConnectionID,
-        vtkProcessModule::CLIENT, stream);
+                     vtkProcessModule::CLIENT, stream);
       }
     }
 
@@ -692,7 +692,7 @@ void vtkSMCompositeDisplayProxy::SetupVolumeDefaults()
            << "EndEvent" << cmd
            << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID,
-      vtkProcessModule::RENDER_SERVER, stream);
+                   vtkProcessModule::RENDER_SERVER, stream);
 
     stream << vtkClientServerStream::Invoke
            << pm->GetProcessModuleID() << "GetController"
@@ -702,7 +702,7 @@ void vtkSMCompositeDisplayProxy::SetupVolumeDefaults()
            << vtkClientServerStream::LastResult
            << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID,
-      vtkProcessModule::RENDER_SERVER, stream);
+                   vtkProcessModule::RENDER_SERVER, stream);
     }
 }
 
@@ -724,7 +724,7 @@ void vtkSMCompositeDisplayProxy::SetupCollectionFilter(vtkSMProxy* collectProxy)
       << collectProxy->GetID(i) << "SetMoveModeToPassThrough"
       << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID,
-      vtkProcessModule::CLIENT_AND_SERVERS, stream);
+                   vtkProcessModule::CLIENT_AND_SERVERS, stream);
     stream
       << vtkClientServerStream::Invoke
       << collectProxy->GetID(i) << "SetMPIMToNSocketConnection" 
@@ -733,14 +733,14 @@ void vtkSMCompositeDisplayProxy::SetupCollectionFilter(vtkSMProxy* collectProxy)
     // create, SetPassThrough, and set the mToN connection
     // object on all servers and client
     pm->SendStream(this->ConnectionID,
-      vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER, stream);
+                   vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER, stream);
     // always set client mode
     stream
       << vtkClientServerStream::Invoke
       << collectProxy->GetID(i) << "SetServerToClient"
       << vtkClientServerStream::End;
     pm->SendStream(this->ConnectionID,
-      vtkProcessModule::CLIENT, stream);
+                   vtkProcessModule::CLIENT, stream);
     // if running in client mode
     // then set the server to be servermode
     if(pm->GetClientMode())
@@ -750,7 +750,7 @@ void vtkSMCompositeDisplayProxy::SetupCollectionFilter(vtkSMProxy* collectProxy)
         << collectProxy->GetID(i) << "SetServerToDataServer"
         << vtkClientServerStream::End;
       pm->SendStream(this->ConnectionID,
-        vtkProcessModule::DATA_SERVER, stream);
+                     vtkProcessModule::DATA_SERVER, stream);
       }
     // if running in render server mode
     if(pm->GetOptions()->GetRenderServerMode())
@@ -760,7 +760,7 @@ void vtkSMCompositeDisplayProxy::SetupCollectionFilter(vtkSMProxy* collectProxy)
         << collectProxy->GetID(i) << "SetServerToRenderServer"
         << vtkClientServerStream::End;
       pm->SendStream(this->ConnectionID,
-        vtkProcessModule::RENDER_SERVER, stream);
+                     vtkProcessModule::RENDER_SERVER, stream);
       }
     }
 }
@@ -814,7 +814,7 @@ int vtkSMCompositeDisplayProxy::IsDistributedGeometryValid()
   if (this->VolumeRenderMode)
     {
     return (   this->DistributedVolumeGeometryIsValid
-            && this->VolumeGeometryIsValid );
+               && this->VolumeGeometryIsValid );
     }
   else
     {
@@ -939,17 +939,17 @@ void vtkSMCompositeDisplayProxy::SetOrderedCompositing(int val)
   this->OrderedCompositing = val;
 
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
-                            this->DistributorProxy->GetProperty("PassThrough"));
+    this->DistributorProxy->GetProperty("PassThrough"));
   ivp->SetElements1(!this->OrderedCompositing || this->CollectionDecision);
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-                         this->LODDistributorProxy->GetProperty("PassThrough"));
+    this->LODDistributorProxy->GetProperty("PassThrough"));
   ivp->SetElements1(!this->OrderedCompositing || this->LODCollectionDecision);
 
   if (this->VolumeDistributorProxy)
     {
     ivp = vtkSMIntVectorProperty::SafeDownCast(
-                      this->VolumeDistributorProxy->GetProperty("PassThrough"));
+      this->VolumeDistributorProxy->GetProperty("PassThrough"));
     ivp->SetElements1(!this->OrderedCompositing);
     }
 
@@ -987,7 +987,7 @@ void vtkSMCompositeDisplayProxy::SetOrderedCompositingTree(vtkSMProxy *tree)
     }
 
   vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
-                                this->DistributorProxy->GetProperty("PKdTree"));
+    this->DistributorProxy->GetProperty("PKdTree"));
   pp->RemoveAllProxies();
   pp->AddProxy(this->OrderedCompositingTree);
 
@@ -1006,26 +1006,26 @@ void vtkSMCompositeDisplayProxy::RemoveGeometryFromCompositingTree()
   unsigned int i;
 
   vtkSMInputProperty *ip = vtkSMInputProperty::SafeDownCast(
-                                  this->DistributorProxy->GetProperty("Input"));
+    this->DistributorProxy->GetProperty("Input"));
   if (ip->GetNumberOfProxies() < 1) return;
 
   vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
-                         this->OrderedCompositingTree->GetProperty("DataSets"));
+    this->OrderedCompositingTree->GetProperty("DataSets"));
 
   vtkSMSourceProxy *input = vtkSMSourceProxy::SafeDownCast(ip->GetProxy(0));
   for (i = 0; i < input->GetNumberOfParts(); i++)
     {
-    pp->RemoveProxy(input->GetPart(i));
+    pp->RemoveProxy(input->GetPart(i)->GetDataObjectProxy(0));
     }
 
   if (this->VolumeDistributorProxy)
     {
     ip = vtkSMInputProperty::SafeDownCast(
-                            this->VolumeDistributorProxy->GetProperty("Input"));
+      this->VolumeDistributorProxy->GetProperty("Input"));
     input = vtkSMSourceProxy::SafeDownCast(ip->GetProxy(0));
     for (i = 0; i < input->GetNumberOfParts(); i++)
       {
-      pp->RemoveProxy(input->GetPart(i));
+      pp->RemoveProxy(input->GetPart(i)->GetDataObjectProxy(0));
       }
     }
 
@@ -1044,22 +1044,22 @@ void vtkSMCompositeDisplayProxy::AddGeometryToCompositingTree()
     if (!this->VolumeRenderMode)
       {
       ip = vtkSMInputProperty::SafeDownCast(
-                                  this->DistributorProxy->GetProperty("Input"));
+        this->DistributorProxy->GetProperty("Input"));
       }
     else
       {
       ip = vtkSMInputProperty::SafeDownCast(
-                            this->VolumeDistributorProxy->GetProperty("Input"));
+        this->VolumeDistributorProxy->GetProperty("Input"));
       }
     if (ip->GetNumberOfProxies() < 1) return;
     vtkSMSourceProxy *input = vtkSMSourceProxy::SafeDownCast(ip->GetProxy(0));
 
     vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
-                         this->OrderedCompositingTree->GetProperty("DataSets"));
+      this->OrderedCompositingTree->GetProperty("DataSets"));
 
     for (unsigned int i = 0; i < input->GetNumberOfParts(); i++)
       {
-      pp->AddProxy(input->GetPart(i));
+      pp->AddProxy(input->GetPart(i)->GetDataObjectProxy(0));
       }
 
     this->OrderedCompositingTree->UpdateVTKObjects();

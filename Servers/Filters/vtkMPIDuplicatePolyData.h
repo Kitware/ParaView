@@ -25,18 +25,19 @@
 #ifndef __vtkMPIDuplicatePolyData_h
 #define __vtkMPIDuplicatePolyData_h
 
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkPolyDataAlgorithm.h"
+
 class vtkSocketController;
 class vtkMultiProcessController;
 class vtkPolyDataWriter;
 class vtkPolyDataReader;
 
 
-class VTK_EXPORT vtkMPIDuplicatePolyData : public vtkPolyDataToPolyDataFilter
+class VTK_EXPORT vtkMPIDuplicatePolyData : public vtkPolyDataAlgorithm
 {
 public:
   static vtkMPIDuplicatePolyData *New();
-  vtkTypeRevisionMacro(vtkMPIDuplicatePolyData, vtkPolyDataToPolyDataFilter);
+  vtkTypeRevisionMacro(vtkMPIDuplicatePolyData, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
@@ -80,15 +81,28 @@ protected:
   vtkMPIDuplicatePolyData();
   ~vtkMPIDuplicatePolyData();
 
+  virtual int RequestInformation(vtkInformation* request,
+                                 vtkInformationVector** inputVector,
+                                 vtkInformationVector* outputVector);
+
+  // Description:
+  // This is called by the superclass.
+  // This is the method you should override.
+  virtual int RequestData(vtkInformation* request,
+                          vtkInformationVector** inputVector,
+                          vtkInformationVector* outputVector);
+
+  int FillInputPortInformation(int, vtkInformation* info);
+
   // Data generation method
-  void ComputeInputUpdateExtents(vtkDataObject *output);
-  void Execute();
   void ServerExecute(vtkPolyDataReader* reader, 
-                     vtkPolyDataWriter* writer);
-  void ClientExecute(vtkPolyDataReader* reader);
+                     vtkPolyDataWriter* writer,
+                     vtkPolyData* input,
+                     vtkPolyData* output);
+  void ClientExecute(vtkPolyDataReader* reader, vtkPolyData* outpit);
   void ReconstructOutput(vtkPolyDataReader* reader, int numProcs,
-                         char* recv, int* recvLengths, int* recvOffsets);
-  void ExecuteInformation();
+                         char* recv, int* recvLengths, int* recvOffsets,
+                         vtkPolyData* output);
 
   vtkMultiProcessController *Controller;
 

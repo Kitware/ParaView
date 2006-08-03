@@ -18,7 +18,7 @@
 #ifndef __vtkHDF5RawImageReader_h
 #define __vtkHDF5RawImageReader_h
 
-#include "vtkSource.h"
+#include "vtkImageAlgorithm.h"
 
 //BTX
 class vtkCallbackCommand;
@@ -33,19 +33,13 @@ void vtkHDF5RawImageReaderAddDataSet(vtkHDF5RawImageReader* reader,
                                      vtkHDF5RawImageReaderDataSet* ds);
 //ETX
 
-class VTK_EXPORT vtkHDF5RawImageReader : public vtkSource
+class VTK_EXPORT vtkHDF5RawImageReader : public vtkImageAlgorithm
 {
 public:
   static vtkHDF5RawImageReader *New();
-  vtkTypeRevisionMacro(vtkHDF5RawImageReader,vtkSource);
+  vtkTypeRevisionMacro(vtkHDF5RawImageReader,vtkImageAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Get/Set the reader's output.
-  void SetOutput(vtkImageData *output);
-  vtkImageData *GetOutput();
-  vtkImageData *GetOutput(int idx);
-  
   // Description:
   // Set or get the file name of the HDF5 file. 
   vtkSetStringMacro(FileName);
@@ -90,9 +84,12 @@ protected:
   vtkHDF5RawImageReader();
   ~vtkHDF5RawImageReader();
    
-  virtual void ExecuteInformation();
-  virtual void Execute();
-
+  virtual int RequestInformation(vtkInformation*,
+                                 vtkInformationVector**,
+                                 vtkInformationVector*);
+  virtual int RequestData(vtkInformation*,
+                          vtkInformationVector**,
+                          vtkInformationVector*);
   // Description:
   // Strings that describe the data.
   char* FileName;
