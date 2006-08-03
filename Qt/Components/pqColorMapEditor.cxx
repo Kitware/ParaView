@@ -135,11 +135,12 @@ void pqColorMapEditor::setDisplay(pqPipelineDisplay *display)
 
   // TODO: Support the color transfer function as well.
   // Get the lookup table from the display.
-  vtkSMProxyProperty *prop = vtkSMProxyProperty::SafeDownCast(
+  vtkSMProxyProperty *proxyProperty = vtkSMProxyProperty::SafeDownCast(
       this->Form->Display->getProxy()->GetProperty("LookupTable"));
-  if(prop)
+  if(proxyProperty)
     {
-    this->LookupTable = vtkSMLookupTableProxy::SafeDownCast(prop->GetProxy(0));
+    this->LookupTable = vtkSMLookupTableProxy::SafeDownCast(
+        proxyProperty->GetProxy(0));
     }
 
   if(this->LookupTable)
@@ -188,7 +189,7 @@ void pqColorMapEditor::closeEvent(QCloseEvent *e)
   QDialog::closeEvent(e);
 }
 
-void pqColorMapEditor::handleTextEdit(const QString &text)
+void pqColorMapEditor::handleTextEdit(const QString &)
 {
   // TODO: Validate the text.
 
