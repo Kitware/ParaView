@@ -1885,5 +1885,34 @@
    <!-- End PNGReader -->
    </SourceProxy>
 
+   <SourceProxy name="SESAMEReader"
+                class="vtkSESAMEReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <FileListDomain name="files"/>
+     </StringVectorProperty>
+     <IntVectorProperty
+         name="TableId"
+         command="SetTable"
+         number_of_elements="1"
+         default_values="0">
+         <IntRangeDomain name="range" min="0"/>
+     </IntVectorProperty>
+     <IntVectorProperty
+         name="TableIds"
+         command="GetTableIdsAsArray"
+         information_only="1">
+         <IntArrayInformationHelper />
+     </IntVectorProperty>
+     <StringVectorProperty
+         name="TableArrayInfo"
+         information_only="1">
+         <ArraySelectionInformationHelper attribute_name="Table"/>
+     </StringVectorProperty>
+     <!-- End SESAMEReader -->
+   </SourceProxy>
+   
   </ProxyGroup>
 </ServerManagerConfiguration>
