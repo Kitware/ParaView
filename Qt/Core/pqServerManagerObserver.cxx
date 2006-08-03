@@ -521,7 +521,7 @@ void pqServerManagerObserver::proxyUnRegistered(vtkObject*, unsigned long, void*
     }
   else if(strcmp(info->GroupName, "sources") == 0 )
     {
-    emit this->sourceUnRegistered(info->Proxy);
+    emit this->sourceUnRegistered(info->ProxyName, info->Proxy);
     }
   else if (strcmp(info->GroupName, "displays") == 0)
     {

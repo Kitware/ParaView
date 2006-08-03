@@ -35,7 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // ParaView Server Manager includes.
 #include "vtkProcessModule.h"
 #include "vtkSMDataObjectDisplayProxy.h"
+#include "vtkSMProxyManager.h"
 #include "vtkSMRenderModuleProxy.h"
+#include "vtkStringList.h"
 
 #include <vtksys/ios/sstream>
 
@@ -66,8 +68,31 @@ pqServerManagerModel* pqServerManagerModel::instance()
 class pqServerManagerModelInternal 
 {
 public:
-  typedef QMap<QString, pqPipelineSource*>  MapOfStringToSource;
-  MapOfStringToSource Sources;
+  struct Key {
+    vtkClientServerID ID;
+    vtkIdType ConnectionID;
+    Key()
+      {
+      this->ID.ID = 0;
+      this->ConnectionID = 0;
+      }
+    Key(const vtkIdType &cid, const vtkClientServerID &vtkid)
+      {
+      this->ID = vtkid;
+      this->ConnectionID = cid;
+      }
+    bool operator <(const Key &other) const
+      {
+      if (this->ConnectionID == other.ConnectionID)
+        {
+        return (this->ID < other.ID);
+        }
+      return (this->ConnectionID < other.ConnectionID);
+      }
+  };
+
+  typedef QMap<Key, pqPipelineSource*> MapOfSources;
+  MapOfSources Sources;
 
   typedef QList<QPointer<pqServer> > ListOfServers;
   ListOfServers  Servers;
@@ -125,11 +150,13 @@ QList<pqServer*> pqServerManagerModel::getServers()
 QList<pqPipelineSource*> pqServerManagerModel::getSources(pqServer* server)
 {
   QList<pqPipelineSource*> list;
-  if (server)
+
+  if(server)
     {
+    vtkIdType cid = server->GetConnectionID();
     foreach (pqPipelineSource* source, this->Internal->Sources)
       {
-      if (source->getProxy()->GetConnectionID() == server->GetConnectionID())
+      if (source->getProxy()->GetConnectionID() == cid) 
         {
         list.push_back(source);
         }
@@ -144,6 +171,13 @@ void pqServerManagerModel::onAddSource(QString name, vtkSMProxy* source)
   if (!source)
     {
     qDebug() << "onAddSource cannot be called with null source.";
+    return;
+    }
+
+  if (this->getPQSource(source))
+    {
+    // proxy is being registered under "sources" group more than once,
+    // the gui is only interested in the first name.
     return;
     }
 
@@ -169,13 +203,13 @@ void pqServerManagerModel::onAddSource(QString name, vtkSMProxy* source)
     {
     pqSource = new pqPipelineSource(name, source, server, this);
     }
-
-  // Set a nice label for the source, since registration names
-  // in ParaView are nothing but IDs which are merely numbers.
-  vtksys_ios::ostringstream name_stream;
-  name_stream << source->GetXMLName() << 
-    this->Internal->NameGenerator.GetCountAndIncrement(source->GetXMLName());
-  pqSource->setProxyName(name_stream.str().c_str());
+  
+  //// Set a nice label for the source, since registration names
+  //// in ParaView are nothing but IDs which are merely numbers.
+  //vtksys_ios::ostringstream name_stream;
+  //name_stream << source->GetXMLName() << 
+  //  this->Internal->NameGenerator.GetCountAndIncrement(source->GetXMLName());
+  ////pqSource->setProxyName(name_stream.str().c_str());
 
 
   QObject::connect(pqSource, 
@@ -196,9 +230,13 @@ void pqServerManagerModel::onAddSource(QString name, vtkSMProxy* source)
   QObject::connect(pqSource, 
     SIGNAL(displayRemoved(pqPipelineSource*, pqPipelineDisplay*)),
     this, SIGNAL(sourceDisplayChanged(pqPipelineSource*, pqPipelineDisplay*)));
+  this->connect(pqSource, SIGNAL(nameChanged(pqServerManagerModelItem*)), 
+    this, SIGNAL(nameChanged(pqServerManagerModelItem*)));
 
   emit this->preSourceAdded(pqSource);
-  this->Internal->Sources.insert(name, pqSource);
+  this->Internal->Sources.insert(
+    pqServerManagerModelInternal::Key(server->GetConnectionID(), 
+      source->GetSelfID()), pqSource);
   emit this->sourceAdded(pqSource);
 
   // It is essential to let the world know of the addition of pqSource
@@ -209,30 +247,49 @@ void pqServerManagerModel::onAddSource(QString name, vtkSMProxy* source)
 }
 
 //-----------------------------------------------------------------------------
-void pqServerManagerModel::onRemoveSource(QString name)
+void pqServerManagerModel::onRemoveSource(QString name, vtkSMProxy* proxy)
 {
-  pqPipelineSource* source = NULL;
-  if (this->Internal->Sources.contains(name))
+  pqPipelineSource* source= this->getPQSource(proxy);
+  if (!source)
     {
-    source = this->Internal->Sources.value(name);
-    emit this->preSourceRemoved(source);
-    source = this->Internal->Sources.take(name);
-
-    // disconnect everything.
-    QObject::disconnect(source, 0, this, 0);
-    emit this->sourceRemoved(source);
-    delete source;
+    return;
     }
-}
 
-//-----------------------------------------------------------------------------
-void pqServerManagerModel::onRemoveSource(vtkSMProxy* proxy)
-{
-  pqPipelineSource* pqSrc = getPQSource(proxy);
-  if (pqSrc)
+  if (source->getProxyName() != name)
     {
-    this->onRemoveSource(pqSrc->getSMName());
+    // The proxy is being unregistered from a name that is not visible to the GUI.
+    // The GUI can only view the first name with which the proxy is registered
+    // under the sources group. Hence, nothing to do here.
+    // Note: this is not an error, hence we don't raise any.
+    return;
     }
+
+  // Now check if this proxy is registered under some other name with the
+  // proxy manager under the sources group. If so, this is akin to a simply
+  // name change, the pqSource is simply taking on a new identity. 
+  vtkSmartPointer<vtkStringList> names = vtkSmartPointer<vtkStringList>::New();
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  pxm->GetProxyNames("sources", proxy, names);
+  for (int cc=0; cc < names->GetLength(); cc++)
+    {
+    if (name == names->GetString(cc))
+      {
+      continue;
+      }
+    // Change the name of the pqsource.
+    source->setProxyName(names->GetString(cc));
+    return;
+    }
+
+  // If not, then alone, is the pqSource really being removed.
+  emit this->preSourceRemoved(source);
+  this->Internal->Sources.remove(pqServerManagerModelInternal::Key(
+      proxy->GetConnectionID(), proxy->GetSelfID()));
+
+  // disconnect everything.
+  QObject::disconnect(source, 0, this, 0);
+  emit this->sourceRemoved(source);
+  delete source;
 }
 
 //-----------------------------------------------------------------------------
@@ -507,12 +564,15 @@ pqServer* pqServerManagerModel::getServerByIndex(unsigned int idx) const
 //-----------------------------------------------------------------------------
 pqPipelineSource* pqServerManagerModel::getPQSource(vtkSMProxy* proxy)
 {
-  foreach (pqPipelineSource* pqSrc, this->Internal->Sources)
+  pqServerManagerModelInternal::Key key(proxy->GetConnectionID(),
+    proxy->GetSelfID());
+
+  pqServerManagerModelInternal::MapOfSources::iterator it =
+    this->Internal->Sources.find(key);
+
+  if (it != this->Internal->Sources.end())
     {
-    if (pqSrc->getProxy() == proxy)
-      {
-      return pqSrc;
-      }
+    return it.value();
     }
   return NULL;
 }
@@ -583,3 +643,4 @@ pqRenderModule* pqServerManagerModel::getRenderModule(int idx)
     }
   return this->Internal->RenderModules.value(idx);
 }
+

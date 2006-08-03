@@ -40,6 +40,7 @@ class vtkSMProxy;
 class vtkSMRenderModuleProxy;
 class QVTKWidget;
 
+class pqProxy;
 class pqPipelineDisplay;
 class pqPipelineSource;
 class pqRenderModule;
@@ -132,8 +133,7 @@ public slots:
   /// Call when a vtkSMProxy is unregistered from the "sources" group.
   /// This will clean up the PQ representation for the proxy
   /// and sever any connections to the proxy.
-  void onRemoveSource(QString name);
-  void onRemoveSource(vtkSMProxy*);
+  void onRemoveSource(QString name, vtkSMProxy*);
 
   /// Call when a new connection is made. For now we pass
   /// a pqServer as an argument. Would like this to be a vtkIdType.

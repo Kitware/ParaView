@@ -1871,8 +1871,11 @@ void pqMainWindowCore::disableAutomaticDisplays()
 //-----------------------------------------------------------------------------
 void pqMainWindowCore::createPendingDisplays()
 {
-  pqApplicationCore::instance()->getPendingDisplayManager()->
-    createPendingDisplays(this->getActiveRenderModule());
+  if (this->getActiveRenderModule())
+    {
+    pqApplicationCore::instance()->getPendingDisplayManager()->
+      createPendingDisplays(this->getActiveRenderModule());
+    }
 }
 
 void pqMainWindowCore::serverRemoved(pqServer* server)

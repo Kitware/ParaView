@@ -670,8 +670,24 @@ Qt::ItemFlags pqPipelineModel::flags(const QModelIndex &idx) const
     {
     indexFlags |= Qt::ItemIsSelectable;
     }
+  pqServerManagerModelItem* item = this->getItemFor(idx);
+  if (item && qobject_cast<pqPipelineSource*>(item))
+    {
+    indexFlags |= Qt::ItemIsEditable;
+    }
 
   return indexFlags;
+}
+
+bool pqPipelineModel::setData(const QModelIndex &idx, const QVariant& value,
+  int role /*=Qt::EditRole*/)
+{
+  pqServerManagerModelItem* item = this->getItemFor(idx);
+  pqPipelineSource* src = qobject_cast<pqPipelineSource*>(item);
+  if (src)
+    {
+    src->rename(value.toString());
+    }
 }
 
 pqServerManagerModelItem *pqPipelineModel::getItemFor(

@@ -150,6 +150,15 @@ void pqProxy::clearInternalProxies()
 }
 
 //-----------------------------------------------------------------------------
+void pqProxy::rename(const QString& newname)
+{
+  vtkSMProxyManager* pxm = vtkSMProxyManager::GetProxyManager();
+  pxm->RegisterProxy(this->getSMGroup().toStdString().c_str(),
+    newname.toStdString().c_str(), this->getProxy());
+  pxm->UnRegisterProxy(this->getSMGroup().toStdString().c_str(),
+    this->getSMName().toStdString().c_str(), this->getProxy());
+}
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

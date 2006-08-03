@@ -105,6 +105,10 @@ void pqPendingDisplayManager::removePendingDisplayForSource(pqPipelineSource* s)
 
 void pqPendingDisplayManager::createPendingDisplays(pqRenderModule* rm)
 {
+  if (!rm)
+    {
+    return;
+    }
   pqPipelineBuilder* pb = pqApplicationCore::instance()->getPipelineBuilder();
 
   foreach (pqPipelineSource* source, this->Internal->SourcesSansDisplays)

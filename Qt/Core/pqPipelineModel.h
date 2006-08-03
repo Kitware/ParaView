@@ -146,6 +146,12 @@ public:
   /// \return
   ///   The flags for the given model index.
   virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+
+  /// \brief
+  ///  Sets the role data for the item at index to value. Returns 
+  ///  true if successful; otherwise returns false.
+  bool setData(const QModelIndex &index, const QVariant& value, 
+    int role = Qt::EditRole);
   //@}
 
   /// \name Object Mapping

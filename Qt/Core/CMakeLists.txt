@@ -44,6 +44,7 @@ QT4_WRAP_CPP(MOC_BUILT_SOURCES
   pqPipelineSource.h
   pqPropertyLinks.h
   pqPropertyManager.h
+  pqProxy.h
   pqRenderModule.h
   pqServer.h
   pqServerManagerModel.h

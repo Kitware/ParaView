@@ -49,6 +49,7 @@ class pqProxyInternal;
 // additional metadata such as user-specified label.
 class PQCORE_EXPORT pqProxy : public pqServerManagerModelItem
 {
+  Q_OBJECT
 public:
   pqProxy(const QString& group, const QString& name,
     vtkSMProxy* proxy, pqServer* server, QObject* parent=NULL);
@@ -58,12 +59,24 @@ public:
   pqServer *getServer() const
     { return this->Server; }
 
-  /// Get/Set the user-sepecified name for this proxy.
-  /// This name need not be unique, it's just the label
-  /// used to identify this proxy for the user. By default,
-  /// it is same as the registeration name.
+  /// This method renames this proxy. It registers the proxy
+  /// under the same old group but with new name, and unregisters
+  /// the old name. This must be distinguished from setProxyName()
+  /// which merely changes the client side name.
+  void rename(const QString& newname);
+
+  // Get/Set the name for the pqProxy. This is the same name
+  // with which the vtkSMProxy is registered with the proxy manager.
+  // This does not affect the name with which the proxy is registered.
+  // Emit nameChanged() signal when the name changes. 
   void setProxyName(const QString& name)
-    { this->ProxyName = name; }
+    {
+    if (this->ProxyName != name)
+      {
+      this->ProxyName = name; 
+      emit this->nameChanged(this);
+      }
+    }
   const QString& getProxyName()
     { return this->ProxyName; }
   
@@ -81,6 +94,10 @@ public:
     {return this->Proxy; }
   /// Returns a list of all the internal proxies added with a given key.
   QList<vtkSMProxy*> getInternalProxies(const QString& key) const;
+
+signals:
+  /// Fired when the name of the proxy is changed.
+  void nameChanged(pqServerManagerModelItem*);
 
 protected:
   /// Concept of internal proxies:

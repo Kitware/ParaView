@@ -237,46 +237,12 @@ vtkSMProxy* pqPipelineBuilder::createProxy(const char* xmlgroup,
     this->UndoStack->BeginUndoSet(QString(label.str().c_str()));
     }
 
-  /*
-  // If the proxy has any proxy_list domains, we need to
-  // create and register proxies which will be used for that property.
-  // We must create and register proxies for the proxy list domain
-  // before we register the actual proxy. This makes sure that the
-  // domain state gets recorded correctly for the proxy so when we recreate
-  // it, we get the proxy list domain propertly populated as well.
-  vtkSMPropertyIterator* iter = proxy->NewPropertyIterator();
-  iter->SetTraverseSubProxies(1);
-  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
-    {
-    vtkSMProxyListDomain* pld = vtkSMProxyListDomain::SafeDownCast(
-      iter->GetProperty()->GetDomain("proxy_list"));
-    if (!pld)
-      {
-      continue;
-      }
-    pld->CreateProxyList(server->GetConnectionID());
-    // Now register the proxies.
-    for (unsigned int cc=0; cc < pld->GetNumberOfProxies(); ++cc)
-      {
-      vtkSMProxy* newProxy = pld->GetProxy(cc);
-      pxm->RegisterProxy(
-        (QString(newProxy->GetXMLGroup()) + "_internal").toStdString().c_str(),
-        newProxy->GetSelfIDAsString(), newProxy);
-      if (cc == 0)
-        {
-        // We set the default value to the first proxy in the list.
-        // TODO: this can be removed, since the Object panel 
-        // can take care of it.
-        vtkSMProxyProperty::SafeDownCast(
-          iter->GetProperty())->AddProxy(newProxy);
-        }
-      }
-    }
-  iter->Delete();
-  */
+  vtksys_ios::ostringstream name_stream;
+  name_stream << proxy->GetXMLName() <<
+    this->NameGenerator->GetCountAndIncrement(
+      proxy->GetXMLName());
 
-  pxm->RegisterProxy(register_group, proxy->GetSelfIDAsString(),
-    proxy);
+  pxm->RegisterProxy(register_group, name_stream.str().c_str(), proxy);
   proxy->Delete();
 
   if (this->UndoStack && is_undoable)
