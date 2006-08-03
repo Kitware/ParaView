@@ -680,7 +680,7 @@ Qt::ItemFlags pqPipelineModel::flags(const QModelIndex &idx) const
 }
 
 bool pqPipelineModel::setData(const QModelIndex &idx, const QVariant& value,
-  int role /*=Qt::EditRole*/)
+  int /*role =Qt::EditRole*/)
 {
   pqServerManagerModelItem* item = this->getItemFor(idx);
   pqPipelineSource* src = qobject_cast<pqPipelineSource*>(item);
@@ -688,6 +688,7 @@ bool pqPipelineModel::setData(const QModelIndex &idx, const QVariant& value,
     {
     src->rename(value.toString());
     }
+  return true;
 }
 
 pqServerManagerModelItem *pqPipelineModel::getItemFor(
