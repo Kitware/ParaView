@@ -73,6 +73,13 @@ public:
     DoubleValue
   };
 
+  enum NotationType {
+    Standard,
+    Exponential,
+    Engineering,
+    StandardOrExponential
+  };
+
 public:
   /// \brief
   ///   Creates a chart value object.
@@ -166,12 +173,11 @@ public:
   /// it is shorter.
   ///
   /// \param precision The floating point precision.
-  /// \param notation The notation used to represent the value
-  ///     choices are 'e' for exponential, 'f' for floating point, and 'n' for engineering
+  /// \param notation The notation used to represent the value.
   /// \return
   ///   A string representation of the value.
-  //QString getString(int precision=2) const;
-  QString getString(int precision=2, char notation=0) const;
+  QString getString(int precision=2,
+      NotationType notation=pqChartValue::StandardOrExponential) const;
 
   /// \name Operators
   //@{

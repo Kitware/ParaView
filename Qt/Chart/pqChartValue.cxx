@@ -189,12 +189,15 @@ double pqChartValue::getDoubleValue() const
     return this->Value.Double;
 }
 
-QString pqChartValue::getString(int precision, char notation) const
+QString pqChartValue::getString(int precision,
+    pqChartValue::NotationType notation) const
 {
   QString result;
   int exponent = 0;
   if(this->Type == IntValue)
+    {
     result.setNum(this->Value.Int);
+    }
   else
     {
     QString result2;
@@ -202,24 +205,18 @@ QString pqChartValue::getString(int precision, char notation) const
       {
       result.setNum(this->Value.Float, 'f', precision);
       result2.setNum(this->Value.Float, 'e', precision);
-      exponent = result2.mid(result2.lastIndexOf("e")+1,result2.length()-1).toInt();
       }
     else
       {
       result.setNum(this->Value.Double, 'f', precision);
       result2.setNum(this->Value.Double, 'e', precision);
-      exponent = result2.mid(result2.lastIndexOf("e")+1,result2.length()-1).toInt();
       }
 
-// FIX: always use scientific notation for negative exponents less than a certain threshold (for now 2)
-//    if(exponent<-2 || result2.length() < result.length())
-//      result = result2;
-
-    // extract the exponent from the exponential result
+    // Extract the exponent from the exponential result.
     exponent = result2.mid(result2.indexOf('e')+1,result2.length()-1).toInt();
 
-    // check for engineering notation flag
-    if(notation=='n')
+    // Use the notation flag to determine which result to use.
+    if(notation == pqChartValue::Engineering)
       {
       int offset = exponent%3;
       if(offset<0)
@@ -253,17 +250,23 @@ QString pqChartValue::getString(int precision, char notation) const
         }
       result = result2;
       }
-    else if(notation=='e')
+    else if(notation == pqChartValue::Exponential)
       {
-      // exponential notation flag is on
+      // Use the exponential notation regardless of the length.
       result = result2;
       }
-    else if(notation!='f' && (exponent<-2 || result2.length() < result.length()))
+    else if(notation == pqChartValue::StandardOrExponential)
       {
-      // always use exponential notation for negative exponents less than a certain threshold (for now 2)
-      result = result2;
+      // Use the shorter notation in this case. If the exponent is
+      // negative, the length of the standard representation will
+      // always be shorter. In that case, always use exponential
+      // notation for negative exponents below a certain threshold (-2).
+      if(exponent < -2 || result2.length() < result.length())
+        {
+        result = result2;
+        }
       }
-    // else use floating point value (i.e. result)
+    //else if(notation == pqChartValue::Standard) use result as is.
     }
   return result;
 }

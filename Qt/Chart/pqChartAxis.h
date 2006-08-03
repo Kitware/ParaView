@@ -345,6 +345,19 @@ public:
   /// \sa pqChartValue::getString()
   int getPrecision() const {return this->Precision;}
 
+  /// \brief
+  ///   Sets the notation type for the axis labels.
+  /// \param notation The new axis notation type.
+  /// \sa pqChartValue::getString()
+  void setNotation(pqChartValue::NotationType notation);
+
+  /// \brief
+  ///   Gets the notation type for the axis labels.
+  /// \return
+  ///   The notation type for the axis labels.
+  /// \sa pqChartValue::getString()
+  pqChartValue::NotationType getNotation() const {return this->Notation;}
+
   /// Returns the (optional) axis label
   pqChartLabel& getLabel() const { return *this->Label; }
 
@@ -468,7 +481,15 @@ public:
   void setNeigbors(const pqChartAxis *atMin,
       const pqChartAxis *atMax);
 
-  /// Returns the width (for vertical axes) or height (for horizontal axes) of this axis.  Used to simplify layout for neighbors
+  /// \brief
+  ///   Gets the size needed for the axis labels.
+  ///
+  /// For a vertical axis, this method returns the the width of the
+  /// axis. For a horizontal axis, this method returns the height of
+  /// the axis. The size is used to simplify the layout of neighbors.
+  ///
+  /// \return
+  ///   The size needed for the axis labels.
   const int getLayoutThickness() const;
 
   /// \brief
@@ -539,12 +560,6 @@ public:
   /// \return
   ///   The new lighter color.
   static QColor lighter(const QColor color, float factor=0.7);
-
-  /// \brief
-  ///   Sets the axis number type.
-  /// \param scale The new axis scale type.
-  void setNotation(char notation) {this->Notation = notation;}
-  char getNotation() {return this->Notation;}
 
 signals:
   /// \brief
@@ -631,7 +646,9 @@ private:
   bool GridVisible;         ///< True if the axis grid should be drawn.
   bool ExtraMaxPadding;     ///< Used for best interval layout.
   bool ExtraMinPadding;     ///< Used for best interval layout.
-  char Notation;            ///< Stores the axis number type.
+
+  /// Stores the axis label notation type.
+  pqChartValue::NotationType Notation;
 
   static double MinLogValue; ///< Stores the log scale minimum.
 };
