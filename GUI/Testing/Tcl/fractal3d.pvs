@@ -76,6 +76,8 @@ $kw(vtkTemp926) ClearAllSelections
 $kw(vtkTemp926) SetSelectState {Fractal Volume Fraction} 1
 set kw(vtkTemp954) [$kw(vtkTemp922) GetPVWidget {Clipping}]
 $kw(vtkTemp954) SetCurrentValue {Off}
+set kw(vtkTemp990) [$kw(vtkTemp922) GetPVWidget {VolumeFractionSurfaceValue}]
+$kw(vtkTemp990) SetValue 0.499
 $kw(vtkTemp922) AcceptCallback
 # Saving state of the Display Proxy associated with the source
 set pvDisp(vtkTemp922) [$kw(vtkTemp922) GetDisplayProxy] 

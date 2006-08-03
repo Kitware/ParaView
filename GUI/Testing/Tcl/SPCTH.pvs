@@ -37,6 +37,8 @@ $kw(vtkTemp853) SetCurrentValue {On}
 set kw(vtkTemp846) [$kw(vtkTemp853) GetPVWidget {On}]
 $kw(vtkTemp846) SetCenter -1.0431e-07 2.9802e-08 1.4901e-08
 $kw(vtkTemp846) SetNormal 0 0 1
+set kw(vtkTemp850) [$kw(vtkTemp833) GetPVWidget {VolumeFractionSurfaceValue}]
+$kw(vtkTemp850) SetValue 0.499
 set kw(vtkTemp880) [$kw(vtkTemp2) GetPVColorMap {Part Index} 1]
 $kw(vtkTemp880) SetScalarBarTitle {Part Index}
 $kw(vtkTemp833) AcceptCallback

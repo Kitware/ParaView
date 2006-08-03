@@ -28,6 +28,8 @@ $kw(vtkTemp1006) SetCurrentValue {On}
 set kw(vtkTemp989) [$kw(vtkTemp1006) GetPVWidget {On}]
 $kw(vtkTemp989) SetCenter -1.75 0 0
 $kw(vtkTemp989) SetNormal 0 0 1
+set kw(vtkTemp990) [$kw(vtkTemp973) GetPVWidget {VolumeFractionSurfaceValue}]
+$kw(vtkTemp990) SetValue 0.499
 $kw(vtkTemp973) AcceptCallback
 $kw(vtkTemp19) SetCameraState 1.513 -34.657 -13.496  -1.750 0.000 -0.000  0.933 0.203 -0.296
 $kw(vtkTemp19) SetCameraState 1.513 -34.657 -13.496  -1.750 0.000 -0.000  0.933 0.203 -0.296
