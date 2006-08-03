@@ -42,7 +42,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.20");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.21");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -378,47 +378,48 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
 {
   vtkDataObject* dobj = vtkDataObject::SafeDownCast(object);
 
+  // Handle the case where the a vtkAlgorithmOutput is passed instead of
+  // the data object. vtkSMPart uses vtkAlgorithmOutput.
   if (!dobj)
     {
-    vtkErrorMacro("Could not cast object to a known data set: " << object);
+    vtkAlgorithmOutput* algOutput = vtkAlgorithmOutput::SafeDownCast(object);
+    if (algOutput && algOutput->GetProducer())
+      {
+      dobj = algOutput->GetProducer()->GetOutputDataObject(
+        algOutput->GetIndex());
+      }
+    }
+
+  if (!dobj)
+    {
+    vtkErrorMacro("Could not cast object to a known data set: " 
+                  << (object?object->GetClassName():"(null"));
     return;
     }
 
-  vtkInformation* pinfo = dobj->GetPipelineInformation();
-
-  vtkCompositeDataSet* cds = 0;
-  if (pinfo && pinfo->Has(vtkCompositeDataSet::COMPOSITE_DATA_SET()))
-    {
-    cds = vtkCompositeDataSet::SafeDownCast(
-      pinfo->Get(vtkCompositeDataSet::COMPOSITE_DATA_SET()));
-    }
-  
-  if (!cds)
-    {
-    cds = vtkCompositeDataSet::SafeDownCast(object);
-    }
-
+  vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(dobj);
   if (cds)
     {
     this->CopyFromCompositeDataSet(cds);
     return;
     }
 
-  vtkDataSet* ds = vtkDataSet::SafeDownCast(object);
+  vtkDataSet* ds = vtkDataSet::SafeDownCast(dobj);
   if (ds)
     {
     this->CopyFromDataSet(ds);
     return;
     }
 
-  vtkGenericDataSet* ads = vtkGenericDataSet::SafeDownCast(object);
+  vtkGenericDataSet* ads = vtkGenericDataSet::SafeDownCast(dobj);
   if (ads)
     {
     this->CopyFromGenericDataSet(ads);
     return;
     }
 
-  vtkErrorMacro("Could not cast object to a known data set: " << object);
+  vtkErrorMacro("Could not cast object to a known data set: " 
+                << (dobj?dobj->GetClassName():"(null"));
 }
 //----------------------------------------------------------------------------
 void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi)
