@@ -47,12 +47,12 @@ SET(PROJECT_TESTS
   EnSight
   Extrusion
   ExtractGrid
-  ExtractPart
+#  ExtractPart
   Flow
   fractal2d
   fractal3d
   Glyph
-  Group
+#  Group
   Transform
   ImageReader
   Mandelbrot
@@ -84,7 +84,7 @@ SET(PROJECT_TESTS
   TestUnstructuredGridIO
   TestRectilinearGridIO
   TestImageDataIO
-  VolumeGroup
+#  VolumeGroup
   XdmfRead
   XdmfReadImageData
   XdmfReadImageDataCollection
