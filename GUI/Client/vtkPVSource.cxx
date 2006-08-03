@@ -66,7 +66,7 @@
 #include <vtksys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.481");
+vtkCxxRevisionMacro(vtkPVSource, "1.482");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDataObjectDisplayProxy);
 vtkCxxSetObjectMacro(vtkPVSource, Lookmark, vtkPVLookmark);
@@ -1777,16 +1777,6 @@ void vtkPVSource::MarkSourcesForUpdate()
 
   this->InvalidateDataInformation();
   //this->Proxy->MarkModified(this->Proxy);
-
-  // Get rid of caches.
-  int numParts;
-  vtkSMPart *part;
-  numParts = this->GetNumberOfParts();
-  for (idx = 0; idx < numParts; ++idx)
-    {
-    part = this->GetPart(idx);
-    part->MarkForUpdate();
-    }
 
   for (idx = 0; idx < this->NumberOfPVConsumers; ++idx)
     {
