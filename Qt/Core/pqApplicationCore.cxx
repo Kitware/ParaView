@@ -165,8 +165,8 @@ void pqApplicationCore::connect(pqServerManagerObserver* pdata,
 {
   QObject::connect(pdata, SIGNAL(sourceRegistered(QString, vtkSMProxy*)),
     smModel, SLOT(onAddSource(QString, vtkSMProxy*)));
-  QObject::connect(pdata, SIGNAL(sourceUnRegistered(QString, vtkSMProxy*)),
-    smModel, SLOT(onRemoveSource(QString, vtkSMProxy*)));
+  QObject::connect(pdata, SIGNAL(sourceUnRegistered(vtkSMProxy*)),
+    smModel, SLOT(onRemoveSource(vtkSMProxy*)));
   QObject::connect(pdata, SIGNAL(connectionCreated(vtkIdType)),
     smModel, SLOT(onAddServer(vtkIdType)));
   QObject::connect(pdata, SIGNAL(connectionClosed(vtkIdType)),
