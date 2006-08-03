@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.31");
+vtkCxxRevisionMacro(vtkPVWriter, "1.32");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -156,7 +156,7 @@ int vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
   vtkProcessModule* pm = pvApp->GetProcessModule();
-  vtkClientServerID dataID = pvs->GetPart()->GetID(0);
+  vtkClientServerID portID = pvs->GetPart()->GetAlgorithmOutputID();
   int success = 1;
 
   // Create the writer and configure it.
@@ -167,7 +167,7 @@ int vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
          << writerID << "SetFileName" << fileName
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke
-         << writerID << "SetInput" << dataID
+         << writerID << "SetInputConnection" << portID
          << vtkClientServerStream::End;
   if (this->DataModeMethod)
     {
@@ -184,13 +184,15 @@ int vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
         pm->NewStreamObject("vtkCompleteArrays", stream);
 
       stream << vtkClientServerStream::Invoke
-             << ca_id << "SetInput" << dataID
+             << ca_id << "SetInputConnection" << portID
              << vtkClientServerStream::End;
       stream << vtkClientServerStream::Invoke
-             << ca_id << "GetOutput" 
+             << ca_id << "GetOutputPort" << 0
              << vtkClientServerStream::End;
       stream << vtkClientServerStream::Invoke
-             << writerID << "SetInput" << vtkClientServerStream::LastResult
+             << writerID 
+             << "SetInputConnection" 
+             << vtkClientServerStream::LastResult
              << vtkClientServerStream::End;
       pm->DeleteStreamObject(ca_id, stream);
       }

@@ -505,28 +505,7 @@ This feature is nice for debugging output.)" />
                help="Set the input to this filter."
                input_name="Input"/>
   </Module>
-  <Module name="ExtractParts"
-          menu_name="Extract Parts"
-          root_name="ExtractParts"
-          module_type="Filter"
-          button_image="PVUngroupButton"
-          button_help="Separate parts from a group."
-          button_visibility="0">
-    <Filter class="vtkSelectInputs">
-      <Input name="Input"
-             class="vtkDataSet" quantity="Multiple">
-        <GroupRequirement quantity="Multiple"/>
-      </Input>
-    </Filter>
-    <InputMenu trace_name="Input" property="Input"
-               label="Input"  hide_gui="1"
-               help="Set the input to this filter."
-               input_name="Input"/>
 
-    <ExtractPartsWidget trace_name="parts"
-                        property="InputMask"
-                        help="Choose the parts to extract."/>
-  </Module>
   <Module name="DataSetSurfaceFilter"
           menu_name="Extract Surface"
           root_name="Surface"
@@ -690,21 +669,6 @@ This feature is nice for debugging output.)" />
       <Item name="3"
             value="3"/>
     </SelectionList>
-  </Module>
-  <Module name="GroupParts"
-          menu_name="Group Parts"
-          root_name="GroupParts"
-          module_type="Filter"
-          replace_input="1"
-          button_image="PVGroupButton"
-          button_help="Group multiple modules into one."
-          button_visibility="0">
-    <Filter class="vtkGroup">
-      <Input name="Input"
-             class="vtkDataSet" quantity="Multiple"/>
-    </Filter>
-    <GroupInputsWidget trace_name="inputs" property="Input"
-                       help="Choose inputs to group."/>
   </Module>
   
   <Module name="LinearExtrusionFilter"
@@ -950,22 +914,6 @@ The mesh quality filter computes the quality of individual triangles, quadrilate
            display_entry="1"
            entry_and_label_on_top="0"
            display_value="0"/>
-  </Module>
-  <Module name="PartScalars"
-          menu_name="Part Id Scalars"
-          root_name="ColorParts"
-          module_type="Filter">
-    <Filter class="vtkColorByPart">
-      <Input name="Input"
-             class="vtkDataSet"
-             quantity="Multiple">
-        <GroupRequirement quantity="Multiple"/>
-      </Input>
-    </Filter>
-    <InputMenu trace_name="Input" property="Input"
-               label="Input"  hide_gui="1"
-               help="Set the input to this filter."
-               input_name="Input"/>
   </Module>
 
   <Module name="OctreeDepthScalars"
